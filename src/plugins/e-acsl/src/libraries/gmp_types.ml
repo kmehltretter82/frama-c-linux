@@ -63,7 +63,6 @@ module Make() = struct
         ttype = TArray(
             TNamed(!t_struct_torig_ref, []),
             Some (Cil.one ~loc:Cil_datatype.Location.unknown),
-            { scache = Not_Computed },
             []);
         treferenced = true;
       }

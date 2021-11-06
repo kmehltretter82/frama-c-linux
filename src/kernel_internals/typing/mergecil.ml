@@ -535,12 +535,12 @@ let hash_type t =
     | TFloat (fkind,_) -> 5 * acc + Hashtbl.hash fkind
     | TPtr(t,_) when depth < 5 -> aux (7*acc) (depth+1) t
     | TPtr _ -> 7 * acc
-    | TArray (t,_,_,_) when depth < 5 -> aux (9*acc) (depth+1) t
+    | TArray (t,_,_) when depth < 5 -> aux (9*acc) (depth+1) t
     | TArray _ -> 9 * acc
     | TFun (r,_,_,_) when depth < 5 -> aux (11*acc) (depth+1) r
     | TFun _ -> 11 * acc
     | TNamed (t,_) -> 13 * acc + Hashtbl.hash t.tname
-    | TComp(c,_,_) ->
+    | TComp(c,_) ->
       let mul = if c.cstruct then 17 else 19 in
       mul * acc + Hashtbl.hash c.cname
     | TEnum (e,_) -> 23 * acc + Hashtbl.hash e.ename
@@ -1033,12 +1033,12 @@ let rec combineTypes (what: combineWhat)
    * leaking types from new to old  *)
   | TInt(IInt, olda), TEnum (ei, a) -> TEnum(ei, addAttributes olda a)
 
-  | TComp (oldci, _, olda) , TComp (ci, _, a) ->
+  | TComp (oldci, olda) , TComp (ci, a) ->
     matchCompInfo oldfidx oldci fidx ci;
     (* If we get here we were successful *)
-    TComp (oldci, empty_size_cache (), addAttributes olda a)
+    TComp (oldci, addAttributes olda a)
 
-  | TArray (oldbt, oldsz, _, olda), TArray (bt, sz, _, a) ->
+  | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
     let combbt = combineTypes CombineOther oldfidx oldbt fidx bt in
     let combinesz =
       match oldsz, sz with
@@ -1049,7 +1049,7 @@ let rec combineTypes (what: combineWhat)
         if same_int64 oldsz' sz' then oldsz else
           raise (Failure "different array sizes")
     in
-    TArray (combbt, combinesz, empty_size_cache (), addAttributes olda a)
+    TArray (combbt, combinesz, addAttributes olda a)
 
   | TPtr (oldbt, olda), TPtr (bt, a) ->
     TPtr (combineTypes CombineOther oldfidx oldbt fidx bt,
@@ -1453,8 +1453,8 @@ let rec update_type_repr t =
       PlainMerging.add_eq_table tEq (oldnode.nfidx, n) renamed_node;
     end;
     TNamed(node.ndata,attrs)
-  | TComp (ci,_,attrs) ->
-    TComp (update_compinfo ci, {scache = Not_Computed}, attrs)
+  | TComp (ci,attrs) ->
+    TComp (update_compinfo ci, attrs)
   | _ -> t
 
 let static_var_visitor = object
@@ -1815,7 +1815,7 @@ let oneFilePass1 (f:file) : unit =
         else begin (* Go inside and clean the referenced flag for the
                     * declared tags *)
           match t.ttype with
-            TComp (ci, _, _ ) ->
+            TComp (ci, _ ) ->
             ci.creferenced <- false;
             (* Create a node for it *)
             ignore
@@ -2073,7 +2073,7 @@ class renameVisitorClass =
      * is not a root. *)
     method! vtype (t: typ) =
       match t with
-        TComp (ci, _, a) when not ci.creferenced -> begin
+        TComp (ci, a) when not ci.creferenced -> begin
           match PlainMerging.findReplacement true sEq !currentFidx ci.cname with
             None ->
             Kernel.debug ~dkey:Kernel.dkey_linker "No renaming needed %s(%d)"
@@ -2083,11 +2083,9 @@ class renameVisitorClass =
             Kernel.debug ~dkey:Kernel.dkey_linker
               "Renaming use of %s(%d) to %s(%d)"
               ci.cname !currentFidx ci'.cname oldfidx;
-            ChangeTo (TComp (ci',
-                             empty_size_cache (),
-                             visitCilAttributes (self :> cilVisitor) a))
+            ChangeTo (TComp (ci', visitCilAttributes (self :> cilVisitor) a))
         end
-      | TComp(ci,_,_) ->
+      | TComp(ci,_) ->
         Kernel.debug ~dkey:Kernel.dkey_linker
           "%s(%d) referenced. No change" ci.cname !currentFidx;
         DoChildren

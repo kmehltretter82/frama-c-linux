@@ -101,14 +101,14 @@ let mk_composite_type choice cstruct res1 anon1 res2 anon2 res3 anon3 =
   let offsets =
     lift_offset cstruct res1 anon1 field1 res2 anon2 field2 res3 anon3 field3
   in
-  let mytype = TComp (info, { scache = Not_Computed }, []) in
+  let mytype = TComp (info, []) in
   let structs = info :: res1.structs @ res2.structs @ res3.structs in
   { designator; mytype; structs; offsets }
 
 let rec mk_offset { cfields } =
   let field = List.hd cfields in
   let offset =
-    match field.ftype with TComp(comp,_,_) -> mk_offset comp | _ -> NoOffset
+    match field.ftype with TComp(comp,_) -> mk_offset comp | _ -> NoOffset
   in
   Field (field, offset)
 
@@ -139,7 +139,7 @@ let generate_failure_file =
     let fmt = Format.formatter_of_out_channel out in
     let typ = List.hd types in
     let x =
-      Cil.makeGlobalVar "x" (TComp (typ, { scache = Not_Computed }, []))
+      Cil.makeGlobalVar "x" (TComp (typ, []))
     in
     let lvx = Var x, offset in
     let typ = Cil.typeOfLval lvx in

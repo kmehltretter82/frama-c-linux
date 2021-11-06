@@ -126,16 +126,16 @@ and pp_typ fmt = function
   | TInt(ikind,attributes) -> Format.fprintf fmt "TInt(%a,%a)"  pp_ikind ikind  pp_attributes attributes
   | TFloat(fkind,attributes) -> Format.fprintf fmt "TFloat(%a,%a)"  pp_fkind fkind  pp_attributes attributes
   | TPtr(typ,attributes) -> Format.fprintf fmt "TPtr(%a,%a)"  pp_typ typ  pp_attributes attributes
-  | TArray(typ,exp_option,bitsSizeofTypCache,attributes) ->
-    Format.fprintf fmt "TArray(%a,%a,%a,%a)"  pp_typ typ  (pp_option pp_exp) exp_option
-      pp_bitsSizeofTypCache bitsSizeofTypCache  pp_attributes attributes
+  | TArray(typ,exp_option,attributes) ->
+    Format.fprintf fmt "TArray(%a,%a,%a)"  pp_typ typ  (pp_option pp_exp) exp_option
+      pp_attributes attributes
   | TFun(typ,string_typ_attributes_tuple_list_option,bool,attributes) ->
     Format.fprintf fmt "TFun(%a,%a,%a,%a)"  pp_typ typ
       (pp_option (pp_list (pp_tuple3 pp_string pp_typ pp_attributes))) string_typ_attributes_tuple_list_option
       pp_bool bool  pp_attributes attributes
   | TNamed(typeinfo,attributes) ->
     Format.fprintf fmt "TNamed(%a,%a)"  pp_typeinfo typeinfo  pp_attributes attributes
-  | TComp(compinfo,bitsSizeofTypCache,attributes) -> Format.fprintf fmt "TComp(%a,%a,%a)"  pp_compinfo compinfo  pp_bitsSizeofTypCache bitsSizeofTypCache  pp_attributes attributes
+  | TComp(compinfo,attributes) -> Format.fprintf fmt "TComp(%a,%a)"  pp_compinfo compinfo  pp_attributes attributes
   | TEnum(enuminfo,attributes) -> Format.fprintf fmt "TEnum(%a,%a)"  pp_enuminfo enuminfo  pp_attributes attributes
   | TBuiltin_va_list(attributes) -> Format.fprintf fmt "TBuiltin_va_list(%a)"  pp_attributes attributes
 
@@ -157,14 +157,6 @@ and pp_fkind fmt = function
   | FFloat -> Format.fprintf fmt "FFloat"
   | FDouble -> Format.fprintf fmt "FDouble"
   | FLongDouble -> Format.fprintf fmt "FLongDouble"
-
-and pp_bitsSizeofTyp fmt = function
-  | Not_Computed -> Format.fprintf fmt "Not_Computed"
-  | Computed(int) -> Format.fprintf fmt "Computed(%a)"  pp_int int
-  | Not_Computable(string,typ) -> Format.fprintf fmt "Not_Computable(%a,%a)"  pp_string string  pp_typ typ
-
-and pp_bitsSizeofTypCache fmt bitsSizeofTypCache = Format.fprintf fmt "{scache=%a}"
-    pp_bitsSizeofTyp bitsSizeofTypCache.scache
 
 and pp_attribute fmt = function
   | Attr(string,attrparam_list) ->

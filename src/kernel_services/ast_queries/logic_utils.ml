@@ -96,7 +96,7 @@ let logicCType t =
 
 let plain_array_to_ptr ty =
   match unroll_type ty with
-  | Ctype(TArray(ty,lo,_,attr) as tarr) ->
+  | Ctype(TArray(ty,lo,attr) as tarr) ->
     let length_attr =
       match lo with
       | None -> []
@@ -2649,7 +2649,7 @@ let const_fold_trange_bounds typ b e =
     | Some te -> extract (constFoldTermToInt te)
     | None ->
       match Cil.unrollType typ with
-      | TArray (_, Some size, _, _) ->
+      | TArray (_, Some size, _) ->
         Integer.pred (extract (Cil.isInteger size))
       | _ -> raise CannotSimplify
   in

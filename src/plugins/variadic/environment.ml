@@ -84,9 +84,9 @@ let find_type (env : t) (namespace : Logic_typing.type_namespace)
   | Logic_typing.Typedef ->
     TNamed (find_typedef env tname, [])
   | Logic_typing.Struct ->
-    TComp (find_struct env tname, {scache=Not_Computed}, [])
+    TComp (find_struct env tname, [])
   | Logic_typing.Union ->
-    TComp (find_union env tname, {scache=Not_Computed}, [])
+    TComp (find_union env tname, [])
   | Logic_typing.Enum ->
     TEnum (find_enum env tname, [])
 

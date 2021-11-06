@@ -2652,7 +2652,7 @@ module Int_Intervals = struct
       match typ with
       | Some t -> t
       | None ->
-        Cil_types.(TArray (TInt(IUChar,[]), None, Cil.empty_size_cache (), []))
+        Cil_types.(TArray (TInt(IUChar,[]), None, []))
     in
     match i with
     | Top -> Format.pp_print_string fmt "[..]"

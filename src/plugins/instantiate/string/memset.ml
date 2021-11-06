@@ -44,14 +44,14 @@ end
 let rec any_char_composed_type t =
   match t with
   | t when Cil.isAnyCharType t -> true
-  | TArray(t, _, _, _) -> any_char_composed_type t
+  | TArray(t, _, _) -> any_char_composed_type t
   | _ -> false
 
 let rec base_char_type t =
   assert (any_char_composed_type t) ;
   match t with
   | t when Cil.isAnyCharType t -> t
-  | TArray(t, _, _, _) -> base_char_type t
+  | TArray(t, _, _) -> base_char_type t
   | _ -> assert false
 
 
@@ -186,11 +186,11 @@ let memset_value e =
 
 let rec contains_union_type t =
   match Cil.unrollType t with
-  | TComp({ cstruct = false }, _, _) ->
+  | TComp({ cstruct = false }, _) ->
     true
-  | TComp({ cfields = Some fields }, _, _) ->
+  | TComp({ cfields = Some fields }, _) ->
     List.exists contains_union_type (List.map (fun f -> f.ftype) fields)
-  | TArray(t, _, _, _) ->
+  | TArray(t, _, _) ->
     contains_union_type t
   | _ -> false
 

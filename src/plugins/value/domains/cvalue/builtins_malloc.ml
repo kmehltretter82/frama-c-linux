@@ -234,22 +234,22 @@ let guess_intended_malloc_type stack sizev constant_size =
 let type_from_nb_elems tsize =
   let typ = tsize.elem_typ in
   match tsize.nb_elems with
-  | None -> TArray (typ, None, Cil.empty_size_cache (), [])
+  | None -> TArray (typ, None, [])
   | Some nb ->
     if Int.equal Int.one nb
     then typ
     else
       let loc = Cil.CurrentLoc.get () in
       let esize_arr = Cil.kinteger64 ~loc nb in (* [nb] fits in size_t *)
-      TArray (typ, Some esize_arr, Cil.empty_size_cache (), [])
+      TArray (typ, Some esize_arr, [])
 
 (* Generalize a type into an array type without size. Useful for variables
    whose size is mutated. *)
 let weaken_type typ =
   match Cil.unrollType typ with
-  | TArray (_, None, _, _) -> typ
-  | TArray (typ, Some _, _, _) | typ ->
-    TArray (typ, None, Cil.empty_size_cache (), [])
+  | TArray (_, None, _) -> typ
+  | TArray (typ, Some _, _) | typ ->
+    TArray (typ, None, [])
 
 (* size for which the base is certain to be valid *)
 let size_sure_valid b = match Base.validity b with
@@ -381,7 +381,7 @@ let string_of_region = function
 let create_weakest_base region =
   let stack = [ fst (Globals.entry_point ()), Kglobal ] in
   let type_base =
-    TArray (Cil.charType, None, Cil.empty_size_cache (), [])
+    TArray (Cil.charType, None, [])
   in
   let var = create_new_var stack "alloc" type_base Weak in
   Value_parameters.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true

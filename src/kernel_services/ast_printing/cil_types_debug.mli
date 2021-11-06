@@ -74,9 +74,6 @@ val pp_global : Format.formatter -> Cil_types.global -> unit
 val pp_typ : Cil_types.typ Pretty_utils.formatter
 val pp_ikind : Format.formatter -> Cil_types.ikind -> unit
 val pp_fkind : Format.formatter -> Cil_types.fkind -> unit
-val pp_bitsSizeofTyp : Format.formatter -> Cil_types.bitsSizeofTyp -> unit
-val pp_bitsSizeofTypCache :
-  Format.formatter -> Cil_types.bitsSizeofTypCache -> unit
 val pp_attribute : Cil_types.attribute Pretty_utils.formatter
 val pp_attributes : Format.formatter -> Cil_types.attributes -> unit
 val pp_attrparam : Cil_types.attrparam Pretty_utils.formatter

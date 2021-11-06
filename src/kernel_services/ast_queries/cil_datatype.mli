@@ -246,6 +246,8 @@ module TypByName: S_with_collections_pretty with type t = typ
 *)
 module TypNoUnroll: S_with_collections_pretty with type t = typ
 
+(** Types, with comparison over struct done by key and ignoring attributes. *)
+module TypNoAttrs: S_with_collections_pretty with type t = typ
 
 module Typeinfo: S_with_collections with type t = typeinfo
 

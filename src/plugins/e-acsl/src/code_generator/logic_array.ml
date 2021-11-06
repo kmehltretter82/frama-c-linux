@@ -41,7 +41,7 @@ let length_exp ~loc kf env ~name array =
   let elem_typ, array_len =
     match Logic_aggr.get_array_typ_opt (Cil.typeOf array) with
     | None -> Options.fatal "Trying to retrieve the length of a non-array"
-    | Some (t, len, _, _) -> t, len
+    | Some (t, len, _) -> t, len
   in
   try
     let len = Cil.lenOfArray64 array_len in

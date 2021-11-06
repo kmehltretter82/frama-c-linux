@@ -1180,14 +1180,14 @@ struct
     | TInt _ | TFloat _ | TVoid _ | TEnum _ | TNamed _ | TBuiltin_va_list _
       -> F.p_true
     | TPtr _ | TFun _ -> phi v
-    | TComp({ cfields = None },_,_) ->
+    | TComp({ cfields = None },_) ->
         F.p_true
-    | TComp({ cfields = Some fields },_,_) ->
+    | TComp({ cfields = Some fields },_) ->
         F.p_all
           (fun fd ->
              forall_pointers phi (e_getfield v (Cfield (fd, KValue))) fd.ftype)
           fields
-    | TArray(elt,_,_,_) ->
+    | TArray(elt,_,_) ->
         let k = Lang.freshvar Qed.Logic.Int in
         F.p_forall [k] (forall_pointers phi (e_get v (e_var k)) elt)
 

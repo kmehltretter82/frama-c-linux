@@ -38,7 +38,7 @@ class tags_visitor = object
         Kernel.warning ~current:true ~once:true
           "anonymous enum in Frama-C stdlib";
         ()
-      | TComp (ci, _, _) when ci.corig_name = "" && !in_stdlib ->
+      | TComp (ci, _) when ci.corig_name = "" && !in_stdlib ->
         Kernel.warning ~current:true ~once:true
           "anonymous %s in Frama-C stdlib"
           (if ci.cstruct then "struct" else "union")

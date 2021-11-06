@@ -94,7 +94,7 @@ class visitor = object(self)
   method private ghost_incompatible nt ot =
     match (unrollType nt), (unrollType ot) with
     | TPtr (nt', _), TPtr(ot', _)
-    | TPtr (nt', _), TArray(ot', _, _, _) ->
+    | TPtr (nt', _), TArray(ot', _, _) ->
       Cil.isGhostType nt' <> Cil.isGhostType ot' ||
       self#ghost_incompatible nt' ot'
     | _ ->

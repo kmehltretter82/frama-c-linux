@@ -569,7 +569,7 @@ let memo_aux_variable tr counter used_prms vi =
     let my_type =
       match counter with
       | None -> vi.vtype
-      | Some _ -> TArray(vi.vtype,None,{scache=Not_Computed},[])
+      | Some _ -> TArray(vi.vtype,None,[])
     in
     let my_var =
       Cil.makeGlobalVar (get_fresh ("aorai_" ^ vi.vname)) my_type
@@ -1152,7 +1152,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
       (* TODO: makes it an integer *)
       let counter =
         let ty = if needs_pebble then
-            Cil_types.TArray (Cil.intType,None,{scache=Not_Computed},[])
+            Cil_types.TArray (Cil.intType,None,[])
           else Cil.intType
         in (* We won't always need a counter *)
         lazy (

@@ -439,16 +439,16 @@ let memset_typ_offsm_int full_typ i =
           (* Do not produce NaN or infinites here (unless they are accepted
              by the engine). *)
           if Fval.is_finite f = True then update size v' else update size v
-        | TComp ({ cstruct = true ; cfields = l}, _, _) -> (* struct *)
+        | TComp ({ cstruct = true ; cfields = l}, _) -> (* struct *)
           let aux_field offsm fi =
             let offset_fi = Int.of_int (fst (Cil.fieldBitsOffset fi)) in
             aux fi.ftype (Int.add offset offset_fi) offsm
           in
           List.fold_left aux_field offsm (Option.value ~default:[] l)
-        | TComp ({ cstruct = false ; cfields = l}, _, _) -> (* union *)
+        | TComp ({ cstruct = false ; cfields = l}, _) -> (* union *)
           (* Use only the first field. This is somewhat arbitrary *)
           aux (List.hd (Option.get l)).ftype offset offsm
-        | TArray (typelt, nb, _, _) -> begin
+        | TArray (typelt, nb, _) -> begin
             let nb = Cil.lenOfArray64 nb in (* always succeeds, we computed the
                                                size of the entire type earlier *)
             if Integer.(gt nb zero) then begin

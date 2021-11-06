@@ -1672,7 +1672,7 @@ and eval_toffset ~alarm_mode env typ toffset =
       empty = false; }
   | TIndex (idx, remaining) ->
     let typ_e, size = match Cil.unrollType typ with
-      | TArray (t, size, _, _) -> t, size
+      | TArray (t, size, _) -> t, size
       | _ -> ast_error "index on a non-array"
     in
     let idx = constraint_trange idx size in

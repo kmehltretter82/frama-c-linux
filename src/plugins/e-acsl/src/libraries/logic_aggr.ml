@@ -36,7 +36,7 @@ let rec get_array_typ_opt ty =
   else
     match ty with
     | TNamed (r, _) -> get_array_typ_opt r.ttype
-    | TArray (t, eo, bsot, a) -> Some (t, eo, bsot, a)
+    | TArray (t, eo, a) -> Some (t, eo, a)
     | _ -> None
 
 (** @return true iff the type is an array *)

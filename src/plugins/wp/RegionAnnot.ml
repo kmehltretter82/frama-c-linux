@@ -254,7 +254,7 @@ let isIndexType t =
 
 let getCompoundType env ~loc typ =
   match Cil.unrollType typ with
-  | TComp(comp,_,_) -> comp
+  | TComp(comp,_) -> comp
   | _ -> error env ~loc "Expected compound type for term"
 
 (* -------------------------------------------------------------------------- *)

@@ -62,7 +62,7 @@ class collect_visitor = object (self)
         debug "add used enum %s@." ei.ename;
         Hashtbl.add used_enuminfo ei.ename (); DoChildren
       end
-    | TComp(ci,_,_) ->
+    | TComp(ci,_) ->
       if Hashtbl.mem used_compinfo ci.cname then SkipChildren
       else begin
         debug "add used comp %s@." ci.cname;

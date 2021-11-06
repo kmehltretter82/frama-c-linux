@@ -200,7 +200,7 @@ and typ =
       {!Cil.charPtrType}, {!Cil.charConstPtrType} (pointer to a constant
       character), {!Cil.voidPtrType}, {!Cil.intPtrType} *)
 
-  | TArray of typ * exp option * bitsSizeofTypCache * attributes
+  | TArray of typ * exp option * attributes
   (** Array type. It indicates the base type and the array length. *)
 
   | TFun of typ * (string * typ * attributes) list option * bool * attributes
@@ -224,7 +224,7 @@ and typ =
       attributes are in addition to those given when the type name was
       defined. *)
 
-  | TComp of compinfo * bitsSizeofTypCache * attributes
+  | TComp of compinfo * attributes
   (** A reference to a struct or a union type. All references to the
       same struct or union must share the same compinfo among them and
       with a [GCompTag] global that precedes all uses (except maybe
@@ -264,14 +264,6 @@ and fkind =
     FFloat      (** [float] *)
   | FDouble     (** [double] *)
   | FLongDouble (** [long double] *)
-
-(** This is used to cache the computation of the size of types in bits. *)
-and bitsSizeofTyp =
-  | Not_Computed
-  | Computed of int
-  | Not_Computable of (string * typ) (** Explanation of the error *)
-
-and bitsSizeofTypCache = { mutable scache : bitsSizeofTyp}
 
 (* ************************************************************************* *)
 (** {2 Attributes} *)

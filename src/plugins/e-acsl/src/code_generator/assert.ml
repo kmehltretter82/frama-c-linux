@@ -146,8 +146,8 @@ let do_register_data ~loc kf env { data_ptr } name e =
       | TPtr _ -> "ptr", [ e ]
       | TArray _ -> "array", [ e ]
       | TFun _ -> "fun", []
-      | TComp ({ cstruct = true }, _, _) -> "struct", []
-      | TComp ({ cstruct = false }, _, _) -> "union", []
+      | TComp ({ cstruct = true }, _) -> "struct", []
+      | TComp ({ cstruct = false }, _) -> "union", []
       | TEnum ({ ekind }, _) -> ikind_to_string ekind, [ Cil.one ~loc; e ]
       | TVoid _
       | TBuiltin_va_list _ -> "other", []

@@ -1446,7 +1446,7 @@ class reorder_ast: Visitor.frama_c_visitor =
                     recursive definition of type %s"
                    ty.tname)
              typedefs
-       | TComp(ci,_,_) ->
+       | TComp(ci,_) ->
          if not (Compinfo.Set.mem ci known_compinfo) then begin
            self#add_needed_decl (GCompTagDecl (ci,Location.unknown));
            self#add_known_compinfo ci

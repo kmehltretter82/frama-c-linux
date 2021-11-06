@@ -712,10 +712,10 @@ class cil_printer () = object (self)
     self#varname fmt v.vname
 
   method private no_ghost_at_first_level = function
-    | TArray(t, e, b, a) ->
+    | TArray(t, e, a) ->
       let t = Cil.typeRemoveAttributes [ "ghost" ] t in
       let a = Cil.dropAttribute "ghost" a in
-      TArray (t, e, b, a)
+      TArray (t, e, a)
     | t -> Cil.typeRemoveAttributes [ "ghost" ] t
 
   (* variable declaration *)
@@ -727,7 +727,7 @@ class cil_printer () = object (self)
       if v.vformal && not state.print_cil_as_is then begin
         match v.vtype with
         | TPtr(t,a) when Cil.hasAttribute "arraylen" a ->
-          { v with vtype = TArray(t, None, { scache = Not_Computed }, a)}
+          { v with vtype = TArray(t, None, a)}
         | _ -> v
       end
       else v
@@ -1963,7 +1963,7 @@ class cil_printer () = object (self)
     | TFloat(fkind, a) ->
       fprintf fmt "%a%a%a" self#fkind fkind self#attributes a pname true
 
-    | TComp (comp, _, a) -> (* A reference to a struct *)
+    | TComp (comp, a) -> (* A reference to a struct *)
       fprintf fmt
         "%a %a%a%a"
         self#pp_keyword (if comp.cstruct then "struct" else "union")
@@ -2009,7 +2009,7 @@ class cil_printer () = object (self)
       in
       self#typ (Some name'') fmt bt'
 
-    | TArray (elemt, lo, _, a) ->
+    | TArray (elemt, lo, a) ->
       let atts_elem, a = Cil.splitArrayAttributes a in
       let size_info,a =
         List.partition

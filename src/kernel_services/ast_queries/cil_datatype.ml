@@ -440,7 +440,8 @@ let compare_exp_struct_eq = Extlib.mk_fun "compare_exp_struct_eq"
 type type_compare_config =
   { by_name : bool;
     logic_type: bool;
-    unroll: bool }
+    unroll: bool;
+    no_attrs:bool; }
 
 let rec compare_attribute config a1 a2 = match a1, a2 with
   | Attr (s1, l1), Attr (s2, l2) ->
@@ -449,10 +450,12 @@ let rec compare_attribute config a1 a2 = match a1, a2 with
   | Attr _, AttrAnnot _ -> -1
   | AttrAnnot _, Attr _ -> 1
 and compare_attributes config  l1 l2 =
-  let l1, l2 = if config.logic_type
-    then !drop_non_logic_attributes l1, !drop_non_logic_attributes l2
-    else l1,l2
-  in compare_list (compare_attribute config) l1 l2
+  if config.no_attrs then 0
+  else
+    let l1, l2 = if config.logic_type
+      then !drop_non_logic_attributes l1, !drop_non_logic_attributes l2
+      else l1,l2
+    in compare_list (compare_attribute config) l1 l2
 and compare_attrparam_list config l1 l2 =
   compare_list (compare_attrparam config) l1 l2
 and compare_attrparam config a1 a2 = match a1, a2 with
@@ -520,7 +523,7 @@ and compare_type config t1 t2 =
       compare_chain
         (compare_type config) t1 t2
         (compare_attributes config) l1 l2
-    | TArray (t1', e1, _, l1), TArray (t2', e2, _, l2) ->
+    | TArray (t1', e1, l1), TArray (t2', e2, l2) ->
       compare_chain compare_array_sizes e1 e2
         (compare_chain
            (compare_type config) t1' t2'
@@ -534,7 +537,7 @@ and compare_type config t1 t2 =
       assert (not config.unroll);
       compare_chain (=?=) t1.tname t2.tname
         (compare_attributes config) a1 a2
-    | TComp (c1, _, l1), TComp (c2, _, l2) ->
+    | TComp (c1, l1), TComp (c2, l2) ->
       let res =
         if config.by_name
         then (=?=) c1.cname c2.cname
@@ -576,14 +579,14 @@ let rec hash_type config t =
   | TFloat (f, l) -> Hashtbl.hash (f, 3, hash_attributes config l)
   | TPtr (t, l) ->
     Hashtbl.hash (hash_type config t, 4, hash_attributes config l)
-  | TArray (t, _, _, l) ->
+  | TArray (t, _, l) ->
     Hashtbl.hash (hash_type config t, 5, hash_attributes config l)
   | TFun (r, a, v, l) ->
     Hashtbl.hash
       (hash_type config r, 6, hash_args config a, v, hash_attributes config l)
   | TNamed (ti, l) ->
     Hashtbl.hash (ti.tname, 7, hash_attributes config l)
-  | TComp (c, _, l) ->
+  | TComp (c, l) ->
     Hashtbl.hash
       ((if config.by_name then Hashtbl.hash c.cname else c.ckey), 8,
        hash_attributes config l)
@@ -602,7 +605,9 @@ module Attribute=struct
   include Make_with_collections
       (struct
         type t = attribute
-        let config = { by_name = false; logic_type = false; unroll = true }
+        let config =
+          { by_name = false; logic_type = false;
+            unroll = true; no_attrs = false }
         let name = "Attribute"
         let reprs = [ AttrAnnot "" ]
         let compare = compare_attribute config
@@ -644,7 +649,9 @@ module Typ= struct
   include
     MakeTyp
       (struct
-        let config = { by_name = false; logic_type = false; unroll = true; }
+        let config =
+          { by_name = false; logic_type = false;
+            unroll = true; no_attrs = false}
         let name = "Typ"
       end)
   let toplevel_attr = function
@@ -653,8 +660,8 @@ module Typ= struct
     | TFloat (_, a) -> a
     | TNamed (_, a) -> a
     | TPtr (_, a) -> a
-    | TArray (_, _, _,a) -> a
-    | TComp (_, _, a) -> a
+    | TArray (_, _,a) -> a
+    | TComp (_, a) -> a
     | TEnum (_, a) -> a
     | TFun (_, _, _, a) -> a
     | TBuiltin_va_list a -> a
@@ -663,15 +670,26 @@ end
 module TypByName =
   MakeTyp
     (struct
-      let config = { by_name = true; logic_type = false; unroll = false; }
+      let config = { by_name = true; logic_type = false;
+                     unroll = false; no_attrs = false }
       let name = "TypByName"
     end)
 
 module TypNoUnroll =
   MakeTyp
     (struct
-      let config = { by_name = false; logic_type = false; unroll = false; }
+      let config = { by_name = false; logic_type = false;
+                     unroll = false; no_attrs = false }
       let name = "TypNoUnroll"
+    end)
+
+module TypNoAttrs =
+  MakeTyp
+    (struct
+      let config =
+        { by_name = false; logic_type = false;
+          unroll = true; no_attrs = true}
+      let name = "TypNoAttrs"
     end)
 
 module Typeinfo =
@@ -1472,7 +1490,8 @@ module Logic_info_structural = struct
           in
           if name_cmp <> 0 then name_cmp else begin
             let config =
-              { by_name = true ; logic_type = true ; unroll = true }
+              { by_name = true ; logic_type = true ;
+                unroll = true ; no_attrs = false }
             in
             let prm_cmp p1 p2 =
               compare_logic_type config p1.lv_type p2.lv_type
@@ -1514,7 +1533,8 @@ end
 module Logic_type =
   Make_Logic_type(
   struct
-    let config = { by_name = false; logic_type = true; unroll = true }
+    let config = { by_name = false; logic_type = true;
+                   unroll = true; no_attrs = false }
     let name = "Logic_type"
   end)
 
@@ -1522,14 +1542,16 @@ module Logic_type_ByName =
   Make_Logic_type(
   struct
     let name = "Logic_type_ByName"
-    let config = { by_name = true; logic_type = true; unroll = false }
+    let config = { by_name = true; logic_type = true;
+                   unroll = false; no_attrs = false }
   end)
 
 module Logic_type_NoUnroll =
   Make_Logic_type(
   struct
     let name = "Logic_type_NoUnroll"
-    let config = { by_name = false; logic_type = false; unroll = false }
+    let config = { by_name = false; logic_type = false;
+                   unroll = false; no_attrs = false }
   end)
 
 module Model_info = struct

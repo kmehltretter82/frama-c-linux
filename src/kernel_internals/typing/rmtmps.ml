@@ -450,7 +450,7 @@ class markReachableVisitor
          self#visitAttrs attrs;
          self#mark_enum e
 
-       | TComp(c, _, attrs) ->
+       | TComp(c, attrs) ->
          let old = is_reachable reachable_tbl (Comp c) in
          if not old then
            begin
@@ -481,7 +481,7 @@ class markReachableVisitor
        | TVoid a | TInt (_,a) | TFloat (_,a) | TBuiltin_va_list a ->
          self#visitAttrs a
        | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
-       | TArray(ty,sz, _, a) ->
+       | TArray(ty,sz, a) ->
          ignore (self#vtype ty); self#visitAttrs a;
          Option.iter (ignore $ (visitCilExpr (self:>cilVisitor))) sz
        | TFun (ty, args,_,a) ->
@@ -625,7 +625,7 @@ class markReferencedVisitor = object
         ti.treferenced <- true;
       end;
       DoChildren
-    | TComp (ci, _, _) ->
+    | TComp (ci, _) ->
       if not (Stack.is_empty inside_typ) then begin
         Kernel.debug ~current:true ~dkey "referenced: comp %s" ci.cname;
         ci.creferenced <- true;
