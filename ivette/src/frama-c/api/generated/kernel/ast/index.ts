@@ -458,6 +458,11 @@ const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
 /** AST Functions */
 export const functions: State.Array<Json.key<'#functions'>,functionsData> = functions_internal;
 
+/** Updated AST informations */
+export const getInformationsUpdate: Server.Signal = {
+  name: 'kernel.ast.getInformationsUpdate',
+};
+
 const getInformations_internal: Server.GetRequest<
   marker |
   undefined,
@@ -473,7 +478,7 @@ const getInformations_internal: Server.GetRequest<
               title: Json.jFail(Json.jString,'String expected'),
               descr: jTextSafe,
             })),
-  signals: [],
+  signals: [ { name: 'kernel.ast.getInformationsUpdate' } ],
 };
 /** Get available informations about markers. When no marker is given, returns all kinds of informations (with empty `descr` field). */
 export const getInformations: Server.GetRequest<
