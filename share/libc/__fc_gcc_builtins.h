@@ -264,73 +264,73 @@ int __builtin_popcountll (unsigned long long x);
   requires validity: \valid_read(mem);
   assigns \result \from *mem, indirect:model;
 */
-__INT8_T __atomic_load_1(__INT8_T* mem, int model);
+__UINT8_T __atomic_load_1(__UINT8_T* mem, int model);
 
 /*@
   requires validity: \valid_read(mem);
   assigns \result \from *mem, indirect: model;
 */
-__INT16_T __atomic_load_2(__INT16_T* mem, int model);
+__UINT16_T __atomic_load_2(__UINT16_T* mem, int model);
 
 /*@
   requires validity: \valid_read(mem);
   assigns \result \from *mem, indirect:model;
 */
-__INT32_T __atomic_load_4(__INT32_T* mem, int model);
+__UINT32_T __atomic_load_4(__UINT32_T* mem, int model);
 
 /*@
   requires validity: \valid_read(mem);
   assigns \result \from *mem, indirect:model;
 */
-__INT64_T __atomic_load_8(__INT64_T* mem, int model);
+__UINT64_T __atomic_load_8(__UINT64_T* mem, int model);
 
 /*@
   requires validity: \valid(mem);
   assigns *mem \from val, indirect: model;
 */
-void __atomic_store_1(__INT8_T* mem, __INT8_T val, int model);
+void __atomic_store_1(__UINT8_T* mem, __UINT8_T val, int model);
 
 /*@
   requires validity: \valid(mem);
   assigns *mem \from val, indirect: model;
 */
-void __atomic_store_2(__INT16_T* mem, __INT16_T val, int model);
+void __atomic_store_2(__UINT16_T* mem, __UINT16_T val, int model);
 
 /*@
   requires validity: \valid(mem);
   assigns *mem \from val, indirect: model;
 */
-void __atomic_store_4(__INT32_T* mem, __INT32_T val, int model);
+void __atomic_store_4(__UINT32_T* mem, __UINT32_T val, int model);
 
 /*@
   requires validity: \valid(mem);
   assigns *mem \from val, indirect: model;
 */
-void __atomic_store_8(__INT64_T* mem, __INT64_T val, int model);
+void __atomic_store_8(__UINT64_T* mem, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(mem);
     assigns *mem \from val, indirect:model;
     assigns \result \from *mem, indirect:model;
  */
-__INT8_T __atomic_exchange_1(__INT8_T* mem, __INT8_T val, int model);
+__UINT8_T __atomic_exchange_1(__UINT8_T* mem, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(mem);
     assigns *mem \from val, indirect:model;
     assigns \result \from *mem, indirect:model;
  */
-__INT16_T __atomic_exchange_2(__INT16_T* mem, __INT16_T val, int model);
+__UINT16_T __atomic_exchange_2(__UINT16_T* mem, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(mem);
     assigns *mem \from val, indirect:model;
     assigns \result \from *mem, indirect:model;
  */
-__INT32_T __atomic_exchange_4(__INT32_T* mem, __INT32_T val, int model);
+__UINT32_T __atomic_exchange_4(__UINT32_T* mem, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(mem);
     assigns *mem \from val, indirect:model;
     assigns \result \from *mem, indirect:model;
  */
-__INT64_T __atomic_exchange_8(__INT64_T* mem, __INT64_T val, int model);
+__UINT64_T __atomic_exchange_8(__UINT64_T* mem, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(mem) && \valid_read(expected);
   assigns *mem \from *mem, indirect: *expected, desired,
@@ -340,9 +340,9 @@ __INT64_T __atomic_exchange_8(__INT64_T* mem, __INT64_T val, int model);
   assigns \result \from indirect: *mem, indirect: *expected;
 */
 _Bool __atomic_compare_exchange_1(
-  __INT8_T* mem,
-  __INT8_T* expected,
-  __INT8_T desired,
+  __UINT8_T* mem,
+  __UINT8_T* expected,
+  __UINT8_T desired,
   _Bool weak, int success_model, int failure_model);
 
 /*@ requires validity: \valid(mem) && \valid_read(expected);
@@ -353,9 +353,9 @@ _Bool __atomic_compare_exchange_1(
   assigns \result \from indirect: *mem, indirect: *expected;
 */
 _Bool __atomic_compare_exchange_2(
-  __INT16_T* mem,
-  __INT16_T* expected,
-  __INT16_T desired,
+  __UINT16_T* mem,
+  __UINT16_T* expected,
+  __UINT16_T desired,
   _Bool weak, int success_model, int failure_model);
 
 /*@ requires validity: \valid(mem) && \valid_read(expected);
@@ -366,9 +366,9 @@ _Bool __atomic_compare_exchange_2(
   assigns \result \from indirect: *mem, indirect: *expected;
 */
 _Bool __atomic_compare_exchange_4(
-  __INT32_T* mem,
-  __INT32_T* expected,
-  __INT32_T desired,
+  __UINT32_T* mem,
+  __UINT32_T* expected,
+  __UINT32_T desired,
   _Bool weak, int success_model, int failure_model);
 
 /*@ requires validity: \valid(mem) && \valid_read(expected);
@@ -379,250 +379,250 @@ _Bool __atomic_compare_exchange_4(
   assigns \result \from indirect: *mem, indirect: *expected;
 */
 _Bool __atomic_compare_exchange_8(
-  __INT64_T* mem,
-  __INT64_T* expected,
-  __INT64_T desired,
+  __UINT64_T* mem,
+  __UINT64_T* expected,
+  __UINT64_T desired,
   _Bool weak, int success_model, int failure_model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_add_fetch_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_add_fetch_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_sub_fetch_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_sub_fetch_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_and_fetch_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_and_fetch_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_xor_fetch_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_xor_fetch_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_or_fetch_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_or_fetch_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_nand_fetch_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_nand_fetch_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_add_fetch_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_add_fetch_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_sub_fetch_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_sub_fetch_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_and_fetch_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_and_fetch_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_xor_fetch_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_xor_fetch_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_or_fetch_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_or_fetch_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_nand_fetch_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_nand_fetch_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_add_fetch_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_add_fetch_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_sub_fetch_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_sub_fetch_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_and_fetch_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_and_fetch_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_xor_fetch_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_xor_fetch_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_or_fetch_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_or_fetch_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_nand_fetch_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_nand_fetch_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_add_fetch_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_add_fetch_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_sub_fetch_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_sub_fetch_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_and_fetch_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_and_fetch_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_xor_fetch_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_xor_fetch_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_or_fetch_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_or_fetch_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_nand_fetch_8(__INT64_T* ptr, __INT64_T val, int model);
+__UINT64_T __atomic_nand_fetch_8(__UINT64_T* ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_fetch_add_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_fetch_add_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_fetch_sub_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_fetch_sub_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_fetch_and_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_fetch_and_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_fetch_xor_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_fetch_xor_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_fetch_or_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_fetch_or_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT8_T __atomic_fetch_nand_1 (__INT8_T *ptr, __INT8_T val, int model);
+__UINT8_T __atomic_fetch_nand_1 (__UINT8_T *ptr, __UINT8_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_fetch_add_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_fetch_add_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_fetch_sub_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_fetch_sub_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_fetch_and_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_fetch_and_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_fetch_xor_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_fetch_xor_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_fetch_or_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_fetch_or_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT16_T __atomic_fetch_nand_2 (__INT16_T *ptr, __INT16_T val, int model);
+__UINT16_T __atomic_fetch_nand_2 (__UINT16_T *ptr, __UINT16_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_fetch_add_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_fetch_add_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_fetch_sub_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_fetch_sub_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_fetch_and_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_fetch_and_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_fetch_xor_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_fetch_xor_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_fetch_or_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_fetch_or_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT32_T __atomic_fetch_nand_4 (__INT32_T *ptr, __INT32_T val, int model);
+__UINT32_T __atomic_fetch_nand_4 (__UINT32_T *ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_fetch_add_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_fetch_add_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_fetch_sub__8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_fetch_sub__8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_fetch_and_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_fetch_and_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_fetch_xor_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_fetch_xor_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_fetch_or_8 (__INT64_T *ptr, __INT64_T val, int model);
+__UINT64_T __atomic_fetch_or_8 (__UINT64_T *ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__INT64_T __atomic_fetch_nand_8(__INT64_T* ptr, __INT64_T val, int model);
+__UINT64_T __atomic_fetch_nand_8(__UINT64_T* ptr, __UINT64_T val, int model);
 
 /*@ requires validity: \valid((char*)ptr);
     assigns \result \from *((char*)ptr);
