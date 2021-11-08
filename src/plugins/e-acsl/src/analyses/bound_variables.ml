@@ -684,8 +684,14 @@ end
       compute_guards loc ~is_forall:true p bound_vars goal
     | Pexists(bound_vars, ({ pred_content = Pand(_, _) } as goal)) ->
       compute_guards loc ~is_forall:false p bound_vars goal
-    | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
-    | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
+    | Pforall _ ->
+      Quantifier.add
+        p
+        (Err (Error.Not_yet "unguarded \\forall quantification"))
+    | Pexists _ ->
+      Quantifier.add
+        p
+        (Err (Error.Not_yet "unguarded \\exists quantification"))
     | _ -> ()
 
   let gannot a =
