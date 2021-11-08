@@ -698,18 +698,18 @@ end
     match a with
     | Dfun_or_pred (li,loc) ->
       (match li.l_body with
-        | LBpred p ->
-          (match Logic_normalizer.get_pred p with
+       | LBpred p ->
+         (match Logic_normalizer.get_pred p with
           | PoT_pred p -> process_quantif ~loc p
           | PoT_term _ -> ())
-        | _ -> ())
+       | _ -> ())
 
     | _ -> ()
 
-    let do_predicates () =
-      Annotations.iter_global (fun _ a -> gannot a)
+  let do_predicates () =
+    Annotations.iter_global (fun _ a -> gannot a)
 
-    let preprocessor = object
+  let preprocessor = object
     inherit E_acsl_visitor.visitor
 
     method !vpredicate p =
