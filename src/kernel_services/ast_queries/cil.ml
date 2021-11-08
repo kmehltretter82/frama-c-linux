@@ -3977,13 +3977,13 @@ module TypSize =
       let size = 47
     end)
 
-let find_sizeof f t =
+let find_sizeof t f =
   try match TypSize.find t with
     | Size size -> size
     | Error (msg, t') -> raise (SizeOfError(msg, t'))
   with Not_found ->
   try
-    let size = f t in
+    let size = f () in
     TypSize.add t (Size size) ;
     size
   with SizeOfError(t',msg) as e ->
@@ -4388,8 +4388,7 @@ and bitsSizeOfEmptyArray typ =
 
 (* The size of a type, in bits. If struct or array then trailing padding is
  * added *)
-and bitsSizeOf t = find_sizeof bitsSizeOfNoCache t
-and bitsSizeOfNoCache t =
+and bitsSizeOf t =
   match t with
   | TInt (ik,_) -> 8 * (bytesSizeOfInt ik)
   | TFloat(FDouble, _) -> 8 * theMachine.theMachine.sizeof_double
@@ -4405,70 +4404,78 @@ and bitsSizeOfNoCache t =
       (SizeOfError
          (Format.sprintf "abstract type '%s'" (compFullName comp), t))
   | TComp ({cfields=Some[]}, _) when acceptEmptyCompinfo() ->
-    0
+    find_sizeof t (fun () -> 0)
   | TComp ({cfields=Some[]} as comp,_) ->
-    (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
-    raise
-      (SizeOfError
-         (Format.sprintf "empty struct '%s'" (compFullName comp), t))
+    find_sizeof t
+      (fun () ->
+         (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
+         raise
+           (SizeOfError
+              (Format.sprintf "empty struct '%s'" (compFullName comp), t)))
   | TComp (comp, _) when comp.cstruct -> (* Struct *)
-    (* Go and get the last offset *)
-    let startAcc =
-      { oaFirstFree = 0;
-        oaLastFieldStart = 0;
-        oaLastFieldWidth = 0;
-        oaPrevBitPack = None;
-      } in
-    let lastoff =
-      fold_struct_fields
-        (fun ~last acc fi -> offsetOfFieldAcc ~last ~fi ~sofar:acc)
-        startAcc (Option.get comp.cfields) (* Note: we treat None above *)
-    in
-    if msvcMode () && lastoff.oaFirstFree = 0
-    then
-      (* On MSVC if we have just a zero-width bitfields then the length
-       * is 32 and is not padded  *)
-      32
-    else
-      addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t)
+    find_sizeof t
+      (fun () ->
+         (* Go and get the last offset *)
+         let startAcc =
+           { oaFirstFree = 0;
+             oaLastFieldStart = 0;
+             oaLastFieldWidth = 0;
+             oaPrevBitPack = None;
+           } in
+         let lastoff =
+           fold_struct_fields
+             (fun ~last acc fi -> offsetOfFieldAcc ~last ~fi ~sofar:acc)
+             startAcc (Option.get comp.cfields) (* Note: we treat None above *)
+         in
+         if msvcMode () && lastoff.oaFirstFree = 0
+         then
+           (* On MSVC if we have just a zero-width bitfields then the length
+            * is 32 and is not padded  *)
+           32
+         else
+           addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t))
 
   | TComp (comp, _) -> (* Union *)
-    (* Get the maximum of all fields *)
-    let startAcc =
-      { oaFirstFree = 0;
-        oaLastFieldStart = 0;
-        oaLastFieldWidth = 0;
-        oaPrevBitPack = None;
-      } in
-    let fold acc fi =
-      let lastoff = offsetOfFieldAcc ~last:false ~fi ~sofar:startAcc in
-      if lastoff.oaFirstFree > acc
-      then lastoff.oaFirstFree
-      else acc
-    in
-    (* Note: we treat None above *)
-    let max = List.fold_left fold 0 (Option.get comp.cfields) in
-    (* Add trailing by simulating adding an extra field *)
-    addTrailing max (8 * bytesAlignOf t)
+    find_sizeof t
+      (fun () ->
+         (* Get the maximum of all fields *)
+         let startAcc =
+           { oaFirstFree = 0;
+             oaLastFieldStart = 0;
+             oaLastFieldWidth = 0;
+             oaPrevBitPack = None;
+           } in
+         let fold acc fi =
+           let lastoff = offsetOfFieldAcc ~last:false ~fi ~sofar:startAcc in
+           if lastoff.oaFirstFree > acc
+           then lastoff.oaFirstFree
+           else acc
+         in
+         (* Note: we treat None above *)
+         let max = List.fold_left fold 0 (Option.get comp.cfields) in
+         (* Add trailing by simulating adding an extra field *)
+         addTrailing max (8 * bytesAlignOf t))
 
   | TArray(bt, Some len, _) ->
-    begin
-      match (constFold true len).enode with
-        Const(CInt64(l,_,_)) ->
-        let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
-        let sz' =
-          match Integer.to_int_opt sz with
-          | Some i -> i
-          | None ->
-            raise
-              (SizeOfError
-                 ("Array is so long that its size can't be "
-                  ^"represented with an OCaml int.", t))
+    find_sizeof t
+      (fun () ->
+         begin
+           match (constFold true len).enode with
+             Const(CInt64(l,_,_)) ->
+             let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
+             let sz' =
+               match Integer.to_int_opt sz with
+               | Some i -> i
+               | None ->
+                 raise
+                   (SizeOfError
+                      ("Array is so long that its size can't be "
+                       ^"represented with an OCaml int.", t))
 
-        in
-        sz' (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
-      | _ -> raise (SizeOfError ("Array with non-constant length.", t))
-    end
+             in
+             sz' (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
+           | _ -> raise (SizeOfError ("Array with non-constant length.", t))
+         end)
   | TVoid _ ->
     if theMachine.theMachine.sizeof_void >= 0 then
       8 * theMachine.theMachine.sizeof_void
@@ -4481,7 +4488,9 @@ and bitsSizeOfNoCache t =
       raise (SizeOfError ("Undefined sizeof on a function.", t))
 
   | TArray (_, None, _) ->
-    raise (SizeOfError ("Size of array without number of elements.", t))
+    find_sizeof t
+      (fun () ->
+         raise (SizeOfError ("Size of array without number of elements.", t)))
 
 (* Iterator on the fields of a structure, with additional information about
    having reached the last field (for flexible member arrays) *)
