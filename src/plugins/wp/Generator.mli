@@ -29,7 +29,6 @@ val user_setup : unit -> Factory.setup
 
 val create :
   ?dump:bool ->
-  ?legacy:bool ->
   ?setup:Factory.setup ->
   ?driver:Factory.driver ->
   unit -> Wpo.generator

@@ -3899,6 +3899,10 @@ and typeTermOffset basetyp =
 
 let isConstType typ_lval = typeHasAttributeMemoryBlock "const" typ_lval
 
+let isGlobalInitConst vi =
+  (* Note: the type must be fully const, not a part of it *)
+  vi.vglob && vi.vstorage <> Extern && typeHasQualifier "const" vi.vtype
+
 (**** Check for volatile attribute ****)
 
 let isVolatileType typ_lval = typeHasAttributeMemoryBlock "volatile" typ_lval

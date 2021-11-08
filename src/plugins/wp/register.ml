@@ -157,9 +157,9 @@ let clear_scheduled () =
     exercised := 0 ;
     session := GOALS.empty ;
     provers := PM.empty ;
-    WpAnnot.trivial_terminates := 0 ;
-    WpAnnot.unreachable_proved := 0 ;
-    WpAnnot.unreachable_failed := 0 ;
+    CfgInfos.trivial_terminates := 0 ;
+    WpReached.unreachable_proved := 0 ;
+    WpReached.unreachable_failed := 0 ;
   end
 
 let get_pstat p =
@@ -439,13 +439,13 @@ let do_report_scheduled () =
   else
     let total =
       !scheduled +
-      !WpAnnot.unreachable_failed +
-      !WpAnnot.unreachable_proved +
-      !WpAnnot.trivial_terminates in
+      !WpReached.unreachable_failed +
+      !WpReached.unreachable_proved +
+      !CfgInfos.trivial_terminates in
     if total > 0 then
       begin
         let passed =
-          !WpAnnot.unreachable_proved + !WpAnnot.trivial_terminates
+          !WpReached.unreachable_proved + !CfgInfos.trivial_terminates
         in
         let passed = GOALS.fold
             (fun g n ->

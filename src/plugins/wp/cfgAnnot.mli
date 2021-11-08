@@ -95,6 +95,10 @@ type loop_contract = {
 val get_loop_contract : ?smoking:bool -> ?terminates:predicate ->
   kernel_function -> stmt -> loop_contract
 
+val mk_variant_properties :
+  kernel_function -> stmt -> code_annotation -> term -> pred_info * pred_info
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Call Contracts                                --- *)
 (* -------------------------------------------------------------------------- *)

@@ -51,4 +51,9 @@ val dump : dir:Datatype.Filepath.t -> Kernel_function.t -> reachability -> unit
 
 val set_doomed : Emitter.t -> WpPropId.prop_id -> unit
 
+val unreachable_proved : int ref
+val unreachable_failed : int ref
+
+val set_unreachable : WpPropId.prop_id -> unit
+
 (* -------------------------------------------------------------------------- *)

@@ -377,3 +377,52 @@ let set_doomed emitter pid =
   | Property.OLGlob _ | Property.OLContract _ -> ()
 
 (* -------------------------------------------------------------------------- *)
+(* --- Status of Unreachable Annotations                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let dkey = Wp_parameters.register_category "reach" (* debugging key *)
+let debug fmt = Wp_parameters.debug ~dkey fmt
+
+let unreachable_proved = ref 0
+let unreachable_failed = ref 0
+
+let wp_unreachable =
+  Emitter.create
+    "Unreachable Annotations"
+    [ Emitter.Property_status ]
+    ~correctness:[] (* TBC *)
+    ~tuning:[] (* TBC *)
+
+let set_unreachable pid =
+  if WpPropId.is_smoke_test pid then
+    begin
+      let source = WpPropId.source_of_id pid in
+      set_doomed wp_unreachable pid ;
+      incr unreachable_failed ;
+      Wp_parameters.warning ~source "Failed smoke-test"
+    end
+  else
+    let open Property in
+    let emit = function
+      | IPPredicate {ip_kind = PKAssumes _} -> ()
+      | p ->
+          debug "unreachable annotation %a@." Property.pretty p;
+          Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
+    in
+    let pids = match WpPropId.property_of_id pid with
+      | IPPredicate {ip_kind = PKAssumes _} -> []
+      | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
+          let active = Datatype.String.Set.elements ib_active in
+          (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
+          (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
+      | IPExtended _ -> []
+      (* Extended clauses might concern anything. Don't validate them
+         unless we know exactly what is going on. *)
+      | p ->
+          incr unreachable_proved ;
+          Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
+            WpPropId.pp_propid pid ; [p]
+    in
+    List.iter emit pids
+
+(* -------------------------------------------------------------------------- *)

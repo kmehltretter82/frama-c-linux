@@ -174,9 +174,9 @@ let is_ptr x = Cil.isPointerType x.Cil_types.vtype
 let is_fun_ptr x = Cil.isFunctionType x.Cil_types.vtype
 let is_formal_ptr x = x.Cil_types.vformal && is_ptr x
 let is_init kf x =
-  WpStrategy.is_main_init kf ||
+  Globals.is_entry_point ~when_lib_entry:false kf ||
   Wp_parameters.AliasInit.get () ||
-  ( WpStrategy.isInitConst () && WpStrategy.isGlobalInitConst x )
+  ( Wp_parameters.Init.get () && Cil.isGlobalInitConst x )
 
 let refusage_param ~byref ~context x =
   let kf,init = match WpContext.get_scope () with

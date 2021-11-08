@@ -55,7 +55,8 @@ struct
   let hypotheses p =
     let kf,init = match WpContext.get_scope () with
       | WpContext.Global -> None,false
-      | WpContext.Kf f -> Some f, WpStrategy.is_main_init f in
+      | WpContext.Kf f ->
+          Some f, Globals.is_entry_point ~when_lib_entry:false f in
     let w = ref p in
     V.iter ?kf ~init (fun vi -> w := MemoryContext.set vi (V.param vi) !w) ;
     M.hypotheses !w
