@@ -2449,7 +2449,7 @@ DISTRIB_FILES += $(wildcard $(PLUGIN_DISTRIBUTED_LIST)                   \
 DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
                   $(DISTRIB_FILES))
 
-src-distrib: ivette-src-distrib
+src-distrib: #ivette-src-distrib
 ivette-src-distrib:
 	make -C ivette update-distrib-files
 
