@@ -332,8 +332,12 @@ let add_generated_functions globals =
 
 (* Generate (and memoize) the function body and create the call to the
    generated function. *)
-let function_to_exp ~loc fname env kf t li params_ty args =
-  let ret_ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
+let function_to_exp ~loc ?tapp fname env kf li params_ty args =
+  let ret_ty =
+    match tapp with
+    | Some tapp -> Typing.get_typ ~lenv:(Env.Local_vars.get env) tapp
+    | None  -> (Cil_types.TInt (IInt, []))
+  in
   let gen tbl =
     let vi, kf, gen_body = generate_kf fname ~loc env ret_ty params_ty li in
     Typing.Function_params_ty.Hashtbl.add tbl params_ty kf;
@@ -387,11 +391,11 @@ let function_to_exp ~loc fname env kf t li params_ty args =
     ~name:li.l_var_info.lv_name
     env
     kf
-    (Some t)
+    tapp
     ret_ty
     (fun vi _ -> [ Cil.mkStmtOneInstr ~valid_sid:true (mkcall vi) ])
 
-let raise_errors l = function
+let raise_errors = function
   | LBnone ->
     Error.not_yet
       "logic functions or predicates with no definition nor reads clause"
@@ -399,59 +403,51 @@ let raise_errors l = function
     Error.not_yet "logic functions or predicates performing read accesses"
   | LBinductive _ -> Error.not_yet "inductive logic functions"
   | LBterm _
-  | LBpred _ ->
-    match l with
-    | [] -> ()
-    | _::_ -> Error.not_yet "logic functions or predicates with labels"
+  | LBpred _ -> ()
 
-let tapp_to_exp ~adata kf env ?eargs tapp =
-  match tapp.term_node with
-  | Tapp(li, l, targs) ->
-    let loc = tapp.term_loc in
+let app_to_exp ~adata ~loc ?tapp kf env ?eargs
+    ((li, targs) : logic_info * term list) =
     let fname = li.l_var_info.lv_name in
     (* build the varinfo (as an expression) which stores the result of the
        function call. *)
     let _, e, adata, env =
       if Builtins.mem li.l_var_info.lv_name then
-        match l with
-        | _::_ -> Error.not_yet "E-ACSL built-in functions with labels"
-        | [] ->
-          (* E-ACSL built-in function call *)
-          let args, adata, env =
-            match eargs with
-            | None ->
-              List.fold_right
-                (fun targ (l, adata, env) ->
-                   let e, adata, env = !term_to_exp_ref ~adata kf env targ in
-                   e :: l, adata, env)
-                targs
-                ([], adata, env)
-            | Some eargs ->
-              if List.compare_lengths targs eargs != 0 then
-                Options.fatal
-                  "[Tapp] unexpected number of arguments when calling %s"
-                  fname;
-              eargs, adata, env
-          in
-          let vi, e, env =
-            Env.new_var
-              ~loc
-              ~name:(fname ^ "_app")
-              env
-              kf
-              (Some tapp)
-              (Misc.cty (Option.get li.l_type))
-              (fun vi _ ->
-                 [ Smart_stmt.rtl_call ~loc
-                     ~result:(Cil.var vi)
-                     ~prefix:""
-                     fname
-                     args ])
-          in
-          vi, e, adata, env
+        (* E-ACSL built-in function call *)
+        let args, adata, env =
+          match eargs with
+          | None ->
+            List.fold_right
+              (fun targ (l, adata, env) ->
+                 let e, adata, env = !term_to_exp_ref ~adata kf env targ in
+                 e :: l, adata, env)
+              targs
+              ([], adata, env)
+          | Some eargs ->
+            if List.compare_lengths targs eargs != 0 then
+              Options.fatal
+                "[Tapp] unexpected number of arguments when calling %s"
+                fname;
+            eargs, adata, env
+        in
+        let vi, e, env =
+          Env.new_var
+            ~loc
+            ~name:(fname ^ "_app")
+            env
+            kf
+            tapp
+            (Misc.cty (Option.get li.l_type))
+            (fun vi _ ->
+               [ Smart_stmt.rtl_call ~loc
+                   ~result:(Cil.var vi)
+                   ~prefix:""
+                   fname
+                   args ])
+        in
+        vi, e, adata, env
       else
         begin
-          raise_errors l li.l_body;
+          raise_errors li.l_body;
           (* build the arguments and compute the integer_ty of the parameters *)
           let params_ty, args, adata, env =
             let eargs, adata, env =
@@ -504,16 +500,123 @@ let tapp_to_exp ~adata kf env ?eargs tapp =
             Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
           in
           let vi, e, env =
-            function_to_exp ~loc gen_fname env kf tapp li params_ty args
+            function_to_exp ~loc ?tapp gen_fname env kf li params_ty args
           in
           vi, e, adata, env
         end
     in
     e, adata, env
-  | _ ->
-    Options.fatal
-      "tapp_to_exp called with '%a' instead of Tapp term"
-      Printer.pp_term tapp
+
+(* let tapp_to_exp ~adata kf env ?eargs tapp = *)
+(*   match tapp.term_node with *)
+(*   | Tapp(li, l, targs) -> *)
+(*     let loc = tapp.term_loc in *)
+(*     let fname = li.l_var_info.lv_name in *)
+(*     (\* build the varinfo (as an expression) which stores the result of the *)
+(*        function call. *\) *)
+(*     let _, e, adata, env = *)
+(*       if Builtins.mem li.l_var_info.lv_name then *)
+(*         match l with *)
+(*         | _::_ -> Error.not_yet "E-ACSL built-in functions with labels" *)
+(*         | [] -> *)
+(*           (\* E-ACSL built-in function call *\) *)
+(*           let args, adata, env = *)
+(*             match eargs with *)
+(*             | None -> *)
+(*               List.fold_right *)
+(*                 (fun targ (l, adata, env) -> *)
+(*                    let e, adata, env = !term_to_exp_ref ~adata kf env targ in *)
+(*                    e :: l, adata, env) *)
+(*                 targs *)
+(*                 ([], adata, env) *)
+(*             | Some eargs -> *)
+(*               if List.compare_lengths targs eargs != 0 then *)
+(*                 Options.fatal *)
+(*                   "[Tapp] unexpected number of arguments when calling %s" *)
+(*                   fname; *)
+(*               eargs, adata, env *)
+(*           in *)
+(*           let vi, e, env = *)
+(*             Env.new_var *)
+(*               ~loc *)
+(*               ~name:(fname ^ "_app") *)
+(*               env *)
+(*               kf *)
+(*               (Some tapp) *)
+(*               (Misc.cty (Option.get li.l_type)) *)
+(*               (fun vi _ -> *)
+(*                  [ Smart_stmt.rtl_call ~loc *)
+(*                      ~result:(Cil.var vi) *)
+(*                      ~prefix:"" *)
+(*                      fname *)
+(*                      args ]) *)
+(*           in *)
+(*           vi, e, adata, env *)
+(*       else *)
+(*         begin *)
+(*           raise_errors l li.l_body; *)
+(*           (\* build the arguments and compute the integer_ty of the parameters *\) *)
+(*           let params_ty, args, adata, env = *)
+(*             let eargs, adata, env = *)
+(*               match eargs with *)
+(*               | None -> *)
+(*                 List.fold_right *)
+(*                   (fun targ (eargs, adata, env) -> *)
+(*                      let e, adata, env = !term_to_exp_ref ~adata kf env targ in *)
+(*                      e :: eargs, adata, env) *)
+(*                   targs *)
+(*                   ([], adata, env) *)
+(*               | Some eargs -> *)
+(*                 if List.compare_lengths targs eargs != 0 then *)
+(*                   Options.fatal *)
+(*                     "[Tapp] unexpected number of arguments when calling %s" *)
+(*                     fname; *)
+(*                 eargs, adata, env *)
+(*             in *)
+(*             try *)
+(*               List.fold_right2 *)
+(*                 (fun targ earg (params_ty, args, adata, env) -> *)
+(*                    let param_ty = *)
+(*                      Typing.get_number_ty *)
+(*                        ~lenv:(Env.Local_vars.get env) *)
+(*                        targ *)
+(*                    in *)
+(*                    let e, env = *)
+(*                      try *)
+(*                        let ty = Typing.typ_of_number_ty param_ty in *)
+(*                        Typed_number.add_cast *)
+(*                          ~loc *)
+(*                          env *)
+(*                          kf *)
+(*                          (Some ty) *)
+(*                          Typed_number.C_number *)
+(*                          (Some targ) *)
+(*                          earg *)
+(*                      with Typing.Not_a_number -> *)
+(*                        earg, env *)
+(*                    in *)
+(*                    param_ty :: params_ty, e :: args, adata, env) *)
+(*                 targs eargs *)
+(*                 ([], [], adata ,env) *)
+(*             with Invalid_argument _ -> *)
+(*               Options.fatal *)
+(*                 "[Tapp] unexpected number of arguments when calling %s" *)
+(*                 fname *)
+(*           in *)
+(*           let gen_fname = *)
+(*             Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname) *)
+(*           in *)
+(*           let vi, e, env = *)
+(*             function_to_exp ~loc ~tapp gen_fname env kf li params_ty args *)
+(*           in *)
+(*           vi, e, adata, env *)
+(*         end *)
+(*     in *)
+(*     e, adata, env *)
+(*   | _ -> *)
+(*     Options.fatal *)
+(*       "tapp_to_exp called with '%a' instead of Tapp term" *)
+(*       Printer.pp_term tapp *)
 
 (*
 Local Variables:

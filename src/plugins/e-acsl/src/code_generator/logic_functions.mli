@@ -36,12 +36,14 @@ open Cil_types
 
 val reset: unit -> unit
 
-val tapp_to_exp:
+val app_to_exp:
   adata:Assert.t ->
+  loc:location ->
+  ?tapp:term ->
   kernel_function ->
   Env.t ->
   ?eargs:exp list ->
-  term ->
+  logic_info * term list ->
   exp * Assert.t * Env.t
 (** Translate a Tapp term to an expression. If the optional argument [eargs] is
     provided, then these expressions are used as arguments of the fonction. *)

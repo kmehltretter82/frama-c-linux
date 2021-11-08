@@ -767,12 +767,13 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | Tapp(li, _, _)
     when li.l_body = LBnone && li.l_var_info.lv_name = "\\numof" ->
     assert false
-  | Tapp(_, [], _) ->
-    let e, adata, env = Logic_functions.tapp_to_exp ~adata kf env t in
+  | Tapp(li, [], args) ->
+    let e, adata, env =
+      Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env (li, args) in
     let adata, env = Assert.register_term ~loc kf env t e adata in
     e, adata, env, Typed_number.C_number, "app"
   | Tapp(_, _ :: _, _) ->
-    Env.not_yet env "logic functions or predicates with labels"
+    Env.not_yet env "logic functions with labels"
   | Tlambda(_, lt) ->
     let exp, adata, env = term_to_exp ~adata kf env lt in
     exp, adata, env, Typed_number.C_number, ""
@@ -1039,7 +1040,12 @@ and predicate_content_to_exp ~adata ?name kf env p =
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, adata, env
   | Ptrue -> Cil.one ~loc, adata, env
-  | Papp _ -> Options.fatal "Reached applied predicate: %a" Printer.pp_predicate p;
+  | Papp (_, _::_,_) -> Env.not_yet env "predicates with labels"
+  | Papp (li, [], args) ->
+    let e, adata, env =
+      Logic_functions.app_to_exp ~adata ~loc kf env (li, args) in
+    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    e, adata, env
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"

@@ -109,12 +109,14 @@ let handle_annotations env kf stmt =
             Typing.type_term ~use_gmp_opt:true tapp;
             let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
             let e_tapp, _, env =
-              Logic_functions.tapp_to_exp
+              Logic_functions.app_to_exp
                 ~adata:Assert.no_data
+                ~loc
+                ~tapp
                 kf
                 env
                 ~eargs:[e_old; e]
-                tapp
+                (measure, [t_old; t])
             in
             let msg =
               Format.asprintf

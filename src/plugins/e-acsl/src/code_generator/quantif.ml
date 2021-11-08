@@ -68,7 +68,7 @@ let convert kf env loc ~is_forall quantif =
   (* guarded quantification over integers (or a subtype of integer) *)
   let bound_vars, goal =
     Error.retrieve_preprocessing
-      "quantified predicate"
+      "preprocessing of quantified predicate"
       Bound_variables.get_preprocessed_quantifier
       quantif
   in

@@ -879,7 +879,7 @@ and type_predicate ?(lenv=[]) p =
         begin
           let guards, goal =
             Error.retrieve_preprocessing
-              "quantified predicate"
+              "preprocessing of quantified predicate"
               Bound_variables.get_preprocessed_quantifier
               p
           in
