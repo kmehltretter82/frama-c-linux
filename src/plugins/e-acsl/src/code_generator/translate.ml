@@ -1386,7 +1386,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
           pred_name = pred_name :: lower_guard_pp.pred_name }
       in
       let lower_guard = Logic_const.prel ~loc (Rge, t, zero_term) in
-      Typing.type_named_predicate lower_guard;
+      Typing.type_named_predicate ~lenv:(Env.Local_vars.get env) lower_guard;
       let adata_lower_guard, env = Assert.empty ~loc kf env in
       let lower_guard, adata_lower_guard, env =
         predicate_to_exp ~adata:adata_lower_guard kf env lower_guard
@@ -1416,7 +1416,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
       pred_name = pred_name :: upper_guard_pp.pred_name }
   in
   let upper_guard = Logic_const.prel ~loc (Rle, t, sizet_max) in
-  Typing.type_named_predicate upper_guard;
+  Typing.type_named_predicate ~lenv:(Env.Local_vars.get env) upper_guard;
   let adata_upper_guard, env = Assert.empty ~loc kf env in
   let upper_guard, adata_upper_guard, env =
     predicate_to_exp ~adata:adata_upper_guard kf env upper_guard
@@ -1500,7 +1500,7 @@ let untyped_term_to_exp typ t =
       | _ -> Typing.nan
   in
   let ctx = Option.map ctx_of_typ typ in
-  Typing.type_term ~use_gmp_opt:true ?ctx t;
+  Typing.type_term ~use_gmp_opt:true ~lenv:[] ?ctx t;
   let env = Env.push Env.empty in
   let env = Env.rte env false in
   let e, _, env =
