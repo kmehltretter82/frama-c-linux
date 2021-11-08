@@ -926,10 +926,10 @@ let type_named_predicate ?(lenv=[]) p =
     Stack.pop pending_typing ()
   done
 
-let unsafe_set t ?ctx ty =
+let unsafe_set t ?ctx ?(lenv=[]) ty =
   let ctx = match ctx with None -> ty | Some ctx -> ctx in
   let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
-  ignore (Memo.memo mk t)
+  ignore (Memo.memo mk ~lenv t)
 
 (******************************************************************************)
 (** {2 Getters} *)

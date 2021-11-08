@@ -65,7 +65,7 @@ let handle_annotations env kf stmt =
            | Some (t, measure_opt) ->
              let env = Env.set_annotation_kind env Smart_stmt.Variant in
              let env = Env.push env in
-             Typing.type_term ~use_gmp_opt:true t;
+             Typing.type_term ~use_gmp_opt:true ~lenv:(Env.Local_vars.get env) t;
              let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
              let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
@@ -106,7 +106,10 @@ let handle_annotations env kf stmt =
                 term_name = [];
                 term_type = Linteger;}
             in
-            Typing.type_term ~use_gmp_opt:true tapp;
+            Typing.type_term
+              ~use_gmp_opt:true
+              ~lenv:(Env.Local_vars.get env)
+              tapp;
             let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
             let e_tapp, _, env =
               Logic_functions.app_to_exp
@@ -166,7 +169,9 @@ let handle_annotations env kf stmt =
             let variant_pos =
               Logic_const.prel ~loc (Rge, t_old, Logic_const.tinteger ~loc 0)
             in
-            Typing.type_named_predicate variant_pos;
+            Typing.type_named_predicate
+              ~lenv:(Env.Local_vars.get env)
+              variant_pos;
             let variant_pos_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_pos
             in
@@ -200,7 +205,9 @@ let handle_annotations env kf stmt =
             let variant_dec =
               Logic_const.prel ~loc (Rgt, t_old, t)
             in
-            Typing.type_named_predicate variant_dec;
+            Typing.type_named_predicate
+              ~lenv:(Env.Local_vars.get env)
+              variant_dec;
             let variant_dec_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_dec
             in
@@ -288,8 +295,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     mk_innermost_block env
   | Lscope.Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
     assert (rel1 == Rle && rel2 == Rlt);
-    Typing.type_term ~use_gmp_opt:false t1;
-    Typing.type_term ~use_gmp_opt:false t2;
+    Typing.type_term ~use_gmp_opt:false ~lenv:(Env.Local_vars.get env) t1;
+    Typing.type_term ~use_gmp_opt:false ~lenv:(Env.Local_vars.get env) t2;
     let ctx =
       let ty1 = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t1 in
       let ty2 = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t2 in
@@ -301,9 +308,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
       Option.iter
         (fun ty ->
-           Typing.unsafe_set tone ~ctx:ty ctx;
-           Typing.unsafe_set t ~ctx:ty ctx;
-           Typing.unsafe_set res ty)
+           Typing.unsafe_set tone ~ctx:ty ~lenv:(Env.Local_vars.get env) ctx;
+           Typing.unsafe_set t ~ctx:ty ~lenv:(Env.Local_vars.get env) ctx;
+           Typing.unsafe_set res ~lenv:(Env.Local_vars.get env) ty)
         ty;
       res
     in
@@ -348,7 +355,11 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           (TBinOp(Lt, tlv, { t2 with term_node = t2.term_node } ))
           Linteger
     in
-    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
+    Typing.type_term
+      ~use_gmp_opt:false
+      ~lenv:(Env.Local_vars.get env)
+      ~ctx:Typing.c_int
+      guard;
     let guard_exp, _, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get

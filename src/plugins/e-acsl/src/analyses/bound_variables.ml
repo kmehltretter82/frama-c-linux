@@ -688,17 +688,25 @@ end
     | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
     | _ -> ()
 
-  let preprocessor = object
+  let gannot a =
+    match a with
+    | Dfun_or_pred (li,loc) ->
+      (match li.l_body with
+        | LBpred p ->
+          (match Logic_normalizer.get_pred p with
+          | PoT_pred p -> process_quantif ~loc p
+          | PoT_term _ -> ())
+        | _ -> ())
+
+    | _ -> ()
+
+    let do_predicates () =
+      Annotations.iter_global (fun _ a -> gannot a)
+
+    let preprocessor = object
     inherit E_acsl_visitor.visitor
 
-    (* Only logic functions and logic predicates are handled.
-       E-acsl simply ignores all the other global annotations *)
-    method !vannotation annot =
-      match annot with
-      | Dfun_or_pred _ -> Cil.DoChildren
-      | _ -> Cil.SkipChildren
-
-    method !vpredicate  p =
+    method !vpredicate p =
       let loc = p.pred_loc in
       match Logic_normalizer.get_pred p with
       | PoT_pred p -> process_quantif ~loc p;
@@ -710,7 +718,8 @@ end
   let compute ast =
     Visitor.visitFramacFileSameGlobals
       (preprocessor :> Visitor.frama_c_inplace)
-      ast
+      ast;
+    do_predicates ()
 
   let compute_annot annot =
     ignore

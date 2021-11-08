@@ -144,7 +144,12 @@ val get_cast: lenv:Function_params_ty.t -> term -> typ option
 val get_cast_of_predicate: lenv:Function_params_ty.t -> predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
-val unsafe_set: term -> ?ctx:number_ty -> number_ty -> unit
+val unsafe_set:
+  term ->
+  ?ctx:number_ty ->
+  ?lenv:Function_params_ty.t ->
+  number_ty ->
+  unit
 (** Register that the given term has the given type in the given context (if
     any). No verification is done. *)
 
