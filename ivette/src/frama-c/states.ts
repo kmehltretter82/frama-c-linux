@@ -186,7 +186,7 @@ export function useRequest<In, Out>(
     }
   });
 
-  const signals = options.onSignals ?? rq.signals;
+  const signals = rq.signals.concat(options.onSignals ?? []);
   React.useEffect(() => {
     signals.forEach((s) => Server.onSignal(s, trigger));
     return () => {
