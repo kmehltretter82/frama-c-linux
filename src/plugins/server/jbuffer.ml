@@ -33,6 +33,7 @@ let append buffer s k n =
   Buffer.add_substring buffer.text s k n
 
 let flush buffer () =
+  Format.pp_print_flush buffer.fmt () ;
   let t = buffer.text in
   let n = Buffer.length t in
   if n > 0 then
@@ -112,13 +113,12 @@ let contents buffer : json =
 let format ?indent ?margin msg =
   let buffer = create ?indent ?margin () in
   Format.kfprintf
-    (fun fmt -> Format.pp_print_flush fmt () ; contents buffer)
+    (fun _fmt -> contents buffer)
     buffer.fmt msg
 
 let to_json ?indent ?margin pp a =
   let buffer = create ?indent ?margin () in
   pp buffer.fmt a ;
-  Format.pp_print_flush buffer.fmt () ;
   contents buffer
 
 let rec is_empty (js : json) = match js with
