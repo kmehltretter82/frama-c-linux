@@ -243,9 +243,10 @@ let to_exp ~loc kf env pot label =
     | Lscope.PoT_pred _ ->
       Cil.intType
     | Lscope.PoT_term t ->
-      begin match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
+      let lenv = (Env.Local_vars.get env) in
+      begin match Typing.get_number_ty ~lenv t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
-          Typing.get_typ ~lenv:(Env.Local_vars.get env) t
+          Typing.get_typ ~lenv t
         | Typing.(Rational | Real) ->
           Error.not_yet "\\at on purely logic variables and over real type"
         | Typing.Gmpz ->
@@ -269,12 +270,10 @@ let to_exp ~loc kf env pot label =
          let t_size =
            Logic_const.term ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
          in
-         Typing.type_term
-           ~use_gmp_opt:false
-           ~lenv:(Env.Local_vars.get env)
-           t_size;
+         let lenv = Env.Local_vars.get env in
+         Typing.type_term ~use_gmp_opt:false ~lenv t_size;
          let malloc_stmt =
-           match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t_size with
+           match Typing.get_number_ty ~lenv t_size with
            | Typing.C_integer IInt ->
              let e_size, _, _ =
                term_to_exp ~adata:Assert.no_data kf env t_size

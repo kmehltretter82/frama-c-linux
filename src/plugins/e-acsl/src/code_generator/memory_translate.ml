@@ -264,9 +264,10 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     in
     Logic_const.term ~loc (Tlet (size_term_info, size_term_if)) Linteger
   in
-  Typing.type_term ~use_gmp_opt:false ~lenv:(Env.Local_vars.get env) size_term;
+  let lenv = Env.Local_vars.get env in
+  Typing.type_term ~use_gmp_opt:false ~lenv size_term;
   let size, adata, env =
-    match Typing.get_number_ty size_term  ~lenv:(Env.Local_vars.get env) with
+    match Typing.get_number_ty size_term  ~lenv with
     | Typing.Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)

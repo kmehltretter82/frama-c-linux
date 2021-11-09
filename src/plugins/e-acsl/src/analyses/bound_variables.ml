@@ -694,19 +694,19 @@ end
         (Err (Error.Not_yet "unguarded \\exists quantification"))
     | _ -> ()
 
-  let gannot a =
-    match a with
-    | Dfun_or_pred (li,loc) ->
-      (match li.l_body with
-       | LBpred p ->
-         (match Logic_normalizer.get_pred p with
-          | PoT_pred p -> process_quantif ~loc p
-          | PoT_term _ -> ())
-       | _ -> ())
+  let do_user_predicates () =
+    let gannot a =
+      match a with
+      | Dfun_or_pred (li,loc) ->
+        (match li.l_body with
+         | LBpred p ->
+           (match Logic_normalizer.get_pred p with
+            | PoT_pred p -> process_quantif ~loc p
+            | PoT_term _ -> ())
+         | _ -> ())
 
-    | _ -> ()
-
-  let do_predicates () =
+      | _ -> ()
+    in
     Annotations.iter_global (fun _ a -> gannot a)
 
   let preprocessor = object
@@ -725,7 +725,7 @@ end
     Visitor.visitFramacFileSameGlobals
       (preprocessor :> Visitor.frama_c_inplace)
       ast;
-    do_predicates ()
+    do_user_predicates ()
 
   let compute_annot annot =
     ignore
