@@ -33,7 +33,6 @@ let append buffer s k n =
   Buffer.add_substring buffer.text s k n
 
 let flush buffer () =
-  Format.pp_print_flush buffer.fmt () ;
   let t = buffer.text in
   let n = Buffer.length t in
   if n > 0 then
@@ -101,6 +100,7 @@ let bprintf buffer msg = Format.fprintf buffer.fmt msg
 let formatter buffer = buffer.fmt
 
 let contents buffer : json =
+  Format.pp_print_flush buffer.fmt () ;
   flush buffer () ;
   while buffer.stack <> [] do
     pop_tag buffer ""
