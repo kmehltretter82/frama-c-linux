@@ -78,6 +78,9 @@ sig
     id:string -> label:string -> title:string ->
     (Format.formatter -> Printer_tag.localizable -> unit) -> unit
 
+  (** Updated informations signal *)
+  val signal : Request.signal
+
   (** Emits a signal to server clients to reload AST marker informations. *)
   val update : unit -> unit
 end
