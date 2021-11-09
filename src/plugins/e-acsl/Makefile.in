@@ -180,6 +180,7 @@ ifeq (@MAY_RUN_TESTS@,yes)
 PLUGIN_TESTS_DIRS := \
 	examples \
 	bts \
+	concurrency \
 	constructs \
 	arith \
 	memory \
@@ -354,7 +355,9 @@ EACSL_TEST_FILES = \
 	tests/temporal/test_config_dev \
 	tests/format/test_config \
 	tests/format/test_config_dev \
-	tests/E_ACSL_test.ml \
+	tests/concurrency/test_config \
+	tests/concurrency/test_config_dev \
+	tests/E_ACSL_test.ml
 
 EACSL_TESTS_C_FILES = \
   $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
