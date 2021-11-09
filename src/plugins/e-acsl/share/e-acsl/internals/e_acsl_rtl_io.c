@@ -45,6 +45,7 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "e_acsl_concurrency.h"
 #include "e_acsl_rtl_io.h"
 
 /*! \brief Test if we can still write `n + 1` characters to the buffer according
@@ -67,6 +68,23 @@
 #define DEC_COUNT(count) DEC_COUNT_N(count, 1)
 
 typedef void (*putcf)(void *, size_t *, char);
+
+#ifdef E_ACSL_CONCURRENCY_PTHREAD
+static pthread_mutex_t rtl_io_global_mutex_value;
+
+static void rtl_io_initialize_global_mutex() {
+  pthread_mutexattr_t attr;
+  pthread_mutexattr_init(&attr);
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init(&rtl_io_global_mutex_value, &attr);
+  pthread_mutexattr_destroy(&attr);
+}
+
+pthread_mutex_t *rtl_io_global_mutex() {
+  E_ACSL_RUN_ONCE(rtl_io_initialize_global_mutex);
+  return &rtl_io_global_mutex_value;
+}
+#endif
 
 /* Unsigned long integers to string conversion (%u) */
 static void uli2a(unsigned long int num, unsigned int base, int uc, char *bf) {
@@ -424,7 +442,9 @@ int rtl_printf(char *fmt, ...) {
 }
 
 int rtl_vprintf(char *fmt, va_list vlist) {
+  RTL_IO_LOCK();
   _format(NULL, NULL, _charc_stdout, fmt, vlist);
+  RTL_IO_UNLOCK();
   return 1;
 }
 
@@ -437,7 +457,9 @@ int rtl_eprintf(char *fmt, ...) {
 }
 
 int rtl_veprintf(char *fmt, va_list vlist) {
+  RTL_IO_LOCK();
   _format(NULL, NULL, _charc_stderr, fmt, vlist);
+  RTL_IO_UNLOCK();
   return 1;
 }
 
@@ -450,8 +472,10 @@ int rtl_dprintf(int fd, char *fmt, ...) {
 }
 
 int rtl_vdprintf(int fd, char *fmt, va_list vlist) {
+  RTL_IO_LOCK();
   intptr_t fd_long = fd;
   _format((void *)fd_long, NULL, _charc_file, fmt, vlist);
+  RTL_IO_UNLOCK();
   return 1;
 }
 

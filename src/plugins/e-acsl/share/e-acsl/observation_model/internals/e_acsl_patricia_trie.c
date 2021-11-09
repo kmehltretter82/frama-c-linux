@@ -606,6 +606,7 @@ static void pt_print_node(const pt_struct_t *pt, pt_node_t *node, int depth) {
 }
 
 void pt_print(const pt_struct_t *pt) {
+  RTL_IO_LOCK();
   DLOG("------------DEBUG\n");
   if (pt != NULL) {
     E_ACSL_RLOCK(pt->lock);
@@ -615,5 +616,6 @@ void pt_print(const pt_struct_t *pt) {
     DLOG("Patricia trie is NULL\n");
   }
   DLOG("-----------------\n");
+  RTL_IO_UNLOCK();
 }
 #endif // E_ACSL_DEBUG

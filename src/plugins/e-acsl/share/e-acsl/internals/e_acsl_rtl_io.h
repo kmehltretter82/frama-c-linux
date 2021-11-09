@@ -77,6 +77,23 @@
 #define STDOUT(...) rtl_printf(__VA_ARGS__)
 #define STDERR(...) rtl_eprintf(__VA_ARGS__)
 
+#ifdef E_ACSL_CONCURRENCY_PTHREAD
+#  include <pthread.h>
+
+/*! \brief Returns the global mutex for RTL printing. This mutex is recursive so
+    multiple locks can be acquired from the same thread. */
+pthread_mutex_t *rtl_io_global_mutex();
+
+/*! \brief Lock the global RTL printing mutex. */
+#  define RTL_IO_LOCK() pthread_mutex_lock(rtl_io_global_mutex());
+
+/*! \brief Unlock the global RTL printing mutex. */
+#  define RTL_IO_UNLOCK() pthread_mutex_unlock(rtl_io_global_mutex());
+#else
+#  define RTL_IO_LOCK()
+#  define RTL_IO_UNLOCK()
+#endif
+
 /* Replacement for printf with support for the above specifiers */
 int rtl_printf(char *fmt, ...);
 int rtl_vprintf(char *fmt, va_list vlist);

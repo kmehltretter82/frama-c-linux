@@ -213,10 +213,12 @@ void init_thread_shadow_layout(size_t stack_size) {
   pt_insert(thread_partitions, (pt_leaf_t)tls);
 
 #  if defined(E_ACSL_DEBUG) && defined(E_ACSL_DEBUG_VERBOSE)
+  RTL_IO_LOCK();
   DLOG(">>> Thread stack -------------\n");
   print_memory_partition(&stack->p);
   DLOG(">>> Thread TLS ---------------\n");
   print_memory_partition(&tls->p);
+  RTL_IO_UNLOCK();
 #  endif
 
   // Safe location tracking for thread-specific locations

@@ -1111,10 +1111,12 @@ void print_heap_shadows(uintptr_t addr) {
 }
 
 void print_shadows(uintptr_t addr, size_t size) {
+  RTL_IO_LOCK();
   if (IS_ON_STATIC(addr))
     print_static_shadows(addr, size);
   else if (IS_ON_HEAP(addr))
     print_heap_shadows(addr);
+  RTL_IO_UNLOCK();
 }
 
 void print_memory_segment(struct memory_segment *p, char *lab, int off) {
@@ -1147,6 +1149,7 @@ void print_memory_partition(struct memory_partition *p) {
 }
 
 void print_shadow_layout() {
+  RTL_IO_LOCK();
   DLOG(">>> HEAP ---------------------\n");
   print_memory_partition(&mem_layout.heap);
   DLOG(">>> STACK --------------------\n");
@@ -1171,6 +1174,7 @@ void print_shadow_layout() {
   print_memory_partition(&mem_layout.rdata);
 #  endif
   DLOG(">>> --------------------------\n");
+  RTL_IO_UNLOCK();
 }
 
 const char *which_segment(uintptr_t addr) {

@@ -77,6 +77,7 @@ static int native_backtrace(void **array, int size) {
 
 void trace() {
 #if E_ACSL_OS_IS_LINUX
+  RTL_IO_LOCK();
 
   int size = 24;
   void **bb = private_malloc(sizeof(void *) * size);
@@ -112,5 +113,6 @@ void trace() {
     counter++;
   }
   STDERR("/***************************************/\n");
+  RTL_IO_UNLOCK();
 #endif /* E_ACSL_OS_IS_LINUX */
 }
