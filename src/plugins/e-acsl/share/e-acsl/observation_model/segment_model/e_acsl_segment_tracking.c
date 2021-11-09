@@ -20,8 +20,11 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "../../instrumentation_model/e_acsl_temporal_timestamp.h"
 #include "../../internals/e_acsl_bits.h"
@@ -1148,6 +1151,33 @@ void print_memory_partition(struct memory_partition *p) {
 #  endif
 }
 
+#  if E_ACSL_OS_IS_LINUX
+/*! \brief Print the content of the `/proc/self/maps` file that is used to
+    retrieve the addresses informations of some segments. */
+static void print_all_segments() {
+  FILE *maps = fopen("/proc/self/maps", "r");
+  DVASSERT(maps != NULL, "Unable to open /proc/self/maps: %s\n",
+           rtl_strerror(errno));
+
+  int result;
+  char buffer[255];
+  uintptr_t start, end;
+  while (fgets(buffer, sizeof(buffer), maps) != NULL) {
+    result = sscanf(buffer, "%" SCNxPTR "-%" SCNxPTR, &start, &end);
+    if (result == 2) {
+      char *remaining = strchr(buffer, ' ');
+      DLOG("%a - %a %s", start, end, remaining ? remaining : buffer);
+    } else {
+      DLOG("%s", buffer);
+    }
+  }
+
+  result = fclose(maps);
+  DVASSERT(result == 0, "Unable to close /proc/self/maps: %s\n",
+           rtl_strerror(errno));
+}
+#  endif
+
 void print_shadow_layout() {
   RTL_IO_LOCK();
   DLOG(">>> HEAP ---------------------\n");
@@ -1161,6 +1191,8 @@ void print_shadow_layout() {
   print_memory_partition(&mem_layout.tls);
   DLOG(">>> VDSO ---------------------\n");
   print_memory_partition(&mem_layout.vdso);
+  // DLOG(">>> /proc/self/maps ----------\n");
+  // print_all_segments();
 #  elif E_ACSL_OS_IS_WINDOWS
   DLOG(">>> TEXT ---------------------\n");
   print_memory_partition(&mem_layout.text);
