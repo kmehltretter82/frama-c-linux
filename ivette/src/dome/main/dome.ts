@@ -125,7 +125,7 @@ function saveGlobalSettings() {
 }
 
 function obtainGlobalSettings() {
-  if (!GlobalSettings) {
+  if (_.isEmpty(GlobalSettings)) {
     GlobalSettings = loadSettings(PATH_GLOBAL_SETTINGS);
   }
   return GlobalSettings;
