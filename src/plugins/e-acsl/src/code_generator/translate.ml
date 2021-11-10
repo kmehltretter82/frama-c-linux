@@ -1056,9 +1056,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
     let ity =
-      Typing.get_integer_op_of_predicate
-        ~lenv
-        p
+      Typing.get_integer_op_of_predicate ~lenv p
     in
     comparison_to_exp ~adata ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->

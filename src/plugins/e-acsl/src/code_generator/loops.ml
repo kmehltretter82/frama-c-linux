@@ -65,9 +65,10 @@ let handle_annotations env kf stmt =
            | Some (t, measure_opt) ->
              let env = Env.set_annotation_kind env Smart_stmt.Variant in
              let env = Env.push env in
-             let lenv = Env.Local_vars.get env in
-             Typing.type_term ~use_gmp_opt:true ~lenv t;
-             let ty = Typing.get_typ ~lenv t in
+             (* There cannot be bound logical variables since we cannot write
+                loops inside logic functions or predicates, hence lenv is []*)
+             Typing.type_term ~use_gmp_opt:true ~lenv:[] t;
+             let ty = Typing.get_typ ~lenv:[] t in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
              let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =

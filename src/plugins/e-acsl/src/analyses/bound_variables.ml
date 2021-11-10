@@ -697,14 +697,10 @@ end
   let do_user_predicates () =
     let gannot a =
       match a with
-      | Dfun_or_pred (li,loc) ->
-        (match li.l_body with
-         | LBpred p ->
-           (match Logic_normalizer.get_pred p with
-            | PoT_pred p -> process_quantif ~loc p
-            | PoT_term _ -> ())
-         | _ -> ())
-
+      | Dfun_or_pred ({l_body = LBpred p},loc) ->
+        (match Logic_normalizer.get_pred p with
+         | PoT_pred p -> process_quantif ~loc p
+         | PoT_term _ -> ())
       | _ -> ()
     in
     Annotations.iter_global (fun _ a -> gannot a)
