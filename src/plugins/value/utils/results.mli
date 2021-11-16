@@ -82,7 +82,15 @@ val eval_exp : Cil_types.exp -> request -> value evaluation
 
 val eval_address : Cil_types.lval -> request -> address evaluation
 
-val eval_callee : Cil_types.exp -> request -> Cil_types.kernel_function list result (* Ignores non-function values; exp must come from Cil Call constructor and are restricted to lvalues with no offset *)
+(* Returns the kernel functions into which the given expression may evaluate.
+   If the callee expression doesn't always evaluate to a function, those
+   spurious values are ignored. If it always evaluate to a non-function value
+   then the returned list is empty.
+   Raises [Stdlib.Invalid_argument] if the callee expression is not an lvalue
+   without offset.
+   Also see [callee] for a function which applies directly on Call
+   statements *)
+val eval_callee : Cil_types.exp -> request -> Kernel_function.t list result
 
 (* Value conversion *)
 val as_int : value evaluation -> int result
@@ -106,9 +114,17 @@ val is_bottom : 'a evaluation -> bool
 val is_called : Cil_types.kernel_function -> bool (* called during the analysis, not by the actual program *)
 val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by the actual program *)
 
-(* Callers / callsites *)
+(* Callers / Callees / Callsites *)
 val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
 val callsites : Cil_types.kernel_function -> Cil_types.stmt list
 val callsites_per_caller : Cil_types.kernel_function ->
-    (Cil_types.kernel_function * Cil_types.stmt list) list
+  (Cil_types.kernel_function * Cil_types.stmt list) list
+
+(* Returns the kernel functions called in the given statement.
+   If the callee expression doesn't always evaluate to a function, those
+   spurious values are ignored. If it always evaluate to a non-function value
+   then the returned list is empty.
+   Raises [Stdlib.Invalid_argument] if the statement is not a [Call]
+   instruction or a [Local_init] with [ConsInit] initializer. *)
+val callee : Cil_types.stmt -> Kernel_function.t list
 [@@@ api_end]

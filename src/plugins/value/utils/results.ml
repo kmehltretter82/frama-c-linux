@@ -376,7 +376,9 @@ struct
       let r,_alarms = A.Eval.eval_function_exp exp state in
       r >>>-: List.map fst
     in
-    get req |> Response.map_join' extract join |> convert
+    get req |> Response.map_join' extract join |> convert |>
+    Result.map (List.sort_uniq Kernel_function.compare)
+
 
   (* Conversion *)
 
@@ -429,7 +431,7 @@ struct
     let response_loc, lv = extract_loc res in
     let is_const_lv = Value_util.is_const_write_invalid (Cil.typeOfLval lv) in
     (* No write effect if [lv] is const *)
-    if access=Locations.Write && is_const_lv 
+    if access=Locations.Write && is_const_lv
     then Result.ok Locations.Zone.bottom
     else
       match A.Loc.get Main_locations.PLoc.key with
@@ -620,8 +622,26 @@ let eval_address lval req =
     end : Lvaluation)
 
 let eval_callee exp req =
+  (* Check the validity of exp *)
+  begin match exp with
+    | Cil_types.({ enode = Lval (_, NoOffset) }) -> ()
+    | _ ->
+      invalid_arg "The callee must be an lvalue with no offset"
+  end;
   let module M = Make () in
   M.eval_callee exp req
+
+let callee stmt =
+  let callee_exp =
+    match stmt.Cil_types.skind with
+    | Instr (Call (_lval, callee_exp, _args, _loc)) ->
+      callee_exp
+    | Instr (Local_init (_vi, ConsInit (f, _, _), _loc)) ->
+      Cil.evar f
+    | _ ->
+      invalid_arg "Can only evaluate the callee on a statement which is a Call"
+  in
+  before stmt |> eval_callee callee_exp |> Result.value ~default:[]
 
 (* Value conversion *)
 
@@ -733,7 +753,7 @@ let callsites_per_caller kf =
   let module Map = Kernel_function.Map in
   let f acc = function
     | [] | (_,Cil_types.Kglobal) :: _ -> acc
-    | (kf,Kstmt stmt) :: _-> 
+    | (kf,Kstmt stmt) :: _->
       Map.update kf (fun old -> Some (stmt :: Option.value ~default:[] old)) acc
   in
   at_start_of kf |> callstacks |>
