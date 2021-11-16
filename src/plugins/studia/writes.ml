@@ -35,7 +35,7 @@ type effects = {
 
 (** Does the functions called at [stmt] modify directly or indirectly [zlval] *)
 let effects_of_call stmt zlval effects  =
-  let aux_kf kf effects =
+  let aux_kf effects kf =
     let inout = !Db.Operational_inputs.get_internal_precise ~stmt kf in
     let out = inout.Inout_type.over_outputs in
     if Zone.intersects out zlval then
@@ -47,8 +47,8 @@ let effects_of_call stmt zlval effects  =
     else
       effects
   in
-  let kfs = Db.Value.call_to_kernel_function stmt in
-  Kernel_function.Hptset.fold aux_kf kfs effects
+  let kfs = Eva.Results.callee stmt in
+  List.fold_left aux_kf effects kfs
 
 class find_write zlval = object (self)
   inherit Visitor.frama_c_inplace
@@ -66,8 +66,8 @@ class find_write zlval = object (self)
           let direct_write = match lvopt with
             | None -> false
             | Some lv ->
-              let zlv = !Db.Value.lval_to_zone (Kstmt stmt) lv in
-              Zone.intersects zlv zlval
+              Eva.Results.(before stmt |> eval_address lv |> as_zone) |>
+              Result.fold ~ok:(Zone.intersects zlval) ~error:(fun _ -> false)
           in
           let effects =
             effects_of_call stmt zlval {direct = direct_write; indirect =false}
