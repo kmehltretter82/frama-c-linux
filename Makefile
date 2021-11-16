@@ -931,6 +931,7 @@ PLUGIN_TYPES_TODOC:=$(addsuffix .mli,$(VALUE_TYPES))
 
 # Eva API
 API_MLI := $(addprefix $(PLUGIN_DIR)/, \
+  engine/analysis.mli \
   utils/results.mli utils/value_results.mli value_parameters.mli \
   legacy/eval_terms.mli utils/unit_tests.mli utils/eva_annotations.mli \
   eval.mli domains/cvalue/builtins.mli)

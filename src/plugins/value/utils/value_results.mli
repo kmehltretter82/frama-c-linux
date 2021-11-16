@@ -26,6 +26,10 @@ val is_called: kernel_function -> bool
 val mark_kf_as_called: kernel_function -> unit
 val add_kf_caller: caller:kernel_function * stmt -> kernel_function -> unit
 
+val callers: kernel_function -> (kernel_function*stmt list) list
+(** @return the list of callers with their call sites. Each function is
+    present only once in the list. *)
+
 val is_non_terminating_instr: stmt -> bool
 (** Returns [true] iff there exists executions of the statement that does
     not always fail/loop (for function calls). Must be called *only* on

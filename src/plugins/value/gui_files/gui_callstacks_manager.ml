@@ -903,7 +903,7 @@ let make_widget (main_ui:main_ui) ~packing make_panel =
   let tabs =
     GPack.notebook ~scrollable:true ~packing:(vpaned#pack ~expand:true) ()
   in
-  vpaned#misc#set_sensitive (Db.Value.is_computed ());
+  vpaned#misc#set_sensitive (Analysis.is_computed ());
   let pack_tab ?lbl w = ignore (tabs#insert_page ?tab_label:lbl w) in
   let lbl_pane_default = GPack.hbox () in
   let clear_button = new Widget.button ~icon:`CLEAR ~tooltip:"Clear" () in
@@ -1031,7 +1031,7 @@ let make_widget (main_ui:main_ui) ~packing make_panel =
     HWidget.iter (fun w _ -> tabs#remove_page (tabs#page_num w)) hash_tabs;
     HWidget.clear hash_tabs;
     clear_default ();
-    vpaned#misc#set_sensitive (Db.Value.is_computed ());
+    vpaned#misc#set_sensitive (Analysis.is_computed ());
   in
   let display_data_by_callstack loc selection content =
     clear_button#set_enabled true;

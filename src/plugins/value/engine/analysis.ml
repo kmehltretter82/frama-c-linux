@@ -216,6 +216,14 @@ let force_compute () =
   Analyzer.compute_from_entry_point ~lib_entry kf ;
   ComputationState.set Computed
 
+let is_computed = Db.Value.is_computed
+
+let compute () =
+  (* Nothing to recompute when Value has already been computed. This boolean
+      is automatically cleared when an option of Value changes, because they
+      are registered as dependencies on [Db.Value.self] in {!Value_parameters}.*)
+  if not (is_computed ()) then force_compute ()
+
 (* Resets the Analyzer when the current project is changed. *)
 let () =
   Project.register_after_set_current_hook

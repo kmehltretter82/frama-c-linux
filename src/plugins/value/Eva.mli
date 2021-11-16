@@ -1,5 +1,22 @@
 (* This file is generated. Do not edit. *)
 
+module Analysis: sig
+  val compute : unit -> unit
+  (** Compute the value analysis, if not already computed, using the entry
+      point of the current project. You may set it with
+      {!Globals.set_entry_point}.
+      @raise Globals.No_such_entry_point if the entry point is incorrect
+      @raise Db.Value.Incorrect_number_of_arguments if some arguments are
+      specified for the entry point using {!Db.Value.fun_set_args}, and
+      an incorrect number of them is given.
+      @plugin development guide *)
+  
+  (** Perform a full analysis if not already done. *)
+  
+  val is_computed : unit -> bool
+  (** Return [true] iff the value analysis has been done. *)
+end
+
 module Results: sig
   (* Usage sketch :
   

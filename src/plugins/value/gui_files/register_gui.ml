@@ -67,7 +67,7 @@ let sync_filetree (filetree:Filetree.t) =
           try
             let vi = Kernel_function.get_vi kf in
             let strikethrough =
-              Db.Value.is_computed () && not (!Db.Value.is_called kf)
+              Analysis.is_computed () && not (!Db.Value.is_called kf)
             in
             filetree#set_global_attribute ~strikethrough vi
           with Not_found -> ());
@@ -75,7 +75,7 @@ let sync_filetree (filetree:Filetree.t) =
        (fun vi _ ->
           if vi.vsource = true then
             filetree#set_global_attribute
-              ~strikethrough:(Db.Value.is_computed () && not (used_var vi))
+              ~strikethrough:(Analysis.is_computed () && not (used_var vi))
               vi
        );
      if not (filetree#flat_mode) then
@@ -84,7 +84,7 @@ let sync_filetree (filetree:Filetree.t) =
             (* the display name removes the path *)
             let globals_state = filetree#get_file_globals file in
             filetree#set_file_attribute
-              ~strikethrough:(Db.Value.is_computed () &&
+              ~strikethrough:(Analysis.is_computed () &&
                               List.for_all snd globals_state)
               file
          )
@@ -96,7 +96,7 @@ let sync_filetree (filetree:Filetree.t) =
     ()
 
 let hide_unused_function_or_var g =
-  !hide_unused () && Db.Value.is_computed () &&
+  !hide_unused () && Analysis.is_computed () &&
   (match g with
    | GFun ({svar = vi}, _) | GFunDecl (_, vi, _) ->
      let kf = Globals.Functions.get vi in
@@ -144,7 +144,7 @@ let value_panel pack (main_ui:main_ui) =
   ignore (run_button#connect#pressed
             (fun () ->
                main_ui#protect ~cancelable:true
-                 (fun () -> refresh (); !Db.Value.compute (); main_ui#reset ());
+                 (fun () -> refresh (); Analysis.compute (); main_ui#reset ());
             ));
   pack box;
   "Eva", box#coerce, Some refresh
@@ -156,7 +156,7 @@ let active_highlighter buffer localizable ~start ~stop =
   let buffer = buffer#buffer in
   (* highlight dead code areas, non-terminating calls, and degeneration
      points if Value has run.*)
-  if Db.Value.is_computed () then
+  if Analysis.is_computed () then
     match localizable with
     | PStmt (kf, stmt) -> begin
         let degenerate =
@@ -222,7 +222,7 @@ let menu_go_to_fun_definition (main_ui:main_ui) (popup_factory:menu) funs =
   List.iter aux funs
 
 let gui_compute_values (main_ui:main_ui) =
-  if not (Db.Value.is_computed ())
+  if not (Analysis.is_computed ())
   then main_ui#launcher ()
 
 let cleaned_outputs kf s =
@@ -555,7 +555,7 @@ let responses_ref = ref (module No_Response: Responses)
 
 let to_do_on_select (menu:menu) (main_ui:main_ui) ~button selected =
   let module Responses = (val !responses_ref) in
-  if Db.Value.is_computed () then
+  if Analysis.is_computed () then
     if button = 1 then
       Responses.left_click_values_computed main_ui selected
     else if button = 3 then
