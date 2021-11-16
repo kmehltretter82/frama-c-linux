@@ -357,7 +357,7 @@ struct
 
   (* Evaluation *)
 
-  let eval_lval lval req=
+  let eval_lval lval req =
     let eval state = A.Eval.copy_lvalue state lval in
     LValue (Response.map eval (get req))
 
@@ -486,6 +486,22 @@ struct
     match r with
     | `Bottom -> true
     | `Top | `Value () -> false
+
+  (* Dependencies *)
+
+  let lval_deps lval req =
+    let compute_deps cvalue =
+      Register.eval_deps_lval (cvalue, Locals_scoping.bottom ()) lval
+    in
+    req |> as_cvalue_model |>
+    Result.fold ~error:(fun _ -> Locations.Zone.bottom) ~ok:compute_deps
+
+  let expr_deps exp req =
+    let compute_deps cvalue =
+      Register.eval_deps (cvalue, Locals_scoping.bottom ()) exp
+    in
+    req |> as_cvalue_model |>
+    Result.fold ~error:(fun _ -> Locations.Zone.bottom) ~ok:compute_deps
 end
 
 
@@ -517,6 +533,17 @@ let equality_class exp req =
 let as_cvalue_model req =
   let module E = Make () in
   E.as_cvalue_model req
+
+
+(* Depedencies *)
+
+let expr_deps exp req =
+  let module E = Make () in
+  E.expr_deps exp req
+
+let lval_deps lval req =
+  let module E = Make () in
+  E.lval_deps lval req
 
 
 (* Evaluation *)

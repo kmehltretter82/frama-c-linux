@@ -68,6 +68,10 @@ module Results: sig
   val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
   val as_cvalue_model : request -> Cvalue.Model.t result
   
+  (* Dependencies *)
+  val expr_deps : Cil_types.exp -> request -> Locations.Zone.t
+  val lval_deps : Cil_types.lval -> request -> Locations.Zone.t
+  
   (* Evaluation *)
   val eval_var : Cil_types.varinfo -> request -> value evaluation
   val eval_lval : Cil_types.lval -> request -> value evaluation

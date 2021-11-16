@@ -20,6 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Functions of the Value plugin registered in {!Db}.
+(** Functions of the Value plugin registered in {!Db}. Only two functions
+    are exported. *)
 
-    Nothing is exported. *)
+val eval_deps : Cvalue.Model.t * Locals_scoping.clobbered_set ->
+  Cil_types.exp -> Locations.Zone.t
+val eval_deps_lval : Cvalue.Model.t * Locals_scoping.clobbered_set ->
+  Cil_types.lval -> Locations.Zone.t
