@@ -33,6 +33,8 @@ share/e-acsl/internals/e_acsl_malloc.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_malloc.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_private_assert.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_private_assert.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/internals/e_acsl_rtl_error.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/internals/e_acsl_rtl_error.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_rtl_io.c: MODIFIED_SPARETIMELABS
 share/e-acsl/internals/e_acsl_rtl_io.h: MODIFIED_SPARETIMELABS
 share/e-acsl/internals/e_acsl_rtl_string.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL

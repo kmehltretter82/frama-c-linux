@@ -20,11 +20,11 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <errno.h>
 #include <stddef.h>
 
 #include "../../internals/e_acsl_malloc.h"
 #include "../../internals/e_acsl_private_assert.h"
+#include "../../internals/e_acsl_rtl_error.h"
 
 #include "e_acsl_shadow_layout.h"
 
@@ -62,13 +62,13 @@ size_t increase_stack_limit(const size_t size) {
       rl.rlim_cur = stacksz;
       result = setrlimit(RLIMIT_STACK, &rl);
       if (result != 0) {
-        private_abort("setrlimit: %s \n", strerror(errno));
+        private_abort("setrlimit: %s \n", rtl_strerror(errno));
       }
     } else {
       stacksz = rl.rlim_cur;
     }
   } else {
-    private_abort("getrlimit: %s \n", strerror(errno));
+    private_abort("getrlimit: %s \n", rtl_strerror(errno));
   }
   return (size_t)stacksz;
 }
@@ -350,7 +350,7 @@ static void init_shadow_layout_vdso() {
   // (using open() instead of fopen() to avoid a dynamic allocation)
   int maps_fd = open("/proc/self/maps", O_RDONLY);
   private_assert(maps_fd >= 0, "Unable to open /proc/self/maps: %s\n",
-                 strerror(errno));
+                 rtl_strerror(errno));
 
   int result;
   uintptr_t start, end;
@@ -370,7 +370,7 @@ static void init_shadow_layout_vdso() {
       end = 0;
       break;
     } else if (count < 0) {
-      DVABORT("Reading /proc/self/maps failed: %s\n", strerror(errno));
+      DVABORT("Reading /proc/self/maps failed: %s\n", rtl_strerror(errno));
       break;
     } else {
       // Scan the start and end addresses of the segment
@@ -379,7 +379,7 @@ static void init_shadow_layout_vdso() {
       DVASSERT(result == 2,
                "Scanning for addresses in /proc/self/maps failed, expected 2 "
                "addresses, found: %d, error: %s\n",
-               result, strerror(errno));
+               result, rtl_strerror(errno));
 
       if (start <= vdso && vdso < end) {
         break;
@@ -397,7 +397,7 @@ static void init_shadow_layout_vdso() {
           offset = lseek(maps_fd, -offset, SEEK_CUR);
           DVASSERT(offset != -1,
                    "Unable to move file offset of /proc/self/maps: %s\n",
-                   strerror(errno));
+                   rtl_strerror(errno));
           break;
         } else {
           // No newline found on the current buffer, continue reading the file
@@ -409,7 +409,7 @@ static void init_shadow_layout_vdso() {
 
   result = close(maps_fd);
   DVASSERT(result == 0, "Unable to close /proc/self/maps: %s\n",
-           strerror(errno));
+           rtl_strerror(errno));
 
   // Initialize the memory partition
   memory_partition *pvdso = &mem_layout.vdso;

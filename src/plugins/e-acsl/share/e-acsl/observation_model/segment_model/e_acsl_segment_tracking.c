@@ -25,6 +25,7 @@
 
 #include "../../instrumentation_model/e_acsl_temporal_timestamp.h"
 #include "../../internals/e_acsl_bits.h"
+#include "../../internals/e_acsl_rtl_error.h"
 #include "../../internals/e_acsl_rtl_string.h"
 #include "../internals/e_acsl_omodel_debug.h"
 #include "e_acsl_shadow_layout.h"
