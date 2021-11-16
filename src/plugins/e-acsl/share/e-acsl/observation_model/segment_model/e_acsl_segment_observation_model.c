@@ -35,7 +35,6 @@
 #include "../../internals/e_acsl_malloc.h"
 #include "../../internals/e_acsl_private_assert.h"
 #include "../../numerical_model/e_acsl_floating_point.h"
-#include "../internals/e_acsl_safe_locations.h"
 #include "e_acsl_segment_tracking.h"
 #include "e_acsl_shadow_layout.h"
 
@@ -322,18 +321,7 @@ void do_eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   shadow_alloca(&main, sizeof(&main));
   initialize_static_region((uintptr_t)&main, sizeof(&main));
   /* Tracking safe locations */
-  collect_safe_locations();
-  int i;
-  for (i = 0; i < get_safe_locations_count(); i++) {
-    memory_location *loc = get_safe_location(i);
-    if (loc->is_on_static) {
-      void *addr = (void *)loc->address;
-      uintptr_t len = loc->length;
-      shadow_alloca(addr, len);
-      if (loc->is_initialized)
-        unsafe_initialize(addr, len);
-    }
-  }
+  register_safe_locations(E_ACSL_REGISTER_ALL_LOCS);
   init_infinity_values();
 }
 

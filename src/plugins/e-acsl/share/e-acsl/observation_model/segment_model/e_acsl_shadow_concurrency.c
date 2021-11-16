@@ -218,6 +218,9 @@ void init_thread_shadow_layout(size_t stack_size) {
   DLOG(">>> Thread TLS ---------------\n");
   print_memory_partition(&tls->p);
 #  endif
+
+  // Safe location tracking for thread-specific locations
+  register_safe_locations(E_ACSL_REGISTER_THREAD_LOCS);
 }
 
 void clean_thread_shadow_layout() {
