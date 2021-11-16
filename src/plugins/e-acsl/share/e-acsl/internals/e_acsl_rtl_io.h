@@ -85,6 +85,15 @@ int rtl_vprintf(char *fmt, va_list vlist);
 int rtl_sprintf(char *s, char *fmt, ...);
 int rtl_vsprintf(char *s, char *fmt, va_list vlist);
 
+/* Same as sprintf buf write only up to ̀bufsize - 1` characters in the buffer
+   and the last character is always a `\0`.
+   This function is more secure than `sprintf()` because if the buffer `s` is
+   valid for `bufsize` characters, it guarantees that there will not be an out
+   of bound write. This function is used for instance in `private_assert_fail()`
+   or in `rtl_strerror()`. */
+int rtl_snprintf(char *s, size_t bufsize, char *fmt, ...);
+int rtl_vsnprintf(char *s, size_t bufsize, char *fmt, va_list vlist);
+
 /* Same as printf but write to the error stream. */
 int rtl_eprintf(char *fmt, ...);
 int rtl_veprintf(char *fmt, va_list vlist);

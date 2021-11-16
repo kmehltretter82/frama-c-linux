@@ -483,7 +483,7 @@ void initialize_heap_region(uintptr_t addr, long len);
 #ifdef E_ACSL_DEBUG
 /* ! \brief Print human-readable representation of a byte in a primary
  * shadow */
-void printbyte(unsigned char c, char buf[]);
+void printbyte(unsigned char c, char buf[], size_t bufsize);
 
 /*! \brief Print human-readable (well, ish) representation of a memory block
  * using primary and secondary shadows. */

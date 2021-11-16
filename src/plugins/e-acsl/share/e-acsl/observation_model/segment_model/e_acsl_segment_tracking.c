@@ -1020,15 +1020,15 @@ void initialize_heap_region(uintptr_t addr, long len) {
 
 /* Internal state print (debug mode) {{{ */
 #ifdef E_ACSL_DEBUG
-void printbyte(unsigned char c, char buf[]) {
+void printbyte(unsigned char c, char buf[], size_t bufsize) {
   if (c >> 2 < LONG_BLOCK_INDEX_START) {
-    rtl_sprintf(buf, "PRIMARY: I{%u} RO{%u} OF{%2u} => %u[%u]",
-                checkbit(INIT_BIT, c), checkbit(READONLY_BIT, c), c >> 2,
-                short_lengths[c >> 2], short_offsets[c >> 2]);
+    rtl_snprintf(buf, bufsize, "PRIMARY: I{%u} RO{%u} OF{%2u} => %u[%u]",
+                 checkbit(INIT_BIT, c), checkbit(READONLY_BIT, c), c >> 2,
+                 short_lengths[c >> 2], short_offsets[c >> 2]);
   } else {
-    rtl_sprintf(buf, "SECONDARY:  I{%u} RO{%u} OF{%u} => %4u",
-                checkbit(INIT_BIT, c), checkbit(READONLY_BIT, c), (c >> 2),
-                (c >> 2) - LONG_BLOCK_INDEX_START);
+    rtl_snprintf(buf, bufsize, "SECONDARY:  I{%u} RO{%u} OF{%u} => %4u",
+                 checkbit(INIT_BIT, c), checkbit(READONLY_BIT, c), (c >> 2),
+                 (c >> 2) - LONG_BLOCK_INDEX_START);
   }
 }
 
@@ -1042,12 +1042,12 @@ void print_static_shadows(uintptr_t addr, size_t size) {
   int i, j = 0;
   for (i = 0; i < size; i++) {
     sec_buf[0] = '\0';
-    printbyte(prim_shadow[i], prim_buf);
+    printbyte(prim_shadow[i], prim_buf, sizeof(prim_buf));
     if (IS_LONG_BLOCK(size) && (i % LONG_BLOCK) == 0) {
       j += 2;
       if (i < LONG_BLOCK_BOUNDARY(size)) {
-        rtl_sprintf(sec_buf, " %a  SZ{%u} OF{%u}", &sec_shadow[j],
-                    sec_shadow[j - 2], sec_shadow[j - 1]);
+        rtl_snprintf(sec_buf, sizeof(sec_buf), " %a  SZ{%u} OF{%u}",
+                     &sec_shadow[j], sec_shadow[j - 2], sec_shadow[j - 1]);
       }
       if (i) {
         DLOG("---------------------------------------------\n");
