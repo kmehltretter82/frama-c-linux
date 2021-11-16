@@ -126,6 +126,11 @@ let match_integer t =
   | Logic.Kint c -> c
   | _ -> raise Not_found
 
+let match_mod t =
+  match F.repr t with
+  | Logic.Mod (e1, e2) -> e1, e2
+  | _ -> raise Not_found
+
 (* integration with qed should be improved! *)
 let rec is_positive_or_null e = match F.repr e with
   | Logic.Fun( f , [e] ) when Fun.equal f f_lnot -> is_negative e
@@ -137,6 +142,7 @@ let rec is_positive_or_null e = match F.repr e with
   | _ -> (* try some improvement first then ask to qed *)
       let improved_is_positive_or_null e = match F.repr e with
         | Logic.Add es -> List.for_all is_positive_or_null es
+        | Logic.Mod(e1,_) -> is_positive_or_null e1
         | _ -> false
       in if improved_is_positive_or_null e then true
       else match F.is_true (F.e_leq e_zero e) with
@@ -168,7 +174,7 @@ let match_positive_or_null e =
   if not (is_positive_or_null e) then raise Not_found;
   e
 
-let match_power2, _match_power2_minus1 =
+let match_power2, match_power2_minus1 =
   let highest_bit_number =
     let hsb p = if p land 2 = 0 then 0 else 1
     in let hsb p = let n = p lsr 2 in if n = 0 then hsb p else 2 + hsb n
@@ -198,7 +204,7 @@ let match_power2, _match_power2_minus1 =
   in let match_power2_minus1 e = match F.repr e with
       | Logic.Kint z when is_power2 (Integer.succ z) ->
           e_zint (highest_bit_number (Integer.succ z))
-      | _ -> raise Not_found
+      | _ -> match_power2 (e_add e_one e)
   in match_power2, match_power2_minus1
 
 let match_fun op t =
@@ -251,6 +257,7 @@ let match_positive_or_null_integer_arg2 =
 let match_integer_extraction = match_list_head match_integer
 
 let match_power2_extraction = match_list_extraction match_power2
+let match_power2_minus1_extraction = match_list_extraction match_power2_minus1
 let match_binop_one_extraction binop = match_list_extraction (match_binop_one_arg1 binop)
 
 
@@ -611,16 +618,28 @@ let smp_leq_with_land a b =
 let smp_eq_with_land a b =
   let es = match_fun f_land a in
   try
-    let b1 = match_integer b in
-    try (* (b1&~a2)!=0 ==> (b1==(a2&e) <=> false) *)
-      let a2,_ = match_integer_extraction es in
-      if Integer.is_zero (Integer.logand b1 (Integer.lognot a2))
-      then raise Not_found ;
-      e_false
-    with Not_found when b == e_minus_one ->
-      (* -1==(a1&a2) <=> (-1==a1 && -1==a2) *)
-      F.e_and (List.map (e_eq b) es)
-  with Not_found -> introduction_bit_test_positive es b
+    try
+      let b1 = match_integer b in
+      try (* (b1&~a2)!=0 ==> (b1==(a2&e) <=> false) *)
+        let a2,_ = match_integer_extraction es in
+        if Integer.is_zero (Integer.logand b1 (Integer.lognot a2))
+        then raise Not_found ;
+        e_false
+      with Not_found when b == e_minus_one ->
+        (* -1==(a1&a2) <=> (-1==a1 && -1==a2) *)
+        F.e_and (List.map (e_eq b) es)
+    with Not_found -> introduction_bit_test_positive es b
+  with Not_found ->
+    (* k>=0 & b1>=0 ==> (b1 & ((1 << k) -1) == b1 % (1 << k)  <==> true) *)
+    let b1,b2 = match_mod b in
+    let k = match_power2 b2 in
+    (* note: a positive or null k is required by match_power2, match_power2_minus1 *)
+    let k',_,es = match_power2_minus1_extraction es in
+    if not ((is_positive_or_null b1) &&
+            (F.decide (F.e_eq k k')) &&
+            (F.decide (F.e_eq b1 (F.e_fun f_land es))))
+    then raise Not_found ;
+    F.e_true
 
 let smp_eq_with_lor a b =
   let b1 = match_integer b in
