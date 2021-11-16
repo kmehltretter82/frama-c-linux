@@ -93,7 +93,8 @@ val as_fval : value evaluation -> Fval.t result
 val as_cvalue : value evaluation -> Cvalue.V.t result
 
 val as_location : address evaluation -> Locations.location result
-val as_zone : address evaluation -> Locations.Zone.t result
+val as_zone : ?access:Locations.access -> address evaluation ->
+  Locations.Zone.t result
 
 (* Evaluation properties *)
 val is_initialized : value evaluation -> bool
