@@ -21,9 +21,9 @@
 #   configure   configure
 ###############################################################################
 
-#############################
-Plugin E-ACSL 24.0 (Chromium)
-#############################
+############################
+Plugin E-ACSL <next-release>
+############################
 
 -  E-ACSL       [2021-11-03] Improve runtime debug logs: the %a modifier now
                 outputs in hexadecimal, the debug logs now all end in new lines,
@@ -33,6 +33,11 @@ Plugin E-ACSL 24.0 (Chromium)
                 have been adjusted to what was effectively used.
 -* E-ACSL       [2021-11-03] Now the same Frama-C options are used when parsing
                 the user sources and the E-ACSL's RTL.
+
+#############################
+Plugin E-ACSL 24.0 (Chromium)
+#############################
+
 -  E-ACSL       [2021-10-20] Add option -e-acsl-assert-print-data
                 (--assert-print-data in e-acsl-gcc.sh) to print data
                 contributing to a failed assertion along with the error message.
