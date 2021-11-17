@@ -841,7 +841,7 @@ NUMERORS_FILES:= \
 	values/numerors/numerors_value domains/numerors/numerors_domain
 
 ifeq ($(HAS_MPFR),yes)
-PLUGIN_REQUIRES+= gmp
+PLUGIN_REQUIRES+= mlmpfr
 PLUGIN_TESTS_DIRS+=value/numerors
 NUMERORS_CMO:= $(NUMERORS_FILES)
 else
