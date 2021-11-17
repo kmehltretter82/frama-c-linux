@@ -24,8 +24,6 @@ open Server
 open Data
 open Cil_types
 
-
-
 module Kmap = Kernel_function.Hashtbl
 module Smap = Cil_datatype.Stmt.Hashtbl
 module CS = Value_types.Callstack
@@ -70,8 +68,6 @@ let handle_top_or_bottom ~top ~bottom compute = function
   | `Top -> top
   | `Value v -> compute v
 
-
-
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -79,9 +75,10 @@ let handle_top_or_bottom ~top ~bottom compute = function
 let next_steps s : step list =
   match s.skind with
   | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
-  | Instr (Set _ | Call _ | Local_init _ | Asm _ | Code_annot _) -> [ `After ]
-  | Switch _ | Loop _ | Block _ | UnspecifiedSequence _ -> [ `After ]
-  | TryCatch _ | TryFinally _ | TryExcept _ -> [ `After ]
+  | Instr (Set _ | Call _ | Local_init _ | Asm _ | Code_annot _)
+  | Switch _ | Loop _ | Block _ | UnspecifiedSequence _
+  | TryCatch _ | TryFinally _ | TryExcept _
+    -> [ `After ]
   | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
 
 let probe_stmt s =
@@ -100,8 +97,6 @@ let probe marker =
   | PStmt(_,s) | PStmtStart(_,s) -> probe_stmt s
   | PVDecl(_,Kstmt s,v) -> Plval((Var v,NoOffset),s)
   | _ -> Pnone
-
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Stmt Ranking                                                       --- *)
@@ -184,8 +179,6 @@ module Ranking : Ranking_sig = struct
 
 end
 
-
-
 (* -------------------------------------------------------------------------- *)
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -222,7 +215,8 @@ module Jcalls : Request.Output with type t = callstack = struct
           "stmt", Jstmt.to_json stmt ;
           "rank", Jint.to_json (Ranking.stmt stmt) ;
         ]
-      in callsite :: jcallstack jcaller ki cs
+      in
+      callsite :: jcallstack jcaller ki cs
 
   let to_json = function
     | [] -> `List []
@@ -242,8 +236,6 @@ module Jtruth : Data.S with type t = truth = struct
     | `String "False" -> Abstract_interp.False
     | _ -> Abstract_interp.Unknown
 end
-
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- EVA Proxy                                                          --- *)
@@ -274,7 +266,9 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     | Some cs ->
       match A.get_stmt_state_by_callstack ~after stmt with
       | (`Top | `Bottom) as res -> res
-      | `Value cmap -> try `Value (CSmap.find cmap cs) with Not_found -> `Bottom
+      | `Value cmap ->
+        try `Value (CSmap.find cmap cs)
+        with Not_found -> `Bottom
 
   type to_offsetmap =
     | Bottom
@@ -294,7 +288,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
 
   let reduce_loc_and_eval loc state =
     if Cvalue.Model.is_top state then Top
-    else if not @@ Cvalue.Model.is_reachable state then Bottom
+    else if not (Cvalue.Model.is_reachable state) then Bottom
     else if Int_Base.(equal loc.Locations.size zero) then Empty
     else
       let loc' = Locations.(valid_part Read loc) in
@@ -330,7 +324,8 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       | InvalidLoc, (Offsetmap _ as res) -> res
       | Offsetmap _, InvalidLoc -> acc
       | Top, r | r, Top -> r (* cannot happen, we should get Top everywhere *)
-    in precise_loc >>-: (fun loc -> Precise_locs.fold f loc Bottom), alarms
+    in
+    precise_loc >>-: (fun loc -> Precise_locs.fold f loc Bottom), alarms
 
   type evaluation =
     | ToValue of A.Val.t
@@ -343,23 +338,19 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     | ToOffsetmap Top -> Format.fprintf fmt "<NO INFORMATION>"
     | ToOffsetmap InvalidLoc -> Format.fprintf fmt "<INVALID LOCATION>"
     | ToOffsetmap (Offsetmap o) ->
-      Cvalue.V_Offsetmap.pretty_generic ?typ:(Some typ) () fmt o ;
+      Cvalue.V_Offsetmap.pretty_generic ~typ () fmt o ;
       Eval_op.pretty_stitched_offsetmap fmt typ o
 
   let eval_lval lval state =
-    match Cil.(unrollType @@ typeOfLval lval) with
+    match Cil.(unrollType (typeOfLval lval)) with
     | TInt _ | TEnum _ | TPtr _ | TFloat _ ->
-      let value, alarms = A.copy_lvalue state lval in
-      let _ = lval_to_offsetmap lval state in
-      let default = Eval.Flagged_Value.bottom in
-      (Bottom.default ~default value).v >>-: (fun v -> ToValue v), alarms
+      A.copy_lvalue state lval >>=. fun value ->
+      value.v >>-: fun v -> ToValue v
     | _ ->
-      let offsetmap, alarms = lval_to_offsetmap lval state in
-      offsetmap >>-: (fun r -> ToOffsetmap r), alarms
+      lval_to_offsetmap lval state >>=: fun offsm -> ToOffsetmap offsm
 
   let eval_expr expr state =
-    let value, alarms = A.eval_expr state expr in
-    value >>-: (fun v -> ToValue v), alarms
+    A.eval_expr state expr >>=: fun value -> ToValue value
 
   let dalarms alarms =
     let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
@@ -373,7 +364,8 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       | `After -> dstate ~after:true stmt callstack
       | `Then cond -> (A.assume_cond stmt state cond true :> dstate)
       | `Else cond -> (A.assume_cond stmt state cond false :> dstate)
-    in List.fold_left (fun acc step -> f acc step @@ add_state step) acc steps
+    in
+    List.fold_left (fun acc step -> f acc step @@ add_state step) acc steps
 
   let domain_step typ eval ((values, alarms) as acc) step =
     let to_str = Pretty_utils.to_string (Bottom.pretty (pp_evaluation typ)) in
@@ -402,7 +394,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     try add (Base.to_varinfo base) acc with Base.Not_a_C_variable -> acc
 
   let compute_pointed_lvalues eval_lval stmt callstack =
-    Option.(bind (A.Val.get Main_values.CVal.key)) @@ fun get ->
+    Option.bind (A.Val.get Main_values.CVal.key) @@ fun get ->
     let get_eval = function ToValue v -> `Value (get v) | _ -> `Bottom in
     let loc state = eval_lval state |> fst >>- get_eval in
     let bases value = Cvalue.V.fold_bases var_of_base value [] in
@@ -426,8 +418,6 @@ let proxy =
   Analysis.register_hook hook ;
   fun () -> !current
 
-
-
 (* -------------------------------------------------------------------------- *)
 (* --- Request getCallstacks                                              --- *)
 (* -------------------------------------------------------------------------- *)
@@ -450,8 +440,6 @@ let () =
       Ranking.sort (CSet.elements cset)
     end
 
-
-
 (* -------------------------------------------------------------------------- *)
 (* --- Request getCallstackInfo                                           --- *)
 (* -------------------------------------------------------------------------- *)
@@ -463,8 +451,6 @@ let () =
     ~input:(module Jcallstack)
     ~output:(module Jcalls)
     begin fun cs -> cs end
-
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getStmtInfo                                                --- *)
@@ -486,8 +472,6 @@ let () =
       set_fct rq (Kernel_function.find_englobing_kf s) ;
       set_rank rq (Ranking.stmt s) ;
     end
-
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getProbeInfo                                               --- *)
@@ -530,8 +514,6 @@ let () =
       | Pexpr (e, s) -> set_probe rq Printer.pp_exp  e s
       | Pnone -> ()
     end
-
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getValues                                                  --- *)
@@ -576,8 +558,6 @@ let () =
         | `Else _, values -> set_else   rq (Some values)
       in List.iter set_values domain.values
     end
-
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getPointedLvalues                                          --- *)
