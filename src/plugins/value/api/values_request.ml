@@ -281,7 +281,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     let b = Base.of_varinfo vi in
     try
       match Cvalue.Model.find_base b state with
-      | `Bottom -> InvalidLoc
+      | `Bottom -> Bottom
       | `Value m -> Offsetmap m
       | `Top -> Top
     with Not_found -> InvalidLoc
@@ -297,7 +297,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
         try
           let size = Int_Base.project loc'.Locations.size in
           match Cvalue.Model.copy_offsetmap loc'.Locations.loc size state with
-          | `Bottom -> Bottom
+          | `Bottom -> InvalidLoc
           | `Value offsm -> Offsetmap offsm
         with Abstract_interp.Error_Top -> Top
 
