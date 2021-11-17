@@ -402,6 +402,20 @@ class split =
                       let q = F.p_bool (F.e_and [e_not c;q]) in
                       let cases = [ "Then" , When p ; "Else" , When q ] in
                       Applicable (Tactical.replace ~at:step.id cases)
+                  | And ps ->
+                      let cond p = (* keep original kind of step *)
+                        match step.condition with
+                        | Type _ -> Type p
+                        | Have _ -> Have p
+                        | When _ -> When p
+                        | Core _ -> Core p
+                        | Init _ -> Init p
+                        | _ -> assert false (* see above pattern matching *)
+                      in
+                      feedback#set_title "Split (conjunction)" ;
+                      feedback#set_descr "Split conjunction into steps" ;
+                      let ps = List.map (fun p -> cond @@ p_bool p) ps in
+                      Applicable (Tactical.replace_step ~at:step.id ps)
                   | _ ->
                       Not_applicable
                 end

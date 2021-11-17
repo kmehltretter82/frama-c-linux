@@ -1737,14 +1737,15 @@ let step_at seq k =
 (* --- Insertion                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let in_sequence ~replace =
+let in_sequence_add_list ~replace =
   let rec in_list k h w =
     if k = 0 then
-      h :: (if replace
-            then match w with
-              | [] -> assert false
-              | _::w -> w
-            else w)
+      List.rev_append h
+        (if replace
+         then match w with
+           | [] -> assert false
+           | _::w -> w
+         else w)
     else
       match w with
       | [] -> assert false
@@ -1760,9 +1761,9 @@ let in_sequence ~replace =
     | Branch(p,a,b) ->
         let n = a.seq_size in
         if k < n then
-          Branch(p,in_sequence k h a,b)
+          Branch(p,in_sequence_add_list k h a,b)
         else
-          Branch(p,a,in_sequence (k-n) h b)
+          Branch(p,a,in_sequence_add_list (k-n) h b)
     | Either cs -> Either (in_case k h cs)
 
   and in_case k h = function
@@ -1770,11 +1771,13 @@ let in_sequence ~replace =
     | c::cs ->
         let n = c.seq_size in
         if k < n
-        then in_sequence k h c :: cs
+        then in_sequence_add_list k h c :: cs
         else c :: in_case (k-n) h cs
 
-  and in_sequence k h s = sequence (in_list k h s.seq_list)
-  in in_sequence
+  and in_sequence_add_list k h s = sequence (in_list k h s.seq_list)
+  in in_sequence_add_list
+
+let in_sequence ~replace id h = in_sequence_add_list ~replace id [h]
 
 let size seq = seq.seq_size
 
@@ -1789,6 +1792,12 @@ let replace ~at step sequent =
   let seq,goal = sequent in
   if 0 <= at && at <= seq.seq_size
   then in_sequence ~replace:true at step seq , goal
+  else raise Not_found
+
+let replace_by_step_list ~at step_list sequent =
+  let seq,goal = sequent in
+  if 0 <= at && at <= seq.seq_size
+  then in_sequence_add_list ~replace:true at step_list seq , goal
   else raise Not_found
 
 (* -------------------------------------------------------------------------- *)

@@ -153,6 +153,10 @@ val replace : at:int -> step -> sequent -> sequent
 (** replace a step in the sequent, the one [at] the specified position.
     @raise Invalid_argument if the index is out of bounds. *)
 
+val replace_by_step_list : at:int -> step list -> sequent -> sequent
+(** replace a step in the sequent, the one [at] the specified position.
+    @raise Invalid_argument if the index is out of bounds. *)
+
 val subst : (term -> term) -> sequent -> sequent
 (** Apply the atomic substitution recursively using [Lang.F.p_subst f].
     Function [f] should only transform the head of the predicate, and can assume
