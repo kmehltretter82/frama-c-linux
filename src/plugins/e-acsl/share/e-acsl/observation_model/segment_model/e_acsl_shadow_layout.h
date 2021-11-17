@@ -45,6 +45,11 @@
 #  define E_ACSL_STACK_SIZE 16
 #endif
 
+/* Default size of a program's TLS tracked via shadow memory */
+#ifndef E_ACSL_TLS_SIZE
+#  define E_ACSL_TLS_SIZE 2
+#endif
+
 /* MAP_ANONYMOUS is a mmap flag indicating that the contents of allocated blocks
  * should be nullified. Set value from <bits/mman-linux.h>, if MAP_ANONYMOUS is
  * undefined */
@@ -75,7 +80,7 @@
   However since the TLS is next to the VDSO segment in the program layout, the
   default size is small enough so that both segments do not overlap. */
 #ifndef PGM_TLS_SIZE
-#  define PGM_TLS_SIZE (2 * MB)
+#  define PGM_TLS_SIZE (E_ACSL_TLS_SIZE * MB)
 #endif
 
 /*! \brief Mspace padding used by shadow segments. This is to make sure that

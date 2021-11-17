@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 ##########################################################################
 #                                                                        #
 #  This file is part of the Frama-C's E-ACSL plug-in.                    #
@@ -125,6 +125,32 @@ is_number() {
   else
     echo '-'
   fi
+}
+
+# Retrieve the zone size for a given zone name and limit
+# - $1: the zone name
+# - $2: the zone size
+# - $3: the minimum zone size
+# Return $2 if it is a positive number greater or equal than $3, otherwise
+# return an error message with an error code of 1.
+get_zone_size() {
+  local name="$1"
+  local n="$2"
+  local lim="$3"
+
+  local zone_size="$(is_number "$n" $lim)"
+  case $zone_size in
+    '-')
+      echo "invalid number for $name: '$n'"
+      return 1
+    ;;
+    '<')
+      echo "$name limit less than minimal size [$lim]"
+      return 1
+    ;;
+    *) echo $zone_size
+  esac;
+  return 0
 }
 
 # Split a comma-separated string into a space-separated string, remove
@@ -267,6 +293,16 @@ mmodel_features() {
     flags="$flags -DE_ACSL_HEAP_SIZE=$OPTION_HEAP_SIZE"
   fi
 
+  # Set TLS shadow size
+  if [ -n "$OPTION_TLS_SIZE" ]; then
+    flags="$flags -DE_ACSL_TLS_SIZE=$OPTION_TLS_SIZE"
+  fi
+
+  # Set thread stack size
+  if [ -n "$OPTION_THREAD_STACK_SIZE" ]; then
+    flags="$flags -DE_ACSL_THREAD_STACK_SIZE=$OPTION_THREAD_STACK_SIZE"
+  fi
+
   # Set runtime verosity flags
   if [ -n "$OPTION_RT_VERBOSE" ]; then
     flags="$flags -DE_ACSL_VERBOSE -DE_ACSL_DEBUG_VERBOSE"
@@ -312,11 +348,11 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   quiet,logfile:,ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,concurrency,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
-  temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
-  external-assert:,assert-print-data,no-assert-print-data,external-print-value:,
-  validate-format-strings,no-trace,libc-replacements,with-dlmalloc:,
-  dlmalloc-from-sources,dlmalloc-compile-only,dlmalloc-compile-flags:,
-  odlmalloc:,ar:,ranlib:,mbits:"
+  temporal,weak-validity,stack-size:,heap-size:,zone-sizes:,rt-verbose,
+  free-valid-address,external-assert:,assert-print-data,no-assert-print-data,
+  external-print-value:,validate-format-strings,no-trace,libc-replacements,
+  with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
+  dlmalloc-compile-flags:,odlmalloc:,ar:,ranlib:,mbits:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -362,6 +398,8 @@ OPTION_RTE_SELECT=        # Generate assertions for these functions only
 OPTION_THEN=              # Adds -then in front of -e-acsl in FC command.
 OPTION_STACK_SIZE=        # Size of a heap shadow space (in MB)
 OPTION_HEAP_SIZE=         # Size of a stack shadow space (in MB)
+OPTIONS_TLS_SIZE=         # Size of a TLS shadow space (in MB)
+OPTIONS_THREAD_STACK_SIZE=  # Size of a thread stack shadow space (in MB)
 OPTION_KEEP_GOING=        # Report failing assertions but do not abort execution
 OPTION_EXTERNAL_ASSERT="" # Use custom definition of assert function
 OPTION_ASSERT_PRINT_DATA= # Print data contributing to a failed runtime assertion
@@ -375,6 +413,8 @@ OPTION_OUTPUT_DLMALLOC=""                # Name of the compiled dlmalloc
 SUPPORTED_MMODELS="bittree,segment" # Supported memory model names
 MIN_STACK=16 # Minimal size of a tracked program stack
 MIN_HEAP=64 # Minimal size of a tracked program heap
+MIN_TLS=1 # Minimal size of a tracked program TLS
+MIN_THREAD_STACK=4 # Minimal size of a tracked program thread stack
 
 manpage() {
   printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
@@ -653,6 +693,8 @@ do
     ;;
     # Set heap shadow size
     --heap-size)
+      warning "--heap-size is a deprecated option."
+      warning "Please use --zone-sizes instead."
       shift;
       zone_size="$(is_number "$1" $MIN_HEAP)"
       case $zone_size in
@@ -665,6 +707,8 @@ do
     ;;
     # Set stack shadow size
     --stack-size)
+      warning "--stack-size is a deprecated option."
+      warning "Please use --zone-sizes instead."
       shift;
       zone_size="$(is_number "$1" $MIN_STACK)"
       case $zone_size in
@@ -672,6 +716,52 @@ do
         '<') error "stack limit less than minimal size [$MIN_STACK"] ;;
         *) OPTION_STACK_SIZE=$zone_size ;;
       esac;
+      shift;
+    ;;
+    --zone-sizes)
+      shift;
+      zone_help_msg="available zone names for option --zone-sizes:
+  - stack
+  - heap
+  - tls
+  - thread-stack
+The size is given in MB.
+"
+      IFS=',' read -ra sizes <<< "$1"
+      for size in "${sizes[@]}"; do
+        IFS=':' read -ra size_arr <<< "$size"
+        if [ "${#size_arr[@]}" -eq "2" ]; then
+          zone_name="${size_arr[0]}"
+          zone_size="${size_arr[1]}"
+          case $zone_name in
+            stack)
+              OPTION_STACK_SIZE="$(get_zone_size $zone_name "$zone_size" $MIN_STACK)"
+              error "$OPTION_STACK_SIZE" $?
+            ;;
+            heap)
+              OPTION_HEAP_SIZE="$(get_zone_size $zone_name "$zone_size" $MIN_HEAP)"
+              error "$OPTION_HEAP_SIZE" $?
+            ;;
+            tls)
+              OPTION_TLS_SIZE="$(get_zone_size $zone_name "$zone_size" $MIN_TLS)"
+              error "$OPTION_TLS_SIZE" $?
+            ;;
+            thread-stack)
+              OPTION_THREAD_STACK_SIZE="$(get_zone_size $zone_name "$zone_size" $MIN_THREAD_STACK)"
+              error "$OPTION_THREAD_STACK_SIZE" $?
+            ;;
+            *)
+              error "invalid zone name: '$zone_name'
+$zone_help_msg"
+            ;;
+          esac
+        elif [ "${#size_arr[@]}" -eq "1" ] && [ "${size_arr[0]}" == "help" ]; then
+          printf "e-acsl-gcc.sh - $zone_help_msg"
+          exit 1
+        else
+          error "invalid zone size format: '$size' (expected 'name:number')"
+        fi
+      done
       shift;
     ;;
     # Custom runtime assert function
