@@ -39,7 +39,6 @@ include module type of Type
 
 val is_bottom: 'a or_bottom -> bool
 val non_bottom: 'a or_bottom -> 'a
-val default : 'a or_bottom -> default:'a -> 'a
 
 val equal:       ('a -> 'a -> bool) -> 'a or_bottom -> 'a or_bottom -> bool
 val compare:     ('a -> 'a -> int)  -> 'a or_bottom -> 'a or_bottom -> int

@@ -39,11 +39,6 @@ end
 
 include Type
 
-let default or_bottom ~default =
-  match or_bottom with
-  | `Bottom -> default
-  | `Value res -> res
-
 let is_bottom = function
   | `Bottom -> true
   | `Value _ -> false
