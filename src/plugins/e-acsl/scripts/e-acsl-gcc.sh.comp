@@ -41,7 +41,7 @@ _eacsl_gcc() {
     --gmp --full-mtracking --rte= --rte-select=
     --frama-c-stdlib --libc-replacements
     --temporal --free-valid-address --weak-validity --validate-format-strings
-    --heap-size --stack-size
+    --zone-sizes=
     --with-dlmalloc --dlmalloc-from-sources --dlmalloc-compile-only
     --dlmalloc-compile-flags --odlmalloc"
 
