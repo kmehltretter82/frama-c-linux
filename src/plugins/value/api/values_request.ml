@@ -72,7 +72,7 @@ let handle_top_or_bottom ~top ~bottom compute = function
 (* --- Marker Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let next_steps s : step list =
+let next_steps s =
   match s.skind with
   | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
   | Instr (Set _ | Call _ | Local_init _ | Asm _ | Code_annot _)
@@ -252,10 +252,6 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   open Eval
   type dstate = A.Dom.state or_top_or_bottom
 
-  let dnone = { alarms = [] ; values = [] }
-  let dtop = { alarms = [] ; values = [`Here , "Not available."] }
-  let dbottom = { alarms = [] ; values = [`Here , "Unreachable."] }
-
   let callstacks stmt =
     match A.get_stmt_state_by_callstack ~after:false stmt with
     | `Top | `Bottom -> []
@@ -358,29 +354,36 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     let f alarm status pool = (status, descr alarm) :: pool in
     Alarmset.fold f [] alarms |> List.rev
 
-  let fold_steps f stmt callstack state acc =
-    let steps = `Here :: next_steps stmt in
-    let add_state = function
-      | `Here -> `Value state
-      | `After -> dstate ~after:true stmt callstack
-      | `Then cond -> (A.assume_cond stmt state cond true :> dstate)
-      | `Else cond -> (A.assume_cond stmt state cond false :> dstate)
-    in
-    List.fold_left (fun acc step -> f acc step @@ add_state step) acc steps
+  let get_next_dstate stmt callstack state = function
+    | `After -> dstate ~after:true stmt callstack
+    | `Then cond -> (A.assume_cond stmt state cond true :> dstate)
+    | `Else cond -> (A.assume_cond stmt state cond false :> dstate)
 
-  let domain_step typ eval ((values, alarms) as acc) step =
-    let to_str = Pretty_utils.to_string (Bottom.pretty (pp_evaluation typ)) in
-    handle_top_or_bottom ~top:acc ~bottom:acc @@ fun state ->
-    let step_value, step_alarms = eval state in
-    let alarms = match step with `Here -> step_alarms | _ -> alarms in
-    (step, to_str step_value) :: values, alarms
+  let eval_steps eval stmt callstack =
+    let before = dstate ~after:false stmt callstack in
+    let value, alarms = eval before in
+    let others =
+      match before with
+      | `Bottom | `Top -> []
+      | `Value state ->
+        let steps = next_steps stmt in
+        let eval_next step = eval (get_next_dstate stmt callstack state step) in
+        List.map (fun step -> (step :> step), fst (eval_next step)) steps
+    in
+    { values = (`Here, value) :: others;
+      alarms = dalarms alarms;
+    }
 
   let domain_eval typ eval stmt callstack =
-    let fold = fold_steps (domain_step typ eval) stmt callstack in
-    let build (vs, als) = { values = List.rev vs ; alarms = dalarms als } in
-    let compute_domain state = fold state ([], Alarmset.none) |> build in
-    handle_top_or_bottom ~top:dtop ~bottom:dbottom compute_domain @@
-    dstate ~after:false stmt callstack
+    let to_str = Pretty_utils.to_string (Bottom.pretty (pp_evaluation typ)) in
+    let eval = function
+      | `Bottom -> "Unreachable", Alarmset.none
+      | `Top -> "No information", Alarmset.none
+      | `Value state ->
+        let value, alarms = eval state in
+        to_str value, alarms
+    in
+    eval_steps eval stmt callstack
 
   let domain p callstack =
     match p with
@@ -388,7 +391,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       domain_eval (Cil.typeOfLval lval) (eval_lval lval) stmt callstack
     | Pexpr (expr, stmt) ->
       domain_eval (Cil.typeOf expr) (eval_expr expr) stmt callstack
-    | Pnone -> dnone
+    | Pnone -> { alarms = [] ; values = [] }
 
   let var_of_base base acc =
     let add vi acc = if Cil.isFunctionType vi.vtype then acc else vi :: acc in
