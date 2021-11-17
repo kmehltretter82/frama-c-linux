@@ -301,31 +301,32 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
           | `Value offsm -> Offsetmap offsm
         with Abstract_interp.Error_Top -> Top
 
-  let extract_or_reduce_lval lval state =
-    match lval with
-    | Var vi, NoOffset -> let r = extract_single_var vi state in fun _ -> r
-    | _ -> fun loc -> reduce_loc_and_eval loc state
+  let get_precise_loc =
+    match A.Loc.get Main_locations.PLoc.key with
+    | None -> fun _ -> Precise_locs.loc_top
+    | Some get -> get
 
   let lval_to_offsetmap lval state =
-    let loc, alarms = A.eval_lval_to_loc state lval in
-    let state = A.Dom.get_cvalue_or_top state in
-    let extract = extract_or_reduce_lval lval state in
-    let precise_loc =
-      match A.Loc.get Main_locations.PLoc.key with
-      | None -> `Value (Precise_locs.loc_top)
-      | Some get -> loc >>-: get
-    and f loc acc =
-      match acc, extract loc with
-      | Offsetmap o1, Offsetmap o2 -> Offsetmap (Cvalue.V_Offsetmap.join o1 o2)
-      | Bottom, v | v, Bottom -> v
-      | Empty, v | v, Empty -> v
-      | Top, Top -> Top
-      | InvalidLoc, InvalidLoc -> InvalidLoc
-      | InvalidLoc, (Offsetmap _ as res) -> res
-      | Offsetmap _, InvalidLoc -> acc
-      | Top, r | r, Top -> r (* cannot happen, we should get Top everywhere *)
-    in
-    precise_loc >>-: (fun loc -> Precise_locs.fold f loc Bottom), alarms
+    let cvalue = A.Dom.get_cvalue_or_top state in
+    match lval with
+    | Var vi, NoOffset ->
+      let r = extract_single_var vi cvalue in
+      `Value r, Alarmset.none
+    | _ ->
+      A.eval_lval_to_loc state lval >>=: fun loc ->
+      let precise_loc = get_precise_loc loc in
+      let f loc acc =
+        match acc, reduce_loc_and_eval loc cvalue with
+        | Offsetmap o1, Offsetmap o2 -> Offsetmap (Cvalue.V_Offsetmap.join o1 o2)
+        | Bottom, v | v, Bottom -> v
+        | Empty, v | v, Empty -> v
+        | Top, Top -> Top
+        | InvalidLoc, InvalidLoc -> InvalidLoc
+        | InvalidLoc, (Offsetmap _ as res) -> res
+        | Offsetmap _, InvalidLoc -> acc
+        | Top, r | r, Top -> r (* cannot happen, we should get Top everywhere *)
+      in
+      Precise_locs.fold f precise_loc Bottom
 
   type evaluation =
     | ToValue of A.Val.t
