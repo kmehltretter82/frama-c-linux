@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 ##########################################################################
 #                                                                        #
 #  This file is part of the Frama-C's E-ACSL plug-in.                    #
@@ -23,11 +23,16 @@
 
 # Convenience wrapper for small runs of E-ACSL Frama-C plugin
 
+# The -e option is not present in the sha-bang on purpose, the error() function
+# should be used after each command that may fail.
+
 # Base dir of this script
 BASEDIR="$(realpath `dirname $0`)"
 
 # Print a message to STDERR and exit. If the second argument (exit code)
 # is provided and it is '0' then do nothing.
+# /!\ Use this function after each command that may fail with the second
+# argument set to $?
 error () {
   if [ -z "$2" ] || ! [ "$2" = 0 ]; then
     echo "e-acsl-gcc: fatal error: $1" 1>&2
