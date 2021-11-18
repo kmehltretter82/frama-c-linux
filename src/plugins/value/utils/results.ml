@@ -742,14 +742,6 @@ let callers kf =
 let uniq_sites = List.sort_uniq Cil_datatype.Stmt.compare
 
 let callsites kf =
-  let f = function
-    | [] | (_,Cil_types.Kglobal) :: _ -> None
-    | (_,Kstmt stmt) :: _-> Some stmt
-  in
-  at_start_of kf |> callstacks |>
-  List.filter_map f |> uniq_sites
-
-let callsites_per_caller kf =
   let module Map = Kernel_function.Map in
   let f acc = function
     | [] | (_,Cil_types.Kglobal) :: _ -> acc

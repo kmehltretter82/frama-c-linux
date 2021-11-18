@@ -116,8 +116,7 @@ val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by t
 
 (* Callers / Callees / Callsites *)
 val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
-val callsites : Cil_types.kernel_function -> Cil_types.stmt list
-val callsites_per_caller : Cil_types.kernel_function ->
+val callsites : Cil_types.kernel_function ->
   (Cil_types.kernel_function * Cil_types.stmt list) list
 
 (* Returns the kernel functions called in the given statement.
