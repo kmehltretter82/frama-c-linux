@@ -334,7 +334,7 @@ sig
     val create : ?pool:pool -> unit -> t
 
     val fresh : t -> tau -> var
-    val get : t -> term -> term
+    val find : t -> term -> term
     val filter : t -> term -> bool
 
     val add : t -> term -> term -> unit

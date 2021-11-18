@@ -311,7 +311,7 @@ struct
       }
 
   let mem_lit l sigma =
-    try F.Subst.get (subst sigma) l == e_true
+    try F.Subst.find (subst sigma) l == e_true
     with Not_found -> false
 
   let add_lit l sigma =

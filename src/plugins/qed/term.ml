@@ -2251,7 +2251,7 @@ struct
       | FUN(f,s) -> (try call f e with Not_found -> compute e s)
       | MAP(m,s) -> (try Tmap.find e m with Not_found -> compute e s)
 
-    let get sigma a = compute a sigma.shared
+    let find sigma a = compute a sigma.shared
 
     let filter sigma a =
       List.for_all (fun f -> f a) sigma.filter
@@ -2302,7 +2302,7 @@ struct
     else e
 
   and compute mu sigma alpha e =
-    try Subst.get sigma e with Not_found ->
+    try Subst.find sigma e with Not_found ->
       let r =
         match e.repr with
         | Bvar(k,_) -> Intmap.find k alpha
