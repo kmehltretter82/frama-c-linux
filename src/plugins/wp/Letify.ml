@@ -41,7 +41,7 @@ struct
   type subst = pred -> pred
   type env = {
     mutable ground : bool Tmap.t ;
-    mutable domain : term Tmap.t ;
+    sigma : F.sigma ;
   }
 
   let rec is_ground env e =
@@ -59,12 +59,12 @@ struct
         env.ground <- Tmap.add e r env.ground ; r
     end
 
+  let add_sigma env a b =
+    Subst.add env.sigma a b
 
-  let clause env h =
-    begin
-      env.domain <- Tmap.add h F.e_true env.domain ;
-      env.domain <- Tmap.add (e_not h) F.e_false env.domain ;
-    end
+  let add_clause env h =
+    add_sigma env h e_true ;
+    add_sigma env (e_not h) e_false
 
   let frank = function
     | ACSL _ -> 0
@@ -74,22 +74,19 @@ struct
     | Model { m_category = Operator _ } -> 2
     | Model { m_category = Constructor } -> 3
 
-  let add_reduce env a b =
-    env.domain <- Tmap.add a b env.domain
-
   let reduce env a b =
-    if F.is_subterm a b then add_reduce env b a else
-    if F.is_subterm b a then add_reduce env a b else
+    if F.is_subterm a b then add_sigma env b a else
+    if F.is_subterm b a then add_sigma env a b else
       begin
         match F.repr a , F.repr b with
         | Fun(f,_) , Fun(g,_) when Wp_parameters.Reduce.get () ->
             let cmp = frank f - frank g in
-            if cmp < 0 then add_reduce env a b else
-            if cmp > 0 then add_reduce env b a
+            if cmp < 0 then add_sigma env a b else
+            if cmp > 0 then add_sigma env b a
         | Fun(f,_) , _ when frank f = 0 ->
-            add_reduce env a b
+            add_sigma env a b
         | _ , Fun(f,_) when frank f = 0 ->
-            add_reduce env b a
+            add_sigma env b a
         | _ -> ()
       end
 
@@ -98,49 +95,40 @@ struct
     | True | False -> ()
     | And ps -> List.iter (walk env) ps
     | Eq(a,b) ->
-        clause env h ;
+        add_clause env h ;
         if is_ground env b then
-          add_reduce env a b
+          add_sigma env a b
         else
         if is_ground env a then
-          add_reduce env b a
+          add_sigma env b a
         else
           reduce env a b
     | Fun(f,[x]) ->
         begin
-          clause env h ;
+          add_clause env h ;
           try
             let iota = Cint.is_cint f in
             let conv = Cint.convert iota x in
-            add_reduce env conv x ;
+            add_sigma env conv x ;
           with Not_found -> ()
         end
     | _ ->
-        clause env h
+        add_clause env h
 
-  let subst mu =
-    let sigma = Lang.sigma () in
-    F.Subst.add_map sigma mu ; F.p_subst sigma
-
-  let e_apply env =
-    let sigma = Lang.sigma () in
-    F.Subst.add_map sigma env.domain ; F.e_subst sigma
-
-  let p_apply env =
-    let sigma = Lang.sigma () in
-    F.Subst.add_map sigma env.domain ; F.p_subst sigma
+  let e_apply env = F.e_subst (Subst.copy env.sigma)
+  let p_apply env = F.p_subst (Subst.copy env.sigma)
 
   let assume env p =
     let p = p_apply env p in
     walk env (F.e_prop p) ; p
 
-  let top () = { ground = Tmap.empty ; domain = Tmap.empty }
-  let copy env = { domain = env.domain ; ground = env.ground }
+  let top () = { ground = Tmap.empty ; sigma = Lang.sigma () }
+  let copy env = { ground = env.ground ; sigma = Subst.copy env.sigma }
 
   let singleton p =
-    let env = { domain = Tmap.empty ; ground = Tmap.empty } in
+    let env = top () in
     ignore (assume env p) ;
-    subst env.domain
+    p_apply env
 
   let branch env p =
     let p = p_apply env p in
