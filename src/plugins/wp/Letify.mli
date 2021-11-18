@@ -29,9 +29,6 @@ open Lang.F
 module Ground :
 sig
 
-  type subst = pred -> pred
-  val singleton : pred -> subst
-
   type env
   val top : unit -> env
   val copy : env -> env

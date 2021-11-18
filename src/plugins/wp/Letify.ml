@@ -38,7 +38,6 @@ let occurs xs a = Vars.intersect xs (F.vars a)
 module Ground =
 struct
 
-  type subst = pred -> pred
   type env = {
     mutable ground : bool Tmap.t ;
     sigma : F.sigma ;
@@ -124,11 +123,6 @@ struct
 
   let top () = { ground = Tmap.empty ; sigma = Lang.sigma () }
   let copy env = { ground = env.ground ; sigma = Subst.copy env.sigma }
-
-  let singleton p =
-    let env = top () in
-    ignore (assume env p) ;
-    p_apply env
 
   let branch env p =
     let p = p_apply env p in
