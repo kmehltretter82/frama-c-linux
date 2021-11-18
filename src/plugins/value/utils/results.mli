@@ -113,6 +113,7 @@ val is_empty : request -> bool
 val is_bottom : 'a evaluation -> bool
 val is_called : Cil_types.kernel_function -> bool (* called during the analysis, not by the actual program *)
 val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by the actual program *)
+val is_reachable_kinstr : Cil_types.kinstr -> bool
 
 (* Callers / Callees / Callsites *)
 val callers : Cil_types.kernel_function -> Cil_types.kernel_function list

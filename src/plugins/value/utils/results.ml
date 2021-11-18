@@ -729,6 +729,11 @@ let is_reachable stmt =
   let module M = Make () in
   M.is_reachable (before stmt)
 
+let is_reachable_kinstr kinstr =
+  let module M = Make () in
+  M.is_reachable (before_kinstr kinstr)
+
+
 (* Callers / callsites *)
 
 let callers kf =
