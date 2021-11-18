@@ -977,13 +977,11 @@ let alpha () =
   F.Subst.add_fun sigma compute ; sigma
 
 let subst xs vs =
-  let bind w x v = Tmap.add (e_var x) v w in
-  let vmap =
-    try List.fold_left2 bind Tmap.empty xs vs
-    with _ -> raise (Invalid_argument "Wp.Lang.Subst.sigma")
-  in
   let sigma = sigma () in
-  F.Subst.add_map sigma vmap ; sigma
+  begin
+    try List.iter2 (fun x v -> F.Subst.add sigma (e_var x) v) xs vs
+    with Invalid_argument _ -> raise (Invalid_argument "Wp.Lang.Subst.sigma")
+  end ; sigma
 
 let e_subst f =
   let sigma = sigma () in
