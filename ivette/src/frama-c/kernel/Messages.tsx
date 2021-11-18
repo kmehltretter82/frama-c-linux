@@ -40,6 +40,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 import * as Kernel from 'frama-c/api/kernel/services';
 
 type Message = Kernel.messageData;
+type logkind = Kernel.logkind;
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -50,14 +51,19 @@ interface Search {
   message?: string;
 }
 
-type KindFilter = Record<Kernel.logkind, boolean>;
+type KindFilter = Record<logkind, boolean>;
 type PluginFilter = {[key: string]: boolean};
+type EmitterFilter = {
+  kernel: boolean;
+  plugins: PluginFilter;
+  others: boolean; // default for Frama-C plugins not in the plugins field.
+};
 
 interface Filter {
   currentFct: boolean;
   search: Search;
   kind: KindFilter;
-  plugin: PluginFilter;
+  emitter: EmitterFilter;
 }
 
 /* Only warnings and errors are shown by default. */
@@ -73,7 +79,6 @@ const kindFilter: KindFilter = {
 /* The fields must be exactly the short names of Frama-C plugins used in
    messages. They are all shown by default. */
 const pluginFilter: PluginFilter = {
-  kernel: true,
   aorai: true,
   dive: true,
   'e-acsl': true,
@@ -91,6 +96,11 @@ const pluginFilter: PluginFilter = {
   slicing: true,
   variadic: true,
   wp: true,
+};
+
+const emitterFilter = {
+  kernel: true,
+  plugins: pluginFilter,
   others: true,
 };
 
@@ -98,16 +108,18 @@ const defaultFilter: Filter = {
   currentFct: false,
   search: {},
   kind: kindFilter,
-  plugin: pluginFilter,
+  emitter: emitterFilter,
 };
 
 function filterKind(filter: KindFilter, msg: Message) {
   return filter[msg.kind];
 }
 
-function filterPlugin(filter: PluginFilter, msg: Message) {
-  if (msg.plugin in filter)
-    return filter[msg.plugin];
+function filterEmitter(filter: EmitterFilter, msg: Message) {
+  if (msg.plugin === 'kernel')
+    return filter.kernel;
+  if (msg.plugin in filter.plugins)
+    return filter.plugins[msg.plugin];
   return filter.others;
 }
 
@@ -168,7 +180,7 @@ function filterMessage(filter: Filter, kf: string | undefined, msg: Message) {
   return (filterFunction(filter, kf, msg) &&
           filterSearched(filter.search, msg) &&
           filterKind(filter.kind, msg) &&
-          filterPlugin(filter.plugin, msg));
+          filterEmitter(filter.emitter, msg));
 }
 
 // --------------------------------------------------------------------------
@@ -196,14 +208,22 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
   const messageState = Forms.useProperty(search, 'message');
 
   const kind = Forms.useProperty(state, 'kind');
-  function KindCheckbox(p: {key: Kernel.logkind}) {
-    return <Checkbox label={p.key} state={Forms.useProperty(kind, p.key)} />;
-  }
+  const kindState = (key: logkind) => Forms.useProperty(kind, key);
+  const kindCheckboxes =
+    Object.keys(kindFilter).map((key) => (
+      <Checkbox key={key} label={key} state={kindState(key as logkind)} />
+    ));
 
-  const plugin = Forms.useProperty(state, 'plugin');
-  function PluginCheckbox(p: {key: string}) {
-    return <Checkbox label={p.key} state={Forms.useProperty(plugin, p.key)} />;
+  const emitter = Forms.useProperty(state, 'emitter');
+  function EmitterCheckbox(p: {key: 'kernel' | 'others'}) {
+    return <Checkbox label={p.key} state={Forms.useProperty(emitter, p.key)} />;
   }
+  const plugin = Forms.useProperty(emitter, 'plugins');
+  const pluginState = (key: string) => Forms.useProperty(plugin, key);
+  const pluginCheckboxes =
+    Object.keys(pluginFilter).map((key) => (
+      <Checkbox key={key} label={key} state={pluginState(key)} />
+    ));
 
   return (
     <Forms.Page className="message-search">
@@ -230,26 +250,17 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
         />
       </Section>
       <Section label="Kind">
-        {
-          Object.keys(kindFilter).map((key) => (
-            KindCheckbox({ key: key as Kernel.logkind })
-          ))
-        }
+        { kindCheckboxes }
       </Section>
       <Section label="Emitter">
         <div className="message-emitter-category">
-          { PluginCheckbox({ key: 'kernel' }) }
+          { EmitterCheckbox({ key: 'kernel' }) }
         </div>
         <div className="message-emitter-category">
-          {
-            Object.keys(pluginFilter).map((key) => (
-              key === 'kernel' || key === 'others' ||
-              PluginCheckbox({ key })
-            ))
-          }
+          { pluginCheckboxes }
         </div>
         <div className="message-emitter-category">
-          { PluginCheckbox({ key: 'others' }) }
+          { EmitterCheckbox({ key: 'others' }) }
         </div>
       </Section>
     </Forms.Page>
@@ -270,7 +281,7 @@ function FilterRatio({ model }: { model: Arrays.ArrayModel<any, any> }) {
 // --- Messages Columns
 // --------------------------------------------------------------------------
 
-const renderKind: Renderer<Kernel.logkind> = (kind: Kernel.logkind) => {
+const renderKind: Renderer<logkind> = (kind: logkind) => {
   const label = kind.toLocaleLowerCase();
   let icon = '';
   let color = 'black';
