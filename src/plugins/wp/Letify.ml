@@ -59,8 +59,6 @@ struct
         env.ground <- Tmap.add e r env.ground ; r
     end
 
-  let merge a b =
-    Tmap.union (fun _ u v -> if F.compare u v <= 0 then u else v) a b
 
   let clause env h =
     begin
@@ -132,50 +130,12 @@ struct
     let sigma = Lang.sigma () in
     F.Subst.add_map sigma env.domain ; F.p_subst sigma
 
-  [@@@ warning "-32"]
-  let pp_sigma fmt s =
-    begin
-      Format.fprintf fmt "@[<hov 2>[" ;
-      Tmap.iter
-        (fun a b -> Format.fprintf fmt "@ %a -> %a ;" F.pp_term a F.pp_term b)
-        s ;
-      Format.fprintf fmt "]@]" ;
-    end
-  [@@@ warning "+32"]
-
-  let pretty fmt env = pp_sigma fmt env.domain
-
   let assume env p =
     let p = p_apply env p in
     walk env (F.e_prop p) ; p
 
   let top () = { ground = Tmap.empty ; domain = Tmap.empty }
   let copy env = { domain = env.domain ; ground = env.ground }
-
-  let compute seq =
-    let n = Array.length seq in
-    let lhs = Array.make n Tmap.empty in
-    let rhs = Array.make n Tmap.empty in
-    let env = top () in
-    for i = 0 to n-2 do
-      seq.(i) <- assume env seq.(i) ;
-      lhs.(succ i) <- env.domain ;
-    done ;
-    if n > 1 then
-      seq.(n-1) <- assume env seq.(n-1) ;
-    let mu = env.domain in
-    env.domain <- Tmap.empty ;
-    for i = n-1 downto 1 do
-      seq.(i) <- assume env seq.(i) ;
-      rhs.(pred i) <- env.domain ;
-    done ;
-    let gs =
-      Array.init n
-        (fun i ->
-           let mu = merge lhs.(i) rhs.(i) in
-           subst mu) in
-    let g = subst mu in
-    gs , g
 
   let singleton p =
     let env = { domain = Tmap.empty ; ground = Tmap.empty } in
