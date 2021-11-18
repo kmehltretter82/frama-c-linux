@@ -332,6 +332,7 @@ sig
   sig
     type t = sigma
     val create : ?pool:pool -> unit -> t
+    val copy : sigma -> sigma
 
     val fresh : t -> tau -> var
     val find : t -> term -> term

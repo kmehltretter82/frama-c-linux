@@ -376,6 +376,7 @@ sig
 
   module Subst :
   sig
+    val copy : sigma -> sigma
     val find : sigma -> term -> term
     val add : sigma -> term -> term -> unit
     val add_map : sigma -> term Tmap.t -> unit

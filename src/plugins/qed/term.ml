@@ -2225,6 +2225,12 @@ struct
       filter = [] ;
     }
 
+    let copy sigma = {
+      pool = POOL.create ~copy:sigma.pool () ;
+      shared = sigma.shared ;
+      filter = sigma.filter ;
+    }
+
     let validate fn e =
       if not (lc_closed e) then
         begin
