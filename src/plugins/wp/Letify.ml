@@ -271,7 +271,7 @@ struct
     | None ->
         let s = Lang.sigma () in
         F.Subst.add_fun s (lookup sigma.def) ;
-        F.Subst.add_map s sigma.cst ;
+        F.Subst.add_fun s (fun e -> Tmap.find e sigma.cst) ;
         F.Subst.add_filter s (filter sigma.dall) ;
         sigma.cache <- Some s ; s
 
