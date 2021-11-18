@@ -341,9 +341,6 @@ sig
     val add : t -> term -> term -> unit
     (** Must bind lc-closed terms, or raise Invalid_argument *)
 
-    val add_map : t -> term Tmap.t -> unit
-    (** Must bind lc-closed terms, or raise Invalid_argument *)
-
     val add_fun : t -> (term -> term) -> unit
     (** Must bind lc-closed terms, or raise Invalid_argument *)
 

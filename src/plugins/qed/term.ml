@@ -2269,17 +2269,6 @@ struct
         | MAP(m,s) -> MAP (Tmap.add a b m,s)
         | (FUN _ | EMPTY) as s -> MAP (Tmap.add a b Tmap.empty,s)
 
-    let add_map sigma m =
-      if not (Tmap.is_empty m) then
-        begin
-          Tmap.iter
-            (fun a b ->
-               validate "Qed.Subst.add_map (domain)" a ;
-               validate "Qed.Subst.add_map (codomain)" b ;
-            ) m ;
-          sigma.shared <- MAP(m,sigma.shared)
-        end
-
     let add_fun sigma f =
       sigma.shared <- FUN(f,sigma.shared)
 
