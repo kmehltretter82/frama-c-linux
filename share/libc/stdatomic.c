@@ -60,7 +60,7 @@ unsigned long long __fc_atomic_load_explicit(void *object,
 unsigned long long __fc_atomic_exchange(void *obj,
                                         unsigned long long desired,
                                         size_t obj_size) {
-  unsigned long long r;
+  unsigned long long r = 0;
   if (obj_size == sizeof(char)) {
     r = *((volatile atomic_uchar *)obj);
     *((volatile atomic_uchar *)obj) = desired;
@@ -120,7 +120,7 @@ _Bool __fc_atomic_compare_exchange_weak_explicit(void *object, void *expected,
 
 unsigned long long __fc_atomic_fetch_add(void *obj, unsigned long long operand,
                                          size_t obj_size) {
-  unsigned long long r;
+  unsigned long long r = 0;
   if (obj_size == sizeof(char)) {
     r = *((volatile atomic_uchar *)obj);
     *((volatile atomic_uchar *)obj) += operand;
@@ -149,7 +149,7 @@ unsigned long long __fc_atomic_fetch_add_explicit(void *obj,
 
 unsigned long long __fc_atomic_fetch_sub(void *obj, unsigned long long operand,
                                          size_t obj_size) {
-  unsigned long long r;
+  unsigned long long r = 0;
   if (obj_size == sizeof(char)) { r = *((volatile atomic_uchar *)obj);
     *((volatile atomic_uchar *)obj) -= operand; }
   else if (obj_size == sizeof(short)) { r =  *((volatile atomic_ushort *)obj);
@@ -173,7 +173,7 @@ unsigned long long __fc_atomic_fetch_sub_explicit(void *obj,
 
 unsigned long long __fc_atomic_fetch_or(void *obj, unsigned long long operand,
                                         size_t obj_size) {
-  unsigned long long r;
+  unsigned long long r = 0;
   if (obj_size == sizeof(char)) { r = *((volatile atomic_uchar *)obj);
     *((volatile atomic_uchar *)obj) |= operand; }
   else if (obj_size == sizeof(short)) { r =  *((volatile atomic_ushort *)obj);
@@ -197,7 +197,7 @@ unsigned long long __fc_atomic_fetch_or_explicit(void *obj,
 
 unsigned long long __fc_atomic_fetch_xor(void *obj, unsigned long long operand,
                                          size_t obj_size) {
-  unsigned long long r;
+  unsigned long long r = 0;
   if (obj_size == sizeof(char)) {
     r = *((volatile atomic_uchar *)obj);
     *((volatile atomic_uchar *)obj) ^= operand;
@@ -228,7 +228,7 @@ unsigned long long __fc_atomic_fetch_xor_explicit(void *obj,
 unsigned long long __fc_atomic_fetch_and(void *obj,
                                          unsigned long long operand,
                                          size_t obj_size) {
-  unsigned long long r;
+  unsigned long long r = 0;
   if (obj_size == sizeof(char)) {
     r = *((volatile atomic_uchar *)obj);
     *((volatile atomic_uchar *)obj) &= operand;
