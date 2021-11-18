@@ -29,9 +29,9 @@ __PUSH_FC_STDLIB
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_string_axiomatic.h"
 
+#include "errno.h"
 // for size_t
 #include "stddef.h"
-
 __BEGIN_DECLS
 
 struct passwd {
@@ -78,11 +78,41 @@ extern struct passwd *getpwnam(const char *name);
 */
 extern struct passwd *getpwuid(uid_t uid);
 
+/*@
+  // missing: assigns \result, *result, *pwd, __fc_pwd[0..] \from 'password database'
+  requires valid_name: valid_read_string(name);
+  requires valid_buf: \valid(buf+(0 .. buflen-1));
+  requires valid_pwd: \valid(pwd);
+  requires valid_result: \valid(result);
+  assigns \result \from indirect:__fc_p_pwd, indirect:name[0..];
+  assigns __fc_pwd \from indirect:name[0..];
+  assigns *pwd, *result \from __fc_p_pwd;
+  assigns buf[0 .. buflen-1] \from indirect:*__fc_p_pwd;
+  ensures result_null_or_assigned:
+    *result == \null || *result == pwd;
+  ensures result_ok_or_error:
+    \result == 0 || \result \in {EIO, EMFILE, ENFILE, ERANGE};
+*/
+extern int getpwnam_r(const char *name, struct passwd *pwd,
+                      char *buf, size_t buflen, struct passwd **result);
 
-extern int            getpwnam_r(const char *, struct passwd *, char *,
-			  size_t, struct passwd **);
-extern int            getpwuid_r(uid_t, struct passwd *, char *,
-			  size_t, struct passwd **);
+/*@
+  // missing: assigns \result, *result, *pwd, __fc_pwd[0..] \from 'password database'
+  requires valid_buf: \valid(buf+(0 .. buflen-1));
+  requires valid_pwd: \valid(pwd);
+  requires valid_result: \valid(result);
+  assigns \result \from indirect:__fc_p_pwd;
+  assigns __fc_pwd \from indirect:uid;
+  assigns *pwd, *result \from __fc_p_pwd;
+  assigns buf[0 .. buflen-1] \from indirect:*__fc_p_pwd;
+  ensures result_null_or_assigned:
+    *result == \null || *result == pwd;
+  ensures result_ok_or_error:
+    \result == 0 || \result \in {EIO, EMFILE, ENFILE, ERANGE};
+*/
+extern int getpwuid_r(uid_t uid, struct passwd *pwd,
+                      char *buf, size_t buflen, struct passwd **result);
+
 extern void           endpwent(void);
 extern struct passwd *getpwent(void);
 extern void           setpwent(void);
