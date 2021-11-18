@@ -33,6 +33,7 @@
 #include "math.c"
 #include "netdb.c"
 #include "netinet/in.c"
+#include "pwd.c"
 #include "signal.c"
 #include "stdatomic.c"
 #include "stdio.c"
