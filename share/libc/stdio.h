@@ -217,7 +217,9 @@ extern int sprintf(char * restrict s,
 extern int sscanf(const char * restrict s,
      const char * restrict format, ...);
 
-/*@ assigns *stream \from format[..], arg; */
+/*@ assigns *stream \from format[..], indirect: arg;
+    assigns \result \from indirect:format[..], indirect:arg;
+*/
 extern int vfprintf(FILE * restrict stream,
      const char * restrict format,
      va_list arg);
