@@ -193,7 +193,7 @@ const getPointedLvalues_internal: Server.GetRequest<
           }),
   signals: [],
 };
-/**  */
+/** Pointed lvalues for the given marker */
 export const getPointedLvalues: Server.GetRequest<
   { callstack?: callstack, pointer: marker },
   { lvalues?: [ string, marker ][] }
