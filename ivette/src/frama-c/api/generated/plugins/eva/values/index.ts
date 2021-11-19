@@ -142,61 +142,74 @@ export const getProbeInfo: Server.GetRequest<
     stmt?: Json.key<'#stmt'>, code?: string }
   >= getProbeInfo_internal;
 
+/** Evaluation of an expression or lvalue */
+export interface evaluation {
+  /** Textual representation of the value */
+  value: string;
+  /** Alarms raised by the evaluation */
+  alarms: [ "True" | "False" | "Unknown", string ][];
+  /** List of variables pointed by the value */
+  pointed_vars: [ string, marker ][];
+}
+
+/** Loose decoder for `evaluation` */
+export const jEvaluation: Json.Loose<evaluation> =
+  Json.jObject({
+    value: Json.jFail(Json.jString,'String expected'),
+    alarms: Json.jList(
+              Json.jTry(
+                Json.jPair(
+                  Json.jFail(
+                    Json.jUnion<"True" | "False" | "Unknown">(
+                      Json.jTag("True"),
+                      Json.jTag("False"),
+                      Json.jTag("Unknown"),
+                    ),'Union expected'),
+                  Json.jFail(Json.jString,'String expected'),
+                ))),
+    pointed_vars: Json.jList(
+                    Json.jTry(
+                      Json.jPair(
+                        Json.jFail(Json.jString,'String expected'),
+                        jMarkerSafe,
+                      ))),
+  });
+
+/** Safe decoder for `evaluation` */
+export const jEvaluationSafe: Json.Safe<evaluation> =
+  Json.jFail(jEvaluation,'Evaluation expected');
+
+/** Natural order for `evaluation` */
+export const byEvaluation: Compare.Order<evaluation> =
+  Compare.byFields
+    <{ value: string, alarms: [ "True" | "False" | "Unknown", string ][],
+       pointed_vars: [ string, marker ][] }>({
+    value: Compare.string,
+    alarms: Compare.array(Compare.pair(Compare.structural,Compare.string,)),
+    pointed_vars: Compare.array(Compare.pair(Compare.string,byMarker,)),
+  });
+
 const getValues_internal: Server.GetRequest<
   { callstack?: callstack, target: marker },
-  { v_else?: string, v_then?: string, v_after?: string, values?: string,
-    alarms: [ "True" | "False" | "Unknown", string ][] }
+  { v_else?: evaluation, v_then?: evaluation, v_after?: evaluation,
+    v_before: evaluation }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getValues',
   input:  Json.jObject({ callstack: jCallstack, target: jMarkerSafe,}),
   output: Json.jObject({
-            v_else: Json.jString,
-            v_then: Json.jString,
-            v_after: Json.jString,
-            values: Json.jString,
-            alarms: Json.jList(
-                      Json.jTry(
-                        Json.jPair(
-                          Json.jFail(
-                            Json.jUnion<"True" | "False" | "Unknown">(
-                              Json.jTag("True"),
-                              Json.jTag("False"),
-                              Json.jTag("Unknown"),
-                            ),'Union expected'),
-                          Json.jFail(Json.jString,'String expected'),
-                        ))),
+            v_else: jEvaluation,
+            v_then: jEvaluation,
+            v_after: jEvaluation,
+            v_before: jEvaluationSafe,
           }),
   signals: [],
 };
 /** Abstract values for the given marker */
 export const getValues: Server.GetRequest<
   { callstack?: callstack, target: marker },
-  { v_else?: string, v_then?: string, v_after?: string, values?: string,
-    alarms: [ "True" | "False" | "Unknown", string ][] }
+  { v_else?: evaluation, v_then?: evaluation, v_after?: evaluation,
+    v_before: evaluation }
   >= getValues_internal;
-
-const getPointedLvalues_internal: Server.GetRequest<
-  { callstack?: callstack, pointer: marker },
-  { lvalues?: [ string, marker ][] }
-  > = {
-  kind: Server.RqKind.GET,
-  name:   'plugins.eva.values.getPointedLvalues',
-  input:  Json.jObject({ callstack: jCallstack, pointer: jMarkerSafe,}),
-  output: Json.jObject({
-            lvalues: Json.jList(
-                       Json.jTry(
-                         Json.jPair(
-                           Json.jFail(Json.jString,'String expected'),
-                           jMarkerSafe,
-                         ))),
-          }),
-  signals: [],
-};
-/** Pointed lvalues for the given marker */
-export const getPointedLvalues: Server.GetRequest<
-  { callstack?: callstack, pointer: marker },
-  { lvalues?: [ string, marker ][] }
-  >= getPointedLvalues_internal;
 
 /* ------------------------------------- */

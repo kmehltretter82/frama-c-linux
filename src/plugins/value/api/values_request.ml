@@ -50,11 +50,21 @@ type probe =
 
 type callstack = Value_types.callstack
 type truth = Abstract_interp.truth
-type step = [ `Here | `After | `Then of exp | `Else of exp ]
+
+type value = {
+  value: string;
+  alarms: ( truth * string ) list ;
+  pointed_vars: (string * Printer_tag.localizable) list;
+}
+
+type 'v next =
+  | After of 'v
+  | Cond of 'v * 'v
+  | Nothing
 
 type domain = {
-  values: ( step * string ) list ;
-  alarms: ( truth * string ) list ;
+  here: value;
+  next: value next;
 }
 
 let signal = Request.signal ~package ~name:"changed"
@@ -62,11 +72,6 @@ let signal = Request.signal ~package ~name:"changed"
 
 let () = Analysis.register_computation_hook ~on:Computed
     (fun _ -> Request.emit signal)
-
-let handle_top_or_bottom ~top ~bottom compute = function
-  | `Bottom -> bottom
-  | `Top -> top
-  | `Value v -> compute v
 
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Utilities                                                   --- *)
@@ -244,7 +249,6 @@ end
 module type EvaProxy = sig
   val callstacks : stmt -> callstack list
   val domain : probe -> callstack option -> domain
-  val pointed_lvalues : probe -> callstack option -> lval list option
 end
 
 module Proxy(A : Analysis.S) : EvaProxy = struct
@@ -349,39 +353,84 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let eval_expr expr state =
     A.eval_expr state expr >>=: fun value -> ToValue value
 
-  let dalarms alarms =
-    let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
-    let f alarm status pool = (status, descr alarm) :: pool in
-    Alarmset.fold f [] alarms |> List.rev
-
-  let get_next_dstate stmt callstack state = function
-    | `After -> dstate ~after:true stmt callstack
-    | `Then cond -> (A.assume_cond stmt state cond true :> dstate)
-    | `Else cond -> (A.assume_cond stmt state cond false :> dstate)
+  let do_next eval state stmt callstack =
+    match stmt.skind with
+    | If (cond, _, _, _) ->
+      let then_state = (A.assume_cond stmt state cond true :> dstate) in
+      let else_state = (A.assume_cond stmt state cond false :> dstate) in
+      Cond (eval then_state, eval else_state)
+    | Instr (Set _ | Call _ | Local_init _) ->
+      let after_state = dstate ~after:true stmt callstack in
+      After (eval after_state)
+    | _ -> Nothing
 
   let eval_steps eval stmt callstack =
     let before = dstate ~after:false stmt callstack in
-    let value, alarms = eval before in
-    let others =
+    let here = eval before in
+    let next =
       match before with
-      | `Bottom | `Top -> []
-      | `Value state ->
-        let steps = next_steps stmt in
-        let eval_next step = eval (get_next_dstate stmt callstack state step) in
-        List.map (fun step -> (step :> step), fst (eval_next step)) steps
+      | `Bottom | `Top -> Nothing
+      | `Value state -> do_next eval state stmt callstack
     in
-    { values = (`Here, value) :: others;
-      alarms = dalarms alarms;
-    }
+    { here; next; }
+
+  let get_cvalue =
+    let default = fun _ -> Cvalue.V.top in
+    Option.value ~default (A.Val.get Main_values.CVal.key)
+
+  let get_bases cvalue =
+    try Base.SetLattice.project (Cvalue.V.get_bases cvalue)
+    with Abstract_interp.Error_Top -> Base.Hptset.empty
+
+  let get_pointed_bases = function
+    | ToValue v -> get_bases (get_cvalue v)
+    | ToOffsetmap (Offsetmap offsm) ->
+      Cvalue.V_Offsetmap.fold_on_values
+        (fun v acc ->
+           let v = Cvalue.V_Or_Uninitialized.get_v v in
+           Base.Hptset.union acc (get_bases v))
+        offsm Base.Hptset.empty
+    | ToOffsetmap (Bottom | Empty | Top | InvalidLoc) -> Base.Hptset.empty
+
+  let get_pointed_vars evaluation =
+    let bases = get_pointed_bases evaluation in
+    let add_var base acc =
+      try Base.to_varinfo base :: acc
+      with Base.Not_a_C_variable -> acc
+    in
+    let vars = Base.Hptset.fold add_var bases [] in
+    List.filter (fun vi -> not (Cil.isFunctionType vi.vtype)) vars
+
+  let make_value typ stmt (evaluation, alarms) =
+    let alarms =
+      let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
+      let f alarm status acc = (status, descr alarm) :: acc in
+      Alarmset.fold f [] alarms |> List.rev
+    in
+    let pretty_eval = Bottom.pretty (pp_evaluation typ) in
+    let value = Pretty_utils.to_string pretty_eval evaluation in
+    let pointed_vars =
+      let vars = Bottom.fold ~bottom:[] get_pointed_vars evaluation in
+      let kf =
+        try Some (Kernel_function.find_englobing_kf stmt)
+        with Not_found -> None
+      in
+      let to_marker vi =
+        let text = Pretty_utils.to_string Printer.pp_varinfo vi in
+        let marker = Printer_tag.PLval (kf, Kstmt stmt, Cil.var vi) in
+        text, marker
+      in
+      List.map to_marker vars
+    in
+    { value; alarms; pointed_vars }
+
 
   let domain_eval typ eval stmt callstack =
-    let to_str = Pretty_utils.to_string (Bottom.pretty (pp_evaluation typ)) in
+    let default value = { value; alarms = []; pointed_vars = []; } in
     let eval = function
-      | `Bottom -> "Unreachable", Alarmset.none
-      | `Top -> "No information", Alarmset.none
-      | `Value state ->
-        let value, alarms = eval state in
-        to_str value, alarms
+      | `Bottom -> default "Unreachable"
+      | `Top -> default "No information"
+      | `Value state -> make_value typ stmt (eval state)
     in
     eval_steps eval stmt callstack
 
@@ -391,28 +440,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       domain_eval (Cil.typeOfLval lval) (eval_lval lval) stmt callstack
     | Pexpr (expr, stmt) ->
       domain_eval (Cil.typeOf expr) (eval_expr expr) stmt callstack
-    | Pnone -> { alarms = [] ; values = [] }
-
-  let var_of_base base acc =
-    let add vi acc = if Cil.isFunctionType vi.vtype then acc else vi :: acc in
-    try add (Base.to_varinfo base) acc with Base.Not_a_C_variable -> acc
-
-  let compute_pointed_lvalues eval_lval stmt callstack =
-    Option.bind (A.Val.get Main_values.CVal.key) @@ fun get ->
-    let get_eval = function ToValue v -> `Value (get v) | _ -> `Bottom in
-    let loc state = eval_lval state |> fst >>- get_eval in
-    let bases value = Cvalue.V.fold_bases var_of_base value [] in
-    let lvalues state = loc state >>-: bases >>-: List.map Cil.var in
-    let compute state = lvalues state |> Bottom.to_option in
-    handle_top_or_bottom ~top:None ~bottom:None compute @@
-    dstate ~after:true stmt callstack
-
-  let pointed_lvalues p callstack =
-    match p with
-    | Plval (l, stmt) -> compute_pointed_lvalues (eval_lval l) stmt callstack
-    | Pexpr (e, stmt) -> compute_pointed_lvalues (eval_expr e) stmt callstack
-    | Pnone -> None
-
+    | Pnone -> assert false
 end
 
 let proxy =
@@ -523,6 +551,37 @@ let () =
 (* --- Request getValues                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
+module JEvaluation = struct
+  open Server.Data
+
+  type record
+  let record: record Record.signature = Record.signature ()
+
+  let value = Record.field record ~name:"value"
+      ~descr:(Markdown.plain "Textual representation of the value")
+      (module Data.Jstring)
+  let alarms = Record.field record ~name:"alarms"
+      ~descr:(Markdown.plain "Alarms raised by the evaluation")
+      (module Jlist (Jpair (Jtruth) (Jstring)))
+  let pointed_vars = Record.field record ~name:"pointed_vars"
+      ~descr:(Markdown.plain "List of variables pointed by the value")
+      (module Jlist (Jpair (Jstring) (Jmarker)))
+
+  let data = Record.publish record ~package ~name:"evaluation"
+      ~descr:(Markdown.plain "Evaluation of an expression or lvalue")
+
+  module R: Record.S with type r = record = (val data)
+  type t = value
+  let jtype = R.jtype
+
+  let to_json t =
+    R.default |>
+    R.set value t.value |>
+    R.set alarms t.alarms |>
+    R.set pointed_vars t.pointed_vars |>
+    R.to_json
+end
+
 let () =
   let getValues = Request.signature () in
   let get_tgt = Request.param getValues ~name:"target"
@@ -531,21 +590,18 @@ let () =
   and get_cs = Request.param_opt getValues ~name:"callstack"
       ~descr:(Md.plain "Callstack to collect (defaults to none)")
       (module Jcallstack)
-  and set_alarms = Request.result getValues ~name:"alarms"
-      ~descr:(Md.plain "Alarms raised during evaluation")
-      (module Jlist(Jpair(Jtruth)(Jstring)))
-  and set_domain = Request.result_opt getValues ~name:"values"
-      ~descr:(Md.plain "Domain values")
-      (module Jstring)
+  and set_before = Request.result getValues ~name:"v_before"
+      ~descr:(Md.plain "Domain values before execution")
+      (module JEvaluation)
   and set_after = Request.result_opt getValues ~name:"v_after"
       ~descr:(Md.plain "Domain values after execution")
-      (module Jstring)
+      (module JEvaluation)
   and set_then = Request.result_opt getValues ~name:"v_then"
       ~descr:(Md.plain "Domain values for true condition")
-      (module Jstring)
+      (module JEvaluation)
   and set_else = Request.result_opt getValues ~name:"v_else"
       ~descr:(Md.plain "Domain values for false condition")
-      (module Jstring)
+      (module JEvaluation)
   in
   Request.register_sig ~package getValues
     ~kind:`GET ~name:"getValues"
@@ -554,43 +610,13 @@ let () =
       let module A : EvaProxy = (val proxy ()) in
       let marker = get_tgt rq and callstack = get_cs rq in
       let domain = A.domain (probe marker) callstack in
-      set_alarms rq domain.alarms ;
-      let set_values = function
-        | `Here,   values -> set_domain rq (Some values)
-        | `After,  values -> set_after  rq (Some values)
-        | `Then _, values -> set_then   rq (Some values)
-        | `Else _, values -> set_else   rq (Some values)
-      in List.iter set_values domain.values
-    end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Request getPointedLvalues                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-let () =
-  let getPointedLvalues = Request.signature () in
-  let get_tgt = Request.param getPointedLvalues ~name:"pointer"
-      ~descr:(Md.plain "Marker to the pointer we want to lookup")
-      (module Jmarker)
-  and get_cs = Request.param_opt getPointedLvalues ~name:"callstack"
-      ~descr:(Md.plain "Callstack to collect (defaults to none)")
-      (module Jcallstack)
-  and set_lvalues = Request.result_opt getPointedLvalues ~name:"lvalues"
-      ~descr:(Md.plain "List of pointed lvalues")
-      (module Jlist(Jpair(Jstring)(Jmarker)))
-  in
-  Request.register_sig ~package getPointedLvalues
-    ~kind:`GET ~name:"getPointedLvalues"
-    ~descr:(Md.plain "Pointed lvalues for the given marker")
-    begin fun rq () ->
-      let module A : EvaProxy = (val proxy ()) in
-      let marker = get_tgt rq and callstack = get_cs rq in
-      let kf = Printer_tag.kf_of_localizable marker in
-      let ki = Printer_tag.ki_of_localizable marker in
-      let pp = Pretty_utils.to_string Printer.pp_lval in
-      let to_marker lval = pp lval, Printer_tag.PLval (kf, ki, lval) in
-      let lvalues = A.pointed_lvalues (probe marker) callstack in
-      Option.map (List.map to_marker) lvalues |> set_lvalues rq
+      set_before rq domain.here;
+      match domain.next with
+      | After value -> set_after rq (Some value)
+      | Cond (v_then, v_else) ->
+        set_then rq (Some v_then);
+        set_else rq (Some v_else)
+      | Nothing -> ()
     end
 
 (* -------------------------------------------------------------------------- *)
