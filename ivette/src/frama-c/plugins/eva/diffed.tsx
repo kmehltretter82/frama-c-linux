@@ -158,26 +158,24 @@ export function Diff3(props: Diff3Props) {
 export interface DiffProps {
   text?: string;
   diff?: string;
-  diffA?: string;
-  diffB?: string;
+  diff2?: string;
 }
 
 export function Diff(props: DiffProps) {
-  const { text, diff, diffA, diffB } = props;
+  const { text, diff, diff2 } = props;
   if (text === undefined)
-    return diff ? <>{diff}</> : null;
+    return null;
+  if (diff !== undefined && diff2 !== undefined)
+    return <Diff3 text={text} diffA={diff} diffB={diff2} />;
   if (diff !== undefined) {
     if (diff === text) return <>{text}</>;
     return <Diff2 text={text} diff={diff} />;
   }
-  if (diffA === undefined) {
-    if (diffB === undefined) return <>{text}</>;
-    return <Diff2 text={text} diff={diffB} />;
-  } if (diffB === undefined) {
-    if (diffA === undefined) return <>{text}</>;
-    return <Diff2 text={text} diff={diffA} />;
+  if (diff2 !== undefined) {
+    if (diff2 === text) return <>{text}</>;
+    return <Diff2 text={text} diff={diff2} />;
   }
-  return <Diff3 text={text} diffA={diffA} diffB={diffB} />;
+  return <>{text}</>;
 }
 
 // --------------------------------------------------------------------------

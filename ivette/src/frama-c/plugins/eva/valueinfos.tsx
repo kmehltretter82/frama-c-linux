@@ -72,7 +72,7 @@ export function AlarmsInfos(props: ModelProp) {
   if (probe) {
     const callstack = model.getCallstack();
     const domain = model.values.getValues(probe, callstack);
-    const alarms = domain?.alarms ?? [];
+    const alarms = domain?.v_before.alarms ?? [];
     if (alarms.length > 0) {
       const renderAlarm = ([status, alarm]: EvaAlarm) => {
         const className = `eva-alarm-info eva-alarm-${status}`;
