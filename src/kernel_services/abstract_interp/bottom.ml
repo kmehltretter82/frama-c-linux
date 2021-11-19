@@ -47,6 +47,10 @@ let non_bottom = function
   | `Value v -> v
   | `Bottom  -> assert false
 
+let value ~bottom = function
+  | `Value v -> v
+  | `Bottom -> bottom
+
 let equal equal x y = match x, y with
   | `Bottom, `Bottom     -> true
   | `Value vx, `Value vy -> equal vx vy
@@ -85,6 +89,9 @@ let iter f = function
   | `Bottom -> ()
   | `Value v -> f v
 
+let fold ~bottom f = function
+  | `Bottom -> bottom
+  | `Value v -> f v
 
 let counter = ref 0
 
