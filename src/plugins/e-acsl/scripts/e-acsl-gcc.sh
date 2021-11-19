@@ -26,8 +26,22 @@
 # The -e option is not present in the sha-bang on purpose, the error() function
 # should be used after each command that may fail.
 
-# Base dir of this script
-BASEDIR="$(realpath `dirname $0`)"
+# Portable realpath using pwd
+realpath() {
+  if [ -e "$1" ]; then
+    if [ -d "$1" ]; then
+      (cd "$1" && pwd)
+    else
+      local name=$(basename "$1")
+      local dir=$(cd $(dirname "$1") && pwd)
+      echo $dir/$name
+    fi
+    return 0
+  else
+    echo "realpath: no such file or directory: '$1'" 1>&2
+    return 1
+  fi
+}
 
 # Print a message to STDERR and exit. If the second argument (exit code)
 # is provided and it is '0' then do nothing.
@@ -45,6 +59,10 @@ warning () {
   echo "e-acsl-gcc: warning: $1" 1>&2
 }
 
+# Base dir of this script
+BASEDIR="$(realpath `dirname $0`)"
+error "unable to find base dir of script" $?
+
 # True if the script is launched from the E-ACSL sources, false otherwise
 is_development_version() {
   test -f "$BASEDIR/../E_ACSL.mli"
@@ -52,13 +70,13 @@ is_development_version() {
 
 # Check if a given executable name can be found by in the PATH
 has_tool() {
-  which "$@" >/dev/null 2>&1 && return 0 || return 1
+  command -v "$@" >/dev/null 2>&1 && return 0 || return 1
 }
 
 # Check if a given executable name is indeed an executable or can be found
 # in the $PATH. Abort the execution if not.
 check_tool() {
-   { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
+   { has_tool "$1" || test -e "$1"; } || error "No executable '$1' found";
 }
 
 # Check if a given Frama-C executable name is indeed an executable, can be found
@@ -66,7 +84,7 @@ check_tool() {
 # in the binary folder of the development version. Abort the execution if not.
 retrieve_framac_path() {
   if has_tool "$1"; then
-    echo $(which "$1")
+    echo $(command -v "$1")
   elif [ -e "$1" ]; then
     echo "$1"
   elif [ -e "$BASEDIR/$1" ]; then
@@ -74,7 +92,8 @@ retrieve_framac_path() {
   elif is_development_version && [ -e "$BASEDIR/../../../../bin/$1" ]; then
     echo "$BASEDIR/../../../../bin/$1"
   else
-    error "No executable $1 or $BASEDIR/$1 found"
+    echo "No executable '$1' or '$BASEDIR/$1' found"
+    return 1
   fi
 }
 
@@ -105,23 +124,6 @@ is_number() {
     fi
   else
     echo '-'
-  fi
-}
-
-# Portable realpath using pwd
-realpath() {
-  if [ -e "$1" ]; then
-    if [ -d "$1" ]; then
-      (cd "$1" && pwd)
-    else
-      local name=$(basename "$1")
-      local dir=$(cd $(dirname "$1") && pwd)
-      echo $dir/$name
-    fi
-    return 0
-  else
-    echo "realpath: no such file or directory: '$1'" 1>&2
-    return 1
   fi
 }
 
@@ -234,7 +236,10 @@ mmodel_features() {
   case $model in
     bittree) flags="-DE_ACSL_BITTREE_MMODEL" ;;
     segment) flags="-DE_ACSL_SEGMENT_MMODEL" ;;
-    *) error "Memory model '$model' is not available in this distribution" ;;
+    *)
+      echo "Memory model '$model' is not available in this distribution"
+      return 1
+    ;;
   esac
 
   # Temporal analysis
@@ -551,13 +556,13 @@ do
     # Supply Frama-C executable name
     -I|--frama-c)
       shift;
-      OPTION_FRAMAC="$(which $1)"
+      OPTION_FRAMAC="$(command -v $1 || echo $1)"
       shift;
     ;;
     # Supply GCC executable name
     -G|--gcc)
       shift;
-      OPTION_CC="$(which $1)"
+      OPTION_CC="$(command -v $1 || echo $1)"
       shift;
     ;;
     # Specify EACSL_SHARE directory (where C runtime library lives) by hand
@@ -595,6 +600,7 @@ do
       shift;
       # Convert comma-separated string into white-space separated string
       OPTION_EACSL_MMODELS="`echo $1 | sed -s 's/,/ /g'`"
+      error "unable to parse '$1' with sed" $?
       shift;
     ;;
     # Print names of the supported memody models.
@@ -701,12 +707,12 @@ do
     ;;
     --ar)
       shift;
-      OPTION_AR="$(which $1)"
+      OPTION_AR="$(command -v $1 || echo $1)"
       shift;
     ;;
     --ranlib)
       shift;
-      OPTION_RANLIB="$(which $1)"
+      OPTION_RANLIB="$(command -v $1 || echo $1)"
       shift;
     ;;
     --with-dlmalloc)
@@ -751,6 +757,7 @@ fi
 
 # Check Frama-C and GCC executable names
 OPTION_FRAMAC="$(retrieve_framac_path "$OPTION_FRAMAC")"
+error "$OPTION_FRAMAC" $?
 check_tool "$OPTION_CC"
 
 # Frama-C directories
@@ -762,6 +769,7 @@ FRAMAC="$OPTION_FRAMAC"
 if is_development_version; then
   # Development version
   DEVELOPMENT="$(realpath "$BASEDIR/..")"
+  error "unable to find parent dir of base dir" $?
   # Check if the project has been built, as if this is a non-installed
   # version that has not been built Frama-C will fallback to an installed one
   # for instrumentation but still use local RTL
@@ -804,7 +812,7 @@ GCCMACHDEP="-m$MACHDEPFLAGS"
 
 # RTE flags
 RTE_FLAGS="$(rte_options "$OPTION_RTE" "$OPTION_RTE_SELECT")"
-error "Invalid argument $1 to --rte|-a option" $?
+error "Invalid argument '$RTE_FLAGS' to --rte|-a option" $?
 
 # Frama-C and related flags
 # Additional flags passed to Frama-C preprocessor via `-cpp-extra-args`
@@ -1032,6 +1040,7 @@ if [ -n "$OPTION_COMPILE" ]; then
     # RTL sources
     EACSL_RTL="$EACSL_SHARE/e_acsl_rtl.c"
     EACSL_MMODEL_FEATURES="$(mmodel_features $model)"
+    error "$EACSL_MMODEL_FEATURES" $?
     ($OPTION_ECHO;
      $CC \
        $EACSL_MMODEL_FEATURES \
