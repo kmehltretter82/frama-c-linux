@@ -263,48 +263,56 @@ int __builtin_popcountll (unsigned long long x);
 /*@
   requires validity: \valid_read(mem);
   assigns \result \from *mem, indirect:model;
+  ensures load_value: \result == *mem;
 */
 __UINT8_T __atomic_load_1(__UINT8_T* mem, int model);
 
 /*@
   requires validity: \valid_read(mem);
   assigns \result \from *mem, indirect: model;
+  ensures load_value: \result == *mem;
 */
 __UINT16_T __atomic_load_2(__UINT16_T* mem, int model);
 
 /*@
   requires validity: \valid_read(mem);
   assigns \result \from *mem, indirect:model;
+  ensures load_value: \result == *mem;
 */
 __UINT32_T __atomic_load_4(__UINT32_T* mem, int model);
 
 /*@
   requires validity: \valid_read(mem);
   assigns \result \from *mem, indirect:model;
+  ensures load_value: \result == *mem;
 */
 __UINT64_T __atomic_load_8(__UINT64_T* mem, int model);
 
 /*@
   requires validity: \valid(mem);
   assigns *mem \from val, indirect: model;
+  ensures store_value: *mem == val;
 */
 void __atomic_store_1(__UINT8_T* mem, __UINT8_T val, int model);
 
 /*@
   requires validity: \valid(mem);
   assigns *mem \from val, indirect: model;
+  ensures store_value: *mem == val;
 */
 void __atomic_store_2(__UINT16_T* mem, __UINT16_T val, int model);
 
 /*@
   requires validity: \valid(mem);
   assigns *mem \from val, indirect: model;
+  ensures store_value: *mem == val;
 */
 void __atomic_store_4(__UINT32_T* mem, __UINT32_T val, int model);
 
 /*@
   requires validity: \valid(mem);
   assigns *mem \from val, indirect: model;
+  ensures store_value: *mem == val;
 */
 void __atomic_store_8(__UINT64_T* mem, __UINT64_T val, int model);
 
