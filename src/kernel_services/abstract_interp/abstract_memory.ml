@@ -504,14 +504,14 @@ sig
   val hash : t -> int
   val equal : t -> t -> bool
   val compare : t -> t -> int
+  val hull : oracle:oracle -> t -> bound * bound
   val raw : t -> Bit.t
   val weak_erase : Bit.t -> t -> t
   val is_included : t -> t -> bool
   val unify : oracle:bioracle -> (submemory -> submemory -> submemory) ->
     t -> t -> t
   val single : bit -> bound -> bound -> submemory -> t
-  val read :
-    oracle:(Cil_types.exp -> Ival.t) ->
+  val read : oracle:oracle ->
     (submemory -> 'a) -> ('a -> 'a -> 'a) -> t -> bound -> 'a
   val write : oracle:oracle -> (submemory -> submemory) ->
     t -> bound -> bound -> t
@@ -605,6 +605,15 @@ struct
       List.for_all2 included_segments m1.segments m2.segments
     with Invalid_argument _ -> false (* Segmentations have different sizes *)
 
+  let hull ~oracle (m : t) : Bound.t * Bound.t =
+    let rec last = function
+      | [] -> assert false
+      | [(_v,u)] -> u
+      | _ :: t -> last t
+    in
+    Bound.lower_const ~oracle m.start,
+    Bound.upper_const ~oracle (last m.segments)
+
   let is_empty_segment ~oracle l u =
     match Bound.cmp ~oracle l u with
     | Equal | Greater -> true
@@ -627,6 +636,7 @@ struct
       | `Bottom -> tail
       | `Value v -> (v,u) :: tail
 
+  (* Unify two arrays m1 and m2 *)
   let unify ~oracle f (m1 (*Left*): t) (m2 (*Right*) : t) : t =
     (* Shortcuts *)
     let compare side = Bound.cmp ~oracle:(oracle side) in
@@ -637,7 +647,6 @@ struct
       let oracle = fun _ -> oracle side in
       Bottom.join (M.join ~oracle)
     in
-
     let {start=l1 ; segments=s1 ; padding=p1 } = m1
     and {start=l2 ; segments=s2 ; padding=p2 } = m2 in
     (* Unify the segmentation start *)
@@ -1047,10 +1056,13 @@ struct
       | Union _, (Scalar _ | Array _ | Struct _) -> false
 
     let unify ~oracle f =
+      let raw_to_array ~oracle side prototype b =
+        let l,u = A.hull ~oracle:(oracle side) prototype in
+        A.single b l u (Raw b)
+      in
       let rec aux m1 m2 =
         match m1, m2 with
         | Raw b1, Raw b2 -> Raw (Bit.join b1 b2)
-        | m, Raw b | Raw b, m -> weak_erase b m
         | Scalar s1, Scalar s2
           when are_typ_compatible s1.scalar_type s2.scalar_type ->
           let size = typ_size s1.scalar_type in
@@ -1059,6 +1071,14 @@ struct
         | Array a1, Array a2 when are_aray_compatible a1 a2 ->
           let array_value = A.unify ~oracle aux a1.array_value a2.array_value in
           Array { a1 with array_value }
+        | Array a, Raw b ->
+          let array_value' = raw_to_array ~oracle Left a.array_value b in
+          let array_value = A.unify ~oracle aux a.array_value array_value' in
+          Array { a with array_value }
+        | Raw b, Array a ->
+          let array_value' = raw_to_array ~oracle Right a.array_value b in
+          let array_value = A.unify ~oracle aux array_value' a.array_value in
+          Array { a with array_value }
         | Struct s1, Struct s2 when are_structs_compatible s1 s2 ->
           let struct_value = S.unify aux s1.struct_value s2.struct_value in
           Struct { s1 with struct_value }
@@ -1068,8 +1088,8 @@ struct
             union_value = aux u1.union_value u2.union_value;
             union_padding = Bit.join u1.union_padding u2.union_padding;
           }
-        | _,_ ->
-          Raw (Bit.join (raw m1) (raw m2))
+        | m, Raw b | Raw b, m -> weak_erase b m
+        | _,_ -> Raw (Bit.join (raw m1) (raw m2))
       in
       aux
 
