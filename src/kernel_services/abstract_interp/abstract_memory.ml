@@ -331,6 +331,8 @@ struct
   let pretty fmt : t -> unit = function
     | Const i -> Integer.pretty fmt i
     | Exp (e,i) when Integer.is_zero i -> Exp.pretty fmt e
+    | Exp (e,i) when Integer.(lt i zero) ->
+      Format.fprintf fmt "%a - %a" Exp.pretty e Integer.pretty (Integer.neg i)
     | Exp (e,i) ->
       Format.fprintf fmt "%a + %a" Exp.pretty e Integer.pretty i
     | _ -> raise Not_implemented
