@@ -449,7 +449,7 @@ struct
       let pp_count fmt =
         match count with
         | None -> ()
-        | Some c -> Format.fprintf fmt " (%a)" (Integer.pretty ~hexa:false) c
+        | Some c -> Format.fprintf fmt " (%a)" Integer.pretty c
       in
       fail ~exp "split on more than %d values%t prevented ; try to improve \
                  the analysis precision or look at the option -eva-split-limit \

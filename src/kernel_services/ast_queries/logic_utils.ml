@@ -282,7 +282,7 @@ let lconstant_to_constant c = match c with
       with Cil.Not_representable ->
         Kernel.fatal
           "Cannot represent logical integer in C: %a"
-          (Integer.pretty ~hexa:false) i
+          Integer.pretty i
     end
   | LStr s -> CStr s
   | LWStr s -> CWStr s

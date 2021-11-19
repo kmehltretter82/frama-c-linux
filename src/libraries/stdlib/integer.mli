@@ -214,7 +214,8 @@ val to_string : t -> string
 val of_string : string -> t
 (** @raise Invalid_argument when the string cannot be parsed. *)
 
-val pretty : ?hexa:bool -> t formatter
+val pretty : t formatter
+val pretty_hex : t formatter
 
 val pp_bin : ?nbits:int -> ?sep:string -> t formatter
 (** Print binary format. Digits are output by blocs of 4 bits

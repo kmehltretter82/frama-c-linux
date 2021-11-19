@@ -1928,7 +1928,7 @@ module Integer =
         in
         Type.par par Type.Call fmt pp
       (* TODO: this should take into account kernel's option -big-ints-hex *)
-      let pretty = Integer.pretty ~hexa:false
+      let pretty = Integer.pretty
       let varname _ = "integer_n"
       let mem_project = never_any_project
     end)

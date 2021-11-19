@@ -41,7 +41,7 @@ module type BINARY_SEMILATTICE = sig
   include  Dataflows.JOIN_SEMILATTICE
 end
 
-let pretty_int = Integer.pretty ~hexa:false
+let pretty_int = Integer.pretty
 
 module Binary(* :BINARY_SEMILATTICE *) = struct
 
@@ -285,9 +285,9 @@ module Store(* (B:sig *)
     if Integer.(equal increment one) then Format.fprintf fmt "++"
     else if Integer.(equal increment minus_one) then Format.fprintf fmt "--"
     else if Integer.(gt increment zero) then
-      Format.fprintf fmt " += %a" (Integer.pretty ~hexa:false) increment
+      Format.fprintf fmt " += %a" Integer.pretty increment
     else if Integer.(lt increment zero) then
-      Format.fprintf fmt " -= %a" (Integer.pretty ~hexa:false)
+      Format.fprintf fmt " -= %a" Integer.pretty
         (Integer.neg increment)
     else assert false (* should never happen *)
 

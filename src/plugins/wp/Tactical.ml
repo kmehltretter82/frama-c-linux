@@ -141,7 +141,7 @@ let rec pp_selection fmt = function
       Format.fprintf fmt "Term %d in %a" (Lang.F.QED.id t) pp_clause c
   | Clause c -> pp_clause fmt c
   | Compose(Cint k) ->
-      Format.fprintf fmt "Constant '%a'" (Integer.pretty ~hexa:false) k
+      Format.fprintf fmt "Constant '%a'" Integer.pretty k
   | Compose(Range(a,b)) ->
       Format.fprintf fmt "Range '%d..%d'" a b
   | Compose(Code(_,id,es)) ->

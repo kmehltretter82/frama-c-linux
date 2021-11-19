@@ -385,7 +385,7 @@ let pretty_current_packing_pragma fmt =
     Option.value ~default:(Integer.of_int theMachine.theMachine.alignof_aligned)
       !current_packing_pragma
   in
-  (Integer.pretty ~hexa:false) fmt align
+  Integer.pretty fmt align
 
 (* Checks if [n] is a valid alignment for #pragma pack, and emits a warning
    if it is not the case. Returns the value to be set as current packing pragma.
@@ -409,7 +409,7 @@ let get_valid_pragma_pack_alignment n =
     in
     if not valid then
       Kernel.warning ~current:true "ignoring invalid packing alignment (%a)"
-        (Integer.pretty ~hexa:false) n;
+        Integer.pretty n;
     valid, Some n
   end
 
@@ -426,7 +426,7 @@ let process_pack_pragma name args =
           let is_valid, new_pragma = get_valid_pragma_pack_alignment n in
           if is_valid then begin
             Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
-              "packing pragma: setting alignment to %a" (Integer.pretty ~hexa:false) n;
+              "packing pragma: setting alignment to %a" Integer.pretty n;
             current_packing_pragma := new_pragma; None
           end else
             Some (Attr (name, args))
@@ -439,7 +439,7 @@ let process_pack_pragma name args =
           if is_valid then begin
             Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
               "packing pragma: pushing alignment %t, setting alignment to %a"
-              pretty_current_packing_pragma (Integer.pretty ~hexa:false) n;
+              pretty_current_packing_pragma Integer.pretty n;
             Stack.push !current_packing_pragma packing_pragma_stack;
             current_packing_pragma:= new_pragma; None
           end else
@@ -575,7 +575,7 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
         else begin
           Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
             "adding aligned(%a) attribute to comp '%s' due to packing pragma"
-            (Integer.pretty ~hexa:false) n ci.cname;
+            Integer.pretty n ci.cname;
           addAttribute (Attr("aligned",[AInt n])) (dropAttribute "aligned" cattrs)
         end
       | Some local ->
@@ -584,7 +584,7 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
         let align = Integer.max n local in
         Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
           "setting aligned(%a) attribute to comp '%s' due to packing pragma"
-          (Integer.pretty ~hexa:false) align ci.cname;
+          Integer.pretty align ci.cname;
         addAttribute (Attr("aligned",[AInt align]))
           (dropAttribute "aligned" cattrs)
     in
@@ -633,7 +633,7 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
           let align = Integer.(min n (of_int sizeof_type)) in
           Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
             "adding aligned(%a) attribute to field '%s.%s' due to packing pragma"
-            (Integer.pretty ~hexa:false) align fi.fcomp.cname fi.fname;
+            Integer.pretty align fi.fcomp.cname fi.fname;
           addAttribute (Attr("aligned",[AInt align])) (dropAttribute "aligned" fattrs)
         end
       | Some local ->
@@ -644,7 +644,7 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
         let align = Integer.min n (Integer.max (Integer.of_int (Cil.bytesSizeOf fi.ftype)) local) in
         Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
           "setting aligned(%a) attribute to field '%s.%s' due to packing pragma"
-          (Integer.pretty ~hexa:false) align fi.fcomp.cname fi.fname;
+          Integer.pretty align fi.fcomp.cname fi.fname;
         addAttribute (Attr("aligned",[AInt align]))
           (dropAttribute "aligned" fattrs)
     end
@@ -1193,7 +1193,7 @@ let to_integer i =
   | Some i -> i
   | None ->
     Kernel.error ~current:true "integer too large: %a"
-      (Integer.pretty ~hexa:true) i;
+      Integer.pretty_hex i;
     -1
 
 let constFoldToInteger e =

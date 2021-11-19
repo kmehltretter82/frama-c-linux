@@ -3239,9 +3239,9 @@ let parseIntAux (str:string) =
       then
         Error (Format.asprintf
                  "Invalid digit %a in integer literal '%s' in base %a."
-                 (Integer.pretty ~hexa:false) what
+                 Integer.pretty what
                  str
-                 (Integer.pretty ~hexa:false) base)
+                 Integer.pretty base)
       else
         let acc' = Integer.add what (Integer.mul base acc) in
         toInt base acc' (idx + 1)
