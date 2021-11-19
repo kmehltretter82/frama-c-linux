@@ -109,7 +109,7 @@ export class FontSizer {
 /* --------------------------------------------------------------------------*/
 
 export const WSIZER = new FontSizer(7, 6);
-export const HSIZER = new FontSizer(14, 6);
+export const HSIZER = new FontSizer(15, 6);
 
 export interface SizedAreaProps {
   cols: number;
