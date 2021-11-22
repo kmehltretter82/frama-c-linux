@@ -140,6 +140,10 @@ module Bound_Lattice
   let is_included = is_included Lattice.is_included
 end
 
+let to_option = function
+  | `Bottom -> None
+  | `Value v -> Some v
+
 let to_list = function
   | `Bottom  -> []
   | `Value v -> [v]

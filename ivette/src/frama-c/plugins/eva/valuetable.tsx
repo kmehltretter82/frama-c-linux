@@ -27,6 +27,8 @@
 // React & Dome
 import React from 'react';
 import * as Dome from 'dome';
+import * as Server from 'frama-c/server';
+import * as Values from 'frama-c/api/plugins/eva/values';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Hpack, Filler } from 'dome/layout/boxes';
@@ -48,6 +50,8 @@ import { Row } from './layout';
 import { Callsite } from './stacks';
 import { Stmt } from './valueinfos';
 import './style.css';
+
+const D = new Dome.Debug('Source Code');
 
 // --------------------------------------------------------------------------
 // --- Cell Diffs
@@ -177,12 +181,31 @@ function TableCell(props: TableCellProps) {
     probe.setPersistent();
     if (probe.zoomable) probe.setZoomed(!probe.zoomed);
   };
+
+  async function onContextMenu() {
+    Server
+      .send(Values.getPointedLvalues, { pointer: marker, callstack })
+      .then((r) => {
+        const lvalues = r.lvalues ?? [];
+        const items: Dome.PopupMenuItem[] = lvalues.map((lval) => {
+          const [text, lvalMarker] = lval;
+          const label = `Display values for ${text}`;
+          const location = { fct: probe.fct, marker: lvalMarker };
+          const onItemClick = () => model.addProbe(location);
+          return { label, onClick: onItemClick };
+        });
+        if (items.length > 0) Dome.popupMenu(items);
+      })
+      .catch((err) => D.error(`Fail to recover pointed lvalues: ${err}`));
+  }
+
   return (
     <div
       className={className}
       style={style}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
     >
       {contents}
     </div>
