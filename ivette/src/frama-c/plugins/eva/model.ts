@@ -106,6 +106,12 @@ export class Model implements ModelCallbacks {
     }
   }
 
+  removeProbe(probe: Probe) {
+    probe.setTransient();
+    if (this.selected === probe)
+      this.clearSelection();
+  }
+
   getStacks(p: Probe | undefined): Values.callstack[] {
     return p ? this.stacks.getStacks(p.marker) : [];
   }

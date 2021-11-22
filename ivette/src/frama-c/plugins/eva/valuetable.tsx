@@ -88,6 +88,7 @@ function TableCell(props: TableCellProps) {
   const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
   const style = { width: minWidth, maxWidth };
   let contents: React.ReactNode = props.probe.marker;
+  let valueText = '';
   let pointedVars: EvaPointedVar[] = [];
   const { transient, marker } = probe;
   const focused = model.getFocused();
@@ -119,6 +120,7 @@ function TableCell(props: TableCellProps) {
         const { condition } = probe;
         const vstate = condition ? model.getVcond() : model.getVstmt();
         const { value, vdiffs } = computeValueDiffs(domain, vstate);
+        valueText = value.value;
         const text = vdiffs.text ?? vdiffs.diff;
         const { cols, rows } = sizeof(text);
         let status = 'none';
@@ -162,13 +164,24 @@ function TableCell(props: TableCellProps) {
   };
 
   async function onContextMenu() {
-    const items: Dome.PopupMenuItem[] = pointedVars.map((lval) => {
+    const items: Dome.PopupMenuItem[] = [];
+    const copyValue = () => navigator.clipboard.writeText(valueText);
+    if (valueText !== '')
+      items.push({ label: 'Copy to clipboard', onClick: copyValue });
+    if (items.length > 0 && pointedVars.length > 0)
+      items.push('separator');
+    pointedVars.forEach((lval) => {
       const [text, lvalMarker] = lval;
       const label = `Display values for ${text}`;
       const location = { fct: probe.fct, marker: lvalMarker };
       const onItemClick = () => model.addProbe(location);
-      return { label, onClick: onItemClick };
+      items.push({ label, onClick: onItemClick });
     });
+    if (items.length > 0)
+      items.push('separator');
+    const remove = () => model.removeProbe(probe);
+    const removeLabel = `Remove column for ${probe.code}`;
+    items.push({ label: removeLabel, onClick: remove });
     if (items.length > 0) Dome.popupMenu(items);
   }
 
