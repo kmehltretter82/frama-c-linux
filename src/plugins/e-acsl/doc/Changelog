@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* e-acsl-gcc   [2021-11-22] Fix e-acsl-gcc.sh detection of failures in
+                subcommands.
 -  E-ACSL       [2021-11-03] Improve runtime debug logs: the %a modifier now
                 outputs in hexadecimal, the debug logs now all end in new lines,
                 the trace now outputs to stderr.
