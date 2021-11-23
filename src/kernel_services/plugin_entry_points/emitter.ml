@@ -155,7 +155,7 @@ module Usable_emitter = struct
         let mem_project = Datatype.never_any_project
       end)
 
-  let get e =
+  let unsafe_get e =
     let get_params map =
       Datatype.String.Map.fold
         (fun s _ acc -> Typed_parameter.get s :: acc)
@@ -166,6 +166,13 @@ module Usable_emitter = struct
       kinds = e.u_kinds;
       correctness_parameters = get_params e.correctness_values;
       tuning_parameters = get_params e.tuning_values }
+
+  (* In some cases, e.g. when loading a state with a different set
+     of plugins loaded, the original emitter might not be available,
+     leading to discarding annotations. Let the kernel adopt them. *)
+  let get e =
+    try unsafe_get e
+    with Not_found -> orphan
 
   let get_name e = e.u_name
   let get_unique_name e = Format.asprintf "%a" pretty e
