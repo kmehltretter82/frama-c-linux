@@ -4403,7 +4403,23 @@ and at the end, the inferred relations are propagated back to the caller.
 
 \emph{This domain is experimental.}
 
-TODO
+The multidim domain implements a typed memory model designed to abstract
+multidimensional arrays, arrays of structures or any composition of any depth
+of these. Arrays are summarized with only one abstract value, meaning the domain
+can't express distinct properties of individual cells. However, for arrays
+of structures, the field values are approximated field by field allowing the
+inference of precise information about each field of the structures in the
+array. The model also keeps track of the types used to write in the memory
+which allows to display the contents of the memory (with
+\lstinline|Frama_C_domain_show_each|) with it's structure, even if the
+printed location's type doesn't match the type used to write into this location.
+
+The domain may not be more precise than the cvalue domain, in particular when
+array properties need to be enmurated cell by cell. However it may often be
+more precise when large arrays of structures are written into, especially when
+the indexes used for the write accesses cannot be reduced to singleton with
+usual techniques like loop unrolling.
+
 
 \subsection{Bitwise values}
 \label{sec:bitwise}
