@@ -7,11 +7,15 @@
    Primary    : 16 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
    Secondary  : 16 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> GLOBAL -------------------
-   Application: 0 MB [0x0000-0000-0000, 0x0000-0000-0000]
-   Primary    : 0 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
-   Secondary  : 0 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Application: xxxkB [0x0000-0000-0000, 0x0000-0000-0000]
+   Primary    : xxxkB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : xxxkB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> TLS ----------------------
-   Application: 64 MB [0x0000-0000-0000, 0x0000-0000-0000]
-   Primary    : 64 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
-   Secondary  : 64 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Application: 2 MB [0x0000-0000-0000, 0x0000-0000-0000]
+   Primary    : 2 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : 2 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+>>> VDSO ---------------------
+   Application: xxxkB [0x0000-0000-0000, 0x0000-0000-0000]
+   Primary    : xxxkB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : xxxkB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> --------------------------

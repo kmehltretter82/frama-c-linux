@@ -1111,7 +1111,19 @@ void print_shadows(uintptr_t addr, size_t size) {
 }
 
 void print_memory_segment(struct memory_segment *p, char *lab, int off) {
-  DLOG("   %s: %lu MB [%a, %a]", lab, MB_SZ(p->size), p->start, p->end);
+#  ifdef E_ACSL_DEBUG
+  const char *unit = "MB";
+  size_t size = MB_SZ(p->size);
+  if (size == 0) {
+    unit = "kB";
+    size = KB_SZ(p->size);
+  }
+  if (size == 0) {
+    unit = "B";
+    size = p->size;
+  }
+  DLOG("   %s: %lu %s [%a, %a]", lab, size, unit, p->start, p->end);
+#  endif
   if (off)
     DLOG("{ Offset: %ld }", p->shadow_offset);
   DLOG("\n");
