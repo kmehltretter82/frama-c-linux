@@ -382,9 +382,9 @@ sig
 
   module Subst :
   sig
-    val get : sigma -> term -> term
+    val copy : sigma -> sigma
+    val find : sigma -> term -> term
     val add : sigma -> term -> term -> unit
-    val add_map : sigma -> term Tmap.t -> unit
     val add_fun : sigma -> (term -> term) -> unit
     val add_filter : sigma -> (term -> bool) -> unit
   end

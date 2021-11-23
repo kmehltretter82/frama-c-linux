@@ -1056,7 +1056,7 @@ struct
     | Some m -> m
     | None ->
         let m = Lang.sigma () in
-        F.Subst.add_map m s.def ;
+        F.Subst.add_fun m (fun e -> Tmap.find e s.def) ;
         s.cache <- Some m ; m
 
   let e_apply s e = F.e_subst (subst s) e

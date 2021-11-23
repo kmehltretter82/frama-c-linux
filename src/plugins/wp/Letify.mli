@@ -29,12 +29,7 @@ open Lang.F
 module Ground :
 sig
 
-  type subst = pred -> pred
-  val singleton : pred -> subst
-  val compute : pred array -> subst array * subst
-
   type env
-  val pretty : Format.formatter -> env -> unit
   val top : unit -> env
   val copy : env -> env
 
