@@ -392,7 +392,7 @@ let get_stmt_assigns kf stmt =
               ) l s.spec_behavior
         | _ -> l
       end stmt []
-  in if asgn = [] then [WpPropId.empty_assigns_info] else asgn
+  in if asgn = [] then [WpPropId.mk_stmt_any_assigns_info stmt] else asgn
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Assertions                                                    --- *)
