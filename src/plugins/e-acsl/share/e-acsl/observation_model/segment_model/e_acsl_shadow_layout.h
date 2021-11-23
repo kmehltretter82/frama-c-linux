@@ -70,9 +70,11 @@
   Standard streams stdin, stdout and stderr are put here.
   Some libraries such as libxml use it quite a lot:
   it may occur that the given size is not enough,
-  in which case it MUST be increased. */
+  in which case it MUST be increased.
+  However since the TLS is next to the VDSO segment in the program layout, the
+  default size is small enough so that both segments do not overlap. */
 #ifndef PGM_TLS_SIZE
-#  define PGM_TLS_SIZE (64 * MB)
+#  define PGM_TLS_SIZE (2 * MB)
 #endif
 
 /*! \brief Mspace padding used by shadow segments. This is to make sure that
@@ -191,6 +193,8 @@ struct memory_layout {
   memory_partition global;
   // The TLS is in a specific section and identifiable
   memory_partition tls;
+  // The VDSO is a small shared library used for some kernel functions
+  memory_partition vdso;
 #elif E_ACSL_OS_IS_WINDOWS
   // On windows
   // The text, bss and data segments are not necessarily contiguous so each one
@@ -214,11 +218,9 @@ struct memory_layout mem_layout = {
 
 /*! \brief Array of used partitions */
 memory_partition *mem_partitions[] = {
-    &mem_layout.heap,
-    &mem_layout.stack,
+    &mem_layout.heap,   &mem_layout.stack,
 #if E_ACSL_OS_IS_LINUX
-    &mem_layout.global,
-    &mem_layout.tls,
+    &mem_layout.global, &mem_layout.tls,   &mem_layout.vdso,
 #elif E_ACSL_OS_IS_WINDOWS
     &mem_layout.text,  &mem_layout.bss,   &mem_layout.data,
     &mem_layout.idata, &mem_layout.rdata,
@@ -291,6 +293,8 @@ void clean_shadow_layout();
 #  define global_secondary_offset mem_layout.global.secondary.shadow_offset
 #  define tls_primary_offset      mem_layout.tls.primary.shadow_offset
 #  define tls_secondary_offset    mem_layout.tls.secondary.shadow_offset
+#  define vdso_primary_offset     mem_layout.vdso.primary.shadow_offset
+#  define vdso_secondary_offset   mem_layout.vdso.secondary.shadow_offset
 #elif E_ACSL_OS_IS_WINDOWS
 #  define text_primary_offset    mem_layout.text.primary.shadow_offset
 #  define text_secondary_offset  mem_layout.text.secondary.shadow_offset
@@ -351,6 +355,14 @@ void clean_shadow_layout();
 
 /*! \brief Convert a TLS address into its secondary shadow counterpart */
 #  define SECONDARY_TLS_SHADOW(_addr) SHADOW_ACCESS(_addr, tls_secondary_offset)
+
+/*! \brief Convert a VDSO address into its primary shadow counterpart */
+#  define PRIMARY_VDSO_SHADOW(_addr) SHADOW_ACCESS(_addr, vdso_primary_offset)
+
+/*! \brief Convert a VDSO address into its secondary shadow counterpart */
+#  define SECONDARY_VDSO_SHADOW(_addr)                                         \
+    SHADOW_ACCESS(_addr, vdso_secondary_offset)
+
 #elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Convert a text address into its primary shadow counterpart */
 #  define PRIMARY_TEXT_SHADOW(_addr) SHADOW_ACCESS(_addr, text_primary_offset)
@@ -418,6 +430,7 @@ void clean_shadow_layout();
     (IS_ON_STACK(_addr)    ? _region##_STACK_SHADOW(_addr)                     \
      : IS_ON_GLOBAL(_addr) ? _region##_GLOBAL_SHADOW(_addr)                    \
      : IS_ON_TLS(_addr)    ? _region##_TLS_SHADOW(_addr)                       \
+     : IS_ON_VDSO(_addr)   ? _region##_VDSO_SHADOW(_addr)                      \
                            : (intptr_t)0)
 // clang-format on
 #elif E_ACSL_OS_IS_WINDOWS
@@ -462,10 +475,14 @@ void clean_shadow_layout();
 /*! \brief Evaluate to true if _addr is a TLS address */
 #  define IS_ON_TLS(_addr) IS_ON(_addr, mem_layout.tls.application)
 
+/*! \brief Evaluate to true if _addr is a VDSO address */
+#  define IS_ON_VDSO(_addr) IS_ON(_addr, mem_layout.vdso.application)
+
 /*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
  * ::IS_ON_GLOBAL or ::IS_ON_TLS  */
 #  define IS_ON_STATIC(_addr)                                                  \
-    (IS_ON_STACK(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
+    (IS_ON_STACK(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr)             \
+     || IS_ON_VDSO(_addr))
 #elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Evaluate to true if `_addr` is a text address */
 #  define IS_ON_TEXT(_addr)  IS_ON(_addr, mem_layout.text.application)
@@ -529,6 +546,15 @@ void clean_shadow_layout();
 /*! \brief Convert a TLS address into its secondary temporal shadow counterpart */
 #    define TEMPORAL_SECONDARY_TLS_SHADOW(_addr)                               \
       SHADOW_ACCESS(_addr, mem_layout.tls.temporal_secondary.shadow_offset)
+
+/*! \brief Convert a VDSO address into its primary temporal shadow counterpart */
+#    define TEMPORAL_PRIMARY_VDSO_SHADOW(_addr)                                \
+      SHADOW_ACCESS(_addr, mem_layout.vdso.temporal_primary.shadow_offset)
+
+/*! \brief Convert a VDSO address into its secondary temporal shadow counterpart */
+#    define TEMPORAL_SECONDARY_VDSO_SHADOW(_addr)                              \
+      SHADOW_ACCESS(_addr, mem_layout.vdso.temporal_secondary.shadow_offset)
+
 #  elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Convert a text address into its primary temporal shadow counterpart */
 #    define TEMPORAL_PRIMARY_TEXT_SHADOW(_addr)                                \

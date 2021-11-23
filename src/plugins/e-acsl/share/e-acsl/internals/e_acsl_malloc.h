@@ -44,9 +44,9 @@
 #define KB        (1024)      //!< Bytes in a kilobyte
 #define MB        (1024 * KB) //!< Bytes in a megabyte
 #define GB        (1024 * MB) //!< Bytes in a gigabyte
-#define KB_SZ(_s) (_s / KB)   //!< Convert bytes to kilobytes
-#define MB_SZ(_s) (_s / MB)   //!< Convert bytes to megabytes
-#define GB_SZ(_s) (_s / GB)   //!< Convert bytes to gigabytes
+#define KB_SZ(_s) ((_s) / KB) //!< Convert bytes to kilobytes
+#define MB_SZ(_s) ((_s) / MB) //!< Convert bytes to megabytes
+#define GB_SZ(_s) ((_s) / GB) //!< Convert bytes to gigabytes
 
 /************************************************************************/
 /*** Mspace initialization {{{ ***/
@@ -85,6 +85,8 @@ typedef void *mspace;
 struct memory_spaces {
   mspace rtl_mspace;           /* `private` (RTL) mspace */
   mspace heap_mspace;          /* `public` (application) mspace */
+  uintptr_t rtl_start;         /* least address in RTL mspace */
+  uintptr_t rtl_end;           /* greatest address in RTL mspace */
   uintptr_t heap_start;        /* least address in application mspace */
   uintptr_t heap_end;          /* greatest address in application mspace */
   uintptr_t heap_mspace_least; /* Initial least address in heap mspace */

@@ -25,6 +25,8 @@
 struct memory_spaces mem_spaces = {
     .rtl_mspace = NULL,
     .heap_mspace = NULL,
+    .rtl_start = 0,
+    .rtl_end = 0,
     .heap_start = 0,
     .heap_end = 0,
     .heap_mspace_least = 0,
@@ -38,6 +40,9 @@ void eacsl_make_memory_spaces(size_t rtl_size, size_t heap_size) {
   mem_spaces.heap_mspace = eacsl_create_mspace(heap_size, 0);
   /* Do not use `eacsl_mspace_least_addr` here, as it returns the address of the
      mspace header. */
+  mem_spaces.rtl_start =
+      (uintptr_t)eacsl_mspace_malloc(mem_spaces.rtl_mspace, 1);
+  mem_spaces.rtl_end = mem_spaces.rtl_start + rtl_size;
   mem_spaces.heap_start =
       (uintptr_t)eacsl_mspace_malloc(mem_spaces.heap_mspace, 1);
   mem_spaces.heap_end = mem_spaces.heap_start + heap_size;
