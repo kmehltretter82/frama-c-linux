@@ -79,13 +79,17 @@ let handle f x = generic_handle f x x
 
 type 'a or_error = Res of 'a | Err of exn
 
-let retrieve_preprocessing analyse_name getter parameter =
+let retrieve_preprocessing analyse_name getter parameter pp =
   try
     match getter parameter with
     | Res res -> res
     | Err exn -> raise exn
   with Not_memoized ->
-    Options.fatal "%s was not performed on construct" analyse_name
+    Options.fatal
+      "%s was not performed on construct %a"
+      analyse_name
+      pp
+      parameter
 
 (*
 Local Variables:

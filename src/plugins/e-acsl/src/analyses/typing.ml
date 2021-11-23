@@ -882,6 +882,7 @@ and type_predicate ~lenv p =
               "preprocessing of quantified predicate"
               Bound_variables.get_preprocessed_quantifier
               p
+              Printer.pp_predicate
           in
           let guards =
             List.map
@@ -938,9 +939,9 @@ let unsafe_set t ?ctx ~lenv ty =
 (******************************************************************************)
 
 let get_number_ty ~lenv t =
-  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t).ty
+  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term).ty
 let get_integer_op ~lenv t =
-  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t).op
+  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term).op
 let get_integer_op_of_predicate ~lenv p = (type_predicate ~lenv p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
@@ -956,15 +957,18 @@ let extract_typ t ty =
   | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
 let get_typ ~lenv t =
-  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
+  let info =
+    Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term in
   extract_typ t info.ty
 
 let get_op ~lenv t =
-  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
+  let info =
+    Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term  in
   extract_typ t info.op
 
 let get_cast ~lenv t =
-  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
+  let info =
+    Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 

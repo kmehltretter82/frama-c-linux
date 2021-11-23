@@ -59,10 +59,15 @@ val nb_not_yet: unit -> int
 val print_not_yet: string -> unit
 (** Print the "not yet" message without raising an exception. *)
 
-val retrieve_preprocessing: string -> ('a -> 'b or_error) -> 'a -> 'b
+val retrieve_preprocessing:
+  string ->
+  ('a -> 'b or_error) ->
+  'a ->
+  (Format.formatter -> 'a -> unit) ->
+  'b
 (** Retrieve the result of a preprocessing phase, which possibly failed.
-    The [string] argument is used to display a message in case the preprocessing
-    phase did not compute the required result. *)
+    The [string] argument and the formatter are used to display a message in
+    case the preprocessing phase did not compute the required result. *)
 
 (*
 Local Variables:
