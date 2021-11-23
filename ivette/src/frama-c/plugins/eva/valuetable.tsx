@@ -98,9 +98,7 @@ function TableCell(props: TableCellProps) {
 
     // ---- Probe Contents
     case 'probes':
-      if (transient) {
-        contents = <span className="dome-text-label">« Probe »</span>;
-      } else {
+      {
         const { stmt, code, label } = probe;
         const textClass = label ? 'dome-text-label' : 'dome-text-cell';
         contents = (
