@@ -3897,8 +3897,8 @@ most cases, and a greater value is rarely needed.
 
 A case-based reasoning on the possible values of an expression can be forced
 inside a function by using \lstinline|split| annotations.  These annotations
-must be given an expression which values correspond to the cases that need to be
-enumerated. The example below shows an usage of this annotation.
+must be given an expression whose values correspond to the cases that need to be
+enumerated. The example below shows a use of this annotation.
 
 \lstinputlisting{examples/parametrizing/split-array.c}
 
@@ -3933,7 +3933,7 @@ with the exact same expression.
 The use of \lstinline|merge| annotations is not mandatory, but they allow the
 user to mitigate the cost of \lstinline|split| annotations.
 
-\subsubsection{Static and dynamic Partitioning}
+\subsubsection{Static and dynamic partitioning}
 
 Two kinds of value partitioning are available:
 \begin{description}
@@ -3950,10 +3950,10 @@ Two kinds of value partitioning are available:
 \end{description}
 
 A static split allows reasoning according to the value of an expression at the
-annotation point, while a dynamic split enables a reasoning according to the
+annotation point, while a dynamic split enables reasoning according to the
 current value of the expression as long as the partitioning is active.
 
-On both following examples, the values of the array \lstinline|t| are sorted in
+In both following examples, the values of the array \lstinline|t| are sorted in
 increasing order, so the value of \lstinline|t[i+1] - t[i]| is always positive.
 However, without value partitioning, the analysis computes independently the
 possible values for \lstinline|t[i]| and \lstinline|t[i+1]|, which may have
@@ -3974,10 +3974,10 @@ of \lstinline|i|.
 
 \lstinputlisting{examples/parametrizing/dynamic-split.c}
 
-On this second example, the value of \lstinline|r| is computed at each
+In this second example, the value of \lstinline|r| is computed at each
 loop iteration and depends on the current value of \lstinline|i|, which
 also changes at each loop iteration.
-So we need a dynamic split to ensures that the analysis separates the new
+So we need a dynamic split to ensure that the analysis separates the new
 values of \lstinline|i| during the analysis of the loop.
 
 We could also use a static split in the loop body, to ensure that the
@@ -3989,16 +3989,16 @@ is often more suitable than static splits.
 
 \subsubsection{Interprocedural value partitioning}
 
-By default, the value partitioning made by \lstinline|split|
+By default, the value partitioning performed by \lstinline|split|
 and \lstinline|dynamic_split| annotations is only maintained in the current
-function: on the return to their calling functions, such value partitioning
+function: when returning to the caller, the value partitioning
 finishes and partitioned states are merged together.
 
 The option \lstinline|-eva-interprocedural-splits| can be used to change this
 behavior and keep value partitioning through return statements.
 
-Alternatively to annotations, it is also possible to use the command-line to
-reason by case during the whole analysis. The command line parameter
+Alternatively to annotations, it is also possible to use the command line to
+perform case-based reasoning throughout the whole analysis. The command-line parameter
 \lstinline|-eva-partition-value <v>| forces the analyzer to reason at all times
 on single values of the global variable \lstinline|v|, by performing a
 dynamic split on \lstinline|v| for the whole analysis.
@@ -4012,7 +4012,7 @@ There are four limitations to the value partitioning:
   floating-point values are not supported yet.
 \item The expression on which the split is done must evaluate to a small set of
   integer values, in order to limit the cost of the partitioning and ensure the
-  termination of the analysis. If the number of possible values infered for the
+  termination of the analysis. If the number of possible values inferred for the
   expression exceeds a defined limit, \Eva{} cancels the split and emits a
   warning. The limit is 100 by default and can be changed with option
   \lstinline|-eva-split-limit <n>|.
@@ -4412,7 +4412,7 @@ able to express distinct properties of individual cells. However, arrays of
 structures are approximated field by field, allowing the inference of precise
 invariants about each field of all structures included in the array.
 
-The model also keeps track of the types used to write in the memory, and thus
+The model also keeps track of the types used to write to the memory, and thus
 can display the contents of the memory with its structure (via
 \lstinline|Frama_C_domain_show_each| directives), even when the underlying
 location type does not always match the types used to write into it.
@@ -4495,10 +4495,10 @@ the program execution when supplying some data.
 
 The initial taint must be specified by the user with ACSL annotations
 \lstinline|//@ taint <lvalues>;| on a statement, or a clause
-\lstinline|taints <lvalues>;| in function contract.
+\lstinline|taints <lvalues>;| in a function contract.
 
 These directives are hypotheses of the taint analysis, and thus have no logical
-status. The specified set of lvalues become tainted just after the code
+status. The specified set of lvalues becomes tainted just after the code
 annotation, or at the return of the function with the \texttt{taints} clause.
 
 \begin{lstlisting}
@@ -4514,7 +4514,7 @@ annotation, or at the return of the function with the \texttt{taints} clause.
       int write(char *buf, int n);
 \end{lstlisting}
 
-The taint is then propagated during the Eva analysis, computing an an
+The taint is then propagated during the Eva analysis, which computes an
 over-approximation of the set of tainted locations at each program point.
 
 The ACSL predicate \lstinline|\tainted| can be used to verify that some
