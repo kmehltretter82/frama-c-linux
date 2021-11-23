@@ -1304,22 +1304,31 @@ struct
       (fun fs e -> Fset.union fs (phi e))
       Fset.empty es
 
-  let rec gvars_of_term m t =
+  let rec gvars_of_term ~deep m t =
     try Tmap.find t m.footprint
     with Not_found ->
-    match F.repr t with
-    | Fun(f,[]) -> Gset.singleton f , Fset.empty
-    | Fun(f,_) -> Gset.empty , fset_of_lfun m f
-    | Rget(_,fd) -> Gset.empty , Fset.singleton fd
-    | Rdef fts -> Gset.empty ,
-                  List.fold_left (fun fs (f,_) -> Fset.add f fs)
-                    Fset.empty fts
-    | _ ->
-        let gs = ref FP.empty in
-        let collect m gs e = gs := FP.union !gs (gvars_of_term m e) in
+      let collect_subterms acc =
+        let gs = ref acc in
+        let collect m gs e = gs := FP.union !gs (gvars_of_term ~deep m e) in
         F.lc_iter (collect m gs) t ;
         let s = !gs in
         m.footprint <- Tmap.add t s m.footprint ; s
+      in
+      match F.repr t with
+      | Fun(f,[]) ->
+          Gset.singleton f , Fset.empty
+      | Fun(f,_) when not deep || is_coloring_lfun f ->
+          Gset.empty , fset_of_lfun ~deep m f
+      | Fun(f,_) ->
+          collect_subterms (Gset.empty , fset_of_lfun ~deep m f)
+      | Rget(_,fd) ->
+          Gset.empty , Fset.singleton fd
+      | Rdef fts ->
+          Gset.empty ,
+          List.fold_left (fun fs (f,_) -> Fset.add f fs)
+            Fset.empty fts
+      | _ ->
+          collect_subterms FP.empty
 
   and gvars_of_pred m p = gvars_of_term m (F.e_prop p)
 
@@ -1340,12 +1349,12 @@ struct
     let tf = Lang.tau_of_field fd in
     Fset.add fd (fset_of_tau tf)
 
-  and fset_of_lemma m d =
-    snd (gvars_of_pred m d.Definitions.l_lemma)
+  and fset_of_lemma ~deep m d =
+    snd (gvars_of_pred ~deep m d.Definitions.l_lemma)
 
   and fset_of_var x = fset_of_tau (F.tau_of_var x)
 
-  and fset_of_lfun m f =
+  and fset_of_lfun ~deep m f =
     try Gmap.find f m.footcalls
     with Not_found ->
       (* bootstrap recursive calls *)
@@ -1358,9 +1367,9 @@ struct
           let df =
             match d.d_definition with
             | Logic _ -> Fset.empty
-            | Function(_,_,t) -> snd (gvars_of_term m t)
-            | Predicate(_,p) -> snd (gvars_of_pred m p)
-            | Inductive ds -> fsetmap (fset_of_lemma m) ds
+            | Function(_,_,t) -> snd (gvars_of_term ~deep m t)
+            | Predicate(_,p) -> snd (gvars_of_pred ~deep m p)
+            | Inductive ds -> fsetmap (fset_of_lemma ~deep m) ds
           in Fset.union ds df
         with Not_found ->
           Fset.empty
@@ -1368,7 +1377,7 @@ struct
 
   let collect_have m p =
     begin
-      m.gs <- FP.union m.gs (gvars_of_pred m p) ;
+      m.gs <- FP.union m.gs (gvars_of_pred ~deep:true m p) ;
       m.xs <- Vars.union m.xs (F.varsp p) ;
     end
 
@@ -1387,7 +1396,7 @@ struct
     | _ ->
         if Vars.subset (F.varsp p) m.xs then
           begin
-            let gs = gvars_of_pred m p in
+            let gs = gvars_of_pred ~deep:false m p in
             if FP.subset gs m.gs then p else
             if FP.intersect gs m.gs then
               (m.fixpoint <- false ; m.gs <- FP.union gs m.gs ; p)
@@ -1425,6 +1434,7 @@ struct
       footcalls = Gmap.empty ;
     } in
     List.iter (collect_step m) seq.seq_list ; collect_have m g ;
+    Kernel.debug ~level:3 "Collected %a" pp_used m ;
     let rec loop () =
       m.fixpoint <- true ;
       let hs' = filter_steplist m seq.seq_list in

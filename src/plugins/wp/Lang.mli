@@ -92,6 +92,7 @@ and model = {
   m_result : sort ;
   m_typeof : tau option list -> tau ;
   m_source : source ;
+  m_coloring : bool ;
 }
 
 and source =
@@ -123,6 +124,7 @@ val extern_s :
   ?params:sort list ->
   ?sort:sort ->
   ?result:tau ->
+  ?coloring:bool ->
   ?typecheck:(tau option list -> tau) ->
   string -> lfun
 
@@ -134,6 +136,7 @@ val extern_f :
   ?params:sort list ->
   ?sort:sort ->
   ?result:tau ->
+  ?coloring:bool ->
   ?typecheck:(tau option list -> tau) ->
   ('a,Format.formatter,unit,lfun) format4 -> 'a
 (** balance just give a default when link is not specified *)
@@ -144,16 +147,17 @@ val extern_p :
   ?prop:string ->
   ?link:Engine.link infoprover ->
   ?params:sort list ->
+  ?coloring:bool ->
   unit -> lfun
 
 val extern_fp : library:library -> ?params:sort list ->
-  ?link:string infoprover -> string -> lfun
+  ?link:string infoprover -> ?coloring:bool -> string -> lfun
 
 val generated_f : ?context:bool -> ?category:lfun category ->
-  ?params:sort list -> ?sort:sort -> ?result:tau ->
+  ?params:sort list -> ?sort:sort -> ?result:tau -> ?coloring:bool ->
   ('a,Format.formatter,unit,lfun) format4 -> 'a
 
-val generated_p : ?context:bool -> string -> lfun
+val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
 
 val extern_t:
   string -> link:string infoprover -> library:library -> mdt
@@ -192,6 +196,8 @@ val parameters : (lfun -> sort list) -> unit (** definitions *)
 
 val name_of_lfun : lfun -> string
 val name_of_field : field -> string
+
+val is_coloring_lfun : lfun -> bool
 
 (** {2 Logic Formulae} *)
 

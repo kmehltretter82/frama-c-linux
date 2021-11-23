@@ -430,6 +430,7 @@ and model = {
   m_result : sort ;
   m_typeof : tau option list -> tau ;
   m_source : source ;
+  m_coloring : bool ;
 }
 
 and source =
@@ -447,6 +448,10 @@ let tau_of_lfun phi ts =
     | Sreal -> Real
     | Sbool -> Bool
     | _ -> m.m_typeof ts
+
+let is_coloring_lfun = function
+  | ACSL _ | CTOR _ -> false
+  | Model { m_coloring } -> m_coloring
 
 type balance = Nary | Left | Right
 
@@ -467,6 +472,7 @@ let symbolf
     ?(params=[])
     ?(sort=Logic.Sdata)
     ?(result:tau option)
+    ?(coloring=false)
     ?(typecheck:(tau option list -> tau) option)
     name =
   let buffer = Buffer.create 80 in
@@ -500,20 +506,21 @@ let symbolf
          m_result = result ;
          m_typeof = typeof ;
          m_source = source ;
+         m_coloring = coloring ;
        }
     ) (Format.formatter_of_buffer buffer) name
 
 let extern_s
-    ~library ?link ?category ?params ?sort ?result ?typecheck name =
+    ~library ?link ?category ?params ?sort ?result ?coloring ?typecheck name =
   symbolf
-    ~library ?category ?params ?sort ?result ?typecheck ?link "%s" name
+    ~library ?category ?params ?sort ?result ?coloring ?typecheck ?link "%s" name
 
 let extern_f
-    ~library ?link ?balance ?category ?params ?sort ?result ?typecheck name =
+    ~library ?link ?balance ?category ?params ?sort ?result ?coloring ?typecheck name =
   symbolf
-    ~library ?category ?params ?link ?balance ?sort ?result ?typecheck name
+    ~library ?category ?params ?link ?balance ?sort ?result ?coloring ?typecheck name
 
-let extern_p ~library ?bool ?prop ?link ?(params=[]) () =
+let extern_p ~library ?bool ?prop ?link ?(params=[]) ?(coloring=false) () =
   let link =
     match bool,prop,link with
     | Some b , Some p , None -> infoprover (Engine.F_bool_prop(b,p))
@@ -526,10 +533,11 @@ let extern_p ~library ?bool ?prop ?link ?(params=[]) () =
     m_params = params ;
     m_result = Logic.Sprop;
     m_typeof = not_found;
-    m_source = Extern (new_extern ~library ~link ~debug)
+    m_source = Extern (new_extern ~library ~link ~debug) ;
+    m_coloring = coloring ;
   }
 
-let extern_fp ~library ?(params=[]) ?link phi =
+let extern_fp ~library ?(params=[]) ?link ?(coloring=false) phi =
   let link = match link with
     | None -> infoprover (Engine.F_call phi)
     | Some link -> map_infoprover (fun phi -> Engine.F_call(phi)) link in
@@ -541,19 +549,21 @@ let extern_fp ~library ?(params=[]) ?link phi =
     m_source = Extern (new_extern
                          ~library
                          ~link
-                         ~debug:phi)
+                         ~debug:phi) ;
+    m_coloring = coloring ;
   }
 
-let generated_f ?context ?category ?params ?sort ?result name =
-  symbolf ?context ?category ?params ?sort ?result name
+let generated_f ?context ?category ?params ?sort ?result ?coloring name =
+  symbolf ?context ?category ?params ?sort ?result ?coloring name
 
-let generated_p ?context name =
+let generated_p ?context ?(coloring=false) name =
   Model {
     m_category = Logic.Function ;
     m_params = [] ;
     m_result = Logic.Sprop;
     m_typeof = not_found;
-    m_source = generated ?context name
+    m_source = generated ?context name ;
+    m_coloring = coloring ;
   }
 
 let extern_t name ~link ~library =
