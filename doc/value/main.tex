@@ -4404,21 +4404,24 @@ and at the end, the inferred relations are propagated back to the caller.
 \emph{This domain is experimental.}
 
 The multidim domain implements a typed memory model designed to abstract
-multidimensional arrays, arrays of structures or any composition of any depth
-of these. Arrays are summarized with only one abstract value, meaning the domain
-can't express distinct properties of individual cells. However, for arrays
-of structures, the field values are approximated field by field allowing the
-inference of precise information about each field of the structures in the
-array. The model also keeps track of the types used to write in the memory
-which allows to display the contents of the memory (with
-\lstinline|Frama_C_domain_show_each|) with it's structure, even if the
-printed location's type doesn't match the type used to write into this location.
+multidimensional arrays, arrays of structures, or any composition of any depth
+of these.
 
-The domain may not be more precise than the cvalue domain, in particular when
-array properties need to be enmurated cell by cell. However it may often be
-more precise when large arrays of structures are written into, especially when
-the indexes used for the write accesses cannot be reduced to singleton with
-usual techniques like loop unrolling.
+Arrays are summarized by only one abstract value, meaning that the domain is not
+able to express distinct properties of individual cells. However, arrays of
+structures are approximated field by field, allowing the inference of precise
+invariants about each field of all structures included in the array.
+
+The model also keeps track of the types used to write in the memory, and thus
+can display the contents of the memory with its structure (via
+\lstinline|Frama_C_domain_show_each| directives), even when the underlying
+location type does not always match the types used to write into it.
+
+The domain is no more precise than the cvalue domain when array properties need
+to be inferred cell by cell.
+However, it may often be more precise on large arrays of structures, especially
+when the indexes at which these arrays are written cannot be
+reduced to singleton values with usual techniques such as loop unrolling.
 
 
 \subsection{Bitwise values}
