@@ -33,12 +33,14 @@ let eval_assigns_from pre_state it =
   if Logic_utils.is_result it.it_content then
     Locations.Zone.bottom
   else
-    let eval_env = Eval_terms.env_assigns pre_state in
-    let under, _ =
-      Eval_terms.eval_tlval_as_zone_under_over
-        ~alarm_mode:Eval_terms.Ignore Locations.Read eval_env term
-    in
-    under
+    try
+      let eval_env = Eval_terms.env_assigns pre_state in
+      let under, _ =
+        Eval_terms.eval_tlval_as_zone_under_over
+          ~alarm_mode:Eval_terms.Ignore Locations.Read eval_env term
+      in
+      under
+    with Eval_terms.LogicEvalError _ -> Locations.Zone.bottom
 
 (** Compute the validity status for [from] in [pre_state], assuming the
     entire clause is [assigns asgn \from from]. The inferred dependencies
