@@ -85,6 +85,8 @@ typedef void *mspace;
 struct memory_spaces {
   mspace rtl_mspace;           /* `private` (RTL) mspace */
   mspace heap_mspace;          /* `public` (application) mspace */
+  uintptr_t rtl_start;         /* least address in RTL mspace */
+  uintptr_t rtl_end;           /* greatest address in RTL mspace */
   uintptr_t heap_start;        /* least address in application mspace */
   uintptr_t heap_end;          /* greatest address in application mspace */
   uintptr_t heap_mspace_least; /* Initial least address in heap mspace */
