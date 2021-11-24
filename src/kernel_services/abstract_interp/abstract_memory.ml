@@ -30,6 +30,19 @@ open Abstract_offset
 
 type size = Integer.t
 
+
+let dunify = false
+let dread = false
+let dwrite = false
+let demerging = false
+
+let dp = ref 0
+let debug b format =
+  incr dp;
+  if b then
+    Kernel.debug ~current:true ("#%d " ^^ format) ~level:0 !dp
+  else Kernel.debug format ~level:50
+
 (* Composition operator for compare function *)
 
 let (<?>) c (cmp,x,y) =
@@ -85,6 +98,13 @@ struct
   let zero = Zero
   let numerical = Any Bases.empty
   let top = Any Bases.top
+
+  let pretty fmt = function
+    | Uninitialized -> Format.fprintf fmt "UNINITIALIZED"
+    | Zero -> Format.fprintf fmt "0"
+    | Any (Set set) when Base.SetLattice.O.is_empty set ->
+      Format.fprintf fmt "[--..--]"
+    | Any _ -> Format.fprintf fmt "T"
 
   let is_any = function Any _ -> true | _ -> false
 
@@ -161,6 +181,8 @@ type side = Left | Right
 type oracle = Cil_types.exp -> Ival.t
 type bioracle = side -> oracle
 type strength = Strong | Weak | Reinforce (* update strength *)
+
+let no_oracle = fun _exp -> Ival.top
 
 module type ProtoMemory =
 sig
@@ -313,15 +335,71 @@ end
 
 
 (* ------------------------------------------------------------------------ *)
-(* --- Arrays abstraction                                               --- *)
+(* --- Comparison operators                                             --- *)
 (* ------------------------------------------------------------------------ *)
 
-type comparison = Equal | Lower | Greater | Uncomparable
+
+type comparison =
+  | Equal
+  | Lower
+  | Greater
+  | LowerOrEqual
+  | GreaterOrEqual
+  | Uncomparable
+
+module type Operators =
+sig
+  [@@@warning "-32"] (* unused operators... for now*)
+
+  type t
+  val (<) : t -> t -> bool
+  val (>) : t -> t -> bool
+  val (<=) : t -> t -> bool
+  val (>=) : t -> t -> bool
+  val (===) : t -> t -> bool
+end
+
+let operators :
+  type a . (a -> a -> comparison) -> (module Operators with type t = a) =
+  fun f ->
+  (module struct
+    type t = a
+
+    let (<) b1 b2 = match f b1 b2 with
+      | Lower -> true
+      | LowerOrEqual | Equal | Greater | GreaterOrEqual | Uncomparable -> false
+
+    let (<=) b1 b2 = match f b1 b2 with
+      | Lower | Equal | LowerOrEqual -> true
+      | Greater | GreaterOrEqual | Uncomparable -> false
+
+    let (>) b1 b2 = match f b1 b2 with
+      | Greater -> true
+      | Equal | LowerOrEqual | Lower | GreaterOrEqual | Uncomparable -> false
+
+    let (>=) b1 b2 = match f b1 b2 with
+      | Greater | GreaterOrEqual | Equal -> true
+      | Lower | LowerOrEqual | Uncomparable -> false
+
+    let (===) b1 b2 = match f b1 b2 with
+      | Equal -> true
+      | GreaterOrEqual | Greater | Lower | LowerOrEqual | Uncomparable -> false
+  end)
+
+
+(* ------------------------------------------------------------------------ *)
+(* --- Arrays abstraction                                               --- *)
+(* ------------------------------------------------------------------------ *)
 
 module Bound =
 struct
   module Var = Cil_datatype.Varinfo
-  module Exp = Cil_datatype.ExpStructEq
+  module Exp =
+  struct
+    include Cil_datatype.ExpStructEq
+    let equal e1 e2 =
+      if e1 == e2 then true else equal e1 e2
+  end
 
   type t =
     | Const of Integer.t
@@ -363,16 +441,6 @@ struct
 
   let of_integer (i : Integer.t) : t =
     Const i
-
-  let succ = function
-    | Const i -> Const (Integer.succ i)
-    | Exp (e, i) -> Exp (e, Integer.succ i)
-    | Ptroffset _ -> raise Not_implemented
-
-  let pred = function
-    | Const i -> Const (Integer.pred i)
-    | Exp (e, i) -> Exp (e, Integer.pred i)
-    | Ptroffset _ -> raise Not_implemented
 
   exception UnsupportedBoundExpression
   exception NonLinear
@@ -435,6 +503,22 @@ struct
     | Const _ -> assert false (* should not happen ? even with absolute adresses ? *)
     | Ptroffset _ -> assert false (* Not produced by of_exp *)
 
+  (* Stupid oracle built from an Ival oracle *)
+  let to_ival ~oracle = function
+    | Const i -> Ival.inject_singleton i
+    | Exp (e, i) -> Ival.add_singleton_int i (oracle e)
+    | Ptroffset _ -> raise Not_implemented
+
+  let succ = function
+    | Const i -> Const (Integer.succ i)
+    | Exp (e, i) -> Exp (e, Integer.succ i)
+    | Ptroffset _ -> raise Not_implemented
+
+  let pred = function
+    | Const i -> Const (Integer.pred i)
+    | Exp (e, i) -> Exp (e, Integer.pred i)
+    | Ptroffset _ -> raise Not_implemented
+
   let incr vi i b =
     try
       match b with
@@ -451,30 +535,33 @@ struct
         else Option.map (fun i -> Ptroffset (e, base, Integer.(sub j (mul l i)))) i
     with NonLinear -> None
 
-  (* Stupid oracle built from an Ival oracle *)
-  let to_ival ~oracle = function
-    | Const i -> Ival.inject_singleton i
-    | Exp (e, i) -> Ival.add_singleton_int i (oracle e)
-    | Ptroffset _ -> raise Not_implemented
+  let cmp_int i1 i2 =
+    let r = Integer.sub i1 i2 in
+    if Integer.is_zero r
+    then Equal
+    else if Integer.(lt r zero) then Lower else Greater
 
   let cmp ~oracle b1 b2 =
     if b1 == b2
     then Equal
     else
       match b1, b2 with
-      | Const i1, Const i2 ->
-        let r = Integer.sub i1 i2 in
-        if Integer.is_zero r
-        then Equal
-        else if Integer.(lt r zero) then Lower else Greater
+      | Const i1, Const i2 -> cmp_int i1 i2
+      | Exp (e1, i1), Exp (e2, i2) when Exp.equal e1 e2 -> cmp_int i1 i2
+      | Ptroffset _, _ | _, Ptroffset _ -> raise Not_implemented
       | _, _ ->
         let r = Ival.sub_int (to_ival ~oracle b1) (to_ival ~oracle b2) in
         match Ival.min_and_max r with
         | Some min, Some max when Integer.is_zero min && Integer.is_zero max ->
           Equal
-        | Some l, _ when Integer.(gt l zero) -> Greater
-        | _, Some u when Integer.(lt u zero) -> Lower
+        | Some l, _ when Integer.(ge l zero) ->
+          if Integer.(gt l zero) then Greater else GreaterOrEqual
+        | _, Some u when Integer.(le u zero) ->
+          if Integer.(lt u zero) then Lower else LowerOrEqual
         | _ -> Uncomparable
+
+  let eq ?(oracle=no_oracle) b1 b2 =
+    cmp ~oracle b1 b2 = Equal
 
   let lower_bound ~oracle b1 b2 =
     let i1 = to_ival ~oracle:(oracle Left) b1
@@ -490,12 +577,49 @@ struct
     and u2 = Option.get (Ival.max_int i2) in
     Const (Integer.max u1 u2)
 
+  let lower_const ~oracle b =
+    Const (Option.get (Ival.min_int (to_ival ~oracle b))) (* TODO: handle exception *)
+
   let upper_const ~oracle b =
     Const (Option.get (Ival.min_int (to_ival ~oracle b))) (* TODO: handle exception *)
 
-  let lower_const ~oracle b =
-    Const (Option.get (Ival.min_int (to_ival ~oracle b))) (* TODO: handle exception *)
+  let _operators oracle = operators (cmp ~oracle)
 end
+
+module AgingBound =
+struct
+  type age = Integer.t
+  type t = Bound.t * age
+
+  let pretty fmt (b,_) = Bound.pretty fmt b
+  let hash (b,a) = Hashtbl.hash (Bound.hash b, Integer.hash a)
+  let compare (b1,a1) (b2,a2) =
+    Bound.compare b1 b2 <?> (Integer.compare, a1, a2)
+  let equal (b1,a1) (b2,a2) =
+    Bound.equal b1 b2 && Integer.equal a1 a2
+  let of_integer i a = Bound.of_integer i, a
+  let _of_exp e a = Bound.of_exp e, a
+  let _succ (b,a) = (Bound.succ b, a)
+  let pred (b,a) = (Bound.pred b, a)
+  let incr vi i (b,a) = Bound.incr vi i b |> Option.map (fun b -> b,a)
+  let _to_ival ~oracle (b,_a) = Bound.to_ival ~oracle b
+  let cmp ~oracle (b1,_a1) (b2,_a2) = Bound.cmp ~oracle b1 b2
+  let eq ?oracle (b1,_a1) (b2,_a2) = Bound.eq ?oracle b1 b2
+  let lower_bound ~oracle (b1,a1) (b2,a2) =
+    Bound.lower_bound ~oracle b1 b2, Integer.max a1 a2
+  let upper_bound ~oracle (b1,a1) (b2,a2) =
+    Bound.upper_bound ~oracle b1 b2, Integer.max a1 a2
+  let lower_const ~oracle (b,_a) =
+    Bound.lower_const ~oracle b
+  let upper_const ~oracle (b,_a) =
+    Bound.upper_const ~oracle b
+
+  let born b = b, Integer.zero
+  let age (_,a) = a
+  let operators oracle : (module Operators with type t = t) =
+    operators (cmp ~oracle)
+end
+
 
 module type Segmentation =
 sig
@@ -514,7 +638,7 @@ sig
     t -> t -> t
   val single : bit -> bound -> bound -> submemory -> t
   val read : oracle:oracle ->
-    (submemory -> 'a) -> ('a -> 'a -> 'a) -> t -> bound -> 'a
+    (submemory -> 'a) -> ('a -> 'a -> 'a) -> t -> bound -> bound -> 'a
   val write : oracle:oracle -> (submemory -> submemory) ->
     t -> bound -> bound -> t
   val incr_bound :
@@ -524,29 +648,34 @@ end
 
 module Segmentation (Config : Config) (M : ProtoMemory) =
 struct
+  module B = AgingBound
+
   type bound = Bound.t
+  type age = Integer.t
   type submemory = M.t
 
   type t = {
-    start: bound;
-    segments: (M.t * bound) list; (* should not be empty *)
-    padding: bit (* padding at the left and right of the segmentation *)
+    start: B.t;
+    segments: (M.t * B.t) list; (* should not be empty *)
+    padding: bit; (* padding at the left and right of the segmentation *)
+    age: age; (* number of writes to the array during the analysis *)
   }
 
   let _pretty_debug fmt (l,s) : unit =
-    Format.fprintf fmt " {%a} " Bound.pretty l;
+    Format.fprintf fmt " {%a} " B.pretty l;
     let pp fmt (v,u) =
-      Format.fprintf fmt "%a {%a} " M.pretty v Bound.pretty u
+      Format.fprintf fmt "%a {%a} " M.pretty v B.pretty u
     in
     List.iter (pp fmt) s
 
-  let pretty_segments fmt (l,s) : unit =
+  let pretty_segments fmt ((l : B.t), (s : (M.t * B.t) list)) : unit =
     let pp fmt (l,v,u) =
-      let u = Bound.pred u in (* Upper bound is not included *)
-      if Bound.(equal l u) then
-        Format.fprintf fmt "[%a]%a" Bound.pretty l M.pretty v
+      let u = B.pred u in (* Upper bound is not included *)
+      (* Less strict than B.equal even with no oracles *)
+      if B.eq l u then
+        Format.fprintf fmt "[%a]%a" B.pretty l M.pretty v
       else
-        Format.fprintf fmt "[%a..%a]%a" Bound.pretty l Bound.pretty u M.pretty v
+        Format.fprintf fmt "[%a .. %a]%a" B.pretty l B.pretty u M.pretty v
     in
     match s with
     | [] -> Format.fprintf fmt "[]" (* should not happen *)
@@ -563,23 +692,23 @@ struct
 
   let hash (m : t) : int =
     Hashtbl.hash (
-      Bound.hash m.start,
-      List.map (fun (v,u) -> Hashtbl.hash (M.hash v, Bound.hash u)) m.segments,
+      B.hash m.start,
+      List.map (fun (v,u) -> Hashtbl.hash (M.hash v, B.hash u)) m.segments,
       Bit.hash m.padding)
 
   let compare (m1 : t) (m2 : t) : int =
     let compare_segments (v1,u1) (v2,u2) =
-      M.compare v1 v2 <?> (Bound.compare, u1, u2)
+      M.compare v1 v2 <?> (B.compare, u1, u2)
     in
-    Bound.compare m1.start m2.start <?>
+    B.compare m1.start m2.start <?>
     (Transitioning.List.compare compare_segments, m1.segments, m2.segments) <?>
     (Bit.compare, m1.padding, m2.padding)
 
   let equal (m1 : t) (m2 : t) : bool =
     let equal_segments (v1,u1) (v2,u2) =
-      M.equal v1 v2 && Bound.equal u1 u2
+      M.equal v1 v2 && B.equal u1 u2
     in
-    Bound.equal m1.start m2.start &&
+    B.equal m1.start m2.start &&
     Transitioning.List.equal equal_segments m1.segments m2.segments &&
     Bit.equal m1.padding m2.padding
 
@@ -598,28 +727,26 @@ struct
 
   let is_included (m1 : t) (m2 : t) : bool =
     let included_segments (v1,u1) (v2,u2) =
-      M.is_included v1 v2 &&
-      Bound.equal u1 u2
+      M.is_included v1 v2 && B.eq u1 u2
     in
-    Bound.equal m1.start m2.start &&
+    B.eq m1.start m2.start &&
     Bit.is_included m1.padding m2.padding &&
     try
       List.for_all2 included_segments m1.segments m2.segments
     with Invalid_argument _ -> false (* Segmentations have different sizes *)
 
-  let hull ~oracle (m : t) : Bound.t * Bound.t =
+  let hull ~oracle (m : t) : bound * bound =
     let rec last = function
       | [] -> assert false
       | [(_v,u)] -> u
       | _ :: t -> last t
     in
-    Bound.lower_const ~oracle m.start,
-    Bound.upper_const ~oracle (last m.segments)
+    B.lower_const ~oracle m.start,
+    B.upper_const ~oracle (B.pred (last m.segments))
 
   let is_empty_segment ~oracle l u =
-    match Bound.cmp ~oracle l u with
-    | Equal | Greater -> true
-    | Lower | Uncomparable -> false
+    let open (val (B.operators oracle)) in
+    l >= u
 
   let check_segments s = (* TODO: remove *)
     match s with
@@ -641,21 +768,21 @@ struct
   (* Unify two arrays m1 and m2 *)
   let unify ~oracle f (m1 (*Left*): t) (m2 (*Right*) : t) : t =
     (* Shortcuts *)
-    let compare side = Bound.cmp ~oracle:(oracle side) in
+    let compare side = B.cmp ~oracle:(oracle side) in
     let equals side b1 b2 =
       compare side b1 b2 = Equal
     in
-    let join side =
-      let oracle = fun _ -> oracle side in
-      Bottom.join (M.join ~oracle)
-    in
+    let smash side = Bottom.join (M.smash ~oracle:(oracle side)) in
     let {start=l1 ; segments=s1 ; padding=p1 } = m1
     and {start=l2 ; segments=s2 ; padding=p2 } = m2 in
     (* Unify the segmentation start *)
-    let l = Bound.lower_bound ~oracle l1 l2 in
+    let l = B.lower_bound ~oracle l1 l2 in
+    debug dunify "%a LUB %a = %a" B.pretty l1 B.pretty l2 B.pretty l;
+    let ll = l in
     let s1 = if equals Left l l1 then s1 else (M.of_raw p1, l1) :: s1
     and s2 = if equals Right l l2 then s2 else (M.of_raw p2, l2) :: s2
     in
+    debug dunify "Unification start@.%a U@.%a" pretty_segments (l,s1) pretty_segments (l,s2);
     (* Unify the segmentation end *)
     let merge_first side = merge_first ~oracle:(oracle side) in
     let rec smash_end side l = function
@@ -666,11 +793,11 @@ struct
     let unify_end l s1 s2 =
       let v1, u1 = smash_end Left l s1
       and v2, u2 = smash_end Right l s2 in
-      let u = Bound.upper_bound ~oracle u1 u2 in
+      let u = B.upper_bound ~oracle u1 u2 in
       let w1 =
-        if equals Left u u1 then v1 else join Left (`Value (M.of_raw p1)) v1
+        if equals Left u u1 then v1 else smash Left (`Value (M.of_raw p1)) v1
       and w2 =
-        if equals Right u u2 then v2 else join Right (`Value (M.of_raw p2)) v2
+        if equals Right u u2 then v2 else smash Right (`Value (M.of_raw p2)) v2
       in
       match Bottom.join f w1 w2 with
       | `Bottom -> [] (* should not happen, but [] is still correct *)
@@ -685,6 +812,7 @@ struct
        +------+-------+---
        l      u2 *)
     let rec aux l s1 s2 acc =
+      debug dunify "Unification progress@.%a U@.%a result:@.%a" pretty_segments (l,s1) pretty_segments (l,s2) pretty_segments (ll, List.rev acc);
       (* Look for emerging slices *)
       let left_slice_emerges = match s1 with
         | (v1,u1) :: t1 when equals Right l u1 -> Some (v1,u1,t1)
@@ -715,54 +843,54 @@ struct
               (* u1 and u2 can be indeferently used left side
                  -> use u2 as next bound *)
               aux u2 t1 t2 ((f v1 v2, u2) :: acc)
-            | Greater, (Greater | Uncomparable) ->
+            | (Greater | GreaterOrEqual),
+              (Greater | GreaterOrEqual | Uncomparable) ->
               (* u1 > u2 on the left side, we are sure u2 doesn't appear left
                  -> remove u2, merge slices *)
               aux l s1 (merge_first Right l s2) acc
-            | (Lower | Uncomparable), Lower ->
+            | (Lower | LowerOrEqual | Uncomparable),
+              (Lower | LowerOrEqual) ->
               (* u1 < u2 on the right side, we are sure u1 doesn't appear right
                  -> remove u1, merge slices *)
               aux l (merge_first Left l s1) s2 acc
-            | Greater, Lower (* Can't choose which bound to remove first *)
-            | (Lower | Uncomparable), (Greater | Uncomparable) ->
+            | (Greater | GreaterOrEqual), (Lower | LowerOrEqual) (* Can't choose which bound to remove first *)
+            | (Lower | LowerOrEqual | Uncomparable),
+              (Greater | GreaterOrEqual | Uncomparable) ->
               aux l (merge_first Left l s1) (merge_first Right l s2) acc
           with NothingToMerge -> (* There is nothing left to merge *)
             unify_end l s1 s2 @ acc
     in
+    let segments = List. rev (aux l s1 s2 []) in
+    debug dunify "Unification result :@.%a" pretty_segments (l,segments);
     (* Iterate through segmentations *)
     {
       start = l ;
-      segments = check_segments (aux l s1 s2 []) ;
+      segments = check_segments segments ;
       padding = Bit.join p1 p2 ;
+      age = Integer.max m1.age m2.age ;
     }
 
-  let single padding lindex uindex value =
+  let single padding lindex (* included *) uindex (* included *) value =
     {
       padding ;
-      start = lindex ;
-      segments = check_segments [(value,uindex)] ;
+      start = B.born lindex ;
+      segments = check_segments [(value,B.born (Bound.succ uindex))] ;
+      age = Integer.zero
     }
 
-  let read ~oracle map reduce m index =
-    let is_below = function
-      | Lower-> true
-      | Equal | Greater | Uncomparable -> false
-    and is_above = function
-      | Greater | Equal -> true
-      | Lower | Uncomparable -> false
-    and fold acc x =
+  let read ~oracle map reduce m lindex uindex =
+    let open (val (B.operators oracle)) in
+    let lindex = B.born lindex and uindex = B.born uindex in
+    let fold acc x =
       Bottom.join reduce acc (`Value (map x))
     in
-    let aux (prev,acc) (v,u) =
-      let next = Bound.cmp ~oracle index u in
-      next,
-      if is_below prev || is_above next then acc else fold acc v
+    let aux (l,acc) (v,u) =
+      u, if l > uindex || u <= lindex then acc else fold acc v
     in
-    let first = Bound.cmp ~oracle index m.start in
     let acc = `Bottom in
-    let acc = if is_above first then acc else fold acc (M.of_raw m.padding) in
-    let last,acc = List.fold_left aux (first,acc) m.segments in
-    let acc = if is_below last then acc else fold acc (M.of_raw m.padding) in
+    let acc = if m.start <= lindex then acc else fold acc (M.of_raw m.padding) in
+    let last,acc = List.fold_left aux (m.start,acc) m.segments in
+    let acc = if last > uindex then acc else fold acc (M.of_raw m.padding) in
     match acc with
     | `Bottom -> assert false (* TODO: ensure that with typing *)
     | `Value v -> v
@@ -771,14 +899,10 @@ struct
      1. reinforcement without loss
      2. weak update without singularization
      3. update reduces the number of segments to 3 *)
-  let write ~oracle f m lindex uindex = (* lindex < uindex *)
-    let (<=) b1 b2 = match Bound.cmp ~oracle b1 b2 with
-      | Lower | Equal -> true
-      | Greater | Uncomparable -> false
-    and (>=) b1 b2 = match Bound.cmp ~oracle b1 b2 with
-      | Greater | Equal -> true
-      | Lower | Uncomparable -> false
-    in
+  let write ~oracle f m lindex (* included *) uindex (* excluded *) = (* lindex < uindex *)
+    let open (val (B.operators oracle)) in
+    let age = Integer.succ m.age in
+    let lindex = lindex, age and uindex = uindex, age in
     (* (start,head) : segmentation kept identical below the write indexes,
                       head is a list in reverse order
        (l,v,u) : the segment (l,u) beeing overwriten with previous value v
@@ -786,21 +910,23 @@ struct
        head = (_,l) :: _
     *)
     let rec aux_before l s =
-      (* Format.printf "aux before: %a@." pretty_segments (l,s); *)
+      debug dwrite "aux before: %a@." pretty_segments (l,s);
+      debug dwrite "%a (%a) >= %a (%a) ? %B@." B.pretty lindex Ival.pretty (B._to_ival ~oracle lindex) B.pretty l Ival.pretty (B._to_ival ~oracle l) (lindex >= l);
       if lindex >= l
       then aux_below l [] l s
       else aux_over lindex [] lindex (M.of_raw m.padding) l s
     and aux_below start head l = fun t ->
-      (* Format.printf "aux_below: %a [%a] %a@." pretty_segments (start,head) Bound.pretty l pretty_segments (l,t); *)
+      debug dwrite "aux_below: %a <{%a}> %a@." pretty_segments (start,head) B.pretty l pretty_segments (l,t);
       match t with (* l <= lindex *)
       | [] ->
         aux_end start head l (M.of_raw m.padding) uindex []
       | (v,u) :: t ->
+        debug dwrite "%a (%a) >= %a (%a) ? %B@." B.pretty lindex Ival.pretty (B._to_ival ~oracle lindex) B.pretty u Ival.pretty (B._to_ival ~oracle u) (lindex >= u);
         if lindex >= u
         then aux_below start ((v,u) :: head) u t
         else aux_over start head l v u t
     and aux_over start head l v u s = (* l <= lindex *)
-      (* Format.printf "aux_over: %a [%a,%a,%a] %a@." pretty_segments (start,head) Bound.pretty l M.pretty v Bound.pretty u pretty_segments (u,s); *)
+      debug dwrite "aux_over: %a <{%a} %a {%a}> %a@." pretty_segments (start,head) B.pretty l M.pretty v B.pretty u pretty_segments (u,s);
       if uindex <= u then
         aux_end start head l v u s
       else
@@ -811,43 +937,60 @@ struct
           (* TODO: do not smash if the slices are covered by the write *)
           aux_over start head l (M.smash ~oracle v v') u' t
     and aux_end start head l v u tail = (* l <= lindex < uindex <= u*)
-      (* Format.printf "aux_end: %a [%a,%a,%a] %a@." pretty_segments (start,head) Bound.pretty l M.pretty v Bound.pretty u pretty_segments (u,tail); *)
+      debug dwrite  "aux_end: %a <{%a} %a {%a}> %a@." pretty_segments (start,head) B.pretty l M.pretty v B.pretty u pretty_segments (u,tail);
+      let previous_is_empty = is_empty_segment ~oracle l lindex
+      and next_is_empty = is_empty_segment ~oracle uindex u in
       let tail' =
-        (if is_empty_segment ~oracle l lindex then [] else [(v,lindex)]) @
+        (if previous_is_empty then [] else [(v,lindex)]) @
         [(f v,uindex)] @
-        (if is_empty_segment ~oracle uindex u then [] else [(v,u)]) @
+        (if next_is_empty then [] else [(v,u)]) @
         tail
+      and head',start' = match head with (* change last bound to match lindex *)
+        | (v',_u) :: t when previous_is_empty -> (v',lindex) :: t, start
+        | [] when previous_is_empty -> [], lindex
+        | head -> head, start
       in
       {
         m with
-        segments = check_segments (List.rev_append head tail');
-        start ;
+        segments = check_segments (List.rev_append head' tail');
+        start = start';
+        age;
       }
     in
     aux_before m.start m.segments
 
   let incr_bound ~oracle vi x m =
+    let incr b =
+      match B.incr vi x b with
+      | Some b -> Some b
+      | None ->
+        try
+          let i = Ival.project_int (oracle (Cil.evar vi)) in
+          Some (B.of_integer i (B.age b))
+        with Ival.Not_Singleton_Int ->
+          None
+    in
     let rec aux acc = function
       | [] -> acc
       | (v,u) :: t ->
-        match Bound.incr vi x u with
+        match incr u with
         | Some u -> aux ((v,u) :: acc) t
         | None ->
           match t with
           | [] ->
-            let u = Bound.upper_const ~oracle u
+            let u = B.upper_const ~oracle u, snd u
             and v = M.smash ~oracle (M.of_raw m.padding) v in
             (v,u) :: acc
-          | (v',u') :: t -> aux ((M.smash ~oracle v v',u') :: acc) t
+          | (v',u') :: t -> aux acc ((M.smash ~oracle v v',u') :: t)
     in
     let start, segments =
-      match Bound.incr vi x m.start with
+      match incr m.start with
       | Some start -> start, m.segments
       | None ->
         match m.segments with
         | [] -> assert false
         | (v,u) :: t ->
-          let l = Bound.lower_const ~oracle m.start
+          let l = B.lower_const ~oracle m.start, snd m.start
           and v = M.smash ~oracle (M.of_raw m.padding) v in
           l, (v,u) :: t
     in
@@ -910,16 +1053,9 @@ struct
       let prefix fmt =
         if not root then Format.fprintf fmt " = "
       in
-      let pretty_bit fmt = function
-        | Uninitialized -> Format.fprintf fmt "UNINITIALIZED"
-        | Zero -> Format.fprintf fmt "0"
-        | Any (Set set) when Base.SetLattice.O.is_empty set ->
-          Format.fprintf fmt "[--..--]"
-        | Any _ -> Format.fprintf fmt "T"
-      in
       function
       | Raw b ->
-        Format.fprintf fmt "%t%a" prefix pretty_bit b
+        Format.fprintf fmt "%t%a" prefix Bit.pretty b
       | Scalar { scalar_value } ->
         Format.fprintf fmt "%t%a" prefix V.pretty scalar_value
       | Struct s ->
@@ -1061,6 +1197,9 @@ struct
       let raw_to_array ~oracle side prototype b =
         let l,u = A.hull ~oracle:(oracle side) prototype in
         A.single b l u (Raw b)
+      and struct_value = function
+        | Struct s -> s.struct_value
+        | m -> S.of_raw (raw m)
       in
       let rec aux m1 m2 =
         match m1, m2 with
@@ -1076,14 +1215,22 @@ struct
         | Array a, Raw b ->
           let array_value' = raw_to_array ~oracle Left a.array_value b in
           let array_value = A.unify ~oracle aux a.array_value array_value' in
+          debug demerging "emerging unification between@.%a and@.%a result:@.%a" A.pretty a.array_value A.pretty array_value' A.pretty array_value;
           Array { a with array_value }
         | Raw b, Array a ->
           let array_value' = raw_to_array ~oracle Right a.array_value b in
           let array_value = A.unify ~oracle aux array_value' a.array_value in
+          debug demerging "emerging unification between@.%a and@.%a result:@.%a" A.pretty array_value' A.pretty a.array_value A.pretty array_value;
           Array { a with array_value }
         | Struct s1, Struct s2 when are_structs_compatible s1 s2 ->
           let struct_value = S.unify aux s1.struct_value s2.struct_value in
           Struct { s1 with struct_value }
+        | Struct s, Raw _ | Raw _, Struct s ->
+          (* Previously implemented as weak_erase, it is useful to continue
+             the recursive unification as there can be an emerging array segment
+             in the sub structure. *)
+          let struct_value = S.unify aux (struct_value m1) (struct_value m2) in
+          Struct { s with struct_value }
         | Union u1, Union u2 when are_union_compatible u1 u2 ->
           Union {
             u1 with
@@ -1100,7 +1247,12 @@ struct
     let smash ~oracle = join ~oracle:(fun _ -> oracle)
 
     let read ~oracle (map : Cil_types.typ -> t -> 'a) (reduce : 'a -> 'a -> 'a) =
+      let map t v =
+        (* debug true "read %a" pretty v; *)
+        map t v
+      in
       let rec aux offset m =
+        debug dread "@[<hv>read at %a in %a@]" TypedOffset.pretty offset pretty m;
         match offset, m with
         | NoOffset t, m ->
           map t m
@@ -1110,9 +1262,16 @@ struct
         | Field (fi, offset'), Union u
           when Cil_datatype.Fieldinfo.equal u.union_field fi ->
           aux offset' u.union_value
-        | Index (exp, _index, elem_type, offset'), Array a
+        | Index (exp, index, elem_type, offset'), Array a
           when are_typ_compatible a.array_cell_type elem_type ->
-          A.read ~oracle (aux offset') reduce a.array_value (Bound.of_exp (Option.get exp)) (* TODO: handle None *)
+          let lindex, uindex = match Option.map Bound.of_exp exp with
+            | Some b -> b, b
+            | None | exception Bound.UnsupportedBoundExpression ->
+              let l, u = Int_val.min_and_max index in
+              Bound.of_integer (Option.get l),
+              Bound.of_integer (Option.get u) (* TODO: handle None *)
+          in
+          A.read ~oracle (aux offset') reduce a.array_value lindex uindex
         | _, m -> (* structure mismatch *)
           let r = Raw (raw m) in
           match offset with
@@ -1123,6 +1282,7 @@ struct
 
     let write ~oracle (f : weak:bool -> Cil_types.typ -> t -> t) =
       let rec aux ~weak offset m =
+        debug dwrite "@[<hv>write at %a from %a" TypedOffset.pretty offset pretty m;
         match offset with
         | NoOffset t ->
           f ~weak t m
@@ -1148,25 +1308,25 @@ struct
               union_value = aux ~weak offset' old.union_value
             }
         | Index (exp, index, elem_type, offset') ->
-          let lindex, uindex, weak = match exp with
-            | None ->
+          let lindex, uindex, weak = match Option.map Bound.of_exp exp with
+            | Some b -> b, b, weak
+            | None | exception Bound.UnsupportedBoundExpression ->
               let l, u = Int_val.min_and_max index in
               let l = Option.get l and u = Option.get u in (* TODO: handle exceptions *)
               Bound.of_integer l, Bound.of_integer u,
               weak || Integer.equal l u
-            | Some e ->
-              let b = Bound.of_exp e in
-              b, b, weak
           in
           match m with
           | Array a when are_typ_compatible a.array_cell_type elem_type ->
             let array_value = A.write ~oracle (aux ~weak offset') a.array_value
                 lindex (Bound.succ uindex) in
+            debug dwrite "wrote from previous@.%a@.->%a" A.pretty a.array_value A.pretty array_value;
             Array { a with array_value }
           | _ ->
             let b = raw m in
             let new_value = aux ~weak offset' (Raw b) in
-            let array_value = A.single b lindex (Bound.succ uindex) new_value in
+            let array_value = A.single b lindex uindex new_value in
+            debug dwrite "wrote from raw@.%a" A.pretty array_value;
             Array { array_cell_type = elem_type ; array_value }
       in aux
 

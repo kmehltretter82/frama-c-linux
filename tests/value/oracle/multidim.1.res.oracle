@@ -1,0 +1,33 @@
+[kernel] Parsing multidim.c (with preprocessing)
+[kernel:typing:no-proto] multidim.c:49: Warning: 
+  Calling function f that is declared without prototype.
+  Its formals will be inferred from actual arguments
+[eva:experimental] Warning: The multidim domain is experimental.
+[eva] Analyzing a complete application starting at main2
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  z[0..3] ∈ {0}
+  nondet ∈ [--..--]
+[eva] multidim.c:57: starting to merge loop iterations
+[eva] multidim.c:60: 
+  Frama_C_domain_show_each:
+  t : # cvalue: {0; 1}
+      # multidim: { [0 .. 9] = {1}, [10 .. 9] = {0} }
+[eva:alarm] multidim.c:61: Warning: check got status unknown.
+[eva] Recording results for main2
+[eva] done for function main2
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main2:
+  t[0..9] ∈ {0; 1}
+[from] Computing for function main2
+[from] Done for function main2
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function main2:
+  NO EFFECTS
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main2:
+    t[0..9]; i
+[inout] Inputs for function main2:
+    \nothing

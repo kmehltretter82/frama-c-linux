@@ -83,19 +83,22 @@ struct
   let array_bounds array_size =
     (* TODO: handle undefined sizes and not const foldable sizes *)
     match array_size with
-    | None -> None, None
+    | None -> None
     | Some size_exp ->
-      Some Integer.zero,
-      Option.map Integer.pred (Cil.constFoldToInt size_exp)
+      match Cil.constFoldToInt size_exp with
+      | None -> None
+      | Some size when Integer.(gt size zero) -> Some (Integer.zero, size)
+      | Some _ -> None
 
   let array_range array_size =
-    let l,u = array_bounds array_size in
-    Int_val.inject_range l u
+    Option.map
+      (fun (l,u) -> Int_val.inject_range (Some l) (Some u))
+      (array_bounds array_size)
 
   let assert_valid_index idx size =
-    let range = array_range size in
-    if not (Int_val.is_included idx range) then
-      raise Abstract_interp.Error_Top
+    match array_range size with
+    | Some range when Int_val.is_included idx range -> ()
+    | _ -> raise Abstract_interp.Error_Top
 
   let rec of_cil_offset oracle base_typ = function
     | Cil_types.NoOffset -> NoOffset base_typ
@@ -119,7 +122,8 @@ struct
             let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
             if Integer.is_zero elem_size then (* array of elements of size 0 *)
               if Int_val.is_zero ival then (* the whole range is valid *)
-                array_range array_size, ival
+                let range = (array_range array_size) in
+                Extlib.the ~exn:Abstract_interp.Error_Top range, ival
               else (* Non-zero offset cannot represent anything here *)
                 raise Abstract_interp.Error_Top
             else
@@ -148,8 +152,14 @@ struct
               let offset, width = Cil.fieldBitsOffset fi in
               let l = Integer.(of_int offset) in
               let u = Integer.(pred (add l (of_int width))) in
-              let range = Int_val.inject_range (Some l) (Some u) in
-              if Int_val.is_included ival range then
+              let matches =
+                if width = 0 then
+                  Int_val.(equal ival (inject_singleton l))
+                else
+                  let range = Int_val.inject_range (Some l) (Some u) in
+                  Int_val.is_included ival range
+              in
+              if matches then
                 let sub_ival = Int_val.add_singleton (Integer.neg l) ival in
                 Field (fi, of_int_val ~base_typ:fi.ftype ~typ sub_ival)
               else
@@ -169,13 +179,14 @@ struct
     | TConst (Integer (v, _)) -> Int_val.inject_singleton v
     | Trange (l,u) ->
       let eval bound = function
-        | None -> bound
-        | Some { Cil_types.term_node=TConst (Integer (v, _)) } -> Some v
+        | None -> Extlib.the ~exn:Abstract_interp.Error_Top bound
+        | Some { Cil_types.term_node=TConst (Integer (v, _)) } -> v
         | Some _ -> raise Abstract_interp.Error_Top
       in
-      let lb, ub = array_bounds array_size in
+      let bounds = array_bounds array_size in
+      let lb = Option.map fst bounds and ub = Option.map snd bounds in
       let l' = eval lb l and u' = eval ub u in
-      Int_val.inject_range l' u'
+      Int_val.inject_range (Some l') (Some u')
     | _ -> raise Abstract_interp.Error_Top
 
   let rec of_term_offset base_typ = function

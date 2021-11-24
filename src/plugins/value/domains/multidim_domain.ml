@@ -305,7 +305,11 @@ struct
         Bottom.non_bottom ival (* TODO: handle exception *)
       | _ -> Value.top
     in
-    fun exp -> Value.project_ival (oracle exp) (* TODO: handle exception *)
+    fun exp ->
+      try
+        Value.project_ival (oracle exp)
+      with Value.Not_based_on_null ->
+        Ival.top (* TODO: should it just not happen ? *)
 
   let extract (state : state) (src : mdlocation) : Memory.t or_bottom =
     let oracle = mk_oracle state in
@@ -375,7 +379,7 @@ struct
       let r = Memory.join ~oracle v1 v2 in
       if Memory.(is_top r) then None else Some r
     in
-    inter ~cache ~symmetric:true ~idempotent:true ~decide s1 s2
+    inter ~cache ~symmetric:false ~idempotent:true ~decide s1 s2
 
   let widen kf stmt s1 s2 =
     let oracle = function
@@ -430,7 +434,7 @@ struct
     let oracle = make_oracle valuation in
     try
       match expr.enode, record.value.v with
-      | Lval lv, `Value value ->
+      | Lval lv, `Value value when not (Value.is_topint value) ->
         let loc = Location.of_lval oracle lv in
         let update value' =
           `Value (Value.narrow value value')
@@ -450,31 +454,37 @@ struct
   let update valuation state =
     `Value (assume_valuation valuation state)
 
-  let update_array_segmentation lval expr state =
+  let update_array_segmentation_bounds vi expr state =
     (* TODO: more general transfer function *)
     (* TODO: only update memory models where the lval is present in the
        segmentation *)
-    let increment expr =
-      match expr.Cil_types.enode with
-      | BinOp ((PlusA|PlusPI), { enode=Lval lval' }, exp, _typ)
-        when Cil_datatype.LvalStructEq.equal lval lval' ->
-        Cil.constFoldToInt exp
-      | BinOp ((PlusA|PlusPI), exp, { enode=Lval lval'}, _typ)
-        when Cil_datatype.LvalStructEq.equal lval lval' ->
-        Cil.constFoldToInt exp
-      | BinOp ((MinusA|MinusPI), { enode=Lval lval' }, exp, _typ)
-        when Cil_datatype.LvalStructEq.equal lval lval' ->
-        Option.map Integer.neg (Cil.constFoldToInt exp)
-      | _ -> None
+    let incr = Option.bind expr (fun expr ->
+        match expr.Cil_types.enode with
+        | BinOp ((PlusA|PlusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
+          when Cil_datatype.Varinfo.equal vi vi' ->
+          Cil.constFoldToInt exp
+        | BinOp ((PlusA|PlusPI), exp, { enode=Lval (Var vi', NoOffset)}, _typ)
+          when Cil_datatype.Varinfo.equal vi vi' ->
+          Cil.constFoldToInt exp
+        | BinOp ((MinusA|MinusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
+          when Cil_datatype.Varinfo.equal vi vi' ->
+          Option.map Integer.neg (Cil.constFoldToInt exp)
+        | _ -> None)
     in
+    (* Very important : oracle must be the oracle before a non-invertible
+       assignement of the bound to allow removing of eventual empty slice
+       before the bound leaves the segmentation. *)
+    map (Memory.incr_bound ~oracle:(mk_oracle state) vi incr) state
+
+  let update_array_segmentation lval expr state =
     match lval with
     | Mem _, _ -> state (* Do nothing *)
     | Var vi, offset ->
-      let incr = match offset with
-        | NoOffset -> increment expr
+      let expr = match offset with
+        | NoOffset -> expr
         | _ -> None
       in
-      map (Memory.incr_bound ~oracle:(mk_oracle state) vi incr) state
+      update_array_segmentation_bounds vi expr state
 
   let assign_lval lval assigned_value oracle state =
     try
@@ -493,7 +503,7 @@ struct
       `Value top
 
   let assign _kinstr left expr assigned_value valuation state =
-    let state = update_array_segmentation left.lval expr state in
+    let state = update_array_segmentation left.lval (Some expr) state in
     let state = assume_valuation valuation state in
     let oracle = make_oracle valuation in
     assign_lval left.lval assigned_value oracle state
@@ -543,6 +553,11 @@ struct
     List.fold_left enter_one state vars
 
   let leave_scope _kf vars state =
+    let state =
+      List.fold_left
+        (fun state vi -> update_array_segmentation_bounds vi None state)
+        state vars
+    in
     remove_vars state vars
 
   let logic_assign assign location state =
