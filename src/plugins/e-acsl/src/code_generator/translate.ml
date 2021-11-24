@@ -1018,22 +1018,30 @@ and at_to_exp_no_lscope env kf t_opt label e =
   res, !env_ref, Typed_number.C_number
 
 and env_of_li ~adata li kf env loc =
-  let t = Misc.term_of_li li in
-  let lenv = Env.Local_vars.get env in
-  let ty = Typing.get_typ ~lenv t in
-  let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
-  let e, adata, env = term_to_exp ~adata kf env t in
-  let stmt = match Typing.get_number_ty ~lenv t with
-    | Typing.(C_integer _ | C_float _ | Nan) ->
-      Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
-    | Typing.Gmpz ->
-      Gmp.init_set ~loc (Cil.var vi) vi_e e
-    | Typing.Rational ->
-      Rational.init_set ~loc (Cil.var vi) vi_e e
-    | Typing.Real ->
-      Error.not_yet "real number"
-  in
-  adata, Env.add_stmt env kf stmt
+  match li.l_var_info.lv_type with
+  | Ctype _ | Linteger | Lreal ->
+    let t = Misc.term_of_li li in
+    let lenv = Env.Local_vars.get env in
+    let ty = Typing.get_typ ~lenv t in
+    let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
+    let e, adata, env = term_to_exp ~adata kf env t in
+    let stmt = match Typing.get_number_ty ~lenv t with
+      | Typing.(C_integer _ | C_float _ | Nan) ->
+        Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
+      | Typing.Gmpz ->
+        Gmp.init_set ~loc (Cil.var vi) vi_e e
+      | Typing.Rational ->
+        Rational.init_set ~loc (Cil.var vi) vi_e e
+      | Typing.Real ->
+        Error.not_yet "real number"
+    in
+    adata, Env.add_stmt env kf stmt
+  | Ltype _ ->
+    Env.not_yet env "user-defined logic type"
+  | Lvar _ ->
+    Env.not_yet env "type variable"
+  | Larrow _ ->
+    Env.not_yet env "lambda-abstraction"
 
 (* Convert an ACSL predicate into a corresponding C expression (if any) in the
    given environment. Also extend this environment which includes the generating
