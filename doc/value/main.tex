@@ -3893,10 +3893,12 @@ most cases, and a greater value is rarely needed.
 
 \subsection{Value partitioning}
 
+\subsubsection{Principle}
+
 A case-based reasoning on the possible values of an expression can be forced
 inside a function by using \lstinline|split| annotations.  These annotations
-must be given an expression which values correspond to the cases that need to be
-enumerated. The example below shows an usage of this annotation.
+must be given an expression whose values correspond to the cases that need to be
+enumerated. The example below shows a use of this annotation.
 
 \lstinputlisting{examples/parametrizing/split-array.c}
 
@@ -3931,10 +3933,77 @@ with the exact same expression.
 The use of \lstinline|merge| annotations is not mandatory, but they allow the
 user to mitigate the cost of \lstinline|split| annotations.
 
-Alternatively to annotations, it is possible to use the command-line to
-reason by case during the whole analysis. The command line parameter
-\lstinline|-eva-partition-value <V>| forces the analyzer to reason at all times
-on single values of the global variable \lstinline|<V>|.
+\subsubsection{Static and dynamic partitioning}
+
+Two kinds of value partitioning are available:
+\begin{description}
+\item[Static split] with annotation \lstinline|//@ split e;| \\
+  The partitioning is done once at the annotation point: Eva enumerates all
+  possible values of the given expression, and continues the analysis separately
+  for each of these values, until a merge annotation is encountered.
+\item[Dynamic split] with annotation \lstinline|//@ dynamic_split e;| \\
+  The partitioning is maintained at each program point according to the current
+  value of the given expression \lstinline|e|. At each assignment of a variable
+  on which \lstinline|e| depends, the partitioning is updated to ensure that the
+  expression always evalutes to a singleton in each analysis state, until a
+  merge annotation is encountered.
+\end{description}
+
+A static split allows reasoning according to the value of an expression at the
+annotation point, while a dynamic split enables reasoning according to the
+current value of the expression as long as the partitioning is active.
+
+In both following examples, the values of the array \lstinline|t| are sorted in
+increasing order, so the value of \lstinline|t[i+1] - t[i]| is always positive.
+However, without value partitioning, the analysis computes independently the
+possible values for \lstinline|t[i]| and \lstinline|t[i+1]|, which may have
+any value in the intervals $[0..55]$ and $[1..89]$ respectively,
+and \lstinline|r = t[i+1] - t[i]| may then be negative.
+
+To be precise on these examples, we need to separate the analysis for each value
+of \lstinline|i|, so that the accesses to the values of \lstinline|t| are exact.
+With such partitioning, the values of \lstinline|t[i]|, \lstinline|t[i+1]| and
+\lstinline|r| are computed separately for each possible value of \lstinline|i|.
+
+\lstinputlisting{examples/parametrizing/static-split.c}
+
+To be precise on this first example, we need a static split on \lstinline|i|, as
+the value of \lstinline|i| is set to 0 before the computation of \lstinline|r|,
+but the values of \lstinline|x| and \lstinline|y| depend on the previous value
+of \lstinline|i|.
+
+\lstinputlisting{examples/parametrizing/dynamic-split.c}
+
+In this second example, the value of \lstinline|r| is computed at each
+loop iteration and depends on the current value of \lstinline|i|, which
+also changes at each loop iteration.
+So we need a dynamic split to ensure that the analysis separates the new
+values of \lstinline|i| during the analysis of the loop.
+
+We could also use a static split in the loop body, to ensure that the
+partitioning is updated at each loop iteration. On more complex codes where
+the partitioned value is written or used many times, a single dynamic split
+is often more suitable than static splits.
+
+
+
+\subsubsection{Interprocedural value partitioning}
+
+By default, the value partitioning performed by \lstinline|split|
+and \lstinline|dynamic_split| annotations is only maintained in the current
+function: when returning to the caller, the value partitioning
+finishes and partitioned states are merged together.
+
+The option \lstinline|-eva-interprocedural-splits| can be used to change this
+behavior and keep value partitioning through return statements.
+
+Alternatively to annotations, it is also possible to use the command line to
+perform case-based reasoning throughout the whole analysis. The command-line parameter
+\lstinline|-eva-partition-value <v>| forces the analyzer to reason at all times
+on single values of the global variable \lstinline|v|, by performing a
+dynamic split on \lstinline|v| for the whole analysis.
+
+\subsubsection{Limitations}
 
 There are four limitations to the value partitioning:
 
@@ -3943,7 +4012,7 @@ There are four limitations to the value partitioning:
   floating-point values are not supported yet.
 \item The expression on which the split is done must evaluate to a small set of
   integer values, in order to limit the cost of the partitioning and ensure the
-  termination of the analysis. If the number of possible values infered for the
+  termination of the analysis. If the number of possible values inferred for the
   expression exceeds a defined limit, \Eva{} cancels the split and emits a
   warning. The limit is 100 by default and can be changed with option
   \lstinline|-eva-split-limit <n>|.
@@ -4058,6 +4127,12 @@ Most domains are also presented in more details in the following subsections.
     Efficient but limited.
     \tabularnewline
     \midrule
+    multidim & d-multidim & \ref{sec:multidim} &
+    More precise representation of arrays of structures
+    and multidimensional arrays. \\
+    Experimental.
+    \tabularnewline
+    \midrule
     bitwise & d-bitwise & \ref{sec:bitwise} &
     Interprets more precisely some bitwise operations. Rarely useful.
     \tabularnewline
@@ -4073,6 +4148,10 @@ Most domains are also presented in more details in the following subsections.
     apron-polka-equality &  &  & \tabularnewline
     apron-polka-loose &  &  & \tabularnewline
     apron-polka-strict &  &  & \tabularnewline
+    \midrule
+    taint & d-taint & \ref{sec:taint} &
+    Experimental. Performs a taint analysis.
+    \tabularnewline
     \midrule
     numerors & d-numerors & \ref{sec:numerors} &
     Experimental. Infers ranges for absolute and relative errors
@@ -4319,6 +4398,32 @@ The analysis of a function can then use the relations inferred in the callers,
 and at the end, the inferred relations are propagated back to the caller.
 
 
+\subsection{Multidim}
+\label{sec:multidim}
+
+\emph{This domain is experimental.}
+
+The multidim domain implements a typed memory model designed to abstract
+multidimensional arrays, arrays of structures, or any composition of any depth
+of these.
+
+Arrays are summarized by only one abstract value, meaning that the domain is not
+able to express distinct properties of individual cells. However, arrays of
+structures are approximated field by field, allowing the inference of precise
+invariants about each field of all structures included in the array.
+
+The model also keeps track of the types used to write to the memory, and thus
+can display the contents of the memory with its structure (via
+\lstinline|Frama_C_domain_show_each| directives), even when the underlying
+location type does not always match the types used to write into it.
+
+The domain is no more precise than the cvalue domain when array properties need
+to be inferred cell by cell.
+However, it may often be more precise on large arrays of structures, especially
+when the indexes at which these arrays are written cannot be
+reduced to singleton values with usual techniques such as loop unrolling.
+
+
 \subsection{Bitwise values}
 \label{sec:bitwise}
 
@@ -4378,6 +4483,65 @@ number of tracked variables. Since relational domains are usually costly
 in very long analyses and/or massive memory usage.
   
 \end{itemize}
+
+\subsection{Taint}
+\label{sec:taint}
+
+\emph{This domain is experimental.}
+
+Option \texttt{-eva-domains taint} performs a taint analysis, which is a
+data-dependency analysis tracking the impact an external user may have on
+the program execution when supplying some data.
+
+The initial taint must be specified by the user with ACSL annotations
+\lstinline|//@ taint <lvalues>;| on a statement, or a clause
+\lstinline|taints <lvalues>;| in a function contract.
+
+These directives are hypotheses of the taint analysis, and thus have no logical
+status. The specified set of lvalues becomes tainted just after the code
+annotation, or at the return of the function with the \texttt{taints} clause.
+
+\begin{lstlisting}
+  int r = write(buf, n);
+  //@ taint r, buf[0..n];
+\end{lstlisting}
+
+\begin{lstlisting}
+  /*@ requires \valid(buf + (0..n));
+      assigns \result, *p, buf[0..n];
+      ensures 0 <= \result < n;
+      taints \result, buf[0..n]; */
+      int write(char *buf, int n);
+\end{lstlisting}
+
+The taint is then propagated during the Eva analysis, which computes an
+over-approximation of the set of tainted locations at each program point.
+
+The ACSL predicate \lstinline|\tainted| can be used to verify that some
+values are \emph{not} tainted.
+Indeed, the domain only infers over-approximations of the tainted locations:
+while locations in the over-approximations \emph{may be} tainted,
+all other locations are proven to be safe.
+
+\begin{lstlisting}
+  void fun(int a, int b, int t) {
+    //@ taint t;
+    int x = a + t;
+    int y = a - b;
+    //@ assert \tainted(x);   // UNKNOWN
+    //@ assert !\tainted(y);  // TRUE
+  }
+\end{lstlisting}
+
+The \lstinline|\tainted| predicate can also be used to reduce the
+over-approximation of the tainted locations, by asserting that some values are
+not tainted anymore.
+
+\begin{lstlisting}
+  /*@ ensures !\tainted(*p); */
+  void sanitize(int *p);
+\end{lstlisting}
+
 
 \subsection{Numerors}
 \label{sec:numerors}
