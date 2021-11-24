@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -171,7 +171,11 @@ let size_from_sizes_and_shifts ~loc = function
 
 (* Build the left-value corresponding to [*(at + index)]. *)
 let lval_at_index ~loc kf env (e_at, vi_at, t_index) =
-  Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int t_index;
+  Typing.type_term
+    ~use_gmp_opt:false
+    ~ctx:Typing.c_int
+    ~lenv:(Env.Local_vars.get env)
+    t_index;
   let term_to_exp = !term_to_exp_ref in
   let e_index, _, env = term_to_exp ~adata:Assert.no_data kf env t_index in
   let e_index = Cil.constFold false e_index in
@@ -239,9 +243,10 @@ let to_exp ~loc kf env pot label =
     | Lscope.PoT_pred _ ->
       Cil.intType
     | Lscope.PoT_term t ->
-      begin match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
+      let lenv = (Env.Local_vars.get env) in
+      begin match Typing.get_number_ty ~lenv t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
-          Typing.get_typ ~lenv:(Env.Local_vars.get env) t
+          Typing.get_typ ~lenv t
         | Typing.(Rational | Real) ->
           Error.not_yet "\\at on purely logic variables and over real type"
         | Typing.Gmpz ->
@@ -265,8 +270,10 @@ let to_exp ~loc kf env pot label =
          let t_size =
            Logic_const.term ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
          in
-         Typing.type_term ~use_gmp_opt:false t_size;
-         let malloc_stmt = match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t_size with
+         let lenv = Env.Local_vars.get env in
+         Typing.type_term ~use_gmp_opt:false ~lenv t_size;
+         let malloc_stmt =
+           match Typing.get_number_ty ~lenv t_size with
            | Typing.C_integer IInt ->
              let e_size, _, _ =
                term_to_exp ~adata:Assert.no_data kf env t_size

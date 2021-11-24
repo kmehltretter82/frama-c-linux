@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -100,14 +100,14 @@ val join: number_ty -> number_ty -> number_ty
 val type_term:
   use_gmp_opt:bool ->
   ?ctx:number_ty ->
-  ?lenv:Function_params_ty.t ->
+  lenv:Function_params_ty.t ->
   term ->
   unit
 (** Compute the type of each subterm of the given term in the given context. If
     [use_gmp_opt] is false, then the conversion to the given context is done
     even if -e-acsl-gmp-only is set. *)
 
-val type_named_predicate: ?lenv:Function_params_ty.t -> predicate -> unit
+val type_named_predicate: lenv:Function_params_ty.t -> predicate -> unit
 (** Compute the type of each term of the given predicate. *)
 
 val clear: unit -> unit
@@ -144,7 +144,12 @@ val get_cast: lenv:Function_params_ty.t -> term -> typ option
 val get_cast_of_predicate: lenv:Function_params_ty.t -> predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
-val unsafe_set: term -> ?ctx:number_ty -> number_ty -> unit
+val unsafe_set:
+  term ->
+  ?ctx:number_ty ->
+  lenv:Function_params_ty.t ->
+  number_ty ->
+  unit
 (** Register that the given term has the given type in the given context (if
     any). No verification is done. *)
 

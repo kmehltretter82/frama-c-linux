@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -194,11 +194,11 @@ module Id_term_with_lenv =
    info is already computed for a term, it is never recomputed *)
 module Memo: sig
   val memo:
-    ?lenv:Function_params_ty.t ->
+    lenv:Function_params_ty.t ->
     (term -> computed_info) ->
     term ->
     computed_info Error.or_error
-  val get: ?lenv:Function_params_ty.t -> term ->
+  val get: lenv:Function_params_ty.t -> term ->
     computed_info Error.or_error
   val clear: unit -> unit
 end = struct
@@ -241,7 +241,7 @@ end = struct
     try Misc.Id_term.Hashtbl.find tbl t
     with Not_found -> Error.not_memoized ()
 
-  let get ?(lenv=[]) t =
+  let get ~lenv t =
     match lenv with
     | [] -> get_nondep t
     | _::_ -> get_dep lenv t
@@ -267,7 +267,7 @@ end = struct
       Id_term_with_lenv.Hashtbl.add dep_tbl (t, lenv) x;
       x
 
-  let memo ?(lenv=[]) f t =
+  let memo ~lenv f t =
     match lenv with
     | [] -> memo_nondep f t
     | _::_ -> memo_dep f t lenv
@@ -390,7 +390,7 @@ let rec type_term
     ?(under_lambda=false)
     ?(arith_operand=false)
     ?ctx
-    ?(lenv=[])
+    ~lenv
     t =
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
@@ -810,7 +810,7 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
   Interval.Env.add lv i;
   (t1, lv, t2)
 
-and type_predicate ?(lenv=[]) p =
+and type_predicate ~lenv p =
   match Logic_normalizer.get_pred p with
   | PoT_term t -> type_term ~use_gmp_opt:true ~lenv t
   | PoT_pred p ->
@@ -879,7 +879,7 @@ and type_predicate ?(lenv=[]) p =
         begin
           let guards, goal =
             Error.retrieve_preprocessing
-              "quantified predicate"
+              "preprocessing of quantified predicate"
               Bound_variables.get_preprocessed_quantifier
               p
           in
@@ -893,7 +893,9 @@ and type_predicate ?(lenv=[]) p =
         end
       | Pseparated tlist ->
         List.iter
-          (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan t))
+          (fun t ->
+             ignore
+               (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t))
           tlist;
         c_int
       | Pinitialized(_, t)
@@ -903,14 +905,14 @@ and type_predicate ?(lenv=[]) p =
       | Pvalid_read(_, t)
       | Pobject_pointer(_,t)
       | Pvalid_function t ->
-        ignore (type_term ~use_gmp_opt:false ~ctx:Nan t);
+        ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t);
         c_int
       | Pat(p, _) -> (type_predicate ~lenv p).ty
       | Pfresh _ -> Error.not_yet "\\fresh"
     in
     coerce ~arith_operand:false ~ctx:c_int ~op c_int
 
-let type_term ~use_gmp_opt ?ctx ?(lenv=[]) t =
+let type_term ~use_gmp_opt ?ctx ~lenv t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx ~lenv t);
@@ -918,7 +920,7 @@ let type_term ~use_gmp_opt ?ctx ?(lenv=[]) t =
     Stack.pop pending_typing ()
   done
 
-let type_named_predicate ?(lenv=[]) p =
+let type_named_predicate ~lenv p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate p;
   ignore (type_predicate ~lenv p);
@@ -926,10 +928,10 @@ let type_named_predicate ?(lenv=[]) p =
     Stack.pop pending_typing ()
   done
 
-let unsafe_set t ?ctx ty =
+let unsafe_set t ?ctx ~lenv ty =
   let ctx = match ctx with None -> ty | Some ctx -> ctx in
   let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
-  ignore (Memo.memo mk t)
+  ignore (Memo.memo mk ~lenv t)
 
 (******************************************************************************)
 (** {2 Getters} *)

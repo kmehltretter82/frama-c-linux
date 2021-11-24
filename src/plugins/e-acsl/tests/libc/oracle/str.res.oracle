@@ -1,19 +1,15 @@
 [e-acsl] beginning translation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:439: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:440: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:445: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:453: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:446: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
@@ -44,12 +40,10 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:424: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:425: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:426: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
@@ -71,8 +65,7 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:379: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:388: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
@@ -97,8 +90,7 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:367: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:368: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
