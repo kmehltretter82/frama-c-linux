@@ -33,20 +33,21 @@
 
 CYGPATH         ?=@CYGPATH@
 
-DESTDIR 	?=
-prefix		?=@prefix@
-exec_prefix	?=@exec_prefix@
+DESTDIR         ?=
+prefix          ?=@prefix@
+exec_prefix     ?=@exec_prefix@
 datarootdir     ?=@datarootdir@
 datadir         ?=@datadir@
-BINDIR		?=$(DESTDIR)@bindir@
-LIBDIR		?=$(DESTDIR)@libdir@
-DATADIR		?=$(DESTDIR)@datarootdir@
-MANDIR		?=$(DESTDIR)@mandir@
+BINDIR          ?=$(DESTDIR)@bindir@
+LIBDIR          ?=$(DESTDIR)@libdir@
+DATADIR         ?=$(DESTDIR)@datarootdir@
+MANDIR          ?=$(DESTDIR)@mandir@
+BASHCOMPDIR     ?=$(DESTDIR)@datarootdir@/bash-completion/completions
 
-FRAMAC_LIBDIR	?=$(LIBDIR)/frama-c
+FRAMAC_LIBDIR ?=$(LIBDIR)/frama-c
 FRAMAC_PLUGINDIR ?=$(FRAMAC_LIBDIR)/plugins
-FRAMAC_DATADIR 	?=$(DATADIR)/frama-c
-EMACS_DATADIR	?=$(DATADIR)/emacs/site-lisp
+FRAMAC_DATADIR ?=$(DATADIR)/frama-c
+EMACS_DATADIR ?=$(DATADIR)/emacs/site-lisp
 FRAMAC_DEFAULT_CPP ?=@FRAMAC_DEFAULT_CPP@
 FRAMAC_DEFAULT_CPP_ARGS ?= @FRAMAC_DEFAULT_CPP_ARGS@
 FRAMAC_GNU_CPP ?=@FRAMAC_GNU_CPP@
