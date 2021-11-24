@@ -6209,7 +6209,8 @@ is presented below. As a reminder, \verb+strcat(d, s)+ appends the string
   @ requires valid_read_string(dest);
   @ requires \valid(dest+(strlen(dest)..strlen(dest)+strlen(src)));
   @ ensures \result == dest;
-  @ assigns dest[strlen(dest)..strlen(dest)+strlen(src)] \from src[0..strlen(src)];
+  @ assigns dest[strlen(dest)..strlen(dest)+strlen(src)]
+  @     \from src[0..strlen(src)];
   @ assigns \result \from dest;
   @*/
 char *strcat(char *dest, const char *src);
@@ -6364,7 +6365,9 @@ This is (or was) the actual, full specification of the function in \FramaC's
 standard library. It contains 3 behaviors, separated according to the
 finiteness of the input value: finite, infinite, or NaN ({\em not a number}).
 
-Each behavior has an {\em assumes} clause, which is the precondition for
+Each behavior has a named\footnote{Named predicates are an ACSL feature; names,
+or {\em ids}, are described in Section~\ref{sec:acsl-guide-complements},
+{\em ACSL ids}.} {\em assumes} clause, which is the precondition for
 that behavior to be {\em active}. ACSL allows several behaviors to be active
 at the same time, but in practice, having disjoint behaviors (only a single
 behavior active at any time) simplifies reasoning. When behaviors are disjoint,
@@ -6461,6 +6464,7 @@ it {\em always} refers to a logic function; it is not possible to call
 a C function in an ACSL annotation.
 
 \section{(Optional) Syntax Complements}
+\label{sec:acsl-guide-complements}
 
 We present here a few more details about ACSL syntax; you may skip this until
 you are more familiar with the rest of the guide.
