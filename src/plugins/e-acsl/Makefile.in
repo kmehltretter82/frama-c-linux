@@ -460,6 +460,7 @@ EACSL_CEA_LGPL_BARE= src/*.ml src/*/*.ml src/*.mli src/*/*.mli \
 	E_ACSL.mli \
 	Makefile.in configure.ac tab-in-changelog.sh \
 	scripts/*.sh \
+	scripts/*.comp \
 	tests/E_ACSL_test.ml \
 	tests/wrapper.sh \
 	man/e-acsl-gcc.sh.1
