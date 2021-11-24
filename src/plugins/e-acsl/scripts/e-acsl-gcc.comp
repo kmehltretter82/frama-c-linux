@@ -23,10 +23,8 @@
 # Bash completion for e-acsl-gcc.sh
 
 _eacsl_gcc() {
-  local cur prev opts base
-  COMPREPLY=()
-  cur="${COMP_WORDS[COMP_CWORD]}"
-  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur prev words cwords opts
+  _init_completion || return
 
   opts="
     -C -d -o -O -v -V -f -E -L -M -l -e -g -q -s -F -m -D -I -G -X -a
@@ -47,20 +45,19 @@ _eacsl_gcc() {
     --with-dlmalloc --dlmalloc-from-sources --dlmalloc-compile-only
     --dlmalloc-compile-flags --odlmalloc"
 
-  case ${prev} in
-    -*)
-      COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
-      return 0
-    ;;
-    *)
-      COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
-      [[ $COMPREPLY == *= ]] && compopt -o nospace
-      return 0
-    ;;
-  esac
-
-  return 0
-}
-complete -F _eacsl_gcc e-acsl-gcc.sh
-
-
+  if [[ $cur == = ]]; then
+    # We just found an option that ends with '=', reset the 'cur' variable
+    # and use files and directories completions
+    cur=
+    _filedir
+  elif [[ $cur != -* ]]; then
+    # We are not adding a parameter, use files and directories completions
+    _filedir
+  else
+    # We started an option, use e-acsl-gcc completions
+    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+    # If the option ends with '=', do not add a space after the option
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+  fi
+} &&
+  complete -F _eacsl_gcc e-acsl-gcc.sh
