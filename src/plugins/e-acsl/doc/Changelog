@@ -25,6 +25,8 @@
 Plugin E-ACSL 24.0 (Chromium)
 #############################
 
+-* E-ACSL       [2021-11-24] Fix code generation of properties proven invalid
+                with a previous analysis (frama-c/e-acsl#166).
 -  E-ACSL       [2021-10-20] Add option -e-acsl-assert-print-data
                 (--assert-print-data in e-acsl-gcc.sh) to print data
                 contributing to a failed assertion along with the error message.
