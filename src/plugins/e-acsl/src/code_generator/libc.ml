@@ -25,7 +25,7 @@
 open Cil_types
 
 (* Retrieve the name of the caller function. [vorig_name] is used instead of
-   [vname] because some plugins like "Variadic" may change the value of [vname] 
+   [vname] because some plugins like "Variadic" may change the value of [vname]
    for some functions like [sprintf]. *)
 let get_caller_name caller =
   caller.vorig_name
@@ -187,7 +187,7 @@ let check_integer_bounds ~from target =
     If [check_lower_bound] is set to false, then the lower bound check is not
     performed. *)
 let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
-  Typing.type_term ~use_gmp_opt:false t;
+  Typing.type_term ~use_gmp_opt:false ~lenv:(Env.Local_vars.get env) t;
   match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
   | Typing.Gmpz ->
     let e, _, env =

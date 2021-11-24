@@ -684,21 +684,31 @@ end
       compute_guards loc ~is_forall:true p bound_vars goal
     | Pexists(bound_vars, ({ pred_content = Pand(_, _) } as goal)) ->
       compute_guards loc ~is_forall:false p bound_vars goal
-    | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
-    | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
+    | Pforall _ ->
+      Quantifier.add
+        p
+        (Err (Error.Not_yet "unguarded \\forall quantification"))
+    | Pexists _ ->
+      Quantifier.add
+        p
+        (Err (Error.Not_yet "unguarded \\exists quantification"))
     | _ -> ()
+
+  let do_user_predicates () =
+    let gannot a =
+      match a with
+      | Dfun_or_pred ({l_body = LBpred p},loc) ->
+        (match Logic_normalizer.get_pred p with
+         | PoT_pred p -> process_quantif ~loc p
+         | PoT_term _ -> ())
+      | _ -> ()
+    in
+    Annotations.iter_global (fun _ a -> gannot a)
 
   let preprocessor = object
     inherit E_acsl_visitor.visitor
 
-    (* Only logic functions and logic predicates are handled.
-       E-acsl simply ignores all the other global annotations *)
-    method !vannotation annot =
-      match annot with
-      | Dfun_or_pred _ -> Cil.DoChildren
-      | _ -> Cil.SkipChildren
-
-    method !vpredicate  p =
+    method !vpredicate p =
       let loc = p.pred_loc in
       match Logic_normalizer.get_pred p with
       | PoT_pred p -> process_quantif ~loc p;
@@ -710,7 +720,8 @@ end
   let compute ast =
     Visitor.visitFramacFileSameGlobals
       (preprocessor :> Visitor.frama_c_inplace)
-      ast
+      ast;
+    do_user_predicates ()
 
   let compute_annot annot =
     ignore
