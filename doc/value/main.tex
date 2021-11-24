@@ -6095,6 +6095,10 @@ The main kinds of clauses used by \Eva{} are:
 \item postconditions (\texttt{ensures}): also part of function contracts,
   \Eva{} uses them to {\em reduce} the state after the call, that is, they
   improve precision of the analysis by discarding irrelevant states.
+  Note that there are two modes: if \Eva{} only has a specification for the
+  function, then \texttt{ensures} are {\em considered valid}; if the function
+  definition is also available, \Eva{} will check the \texttt{ensures}. If it
+  fails to prove them, it will generate alarms before reducing.
 \item assigns ... from (\texttt{assigns}): also part of function contracts,
   they state all locations that are possibly modified by the function. For \Eva{},
   the \texttt{from} part of these clauses also tells, in the case of pointers,
@@ -6196,19 +6200,19 @@ The following predicates are abundantly used by \Eva{}:
 
 \paragraph{Examples}
 
-A simplified version of the \texttt{strcpy} specification in \FramaC's libc
-is presented below. As a reminder, \verb+strcpy(d, s)+ copies the string
+A simplified version of the \texttt{strcat} specification in \FramaC's libc
+is presented below. As a reminder, \verb+strcat(d, s)+ appends the string
 \texttt{s} at the end of string \texttt{d}.
 
 \begin{lstlisting}
-/*@ requires source_is_valid: valid_read_string(src);
-  @ requires dest_is_valid: valid_read_string(dest);
-  @ requires room_string: \valid(dest+(0..strlen(src)));
+/*@ requires valid_read_string(src);
+  @ requires valid_read_string(dest);
+  @ requires \valid(dest+(strlen(dest)..strlen(dest)+strlen(src)));
   @ ensures \result == dest;
-  @ assigns dest[strlen(dest)..strlen(src)] \from src[0..strlen(src)];
+  @ assigns dest[strlen(dest)..strlen(dest)+strlen(src)] \from src[0..strlen(src)];
   @ assigns \result \from dest;
   @*/
-char *strcpy(char *dest, const char *src);
+char *strcat(char *dest, const char *src);
 \end{lstlisting}
 
 Let us read this specification carefully:
@@ -6216,10 +6220,12 @@ Let us read this specification carefully:
 \begin{itemize}
 \item the string to be copied (\texttt{src}) must be a valid string,
   that is, readable and nul-terminated;
-\item the destination string must {\em also} be a valid string;
+\item the destination string must {\em also} be a valid string
+  (since we are copying {\em after} this string, we need to know where it ends);
 \item there must be enough room, in the buffer pointed to by \texttt{dest},
-  to store each of the characters or \texttt{src}, including the terminating
-  zero character; this is described via the \verb+\valid+ predicate,
+  {\em after} the length of \texttt{dest} itself, to store each of the characters
+  of \texttt{src}, including the terminating zero character;
+  this is described via the \verb+\valid+ predicate,
   which imposes writability of its memory locations, and via a range operator,
   which avoids having to use a \texttt{forall} operator;
 \item the postcondition is trivial: it simply returns the destination pointer,
@@ -6241,7 +6247,7 @@ Note that the specification above is missing some important points: first, we
 never specify that the bytes in the range
 \verb+dest[strlen(dest)+0..strlen(src)] are identical to those in
   \verb+src[0..strlen(src)]+. Second, we omitted the fact that \texttt{src}
-  and \texttt{dest} must be {\em disjoint}: \texttt{strcpy} does not accept
+  and \texttt{dest} must be {\em disjoint}: \texttt{strcat} does not accept
   overlapping bytes between source and destination. In ACSL, this is specified
   via the \verb+\separated(<locations>)+ predicate. This predicate is essential
   for WP, but in \Eva{} it is present much less often.
