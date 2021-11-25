@@ -87,7 +87,7 @@ tags: [
 ]
 
 build: [
-  ["autoconf"] {pinned}
+  ["autoconf"] {dev}
   ["./configure" "--prefix" prefix
                  "--mandir=%{man}%"
   ]
