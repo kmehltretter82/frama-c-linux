@@ -101,6 +101,9 @@ export default function SourceCode() {
   const selected: React.MutableRefObject<undefined | States.Location> =
     React.useRef();
 
+  /* Updates the cursor position according to the current [selection], except
+     when the [selection] is changed according to a click in the source code,
+     in which case the cursor should stay exactly where the user clicked. */
   React.useEffect(() => {
     if (selected.current && selected?.current === selection?.current)
       selected.current = undefined;
