@@ -46,6 +46,12 @@ void eacsl_print_values(eacsl_assert_data_t *data) {
 }
 
 #ifndef E_ACSL_EXTERNAL_ASSERT
+
+/*! \brief Return `str` id `cond` is true, an empty string otherwise. */
+#  define STR_IF(cond, str) ((cond) ? (str) : "")
+/*! \brief Return `str` if the string is not null, an empty string otherwise. */
+#  define STR_IF_NOT_NULL(str) STR_IF(str, str)
+
 /*! \brief Default implementation of E-ACSL runtime assertions */
 void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
   if (eacsl_runtime_sound_verdict) {
@@ -55,9 +61,11 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
       STDERR("%s: In function '%s'\n"
              "%s:%d: Error: %s failed:\n"
              "\tThe failing predicate is:\n"
-             "\t%s.\n",
+             "\t%s%s%s.\n",
              data->file, data->fct,
              data->file, data->line, data->kind,
+             STR_IF_NOT_NULL(data->name),
+             STR_IF(data->name, ":\n\t\t"),
              data->pred_txt);
       // clang-format on
       eacsl_print_values(data);
@@ -78,9 +86,11 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
       // clang-format off
       STDERR("%s: In function '%s'\n"
              "%s:%d: %s valid:\n"
-             "\t%s.\n",
+             "\t%s%s%s.\n",
              data->file, data->fct,
              data->file, data->line, data->kind,
+             STR_IF_NOT_NULL(data->name),
+             STR_IF(data->name, ":\n\t\t"),
              data->pred_txt);
       // clang-format on
       eacsl_print_values(data);
@@ -93,9 +103,11 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
     STDERR("%s: In function '%s'\n"
            "%s:%d: Warning: no sound verdict for %s (guess: %s).\n"
            "\tthe considered predicate is:\n"
-           "\t%s\n",
+           "\t%s%s%s\n",
            data->file, data->fct,
            data->file, data->line, data->kind, predicate ? "ok" : "FAIL",
+           STR_IF_NOT_NULL(data->name),
+           STR_IF(data->name, ":\n\t\t"),
            data->pred_txt);
     // clang-format on
     eacsl_print_values(data);
