@@ -168,6 +168,10 @@ src/frama-c/plugins/dive/pkg.json: .ignore
 src/frama-c/plugins/dive/react-cytoscapejs.d.ts: CEA_LGPL
 src/frama-c/plugins/dive/style.json: .ignore
 src/frama-c/plugins/dive/tippy.css: .ignore
+src/frama-c/plugins/eva/.eslintrc.js: .ignore
+src/frama-c/plugins/eva/Coverage.tsx: CEA_LGPL
+src/frama-c/plugins/eva/CoverageMeter.tsx: CEA_LGPL
+src/frama-c/plugins/eva/Summary.tsx: CEA_LGPL
 src/frama-c/plugins/eva/cells.ts: CEA_LGPL
 src/frama-c/plugins/eva/diffed.tsx: CEA_LGPL
 src/frama-c/plugins/eva/index.tsx: CEA_LGPL
@@ -179,6 +183,7 @@ src/frama-c/plugins/eva/probes.ts: CEA_LGPL
 src/frama-c/plugins/eva/sized.tsx: CEA_LGPL
 src/frama-c/plugins/eva/stacks.ts: CEA_LGPL
 src/frama-c/plugins/eva/style.css: .ignore
+src/frama-c/plugins/eva/summary.css: .ignore
 src/frama-c/plugins/eva/valueinfos.tsx: CEA_LGPL
 src/frama-c/plugins/eva/valuetable.tsx: CEA_LGPL
 src/frama-c/server.ts: CEA_LGPL
