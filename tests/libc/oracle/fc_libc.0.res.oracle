@@ -213,13 +213,13 @@
   
   Global metrics
   ============== 
-  Sloc = 1641
+  Sloc = 1647
   Decision point = 307
   Global variables = 86
   If = 292
   Loop = 55
   Goto = 118
-  Assignment = 711
+  Assignment = 717
   Exit point = 128
   Function = 556
   Function call = 165
