@@ -2,6 +2,9 @@
 [obfuscator] Warning: unobfuscated attribute name `fc_stdlib'
 [obfuscator] Warning: unobfuscated attribute parameter name `stdint.h'
 [obfuscator] Warning: unobfuscated attribute name `missingproto'
+[obfuscator] Warning: unobfuscated axiomatic name `A'
+[obfuscator] Warning: unobfuscated axiomatic name `A1'
+[obfuscator] Warning: unobfuscated lemma name `OK'
 /* *********************************** */
 /* start of dictionary for obfuscation */
 /* *********************************** */
@@ -18,6 +21,7 @@
 #define F4 builtin_and_stdlib
 #define F5 implem
 #define F6 test_func
+#define F7 my_f
 // global variables
 #define G1 my_var
 #define G2 example_struct
@@ -32,6 +36,10 @@
 // logic variables
 #define LV1 I
 #define LV2 x
+#define LV3 P
+#define LV4 galois_fp_old
+#define LV5 P1
+#define LV6 galois_fp_old
 // fields
 #define M1 my_func
 // predicates
@@ -164,4 +172,23 @@ void F6(struct T2 *f6)
   return;
 }
 
+/*@ axiomatic A {
+      predicate LV3(void (*LV4)()) ;
+      
+      }
+ */
+/*@ axiomatic A1 {
+      predicate LV5(void (*LV6)()) ;
+      
+      }
+
+*/
+void F7(void)
+{
+  return;
+}
+
+/*@ lemma OK{L}: LV3((void (*)())(&F7)) ∧ LV5((void (*)())(&F7));
+
+*/
 

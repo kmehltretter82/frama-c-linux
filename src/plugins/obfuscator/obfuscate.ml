@@ -290,7 +290,7 @@ end
 let obfuscate () =
   Dictionary.mark_as_computed ();
   obfuscate_behaviors ();
-  Visitor.visitFramacFileSameGlobals
+  Visitor.visitFramacFile
     (new visitor :> Visitor.frama_c_visitor)
     (Ast.get ());
   Printer.update_printer (module UpdatePrinter: Printer.PrinterExtension)
