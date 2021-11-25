@@ -2,12 +2,12 @@
 [obfuscator] Warning: unobfuscated attribute name `fc_stdlib'
 [obfuscator] Warning: unobfuscated attribute parameter name `stdint.h'
 [obfuscator] Warning: unobfuscated attribute name `missingproto'
-[obfuscator] Warning: unobfuscated axiomatic name `A'
-[obfuscator] Warning: unobfuscated axiomatic name `A1'
-[obfuscator] Warning: unobfuscated lemma name `OK'
 /* *********************************** */
 /* start of dictionary for obfuscation */
 /* *********************************** */
+// axiomatics
+#define A1 A
+#define A2 A1
 // behaviors
 #define B1 bhv
 // enums
@@ -31,6 +31,8 @@
 // logic constructors
 #define LC1 T
 #define LC2 F
+// lemmas
+#define LE1 OK
 // logic types
 #define LT1 t
 // logic variables
@@ -172,12 +174,12 @@ void F6(struct T2 *f6)
   return;
 }
 
-/*@ axiomatic A {
+/*@ axiomatic A1 {
       predicate LV3(void (*LV4)()) ;
       
       }
  */
-/*@ axiomatic A1 {
+/*@ axiomatic A2 {
       predicate LV5(void (*LV6)()) ;
       
       }
@@ -188,7 +190,7 @@ void F7(void)
   return;
 }
 
-/*@ lemma OK{L}: LV3((void (*)())(&F7)) ∧ LV5((void (*)())(&F7));
+/*@ lemma LE1{L}: LV3((void (*)())(&F7)) ∧ LV5((void (*)())(&F7));
 
 */
 

@@ -166,12 +166,13 @@ class visitor = object
     Cil.DoChildren
 
   method! vannotation = function
-    | Daxiomatic(str, _, _, _) ->
-      warn "axiomatic" str;
-      Cil.DoChildren
-    | Dlemma(str, _, _, { tp_kind }, _, _) ->
-      warn (Cil_printer.string_of_lemma tp_kind) str;
-      Cil.DoChildren
+    | Daxiomatic(str, globs, attrs, loc) ->
+      let str' = Dictionary.fresh Obfuscator_kind.Axiomatic str in
+      Cil.ChangeDoChildrenPost(Daxiomatic(str',globs,attrs,loc),Extlib.id)
+    | Dlemma(str, labs, typs, pred, attrs, loc) ->
+      let str' = Dictionary.fresh Obfuscator_kind.Lemma str in
+      Cil.ChangeDoChildrenPost(
+        Dlemma(str',labs,typs, pred, attrs, loc),Extlib.id)
     | _ ->
       Cil.DoChildren
 
