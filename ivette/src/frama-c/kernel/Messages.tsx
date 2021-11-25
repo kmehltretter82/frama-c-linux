@@ -40,6 +40,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 import * as Kernel from 'frama-c/api/kernel/services';
 
 type Message = Kernel.messageData;
+type logkind = Kernel.logkind;
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -50,88 +51,76 @@ interface Search {
   message?: string;
 }
 
-interface KindFilter {
-  result?: boolean;
-  feedback?: boolean;
-  debug?: boolean;
-  warning?: boolean;
-  error?: boolean;
-  failure?: boolean;
-}
-
-interface PluginFilter {
-  kernel?: boolean;
-  aorai?: boolean;
-  dive?: boolean;
-  eacsl?: boolean;
-  eva?: boolean;
-  from?: boolean;
-  impact?: boolean;
-  inout?: boolean;
-  metrics?: boolean;
-  nonterm?: boolean;
-  pdg?: boolean;
-  report?: boolean;
-  rte?: boolean;
-  scope?: boolean;
-  server?: boolean;
-  slicing?: boolean;
-  variadic?: boolean;
-  wp?: boolean;
-  others?: boolean;
-}
+type KindFilter = Record<logkind, boolean>;
+type PluginFilter = {[key: string]: boolean};
+type EmitterFilter = {
+  kernel: boolean;
+  plugins: PluginFilter;
+  others: boolean; // default for Frama-C plugins not in the plugins field.
+};
 
 interface Filter {
   currentFct: boolean;
   search: Search;
   kind: KindFilter;
-  plugin: PluginFilter;
+  emitter: EmitterFilter;
 }
+
+/* Only warnings and errors are shown by default. */
+const kindFilter: KindFilter = {
+  RESULT: false,
+  FEEDBACK: false,
+  DEBUG: false,
+  WARNING: true,
+  ERROR: true,
+  FAILURE: true,
+};
+
+/* The fields must be exactly the short names of Frama-C plugins used in
+   messages. They are all shown by default. */
+const pluginFilter: PluginFilter = {
+  aorai: true,
+  dive: true,
+  'e-acsl': true,
+  eva: true,
+  from: true,
+  impact: true,
+  inout: true,
+  metrics: true,
+  nonterm: true,
+  pdg: true,
+  report: true,
+  rte: true,
+  scope: true,
+  server: true,
+  slicing: true,
+  variadic: true,
+  wp: true,
+};
+
+const emitterFilter = {
+  kernel: true,
+  plugins: pluginFilter,
+  others: true,
+};
 
 const defaultFilter: Filter = {
   currentFct: false,
   search: {},
-  kind: {
-    result: false,
-    feedback: false,
-    debug: false,
-  },
-  plugin: {},
+  kind: kindFilter,
+  emitter: emitterFilter,
 };
 
 function filterKind(filter: KindFilter, msg: Message) {
-  const hide =
-    (filter.result === false && msg.kind === 'RESULT')
-    || (filter.feedback === false && msg.kind === 'FEEDBACK')
-    || (filter.debug === false && msg.kind === 'DEBUG')
-    || (filter.warning === false && msg.kind === 'WARNING')
-    || (filter.error === false && msg.kind === 'ERROR')
-    || (filter.failure === false && msg.kind === 'FAILURE');
-  return !hide;
+  return filter[msg.kind];
 }
 
-function filterPlugin(filter: PluginFilter, msg: Message) {
-  switch (msg.plugin) {
-    case 'kernel': return !(filter.kernel === false);
-    case 'aorai': return !(filter.aorai === false);
-    case 'dive': return !(filter.dive === false);
-    case 'e-acsl': return !(filter.eacsl === false);
-    case 'eva': return !(filter.eva === false);
-    case 'from': return !(filter.from === false);
-    case 'impact': return !(filter.impact === false);
-    case 'inout': return !(filter.inout === false);
-    case 'metrics': return !(filter.metrics === false);
-    case 'nonterm': return !(filter.nonterm === false);
-    case 'pdg': return !(filter.pdg === false);
-    case 'report': return !(filter.report === false);
-    case 'rte': return !(filter.rte === false);
-    case 'scope': return !(filter.scope === false);
-    case 'server': return !(filter.server === false);
-    case 'slicing': return !(filter.slicing === false);
-    case 'variadic': return !(filter.variadic === false);
-    case 'wp': return !(filter.wp === false);
-    default: return !(filter.others === false);
-  }
+function filterEmitter(filter: EmitterFilter, msg: Message) {
+  if (msg.plugin === 'kernel')
+    return filter.kernel;
+  if (msg.plugin in filter.plugins)
+    return filter.plugins[msg.plugin];
+  return filter.others;
 }
 
 function searchCategory(search: string | undefined, msg: string | undefined) {
@@ -191,12 +180,26 @@ function filterMessage(filter: Filter, kf: string | undefined, msg: Message) {
   return (filterFunction(filter, kf, msg) &&
           filterSearched(filter.search, msg) &&
           filterKind(filter.kind, msg) &&
-          filterPlugin(filter.plugin, msg));
+          filterEmitter(filter.emitter, msg));
 }
 
 // --------------------------------------------------------------------------
 // --- Filters panel and ratio
 // --------------------------------------------------------------------------
+
+function Checkbox(p: Forms.CheckboxFieldProps) {
+  const lbl = p.label.charAt(0).toUpperCase() + p.label.slice(1).toLowerCase();
+  return <Forms.CheckboxField label={lbl} state={p.state} />;
+}
+
+function Section(p: Forms.SectionProps) {
+  const settings = `ivette.messages.filter.${p.label}`;
+  return (
+    <Forms.Section label={p.label} unfold settings={settings}>
+      {p.children}
+    </Forms.Section>
+  );
+}
 
 function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
   const state = props.filter;
@@ -205,101 +208,62 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
   const messageState = Forms.useProperty(search, 'message');
 
   const kind = Forms.useProperty(state, 'kind');
-  function kindState(path: keyof KindFilter) {
-    return Forms.useDefault(Forms.useProperty(kind, path), true);
-  }
+  const kindState = (key: logkind) => Forms.useProperty(kind, key);
+  const kindCheckboxes =
+    Object.keys(kindFilter).map((key) => (
+      <Checkbox key={key} label={key} state={kindState(key as logkind)} />
+    ));
 
-  const plugin = Forms.useProperty(state, 'plugin');
-  function pluginState(path: keyof PluginFilter) {
-    return Forms.useDefault(Forms.useProperty(plugin, path), true);
+  const emitter = Forms.useProperty(state, 'emitter');
+  function EmitterCheckbox(p: {key: 'kernel' | 'others'}) {
+    return <Checkbox label={p.key} state={Forms.useProperty(emitter, p.key)} />;
   }
+  const plugin = Forms.useProperty(emitter, 'plugins');
+  const pluginState = (key: string) => Forms.useProperty(plugin, key);
+  const pluginCheckboxes =
+    Object.keys(pluginFilter).map((key) => (
+      <Checkbox key={key} label={key} state={pluginState(key)} />
+    ));
 
   return (
-    <Scroll>
-      <Forms.Page className="message-search">
-        <Forms.CheckboxField
-          label="Current function"
-          title="Only show messages emitted at the current function"
-          state={Forms.useProperty(state, 'currentFct')}
+    <Forms.Page className="message-search">
+      <Forms.CheckboxField
+        label="Current function"
+        title="Only show messages emitted at the current function"
+        state={Forms.useProperty(state, 'currentFct')}
+      />
+      <Section label="Search">
+        <Forms.TextField
+          label="Category"
+          state={categoryState}
+          placeholder="Category"
+          title={'Search in message category.\n'
+               + 'Use -<name> to hide some categories.'}
         />
-        <Forms.Section
-          label="Search"
-          unfold
-          settings="ivette.messages.search"
-        >
-          <Forms.TextField
-            label="Category"
-            state={categoryState}
-            placeholder="Category"
-            title={'Search in message category.\n'
-                 + 'Use -<name> to hide some categories.'}
-          />
-          <Forms.TextField
-            label="Message"
-            state={messageState}
-            placeholder="Message"
-            title={'Search in message text.\n'
-                 + 'Case-insensitive by default.\n'
-                 + 'Use "text" for an exact case-sensitive search.'}
-          />
-        </Forms.Section>
-        <Forms.Section
-          label="Kind"
-          unfold
-          settings="ivette.messages.filterKind"
-        >
-          <Forms.CheckboxField label="Result" state={kindState('result')} />
-          <Forms.CheckboxField label="Feedback" state={kindState('feedback')} />
-          <Forms.CheckboxField label="Debug" state={kindState('debug')} />
-          <Forms.CheckboxField label="Warning" state={kindState('warning')} />
-          <Forms.CheckboxField label="Error" state={kindState('error')} />
-          <Forms.CheckboxField label="Failure" state={kindState('failure')} />
-        </Forms.Section>
-        <Forms.Section
-          label="Emitter"
-          unfold
-          settings="ivette.messages.filterEmitter"
-        >
-          <div className="message-emitter-category">
-            <Forms.CheckboxField label="Kernel" state={pluginState('kernel')} />
-          </div>
-          <div className="message-emitter-category">
-            <Forms.CheckboxField label="Aoraï" state={pluginState('aorai')} />
-            <Forms.CheckboxField label="Dive" state={pluginState('dive')} />
-            <Forms.CheckboxField label="E-ACSL" state={pluginState('eacsl')} />
-            <Forms.CheckboxField label="Eva" state={pluginState('eva')} />
-            <Forms.CheckboxField label="From" state={pluginState('from')} />
-            <Forms.CheckboxField label="Impact" state={pluginState('impact')} />
-            <Forms.CheckboxField label="InOut" state={pluginState('inout')} />
-            <Forms.CheckboxField
-              label="Metrics"
-              state={pluginState('metrics')}
-            />
-            <Forms.CheckboxField
-              label="NonTerm"
-              state={pluginState('nonterm')}
-            />
-            <Forms.CheckboxField label="Pdg" state={pluginState('pdg')} />
-            <Forms.CheckboxField label="Report" state={pluginState('report')} />
-            <Forms.CheckboxField label="RTE" state={pluginState('rte')} />
-            <Forms.CheckboxField label="Scope" state={pluginState('scope')} />
-            <Forms.CheckboxField label="Server" state={pluginState('server')} />
-            <Forms.CheckboxField
-              label="Slicing"
-              state={pluginState('slicing')}
-            />
-            <Forms.CheckboxField
-              label="Variadic"
-              state={pluginState('variadic')}
-            />
-            <Forms.CheckboxField label="WP" state={pluginState('wp')} />
-          </div>
-          <div className="message-emitter-category">
-            <Forms.CheckboxField label="Others" state={pluginState('others')} />
-          </div>
-        </Forms.Section>
-      </Forms.Page>
-    </Scroll>
+        <Forms.TextField
+          label="Message"
+          state={messageState}
+          placeholder="Message"
+          title={'Search in message text.\n'
+               + 'Case-insensitive by default.\n'
+               + 'Use "text" for an exact case-sensitive search.'}
+        />
+      </Section>
+      <Section label="Kind">
+        { kindCheckboxes }
+      </Section>
+      <Section label="Emitter">
+        <div className="message-emitter-category">
+          { EmitterCheckbox({ key: 'kernel' }) }
+        </div>
+        <div className="message-emitter-category">
+          { pluginCheckboxes }
+        </div>
+        <div className="message-emitter-category">
+          { EmitterCheckbox({ key: 'others' }) }
+        </div>
+      </Section>
+    </Forms.Page>
   );
 }
 
@@ -317,7 +281,7 @@ function FilterRatio({ model }: { model: Arrays.ArrayModel<any, any> }) {
 // --- Messages Columns
 // --------------------------------------------------------------------------
 
-const renderKind: Renderer<Kernel.logkind> = (kind: Kernel.logkind) => {
+const renderKind: Renderer<logkind> = (kind: logkind) => {
   const label = kind.toLocaleLowerCase();
   let icon = '';
   let color = 'black';
@@ -507,7 +471,9 @@ export default function RenderMessages() {
           </Table>
           {MessagePanel}
         </BSplit>
-        <MessageFilter filter={filterState} />
+        <Scroll>
+          <MessageFilter filter={filterState} />
+        </Scroll>
       </RSplit>
     </>
   );
