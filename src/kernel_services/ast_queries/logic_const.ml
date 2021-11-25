@@ -226,6 +226,11 @@ let transform_element f t = set_conversion (plain_or_set f t) t
 
 let is_plain_type ty = not (is_set_type ty)
 
+let make_arrow_type args rt =
+  match args with
+  | [] -> rt
+  | _ -> Larrow(List.map (fun x -> x.lv_type) args, rt)
+
 let rec is_boolean_type = function
   | Ltype ({ lt_name = s }, []) when s = Utf8_logic.boolean -> true
   | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->

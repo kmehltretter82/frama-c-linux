@@ -283,6 +283,13 @@ val transform_element: (logic_type -> logic_type) -> logic_type -> logic_type
     @modify 18.0-Argon expands the logic type definition if necessary. *)
 val is_plain_type: logic_type -> bool
 
+(** [make_arrow_type args rt] returns a [rt] if [args] is empty or the
+    corresponding [Larrow] type.
+
+    @since Frama-C+dev
+*)
+val make_arrow_type: logic_var list -> logic_type -> logic_type
+
 (** @return true if the argument is the boolean type.
     @modify 18.0-Argon expands the logic type definition if necessary. *)
 val is_boolean_type: logic_type -> bool
