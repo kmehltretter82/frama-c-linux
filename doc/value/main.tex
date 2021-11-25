@@ -6077,8 +6077,8 @@ for an example syntax when dealing with pointers to type \texttt{void}.
 
 ACSL annotations are preprocessed by default. This means you can use
 definitions such as \verb+INT_MAX+, \verb+EOF+, etc.
-However, for null pointers, use the ACSL term \verb+\null+ instead of
-the C macro \verb+NULL+.
+For null pointers, the ACSL term \verb+\null+ can be used, notably if macro 
+\verb+NULL+ is not available.
 
 \section{Kinds of clauses}
 
@@ -6099,9 +6099,9 @@ The main kinds of clauses used by \Eva{} are:
   function, then \texttt{ensures} are {\em considered valid}; if the function
   definition is also available, \Eva{} will check the \texttt{ensures}. If it
   fails to prove them, it will generate alarms before reducing.
-\item assigns ... from (\texttt{assigns}): also part of function contracts,
+\item assigns ... \textbackslash{}from (\texttt{assigns}): also part of function contracts,
   they state all locations that are possibly modified by the function. For \Eva{},
-  the \texttt{from} part of these clauses also tells, in the case of pointers,
+  the \verb+\from+ part of these clauses also tells, in the case of pointers,
   where do the new values come from. Note that \verb+assigns+ means
   {\em possibly} modified; you should read them as ``may assign''.
 \end{itemize}
@@ -6228,7 +6228,7 @@ Let us read this specification carefully:
   of \texttt{src}, including the terminating zero character;
   this is described via the \verb+\valid+ predicate,
   which imposes writability of its memory locations, and via a range operator,
-  which avoids having to use a \texttt{forall} operator;
+  which avoids having to use a \verb+\forall+ operator;
 \item the postcondition is trivial: it simply returns the destination pointer,
   unchanged;
 \item there are two \texttt{assigns} clauses, because their \verb+\from+
@@ -6250,7 +6250,7 @@ never specify that the bytes in the range
   \verb+src[0..strlen(src)]+. Second, we omitted the fact that \texttt{src}
   and \texttt{dest} must be {\em disjoint}: \texttt{strcat} does not accept
   overlapping bytes between source and destination. In ACSL, this is specified
-  via the \verb+\separated(<locations>)+ predicate. This predicate is essential
+  via the \verb+\separated(<locations>)+ predicate (see below). This predicate is essential
   for WP, but in \Eva{} it is present much less often.
   Third, we never stated that all of the modified bytes were {\em actually}
   modified, that is: we are {\em certain} that their locations have been
@@ -6369,12 +6369,14 @@ Each behavior has a named\footnote{Named predicates are an ACSL feature; names,
 or {\em ids}, are described in Section~\ref{sec:acsl-guide-complements},
 {\em ACSL ids}.} {\em assumes} clause, which is the precondition for
 that behavior to be {\em active}. ACSL allows several behaviors to be active
-at the same time, but in practice, having disjoint behaviors (only a single
+at the same time, but in practice, having disjoint behaviors (at most one single
 behavior active at any time) simplifies reasoning. When behaviors are disjoint,
 the union of two \texttt{assumes} clauses is always empty.
 
 Ideally, behaviors should be {\em complete}: at least one of them should be
-active at any time. Incomplete behaviors may lead to loss of precision.
+active at any time\footnote{Hence, as is the case here, a complete and disjoint set
+of behaviors means that exactly one behavior is active at any time}.
+Incomplete behaviors may lead to loss of precision.
 
 Note that several ACSL floating-point predicates are used: \verb+\is_finite+,
 \verb+\is_infinite+, \verb+\is_plus_infinity+ and \verb+\is_NaN+. They are
@@ -6497,8 +6499,9 @@ int main(void) {
 
 Parsing the above code fails with
 \texttt{[kernel:annot-error] unbound logic variable N}.
-The issue is that the token \texttt{0..N} prevents the logic preprocessor
-from expanding \texttt{N}. To fix this, simply add spaces between the bounds:
+The issue is that, according to the C standard, \texttt{0..N} is a preprocessing token
+in itself, so that the preprocessor does not see \texttt{N} in isolation, and does not expand
+the macro. To fix this, simply add spaces between the bounds:
 \texttt{a[0 .. N-1]}.
 As a general rule, we recommend {\em always} adding spaces between the bounds.
 
@@ -6562,8 +6565,8 @@ In the first case, unless the sign domain (option \texttt{-eva-domains sign})
 is enabled, there is little chance that \Eva{} will produce an interval without
 zero.
 
-In the second case, if there is enough slevel (or some other enable disjunction
-mechanism), \Eva{} will produce two separate states: one with
+In the second case, if there is enough slevel (or some other disjunction
+mechanism is enabled), \Eva{} will produce two separate states: one with
 \verb+\result > 0+ and another with \verb+\result < 0+,
 at least until both states have to be merged later.
 
