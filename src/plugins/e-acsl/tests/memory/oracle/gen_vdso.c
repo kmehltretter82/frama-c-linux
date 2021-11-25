@@ -81,10 +81,11 @@ time_t __gen_e_acsl_time(time_t *timer)
                                    "\\valid(timer)",0,__gen_e_acsl_valid);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Precondition";
-      __gen_e_acsl_assert_data.pred_txt = "not_null: valid_timer: \\valid(timer)";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(timer)";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data.fct = "time";
       __gen_e_acsl_assert_data.line = 102;
+      __gen_e_acsl_assert_data.name = "not_null/valid_timer";
       __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
@@ -142,10 +143,11 @@ time_t __gen_e_acsl_time(time_t *timer)
                                    0,__gen_e_acsl_initialized);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "not_null: initialization: timer: \\initialized(\\old(timer))";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(\\old(timer))";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data_4.fct = "time";
       __gen_e_acsl_assert_data_4.line = 104;
+      __gen_e_acsl_assert_data_4.name = "not_null/initialization/timer";
       __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }

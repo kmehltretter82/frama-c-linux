@@ -33,10 +33,11 @@ void g(int a, int *b)
                                  *(b + 1));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "division_by_zero: (long)*(b + 1) != 0";
+    __gen_e_acsl_assert_data_2.pred_txt = "(long)*(b + 1) != 0";
     __gen_e_acsl_assert_data_2.file = "acsl_check.c";
     __gen_e_acsl_assert_data_2.fct = "g";
     __gen_e_acsl_assert_data_2.line = 15;
+    __gen_e_acsl_assert_data_2.name = "division_by_zero";
     __e_acsl_assert((long)*(b + 1) != 0L,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
@@ -49,10 +50,11 @@ void g(int a, int *b)
                                                   (void *)(& b));
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "RTE";
-    __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(b + 1)";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(b + 1)";
     __gen_e_acsl_assert_data_3.file = "acsl_check.c";
     __gen_e_acsl_assert_data_3.fct = "g";
     __gen_e_acsl_assert_data_3.line = 15;
+    __gen_e_acsl_assert_data_3.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_assert_data.blocking = 0;
