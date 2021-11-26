@@ -250,7 +250,7 @@ let array_size = function
   | Some e ->
       match constant e with
       | 0L when Cil.gccMode () || Cil.msvcMode () -> None
-      | 0L -> Warning.error "0 sized array only allowed in GCC/MSVC mode"
+      | 0L -> Warning.error "0 sized array %s" (Cil.allowed_machdep "GCC/MSVC")
       | n  -> Some n
 
 let get_int e =
