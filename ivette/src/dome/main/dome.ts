@@ -328,6 +328,8 @@ function createBrowserWindow(
     backgroundColor: '#f0f0f0',
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
+      contextIsolation: false,
       additionalArguments: [browserArguments],
     },
     ...config,
