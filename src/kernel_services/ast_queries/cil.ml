@@ -171,6 +171,12 @@ let set_acceptEmptyCompinfo () = acceptEmptyCompinfo := true
 let acceptEmptyCompinfo () =
   msvcMode () || gccMode () || !acceptEmptyCompinfo
 
+let allowed_machdep machdep =
+  Format.asprintf
+    "only allowed for %s machdeps;@ see option -machdep or@ \
+     run '-machdep help' for the list of available machdeps"
+    machdep
+
 let theMachineProject = ref (createMachine ())
 
 module Machine_datatype =
