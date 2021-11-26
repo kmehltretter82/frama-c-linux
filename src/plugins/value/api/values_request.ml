@@ -311,11 +311,9 @@ let get_bases cvalue =
 (* Get pointed bases from an offsetmap.  *)
 let get_pointed_bases = function
   | Offsetmap offsm ->
-    Cvalue.V_Offsetmap.fold_on_values
-      (fun v acc ->
-         let v = Cvalue.V_Or_Uninitialized.get_v v in
-         Base.Hptset.union acc (get_bases v))
-      offsm Base.Hptset.empty
+    let get_bases v = Cvalue.V_Or_Uninitialized.get_v v |> get_bases in
+    let f v acc = get_bases v |> Base.Hptset.union acc in
+    Cvalue.V_Offsetmap.fold_on_values f offsm Base.Hptset.empty
   | Bottom | Empty | Top | InvalidLoc -> Base.Hptset.empty
 
 (* Only keep a list of C variables from both previous functions. *)
@@ -342,9 +340,8 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   type dstate = A.Dom.state or_top_or_bottom
 
   let get_precise_loc =
-    match A.Loc.get Main_locations.PLoc.key with
-    | None -> fun _ -> Precise_locs.loc_top
-    | Some get -> get
+    let default = fun _ -> Precise_locs.loc_top in
+    Option.value ~default (A.Loc.get Main_locations.PLoc.key)
 
   let get_cvalue =
     let default = fun _ -> Cvalue.V.top in
@@ -396,16 +393,13 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
 
   (* Creates an exported [value] from an evaluation result. *)
   let make_value typ stmt (result, alarms) =
-    let alarms =
-      let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
-      let f alarm status acc = (status, descr alarm) :: acc in
-      Alarmset.fold f [] alarms |> List.rev
-    in
+    let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
+    let f alarm status acc = (status, descr alarm) :: acc in
+    let alarms = Alarmset.fold f [] alarms |> List.rev in
     let pretty_eval = Bottom.pretty (pp_result typ) in
     let value = Pretty_utils.to_string pretty_eval result in
-    let pointed_vars =
-      Bottom.fold ~bottom:[] (get_pointed_markers stmt) result
-    in
+    let pointed_markers = get_pointed_markers stmt in
+    let pointed_vars = Bottom.fold ~bottom:[] pointed_markers result in
     { value; alarms; pointed_vars }
 
   (* --- Evaluates an expression or lvalue into an evaluation [result]. ----- *)
