@@ -17,7 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
-o!  Kernel    [2021-11-19] Integer.pretty does not have the optional argument
+o!  Kernel    [2021-11-29] Integer.pretty does not have the optional argument
               hexa anymore. Use Integer.pretty_hex or Integer.pp_hex if you
               want to print integers in hexadecimal format.
 
