@@ -11,7 +11,7 @@ other analyzers in the framework. Thanks to this approach, \FramaC can provide
 a number of sophisticated tools such as a concurrency safety analysis
 (Mthread~\cite{mthread}),
 an enforcer of secure information flow (SecureFlow~\cite{secureflow1,secureflow2}),
-or a coverage-based test generator (LTest~\cite{ltest}), among many others.
+or a set of tools for various test coverage criteria (LTest~\cite{ltest}), among many others.
 
 \section{\FramaC as a Code Analysis Tool}
 
@@ -110,9 +110,9 @@ review.
 \section{\FramaC as a Tool for \C programs}
 
 The \C source code analyzed by \FramaC is assumed to follow the \tool{C99} ISO
-standard\index{C99 ISO standard@\tool{C99} ISO standard}\footnote{Some common
-GCC extensions, as well as some parts of the \tool{C11} standard, are
-also supported.}. \C comments may
+standard\index{C99 ISO standard@\tool{C99} ISO standard}\footnote{Some parts of
+the \tool{C11} standard, as well as some common GCC extensions,
+are also supported.}. \C comments may
 contain \acsl annotations~\cite{acsl} used as specifications to be interpreted
 by \FramaC. The subset of \acsl currently interpreted in \FramaC is described
 in~\cite{acsl-implem}.
@@ -141,7 +141,7 @@ documentation~\cite{value,wp,eacsl}.
 Additional plug-ins can be provided by third-party developers and installed
 separately from the kernel. \FramaC is thus not limited to the set of analyses
 initially installed. For instance, it may be extended with the \tool{Frama-Clang}
-plug-in~\cite{framaclang}, which provides a front-end for C++ code;
+plug-in~\cite{framaclang}, which provides an experimental front-end for C++ code;
 or \tool{MetAcsl}~\cite{metacsl}, which allows specifying higher-level
 meta-properties; among others.
 
