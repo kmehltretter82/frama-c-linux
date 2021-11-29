@@ -418,7 +418,10 @@ indicate the option needed to allow the file to be parsed:
 
 \FramaC bundles a C standard library in order to help parse and analyze code
 that relies on the functions specified in the ISO C standard.
-Such library is provided on a best-effort basis, and it is part of the
+Furthermore, In order to simplify parsing of code using common open-source libraries,
+\FramaC's standard library also includes some POSIX and non-POSIX headers which
+are not part of ISO C.
+Such libraries are provided on a best-effort basis, and they are part of the
 {\em trusted computing base}: to ensure its correctness, the specifications
 must be ultimately proofread by the user.
 
@@ -431,8 +434,11 @@ By default, \FramaC's preprocessing will include the headers of its own standard
 library, instead of those installed in the user's machine. This avoids issues
 with non-portable, compiler-specific features.
 Option \optiondef{-}{frama-c-stdlib} (set by default)
-adds \texttt{-I\$FRAMAC\_SHARE/libc} to the preprocessor command, and also
-\texttt{-nostdinc} if \optionuse{-}{cpp-frama-c-compliant} is set.
+adds \texttt{-I\$FRAMAC\_SHARE/libc} to the preprocessor command, as well as
+GCC-specific option \texttt{-nostdinc}. If the latter is not recognized by
+your preprocessor,
+\optionuse{-}{no-cpp-frama-c-compliant} can be given to \FramaC
+(see section~\ref{sec:preprocessing}).
 
 The use of \FramaC's standard library contains a few caveats:
 \begin{itemize}
@@ -451,10 +457,6 @@ The use of \FramaC's standard library contains a few caveats:
   consider filing an issue (see Chapter~\ref{user-errors}) to ask for the
   inclusion of such headers and/or definitions in \FramaC's standard library.
 \end{itemize}
-
-In order to simplify parsing of code using common open-source libraries,
-\FramaC's standard library also includes some POSIX and non-POSIX headers which
-are not part of ISO C.
 
 Note that, while \FramaC's library intends to offer maximum portability, some
 definitions such as numeric constants require actual values to be defined.
