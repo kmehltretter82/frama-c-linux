@@ -23,6 +23,9 @@
 open Tactical
 open ProofScript
 
+let dkey_pp_allgoals =
+  Wp_parameters.register_category "script:allgoals"
+
 (* -------------------------------------------------------------------------- *)
 (* --- Alternatives Ordering                                              --- *)
 (* -------------------------------------------------------------------------- *)
@@ -389,12 +392,18 @@ let rec crawl env on_child node = function
 (* --- Main Process                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+let pp_subgoal env fmt node =
+  let main = Env.goal env None in
+  let wpo = Env.goal env (Some node) in
+  Format.fprintf fmt "%s subgoal:@\n%a" (Wpo.get_gid main) Wpo.pp_goal_flow wpo
+
 let schedule job =
   Task.spawn (ProverTask.server ()) (Task.thread (Task.todo job))
 
 let rec process env node =
   schedule
     begin fun () ->
+      Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" (pp_subgoal env) node ;
       if ProofEngine.proved node then
         ( Env.validate env ; Task.return () )
       else
@@ -407,6 +416,7 @@ let task
     ~depth ~width ~backtrack ~auto
     ~start ~progress ~result ~success wpo =
   begin fun () ->
+    Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" Wpo.pp_goal_flow wpo ;
     Prover.simplify ~start ~result wpo >>= fun succeed ->
     if succeed
     then
