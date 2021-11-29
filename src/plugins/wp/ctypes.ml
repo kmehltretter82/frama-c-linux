@@ -241,7 +241,7 @@ let constant e =
       begin
         try Integer.to_int64_exn k
         with Z.Overflow ->
-          Warning.error "Array size too large (%a)" (Integer.pretty ~hexa:true) k
+          Warning.error "Array size too large (%a)" Integer.pretty_hex k
       end
   | _ -> Warning.error "Non-constant expression (%a)" Printer.pp_exp e
 

@@ -22,15 +22,12 @@
 
 type index = Integer.t * (Integer.t * Integer.t) list (* o, [dᵢ,bᵢ]ᵢ *)
 
-let pretty_int fmt i =
-  Integer.pretty ~hexa:false fmt i
-
 module Term =
 struct
   type t = Integer.t * Integer.t
 
   let pretty fmt (d,b : t) =
-    Format.fprintf fmt "%a×[..%a]" pretty_int d pretty_int b
+    Format.fprintf fmt "%a×[..%a]" Integer.pretty d Integer.pretty b
 
   let order (d1,_b1 : t) (d2,_b2 : t) = (* descending order *)
     Integer.compare d2 d1
@@ -92,7 +89,7 @@ struct
 
   let pretty fmt (o,sum) =
     Format.fprintf fmt "%a + %a"
-      (Integer.pretty ~hexa:false) o
+      Integer.pretty o
       (Pretty_utils.pp_list ~sep:" +@ " Term.pretty) sum
 
   let reprs = [(Integer.zero,[])]

@@ -29,6 +29,8 @@ bin/migration_scripts/aluminium2silicon.sh: CEA_LGPL
 bin/migration_scripts/boron2carbon.sh: CEA_LGPL
 bin/migration_scripts/calcium2scandium.sh: CEA_LGPL
 bin/migration_scripts/carbon2nitrogen.sh: CEA_LGPL
+bin/migration_scripts/chlorine2argon.sh: CEA_LGPL
+bin/migration_scripts/chromium2manganese.sh: CEA_LGPL
 bin/migration_scripts/fluorine2neon.sh: CEA_LGPL
 bin/migration_scripts/lithium2beryllium.sh: CEA_LGPL
 bin/migration_scripts/magnesium2aluminium.sh: CEA_LGPL
@@ -36,11 +38,10 @@ bin/migration_scripts/neon2sodium.sh: CEA_LGPL
 bin/migration_scripts/nitrogen2oxygen.sh: CEA_LGPL
 bin/migration_scripts/oxygen2fluorine.sh: CEA_LGPL
 bin/migration_scripts/phosphorus2sulfur.sh: CEA_LGPL
+bin/migration_scripts/potassium2calcium.sh: CEA_LGPL
 bin/migration_scripts/silicon2phosphorus.sh: CEA_LGPL
 bin/migration_scripts/sodium2magnesium.sh: CEA_LGPL
 bin/migration_scripts/sulfur2chlorine.sh: CEA_LGPL
-bin/migration_scripts/chlorine2argon.sh: CEA_LGPL
-bin/migration_scripts/potassium2calcium.sh: CEA_LGPL
 bin/migration_scripts/titanium2vanadium.sh: CEA_LGPL
 bin/migration_scripts/vanadium2chromium.sh: CEA_LGPL
 bin/sed_get_binutils_version: .ignore
