@@ -108,11 +108,21 @@ struct
 
   let fold : (base-> offset -> 'a -> 'a) -> t -> 'a -> 'a = Map.fold
 
+  let bases map =
+    Map.fold (fun b _ acc -> b :: acc) map []
+
   let is_singleton map =
     match map_to_singleton map with
     | None -> false
     | Some (b,o) ->
       not (Base.is_weak b) && Offset.is_singleton o
+
+  let references map =
+    let module Set = Cil_datatype.Varinfo.Set in
+    let add_refs _b o =
+      Set.union (Set.of_list (Offset.references o))
+    in
+    Map.fold add_refs map Set.empty |> Set.to_seq |> List.of_seq
 
   let of_var (vi : Cil_types.varinfo) : t =
     Map.singleton (Base.of_varinfo vi) (`Value (NoOffset vi.vtype))
@@ -184,7 +194,7 @@ struct
   include Datatype.Make (Prototype)
 
   let pretty = Memory.pretty
-  let pretty_debug = Memory.pretty
+  let _pretty_debug = Memory.pretty
   let top = Memory.top
   let is_top = Memory.is_top
   let is_included = Memory.is_included
@@ -233,15 +243,30 @@ struct
       Memory.overwrite ~oracle ~weak dst loc src
 end
 
+(* References to variables inside array segmentation.
+   For instance if an array A is described with the segmentation
+     0..i-1 ; i ; i+1..10
+   then, everytime i is changed, the segmentation must be updated. This requires
+   referencing every base where at least one segmentation references i. *)
+module References =
+struct
+  include Base.Hptset (* The set of bases referencing the variable *)
+end
 
 module DomainLattice =
 struct
   (* The domain is essentially a map from bases to individual memory abstractions *)
   module Initial_Values = struct let v = [[]] end
   module Deps = struct let l = [Ast.self] end
+  module V =
+  struct
+    include Datatype.Pair (Memory) (References)
+    let pretty_debug = pretty
+    let top = Memory.top, References.empty
+  end
 
   include Hptmap.Make
-      (Base.Base) (Memory)
+      (Base.Base) (V)
       (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
   type state = t
@@ -268,7 +293,7 @@ struct
     | CLogic_Var _ | String _ -> false
 
   let find_or_top (state : state) (b : base) =
-    try find b state with Not_found -> Memory.top
+    try find b state with Not_found -> V.top
 
   let remove_var (state : state) (v : Cil_types.varinfo) =
     remove (Base.of_varinfo v) state
@@ -288,7 +313,7 @@ struct
     state -> mdlocation -> a or_bottom =
     fun map reduce state loc ->
     let f base off acc =
-      let v = map (find_or_top state base) off in
+      let v = map (fst (find_or_top state base)) off in
       Bottom.join reduce (`Value v) acc
     in
     Location.fold f loc `Bottom
@@ -317,13 +342,20 @@ struct
 
   let write (update : memory -> offset -> memory)
       (state : state) (loc : mdlocation) : state =
+    let bases = Location.bases loc in
     let f base off state =
       if covers_base base then
-        add base (update (find_or_top state base) off) state
+        let memory, refs = find_or_top state base in
+        add base (update memory off, refs) state
       else
         state
+    and add_ref state vi =
+      let base = Base.of_varinfo vi in
+      let memory, refs = find_or_top state base in
+      add base (memory, References.union refs (References.of_list bases)) state
     in
-    Location.fold f loc state
+    let state = Location.fold f loc state in
+    List.fold_left add_ref state (Location.references loc)
 
   let set (state : state) (dst : mdlocation) (v : value) : state =
     let weak = not (Location.is_singleton dst)
@@ -356,7 +388,7 @@ struct
     let cache = cache_name "is_included" in
     let decide_fst _b _v1 = true (* v2 is top *) in
     let decide_snd _b _v2 = false (* v1 is top, v2 is not *) in
-    let decide_both _ v1 v2 = Memory.is_included v1 v2 in
+    let decide_both _ (m1,_r1) (m2,_r2) = Memory.is_included m1 m2 in
     let decide_fast s t = if s == t then PTrue else PUnknown in
     binary_predicate cache UniversalPredicate
       ~decide_fast ~decide_fst ~decide_snd ~decide_both
@@ -375,9 +407,10 @@ struct
       | Right -> mk_oracle s2
     in
     let cache = Hptmap_sig.NoCache
-    and decide _ v1 v2 =
-      let r = Memory.join ~oracle v1 v2 in
-      if Memory.(is_top r) then None else Some r
+    and decide _ (m1,r1) (m2,r2) =
+      let m = Memory.join ~oracle m1 m2
+      and r = References.union r1 r2 in
+      if Memory.(is_top m) then None else Some (m,r)
     in
     inter ~cache ~symmetric:false ~idempotent:true ~decide s1 s2
 
@@ -387,9 +420,10 @@ struct
       | Right -> mk_oracle s2
     and _,get_hints = Widen.getWidenHints kf stmt in
     let cache = Hptmap_sig.NoCache
-    and decide base b1 b2 =
-      let r = Memory.widen ~oracle (get_hints base) b1 b2 in
-      if Memory.(is_top r) then None else Some r
+    and decide base (m1,r1) (m2,r2) =
+      let m = Memory.widen ~oracle (get_hints base) m1 m2
+      and r = References.union r1 r2 in
+      if Memory.(is_top m) then None else Some (m,r)
     in
     inter ~cache ~symmetric:false ~idempotent:true ~decide s1 s2
 end
@@ -456,8 +490,6 @@ struct
 
   let update_array_segmentation_bounds vi expr state =
     (* TODO: more general transfer function *)
-    (* TODO: only update memory models where the lval is present in the
-       segmentation *)
     let incr = Option.bind expr (fun expr ->
         match expr.Cil_types.enode with
         | BinOp ((PlusA|PlusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
@@ -474,7 +506,24 @@ struct
     (* Very important : oracle must be the oracle before a non-invertible
        assignement of the bound to allow removing of eventual empty slice
        before the bound leaves the segmentation. *)
-    map (Memory.incr_bound ~oracle:(mk_oracle state) vi incr) state
+    let oracle = mk_oracle state in
+    let references = snd (find_or_top state (Base.of_varinfo vi)) in
+    let update_ref base state =
+      let update (memory, refs) =
+        Memory.incr_bound ~oracle vi incr memory, refs
+      in
+      replace (Option.map update) base state
+    in
+    let state = References.fold update_ref references state in
+    (* If increment is None, every reference to vi should have been removed by
+       Memory.incr_bound *)
+    if Option.is_none incr then
+      replace
+        (Option.map (fun (memory, _refs) -> memory, References.empty))
+        (Base.of_varinfo vi)
+        state
+    else
+      state
 
   let update_array_segmentation lval expr state =
     match lval with

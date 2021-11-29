@@ -31,6 +31,7 @@ sig
   val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t
   val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t
   val is_singleton : t -> bool
+  val references : t -> Cil_types.varinfo list (* variables referenced in the offset *)
 end
 
 type typed_offset =

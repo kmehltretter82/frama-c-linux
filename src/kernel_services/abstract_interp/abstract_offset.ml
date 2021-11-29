@@ -31,6 +31,7 @@ sig
   val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t
   val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t
   val is_singleton : t -> bool
+  val references : t -> Cil_types.varinfo list
 end
 
 type typed_offset =
@@ -87,7 +88,7 @@ struct
     | Some size_exp ->
       match Cil.constFoldToInt size_exp with
       | None -> None
-      | Some size when Integer.(gt size zero) -> Some (Integer.zero, size)
+      | Some size when Integer.(gt size zero) -> Some Integer.(zero, pred size)
       | Some _ -> None
 
   let array_range array_size =
@@ -208,6 +209,17 @@ struct
     | Field (_fi, sub) -> is_singleton sub
     | Index (e, ival, _elem_typ, sub) ->
       (Option.is_some e || Int_val.is_singleton ival) && is_singleton sub
+
+  let references =
+    let rec aux acc = function
+      | NoOffset _ -> acc
+      | Field (_, sub) | Index (None, _, _, sub) -> aux acc sub
+      | Index (Some e, _, _, sub) ->
+        let r = Cil.extract_varinfos_from_exp e in
+        let acc = (Cil_datatype.Varinfo.Set.to_seq r |> List.of_seq) @ acc in
+        aux acc sub
+    in
+    aux []
 end
 
 module TypedOffsetOrTop =
@@ -245,4 +257,8 @@ struct
   let is_singleton = function
     | `Top -> false
     | `Value o -> TypedOffset.is_singleton o
+
+  let references = function
+    | `Top -> []
+    | `Value o -> TypedOffset.references o
 end
