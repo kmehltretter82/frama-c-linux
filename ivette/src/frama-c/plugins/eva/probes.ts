@@ -38,17 +38,14 @@ import { ModelCallbacks } from './cells';
 
 const Ka = 'A'.charCodeAt(0);
 const Kz = 'Z'.charCodeAt(0);
-const LabelRing: string[] = [];
 const LabelSize = 12;
 let La = Ka;
 let Lk = 0;
 
 function newLabel() {
-  let lbl = LabelRing.shift();
-  if (lbl) return lbl;
   const a = La;
   const k = Lk;
-  lbl = String.fromCharCode(a);
+  const lbl = String.fromCharCode(a);
   if (a < Kz) {
     La++;
   } else {
@@ -103,7 +100,10 @@ export class Probe {
         this.effects = effects;
         this.condition = condition;
         this.loading = false;
-        this.updateLabel();
+        if (code && code.length > LabelSize)
+          this.label = newLabel();
+        else
+          this.label = code;
       })
       .catch(() => {
         this.code = '(error)';
@@ -124,20 +124,9 @@ export class Probe {
   setPersistent() { this.updateTransient(false); }
   setTransient() { this.updateTransient(true); }
 
-  private updateLabel() {
-    const { transient, label, code } = this;
-    if (transient && label) {
-      LabelRing.push(label);
-      this.label = undefined;
-    }
-    if (!transient && !label && code && code.length > LabelSize)
-      this.label = newLabel();
-  }
-
   private updateTransient(tr: boolean) {
     if (this.transient !== tr) {
       this.transient = tr;
-      this.updateLabel();
       this.model.forceLayout();
     }
   }
