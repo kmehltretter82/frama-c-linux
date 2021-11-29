@@ -245,6 +245,14 @@ let constant e =
       end
   | _ -> Warning.error "Non-constant expression (%a)" Printer.pp_exp e
 
+let array_size = function
+  | None -> None
+  | Some e ->
+      match constant e with
+      | 0L when Cil.gccMode () || Cil.msvcMode () -> None
+      | 0L -> Warning.error "0 sized array %s" (Cil.allowed_machdep "GCC/MSVC")
+      | n  -> Some n
+
 let get_int e =
   match (Cil.constFold true e).enode with
   | Const(CInt64(k,_,_)) -> Some (Integer.to_int_exn k)
@@ -281,7 +289,7 @@ let rec object_of typ =
   | TComp (comp,_,_) -> C_comp comp
   | TArray (typ_elt,e_opt,_,_) ->
       begin
-        match e_opt with
+        match array_size e_opt with
         | None ->
             C_array {
               arr_element = typ_elt;
@@ -292,7 +300,7 @@ let rec object_of typ =
             C_array {
               arr_element = typ_elt ;
               arr_flat = Some {
-                  arr_size = Int64.to_int (constant e) ;
+                  arr_size = Int64.to_int e ;
                   arr_dim = dim ;
                   arr_cell = ty_cell ;
                   arr_cell_nbr = ncells ;

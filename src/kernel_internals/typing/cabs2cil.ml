@@ -1346,20 +1346,14 @@ let canDropStatement (s: stmt) : bool =
   ignore (visitCilStmt vis s);
   !pRes
 
-let allowed_machdep machdep =
-  Format.asprintf
-    "only allowed for %s machdeps;@ see option -machdep or@ \
-     run '-machdep help' for the list of available machdeps"
-    machdep
-
 let fail_if_incompatible_sizeof ~ensure_complete op typ =
   if Cil.isFunctionType typ && Cil.theMachine.theMachine.sizeof_fun < 0 then
     Kernel.error ~current:true "%s called on function %s" op
-      (allowed_machdep "GCC");
+      (Cil.allowed_machdep "GCC");
   let is_void = Cil.isVoidType typ in
   if is_void && Cil.theMachine.theMachine.sizeof_void < 0 then
     Kernel.error ~current:true "%s on void type %s" op
-      (allowed_machdep "GCC/MSVC");
+      (Cil.allowed_machdep "GCC/MSVC");
   if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
     Kernel.error ~current:true
       "%s on incomplete type '%a'" op Cil_printer.pp_typ typ
@@ -3359,7 +3353,7 @@ let rec _pp_preInit fmt = function
 let empty_preinit() =
   if Cil.gccMode () || Cil.msvcMode () then
     CompoundPre (ref (-1), ref [| |])
-  else abort_context "empty initializers %s" (allowed_machdep "GCC/MSVC")
+  else abort_context "empty initializers %s" (Cil.allowed_machdep "GCC/MSVC")
 
 (* Set an initializer *)
 let rec setOneInit this o preinit =
@@ -5212,7 +5206,7 @@ and doType (ghost:bool) isFuncArg
              not (Cil.gccMode () || Cil.msvcMode ())
           then
             Kernel.error ~once:true ~current:true
-              "zero-length arrays %s" (allowed_machdep "GCC/MSVC");
+              "zero-length arrays %s" (Cil.allowed_machdep "GCC/MSVC");
           Some len'
       in
       let al' = doAttributes ghost al in
@@ -5478,7 +5472,7 @@ and makeCompType ghost (isstruct: bool)
           Kernel.error ~source
             "field `%s' declared with a type containing a flexible array \
              member %s."
-            n (allowed_machdep "GCC/MSVC")
+            n (Cil.allowed_machdep "GCC/MSVC")
       end
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
       then begin
@@ -5638,7 +5632,7 @@ and makeCompType ghost (isstruct: bool)
     Kernel.error ~current:true ~once:true
       "empty %ss %s"
       (if comp.cstruct then "struct" else "union")
-      (allowed_machdep "GCC/MSVC");
+      (Cil.allowed_machdep "GCC/MSVC");
   List.iter check flds;
   if comp.cfields <> None then begin
     let old_fields = Option.get comp.cfields in

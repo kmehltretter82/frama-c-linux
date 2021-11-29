@@ -118,6 +118,13 @@ val acceptEmptyCompinfo: unit -> bool
     @since 23.0-Vanadium
 *)
 
+val allowed_machdep: string -> string
+(** [allowed_machdep "machdep family"] provides a standard message for features
+    only allowed for a particular machdep.
+
+    @since Frama-C+dev
+*)
+
 (* ************************************************************************* *)
 (** {2 Values for manipulating globals} *)
 (* ************************************************************************* *)
