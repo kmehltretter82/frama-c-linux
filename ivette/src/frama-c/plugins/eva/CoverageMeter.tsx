@@ -40,7 +40,8 @@ export default function (props: {coverage: Coverage}) {
     <meter
       min={0}
       max={total}
-      low={0.8 * total}
+      low={0.50 * total}
+      high={0.85 * total}
       optimum={total}
       value={reachable}
     />
