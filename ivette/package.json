@@ -11,6 +11,9 @@
     "typecheck:watch": "yarn run typecheck -- --watch",
     "build": "tsc"
   },
+  "resolutions": {
+    "@types/react": "^16.9.17"
+  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7",
