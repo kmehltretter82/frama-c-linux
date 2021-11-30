@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* e-acsl-gcc   [2021-11-30] Fix e-acsl-gcc.sh bash autocompletion script and
+                install it at a standard location.
 -* E-ACSL       [2021-11-23] Add support for VDSO segment on Linux.
 -* e-acsl-gcc   [2021-11-22] Fix e-acsl-gcc.sh detection of failures in
                 subcommands.
