@@ -126,8 +126,8 @@ let config_name ~env name =
 let macro_default_options = ref "-journal-disable -check -no-autoload-plugins"
 let macro_frama_c_exe = ref "frama-c"
 let macro_frama_c_only = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
-let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
-let macro_frama_c = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
+let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"
+let macro_frama_c = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@ @PTEST_FILE@"
 let macro_frama_c_share = ref "../../../../install/default/share/frama-c/share"
 
 let default_toplevel = ref "@frama-c@ @PTEST_OPTIONS@"
@@ -154,7 +154,7 @@ let example_msg =
      DONTRUN:            @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
                                                     # Note: the textual targets are compared to oracles.@]@  \
-     DEPS: <file>...     @[<v 0># Adds a dependency to all sub-test and execnow commands.@ \
+     DEPS: <file>...     @[<v 0># Adds a dependency to next sub-test and execnow commands.@ \
                                 # Notes: a dependency to the included file can be added with this directive.@ \
                                 # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
      LOG: <file>...      @[<v 0># Defines dune targets built by the next sub-test command.@]@  \
@@ -162,9 +162,10 @@ let example_msg =
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
      STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
      STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
-     PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the macro @@PTEST_PLUGIN@@ defining the '-load-plugins' option used in the macro @@PLUGIN_OPTIONS@@.@]@  \
+     PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the macro @@PTEST_PLUGIN@@ defining the '-load-plugins' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      CMXS: <module>...   @[<v 0># Defines dune targets without dependency to tests so use '-load-module %%{dep:<module>.cmxs}' into the test options.@]@  \
-     MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the macro @@PLUGIN_OPTIONS@@.@]@  \
+     MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
+     SCRIPT: <module>... @[alias 'MODULE' directive.@]@  \
      LIBS: <module>...   @[<v 0># Like 'MODULE' directive but for modules that can be shared between several test files.@]@  \
      EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
@@ -189,11 +190,15 @@ let example_msg =
      @@PTEST_RESULT@@          # Shorthand alias to @@PTEST_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
      @@PTEST_ORACLE@@          # Basename of the current oracle file (macro only usable in FILTER directives).@  \
      @@PTEST_DEFAULT_OPTIONS@@ # The default option list: %s@  \
+     @@PTEST_LIBS@@            # The current list of modules defined by the LIBS directive.@  \
+     @@PTEST_DEPS@@            # The current list of dependencies defined by the DEPS directive.@  \
+     @@PTEST_MODULE@@          # The current list of modules defined by the MODULE directive.@  \
+     @@PTEST_SCRIPT@@          # The current list of modules defined by the SCRIPT directive (DEPRECATED).@  \
      @@PTEST_PLUGIN@@          # The current list of plugins set by the PLUGIN directive.@  \
      @]@ \
      @[<v 1>\
      Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
-     @@PLUGIN_OPTIONS@@ # The current list of options related to PLUGIN, MODULE and LIBS to load.@  \
+     @@PTEST_LOAD_OPTIONS@@ # The current list of options related to PLUGIN, MODULE, SCRIPT and LIBS to load.@  \
      @@PTEST_OPTIONS@@  # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
      @@frama-c-exe@@    # Shortcut defined as follow: %s@  \
      @@frama-c-only@@   # Shortcut defined as follow: %s@  \
@@ -478,7 +483,11 @@ module Macros = struct
     StringMap.add name (get name macros ^ expand macros def) macros
 
   let default_macros = add_list
-    [ "PTEST_PLUGIN", "" ;
+    [ "PTEST_DEPS",   "";
+      "PTEST_LIBS",   "";
+      "PTEST_MODULE", "";
+      "PTEST_SCRIPT", "";
+      "PTEST_PLUGIN", "";
       "PTEST_DEFAULT_OPTIONS", !macro_default_options;
       "frama-c-exe", !macro_frama_c_exe;
       "frama-c-only", !macro_frama_c_only;
@@ -530,7 +539,6 @@ type config =
     dc_deps : string list; (** deps *)
     dc_plugin : string list; (** only plugins to load *)
     dc_module : string list; (** module to load *)
-    dc_plugin_all : string list; (** all used plugins *)
     dc_macros: Macros.t; (** existing macros. *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
@@ -580,7 +588,6 @@ end = struct
       dc_execnow = List.rev config.dc_execnow;
       dc_deps = List.map subst config.dc_deps;
       dc_plugin = List.map subst config.dc_plugin;
-      dc_plugin_all = StringSet.elements (StringSet.of_list  (List.map subst config.dc_plugin_all));
       dc_module = List.map subst config.dc_module;
       dc_libs = List.map subst config.dc_libs;
     },
@@ -612,7 +619,6 @@ end = struct
       dc_libs = [];
       dc_deps = [];
       dc_plugin = [];
-      dc_plugin_all = [];
       dc_module = [];
       dc_filter = None ;
       dc_exit_code = None;
@@ -730,7 +736,9 @@ end = struct
 
   let config_deps ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
-    { current with dc_deps = (split_list s) @ current.dc_deps }
+    { current with
+      dc_deps = (split_list s);
+      dc_macros = Macros.add_list ["PTEST_DEPS", s] current.dc_macros }
 
   let config_libs ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
@@ -743,16 +751,15 @@ end = struct
     let s = Macros.expand current.dc_macros s in
     let deps = split_list s in
     { current with dc_plugin = deps ;
-                   dc_plugin_all = deps @ current.dc_plugin_all;
                    dc_macros = Macros.add_list ["PTEST_PLUGIN", s] current.dc_macros }
 
-  let config_module ~drop:_ ~file:_ ~dir:_ s current =
+  let config_module macro_name ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     let deps = List.map (fun s -> s ^ ".cmxs") l in
     { current with
       dc_module = deps;
-      dc_macros = Macros.add_list ["PTEST_MODULE", s] current.dc_macros }
+      dc_macros = Macros.add_list [macro_name, s] current.dc_macros }
 
   let config_macro ~drop:_ ~file ~dir s current =
     (* note: the expansion is donly done into the definition *)
@@ -876,7 +883,8 @@ end = struct
       "MACRO", config_macro;
       "LIBS", config_libs;
       "DEPS", config_deps;
-      "MODULE", config_module;
+      "MODULE", config_module "PTEST_MODULE";
+      "SCRIPT", config_module "PTEST_SCRIPT";
       "PLUGIN", config_plugin;
 
       "LOG",
@@ -1070,7 +1078,7 @@ let basic_command_string command =
   let macros = (* set expanded macros that can be used into CMD directives *)
     Macros.add_list [
       "PTEST_OPTIONS", Macros.expand command.macros command.options;
-      "PLUGIN_OPTIONS", plugins_options;
+      "PTEST_LOAD_OPTIONS", plugins_options;
     ] command.macros in
   let raw_command = Macros.expand macros command.toplevel in
   if command.timeout = "" then raw_command
