@@ -48,12 +48,12 @@ function reloadWindow() {
   });
 }
 
-function toggleFullScreen(_item: MenuItem, focusedWindow: BrowserWindow) {
+function toggleFullScreen(_item: MenuItem, focusedWindow?: BrowserWindow) {
   if (focusedWindow)
     focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
 }
 
-function toggleDevTools(_item: MenuItem, focusedWindow: BrowserWindow) {
+function toggleDevTools(_item: MenuItem, focusedWindow?: BrowserWindow) {
   if (focusedWindow)
     focusedWindow.webContents.toggleDevTools();
 }
@@ -190,9 +190,9 @@ const editMenuItems: MenuSpec = [
     accelerator: 'CmdOrCtrl+F',
     click: (
       _item: Electron.MenuItem,
-      window: Electron.BrowserWindow,
+      window: Electron.BrowserWindow | undefined,
       _evt: Electron.KeyboardEvent,
-    ) => window.webContents.send('dome.ipc.find'),
+    ) => window?.webContents.send('dome.ipc.find'),
   },
 ];
 
@@ -362,9 +362,9 @@ export function addMenuItem(custom: CustomMenuItemSpec) {
       if (!spec.click && !spec.role)
         spec.click = (
           _item: Electron.MenuItem,
-          window: Electron.BrowserWindow,
+          window: Electron.BrowserWindow | undefined,
           _evt: Electron.KeyboardEvent,
-        ) => window.webContents.send('dome.ipc.menu.clicked', id);
+        ) => window?.webContents.send('dome.ipc.menu.clicked', id);
       customItems.set(id, { spec });
       menuSpec.push(spec);
     }
