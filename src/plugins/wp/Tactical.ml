@@ -357,6 +357,15 @@ let replace ~at cases sequent =
        descr , Conditions.replace ~at step sequent)
     cases
 
+let replace_step ~at conditions sequent =
+  let step =
+    let s = Conditions.step_at (fst sequent) at in
+    (* keep original infos *)
+    Conditions.step ?descr:s.descr ?stmt:s.stmt ~deps:s.deps ~warn:s.warn
+  in
+  let conditions = List.map step conditions in
+  [ "Split conj", Conditions.replace_by_step_list ~at conditions sequent ]
+
 let split cases sequent =
   let hyps = fst sequent in
   List.map (fun (descr,p) -> descr,(hyps,p)) cases

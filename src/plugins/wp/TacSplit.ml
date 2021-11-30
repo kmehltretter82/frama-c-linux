@@ -168,32 +168,35 @@ class split =
         ~params:[]
 
     method select feedback (s : Tactical.selection) =
+      let split_cmp at title x y =
+        feedback#set_title title ;
+        feedback#set_descr
+          "Decompose into three comparisons (lt, eq, gt)" ;
+        let cases = [
+          "Lt",F.p_bool (e_lt x y);
+          "Eq",F.p_bool (e_eq x y);
+          "Gt",F.p_bool (e_lt y x);
+        ] in
+        Applicable (Tactical.insert ?at cases)
+      in
+      let split_leq at x y = split_cmp at "Split (<=)" x y in
+      let split_eq at x y = split_cmp at "Split (=)" x y in
+      let split_neq at x y = split_cmp at "Split (<>)" x y in
+      let split_lt at x y =
+        let x = if F.is_int x then F.(e_add x e_one) else x in
+        split_cmp at "Split (<)" x y
+      in
       match s with
       | Empty | Compose _ -> Not_applicable
       | Inside(_,e) ->
           begin
-            let split_cmp title x y =
-              feedback#set_title title ;
-              feedback#set_descr
-                "Decompose into three comparisons (lt, eq, gt)" ;
-              let cases = [
-                "Lt",F.p_bool (e_lt x y);
-                "Eq",F.p_bool (e_eq x y);
-                "Gt",F.p_bool (e_lt y x);
-              ] in
-              let at = Tactical.at s in
-              Applicable (Tactical.insert ?at cases)
-            in
+            let at = Tactical.at s in
             let open Qed.Logic in
             match Lang.F.repr e with
-            | Leq(x,y) -> split_cmp "Split (comp.)" x y
-            | Lt(x,y) ->
-                let x = if F.is_int x then F.(e_add x e_one) else x in
-                split_cmp "Split (comp.)" x y
-            | Eq(x,y)  when not (is_prop x || is_prop y) ->
-                split_cmp "Split (eq.)" x y
-            | Neq(x,y) when not (is_prop x || is_prop y) ->
-                split_cmp "Split (neq.)" x y
+            | Leq(x,y) -> split_leq at x y
+            | Lt(x,y) -> split_lt at x y
+            | Eq(x,y) when not (is_prop x || is_prop y) -> split_eq at x y
+            | Neq(x,y) when not (is_prop x || is_prop y) -> split_neq at x y
             | _ when F.is_prop e ->
                 feedback#set_title "Split (true,false)" ;
                 feedback#set_descr "Decompose between True and False values" ;
@@ -384,17 +387,13 @@ class split =
                       ] in
                       Applicable (Tactical.replace ~at:step.id cases)
                   | Neq(x,y) when not (is_prop x || is_prop y) ->
-                      feedback#set_title "Split (<>)";
-                      feedback#set_descr "Decompose into two comparisons (<, >)" ;
-                      let cases = ["Lt", When F.(p_bool (e_lt x y));
-                                   "Gt", When F.(p_bool (e_lt y x))] in
-                      Applicable (Tactical.replace ~at:step.id cases)
-                  | Leq(x,y) when not (is_prop x || is_prop y) ->
-                      feedback#set_title "Split (<=)";
-                      feedback#set_descr "Decompose into two comparisons (<, =)" ;
-                      let cases = ["Lt", When F.(p_bool (e_lt x y));
-                                   "Eq", When F.(p_bool (e_eq y x))] in
-                      Applicable (Tactical.replace ~at:step.id cases)
+                      split_neq (Some step.id) x y
+                  | Eq(x,y) when not (is_prop x || is_prop y) ->
+                      split_eq (Some step.id) x y
+                  | Lt(x,y) ->
+                      split_lt (Some step.id) x y
+                  | Leq(x,y) ->
+                      split_leq (Some step.id) x y
                   | If(c,p,q) ->
                       feedback#set_title "Split (if)" ;
                       feedback#set_descr "Split Conditional into Branches" ;
@@ -402,6 +401,20 @@ class split =
                       let q = F.p_bool (F.e_and [e_not c;q]) in
                       let cases = [ "Then" , When p ; "Else" , When q ] in
                       Applicable (Tactical.replace ~at:step.id cases)
+                  | And ps ->
+                      let cond p = (* keep original kind of step *)
+                        match step.condition with
+                        | Type _ -> Type p
+                        | Have _ -> Have p
+                        | When _ -> When p
+                        | Core _ -> Core p
+                        | Init _ -> Init p
+                        | _ -> assert false (* see above pattern matching *)
+                      in
+                      feedback#set_title "Split (conjunction)" ;
+                      feedback#set_descr "Split conjunction into steps" ;
+                      let ps = List.map (fun p -> cond @@ p_bool p) ps in
+                      Applicable (Tactical.replace_step ~at:step.id ps)
                   | _ ->
                       Not_applicable
                 end
