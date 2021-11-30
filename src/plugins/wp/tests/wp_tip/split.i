@@ -52,11 +52,23 @@ void test_step_and(void) {}
 
 /*@ requires LP == LQ ;
   @ ensures S ; */
-void test_step_eq(void) {}
+void test_step_peq(void) {}
 
 /*@ requires LP != LQ ;
   @ ensures S ; */
+void test_step_pneq(void) {}
+
+/*@ requires a != b ;
+  @ ensures S ; */
 void test_step_neq(void) {}
+
+/*@ requires a <= b ;
+  @ ensures S ; */
+void test_step_leq(void) {}
+
+/*@ requires a < b ;
+  @ ensures S ; */
+void test_step_lt(void) {}
 
 /*@ requires (a < b) ? P : Q ;
   @ ensures S ; */
@@ -69,7 +81,6 @@ void test_step_fa_if(void) {}
 /*@ requires \forall integer i ; Pi(i) || P || Qi(i) || Q || R ;
   @ ensures S ; */
 void test_step_fa_or(void) {}
-
 
 /*@ requires \forall integer i ; Pi(i) && P && Qi(i) && Q && R ;
   @ ensures S ; */
