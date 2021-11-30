@@ -41,7 +41,7 @@ and running \FramaC are described below.
 \item[A \C compiler]\index{C compiler} is required to compile the \FramaC
   kernel.
 \item[A \tool{Unix}-like compilation environment] with at least the tool
-  \texttt{GNU make}\footnote{\url{http://www.gnu.org/software/make}},
+  \texttt{GNU make}\footnote{\url{http://www.gnu.org/software/make}} $\ge 4.0$,
   as well as various POSIX commands, libraries and header files, is necessary
   for compiling \FramaC and its plug-ins.
 \item[The \caml compiler]\index{OCaml compiler}\footnote{\url{http://ocaml.org}}
@@ -55,54 +55,60 @@ etc., are listed in the \texttt{INSTALL.md} and \texttt{opam/opam} files.
 
 \section{One Framework, Several Executables}\label{sec:modes}
 
-\FramaC installs some executables\footnote{On Windows OS, the
-  usual extension \texttt{.exe} is added to each file name.}, namely:
+The main executables installed by \FramaC are:
+
 \begin{itemize}
-\item \texttt{frama-c}\codeidx{frama-c}: natively-compiled batch version;
-\item \texttt{frama-c.byte}\codeidx{frama-c.byte}: bytecode batch version;
-\item \texttt{frama-c-gui}\codeidx{frama-c-gui}: natively-compiled interactive
-  version;
-\item \texttt{frama-c-gui.byte}\codeidx{frama-c-gui.byte}: bytecode interactive version;
+\item \texttt{frama-c}\codeidx{frama-c}: batch version (command line);
+\item \texttt{frama-c-gui}\codeidx{frama-c-gui}: interactive version (graphical interface).
+\end{itemize}
+
+\begin{description}
+\item[Batch version]\index{Batch version}
+
+  The \texttt{frama-c} binary can be used to perform most \FramaC analyses:
+  from parsing the sources to running complex analyses, on-demand or as part
+  of a continuous integration pipeline. Many analyses can display their output
+  in simple text form, but some structured results (HTML, CSV or JSON) are
+  also available. For instance, a SARIF~(see Section~\ref{sarif}) output
+  based on JSON is can be produced by the \tool{Markdown Report} plug-in.
+  While the batch version is very powerful, it does not offer the visualization
+  features of the interactive version.
+
+\item[Interactive version]\index{Interactive version}
+  The interactive version is a GUI that can be used to select the set of files
+  to analyze, specify options, launch analyses, browse the code and observe
+  analysis results at one's convenience (see Chapter~\ref{user-gui} for
+  details). For instance, you can hover over an expression in the code and
+  obtain immediate syntactic and semantic information about it; or use context
+  menus for easy code navigation.
+  However, the initial analysis setup (especially parsing) can be complex for
+  some projects, and the batch version is better suited for providing error
+  messages at this stage.
+
+\end{description}
+
+Both versions are complementary: the batch version is recommended
+for initial setup and analysis, while the interactive version is recommended for
+results visualization and interactive proofs.
+
+Besides these two executables, \FramaC also provides a few other command line
+binaries:
+\begin{itemize}
 \item \texttt{frama-c-config}\codeidx{frama-c-config}: auxiliary batch version for
-  quickly retrieving configuration information (e.g. installation path);
+  quickly retrieving configuration information (e.g. installation paths);
+  it is only useful for scripting and running a large amount of analyses;
 \item \texttt{frama-c-script}\codeidx{frama-c-script}: contains several
   utilities related to source preparation, results visualization and analysis
   automation. Run it without arguments to obtain more details.
 \end{itemize}
-The differences between these versions are described below.
-\begin{description}
-\item[\emph{native-compiled \emph{vs} bytecode}:]
-  \index{Native-compiled|bfit}\index{Bytecode|bfit} native executables contain
-  machine code, while bytecode executables contain machine-independent
-  instructions which are run by a bytecode interpreter.
 
-  The native-compiled version is usually ten times faster than the bytecode one.
-  The bytecode is sometimes able to provide better debugging information.
-  Use the native-compiled version unless you have a specific reason to use the
-  bytecode one.
-
-\item[\emph{batch \emph{vs} interactive}:]\index{Batch
-    version}\index{Interactive version} The interactive version is a
-  GUI that can be used to select the set of files to analyze, specify
-  options, launch analyses, browse the code and observe analysis
-  results at one's convenience (see Chapter~\ref{user-gui} for details).
-
-  With the batch version, all settings and actions
-  must be provided on the command-line. This is not possible for all plug-ins,
-  nor is it always easy for beginners.
-  Modulo the limited user interactions, the batch version allows
-  the same analyses as the interactive version\footnote{For a single analysis
-    project. Multiple projects can only be handled in the interactive version
-   or programmatically. See Section~\ref{sec:project}}.
-  A batch analysis session consists in launching \FramaC in a
-  terminal. Results are printed on the standard output.
-
-  The task of analyzing some \C code being iterative and error-prone,
-  \FramaC provides functionalities to set up an analysis project,
-  observe preliminary results, and progress until a complete and
-  satisfactory analysis of the desired code is obtained.
-
-\end{description}
+Finally, note that the two main binaries (\texttt{frama-c} and
+\texttt{frama-c-gui} are also provided in {\em bytecode} version, as
+\texttt{frama-c.byte} and \texttt{frama-c-gui.byte}.
+\index{Native-compiled|bfit}\index{Bytecode|bfit}
+The bytecode is sometimes able to provide better debugging information;
+but since the native-compiled version is usually much faster (10x),
+use the latter unless you have a specific reason to use the bytecode one.
 
 \section{\FramaC Command Line and General Options}\index{Options}
 
@@ -145,6 +151,11 @@ all documented with \texttt{-kernel-h}:
 
 There are many aliases for these options, but for backward compatibility purposes only.
 Those listed above should be used for scripting.
+Note that, for all of these options except \texttt{-plugins},
+you can use \texttt{frama-c-config} (instead of \texttt{frama-c}),
+which offers faster loading times.
+This is unnecessary for occasional usage, but when running hundreds of
+instances of short analyses on \FramaC, the difference is significant.
 
 For a more thorough display of configuration-related data, in JSON format,
 use option \optiondef{-}{print-config-json}. Note that the data output by this

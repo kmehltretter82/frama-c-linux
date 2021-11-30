@@ -203,7 +203,34 @@ let dup_global loc spec sound_verdict_vi kf vi new_vi =
       let e = Emitter.Usable_emitter.get ep.emitter in
       if ep.logical_consequence
       then logical_consequence e new_ip ep.properties
-      else emit e new_ip ~hyps:ep.properties status
+      else
+        let status, hyps =
+          match status, ep.properties with
+          | True, _ | Dont_know, _
+          | False_and_reachable, [] | False_if_reachable, [] ->
+            (* Valid emission: either [true] status with arbitrary hypotheses or
+               [false] status with empty hypotheses. *)
+            status, ep.properties
+          | False_and_reachable, [ IPReachable _ ]
+          | False_if_reachable, [ IPReachable _ ] ->
+            (* [False] status with a reachability hypothesis: remove the
+               hypothesis and set the status to [False_if_reachable]. *)
+            False_if_reachable, []
+          | False_and_reachable, hyps | False_if_reachable, hyps ->
+            (* Invalid emission: [false] status with arbitrary hypotheses. *)
+            Options.fatal
+              "Property with status '%s' and non-empty hypotheses:\n\
+               * Property: %a\n\
+               * Hypotheses:\n- %a"
+              (match status with
+               | True -> "True"
+               | Dont_know -> "Dont_know"
+               | False_if_reachable -> "False_if_reachable"
+               | False_and_reachable -> "False_and_reachable")
+              Property.short_pretty new_ip
+              (Pretty_utils.pp_list ~sep:"\n- " Property.short_pretty) hyps
+        in
+        emit e new_ip ~hyps status
     in
     match get old_ip with
     | Never_tried ->
@@ -212,9 +239,9 @@ let dup_global loc spec sound_verdict_vi kf vi new_vi =
       List.iter (cp s) epl
     | Inconsistent icst ->
       List.iter (cp True) icst.valid;
-      (* either the program is reachable and [False_and_reachable] is
-         fine, or the program point is not reachable and it does not
-         matter for E-ACSL that checks it at runtime. *)
+      (* Copy invalid properties with [False_and_reachable], if a reachability
+         hypothesis is present then the [cp] function will convert it to
+         [False_if_reachable]. *)
       List.iter (cp False_and_reachable) icst.invalid
   in
   let ips kf s = Property.ip_of_spec kf Kglobal ~active:[] s in
