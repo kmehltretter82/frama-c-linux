@@ -2039,7 +2039,7 @@ struct
       | _,typ ->
         { term with
           term_node = Tlambda(quants, term);
-          term_type = Larrow(List.map (fun x -> x.lv_type) quants,typ) }
+          term_type = make_arrow_type quants typ }
     in
     let rec aux known_vars kont term =
       match term.term_node with
@@ -2948,7 +2948,7 @@ struct
         | _ -> [],tdef
       in
       var.l_type <- Some tdef.term_type;
-      var.l_var_info.lv_type <- tdef.term_type;
+      var.l_var_info.lv_type <- make_arrow_type args tdef.term_type;
       var.l_profile <- args;
       var.l_body <- LBterm tdef;
       let env = Lenv.add_logic_info ident var env in
@@ -3455,10 +3455,8 @@ struct
       in
       let var = Cil_const.make_logic_info_local x in
       var.l_profile <- args;
-      var.l_var_info.lv_type <-
-        (match typ with
-           None -> Ctype (Cil.voidType)
-         | Some t -> t);
+      let rt = Option.value typ ~default:(Ctype Cil.voidType) in
+      var.l_var_info.lv_type <- make_arrow_type args rt;
       var.l_type <- typ;
       var.l_body <- tdef;
       let env = Lenv.add_logic_info x var env in
@@ -4003,13 +4001,8 @@ struct
        - Polymorphism is not reflected on the lvar level.
        - However, such lvar should rarely if at all be seen under a Tvar.
     *)
-    (match p,t with
-       _,None -> ()
-     | [], Some t ->
-       info.l_var_info.lv_type <- t
-     | _,Some t ->
-       let typ = Larrow (List.map (fun x -> x.lv_type) p,t) in
-       info.l_var_info.lv_type <- typ);
+    let rt = Option.value t ~default:(Ctype Cil.voidType) in
+    info.l_var_info.lv_type <- make_arrow_type p rt;
     info.l_tparams <- poly;
     info.l_profile <- p;
     info.l_type <- t;
