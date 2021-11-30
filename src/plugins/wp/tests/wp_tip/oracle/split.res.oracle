@@ -247,11 +247,11 @@
   Goal Wp.Tactical.typed_test_step_and_ensures-0 (generated):
   Assume {
     (* Pre-condition *)
-    Have: P_R.
+    Have: P_P.
     (* Pre-condition *)
     Have: P_Q.
     (* Pre-condition *)
-    Have: P_P.
+    Have: P_R.
   }
   Prove: P_S.
   

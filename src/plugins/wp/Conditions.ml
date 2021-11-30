@@ -1740,7 +1740,7 @@ let step_at seq k =
 let in_sequence_add_list ~replace =
   let rec in_list k h w =
     if k = 0 then
-      List.rev_append h
+      List.rev_append (List.rev h)
         (if replace
          then match w with
            | [] -> assert false
