@@ -114,6 +114,62 @@ sed 's|@FRAMAC_TESTS@|sudo apk add ncurses \&\& cd /frama-c \&\& make tests PTES
 sed 's|@OCAMLV@|4.08|g' | \
 cat > $@
 
+24.0-stripped: Dockerfile.24.0
+	docker build . -t framac/frama-c:$@ --target frama-c-stripped -f $^ \
+--build-arg=from_archive=https://www.frama-c.com/download/frama-c-24.0-Chromium.tar.gz $(ARGS)
+TARGETS += 24.0-stripped
+
+24.0: Dockerfile.24.0
+	docker build . -t framac/frama-c:$@ --target frama-c-slim -f $^ \
+--build-arg=from_archive=https://www.frama-c.com/download/frama-c-24.0-Chromium.tar.gz $(ARGS)
+TARGETS += 24.0
+
+24.0-gui: Dockerfile.24.0
+	docker build . -t framac/frama-c-gui:24.0 --target frama-c-gui-slim -f $^ \
+--build-arg=from_archive=https://www.frama-c.com/download/frama-c-24.0-Chromium.tar.gz $(ARGS)
+TARGETS += 24.0-gui
+
+push-24.0: 24.0 24.0-gui 24.0-stripped
+	docker push framac/frama-c:24.0
+	docker push framac/frama-c-gui:24.0
+	docker push framac/frama-c:24.0-stripped
+
+# Note: alpine-3.14 has Z3 version 4.8.11, which is not supported in some
+# versions of Why3, so we remain with alpine-3.13 for now.
+Dockerfile.24.0: Makefile Dockerfile.template env.template
+	sed 's|@ALPINE_OPAM_BASE@|ocaml/opam:alpine-3.13-ocaml-4.08|g' Dockerfile.template | \
+sed 's|@ALPINE_BASE@|alpine:3.13|g' | \
+sed 's|@ENV@|$(shell cat env.template)|g' | \
+sed 's|@CVC4@|$(shell cat cvc4.template)|g' | \
+sed 's|@CVC4_VERSION@|1.7|g' | \
+sed 's|@Z3@|$(shell cat z3.template)|g' | \
+sed 's|@OPAM_CACHE_FIX@|opam repository set-url default https://opam.ocaml.org \&\&|g' | \
+sed 's|@OPAM_SWITCH@|true|g' | \
+sed 's|@OPAM_DEPS@|\\\
+alt-ergo.2.2.0 \\\
+apron.v0.9.12 \\\
+conf-graphviz.0.1 \\\
+mlgmpidl.1.2.12 \\\
+ocamlfind.1.8.1 \\\
+ocamlgraph.1.8.8 \\\
+ppx_deriving_yojson.3.5.2 \\\
+why3.1.4.0 \\\
+yojson.1.7.0 \\\
+zarith.1.9.1 \\\
+zmq.5.1.3 \\\
+conf-python-3.1.0.0 \\\
+conf-time.1|' | \
+sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@WP_REPORT@|-wp -report|g'| \
+sed 's|@WHY3_CONFIG@|why3 config detect|g' | \
+sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,z3|g' | \
+sed 's|@GUI_ALPINE_DEPS@||g' | \
+sed 's|@GUI_OPAM_DEPS@|lablgtk3 lablgtk3-sourceview3 conf-gtksourceview3|g' | \
+sed 's|@GUI_REMAKE@|make clean \&\& ./configure --enable-gui \&\& make -j \&\& sudo make install|g' | \
+sed 's|@FRAMAC_TESTS@|sudo apk add ncurses \&\& cd /frama-c \&\& make tests PTESTS_OPTS=-error-code|g' | \
+sed 's|@OCAMLV@|4.08|g' | \
+cat > $@
+
 23.1-stripped: Dockerfile.23.1
 	docker build . -t framac/frama-c:$@ --target frama-c-stripped -f $^ \
 --build-arg=from_archive=https://www.frama-c.com/download/frama-c-23.1-Vanadium.tar.gz $(ARGS)
