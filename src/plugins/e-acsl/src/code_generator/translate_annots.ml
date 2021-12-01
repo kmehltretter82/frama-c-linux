@@ -63,7 +63,7 @@ let pre_code_annotation kf stmt env annot =
         if l <> [] then
           Env.not_yet env "@[assertion applied only on some behaviors@]";
         Env.with_rte env true
-          ~f:(fun env -> Translate_predicates.translate_predicate kf env p)
+          ~f:(fun env -> Translate_predicates.do_it kf env p)
       else
         env
     | AStmtSpec(l, spec) ->
@@ -81,7 +81,7 @@ let pre_code_annotation kf stmt env annot =
           Env.not_yet env "@[invariant applied only on some behaviors@]";
         let env =
           Env.with_rte env true
-            ~f:(fun env -> Translate_predicates.translate_predicate kf env p)
+            ~f:(fun env -> Translate_predicates.do_it kf env p)
         in
         if loop_invariant then
           Env.add_loop_invariant env p

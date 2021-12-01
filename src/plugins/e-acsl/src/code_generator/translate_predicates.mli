@@ -24,7 +24,7 @@ open Cil_types
 
 (** Generate C implementations of E-ACSL predicates. *)
 
-val predicate_to_exp:
+val to_exp:
   adata:Assert.t ->
   ?name:string ->
   kernel_function ->
@@ -34,7 +34,7 @@ val predicate_to_exp:
   exp * Assert.t * Env.t
 (** Convert an ACSL predicate into a corresponding C expression. *)
 
-val generalized_untyped_predicate_to_exp:
+val generalized_untyped_to_exp:
   adata:Assert.t ->
   ?name:string ->
   kernel_function ->
@@ -44,7 +44,7 @@ val generalized_untyped_predicate_to_exp:
   exp * Assert.t * Env.t
 (** Convert an untyped ACSL predicate into a corresponding C expression. *)
 
-val translate_predicate:
+val do_it:
   ?pred_to_print:predicate ->
   kernel_function ->
   Env.t ->
@@ -54,11 +54,11 @@ val translate_predicate:
     If [pred_to_print] is set, then the runtime check will use this predicate as
     message. *)
 
-exception No_simple_predicate_translation of predicate
-(** Exceptin raised if [untyped_predicate_to_exp] would generate new statements
-    in the environment *)
+exception No_simple_translation of predicate
+(** Exceptin raised if [untyped_to_exp] would generate new statements in the
+    environment *)
 
-val untyped_predicate_to_exp: predicate -> exp
+val untyped_to_exp: predicate -> exp
 (** Convert an untyped ACSL predicate into a corresponding C expression. This
     expression is valid only in certain contexts and shouldn't be used. *)
 

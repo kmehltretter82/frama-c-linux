@@ -215,7 +215,7 @@ let add_new_block_in_stmt env kf stmt =
           List.iter
             (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env))
             rtes;
-          Translate_rtes.translate_rte_annots Printer.pp_stmt stmt kf env rtes
+          Translate_rtes.rte_annots Printer.pp_stmt stmt kf env rtes
         end else
           env
       in

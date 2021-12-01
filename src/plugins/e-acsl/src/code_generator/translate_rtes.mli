@@ -24,7 +24,7 @@ open Cil_types
 
 (** Generate and translate RTE annotations. *)
 
-val translate_rte_annots:
+val rte_annots:
   (Format.formatter -> 'a -> unit) ->
   'a ->
   kernel_function ->
@@ -34,7 +34,7 @@ val translate_rte_annots:
 (** Translate the given RTE annotations into runtime checks in the given
     environment. *)
 
-val translate_rte: ?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp -> Env.t
+val exp: ?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp -> Env.t
 (** Generate RTE annotations from the given expression and translate them in the
     given environment. *)
 

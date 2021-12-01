@@ -135,7 +135,7 @@ let rec thost_to_host kf env th = match th with
      | Var v -> Var v, env, "result"
      | _ -> assert false)
   | TMem t ->
-    let e, _, env = term_to_exp ~adata:Assert.no_data kf env t in
+    let e, _, env = to_exp ~adata:Assert.no_data kf env t in
     Mem e, env, ""
 
 and toffset_to_offset ?loc kf env = function
@@ -144,7 +144,7 @@ and toffset_to_offset ?loc kf env = function
     let offset, env = toffset_to_offset ?loc kf env offset in
     Field(f, offset), env
   | TIndex(t, offset) ->
-    let e, _, env = term_to_exp ~adata:Assert.no_data kf env t in
+    let e, _, env = to_exp ~adata:Assert.no_data kf env t in
     let offset, env = toffset_to_offset kf env offset in
     Index(e, offset), env
   | TModel _ -> Env.not_yet env "model"
@@ -171,8 +171,8 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
       | Some e -> e
       | _ -> Options.fatal "unexpected error in \\sum translation"
     in
-    let e_min, adata, env = term_to_exp ~adata kf env t_min in
-    let e_max, adata, env = term_to_exp ~adata kf env t_max in
+    let e_min, adata, env = to_exp ~adata kf env t_min in
+    let e_max, adata, env = to_exp ~adata kf env t_max in
     let k_as_varinfo, k_as_exp, env = Env.Logic_binding.add ~ty:ty_k env kf k in
     let init_k_stmt = Gmp.init_set ~loc (Cil.var k_as_varinfo) k_as_exp e_min in
     (* variable initialization *)
@@ -196,7 +196,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     in
     (* lambda_as_varinfo assignment *)
     let env = Env.push env in
-    let e_lbd, _, env = term_to_exp ~adata:Assert.no_data kf env lt in
+    let e_lbd, _, env = to_exp ~adata:Assert.no_data kf env lt in
     Interval.Env.remove k;
     let lbd_stmt,env =
       Env.pop_and_get env
@@ -276,7 +276,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let adata, env = Assert.register_term ~loc kf env ~force:true t e adata in
     e, adata, env, Typed_number.C_number, "sizeof"
   | TSizeOfE t' ->
-    let e', _, env = term_to_exp ~adata:Assert.no_data kf env t' in
+    let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
     let e = Cil.sizeOf ~loc (Cil.typeOf e') in
     let adata, env = Assert.register_term ~loc kf env ~force:true t e adata in
     e, adata, env, Typed_number.C_number, "sizeof"
@@ -289,13 +289,13 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let adata, env = Assert.register_term ~loc kf env t e adata in
     e, adata, env, Typed_number.C_number, "alignof"
   | TAlignOfE t' ->
-    let e', _, env = term_to_exp ~adata:Assert.no_data kf env t' in
+    let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
     let e = Cil.new_exp ~loc (AlignOfE e') in
     let adata, env = Assert.register_term ~loc kf env t e adata in
     e, adata, env, Typed_number.C_number, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
     let ty = Typing.get_typ ~lenv t in
-    let e, adata, env = term_to_exp ~adata kf env t' in
+    let e, adata, env = to_exp ~adata kf env t' in
     if Gmp_types.Z.is_t ty then
       let name, vname = match op with
         | Neg -> "__gmpz_neg", "neg"
@@ -339,14 +339,14 @@ and context_insensitive_term_to_exp ~adata kf env t =
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Cil.isIntegralType ty);
-      let e, adata, env = term_to_exp ~adata kf env t in
+      let e, adata, env = to_exp ~adata kf env t in
       let e = Smart_exp.lnot ~loc e in
       e, adata, env, Typed_number.C_number, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
     let ty = Typing.get_typ ~lenv t in
-    let e1, adata, env = term_to_exp ~adata kf env t1 in
-    let e2, adata, env = term_to_exp ~adata kf env t2 in
+    let e1, adata, env = to_exp ~adata kf env t1 in
+    let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       let name = Gmp.name_of_mpz_arith_bop bop in
       let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
@@ -368,8 +368,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
     end
   | TBinOp(Div | Mod as bop, t1, t2) ->
     let ty = Typing.get_typ ~lenv t in
-    let e1, adata, env = term_to_exp ~adata kf env t1 in
-    let t2_to_exp adata env = term_to_exp ~adata kf env t2 in
+    let e1, adata, env = to_exp ~adata kf env t1 in
+    let t2_to_exp adata env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       (* Creating a second assertion context that will hold the data contributing
          to the guard of the denominator. The context will be merged to [adata]
@@ -434,8 +434,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | TBinOp((Shiftlt | Shiftrt) as bop, t1, t2) ->
     (* left/right shift *)
     let ty = Typing.get_typ ~lenv t in
-    let t1_to_exp adata env = term_to_exp ~adata kf env t1 in
-    let t2_to_exp adata env = term_to_exp ~adata kf env t2 in
+    let t1_to_exp adata env = to_exp ~adata kf env t1 in
+    let t2_to_exp adata env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       (* Creating secondary assertion contexts [adata1] and [adata2] to hold the
          data contributing to the guards of [t1] and [t2].
@@ -621,10 +621,10 @@ and context_insensitive_term_to_exp ~adata kf env t =
       Extlib.flatten
         (Env.with_rte_and_result env true
            ~f:(fun env ->
-               let e1, adata, env1 = term_to_exp ~adata kf env t1 in
+               let e1, adata, env1 = to_exp ~adata kf env t1 in
                let env' = Env.push env1 in
                let e2, adata, env2 =
-                 term_to_exp ~adata kf (Env.push env') t2
+                 to_exp ~adata kf (Env.push env') t2
                in
                let res2 = e2, env2 in
                Extlib.nest
@@ -640,9 +640,9 @@ and context_insensitive_term_to_exp ~adata kf env t =
       Extlib.flatten
         (Env.with_rte_and_result env true
            ~f:(fun env ->
-               let e1, adata, env1 = term_to_exp ~adata kf env t1 in
+               let e1, adata, env1 = to_exp ~adata kf env t1 in
                let e2, adata, env2 =
-                 term_to_exp ~adata kf (Env.push env1) t2
+                 to_exp ~adata kf (Env.push env1) t2
                in
                let res2 = e2, env2 in
                let env3 = Env.push env2 in
@@ -656,8 +656,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
     (* other logic/arith operators  *)
     let ty = Typing.get_typ ~lenv t in
-    let e1, adata, env = term_to_exp ~adata kf env t1 in
-    let e2, adata, env = term_to_exp ~adata kf env t2 in
+    let e1, adata, env = to_exp ~adata kf env t1 in
+    let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       let mk_stmts _v e =
         let name = Gmp.name_of_mpz_arith_bop bop in
@@ -685,15 +685,15 @@ and context_insensitive_term_to_exp ~adata kf env t =
       | Ctype ty -> ty
       | _ -> assert false
     in
-    let e1, adata, env = term_to_exp ~adata kf env t1 in
-    let e2, adata, env = term_to_exp ~adata kf env t2 in
+    let e1, adata, env = to_exp ~adata kf env t1 in
+    let e2, adata, env = to_exp ~adata kf env t2 in
     let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp(MinusPP, t1, t2) ->
     begin match Typing.get_number_ty ~lenv t with
       | Typing.C_integer _ ->
-        let e1, adata, env = term_to_exp ~adata kf env t1 in
-        let e2, adata, env = term_to_exp ~adata kf env t2 in
+        let e1, adata, env = to_exp ~adata kf env t1 in
+        let e2, adata, env = to_exp ~adata kf env t2 in
         let ty = Typing.get_typ ~lenv t in
         let e = Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)) in
         e, adata, env, Typed_number.C_number, ""
@@ -703,7 +703,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
         assert false
     end
   | TCastE(ty, t') ->
-    let e, adata, env = term_to_exp ~adata kf env t' in
+    let e, adata, env = to_exp ~adata kf env t' in
     let e, env =
       Typed_number.add_cast
         ~loc
@@ -742,7 +742,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | Tapp(_, _ :: _, _) ->
     Env.not_yet env "logic functions with labels"
   | Tlambda(_, lt) ->
-    let exp, adata, env = term_to_exp ~adata kf env lt in
+    let exp, adata, env = to_exp ~adata kf env lt in
     exp, adata, env, Typed_number.C_number, ""
   | TDataCons _ -> Env.not_yet env "constructor"
   | Tif(t1, t2, t3) ->
@@ -750,13 +750,13 @@ and context_insensitive_term_to_exp ~adata kf env t =
       Extlib.flatten
         (Env.with_rte_and_result env true
            ~f:(fun env ->
-               let e1, adata, env1 = term_to_exp ~adata kf env t1 in
+               let e1, adata, env1 = to_exp ~adata kf env t1 in
                let e2, adata, env2 =
-                 term_to_exp ~adata kf (Env.push env1) t2
+                 to_exp ~adata kf (Env.push env1) t2
                in
                let res2 = e2, env2 in
                let e3, adata, env3 =
-                 term_to_exp ~adata kf (Env.push env2) t3
+                 to_exp ~adata kf (Env.push env2) t3
                in
                let res3 = e3, env3 in
                Extlib.nest
@@ -766,7 +766,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     in
     e, adata, env, Typed_number.C_number, ""
   | Tat(t, BuiltinLabel Here) ->
-    let e, adata, env = term_to_exp ~adata kf env t in
+    let e, adata, env = to_exp ~adata kf env t in
     e, adata, env, Typed_number.C_number, ""
   | Tat(t', label) ->
     let lscope = Env.Logic_scope.get env in
@@ -776,7 +776,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
       let adata, env = Assert.register_term ~loc kf env t e adata in
       e, adata, env, Typed_number.C_number, ""
     else
-      let e, _, env = term_to_exp ~adata:Assert.no_data kf (Env.push env) t' in
+      let e, _, env = to_exp ~adata:Assert.no_data kf (Env.push env) t' in
       let e, env, sty = Translate_utils.at_to_exp_no_lscope kf env (Some t) label e in
       let adata, env = Assert.register_term ~loc kf env t e adata in
       e, adata, env, sty, ""
@@ -828,14 +828,14 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
-    let e, adata, env = term_to_exp ~adata kf env t in
+    let e, adata, env = to_exp ~adata kf env t in
     Interval.Env.remove li.l_var_info;
     e, adata, env, Typed_number.C_number, ""
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
    constructs. *)
-and term_to_exp ~adata kf env t =
+and to_exp ~adata kf env t =
   let generate_rte = Env.generate_rte env in
   Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)in local \
                                    environment '%a'"
@@ -865,16 +865,16 @@ and term_to_exp ~adata kf env t =
          ))
 
 let () =
-  Translate_utils.term_to_exp_ref := term_to_exp;
-  Loops.term_to_exp_ref := term_to_exp;
-  At_with_lscope.term_to_exp_ref := term_to_exp;
-  Memory_translate.term_to_exp_ref := term_to_exp;
-  Logic_functions.term_to_exp_ref := term_to_exp
+  Translate_utils.term_to_exp_ref := to_exp;
+  Loops.term_to_exp_ref := to_exp;
+  At_with_lscope.term_to_exp_ref := to_exp;
+  Memory_translate.term_to_exp_ref := to_exp;
+  Logic_functions.term_to_exp_ref := to_exp
 
-exception No_simple_term_translation of term
+exception No_simple_translation of term
 
 (* This function is used by plug-in [Cfp]. *)
-let untyped_term_to_exp typ t =
+let untyped_to_exp typ t =
   (* infer a context from the given [typ] whenever possible *)
   let ctx_of_typ ty =
     if Gmp_types.Z.is_t ty then Typing.gmpz
@@ -890,10 +890,10 @@ let untyped_term_to_exp typ t =
   let env = Env.push Env.empty in
   let env = Env.rte env false in
   let e, _, env =
-    try term_to_exp ~adata:Assert.no_data (Kernel_function.dummy ()) env t
-    with Rtl.Symbols.Unregistered _ -> raise (No_simple_term_translation t)
+    try to_exp ~adata:Assert.no_data (Kernel_function.dummy ()) env t
+    with Rtl.Symbols.Unregistered _ -> raise (No_simple_translation t)
   in
-  if not (Env.has_no_new_stmt env) then raise (No_simple_term_translation t);
+  if not (Env.has_no_new_stmt env) then raise (No_simple_translation t);
   e
 
 (*

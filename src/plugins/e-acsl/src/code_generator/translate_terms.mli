@@ -24,7 +24,7 @@ open Cil_types
 
 (** Generate C implementations of E-ACSL terms. *)
 
-val term_to_exp:
+val to_exp:
   adata:Assert.t ->
   kernel_function ->
   Env.t ->
@@ -32,11 +32,11 @@ val term_to_exp:
   exp * Assert.t * Env.t
 (** Convert an ACSL term into a corresponding C expression. *)
 
-exception No_simple_term_translation of term
-(** Exceptin raised if [untyped_term_to_exp] would generate new statements in
+exception No_simple_translation of term
+(** Exceptin raised if [untyped_to_exp] would generate new statements in
     the environment *)
 
-val untyped_term_to_exp: typ option -> term -> exp
+val untyped_to_exp: typ option -> term -> exp
 (** Convert an untyped ACSL term into a corresponding C expression. *)
 
 (**************************************************************************)

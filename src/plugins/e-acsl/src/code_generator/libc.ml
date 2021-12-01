@@ -203,7 +203,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
     e, env
   | Typing.(C_integer _ | C_float _) as nty ->
     (* We know that [t] can be translated to a C type, so we start with that *)
-    let e, _, env = Translate_terms.term_to_exp ~adata:Assert.no_data kf env t in
+    let e, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf env t in
     (* Then we can check if the expression will fit in a [size_t] *)
     let sizet = Cil.(theMachine.typeOfSizeOf) in
     let sizet_kind = Cil.(theMachine.kindOfSizeOf) in

@@ -99,7 +99,7 @@ end = struct
   let set_assumes ~loc env kf contract idx assumes =
     let idx_e = Cil.integer ~loc idx in
     let assumes_e, _, env =
-      Translate_predicates.generalized_untyped_predicate_to_exp
+      Translate_predicates.generalized_untyped_to_exp
         ~adata:Assert.no_data
         kf
         env
@@ -327,7 +327,7 @@ let check_default_requires kf kinstr env contract =
            let tp_requires = ip_requires.ip_content in
            let loc = tp_requires.tp_statement.pred_loc in
            Cil.CurrentLoc.set loc;
-           Translate_predicates.translate_predicate kf env tp_requires
+           Translate_predicates.do_it kf env tp_requires
          else
            env)
       env
@@ -368,7 +368,7 @@ let check_other_requires kf kinstr env contract =
                  (* Create runtime check *)
                  let adata, env = Assert.empty ~loc kf env in
                  let requires_e, adata, env =
-                   Translate_predicates.generalized_untyped_predicate_to_exp
+                   Translate_predicates.generalized_untyped_to_exp
                      ~adata
                      kf
                      env
@@ -653,7 +653,7 @@ let check_post_conds kf kinstr env contract =
              | Normal ->
                (* If translating the default behavior, directly translate the
                   predicate *)
-               Translate_predicates.translate_predicate kf env tp_post_cond
+               Translate_predicates.do_it kf env tp_post_cond
              | Exits | Breaks | Continues | Returns ->
                Error.print_not_yet "abnormal termination case in behavior";
                env
@@ -691,7 +691,7 @@ let check_post_conds kf kinstr env contract =
                      (* Create runtime check *)
                      let adata, env = Assert.empty ~loc kf env in
                      let post_cond_e, adata, env =
-                       Translate_predicates.generalized_untyped_predicate_to_exp
+                       Translate_predicates.generalized_untyped_to_exp
                          ~adata
                          kf
                          env

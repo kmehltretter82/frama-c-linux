@@ -25,7 +25,7 @@
 open Cil_types
 let dkey = Options.dkey_translation
 
-let translate_rte_annots pp elt kf env l =
+let rte_annots pp elt kf env l =
   let old_kind = Env.annotation_kind env in
   let env = Env.set_annotation_kind env Smart_stmt.RTE in
   let env =
@@ -42,7 +42,7 @@ let translate_rte_annots pp elt kf env l =
                 let env = Env.Logic_scope.set_reset env false in
                 let env =
                   Env.with_rte env false
-                    ~f:(fun env -> Translate_predicates.translate_predicate kf env p)
+                    ~f:(fun env -> Translate_predicates.do_it kf env p)
                 in
                 let env = Env.Logic_scope.set_reset env lscope_reset_old in
                 env)
@@ -54,9 +54,9 @@ let translate_rte_annots pp elt kf env l =
   Env.set_annotation_kind env old_kind
 
 let () =
-  Translate_predicates.translate_rte_annots_ref := translate_rte_annots
+  Translate_predicates.translate_rte_annots_ref := rte_annots
 
-let translate_rte ?filter kf env e =
+let exp ?filter kf env e =
   let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
   let l = Rte.exp kf stmt e in
   let l =
@@ -65,12 +65,12 @@ let translate_rte ?filter kf env e =
     | None -> l
   in
   List.iter (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env)) l;
-  translate_rte_annots Printer.pp_exp e kf env l
+  rte_annots Printer.pp_exp e kf env l
 
 let () =
-  Translate_terms.translate_rte_exp_ref := translate_rte;
-  Translate_predicates.translate_rte_exp_ref := translate_rte;
-  Logic_array.translate_rte_ref := translate_rte
+  Translate_terms.translate_rte_exp_ref := exp;
+  Translate_predicates.translate_rte_exp_ref := exp;
+  Logic_array.translate_rte_ref := exp
 
 (*
 Local Variables:
