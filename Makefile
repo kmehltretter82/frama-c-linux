@@ -1712,8 +1712,11 @@ $(CHECK_API_DIR)/check_code.cmxs: $(CHECK_API_DIR)/check_code.ml
 
 CHECK_CODE=$(CHECK_API_DIR)/check_code.cmxs
 
-.PHONY: check-devguide
-check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc
+.PHONY: check-devguide devguide
+devguide:
+	$(MAKE) FRAMAC_INTERNAL=no -C $(DOC_DEV_DIR)
+
+check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc devguide
 	$(PRINT) 'Checking     developer guide consistency'
 	$(MKDIR) $(CHECK_API_DIR)/html
 	$(OCAMLDOC) $(DOC_FLAGS) -I $(OCAMLLIB) \
