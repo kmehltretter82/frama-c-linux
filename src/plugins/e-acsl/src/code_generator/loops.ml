@@ -333,7 +333,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
        to avoid the extra addition (relevant when computing with GMP) *)
     let guard =
       match t2.term_node with
-      | TBinOp (PlusA, t2_minus_one, {term_node = TConst(Integer (n, _))}) when Integer.is_one n ->
+      | TBinOp (PlusA, t2_minus_one, {term_node = TConst(Integer (n, _))}) when
+          Integer.is_one n ->
         Logic_const.term ~loc
           (TBinOp(Le, tlv, { t2_minus_one with term_node = t2_minus_one.term_node }))
           Linteger

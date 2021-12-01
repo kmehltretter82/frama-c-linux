@@ -495,7 +495,8 @@ end = struct
     try Misc.Id_term.Hashtbl.find tbl t
     with Not_found ->
       let x =
-        try Error.Res (f t)
+        try
+          Error.Res (f t);
         with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
       in
       Misc.Id_term.Hashtbl.add tbl t x;
@@ -650,10 +651,14 @@ let rec infer ~logic_env t =
       singleton n
     | TLval lv -> infer_term_lval ~logic_env lv
     | TSizeOf ty -> infer_sizeof ty
-    | TSizeOfE t -> infer_sizeof (get_cty t)
+    | TSizeOfE t ->
+      ignore (infer ~logic_env t);
+      infer_sizeof (get_cty t)
     | TSizeOfStr str -> singleton_of_int (String.length str + 1 (* '\0' *))
     | TAlignOf ty -> infer_alignof ty
-    | TAlignOfE t -> infer_alignof (get_cty t)
+    | TAlignOfE t ->
+      ignore (infer ~logic_env t);
+      infer_alignof (get_cty t)
 
     | TUnOp (Neg, t) ->
       let i = infer ~logic_env t in
@@ -714,13 +719,16 @@ let rec infer ~logic_env t =
       let src = infer ~logic_env t in
       let dst = interv_of_typ ty in
       Error.map (fun src -> cast ~src ~dst) src
-    | Tif (_, t2, t3) ->
+    | Tif (t1, t2, t3) ->
+      ignore (infer ~logic_env t1);
       let i2 = infer ~logic_env t2 in
       let i3 = infer ~logic_env t3 in
       Error.map2 join i2 i3
     | Tat (t, _) ->
       get_res (infer ~logic_env t)
-    | TBinOp (MinusPP, t, _) ->
+    | TBinOp (MinusPP, t, t2) ->
+      ignore(infer ~logic_env t);
+      ignore(infer ~logic_env t2);
       (match Cil.unrollType (get_cty t) with
        | TArray(_, _, _) as ta ->
          begin
@@ -738,6 +746,7 @@ let rec infer ~logic_env t =
        | _ -> assert false)
     | Tblock_length (_, t)
     | Toffset(_, t) ->
+      ignore (infer ~logic_env t);
       (match Cil.unrollType (get_cty t) with
        | TArray(_, _, _) as ta ->
          begin
@@ -770,17 +779,35 @@ let rec infer ~logic_env t =
       else Rational
     | Tlambda ([ _ ],lt) ->
       get_res (infer ~logic_env lt)
+
+    | TStartOf lv
+    | TAddrOf lv ->
+      ignore (infer_term_lval ~logic_env lv);
+      Nan
+
+    | TBinOp (PlusPI, t1 ,t2)
+    | TBinOp (MinusPI, t1, t2) ->
+      ignore(infer ~logic_env t1);
+      ignore(infer ~logic_env t2);
+      Nan
+
+    | Tbase_addr (_,t)
+    | Ttypeof t ->
+      ignore(infer ~logic_env t);
+      Nan
+
+    |TDataCons(_,l) ->
+      List.iter (fun t -> ignore (infer ~logic_env t)) l;
+      Nan
+
+    | TUpdate(t1, toff, t2) ->
+      ignore (infer ~logic_env t1);
+      ignore (infer ~logic_env t2);
+      infer_term_offset ~logic_env toff;
+      Nan
+
     | Tlambda (_,_)
     | TConst (LStr _ | LWStr _)
-    | TBinOp (PlusPI,_,_)
-    | TBinOp (IndexPI,_,_)
-    | TBinOp (MinusPI,_,_)
-    | TAddrOf _
-    | TStartOf _
-    | TDataCons (_,_)
-    | Tbase_addr (_,_)
-    | TUpdate (_,_,_)
-    | Ttypeof _
     | Ttype _
     | Tempty_set ->
       Nan
@@ -790,6 +817,8 @@ and infer_term_lval ~logic_env (host, offset as tlv) =
   match offset with
   | TNoOffset -> infer_term_host ~logic_env host
   | _ ->
+    ignore(infer_term_host ~logic_env host);
+    infer_term_offset ~logic_env offset;
     let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
     interv_of_typ ty
 
@@ -806,6 +835,7 @@ and infer_term_host ~logic_env thost =
   | TResult ty ->
     interv_of_typ ty
   | TMem t ->
+    ignore(infer ~logic_env t);
     let ty = Logic_utils.logicCType t.term_type in
     match Cil.unrollType ty with
     | TPtr(ty, _) | TArray(ty, _, _) ->
@@ -814,6 +844,16 @@ and infer_term_host ~logic_env thost =
       Options.fatal "unexpected type %a for term %a"
         Printer.pp_typ ty
         Printer.pp_term t
+
+
+and infer_term_offset ~logic_env t =
+  match t with
+  | TNoOffset -> ()
+  | TField(_, toff)
+  | TModel(_, toff) -> infer_term_offset ~logic_env toff
+  | TIndex(t, toff) ->
+    ignore (infer ~logic_env t);
+    infer_term_offset ~logic_env toff
 
 let rec infer_predicate ~logic_env p =
   match Logic_normalizer.get_pred p with

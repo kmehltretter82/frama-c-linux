@@ -690,7 +690,8 @@ and type_term_lval ~profile (host, offset) =
 and type_term_lhost ~profile t  = match t with
   | TVar _
   | TResult _ -> ()
-  | TMem t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t)
+  | TMem t ->
+    ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t)
 
 and type_term_offset ~profile t = match t with
   | TNoOffset -> ()
