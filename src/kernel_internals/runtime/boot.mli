@@ -20,4 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Nothing is exported. *)
+(** Nothing is exported.
+
+    @plugin development guide
+*)

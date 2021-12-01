@@ -3786,10 +3786,10 @@ risk sharing\index{Sharing} the same AST\index{AST!Sharing|see{Sharing}}).
 \index{Visitor!Behavior|bfit}
 
 The visitors take as argument a
-\verb+visitor_behavior+\scodeidx{Cil}{visitor\_behavior}, which comes in two
-flavors: \verb+inplace_visit+\scodeidx{Cil}{inplace\_visit}%
-\index{Visitor!In-Place|bfit} and \verb+copy_visit+%
-\scodeidx{Cil}{copy\_visit}\index{Visitor!Copy|bfit}. In the in-place mode,
+\verb+Visitor_behavior.t+\scodeidx{Visitor\_behavior}{t}, which comes in two
+flavors: \verb+inplace+\scodeidx{Visitor\_behavior}{inplace}%
+\index{Visitor!In-Place|bfit} and \verb+copy+%
+\scodeidx{Visitor\_behavior}{copy}\index{Visitor!Copy|bfit}. In the in-place mode,
 nodes are visited in place, while in the copy mode, nodes are copied and the
 visit is done on the copy\index{AST!Copying}. For the nodes
 shared\index{Sharing} across the AST
@@ -3802,32 +3802,37 @@ shared\index{Sharing} across the AST
 \verb+logic_info+\scodeidx{Cil\_types}{logic\_info} and
 \verb+fieldinfo+\scodeidx{Cil\_types}{fieldinfo}), sharing is of course
 preserved, and the mapping between the old nodes and their copy can be
-manipulated explicitly through the following functions:
+manipulated explicitly through the following modules, which define a function
+for each of the types above.
 \begin{itemize}
 \item
-  \verb+reset_behavior_+\emph{name}
-  \scodeidxdef{Cil}{reset\_behavior\_varinfo}
-  resets the mapping corresponding to the type \emph{name}.
-\item \verb+get_original_+\emph{name}\scodeidxdef{Cil}{get\_original\_varinfo}
-  gets the original value corresponding to a copy (and behaves as the identity
-  if the given value is not known).
-\item \verb+get_+\emph{name}\scodeidxdef{Cil}{get\_varinfo} gets the copy
+  \verb+Reset+\scodeidxdef{Visitor\_behavior}{Reset}
+  allows to reset the mappings.
+\item \verb+Get+\scodeidxdef{Visitor\_behavior}{Get} gets the copy
   corresponding to an old value. If the given value is not known, it behaves as
   the identity.
-\item \verb+set_+\emph{name}\scodeidxdef{Cil}{set\_varinfo} sets a copy for a
+\item \verb+Memo+\scodeidxdef{Visitor\_behavior}{Memo} is similar to
+  \verb+Get+, except that if the given value is not known, a new binding is
+  created.
+\item \verb+Get_orig+\scodeidxdef{Visitor\_behavior}{Get\_orig}
+  gets the original value corresponding to a copy (and behaves as the identity
+  if the given value is not known).
+\item \verb+Set+\emph{name}\scodeidxdef{Visitor\_behavior}{Set} sets a copy for a
   given value. Be sure to use it before any occurrence of the old value has
   been copied, or sharing will be lost.
+\item \verb+Set_orig+\scodeidxdef{Visitor\_behavior}{Set\_orig} sets the original
+  value corresponding to a given copy.
 \end{itemize}
 
 \begin{important}
-  \verb+get_original_+\emph{name} functions allow to retrieve additional
+  Functions from the \verb+Get_orig+\emph{name} modules allow to retrieve additional
   information tied to the original AST nodes. Its result must not be modified
   in place\index{AST!Modification} (this would defeat the purpose of operating
   on a copy to leave the original AST untouched). Moreover, note that whenever
   the index used for \emph{name} is modified in the copy, the internal state of
   the visitor behavior\index{Visitor!Behavior} must be updated accordingly
-  (\emph{via} the \verb+set_+\emph{name} function) for
-  \verb+get_original_+\emph{name} to give correct results.\index{Consistency}
+  (\emph{via} the \verb+Set.+\emph{name} function) for
+  \verb+Get_orig.+\emph{name} to give correct results.\index{Consistency}
 \end{important}
 
 The list of such indices is given Figure~\ref{fig:idx-visitor}.
@@ -3903,7 +3908,7 @@ whether the table entries are visited before or after the children in the AST.
 Here is a small copy visitor that adds an assertion for each
 division in the program, stating that the divisor is not zero:
 \scodeidx{Visitor}{generic\_frama\_c\_visitor}
-\scodeidx{Cil}{copy\_visit}
+\scodeidx{Visitor\_behavior}{copy}
 \scodeidx{Cil}{lzero}
 \sscodeidx{Cil}{cilVisitor}{vexpr}
 \sscodeidx{Cil\_types}{exp\_node}{BinOp}
@@ -3917,8 +3922,8 @@ division in the program, stating that the divisor is not zero:
 \scodeidx{File}{create\_project\_from\_visitor}
 \scodeidx{Annotations}{add\_assert}
 \sscodeidx{Db}{Main}{extend}
-\scodeidx{Cil}{get\_stmt}
-\scodeidx{Cil}{get\_kernel\_function}
+\sscodeidx{Visitor\_behavior}{Get}{stmt}
+\sscodeidx{Visitor\_behavior}{Get}{kernel\_function}
 \sscodeidx{Cil}{cilVisitor}{behavior}
 \scodeidx{Ast}{self}
 \sscodeidx{Cil}{cilVisitor}{current\_kinstr}

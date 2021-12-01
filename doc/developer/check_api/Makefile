@@ -23,7 +23,7 @@ DEPENDENCIES= $(FRAMAC_MODERN) \
 all:  check_and_compare main.idx
 	./check_and_compare
 
-main.idx: ../developer.idx $(wildcard ../*.pretex)
+main.idx: ../developer.idx $(wildcard ../*.tex)
 	cp ../developer.idx main.idx
 
 check_and_compare: check_index_grammar.cmi check_index_grammar.cmx \

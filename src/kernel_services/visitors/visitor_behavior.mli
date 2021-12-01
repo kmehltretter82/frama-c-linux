@@ -50,7 +50,7 @@ val copy: Project.t -> t
 
 val refresh: Project.t -> t
 (** Makes fresh copies of the mutable structures and provides fresh id
-    for the structures that have ids. Note that as for {!copy_visit}, only
+    for the structures that have ids. Note that as for {!copy}, only
     varinfo that are declared in the scope of the visit will be copied and
     provided with a new id.
 *)

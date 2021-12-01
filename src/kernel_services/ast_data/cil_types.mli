@@ -1806,7 +1806,9 @@ and global_annotation =
   (** Model field for a type t, seen as a logic function with one
       argument of type t *)
   | Dextended of acsl_extension * attributes * location
-  (** Extended global clause. *)
+  (** Extended global clause.
+      @plugin development guide
+  *)
 
 type kinstr =
   | Kstmt of stmt
