@@ -1357,7 +1357,9 @@ end = struct
 
   let get_ptest_file cmd = SubDir.make_file cmd.directory cmd.file
 
-  let expand_macros ~defaults cmd =
+  let expand_macros =
+    let dune_cmd_features = Str.regexp "%{[a-z][a-z-]*:\\([^}]*\\)}" in
+    fun ~defaults cmd ->
     let ptest_config =
       if !special_config = "" then "" else "_" ^ !special_config
     in
@@ -1408,6 +1410,9 @@ end = struct
         String.concat " " (toplevel::(if has_ptest_file then options else ptest_file::options))
       end
       else toplevel
+    in
+    let toplevel = (* removes dune feature such as %{deps:...} *)
+      str_global_replace dune_cmd_features "\\1" toplevel
     in
     { cmd with
       macros;
