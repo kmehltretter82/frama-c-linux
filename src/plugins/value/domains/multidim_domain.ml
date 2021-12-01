@@ -128,10 +128,14 @@ struct
     Map.singleton (Base.of_varinfo vi) (`Value (NoOffset vi.vtype))
 
   (* Raises Abstract_domain.{Error_top,Error_bottom} *)
-  let of_lval oracle ((host,offset) : Cil_types.lval) : t =
+  let of_lval oracle ((host,offset) as lval : Cil_types.lval) : t =
     let oracle' = convert_oracle oracle in
     let base_typ = Cil.typeOfLhost host in
-    let offset = Offset.of_cil_offset oracle' base_typ offset in
+    let offset =
+      if Cil.typeHasQualifier "volatile" (Cil.typeOfLval lval) then
+        `Top
+      else
+        Offset.of_cil_offset oracle' base_typ offset in
     match host with
     | Var vi ->
       Map.singleton (Base.of_varinfo vi) offset

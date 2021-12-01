@@ -103,7 +103,11 @@ struct
 
   let rec of_cil_offset oracle base_typ = function
     | Cil_types.NoOffset -> NoOffset base_typ
-    | Field (fi, sub) -> Field (fi, of_cil_offset oracle fi.ftype sub)
+    | Field (fi, sub) ->
+      if Cil.typeHasQualifier "volatile" fi.ftype then
+        raise Abstract_interp.Error_Top
+      else
+        Field (fi, of_cil_offset oracle fi.ftype sub)
     | Index (exp, sub) ->
       match Cil.unrollType base_typ with
       | TArray (elem_typ, array_size, _) ->
@@ -161,8 +165,11 @@ struct
                   Int_val.is_included ival range
               in
               if matches then
-                let sub_ival = Int_val.add_singleton (Integer.neg l) ival in
-                Field (fi, of_int_val ~base_typ:fi.ftype ~typ sub_ival)
+                if Cil.typeHasQualifier "volatile" fi.ftype then
+                  raise Abstract_interp.Error_Top
+                else
+                  let sub_ival = Int_val.add_singleton (Integer.neg l) ival in
+                  Field (fi, of_int_val ~base_typ:fi.ftype ~typ sub_ival)
               else
                 find_field q
           in
@@ -193,7 +200,10 @@ struct
   let rec of_term_offset base_typ = function
     | Cil_types.TNoOffset -> NoOffset base_typ
     | TField (fi, sub) ->
-      Field (fi, of_term_offset fi.ftype sub)
+      if Cil.typeHasQualifier "volatile" fi.ftype then
+        raise Abstract_interp.Error_Top
+      else
+        Field (fi, of_term_offset fi.ftype sub)
     | TIndex (index, sub) ->
       begin match Cil.unrollType base_typ with
         | TArray (elem_typ, array_size, _) ->
