@@ -303,6 +303,9 @@ let example_msg =
      LIBS: <module>...    @[<v 0># Don't compile the module but set the @@PTEST_LIBS@@ macro.@]@  \
      PLUGIN: <plugin>...  @[<v 0># Set the @@PTEST_PLUGIN@@ macro.@]@  \
      SCRIPT: <script>...  @[<v 0># Set the @@PTEST_SCRIPT@@ macro.@]@  \
+     DEPS: <dependency>...@[<v 0># Set the @@PTEST_DEPS@@ macro and adds a dependency to next sub-test and execnow commands (forward compatibility).@ \
+     # NB: a dependency to the included files can be added with this directive.@ \
+     # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
      LOG: <file>...       @[<v 0># Defines targets built by the next sub-test command.@]@  \
      CMD: <command>       @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>       @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
@@ -338,6 +341,7 @@ let example_msg =
      @@PTEST_CONFIG@@       # Test configuration suffix.@ \
      @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@ \
      @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@ \
+     @@PTEST_DEPS@@         # Current list of dependencies defined by the DEPS directive.@ \
      @@PTEST_LIBS@@         # Current list of modules defined by the LIBS directive.@ \
      @@PTEST_MODULE@@       # Current list of modules defined by the MODULE directive.@ \
      @@PTEST_PLUGIN@@       # Current list of plugins defined by the PLUGIN directive.@ \
@@ -823,6 +827,7 @@ end = struct
       "PTEST_PRE_OPTIONS",      !macro_pre_options;
       "PTEST_POST_OPTIONS",     !macro_post_options;
       "PTEST_MAKE_MODULE", "make -s";
+      "PTEST_DEPS", "";
       "PTEST_LIBS", "";
       "PTEST_MODULE", "";
       "PTEST_PLUGIN", "";
@@ -1009,6 +1014,14 @@ end = struct
   let update_plugin_macros =
     update_macros (fun name -> name) "-load-module=" "PTEST_PLUGIN" "PTEST_LOAD_PLUGIN"
 
+  let config_deps ~file dir s current =
+    let macro_def = "PTEST_DEPS" in
+    let def = Macros.expand_directive ~file current.dc_macros s in
+    if !verbosity >= 3 then Format.printf "%% %s: %s@." macro_def def ;
+    let dc_macros = Macros.add_list [ macro_def, def ;
+                                    ] current.dc_macros in
+    { current with dc_macros }
+
   let config_module ~file dir s current =
     let s = Macros.expand_directive ~file current.dc_macros s in
     let deps = str_split_list s in
@@ -1103,6 +1116,8 @@ end = struct
       "MACRO", config_macro;
 
       "MODULE", config_module;
+
+      "DEPS",   config_deps;
 
       "LIBS",   config_libs_script_plugin update_libs_macros;
       "SCRIPT", config_libs_script_plugin update_script_macros;
