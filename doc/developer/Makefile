@@ -34,13 +34,8 @@ DEPENDENCIES= $(FRAMAC_MODERN) $(GENERATED) frama-c-book.cls
 
 all: developer.pdf check
 
-FRAMAC := $(shell command -v frama-c 2> /dev/null)
-
 # local plugin.cmi (if any) is in conflict with the one of Frama-C
 check: $(GENERATED)
-ifndef FRAMAC
-	$(ECHO) frama-c is not installed in the PATH, nothing to check!
-else
 	$(ECHO) Checking compilation of example scripts
 	../../bin/frama-c \
 		-load-script ./examples/syntactic_check \
@@ -62,11 +57,10 @@ else
 	do ../../bin/frama-c -load-script ./tutorial/hello/generated/$$i/hello_world.ml ; \
 	done
 	$(ECHO) compilation ok
-	$(MAKE) -C tutorial/hello/generated/with_test
-	$(MAKE) -C tutorial/hello/generated/makefile_multiple
-	$(MAKE) -C tutorial/hello/generated/makefile_single
-	$(MAKE) -C tutorial/viewcfg/generated/split
-endif
+	$(MAKE) PATH=../../bin:$$PATH -C tutorial/hello/generated/with_test
+	$(MAKE) PATH=../../bin:$$PATH -C tutorial/hello/generated/makefile_multiple
+	$(MAKE) PATH=../../bin:$$PATH -C tutorial/hello/generated/makefile_single
+	$(MAKE) PATH=../../bin:$$PATH -C tutorial/viewcfg/generated/split
 
 check-all: developer.pdf 
 	$(MAKE) -C ../.. check-devguide
