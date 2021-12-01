@@ -39,6 +39,8 @@
 | ".*_frama-c" -> skip match:"#compdef.*"
 | ".*\.sh" -> frame open:"#"  line:"#" close:"#"
 | ".*\.sh" -> skip match:"#!.*"
+| ".*\.sh.comp" -> frame open:"#"  line:"#" close:"#"
+| ".*\.sh.comp" -> skip match:"#!.*"
 | "frama-c" -> frame open:"#"  line:"#" close:"#"
 | ".*frama-c" -> skip match:"#!.*"
 | "frama-c-config" -> frame open:"#"  line:"#" close:"#"
