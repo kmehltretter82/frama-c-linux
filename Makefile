@@ -1707,8 +1707,8 @@ $(CHECK_API_DIR)/check_code.cmo: $(CHECK_API_DIR)/check_code.ml
 
 $(CHECK_API_DIR)/check_code.cmxs: $(CHECK_API_DIR)/check_code.ml
 	$(PRINT_PACKING) $@
-	$(OCAMLOPT) -o $@ -shared -I +ocamldoc \
-		str.cmxa $(CHECK_API_DIR)/check_code.ml
+	$(OCAMLOPT) -package ocamldoc -o $@ -shared \
+		$(CHECK_API_DIR)/check_code.ml
 
 CHECK_CODE=$(CHECK_API_DIR)/check_code.cmxs
 
