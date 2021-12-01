@@ -22,7 +22,7 @@
 
 open Cil_types
 
-(** Generate C implementations of E-ACSL predicates and terms. *)
+(** Generate C implementations of E-ACSL predicates. *)
 
 val predicate_to_exp:
   adata:Assert.t ->
@@ -54,55 +54,32 @@ val translate_predicate:
     If [pred_to_print] is set, then the runtime check will use this predicate as
     message. *)
 
-val term_to_exp:
-  adata:Assert.t ->
-  kernel_function ->
-  Env.t ->
-  term ->
-  exp * Assert.t * Env.t
-(** Convert an ACSL term into a corresponding C expression. *)
-
-val translate_rte_annots:
-  (Format.formatter -> 'a -> unit) ->
-  'a ->
-  kernel_function ->
-  Env.t ->
-  code_annotation list ->
-  Env.t
-(** Translate the given RTE annotations into runtime checks in the given
-    environment. *)
-
-val gmp_to_sizet:
-  adata:Assert.t ->
-  loc:location ->
-  name:string ->
-  ?check_lower_bound:bool ->
-  ?pp:term ->
-  kernel_function ->
-  Env.t ->
-  term ->
-  exp * Assert.t * Env.t
-(** Translate the given GMP integer to an expression of type [size_t]. RTE
-    checks are generated to ensure that the GMP value holds in this type.
-    The parameter [name] is used to generate relevant predicate names.
-    If [check_lower_bound] is set to [false], then the GMP value is assumed to
-    be positive.
-    If [pp] is provided, this term is used in the messages of the RTE checks. *)
-
-exception No_simple_term_translation of term
-(** Exceptin raised if [untyped_term_to_exp] would generate new statements in
-    the environment *)
-
 exception No_simple_predicate_translation of predicate
 (** Exceptin raised if [untyped_predicate_to_exp] would generate new statements
     in the environment *)
 
-val untyped_term_to_exp: typ option -> term -> exp
-(** Convert an untyped ACSL term into a corresponding C expression. *)
-
 val untyped_predicate_to_exp: predicate -> exp
 (** Convert an untyped ACSL predicate into a corresponding C expression. This
     expression is valid only in certain contexts and shouldn't be used. *)
+
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
+
+val translate_rte_annots_ref:
+  ((Format.formatter -> code_annotation -> unit) ->
+   code_annotation ->
+   kernel_function ->
+   Env.t ->
+   code_annotation list ->
+   Env.t) ref
+
+val translate_rte_exp_ref:
+  (?filter:(code_annotation -> bool) ->
+   kernel_function ->
+   Env.t ->
+   exp ->
+   Env.t) ref
 
 (*
 Local Variables:

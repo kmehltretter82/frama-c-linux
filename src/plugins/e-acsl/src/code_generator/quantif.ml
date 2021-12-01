@@ -23,7 +23,7 @@
 open Cil_types
 open Cil
 
-(** Forward reference for [Translate.predicate_to_exp]. *)
+(** Forward reference for [Translate_predicates.to_exp]. *)
 let predicate_to_exp_ref
   : (adata:Assert.t ->
      kernel_function ->

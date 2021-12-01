@@ -22,44 +22,33 @@
 
 open Cil_types
 
-(** Functions that translate a given ACSL annotation into the corresponding C
-    statements (if any) for runtime assertion checking. These C statements are
-    part of the resulting environment. *)
+(** Generate C implementations of E-ACSL terms. *)
 
-val pre_funspec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
-(** Translate the preconditions of the given function contract in the
-    environment. The contract is attached to the kernel_function.
+val term_to_exp:
+  adata:Assert.t ->
+  kernel_function ->
+  Env.t ->
+  term ->
+  exp * Assert.t * Env.t
+(** Convert an ACSL term into a corresponding C expression. *)
 
-    The function contract is pushed in the environment, some care should be
-    taken to call {!post_funspec} at the right time to pop the right
-    contract. *)
+exception No_simple_term_translation of term
+(** Exceptin raised if [untyped_term_to_exp] would generate new statements in
+    the environment *)
 
-val post_funspec: kernel_function -> kinstr -> Env.t -> Env.t
-(** Translate the postconditions of the current function contract in the
-    environment.
+val untyped_term_to_exp: typ option -> term -> exp
+(** Convert an untyped ACSL term into a corresponding C expression. *)
 
-    The function contract previously built by {!pre_funspec} is popped
-    from the environment. Some care should be taken to call this function at
-    the right time to pop the right contract. *)
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
 
-val pre_code_annotation:
-  kernel_function -> stmt -> Env.t -> code_annotation -> Env.t
-(** Translate the preconditions of the given code annotation in the
-    environment.
-
-    If available, the statement contract is pushed in the environment, some care
-    should be taken to call {!post_code_annotation} at the right time
-    to pop the right contract. *)
-
-val post_code_annotation:
-  kernel_function -> stmt -> Env.t -> code_annotation -> Env.t
-(** Translate the postconditions of the current code annotation in the
-    environment.
-
-    If necessarry, the statement contract previously built by
-    {!pre_code_annotation} is popped from the environment. Some care
-    should be taken to call this function at the right time to pop the right
-    contract. *)
+val translate_rte_exp_ref:
+  (?filter:(code_annotation -> bool) ->
+   kernel_function ->
+   Env.t ->
+   exp ->
+   Env.t) ref
 
 (*
 Local Variables:

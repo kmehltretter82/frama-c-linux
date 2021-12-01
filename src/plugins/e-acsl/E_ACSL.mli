@@ -29,7 +29,7 @@ module Error: sig
   exception Not_yet of string
 end
 
-module Translate: sig
+module Translate_terms: sig
   exception No_simple_term_translation of term
   val untyped_term_to_exp: typ option -> term -> exp
   (** @raise Typing_error when the given term cannot be typed (something wrong
@@ -37,7 +37,9 @@ module Translate: sig
       @raise Not_yet when the given term contains an unsupported construct.
       @raise No_simple_term_translation when the given term cannot be translated
       into a single expression. *)
+end
 
+module Translate_predicates: sig
   exception No_simple_predicate_translation of predicate
   val untyped_predicate_to_exp: predicate -> exp
   (** @raise Typing_error when the given predicate cannot be typed

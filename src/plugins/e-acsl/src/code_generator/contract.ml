@@ -24,16 +24,6 @@ open Cil_types
 open Contract_types
 
 (**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-let must_translate_ppt_ref : (Property.t -> bool) ref =
-  Extlib.mk_fun "must_translate_ppt_ref"
-
-let must_translate_ppt_opt_ref : (Property.t option -> bool) ref =
-  Extlib.mk_fun "must_translate_ppt_opt_ref"
-
-(**************************************************************************)
 (********************** Contract ********************************)
 (**************************************************************************)
 
@@ -109,7 +99,7 @@ end = struct
   let set_assumes ~loc env kf contract idx assumes =
     let idx_e = Cil.integer ~loc idx in
     let assumes_e, _, env =
-      Translate.generalized_untyped_predicate_to_exp
+      Translate_predicates.generalized_untyped_predicate_to_exp
         ~adata:Assert.no_data
         kf
         env
@@ -332,12 +322,12 @@ let check_default_requires kf kinstr env contract =
   | Some b ->
     fold_left_handle_error
       (fun env ip_requires ->
-         if !must_translate_ppt_ref
+         if Translate_utils.must_translate
              (Property.ip_of_requires kf kinstr b ip_requires) then
            let tp_requires = ip_requires.ip_content in
            let loc = tp_requires.tp_statement.pred_loc in
            Cil.CurrentLoc.set loc;
-           Translate.translate_predicate kf env tp_requires
+           Translate_predicates.translate_predicate kf env tp_requires
          else
            env)
       env
@@ -361,7 +351,7 @@ let check_other_requires kf kinstr env contract =
       let env, stmts =
         fold_left_handle_error_with_args
           (fun (env, stmts) ip_requires ->
-             if !must_translate_ppt_ref
+             if Translate_utils.must_translate
                  (Property.ip_of_requires kf kinstr b ip_requires) then
                let tp_requires = ip_requires.ip_content in
                let pred_kind = tp_requires.tp_kind in
@@ -378,7 +368,7 @@ let check_other_requires kf kinstr env contract =
                  (* Create runtime check *)
                  let adata, env = Assert.empty ~loc kf env in
                  let requires_e, adata, env =
-                   Translate.generalized_untyped_predicate_to_exp
+                   Translate_predicates.generalized_untyped_predicate_to_exp
                      ~adata
                      kf
                      env
@@ -450,7 +440,6 @@ type translate_ppt =
     the number of active behaviors and creates assertions for the
     [ppt_to_translate]. *)
 let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env contract clauses =
-  let must_translate = !must_translate_ppt_ref in
   let loc = contract.location in
   Cil.CurrentLoc.set loc;
   let do_clause env bhvrs =
@@ -459,13 +448,13 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
     let must_translate_complete =
       match ppt_to_translate with
       | Both | Complete ->
-        must_translate (Property.ip_of_complete kf kinstr ~active bhvrs_list)
+        Translate_utils.must_translate (Property.ip_of_complete kf kinstr ~active bhvrs_list)
       | Disjoint -> false
     in
     let must_translate_disjoint =
       match ppt_to_translate with
       | Both | Disjoint ->
-        must_translate (Property.ip_of_disjoint kf kinstr ~active bhvrs_list)
+        Translate_utils.must_translate (Property.ip_of_disjoint kf kinstr ~active bhvrs_list)
       | Complete -> false
     in
 
@@ -646,7 +635,7 @@ let check_post_conds kf kinstr env contract =
         (fun env ->
            let active = [] in (* TODO: 'for' behaviors, e-acsl#109 *)
            let ppt = Property.ip_assigns_of_behavior kf kinstr ~active b in
-           if b.b_assigns <> WritesAny && !must_translate_ppt_opt_ref ppt
+           if b.b_assigns <> WritesAny && Translate_utils.must_translate_opt ppt
            then Env.not_yet env "assigns clause in behavior";
            (* ignore b.b_extended since we never translate them *)
            env)
@@ -655,7 +644,7 @@ let check_post_conds kf kinstr env contract =
     if Cil.is_default_behavior b then
       fold_left_handle_error
         (fun env ((termination, ip_post_cond) as tp) ->
-           if !must_translate_ppt_ref
+           if Translate_utils.must_translate
                (Property.ip_of_ensures kf kinstr b tp) then
              let tp_post_cond = ip_post_cond.ip_content in
              let loc = tp_post_cond.tp_statement.pred_loc in
@@ -664,7 +653,7 @@ let check_post_conds kf kinstr env contract =
              | Normal ->
                (* If translating the default behavior, directly translate the
                   predicate *)
-               Translate.translate_predicate kf env tp_post_cond
+               Translate_predicates.translate_predicate kf env tp_post_cond
              | Exits | Breaks | Continues | Returns ->
                Error.print_not_yet "abnormal termination case in behavior";
                env
@@ -680,7 +669,7 @@ let check_post_conds kf kinstr env contract =
       let env, stmts =
         fold_left_handle_error_with_args
           (fun (env, stmts) ((termination, ip_post_cond) as tp) ->
-             if !must_translate_ppt_ref
+             if Translate_utils.must_translate
                  (Property.ip_of_ensures kf kinstr b tp) then
                let tp_post_cond = ip_post_cond.ip_content in
                let pred_kind = tp_post_cond.tp_kind in
@@ -702,7 +691,7 @@ let check_post_conds kf kinstr env contract =
                      (* Create runtime check *)
                      let adata, env = Assert.empty ~loc kf env in
                      let post_cond_e, adata, env =
-                       Translate.generalized_untyped_predicate_to_exp
+                       Translate_predicates.generalized_untyped_predicate_to_exp
                          ~adata
                          kf
                          env
