@@ -448,13 +448,15 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
     let must_translate_complete =
       match ppt_to_translate with
       | Both | Complete ->
-        Translate_utils.must_translate (Property.ip_of_complete kf kinstr ~active bhvrs_list)
+        Translate_utils.must_translate
+          (Property.ip_of_complete kf kinstr ~active bhvrs_list)
       | Disjoint -> false
     in
     let must_translate_disjoint =
       match ppt_to_translate with
       | Both | Disjoint ->
-        Translate_utils.must_translate (Property.ip_of_disjoint kf kinstr ~active bhvrs_list)
+        Translate_utils.must_translate
+          (Property.ip_of_disjoint kf kinstr ~active bhvrs_list)
       | Complete -> false
     in
 
@@ -570,8 +572,8 @@ let check_complete_and_disjoint kf kinstr env contract =
        - The disjoint list
 
        The behaviors of a clause are stored in a Set so that they are
-       automatically sorted, the duplicates are removed, and they can be compared
-       for equality.
+       automatically sorted, the duplicates are removed, and they can be
+       compared for equality.
     *)
     let completes =
       List.map
@@ -599,7 +601,9 @@ let check_complete_and_disjoint kf kinstr env contract =
     in
     (* Create a common variable to hold the number of active behavior for the
        current check *)
-    let get_or_create_var = mk_get_or_create_var kf Cil.intType "active_bhvrs" in
+    let get_or_create_var =
+      mk_get_or_create_var kf Cil.intType "active_bhvrs"
+    in
     (* Check the complete and disjoint clauses *)
     let check_bhvrs env ppt_to_translate bhvrs =
       check_active_behaviors

@@ -34,7 +34,12 @@ val rte_annots:
 (** Translate the given RTE annotations into runtime checks in the given
     environment. *)
 
-val exp: ?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp -> Env.t
+val exp:
+  ?filter:(code_annotation -> bool) ->
+  kernel_function ->
+  Env.t ->
+  exp ->
+  Env.t
 (** Generate RTE annotations from the given expression and translate them in the
     given environment. *)
 

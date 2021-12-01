@@ -86,7 +86,16 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     let ity =
       Typing.get_integer_op_of_predicate ~lenv p
     in
-    Translate_utils.comparison_to_exp ~adata ~loc kf env ity (relation_to_binop rel) t1 t2 None
+    Translate_utils.comparison_to_exp
+      ~adata
+      ~loc
+      kf
+      env
+      ity
+      (relation_to_binop rel)
+      t1
+      t2
+      None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
     Extlib.flatten
@@ -193,7 +202,9 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     else begin
       (* convert [t'] to [e] in a separated local env *)
       let e, adata, env = to_exp ~adata kf (Env.push env) p' in
-      let e, env, sty = Translate_utils.at_to_exp_no_lscope kf env None label e in
+      let e, env, sty =
+        Translate_utils.at_to_exp_no_lscope kf env None label e
+      in
       assert (sty = Typed_number.C_number);
       let adata, env = Assert.register_pred ~loc kf env p e adata in
       e, adata, env
@@ -227,7 +238,12 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
            let tp = Logic_const.toplevel_predicate ~kind:Assert p in
            let annot = Logic_const.new_code_annotation (AAssert ([],tp)) in
            Typing.preprocess_rte (Env.Local_vars.get env) annot;
-           !translate_rte_annots_ref Printer.pp_code_annotation annot kf env [annot]
+           !translate_rte_annots_ref
+             Printer.pp_code_annotation
+             annot
+             kf
+             env
+             [annot]
         )
         env
         tlist

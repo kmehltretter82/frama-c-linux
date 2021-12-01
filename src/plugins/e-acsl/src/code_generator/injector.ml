@@ -648,8 +648,8 @@ let inject_in_global (env, main) global =
     ~fun_def
     global
 
-(* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end] as
-   the last before [return] *)
+(* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end]
+   as the last before [return] *)
 let surround_function_with kf fundec stmt_begin stmt_end =
   let body = fundec.sbody in
   (* Insert last statement *)

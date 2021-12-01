@@ -86,8 +86,9 @@ let constant_to_exp ~loc env t c =
     else mk_real lr.r_literal
   | LEnum e -> Cil.new_exp ~loc (Const (CEnum e)), Typed_number.C_number
 
-(* Create and initialize a variable in the [env] according to [ty], [name] and [exp_init],
-   return a tuple [varinfo * exp] and the [env] extended with the new variable. *)
+(* Create and initialize a variable in the [env] according to [ty], [name] and
+   [exp_init], return a tuple [varinfo * exp] and the [env] extended with the
+   new variable. *)
 let create_and_init_var ~loc kf ty name exp_init env =
   Env.new_var
     ~loc
@@ -371,9 +372,10 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let t2_to_exp adata env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
-      (* Creating a second assertion context that will hold the data contributing
-         to the guard of the denominator. The context will be merged to [adata]
-         afterward so that the calling assertion context holds all data. *)
+      (* Creating a second assertion context that will hold the data
+         contributing to the guard of the denominator. The context will be
+         merged to [adata] afterward so that the calling assertion context holds
+         all data. *)
       let adata2, env = Assert.empty ~loc kf env in
       let e2, adata2, env = t2_to_exp adata2 env in
       let adata, env = Assert.merge_right ~loc kf env adata2 adata in
@@ -391,7 +393,17 @@ and context_insensitive_term_to_exp ~adata kf env t =
       let guard, _, env =
         let name = Misc.name_of_binop bop ^ "_guard" in
         Translate_utils.comparison_to_exp
-          ~adata:Assert.no_data ~loc kf env Typing.gmpz ~e1:e2 ~name Ne t2 zero t
+          ~adata:Assert.no_data
+          ~loc
+          kf
+          env
+          Typing.gmpz
+          ~e1:e2
+          ~name
+          Ne
+          t2
+          zero
+          t
       in
       let p = Logic_const.prel ~loc (Rneq, t2, zero) in
       let cond, env =
@@ -428,7 +440,16 @@ and context_insensitive_term_to_exp ~adata kf env t =
     (* comparison operators *)
     let ity = Typing.get_integer_op ~lenv t in
     let e, adata, env =
-      Translate_utils.comparison_to_exp ~adata ~loc kf env ity bop t1 t2 (Some t)
+      Translate_utils.comparison_to_exp
+        ~adata
+        ~loc
+        kf
+        env
+        ity
+        bop
+        t1
+        t2
+        (Some t)
     in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp((Shiftlt | Shiftrt) as bop, t1, t2) ->
@@ -761,7 +782,13 @@ and context_insensitive_term_to_exp ~adata kf env t =
                let res3 = e3, env3 in
                Extlib.nest
                  adata
-                 (Translate_utils.conditional_to_exp ~loc kf (Some t) e1 res2 res3)
+                 (Translate_utils.conditional_to_exp
+                    ~loc
+                    kf
+                    (Some t)
+                    e1
+                    res2
+                    res3)
              ))
     in
     e, adata, env, Typed_number.C_number, ""
@@ -777,7 +804,9 @@ and context_insensitive_term_to_exp ~adata kf env t =
       e, adata, env, Typed_number.C_number, ""
     else
       let e, _, env = to_exp ~adata:Assert.no_data kf (Env.push env) t' in
-      let e, env, sty = Translate_utils.at_to_exp_no_lscope kf env (Some t) label e in
+      let e, env, sty =
+        Translate_utils.at_to_exp_no_lscope kf env (Some t) label e
+      in
       let adata, env = Assert.register_term ~loc kf env t e adata in
       e, adata, env, sty, ""
   | Tbase_addr(BuiltinLabel Here, t') ->
@@ -848,7 +877,9 @@ and to_exp ~adata kf env t =
            let e, adata, env, sty, name =
              context_insensitive_term_to_exp ~adata kf env t
            in
-           let env = if generate_rte then !translate_rte_exp_ref kf env e else env in
+           let env =
+             if generate_rte then !translate_rte_exp_ref kf env e else env
+           in
            let cast = Typing.get_cast ~lenv:(Env.Local_vars.get env) t in
            let name = if name = "" then None else Some name in
            Extlib.nest
