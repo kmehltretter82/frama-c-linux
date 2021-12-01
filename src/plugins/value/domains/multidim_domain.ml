@@ -246,6 +246,12 @@ struct
     | `Top -> Memory.top
     | `Value loc ->
       Memory.overwrite ~oracle ~weak dst loc src
+
+  let segmentation_hint ~oracle m loc bounds =
+    match loc with
+    | `Top -> Memory.top
+    | `Value loc ->
+      Memory.segmentation_hint ~oracle m loc bounds
 end
 
 (* References to variables inside array segmentation.
@@ -335,7 +341,6 @@ struct
       | Lval lval ->
         let value = get state (Location.of_lval oracle lval) in
         Bottom.non_bottom value (* TODO: handle exception *)
-      | Info (e, _) -> oracle e
       | Const (CInt64 (i,_,_)) -> Value.inject_int i
       | UnOp (op, e, typ) -> Value.forward_unop typ op (oracle e)
       | BinOp (op, e1, e2, TFloat (fkind, _)) ->
@@ -348,7 +353,7 @@ struct
         and dst_type = scalar_type typ in
         Value.forward_cast ~src_type ~dst_type (oracle e)
       | _ ->
-        Value_parameters.fatal
+        Self.fatal
           "This type of array index expression is not supported: %a"
           Cil_printer.pp_exp exp
     in
@@ -365,22 +370,26 @@ struct
     let oracle = mk_oracle state in
     read (Memory.extract ~oracle) (Memory.smash ~oracle) state src
 
+  let add_references state vi refs' =
+    let base = Base.of_varinfo vi in
+    let memory, refs = find_or_top state base in
+    let refs'' = References.union refs (References.of_list refs') in
+    add base (memory, refs'') state
+
+  let add_references_l state l refs =
+    List.fold_left (fun state vi -> add_references state vi refs) state l
+
   let write (update : memory -> offset -> memory)
       (state : state) (loc : mdlocation) : state =
-    let bases = Location.bases loc in
     let f base off state =
       if covers_base base then
         let memory, refs = find_or_top state base in
         add base (update memory off, refs) state
       else
         state
-    and add_ref state vi =
-      let base = Base.of_varinfo vi in
-      let memory, refs = find_or_top state base in
-      add base (memory, References.union refs (References.of_list bases)) state
     in
     let state = Location.fold f loc state in
-    List.fold_left add_ref state (Location.references loc)
+    add_references_l state (Location.references loc) (Location.bases loc)
 
   let set (state : state) (dst : mdlocation) (v : value) : state =
     let weak = not (Location.is_singleton dst)
@@ -672,6 +681,28 @@ struct
       | _ -> `Value state
     in
     reduce predicate truth state
+
+  let interpret_acsl_extension extension _env state =
+    if extension.ext_name = "array_partition" then
+      let annotation = Eva_annotations.read_array_segmentation extension in
+      let vi,offset,bounds = annotation in
+      (* Update the segmentation *)
+      let lval = Cil_types.Var vi, offset in
+      let loc = Location.of_lval (mk_oracle' state) lval in
+      let oracle = mk_oracle state in
+      let update m offset =
+        Memory.segmentation_hint ~oracle m offset bounds
+      in
+      let state = write update state loc in
+      (* Update the references *)
+      let add acc e =
+        let r = Cil.extract_varinfos_from_exp e in
+        (Cil_datatype.Varinfo.Set.to_seq r |> List.of_seq) @ acc
+      in
+      let references = List.fold_left add [] bounds in
+      add_references_l state references (Location.bases loc)
+    else
+      state
 
   let empty () = top
 

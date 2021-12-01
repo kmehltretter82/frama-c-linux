@@ -351,3 +351,51 @@ module Allocation = struct
 end
 
 let get_allocation = Allocation.get
+
+
+module ArraySegmentation = Register (struct
+    module Interp = Db.Properties.Interp
+
+    type t = Cil_types.varinfo * Cil_types.offset * Cil_types.exp list
+    let name = "array_partition"
+    let is_loop_annot = false
+
+    let convert = function
+      | {term_node =  TLval (TVar {lv_origin=Some vi}, toffset)} :: tbounds ->
+        begin try
+            let offset = !Interp.term_offset_to_offset ~result:None toffset
+            and bounds = List.map (!Interp.term_to_exp ~result:None) tbounds in
+            Some (vi, offset, bounds)
+          with
+            Interp.No_conversion -> None
+        end
+      | _ -> None
+
+    let parse ~typing_context:context lexprs =
+      let open Logic_typing in
+      let l = List.map (context.type_term context context.pre_state) lexprs in
+      Extlib.the ~exn:Parse_error (convert l)
+
+    let import = function
+      | Ext_terms l -> Option.get (convert l)
+      | _ -> assert false
+
+    let export (vi, offset, bounds) =
+      let lv = Cil.cvar_to_lvar vi
+      and toffset = Logic_utils.offset_to_term_offset offset
+      and tbounds = List.map Logic_utils.expr_to_term bounds in
+      let tlval = TVar lv, toffset in
+      let tarray = Logic_const.term (TLval tlval) (Cil.typeOfTermLval tlval) in
+      Ext_terms (tarray :: tbounds)
+
+    let print fmt (vi,offset,bounds) =
+      Format.fprintf fmt "%a, %a"
+        Cil_printer.pp_lval (Var vi, offset)
+        (Pretty_utils.pp_list ~sep:",@ " Cil_printer.pp_exp) bounds
+  end)
+
+
+type array_segmentation = ArraySegmentation.t
+let get_array_segmentation = ArraySegmentation.get
+let add_array_segmentation = ArraySegmentation.add
+let read_array_segmentation ext = ArraySegmentation.import ext.ext_kind

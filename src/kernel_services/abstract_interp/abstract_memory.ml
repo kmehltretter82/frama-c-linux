@@ -211,6 +211,7 @@ sig
     weak:bool -> Abstract_offset.typed_offset -> t -> t
   val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
     t -> t
+  val add_segmentation_bounds : oracle:oracle -> Cil_types.exp list -> t -> t
 end
 
 
@@ -661,6 +662,7 @@ sig
   val incr_bound :
     oracle:oracle -> Bound.Var.t -> Integer.t option -> t -> t
   val map : (submemory -> submemory) -> t -> t
+  val add_segmentation_bounds : oracle:oracle -> bound list -> t -> t
 end
 
 module Segmentation (Config : Config) (M : ProtoMemory) =
@@ -925,6 +927,7 @@ struct
   let write ~oracle f m lindex (* included *) uindex (* excluded *) = (* lindex < uindex *)
     let open (val (B.operators oracle)) in
     let age = Integer.succ m.age in
+    let same_bounds = lindex == uindex in
     let lindex = lindex, age and uindex = uindex, age in
     (* (start,head) : segmentation kept identical below the write indexes,
                       head is a list in reverse order
@@ -967,7 +970,7 @@ struct
       and next_is_empty = is_empty_segment ~oracle uindex u in
       let tail' =
         (if previous_is_empty then [] else [(v,lindex)]) @
-        [(f v,uindex)] @
+        (if same_bounds then [] else [(f v,uindex)]) @
         (if next_is_empty then [] else [(v,u)]) @
         tail
       and head',start' = match head with (* change last bound to match lindex *)
@@ -1014,6 +1017,12 @@ struct
 
   let map f m =
     { m with segments = check_segments (List.map (fun (v,u) -> f v, u) m.segments) }
+
+  let add_segmentation_bounds ~oracle bounds m =
+    let add_bound m b =
+      write ~oracle (fun _ -> assert false) m b b
+    in
+    List.fold_left add_bound m bounds
 end
 
 
@@ -1355,6 +1364,20 @@ struct
           let array_value = A.incr_bound ~oracle vi x a.array_value in
           Array { a with array_value=A.map aux array_value }
       in aux
+
+    let add_segmentation_bounds ~oracle bounds = function
+      | Array a ->
+        let convert_bound exp =
+          try
+            Some (Bound.of_exp exp)
+          with Bound.UnsupportedBoundExpression -> None
+        in
+        let bounds = List.filter_map convert_bound bounds in
+        Array {
+          a with
+          array_value = A.add_segmentation_bounds ~oracle bounds a.array_value
+        }
+      | m -> m (* Ignore segmentation hints on non-array *)
   end
   and S : Structures with type submemory = ProtoMemory.t =
     Structures (Config) (ProtoMemory)
@@ -1425,4 +1448,10 @@ struct
         src
     in
     write ~oracle ~weak f offset dst
+
+  let segmentation_hint ~oracle m offset bounds =
+    let f ~weak:_ _typ m =
+      add_segmentation_bounds ~oracle bounds m
+    in
+    write ~oracle ~weak:false f offset m
 end

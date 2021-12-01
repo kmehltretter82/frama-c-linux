@@ -123,4 +123,9 @@ sig
 
   (* Pretty prints memory *)
   val pretty : Format.formatter -> t -> unit
+
+  (* Update the array segmentation at the given offset so the given bound
+     expressions appear in the segmentation *)
+  val segmentation_hint : oracle:oracle ->
+    t -> location -> Cil_types.exp list -> t
 end
