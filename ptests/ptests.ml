@@ -127,17 +127,19 @@ let str_split_list =
 
 (* removes first blanks *)
 let trim_right s =
-  let n = ref (String.length s - 1) in
-  let last_char_to_keep =
-    try
-      while !n > 0 do
-        if String.get s !n <> ' ' then raise Exit;
-        n := !n - 1
-      done;
-      0
-    with Exit -> !n
-  in
-  String.sub s 0 (last_char_to_keep+1)
+  if s = "" then s else begin
+    let n = ref (String.length s - 1) in
+    let last_char_to_keep =
+      try
+        while !n > 0 do
+          if String.get s !n <> ' ' then raise Exit;
+          n := !n - 1
+        done;
+        0
+      with Exit -> !n
+    in
+    String.sub s 0 (last_char_to_keep+1)
+  end
 
 let default_env = ref []
 
@@ -296,22 +298,24 @@ let example_msg =
      FILEREG: <regexp>    @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
      DONTRUN:             @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
-     # Note: the textual targets are compared to oracles.@]@  \
-     MODULE: <module>...  @[<v 0># Compile the module and set the @PTEST_MODULE@ macro.@]@  \
-     LIBS: <module>...    @[<v 0># Don't compile the module but set the @PTEST_LIBS@ macro.@]@  \
-     PLUGIN: <plugin>...  @[<v 0># Set the @PTEST_PLUGIN@ macro.@]@  \
-     SCRIPT: <script>...  @[<v 0># Set the @PTEST_SCRIPT@ macro.@]@  \
+     # NB: the textual targets are compared to oracles.@]@  \
+     MODULE: <module>...  @[<v 0># Compile the module and set the @@PTEST_MODULE@@ macro.@]@  \
+     LIBS: <module>...    @[<v 0># Don't compile the module but set the @@PTEST_LIBS@@ macro.@]@  \
+     PLUGIN: <plugin>...  @[<v 0># Set the @@PTEST_PLUGIN@@ macro.@]@  \
+     SCRIPT: <script>...  @[<v 0># Set the @@PTEST_SCRIPT@@ macro.@]@  \
      LOG: <file>...       @[<v 0># Defines targets built by the next sub-test command.@]@  \
      CMD: <command>       @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>       @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
-     STDOPT: +<extra>     @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
-     STDOPT: #<extra>     @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
+     STDOPT: -\"<extra>\"   @[<v 0># Defines a sub-test and remove the extra from the current option.@ \
+     # NB: current version does not allow to remove a multiple-extra-argument.@]@  \
+     STDOPT: +\"<extra>\"   @[<v 0># Defines a sub-test and appends the extra to the current option.@]@  \
+     STDOPT: #\"<extra>\"   @[<v 0># Defines a sub-test and prepends the extra to the current option.@]@  \
      EXIT: <number>       @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>        @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
      # Chaining multiple filter commands is possible by defining several FILTER directives.@ \
      # An empty command drops the previous FILTER directives.@ \
-     # Note: in such a command, the @@PTEST_ORACLE@@ macro is set to the basename of the oracle.@ \
+     # NB: in such a command, the @@PTEST_ORACLE@@ macro is set to the basename of the oracle.@ \
      # This allows running a 'diff' command with the oracle of another test configuration:@ \
      #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ @]@  \
      TIMEOUT: <delay>     @[<v 0># Set a timeout for all sub-test.@]@  \
@@ -916,26 +920,23 @@ end = struct
           Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
             (fun c opt rem ->
                match c with
-               | "+" -> aux (opt :: opts) rem
-               | "#" -> aux (opts @ [ opt ]) rem
+               | "+" -> aux (opts @ [ opt ]) rem (* appends [opt] *)
+               | "#" -> aux (opt :: opts) rem (* preppends [opt] *)
                | "-" -> aux (List.filter (fun x -> x <> opt) opts) rem
                | _ -> assert false (* format of scanned string disallow it *))
         with
         | Scanf.Scan_failure _ ->
           if s <> "" then
-            lock_eprintf "%s: unknown STDOPT configuration string: %s\n%!" file s;
+            lock_eprintf "%s: unknown STDOPT configuration string: %s@."
+              file s;
           opts
         | End_of_file -> opts
       in
       (* NB: current settings does not allow to remove a multiple-argument
          option (e.g. -verbose 2).
       *)
-      (* revert the initial list, as it will be reverted back in the end. *)
-      let opts =
-        aux (List.rev (str_split space stdopts)) s
-      in
-      (* preserve options ordering *)
-      List.fold_right (fun x s -> s ^ " " ^ x) opts ""
+      let opts = aux (str_split space stdopts) s in
+      String.concat " " opts
 
   (* how to process options *)
   let config_exec ~warn ~once ~file dir s current =
