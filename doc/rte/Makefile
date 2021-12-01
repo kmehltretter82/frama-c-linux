@@ -7,7 +7,7 @@ include ../MakeLaTeXModern
 DWNLDDIR=../manuals
 DOCNAME=rte-manual.pdf
 
-main.pdf: $(FRAMAC_MODERN) \
+main.pdf: $(FRAMAC_MODERN) ../../VERSION \
 	main.tex rte.tex \
 	biblio.bib \
 	stmtannot.c fcontract.c
