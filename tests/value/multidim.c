@@ -1,8 +1,5 @@
 /* run.config*
-   STDOPT: #"-main main -eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
-   STDOPT: #"-main main2 -eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
-   STDOPT: #"-main main3 -eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
-   STDOPT: #"-main main4 -eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
+   STDOPT: #"-eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
 */
 #include "__fc_builtin.h"
 #define N 4
@@ -32,7 +29,7 @@ void f(void);
 
 volatile int nondet;
 
-void main(s x) {
+void main1(s x) {
   s y1 = {{{{3.0}}}};
   s y2;
 
@@ -87,4 +84,11 @@ void main4(void) { // How trace partitioning changes array partitioning ?
     }
   }
   Frama_C_domain_show_each(t);
+}
+
+void main(s x) {
+  main1(x);
+  main2();
+  main3();
+  main4();
 }
