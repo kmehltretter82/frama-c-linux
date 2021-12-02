@@ -218,6 +218,8 @@ module OffsetStructEq: S_with_collections with type t = offset
 module OffsetStructEqStrict: S_with_collections with type t = offset
 
 module Stmt_Id:  Hptmap.Id_Datatype with type t = stmt
+
+(** @plugin development guide *)
 module Stmt: sig
   include S_with_collections_pretty with type t = stmt
   module Hptset: sig
@@ -299,7 +301,9 @@ module Funbehavior: S_with_pretty with type t = funbehavior
 
 module Funspec: S_with_pretty with type t = funspec
 
-(** @since Fluorine-20130401 *)
+(** @since Fluorine-20130401
+    @plugin development guide
+*)
 module Fundec: S_with_collections_pretty with type t = fundec
 
 module Global_annotation: sig

@@ -1784,8 +1784,9 @@ module implements a datastructure, it usually implements
 
 \begin{example}
 The following line of code pretty prints whether two statements are equal.
-\sscodeidx{Cil\_datatype}{Stmt}{pretty}
-\sscodeidx{Cil\_datatype}{Stmt}{equal}
+\scodeidx{Cil\_datatype}{Stmt}
+\sscodeidx{Datatype}{S\_no\_copy}{equal}
+\sscodeidx{Datatype}{S\_no\_copy}{pretty}
 \begin{ocamlcode}
 (* assuming the type of [stmt1] and [stmt2] is Cil_types.stmt *)
 Format.fprintf 
@@ -2312,9 +2313,10 @@ plug-in which provides a dynamic API for callstacks as follows.
 \scodeidx{Kernel\_function}{ty}
 \scodeidx{Kernel\_function}{pretty}
 \scodeidx{Kernel\_function}{dummy}
-\sscodeidx{Cil\_datatype}{Stmt}{t}
-\sscodeidx{Cil\_datatype}{Stmt}{ty}
-\sscodeidx{Cil\_datatype}{Stmt}{pretty}
+\scodeidx{Cil\_datatype}{Stmt}
+\sscodeidx{Datatype}{Ty}{t}
+\sscodeidx{Datatype}{Ty}{ty}
+\sscodeidx{Datatype}{S\_no\_copy}{pretty}
 \scodeidx{Cil}{dummyStmt}
 \scodeidx{Datatype}{Serializable\_undefined}
 \ocamlinput{./examples/generated/callstack.ml}
@@ -2323,7 +2325,8 @@ You have to use the functor \texttt{Type.Abstract} to access to the type value
 corresponding to the type of callstacks (and thus to access to the above
 dynamically registered functions).
 \scodeidx{Kernel\_function}{ty}
-\sscodeidx{Cil\_datatype}{Stmt}{ty}
+\scodeidx{Cil\_datatype}{Stmt}
+\sscodeidx{Datatype}{Ty}{t}
 \scodeidx{Type}{Abstract}
 \scodeidx{Dynamic}{get}
 \scodeidx{Datatype}{func}
@@ -2504,7 +2507,8 @@ it to store results of analyses. For example, using this mechanism inside
 \framac to create a \texttt{state} which would memoize\index{Memoization} some
 information attached to statements would result in the following piece of code.
 \scodeidx{Kernel\_function}{t} \scodeidx{Cil\_types}{varinfo}
-\sscodeidx{Cil\_datatype}{Stmt}{Hashtbl} \sscodeidx{Db}{Value}{compute}
+\scodeidx{Cil\_datatype}{Stmt}\sscodeidx{Datatype}{S\_with\_collections}{Hashtbl}
+\sscodeidx{Db}{Value}{compute}
 \begin{ocamlcode}
 open Cil_datatype
 type info = Kernel_function.t * Cil_types.varinfo
@@ -3982,10 +3986,10 @@ Such clauses can be of different categories, as described by
 \scodeidx{Cil\_types}{ext\_category}\texttt{Cil\_types.ext\_category}.
 \begin{itemize}
 \item A contract extension will be
-stored in the \texttt{b\_extended}\sscodeidx{Cil\_types}{behavior}{b\_extended} field of
+stored in the \texttt{b\_extended}\scodeidx{Cil\_types}{behavior}{b\_extended} field of
 \texttt{Cil\_types.behavior}\scodeidx{Cil\_types}{behavior}.
 \item A global extension will be found as a global ACSL annotation in the form of a
-\scodeidx{Cil\_types}{Dextended}\texttt{Cil\_types.Dextended} constructor.
+\sscodeidx{Cil\_types}{global\_annotation}{Dextended}\texttt{Cil\_types.Dextended} constructor.
 \item A code annotation extension will be stored with an
 \scodeidx{Cil\_types}{AExtended}\texttt{Cil\_types.AExtended} constructor. Such an extension has itself
 different flavors, determined by the \scodeidx{Cil\_types}{ext\_code\_annot\_context} type:
