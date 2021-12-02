@@ -509,6 +509,16 @@ struct
     | Exp (e, i) -> Ival.add_singleton_int i (oracle e)
     | Ptroffset _ -> raise Not_implemented
 
+  let to_const ~oracle = function
+    | Const i -> Some i
+    | Exp (e, i) ->
+      begin try
+          Some (Integer.add (Ival.project_int (oracle e)) i)
+        with Ival.Not_Singleton_Int ->
+          None
+      end
+    | Ptroffset _ -> raise Not_implemented
+
   let succ = function
     | Const i -> Const (Integer.succ i)
     | Exp (e, i) -> Exp (e, Integer.succ i)
@@ -534,6 +544,11 @@ struct
         then Some b
         else Option.map (fun i -> Ptroffset (e, base, Integer.(sub j (mul l i)))) i
     with NonLinear -> None
+
+  let incr_or_constantify ~oracle vi i b =
+    match incr vi i b with
+    | Some v -> Some v
+    | None -> Option.map (fun c -> Const c) (to_const ~oracle b)
 
   let cmp_int i1 i2 =
     let r = Integer.sub i1 i2 in
@@ -597,11 +612,13 @@ struct
     Bound.compare b1 b2 <?> (Integer.compare, a1, a2)
   let equal (b1,a1) (b2,a2) =
     Bound.equal b1 b2 && Integer.equal a1 a2
-  let of_integer i a = Bound.of_integer i, a
+  let _of_integer i a = Bound.of_integer i, a
   let _of_exp e a = Bound.of_exp e, a
   let _succ (b,a) = (Bound.succ b, a)
   let pred (b,a) = (Bound.pred b, a)
-  let incr vi i (b,a) = Bound.incr vi i b |> Option.map (fun b -> b,a)
+  let _incr vi i (b,a) = Bound.incr vi i b |> Option.map (fun b -> b,a)
+  let incr_or_constantify ~oracle vi i (b,a) =
+    Bound.incr_or_constantify ~oracle vi i b |> Option.map (fun b -> b,a)
   let _to_ival ~oracle (b,_a) = Bound.to_ival ~oracle b
   let cmp ~oracle (b1,_a1) (b2,_a2) = Bound.cmp ~oracle b1 b2
   let eq ?oracle (b1,_a1) (b2,_a2) = Bound.eq ?oracle b1 b2
@@ -615,7 +632,7 @@ struct
     Bound.upper_const ~oracle b
 
   let born b = b, Integer.zero
-  let age (_,a) = a
+  let _age (_,a) = a
   let operators oracle : (module Operators with type t = t) =
     operators (cmp ~oracle)
 end
@@ -823,9 +840,15 @@ struct
       in
       match left_slice_emerges, right_slice_emerges with
       | Some (v1,u1,t1), None -> (* left slice emerges *)
-        aux u1 t1 s2 ((v1,u1) :: acc)
+        if equals Left l u1 then (* actually empty both sides*)
+          aux l t1 s2 acc
+        else
+          aux u1 t1 s2 ((v1,u1) :: acc)
       | None, Some (v2,u2,t2) -> (* right slice emerges *)
-        aux u2 s1 t2 ((v2,u2) :: acc)
+        if equals Right l u2 then (* actually empty both sides *)
+          aux l s1 t2 acc
+        else
+          aux u2 s1 t2 ((v2,u2) :: acc)
       | Some _, Some _ (* both emerges, can't choose *)
       | None, None -> (* none emerges *)
         match s1, s2 with (* Are we done yet ? *)
@@ -960,16 +983,7 @@ struct
     aux_before m.start m.segments
 
   let incr_bound ~oracle vi x m =
-    let incr b =
-      match B.incr vi x b with
-      | Some b -> Some b
-      | None ->
-        try
-          let i = Ival.project_int (oracle (Cil.evar vi)) in
-          Some (B.of_integer i (B.age b))
-        with Ival.Not_Singleton_Int ->
-          None
-    in
+    let incr = B.incr_or_constantify ~oracle vi x in
     let rec aux acc = function
       | [] -> acc
       | (v,u) :: t ->

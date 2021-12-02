@@ -1,7 +1,4 @@
 [kernel] Parsing multidim.c (with preprocessing)
-[kernel:typing:no-proto] multidim.c:49: Warning: 
-  Calling function f that is declared without prototype.
-  Its formals will be inferred from actual arguments
 [eva:experimental] Warning: The multidim domain is experimental.
 [eva] Analyzing a complete application starting at main3
 [eva] Computing initial state
@@ -9,47 +6,40 @@
 [eva:initial-state] Values of globals at initialization
   z[0..3] ∈ {0}
   nondet ∈ [--..--]
+[eva] multidim.c:67: starting to merge loop iterations
 [eva] multidim.c:66: starting to merge loop iterations
-[eva] multidim.c:65: starting to merge loop iterations
-[kernel] multidim.c:67: 
-  more than 1(20) locations to update in array. Approximating.
 [kernel] multidim.c:68: 
   more than 1(20) locations to update in array. Approximating.
-[kernel] multidim.c:67: 
-  more than 1(28) locations to update in array. Approximating.
+[kernel] multidim.c:69: 
+  more than 1(20) locations to update in array. Approximating.
 [kernel] multidim.c:68: 
   more than 1(28) locations to update in array. Approximating.
-[eva] multidim.c:72: 
+[kernel] multidim.c:69: 
+  more than 1(28) locations to update in array. Approximating.
+[eva] computing for function Frama_C_interval <- main3.
+  Called from multidim.c:73.
+[eva] using specification for function Frama_C_interval
+[eva] multidim.c:73: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main3.
+  Called from multidim.c:74.
+[eva] multidim.c:74: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] multidim.c:76: 
   Frama_C_domain_show_each:
   z : # cvalue: [0].t1[0].f ∈ [0. .. 2.]
                 {[0]{.t1{[0].i; [1..3]}; .t2[0..3]}; [1..2]; [3].t1{[0..2]; [3].f}} ∈
                 [--..--]
                 [3].t1[3].i ∈ {0; 2}
                 [3].t2[0..3] ∈ {0}
-      # multidim: [0 .. 3] = {
-                    .t1{
-                      [0 .. 3] = { .f = [0. .. 2.], .i = {0; 2} },
-                      [4 .. 3] = 0
-                    }
-                  }
-[eva] computing for function Frama_C_interval <- main3.
-  Called from multidim.c:74.
-[eva] using specification for function Frama_C_interval
-[eva] multidim.c:74: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- main3.
-  Called from multidim.c:75.
-[eva] multidim.c:75: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] multidim.c:77: 
-  Frama_C_domain_show_each:
+      # multidim: [0 .. 3] = { .t1[0 .. 3] = { .f = [0. .. 2.], .i = {0; 2} } }
   r : # cvalue: [--..--]
       # multidim: { .f = [0. .. 2.], .i = {0; 2} }
 [eva] Recording results for main3
-[kernel] multidim.c:67: more than 1(28) elements to enumerate. Approximating.
 [kernel] multidim.c:68: more than 1(28) elements to enumerate. Approximating.
+[kernel] multidim.c:69: more than 1(28) elements to enumerate. Approximating.
 [eva] done for function main3
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main3:
@@ -63,8 +53,8 @@
   b ∈ {0; 1; 2; 3}
   r ∈ [--..--]
 [from] Computing for function main3
-[kernel] multidim.c:67: more than 1(28) dependencies to update. Approximating.
 [kernel] multidim.c:68: more than 1(28) dependencies to update. Approximating.
+[kernel] multidim.c:69: more than 1(28) dependencies to update. Approximating.
 [from] Computing for function Frama_C_interval <-main3
 [from] Done for function Frama_C_interval
 [from] Done for function main3

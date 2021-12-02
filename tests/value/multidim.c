@@ -2,6 +2,7 @@
    STDOPT: #"-main main -eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
    STDOPT: #"-main main2 -eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
    STDOPT: #"-main main3 -eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
+   STDOPT: #"-main main4 -eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
 */
 #include "__fc_builtin.h"
 #define N 4
@@ -27,7 +28,7 @@ s z[M];
 /*@ assigns z[..] \from \nothing;
     ensures \are_finite(z[..].t1[..].f) && \are_finite(z[..].t2[..].f);
   */
-void f();
+void f(void);
 
 volatile int nondet;
 
@@ -57,8 +58,8 @@ void main2(void) {
   for (int i = 0 ; i < 10 ; i++) {
     t[i] = 1;
   }
-  Frama_C_domain_show_each(t);
   //@ check t[0..9] == 1;
+  Frama_C_domain_show_each(t);
 }
 
 void main3(void) {
@@ -69,10 +70,21 @@ void main3(void) {
     }
   }
   
-  Frama_C_domain_show_each(z);
-
   int a = Frama_C_interval(0,M-1);
   int b = Frama_C_interval(0,N-1);
   t r = z[a].t1[b];
-  Frama_C_domain_show_each(r);
+  Frama_C_domain_show_each(z, r);
+}
+
+void main4(void) { // How trace partitioning changes array partitioning ?
+  int t[N];
+
+  //@ loop unroll 1;
+  for (int i = 0; i < M; i++) {
+    //@ loop unroll N;
+    for (int j = 0; j < N; j++) {
+      t[j] = 42;
+    }
+  }
+  Frama_C_domain_show_each(t);
 }
