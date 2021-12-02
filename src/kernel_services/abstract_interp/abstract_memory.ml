@@ -955,7 +955,9 @@ struct
       else
         match s with
         | [] ->
-          aux_end start head l (M.smash ~oracle v (M.of_raw m.padding)) uindex []
+          let u = B.upper_bound ~oracle:(fun _ -> oracle) u uindex
+          and v = M.smash ~oracle v (M.of_raw m.padding) in
+          aux_end start head l v u []
         | (v',u') :: t ->
           (* TODO: do not smash if the slices are covered by the write *)
           aux_over start head l (M.smash ~oracle v v') u' t
