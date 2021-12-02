@@ -35,6 +35,7 @@ let map_to_singleton map =
 module Value =
 struct
   include Cvalue.V
+  include Cvalue_forward (* for fallback oracles *)
 
   let _to_integer cvalue =
     try  Some (Ival.project_int (project_ival cvalue))
@@ -326,19 +327,39 @@ struct
     let oracle = mk_oracle state in
     read (Memory.get ~oracle) Value.join state src
 
-  and mk_oracle (state : state) : Abstract_memory.oracle =
+  and mk_oracle' (state : state) : Cil_types.exp -> Value.t =
+    (* Until Eva gives access to good oracles, we use this poor stupid oracle
+       instead *)
     let rec oracle exp =
       match exp.enode with
       | Lval lval ->
-        let ival = get state (Location.of_lval oracle lval) in
-        Bottom.non_bottom ival (* TODO: handle exception *)
-      | _ -> Value.top
+        let value = get state (Location.of_lval oracle lval) in
+        Bottom.non_bottom value (* TODO: handle exception *)
+      | Info (e, _) -> oracle e
+      | Const (CInt64 (i,_,_)) -> Value.inject_int i
+      | UnOp (op, e, typ) -> Value.forward_unop typ op (oracle e)
+      | BinOp (op, e1, e2, TFloat (fkind, _)) ->
+        Value.forward_binop_float (Fval.kind fkind) (oracle e1) op (oracle e2)
+      | BinOp (op, e1, e2, typ) ->
+        Value.forward_binop_int ~typ (oracle e1) op (oracle e2)
+      | CastE (typ, e) ->
+        let scalar_type t = Option.get (Eval_typ.classify_as_scalar t) in
+        let src_type =  scalar_type (Cil.typeOf e)
+        and dst_type = scalar_type typ in
+        Value.forward_cast ~src_type ~dst_type (oracle e)
+      | _ ->
+        Value_parameters.fatal
+          "This type of array index expression is not supported: %a"
+          Cil_printer.pp_exp exp
     in
+    fun exp -> oracle (Cil.constFold true exp)
+
+  and mk_oracle (state : state) : Abstract_memory.oracle =
     fun exp ->
-      try
-        Value.project_ival (oracle exp)
-      with Value.Not_based_on_null ->
-        Ival.top (* TODO: should it just not happen ? *)
+    try
+      Value.project_ival (mk_oracle' state exp)
+    with Value.Not_based_on_null ->
+      Ival.top (* TODO: should it just not happen ? *)
 
   let extract (state : state) (src : mdlocation) : Memory.t or_bottom =
     let oracle = mk_oracle state in
