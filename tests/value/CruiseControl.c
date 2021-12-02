@@ -1,6 +1,6 @@
 /* run.config*
-   
-   STDOPT: #"-float-normal tests/value/CruiseControl_const.c -lib-entry -main CruiseControl -eva-context-depth 10 -eva-context-valid-pointers"
+ DEPS: CruiseControl.h CruiseControl_extern.h scade_types.h config_types.h definitions.h
+   STDOPT: #"-float-normal %{dep:tests/value/CruiseControl_const.c} -lib-entry -main CruiseControl -eva-context-depth 10 -eva-context-valid-pointers"
 
 */
 /*$************* SCADE_KCG KCG Version 5.1.1 (build i10) **************

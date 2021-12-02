@@ -11,7 +11,7 @@
  MODULE: check_compliance
    OPT: -kernel-msg-key printer:attrs
  MODULE:
- CMD: ./tests/libc/check_full_libc.sh
+ CMD: %{dep:@PTEST_DIR@/check_full_libc.sh}
    OPT:
 **/
 #define __FC_REG_TEST

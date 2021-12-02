@@ -1,5 +1,6 @@
 /* run.config
-   STDOPT: +"tests/syntax/enum2.c"
+ DEPS: enum.h
+   STDOPT: +"%{dep:@PTEST_DIR@/enum2.c}"
 */
 
 

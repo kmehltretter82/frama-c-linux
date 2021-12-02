@@ -1,7 +1,8 @@
 /* run.config
  LIBS: libSelect
  MODULE: @PTEST_NAME@
-   OPT: @EVA_OPTIONS@ -machdep x86_32 -ulevel -1 -deps -slicing-level 2
+ DEPS: ../test/adpcm.c
+   STDOPT: +"-ulevel -1 -deps -slicing-level 2"
 */
 
 #include "../test/adpcm.c"

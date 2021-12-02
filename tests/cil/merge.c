@@ -1,4 +1,4 @@
 /* run.config
-   OPT: tests/cil/merge2.c -print
+   STDOPT: +"%{dep:@PTEST_DIR@/merge2.c}"
 */
 extern int x;
