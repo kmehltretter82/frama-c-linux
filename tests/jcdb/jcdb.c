@@ -7,7 +7,7 @@
  MODULE: @PTEST_NAME@
    OPT: -json-compilation-database %{dep:@PTEST_DIR@/with_arguments.json}
  MODULE:
-   EXECNOW: LOG list_files.res LOG list_files.err %{bin:frama-c-script} list-files %{dep:@PTEST_DIR@/compile_commands_working.json} > @PTEST_DIR@/result/list_files.res 2> @PTEST_DIR@/result/list_files.err
+   EXECNOW: LOG list_files.res LOG list_files.err %{bin:frama-c-script} list-files %{dep:@PTEST_DIR@/compile_commands_working.json} > @PTEST_RESULT@/list_files.res 2> @PTEST_RESULT@/list_files.err
 */
 
 #include <stdio.h>

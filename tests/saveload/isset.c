@@ -1,9 +1,9 @@
 /* run.config
-   EXECNOW: LOG isset_sav.res LOG isset_sav.err BIN isset.sav @frama-c@ -quiet -eva @EVA_OPTIONS@ -save tests/saveload/result/isset.sav tests/saveload/isset.c > ./tests/saveload/result/isset_sav.res 2> ./tests/saveload/result/isset_sav.err
-   STDOPT: +"-quiet -load ./tests/saveload/result/isset.sav"
-   STDOPT: +"-load ./tests/saveload/result/isset.sav"
-   STDOPT: +"-eva @EVA_OPTIONS@ -load ./tests/saveload/result/isset.sav"
-   STDOPT: +"-quiet -eva @EVA_OPTIONS@ -load ./tests/saveload/result/isset.sav"
+   EXECNOW: LOG isset_sav.res LOG isset_sav.err BIN isset.sav @frama-c@ -quiet -eva @EVA_OPTIONS@ -save @PTEST_RESULT@/isset.sav @PTEST_DIR@/isset.c > @PTEST_RESULT@/isset_sav.res 2> @PTEST_RESULT@/isset_sav.err
+   STDOPT: +"-quiet -load @PTEST_RESULT@/isset.sav"
+   STDOPT: +"-load @PTEST_RESULT@/isset.sav"
+   STDOPT: +"-eva @EVA_OPTIONS@ -load @PTEST_RESULT@/isset.sav"
+   STDOPT: +"-quiet -eva @EVA_OPTIONS@ -load @PTEST_RESULT@/isset.sav"
 */
 
 int main() {

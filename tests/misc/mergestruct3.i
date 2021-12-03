@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -print tests/misc/mergestruct1.i tests/misc/mergestruct2.i
-   OPT: -print tests/misc/mergestruct2.i tests/misc/mergestruct1.i
+   OPT: -print @PTEST_DIR@/mergestruct1.i @PTEST_DIR@/mergestruct2.i
+   OPT: -print @PTEST_DIR@/mergestruct2.i @PTEST_DIR@/mergestruct1.i
 */
 struct s { float a; } s2;
 

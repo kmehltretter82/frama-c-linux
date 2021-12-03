@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-eva -slice-value a -then-on 'Slicing export' -print -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check"
+   STDOPT: +"-eva -slice-value a -then-on 'Slicing export' -print -then -print -ocode @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check"
  */
 /*@ requires \valid(dest); */
 extern void cpy(int *dest, const int *src);

@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print tests/spec/third.c tests/spec/second.c
+   OPT: -print @PTEST_DIR@/third.c @PTEST_DIR@/second.c
 */
 /*@ behavior b:
   requires \valid(first);

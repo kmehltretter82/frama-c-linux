@@ -1,7 +1,7 @@
 /* run.config
  PLUGIN: @EVA_PLUGINS@ slicing
-   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err @frama-c@ -slicing-level 2 -slice-return main -eva-show-progress -save ./tests/saveload/result/sparecode.sav tests/saveload/sparecode.i -then-on 'Slicing export' -print > tests/saveload/result/sparecode_sav.res 2> tests/saveload/result/sparecode_sav.err
-   STDOPT: +"-load ./tests/saveload/result/sparecode.sav"
+   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err @frama-c@ -slicing-level 2 -slice-return main -eva-show-progress -save @PTEST_RESULT@/sparecode.sav @PTEST_DIR@/sparecode.i -then-on 'Slicing export' -print > @PTEST_RESULT@/sparecode_sav.res 2> @PTEST_RESULT@/sparecode_sav.err
+   STDOPT: +"-load @PTEST_RESULT@/sparecode.sav"
 */
 int G;
 int f (int x, int y) {

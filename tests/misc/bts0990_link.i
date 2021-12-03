@@ -3,7 +3,7 @@
    OPT: %{dep:@PTEST_DIR@/bts0990_link_1.i}
 */
 // NB: This test is meant to return an error, as s is declared as an array in
-// tests/misc/bts0990_link_1.i
+// @PTEST_DIR@/bts0990_link_1.i
 
 char *s;
 

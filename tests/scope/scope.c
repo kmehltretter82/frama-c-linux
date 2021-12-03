@@ -4,9 +4,9 @@
    OPT: -eva @EVA_CONFIG@ -main loop
 */
 /*
- * bin/viewer.byte -main f tests/scope/scope.c -eva
- * bin/viewer.byte -main f2 tests/scope/scope.c -eva
- * bin/viewer.byte -main loop tests/scope/scope.c -eva
+ * bin/viewer.byte -main f @PTEST_DIR@/scope.c -eva
+ * bin/viewer.byte -main f2 @PTEST_DIR@/scope.c -eva
+ * bin/viewer.byte -main loop @PTEST_DIR@/scope.c -eva
  */
 
 #include "__fc_builtin.h"
