@@ -1,10 +1,10 @@
 /* run.config
-PLUGIN: eva,scope
+ PLUGIN: eva,scope
+ DEPS: preprocess.h
    OPT: -eva @EVA_CONFIG@ -print
 */
 // see bts 1357
 #define assert(x) (x)?1:0
-
 int x = 1;
 
 #define FOO 1

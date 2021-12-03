@@ -3,6 +3,6 @@
 */
 
 /* run.config_qualif
-   CMD: tests/wp_plugin/config.sh
+   CMD: %{dep:@PTEST_DIR@/config.sh}
    OPT:
 */

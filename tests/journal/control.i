@@ -6,7 +6,7 @@
    OPT:
  MODULE:
  SCRIPT: result/control_journal_bis.ml
-   EXECNOW: BIN control_journal_bis.ml cp @PTEST_RESULT@/control_journal.ml @PTEST_RESULT@/control_journal_bis.ml > @DEV_NULL@ 2> @DEV_NULL@
+   EXECNOW: BIN control_journal_bis.ml cp %{dep:@PTEST_RESULT@/control_journal.ml} @PTEST_RESULT@/control_journal_bis.ml > @DEV_NULL@ 2> @DEV_NULL@
    OPT: -calldeps
  MODULE: abstract_cpt use_cpt
  SCRIPT:

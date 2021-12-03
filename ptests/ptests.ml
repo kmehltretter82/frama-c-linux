@@ -127,17 +127,19 @@ let str_split_list =
 
 (* removes first blanks *)
 let trim_right s =
-  let n = ref (String.length s - 1) in
-  let last_char_to_keep =
-    try
-      while !n > 0 do
-        if String.get s !n <> ' ' then raise Exit;
-        n := !n - 1
-      done;
-      0
-    with Exit -> !n
-  in
-  String.sub s 0 (last_char_to_keep+1)
+  if s = "" then s else begin
+    let n = ref (String.length s - 1) in
+    let last_char_to_keep =
+      try
+        while !n > 0 do
+          if String.get s !n <> ' ' then raise Exit;
+          n := !n - 1
+        done;
+        0
+      with Exit -> !n
+    in
+    String.sub s 0 (last_char_to_keep+1)
+  end
 
 let default_env = ref []
 
@@ -296,22 +298,27 @@ let example_msg =
      FILEREG: <regexp>    @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
      DONTRUN:             @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
-     # Note: the textual targets are compared to oracles.@]@  \
-     MODULE: <module>...  @[<v 0># Compile the module and set the @PTEST_MODULE@ macro.@]@  \
-     LIBS: <module>...    @[<v 0># Don't compile the module but set the @PTEST_LIBS@ macro.@]@  \
-     PLUGIN: <plugin>...  @[<v 0># Set the @PTEST_PLUGIN@ macro.@]@  \
-     SCRIPT: <script>...  @[<v 0># Set the @PTEST_SCRIPT@ macro.@]@  \
+     # NB: the textual targets are compared to oracles.@]@  \
+     MODULE: <module>...  @[<v 0># Compile the module and set the @@PTEST_MODULE@@ macro.@]@  \
+     LIBS: <module>...    @[<v 0># Don't compile the module but set the @@PTEST_LIBS@@ macro.@]@  \
+     PLUGIN: <plugin>...  @[<v 0># Set the @@PTEST_PLUGIN@@ macro.@]@  \
+     SCRIPT: <script>...  @[<v 0># Set the @@PTEST_SCRIPT@@ macro.@]@  \
+     DEPS: <dependency>...@[<v 0># Set the @@PTEST_DEPS@@ macro and adds a dependency to next sub-test and execnow commands (forward compatibility).@ \
+     # NB: a dependency to the included files can be added with this directive.@ \
+     # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
      LOG: <file>...       @[<v 0># Defines targets built by the next sub-test command.@]@  \
      CMD: <command>       @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>       @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
-     STDOPT: +<extra>     @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
-     STDOPT: #<extra>     @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
+     STDOPT: -\"<extra>\"   @[<v 0># Defines a sub-test and remove the extra from the current option.@ \
+     # NB: current version does not allow to remove a multiple-extra-argument.@]@  \
+     STDOPT: +\"<extra>\"   @[<v 0># Defines a sub-test and appends the extra to the current option.@]@  \
+     STDOPT: #\"<extra>\"   @[<v 0># Defines a sub-test and prepends the extra to the current option.@]@  \
      EXIT: <number>       @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>        @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
      # Chaining multiple filter commands is possible by defining several FILTER directives.@ \
      # An empty command drops the previous FILTER directives.@ \
-     # Note: in such a command, the @@PTEST_ORACLE@@ macro is set to the basename of the oracle.@ \
+     # NB: in such a command, the @@PTEST_ORACLE@@ macro is set to the basename of the oracle.@ \
      # This allows running a 'diff' command with the oracle of another test configuration:@ \
      #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ @]@  \
      TIMEOUT: <delay>     @[<v 0># Set a timeout for all sub-test.@]@  \
@@ -334,6 +341,7 @@ let example_msg =
      @@PTEST_CONFIG@@       # Test configuration suffix.@ \
      @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@ \
      @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@ \
+     @@PTEST_DEPS@@         # Current list of dependencies defined by the DEPS directive.@ \
      @@PTEST_LIBS@@         # Current list of modules defined by the LIBS directive.@ \
      @@PTEST_MODULE@@       # Current list of modules defined by the MODULE directive.@ \
      @@PTEST_PLUGIN@@       # Current list of plugins defined by the PLUGIN directive.@ \
@@ -819,6 +827,7 @@ end = struct
       "PTEST_PRE_OPTIONS",      !macro_pre_options;
       "PTEST_POST_OPTIONS",     !macro_post_options;
       "PTEST_MAKE_MODULE", "make -s";
+      "PTEST_DEPS", "";
       "PTEST_LIBS", "";
       "PTEST_MODULE", "";
       "PTEST_PLUGIN", "";
@@ -916,26 +925,23 @@ end = struct
           Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
             (fun c opt rem ->
                match c with
-               | "+" -> aux (opt :: opts) rem
-               | "#" -> aux (opts @ [ opt ]) rem
+               | "+" -> aux (opts @ [ opt ]) rem (* appends [opt] *)
+               | "#" -> aux (opt :: opts) rem (* preppends [opt] *)
                | "-" -> aux (List.filter (fun x -> x <> opt) opts) rem
                | _ -> assert false (* format of scanned string disallow it *))
         with
         | Scanf.Scan_failure _ ->
           if s <> "" then
-            lock_eprintf "%s: unknown STDOPT configuration string: %s\n%!" file s;
+            lock_eprintf "%s: unknown STDOPT configuration string: %s@."
+              file s;
           opts
         | End_of_file -> opts
       in
       (* NB: current settings does not allow to remove a multiple-argument
          option (e.g. -verbose 2).
       *)
-      (* revert the initial list, as it will be reverted back in the end. *)
-      let opts =
-        aux (List.rev (str_split space stdopts)) s
-      in
-      (* preserve options ordering *)
-      List.fold_right (fun x s -> s ^ " " ^ x) opts ""
+      let opts = aux (str_split space stdopts) s in
+      String.concat " " opts
 
   (* how to process options *)
   let config_exec ~warn ~once ~file dir s current =
@@ -1007,6 +1013,14 @@ end = struct
 
   let update_plugin_macros =
     update_macros (fun name -> name) "-load-module=" "PTEST_PLUGIN" "PTEST_LOAD_PLUGIN"
+
+  let config_deps ~file dir s current =
+    let macro_def = "PTEST_DEPS" in
+    let def = Macros.expand_directive ~file current.dc_macros s in
+    if !verbosity >= 3 then Format.printf "%% %s: %s@." macro_def def ;
+    let dc_macros = Macros.add_list [ macro_def, def ;
+                                    ] current.dc_macros in
+    { current with dc_macros }
 
   let config_module ~file dir s current =
     let s = Macros.expand_directive ~file current.dc_macros s in
@@ -1102,6 +1116,8 @@ end = struct
       "MACRO", config_macro;
 
       "MODULE", config_module;
+
+      "DEPS",   config_deps;
 
       "LIBS",   config_libs_script_plugin update_libs_macros;
       "SCRIPT", config_libs_script_plugin update_script_macros;
@@ -1341,68 +1357,75 @@ end = struct
 
   let get_ptest_file cmd = SubDir.make_file cmd.directory cmd.file
 
-  let expand_macros ~defaults cmd =
-    let ptest_config =
-      if !special_config = "" then "" else "_" ^ !special_config
-    in
-    let ptest_file = get_ptest_file cmd in
-    let ptest_name =
-      try Filename.chop_extension cmd.file
-      with Invalid_argument _ -> cmd.file
-    in
-    let ptest_file = Filename.sanitize ptest_file in
-    let ptest_load_plugin = Macros.get "PTEST_LOAD_PLUGIN" cmd.macros in
-    let ptest_load_module = Macros.get "PTEST_LOAD_MODULE" cmd.macros in
-    let ptest_load_libs = Macros.get "PTEST_LOAD_LIBS" cmd.macros in
-    let ptest_load_script = Macros.get "PTEST_LOAD_SCRIPT" cmd.macros in
-    let macros =
-      [ "PTEST_CONFIG", ptest_config;
-        "PTEST_DIR", SubDir.get cmd.directory;
-        "PTEST_RESULT",
-        SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
-        "PTEST_FILE", ptest_file;
-        "PTEST_NAME", ptest_name;
-        "PTEST_NUMBER", string_of_int cmd.n;
-        "PTEST_OPT", cmd.options;
-        "PTEST_LOAD_OPTIONS", (String.concat " "
-                                 [ ptest_load_plugin ;
-                                   ptest_load_libs ;
-                                   ptest_load_module ;
-                                   ptest_load_script ; ])
-      ]
-    in
-    let macros = Macros.add_list macros cmd.macros in
-    let macros = Macros.add_defaults ~defaults macros in
-    let process_macros s = Macros.expand macros s in
-    let toplevel =
-      let in_toplevel,toplevel= Macros.does_expand macros cmd.toplevel in
-      if not cmd.execnow then begin
-        let has_ptest_file, options =
-          if in_toplevel.has_ptest_opt then in_toplevel.has_ptest_file, []
-          else
-            let in_option,options= Macros.does_expand macros cmd.options in
-            (in_option.has_ptest_file || in_toplevel.has_ptest_file),
-            (if in_toplevel.has_frama_c_exe then
-               [ process_macros "@PTEST_PRE_OPTIONS@" ;
-                 options ;
-                 process_macros "@PTEST_POST_OPTIONS@" ;
-               ]
-             else [ options ])
-        in
-        String.concat " " (toplevel::(if has_ptest_file then options else ptest_file::options))
-      end
-      else toplevel
-    in
-    { cmd with
-      macros;
-      toplevel;
-      options = ""; (* no more usable *)
-      log_files = List.map process_macros cmd.log_files;
-      filter =
-        match cmd.filter with
-        | None -> None
-        | Some filter -> Some (process_macros filter)
-    }
+  let expand_macros =
+    let dune_cmd_features = Str.regexp "%{[a-z][a-z-]*:\\([^}]*\\)}" in
+    let dune_bin_features = Str.regexp "%{bin:\\([^}]*\\)}" in
+    fun ~defaults cmd ->
+      let ptest_config =
+        if !special_config = "" then "" else "_" ^ !special_config
+      in
+      let ptest_file = get_ptest_file cmd in
+      let ptest_name =
+        try Filename.chop_extension cmd.file
+        with Invalid_argument _ -> cmd.file
+      in
+      let ptest_file = Filename.sanitize ptest_file in
+      let ptest_load_plugin = Macros.get "PTEST_LOAD_PLUGIN" cmd.macros in
+      let ptest_load_module = Macros.get "PTEST_LOAD_MODULE" cmd.macros in
+      let ptest_load_libs = Macros.get "PTEST_LOAD_LIBS" cmd.macros in
+      let ptest_load_script = Macros.get "PTEST_LOAD_SCRIPT" cmd.macros in
+      let macros =
+        [ "PTEST_CONFIG", ptest_config;
+          "PTEST_DIR", SubDir.get cmd.directory;
+          "PTEST_RESULT",
+          SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
+          "PTEST_FILE", ptest_file;
+          "PTEST_NAME", ptest_name;
+          "PTEST_NUMBER", string_of_int cmd.n;
+          "PTEST_OPT", cmd.options;
+          "PTEST_LOAD_OPTIONS", (String.concat " "
+                                   [ ptest_load_plugin ;
+                                     ptest_load_libs ;
+                                     ptest_load_module ;
+                                     ptest_load_script ; ])
+        ]
+      in
+      let macros = Macros.add_list macros cmd.macros in
+      let macros = Macros.add_defaults ~defaults macros in
+      let process_macros s = Macros.expand macros s in
+      let toplevel =
+        let in_toplevel,toplevel= Macros.does_expand macros cmd.toplevel in
+        if not cmd.execnow then begin
+          let has_ptest_file, options =
+            if in_toplevel.has_ptest_opt then in_toplevel.has_ptest_file, []
+            else
+              let in_option,options= Macros.does_expand macros cmd.options in
+              (in_option.has_ptest_file || in_toplevel.has_ptest_file),
+              (if in_toplevel.has_frama_c_exe then
+                 [ process_macros "@PTEST_PRE_OPTIONS@" ;
+                   options ;
+                   process_macros "@PTEST_POST_OPTIONS@" ;
+                 ]
+               else [ options ])
+          in
+          String.concat " " (toplevel::(if has_ptest_file then options else ptest_file::options))
+        end
+        else toplevel
+      in
+      let toplevel = (* removes dune feature such as %{deps:...} *)
+        let x = str_global_replace dune_bin_features "./bin/\\1" toplevel in
+        str_global_replace dune_cmd_features "\\1" x
+      in
+      { cmd with
+        macros;
+        toplevel;
+        options = ""; (* no more usable *)
+        log_files = List.map process_macros cmd.log_files;
+        filter =
+          match cmd.filter with
+          | None -> None
+          | Some filter -> Some (process_macros filter)
+      }
 
   let basic_command_string =
     fun command ->

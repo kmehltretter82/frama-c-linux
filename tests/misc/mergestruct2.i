@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print tests/misc/mergestruct3.i tests/misc/mergestruct1.i
+   OPT: -print %{dep:@PTEST_DIR@/mergestruct3.i} %{dep:@PTEST_DIR@/mergestruct1.i}
 */
 struct s *p;
 

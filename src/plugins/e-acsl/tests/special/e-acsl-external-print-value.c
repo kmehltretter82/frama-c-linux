@@ -1,5 +1,5 @@
 /* run.config_dev
-   MACRO: ROOT_EACSL_GCC_OPTS_EXT --assert-print-data --external-print-value tests/special/e-acsl-external-print-value-fct.c
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT --assert-print-data --external-print-value @PTEST_DIR@/e-acsl-external-print-value-fct.c
 */
 
 int main() {

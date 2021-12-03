@@ -1,7 +1,7 @@
 /* run.config
-   OPT: tests/spec/volatile_aux.c -print -copy
+ DEPS: volatile.h
+   OPT: %{dep:@PTEST_DIR@/volatile_aux.c} -print -copy
 */
-
 #include "volatile.h"
 
 //@volatile x,y writes w ;

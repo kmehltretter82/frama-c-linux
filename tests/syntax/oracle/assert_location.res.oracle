@@ -12,7 +12,7 @@ void h(void)
 void c(void)
 {
   __FC_assert("I\'m in assert_location.c" != (char const *)0,
-              "tests/syntax/assert_location.c",4,
+              "tests/syntax/assert_location.c",9,
               "\"I\'m in assert_location.c\"");
   return;
 }

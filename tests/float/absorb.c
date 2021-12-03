@@ -1,10 +1,10 @@
 /* run.config
    COMMENT: run.config is intentionally not-*
 PLUGIN:
-   EXECNOW: BIN absorb.sav LOG absorb_sav.res LOG absorb_sav.err @frama-c@ -save @PTEST_DIR@/result/absorb.sav @PTEST_FILE@ > @PTEST_DIR@/result/absorb_sav.res 2> @PTEST_DIR@/result/absorb_sav.err
+   EXECNOW: BIN absorb.sav LOG absorb_sav.res LOG absorb_sav.err @frama-c@ -save @PTEST_RESULT@/absorb.sav @PTEST_FILE@ > @PTEST_RESULT@/absorb_sav.res 2> @PTEST_RESULT@/absorb_sav.err
 PLUGIN: @EVA_PLUGINS@
-   EXECNOW: BIN absorb.sav2 LOG absorb_sav2.res LOG absorb_sav2.err @frama-c@ -load @PTEST_DIR@/result/absorb.sav -eva @EVA_CONFIG@ -float-hex -save @PTEST_DIR@/result/absorb.sav2 > @PTEST_DIR@/result/absorb_sav2.res 2> @PTEST_DIR@/result/absorb_sav2.err
-   OPT: -load @PTEST_DIR@/result/absorb.sav2 -deps -out -input
+   EXECNOW: BIN absorb.sav2 LOG absorb_sav2.res LOG absorb_sav2.err @frama-c@ -load %{dep:@PTEST_RESULT@/absorb.sav} -eva @EVA_CONFIG@ -float-hex -save @PTEST_RESULT@/absorb.sav2 > @PTEST_RESULT@/absorb_sav2.res 2> @PTEST_RESULT@/absorb_sav2.err
+   OPT: -load %{dep:@PTEST_RESULT@/absorb.sav2} -deps -out -input
 */
 /* run.config*
    DONTRUN:

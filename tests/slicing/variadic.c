@@ -1,4 +1,5 @@
 /* run.config
+  DEPS: ../pdg/variadic.c
     STDOPT: +"-slice-return f3 -no-slice-callers -then-on 'Slicing export' -print"
     STDOPT: +"-slice-return f3 -no-slice-callers -variadic-no-translation -then-last -print"
     STDOPT: +"-slice-return f3 -then-on 'Slicing export' -print"

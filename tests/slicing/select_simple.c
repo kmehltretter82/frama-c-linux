@@ -1,6 +1,7 @@
 /* run.config
  LIBS: libSelect
  MODULE: @PTEST_NAME@
+ DEPS: simple_intra_slice.i
    OPT: @EVA_OPTIONS@ -deps
 */
 
