@@ -976,6 +976,15 @@ CFG'' item appears, that displays the control flow graph of the
 function in a dialog box. This is achieved just by appending the following
 pieces of code at the end of the \texttt{cfg\_print.ml} file.
 
+\begin{important}
+Frama-C GUI can be compiled against two versions of lablgtk (the OCaml
+bindings to the Gtk toolkit). The actual rendering of the control flow graph
+is actually done by the external OCamlgraph library, and only available
+when compiling against lablgtk2. If you're using lablgtk3,
+you will only see a pop-up window indicating that there's no support for
+displaying graphs.
+\end{important}
+
 Currently, we used a visitor that outputs a \dottool file with the CFG of
 all functions of all files. We use \texttt{dump\_function} to output
 the CFG of a single function instead.
@@ -993,7 +1002,7 @@ Now we write the GUI extension code:
 \scodeidx{Pretty\_source}{PVDecl}
 \sscodeidx{Globals}{Functions}{get}
 \scodeidx{Kernel\_function}{get\_definition}
-\scodeidx{Gtk\_helper}{graph\_window}
+\scodeidx{Dgraph\_helper}{graph\_window}
 \scodeidx{Design}{register\_extension}
 \sscodeidx{Design}{main\_window\_extension\_points}{register\_source\_selector}
 
