@@ -1800,7 +1800,8 @@ Format.fprintf
 Module \texttt{Datatype.String}\scodeidx{Datatype}{String} implements
 \texttt{Datatype.S\_with\_collections}. Thus you can initialize a set of strings
 in the following way.
-\sscodeidx{Datatype}{String}{Set}
+\scodeidx{Datatype}{String}
+\sscodeidx{Datatype}{S\_with\_collections}{Set}
 \begin{ocamlcode}
 let string_set = 
   List.fold_left 
@@ -1956,7 +1957,8 @@ Here is how to apply \texttt{Datatype.Polymorphic} corresponding to the type
 \scodeidx{Structural\_descr}{pack}
 \scodeidx{Structural\_descr}{p\_int}
 \scodeidx{Datatype}{Int}
-\sscodeidx{Datatype}{String}{Hashtbl}
+\scodeidx{Datatype}{String}
+\sscodeidx{Datatype}{S\_with\_collections}{Hashtbl}
 \scodeidx{Datatype}{List}
 \scodeidx{Type}{par}
 \begin{ocamlcode}
@@ -2307,14 +2309,12 @@ plug-in-defined types in an abstract way through the functor
 There is no current example in the \framac open-source part, but consider a
 plug-in which provides a dynamic API for callstacks as follows.
 \scodeidx{Plugin}{Register}
-\scodeidx{Kernel\_function}{t}
-\scodeidx{Kernel\_function}{ty}
-\scodeidx{Kernel\_function}{pretty}
-\scodeidx{Kernel\_function}{dummy}
-\scodeidx{Cil\_datatype}{Stmt}
+\codeidx{Kernel\_function}
 \sscodeidx{Datatype}{Ty}{t}
 \sscodeidx{Datatype}{Ty}{ty}
 \sscodeidx{Datatype}{S\_no\_copy}{pretty}
+\scodeidx{Kernel\_function}{dummy}
+\scodeidx{Cil\_datatype}{Stmt}
 \scodeidx{Cil}{dummyStmt}
 \scodeidx{Datatype}{Serializable\_undefined}
 \ocamlinput{./examples/generated/callstack.ml}
@@ -2322,7 +2322,8 @@ plug-in which provides a dynamic API for callstacks as follows.
 You have to use the functor \texttt{Type.Abstract} to access to the type value
 corresponding to the type of callstacks (and thus to access to the above
 dynamically registered functions).
-\scodeidx{Kernel\_function}{ty}
+\codeidx{Kernel\_function}
+\sscodeidx{Datatype}{Ty}{ty}
 \scodeidx{Cil\_datatype}{Stmt}
 \sscodeidx{Datatype}{Ty}{t}
 \scodeidx{Type}{Abstract}
@@ -2504,7 +2505,8 @@ In most non-\framac applications, a state is a global mutable value. One can use
 it to store results of analyses. For example, using this mechanism inside
 \framac to create a \texttt{state} which would memoize\index{Memoization} some
 information attached to statements would result in the following piece of code.
-\scodeidx{Kernel\_function}{t} \scodeidx{Cil\_types}{varinfo}
+\codeidx{Kernel\_function}\sscodeidx{Datatype}{Ty}{t}
+\scodeidx{Cil\_types}{varinfo}
 \scodeidx{Cil\_datatype}{Stmt}\sscodeidx{Datatype}{S\_with\_collections}{Hashtbl}
 \sscodeidx{Db}{Value}{compute}
 \begin{ocamlcode}
@@ -2963,8 +2965,9 @@ code.
 \subsection{Definition}\label{options:definition}
 
 In \framac, a parameter is represented by a value of type
-\texttt{Typed\_parameter.t}\scodeidxdef{Typed\_parameter}{t} and by a module
-implementing the signature
+\texttt{Typed\_parameter.t}\codeidxdef{Typed\_parameter}
+\sscodeidx{Datatype}{Ty}{t}
+and by a module implementing the signature
 \texttt{Parameter\_sig.S}\scodeidxdef{Parameter\_sig}{S}. The first
 representation is a low-level one required by emitters\index{Emitter} (see
 Section~\ref{adv:annotations}) and the GUI. The second one provides a high-level
