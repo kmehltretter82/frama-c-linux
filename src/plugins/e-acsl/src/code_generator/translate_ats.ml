@@ -117,6 +117,7 @@ let rec sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope sizes_and_shift
       | _ ->
         Options.fatal "Unexpected comparison operator"
     in
+    Interval.(preprocess_term ~logic_env t_size);
     let iv = Interval.(extract_ival (get ~logic_env t_size)) in
     (* The EXACT amount of memory that is needed can be known at runtime. This
        is because the tightest bounds for the variables can be known at runtime.
