@@ -198,7 +198,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   in
   (* s *)
   let ty = match Cil.unrollType (Misc.cty ptr.term_type) with
-    | TPtr(ty, _) | TArray(ty, _, _, _) -> ty
+    | TPtr(ty, _) | TArray(ty, _, _) -> ty
     | _ -> assert false
   in
   let s = Logic_const.term ~loc (TSizeOf ty) Linteger in

@@ -72,7 +72,7 @@ struct
       let to_exp = Cil.integer ~loc:unknown_loc in
       let size = Option.map to_exp size in
       Listed typ,
-      Ctype (TArray (t, size, Cil.empty_size_cache (), []))
+      Ctype (TArray (t, size, []))
     | _, _ -> raise NotACType
 
 
@@ -89,10 +89,10 @@ struct
       | TInt (kind, l) -> TInt (kind, add_to l)
       | TFloat (kind, l) -> TFloat (kind, add_to l)
       | TPtr (typ, l) -> TPtr (typ, add_to l)
-      | TArray (typ, size, cache, l) -> TArray (typ, size, cache, add_to l)
+      | TArray (typ, size, l) -> TArray (typ, size, add_to l)
       | TFun (typ, args, variadic, l) -> TFun (typ, args, variadic, add_to l)
       | TNamed (typeinfo, l) -> TNamed (typeinfo, add_to l)
-      | TComp (compinfo, cache, l) -> TComp (compinfo, cache, add_to l)
+      | TComp (compinfo, l) -> TComp (compinfo, add_to l)
       | TEnum (enuminfo, l) -> TEnum (enuminfo, add_to l)
       | TBuiltin_va_list l -> TBuiltin_va_list (add_to l)
     in
@@ -445,8 +445,8 @@ struct
     | (Field (lv,_) | FieldNamed (lv,_)) as e ->
       let (host, offset) as lv' = build_lval ~loc lv in
       let host', offset', ci = match Cil.(unrollTypeDeep (typeOfLval lv')) with
-        | TComp (ci,_,_) -> host, offset, ci
-        | TPtr (TComp (ci,_,_),_) ->
+        | TComp (ci,_) -> host, offset, ci
+        | TPtr (TComp (ci,_),_) ->
           Mem (Cil.new_exp ~loc (Lval lv')), Cil_types.NoOffset, ci
         | _ -> typing_error "trying to get a field of an lvalue which is not \
                              of composite type or pointer to a composite type"
@@ -522,8 +522,8 @@ struct
         | lty -> lty
       in
       let host', offset', ci = match lty with
-        | Ctype (TComp (ci,_,_)) -> host, offset, ci
-        | Ctype (TPtr (TComp (ci,_,_),_)) ->
+        | Ctype (TComp (ci,_)) -> host, offset, ci
+        | Ctype (TPtr (TComp (ci,_),_)) ->
           TMem (Logic_const.term ~loc (Cil_types.TLval tlv') lty), TNoOffset, ci
         | _ -> typing_error "trying to get a field of an lvalue which is not \
                              of composite type or pointer to a composite type"

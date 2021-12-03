@@ -191,7 +191,6 @@ and pp_def fmt = function
     List.iter (fun def -> fprintf fmt ",@ def(%a)" pp_def def) defs;
     fprintf fmt ")@]"
   |     GLOBANNOT _ -> fprintf fmt "GLOBANNOT"
-  |     CUSTOM _ -> fprintf fmt "CUSTOM"
 
 and pp_file fmt (s,l) =
   fprintf fmt "@[FILE %a, {" Filepath.Normalized.pp_abs s;

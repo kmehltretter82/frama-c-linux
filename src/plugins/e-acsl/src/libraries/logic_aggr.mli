@@ -25,7 +25,7 @@ open Cil_types
 (** Utilities function for aggregate types. *)
 
 val get_array_typ_opt:
-  typ -> (typ * exp option * bitsSizeofTypCache * attributes) option
+  typ -> (typ * exp option * attributes) option
 (** @return the content of the array type if [ty] is an array, or None
     otherwise. *)
 

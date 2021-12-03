@@ -24,7 +24,7 @@ and in_array_ghost_status fmt lval =
   Format.fprintf fmt "%a" ghost_status lval
 and comp_ghost_status fmt lval =
   match Cil.typeOfLval lval with
-  | TComp({ cfields }, _, _) ->
+  | TComp({ cfields }, _) ->
     Format.fprintf fmt "{ " ;
     List.iter (field_ghost_status fmt lval) (Option.value ~default:[] cfields) ;
     Format.fprintf fmt " }"

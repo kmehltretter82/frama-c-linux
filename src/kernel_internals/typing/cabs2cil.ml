@@ -624,7 +624,7 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
         else begin
           let sizeof_type =
             match Cil.unrollType fi.ftype with
-            | TArray (_, None, _, _) ->
+            | TArray (_, None, _) ->
               (* flexible array member: use size of pointer *)
               Cil.bitsSizeOf theMachine.upointType
             | _ ->
@@ -678,7 +678,7 @@ let gotoTargetNextAddr: int ref = ref 0
  * is *)
 let isTransparentUnion (t: typ) : fieldinfo option =
   match unrollType t with
-  | TComp (comp, _, _) when not comp.cstruct ->
+  | TComp (comp, _) when not comp.cstruct ->
     (* Turn transparent unions into the type of their first field *)
     if typeHasAttribute "transparent_union" t then begin
       match comp.cfields with
@@ -1175,10 +1175,10 @@ let constFoldTypeVisitor = object
   inherit nopCilVisitor
   method! vtype t: typ visitAction =
     match t with
-    | TArray(bt, Some len, _, a) ->
+    | TArray(bt, Some len, a) ->
       let len' = constFold true len in
       ChangeDoChildrenPost (
-        TArray(bt, Some len', empty_size_cache (), a),
+        TArray(bt, Some len', a),
         (fun x -> x)
       )
     | _ -> DoChildren
@@ -1313,7 +1313,7 @@ let findCompType ghost kind name attr =
       let self, isnew = createCompInfo iss name ~norig:name in
       if isnew then
         cabsPushGlobal (GCompTagDecl (self, CurrentLoc.get ()));
-      TComp (self, empty_size_cache (), attr)
+      TComp (self, attr)
   in
   try
     let old, _ = lookupTypeNoError ghost kind name in (* already defined  *)
@@ -2591,17 +2591,17 @@ let rec cabsTypeCombineAttributes what a0 t =
       | TEnum (enum, a) -> TEnum (enum, add a)
       | TPtr (t, a) -> TPtr (t, add a)
       | TFun (t, args, isva, a) -> TFun(t, args, isva, add a)
-      | TComp (comp, s, a) -> TComp (comp, s, add a)
+      | TComp (comp, a) -> TComp (comp, add a)
       | TNamed (t, a) -> TNamed (t, add a)
       | TBuiltin_va_list a -> TBuiltin_va_list (add a)
-      | TArray (t, l, s, a) ->
+      | TArray (t, l, a) ->
         let att_elt, att_typ = Cil.splitArrayAttributes a0 in
-        TArray (cabsArrayPushAttributes what att_elt t, l, s,
+        TArray (cabsArrayPushAttributes what att_elt t, l,
                 combineAttributes what att_typ a)
   end
 and cabsArrayPushAttributes what al = function
-  | TArray (bt, l, s, a) ->
-    TArray (cabsArrayPushAttributes what al bt, l, s, a)
+  | TArray (bt, l, a) ->
+    TArray (cabsArrayPushAttributes what al bt, l, a)
   | t -> cabsTypeCombineAttributes what al t
 
 let cabsTypeAddAttributes =
@@ -2661,17 +2661,17 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
   | TInt(IInt, olda), TEnum (ei, a) -> TEnum(ei, combineAttributes what olda a)
 
 
-  | TComp (oldci, _, olda) , TComp (ci, _, a) ->
+  | TComp (oldci, olda) , TComp (ci, a) ->
     if oldci.cstruct <> ci.cstruct then
       raise (Cannot_combine "different struct/union types");
     let comb_a = combineAttributes what olda a in
     if oldci.cname = ci.cname then
-      TComp (oldci, empty_size_cache (), comb_a)
+      TComp (oldci, comb_a)
     else
       raise (Cannot_combine (Format.sprintf "%ss with different tags"
                                (if oldci.cstruct then "struct" else "union")))
 
-  | TArray (oldbt, oldsz, _, olda), TArray (bt, sz, _, a) ->
+  | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
     let newbt = combineTypes CombineOther oldbt bt in
     let newsz =
       match oldsz, sz with
@@ -2701,7 +2701,7 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
           raise (Cannot_combine "different array lengths")
 
     in
-    TArray (newbt, newsz, empty_size_cache (), combineAttributes what olda a)
+    TArray (newbt, newsz, combineAttributes what olda a)
 
   | TPtr (oldbt, olda), TPtr (bt, a) ->
     TPtr (combineTypes CombineOther oldbt bt, combineAttributes what olda a)
@@ -2847,7 +2847,7 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
         included_qualifiers ~context a1 a2)
       args1 args2
   | TPtr (t1', a1), TPtr (t2', a2)
-  | TArray (t1', _, _, a1), TArray (t2', _, _, a2) ->
+  | TArray (t1', _, a1), TArray (t2', _, a2) ->
     (included_qualifiers ~context a1 a2) &&
     let context = qualifier_context_ptr context in
     have_compatible_qualifiers_deep ~context t1' t2'
@@ -2991,10 +2991,10 @@ let rec castTo ?context ?(fromsource=false)
 
     | TArray _, TPtr _ -> result
 
-    | TArray(t1,_,_,_), TArray(t2,None,_,_)
+    | TArray(t1,_,_), TArray(t2,None,_)
       when Cil_datatype.Typ.equal t1 t2 -> (nt', e)
 
-    | TPtr _, TArray(_,_,_,_) ->
+    | TPtr _, TArray(_,_,_) ->
       error "Cast over a non-scalar type %a" Cil_printer.pp_typ nt';
 
     | TEnum _, TInt _ -> result
@@ -3032,7 +3032,7 @@ let rec castTo ?context ?(fromsource=false)
 
     (* Even casts between structs are allowed when we are only
      * modifying some attributes *)
-    | TComp (comp1, _, _), TComp (comp2, _, _) when comp1.ckey = comp2.ckey ->
+    | TComp (comp1, _), TComp (comp2, _) when comp1.ckey = comp2.ckey ->
       result
 
     (** If we try to pass a transparent union value to a function
@@ -3040,7 +3040,7 @@ let rec castTo ?context ?(fromsource=false)
      * have been changed to the type of the first argument, and we'll
      * see a cast from a union to the type of the first argument. Turn
      * that into a field access *)
-    | TComp(_, _, _), _ -> begin
+    | TComp(_, _), _ -> begin
         match isTransparentUnion ot with
         | None ->
           Kernel.fatal ~current:true "castTo %a -> %a"
@@ -3299,7 +3299,7 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
     match unrollType t2, unrollType t3 with
     | (TInt _ | TEnum _ | TFloat _), (TInt _ | TEnum _ | TFloat _) ->
       arithmeticConversion t2 t3
-    | TComp (comp2,_,_), TComp (comp3,_,_)
+    | TComp (comp2,_), TComp (comp3,_)
       when comp2.ckey = comp3.ckey -> t2
     | TPtr(_, _), TPtr(TVoid _, _) -> t2
     | TPtr(TVoid _, _), TPtr(_, _) -> t3
@@ -3433,7 +3433,7 @@ let rec collectInitializer
       Kernel.debug ~dkey "Initializing object of type %a to %a"
         Cil_printer.pp_typ thistype Cil_printer.pp_exp e;
       SingleInit e, thistype, Cil_datatype.Lval.Set.union r reads
-    | TArray (bt, leno, _, at), CompoundPre (pMaxIdx, pArray) ->
+    | TArray (bt, leno, at), CompoundPre (pMaxIdx, pArray) ->
       Kernel.debug ~dkey
         "Initialization of an array object of type %a with index max %d"
         Cil_printer.pp_typ thistype !pMaxIdx;
@@ -3503,7 +3503,7 @@ let rec collectInitializer
       let newtype =
         (* detect flexible array member initialization *)
         match thistype, Cil.unrollType parenttype with
-        | TArray (_, None, _, _), TComp (comp, _, _)
+        | TArray (_, None, _), TComp (comp, _)
           when comp.cstruct && len > 0 ->
           (* incomplete array type inside a struct => FAM, with
              a non-empty initializer (len > 0)
@@ -3514,13 +3514,13 @@ let rec collectInitializer
           Kernel.error ~once:true ~current:true
             "static initialization of flexible array members is an \
              unsupported GNU extension";
-          TArray (typ, None, empty_size_cache (), at)
+          TArray (typ, None, at)
         | _ -> (* not a flexible array member *)
           if len = 0 && not (Cil.gccMode() || Cil.msvcMode ()) then
             Kernel.error ~once:true ~current:true
               "arrays of size zero not supported in C99@ \
                (only allowed as compiler extensions)";
-          TArray (typ, Some (integer ~loc len), empty_size_cache (), at)
+          TArray (typ, Some (integer ~loc len), at)
       in
       CompoundInit (newtype, (* collect [] endAt*)init),
       (* If the sizes of the initializers have not been used anywhere,
@@ -3529,7 +3529,7 @@ let rec collectInitializer
       (if len_used then newtype else thistype),
       reads
 
-    | TComp (comp, _, _) as t,
+    | TComp (comp, _) as t,
       CompoundPre (pMaxIdx, pArray) when comp.cstruct ->
       Kernel.debug ~dkey
         "Initialization of an object of type %a with at least %d components"
@@ -3558,7 +3558,7 @@ let rec collectInitializer
         collect 0 reads (Option.value ~default:[] comp.cfields) in
       CompoundInit (thistype, init), thistype, reads
 
-    | TComp (comp, _, _), CompoundPre (pMaxIdx, pArray) when not comp.cstruct ->
+    | TComp (comp, _), CompoundPre (pMaxIdx, pArray) when not comp.cstruct ->
       Kernel.debug ~dkey
         "Initialization of an object of type %a with at least %d components"
         Cil_printer.pp_typ thistype !pMaxIdx;
@@ -3677,7 +3677,7 @@ and normalSubobj (so: subobj) : unit =
       advanceSubobj so
     end else begin
       let fst = List.hd nextflds
-      and baseTyp = TComp (compinfo,empty_size_cache (), []) in
+      and baseTyp = TComp (compinfo, []) in
       so.soTyp <- Cil.typeOffset baseTyp fst;
       so.soOff <- addOffset fst parOff
     end
@@ -3742,7 +3742,7 @@ let fieldsToInit
     else if prefix anonCompFieldName f.fname && not found
             && f.forig_name <> f.fname then
       match unrollType f.ftype with
-      | TComp (comp, _, _) ->
+      | TComp (comp, _) ->
         add_comp offset comp acc (* go deeper inside *)
       | _ ->
         abort_context "unnamed field type is not a struct/union"
@@ -3779,7 +3779,7 @@ let find_field_offset cond (fidlist: fieldinfo list) : offset =
       Field(fid, NoOffset)
     | fid :: rest when prefix anonCompFieldName fid.fname -> begin
         match unrollType fid.ftype with
-        | TComp (ci, _, _) ->
+        | TComp (ci, _) ->
           (try
              let off = search (Option.value ~default:[] ci.cfields) in
              Field(fid,off)
@@ -4326,9 +4326,9 @@ let default_argument_promotion idx exp =
     | TInt(k,_) -> TInt(k,[])
     | TFloat(FFloat,_) -> doubleType
     | TFloat(k,_) -> TFloat(k,[])
-    | TPtr(t,_) | TArray(t,_,_,_) -> TPtr(t,[])
+    | TPtr(t,_) | TArray(t,_,_) -> TPtr(t,[])
     | (TFun _) as t -> TPtr(t,[])
-    | TComp(ci,_,_) -> TComp(ci,{ scache = Not_Computed },[])
+    | TComp(ci,_) -> TComp(ci,[])
     | TEnum(ei,_) -> TEnum(ei,[])
     | TBuiltin_va_list _ ->
       abort_context "implicit prototype cannot have variadic arguments"
@@ -4462,7 +4462,7 @@ let checkTypedefSize name typ =
 let rec checkRestrictQualifierDeep t =
   if typeHasQualifier "restrict" t then
     match unrollType t with
-    | TArray (bt, _, _, _) | TPtr (bt, _) ->
+    | TArray (bt, _, _) | TPtr (bt, _) ->
       if isFunctionType bt then
         Kernel.error ~once:true ~current:true
           "function pointer type does not allow 'restrict' qualifier"
@@ -4472,7 +4472,7 @@ let rec checkRestrictQualifierDeep t =
              "invalid usage of 'restrict' qualifier"
   else
     match unrollType t with
-    | TArray (bt, _, _, _) | TPtr (bt, _) ->
+    | TArray (bt, _, _) | TPtr (bt, _) ->
       checkRestrictQualifierDeep bt
     | TFun (rt, args, _, _) ->
       checkRestrictQualifierDeep rt;
@@ -4826,7 +4826,6 @@ let rec doSpecList ghost (suggestedAnonName: string)
             | TPtr(bt, _) -> (* This is the type of array elements *)
               TArray(bt,
                      Some (new_exp ~loc:e'.eloc (SizeOfStr s)),
-                     empty_size_cache (),
                      [])
             | _ -> abort_context "The typeOf a string is not a pointer type"
           end
@@ -5214,7 +5213,7 @@ and doType (ghost:bool) isFuncArg
         Kernel.error ~once:true ~current:true
           "static specifier inside array argument is allowed only in \
            function argument";
-      doDeclType (TArray(bt, lo, empty_size_cache (), al')) acc d
+      doDeclType (TArray(bt, lo, al')) acc d
 
     | Cabs.PROTO (d, args, ghost_args, isva) ->
       (* Start a scope for the parameter names *)
@@ -5325,13 +5324,13 @@ and doType (ghost:bool) isFuncArg
         | [] -> ()
         | a :: args' ->
           (match unrollType a.vtype with
-           | TArray(bt,lo,_,attr) ->
+           | TArray(bt,lo,attr) ->
              (* Note that for multi-dimensional arrays we strip off only
                 the first TArray and leave bt alone. *)
              let real_type = turnArrayIntoPointer bt lo attr in
              Cil.update_var_type a real_type
            | TFun _ -> Cil.update_var_type a (TPtr(a.vtype, []))
-           | TComp (_, _,_) -> begin
+           | TComp (_,_) -> begin
                match isTransparentUnion a.vtype with
                | None ->  ()
                | Some fstfield ->
@@ -5359,7 +5358,7 @@ and doType (ghost:bool) isFuncArg
       in
       let tres =
         match unrollType bt with
-        | TArray(t,lo,_,attr) -> turnArrayIntoPointer t lo attr
+        | TArray(t,lo,attr) -> turnArrayIntoPointer t lo attr
         | _ -> bt
       in
       (* Drop qualifiers on the return type. They are meaningless (qualifiers
@@ -5477,7 +5476,7 @@ and makeCompType ghost (isstruct: bool)
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
       then begin
         match Cil.unrollType ftype with
-        | TArray(_,None,_,_) when last_group && last_field ->
+        | TArray(_,None,_) when last_group && last_field ->
           begin
             (* possible flexible array member; check if struct contains at least
                one other field *)
@@ -5558,8 +5557,8 @@ and makeCompType ghost (isstruct: bool)
       in
       let rec is_circular t =
         match Cil.unrollType t with
-        | TArray(bt,_,_,_) -> is_circular bt
-        | TComp (comp',_,_) ->
+        | TArray(bt,_,_) -> is_circular bt
+        | TComp (comp',_) ->
           if Cil_datatype.Compinfo.equal comp comp' then begin
             (* abort and not error, as this circularity could lead
                to infinite recursion... *)
@@ -5585,7 +5584,6 @@ and makeCompType ghost (isstruct: bool)
         faddrof = false;
         fsize_in_bits = None;
         foffset_in_bits = None;
-        fpadding_in_bits = None;
       } :: flds
     in
     fold addFieldInfo flds nl
@@ -5622,7 +5620,7 @@ and makeCompType ghost (isstruct: bool)
       Kernel.error ~source
         "field %s occurs multiple times in aggregate %a. \
          Previous occurrence is at line %d."
-        f.fname Cil_printer.pp_typ (TComp(comp,{scache = Not_Computed},[]))
+        f.fname Cil_printer.pp_typ (TComp(comp,[]))
         (fst oldf.floc).Filepath.pos_lnum
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
@@ -5664,7 +5662,7 @@ and makeCompType ghost (isstruct: bool)
   (*  ignore (E.log "makeComp: %s: %a\n" comp.cname d_attrlist a); *)
   let a = Cil.addAttributes comp.cattr a in
   comp.cattr <- process_pragmas_pack_align_comp_attributes comp a;
-  let res = TComp (comp,empty_size_cache (), []) in
+  let res = TComp (comp, []) in
   (* Create a typedef for this one *)
   cabsPushGlobal (GCompTag (comp, CurrentLoc.get ()));
 
@@ -5685,7 +5683,7 @@ and preprocessCast ghost (specs: Cabs.specifier)
    * will resolve this later, when we'll convert casts to unions. *)
   let ie' =
     match unrollType typ, ie with
-    | TComp (c, _, _), Cabs.SINGLE_INIT _ when not c.cstruct ->
+    | TComp (c, _), Cabs.SINGLE_INIT _ when not c.cstruct ->
       Cabs.COMPOUND_INIT [(Cabs.INFIELD_INIT ("___matching_field",
                                               Cabs.NEXT_INIT),
                            ie)]
@@ -5695,7 +5693,7 @@ and preprocessCast ghost (specs: Cabs.specifier)
    * when we do again the specs we get the right name  *)
   let specs1 =
     match typ with
-    | TComp (ci, _, _) ->
+    | TComp (ci, _) ->
       List.map
         (function
             Cabs.SpecType (Cabs.Tstruct ("", _, [])) ->
@@ -5763,7 +5761,7 @@ and doExp local_env
   let processArrayFun e t =
     let loc = e.eloc in
     match e.enode, unrollType t with
-    | (Lval(lv) | CastE(_, {enode = Lval lv})), TArray(tbase, _, _, a) ->
+    | (Lval(lv) | CastE(_, {enode = Lval lv})), TArray(tbase, _, a) ->
       mkStartOfAndMark loc lv, TPtr(tbase, a)
     | Lval(Mem _, _), TFun _ -> e, t (* Do not turn pointer function types *)
     | (Lval(lv) | CastE(_, {enode = Lval lv})), TFun _  ->
@@ -5972,7 +5970,7 @@ and doExp local_env
       in
       let field_offset =
         match unrollType t' with
-        | TComp (comp, _, _) -> findField str comp
+        | TComp (comp, _) -> findField str comp
         | _ ->
           Kernel.fatal ~current:true "expecting a struct with field %s" str
       in
@@ -5994,11 +5992,11 @@ and doExp local_env
       in
       let pointedt = match unrollType t' with
         | TPtr(t1, _) -> t1
-        | TArray(t1,_,_,_) -> t1
+        | TArray(t1,_,_) -> t1
         | _ -> Kernel.fatal ~current:true "expecting a pointer to a struct"
       in
       let field_offset = match unrollType pointedt with
-        | TComp (comp, _, _) -> findField str comp
+        | TComp (comp, _) -> findField str comp
         | x ->
           Kernel.fatal ~current:true
             "expecting a struct with field %s. Found %a. t1 is %a"
@@ -8159,7 +8157,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
   (* If we are at an array of characters and the initializer is a
    * string literal (optionally enclosed in braces) then explode the
    * string into characters *)
-  | TArray(bt, leno, _, _ ),
+  | TArray(bt, leno, _ ),
     (Cabs.NEXT_INIT,
      (Cabs.SINGLE_INIT({ expr_node = Cabs.CONSTANT (Cabs.CONST_STRING s)} as e)|
       Cabs.COMPOUND_INIT
@@ -8221,7 +8219,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
   (* [weimer] Wed Jan 30 15:38:05 PST 2002
    * Despite what the compiler says, this match case is used and it is
    * important. *)
-  | TArray(bt, leno, _, _),
+  | TArray(bt, leno, _),
     (Cabs.NEXT_INIT,
      (Cabs.SINGLE_INIT({expr_node = Cabs.CONSTANT (Cabs.CONST_WSTRING s)} as e)|
       Cabs.COMPOUND_INIT
@@ -8294,7 +8292,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     doInit local_env asconst add_implicit_ensures preinit' so acc' restil
   (* If we are at an array and we see a single initializer then it must
    * be one for the first element *)
-  | TArray(bt, leno, _, _), (Cabs.NEXT_INIT, Cabs.SINGLE_INIT _oneinit) :: _restil  ->
+  | TArray(bt, leno, _), (Cabs.NEXT_INIT, Cabs.SINGLE_INIT _oneinit) :: _restil  ->
     (* Grab the length if there is one *)
     let leno = integerArrayLength leno in
     so.stack <- InArray(so.soOff, bt, leno, ref 0) :: so.stack;
@@ -8302,20 +8300,20 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     (* Start over with the fields *)
     doInit local_env asconst add_implicit_ensures preinit so acc allinitl
   (* An incomplete structure with any initializer is an error. *)
-  | TComp (comp, _, _), _ :: restil when comp.cfields = None ->
+  | TComp (comp, _), _ :: restil when comp.cfields = None ->
     Kernel.error ~current:true ~once:true
       "variable `%s' has initializer but incomplete type" so.host.vname;
     doInit local_env asconst add_implicit_ensures preinit so acc restil
   (* If we are at a composite and we see a single initializer of the same
    * type as the composite then grab it all. If the type is not the same
    * then we must go on and try to initialize the fields *)
-  | TComp (comp, _, _), (Cabs.NEXT_INIT, Cabs.SINGLE_INIT oneinit) :: restil ->
+  | TComp (comp, _), (Cabs.NEXT_INIT, Cabs.SINGLE_INIT oneinit) :: restil ->
     let r,se, oneinit', t' =
       doExp (no_paren_local_env local_env) asconst oneinit (AExp None)
     in
     let r = Cil_datatype.Lval.Set.of_list r in
     if (match unrollType t' with
-        | TComp (comp', _, _) when comp'.ckey = comp.ckey -> true
+        | TComp (comp', _) when comp'.ckey = comp.ckey -> true
         | _ -> false)
     then begin
       (* Initialize the whole struct *)
@@ -8351,7 +8349,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     doInit local_env asconst add_implicit_ensures preinit' so se restil
   (* An array with a compound initializer. The initializer is for the
    * array elements *)
-  | TArray (bt, leno, _, _), (Cabs.NEXT_INIT, Cabs.COMPOUND_INIT initl) :: restil ->
+  | TArray (bt, leno, _), (Cabs.NEXT_INIT, Cabs.COMPOUND_INIT initl) :: restil ->
     (* Create a separate object for the array *)
     let so' = makeSubobj so.host so.soTyp so.soOff in
     (* Go inside the array *)
@@ -8382,7 +8380,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     doInit local_env asconst add_implicit_ensures preinit' so acc' restil
   (* We have a designator that tells us to select the matching union field.
    * This is to support a GCC extension *)
-  | TComp(ci, _, _) as targ,
+  | TComp(ci, _) as targ,
     [(Cabs.NEXT_INIT,
       Cabs.COMPOUND_INIT
         [(Cabs.INFIELD_INIT ("___matching_field", Cabs.NEXT_INIT),
@@ -8415,7 +8413,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         [Cabs.INFIELD_INIT (fi.fname, Cabs.NEXT_INIT), Cabs.SINGLE_INIT oneinit]
 
   (* A structure with a composite initializer. We initialize the fields*)
-  | TComp (comp, _, _), (Cabs.NEXT_INIT, Cabs.COMPOUND_INIT initl) :: restil ->
+  | TComp (comp, _), (Cabs.NEXT_INIT, Cabs.COMPOUND_INIT initl) :: restil ->
     (* Create a separate subobject iterator *)
     let so' = makeSubobj so.host so.soTyp so.soOff in
     (* Go inside the comp *)
@@ -8479,7 +8477,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         | Cabs.NEXT_INIT -> acc
         | Cabs.INFIELD_INIT (fn, whatnext) -> begin
             match unrollType so.soTyp with
-            | TComp (comp, _, _) ->
+            | TComp (comp, _) ->
               let toinit = fieldsToInit comp (Some fn) in
               so.stack <- InComp(so.soOff, comp, toinit) :: so.stack;
               normalSubobj so;
@@ -8491,7 +8489,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
 
         | Cabs.ATINDEX_INIT(idx, whatnext) -> begin
             match unrollType so.soTyp with
-            | TArray (bt, leno, _, _) ->
+            | TArray (bt, leno, _) ->
               let ilen = integerArrayLength leno in
               let nextidx', doidx =
                 let (r,doidx, idxe', _) =
@@ -9057,15 +9055,15 @@ and createLocal ghost ((_, sto, _, _) as specs)
       (* Fix the length *)
       (match vi.vtype, ie', et with
        (* We have a length now *)
-       | TArray(_,None, _, _), _, TArray(_, Some _, _, _) ->
+       | TArray(_,None, _), _, TArray(_, Some _, _) ->
          Cil.update_var_type vi et
        (* Initializing a local array *)
-       | TArray(TInt((IChar|IUChar|ISChar), _) as bt, None, l, a),
+       | TArray(TInt((IChar|IUChar|ISChar), _) as bt, None, a),
          SingleInit({enode = Const(CStr s);eloc=loc}), _ ->
          Cil.update_var_type vi
            (TArray(bt,
                    Some (integer ~loc (String.length s + 1)),
-                   l, a))
+                   a))
        | _, _, _ -> ());
 
       (* Now create assignments instead of the initialization *)
@@ -9635,21 +9633,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
     end;
     empty
 
-  | Cabs.CUSTOM (custom, name, location) when isglobal ->
-    begin
-      let loc = convLoc location in
-      CurrentLoc.set loc;
-      try
-        let tcustom = Ltyping.custom custom in
-        let attr = fc_stdlib_attribute [] in
-        cabsPushGlobal (GAnnot(Dcustom_annot(tcustom, name, attr,loc),loc))
-      with LogicTypeError ((source,_),msg) ->
-        Kernel.warning
-          ~wkey:Kernel.wkey_annot_error ~source
-          "%s. Ignoring custom annotation" msg
-    end;
-    empty
-  | Cabs.CUSTOM _ | Cabs.GLOBANNOT _ | Cabs.PRAGMA _ | Cabs.GLOBASM _ | Cabs.FUNDEF _ ->
+  | Cabs.GLOBANNOT _ | Cabs.PRAGMA _ | Cabs.GLOBASM _ | Cabs.FUNDEF _ ->
     Kernel.fatal ~current:true "this form of declaration must be global"
 
 and doTypedef ghost ((specs, nl): Cabs.name_group) =
@@ -9710,13 +9694,13 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
               begin
                 match newTyp' with (* do NOT unroll type here,
                                       redefinitions of typedefs are ok *)
-                | TComp (newci, _, _) ->
+                | TComp (newci, _) ->
                   (* Composite types with different tags may be compatible, but here
                      we use the tags to try and detect if the type is being redefined,
                      which is NOT allowed. *)
                   begin
                     match unrollType typeinfo.ttype with
-                    | TComp (ci, _, _) ->
+                    | TComp (ci, _) ->
                       if ci.cname <> newci.cname then
                         (* different tags => we consider that the type is being redefined *)
                         error_conflicting_types ()
@@ -9781,7 +9765,7 @@ and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
         | _ -> false) specs
   in
   match restyp with
-  | TComp(ci, _, al) ->
+  | TComp(ci, al) ->
     if isadef then begin
       ci.cattr <- cabsAddAttributes ci.cattr al;
       (* The GCompTag was already added *)

@@ -119,7 +119,7 @@ let sizeof_lval lv =
 let sizeof_pointed typ =
   match unrollType typ with
   | TPtr (typ,_) -> sizeof typ
-  | TArray(typ,_,_,_) -> sizeof typ
+  | TArray(typ,_,_) -> sizeof typ
   | _ ->
     Kernel.fatal "TYPE IS: %a (unrolled as %a)"
       Printer.pp_typ typ
@@ -130,7 +130,7 @@ let sizeof_pointed typ =
 let osizeof_pointed typ =
   match unrollType typ with
   | TPtr (typ,_) -> osizeof typ
-  | TArray(typ,_,_,_) -> osizeof typ
+  | TArray(typ,_,_) -> osizeof typ
   | _ ->
     assert false (*
         Format.printf "TYPE IS: %a\n" Printer.pp_typ typ;
@@ -239,7 +239,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
        raw_bits 'b' start stop)
     )
 
-  | TComp (compinfo, _, _) as typ ->
+  | TComp (compinfo, _) as typ ->
     let size = Integer.of_int (try bitsSizeOf typ
                                with SizeOfError _ -> 0)
     in
@@ -342,7 +342,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
         raw_bits '?' start stop
     end
 
-  | TArray (typ, _, _, _) ->
+  | TArray (typ, _, _) ->
     let size =
       try Integer.of_int (bitsSizeOf typ)
       with Cil.SizeOfError _ -> Integer.zero
@@ -468,7 +468,7 @@ let rec type_compatible t1 t2 =
   | TInt (i1, _), TInt (i2, _) -> i1 = i2
   | TFloat (f1, _), TFloat (f2, _) -> f1 = f2
   | TPtr (t1, _), TPtr (t2, _) -> type_compatible t1 t2
-  | TArray (t1', s1, _, _), TArray (t2', s2, _, _) ->
+  | TArray (t1', s1, _), TArray (t2', s2, _) ->
     type_compatible t1' t2' &&
     (s1 == s2 || try Integer.equal (Cil.lenOfArray64 s1) (Cil.lenOfArray64 s2)
      with Cil.LenOfArray -> false)
@@ -482,7 +482,7 @@ let rec type_compatible t1 t2 =
            (fun (_, t1, _) (_, t2, _) -> type_compatible t1 t2) l1 l2
        with Invalid_argument _ -> false)
   | TNamed _, TNamed _ -> assert false
-  | TComp (c1, _, _), TComp (c2, _, _) -> c1.ckey = c2.ckey
+  | TComp (c1, _), TComp (c2, _) -> c1.ckey = c2.ckey
   | TEnum (e1, _), TEnum (e2, _) -> e1.ename = e2.ename
   | TBuiltin_va_list _, TBuiltin_va_list _ -> true
   | (TVoid _ | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TNamed _ |
@@ -517,7 +517,7 @@ let rec find_offset typ ~offset om =
     NoOffset, typ
   else
     match Cil.unrollType typ with
-    | TArray (typ_elt, _, _, _) ->
+    | TArray (typ_elt, _, _) ->
       let size_elt = Integer.of_int (Cil.bitsSizeOf typ_elt) in
       if Integer.(equal size_elt zero) then
         begin
@@ -528,7 +528,7 @@ let rec find_offset typ ~offset om =
              Since the sizeof each element is zero, any offset is valid anyway.
           *)
           let typ =
-            TArray (typ_elt, Some minus_one_expr, Cil.empty_size_cache (),[])
+            TArray (typ_elt, Some minus_one_expr, [])
           in
           Index (minus_one_expr, NoOffset), typ
         end
@@ -551,14 +551,14 @@ let rec find_offset typ ~offset om =
               let nb = Integer.e_div size size_elt in
               let exp_nb = Cil.kinteger64 ~loc nb in
               let typ =
-                TArray (typ_elt, Some exp_nb, Cil.empty_size_cache (),[])
+                TArray (typ_elt, Some exp_nb, [])
               in
               Index (exp_start, NoOffset), typ
             else (* We match different parts of multiple cells: too imprecise. *)
               raise NoMatchingOffset
         end
 
-    | TComp (ci, _, _) ->
+    | TComp (ci, _) ->
       let rec find_field = function
         | [] -> raise NoMatchingOffset
         | fi :: q ->

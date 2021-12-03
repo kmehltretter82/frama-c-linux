@@ -756,13 +756,13 @@ module Types = struct
       | GCompTag (ci, _loc) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (TComp (ci, Cil.empty_size_cache (), []));
+        Types.add name_tag (TComp (ci, []));
         TypeNameToGlobal.replace name_tag g
 
       | GCompTagDecl (ci, _) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (TComp (ci, Cil.empty_size_cache (), []))
+        Types.add name_tag (TComp (ci, []))
 
       | _ -> ()
     in

@@ -34,11 +34,11 @@ open Lang.F
 
 module WpLog = Wp_parameters
 let constfold_ctyp = function
-  | TArray (_,Some {enode = (Const CInt64 _) },_,_) as ct -> ct
-  | TArray (ty,Some len,cache,attr) as ct -> begin
+  | TArray (_,Some {enode = (Const CInt64 _) },_) as ct -> ct
+  | TArray (ty,Some len,attr) as ct -> begin
       match Cil.constFold true len with
       | {enode = (Const CInt64 _) } as len ->
-          TArray(ty,Some len,cache,attr)
+          TArray(ty,Some len,attr)
       | _ -> ct
     end
   | ct -> ct
@@ -496,10 +496,10 @@ struct
         let ct = constfold_ctyp ct in
         let acc = (* updated acc with default init of structure *)
           match ct with
-          | TComp ( { cfields = None },_,_) ->
+          | TComp ( { cfields = None },_) ->
               Wp_parameters.fatal
                 "Initializer for incomplete type %a" Cil_printer.pp_typ ct
-          | TComp ( { cstruct ; cfields = Some fields },_,_)
+          | TComp ( { cstruct ; cfields = Some fields },_)
             when cstruct && (* not for union... *)
                  (List.length initl) < (List.length fields) ->
               (* default init for unintialized field of a struct *)
@@ -522,7 +522,7 @@ struct
           | _ -> acc
         in
         match ct with
-        | TArray (ty,len,_,_) ->
+        | TArray (ty,len,_) ->
             let delayed =
               match len with (* number of required elements *)
               | Some {enode = (Const CInt64 (size,_,_))} ->

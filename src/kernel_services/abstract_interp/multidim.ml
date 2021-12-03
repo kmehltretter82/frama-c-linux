@@ -221,7 +221,7 @@ let of_offset oracle base_typ offset =
       aux fi.ftype (Integer.of_int field_size) (add_int x field_offset) sub
     | Index (exp, sub) ->
       match base_typ with
-      | TArray (elem_typ, _array_size, _, _) ->
+      | TArray (elem_typ, _array_size, _) ->
         let idx = of_exp oracle exp in
         let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
         let x' = add x (mul_integer idx elem_size) in

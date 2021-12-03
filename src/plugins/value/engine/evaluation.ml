@@ -1034,7 +1034,7 @@ module Make
     | NoOffset -> return (Loc.no_offset, typ, false)
     | Index (index_expr, remaining) ->
       let typ_pointed, array_size = match Cil.unrollType typ with
-        | TArray (t, size, _, _) -> t, size
+        | TArray (t, size, _) -> t, size
         | t -> Value_parameters.fatal ~current:true
                  "Got type '%a'" Printer.pp_typ t
       in

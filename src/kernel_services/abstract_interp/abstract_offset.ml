@@ -86,7 +86,7 @@ struct
     | Field (fi, sub) -> Field (fi, of_cil_offset oracle fi.ftype sub)
     | Index (exp, sub) ->
       match Cil.unrollType base_typ with
-      | TArray (elem_typ, array_size, _, _) ->
+      | TArray (elem_typ, array_size, _) ->
         let idx = oracle exp in
         assert_valid_index idx array_size;
         Index (idx, elem_typ, of_cil_offset oracle elem_typ sub)
@@ -97,7 +97,7 @@ struct
       NoOffset typ
     else
       match Cil.unrollType base_typ with
-      | TArray (elem_typ, array_size, _, _) ->
+      | TArray (elem_typ, array_size, _) ->
         let range, rem =
           try
             let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
@@ -121,7 +121,7 @@ struct
         let sub = of_int_val ~base_typ:elem_typ ~typ rem in
         Index (range, elem_typ, sub)
 
-      | TComp (ci, _, _) ->
+      | TComp (ci, _) ->
         if not ci.cstruct then
           (* Ignore unions for now *)
           raise Abstract_interp.Error_Top
@@ -168,7 +168,7 @@ struct
       Field (fi, of_term_offset fi.ftype sub)
     | TIndex (index, sub) ->
       begin match Cil.unrollType base_typ with
-        | TArray (elem_typ, array_size, _, _) ->
+        | TArray (elem_typ, array_size, _) ->
           let idx = index_of_term array_size index in
           assert_valid_index idx array_size;
           Index (idx, elem_typ, of_term_offset elem_typ sub)

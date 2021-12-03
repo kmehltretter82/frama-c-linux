@@ -722,21 +722,34 @@ let rec infer t =
     infer t
   | TBinOp (MinusPP, t, _) ->
     (match Cil.unrollType (get_cty t) with
-     | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
-       (* the second argument must be in the same block than [t]. Consequently
-          the result of the difference belongs to [0; \block_length(t)] *)
-       let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
-       ival Integer.zero (Integer.of_int nb_bytes)
-     | TArray _ | TPtr _ ->
+     | TArray(_, _, _) as ta ->
+       begin
+         try
+           let n = Cil.bitsSizeOf ta in
+           (* the second argument must be in the same block than [t].
+              Consequently the result of the difference belongs to
+              [0; \block_length(t)] *)
+           let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
+           ival Integer.zero (Integer.of_int nb_bytes)
+         with Cil.SizeOfError _ ->
+           Lazy.force interv_of_unknown_block
+       end
+     | TPtr _ ->
        Lazy.force interv_of_unknown_block
      | _ -> assert false)
   | Tblock_length (_, t)
   | Toffset(_, t) ->
     (match Cil.unrollType (get_cty t) with
-     | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
-       let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
-       singleton_of_int nb_bytes
-     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block
+     | TArray(_, _, _) as ta ->
+       begin
+         try
+           let n = Cil.bitsSizeOf ta in
+           let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
+           singleton_of_int nb_bytes
+         with Cil.SizeOfError _ ->
+           Lazy.force interv_of_unknown_block
+       end
+     | TPtr _ -> Lazy.force interv_of_unknown_block
      | _ -> assert false)
   | Tnull  -> singleton_of_int 0
   | TLogic_coerce (_, t) -> infer t
@@ -870,7 +883,7 @@ and infer_term_host thost =
   | TMem t ->
     let ty = Logic_utils.logicCType t.term_type in
     match Cil.unrollType ty with
-    | TPtr(ty, _) | TArray(ty, _, _, _) ->
+    | TPtr(ty, _) | TArray(ty, _, _) ->
       interv_of_typ ty
     | _ ->
       Options.fatal "unexpected type %a for term %a"

@@ -68,7 +68,7 @@ struct
 
   let index ty =
     match Cil.unrollType ty with
-    | TArray(te,n,_,_) ->
+    | TArray(te,n,_) ->
         begin
           match Option.bind n Ctypes.get_int with
           | None -> failwith "Wp.Layout: unkown array size"
@@ -96,7 +96,7 @@ struct
 
   let typ_of_comp cache comp =
     try H.find cache comp with Not_found ->
-      let typ = TComp(comp,Cil.empty_size_cache (),[]) in
+      let typ = TComp(comp,[]) in
       H.add cache comp typ ; typ
 
   let field_offset _cache fd =
@@ -489,7 +489,7 @@ struct
   let rec get_dim s rds typ =
     if s = Cil.bitsSizeOf typ then Some (List.rev rds) else
       match Cil.unrollType typ with
-      | TArray( te , Some e , _ , _ ) ->
+      | TArray( te , Some e , _ ) ->
           begin match Ctypes.get_int e with
             | None -> None
             | Some n -> get_dim s (if n = 1 then rds else n::rds) te

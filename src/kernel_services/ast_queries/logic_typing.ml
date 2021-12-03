@@ -765,7 +765,7 @@ struct
       ignore (Logic_env.find_model_field f ty); true
     with Not_found ->
       (match Cil.unrollType ty with
-       | TComp(comp,_,_) ->
+       | TComp(comp,_) ->
          List.exists
            (fun x -> x.fname = f)
            (Option.value ~default:[] comp.cfields)
@@ -773,7 +773,7 @@ struct
 
   let plain_type_of_c_field loc f ty =
     match Cil.unrollType ty with
-    | TComp (comp, _, attrs) ->
+    | TComp (comp, attrs) ->
       (try
          let attrs = Cil.filter_qualifier_attributes attrs in
          let field = C.find_comp_field comp f in
@@ -932,8 +932,7 @@ struct
           with Not_found ->
             ctxt.error loc "size of array must be an integral value";
       in
-      Ctype (TArray (ctype ty, size,
-                     Cil.empty_size_cache (),[]))
+      Ctype (TArray (ctype ty, size,[]))
     | LTpointer ty -> Ctype (TPtr (ctype ty, []))
     | LTenum e ->
       (try Ctype (ctxt.find_type Enum e)
@@ -1338,8 +1337,8 @@ struct
         result
       | TInt _, TPtr _ -> result
       | TPtr _, TInt _ -> result
-      | ((TArray (told,_,_,_) | TPtr (told,_)),
-         (TPtr (tnew,_) | TArray(tnew,_,_,_)))
+      | ((TArray (told,_,_) | TPtr (told,_)),
+         (TPtr (tnew,_) | TArray(tnew,_,_)))
         when is_same_c_type told tnew -> result
       | (TPtr _ | TArray _), (TPtr _ | TArray _)
         when isLogicNull e -> result
@@ -1366,7 +1365,7 @@ struct
         result
       | (TInt _ | TEnum _ | TPtr _ ), TVoid _ ->
         (ot, e)
-      | TComp (comp1, _, _), TComp (comp2, _, _)
+      | TComp (comp1, _), TComp (comp2, _)
         when comp1.ckey = comp2.ckey ->
         nt, e
       | _ ->
@@ -4307,8 +4306,6 @@ struct
     finish_transaction (); res
 
   let annot = C.on_error annot rollback_transaction
-
-  let custom _c = CustomDummy
 
 end
 

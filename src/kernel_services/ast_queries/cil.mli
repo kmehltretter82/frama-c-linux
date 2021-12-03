@@ -2131,9 +2131,6 @@ val peepHole1: (instr -> instr list option) -> stmt list -> unit
     of the error *)
 exception SizeOfError of string * typ
 
-(** Create a fresh size cache with [Not_Computed] *)
-val empty_size_cache : unit -> bitsSizeofTypCache
-
 (** Give the unsigned kind corresponding to any integer kind *)
 val unsignedVersionOf : ikind -> ikind
 

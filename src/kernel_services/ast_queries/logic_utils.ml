@@ -96,7 +96,7 @@ let logicCType t =
 
 let plain_array_to_ptr ty =
   match unroll_type ty with
-  | Ctype(TArray(ty,lo,_,attr) as tarr) ->
+  | Ctype(TArray(ty,lo,attr) as tarr) ->
     let length_attr =
       match lo with
       | None -> []
@@ -734,7 +734,6 @@ let rec add_attribute_glob_annot a g =
   | Dlemma(n,labs,t,p,al,l) ->
     Dlemma(n,labs,t,p,Cil.addAttribute a al,l)
   | Dmodel_annot (mi,_) -> mi.mi_attr <- Cil.addAttribute a mi.mi_attr; g
-  | Dcustom_annot(c,n,al,l) -> Dcustom_annot(c,n,Cil.addAttribute a al, l)
   | Dextended (e,al,l) -> Dextended(e,Cil.addAttribute a al,l)
 
 let behavior_has_only_assigns bhvs =
@@ -1250,9 +1249,6 @@ let rec is_same_global_annotation ga1 ga2 =
   | Dinvariant (li1,_), Dinvariant (li2,_) -> is_same_logic_info li1 li2
   | Dtype_annot (li1,_), Dtype_annot (li2,_) -> is_same_logic_info li1 li2
   | Dmodel_annot (li1,_), Dmodel_annot (li2,_) -> is_same_model_info li1 li2
-  | Dcustom_annot (c1, n1, attr1, _),
-    Dcustom_annot (c2, n2, attr2, _) ->
-    is_same_string n1 n2 && c1 = c2 && is_same_attributes attr1 attr2
   | Dvolatile(t1,r1,w1,attr1,_), Dvolatile(t2,r2,w2,attr2,_) ->
     is_same_list is_same_identified_term t1 t2 &&
     is_same_opt (fun x y -> x.vname = y.vname) r1 r2 &&
@@ -1260,10 +1256,10 @@ let rec is_same_global_annotation ga1 ga2 =
     is_same_attributes attr1 attr2
   | Dextended(id1,_,_), Dextended(id2,_,_) -> id1 = id2
   | (Dfun_or_pred _ | Daxiomatic _ | Dtype _ | Dlemma _
-    | Dinvariant _ | Dtype_annot _ | Dcustom_annot _ | Dmodel_annot _
+    | Dinvariant _ | Dtype_annot _ | Dmodel_annot _
     | Dvolatile _ | Dextended _),
     (Dfun_or_pred _ | Daxiomatic _ | Dtype _ | Dlemma _
-    | Dinvariant _ | Dtype_annot _ | Dcustom_annot _ | Dmodel_annot _
+    | Dinvariant _ | Dtype_annot _ | Dmodel_annot _
     | Dvolatile _ | Dextended _) -> false
 
 let is_same_axiomatic ax1 ax2 =
@@ -2653,7 +2649,7 @@ let const_fold_trange_bounds typ b e =
     | Some te -> extract (constFoldTermToInt te)
     | None ->
       match Cil.unrollType typ with
-      | TArray (_, Some size, _, _) ->
+      | TArray (_, Some size, _) ->
         Integer.pred (extract (Cil.isInteger size))
       | _ -> raise CannotSimplify
   in

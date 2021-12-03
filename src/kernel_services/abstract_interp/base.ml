@@ -253,8 +253,8 @@ let is_weak = function
 
 (* Does a C type end by an empty struct? *)
 let rec final_empty_struct = function
-  | TArray (typ, _, _, _) -> final_empty_struct typ
-  | TComp (compinfo, _, _) ->
+  | TArray (typ, _, _) -> final_empty_struct typ
+  | TComp (compinfo, _) ->
     begin
       match compinfo.cfields with
       | Some [] | None -> true

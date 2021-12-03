@@ -1753,7 +1753,7 @@ class main_window () : main_window_extension_points =
           let opt_tag_name =
             match typ with
             | TNamed (ti, _) -> Some (Logic_typing.Typedef, ti.torig_name)
-            | TComp (ci, _, _) ->
+            | TComp (ci, _) ->
               let tag = if ci.cstruct then Logic_typing.Struct
                 else Logic_typing.Union
               in

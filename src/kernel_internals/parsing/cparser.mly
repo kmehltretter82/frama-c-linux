@@ -316,7 +316,6 @@ let in_ghost_block ?(battrs=[]) l =
 %token <Logic_ptree.code_annot * Cabs.cabsloc> CODE_ANNOT
 %token <Logic_ptree.code_annot list * Cabs.cabsloc> LOOP_ANNOT
 %token <string * Cabs.cabsloc> ATTRIBUTE_ANNOT
-%token <Logic_ptree.custom_tree  * string * Cabs.cabsloc> CUSTOM_ANNOT
 
 %token <string> IDENT
 %token <int64 list * Cabs.cabsloc> CST_CHAR
@@ -469,7 +468,6 @@ ghost_globals:
 /*** Global Definition ***/
 global:
 | DECL             { GLOBANNOT $1 }
-| CUSTOM_ANNOT     { let (x,y,z) = $1 in CUSTOM(x,y,z) }
 | declaration      { $1 }
 | function_def     { $1 }
 

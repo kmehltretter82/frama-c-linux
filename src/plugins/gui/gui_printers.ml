@@ -97,7 +97,7 @@ let lid_of_loc loc =
    E.g. for [t = int***], returns [int]. *)
 let rec get_type_specifier (t:typ) =
   match t with
-  | TPtr (bt, _) | TArray (bt, _, _, _) -> get_type_specifier bt
+  | TPtr (bt, _) | TArray (bt, _, _) -> get_type_specifier bt
   | _ -> t
 
 let pp_tcomp_unfolded fmt comp attrs =
@@ -123,14 +123,14 @@ let pp_typ_unfolded fmt (t : typ) =
     begin
       (* unfolds the typedef, and one step further if it is a TComp/TEnum *)
       match ty.ttype with
-      | TComp (comp, _, cattrs) ->
+      | TComp (comp, cattrs) ->
         pp_tcomp_unfolded fmt comp (Cil.addAttributes attrs cattrs)
       | TEnum (enum, eattrs) ->
         pp_enum_unfolded fmt enum (Cil.addAttributes attrs eattrs)
       | _ ->
         Printer.pp_typ fmt (Cil.typeAddAttributes attrs ty.ttype)
     end
-  | TComp (comp, _, attrs) -> pp_tcomp_unfolded fmt comp attrs
+  | TComp (comp, attrs) -> pp_tcomp_unfolded fmt comp attrs
   | TEnum (enum, attrs) -> pp_enum_unfolded fmt enum attrs
   | _ -> Printer.pp_typ fmt t
 

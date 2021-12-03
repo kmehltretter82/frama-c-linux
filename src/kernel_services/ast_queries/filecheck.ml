@@ -1316,7 +1316,7 @@ module Base_checker = struct
 
       method! vtype ty =
         match ty with
-        | TArray (_, _, _, la) ->
+        | TArray (_, _, la) ->
           let elt, _ = Cil.splitArrayAttributes la in
           if elt != [] then
             Kernel.fatal

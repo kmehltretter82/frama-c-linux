@@ -1256,7 +1256,7 @@ let extract_logic_infos g =
   let rec aux acc = function
     | Dfun_or_pred (li,_) | Dinvariant (li,_) | Dtype_annot (li,_) -> li :: acc
     | Dvolatile _ | Dtype _ | Dlemma _
-    | Dmodel_annot _ | Dcustom_annot _ | Dextended _ -> acc
+    | Dmodel_annot _ | Dextended _ -> acc
     | Daxiomatic(_,l,_,_) -> List.fold_left aux acc l
   in aux [] g
 
@@ -1446,7 +1446,7 @@ class reorder_ast: Visitor.frama_c_visitor =
                     recursive definition of type %s"
                    ty.tname)
              typedefs
-       | TComp(ci,_,_) ->
+       | TComp(ci,_) ->
          if not (Compinfo.Set.mem ci known_compinfo) then begin
            self#add_needed_decl (GCompTagDecl (ci,Location.unknown));
            self#add_known_compinfo ci

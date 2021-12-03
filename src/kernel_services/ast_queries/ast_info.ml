@@ -401,34 +401,34 @@ let block_of_local (fdec:fundec) vi =
 (** {2 Types} *)
 (* ************************************************************************** *)
 
-let array_type ?length ?(attr=[]) ty = TArray(ty,length,empty_size_cache (),attr)
+let array_type ?length ?(attr=[]) ty = TArray(ty,length,attr)
 
 let direct_array_size ty =
   match unrollType ty with
-  | TArray(_ty,Some size,_,_) -> value_of_integral_expr size
-  | TArray(_ty,None,_,_) -> Integer.zero
+  | TArray(_ty,Some size,_) -> value_of_integral_expr size
+  | TArray(_ty,None,_) -> Integer.zero
   | _ -> assert false
 
 let rec array_size ty =
   match unrollType ty with
-  | TArray(elemty,Some _,_,_) ->
+  | TArray(elemty,Some _,_) ->
     if isArrayType elemty then
       Integer.mul (direct_array_size ty) (array_size elemty)
     else direct_array_size ty
-  | TArray(_,None,_,_) -> Integer.zero
+  | TArray(_,None,_) -> Integer.zero
   | _ -> assert false
 
 let direct_element_type ty = match unrollType ty with
-  | TArray(eltyp,_,_,_) -> eltyp
+  | TArray(eltyp,_,_) -> eltyp
   | _ -> assert false
 
 let element_type ty =
   let rec elem_type ty = match unrollType ty with
-    | TArray(eltyp,_,_,_) -> elem_type eltyp
+    | TArray(eltyp,_,_) -> elem_type eltyp
     | _ -> ty
   in
   match unrollType ty with
-  | TArray(eltyp,_,_,_) -> elem_type eltyp
+  | TArray(eltyp,_,_) -> elem_type eltyp
   | _ -> assert false
 
 let direct_pointed_type ty =

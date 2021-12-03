@@ -379,13 +379,6 @@ type code_annot =
       @modify 18.0-Argon
   *)
 
-(** custom trees *)
-
-type custom_tree =
-  | CustomType of logic_type
-  | CustomLexpr of lexpr
-  | CustomOther of string * (custom_tree list)
-
 (** all kind of annotations*)
 type annot =
   | Adecl of decl list (** global annotation. *)
@@ -396,7 +389,6 @@ type annot =
   | Acode_annot of location * code_annot (** code annotation. *)
   | Aloop_annot of location * code_annot list (** loop annotation. *)
   | Aattribute_annot of location * string (** attribute annotation. *)
-  | Acustom of location * string * custom_tree
 
 (** ACSL extension for external spec file **)
 type ext_decl =

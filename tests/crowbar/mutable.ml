@@ -53,13 +53,13 @@ let mk_composite_type field_kind (subtypes, subkind) =
   let typ_attr = tattr_of_kind field_kind in
   let subtype = List.hd subtypes in
   let kind = merge_kind field_kind subkind in
-  let field_type = TComp (subtype, { scache = Not_Computed }, typ_attr) in
+  let field_type = TComp (subtype, typ_attr) in
   (mk_type field_type field_attr) :: subtypes, kind
 
 let rec mk_offset { cfields } =
   let field = List.hd cfields in
   let offset =
-    match field.ftype with TComp(comp,_,_) -> mk_offset comp | _ -> NoOffset
+    match field.ftype with TComp(comp,_) -> mk_offset comp | _ -> NoOffset
   in
   Field (field, offset)
 
@@ -84,7 +84,7 @@ let generate_failure_file is_const =
     let fmt = Format.formatter_of_out_channel out in
     let typ = List.hd types in
     let x =
-      Cil.makeGlobalVar "x" (TComp (typ, { scache = Not_Computed }, []))
+      Cil.makeGlobalVar "x" (TComp (typ, []))
     in
     let y =
       Cil.makeGlobalVar "y" (TInt (IInt,[]))
@@ -124,7 +124,7 @@ let test (types, kind) =
   let out_type = List.hd types in
   let offset = mk_offset out_type in
   let inner_type =
-    Cil.typeOffset (TComp (out_type, { scache = Not_Computed }, [])) offset
+    Cil.typeOffset (TComp (out_type, [])) offset
   in
   match kind with
   | NoAttr | Mutable ->
