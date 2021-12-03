@@ -1593,9 +1593,10 @@ that can be used instead of the basic ones:
   debugging level are sufficient.
 
 %%item
-  \logprintf{with\_log}{ f ?kind}%
-  Emits a message like \texttt{log}, and finally pass the generated
-  message to the continuation $f$, and returns its result.
+  \logprintf{logwith}{ f ?wkey ?emitwith ?once}%
+  Emits a message like \texttt{warning}, and finally pass the generated
+  \texttt{event} (or \texttt{None}) to the continuation $f$,
+  and returns its result.
 \end{description}
 
 The default kind is \lstinline{Result}, but all the other kind of
@@ -1643,9 +1644,6 @@ own, in addition to the one automatically created for your plug-in.
   \logroutine{log\_channel}{ channel ?kind ?prefix}%
   This routine is similar to the \lstinline{log} one.
 
-%%item
-  \logroutine{with\_log\_channel}{ channel f ?kind ?prefix}%
-  This routine is similar to the \lstinline{with_log} one.
 \end{description}
 
 With both logging routines, you may specify a prefix to be used during
