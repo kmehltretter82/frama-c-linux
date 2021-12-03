@@ -180,6 +180,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
     [expr_to_predicate] instead.
 
     @modify 21.0-Scandium
+    @plugin development guide
 *)
 
 val expr_to_predicate: exp -> predicate

@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Nothing is exported.
-
+(** Main entry point of Frama-C. Nothing is exported.
     @plugin development guide
 *)

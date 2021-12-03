@@ -20,8 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Implementation of data flow analyses over user-supplied domains. *)
+(** Implementation of data flow analyses over user-supplied domains.
+    @plugin development guide
+*)
 
+(** possible kinds of action for backward analysis *)
 type 't action =
     Default (** The default action *)
   | Done of 't (** Do not do the default action. Use this result *)

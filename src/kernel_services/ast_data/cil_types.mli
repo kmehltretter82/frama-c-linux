@@ -1681,6 +1681,7 @@ and ext_category =
   | Ext_global
   | Ext_code_annot of ext_code_annot_context
 
+(** @plugin development guide *)
 and ext_code_annot_context =
   | Ext_here (** at current program point. *)
   | Ext_next_stmt (** covers next statement. *)
