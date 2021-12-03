@@ -633,7 +633,7 @@ struct
     Bound.upper_const ~oracle b
 
   let born b = b, Integer.zero
-  let _age (_,a) = a
+  let age (_,a) = a
   let operators oracle : (module Operators with type t = t) =
     operators (cmp ~oracle)
 end
@@ -920,6 +920,40 @@ struct
     | `Bottom -> assert false (* TODO: ensure that with typing *)
     | `Value v -> v
 
+  let segments_limit = 10
+
+  let oldest_inner_bound m =
+    match m.segments with (* ignore m.start bound *)
+    | [] -> None
+    | (_,b) :: t ->
+      let rec aux acc = function
+        | [] -> None
+        | [_] -> Some acc (* ignore last bound *)
+        | (_,b) :: t -> aux (min acc (B.age b)) t
+      in
+      aux (B.age b) t
+
+  let remove_oldest_bounds ~oracle m =
+    match oldest_inner_bound m with
+    | None -> m (* no inner bounds, should not happen if segments_limit > 2 *)
+    | Some oldest_age ->
+      (* Remvoe all bounds of this age *)
+      let rec aux acc l = function
+        | ([] | [_]) as t -> List.rev (t @ acc)
+        | ((v,u) :: t) as s ->
+          if B.age u =  oldest_age then
+            aux acc l (merge_first ~oracle l s)
+          else
+            aux ((v,u) :: acc) u t
+      in
+      { m with segments = aux [] m.start m.segments }
+
+  let limit_size ~oracle m =
+    let rec aux m n =
+      if n <= 0 then m else aux (remove_oldest_bounds ~oracle m) (n - 1)
+    in
+    aux m (List.length m.segments - segments_limit)
+
   (* TODO: partitioning strategies
      1. reinforcement without loss
      2. weak update without singularization
@@ -985,7 +1019,7 @@ struct
         age;
       }
     in
-    aux_before m.start m.segments
+    limit_size ~oracle (aux_before m.start m.segments)
 
   let incr_bound ~oracle vi x m =
     let incr = B.incr_or_constantify ~oracle vi x in

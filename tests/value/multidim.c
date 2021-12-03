@@ -73,7 +73,8 @@ void main3(void) {
   Frama_C_domain_show_each(z, r);
 }
 
-void main4(void) { // How trace partitioning changes array partitioning ?
+void main4(void) {
+  // How trace partitioning changes array partitioning ?
   int t[N];
 
   //@ loop unroll 1;
@@ -83,6 +84,37 @@ void main4(void) { // How trace partitioning changes array partitioning ?
       t[j] = 42;
     }
   }
+
+  Frama_C_domain_show_each(t);
+}
+
+void main5(void) {
+  // Array partitioning hints
+  int t[20] = {0};
+
+  //@ array_partition t, 0, 10, 20;
+  for (int i = 0; i < 20; i++) {
+    //@ split i < 9;
+    //@ split i == 9;
+    if (i < 10)
+      t[i] = 1;
+    else
+      t[i] = 2;
+    //@ array_partition t, 0, 10, 20;
+  }
+
+  Frama_C_domain_show_each(t);
+}
+
+void main6(void) {
+  // Limit on the number of bounds in a segmentation
+  int t[100];
+
+  //@ loop unroll 100;
+  for (int i = 0; i < 100; i++) {
+    t[i] = 0;
+  }
+
   Frama_C_domain_show_each(t);
 }
 
@@ -91,4 +123,6 @@ void main(s x) {
   main2();
   main3();
   main4();
+  main5();
+  main6();
 }
