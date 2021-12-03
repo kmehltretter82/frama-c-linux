@@ -6,7 +6,7 @@
   Function abs
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/abs.i, line 13) in 'abs':
+Goal Post-condition (file tests/wp_plugin/abs.i, line 15) in 'abs':
 Assume {
   Type: is_sint32(abs_0) /\ is_sint32(x).
   If x < 0
