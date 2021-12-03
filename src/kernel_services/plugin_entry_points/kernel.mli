@@ -201,6 +201,12 @@ val wkey_unnamed_typedef: warn_category
 (** Warning related to "unnamed typedef that does not introduce a struct
     or enumeration type". *)
 
+val wkey_file: warn_category
+(** Warnings related to operations on files during preprocessing/parsing. *)
+
+val wkey_file_not_found: warn_category
+(** Warnings related to missing files during preprocessing/parsing. *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:

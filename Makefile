@@ -535,6 +535,7 @@ KERNEL_CMO=\
 	src/kernel_services/visitors/visitor_behavior.cmo		\
 	src/kernel_services/ast_queries/cil.cmo                      \
 	src/kernel_services/ast_queries/cil_builtins.cmo             \
+	src/kernel_internals/parsing/parse_env.cmo                     \
 	src/kernel_internals/parsing/errorloc.cmo                      \
 	src/kernel_services/ast_printing/cil_printer.cmo                \
 	src/kernel_services/ast_printing/cil_descriptive_printer.cmo    \

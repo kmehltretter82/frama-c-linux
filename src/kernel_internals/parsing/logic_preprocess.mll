@@ -531,18 +531,23 @@ parse
   let file suffix cpp filename =
     reset ();
     let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
-    let inchan = open_in_bin filename in
-    let lex = Lexing.from_channel inchan in
-    let ppname =
-      Extlib.temp_file_cleanup_at_exit ~debug
-        (Filename.basename filename) ".pp"
-    in
-    let ppfile = open_out ppname in
-    main lex;
-    preprocess_annots suffix cpp ppfile;
-    close_in inchan;
-    close_out ppfile;
-    Datatype.Filepath.of_string ppname
+    match Parse_env.open_source filename with
+    | Error msg -> Kernel.abort "logic_preprocess: %s" msg
+    | Ok source ->
+      let lex = Lexing.from_string source in
+      let ppname =
+        Extlib.temp_file_cleanup_at_exit ~debug
+          (Filename.basename filename) ".pp"
+      in
+      Parse_env.set_i_for_pp
+        (Filepath.Normalized.of_string ppname)
+        (Filepath.Normalized.of_string filename);
+      let ppfile = open_out ppname in
+      main lex;
+      (* Format.printf "cwd during preprocess_annots: %s@." (Sys.getcwd ()); *)
+      preprocess_annots suffix cpp ppfile;
+      close_out ppfile;
+      Datatype.Filepath.of_string ppname
 }
 
 (*

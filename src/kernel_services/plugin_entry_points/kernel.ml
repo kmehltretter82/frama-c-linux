@@ -205,6 +205,12 @@ let wkey_asm = register_warn_category "asm:clobber"
 
 let wkey_unnamed_typedef = register_warn_category "parser:unnamed-typedef"
 
+let wkey_file = register_warn_category "file"
+let () = set_warn_status wkey_file Log.Winactive
+
+let wkey_file_not_found = register_warn_category "file:not-found"
+let () = set_warn_status wkey_file_not_found Log.Wfeedback
+
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
 (* ************************************************************************* *)

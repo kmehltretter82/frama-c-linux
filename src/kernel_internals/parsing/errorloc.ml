@@ -46,13 +46,11 @@
 (***** Handling parsing errors ********)
 type parseinfo = {
   lexbuf : Lexing.lexbuf;
-  inchan : in_channel;
   mutable current_working_directory : string option;
 }
 
 let dummyinfo = {
   lexbuf    = Lexing.from_string "";
-  inchan    = stdin;
   current_working_directory = None;
 }
 
@@ -66,28 +64,25 @@ let startParsing fname =
        You want to open %S and %S is still open"
       fname (Lexing.lexeme_start_p !current.lexbuf).Lexing.pos_fname
   end;
-  let inchan =
-    try open_in_bin fname
-    with Sys_error s ->
-      Kernel.abort "Cannot find input file %S: %s" fname s
-  in
-  let lexbuf = Lexing.from_channel inchan in
-  let filename = Filepath.normalize fname in
-  let i = { lexbuf; inchan; current_working_directory = None } in
-  (* Initialize lexer buffer. *)
-  lexbuf.Lexing.lex_curr_p <-
-    { Lexing.pos_fname = filename;
-      Lexing.pos_lnum  = 1;
-      Lexing.pos_bol   = 0;
-      Lexing.pos_cnum  = 0
-    };
-  current := i;
-  lexbuf
+  match Parse_env.open_source fname with
+  | Error msg -> Kernel.fatal "%s" msg
+  | Ok in_str ->
+    let lexbuf = Lexing.from_string in_str in
+    let filename = Filepath.normalize fname in
+    let i = { lexbuf; current_working_directory = None } in
+    (* Initialize lexer buffer. *)
+    lexbuf.Lexing.lex_curr_p <-
+      { Lexing.pos_fname = filename;
+        Lexing.pos_lnum  = 1;
+        Lexing.pos_bol   = 0;
+        Lexing.pos_cnum  = 0
+      };
+    current := i;
+    lexbuf
 
 let finishParsing () =
   let i = !current in
   assert (i != dummyinfo);
-  close_in i.inchan;
   current := dummyinfo
 
 
