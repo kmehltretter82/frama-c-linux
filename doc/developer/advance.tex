@@ -2806,7 +2806,7 @@ a new one is loaded\index{Loading} from disk).
   \scodeidxdef{File}{init\_project\_from\_visitor};
   or write the following line of code (see Section~\ref{proj:selection}):
   \scodeidx{Project}{clear}
-  \scodeidx{State\_selection}{only\_dependencies}
+  \sscodeidx{State\_selection}{S}{only\_dependencies}
   \scodeidx{Ast}{self}
   \begin{alltt}
   let selection = State_selection.only_dependencies Ast.self in
@@ -2915,7 +2915,7 @@ consistently handle state dependencies\index{State!Dependency}.
   The following statement clears all the results of the value analysis and all
   its dependencies in the current project.\index{State!Cleaning}
   \scodeidx{Project}{clear}
-  \scodeidx{State\_selection}{with\_dependencies}
+  \sscodeidx{State\_selection}{S}{with\_dependencies}
   \sscodeidx{Db}{Value}{self}
 \begin{ocamlcode}
 let selection = State_selection.with_dependencies Db.Value.self in
