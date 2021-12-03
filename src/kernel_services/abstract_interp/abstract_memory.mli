@@ -59,7 +59,13 @@ end
 
 module type Config =
 sig
+  (* Dependencies of the hash-consing table. The table will be cleared
+     whenever one of those dependencies is cleared. *)
   val deps : State.t list
+
+  (* Limit on the number of slice after a write for array segmentations.
+     Makes sense above or equal to 1, though below 3 is counter-productive. *)
+  val slice_limit : unit -> int
 end
 
 

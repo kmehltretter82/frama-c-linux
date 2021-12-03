@@ -184,7 +184,10 @@ end
 
 module Memory =
 struct
-  module Config = struct let deps = [Ast.self] end
+  module Config = struct
+    let deps = [Ast.self]
+    let slice_limit = Value_parameters.MultidimSegmentLimit.get
+  end
   module Memory = Abstract_memory.TypedMemory (Config) (Value)
 
   module Prototype =

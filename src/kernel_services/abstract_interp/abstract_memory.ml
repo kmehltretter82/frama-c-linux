@@ -170,6 +170,7 @@ end
 module type Config =
 sig
   val deps : State.t list
+  val slice_limit : unit -> int
 end
 
 
@@ -949,10 +950,13 @@ struct
       { m with segments = aux [] m.start m.segments }
 
   let limit_size ~oracle m =
-    let rec aux m n =
-      if n <= 0 then m else aux (remove_oldest_bounds ~oracle m) (n - 1)
+    let limit = Config.slice_limit () in
+    let rec aux m =
+      if List.length m.segments <= limit
+      then m
+      else aux (remove_oldest_bounds ~oracle m)
     in
-    aux m (List.length m.segments - segments_limit)
+    aux m
 
   (* TODO: partitioning strategies
      1. reinforcement without loss
