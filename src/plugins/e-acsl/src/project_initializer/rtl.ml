@@ -232,7 +232,7 @@ let lookup_rtl_globals rtl_ast =
         Assocs.add_kf g kf
       in
       do_it ~add ~assoc (fun _ -> Globals.Functions.mem_name vi.vname) acc l g
-    | GAnnot (Daxiomatic (name, galist, _, _), _) as g :: l ->
+    | GAnnot (Daxiomatic (name, galist, _, _) as ga, _) as g :: l ->
       (* processing axiomatics *)
       let fun_or_preds =
         (* extract the functions and predicates from the axiomatic *)
@@ -264,19 +264,43 @@ let lookup_rtl_globals rtl_ast =
            all its functions and predicates are in the user's project. If only
            some of them are in it then it is an error, and if none of them are
            then the axiomatic is not in the user's project. *)
-        if exists && not forall then
-          Options.abort
-            "@[The following logic functions or predicates@ \
-             are in conflict with logic functions or predicates from the@ \
-             axiomatic '%s' in the E-ACSL runtime library, please rename@ \
-             them:@ %a@]"
-            name
-            (Pretty_utils.pp_list
-               ~sep:",@ "
-               Printer.pp_logic_info)
-            conflicting_lis
-        else
-          forall
+        let in_user_prj =
+          if exists && not forall then
+            Options.abort
+              "@[The following logic functions or predicates@ \
+               are in conflict with logic functions or predicates from the@ \
+               axiomatic '%s' in the E-ACSL runtime library, please rename@ \
+               them:@ %a@]"
+              name
+              (Pretty_utils.pp_list
+                 ~sep:",@ "
+                 Printer.pp_logic_info)
+              conflicting_lis
+          else
+            forall
+        in
+        (* If the axiomatic is not "in the user's project", check if a different
+           axiomatic with the same name is in it. *)
+        if not in_user_prj then begin
+          let ip_from_ga = Property.ip_of_global_annotation ga in
+          let found =
+            try
+              Property_status.iter
+                (fun ppt ->
+                   if List.exists (Property.equal ppt) ip_from_ga
+                   then raise Exit);
+              false
+            with Exit ->
+              true
+          in
+          if found then
+            Options.abort
+              "@[The axiomatic '%s' is in conflict with an@ \
+               axiomatic with the same name in the E-ACSL runtime library,@ \
+               please rename it.@]"
+              name
+        end;
+        in_user_prj
       in
       let assoc _g =
         List.iter

@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-12-03] Fix crash when creating an axiomatic with an
+                existing name in E-ACSL's RTL (frama-c/e-acsl#161).
 -* E-ACSL       [2021-12-01] Fix crash when binding a lambda-abstraction to a
                 local variable (frama-c/e-acsl#189).
 -* e-acsl-gcc   [2021-11-30] Fix e-acsl-gcc.sh bash autocompletion script and
