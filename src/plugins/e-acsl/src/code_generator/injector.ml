@@ -602,7 +602,7 @@ let inject_in_fundec main fundec =
   let main = if Kernel_function.is_main kf then Some kf else main in
   Options.feedback ~dkey ~level:2 "function %a done."
     Kernel_function.pretty kf;
-  env, main
+  main
 
 (* ************************************************************************** *)
 (* The whole AST *)
@@ -621,26 +621,26 @@ let unghost_vi vi =
   | _ ->
     ()
 
-let inject_in_global (env, main) global =
-  let update_builtin vi = Builtins.update vi.vname vi; env, main in
+let inject_in_global main global =
+  let update_builtin vi = Builtins.update vi.vname vi; main in
   let observe_and_unghost vi =
-    unghost_vi vi; Global_observer.add vi; env, main
+    unghost_vi vi; Global_observer.add vi; main
   in
   let var_def vi init =
     Global_observer.add vi;
     unghost_vi vi;
-    let _init, env = inject_in_init env None vi NoOffset init in
+    let _init, _env = inject_in_init Env.empty None vi NoOffset init in
     (* ignore the new initializer that handles literal strings
            since they are not substituted in global initializers
            (see  [replace_literal_string_in_exp]) *)
-    env, main
+    main
   in
   let fun_def ({svar = vi} as fundec) =
     unghost_vi vi;
     inject_in_fundec main fundec
   in
   E_acsl_visitor.case_globals
-    ~default:(fun () -> env, main)
+    ~default:(fun () -> main)
     ~builtin:update_builtin
     ~var_fun_decl:observe_and_unghost
     ~var_init:observe_and_unghost
@@ -804,8 +804,8 @@ let inject_mtracking_handler main =
   end
 
 let inject_in_file file =
-  let _env, main =
-    List.fold_left inject_in_global (Env.empty, None) file.globals
+  let main =
+    List.fold_left inject_in_global None file.globals
   in
   (* post-treatment *)
   (* extend [main] with forward initialization and put it at end *)
