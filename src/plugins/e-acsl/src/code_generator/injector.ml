@@ -215,7 +215,7 @@ let add_new_block_in_stmt env kf stmt =
           List.iter
             (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env))
             rtes;
-          Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
+          Translate_rtes.rte_annots Printer.pp_stmt stmt kf env rtes
         end else
           env
       in
@@ -648,8 +648,8 @@ let inject_in_global main global =
     ~fun_def
     global
 
-(* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end] as
-   the last before [return] *)
+(* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end]
+   as the last before [return] *)
 let surround_function_with kf fundec stmt_begin stmt_end =
   let body = fundec.sbody in
   (* Insert last statement *)

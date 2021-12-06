@@ -37,11 +37,3 @@ val translate_preconditions: kernel_function -> kinstr -> Env.t -> t -> Env.t
 
 val translate_postconditions: kernel_function -> kinstr -> Env.t -> Env.t
 (** Translate the postconditions of the given contract into the environment *)
-
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-val must_translate_ppt_ref: (Property.t -> bool) ref
-
-val must_translate_ppt_opt_ref: (Property.t option -> bool) ref

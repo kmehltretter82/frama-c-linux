@@ -90,7 +90,10 @@ SRC_CODE_GENERATOR:= \
 	at_with_lscope \
 	memory_translate \
 	logic_array \
-	translate \
+	translate_utils \
+	translate_terms \
+	translate_predicates \
+	translate_rtes \
 	contract \
 	translate_annots \
 	temporal \

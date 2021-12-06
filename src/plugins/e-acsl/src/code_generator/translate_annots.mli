@@ -26,15 +26,6 @@ open Cil_types
     statements (if any) for runtime assertion checking. These C statements are
     part of the resulting environment. *)
 
-val must_translate: Property.t -> bool
-(** Return true if the given property must be translated (ie. if the valid
-    properties must be translated or if its status is not [True]), false
-    otherwise. *)
-
-val must_translate_opt: Property.t option -> bool
-(** Same than [must_translate] but for [Property.t option]. Return false if the
-    option is [None]. *)
-
 val pre_funspec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
 (** Translate the preconditions of the given function contract in the
     environment. The contract is attached to the kernel_function.
@@ -72,6 +63,6 @@ val post_code_annotation:
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
