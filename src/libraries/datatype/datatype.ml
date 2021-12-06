@@ -226,12 +226,12 @@ struct
 
   let mk_full_descr d =
     let descr =
-      if rehash == undefined then
-        if Descr.is_unmarshable d then Descr.unmarshable
-        else begin
-          check rehash "rehash" name "descriptor";
-          assert false
-        end
+      if Descr.is_unmarshable d then Descr.unmarshable
+      else
+      if rehash == undefined then begin
+        check rehash "rehash" name "descriptor";
+        assert false
+      end
       else
       if rehash == identity then d
       else
