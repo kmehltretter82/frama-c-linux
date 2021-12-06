@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
+   STDOPT: #"-eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1 -eva-multidim-disjunctive-invariants"
 */
 #include "__fc_builtin.h"
 #define N 4
@@ -118,6 +118,46 @@ void main6(void) {
   Frama_C_domain_show_each(t);
 }
 
+typedef enum { INT=1, FLOAT=2 } type;
+
+typedef struct {
+  type typ;
+  union {
+    int i;
+    float f; 
+  } val;
+} dynamic_typed;
+
+void main7() {
+  dynamic_typed t[1000];
+
+  for (int i = 0 ; i < 1000 ; i++) {
+    if (nondet) {
+      t[i].typ = INT;
+      t[i].val.i = 42;
+    }
+    else {
+      t[i].typ = FLOAT;
+      t[i].val.f = 42.0f;
+    }
+  }
+
+  Frama_C_domain_show_each(t);
+
+  int j = Frama_C_interval(0, 999);
+  switch (t[j].typ) {
+    case INT:
+      Frama_C_show_each_INT(t[j].val.i);
+      break;
+    case FLOAT:
+      Frama_C_show_each_FLOAT(t[j].val.f);
+      break;
+    default:
+      Frama_C_show_each_BOTTOM("Unreachable");
+      break;
+  }
+}
+
 void main(s x) {
   main1(x);
   main2();
@@ -125,4 +165,5 @@ void main(s x) {
   main4();
   main5();
   main6();
+  main7();
 }

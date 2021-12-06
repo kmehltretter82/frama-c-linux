@@ -37,7 +37,7 @@ struct
   include Cvalue.V
   include Cvalue_forward (* for fallback oracles *)
 
-  let _to_integer cvalue =
+  let to_integer cvalue =
     try  Some (Ival.project_int (project_ival cvalue))
     with Not_based_on_null | Ival.Not_Singleton_Int -> None
 
@@ -186,7 +186,9 @@ module Memory =
 struct
   module Config = struct
     let deps = [Ast.self]
-    let slice_limit = Value_parameters.MultidimSegmentLimit.get
+    let slice_limit = Parameters.MultidimSegmentLimit.get
+    let disjunctive_invariants =
+      Parameters.MultidimDisjunctiveInvariants.get
   end
   module Memory = Abstract_memory.TypedMemory (Config) (Value)
 
@@ -235,14 +237,9 @@ struct
 
   let reinforce ~oracle f m loc =
     match loc with
-    | `Top -> m
+    | `Top -> `Value m
     | `Value loc ->
-      let f' x =
-        match f x with
-        | `Value v -> v
-        | `Bottom -> raise Abstract_interp.Error_Bottom
-      in
-      Memory.reinforce ~oracle f' m loc
+      Memory.reinforce ~oracle f m loc
 
   let overwrite ~oracle ~weak dst loc src =
     match loc with
@@ -382,17 +379,23 @@ struct
   let add_references_l state l refs =
     List.fold_left (fun state vi -> add_references state vi refs) state l
 
-  let write (update : memory -> offset -> memory)
-      (state : state) (loc : mdlocation) : state =
-    let f base off state =
+  let write' (update : memory -> offset -> memory or_bottom)
+      (state : state) (loc : mdlocation) : state or_bottom =
+    let f base off state' =
       if covers_base base then
+        state' >>- fun state ->
         let memory, refs = find_or_top state base in
-        add base (update memory off, refs) state
+        update memory off >>-: fun memory' ->
+        add base (memory', refs) state
       else
-        state
+        state'
     in
-    let state = Location.fold f loc state in
+    Location.fold f loc (`Value state) >>-: fun state ->
     add_references_l state (Location.references loc) (Location.bases loc)
+
+  let write update state loc =
+    (* Result can never be bottom if update never returns bottom *)
+    Bottom.non_bottom (write' (fun m o -> `Value (update m o)) state loc)
 
   let set (state : state) (dst : mdlocation) (v : value) : state =
     let weak = not (Location.is_singleton dst)
@@ -413,9 +416,9 @@ struct
     write (fun m off -> Memory.erase ~oracle ~weak m off b) state dst
 
   let reinforce (f : value -> value or_bottom)
-      (state : state) (dst : mdlocation) : state =
+      (state : state) (dst : mdlocation) : state or_bottom =
     let oracle = mk_oracle state in
-    write (fun m off -> Memory.reinforce ~oracle f m off) state dst
+    write' (fun m off -> Memory.reinforce ~oracle f m off) state dst
 
   (* Lattice *)
 
@@ -501,29 +504,31 @@ struct
     | `Value {value={v=`Bottom}} -> raise Abstract_interp.Error_Bottom
     | `Value {value={v=`Value value}} -> value
 
-  let assume_exp valuation expr record state =
+  let assume_exp valuation expr record state' =
+    state' >>- fun state ->
     let oracle = make_oracle valuation in
     try
       match expr.enode, record.value.v with
       | Lval lv, `Value value when not (Value.is_topint value) ->
         let loc = Location.of_lval oracle lv in
         let update value' =
-          `Value (Value.narrow value value')
+          let v = Value.narrow value value' in
+          if Value.is_bottom v then `Bottom else `Value v
         in
         if Location.is_singleton loc
         then reinforce update state loc
-        else state
-      | _, `Bottom -> state (* Indeterminate value, ignore *)
-      | _ -> state
+        else `Value state
+      | _, `Bottom -> `Value state (* Indeterminate value, ignore *)
+      | _ -> `Value state
     with
     (* Failed to evaluate the location *)
-      Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> state
+      Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> `Value state
 
   let assume_valuation valuation state =
-    valuation.Abstract_domain.fold (assume_exp valuation) state
+    valuation.Abstract_domain.fold (assume_exp valuation) (`Value state)
 
   let update valuation state =
-    `Value (assume_valuation valuation state)
+    assume_valuation valuation state
 
   let update_array_segmentation_bounds vi expr state =
     (* TODO: more general transfer function *)
@@ -577,25 +582,25 @@ struct
       let dst = Location.of_lval oracle lval in
       match assigned_value with
       | Assign value ->
-        `Value (set state dst value)
+        set state dst value
       | Copy (right, _value) ->
         try
           let src = Location.of_lval oracle right.lval in
-          `Value (overwrite state dst src)
+          overwrite state dst src
         with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
-          `Value (erase state dst Abstract_memory.Bit.top)
+          erase state dst Abstract_memory.Bit.top
     with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
       (* Failed to evaluate the left location *)
-      `Value top
+      top
 
   let assign _kinstr left expr assigned_value valuation state =
     let state = update_array_segmentation left.lval (Some expr) state in
-    let state = assume_valuation valuation state in
+    assume_valuation valuation state >>-: fun state ->
     let oracle = make_oracle valuation in
     assign_lval left.lval assigned_value oracle state
 
   let assume _stmt _expr _pos valuation state =
-    `Value (assume_valuation valuation state)
+    assume_valuation valuation state
 
   let start_call _stmt call recursion valuation state =
     if recursion <> None
@@ -604,7 +609,7 @@ struct
         "The multidim domain does not support recursive calls yet";
     let oracle = make_oracle valuation in
     let bind state arg =
-      state >>- assign_lval (Cil.var arg.formal) arg.avalue oracle
+      state >>-: assign_lval (Cil.var arg.formal) arg.avalue oracle
     in
     List.fold_left bind (`Value state) call.arguments
 
@@ -613,7 +618,7 @@ struct
     | None, _ | _, None   -> `Value post
     | Some f, Some return ->
       let args = List.map (fun arg -> arg.avalue) call.arguments in
-      f args >>- fun assigned_result ->
+      f args >>-: fun assigned_result ->
       assign_lval (Cil.var return) assigned_result no_oracle post
 
   let show_expr valuation state fmt expr =
@@ -666,7 +671,7 @@ struct
         begin match Cil.unrollType (Logic_utils.logicCType typ) with
           | TFloat (fkind,_) ->
             let update = Value.backward_is_finite positive fkind in
-            `Value (reinforce update state loc)
+            reinforce update state loc
           | _ | exception (Failure _) -> `Value state
         end
       | _ -> `Value state

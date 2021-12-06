@@ -53,6 +53,7 @@ sig
   val pretty : Format.formatter -> t -> unit
   val of_bit : bit -> t
   val to_bit : t -> bit
+  val to_integer : t -> Integer.t option
   val is_included : t -> t -> bool
   val join : t -> t -> t
 end
@@ -66,6 +67,10 @@ sig
   (* Limit on the number of slice after a write for array segmentations.
      Makes sense above or equal to 1, though below 3 is counter-productive. *)
   val slice_limit : unit -> int
+
+  (* Whether the memory model try to infer some structure disjunctive
+     invariants. *)
+  val disjunctive_invariants : unit -> bool
 end
 
 
@@ -111,7 +116,8 @@ sig
 
   (* Reinforce values on a set of locations when the locations match the
      memory structure ; does nothing on locations that cannot be matched *)
-  val reinforce : oracle:oracle -> (value -> value) ->  t -> location -> t
+  val reinforce : oracle:oracle ->
+    (value -> value Bottom.or_bottom) ->  t -> location -> t Bottom.or_bottom
 
   (* Test inclusion of one memory map into another *)
   val is_included : t -> t -> bool
