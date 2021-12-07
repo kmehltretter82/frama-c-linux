@@ -197,6 +197,10 @@ val wkey_parser_unsupported: warn_category
 val wkey_asm: warn_category
 (** Warnings related to assembly code. *)
 
+val wkey_unnamed_typedef: warn_category
+(** Warning related to "unnamed typedef that does not introduce a struct
+    or enumeration type". *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:

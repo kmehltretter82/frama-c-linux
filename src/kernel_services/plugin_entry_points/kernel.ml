@@ -203,6 +203,8 @@ let wkey_parser_unsupported = register_warn_category "parser:unsupported"
 
 let wkey_asm = register_warn_category "asm:clobber"
 
+let wkey_unnamed_typedef = register_warn_category "parser:unnamed-typedef"
+
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
 (* ************************************************************************* *)
