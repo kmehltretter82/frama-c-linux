@@ -181,8 +181,6 @@ let warn_degrade reason =
       View degraded to non-service graph.\n\
       (use -cg-no-services to avoid this warning)")
 
-exception Found_vertex of bool
-
 let main (window: Design.main_window_extension_points) =
   ignore
     ((window#menu_manager ())#add_plugin

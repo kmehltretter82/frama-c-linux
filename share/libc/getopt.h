@@ -24,10 +24,9 @@
 #define __FC_GETOPT_H
 #include "features.h"
 __PUSH_FC_STDLIB
-
+#include "unistd.h"
 __BEGIN_DECLS
 
-#include "unistd.h"
 
 /* GNU specific */
 struct option

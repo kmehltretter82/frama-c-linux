@@ -1,8 +1,8 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva -eva @EVA_CONFIG@ -eva-no-show-progress -eva-print-callstacks -journal-disable -eva-no-results
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -eva-no-show-progress -eva-print-callstacks -eva-no-results
 */
 int *p, x;
-
 void f(void)
 {
   if (*p) x = 1;

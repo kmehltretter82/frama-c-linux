@@ -52,6 +52,7 @@ Ivette.registerGroup({
   label: 'Frama-C Kernel',
 }, () => {
   Ivette.registerSidebar({ id: 'frama-c.globals', children: <Globals /> });
+  Ivette.registerSidebar({ id: 'frama-c.astinfo', children: <ASTinfo /> });
   Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
   Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
@@ -61,15 +62,9 @@ Ivette.registerGroup({
     children: <ASTview />,
   });
   Ivette.registerComponent({
-    id: 'frama-c.astinfo',
-    label: 'Informations',
-    title: 'Informations on currently selected item',
-    children: <ASTinfo />,
-  });
-  Ivette.registerComponent({
     id: 'frama-c.sourcecode',
     label: 'Source Code',
-    title: 'C/ASCL Source Code',
+    title: 'C/ACSL Source Code',
     children: <SourceCode />,
   });
   Ivette.registerComponent({
@@ -81,7 +76,7 @@ Ivette.registerGroup({
   Ivette.registerComponent({
     id: 'frama-c.properties',
     label: 'Properties',
-    title: 'Status of ASCL Properties',
+    title: 'Status of ACSL Properties',
     children: <Properties />,
   });
   Ivette.registerComponent({
@@ -111,7 +106,7 @@ Ivette.registerView({
   label: 'Source Code',
   layout: [
     ['frama-c.astview', 'frama-c.sourcecode'],
-    'frama-c.astinfo',
+    ['frama-c.messages'],
   ],
 });
 

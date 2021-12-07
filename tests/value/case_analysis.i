@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_CONFIG@ -eva-slevel 30 -journal-disable -float-normal
-
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -eva-slevel 30 -float-normal
 */
 
 int sq,s;

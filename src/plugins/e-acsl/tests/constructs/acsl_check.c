@@ -1,3 +1,6 @@
+/* run.config_dev
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT -F -no-unicode
+*/
 #include <stdio.h>
 
 /*@

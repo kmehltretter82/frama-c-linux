@@ -54,15 +54,53 @@ import { jTagSafe } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { tag } from 'frama-c/api/kernel/data';
 
-const isComputed_internal: Server.GetRequest<null,boolean> = {
+/** State of the computation of Eva Analysis. */
+export type computationStateType = "not_computed" | "computing" | "computed";
+
+/** Loose decoder for `computationStateType` */
+export const jComputationStateType: Json.Loose<computationStateType> =
+  Json.jUnion<"not_computed" | "computing" | "computed">(
+    Json.jTag("not_computed"),
+    Json.jTag("computing"),
+    Json.jTag("computed"),
+  );
+
+/** Safe decoder for `computationStateType` */
+export const jComputationStateTypeSafe: Json.Safe<computationStateType> =
+  Json.jFail(jComputationStateType,'ComputationStateType expected');
+
+/** Natural order for `computationStateType` */
+export const byComputationStateType: Compare.Order<computationStateType> =
+  Compare.structural;
+
+/** Signal for state [`computationState`](#computationstate)  */
+export const signalComputationState: Server.Signal = {
+  name: 'plugins.eva.general.signalComputationState',
+};
+
+const getComputationState_internal: Server.GetRequest<
+  null,
+  computationStateType
+  > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.isComputed',
+  name:   'plugins.eva.general.getComputationState',
   input:  Json.jNull,
-  output: Json.jBoolean,
+  output: jComputationStateType,
   signals: [],
 };
-/** True if the Eva analysis has been done */
-export const isComputed: Server.GetRequest<null,boolean>= isComputed_internal;
+/** Getter for state [`computationState`](#computationstate)  */
+export const getComputationState: Server.GetRequest<
+  null,
+  computationStateType
+  >= getComputationState_internal;
+
+const computationState_internal: State.Value<computationStateType> = {
+  name: 'plugins.eva.general.computationState',
+  signal: signalComputationState,
+  getter: getComputationState,
+};
+/** The current computation state of the analysis. */
+export const computationState: State.Value<computationStateType> = computationState_internal;
 
 const getCallers_internal: Server.GetRequest<
   Json.key<'#fct'>,
@@ -243,5 +281,303 @@ const properties_internal: State.Array<Json.key<'#property'>,propertiesData> = {
 };
 /** Status of Registered Properties */
 export const properties: State.Array<Json.key<'#property'>,propertiesData> = properties_internal;
+
+/** The alarms are counted after being grouped by these categories */
+export enum alarmCategory {
+  /** Integer division by zero */
+  division_by_zero = 'division_by_zero',
+  /** Invalid pointer dereferencing */
+  mem_access = 'mem_access',
+  /** Array access out of bounds */
+  index_bound = 'index_bound',
+  /** Invalid shift */
+  shift = 'shift',
+  /** Integer overflow or downcast */
+  overflow = 'overflow',
+  /** Uninitialized memory read */
+  initialization = 'initialization',
+  /** Read of a dangling pointer */
+  dangling_pointer = 'dangling_pointer',
+  /** Non-finite (nan or infinite) floating-point value */
+  is_nan_or_infinite = 'is_nan_or_infinite',
+  /** Overflow in float to int conversion */
+  float_to_int = 'float_to_int',
+  /** Any other alarm */
+  other = 'other',
+}
+
+/** Loose decoder for `alarmCategory` */
+export const jAlarmCategory: Json.Loose<alarmCategory> =
+  Json.jEnum(alarmCategory);
+
+/** Safe decoder for `alarmCategory` */
+export const jAlarmCategorySafe: Json.Safe<alarmCategory> =
+  Json.jFail(Json.jEnum(alarmCategory),
+    'plugins.eva.general.alarmCategory expected');
+
+/** Natural order for `alarmCategory` */
+export const byAlarmCategory: Compare.Order<alarmCategory> =
+  Compare.byEnum(alarmCategory);
+
+const alarmCategoryTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.alarmCategoryTags',
+  input:  Json.jNull,
+  output: Json.jList(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const alarmCategoryTags: Server.GetRequest<null,tag[]>= alarmCategoryTags_internal;
+
+/** Statuses count. */
+export type statusesEntry =
+  { valid: number, unknown: number, invalid: number };
+
+/** Loose decoder for `statusesEntry` */
+export const jStatusesEntry: Json.Loose<statusesEntry> =
+  Json.jObject({
+    valid: Json.jFail(Json.jNumber,'Number expected'),
+    unknown: Json.jFail(Json.jNumber,'Number expected'),
+    invalid: Json.jFail(Json.jNumber,'Number expected'),
+  });
+
+/** Safe decoder for `statusesEntry` */
+export const jStatusesEntrySafe: Json.Safe<statusesEntry> =
+  Json.jFail(jStatusesEntry,'StatusesEntry expected');
+
+/** Natural order for `statusesEntry` */
+export const byStatusesEntry: Compare.Order<statusesEntry> =
+  Compare.byFields
+    <{ valid: number, unknown: number, invalid: number }>({
+    valid: Compare.number,
+    unknown: Compare.number,
+    invalid: Compare.number,
+  });
+
+/** Alarm count for each alarm category. */
+export type alarmEntry = { category: alarmCategory, count: number };
+
+/** Loose decoder for `alarmEntry` */
+export const jAlarmEntry: Json.Loose<alarmEntry> =
+  Json.jObject({
+    category: jAlarmCategorySafe,
+    count: Json.jFail(Json.jNumber,'Number expected'),
+  });
+
+/** Safe decoder for `alarmEntry` */
+export const jAlarmEntrySafe: Json.Safe<alarmEntry> =
+  Json.jFail(jAlarmEntry,'AlarmEntry expected');
+
+/** Natural order for `alarmEntry` */
+export const byAlarmEntry: Compare.Order<alarmEntry> =
+  Compare.byFields
+    <{ category: alarmCategory, count: number }>({
+    category: byAlarmCategory,
+    count: Compare.number,
+  });
+
+/** Statistics about an Eva analysis. */
+export type programStatsType =
+  { progFunCoverage: { reachable: number, dead: number },
+    progStmtCoverage: { reachable: number, dead: number },
+    progAlarms: alarmEntry[],
+    evaEvents: { errors: number, warnings: number },
+    kernelEvents: { errors: number, warnings: number },
+    alarmsStatuses: statusesEntry, assertionsStatuses: statusesEntry,
+    precondsStatuses: statusesEntry };
+
+/** Loose decoder for `programStatsType` */
+export const jProgramStatsType: Json.Loose<programStatsType> =
+  Json.jObject({
+    progFunCoverage: Json.jFail(
+                       Json.jObject({
+                         reachable: Json.jFail(Json.jNumber,
+                                      'Number expected'),
+                         dead: Json.jFail(Json.jNumber,'Number expected'),
+                       }),'Record expected'),
+    progStmtCoverage: Json.jFail(
+                        Json.jObject({
+                          reachable: Json.jFail(Json.jNumber,
+                                       'Number expected'),
+                          dead: Json.jFail(Json.jNumber,'Number expected'),
+                        }),'Record expected'),
+    progAlarms: Json.jList(jAlarmEntry),
+    evaEvents: Json.jFail(
+                 Json.jObject({
+                   errors: Json.jFail(Json.jNumber,'Number expected'),
+                   warnings: Json.jFail(Json.jNumber,'Number expected'),
+                 }),'Record expected'),
+    kernelEvents: Json.jFail(
+                    Json.jObject({
+                      errors: Json.jFail(Json.jNumber,'Number expected'),
+                      warnings: Json.jFail(Json.jNumber,'Number expected'),
+                    }),'Record expected'),
+    alarmsStatuses: jStatusesEntrySafe,
+    assertionsStatuses: jStatusesEntrySafe,
+    precondsStatuses: jStatusesEntrySafe,
+  });
+
+/** Safe decoder for `programStatsType` */
+export const jProgramStatsTypeSafe: Json.Safe<programStatsType> =
+  Json.jFail(jProgramStatsType,'ProgramStatsType expected');
+
+/** Natural order for `programStatsType` */
+export const byProgramStatsType: Compare.Order<programStatsType> =
+  Compare.byFields
+    <{ progFunCoverage: { reachable: number, dead: number },
+       progStmtCoverage: { reachable: number, dead: number },
+       progAlarms: alarmEntry[],
+       evaEvents: { errors: number, warnings: number },
+       kernelEvents: { errors: number, warnings: number },
+       alarmsStatuses: statusesEntry, assertionsStatuses: statusesEntry,
+       precondsStatuses: statusesEntry }>({
+    progFunCoverage: Compare.byFields
+                       <{ reachable: number, dead: number }>({
+                       reachable: Compare.number,
+                       dead: Compare.number,
+                     }),
+    progStmtCoverage: Compare.byFields
+                        <{ reachable: number, dead: number }>({
+                        reachable: Compare.number,
+                        dead: Compare.number,
+                      }),
+    progAlarms: Compare.array(byAlarmEntry),
+    evaEvents: Compare.byFields
+                 <{ errors: number, warnings: number }>({
+                 errors: Compare.number,
+                 warnings: Compare.number,
+               }),
+    kernelEvents: Compare.byFields
+                    <{ errors: number, warnings: number }>({
+                    errors: Compare.number,
+                    warnings: Compare.number,
+                  }),
+    alarmsStatuses: byStatusesEntry,
+    assertionsStatuses: byStatusesEntry,
+    precondsStatuses: byStatusesEntry,
+  });
+
+/** Signal for state [`programStats`](#programstats)  */
+export const signalProgramStats: Server.Signal = {
+  name: 'plugins.eva.general.signalProgramStats',
+};
+
+const getProgramStats_internal: Server.GetRequest<null,programStatsType> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.getProgramStats',
+  input:  Json.jNull,
+  output: jProgramStatsType,
+  signals: [],
+};
+/** Getter for state [`programStats`](#programstats)  */
+export const getProgramStats: Server.GetRequest<null,programStatsType>= getProgramStats_internal;
+
+const programStats_internal: State.Value<programStatsType> = {
+  name: 'plugins.eva.general.programStats',
+  signal: signalProgramStats,
+  getter: getProgramStats,
+};
+/** Statistics about the last Eva analysis for the whole program */
+export const programStats: State.Value<programStatsType> = programStats_internal;
+
+/** Data for array rows [`functionStats`](#functionstats)  */
+export interface functionStatsData {
+  /** Entry identifier. */
+  key: Json.key<'#fundec'>;
+  /** Coverage of the Eva analysis */
+  coverage: { reachable: number, dead: number };
+  /** Alarms raised by the Eva analysis by category */
+  alarmCount: alarmEntry[];
+  /** Alarms statuses emitted by the Eva analysis */
+  alarmStatuses: statusesEntry;
+}
+
+/** Loose decoder for `functionStatsData` */
+export const jFunctionStatsData: Json.Loose<functionStatsData> =
+  Json.jObject({
+    key: Json.jFail(Json.jKey<'#fundec'>('#fundec'),'#fundec expected'),
+    coverage: Json.jFail(
+                Json.jObject({
+                  reachable: Json.jFail(Json.jNumber,'Number expected'),
+                  dead: Json.jFail(Json.jNumber,'Number expected'),
+                }),'Record expected'),
+    alarmCount: Json.jList(jAlarmEntry),
+    alarmStatuses: jStatusesEntrySafe,
+  });
+
+/** Safe decoder for `functionStatsData` */
+export const jFunctionStatsDataSafe: Json.Safe<functionStatsData> =
+  Json.jFail(jFunctionStatsData,'FunctionStatsData expected');
+
+/** Natural order for `functionStatsData` */
+export const byFunctionStatsData: Compare.Order<functionStatsData> =
+  Compare.byFields
+    <{ key: Json.key<'#fundec'>,
+       coverage: { reachable: number, dead: number },
+       alarmCount: alarmEntry[], alarmStatuses: statusesEntry }>({
+    key: Compare.string,
+    coverage: Compare.byFields
+                <{ reachable: number, dead: number }>({
+                reachable: Compare.number,
+                dead: Compare.number,
+              }),
+    alarmCount: Compare.array(byAlarmEntry),
+    alarmStatuses: byStatusesEntry,
+  });
+
+/** Signal for array [`functionStats`](#functionstats)  */
+export const signalFunctionStats: Server.Signal = {
+  name: 'plugins.eva.general.signalFunctionStats',
+};
+
+const reloadFunctionStats_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.reloadFunctionStats',
+  input:  Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`functionStats`](#functionstats)  */
+export const reloadFunctionStats: Server.GetRequest<null,null>= reloadFunctionStats_internal;
+
+const fetchFunctionStats_internal: Server.GetRequest<
+  number,
+  { pending: number, updated: functionStatsData[],
+    removed: Json.key<'#fundec'>[], reload: boolean }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.fetchFunctionStats',
+  input:  Json.jNumber,
+  output: Json.jObject({
+            pending: Json.jFail(Json.jNumber,'Number expected'),
+            updated: Json.jList(jFunctionStatsData),
+            removed: Json.jList(Json.jKey<'#fundec'>('#fundec')),
+            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+          }),
+  signals: [],
+};
+/** Data fetcher for array [`functionStats`](#functionstats)  */
+export const fetchFunctionStats: Server.GetRequest<
+  number,
+  { pending: number, updated: functionStatsData[],
+    removed: Json.key<'#fundec'>[], reload: boolean }
+  >= fetchFunctionStats_internal;
+
+const functionStats_internal: State.Array<
+  Json.key<'#fundec'>,
+  functionStatsData
+  > = {
+  name: 'plugins.eva.general.functionStats',
+  getkey: ((d:functionStatsData) => d.key),
+  signal: signalFunctionStats,
+  fetch: fetchFunctionStats,
+  reload: reloadFunctionStats,
+  order: byFunctionStatsData,
+};
+/** Statistics about the last Eva analysis for each function */
+export const functionStats: State.Array<
+  Json.key<'#fundec'>,
+  functionStatsData
+  > = functionStats_internal;
 
 /* ------------------------------------- */

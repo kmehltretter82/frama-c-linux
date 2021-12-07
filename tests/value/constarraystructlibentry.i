@@ -1,7 +1,7 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_CONFIG@ -lib-entry -eva-initialization-padding-globals yes -then -eva-initialization-padding-globals no
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -lib-entry -eva-initialization-padding-globals yes -then -eva-initialization-padding-globals no
 */
-
 const int t[] = { 1, 2, 3, 4, 5 } ;
 
 const int t2[3][3] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 } ;

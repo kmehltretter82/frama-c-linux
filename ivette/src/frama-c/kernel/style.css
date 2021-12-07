@@ -10,11 +10,26 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Lightweight Text Markers                                           --- */
+/* -------------------------------------------------------------------------- */
+
+.kernel-text {
+  white-space: pre;
+}
+
+.kernel-text-marker:hover {
+  background: lightgreen;
+}
+/* -------------------------------------------------------------------------- */
 /* --- AST View                                                           --- */
 /* -------------------------------------------------------------------------- */
 
 .highlighted-marker {
     background-color: #FFFF66;
+}
+
+.hovered-marker {
+    background-color: lightblue;
 }
 
 .dead-code {
@@ -50,7 +65,75 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Globals                                                            --- */
+/* --- Informations                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+.astinfo-section {
+    position: relative;
+    overflow: hidden;
+    padding-top: 1px;
+    padding-bottom: 2px;
+}
+
+.astinfo-section.hovered {
+    background: #ddd;
+}
+
+.astinfo-section.transient {
+    background: #f5d69e;
+}
+
+.astinfo-folderbutton {
+    flex: 0 0 auto;
+}
+
+.astinfo-markerbar {
+    display: flex;
+    overflow: hidden;
+    padding-left: 4px;
+}
+
+.astinfo-markerkind {
+    background: #b1c6dc;
+    position: relative;
+    top: -1px;
+    border-radius: 2px;
+    font-size: 7pt;
+    padding: 2px;
+    color: black;
+    user-select: none;
+    margin-right: 3pt;
+}
+
+.astinfo-markercode {
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+    cursor: default;
+}
+
+.astinfo-markerbutton {
+    flex: 0 1 auto;
+    margin: 0px;
+    position: relative;
+}
+
+.astinfo-infos {
+    display: flex ;
+    margin-top: 1px ;
+    margin-bottom: 1px ;
+}
+
+.astinfo-kind {
+    flex: 0 1 50px;
+    text-align: center;
+    margin-top: 1px;
+    margin-left: 8px;
+    color: #999;
+    font-size: smaller;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Messages                                                           --- */
 /* -------------------------------------------------------------------------- */
 
 .message-search {
@@ -79,6 +162,10 @@
     margin: 0px 4px;
     display: inline-block;
     min-width: 80px;
+}
+
+.message-search .message-emitter-category {
+    margin-bottom: 10px;
 }
 
 /* -------------------------------------------------------------------------- */

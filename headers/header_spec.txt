@@ -180,6 +180,7 @@ share/libc/__fc_define_clockid_t.h: CEA_LGPL
 share/libc/__fc_define_dev_t.h: CEA_LGPL
 share/libc/__fc_define_eof.h: CEA_LGPL
 share/libc/__fc_define_fd_set_t.h: CEA_LGPL
+share/libc/__fc_define_fds.h: CEA_LGPL
 share/libc/__fc_define_file.h: CEA_LGPL
 share/libc/__fc_define_fpos_t.h: CEA_LGPL
 share/libc/__fc_define_fs_cnt.h: CEA_LGPL
@@ -206,6 +207,7 @@ share/libc/__fc_define_suseconds_t.h: CEA_LGPL
 share/libc/__fc_define_time_t.h: CEA_LGPL
 share/libc/__fc_define_timer_t.h: CEA_LGPL
 share/libc/__fc_define_timespec.h: CEA_LGPL
+share/libc/__fc_define_timeval.h: CEA_LGPL
 share/libc/__fc_define_uid_and_gid.h: CEA_LGPL
 share/libc/__fc_define_useconds_t.h: CEA_LGPL
 share/libc/__fc_define_wchar_t.h: CEA_LGPL
@@ -796,6 +798,7 @@ src/plugins/callgraph/Callgraph.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/callgraph_api.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/callgraph/cg_viewer.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg_viewer.yes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/journalize.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/journalize.mli: CEA_LGPL_OR_PROPRIETARY
@@ -1477,6 +1480,8 @@ src/plugins/value/utils/eva_audit.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_audit.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/summary.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/summary.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/unit_tests.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/unit_tests.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/value_perf.ml: CEA_LGPL_OR_PROPRIETARY

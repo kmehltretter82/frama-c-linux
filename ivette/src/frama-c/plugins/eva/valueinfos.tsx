@@ -30,6 +30,7 @@ import { classes } from 'dome/misc/utils';
 import { Hpack, Vpack } from 'dome/layout/boxes';
 import { Code, Cell } from 'dome/controls/labels';
 import * as States from 'frama-c/states';
+import * as Ast from 'frama-c/api/kernel/ast';
 
 // Locals
 import { EvaAlarm } from './cells';
@@ -41,17 +42,22 @@ import { useModel } from './model';
 // --------------------------------------------------------------------------
 
 interface StmtProps {
-  stmt?: string;
-  rank?: number;
+  stmt?: Ast.marker;
+  marker: Ast.marker;
+  short?: boolean;
 }
 
 export function Stmt(props: StmtProps) {
-  const { rank, stmt } = props;
-  if (rank === undefined || !stmt) return null;
-  const title = `Stmt at global rank ${rank} (internal id: ${stmt})`;
+  const { stmt, marker, short } = props;
+  if (!stmt) return null;
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+  const line = markersInfo.getData(marker)?.sloc?.line;
+  const filename = markersInfo.getData(marker)?.sloc?.base;
+  const title = markersInfo.getData(stmt)?.descr;
+  const text = short ? `@L${line}` : `@${filename}:${line}`;
   return (
     <span className="dome-text-cell eva-stmt" title={title}>
-      @S{rank}
+      {text}
     </span>
   );
 }
@@ -94,7 +100,7 @@ export function StackInfos() {
   const focused = model.getFocused();
   const callstack = model.getCalls();
   if (callstack.length <= 1) return null;
-  const makeCallsite = ({ caller, stmt, rank }: Callsite) => {
+  const makeCallsite = ({ caller, stmt }: Callsite) => {
     if (!caller || !stmt) return null;
     const key = `${caller}@${stmt}`;
     const isFocused = focused?.marker === stmt;
@@ -125,7 +131,7 @@ export function StackInfos() {
         onDoubleClick={onDoubleClick}
       >
         {caller}
-        <Stmt stmt={stmt} rank={rank} />
+        <Stmt stmt={stmt} marker={stmt} />
       </Cell>
     );
   };

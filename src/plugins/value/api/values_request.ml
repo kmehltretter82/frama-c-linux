@@ -60,7 +60,8 @@ type domain = {
 let signal = Request.signal ~package ~name:"changed"
     ~descr:(Md.plain "Emitted when EVA results has changed")
 
-let () = Analysis.register_computed_hook (fun () -> Request.emit signal)
+let () = Analysis.register_computation_hook ~on:Computed
+    (fun _ -> Request.emit signal)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Utilities                                                   --- *)

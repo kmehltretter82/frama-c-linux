@@ -41,7 +41,7 @@ module Make
         to be reused in subsequent calls *)
     val store_computed_call:
       kernel_function -> Domain.t -> Value.t or_bottom list ->
-      Domain.t list or_bottom ->
+      (Partition.key * Domain.t) list ->
       unit
 
     (** [reuse_previous_call kf init_state args] searches amongst the previous
@@ -52,7 +52,7 @@ module Make
         by the plugins that have registered Value callbacks.) *)
     val reuse_previous_call:
       kernel_function -> Domain.t -> Value.t or_bottom list ->
-      (Domain.t list or_bottom * int) option
+      ((Partition.key * Domain.t) list * int) option
   end
 
 

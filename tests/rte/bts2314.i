@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -warn-signed-downcast -print -machdep x86_32
+   STDOPT: #" -warn-signed-downcast -print -machdep x86_32"
 */
 
 struct STR { int num : 7; };

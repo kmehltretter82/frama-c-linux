@@ -26,6 +26,7 @@
 
 open Cil_types
 
+val is_called: kernel_function -> bool
 val mark_kf_as_called: kernel_function -> unit
 val add_kf_caller: caller:kernel_function * stmt -> kernel_function -> unit
 
@@ -45,9 +46,6 @@ val change_callstacks:
 (** Change the callstacks for the results for which this is meaningful.
     For technical reasons, the top of the callstack must currently
     be preserved. *)
-
-(** Prints a summary of the analysis. *)
-val print_summary: unit -> unit
 
 (*
 Local Variables:

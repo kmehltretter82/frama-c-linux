@@ -260,14 +260,6 @@ module ExternArrays =
   end)
 
 let () = Parameter_customize.set_group wp_model
-module Overflows =
-  False(struct
-    let option_name = "-wp-overflows"
-    let help = "Collect hypotheses for absence of overflow and downcast\n\
-                (incompatible with RTE generator plug-in)"
-  end)
-
-let () = Parameter_customize.set_group wp_model
 module WeakIntModel =
   False(struct
     let option_name = "-wp-weak-int-model"
@@ -1134,19 +1126,6 @@ module OutputDir =
     let help = "Set working directory for generated files.\n\
                 Defaults to some temporary directory."
   end)
-
-(* -------------------------------------------------------------------------- *)
-(* --- Overflows                                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-let active_unless_rte option =
-  if RTE.get () || Dynamic.Parameter.Bool.get "-rte" () then
-    ( warning ~once:true
-        "Option %s incompatiable with RTE (ignored)" option ;
-      false )
-  else true
-
-let get_overflows () = Overflows.get () && active_unless_rte "-wp-overflows"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Output Dir                                                         --- *)

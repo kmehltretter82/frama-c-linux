@@ -1,2 +1,3 @@
-PLUGIN: @EVA_PLUGINS@ rtegen
-STDOPT:
+PLUGIN: rtegen
+
+OPT: @RTE_TEST@ -then -print

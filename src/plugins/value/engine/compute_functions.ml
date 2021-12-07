@@ -201,9 +201,11 @@ module Make (Abstract: Abstractions.Eva) = struct
           Library_functions.warn_unsupported_spec vi.vorig_name;
         Spec.compute_using_specification ~warn:true call_kinstr call spec state,
         Eval.Cacheable
-      | `Def _fundec ->
+      | `Def fundec ->
         Db.Value.Call_Type_Value_Callbacks.apply (`Def, cvalue_state, call_stack);
-        Computer.compute kf call_kinstr state
+        let result = Computer.compute kf call_kinstr state in
+        Summary.FunctionStats.recompute fundec;
+        result
     in
     if pp then
       Value_parameters.feedback
@@ -276,8 +278,8 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   let join_states = function
     | [] -> `Bottom
-    | [state] -> `Value state
-    | s :: l  -> `Value (List.fold_left Abstract.Dom.join s l)
+    | (_k,s) :: l  ->
+      `Value (List.fold_left Abstract.Dom.join s (List.map snd l))
 
   let compute_call_or_builtin stmt call recursion state =
     match Builtins.find_builtin_override call.kf with
@@ -297,7 +299,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         Spec.compute_using_specification ~warn:false kinstr call spec state
       in
       Locations.Location_Bytes.do_track_garbled_mix true;
-      let final_state = states >>- join_states in
+      let final_state = join_states states in
       let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
       match final_state with
       | `Bottom ->
@@ -312,9 +314,10 @@ module Make (Abstract: Abstractions.Eva) = struct
           Builtins.apply_builtin builtin cvalue_call ~pre:cvalue_state ~post
         in
         let insert cvalue_state =
+          Partition.Key.empty,
           Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
         in
-        let states = Bottom.bot_of_list (List.map insert cvalue_states) in
+        let states = List.map insert cvalue_states in
         Transfer.{states; cacheable; builtin=true}
 
   let compute_call =
@@ -342,14 +345,14 @@ module Make (Abstract: Abstractions.Eva) = struct
       let final_result =
         compute_using_spec_or_body Kglobal call None init_state
       in
-      let final_states = final_result.Transfer.states in
-      let final_state = PowersetDomain.(final_states >>-: of_list >>- join) in
+      let final_states = List.map snd (final_result.Transfer.states) in
+      let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Value_util.pop_call_stack ();
       Value_parameters.feedback "done for function %a" Kernel_function.pretty kf;
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
-      Value_results.print_summary ();
+      Summary.print_summary ();
       restore_signals ()
     in
     let cleanup () =

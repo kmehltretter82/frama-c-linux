@@ -317,8 +317,8 @@
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
   __fc_heap_status ∈ [--..--]
+  __fc_fds[0..1023] ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
-  __fc_fds[0..1023] ∈ {0}
   __fc_sockfds[0..1023] ∈ [--..--]
   __fc_socket_counter ∈ [--..--]
   __fc_ghbn.host.h_name ∈ {{ NULL ; &__fc_ghbn.hostbuf[0] }}

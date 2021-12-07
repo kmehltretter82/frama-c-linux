@@ -36,6 +36,8 @@ import { AutoSizer } from 'react-virtualized';
 import { ProbeInfos } from './probeinfos';
 import { Dimension, ValuesPanel } from './valuetable';
 import { AlarmsInfos, StackInfos } from './valueinfos';
+import { } from './Summary';
+import { } from './Coverage';
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -88,6 +90,16 @@ Ivette.registerComponent({
   label: 'Eva Values',
   title: 'Values inferred by the Eva analysis',
   children: <ValuesComponent />,
+});
+
+Ivette.registerView({
+  id: 'summary',
+  rank: 1,
+  label: 'Eva Summary',
+  layout: [
+    ['frama-c.plugins.eva_summary', 'frama-c.plugins.eva_coverage'],
+    'frama-c.messages',
+  ],
 });
 
 Ivette.registerView({

@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -rte -rte-initialized="@all" -print
-   OPT: -rte -rte-initialized="@all,-f1" -print
+   STDOPT: #" -rte-initialized=@all -print"
+   STDOPT: #" -rte-initialized='@all,-f1' -print"
 */
 
 int f1(void){

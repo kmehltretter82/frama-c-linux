@@ -11,28 +11,6 @@
 [e-acsl] Warning: annotating undefined function `strdup':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:488: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:491: Warning: 
-  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:495: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:278: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
@@ -53,6 +31,8 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:491: Warning: 
+  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
   E-ACSL construct `logic functions or predicates with labels'
   is not yet supported.
@@ -60,7 +40,7 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:843: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:79: Warning: 

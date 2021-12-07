@@ -1,9 +1,9 @@
 /* run.config
-LOG: @PTEST_NAME@_forward.dot
-LOG: @PTEST_NAME@_backward.dot
-OPT: -load-script @PTEST_DIR@/@PTEST_NAME@_forward.ml -load-script @PTEST_DIR@/@PTEST_NAME@_backward.ml
+MODULE: @PTEST_NAME@_forward @PTEST_NAME@_backward
+  LOG: @PTEST_NAME@_forward.dot
+  LOG: @PTEST_NAME@_backward.dot
+  OPT:
 */
-
 /* Tests the dataflow functor of interpreted automata via a caml script
    implementing a propagation of constants. */
 

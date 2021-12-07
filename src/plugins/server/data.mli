@@ -84,6 +84,10 @@ module Jalpha : S with type t = string
 module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer]. *)
 module Jmarkdown : S with type t = Markdown.text
 
+(** All-in-one formatter. Return the JSON encoding of formatted text. *)
+val jpretty : ?indent:int -> ?margin:int ->
+  (Format.formatter -> 'a -> unit) -> 'a -> Jtext.t
+
 (* -------------------------------------------------------------------------- *)
 (** {2 Constructors} *)
 (* -------------------------------------------------------------------------- *)
@@ -152,11 +156,11 @@ val declare :
     {[
       (* ---- Exemple of Record Data --- *)
       type r
-      let s = Record.signature ~page ~kind ~name ~descr () in
+      let s = Record.signature () in
       let fd_a = Record.field s ~name:"a" ~descr:"..." (module A) in
       let fd_b = Record.field s ~name:"b" ~descr:"..." (module B) in
-
-      module M = (val (Record.publish s) : Record with type r = r)
+      let r = Record.publish s ~page ~kind ~name ~descr
+      module M = (val r) : Record with type r = r)
 
       let make a b = M.default |> M.set fd_a a |> M.set fd_b b
     ]}

@@ -1,7 +1,7 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module from,inout,eva,report -lib-entry -eva @EVA_CONFIG@ -then -report -report-print-properties -then -report-no-specialized
+ PLUGIN: @EVA_MAIN_PLUGINS@ report
+   OPT: -lib-entry -eva @EVA_CONFIG@ -then -report -report-print-properties -then -report-no-specialized
 */
-
 
 int x;
 

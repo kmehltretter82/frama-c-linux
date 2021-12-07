@@ -1,7 +1,7 @@
 /* run.config
-   OPT: -load-script tests/plugin/needs_globals.ml -instantiate -check -print
+  SCRIPT: @PTEST_NAME@
+   OPT: -instantiate -check -print
 */
-
 int i ; // needed for already_one specifciation
 void already_one(void* parameter) ;
 

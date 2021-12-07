@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: logic functions without labels
+   STDOPT: +"-eva-slevel 100"
 */
 
 /*@ predicate p1(int x, int y) = x + y > 0; */
@@ -39,6 +40,9 @@ int glob = 5;
 /*@ predicate p_notyet{L}(integer x) = x > 0; */
 /*@ logic integer f_notyet{L}(integer x) = x; */
 
+// Test sums inside functions
+/*@ logic integer f_sum (integer x) = \sum(1,x,\lambda integer y; 1); */
+
 int main(void) {
   int x = 1, y = 2;
   /*@ assert p1(x, y); */;
@@ -69,6 +73,8 @@ int main(void) {
 
   double d = 2.0;
   /*@ assert f2(d) > 0; */;
+
+  /*@ assert f_sum (100) == 100; */
 
   // not yet supported
   /* /\*@ assert p_notyet(27); *\/ ; */

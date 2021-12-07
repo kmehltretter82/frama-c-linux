@@ -125,7 +125,7 @@ and childrenTypeSpecifier vis ts =
       in
       let nel' = mapNoCopy doOneField nel in
       if s' != s || nel' != nel then FIELD (s', nel') else input
-    | TYPE_ANNOT _ -> input
+    | TYPE_ANNOT _ | STATIC_ASSERT_FG _ -> input
   in
   match ts with
     Tstruct (n, Some fg, extraAttrs) ->
@@ -257,6 +257,9 @@ and childrenDefinition vis d =
   | PRAGMA (e, l) ->
     let e' = visitCabsExpression vis e in
     if e' != e then PRAGMA (e', l) else d
+  | STATIC_ASSERT (e, s, l) ->
+    let e' = visitCabsExpression vis e in
+    if e' != e then STATIC_ASSERT (e', s, l) else d
   | LINKAGE (n, l, dl) ->
     let dl' = mapNoCopyList (visitCabsDefinition vis) dl in
     if dl' != dl then LINKAGE (n, l, dl') else d

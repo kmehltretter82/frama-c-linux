@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -warn-special-float non-finite -print -machdep x86_32 -journal-disable
+   STDOPT: #" -warn-special-float non-finite -print -machdep x86_32"
 */
 #define _ISOC99_SOURCE
 #include <math.h>

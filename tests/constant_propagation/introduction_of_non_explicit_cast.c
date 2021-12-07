@@ -1,6 +1,6 @@
 /* run.config
    MODULE: @PTEST_NAME@
-   OPT: -eva @EVA_OPTIONS@ -deps -journal-disable
+   OPT: -eva @EVA_OPTIONS@ -deps
 */
 
 int x,y,z;

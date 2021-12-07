@@ -54,6 +54,7 @@
  *        assertion failure
  *      E_ACSL_FAIL_EXITCODE - do not issue abort signal but exit with a
  *        given code
+ *      E_ACSL_DEBUG_ASSERT - print the valid predicates.
  *    Shadow spaces (only for segment model):
  *      E_ACSL_STACK_SIZE - size (in MB) of the tracked program stack
  *      E_ACSL_HEAP_SIZE - size (in MB) of the tracked program heap
@@ -64,6 +65,9 @@
  *      E_ACSL_EXTERNAL_ASSERT - if this macro is defined then function
  *      `__e_acsl_assert` is excluded from compilation. This is to allow
  *      providing alternative definitions of assertions by users.
+ *      E_ACSL_EXTERNAL_PRINT_VALUE - if this macro is defined then function
+ *      `__e_acsl_print_value` is excluded from compilation. This is to allow
+ *      providing alternative definitions of data printing functions by users.
  *    Memory deallocation:
  *      E_ACSL_FREE_VALID_ADDRESS -- Clause 7.20.3.2 of C99 standard states
  *      that NULL is a valid input to free:
@@ -81,6 +85,7 @@
 /************************************************************************/
 
 #include "instrumentation_model/e_acsl_assert.h"
+#include "instrumentation_model/e_acsl_assert_data.h"
 #include "observation_model/e_acsl_heap.h"
 
 /* }}} */
@@ -89,6 +94,7 @@
 /*** Generated code API {{{ ***/
 /************************************************************************/
 
+#include "instrumentation_model/e_acsl_assert_data_api.h"
 #include "instrumentation_model/e_acsl_contract.h"
 #include "instrumentation_model/e_acsl_temporal.h"
 #include "numerical_model/e_acsl_floating_point.h"

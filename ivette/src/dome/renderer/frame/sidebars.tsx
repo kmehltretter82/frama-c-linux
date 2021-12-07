@@ -151,6 +151,8 @@ export function Section(props: SectionProps) {
   const foldable = unfold === undefined;
   const visible = unfold ?? state;
   const maxHeight = visible ? 'max-content' : 0;
+  const label =
+    (visible || !!props.summary) ? props.label : `${props.label}…`;
 
   return (
     <div className="dome-xSideBarSection">
@@ -159,7 +161,7 @@ export function Section(props: SectionProps) {
         title={props.title}
         onContextMenu={props.onContextMenu}
       >
-        <Label label={props.label} />
+        <Label label={label} />
         {!visible && makeBadge(props.summary)}
         {foldable && <HideShow visible={visible} onClick={flipState} />}
       </div>

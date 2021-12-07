@@ -33,7 +33,7 @@ import * as Ivette from 'ivette';
 
 import * as States from 'frama-c/states';
 import { functions, functionsData } from 'frama-c/api/kernel/ast';
-import { isComputed } from 'frama-c/api/plugins/eva/general';
+import { computationState } from 'frama-c/api/plugins/eva/general';
 
 // --------------------------------------------------------------------------
 // --- Global Search Hints
@@ -115,7 +115,7 @@ export default () => {
     useFlipSettings('ivette.globals.evaonly', false);
   const multipleSelection = selection?.multiple;
   const multipleSelectionActive = multipleSelection?.allSelections.length > 0;
-  const evaComputed = States.useRequest(isComputed, null);
+  const evaComputed = States.useSyncValue(computationState) === 'computed';
 
   function isSelected(fct: functionsData) {
     return multipleSelection?.allSelections.some(
@@ -140,7 +140,7 @@ export default () => {
     updateSelection({ location: { fct: name } });
   }
 
-  async function onContextMenu() {
+  function onContextMenu() {
     const items: Dome.PopupMenuItem[] = [
       {
         label: 'Show Frama-C builtins',
@@ -184,8 +184,9 @@ export default () => {
     <Section
       label="Functions"
       title={title}
-      onContextMenu={onContextMenu}
       defaultUnfold
+      settings="frama-c.sidebar.globals"
+      onContextMenu={onContextMenu}
     >
       {filtered.map((fct) => (
         <FctItem

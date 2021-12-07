@@ -140,6 +140,8 @@ and pp_field_group fmt = function
       l;
     fprintf fmt "}@]"
   | TYPE_ANNOT _ -> fprintf fmt "TYPE_ANNOT"
+  | STATIC_ASSERT_FG (exp, s, loc) ->
+    fprintf  fmt "@[<hov 2>STATIC_ASSERT_FG exp(%a, %s, loc(%a))@]" pp_exp exp s pp_cabsloc loc
 
 and pp_field_groups fmt l =
   fprintf fmt "{";
@@ -182,6 +184,8 @@ and pp_def fmt = function
     fprintf fmt "@[<hov 2>GLOBASM %s, loc(%a)@]" s pp_cabsloc loc
   |     PRAGMA (exp, loc) ->
     fprintf  fmt "@[<hov 2>PRAGMA exp(%a, loc(%a))@]" pp_exp exp pp_cabsloc loc
+  |     STATIC_ASSERT (exp, s, loc) ->
+    fprintf  fmt "@[<hov 2>STATIC_ASSERT exp(%a, %s, loc(%a))@]" pp_exp exp s pp_cabsloc loc
   |     LINKAGE (s, loc, defs) ->
     fprintf  fmt "@[<hov 2>LINKAGE %s, loc(%a), defs(" s pp_cabsloc loc;
     List.iter (fun def -> fprintf fmt ",@ def(%a)" pp_def def) defs;

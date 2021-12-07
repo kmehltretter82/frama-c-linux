@@ -1,8 +1,8 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva,inout -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST"  -journal-disable
-   OPT: -no-autoload-plugins -load-module eva,inout -machdep ppc_32 -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST" -journal-disable
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST"
+   OPT: -machdep ppc_32 -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST"
 */
-
 
 #ifndef PTEST
 #include <stdio.h>

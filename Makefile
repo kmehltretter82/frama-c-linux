@@ -882,6 +882,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
 	utils/value_results \
+	utils/summary \
 	domains/cvalue/builtins domains/cvalue/builtins_malloc \
 	domains/cvalue/builtins_string domains/cvalue/builtins_misc \
 	domains/cvalue/builtins_memory domains/cvalue/builtins_print_c \
@@ -893,11 +894,11 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
-	engine/subdivided_evaluation engine/evaluation engine/abstractions \
-	engine/recursion engine/transfer_stmt engine/transfer_specification \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
+	engine/subdivided_evaluation engine/evaluation engine/abstractions \
+	engine/recursion engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
 	domains/taint_domain \
@@ -1542,8 +1543,8 @@ server-doc-html: server-doc-md
 			--lua-filter doc/pandoc/href.lua \
 			{} -o {}.html \;
 	@cp -f doc/pandoc/style.css doc/server/
-	$(PRINT) 'HTML server documentation ready:'
-	$(PRINT) '  open doc/server/readme.md.html'
+	$(PRINT) 'HTML server documentation generated'
+	$(PRINT) 'HTML file://$(PWD)/doc/server/readme.md.html'
 
 server-doc: server-doc-html
 
@@ -2436,7 +2437,7 @@ GENERATED+=ptests/ptests_config.ml tests/ptests_config $(GENERATED_TESTS)
 # Source distribution #
 #######################
 
-.PHONY: src-distrib
+.PHONY: src-distrib ivette-src-distrib
 
 STANDALONE_PLUGINS_FILES = \
 	$(addprefix src/dummy/hello_world/,hello_world.ml Makefile) \
@@ -2447,6 +2448,10 @@ DISTRIB_FILES += $(wildcard $(PLUGIN_DISTRIBUTED_LIST)                   \
                     $(PLUGIN_DIST_DOC_LIST) $(STANDALONE_PLUGINS_FILES))
 DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
                   $(DISTRIB_FILES))
+
+src-distrib: #ivette-src-distrib
+ivette-src-distrib:
+	make -C ivette update-distrib-files
 
 sinclude ivette/Makefile.distrib
 

@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -rte -then -print
-   OPT: -warn-signed-downcast -rte -then -print
+   STDOPT:
+   STDOPT: #"-warn-signed-downcast "
  */
 
 int main(void) {

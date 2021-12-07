@@ -792,6 +792,24 @@ let () = add_precision_dep SplitLimit.parameter
 let () = SplitLimit.set_range 0 max_int
 
 let () = Parameter_customize.set_group precision_tuning
+module InterproceduralSplits =
+  False
+    (struct
+      let option_name = "-eva-interprocedural-splits"
+      let help = "Keep partitioning splits through function returns"
+    end)
+let () = add_precision_dep InterproceduralSplits.parameter
+
+let () = Parameter_customize.set_group precision_tuning
+module InterproceduralHistory =
+  False
+    (struct
+      let option_name = "-eva-interprocedural-history"
+      let help = "Keep partitioning history through function returns"
+    end)
+let () = add_precision_dep InterproceduralHistory.parameter
+
+let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module SplitReturnFunction =
   Kernel_function_map

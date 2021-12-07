@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-eva -pdg -out -input -deps -eva-no-results-function no_results -eva-no-builtins-auto -load-module pdg -pdg -then -main main_asm"
+   STDOPT: +"-eva -pdg -out -input -deps -eva-no-results-function no_results -eva-no-builtins-auto -pdg -then -main main_asm"
 */
 volatile int nondet;
 int no_results() {return 1;}

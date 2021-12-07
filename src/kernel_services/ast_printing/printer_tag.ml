@@ -76,8 +76,9 @@ let pretty fmt = function
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
   | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
   | PIP prop -> Description.pp_property fmt prop
-  | PStmt(_,stmt) | PStmtStart (_, stmt) -> Printer.pp_stmt fmt stmt
   | PGlobal g -> Printer.pp_global fmt (decl_of g)
+  | PStmt(_,stmt) | PStmtStart (_, stmt) ->
+    Printer.(without_annot pp_stmt) fmt stmt
 
 let pp_ki_loc fmt ki =
   match ki with

@@ -60,10 +60,23 @@ interface KindFilter {
 
 interface PluginFilter {
   kernel?: boolean;
-  server?: boolean;
+  aorai?: boolean;
+  dive?: boolean;
+  eacsl?: boolean;
   eva?: boolean;
-  wp?: boolean;
+  from?: boolean;
+  impact?: boolean;
+  inout?: boolean;
+  metrics?: boolean;
   nonterm?: boolean;
+  pdg?: boolean;
+  report?: boolean;
+  rte?: boolean;
+  scope?: boolean;
+  server?: boolean;
+  slicing?: boolean;
+  variadic?: boolean;
+  wp?: boolean;
   others?: boolean;
 }
 
@@ -99,10 +112,23 @@ function filterKind(filter: KindFilter, msg: Message) {
 function filterPlugin(filter: PluginFilter, msg: Message) {
   switch (msg.plugin) {
     case 'kernel': return !(filter.kernel === false);
-    case 'server': return !(filter.server === false);
+    case 'aorai': return !(filter.aorai === false);
+    case 'dive': return !(filter.dive === false);
+    case 'e-acsl': return !(filter.eacsl === false);
     case 'eva': return !(filter.eva === false);
-    case 'wp': return !(filter.wp === false);
+    case 'from': return !(filter.from === false);
+    case 'impact': return !(filter.impact === false);
+    case 'inout': return !(filter.inout === false);
+    case 'metrics': return !(filter.metrics === false);
     case 'nonterm': return !(filter.nonterm === false);
+    case 'pdg': return !(filter.pdg === false);
+    case 'report': return !(filter.report === false);
+    case 'rte': return !(filter.rte === false);
+    case 'scope': return !(filter.scope === false);
+    case 'server': return !(filter.server === false);
+    case 'slicing': return !(filter.slicing === false);
+    case 'variadic': return !(filter.variadic === false);
+    case 'wp': return !(filter.wp === false);
     default: return !(filter.others === false);
   }
 }
@@ -233,12 +259,43 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
           unfold
           settings="ivette.messages.filterEmitter"
         >
-          <Forms.CheckboxField label="Kernel" state={pluginState('kernel')} />
-          <Forms.CheckboxField label="Server" state={pluginState('server')} />
-          <Forms.CheckboxField label="Eva" state={pluginState('eva')} />
-          <Forms.CheckboxField label="WP" state={pluginState('wp')} />
-          <Forms.CheckboxField label="Nonterm" state={pluginState('nonterm')} />
-          <Forms.CheckboxField label="Others" state={pluginState('others')} />
+          <div className="message-emitter-category">
+            <Forms.CheckboxField label="Kernel" state={pluginState('kernel')} />
+          </div>
+          <div className="message-emitter-category">
+            <Forms.CheckboxField label="Aoraï" state={pluginState('aorai')} />
+            <Forms.CheckboxField label="Dive" state={pluginState('dive')} />
+            <Forms.CheckboxField label="E-ACSL" state={pluginState('eacsl')} />
+            <Forms.CheckboxField label="Eva" state={pluginState('eva')} />
+            <Forms.CheckboxField label="From" state={pluginState('from')} />
+            <Forms.CheckboxField label="Impact" state={pluginState('impact')} />
+            <Forms.CheckboxField label="InOut" state={pluginState('inout')} />
+            <Forms.CheckboxField
+              label="Metrics"
+              state={pluginState('metrics')}
+            />
+            <Forms.CheckboxField
+              label="NonTerm"
+              state={pluginState('nonterm')}
+            />
+            <Forms.CheckboxField label="Pdg" state={pluginState('pdg')} />
+            <Forms.CheckboxField label="Report" state={pluginState('report')} />
+            <Forms.CheckboxField label="RTE" state={pluginState('rte')} />
+            <Forms.CheckboxField label="Scope" state={pluginState('scope')} />
+            <Forms.CheckboxField label="Server" state={pluginState('server')} />
+            <Forms.CheckboxField
+              label="Slicing"
+              state={pluginState('slicing')}
+            />
+            <Forms.CheckboxField
+              label="Variadic"
+              state={pluginState('variadic')}
+            />
+            <Forms.CheckboxField label="WP" state={pluginState('wp')} />
+          </div>
+          <div className="message-emitter-category">
+            <Forms.CheckboxField label="Others" state={pluginState('others')} />
+          </div>
         </Forms.Section>
       </Forms.Page>
     </Scroll>
@@ -412,6 +469,7 @@ export default function RenderMessages() {
       </TitleBar>
       <RSplit
         settings="ivette.messages.filterSplit"
+        defaultPosition={225}
         unfold={showFilter}
       >
         <Table<string, Message>

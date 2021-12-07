@@ -1,12 +1,12 @@
 /* run.config
-  EXECNOW: BIN control_journal2.ml ./bin/toplevel.opt -journal-enable -eva -deps -out -main f -journal-name tests/journal/result/control_journal2.ml tests/journal/control2.c > @DEV_NULL@ 2> @DEV_NULL@
-  EXECNOW: LOG control2_sav.res LOG control2_sav.err BIN control_journal_next2.ml FRAMAC_LIB=lib/fc ./bin/toplevel.byte -journal-enable -load-script tests/journal/result/control_journal2 -lib-entry -journal-name tests/journal/result/control_journal_next2.ml tests/journal/control2.c > ./tests/journal/result/control2_sav.res 2> ./tests/journal/result/control2_sav.err
-  CMD: FRAMAC_LIB=lib/fc ./bin/toplevel.byte
-  OPT: -load-script tests/journal/result/control_journal_next2
+ PLUGIN: @EVA_PLUGINS@
+   EXECNOW: BIN control_journal2.ml @frama-c@ -journal-enable -eva -deps -out -main f -journal-name @PTEST_RESULT@/control_journal2.ml @PTEST_FILE@ > @DEV_NULL@ 2> @DEV_NULL@
+ SCRIPT: result/control_journal2
+   EXECNOW: LOG control2_sav.res LOG control2_sav.err BIN control_journal_next2.ml @frama-c@ -journal-enable -lib-entry -journal-name @PTEST_RESULT@/control_journal_next2.ml @PTEST_FILE@ > @PTEST_RESULT@/control2_sav.res 2> @PTEST_RESULT@/control2_sav.err
+ SCRIPT: result/control_journal_next2
+   OPT:
 */
-
 int x,y,c,d;
-
 void f() {
   int i;
   for(i=0; i<4 ; i++) {

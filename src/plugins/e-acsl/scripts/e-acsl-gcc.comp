@@ -33,6 +33,7 @@ _eacsl_gcc() {
     -h -c -T -k
     --verbose= --debug= --logfile= --quiet --rt-debug --help
     --rt-verbose --check --then --keep-going --fail-with-code --external-assert=
+    --assert-print-data --no-assert-print-data --external-print-value=
     --no-trace
     --ocode= --oexec= --oexec-e-acsl=
     --ld-flags= --cpp-flags= --extra-cpp-args=

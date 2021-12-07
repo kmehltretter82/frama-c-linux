@@ -1,8 +1,8 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva,inout -simplify-cfg -keep-switch -eva @EVA_CONFIG@ -journal-disable
-   OPT: -no-autoload-plugins -load-module eva,inout -simplify-cfg -eva @EVA_CONFIG@ -journal-disable
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -simplify-cfg -keep-switch -eva @EVA_CONFIG@
+   OPT: -simplify-cfg -eva @EVA_CONFIG@
 */
-
 int main(int x, int y) {
   int z = 0;
   char c = 'c';

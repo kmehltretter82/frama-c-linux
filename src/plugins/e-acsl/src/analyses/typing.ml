@@ -197,8 +197,9 @@ module Memo: sig
     ?lenv:Function_params_ty.t ->
     (term -> computed_info) ->
     term ->
-    computed_info
-  val get: ?lenv:Function_params_ty.t -> term -> computed_info
+    computed_info Error.or_error
+  val get: ?lenv:Function_params_ty.t -> term ->
+    computed_info Error.or_error
   val clear: unit -> unit
 end = struct
 
@@ -216,7 +217,8 @@ end = struct
        the guard and once for encoding [x+1] when incrementing it. The
        memoization is only useful here and indeed prevent the generation of one
        extra variable in some cases. *)
-  let tbl = Misc.Id_term.Hashtbl.create 97
+  let tbl : computed_info Error.or_error Misc.Id_term.Hashtbl.t =
+    Misc.Id_term.Hashtbl.create 97
 
   (* The type of the logic function
      \\@ logic integer f (integer x) = x + 1;
@@ -228,23 +230,16 @@ end = struct
      We distinguish the calls to the function by storing the type of the
      arguments corresponding to each call, and we weaken the typing so that it
      is invariant when the arguments have the same type. *)
-  let dep_tbl : computed_info Id_term_with_lenv.Hashtbl.t
+  let dep_tbl : computed_info Error.or_error Id_term_with_lenv.Hashtbl.t
     = Id_term_with_lenv.Hashtbl.create 97
 
   let get_dep lenv t =
-    try
-      Id_term_with_lenv.Hashtbl.find dep_tbl (t,lenv)
-    with Not_found ->
-      Options.fatal
-        "[typing] type of term '%a' was never computed with arguments '%a'."
-        Printer.pp_term t Function_params_ty.pretty lenv
+    try Id_term_with_lenv.Hashtbl.find dep_tbl (t,lenv)
+    with Not_found -> Error.not_memoized ()
 
   let get_nondep t =
     try Misc.Id_term.Hashtbl.find tbl t
-    with Not_found ->
-      Options.fatal
-        "[typing] type of term '%a' was never computed."
-        Printer.pp_term t
+    with Not_found -> Error.not_memoized ()
 
   let get ?(lenv=[]) t =
     match lenv with
@@ -254,7 +249,10 @@ end = struct
   let memo_nondep f t =
     try Misc.Id_term.Hashtbl.find tbl t
     with Not_found ->
-      let x = f t in
+      let x =
+        try Error.Res (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+      in
       Misc.Id_term.Hashtbl.add tbl t x;
       x
 
@@ -262,9 +260,12 @@ end = struct
     try
       Id_term_with_lenv.Hashtbl.find dep_tbl (t, lenv)
     with Not_found ->
-      let ty = f t in
-      Id_term_with_lenv.Hashtbl.add dep_tbl (t, lenv) ty;
-      ty
+      let x =
+        try Error.Res (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+      in
+      Id_term_with_lenv.Hashtbl.add dep_tbl (t, lenv) x;
+      x
 
   let memo ?(lenv=[]) f t =
     match lenv with
@@ -666,7 +667,7 @@ let rec type_term
       ignore (type_term ~use_gmp_opt:true ~lenv li_t);
       dup (type_term ~use_gmp_opt:true ?ctx ~lenv t).ty
     | Tlambda ([ _ ],lt) ->
-      dup (type_term ~use_gmp_opt:true ~under_lambda:true ?ctx lt).ty;
+      dup (type_term ~use_gmp_opt:true ~under_lambda:true ?ctx ~lenv lt).ty;
     | Tlambda (_,_) -> Error.not_yet "lambda"
     | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"
@@ -678,13 +679,17 @@ let rec type_term
     | Tempty_set  -> dup Nan
   in
   let t = Logic_normalizer.get_term t in
-  Memo.memo ~lenv
-    (fun t ->
-       let ty, op = infer t in
-       match ctx with
-       | None -> { ty; op; cast = None }
-       | Some ctx -> coerce ~arith_operand ~ctx ~op ty)
-    t
+  match
+    Memo.memo ~lenv
+      (fun t ->
+         let ty, op = infer t in
+         match ctx with
+         | None -> { ty; op; cast = None }
+         | Some ctx -> coerce ~arith_operand ~ctx ~op ty)
+      t
+  with
+  | Res res -> res
+  | Err exn -> raise exn
 
 and type_term_lval ~lenv (host, offset) =
   type_term_lhost ~lenv host;
@@ -870,22 +875,21 @@ and type_predicate ?(lenv=[]) p =
         ignore (type_term ~use_gmp_opt:true ~lenv li_t);
         (type_predicate ~lenv p).ty
       | Pforall _
-      | Pexists _ -> begin
-          match Bound_variables.get_preprocessed_quantifier p with
-          (* If there is no  preprocessed form for the quantifier, it means that
-             the preprocessing phase raised an error. It is costly to analyze
-             again and determine what was the error, so instead we raise the
-             exception [Ignored] which signifies that no error message should
-             be displayed *)
-          | None -> Error.ignored ()
-          | Some (guards, goal) ->
-            let guards =
-              List.map
-                (fun (t1, x, t2) ->
-                   type_bound_variables ~loc:p.pred_loc ~lenv (t1, x, t2))
-                guards
-            in Bound_variables.replace p guards goal;
-            (type_predicate ~lenv goal).ty
+      | Pexists _ ->
+        begin
+          let guards, goal =
+            Error.retrieve_preprocessing
+              "quantified predicate"
+              Bound_variables.get_preprocessed_quantifier
+              p
+          in
+          let guards =
+            List.map
+              (fun (t1, x, t2) ->
+                 type_bound_variables ~loc:p.pred_loc ~lenv (t1, x, t2))
+              guards
+          in Bound_variables.replace p guards goal;
+          (type_predicate ~lenv goal).ty
         end
       | Pseparated tlist ->
         List.iter
@@ -931,8 +935,10 @@ let unsafe_set t ?ctx ty =
 (** {2 Getters} *)
 (******************************************************************************)
 
-let get_number_ty ~lenv t = (Memo.get ~lenv t).ty
-let get_integer_op ~lenv t = (Memo.get ~lenv t).op
+let get_number_ty ~lenv t =
+  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t).ty
+let get_integer_op ~lenv t =
+  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t).op
 let get_integer_op_of_predicate ~lenv p = (type_predicate ~lenv p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
@@ -948,15 +954,15 @@ let extract_typ t ty =
   | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
 let get_typ ~lenv t =
-  let info = Memo.get ~lenv t in
+  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
   extract_typ t info.ty
 
 let get_op ~lenv t =
-  let info = Memo.get ~lenv t in
+  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
   extract_typ t info.op
 
 let get_cast ~lenv t =
-  let info = Memo.get ~lenv t in
+  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
@@ -967,58 +973,37 @@ let get_cast_of_predicate ~lenv p =
 
 let clear = Memo.clear
 
-open Cil_types
-
 let typer_visitor lenv = object
-  inherit Visitor.frama_c_inplace
-
-  method !vglob_aux =
-    function
-    (* library functions and built-ins *)
-    | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-      Cil.SkipChildren
-
-    | GFun({ svar = vi }, _)
-      when Misc.is_fc_or_compiler_builtin vi ->
-      Cil.SkipChildren
-
-    | g when Rtl.Symbols.mem_global g ->
-      Cil.SkipChildren
-
-    | GFun({svar = vi}, _) ->
-      let kf = try Globals.Functions.get vi with Not_found -> assert false in
-      if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
-
-    (* other globals: nothing to do *)
-    | GFunDecl _
-    | GVarDecl _
-    | GVar _
-    | GType _
-    | GCompTag _
-    | GCompTagDecl _
-    | GEnumTag _
-    | GEnumTagDecl _
-    | GAsm _
-    | GPragma _
-    | GText _
-    | GAnnot _
-      -> Cil.SkipChildren
+  inherit E_acsl_visitor.visitor
 
   method !vpredicate p =
-    Error.generic_handle (type_named_predicate ~lenv) () p;
+    (* Do not raise a warning for e-acsl errors at preprocessing time,
+       those errrors are stored in the table and warnings are raised at
+       translation time*)
+    let _ = try type_named_predicate ~lenv p
+      with Error.Not_yet _ | Error.Typing_error _  -> ()
+    in
     Cil.SkipChildren
 end
 
 let type_program ast =
-  Visitor.visitFramacFileSameGlobals (typer_visitor []) ast
+  Visitor.visitFramacFileSameGlobals
+    (typer_visitor [] :> Visitor.frama_c_inplace)
+    ast
 
 let type_code_annot lenv annot =
-  ignore (Visitor.visitFramacCodeAnnotation (typer_visitor lenv) annot)
+  ignore
+    (Visitor.visitFramacCodeAnnotation
+       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       annot)
 
 let preprocess_predicate lenv p =
   Logic_normalizer.preprocess_predicate p;
   Bound_variables.preprocess_predicate p;
-  ignore (Visitor.visitFramacPredicate (typer_visitor lenv) p)
+  ignore
+    (Visitor.visitFramacPredicate
+       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       p)
 
 let preprocess_rte ~lenv rte =
   Logic_normalizer.preprocess_annot rte;

@@ -297,8 +297,10 @@ let example_msg =
      DONTRUN:             @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
      # Note: the textual targets are compared to oracles.@]@  \
-     MODULE: <module>...  @[<v 0># Compile the module and set the @PTEST_MODULE@ macro@]@  \
-     PLUGIN: <plugin>... @[<v 0># Set the @PTEST_PLUGIN@ macro.@]@  \
+     MODULE: <module>...  @[<v 0># Compile the module and set the @PTEST_MODULE@ macro.@]@  \
+     LIBS: <module>...    @[<v 0># Don't compile the module but set the @PTEST_LIBS@ macro.@]@  \
+     PLUGIN: <plugin>...  @[<v 0># Set the @PTEST_PLUGIN@ macro.@]@  \
+     SCRIPT: <script>...  @[<v 0># Set the @PTEST_SCRIPT@ macro.@]@  \
      LOG: <file>...       @[<v 0># Defines targets built by the next sub-test command.@]@  \
      CMD: <command>       @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>       @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
@@ -332,14 +334,18 @@ let example_msg =
      @@PTEST_CONFIG@@       # Test configuration suffix.@ \
      @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@ \
      @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@ \
-     @@PTEST_MODULE@@       # Current list of module defined by the MODULE directive.@ \
+     @@PTEST_LIBS@@         # Current list of modules defined by the LIBS directive.@ \
+     @@PTEST_MODULE@@       # Current list of modules defined by the MODULE directive.@ \
      @@PTEST_PLUGIN@@       # Current list of plugins defined by the PLUGIN directive.@ \
+     @@PTEST_SCRIPT@@       # Current list of ML scripts defined by the SCRIPT directive.@ \
      @]@ \
      Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
      @@PTEST_DEFAULT_OPTIONS@@  # The default option list: %s@  \
+     @@PTEST_LOAD_LIBS@@        # The '-load-module' option related to the LIBS directive.@  \
      @@PTEST_LOAD_MODULE@@      # The '-load-module' option related to the MODULE directive.@  \
      @@PTEST_LOAD_PLUGIN@@      # The '-load-module' option related to the PLUGIN directive.@  \
-     @@PTEST_LOAD_OPTIONS@@     # Shorthand alias to '@@PTEST_LOAD_PLUGIN@@ @@PTEST_LOAD_MODULE@@' .@  \
+     @@PTEST_LOAD_SCRIPT@@      # The '-load-script' option related to the SCRIPT directive.@  \
+     @@PTEST_LOAD_OPTIONS@@     # Shorthand alias to '@@PTEST_LOAD_PLUGIN@@ @@PTEST_LOAD_LIBS@@ @@PTEST_LOAD_MODULE@@ @@PTEST_LOAD_SCRIPT@@' .@  \
      @@PTEST_OPTIONS@@          # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
      @@frama-c@@                # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@            # Shortcut defined as follow: %s@  \
@@ -640,8 +646,8 @@ struct
       let has_ptest_opt = ref false in
       let has_ptest_options = ref false in
       let has_frama_c_exe = ref false in
-      if !verbosity >= 3 then lock_printf "%% Expand: %s@." s;
-      if !verbosity >= 4 then print_macros macros;
+      if !verbosity >= 4 then lock_printf "%% Expand: %s@." s;
+      if !verbosity >= 5 then print_macros macros;
       let rec aux s =
         let expand_macro = function
           | Str.Text s -> s
@@ -655,9 +661,9 @@ struct
                  | "PTEST_OPTIONS" -> has_ptest_options := true
                  | "frama-c-exe" -> has_frama_c_exe := true
                  | _ -> ());
-                if !verbosity >= 4 then lock_printf "%%     - macro is %s\n%!" macro;
+                if !verbosity >= 5 then lock_printf "%%     - macro is %s\n%!" macro;
                 let replacement = find macro macros in
-                if !verbosity >= 3 then
+                if !verbosity >= 4 then
                   lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
                 aux replacement
               with
@@ -667,29 +673,43 @@ struct
         in
         String.concat "" (List.map expand_macro (Str.full_split macro_regex s))
       in
-      try
-        Mutex.lock str_mutex;
-        let r = aux s in
-        Mutex.unlock str_mutex;
-        if !verbosity >= 3 then lock_printf "%% Expansion result: %s@." r;
-        { has_ptest_file= !has_ptest_file;
-          has_ptest_opt= !has_ptest_opt;
-          has_frama_c_exe= !has_frama_c_exe;
-        }, r
-      with e ->
-        lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
-        Mutex.unlock str_mutex;
-        raise e
+      Mutex.lock str_mutex;
+      let r = try aux s
+        with e ->
+          Mutex.unlock str_mutex;
+          lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
+          raise e
+      in
+      Mutex.unlock str_mutex;
+      if !verbosity >= 4 then lock_printf "%% Expansion result: %s@." r;
+      { has_ptest_file= !has_ptest_file;
+        has_ptest_opt= !has_ptest_opt;
+        has_frama_c_exe= !has_frama_c_exe;
+      }, r
 
   let expand macros s =
     snd (does_expand macros s)
+
+  let expand_directive =
+    let deprecated_opts = "(-load-module|-load-script)" in
+    let re = Str.regexp "\\(-load-module\\|-load-script\\)" in
+    fun ~file macros s ->
+      Mutex.lock str_mutex;
+      let contains =
+        try ignore (Str.search_forward re s 0); true
+        with Not_found -> false
+      in
+      Mutex.unlock str_mutex;
+      if contains then lock_eprintf "%s: DEPRECATED direct use of %s option: %s@.Please use PLUGIN, MODULE, SCRIPT or LIBS directive instead of the deprecated option.@." file deprecated_opts s;
+      expand macros s
+
 
   let get ?(default="") name macros =
     try find name macros with Not_found -> default
 
   let add_list l map =
     List.fold_left (fun acc (k,v) ->
-        if !verbosity >= 3 then
+        if !verbosity >= 4 then
           lock_printf "%%   - Adds macro %s with definition %s@." k v;
         add k v acc) map l
 
@@ -735,6 +755,8 @@ type config =
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
                                   *)
+    dc_load_script: string; (** load libs options. *)
+    dc_load_libs: string; (** load libs options. *)
     dc_load_module: string; (** load module options. *)
     dc_cmxs_module: StringSet.t; (** compiled modules. *)
     dc_macros: Macros.t; (** existing macros. *)
@@ -797,8 +819,10 @@ end = struct
       "PTEST_PRE_OPTIONS",      !macro_pre_options;
       "PTEST_POST_OPTIONS",     !macro_post_options;
       "PTEST_MAKE_MODULE", "make -s";
+      "PTEST_LIBS", "";
       "PTEST_MODULE", "";
       "PTEST_PLUGIN", "";
+      "PTEST_SCRIPT", "";
     ]
     in
     Macros.add_list l Macros.empty
@@ -813,6 +837,8 @@ end = struct
       dc_commands = [ { toplevel= !default_toplevel; opts=""; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
       dc_dont_run = false;
       dc_load_module = "";
+      dc_load_libs = "";
+      dc_load_script = "";
       dc_cmxs_module = StringSet.empty;
       dc_framac = true;
       dc_default_log = [];
@@ -884,7 +910,7 @@ end = struct
 
   let make_custom_opts =
     let space = Str.regexp " " in
-    fun stdopts s ->
+    fun ~file stdopts s ->
       let rec aux opts s =
         try
           Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
@@ -897,7 +923,7 @@ end = struct
         with
         | Scanf.Scan_failure _ ->
           if s <> "" then
-            lock_eprintf "unknown STDOPT configuration string: %s\n%!" s;
+            lock_eprintf "%s: unknown STDOPT configuration string: %s\n%!" file s;
           opts
         | End_of_file -> opts
       in
@@ -913,34 +939,37 @@ end = struct
 
   (* how to process options *)
   let config_exec ~warn ~once ~file dir s current =
+    let s = Macros.expand_directive ~file current.dc_macros s in
     { current with
       dc_execnow =
         scan_execnow ~warn ~once ~file dir current.dc_macros current.dc_timeout s :: current.dc_execnow }
 
-  let config_macro ~file _dir s current =
+  let config_macro =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
-    Mutex.lock str_mutex;
-    if Str.string_match regex s 0 then begin
-      let name = Str.matched_group 1 s in
-      let def =
-        try Str.matched_group 3 s with Not_found -> (* empty text *) ""
-      in
-      Mutex.unlock str_mutex;
-      if !verbosity >= 3 then
-        lock_printf "%%   - New macro %s with definition %s\n%!" name def;
-      { current with dc_macros = Macros.add_expand name def current.dc_macros }
-    end else begin
-      Mutex.unlock str_mutex;
-      lock_eprintf "%s: cannot understand MACRO definition: %s\n%!" file s;
-      current
-    end
+    fun ~file _dir s current ->
+      let s = Macros.expand_directive ~file current.dc_macros s in
+      Mutex.lock str_mutex;
+      if Str.string_match regex s 0 then begin
+        let name = Str.matched_group 1 s in
+        let def =
+          try Str.matched_group 3 s with Not_found -> (* empty text *) ""
+        in
+        Mutex.unlock str_mutex;
+        if !verbosity >= 4 then
+          lock_printf "%%   - New macro %s with definition %s\n%!" name def;
+        { current with dc_macros = Macros.add_expand name def current.dc_macros }
+      end else begin
+        Mutex.unlock str_mutex;
+        lock_eprintf "%s: cannot understand MACRO definition: %s\n%!" file s;
+        current
+      end
 
-  let update_module s =
+  let update_module_libs_name s =
     "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ (if !use_byte then ".cmo" else ".cmxs")
 
   let add_make_modules ~file dir deps current =
     let deps,current = List.fold_left (fun ((deps,curr) as acc) s ->
-        let s = update_module s in
+        let s = update_module_libs_name s in
         if StringSet.mem s curr.dc_cmxs_module then acc
         else
           (deps ^ " " ^ s),
@@ -953,37 +982,48 @@ end = struct
       config_exec ~warn:false ~once:true ~file dir (make_cmd ^ deps) current
     end
 
-  let update_module_macros modules macros =
+  let update_macros update_name load_option macro_def macro_load_def current modules =
     let def = String.concat "," modules in
     let load_def = if String.(def = "") then "" else
-        "-load-module=" ^ (String.concat "," (List.map update_module modules))
+        load_option ^ (String.concat "," (List.map update_name modules))
     in
-    Macros.add_list [ "PTEST_MODULE", def ;
-                      "PTEST_LOAD_MODULE", load_def ;
-                    ] macros
+    if !verbosity >= 3 then Format.printf "%% %s: %s@." macro_def def ;
+    let dc_macros = Macros.add_list [ macro_def, def ;
+                                      macro_load_def, load_def ;
+                                    ] current.dc_macros in
+    { current with dc_macros }
+
+  let update_script_name s =
+    "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ ".ml"
+
+  let update_module_macros =
+    update_macros update_module_libs_name "-load-module=" "PTEST_MODULE" "PTEST_LOAD_MODULE"
+
+  let update_libs_macros =
+    update_macros update_module_libs_name "-load-module=" "PTEST_LIBS" "PTEST_LOAD_LIBS"
+
+  let update_script_macros =
+    update_macros update_script_name "-load-script=" "PTEST_SCRIPT" "PTEST_LOAD_SCRIPT"
+
+  let update_plugin_macros =
+    update_macros (fun name -> name) "-load-module=" "PTEST_PLUGIN" "PTEST_LOAD_PLUGIN"
 
   let config_module ~file dir s current =
-    let deps = str_split_list (Macros.expand current.dc_macros s) in
-    let current = { current with dc_macros = update_module_macros deps current.dc_macros } in
+    let s = Macros.expand_directive ~file current.dc_macros s in
+    let deps = str_split_list s in
+    let current = update_module_macros current deps in
     add_make_modules ~file dir deps current
 
-  let update_plugin_macros plugins macros =
-    let def = String.concat "," plugins in
-    let load_def = if String.(def = "") then "" else
-        (* the option "-load-plugin" will be used in a future version for PLUGIN *)
-        "-load-module=" ^ def
-    in
-    Macros.add_list [ "PTEST_PLUGIN", def ;
-                      "PTEST_LOAD_PLUGIN", load_def  ;
-                    ] macros
-
-  let config_plugins ~file dir s current =
-    let deps = str_split_list (Macros.expand current.dc_macros s) in
-    { current with dc_macros = update_plugin_macros deps current.dc_macros }
+  let config_libs_script_plugin update ~file dir s current =
+    let s = Macros.expand_directive ~file current.dc_macros s in
+    let deps = str_split_list s in
+    update current deps
 
   let config_options =
     [ "CMD",
-      (fun ~file:_ _ s current -> { current with dc_default_toplevel = s});
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
+         { current with dc_default_toplevel = s});
 
       "OPT",
       (fun ~file _ s current ->
@@ -991,6 +1031,7 @@ end = struct
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
+         let s = Macros.expand_directive ~file current.dc_macros s in
          let t =
            { toplevel= current.dc_default_toplevel;
              opts= s;
@@ -1009,11 +1050,12 @@ end = struct
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
+         let s = Macros.expand_directive ~file current.dc_macros s in
          let new_top =
            List.map
              (fun command ->
                 { toplevel = current.dc_default_toplevel;
-                  opts= make_custom_opts command.opts s;
+                  opts= make_custom_opts ~file command.opts s;
                   logs= command.logs @ current.dc_default_log;
                   macros= current.dc_macros;
                   exit_code = current.dc_exit_code;
@@ -1025,10 +1067,13 @@ end = struct
                         dc_default_log = !default_parsing_env.current_default_log });
 
       "FILEREG",
-      (fun ~file:_ _ s current -> { current with dc_test_regexp = s });
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
+         { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~file:_ _ s current ->
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
          let s = trim_right s in
          match current.dc_filter with
          | None when s="" -> { current with dc_filter = None }
@@ -1036,7 +1081,9 @@ end = struct
          | Some filter    -> { current with dc_filter = Some (s ^ " | " ^ filter) });
 
       "EXIT",
-      (fun ~file:_ _ s current -> { current with dc_exit_code = Some s });
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
+         { current with dc_exit_code = Some s });
 
       "GCC",
       (fun ~file _ _ acc ->
@@ -1056,13 +1103,19 @@ end = struct
 
       "MODULE", config_module;
 
-      "PLUGIN", config_plugins;
+      "LIBS",   config_libs_script_plugin update_libs_macros;
+      "SCRIPT", config_libs_script_plugin update_script_macros;
+      "PLUGIN", config_libs_script_plugin update_plugin_macros;
 
       "LOG",
-      (fun ~file:_ _ s current -> { current with dc_default_log = s :: current.dc_default_log });
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
+         { current with dc_default_log = s :: current.dc_default_log });
 
       "TIMEOUT",
-      (fun ~file:_ _ s current -> { current with dc_timeout = s });
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
+         { current with dc_timeout = s });
 
       "NOFRAMAC",
       (fun ~file _ _ current ->
@@ -1300,6 +1353,8 @@ end = struct
     let ptest_file = Filename.sanitize ptest_file in
     let ptest_load_plugin = Macros.get "PTEST_LOAD_PLUGIN" cmd.macros in
     let ptest_load_module = Macros.get "PTEST_LOAD_MODULE" cmd.macros in
+    let ptest_load_libs = Macros.get "PTEST_LOAD_LIBS" cmd.macros in
+    let ptest_load_script = Macros.get "PTEST_LOAD_SCRIPT" cmd.macros in
     let macros =
       [ "PTEST_CONFIG", ptest_config;
         "PTEST_DIR", SubDir.get cmd.directory;
@@ -1311,7 +1366,9 @@ end = struct
         "PTEST_OPT", cmd.options;
         "PTEST_LOAD_OPTIONS", (String.concat " "
                                  [ ptest_load_plugin ;
-                                   ptest_load_module ])
+                                   ptest_load_libs ;
+                                   ptest_load_module ;
+                                   ptest_load_script ; ])
       ]
     in
     let macros = Macros.add_list macros cmd.macros in

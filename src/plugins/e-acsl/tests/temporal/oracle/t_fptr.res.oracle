@@ -4,3 +4,15 @@
 [e-acsl] tests/temporal/t_fptr.c:16: Warning: 
   E-ACSL construct `\valid_function' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] tests/temporal/t_fptr.c:19: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] tests/temporal/t_fptr.c:19: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] tests/temporal/t_fptr.c:19: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] tests/temporal/t_fptr.c:19: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.

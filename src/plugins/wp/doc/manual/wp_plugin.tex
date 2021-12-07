@@ -895,11 +895,6 @@ The available \textsf{WP} command-line options related to model selection are:
   used by the (default) arithmetic model \texttt{-wp-model +int} to interpret integer
   arithmetic. See section~\ref{wp-model-arith} for details.
 
-\item[\tt -wp-(no)-overflows] explicitly add to proof context the assumptions related
-  to overflows and downcasts selected. This is especially useful when casts are inserted
-  in \textsf{ACSL} contracts to ensure type-checking but are related to identity-casts
-  from the code. The option is \texttt{off} by default.
-
 \item[\tt -wp-literals] exports the contents of string literals
   to provers (default: \texttt{no}).
 \item[\tt -wp-extern-arrays] gives an arbitrary large size to arrays

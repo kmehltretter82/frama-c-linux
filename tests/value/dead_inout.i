@@ -1,7 +1,7 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module from,inout @EVA_CONFIG@ -out -input -inout -inout -main main_all
+PLUGIN: @EVA_MAIN_PLUGINS@ inout
+   OPT: @EVA_CONFIG@ -out -input -inout -inout -main main_all
  */
-
 // This tests a potential imprecision with the computation of input and outputs if one forgets to test that a statement is dead
 int a, b;
 

@@ -1,7 +1,7 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_CONFIG@ -warn-signed-overflow
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -warn-signed-overflow
 */
-
 #include <limits.h>
 
 int cl, cu, ucu;

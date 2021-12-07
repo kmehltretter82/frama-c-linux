@@ -100,6 +100,7 @@ let bprintf buffer msg = Format.fprintf buffer.fmt msg
 let formatter buffer = buffer.fmt
 
 let contents buffer : json =
+  Format.pp_print_flush buffer.fmt () ;
   flush buffer () ;
   while buffer.stack <> [] do
     pop_tag buffer ""
@@ -112,14 +113,19 @@ let contents buffer : json =
 let format ?indent ?margin msg =
   let buffer = create ?indent ?margin () in
   Format.kfprintf
-    (fun fmt -> Format.pp_print_flush fmt () ; contents buffer)
+    (fun _fmt -> contents buffer)
     buffer.fmt msg
 
 let to_json ?indent ?margin pp a =
   let buffer = create ?indent ?margin () in
   pp buffer.fmt a ;
-  Format.pp_print_flush buffer.fmt () ;
   contents buffer
+
+let rec is_empty (js : json) = match js with
+  | `Null -> true
+  | `List js -> List.for_all is_empty js
+  | `String "" -> true
+  | _ -> false
 
 let rec fprintf fmt = function
   | `Null -> ()

@@ -33,7 +33,6 @@
       intersect the first guard with the provided type for the variable v
 *)
 open Cil_types
-open Cil
 open Cil_datatype
 
 (** [error_msg quantif msg pp x] creates an error message from the string [msg]
@@ -80,8 +79,13 @@ module Quantified_predicate =
 (* Memoization module to store the preprocessed form of a quantified predicate
 *)
 module Quantifier: sig
-  val add: predicate -> (term * logic_var * term) list -> predicate -> unit
-  val get: predicate -> ((term * logic_var * term) list * predicate) option
+  val add:
+    predicate ->
+    ((term * logic_var * term) list * predicate) Error.or_error ->
+    unit
+  val get:
+    predicate ->
+    ((term * logic_var * term) list * predicate) Error.or_error
   (** getter and setter for the additional guard that intersects with the type
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
@@ -95,10 +99,11 @@ end = struct
   let guard_tbl = Cil_datatype.Logic_var.Hashtbl.create 97
 
   let get p =
-    Quantified_predicate.Hashtbl.find_opt tbl p
+    try Quantified_predicate.Hashtbl.find tbl p
+    with Not_found -> Error.not_memoized ()
 
-  let add p guarded_vars goal =
-    Quantified_predicate.Hashtbl.add tbl p (guarded_vars, goal)
+  let add p res_or_error =
+    Quantified_predicate.Hashtbl.add tbl p res_or_error
 
   let get_guard_for_small_type x =
     try Some (Cil_datatype.Logic_var.Hashtbl.find guard_tbl x)
@@ -108,7 +113,7 @@ end = struct
     Cil_datatype.Logic_var.Hashtbl.add guard_tbl lv p
 
   let replace p guarded_vars goal =
-    Quantified_predicate.Hashtbl.replace tbl p (guarded_vars, goal)
+    Quantified_predicate.Hashtbl.replace tbl p (Error.Res (guarded_vars, goal))
 
   let clear () =
     Cil_datatype.Logic_var.Hashtbl.clear guard_tbl;
@@ -212,7 +217,7 @@ end = struct
         (fun s v ->
            let v =
              match v.lv_type with
-             | Ctype ty when isIntegralType ty -> v
+             | Ctype ty when Cil.isIntegralType ty -> v
              | Linteger -> v
              | Ltype _ as ty when Logic_const.is_boolean_type ty -> v
              | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ ->
@@ -657,10 +662,13 @@ let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
 
 
 let compute_guards loc ~is_forall p bounded_vars hyps =
-  let guards,goal = compute_quantif_guards p ~is_forall bounded_vars hyps in
-  (* transform [guards] into [lscope_var list] *)
-  let normalized_guards = List.map (normalize_guard ~loc) guards
-  in Quantifier.add p normalized_guards goal
+  try
+    let guards,goal = compute_quantif_guards p ~is_forall bounded_vars hyps in
+    (* transform [guards] into [lscope_var list] *)
+    let normalized_guards = List.map (normalize_guard ~loc) guards
+    in Quantifier.add p (Res (normalized_guards,goal))
+  with exn ->
+    Quantifier.add p (Err exn)
 
 module Preprocessor : sig
   val compute : file -> unit
@@ -681,7 +689,7 @@ end
     | _ -> ()
 
   let preprocessor = object
-    inherit Visitor.frama_c_inplace
+    inherit E_acsl_visitor.visitor
 
     (* Only logic functions and logic predicates are handled.
        E-acsl simply ignores all the other global annotations *)
@@ -690,62 +698,31 @@ end
       | Dfun_or_pred _ -> Cil.DoChildren
       | _ -> Cil.SkipChildren
 
-    (* Ignore the annotations attached to statements from the RTL *)
-    method !vglob_aux =
-      function
-      (* library functions and built-ins *)
-      | GVarDecl(vi, _) | GVar(vi, _, _)
-      | GFunDecl(_, vi, _)
-      | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-        Cil.SkipChildren
-
-      | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
-        when Misc.is_fc_or_compiler_builtin vi ->
-        Cil.SkipChildren
-      | g when Rtl.Symbols.mem_global g ->
-        Cil.SkipChildren
-
-      (* generated function declaration: nothing to do *)
-      | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
-        Cil.SkipChildren
-
-      | GFun({svar = vi}, _) ->
-        let kf = try Globals.Functions.get vi with Not_found -> assert false in
-        if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
-
-      | GAnnot _ -> Cil.DoChildren
-
-      (* other globals: nothing to do *)
-      | GFunDecl _
-      | GVarDecl _
-      | GVar _
-      | GType _
-      | GCompTag _
-      | GCompTagDecl _
-      | GEnumTag _
-      | GEnumTagDecl _
-      | GAsm _
-      | GPragma _
-      | GText _
-        -> Cil.SkipChildren
-
     method !vpredicate  p =
       let loc = p.pred_loc in
       match Logic_normalizer.get_pred p with
-      | PoT_pred p -> Error.generic_handle (process_quantif ~loc) () p;
+      | PoT_pred p -> process_quantif ~loc p;
         Cil.DoChildren
       | PoT_term _ -> Cil.DoChildren
 
   end
 
   let compute ast =
-    Visitor.visitFramacFileSameGlobals preprocessor ast
+    Visitor.visitFramacFileSameGlobals
+      (preprocessor :> Visitor.frama_c_inplace)
+      ast
 
   let compute_annot annot =
-    ignore (Visitor.visitFramacCodeAnnotation preprocessor annot)
+    ignore
+      (Visitor.visitFramacCodeAnnotation
+         (preprocessor :> Visitor.frama_c_inplace)
+         annot)
 
   let compute_predicate p =
-    ignore (Visitor.visitFramacPredicate preprocessor p)
+    ignore
+      (Visitor.visitFramacPredicate
+         (preprocessor :> Visitor.frama_c_inplace)
+         p)
 end
 
 let preprocess = Preprocessor.compute
