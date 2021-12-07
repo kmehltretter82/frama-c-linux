@@ -1,5 +1,5 @@
 /* run.config_qualif
-   OPT: -wp -wp-prover alt-ergo,native:coq -wp-coq-script @PTEST_DIR@/tset.s
+   OPT: -wp -wp-prover alt-ergo,native:coq -wp-coq-script %{dep:@PTEST_DIR@/tset.s}
 */
 
 /*@

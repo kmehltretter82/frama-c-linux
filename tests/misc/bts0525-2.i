@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -typecheck @PTEST_DIR@/bts0525.i
+   OPT: -typecheck %{dep:@PTEST_DIR@/bts0525.i}
 */
 
 typedef enum {E1=2, E2} T_EN1 ;

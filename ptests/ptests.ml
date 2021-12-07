@@ -592,6 +592,8 @@ module SubDir: sig
   val make_oracle_file: t -> string -> string
   val make_result_file: t -> string -> string
   val make_file: t -> string -> string
+
+  val result_dirname: string
 end = struct
   type t = string
 
@@ -1360,6 +1362,7 @@ end = struct
   let expand_macros =
     let dune_cmd_features = Str.regexp "%{[a-z][a-z-]*:\\([^}]*\\)}" in
     let dune_bin_features = Str.regexp "%{bin:\\([^}]*\\)}" in
+    let dune_bin_subst = (Filename.dirname !toplevel_path) ^ "/\\1" in
     fun ~defaults cmd ->
       let ptest_config =
         if !special_config = "" then "" else "_" ^ !special_config
@@ -1378,7 +1381,7 @@ end = struct
         [ "PTEST_CONFIG", ptest_config;
           "PTEST_DIR", SubDir.get cmd.directory;
           "PTEST_RESULT",
-          SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
+          SubDir.get cmd.directory ^ "/" ^ SubDir.result_dirname;
           "PTEST_FILE", ptest_file;
           "PTEST_NAME", ptest_name;
           "PTEST_NUMBER", string_of_int cmd.n;
@@ -1413,7 +1416,7 @@ end = struct
         else toplevel
       in
       let toplevel = (* removes dune feature such as %{deps:...} *)
-        let x = str_global_replace dune_bin_features "./bin/\\1" toplevel in
+        let x = str_global_replace dune_bin_features dune_bin_subst toplevel in
         str_global_replace dune_cmd_features "\\1" x
       in
       { cmd with

@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -print @PTEST_DIR@/mergestruct1.i @PTEST_DIR@/mergestruct2.i
-   OPT: -print @PTEST_DIR@/mergestruct2.i @PTEST_DIR@/mergestruct1.i
+   OPT: -print %{dep:@PTEST_DIR@/mergestruct1.i} %{dep:@PTEST_DIR@/mergestruct2.i}
+   OPT: -print %{dep:@PTEST_DIR@/mergestruct2.i} %{dep:@PTEST_DIR@/mergestruct1.i}
 */
 struct s { float a; } s2;
 
