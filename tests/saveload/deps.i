@@ -1,15 +1,15 @@
 /* run.config
  MODULE: deps_A
    EXECNOW: LOG deps_sav.res LOG deps_sav.err BIN deps.sav @frama-c@ -eva @EVA_OPTIONS@ -out -input -deps @PTEST_FILE@ -save @PTEST_RESULT@/deps.sav > @PTEST_RESULT@/deps_sav.res 2> @PTEST_RESULT@/deps_sav.err
-   STDOPT: +"-load @PTEST_RESULT@/deps.sav -eva @EVA_OPTIONS@ -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_RESULT@/deps.sav} -eva @EVA_OPTIONS@ -out -input -deps "
  MODULE: deps_B
-   STDOPT: +"-load @PTEST_RESULT@/deps.sav  -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_RESULT@/deps.sav}  -out -input -deps "
  MODULE: deps_C
-   STDOPT: +"-load @PTEST_RESULT@/deps.sav  -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_RESULT@/deps.sav}  -out -input -deps "
  MODULE: deps_D
-   STDOPT: +"-load @PTEST_RESULT@/deps.sav  -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_RESULT@/deps.sav}  -out -input -deps "
  MODULE: deps_E
-   STDOPT: +"-load @PTEST_RESULT@/deps.sav  -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_RESULT@/deps.sav}  -out -input -deps "
 */
 
 int main() {
