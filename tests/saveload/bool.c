@@ -1,5 +1,5 @@
 /* run.config
-   EXECNOW: BIN bool.sav LOG bool_sav.res LOG bool_sav.err @frama-c@ -save @PTEST_RESULT@/bool.sav -machdep x86_32 -eva @EVA_OPTIONS@ @PTEST_DIR@/bool.c > @PTEST_RESULT@/bool_sav.res 2> @PTEST_RESULT@/bool_sav.err
+   EXECNOW: BIN bool.sav LOG bool_sav.res LOG bool_sav.err @frama-c@ -save @PTEST_RESULT@/bool.sav -machdep x86_32 -eva @EVA_OPTIONS@ %{dep:@PTEST_DIR@/bool.c} > @PTEST_RESULT@/bool_sav.res 2> @PTEST_RESULT@/bool_sav.err
    STDOPT: +"-load @PTEST_RESULT@/bool.sav -out -input -deps"
    STDOPT: +"-load @PTEST_RESULT@/bool.sav -eva @EVA_OPTIONS@"
  */

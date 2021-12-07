@@ -1,6 +1,6 @@
 /* run.config
  PLUGIN: @EVA_PLUGINS@ slicing
-   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err @frama-c@ -slicing-level 2 -slice-return main -eva-show-progress -save @PTEST_RESULT@/sparecode.sav @PTEST_DIR@/sparecode.i -then-on 'Slicing export' -print > @PTEST_RESULT@/sparecode_sav.res 2> @PTEST_RESULT@/sparecode_sav.err
+   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err @frama-c@ -slicing-level 2 -slice-return main -eva-show-progress -save @PTEST_RESULT@/sparecode.sav %{dep:@PTEST_DIR@/sparecode.i} -then-on 'Slicing export' -print > @PTEST_RESULT@/sparecode_sav.res 2> @PTEST_RESULT@/sparecode_sav.err
    STDOPT: +"-load @PTEST_RESULT@/sparecode.sav"
 */
 int G;
