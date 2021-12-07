@@ -2,7 +2,7 @@
    OPT: -wp-gen -wp-rte -wp-prover why3 -wp-msg-key print-generated
 */
 /* run.config_qualif
-   OPT: -wp-rte -wp-coq-script @PTEST_DIR@/chunk_typing_usable.script -wp-prover alt-ergo,native:coq
+   OPT: -wp-rte -wp-coq-script %{dep:@PTEST_DIR@/chunk_typing_usable.script} -wp-prover alt-ergo,native:coq
 */
 
 /*@
