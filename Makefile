@@ -563,6 +563,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_data/annotations.cmo                    \
 	src/kernel_services/ast_printing/printer.cmo                    \
 	src/kernel_internals/typing/logic_builtin.cmo                 \
+	src/kernel_services/ast_queries/ast_diff.cmo                  \
 	src/kernel_services/ast_printing/cabs_debug.cmo                 \
 	src/kernel_internals/parsing/lexerhack.cmo                     \
 	src/kernel_internals/parsing/clexer.cmo                        \
