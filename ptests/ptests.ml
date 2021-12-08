@@ -1609,19 +1609,23 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let oracle_dune_file = SubDir.make_file (SubDir.oracle_subdir ~env directory) "dune" in
        let oracle_cout = (open_out oracle_dune_file) in
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
-       let dir_files = Sys.readdir (SubDir.get directory) in
        let has_test = ref false in
        let modules = ref StringMap.empty in
-       if !verbosity >= 3 then Format.printf "%% - Look at %d entries of the directory...@." (Array.length dir_files);
-       for i = 0 to pred (Array.length dir_files) do
-         let file = dir_files.(i) in
-         assert (Filename.is_relative file);
-         if test_pattern dir_config file
-         then begin
-           if !verbosity >= 2 then Format.printf "%% - Process test file %s ...@." file;
-           has_test := dispatcher ~env ~result_fmt ~oracle_fmt file directory dir_config modules || !has_test;
-         end;
-       done;
+       let dir_files = Array.to_list (Sys.readdir (SubDir.get directory)) in
+       (* ignore hidden files (starting with '.') *)
+       let dir_files =
+         List.filter (fun n -> String.get n 0 <> '.') dir_files
+       in
+       if !verbosity >= 3 then Format.printf "%% - Look at %d entries of the directory...@." (List.length dir_files);
+       List.iter
+         (fun file ->
+            assert (Filename.is_relative file);
+            if test_pattern dir_config file
+            then begin
+              if !verbosity >= 2 then Format.printf "%% - Process test file %s ...@." file;
+              has_test := dispatcher ~env ~result_fmt ~oracle_fmt file directory dir_config modules || !has_test;
+            end;
+         ) dir_files;
        let n = ref 0 in
        StringMap.iter (fun cmxs (libs,files) ->
            let files = StringSet.elements (StringSet.of_list files) in
