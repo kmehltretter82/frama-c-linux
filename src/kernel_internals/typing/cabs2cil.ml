@@ -9777,8 +9777,8 @@ and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
     end else
       cabsPushGlobal (GEnumTagDecl(ei, CurrentLoc.get ()))
   | _ ->
-    Kernel.warning ~current:true
-      "Ignoring un-named typedef that does not introduce a struct or \
+    Kernel.warning ~current:true ~wkey:Kernel.wkey_unnamed_typedef
+      "Ignoring unnamed typedef that does not introduce a struct or \
        enumeration type"
 
 (* Now define the processors for body and statement *)
