@@ -2057,18 +2057,22 @@ let () =
        else begin
          if not (List.mem suite exclude_suite) then begin
            let dirname = SubDir.get directory in
-           let dir_files = Sys.readdir dirname in
+           let dir_files = Array.to_list (Sys.readdir dirname) in
+           (* ignore hidden files (starting with '.' *)
+           let dir_files =
+             List.filter (fun n -> String.get n 0 <> '.') dir_files
+           in
            if !verbosity >= 2 then
              lock_printf "%% - Look at %d entries of the directory %S ...@."
-               (Array.length dir_files) dirname;
-           for i = 0 to pred (Array.length dir_files) do
-             let file = dir_files.(i) in
-             assert (Filename.is_relative file);
-             if test_pattern dir_config file &&
-                (not (List.mem (SubDir.make_file directory file) exclude_file))
-             then
-               Queue.push (file, directory, dir_config) files;
-           done
+               (List.length dir_files) dirname;
+           List.iter
+             (fun file ->
+                assert (Filename.is_relative file);
+                if test_pattern dir_config file &&
+                   (not (List.mem (SubDir.make_file directory file) exclude_file))
+                then
+                  Queue.push (file, directory, dir_config) files;
+             ) dir_files
          end
        end)
     suites
