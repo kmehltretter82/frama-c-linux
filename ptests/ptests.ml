@@ -663,8 +663,8 @@ struct
           | Str.Text s -> s
           | Str.Delim s ->
             if Str.string_match macro_regex s 0 then begin
-              let macro = Str.matched_group 1 s in
               try
+                let macro = Str.matched_group 1 s in
                 (match macro with
                  | "PTEST_FILE" -> has_ptest_file := true
                  | "PTEST_OPT" -> has_ptest_opt := true
@@ -1921,7 +1921,11 @@ let diff_check_exist old_file new_file =
     new_file ^ "\";" ^ " cat " ^ new_file
   end
 
-let do_diff = function
+let do_diff =
+  let stdout_redir_regexp = Str.regexp "[^2]> ?\\([-a-zA-Z0-9_/.]+\\)"
+  and stderr_redir_regexp = Str.regexp "2> ?\\([-a-zA-Z0-9_/.]+\\)";
+  in
+  function
   | Command_error (diff, kind) ->
     let log_prefix = Cmd.log_prefix diff in
     let log_ext = log_ext kind in
@@ -1942,19 +1946,21 @@ let do_diff = function
   | Target_error execnow ->
     let test_file = SubDir.make_file execnow.ex_dir execnow.ex_file in
     lock_printf "#------ Custom command failed for test file %s:@\n" test_file;
-    let print_redirected out redir_str =
+    let print_redirected out redir_regexp =
       try
-        ignore (Str.search_forward (Str.regexp redir_str) execnow.ex_cmd 0);
+        Mutex.lock str_mutex;
+        ignore (Str.search_forward redir_regexp execnow.ex_cmd 0);
         let file = Str.matched_group 1 execnow.ex_cmd in
+        Mutex.unlock str_mutex;
         lock_printf "#- %s redirected to %s:@\n" out file;
         if not (Sys.file_exists file) then
           lock_printf "#- error: file does not exist: %s:@\n" file
         else
           ignore (launch ("cat " ^ file));
-      with Not_found -> ()
+      with Not_found -> lock_printf "#- error: EXECNOW command without %s redirection: %s@\n" out execnow.ex_cmd
     in
-    print_redirected "stdout" "[^2]> ?\\([-a-zA-Z0-9_/.]+\\)";
-    print_redirected "stderr" "2> ?\\([-a-zA-Z0-9_/.]+\\)";
+    print_redirected "stdout" stdout_redir_regexp;
+    print_redirected "stderr" stderr_redir_regexp;
     lock_printf "#- Tested file: %s #- Custom command: %s@\n" test_file execnow.ex_cmd;
   | Log_error(dir, test_file, log) ->
     let test_file = SubDir.make_file dir test_file in
