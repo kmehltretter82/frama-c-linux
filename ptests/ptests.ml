@@ -737,6 +737,7 @@ type execnow =
     ex_log: string list; (** log files *)
     ex_bin: string list; (** bin files *)
     ex_dir: SubDir.t;    (** directory of test suite *)
+    ex_file: string;     (** test file*)
     ex_once: bool;       (** true iff the command has to be executed only once
                              per config file (otherwise it is executed for
                              every file of the test suite) *)
@@ -890,6 +891,7 @@ end = struct
           ex_log = [];
           ex_bin = [];
           ex_dir = dir;
+          ex_file = file;
           ex_once = once;
           ex_done = ref false;
           ex_timeout;
@@ -1268,11 +1270,11 @@ type log = Err | Res
 type diff =
   | Command_error of toplevel_command * log
   | Target_error of execnow
-  | Log_error of SubDir.t (** directory *) * string (** file *)
+  | Log_error of SubDir.t (** directory *) * string (** test file *) * string (** log file *)
 
 type cmps =
   | Cmp_Toplevel of toplevel_command * bool (** returns with the required exit_code *)
-  | Cmp_Log of SubDir.t (** directory *) * string (** file *)
+  | Cmp_Log of SubDir.t (** directory *) * string (** test file *) * string (** log file *)
 
 type shared =
   { lock : Mutex.t ;
@@ -1624,7 +1626,7 @@ let do_command command =
         shared.summary_run <- succ shared.summary_run ;
         Queue.push (Cmp_Toplevel (command,summary_ret)) shared.cmps;
         List.iter
-          (fun f -> Queue.push (Cmp_Log (command.directory, f)) shared.cmps)
+          (fun log -> Queue.push (Cmp_Log (command.directory, command.file, log)) shared.cmps)
           command.log_files;
         unlock ()
       end
@@ -1643,7 +1645,7 @@ let do_command command =
         if !behavior = Examine || !behavior = Run
         then begin
           List.iter
-            (fun f -> Queue.push (Cmp_Log(execnow.ex_dir, f)) shared.cmps)
+            (fun log -> Queue.push (Cmp_Log(execnow.ex_dir, execnow.ex_file, log)) shared.cmps)
             execnow.ex_log
         end
       end
@@ -1824,20 +1826,20 @@ let compare_one_file cmp log_prefix oracle_prefix log_kind =
         ~cmp_string ~log_file ~oracle_file
     end
 
-let compare_one_log_file dir file =
+let compare_one_log_file dir ~test_file ~log =
   if !behavior = Show
   then begin
     lock();
-    Queue.push (Log_error(dir,file)) shared.diffs;
+    Queue.push (Log_error(dir,test_file,log)) shared.diffs;
     Condition.signal shared.diff_available;
     unlock()
   end else
-    let log_file = Filename.sanitize (SubDir.make_result_file dir file) in
-    let oracle_file = Filename.sanitize (SubDir.make_oracle_file dir file) in
+    let log_file = Filename.sanitize (SubDir.make_result_file dir log) in
+    let oracle_file = Filename.sanitize (SubDir.make_oracle_file dir log) in
     let cmp_string = Format.sprintf "%s %s %s > %s 2> %s"
         !do_cmp  log_file oracle_file dev_null dev_null in
-    if !verbosity >= 2 then lock_printf "%% cmplog: %s / %s@." (SubDir.get dir) file;
-    ignore (launch_and_check_compare_file (Log_error (dir,file))
+    if !verbosity >= 2 then lock_printf "%% cmplog: %s / %s@." (SubDir.get dir) log;
+    ignore (launch_and_check_compare_file (Log_error (dir,test_file,log))
               ~cmp_string ~log_file ~oracle_file)
 
 let do_cmp = function
@@ -1850,8 +1852,8 @@ let do_cmp = function
               }
     in
     report_cmp cmd cmp
-  | Cmp_Log(dir, f) ->
-    ignore (compare_one_log_file dir f)
+  | Cmp_Log(dir, test_file, log) ->
+    ignore (compare_one_log_file dir ~test_file ~log)
 
 let worker_thread () =
   while true do
@@ -1925,8 +1927,8 @@ let do_diff = function
     let log_ext = log_ext kind in
     let log_file = Filename.sanitize (log_prefix ^ log_ext ^ ".log") in
     do_filter diff kind ;
-    let command_string = Cmd.command_string diff in
-    lock_printf "%tCommand:@\n%s@." print_default_env command_string;
+    let test_file = SubDir.make_file diff.directory diff.file in
+    lock_printf "#------ Oracle difference for test file: %s@.%t@." test_file print_default_env ;
     if !behavior = Show
     then ignore (launch ("cat " ^ log_file))
     else
@@ -1935,35 +1937,41 @@ let do_diff = function
         Filename.sanitize (oracle_prefix ^ log_ext ^ ".oracle")
       in
       let diff_string = diff_check_exist oracle_file log_file in
-      ignore (launch diff_string)
+      ignore (launch diff_string);
+      lock_printf "#- Tested file: %s #- Command:@\n%s@." test_file (Cmd.command_string diff);
   | Target_error execnow ->
-    lock_printf "Custom command failed: %s@\n" execnow.ex_cmd;
+    let test_file = SubDir.make_file execnow.ex_dir execnow.ex_file in
+    lock_printf "#------ Custom command failed for test file %s:@\n" test_file;
     let print_redirected out redir_str =
       try
         ignore (Str.search_forward (Str.regexp redir_str) execnow.ex_cmd 0);
         let file = Str.matched_group 1 execnow.ex_cmd in
-        lock_printf "%s redirected to %s:@\n" out file;
+        lock_printf "#- %s redirected to %s:@\n" out file;
         if not (Sys.file_exists file) then
-          lock_printf "error: file does not exist: %s:@\n" file
+          lock_printf "#- error: file does not exist: %s:@\n" file
         else
           ignore (launch ("cat " ^ file));
       with Not_found -> ()
     in
     print_redirected "stdout" "[^2]> ?\\([-a-zA-Z0-9_/.]+\\)";
     print_redirected "stderr" "2> ?\\([-a-zA-Z0-9_/.]+\\)";
-  | Log_error(dir, file) ->
+    lock_printf "#- Tested file: %s #- Custom command: %s@\n" test_file execnow.ex_cmd;
+  | Log_error(dir, test_file, log) ->
+    let test_file = SubDir.make_file dir test_file in
+    lock_printf "#------ Log difference for test file: %s@." test_file ;
     let result_file =
-      Filename.sanitize (SubDir.make_result_file dir file)
+      Filename.sanitize (SubDir.make_result_file dir log)
     in
-    lock_printf "Log of %s:@." result_file;
     if !behavior = Show
     then ignore (launch ("cat " ^ result_file))
-    else
+    else begin
       let oracle_file =
-        Filename.sanitize (SubDir.make_oracle_file dir file)
+        Filename.sanitize (SubDir.make_oracle_file dir log)
       in
       let diff_string = diff_check_exist oracle_file result_file in
       ignore (launch diff_string)
+    end;
+    lock_printf "#- Tested file: %s #- Log file: %s@." test_file result_file
 
 let diff_thread () =
   lock () ;
@@ -2138,6 +2146,7 @@ let dispatcher () =
             ex_log = cmd.log_files;
             ex_bin = List.map process_macros execnow.ex_bin;
             ex_dir = execnow.ex_dir;
+            ex_file = cmd.file;
             ex_once = execnow.ex_once;
             ex_done = execnow.ex_done;
             ex_timeout = cmd.timeout;
