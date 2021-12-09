@@ -25,6 +25,7 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
@@ -33,7 +34,7 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
-import { functions, markerInfo } from 'frama-c/api/kernel/ast';
+import { functions, markerInfo, getMarkerAt } from 'frama-c/api/kernel/ast';
 import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
 import { IconButton } from 'dome/controls/buttons';
@@ -62,8 +63,8 @@ const D = new Dome.Debug('Source Code');
 export default function SourceCode() {
 
   // Hooks
-  const [buffer] = React.useState(new RichTextBuffer());
-  const [selection] = States.useSelection();
+  const [buffer] = React.useState(() => new RichTextBuffer());
+  const [selection, updateSelection] = States.useSelection();
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
   const markersInfo = States.useSyncArray(markerInfo);
@@ -95,11 +96,52 @@ export default function SourceCode() {
   const text = React.useMemo(read, [file, onError]);
   const { result } = Dome.usePromise(text);
   React.useEffect(() => buffer.setValue(result), [buffer, result]);
-  React.useEffect(() => buffer.setCursorOnTop(line), [buffer, line, result]);
+
+  /* Last location selected by a click in the source code. */
+  const selected: React.MutableRefObject<undefined | States.Location> =
+    React.useRef();
+
+  /* Updates the cursor position according to the current [selection], except
+     when the [selection] is changed according to a click in the source code,
+     in which case the cursor should stay exactly where the user clicked. */
+  React.useEffect(() => {
+    if (selected.current && selected?.current === selection?.current)
+      selected.current = undefined;
+    else
+      buffer.setCursorOnTop(line);
+  }, [buffer, selection, line, result]);
 
   /* CodeMirror types used to bind callbacks to extraKeys. */
   type position = CodeMirror.Position;
   type editor = CodeMirror.Editor;
+
+  async function select(editor: editor, event: MouseEvent) {
+    const pos = editor.coordsChar({ left: event.x, top: event.y });
+    if (file === '' || !pos) return;
+    const arg = [file, pos.line + 1, pos.ch + 1];
+    Server
+      .send(getMarkerAt, arg)
+      .then(([fct, marker]) => {
+        if (fct || marker) {
+          const location = { fct, marker } as States.Location;
+          selected.current = location;
+          updateSelection({ location });
+        }
+      })
+      .catch((err) => {
+        D.error(`Failed to get marker from source file position: ${err}`);
+        Status.setMessage({
+          text: 'Failed request to Frama-C server',
+          kind: 'error',
+        });
+      });
+  }
+
+  const selectCallback = React.useCallback(select, [file]);
+  React.useEffect(() => {
+    buffer.forEach((cm) => cm.on('mousedown', selectCallback));
+    return () => buffer.forEach((cm) => cm.off('mousedown', selectCallback));
+  }, [buffer, selectCallback]);
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   async function launchEditor(_?: editor, pos?: position) {

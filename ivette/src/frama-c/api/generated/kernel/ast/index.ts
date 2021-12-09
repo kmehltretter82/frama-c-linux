@@ -468,6 +468,27 @@ const getInfo_internal: Server.GetRequest<marker,text> = {
 /** Get textual information about a marker */
 export const getInfo: Server.GetRequest<marker,text>= getInfo_internal;
 
+const getMarkerAt_internal: Server.GetRequest<
+  [ string, number, number ],
+  [ Json.key<'#fct'> | undefined, marker | undefined ]
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.getMarkerAt',
+  input:  Json.jTry(
+            Json.jTriple(
+              Json.jFail(Json.jString,'String expected'),
+              Json.jFail(Json.jNumber,'Number expected'),
+              Json.jFail(Json.jNumber,'Number expected'),
+            )),
+  output: Json.jTry(Json.jPair( Json.jKey<'#fct'>('#fct'), jMarker,)),
+  signals: [],
+};
+/** Returns the marker and function at a source file position, if any. Input: file path, line and column. */
+export const getMarkerAt: Server.GetRequest<
+  [ string, number, number ],
+  [ Json.key<'#fct'> | undefined, marker | undefined ]
+  >= getMarkerAt_internal;
+
 const getFiles_internal: Server.GetRequest<null,string[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFiles',
