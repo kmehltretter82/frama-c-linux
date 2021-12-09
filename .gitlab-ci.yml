@@ -184,25 +184,10 @@ internal_nightly:
   tags:
    - nix
 
-frama-c-ocaml-4.09:
-  variables:
-    OCAML: "4_09"
-  <<: *frama-c-ocaml
-  only:
-  - schedules
-
-frama-c-ocaml-4.12:
-  variables:
-    OCAML: "4_12"
-  <<: *frama-c-ocaml
-
-# check compatibility with future OCaml version
 frama-c-ocaml-4.13:
   variables:
     OCAML: "4_13"
   <<: *frama-c-ocaml
-  allow_failure: true
-
 
 caveat-importer:
   stage: tests
