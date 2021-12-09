@@ -39,6 +39,7 @@ include module type of Type
 
 val is_bottom: 'a or_bottom -> bool
 val non_bottom: 'a or_bottom -> 'a
+val value: bottom: 'a -> 'a or_bottom -> 'a
 
 val equal:       ('a -> 'a -> bool) -> 'a or_bottom -> 'a or_bottom -> bool
 val compare:     ('a -> 'a -> int)  -> 'a or_bottom -> 'a or_bottom -> int
@@ -52,6 +53,7 @@ val pretty :
   Format.formatter -> 'a or_bottom -> unit
 
 val iter: ('a -> unit) -> 'a or_bottom -> unit
+val fold: bottom: 'b -> ('a -> 'b) -> 'a or_bottom -> 'b
 
 (** Datatype constructor. *)
 module Make_Datatype

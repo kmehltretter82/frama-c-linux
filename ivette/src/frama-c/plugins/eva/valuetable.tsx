@@ -27,8 +27,6 @@
 // React & Dome
 import React from 'react';
 import * as Dome from 'dome';
-import * as Server from 'frama-c/server';
-import * as Values from 'frama-c/api/plugins/eva/values';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Hpack, Filler } from 'dome/layout/boxes';
@@ -36,60 +34,39 @@ import { Inset } from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
 import { Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { ModelProp } from 'frama-c/plugins/eva/model';
+import { ModelProp, EvalStmt, EvalCond } from 'frama-c/plugins/eva/model';
 
 // Frama-C
 import * as States from 'frama-c/states';
 
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
-import { Diff, DiffProps } from './diffed';
-import { sizeof, EvaValues, EvaState } from './cells';
+import { Diff } from './diffed';
+import { sizeof, EvaValues, EvaPointedVar, Evaluation } from './cells';
 import { Probe } from './probes';
 import { Row } from './layout';
 import { Callsite } from './stacks';
 import { Stmt } from './valueinfos';
 import './style.css';
 
-const D = new Dome.Debug('Source Code');
-
 // --------------------------------------------------------------------------
 // --- Cell Diffs
 // --------------------------------------------------------------------------
 
-function isTrivial(v: EvaValues) {
-  return v.values === '{0; 1}' &&
-    v.v_then === '{1}' &&
-    v.v_else === '{0}';
-}
-
-function computeDiffs(
-  condition: boolean,
-  v: EvaValues,
-  vstate: EvaState,
-): DiffProps {
-  if (condition) {
-    const trv = isTrivial(v);
-    switch (vstate) {
-      case 'Here':
-      case 'After':
-        return trv ? { text: v.values } :
-          { text: v.values, diffA: v.v_then, diffB: v.v_else };
-      case 'Then':
-        return { text: v.v_then, diff: !trv ? v.values : undefined };
-      case 'Else':
-        return { text: v.v_else, diff: !trv ? v.values : undefined };
-    }
-  } else {
-    switch (vstate) {
-      case 'Here':
-      case 'Then':
-      case 'Else':
-        return { text: v.values, diff: v.v_after };
-      case 'After':
-        return { text: v.v_after, diff: v.values };
-    }
+function computeValueDiffs(v: EvaValues, vstate: EvalStmt | EvalCond) {
+  let here = v.v_before;
+  let diff: undefined | Evaluation;
+  let diff2: undefined | Evaluation;
+  function setValue(e?: Evaluation) { if (e) { here = e; diff = v.v_before; } }
+  switch (vstate) {
+    case 'Before': diff = v.v_after; break;
+    case 'After': setValue(v.v_after); break;
+    case 'Then': setValue(v.v_then); break;
+    case 'Else': setValue(v.v_else); break;
+    case 'Cond': diff = v.v_then; diff2 = v.v_else; break;
   }
+  const vdiffs = { text: here.value, diff: diff?.value, diff2: diff2?.value };
+  return { value: here, vdiffs };
 }
 
 // --------------------------------------------------------------------------
@@ -111,6 +88,8 @@ function TableCell(props: TableCellProps) {
   const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
   const style = { width: minWidth, maxWidth };
   let contents: React.ReactNode = props.probe.marker;
+  let valueText = '';
+  let pointedVars: EvaPointedVar[] = [];
   const { transient, marker } = probe;
   const focused = model.getFocused();
   const isFocused = focused === probe;
@@ -119,9 +98,7 @@ function TableCell(props: TableCellProps) {
 
     // ---- Probe Contents
     case 'probes':
-      if (transient) {
-        contents = <span className="dome-text-label">« Probe »</span>;
-      } else {
+      {
         const { stmt, code, label } = probe;
         const textClass = label ? 'dome-text-label' : 'dome-text-cell';
         contents = (
@@ -138,17 +115,19 @@ function TableCell(props: TableCellProps) {
     case 'callstack':
       {
         const domain = model.values.getValues(probe, callstack);
-        const { alarms = [] } = domain;
         const { condition } = probe;
         const vstate = condition ? model.getVcond() : model.getVstmt();
-        const vdiffs = computeDiffs(condition, domain, vstate);
+        const { value, vdiffs } = computeValueDiffs(domain, vstate);
+        valueText = value.value;
         const text = vdiffs.text ?? vdiffs.diff;
         const { cols, rows } = sizeof(text);
         let status = 'none';
-        if (alarms.length > 0) {
-          if (alarms.find(([st, _]) => st === 'False')) status = 'False';
+        if (value.alarms.length > 0) {
+          if (value.alarms.find(([st, _]) => st === 'False')) status = 'False';
           else status = 'Unknown';
         }
+        if (value.pointed_vars.length > 0)
+          pointedVars = value.pointed_vars;
         const alarmClass = `eva-cell-alarms eva-alarm-${status}`;
         const title = 'At least one alarm is raised in one callstack';
         contents = (
@@ -183,20 +162,25 @@ function TableCell(props: TableCellProps) {
   };
 
   async function onContextMenu() {
-    Server
-      .send(Values.getPointedLvalues, { pointer: marker, callstack })
-      .then((r) => {
-        const lvalues = r.lvalues ?? [];
-        const items: Dome.PopupMenuItem[] = lvalues.map((lval) => {
-          const [text, lvalMarker] = lval;
-          const label = `Display values for ${text}`;
-          const location = { fct: probe.fct, marker: lvalMarker };
-          const onItemClick = () => model.addProbe(location);
-          return { label, onClick: onItemClick };
-        });
-        if (items.length > 0) Dome.popupMenu(items);
-      })
-      .catch((err) => D.error(`Fail to recover pointed lvalues: ${err}`));
+    const items: Dome.PopupMenuItem[] = [];
+    const copyValue = () => navigator.clipboard.writeText(valueText);
+    if (valueText !== '')
+      items.push({ label: 'Copy to clipboard', onClick: copyValue });
+    if (items.length > 0 && pointedVars.length > 0)
+      items.push('separator');
+    pointedVars.forEach((lval) => {
+      const [text, lvalMarker] = lval;
+      const label = `Display values for ${text}`;
+      const location = { fct: probe.fct, marker: lvalMarker };
+      const onItemClick = () => model.addProbe(location);
+      items.push({ label, onClick: onItemClick });
+    });
+    if (items.length > 0)
+      items.push('separator');
+    const remove = () => model.removeProbe(probe);
+    const removeLabel = `Remove column for ${probe.code}`;
+    items.push({ label: removeLabel, onClick: remove });
+    if (items.length > 0) Dome.popupMenu(items);
   }
 
   return (

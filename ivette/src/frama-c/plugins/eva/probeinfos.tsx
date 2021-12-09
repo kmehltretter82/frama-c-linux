@@ -133,9 +133,9 @@ export function ProbeInfos(props: ModelProp) {
         <Button
           visible={condition}
           label="C"
-          selected={vcond === 'Here'}
+          selected={vcond === 'Cond'}
           title="Show values in all conditions"
-          onClick={() => model.setVcond('Here')}
+          onClick={() => model.setVcond('Cond')}
         />
         <Button
           visible={condition || vcond === 'Then'}
@@ -162,7 +162,7 @@ export function ProbeInfos(props: ModelProp) {
           value="After"
           title="Show values after/before statement effects"
           onClick={() => {
-            model.setVstmt(vstmt === 'After' ? 'Here' : 'After');
+            model.setVstmt(vstmt === 'After' ? 'Before' : 'After');
           }}
         />
       </ButtonGroup>
