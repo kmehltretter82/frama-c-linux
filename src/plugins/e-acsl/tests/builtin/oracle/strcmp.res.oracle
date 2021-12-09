@@ -1,4 +1,4 @@
-[variadic] tests/builtin/strcmp.c:11: Warning: 
+[variadic] tests/builtin/strcmp.c:13: Warning: 
   Call to function fprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
 [e-acsl] beginning translation.
 [e-acsl] Warning: annotating undefined function `abort':

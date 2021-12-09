@@ -1,9 +1,9 @@
 /* run.config
+MACRO: RM_TMP_DIR rm -rf make-for-make-wrapper.parse make-for-make-wrapper.eva
    NOFRAMAC: testing frama-c-script
    COMMENT: in case of errors, remove the 'grep' part to get the full output
-   EXECNOW: LOG make-wrapper.res LOG make-wrapper.err cd @PTEST_DIR@ && touch make-wrapper2.c && touch make-wrapper3.c && FRAMAC=../../bin/frama-c ../../bin/frama-c-script make-wrapper --make-dir . -f make-for-make-wrapper.mk | grep -A999999 "make-wrapper recommendations" > result/make-wrapper.res 2> result/make-wrapper.err && rm -rf make-for-make-wrapper.parse make-for-make-wrapper.eva
+   EXECNOW: LOG make-wrapper.res LOG make-wrapper.err (cd @PTEST_DIR@ && touch make-wrapper2.c && touch make-wrapper3.c && @RM_TMP_DIR@ && FRAMAC=%{bin:frama-c} %{bin:frama-c-script} make-wrapper --make-dir . -f make-for-make-wrapper.mk | grep -A999999 "make-wrapper recommendations" && @RM_TMP_DIR@) > @PTEST_RESULT@/make-wrapper.res 2> @PTEST_RESULT@/make-wrapper.err
 */
-
 int defined(int a);
 
 int specified(int a);

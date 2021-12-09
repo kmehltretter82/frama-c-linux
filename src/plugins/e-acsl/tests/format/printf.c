@@ -6,7 +6,7 @@
    MACRO: ROOT_EACSL_GCC_OPTS_EXT @ROOT_EACSL_GCC_OPTS_EXT@ -e "-Wno-maybe-uninitialized"
 */
 
-#include "../utils/signalled.h"
+#include "utils/signalled.h"
 #include <limits.h>
 #include <signal.h>
 #include <stddef.h>
