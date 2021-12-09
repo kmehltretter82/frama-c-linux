@@ -430,8 +430,8 @@ class TableState<Key, Row> {
       this.columns.forEach(({ id }) => {
         const cw = resize.get(id);
         const cv = visible.get(id);
-        if (cw) cws[id] = cw;
-        if (cv) cvs[id] = cv;
+        if (cw !== undefined) cws[id] = cw;
+        if (cv !== undefined) cvs[id] = cv;
       });
       const theSettings: TableSettings = { resize: cws, visible: cvs };
       Settings.setWindowSettings(userSettings, theSettings);

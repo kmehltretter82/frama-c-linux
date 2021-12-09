@@ -29,6 +29,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Vfill } from 'dome/layout/boxes';
 import { IconButton } from 'dome/controls/buttons';
 import { AutoSizer } from 'react-virtualized';
@@ -46,8 +47,10 @@ import './style.css';
 // --- Values Component
 // --------------------------------------------------------------------------
 
+const globalModelState = new GlobalState(new Model());
+
 function ValuesComponent() {
-  const [model] = React.useState(() => new Model());
+  const [model] = useGlobalState(globalModelState);
   model.mount();
   Dome.useUpdate(model.changed, model.laidout);
   Server.onShutdown(() => model.unmount());
