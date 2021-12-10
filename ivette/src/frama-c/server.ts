@@ -21,7 +21,7 @@
 /* ************************************************************************ */
 
 // --------------------------------------------------------------------------
-// --- Frama-C Server
+// --- Connection to Frama-C Server
 // --------------------------------------------------------------------------
 
 /**
@@ -36,8 +36,8 @@ import * as Dome from 'dome';
 import * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
-import { Request as ZmqRequest } from 'zeromq';
 import { ChildProcess } from 'child_process';
+import { client } from './client_zmq';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -150,30 +150,12 @@ type RejectPromise = (error: Error) => void;
 /** Pending promise callbacks (pairs of (resolve, reject)). */
 let pending: IndexedPair<ResolvePromise, RejectPromise> = {};
 
-/** Queue of server commands to be sent. */
-let queueCmd: string[] = [];
-
-/** Waiting request ids to be sent. */
-let queueId: string[] = [];
-
-/** Polling timeout and timer. */
-const pollingTimeout = 50;
-let pollingTimer: NodeJS.Timeout | undefined;
-
-/** Flushing timer. */
-let flushingTimer: NodeJS.Immediate | undefined;
-
 /** Server process. */
 let process: ChildProcess | undefined;
 
 /** Killing timeout and timer for server process hard kill. */
 const killingTimeout = 300;
 let killingTimer: NodeJS.Timeout | undefined;
-
-/** ZMQ (REQ) socket. */
-let zmqSocket: ZmqRequest | undefined;
-/** Flag on whether ZMQ socket is busy. */
-let zmqIsBusy = false;
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -513,9 +495,7 @@ async function _launch() {
     }
   });
   // Connect to Server
-  zmqSocket = new ZmqRequest();
-  zmqIsBusy = false;
-  zmqSocket.connect(sockaddr);
+  client.connect(sockaddr);
 }
 
 // --------------------------------------------------------------------------
@@ -526,28 +506,20 @@ function _reset() {
   D.log('Reset to initial configuration');
 
   rqCount = 0;
-  queueCmd = [];
-  queueId = [];
   _.forEach(pending, ([, reject]) => reject(new Error('Server reset')));
   pending = {};
-  if (flushingTimer) {
-    clearImmediate(flushingTimer);
-    flushingTimer = undefined;
-  }
-  if (pollingTimer) {
-    clearTimeout(pollingTimer);
-    pollingTimer = undefined;
-  }
+
   if (killingTimer) {
     clearTimeout(killingTimer);
     killingTimer = undefined;
   }
+
 }
 
 function _kill() {
   D.log('Hard kill');
 
-  _reset();
+  client.disconnect();
   if (process) {
     process.kill();
   }
@@ -555,10 +527,8 @@ function _kill() {
 
 async function _shutdown() {
   D.log('Shutdown');
-
   _reset();
-  queueCmd.push('SHUTDOWN');
-  _flush();
+  client.shutdown();
   const killingPromise = new Promise((resolve) => {
     if (!killingTimer) {
       if (process) {
@@ -575,11 +545,7 @@ async function _shutdown() {
 
 function _exit(error?: Error) {
   _reset();
-  if (zmqSocket) {
-    zmqSocket.close();
-    zmqSocket = undefined;
-  }
-  zmqIsBusy = false;
+  client.disconnect();
   process = undefined;
   if (status.stage === Stage.RESTARTING) {
     setImmediate(start);
@@ -595,12 +561,12 @@ function _exit(error?: Error) {
 // --------------------------------------------------------------------------
 
 class SignalHandler {
-  id: any;
+  id: string;
   event: Dome.Event;
   active: boolean;
   listen: boolean;
 
-  constructor(id: any) {
+  constructor(id: string) {
     this.id = id;
     this.event = new SIGNAL(id);
     this.active = false;
@@ -635,8 +601,7 @@ class SignalHandler {
   sigon() {
     if (this.active && !this.listen) {
       this.listen = true;
-      queueCmd.push('SIGON', this.id);
-      _flush();
+      client.sigOn(this.id);
     }
   }
 
@@ -645,8 +610,7 @@ class SignalHandler {
     if (!this.active && this.listen) {
       if (isRunning()) {
         this.listen = false;
-        queueCmd.push('SIGOFF', this.id);
-        _flush();
+        client.sigOff(this.id);
       }
     }
   }
@@ -660,7 +624,7 @@ class SignalHandler {
 
 const signals: Map<string, SignalHandler> = new Map();
 
-function _signal(id: any) {
+function _signal(id: string): SignalHandler {
   let s = signals.get(id);
   if (!s) {
     s = new SignalHandler(id);
@@ -668,6 +632,10 @@ function _signal(id: any) {
   }
   return s;
 }
+
+client.onSignal((id: string) => {
+  _signal(id).event.emit();
+})
 
 // --- External API
 
@@ -776,7 +744,6 @@ export function send<In, Out>(
   if (!request.name) return Promise.reject(new Error('Undefined request'));
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
-  const data = JSON.stringify(param);
   const promise: Killable<Out> = new Promise<Out>((resolve, reject) => {
     const decodedResolve = (js: Json.json) => {
       const result = Json.jTry(request.output)(js);
@@ -785,139 +752,32 @@ export function send<In, Out>(
     pending[rid] = [decodedResolve, reject];
   });
   promise.kill = () => {
-    if (zmqSocket && pending[rid]) {
-      queueCmd.push('KILL', rid);
-      _flush();
-    }
+    if (pending[rid]) client.kill(rid);
   };
-  queueCmd.push(request.kind, rid, request.name, data);
-  queueId.push(rid);
-  _flush();
+  client.send(request.kind, rid, request.name, param);
   return promise;
 }
 
-function _resolve(id: string | number, data: string) {
+client.onData((id: string, data: Json.json) => {
   const [resolve] = pending[id];
   if (resolve) {
     delete pending[id];
-    resolve(JSON.parse(data));
+    resolve(data);
   }
-}
+});
 
-function _reject(id: string | number, error: Error) {
+client.onRejected((id: string, error: string) => {
   const [, reject] = pending[id];
   if (reject) {
     delete pending[id];
-    reject(error);
+    reject(new Error(error));
   }
-}
+});
 
-function _cancel(ids: any[]) {
-  ids.forEach((rid) => _reject(rid, new Error('Canceled request')));
-}
-
-function _waiting() {
-  return _.find(pending, () => true) !== undefined;
-}
-
-// --------------------------------------------------------------------------
-// --- Server Command Queue
-// --------------------------------------------------------------------------
-
-function _flush() {
-  if (!flushingTimer) {
-    flushingTimer = setImmediate(() => {
-      flushingTimer = undefined;
-      _send();
-    });
-  }
-}
-
-function _poll() {
-  if (!pollingTimer) {
-    const delay = (config && config.polling) || pollingTimeout;
-    pollingTimer = setTimeout(() => {
-      pollingTimer = undefined;
-      _send();
-    }, delay);
-  }
-}
-
-async function _send() {
-  // when busy, will be eventually re-triggered
-  if (!zmqIsBusy) {
-    const cmds = queueCmd;
-    if (!cmds.length) {
-      cmds.push('POLL');
-      if (!_waiting())
-        rqCount = 0; // No pending command nor pending response
-    }
-    zmqIsBusy = true;
-    const ids = queueId;
-    queueCmd = [];
-    queueId = [];
-    try {
-      await zmqSocket?.send(cmds);
-      const resp = await zmqSocket?.receive();
-      _receive(resp);
-    } catch (error) {
-      D.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
-      _cancel(ids);
-    }
-    zmqIsBusy = false;
-    STATUS.emit(status);
-  }
-}
-
-function _receive(resp: any) {
-  try {
-    let rid;
-    let data;
-    let err;
-    let cmd;
-    const shift = () => resp.shift().toString();
-    let unknownResponse = false;
-    while (resp.length && !unknownResponse) {
-      cmd = shift();
-      switch (cmd) {
-        case 'NONE':
-          break;
-        case 'DATA':
-          rid = shift();
-          data = shift();
-          _resolve(rid, data);
-          break;
-        case 'KILLED':
-          rid = shift();
-          _reject(rid, new Error('Killed'));
-          break;
-        case 'ERROR':
-          rid = shift();
-          err = shift();
-          _reject(rid, err);
-          break;
-        case 'REJECTED':
-          rid = shift();
-          _reject(rid, new Error('Rejected'));
-          break;
-        case 'SIGNAL':
-          rid = shift();
-          (new SIGNAL(rid)).emit();
-          break;
-        case 'WRONG':
-          err = shift();
-          D.error(`ZMQ Protocol Error: ${err}`);
-          break;
-        default:
-          D.error(`Unknown Response: ${cmd}`);
-          unknownResponse = true;
-          break;
-      }
-    }
-  } finally {
-    if (queueCmd.length) _flush();
-    else _poll();
-  }
-}
+client.onIdle(() => {
+  const waiting = _.find(pending, () => true) !== undefined;
+  if (!waiting)
+    rqCount = 0; // No pending command nor pending response
+});
 
 // --------------------------------------------------------------------------
