@@ -43,6 +43,7 @@ PLUGIN_CMO:= \
 	data main request states \
 	server_doc \
 	server_batch \
+	server_socket \
 	kernel_ast \
 	kernel_main \
 	kernel_project \
@@ -54,7 +55,7 @@ PLUGIN_TESTS_DIRS := batch
 
 PLUGIN_REQUIRES:= yojson
 
-PLUGIN_UNDOC:= server_batch.ml server_zmq.ml
+PLUGIN_UNDOC:= server_batch.ml server_zmq.ml server_socket.ml
 
 PLUGIN_GENERATED:= $(PLUGIN_DIR)/Server.mli
 

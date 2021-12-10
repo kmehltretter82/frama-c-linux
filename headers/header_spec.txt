@@ -1227,6 +1227,8 @@ src/plugins/server/server_parameters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_batch.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_batch.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/server_socket.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/server_socket.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_zmq.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_zmq.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/states.ml: CEA_LGPL_OR_PROPRIETARY
