@@ -26,6 +26,7 @@ sig
 
   val pretty : Format.formatter -> t -> unit
   val append : t -> t -> t (* Does not check that the appened offset fits *)
+  val add_index : (Cil_types.exp -> Int_val.t) -> t -> Cil_types.exp -> t
   val join : t -> t -> t
   val of_cil_offset : (Cil_types.exp -> Int_val.t) -> Cil_types.typ -> Cil_types.offset -> t
   val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t

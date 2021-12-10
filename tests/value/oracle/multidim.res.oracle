@@ -9,7 +9,7 @@
   z[0..3] ∈ {0}
   nondet ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from multidim.c:162.
+  Called from multidim.c:173.
 [eva] multidim.c:39: 
   Frama_C_domain_show_each:
   x : # cvalue: .t1[0].f ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
@@ -86,7 +86,7 @@
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from multidim.c:163.
+  Called from multidim.c:174.
 [eva] multidim.c:55: starting to merge loop iterations
 [eva:alarm] multidim.c:58: Warning: check got status unknown.
 [eva] multidim.c:59: 
@@ -96,7 +96,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from multidim.c:164.
+  Called from multidim.c:175.
 [eva] multidim.c:64: starting to merge loop iterations
 [eva] multidim.c:63: starting to merge loop iterations
 [kernel] multidim.c:65: 
@@ -137,7 +137,7 @@
 [kernel] multidim.c:66: more than 1(28) elements to enumerate. Approximating.
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from multidim.c:165.
+  Called from multidim.c:176.
 [eva:loop-unroll:partial] multidim.c:81: loop not completely unrolled
 [eva] multidim.c:81: starting to merge loop iterations
 [eva] multidim.c:83: starting to merge loop iterations
@@ -148,7 +148,7 @@
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from multidim.c:166.
+  Called from multidim.c:177.
 [eva] multidim.c:96: starting to merge loop iterations
 [eva] multidim.c:106: 
   Frama_C_domain_show_each:
@@ -163,7 +163,7 @@
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
-  Called from multidim.c:167.
+  Called from multidim.c:178.
 [eva] multidim.c:114: Trace partitioning superposing up to 100 states
 [eva] multidim.c:118: 
   Frama_C_domain_show_each:
@@ -181,7 +181,7 @@
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
-  Called from multidim.c:168.
+  Called from multidim.c:179.
 [eva] multidim.c:134: starting to merge loop iterations
 [kernel] multidim.c:136: 
   more than 1(1000) locations to update in array. Approximating.
@@ -215,6 +215,15 @@
 [kernel] multidim.c:136: more than 1(1000) elements to enumerate. Approximating.
 [kernel] multidim.c:137: more than 1(1000) elements to enumerate. Approximating.
 [eva] Done for function main7
+[eva] computing for function main8 <- main.
+  Called from multidim.c:180.
+[eva] multidim.c:165: starting to merge loop iterations
+[eva] multidim.c:169: 
+  Frama_C_domain_show_each:
+  t : # cvalue: {0; 1}
+      # multidim: { [0 .. 9] = {1}, [10 .. 9] = {0} }
+[eva] Recording results for main8
+[eva] Done for function main8
 [eva] Recording results for main
 [eva] done for function main
 [kernel] multidim.c:50: more than 1(28) elements to enumerate. Approximating.
@@ -245,6 +254,9 @@
   t[0].typ ∈ {1; 2} or UNINITIALIZED
    {[0].val; [1..999]} ∈ [--..--] or UNINITIALIZED
   j ∈ [0..999]
+[eva:final-states] Values at end of function main8:
+  t[0..9] ∈ {0; 1}
+  p ∈ {{ &t[0] }}
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   z[0..3] ∈ [--..--]
@@ -276,6 +288,8 @@
 [kernel] multidim.c:141: 
   more than 1(1000) dependencies to update. Approximating.
 [from] Done for function main7
+[from] Computing for function main8
+[from] Done for function main8
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -300,6 +314,8 @@
   NO EFFECTS
 [from] Function main7:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+[from] Function main8:
+  NO EFFECTS
 [from] Function main:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   z[0..3] FROM \nothing
@@ -332,6 +348,10 @@
     Frama_C_entropy_source; t[0..999]; i; j
 [inout] Inputs for function main7:
     Frama_C_entropy_source; nondet
+[inout] Out (internal) for function main8:
+    t[0..9]; p; i
+[inout] Inputs for function main8:
+    \nothing
 [inout] Out (internal) for function main:
     Frama_C_entropy_source; z[0..3]
 [inout] Inputs for function main:

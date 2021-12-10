@@ -158,6 +158,17 @@ void main7() {
   }
 }
 
+void main8(void) {
+  int t[10] = {0};
+  int *p = t;
+
+  for (int i = 0 ; i < 10 ; i++) {
+    *(p + i) = 1;
+  }
+
+  Frama_C_domain_show_each(t);
+}
+
 void main(s x) {
   main1(x);
   main2();
@@ -166,4 +177,5 @@ void main(s x) {
   main5();
   main6();
   main7();
+  main8();
 }

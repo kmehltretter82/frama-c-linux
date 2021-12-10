@@ -796,11 +796,23 @@ struct
     and u2 = Option.get (Ival.max_int i2) in
     Const (Integer.max u1 u2)
 
+  exception NoBound
+
   let lower_const ~oracle b =
-    Const (Option.get (Ival.min_int (to_ival ~oracle b))) (* TODO: handle exception *)
+    match Ival.min_int (to_ival ~oracle b) with
+    | Some l -> Const l
+    | None -> (* TODO: handle exception *)
+      Kernel.feedback ~current:true "cannot retrieve lower bound for %a in %a"
+        pretty b Ival.pretty (to_ival ~oracle b);
+      raise NoBound
 
   let upper_const ~oracle b =
-    Const (Option.get (Ival.min_int (to_ival ~oracle b))) (* TODO: handle exception *)
+    match Ival.max_int (to_ival ~oracle b) with
+    | Some u -> Const u
+    | None -> (* TODO: handle exception *)
+      Kernel.feedback ~current:true "cannot retrieve upper bound for %a in %a"
+        pretty b Ival.pretty (to_ival ~oracle b);
+      raise NoBound
 
   let _operators oracle = operators (cmp ~oracle)
 end
@@ -1526,15 +1538,23 @@ struct
           let array_value = A.unify ~oracle aux a1.array_value a2.array_value in
           Array { a1 with array_value }
         | Array a, Raw b ->
-          let array_value' = raw_to_array ~oracle Left a.array_value b in
-          let array_value = A.unify ~oracle aux a.array_value array_value' in
-          debug demerging "emerging unification between@.%a and@.%a result:@.%a" A.pretty a.array_value A.pretty array_value' A.pretty array_value;
-          Array { a with array_value }
+          begin try
+              let array_value' = raw_to_array ~oracle Left a.array_value b in
+              let array_value = A.unify ~oracle aux a.array_value array_value' in
+              debug demerging "emerging unification between@.%a and@.%a result:@.%a" A.pretty a.array_value A.pretty array_value' A.pretty array_value;
+              Array { a with array_value }
+            with Bound.NoBound ->
+              weak_erase b m1 (* TODO: find a better way to handle this case *)
+          end
         | Raw b, Array a ->
-          let array_value' = raw_to_array ~oracle Right a.array_value b in
-          let array_value = A.unify ~oracle aux array_value' a.array_value in
-          debug demerging "emerging unification between@.%a and@.%a result:@.%a" A.pretty array_value' A.pretty a.array_value A.pretty array_value;
-          Array { a with array_value }
+          begin try
+              let array_value' = raw_to_array ~oracle Right a.array_value b in
+              let array_value = A.unify ~oracle aux array_value' a.array_value in
+              debug demerging "emerging unification between@.%a and@.%a result:@.%a" A.pretty array_value' A.pretty a.array_value A.pretty array_value;
+              Array { a with array_value }
+            with Bound.NoBound ->
+              weak_erase b m2 (* TODO: find a better way to handle this case *)
+          end
         | Struct s1, Struct s2 when are_structs_compatible s1 s2 ->
           let struct_value = S.unify aux s1.struct_value s2.struct_value in
           Struct { s1 with struct_value }

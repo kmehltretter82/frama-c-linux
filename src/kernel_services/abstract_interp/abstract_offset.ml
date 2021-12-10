@@ -25,7 +25,8 @@ sig
   type t
 
   val pretty : Format.formatter -> t -> unit
-  val append : t -> t -> t (* Does not check that the appened offset fits *)
+  val append : t -> t -> t
+  val add_index : (Cil_types.exp -> Int_val.t) -> t -> Cil_types.exp -> t
   val join : t -> t -> t
   val of_cil_offset : (Cil_types.exp -> Int_val.t) -> Cil_types.typ -> Cil_types.offset -> t
   val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t
@@ -62,6 +63,28 @@ struct
     | NoOffset _t -> o2
     | Field (fi, s) -> Field (fi, append s o2)
     | Index (e, i, t, s) -> Index (e, i, t, append s o2)
+
+  let add_index oracle base exp =
+    let rec aux = function
+      | NoOffset _ -> assert false
+      | Field (fi, s) -> Field (fi, aux s)
+      | Index (e, i, t, (NoOffset _ as s)) ->
+        begin
+          let idx' = Int_val.add i (oracle exp) in
+          let loc = Cil_datatype.Location.unknown in
+          let e = match e with (* If i is singleton, we can use this as the index expression *)
+            | None when Int_val.is_singleton i ->
+              let loc = Cil_datatype.Location.unknown in
+              Some (Cil.kinteger64 ~loc (Int_val.project_int i))
+            | e -> e
+          in
+          let e' = Option.map (Fun.flip (Cil.mkBinOp ~loc Cil_types.PlusA) exp) e in
+          (* TODO: is idx inside bounds ? *)
+          Index (e', idx', t, s)
+        end
+      | Index (e, i, t, s) -> Index (e, i, t, aux s)
+    in
+    aux base
 
   let rec join o1 o2 =
     match o1, o2 with
@@ -127,7 +150,7 @@ struct
             let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
             if Integer.is_zero elem_size then (* array of elements of size 0 *)
               if Int_val.is_zero ival then (* the whole range is valid *)
-                let range = (array_range array_size) in
+                let range = array_range array_size in
                 Extlib.the ~exn:Abstract_interp.Error_Top range, ival
               else (* Non-zero offset cannot represent anything here *)
                 raise Abstract_interp.Error_Top
@@ -244,6 +267,11 @@ struct
     match o1, o2 with
     | `Top, _ | _, `Top -> `Top
     | `Value o1, `Value o2 -> `Value (TypedOffset.append o1 o2)
+
+  let add_index oracle base exp =
+    match base with
+    | `Top -> `Top
+    | `Value base -> `Value (TypedOffset.add_index oracle base exp)
 
   let join o1 o2 =
     match o1, o2 with

@@ -141,13 +141,23 @@ struct
     | Var vi ->
       Map.singleton (Base.of_varinfo vi) offset
     | Mem exp ->
+      let exp, index = match exp.enode with
+        | BinOp (PlusPI, e1, e2, _typ) ->
+          e1, Some e2
+        | _ -> exp, None
+      in
       let add base ival map =
         let offset' : Offset.t =
           match Base.typeof base with
           | None -> `Top
           | Some base_typ ->
             let typ = Cil.typeOf_pointed (Cil.typeOf exp) in
-            Offset.(append (of_ival ~base_typ ~typ ival) offset)
+            let base_offset = Offset.of_ival ~base_typ ~typ ival in
+            let base_offset = match index with
+              | None -> base_offset
+              | Some exp -> Offset.add_index oracle' base_offset exp
+            in
+            Offset.append base_offset offset
         in
         Map.add base offset' map
       in
