@@ -254,6 +254,13 @@ int __builtin_popcountl (unsigned long x);
  */
 int __builtin_popcountll (unsigned long long x);
 
+// According to the GCC docs
+// (https://gcc.gnu.org/onlinedocs/gcc/_005f_005fsync-Builtins.html),
+// this creates a 'full memory barrier'; we do not model the concurrency
+// aspects yet.
+/*@ assigns \nothing; */
+void __sync_synchronize(void);
+
 __END_DECLS
 
 __POP_FC_STDLIB

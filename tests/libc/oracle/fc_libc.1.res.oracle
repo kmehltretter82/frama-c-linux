@@ -8691,6 +8691,9 @@ int __builtin_popcountl(unsigned long x);
  */
 int __builtin_popcountll(unsigned long long x);
 
+/*@ assigns \nothing; */
+void __sync_synchronize(void);
+
 /*@ logic 𝔹 bit_test(ℤ x, ℤ pos) = (x & (1 << pos)) ≢ 0;
 
 */

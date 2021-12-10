@@ -647,7 +647,9 @@ let initGccBuiltins () : unit =
           true;
       | None -> ())
     atomic_instances;
-  add ~prefix:"" "__sync_synchronize" voidType [] true
+  (* __sync_synchronize has been declared non-variadic and a spec was added
+     to __fc_gcc_builtins.h; to avoid issues with pretty-printing, we removed
+     it from this list. *)
 ;;
 
 (* Builtins related to va_list. Added to all non-msvc machdeps, because
