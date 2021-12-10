@@ -614,7 +614,7 @@ module SymbolicPath =
     (struct
       let option_name = "-add-symbolic-path"
       let module_name = "SymbolicPath"
-      let arg_name = "name_1:path_1,...,name_n:path_n"
+      let arg_name = "path_1:name_1,...,path_n:name_n"
       let existence = Filepath.Indifferent
       let file_kind = "directory"
       let help =
