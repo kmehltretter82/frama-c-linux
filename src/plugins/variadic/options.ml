@@ -42,3 +42,9 @@ module Strict = Self.True
                   distinct integral types which have the same size and \
                   signedness"
     end)
+
+let wkey_libc = Self.register_warn_category "libc"
+let wkey_format = Self.register_warn_category "libc:format"
+let wkey_libc_framac = Self.register_warn_category "libc:frama-c"
+let wkey_prototype = Self.register_warn_category "prototype"
+let wkey_typing = Self.register_warn_category "typing"

@@ -16,8 +16,8 @@
   Declaration of variadic function dprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:590: 
   Declaration of variadic function asprintf.
-[variadic] printf.c:8: Warning: Multiple usage of flag '-'.
-[variadic] printf.c:8: Warning: 
+[variadic:libc:format] printf.c:8: Warning: Multiple usage of flag '-'.
+[variadic:libc:format] printf.c:8: Warning: 
   Flag ' ' and conversion specififer e are not compatibles.
 [variadic] printf.c:8: 
   Fallback translation of call printf to a call to the specialized version printf_fallback_1.

@@ -23,3 +23,9 @@
 module Self : Plugin.General_services
 module Enabled : Parameter_sig.Bool
 module Strict : Parameter_sig.Bool
+
+val wkey_format: Self.warn_category
+val wkey_libc: Self.warn_category
+val wkey_libc_framac: Self.warn_category
+val wkey_prototype: Self.warn_category
+val wkey_typing: Self.warn_category

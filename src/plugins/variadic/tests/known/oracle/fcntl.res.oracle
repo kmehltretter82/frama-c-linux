@@ -9,7 +9,7 @@
   Translating call to the specialized version fcntl(int, int, int).
 [variadic] fcntl.c:10: 
   Translating call to the specialized version fcntl(int, int, struct flock *).
-[variadic] fcntl.c:16: Warning: 
+[variadic:prototype] fcntl.c:16: Warning: 
   No matching prototype found for this call to fcntl.
   Expected candidates:
          fcntl(int, int)
@@ -23,7 +23,7 @@
   Translating call to the specialized version fcntl(int, int).
 [variadic] fcntl.c:24: 
   Translating call to the specialized version fcntl(int, int, struct flock *).
-[variadic] fcntl.c:28: Warning: 
+[variadic:prototype] fcntl.c:28: Warning: 
   No matching prototype found for this call to fcntl.
   Expected candidates:
          fcntl(int, int)

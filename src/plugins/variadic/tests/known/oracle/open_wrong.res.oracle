@@ -3,7 +3,7 @@
 [variadic] FRAMAC_SHARE/libc/fcntl.h:124: Declaration of variadic function open.
 [variadic] FRAMAC_SHARE/libc/fcntl.h:131: 
   Declaration of variadic function openat.
-[variadic] open_wrong.c:13: Warning: 
+[variadic:prototype] open_wrong.c:13: Warning: 
   No matching prototype found for this call to open.
   Expected candidates:
          open(char const *, int)

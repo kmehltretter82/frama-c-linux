@@ -7,9 +7,9 @@
   Translating call to the specialized version openat(int, char const *, int, mode_t).
 [variadic] openat.c:9: 
   Translating call to the specialized version openat(int, char const *, int, mode_t).
-[variadic] openat.c:9: Warning: 
+[variadic:typing] openat.c:9: Warning: 
   Incorrect type for argument 4. The argument will be cast from int to mode_t.
-[variadic] openat.c:10: Warning: 
+[variadic:prototype] openat.c:10: Warning: 
   No matching prototype found for this call to openat.
   Expected candidates:
          openat(int, char const *, int)
