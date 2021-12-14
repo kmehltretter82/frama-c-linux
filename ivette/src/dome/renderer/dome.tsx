@@ -42,7 +42,7 @@ import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
-import { remote, ipcRenderer } from 'electron';
+import { Menu, MenuItem, ipcRenderer } from 'electron';
 import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
@@ -168,7 +168,7 @@ export function onCommand(
 }
 
 ipcRenderer.on('dome.ipc.command', (_event, argv, wdir) => {
-  SYS.SET_COMMAND(argv, wdir);
+  SYS.setCommandLine(argv, wdir);
   System.emitter.emit('dome.command', argv, wdir);
 });
 
@@ -467,7 +467,6 @@ export function popupMenu(
   items: PopupMenuItem[],
   callback?: (item: string | undefined) => void,
 ) {
-  const { Menu, MenuItem } = remote;
   const menu = new Menu();
   let selected = '';
   let kid = 0;
@@ -489,7 +488,7 @@ export function popupMenu(
     }
   });
   const job = callback ? () => callback(selected) : undefined;
-  menu.popup({ window: remote.getCurrentWindow(), callback: job });
+  menu.popup({ callback: job });
 }
 
 // --------------------------------------------------------------------------

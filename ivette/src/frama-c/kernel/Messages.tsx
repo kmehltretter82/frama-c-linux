@@ -53,7 +53,7 @@ interface Search {
 }
 
 type KindFilter = Record<logkind, boolean>;
-type PluginFilter = {[key: string]: boolean};
+type PluginFilter = { [key: string]: boolean };
 type EmitterFilter = {
   kernel: boolean;
   plugins: PluginFilter;
@@ -80,23 +80,23 @@ const kindFilter: KindFilter = {
 /* The fields must be exactly the short names of Frama-C plugins used in
    messages. They are all shown by default. */
 const pluginFilter: PluginFilter = {
-  aorai: true,
-  dive: true,
+  'aorai': true,
+  'dive': true,
   'e-acsl': true,
-  eva: true,
-  from: true,
-  impact: true,
-  inout: true,
-  metrics: true,
-  nonterm: true,
-  pdg: true,
-  report: true,
-  rte: true,
-  scope: true,
-  server: true,
-  slicing: true,
-  variadic: true,
-  wp: true,
+  'eva': true,
+  'from': true,
+  'impact': true,
+  'inout': true,
+  'metrics': true,
+  'nonterm': true,
+  'pdg': true,
+  'report': true,
+  'rte': true,
+  'scope': true,
+  'server': true,
+  'slicing': true,
+  'variadic': true,
+  'wp': true,
 };
 
 const emitterFilter = {
@@ -168,7 +168,7 @@ function searchString(search: string | undefined, msg: string) {
 
 function filterSearched(search: Search, msg: Message) {
   return (searchString(search.message, msg.message) &&
-          searchCategory(search.category, msg.category));
+    searchCategory(search.category, msg.category));
 }
 
 function filterFunction(filter: Filter, kf: string | undefined, msg: Message) {
@@ -179,19 +179,14 @@ function filterFunction(filter: Filter, kf: string | undefined, msg: Message) {
 
 function filterMessage(filter: Filter, kf: string | undefined, msg: Message) {
   return (filterFunction(filter, kf, msg) &&
-          filterSearched(filter.search, msg) &&
-          filterKind(filter.kind, msg) &&
-          filterEmitter(filter.emitter, msg));
+    filterSearched(filter.search, msg) &&
+    filterKind(filter.kind, msg) &&
+    filterEmitter(filter.emitter, msg));
 }
 
 // --------------------------------------------------------------------------
 // --- Filters panel and ratio
 // --------------------------------------------------------------------------
-
-function Checkbox(p: Forms.CheckboxFieldProps) {
-  const lbl = p.label.charAt(0).toUpperCase() + p.label.slice(1).toLowerCase();
-  return <Forms.CheckboxField label={lbl} state={p.state} />;
-}
 
 function Section(p: Forms.SectionProps) {
   const settings = `ivette.messages.filter.${p.label}`;
@@ -202,28 +197,42 @@ function Section(p: Forms.SectionProps) {
   );
 }
 
-function MessageFilter(props: {filter: State<Filter>}) {
+function MessageKindCheckbox(props: {
+  kind: logkind,
+  kindState: Forms.FieldState<KindFilter>,
+}) {
+  const { kind, kindState } = props;
+  const label = kind.charAt(0).toUpperCase + kind.slice(1).toLowerCase();
+  const state = Forms.useProperty(kindState, kind);
+  return <Forms.CheckboxField label={label} state={state} />;
+}
+
+function PluginCheckbox(props: {
+  plugin: string,
+  pluginState: Forms.FieldState<PluginFilter>,
+}) {
+  const label = props.plugin.toUpperCase();
+  const state = Forms.useProperty(props.pluginState, props.plugin);
+  return <Forms.CheckboxField label={label} state={state} />;
+}
+
+function MessageFilter(props: { filter: State<Filter> }) {
   const state = Forms.useValid(props.filter);
   const search = Forms.useProperty(state, 'search');
   const categoryState = Forms.useProperty(search, 'category');
   const messageState = Forms.useProperty(search, 'message');
-
-  const kind = Forms.useProperty(state, 'kind');
-  const kindState = (key: logkind) => Forms.useProperty(kind, key);
+  const kindState = Forms.useProperty(state, 'kind');
   const kindCheckboxes =
-    Object.keys(kindFilter).map((key) => (
-      <Checkbox key={key} label={key} state={kindState(key as logkind)} />
+    Object.keys(kindFilter).map((k) => (
+      <MessageKindCheckbox key={k} kind={k as logkind} kindState={kindState} />
     ));
-
-  const emitter = Forms.useProperty(state, 'emitter');
-  function EmitterCheckbox(p: {key: 'kernel' | 'others'}) {
-    return <Checkbox label={p.key} state={Forms.useProperty(emitter, p.key)} />;
-  }
-  const plugin = Forms.useProperty(emitter, 'plugins');
-  const pluginState = (key: string) => Forms.useProperty(plugin, key);
+  const emitterState = Forms.useProperty(state, 'emitter');
+  const kernelState = Forms.useProperty(emitterState, 'kernel');
+  const othersState = Forms.useProperty(emitterState, 'others');
+  const pluginState = Forms.useProperty(emitterState, 'plugins');
   const pluginCheckboxes =
-    Object.keys(pluginFilter).map((key) => (
-      <Checkbox key={key} label={key} state={pluginState(key)} />
+    Object.keys(pluginFilter).map((p) => (
+      <PluginCheckbox key={p} plugin={p} pluginState={pluginState} />
     ));
 
   return (
@@ -239,29 +248,29 @@ function MessageFilter(props: {filter: State<Filter>}) {
           state={categoryState}
           placeholder="Category"
           title={'Search in message category.\n'
-               + 'Use -<name> to hide some categories.'}
+            + 'Use -<name> to hide some categories.'}
         />
         <Forms.TextField
           label="Message"
           state={messageState}
           placeholder="Message"
           title={'Search in message text.\n'
-               + 'Case-insensitive by default.\n'
-               + 'Use "text" for an exact case-sensitive search.'}
+            + 'Case-insensitive by default.\n'
+            + 'Use "text" for an exact case-sensitive search.'}
         />
       </Section>
       <Section label="Kind">
-        { kindCheckboxes }
+        {kindCheckboxes}
       </Section>
       <Section label="Emitter">
         <div className="message-emitter-category">
-          { EmitterCheckbox({ key: 'kernel' }) }
+          <Forms.CheckboxField label='Kernel' state={kernelState} />
         </div>
         <div className="message-emitter-category">
-          { pluginCheckboxes }
+          {pluginCheckboxes}
         </div>
         <div className="message-emitter-category">
-          { EmitterCheckbox({ key: 'others' }) }
+          <Forms.CheckboxField label='Others' state={othersState} />
         </div>
       </Section>
     </Forms.Page>

@@ -8,3 +8,6 @@ coverage
 lib
 # don't lint the generated API
 api
+
+# ZMQ Server is not working (yet)
+src/frama-c/client_zmq.ts

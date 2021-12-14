@@ -25,9 +25,8 @@
 // --------------------------------------------------------------------------
 
 /* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/camelcase */
 
-import { app, ipcMain, BrowserWindow, Menu, MenuItem, shell } from 'electron';
+import { app, ipcMain, BrowserWindow, Menu, MenuItem, shell, KeyboardEvent } from 'electron';
 import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------
@@ -48,14 +47,31 @@ function reloadWindow() {
   });
 }
 
-function toggleFullScreen(_item: MenuItem, focusedWindow: BrowserWindow) {
+function toggleFullScreen(
+  _item: MenuItem,
+  focusedWindow: BrowserWindow | undefined,
+  _evt: KeyboardEvent,
+) {
   if (focusedWindow)
     focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
 }
 
-function toggleDevTools(_item: MenuItem, focusedWindow: BrowserWindow) {
+function toggleDevTools(
+  _item: MenuItem,
+  focusedWindow: BrowserWindow | undefined,
+  _evt: KeyboardEvent,
+) {
   if (focusedWindow)
     focusedWindow.webContents.toggleDevTools();
+}
+
+function userFindInfo(
+  _item: MenuItem,
+  focusedWindow: BrowserWindow | undefined,
+  _evt: KeyboardEvent,
+) {
+  if (focusedWindow)
+    focusedWindow.webContents.send('dome.ipc.find');
 }
 
 // --------------------------------------------------------------------------
@@ -131,9 +147,9 @@ const macosAppMenuItems = (appName: string): MenuSpec => [
 // --- File Menu Items (platform dependant)
 // --------------------------------------------------------------------------
 
-const fileMenuItems_custom: MenuSpec = [];
+const fileMenuItemsCustom: MenuSpec = [];
 
-const fileMenuItems_linux: MenuSpec = [
+const fileMenuItemsLinux: MenuSpec = [
   {
     label: 'Preferences…',
     click: () => ipcMain.emit('dome.menu.settings'),
@@ -154,7 +170,7 @@ const fileMenuItems_linux: MenuSpec = [
 // --- Edit Menu Items
 // --------------------------------------------------------------------------
 
-const editMenuItems_custom: MenuSpec = [];
+const editMenuItemsCustom: MenuSpec = [];
 
 const editMenuItems: MenuSpec = [
   {
@@ -188,11 +204,7 @@ const editMenuItems: MenuSpec = [
   {
     label: 'Find',
     accelerator: 'CmdOrCtrl+F',
-    click: (
-      _item: Electron.MenuItem,
-      window: Electron.BrowserWindow,
-      _evt: Electron.KeyboardEvent,
-    ) => window.webContents.send('dome.ipc.find'),
+    click: userFindInfo,
   },
 ];
 
@@ -200,7 +212,7 @@ const editMenuItems: MenuSpec = [
 // --- View Menu Items
 // --------------------------------------------------------------------------
 
-const viewMenuItems_custom: MenuSpec = [];
+const viewMenuItemsCustom: MenuSpec = [];
 
 const viewMenuItems = (osx: boolean): MenuSpec => [
   {
@@ -222,7 +234,7 @@ const viewMenuItems = (osx: boolean): MenuSpec => [
 // --- Window Menu Items
 // --------------------------------------------------------------------------
 
-const windowMenuItems_linux: MenuSpec = [
+const windowMenuItemsLinux: MenuSpec = [
   {
     label: 'Minimize',
     accelerator: 'CmdOrCtrl+M',
@@ -241,7 +253,7 @@ const windowMenuItems_linux: MenuSpec = [
   },
 ];
 
-const windowMenuItems_macos: MenuSpec = windowMenuItems_linux.concat([
+const windowMenuItemsMacos: MenuSpec = windowMenuItemsLinux.concat([
   {
     label: 'Bring All to Front',
     role: 'front',
@@ -292,9 +304,9 @@ const customItems = new Map<string, ItemEntry>();
 
 function findMenu(label: string): MenuSpec | undefined {
   switch (label) {
-    case 'File': return fileMenuItems_custom;
-    case 'Edit': return editMenuItems_custom;
-    case 'View': return viewMenuItems_custom;
+    case 'File': return fileMenuItemsCustom;
+    case 'Edit': return editMenuItemsCustom;
+    case 'View': return viewMenuItemsCustom;
     default: {
       const cm = customMenus.find((m) => m.label === label);
       return cm && cm.submenu;
@@ -317,12 +329,12 @@ export interface CustomMenuItem extends MenuItemSpec {
   key?: string;
 }
 
-export interface Separator {
+export interface SeparatorItem {
   menu: string;
   type: 'separator';
 }
 
-export type CustomMenuItemSpec = Separator | CustomMenuItem;
+export type CustomMenuItemSpec = SeparatorItem | CustomMenuItem;
 
 export function addMenuItem(custom: CustomMenuItemSpec) {
   const menuSpec = findMenu(custom.menu);
@@ -361,10 +373,10 @@ export function addMenuItem(custom: CustomMenuItemSpec) {
     } else {
       if (!spec.click && !spec.role)
         spec.click = (
-          _item: Electron.MenuItem,
-          window: Electron.BrowserWindow,
-          _evt: Electron.KeyboardEvent,
-        ) => window.webContents.send('dome.ipc.menu.clicked', id);
+          _item: MenuItem,
+          window: BrowserWindow | undefined,
+          _evt: KeyboardEvent,
+        ) => window?.webContents.send('dome.ipc.menu.clicked', id);
       customItems.set(id, { spec });
       menuSpec.push(spec);
     }
@@ -392,13 +404,13 @@ function template(): CustomMenu[] {
       return ([] as CustomMenu[]).concat(
         [
           { label: app.name, submenu: macosAppMenuItems(app.name) },
-          { label: 'File', submenu: fileMenuItems_custom },
-          { label: 'Edit', submenu: concatSep(editMenuItems, editMenuItems_custom) },
-          { label: 'View', submenu: concatSep(viewMenuItems_custom, viewMenuItems(true)) },
+          { label: 'File', submenu: fileMenuItemsCustom },
+          { label: 'Edit', submenu: concatSep(editMenuItems, editMenuItemsCustom) },
+          { label: 'View', submenu: concatSep(viewMenuItemsCustom, viewMenuItems(true)) },
         ],
         customMenus,
         [
-          { label: 'Window', role: 'window', submenu: windowMenuItems_macos },
+          { label: 'Window', role: 'window', submenu: windowMenuItemsMacos },
           { label: 'Help', role: 'help', submenu: helpMenuItems },
         ],
       );
@@ -407,13 +419,13 @@ function template(): CustomMenu[] {
     default:
       return ([] as CustomMenu[]).concat(
         [
-          { label: 'File', submenu: concatSep(fileMenuItems_custom, fileMenuItems_linux) },
-          { label: 'Edit', submenu: concatSep(editMenuItems, editMenuItems_custom) },
-          { label: 'View', submenu: concatSep(viewMenuItems_custom, viewMenuItems(false)) },
+          { label: 'File', submenu: concatSep(fileMenuItemsCustom, fileMenuItemsLinux) },
+          { label: 'Edit', submenu: concatSep(editMenuItems, editMenuItemsCustom) },
+          { label: 'View', submenu: concatSep(viewMenuItemsCustom, viewMenuItems(false)) },
         ],
         customMenus,
         [
-          { label: 'Window', submenu: windowMenuItems_linux },
+          { label: 'Window', submenu: windowMenuItemsLinux },
           { label: 'Help', submenu: helpMenuItems },
         ],
       );
@@ -445,9 +457,9 @@ export function install() {
 
 // Called by reload above
 function reset() {
-  fileMenuItems_custom.length = 0;
-  editMenuItems_custom.length = 0;
-  viewMenuItems_custom.length = 0;
+  fileMenuItemsCustom.length = 0;
+  editMenuItemsCustom.length = 0;
+  viewMenuItemsCustom.length = 0;
   customMenus.length = 0;
   customItems.clear();
   install();

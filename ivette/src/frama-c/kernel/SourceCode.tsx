@@ -90,10 +90,14 @@ export default function SourceCode() {
     });
 
   // Updating the buffer content.
-  const errorMsg = () => { D.error(`Fail to load source code file ${file}`); };
-  const onError = () => { if (file) errorMsg(); return ''; };
-  const read = () => System.readFile(file).catch(onError);
-  const text = React.useMemo(read, [file, onError]);
+  const text = React.useMemo(async () => {
+    const onError = () => {
+      if (file)
+        D.error(`Fail to load source code file ${file}`);
+      return '';
+    };
+    return System.readFile(file).catch(onError);
+  }, [file]);
   const { result } = Dome.usePromise(text);
   React.useEffect(() => buffer.setValue(result), [buffer, result]);
 
@@ -115,29 +119,31 @@ export default function SourceCode() {
   type position = CodeMirror.Position;
   type editor = CodeMirror.Editor;
 
-  async function select(editor: editor, event: MouseEvent) {
-    const pos = editor.coordsChar({ left: event.x, top: event.y });
-    if (file === '' || !pos) return;
-    const arg = [file, pos.line + 1, pos.ch + 1];
-    Server
-      .send(getMarkerAt, arg)
-      .then(([fct, marker]) => {
-        if (fct || marker) {
-          const location = { fct, marker } as States.Location;
-          selected.current = location;
-          updateSelection({ location });
-        }
-      })
-      .catch((err) => {
-        D.error(`Failed to get marker from source file position: ${err}`);
-        Status.setMessage({
-          text: 'Failed request to Frama-C server',
-          kind: 'error',
+  const selectCallback = React.useCallback(
+    async function select(editor: editor, event: MouseEvent) {
+      const pos = editor.coordsChar({ left: event.x, top: event.y });
+      if (file === '' || !pos) return;
+      const arg = [file, pos.line + 1, pos.ch + 1];
+      Server
+        .send(getMarkerAt, arg)
+        .then(([fct, marker]) => {
+          if (fct || marker) {
+            const location = { fct, marker } as States.Location;
+            selected.current = location;
+            updateSelection({ location });
+          }
+        })
+        .catch((err) => {
+          D.error(`Failed to get marker from source file position: ${err}`);
+          Status.setMessage({
+            text: 'Failed request to Frama-C server',
+            kind: 'error',
+          });
         });
-      });
-  }
+    },
+    [file, updateSelection],
+  );
 
-  const selectCallback = React.useCallback(select, [file]);
   React.useEffect(() => {
     buffer.forEach((cm) => cm.on('mousedown', selectCallback));
     return () => buffer.forEach((cm) => cm.off('mousedown', selectCallback));

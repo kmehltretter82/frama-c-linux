@@ -37,7 +37,7 @@ import * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { ChildProcess } from 'child_process';
-import { client } from './client_zmq';
+import { client } from './client_socket';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -100,7 +100,7 @@ export enum Stage {
   /** Server is restarting. */
   RESTARTING = 'RESTARTING',
   /** Server is off upon failure. */
-  FAILURE = 'FAILURE'
+  FAILURE = 'FAILURE',
 }
 
 export interface OkStatus {
@@ -248,9 +248,10 @@ export async function start() {
         await _launch();
         _status(okStatus(Stage.ON));
       } catch (error) {
-        D.error(error.toString());
-        buffer.append(error.toString(), '\n');
-        _exit(error);
+        const msg = '' + error;
+        D.error(msg);
+        buffer.append(msg, '\n');
+        _exit(msg);
       }
       return;
     case Stage.HALTING:
@@ -480,14 +481,14 @@ async function _launch() {
     if (signal) {
       // [signal] is non-null.
       buffer.log('Signal:', signal);
-      const error = new Error(`Process terminated by the signal ${signal}`);
+      const error = `Process terminated by the signal ${signal}`;
       _exit(error);
       return;
     }
     // [signal] is null, hence [code] is non-null (cf. NodeJS doc).
     if (code) {
       buffer.log('Exit:', code);
-      const error = new Error(`Process exited with code ${code}`);
+      const error = `Process exited with code ${code}`;
       _exit(error);
     } else {
       // [code] is zero: normal exit w/o error.
@@ -543,14 +544,14 @@ async function _shutdown() {
   await killingPromise;
 }
 
-function _exit(error?: Error) {
+function _exit(error?: string) {
   _reset();
   client.disconnect();
   process = undefined;
   if (status.stage === Stage.RESTARTING) {
     setImmediate(start);
   } else if (error) {
-    _status(errorStatus(error.toString()));
+    _status(errorStatus(error));
   } else {
     _status(okStatus(Stage.OFF));
   }
@@ -565,6 +566,7 @@ class SignalHandler {
   event: Dome.Event;
   active: boolean;
   listen: boolean;
+  handler: _.DebouncedFunc<() => void>;
 
   constructor(id: string) {
     this.id = id;
@@ -572,7 +574,7 @@ class SignalHandler {
     this.active = false;
     this.listen = false;
     this.sigon = this.sigon.bind(this);
-    this.sigoff = _.debounce(this.sigoff.bind(this), 1000);
+    this.sigoff = this.handler = _.debounce(this.sigoff.bind(this), 1000);
     this.unplug = this.unplug.bind(this);
   }
 
@@ -617,6 +619,7 @@ class SignalHandler {
 
   unplug() {
     this.listen = false;
+    this.handler.cancel();
   }
 }
 
@@ -633,9 +636,7 @@ function _signal(id: string): SignalHandler {
   return s;
 }
 
-client.onSignal((id: string) => {
-  _signal(id).event.emit();
-})
+client.onSignal((id: string) => { _signal(id).event.emit(); });
 
 // --- External API
 
@@ -686,7 +687,6 @@ READY.on(() => {
 SHUTDOWN.on(() => {
   signals.forEach((h: SignalHandler) => {
     h.unplug();
-    (h.sigoff as unknown as _.Cancelable).cancel();
   });
 });
 
@@ -701,7 +701,7 @@ export enum RqKind {
   /** Used to write data into the Frama-C server. */
   SET = 'SET',
   /** Used to make the Frama-C server execute a task. */
-  EXEC = 'EXEC'
+  EXEC = 'EXEC',
 }
 
 /** Server signal. */
@@ -726,7 +726,7 @@ export type GetRequest<In, Out> = Request<RqKind.GET, In, Out>;
 export type SetRequest<In, Out> = Request<RqKind.SET, In, Out>;
 export type ExecRequest<In, Out> = Request<RqKind.EXEC, In, Out>;
 
-export interface Killable<Data> extends Promise<Data> {
+export interface Response<Data> extends Promise<Data> {
   kill?: () => void;
 }
 
@@ -739,23 +739,30 @@ export interface Killable<Data> extends Promise<Data> {
 export function send<In, Out>(
   request: Request<RqKind, In, Out>,
   param: In,
-): Killable<Out> {
+): Response<Out> {
   if (!isRunning()) return Promise.reject(new Error('Server not running'));
   if (!request.name) return Promise.reject(new Error('Undefined request'));
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
-  const promise: Killable<Out> = new Promise<Out>((resolve, reject) => {
+  const response: Response<Out> = new Promise<Out>((resolve, reject) => {
     const decodedResolve = (js: Json.json) => {
-      const result = Json.jTry(request.output)(js);
-      resolve(result);
+      try {
+        const result = request.output(js);
+        if (result !== undefined)
+          resolve(result);
+        else
+          reject();
+      } catch (err) {
+        reject(err);
+      }
     };
     pending[rid] = [decodedResolve, reject];
   });
-  promise.kill = () => {
+  response.kill = () => {
     if (pending[rid]) client.kill(rid);
   };
   client.send(request.kind, rid, request.name, param);
-  return promise;
+  return response;
 }
 
 client.onData((id: string, data: Json.json) => {

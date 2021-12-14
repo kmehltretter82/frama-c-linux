@@ -21,17 +21,18 @@
 /* ************************************************************************ */
 
 import Net from 'net';
+import { Debug } from 'dome';
 import Emitter from 'events';
 import { json } from 'dome/data/json';
 import { Client } from './client';
+
+const D = new Debug('SocketServer');
 
 // --------------------------------------------------------------------------
 // --- Frama-C Server API
 // --------------------------------------------------------------------------
 
 class SocketClient implements Client {
-
-  constructor() { }
 
   events = new Emitter();
   running = false;
@@ -45,7 +46,7 @@ class SocketClient implements Client {
       this.socket.destroy();
     }
     this.socket = Net.createConnection(sockaddr, () => {
-      console.log('Socket server connected');
+      D.log('Client connected');
       this.running = true;
       this._flush();
     });
@@ -53,14 +54,14 @@ class SocketClient implements Client {
     this.socket.on('end', () => this.disconnect());
     this.socket.on('data', (data: Buffer) => this._receive(data));
     this.socket.on('error', (err: Error) => {
-      console.warn('Socket error', err);
+      D.warn('Socket error', err);
     });
   }
 
   disconnect(): void {
     this.queue = [];
     if (this.socket) {
-      console.log('Socket disconnected');
+      D.log('Client disconnected');
       this.socket.destroy();
       this.socket = undefined;
     }
@@ -73,19 +74,34 @@ class SocketClient implements Client {
   }
 
   /** Signal ON */
-  sigOn(id: string): void { this.queue.push({ cmd: 'SIGON', id }); this._flush(); }
+  sigOn(id: string): void {
+    this.queue.push({ cmd: 'SIGON', id });
+    this._flush();
+  }
 
   /** Signal ON */
-  sigOff(id: string): void { this.queue.push({ cmd: 'SIGOFF', id }); this._flush(); }
+  sigOff(id: string): void {
+    this.queue.push({ cmd: 'SIGOFF', id });
+    this._flush();
+  }
 
   /** Kill Request */
-  kill(id: string): void { this.queue.push({ cmd: 'KILL', id }); this._flush(); }
+  kill(id: string): void {
+    this.queue.push({ cmd: 'KILL', id });
+    this._flush();
+  }
 
   /** Polling */
-  poll(): void { this.queue.push('POLL'); this._flush(); }
+  poll(): void {
+    this.queue.push('POLL');
+    this._flush();
+  }
 
   /** Shutdown the server */
-  shutdown(): void { this.queue.push('SHUTDOWN'); this._flush(); }
+  shutdown(): void {
+    this.queue.push('SHUTDOWN');
+    this._flush();
+  }
 
   /** Request data callback */
   onData(callback: (id: string, data: json) => void): void {
@@ -163,7 +179,7 @@ class SocketClient implements Client {
 
   _receive(chunk: Buffer) {
     this.buffer = Buffer.concat([this.buffer, chunk]);
-    while (1) {
+    while (true) {
       const data = this._fetch();
       if (data === undefined) break;
       try {
@@ -176,12 +192,12 @@ class SocketClient implements Client {
             case 'REJECTED': this.events.emit('REJECT', cmd.id); break;
             case 'SIGNAL': this.events.emit('SIGNAL', cmd.id); break;
             default:
-              console.log('Unknown command', cmd);
+              D.warn('Unknown command', cmd);
           }
         } else
-          console.log('Misformed data', data);
+          D.warn('Misformed data', data);
       } catch (err) {
-        console.log('Misformed JSON', data, err);
+        D.warn('Misformed JSON', data, err);
       }
     }
   }

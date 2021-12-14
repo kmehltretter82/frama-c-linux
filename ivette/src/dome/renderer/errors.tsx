@@ -60,7 +60,7 @@ interface CatchState {
 /**
    React Error Boundaries.
  */
-export class Catch extends React.Component<CatchProps, CatchState, {}> {
+export class Catch extends React.Component<CatchProps, CatchState, unknown> {
 
   constructor(props: CatchProps) {
     super(props);

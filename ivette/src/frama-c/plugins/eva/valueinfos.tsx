@@ -48,9 +48,10 @@ interface StmtProps {
 }
 
 export function Stmt(props: StmtProps) {
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+
   const { stmt, marker, short } = props;
   if (!stmt) return null;
-  const markersInfo = States.useSyncArray(Ast.markerInfo);
   const line = markersInfo.getData(marker)?.sloc?.line;
   const filename = markersInfo.getData(marker)?.sloc?.base;
   const title = markersInfo.getData(stmt)?.descr;

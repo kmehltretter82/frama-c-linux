@@ -68,7 +68,7 @@ export function SideBar(props: SideBarProps) {
 // --------------------------------------------------------------------------
 
 export type BadgeElt = undefined | null | string | number | React.ReactNode;
-export type Badge = BadgeElt | BadgeElt[];
+export type Badges = BadgeElt | BadgeElt[];
 
 const makeBadgeElt = (elt: BadgeElt): React.ReactNode => {
   if (elt === undefined || elt === null) return null;
@@ -81,7 +81,7 @@ const makeBadgeElt = (elt: BadgeElt): React.ReactNode => {
   }
 };
 
-const makeBadge = (elt: Badge): React.ReactNode => {
+const makeBadge = (elt: Badges): React.ReactNode => {
   if (Array.isArray(elt))
     return elt.map(makeBadgeElt);
   return makeBadgeElt(elt);
@@ -120,7 +120,7 @@ export interface SectionProps {
   /** Disabled sections are made unvisible. */
   disabled?: boolean;
   /** Badge summary (only visible when folded). */
-  summary?: Badge;
+  summary?: Badges;
   /** Right-click callback. */
   onContextMenu?: () => void;
   /** Section contents. */
@@ -182,7 +182,7 @@ export interface ItemProps {
   /** Item tooltip text. */
   title?: string;
   /** Badge. */
-  badge?: Badge;
+  badge?: Badges;
   /** Enabled item. */
   enabled?: boolean;
   /** Disabled item (dimmed). */

@@ -36,9 +36,9 @@ import Emitter from 'events';
 import Exec from 'child_process';
 import fspath from 'path';
 import fs from 'fs';
-import { app, remote } from 'electron';
+import { app } from 'electron';
 
-declare const __static: string;
+declare const staticPath: string;
 
 // --------------------------------------------------------------------------
 // --- Platform Specificities
@@ -121,7 +121,7 @@ export function doExit() {
 let COMMAND_WDIR = '.';
 let COMMAND_ARGV: string[] = [];
 
-function SET_COMMAND(argv: string[], wdir: string) {
+function setCommandLine(argv: string[], wdir: string) {
   COMMAND_ARGV = argv;
   COMMAND_WDIR = wdir;
 }
@@ -130,22 +130,20 @@ function SET_COMMAND(argv: string[], wdir: string) {
 // --- User's Directories
 // --------------------------------------------------------------------------
 
-const appProxy = app || remote.app;
-
 /** Returns user's home directory. */
-export function getHome() { return appProxy.getPath('home'); }
+export function getHome() { return app.getPath('home'); }
 
 /** Returns user's desktop directory. */
-export function getDesktop() { return appProxy.getPath('desktop'); }
+export function getDesktop() { return app.getPath('desktop'); }
 
 /** Returns user's documents directory. */
-export function getDocuments() { return appProxy.getPath('documents'); }
+export function getDocuments() { return app.getPath('documents'); }
 
 /** Returns user's downloads directory. */
-export function getDownloads() { return appProxy.getPath('downloads'); }
+export function getDownloads() { return app.getPath('downloads'); }
 
 /** Returns temporary directory. */
-export function getTempDir() { return appProxy.getPath('temp'); }
+export function getTempDir() { return app.getPath('temp'); }
 
 /**
    Working directory (Application Window).
@@ -185,7 +183,7 @@ export function getArguments() { return COMMAND_ARGV; }
     configuration.
 */
 export function getStatic(...path: string[]) {
-  return fspath.join(__static, ...path);
+  return fspath.join(staticPath, ...path);
 }
 
 // --------------------------------------------------------------------------
@@ -308,14 +306,10 @@ export function exists(path: string) {
 /**
    Reads a textual file contents.
 
-   Promisified
-   [Node `fs.readFile`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_readfile_path_options_callback)
-   using `UTF-8` encoding.
+   Promisified `fs.readFile` using `utf-8` encoding.
  */
 export function readFile(path: string): Promise<string> {
-  return new Promise((result, reject) => {
-    fs.readFile(path, 'UTF-8', (err, data) => (err ? reject(err) : result(data)));
-  });
+  return fs.promises.readFile(path, { encoding: 'utf-8' });
 }
 
 // --------------------------------------------------------------------------
@@ -325,14 +319,10 @@ export function readFile(path: string): Promise<string> {
 /**
    Writes a textual content in a file.
 
-   Promisified
-   [Node `fs.writeFile`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_writefile_file_data_options_callback)
-   using `UTF-8` encoding.
+   Promisified `fs.writeFile` using `utf-8` encoding.
  */
-export function writeFile(path: string, content: string): Promise<void> {
-  return new Promise((result, reject) => {
-    fs.writeFile(path, content, 'UTF-8', (err) => (err ? reject(err) : result()));
-  });
+export async function writeFile(path: string, content: string): Promise<void> {
+  return fs.promises.writeFile(path, content, { encoding: 'utf-8' });
 }
 
 // --------------------------------------------------------------------------
@@ -344,14 +334,10 @@ export function writeFile(path: string, content: string): Promise<void> {
    @param srcPath - the source file path
    @param tgtPath - the target file path
 
-   Promisified
-   [Node `fs.copyFile`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_copyfile_src_dest_flags_callback)
-   using `UTF-8` encoding.
+   Promisified `fs.copyFile`.
  */
-export function copyFile(srcPath: string, tgtPath: string): Promise<void> {
-  return new Promise((result, reject) => {
-    fs.copyFile(srcPath, tgtPath, (err) => (err ? reject(err) : result()));
-  });
+export async function copyFile(srcPath: string, tgtPath: string): Promise<void> {
+  return fs.promises.copyFile(srcPath, tgtPath);
 }
 
 // --------------------------------------------------------------------------
@@ -362,24 +348,15 @@ export function copyFile(srcPath: string, tgtPath: string): Promise<void> {
    Reads a directory.
    @returns directory contents (local names)
 
-   Promisified
-   [Node `fs.readdir`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_readdir_path_options_callback).
+   Promisified `fs.readdir`.
 
-   Uses `UTF-8` encoding to obtain (relative) file names instead of byte buffers. On MacOS, `.DS_Store` entries
-   are filtered out.
+   Uses `utf-8` encoding to obtain (relative) file names instead of byte buffers.
+   On MacOS, `.DS_Store` entries are filtered out.
 */
-export function readDir(path: string): Promise<string[]> {
+export async function readDir(path: string): Promise<string[]> {
   const filterDir = (f: string) => f !== '.DS_Store';
-  return new Promise((result, reject) => {
-    fs.readdir(
-      path,
-      { encoding: 'UTF-8', withFileTypes: true },
-      (err: NodeJS.ErrnoException | null, files: fs.Dirent[]) => {
-        if (err) reject(err);
-        else result(files.map((fn) => fn.name).filter(filterDir));
-      },
-    );
-  });
+  const entries = await fs.promises.readdir(path, { encoding: 'utf-8', withFileTypes: true });
+  return entries.map((fn) => fn.name).filter(filterDir);
 }
 
 // --------------------------------------------------------------------------
@@ -441,7 +418,8 @@ async function rmDirRec(path: string): Promise<void> {
   try {
     const stats = fs.statSync(path);
     if (stats.isFile()) {
-      return remove(path);
+      await remove(path);
+      return;
     }
     if (stats.isDirectory()) {
       const rmDirSub = (name: string) => {
@@ -506,9 +484,9 @@ atExit(() => {
 export type StdPipe = { path?: string | undefined; mode?: number; pipe?: boolean };
 export type StdOptions = undefined | 'null' | 'ignore' | 'pipe' | StdPipe;
 
-type stdio = { io: number | 'pipe' | 'ignore' | 'ipc'; fd?: number };
+type StdIO = { io: number | 'pipe' | 'ignore' | 'ipc'; fd?: number };
 
-function stdSpec(spec: StdOptions, isOutput: boolean): stdio {
+function stdSpec(spec: StdOptions, isOutput: boolean): StdIO {
   switch (spec) {
     case undefined:
       return { io: isOutput ? 'pipe' : 'ignore' };
@@ -533,7 +511,7 @@ interface Readable {
 
 function pipeTee(std: Readable, fd: number) {
   if (!fd) return;
-  const out = fs.createWriteStream('<ignored>', { fd, encoding: 'UTF-8' });
+  const out = fs.createWriteStream('<ignored>', { fd, encoding: 'utf-8' });
   out.on('error', (err) => {
     console.warn('[Dome] can not pipe:', err);
     std.unpipe(out);
@@ -627,11 +605,11 @@ export function spawn(
     const err = child.stderr;
 
     if (out && stdout.fd) {
-      out.setEncoding('UTF-8');
+      out.setEncoding('utf-8');
       pipeTee(out, stdout.fd);
     }
     if (err && stderr.fd) {
-      err.setEncoding('UTF-8');
+      err.setEncoding('utf-8');
       pipeTee(err, stderr.fd);
     }
 
@@ -651,7 +629,7 @@ const WINDOW_PREFERENCES_ARGV = '--dome-preferences-window';
 // --------------------------------------------------------------------------
 
 export default {
-  SET_COMMAND,
+  setCommandLine,
   WINDOW_APPLICATION_ARGV,
   WINDOW_PREFERENCES_ARGV,
 };

@@ -174,9 +174,9 @@ ipcMain.on('dome.ipc.settings.sync', windowSyncSettings);
 // --- Patching Settings
 // --------------------------------------------------------------------------
 
-type patch = { key: string; value: any };
+type Patch = { key: string; value: any };
 
-function applyPatches(data: Store, args: patch[]) {
+function applyPatches(data: Store, args: Patch[]) {
   args.forEach(({ key, value }) => {
     if (value === null) {
       delete data[key];
@@ -186,7 +186,7 @@ function applyPatches(data: Store, args: patch[]) {
   });
 }
 
-function applyWindowSettings(event: IpcMainEvent, args: patch[]) {
+function applyWindowSettings(event: IpcMainEvent, args: Patch[]) {
   const handle = WindowHandles.get(event.sender.id);
   if (handle) {
     applyPatches(handle.settings, args);
@@ -194,7 +194,7 @@ function applyWindowSettings(event: IpcMainEvent, args: patch[]) {
   }
 }
 
-function applyStorageSettings(event: IpcMainEvent, args: patch[]) {
+function applyStorageSettings(event: IpcMainEvent, args: Patch[]) {
   const handle = WindowHandles.get(event.sender.id);
   if (handle) {
     applyPatches(handle.storage, args);
@@ -202,7 +202,7 @@ function applyStorageSettings(event: IpcMainEvent, args: patch[]) {
   }
 }
 
-function applyGlobalSettings(event: IpcMainEvent, args: patch[]) {
+function applyGlobalSettings(event: IpcMainEvent, args: Patch[]) {
   applyPatches(obtainGlobalSettings(), args);
   BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
     const contents = w.webContents;
@@ -274,7 +274,7 @@ function getURL() {
   return `file://${__dirname}/index.html`;
 }
 
-function navigateURL(sender: Electron.webContents) {
+function navigateURL(sender: Electron.WebContents) {
   return (event: Electron.Event, url: string) => {
     event.preventDefault();
     const href = new URL(url);

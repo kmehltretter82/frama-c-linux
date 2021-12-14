@@ -113,6 +113,8 @@ function byVisibleTag(lmin: number, lmax: number) {
 // --- Buffer
 // --------------------------------------------------------------------------
 
+type TextMarker = CodeMirror.TextMarker<CodeMirror.MarkerRange>;
+
 export interface RichTextBufferProps {
 
   /**
@@ -184,7 +186,7 @@ export class RichTextBuffer extends Emitter {
   private cssmarkers = new Map<string, CSSMarker>();
 
   // Indexed by marker user identifier
-  private textmarkers = new Map<string, CodeMirror.TextMarker[]>();
+  private textmarkers = new Map<string, TextMarker[]>();
 
   private decorator?: Decorator;
   private edited = false;
@@ -327,7 +329,7 @@ export class RichTextBuffer extends Emitter {
 
   /** Lookup for the text markers associated with a marker identifier.
       Remove the marked tags from the buffered tag array. */
-  findTextMarker(id: string): CodeMirror.TextMarker[] {
+  findTextMarker(id: string): TextMarker[] {
     this.doFlushText();
     this.bufferedTags.forEach((tg, idx) => {
       if (tg?.id === id) {
@@ -470,8 +472,10 @@ export class RichTextBuffer extends Emitter {
       let line = Infinity;
       this.findTextMarker(position).forEach((tm) => {
         const rg = tm.find();
-        const ln = rg.from.line;
-        if (ln < line) line = ln;
+        if (rg && rg.from) {
+          const ln = rg.from.line;
+          if (ln < line) line = ln;
+        }
       });
       if (line !== Infinity)
         this.emit('scroll', line);
@@ -497,7 +501,7 @@ export class RichTextBuffer extends Emitter {
 
   private onChange(
     _editor: CodeMirror.Editor,
-    change: CodeMirror.EditorChangeLinkedList,
+    change: CodeMirror.EditorChange,
   ) {
     if (change.origin !== 'buffer') {
       this.setEdited(true);

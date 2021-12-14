@@ -72,7 +72,7 @@ Server.onReady(async () => {
     currentProject = current.id;
     PROJECT.emit();
   } catch (error) {
-    D.error(`Fail to retrieve the current project. ${error.toString()}`);
+    D.error(`Fail to retrieve the current project. ${error}`);
   }
 });
 
@@ -116,7 +116,7 @@ export async function setProject(project: string) {
       currentProject = project;
       PROJECT.emit();
     } catch (error) {
-      D.error(`Fail to set the current project. ${error.toString()}`);
+      D.error(`Fail to set the current project. ${error}`);
     }
   }
 }
@@ -171,7 +171,7 @@ export function useRequest<In, Out>(
         const r = await Server.send(rq, params);
         update(r);
       } catch (error) {
-        D.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
+        D.error(`Fail in useRequest '${rq.name}'. ${error}`);
         update(options.onError);
       }
     } else {
@@ -300,7 +300,7 @@ class SyncState<A> {
     } catch (error) {
       D.error(
         `Fail to set value of SyncState '${this.handler.name}'.`,
-        `${error.toString()}`,
+        `${error}`,
       );
     }
   }
@@ -314,7 +314,7 @@ class SyncState<A> {
     } catch (error) {
       D.error(
         `Fail to update SyncState '${this.handler.name}'.`,
-        `${error.toString()}`,
+        `${error}`,
       );
     }
   }
@@ -407,7 +407,7 @@ class SyncArray<K, A> {
     } catch (error) {
       D.error(
         `Fail to retrieve the value of syncArray '${this.handler.name}.`,
-        `${error.toString()}`,
+        `${error}`,
       );
     } finally {
       this.fetching = false;
@@ -426,7 +426,7 @@ class SyncArray<K, A> {
     } catch (error) {
       D.error(
         `Fail to set reload of syncArray '${this.handler.name}'.`,
-        `${error.toString()}`,
+        `${error}`,
       );
     }
   }
@@ -477,7 +477,7 @@ export function useSyncArray<K, A>(
 ): CompactModel<K, A> {
   Dome.useUpdate(PROJECT);
   const st = lookupSyncArray(arr);
-  React.useEffect(st.update);
+  React.useEffect(() => st.update(), [st]);
   Server.useSignal(arr.signal, st.fetch);
   useModel(st.model, sync);
   return st.model;
@@ -778,7 +778,7 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
 /** Resets the selected locations. */
 export async function resetSelection() {
   GlobalSelection.setValue(emptySelection);
-  const main = await Server.send(Ast.getMainFunction, { });
+  const main = await Server.send(Ast.getMainFunction, {});
   // If the selection has already been modified, do not change it.
   if (main && GlobalSelection.getValue() === emptySelection) {
     GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });

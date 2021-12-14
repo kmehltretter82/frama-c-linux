@@ -34,17 +34,17 @@ import { GlobalState, useGlobalState } from 'dome/data/states';
 export type kind =
   'none' | 'info' | 'warning' | 'error' | 'success' | 'progress';
 
-export interface Message {
+export interface MessageProps {
   kind: kind;
   text: string;
   title?: string;
 }
 
-const emptyMessage: Message = { text: '', kind: 'none' };
+const emptyMessage: MessageProps = { text: '', kind: 'none' };
 
 const GlobalMessage = new GlobalState(emptyMessage);
 
-export function setMessage(message: Message) {
+export function setMessage(message: MessageProps) {
   GlobalMessage.setValue(message);
 }
 
@@ -54,11 +54,11 @@ export default function Message() {
   return (
     <>
       <Toolbars.Space />
-      { message.kind === 'progress' && <LED status="active" blink /> }
-      { message.kind === 'success' && <Icon id="CHECK" fill="green" /> }
-      { message.kind === 'warning' && <Icon id="ATTENTION" /> }
-      { message.kind === 'error' && <Icon id="CROSS" fill="red" /> }
-      { message.kind === 'info' && <Icon id="CIRC.INFO" /> }
+      {message.kind === 'progress' && <LED status="active" blink />}
+      {message.kind === 'success' && <Icon id="CHECK" fill="green" />}
+      {message.kind === 'warning' && <Icon id="ATTENTION" />}
+      {message.kind === 'error' && <Icon id="CROSS" fill="red" />}
+      {message.kind === 'info' && <Icon id="CIRC.INFO" />}
       <Code label={message.text} title={message.title} />
       <Toolbars.Space />
       <IconButton

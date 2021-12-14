@@ -32,6 +32,8 @@
 
 import { DEVEL } from 'dome/system';
 
+/* eslint-disable @typescript-eslint/naming-convention, no-shadow */
+
 export type json =
   undefined | null | boolean | number | string |
   json[] | { [key: string]: json };

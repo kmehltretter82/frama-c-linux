@@ -206,8 +206,8 @@ interface PopupItem {
 type PopupMenu = ('separator' | PopupItem)[];
 
 type Cmap<A> = Map<string, A>;
-type Cprops = ColProps<any>;
 type ColProps<R> = ColumnProps<R, any>;
+type Cprops = ColProps<any>;
 
 // --------------------------------------------------------------------------
 // --- Column Utilities
@@ -239,8 +239,8 @@ function makeRowGetter<Key, Row>(model?: Model<Key, Row>) {
 }
 
 function makeDataGetter(
-  getter: ((row: any, dataKey: string) => any) = defaultGetter,
   dataKey: string,
+  getter: ((row: any, dataKey: string) => any) = defaultGetter,
 ): TableCellDataGetter {
   return (({ rowData }) => {
     try {
@@ -644,7 +644,7 @@ class TableState<Key, Row> {
   computeGetter(id: string, dataKey: string, props: Cprops) {
     const current = this.getter.get(id);
     if (current) return current;
-    const dataGetter = makeDataGetter(props.getter, dataKey);
+    const dataGetter = makeDataGetter(dataKey, props.getter);
     this.getter.set(id, dataGetter);
     return dataGetter;
   }

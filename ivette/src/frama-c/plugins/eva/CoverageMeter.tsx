@@ -22,17 +22,17 @@
 
 import React from 'react';
 
-export interface Coverage {
+export interface CoverageProps {
   reachable: number;
   dead: number;
 }
 
-export function percent(coverage: Coverage): string {
+export function percent(coverage: CoverageProps): string {
   const q = coverage.reachable / (coverage.reachable + coverage.dead);
   return `${(q * 100).toFixed(1)}%`;
 }
 
-export default function (props: {coverage: Coverage}) {
+export default function(props: { coverage: CoverageProps }) {
   const { reachable, dead } = props.coverage;
   const total = reachable + dead;
 

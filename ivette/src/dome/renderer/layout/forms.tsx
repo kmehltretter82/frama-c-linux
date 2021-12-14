@@ -45,12 +45,12 @@ import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
 import { Checkbox, Radio, Select as SelectMenu } from 'dome/controls/buttons';
 
-export type Error =
+export type FieldError =
   | undefined | boolean | string
-  | { [key: string]: Error } | Error[];
-export type Checker<A> = (value: A) => boolean | Error;
-export type Callback<A> = (value: A, error: Error) => void;
-export type FieldState<A> = [A, Error, Callback<A>];
+  | { [key: string]: FieldError } | FieldError[];
+export type Checker<A> = (value: A) => boolean | FieldError;
+export type Callback<A> = (value: A, error: FieldError) => void;
+export type FieldState<A> = [A, FieldError, Callback<A>];
 
 /* --------------------------------------------------------------------------*/
 /* --- State Errors Utilities                                             ---*/
@@ -66,28 +66,28 @@ export function inRange(
 export function validate<A>(
   value: A,
   checker: undefined | Checker<A>,
-): Error {
+): FieldError {
   if (checker) {
     try {
       const r = checker(value);
       if (r === undefined || r === true) return undefined;
       return r;
     } catch (err) {
-      return err.toString() || false;
+      return '' + err || false;
     }
   }
   return undefined;
 }
 
-export function isValid(err: Error): boolean { return !err; }
+export function isValid(err: FieldError): boolean { return !err; }
 
-type ObjectError = { [key: string]: Error };
+type ObjectError = { [key: string]: FieldError };
 
-function isObjectError(err: Error): err is ObjectError {
+function isObjectError(err: FieldError): err is ObjectError {
   return typeof err === 'object' && !Array.isArray(err);
 }
 
-function isArrayError(err: Error): err is Error[] {
+function isArrayError(err: FieldError): err is FieldError[] {
   return Array.isArray(err);
 }
 
@@ -99,7 +99,7 @@ function isValidObject(err: ObjectError): boolean {
   return true;
 }
 
-function isValidArray(err: Error[]): boolean {
+function isValidArray(err: FieldError[]): boolean {
   for (let k = 0; k < err.length; k++) {
     if (!isValid(err[k])) return false;
   }
@@ -117,8 +117,8 @@ export function useState<A>(
   onChange?: Callback<A>,
 ): FieldState<A> {
   const [value, setValue] = React.useState<A>(defaultValue);
-  const [error, setError] = React.useState<Error>(undefined);
-  const setState = React.useCallback((newValue: A, newError: Error) => {
+  const [error, setError] = React.useState<FieldError>(undefined);
+  const setState = React.useCallback((newValue: A, newError: FieldError) => {
     const localError = validate(newValue, checker) || newError;
     setValue(newValue);
     setError(localError);
@@ -133,9 +133,9 @@ export function useValid<A>(
 ): FieldState<A> {
   const [value, setValue] = state;
   const [local, setLocal] = React.useState(value);
-  const [error, setError] = React.useState<Error>(undefined);
+  const [error, setError] = React.useState<FieldError>(undefined);
   const update = React.useCallback(
-    (newValue: A, newError: Error) => {
+    (newValue: A, newError: FieldError) => {
       setLocal(newValue);
       setError(newError);
       if (!newError) setValue(newValue);
@@ -162,7 +162,7 @@ export function useDefined<A>(
 ): FieldState<A | undefined> {
   const [value, error, setState] = state;
   const update = React.useCallback(
-    (newValue: A | undefined, newError: Error) => {
+    (newValue: A | undefined, newError: FieldError) => {
       if (newValue !== undefined) {
         setState(newValue, newError);
       }
@@ -182,7 +182,7 @@ export function useRequired<A>(
   const [value, error, setState] = state;
   const cache = React.useRef(value);
   const update = React.useCallback(
-    (newValue: A | undefined, newError: Error) => {
+    (newValue: A | undefined, newError: FieldError) => {
       if (newValue === undefined) {
         setState(cache.current, onError || 'Required field');
       } else {
@@ -202,7 +202,7 @@ export function useChecker<A>(
   checker?: Checker<A>,
 ): FieldState<A> {
   const [value, error, setState] = state;
-  const update = React.useCallback((newValue: A, newError: Error) => {
+  const update = React.useCallback((newValue: A, newError: FieldError) => {
     const localError = validate(newValue, checker) || newError;
     setState(newValue, localError);
   }, [checker, setState]);
@@ -235,11 +235,11 @@ export function useFilter<A, B>(
 
   const [value, error, setState] = state;
   const [localValue, setLocalValue] = React.useState(defaultValue);
-  const [localError, setLocalError] = React.useState<Error>(undefined);
+  const [localError, setLocalError] = React.useState<FieldError>(undefined);
   const [dangling, setDangling] = React.useState(false);
 
   const update = React.useCallback(
-    (newValue: B, newError: Error) => {
+    (newValue: B, newError: FieldError) => {
       try {
         const outValue = output(newValue);
         setLocalValue(newValue);
@@ -250,7 +250,7 @@ export function useFilter<A, B>(
         }
       } catch (err) {
         setLocalValue(newValue);
-        setLocalError(newError || err.toString() || 'Invalid value');
+        setLocalError(newError || err ? '' + err : 'Invalid value');
         setDangling(true);
       }
     }, [output, setState, setLocalValue, setLocalError],
@@ -262,7 +262,7 @@ export function useFilter<A, B>(
   try {
     return [input(value), error, update];
   } catch (err) {
-    return [localValue, err.toString() || 'Invalid input', update];
+    return [localValue, err ? '' + err : 'Invalid input', update];
   }
 
 }
@@ -284,12 +284,12 @@ export function useLatency<A>(
   const update = React.useMemo(() => {
     if (period > 0) {
       const propagate = debounce(
-        (lateValue: A, lateError: Error) => {
+        (lateValue: A, lateError: FieldError) => {
           setState(lateValue, lateError);
           setDangling(false);
         }, period,
       );
-      return (newValue: A, newError: Error) => {
+      return (newValue: A, newError: FieldError) => {
         setLocalValue(newValue);
         setLocalError(newError);
         setDangling(true);
@@ -315,7 +315,7 @@ export function useProperty<A, K extends keyof A>(
   checker?: Checker<A[K]>,
 ): FieldState<A[K]> {
   const [value, error, setState] = state;
-  const update = React.useCallback((newProp: A[K], newError: Error) => {
+  const update = React.useCallback((newProp: A[K], newError: FieldError) => {
     const newValue = { ...value, [property]: newProp };
     const objError = isObjectError(error) ? error : {};
     const propError = validate(newProp, checker) || newError;
@@ -334,7 +334,7 @@ export function useIndex<A>(
   checker?: Checker<A>,
 ): FieldState<A> {
   const [array, error, setState] = state;
-  const update = React.useCallback((newValue: A, newError: Error) => {
+  const update = React.useCallback((newValue: A, newError: FieldError) => {
     const newArray = array.slice();
     newArray[index] = newValue;
     const localError = isArrayError(error) ? error.slice() : [];
@@ -436,7 +436,7 @@ export interface WarningProps {
   /** Short warning message (displayed on hover). */
   warning?: string;
   /** Error details (if a string is provided, in tooltip). */
-  error?: Error;
+  error?: FieldError;
   /** Label offset. */
   offset?: number;
 }
@@ -494,7 +494,7 @@ export interface SectionProps extends FilterProps, Children {
   /** Warning Error (when unfolded). */
   warning?: string;
   /** Associated Error. */
-  error?: Error;
+  error?: FieldError;
   /** Fold/Unfold settings. */
   settings?: string;
   /** Fold/Unfold state (defaults to false). */
@@ -550,7 +550,7 @@ export interface GenericFieldProps extends FilterProps, Children {
   /** Warning message (in case of error). */
   onError?: string;
   /** Error (if any). */
-  error?: Error;
+  error?: FieldError;
 }
 
 let FIELDID = 0;
@@ -626,24 +626,13 @@ export interface FieldProps<A> extends FilterProps {
 }
 
 type InputEvent = { target: { value: string } };
-type InputState = [string, Error, (evt: InputEvent) => void];
+type InputState = [string, FieldError, (evt: InputEvent) => void];
 
 function useChangeEvent(setState: Callback<string>) {
   return React.useCallback(
     (evt: InputEvent) => { setState(evt.target.value, undefined); },
     [setState],
   );
-}
-
-function useTextInputField(
-  props: TextFieldProps,
-  defaultLatency: number,
-): InputState {
-  const checked = useChecker(props.state, props.checker);
-  const period = props.latency ?? defaultLatency;
-  const [value, error, setState] = useLatency(checked, period);
-  const onChange = useChangeEvent(setState);
-  return [value || '', error, onChange];
 }
 
 /* --------------------------------------------------------------------------*/
@@ -656,6 +645,17 @@ export interface TextFieldProps extends FieldProps<string | undefined> {
   className?: string;
   style?: React.CSSProperties;
   latency?: number;
+}
+
+function useTextInputField(
+  props: TextFieldProps,
+  defaultLatency: number,
+): InputState {
+  const checked = useChecker(props.state, props.checker);
+  const period = props.latency ?? defaultLatency;
+  const [value, error, setState] = useLatency(checked, period);
+  const onChange = useChangeEvent(setState);
+  return [value || '', error, onChange];
 }
 
 /**
