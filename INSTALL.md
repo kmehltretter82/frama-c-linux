@@ -123,19 +123,21 @@ by Frama-C, they must of course be installed as well.
 ### Installing Frama-C on Windows via WSL
 
 Frama-C is developed on Linux, but it can be installed on Windows using the
-following tools:
+Windows Subsystem for Linux (WSL).
 
-- Windows Subsystem for Linux
-- VcXsrv (X server for Windows)
+**Note**: if you have WSL2 (Windows 11), you can run the graphical interface
+          directly, thanks to WSLg. If you are using WSL 1, you need to install
+          an X server for Windows, such as VcXsrv
+          (see section "Running the Frama-C GUI on WSL").
 
 #### Prerequisites: WSL + a Linux distribution
 
-For enabling WSL on Windows, you may follow these instructions
+To enable WSL on Windows, you may follow these instructions
 (we tested with Ubuntu 20.04 LTS;
 other distributions/versions should also work,
 but the instructions below may require some modifications).
 
-https://docs.microsoft.com/en-us/windows/wsl/install-win10
+https://docs.microsoft.com/en-us/windows/wsl/install
 
 Notes:
 
@@ -146,13 +148,13 @@ Notes:
 
 #### Installing opam and Frama-C on WSL
 
-For installing opam, some packages are required. The following commands can be
+To install opam, some packages are required. The following commands can be
 run to update the system and install those packages:
 
 ```
 sudo apt update
 sudo apt upgrade
-sudo apt install make m4 gcc opam yaru-theme-gtk yaru-theme-icon
+sudo apt install make m4 gcc opam gnome-icon-theme
 ```
 
 Then opam can be set up using these commands:
@@ -164,9 +166,10 @@ opam install -y depext
 ```
 
 You can force a particular Ocaml version during `opam init` by using the option
-`-c <version>` if needed.
+`-c <version>` if needed. For instance, you can try installing the OCaml version
+mentioned in the [reference configuration](reference-configuration.md).
 
-Now, for installing Frama-C, run the following commands that will use `apt` to
+Now, to install Frama-C, run the following commands, which will use `apt` to
 install the dependencies of the opam packages and then install them:
 
 ```
@@ -176,9 +179,15 @@ opam depext --install -y frama-c
 
 #### Running the Frama-C GUI on WSL
 
-Microsoft WSL does not support graphical user interfaces directly. If you want
-to run Frama-C's GUI, you need to install an X server, such as VcXsrv or
-Cygwin/X. We present below how to install VcXsrv.
+If you have WSL2: a known issue with Frama-C 24.0 (Chromium), lablgtk3 and
+Wayland require prefixing the command running the Frama-C GUI with
+`GDK_BACKEND=x11`, as in:
+
+    GDK_BACKEND=x11 frama-c-gui <options>
+
+If you have WSL 1: WSL 1 does not support graphical user interfaces directly.
+If you want to run Frama-C's GUI, you need to install an X server,
+such as VcXsrv or Cygwin/X. We present below how to install VcXsrv.
 
 First, install VcXsrv from:
 
