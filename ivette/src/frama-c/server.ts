@@ -449,11 +449,9 @@ async function _launch() {
   buffer.append('\n');
 
   if (!sockaddr) {
-    const tmp = System.getTempDir();
-    const pid = System.getPID();
-    const socketfile = System.join(tmp, `ivette.frama-c.${pid}.io`);
-    System.atExit(() => System.remove(socketfile));
-    sockaddr = `ipc://${socketfile}`;
+    const tmp = Dome.getTempDir();
+    const pid = Dome.getPID();
+    sockaddr = System.join(tmp, `ivette.frama-c.${pid}.io`);
   }
   if (!cwd) cwd = System.getWorkingDir();
   logout = logout && System.join(cwd, logout);

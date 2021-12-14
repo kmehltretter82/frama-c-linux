@@ -41,7 +41,7 @@ class ZmqClient implements Client {
 
   /** Server CLI */
   commandLine(sockaddr: string, params: string[]): string[] {
-    return ['-server-zmq', sockaddr, '-then'].concat(params);
+    return ['-server-zmq', `ipc://${sockaddr}`, '-then'].concat(params);
   }
 
   /** Connection */

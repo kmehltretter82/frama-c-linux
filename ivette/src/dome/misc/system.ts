@@ -36,9 +36,6 @@ import Emitter from 'events';
 import Exec from 'child_process';
 import fspath from 'path';
 import fs from 'fs';
-import { app } from 'electron';
-
-declare const staticPath: string;
 
 // --------------------------------------------------------------------------
 // --- Platform Specificities
@@ -126,25 +123,6 @@ function setCommandLine(argv: string[], wdir: string) {
   COMMAND_WDIR = wdir;
 }
 
-// --------------------------------------------------------------------------
-// --- User's Directories
-// --------------------------------------------------------------------------
-
-/** Returns user's home directory. */
-export function getHome() { return app.getPath('home'); }
-
-/** Returns user's desktop directory. */
-export function getDesktop() { return app.getPath('desktop'); }
-
-/** Returns user's documents directory. */
-export function getDocuments() { return app.getPath('documents'); }
-
-/** Returns user's downloads directory. */
-export function getDownloads() { return app.getPath('downloads'); }
-
-/** Returns temporary directory. */
-export function getTempDir() { return app.getPath('temp'); }
-
 /**
    Working directory (Application Window).
 
@@ -174,17 +152,6 @@ export function getPID() { return process.pid; }
    See also [[dome.onCommand]]
 */
 export function getArguments() { return COMMAND_ARGV; }
-
-/** Returns path of static assets.
-
-    Returns the path to the associated `./static/<...path>` of your
-    application. The `./static/` directory is automatically packed
-    into your application by Dome thanks to `electron-webpack` default
-    configuration.
-*/
-export function getStatic(...path: string[]) {
-  return fspath.join(staticPath, ...path);
-}
 
 // --------------------------------------------------------------------------
 // --- File Join

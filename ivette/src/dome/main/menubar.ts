@@ -24,9 +24,15 @@
 // --- Menus & MenuBar Management
 // --------------------------------------------------------------------------
 
-/* eslint-disable max-len */
-
-import { app, ipcMain, BrowserWindow, Menu, MenuItem, shell, KeyboardEvent } from 'electron';
+import {
+  app,
+  ipcMain,
+  BrowserWindow,
+  Menu,
+  MenuItem,
+  shell,
+  KeyboardEvent,
+} from 'electron';
 import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------
@@ -349,16 +355,22 @@ export function addMenuItem(custom: CustomMenuItemSpec) {
     if (key) {
       switch (System.platform) {
         case 'macos':
-          if (key.startsWith('Cmd+')) spec.accelerator = `Cmd+${key.substring(4)}`;
-          if (key.startsWith('Alt+')) spec.accelerator = `Cmd+Alt+${key.substring(4)}`;
-          if (key.startsWith('Meta+')) spec.accelerator = `Cmd+Shift+${key.substring(5)}`;
+          if (key.startsWith('Cmd+'))
+            spec.accelerator = `Cmd+${key.substring(4)}`;
+          if (key.startsWith('Alt+'))
+            spec.accelerator = `Cmd+Alt+${key.substring(4)}`;
+          if (key.startsWith('Meta+'))
+            spec.accelerator = `Cmd+Shift+${key.substring(5)}`;
           break;
         case 'windows':
         case 'linux':
         default:
-          if (key.startsWith('Cmd+')) spec.accelerator = `Ctrl+${key.substring(4)}`;
-          if (key.startsWith('Alt+')) spec.accelerator = `Alt+${key.substring(4)}`;
-          if (key.startsWith('Meta+')) spec.accelerator = `Ctrl+Alt+${key.substring(5)}`;
+          if (key.startsWith('Cmd+'))
+            spec.accelerator = `Ctrl+${key.substring(4)}`;
+          if (key.startsWith('Alt+'))
+            spec.accelerator = `Alt+${key.substring(4)}`;
+          if (key.startsWith('Meta+'))
+            spec.accelerator = `Ctrl+Alt+${key.substring(5)}`;
           break;
       }
     }
@@ -404,14 +416,31 @@ function template(): CustomMenu[] {
       return ([] as CustomMenu[]).concat(
         [
           { label: app.name, submenu: macosAppMenuItems(app.name) },
-          { label: 'File', submenu: fileMenuItemsCustom },
-          { label: 'Edit', submenu: concatSep(editMenuItems, editMenuItemsCustom) },
-          { label: 'View', submenu: concatSep(viewMenuItemsCustom, viewMenuItems(true)) },
+          {
+            label: 'File',
+            submenu: fileMenuItemsCustom,
+          },
+          {
+            label: 'Edit',
+            submenu: concatSep(editMenuItems, editMenuItemsCustom),
+          },
+          {
+            label: 'View',
+            submenu: concatSep(viewMenuItemsCustom, viewMenuItems(true)),
+          },
         ],
         customMenus,
         [
-          { label: 'Window', role: 'window', submenu: windowMenuItemsMacos },
-          { label: 'Help', role: 'help', submenu: helpMenuItems },
+          {
+            label: 'Window',
+            role: 'window',
+            submenu: windowMenuItemsMacos,
+          },
+          {
+            label: 'Help',
+            role: 'help',
+            submenu: helpMenuItems,
+          },
         ],
       );
     case 'windows':
@@ -419,9 +448,18 @@ function template(): CustomMenu[] {
     default:
       return ([] as CustomMenu[]).concat(
         [
-          { label: 'File', submenu: concatSep(fileMenuItemsCustom, fileMenuItemsLinux) },
-          { label: 'Edit', submenu: concatSep(editMenuItems, editMenuItemsCustom) },
-          { label: 'View', submenu: concatSep(viewMenuItemsCustom, viewMenuItems(false)) },
+          {
+            label: 'File',
+            submenu: concatSep(fileMenuItemsCustom, fileMenuItemsLinux),
+          },
+          {
+            label: 'Edit',
+            submenu: concatSep(editMenuItems, editMenuItemsCustom),
+          },
+          {
+            label: 'View',
+            submenu: concatSep(viewMenuItemsCustom, viewMenuItems(false)),
+          },
         ],
         customMenus,
         [
@@ -464,5 +502,48 @@ function reset() {
   customItems.clear();
   install();
 }
+
+// --------------------------------------------------------------------------
+// --- Popup Menu Management
+// --------------------------------------------------------------------------
+
+interface PopupMenuItemProps {
+  /** Item label. */
+  label: string;
+  /** Optional menu identifier. */
+  id?: string;
+  /** Displayed item, default is `true`. */
+  display?: boolean;
+  /** Enabled item, default is `true`. */
+  enabled?: boolean;
+  /** Checked item, default is `false`. */
+  checked?: boolean;
+}
+
+type PopupMenuItem = PopupMenuItemProps | 'separator';
+
+function handlePopupMenu(_: Event, items: PopupMenuItem[]): Promise<number> {
+  return new Promise((resolve) => {
+    const menu = new Menu();
+    let kid = 0;
+    let selected = (-1);
+    items.forEach((item, index) => {
+      if (item === 'separator')
+        menu.append(new MenuItem({ type: 'separator' }));
+      else if (item) {
+        const { display = true, enabled, checked } = item;
+        if (display) {
+          const label = item.label || `#${++kid}`;
+          const click = () => { selected = index; };
+          const type = checked !== undefined ? 'checkbox' : 'normal';
+          menu.append(new MenuItem({ label, enabled, type, checked, click }));
+        }
+      }
+    });
+    menu.popup({ callback: () => resolve(selected) });
+  });
+}
+
+ipcMain.handle('dome.popup', handlePopupMenu);
 
 // --------------------------------------------------------------------------

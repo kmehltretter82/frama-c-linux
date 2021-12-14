@@ -42,7 +42,7 @@ import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
-import { Menu, MenuItem, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
@@ -78,13 +78,49 @@ export type PlatformKind = 'linux' | 'macos' | 'windows';
 export const platform: PlatformKind = (System.platform as PlatformKind);
 
 // --------------------------------------------------------------------------
+// --- User's Directories
+// --------------------------------------------------------------------------
+
+let loadedPaths = false;
+const remoteAppPaths: { [index: string]: string } = {};
+
+function getPath(k: string): string {
+  if (!loadedPaths) {
+    loadedPaths = true;
+    Object.assign(remoteAppPaths, ipcRenderer.sendSync('dome.app.paths'));
+  }
+  return remoteAppPaths[k];
+}
+
+/** Returns user's home directory. */
+export function getHome() { return getPath('home'); }
+
+/** Returns user's desktop directory. */
+export function getDesktop() { return getPath('desktop'); }
+
+/** Returns user's documents directory. */
+export function getDocuments() { return getPath('documents'); }
+
+/** Returns user's downloads directory. */
+export function getDownloads() { return getPath('downloads'); }
+
+/** Returns temporary directory. */
+export function getTempDir() { return getPath('temp'); }
+
+/** Working directory (Application Window). */
+export function getWorkingDir() { return System.getWorkingDir(); }
+
+/** Current process ID.. */
+export function getPID() { return System.getPID(); }
+
+// --------------------------------------------------------------------------
 // --- Application Emitter
 // --------------------------------------------------------------------------
 
 /** Typed Dome Event.
 
-    To register an event with no argument, simply use `new Event('myEvent')`.
-*/
+   To register an event with no argument, simply use `new Event('myEvent')`.
+ */
 export class Event<A = void> {
 
   private name: string;
@@ -467,28 +503,26 @@ export function popupMenu(
   items: PopupMenuItem[],
   callback?: (item: string | undefined) => void,
 ) {
-  const menu = new Menu();
-  let selected = '';
-  let kid = 0;
-  items.forEach((item) => {
-    if (item === 'separator')
-      menu.append(new MenuItem({ type: 'separator' }));
-    else if (item) {
-      const { display = true, enabled, checked } = item;
-      if (display) {
-        const label = item.label || `#${++kid}`;
-        const id = item.id || label;
-        const click = () => {
-          selected = id;
-          if (item.onClick) item.onClick();
-        };
-        const type = checked !== undefined ? 'checkbox' : 'normal';
-        menu.append(new MenuItem({ label, enabled, type, checked, click }));
-      }
+  ipcRenderer.invoke('dome.popup', items.map((item) => {
+    if (!item) return undefined;
+    if (item === 'separator') return item;
+    return {
+      label: item.label,
+      id: item.id,
+      display: item.display,
+      enabled: item.enabled,
+      checked: item.checked,
+    };
+  })).then((index: number) => {
+    const item = items[index];
+    if (item && item !== 'separator') {
+      const { id, label, onClick } = item;
+      if (onClick) onClick();
+      if (callback) callback(id || label);
+    } else {
+      if (callback) callback(undefined);
     }
   });
-  const job = callback ? () => callback(selected) : undefined;
-  menu.popup({ callback: job });
 }
 
 // --------------------------------------------------------------------------

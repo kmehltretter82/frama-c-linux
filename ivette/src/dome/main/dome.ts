@@ -328,6 +328,7 @@ function createBrowserWindow(
     backgroundColor: '#f0f0f0',
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
       additionalArguments: [browserArguments],
     },
     ...config,
@@ -521,6 +522,15 @@ function restoreDefaultSettings() {
 
 ipcMain.on('dome.menu.settings', showSettingsWindow);
 ipcMain.on('dome.menu.defaults', restoreDefaultSettings);
+ipcMain.on('dome.app.paths', (event) => {
+  event.returnValue = {
+    'home': app.getPath('home'),
+    'desktop': app.getPath('desktop'),
+    'documents': app.getPath('documents'),
+    'downloads': app.getPath('downloads'),
+    'temp': app.getPath('temp'),
+  };
+});
 
 // --------------------------------------------------------------------------
 // --- Main Application Starter
