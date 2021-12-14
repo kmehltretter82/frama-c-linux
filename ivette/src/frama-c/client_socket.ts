@@ -40,6 +40,11 @@ class SocketClient implements Client {
   queue: json[] = [];
   buffer: Buffer = Buffer.from('');
 
+  /** Server CLI */
+  commandLine(sockaddr: string, params: string[]): string[] {
+    return ['-server-socket', sockaddr, '-then'].concat(params);
+  }
+
   /** Connection */
   connect(sockaddr: string): void {
     if (this.socket) {

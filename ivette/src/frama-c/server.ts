@@ -458,7 +458,7 @@ async function _launch() {
   if (!cwd) cwd = System.getWorkingDir();
   logout = logout && System.join(cwd, logout);
   logerr = logerr && System.join(cwd, logerr);
-  params = ['-server-zmq', sockaddr, '-then'].concat(params);
+  params = client.commandLine(sockaddr, params);
   const options = {
     cwd,
     stdout: { path: logout, pipe: true },

@@ -28,6 +28,9 @@ import { json } from 'dome/data/json';
 
 export interface Client {
 
+  /** Server CLI */
+  commandLine(sockaddr: string, params: string[]): string[];
+
   /** Connection */
   connect(addr: string): void;
 

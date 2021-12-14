@@ -33,14 +33,16 @@ const pollingTimeout = 50;
 
 class ZmqClient implements Client {
 
-  constructor() { }
-
   events = new Emitter();
-
   queueCmd: string[] = [];
   queueId: string[] = [];
   zmqSocket: ZmqRequest | undefined;
   zmqIsBusy = false;
+
+  /** Server CLI */
+  commandLine(sockaddr: string, params: string[]): string[] {
+    return ['-server-zmq', sockaddr, '-then'].concat(params);
+  }
 
   /** Connection */
   connect(sockaddr: string): void {
