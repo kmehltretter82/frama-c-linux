@@ -1,6 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing gnu_zero_array.i (no preprocessing)
-[rte] annotating function main
+[rte:annot] annotating function main
 [wp] Running WP plugin...
 [wp] gnu_zero_array.i:14: Warning: 
   Cast with incompatible pointers types (source: sint8*) (target: S*)

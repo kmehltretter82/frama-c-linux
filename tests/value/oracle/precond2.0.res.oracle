@@ -1,6 +1,6 @@
 [kernel] Parsing precond2.c (with preprocessing)
-[rte] annotating function f
-[rte] annotating function main
+[rte:annot] annotating function f
+[rte:annot] annotating function main
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

@@ -1,5 +1,5 @@
 [kernel] Parsing value_rte.c (with preprocessing)
-[rte] annotating function main
+[rte:annot] annotating function main
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

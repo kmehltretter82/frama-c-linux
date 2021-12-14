@@ -1,5 +1,5 @@
 [kernel] Parsing addsub_typedef.c (with preprocessing)
-[rte] annotating function main
+[rte:annot] annotating function main
 [rte] addsub_typedef.c:11: Warning: 
   guaranteed RTE:
   assert signed_overflow: 0x7fffffff + 0x7fffffff ≤ 2147483647;
