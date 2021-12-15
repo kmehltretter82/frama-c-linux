@@ -28,6 +28,8 @@ open Analyses_types
 
 type t = lscope
 
+module D: Datatype.S with type t = lscope
+
 val empty: t
 (* Create an empty logic scope. *)
 
