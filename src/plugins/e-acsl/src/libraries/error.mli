@@ -21,13 +21,12 @@
 (**************************************************************************)
 
 (** Handling errors. *)
+open Error_types
 
 exception Ignored
 exception Typing_error of string
 exception Not_yet of string
 exception Not_memoized
-
-type 'a or_error = Res of 'a | Err of exn
 
 val untypable: string -> 'a
 (** Type error built from the given argument. *)

@@ -34,6 +34,7 @@
 *)
 open Cil_types
 open Cil_datatype
+open Error_types
 
 (** [error_msg quantif msg pp x] creates an error message from the string [msg]
     containing the value [x] pretty-printed by [pp] and the predicate [quantif]
@@ -81,11 +82,11 @@ module Quantified_predicate =
 module Quantifier: sig
   val add:
     predicate ->
-    ((term * logic_var * term) list * predicate) Error.or_error ->
+    ((term * logic_var * term) list * predicate) or_error ->
     unit
   val get:
     predicate ->
-    ((term * logic_var * term) list * predicate) Error.or_error
+    ((term * logic_var * term) list * predicate) or_error
   (** getter and setter for the additional guard that intersects with the type
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
@@ -113,7 +114,7 @@ end = struct
     Cil_datatype.Logic_var.Hashtbl.add guard_tbl lv p
 
   let replace p guarded_vars goal =
-    Quantified_predicate.Hashtbl.replace tbl p (Error.Res (guarded_vars, goal))
+    Quantified_predicate.Hashtbl.replace tbl p (Res (guarded_vars, goal))
 
   let clear () =
     Cil_datatype.Logic_var.Hashtbl.clear guard_tbl;

@@ -38,6 +38,10 @@ endif
 ###################
 
 # libraries
+LIBRARIES_CMI:= \
+	error_types
+LIBRARIES_CMI:=$(addprefix src/libraries/, $(LIBRARIES_CMI))
+
 SRC_LIBRARIES:= \
 	error \
 	builtins \
@@ -126,6 +130,7 @@ PLUGIN_CMO:= src/local_config \
 	$(SRC_CODE_GENERATOR) \
 	src/main
 PLUGIN_CMI:= \
+	$(LIBRARIES_CMI) \
 	$(CODE_GENERATOR_CMI)
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=yes

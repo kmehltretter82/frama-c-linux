@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Error_types
+
 exception Ignored
 let ignored () = raise Ignored
 
@@ -76,8 +78,6 @@ let generic_handle f res x =
   | Ignored -> res
 
 let handle f x = generic_handle f x x
-
-type 'a or_error = Res of 'a | Err of exn
 
 let retrieve_preprocessing analyse_name getter parameter pp =
   try

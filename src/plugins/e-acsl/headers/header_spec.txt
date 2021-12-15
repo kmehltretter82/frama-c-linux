@@ -149,6 +149,7 @@ src/code_generator/typed_number.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/typed_number.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/builtins.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/builtins.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/libraries/error_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/error.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/error.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/functions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
