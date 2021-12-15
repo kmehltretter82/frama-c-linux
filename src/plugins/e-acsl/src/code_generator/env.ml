@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 open Analyses_types
@@ -400,7 +399,7 @@ let add_stmt ?(post=false) env stmt =
   { env with env_stack = local_env :: tl }
 
 let extend_stmt_in_place env stmt ~label block =
-  let stmt = E_acsl_label.get_first_inner_stmt stmt in
+  let stmt = Labels.get_first_inner_stmt stmt in
   let new_stmt = Smart_stmt.block_stmt block in
   let sk = stmt.skind in
   stmt.skind <- Block (Cil.mkBlock [ new_stmt; Smart_stmt.stmt sk ]);

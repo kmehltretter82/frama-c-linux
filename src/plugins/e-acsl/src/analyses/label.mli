@@ -25,10 +25,6 @@ open Cil_types
 val get_stmt: kernel_function -> logic_label -> stmt
 (** @return the statement where the logic label points to. *)
 
-val get_first_inner_stmt: stmt -> stmt
-(** If the given statement has a label, return the first statement of the block.
-    Otherwise return the given statement. *)
-
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

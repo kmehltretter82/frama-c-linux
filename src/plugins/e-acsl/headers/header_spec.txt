@@ -94,6 +94,8 @@ src/analyses/interval.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/interval.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/label.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/label.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/labels.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/labels.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/logic_normalizer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

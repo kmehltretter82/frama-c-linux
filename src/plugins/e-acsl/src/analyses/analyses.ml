@@ -30,7 +30,10 @@ let preprocess () =
   analyses_feedback "normalizing quantifiers";
   Bound_variables.preprocess ast;
   analyses_feedback "typing annotations";
-  Typing.type_program ast
+  Typing.type_program ast;
+  analyses_feedback
+    "computing translation locations of labeled predicates and terms";
+  Labels.preprocess ast
 
 let reset () =
   Memory_tracking.reset ();
@@ -38,4 +41,5 @@ let reset () =
   Bound_variables.clear_guards ();
   Logic_normalizer.clear ();
   Interval.Env.clear();
-  Typing.clear ()
+  Typing.clear ();
+  Labels.reset ()

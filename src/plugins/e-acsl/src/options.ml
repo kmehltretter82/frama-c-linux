@@ -187,6 +187,7 @@ module Dkey = struct
   let interval = register_category "analysis:interval_inference"
   let mtracking = register_category "analysis:memory_tracking"
   let typing = register_category "analysis:typing"
+  let labels = register_category "analysis:labels"
   let translation = register_category "translation"
 end
 

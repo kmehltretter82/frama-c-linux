@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 
@@ -37,7 +36,7 @@ end = struct
 
   let tbl = Stmt.Hashtbl.create 17
   let add s x =
-    let s = E_acsl_label.get_first_inner_stmt s in
+    let s = Labels.get_first_inner_stmt s in
     Stmt.Hashtbl.add tbl s x
 
   let find stmt =
@@ -81,7 +80,7 @@ module Exits = Build_env(struct
     (* Use [Labeled_stmts.get_first_inner_stmt] so that [find] and [get_all]
        return the first statement of the labeled block instead of the labeled
        statement. *)
-    let map_opt = Some E_acsl_label.get_first_inner_stmt
+    let map_opt = Some Labels.get_first_inner_stmt
   end)
 
 (* Map labelled statements back to gotos which lead to them and case statements
@@ -91,7 +90,7 @@ module LJumps = Build_env(struct
     (* Use [Labeled_stmts.get_first_inner_stmt] so that [find] and [get_all]
        return the first statement of the labeled block instead of the labeled
        statement. *)
-    let map_opt = Some E_acsl_label.get_first_inner_stmt
+    let map_opt = Some Labels.get_first_inner_stmt
   end)
 
 let clear () =

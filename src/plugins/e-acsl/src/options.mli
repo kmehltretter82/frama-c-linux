@@ -49,6 +49,7 @@ module Dkey: sig
   val interval: category
   val mtracking: category
   val typing: category
+  val labels: category
   val translation: category
 end
 

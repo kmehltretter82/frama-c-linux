@@ -36,6 +36,8 @@ type pred_or_term =
   | PoT_pred of predicate
   | PoT_term of term
 
+type at_data = kernel_function * kinstr * lscope * pred_or_term * logic_label
+
 type annotation_kind =
   | Assertion
   | Precondition
