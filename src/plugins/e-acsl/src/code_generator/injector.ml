@@ -840,13 +840,9 @@ let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
-  Memory_tracking.reset ();
   Logic_functions.reset ();
-  Literal_strings.reset ();
   Global_observer.reset ();
-  Bound_variables.clear_guards ();
-  Logic_normalizer.clear ();
-  Typing.clear ();
+  Analyses.reset ();
   (* reset some kernel states: *)
   (* reset the CFG that has been heavily modified by the code generation step *)
   Cfg.clearFileCFG ~clear_id:false ast;
@@ -856,23 +852,10 @@ let reset_all ast =
   Ast.mark_as_grown ()
 
 let inject () =
-  Gmp_types.init ();
   let ast = Ast.get () in
   let current_project = Project.current() in
   Options.feedback ~level:2
-    "preprocessing annotations in project %a"
-    Project.pretty current_project;
-  Logic_normalizer.preprocess ast;
-  Options.feedback ~level:2
-    "normalizing quantifiers in project %a"
-    Project.pretty current_project;
-  Bound_variables.preprocess ast;
-  Options.feedback ~level:2
-    "typing annotations in project %a"
-    Project.pretty current_project;
-  Typing.type_program ast;
-  Options.feedback ~level:2
-    "injecting annotations as code in project %a"
+    "injecting annotations as code in %a"
     Project.pretty current_project;
   inject_in_file ast;
   reset_all ast;

@@ -71,7 +71,8 @@ SRC_ANALYSES:= \
 	typing \
 	literal_strings \
 	memory_tracking \
-	exit_points
+	exit_points \
+	analyses
 SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
 # code generator
