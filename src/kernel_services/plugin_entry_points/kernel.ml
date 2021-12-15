@@ -69,6 +69,8 @@ let dkey_file_print_one = register_category "file:print-one"
 
 let dkey_file_transform = register_category "file:transformation"
 
+let dkey_file_source = register_category "file:source"
+
 let dkey_filter = register_category "filter"
 
 let dkey_globals = register_category "globals"
@@ -204,9 +206,6 @@ let wkey_parser_unsupported = register_warn_category "parser:unsupported"
 let wkey_asm = register_warn_category "asm:clobber"
 
 let wkey_unnamed_typedef = register_warn_category "parser:unnamed-typedef"
-
-let wkey_file = register_warn_category "file"
-let () = set_warn_status wkey_file Log.Winactive
 
 let wkey_file_not_found = register_warn_category "file:not-found"
 let () = set_warn_status wkey_file_not_found Log.Wfeedback

@@ -539,12 +539,13 @@ parse
         Extlib.temp_file_cleanup_at_exit ~debug
           (Filename.basename filename) ".pp"
       in
-      Parse_env.set_i_for_pp
-        (Filepath.Normalized.of_string ppname)
-        (Filepath.Normalized.of_string filename);
+      let fp_of_string = Filepath.Normalized.of_string in
+      let workdir_opt = Parse_env.get_workdir (fp_of_string filename) in
+      Option.iter
+        (fun workdir -> Parse_env.set_workdir (fp_of_string ppname) workdir)
+        workdir_opt;
       let ppfile = open_out ppname in
       main lex;
-      (* Format.printf "cwd during preprocess_annots: %s@." (Sys.getcwd ()); *)
       preprocess_annots suffix cpp ppfile;
       close_out ppfile;
       Datatype.Filepath.of_string ppname

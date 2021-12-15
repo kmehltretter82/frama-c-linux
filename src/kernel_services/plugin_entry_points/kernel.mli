@@ -67,6 +67,9 @@ val dkey_file_print_one: category
 
 val dkey_file_annot: category
 
+val dkey_file_source: category
+(** Messages related to operations on files during preprocessing/parsing. *)
+
 val dkey_filter: category
 
 val dkey_globals: category
@@ -200,9 +203,6 @@ val wkey_asm: warn_category
 val wkey_unnamed_typedef: warn_category
 (** Warning related to "unnamed typedef that does not introduce a struct
     or enumeration type". *)
-
-val wkey_file: warn_category
-(** Warnings related to operations on files during preprocessing/parsing. *)
 
 val wkey_file_not_found: warn_category
 (** Warnings related to missing files during preprocessing/parsing. *)

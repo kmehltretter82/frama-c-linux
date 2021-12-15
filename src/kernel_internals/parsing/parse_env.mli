@@ -24,4 +24,4 @@ val open_source : string -> (string, string) result
 
 val set_workdir : Filepath.Normalized.t -> string -> unit
 
-val set_i_for_pp : Filepath.Normalized.t -> Filepath.Normalized.t -> unit
+val get_workdir : Filepath.Normalized.t -> string option

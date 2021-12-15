@@ -28,32 +28,27 @@ module SourceFiles =
   State_builder.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.String)
     (struct
       let name = "SourceFiles"
-      let dependencies = [ ]
+      let dependencies = [ Kernel.Files.self ]
       let size = 1
     end)
 
-(* maps .i files to their workdir (when a JCDB is used) *)
+(* maps .i/.pp files to their workdir (when a JCDB is used) *)
 module PreprocessingWorkdir =
   State_builder.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.String)
     (struct
       let name = "PreprocessingWorkdir"
-      let dependencies = [ ]
-      let size = 1
+      let dependencies =
+        [ Kernel.Files.self; Kernel.JsonCompilationDatabase.self ]
+      let size = 2
     end)
 
-let set_workdir i workdir =
-  PreprocessingWorkdir.replace i workdir
+let set_workdir file workdir =
+  PreprocessingWorkdir.replace file workdir
 
-module PpToPreprocessed =
-  State_builder.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.Filepath)
-    (struct
-      let name = "PpToPreprocessed"
-      let dependencies = [ ]
-      let size = 1
-    end)
-
-let set_i_for_pp pp i =
-  PpToPreprocessed.replace pp i
+let get_workdir file =
+  try
+    Some (PreprocessingWorkdir.find file)
+  with Not_found -> None
 
 let store_referenced_source fname =
   let fp = Datatype.Filepath.of_string fname in
@@ -101,7 +96,8 @@ let open_source fname =
     Ok s
   with Not_found ->
   try
-    Kernel.warning ~wkey:Kernel.wkey_file "opening source file: %S" fname;
+    Kernel.feedback ~dkey:Kernel.dkey_file_source
+      "opening source file: %S" fname;
     let inchan = open_in_bin (fp :> string) in
     let contents = really_input_string inchan (in_channel_length inchan) in
     close_in inchan;
@@ -109,10 +105,6 @@ let open_source fname =
     let workdir =
       try
         Some (PreprocessingWorkdir.find fp)
-      with Not_found ->
-      try
-        let i = PpToPreprocessed.find fp in
-        Some (PreprocessingWorkdir.find i)
       with Not_found ->
         None
     in
