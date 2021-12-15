@@ -217,7 +217,8 @@ sig
     weak:bool -> Abstract_offset.typed_offset -> t -> t or_bottom
   val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
     t -> t
-  val add_segmentation_bounds : oracle:oracle -> Cil_types.exp list -> t -> t
+  val add_segmentation_bounds : oracle:oracle -> typ:Cil_types.typ ->
+    Cil_types.exp list -> t -> t
 end
 
 
@@ -311,13 +312,12 @@ struct
       ~decide_fast ~decide_fst ~decide_snd ~decide_both
       m1.fields m2.fields
 
-  let unify f m1 m2 =
-    let decide b =
-      FieldMap.Traversing (fun _fi m -> Some (f (M.of_raw b) m))
-    in
+  let unify f m1 m2 = (* f is not symmetric *)
     let decide_both _fi = fun m1 m2 -> Some (f m1 m2)
-    and decide_left = decide m2.padding
-    and decide_right = decide m1.padding
+    and decide_left = FieldMap.Traversing (fun _fi m1 ->
+        Some (f m1 (M.of_raw m2.padding)))
+    and decide_right = FieldMap.Traversing (fun _fi m2 ->
+        Some (f (M.of_raw m1.padding) m2))
     in
     let fields = FieldMap.merge
         ~cache:Hptmap_sig.NoCache ~symmetric:false ~idempotent:true
@@ -1004,7 +1004,14 @@ struct
     (* Shortcuts *)
     let compare side = B.cmp ~oracle:(oracle side) in
     let equals side b1 b2 =
-      compare side b1 b2 = Equal
+      let r = compare side b1 b2 = Equal in
+      (* Format.printf "%a (%a) = %a (%a) ? %B@."
+         B.pretty b1
+         Ival.pretty (B._to_ival ~oracle:(oracle side) b1)
+         B.pretty b2
+         Ival.pretty (B._to_ival ~oracle:(oracle side) b2)
+         r; *)
+      r
     in
     let smash side = Bottom.join (M.smash ~oracle:(oracle side)) in
     let {start=l1 ; segments=s1 ; padding=p1 } = m1
@@ -1527,6 +1534,7 @@ struct
         A.single b l u (Raw b)
       in
       let rec aux m1 m2 =
+        debug dunify "unification between@.%a and@.%a" pretty m1 pretty m2;
         match m1, m2 with
         | Raw b1, Raw b2 -> Raw (Bit.join b1 b2)
         | Scalar s1, Scalar s2
@@ -1537,23 +1545,29 @@ struct
         | Array a1, Array a2 when are_aray_compatible a1 a2 ->
           let array_value = A.unify ~oracle aux a1.array_value a2.array_value in
           Array { a1 with array_value }
-        | Array a, Raw b ->
+        | Array a1, Raw b2 ->
           begin try
-              let array_value' = raw_to_array ~oracle Left a.array_value b in
-              let array_value = A.unify ~oracle aux a.array_value array_value' in
-              debug demerging "emerging unification between@.%a and@.%a result:@.%a" A.pretty a.array_value A.pretty array_value' A.pretty array_value;
-              Array { a with array_value }
+              let array_value2 = raw_to_array ~oracle Left a1.array_value b2 in
+              let array_value = A.unify ~oracle aux a1.array_value array_value2 in
+              debug demerging "emerging unification between@.%a and@.%a result:@.%a"
+                A.pretty a1.array_value
+                A.pretty array_value2
+                A.pretty array_value;
+              Array { a1 with array_value }
             with Bound.NoBound ->
-              weak_erase b m1 (* TODO: find a better way to handle this case *)
+              weak_erase b2 m1 (* TODO: find a better way to handle this case *)
           end
-        | Raw b, Array a ->
+        | Raw b1, Array a2 ->
           begin try
-              let array_value' = raw_to_array ~oracle Right a.array_value b in
-              let array_value = A.unify ~oracle aux array_value' a.array_value in
-              debug demerging "emerging unification between@.%a and@.%a result:@.%a" A.pretty array_value' A.pretty a.array_value A.pretty array_value;
-              Array { a with array_value }
+              let array_value1 = raw_to_array ~oracle Right a2.array_value b1 in
+              let array_value = A.unify ~oracle aux array_value1 a2.array_value in
+              debug demerging "emerging unification between@.%a and@.%a result:@.%a"
+                A.pretty array_value1
+                A.pretty a2.array_value
+                A.pretty array_value;
+              Array { a2 with array_value }
             with Bound.NoBound ->
-              weak_erase b m2 (* TODO: find a better way to handle this case *)
+              weak_erase b1 m2 (* TODO: find a better way to handle this case *)
           end
         | Struct s1, Struct s2 when are_structs_compatible s1 s2 ->
           let struct_value = S.unify aux s1.struct_value s2.struct_value in
@@ -1685,18 +1699,26 @@ struct
           Array { a with array_value=A.map aux array_value }
       in aux
 
-    let add_segmentation_bounds ~oracle bounds = function
+    let add_segmentation_bounds ~oracle ~typ bounds =
+      let convert_bound exp =
+        try
+          Some (Bound.of_exp exp)
+        with Bound.UnsupportedBoundExpression -> None
+      in
+      let bounds = List.filter_map convert_bound bounds in
+      function
+      | (Raw b as m) ->
+        begin match bounds with
+          | l :: u :: t ->
+            let array_value = A.single b l u m in
+            let array_value = A.add_segmentation_bounds ~oracle t array_value in
+            Array { array_cell_type = typ ; array_value }
+          | _ -> m (* Can't build a segmentation with only one bound *)
+        end
       | Array a ->
-        let convert_bound exp =
-          try
-            Some (Bound.of_exp exp)
-          with Bound.UnsupportedBoundExpression -> None
+        let array_value = A.add_segmentation_bounds ~oracle bounds a.array_value
         in
-        let bounds = List.filter_map convert_bound bounds in
-        Array {
-          a with
-          array_value = A.add_segmentation_bounds ~oracle bounds a.array_value
-        }
+        Array { a with array_value }
       | m -> m (* Ignore segmentation hints on non-array *)
   end
   and S : Structures with type submemory = ProtoMemory.t =
@@ -1780,8 +1802,8 @@ struct
     write' ~oracle ~weak f offset dst
 
   let segmentation_hint ~oracle m offset bounds =
-    let f ~weak:_ _typ m =
-      add_segmentation_bounds ~oracle bounds m
+    let f ~weak:_ typ m =
+      add_segmentation_bounds ~oracle ~typ bounds m
     in
     write' ~oracle ~weak:false f offset m
 end
