@@ -63,7 +63,6 @@ let feed_bytes ch =
   if not ch.eof then
     try
       let n = input ch.inc ch.tmp 0 buffer_size in
-      if n > 0 then Format.eprintf "READ %d bytes@." n ;
       Buffer.add_subbytes ch.buffer ch.tmp 0 n ;
     with
     | Sys_blocked_io -> ()
@@ -71,7 +70,6 @@ let feed_bytes ch =
 
 let read_data ch =
   try
-    Format.eprintf "DATA %S@." (Buffer.contents ch.buffer) ;
     let h = match Buffer.nth ch.buffer 0 with
       | 'S' -> 3
       | 'L' -> 7

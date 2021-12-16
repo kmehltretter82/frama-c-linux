@@ -308,8 +308,11 @@ class SyncState<A> {
   async update() {
     try {
       this.upToDate = true;
-      const v = await Server.send(this.handler.getter, null);
-      this.value = v;
+      this.value = undefined;
+      if (Server.isRunning()) {
+        const v = await Server.send(this.handler.getter, null);
+        this.value = v;
+      }
       this.UPDATE.emit();
     } catch (error) {
       D.error(
@@ -761,6 +764,7 @@ const emptySelection = {
 
 export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
 export const GlobalSelection = new GlobalState<Selection>(emptySelection);
+
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
 export function setSelection(location: Location, meta = false) {
@@ -778,12 +782,15 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
 /** Resets the selected locations. */
 export async function resetSelection() {
   GlobalSelection.setValue(emptySelection);
-  const main = await Server.send(Ast.getMainFunction, {});
-  // If the selection has already been modified, do not change it.
-  if (main && GlobalSelection.getValue() === emptySelection) {
-    GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
+  if (Server.isRunning()) {
+    const main = await Server.send(Ast.getMainFunction, {});
+    // If the selection has already been modified, do not change it.
+    if (main && GlobalSelection.getValue() === emptySelection) {
+      GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
+    }
   }
 }
+
 /* Select the main function when the current project changes and the selection
    is still empty (which happens at the start of the GUI). */
 PROJECT.on(async () => {

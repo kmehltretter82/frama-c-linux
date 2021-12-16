@@ -40,12 +40,6 @@ import { ChildProcess } from 'child_process';
 import { client } from './client_socket';
 
 // --------------------------------------------------------------------------
-// --- Pretty Printing (Browser Console)
-// --------------------------------------------------------------------------
-
-const D = new Dome.Debug('Server');
-
-// --------------------------------------------------------------------------
 // --- Events
 // --------------------------------------------------------------------------
 
@@ -189,7 +183,6 @@ export function onShutdown(callback: () => void) { SHUTDOWN.on(callback); }
 
 function _status(newStatus: Status) {
   if (newStatus !== status) {
-    D.log('Server', newStatus);
     const oldStatus = status;
     status = newStatus;
     STATUS.emit(newStatus);
@@ -439,8 +432,6 @@ async function _launch() {
   process?.stdout?.on('data', logger);
   process?.stderr?.on('data', logger);
   process?.on('exit', (code: number | null, signal: string | null) => {
-    D.log('Process exited');
-
     if (signal) {
       // [signal] is non-null.
       buffer.log('[frama-c]', signal);
@@ -479,13 +470,11 @@ function _clear() {
 }
 
 function _kill() {
-  D.log('Hard kill');
   client.disconnect();
   if (process) process.kill();
 }
 
 async function _shutdown() {
-  D.log('Shutdown');
   _clear();
   client.shutdown();
   const killingPromise = new Promise((resolve) => {
@@ -731,12 +720,8 @@ function _resolved(id: string) {
 
 client.onConnect((err?: Error) => {
   if (err) {
-    if (Dome.DEVEL)
-      buffer.log('[client]', err.toString());
     _status(Status.FAILURE);
   } else {
-    if (Dome.DEVEL)
-      buffer.log('[client] Connected.');
     _status(Status.ON);
   }
 });
@@ -758,7 +743,6 @@ client.onKilled((id: string) => {
 });
 
 client.onRejected((id: string) => {
-  D.log('Rejected', id);
   const p = pending.get(id);
   if (p) {
     p.reject();
@@ -767,7 +751,6 @@ client.onRejected((id: string) => {
 });
 
 client.onError((id: string, msg: string) => {
-  D.log('Request error', id, msg);
   const p = pending.get(id);
   if (p) {
     p.reject();

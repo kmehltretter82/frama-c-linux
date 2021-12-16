@@ -159,31 +159,31 @@ class SocketClient extends Client {
             'W' + padding.substring(hex.length, 15);
       s.write(Buffer.from(header + hex));
       s.write(data);
-      console.log('SENT', header + hex + data.toString('utf8'), data.length);
     }
   }
 
   _fetch(): undefined | string {
     const msg = this.buffer;
     const len = msg.length;
-    this.buffer = msg;
     if (len < 1) return;
     const hd = msg.readInt8(0);
     // 'S': 83, 'L': 76, 'W': 87
-    const nhex = hd == 83 ? 3 : hd == 76 ? 7 : 15;
-    if (len < 1 + nhex) return;
-    const size = Number.parseInt(msg.slice(1, nhex).toString('ascii'), 16);
-    const offset = 1 + nhex + size;
+    const phex = hd == 83 ? 4 : hd == 76 ? 8 : 16;
+    if (len < phex) return;
+    const size = Number.parseInt(msg.slice(1, phex).toString('ascii'), 16);
+    const offset = phex + size;
     if (len < offset) return;
     this.buffer = msg.slice(offset);
-    return msg.slice(1 + nhex, offset).toString('utf8');
+    return msg.slice(phex, offset).toString('utf8');
   }
 
   _receive(chunk: Buffer) {
     this.buffer = Buffer.concat([this.buffer, chunk]);
     while (true) {
+      const n0 = this.buffer.length;
       const data = this._fetch();
-      if (data === undefined) break;
+      const n1 = this.buffer.length;
+      if (data === undefined || n0 <= n1) break;
       try {
         const cmd: any = JSON.parse(data);
         if (cmd !== null && typeof (cmd) === 'object') {
