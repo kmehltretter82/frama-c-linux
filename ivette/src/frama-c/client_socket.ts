@@ -22,21 +22,24 @@
 
 import Net from 'net';
 import { Debug } from 'dome';
-import Emitter from 'events';
 import { json } from 'dome/data/json';
 import { Client } from './client';
 
 const D = new Debug('SocketServer');
 
+const RETRIES = 10;
+const TIMEOUT = 200;
+
 // --------------------------------------------------------------------------
 // --- Frama-C Server API
 // --------------------------------------------------------------------------
 
-class SocketClient implements Client {
+class SocketClient extends Client {
 
-  events = new Emitter();
+  retries = 0;
   running = false;
   socket: Net.Socket | undefined;
+  timer: NodeJS.Timeout | undefined;
   queue: json[] = [];
   buffer: Buffer = Buffer.from('');
 
@@ -47,26 +50,49 @@ class SocketClient implements Client {
 
   /** Connection */
   connect(sockaddr: string): void {
+    this.retries++;
     if (this.socket) {
       this.socket.destroy();
     }
-    this.socket = Net.createConnection(sockaddr, () => {
-      D.log('Client connected');
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
+    const s = Net.createConnection(sockaddr, () => {
+      D.log('Client connected', this.retries);
       this.running = true;
+      this.retries = 0;
+      this.emitConnect();
       this._flush();
     });
     // Using Buffer data encoding at this level
-    this.socket.on('end', () => this.disconnect());
-    this.socket.on('data', (data: Buffer) => this._receive(data));
-    this.socket.on('error', (err: Error) => {
-      D.warn('Socket error', err);
+    s.on('end', () => this.disconnect());
+    s.on('data', (data: Buffer) => this._receive(data));
+    s.on('error', (err: Error) => {
+      s.destroy();
+      if (this.retries <= RETRIES && !this.running) {
+        D.log('Retry', this.retries, '/', RETRIES);
+        this.socket = undefined;
+        this.timer = setTimeout(() => this.connect(sockaddr), TIMEOUT);
+      } else {
+        D.warn('Socket error', err.toString());
+        this.running = false;
+        this.emitConnect(err);
+      }
     });
+    this.socket = s;
   }
 
   disconnect(): void {
+    D.log('Disconnect');
     this.queue = [];
+    this.retries = 0;
+    this.running = false;
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
     if (this.socket) {
-      D.log('Client disconnected');
       this.socket.destroy();
       this.socket = undefined;
     }
@@ -108,36 +134,6 @@ class SocketClient implements Client {
     this._flush();
   }
 
-  /** Request data callback */
-  onData(callback: (id: string, data: json) => void): void {
-    this.events.on('DATA', callback);
-  }
-
-  /** Rejected request callback */
-  onRejected(callback: (id: string, err: string) => void): void {
-    this.events.on('REJECT', callback);
-  }
-
-  /** Request error callback */
-  onError(callback: (msg: string) => void): void {
-    this.events.on('ERROR', callback);
-  }
-
-  /** Killed request callback */
-  onKilled(callback: (id: string) => void): void {
-    this.events.on('KILL', callback);
-  }
-
-  /** Signal callback */
-  onSignal(callback: (id: string) => void): void {
-    this.events.on('SIGNAL', callback);
-  }
-
-  /** Signal callback */
-  onIdle(callback: () => void): void {
-    this.events.on('IDLE', callback);
-  }
-
   // --------------------------------------------------------------------------
   // --- Low-Level Management
   // --------------------------------------------------------------------------
@@ -158,11 +154,12 @@ class SocketClient implements Client {
       const hex = Number(len).toString(16).toUpperCase();
       const padding = '0000000000000000';
       const header =
-        len < 0xFFF ? 'S' + padding.substring(hex.length, 3) :
-          len < 0xFFFFFFF ? 'L' + padding.substring(hex.length, 7) :
+        len <= 0xFFF ? 'S' + padding.substring(hex.length, 3) :
+          len <= 0xFFFFFFF ? 'L' + padding.substring(hex.length, 7) :
             'W' + padding.substring(hex.length, 15);
       s.write(Buffer.from(header + hex));
       s.write(data);
+      console.log('SENT', header + hex + data.toString('utf8'), data.length);
     }
   }
 
@@ -191,11 +188,11 @@ class SocketClient implements Client {
         const cmd: any = JSON.parse(data);
         if (cmd !== null && typeof (cmd) === 'object') {
           switch (cmd.res) {
-            case 'DATA': this.events.emit('DATA', cmd.id, cmd.data); break;
-            case 'ERROR': this.events.emit('ERROR', cmd.msg); break;
-            case 'KILLED': this.events.emit('KILLED', cmd.id); break;
-            case 'REJECTED': this.events.emit('REJECT', cmd.id); break;
-            case 'SIGNAL': this.events.emit('SIGNAL', cmd.id); break;
+            case 'DATA': this.emitData(cmd.id, cmd.data); break;
+            case 'ERROR': this.emitError(cmd.id, cmd.msg); break;
+            case 'KILLED': this.emitKilled(cmd.id); break;
+            case 'REJECTED': this.emitRejected(cmd.id); break;
+            case 'SIGNAL': this.emitSignal(cmd.id); break;
             default:
               D.warn('Unknown command', cmd);
           }

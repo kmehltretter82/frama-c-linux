@@ -20,58 +20,128 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+import Emitter from 'events';
 import { json } from 'dome/data/json';
 
 // --------------------------------------------------------------------------
 // --- Frama-C Server Access (Client side)
 // --------------------------------------------------------------------------
 
-export interface Client {
+export abstract class Client {
 
   /** Server CLI */
-  commandLine(sockaddr: string, params: string[]): string[];
+  abstract commandLine(sockaddr: string, params: string[]): string[];
 
   /** Connection */
-  connect(addr: string): void;
+  abstract connect(addr: string): void;
 
   /** Disconnection */
-  disconnect(): void;
+  abstract disconnect(): void;
 
   /** Send Request */
-  send(kind: string, id: string, request: string, data: any): void;
+  abstract send(kind: string, id: string, request: string, data: any): void;
 
   /** Signal ON */
-  sigOn(id: string): void;
+  abstract sigOn(id: string): void;
 
   /** Signal ON */
-  sigOff(id: string): void;
+  abstract sigOff(id: string): void;
 
   /** Kill Request */
-  kill(id: string): void;
+  abstract kill(id: string): void;
 
   /** Polling */
-  poll(): void;
+  abstract poll(): void;
 
   /** Shutdown the server */
-  shutdown(): void;
+  abstract shutdown(): void;
+
+  /** @internal */
+  private events = new Emitter();
+
+  // --------------------------------------------------------------------------
+  // --- DATA Event
+  // --------------------------------------------------------------------------
 
   /** Request data callback */
-  onData(callback: (id: string, data: json) => void): void;
+  onData(callback: (id: string, data: json) => void): void {
+    this.events.on('DATA', callback);
+  }
+
+  /** @internal */
+  emitData(id: string, data: json): void {
+    this.events.emit('DATA', id, data);
+  }
+
+  // --------------------------------------------------------------------------
+  // --- REJECTED Event
+  // --------------------------------------------------------------------------
 
   /** Rejected request callback */
-  onRejected(callback: (id: string, msg: string) => void): void;
+  onRejected(callback: (id: string) => void): void {
+    this.events.on('REJECTED', callback);
+  }
+
+  /** @internal */
+  emitRejected(id: string): void {
+    this.events.emit('REJECTED', id);
+  }
+
+  // --------------------------------------------------------------------------
+  // --- ERROR Event
+  // --------------------------------------------------------------------------
+
+  /** Rejected request callback */
+  onError(callback: (id: string, msg: string) => void): void {
+    this.events.on('ERROR', callback);
+  }
+
+  /** @internal */
+  emitError(id: string, msg: string): void {
+    this.events.emit('ERROR', id, msg);
+  }
+
+  // --------------------------------------------------------------------------
+  // --- KILLED Event
+  // --------------------------------------------------------------------------
 
   /** Killed request callback */
-  onKilled(callback: (id: string) => void): void;
+  onKilled(callback: (id: string) => void): void {
+    this.events.on('KILLED', callback);
+  }
+
+  /** @internal */
+  emitKilled(id: string): void {
+    this.events.emit('KILLED', id);
+  }
+
+  // --------------------------------------------------------------------------
+  // --- SIGNAL Event
+  // --------------------------------------------------------------------------
 
   /** Signal callback */
-  onSignal(callback: (id: string) => void): void;
+  onSignal(callback: (id: string) => void): void {
+    this.events.on('SIGNAL', callback);
+  }
 
-  /** Error callback */
-  onError(callback: (msg: string) => void): void;
+  /** @internal */
+  emitSignal(id: string): void {
+    this.events.emit('SIGNAL', id);
+  }
 
-  /** Idle callback */
-  onIdle(callback: () => void): void;
+  // --------------------------------------------------------------------------
+  // --- CONNECT Event
+  // --------------------------------------------------------------------------
+
+  /** Connection callback */
+  onConnect(callback: (err?: Error) => void): void {
+    this.events.on('CONNECT', callback);
+  }
+
+  /** @internal */
+  emitConnect(err?: Error): void {
+    this.events.emit('CONNECT', err);
+  }
 
 }
 

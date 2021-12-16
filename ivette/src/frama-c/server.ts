@@ -25,12 +25,12 @@
 // --------------------------------------------------------------------------
 
 /**
- * Manage the current Frama-C server/client interface
- * @packageDocumentation
- * @module frama-c/server
+   Manage the current Frama-C server/client interface
+   @packageDocumentation
+   @module frama-c/server
 */
 
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
 import * as System from 'dome/system';
@@ -88,7 +88,7 @@ export class SIGNAL extends Dome.Event {
 // --------------------------------------------------------------------------
 
 /** Server stages. */
-export enum Stage {
+export enum Status {
   /** Server is off. */
   OFF = 'OFF',
   /** Server is starting, but not on yet. */
@@ -103,58 +103,32 @@ export enum Stage {
   FAILURE = 'FAILURE',
 }
 
-export interface OkStatus {
-  readonly stage:
-  Stage.OFF | Stage.ON | Stage.STARTING | Stage.RESTARTING | Stage.HALTING;
-}
-
-export interface ErrorStatus {
-  readonly stage: Stage.FAILURE;
-  /** Failure message. */
-  readonly error: string;
-}
-
-export type Status = OkStatus | ErrorStatus;
-
-function okStatus(
-  s: Stage.OFF | Stage.ON | Stage.STARTING | Stage.RESTARTING | Stage.HALTING,
-) {
-  return { stage: s };
-}
-
-function errorStatus(error: string): ErrorStatus {
-  return { stage: Stage.FAILURE, error };
-}
-
-export function hasErrorStatus(s: Status): s is ErrorStatus {
-  return (s as ErrorStatus).error !== undefined;
-}
-
 // --------------------------------------------------------------------------
 // --- Server Global State
 // --------------------------------------------------------------------------
 
 /** The current server status. */
-let status: Status = okStatus(Stage.OFF);
+let status: Status = Status.OFF;
 
 /** Request counter. */
 let rqCount = 0;
 
-type IndexedPair<T, U> = {
-  [index: string]: [T, U];
-};
-
-type ResolvePromise = (value: Json.json) => void;
-type RejectPromise = (error: Error) => void;
-
-/** Pending promise callbacks (pairs of (resolve, reject)). */
-let pending: IndexedPair<ResolvePromise, RejectPromise> = {};
+/** Pending Requests. */
+interface PendingRequest {
+  resolve: (data: Json.json) => void;
+  reject: () => void;
+}
+const pending = new Map<string, PendingRequest>();
 
 /** Server process. */
 let process: ChildProcess | undefined;
 
+/** Polling timeout when server is busy. */
+//const pollingTimeout = 200;
+let pollingTimer: NodeJS.Timeout | undefined;
+
 /** Killing timeout and timer for server process hard kill. */
-const killingTimeout = 300;
+const killingTimeout = 500;
 let killingTimer: NodeJS.Timeout | undefined;
 
 // --------------------------------------------------------------------------
@@ -187,14 +161,14 @@ export function useStatus(): Status {
  *  Whether the server is running and ready to handle requests.
  *  @return {boolean} Whether server stage is [[ON]].
  */
-export function isRunning(): boolean { return status.stage === Stage.ON; }
+export function isRunning(): boolean { return status === Status.ON; }
 
 /**
  *  Number of requests still pending.
  *  @return {number} Pending requests.
  */
 export function getPending(): number {
-  return _.reduce(pending, (n) => n + 1, 0);
+  return pending.size;
 }
 
 /**
@@ -214,16 +188,13 @@ export function onShutdown(callback: () => void) { SHUTDOWN.on(callback); }
 // --------------------------------------------------------------------------
 
 function _status(newStatus: Status) {
-  if (Dome.DEVEL && hasErrorStatus(newStatus)) {
-    D.error(newStatus.error);
-  }
-
   if (newStatus !== status) {
+    D.log('Server', newStatus);
     const oldStatus = status;
     status = newStatus;
     STATUS.emit(newStatus);
-    if (oldStatus.stage === Stage.ON) SHUTDOWN.emit();
-    if (newStatus.stage === Stage.ON) READY.emit();
+    if (oldStatus === Status.ON) SHUTDOWN.emit();
+    if (newStatus === Status.ON) READY.emit();
   }
 }
 
@@ -239,23 +210,20 @@ function _status(newStatus: Status) {
  *  - Otherwise, the Frama-C server is spawned.
  */
 export async function start() {
-  switch (status.stage) {
-    case Stage.OFF:
-    case Stage.FAILURE:
-    case Stage.RESTARTING:
-      _status(okStatus(Stage.STARTING));
+  switch (status) {
+    case Status.OFF:
+    case Status.FAILURE:
+    case Status.RESTARTING:
+      _status(Status.STARTING);
       try {
         await _launch();
-        _status(okStatus(Stage.ON));
       } catch (error) {
-        const msg = '' + error;
-        D.error(msg);
-        buffer.append(msg, '\n');
-        _exit(msg);
+        buffer.log('[frama-c]', error);
+        _exit(false);
       }
       return;
-    case Stage.HALTING:
-      _status(okStatus(Stage.RESTARTING));
+    case Status.HALTING:
+      _status(Status.RESTARTING);
       return;
     default:
       return;
@@ -271,21 +239,17 @@ export async function start() {
  *
  *  - If the server is starting, it is hard killed.
  *  - If the server is running, it is shutdown gracefully.
- *  - If the server is restarting, restart is canceled.
  *  - Otherwise, this is a no-op.
  */
 export function stop() {
-  switch (status.stage) {
-    case Stage.STARTING:
-      _status(okStatus(Stage.HALTING));
+  switch (status) {
+    case Status.STARTING:
+      _status(Status.HALTING);
       _kill();
       return;
-    case Stage.ON:
-      _status(okStatus(Stage.HALTING));
+    case Status.ON:
+      _status(Status.HALTING);
       _shutdown();
-      return;
-    case Stage.RESTARTING:
-      _status(okStatus(Stage.HALTING));
       return;
     default:
       return;
@@ -304,12 +268,12 @@ export function stop() {
  *  - Otherwise, this is a no-op.
  */
 export function kill() {
-  switch (status.stage) {
-    case Stage.STARTING:
-    case Stage.ON:
-    case Stage.HALTING:
-    case Stage.RESTARTING:
-      _status(okStatus(Stage.HALTING));
+  switch (status) {
+    case Status.STARTING:
+    case Status.ON:
+    case Status.HALTING:
+    case Status.RESTARTING:
+      _status(Status.HALTING);
       _kill();
       return;
     default:
@@ -330,17 +294,17 @@ export function kill() {
  *  - Otherwise, this is a no-op.
  */
 export function restart() {
-  switch (status.stage) {
-    case Stage.OFF:
-    case Stage.FAILURE:
+  switch (status) {
+    case Status.OFF:
+    case Status.FAILURE:
       start();
       return;
-    case Stage.ON:
-      _status(okStatus(Stage.RESTARTING));
+    case Status.ON:
+      _status(Status.RESTARTING);
       _shutdown();
       return;
-    case Stage.HALTING:
-      _status(okStatus(Stage.RESTARTING));
+    case Status.HALTING:
+      _status(Status.RESTARTING);
       return;
     default:
       return;
@@ -359,11 +323,12 @@ export function restart() {
  *  - Otherwise, this is a no-op.
  */
 export function clear() {
-  switch (status.stage) {
-    case Stage.FAILURE:
-    case Stage.OFF:
+  switch (status) {
+    case Status.FAILURE:
+    case Status.OFF:
       buffer.clear();
-      _status(okStatus(Stage.OFF));
+      _clear();
+      _status(Status.OFF);
       return;
     default:
       return;
@@ -478,19 +443,17 @@ async function _launch() {
 
     if (signal) {
       // [signal] is non-null.
-      buffer.log('Signal:', signal);
-      const error = `Process terminated by the signal ${signal}`;
-      _exit(error);
+      buffer.log('[frama-c]', signal);
+      _exit(false);
       return;
     }
     // [signal] is null, hence [code] is non-null (cf. NodeJS doc).
     if (code) {
-      buffer.log('Exit:', code);
-      const error = `Process exited with code ${code}`;
-      _exit(error);
+      buffer.log('[frama-c] exit', code);
+      _exit(false);
     } else {
       // [code] is zero: normal exit w/o error.
-      _exit();
+      _exit(true);
     }
   });
   // Connect to Server
@@ -501,32 +464,29 @@ async function _launch() {
 // --- Low-level Killing
 // --------------------------------------------------------------------------
 
-function _reset() {
-  D.log('Reset to initial configuration');
-
+function _clear() {
   rqCount = 0;
-  _.forEach(pending, ([, reject]) => reject(new Error('Server reset')));
-  pending = {};
-
+  pending.forEach((p: PendingRequest) => p.reject());
+  pending.clear();
+  if (pollingTimer) {
+    clearTimeout(pollingTimer);
+    pollingTimer = undefined;
+  }
   if (killingTimer) {
     clearTimeout(killingTimer);
     killingTimer = undefined;
   }
-
 }
 
 function _kill() {
   D.log('Hard kill');
-
   client.disconnect();
-  if (process) {
-    process.kill();
-  }
+  if (process) process.kill();
 }
 
 async function _shutdown() {
   D.log('Shutdown');
-  _reset();
+  _clear();
   client.shutdown();
   const killingPromise = new Promise((resolve) => {
     if (!killingTimer) {
@@ -542,17 +502,14 @@ async function _shutdown() {
   await killingPromise;
 }
 
-function _exit(error?: string) {
-  _reset();
+function _exit(error: boolean) {
+  _clear();
   client.disconnect();
   process = undefined;
-  if (status.stage === Stage.RESTARTING) {
+  if (status === Status.RESTARTING) {
     setImmediate(start);
-  } else if (error) {
-    _status(errorStatus(error));
-  } else {
-    _status(okStatus(Stage.OFF));
   }
+  _status(error ? Status.FAILURE : Status.OFF);
 }
 
 // --------------------------------------------------------------------------
@@ -572,7 +529,7 @@ class SignalHandler {
     this.active = false;
     this.listen = false;
     this.sigon = this.sigon.bind(this);
-    this.sigoff = this.handler = _.debounce(this.sigoff.bind(this), 1000);
+    this.sigoff = this.handler = debounce(this.sigoff.bind(this), 1000);
     this.unplug = this.unplug.bind(this);
   }
 
@@ -615,6 +572,10 @@ class SignalHandler {
     }
   }
 
+  emit() {
+    this.event.emit();
+  }
+
   unplug() {
     this.listen = false;
     this.handler.cancel();
@@ -634,8 +595,6 @@ function _signal(id: string): SignalHandler {
   return s;
 }
 
-client.onSignal((id: string) => { _signal(id).event.emit(); });
-
 // --- External API
 
 /**
@@ -646,7 +605,7 @@ client.onSignal((id: string) => { _signal(id).event.emit(); });
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function onSignal(s: Signal, callback: any) {
+export function onSignal(s: Signal, callback: () => void) {
   _signal(s.name).on(callback);
 }
 
@@ -658,7 +617,7 @@ export function onSignal(s: Signal, callback: any) {
  *  @param {string} id The signal identifier that was listen to.
  *  @param {function} callback The callback to remove.
  */
-export function offSignal(s: Signal, callback: any) {
+export function offSignal(s: Signal, callback: () => void) {
   _signal(s.name).off(callback);
 }
 
@@ -667,7 +626,7 @@ export function offSignal(s: Signal, callback: any) {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function useSignal(s: Signal, callback: any) {
+export function useSignal(s: Signal, callback: () => void) {
   React.useEffect(() => {
     onSignal(s, callback);
     return () => { offSignal(s, callback); };
@@ -738,8 +697,8 @@ export function send<In, Out>(
   request: Request<RqKind, In, Out>,
   param: In,
 ): Response<Out> {
-  if (!isRunning()) return Promise.reject(new Error('Server not running'));
-  if (!request.name) return Promise.reject(new Error('Undefined request'));
+  if (!isRunning()) return Promise.reject('Server not running');
+  if (!request.name) return Promise.reject('Undefined request');
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
   const response: Response<Out> = new Promise<Out>((resolve, reject) => {
@@ -754,35 +713,70 @@ export function send<In, Out>(
         reject(err);
       }
     };
-    pending[rid] = [decodedResolve, reject];
+    pending.set(rid, { resolve: decodedResolve, reject });
   });
-  response.kill = () => {
-    if (pending[rid]) client.kill(rid);
-  };
+  response.kill = () => pending.get(rid)?.reject();
   client.send(request.kind, rid, request.name, param);
   return response;
 }
 
+// --------------------------------------------------------------------------
+// --- Client Events
+// --------------------------------------------------------------------------
+
+function _resolved(id: string) {
+  pending.delete(id);
+  if (pending.size == 0) rqCount = 0;
+}
+
+client.onConnect((err?: Error) => {
+  if (err) {
+    if (Dome.DEVEL)
+      buffer.log('[client]', err.toString());
+    _status(Status.FAILURE);
+  } else {
+    if (Dome.DEVEL)
+      buffer.log('[client] Connected.');
+    _status(Status.ON);
+  }
+});
+
 client.onData((id: string, data: Json.json) => {
-  const [resolve] = pending[id];
-  if (resolve) {
-    delete pending[id];
-    resolve(data);
+  const p = pending.get(id);
+  if (p) {
+    p.resolve(data);
+    _resolved(id);
   }
 });
 
-client.onRejected((id: string, error: string) => {
-  const [, reject] = pending[id];
-  if (reject) {
-    delete pending[id];
-    reject(new Error(error));
+client.onKilled((id: string) => {
+  const p = pending.get(id);
+  if (p) {
+    p.reject();
+    _resolved(id);
   }
 });
 
-client.onIdle(() => {
-  const waiting = _.find(pending, () => true) !== undefined;
-  if (!waiting)
-    rqCount = 0; // No pending command nor pending response
+client.onRejected((id: string) => {
+  D.log('Rejected', id);
+  const p = pending.get(id);
+  if (p) {
+    p.reject();
+    _resolved(id);
+  }
+});
+
+client.onError((id: string, msg: string) => {
+  D.log('Request error', id, msg);
+  const p = pending.get(id);
+  if (p) {
+    p.reject();
+    _resolved(id);
+  }
+});
+
+client.onSignal((id: string) => {
+  _signal(id).emit();
 });
 
 // --------------------------------------------------------------------------
