@@ -155,7 +155,7 @@ export const Control = () => {
       break;
     case Server.Status.ON:
     case Server.Status.FAILURE:
-      stop = { enabled: true, onClick: Server.clear };
+      stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
       break;
     default:

@@ -58,32 +58,33 @@ type channel = {
   buffer : Buffer.t ;
 }
 
-let feed q =
-  if not q.eof then
-    try Buffer.add_channel q.buffer q.inc buffer_size
-    with End_of_file -> q.eof <- true
+let feed ch =
+  if not ch.eof then
+    try Buffer.add_channel ch.buffer ch.inc buffer_size
+    with End_of_file -> ch.eof <- true
 
-let read q =
+let read ch =
   try
-    let h = match Buffer.nth q.buffer 0 with
+    Format.printf "READ %S@." (Buffer.contents ch.buffer);
+    let h = match Buffer.nth ch.buffer 0 with
       | 'S' -> 3
       | 'L' -> 7
       | 'W' -> 15
       | _ -> raise (Invalid_argument "Server_socket.read")
     in
-    let hex = Buffer.sub q.buffer 1 h in
+    let hex = Buffer.sub ch.buffer 1 h in
     let len = int_of_string ("0x" ^ hex) in
-    let data = Buffer.sub q.buffer (1+h) len in
+    let data = Buffer.sub ch.buffer (1+h) len in
     let p = 1 + h + len in
-    let n = Buffer.length q.buffer - p in
-    let rest = Buffer.sub q.buffer p n in
-    Buffer.reset q.buffer ;
-    Buffer.add_string q.buffer rest ;
+    let n = Buffer.length ch.buffer - p in
+    let rest = Buffer.sub ch.buffer p n in
+    Buffer.reset ch.buffer ;
+    Buffer.add_string ch.buffer rest ;
     Some data
   with Invalid_argument _ ->
     None
 
-let write q data =
+let write ch data =
   begin
     let len = String.length data in
     let hex =
@@ -91,9 +92,9 @@ let write q data =
       if len < 0xFFFFFFF then Printf.sprintf "L%07x" len else
         Printf.sprintf "W%015x" len
     in
-    output_string q.out hex ;
-    output_string q.out data ;
-    flush q.out ;
+    output_string ch.out hex ;
+    output_string ch.out data ;
+    flush ch.out ;
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -141,81 +142,130 @@ let encode (resp : string Main.response) : string =
         "id", `String id ]
   in Yojson.Basic.to_string ~std:false js
 
-let commands q =
+let parse ch =
   begin
-    feed q ;
-    let rec scan cmds q =
-      match read q with
+    feed ch ;
+    let rec scan cmds ch =
+      match read ch with
       | None -> List.rev cmds
       | Some data ->
         match decode data with
-        | cmd -> scan (cmd::cmds) q
-        | exception _ -> scan cmds q
-    in scan [] q
+        | cmd -> scan (cmd::cmds) ch
+        | exception _ -> scan cmds ch
+    in scan [] ch
   end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Socket Messages                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let callback q rs =
+let callback ch rs =
   List.iter
     (fun r ->
        match encode r with
-       | data -> write q data
+       | data -> write ch data
        | exception _ -> ()
     ) rs
 
-let fetch q () =
-  if q.eof then None else
-    match commands q with
+let commands ch =
+  if ch.eof then None else
+    match parse ch with
     | [] -> None
-    | requests -> Some Main.{ requests ; callback = callback q }
+    | requests -> Some Main.{ requests ; callback = callback ch }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Establish the Server                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pretty = Format.pp_print_string
-let server = ref None
+type socket = {
+  socket : Unix.file_descr ;
+  mutable channel : channel option ;
+}
 
-let bind inc out =
+let fetch (s:socket) () =
+  Format.printf "SOCKET-FETCH@." ;
   try
-    Senv.debug "Client connected" ;
-    let channel = {
-      eof = false ; inc ; out ;
-      buffer = Buffer.create buffer_size ;
-    } in
-    let srv = Main.create ~pretty ~fetch:(fetch channel) () in
+    match s.channel with
+    | Some ch -> commands ch
+    | None ->
+      let fd,_ = Unix.accept ~cloexec:true s.socket in
+      Unix.set_nonblock fd ;
+      let inc = Unix.in_channel_of_descr fd in
+      let out = Unix.out_channel_of_descr fd in
+      Senv.debug "Client connected" ;
+      let ch = {
+        eof = false ; inc ; out ;
+        buffer = Buffer.create buffer_size ;
+      } in
+      s.channel <- Some ch ;
+      commands ch
+  with
+  | Unix.Unix_error(EAGAIN,_,_) -> None
+  | Stdlib.Sys_error msg ->
+    Senv.warning "SocketClient: sys %s" msg ;
+    None
+  | exn ->
+    Senv.warning "SocketClient: exn %s" (Printexc.to_string exn) ;
+    None
+
+let close (s:socket) =
+  Unix.shutdown s.socket SHUTDOWN_ALL ;
+  match s.channel with None -> () | Some ch ->
+    begin
+      close_in ch.inc ;
+      close_out ch.out ;
+    end
+
+let bind fd =
+  let socket = { socket = fd ; channel = None } in
+  try
+    Unix.listen fd 1 ;
+    Unix.set_nonblock fd ;
+    ignore (Sys.signal Sys.sigpipe Signal_ignore) ;
+    let pretty = Format.pp_print_string in
+    let server = Main.create ~pretty ~fetch:(fetch socket) () in
     Extlib.safe_at_exit begin fun () ->
-      Main.stop srv ;
-      close_in inc ;
-      close_out out ;
+      Main.stop server ;
+      close socket ;
     end ;
-    Main.start srv ;
-    Cmdline.at_normal_exit (fun () -> Main.run srv) ;
+    Main.start server ;
+    Cmdline.at_normal_exit (fun () ->
+        Format.eprintf "SERVER-RUN@." ;
+        Main.run server ;
+        Format.eprintf "SERVER-OUT@." ;
+      ) ;
   with exn ->
-    close_in inc ;
-    close_out out ;
+    close socket ;
     raise exn
 
+(* -------------------------------------------------------------------------- *)
+(* --- Synchronous Server                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let server = ref None
+
 let cmdline () =
-  let url = Socket.get () in
+  let addr = Socket.get () in
   match !server with
-  | Some url0 ->
-    if url = url0 then
-      Senv.feedback "Socket server already running"
+  | Some addr0 ->
+    if Senv.debug_atleast 1 && addr <> addr0 then
+      Senv.warning "Socket server already running on [%s]." addr0
     else
-      Senv.warning "Socket server already running on [%s]" url0
+      Senv.feedback "Socket server already running."
   | None ->
-    if url <> "" then
+    if addr <> "" then
       try
-        server := Some url ;
-        if Sys.file_exists url then Unix.unlink url ;
-        Senv.feedback "Socket server running on [%s]" url ;
-        Unix.establish_server bind (ADDR_UNIX url) ;
+        server := Some addr ;
+        if Sys.file_exists addr then Unix.unlink addr ;
+        let fd = Unix.socket PF_UNIX SOCK_STREAM 0 in
+        Unix.bind fd (ADDR_UNIX addr) ;
+        if Senv.debug_atleast 1 then
+          Senv.feedback "Socket server running on [%s]." addr
+        else
+          Senv.feedback "Socket server running." ;
+        bind fd
       with exn ->
-        Senv.fatal "Server socket failed@\nError: %s@"
+        Senv.fatal "Server socket failed.@\nError: %s@"
           (Printexc.to_string exn)
 
 let () = Db.Main.extend cmdline
