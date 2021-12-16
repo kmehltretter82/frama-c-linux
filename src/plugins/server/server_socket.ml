@@ -55,17 +55,23 @@ type channel = {
   mutable eof : bool ;
   inc : in_channel ;
   out : out_channel ;
+  tmp : bytes ;
   buffer : Buffer.t ;
 }
 
-let feed ch =
+let feed_bytes ch =
   if not ch.eof then
-    try Buffer.add_channel ch.buffer ch.inc buffer_size
-    with End_of_file -> ch.eof <- true
+    try
+      let n = input ch.inc ch.tmp 0 buffer_size in
+      if n > 0 then Format.eprintf "READ %d bytes@." n ;
+      Buffer.add_subbytes ch.buffer ch.tmp 0 n ;
+    with
+    | Sys_blocked_io -> ()
+    | End_of_file -> ch.eof <- true
 
-let read ch =
+let read_data ch =
   try
-    Format.printf "READ %S@." (Buffer.contents ch.buffer);
+    Format.eprintf "DATA %S@." (Buffer.contents ch.buffer) ;
     let h = match Buffer.nth ch.buffer 0 with
       | 'S' -> 3
       | 'L' -> 7
@@ -84,7 +90,7 @@ let read ch =
   with Invalid_argument _ ->
     None
 
-let write ch data =
+let write_data ch data =
   begin
     let len = String.length data in
     let hex =
@@ -143,17 +149,14 @@ let encode (resp : string Main.response) : string =
   in Yojson.Basic.to_string ~std:false js
 
 let parse ch =
-  begin
-    feed ch ;
-    let rec scan cmds ch =
-      match read ch with
-      | None -> List.rev cmds
-      | Some data ->
-        match decode data with
-        | cmd -> scan (cmd::cmds) ch
-        | exception _ -> scan cmds ch
-    in scan [] ch
-  end
+  let rec scan cmds ch =
+    match read_data ch with
+    | None -> List.rev cmds
+    | Some data ->
+      match decode data with
+      | cmd -> scan (cmd::cmds) ch
+      | exception _ -> scan cmds ch
+  in scan [] ch
 
 (* -------------------------------------------------------------------------- *)
 (* --- Socket Messages                                                    --- *)
@@ -163,15 +166,18 @@ let callback ch rs =
   List.iter
     (fun r ->
        match encode r with
-       | data -> write ch data
+       | data -> write_data ch data
        | exception _ -> ()
     ) rs
 
 let commands ch =
   if ch.eof then None else
-    match parse ch with
-    | [] -> None
-    | requests -> Some Main.{ requests ; callback = callback ch }
+    begin
+      feed_bytes ch ;
+      match parse ch with
+      | [] -> None
+      | requests -> Some Main.{ requests ; callback = callback ch }
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Establish the Server                                               --- *)
@@ -182,43 +188,40 @@ type socket = {
   mutable channel : channel option ;
 }
 
+let close (s: socket) =
+  match s.channel with None -> () | Some ch ->
+    begin
+      s.channel <- None ;
+      close_in ch.inc ;
+      close_out ch.out ;
+    end
+
 let fetch (s:socket) () =
-  Format.printf "SOCKET-FETCH@." ;
   try
     match s.channel with
     | Some ch -> commands ch
     | None ->
       let fd,_ = Unix.accept ~cloexec:true s.socket in
-      Unix.set_nonblock fd ;
       let inc = Unix.in_channel_of_descr fd in
       let out = Unix.out_channel_of_descr fd in
       Senv.debug "Client connected" ;
       let ch = {
         eof = false ; inc ; out ;
+        tmp = Bytes.create buffer_size ;
         buffer = Buffer.create buffer_size ;
       } in
       s.channel <- Some ch ;
       commands ch
   with
-  | Unix.Unix_error(EAGAIN,_,_) -> None
-  | Stdlib.Sys_error msg ->
-    Senv.warning "SocketClient: sys %s" msg ;
-    None
+  | Unix.Unix_error _ -> close s ; None
   | exn ->
-    Senv.warning "SocketClient: exn %s" (Printexc.to_string exn) ;
-    None
-
-let close (s:socket) =
-  Unix.shutdown s.socket SHUTDOWN_ALL ;
-  match s.channel with None -> () | Some ch ->
-    begin
-      close_in ch.inc ;
-      close_out ch.out ;
-    end
+    Senv.warning "Socket: exn %s" (Printexc.to_string exn) ;
+    close s ; None
 
 let bind fd =
   let socket = { socket = fd ; channel = None } in
   try
+    Unix.set_nonblock fd ;
     Unix.listen fd 1 ;
     Unix.set_nonblock fd ;
     ignore (Sys.signal Sys.sigpipe Signal_ignore) ;
@@ -229,11 +232,7 @@ let bind fd =
       close socket ;
     end ;
     Main.start server ;
-    Cmdline.at_normal_exit (fun () ->
-        Format.eprintf "SERVER-RUN@." ;
-        Main.run server ;
-        Format.eprintf "SERVER-OUT@." ;
-      ) ;
+    Cmdline.at_normal_exit (fun () -> Main.run server) ;
   with exn ->
     close socket ;
     raise exn
