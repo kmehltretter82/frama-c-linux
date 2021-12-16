@@ -51,7 +51,10 @@ let get_spec kinstr kf =
       "@[Recursive call to %a@ without a specification.@ \
        Generating probably incomplete assigns to interpret the call.@ \
        Try to increase@ the %s parameter@ \
-       or write a correct specification@ for function %a.%t@]"
+       or write a correct specification@ for function %a.@\n%t@]"
+      (* note: the "\n" before the pretty print of the stack is required by:
+         FRAMAC_SHARE/analysis-scripts/make_wrapper.py
+      *)
       Kernel_function.pretty kf
       Value_parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
