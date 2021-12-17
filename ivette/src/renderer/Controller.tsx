@@ -30,7 +30,8 @@ import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 
 import * as Toolbars from 'dome/frame/toolbars';
-import { LED, LEDstatus, IconButton } from 'dome/controls/buttons';
+import { IconButton } from 'dome/controls/buttons';
+import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';

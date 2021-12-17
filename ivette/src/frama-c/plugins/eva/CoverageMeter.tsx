@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import { Meter } from 'dome/controls/displays';
 
 export interface CoverageProps {
   reachable: number;
@@ -37,12 +38,12 @@ export default function(props: { coverage: CoverageProps }) {
   const total = reachable + dead;
 
   return (
-    <meter
+    <Meter
       min={0}
       max={total}
       low={0.50 * total}
       high={0.85 * total}
-      optimum={total}
+      optimum='HIGH'
       value={reachable}
     />
   );

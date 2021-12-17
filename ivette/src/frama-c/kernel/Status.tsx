@@ -26,7 +26,8 @@
 
 import React from 'react';
 import { Code } from 'dome/controls/labels';
-import { LED, IconButton } from 'dome/controls/buttons';
+import { IconButton } from 'dome/controls/buttons';
+import { LED } from 'dome/controls/displays';
 import { Icon } from 'dome/controls/icons';
 import * as Toolbars from 'dome/frame/toolbars';
 import { GlobalState, useGlobalState } from 'dome/data/states';

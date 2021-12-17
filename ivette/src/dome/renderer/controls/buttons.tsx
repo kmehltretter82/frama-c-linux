@@ -32,7 +32,6 @@
 import React from 'react';
 import { classes } from 'dome/misc/utils';
 import { Icon } from './icons';
-import { LabelProps } from './labels';
 import './style.css';
 
 interface EVENT {
@@ -46,68 +45,6 @@ const DISABLED = ({ disabled = false, enabled = true }) => (
 const TRIGGER = (onClick?: () => void) => (evt?: EVENT) => {
   evt?.stopPropagation();
   if (onClick) onClick();
-};
-
-// --------------------------------------------------------------------------
-// --- LCD
-// --------------------------------------------------------------------------
-
-/** Button-like label. */
-export function LCD(props: LabelProps) {
-  const className = classes(
-    'dome-xButton dome-xBoxButton dome-text-code dome-xButton-lcd ',
-    props.className,
-  );
-  return (
-    <label
-      className={className}
-      title={props.title}
-      style={props.style}
-    >
-      {props.icon && <Icon id={props.icon} />}
-      {props.label}
-      {props.children}
-    </label>
-  );
-}
-
-// --------------------------------------------------------------------------
-// --- Led
-// --------------------------------------------------------------------------
-
-export type LEDstatus =
-  undefined | 'inactive' | 'active' | 'positive' | 'negative' | 'warning';
-
-export interface LEDprops {
-  /**
-  Led status:
-     - `'inactive'`: off (default)
-     - `'active'`: blue color
-     - `'positive'`: green color
-     - `'negative'`: red color
-     - `'warning'`: orange color
-   */
-  status?: LEDstatus;
-  /** Blinking Led (default: `false`). */
-  blink?: boolean;
-  /** Tooltip text. */
-  title?: string;
-  /** Additional CSS class. */
-  className?: string;
-  /** Additional CSS style. */
-  style?: React.CSSProperties;
-}
-
-export const LED = (props: LEDprops) => {
-  const className = classes(
-    'dome-xButton-led',
-    `dome-xButton-led-${props.status || 'inactive'}`,
-    props.blink && 'dome-xButton-blink',
-    props.className,
-  );
-  return (
-    <div className={className} title={props.title} style={props.style} />
-  );
 };
 
 // --------------------------------------------------------------------------

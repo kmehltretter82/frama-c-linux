@@ -22,11 +22,10 @@
 
 // React & Dome
 import React from 'react';
+import { LED } from 'dome/controls/displays';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/api/plugins/eva/general';
-
-import { LED } from 'dome/controls/buttons';
 
 import CoverageMeter, { percent } from './CoverageMeter';
 
@@ -143,10 +142,10 @@ function Alarms(data: Eva.programStatsType,
         </tbody>
       </table>
       {invalid > 0 && (
-      <div>
-        {invalid} of them {invalid === 1 ? 'is a' : 'are'} sure
-        alarm{plural(invalid)}.
-      </div>
+        <div>
+          {invalid} of them {invalid === 1 ? 'is a' : 'are'} sure
+          alarm{plural(invalid)}.
+        </div>
       )}
     </>
   );
