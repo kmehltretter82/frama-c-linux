@@ -86,8 +86,7 @@
     "node_modules",
     "dist",
     "src/dome/doc",
-    "src/dome/template",
-    "src/frama-c/client_zmq.ts"
+    "src/dome/template"
   ],
   "typedocOptions": {
     "name": "Ivette Documentation",

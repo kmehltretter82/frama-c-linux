@@ -20,23 +20,20 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import Emitter from 'events';
-import { Request as ZmqRequest } from 'zeromq';
-import { json } from 'dome/data/json';
+import * as ZMQ from 'zeromq';
+import { Debug } from 'dome';
 import { Client } from './client';
 
-const pollingTimeout = 50;
+const D = new Debug('ZmqServer');
 
 // --------------------------------------------------------------------------
 // --- Frama-C Server API
 // --------------------------------------------------------------------------
 
-class ZmqClient implements Client {
+class ZmqClient extends Client {
 
-  events = new Emitter();
-  queueCmd: string[] = [];
-  queueId: string[] = [];
-  zmqSocket: ZmqRequest | undefined;
+  queue: string[] = [];
+  zmqSocket: ZMQ.Socket | undefined;
   zmqIsBusy = false;
 
   /** Server CLI */
@@ -46,18 +43,18 @@ class ZmqClient implements Client {
 
   /** Connection */
   connect(sockaddr: string): void {
-    if (!this.zmqSocket) {
+    if (this.zmqSocket) {
       this.zmqSocket.close();
     }
-    this.zmqSocket = new ZmqRequest();
+    this.zmqSocket = new ZMQ.Socket('req');
     this.zmqIsBusy = false;
-    this.zmqSocket.connect(sockaddr);
+    this.zmqSocket.connect(`ipc://${sockaddr}`);
+    this.zmqSocket.on('message', (msg: string[]) => this._receive(msg));
   }
 
   disconnect(): void {
     this.zmqIsBusy = false;
-    this.queueCmd = [];
-    this.queueId = [];
+    this.queue = [];
     if (this.zmqSocket) {
       this.zmqSocket.close();
       this.zmqSocket = undefined;
@@ -66,191 +63,137 @@ class ZmqClient implements Client {
 
   /** Send Request */
   send(kind: string, id: string, request: string, data: any): void {
-    this.queueCmd.push(kind, id, request, data);
-    this.queueId.push(id);
-    this._flush();
+    if (this.zmqSocket) {
+      this.queue.push(kind, id, request, data);
+      this._flush();
+    }
   }
 
   /** Signal ON */
-  sigOn(id: string): void { this.queueCmd.push('SIGON', id); this._flush(); }
+  sigOn(id: string): void {
+    if (this.zmqSocket) {
+      this.queue.push('SIGON', id);
+      this._flush();
+    }
+  }
 
   /** Signal ON */
-  sigOff(id: string): void { this.queueCmd.push('SIGOFF', id); this._flush(); }
+  sigOff(id: string): void {
+    if (this.zmqSocket) {
+      this.queue.push('SIGOFF', id);
+      this._flush();
+    }
+  }
 
   /** Kill Request */
   kill(id: string): void {
     if (this.zmqSocket) {
-      this.queueCmd.push('KILL', id);
+      this.queue.push('KILL', id);
       this._flush();
     }
   }
 
   /** Polling */
-  poll(): void { }
+  poll(): void {
+    if (this.zmqSocket && this.queue.length == 0) {
+      this.queue.push('POLL');
+    }
+    this._flush();
+  }
 
   /** Shutdown the server */
   shutdown(): void {
-    this._reset();
-    this._flush();
-    this.queueCmd.push('SHUTDOWN');
-  }
-
-  /** Request data callback */
-  onData(callback: (id: string, data: json) => void): void {
-    this.events.on('DATA', callback);
-  }
-
-  /** Rejected request callback */
-  onRejected(callback: (id: string, err: string) => void): void {
-    this.events.on('REJECT', callback);
-  }
-
-  /** Request error callback */
-  onError(callback: (msg: string) => void): void {
-    this.events.on('ERROR', callback);
-  }
-
-  /** Killed request callback */
-  onKilled(callback: (id: string) => void): void {
-    this.events.on('KILL', callback);
-  }
-
-  /** Signal callback */
-  onSignal(callback: (id: string) => void): void {
-    this.events.on('SIGNAL', callback);
-  }
-
-  /** Idle callback */
-  onIdle(callback: () => void): void {
-    this.events.on('CALLBACK', callback);
+    this.queue = [];
+    if (this.zmqSocket) {
+      this.queue.push('SHUTDOWN');
+      this._flush();
+    }
   }
 
   // --------------------------------------------------------------------------
   // --- Low-Level Management
   // --------------------------------------------------------------------------
 
-  pollingTimer: NodeJS.Timeout | undefined;
-  flushingTimer: NodeJS.Immediate | undefined;
-
-  _reset() {
-    if (this.flushingTimer) {
-      clearImmediate(this.flushingTimer);
-      this.flushingTimer = undefined;
-    }
-    if (this.pollingTimer) {
-      clearTimeout(this.pollingTimer);
-      this.pollingTimer = undefined;
-    }
-  }
-
   _flush() {
-    if (!this.flushingTimer) {
-      this.flushingTimer = setImmediate(() => {
-        this.flushingTimer = undefined;
-        this._send();
-      });
-    }
-  }
-
-  _poll() {
-    if (!this.pollingTimer) {
-      this.pollingTimer = setTimeout(() => {
-        this.pollingTimer = undefined;
-        this._send();
-      }, pollingTimeout);
-    }
-  }
-
-  async _send() {
-    // when busy, will be eventually re-triggered
-    if (!this.zmqIsBusy) {
-      const cmds = this.queueCmd;
-      if (!cmds.length) {
-        this.queueCmd.push('POLL');
-        this.events.emit('IDLE');
-      }
-      this.zmqIsBusy = true;
-      const ids = this.queueId;
-      this.queueCmd = [];
-      this.queueId = [];
-      try {
-        await this.zmqSocket?.send(cmds);
-        const resp = await this.zmqSocket?.receive();
-        this._receive(resp);
-      } catch (error) {
-        this._error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
-        const err = 'Canceled request';
-        ids.forEach((rid) => this._reject(rid, err));
-      }
-      this.zmqIsBusy = false;
-      this.events.emit('IDLE');
-    }
-  }
-
-  _data(id: string, data: any) {
-    this.events.emit('DATA', id, data);
-  }
-
-  _reject(id: string, error: string) {
-    this.events.emit('REJECT', id, error);
-  }
-
-  _signal(id: string) {
-    this.events.emit('SIGNAL', id);
-  }
-
-  _error(err: any) {
-    this.events.emit('ERROR', err);
-  }
-
-  _receive(resp: any) {
-    try {
-      let rid;
-      let data;
-      let err;
-      let cmd;
-      const shift = () => resp.shift().toString();
-      let unknownResponse = false;
-      while (resp.length && !unknownResponse) {
-        cmd = shift();
-        switch (cmd) {
-          case 'NONE':
-            break;
-          case 'DATA':
-            rid = shift();
-            data = shift();
-            this._data(rid, data);
-            break;
-          case 'KILLED':
-            rid = shift();
-            this._reject(rid, 'Killed');
-            break;
-          case 'ERROR':
-            rid = shift();
-            err = shift();
-            this._reject(rid, err);
-            break;
-          case 'REJECTED':
-            rid = shift();
-            this._reject(rid, 'Rejected');
-            break;
-          case 'SIGNAL':
-            rid = shift();
-            this._signal(rid);
-            break;
-          case 'WRONG':
-            err = shift();
-            this._error(`ZMQ Protocol Error: ${err}`);
-            break;
-          default:
-            this._error(`Unknown Response: ${cmd}`);
-            unknownResponse = true;
-            break;
+    const socket = this.zmqSocket;
+    if (socket) {
+      const cmds = this.queue;
+      if (cmds && !this.zmqIsBusy) {
+        try {
+          this.queue = [];
+          socket.send(cmds);
+          this.zmqIsBusy = true;
+        } catch (err) {
+          D.error('ZmqSocket', err);
+          this.zmqIsBusy = false;
         }
       }
+    } else {
+      this.queue = [];
+    }
+  }
+
+  _receive(resp: string[]) {
+    try {
+      this._decode(resp);
+    } catch (err) {
+      D.error('ZmqSocket', err);
     } finally {
-      if (this.queueCmd.length) this._flush();
-      else this._poll();
+      this.zmqIsBusy = false;
+      setImmediate(() => this._flush());
+    }
+  }
+
+  /* eslint-disable @typescript-eslint/indent */
+  _decode(resp: string[]) {
+    const shift = () => resp.shift() ?? '';
+    while (resp.length) {
+      const cmd = shift();
+      switch (cmd) {
+        case 'NONE':
+          break;
+        case 'DATA':
+          {
+            const rid = shift();
+            const data = JSON.parse(shift());
+            this.emitData(rid, data);
+          }
+          break;
+        case 'KILLED':
+          {
+            const rid = shift();
+            this.emitKilled(rid);
+          }
+          break;
+        case 'ERROR':
+          {
+            const rid = shift();
+            const msg = shift();
+            this.emitError(rid, msg);
+          }
+          break;
+        case 'REJECTED':
+          {
+            const rid = shift();
+            this.emitRejected(rid);
+          }
+          break;
+        case 'SIGNAL':
+          {
+            const rid = shift();
+            this.emitSignal(rid);
+          }
+          break;
+        case 'WRONG':
+          {
+            const err = shift();
+            D.error(`ZMQ Protocol Error: ${err}`);
+          }
+          break;
+        default:
+          D.error(`Unknown Response: ${cmd}`);
+          return;
+      }
     }
   }
 
