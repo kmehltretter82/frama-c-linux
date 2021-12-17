@@ -468,8 +468,13 @@ let mk_variant_properties kf s ca v =
   let vdecr = Logic_const.prel ~loc (Rlt, v, vcurr) in
   (vpos_id, vpos), (vdecr_id, vdecr)
 
+type loop_hypothesis =
+  | NoHyp
+  | Check of WpPropId.prop_id
+  | Always of WpPropId.prop_id
+
 type loop_invariant = {
-  loop_hyp : WpPropId.prop_id option ;
+  loop_hyp : loop_hypothesis ;
   loop_est : WpPropId.prop_id option ;
   loop_ind : WpPropId.prop_id option ;
   loop_pred : Cil_types.predicate ;
@@ -509,10 +514,11 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                 let g_est, g_ind = WpPropId.mk_loop_inv kf stmt ca in
                 let admit = Logic_utils.use_predicate inv.tp_kind in
                 let verif = Logic_utils.verify_predicate inv.tp_kind in
+                let loop_hyp = if admit then Always g_hyp else Check g_hyp in
                 let use flag id = if flag then Some id else None in
                 let inv =
                   { loop_pred = normalize_pred inv.tp_statement ;
-                    loop_hyp = use admit g_hyp ;
+                    loop_hyp ;
                     loop_est = use verif g_est ;
                     loop_ind = use verif g_ind ; }
                 in
@@ -536,7 +542,7 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                 let mk_inv (i, p) =
                   let i, p = intro_terminates @@ normalize_annot (i, p) in
                   { loop_pred = p ;
-                    loop_hyp = None ; loop_est = None ; loop_ind = Some i }
+                    loop_hyp = NoHyp ; loop_est = None ; loop_ind = Some i }
                 in
                 { l with loop_terminates = None ;
                          loop_invariants =

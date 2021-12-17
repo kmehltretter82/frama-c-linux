@@ -78,8 +78,13 @@ val get_stmt_assigns : kernel_function -> stmt -> assigns_full_info list
 (* --- Property Accessors : Loop Contracts                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+type loop_hypothesis =
+  | NoHyp
+  | Check of WpPropId.prop_id
+  | Always of WpPropId.prop_id
+
 type loop_invariant = {
-  loop_hyp : WpPropId.prop_id option ;
+  loop_hyp : loop_hypothesis ;
   loop_est : WpPropId.prop_id option ;
   loop_ind : WpPropId.prop_id option ;
   loop_pred : Cil_types.predicate ;

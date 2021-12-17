@@ -65,7 +65,8 @@ module type S = sig
   val new_env : ?lvars:Cil_types.logic_var list -> kernel_function -> t_env
 
   val add_axiom : WpPropId.prop_id -> LogicUsage.logic_lemma -> unit
-  val add_hyp  : t_env -> WpPropId.pred_info -> t_prop -> t_prop
+  val add_hyp :
+    ?for_pid:WpPropId.prop_id -> t_env -> WpPropId.pred_info -> t_prop -> t_prop
   val add_goal : t_env -> WpPropId.pred_info -> t_prop -> t_prop
   val add_subgoal : t_env -> WpPropId.pred_info -> ?deps:Property.Set.t ->
     predicate -> stmt -> WpPropId.effect_source -> t_prop -> t_prop
