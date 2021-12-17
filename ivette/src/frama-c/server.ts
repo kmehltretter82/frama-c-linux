@@ -110,7 +110,7 @@ let rqCount = 0;
 /** Pending Requests. */
 interface PendingRequest {
   resolve: (data: Json.json) => void;
-  reject: () => void;
+  reject: (err?: string) => void;
 }
 const pending = new Map<string, PendingRequest>();
 
@@ -745,7 +745,7 @@ client.onKilled((id: string) => {
 client.onRejected((id: string) => {
   const p = pending.get(id);
   if (p) {
-    p.reject();
+    p.reject('rejected');
     _resolved(id);
   }
 });
@@ -753,7 +753,7 @@ client.onRejected((id: string) => {
 client.onError((id: string, msg: string) => {
   const p = pending.get(id);
   if (p) {
-    p.reject();
+    p.reject(msg);
     _resolved(id);
   }
 });

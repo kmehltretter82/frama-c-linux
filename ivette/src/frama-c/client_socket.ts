@@ -59,7 +59,6 @@ class SocketClient extends Client {
       this.timer = undefined;
     }
     const s = Net.createConnection(sockaddr, () => {
-      D.log('Client connected', this.retries);
       this.running = true;
       this.retries = 0;
       this.emitConnect();
@@ -71,11 +70,9 @@ class SocketClient extends Client {
     s.on('error', (err: Error) => {
       s.destroy();
       if (this.retries <= RETRIES && !this.running) {
-        D.log('Retry', this.retries, '/', RETRIES);
         this.socket = undefined;
         this.timer = setTimeout(() => this.connect(sockaddr), TIMEOUT);
       } else {
-        D.warn('Socket error', err.toString());
         this.running = false;
         this.emitConnect(err);
       }
@@ -84,7 +81,6 @@ class SocketClient extends Client {
   }
 
   disconnect(): void {
-    D.log('Disconnect');
     this.queue = [];
     this.retries = 0;
     this.running = false;

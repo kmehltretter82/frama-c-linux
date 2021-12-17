@@ -783,10 +783,14 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
 export async function resetSelection() {
   GlobalSelection.setValue(emptySelection);
   if (Server.isRunning()) {
-    const main = await Server.send(Ast.getMainFunction, {});
-    // If the selection has already been modified, do not change it.
-    if (main && GlobalSelection.getValue() === emptySelection) {
-      GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
+    try {
+      const main = await Server.send(Ast.getMainFunction, {});
+      // If the selection has already been modified, do not change it.
+      if (main && GlobalSelection.getValue() === emptySelection) {
+        GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
+      }
+    } catch (err) {
+      if (err) D.warn('Request error', err);
     }
   }
 }
