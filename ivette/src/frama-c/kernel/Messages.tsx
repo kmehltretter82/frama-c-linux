@@ -197,23 +197,26 @@ function Section(p: Forms.SectionProps) {
   );
 }
 
+function Checkbox(p: Forms.CheckboxFieldProps) {
+  const lbl = p.label.charAt(0).toUpperCase() + p.label.slice(1).toLowerCase();
+  return <Forms.CheckboxField label={lbl} state={p.state} />;
+}
+
 function MessageKindCheckbox(props: {
   kind: logkind,
   kindState: Forms.FieldState<KindFilter>,
 }) {
   const { kind, kindState } = props;
-  const label = kind.charAt(0).toUpperCase + kind.slice(1).toLowerCase();
   const state = Forms.useProperty(kindState, kind);
-  return <Forms.CheckboxField label={label} state={state} />;
+  return <Checkbox label={kind} state={state} />;
 }
 
 function PluginCheckbox(props: {
   plugin: string,
   pluginState: Forms.FieldState<PluginFilter>,
 }) {
-  const label = props.plugin.toUpperCase();
   const state = Forms.useProperty(props.pluginState, props.plugin);
-  return <Forms.CheckboxField label={label} state={state} />;
+  return <Checkbox label={props.plugin} state={state} />;
 }
 
 function MessageFilter(props: { filter: State<Filter> }) {
