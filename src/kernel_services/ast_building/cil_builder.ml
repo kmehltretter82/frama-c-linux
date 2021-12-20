@@ -745,7 +745,10 @@ struct
     | Skip ->
       Cil_types.Skip (loc)
     | Assign (dest,src) ->
-      Cil_types.Set (build_lval ~loc dest, build_exp ~loc src, loc)
+      let dest' = build_lval ~loc dest
+      and src' = build_exp ~loc src in
+      let src' = Cil.mkCast ~newt:(Cil.typeOfLval dest') src' in
+      Cil_types.Set (dest', src', loc)
     | Call (dest,callee,args) ->
       let dest' = Option.map (build_lval ~loc) dest
       and callee' = build_exp ~loc callee
