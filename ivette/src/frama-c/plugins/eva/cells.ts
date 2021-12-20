@@ -175,7 +175,7 @@ export class ValueCache {
       .send(Values.getValues, { target: marker, callstack })
       .then((r) => {
         newValue.errors = undefined;
-        newValue.v_before = r.v_before;
+        if (r.v_before) newValue.v_before = r.v_before;
         newValue.v_after = r.v_after;
         newValue.v_then = r.v_then;
         newValue.v_else = r.v_else;

@@ -192,7 +192,7 @@ export const byEvaluation: Compare.Order<evaluation> =
 const getValues_internal: Server.GetRequest<
   { callstack?: callstack, target: marker },
   { v_else?: evaluation, v_then?: evaluation, v_after?: evaluation,
-    v_before: evaluation }
+    v_before?: evaluation }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getValues',
@@ -201,7 +201,7 @@ const getValues_internal: Server.GetRequest<
             v_else: jEvaluation,
             v_then: jEvaluation,
             v_after: jEvaluation,
-            v_before: jEvaluationSafe,
+            v_before: jEvaluation,
           }),
   signals: [],
 };
@@ -209,7 +209,7 @@ const getValues_internal: Server.GetRequest<
 export const getValues: Server.GetRequest<
   { callstack?: callstack, target: marker },
   { v_else?: evaluation, v_then?: evaluation, v_after?: evaluation,
-    v_before: evaluation }
+    v_before?: evaluation }
   >= getValues_internal;
 
 /* ------------------------------------- */
