@@ -136,12 +136,12 @@ $(PLUGIN_DIR)/tests/ptests_config: $(PTESTS_DEP)
 	$(ECHO) "FRAMAC_SHARE=$(FRAMAC_SHARE)" >> $$@
 	$(ECHO) "FRAMAC_LIB=$(FRAMAC_LIB)" >> $$@
 	if test "$(FRAMAC_INTERNAL)" = "no"; then \
-	  $(ECHO) "FRAMAC_PLUGIN=$(PLUGIN_LIB_DIR):$(PLUGIN_INSTALL_DIR)" >> $$@; \
-	  $(ECHO) "FRAMAC_PLUGIN_GUI=$(PLUGIN_GUI_LIB_DIR):$(PLUGIN_INSTALL_DIR)/gui" >> $$@; \
+	  $(ECHO) "FRAMAC_PLUGIN=$(realpath $(PLUGIN_LIB_DIR)):$(PLUGIN_INSTALL_DIR)" >> $$@; \
+	  $(ECHO) "FRAMAC_PLUGIN_GUI=$(realpath $(PLUGIN_GUI_LIB_DIR)):$(PLUGIN_INSTALL_DIR)/gui" >> $$@; \
           $(ECHO) "OCAMLFIND_IGNORE_DUPS_IN=$(PLUGIN_INSTALL_DIR)" >> $$@; \
         else \
-	  $(ECHO) "FRAMAC_PLUGIN=$(PLUGIN_LIB_DIR)" >> $$@; \
-	  $(ECHO) "FRAMAC_PLUGIN_GUI=$(PLUGIN_GUI_LIB_DIR)" >> $$@; \
+	  $(ECHO) "FRAMAC_PLUGIN=$(realpath $(PLUGIN_LIB_DIR))" >> $$@; \
+	  $(ECHO) "FRAMAC_PLUGIN_GUI=$(realpath $(PLUGIN_GUI_LIB_DIR))" >> $$@; \
         fi
 	$(ECHO) "OCAMLRUNPARAM=" >> $$@
 	$(CHMOD_RO) $$@
