@@ -257,6 +257,7 @@ DISTRIB_FILES:=\
       $(LIBC_FILES)							\
       share/analysis-scripts/analysis.mk                                \
       share/analysis-scripts/benchmark_database.py                      \
+      share/analysis-scripts/build.py                                   \
       share/analysis-scripts/build_callgraph.py                         \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
@@ -1973,6 +1974,8 @@ install:: install-lib-$(OCAMLBEST)
 	$(CP) \
 	  share/analysis-scripts/analysis.mk \
 	  share/analysis-scripts/benchmark_database.py \
+	  share/analysis-scripts/build.py \
+	  share/analysis-scripts/build_callgraph.py \
 	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/clone.sh \

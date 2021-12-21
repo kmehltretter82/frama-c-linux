@@ -36,6 +36,10 @@ usage() {
    echo ""
    echo "  where cmd is:"
    echo ""
+   echo "  - build [--jbdb build_commands.json] [--sources file...]"
+   echo "      Produces a GNUmakefile for Frama-C analyses."
+   echo "      Uses a build_commands.json if available."
+   echo ""
    echo "  - configure machdep"
    echo "      Runs an existing configure script to only consider files"
    echo "      in Frama-C's libc; this will hopefully disable non-essential"
@@ -216,6 +220,10 @@ configure_for_frama_c() {
 case "$command" in
     "help" | "-help" | "--help" | "-h")
         usage 0;
+        ;;
+    "build")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/build.py "$@";
         ;;
     "make-template")
         shift;
