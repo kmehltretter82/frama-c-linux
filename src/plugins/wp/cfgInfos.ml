@@ -208,7 +208,7 @@ module Callees = WpContext.StaticGenerator(Kernel_function)
 
 module RecursiveClusters : sig
   val is_recursive : Kernel_function.t -> bool
-  val get_cluster : Kernel_function.t -> Kernel_function.Set.t option
+  val in_cluster : caller:Kernel_function.t -> Kernel_function.t -> bool
 end =
 struct
   (* Tarjan's algorithm, adapted from:
@@ -287,10 +287,15 @@ struct
   let is_recursive kf =
     (* in a recursive cluster or contains unspecified function pointer call *)
     None <> get_cluster kf || [] <> snd @@ Callees.get kf
+
+  let in_cluster ~caller callee =
+    match get_cluster caller with
+    | None -> false
+    | Some cluster -> Fset.mem callee cluster
 end
 
 let is_recursive = RecursiveClusters.is_recursive
-let get_cluster = RecursiveClusters.get_cluster
+let in_cluster = RecursiveClusters.in_cluster
 
 (* -------------------------------------------------------------------------- *)
 (* --- No variant loops                                                   --- *)
@@ -433,11 +438,8 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
   Option.iter
     begin fun (cfg : Cfg.automaton) ->
       (* Spec Iteration *)
-      if selected_decreases ~prop kf then
-        Wp_parameters.warning
-          "Unsupported clause @decreases in '%a' (ignored)"
-          Kernel_function.pretty kf ;
-      if selected_terminates ~prop kf ||
+      if selected_decreases ~prop kf ||
+         selected_terminates ~prop kf ||
          selected_disjoint_complete kf ~bhv ~prop ||
          (List.exists (selected_bhv ~smoking ~bhv ~prop) behaviors)
       then infos.annots <- true ;

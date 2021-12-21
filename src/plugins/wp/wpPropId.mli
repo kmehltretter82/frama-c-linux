@@ -89,24 +89,6 @@ val are_selected_names: string list -> string list -> bool
 (** [are_selected_names asked names] checks if [names] of a property are
     selected according to [asked] names. *)
 
-type prop_kind =
-  | PKTactic      (** tactical sub-goal *)
-  | PKCheck       (** internal check *)
-  | PKProp        (** normal property *)
-  | PKEstablished (** computation related to a loop property before the loop. *)
-  | PKPreserved   (** computation related to a loop property inside the loop. *)
-  | PKPropLoop    (** loop property used as hypothesis inside a loop. *)
-  | PKVarDecr     (** computation related to the decreasing of a variant in a loop *)
-  | PKVarPos      (** computation related to a loop variant being positive *)
-  | PKVarRel      (** computation related to a generalized loop variant *)
-  | PKAFctOut     (** computation related to the function assigns on normal termination *)
-  | PKAFctExit    (** computation related to the function assigns on exit termination *)
-  | PKTerminates  (** computation related to the termination *)
-  | PKSmoke      (** smoke property *)
-  | PKPre of kernel_function * stmt * Property.t (** precondition for function
-                                                     at stmt, property of the require. Many information that should come
-                                                     from the p_prop part of the prop_id, but in the PKPre case,
-                                                     it seems that it is hidden in a IPBlob property ! *)
 
 val pretty : Format.formatter -> prop_id -> unit
 val pretty_context : Description.kf -> Format.formatter -> prop_id -> unit
@@ -284,9 +266,6 @@ val split_map : (prop_id -> 'a -> 'b) -> prop_id -> 'a list -> 'b list
 
 (** [mk_part pid (k, n)] build the identification for the [k/n] part of [pid].*)
 val mk_part : prop_id -> (int * int) -> prop_id
-
-(** get the 'kind' information. *)
-val kind_of_id : prop_id -> prop_kind
 
 (** get the 'part' information. *)
 val parts_of_id : prop_id -> (int * int) option

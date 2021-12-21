@@ -250,6 +250,9 @@ let get_decreases_goal kf =
   | None -> None
   | Some v -> Some (defined v)
 
+let get_decreases_hyp kf =
+  Annotations.decreases ~populate:false kf
+
 (* -------------------------------------------------------------------------- *)
 (* --- Contracts                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -262,6 +265,7 @@ type contract = {
   contract_smoke : WpPropId.pred_info list ;
   contract_assigns : Cil_types.assigns ;
   contract_terminates : bool * Cil_types.predicate ;
+  contract_decreases : Cil_types.variant option ;
 }
 
 let assigns_upper_bound behaviors =
@@ -338,6 +342,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           | Writes froms -> Writes (normalize_froms Normal froms)
         in
         let terminates = get_terminates_hyp kf in
+        let decreases = get_decreases_hyp kf in
         {
           contract_cond = List.rev !wcond ;
           contract_hpre = List.rev !whpre ;
@@ -346,6 +351,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           contract_smoke = [] ;
           contract_assigns = assigns ;
           contract_terminates = terminates ;
+          contract_decreases = decreases ;
         }
     end)
 
