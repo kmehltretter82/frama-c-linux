@@ -157,7 +157,8 @@ let example_msg =
      DEPS: <file>...     @[<v 0># Adds a dependency to next sub-test and execnow commands.@ \
                                 # Notes: a dependency to the included file can be added with this directive.@ \
                                 # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
-     LOG: <file>...      @[<v 0># Defines dune targets built by the next sub-test command.@]@  \
+     LOG: <file>...      @[<v 0># Defines textual targets built by the next sub-test command..@ \
+                                # Note: the textual targets are compared to oracles.@]@  \
      CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
      STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
@@ -174,7 +175,7 @@ let example_msg =
      # An empty command drops the previous FILTER directives.@ \
      # Note: in such a command, the macro @@PTEST_ORACLE@@ is set to the basename of the oracle.@ \
      # This allows running a 'diff' command with the oracle of another test configuration:@ \
-     #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ - @]@  \
+     #    FILTER: diff --new-file %%{dep:@@PTEST_SUITE_DIR@@/oracle_configuration/@@PTEST_ORACLE@@} - @]@  \
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      GCC:                @[<v 0># Deprecated.@]@  \
@@ -182,12 +183,13 @@ let example_msg =
      @]@ \
      @[<v 1>\
      Some predefined macros can be used in test directives:@  \
-     @@PTEST_DIR@@             # Dirname of the test file.@  \
+     @@PTEST_DIR@@             # Path to the test file from the execution directory (./).@  \
      @@PTEST_FILE@@            # Substituted by the test filename.@  \
      @@PTEST_NAME@@            # Basename of the test file.@  \
      @@PTEST_NUMBER@@          # Test command number.@  \
      @@PTEST_CONFIG@@          # Test configuration suffix.@  \
-     @@PTEST_RESULT@@          # Shorthand alias to @@PTEST_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
+     @@PTEST_SUITE_DIR@        # Path to the directory contained the source of the test file (../).
+     @@PTEST_RESULT@@          # Shorthand alias to @@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
      @@PTEST_ORACLE@@          # Basename of the current oracle file (macro only usable in FILTER directives).@  \
      @@PTEST_DEFAULT_OPTIONS@@ # The default option list: %s@  \
      @@PTEST_LIBS@@            # The current list of modules defined by the LIBS directive.@  \
@@ -205,6 +207,7 @@ let example_msg =
      @@frama-c@@        # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@    # Shortcut defined as follow: %s@  \
      @@FRAMAC_SHARE@@   # Shortcut defined as follow: %s@  \
+     @@PTEST_SHARE_DIR@@   # Path to the share directory of the related plugin.@  \
      @@DEV_NULL@@       # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
       @]@ \
      @[<v 1>\
@@ -571,14 +574,15 @@ module Test_config: sig
 
 end = struct
 
-  let ptest_vars ~env directory ~file config =
+  let ptest_vars ~env _directory ~file config =
     let ptest_config = config_name ~env "" in
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
     let ptest_vars =
         [ "PTEST_CONFIG", ptest_config;
-          "PTEST_DIR", SubDir.get directory;
-          "PTEST_RESULT", SubDir.get (SubDir.result_subdir ~env directory);
+          "PTEST_DIR", ".";
+          "PTEST_RESULT", ".";
+          "PTEST_SUITE_DIR", "..";
           "PTEST_FILE", ptest_file;
           "PTEST_NAME", ptest_name;
         ] in
