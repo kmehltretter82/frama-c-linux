@@ -1525,72 +1525,72 @@ end = struct
       else Format.sprintf "(cd %s && (%s))" (SubDir.make_result_file cmd.directory "") s
 
   let expand_macros =
-     fun ~execnow ~defaults cmd ->
-      let ptest_config =
-        if !special_config = "" then "" else "_" ^ !special_config
-      in
-      let ptest_file = get_ptest_file cmd in
-      let ptest_name =
-        try Filename.chop_extension cmd.file
-        with Invalid_argument _ -> cmd.file
-      in
-      let ptest_file = Filename.sanitize ptest_file in
-      let ptest_load_plugin = Macros.get "PTEST_LOAD_PLUGIN" cmd.macros in
-      let ptest_load_module = Macros.get "PTEST_LOAD_MODULE" cmd.macros in
-      let ptest_load_libs = Macros.get "PTEST_LOAD_LIBS" cmd.macros in
-      let ptest_load_script = Macros.get "PTEST_LOAD_SCRIPT" cmd.macros in
-      let macros =
-        [ "PTEST_CONFIG", ptest_config;
-          "PTEST_DIR", get_ptest_dir cmd;
-          "PTEST_SHARE_DIR", ptest_share_dir;
-          "PTEST_SUITE_DIR", get_ptest_suite_dir cmd;
-          "PTEST_MAKE_DIR", SubDir.get cmd.directory;
-          "PTEST_RESULT", get_ptest_result cmd;
-          "PTEST_FILE", ptest_file;
-          "PTEST_NAME", ptest_name;
-          "PTEST_NUMBER", string_of_int cmd.n;
-          "PTEST_OPT", cmd.options;
-          "PTEST_LOAD_OPTIONS", (String.concat " "
-                                   [ ptest_load_plugin ;
-                                     ptest_load_libs ;
-                                     ptest_load_module ;
-                                     ptest_load_script ; ])
-        ]
-      in
-      let macros = Macros.add_list macros cmd.macros in
-      let macros = Macros.add_defaults ~defaults macros in
-      let process_macros s = Macros.expand macros s in
-      let toplevel =
-        let toplevel = log_default_filter cmd.toplevel in
-        let in_toplevel,toplevel= Macros.does_expand macros toplevel in
-        if not cmd.execnow then begin
-          let has_ptest_file, options =
-            if in_toplevel.has_ptest_opt then in_toplevel.has_ptest_file, []
-            else
-              let in_option,options= Macros.does_expand macros cmd.options in
-              (in_option.has_ptest_file || in_toplevel.has_ptest_file),
-              (if in_toplevel.has_frama_c_exe then
-                 [ process_macros "@PTEST_PRE_OPTIONS@" ;
-                   options ;
-                   process_macros "@PTEST_POST_OPTIONS@" ;
-                 ]
-               else [ options ])
-          in
-          String.concat " " (toplevel::(if has_ptest_file then options else ptest_file::options))
-        end
-        else toplevel
-      in
-      let toplevel = get_ptest_toplevel cmd (dune_feature_cmd toplevel) in
-      { cmd with
-        macros;
-        toplevel;
-        options = ""; (* no more usable *)
-        log_files = List.map process_macros cmd.log_files;
-        filter =
-          match cmd.filter with
-          | None -> None
-          | Some filter -> Some (process_macros filter)
-      }
+    fun ~execnow ~defaults cmd ->
+    let ptest_config =
+      if !special_config = "" then "" else "_" ^ !special_config
+    in
+    let ptest_file = get_ptest_file cmd in
+    let ptest_name =
+      try Filename.chop_extension cmd.file
+      with Invalid_argument _ -> cmd.file
+    in
+    let ptest_file = Filename.sanitize ptest_file in
+    let ptest_load_plugin = Macros.get "PTEST_LOAD_PLUGIN" cmd.macros in
+    let ptest_load_module = Macros.get "PTEST_LOAD_MODULE" cmd.macros in
+    let ptest_load_libs = Macros.get "PTEST_LOAD_LIBS" cmd.macros in
+    let ptest_load_script = Macros.get "PTEST_LOAD_SCRIPT" cmd.macros in
+    let macros =
+      [ "PTEST_CONFIG", ptest_config;
+        "PTEST_DIR", get_ptest_dir cmd;
+        "PTEST_SHARE_DIR", ptest_share_dir;
+        "PTEST_SUITE_DIR", get_ptest_suite_dir cmd;
+        "PTEST_MAKE_DIR", SubDir.get cmd.directory;
+        "PTEST_RESULT", get_ptest_result cmd;
+        "PTEST_FILE", ptest_file;
+        "PTEST_NAME", ptest_name;
+        "PTEST_NUMBER", string_of_int cmd.n;
+        "PTEST_OPT", cmd.options;
+        "PTEST_LOAD_OPTIONS", (String.concat " "
+                                 [ ptest_load_plugin ;
+                                   ptest_load_libs ;
+                                   ptest_load_module ;
+                                   ptest_load_script ; ])
+      ]
+    in
+    let macros = Macros.add_list macros cmd.macros in
+    let macros = Macros.add_defaults ~defaults macros in
+    let process_macros s = Macros.expand macros s in
+    let toplevel =
+      let toplevel = log_default_filter cmd.toplevel in
+      let in_toplevel,toplevel= Macros.does_expand macros toplevel in
+      if not cmd.execnow then begin
+        let has_ptest_file, options =
+          if in_toplevel.has_ptest_opt then in_toplevel.has_ptest_file, []
+          else
+            let in_option,options= Macros.does_expand macros cmd.options in
+            (in_option.has_ptest_file || in_toplevel.has_ptest_file),
+            (if in_toplevel.has_frama_c_exe then
+               [ process_macros "@PTEST_PRE_OPTIONS@" ;
+                 options ;
+                 process_macros "@PTEST_POST_OPTIONS@" ;
+               ]
+             else [ options ])
+        in
+        String.concat " " (toplevel::(if has_ptest_file then options else ptest_file::options))
+      end
+      else toplevel
+    in
+    let toplevel = get_ptest_toplevel cmd (dune_feature_cmd toplevel) in
+    { cmd with
+      macros;
+      toplevel;
+      options = ""; (* no more usable *)
+      log_files = List.map process_macros cmd.log_files;
+      filter =
+        match cmd.filter with
+        | None -> None
+        | Some filter -> Some (process_macros filter)
+    }
 
   let basic_command_string =
     fun command ->
