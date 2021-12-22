@@ -25,7 +25,7 @@ module StringList = Datatype.List(Datatype.String)
 module Flags =
   State_builder.Hashtbl
     (Datatype.Filepath.Hashtbl)
-    (StringList)
+    (Datatype.Pair(Datatype.Filepath)(StringList))
     (struct
       let name ="JsonCompilationDatabase.Flags"
       let dependencies = [Kernel.JsonCompilationDatabase.self]
@@ -191,10 +191,21 @@ let filter_useful_flags ~requote option_list =
    occurrences in the list. Since we cannot infer which of them is the
    "right" one, we replace them with the latest ones found, warning the
    user if previous flags were different. *)
-let update_flags_verbosely path flags =
+let update_flags_verbosely path (dir, flags) =
   try
-    let previous_flags = Flags.find path in
-    if previous_flags <> flags then
+    let (previous_dir, previous_flags) = Flags.find path in
+    let must_replace = ref false in
+    if previous_dir <> dir then begin
+      Kernel.warning ~wkey:Kernel.wkey_jcdb
+        "@[<v>found different directories for '%a', replacing old directory.@ \
+         Old directory: %a@ \
+         New directory: %a@]"
+        Datatype.Filepath.pretty path
+        Datatype.Filepath.pretty previous_dir
+        Datatype.Filepath.pretty dir;
+      must_replace := true
+    end;
+    if previous_flags <> flags then begin
       let removed_flags =
         List.filter (fun e -> not (List.mem e previous_flags)) flags
       in
@@ -214,19 +225,29 @@ let update_flags_verbosely path flags =
       Kernel.warning ~wkey:Kernel.wkey_jcdb
         "@[<v>found duplicate flags for '%a', replacing old flags.%s%s@]"
         Datatype.Filepath.pretty path removed_str added_str;
-      Flags.replace path flags
+      must_replace := true
+    end;
+    if !must_replace then
+      Flags.replace path (dir, flags)
   with
   | Not_found ->
-    Flags.add path flags
+    Flags.add path (dir, flags)
 
-let parse_build_entry bcdb_dir r =
+let parse_build_entry jbdb_dir r =
   let open Yojson.Basic.Util in
   let filenames = r |> member "sources" |> to_list |> List.map to_string in
+  let dirname   = r |> member "directory" |> to_string in
+  let dirname =
+    if Filename.is_relative dirname then Filename.concat jbdb_dir dirname
+    else dirname
+  in
+  let dirname = Filepath.normalize dirname in
   let args = List.map to_string (r |> member "arguments" |> to_list) in
   let flags = filter_useful_flags ~requote:true args in
   List.iter (fun filename ->
-      let path = Datatype.Filepath.of_string ~base_name:bcdb_dir filename in
-      update_flags_verbosely path flags
+      let path = Datatype.Filepath.of_string ~base_name:dirname filename in
+      let dirpath = Datatype.Filepath.of_string dirname in
+      update_flags_verbosely path (dirpath, flags)
     ) filenames
 
 let parse_compilation_entry jcdb_dir r =
@@ -261,7 +282,8 @@ let parse_compilation_entry jcdb_dir r =
       Kernel.abort "compilation database: expected 'arguments' or 'command'"
   in
   let flags = filter_useful_flags ~requote string_option_list in
-  update_flags_verbosely path flags
+  let dirpath = Datatype.Filepath.of_string dirname in
+  update_flags_verbosely path (dirpath, flags)
 
 let compute_flags_from_file () =
   let database = (Kernel.JsonCompilationDatabase.get () :> string) in
@@ -299,7 +321,7 @@ let get_flags f =
   if not (Kernel.JsonCompilationDatabase.is_empty ()) then begin
     if not (Flags.is_computed ()) then compute_flags_from_file ();
     try
-      let flags = Flags.find f in
+      let (_, flags) = Flags.find f in
       Kernel.feedback ~dkey:Kernel.dkey_compilation_db
         "flags found for '%a': %a"  Datatype.Filepath.pretty f StringList.pretty flags;
       flags
@@ -309,6 +331,22 @@ let get_flags f =
       []
   end
   else []
+
+let get_dir f =
+  if not (Kernel.JsonCompilationDatabase.is_empty ()) then begin
+    if not (Flags.is_computed ()) then compute_flags_from_file ();
+    try
+      let (dir, _) = Flags.find f in
+      Kernel.feedback ~dkey:Kernel.dkey_compilation_db
+        "directory found for '%a': %a"
+        Datatype.Filepath.pretty f Datatype.Filepath.pretty dir;
+      Some dir
+    with Not_found ->
+      Kernel.feedback ~dkey:Kernel.dkey_compilation_db
+        "no directory found for '%a'" Datatype.Filepath.pretty f;
+      None
+  end
+  else None
 
 let has_entry f =
   if not (Flags.is_computed ()) then compute_flags_from_file ();

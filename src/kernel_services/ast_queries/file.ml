@@ -525,11 +525,6 @@ let build_cpp_cmd = function
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
     let cpp_command_with_chdir =
       if Kernel.JsonCompilationDatabase.is_set () then
-        let jcdb_path = (Kernel.JsonCompilationDatabase.get () :> string) in
-        let dir =
-          if Sys.is_directory jcdb_path then jcdb_path
-          else Filename.dirname jcdb_path
-        in
         (* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
            no function in its stdlib to resolve symbolic links (e.g. realpath)
            for a given path. 'getcwd' always resolves them, but if the user
@@ -538,6 +533,11 @@ let build_cpp_cmd = function
            currently choose to never resolve them.
            We only resort to getcwd() to avoid issues when PWD does not exist. *)
         let cwd = try Unix.getenv "PWD" with Not_found -> Sys.getcwd () in
+        let dir =
+          match Json_compilation_database.get_dir f with
+          | None -> cwd
+          | Some d -> (d:>string)
+        in
         if cwd <> dir then
           "cd " ^ dir ^ " && " ^ cpp_command
         else cpp_command
