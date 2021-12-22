@@ -122,8 +122,7 @@ def call_and_get_output(command_and_args):
 def ask_if_overwrite(path):
     yn = input(f"warning: {path} already exists. Overwrite? [y/N] ")
     if yn == "" or not (yn[0] == "Y" or yn[0] == "y"):
-        print("Exiting without overwriting.")
-        sys.exit(0)
+        sys.exit("Exiting without overwriting.")
 
 def insert_lines_after(lines, line_pattern, new_lines):
     re_line = re.compile(line_pattern)
@@ -158,6 +157,11 @@ def replace_line(lines, line_pattern, value, all_occurrences=False):
     else:
         sys.exit(f"error: no lines found matching pattern: {line_pattern}")
 
+# replaces '/' with '_' so that a valid target name is created
+def make_target_name(target):
+    pp = blug_jbdb.prettify(target)
+    return pp.replace('/', '_')
+
 # sources are pretty-printed relatively to the .frama-c directory, where the
 # GNUmakefile will reside
 def rel_prefix(path):
@@ -188,16 +192,28 @@ def copy_fc_stubs():
         fc_stubs_copied = True
     return dest
 
-# returns the line number where a likely definition for [funcname] was found,
-# or None otherwise
+# Returns pairs (line_number, has_args) for each likely definition of
+# [funcname] in [filename].
+# [has_args] is used to distinguish between main(void) and main(int, char**).
 def find_definitions(funcname, filename):
     with open(filename, encoding="ascii", errors='ignore') as data:
         file_content = data.read()
     file_lines = file_content.splitlines(keepends=True)
     newlines = function_finder.compute_newline_offsets(file_lines)
-    defs = function_finder.find_definitions_and_declarations(True, False, filename, file_content, file_lines, newlines)
-    defs = [d for d in defs if d[0] == funcname]
-    return [d[2] for d in defs]
+    defs = function_finder.find_definitions_and_declarations(True, False, filename, file_content, file_lines, newlines, funcname)
+    #print(f"found defs for {funcname}: {defs}")
+    res = []
+    for d in defs:
+        defining_line = file_lines[d[2]-1]
+        after_funcname = defining_line[defining_line.find(funcname)+len(funcname):]
+        # heuristics: if there is a comma after the function name,
+        # it is very likely the signature contains arguments;
+        # otherwise, the function is either defined in several lines,
+        # or we somehow missed it. By default, we assume it has no arguments
+        # if we miss it.
+        has_args = ',' in after_funcname
+        res.append((d[2], has_args))
+    return res
 
 # End of auxiliary functions ##################################################
 
@@ -207,7 +223,7 @@ if sources:
         sys.exit(f"error: option --targets is mandatory when --sources is specified")
     if len(targets) > 1:
         sys.exit(f"error: option --targets can only have a single target when --sources is specified")
-    sources_map[targets[0]] = sources
+    sources_map[targets[0]] = [s for s in sources if blug_jbdb.filter_source(s)]
 elif os.path.isfile(jbdb_path):
     # JBDB exists
     with open(jbdb_path, "r") as data:
@@ -230,7 +246,7 @@ elif os.path.isfile(jbdb_path):
         else:
             if unknown_targets != []:
                 continue # already found a problem; avoid useless computations
-            sources = blug_jbdb.collect_leaves(graph, [target])
+            sources = [s for s in blug_jbdb.collect_leaves(graph, [target]) if blug_jbdb.filter_source(s)]
             sources_map[target] = sorted([blug_jbdb.prettify(source) for source in sources])
     if unknown_targets:
         targets_pretty = "\n".join(unknown_targets)
@@ -248,18 +264,21 @@ if unknown_sources:
 
 # Check that the main function is defined exactly once per target.
 # note: this is only based on heuristics (and fails on a few real case studies),
-# so we cannot emit errors, only warnings
+# so we cannot emit errors, only warnings.
+# We also need to check if the main function uses a 'main(void)'-style
+# signature, to patch fc_stubs.c.
 
+main_definitions = {}
 for target, sources in sources_map.items():
-    main_definitions = []
+    main_definitions[target] = []
     for source in sources:
-        defs = find_definitions(main, source)
-        main_definitions += [(source, line) for line in defs]
-    if main_definitions == []:
-        print(f"warning: function '{main}' seems to be never defined in the sources of target '{target}'")
-    elif len(main_definitions) > 1:
-        print(f"warning: function '{main}' seems to be defined multiple times in the sources of target '{target}':")
-        for (filename, line) in main_definitions:
+        fundefs = find_definitions(main, source)
+        main_definitions[target] += [(source, fundef[0], fundef[1]) for fundef in fundefs]
+    if main_definitions[target] == []:
+        logging.warning(f"function '{main}' seems to be never defined in the sources of target '{blug_jbdb.prettify(target)}'")
+    elif len(main_definitions[target]) > 1:
+        logging.warning(f"function '{main}' seems to be defined multiple times in the sources of target '{blug_jbdb.prettify(target)}':")
+        for (filename, line, _) in main_definitions[target]:
             print(f"- definition at {filename}:{line}")
 
 # End of checks; start writing GNUmakefile and stubs from templates ###########
@@ -271,9 +290,19 @@ if not dot_framac_dir.is_dir():
 fc_config = json.loads(call_and_get_output([framac_bin / "frama-c", "-print-config-json"]))
 share_dir = Path(fc_config['datadir'])
 
-fc_stubs = copy_fc_stubs()
-for target in targets:
-    sources_map[target].insert(0, fc_stubs)
+# copy fc_stubs if at least one main function has arguments
+any_has_arguments = False
+for defs in main_definitions.values():
+    if any(d[2] for d in defs):
+        any_has_arguments = True
+        break
+
+if any_has_arguments:
+    fc_stubs = copy_fc_stubs()
+    for target in targets:
+        if any(d[2] for d in main_definitions[target]):
+            logging.debug(f"target {blug_jbdb.prettify(target)} has main with args, adding fc_stubs.c to its sources")
+            sources_map[target].insert(0, fc_stubs)
 
 gnumakefile = dot_framac_dir / "GNUmakefile"
 
@@ -289,14 +318,15 @@ if machdep:
 if jbdb_path:
     insert_lines_after(template, "^FCFLAGS", [f"  -json-compilation-database {rel_prefix(jbdb_path)} \\"])
 
-targets_eva = ([f"  {target}.eva \\" for target in targets])
+targets_eva = ([f"  {make_target_name(target)}.eva \\" for target in targets])
 replace_line(template, "^TARGETS = main.eva", "TARGETS = \\")
 insert_lines_after(template, r"^TARGETS = \\", targets_eva)
 
 delete_line(template, r"^main.parse: \\")
 delete_line(template, r"^  main.c \\")
 for target, sources in reversed(sources_map.items()):
-    new_lines = [f"{target}.parse: \\"] + pretty_sources(sources) + ["", f"{target}.parse: FCFLAGS += -main eva_main", ""]
+    pp_target = make_target_name(target)
+    new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + ["", f"{pp_target}.parse: FCFLAGS += -main eva_main", ""]
     insert_lines_after(template, "^### Each target <t>.eva", new_lines)
 
 gnumakefile.write_text("\n".join(template))
