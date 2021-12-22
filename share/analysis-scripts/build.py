@@ -191,8 +191,11 @@ def copy_fc_stubs():
 # returns the line number where a likely definition for [funcname] was found,
 # or None otherwise
 def find_definitions(funcname, filename):
-    newlines = function_finder.compute_newline_offsets(filename)
-    defs = function_finder.find_definitions_and_declarations(True, False, filename, newlines)
+    with open(filename, encoding="ascii", errors='ignore') as data:
+        file_content = data.read()
+    file_lines = file_content.splitlines(keepends=True)
+    newlines = function_finder.compute_newline_offsets(file_lines)
+    defs = function_finder.find_definitions_and_declarations(True, False, filename, file_content, file_lines, newlines)
     defs = [d for d in defs if d[0] == funcname]
     return [d[2] for d in defs]
 

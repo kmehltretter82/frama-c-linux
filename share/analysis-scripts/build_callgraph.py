@@ -82,9 +82,12 @@ def compute(files):
     cg = Callgraph()
     for f in files:
         #print(f"Processing {os.path.relpath(f)}...")
-        newlines = function_finder.compute_newline_offsets(f)
-        defs = function_finder.find_definitions_and_declarations(True, False, f, newlines)
-        calls = function_finder.find_calls(f, newlines)
+        with open(f, encoding="ascii", errors='ignore') as data:
+            file_content = data.read()
+        file_lines = file_content.splitlines(keepends=True)
+        newlines = function_finder.compute_newline_offsets(file_lines)
+        defs = function_finder.find_definitions_and_declarations(True, False, f, file_content, file_lines, newlines)
+        calls = function_finder.find_calls(file_content, newlines)
         for call in calls:
             caller = function_finder.find_caller(defs, call)
             if caller:

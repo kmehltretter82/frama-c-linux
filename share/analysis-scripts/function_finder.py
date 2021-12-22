@@ -60,9 +60,9 @@ def prepare_re_specific_name(fname):
 
 # Returns 0 if not found, 1 if declaration, 2 if definition
 def find_specific_name(prepared_re, f):
-   with open(f, encoding="ascii", errors='ignore') as content_file:
-      content = content_file.read()
-      has_decl_or_def = prepared_re.search(content)
+   with open(f, encoding="ascii", errors='ignore') as data:
+      file_content = data.read()
+      has_decl_or_def = prepared_re.search(file_content)
       if has_decl_or_def is None:
           return 0
       else:
@@ -70,33 +70,35 @@ def find_specific_name(prepared_re, f):
          return 1 if is_decl else 2
 
 
-# matches function definitions
-re_fundef_or_decl = re.compile("^" + optional_type_prefix +
-                               "(" + c_identifier + ")" + whitespace +
-                               argument_list + whitespace +
-                               optional_c_id + whitespace + "(;|{)",
-                               flags=re.DOTALL | re.MULTILINE)
+# matches function definitions or declarations
+# if funcname is not None, only matches for the specified
+# function name
+def compute_re_def_or_decl(funcname):
+    id = funcname if funcname else c_identifier
+    return re.compile("^" + optional_type_prefix +
+                      "(" + id + ")" + whitespace +
+                      argument_list + whitespace +
+                      optional_c_id + whitespace + "(;|{)",
+                      flags=re.DOTALL | re.MULTILINE)
 
 # matches function calls
 re_funcall = re.compile("(" + c_identifier + ")" + whitespace + "\(")
 
 # Computes the offset (in bytes) of each '\n' in the file,
 # returning them as a list
-def compute_newline_offsets(filename):
+def compute_newline_offsets(file_lines):
     offsets = []
     current = 0
-    with open(filename, encoding="ascii", errors='ignore') as data:
-        for line in data:
-            current += len(line)
-            offsets.append(current)
+    for line in file_lines:
+        current += len(line)
+        offsets.append(current)
     return offsets
 
 # Returns the line number (starting at 1) containing the character
 # of offset [offset].
 # [offsets] is the sorted list of offsets for newline characters in the file.
 def line_of_offset(offsets, offset):
-    i = bisect.bisect_right(offsets, offset)
-    return i+1
+    return bisect.bisect_right(offsets, offset) + 1
 
 # Returns the line number (starting at 1) of each line starting with '}'
 # as its first character.
@@ -104,12 +106,12 @@ def line_of_offset(offsets, offset):
 # This is a heuristic to attempt to detect function closing braces:
 # it assumes that the first '}' (without preceding whitespace) after a
 # function definition denotes its closing brace.
-def compute_closing_braces(filename):
+def compute_closing_braces(file_lines):
     braces = []
-    with open(filename, encoding="ascii", errors='ignore') as data:
-        for i, line in enumerate(data, start=1):
-            if line.startswith("}"):
-               braces.append(i)
+    for i, line in enumerate(file_lines, start=1):
+        # note: lines contain '\n', so they are never empty
+        if line[0] == '}':
+            braces.append(i)
     return braces
 
 # Returns the first element of [line_numbers] greater than [n], or [None]
@@ -118,10 +120,11 @@ def compute_closing_braces(filename):
 #
 # [line_numbers] must be sorted in ascending order.
 def get_first_line_after(line_numbers, n):
-    for line in line_numbers:
-        if line > n:
-            return line
-    return None
+    #for line in line_numbers:
+    #    if line > n:
+    #        return line
+    #assert False
+    return line_numbers[bisect.bisect_left(line_numbers, n)]
 
 # Returns a list of tuples (fname, is_def, line_start, line_end, terminator_offset)
 # for each function definition or declaration.
@@ -133,37 +136,38 @@ def get_first_line_after(line_numbers, n):
 # [terminator_offset] is used by the caller to filter the function prototype
 # itself and avoid considering it as a call. For function definitions,
 # this is the opening brace; for function declarations, this is the semicolon.
-def find_definitions_and_declarations(want_defs, want_decls, filename, newlines):
-    braces = compute_closing_braces(filename)
-    with open(filename, encoding="ascii", errors='ignore') as data:
-        content = data.read()
+def find_definitions_and_declarations(want_defs, want_decls, filename, file_content, file_lines, newlines, funcname=None):
+    braces = compute_closing_braces(file_lines)
     res = []
-    for match in re.finditer(re_fundef_or_decl, content):
+    re_fundef_or_decl = compute_re_def_or_decl(funcname)
+    for match in re.finditer(re_fundef_or_decl, file_content):
         funcname = match.group(1)
-        is_def = match.group(2) == "{"
-        is_decl = match.group(2) == ";"
+        terminator = match.group(2)
+        terminator_offset = match.start(2)
+        is_def = terminator == "{"
+        is_decl = terminator == ";"
         assert is_def or is_decl
         start = line_of_offset(newlines, match.start(1))
         if is_decl:
             if not want_decls:
                 continue
-            end = line_of_offset(newlines, match.start(2))
+            end = line_of_offset(newlines, terminator_offset)
         else:
             if not want_defs:
                 continue
-            definition = content[match.start(1):newlines[start-1]]
+            definition = file_content[match.start(1):newlines[start-1]]
             # try "single-line function heuristic":
             # assume the function is defined as 'type f(...) { code; }',
             # in a single line
             if definition.strip().endswith("}"):
-                end = line_of_offset(newlines, match.start(2))
+                end = line_of_offset(newlines, terminator_offset)
             else:
                 end = get_first_line_after(braces, start)
                 if not end:
                     # no closing braces found; try again the "single-line function heuristic"
                     def_start_newline_offset = newlines[start-1]
-                    line_of_opening_brace = line_of_offset(newlines, match.start(2))
-                    if start == line_of_opening_brace and definition.rstrip().endswith("}"):
+                    line_of_opening_brace = line_of_offset(newlines, terminator_offset)
+                    if start == line_of_opening_brace and definition.rstrip()[-1] == '}':
                         # assume the '}' is closing the '{' from the same line
                         end = line_of_opening_brace
                     else:
@@ -171,7 +175,6 @@ def find_definitions_and_declarations(want_defs, want_decls, filename, newlines)
                         print(f"{os.path.relpath(filename)}:{start}:closing brace not found, " +
                               f"skipping potential definition of '{funcname}'")
                         continue
-        terminator_offset = match.start(2)
         if debug:
             print(f"function_finder: {'def' if is_def else 'decl'} of {funcname} between {start} and {end}")
         res.append((funcname, is_def, start, end, terminator_offset))
@@ -184,12 +187,10 @@ calls_blacklist = ["if", "while", "for", "return", "sizeof", "switch", "_Alignas
 #
 # Note: this may include the function prototype itself;
 # it must be filtered by the caller.
-def find_calls(filename, newlines):
-    with open(filename, encoding="ascii", errors='ignore') as data:
-        content = data.read()
+def find_calls(file_content, newlines):
     # create a list of Match objects that fit "pattern" regex
     res = []
-    for match in re.finditer(re_funcall, content):
+    for match in re.finditer(re_funcall, file_content):
         funcname = match.group(1)
         offset = match.start(1)
         line = line_of_offset(newlines, offset)
