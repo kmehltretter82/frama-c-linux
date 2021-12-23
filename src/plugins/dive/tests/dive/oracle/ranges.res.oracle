@@ -1,9 +1,9 @@
-[kernel] Parsing tests/dive/ranges.i (no preprocessing)
+[kernel] Parsing ranges.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function Frama_C_interval
-[eva:alarm] tests/dive/ranges.i:25: Warning: 
+[eva:alarm] ranges.i:25: Warning: 
   signed overflow.
   assert
   (int)((int)((int)((int)((int)((int)(i0 + i1) + i2) + i3) + i4) + i5) + i6) +
@@ -22,4 +22,4 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[dive] output to tests/dive/result/ranges.dot
+[dive] output to ranges.dot

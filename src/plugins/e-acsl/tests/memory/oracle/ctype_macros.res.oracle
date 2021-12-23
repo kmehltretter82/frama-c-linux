@@ -6,5 +6,5 @@
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] tests/memory/ctype_macros.c:37: Warning: 
+[eva:alarm] ctype_macros.c:37: Warning: 
   function __gen_e_acsl_isupper: precondition 'c_uchar_or_eof' got status unknown.

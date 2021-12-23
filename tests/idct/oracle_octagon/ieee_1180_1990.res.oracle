@@ -1,77 +1,43 @@
-424a425,432
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-498a507,514
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-571a588,595
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-> [eva] tests/idct/ieee_1180_1990.c:85: 
->   Reusing old results for call to IEEE_1180_1990_rand
-579a604,617
-> [eva] tests/idct/ieee_1180_1990.c:100: 
->   Call to builtin Frama_C_sqrt for function sqrt
-> [eva] tests/idct/ieee_1180_1990.c:101: 
->   Call to builtin Frama_C_cos for function cos
-> [eva] tests/idct/ieee_1180_1990.c:100: 
->   Call to builtin Frama_C_sqrt for function sqrt
-> [eva] tests/idct/ieee_1180_1990.c:101: 
->   Call to builtin Frama_C_cos for function cos
-> [eva] tests/idct/ieee_1180_1990.c:100: 
->   Call to builtin Frama_C_sqrt for function sqrt
-> [eva] tests/idct/ieee_1180_1990.c:101: 
->   Call to builtin Frama_C_cos for function cos
-> [eva] tests/idct/ieee_1180_1990.c:100: 
->   Call to builtin Frama_C_sqrt for function sqrt
-581a620,621
-> [eva] tests/idct/ieee_1180_1990.c:100: 
->   Call to builtin Frama_C_sqrt for function sqrt
-583a624,629
-> [eva] tests/idct/ieee_1180_1990.c:100: 
->   Call to builtin Frama_C_sqrt for function sqrt
-> [eva] tests/idct/ieee_1180_1990.c:101: 
->   Call to builtin Frama_C_cos for function cos
-> [eva] tests/idct/ieee_1180_1990.c:100: 
->   Call to builtin Frama_C_sqrt for function sqrt
-605a652,661
-> [eva] tests/idct/ieee_1180_1990.c:140: 
->   Call to builtin Frama_C_sqrt for function sqrt
-> [eva] tests/idct/ieee_1180_1990.c:141: 
->   Call to builtin Frama_C_cos for function cos
-> [eva] tests/idct/ieee_1180_1990.c:140: 
->   Call to builtin Frama_C_sqrt for function sqrt
-> [eva] tests/idct/ieee_1180_1990.c:141: 
->   Call to builtin Frama_C_cos for function cos
-> [eva] tests/idct/ieee_1180_1990.c:140: 
->   Call to builtin Frama_C_sqrt for function sqrt
-607a664,665
-> [eva] tests/idct/ieee_1180_1990.c:140: 
->   Call to builtin Frama_C_sqrt for function sqrt
-609a668,677
-> [eva] tests/idct/ieee_1180_1990.c:140: 
->   Call to builtin Frama_C_sqrt for function sqrt
-> [eva] tests/idct/ieee_1180_1990.c:141: 
->   Call to builtin Frama_C_cos for function cos
-> [eva] tests/idct/ieee_1180_1990.c:140: 
->   Call to builtin Frama_C_sqrt for function sqrt
-> [eva] tests/idct/ieee_1180_1990.c:141: 
->   Call to builtin Frama_C_cos for function cos
-> [eva] tests/idct/ieee_1180_1990.c:140: 
->   Call to builtin Frama_C_sqrt for function sqrt
+359a360,363
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+423a428,431
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+485a494,497
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
+491a504,510
+> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
+> [eva] ieee_1180_1990.c:101: Call to builtin Frama_C_cos for function cos
+> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
+> [eva] ieee_1180_1990.c:101: Call to builtin Frama_C_cos for function cos
+> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
+> [eva] ieee_1180_1990.c:101: Call to builtin Frama_C_cos for function cos
+> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
+492a512
+> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
+493a514,516
+> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
+> [eva] ieee_1180_1990.c:101: Call to builtin Frama_C_cos for function cos
+> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
+506a530
+> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
+507a532
+> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
+508a534,542
+> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
+> [eva] ieee_1180_1990.c:141: Call to builtin Frama_C_cos for function cos
+> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
+> [eva] ieee_1180_1990.c:141: Call to builtin Frama_C_cos for function cos
+> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
+> [eva] ieee_1180_1990.c:141: Call to builtin Frama_C_cos for function cos
+> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
+> [eva] ieee_1180_1990.c:141: Call to builtin Frama_C_cos for function cos
+> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt

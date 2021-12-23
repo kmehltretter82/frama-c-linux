@@ -1,4 +1,4 @@
-[kernel] Parsing tests/rte/invalid_fptr.i (no preprocessing)
+[kernel] Parsing invalid_fptr.i (no preprocessing)
 [rte] annotating function f
 [rte] annotating function g
 [rte] annotating function h

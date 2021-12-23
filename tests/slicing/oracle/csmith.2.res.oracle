@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/csmith.i (no preprocessing)
+[kernel] Parsing csmith.i (no preprocessing)
 [eva] Analyzing a complete application starting at bts906c
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,8 +6,8 @@
   G1 ∈ {0}
   G1b ∈ {0}
   G2 ∈ {0}
-[eva] tests/slicing/csmith.i:189: starting to merge loop iterations
-[eva] tests/slicing/csmith.i:190: starting to merge loop iterations
+[eva] csmith.i:189: starting to merge loop iterations
+[eva] csmith.i:190: starting to merge loop iterations
 [eva] Recording results for bts906c
 [eva] done for function bts906c
 [pdg] computing for function bts906c

@@ -59,7 +59,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "!\\valid(p + (0 .. 9))";
-    __gen_e_acsl_assert_data.file = "tests/bts/bts2406.c";
+    __gen_e_acsl_assert_data.file = "bts2406.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 10;
     __e_acsl_assert(! __gen_e_acsl_valid,& __gen_e_acsl_assert_data);
@@ -96,7 +96,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(&t[0 .. 9])";
-    __gen_e_acsl_assert_data_2.file = "tests/bts/bts2406.c";
+    __gen_e_acsl_assert_data_2.file = "bts2406.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 11;
     __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);

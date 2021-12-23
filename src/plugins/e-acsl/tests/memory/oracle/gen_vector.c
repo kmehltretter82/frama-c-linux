@@ -63,7 +63,7 @@ int *new_inversed(int len, int *v)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(v) && \\offset(v) + len * sizeof(int) <= \\block_length(v)";
-    __gen_e_acsl_assert_data.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data.file = "vector.c";
     __gen_e_acsl_assert_data.fct = "new_inversed";
     __gen_e_acsl_assert_data.line = 12;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -109,7 +109,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(&v1[2])";
-    __gen_e_acsl_assert_data.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data.file = "vector.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 22;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
@@ -133,7 +133,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&v1[2])";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data_2.file = "vector.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 24;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
@@ -159,7 +159,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(v2 + 2)";
-    __gen_e_acsl_assert_data_3.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data_3.file = "vector.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 27;
     __e_acsl_assert(__gen_e_acsl_initialized_2,& __gen_e_acsl_assert_data_3);
@@ -173,7 +173,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "LAST == 1";
-    __gen_e_acsl_assert_data_4.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data_4.file = "vector.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 28;
     __e_acsl_assert(LAST == 1,& __gen_e_acsl_assert_data_4);

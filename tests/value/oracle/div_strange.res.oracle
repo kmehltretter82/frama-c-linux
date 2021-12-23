@@ -1,10 +1,10 @@
-[kernel] Parsing tests/value/div_strange.i (no preprocessing)
+[kernel] Parsing div_strange.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/value/div_strange.i:7: Frama_C_show_each_F: {1073741823}
+[eva] div_strange.i:7: Frama_C_show_each_F: {1073741823}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

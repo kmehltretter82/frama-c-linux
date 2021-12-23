@@ -1,6 +1,5 @@
-[variadic] tests/defined/va_list-as-arg.c:15: 
-  Declaration of variadic function sum.
-[variadic] tests/defined/va_list-as-arg.c:25: 
+[variadic] va_list-as-arg.c:15: Declaration of variadic function sum.
+[variadic] va_list-as-arg.c:25: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

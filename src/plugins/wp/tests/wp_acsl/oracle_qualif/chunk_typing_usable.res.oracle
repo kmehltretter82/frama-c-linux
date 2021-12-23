@@ -1,5 +1,5 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_acsl/chunk_typing_usable.i (no preprocessing)
+[kernel] Parsing chunk_typing_usable.i (no preprocessing)
 [wp] Running WP plugin...
 [rte] annotating function usable_axiom
 [rte] annotating function usable_lemma

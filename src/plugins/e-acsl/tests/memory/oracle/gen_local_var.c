@@ -47,7 +47,7 @@ struct list *add(struct list *l, int i)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(new)";
-    __gen_e_acsl_assert_data.file = "tests/memory/local_var.c";
+    __gen_e_acsl_assert_data.file = "local_var.c";
     __gen_e_acsl_assert_data.fct = "add";
     __gen_e_acsl_assert_data.line = 15;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);

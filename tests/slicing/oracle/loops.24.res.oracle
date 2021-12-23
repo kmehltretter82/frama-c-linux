@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/loops.i (no preprocessing)
+[kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at alarm
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,9 +9,8 @@
   X ∈ [--..--]
   Y ∈ [--..--]
   Z ∈ [--..--]
-[eva] tests/slicing/loops.i:210: assertion got status valid.
-[eva:alarm] tests/slicing/loops.i:211: Warning: 
-  signed overflow. assert j + 1 ≤ 2147483647;
+[eva] loops.i:210: assertion got status valid.
+[eva:alarm] loops.i:211: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva] Recording results for alarm
 [eva] done for function alarm
 [from] Computing for function alarm
@@ -45,4 +44,4 @@ void alarm(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_24_loops.i (no preprocessing)
+[kernel] Parsing ocode_24_loops.i (no preprocessing)

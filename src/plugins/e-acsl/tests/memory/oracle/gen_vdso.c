@@ -213,7 +213,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "tmp != -1";
-    __gen_e_acsl_assert_data.file = "tests/memory/vdso.c";
+    __gen_e_acsl_assert_data.file = "vdso.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 13;
     __e_acsl_assert(tmp != -1L,& __gen_e_acsl_assert_data);

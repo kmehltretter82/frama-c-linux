@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_bts/bts_1174.i (no preprocessing)
+[kernel] Parsing bts_1174.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function job
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok' (file tests/wp_bts/bts_1174.i, line 11):
+Goal Assertion 'qed_ok' (file bts_1174.i, line 11):
 Let r = of_f64(x).
 Assume {
   Type: is_sint32(a).

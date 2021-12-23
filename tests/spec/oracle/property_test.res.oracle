@@ -1,4 +1,4 @@
-[kernel] Parsing tests/spec/property_test.i (no preprocessing)
+[kernel] Parsing property_test.i (no preprocessing)
 In project project "default":
 Status of assert X ≥ \at(X,Pre);: no verification attempted
 Status of default behavior for statement 7: no verification attempted

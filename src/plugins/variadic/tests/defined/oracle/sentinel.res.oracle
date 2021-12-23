@@ -1,6 +1,5 @@
-[variadic] tests/defined/sentinel.c:3: Declaration of variadic function sum.
-[variadic] tests/defined/sentinel.c:21: 
-  Generic translation of call to variadic function.
+[variadic] sentinel.c:3: Declaration of variadic function sum.
+[variadic] sentinel.c:21: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

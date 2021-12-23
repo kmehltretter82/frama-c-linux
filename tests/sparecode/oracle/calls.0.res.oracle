@@ -1,4 +1,4 @@
-[kernel] Parsing tests/sparecode/calls.i (no preprocessing)
+[kernel] Parsing calls.i (no preprocessing)
 [sparecode] remove unused code...
 [sparecode] selecting function main outputs and entry point
 [eva] Analyzing a complete application starting at main
@@ -7,15 +7,15 @@
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/sparecode/calls.i:16.
+  Called from calls.i:16.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/sparecode/calls.i:17.
+  Called from calls.i:17.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/sparecode/calls.i:18.
+  Called from calls.i:18.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main

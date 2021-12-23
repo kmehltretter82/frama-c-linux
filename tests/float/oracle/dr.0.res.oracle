@@ -1,5 +1,5 @@
-[kernel] Parsing tests/float/dr.i (no preprocessing)
-[kernel:parser:decimal-float] tests/float/dr.i:7: Warning: 
+[kernel] Parsing dr.i (no preprocessing)
+[kernel:parser:decimal-float] dr.i:7: Warning: 
   Floating-point constant 100e30f is not represented exactly. Will use 0x1.3b8b5c0000000p106.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
@@ -22,7 +22,7 @@
   d2 ∈ {1.01161128283}
   e1 ∈ {0}
   e2 ∈ {0}
-[eva] tests/float/dr.i:26: Frama_C_show_each: {1}, {0}
+[eva] dr.i:26: Frama_C_show_each: {1}, {0}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

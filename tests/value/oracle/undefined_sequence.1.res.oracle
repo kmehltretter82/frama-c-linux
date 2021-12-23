@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/undefined_sequence.i (no preprocessing)
+[kernel] Parsing undefined_sequence.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,56 +7,56 @@
   c ∈ [--..--]
   r ∈ {0}
   H ∈ {0}
-[eva] tests/value/undefined_sequence.i:36: starting to merge loop iterations
-[eva] tests/value/undefined_sequence.i:38: starting to merge loop iterations
-[eva] tests/value/undefined_sequence.i:40: starting to merge loop iterations
-[eva:alarm] tests/value/undefined_sequence.i:40: Warning: 
+[eva] undefined_sequence.i:36: starting to merge loop iterations
+[eva] undefined_sequence.i:38: starting to merge loop iterations
+[eva] undefined_sequence.i:40: starting to merge loop iterations
+[eva:alarm] undefined_sequence.i:40: Warning: 
   signed overflow.
   assert G[tmp_2] + G[tmp_3] ≤ 2147483647;
   (tmp_2 from j++, tmp_3 from i++)
-[eva] tests/value/undefined_sequence.i:43: starting to merge loop iterations
-[eva:alarm] tests/value/undefined_sequence.i:50: Warning: 
+[eva] undefined_sequence.i:43: starting to merge loop iterations
+[eva:alarm] undefined_sequence.i:50: Warning: 
   signed overflow. assert G[j] + G[tmp_6] ≤ 2147483647;
                    (tmp_6 from j++)
-[eva:alarm] tests/value/undefined_sequence.i:51: Warning: 
+[eva:alarm] undefined_sequence.i:51: Warning: 
   signed overflow. assert G[tmp_7] + G[i] ≤ 2147483647;
                    (tmp_7 from i++)
-[eva] tests/value/undefined_sequence.i:49: starting to merge loop iterations
+[eva] undefined_sequence.i:49: starting to merge loop iterations
 [eva] computing for function g <- main.
-  Called from tests/value/undefined_sequence.i:53.
+  Called from undefined_sequence.i:53.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function f <- main.
-  Called from tests/value/undefined_sequence.i:53.
+  Called from undefined_sequence.i:53.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] tests/value/undefined_sequence.i:54: Reusing old results for call to g
+[eva] undefined_sequence.i:54: Reusing old results for call to g
 [eva] computing for function f <- main.
-  Called from tests/value/undefined_sequence.i:54.
+  Called from undefined_sequence.i:54.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function h <- main.
-  Called from tests/value/undefined_sequence.i:56.
+  Called from undefined_sequence.i:56.
 [eva] Recording results for h
 [eva] Done for function h
 [eva] computing for function h <- main.
-  Called from tests/value/undefined_sequence.i:56.
+  Called from undefined_sequence.i:56.
 [eva] Recording results for h
 [eva] Done for function h
 [eva] computing for function func <- main.
-  Called from tests/value/undefined_sequence.i:60.
+  Called from undefined_sequence.i:60.
 [eva] Recording results for func
 [eva] Done for function func
 [eva] computing for function ub_ret <- main.
-  Called from tests/value/undefined_sequence.i:65.
+  Called from undefined_sequence.i:65.
 [eva] Recording results for ub_ret
 [eva] Done for function ub_ret
 [eva] computing for function f <- main.
-  Called from tests/value/undefined_sequence.i:67.
+  Called from undefined_sequence.i:67.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- main.
-  Called from tests/value/undefined_sequence.i:67.
+  Called from undefined_sequence.i:67.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main

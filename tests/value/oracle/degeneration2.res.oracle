@@ -1,36 +1,36 @@
-[kernel] Parsing tests/value/degeneration2.i (no preprocessing)
+[kernel] Parsing degeneration2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva:alarm] tests/value/degeneration2.i:14: Warning: 
+[eva:alarm] degeneration2.i:14: Warning: 
   accessing uninitialized left-value. assert \initialized(&A);
-[eva:alarm] tests/value/degeneration2.i:14: Warning: 
+[eva:alarm] degeneration2.i:14: Warning: 
   pointer downcast. assert (unsigned int)A ≤ 2147483647;
-[eva:alarm] tests/value/degeneration2.i:14: Warning: 
+[eva:alarm] degeneration2.i:14: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)A);
-[eva:alarm] tests/value/degeneration2.i:14: Warning: 
+[eva:alarm] degeneration2.i:14: Warning: 
   signed overflow. assert -((int)A) ≤ 2147483647;
-[eva] tests/value/degeneration2.i:14: 
+[eva] degeneration2.i:14: 
   Assigning imprecise value to A.
-  The imprecision originates from Arithmetic {tests/value/degeneration2.i:14}
-[eva:alarm] tests/value/degeneration2.i:17: Warning: 
+  The imprecision originates from Arithmetic {degeneration2.i:14}
+[eva:alarm] degeneration2.i:17: Warning: 
   accessing uninitialized left-value. assert \initialized((int *)A);
-[eva:alarm] tests/value/degeneration2.i:17: Warning: 
+[eva:alarm] degeneration2.i:17: Warning: 
   out of bounds read. assert \valid_read((int *)A);
-[eva] tests/value/degeneration2.i:16: starting to merge loop iterations
-[eva:alarm] tests/value/degeneration2.i:25: Warning: 
+[eva] degeneration2.i:16: starting to merge loop iterations
+[eva:alarm] degeneration2.i:25: Warning: 
   accessing uninitialized left-value. assert \initialized(&offset_uninit);
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/degeneration2.i:25: 
+[eva] degeneration2.i:25: 
   assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   A ∈
    {{ garbled mix of &{B; C; D; E}
-    (origin: Arithmetic {tests/value/degeneration2.i:14}) }}
+    (origin: Arithmetic {degeneration2.i:14}) }}
   B ∈ {{ (void *)&C }} or UNINITIALIZED
   C ∈ {{ (void *)&D }} or UNINITIALIZED
   D ∈ {{ (void *)&E }} or UNINITIALIZED

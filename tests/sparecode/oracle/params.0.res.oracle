@@ -1,4 +1,4 @@
-[kernel] Parsing tests/sparecode/params.i (no preprocessing)
+[kernel] Parsing params.i (no preprocessing)
 [sparecode] remove unused code...
 [sparecode] selecting function main outputs and entry point
 [eva] Analyzing a complete application starting at main
@@ -7,7 +7,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function main1 <- main.
-  Called from tests/sparecode/params.i:17.
+  Called from params.i:17.
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] Recording results for main

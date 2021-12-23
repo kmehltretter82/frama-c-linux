@@ -1,17 +1,17 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_bts/issue_825.i (no preprocessing)
+[kernel] Parsing issue_825.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function issue
 ------------------------------------------------------------
 
-Goal Check 'ko' (file tests/wp_bts/issue_825.i, line 18):
+Goal Check 'ko' (file issue_825.i, line 18):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Check 'ko' (file tests/wp_bts/issue_825.i, line 19):
+Goal Check 'ko' (file issue_825.i, line 19):
 Assume { Type: is_sint32(a). }
 Prove: a = 0.
 
@@ -20,28 +20,28 @@ Prove: a = 0.
   Function job
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_bts/issue_825.i, line 2) in 'job':
+Goal Post-condition (file issue_825.i, line 2) in 'job':
 Assume { Type: is_sint32(i). (* Else *) Have: 10 <= i. }
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_bts/issue_825.i, line 9):
+Goal Preservation of Invariant (file issue_825.i, line 9):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_bts/issue_825.i, line 9):
+Goal Establishment of Invariant (file issue_825.i, line 9):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_bts/issue_825.i, line 10) (1/2):
+Goal Loop assigns (file issue_825.i, line 10) (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_bts/issue_825.i, line 10) (2/2):
+Goal Loop assigns (file issue_825.i, line 10) (2/2):
 Effect at line 13
 Assume { Type: is_sint32(i). (* Then *) Have: i <= 9. }
 Prove: false.

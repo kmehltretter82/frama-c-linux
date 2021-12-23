@@ -1,14 +1,14 @@
-104a105,106
-> [kernel] tests/builtins/imprecise.c:51: 
+99a100,101
+> [kernel] imprecise.c:51: 
 >   imprecise size for variable v3 (abstract type 'struct u')
-229a232,233
-> [kernel] tests/builtins/imprecise.c:111: 
+220a223,224
+> [kernel] imprecise.c:111: 
 >   more than 200(300) elements to enumerate. Approximating.
-238a243,244
-> [kernel] tests/builtins/imprecise.c:114: 
->   more than 200(300) elements to enumerate. Approximating.
-242,245d247
-< [kernel] tests/builtins/imprecise.c:111: 
+229,232d232
+< [eva:alarm] imprecise.c:116: Warning: assertion got status unknown.
+< [eva] Recording results for many_writes
+< [kernel] imprecise.c:111: 
 <   more than 200(300) elements to enumerate. Approximating.
-< [kernel] tests/builtins/imprecise.c:114: 
-<   more than 200(300) elements to enumerate. Approximating.
+234a235,236
+> [eva:alarm] imprecise.c:116: Warning: assertion got status unknown.
+> [eva] Recording results for many_writes

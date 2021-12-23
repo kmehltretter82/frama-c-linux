@@ -1,19 +1,19 @@
-18,25d17
-< [eva:alarm] tests/value/relation_shift.i:15: Warning: 
+17,24d16
+< [eva:alarm] relation_shift.i:15: Warning: 
 <   signed overflow. assert -2147483648 ≤ x - y;
-< [eva:alarm] tests/value/relation_shift.i:15: Warning: 
+< [eva:alarm] relation_shift.i:15: Warning: 
 <   signed overflow. assert x - y ≤ 2147483647;
-< [eva:alarm] tests/value/relation_shift.i:16: Warning: 
+< [eva:alarm] relation_shift.i:16: Warning: 
 <   signed overflow. assert -2147483648 ≤ z - y;
-< [eva:alarm] tests/value/relation_shift.i:16: Warning: 
+< [eva:alarm] relation_shift.i:16: Warning: 
 <   signed overflow. assert z - y ≤ 2147483647;
-31,32c23,24
+30,31c22,23
 <   r1 ∈ [--..--]
 <   r2 ∈ [--..--]
 ---
 >   r1 ∈ {2}
 >   r2 ∈ {7}
-35,37c27,29
+34,36c26,28
 <   x ∈ [-2147483647..2147483647]
 <   y ∈ [-2147483648..2147483646]
 <   z ∈ [-2147483642..2147483647]
@@ -21,13 +21,13 @@
 >   x ∈ [-2147483646..2147483642]
 >   y ∈ [-2147483648..2147483640]
 >   z ∈ [-2147483641..2147483647]
-49,50c41,42
+48,49c40,41
 <   r1 ∈ [--..--]
 <   r2 ∈ [--..--]
 ---
 >   r1 ∈ {2}
 >   r2 ∈ {7}
-53,55c45,47
+52,54c44,46
 <   x ∈ [-2147483647..2147483647]
 <   y ∈ [-2147483648..2147483646]
 <   z ∈ [-2147483642..2147483647]

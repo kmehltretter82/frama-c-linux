@@ -40,7 +40,7 @@ void compound_decl_and_init(int value)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(&a)";
-    __gen_e_acsl_assert_data.file = "tests/memory/decl_in_switch.c";
+    __gen_e_acsl_assert_data.file = "decl_in_switch.c";
     __gen_e_acsl_assert_data.fct = "compound_decl_and_init";
     __gen_e_acsl_assert_data.line = 22;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
@@ -64,7 +64,7 @@ void compound_decl_and_init(int value)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
       __gen_e_acsl_assert_data_2.pred_txt = "\\valid(&b)";
-      __gen_e_acsl_assert_data_2.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data_2.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data_2.fct = "compound_decl_and_init";
       __gen_e_acsl_assert_data_2.line = 26;
       __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
@@ -90,7 +90,7 @@ void compound_decl_and_init(int value)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Assertion";
       __gen_e_acsl_assert_data_3.pred_txt = "\\valid(&c)";
-      __gen_e_acsl_assert_data_3.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data_3.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data_3.fct = "compound_decl_and_init";
       __gen_e_acsl_assert_data_3.line = 30;
       __e_acsl_assert(__gen_e_acsl_valid_3,& __gen_e_acsl_assert_data_3);
@@ -119,7 +119,7 @@ void compound_decl_and_init(int value)
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Assertion";
       __gen_e_acsl_assert_data_4.pred_txt = "\\valid(&d)";
-      __gen_e_acsl_assert_data_4.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data_4.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data_4.fct = "compound_decl_and_init";
       __gen_e_acsl_assert_data_4.line = 35;
       __e_acsl_assert(__gen_e_acsl_valid_4,& __gen_e_acsl_assert_data_4);
@@ -156,7 +156,7 @@ void separate_decl_and_init(int value)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(&a)";
-    __gen_e_acsl_assert_data.file = "tests/memory/decl_in_switch.c";
+    __gen_e_acsl_assert_data.file = "decl_in_switch.c";
     __gen_e_acsl_assert_data.fct = "separate_decl_and_init";
     __gen_e_acsl_assert_data.line = 45;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
@@ -185,7 +185,7 @@ void separate_decl_and_init(int value)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
       __gen_e_acsl_assert_data_2.pred_txt = "\\valid(&b)";
-      __gen_e_acsl_assert_data_2.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data_2.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data_2.fct = "separate_decl_and_init";
       __gen_e_acsl_assert_data_2.line = 50;
       __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
@@ -212,7 +212,7 @@ void separate_decl_and_init(int value)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Assertion";
       __gen_e_acsl_assert_data_3.pred_txt = "\\valid(&c)";
-      __gen_e_acsl_assert_data_3.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data_3.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data_3.fct = "separate_decl_and_init";
       __gen_e_acsl_assert_data_3.line = 55;
       __e_acsl_assert(__gen_e_acsl_valid_3,& __gen_e_acsl_assert_data_3);
@@ -242,7 +242,7 @@ void separate_decl_and_init(int value)
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Assertion";
       __gen_e_acsl_assert_data_4.pred_txt = "\\valid(&d)";
-      __gen_e_acsl_assert_data_4.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data_4.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data_4.fct = "separate_decl_and_init";
       __gen_e_acsl_assert_data_4.line = 61;
       __e_acsl_assert(__gen_e_acsl_valid_4,& __gen_e_acsl_assert_data_4);
@@ -282,7 +282,7 @@ void label_in_switch(int value)
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Assertion";
       __gen_e_acsl_assert_data.pred_txt = "\\valid(&d)";
-      __gen_e_acsl_assert_data.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data.fct = "label_in_switch";
       __gen_e_acsl_assert_data.line = 74;
       __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
@@ -309,7 +309,7 @@ void label_in_switch(int value)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
       __gen_e_acsl_assert_data_2.pred_txt = "\\valid(&e)";
-      __gen_e_acsl_assert_data_2.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data_2.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data_2.fct = "label_in_switch";
       __gen_e_acsl_assert_data_2.line = 80;
       __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
@@ -340,7 +340,7 @@ void label_in_switch(int value)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Assertion";
       __gen_e_acsl_assert_data_3.pred_txt = "\\valid(&ff)";
-      __gen_e_acsl_assert_data_3.file = "tests/memory/decl_in_switch.c";
+      __gen_e_acsl_assert_data_3.file = "decl_in_switch.c";
       __gen_e_acsl_assert_data_3.fct = "label_in_switch";
       __gen_e_acsl_assert_data_3.line = 84;
       __e_acsl_assert(__gen_e_acsl_valid_3,& __gen_e_acsl_assert_data_3);

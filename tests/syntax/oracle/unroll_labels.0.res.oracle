@@ -1,13 +1,13 @@
-[kernel] Parsing tests/syntax/unroll_labels.i (no preprocessing)
+[kernel] Parsing unroll_labels.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   foo ∈ [--..--]
-[eva] tests/syntax/unroll_labels.i:25: starting to merge loop iterations
-[eva] tests/syntax/unroll_labels.i:39: starting to merge loop iterations
-[eva] tests/syntax/unroll_labels.i:33: starting to merge loop iterations
-[eva] tests/syntax/unroll_labels.i:53: starting to merge loop iterations
+[eva] unroll_labels.i:25: starting to merge loop iterations
+[eva] unroll_labels.i:39: starting to merge loop iterations
+[eva] unroll_labels.i:33: starting to merge loop iterations
+[eva] unroll_labels.i:53: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

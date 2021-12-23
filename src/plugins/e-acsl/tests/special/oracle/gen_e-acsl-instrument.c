@@ -110,7 +110,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\initialized(&x)";
-    __gen_e_acsl_assert_data.file = "tests/special/e-acsl-instrument.c";
+    __gen_e_acsl_assert_data.file = "e-acsl-instrument.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 61;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
@@ -133,7 +133,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&y)";
-    __gen_e_acsl_assert_data_2.file = "tests/special/e-acsl-instrument.c";
+    __gen_e_acsl_assert_data_2.file = "e-acsl-instrument.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 62;
     __e_acsl_assert(__gen_e_acsl_initialized_2,& __gen_e_acsl_assert_data_2);
@@ -175,7 +175,7 @@ int __gen_e_acsl_instrument2(int *p)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-    __gen_e_acsl_assert_data.file = "tests/special/e-acsl-instrument.c";
+    __gen_e_acsl_assert_data.file = "e-acsl-instrument.c";
     __gen_e_acsl_assert_data.fct = "instrument2";
     __gen_e_acsl_assert_data.line = 33;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
@@ -203,7 +203,7 @@ int __gen_e_acsl_uninstrument2(int *p)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-    __gen_e_acsl_assert_data.file = "tests/special/e-acsl-instrument.c";
+    __gen_e_acsl_assert_data.file = "e-acsl-instrument.c";
     __gen_e_acsl_assert_data.fct = "uninstrument2";
     __gen_e_acsl_assert_data.line = 17;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);

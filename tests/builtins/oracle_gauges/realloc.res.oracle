@@ -1,10 +1,9 @@
-677a678,1026
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+627a628,964
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -28,12 +27,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -57,12 +55,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -86,12 +83,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -115,12 +111,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -144,12 +139,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -173,12 +167,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -202,12 +195,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -231,12 +223,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -260,13 +251,12 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:150: starting to merge loop iterations
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:150: starting to merge loop iterations
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -290,12 +280,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
@@ -319,12 +308,11 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
->   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]

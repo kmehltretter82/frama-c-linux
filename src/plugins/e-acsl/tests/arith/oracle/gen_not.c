@@ -15,7 +15,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "x == 0";
-    __gen_e_acsl_assert_data.file = "tests/arith/not.i";
+    __gen_e_acsl_assert_data.file = "not.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 6;
     __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data);
@@ -30,7 +30,7 @@ int main(void)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
       __gen_e_acsl_assert_data_2.pred_txt = "x != 0";
-      __gen_e_acsl_assert_data_2.file = "tests/arith/not.i";
+      __gen_e_acsl_assert_data_2.file = "not.i";
       __gen_e_acsl_assert_data_2.fct = "main";
       __gen_e_acsl_assert_data_2.line = 8;
       __e_acsl_assert(x != 0,& __gen_e_acsl_assert_data_2);

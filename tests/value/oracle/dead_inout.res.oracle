@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/dead_inout.i (no preprocessing)
+[kernel] Parsing dead_inout.i (no preprocessing)
 [eva] Analyzing a complete application starting at main_all
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,25 +6,25 @@
   a ∈ {0}
   b ∈ {0}
 [eva] computing for function main <- main_all.
-  Called from tests/value/dead_inout.i:40.
+  Called from dead_inout.i:40.
 [eva] computing for function f <- main <- main_all.
-  Called from tests/value/dead_inout.i:18.
+  Called from dead_inout.i:18.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- main <- main_all.
-  Called from tests/value/dead_inout.i:19.
+  Called from dead_inout.i:19.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main
 [eva] Done for function main
 [eva] computing for function main2 <- main_all.
-  Called from tests/value/dead_inout.i:41.
+  Called from dead_inout.i:41.
 [eva] computing for function f2 <- main2 <- main_all.
-  Called from tests/value/dead_inout.i:33.
+  Called from dead_inout.i:33.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function f2 <- main2 <- main_all.
-  Called from tests/value/dead_inout.i:34.
+  Called from dead_inout.i:34.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] Recording results for main2

@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp/sharing.c (with preprocessing)
+[kernel] Parsing sharing.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled

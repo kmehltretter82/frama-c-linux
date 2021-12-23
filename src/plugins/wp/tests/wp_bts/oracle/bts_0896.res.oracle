@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_bts/bts_0896.i (no preprocessing)
+[kernel] Parsing bts_0896.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'r2' in 'g'' in 'f' at call 'g' (file tests/wp_bts/bts_0896.i, line 22)
+Goal Instance of 'Pre-condition 'r2' in 'g'' in 'f' at call 'g' (file bts_0896.i, line 22)
 :
 Prove: true.
 
@@ -15,12 +15,12 @@ Prove: true.
   Function g
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_bts/bts_0896.i, line 18) in 'g':
+Goal Assigns (file bts_0896.i, line 18) in 'g':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_bts/bts_0896.i, line 18) in 'g':
+Goal Assigns (file bts_0896.i, line 18) in 'g':
 Prove: true.
 
 ------------------------------------------------------------

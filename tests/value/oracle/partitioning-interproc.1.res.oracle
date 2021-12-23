@@ -1,11 +1,11 @@
-[kernel] Parsing tests/value/partitioning-interproc.c (with preprocessing)
+[kernel] Parsing partitioning-interproc.c (with preprocessing)
 [eva] Analyzing a complete application starting at fabs_test
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function fabs <- fabs_test.
-  Called from tests/value/partitioning-interproc.c:50.
+  Called from partitioning-interproc.c:50.
 [eva] Recording results for fabs
 [eva] Done for function fabs
 [eva] Recording results for fabs_test

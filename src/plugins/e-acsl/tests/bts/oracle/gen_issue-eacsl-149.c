@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\exists unsigned int x; -1 < x < 5 && x == 0";
-    __gen_e_acsl_assert_data.file = "tests/bts/issue-eacsl-149.c";
+    __gen_e_acsl_assert_data.file = "issue-eacsl-149.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 4;
     __e_acsl_assert(__gen_e_acsl_exists,& __gen_e_acsl_assert_data);
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "!(\\forall unsigned int x; -1 < x < 5 ==> x != 0)";
-    __gen_e_acsl_assert_data_2.file = "tests/bts/issue-eacsl-149.c";
+    __gen_e_acsl_assert_data_2.file = "issue-eacsl-149.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 5;
     __e_acsl_assert(! __gen_e_acsl_forall,& __gen_e_acsl_assert_data_2);

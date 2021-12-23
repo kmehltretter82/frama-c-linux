@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/multi_access.i (no preprocessing)
+[kernel] Parsing multi_access.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

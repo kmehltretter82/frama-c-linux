@@ -98,7 +98,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "p1(x, y)";
-    __gen_e_acsl_assert_data.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data.file = "functions.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 44;
     __e_acsl_assert(__gen_e_acsl_p1_2,& __gen_e_acsl_assert_data);
@@ -115,7 +115,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "p2(3, 4)";
-    __gen_e_acsl_assert_data_2.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_2.file = "functions.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 45;
     __e_acsl_assert(__gen_e_acsl_p2_2,& __gen_e_acsl_assert_data_2);
@@ -136,7 +136,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "p2(5, 99999999999999999999999999999)";
-    __gen_e_acsl_assert_data_3.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_3.file = "functions.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 46;
     __e_acsl_assert(__gen_e_acsl_p2_4,& __gen_e_acsl_assert_data_3);
@@ -161,7 +161,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "f1(x, y) == 3";
-    __gen_e_acsl_assert_data_4.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_4.file = "functions.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 48;
     __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data_4);
@@ -190,7 +190,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "p2(x, f1(3, 4))";
-    __gen_e_acsl_assert_data_5.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_5.file = "functions.c";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 49;
     __e_acsl_assert(__gen_e_acsl_p2_6,& __gen_e_acsl_assert_data_5);
@@ -217,7 +217,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "f1(9, 99999999999999999999999999999) > 0";
-    __gen_e_acsl_assert_data_6.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_6.file = "functions.c";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 50;
     __e_acsl_assert(__gen_e_acsl_gt_4 > 0,& __gen_e_acsl_assert_data_6);
@@ -248,7 +248,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
     __gen_e_acsl_assert_data_7.pred_txt = "f1(99999999999999999999999999999, 99999999999999999999999999999) ==\n199999999999999999999999999998";
-    __gen_e_acsl_assert_data_7.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_7.file = "functions.c";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 51;
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,& __gen_e_acsl_assert_data_7);
@@ -281,7 +281,7 @@ int main(void)
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
     __gen_e_acsl_assert_data_8.pred_txt = "g(x) == x";
-    __gen_e_acsl_assert_data_8.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_8.file = "functions.c";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 56;
     __e_acsl_assert(__gen_e_acsl_eq_3 == 0,& __gen_e_acsl_assert_data_8);
@@ -310,7 +310,7 @@ int main(void)
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "h_char(c) == c";
-    __gen_e_acsl_assert_data_9.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_9.file = "functions.c";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 59;
     __e_acsl_assert(__gen_e_acsl_eq_4 == 0,& __gen_e_acsl_assert_data_9);
@@ -339,7 +339,7 @@ int main(void)
     __gen_e_acsl_assert_data_10.blocking = 1;
     __gen_e_acsl_assert_data_10.kind = "Assertion";
     __gen_e_acsl_assert_data_10.pred_txt = "h_short(s) == s";
-    __gen_e_acsl_assert_data_10.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_10.file = "functions.c";
     __gen_e_acsl_assert_data_10.fct = "main";
     __gen_e_acsl_assert_data_10.line = 61;
     __e_acsl_assert(__gen_e_acsl_eq_5 == 0,& __gen_e_acsl_assert_data_10);
@@ -369,7 +369,7 @@ int main(void)
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "Assertion";
     __gen_e_acsl_assert_data_11.pred_txt = "t2(t1(m)) == 17";
-    __gen_e_acsl_assert_data_11.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_11.file = "functions.c";
     __gen_e_acsl_assert_data_11.fct = "main";
     __gen_e_acsl_assert_data_11.line = 66;
     __e_acsl_assert(__gen_e_acsl_eq_6 == 0,& __gen_e_acsl_assert_data_11);
@@ -400,7 +400,7 @@ int main(void)
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "Assertion";
     __gen_e_acsl_assert_data_12.pred_txt = "f2(d) > 0";
-    __gen_e_acsl_assert_data_12.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data_12.file = "functions.c";
     __gen_e_acsl_assert_data_12.fct = "main";
     __gen_e_acsl_assert_data_12.line = 71;
     __e_acsl_assert(__gen_e_acsl_gt_5 > 0,& __gen_e_acsl_assert_data_12);
@@ -427,7 +427,7 @@ void __gen_e_acsl_k(int x)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "k_pred(x)";
-    __gen_e_acsl_assert_data.file = "tests/gmp-only/functions.c";
+    __gen_e_acsl_assert_data.file = "functions.c";
     __gen_e_acsl_assert_data.fct = "k";
     __gen_e_acsl_assert_data.line = 27;
     __e_acsl_assert(__gen_e_acsl_k_pred_2,& __gen_e_acsl_assert_data);

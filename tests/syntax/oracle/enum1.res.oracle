@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/enum1.c (with preprocessing)
-[kernel] Parsing tests/syntax/enum2.c (with preprocessing)
+[kernel] Parsing enum1.c (with preprocessing)
+[kernel] Parsing enum2.c (with preprocessing)
 [kernel] Warning: merging definitions of enum f using int type
   (different names for enumeration items); items {F21=0, F22=1} and {F11=0,
   F12=1}

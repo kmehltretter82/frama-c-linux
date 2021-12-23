@@ -1,5 +1,5 @@
 # frama-c -wp -wp-rte -warn-unsigned-overflow [...]
-[kernel] Parsing tests/wp_plugin/rte.i (no preprocessing)
+[kernel] Parsing rte.i (no preprocessing)
 [wp] Running WP plugin...
 [wp:rte] function job: generate rte for memory access
 [wp:rte] function job: generate rte for division by zero

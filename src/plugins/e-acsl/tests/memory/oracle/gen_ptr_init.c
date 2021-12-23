@@ -21,7 +21,7 @@ void g(int *C, int *D)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\initialized(&C)";
-    __gen_e_acsl_assert_data.file = "tests/memory/ptr_init.c";
+    __gen_e_acsl_assert_data.file = "ptr_init.c";
     __gen_e_acsl_assert_data.fct = "g";
     __gen_e_acsl_assert_data.line = 16;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data);
@@ -71,7 +71,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\initialized(&A)";
-    __gen_e_acsl_assert_data.file = "tests/memory/ptr_init.c";
+    __gen_e_acsl_assert_data.file = "ptr_init.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 25;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data);
@@ -93,7 +93,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&x)";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/ptr_init.c";
+    __gen_e_acsl_assert_data_2.file = "ptr_init.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 26;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);

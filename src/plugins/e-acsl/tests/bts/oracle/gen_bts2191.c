@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid_read(_G[0].str)";
-    __gen_e_acsl_assert_data.file = "tests/bts/bts2191.c";
+    __gen_e_acsl_assert_data.file = "bts2191.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 14;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);

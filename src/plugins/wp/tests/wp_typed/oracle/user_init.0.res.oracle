@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_typed/user_init.i (no preprocessing)
+[kernel] Parsing user_init.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [CFG] Goal init_exits : Valid (Unreachable)
 [wp] Warning: Missing RTE guards
@@ -11,7 +11,7 @@
   Function init
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 10) in 'init':
+Goal Post-condition (file user_init.i, line 10) in 'init':
 Let a_1 = shift_sint32(a, 0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
@@ -35,7 +35,7 @@ Prove: havoc(Mint_undef_0, Mint_0, a_1, i)[shift_sint32(a, i_1)] = v.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 17):
+Goal Preservation of Invariant 'Partial' (file user_init.i, line 17):
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
 Assume {
@@ -62,12 +62,12 @@ Prove: a_2[shift_sint32(a, i) <- v][shift_sint32(a, i_1)] = v.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 17):
+Goal Establishment of Invariant 'Partial' (file user_init.i, line 17):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 16):
+Goal Preservation of Invariant 'Range' (file user_init.i, line 16):
 Let a_1 = shift_sint32(a, 0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
@@ -89,7 +89,7 @@ Prove: (-1) <= i.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 16):
+Goal Establishment of Invariant 'Range' (file user_init.i, line 16):
 Prove: true.
 
 ------------------------------------------------------------
@@ -136,18 +136,18 @@ Prove: included(a_3, 1, a_1, n).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_init.i, line 9) in 'init':
+Goal Assigns (file user_init.i, line 9) in 'init':
 Effect at line 20
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 20):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 20):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 20):
+Goal Positivity of Loop variant at loop (file user_init.i, line 20):
 Prove: true.
 
 ------------------------------------------------------------
@@ -155,7 +155,7 @@ Prove: true.
   Function init_t1
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 24) in 'init_t1':
+Goal Post-condition (file user_init.i, line 24) in 'init_t1':
 Assume {
   Type: is_uint32(i_1).
   (* Goal *)
@@ -171,7 +171,7 @@ Prove: t1_0[i] = v.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 32):
+Goal Preservation of Invariant 'Partial' (file user_init.i, line 32):
 Let x = to_uint32(1 + i).
 Assume {
   Type: is_uint32(i).
@@ -190,12 +190,12 @@ Prove: t1_0[i <- v][i_1] = v.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 32):
+Goal Establishment of Invariant 'Partial' (file user_init.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 31):
+Goal Preservation of Invariant 'Range' (file user_init.i, line 31):
 Assume {
   Type: is_uint32(i).
   (* Invariant 'Range' *)
@@ -209,7 +209,7 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 31):
+Goal Establishment of Invariant 'Range' (file user_init.i, line 31):
 Prove: true.
 
 ------------------------------------------------------------
@@ -219,19 +219,19 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_init.i, line 26) in 'init_t1' (1/2):
+Goal Assigns (file user_init.i, line 26) in 'init_t1' (1/2):
 Effect at line 35
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_init.i, line 26) in 'init_t1' (2/2):
+Goal Assigns (file user_init.i, line 26) in 'init_t1' (2/2):
 Effect at line 35
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 35):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 35):
 Let x = to_uint32(1 + i).
 Assume {
   Type: is_uint32(i).
@@ -251,7 +251,7 @@ Prove: i < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 35):
+Goal Positivity of Loop variant at loop (file user_init.i, line 35):
 Prove: true.
 
 ------------------------------------------------------------
@@ -259,7 +259,7 @@ Prove: true.
   Function init_t2_bis_v1
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 127) in 'init_t2_bis_v1':
+Goal Post-condition (file user_init.i, line 127) in 'init_t2_bis_v1':
 Let a = global(G_t2_52).
 Assume {
   Type: is_uint32(i_2) /\ is_sint32(v).
@@ -284,12 +284,12 @@ Prove: Mint_0[shift_sint32(shift_A20_sint32(a, i), i_1)] = v.
 
 ------------------------------------------------------------
 
-Goal Exit-condition (file tests/wp_typed/user_init.i, line 129) in 'init_t2_bis_v1':
+Goal Exit-condition (file user_init.i, line 129) in 'init_t2_bis_v1':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 136):
+Goal Preservation of Invariant 'Partial' (file user_init.i, line 136):
 Let x = to_uint32(1 + i).
 Let a = global(G_t2_52).
 Let a_1 = shift_A20_sint32(a, i).
@@ -323,12 +323,12 @@ Prove: a_3[shift_sint32(shift_A20_sint32(a, i_1), i_2)] = Mint_undef_0[a_2].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 136):
+Goal Establishment of Invariant 'Partial' (file user_init.i, line 136):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 135):
+Goal Preservation of Invariant 'Range' (file user_init.i, line 135):
 Let a = global(G_t2_52).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
@@ -356,12 +356,12 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 135):
+Goal Establishment of Invariant 'Range' (file user_init.i, line 135):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Offset' (file tests/wp_typed/user_init.i, line 141):
+Goal Assertion 'Offset' (file user_init.i, line 141):
 Prove: true.
 
 ------------------------------------------------------------
@@ -517,7 +517,7 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 139):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 139):
 Let x = to_uint32(1 + i).
 Let a = global(G_t2_52).
 Let a_1 = shift_A20_sint32(a, i).
@@ -553,18 +553,18 @@ Prove: i < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 139):
+Goal Positivity of Loop variant at loop (file user_init.i, line 139):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 7) in 'init'' in 'init_t2_bis_v1' at call 'init' (file tests/wp_typed/user_init.i, line 140)
+Goal Instance of 'Pre-condition (file user_init.i, line 7) in 'init'' in 'init_t2_bis_v1' at call 'init' (file user_init.i, line 140)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 8) in 'init'' in 'init_t2_bis_v1' at call 'init' (file tests/wp_typed/user_init.i, line 140)
+Goal Instance of 'Pre-condition (file user_init.i, line 8) in 'init'' in 'init_t2_bis_v1' at call 'init' (file user_init.i, line 140)
 :
 Prove: true.
 
@@ -573,7 +573,7 @@ Prove: true.
   Function init_t2_bis_v2
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 145) in 'init_t2_bis_v2':
+Goal Post-condition (file user_init.i, line 145) in 'init_t2_bis_v2':
 Let a = global(G_t2_52).
 Assume {
   Type: is_uint32(i_2) /\ is_sint32(v).
@@ -597,12 +597,12 @@ Prove: Mint_0[shift_sint32(shift_A20_sint32(a, i), i_1)] = v.
 
 ------------------------------------------------------------
 
-Goal Exit-condition (file tests/wp_typed/user_init.i, line 147) in 'init_t2_bis_v2':
+Goal Exit-condition (file user_init.i, line 147) in 'init_t2_bis_v2':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 154):
+Goal Preservation of Invariant 'Partial' (file user_init.i, line 154):
 Let x = to_uint32(1 + i).
 Let a = global(G_t2_52).
 Let a_1 = shift_A20_sint32(a, i).
@@ -635,12 +635,12 @@ Prove: a_3[shift_sint32(shift_A20_sint32(a, i_1), i_2)] = Mint_undef_0[a_2].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 154):
+Goal Establishment of Invariant 'Partial' (file user_init.i, line 154):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 153):
+Goal Preservation of Invariant 'Range' (file user_init.i, line 153):
 Let a = global(G_t2_52).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
@@ -667,12 +667,12 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 153):
+Goal Establishment of Invariant 'Range' (file user_init.i, line 153):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Offset_i' (file tests/wp_typed/user_init.i, line 159):
+Goal Assertion 'Offset_i' (file user_init.i, line 159):
 Prove: true.
 
 ------------------------------------------------------------
@@ -819,7 +819,7 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 157):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 157):
 Let x = to_uint32(1 + i).
 Let a = global(G_t2_52).
 Let a_1 = shift_A20_sint32(a, i).
@@ -854,18 +854,18 @@ Prove: i < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 157):
+Goal Positivity of Loop variant at loop (file user_init.i, line 157):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 7) in 'init'' in 'init_t2_bis_v2' at call 'init' (file tests/wp_typed/user_init.i, line 158)
+Goal Instance of 'Pre-condition (file user_init.i, line 7) in 'init'' in 'init_t2_bis_v2' at call 'init' (file user_init.i, line 158)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 8) in 'init'' in 'init_t2_bis_v2' at call 'init' (file tests/wp_typed/user_init.i, line 158)
+Goal Instance of 'Pre-condition (file user_init.i, line 8) in 'init'' in 'init_t2_bis_v2' at call 'init' (file user_init.i, line 158)
 :
 Prove: true.
 
@@ -874,7 +874,7 @@ Prove: true.
   Function init_t2_v1
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 39) in 'init_t2_v1':
+Goal Post-condition (file user_init.i, line 39) in 'init_t2_v1':
 Assume {
   (* Heap *)
   Type: IsArray_d2_sint32(t2_1).
@@ -893,7 +893,7 @@ Prove: t2_0[i][i_1] = v.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 48):
+Goal Preservation of Invariant 'Partial_i' (file user_init.i, line 48):
 Let x = to_uint32(1 + i).
 Let m = t2_0[i].
 Assume {
@@ -931,12 +931,12 @@ Prove: m[0] = t2_0[i_1][i_2].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 48):
+Goal Establishment of Invariant 'Partial_i' (file user_init.i, line 48):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 47):
+Goal Preservation of Invariant 'Range_i' (file user_init.i, line 47):
 Assume {
   Type: is_uint32(i).
   (* Heap *)
@@ -968,12 +968,12 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 47):
+Goal Establishment of Invariant 'Range_i' (file user_init.i, line 47):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 54):
+Goal Preservation of Invariant 'Partial_j' (file user_init.i, line 54):
 Let x = to_uint32(1 + j).
 Let m = t2_0[i].
 Assume {
@@ -1015,12 +1015,12 @@ Prove: m[j <- v][i_1] = v.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 54):
+Goal Establishment of Invariant 'Partial_j' (file user_init.i, line 54):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Previous_i' (file tests/wp_typed/user_init.i, line 55):
+Goal Preservation of Invariant 'Previous_i' (file user_init.i, line 55):
 Let x = to_uint32(1 + j).
 Let m = t2_0[i].
 Let m_1 = m[j <- v].
@@ -1065,12 +1065,12 @@ Prove: t2_0[i <- m_1][i_1][i_2] = t2_1[i_1][i_2].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Previous_i' (file tests/wp_typed/user_init.i, line 55):
+Goal Establishment of Invariant 'Previous_i' (file user_init.i, line 55):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 53):
+Goal Preservation of Invariant 'Range_j' (file user_init.i, line 53):
 Assume {
   Type: is_uint32(i) /\ is_uint32(j).
   (* Heap *)
@@ -1106,17 +1106,17 @@ Prove: to_uint32(1 + j) <= 20.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 53):
+Goal Establishment of Invariant 'Range_j' (file user_init.i, line 53):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Last_j' (file tests/wp_typed/user_init.i, line 61):
+Goal Assertion 'Last_j' (file user_init.i, line 61):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Last_i' (file tests/wp_typed/user_init.i, line 64):
+Goal Assertion 'Last_i' (file user_init.i, line 64):
 Prove: true.
 
 ------------------------------------------------------------
@@ -1349,7 +1349,7 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 51):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 51):
 Let x = to_uint32(1 + i).
 Let m = t2_2[i].
 Assume {
@@ -1388,12 +1388,12 @@ Prove: i < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 51):
+Goal Positivity of Loop variant at loop (file user_init.i, line 51):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 58):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 58):
 Let m = t2_2[i].
 Let m_1 = m[j <- v].
 Let x = to_uint32(1 + j).
@@ -1439,7 +1439,7 @@ Prove: j < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 58):
+Goal Positivity of Loop variant at loop (file user_init.i, line 58):
 Prove: true.
 
 ------------------------------------------------------------
@@ -1447,7 +1447,7 @@ Prove: true.
   Function init_t2_v2
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 68) in 'init_t2_v2':
+Goal Post-condition (file user_init.i, line 68) in 'init_t2_v2':
 Assume {
   (* Goal *)
   When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
@@ -1459,7 +1459,7 @@ Prove: t2_0[i][i_1] = v.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 77):
+Goal Preservation of Invariant 'Partial_i' (file user_init.i, line 77):
 Let x = to_uint32(1 + i).
 Let m = t2_0[i].
 Assume {
@@ -1485,12 +1485,12 @@ Prove: m[0] = t2_0[i_1][i_2].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 77):
+Goal Establishment of Invariant 'Partial_i' (file user_init.i, line 77):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 76):
+Goal Preservation of Invariant 'Range_i' (file user_init.i, line 76):
 Assume {
   Type: is_uint32(i).
   (* Invariant 'Range_i' *)
@@ -1510,12 +1510,12 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 76):
+Goal Establishment of Invariant 'Range_i' (file user_init.i, line 76):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 83):
+Goal Preservation of Invariant 'Partial_j' (file user_init.i, line 83):
 Let x = to_uint32(1 + j).
 Let m = t2_0[i].
 Assume {
@@ -1545,12 +1545,12 @@ Prove: m[j <- v][i_1] = v.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 83):
+Goal Establishment of Invariant 'Partial_j' (file user_init.i, line 83):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Previous_i' (file tests/wp_typed/user_init.i, line 84):
+Goal Preservation of Invariant 'Previous_i' (file user_init.i, line 84):
 Let x = to_uint32(1 + j).
 Let m = t2_0[i].
 Let m_1 = m[j <- v].
@@ -1583,12 +1583,12 @@ Prove: t2_0[i <- m_1][i_1][i_2] = t2_1[i_1][i_2].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Previous_i' (file tests/wp_typed/user_init.i, line 84):
+Goal Establishment of Invariant 'Previous_i' (file user_init.i, line 84):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 82):
+Goal Preservation of Invariant 'Range_j' (file user_init.i, line 82):
 Assume {
   Type: is_uint32(i) /\ is_uint32(j).
   (* Invariant 'Range_i' *)
@@ -1612,17 +1612,17 @@ Prove: to_uint32(1 + j) <= 20.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 82):
+Goal Establishment of Invariant 'Range_j' (file user_init.i, line 82):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Last_j' (file tests/wp_typed/user_init.i, line 90):
+Goal Assertion 'Last_j' (file user_init.i, line 90):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Last_i' (file tests/wp_typed/user_init.i, line 93):
+Goal Assertion 'Last_i' (file user_init.i, line 93):
 Prove: true.
 
 ------------------------------------------------------------
@@ -1795,7 +1795,7 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 80):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 80):
 Let x = to_uint32(1 + i).
 Let m = t2_1[i].
 Assume {
@@ -1822,12 +1822,12 @@ Prove: i < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 80):
+Goal Positivity of Loop variant at loop (file user_init.i, line 80):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 87):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 87):
 Let m = t2_1[i].
 Let m_1 = m[j <- v].
 Let x = to_uint32(1 + j).
@@ -1861,7 +1861,7 @@ Prove: j < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 87):
+Goal Positivity of Loop variant at loop (file user_init.i, line 87):
 Prove: true.
 
 ------------------------------------------------------------
@@ -1869,7 +1869,7 @@ Prove: true.
   Function init_t2_v3
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 99) in 'init_t2_v3':
+Goal Post-condition (file user_init.i, line 99) in 'init_t2_v3':
 Assume {
   Type: is_sint32(v).
   (* Goal *)
@@ -1882,7 +1882,7 @@ Prove: P_MemSet20(t2_0[i], 20, v).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 108):
+Goal Preservation of Invariant 'Partial_i' (file user_init.i, line 108):
 Let x = to_uint32(1 + i).
 Let m = t2_0[i].
 Assume {
@@ -1908,12 +1908,12 @@ Prove: P_MemSet20(t2_0[i <- v][i_1], 20, v_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 108):
+Goal Establishment of Invariant 'Partial_i' (file user_init.i, line 108):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 107):
+Goal Preservation of Invariant 'Range_i' (file user_init.i, line 107):
 Let m = t2_0[i].
 Assume {
   Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
@@ -1934,12 +1934,12 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 107):
+Goal Establishment of Invariant 'Range_i' (file user_init.i, line 107):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 114):
+Goal Preservation of Invariant 'Partial_j' (file user_init.i, line 114):
 Let x = to_uint32(1 + j).
 Let m = t2_0[i].
 Let m_1 = v[j <- v_1].
@@ -1968,7 +1968,7 @@ Prove: P_MemSet20(m_1, x, v_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 114):
+Goal Establishment of Invariant 'Partial_j' (file user_init.i, line 114):
 Let m = t2_0[i].
 Assume {
   Type: is_uint32(i) /\ is_sint32(v) /\ IsArray_sint32(m).
@@ -1984,7 +1984,7 @@ Prove: P_MemSet20(m, 0, v).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 113):
+Goal Preservation of Invariant 'Range_j' (file user_init.i, line 113):
 Let m = t2_0[i].
 Assume {
   Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
@@ -2009,17 +2009,17 @@ Prove: to_uint32(1 + j) <= 20.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 113):
+Goal Establishment of Invariant 'Range_j' (file user_init.i, line 113):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Last_j' (file tests/wp_typed/user_init.i, line 120):
+Goal Assertion 'Last_j' (file user_init.i, line 120):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Last_i' (file tests/wp_typed/user_init.i, line 123):
+Goal Assertion 'Last_i' (file user_init.i, line 123):
 Prove: true.
 
 ------------------------------------------------------------
@@ -2122,7 +2122,7 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 111):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 111):
 Let x = to_uint32(1 + i).
 Let m = t2_0[i].
 Assume {
@@ -2149,12 +2149,12 @@ Prove: i < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 111):
+Goal Positivity of Loop variant at loop (file user_init.i, line 111):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 117):
+Goal Decreasing of Loop variant at loop (file user_init.i, line 117):
 Let m = v[j <- v_1].
 Let x = to_uint32(1 + j).
 Let m_1 = t2_0[i].
@@ -2185,7 +2185,7 @@ Prove: j < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 117):
+Goal Positivity of Loop variant at loop (file user_init.i, line 117):
 Prove: true.
 
 ------------------------------------------------------------

@@ -32,7 +32,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "x == 120";
-    __gen_e_acsl_assert_data.file = "tests/bts/bts1395.i";
+    __gen_e_acsl_assert_data.file = "bts1395.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 15;
     __e_acsl_assert(x == 120,& __gen_e_acsl_assert_data);
@@ -54,7 +54,7 @@ int __gen_e_acsl_fact(int n)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "n > 0";
-    __gen_e_acsl_assert_data.file = "tests/bts/bts1395.i";
+    __gen_e_acsl_assert_data.file = "bts1395.i";
     __gen_e_acsl_assert_data.fct = "fact";
     __gen_e_acsl_assert_data.line = 6;
     __e_acsl_assert(n > 0,& __gen_e_acsl_assert_data);

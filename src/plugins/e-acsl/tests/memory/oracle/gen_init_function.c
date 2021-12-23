@@ -19,7 +19,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "__e_acsl_heap_allocation_size == 0";
-    __gen_e_acsl_assert_data.file = "tests/memory/init_function.c";
+    __gen_e_acsl_assert_data.file = "init_function.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 16;
     __e_acsl_assert(__e_acsl_heap_allocation_size == 0UL,
@@ -37,7 +37,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "__e_acsl_heap_allocation_size == 7";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/init_function.c";
+    __gen_e_acsl_assert_data_2.file = "init_function.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 18;
     __e_acsl_assert(__e_acsl_heap_allocation_size == 7UL,

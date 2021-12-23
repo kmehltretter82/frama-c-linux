@@ -1,5 +1,5 @@
 # frama-c -wp -wp-timeout 120 -wp-steps 2500 [...]
-[kernel] Parsing tests/wp_plugin/string_c.c (with preprocessing)
+[kernel] Parsing string_c.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 44 goals scheduled

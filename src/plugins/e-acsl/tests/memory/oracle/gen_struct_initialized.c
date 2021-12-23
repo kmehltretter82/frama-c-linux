@@ -34,7 +34,7 @@ int main(void)
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Assertion";
       __gen_e_acsl_assert_data.pred_txt = "!\\initialized(&static_pair.a)";
-      __gen_e_acsl_assert_data.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data.file = "struct_initialized.c";
       __gen_e_acsl_assert_data.fct = "main";
       __gen_e_acsl_assert_data.line = 13;
       __e_acsl_assert(! __gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
@@ -58,7 +58,7 @@ int main(void)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
       __gen_e_acsl_assert_data_2.pred_txt = "!\\initialized(&static_pair.b)";
-      __gen_e_acsl_assert_data_2.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_2.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_2.fct = "main";
       __gen_e_acsl_assert_data_2.line = 14;
       __e_acsl_assert(! __gen_e_acsl_initialized_2,
@@ -85,7 +85,7 @@ int main(void)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Assertion";
       __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&static_pair.a)";
-      __gen_e_acsl_assert_data_3.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_3.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_3.fct = "main";
       __gen_e_acsl_assert_data_3.line = 16;
       __e_acsl_assert(__gen_e_acsl_initialized_3,
@@ -110,7 +110,7 @@ int main(void)
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Assertion";
       __gen_e_acsl_assert_data_4.pred_txt = "!\\initialized(&static_pair.b)";
-      __gen_e_acsl_assert_data_4.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_4.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_4.fct = "main";
       __gen_e_acsl_assert_data_4.line = 17;
       __e_acsl_assert(! __gen_e_acsl_initialized_4,
@@ -137,7 +137,7 @@ int main(void)
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "Assertion";
       __gen_e_acsl_assert_data_5.pred_txt = "\\initialized(&static_pair.a)";
-      __gen_e_acsl_assert_data_5.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_5.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_5.fct = "main";
       __gen_e_acsl_assert_data_5.line = 19;
       __e_acsl_assert(__gen_e_acsl_initialized_5,
@@ -162,7 +162,7 @@ int main(void)
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "Assertion";
       __gen_e_acsl_assert_data_6.pred_txt = "\\initialized(&static_pair.b)";
-      __gen_e_acsl_assert_data_6.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_6.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_6.fct = "main";
       __gen_e_acsl_assert_data_6.line = 20;
       __e_acsl_assert(__gen_e_acsl_initialized_6,
@@ -192,7 +192,7 @@ int main(void)
       __gen_e_acsl_assert_data_7.blocking = 1;
       __gen_e_acsl_assert_data_7.kind = "Assertion";
       __gen_e_acsl_assert_data_7.pred_txt = "!\\initialized(&heap_pair->a)";
-      __gen_e_acsl_assert_data_7.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_7.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_7.fct = "main";
       __gen_e_acsl_assert_data_7.line = 26;
       __e_acsl_assert(! __gen_e_acsl_initialized_7,
@@ -216,7 +216,7 @@ int main(void)
       __gen_e_acsl_assert_data_8.blocking = 1;
       __gen_e_acsl_assert_data_8.kind = "Assertion";
       __gen_e_acsl_assert_data_8.pred_txt = "!\\initialized(&heap_pair->b)";
-      __gen_e_acsl_assert_data_8.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_8.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_8.fct = "main";
       __gen_e_acsl_assert_data_8.line = 27;
       __e_acsl_assert(! __gen_e_acsl_initialized_8,
@@ -242,7 +242,7 @@ int main(void)
       __gen_e_acsl_assert_data_9.blocking = 1;
       __gen_e_acsl_assert_data_9.kind = "Assertion";
       __gen_e_acsl_assert_data_9.pred_txt = "\\initialized(&heap_pair->a)";
-      __gen_e_acsl_assert_data_9.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_9.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_9.fct = "main";
       __gen_e_acsl_assert_data_9.line = 29;
       __e_acsl_assert(__gen_e_acsl_initialized_9,
@@ -266,7 +266,7 @@ int main(void)
       __gen_e_acsl_assert_data_10.blocking = 1;
       __gen_e_acsl_assert_data_10.kind = "Assertion";
       __gen_e_acsl_assert_data_10.pred_txt = "!\\initialized(&heap_pair->b)";
-      __gen_e_acsl_assert_data_10.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_10.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_10.fct = "main";
       __gen_e_acsl_assert_data_10.line = 30;
       __e_acsl_assert(! __gen_e_acsl_initialized_10,
@@ -292,7 +292,7 @@ int main(void)
       __gen_e_acsl_assert_data_11.blocking = 1;
       __gen_e_acsl_assert_data_11.kind = "Assertion";
       __gen_e_acsl_assert_data_11.pred_txt = "\\initialized(&heap_pair->a)";
-      __gen_e_acsl_assert_data_11.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_11.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_11.fct = "main";
       __gen_e_acsl_assert_data_11.line = 32;
       __e_acsl_assert(__gen_e_acsl_initialized_11,
@@ -316,7 +316,7 @@ int main(void)
       __gen_e_acsl_assert_data_12.blocking = 1;
       __gen_e_acsl_assert_data_12.kind = "Assertion";
       __gen_e_acsl_assert_data_12.pred_txt = "\\initialized(&heap_pair->b)";
-      __gen_e_acsl_assert_data_12.file = "tests/memory/struct_initialized.c";
+      __gen_e_acsl_assert_data_12.file = "struct_initialized.c";
       __gen_e_acsl_assert_data_12.fct = "main";
       __gen_e_acsl_assert_data_12.line = 33;
       __e_acsl_assert(__gen_e_acsl_initialized_12,

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/constant_propagation/const_propagate.c (with preprocessing)
+[kernel] Parsing const_propagate.c (with preprocessing)
 [scf] beginning constant propagation
 [eva] Analyzing a complete application starting at init
 [eva] Computing initial state
@@ -20,8 +20,8 @@
   d2 ∈ {0}
   d3 ∈ {0}
 [eva] computing for function add3 <- init.
-  Called from tests/constant_propagation/const_propagate.c:56.
-[eva:alarm] tests/constant_propagation/const_propagate.c:48: Warning: 
+  Called from const_propagate.c:56.
+[eva:alarm] const_propagate.c:48: Warning: 
   signed overflow. assert v1 + v2 ≤ 2147483647;
 [eva] Recording results for add3
 [eva] Done for function add3

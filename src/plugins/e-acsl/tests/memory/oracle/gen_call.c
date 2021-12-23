@@ -67,7 +67,7 @@ int *__gen_e_acsl_f(int *x, int *y)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(\\result)";
-    __gen_e_acsl_assert_data.file = "tests/memory/call.c";
+    __gen_e_acsl_assert_data.file = "call.c";
     __gen_e_acsl_assert_data.fct = "f";
     __gen_e_acsl_assert_data.line = 7;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);

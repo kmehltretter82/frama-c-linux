@@ -1,4 +1,4 @@
-[kernel] Parsing tests/metrics/cyclo_comp5.c (with preprocessing)
+[kernel] Parsing cyclo_comp5.c (with preprocessing)
 [metrics] Defined functions (2)
   =====================
    complexity5 (1 call); main (0 call); 

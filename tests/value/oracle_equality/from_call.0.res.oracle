@@ -1,17 +1,17 @@
 68c68,73
-< [eva] tests/value/from_call.i:20: Reusing old results for call to g
+< [eva] from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
->   Called from tests/value/from_call.i:20.
+>   Called from from_call.i:20.
 > [eva] Recording results for g
 > [from] Computing for function g
 > [from] Done for function g
 > [eva] Done for function g
 78c83,88
-< [eva] tests/value/from_call.i:20: Reusing old results for call to g
+< [eva] from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
->   Called from tests/value/from_call.i:20.
+>   Called from from_call.i:20.
 > [eva] Recording results for g
 > [from] Computing for function g
 > [from] Done for function g

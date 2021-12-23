@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/loop2.i (no preprocessing)
+[kernel] Parsing loop2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -11,7 +11,7 @@
   r ∈ {0}
   G[0..4] ∈ {0}
   Reg5 ∈ {0}
-[eva] tests/value/loop2.i:8: starting to merge loop iterations
+[eva] loop2.i:8: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

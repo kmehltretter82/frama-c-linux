@@ -1,4 +1,4 @@
-[kernel] Parsing tests/builtins/big_local_array.i (no preprocessing)
+[kernel] Parsing big_local_array.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

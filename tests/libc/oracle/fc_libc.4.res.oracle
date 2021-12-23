@@ -1,4 +1,4 @@
-[kernel] Parsing tests/libc/fc_libc.c (with preprocessing)
+[kernel] Parsing fc_libc.c (with preprocessing)
 [kernel] Parsing c11_functions.json
 [kernel] Parsing c11_headers.json
 [kernel] Parsing glibc_functions.json

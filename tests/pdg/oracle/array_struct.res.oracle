@@ -1,19 +1,19 @@
-[kernel] Parsing tests/pdg/array_struct.i (no preprocessing)
+[kernel] Parsing array_struct.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..99] ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/pdg/array_struct.i:18.
-[eva:alarm] tests/pdg/array_struct.i:13: Warning: 
+  Called from array_struct.i:18.
+[eva:alarm] array_struct.i:13: Warning: 
   accessing out of bounds index. assert 0 ≤ c;
-[eva:alarm] tests/pdg/array_struct.i:13: Warning: 
+[eva:alarm] array_struct.i:13: Warning: 
   accessing out of bounds index. assert c < 100;
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/pdg/array_struct.i:19.
+  Called from array_struct.i:19.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main

@@ -40,7 +40,7 @@ digraph G {
     subgraph cluster_cs_4 { label=<f>; cp31;cp25;
        };
      };
-  subgraph cluster_file_1 { label=<tests/dive/various.i>; cp28;cp8;
+  subgraph cluster_file_1 { label=<various.i>; cp28;cp8;
      };
   
   cp2 -> cp5;
