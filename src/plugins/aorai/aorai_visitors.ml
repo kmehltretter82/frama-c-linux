@@ -737,10 +737,12 @@ class visit_adding_pre_post_from_buch treatloops =
             end
           else post_cond
         in
-        let infos = Aorai_utils.get_preds_post_bc_wrt_params kf in
         let post_cond =
-          if Logic_utils.is_trivially_true infos then post_cond
-          else (Normal, Logic_const.new_predicate infos) :: post_cond
+          if Data_for_aorai.isObservableFunction kf then begin
+            let infos = Aorai_utils.get_preds_post_bc_wrt_params kf in
+            if Logic_utils.is_trivially_true infos then post_cond
+            else (Normal, Logic_const.new_predicate infos) :: post_cond
+          end else post_cond
         in
         let post_cond = post_cond @ get_action_post_cond kf return_state in
         [Cil.mk_behavior ~name ~post_cond ()]
@@ -931,9 +933,11 @@ class visit_adding_pre_post_from_buch treatloops =
          let my_state = Data_for_aorai.get_kf_init_state my_kf in
          let requires = needs_zero_one_choice my_state in
          let requires =
-           Aorai_utils.auto_func_preconditions
-             loc my_kf Promelaast.Call my_state
-           @ requires
+           if Data_for_aorai.isObservableFunction my_kf then
+             Aorai_utils.auto_func_preconditions
+               loc my_kf Promelaast.Call my_state
+             @ requires
+           else requires
          in
          let post_cond = needs_post my_kf in
          match Cil.find_default_behavior spec with
