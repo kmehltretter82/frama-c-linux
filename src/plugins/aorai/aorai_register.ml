@@ -193,9 +193,7 @@ let output () =
       Promelaoutput.Typed.output_dot_automata (Data_for_aorai.getAutomata ())
         (!dot_file:>string);
       printverb "Generating dot file    : done\n"
-    end;
-  (* Some test traces. *)
-  Data_for_aorai.debug_computed_state ()
+    end
 
 let work () =
   let file = Ast.get () in
