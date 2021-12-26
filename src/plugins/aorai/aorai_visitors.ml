@@ -560,21 +560,6 @@ class visit_adding_pre_post_from_buch treatloops =
       predicate_to_invariant kf stmt pred
     end
   in
-  let impossible_states_preds start possible_states my_state =
-    let treat_one_start_state state start_state end_states acc =
-      if not (Data_for_aorai.Aorai_state.Map.mem state end_states) then
-        Logic_const.pimplies
-          (Logic_const.pat(Aorai_utils.is_state_pred start_state, start),
-           Aorai_utils.is_out_of_state_pred state)
-        :: acc
-      else acc
-    in
-    let treat_one_state state _ acc =
-      Data_for_aorai.Aorai_state.Map.fold
-        (treat_one_start_state state) my_state acc
-    in
-    Data_for_aorai.Aorai_state.Map.fold treat_one_state possible_states []
-  in
   let impossible_states_preds_inv start possible_states my_state =
     let treat_one_start_state state start_state end_states acc =
       if Data_for_aorai.Aorai_state.Map.mem state end_states then
@@ -1064,7 +1049,8 @@ class visit_adding_pre_post_from_buch treatloops =
         condition_to_invariant kf possible_states new_loop;
 
         let init_preds =
-          impossible_states_preds Logic_const.pre_label possible_states init_state
+          impossible_states_preds_inv
+            Logic_const.pre_label possible_states init_state
         in
         let treat_init_pred pred =
           let pred = mk_imply Rneq pred in
