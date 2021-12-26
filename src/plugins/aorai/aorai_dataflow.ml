@@ -416,9 +416,7 @@ module Computer(I: Init) = struct
       Data_for_aorai.pretty_state old Data_for_aorai.pretty_state cur;
     if Data_for_aorai.included_state cur old then begin
       Aorai_option.debug ~dkey:forward_dkey "Included";
-      if is_loop && Cil_datatype.Stmt.Set.mem stmt loops &&
-         Data_for_aorai.Aorai_state.Map.is_empty
-           (Data_for_aorai.get_loop_invariant_state stmt)
+      if is_loop && Cil_datatype.Stmt.Set.mem stmt loops
       then
         Data_for_aorai.set_loop_invariant_state stmt cur;
       None

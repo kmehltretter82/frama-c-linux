@@ -4,7 +4,9 @@
 
 void f(void) {}
 
-void g(void) {}
+void g(void) {
+  for (int i = 0; i < 1; i++) ;
+}
 
 void h(void) {
   g();
