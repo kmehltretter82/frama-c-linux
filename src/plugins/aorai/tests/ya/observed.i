@@ -6,7 +6,10 @@ void f(void) {}
 
 void g(void) {}
 
-void h(void) {}
+void h(void) {
+  g();
+  g();
+}
 
 int main() {
   f();
