@@ -15,7 +15,7 @@ enum aorai_OpStatusList {
 /*@ ghost int aorai_intermediate_state_0 = 0; */
 /*@ ghost int final = 0; */
 /*@ ghost int first_step = 0; */
-/*@ ghost int init = 0; */
+/*@ ghost int init = 1; */
 /*@ ghost
   /@ requires
        1 ≡ init ∧ 0 ≡ aorai_intermediate_state ∧

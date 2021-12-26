@@ -306,9 +306,11 @@ let isCrossableAtInit tr func =
     | TRel(rel,t1,t2) -> eval_rel_at_init rel t1 t2
 
   in
-  match isCross tr.cross with
-  | Bool3.True | Bool3.Undefined -> true
-  | Bool3.False -> false
+  if Data_for_aorai.isObservableFunction func then begin
+    match isCross tr.cross with
+    | Bool3.True | Bool3.Undefined -> true
+    | Bool3.False -> false
+  end else true
 
 (* ************************************************************************* *)
 (** {b Expressions management} *)
