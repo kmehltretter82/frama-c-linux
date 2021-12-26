@@ -84,10 +84,51 @@ let are_typ_compatible t1 t2 =
 (* --- Imprecise bits abstraction                                       --- *)
 (* ------------------------------------------------------------------------ *)
 
+type initialization =
+  | SurelyInitialized
+  | MaybeUninitialized
+
 type bit =
   | Uninitialized
-  | Zero
-  | Any of Base.SetLattice.t
+  | Zero of initialization
+  | Any of Base.SetLattice.t * initialization
+
+module Initialization =
+struct
+  let pretty fmt = function
+    | SurelyInitialized -> ()
+    | MaybeUninitialized ->
+      Format.fprintf fmt "or UNINITIALIZED"
+
+  let hash = function
+    | SurelyInitialized -> 3
+    | MaybeUninitialized -> 7
+
+  let equal i1 i2 =
+    match i1, i2 with
+    | SurelyInitialized, SurelyInitialized
+    | MaybeUninitialized, MaybeUninitialized -> true
+    | _, _ -> false
+
+  let compare i1 i2 =
+    match i1, i2 with
+    | SurelyInitialized, SurelyInitialized
+    | MaybeUninitialized, MaybeUninitialized -> 0
+    | SurelyInitialized, MaybeUninitialized -> -1
+    | MaybeUninitialized, SurelyInitialized -> 1
+
+  let is_included i1 i2 =
+    match i1, i2 with
+    | SurelyInitialized, _
+    | _, MaybeUninitialized -> true
+    | MaybeUninitialized, SurelyInitialized -> false
+
+  let join i1 i2 =
+    match i1, i2 with
+    | SurelyInitialized, SurelyInitialized -> SurelyInitialized
+    | MaybeUninitialized, _
+    | _, MaybeUninitialized -> MaybeUninitialized
+end
 
 module Bit =
 struct
@@ -96,54 +137,72 @@ struct
   type t = bit
 
   let uninitialized = Uninitialized
-  let zero = Zero
-  let numerical = Any Bases.empty
-  let top = Any Bases.top
+  let zero = Zero SurelyInitialized
+  let numerical = Any (Bases.empty, SurelyInitialized)
+  let top = Any (Bases.top, MaybeUninitialized)
+
 
   let pretty fmt = function
-    | Uninitialized -> Format.fprintf fmt "UNINITIALIZED"
-    | Zero -> Format.fprintf fmt "0"
-    | Any (Set set) when Base.SetLattice.O.is_empty set ->
-      Format.fprintf fmt "[--..--]"
+    | Uninitialized ->
+      Format.fprintf fmt "UNINITIALIZED"
+    | Zero i ->
+      Format.fprintf fmt "0%a" Initialization.pretty i
+    | Any (Set set, i) when Base.SetLattice.O.is_empty set ->
+      Format.fprintf fmt "[--..--]%a" Initialization.pretty i
     | Any _ -> Format.fprintf fmt "T"
 
   let is_any = function Any _ -> true | _ -> false
 
   let hash = function
     | Uninitialized -> 7
-    | Zero -> 3
-    | Any set -> Bases.hash set
+    | Zero i -> Hashtbl.hash (3, Initialization.hash i)
+    | Any (set, i)-> Hashtbl.hash (53, Bases.hash set, Initialization.hash i)
 
   let equal d1 d2 =
     match d1,d2 with
     | Uninitialized, Uninitialized -> true
-    | Zero, Zero -> true
-    | Any set1, Any set2 -> Bases.equal set1 set2
+    | Zero i1, Zero i2 -> Initialization.equal i1 i2
+    | Any (set1,i1), Any (set2,i2) ->
+      Bases.equal set1 set2 && Initialization.equal i1 i2
     | _, _ -> false
 
   let compare d1 d2 =
     match d1,d2 with
     | Uninitialized, Uninitialized -> 0
-    | Zero, Zero -> 0
-    | Any set1, Any set2 -> Bases.compare set1 set2
+    | Zero i1, Zero i2 -> Initialization.compare i1 i2
+    | Any (set1,i1), Any (set2,i2) ->
+      Bases.compare set1 set2 <?> (Initialization.compare, i1, i2)
     | Uninitialized, _ -> 1
     | _, Uninitialized -> -1
-    | Zero, _ -> 1
-    | _, Zero -> -1
+    | Zero _, _ -> 1
+    | _, Zero _-> -1
+
+  let initialization = function
+    | Uninitialized -> MaybeUninitialized
+    | Zero i -> i
+    | Any (_,i) -> i
 
   let is_included d1 d2 =
+    Initialization.is_included (initialization d1) (initialization d2) &&
     match d1, d2 with
     | Uninitialized, _ -> true
     | _, Uninitialized -> false
-    | Zero, _ -> true
-    | _, Zero -> false
-    | Any set1, Any set2 -> Bases.is_included set1 set2
+    | Zero _, _ -> true
+    | _, Zero _ -> false
+    | Any (set1,_), Any (set2,_) -> Bases.is_included set1 set2
 
   let join d1 d2 =
     match d1, d2 with
-    | Uninitialized, d | d, Uninitialized -> d
-    | Zero, d | d, Zero -> d
-    | Any set1, Any set2 -> Any (Bases.join set1 set2)
+    | Uninitialized, Uninitialized -> Uninitialized
+    | Zero i1, Zero i2 ->
+      Zero (Initialization.join i1 i2)
+    | Any (set1,i1), Any (set2,i2) ->
+      Any (Bases.join set1 set2, Initialization.join i1 i2)
+    | Zero _, Uninitialized
+    | Uninitialized, Zero _ -> Zero MaybeUninitialized
+    | Any (set,i), (Zero _ | Uninitialized as b)
+    | (Zero _ | Uninitialized as b), Any (set,i) ->
+      Any (set, Initialization.join i (initialization b))
 end
 
 
@@ -259,7 +318,7 @@ struct
         include Datatype.Serializable_undefined
         include M
         let name = "Abstract_Memory.Structures.Values"
-        let reprs = [ of_raw Zero ]
+        let reprs = [ of_raw Bit.zero ]
       end)
     let pretty_debug = pretty
   end
@@ -416,7 +475,7 @@ struct
     include Datatype.Serializable_undefined
     include S
     let name = "Abstract_Memory.Disjunction.S"
-    let reprs = [ of_raw Zero ]
+    let reprs = [ of_raw Bit.zero ]
     let eval_key key m = M.to_singleton_int (read m key)
     let suitable_key key m = Option.is_some (eval_key key m)
     let keys_candidates ci m =
@@ -1470,7 +1529,7 @@ struct
 
     let rec to_singleton_int = function
       | Scalar s -> V.to_integer s.scalar_value
-      | Raw Zero -> Some Integer.zero
+      | Raw (Zero _) -> Some Integer.zero
       | Union u -> to_singleton_int u.union_value
       | _ -> None
 
@@ -1688,7 +1747,7 @@ struct
             Array { array_cell_type = elem_type ; array_value }
       in aux
 
-    let incr_bound ~oracle vi x = (* TODO: keep subtree when nothing changes *)
+    let incr_bound ~oracle vi x m = (* TODO: keep subtree when nothing changes *)
       let rec aux = function
         | (Raw _ | Scalar _) as m -> m
         | Struct s -> Struct { s with struct_value = S.map aux s.struct_value }
@@ -1697,7 +1756,10 @@ struct
         | Array a ->
           let array_value = A.incr_bound ~oracle vi x a.array_value in
           Array { a with array_value=A.map aux array_value }
-      in aux
+      in
+      let r = aux m in
+      (* debug true "bounds updated@.%a@.to%a" pretty m pretty r; *)
+      r
 
     let add_segmentation_bounds ~oracle ~typ bounds =
       let convert_bound exp =

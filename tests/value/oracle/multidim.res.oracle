@@ -42,7 +42,7 @@
                    }
   y2 : # cvalue: .t1[0].f ∈ {4.} or UNINITIALIZED
                  {.t1{[0].i; [1..3]}; .t2[0..3]} ∈ UNINITIALIZED
-       # multidim: { .t1[0] = { .f = {4.} } }
+       # multidim: { .t1[0] = { .f = {4.} or UNINITIALIZED } }
   z : # cvalue: {0}
       # multidim: 0
 [eva] multidim.c:45: 
@@ -64,8 +64,8 @@
                 .t2[3].f ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
                 .t2[3].i ∈ [--..--]
       # multidim: {
-                    .t1[0 .. 3] = { .f = {{ ANYTHING }} },
-                    .t2[0 .. 3] = { .f = {{ ANYTHING }} }
+                    .t1[0 .. 3] = { .f = {{ ANYTHING }} or UNINITIALIZED },
+                    .t2[0 .. 3] = { .f = {{ ANYTHING }} or UNINITIALIZED }
                   }
 [eva] computing for function f <- main1 <- main.
   Called from multidim.c:47.
@@ -207,8 +207,6 @@
 [eva] multidim.c:147: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] multidim.c:148: Warning: 
-  accessing uninitialized left-value. assert \initialized(&t[j].typ);
 [eva] multidim.c:150: Frama_C_show_each_INT: {42}
 [eva] multidim.c:153: Frama_C_show_each_FLOAT: {42.}
 [eva] Recording results for main7

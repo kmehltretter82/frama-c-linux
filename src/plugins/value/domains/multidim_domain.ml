@@ -37,25 +37,6 @@ struct
   include Cvalue.V
   include Cvalue_forward (* for fallback oracles *)
 
-  let to_integer cvalue =
-    try  Some (Ival.project_int (project_ival cvalue))
-    with Not_based_on_null | Ival.Not_Singleton_Int -> None
-
-  let of_integer = inject_int
-
-  let of_bit = function
-    | Abstract_memory.Uninitialized -> bottom
-    | Zero -> inject_int Integer.zero
-    | Any (Set s) -> inject_top_origin Origin.top s
-    | Any (Top) -> top_with_origin Origin.top
-
-  let to_bit v =
-    if is_bottom v
-    then Abstract_memory.Uninitialized
-    else if is_zero v
-    then Abstract_memory.Zero
-    else Abstract_memory.Any (get_bases v)
-
   let backward_is_finite positive fkind v =
     let prec = Fval.kind fkind in
     try
@@ -65,10 +46,58 @@ struct
       `Value v
 end
 
+module Value_or_Uninitialized =
+struct
+  open Cvalue
+  include V_Or_Uninitialized
+
+  let to_integer cvalue =
+    try  Some (Ival.project_int (V.project_ival (get_v cvalue)))
+    with V.Not_based_on_null | Ival.Not_Singleton_Int -> None
+
+  let make i v =
+    let initialized = match i with
+      | Abstract_memory.SurelyInitialized -> true
+      | Abstract_memory.MaybeUninitialized -> false
+    in
+    V_Or_Uninitialized.make ~initialized ~escaping:false v
+
+  let of_value v =
+    V_Or_Uninitialized.make ~initialized:true ~escaping:false v
+
+  let of_bit = function
+    | Abstract_memory.Uninitialized -> uninitialized
+    | Zero i -> make i (V.inject_int Integer.zero)
+    | Any (Set s,i) -> make i (V.inject_top_origin Origin.top s)
+    | Any (Top, i) -> make i (V.top_with_origin Origin.top)
+
+  let to_bit v' =
+    let v = get_v v'
+    and initialization =
+      if is_initialized v'
+      then Abstract_memory.SurelyInitialized
+      else Abstract_memory.MaybeUninitialized
+    in
+    if V.is_bottom v
+    then Abstract_memory.Uninitialized
+    else if V.is_zero v
+    then Abstract_memory.Zero (initialization)
+    else Abstract_memory.Any (V.get_bases v, initialization)
+
+  let from_flagged fv =
+    V_Or_Uninitialized.make
+      ~initialized:fv.initialized
+      ~escaping:false
+      (Bottom.value ~bottom:V.bottom fv.v)
+
+  let map' f v =
+    f (get_v v) >>-: fun new_v -> map (fun _ -> new_v) v
+end
+
 let no_oracle exp =
   match Cil.isInteger exp with
   | None -> raise Abstract_interp.Error_Top
-  | Some i -> Value.of_integer i
+  | Some i -> Value.inject_int i
 
 let convert_oracle oracle =
   fun exp ->
@@ -200,7 +229,7 @@ struct
     let disjunctive_invariants =
       Parameters.MultidimDisjunctiveInvariants.get
   end
-  module Memory = Abstract_memory.TypedMemory (Config) (Value)
+  module Memory = Abstract_memory.TypedMemory (Config) (Value_or_Uninitialized)
 
   module Prototype =
   (* Datatype *)
@@ -221,12 +250,14 @@ struct
   let narrow = fun m1 _m2 -> m1
   let join = Memory.join
   let smash ~oracle = Memory.join ~oracle:(fun _ -> oracle)
-  let widen h = Memory.widen (fun ~size v1 v2 -> Value.widen (size,h) v1 v2)
+  let widen h =
+    Memory.widen
+      (fun ~size v1 v2 -> Value_or_Uninitialized.widen (size,h) v1 v2)
   let incr_bound = Memory.incr_bound
 
   let get ~oracle m loc =
     match loc with
-    | `Top -> Value.top
+    | `Top -> Value_or_Uninitialized.top
     | `Value loc -> Memory.get ~oracle m loc
 
   let extract ~oracle m loc =
@@ -292,6 +323,7 @@ struct
 
   type state = t
   type value = Value.t
+  type value_or_uninitialized = Value_or_Uninitialized.t
   type base = Base.t
   type offset = Location.offset
   type memory = Memory.t
@@ -339,18 +371,18 @@ struct
     in
     Location.fold f loc `Bottom
 
-  and get (state : state) (src : mdlocation) : value or_bottom =
+  and get (state : state) (src : mdlocation) : value_or_uninitialized or_bottom =
     let oracle = mk_oracle state in
-    read (Memory.get ~oracle) Value.join state src
+    read (Memory.get ~oracle) Value_or_Uninitialized.join state src
 
-  and mk_oracle' (state : state) : Cil_types.exp -> Value.t =
+  and mk_oracle' (state : state) : Cil_types.exp -> value =
     (* Until Eva gives access to good oracles, we use this poor stupid oracle
        instead *)
     let rec oracle exp =
       match exp.enode with
       | Lval lval ->
         let value = get state (Location.of_lval oracle lval) in
-        Bottom.non_bottom value (* TODO: handle exception *)
+        Value_or_Uninitialized.get_v (Bottom.non_bottom value) (* TODO: handle exception *)
       | Const (CInt64 (i,_,_)) -> Value.inject_int i
       | UnOp (op, e, typ) -> Value.forward_unop typ op (oracle e)
       | BinOp (op, e1, e2, TFloat (fkind, _)) ->
@@ -369,12 +401,20 @@ struct
     in
     fun exp -> oracle (Cil.constFold true exp)
 
-  and mk_oracle (state : state) : Abstract_memory.oracle =
+  and convert_oracle (oracle : Cil_types.exp -> value)
+    : Abstract_memory.oracle =
     fun exp ->
     try
-      Value.project_ival (mk_oracle' state exp)
+      Value.project_ival (oracle exp)
     with Value.Not_based_on_null ->
       Ival.top (* TODO: should it just not happen ? *)
+
+  and convert_oracle_or_default state = function (* TODO: use everywhere *)
+    | Some oracle -> convert_oracle oracle
+    | None -> mk_oracle state
+
+  and mk_oracle (state : state) : Abstract_memory.oracle =
+    convert_oracle (mk_oracle' state)
 
   let extract (state : state) (src : mdlocation) : Memory.t or_bottom =
     let oracle = mk_oracle state in
@@ -407,7 +447,7 @@ struct
     (* Result can never be bottom if update never returns bottom *)
     Bottom.non_bottom (write' (fun m o -> `Value (update m o)) state loc)
 
-  let set (state : state) (dst : mdlocation) (v : value) : state =
+  let set (state : state) (dst : mdlocation) (v : value_or_uninitialized) : state =
     let weak = not (Location.is_singleton dst)
     and oracle = mk_oracle state in
     write (Memory.set ~oracle ~weak v) state dst
@@ -425,9 +465,11 @@ struct
     and oracle = mk_oracle state in
     write (fun m off -> Memory.erase ~oracle ~weak m off b) state dst
 
-  let reinforce (f : value -> value or_bottom)
+  let reinforce
+      ?oracle
+      (f : value_or_uninitialized -> value_or_uninitialized or_bottom)
       (state : state) (dst : mdlocation) : state or_bottom =
-    let oracle = mk_oracle state in
+    let oracle = convert_oracle_or_default state oracle in
     write' (fun m off -> Memory.reinforce ~oracle f m off) state dst
 
   (* Lattice *)
@@ -495,15 +537,19 @@ struct
       | `Bottom, _ -> raise Abstract_interp.Error_Bottom
       | `Value v, _ -> v
     in
-    let v =
-      try
-        let loc = Location.of_lval oracle lv in
-        get state loc >>-: fun v -> v, None
-      with
-      | Abstract_interp.Error_Top -> `Value (Value.top, None)
-      | Abstract_interp.Error_Bottom -> `Bottom
-    in
-    v, Alarmset.all
+    try
+      let loc = Location.of_lval oracle lv in
+      let v = get state loc in
+      (v >>-: fun v -> (Value_or_Uninitialized.get_v v, None)),
+      match v with
+      | `Bottom -> Alarmset.all
+      | `Value v ->
+        if Value_or_Uninitialized.is_initialized v
+        then Alarmset.(set (Alarms.Uninitialized lv) True all)
+        else Alarmset.all
+    with
+    | Abstract_interp.Error_Top -> `Value (Value.top, None), Alarmset.all
+    | Abstract_interp.Error_Bottom -> `Bottom, Alarmset.all
 
 
   (* Eva Transfer *)
@@ -518,17 +564,19 @@ struct
     state' >>- fun state ->
     let oracle = make_oracle valuation in
     try
-      match expr.enode, record.value.v with
-      | Lval lv, `Value value when not (Value.is_topint value) ->
-        let loc = Location.of_lval oracle lv in
-        let update value' =
-          let v = Value.narrow value value' in
-          if Value.is_bottom v then `Bottom else `Value v
-        in
-        if Location.is_singleton loc
-        then reinforce update state loc
+      match expr.enode with
+      | Lval lv ->
+        let value = Value_or_Uninitialized.from_flagged record.value in
+        if not (Value.is_topint (Value_or_Uninitialized.get_v value)) then
+          let loc = Location.of_lval oracle lv in
+          let update value' =
+            let v = Value_or_Uninitialized.narrow value value' in
+            if Value_or_Uninitialized.is_bottom v then `Bottom else `Value v
+          in
+          if Location.is_singleton loc
+          then reinforce ~oracle update state loc
+          else `Value state
         else `Value state
-      | _, `Bottom -> `Value state (* Indeterminate value, ignore *)
       | _ -> `Value state
     with
     (* Failed to evaluate the location *)
@@ -592,7 +640,7 @@ struct
       let dst = Location.of_lval oracle lval in
       match assigned_value with
       | Assign value ->
-        set state dst value
+        set state dst (Value_or_Uninitialized.of_value value)
       | Copy (right, _value) ->
         try
           let src = Location.of_lval oracle right.lval in
@@ -681,7 +729,7 @@ struct
         begin match Cil.unrollType (Logic_utils.logicCType typ) with
           | TFloat (fkind,_) ->
             let update = Value.backward_is_finite positive fkind in
-            reinforce update state loc
+            reinforce (Value_or_Uninitialized.map' update) state loc
           | _ | exception (Failure _) -> `Value state
         end
       | _ -> `Value state

@@ -22,12 +22,18 @@
 
 type size = Integer.t
 
+type initialization =
+  | SurelyInitialized
+  | MaybeUninitialized
+
 type bit =
   | Uninitialized (* Uninitialized everywhere *)
-  | Zero (* Zero or uninitialized everywhere *)
-  | Any of Base.SetLattice.t (* Undetermined anywhere, and can contain bits
-                                of pointers. If the base set is empty,
-                                the bit can only come from numerical values. *)
+  | Zero of initialization (* Zero or uninitialized everywhere *)
+  | Any of Base.SetLattice.t * initialization
+  (* Undetermined anywhere, and can contain bits
+     of pointers. If the base set is empty,
+     the bit can only come from numerical values. *)
+
 
 module Bit :
 sig
