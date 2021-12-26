@@ -154,11 +154,32 @@ void f(void)
   return;
 }
 
-/*@ behavior Buchi_property_behavior:
-      ensures
-        0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ final ∧ 0 ≡ init;
+/*@ requires 1 ≡ first_step ∨ 0 ≡ first_step;
+    requires
+      1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
+    
+    behavior Buchi_behavior_in_0:
+      assumes 1 ≡ aorai_intermediate_state_0;
+      ensures 1 ≡ aorai_intermediate_state_0;
+    
+    behavior Buchi_behavior_in_1:
+      assumes 1 ≡ first_step;
       ensures 1 ≡ first_step;
+    
+    behavior Buchi_behavior_out_0:
+      ensures 0 ≡ aorai_intermediate_state;
+    
+    behavior Buchi_behavior_out_1:
+      ensures 0 ≡ aorai_intermediate_state_0;
+    
+    behavior Buchi_behavior_out_2:
+      ensures 0 ≡ final;
+    
+    behavior Buchi_behavior_out_3:
+      ensures 0 ≡ first_step;
+    
+    behavior Buchi_behavior_out_4:
+      ensures 0 ≡ init;
  */
 void g(void)
 {
@@ -298,6 +319,8 @@ void g(void)
 void h(void)
 {
   /*@ ghost h_pre_func(); */
+  g();
+  g();
   /*@ ghost h_post_func(); */
   return;
 }

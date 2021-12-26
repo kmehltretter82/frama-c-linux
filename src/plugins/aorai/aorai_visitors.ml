@@ -398,7 +398,11 @@ let possible_start kf (start,int) =
     Logic_const.por
       (cond, Aorai_utils.crosscond_to_pred tr.cross kf Promelaast.Call)
   in
-  let cond = List.fold_left treat_one_trans Logic_const.pfalse trans in
+  let cond =
+    if Data_for_aorai.isObservableFunction kf then
+      List.fold_left treat_one_trans Logic_const.pfalse trans
+    else Logic_const.ptrue
+  in
   Logic_const.pand (Aorai_utils.is_state_pred start, cond)
 
 let neg_trans kf trans =
