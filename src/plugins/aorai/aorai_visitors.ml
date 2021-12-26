@@ -707,6 +707,36 @@ class visit_adding_pre_post_from_buch treatloops =
     (* If several states are associated to the same post-condition,
        then their specification is factorised. *)
     let equivs = partition_pre_state return_state in
+    let mk_post_cond ?init_trans has_other_bhvs reachable_states =
+      let (multi_choice, reachable, unreachable) =
+        pred_reachable reachable_states
+      in
+      let post_cond = Normal, Logic_const.new_predicate reachable in
+      let post_cond =
+        if Aorai_option.Deterministic.get () || has_other_bhvs then [post_cond]
+        else
+          [Normal, Logic_const.new_predicate unreachable; post_cond]
+      in
+      let post_cond =
+        if multi_choice && not (Aorai_option.Deterministic.get ()) then
+          begin
+            let preds = make_zero_one_choice reachable_states in
+            List.fold_left
+              (fun acc p ->
+                 (Normal, Logic_const.new_predicate p) :: acc)
+              post_cond preds
+          end
+        else post_cond
+      in
+      let post_cond =
+        if Data_for_aorai.isObservableFunction kf then begin
+          let infos = Aorai_utils.get_preds_post_bc_wrt_params kf in
+          if Logic_utils.is_trivially_true infos then post_cond
+          else (Normal, Logic_const.new_predicate infos) :: post_cond
+        end else post_cond
+      in
+      post_cond @ get_action_post_cond kf ?init_trans return_state
+    in
     let bhvs =
       match equivs with
       | [ e ] -> (* we just have one possible case, no need to generate
@@ -717,34 +747,7 @@ class visit_adding_pre_post_from_buch treatloops =
         let reachable_states =
           Data_for_aorai.Aorai_state.Map.find s return_state
         in
-        let (multi_choice, reachable, unreachable) =
-          pred_reachable reachable_states
-        in
-        let post_cond = Normal, Logic_const.new_predicate reachable in
-        let post_cond =
-          if Aorai_option.Deterministic.get () then [post_cond]
-          else
-            [Normal, Logic_const.new_predicate unreachable; post_cond]
-        in
-        let post_cond =
-          if multi_choice && not (Aorai_option.Deterministic.get ()) then
-            begin
-              let preds = make_zero_one_choice reachable_states in
-              List.fold_left
-                (fun acc p ->
-                   (Normal, Logic_const.new_predicate p) :: acc)
-                post_cond preds
-            end
-          else post_cond
-        in
-        let post_cond =
-          if Data_for_aorai.isObservableFunction kf then begin
-            let infos = Aorai_utils.get_preds_post_bc_wrt_params kf in
-            if Logic_utils.is_trivially_true infos then post_cond
-            else (Normal, Logic_const.new_predicate infos) :: post_cond
-          end else post_cond
-        in
-        let post_cond = post_cond @ get_action_post_cond kf return_state in
+        let post_cond = mk_post_cond false reachable_states in
         [Cil.mk_behavior ~name ~post_cond ()]
       | _ ->
         let _,bhvs =
@@ -767,28 +770,6 @@ class visit_adding_pre_post_from_buch treatloops =
                       Data_for_aorai.Aorai_state.Set.mem case_int int)
                    reachable_states
                in
-               let (multi_choice, reachable, _) =
-                 pred_reachable reachable_states
-               in
-               let post_cond =
-                 [Normal, Logic_const.new_predicate reachable]
-               in
-               let post_cond =
-                 if multi_choice && not (Aorai_option.Deterministic.get()) then
-                   begin
-                     let preds = make_zero_one_choice reachable_states in
-                     List.fold_left
-                       (fun acc p ->
-                          (Normal, Logic_const.new_predicate p) :: acc)
-                       post_cond preds
-                   end
-                 else post_cond
-               in
-               let infos = Aorai_utils.get_preds_post_bc_wrt_params kf in
-               let post_cond =
-                 if Logic_utils.is_trivially_true infos then post_cond
-                 else (Normal, Logic_const.new_predicate infos) :: post_cond
-               in
                let init_trans =
                  List.fold_left
                    (fun acc (start, int) ->
@@ -803,10 +784,7 @@ class visit_adding_pre_post_from_buch treatloops =
                    Data_for_aorai.Aorai_state.Map.empty
                    equiv
                in
-               let post_cond =
-                 post_cond @
-                 (get_action_post_cond kf ~init_trans return_state)
-               in
+               let post_cond = mk_post_cond ~init_trans true reachable_states in
                (i+1,
                 Cil.mk_behavior ~name ~assumes ~post_cond () :: acc))
             (0,[])
