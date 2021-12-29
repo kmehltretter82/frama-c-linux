@@ -421,18 +421,22 @@ let neg_trans kf trans =
           ([stop],[]) l
       in
       let cond =
-        List.fold_left
-          (fun cond stop ->
-             let trans = Path_analysis.get_edges start stop auto in
-             List.fold_left
-               (fun cond tr ->
-                  Logic_simplification.tand
-                    cond (Logic_simplification.tnot tr.cross))
-               cond trans)
-          TTrue same_start
+        if Data_for_aorai.isObservableFunction kf then begin
+          let cond =
+            List.fold_left
+              (fun cond stop ->
+                 let trans = Path_analysis.get_edges start stop auto in
+                 List.fold_left
+                   (fun cond tr ->
+                      Logic_simplification.tand
+                        cond (Logic_simplification.tnot tr.cross))
+                   cond trans)
+              TTrue same_start
+          in
+          let cond = fst (Logic_simplification.simplifyCond cond) in
+          Aorai_utils.crosscond_to_pred cond kf Promelaast.Call
+        end else Logic_const.pfalse
       in
-      let cond = fst (Logic_simplification.simplifyCond cond) in
-      let cond = Aorai_utils.crosscond_to_pred cond kf Promelaast.Call in
       let cond =
         Logic_const.por (Aorai_utils.is_out_of_state_pred start, cond)
       in

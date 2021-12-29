@@ -170,12 +170,14 @@ void f(void)
       ensures 0 ≡ aorai_intermediate_state;
     
     behavior Buchi_behavior_out_1:
+      assumes 0 ≡ aorai_intermediate_state_0;
       ensures 0 ≡ aorai_intermediate_state_0;
     
     behavior Buchi_behavior_out_2:
       ensures 0 ≡ final;
     
     behavior Buchi_behavior_out_3:
+      assumes 0 ≡ first_step;
       ensures 0 ≡ first_step;
     
     behavior Buchi_behavior_out_4:
