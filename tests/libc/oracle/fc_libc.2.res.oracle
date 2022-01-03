@@ -100,6 +100,7 @@ skipping FRAMAC_SHARE/libc/complex.h
 [kernel] Parsing FRAMAC_SHARE/libc/stdint.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/stdio.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/stdlib.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/stdnoreturn.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/string.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/strings.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/stropts.h (with preprocessing)

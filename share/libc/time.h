@@ -148,6 +148,7 @@ extern struct tm *gmtime(const time_t *timer);
   assigns __fc_time_tm \from *timer;
   ensures result_null_or_internal_tm:
     \result == &__fc_time_tm || \result == \null;
+  ensures maybe_error: errno == \old(errno) || errno == EOVERFLOW;
 */
 extern struct tm *localtime(const time_t *timer);
 
@@ -277,6 +278,16 @@ extern struct tm *getdate(const char *string);
 extern struct tm *gmtime_r(const time_t *restrict timer,
                            struct tm *restrict result);
 
+/*@
+  requires valid_timer: \valid_read(timep);
+  requires valid_result: \valid(result);
+  assigns \result \from indirect:*timep, result;
+  assigns *result \from indirect:*timep;
+  assigns errno \from indirect:*timep;
+  ensures result_null_or_initialized:initialization:
+    (\result == result && \initialized(result)) || \result == \null;
+  ensures maybe_error: errno == \old(errno) || errno == EOVERFLOW;
+*/
 extern struct tm *localtime_r(const time_t *restrict timep,
                               struct tm *restrict result);
 

@@ -64,5 +64,10 @@ int main() {
   time_str = asctime(&mytime);
   //@ assert valid_string(time_str);
 
+  struct tm *localp = localtime(&t);
+  struct tm localr;
+  localp = localtime_r(&t, &localr);
+  //@ assert localp == \null || localp == &localr;
+
   return 0;
 }
