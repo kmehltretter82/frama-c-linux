@@ -67,7 +67,7 @@ parser.add_argument('--targets', metavar='FILE', nargs='+',
 (wrapper_args, args) = parser.parse_known_args()
 force = wrapper_args.force
 jbdb_path = wrapper_args.jbdb[0]
-machdep = wrapper_args.machdep[0] if wrapper_args.machdep else None
+machdep = wrapper_args.machdep
 main = wrapper_args.main
 sources = wrapper_args.sources
 targets = wrapper_args.targets
@@ -326,7 +326,10 @@ delete_line(template, r"^main.parse: \\")
 delete_line(template, r"^  main.c \\")
 for target, sources in reversed(sources_map.items()):
     pp_target = make_target_name(target)
-    new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + ["", f"{pp_target}.parse: FCFLAGS += -main eva_main", ""]
+    new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + [""]
+    if any(d[2] for d in main_definitions[target]):
+        logging.debug(f"target {blug_jbdb.prettify(target)} has main with args, adding -main eva_main to its FCFLAGS")
+        new_lines += [f"{pp_target}.parse: FCFLAGS += -main eva_main", ""]
     insert_lines_after(template, "^### Each target <t>.eva", new_lines)
 
 gnumakefile.write_text("\n".join(template))
