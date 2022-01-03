@@ -287,23 +287,18 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     mk_innermost_block env
   | Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
     assert (rel1 == Rle && rel2 == Rlt);
-    Typing.preprocess_term ~use_gmp_opt:false ~logic_env t1;
-    Typing.preprocess_term ~use_gmp_opt:false ~logic_env t2;
     let ctx =
       Typing.number_ty_bound_variable
         ~profile:(Interval.Logic_environment.get_profile (Env.Logic_env.get env))
         (t1, logic_x, t2)
     in
-    let t_plus_one ?ty t =
-      (* whenever provided, [ty] is known to be the type of the result *)
+    let t_plus_one ~ty t =
+      (* [ty] is the type of the result *)
       let tone = Cil.lone ~loc () in
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
-      Option.iter
-        (fun ty ->
-           Typing.unsafe_set tone ~ctx:ty ~lenv ctx;
-           Typing.unsafe_set t ~ctx:ty ~lenv ctx;
-           Typing.unsafe_set res ~lenv ty)
-        ty;
+      Typing.unsafe_set ~logic_env tone ~ctx:ty ctx;
+      Typing.unsafe_set ~logic_env t ~ctx:ty ctx;
+      Typing.unsafe_set ~logic_env res ty;
       res
     in
     let ty =
@@ -340,12 +335,11 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | TBinOp (PlusA, t2_minus_one, {term_node = TConst(Integer (n, _))}) when
           Integer.is_one n ->
         Logic_const.term ~loc
-          (TBinOp(Le, tlv, { t2_minus_one with term_node = t2_minus_one.term_node }))
+          (TBinOp(Le, tlv, t2_minus_one))
           Linteger
       | _ ->
-        (* must copy [t2] to force it being typed again *)
         Logic_const.term ~loc
-          (TBinOp(Lt, tlv, { t2 with term_node = t2.term_node } ))
+          (TBinOp(Lt, tlv, t2))
           Linteger
     in
     Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.c_int ~logic_env guard;
