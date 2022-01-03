@@ -119,7 +119,7 @@ const pending = new Map<string, PendingRequest>();
 let process: ChildProcess | undefined;
 
 /** Polling timeout when server is busy. */
-//const pollingTimeout = 200;
+const pollingTimeout = 200;
 let pollingTimer: NodeJS.Timeout | undefined;
 
 /** Killing timeout and timer for server process hard kill. */
@@ -348,7 +348,7 @@ export interface Configuration {
   /** Shutdown timeout before server is hard killed, in milliseconds
    *  (default: 300ms). */
   timeout?: number;
-  /** Server polling period in milliseconds (default: 50ms). */
+  /** Server polling period in milliseconds (default: 200ms). */
   polling?: number;
   /** Process stdout log file (default: `undefined`). */
   logout?: string;
@@ -692,21 +692,20 @@ export function send<In, Out>(
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
   const response: Response<Out> = new Promise<Out>((resolve, reject) => {
-    const decodedResolve = (js: Json.json) => {
-      try {
-        const result = request.output(js);
-        if (result !== undefined)
-          resolve(result);
-        else
-          reject();
-      } catch (err) {
-        reject(err);
-      }
+    const unwrap = (js: Json.json) => {
+      const data = request.output(js);
+      resolve(data as unknown as Out);
     };
-    pending.set(rid, { resolve: decodedResolve, reject });
+    pending.set(rid, { resolve: unwrap, reject });
   });
   response.kill = () => pending.get(rid)?.reject();
   client.send(request.kind, rid, request.name, param);
+  if (!pollingTimer) {
+    const polling = (config && config.polling) || pollingTimeout;
+    pollingTimer = setInterval(() => {
+      client.poll();
+    }, polling);
+  }
   return response;
 }
 
@@ -716,7 +715,13 @@ export function send<In, Out>(
 
 function _resolved(id: string) {
   pending.delete(id);
-  if (pending.size == 0) rqCount = 0;
+  if (pending.size == 0) {
+    rqCount = 0;
+    if (pollingTimer) {
+      clearInterval(pollingTimer);
+      pollingTimer = undefined;
+    }
+  }
 }
 
 client.onConnect((err?: Error) => {

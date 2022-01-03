@@ -109,8 +109,8 @@ let jfield fd js = Json.field fd js |> Json.string
 
 let decode (data : string) : string Main.request =
   match data with
-  | "POLL" -> `Poll
-  | "SHUTDOWN" -> `Shutdown
+  | "\"POLL\"" -> `Poll
+  | "\"SHUTDOWN\"" -> `Shutdown
   | _ ->
     let js = Yojson.Basic.from_string data in
     match jfield "cmd" js with
@@ -122,7 +122,10 @@ let decode (data : string) : string Main.request =
     | "SIGON" -> `SigOn (jfield "id" js)
     | "SIGOFF" -> `SigOff (jfield "id" js)
     | "KILL" -> `Kill (jfield "id" js)
-    | _ -> raise Not_found
+    | _ ->
+      Senv.debug ~level:2 "Invalid socket command:@ @[<hov 2>%a@]"
+        Json.pp js ;
+      raise Not_found
 
 let encode (resp : string Main.response) : string =
   let js =
