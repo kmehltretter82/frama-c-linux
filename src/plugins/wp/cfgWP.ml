@@ -1154,8 +1154,7 @@ struct
                | (_, r), Some (_, r')
                  when not @@ Option.equal Logic_utils.is_same_logic_info r r' ->
                    Warning.error
-                     "On call to %a, decreases relation (%a) does not match \
-                      caller relation (%a)"
+                     "On call to %a, relation (%a) does not match caller (%a)"
                      Kernel_function.pretty kf
                      (Pretty_utils.pp_opt Cil_printer.pp_logic_info) r
                      (Pretty_utils.pp_opt Cil_printer.pp_logic_info) r'
