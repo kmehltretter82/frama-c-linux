@@ -73,7 +73,7 @@ export function validate<A>(
       if (r === undefined || r === true) return undefined;
       return r;
     } catch (err) {
-      return '' + err || false;
+      return `${err}`;
     }
   }
   return undefined;
@@ -250,7 +250,7 @@ export function useFilter<A, B>(
         }
       } catch (err) {
         setLocalValue(newValue);
-        setLocalError(newError || err ? '' + err : 'Invalid value');
+        setLocalError(newError || err ? `${err}` : 'Invalid value');
         setDangling(true);
       }
     }, [output, setState, setLocalValue, setLocalError],
@@ -262,7 +262,7 @@ export function useFilter<A, B>(
   try {
     return [input(value), error, update];
   } catch (err) {
-    return [localValue, err ? '' + err : 'Invalid input', update];
+    return [localValue, err ? `${err}` : 'Invalid input', update];
   }
 
 }

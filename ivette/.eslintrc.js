@@ -67,6 +67,8 @@ module.exports = {
     "curly": "off",
     // Do not specify position for single commands
     "nonblock-statement-body-position": "off",
+    // Requires '+' to be applied on 2 numbers or 2 strings only
+    "@typescript-eslint/restrict-plus-operands": "error",
     // Allow ++/-- operators only in for-loops
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     // Force code to 80 columns, but for trailing comments

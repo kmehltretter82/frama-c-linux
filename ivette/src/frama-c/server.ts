@@ -392,7 +392,7 @@ async function _launch() {
 
   buffer.clear();
   buffer.append('$', command);
-  const size = params.reduce((n: any, p: any) => n + p.length, 0);
+  const size = params.reduce((n, p) => n + p.length, 0);
   if (size < 40) {
     buffer.append('', ...params);
   } else {
