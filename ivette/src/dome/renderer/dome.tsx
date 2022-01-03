@@ -503,17 +503,18 @@ export function popupMenu(
   items: PopupMenuItem[],
   callback?: (item: string | undefined) => void,
 ) {
-  ipcRenderer.invoke('dome.popup', items.map((item) => {
+  const ipcItems = items.map((item) => {
     if (!item) return undefined;
     if (item === 'separator') return item;
     return {
       label: item.label,
       id: item.id,
-      display: item.display,
-      enabled: item.enabled,
-      checked: item.checked,
+      display: !!(item.display ?? true),
+      enabled: !!(item.enabled ?? true),
+      checked: !!(item.checked ?? false),
     };
-  })).then((index: number) => {
+  });
+  ipcRenderer.invoke('dome.popup', ipcItems).then((index: number) => {
     const item = items[index];
     if (item && item !== 'separator') {
       const { id, label, onClick } = item;
