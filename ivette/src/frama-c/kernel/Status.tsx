@@ -21,7 +21,7 @@
 /* ************************************************************************ */
 
 /* --------------------------------------------------------------------------*/
-/* --- Frama-C Selection History                                          ---*/
+/* --- Frama-C Status Message                                             ---*/
 /* --------------------------------------------------------------------------*/
 
 import React from 'react';
@@ -31,6 +31,7 @@ import { LED } from 'dome/controls/displays';
 import { Icon } from 'dome/controls/icons';
 import * as Toolbars from 'dome/frame/toolbars';
 import { GlobalState, useGlobalState } from 'dome/data/states';
+import * as Server from 'frama-c/server';
 
 export type kind =
   'none' | 'info' | 'warning' | 'error' | 'success' | 'progress';
@@ -51,7 +52,6 @@ export function setMessage(message: MessageProps) {
 
 export default function Message() {
   const [message] = useGlobalState(GlobalMessage);
-
   return (
     <>
       <Toolbars.Space />
@@ -61,9 +61,8 @@ export default function Message() {
       {message.kind === 'error' && <Icon id="CROSS" fill="red" />}
       {message.kind === 'info' && <Icon id="CIRC.INFO" />}
       <Code label={message.text} title={message.title} />
-      <Toolbars.Space />
       <IconButton
-        icon="CROSS"
+        icon="CIRC.CLOSE"
         onClick={() => setMessage(emptyMessage)}
         visible={message !== emptyMessage}
         title="Hide current message"
@@ -71,6 +70,13 @@ export default function Message() {
       <Toolbars.Space />
     </>
   );
+}
+
+/* Callback on server events */
+
+{
+  Server.onReady(() => setMessage(emptyMessage));
+  Server.onShutdown(() => setMessage(emptyMessage));
 }
 
 /* --------------------------------------------------------------------------*/
