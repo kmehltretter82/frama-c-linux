@@ -756,3 +756,9 @@ let callsites kf =
   at_start_of kf |> callstacks |>
   List.fold_left f Map.empty |> Map.to_seq |> List.of_seq |>
   List.map (fun (kf,sites) -> kf, uniq_sites sites)
+
+
+(* Result conversion *)
+
+let default default_value result =
+  Result.value ~default:default_value result

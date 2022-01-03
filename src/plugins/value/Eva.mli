@@ -20,7 +20,7 @@ end
 module Results: sig
   (* Usage sketch :
   
-     Eva.Results.(before stmt |> in_callstack cs |> eval_var vi |> as_int)
+     Eva.Results.(before stmt |> in_callstack cs |> eval_var vi |> as_int |> value ~default:0)
   
      or, if you prefer
   
@@ -124,6 +124,12 @@ module Results: sig
      Raises [Stdlib.Invalid_argument] if the statement is not a [Call]
      instruction or a [Local_init] with [ConsInit] initializer. *)
   val callee : Cil_types.stmt -> Kernel_function.t list
+  
+  (* Result conversion *)
+  (** [default d r] extract the value of r if r is Ok or use the default value d
+      otherwise.
+      Equivalent to [Result.value ~default:d r] *)
+  val default : 'a -> 'a result -> 'a
 end
 
 module Value_results: sig
