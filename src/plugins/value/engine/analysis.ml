@@ -229,3 +229,5 @@ let () =
   Project.register_after_set_current_hook
     ~user_only:true (fun _ -> reset_analyzer ());
   Project.register_after_global_load_hook reset_analyzer
+
+let self = Db.Value.self

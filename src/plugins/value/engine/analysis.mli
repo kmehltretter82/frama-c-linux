@@ -97,10 +97,11 @@ val compute : unit -> unit
     an incorrect number of them is given.
     @plugin development guide *)
 
-(** Perform a full analysis if not already done. *)
-
 val is_computed : unit -> bool
 (** Return [true] iff the value analysis has been done. *)
+
+val self : State.t
+(** Internal state of Eva analysis from projects viewpoint. *)
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t
