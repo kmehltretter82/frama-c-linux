@@ -27,7 +27,7 @@
  */
 
 import filepath from 'path';
-import { dialog } from 'electron';
+import { ipcRenderer } from 'electron';
 import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------
@@ -122,9 +122,9 @@ export async function showMessageBox<A>(
 
   if (cancelId === defaultId) cancelId = -1;
 
-  return dialog.showMessageBox(
+  return ipcRenderer.invoke('dome.dialog.showMessageBox',
     {
-      type: kind,
+      'type': kind,
       message,
       detail: details,
       defaultId,
@@ -196,7 +196,7 @@ export async function showOpenFile(
   props: OpenFileProps,
 ): Promise<string | undefined> {
   const { title, label, path, hidden = false, filters } = props;
-  return dialog.showOpenDialog(
+  return ipcRenderer.invoke('dome.dialog.showOpenDialog',
     {
       title,
       buttonLabel: label,
@@ -219,7 +219,7 @@ export async function showOpenFiles(
 ): Promise<string[] | undefined> {
   const { title, label, path, hidden, filters } = props;
 
-  return dialog.showOpenDialog(
+  return ipcRenderer.invoke('dome.dialog.showOpenDialog',
     {
       title,
       buttonLabel: label,
@@ -255,7 +255,7 @@ export async function showSaveFile(
   props: SaveFileProps,
 ): Promise<string | undefined> {
   const { title, label, path, filters } = props;
-  return dialog.showSaveDialog(
+  return ipcRenderer.invoke('dome.dialog.showSaveDialog',
     {
       title,
       buttonLabel: label,
@@ -288,7 +288,7 @@ export async function showOpenDir(
     default: break;
   }
 
-  return dialog.showOpenDialog(
+  return ipcRenderer.invoke('dome.dialog.showOpenDialog',
     {
       title,
       buttonLabel: label,

@@ -45,6 +45,7 @@ import {
   BrowserWindowConstructorOptions,
   IpcMainEvent,
   shell,
+  dialog,
 } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
 import SYS, * as System from 'dome/system';
@@ -594,5 +595,24 @@ export function setMenuItem(spec: Menubar.CustomMenuItem) {
 ipcMain.on('dome.ipc.menu.addmenu', (_evt, label) => addMenu(label));
 ipcMain.on('dome.ipc.menu.addmenuitem', (_evt, spec) => addMenuItem(spec));
 ipcMain.on('dome.ipc.menu.setmenuitem', (_evt, spec) => setMenuItem(spec));
+
+// --------------------------------------------------------------------------
+// --- Dialogs Management
+// --------------------------------------------------------------------------
+
+ipcMain.handle(
+  'dome.dialog.showMessageBox',
+  (_evt, props) => dialog.showMessageBox(props),
+);
+
+ipcMain.handle(
+  'dome.dialog.showOpenDialog',
+  (_evt, props) => dialog.showOpenDialog(props),
+);
+
+ipcMain.handle(
+  'dome.dialog.showSaveDialog',
+  (_evt, props) => dialog.showSaveDialog(props),
+);
 
 // --------------------------------------------------------------------------
