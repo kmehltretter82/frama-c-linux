@@ -274,13 +274,13 @@ function SplitterEngine(props: SplitterEngineProps): JSX.Element {
         {A}
       </div>
       <DraggableCore
+        key="split"
         handle={HANDLE}
         onStart={onStart}
         onDrag={onDrag}
         onStop={onStop}
       >
         <div
-          key="split"
           className={css.split}
           style={styleR}
         >

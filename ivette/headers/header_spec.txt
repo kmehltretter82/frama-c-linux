@@ -111,6 +111,7 @@ src/dome/renderer/layout/boxes.tsx: CEA_LGPL
 src/dome/renderer/layout/dispatch.tsx: CEA_LGPL
 src/dome/renderer/layout/forms.tsx: CEA_LGPL
 src/dome/renderer/layout/grids.js: CEA_LGPL
+src/dome/renderer/layout/qsplit.tsx: CEA_LGPL
 src/dome/renderer/layout/splitters.tsx: CEA_LGPL
 src/dome/renderer/layout/style.css: .ignore
 src/dome/renderer/light.css: .ignore

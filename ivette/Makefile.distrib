@@ -112,6 +112,7 @@ DISTRIB_FILES += ivette/src/dome/renderer/layout/boxes.tsx
 DISTRIB_FILES += ivette/src/dome/renderer/layout/dispatch.tsx
 DISTRIB_FILES += ivette/src/dome/renderer/layout/forms.tsx
 DISTRIB_FILES += ivette/src/dome/renderer/layout/grids.js
+DISTRIB_FILES += ivette/src/dome/renderer/layout/qsplit.tsx
 DISTRIB_FILES += ivette/src/dome/renderer/layout/splitters.tsx
 DISTRIB_FILES += ivette/src/dome/renderer/layout/style.css
 DISTRIB_FILES += ivette/src/dome/renderer/light.css
