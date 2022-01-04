@@ -79,7 +79,6 @@ val ident_names : string list -> string list
 val prop_id_keys : prop_id -> string list * string list (* required , hints *)
 
 val get_propid : prop_id -> string (** Unique identifier of [prop_id] *)
-val get_legacy : prop_id -> string (** Unique legacy identifier of [prop_id] *)
 val pp_propid : Format.formatter -> prop_id -> unit (** Print unique id of [prop_id] *)
 
 val user_pred_names: toplevel_predicate -> string list

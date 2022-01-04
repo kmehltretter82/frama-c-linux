@@ -43,7 +43,6 @@ let legacies wpo =
   [
     jsonfile dscript wpo.po_gid ;
     jsonfile dmodel wpo.po_gid ;
-    jsonfile dmodel wpo.po_leg ;
   ]
 
 let get wpo =

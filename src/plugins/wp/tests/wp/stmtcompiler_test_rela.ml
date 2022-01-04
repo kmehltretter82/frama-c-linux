@@ -58,7 +58,6 @@ let run () =
     let annot = Logic_const.new_code_annotation (AAssert ([],pred)) in
     let po = Wpo.{
         po_gid = "";
-        po_leg = "";
         po_sid = "";
         po_name = "";
         po_idx = Function(kf, None);
@@ -73,7 +72,6 @@ let run () =
         | h :: _ ->
             inter_po := Wpo.{
                 po_gid = "";
-                po_leg = "";
                 po_sid = "";
                 po_name = "";
                 po_idx = Function(kf, None);

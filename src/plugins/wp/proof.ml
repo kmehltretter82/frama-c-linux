@@ -205,18 +205,10 @@ let loadscripts () =
         end
     end
 
-let find_script_for_goal ~gid ~legacy =
+let find_script_for_goal ~gid =
   loadscripts () ;
   try
     let _,proof,qed = Hashtbl.find scriptbase gid in
-    Some(proof,qed)
-  with Not_found ->
-  try
-    let (_,proof,qed) as entry = Hashtbl.find scriptbase legacy in
-    Wp_parameters.feedback "Upgrading Coq script for '%s'" gid ;
-    Hashtbl.add scriptbase gid entry ;
-    Hashtbl.remove scriptbase legacy ;
-    needsave := true ;
     Some(proof,qed)
   with Not_found ->
     None
@@ -276,8 +268,8 @@ let add_script_for ~gid hints proof =
 (* --- Prover API                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let script_for ~pid ~gid ~legacy =
-  let found = find_script_for_goal ~gid ~legacy in
+let script_for ~pid ~gid =
+  let found = find_script_for_goal ~gid in
   ( if found <> None then
       let required,hints = WpPropId.prop_id_keys pid in
       let all = List.merge String.compare required hints in
@@ -301,8 +293,8 @@ let hints_for ~pid =
     else default
   else default
 
-let script_for_ide ~pid ~gid ~legacy =
-  match find_script_for_goal ~gid ~legacy with
+let script_for_ide ~pid ~gid =
+  match find_script_for_goal ~gid with
   | Some script -> script
   | None ->
       let required,hints = WpPropId.prop_id_keys pid in

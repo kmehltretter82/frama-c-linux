@@ -328,66 +328,6 @@ struct
 
 end
 
-module LegacyNames :
-sig
-  val get_prop_id_name: prop_id -> string
-end = struct
-
-  let base_id_prop_txt = Property.LegacyNames.get_prop_name_id
-
-  let basename_of_prop_id p =
-    match p.p_kind , p.p_prop with
-    | PKEstablished , p -> base_id_prop_txt p ^ "_established"
-    | PKPreserved , p -> base_id_prop_txt p ^ "_preserved"
-    | PKVarDecr , p -> base_id_prop_txt p ^ "_decrease"
-    | PKVarPos , p -> base_id_prop_txt p ^ "_positive"
-    | PKVarRel , p -> base_id_prop_txt p ^ "_relation"
-    | PKAFctOut , p -> base_id_prop_txt p ^ "_normal"
-    | PKAFctExit , p -> base_id_prop_txt p ^ "_exit"
-    | PKPre(_kf,stmt,pre) , _ ->
-        let kf_name_of_stmt =
-          Kernel_function.get_name
-            (Kernel_function.find_englobing_kf stmt)
-        in Printf.sprintf "%s_call_%s" kf_name_of_stmt (base_id_prop_txt pre)
-    | _ , p ->
-        base_id_prop_txt p
-
-
-  (** function used to normalize basename *)
-  let normalize_basename s =
-    (* truncates basename in order to limit length of file name *)
-    let max_len = Wp_parameters.TruncPropIdFileName.get () in
-    if max_len > 0 && String.length s > max_len then
-      if max_len > 3 then (String.sub s 0 (max_len-3)) ^ "___"
-      else String.sub s 0 max_len
-    else s
-
-  (** returns the normalized basename of the property. *)
-  let get_prop_id_basename p =
-    let basename = basename_of_prop_id p in
-    let basename = match p.p_part with
-      | None -> basename
-      | Some(k,n) ->
-          if n < 10 then Printf.sprintf "%s_part%d" basename (succ k) else
-          if n < 100 then Printf.sprintf "%s_part%02d" basename (succ k) else
-          if n < 1000 then Printf.sprintf "%s_part%03d" basename (succ k) else
-            Printf.sprintf "%s_part%06d" basename (succ k)
-    in normalize_basename basename
-
-
-  module UniquifyPropId = NameUniquify(PropIdRaw)(struct
-      let name = "WpProperty"
-      let basename = get_prop_id_basename
-    end)
-
-
-  (** returns a unique name identifying the property.
-      This name is built from the basename of the property. *)
-  let get_prop_id_name pid =
-    UniquifyPropId.unique_basename pid
-
-end
-
 (* -------------------------------------------------------------------------- *)
 (* --- Naming Properties                                                  --- *)
 (* -------------------------------------------------------------------------- *)
@@ -470,9 +410,6 @@ end
 (* -------------------------------------------------------------------------- *)
 (* --- Naming Accessors                                                   --- *)
 (* -------------------------------------------------------------------------- *)
-
-let get_legacy = LegacyNames.get_prop_id_name
-(** Legacy property PO name *)
 
 let get_propid = Names.get_prop_id_name
 (** Name related to a property PO *)

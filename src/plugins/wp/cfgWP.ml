@@ -1498,7 +1498,6 @@ struct
       po_pid = pid ;
       po_sid = "" ;
       po_gid = "" ;
-      po_leg = "" ;
       po_name = "" ;
       po_idx = index ;
       po_formula = GoalAnnot vcq ;
@@ -1557,12 +1556,10 @@ struct
         WpPropId.split_bag
           begin fun po_pid wpo ->
             let po_sid = WpPropId.get_propid po_pid in
-            let po_leg = WpPropId.get_legacy po_pid in
             let po_gid = Printf.sprintf "%s_%s" mid po_sid in
-            let po_leg = Printf.sprintf "%s_%s" mid po_leg in
             let po_name = Pretty_utils.to_string WpPropId.pretty_local pid in
             let wpo =
-              { wpo with po_pid ; po_sid ; po_gid ; po_leg ; po_name }
+              { wpo with po_pid ; po_sid ; po_gid ; po_name }
             in
             Wpo.add wpo ;
             collection := Bag.append !collection wpo ;
@@ -1589,11 +1586,9 @@ struct
         | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
       let mid = WpContext.MODEL.id model in
       let sid = WpPropId.get_propid id in
-      let leg = WpPropId.get_legacy id in
       let wpo = {
         Wpo.po_model = model ;
         Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
-        Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
         Wpo.po_sid = sid ;
         Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
         Wpo.po_idx = index ;
