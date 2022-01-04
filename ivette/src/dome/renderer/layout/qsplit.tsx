@@ -48,7 +48,7 @@ export interface QSplitProps {
   H?: number; /** Horizontal panes ratio (range `0..1`, default `0.5`). */
   V?: number; /** Vertical panes ratio (range `0..1`, default `0.5`). */
   setPosition?: (H: number, V: number) => void; /** Dragging ratios callback. */
-  children?: JSX.Element;
+  children?: React.ReactNode;
   /** Q-Split contents. Shall be (possibly packed) Q-Panes.
       Other components would be layout as they are in the
      positionned `<div/>` of the Q-Split. */
@@ -76,6 +76,8 @@ interface QSplitterProps {
 const HANDLE = '.dome-xSplitter-grab';
 const HGRAB = 'dome-xSplitter-grab dome-xSplitter-hgrab';
 const VGRAB = 'dome-xSplitter-grab dome-xSplitter-vgrab';
+const HPOSR = 'dome-xSplitter-hline dome-xSplitter-hpos-R';
+const VPOSR = 'dome-xSplitter-vline dome-xSplitter-vpos-R';
 const DRAGGING = 'dome-color-dragging';
 const DRAGZONE = 'dome-color-dragzone';
 
@@ -112,6 +114,8 @@ function QSplitter(props: QSplitterProps) {
     dragging ? DRAGGING : DRAGZONE,
   );
 
+  const css = hsplit ? HPOSR : VPOSR;
+
   return (
     <DraggableCore
       handle={HANDLE}
@@ -120,7 +124,7 @@ function QSplitter(props: QSplitterProps) {
       onStop={onStop}
     >
       <div
-        className={hsplit ? 'dome-xQSplitter-h' : 'dome-xQSplitter-v'}
+        className={css}
         style={style}
       >
         <div className={dragger} />
@@ -308,7 +312,7 @@ export interface QPaneProps {
   id: string; /** Q-Pane Identifer. */
   className?: string; /** Additional class of the Q-Pane div. */
   style?: React.CSSProperties; /** Additional style of the Q-Pane div. */
-  children?: JSX.Element; /** Q-Pane contents. */
+  children?: React.ReactNode; /** Q-Pane contents. */
 }
 
 export function QPane(props: QPaneProps) {
