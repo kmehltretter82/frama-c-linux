@@ -70,7 +70,8 @@ export interface QSplitProps {
 type DragPos = { position: number, anchor: number, offset: number };
 type Dragging = undefined | DragPos;
 
-const getDragPosition = (d: DragPos) => d.position + d.offset - d.anchor;
+const getDragPosition =
+  (d: DragPos): number => d.position + d.offset - d.anchor;
 
 interface BSplitterProps {
   hsplit: boolean;
@@ -91,7 +92,7 @@ const HVGRAB = 'dome-xSplitter-grab dome-xSplitter-hvgrab';
 const DRAGGING = 'dome-color-dragging';
 const DRAGZONE = 'dome-color-dragzone';
 
-function BSplitter(props: BSplitterProps) {
+function BSplitter(props: BSplitterProps): JSX.Element {
   const { hsplit, style, dragging } = props;
 
   const onStart: DraggableEventHandler =
@@ -157,7 +158,7 @@ interface CSplitterProps {
   setPosition: (X: number, Y: number) => void;
 }
 
-function CSplitter(props: CSplitterProps) {
+function CSplitter(props: CSplitterProps): JSX.Element {
   const { style, dragX, dragY } = props;
 
   const onStart: DraggableEventHandler =
@@ -220,13 +221,13 @@ const HSPLIT = (
   left: number,
   top: number,
   height: number,
-) => ({ display: 'block', left, top, height });
+): React.CSSProperties => ({ display: 'block', left, top, height });
 
 const VSPLIT = (
   left: number,
   top: number,
   width: number,
-) => ({ display: 'block', left, top, width });
+): React.CSSProperties => ({ display: 'block', left, top, width });
 
 const DISPLAY = (
   layout: QSplitLayout,
@@ -235,17 +236,17 @@ const DISPLAY = (
   width: number,
   top: number,
   height: number,
-) => {
+): void => {
   if (id) layout.set(id, { display: 'block', left, width, top, height });
 };
 
 interface QSplitEngineProps extends QSplitProps { size: Size }
 
-const inRange = (P: number, D: number) => Math.max(0, Math.min(P, D));
+const inRange = (P: number, D: number): number => Math.max(0, Math.min(P, D));
 
-const getRatio = (P: number, D: number) => inRange(P, D) / D;
+const getRatio = (P: number, D: number): number => inRange(P, D) / D;
 
-const getPosition = (d: Dragging, D: number, R: number) =>
+const getPosition = (d: Dragging, D: number, R: number): number =>
   d ? inRange(getDragPosition(d), D) : Math.round(D * R);
 
 type Pid = string | undefined;
@@ -258,19 +259,19 @@ const sameOf = (P: Pid, Q: Pid): Pid => {
   return undefined;
 };
 
-const merge = (U: Sid, V: Sid) => {
+const merge = (U: Sid, V: Sid): Sid => {
   if (U === V) return U;
   if (U === undefined) return V;
   if (V === undefined) return U;
   return null;
 };
 
-const fullOf = (A: Pid, B: Pid, C: Pid, D: Pid) => {
+const fullOf = (A: Pid, B: Pid, C: Pid, D: Pid): Pid => {
   const S = merge(A, merge(B, merge(C, D)));
   return (S === null ? undefined : S);
 };
 
-function QSplitEngine(props: QSplitEngineProps) {
+function QSplitEngine(props: QSplitEngineProps): JSX.Element {
   const [dragX, setDragX] = React.useState<Dragging>();
   const [dragY, setDragY] = React.useState<Dragging>();
   const layout: QSplitLayout = new Map();
@@ -449,7 +450,7 @@ function QSplitEngine(props: QSplitEngineProps) {
    corners but the adjacent quarters can not collapse,
    it will be positionned into only one quarter.
  */
-export function QSplit(props: QSplitProps) {
+export function QSplit(props: QSplitProps): JSX.Element {
   const CONTAINER = Utils.classes('dome-xSplitter-container', props.className);
   return (
     <div className={CONTAINER} style={props.style}>
@@ -478,7 +479,7 @@ export interface QPaneProps {
 
    Childrens are rendered in a positionned `<div/>` with absolute coordinates.
  */
-export function QPane(props: QPaneProps) {
+export function QPane(props: QPaneProps): JSX.Element {
   const layout = React.useContext(QSplitContext);
   const QPANE = Utils.classes('dome-xSplitter-pane', props.className);
   const QSTYLE = Utils.styles(props.style, layout?.get(props.id) ?? NODISPLAY);
