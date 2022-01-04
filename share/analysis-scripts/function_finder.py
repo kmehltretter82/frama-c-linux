@@ -112,6 +112,13 @@ def compute_closing_braces(file_lines):
         # note: lines contain '\n', so they are never empty
         if line[0] == '}':
             braces.append(i)
+    # Special heuristics: if the last line contains whitespace + '}',
+    # assume it closes a function.
+    last_line_number = len(file_lines)+1
+    if file_lines != [] and not (last_line_number in braces):
+        last_line = file_lines[-1].lstrip()
+        if len(last_line) >= 1 and last_line[0] == '}':
+            braces.append(last_line_number)
     return braces
 
 # Returns the first element of [line_numbers] greater than [n], or [None]
@@ -120,11 +127,11 @@ def compute_closing_braces(file_lines):
 #
 # [line_numbers] must be sorted in ascending order.
 def get_first_line_after(line_numbers, n):
-    #for line in line_numbers:
-    #    if line > n:
-    #        return line
-    #assert False
-    return line_numbers[bisect.bisect_left(line_numbers, n)]
+    try:
+        return line_numbers[bisect.bisect_left(line_numbers, n)]
+    except IndexError:
+        # could not find line (e.g. for closing braces); return None
+        return None
 
 # Returns a list of tuples (fname, is_def, line_start, line_end, terminator_offset)
 # for each function definition or declaration.
