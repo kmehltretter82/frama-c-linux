@@ -558,6 +558,8 @@ class pane (gprovers : GuiConfig.provers) =
               scripter#tree proof ;
               text#hrule ;
               text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+              text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
+              text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
               text#hrule ;
               scripter#status proof ;
             end ()
