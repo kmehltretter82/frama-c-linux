@@ -379,6 +379,7 @@ pkgs.lib.makeExtensible
                 why3 config detect
                 # Setup WP related
                 export CAVEAT_IMPORTER_NIX_MODE=yes
+                export GENASSIGNS_NIX_MODE=yes
                 export FRAMAC_WP_CACHE=replay
                 export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
                 make tests -j4 PTESTS_OPTS="-error-code -j 4"

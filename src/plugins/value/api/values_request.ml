@@ -46,7 +46,6 @@ let package =
 type probe =
   | Pexpr of exp * stmt
   | Plval of lval * stmt
-  | Pnone
 
 type callstack = Value_types.callstack
 type truth = Abstract_interp.truth
@@ -94,20 +93,20 @@ let next_steps s =
 
 let probe_stmt s =
   match s.skind with
-  | Instr (Set(lv,_,_)) -> Plval(lv,s)
-  | Instr (Call(Some lr,_,_,_)) -> Plval(lr,s)
-  | Instr (Local_init(v,_,_)) -> Plval((Var v,NoOffset),s)
-  | Return (Some e,_) | If(e,_,_,_) | Switch(e,_,_,_) -> Pexpr(e,s)
-  | _ -> Pnone
+  | Instr (Set(lv,_,_)) -> Some (Plval (lv,s))
+  | Instr (Call(Some lr,_,_,_)) -> Some (Plval (lr,s))
+  | Instr (Local_init(v,_,_)) -> Some (Plval ((Var v,NoOffset), s))
+  | Return (Some e,_) | If(e,_,_,_) | Switch(e,_,_,_) -> Some (Pexpr (e,s))
+  | _ -> None
 
 let probe marker =
   let open Printer_tag in
   match marker with
-  | PLval(_,Kstmt s,l) -> Plval(l,s)
-  | PExp(_,Kstmt s,e) -> Pexpr(e,s)
+  | PLval(_,Kstmt s,l) -> Some (Plval (l,s))
+  | PExp(_,Kstmt s,e) -> Some (Pexpr (e,s))
   | PStmt(_,s) | PStmtStart(_,s) -> probe_stmt s
-  | PVDecl(_,Kstmt s,v) -> Plval((Var v,NoOffset),s)
-  | _ -> Pnone
+  | PVDecl(_,Kstmt s,v) -> Some (Plval ((Var v,NoOffset),s))
+  | _ -> None
 
 (* -------------------------------------------------------------------------- *)
 (* --- Stmt Ranking                                                       --- *)
@@ -461,7 +460,6 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       eval_steps (Cil.typeOfLval lval) (eval_lval lval) stmt callstack
     | Pexpr (expr, stmt) ->
       eval_steps (Cil.typeOf expr) (eval_expr expr) stmt callstack
-    | Pnone -> assert false
 end
 
 let proxy =
@@ -486,8 +484,8 @@ let () =
       let add stmt = List.fold_right CSet.add (A.callstacks stmt) in
       let gather_callstacks cset marker =
         match probe marker with
-        | Pexpr (_, stmt) | Plval (_, stmt) -> add stmt cset
-        | Pnone -> cset
+        | Some (Pexpr (_, stmt) | Plval (_, stmt)) -> add stmt cset
+        | None -> cset
       in
       let cset = List.fold_left gather_callstacks CSet.empty markers in
       Ranking.sort (CSet.elements cset)
@@ -563,9 +561,9 @@ let () =
     ~descr:(Md.plain "Probe informations")
     begin fun rq marker ->
       match probe marker with
-      | Plval (l, s) -> set_probe rq Printer.pp_lval l s
-      | Pexpr (e, s) -> set_probe rq Printer.pp_exp  e s
-      | Pnone -> ()
+      | Some (Plval (l, s)) -> set_probe rq Printer.pp_lval l s
+      | Some (Pexpr (e, s)) -> set_probe rq Printer.pp_exp  e s
+      | None -> ()
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -611,7 +609,7 @@ let () =
   and get_cs = Request.param_opt getValues ~name:"callstack"
       ~descr:(Md.plain "Callstack to collect (defaults to none)")
       (module Jcallstack)
-  and set_before = Request.result getValues ~name:"v_before"
+  and set_before = Request.result_opt getValues ~name:"v_before"
       ~descr:(Md.plain "Domain values before execution")
       (module JEvaluation)
   and set_after = Request.result_opt getValues ~name:"v_after"
@@ -630,14 +628,17 @@ let () =
     begin fun rq () ->
       let module A : EvaProxy = (val proxy ()) in
       let marker = get_tgt rq and callstack = get_cs rq in
-      let domain = A.evaluate (probe marker) callstack in
-      set_before rq domain.here;
-      match domain.next with
-      | After value -> set_after rq (Some value)
-      | Cond (v_then, v_else) ->
-        set_then rq (Some v_then);
-        set_else rq (Some v_else)
-      | Nothing -> ()
+      match probe marker with
+      | None -> ()
+      | Some probe ->
+        let domain = A.evaluate probe callstack in
+        set_before rq (Some domain.here);
+        match domain.next with
+        | After value -> set_after rq (Some value)
+        | Cond (v_then, v_else) ->
+          set_then rq (Some v_then);
+          set_else rq (Some v_else)
+        | Nothing -> ()
     end
 
 (* -------------------------------------------------------------------------- *)

@@ -80,12 +80,44 @@ with subprocess.Popen(cmd_list,
 re_missing_spec = re.compile("Neither code nor specification for function ([^,]+),")
 re_recursive_call_start = re.compile("detected recursive call")
 re_recursive_call_stack_start = re.compile("^\s+stack:")
-re_recursive_call_stack_end = re.compile("\[kernel:annot:missing-spec\]")
+re_recursive_call_stack_end = re.compile("^\[")
 
 tips = []
 
 lines = iter(output_lines)
 for line in lines:
+    match = re_recursive_call_start.search(line)
+    if match:
+       def action():
+         print("Consider patching, stubbing or adding an ACSL " +
+               "specification to the recursive call, " +
+               "then re-run the analysis.")
+       while True:
+         msg_lines = []
+         match = re_recursive_call_start.search(line)
+         try:
+             while not match:
+                line = next(lines)
+                match = re_recursive_call_start.search(line)
+             match = None
+             while not match:
+                 line = next(lines)
+                 match = re_recursive_call_stack_start.search(line)
+             match = None
+             while not match:
+                  msg_lines.append(line)
+                  line = next(lines)
+                  match = re_recursive_call_stack_end.search(line)
+             # note: this ending line can also match re_missing_spec
+             tip = {"message": "Found recursive call at:\n" +
+                    "".join(msg_lines),
+                    "action":action
+                    }
+             tips.append(tip)
+             break
+         except StopIteration:
+             print("** Error: did not match expected regex before EOF")
+             assert False
     match = re_missing_spec.search(line)
     if match:
        fname = match.group(1)
@@ -120,38 +152,6 @@ for line in lines:
               "action":partial(action, fname)
        }
        tips.append(tip)
-    else:
-       match = re_recursive_call_start.search(line)
-       if match:
-          def action():
-             print("Consider patching, stubbing or adding an ACSL " +
-                   "specification to the recursive call, " +
-                   "then re-run the analysis.")
-          while True:
-             msg_lines = []
-             match = re_recursive_call_start.search(line)
-             try:
-                 while not match:
-                    line = next(lines)
-                    match = re_recursive_call_start.search(line)
-                 match = None
-                 while not match:
-                    line = next(lines)
-                    match = re_recursive_call_stack_start.search(line)
-                 match = None
-                 while not match:
-                     msg_lines.append(line)
-                     line = next(lines)
-                     match = re_recursive_call_stack_end.search(line)
-                 tip = {"message": "Found recursive call at:\n" +
-                        "".join(msg_lines),
-                        "action":action
-                        }
-                 tips.append(tip)
-                 break
-             except StopIteration:
-                 print("** Error: did not match expected regex before EOF")
-                 assert False
 
 if tips != []:
    print("")

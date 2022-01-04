@@ -150,7 +150,13 @@ class deadCallsVisitor fmt ~libc cov_metrics =
         match self#current_kf with
         | None ->
           (match current_initializer with
-           | None -> assert false
+           | None ->
+             (* This can happen in the rare cases a function is referenced by
+                a specification *)
+             Format.fprintf fmt
+               "@[<h>%s referenced by an ACSL specification (at %a)@]@ "
+               vi.vname
+               Location.pretty (Cil.CurrentLoc.get ())
            | Some vinit ->
              Format.fprintf fmt
                "@[<h>Initializer of %s references %s (at %t)@]@ "
