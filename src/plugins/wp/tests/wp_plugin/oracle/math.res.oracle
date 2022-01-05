@@ -231,7 +231,7 @@ Prove: exp(log(r)) = r.
 ------------------------------------------------------------
 
 Goal Post-condition 'min_plus_distrib' in 'ok':
-Prove: (r + min_real(r_1, r_2)) = min_real(r_1 + r, r_2 + r).
+Prove: (r + Rg.min(r_1, r_2)) = Rg.min(r_1 + r, r_2 + r).
 
 ------------------------------------------------------------
 
