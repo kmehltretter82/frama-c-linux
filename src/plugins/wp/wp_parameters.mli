@@ -137,10 +137,6 @@ module CoqTactic: Parameter_sig.String
 module Hints: Parameter_sig.Int
 module TryHints: Parameter_sig.Bool
 module Why3Flags: Parameter_sig.String_list
-module AltErgo: Parameter_sig.String
-module AltGrErgo: Parameter_sig.String
-module AltErgoLibs: Parameter_sig.String_list
-module AltErgoFlags: Parameter_sig.String_list
 
 module Auto: Parameter_sig.String_list
 module AutoDepth: Parameter_sig.Int

@@ -994,43 +994,6 @@ module Why3Flags =
       let help = "Additional options for Why3"
     end)
 
-let () = Parameter_customize.set_group wp_prover_options
-module AltErgo =
-  String(struct
-    let option_name = "-wp-alt-ergo"
-    let default = "alt-ergo"
-    let arg_name = "<cmd>"
-    let help = "Command to run alt-ergo (default: 'alt-ergo')"
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module AltGrErgo =
-  String(struct
-    let option_name = "-wp-altgr-ergo"
-    let default = "altgr-ergo"
-    let arg_name = "<cmd>"
-    let help = "Command to run alt-ergo user interface (default: 'altgr-ergo')"
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module AltErgoLibs =
-  String_list
-    (struct
-      let option_name = "-wp-alt-ergo-lib"
-      let arg_name = "*.mlw"
-      let help = "Additional library file for Alt-Ergo"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
-let () = Parameter_customize.no_category ()
-module AltErgoFlags =
-  String_list
-    (struct
-      let option_name = "-wp-alt-ergo-opt"
-      let arg_name = "option,..."
-      let help = "Additional options for Alt-Ergo"
-    end)
-
 (* ------------------------------------------------------------------------ *)
 (* --- PO Management                                                    --- *)
 (* ------------------------------------------------------------------------ *)
