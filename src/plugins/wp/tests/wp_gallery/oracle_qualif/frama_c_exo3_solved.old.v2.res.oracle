@@ -23,7 +23,7 @@
 [wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_v1_sound1_established : Valid
 [wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_v1_sound2_preserved : Valid
 [wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_v1_sound2_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_v1_v2_diff_preserved : Valid
+[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_v1_v2_diff_preserved : Valid
 [wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_v1_v2_diff_established : Valid
 [wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_v2_sound1_preserved : Valid
 [wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_v2_sound1_established : Valid
@@ -39,11 +39,11 @@
 [wp] [Qed] Goal typed_ref_equal_elements_loop_variant_2_decrease : Valid
 [wp] [Qed] Goal typed_ref_equal_elements_loop_variant_2_positive : Valid
 [wp] Proved goals:   35 / 35
-  Qed:            17 
-  Alt-Ergo:       18
+  Qed:            18 
+  Alt-Ergo:       17
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  equal_elements           17       18       35       100%
+  equal_elements           18       17       35       100%
 ------------------------------------------------------------
 [wp] tests/wp_gallery/frama_c_exo3_solved.old.v2.c:56: Warning: 
   Memory model hypotheses for function 'equal_elements':
@@ -78,5 +78,5 @@
   Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  equal_elements           28       23       51       100%
+  equal_elements           29       22       51       100%
 ------------------------------------------------------------

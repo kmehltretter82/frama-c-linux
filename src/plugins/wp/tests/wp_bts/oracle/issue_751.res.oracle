@@ -36,21 +36,22 @@ Prove: true.
 Goal Loop assigns (file tests/wp_bts/issue_751.i, line 8) (2/2):
 Effect at line 11
 Let x = land(3840, R).
-Let x_1 = x / 256.
+Let x_1 = lsr(x, 8).
+Let x_2 = j - 1.
 Assume {
-  Type: is_sint32(R) /\ is_sint32(j) /\ is_sint32(lsr(x, 8)).
+  Type: is_sint32(R) /\ is_sint32(j) /\ is_sint32(x_2) /\ is_sint32(x_1).
   (* Heap *)
   Type: (region(Data_0.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: !invalid(Malloc_0, shift_sint32(Data_0, j), 1).
+  When: !invalid(Malloc_0, shift_sint32(Data_0, x_2), 1).
   (* Pre-condition *)
   Have: (0 < x) /\ (x <= 2303).
   (* Invariant 'RANGE' *)
-  Have: (0 <= j) /\ (j <= x_1).
+  Have: (0 < j) /\ (j <= (1 + x_1)).
   (* Then *)
-  Have: j < x_1.
+  Have: j <= (x / 256).
 }
-Prove: j <= 7.
+Prove: j <= 8.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

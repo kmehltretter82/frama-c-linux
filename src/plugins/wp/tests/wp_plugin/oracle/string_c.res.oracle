@@ -18,10 +18,12 @@ Assume {
   (* Pre-condition 'separation' *)
   Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
+  Have: 0 <= n.
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
   (* Else *)
   Have: n <= i.
 }
@@ -50,10 +52,12 @@ Assume {
   (* Pre-condition 'separation' *)
   Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
+  Have: 0 <= n.
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
   (* Then *)
   Have: i < n.
 }
@@ -79,6 +83,7 @@ Prove: 0 <= n.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 34):
+Let x = to_uint64(1 + i).
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = a_1[shift_sint8(dest_0, i) <- a_1[shift_sint8(src_0, i)]].
@@ -88,7 +93,7 @@ Assume {
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 < to_uint64(1 + i)).
+  When: (0 <= i_1) /\ (i_1 < x).
   (* Pre-condition 'valid_dest' *)
   Have: P_valid_or_empty(Malloc_0, dest_0, n).
   (* Pre-condition 'valid_src' *)
@@ -96,12 +101,16 @@ Assume {
   (* Pre-condition 'separation' *)
   Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_1[shift_sint8(src_0, i_2)] = a_1[shift_sint8(dest_0, i_2)]))).
+  Have: 0 <= n.
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_1[shift_sint8(src_0, i_2)] = a_1[shift_sint8(dest_0, i_2)]))).
   (* Then *)
   Have: i < n.
+  (* Invariant 'no_eva' *)
+  Have: x <= n.
 }
 Prove: a_2[shift_sint8(src_0, i_1)] = a_2[shift_sint8(dest_0, i_1)].
 
@@ -125,9 +134,11 @@ Prove: true.
 
 Goal Loop assigns (file FRAMAC_SHARE/libc/string.c, line 35) (3/3):
 Effect at line 39
+Let x = to_uint64(1 + i).
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(dest_0, i).
+Let a_3 = a_1[a_2 <- a_1[shift_sint8(src_0, i)]].
 Assume {
   Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
@@ -142,12 +153,19 @@ Assume {
   (* Pre-condition 'separation' *)
   Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
+  Have: 0 <= n.
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
   (* Then *)
   Have: i < n.
+  (* Invariant 'no_eva' *)
+  Have: x <= n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < x) ->
+      (a_3[shift_sint8(src_0, i_1)] = a_3[shift_sint8(dest_0, i_1)]))).
 }
 Prove: included(a_2, 1, a, n).
 
@@ -160,8 +178,10 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Decreasing of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 38):
+Let x = to_uint64(1 + i).
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_2 = a_1[shift_sint8(dest_0, i) <- a_1[shift_sint8(src_0, i)]].
 Assume {
   Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
@@ -174,14 +194,21 @@ Assume {
   (* Pre-condition 'separation' *)
   Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
+  Have: 0 <= n.
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
   (* Then *)
   Have: i < n.
+  (* Invariant 'no_eva' *)
+  Have: x <= n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < x) ->
+      (a_2[shift_sint8(src_0, i_1)] = a_2[shift_sint8(dest_0, i_1)]))).
 }
-Prove: i < to_uint64(1 + i).
+Prove: i < x.
 
 ------------------------------------------------------------
 
@@ -193,7 +220,7 @@ Prove: true.
 Goal Post-condition 'copied_contents' in 'memmove':
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(i_1) /\
-      is_uint64(n).
+      is_uint64(i_2) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -217,34 +244,44 @@ Assume {
     If memoverlap_0 <= 0
     Then {
       Have: (ta_i_0=false).
+      (* Invariant 'no_eva' *)
+      Have: 0 <= n.
       (* Loop assigns ... *)
       Have: havoc(Mchar_undef_0, Mchar_0, a, n) = Mchar_1.
       (* Invariant 'no_eva' *)
-      Have: forall i_2 : Z. let a_2 = shift_sint8(src_0, i_2) in
-          ((i <= i_2) -> ((i_2 < n) -> (Mchar_1[a_2] = Mchar_0[a_2]))).
-      (* Invariant 'no_eva' *)
-      Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-          (Mchar_1[shift_sint8(dest_0, i_2)]
-             = Mchar_0[shift_sint8(src_0, i_2)]))).
-      (* Invariant 'no_eva' *)
       Have: (0 <= i) /\ (i <= n).
+      (* Invariant 'no_eva' *)
+      Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i) ->
+          (Mchar_1[shift_sint8(dest_0, i_3)]
+             = Mchar_0[shift_sint8(src_0, i_3)]))).
+      (* Invariant 'no_eva' *)
+      Have: forall i_3 : Z. let a_2 = shift_sint8(src_0, i_3) in
+          ((i <= i_3) -> ((i_3 < n) -> (Mchar_1[a_2] = Mchar_0[a_2]))).
       (* Else *)
       Have: n <= i.
     }
     Else {
       (* Block In *)
       Have: (ta_i_1=false).
+      (* Initializer *)
+      Init: to_uint64(n - 1) = i_2.
+      (* Invariant 'no_eva' *)
+      Have: i_2 < n.
+      (* Invariant 'no_eva' *)
+      Have: forall i_3 : Z. ((i_2 < i_3) -> ((i_3 < n) ->
+          (Mchar_0[shift_sint8(src_0, i_3)]
+             = Mchar_0[shift_sint8(dest_0, i_3)]))).
       (* Loop assigns ... *)
       Have: havoc(Mchar_undef_1, Mchar_0, a, n) = Mchar_2.
       (* Invariant 'no_eva' *)
-      Have: forall i_2 : Z. let a_2 = shift_sint8(src_0, i_2) in
-          ((i_2 <= i_1) -> ((0 <= i_2) -> (Mchar_2[a_2] = Mchar_0[a_2]))).
-      (* Invariant 'no_eva' *)
-      Have: forall i_2 : Z. ((i_1 < i_2) -> ((i_2 < n) ->
-          (Mchar_2[shift_sint8(dest_0, i_2)]
-             = Mchar_0[shift_sint8(src_0, i_2)]))).
-      (* Invariant 'no_eva' *)
       Have: (0 <= i_1) /\ (i_1 < n).
+      (* Invariant 'no_eva' *)
+      Have: forall i_3 : Z. ((i_1 < i_3) -> ((i_3 < n) ->
+          (Mchar_2[shift_sint8(dest_0, i_3)]
+             = Mchar_0[shift_sint8(src_0, i_3)]))).
+      (* Invariant 'no_eva' *)
+      Have: forall i_3 : Z. let a_2 = shift_sint8(src_0, i_3) in
+          ((i_3 <= i_1) -> ((0 <= i_3) -> (Mchar_2[a_2] = Mchar_0[a_2]))).
       (* Else *)
       Have: i_1 <= 0.
       Have: Mchar_2[a <- Mchar_2[a_1]] = Mchar_1.
@@ -284,13 +321,15 @@ Assume {
   (* Then *)
   Have: memoverlap_0 <= 0.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. let a_3 = shift_sint8(src_0, i_1) in ((i <= i_1) ->
-      ((i_1 < n) -> (a_1[a_3] = Mchar_0[a_3]))).
+  Have: 0 <= n.
+  (* Invariant 'no_eva' *)
+  Have: (0 <= i) /\ (i <= n).
   (* Invariant 'no_eva' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (a_1[shift_sint8(dest_0, i_1)] = Mchar_0[shift_sint8(src_0, i_1)]))).
   (* Invariant 'no_eva' *)
-  Have: (0 <= i) /\ (i <= n).
+  Have: forall i_1 : Z. let a_3 = shift_sint8(src_0, i_1) in ((i <= i_1) ->
+      ((i_1 < n) -> (a_1[a_3] = Mchar_0[a_3]))).
   (* Then *)
   Have: i < n.
 }
@@ -325,6 +364,7 @@ Prove: 0 <= n.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 96):
+Let x = to_uint64(1 + i).
 Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(s, 0).
@@ -334,7 +374,7 @@ Assume {
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
       sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 < to_uint64(1 + i)).
+  When: (0 <= i_1) /\ (i_1 < x).
   (* Pre-condition 'valid_dest' *)
   Have: P_valid_or_empty(Malloc_0, d, n).
   (* Pre-condition 'valid_src' *)
@@ -350,15 +390,19 @@ Assume {
   (* Then *)
   Have: memoverlap_0 <= 0.
   (* Invariant 'no_eva' *)
-  Have: forall i_2 : Z. let a_3 = shift_sint8(s, i_2) in ((i <= i_2) ->
-      ((i_2 < n) -> (a_1[a_3] = Mchar_0[a_3]))).
+  Have: 0 <= n.
+  (* Invariant 'no_eva' *)
+  Have: (0 <= i) /\ (i <= n).
   (* Invariant 'no_eva' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_1[shift_sint8(d, i_2)] = Mchar_0[shift_sint8(s, i_2)]))).
   (* Invariant 'no_eva' *)
-  Have: (0 <= i) /\ (i <= n).
+  Have: forall i_2 : Z. let a_3 = shift_sint8(s, i_2) in ((i <= i_2) ->
+      ((i_2 < n) -> (a_1[a_3] = Mchar_0[a_3]))).
   (* Then *)
   Have: i < n.
+  (* Invariant 'no_eva' *)
+  Have: x <= n.
 }
 Prove: a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]][shift_sint8(d, i_1)] =
     Mchar_0[shift_sint8(s, i_1)].
@@ -371,17 +415,19 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 97):
+Let x = to_uint64(1 + i).
 Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
-Let a_2 = shift_sint8(s, 0).
-Let a_3 = shift_sint8(s, i_1).
+Let a_2 = a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]].
+Let a_3 = shift_sint8(s, 0).
+Let a_4 = shift_sint8(s, i_1).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
       sconst(Mchar_0).
   (* Goal *)
-  When: (i_1 < n) /\ (to_uint64(1 + i) <= i_1).
+  When: (i_1 < n) /\ (x <= i_1).
   (* Pre-condition 'valid_dest' *)
   Have: P_valid_or_empty(Malloc_0, d, n).
   (* Pre-condition 'valid_src' *)
@@ -389,25 +435,32 @@ Assume {
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
-  Have: ((separated(a, n, a_2, n) -> (memoverlap_0 = 0))) /\
+  Have: ((separated(a, n, a_3, n) -> (memoverlap_0 = 0))) /\
       ((addr_le(d, s) -> (addr_lt(s, shift_sint8(d, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = (-1)))))) /\
+       ((!separated(a, n, a_3, n)) -> (memoverlap_0 = (-1)))))) /\
       ((addr_lt(s, d) -> (addr_le(d, shift_sint8(s, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = 1))))).
+       ((!separated(a, n, a_3, n)) -> (memoverlap_0 = 1))))).
   (* Then *)
   Have: memoverlap_0 <= 0.
   (* Invariant 'no_eva' *)
-  Have: forall i_2 : Z. let a_4 = shift_sint8(s, i_2) in ((i <= i_2) ->
-      ((i_2 < n) -> (a_1[a_4] = Mchar_0[a_4]))).
+  Have: 0 <= n.
+  (* Invariant 'no_eva' *)
+  Have: (0 <= i) /\ (i <= n).
   (* Invariant 'no_eva' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_1[shift_sint8(d, i_2)] = Mchar_0[shift_sint8(s, i_2)]))).
   (* Invariant 'no_eva' *)
-  Have: (0 <= i) /\ (i <= n).
+  Have: forall i_2 : Z. let a_5 = shift_sint8(s, i_2) in ((i <= i_2) ->
+      ((i_2 < n) -> (a_1[a_5] = Mchar_0[a_5]))).
   (* Then *)
   Have: i < n.
+  (* Invariant 'no_eva' *)
+  Have: x <= n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < x) ->
+      (a_2[shift_sint8(d, i_2)] = Mchar_0[shift_sint8(s, i_2)]))).
 }
-Prove: a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]][a_3] = Mchar_0[a_3].
+Prove: a_2[a_4] = Mchar_0[a_4].
 
 ------------------------------------------------------------
 
@@ -419,6 +472,7 @@ Prove: true.
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 107):
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let x = to_uint64(n - 1).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
@@ -440,13 +494,18 @@ Assume {
   (* Else *)
   Have: 0 < memoverlap_0.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. let a_3 = shift_sint8(src_0, i_1) in ((i_1 <= i) ->
-      ((0 <= i_1) -> (a_1[a_3] = Mchar_0[a_3]))).
+  Have: x < n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((i_1 < n) -> ((x < i_1) ->
+      (Mchar_0[shift_sint8(src_0, i_1)] = Mchar_0[shift_sint8(dest_0, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: (0 <= i) /\ (i < n).
   (* Invariant 'no_eva' *)
   Have: forall i_1 : Z. ((i < i_1) -> ((i_1 < n) ->
       (a_1[shift_sint8(dest_0, i_1)] = Mchar_0[shift_sint8(src_0, i_1)]))).
   (* Invariant 'no_eva' *)
-  Have: (0 <= i) /\ (i < n).
+  Have: forall i_1 : Z. let a_3 = shift_sint8(src_0, i_1) in ((i_1 <= i) ->
+      ((0 <= i_1) -> (a_1[a_3] = Mchar_0[a_3]))).
   (* Then *)
   Have: 0 < i.
 }
@@ -481,8 +540,10 @@ Prove: to_uint64(n - 1) < n.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 108):
+Let x = to_uint64(i - 1).
 Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let x_1 = to_uint64(n - 1).
 Let a_2 = shift_sint8(s, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
@@ -490,7 +551,7 @@ Assume {
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
       sconst(Mchar_0).
   (* Goal *)
-  When: (i_1 < n) /\ (to_uint64(i - 1) < i_1).
+  When: (i_1 < n) /\ (x < i_1).
   (* Pre-condition 'valid_dest' *)
   Have: P_valid_or_empty(Malloc_0, d, n).
   (* Pre-condition 'valid_src' *)
@@ -506,15 +567,22 @@ Assume {
   (* Else *)
   Have: 0 < memoverlap_0.
   (* Invariant 'no_eva' *)
-  Have: forall i_2 : Z. let a_3 = shift_sint8(s, i_2) in ((i_2 <= i) ->
-      ((0 <= i_2) -> (a_1[a_3] = Mchar_0[a_3]))).
+  Have: x_1 < n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_2 : Z. ((i_2 < n) -> ((x_1 < i_2) ->
+      (Mchar_0[shift_sint8(s, i_2)] = Mchar_0[shift_sint8(d, i_2)]))).
+  (* Invariant 'no_eva' *)
+  Have: (0 <= i) /\ (i < n).
   (* Invariant 'no_eva' *)
   Have: forall i_2 : Z. ((i < i_2) -> ((i_2 < n) ->
       (a_1[shift_sint8(d, i_2)] = Mchar_0[shift_sint8(s, i_2)]))).
   (* Invariant 'no_eva' *)
-  Have: (0 <= i) /\ (i < n).
+  Have: forall i_2 : Z. let a_3 = shift_sint8(s, i_2) in ((i_2 <= i) ->
+      ((0 <= i_2) -> (a_1[a_3] = Mchar_0[a_3]))).
   (* Then *)
   Have: 0 < i.
+  (* Invariant 'no_eva' *)
+  Have: x < n.
 }
 Prove: a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]][shift_sint8(d, i_1)] =
     Mchar_0[shift_sint8(s, i_1)].
@@ -522,6 +590,7 @@ Prove: a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]][shift_sint8(d, i_1)] =
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 108):
+Let x = to_uint64(n - 1).
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = shift_sint8(src_0, 0).
 Assume {
@@ -530,7 +599,7 @@ Assume {
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (i < n) /\ (to_uint64(n - 1) < i).
+  When: (i < n) /\ (x < i).
   (* Pre-condition 'valid_dest' *)
   Have: P_valid_or_empty(Malloc_0, dest_0, n).
   (* Pre-condition 'valid_src' *)
@@ -545,23 +614,28 @@ Assume {
        ((!separated(a, n, a_1, n)) -> (memoverlap_0 = 1))))).
   (* Else *)
   Have: 0 < memoverlap_0.
+  (* Invariant 'no_eva' *)
+  Have: x < n.
 }
 Prove: Mchar_0[shift_sint8(src_0, i)] = Mchar_0[shift_sint8(dest_0, i)].
 
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 109):
+Let x = to_uint64(i - 1).
 Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
-Let a_2 = shift_sint8(s, 0).
-Let a_3 = shift_sint8(s, i_1).
+Let a_2 = a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]].
+Let x_1 = to_uint64(n - 1).
+Let a_3 = shift_sint8(s, 0).
+Let a_4 = shift_sint8(s, i_1).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
       sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= to_uint64(i - 1)).
+  When: (0 <= i_1) /\ (i_1 <= x).
   (* Pre-condition 'valid_dest' *)
   Have: P_valid_or_empty(Malloc_0, d, n).
   (* Pre-condition 'valid_src' *)
@@ -569,25 +643,35 @@ Assume {
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
-  Have: ((separated(a, n, a_2, n) -> (memoverlap_0 = 0))) /\
+  Have: ((separated(a, n, a_3, n) -> (memoverlap_0 = 0))) /\
       ((addr_le(d, s) -> (addr_lt(s, shift_sint8(d, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = (-1)))))) /\
+       ((!separated(a, n, a_3, n)) -> (memoverlap_0 = (-1)))))) /\
       ((addr_lt(s, d) -> (addr_le(d, shift_sint8(s, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = 1))))).
+       ((!separated(a, n, a_3, n)) -> (memoverlap_0 = 1))))).
   (* Else *)
   Have: 0 < memoverlap_0.
   (* Invariant 'no_eva' *)
-  Have: forall i_2 : Z. let a_4 = shift_sint8(s, i_2) in ((i_2 <= i) ->
-      ((0 <= i_2) -> (a_1[a_4] = Mchar_0[a_4]))).
+  Have: x_1 < n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_2 : Z. ((i_2 < n) -> ((x_1 < i_2) ->
+      (Mchar_0[shift_sint8(s, i_2)] = Mchar_0[shift_sint8(d, i_2)]))).
+  (* Invariant 'no_eva' *)
+  Have: (0 <= i) /\ (i < n).
   (* Invariant 'no_eva' *)
   Have: forall i_2 : Z. ((i < i_2) -> ((i_2 < n) ->
       (a_1[shift_sint8(d, i_2)] = Mchar_0[shift_sint8(s, i_2)]))).
   (* Invariant 'no_eva' *)
-  Have: (0 <= i) /\ (i < n).
+  Have: forall i_2 : Z. let a_5 = shift_sint8(s, i_2) in ((i_2 <= i) ->
+      ((0 <= i_2) -> (a_1[a_5] = Mchar_0[a_5]))).
   (* Then *)
   Have: 0 < i.
+  (* Invariant 'no_eva' *)
+  Have: x < n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_2 : Z. ((i_2 < n) -> ((x < i_2) ->
+      (a_2[shift_sint8(d, i_2)] = Mchar_0[shift_sint8(s, i_2)]))).
 }
-Prove: a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]][a_3] = Mchar_0[a_3].
+Prove: a_2[a_4] = Mchar_0[a_4].
 
 ------------------------------------------------------------
 
@@ -609,43 +693,55 @@ Prove: true.
 
 Goal Loop assigns (file FRAMAC_SHARE/libc/string.c, line 98) (3/3):
 Effect at line 102
+Let x = to_uint64(1 + i).
 Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
-Let a_2 = shift_sint8(src_0, 0).
-Let a_3 = shift_sint8(d, i).
+Let a_2 = shift_sint8(d, i).
+Let a_3 = a_1[a_2 <- a_1[shift_sint8(s, i)]].
+Let a_4 = shift_sint8(s, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
-  Type: (region(d.base) <= 0) /\ (region(src_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
+      sconst(Mchar_0).
   (* Goal *)
-  When: !invalid(Malloc_0, a_3, 1).
+  When: !invalid(Malloc_0, a_2, 1).
   (* Pre-condition 'valid_dest' *)
   Have: P_valid_or_empty(Malloc_0, d, n).
   (* Pre-condition 'valid_src' *)
-  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
-  Have: ((separated(a, n, a_2, n) -> (memoverlap_0 = 0))) /\
-      ((addr_le(d, src_0) -> (addr_lt(src_0, shift_sint8(d, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = (-1)))))) /\
-      ((addr_lt(src_0, d) -> (addr_le(d, shift_sint8(src_0, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = 1))))).
+  Have: ((separated(a, n, a_4, n) -> (memoverlap_0 = 0))) /\
+      ((addr_le(d, s) -> (addr_lt(s, shift_sint8(d, n)) ->
+       ((!separated(a, n, a_4, n)) -> (memoverlap_0 = (-1)))))) /\
+      ((addr_lt(s, d) -> (addr_le(d, shift_sint8(s, n)) ->
+       ((!separated(a, n, a_4, n)) -> (memoverlap_0 = 1))))).
   (* Then *)
   Have: memoverlap_0 <= 0.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. let a_4 = shift_sint8(src_0, i_1) in ((i <= i_1) ->
-      ((i_1 < n) -> (a_1[a_4] = Mchar_0[a_4]))).
-  (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(src_0, i_1)]))).
+  Have: 0 <= n.
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_1[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(s, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. let a_5 = shift_sint8(s, i_1) in ((i <= i_1) ->
+      ((i_1 < n) -> (a_1[a_5] = Mchar_0[a_5]))).
   (* Then *)
   Have: i < n.
+  (* Invariant 'no_eva' *)
+  Have: x <= n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < x) ->
+      (a_3[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(s, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. let a_5 = shift_sint8(s, i_1) in ((i_1 < n) ->
+      ((x <= i_1) -> (a_3[a_5] = Mchar_0[a_5]))).
 }
-Prove: included(a_3, 1, a, n).
+Prove: included(a_2, 1, a, n).
 
 ------------------------------------------------------------
 
@@ -662,43 +758,59 @@ Prove: true.
 
 Goal Loop assigns (file FRAMAC_SHARE/libc/string.c, line 110) (3/3):
 Effect at line 114
+Let x = to_uint64(i - 1).
 Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
-Let a_2 = shift_sint8(src_0, 0).
-Let a_3 = shift_sint8(d, i).
+Let a_2 = shift_sint8(d, i).
+Let a_3 = a_1[a_2 <- a_1[shift_sint8(s, i)]].
+Let x_1 = to_uint64(n - 1).
+Let a_4 = shift_sint8(s, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
-  Type: (region(d.base) <= 0) /\ (region(src_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
+      sconst(Mchar_0).
   (* Goal *)
-  When: !invalid(Malloc_0, a_3, 1).
+  When: !invalid(Malloc_0, a_2, 1).
   (* Pre-condition 'valid_dest' *)
   Have: P_valid_or_empty(Malloc_0, d, n).
   (* Pre-condition 'valid_src' *)
-  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
-  Have: ((separated(a, n, a_2, n) -> (memoverlap_0 = 0))) /\
-      ((addr_le(d, src_0) -> (addr_lt(src_0, shift_sint8(d, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = (-1)))))) /\
-      ((addr_lt(src_0, d) -> (addr_le(d, shift_sint8(src_0, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = 1))))).
+  Have: ((separated(a, n, a_4, n) -> (memoverlap_0 = 0))) /\
+      ((addr_le(d, s) -> (addr_lt(s, shift_sint8(d, n)) ->
+       ((!separated(a, n, a_4, n)) -> (memoverlap_0 = (-1)))))) /\
+      ((addr_lt(s, d) -> (addr_le(d, shift_sint8(s, n)) ->
+       ((!separated(a, n, a_4, n)) -> (memoverlap_0 = 1))))).
   (* Else *)
   Have: 0 < memoverlap_0.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. let a_4 = shift_sint8(src_0, i_1) in ((i_1 <= i) ->
-      ((0 <= i_1) -> (a_1[a_4] = Mchar_0[a_4]))).
+  Have: x_1 < n.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. ((i < i_1) -> ((i_1 < n) ->
-      (a_1[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(src_0, i_1)]))).
+  Have: forall i_1 : Z. ((i_1 < n) -> ((x_1 < i_1) ->
+      (Mchar_0[shift_sint8(s, i_1)] = Mchar_0[shift_sint8(d, i_1)]))).
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i < n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((i < i_1) -> ((i_1 < n) ->
+      (a_1[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(s, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. let a_5 = shift_sint8(s, i_1) in ((i_1 <= i) ->
+      ((0 <= i_1) -> (a_1[a_5] = Mchar_0[a_5]))).
   (* Then *)
   Have: 0 < i.
+  (* Invariant 'no_eva' *)
+  Have: x < n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((i_1 < n) -> ((x < i_1) ->
+      (a_3[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(s, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. let a_5 = shift_sint8(s, i_1) in ((0 <= i_1) ->
+      ((i_1 <= x) -> (a_3[a_5] = Mchar_0[a_5]))).
 }
-Prove: included(a_3, 1, a, n).
+Prove: included(a_2, 1, a, n).
 
 ------------------------------------------------------------
 
@@ -740,6 +852,7 @@ Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 122) in 'memmove' (6/7):
 Effect at line 115
 Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let x = to_uint64(n - 1).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
@@ -763,13 +876,18 @@ Assume {
   (* Else *)
   Have: 0 < memoverlap_0.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. let a_3 = shift_sint8(src_0, i_1) in ((i_1 <= i) ->
-      ((0 <= i_1) -> (a_1[a_3] = Mchar_0[a_3]))).
+  Have: x < n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((i_1 < n) -> ((x < i_1) ->
+      (Mchar_0[shift_sint8(src_0, i_1)] = Mchar_0[shift_sint8(d, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: (0 <= i) /\ (i < n).
   (* Invariant 'no_eva' *)
   Have: forall i_1 : Z. ((i < i_1) -> ((i_1 < n) ->
       (a_1[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(src_0, i_1)]))).
   (* Invariant 'no_eva' *)
-  Have: (0 <= i) /\ (i < n).
+  Have: forall i_1 : Z. let a_3 = shift_sint8(src_0, i_1) in ((i_1 <= i) ->
+      ((0 <= i_1) -> (a_1[a_3] = Mchar_0[a_3]))).
   (* Else *)
   Have: i <= 0.
 }
@@ -784,40 +902,52 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Decreasing of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 101):
-Let a = shift_sint8(dest_0, 0).
+Let x = to_uint64(1 + i).
+Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
-Let a_2 = shift_sint8(src_0, 0).
+Let a_2 = a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]].
+Let a_3 = shift_sint8(s, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
-  Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
+      sconst(Mchar_0).
   (* Pre-condition 'valid_dest' *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  Have: P_valid_or_empty(Malloc_0, d, n).
   (* Pre-condition 'valid_src' *)
-  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
-  Have: ((separated(a, n, a_2, n) -> (memoverlap_0 = 0))) /\
-      ((addr_le(dest_0, src_0) -> (addr_lt(src_0, shift_sint8(dest_0, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = (-1)))))) /\
-      ((addr_lt(src_0, dest_0) -> (addr_le(dest_0, shift_sint8(src_0, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = 1))))).
+  Have: ((separated(a, n, a_3, n) -> (memoverlap_0 = 0))) /\
+      ((addr_le(d, s) -> (addr_lt(s, shift_sint8(d, n)) ->
+       ((!separated(a, n, a_3, n)) -> (memoverlap_0 = (-1)))))) /\
+      ((addr_lt(s, d) -> (addr_le(d, shift_sint8(s, n)) ->
+       ((!separated(a, n, a_3, n)) -> (memoverlap_0 = 1))))).
   (* Then *)
   Have: memoverlap_0 <= 0.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. let a_3 = shift_sint8(src_0, i_1) in ((i <= i_1) ->
-      ((i_1 < n) -> (a_1[a_3] = Mchar_0[a_3]))).
-  (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_sint8(dest_0, i_1)] = Mchar_0[shift_sint8(src_0, i_1)]))).
+  Have: 0 <= n.
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_1[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(s, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. let a_4 = shift_sint8(s, i_1) in ((i <= i_1) ->
+      ((i_1 < n) -> (a_1[a_4] = Mchar_0[a_4]))).
   (* Then *)
   Have: i < n.
+  (* Invariant 'no_eva' *)
+  Have: x <= n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < x) ->
+      (a_2[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(s, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. let a_4 = shift_sint8(s, i_1) in ((i_1 < n) ->
+      ((x <= i_1) -> (a_2[a_4] = Mchar_0[a_4]))).
 }
-Prove: i < to_uint64(1 + i).
+Prove: i < x.
 
 ------------------------------------------------------------
 
@@ -827,40 +957,56 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Decreasing of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 113):
-Let a = shift_sint8(dest_0, 0).
+Let x = to_uint64(i - 1).
+Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
-Let a_2 = shift_sint8(src_0, 0).
+Let a_2 = a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]].
+Let x_1 = to_uint64(n - 1).
+Let a_3 = shift_sint8(s, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
-  Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
+      sconst(Mchar_0).
   (* Pre-condition 'valid_dest' *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  Have: P_valid_or_empty(Malloc_0, d, n).
   (* Pre-condition 'valid_src' *)
-  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
-  Have: ((separated(a, n, a_2, n) -> (memoverlap_0 = 0))) /\
-      ((addr_le(dest_0, src_0) -> (addr_lt(src_0, shift_sint8(dest_0, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = (-1)))))) /\
-      ((addr_lt(src_0, dest_0) -> (addr_le(dest_0, shift_sint8(src_0, n)) ->
-       ((!separated(a, n, a_2, n)) -> (memoverlap_0 = 1))))).
+  Have: ((separated(a, n, a_3, n) -> (memoverlap_0 = 0))) /\
+      ((addr_le(d, s) -> (addr_lt(s, shift_sint8(d, n)) ->
+       ((!separated(a, n, a_3, n)) -> (memoverlap_0 = (-1)))))) /\
+      ((addr_lt(s, d) -> (addr_le(d, shift_sint8(s, n)) ->
+       ((!separated(a, n, a_3, n)) -> (memoverlap_0 = 1))))).
   (* Else *)
   Have: 0 < memoverlap_0.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. let a_3 = shift_sint8(src_0, i_1) in ((i_1 <= i) ->
-      ((0 <= i_1) -> (a_1[a_3] = Mchar_0[a_3]))).
+  Have: x_1 < n.
   (* Invariant 'no_eva' *)
-  Have: forall i_1 : Z. ((i < i_1) -> ((i_1 < n) ->
-      (a_1[shift_sint8(dest_0, i_1)] = Mchar_0[shift_sint8(src_0, i_1)]))).
+  Have: forall i_1 : Z. ((i_1 < n) -> ((x_1 < i_1) ->
+      (Mchar_0[shift_sint8(s, i_1)] = Mchar_0[shift_sint8(d, i_1)]))).
   (* Invariant 'no_eva' *)
   Have: (0 <= i) /\ (i < n).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((i < i_1) -> ((i_1 < n) ->
+      (a_1[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(s, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. let a_4 = shift_sint8(s, i_1) in ((i_1 <= i) ->
+      ((0 <= i_1) -> (a_1[a_4] = Mchar_0[a_4]))).
   (* Then *)
   Have: 0 < i.
+  (* Invariant 'no_eva' *)
+  Have: x < n.
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. ((i_1 < n) -> ((x < i_1) ->
+      (a_2[shift_sint8(d, i_1)] = Mchar_0[shift_sint8(s, i_1)]))).
+  (* Invariant 'no_eva' *)
+  Have: forall i_1 : Z. let a_4 = shift_sint8(s, i_1) in ((0 <= i_1) ->
+      ((i_1 <= x) -> (a_2[a_4] = Mchar_0[a_4]))).
 }
-Prove: to_uint64(i - 1) < i.
+Prove: x < i.
 
 ------------------------------------------------------------
 

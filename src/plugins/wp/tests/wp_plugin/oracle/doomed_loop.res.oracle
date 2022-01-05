@@ -37,7 +37,8 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'B' (file tests/wp_plugin/doomed_loop.i, line 19):
-Prove: !P_P(0).
+Assume { (* Invariant 'A' *) Have: P_P(0). }
+Prove: false.
 
 ------------------------------------------------------------
 

@@ -178,23 +178,7 @@ Prove: true.
 
 Goal Loop assigns 'CHECK' (3/3):
 Effect at line 139
-Assume {
-  Type: is_sint32(i_1) /\ is_sint32(i).
-  (* Heap *)
-  Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
-      linked(Malloc_0).
-  (* Goal *)
-  When: !invalid(Malloc_0, shift_sint32(shiftfield_F1_S_a(pg_0), i), 1).
-  (* Invariant 'CHECK' *)
-  Have: (0 <= i_1) /\ (i_1 <= 10).
-  (* Else *)
-  Have: 10 <= i_1.
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
-  (* Then *)
-  Have: i <= 9.
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -242,22 +226,7 @@ Prove: true.
 
 Goal Loop assigns 'CHECK' (3/3):
 Effect at line 115
-Assume {
-  Type: is_sint32(i_1) /\ is_sint32(i).
-  (* Heap *)
-  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
-  (* Goal *)
-  When: !invalid(Malloc_0, shift_sint32(shiftfield_F1_S_a(s), i), 1).
-  (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10).
-  (* Else *)
-  Have: 10 <= i_1.
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
-  (* Then *)
-  Have: i <= 9.
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

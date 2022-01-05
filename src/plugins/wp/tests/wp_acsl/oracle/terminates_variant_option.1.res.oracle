@@ -54,6 +54,8 @@ Assume {
   Have: ((0 <= c1_0) -> ((cpt_0 <= c1_0) /\ (0 <= cpt_0))).
   (* Else *)
   Have: 2 <= cpt_0.
+  (* Invariant *)
+  Have: ((0 <= c1_0) -> (cpt_0 <= (1 + c1_0))).
 }
 Prove: 0 <= cpt_0.
 
