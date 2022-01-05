@@ -99,6 +99,8 @@
     "categoryOrder": [ "Hooks", "Components", "*", "Other" ],
     "listInvalidSymbolLinks":true,
     "hideGenerator":true,
-    "readme": "./README.md",
+    "includes": "src/dome/doc/guides",
+    "customCss": "src/dome/doc/gallery.css",
+    "readme": "none"
   }
 }
