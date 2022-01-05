@@ -503,7 +503,11 @@ export interface SelectProps {
    component entirely, which is quite ugly by default.
  */
 export function Select(props: SelectProps) {
-  const { onChange, className = '', placeholder } = props;
+  const { onChange, placeholder } = props;
+  const className = classes(
+    'dome-xSelect dome-xBoxButton dome-xButton-default dome-xButton-label',
+    props.className,
+  );
   const disabled = onChange ? DISABLED(props) : true;
   const callback = (evt: React.ChangeEvent<HTMLSelectElement>) => {
     if (onChange) onChange(evt.target.value);
@@ -512,7 +516,7 @@ export function Select(props: SelectProps) {
     <select
       id={props.id}
       disabled={disabled}
-      className={`dome - xSelect ${className} `}
+      className={className}
       style={props.style}
       title={props.title}
       value={props.value}
@@ -520,7 +524,7 @@ export function Select(props: SelectProps) {
     >
       {placeholder && <option value="">— {placeholder} —</option>}
       {props.children}
-    </select>
+    </select >
   );
 }
 
