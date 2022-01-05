@@ -1736,6 +1736,8 @@ src/plugins/wp/TacBittest.ml: CEA_WP
 src/plugins/wp/TacBittest.mli: CEA_WP
 src/plugins/wp/TacChoice.ml: CEA_WP
 src/plugins/wp/TacChoice.mli: CEA_WP
+src/plugins/wp/TacClear.ml: CEA_WP
+src/plugins/wp/TacClear.mli: CEA_WP
 src/plugins/wp/TacCongruence.ml: CEA_WP
 src/plugins/wp/TacCongruence.mli: CEA_WP
 src/plugins/wp/TacCompound.ml: CEA_WP

@@ -22,36 +22,20 @@
 
 open Tactical
 
-(* -------------------------------------------------------------------------- *)
-(* --- Filter Tactical                                                    --- *)
-(* -------------------------------------------------------------------------- *)
+class clear =
+  object(_)
+    inherit Tactical.make ~id:"Wp.clear"
+        ~title:"Clear"
+        ~descr:"Remove Hypothesis"
+        ~params:[]
 
-let vanti,panti =
-  Tactical.checkbox ~id:"anti"
-    ~title:"Absurd"
-    ~descr:"Find Contradiction in Side Hypotheses"
-    ~default:false ()
-
-class filter =
-  object(self)
-    inherit Tactical.make ~id:"Wp.filter"
-        ~title:"Filter"
-        ~descr:"Dependent Erasure of Hypotheses"
-        ~params:[panti]
-
-    method select feedback _sel =
-      let anti = self#get_field vanti in
-      let process seq = ["Filter",Filtering.compute ~anti seq] in
-      feedback#set_title (if anti then "Filter (absurd)" else "Filter") ;
-      Applicable process
-
+    method select _feedback sel =
+      match sel with
+      | Clause(Step step) ->
+          let removed = [ "Cleared hypothesis", Conditions.Have Lang.F.p_true] in
+          Applicable (Tactical.replace ~at:step.id removed)
+      | _ ->
+          Not_applicable
   end
 
-let tactical = Tactical.export (new filter)
-
-let strategy ?(priority=1.0) ?(anti=false) () =
-  Strategy.{
-    priority ; tactical ;
-    selection = Empty ;
-    arguments = [arg vanti anti] ;
-  }
+let tactical = Tactical.export (new clear)

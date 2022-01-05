@@ -288,6 +288,11 @@ The user can select a hypothesis $H$, and change the goal to $\neg H$:
 
 $$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,\neg H} $$
 
+\paragraph{Clear} Remove Hypothesis\\
+The user can select a hypothesis $H$, and remove it from the context:
+
+$$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,G} $$
+
 \paragraph{Choice} Select a Goal Alternative\\
 When the goal is a disjunction, the user select one alternative and discard the others:
 $$ \TACTIC{\Delta\models\,\Gamma,G}{\Delta\models\,G} $$
@@ -301,7 +306,7 @@ $$ \TACTIC{ a = b }{ \bigwedge a.f_i = b.f_i } $$
 The user select a hypothesis (typically, a negation) and swap it with the goal.
 $$ \TACTIC{\Delta,H\models\,G}{\Delta,\neg G\models\,\neg H} $$
 
-\paragraph{Cut} Use Intermerdiate Hypothesis
+\paragraph{Cut} Use Intermediate Hypothesis
 The user introduce a new clause $C$ with the composer to prove the goal. There two variants of the tactic, made available by a menu in the tactic panel.
 
 The \textsf{Modus-Ponens} variant where the clause $C$ is used as an intermediate proof step:
@@ -322,10 +327,16 @@ $$\TACTIC{\Delta\models\,G}{%
 \paragraph{Definition} Unfold predicate and logic function definition\\
 The user simply select a term $f(e_1,\ldots,e_n)$ or a predicate $P(e_1,\ldots,e_n)$ which is replaced by its definition, when available.
 
-\paragraph{Filter} Erase Hypotheses \\
-The tactic is always applicable. It removes hypotheses from the goal on a variable used basis. When variables are compounds (record and arrays) a finer heuristics is used to detect which parts of the variable is relevant. A transitive closure of dependencies is also used. However, it is always possible that too many hypotheses are removed.
+\paragraph{Filter} Dependent Erasure of Hypotheses \\
+The tactic is always applicable. It removes hypotheses from the goal on a
+variable used basis. When variables are compounds (record and arrays) a finer
+heuristic is used to detect which parts of the variable is relevant. A
+transitive closure of dependencies is also used. However, it is always
+possible that too many hypotheses are removed.
 
-The tactic also have a variant where only hypotheses \emph{not relevant} to the goal are retained. This is useful to find absurd hypotheses that are completely disjoint from the goal.
+The tactic also have a variant where only hypotheses \emph{not relevant} to the
+goal are retained. This is useful to find absurd hypotheses that are completely
+disjoint from the goal.
 
 \paragraph{Instance} Instantiate properties\\
 The user selects a hypothesis with one or several $\forall$ quantifiers, or an $\exists$ quantified goal. Then, with the composer, the use choose to instantiate one or several of the quantified parameters. In case of $\forall$ quantifier over integer, a range of values can be instantiated instead.
