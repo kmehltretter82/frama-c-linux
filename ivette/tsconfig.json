@@ -90,30 +90,15 @@
   ],
   "typedocOptions": {
     "name": "Ivette Documentation",
-    "mode": "modules",
     "out": "doc/html",
     "includeVersion": true,
     "disableSources": true,
     "excludePrivate": true,
-    "excludeNotExported": true,
     "excludeExternals": true,
     "categorizeByGroup": false,
     "categoryOrder": [ "Hooks", "Components", "*", "Other" ],
-    "stripInternal": true,
     "listInvalidSymbolLinks":true,
     "hideGenerator":true,
     "readme": "./README.md",
-    "inputFiles": [
-      "doc/pages",
-      "src/ivette/index.tsx",
-      "src/ivette/prefs.tsx",
-      "src/frama-c/server.ts",
-      "src/frama-c/states.ts",
-      "src/frama-c/utils.ts",
-      "src/frama-c/api/generated",
-      "src/dome/renderer",
-      "src/dome/misc/utils.ts",
-      "src/dome/misc/system.ts",
-    ]
   }
 }

@@ -116,14 +116,15 @@ DOC_GUIDES= src/dome/doc/guides
 
 NODEBIN= ./node_modules/.bin
 
+DOCDIRS= src/ivette src/frama-c src/dome/renderer src/dome/utils
+
 doc: $(NODEBIN)/typedoc
 	@echo "\n[Ivette] documentation"
 	@rm -fr doc/html
-	@yarn run typedoc
+	@yarn run typedoc $(shell find $(DOCDIRS) -name "*.ts" -or -name "*.tsx")
 	@mkdir -p doc/html/guides
 	@echo "\n[Ivette] guides"
 	@node $(DOC_ICONS_MAKE) $(DOC_ICONS_DATA) > doc/html/guides/icons.md
-	@cp $(DOC_ICONS_CSS) doc/html/assets/css/
 	@find $(DOC_GUIDES) -name "*.md" -exec cp -f {} doc/html/guides/ \;
 	@find doc/html/guides -name "*.md" -print -exec pandoc \
 		--standalone --toc --toc-depth=2 --to html \
