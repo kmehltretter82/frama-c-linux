@@ -2,7 +2,7 @@
    OPT: -wp-par 1 -wp-no-print -wp-prover qed,tip -wp-msg-key script -wp-session @PTEST_DIR@/oracle/@PTEST_NAME@.session
 */
 /* run.config_qualif
-   DONT_RUN:
+   DONTRUN:
 */
 
 /*@ axiomatic X {
