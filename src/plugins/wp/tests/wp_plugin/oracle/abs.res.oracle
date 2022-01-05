@@ -6,7 +6,7 @@
   Function abs
 ------------------------------------------------------------
 
-Goal Post-condition (file abs.i, line 15) in 'abs':
+Goal Post-condition (file abs.i, line 14) in 'abs':
 Assume {
   Type: is_sint32(abs_0) /\ is_sint32(x).
   If x < 0
