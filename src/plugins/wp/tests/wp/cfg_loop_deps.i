@@ -15,10 +15,10 @@ int x ;
 
 void function(void){
   int i = 0;
-  /*@ loop invariant       IP: P(i) ;
-    @ check loop invariant IQ: Q(i);
-    @ admit loop invariant IR: R(i);
-    @ loop invariant       IS: S(i);
+  /*@ loop invariant       Inv_P  : P(i) ;
+    @ check loop invariant Check_Q: Q(i);
+    @ admit loop invariant Admit_R: R(i);
+    @ loop invariant       Inv_S  : S(i);
     @ loop assigns i ; */
   while(i < 10) i++ ;
 
