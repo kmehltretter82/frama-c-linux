@@ -69,10 +69,10 @@ let builtin_show_aorai_state state args =
     let history = Data_for_aorai.(curState :: (whole_history ())) in
     Aorai_option.result ~current:true "@[<hv>%a@]"
       (Pretty_utils.pp_list ~sep:" <- " (show_aorai_variable state)) history;
-    if args <> [] then begin
-      Aorai_option.result ~current:true "@[<hv>%a@]"
-        (Pretty_utils.pp_list ~sep:"," show_val) args
-    end;
+  end;
+  if args <> [] then begin
+    Aorai_option.result ~current:true "@[<hv>%a@]"
+      (Pretty_utils.pp_list ~sep:"," show_val) args
   end;
   (* Return value : returns nothing, changes nothing *)
   Eva.Builtins.States [state]
