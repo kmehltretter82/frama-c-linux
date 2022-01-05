@@ -38,7 +38,15 @@ type arg_type =
   | Undefine of string
 
 let whitelisted_prefixes =
-  [Path "-I"; Path "-include"; Path "-imacros"; Define "-D"; Undefine "-U"]
+  [
+    Path "-I";
+    Path "-idirafter";
+    Path "-include";
+    Path "-imacros";
+    Path "-isystem";
+    Define "-D";
+    Undefine "-U"
+  ]
 
 let string_of_arg_type = function
     Path s | Define s | Undefine s -> s
