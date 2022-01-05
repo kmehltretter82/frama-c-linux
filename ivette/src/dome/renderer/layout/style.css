@@ -191,7 +191,7 @@
     background: var(--splitter) ;
 }
 
-.dome-xQPane
+.dome-xSplitter-pane
 {
     position: absolute;
     overflow: hidden;

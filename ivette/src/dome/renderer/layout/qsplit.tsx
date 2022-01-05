@@ -166,8 +166,12 @@ const DISPLAY = (
 
 interface QSplitEngineProps extends QSplitProps { size: Size }
 
+const inRange = (P: number, D: number) => Math.max(0, Math.min(P, D));
+
+const getRatio = (P: number, D: number) => inRange(P, D) / D;
+
 const getPosition = (d: Dragging, D: number, R: number) =>
-  d ? getDragPosition(d) : Math.round(D * R);
+  d ? inRange(getDragPosition(d), D) : Math.round(D * R);
 
 function QSplitEngine(props: QSplitEngineProps) {
   const [dragX, setDragX] = React.useState<Dragging>();
@@ -178,10 +182,10 @@ function QSplitEngine(props: QSplitEngineProps) {
   const { A, B, C, D, H = 0.5, V = 0.5, size, setPosition } = props;
   const { width, height } = size;
   const setX = React.useCallback((X: number) => {
-    if (setPosition) setPosition(X / width, V);
+    if (setPosition) setPosition(getRatio(X, width), V);
   }, [setPosition, width, V]);
   const setY = React.useCallback((Y: number) => {
-    if (setPosition) setPosition(H, Y / height);
+    if (setPosition) setPosition(H, getRatio(Y, height));
   }, [setPosition, height, H]);
   const resetX = React.useCallback(() => {
     if (setPosition) setPosition(0.5, V);
@@ -327,7 +331,7 @@ export interface QPaneProps {
 
 export function QPane(props: QPaneProps) {
   const layout = React.useContext(QSplitContext);
-  const QPANE = Utils.classes('dome-xQPane', props.className);
+  const QPANE = Utils.classes('dome-xSplitter-pane', props.className);
   const QSTYLE = Utils.styles(props.style, layout?.get(props.id) ?? NODISPLAY);
   return <div className={QPANE} style={QSTYLE}>{props.children}</div>;
 }
