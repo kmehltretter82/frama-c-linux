@@ -1,6 +1,5 @@
 /* run.config_qualif
    OPT: -wp-prover native:coq
-   OPT: -wp-prover native:alt-ergo -wp-steps 5 -wp-timeout 100
    OPT: -wp-prover alt-ergo -wp-steps 5 -wp-timeout 100
 */
 
