@@ -239,6 +239,28 @@ const getRatio = (P: number, D: number) => inRange(P, D) / D;
 const getPosition = (d: Dragging, D: number, R: number) =>
   d ? inRange(getDragPosition(d), D) : Math.round(D * R);
 
+type Pid = string | undefined;
+type Sid = string | undefined | null; // null means Top
+
+const sameOf = (P: Pid, Q: Pid): Pid => {
+  if (P === Q) return P;
+  if (!P) return Q;
+  if (!Q) return P;
+  return undefined;
+};
+
+const merge = (U: Sid, V: Sid) => {
+  if (U === V) return U;
+  if (U === undefined) return V;
+  if (V === undefined) return U;
+  return null;
+};
+
+const fullOf = (A: Pid, B: Pid, C: Pid, D: Pid) => {
+  const S = merge(A, merge(B, merge(C, D)));
+  return (S === null ? undefined : S);
+};
+
 function QSplitEngine(props: QSplitEngineProps) {
   const [dragX, setDragX] = React.useState<Dragging>();
   const [dragY, setDragY] = React.useState<Dragging>();
@@ -270,32 +292,32 @@ function QSplitEngine(props: QSplitEngineProps) {
   const Y = getPosition(dragY, height, V);
   const RX = width - X - 1;
   const RY = height - Y - 1;
-  const FULL = A !== undefined && A === D;
-  const AB = A !== undefined && (A === B);
-  const AC = A !== undefined && (A === C);
-  const BD = B !== undefined && (B === D);
-  const CD = C !== undefined && (C === D);
+  const AB = sameOf(A, B);
+  const AC = sameOf(A, C);
+  const BD = sameOf(B, D);
+  const CD = sameOf(C, D);
+  const ABCD = fullOf(A, B, C, D);
   //----------------------------------------
   // [ A ]
   //---------------------------------------
-  if (FULL) {
-    DISPLAY(layout, A, 0, width, 0, height);
+  if (ABCD) {
+    DISPLAY(layout, ABCD, 0, width, 0, height);
   }
   //----------------------------------------
   // [ A - C ]
   //---------------------------------------
   else if (AB && CD) {
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, A, 0, width, 0, Y);
-    DISPLAY(layout, C, 0, width, Y + 1, RY);
+    DISPLAY(layout, AB, 0, width, 0, Y);
+    DISPLAY(layout, CD, 0, width, Y + 1, RY);
   }
   //----------------------------------------
   // [ A | B ]
   //---------------------------------------
   else if (AC && BD) {
     hsplit = HSPLIT(X, 0, height);
-    DISPLAY(layout, A, 0, X, 0, height);
-    DISPLAY(layout, B, X + 1, RX, 0, height);
+    DISPLAY(layout, AC, 0, X, 0, height);
+    DISPLAY(layout, BD, X + 1, RX, 0, height);
   }
   //----------------------------------------
   // [ A – C|D ]
@@ -303,7 +325,7 @@ function QSplitEngine(props: QSplitEngineProps) {
   else if (AB) {
     hsplit = HSPLIT(X, Y, RY);
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, A, 0, width, 0, Y);
+    DISPLAY(layout, AB, 0, width, 0, Y);
     DISPLAY(layout, C, 0, X, Y + 1, RY);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
   }
@@ -313,7 +335,7 @@ function QSplitEngine(props: QSplitEngineProps) {
   else if (AC) {
     hsplit = HSPLIT(X, 0, height);
     vsplit = VSPLIT(X, Y, RY);
-    DISPLAY(layout, A, 0, X, 0, height);
+    DISPLAY(layout, AC, 0, X, 0, height);
     DISPLAY(layout, B, X + 1, RX, 0, Y);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
   }
@@ -324,7 +346,7 @@ function QSplitEngine(props: QSplitEngineProps) {
     hsplit = HSPLIT(X, 0, height);
     vsplit = VSPLIT(0, Y, X);
     DISPLAY(layout, A, 0, X, 0, Y);
-    DISPLAY(layout, B, X + 1, RX, 0, height);
+    DISPLAY(layout, BD, X + 1, RX, 0, height);
     DISPLAY(layout, C, 0, X, Y + 1, RY);
   }
   //----------------------------------------
@@ -335,7 +357,7 @@ function QSplitEngine(props: QSplitEngineProps) {
     vsplit = VSPLIT(0, Y, width);
     DISPLAY(layout, A, 0, X, 0, Y);
     DISPLAY(layout, B, X + 1, RX, 0, Y);
-    DISPLAY(layout, C, 0, width, Y + 1, RY);
+    DISPLAY(layout, CD, 0, width, Y + 1, RY);
   }
   //----------------------------------------
   // [ A, B, C, D ]
