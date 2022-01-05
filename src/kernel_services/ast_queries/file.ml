@@ -546,7 +546,7 @@ let build_cpp_cmd = function
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
-    Some (cpp_command_with_chdir, ppf, supp_args)
+    Some (cpp_command_with_chdir, ppf, supported_cpp_arch_args)
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
@@ -557,7 +557,7 @@ let parse_cabs cpp_command = function
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
   | NeedCPP (f, cmdl, _extra, is_gnu_like) ->
-    let cpp_command, ppf, supp_args = Option.get cpp_command in
+    let cpp_command, ppf, logic_pp_args = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
@@ -601,6 +601,9 @@ let parse_cabs cpp_command = function
                   "trying to preprocess annotation with an unknown \
                    preprocessor."; true))
       then begin
+        let supp_args =
+          Format.asprintf "%s" (concat_strs ~pre:" " ~sep:" " logic_pp_args)
+        in
         let ppf' =
           try Logic_preprocess.file ".c"
                 (replace_in_cpp_cmd cmdl supp_args)
