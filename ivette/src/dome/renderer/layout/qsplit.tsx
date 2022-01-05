@@ -301,8 +301,8 @@ function QSplitEngine(props: QSplitEngineProps) {
   // [ A – C|D ]
   //----------------------------------------
   else if (AB) {
-    hsplit = HSPLIT(X, 0, height);
-    vsplit = VSPLIT(X, Y, RX);
+    hsplit = HSPLIT(X, Y, RY);
+    vsplit = VSPLIT(0, Y, width);
     DISPLAY(layout, A, 0, width, 0, Y);
     DISPLAY(layout, C, 0, X, Y + 1, RY);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
@@ -321,8 +321,8 @@ function QSplitEngine(props: QSplitEngineProps) {
   // [ A-C | B ]
   //----------------------------------------
   else if (BD) {
-    hsplit = HSPLIT(0, Y, RX);
-    vsplit = VSPLIT(X, 0, width);
+    hsplit = HSPLIT(X, 0, height);
+    vsplit = VSPLIT(0, Y, X);
     DISPLAY(layout, A, 0, X, 0, Y);
     DISPLAY(layout, B, X + 1, RX, 0, height);
     DISPLAY(layout, C, 0, X, Y + 1, RY);
@@ -331,7 +331,7 @@ function QSplitEngine(props: QSplitEngineProps) {
   // [ A|B - C ]
   //----------------------------------------
   else if (CD) {
-    hsplit = HSPLIT(X, 0, RX);
+    hsplit = HSPLIT(X, 0, Y);
     vsplit = VSPLIT(0, Y, width);
     DISPLAY(layout, A, 0, X, 0, Y);
     DISPLAY(layout, B, X + 1, RX, 0, Y);
