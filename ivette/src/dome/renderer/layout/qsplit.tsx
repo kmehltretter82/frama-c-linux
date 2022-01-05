@@ -20,9 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-// --------------------------------------------------------------------------
-// --- Quarter-based Splitter
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* --- Quarter-based Splitter                                             --- */
+/* -------------------------------------------------------------------------- */
 
 /**
     @packageDocumentation
@@ -39,19 +39,28 @@ import { AutoSizer, Size } from 'react-virtualized';
 /* -------------------------------------------------------------------------- */
 
 export interface QSplitProps {
-  className?: string; /** Q-Split additional class. */
-  style?: React.CSSProperties; /** Q-Split additional style. */
-  A?: string; /** Q-Pane to layout in A-quarter. */
-  B?: string; /** Q-Pane to layout in B-quarter. */
-  C?: string; /** Q-Pane to layout in C-quarter. */
-  D?: string; /** Q-Pane to layout in D-quarter. */
-  H?: number; /** Horizontal panes ratio (range `0..1`, default `0.5`). */
-  V?: number; /** Vertical panes ratio (range `0..1`, default `0.5`). */
-  setPosition?: (H: number, V: number) => void; /** Dragging ratios callback. */
-  children?: React.ReactNode;
+  /** Q-Split additional class. */
+  className?: string;
+  /** Q-Split additional style. */
+  style?: React.CSSProperties;
+  /** Q-Pane to layout in A-quarter. */
+  A?: string;
+  /** Q-Pane to layout in B-quarter. */
+  B?: string;
+  /** Q-Pane to layout in C-quarter. */
+  C?: string;
+  /** Q-Pane to layout in D-quarter. */
+  D?: string;
+  /** Horizontal panes ratio (range `0..1`, default `0.5`). */
+  H?: number;
+  /** Vertical panes ratio (range `0..1`, default `0.5`). */
+  V?: number;
+  /** Dragging ratios callback. */
+  setPosition?: (H: number, V: number) => void;
   /** Q-Split contents. Shall be (possibly packed) Q-Panes.
-      Other components would be layout as they are in the
+     Other components would be layout as they are in the
      positionned `<div/>` of the Q-Split. */
+  children?: React.ReactNode;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -415,6 +424,31 @@ function QSplitEngine(props: QSplitEngineProps) {
 /* --- Q-Split                                                            --- */
 /* -------------------------------------------------------------------------- */
 
+/** Q-Spliiter Container.
+
+   The contained is divided into four quarters named `A`, `B`, `C` and `D`
+   with the following layout:
+
+   ```
+     A | B
+     -----
+     C | D
+   ```
+
+   The horizontal and vertical split bars can be dragged to adjust the ratios.
+   The central node can also be dragged to adust both ratios.
+
+   Any adjacent quarters collapse when they contain either the same component
+   or one component and `undefined`. The split bars are erased accordingly.
+
+   When all quarters contain the same component or `undefined`, they all
+   collapse and the only component extends to the full container size.
+
+   Other cases are a bit degenerated and lead to « incomplete » layout.
+   For instance, when a given component is positionned into two diagonal
+   corners but the adjacent quarters can not collapse,
+   it will be positionned into only one quarter.
+ */
 export function QSplit(props: QSplitProps) {
   const CONTAINER = Utils.classes('dome-xSplitter-container', props.className);
   return (
@@ -439,6 +473,11 @@ export interface QPaneProps {
   children?: React.ReactNode; /** Q-Pane contents. */
 }
 
+/**
+   Q-Splitter Components.
+
+   Childrens are rendered in a positionned `<div/>` with absolute coordinates.
+ */
 export function QPane(props: QPaneProps) {
   const layout = React.useContext(QSplitContext);
   const QPANE = Utils.classes('dome-xSplitter-pane', props.className);
