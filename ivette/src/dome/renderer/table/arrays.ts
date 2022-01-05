@@ -43,13 +43,13 @@ import {
 
 export type ByColumns<Row> = { [dataKey: string]: Compare.Order<Row> };
 
-interface PACK<Key, Row> {
+export interface PACK<Key, Row> {
   index: number | undefined;
   key: Key;
   row: Row;
 }
 
-type SORT<K, R> = Order<PACK<K, R>>;
+export type SORT<K, R> = Order<PACK<K, R>>;
 
 function orderBy<K, R>(
   columns: ByColumns<R>,

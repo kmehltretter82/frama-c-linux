@@ -97,7 +97,6 @@
     "excludeExternals": true,
     "categorizeByGroup": false,
     "categoryOrder": [ "Hooks", "Components", "*", "Other" ],
-    "listInvalidSymbolLinks":true,
     "hideGenerator":true,
     "includes": "src/dome/doc/guides",
     "customCss": "src/dome/doc/gallery.css",

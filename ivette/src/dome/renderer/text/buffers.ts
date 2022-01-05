@@ -113,7 +113,7 @@ function byVisibleTag(lmin: number, lmax: number) {
 // --- Buffer
 // --------------------------------------------------------------------------
 
-type TextMarker = CodeMirror.TextMarker<CodeMirror.MarkerRange>;
+export type TextMarker = CodeMirror.TextMarker<CodeMirror.MarkerRange>;
 
 export interface RichTextBufferProps {
 
