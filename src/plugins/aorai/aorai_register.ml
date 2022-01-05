@@ -263,7 +263,12 @@ let work () =
             Aorai_visitors.add_sync_with_buch file;
             if Aorai_option.GenerateAnnotations.get () then
               Aorai_visitors.add_pre_post_from_buch file
-                (Aorai_option.advance_abstract_interpretation ());
+                (Aorai_option.advance_abstract_interpretation ())
+            else if Aorai_option.ConsiderAcceptance.get () then begin
+              let kf,_ = Globals.entry_point() in
+              let bhv = Aorai_utils.mk_acceptance_bhv () in
+              Annotations.add_behaviors Aorai_option.emitter kf [bhv]
+            end;
             Aorai_eva_analysis.setup ();
             printverb "Annotation of Cil      : done\n";
           end

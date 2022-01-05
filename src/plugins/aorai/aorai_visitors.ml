@@ -32,15 +32,6 @@ open Cil
 
 let dkey = Aorai_option.register_category "action"
 
-let get_acceptance_pred () =
-  let (st,_) = Data_for_aorai.getGraph () in
-  List.fold_left
-    (fun acc s ->
-       match s.acceptation with
-         Bool3.True -> Logic_const.por (acc, Aorai_utils.is_state_pred s)
-       | Bool3.False | Bool3.Undefined -> acc)
-    Logic_const.pfalse st
-
 (****************************************************************************)
 
 (* The instrumentation is done in two passes:
@@ -839,10 +830,7 @@ class visit_adding_pre_post_from_buch treatloops =
          Datatype.String.equal
            (Kernel_function.get_name kf) (Kernel.MainFunction.get())
       then
-        let accept = Logic_const.new_predicate (get_acceptance_pred()) in
-        let post_cond = [Normal, accept] in
-        let name = "aorai_acceptance" in
-        Cil.mk_behavior ~name ~post_cond () :: bhvs
+        Aorai_utils.mk_acceptance_bhv () :: bhvs
       else bhvs
     in
     if Aorai_option.AddingOperationNameAndStatusInSpecification.get()

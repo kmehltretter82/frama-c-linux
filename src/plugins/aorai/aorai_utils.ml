@@ -1940,6 +1940,20 @@ let auto_func_behaviors loc f st state =
   (* Keep behaviors ordered according to the states they describe *)
   global_behavior :: (List.rev_append behaviors non_action_behaviors)
 
+let mk_acceptance_pred () =
+  let (st,_) = Data_for_aorai.getGraph () in
+  List.fold_left
+    (fun acc s ->
+       match s.acceptation with
+         Bool3.True -> Logic_const.por (acc, is_state_pred s)
+       | Bool3.False | Bool3.Undefined -> acc)
+    Logic_const.pfalse st
+
+let mk_acceptance_bhv () =
+  let accept = Logic_const.new_predicate (mk_acceptance_pred()) in
+  let post_cond = [Normal, accept] in
+  let name = "aorai_acceptance" in
+  Cil.mk_behavior ~name ~post_cond ()
 
 let act_convert loc act res =
   let treat_one_act =
