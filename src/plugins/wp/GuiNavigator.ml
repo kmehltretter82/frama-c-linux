@@ -262,7 +262,6 @@ class behavior
               let mode = match mode , prover with
                 | Some m , _ -> m
                 | None , VCS.NativeCoq -> VCS.Edit
-                | None , VCS.NativeAltErgo -> VCS.Fix
                 | _ -> if VCS.is_auto prover then VCS.Batch else VCS.Fix in
               schedule (Prover.prove w ~mode ~result prover) ;
               refresh w
@@ -346,7 +345,6 @@ class behavior
         | None | Some Tactical -> popup_tip#run ()
         | Some Qed -> popup_qed#run ()
         | Some NativeCoq -> popup_coq#run ()
-        | Some NativeAltErgo -> popup_ergo#run ()
         | Some (Why3 _ as p) ->
             if VCS.is_auto p
             then popup_why3_auto#run ()

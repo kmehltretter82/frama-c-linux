@@ -182,7 +182,6 @@ let builtin_strict_leq lfun ~domain ~zero ~monotonic a b =
 let f_iabs =
   extern_f ~library:"cmath"
     ~link:{
-      altergo = Qed.Engine.F_call "abs_int";
       why3     = Qed.Engine.F_call "IAbs.abs";
       coq      = Qed.Engine.F_call "Z.abs";
     } "\\iabs"
@@ -191,7 +190,6 @@ let f_rabs =
   extern_f ~library:"cmath"
     ~result:Real ~params:[Sreal]
     ~link:{
-      altergo = Qed.Engine.F_call "abs_real";
       why3     = Qed.Engine.F_call "RAbs.abs";
       coq      = Qed.Engine.F_call "R.abs";
     } "\\rabs"

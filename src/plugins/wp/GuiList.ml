@@ -152,8 +152,6 @@ class pane (gprovers:GuiConfig.provers) =
           self#create_prover
           [ VCS.Qed ; VCS.Tactical ] ;
         let prv = Wp_parameters.Provers.get () in
-        if List.mem "native:alt-ergo" prv then
-          self#create_prover VCS.NativeAltErgo ;
         if List.mem "native:coq" prv then
           self#create_prover VCS.NativeCoq ;
         ignore (list#add_column_empty) ;

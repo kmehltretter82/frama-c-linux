@@ -36,7 +36,6 @@ type library = string
     In case a Qed.Engine.link is used, [F_subst] patterns
     are not supported for Why-3. *)
 type 'a infoprover = {
-  altergo: 'a;
   why3   : 'a;
   coq    : 'a;
 }

@@ -289,11 +289,10 @@ and bal = parse
       | RECLINK l ->
         skip input ;
         begin try
-          {Lang.altergo = conv_bal def (List.assoc "altergo" l);
-                why3    = conv_bal def (List.assoc "why3" l);
+          {Lang.why3    = conv_bal def (List.assoc "why3" l);
                 coq     = conv_bal def (List.assoc "coq" l) }
         with Not_found ->
-          failwith "a link must contain an entry for 'altergo', 'why3' and 'coq'"
+          failwith "a link must contain an entry for 'why3' and 'coq'"
         end
       | _ -> failwith "Missing link symbol"
 
@@ -304,11 +303,10 @@ and bal = parse
       | `RecString l ->
         skip input ;
         begin try
-          {Lang.altergo = List.assoc "altergo" l;
-                why3    = List.assoc "why3" l;
+          {Lang.why3    = List.assoc "why3" l;
                 coq     = List.assoc "coq" l }
         with Not_found ->
-          failwith "a link must contain an entry for 'altergo', 'why3' and 'coq'"
+          failwith "a link must contain an entry for 'why3' and 'coq'"
         end
       | _ -> failwith "Missing link symbol"
 

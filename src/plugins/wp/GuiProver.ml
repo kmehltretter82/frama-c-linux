@@ -28,14 +28,14 @@ let smoke_status = `Share "theme/default/valid_under_hyp.png"
 
 let filter = function
   | VCS.Qed | VCS.Tactical | VCS.NativeCoq -> false
-  | VCS.Why3 _ | VCS.NativeAltErgo -> true
+  | VCS.Why3 _ -> true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Palette Tool                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
 let timeout_for = function
-  | VCS.NativeAltErgo | VCS.Why3 _ ->
+  | VCS.Why3 _ ->
       let value = Wp_parameters.Timeout.get () in
       let spin = new Widget.spinner
         ~tooltip:"Prover Timeout (0 for none)"
@@ -44,7 +44,7 @@ let timeout_for = function
   | _ -> None
 
 let stepout_for = function
-  | VCS.NativeAltErgo ->
+  | VCS.Why3 _ ->
       let value = Wp_parameters.Steps.get () in
       let spin = new Widget.spinner
         ~tooltip:"Prover Step Limit (0 for none)"

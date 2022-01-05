@@ -106,7 +106,6 @@ let lemma_id l = Printf.sprintf "Q_%s" (avoid_leading_backlash l)
 
 type 'a infoprover =
   {
-    altergo: 'a;
     why3   : 'a;
     coq    : 'a;
   }
@@ -114,13 +113,11 @@ type 'a infoprover =
 (* generic way to have different informations for the provers *)
 
 let infoprover x = {
-  altergo = x;
   why3    = x;
   coq     = x;
 }
 
 let map_infoprover f i = {
-  altergo = f i.altergo;
   why3    = f i.why3;
   coq     = f i.coq;
 }
@@ -259,8 +256,8 @@ struct
   type t = adt
 
   let basename = function
-    | Mtype a -> basename "M" a.ext_link.altergo
-    | Mrecord(r,_) -> basename "R" r.ext_link.altergo
+    | Mtype a -> basename "M" a.ext_link.why3
+    | Mrecord(r,_) -> basename "R" r.ext_link.why3
     | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
     | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
@@ -331,7 +328,7 @@ let datatype ~library name =
   Mtype m
 
 let record ~link ~library fts =
-  let m = new_extern ~link ~library ~debug:link.altergo in
+  let m = new_extern ~link ~library ~debug:link.why3 in
   let r = { fields = [] } in
   let fs = List.map (fun (f,t) -> Mfield(m,r,f,t)) fts in
   r.fields <- fs ; Mrecord(m,r)
@@ -527,7 +524,7 @@ let extern_p ~library ?bool ?prop ?link ?(params=[]) ?(coloring=false) () =
     | _ , _ , Some info -> info
     | _ , _ , _ -> assert false
   in
-  let debug = Export.debug link.altergo in
+  let debug = Export.debug link.why3 in
   Model {
     m_category = Logic.Function;
     m_params = params ;

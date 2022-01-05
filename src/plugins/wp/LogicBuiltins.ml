@@ -239,7 +239,7 @@ let add_logic ~source result name kinds ~library ?category ~link () =
 
 let add_predicate ~source name kinds ~library ~link () =
   let params = List.map skind kinds in
-  let lfun = Lang.extern_fp ~library ~params ~link link.altergo in
+  let lfun = Lang.extern_fp ~library ~params ~link link.why3 in
   register ~source name kinds (LFUN lfun)
 
 let add_ctor ~source name kinds ~library ~link () =

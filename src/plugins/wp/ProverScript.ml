@@ -36,7 +36,7 @@ struct
 
   let stage = function
     | Prover( Qed , { verdict = Valid } ) -> 0
-    | Prover( (NativeAltErgo | Why3 _) , { verdict = Valid } ) -> 1
+    | Prover( Why3 _ , { verdict = Valid } ) -> 1
     | Prover( NativeCoq , { verdict = Valid } ) -> 2
     | Tactic _ -> 3
     | Prover _ -> 4
