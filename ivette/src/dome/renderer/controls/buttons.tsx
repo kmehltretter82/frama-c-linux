@@ -75,7 +75,7 @@ const LABEL = ({ disabled, label }: LABELprops) => (
 );
 
 export type ButtonKind =
-  'default' | 'active' | 'primary' | 'warning' | 'positive' | 'negative';
+  'default' | 'primary' | 'warning' | 'positive' | 'negative';
 
 export interface ButtonProps {
   /** Text of the label. Prepend to other children elements. */
@@ -106,7 +106,6 @@ export interface ButtonProps {
   focusable?: boolean;
   /** Styled bytton:
      - `'default'`: normal button;
-     - `'active'`: active normal button;
      - `'primary'`: primary button, in blue;
      - `'warning'`: warning button, in orange;
      - `'positive'`: positive button, in green;
@@ -495,12 +494,6 @@ export interface SelectProps {
    *   <optgroup label='…'>…</optgroup>
    *   <option value='…' disabled=… >…</option>
 
-   **Warning:** most non-positionning CSS properties might not
-   work on the`<select>` element due to the native rendering used
-   by Chrome.
-   You might use `-webkit-appearance: none` to cancel this behavior,
-   you will have to restyle the
-   component entirely, which is quite ugly by default.
  */
 export function Select(props: SelectProps) {
   const { onChange, placeholder } = props;
