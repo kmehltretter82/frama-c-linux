@@ -63,7 +63,7 @@ type Dragging = undefined | DragPos;
 
 const getDragPosition = (d: DragPos) => d.position + d.offset - d.anchor;
 
-interface QSplitterProps {
+interface BSplitterProps {
   hsplit: boolean;
   style: React.CSSProperties;
   dragging: Dragging;
@@ -72,15 +72,17 @@ interface QSplitterProps {
   resetPosition: () => void;
 }
 
+const HPOS = 'dome-xSplitter-hpos-R';
+const VPOS = 'dome-xSplitter-vpos-R';
+const HVPOS = 'dome-xSplitter-hvpos';
 const HANDLE = '.dome-xSplitter-grab';
 const HGRAB = 'dome-xSplitter-grab dome-xSplitter-hgrab';
 const VGRAB = 'dome-xSplitter-grab dome-xSplitter-vgrab';
-const HPOSR = 'dome-xSplitter-hline dome-xSplitter-hpos-R';
-const VPOSR = 'dome-xSplitter-vline dome-xSplitter-vpos-R';
+const HVGRAB = 'dome-xSplitter-grab dome-xSplitter-hvgrab';
 const DRAGGING = 'dome-color-dragging';
 const DRAGZONE = 'dome-color-dragzone';
 
-function QSplitter(props: QSplitterProps) {
+function BSplitter(props: BSplitterProps) {
   const { hsplit, style, dragging } = props;
 
   const onStart: DraggableEventHandler =
@@ -113,7 +115,7 @@ function QSplitter(props: QSplitterProps) {
     dragging ? DRAGGING : DRAGZONE,
   );
 
-  const css = hsplit ? HPOSR : VPOSR;
+  const css = hsplit ? HPOS : VPOS;
 
   return (
     <DraggableCore
@@ -132,6 +134,70 @@ function QSplitter(props: QSplitterProps) {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* --- Split Node                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+interface CSplitterProps {
+  style: React.CSSProperties;
+  dragX: Dragging;
+  dragY: Dragging;
+  setDragX: (dx: Dragging) => void;
+  setDragY: (dy: Dragging) => void;
+  resetPosition: () => void;
+  setPosition: (X: number, Y: number) => void;
+}
+
+function CSplitter(props: CSplitterProps) {
+  const { style, dragX, dragY } = props;
+
+  const onStart: DraggableEventHandler =
+    (_evt, data) => {
+      const startX = data.node.offsetLeft;
+      const startY = data.node.offsetTop;
+      const anchorX = data.x;
+      const anchorY = data.y;
+      props.setDragX({ position: startX, offset: anchorX, anchor: anchorX });
+      props.setDragY({ position: startY, offset: anchorY, anchor: anchorY });
+    };
+
+  const onDrag: DraggableEventHandler =
+    (_evt, data) => {
+      if (dragX) props.setDragX({ ...dragX, offset: data.x });
+      if (dragY) props.setDragY({ ...dragY, offset: data.y });
+    };
+
+  const onStop: DraggableEventHandler =
+    (evt, _data) => {
+      if (evt.metaKey || evt.altKey || evt.ctrlKey) {
+        props.resetPosition();
+      } else if (dragX && dragY) {
+        const X = getDragPosition(dragX);
+        const Y = getDragPosition(dragY);
+        props.setPosition(X, Y);
+      }
+      props.setDragX(undefined);
+      props.setDragY(undefined);
+    };
+
+  const dragging = dragX !== undefined && dragY !== undefined;
+  const dragger = Utils.classes(HVGRAB, dragging ? DRAGGING : DRAGZONE);
+  return (
+    <DraggableCore
+      handle={HANDLE}
+      onStart={onStart}
+      onDrag={onDrag}
+      onStop={onStop}
+    >
+      <div
+        className={HVPOS}
+        style={style}
+      >
+        <div className={dragger} />
+      </div>
+    </DraggableCore>
+  );
+}
 
 /* -------------------------------------------------------------------------- */
 /* --- Q-Split Engine                                                     --- */
@@ -179,6 +245,7 @@ function QSplitEngine(props: QSplitEngineProps) {
   const layout: QSplitLayout = new Map();
   let hsplit: React.CSSProperties = NODISPLAY;
   let vsplit: React.CSSProperties = NODISPLAY;
+  let hvsplit: React.CSSProperties = NODISPLAY;
   const { A, B, C, D, H = 0.5, V = 0.5, size, setPosition } = props;
   const { width, height } = size;
   const setX = React.useCallback((X: number) => {
@@ -187,21 +254,27 @@ function QSplitEngine(props: QSplitEngineProps) {
   const setY = React.useCallback((Y: number) => {
     if (setPosition) setPosition(H, getRatio(Y, height));
   }, [setPosition, height, H]);
+  const setXY = React.useCallback((X: number, Y: number) => {
+    if (setPosition) setPosition(getRatio(X, width), getRatio(Y, height));
+  }, [setPosition, width, height]);
   const resetX = React.useCallback(() => {
     if (setPosition) setPosition(0.5, V);
   }, [setPosition, V]);
   const resetY = React.useCallback(() => {
     if (setPosition) setPosition(H, 0.5);
   }, [setPosition, H]);
+  const resetXY = React.useCallback(() => {
+    if (setPosition) setPosition(0.5, 0.5);
+  }, [setPosition]);
   const X = getPosition(dragX, width, H);
   const Y = getPosition(dragY, height, V);
   const RX = width - X - 1;
   const RY = height - Y - 1;
   const FULL = A !== undefined && A === D;
-  const AB = A !== undefined && A === B;
-  const AC = A !== undefined && A === C;
-  const BD = B !== undefined && B === D;
-  const CD = C !== undefined && C === D;
+  const AB = A !== undefined && (A === B);
+  const AC = A !== undefined && (A === C);
+  const BD = B !== undefined && (B === D);
+  const CD = C !== undefined && (C === D);
   //----------------------------------------
   // [ A ]
   //---------------------------------------
@@ -209,7 +282,7 @@ function QSplitEngine(props: QSplitEngineProps) {
     DISPLAY(layout, A, 0, width, 0, height);
   }
   //----------------------------------------
-  // [ A - CD ]
+  // [ A - C ]
   //---------------------------------------
   else if (AB && CD) {
     vsplit = VSPLIT(0, Y, width);
@@ -276,26 +349,41 @@ function QSplitEngine(props: QSplitEngineProps) {
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
   }
   //----------------------------------------
+  if (hsplit !== NODISPLAY && vsplit !== NODISPLAY)
+    hvsplit = { display: 'block', left: X, top: Y };
+  //----------------------------------------
   // Rendering
   //----------------------------------------
   return (
     <QSplitContext.Provider value={layout}>
-      <QSplitter
-        key='SPLIT-H'
+      <BSplitter
+        key='HSPLIT'
         hsplit={true}
         dragging={dragX}
         setDragging={setDragX}
         setPosition={setX}
         resetPosition={resetX}
-        style={hsplit} />
-      <QSplitter
-        key='SPLIT-V'
+        style={hsplit}
+      />
+      <BSplitter
+        key='VSPLIT'
         hsplit={false}
         dragging={dragY}
         setDragging={setDragY}
         setPosition={setY}
         resetPosition={resetY}
-        style={vsplit} />
+        style={vsplit}
+      />
+      <CSplitter
+        key='HVSPLIT'
+        dragX={dragX}
+        dragY={dragY}
+        setDragX={setDragX}
+        setDragY={setDragY}
+        setPosition={setXY}
+        resetPosition={resetXY}
+        style={hvsplit}
+      />
       {props.children}
     </QSplitContext.Provider>
   );
