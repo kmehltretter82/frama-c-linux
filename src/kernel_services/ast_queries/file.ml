@@ -445,6 +445,26 @@ let concat_strs ?(pre="") ?(sep=" ") l =
   if l = [] then ""
   else pre ^ (String.concat sep l)
 
+let adjust_pwd fp cpp_command =
+  if Kernel.JsonCompilationDatabase.is_set () then
+    (* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
+       no function in its stdlib to resolve symbolic links (e.g. realpath)
+       for a given path. 'getcwd' always resolves them, but if the user
+       supplies a path with symbolic links, this may cause issues.
+       Instead of forcing the user to always provide resolved paths, we
+       currently choose to never resolve them.
+       We only resort to getcwd() to avoid issues when PWD does not exist. *)
+    let cwd = try Unix.getenv "PWD" with Not_found -> Sys.getcwd () in
+    let dir =
+      match Json_compilation_database.get_dir fp with
+      | None -> cwd
+      | Some d -> (d:>string)
+    in
+    if cwd <> dir then
+      "cd " ^ dir ^ " && " ^ cpp_command
+    else cpp_command
+  else cpp_command
+
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra, is_gnu_like) ->
@@ -523,26 +543,7 @@ let build_cpp_cmd = function
         include_args define_args
     in
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
-    let cpp_command_with_chdir =
-      if Kernel.JsonCompilationDatabase.is_set () then
-        (* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
-           no function in its stdlib to resolve symbolic links (e.g. realpath)
-           for a given path. 'getcwd' always resolves them, but if the user
-           supplies a path with symbolic links, this may cause issues.
-           Instead of forcing the user to always provide resolved paths, we
-           currently choose to never resolve them.
-           We only resort to getcwd() to avoid issues when PWD does not exist. *)
-        let cwd = try Unix.getenv "PWD" with Not_found -> Sys.getcwd () in
-        let dir =
-          match Json_compilation_database.get_dir f with
-          | None -> cwd
-          | Some d -> (d:>string)
-        in
-        if cwd <> dir then
-          "cd " ^ dir ^ " && " ^ cpp_command
-        else cpp_command
-      else cpp_command
-    in
+    let cpp_command_with_chdir = adjust_pwd f cpp_command in
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
