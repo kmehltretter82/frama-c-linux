@@ -200,6 +200,11 @@ let find_candidate_enuminfo ?loc:_loc ei =
         Cil_datatype.Global.pretty g
   end else None
 
+let find_candidate_varinfo ?loc:_loc vi where =
+  try
+    Some (Globals.Vars.find_from_astinfo vi.vname where)
+  with Not_found -> None
+
 let is_same_opt f o o' =
   match o, o' with
   | None, None -> true
@@ -247,7 +252,22 @@ and is_same_enuminfo _ei _ei' = false
 and is_same_formal (_,t,a) (_,t',a') =
   is_same_type t t' && Cil_datatype.Attributes.equal a a'
 
+and is_same_compound_init (o,i) (o',i') =
+  is_same_offset o o' && is_same_init i i'
+
+and is_same_init i i' =
+  match i, i' with
+  | SingleInit e, SingleInit e' -> is_same_exp e e'
+  | CompoundInit (t,l), CompoundInit (t', l') ->
+    is_same_type t t' &&
+    Logic_utils.is_same_list is_same_compound_init l l'
+  | (SingleInit _ | CompoundInit _), _ -> false
+
+and is_same_initinfo i i' = is_same_opt is_same_init i.init i'.init
+
 and is_same_exp _e _e' = false
+
+and is_same_offset _o _o' = false
 
 and typeinfo_correspondance ?loc ti =
   let add ti =
@@ -276,9 +296,29 @@ and enuminfo_correspondance ?loc ei =
   in
   Enuminfo.memo add ei
 
+let gvar_correspondance ?loc vi =
+  let add vi =
+    match find_candidate_varinfo ?loc vi Cil_types.VGlobal with
+    | None -> `Not_present
+    | Some vi' ->
+      let selection = State_selection.singleton Globals.Vars.self in
+      let init =
+        Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
+      in
+      let init' = Globals.Vars.find vi' in
+      if is_same_initinfo init init' then `Same vi' else `Not_present
+  in
+  Varinfo.memo add vi
+
 let global_correspondance g =
   match g with
   | GType (ti,loc) -> ignore (typeinfo_correspondance ~loc ti)
+  | GCompTag(ci,loc) | GCompTagDecl(ci,loc) ->
+    ignore (compinfo_correspondance ~loc ci)
+  | GEnumTag(ei,loc) | GEnumTagDecl(ei,loc) ->
+    ignore (enuminfo_correspondance ~loc ei)
+  | GVar(vi,_,loc) | GVarDecl(vi,loc) ->
+    ignore (gvar_correspondance ~loc vi)
   | _ -> ()
 
 let compare_ast prj =
