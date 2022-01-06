@@ -40,6 +40,8 @@ type 'a correspondance =
 type kf_correspondance =
   [ kernel_function correspondance
   | `Same_spec of kernel_function (** body has changed, but spec is identical *)
+  | `Different_calls of kernel_function
+    (** body is identical, but there are calls to functions that have changed. *)
   ]
 
 (** varinfos correspondances *)
@@ -94,3 +96,6 @@ module Kernel_function:
 module Fundec:
   State_builder.Hashtbl
   with type key = fundec and type data = fundec correspondance
+
+(** [compare_ast prj] sets [prj] as the original project and fill the tables. *)
+val compare_ast: Project.t -> unit
