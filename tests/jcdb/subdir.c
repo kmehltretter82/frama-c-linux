@@ -9,5 +9,5 @@
 #include "__fc_builtin.h" // to check that Frama-C's libc is correctly included
 
 int main() {
-  return ONE + TWO;
+  return ONE + TWO + THREE;
 }
