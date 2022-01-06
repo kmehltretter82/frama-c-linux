@@ -228,8 +228,8 @@ let rec is_same_type t t' =
   | TNamed(t,a), TNamed(t',a') ->
     let correspondance = typeinfo_correspondance t in
     (match correspondance with
-      | `Not_present -> false
-      | `Same t'' -> Cil_datatype.Typeinfo.equal t' t'') &&
+     | `Not_present -> false
+     | `Same t'' -> Cil_datatype.Typeinfo.equal t' t'') &&
     Cil_datatype.Attributes.equal a a'
   | TComp(c,a), TComp(c', a') ->
     let correspondance = compinfo_correspondance c in
@@ -319,6 +319,8 @@ let global_correspondance g =
     ignore (enuminfo_correspondance ~loc ei)
   | GVar(vi,_,loc) | GVarDecl(vi,loc) ->
     ignore (gvar_correspondance ~loc vi)
+  | GFunDecl(_,_vi,_loc) -> ()
+  | GFun(_f,_loc) -> ()
   | _ -> ()
 
 let compare_ast prj =
