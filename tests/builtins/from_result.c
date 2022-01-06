@@ -1,8 +1,8 @@
 /* run.config*
-   OPT:  @EVA_CONFIG@ -eva-alloc-builtin fresh -deps
+   OPT:  -cpp-extra-args=-I@PTEST_SHARE_DIR@ @EVA_CONFIG@ -eva-alloc-builtin fresh -deps
 */
 
-#include "../../share/libc/stdlib.c"
+#include "libc/stdlib.c"
 
 struct T { int a; int b; };
 

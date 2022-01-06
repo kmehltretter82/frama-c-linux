@@ -1,9 +1,9 @@
 /* run.config
  PLUGIN: @EVA_PLUGINS@
    EXECNOW: BIN control_journal2.ml @frama-c@ -journal-enable -eva -deps -out -main f -journal-name @PTEST_RESULT@/control_journal2.ml @PTEST_FILE@ > @DEV_NULL@ 2> @DEV_NULL@
- SCRIPT: result/control_journal2
+ SCRIPT: @PTEST_RESULT@/control_journal2.ml
    EXECNOW: LOG control2_sav.res LOG control2_sav.err BIN control_journal_next2.ml @frama-c@ -journal-enable -lib-entry -journal-name @PTEST_RESULT@/control_journal_next2.ml @PTEST_FILE@ > @PTEST_RESULT@/control2_sav.res 2> @PTEST_RESULT@/control2_sav.err
- SCRIPT: result/control_journal_next2
+ SCRIPT: @PTEST_RESULT@/control_journal_next2.ml
    OPT:
 */
 int x,y,c,d;

@@ -1,4 +1,4 @@
 /* run.config
-  SCRIPT: with\ space/module
+ SCRIPT: @PTEST_DIR@/with\ space/module
    OPT:
  */

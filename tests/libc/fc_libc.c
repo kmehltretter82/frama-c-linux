@@ -1,7 +1,7 @@
 /* run.config*
  PLUGIN: @EVA_PLUGINS@ metrics
  MODULE: check_libc_naming_conventions, check_const
-   OPT: -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
+   OPT: -print -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' -metrics -metrics-libc -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
  MODULE:
    OPT: -print -print-libc -machdep x86_32
  MODULE: check_parsing_individual_headers
@@ -11,7 +11,7 @@
  MODULE: check_compliance
    OPT: -kernel-msg-key printer:attrs
  MODULE:
- CMD: %{dep:@PTEST_DIR@/check_full_libc.sh}
+ CMD: %{dep:@PTEST_DIR@/check_full_libc.sh} @PTEST_SHARE_DIR@/libc
    OPT:
 **/
 #define __FC_REG_TEST

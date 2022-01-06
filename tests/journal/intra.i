@@ -2,7 +2,7 @@
  PLUGIN: @EVA_PLUGINS@ sparecode
  MODULE: @PTEST_NAME@
    EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -journal-enable -journal-name @PTEST_RESULT@/intra_journal.ml @PTEST_FILE@ > @DEV_NULL@ 2> @DEV_NULL@
- SCRIPT: result/intra_journal
+ SCRIPT: @PTEST_RESULT@/intra_journal.ml
    OPT:
 */
 
