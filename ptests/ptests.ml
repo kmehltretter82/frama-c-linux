@@ -1979,7 +1979,7 @@ let do_filter =
         Format.sprintf "%s > %s 2> %s" filter_cmd log_file dev_null
       in
       if !verbosity >= 1
-      then lock_printf "%% launch Filter:@\n%s@." filter_cmd;
+      then lock_printf "%% launch FILTER:@\n%s@." filter_cmd;
       ignore (launch filter_cmd)
 
 let compare_one_file cmp log_prefix oracle_prefix log_kind =
