@@ -3,7 +3,7 @@
    STDOPT: +"-eva-precision=1"
 */
 
-#include "../utils/signalled.h"
+#include "utils/signalled.h"
 #include <stdio.h>
 #include <stdlib.h>
 

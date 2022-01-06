@@ -24,6 +24,12 @@
 Plugin WP <next-release>
 ########################
 
+- TIP         [2022-01-05] New tactic Clear: remove hypothesis
+-* WP         [2022-01-05] Fix loop invariant order
+- WP          [2022-01-05] Weaken check loop invariant
+- TIP         [2021-11-30] Extended Split tactic: can split in hypotheses, can
+                           split conjunctions into multiple hypotheses.
+- WP          [2021-11-08] Removed legacy WP engine and option -wp-legacy
 
 #########################
 Plugin WP 24.0 (Chromium)

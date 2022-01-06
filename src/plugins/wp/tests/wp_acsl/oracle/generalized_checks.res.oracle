@@ -151,8 +151,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'false_but_preserved' (file tests/wp_acsl/generalized_checks.i, line 70):
-Assume { Type: is_sint32(i). (* Then *) Have: i <= 9. }
-Prove: false.
+Prove: true.
 
 ------------------------------------------------------------
 

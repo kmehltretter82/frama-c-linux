@@ -1,8 +1,14 @@
 #!/bin/sh -eu
 
+# Script used by the test "fc_libc.c"
+
 errors=0
 
-cd share/libc
+if [ "$#" -ge 1 ] && [ -d "$1" ]; then
+    cd "$1"
+else
+    cd share/libc
+fi
 
 for A in *.h */*.h; do
     if ! grep -q $A ../../tests/libc/fc_libc.c

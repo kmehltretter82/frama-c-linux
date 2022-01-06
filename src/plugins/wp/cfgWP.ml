@@ -484,7 +484,7 @@ struct
 
   let add_axiom _id _l = ()
 
-  let add_hyp wenv (hpid,predicate) wp = in_wenv wenv wp
+  let add_hyp ?for_pid wenv (hpid,predicate) wp = in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
              ~severe:false ~effect:"Skip hypothesis"
@@ -493,7 +493,11 @@ struct
            | Warning.Result(warn,p) -> warn , [p]
            | Warning.Failed warn -> warn , []
          in
-         let vcs = gmap (assume_vc ~hpid ~warn hs) wp.vcs in
+         let assume_vc target vcs = match for_pid with
+           | Some id when not @@ PropId.equal id (TARGET.prop_id target) -> vcs
+           | _ -> Splitter.map (assume_vc ~hpid ~warn hs) vcs
+         in
+         let vcs = Gmap.mapi assume_vc wp.vcs in
          { wp with vcs = vcs })
 
   let add_goal wenv (gpid,predicate) wp = in_wenv wenv wp

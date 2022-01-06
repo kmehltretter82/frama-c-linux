@@ -15,10 +15,10 @@
 [wp] [Qed] Goal typed_max_subarray_loop_invariant_4_established : Valid
 [wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_5_preserved : Valid
 [wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_5_established : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_6_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_6_established : Valid
+[wp] [Qed] Goal typed_max_subarray_loop_invariant_6_preserved : Valid
+[wp] [Qed] Goal typed_max_subarray_loop_invariant_6_established : Valid
 [wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_7_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_7_established : Valid
+[wp] [Qed] Goal typed_max_subarray_loop_invariant_7_established : Valid
 [wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_8_preserved : Valid
 [wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_8_established : Valid
 [wp] [Qed] Goal typed_max_subarray_loop_assigns : Valid
@@ -26,11 +26,11 @@
 [wp] [Qed] Goal typed_max_subarray_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_max_subarray_loop_variant_positive : Valid
 [wp] Proved goals:   22 / 22
-  Qed:             9 
-  Alt-Ergo:       13
+  Qed:            12 
+  Alt-Ergo:       10
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  max_subarray              9       13       22       100%
+  max_subarray             12       10       22       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function max_subarray
@@ -41,5 +41,5 @@
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  max_subarray              9       14       23       100%
+  max_subarray             12       11       23       100%
 ------------------------------------------------------------

@@ -400,8 +400,11 @@ let loop_contract_pids kf stmt =
         | WpPropId.NoAssignsInfo | AssignsAny _ -> l
         | AssignsLocations (pid, _) -> pid :: l
       in
-      List.fold_right (fun (pid,_) l -> pid :: l) invs.loop_established @@
-      List.fold_right (fun (pid,_) l -> pid :: l) invs.loop_preserved @@
+      let verif_fold CfgAnnot.{ loop_est ; loop_ind } l =
+        let l = Option.fold ~none:l ~some:(fun i -> i :: l) loop_est in
+        Option.fold ~none:l ~some:(fun i -> i :: l) loop_ind
+      in
+      List.fold_right verif_fold invs.loop_invariants @@
       List.fold_right add_assigns invs.loop_assigns []
   | _ -> []
 

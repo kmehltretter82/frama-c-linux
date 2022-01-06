@@ -1,8 +1,8 @@
 {
   "sources": {
-    "tests/misc/audit.c": "01010101010101010101010101010101",
-    "tests/misc/audit_included.h": "c2cc488143a476f69cf2ed04c3439e6e",
-    "tests/misc/non_existing_file.h": "1234567890abcdef1234567890abcdef"
+    "PTEST_DIR/audit.c": "01010101010101010101010101010101",
+    "PTEST_DIR/audit_included.h": "c2cc488143a476f69cf2ed04c3439e6e",
+    "PTEST_DIR/non_existing_file.h": "1234567890abcdef1234567890abcdef"
   },
   "kernel": {
     "warning-categories": {

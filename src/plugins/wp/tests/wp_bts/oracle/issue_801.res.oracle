@@ -33,7 +33,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file tests/wp_bts/issue_801.i, line 14):
-Assume { Type: is_sint32(s). (* Then *) Have: s <= 9. }
-Prove: s <= 10.
+Prove: true.
 
 ------------------------------------------------------------

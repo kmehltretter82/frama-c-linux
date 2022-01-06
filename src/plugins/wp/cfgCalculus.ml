@@ -182,8 +182,8 @@ struct
         then W.add_assigns env.we ai w
         else w
 
-  let use_property env (p : WpPropId.pred_info) w =
-    if is_selected ~goal:false env p then W.add_hyp env.we p w else w
+  let use_property ?for_pid env (p : WpPropId.pred_info) w =
+    if is_selected ~goal:false env p then W.add_hyp ?for_pid env.we p w else w
 
   let prove_property env (p : WpPropId.pred_info) w =
     if is_selected ~goal:true env p then W.add_goal env.we p w else w
@@ -259,14 +259,37 @@ struct
       | None, _ | _, None -> w (* no terminates goal or nothing to prove *)
       | Some t, Some prop -> prove_subproperty env t prop s FromCode w
     in
+    let prove_invariant env pid pred w =
+      match pid with None -> w | Some pid -> prove_property env (pid, pred) w
+    in
+    let assume_invariant env (hyp: CfgAnnot.loop_hypothesis) pred ind w =
+      match hyp with
+      | NoHyp -> w
+      | Check pid -> use_property ?for_pid:ind env (pid, pred) w
+      | Always pid -> use_property env (pid, pred) w
+    in
+    let established env CfgAnnot.{ loop_hyp; loop_ind; loop_est; loop_pred } w =
+      prove_invariant env loop_est loop_pred @@
+      assume_invariant env loop_hyp loop_pred loop_ind w
+    in
+    let loop_current_hyp env CfgAnnot.{ loop_hyp ; loop_ind ; loop_pred } w =
+      assume_invariant env loop_hyp loop_pred loop_ind w
+    in
+    let preserved env CfgAnnot.{ loop_hyp ; loop_ind ; loop_pred } w =
+      prove_invariant env loop_ind loop_pred @@
+      begin match loop_hyp with
+        | CfgAnnot.Always pid -> use_property env (pid, loop_pred)
+        | _ -> Extlib.id (* we never assume this one for checks *)
+      end w
+    in
     insert_terminates @@
-    List.fold_right (prove_property env) lc.loop_established @@
+    List.fold_right (established env) lc.loop_invariants @@
     List.fold_right (use_assigns env) lc.loop_assigns @@
     W.label env.we None (Clabels.loop_current s) @@
-    List.fold_right (use_property env) lc.loop_invariants @@
+    List.fold_right (loop_current_hyp env) lc.loop_invariants @@
     List.fold_right (prove_property env) lc.loop_smoke @@
     let q =
-      List.fold_right (prove_property env) lc.loop_preserved @@
+      List.fold_right (preserved env) lc.loop_invariants @@
       List.fold_right (prove_assigns env) lc.loop_assigns @@
       W.empty in
     ( Vhash.replace env.wp a (Some q) ; successors env a )

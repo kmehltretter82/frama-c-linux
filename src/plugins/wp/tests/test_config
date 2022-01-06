@@ -1,3 +1,3 @@
 PLUGIN: wp
-CMD: @frama-c@ -wp -wp-prover none -wp-print -wp-share ./share -wp-msg-key shell -wp-warn-key "pedantic-assigns=inactive"
+CMD: @frama-c@ -wp -wp-prover none -wp-print -wp-share @PTEST_SHARE_DIR@ -wp-msg-key shell -wp-warn-key "pedantic-assigns=inactive"
 OPT:

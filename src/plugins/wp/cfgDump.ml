@@ -89,12 +89,17 @@ let new_env ?lvars kf : t_env = ignore lvars ; kf
 
 let add_axiom _p _l = ()
 
-let add_hyp _env (pid,pred) k =
+let add_hyp ?for_pid _env (pid,pred) k =
+  ignore(for_pid);
   let u = node () in
   if Wp_parameters.debug_atleast 1 then
-    Format.fprintf !out "  %a [ color=green , label=\"Assume %a\" ] ;@." pretty u Printer.pp_predicate pred
+    Format.fprintf !out "  %a [ color=green , label=\"Assume %a%a\"] ;@."
+      pretty u Printer.pp_predicate pred
+      (Pretty_utils.pp_opt ~pre:" for" WpPropId.pretty) for_pid
   else
-    Format.fprintf !out "  %a [ color=green , label=\"Assume %a\" ] ;@." pretty u WpPropId.pp_propid pid ;
+    Format.fprintf !out "  %a [ color=green , label=\"Assume %a%a\"] ;@."
+      pretty u WpPropId.pp_propid pid
+      (Pretty_utils.pp_opt ~pre:" for" WpPropId.pretty) for_pid ;
   link u k ; u
 
 let add_goal env (pid,pred) k =

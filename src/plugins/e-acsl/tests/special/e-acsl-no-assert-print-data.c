@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: test assertion failure without printing assertion data
-   LOG: gen_@PTEST_NAME@.c
+
    STDOPT: #"-e-acsl-no-assert-print-data"
 */
 /* run.config_dev
