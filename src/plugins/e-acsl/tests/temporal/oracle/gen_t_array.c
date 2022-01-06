@@ -51,7 +51,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(src[0])";
-    __gen_e_acsl_assert_data.file = "tests/temporal/t_array.c";
+    __gen_e_acsl_assert_data.file = "t_array.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 12;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -89,7 +89,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(src[1])";
-    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_array.c";
+    __gen_e_acsl_assert_data_2.file = "t_array.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 13;
     __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
@@ -127,7 +127,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "!\\valid(src[2])";
-    __gen_e_acsl_assert_data_3.file = "tests/temporal/t_array.c";
+    __gen_e_acsl_assert_data_3.file = "t_array.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 14;
     __e_acsl_assert(! __gen_e_acsl_and_3,& __gen_e_acsl_assert_data_3);

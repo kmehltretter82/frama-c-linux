@@ -33,7 +33,7 @@ void __gen_e_acsl_loop(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "global_i == 0";
-    __gen_e_acsl_assert_data.file = "tests/bts/bts1478.c";
+    __gen_e_acsl_assert_data.file = "bts1478.c";
     __gen_e_acsl_assert_data.fct = "loop";
     __gen_e_acsl_assert_data.line = 9;
     __e_acsl_assert(global_i == 0,& __gen_e_acsl_assert_data);
@@ -53,7 +53,7 @@ void __gen_e_acsl_loop(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Precondition";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(global_i_ptr)";
-    __gen_e_acsl_assert_data_2.file = "tests/bts/bts1478.c";
+    __gen_e_acsl_assert_data_2.file = "bts1478.c";
     __gen_e_acsl_assert_data_2.fct = "loop";
     __gen_e_acsl_assert_data_2.line = 10;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data_2);
@@ -67,7 +67,7 @@ void __gen_e_acsl_loop(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Precondition";
     __gen_e_acsl_assert_data_3.pred_txt = "global_i_ptr == &global_i";
-    __gen_e_acsl_assert_data_3.file = "tests/bts/bts1478.c";
+    __gen_e_acsl_assert_data_3.file = "bts1478.c";
     __gen_e_acsl_assert_data_3.fct = "loop";
     __gen_e_acsl_assert_data_3.line = 11;
     __e_acsl_assert(global_i_ptr == & global_i,& __gen_e_acsl_assert_data_3);

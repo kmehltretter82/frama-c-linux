@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/bitwise_idemp.i (no preprocessing)
+[kernel] Parsing bitwise_idemp.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function land
 ------------------------------------------------------------
 
-Goal Check 'A' (file tests/wp_acsl/bitwise_idemp.i, line 11):
+Goal Check 'A' (file bitwise_idemp.i, line 11):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(x).
   (* Goal *)
@@ -16,7 +16,7 @@ Prove: land(a, land(b, c)) = land(a, b).
 
 ------------------------------------------------------------
 
-Goal Check 'B' (file tests/wp_acsl/bitwise_idemp.i, line 12):
+Goal Check 'B' (file bitwise_idemp.i, line 12):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(x).
   (* Goal *)
@@ -29,7 +29,7 @@ Prove: land(a, land(b, c)) = land(a, b).
   Function lor
 ------------------------------------------------------------
 
-Goal Check 'A' (file tests/wp_acsl/bitwise_idemp.i, line 26):
+Goal Check 'A' (file bitwise_idemp.i, line 26):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(x).
   (* Goal *)
@@ -39,7 +39,7 @@ Prove: lor(a, lor(b, c)) = lor(a, b).
 
 ------------------------------------------------------------
 
-Goal Check 'B' (file tests/wp_acsl/bitwise_idemp.i, line 27):
+Goal Check 'B' (file bitwise_idemp.i, line 27):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(x).
   (* Goal *)
@@ -52,7 +52,7 @@ Prove: lor(a, lor(b, c)) = lor(a, b).
   Function lxor
 ------------------------------------------------------------
 
-Goal Check 'A' (file tests/wp_acsl/bitwise_idemp.i, line 40):
+Goal Check 'A' (file bitwise_idemp.i, line 40):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(e) /\
       is_sint32(x).
@@ -63,7 +63,7 @@ Prove: lxor(a, lxor(b, c)) = e.
 
 ------------------------------------------------------------
 
-Goal Check 'B' (file tests/wp_acsl/bitwise_idemp.i, line 41):
+Goal Check 'B' (file bitwise_idemp.i, line 41):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(e) /\
       is_sint32(x).

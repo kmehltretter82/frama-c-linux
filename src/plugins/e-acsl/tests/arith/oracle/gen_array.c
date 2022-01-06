@@ -39,7 +39,7 @@ void arrays(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "a != b";
-    __gen_e_acsl_assert_data.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data.file = "array.i";
     __gen_e_acsl_assert_data.fct = "arrays";
     __gen_e_acsl_assert_data.line = 21;
     __e_acsl_assert(__gen_e_acsl_ne,& __gen_e_acsl_assert_data);
@@ -70,7 +70,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "a == c";
-    __gen_e_acsl_assert_data_2.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_2.file = "array.i";
     __gen_e_acsl_assert_data_2.fct = "arrays";
     __gen_e_acsl_assert_data_2.line = 22;
     __e_acsl_assert(__gen_e_acsl_eq,& __gen_e_acsl_assert_data_2);
@@ -101,7 +101,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "a != d";
-    __gen_e_acsl_assert_data_3.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_3.file = "array.i";
     __gen_e_acsl_assert_data_3.fct = "arrays";
     __gen_e_acsl_assert_data_3.line = 23;
     __e_acsl_assert(__gen_e_acsl_ne_2,& __gen_e_acsl_assert_data_3);
@@ -124,7 +124,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "e != f";
-    __gen_e_acsl_assert_data_4.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_4.file = "array.i";
     __gen_e_acsl_assert_data_4.fct = "arrays";
     __gen_e_acsl_assert_data_4.line = 30;
     __e_acsl_assert(e != f,& __gen_e_acsl_assert_data_4);
@@ -139,7 +139,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "e != g";
-    __gen_e_acsl_assert_data_5.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_5.file = "array.i";
     __gen_e_acsl_assert_data_5.fct = "arrays";
     __gen_e_acsl_assert_data_5.line = 31;
     __e_acsl_assert(e != g,& __gen_e_acsl_assert_data_5);
@@ -154,7 +154,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "e == h";
-    __gen_e_acsl_assert_data_6.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_6.file = "array.i";
     __gen_e_acsl_assert_data_6.fct = "arrays";
     __gen_e_acsl_assert_data_6.line = 32;
     __e_acsl_assert(e == h,& __gen_e_acsl_assert_data_6);
@@ -170,7 +170,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
     __gen_e_acsl_assert_data_7.pred_txt = "e == (int *)a";
-    __gen_e_acsl_assert_data_7.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_7.file = "array.i";
     __gen_e_acsl_assert_data_7.fct = "arrays";
     __gen_e_acsl_assert_data_7.line = 36;
     __e_acsl_assert(e == a,& __gen_e_acsl_assert_data_7);
@@ -186,7 +186,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
     __gen_e_acsl_assert_data_8.pred_txt = "e != (int *)c";
-    __gen_e_acsl_assert_data_8.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_8.file = "array.i";
     __gen_e_acsl_assert_data_8.fct = "arrays";
     __gen_e_acsl_assert_data_8.line = 37;
     __e_acsl_assert(e != c,& __gen_e_acsl_assert_data_8);
@@ -223,7 +223,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_10.blocking = 1;
           __gen_e_acsl_assert_data_10.kind = "RTE";
           __gen_e_acsl_assert_data_10.pred_txt = "mem_access: \\valid_read(&(*((int (*)[3])g))[__gen_e_acsl_iter_4])";
-          __gen_e_acsl_assert_data_10.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_10.file = "array.i";
           __gen_e_acsl_assert_data_10.fct = "arrays";
           __gen_e_acsl_assert_data_10.line = 40;
           __e_acsl_assert(__gen_e_acsl_valid_read,
@@ -241,7 +241,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "a == *((int (*)[3])g)";
-    __gen_e_acsl_assert_data_9.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_9.file = "array.i";
     __gen_e_acsl_assert_data_9.fct = "arrays";
     __gen_e_acsl_assert_data_9.line = 40;
     __e_acsl_assert(__gen_e_acsl_eq_2,& __gen_e_acsl_assert_data_9);
@@ -276,7 +276,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "RTE";
     __gen_e_acsl_assert_data_12.pred_txt = "mem_access: \\valid_read((int *)*((int (*)[])g))";
-    __gen_e_acsl_assert_data_12.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_12.file = "array.i";
     __gen_e_acsl_assert_data_12.fct = "arrays";
     __gen_e_acsl_assert_data_12.line = 41;
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_12);
@@ -304,7 +304,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_13.blocking = 1;
           __gen_e_acsl_assert_data_13.kind = "RTE";
           __gen_e_acsl_assert_data_13.pred_txt = "mem_access: \\valid_read(&(*((int (*)[])g))[__gen_e_acsl_iter_5])";
-          __gen_e_acsl_assert_data_13.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_13.file = "array.i";
           __gen_e_acsl_assert_data_13.fct = "arrays";
           __gen_e_acsl_assert_data_13.line = 41;
           __e_acsl_assert(__gen_e_acsl_valid_read_3,
@@ -322,7 +322,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "Assertion";
     __gen_e_acsl_assert_data_11.pred_txt = "a == *((int (*)[])g)";
-    __gen_e_acsl_assert_data_11.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_11.file = "array.i";
     __gen_e_acsl_assert_data_11.fct = "arrays";
     __gen_e_acsl_assert_data_11.line = 41;
     __e_acsl_assert(__gen_e_acsl_eq_3,& __gen_e_acsl_assert_data_11);
@@ -359,7 +359,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_15.blocking = 1;
           __gen_e_acsl_assert_data_15.kind = "RTE";
           __gen_e_acsl_assert_data_15.pred_txt = "mem_access: \\valid_read(&(*((int (*)[3])f))[__gen_e_acsl_iter_6])";
-          __gen_e_acsl_assert_data_15.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_15.file = "array.i";
           __gen_e_acsl_assert_data_15.fct = "arrays";
           __gen_e_acsl_assert_data_15.line = 42;
           __e_acsl_assert(__gen_e_acsl_valid_read_4,
@@ -377,7 +377,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_14.blocking = 1;
     __gen_e_acsl_assert_data_14.kind = "Assertion";
     __gen_e_acsl_assert_data_14.pred_txt = "a != *((int (*)[3])f)";
-    __gen_e_acsl_assert_data_14.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_14.file = "array.i";
     __gen_e_acsl_assert_data_14.fct = "arrays";
     __gen_e_acsl_assert_data_14.line = 42;
     __e_acsl_assert(__gen_e_acsl_ne_3,& __gen_e_acsl_assert_data_14);
@@ -412,7 +412,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "RTE";
     __gen_e_acsl_assert_data_17.pred_txt = "mem_access: \\valid_read((int *)*((int (*)[])f))";
-    __gen_e_acsl_assert_data_17.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_17.file = "array.i";
     __gen_e_acsl_assert_data_17.fct = "arrays";
     __gen_e_acsl_assert_data_17.line = 43;
     __e_acsl_assert(__gen_e_acsl_valid_read_5,& __gen_e_acsl_assert_data_17);
@@ -440,7 +440,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_18.blocking = 1;
           __gen_e_acsl_assert_data_18.kind = "RTE";
           __gen_e_acsl_assert_data_18.pred_txt = "mem_access: \\valid_read(&(*((int (*)[])f))[__gen_e_acsl_iter_7])";
-          __gen_e_acsl_assert_data_18.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_18.file = "array.i";
           __gen_e_acsl_assert_data_18.fct = "arrays";
           __gen_e_acsl_assert_data_18.line = 43;
           __e_acsl_assert(__gen_e_acsl_valid_read_6,
@@ -458,7 +458,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
     __gen_e_acsl_assert_data_16.pred_txt = "a != *((int (*)[])f)";
-    __gen_e_acsl_assert_data_16.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_16.file = "array.i";
     __gen_e_acsl_assert_data_16.fct = "arrays";
     __gen_e_acsl_assert_data_16.line = 43;
     __e_acsl_assert(__gen_e_acsl_ne_4,& __gen_e_acsl_assert_data_16);
@@ -498,7 +498,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_19.blocking = 1;
     __gen_e_acsl_assert_data_19.kind = "Assertion";
     __gen_e_acsl_assert_data_19.pred_txt = "i != j";
-    __gen_e_acsl_assert_data_19.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_19.file = "array.i";
     __gen_e_acsl_assert_data_19.fct = "arrays";
     __gen_e_acsl_assert_data_19.line = 49;
     __e_acsl_assert(__gen_e_acsl_ne_5,& __gen_e_acsl_assert_data_19);
@@ -529,7 +529,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_20.blocking = 1;
     __gen_e_acsl_assert_data_20.kind = "Assertion";
     __gen_e_acsl_assert_data_20.pred_txt = "i != k";
-    __gen_e_acsl_assert_data_20.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_20.file = "array.i";
     __gen_e_acsl_assert_data_20.fct = "arrays";
     __gen_e_acsl_assert_data_20.line = 50;
     __e_acsl_assert(__gen_e_acsl_ne_6,& __gen_e_acsl_assert_data_20);
@@ -560,7 +560,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_21.blocking = 1;
     __gen_e_acsl_assert_data_21.kind = "Assertion";
     __gen_e_acsl_assert_data_21.pred_txt = "j != k";
-    __gen_e_acsl_assert_data_21.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_21.file = "array.i";
     __gen_e_acsl_assert_data_21.fct = "arrays";
     __gen_e_acsl_assert_data_21.line = 51;
     __e_acsl_assert(__gen_e_acsl_ne_7,& __gen_e_acsl_assert_data_21);
@@ -608,7 +608,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_23.blocking = 1;
           __gen_e_acsl_assert_data_23.kind = "RTE";
           __gen_e_acsl_assert_data_23.pred_txt = "mem_access: \\valid_read(&(*((int (*)[3])l))[__gen_e_acsl_iter_11])";
-          __gen_e_acsl_assert_data_23.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_23.file = "array.i";
           __gen_e_acsl_assert_data_23.fct = "arrays";
           __gen_e_acsl_assert_data_23.line = 55;
           __e_acsl_assert(__gen_e_acsl_valid_read_7,
@@ -628,7 +628,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_24.blocking = 1;
           __gen_e_acsl_assert_data_24.kind = "RTE";
           __gen_e_acsl_assert_data_24.pred_txt = "mem_access: \\valid_read(&(*((int (*)[3])m))[__gen_e_acsl_iter_11])";
-          __gen_e_acsl_assert_data_24.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_24.file = "array.i";
           __gen_e_acsl_assert_data_24.fct = "arrays";
           __gen_e_acsl_assert_data_24.line = 55;
           __e_acsl_assert(__gen_e_acsl_valid_read_8,
@@ -646,7 +646,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_22.blocking = 1;
     __gen_e_acsl_assert_data_22.kind = "Assertion";
     __gen_e_acsl_assert_data_22.pred_txt = "*((int (*)[3])l) != *((int (*)[3])m)";
-    __gen_e_acsl_assert_data_22.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_22.file = "array.i";
     __gen_e_acsl_assert_data_22.fct = "arrays";
     __gen_e_acsl_assert_data_22.line = 55;
     __e_acsl_assert(__gen_e_acsl_ne_8,& __gen_e_acsl_assert_data_22);
@@ -685,7 +685,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_26.blocking = 1;
           __gen_e_acsl_assert_data_26.kind = "RTE";
           __gen_e_acsl_assert_data_26.pred_txt = "mem_access: \\valid_read(&(*((int (*)[3])l))[__gen_e_acsl_iter_12])";
-          __gen_e_acsl_assert_data_26.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_26.file = "array.i";
           __gen_e_acsl_assert_data_26.fct = "arrays";
           __gen_e_acsl_assert_data_26.line = 56;
           __e_acsl_assert(__gen_e_acsl_valid_read_9,
@@ -705,7 +705,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_27.blocking = 1;
           __gen_e_acsl_assert_data_27.kind = "RTE";
           __gen_e_acsl_assert_data_27.pred_txt = "mem_access: \\valid_read(&(*((int (*)[3])n))[__gen_e_acsl_iter_12])";
-          __gen_e_acsl_assert_data_27.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_27.file = "array.i";
           __gen_e_acsl_assert_data_27.fct = "arrays";
           __gen_e_acsl_assert_data_27.line = 56;
           __e_acsl_assert(__gen_e_acsl_valid_read_10,
@@ -723,7 +723,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_25.blocking = 1;
     __gen_e_acsl_assert_data_25.kind = "Assertion";
     __gen_e_acsl_assert_data_25.pred_txt = "*((int (*)[3])l) == *((int (*)[3])n)";
-    __gen_e_acsl_assert_data_25.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_25.file = "array.i";
     __gen_e_acsl_assert_data_25.fct = "arrays";
     __gen_e_acsl_assert_data_25.line = 56;
     __e_acsl_assert(__gen_e_acsl_eq_4,& __gen_e_acsl_assert_data_25);
@@ -748,14 +748,14 @@ void arrays(void)
       __gen_e_acsl_assert_data_30.blocking = 1;
       __gen_e_acsl_assert_data_30.kind = "RTE";
       __gen_e_acsl_assert_data_30.pred_txt = "array_coercion: (int)3 <= (int)6";
-      __gen_e_acsl_assert_data_30.file = "tests/arith/array.i";
+      __gen_e_acsl_assert_data_30.file = "array.i";
       __gen_e_acsl_assert_data_30.fct = "arrays";
       __gen_e_acsl_assert_data_30.line = 59;
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_30);
       __gen_e_acsl_assert_data_29.blocking = 1;
       __gen_e_acsl_assert_data_29.kind = "RTE";
       __gen_e_acsl_assert_data_29.pred_txt = "array_coercion: (int)3 <= (int)6";
-      __gen_e_acsl_assert_data_29.file = "tests/arith/array.i";
+      __gen_e_acsl_assert_data_29.file = "array.i";
       __gen_e_acsl_assert_data_29.fct = "arrays";
       __gen_e_acsl_assert_data_29.line = 59;
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_29);
@@ -772,7 +772,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_28.blocking = 1;
     __gen_e_acsl_assert_data_28.kind = "Assertion";
     __gen_e_acsl_assert_data_28.pred_txt = "(int [3])i != (int [3])k";
-    __gen_e_acsl_assert_data_28.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_28.file = "array.i";
     __gen_e_acsl_assert_data_28.fct = "arrays";
     __gen_e_acsl_assert_data_28.line = 59;
     __e_acsl_assert(__gen_e_acsl_ne_9,& __gen_e_acsl_assert_data_28);
@@ -797,14 +797,14 @@ void arrays(void)
       __gen_e_acsl_assert_data_33.blocking = 1;
       __gen_e_acsl_assert_data_33.kind = "RTE";
       __gen_e_acsl_assert_data_33.pred_txt = "array_coercion: (int)3 <= (int)6";
-      __gen_e_acsl_assert_data_33.file = "tests/arith/array.i";
+      __gen_e_acsl_assert_data_33.file = "array.i";
       __gen_e_acsl_assert_data_33.fct = "arrays";
       __gen_e_acsl_assert_data_33.line = 60;
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_33);
       __gen_e_acsl_assert_data_32.blocking = 1;
       __gen_e_acsl_assert_data_32.kind = "RTE";
       __gen_e_acsl_assert_data_32.pred_txt = "array_coercion: (int)3 <= (int)6";
-      __gen_e_acsl_assert_data_32.file = "tests/arith/array.i";
+      __gen_e_acsl_assert_data_32.file = "array.i";
       __gen_e_acsl_assert_data_32.fct = "arrays";
       __gen_e_acsl_assert_data_32.line = 60;
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_32);
@@ -821,7 +821,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_31.blocking = 1;
     __gen_e_acsl_assert_data_31.kind = "Assertion";
     __gen_e_acsl_assert_data_31.pred_txt = "(int [3])j == (int [3])k";
-    __gen_e_acsl_assert_data_31.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_31.file = "array.i";
     __gen_e_acsl_assert_data_31.fct = "arrays";
     __gen_e_acsl_assert_data_31.line = 60;
     __e_acsl_assert(__gen_e_acsl_eq_5,& __gen_e_acsl_assert_data_31);
@@ -860,7 +860,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_35.blocking = 1;
           __gen_e_acsl_assert_data_35.kind = "RTE";
           __gen_e_acsl_assert_data_35.pred_txt = "mem_access: \\valid_read(&(*((int (*)[2])l))[__gen_e_acsl_iter_15])";
-          __gen_e_acsl_assert_data_35.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_35.file = "array.i";
           __gen_e_acsl_assert_data_35.fct = "arrays";
           __gen_e_acsl_assert_data_35.line = 61;
           __e_acsl_assert(__gen_e_acsl_valid_read_11,
@@ -880,7 +880,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_36.blocking = 1;
           __gen_e_acsl_assert_data_36.kind = "RTE";
           __gen_e_acsl_assert_data_36.pred_txt = "mem_access: \\valid_read(&(*((int (*)[2])m))[__gen_e_acsl_iter_15])";
-          __gen_e_acsl_assert_data_36.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_36.file = "array.i";
           __gen_e_acsl_assert_data_36.fct = "arrays";
           __gen_e_acsl_assert_data_36.line = 61;
           __e_acsl_assert(__gen_e_acsl_valid_read_12,
@@ -898,7 +898,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_34.blocking = 1;
     __gen_e_acsl_assert_data_34.kind = "Assertion";
     __gen_e_acsl_assert_data_34.pred_txt = "*((int (*)[2])l) != *((int (*)[2])m)";
-    __gen_e_acsl_assert_data_34.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_34.file = "array.i";
     __gen_e_acsl_assert_data_34.fct = "arrays";
     __gen_e_acsl_assert_data_34.line = 61;
     __e_acsl_assert(__gen_e_acsl_ne_10,& __gen_e_acsl_assert_data_34);
@@ -937,7 +937,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_38.blocking = 1;
           __gen_e_acsl_assert_data_38.kind = "RTE";
           __gen_e_acsl_assert_data_38.pred_txt = "mem_access: \\valid_read(&(*((int (*)[2])l))[__gen_e_acsl_iter_16])";
-          __gen_e_acsl_assert_data_38.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_38.file = "array.i";
           __gen_e_acsl_assert_data_38.fct = "arrays";
           __gen_e_acsl_assert_data_38.line = 62;
           __e_acsl_assert(__gen_e_acsl_valid_read_13,
@@ -957,7 +957,7 @@ void arrays(void)
           __gen_e_acsl_assert_data_39.blocking = 1;
           __gen_e_acsl_assert_data_39.kind = "RTE";
           __gen_e_acsl_assert_data_39.pred_txt = "mem_access: \\valid_read(&(*((int (*)[2])n))[__gen_e_acsl_iter_16])";
-          __gen_e_acsl_assert_data_39.file = "tests/arith/array.i";
+          __gen_e_acsl_assert_data_39.file = "array.i";
           __gen_e_acsl_assert_data_39.fct = "arrays";
           __gen_e_acsl_assert_data_39.line = 62;
           __e_acsl_assert(__gen_e_acsl_valid_read_14,
@@ -975,7 +975,7 @@ void arrays(void)
     __gen_e_acsl_assert_data_37.blocking = 1;
     __gen_e_acsl_assert_data_37.kind = "Assertion";
     __gen_e_acsl_assert_data_37.pred_txt = "*((int (*)[2])l) == *((int (*)[2])n)";
-    __gen_e_acsl_assert_data_37.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_37.file = "array.i";
     __gen_e_acsl_assert_data_37.fct = "arrays";
     __gen_e_acsl_assert_data_37.line = 62;
     __e_acsl_assert(__gen_e_acsl_eq_6,& __gen_e_acsl_assert_data_37);
@@ -1025,7 +1025,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "T1[0] == T2[0]";
-    __gen_e_acsl_assert_data.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data.file = "array.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 110;
     __e_acsl_assert(T1[0] == T2[0],& __gen_e_acsl_assert_data);
@@ -1042,7 +1042,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "T1[1] != T2[1]";
-    __gen_e_acsl_assert_data_2.file = "tests/arith/array.i";
+    __gen_e_acsl_assert_data_2.file = "array.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 111;
     __e_acsl_assert(T1[1] != T2[1],& __gen_e_acsl_assert_data_2);

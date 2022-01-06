@@ -1,47 +1,47 @@
-[kernel] Parsing tests/float/contract_special_float.c (with preprocessing)
+[kernel] Parsing contract_special_float.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva:alarm] tests/float/contract_special_float.c:91: Warning: 
+[eva:alarm] contract_special_float.c:91: Warning: 
   non-finite double value. assert \is_finite(v);
 [eva] computing for function fun <- main.
-  Called from tests/float/contract_special_float.c:92.
+  Called from contract_special_float.c:92.
 [eva] using specification for function fun
-[eva:alarm] tests/float/contract_special_float.c:92: Warning: 
+[eva:alarm] contract_special_float.c:92: Warning: 
   function fun: precondition 'domain_arg' got status unknown.
 [eva] Done for function fun
-[eva:alarm] tests/float/contract_special_float.c:93: Warning: 
+[eva:alarm] contract_special_float.c:93: Warning: 
   non-finite double value. assert \is_finite(v);
 [eva] computing for function fun_no_default <- main.
-  Called from tests/float/contract_special_float.c:94.
+  Called from contract_special_float.c:94.
 [eva] using specification for function fun_no_default
-[eva:alarm] tests/float/contract_special_float.c:94: Warning: 
+[eva:alarm] contract_special_float.c:94: Warning: 
   function fun_no_default: precondition 'domain_arg' got status unknown.
 [eva] Done for function fun_no_default
-[eva:alarm] tests/float/contract_special_float.c:95: Warning: 
+[eva:alarm] contract_special_float.c:95: Warning: 
   non-finite double value. assert \is_finite(v);
 [eva] computing for function fun_no_disjoint <- main.
-  Called from tests/float/contract_special_float.c:96.
+  Called from contract_special_float.c:96.
 [eva] using specification for function fun_no_disjoint
-[eva:alarm] tests/float/contract_special_float.c:96: Warning: 
+[eva:alarm] contract_special_float.c:96: Warning: 
   function fun_no_disjoint: precondition 'not_negative' got status unknown.
-[eva:alarm] tests/float/contract_special_float.c:96: Warning: 
+[eva:alarm] contract_special_float.c:96: Warning: 
   function fun_no_disjoint: precondition 'not_infinite' got status unknown.
-[eva] tests/float/contract_special_float.c:96: 
+[eva] contract_special_float.c:96: 
   function fun_no_disjoint: precondition 'not_nan' got status valid.
 [eva] Done for function fun_no_disjoint
-[eva:alarm] tests/float/contract_special_float.c:97: Warning: 
+[eva:alarm] contract_special_float.c:97: Warning: 
   non-finite double value. assert \is_finite(v);
 [eva] computing for function fun_no_complete <- main.
-  Called from tests/float/contract_special_float.c:98.
+  Called from contract_special_float.c:98.
 [eva] using specification for function fun_no_complete
-[eva:alarm] tests/float/contract_special_float.c:98: Warning: 
+[eva:alarm] contract_special_float.c:98: Warning: 
   function fun_no_complete: precondition 'not_negative' got status unknown.
-[eva:alarm] tests/float/contract_special_float.c:98: Warning: 
+[eva:alarm] contract_special_float.c:98: Warning: 
   function fun_no_complete: precondition 'not_infinite' got status unknown.
-[eva] tests/float/contract_special_float.c:98: 
+[eva] contract_special_float.c:98: 
   function fun_no_complete: precondition 'not_nan' got status valid.
 [eva] Done for function fun_no_complete
 [eva] Recording results for main

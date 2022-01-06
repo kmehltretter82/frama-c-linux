@@ -17,7 +17,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\'c\' == \'c\'";
-    __gen_e_acsl_assert_data.file = "tests/memory/other_constants.i";
+    __gen_e_acsl_assert_data.file = "other_constants.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 10;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data);
@@ -29,7 +29,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "false != true";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/other_constants.i";
+    __gen_e_acsl_assert_data_2.file = "other_constants.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 11;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_2);

@@ -44,7 +44,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "n == 1";
-    __gen_e_acsl_assert_data.file = "tests/bts/bts1324.i";
+    __gen_e_acsl_assert_data.file = "bts1324.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 23;
     __e_acsl_assert(n == 1,& __gen_e_acsl_assert_data);
@@ -91,7 +91,7 @@ int __gen_e_acsl_sorted(int *t, int n)
         __gen_e_acsl_assert_data.blocking = 1;
         __gen_e_acsl_assert_data.kind = "RTE";
         __gen_e_acsl_assert_data.pred_txt = "mem_access: \\valid_read(t + __gen_e_acsl_i)";
-        __gen_e_acsl_assert_data.file = "tests/bts/bts1324.i";
+        __gen_e_acsl_assert_data.file = "bts1324.i";
         __gen_e_acsl_assert_data.fct = "sorted";
         __gen_e_acsl_assert_data.line = 6;
         __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
@@ -112,7 +112,7 @@ int __gen_e_acsl_sorted(int *t, int n)
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "RTE";
         __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(t + (long)(__gen_e_acsl_i - 1))";
-        __gen_e_acsl_assert_data_2.file = "tests/bts/bts1324.i";
+        __gen_e_acsl_assert_data_2.file = "bts1324.i";
         __gen_e_acsl_assert_data_2.fct = "sorted";
         __gen_e_acsl_assert_data_2.line = 6;
         __e_acsl_assert(__gen_e_acsl_valid_read_2,
@@ -143,7 +143,7 @@ int __gen_e_acsl_sorted(int *t, int n)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Postcondition";
       __gen_e_acsl_assert_data_3.pred_txt = "yes: \\result == 1";
-      __gen_e_acsl_assert_data_3.file = "tests/bts/bts1324.i";
+      __gen_e_acsl_assert_data_3.file = "bts1324.i";
       __gen_e_acsl_assert_data_3.fct = "sorted";
       __gen_e_acsl_assert_data_3.line = 7;
       __e_acsl_assert(__retres == 1,& __gen_e_acsl_assert_data_3);

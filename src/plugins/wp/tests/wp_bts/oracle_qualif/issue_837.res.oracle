@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_bts/issue_837.c (with preprocessing)
+[kernel] Parsing issue_837.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 9 goals scheduled

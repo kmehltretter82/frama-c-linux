@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/cast1.i (no preprocessing)
+[kernel] Parsing cast1.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,8 +9,8 @@
    [1..4] ∈ {0}
   I[0] ∈ {1}
    [1..4] ∈ {0}
-[eva] tests/value/cast1.i:7: starting to merge loop iterations
-[eva] tests/value/cast1.i:8: starting to merge loop iterations
+[eva] cast1.i:7: starting to merge loop iterations
+[eva] cast1.i:8: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

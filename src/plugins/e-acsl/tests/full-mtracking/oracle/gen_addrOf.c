@@ -31,7 +31,7 @@ void f(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\initialized(p)";
-    __gen_e_acsl_assert_data.file = "tests/full-mtracking/addrOf.i";
+    __gen_e_acsl_assert_data.file = "addrOf.i";
     __gen_e_acsl_assert_data.fct = "f";
     __gen_e_acsl_assert_data.line = 10;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
@@ -80,7 +80,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "&x == &x";
-    __gen_e_acsl_assert_data.file = "tests/full-mtracking/addrOf.i";
+    __gen_e_acsl_assert_data.file = "addrOf.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 16;
     __e_acsl_assert(& x == & x,& __gen_e_acsl_assert_data);

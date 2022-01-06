@@ -1,27 +1,27 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/checks.i (no preprocessing)
+[kernel] Parsing checks.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function main
 ------------------------------------------------------------
 
-Goal Check 'c1' (file tests/wp_acsl/checks.i, line 14):
+Goal Check 'c1' (file checks.i, line 14):
 Prove: P_P.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a1' (file tests/wp_acsl/checks.i, line 15):
+Goal Assertion 'a1' (file checks.i, line 15):
 Prove: P_P.
 
 ------------------------------------------------------------
 
-Goal Check 'c2' (file tests/wp_acsl/checks.i, line 16):
+Goal Check 'c2' (file checks.i, line 16):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a2' (file tests/wp_acsl/checks.i, line 17):
+Goal Assertion 'a2' (file checks.i, line 17):
 Prove: true.
 
 ------------------------------------------------------------
@@ -30,12 +30,10 @@ Prove: true.
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/wp_acsl/checks.i:14: Warning: check 'c1' got status unknown.
-[eva:alarm] tests/wp_acsl/checks.i:15: Warning: 
-  assertion 'a1' got status unknown.
-[eva:alarm] tests/wp_acsl/checks.i:16: Warning: check 'c2' got status unknown.
-[eva:alarm] tests/wp_acsl/checks.i:17: Warning: 
-  assertion 'a2' got status unknown.
+[eva:alarm] checks.i:14: Warning: check 'c1' got status unknown.
+[eva:alarm] checks.i:15: Warning: assertion 'a1' got status unknown.
+[eva:alarm] checks.i:16: Warning: check 'c2' got status unknown.
+[eva:alarm] checks.i:17: Warning: assertion 'a2' got status unknown.
 [eva] done for function main
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
@@ -67,16 +65,16 @@ Prove: true.
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Check 'c1' (file tests/wp_acsl/checks.i, line 14)
+[    -    ] Check 'c1' (file checks.i, line 14)
             tried with Eva.
-[    -    ] Assertion 'a1' (file tests/wp_acsl/checks.i, line 15)
+[    -    ] Assertion 'a1' (file checks.i, line 15)
             tried with Eva.
-[ Partial ] Check 'c2' (file tests/wp_acsl/checks.i, line 16)
+[ Partial ] Check 'c2' (file checks.i, line 16)
             By RedundantAlarms, with pending:
-             - Assertion 'a1' (file tests/wp_acsl/checks.i, line 15)
-[ Partial ] Assertion 'a2' (file tests/wp_acsl/checks.i, line 17)
+             - Assertion 'a1' (file checks.i, line 15)
+[ Partial ] Assertion 'a2' (file checks.i, line 17)
             By RedundantAlarms, with pending:
-             - Assertion 'a1' (file tests/wp_acsl/checks.i, line 15)
+             - Assertion 'a1' (file checks.i, line 15)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary

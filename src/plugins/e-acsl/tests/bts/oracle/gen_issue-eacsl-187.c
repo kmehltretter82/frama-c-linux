@@ -23,7 +23,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "p(2)";
-    __gen_e_acsl_assert_data.file = "tests/bts/issue-eacsl-187.c";
+    __gen_e_acsl_assert_data.file = "issue-eacsl-187.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 4;
     __e_acsl_assert(__gen_e_acsl_p_2,& __gen_e_acsl_assert_data);

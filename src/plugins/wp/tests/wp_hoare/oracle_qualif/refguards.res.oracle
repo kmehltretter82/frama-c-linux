@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_hoare/refguards.i (no preprocessing)
+[kernel] Parsing refguards.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 9 goals scheduled
@@ -22,7 +22,7 @@
   h                         1        -        1       100%
   s                         5        -        6      83.3%
 ------------------------------------------------------------
-[wp] tests/wp_hoare/refguards.i:10: Warning: 
+[wp] refguards.i:10: Warning: 
   Memory model hypotheses for function 'f':
   /*@
      behavior wp_typed_ref:
@@ -31,7 +31,7 @@
        requires \separated(c, d, {a + (..), b + (..)});
      */
   void f(int *a, int *b, int *c, int *d, int k);
-[wp] tests/wp_hoare/refguards.i:25: Warning: 
+[wp] refguards.i:25: Warning: 
   Memory model hypotheses for function 'h':
   /*@
      behavior wp_typed_ref:
@@ -40,7 +40,7 @@
        requires \separated(c, d);
      */
   void h(int *c, int *d, int k);
-[wp] tests/wp_hoare/refguards.i:39: Warning: 
+[wp] refguards.i:39: Warning: 
   Memory model hypotheses for function 's':
   /*@
      behavior wp_typed_ref:

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/wstring_phase6.c (with preprocessing)
+[kernel] Parsing wstring_phase6.c (with preprocessing)
 [kernel] Constant "%s\n" location: Start line 9, char 8; End line 9, char 14
 [kernel] Constant "123456" location: Start line 9, char 16; End line 9, char 27
 [kernel] Constant "%ls\n" location: Start line 10, char 8; End line 10, char 15

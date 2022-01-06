@@ -17,7 +17,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "x < y";
-    __gen_e_acsl_assert_data.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data.file = "comparison.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 7;
     __e_acsl_assert(x < y,& __gen_e_acsl_assert_data);
@@ -32,7 +32,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "y > x";
-    __gen_e_acsl_assert_data_2.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_2.file = "comparison.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 8;
     __e_acsl_assert(y > x,& __gen_e_acsl_assert_data_2);
@@ -46,7 +46,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "x <= 0";
-    __gen_e_acsl_assert_data_3.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_3.file = "comparison.i";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 9;
     __e_acsl_assert(x <= 0,& __gen_e_acsl_assert_data_3);
@@ -60,7 +60,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "y >= 1";
-    __gen_e_acsl_assert_data_4.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_4.file = "comparison.i";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 10;
     __e_acsl_assert(y >= 1,& __gen_e_acsl_assert_data_4);
@@ -76,7 +76,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "s == s";
-    __gen_e_acsl_assert_data_5.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_5.file = "comparison.i";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 12;
     __e_acsl_assert(s == s,& __gen_e_acsl_assert_data_5);
@@ -89,7 +89,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "5 < 18";
-    __gen_e_acsl_assert_data_6.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_6.file = "comparison.i";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 15;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_6);
@@ -101,7 +101,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
     __gen_e_acsl_assert_data_7.pred_txt = "32 > 3";
-    __gen_e_acsl_assert_data_7.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_7.file = "comparison.i";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 16;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_7);
@@ -113,7 +113,7 @@ int main(void)
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
     __gen_e_acsl_assert_data_8.pred_txt = "12 <= 13";
-    __gen_e_acsl_assert_data_8.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_8.file = "comparison.i";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 17;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_8);
@@ -125,7 +125,7 @@ int main(void)
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "123 >= 12";
-    __gen_e_acsl_assert_data_9.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_9.file = "comparison.i";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 18;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_9);
@@ -137,7 +137,7 @@ int main(void)
     __gen_e_acsl_assert_data_10.blocking = 1;
     __gen_e_acsl_assert_data_10.kind = "Assertion";
     __gen_e_acsl_assert_data_10.pred_txt = "0xff == 0xff";
-    __gen_e_acsl_assert_data_10.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_10.file = "comparison.i";
     __gen_e_acsl_assert_data_10.fct = "main";
     __gen_e_acsl_assert_data_10.line = 19;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_10);
@@ -149,7 +149,7 @@ int main(void)
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "Assertion";
     __gen_e_acsl_assert_data_11.pred_txt = "1 != 2";
-    __gen_e_acsl_assert_data_11.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_11.file = "comparison.i";
     __gen_e_acsl_assert_data_11.fct = "main";
     __gen_e_acsl_assert_data_11.line = 20;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_11);
@@ -161,7 +161,7 @@ int main(void)
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "Assertion";
     __gen_e_acsl_assert_data_12.pred_txt = "-5 < 18";
-    __gen_e_acsl_assert_data_12.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_12.file = "comparison.i";
     __gen_e_acsl_assert_data_12.fct = "main";
     __gen_e_acsl_assert_data_12.line = 22;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_12);
@@ -173,7 +173,7 @@ int main(void)
     __gen_e_acsl_assert_data_13.blocking = 1;
     __gen_e_acsl_assert_data_13.kind = "Assertion";
     __gen_e_acsl_assert_data_13.pred_txt = "32 > -3";
-    __gen_e_acsl_assert_data_13.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_13.file = "comparison.i";
     __gen_e_acsl_assert_data_13.fct = "main";
     __gen_e_acsl_assert_data_13.line = 23;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_13);
@@ -185,7 +185,7 @@ int main(void)
     __gen_e_acsl_assert_data_14.blocking = 1;
     __gen_e_acsl_assert_data_14.kind = "Assertion";
     __gen_e_acsl_assert_data_14.pred_txt = "-12 <= 13";
-    __gen_e_acsl_assert_data_14.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_14.file = "comparison.i";
     __gen_e_acsl_assert_data_14.fct = "main";
     __gen_e_acsl_assert_data_14.line = 24;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_14);
@@ -197,7 +197,7 @@ int main(void)
     __gen_e_acsl_assert_data_15.blocking = 1;
     __gen_e_acsl_assert_data_15.kind = "Assertion";
     __gen_e_acsl_assert_data_15.pred_txt = "123 >= -12";
-    __gen_e_acsl_assert_data_15.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_15.file = "comparison.i";
     __gen_e_acsl_assert_data_15.fct = "main";
     __gen_e_acsl_assert_data_15.line = 25;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_15);
@@ -209,7 +209,7 @@ int main(void)
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
     __gen_e_acsl_assert_data_16.pred_txt = "-0xff == -0xff";
-    __gen_e_acsl_assert_data_16.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_16.file = "comparison.i";
     __gen_e_acsl_assert_data_16.fct = "main";
     __gen_e_acsl_assert_data_16.line = 26;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_16);
@@ -221,7 +221,7 @@ int main(void)
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "Assertion";
     __gen_e_acsl_assert_data_17.pred_txt = "1 != -2";
-    __gen_e_acsl_assert_data_17.file = "tests/arith/comparison.i";
+    __gen_e_acsl_assert_data_17.file = "comparison.i";
     __gen_e_acsl_assert_data_17.fct = "main";
     __gen_e_acsl_assert_data_17.line = 27;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_17);

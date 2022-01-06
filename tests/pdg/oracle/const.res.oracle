@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/const.i (no preprocessing)
+[kernel] Parsing const.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -10,13 +10,13 @@
   G5.M3 ∈ {{ &G2 }}
     .M4 ∈ {{ &G3 }}
 [eva] computing for function F2 <- main.
-  Called from tests/pdg/const.i:39.
+  Called from const.i:39.
 [eva] Recording results for F2
 [from] Computing for function F2
 [from] Done for function F2
 [eva] Done for function F2
 [eva] computing for function F1 <- main.
-  Called from tests/pdg/const.i:41.
+  Called from const.i:41.
 [eva] Recording results for F1
 [from] Computing for function F1
 [from] Done for function F1
@@ -56,10 +56,10 @@
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to F2 at tests/pdg/const.i:39 (by main):
+[from] call to F2 at const.i:39 (by main):
   G1.M1 FROM G4; f2
   \result FROM \nothing
-[from] call to F1 at tests/pdg/const.i:41 (by main):
+[from] call to F1 at const.i:41 (by main):
   G3.M2 FROM G2.M2; f1; G5
 [from] entry point:
   G1.M1 FROM G4

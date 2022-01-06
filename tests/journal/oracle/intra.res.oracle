@@ -1,4 +1,4 @@
-[kernel] Parsing tests/journal/intra.i (no preprocessing)
+[kernel] Parsing intra.i (no preprocessing)
 [sparecode] remove unused code...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -8,49 +8,49 @@
   X10 ∈ {0}
   Y10 ∈ {0}
 [eva] computing for function param <- main.
-  Called from tests/journal/intra.i:81.
+  Called from intra.i:81.
 [eva] Recording results for param
 [eva] Done for function param
 [eva] computing for function tmp <- main.
-  Called from tests/journal/intra.i:82.
-[eva] tests/journal/intra.i:20: assertion got status valid.
-[eva] tests/journal/intra.i:22: assertion got status valid.
+  Called from intra.i:82.
+[eva] intra.i:20: assertion got status valid.
+[eva] intra.i:22: assertion got status valid.
 [eva] Recording results for tmp
 [eva] Done for function tmp
 [eva] computing for function spare_called_fct <- main.
-  Called from tests/journal/intra.i:83.
+  Called from intra.i:83.
 [eva] Recording results for spare_called_fct
 [eva] Done for function spare_called_fct
 [eva] computing for function call_two_outputs <- main.
-  Called from tests/journal/intra.i:84.
+  Called from intra.i:84.
 [eva] computing for function two_outputs <- call_two_outputs <- main.
-  Called from tests/journal/intra.i:48.
+  Called from intra.i:48.
 [eva] Recording results for two_outputs
 [eva] Done for function two_outputs
 [eva] computing for function two_outputs <- call_two_outputs <- main.
-  Called from tests/journal/intra.i:52.
+  Called from intra.i:52.
 [eva] Recording results for two_outputs
 [eva] Done for function two_outputs
 [eva] Recording results for call_two_outputs
 [eva] Done for function call_two_outputs
 [eva] computing for function loop <- main.
-  Called from tests/journal/intra.i:85.
-[eva] tests/journal/intra.i:63: assertion got status valid.
-[eva] tests/journal/intra.i:64: loop invariant got status valid.
-[eva] tests/journal/intra.i:66: starting to merge loop iterations
+  Called from intra.i:85.
+[eva] intra.i:63: assertion got status valid.
+[eva] intra.i:64: loop invariant got status valid.
+[eva] intra.i:66: starting to merge loop iterations
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] computing for function assign <- main.
-  Called from tests/journal/intra.i:86.
+  Called from intra.i:86.
 [eva] Recording results for assign
 [eva] Done for function assign
 [eva] computing for function assign <- main.
-  Called from tests/journal/intra.i:87.
+  Called from intra.i:87.
 [eva] Recording results for assign
 [eva] Done for function assign
 [eva] computing for function stop <- main.
-  Called from tests/journal/intra.i:90.
-[kernel:annot:missing-spec] tests/journal/intra.i:90: Warning: 
+  Called from intra.i:90.
+[kernel:annot:missing-spec] intra.i:90: Warning: 
   Neither code nor specification for function stop, generating default assigns from the prototype
 [eva] using specification for function stop
 [eva] Done for function stop

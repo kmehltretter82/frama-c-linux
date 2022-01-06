@@ -1,4 +1,4 @@
-[kernel] Parsing tests/bts/issue-eacsl-145.c (with preprocessing)
+[kernel] Parsing issue-eacsl-145.c (with preprocessing)
 [e-acsl] beginning translation.
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
 [e-acsl] translation done in project "e-acsl".
@@ -20,12 +20,12 @@
 [eva] using specification for function __e_acsl_full_init
 [eva] using specification for function __e_acsl_assert_register_ptr
 [eva] using specification for function __e_acsl_assert_register_ulong
-[eva:alarm] tests/bts/issue-eacsl-145.c:9: Warning: 
+[eva:alarm] issue-eacsl-145.c:9: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
 [eva] using specification for function __e_acsl_valid
 [eva] using specification for function __e_acsl_assert_register_int
-[eva:alarm] tests/bts/issue-eacsl-145.c:9: Warning: 
+[eva:alarm] issue-eacsl-145.c:9: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva] using specification for function __e_acsl_assert

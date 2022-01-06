@@ -134,7 +134,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "g1 == \\null || \\valid(g1)";
-    __gen_e_acsl_assert_data.file = "tests/temporal/t_getenv.c";
+    __gen_e_acsl_assert_data.file = "t_getenv.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 13;
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
@@ -178,7 +178,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "g2 == \\null || \\valid(g2)";
-    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_getenv.c";
+    __gen_e_acsl_assert_data_2.file = "t_getenv.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 14;
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data_2);

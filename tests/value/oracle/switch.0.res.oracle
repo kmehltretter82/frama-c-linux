@@ -1,5 +1,5 @@
-[kernel] Parsing tests/value/switch.i (no preprocessing)
-[kernel] tests/value/switch.i:52: 
+[kernel] Parsing switch.i (no preprocessing)
+[kernel] switch.i:52: 
   Case label 0xFFFFFFFF exceeds range of long for switch expression. Nothing to worry.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -10,7 +10,7 @@
   result4 ∈ {0}
   result2 ∈ {7}
   d2 ∈ {0}
-[eva] tests/value/switch.i:29: Frama_C_show_each_F: {0}
+[eva] switch.i:29: Frama_C_show_each_F: {0}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

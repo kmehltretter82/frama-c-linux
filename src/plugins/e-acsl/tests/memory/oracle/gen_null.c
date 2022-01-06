@@ -13,7 +13,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\null == (void *)0";
-    __gen_e_acsl_assert_data.file = "tests/memory/null.i";
+    __gen_e_acsl_assert_data.file = "null.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 6;
     __e_acsl_assert((void *)0 == (void *)0,& __gen_e_acsl_assert_data);

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/semaphore.i (no preprocessing)
+[kernel] Parsing semaphore.i (no preprocessing)
 [eva] Analyzing a complete application starting at g
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,53 +6,53 @@
   Sa ∈ {0}
   Sb ∈ {0}
 [eva] computing for function V <- g.
-  Called from tests/value/semaphore.i:31.
-[kernel:annot:missing-spec] tests/value/semaphore.i:31: Warning: 
+  Called from semaphore.i:31.
+[kernel:annot:missing-spec] semaphore.i:31: Warning: 
   Neither code nor specification for function V, generating default assigns from the prototype
 [eva] using specification for function V
 [eva] Done for function V
-[eva] tests/value/semaphore.i:29: starting to merge loop iterations
+[eva] semaphore.i:29: starting to merge loop iterations
 [eva] computing for function V <- g.
-  Called from tests/value/semaphore.i:31.
+  Called from semaphore.i:31.
 [eva] Done for function V
 [eva] computing for function V <- g.
-  Called from tests/value/semaphore.i:31.
+  Called from semaphore.i:31.
 [eva] Done for function V
 [eva] computing for function V <- g.
-  Called from tests/value/semaphore.i:31.
+  Called from semaphore.i:31.
 [eva] Done for function V
-[eva] tests/value/semaphore.i:28: starting to merge loop iterations
+[eva] semaphore.i:28: starting to merge loop iterations
 [eva] computing for function P <- g.
-  Called from tests/value/semaphore.i:34.
-[kernel:annot:missing-spec] tests/value/semaphore.i:34: Warning: 
+  Called from semaphore.i:34.
+[kernel:annot:missing-spec] semaphore.i:34: Warning: 
   Neither code nor specification for function P, generating default assigns from the prototype
 [eva] using specification for function P
 [eva] Done for function P
 [eva] computing for function P <- g.
-  Called from tests/value/semaphore.i:35.
+  Called from semaphore.i:35.
 [eva] Done for function P
 [eva] computing for function V <- g.
-  Called from tests/value/semaphore.i:37.
+  Called from semaphore.i:37.
 [eva] Done for function V
 [eva] computing for function V <- g.
-  Called from tests/value/semaphore.i:38.
+  Called from semaphore.i:38.
 [eva] Done for function V
 [eva] computing for function f <- g.
-  Called from tests/value/semaphore.i:40.
+  Called from semaphore.i:40.
 [eva] computing for function P <- f <- g.
-  Called from tests/value/semaphore.i:14.
+  Called from semaphore.i:14.
 [eva] Done for function P
 [eva] computing for function P <- f <- g.
-  Called from tests/value/semaphore.i:16.
+  Called from semaphore.i:16.
 [eva] Done for function P
 [eva] computing for function P <- f <- g.
-  Called from tests/value/semaphore.i:17.
+  Called from semaphore.i:17.
 [eva] Done for function P
 [eva] computing for function V <- f <- g.
-  Called from tests/value/semaphore.i:19.
+  Called from semaphore.i:19.
 [eva] Done for function V
 [eva] computing for function V <- f <- g.
-  Called from tests/value/semaphore.i:20.
+  Called from semaphore.i:20.
 [eva] Done for function V
 [eva] Recording results for f
 [eva] Done for function f

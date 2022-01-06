@@ -1,46 +1,45 @@
-[kernel] Parsing tests/value/equality.c (with preprocessing)
+[kernel] Parsing equality.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   rand ∈ [--..--]
 [eva] computing for function replace_lvalue <- main.
-  Called from tests/value/equality.c:62.
+  Called from equality.c:62.
 [eva] Recording results for replace_lvalue
 [eva] Done for function replace_lvalue
 [eva] computing for function assign_by_copy <- main.
-  Called from tests/value/equality.c:63.
+  Called from equality.c:63.
 [eva] computing for function Frama_C_interval <- assign_by_copy <- main.
-  Called from tests/value/equality.c:40.
+  Called from equality.c:40.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/equality.c:40: 
+[eva] equality.c:40: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/equality.c:44: Warning: 
+[eva:alarm] equality.c:44: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
 [eva] Recording results for assign_by_copy
 [eva] Done for function assign_by_copy
 [eva] computing for function symbolic <- main.
-  Called from tests/value/equality.c:64.
+  Called from equality.c:64.
 [eva] computing for function Frama_C_float_interval <- symbolic <- main.
-  Called from tests/value/equality.c:52.
+  Called from equality.c:52.
 [eva] using specification for function Frama_C_float_interval
-[eva] tests/value/equality.c:52: 
+[eva] equality.c:52: 
   function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] tests/value/equality.c:52: 
+[eva] equality.c:52: 
   function Frama_C_float_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] computing for function Frama_C_float_interval <- symbolic <- main.
-  Called from tests/value/equality.c:53.
-[eva] tests/value/equality.c:53: 
+  Called from equality.c:53.
+[eva] equality.c:53: 
   function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] tests/value/equality.c:53: 
+[eva] equality.c:53: 
   function Frama_C_float_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
-[eva] tests/value/equality.c:57: Call to builtin sqrtf
-[eva] tests/value/equality.c:57: 
-  function sqrtf: precondition 'finite_arg' got status valid.
-[eva:alarm] tests/value/equality.c:57: Warning: 
+[eva] equality.c:57: Call to builtin sqrtf
+[eva] equality.c:57: function sqrtf: precondition 'finite_arg' got status valid.
+[eva:alarm] equality.c:57: Warning: 
   function sqrtf: precondition 'arg_positive' got status unknown.
 [eva] Recording results for symbolic
 [eva] Done for function symbolic

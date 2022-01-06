@@ -41,7 +41,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "A + (long)((long)(3 * A) - 1) == -1";
-    __gen_e_acsl_assert_data.file = "tests/bts/bts2231.i";
+    __gen_e_acsl_assert_data.file = "bts2231.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 8;
     __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data);

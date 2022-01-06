@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_gallery/frama_c_exo1_solved.c (with preprocessing)
+[kernel] Parsing frama_c_exo1_solved.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 10 goals scheduled

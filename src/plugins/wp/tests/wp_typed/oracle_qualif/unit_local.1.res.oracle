@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Raw)' [...]
-[kernel] Parsing tests/wp_typed/unit_local.c (with preprocessing)
+[kernel] Parsing unit_local.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 3 goals scheduled

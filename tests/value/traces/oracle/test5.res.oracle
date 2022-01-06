@@ -1,5 +1,5 @@
-[kernel] Parsing tests/value/traces/test5.i (no preprocessing)
-[kernel:typing:implicit-function-declaration] tests/value/traces/test5.i:21: Warning: 
+[kernel] Parsing test5.i (no preprocessing)
+[kernel:typing:implicit-function-declaration] test5.i:21: Warning: 
   Calling undeclared function my_switch. Old style K&R code?
 [eva:experimental] Warning: The traces domain is experimental.
 [eva] Analyzing a complete application starting at main
@@ -8,98 +8,98 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
-[kernel:annot:missing-spec] tests/value/traces/test5.i:21: Warning: 
+  Called from test5.i:21.
+[kernel:annot:missing-spec] test5.i:21: Warning: 
   Neither code nor specification for function my_switch, generating default assigns from the prototype
 [eva] using specification for function my_switch
 [eva] Done for function my_switch
-[eva:alarm] tests/value/traces/test5.i:21: Warning: 
+[eva:alarm] test5.i:21: Warning: 
   signed overflow.
   assert tmp_0 + tmp ≤ 2147483647;
   (tmp_0 from my_switch(tmp))
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
-[eva:alarm] tests/value/traces/test5.i:21: Warning: 
+[eva:alarm] test5.i:21: Warning: 
   signed overflow.
   assert -2147483648 ≤ tmp_0 + tmp;
   (tmp_0 from my_switch(tmp))
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
-[eva] tests/value/traces/test5.i:20: starting to merge loop iterations
+[eva] test5.i:20: starting to merge loop iterations
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
-[eva] Done for function my_switch
-[eva] tests/value/traces/test5.i:19: starting to merge loop iterations
-[eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
+[eva] Done for function my_switch
+[eva] test5.i:19: starting to merge loop iterations
+[eva] computing for function my_switch <- main.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] computing for function my_switch <- main.
-  Called from tests/value/traces/test5.i:21.
+  Called from test5.i:21.
+[eva] Done for function my_switch
+[eva] computing for function my_switch <- main.
+  Called from test5.i:21.
 [eva] Done for function my_switch
 [eva] Recording results for main
 [eva] done for function main

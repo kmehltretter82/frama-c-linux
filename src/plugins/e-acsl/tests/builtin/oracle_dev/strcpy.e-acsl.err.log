@@ -1,27 +1,27 @@
-TEST 1: OK: Expected execution at tests/builtin/strcpy.c:58
-TEST 2: OK: Expected execution at tests/builtin/strcpy.c:59
+TEST 1: OK: Expected execution at strcpy.c:58
+TEST 2: OK: Expected execution at strcpy.c:59
 strlen: insufficient space in destination string, at least 5 bytes required
-TEST 3: OK: Expected signal at tests/builtin/strcpy.c:60
+TEST 3: OK: Expected signal at strcpy.c:60
 strlen: destination string space unallocated or cannot be written
-TEST 4: OK: Expected signal at tests/builtin/strcpy.c:61
+TEST 4: OK: Expected signal at strcpy.c:61
 strlen: destination string space unallocated or cannot be written
-TEST 5: OK: Expected signal at tests/builtin/strcpy.c:62
-TEST 6: OK: Expected execution at tests/builtin/strcpy.c:63
+TEST 5: OK: Expected signal at strcpy.c:62
+TEST 6: OK: Expected execution at strcpy.c:63
 strcpy: overlapping memory areas
-TEST 7: OK: Expected signal at tests/builtin/strcpy.c:64
-TEST 8: OK: Expected execution at tests/builtin/strcpy.c:65
+TEST 7: OK: Expected signal at strcpy.c:64
+TEST 8: OK: Expected execution at strcpy.c:65
 strcpy: overlapping memory areas
-TEST 9: OK: Expected signal at tests/builtin/strcpy.c:66
-TEST 10: OK: Expected execution at tests/builtin/strcpy.c:69
+TEST 9: OK: Expected signal at strcpy.c:66
+TEST 10: OK: Expected execution at strcpy.c:69
 strncpy: insufficient space in destination string , at least 6 bytes required
-TEST 11: OK: Expected signal at tests/builtin/strcpy.c:70
+TEST 11: OK: Expected signal at strcpy.c:70
 strncpy: destination string  space unallocated or cannot be written
-TEST 12: OK: Expected signal at tests/builtin/strcpy.c:71
+TEST 12: OK: Expected signal at strcpy.c:71
 strncpy: destination string  space unallocated or cannot be written
-TEST 13: OK: Expected signal at tests/builtin/strcpy.c:72
-TEST 14: OK: Expected execution at tests/builtin/strcpy.c:73
+TEST 13: OK: Expected signal at strcpy.c:72
+TEST 14: OK: Expected execution at strcpy.c:73
 strncpy: overlapping memory areas
-TEST 15: OK: Expected signal at tests/builtin/strcpy.c:74
-TEST 16: OK: Expected execution at tests/builtin/strcpy.c:75
+TEST 15: OK: Expected signal at strcpy.c:74
+TEST 16: OK: Expected execution at strcpy.c:75
 strncpy: overlapping memory areas
-TEST 17: OK: Expected signal at tests/builtin/strcpy.c:76
+TEST 17: OK: Expected signal at strcpy.c:76

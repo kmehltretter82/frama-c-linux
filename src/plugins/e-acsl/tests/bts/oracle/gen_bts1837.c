@@ -30,7 +30,7 @@ int f(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid_read(S)";
-    __gen_e_acsl_assert_data.file = "tests/bts/bts1837.i";
+    __gen_e_acsl_assert_data.file = "bts1837.i";
     __gen_e_acsl_assert_data.fct = "f";
     __gen_e_acsl_assert_data.line = 11;
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
@@ -70,7 +70,7 @@ int f(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(s1)";
-    __gen_e_acsl_assert_data_2.file = "tests/bts/bts1837.i";
+    __gen_e_acsl_assert_data_2.file = "bts1837.i";
     __gen_e_acsl_assert_data_2.fct = "f";
     __gen_e_acsl_assert_data_2.line = 12;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
@@ -110,7 +110,7 @@ int f(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(s2)";
-    __gen_e_acsl_assert_data_3.file = "tests/bts/bts1837.i";
+    __gen_e_acsl_assert_data_3.file = "bts1837.i";
     __gen_e_acsl_assert_data_3.fct = "f";
     __gen_e_acsl_assert_data_3.line = 13;
     __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_3);
@@ -202,7 +202,7 @@ int main(void)
         __gen_e_acsl_assert_data.blocking = 1;
         __gen_e_acsl_assert_data.kind = "Assertion";
         __gen_e_acsl_assert_data.pred_txt = "\\valid_read(s)";
-        __gen_e_acsl_assert_data.file = "tests/bts/bts1837.i";
+        __gen_e_acsl_assert_data.file = "bts1837.i";
         __gen_e_acsl_assert_data.fct = "main";
         __gen_e_acsl_assert_data.line = 21;
         __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -239,7 +239,7 @@ int main(void)
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "Assertion";
         __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(s)";
-        __gen_e_acsl_assert_data_2.file = "tests/bts/bts1837.i";
+        __gen_e_acsl_assert_data_2.file = "bts1837.i";
         __gen_e_acsl_assert_data_2.fct = "main";
         __gen_e_acsl_assert_data_2.line = 22;
         __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);

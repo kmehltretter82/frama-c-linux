@@ -22,7 +22,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "x == 1";
-    __gen_e_acsl_assert_data.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data.file = "stmt_contract.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 8;
     __e_acsl_assert(x == 1,& __gen_e_acsl_assert_data);
@@ -40,7 +40,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Postcondition";
     __gen_e_acsl_assert_data_2.pred_txt = "x == 2";
-    __gen_e_acsl_assert_data_2.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_2.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 11;
     __e_acsl_assert(x == 2,& __gen_e_acsl_assert_data_2);
@@ -51,7 +51,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Postcondition";
     __gen_e_acsl_assert_data_3.pred_txt = "y == 2";
-    __gen_e_acsl_assert_data_3.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_3.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 12;
     __e_acsl_assert(y == 2,& __gen_e_acsl_assert_data_3);
@@ -67,7 +67,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Postcondition";
     __gen_e_acsl_assert_data_4.pred_txt = "x == 2 && y == 2";
-    __gen_e_acsl_assert_data_4.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_4.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 13;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_4);
@@ -80,7 +80,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Precondition";
     __gen_e_acsl_assert_data_5.pred_txt = "x == 2";
-    __gen_e_acsl_assert_data_5.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_5.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 17;
     __e_acsl_assert(x == 2,& __gen_e_acsl_assert_data_5);
@@ -95,7 +95,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Precondition";
     __gen_e_acsl_assert_data_6.pred_txt = "x == 3";
-    __gen_e_acsl_assert_data_6.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_6.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 20;
     __e_acsl_assert(x == 3,& __gen_e_acsl_assert_data_6);
@@ -106,7 +106,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Precondition";
     __gen_e_acsl_assert_data_7.pred_txt = "y == 2";
-    __gen_e_acsl_assert_data_7.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_7.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 21;
     __e_acsl_assert(y == 2,& __gen_e_acsl_assert_data_7);
@@ -133,7 +133,7 @@ int main(void)
         __gen_e_acsl_assert_data_8.blocking = 1;
         __gen_e_acsl_assert_data_8.kind = "Precondition";
         __gen_e_acsl_assert_data_8.pred_txt = "b1: x == 5";
-        __gen_e_acsl_assert_data_8.file = "tests/constructs/stmt_contract.i";
+        __gen_e_acsl_assert_data_8.file = "stmt_contract.i";
         __gen_e_acsl_assert_data_8.fct = "main";
         __gen_e_acsl_assert_data_8.line = 25;
         __e_acsl_assert(x == 5,& __gen_e_acsl_assert_data_8);
@@ -152,7 +152,7 @@ int main(void)
         __gen_e_acsl_assert_data_10.blocking = 1;
         __gen_e_acsl_assert_data_10.kind = "Precondition";
         __gen_e_acsl_assert_data_10.pred_txt = "b2: y == 2";
-        __gen_e_acsl_assert_data_10.file = "tests/constructs/stmt_contract.i";
+        __gen_e_acsl_assert_data_10.file = "stmt_contract.i";
         __gen_e_acsl_assert_data_10.fct = "main";
         __gen_e_acsl_assert_data_10.line = 29;
         __e_acsl_assert(y == 2,& __gen_e_acsl_assert_data_10);
@@ -160,7 +160,7 @@ int main(void)
         __gen_e_acsl_assert_data_9.blocking = 1;
         __gen_e_acsl_assert_data_9.kind = "Precondition";
         __gen_e_acsl_assert_data_9.pred_txt = "b2: x == 3 + y";
-        __gen_e_acsl_assert_data_9.file = "tests/constructs/stmt_contract.i";
+        __gen_e_acsl_assert_data_9.file = "stmt_contract.i";
         __gen_e_acsl_assert_data_9.fct = "main";
         __gen_e_acsl_assert_data_9.line = 28;
         __e_acsl_assert((long)x == 3L + y,& __gen_e_acsl_assert_data_9);
@@ -186,7 +186,7 @@ int main(void)
       __gen_e_acsl_assert_data_11.blocking = 1;
       __gen_e_acsl_assert_data_11.kind = "Postcondition";
       __gen_e_acsl_assert_data_11.pred_txt = "b1: x == 3";
-      __gen_e_acsl_assert_data_11.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_11.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_11.fct = "main";
       __gen_e_acsl_assert_data_11.line = 26;
       __e_acsl_assert(x == 3,& __gen_e_acsl_assert_data_11);
@@ -202,7 +202,7 @@ int main(void)
       __gen_e_acsl_assert_data_12.blocking = 1;
       __gen_e_acsl_assert_data_12.kind = "Postcondition";
       __gen_e_acsl_assert_data_12.pred_txt = "b2: x == y + 1";
-      __gen_e_acsl_assert_data_12.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_12.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_12.fct = "main";
       __gen_e_acsl_assert_data_12.line = 30;
       __e_acsl_assert((long)x == y + 1L,& __gen_e_acsl_assert_data_12);
@@ -228,7 +228,7 @@ int main(void)
       __gen_e_acsl_assert_data_13.blocking = 1;
       __gen_e_acsl_assert_data_13.kind = "Precondition";
       __gen_e_acsl_assert_data_13.pred_txt = "b1: x == 0";
-      __gen_e_acsl_assert_data_13.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_13.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_13.fct = "main";
       __gen_e_acsl_assert_data_13.line = 35;
       __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data_13);
@@ -247,7 +247,7 @@ int main(void)
       __gen_e_acsl_assert_data_15.blocking = 1;
       __gen_e_acsl_assert_data_15.kind = "Precondition";
       __gen_e_acsl_assert_data_15.pred_txt = "b2: x + y == 5";
-      __gen_e_acsl_assert_data_15.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_15.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_15.fct = "main";
       __gen_e_acsl_assert_data_15.line = 40;
       __e_acsl_assert(x + (long)y == 5L,& __gen_e_acsl_assert_data_15);
@@ -255,7 +255,7 @@ int main(void)
       __gen_e_acsl_assert_data_14.blocking = 1;
       __gen_e_acsl_assert_data_14.kind = "Precondition";
       __gen_e_acsl_assert_data_14.pred_txt = "b2: x == 3";
-      __gen_e_acsl_assert_data_14.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_14.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_14.fct = "main";
       __gen_e_acsl_assert_data_14.line = 39;
       __e_acsl_assert(x == 3,& __gen_e_acsl_assert_data_14);
@@ -281,7 +281,7 @@ int main(void)
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Precondition";
     __gen_e_acsl_assert_data_16.pred_txt = "x == 5";
-    __gen_e_acsl_assert_data_16.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_16.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_16.fct = "main";
     __gen_e_acsl_assert_data_16.line = 43;
     __e_acsl_assert(x == 5,& __gen_e_acsl_assert_data_16);
@@ -296,7 +296,7 @@ int main(void)
       __gen_e_acsl_assert_data_17.blocking = 1;
       __gen_e_acsl_assert_data_17.kind = "Precondition";
       __gen_e_acsl_assert_data_17.pred_txt = "y == 2";
-      __gen_e_acsl_assert_data_17.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_17.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_17.fct = "main";
       __gen_e_acsl_assert_data_17.line = 44;
       __e_acsl_assert(y == 2,& __gen_e_acsl_assert_data_17);
@@ -316,7 +316,7 @@ int main(void)
       __gen_e_acsl_assert_data_18.blocking = 1;
       __gen_e_acsl_assert_data_18.kind = "Precondition";
       __gen_e_acsl_assert_data_18.pred_txt = "x > -1000";
-      __gen_e_acsl_assert_data_18.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_18.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_18.fct = "main";
       __gen_e_acsl_assert_data_18.line = 49;
       __e_acsl_assert(x > -1000,& __gen_e_acsl_assert_data_18);
@@ -341,7 +341,7 @@ int main(void)
         __gen_e_acsl_assert_data_19.blocking = 1;
         __gen_e_acsl_assert_data_19.kind = "Precondition";
         __gen_e_acsl_assert_data_19.pred_txt = "all behaviors complete";
-        __gen_e_acsl_assert_data_19.file = "tests/constructs/stmt_contract.i";
+        __gen_e_acsl_assert_data_19.file = "stmt_contract.i";
         __gen_e_acsl_assert_data_19.fct = "main";
         __gen_e_acsl_assert_data_19.line = 64;
         __e_acsl_assert(__gen_e_acsl_active_bhvrs >= 1,
@@ -350,7 +350,7 @@ int main(void)
         __gen_e_acsl_assert_data_20.blocking = 1;
         __gen_e_acsl_assert_data_20.kind = "Precondition";
         __gen_e_acsl_assert_data_20.pred_txt = "all behaviors disjoint";
-        __gen_e_acsl_assert_data_20.file = "tests/constructs/stmt_contract.i";
+        __gen_e_acsl_assert_data_20.file = "stmt_contract.i";
         __gen_e_acsl_assert_data_20.fct = "main";
         __gen_e_acsl_assert_data_20.line = 64;
         __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,
@@ -380,7 +380,7 @@ int main(void)
     __gen_e_acsl_assert_data_21.blocking = 1;
     __gen_e_acsl_assert_data_21.kind = "Postcondition";
     __gen_e_acsl_assert_data_21.pred_txt = "z >= 0";
-    __gen_e_acsl_assert_data_21.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_21.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_21.fct = "main";
     __gen_e_acsl_assert_data_21.line = 51;
     __e_acsl_assert(z >= 0,& __gen_e_acsl_assert_data_21);
@@ -395,7 +395,7 @@ int main(void)
       __gen_e_acsl_assert_data_22.blocking = 1;
       __gen_e_acsl_assert_data_22.kind = "Postcondition";
       __gen_e_acsl_assert_data_22.pred_txt = "pos: z == x";
-      __gen_e_acsl_assert_data_22.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_22.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_22.fct = "main";
       __gen_e_acsl_assert_data_22.line = 55;
       __e_acsl_assert(z == x,& __gen_e_acsl_assert_data_22);
@@ -411,7 +411,7 @@ int main(void)
       __gen_e_acsl_assert_data_23.blocking = 1;
       __gen_e_acsl_assert_data_23.kind = "Postcondition";
       __gen_e_acsl_assert_data_23.pred_txt = "neg: z == -x";
-      __gen_e_acsl_assert_data_23.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_23.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_23.fct = "main";
       __gen_e_acsl_assert_data_23.line = 59;
       __e_acsl_assert((long)z == - ((long)x),& __gen_e_acsl_assert_data_23);
@@ -427,7 +427,7 @@ int main(void)
       __gen_e_acsl_assert_data_24.blocking = 1;
       __gen_e_acsl_assert_data_24.kind = "Precondition";
       __gen_e_acsl_assert_data_24.pred_txt = "x == 7";
-      __gen_e_acsl_assert_data_24.file = "tests/constructs/stmt_contract.i";
+      __gen_e_acsl_assert_data_24.file = "stmt_contract.i";
       __gen_e_acsl_assert_data_24.fct = "main";
       __gen_e_acsl_assert_data_24.line = 70;
       __e_acsl_assert(x == 7,& __gen_e_acsl_assert_data_24);
@@ -445,7 +445,7 @@ int main(void)
     __gen_e_acsl_assert_data_25.blocking = 1;
     __gen_e_acsl_assert_data_25.kind = "Postcondition";
     __gen_e_acsl_assert_data_25.pred_txt = "x == 7";
-    __gen_e_acsl_assert_data_25.file = "tests/constructs/stmt_contract.i";
+    __gen_e_acsl_assert_data_25.file = "stmt_contract.i";
     __gen_e_acsl_assert_data_25.fct = "main";
     __gen_e_acsl_assert_data_25.line = 71;
     __e_acsl_assert(x == 7,& __gen_e_acsl_assert_data_25);

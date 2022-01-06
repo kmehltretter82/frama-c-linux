@@ -1,5 +1,5 @@
 # frama-c -wp -wp-rte -warn-unsigned-overflow [...]
-[kernel] Parsing tests/wp_gallery/binary-multiplication-without-overflow.c (with preprocessing)
+[kernel] Parsing binary-multiplication-without-overflow.c (with preprocessing)
 [wp] Running WP plugin...
 [rte] annotating function BinaryMultiplication
 [wp] Goal typed_lemma_half : not tried

@@ -1,45 +1,45 @@
-[kernel] Parsing tests/value/noreturn.i (no preprocessing)
+[kernel] Parsing noreturn.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] computing for function warn_may_never_end <- main.
-  Called from tests/value/noreturn.i:26.
+  Called from noreturn.i:26.
 [eva] Recording results for warn_may_never_end
 [eva] Done for function warn_may_never_end
 [eva] computing for function warn_may_never_end <- main.
-  Called from tests/value/noreturn.i:27.
+  Called from noreturn.i:27.
 [eva] Recording results for warn_may_never_end
 [eva] Done for function warn_may_never_end
 [eva] computing for function warn_never_ends <- main.
-  Called from tests/value/noreturn.i:28.
+  Called from noreturn.i:28.
 [eva] Recording results for warn_never_ends
 [eva] Done for function warn_never_ends
 [eva] computing for function stop <- main.
-  Called from tests/value/noreturn.i:29.
-[kernel:annot:missing-spec] tests/value/noreturn.i:29: Warning: 
+  Called from noreturn.i:29.
+[kernel:annot:missing-spec] noreturn.i:29: Warning: 
   Neither code nor specification for function stop, generating default assigns from the prototype
 [eva] using specification for function stop
 [eva] Done for function stop
 [eva] computing for function haltme <- main.
-  Called from tests/value/noreturn.i:30.
-[kernel:annot:missing-spec] tests/value/noreturn.i:30: Warning: 
+  Called from noreturn.i:30.
+[kernel:annot:missing-spec] noreturn.i:30: Warning: 
   Neither code nor specification for function haltme, generating default assigns from the prototype
 [eva] using specification for function haltme
 [eva] Done for function haltme
 [eva] computing for function never_ends <- main.
-  Called from tests/value/noreturn.i:31.
+  Called from noreturn.i:31.
 [eva] Recording results for never_ends
 [eva] Done for function never_ends
 [eva] computing for function should_never_end <- main.
-  Called from tests/value/noreturn.i:32.
+  Called from noreturn.i:32.
 [eva] Recording results for should_never_end
-[eva] tests/value/noreturn.i:13: Warning: 
+[eva] noreturn.i:13: Warning: 
   function should_never_end may terminate but has the noreturn attribute
 [eva] Done for function should_never_end
 [eva] computing for function should_never_end <- main.
-  Called from tests/value/noreturn.i:33.
+  Called from noreturn.i:33.
 [eva] Recording results for should_never_end
 [eva] Done for function should_never_end
 [eva] Recording results for main

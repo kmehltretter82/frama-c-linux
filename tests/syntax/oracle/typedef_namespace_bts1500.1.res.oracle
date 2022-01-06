@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/typedef_namespace_bts1500.c (with preprocessing)
-[kernel] tests/syntax/typedef_namespace_bts1500.c:21: 
+[kernel] Parsing typedef_namespace_bts1500.c (with preprocessing)
+[kernel] typedef_namespace_bts1500.c:21: 
   syntax error:
   Location: between lines 21 and 24, before or at token: y
   19    int main () {

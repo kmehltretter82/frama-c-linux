@@ -1,5 +1,5 @@
-[kernel] Parsing tests/ltl/test_boucle.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] tests/ltl/test_boucle.c:16: Warning: 
+[kernel] Parsing test_boucle.c (with preprocessing)
+[kernel:typing:implicit-function-declaration] test_boucle.c:16: Warning: 
   Calling undeclared function call_to_an_undefined_function. Old style K&R code?
 [kernel] Parsing TMPDIR/aorai_test_boucle_0.i (no preprocessing)
 [wp] Warning: Missing RTE guards

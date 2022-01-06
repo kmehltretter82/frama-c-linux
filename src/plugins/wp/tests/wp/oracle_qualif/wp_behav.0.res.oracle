@@ -1,8 +1,8 @@
 # frama-c -wp -wp-timeout 1 [...]
-[kernel] Parsing tests/wp/wp_behav.c (with preprocessing)
+[kernel] Parsing wp_behav.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp/wp_behav.c:82: Warning: 
+[wp] wp_behav.c:82: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 19 goals scheduled
 [wp] [Qed] Goal typed_f_ensures_qed_ok : Valid

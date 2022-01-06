@@ -18,7 +18,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "sizeof(int) == sizeof(x)";
-    __gen_e_acsl_assert_data.file = "tests/memory/sizeof.i";
+    __gen_e_acsl_assert_data.file = "sizeof.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 8;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data);

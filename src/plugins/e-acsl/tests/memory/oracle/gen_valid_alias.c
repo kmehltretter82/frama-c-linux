@@ -71,7 +71,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "!\\valid(a) && !\\valid(b)";
-    __gen_e_acsl_assert_data.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data.file = "valid_alias.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 9;
     __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data);
@@ -143,7 +143,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(a) && \\valid(b)";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data_2.file = "valid_alias.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 13;
     __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_2);
@@ -179,7 +179,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "RTE";
     __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read(b)";
-    __gen_e_acsl_assert_data_4.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data_4.file = "valid_alias.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 14;
     __e_acsl_assert(__gen_e_acsl_and_7,& __gen_e_acsl_assert_data_4);
@@ -187,7 +187,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "*b == n";
-    __gen_e_acsl_assert_data_3.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data_3.file = "valid_alias.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 14;
     __e_acsl_assert(*b == n,& __gen_e_acsl_assert_data_3);
@@ -255,7 +255,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "!\\valid(a) && !\\valid(b)";
-    __gen_e_acsl_assert_data_5.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data_5.file = "valid_alias.c";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 16;
     __e_acsl_assert(__gen_e_acsl_and_10,& __gen_e_acsl_assert_data_5);

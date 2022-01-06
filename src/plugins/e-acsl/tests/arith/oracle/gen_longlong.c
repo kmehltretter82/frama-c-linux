@@ -64,7 +64,7 @@ int main(void)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
       __gen_e_acsl_assert_data_2.pred_txt = "2 != 0";
-      __gen_e_acsl_assert_data_2.file = "tests/arith/longlong.i";
+      __gen_e_acsl_assert_data_2.file = "longlong.i";
       __gen_e_acsl_assert_data_2.fct = "main";
       __gen_e_acsl_assert_data_2.line = 19;
       __e_acsl_assert(__gen_e_acsl_mod_guard != 0,
@@ -77,7 +77,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "(2 * x + 1) % 2 == 1";
-    __gen_e_acsl_assert_data.file = "tests/arith/longlong.i";
+    __gen_e_acsl_assert_data.file = "longlong.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 19;
     __e_acsl_assert(__gen_e_acsl__4 == 1L,& __gen_e_acsl_assert_data);

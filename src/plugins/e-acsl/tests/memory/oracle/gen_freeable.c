@@ -41,7 +41,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "!\\freeable(p)";
-    __gen_e_acsl_assert_data.file = "tests/memory/freeable.c";
+    __gen_e_acsl_assert_data.file = "freeable.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 14;
     __e_acsl_assert(! __gen_e_acsl_freeable,& __gen_e_acsl_assert_data);
@@ -59,7 +59,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "!\\freeable((void *)0)";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/freeable.c";
+    __gen_e_acsl_assert_data_2.file = "freeable.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 15;
     __e_acsl_assert(! __gen_e_acsl_freeable_2,& __gen_e_acsl_assert_data_2);
@@ -80,7 +80,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "!\\freeable(p + 1)";
-    __gen_e_acsl_assert_data_3.file = "tests/memory/freeable.c";
+    __gen_e_acsl_assert_data_3.file = "freeable.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 17;
     __e_acsl_assert(! __gen_e_acsl_freeable_3,& __gen_e_acsl_assert_data_3);
@@ -98,7 +98,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "\\freeable(p)";
-    __gen_e_acsl_assert_data_4.file = "tests/memory/freeable.c";
+    __gen_e_acsl_assert_data_4.file = "freeable.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 18;
     __e_acsl_assert(__gen_e_acsl_freeable_4,& __gen_e_acsl_assert_data_4);
@@ -117,7 +117,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "!\\freeable(p)";
-    __gen_e_acsl_assert_data_5.file = "tests/memory/freeable.c";
+    __gen_e_acsl_assert_data_5.file = "freeable.c";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 20;
     __e_acsl_assert(! __gen_e_acsl_freeable_5,& __gen_e_acsl_assert_data_5);
@@ -137,7 +137,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "!\\freeable((char *)array)";
-    __gen_e_acsl_assert_data_6.file = "tests/memory/freeable.c";
+    __gen_e_acsl_assert_data_6.file = "freeable.c";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 23;
     __e_acsl_assert(! __gen_e_acsl_freeable_6,& __gen_e_acsl_assert_data_6);
@@ -157,7 +157,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
     __gen_e_acsl_assert_data_7.pred_txt = "!\\freeable(&array[5])";
-    __gen_e_acsl_assert_data_7.file = "tests/memory/freeable.c";
+    __gen_e_acsl_assert_data_7.file = "freeable.c";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 24;
     __e_acsl_assert(! __gen_e_acsl_freeable_7,& __gen_e_acsl_assert_data_7);

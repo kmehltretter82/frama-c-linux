@@ -17,7 +17,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "(int)x == y";
-    __gen_e_acsl_assert_data.file = "tests/arith/cast.i";
+    __gen_e_acsl_assert_data.file = "cast.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 9;
     __e_acsl_assert((int)x == y,& __gen_e_acsl_assert_data);
@@ -32,7 +32,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "x == (long)y";
-    __gen_e_acsl_assert_data_2.file = "tests/arith/cast.i";
+    __gen_e_acsl_assert_data_2.file = "cast.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 10;
     __e_acsl_assert(x == (long)y,& __gen_e_acsl_assert_data_2);
@@ -46,7 +46,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "y == (int)0";
-    __gen_e_acsl_assert_data_3.file = "tests/arith/cast.i";
+    __gen_e_acsl_assert_data_3.file = "cast.i";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 12;
     __e_acsl_assert(y == 0,& __gen_e_acsl_assert_data_3);
@@ -60,7 +60,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "(unsigned int)y == (unsigned int)0";
-    __gen_e_acsl_assert_data_4.file = "tests/arith/cast.i";
+    __gen_e_acsl_assert_data_4.file = "cast.i";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 13;
     __e_acsl_assert((unsigned int)y == 0U,& __gen_e_acsl_assert_data_4);
@@ -74,7 +74,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "y != (int)0xfffffffffffffff";
-    __gen_e_acsl_assert_data_5.file = "tests/arith/cast.i";
+    __gen_e_acsl_assert_data_5.file = "cast.i";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 16;
     __e_acsl_assert(y != -1,& __gen_e_acsl_assert_data_5);
@@ -88,7 +88,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "(unsigned int)y != (unsigned int)0xfffffffffffffff";
-    __gen_e_acsl_assert_data_6.file = "tests/arith/cast.i";
+    __gen_e_acsl_assert_data_6.file = "cast.i";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 17;
     __e_acsl_assert((unsigned int)y != 4294967295U,

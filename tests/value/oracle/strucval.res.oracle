@@ -1,11 +1,11 @@
-[kernel] Parsing tests/value/strucval.c (with preprocessing)
+[kernel] Parsing strucval.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function h <- main.
-  Called from tests/value/strucval.c:27.
+  Called from strucval.c:27.
 [eva] using specification for function h
 [eva] Done for function h
 [eva] Recording results for main

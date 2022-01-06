@@ -59,7 +59,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-    __gen_e_acsl_assert_data.file = "tests/memory/errno.c";
+    __gen_e_acsl_assert_data.file = "errno.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 11;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);

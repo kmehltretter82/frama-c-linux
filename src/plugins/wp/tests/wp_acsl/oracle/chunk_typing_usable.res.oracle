@@ -1,5 +1,5 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_acsl/chunk_typing_usable.i (no preprocessing)
+[kernel] Parsing chunk_typing_usable.i (no preprocessing)
 [wp] Running WP plugin...
 [rte] annotating function usable_axiom
 [rte] annotating function usable_lemma
@@ -465,7 +465,7 @@ Prove: (f_0<=s_0) -> (s_0<=t_0) -> (is_sint32_chunk Mint_0)
   Function usable_axiom
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/chunk_typing_usable.i, line 29) in 'usable_axiom':
+Goal Post-condition (file chunk_typing_usable.i, line 29) in 'usable_axiom':
 Let x = e - 1.
 Assume {
   Type: is_sint32_chunk(Mint_0) /\ is_uint32(b) /\ is_uint32(e).
@@ -483,7 +483,7 @@ Prove: L_occ(Mint_0, i, a, b, x) = L_occ(Mint_0, i, a, b, e).
   Function usable_lemma
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/chunk_typing_usable.i, line 43) in 'usable_lemma':
+Goal Post-condition (file chunk_typing_usable.i, line 43) in 'usable_lemma':
 Assume {
   Type: is_sint32_chunk(Mint_0) /\ is_uint32(b) /\ is_uint32(e) /\
       is_uint32(s).

@@ -45,7 +45,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\offset((int *)A) == 0";
-    __gen_e_acsl_assert_data.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data.file = "offset.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 13;
     __e_acsl_assert(__gen_e_acsl_offset == 0UL,& __gen_e_acsl_assert_data);
@@ -64,7 +64,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\offset(&A[3]) == 12";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_2.file = "offset.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 14;
     __e_acsl_assert(__gen_e_acsl_offset_2 == 12UL,
@@ -84,7 +84,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\offset(PA) == 0";
-    __gen_e_acsl_assert_data_3.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_3.file = "offset.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 15;
     __e_acsl_assert(__gen_e_acsl_offset_3 == 0UL,
@@ -106,7 +106,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "\\offset(PA + 1) == 8";
-    __gen_e_acsl_assert_data_4.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_4.file = "offset.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 17;
     __e_acsl_assert(__gen_e_acsl_offset_4 == 8UL,
@@ -130,7 +130,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "\\offset((int *)a) == 0";
-    __gen_e_acsl_assert_data_5.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_5.file = "offset.c";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 21;
     __e_acsl_assert(__gen_e_acsl_offset_5 == 0UL,
@@ -150,7 +150,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "\\offset(&a[1]) == 4";
-    __gen_e_acsl_assert_data_6.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_6.file = "offset.c";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 22;
     __e_acsl_assert(__gen_e_acsl_offset_6 == 4UL,
@@ -170,7 +170,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
     __gen_e_acsl_assert_data_7.pred_txt = "\\offset(&a[3]) == 12";
-    __gen_e_acsl_assert_data_7.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_7.file = "offset.c";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 23;
     __e_acsl_assert(__gen_e_acsl_offset_7 == 12UL,
@@ -196,7 +196,7 @@ int main(void)
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
     __gen_e_acsl_assert_data_8.pred_txt = "\\offset(&l) == 0";
-    __gen_e_acsl_assert_data_8.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_8.file = "offset.c";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 28;
     __e_acsl_assert(__gen_e_acsl_offset_8 == 0UL,
@@ -216,7 +216,7 @@ int main(void)
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "\\offset(pl) == 0";
-    __gen_e_acsl_assert_data_9.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_9.file = "offset.c";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 29;
     __e_acsl_assert(__gen_e_acsl_offset_9 == 0UL,
@@ -237,7 +237,7 @@ int main(void)
     __gen_e_acsl_assert_data_10.blocking = 1;
     __gen_e_acsl_assert_data_10.kind = "Assertion";
     __gen_e_acsl_assert_data_10.pred_txt = "\\offset(pl + 1) == 1";
-    __gen_e_acsl_assert_data_10.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_10.file = "offset.c";
     __gen_e_acsl_assert_data_10.fct = "main";
     __gen_e_acsl_assert_data_10.line = 30;
     __e_acsl_assert(__gen_e_acsl_offset_10 == 1UL,
@@ -258,7 +258,7 @@ int main(void)
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "Assertion";
     __gen_e_acsl_assert_data_11.pred_txt = "\\offset(pl + 7) == 7";
-    __gen_e_acsl_assert_data_11.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_11.file = "offset.c";
     __gen_e_acsl_assert_data_11.fct = "main";
     __gen_e_acsl_assert_data_11.line = 31;
     __e_acsl_assert(__gen_e_acsl_offset_11 == 7UL,
@@ -281,7 +281,7 @@ int main(void)
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "Assertion";
     __gen_e_acsl_assert_data_12.pred_txt = "\\offset(pi) == 0";
-    __gen_e_acsl_assert_data_12.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_12.file = "offset.c";
     __gen_e_acsl_assert_data_12.fct = "main";
     __gen_e_acsl_assert_data_12.line = 33;
     __e_acsl_assert(__gen_e_acsl_offset_12 == 0UL,
@@ -303,7 +303,7 @@ int main(void)
     __gen_e_acsl_assert_data_13.blocking = 1;
     __gen_e_acsl_assert_data_13.kind = "Assertion";
     __gen_e_acsl_assert_data_13.pred_txt = "\\offset(pi) == 4";
-    __gen_e_acsl_assert_data_13.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_13.file = "offset.c";
     __gen_e_acsl_assert_data_13.fct = "main";
     __gen_e_acsl_assert_data_13.line = 35;
     __e_acsl_assert(__gen_e_acsl_offset_13 == 4UL,
@@ -325,7 +325,7 @@ int main(void)
     __gen_e_acsl_assert_data_14.blocking = 1;
     __gen_e_acsl_assert_data_14.kind = "Assertion";
     __gen_e_acsl_assert_data_14.pred_txt = "\\offset(p) == 0";
-    __gen_e_acsl_assert_data_14.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_14.file = "offset.c";
     __gen_e_acsl_assert_data_14.fct = "main";
     __gen_e_acsl_assert_data_14.line = 39;
     __e_acsl_assert(__gen_e_acsl_offset_14 == 0UL,
@@ -345,7 +345,7 @@ int main(void)
     __gen_e_acsl_assert_data_15.blocking = 1;
     __gen_e_acsl_assert_data_15.kind = "Assertion";
     __gen_e_acsl_assert_data_15.pred_txt = "\\offset(p + 1) == 1";
-    __gen_e_acsl_assert_data_15.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_15.file = "offset.c";
     __gen_e_acsl_assert_data_15.fct = "main";
     __gen_e_acsl_assert_data_15.line = 40;
     __e_acsl_assert(__gen_e_acsl_offset_15 == 1UL,
@@ -365,7 +365,7 @@ int main(void)
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
     __gen_e_acsl_assert_data_16.pred_txt = "\\offset(p + 11) == 11";
-    __gen_e_acsl_assert_data_16.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_16.file = "offset.c";
     __gen_e_acsl_assert_data_16.fct = "main";
     __gen_e_acsl_assert_data_16.line = 41;
     __e_acsl_assert(__gen_e_acsl_offset_16 == 11UL,
@@ -387,7 +387,7 @@ int main(void)
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "Assertion";
     __gen_e_acsl_assert_data_17.pred_txt = "\\offset(p + 5) == 10";
-    __gen_e_acsl_assert_data_17.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_17.file = "offset.c";
     __gen_e_acsl_assert_data_17.fct = "main";
     __gen_e_acsl_assert_data_17.line = 43;
     __e_acsl_assert(__gen_e_acsl_offset_17 == 10UL,
@@ -407,7 +407,7 @@ int main(void)
     __gen_e_acsl_assert_data_18.blocking = 1;
     __gen_e_acsl_assert_data_18.kind = "Assertion";
     __gen_e_acsl_assert_data_18.pred_txt = "\\offset(p - 5) == 0";
-    __gen_e_acsl_assert_data_18.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_18.file = "offset.c";
     __gen_e_acsl_assert_data_18.fct = "main";
     __gen_e_acsl_assert_data_18.line = 44;
     __e_acsl_assert(__gen_e_acsl_offset_18 == 0UL,
@@ -429,7 +429,7 @@ int main(void)
     __gen_e_acsl_assert_data_19.blocking = 1;
     __gen_e_acsl_assert_data_19.kind = "Assertion";
     __gen_e_acsl_assert_data_19.pred_txt = "\\offset(q) == 0";
-    __gen_e_acsl_assert_data_19.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_19.file = "offset.c";
     __gen_e_acsl_assert_data_19.fct = "main";
     __gen_e_acsl_assert_data_19.line = 49;
     __e_acsl_assert(__gen_e_acsl_offset_19 == 0UL,
@@ -452,7 +452,7 @@ int main(void)
     __gen_e_acsl_assert_data_20.blocking = 1;
     __gen_e_acsl_assert_data_20.kind = "Assertion";
     __gen_e_acsl_assert_data_20.pred_txt = "\\offset(q) == sizeof(long)";
-    __gen_e_acsl_assert_data_20.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_20.file = "offset.c";
     __gen_e_acsl_assert_data_20.fct = "main";
     __gen_e_acsl_assert_data_20.line = 51;
     __e_acsl_assert(__gen_e_acsl_offset_20 == 8UL,
@@ -475,7 +475,7 @@ int main(void)
     __gen_e_acsl_assert_data_21.blocking = 1;
     __gen_e_acsl_assert_data_21.kind = "Assertion";
     __gen_e_acsl_assert_data_21.pred_txt = "\\offset(q) == sizeof(long) * 3";
-    __gen_e_acsl_assert_data_21.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_21.file = "offset.c";
     __gen_e_acsl_assert_data_21.fct = "main";
     __gen_e_acsl_assert_data_21.line = 53;
     __e_acsl_assert(__gen_e_acsl_offset_21 == 24UL,
@@ -498,7 +498,7 @@ int main(void)
     __gen_e_acsl_assert_data_22.blocking = 1;
     __gen_e_acsl_assert_data_22.kind = "Assertion";
     __gen_e_acsl_assert_data_22.pred_txt = "\\offset(q) == sizeof(long) * 7";
-    __gen_e_acsl_assert_data_22.file = "tests/memory/offset.c";
+    __gen_e_acsl_assert_data_22.file = "offset.c";
     __gen_e_acsl_assert_data_22.fct = "main";
     __gen_e_acsl_assert_data_22.line = 55;
     __e_acsl_assert(__gen_e_acsl_offset_22 == 56UL,

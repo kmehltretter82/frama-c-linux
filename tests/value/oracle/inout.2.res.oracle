@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/inout.i (no preprocessing)
+[kernel] Parsing inout.i (no preprocessing)
 [eva] Analyzing a complete application starting at never_terminate
 [eva] Computing initial state
 [eva] Initial state computed

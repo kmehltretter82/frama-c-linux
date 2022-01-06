@@ -1,5 +1,5 @@
-[kernel] Parsing tests/value/undef_behavior_bts1059.i (no preprocessing)
-[kernel] tests/value/undef_behavior_bts1059.i:15: Warning: 
+[kernel] Parsing undef_behavior_bts1059.i (no preprocessing)
+[kernel] undef_behavior_bts1059.i:15: Warning: 
   Unspecified sequence with side effect:
   /* a <- 
   */
@@ -11,7 +11,7 @@
   }
   /* a <-  */
   a = tmp;
-[kernel] tests/value/undef_behavior_bts1059.i:23: Warning: 
+[kernel] undef_behavior_bts1059.i:23: Warning: 
   Unspecified sequence with side effect:
   /*  <-  */
   tmp_4 = a;
@@ -24,15 +24,15 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
-[eva:alarm] tests/value/undef_behavior_bts1059.i:15: Warning: 
+[eva:alarm] undef_behavior_bts1059.i:15: Warning: 
   undefined multiple accesses in expression. assert \separated(&a, &a);
-[eva:alarm] tests/value/undef_behavior_bts1059.i:23: Warning: 
+[eva:alarm] undef_behavior_bts1059.i:23: Warning: 
   undefined multiple accesses in expression. assert \separated(&a, &a);
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/undef_behavior_bts1059.i:15: 
+[eva] undef_behavior_bts1059.i:15: 
   assertion 'Eva,separation' got final status invalid.
-[eva] tests/value/undef_behavior_bts1059.i:23: 
+[eva] undef_behavior_bts1059.i:23: 
   assertion 'Eva,separation' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

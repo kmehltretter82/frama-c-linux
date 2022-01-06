@@ -46,7 +46,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\block_length((int *)A) == sizeof(A)";
-    __gen_e_acsl_assert_data.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data.file = "block_length.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 13;
     __e_acsl_assert(__gen_e_acsl_block_length == 16UL,
@@ -69,7 +69,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\block_length(&A[3]) == sizeof(A)";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_2.file = "block_length.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 14;
     __e_acsl_assert(__gen_e_acsl_block_length_2 == 16UL,
@@ -92,7 +92,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\block_length(PA) == sizeof(A)";
-    __gen_e_acsl_assert_data_3.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_3.file = "block_length.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 15;
     __e_acsl_assert(__gen_e_acsl_block_length_3 == 16UL,
@@ -121,7 +121,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "\\block_length(PA + 1) == \\block_length(&A[1])";
-    __gen_e_acsl_assert_data_4.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_4.file = "block_length.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 17;
     __e_acsl_assert(__gen_e_acsl_block_length_4 == __gen_e_acsl_block_length_5,
@@ -150,7 +150,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "\\block_length((int *)a) == sizeof(a)";
-    __gen_e_acsl_assert_data_5.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_5.file = "block_length.c";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 22;
     __e_acsl_assert(__gen_e_acsl_block_length_6 == 16UL,
@@ -173,7 +173,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "\\block_length(&a[3]) == sizeof(a)";
-    __gen_e_acsl_assert_data_6.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_6.file = "block_length.c";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 23;
     __e_acsl_assert(__gen_e_acsl_block_length_7 == 16UL,
@@ -196,7 +196,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
     __gen_e_acsl_assert_data_7.pred_txt = "\\block_length(pa) == sizeof(a)";
-    __gen_e_acsl_assert_data_7.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_7.file = "block_length.c";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 24;
     __e_acsl_assert(__gen_e_acsl_block_length_8 == 16UL,
@@ -226,7 +226,7 @@ int main(void)
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
     __gen_e_acsl_assert_data_8.pred_txt = "\\block_length(pa + 1) == \\block_length(&a[1])";
-    __gen_e_acsl_assert_data_8.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_8.file = "block_length.c";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 26;
     __e_acsl_assert(__gen_e_acsl_block_length_9 == __gen_e_acsl_block_length_10,
@@ -255,7 +255,7 @@ int main(void)
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "\\block_length(&l) == sizeof(long)";
-    __gen_e_acsl_assert_data_9.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_9.file = "block_length.c";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 32;
     __e_acsl_assert(__gen_e_acsl_block_length_11 == 8UL,
@@ -278,7 +278,7 @@ int main(void)
     __gen_e_acsl_assert_data_10.blocking = 1;
     __gen_e_acsl_assert_data_10.kind = "Assertion";
     __gen_e_acsl_assert_data_10.pred_txt = "\\block_length(pl) == sizeof(long)";
-    __gen_e_acsl_assert_data_10.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_10.file = "block_length.c";
     __gen_e_acsl_assert_data_10.fct = "main";
     __gen_e_acsl_assert_data_10.line = 33;
     __e_acsl_assert(__gen_e_acsl_block_length_12 == 8UL,
@@ -301,7 +301,7 @@ int main(void)
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "Assertion";
     __gen_e_acsl_assert_data_11.pred_txt = "\\block_length(pl + 7) == sizeof(long)";
-    __gen_e_acsl_assert_data_11.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_11.file = "block_length.c";
     __gen_e_acsl_assert_data_11.fct = "main";
     __gen_e_acsl_assert_data_11.line = 34;
     __e_acsl_assert(__gen_e_acsl_block_length_13 == 8UL,
@@ -332,7 +332,7 @@ int main(void)
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "Assertion";
     __gen_e_acsl_assert_data_12.pred_txt = "\\block_length(pi) == \\block_length(&l)";
-    __gen_e_acsl_assert_data_12.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_12.file = "block_length.c";
     __gen_e_acsl_assert_data_12.fct = "main";
     __gen_e_acsl_assert_data_12.line = 36;
     __e_acsl_assert(__gen_e_acsl_block_length_14 == __gen_e_acsl_block_length_15,
@@ -362,7 +362,7 @@ int main(void)
     __gen_e_acsl_assert_data_13.blocking = 1;
     __gen_e_acsl_assert_data_13.kind = "Assertion";
     __gen_e_acsl_assert_data_13.pred_txt = "\\block_length(pi) == \\block_length(&l)";
-    __gen_e_acsl_assert_data_13.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_13.file = "block_length.c";
     __gen_e_acsl_assert_data_13.fct = "main";
     __gen_e_acsl_assert_data_13.line = 38;
     __e_acsl_assert(__gen_e_acsl_block_length_16 == __gen_e_acsl_block_length_17,
@@ -388,7 +388,7 @@ int main(void)
     __gen_e_acsl_assert_data_14.blocking = 1;
     __gen_e_acsl_assert_data_14.kind = "Assertion";
     __gen_e_acsl_assert_data_14.pred_txt = "\\block_length(p) == size";
-    __gen_e_acsl_assert_data_14.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_14.file = "block_length.c";
     __gen_e_acsl_assert_data_14.fct = "main";
     __gen_e_acsl_assert_data_14.line = 43;
     __e_acsl_assert(__gen_e_acsl_block_length_18 == size,
@@ -410,7 +410,7 @@ int main(void)
     __gen_e_acsl_assert_data_15.blocking = 1;
     __gen_e_acsl_assert_data_15.kind = "Assertion";
     __gen_e_acsl_assert_data_15.pred_txt = "\\block_length(p + 11) == size";
-    __gen_e_acsl_assert_data_15.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_15.file = "block_length.c";
     __gen_e_acsl_assert_data_15.fct = "main";
     __gen_e_acsl_assert_data_15.line = 44;
     __e_acsl_assert(__gen_e_acsl_block_length_19 == size,
@@ -438,7 +438,7 @@ int main(void)
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
     __gen_e_acsl_assert_data_16.pred_txt = "\\block_length(p + 5) == \\block_length(p - 5)";
-    __gen_e_acsl_assert_data_16.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_16.file = "block_length.c";
     __gen_e_acsl_assert_data_16.fct = "main";
     __gen_e_acsl_assert_data_16.line = 46;
     __e_acsl_assert(__gen_e_acsl_block_length_20 == __gen_e_acsl_block_length_21,
@@ -464,7 +464,7 @@ int main(void)
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "Assertion";
     __gen_e_acsl_assert_data_17.pred_txt = "\\block_length(q) == size";
-    __gen_e_acsl_assert_data_17.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_17.file = "block_length.c";
     __gen_e_acsl_assert_data_17.fct = "main";
     __gen_e_acsl_assert_data_17.line = 52;
     __e_acsl_assert(__gen_e_acsl_block_length_22 == size,
@@ -488,7 +488,7 @@ int main(void)
     __gen_e_acsl_assert_data_18.blocking = 1;
     __gen_e_acsl_assert_data_18.kind = "Assertion";
     __gen_e_acsl_assert_data_18.pred_txt = "\\block_length(q) == size";
-    __gen_e_acsl_assert_data_18.file = "tests/memory/block_length.c";
+    __gen_e_acsl_assert_data_18.file = "block_length.c";
     __gen_e_acsl_assert_data_18.fct = "main";
     __gen_e_acsl_assert_data_18.line = 54;
     __e_acsl_assert(__gen_e_acsl_block_length_23 == size,

@@ -16,7 +16,7 @@ int main(void)
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Assertion";
       __gen_e_acsl_assert_data.pred_txt = "\\false";
-      __gen_e_acsl_assert_data.file = "tests/constructs/false.i";
+      __gen_e_acsl_assert_data.file = "false.i";
       __gen_e_acsl_assert_data.fct = "main";
       __gen_e_acsl_assert_data.line = 7;
       __e_acsl_assert(0,& __gen_e_acsl_assert_data);

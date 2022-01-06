@@ -25,7 +25,7 @@ int main(void)
         __gen_e_acsl_assert_data.blocking = 1;
         __gen_e_acsl_assert_data.kind = "Invariant";
         __gen_e_acsl_assert_data.pred_txt = "0 <= i < 10";
-        __gen_e_acsl_assert_data.file = "tests/constructs/invariant.i";
+        __gen_e_acsl_assert_data.file = "invariant.i";
         __gen_e_acsl_assert_data.fct = "main";
         __gen_e_acsl_assert_data.line = 9;
         __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -41,7 +41,7 @@ int main(void)
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "Invariant";
         __gen_e_acsl_assert_data_2.pred_txt = "i <= x";
-        __gen_e_acsl_assert_data_2.file = "tests/constructs/invariant.i";
+        __gen_e_acsl_assert_data_2.file = "invariant.i";
         __gen_e_acsl_assert_data_2.fct = "main";
         __gen_e_acsl_assert_data_2.line = 11;
         __e_acsl_assert(i <= x,& __gen_e_acsl_assert_data_2);

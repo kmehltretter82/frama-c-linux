@@ -1,35 +1,35 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/clusters.i (no preprocessing)
+[kernel] Parsing clusters.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] tests/wp_acsl/clusters.i:40: Warning: 
+[wp] clusters.i:40: Warning: 
   Missing terminates clause for callee_no_r, populates 'terminates \true'
 [wp] [CFG] Goal callee_no_r_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_acsl/clusters.i:45: Warning: 
+[wp] clusters.i:45: Warning: 
   Missing terminates clause for caller_no_cluster, populates 'terminates \true'
-[wp] tests/wp_acsl/clusters.i:60: Warning: 
+[wp] clusters.i:60: Warning: 
   Missing terminates clause for fp, populates 'terminates \true'
-[wp] tests/wp_acsl/clusters.i:60: Warning: 
+[wp] clusters.i:60: Warning: 
   Unsupported clause @decreases in 'function' (ignored)
-[wp] tests/wp_acsl/clusters.i:54: Warning: 
+[wp] clusters.i:54: Warning: 
   Missing terminates clause for function, populates 'terminates \true'
-[wp] tests/wp_acsl/clusters.i:28: Warning: 
+[wp] clusters.i:28: Warning: 
   Missing terminates clause for mutual_1, populates 'terminates \true'
-[wp] tests/wp_acsl/clusters.i:60: Warning: 
+[wp] clusters.i:60: Warning: 
   Unsupported clause @decreases in 'mutual_2' (ignored)
-[wp] tests/wp_acsl/clusters.i:35: Warning: 
+[wp] clusters.i:35: Warning: 
   Missing terminates clause for mutual_2, populates 'terminates \true'
-[wp] tests/wp_acsl/clusters.i:60: Warning: 
+[wp] clusters.i:60: Warning: 
   Unsupported clause @decreases in 'simpl_r' (ignored)
-[wp] tests/wp_acsl/clusters.i:11: Warning: 
+[wp] clusters.i:11: Warning: 
   Missing terminates clause for simpl_r, populates 'terminates \true'
-[wp] tests/wp_acsl/clusters.i:15: Warning: 
+[wp] clusters.i:15: Warning: 
   Missing terminates clause for simpl_rf, populates 'terminates \true'
-[wp] tests/wp_acsl/clusters.i:60: Warning: 
+[wp] clusters.i:60: Warning: 
   No 'decreases' clause on recursive function 'simpl_rf', cannot prove termination
-[wp] tests/wp_acsl/clusters.i:60: Warning: 
+[wp] clusters.i:60: Warning: 
   No 'decreases' clause on recursive function 'mutual_1', cannot prove termination
-[wp] tests/wp_acsl/clusters.i:60: Warning: 
+[wp] clusters.i:60: Warning: 
   No 'decreases' clause on recursive function 'fp', cannot prove termination
 [wp] 12 goals scheduled
 [wp] [Qed] Goal typed_simpl_r_terminates : Valid

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/simplify_cfg.i (no preprocessing)
+[kernel] Parsing simplify_cfg.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
