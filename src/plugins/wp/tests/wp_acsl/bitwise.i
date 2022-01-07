@@ -124,3 +124,9 @@ void lemma(unsigned a, unsigned b, unsigned k) {
   //@ check           ( a & b & 77 & ((1 << (k & 55))-1) ) == ( (a & b & 77) % (1 << (k & 55)) );
 
 }
+
+//@ ensures \result == (x & 0xFF) ;
+unsigned char cast_uchar(int x) {
+  unsigned char c = x;
+  return c;
+}
