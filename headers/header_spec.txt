@@ -1849,8 +1849,6 @@ src/plugins/wp/intro_wp.txt: CEA_WP
 src/plugins/wp/mcfg.mli: CEA_WP
 src/plugins/wp/normAtLabels.ml: CEA_WP
 src/plugins/wp/normAtLabels.mli: CEA_WP
-src/plugins/wp/proof.ml: CEA_WP
-src/plugins/wp/proof.mli: CEA_WP
 src/plugins/wp/prover.ml: CEA_WP
 src/plugins/wp/prover.mli: CEA_WP
 src/plugins/wp/register.ml: CEA_WP
@@ -1860,7 +1858,6 @@ src/plugins/wp/rformat.mll: CEA_WP
 src/plugins/wp/script.mli: CEA_WP
 src/plugins/wp/script.mll: CEA_WP
 src/plugins/wp/share/.gitignore: .ignore
-src/plugins/wp/share/Makefile.coqwp: CEA_WP
 src/plugins/wp/share/Makefile.resources: CEA_WP
 src/plugins/wp/share/coqwp/ArcTrigo.v: CEA_WP
 src/plugins/wp/share/coqwp/Bits.v: CEA_WP
