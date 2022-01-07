@@ -3,16 +3,14 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function usable_axiom
 [rte:annot] annotating function usable_lemma
-[wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 3 goals scheduled
-[wp] [Coq] Goal typed_lemma_provable_lemma : Saved script
-[wp] [Coq (native)] Goal typed_lemma_provable_lemma : Valid
+[wp] [Coq] Goal typed_lemma_provable_lemma : Valid
 [wp] [Alt-Ergo] Goal typed_usable_axiom_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_usable_lemma_ensures : Valid
 [wp] Proved goals:    3 / 3
   Qed:             0 
-  Coq (native):    1 
   Alt-Ergo:        2  (unsuccess: 1)
+  Coq:             1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     -        -        1       100%

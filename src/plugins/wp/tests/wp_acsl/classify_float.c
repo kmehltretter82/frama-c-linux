@@ -1,6 +1,6 @@
 /* run.config_qualif
    OPT: -wp-prover alt-ergo
-   OPT: -wp-prover native:coq -wp-coq-script %{dep:@PTEST_DIR@/classify_float.script}
+   OPT: -wp-prover coq
    OPT: -wp-model real
  */
 

@@ -2,7 +2,7 @@
    DONTRUN:
 */
 /* run.config_qualif
-   OPT: -wp-prover native:coq -wp-coq-script %{dep:@PTEST_DIR@/region_to_coq.script}
+   OPT: -wp-prover coq
 */
 
 void copy(int* a, unsigned int n, int* b)

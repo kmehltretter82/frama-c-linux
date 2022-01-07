@@ -7,7 +7,7 @@
  COMMENT: depends from files mentionned into "abs.driver"
  DEPS: abs.why abs.mlw abs.script Abs.v
    OPT: -wp -wp-driver %{dep:@PTEST_DIR@/abs.driver} -wp-prover alt-ergo
-   OPT: -wp -wp-driver %{dep:@PTEST_DIR@/abs.driver} -wp-prover native:coq -wp-coq-script %{dep:@PTEST_DIR@/abs.script}
+   OPT: -wp -wp-driver %{dep:@PTEST_DIR@/abs.driver} -wp-prover coq
 */
 /*@ axiomatic Absolute { logic integer ABS(integer x) ; } */
 

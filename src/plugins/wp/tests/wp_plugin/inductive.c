@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-prover coq -wp-coq-script %{dep:@PTEST_DIR@/inductive.script} -wp-timeout 240
+   OPT: -wp-prover coq -wp-timeout 240
 */
 
 typedef struct _list { int element; struct _list* next; } list;

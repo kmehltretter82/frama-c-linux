@@ -1,15 +1,12 @@
 # frama-c -wp -wp-timeout 240 [...]
 [kernel] Parsing inductive.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 2 goals scheduled
-[wp] [Coq] Goal typed_lemma_offset : Saved script
-[wp] [Coq (native)] Goal typed_lemma_offset : Valid
-[wp] [Coq] Goal typed_lemma_test : Saved script
-[wp] [Coq (native)] Goal typed_lemma_test : Valid
+[wp] [Coq] Goal typed_lemma_offset : Valid
+[wp] [Coq] Goal typed_lemma_test : Valid
 [wp] Proved goals:    2 / 2
   Qed:             0 
-  Coq (native):    2
+  Coq:             2
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     -        -        2       100%

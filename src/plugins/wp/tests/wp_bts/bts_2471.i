@@ -4,7 +4,7 @@
 
 /* run.config_qualif
    OPT: -wp-timeout 1
-   OPT: -wp-prover native:coq
+   OPT: -wp-prover coq
  */
 
 /*@ axiomatic maps {
