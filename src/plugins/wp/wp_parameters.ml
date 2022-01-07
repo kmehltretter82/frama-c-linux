@@ -35,6 +35,11 @@ let warning ?wkey ?current = match current with
   | None -> warning ?wkey ~current:true
   | Some b -> warning ?wkey ~current:b
 
+let wkey_hyp = register_warn_category "hypothesis"
+
+let hypothesis ?current ?source ?emitwith ?echo ?once ?append text =
+  warning ~wkey:wkey_hyp ?current ?source ?emitwith ?echo ?once ?append text
+
 let resetdemon = ref []
 let on_reset f = resetdemon := f :: !resetdemon
 let reset () = List.iter (fun f -> f ()) !resetdemon
