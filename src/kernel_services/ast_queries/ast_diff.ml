@@ -136,37 +136,68 @@ module Info(I: sig val name: string end) =
     let size = 43
   end)
 
-module Build(D:Datatype.S_with_collections) =
-  State_builder.Hashtbl(D.Hashtbl)(Correspondance.Make(D))
-    (Info(struct let name = "Ast_diff." ^ D.name end))
+(* Map of symbols under analysis, in case of recursion.
+   Note that this can only happen with aggregate types, logic
+   types, and function (both C and ACSL). Other symbols must be
+   correctly ordered in a well-formed AST
+*)
+[@@@ ocaml.warning "-69"] (* WIP: currently not all fields are used *)
+type is_same_env =
+  {
+    compinfo: compinfo Cil_datatype.Compinfo.Map.t;
+    kernel_function: kernel_function Kernel_function.Map.t;
+    logic_info: logic_info Cil_datatype.Logic_info.Map.t;
+    logic_type_info: logic_type_info Cil_datatype.Logic_type_info.Map.t;
+  }
 
-module Varinfo = Build(Cil_datatype.Varinfo)
+module Build(H:Datatype.S_with_collections)(D:Datatype.S) = struct
+  include
+    State_builder.Hashtbl(H.Hashtbl)(D)
+      (Info(struct let name = "Ast_diff." ^ D.name end))
 
-module Compinfo = Build(Cil_datatype.Compinfo)
+  let memo_env mk_val key env =
+    if mem key then find key, env
+    else let (data, _) as res = mk_val key env in
+      add key data; res
+end
 
-module Enuminfo = Build(Cil_datatype.Enuminfo)
+module Build_correspondance(H:Datatype.S_with_collections) =
+  Build(H)(Correspondance.Make(H))
 
-module Enumitem = Build(Cil_datatype.Enumitem)
+module Varinfo = Build_correspondance(Cil_datatype.Varinfo)
 
-module Typeinfo = Build(Cil_datatype.Typeinfo)
+module Compinfo = Build_correspondance(Cil_datatype.Compinfo)
 
-module Stmt = Build(Cil_datatype.Stmt)
+module Enuminfo = Build_correspondance(Cil_datatype.Enuminfo)
 
-module Logic_info = Build(Cil_datatype.Logic_info)
+module Enumitem = Build_correspondance(Cil_datatype.Enumitem)
 
-module Logic_type_info = Build(Cil_datatype.Logic_type_info)
+module Typeinfo = Build_correspondance(Cil_datatype.Typeinfo)
 
-module Fieldinfo = Build(Cil_datatype.Fieldinfo)
+module Stmt = Build_correspondance(Cil_datatype.Stmt)
 
-module Model_info = Build(Cil_datatype.Model_info)
+module Logic_info = Build_correspondance(Cil_datatype.Logic_info)
 
-module Logic_var = Build(Cil_datatype.Logic_var)
+module Logic_type_info = Build_correspondance(Cil_datatype.Logic_type_info)
 
-module Kernel_function =
-  State_builder.Hashtbl(Kernel_function.Hashtbl)(Kf_correspondance)
-    (Info(struct let name = "Ast_diff.Kernel_function" end))
+module Fieldinfo = Build_correspondance(Cil_datatype.Fieldinfo)
 
-module Fundec = Build(Cil_datatype.Fundec)
+module Model_info = Build_correspondance(Cil_datatype.Model_info)
+
+module Logic_var = Build_correspondance(Cil_datatype.Logic_var)
+
+module Kf = Kernel_function
+
+module Kernel_function = Build(Kernel_function)(Kf_correspondance)
+
+module Fundec = Build_correspondance(Cil_datatype.Fundec)
+
+let empty_env =
+  { compinfo = Cil_datatype.Compinfo.Map.empty;
+    kernel_function = Kf.Map.empty;
+    logic_info = Cil_datatype.Logic_info.Map.empty;
+    logic_type_info = Cil_datatype.Logic_type_info.Map.empty;
+  }
 
 (** TODO: use location info to detect potential renaming.
     Requires some information about syntactic diff. *)
@@ -205,96 +236,115 @@ let find_candidate_varinfo ?loc:_loc vi where =
     Some (Globals.Vars.find_from_astinfo vi.vname where)
   with Not_found -> None
 
-let is_same_opt f o o' =
-  match o, o' with
-  | None, None -> true
-  | Some v, Some v' -> f v v'
-  | _ -> false
+let (&&>) (res,env) f = if res then f env else false, env
+let (&&|) env f = f env
+let (&&&) (res,env) b = res && b, env
 
-let rec is_same_type t t' =
+let is_same_opt f o o' env =
+  match o, o' with
+  | None, None -> true, env
+  | Some v, Some v' -> f v v' env
+  | _ -> false, env
+
+let rec is_same_list f l l' env =
+  match l, l' with
+  | [], [] -> true, env
+  | h::t, h'::t' ->
+    env &&| f h h' &&> is_same_list f t t'
+  | _ -> false, env
+
+let rec is_same_type t t' env =
   match t, t' with
   | (TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _), _ ->
-    Cil_datatype.TypByName.equal t t'
+    Cil_datatype.TypByName.equal t t', env
   | TPtr(t,a), TPtr(t',a') ->
-    is_same_type t t' && Cil_datatype.Attributes.equal a a'
+    env &&| is_same_type t t' &&& Cil_datatype.Attributes.equal a a'
   | TArray(t,s,a), TArray(t',s',a') ->
-    is_same_type t t' && is_same_opt is_same_exp s s'
-    && Cil_datatype.Attributes.equal a a'
+    env &&|
+    is_same_type t t' &&>
+    is_same_opt is_same_exp s s' &&&
+    Cil_datatype.Attributes.equal a a'
   | TFun(rt,l,var,a), TFun(rt', l', var', a') ->
-    is_same_type rt rt' &&
-    is_same_opt (Logic_utils.is_same_list is_same_formal) l l' &&
-    var = var' &&
+    env &&|
+    is_same_type rt rt' &&>
+    is_same_opt (is_same_list is_same_formal) l l' &&&
+    (var = var') &&&
     Cil_datatype.Attributes.equal a a'
   | TNamed(t,a), TNamed(t',a') ->
-    let correspondance = typeinfo_correspondance t in
+    let correspondance, env = typeinfo_correspondance t env in
     (match correspondance with
-     | `Not_present -> false
-     | `Same t'' -> Cil_datatype.Typeinfo.equal t' t'') &&
+     | `Not_present -> false, env
+     | `Same t'' -> Cil_datatype.Typeinfo.equal t' t'',env) &&&
     Cil_datatype.Attributes.equal a a'
   | TComp(c,a), TComp(c', a') ->
-    let correspondance = compinfo_correspondance c in
+    let correspondance, env = compinfo_correspondance c env in
     (match correspondance with
-     | `Not_present -> false
-     | `Same c'' -> Cil_datatype.Compinfo.equal c' c'') &&
+     | `Not_present -> false, env
+     | `Same c'' -> Cil_datatype.Compinfo.equal c' c'', env) &&&
     Cil_datatype.Attributes.equal a a'
   | TEnum(e,a), TEnum(e',a') ->
-    let correspondance = enuminfo_correspondance e in
+    let correspondance, env = enuminfo_correspondance e env in
     (match correspondance with
-     | `Not_present -> false
-     | `Same e'' -> Cil_datatype.Enuminfo.equal e' e'') &&
+     | `Not_present -> false, env
+     | `Same e'' -> Cil_datatype.Enuminfo.equal e' e'', env) &&&
     Cil_datatype.Attributes.equal a a'
-  | (TPtr _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _), _ -> false
+  | (TPtr _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _), _ -> false, env
 
-and is_same_compinfo _ci _ci' = false
+and is_same_compinfo _ci _ci' env = false, env
 
-and is_same_enuminfo _ei _ei' = false
+and is_same_enuminfo _ei _ei' env = false, env
 
-and is_same_formal (_,t,a) (_,t',a') =
-  is_same_type t t' && Cil_datatype.Attributes.equal a a'
+and is_same_formal (_,t,a) (_,t',a') env =
+  is_same_type t t' env &&& Cil_datatype.Attributes.equal a a'
 
-and is_same_compound_init (o,i) (o',i') =
-  is_same_offset o o' && is_same_init i i'
+and is_same_compound_init (o,i) (o',i') env =
+  is_same_offset o o' env &&> is_same_init i i'
 
-and is_same_init i i' =
+and is_same_init i i' env =
   match i, i' with
-  | SingleInit e, SingleInit e' -> is_same_exp e e'
+  | SingleInit e, SingleInit e' -> is_same_exp e e' env
   | CompoundInit (t,l), CompoundInit (t', l') ->
-    is_same_type t t' &&
-    Logic_utils.is_same_list is_same_compound_init l l'
-  | (SingleInit _ | CompoundInit _), _ -> false
+    is_same_type t t' env &&>
+    (is_same_list is_same_compound_init) l l'
+  | (SingleInit _ | CompoundInit _), _ -> false, env
 
 and is_same_initinfo i i' = is_same_opt is_same_init i.init i'.init
 
-and is_same_exp _e _e' = false
+and is_same_exp _e _e' env = false, env
 
-and is_same_offset _o _o' = false
+and is_same_offset _o _o' env = false, env
 
-and typeinfo_correspondance ?loc ti =
-  let add ti =
+and typeinfo_correspondance ?loc ti env =
+  let add ti env =
     match find_candidate_type ?loc ti with
-    | None -> `Not_present
+    | None -> `Not_present, env
     | Some ti' ->
-      if is_same_type ti.ttype ti'.ttype then `Same ti' else `Not_present
+      let res, env = is_same_type ti.ttype ti'.ttype env in
+      (if res then `Same ti' else `Not_present), env
   in
-  Typeinfo.memo add ti
+  Typeinfo.memo_env add ti env
 
-and compinfo_correspondance ?loc ci =
-  let add ci =
+and compinfo_correspondance ?loc ci env =
+  let add ci env =
     match find_candidate_compinfo ?loc ci with
-    | None -> `Not_present
+    | None -> `Not_present, env
     | Some ci' ->
-      if is_same_compinfo ci ci' then `Same ci' else `Not_present
+      let res, env = is_same_compinfo ci ci' env in
+      (if res then `Same ci' else `Not_present), env
   in
-  Compinfo.memo add ci
+  match Cil_datatype.Compinfo.Map.find_opt ci env.compinfo with
+  | Some ci' -> `Same ci', env
+  | None -> Compinfo.memo_env add ci env
 
-and enuminfo_correspondance ?loc ei =
-  let add ei =
+and enuminfo_correspondance ?loc ei env =
+  let add ei env =
     match find_candidate_enuminfo ?loc ei with
-    | None -> `Not_present
+    | None -> `Not_present, env
     | Some ei' ->
-      if is_same_enuminfo ei ei' then `Same ei' else `Not_present
+      let res, env = is_same_enuminfo ei ei' env in
+      (if res then `Same ei' else `Not_present),env
   in
-  Enuminfo.memo add ei
+  Enuminfo.memo_env add ei env
 
 let gvar_correspondance ?loc vi =
   let add vi =
@@ -306,17 +356,18 @@ let gvar_correspondance ?loc vi =
         Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
       in
       let init' = Globals.Vars.find vi' in
-      if is_same_initinfo init init' then `Same vi' else `Not_present
+      let res,_ = is_same_initinfo init init' empty_env in
+      if res then `Same vi' else `Not_present
   in
   Varinfo.memo add vi
 
 let global_correspondance g =
   match g with
-  | GType (ti,loc) -> ignore (typeinfo_correspondance ~loc ti)
+  | GType (ti,loc) -> ignore (typeinfo_correspondance ~loc ti empty_env)
   | GCompTag(ci,loc) | GCompTagDecl(ci,loc) ->
-    ignore (compinfo_correspondance ~loc ci)
+    ignore (compinfo_correspondance ~loc ci empty_env)
   | GEnumTag(ei,loc) | GEnumTagDecl(ei,loc) ->
-    ignore (enuminfo_correspondance ~loc ei)
+    ignore (enuminfo_correspondance ~loc ei empty_env)
   | GVar(vi,_,loc) | GVarDecl(vi,loc) ->
     ignore (gvar_correspondance ~loc vi)
   | GFunDecl(_,_vi,_loc) -> ()
