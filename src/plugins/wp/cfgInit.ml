@@ -26,22 +26,22 @@ module Make(W : Mcfg.S) =
 struct
 
   let compute_global_init wenv filter obj =
-    Globals.Vars.fold_in_file_order
+    Globals.Vars.fold_in_file_rev_order
       (fun var initinfo obj ->
+
          if var.vstorage = Extern then obj else
            let do_init = match filter with
              | `All -> true
              | `InitConst -> Cil.isGlobalInitConst var
            in if not do_init then obj
-           else
-             let old_loc = Cil.CurrentLoc.get () in
+           else let old_loc = Cil.CurrentLoc.get () in
              Cil.CurrentLoc.set var.vdecl ;
              let obj = W.init wenv var initinfo.init obj in
              Cil.CurrentLoc.set old_loc ; obj
       ) obj
 
   let process_global_const wenv obj =
-    Globals.Vars.fold_in_file_order
+    Globals.Vars.fold_in_file_rev_order
       (fun var _initinfo obj ->
          if Cil.isGlobalInitConst var
          then W.const wenv var obj
