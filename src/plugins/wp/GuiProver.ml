@@ -27,7 +27,7 @@ let wg_status = `Share "theme/default/surely_invalid.png"
 let smoke_status = `Share "theme/default/valid_under_hyp.png"
 
 let filter = function
-  | VCS.Qed | VCS.Tactical | VCS.NativeCoq -> false
+  | VCS.Qed | VCS.Tactical -> false
   | VCS.Why3 _ -> true
 
 (* -------------------------------------------------------------------------- *)

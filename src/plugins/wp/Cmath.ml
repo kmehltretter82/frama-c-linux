@@ -180,19 +180,12 @@ let builtin_strict_leq lfun ~domain ~zero ~monotonic a b =
 (* -------------------------------------------------------------------------- *)
 
 let f_iabs =
-  extern_f ~library:"cmath"
-    ~link:{
-      why3     = Qed.Engine.F_call "IAbs.abs";
-      coq      = Qed.Engine.F_call "Z.abs";
-    } "\\iabs"
+  extern_f ~library:"cmath" ~link:(Qed.Engine.F_call "IAbs.abs") "\\iabs"
 
 let f_rabs =
   extern_f ~library:"cmath"
     ~result:Real ~params:[Sreal]
-    ~link:{
-      why3     = Qed.Engine.F_call "RAbs.abs";
-      coq      = Qed.Engine.F_call "R.abs";
-    } "\\rabs"
+    ~link:(Qed.Engine.F_call "RAbs.abs") "\\rabs"
 
 let () =
   begin

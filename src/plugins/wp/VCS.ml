@@ -28,7 +28,6 @@ let dkey_shell = Wp_parameters.register_category "shell"
 
 type prover =
   | Why3 of Why3Provers.t (* Prover via WHY *)
-  | NativeCoq     (* Direct Coq and Coqide *)
   | Qed           (* Qed Solver *)
   | Tactical      (* Interactive Prover *)
 
@@ -42,12 +41,6 @@ type mode =
 let parse_prover = function
   | "" | "none" -> None
   | "qed" | "Qed" -> Some Qed
-  | "native-coq" (* for wp-reports *)
-  | "native:coq" | "native:coqide" | "native:coqedit"
-    ->
-      Wp_parameters.warning ~once:true ~current:false
-        "native support for coq is deprecated, use tip instead" ;
-      Some NativeCoq
   | "script" -> Some Tactical
   | "tip" -> Some Tactical
   | "why3" -> Some (Why3 { Why3.Whyconf.prover_name = "why3";
@@ -83,7 +76,6 @@ let parse_mode m =
 
 let name_of_prover = function
   | Why3 s -> Why3Provers.print_wp s
-  | NativeCoq -> "native:coq"
   | Qed -> "qed"
   | Tactical -> "script"
 
@@ -92,7 +84,6 @@ let title_of_prover = function
       if Wp_parameters.has_dkey dkey_shell
       then Why3Provers.name s
       else Why3Provers.title s
-  | NativeCoq -> "Coq (native)"
   | Qed -> "Qed"
   | Tactical -> "Script"
 
@@ -119,13 +110,12 @@ let sanitize_why3 s =
 
 let filename_for_prover = function
   | Why3 s -> sanitize_why3 (Why3Provers.print_wp s)
-  | NativeCoq -> "Coq"
   | Qed -> "Qed"
   | Tactical -> "Tactical"
 
 let is_auto = function
   | Qed -> true
-  | Tactical | NativeCoq -> false
+  | Tactical -> false
   | Why3 p ->
       match p.prover_name with
       | "Alt-Ergo" | "CVC4" | "Z3" -> true
@@ -145,9 +135,6 @@ let cmp_prover p q =
   | Tactical , Tactical -> 0
   | Tactical , _ -> (-1)
   | _ , Tactical -> 1
-  | NativeCoq , NativeCoq -> 0
-  | NativeCoq , _ -> (-1)
-  | _ , NativeCoq -> 1
   | Why3 p , Why3 q -> Why3Provers.compare p q
 
 let pp_prover fmt p = Format.pp_print_string fmt (title_of_prover p)
@@ -331,7 +318,6 @@ let pp_result fmt r =
 let is_qualified prover result =
   match prover with
   | Qed | Tactical -> true
-  | NativeCoq -> result.verdict <> Timeout
   | Why3 _ -> result.cached || result.prover_time < Rformat.epsilon
 
 let pp_cache_miss fmt st updating prover result =

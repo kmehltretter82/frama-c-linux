@@ -33,12 +33,9 @@ type library = string
 
 (** Name for external prover.
 
-    In case a Qed.Engine.link is used, [F_subst] patterns
-    are not supported for Why-3. *)
-type 'a infoprover = {
-  why3   : 'a;
-  coq    : 'a;
-}
+    In case a Qed.Engine.link is used, [F_subst] patterns are not supported. *)
+type 'a infoprover = 'a
+
 (** generic way to have different informations for the provers *)
 
 val infoprover: 'a -> 'a infoprover

@@ -285,11 +285,9 @@ and bal = parse
         skip input; Lang.infoprover link
       | RECLINK l ->
         skip input ;
-        begin try
-          {Lang.why3    = conv_bal def (List.assoc "why3" l);
-                coq     = conv_bal def (List.assoc "coq" l) }
+        begin try conv_bal def (List.assoc "why3" l);
         with Not_found ->
-          failwith "a link must contain an entry for 'why3' and 'coq'"
+          failwith "a link must contain an entry for 'why3'"
         end
       | _ -> failwith "Missing link symbol"
 
@@ -299,11 +297,9 @@ and bal = parse
         skip input ; Lang.infoprover f
       | `RecString l ->
         skip input ;
-        begin try
-          {Lang.why3    = List.assoc "why3" l;
-                coq     = List.assoc "coq" l }
+        begin try List.assoc "why3" l
         with Not_found ->
-          failwith "a link must contain an entry for 'why3' and 'coq'"
+          failwith "a link must contain an entry for 'why3'"
         end
       | _ -> failwith "Missing link symbol"
 

@@ -40,14 +40,8 @@ let library = "vlist"
 let t_list = "\\list"
 let l_list = Lang.infoprover "list"
 let l_concat = Lang.infoprover (E.F_right "concat")
-let l_elt = Lang.(E.({
-    why3 = F_call "elt" ;
-    coq = F_subst "(cons %1 nil)" ;
-  }))
-let l_repeat = Lang.(E.({
-    why3 = F_call "repeat" ;
-    coq = F_call "repeat" ;
-  }))
+let l_elt = E.(F_call "elt")
+let l_repeat = E.(F_call "repeat")
 
 (*--- Typechecking ---*)
 

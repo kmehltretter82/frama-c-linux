@@ -151,9 +151,6 @@ class pane (gprovers:GuiConfig.provers) =
         List.iter
           self#create_prover
           [ VCS.Qed ; VCS.Tactical ] ;
-        let prv = Wp_parameters.Provers.get () in
-        if List.mem "native:coq" prv then
-          self#create_prover VCS.NativeCoq ;
         ignore (list#add_column_empty) ;
         list#set_selection_mode `MULTIPLE ;
         gprovers#connect self#configure ;

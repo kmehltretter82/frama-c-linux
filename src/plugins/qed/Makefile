@@ -55,7 +55,7 @@ PLUGIN_CMO:= \
 	plib pretty export \
 	export_whycore \
 	export_why3 \
-	export_coq \
+
 
 PLUGIN_CMI:= logic engine
 
@@ -87,7 +87,6 @@ QED_API= \
 	plib.mli pretty.mli engine.mli export.mli \
 	export_whycore.mli \
 	export_why3.mli \
-	export_coq.mli \
 
 QED_MLI=$(addprefix $(Qed_DIR)/, $(QED_API))
 

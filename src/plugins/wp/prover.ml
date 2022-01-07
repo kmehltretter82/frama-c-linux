@@ -33,7 +33,6 @@ let dispatch ?(config=VCS.default) mode prover wpo =
   begin
     match prover with
     | Qed | Tactical -> Task.return VCS.no_result
-    | NativeCoq -> ProverCoq.prove mode wpo
     | Why3 prover ->
         let smoke = Wpo.is_smoke_test wpo in
         ProverWhy3.prove

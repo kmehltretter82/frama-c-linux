@@ -37,10 +37,9 @@ struct
   let stage = function
     | Prover( Qed , { verdict = Valid } ) -> 0
     | Prover( Why3 _ , { verdict = Valid } ) -> 1
-    | Prover( NativeCoq , { verdict = Valid } ) -> 2
-    | Tactic _ -> 3
-    | Prover _ -> 4
-    | Error _ -> 5
+    | Tactic _ -> 2
+    | Prover _ -> 3
+    | Error _ -> 4
 
   let time = function
     | Tactic _ | Error _ -> 0.0

@@ -118,24 +118,14 @@ module CacheEnv: Parameter_sig.Bool
 module CacheDir: Parameter_sig.String
 module CachePrint: Parameter_sig.Bool
 module Drivers: Parameter_sig.String_list
-module Script: Parameter_sig.String
-module UpdateScript: Parameter_sig.Bool
 module Timeout: Parameter_sig.Int
 module SmokeTimeout: Parameter_sig.Int
 module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
 module TimeMargin: Parameter_sig.Int
-module CoqTimeout: Parameter_sig.Int
-module CoqCompiler : Parameter_sig.String
-module CoqIde : Parameter_sig.String
-module CoqProject : Parameter_sig.String
 module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool
-module CoqLibs: Parameter_sig.String_list
-module CoqTactic: Parameter_sig.String
-module Hints: Parameter_sig.Int
-module TryHints: Parameter_sig.Bool
 module Why3Flags: Parameter_sig.String_list
 
 module Auto: Parameter_sig.String_list

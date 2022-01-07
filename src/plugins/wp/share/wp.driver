@@ -21,63 +21,39 @@
 /**************************************************************************/
 
 library qed:
-coq.file += "coqwp/BuiltIn.v";
-coq.file += "coqwp:bool/Bool.v";
-coq.file += "coqwp/HighOrd.v";
-coq.file += "coqwp:int/Int.v";
-coq.file += "coqwp:int/Abs.v";
-coq.file += "coqwp:int/ComputerDivision.v";
-coq.file += "coqwp:int/EuclideanDivision.v";
-coq.file += "coqwp:int/ComputerOfEuclideanDivision.v";
-coq.file += "coqwp:real/Real.v";
-coq.file += "coqwp:real/RealInfix.v";
-coq.file += "coqwp:real/FromInt.v";
-coq.file += "coqwp:map/Map.v";
-coq.file += "coqwp:bool/Bool.v";
-coq.file += "coqwp/Qedlib.v";
-coq.file += "coqwp/Qed.v";
 why3.import += "int.Abs:IAbs";
 why3.import += "frama_c_wp.qed.Qed";
 why3.qualifier := "frama_c_wp.qed";
 
 library const:
-coq.file += "coqwp:map/Const.v";
 why3.import += "map.Const";
 
 library minmax_int:
-coq.file += "coqwp:int/MinMax.v";
 why3.import += "int.MinMax:Ig";
 logic integer "\\max"(integer,integer) =
       commutative:associative:idempotent:
-      {coq="Zmax";why3="Ig.max"};
+      {why3="Ig.max"};
 logic integer "\\min"(integer,integer) =
       commutative:associative:idempotent:
-      {coq="Zmin";why3="Ig.min"};
+      {why3="Ig.min"};
 
 library minmax_real:
-coq.file += "coqwp:real/MinMax.v";
 why3.import += "real.MinMax:Rg";
 logic real "\\max"(real,real) =
       commutative:associative:idempotent:
-      {coq="Rmax";why3="Rg.max"};
+      {why3="Rg.max"};
 logic real "\\min"(real,real) =
       commutative:associative:idempotent:
-      {coq="Rmin";why3="Rg.min"};
+      {why3="Rg.min"};
 
 library cint:
-coq.file += "coqwp/Bits.v";
-coq.file += "coqwp/Zbits.v";
-coq.file += "coqwp/Cint.v";
 why3.import += "frama_c_wp.cint.Cint";
 
 library cbits: cint
 logic boolean "bit_test"(integer,integer) := \bit_test_stdlib;
-coq.file += "coqwp/Cbits.v";
 why3.import += "frama_c_wp.cbits.Cbits";
 
 library cfloat: cmath sqrt
-coq.file += "coqwp:real/Abs.v";
-coq.file += "coqwp/Cfloat.v";
 why3.import += "frama_c_wp.cfloat.Cfloat";
 type "rounding_mode"   = "Rounding.mode";
 ctor "\\Up"()          = "Rounding.RTP";
@@ -100,33 +76,24 @@ logic float64 "\\round_double"(rounding_mode,real) = "round_double";
 
 library vset:
 type set = "set";
-coq.file := "coqwp/Vset.v";
 why3.import := "vset.Vset";
 
 library vlist:
-coq.file := "coqwp/Vlist.v";
 why3.import := "frama_c_wp.vlist.Vlist";
 
 library memory:
-coq.file := "coqwp/Memory.v";
 why3.import := "frama_c_wp.memory.Memory";
 
 library sqrt: cmath
 why3.import += "real.Square";
-coq.file += "coqwp/Square.v";
 why3.import += "frama_c_wp.cmath.Square";
 
 library exponential: qed
 why3.import += "real.ExpLog" ;
 why3.import += "frama_c_wp.cmath.ExpLog" ;
-coq.file += "coqwp:real/ExpLog.v" ;
-coq.file += "coqwp/Exp.v" ;
 
 library power: exponential sqrt
 why3.import += "real.PowerReal" ;
-coq.file += "coqwp:int/Exponentiation.v" ;
-coq.file += "coqwp:int/Power.v" ;
-coq.file += "coqwp:real/PowerReal.v" ;
 
 library truncate: qed
 why3.import += "real.Truncate" ;
@@ -134,17 +101,12 @@ why3.import += "real.Truncate" ;
 library cmath: qed
 why3.import += "real.Abs:RAbs" ;
 why3.import += "frama_c_wp.cmath.Cmath";
-coq.file += "coqwp:real/Abs.v" ;
-coq.file += "coqwp:real/Square.v";
-coq.file += "coqwp/Cmath.v";
 
 library trigonometry: sqrt cmath
 why3.import += "real.Trigonometry";
-coq.file += "coqwp:real/Trigonometry.v";
 
 library arctrigo: trigonometry
 why3.import += "frama_c_wp.cmath.ArcTrigo";
-coq.file += "coqwp/ArcTrigo.v";
 
 library hyperbolic: sqrt exponential
 why3.import += "real.Hyperbolic";
