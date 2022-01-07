@@ -35,13 +35,6 @@ m4_ifndef([FRAMAC_M4_MACROS],
 
 check_plugin(wp,PLUGIN_RELATIVE_PATH(plugin_file),[WP plug-in],yes,yes)
 
-AC_ARG_ENABLE(
-  wp-coq,
-  [  --enable-wp-coq         Wp precompiled Coq libraries (default: yes)],
-  WPCOQ=$enableval,
-  WPCOQ=yes
-)
-
 plugin_require(wp,qed)
 plugin_require(wp,rtegen)
 plugin_use(wp,gui)
@@ -74,31 +67,6 @@ case $WHY3VERSION in
         AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.4.0+)])
         ;;
 esac
-fi
-
-# Nb: this would deserve to use plugin_requires mechanism
-if test "$ENABLE_WP" != "no"; then
-
-  ## Configuring for WP-COQ
-  if test "$WPCOQ" = "yes" ; then
-    AC_CHECK_PROG(COQC,coqc,yes,no)
-    if test "$COQC" = "yes" ; then
-      COQVERSION=`coqc -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
-      case $COQVERSION in
-        8.13.*|trunk)
-          AC_MSG_RESULT(coqc version $COQVERSION found)
-          ;;
-        *)
-          AC_MSG_RESULT(unsupported coqc version $COQVERSION for - deprecated - native backend)
-          COQC="no"
-          ;;
-      esac
-    fi
-  else
-    COQC="no"
-  fi
-  AC_SUBST(COQC)
-
 fi
 
 write_plugin_config(Makefile)
