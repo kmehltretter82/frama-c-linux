@@ -565,8 +565,26 @@ let rec type_term
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
           List.iter
-            (fun x -> ignore
-                (type_term ~use_gmp_opt ~under_lambda ~arith_operand ~profile x))
+            (fun x ->
+               let ctx = match x.term_type with
+                 | Linteger ->
+                   (* If the function parameter is an integer,
+                      the kernel introduces a coercion to integer, so we will
+                      always see integer here.*)
+                   begin match x.term_node with
+                     |TLogic_coerce _ -> None
+                     |_ -> if Options.Gmp_only.get() then Some Gmpz else None
+                   end
+                 | Lreal -> Some Real
+                 | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
+               in
+               ignore
+                 (type_term
+                    ~use_gmp_opt:true
+                    ~under_lambda:true
+                    ~arith_operand
+                    ?ctx
+                    ~profile x))
             args;
           let new_profile = List.map (Interval.get_p ~profile) args in
           Stack.push
@@ -576,21 +594,48 @@ let rec type_term
           dup c_int
         | LBterm t_body ->
           List.iter
-            (fun x -> ignore
-                (type_term ~use_gmp_opt ~under_lambda ~arith_operand ~profile x))
+            (fun x ->
+               let ctx = match x.term_type with
+                 | Linteger ->
+                   (* If the function parameter is an integer,
+                      the kernel introduces a coercion to integer, so we will
+                      always see integer here.*)
+                   begin match x.term_node with
+                     | TLogic_coerce _ -> None
+                     |_ -> if Options.Gmp_only.get() then Some Gmpz else None
+                   end
+                 | Lreal -> Some Real
+                 | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
+               in
+               ignore
+                 (type_term
+                    ~use_gmp_opt:true
+                    ~under_lambda:true
+                    ~arith_operand
+                    ?ctx
+                    ~profile x))
             args;
           let new_profile = List.map (Interval.get_p ~profile) args in
+          let gmp,ctx_body = match li.l_type with
+            | Some (Ctype typ) ->
+              false, Some (number_ty_of_typ ~post:false typ)
+            | _ ->
+              true, if Options.Gmp_only.get() then Some Gmpz else ctx
+          in
           Stack.push
             (fun () ->
                ignore (type_term
-                         ~use_gmp_opt
+                         ~use_gmp_opt:false
                          ~under_lambda:true
                          ~arith_operand
-                         ?ctx
+                         ?ctx:ctx_body
                          ~profile:new_profile
                          t_body))
             pending_typing;
-          dup (ty_of_interv ?ctx ~use_gmp_opt (Interval.get_p ~profile t))
+          dup (ty_of_interv
+                 ?ctx:ctx_body
+                 ~use_gmp_opt:(gmp && use_gmp_opt)
+                 (Interval.get_p ~profile t))
         | LBnone ->
           (match args with
            | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->

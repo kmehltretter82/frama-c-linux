@@ -514,14 +514,16 @@ long __gen_e_acsl_f1(int x, int y)
     assigns \result \from c; */
 int __gen_e_acsl_h_char(int c)
 {
-  return c;
+  int __retres = (char)c;
+  return __retres;
 }
 
 /*@ assigns \result;
     assigns \result \from s; */
 int __gen_e_acsl_h_short(int s)
 {
-  return s;
+  int __retres = (short)s;
+  return __retres;
 }
 
 /*@ assigns \result;
