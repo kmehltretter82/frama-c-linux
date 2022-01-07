@@ -126,6 +126,11 @@ let match_integer t =
   | Logic.Kint c -> c
   | _ -> raise Not_found
 
+let match_to_cint t =
+  match F.repr t with
+  | Logic.Fun( conv , [a] ) -> (to_cint conv), a
+  | _ -> raise Not_found
+
 let match_mod t =
   match F.repr t with
   | Logic.Mod (e1, e2) -> e1, e2
@@ -630,6 +635,7 @@ let smp_eq_with_land a b =
         F.e_and (List.map (e_eq b) es)
     with Not_found -> introduction_bit_test_positive es b
   with Not_found ->
+  try
     (* k>=0 & b1>=0 ==> (b1 & ((1 << k) -1) == b1 % (1 << k)  <==> true) *)
     let b1,b2 = match_mod b in
     let k = match_power2 b2 in
@@ -637,6 +643,21 @@ let smp_eq_with_land a b =
     let k',_,es = match_power2_minus1_extraction es in
     if not ((is_positive_or_null b1) &&
             (F.decide (F.e_eq k k')) &&
+            (F.decide (F.e_eq b1 (F.e_fun f_land es))))
+    then raise Not_found ;
+    F.e_true
+  with Not_found ->
+    (* k in {8,16,32,64} ==> (b1 & ((1 << k) -1) == to_cint_unsigned_bits(k, b1)  <==> true *)
+    let iota,b1 = match_to_cint b in
+    if Ctypes.signed iota then raise Not_found ;
+    let n = Ctypes.i_bits iota in
+    if n = 1 then
+      (* rejects [to_bool()] that is not a modulo *)
+      raise Not_found ;
+    let k',_,es = match_power2_minus1_extraction es in
+    let k' = match_integer k' in
+    let k = Integer.of_int n in
+    if not ((Integer.equal k k') &&
             (F.decide (F.e_eq b1 (F.e_fun f_land es))))
     then raise Not_found ;
     F.e_true
