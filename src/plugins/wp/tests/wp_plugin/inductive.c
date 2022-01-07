@@ -1,9 +1,9 @@
 /* run.config
-   OPT: -wp-prover native:coq -wp-gen -wp-msg-key print-generated
+   OPT: -wp-prover why3 -wp-gen -wp-msg-key print-generated
 */
 
 /* run.config_qualif
-   OPT: -wp-prover native:coq -wp-coq-script %{dep:@PTEST_DIR@/inductive.script} -wp-timeout 240
+   OPT: -wp-prover coq -wp-coq-script %{dep:@PTEST_DIR@/inductive.script} -wp-timeout 240
 */
 
 typedef struct _list { int element; struct _list* next; } list;
@@ -42,11 +42,11 @@ typedef struct _list { int element; struct _list* next; } list;
     }
 */
 
-/*@ lemma test: 
-    \forall list *root,*node; 
+/*@ lemma test:
+    \forall list *root,*node;
          reachable(root,node) ==> ( root == node || (\valid(root) && reachable(root->next, node)) );
 */
-/*@ lemma offset{L1,L2} : 
+/*@ lemma offset{L1,L2} :
     \forall int *a, *b, integer begin, end, offset;
          same_elements{L1,L2}(a+offset,b+offset, begin, end) ==>
          same_elements{L1,L2}(a, b, begin+offset, end+offset);

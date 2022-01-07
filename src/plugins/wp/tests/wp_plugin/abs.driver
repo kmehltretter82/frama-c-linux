@@ -1,5 +1,4 @@
 library "abs":
 logic integer ABS (integer) = "my_abs" ;
 
-coq.file := "Abs.v";
 why3.file := "abs.why";
