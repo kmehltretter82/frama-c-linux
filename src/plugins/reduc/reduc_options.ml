@@ -24,7 +24,7 @@ include Plugin.Register
     (struct
       let name = "Reduction"
       let shortname = "reduc"
-      let help = "Generate ACSL annotations from Value Analysis informations"
+      let help = "Generate ACSL annotations from Eva information"
     end)
 
 module Reduc =
@@ -40,7 +40,7 @@ module GenAnnot =
     (struct
       let option_name = "-reduc-gen-annot"
       let arg_name = "gen-annot-heuristic"
-      let help = "Heuristic to generate annotations from Value"
+      let help = "Heuristic to generate annotations from Eva"
       let default = "inout"
     end)
 let () = GenAnnot.set_possible_values ["inout"; "all"]
