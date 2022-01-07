@@ -38,10 +38,10 @@
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:1116: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:470: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:505: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:472: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:507: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
