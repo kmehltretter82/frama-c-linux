@@ -244,11 +244,17 @@ let get_terminates_hyp kf =
   | Defined (_, p) -> false, p
   | Assumed p -> true, p
 
+let check_variant_relation = function
+  | (_, None) -> ()
+  | (_, Some rel) ->
+      Wp_parameters.hypothesis ~once:true
+        "'%a' relation must be well-founded" Cil_printer.pp_logic_info rel
+
 let get_decreases_goal kf =
   let defined t = WpPropId.mk_decrease_id kf Kglobal t, t in
   match Annotations.decreases ~populate:false kf with
   | None -> None
-  | Some v -> Some (defined v)
+  | Some v -> check_variant_relation v ; Some (defined v)
 
 let get_decreases_hyp kf =
   Annotations.decreases ~populate:false kf
@@ -475,6 +481,7 @@ let mk_variant_properties kf s ca v =
   (vpos_id, vpos), (vdecr_id, vdecr)
 
 let mk_variant_relation_property kf s ca v li =
+  check_variant_relation (v, Some li) ;
   let vid = WpPropId.mk_var_id kf s ca in
   let loc = v.term_loc in
   let lcurr = Clabels.to_logic (Clabels.loop_current s) in

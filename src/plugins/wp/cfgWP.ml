@@ -1153,11 +1153,12 @@ struct
                      Kernel_function.pretty kf
                | (_, r), Some (_, r')
                  when not @@ Option.equal Logic_utils.is_same_logic_info r r' ->
+                   let none : Pretty_utils.sformat = "<None>" in
                    Warning.error
                      "On call to %a, relation (%a) does not match caller (%a)"
                      Kernel_function.pretty kf
-                     (Pretty_utils.pp_opt Cil_printer.pp_logic_info) r
-                     (Pretty_utils.pp_opt Cil_printer.pp_logic_info) r'
+                     (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r
+                     (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r'
                | (caller_d, rel), Some (callee_d,_ ) ->
                    let rel caller callee = match rel with
                      | None ->
