@@ -613,12 +613,23 @@ let smp_lnot = function
 (* --- Comparision with L-AND / L-OR / L-NOT                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let smp_leq_with_land a b =
-  let es = match_fun f_land a in
-  let a1,_ = match_list_head match_positive_or_null_integer es in
-  if F.decide (F.e_leq (e_zint a1) b)
+let smp_leq_improved f a b =
+  ignore (match_fun f b) ; (* It must be an improved of [is_positive_or_null f(args)] *)
+  (* a <= 0 && 0 <= f(args) *)
+  if F.decide (F.e_leq a F.e_zero) && is_positive_or_null b
   then e_true
   else raise Not_found
+
+let smp_leq_with_land a b =
+  try
+    let es = match_fun f_land a in
+    let a1,_ = match_list_head match_positive_or_null_integer es in
+    if F.decide (F.e_leq (e_zint a1) b)
+    then e_true
+    else raise Not_found
+  with Not_found ->
+    (* a <= 0 && 0 <= (x&y) ==> a <= (x & y) *)
+    smp_leq_improved f_land a b
 
 let smp_eq_with_land a b =
   let es = match_fun f_land a in
@@ -777,7 +788,11 @@ let smp_eq_with_lsl a b =
   try smp_eq_with_lsl_cst a b
   with Not_found -> smp_cmp_with_lsl e_eq a b
 
-let smp_leq_with_lsl a0 b0 = smp_cmp_with_lsl e_leq a0 b0
+let smp_leq_with_lsl a b =
+  try smp_cmp_with_lsl e_leq a b
+  with Not_found ->
+    (* a <= 0 && 0 <= (x << y) ==> a <= (x << y) *)
+    smp_leq_improved f_lsl a b
 
 let smp_eq_with_lsr a0 b0 =
   try
@@ -820,6 +835,7 @@ let smp_leq_with_lsr x y =
       let k = two_power_k p in
       e_leq x (e_div a (e_zint k))
   with Not_found ->
+  try
     let a,p = match_fun f_lsr x |> match_positive_or_null_integer_arg2 in
     (* (a >> p) <= y with p >= 0 *)
     if y == e_zero then
@@ -829,6 +845,10 @@ let smp_leq_with_lsr x y =
       (* p >= 0 ==> ( (a >> p) <= y <==> a/(2**p) <= y ) *)
       let k = two_power_k p in
       e_leq (e_div a (e_zint k)) y
+  with Not_found ->
+    (* x <= y && 0 <= (a&b) ==> x <= (a >> b) *)
+    smp_leq_improved f_lsr x y
+
 
 (* Rewritting at export *)
 let bitk_export k e = F.e_fun ~result:Logic.Bool f_bit_export [e;k]
@@ -858,10 +878,10 @@ let () =
            no creation of [e_fun f_bit_stdlib args] *)
         let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
         let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
-        let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot smp_lnot in
-        let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor
+        let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot smp_lnot ~leq:(smp_leq_improved f_lnot) in
+        let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor ~leq:(smp_leq_improved f_lxor)
             (smp2 f_lxor Integer.logxor) in
-        let bi_lor  = mk_builtin "f_lor" f_lor  ~eq:smp_eq_with_lor
+        let bi_lor  = mk_builtin "f_lor" f_lor  ~eq:smp_eq_with_lor ~leq:(smp_leq_improved f_lor)
             (smp2 f_lor  Integer.logor) in
         let bi_land = mk_builtin "f_land" f_land ~eq:smp_eq_with_land ~leq:smp_leq_with_land
             smp_land in

@@ -3,10 +3,10 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 40 goals scheduled
-[wp] [Alt-Ergo] Goal typed_acquire_loop_invariant_RANGE_preserved : Valid
+[wp] [Alt-Ergo] Goal typed_acquire_loop_invariant_RANGE_preserved : Valid (Qed:3ms) (17ms) (39) (missing cache)
 [wp] [Qed] Goal typed_acquire_loop_invariant_RANGE_established : Valid
 [wp] [Qed] Goal typed_acquire_loop_assigns_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_acquire_loop_assigns_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_acquire_loop_assigns_part2 : Valid (Qed:5ms) (18ms) (52) (missing cache)
 [wp] [Qed] Goal typed_issue_751_check : Valid
 [wp] [Qed] Goal typed_issue_751_check_2 : Valid
 [wp] [Qed] Goal typed_issue_751_check_3 : Valid
