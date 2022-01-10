@@ -182,7 +182,6 @@ module Info(I: sig val name: string end) =
    types, and function (both C and ACSL). Other symbols must be
    correctly ordered in a well-formed AST
 *)
-[@@@ ocaml.warning "-69"] (* WIP: currently not all fields are used *)
 type is_same_env =
   {
     compinfo: compinfo Cil_datatype.Compinfo.Map.t;
@@ -191,16 +190,9 @@ type is_same_env =
     logic_type_info: logic_type_info Cil_datatype.Logic_type_info.Map.t;
   }
 
-module Build(H:Datatype.S_with_collections)(D:Datatype.S) = struct
-  include
-    State_builder.Hashtbl(H.Hashtbl)(D)
-      (Info(struct let name = "Ast_diff." ^ D.name end))
-
-  let memo_env mk_val key env =
-    if mem key then find key, env
-    else let (data, _) as res = mk_val key env in
-      add key data; res
-end
+module Build(H:Datatype.S_with_collections)(D:Datatype.S) =
+  State_builder.Hashtbl(H.Hashtbl)(D)
+    (Info(struct let name = "Ast_diff." ^ D.name end))
 
 module Build_correspondance(H:Datatype.S_with_collections) =
   Build(H)(Correspondance.Make(H))
@@ -287,98 +279,91 @@ let find_candidate_logic_type ?loc:_loc ti =
     Some (Logic_env.find_logic_type ti.lt_name)
   with Not_found -> None
 
-let (&&>) (res,env) f = if res then f env else false, env
-let (&&|) env f = f env
-let (&&&) (res,env) b = res && b, env
-
 let is_same_opt f o o' env =
   match o, o' with
-  | None, None -> true, env
+  | None, None -> true
   | Some v, Some v' -> f v v' env
-  | _ -> false, env
+  | _ -> false
 
 let rec is_same_list f l l' env =
   match l, l' with
-  | [], [] -> true, env
+  | [], [] -> true
   | h::t, h'::t' ->
-    env &&| f h h' &&> is_same_list f t t'
-  | _ -> false, env
+    f h h' env && is_same_list f t t' env
+  | _ -> false
 
 let rec is_same_type t t' env =
   match t, t' with
   | (TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _), _ ->
-    Cil_datatype.TypByName.equal t t', env
+    Cil_datatype.TypByName.equal t t'
   | TPtr(t,a), TPtr(t',a') ->
-    env &&| is_same_type t t' &&& Cil_datatype.Attributes.equal a a'
+    is_same_type t t' env && Cil_datatype.Attributes.equal a a'
   | TArray(t,s,a), TArray(t',s',a') ->
-    env &&|
-    is_same_type t t' &&>
-    is_same_opt is_same_exp s s' &&&
+    is_same_type t t' env &&
+    is_same_opt is_same_exp s s' env &&
     Cil_datatype.Attributes.equal a a'
   | TFun(rt,l,var,a), TFun(rt', l', var', a') ->
-    env &&|
-    is_same_type rt rt' &&>
-    is_same_opt (is_same_list is_same_formal) l l' &&&
-    (var = var') &&&
+    is_same_type rt rt' env &&
+    is_same_opt (is_same_list is_same_formal) l l' env &&
+    (var = var') &&
     Cil_datatype.Attributes.equal a a'
   | TNamed(t,a), TNamed(t',a') ->
-    let correspondance, env = typeinfo_correspondance t env in
+    let correspondance = typeinfo_correspondance t env in
     (match correspondance with
-     | `Not_present -> false, env
-     | `Same t'' -> Cil_datatype.Typeinfo.equal t' t'',env) &&&
+     | `Not_present -> false
+     | `Same t'' -> Cil_datatype.Typeinfo.equal t' t'') &&
     Cil_datatype.Attributes.equal a a'
   | TComp(c,a), TComp(c', a') ->
-    let correspondance, env = compinfo_correspondance c env in
+    let correspondance = compinfo_correspondance c env in
     (match correspondance with
-     | `Not_present -> false, env
-     | `Same c'' -> Cil_datatype.Compinfo.equal c' c'', env) &&&
+     | `Not_present -> false
+     | `Same c'' -> Cil_datatype.Compinfo.equal c' c'') &&
     Cil_datatype.Attributes.equal a a'
   | TEnum(e,a), TEnum(e',a') ->
-    let correspondance, env = enuminfo_correspondance e env in
+    let correspondance = enuminfo_correspondance e env in
     (match correspondance with
-     | `Not_present -> false, env
-     | `Same e'' -> Cil_datatype.Enuminfo.equal e' e'', env) &&&
+     | `Not_present -> false
+     | `Same e'' -> Cil_datatype.Enuminfo.equal e' e'') &&
     Cil_datatype.Attributes.equal a a'
-  | (TPtr _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _), _ -> false, env
+  | (TPtr _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _), _ -> false
 
-and is_same_compinfo _ci _ci' env = false, env
+and is_same_compinfo _ci _ci' _env = false
 
-and is_same_enuminfo _ei _ei' env = false, env
+and is_same_enuminfo _ei _ei' _env = false
 
 and is_same_formal (_,t,a) (_,t',a') env =
-  is_same_type t t' env &&& Cil_datatype.Attributes.equal a a'
+  is_same_type t t' env && Cil_datatype.Attributes.equal a a'
 
 and is_same_compound_init (o,i) (o',i') env =
-  is_same_offset o o' env &&> is_same_init i i'
+  is_same_offset o o' env && is_same_init i i' env
 
 and is_same_init i i' env =
   match i, i' with
   | SingleInit e, SingleInit e' -> is_same_exp e e' env
   | CompoundInit (t,l), CompoundInit (t', l') ->
-    is_same_type t t' env &&>
-    (is_same_list is_same_compound_init) l l'
-  | (SingleInit _ | CompoundInit _), _ -> false, env
+    is_same_type t t' env &&
+    (is_same_list is_same_compound_init) l l' env
+  | (SingleInit _ | CompoundInit _), _ -> false
 
-and is_same_initinfo i i' = is_same_opt is_same_init i.init i'.init
+and is_same_initinfo i i' env = is_same_opt is_same_init i.init i'.init env
 
-and is_same_exp _e _e' env = false, env
+and is_same_exp _e _e' _env = false
 
-and is_same_offset _o _o' env = false, env
+and is_same_offset _o _o' _env = false
 
-and is_same_funspec _s _s' env = false, env
+and is_same_funspec _s _s' _env = false
 
-and is_same_fundec _f _f' env: body_correspondance*is_same_env =
-  `Body_changed, env
+and is_same_fundec _f _f' _env: body_correspondance = `Body_changed
 
-and is_same_logic_type _t _t' env = false, env
+and is_same_logic_type _t _t' _env = false
 
-and is_same_logic_param _lv _lv' env = false, env
+and is_same_logic_param _lv _lv' _env = false
 
-and is_same_logic_info _li _li' env = false, env
+and is_same_logic_info _li _li' _env = false
 
-and is_same_logic_type_info _ti _ti' env = false, env
+and is_same_logic_type_info _ti _ti' _env = false
 
-and is_same_model_info _mi _mi' env = false, env
+and is_same_model_info _mi _mi' _env = false
 
 (* because of overloading, we have to check for a corresponding profile,
    leading to potentially recursive calls to is_same_* functions. *)
@@ -390,20 +375,18 @@ and find_candidate_logic_info ?loc:_loc li env =
   let rec extract l =
     match l with
     | [] -> None
-    | li' :: tl ->
-      let (res,_) = find_one li' in
-      if res then Some li' else extract tl
+    | li' :: tl -> if find_one li' then Some li' else extract tl
   in
   match extract candidates with
   | None -> None
   | Some li' ->
-    let (res,_) = is_same_opt is_same_logic_type li.l_type li'.l_type env in
+    let res = is_same_opt is_same_logic_type li.l_type li'.l_type env in
     if res then Some li' else None
 
 and find_candidate_model_info ?loc:_loc mi env =
   let candidates = Logic_env.find_all_model_fields mi.mi_name in
   let find_one mi' =
-    fst (is_same_type mi.mi_base_type mi'.mi_base_type env)
+    is_same_type mi.mi_base_type mi'.mi_base_type env
   in
   let rec aux = function
     | [] -> None
@@ -412,39 +395,38 @@ and find_candidate_model_info ?loc:_loc mi env =
   aux candidates
 
 and typeinfo_correspondance ?loc ti env =
-  let add ti env =
+  let add ti =
     match find_candidate_type ?loc ti with
-    | None -> `Not_present, env
+    | None -> `Not_present
     | Some ti' ->
-      let res, env = is_same_type ti.ttype ti'.ttype env in
-      (if res then `Same ti' else `Not_present), env
+      let res = is_same_type ti.ttype ti'.ttype env in
+      if res then `Same ti' else `Not_present
   in
-  Typeinfo.memo_env add ti env
+  Typeinfo.memo add ti
 
 and compinfo_correspondance ?loc ci env =
-  let add ci env =
+  let add ci =
     match find_candidate_compinfo ?loc ci with
-    | None -> `Not_present, env
+    | None -> `Not_present
     | Some ci' ->
-      let env =
+      let env' =
         {env with compinfo = Cil_datatype.Compinfo.Map.add ci ci' env.compinfo}
       in
-      let res, env = is_same_compinfo ci ci' env in
-      (if res then `Same ci' else `Not_present), env
+      let res = is_same_compinfo ci ci' env' in
+      if res then `Same ci' else `Not_present
   in
   match Cil_datatype.Compinfo.Map.find_opt ci env.compinfo with
-  | Some ci' -> `Same ci', env
-  | None -> Compinfo.memo_env add ci env
+  | Some ci' -> `Same ci'
+  | None -> Compinfo.memo add ci
 
 and enuminfo_correspondance ?loc ei env =
-  let add ei env =
+  let add ei =
     match find_candidate_enuminfo ?loc ei with
-    | None -> `Not_present, env
+    | None -> `Not_present
     | Some ei' ->
-      let res, env = is_same_enuminfo ei ei' env in
-      (if res then `Same ei' else `Not_present),env
+      if is_same_enuminfo ei ei' env then `Same ei' else `Not_present
   in
-  Enuminfo.memo_env add ei env
+  Enuminfo.memo add ei
 
 and gfun_correspondance ?loc vi env =
   let selection =
@@ -458,64 +440,64 @@ and gfun_correspondance ?loc vi env =
   let kf =
     Project.on ~selection (Orig_project.get()) Globals.Functions.get vi
   in
-  let add kf env =
+  let add kf =
     match find_candidate_func ?loc kf with
-    | None -> `Not_present, env
+    | None -> `Not_present
     | Some kf' ->
-      let env =
+      let env' =
         { env with kernel_function = Kf.Map.add kf kf' env.kernel_function }
       in
-      let same_spec, env = is_same_funspec kf.spec kf'.spec env in
-      let same_body, env =
+      let same_spec = is_same_funspec kf.spec kf'.spec env' in
+      let same_body =
         match (Kf.has_definition kf, Kf.has_definition kf') with
-        | false, false -> `Same_body, env
-        | false, true | true, false -> `Body_changed, env
+        | false, false -> `Same_body
+        | false, true | true, false -> `Body_changed
         | true, true ->
-          is_same_fundec (Kf.get_definition kf) (Kf.get_definition kf') env
+          is_same_fundec (Kf.get_definition kf) (Kf.get_definition kf') env'
       in
       match same_spec, same_body with
-      | false, `Body_changed -> `Not_present, env
-      | false, `Callees_changed -> `Partial(kf',`Callees_spec_changed), env
-      | false, `Same_body -> `Partial(kf', `Spec_changed), env
-      | true, `Same_body -> `Same kf', env
-      | true, ((`Body_changed|`Callees_changed) as c) -> `Partial(kf', c), env
+      | false, `Body_changed -> `Not_present
+      | false, `Callees_changed -> `Partial(kf',`Callees_spec_changed)
+      | false, `Same_body -> `Partial(kf', `Spec_changed)
+      | true, `Same_body -> `Same kf'
+      | true, ((`Body_changed|`Callees_changed) as c) -> `Partial(kf', c)
   in
   match Kf.Map.find_opt kf env.kernel_function with
-  | Some kf' -> `Same kf', env
-  | None -> Kernel_function.memo_env add kf env
+  | Some kf' -> `Same kf'
+  | None -> Kernel_function.memo add kf
 
 and logic_info_correspondance ?loc li env =
-  let add li env =
+  let add li =
     match find_candidate_logic_info ?loc li env with
-    | None -> `Not_present, env
+    | None -> `Not_present
     | Some li' ->
       let env =
         { env with
           logic_info = Cil_datatype.Logic_info.Map.add li li' env.logic_info }
       in
-      let res, env = is_same_logic_info li li' env in
-      (if res then `Same li' else `Not_present), env
+      let res = is_same_logic_info li li' env in
+      if res then `Same li' else `Not_present
   in
   match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
-  | Some li' -> `Same li', env
-  | None -> Logic_info.memo_env add li env
+  | Some li' -> `Same li'
+  | None -> Logic_info.memo add li
 
 and logic_type_correspondance ?loc ti env =
-  let add ti env =
+  let add ti =
     match find_candidate_logic_type ?loc ti with
-    | None -> `Not_present, env
+    | None -> `Not_present
     | Some ti' ->
       let env =
         { env with
           logic_type_info =
             Cil_datatype.Logic_type_info.Map.add ti ti' env.logic_type_info }
       in
-      let res, env = is_same_logic_type_info ti ti' env in
-      (if res then `Same ti' else `Not_present), env
+      let res = is_same_logic_type_info ti ti' env in
+      if res then `Same ti' else `Not_present
   in
   match Cil_datatype.Logic_type_info.Map.find_opt ti env.logic_type_info with
-  | Some ti' -> `Same ti', env
-  | None -> Logic_type_info.memo_env add ti env
+  | Some ti' -> `Same ti'
+  | None -> Logic_type_info.memo add ti
 
 let gvar_correspondance ?loc vi =
   let add vi =
@@ -527,7 +509,7 @@ let gvar_correspondance ?loc vi =
         Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
       in
       let init' = Globals.Vars.find vi' in
-      let res,_ = is_same_initinfo init init' empty_env in
+      let res = is_same_initinfo init init' empty_env in
       if res then `Same vi' else `Not_present
   in
   Varinfo.memo add vi
@@ -537,7 +519,7 @@ let model_info_correspondance ?loc mi =
     match find_candidate_model_info ?loc mi empty_env with
     | None -> `Not_present
     | Some mi' ->
-      let res,_ = is_same_model_info mi mi' empty_env in
+      let res = is_same_model_info mi mi' empty_env in
       if res then `Same mi' else `Not_present
   in
   Model_info.memo add mi
