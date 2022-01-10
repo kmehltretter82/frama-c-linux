@@ -36,12 +36,22 @@ type 'a correspondance =
   | `Not_present (** no correspondance *)
   ]
 
-(** specific correspondance for kernel functions *)
+(** for kernel function, we are a bit more precise than a yes/no answer.
+    More precisely, we check whether a function has the same spec,
+    the same body, and whether its callees have changed (provided
+    the body itself is identical, otherwise, there's no point in checking
+    the callees.
+*)
+type partial_correspondance =
+  [ `Spec_changed (** body and callees haven't changed *)
+  | `Body_changed (** spec hasn't changed *)
+  | `Callees_changed (** spec and body haven't changed *)
+  | `Callees_spec_changed (** body hasn't changed *)
+  ]
+
 type kf_correspondance =
   [ kernel_function correspondance
-  | `Same_spec of kernel_function (** body has changed, but spec is identical *)
-  | `Different_calls of kernel_function
-    (** body is identical, but there are calls to functions that have changed. *)
+  | `Partial of kernel_function * partial_correspondance
   ]
 
 (** varinfos correspondances *)

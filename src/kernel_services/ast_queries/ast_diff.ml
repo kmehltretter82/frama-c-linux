@@ -77,10 +77,57 @@ module Correspondance =
   end
   )
 
+(* for kernel function, we are a bit more precise than a yes/no answer.
+   More precisely, we check whether a function has the same spec,
+   the same body, and whether its callees have changed (provided
+   the body itself is identical, otherwise, there's no point in checking
+   the callees.
+*)
+type partial_correspondance =
+  [ `Spec_changed (* body and callees haven't changed *)
+  | `Body_changed (* spec hasn't changed *)
+  | `Callees_changed (* spec and body haven't changed *)
+  | `Callees_spec_changed (* body hasn't changed *)
+  ]
+
+type body_correspondance =
+  [ `Body_changed
+  | `Callees_changed
+  | `Same_body
+  ]
+
+let (<=>) res (cmp,x,y) = if res <> 0 then res else cmp x y
+
+let compare_pc pc1 pc2 =
+  match pc1, pc2 with
+  | `Spec_changed, `Spec_changed -> 0
+  | `Spec_changed, _ -> -1
+  | _, `Spec_changed -> 1
+  | `Body_changed, `Body_changed -> 0
+  | `Body_changed, _ -> -1
+  | _, `Body_changed -> 1
+  | `Callees_changed, `Callees_changed -> -1
+  | `Callees_changed, _ -> -1
+  | _, `Callees_changed -> 1
+  | `Callees_spec_changed, `Callees_spec_changed -> 0
+
+let string_of_pc = function
+  | `Spec_changed -> "Spec_changed"
+  | `Body_changed -> "Body_changed"
+  | `Callees_changed -> "Callees_changed"
+  | `Callees_spec_changed -> "Callees_spec_changed"
+
+let pretty_pc fmt =
+  let open Format in
+  function
+  | `Spec_changed -> pp_print_string fmt "(spec changed)"
+  | `Body_changed -> pp_print_string fmt "(body_changed)"
+  | `Callees_changed -> pp_print_string fmt "(callees changed)"
+  | `Callees_spec_changed -> pp_print_string fmt "(callees and spec changed)"
+
 type kf_correspondance =
   [ kernel_function correspondance
-  | `Same_spec of kernel_function (** body has changed, but spec is identical *)
-  | `Different_calls of kernel_function
+  | `Partial of kernel_function * partial_correspondance
   ]
 
 module Kf_correspondance =
@@ -92,40 +139,34 @@ module Kf_correspondance =
     type t = kf_correspondance
     let reprs =
       let kf = List.hd Kernel_function.reprs in
-      `Same_spec kf :: (C.reprs :> t list)
+      `Partial (kf,`Spec_changed)
+      :: (C.reprs :> t list)
     let compare x y =
       match x,y with
-      | `Same_spec f1, `Same_spec f2 -> Kernel_function.compare f1 f2
-      | `Same_spec _, _ -> 1
-      | _, `Same_spec _ -> -1
-      | `Different_calls f1, `Different_calls f2 -> Kernel_function.compare f1 f2
-      | `Different_calls _, _ -> 1
-      | _, `Different_calls _ -> -1
+      | `Partial (kf1,flags1), `Partial(kf2,flags2) ->
+        Kernel_function.compare kf1 kf2 <=> (compare_pc,flags1,flags2)
+      | `Partial _, _ -> 1
+      | _, `Partial _ -> -1
       | (#correspondance as x), (#correspondance as y) -> C.compare x y
     let equal = Datatype.from_compare
     let hash = function
-      | `Same_spec f -> 57 * (Kernel_function.hash f)
-      | `Different_calls f -> 79 * (Kernel_function.hash f)
+      | `Partial(kf,_) -> 57 * (Kernel_function.hash kf)
       | #correspondance as x -> C.hash x
     let internal_pretty_code p fmt = function
-      | `Same_spec f ->
+      | `Partial (kf,flags) ->
         let pp fmt =
-          Format.fprintf fmt "`Same_spec %a"
-            (Kernel_function.internal_pretty_code Type.Call) f
-        in
-        Type.par p Call fmt pp
-      | `Different_calls f ->
-        let pp fmt =
-          Format.fprintf fmt "`Different_calls %a"
-            (Kernel_function.internal_pretty_code Type.Call) f
+          Format.fprintf fmt
+            "`Partial (%a,%s)"
+            (Kernel_function.internal_pretty_code Type.Call) kf
+            (string_of_pc flags)
         in
         Type.par p Call fmt pp
       | #correspondance as x -> C.internal_pretty_code p fmt x
     let pretty fmt = function
-      | `Same_spec f ->
-        Format.fprintf fmt "-> (contract) %a" Kernel_function.pretty f
-      | `Different_calls f ->
-        Format.fprintf fmt " -> (callees differ) %a" Kernel_function.pretty f
+      | `Partial(kf,flags) ->
+        Format.fprintf fmt "-> %a %a"
+          Kernel_function.pretty kf
+          pretty_pc flags
       | #correspondance as x -> C.pretty fmt x
   end)
 
@@ -236,6 +277,11 @@ let find_candidate_varinfo ?loc:_loc vi where =
     Some (Globals.Vars.find_from_astinfo vi.vname where)
   with Not_found -> None
 
+let find_candidate_func ?loc:_loc kf =
+  try
+    Some (Globals.Functions.find_by_name (Kf.get_name kf))
+  with Not_found -> None
+
 let (&&>) (res,env) f = if res then f env else false, env
 let (&&|) env f = f env
 let (&&&) (res,env) b = res && b, env
@@ -314,6 +360,11 @@ and is_same_exp _e _e' env = false, env
 
 and is_same_offset _o _o' env = false, env
 
+and is_same_funspec _s1 _s2 env = false, env
+
+and is_same_fundec _f1 _f2 env: body_correspondance*is_same_env =
+  `Body_changed, env
+
 and typeinfo_correspondance ?loc ti env =
   let add ti env =
     match find_candidate_type ?loc ti with
@@ -329,6 +380,9 @@ and compinfo_correspondance ?loc ci env =
     match find_candidate_compinfo ?loc ci with
     | None -> `Not_present, env
     | Some ci' ->
+      let env =
+        {env with compinfo = Cil_datatype.Compinfo.Map.add ci ci' env.compinfo}
+      in
       let res, env = is_same_compinfo ci ci' env in
       (if res then `Same ci' else `Not_present), env
   in
@@ -345,6 +399,44 @@ and enuminfo_correspondance ?loc ei env =
       (if res then `Same ei' else `Not_present),env
   in
   Enuminfo.memo_env add ei env
+
+and gfun_correspondance ?loc vi env =
+  let selection =
+    State_selection.(
+      union
+        (with_dependencies Kernel_function.self)
+        (union
+           (with_dependencies Annotations.funspec_state)
+           (with_dependencies Annotations.code_annot_state)))
+  in
+  let kf =
+    Project.on ~selection (Orig_project.get()) Globals.Functions.get vi
+  in
+  let add kf env =
+    match find_candidate_func ?loc kf with
+    | None -> `Not_present, env
+    | Some kf' ->
+      let env =
+        { env with kernel_function = Kf.Map.add kf kf' env.kernel_function }
+      in
+      let same_spec, env = is_same_funspec kf.spec kf'.spec env in
+      let same_body, env =
+        match (Kf.has_definition kf, Kf.has_definition kf') with
+        | false, false -> `Same_body, env
+        | false, true | true, false -> `Body_changed, env
+        | true, true ->
+          is_same_fundec (Kf.get_definition kf) (Kf.get_definition kf') env
+      in
+      match same_spec, same_body with
+      | false, `Body_changed -> `Not_present, env
+      | false, `Callees_changed -> `Partial(kf',`Callees_spec_changed), env
+      | false, `Same_body -> `Partial(kf', `Spec_changed), env
+      | true, `Same_body -> `Same kf', env
+      | true, ((`Body_changed|`Callees_changed) as c) -> `Partial(kf', c), env
+  in
+  match Kf.Map.find_opt kf env.kernel_function with
+  | Some kf' -> `Same kf', env
+  | None -> Kernel_function.memo_env add kf env
 
 let gvar_correspondance ?loc vi =
   let add vi =
@@ -370,8 +462,8 @@ let global_correspondance g =
     ignore (enuminfo_correspondance ~loc ei empty_env)
   | GVar(vi,_,loc) | GVarDecl(vi,loc) ->
     ignore (gvar_correspondance ~loc vi)
-  | GFunDecl(_,_vi,_loc) -> ()
-  | GFun(_f,_loc) -> ()
+  | GFunDecl(_,vi,loc) -> ignore (gfun_correspondance ~loc vi empty_env)
+  | GFun(f,loc) -> ignore (gfun_correspondance ~loc f.svar empty_env)
   | _ -> ()
 
 let compare_ast prj =
