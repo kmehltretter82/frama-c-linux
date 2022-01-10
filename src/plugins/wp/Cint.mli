@@ -77,6 +77,11 @@ val f_bits : lfun list (** All bit-test functions *)
 
 val bit_test : term -> int -> term
 
+(** Matchers *)
+
+val match_power2 : term -> term
+val match_power2_minus1 : term -> term
+
 (** Simplifiers *)
 
 val is_cint_simplifier: simplifier
