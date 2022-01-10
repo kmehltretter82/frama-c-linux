@@ -41,7 +41,7 @@ val unreachable : t -> Cfg.vertex -> bool
 val terminates_deps : t -> Property.Set.t
 
 val is_recursive : Kernel_function.t -> bool
-val get_cluster : Kernel_function.t -> Kernel_function.Set.t option
+val in_cluster : caller:Kernel_function.t -> Kernel_function.t -> bool
 
 val trivial_terminates : int ref
 

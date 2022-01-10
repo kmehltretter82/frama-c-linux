@@ -33,7 +33,7 @@ void mutual_1(unsigned n){
 // succeeds termination
 //@ decreases n ;
 void mutual_2(unsigned n){
-  if(n) mutual_1(n-1);
+  if(n) mutual_1(n-1); // fails decreases: no decreases for mutual_1
   simpl_rf(n); // this does not prevent termination proof
 }
 
@@ -52,7 +52,7 @@ void fp(void (*)(unsigned), unsigned);
 
 //@ decreases n ;
 void function(unsigned n){
-  if(n) fp(&function, n-1);
+  if(n) fp(&function, n-1); // fails decreases: no decreases for fp
 }
 
 // termination fails : recursion without decreases

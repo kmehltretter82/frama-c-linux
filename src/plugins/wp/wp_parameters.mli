@@ -23,6 +23,7 @@
 include Plugin.S
 
 val reset : unit -> unit
+val hypothesis : 'a Log.pretty_printer
 
 (** {2 Function Selection} *)
 
