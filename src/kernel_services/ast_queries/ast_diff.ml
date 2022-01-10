@@ -186,8 +186,10 @@ type is_same_env =
   {
     compinfo: compinfo Cil_datatype.Compinfo.Map.t;
     kernel_function: kernel_function Kernel_function.Map.t;
+    local_vars: varinfo Cil_datatype.Varinfo.Map.t;
     logic_info: logic_info Cil_datatype.Logic_info.Map.t;
     logic_type_info: logic_type_info Cil_datatype.Logic_type_info.Map.t;
+    logic_local_vars: logic_var Cil_datatype.Logic_var.Map.t;
   }
 
 module Build(H:Datatype.S_with_collections)(D:Datatype.S) =
@@ -228,9 +230,34 @@ module Fundec = Build_correspondance(Cil_datatype.Fundec)
 let empty_env =
   { compinfo = Cil_datatype.Compinfo.Map.empty;
     kernel_function = Kf.Map.empty;
+    local_vars = Cil_datatype.Varinfo.Map.empty;
     logic_info = Cil_datatype.Logic_info.Map.empty;
     logic_type_info = Cil_datatype.Logic_type_info.Map.empty;
+    logic_local_vars = Cil_datatype.Logic_var.Map.empty;
   }
+
+let add_formals f f' env =
+  let add_one env v v' =
+    { env with local_vars = Cil_datatype.Varinfo.Map.add v v' env.local_vars }
+  in
+  List.fold_left2 add_one env f f'
+
+let add_logic_prms p p' env =
+  let add_one env lv lv' =
+    { env with
+      logic_local_vars =
+        Cil_datatype.Logic_var.Map.add lv lv' env.logic_local_vars }
+  in
+  List.fold_left2 add_one env p p'
+
+let formals_correspondance f f' =
+  let add_one v v' = Varinfo.add v (`Same v') in
+  List.iter2 add_one f f'
+
+let logic_prms_correspondance p p' =
+  let add_one lv lv' =
+    Logic_var.add lv (`Same lv') in
+  List.iter2 add_one p p'
 
 (** TODO: use location info to detect potential renaming.
     Requires some information about syntactic diff. *)
@@ -365,6 +392,16 @@ and is_same_logic_type_info _ti _ti' _env = false
 
 and is_same_model_info _mi _mi' _env = false
 
+(* only for locals and formals. Globals are treated by
+   gvar_correspondance below. *)
+and is_same_varinfo vi vi' env =
+  is_same_type vi.vtype vi'.vtype env &&
+  Cil_datatype.Attributes.equal vi.vattr vi'.vattr
+
+and is_same_logic_var lv lv' env =
+  is_same_logic_type lv.lv_type lv'.lv_type env &&
+  Cil_datatype.Attributes.equal lv.lv_attr lv'.lv_attr
+
 (* because of overloading, we have to check for a corresponding profile,
    leading to potentially recursive calls to is_same_* functions. *)
 and find_candidate_logic_info ?loc:_loc li env =
@@ -444,23 +481,40 @@ and gfun_correspondance ?loc vi env =
     match find_candidate_func ?loc kf with
     | None -> `Not_present
     | Some kf' ->
-      let env' =
-        { env with kernel_function = Kf.Map.add kf kf' env.kernel_function }
-      in
-      let same_spec = is_same_funspec kf.spec kf'.spec env' in
-      let same_body =
-        match (Kf.has_definition kf, Kf.has_definition kf') with
-        | false, false -> `Same_body
-        | false, true | true, false -> `Body_changed
-        | true, true ->
-          is_same_fundec (Kf.get_definition kf) (Kf.get_definition kf') env'
-      in
-      match same_spec, same_body with
-      | false, `Body_changed -> `Not_present
-      | false, `Callees_changed -> `Partial(kf',`Callees_spec_changed)
-      | false, `Same_body -> `Partial(kf', `Spec_changed)
-      | true, `Same_body -> `Same kf'
-      | true, ((`Body_changed|`Callees_changed) as c) -> `Partial(kf', c)
+      let formals = Kf.get_formals kf in
+      let formals' = Kf.get_formals kf' in
+      if is_same_list is_same_varinfo formals formals' env then begin
+        (* we only add formals to global correspondance tables if some
+           part of the kf is unchanged (otherwise, we can't reuse information
+           about the formals anyways). Hence, we only add them into the local
+           env for now. *)
+        let env = add_formals formals formals' env in
+        let env =
+          { env with kernel_function = Kf.Map.add kf kf' env.kernel_function }
+        in
+        let same_spec = is_same_funspec kf.spec kf'.spec env in
+        let same_body =
+          match (Kf.has_definition kf, Kf.has_definition kf') with
+          | false, false -> `Same_body
+          | false, true | true, false -> `Body_changed
+          | true, true ->
+            is_same_fundec (Kf.get_definition kf) (Kf.get_definition kf') env
+        in
+        match same_spec, same_body with
+        | false, `Body_changed -> `Not_present
+        | false, `Callees_changed ->
+          formals_correspondance formals formals';
+          `Partial(kf',`Callees_spec_changed)
+        | false, `Same_body ->
+          formals_correspondance formals formals';
+          `Partial(kf', `Spec_changed)
+        | true, `Same_body ->
+          formals_correspondance formals formals';
+          `Same kf'
+        | true, ((`Body_changed|`Callees_changed) as c) ->
+          formals_correspondance formals formals';
+          `Partial(kf', c)
+      end else `Not_present
   in
   match Kf.Map.find_opt kf env.kernel_function with
   | Some kf' -> `Same kf'
@@ -471,12 +525,19 @@ and logic_info_correspondance ?loc li env =
     match find_candidate_logic_info ?loc li env with
     | None -> `Not_present
     | Some li' ->
-      let env =
-        { env with
-          logic_info = Cil_datatype.Logic_info.Map.add li li' env.logic_info }
-      in
-      let res = is_same_logic_info li li' env in
-      if res then `Same li' else `Not_present
+      if is_same_list is_same_logic_var li.l_profile li'.l_profile env then
+        begin
+          let env = add_logic_prms li.l_profile li'.l_profile env in
+          let env =
+            { env with
+              logic_info=Cil_datatype.Logic_info.Map.add li li' env.logic_info }
+          in
+          let res = is_same_logic_info li li' env in
+          if res then begin
+            logic_prms_correspondance li.l_profile li'.l_profile;
+            `Same li'
+          end else `Not_present
+        end else `Not_present
   in
   match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
   | Some li' -> `Same li'
