@@ -43,6 +43,6 @@ val savescripts : unit -> unit
 (** If necessary, dump the scripts database into the file
     specified by [-wp-script f]. *)
 
-val script_for : pid:prop_id -> gid:string -> legacy:string -> (string * string) option
-val script_for_ide : pid:prop_id -> gid:string -> legacy:string -> string * string
+val script_for : pid:prop_id -> gid:string -> (string * string) option
+val script_for_ide : pid:prop_id -> gid:string -> string * string
 val hints_for : pid:prop_id -> (string * string * string) list
