@@ -282,6 +282,11 @@ let find_candidate_func ?loc:_loc kf =
     Some (Globals.Functions.find_by_name (Kf.get_name kf))
   with Not_found -> None
 
+let find_candidate_logic_type ?loc:_loc ti =
+  try
+    Some (Logic_env.find_logic_type ti.lt_name)
+  with Not_found -> None
+
 let (&&>) (res,env) f = if res then f env else false, env
 let (&&|) env f = f env
 let (&&&) (res,env) b = res && b, env
@@ -360,10 +365,51 @@ and is_same_exp _e _e' env = false, env
 
 and is_same_offset _o _o' env = false, env
 
-and is_same_funspec _s1 _s2 env = false, env
+and is_same_funspec _s _s' env = false, env
 
-and is_same_fundec _f1 _f2 env: body_correspondance*is_same_env =
+and is_same_fundec _f _f' env: body_correspondance*is_same_env =
   `Body_changed, env
+
+and is_same_logic_type _t _t' env = false, env
+
+and is_same_logic_param _lv _lv' env = false, env
+
+and is_same_logic_info _li _li' env = false, env
+
+and is_same_logic_type_info _ti _ti' env = false, env
+
+and is_same_model_info _mi _mi' env = false, env
+
+(* because of overloading, we have to check for a corresponding profile,
+   leading to potentially recursive calls to is_same_* functions. *)
+and find_candidate_logic_info ?loc:_loc li env =
+  let candidates = Logic_env.find_all_logic_functions li.l_var_info.lv_name in
+  let find_one li' =
+    is_same_list is_same_logic_param li.l_profile li'.l_profile env
+  in
+  let rec extract l =
+    match l with
+    | [] -> None
+    | li' :: tl ->
+      let (res,_) = find_one li' in
+      if res then Some li' else extract tl
+  in
+  match extract candidates with
+  | None -> None
+  | Some li' ->
+    let (res,_) = is_same_opt is_same_logic_type li.l_type li'.l_type env in
+    if res then Some li' else None
+
+and find_candidate_model_info ?loc:_loc mi env =
+  let candidates = Logic_env.find_all_model_fields mi.mi_name in
+  let find_one mi' =
+    fst (is_same_type mi.mi_base_type mi'.mi_base_type env)
+  in
+  let rec aux = function
+    | [] -> None
+    | mi' :: tl -> if find_one mi' then Some mi' else aux tl
+  in
+  aux candidates
 
 and typeinfo_correspondance ?loc ti env =
   let add ti env =
@@ -438,6 +484,39 @@ and gfun_correspondance ?loc vi env =
   | Some kf' -> `Same kf', env
   | None -> Kernel_function.memo_env add kf env
 
+and logic_info_correspondance ?loc li env =
+  let add li env =
+    match find_candidate_logic_info ?loc li env with
+    | None -> `Not_present, env
+    | Some li' ->
+      let env =
+        { env with
+          logic_info = Cil_datatype.Logic_info.Map.add li li' env.logic_info }
+      in
+      let res, env = is_same_logic_info li li' env in
+      (if res then `Same li' else `Not_present), env
+  in
+  match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
+  | Some li' -> `Same li', env
+  | None -> Logic_info.memo_env add li env
+
+and logic_type_correspondance ?loc ti env =
+  let add ti env =
+    match find_candidate_logic_type ?loc ti with
+    | None -> `Not_present, env
+    | Some ti' ->
+      let env =
+        { env with
+          logic_type_info =
+            Cil_datatype.Logic_type_info.Map.add ti ti' env.logic_type_info }
+      in
+      let res, env = is_same_logic_type_info ti ti' env in
+      (if res then `Same ti' else `Not_present), env
+  in
+  match Cil_datatype.Logic_type_info.Map.find_opt ti env.logic_type_info with
+  | Some ti' -> `Same ti', env
+  | None -> Logic_type_info.memo_env add ti env
+
 let gvar_correspondance ?loc vi =
   let add vi =
     match find_candidate_varinfo ?loc vi Cil_types.VGlobal with
@@ -453,6 +532,40 @@ let gvar_correspondance ?loc vi =
   in
   Varinfo.memo add vi
 
+let model_info_correspondance ?loc mi =
+  let add mi =
+    match find_candidate_model_info ?loc mi empty_env with
+    | None -> `Not_present
+    | Some mi' ->
+      let res,_ = is_same_model_info mi mi' empty_env in
+      if res then `Same mi' else `Not_present
+  in
+  Model_info.memo add mi
+
+let rec gannot_correspondance =
+  function
+  | Dfun_or_pred (li,loc) ->
+    ignore (logic_info_correspondance ~loc li empty_env)
+
+  | Dvolatile _ -> ()
+  (* reading and writing function themselves will be checked elsewhere. *)
+
+  | Daxiomatic(_,l,_,_) ->
+    List.iter gannot_correspondance l
+  | Dtype (ti,loc) -> ignore (logic_type_correspondance ~loc ti empty_env)
+  | Dlemma _ -> ()
+  (* TODO: we currently do not have any appropriate structure for
+     storing information about lemmas. *)
+  | Dinvariant(li, loc) ->
+    ignore (logic_info_correspondance ~loc li empty_env)
+  | Dtype_annot(li,loc) ->
+    ignore (logic_info_correspondance ~loc li empty_env)
+  | Dmodel_annot (mi,loc) ->
+    ignore (model_info_correspondance ~loc mi)
+  | Dextended _ -> ()
+(* TODO: provide mechanism for extension themselves
+   to give relevant information. *)
+
 let global_correspondance g =
   match g with
   | GType (ti,loc) -> ignore (typeinfo_correspondance ~loc ti empty_env)
@@ -464,7 +577,8 @@ let global_correspondance g =
     ignore (gvar_correspondance ~loc vi)
   | GFunDecl(_,vi,loc) -> ignore (gfun_correspondance ~loc vi empty_env)
   | GFun(f,loc) -> ignore (gfun_correspondance ~loc f.svar empty_env)
-  | _ -> ()
+  | GAnnot (g,_) -> gannot_correspondance g
+  | GAsm _ | GPragma _ | GText _ -> ()
 
 let compare_ast prj =
   Orig_project.set prj;
