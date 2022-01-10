@@ -34,48 +34,48 @@ type 'a correspondance =
   | `Not_present (** no correspondance *)
   ]
 
-module Correspondance =
-  Datatype.Polymorphic(
-  struct
-    type 'a t = 'a correspondance
-    let name a = Type.name a ^ " correspondance"
-    let module_name = "Correspondance"
-    let structural_descr _ = Structural_descr.t_abstract
-    let reprs x = [ `Not_present; `Same x]
-    let mk_equal eq x y =
-      match x,y with
-      | `Same x, `Same y -> eq x y
-      | `Not_present, `Not_present -> true
-      | `Same _, `Not_present
-      | `Not_present, `Same _ -> false
-    let mk_compare cmp x y =
-      match x,y with
-      | `Not_present, `Not_present -> 0
-      | `Not_present, `Same _ -> -1
-      | `Same x, `Same y -> cmp x y
-      | `Same _, `Not_present -> 1
-    let mk_hash h = function
-      | `Same x -> 117 * h x
-      | `Not_present -> 43
-    let map f = function
-      | `Same x -> `Same (f x)
-      | `Not_present -> `Not_present
-    let mk_internal_pretty_code pp prec fmt = function
-      | `Not_present -> Format.pp_print_string fmt "`Not_present"
-      | `Same x ->
-        let pp fmt = Format.fprintf fmt "`Same %a" (pp Type.Call) x in
-        Type.par prec Call fmt pp
-    let mk_pretty pp fmt = function
-      | `Not_present -> Format.pp_print_string fmt "N/A"
-      | `Same x -> Format.fprintf fmt " => %a" pp x
-    let mk_varname v = function
-      | `Not_present -> "x"
-      | `Same x -> v x ^ "_c"
-    let mk_mem_project mem query = function
-      | `Not_present -> false
-      | `Same x -> mem query x
-  end
-  )
+module Correspondance_input =
+struct
+  type 'a t = 'a correspondance
+  let name a = Type.name a ^ " correspondance"
+  let module_name = "Correspondance"
+  let structural_descr _ = Structural_descr.t_abstract
+  let reprs x = [ `Not_present; `Same x]
+  let mk_equal eq x y =
+    match x,y with
+    | `Same x, `Same y -> eq x y
+    | `Not_present, `Not_present -> true
+    | `Same _, `Not_present
+    | `Not_present, `Same _ -> false
+  let mk_compare cmp x y =
+    match x,y with
+    | `Not_present, `Not_present -> 0
+    | `Not_present, `Same _ -> -1
+    | `Same x, `Same y -> cmp x y
+    | `Same _, `Not_present -> 1
+  let mk_hash h = function
+    | `Same x -> 117 * h x
+    | `Not_present -> 43
+  let map f = function
+    | `Same x -> `Same (f x)
+    | `Not_present -> `Not_present
+  let mk_internal_pretty_code pp prec fmt = function
+    | `Not_present -> Format.pp_print_string fmt "`Not_present"
+    | `Same x ->
+      let pp fmt = Format.fprintf fmt "`Same %a" (pp Type.Call) x in
+      Type.par prec Call fmt pp
+  let mk_pretty pp fmt = function
+    | `Not_present -> Format.pp_print_string fmt "N/A"
+    | `Same x -> Format.fprintf fmt " => %a" pp x
+  let mk_varname v = function
+    | `Not_present -> "x"
+    | `Same x -> v x ^ "_c"
+  let mk_mem_project mem query = function
+    | `Not_present -> false
+    | `Same x -> mem query x
+end
+
+module Correspondance=Datatype.Polymorphic(Correspondance_input)
 
 (* for kernel function, we are a bit more precise than a yes/no answer.
    More precisely, we check whether a function has the same spec,
@@ -125,50 +125,70 @@ let pretty_pc fmt =
   | `Callees_changed -> pp_print_string fmt "(callees changed)"
   | `Callees_spec_changed -> pp_print_string fmt "(callees and spec changed)"
 
-type kf_correspondance =
-  [ kernel_function correspondance
-  | `Partial of kernel_function * partial_correspondance
+type 'a code_correspondance =
+  [ 'a correspondance
+  | `Partial of 'a * partial_correspondance
   ]
 
-module Kf_correspondance =
-  Datatype.Make(
-  struct
-    let name = "Kf_correspondance"
-    module C = Correspondance.Make(Kernel_function)
-    include Datatype.Serializable_undefined
-    type t = kf_correspondance
-    let reprs =
-      let kf = List.hd Kernel_function.reprs in
-      `Partial (kf,`Spec_changed)
-      :: (C.reprs :> t list)
-    let compare x y =
-      match x,y with
-      | `Partial (kf1,flags1), `Partial(kf2,flags2) ->
-        Kernel_function.compare kf1 kf2 <=> (compare_pc,flags1,flags2)
-      | `Partial _, _ -> 1
-      | _, `Partial _ -> -1
-      | (#correspondance as x), (#correspondance as y) -> C.compare x y
-    let equal = Datatype.from_compare
-    let hash = function
-      | `Partial(kf,_) -> 57 * (Kernel_function.hash kf)
-      | #correspondance as x -> C.hash x
-    let internal_pretty_code p fmt = function
-      | `Partial (kf,flags) ->
-        let pp fmt =
-          Format.fprintf fmt
-            "`Partial (%a,%s)"
-            (Kernel_function.internal_pretty_code Type.Call) kf
-            (string_of_pc flags)
-        in
-        Type.par p Call fmt pp
-      | #correspondance as x -> C.internal_pretty_code p fmt x
-    let pretty fmt = function
-      | `Partial(kf,flags) ->
-        Format.fprintf fmt "-> %a %a"
-          Kernel_function.pretty kf
-          pretty_pc flags
-      | #correspondance as x -> C.pretty fmt x
-  end)
+module Code_correspondance_input =
+struct
+  type 'a t = 'a code_correspondance
+  let name a = Type.name a ^ " code_correspondance"
+  let module_name = "Code_correspondance"
+  let structural_descr _ = Structural_descr.t_abstract
+  let reprs = Correspondance_input.reprs
+  let mk_equal eq x y =
+    match x,y with
+    | `Partial(x,pc), `Partial(x',pc') -> eq x x' && (compare_pc pc pc' = 0)
+    | `Partial _, _ | _, `Partial _ -> false
+    | (#correspondance as c), (#correspondance as c') ->
+      Correspondance_input.mk_equal eq c c'
+
+  let mk_compare cmp x y =
+    match x,y with
+    | `Partial(x,pc), `Partial(x',pc') ->
+      cmp x x' <=> (compare_pc,pc,pc')
+    | `Partial _, `Same _ -> -1
+    | `Same _, `Partial _ -> 1
+    | `Partial _, `Not_present -> 1
+    | `Not_present, `Partial _ -> -1
+    | (#correspondance as c), (#correspondance as c') ->
+      Correspondance_input.mk_compare cmp c c'
+
+  let mk_hash hash = function
+    | `Partial (x,_) -> 57 * hash x
+    | #correspondance as x -> Correspondance_input.mk_hash hash x
+
+  let map f = function
+    | `Partial(x,pc) -> `Partial(f x,pc)
+    | (#correspondance as x) -> Correspondance_input.map f x
+
+  let mk_internal_pretty_code pp prec fmt = function
+    | `Partial (x,flags) ->
+      let pp fmt =
+        Format.fprintf fmt "`Partial (%a,%s)"
+          (pp Type.Call) x (string_of_pc flags)
+      in
+      Type.par prec Call fmt pp
+    | #correspondance as x ->
+      Correspondance_input.mk_internal_pretty_code pp prec fmt x
+
+  let mk_pretty pp fmt = function
+    | `Partial(x,flags) ->
+      Format.fprintf fmt "-> %a %a" pp x pretty_pc flags
+    | #correspondance as x -> Correspondance_input.mk_pretty pp fmt x
+
+  let mk_varname f = function
+    | `Partial (x,_) -> f x ^ "_pc"
+    | #correspondance as x -> Correspondance_input.mk_varname f x
+
+  let mk_mem_project f p = function
+    | `Partial (x,_) -> f p x
+    | #correspondance as x -> Correspondance_input.mk_mem_project f p x
+end
+
+module Code_correspondance =
+  Datatype.Polymorphic(Code_correspondance_input)
 
 module Info(I: sig val name: string end) =
   (struct
@@ -199,6 +219,9 @@ module Build(H:Datatype.S_with_collections)(D:Datatype.S) =
 module Build_correspondance(H:Datatype.S_with_collections) =
   Build(H)(Correspondance.Make(H))
 
+module Build_code_correspondance(H:Datatype.S_with_collections) =
+  Build(H)(Code_correspondance.Make(H))
+
 module Varinfo = Build_correspondance(Cil_datatype.Varinfo)
 
 module Compinfo = Build_correspondance(Cil_datatype.Compinfo)
@@ -209,7 +232,7 @@ module Enumitem = Build_correspondance(Cil_datatype.Enumitem)
 
 module Typeinfo = Build_correspondance(Cil_datatype.Typeinfo)
 
-module Stmt = Build_correspondance(Cil_datatype.Stmt)
+module Stmt = Build_code_correspondance(Cil_datatype.Stmt)
 
 module Logic_info = Build_correspondance(Cil_datatype.Logic_info)
 
@@ -223,7 +246,7 @@ module Logic_var = Build_correspondance(Cil_datatype.Logic_var)
 
 module Kf = Kernel_function
 
-module Kernel_function = Build(Kernel_function)(Kf_correspondance)
+module Kernel_function = Build_code_correspondance(Kernel_function)
 
 module Fundec = Build_correspondance(Cil_datatype.Fundec)
 
@@ -236,7 +259,7 @@ let empty_env =
     logic_local_vars = Cil_datatype.Logic_var.Map.empty;
   }
 
-let add_formals f f' env =
+let add_locals f f' env =
   let add_one env v v' =
     { env with local_vars = Cil_datatype.Varinfo.Map.add v v' env.local_vars }
   in
@@ -376,11 +399,63 @@ and is_same_initinfo i i' env = is_same_opt is_same_init i.init i'.init env
 
 and is_same_exp _e _e' _env = false
 
+and is_same_instr _i _i' _env = `Body_changed
+
+and is_same_stmt s s' env =
+  if s.ghost = s'.ghost && Cil_datatype.Attributes.equal s.sattr s'.sattr then
+    begin
+      match s.skind,s'.skind with
+      | Instr i, Instr i' -> is_same_instr i i' env, env
+      | Return (r,_), Return(r', _) ->
+        if is_same_opt is_same_exp r r' env then `Same_body, env
+        else `Body_changed, env
+      | Goto (_s,_), Goto(_s',_) -> `Body_changed, env
+      | _ -> `Body_changed, env
+    end else `Body_changed, env
+
+(* is_same_block will return its modified environment in order
+   to update correspondance table with respect to locals, in case
+   the body of the enclosing function is unchanged. *)
+and is_same_block b b' env =
+  let local_decls = List.filter (fun x -> not x.vdefined) b.blocals in
+  let local_decls' = List.filter (fun x -> not x.vdefined) b'.blocals in
+  if is_same_list is_same_varinfo local_decls local_decls' env &&
+     Cil_datatype.Attributes.equal b.battrs b'.battrs
+  then begin
+    let env = add_locals local_decls local_decls' env in
+    let rec is_same_stmts l l' (prev, env as res) =
+      match l, l' with
+      | [], [] -> res
+      | [], _ | _, [] -> `Body_changed, env
+      | s :: tl, s' :: tl' ->
+        let res_stmt, env = is_same_stmt s s' env in
+        match prev, res_stmt with
+        | `Body_changed, _ | _, `Body_changed -> `Body_changed, env
+        | `Same_body, r | r, `Same_body -> is_same_stmts tl tl' (r,env)
+        | `Callees_changed, `Callees_changed ->
+          is_same_stmts tl tl' (`Callees_changed, env)
+    in
+    is_same_stmts b.bstmts b'.bstmts (`Same_body, env)
+  end else `Body_changed, env
+
 and is_same_offset _o _o' _env = false
 
 and is_same_funspec _s _s' _env = false
 
-and is_same_fundec _f _f' _env: body_correspondance = `Body_changed
+(* correspondance of formals is supposed to have already been checked,
+   and formals mapping to have been put in the local env
+*)
+and is_same_fundec f f' env: body_correspondance =
+  let res, env = is_same_block f.sbody f'.sbody env in
+  let add_local v =
+    let v' = Cil_datatype.Varinfo.Map.find v env.local_vars in
+    Varinfo.add v (`Same v')
+  in
+  (match res with
+   | `Same_body | `Callees_changed ->
+     List.iter add_local f.slocals
+   | `Body_changed -> ());
+  res
 
 and is_same_logic_type _t _t' _env = false
 
@@ -488,7 +563,7 @@ and gfun_correspondance ?loc vi env =
            part of the kf is unchanged (otherwise, we can't reuse information
            about the formals anyways). Hence, we only add them into the local
            env for now. *)
-        let env = add_formals formals formals' env in
+        let env = add_locals formals formals' env in
         let env =
           { env with kernel_function = Kf.Map.add kf kf' env.kernel_function }
         in

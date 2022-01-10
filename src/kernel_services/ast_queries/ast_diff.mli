@@ -49,9 +49,9 @@ type partial_correspondance =
   | `Callees_spec_changed (** body hasn't changed *)
   ]
 
-type kf_correspondance =
-  [ kernel_function correspondance
-  | `Partial of kernel_function * partial_correspondance
+type 'a code_correspondance =
+  [ 'a correspondance
+  | `Partial of 'a * partial_correspondance
   ]
 
 (** varinfos correspondances *)
@@ -77,7 +77,7 @@ module Typeinfo:
 
 module Stmt:
   State_builder.Hashtbl
-  with type key = stmt and type data = stmt correspondance
+  with type key = stmt and type data = stmt code_correspondance
 
 module Logic_info:
   State_builder.Hashtbl
@@ -101,7 +101,8 @@ module Logic_var:
 
 module Kernel_function:
   State_builder.Hashtbl
-  with type key = kernel_function and type data = kf_correspondance
+  with type key = kernel_function
+   and type data = kernel_function code_correspondance
 
 module Fundec:
   State_builder.Hashtbl
