@@ -3384,7 +3384,13 @@ let rec setOneInit this o preinit =
     let pMaxIdx, pArray =
       match this  with
       | NoInitPre  -> (* No initializer so far here *)
-        ref idx, ref (Array.make (max 32 (idx + 1)) NoInitPre)
+        begin
+          try
+            ref idx, ref (Array.make (max 32 (idx + 1)) NoInitPre)
+          with Invalid_argument _ | Out_of_memory ->
+            Kernel.abort ~current:true
+              "array length too large: %d" ((max 32 (idx + 1)))
+        end
 
       | CompoundPre (pMaxIdx, pArray) ->
         if !pMaxIdx < idx then begin
