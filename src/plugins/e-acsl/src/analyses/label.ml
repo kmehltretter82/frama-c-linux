@@ -21,7 +21,17 @@
 (**************************************************************************)
 
 open Cil_types
-module Error = Translation_error
+module Error = Error.Make(struct let phase = Options.Dkey.translation end)
+
+let get_first_inner_stmt stmt =
+  match stmt.labels, stmt.skind with
+  | [], _ -> stmt
+  | _ :: _, Block { bstmts = dest_stmt :: _ } ->
+    dest_stmt
+  | labels, _ ->
+    Options.fatal "Unexpected stmt:\nlabels: [%a]\nstmt: %a"
+      (Pretty_utils.pp_list ~sep:"; " Cil_types_debug.pp_label) labels
+      Printer.pp_stmt stmt
 
 (* The keys are the stmts which were previously labeled, whereas the associated
    values are the new stmts containing the same labels. *)

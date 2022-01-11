@@ -62,6 +62,7 @@ ANALYSES_CMI:=$(addprefix src/analyses/, $(ANALYSES_CMI))
 
 SRC_ANALYSES:= \
 	analyses_datatype \
+	label \
 	rte \
 	lscope \
 	e_acsl_visitor \
@@ -85,7 +86,6 @@ SRC_CODE_GENERATOR:= \
 	smart_exp \
 	smart_stmt \
 	gmp \
-	label \
 	env \
 	assert \
 	rational \

@@ -31,6 +31,10 @@ val get_stmt: kernel_function -> logic_label -> stmt
 val self: State.t
 (** Internal state *)
 
+val get_first_inner_stmt: stmt -> stmt
+(** If the given statement has a label, return the first statement of the block.
+    Otherwise return the given statement. *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."
