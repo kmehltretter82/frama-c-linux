@@ -613,10 +613,17 @@ val isArrayType: typ -> bool
 (** True if the argument is a struct of union type *)
 val isStructOrUnionType: typ -> bool
 
+(** possible causes for raising {!Cil.LenOfArray} *)
+type incorrect_array_length = Not_constant | Not_integer | Negative | Too_big
+
+val pp_incorrect_array_length:
+  Format.formatter -> incorrect_array_length -> unit
+
 (** Raised when {!Cil.lenOfArray} fails either because the length is [None],
   * because it is a non-constant expression, or because it overflows an int.
 *)
-exception LenOfArray
+exception LenOfArray of incorrect_array_length
+
 
 (** Call to compute the array length as present in the array type, to an
   * integer. Raises {!Cil.LenOfArray} if not able to compute the length, such

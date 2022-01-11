@@ -3769,11 +3769,11 @@ let integerArrayLength (leno: exp option) : int =
   | None -> max_int
   | Some len ->
     try lenOfArray leno
-    with LenOfArray ->
-      Kernel.fatal ~current:true
-        "Array length %a is not a compile-time constant: \
-         no explicit initializer allowed."
-        Cil_printer.pp_exp len
+    with
+    | LenOfArray cause ->
+      Kernel.abort ~current:true
+        "Array length %a is %a: no explicit initializer allowed."
+        Cil_printer.pp_exp len Cil.pp_incorrect_array_length cause
 
 let find_field_offset cond (fidlist: fieldinfo list) : offset =
   (* Depth first search for the field. This appears to be what GCC does.

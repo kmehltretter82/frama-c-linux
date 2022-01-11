@@ -471,7 +471,7 @@ let rec type_compatible t1 t2 =
   | TArray (t1', s1, _), TArray (t2', s2, _) ->
     type_compatible t1' t2' &&
     (s1 == s2 || try Integer.equal (Cil.lenOfArray64 s1) (Cil.lenOfArray64 s2)
-     with Cil.LenOfArray -> false)
+     with Cil.LenOfArray _ -> false)
   | TFun (r1, a1, v1, _), TFun (r2, a2, v2, _) ->
     v1 = v2 && type_compatible r1 r2 &&
     (match a1, a2 with

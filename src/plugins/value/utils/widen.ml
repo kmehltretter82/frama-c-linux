@@ -295,7 +295,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
                 let size = Cil.lenOfArray64 size in
                 if Integer.(gt size zero) then
                   self#add_index_hints size idx
-              with Cil.LenOfArray -> ()
+              with Cil.LenOfArray _ -> ()
             end
           | _ -> ()
         end
