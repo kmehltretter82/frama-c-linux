@@ -1,7 +1,7 @@
 [kernel] Parsing very_large_integers.c (with preprocessing)
 [kernel] very_large_integers.c:25: User Error: 
   integer constant too large in expression (unsigned long long)999999999999999999 + 9999999999999999999
-[kernel] very_large_integers.c:25: User Error: 
+[kernel] very_large_integers.c:26: User Error: 
   bitfield width is not a valid integer constant
 [kernel] User Error: stopping on file "very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.

@@ -5503,28 +5503,29 @@ and makeCompType ghost (isstruct: bool)
         match widtho with
         | None -> None, ftype
         | Some w -> begin
+            let source = fst w.expr_loc in
             (match unrollType ftype with
              | TInt (_, _) -> ()
              | TEnum _ -> ()
              | _ ->
-               Kernel.abort ~once:true ~current:true
+               Kernel.abort ~once:true ~source
                  "Base type for bitfield is not an integer type");
             match isIntegerConstant ghost w with
             | None ->
-              Kernel.abort ~current:true
+              Kernel.abort ~source
                 "bitfield width is not a valid integer constant";
             | Some s as w ->
               begin
                 if s < 0 then
-                  Kernel.abort ~current:true "negative bitfield width (%d)" s;
+                  Kernel.abort ~source "negative bitfield width (%d)" s;
                 try
                   if s > Cil.bitsSizeOf ftype then
-                    Kernel.error ~current:true
+                    Kernel.error ~source
                       "bitfield width (%d) exceeds its type (%a, %d bits)"
                       s Cil_printer.pp_typ ftype (Cil.bitsSizeOf ftype)
                 with
                   SizeOfError _ ->
-                  Kernel.fatal ~current:true
+                  Kernel.fatal ~source
                     "Unable to compute size of %a" Cil_printer.pp_typ ftype
               end;
               let ftype =
