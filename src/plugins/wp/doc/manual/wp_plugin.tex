@@ -497,10 +497,29 @@ $G(n) \equiv P(n)\Longrightarrow\,Q(n)$:
 \Delta,\; \forall i,\, n < i \leq b \Longrightarrow G(i) \; & \models G(n)
 \end{array}} \]
 
+\paragraph{Mod-Mask} Rewrite bitmask into/from modulo \\
+This tactic is used to rewrite a bitmask into a modulo (or a modulo into a
+bitmask) when possible. The user selects an expression $e$ of the form
+$b \% m$ (resp. $b \& m$ - $\texttt{land b m}$) than can be rewritten into
+$b \& (m+1)$ (resp. $b \% (m - 1)$), if $0 \leq b$ and $m$ is a positive power
+of 2 (resp. $m + 1$ is a positive power of 2). When selecting an expression
+$x \& y$, both directions $x \% (y - 1)$ and $y \% (x - 1)$ can be considered.
+
+Since establishing that $m$ is a positive power of 2 can be hard, the tactic has
+several behaviors. If \textsf{Qed} can prove immediately that an operand $m$ (or
+$m+1$ for bitmaks) is a positive power of 2, the tactic only generates the guard
+$0 \leq b$ and the rewritten goal. If it is not the case, the tactic appears
+with the name ``Mod-Mask (hard)'' in the GUI. In this situation, the guard
+consists of two conditions: $0 \leq b$ and $m$ (or $m+1$) is a positive power of
+2. This guard involves an existential quantification, so it can be hard to
+prove. When the selected term is a bitmask, the tactic cannot decide itself the
+direction of the modulo, thus a checkbox is added in the configuration of the
+tactic to select the direction of rewriting.
+
 \paragraph{Overflow} Integer Conversions \\
 This tactic split machine integer conversions into three cases: value in integer
 range, lower than range and upper than range. The tactic applies on expression
-with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer
+with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a machine-integer
 name, \emph{eg.} \texttt{to\_uint32}.
 
 \[\TACTIC{\Delta\models G}{%

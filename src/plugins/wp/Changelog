@@ -24,6 +24,7 @@
 Plugin WP <next-release>
 ########################
 
+- TIP         [2022-01-10] New tactic Mod-Mask: rewrite bitmask into/from modulo
 - TIP         [2022-01-05] New tactic Clear: remove hypothesis
 -* WP         [2022-01-05] Fix loop invariant order
 - WP          [2022-01-05] Weaken check loop invariant
