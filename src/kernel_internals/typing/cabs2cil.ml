@@ -5507,28 +5507,24 @@ and makeCompType ghost (isstruct: bool)
              | TInt (_, _) -> ()
              | TEnum _ -> ()
              | _ ->
-               Kernel.error ~once:true ~source
+               Kernel.abort ~once:true ~current:true
                  "Base type for bitfield is not an integer type");
             match isIntegerConstant ghost w with
             | None ->
-              Kernel.error ~source
+              Kernel.abort ~current:true
                 "bitfield width is not a valid integer constant";
-              (* error  does not immediately stop execution.
-                 Hence, we return a placeholder here.
-              *)
-              Some 0, ftype
             | Some s as w ->
               begin
                 if s < 0 then
-                  Kernel.error ~source "negative bitfield width (%d)" s;
+                  Kernel.abort ~current:true "negative bitfield width (%d)" s;
                 try
                   if s > Cil.bitsSizeOf ftype then
-                    Kernel.error ~source
+                    Kernel.error ~current:true
                       "bitfield width (%d) exceeds its type (%a, %d bits)"
                       s Cil_printer.pp_typ ftype (Cil.bitsSizeOf ftype)
                 with
                   SizeOfError _ ->
-                  Kernel.fatal ~source
+                  Kernel.fatal ~current:true
                     "Unable to compute size of %a" Cil_printer.pp_typ ftype
               end;
               let ftype =
