@@ -182,6 +182,7 @@
 
 .eva-cell .eva-stmt {
     margin-left: 0.2em;
+    padding: 2px 0px;
 }
 
 .eva-cell-expression {
