@@ -180,7 +180,8 @@ let rec leftmost a ms =
   match F.repr a with
   | L.Fun( concat , e :: es ) when concat == f_concat ->
       leftmost e (es@ms)
-  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat && Cint.is_positive_or_null n ->
+  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat &&
+                                     (F.decide (F.e_lt F.e_zero n)) ->
       leftmost u (v_repeat u (F.e_sub n F.e_one) :: ms)
   | _ -> a , ms
 
@@ -191,7 +192,8 @@ let rec rightmost ms a =
         | [] -> ms , a
         | e::es -> rightmost (ms @ List.rev es) e
       end
-  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat && Cint.is_positive_or_null n ->
+  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat &&
+                                     (F.decide (F.e_lt F.e_zero n)) ->
       rightmost (ms @ [v_repeat u (F.e_sub n F.e_one)]) u
   | _ -> ms , a
 
