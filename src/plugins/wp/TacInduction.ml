@@ -22,22 +22,40 @@
 
 open Lang
 
-type env = {
-  n : F.var ;
-  sigma : F.sigma ;
-  mutable hind : F.pred list ;
-}
+let filter n sequence =
+  let sequence = Conditions.list sequence in
+  let partition p =
+    match F.p_expr p with
+    | And ps -> List.partition (F.occursp n) ps
+    | _ -> if F.occursp n p then [ p ], [] else [], [ p ]
+  in
+  let add make (removed, steps) (rem, kept) =
+    List.rev_append (List.rev rem) removed, make (F.p_conj kept) :: steps
+  in
+  let partition_add acc make p = add make acc @@ partition p in
+  let filter_condition ((removed, steps) as acc) s =
+    let update = Conditions.update_cond s in
+    match s.condition with
+    | Type p -> partition_add acc (fun x -> update (Type x)) p
+    | Have p -> partition_add acc (fun x -> update (Have x)) p
+    | When p -> partition_add acc (fun x -> update (When x)) p
+    | Core p -> partition_add acc (fun x -> update (Core x)) p
+    | Init p -> partition_add acc (fun x -> update (Init x)) p
+    | State _ -> removed, update (Have F.p_true) :: steps
+    | Either _ | Branch _ as c ->
+        (* Note: it is not really expected that Conditions.pred_cond can
+           generate a property that, once partitioned, results in both kept and
+           removed parts. Anyway if it is the case, it means that it was able to
+           reduce the original property to a single conjunction, so let us
+           handle it like a Have. *)
+        match partition @@ Conditions.pred_cond c with
+        | [], _ -> removed, s :: steps
+        | res -> add (fun x -> update (Have x)) acc res
+  in
+  let removed, steps = List.fold_left filter_condition ([], []) sequence in
+  List.rev removed, Conditions.sequence @@ List.rev steps
 
-let rec strip env p =
-  match F.p_expr p with
-  | And ps -> F.p_all (strip env) ps
-  | _ ->
-      let p = F.p_subst env.sigma p in
-      if F.occursp env.n p then
-        ( env.hind <- p :: env.hind ; F.p_true )
-      else p
-
-let process value n0 seq =
+let process value n0 sequent =
 
   (* Transfrom seq into: hyps => (forall n, goal) *)
   let n = Lang.freshvar ~basename:"n" Qed.Logic.Int in
@@ -46,9 +64,9 @@ let process value n0 seq =
   let vi = F.e_var i in
   let sigma = Lang.sigma () in
   F.Subst.add sigma value vn ;
-  let env = { n ; sigma ; hind = [] } in
-  let hyps = Conditions.map_sequence (strip env) (fst seq) in
-  let goal_n = F.p_hyps env.hind @@ F.p_subst sigma (snd seq) in
+  let seq, goal = Conditions.map_sequent (F.p_subst sigma) sequent in
+  let hind, seq = filter n seq in
+  let goal_n = F.p_hyps hind @@ F.p_subst sigma goal in
   let goal_i = F.p_subst_var n vi goal_n in
 
   (* Base: n = n0 *)
@@ -67,7 +85,7 @@ let process value n0 seq =
     F.p_hyps [F.p_lt vn n0; hind] goal_n in
 
   (* All Cases *)
-  List.map (fun (name,goal) -> name , (hyps,goal)) [
+  List.map (fun (name,goal) -> name , (seq,goal)) [
     "Base" , goal_base ;
     "Induction (sup)" , goal_sup ;
     "Induction (inf)" , goal_inf ;
