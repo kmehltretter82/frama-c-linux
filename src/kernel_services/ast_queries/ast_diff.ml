@@ -250,6 +250,19 @@ module Kernel_function = Build_code_correspondance(Kernel_function)
 
 module Fundec = Build_correspondance(Cil_datatype.Fundec)
 
+let (&&>) (res,env) f =
+  match res with
+  | `Body_changed -> `Body_changed, env
+  | `Same_body -> f env
+  | `Callees_changed ->
+    let res', env = f env in
+    match res' with
+    | `Body_changed -> `Body_changed, env
+    | `Same_body | `Callees_changed -> `Callees_changed, env
+
+let (&&&) acc f =
+  let f env = (f env, env) in acc &&> f
+
 let empty_env =
   { compinfo = Cil_datatype.Compinfo.Map.empty;
     kernel_function = Kf.Map.empty;
@@ -281,6 +294,13 @@ let logic_prms_correspondance p p' =
   let add_one lv lv' =
     Logic_var.add lv (`Same lv') in
   List.iter2 add_one p p'
+
+let update_stmt_correspondance s s' (corres,_) =
+  match corres with
+  | `Same_body -> Stmt.add s (`Same s')
+  | (`Spec_changed | `Callees_changed | `Callees_spec_changed) as c ->
+    Stmt.add s (`Partial(s',(c:>partial_correspondance)))
+  | `Body_changed -> ()
 
 (** TODO: use location info to detect potential renaming.
     Requires some information about syntactic diff. *)
@@ -334,6 +354,8 @@ let is_same_opt f o o' env =
   | None, None -> true
   | Some v, Some v' -> f v v' env
   | _ -> false
+
+let is_same_pair f1 f2 (x1,x2) (y1,y2) env = f1 x1 y1 env && f2 x2 y2 env
 
 let rec is_same_list f l l' env =
   match l, l' with
@@ -401,16 +423,70 @@ and is_same_exp _e _e' _env = false
 
 and is_same_instr _i _i' _env = `Body_changed
 
+and is_same_instr_list l l' env =
+  match l, l' with
+  | [], [] -> `Same_body
+  | [], _ | _, [] -> `Body_changed
+  | i::tl, i'::tl' ->
+    let res = is_same_instr i i' env in
+    fst ((res, env) &&& is_same_instr_list tl tl')
+
 and is_same_stmt s s' env =
   if s.ghost = s'.ghost && Cil_datatype.Attributes.equal s.sattr s'.sattr then
     begin
-      match s.skind,s'.skind with
-      | Instr i, Instr i' -> is_same_instr i i' env, env
-      | Return (r,_), Return(r', _) ->
-        if is_same_opt is_same_exp r r' env then `Same_body, env
-        else `Body_changed, env
-      | Goto (_s,_), Goto(_s',_) -> `Body_changed, env
-      | _ -> `Body_changed, env
+      let res =
+        match s.skind,s'.skind with
+        | Instr i, Instr i' -> is_same_instr i i' env, env
+        | Return (r,_), Return(r', _) ->
+          if is_same_opt is_same_exp r r' env then `Same_body, env
+          else `Body_changed, env
+        | Goto (_s,_), Goto(_s',_) -> `Same_body, env
+        | Break _, Break _ -> `Same_body, env
+        | Continue _, Continue _ -> `Same_body, env
+        | If(e,b1,b2,_), If(e',b1',b2',_) ->
+          if is_same_exp e e' env then begin
+            is_same_block b1 b1' env &&>
+            (is_same_block b2 b2')
+          end else `Body_changed, env
+        | Switch(e,b,_,_), Switch(e',b',_,_) ->
+          if is_same_exp e e' env then begin
+            is_same_block b b' env
+          end else `Body_changed, env
+        | Loop(_,b,_,_,_), Loop(_,b',_,_,_) ->
+          is_same_block b b' env
+        | Block b, Block b' ->
+          is_same_block b b' env
+        | UnspecifiedSequence l, UnspecifiedSequence l' ->
+          let b = Cil.block_from_unspecified_sequence l in
+          let b' = Cil.block_from_unspecified_sequence l' in
+          is_same_block b b' env
+        | Throw (e,_), Throw (e',_) ->
+          if is_same_opt (is_same_pair is_same_exp is_same_type) e e' env then
+            `Same_body, env
+          else `Body_changed, env
+        | TryCatch (b,c,_), TryCatch(b',c',_) ->
+          let rec is_same_catch_list l l' env =
+            match l, l' with
+            | [], [] -> `Same_body, env
+            | [],_ | _, [] -> `Body_changed, env
+            | (bind, b) :: tl, (bind', b') :: tl' ->
+              is_same_binder bind bind' env &&>
+              (is_same_block b b') &&>
+              (is_same_catch_list tl tl')
+          in
+          is_same_block b b' env &&> is_same_catch_list c c'
+        | TryFinally(b1,b2,_), TryFinally(b1',b2',_) ->
+          is_same_block b1 b1' env &&>
+          (is_same_block b2 b2')
+        | TryExcept(b1,(h,e),b2,_), TryExcept(b1',(h',e'),b2',_) ->
+          if is_same_exp e e' env then begin
+            is_same_block b1 b1' env &&&
+            (is_same_instr_list h h') &&>
+            (is_same_block b2 b2')
+          end else `Body_changed, env
+        | _ -> `Body_changed, env
+      in
+      update_stmt_correspondance s s' res; res
     end else `Body_changed, env
 
 (* is_same_block will return its modified environment in order
@@ -423,20 +499,36 @@ and is_same_block b b' env =
      Cil_datatype.Attributes.equal b.battrs b'.battrs
   then begin
     let env = add_locals local_decls local_decls' env in
-    let rec is_same_stmts l l' (prev, env as res) =
+    let rec is_same_stmts l l' env =
       match l, l' with
-      | [], [] -> res
+      | [], [] -> `Same_body,env
       | [], _ | _, [] -> `Body_changed, env
       | s :: tl, s' :: tl' ->
-        let res_stmt, env = is_same_stmt s s' env in
-        match prev, res_stmt with
-        | `Body_changed, _ | _, `Body_changed -> `Body_changed, env
-        | `Same_body, r | r, `Same_body -> is_same_stmts tl tl' (r,env)
-        | `Callees_changed, `Callees_changed ->
-          is_same_stmts tl tl' (`Callees_changed, env)
+        is_same_stmt s s' env &&> (is_same_stmts tl tl')
     in
-    is_same_stmts b.bstmts b'.bstmts (`Same_body, env)
+    is_same_stmts b.bstmts b'.bstmts env
   end else `Body_changed, env
+
+and is_same_binder b b' env =
+  match b, b' with
+  | Catch_exn(v,conv), Catch_exn(v', conv') ->
+    if is_same_varinfo v v' env then begin
+      let env = add_locals [v] [v'] env in
+      let rec is_same_conv l l' env =
+        match l, l' with
+        | [], [] -> `Same_body, env
+        | [], _ | _, [] -> `Body_changed, env
+        | (v,b)::tl, (v',b')::tl' ->
+          if is_same_varinfo v v' env then begin
+            let env = add_locals [v] [v'] env in
+            is_same_block b b' env &&>
+            (is_same_conv tl tl')
+          end else `Body_changed, env
+      in
+      is_same_conv conv conv' env
+    end else `Body_changed, env
+  | Catch_all, Catch_all -> `Same_body, env
+  | (Catch_exn _ | Catch_all), _ -> `Body_changed, env
 
 and is_same_offset _o _o' _env = false
 
@@ -447,6 +539,10 @@ and is_same_funspec _s _s' _env = false
 *)
 and is_same_fundec f f' env: body_correspondance =
   let res, env = is_same_block f.sbody f'.sbody env in
+  (* Since we add the locals only if the body is the same,
+     we have explored all nodes, and added all locals bindings.
+     Otherwise, is_same_block would have returned `Body_changed.
+     Hence [Not_found] cannot be raised. *)
   let add_local v =
     let v' = Cil_datatype.Varinfo.Map.find v env.local_vars in
     Varinfo.add v (`Same v')
