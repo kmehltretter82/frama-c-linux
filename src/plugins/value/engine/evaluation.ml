@@ -1056,7 +1056,7 @@ module Make
               let size_expr = Option.get array_size in (* array_size exists *)
               assume_valid_index ~size ~size_expr ~index_expr index
           with
-          | Cil.LenOfArray -> `Value index, Alarmset.none (* unknown array size *)
+          | Cil.LenOfArray _ -> `Value index, Alarmset.none (* unknown array size *)
       in
       valid_index >>=: fun index ->
       Loc.forward_index typ_pointed index roffset, typ_offs,

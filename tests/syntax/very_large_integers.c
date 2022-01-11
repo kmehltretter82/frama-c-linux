@@ -14,6 +14,8 @@
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT_OCTAL"
    STDOPT: #"-cpp-extra-args=-DEVA_UNROLL -eva -kernel-warn-key annot-error=error"
    STDOPT: #"-cpp-extra-args=-DCABS_DOWHILE"
+   STDOPT: #"-cpp-extra-args=-DARRAY_INIT1"
+   STDOPT: #"-cpp-extra-args=-DARRAY_INIT2"
    EXIT: 0
    STDOPT: #"-cpp-extra-args=-DUNROLL_PRAGMA"
 */
@@ -83,6 +85,24 @@ typedef struct {
 
 #ifdef LOGIC_CONSTANT_OCTAL
 //@ type too_large_logic_array_octal = int[09876543210];
+#endif
+
+#ifdef ARRAY_INIT1
+// Previously caused Invalid_argument(Array.make)
+int a1[] = {[72057594037927936] = 0};
+#endif
+
+#ifdef ARRAY_INIT2
+struct arri2 {
+  int a[7205759403792795];
+};
+struct st {
+  struct arri2 a;
+};
+// Previously caused Out of memory
+struct st s = {
+  {{[7205759403792793 ... 7205759403792793] = 0}}
+};
 #endif
 
 int main() {

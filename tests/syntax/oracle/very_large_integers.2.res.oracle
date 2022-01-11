@@ -1,7 +1,7 @@
 [kernel] Parsing very_large_integers.c (with preprocessing)
-[kernel] very_large_integers.c:37: User Error: 
+[kernel] very_large_integers.c:39: User Error: 
   integer constant too large in expression 9999999999999999999U
-[kernel] very_large_integers.c:37: Failure: 
+[kernel] very_large_integers.c:39: Failure: 
   Cannot understand the constants in case range
 [kernel] User Error: stopping on file "very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
