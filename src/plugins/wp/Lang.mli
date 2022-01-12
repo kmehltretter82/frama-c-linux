@@ -356,7 +356,8 @@ sig
   val e_prop : pred -> term
   val p_bools : term list -> pred list
   val e_props : pred list -> term list
-  val lift : (term -> term) -> pred -> pred
+  val e_lift : (term -> term) -> pred -> pred
+  val p_lift : (pred -> pred) -> term -> term
 
   val p_not : pred -> pred
   val p_and : pred -> pred -> pred
