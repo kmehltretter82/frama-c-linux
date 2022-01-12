@@ -46,6 +46,8 @@ let dkey_asm_contracts = register_category "asm:contracts"
 
 let dkey_ast = register_category "ast"
 
+let dkey_builtins = register_category "builtins"
+
 let dkey_check = register_category "check"
 
 let dkey_constfold = register_category "constfold"
