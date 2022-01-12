@@ -192,10 +192,24 @@ let rec leftmost a ms =
   match F.repr a with
   | L.Fun( concat , e :: es ) when concat == f_concat ->
       leftmost e (es@ms)
-  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat &&
-                                     (F.decide (F.e_lt F.e_zero n)) ->
-      leftmost u (v_repeat u (F.e_sub n F.e_one) :: ms)
+  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat -> begin
+      let exception RetryOnUnfold in
+      try (* tries to perform some rolling that do not depend on [n] *)
+        raise RetryOnUnfold
+      with RetryOnUnfold ->
+        if F.decide (F.e_lt F.e_zero n) then
+          (* 0<n ==> (u*^n) ^ ms ==  u ^ (u*^(n-1)) ^ ms *)
+          leftmost u (v_repeat u (F.e_sub n F.e_one) :: ms)
+        else
+          a , ms
+    end
   | _ -> a , ms
+
+(* [leftmost a] returns [s,xs] such that [a = s ^ x1 ^ ... ^ xn] *)
+let leftmost a =
+  let r = leftmost a [] in
+  (* Format.printf "@.leftmost %a@ = %a ^ ... (%d more)@." Lang.F.pp_term a  Lang.F.pp_term (fst r) (List.length (snd r)) ; *)
+  r
 
 let rec rightmost ms a =
   match F.repr a with
@@ -209,9 +223,15 @@ let rec rightmost ms a =
       rightmost (ms @ [v_repeat u (F.e_sub n F.e_one)]) u
   | _ -> ms , a
 
+(* [rightmost a] returns [s,xs] such that [a = x1 ^ ... ^ xn ^ s] *)
+let rightmost a =
+  let r = rightmost [] a in
+  (* Format.printf "@.rightmost %a@ = %a ^ ... (%d more)@." Lang.F.pp_term a Lang.F.pp_term (fst r) (List.length (snd r)) ; *)
+  r
+
 let leftmost_eq a b =
-  let a , u = leftmost a [] in
-  let b , v = leftmost b [] in
+  let a , u = leftmost a in
+  let b , v = leftmost b in
   if u <> [] || v <> [] then
     match F.is_equal a b with
     | L.Yes -> F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
@@ -221,8 +241,8 @@ let leftmost_eq a b =
     raise Not_found
 
 let rightmost_eq a b =
-  let u , a = rightmost [] a in
-  let v , b = rightmost [] b in
+  let u , a = rightmost a in
+  let v , b = rightmost b in
   if u <> [] || v <> [] then
     match F.is_equal a b with
     | L.Yes -> F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
@@ -289,6 +309,7 @@ let () =
       F.set_builtin_2' f_cons rewrite_cons ;
       F.set_builtin_2 f_repeat rewrite_repeat ;
       F.set_builtin_1 f_length rewrite_length ;
+      F.set_builtin_eqp f_concat rewrite_eq ;
       F.set_builtin_eqp f_repeat rewrite_eq ;
       F.set_builtin_eqp f_nil rewrite_eq ;
     end

@@ -32,6 +32,11 @@ Prove: (0<=k_0) -> (k_0<(3*(length x_0)))
 
 ------------------------------------------------------------
 
+Lemma concat_repeat_swap:
+Prove: let a_0 = (repeat x_0 k_0) in (concat a_0 x_0)=(concat x_0 a_0)
+
+------------------------------------------------------------
+
 Lemma eq_repeat_concat_3:
 Assume: 'access_4_4' 'access_16_16'
 Prove: true

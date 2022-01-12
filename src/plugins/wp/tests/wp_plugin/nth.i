@@ -6,6 +6,10 @@
   axiomatic Nth {
   logic integer f(integer a);
 
+  check lemma concat_repeat_swap:
+    \forall \list<integer> x ;
+      \forall integer k ; ((x *^ k) ^ x) == (x ^ (x *^ k));
+
   lemma access_16_16: ok:
   \forall integer k ; 0 <= k < 16 ==>
     f(k)==\nth([| f(0), f(1), f(2),  f(3),  f(4),  f(5),  f(6),  f(7),
