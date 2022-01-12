@@ -37,7 +37,7 @@ int eacsl_runtime_sound_verdict = 1;
 void eacsl_print_values(eacsl_assert_data_t *data) {
   eacsl_assert_data_value_t *value = data->values;
   if (value != NULL) {
-    STDERR("\tWith values:\n");
+    STDERR("\tWith values at failure point:\n");
   }
   while (value != NULL) {
     eacsl_print_value(value);
