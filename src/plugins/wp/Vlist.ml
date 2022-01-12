@@ -195,7 +195,14 @@ let rec leftmost a ms =
   | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat -> begin
       let exception RetryOnUnfold in
       try (* tries to perform some rolling that do not depend on [n] *)
-        raise RetryOnUnfold
+        match ms with
+        | b::ms ->
+            let b,ms = leftmost b ms in
+            let u,us = leftmost u [] in
+            if not (F.decide (F.e_eq u b)) then raise RetryOnUnfold;
+            (*  u=b ==>  ((u^us)*^n) ^ b ^ ms  == u ^ (us^b)*^n) ^ ms *)
+            u, v_repeat (v_concat (us@[b]) (F.typeof a)) n :: ms
+        | _ -> raise RetryOnUnfold
       with RetryOnUnfold ->
         if F.decide (F.e_lt F.e_zero n) then
           (* 0<n ==> (u*^n) ^ ms ==  u ^ (u*^(n-1)) ^ ms *)
