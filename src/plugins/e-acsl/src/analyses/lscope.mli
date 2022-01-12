@@ -39,6 +39,11 @@ val is_empty: t -> bool
 val add: lscope_var -> t -> t
 (* Return a new logic scope in which the given [lscope_var] has been added. *)
 
+val remove: lscope_var -> t -> t
+(** @return a new logic scope in which the given [lscope_var] has been removed
+    if it was present. Use physical equality to check if the [lscope_var] is
+    present. *)
+
 val get_all: t -> lscope_var list
 (* Return the list of [lscope_var] of the given logic scope.
    The first element is the last [lscope_var] that was added to [t], the

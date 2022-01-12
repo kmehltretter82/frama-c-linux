@@ -33,6 +33,9 @@ let is_empty = function [] -> true | _ :: _ -> false
 
 let add lscope_var t = lscope_var :: t
 
+let remove lscope_var t =
+  List.filter (fun elt -> elt != lscope_var) t
+
 let get_all t = t
 
 let exists lv t =

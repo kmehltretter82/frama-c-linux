@@ -131,6 +131,10 @@ module Logic_scope: sig
   (** Add a new logic variable with its associated information in the
       logic scope of the environment. *)
 
+  val remove: t -> lscope_var -> t
+  (** Remove a logic variable and its associated information from the logic
+      scope of the environment. *)
+
   val reset: t -> t
   (** Return a new environment in which the logic scope is reset
       iff [set_reset _ true] has been called beforehand. Do nothing otherwise. *)

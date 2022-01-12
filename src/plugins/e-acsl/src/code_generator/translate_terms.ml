@@ -861,10 +861,15 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | Tcomprehension _ -> Env.not_yet env "tset comprehension"
   | Trange _ -> Env.not_yet env "range"
   | Tlet(li, t) ->
+    (* Translate the term registered to the \let logic variable *)
+    let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
+    (* Register the logic var to the logic scope *)
     let lvs = Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
-    let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
+    (* Translate the body of the \let *)
     let e, adata, env = to_exp ~adata kf env t in
+    (* Remove the logic var from the logic scope *)
+    let env = Env.Logic_scope.remove env lvs in
     Interval.Env.remove li.l_var_info;
     e, adata, env, Typed_number.C_number, ""
 

@@ -375,6 +375,7 @@ end
 module Logic_scope = struct
   let get env = env.lscope
   let extend env lvs = { env with lscope = Lscope.add lvs env.lscope }
+  let remove env lvs = { env with lscope = Lscope.remove lvs env.lscope }
   let set_reset env bool = { env with lscope_reset = bool }
   let get_reset env = env.lscope_reset
   let reset env =
