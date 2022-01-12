@@ -262,7 +262,6 @@ let rec subsequence xs rs ys =
       let rs,ys = omit rs x ys in
       subsequence xs rs ys
 
-let p_is_nil a = F.p_equal a (v_nil (F.typeof a))
 let rewrite_eq a b =
   match F.repr a , F.repr b with
   | L.Fun(nil,[]) , _ when nil == f_nil -> rewrite_is_nil ~nil:a b
@@ -272,9 +271,14 @@ let rewrite_eq a b =
       try rightmost_eq a b with Not_found ->
         let xs = elements a in
         let ys = elements b in
-        if List.length xs < List.length ys
-        then F.p_all p_is_nil (subsequence xs [] ys)
-        else F.p_all p_is_nil (subsequence ys [] xs)
+        let rs = if List.length xs < List.length ys
+          then subsequence xs [] ys
+          else subsequence ys [] xs
+        in
+        let pred = F.p_all (fun s -> F.p_equal s (v_nil (F.typeof s))) rs in
+        if F.decide (e_prop pred)
+        then F.p_true
+        else raise Not_found
 
 (* All Simplifications *)
 
