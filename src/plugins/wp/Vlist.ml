@@ -115,10 +115,11 @@ let () =
 
 (*--- Smart Constructors ---*)
 
-let is_nil e =
+let is_nil e = (* under-approximation of e==[] *)
   match F.repr e with
   | Qed.Logic.Fun (f,_) -> Fun.equal f f_nil
   | _ -> false
+
 let v_nil t = F.e_fun ~result:t f_nil []
 let v_elt e = F.e_fun f_elt [e]
 let v_concat es tau = F.e_fun f_concat es ~result:tau
@@ -129,23 +130,32 @@ let v_repeat s n = F.e_fun f_repeat [s;n]
 (* --- Rewriters                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rewrite_cons a w tau = v_concat [v_elt a ; w] (vlist_get_tau tau)
+let rewrite_cons a w tau = (* a::w == [a]^w *)
+  v_concat [v_elt a ; w] (vlist_get_tau tau)
 
 let rewrite_length e =
   match F.repr e with
-  | L.Fun( nil , [] ) when nil == f_nil -> F.e_zero
-  | L.Fun( elt , [_] ) when elt == f_elt -> F.e_one
-  | L.Fun( concat , es ) when concat == f_concat ->
+  | L.Fun( nil , [] ) when nil == f_nil -> F.e_zero (* \length([]) == 0 *)
+  | L.Fun( elt , [_] ) when elt == f_elt -> F.e_one (* \length([x]) == 1 *)
+  | L.Fun( concat , es ) when concat == f_concat -> (* \length(\concat(...,x_i,...)) == \sum(...,\length(x_i),...)  *)
       F.e_sum (List.map v_length es)
-  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat &&
+  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat && (* n>=0 ==> (\length(u ^* n) == n * \length(u) *)
                                      Cint.is_positive_or_null n ->
       F.e_mul (v_length u) n
+  | _ -> raise Not_found (* NB. do not considers \Cons because they are removed *)
+
+let match_natural k =
+  match F.repr k with
+  | L.Kint z ->
+      let k = try Integer.to_int_exn z with Z.Overflow -> raise Not_found in
+      if 0 <= k then k else raise Not_found
   | _ -> raise Not_found
 
 let rec get_nth k e =
   match F.repr e with
   | L.Fun( concat , list ) when concat == f_concat -> get_nth_list k list
-  | L.Fun( elt , [x] ) when elt == f_elt && k = 0 -> x
+  | L.Fun( elt , [x] ) when elt == f_elt ->
+      get_nth_elt k x (fun _ -> raise Not_found)
   | _ -> raise Not_found
 
 and get_nth_list k = function
@@ -153,24 +163,22 @@ and get_nth_list k = function
       begin
         match F.repr head with
         | L.Fun( elt , [x] ) when elt == f_elt ->
-            if k = 0 then x else get_nth_list (k-1) tail
+            get_nth_elt k x (fun k -> get_nth_list k tail)
         | _ -> raise Not_found
       end
   | [] -> raise Not_found
+and get_nth_elt k x f =
+  if k = 0 then x else (f (k-1))
 
 let rewrite_nth s k =
-  match F.repr k with
-  | L.Kint z ->
-      let k = try Integer.to_int_exn z with Z.Overflow -> raise Not_found in
-      if 0 <= k then get_nth k s else raise Not_found
-  | _ -> raise Not_found
+  get_nth (match_natural k) s
 
 let rewrite_repeat s n =
-  if F.equal n e_zero then v_nil (F.typeof s)  else
-  if F.equal n e_one then s else
-  if is_nil s then s else
+  if F.equal n e_zero then v_nil (F.typeof s) else  (* (s *^ n) == s *)
+  if F.equal n e_one then s else  (* (s *^ 1) == s *)
+  if is_nil s then s else (* ([] *^ n) == [] ; even if [n] is negative *)
     match F.repr s with
-    | L.Fun( repeat , [s0 ; n0] )
+    | L.Fun( repeat , [s0 ; n0] ) (* n0>=0 && n>=0 ==> ((s0 *^ n0) *^ n) == (s0 *^ (n0 * n)) *)
       when (repeat == f_repeat) &&
            (Cint.is_positive_or_null n) &&
            (Cint.is_positive_or_null n0) -> v_repeat s0 (F.e_mul n0 n)
@@ -219,12 +227,15 @@ let rightmost_eq a b =
   else
     raise Not_found
 
-let p_is_nil a = F.p_equal a (v_nil (F.typeof a))
-let rewrite_is_nil a =
+let rewrite_is_nil ~nil a =
+  let p_is_nil a = F.p_equal nil a  in
   match F.repr a with
-  | L.Fun(concat,es) when concat == f_concat -> F.p_all p_is_nil es
-  | L.Fun(elt,[_]) when elt == f_elt -> F.p_false
+  | L.Fun(concat,es) when concat == f_concat ->
+      (* \concat (s1,...,sn)==[] <==> (s1==[] && ... && sn==[]) *)
+      F.p_all p_is_nil es
+  | L.Fun(elt,[_]) when elt == f_elt -> F.p_false (* [x]==[] <==> false *)
   | L.Fun(repeat,[u;n]) when repeat == f_repeat ->
+      (* (s *^ n)==[] <==> (s==[] || n<=0)  *)
       F.p_or (F.p_leq n F.e_zero) (p_is_nil u)
   | _ -> raise Not_found
 
@@ -247,10 +258,11 @@ let rec subsequence xs rs ys =
       let rs,ys = omit rs x ys in
       subsequence xs rs ys
 
+let p_is_nil a = F.p_equal a (v_nil (F.typeof a))
 let rewrite_eq a b =
   match F.repr a , F.repr b with
-  | L.Fun(nil,[]) , _ when nil == f_nil -> rewrite_is_nil b
-  | _ , L.Fun(nil,[]) when nil == f_nil -> rewrite_is_nil a
+  | L.Fun(nil,[]) , _ when nil == f_nil -> rewrite_is_nil ~nil:a b
+  | _ , L.Fun(nil,[]) when nil == f_nil -> rewrite_is_nil ~nil:b a
   | _ ->
       try leftmost_eq a b with Not_found ->
       try rightmost_eq a b with Not_found ->
