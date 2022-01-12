@@ -40,31 +40,29 @@ void __gen_e_acsl_f(struct X *item)
 {
   struct X __gen_e_acsl_at_2;
   struct X *__gen_e_acsl_at;
-  __e_acsl_store_block((void *)(& item),(size_t)8);
   {
     int __gen_e_acsl_valid_read;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"item",
+    __e_acsl_store_block((void *)(& item),(size_t)8);
+    __gen_e_acsl_at = item;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"item",
                                  (void *)item);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(struct X)",0,sizeof(struct X));
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)item,
                                                   sizeof(struct X),
                                                   (void *)item,
                                                   (void *)(& item));
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(item)";
-    __gen_e_acsl_assert_data_2.file = "issue-eacsl-139.c";
-    __gen_e_acsl_assert_data_2.fct = "f";
-    __gen_e_acsl_assert_data_2.line = 9;
-    __gen_e_acsl_assert_data_2.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "RTE";
+    __gen_e_acsl_assert_data.pred_txt = "mem_access: \\valid_read(item)";
+    __gen_e_acsl_assert_data.file = "issue-eacsl-139.c";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 9;
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __gen_e_acsl_at_2 = *item;
   }
-  __gen_e_acsl_at = item;
   f(item);
   __e_acsl_delete_block((void *)(& item));
   return;

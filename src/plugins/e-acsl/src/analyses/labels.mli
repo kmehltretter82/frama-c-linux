@@ -88,3 +88,9 @@ val must_translate_ppt_ref: (Property.t -> bool) ref
 val must_translate_ppt_opt_ref: (Property.t option -> bool) ref
 
 val has_empty_quantif_ref: ((term * logic_var * term) list -> bool) ref
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)

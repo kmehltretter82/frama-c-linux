@@ -518,6 +518,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     int __gen_e_acsl_separated;
     __e_acsl_store_block((void *)(& src),(size_t)8);
     __e_acsl_store_block((void *)(& dest),(size_t)8);
+    __gen_e_acsl_at = dest;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
@@ -656,7 +657,6 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     __gmpz_clear(__gen_e_acsl_sub_2);
     __gmpz_clear(__gen_e_acsl_add);
   }
-  __gen_e_acsl_at = dest;
   __retres = memcpy(dest,src,n);
   __e_acsl_initialize(dest,n);
   {

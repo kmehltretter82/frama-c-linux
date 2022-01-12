@@ -401,7 +401,7 @@ module Process: sig
     kernel_function ->
     kinstr ->
     stmt ->
-    Smart_stmt.annotation_kind ->
+    annotation_kind ->
     lscope ->
     term ->
     unit
@@ -416,7 +416,7 @@ module Process: sig
     kernel_function ->
     kinstr ->
     stmt ->
-    Smart_stmt.annotation_kind ->
+    annotation_kind ->
     lscope ->
     predicate ->
     unit
@@ -438,7 +438,7 @@ end = struct
     (** Statement of the predicate or term being analysed. *)
     stmt: stmt;
     (** King of annotation for the predicate or term being analysed. *)
-    akind: Smart_stmt.annotation_kind;
+    akind: annotation_kind;
     (** Logic scope for the predicate or term being analysed. *)
     lscope: Lscope.t;
   }
@@ -462,12 +462,12 @@ end = struct
   (** @return a textual representation of the given kind of annotation. *)
   let akind_to_string k =
     match k with
-    | Smart_stmt.Assertion -> "Assertion"
-    | Smart_stmt.Precondition -> "Precondition"
-    | Smart_stmt.Postcondition -> "Postcondition"
-    | Smart_stmt.Invariant -> "Invariant"
-    | Smart_stmt.Variant -> "Variant"
-    | Smart_stmt.RTE -> "RTE"
+    | Assertion -> "Assertion"
+    | Precondition -> "Precondition"
+    | Postcondition -> "Postcondition"
+    | Invariant -> "Invariant"
+    | Variant -> "Variant"
+    | RTE -> "RTE"
 
   (** Apply [fct ?error env] on every element of the list [args]. *)
   let do_list fct ?error env args =
@@ -493,15 +493,15 @@ end = struct
 
       (* Translate on the statement corresponding to the [Pre] label of the
          enclosing function. *)
-      | Kglobal, Smart_stmt.Postcondition, BuiltinLabel(Pre | Old) ->
+      | Kglobal, Postcondition, BuiltinLabel(Pre | Old) ->
         error, Some env.pre_func_stmt
-      | Kstmt _, Smart_stmt.(Precondition | Postcondition), BuiltinLabel(Pre) ->
+      | Kstmt _, (Precondition | Postcondition), BuiltinLabel(Pre) ->
         error, Some env.pre_func_stmt
-      | _, Smart_stmt.Assertion, BuiltinLabel(Pre) ->
+      | _, Assertion, BuiltinLabel(Pre) ->
         error, Some env.pre_func_stmt
 
       (* Translate before the current statement. *)
-      | Kstmt stmt, Smart_stmt.Postcondition, BuiltinLabel(Old) ->
+      | Kstmt stmt, Postcondition, BuiltinLabel(Old) ->
         if not (Cil_datatype.Stmt.equal stmt env.stmt) then
           Options.fatal
             "The statement of the kinstr and the current statement should \
@@ -511,16 +511,16 @@ end = struct
       (* In-place translations *)
       | _, _, BuiltinLabel(Here) ->
         error, None
-      | Kglobal, Smart_stmt.Precondition, BuiltinLabel(Pre | Old) ->
+      | Kglobal, Precondition, BuiltinLabel(Pre | Old) ->
         error, None
-      | _, Smart_stmt.Postcondition, BuiltinLabel(Post) ->
+      | _, Postcondition, BuiltinLabel(Post) ->
         error, None
-      | Kstmt _, Smart_stmt.Precondition, BuiltinLabel(Old) ->
+      | Kstmt _, Precondition, BuiltinLabel(Old) ->
         error, None
 
       (* Invalid position for the given label *)
-      | _, Smart_stmt.Assertion, BuiltinLabel(Old | Post)
-      | _, Smart_stmt.Precondition, BuiltinLabel(Post) ->
+      | _, Assertion, BuiltinLabel(Old | Post)
+      | _, Precondition, BuiltinLabel(Post) ->
         let msg =
           Format.asprintf "label '%a' within annotation '%s' in '%a'"
             Printer.pp_logic_label label
@@ -773,7 +773,7 @@ end
 
 class vis_at_labels () =
   object (self)
-    inherit E_acsl_visitor.visitor
+    inherit E_acsl_visitor.visitor dkey
 
     (** Statement corresponding to the [Pre] label of the enclosing function*)
     val mutable pre_func_stmt: stmt option = None
@@ -858,7 +858,7 @@ class vis_at_labels () =
     method process_spec ?error kf kinstr stmt spec =
       List.iter
         (fun bhv ->
-           let akind = Smart_stmt.Precondition in
+           let akind = Precondition in
            List.iter
              (fun assumes -> self#process_id_pred kf kinstr stmt akind assumes)
              bhv.b_assumes;
@@ -868,7 +868,7 @@ class vis_at_labels () =
                     (Property.ip_of_requires kf kinstr bhv requires) then
                   self#process_id_pred kf kinstr stmt akind requires)
              bhv.b_requires;
-           let akind = Smart_stmt.Postcondition in
+           let akind = Postcondition in
            (* The links between the [identified_property]s and the [assigns] or
               [allocates] clauses are not clear. For now store a [not_yet] error
               for every term of the clauses. Update the code to add the relevant
@@ -925,7 +925,7 @@ class vis_at_labels () =
                  kf
                  kinstr
                  stmt
-                 Smart_stmt.Assertion
+                 Assertion
                  p.tp_statement
            | AStmtSpec(l, spec) ->
              let error =
@@ -950,13 +950,13 @@ class vis_at_labels () =
                  kf
                  kinstr
                  stmt
-                 Smart_stmt.Invariant
+                 Invariant
                  p.tp_statement
              end
            | AVariant(t, _) ->
              if !must_translate_ppt_ref
                  (Property.ip_of_code_annot_single kf stmt annot) then
-               self#process_term kf kinstr stmt Smart_stmt.Variant t
+               self#process_term kf kinstr stmt Variant t
            | AAssigns (_, assigns) ->
              (* The link between the [identified_property] and the [assigns]
                 clause is not clear. For now store a [not_yet] error for every
@@ -969,7 +969,7 @@ class vis_at_labels () =
                kf
                kinstr
                stmt
-               (Smart_stmt.Postcondition)
+               Postcondition
                assigns
            | AAllocation (_, allocates) ->
              (* The link between the [identified_property] and the [allocates]
@@ -983,7 +983,7 @@ class vis_at_labels () =
                kf
                kinstr
                stmt
-               (Smart_stmt.Postcondition)
+               Postcondition
                allocates
            | APragma _ -> ()
            | AExtended _ -> ()
@@ -1015,3 +1015,9 @@ let pp_at_data = AtData.pretty
 let _debug () =
   Options.feedback ~level:2 "Labels preprocessing";
   Translation._debug ()
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)
