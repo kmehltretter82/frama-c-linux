@@ -196,6 +196,11 @@ let register_pred ~loc env ?force p e adata =
     let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
     register ~loc env name ?force e adata
 
+let register_pred_or_term ~loc env ?force pot e adata =
+  match pot with
+  | PoT_term t -> register_term ~loc env ?force t e adata
+  | PoT_pred p -> register_pred ~loc env ?force p e adata
+
 let kind_to_string loc k =
   Cil.mkString
     ~loc

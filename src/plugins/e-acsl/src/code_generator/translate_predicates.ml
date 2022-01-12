@@ -66,8 +66,11 @@ let relation_to_binop = function
 
 (* Convert an ACSL predicate into a corresponding C expression (if any) in the
    given environment. Also extend this environment which includes the generating
-   constructs. *)
-let rec predicate_content_to_exp ~adata ?name kf env p =
+   constructs.
+   If [inplace] is true, then the root predicate is immediately translated
+   regardless of its label. Otherwise [Translate_ats] is used to retrieve the
+   translation. *)
+let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   let loc = p.pred_loc in
   let lenv = Env.Local_vars.get env in
   Cil.CurrentLoc.set loc;
@@ -202,25 +205,11 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     let e, env = Quantif.quantif_to_exp kf env p in
     let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
-  | Pat(p, BuiltinLabel Here) ->
-    to_exp ~adata kf env p
   | Pat(p', label) ->
-    let lscope = Env.Logic_scope.get env in
-    let pot = PoT_pred p' in
-    if Lscope.is_used lscope pot then
-      let e, env = At_with_lscope.to_exp ~loc kf env pot label in
-      let adata, env = Assert.register_pred ~loc env p e adata in
-      e, adata, env
-    else begin
-      (* convert [t'] to [e] in a separated local env *)
-      let e, adata, env = to_exp ~adata kf (Env.push env) p' in
-      let e, env, sty =
-        Translate_utils.at_to_exp_no_lscope kf env None label e
-      in
-      assert (sty = Typed_number.C_number);
-      let adata, env = Assert.register_pred ~loc env p e adata in
-      e, adata, env
-    end
+    if inplace then
+      to_exp ~adata kf env p'
+    else
+      Translate_ats.to_exp ~loc ~adata kf env (PoT_pred p) label
   | Pvalid_read(BuiltinLabel Here, t) as pc
   | (Pvalid(BuiltinLabel Here, t) as pc) ->
     let call_valid ~adata t p =
@@ -309,7 +298,19 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
   | Pfreeable _ -> Env.not_yet env "labeled \\freeable"
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
-and to_exp ~adata ?name kf ?rte env p =
+(** [to_exp ~adata ?inplace ?name kf ?rte env p] converts an ACSL predicate into
+    a corresponding C expression.
+    - [adata]: assertion context.
+    - [inplace]: if the root predicate has a label, indicates if it should be
+      immediately translated or if [Translate_ats] should be used to retrieve
+      the translation.
+    - [name]: name to use for generated variables.
+    - [kf]: The enclosing function.
+    - [rte]: if true, generate and translate RTE before translating the
+      predicate.
+    - [env]: The current environment.
+    - [p]: The predicate to translate. *)
+and to_exp ~adata ?inplace ?name kf ?rte env p =
   let p = Logic_normalizer.get_pred p in
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
   Extlib.flatten
@@ -317,7 +318,7 @@ and to_exp ~adata ?name kf ?rte env p =
        ~rte:false
        ~f:(fun env ->
            let e, adata, env =
-             predicate_content_to_exp ~adata ?name kf env p
+             predicate_content_to_exp ?inplace ~adata ?name kf env p
            in
            let env = if rte then !translate_rte_exp_ref kf env e else env in
            let cast =
@@ -385,12 +386,15 @@ let predicate_to_exp_without_rte ~adata kf env p =
   (* forget optional argument ?rte and ?name*)
   to_exp ~adata kf env p
 
+let predicate_to_exp_without_inplace ~adata ?name kf ?rte env p =
+  to_exp ~adata ?name kf ?rte env p
+
 let () =
-  Translate_utils.predicate_to_exp_ref := to_exp;
+  Translate_utils.predicate_to_exp_ref := predicate_to_exp_without_inplace;
+  Translate_ats.predicate_to_exp_ref := to_exp;
   Loops.translate_predicate_ref := do_it;
   Loops.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Quantif.predicate_to_exp_ref := predicate_to_exp_without_rte;
-  At_with_lscope.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Memory_translate.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Logic_functions.predicate_to_exp_ref := predicate_to_exp_without_rte
 

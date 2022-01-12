@@ -96,17 +96,6 @@ val env_of_li:
 (** [env_of_li ~adata ~loc kf env li] translates the logic info [li] in the
     given environment with the given assertion context. *)
 
-val at_to_exp_no_lscope:
-  kernel_function ->
-  Env.t ->
-  term option ->
-  logic_label ->
-  exp ->
-  exp * Env.t * Typed_number.strnum
-(** [at_to_exp_no_lscope kf env t_opt llabel e] generates an expression
-    representing the expression [e] at the label [llabel].
-    [t_opt] is the term representing [\at(e, llabel)]. *)
-
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)

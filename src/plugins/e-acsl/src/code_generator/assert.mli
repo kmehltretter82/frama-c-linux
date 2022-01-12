@@ -97,6 +97,19 @@ val register_pred:
     parameter [force] has the same signification than for the function
     [register]. *)
 
+val register_pred_or_term:
+  loc:location ->
+  Env.t ->
+  ?force:bool ->
+  pred_or_term ->
+  exp ->
+  t ->
+  t * Env.t
+(** [register_pred_or_term ~loc kf env ?force pot e adata] registers the data
+    [e] corresponding to the predicate or term [pot] to the assertion context
+    [adata]. The parameter [force] has the same signification than for the
+    function [register]. *)
+
 val runtime_check:
   adata:t ->
   pred_kind:predicate_kind ->

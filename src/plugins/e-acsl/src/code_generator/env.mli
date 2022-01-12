@@ -186,6 +186,10 @@ end
 (** {2 Context for error handling} *)
 (* ************************************************************************** *)
 
+module Context: sig
+  val save: t -> unit
+end
+
 val handle_error: (t -> t) -> t -> t
 (** Run the closure with the given environment and handle potential errors.
     Restore the globals of the environment to the last time [Env.Context.save]
@@ -199,7 +203,6 @@ val handle_error_with_args: (t * 'a -> t * 'a) -> t * 'a -> t * 'a
 
 val not_yet: t -> string -> 'a
 (** Save the current context and raise [Error.Not_yet] exception. *)
-
 
 (* ************************************************************************** *)
 (** {2 Current environment kinstr} *)
