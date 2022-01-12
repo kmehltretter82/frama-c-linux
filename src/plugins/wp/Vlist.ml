@@ -174,9 +174,13 @@ let rewrite_nth s k =
   get_nth (match_natural k) s
 
 let rewrite_repeat s n =
-  if F.equal n e_zero then v_nil (F.typeof s) else  (* (s *^ n) == s *)
-  if F.equal n e_one then s else  (* (s *^ 1) == s *)
-  if is_nil s then s else (* ([] *^ n) == [] ; even if [n] is negative *)
+  if F.decide (F.e_leq n e_zero) then (* n <=0 ==> (s *^ n) == [] *)
+    v_nil (F.typeof s)
+  else if F.equal n e_one then (* (s *^ 1) == s *)
+    s
+  else if is_nil s then (* ([] *^ n) == [] ; even if [n] is negative *)
+    s
+  else
     match F.repr s with
     | L.Fun( repeat , [s0 ; n0] ) (* n0>=0 && n>=0 ==> ((s0 *^ n0) *^ n) == (s0 *^ (n0 * n)) *)
       when (repeat == f_repeat) &&
