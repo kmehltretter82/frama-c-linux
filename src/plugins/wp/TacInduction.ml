@@ -22,38 +22,24 @@
 
 open Lang
 
-let filter n sequence =
-  let sequence = Conditions.list sequence in
-  let partition p =
-    match F.p_expr p with
-    | And ps -> List.partition (F.occursp n) ps
-    | _ -> if F.occursp n p then [ p ], [] else [], [ p ]
-  in
-  let add make (removed, steps) (rem, kept) =
-    List.rev_append (List.rev rem) removed, make (F.p_conj kept) :: steps
-  in
-  let partition_add acc make p = add make acc @@ partition p in
-  let filter_condition ((removed, steps) as acc) s =
-    let update = Conditions.update_cond s in
-    match s.condition with
-    | Type p -> partition_add acc (fun x -> update (Type x)) p
-    | Have p -> partition_add acc (fun x -> update (Have x)) p
-    | When p -> partition_add acc (fun x -> update (When x)) p
-    | Core p -> partition_add acc (fun x -> update (Core x)) p
-    | Init p -> partition_add acc (fun x -> update (Init x)) p
-    | State _ -> removed, update (Have F.p_true) :: steps
-    | Either _ | Branch _ as c ->
-        (* Note: it is not really expected that Conditions.pred_cond can
-           generate a property that, once partitioned, results in both kept and
-           removed parts. Anyway if it is the case, it means that it was able to
-           reduce the original property to a single conjunction, so let us
-           handle it like a Have. *)
-        match partition @@ Conditions.pred_cond c with
-        | [], _ -> removed, s :: steps
-        | res -> add (fun x -> update (Have x)) acc res
-  in
-  let removed, steps = List.fold_left filter_condition ([], []) sequence in
-  List.rev removed, Conditions.sequence @@ List.rev steps
+(* remove parts with n from p into hs accumulator *)
+let filter_pred n hs p  =
+  F.p_conj @@ List.filter
+    (fun p -> if F.occursp n p then (hs := p :: !hs ; false) else true)
+    (match F.p_expr p with And ps -> ps | _ -> [p])
+
+(* remove parts with n from step s into hs accumulator *)
+let filter_step n hs s =
+  match s.Conditions.condition with
+  | (Have _ | Type _ | Core _ | Init _ | When _)  ->
+      Conditions.map_step (filter_pred n hs) s
+  | (State _ | Branch _ | Either _) as c ->
+      if F.Vars.mem n s.vars then
+        (hs := Conditions.pred_cond c :: !hs ; Conditions.step (Have F.p_true))
+      else s
+
+let filter_seq n hs seq =
+  Conditions.sequence @@ List.map (filter_step n hs) @@ Conditions.list seq
 
 let process value n0 sequent =
 
@@ -65,8 +51,9 @@ let process value n0 sequent =
   let sigma = Lang.sigma () in
   F.Subst.add sigma value vn ;
   let seq, goal = Conditions.map_sequent (F.p_subst sigma) sequent in
-  let hind, seq = filter n seq in
-  let goal_n = F.p_hyps hind @@ F.p_subst sigma goal in
+  let hind = ref [] in
+  let seq = filter_seq n hind seq in
+  let goal_n = F.p_hyps !hind @@ F.p_subst sigma goal in
   let goal_i = F.p_subst_var n vi goal_n in
 
   (* Base: n = n0 *)
