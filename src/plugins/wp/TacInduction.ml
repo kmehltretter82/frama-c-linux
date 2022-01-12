@@ -53,7 +53,7 @@ let process value n0 sequent =
   let seq, goal = Conditions.map_sequent (F.p_subst sigma) sequent in
   let hind = ref [] in
   let seq = filter_seq n hind seq in
-  let goal_n = F.p_hyps !hind @@ F.p_subst sigma goal in
+  let goal_n = F.p_hyps !hind goal in
   let goal_i = F.p_subst_var n vi goal_n in
 
   (* Base: n = n0 *)
