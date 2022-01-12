@@ -63,12 +63,16 @@ class sequence =
             begin
               match self#get_field vmode with
               | `Sum ->
+                  (* n1>=0 && n2>=0 && ... |- (a *^ (n1 + n2 + ...)) -+-> ((a *^ n1) ^ (a *^ n2) ^ ...) *)
                   let ns = sum n in
+                  (* NB. the term is rewriten in itself when the initial term is not a sum *)
                   let pos = F.p_all positive ns in
                   let cat = concat ~result (List.map (repeat ~result a) ns) in
                   Tactical.condition "Positive" pos @@
                   Tactical.rewrite ?at [ "Unroll" , pos , value , cat ]
               | `Left ->
+                  (*   n<=0 |- (a *^ n) -+-> [] *)
+                  (* n-1>=0 |- (a *^ n) -+-> (a ^ (a *^ (n-1))) *)
                   let p = F.e_add n F.e_minus_one in
                   let unroll = concat ~result [a ; repeat ~result a p] in
                   Tactical.rewrite ?at [
@@ -76,6 +80,8 @@ class sequence =
                     "Unroll", positive p , value , unroll ;
                   ]
               | `Right ->
+                  (*   n<=0 |- (a *^ n) -+-> [] *)
+                  (* n-1>=0 |- (a *^ n) -+-> ((a *^ (n-1)) ^ a) *)
                   let p = F.e_add n F.e_minus_one in
                   let unroll = concat ~result [repeat ~result a p ; a] in
                   Tactical.rewrite ?at [
