@@ -27,7 +27,7 @@ int f(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(&a)";
-    __gen_e_acsl_assert_data.file = "tests/bts/issue-eacsl-105.c";
+    __gen_e_acsl_assert_data.file = "issue-eacsl-105.c";
     __gen_e_acsl_assert_data.fct = "f";
     __gen_e_acsl_assert_data.line = 11;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);

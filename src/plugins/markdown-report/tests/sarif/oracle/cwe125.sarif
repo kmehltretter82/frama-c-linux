@@ -16,55 +16,50 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report tests/sarif/cwe125.c -save tests/sarif/result/cwe125_parse.sav",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report cwe125.c -save ./cwe125_parse.sav",
           "arguments": [
             "-journal-disable", "-check", "-no-autoload-plugins",
-            "-load-module=eva,from,scope,markdown_report",
-            "tests/sarif/cwe125.c", "-save",
-            "tests/sarif/result/cwe125_parse.sav"
+            "-add-symbolic-path", ":.",
+            "-load-module=eva,from,scope,markdown_report", "cwe125.c",
+            "-save", "./cwe125_parse.sav"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         },
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report -load tests/sarif/result/cwe125_parse.sav -eva -save tests/sarif/result/cwe125_eva.sav",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_parse.sav -eva -save ./cwe125_eva.sav",
           "arguments": [
             "-journal-disable", "-check", "-no-autoload-plugins",
+            "-add-symbolic-path", ":.",
             "-load-module=eva,from,scope,markdown_report", "-load",
-            "tests/sarif/result/cwe125_parse.sav", "-eva", "-save",
-            "tests/sarif/result/cwe125_eva.sav"
+            "./cwe125_parse.sav", "-eva", "-save", "./cwe125_eva.sav"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         },
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report -load tests/sarif/result/cwe125_eva.sav -then -mdr-out tests/sarif/result/cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_eva.sav -then -mdr-out ./cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
           "arguments": [
             "-journal-disable", "-check", "-no-autoload-plugins",
+            "-add-symbolic-path", ":.",
             "-load-module=eva,from,scope,markdown_report", "-load",
-            "tests/sarif/result/cwe125_eva.sav", "-then", "-mdr-out",
-            "tests/sarif/result/cwe125.sarif", "-mdr-gen", "sarif",
-            "-mdr-no-print-libc", "-mdr-sarif-deterministic"
+            "./cwe125_eva.sav", "-then", "-mdr-out", "./cwe125.sarif",
+            "-mdr-gen", "sarif", "-mdr-no-print-libc",
+            "-mdr-sarif-deterministic"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         }
       ],
       "originalUriBaseIds": {
-        "FRAMAC_SHARE": {
-          "uri": "file:///omitted-for-deterministic-output/"
-        },
-        "FRAMAC_LIB": { "uri": "file:///omitted-for-deterministic-output/" },
-        "FRAMAC_PLUGIN": {
-          "uri": "file:///omitted-for-deterministic-output/"
-        },
+        ".": { "uri": "file:///omitted-for-deterministic-output/" },
         "PWD": { "uri": "file:///omitted-for-deterministic-output/" }
       },
       "artifacts": [
         {
-          "location": { "uri": "tests/sarif/cwe125.c", "uriBaseId": "PWD" },
+          "location": { "uri": "cwe125.c", "uriBaseId": "PWD" },
           "roles": [ "analysisTarget" ],
           "mimeType": "text/x-csrc"
         }
@@ -82,10 +77,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 21,
                   "startColumn": 8,
@@ -108,10 +100,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
                   "endLine": 27,
@@ -132,10 +121,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
                   "endLine": 27,
@@ -154,10 +140,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 36,
                   "startColumn": 13,
@@ -177,10 +160,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
                   "endLine": 27,
@@ -199,10 +179,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
                   "endLine": 27,
@@ -223,10 +200,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
                   "endLine": 27,

@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/frame.i (no preprocessing)
+[kernel] Parsing frame.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -53,7 +53,7 @@ Prove: x_1 = x.
 
 ------------------------------------------------------------
 
-Goal Assertion 'FRAMED' (file tests/wp_plugin/frame.i, line 28):
+Goal Assertion 'FRAMED' (file frame.i, line 28):
 Prove: true.
 
 ------------------------------------------------------------

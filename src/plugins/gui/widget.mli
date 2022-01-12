@@ -130,6 +130,7 @@ class checkbox : label:string -> ?tooltip:string -> unit ->
   object
     inherit action
     inherit [bool] selector
+    method set_label : string -> unit
   end
 
 class switch : ?tooltip:string -> unit ->

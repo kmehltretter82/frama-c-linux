@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_hoare/byref.i (no preprocessing)
+[kernel] Parsing byref.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 12 goals scheduled
@@ -26,17 +26,17 @@
   formal                    2        -        2       100%
   global                    2        -        2       100%
 ------------------------------------------------------------
-[wp] tests/wp_hoare/byref.i:14: Warning: 
+[wp] byref.i:14: Warning: 
   Memory model hypotheses for function 'f':
   /*@ behavior wp_typed_ref:
         requires \valid(r); */
   void f(int *r);
-[wp] tests/wp_hoare/byref.i:20: Warning: 
+[wp] byref.i:20: Warning: 
   Memory model hypotheses for function 'wrong_without_ref':
   /*@ behavior wp_typed_ref:
         requires \valid(q); */
   int wrong_without_ref(int *q);
-[wp] tests/wp_hoare/byref.i:31: Warning: 
+[wp] byref.i:31: Warning: 
   Memory model hypotheses for function 'pointer':
   /*@ behavior wp_typed_ref:
         requires \valid(q); */

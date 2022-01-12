@@ -1,27 +1,27 @@
-[kernel] Parsing tests/value/call_multi.i (no preprocessing)
+[kernel] Parsing call_multi.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
 [eva] computing for function uppol2 <- main.
-  Called from tests/value/call_multi.i:29.
-[eva] tests/value/call_multi.i:23: Frama_C_show_each_GOT: {128}
+  Called from call_multi.i:29.
+[eva] call_multi.i:23: Frama_C_show_each_GOT: {128}
 [eva] Recording results for uppol2
 [eva] Done for function uppol2
 [eva] computing for function uppol2 <- main.
-  Called from tests/value/call_multi.i:30.
-[eva] tests/value/call_multi.i:23: Frama_C_show_each_GOT: {128}
+  Called from call_multi.i:30.
+[eva] call_multi.i:23: Frama_C_show_each_GOT: {128}
 [eva] Recording results for uppol2
 [eva] Done for function uppol2
 [eva] computing for function uppol2 <- main.
-  Called from tests/value/call_multi.i:31.
-[eva] tests/value/call_multi.i:23: Frama_C_show_each_GOT: {-128}
+  Called from call_multi.i:31.
+[eva] call_multi.i:23: Frama_C_show_each_GOT: {-128}
 [eva] Recording results for uppol2
 [eva] Done for function uppol2
 [eva] computing for function uppol2 <- main.
-  Called from tests/value/call_multi.i:32.
-[eva] tests/value/call_multi.i:23: Frama_C_show_each_GOT: {128}
+  Called from call_multi.i:32.
+[eva] call_multi.i:23: Frama_C_show_each_GOT: {128}
 [eva] Recording results for uppol2
 [eva] Done for function uppol2
 [eva] Recording results for main

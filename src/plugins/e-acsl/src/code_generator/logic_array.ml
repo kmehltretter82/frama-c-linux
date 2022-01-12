@@ -46,7 +46,7 @@ let length_exp ~loc kf env ~name array =
   try
     let len = Cil.lenOfArray64 array_len in
     (Cil.kinteger64 ~loc len), env
-  with Cil.LenOfArray ->
+  with Cil.LenOfArray _ ->
     (* check RTE on the array before accessing its block length and offset *)
     let env = !translate_rte_ref kf env array in
     (* helper function *)

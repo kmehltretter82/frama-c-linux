@@ -4,14 +4,13 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] using specification for function Frama_C_interval
-[eva:alarm] tests/sarif/cwe125.c:21: Warning: 
+[eva:alarm] cwe125.c:21: Warning: 
   out of bounds read. assert \valid_read(array + index);
-[eva:alarm] tests/sarif/cwe125.c:27: Warning: 
+[eva:alarm] cwe125.c:27: Warning: 
   out of bounds read. assert \valid_read(array + index);
 [eva] done for function main
-[eva] tests/sarif/cwe125.c:27: 
-  assertion 'Eva,mem_access' got final status invalid.
-[kernel:annot:missing-spec] tests/sarif/cwe125.c:27: Warning: 
+[eva] cwe125.c:27: assertion 'Eva,mem_access' got final status invalid.
+[kernel:annot:missing-spec] cwe125.c:27: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function getValueFromArray:

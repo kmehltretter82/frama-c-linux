@@ -48,7 +48,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\initialized(b)";
-    __gen_e_acsl_assert_data.file = "tests/memory/goto.c";
+    __gen_e_acsl_assert_data.file = "goto.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 17;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);

@@ -52,7 +52,7 @@ void __gen_e_acsl_f(struct X *item)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(item)";
-    __gen_e_acsl_assert_data_2.file = "tests/bts/issue-eacsl-139.c";
+    __gen_e_acsl_assert_data_2.file = "issue-eacsl-139.c";
     __gen_e_acsl_assert_data_2.fct = "f";
     __gen_e_acsl_assert_data_2.line = 9;
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);

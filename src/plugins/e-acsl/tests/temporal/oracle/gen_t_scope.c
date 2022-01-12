@@ -57,7 +57,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "!\\valid(p)";
-    __gen_e_acsl_assert_data.file = "tests/temporal/t_scope.c";
+    __gen_e_acsl_assert_data.file = "t_scope.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 15;
     __e_acsl_assert(! __gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -94,7 +94,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(q)";
-    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_scope.c";
+    __gen_e_acsl_assert_data_2.file = "t_scope.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 16;
     __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
@@ -138,7 +138,7 @@ int main(void)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Assertion";
       __gen_e_acsl_assert_data_3.pred_txt = "\\valid(p)";
-      __gen_e_acsl_assert_data_3.file = "tests/temporal/t_scope.c";
+      __gen_e_acsl_assert_data_3.file = "t_scope.c";
       __gen_e_acsl_assert_data_3.fct = "main";
       __gen_e_acsl_assert_data_3.line = 21;
       __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_3);
@@ -177,7 +177,7 @@ int main(void)
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Assertion";
       __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(q)";
-      __gen_e_acsl_assert_data_4.file = "tests/temporal/t_scope.c";
+      __gen_e_acsl_assert_data_4.file = "t_scope.c";
       __gen_e_acsl_assert_data_4.fct = "main";
       __gen_e_acsl_assert_data_4.line = 24;
       __e_acsl_assert(! __gen_e_acsl_and_4,& __gen_e_acsl_assert_data_4);
@@ -199,7 +199,7 @@ int main(void)
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "Assertion";
       __gen_e_acsl_assert_data_5.pred_txt = "\\valid(&j)";
-      __gen_e_acsl_assert_data_5.file = "tests/temporal/t_scope.c";
+      __gen_e_acsl_assert_data_5.file = "t_scope.c";
       __gen_e_acsl_assert_data_5.fct = "main";
       __gen_e_acsl_assert_data_5.line = 25;
       __e_acsl_assert(__gen_e_acsl_valid_5,& __gen_e_acsl_assert_data_5);
@@ -248,7 +248,7 @@ int main(void)
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "Assertion";
       __gen_e_acsl_assert_data_6.pred_txt = "!\\valid(p)";
-      __gen_e_acsl_assert_data_6.file = "tests/temporal/t_scope.c";
+      __gen_e_acsl_assert_data_6.file = "t_scope.c";
       __gen_e_acsl_assert_data_6.fct = "main";
       __gen_e_acsl_assert_data_6.line = 33;
       __e_acsl_assert(! __gen_e_acsl_and_5,& __gen_e_acsl_assert_data_6);
@@ -291,7 +291,7 @@ int main(void)
       __gen_e_acsl_assert_data_7.blocking = 1;
       __gen_e_acsl_assert_data_7.kind = "Assertion";
       __gen_e_acsl_assert_data_7.pred_txt = "\\valid(p)";
-      __gen_e_acsl_assert_data_7.file = "tests/temporal/t_scope.c";
+      __gen_e_acsl_assert_data_7.file = "t_scope.c";
       __gen_e_acsl_assert_data_7.fct = "main";
       __gen_e_acsl_assert_data_7.line = 36;
       __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_7);

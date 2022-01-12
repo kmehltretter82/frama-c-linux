@@ -445,6 +445,26 @@ let concat_strs ?(pre="") ?(sep=" ") l =
   if l = [] then ""
   else pre ^ (String.concat sep l)
 
+let adjust_pwd fp cpp_command =
+  if Kernel.JsonCompilationDatabase.is_set () then
+    (* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
+       no function in its stdlib to resolve symbolic links (e.g. realpath)
+       for a given path. 'getcwd' always resolves them, but if the user
+       supplies a path with symbolic links, this may cause issues.
+       Instead of forcing the user to always provide resolved paths, we
+       currently choose to never resolve them.
+       We only resort to getcwd() to avoid issues when PWD does not exist. *)
+    let cwd = try Unix.getenv "PWD" with Not_found -> Sys.getcwd () in
+    let dir =
+      match Json_compilation_database.get_dir fp with
+      | None -> cwd
+      | Some d -> (d:>string)
+    in
+    if cwd <> dir then
+      "cd " ^ dir ^ " && " ^ cpp_command
+    else cpp_command
+  else cpp_command
+
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra, is_gnu_like) ->
@@ -523,30 +543,11 @@ let build_cpp_cmd = function
         include_args define_args
     in
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
-    let cpp_command_with_chdir =
-      if Kernel.JsonCompilationDatabase.is_set () then
-        let jcdb_path = (Kernel.JsonCompilationDatabase.get () :> string) in
-        let dir =
-          if Sys.is_directory jcdb_path then jcdb_path
-          else Filename.dirname jcdb_path
-        in
-        (* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
-           no function in its stdlib to resolve symbolic links (e.g. realpath)
-           for a given path. 'getcwd' always resolves them, but if the user
-           supplies a path with symbolic links, this may cause issues.
-           Instead of forcing the user to always provide resolved paths, we
-           currently choose to never resolve them.
-           We only resort to getcwd() to avoid issues when PWD does not exist. *)
-        let cwd = try Unix.getenv "PWD" with Not_found -> Sys.getcwd () in
-        if cwd <> dir then
-          "cd " ^ dir ^ " && " ^ cpp_command
-        else cpp_command
-      else cpp_command
-    in
+    let cpp_command_with_chdir = adjust_pwd f cpp_command in
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
-    Some (cpp_command_with_chdir, ppf, supp_args)
+    Some (cpp_command_with_chdir, ppf, supported_cpp_arch_args)
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
@@ -557,7 +558,7 @@ let parse_cabs cpp_command = function
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
   | NeedCPP (f, cmdl, _extra, is_gnu_like) ->
-    let cpp_command, ppf, supp_args = Option.get cpp_command in
+    let cpp_command, ppf, logic_pp_args = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
@@ -601,6 +602,9 @@ let parse_cabs cpp_command = function
                   "trying to preprocess annotation with an unknown \
                    preprocessor."; true))
       then begin
+        let supp_args =
+          Format.asprintf "%s" (concat_strs ~pre:" " ~sep:" " logic_pp_args)
+        in
         let ppf' =
           try Logic_preprocess.file ".c"
                 (replace_in_cpp_cmd cmdl supp_args)

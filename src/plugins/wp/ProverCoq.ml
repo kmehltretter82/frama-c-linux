@@ -525,7 +525,6 @@ open Wpo
 type coq_wpo = {
   cw_pid : WpPropId.prop_id ;
   cw_gid : string ;
-  cw_leg : string ;
   cw_goal : string ; (* filename for goal without proof *)
   cw_script : string ; (* filename for goal with proof script *)
   cw_headers : string list ; (* filename for libraries *)
@@ -558,7 +557,7 @@ let rec try_hints w = function
 
 let try_prove w =
   begin
-    match Proof.script_for ~pid:w.cw_pid ~gid:w.cw_gid ~legacy:w.cw_leg with
+    match Proof.script_for ~pid:w.cw_pid ~gid:w.cw_gid with
     | Some (script,closing) ->
         Wp_parameters.feedback ~ontty "[Coq] Goal %s : Saved script" w.cw_gid ;
         try_script w script closing
@@ -572,7 +571,7 @@ let try_prove w =
 
 let try_coqide w =
   let script,closing =
-    Proof.script_for_ide ~pid:w.cw_pid ~gid:w.cw_gid ~legacy:w.cw_leg in
+    Proof.script_for_ide ~pid:w.cw_pid ~gid:w.cw_gid in
   make_script w script closing ;
   (new runcoq w.cw_includes w.cw_script)#coqide >>= fun st ->
   if st = 0 then
@@ -632,7 +631,6 @@ let prove_session ~mode w =
 let prove_prop wpo ~mode ~axioms ~prop =
   let pid = wpo.po_pid in
   let gid = wpo.po_gid in
-  let leg = wpo.po_leg in
   let model = wpo.po_model in
   let context = Wpo.get_context wpo in
   let script = DISK.file_goal ~pid ~model ~prover:NativeCoq in
@@ -642,7 +640,6 @@ let prove_prop wpo ~mode ~axioms ~prop =
   prove_session ~mode {
     cw_pid = pid ;
     cw_gid = gid ;
-    cw_leg = leg ;
     cw_goal = goal ;
     cw_script = script ;
     cw_headers = headers ;

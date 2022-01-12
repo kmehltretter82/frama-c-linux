@@ -211,6 +211,7 @@ class checkbox ~label ?tooltip () =
     inherit [bool] selector false as s
     inherit! gobj_action button as b
     method! set_enabled e = s#set_enabled e ; b#set_enabled e
+    method set_label l = button#set_label l
     method! set a = s#set a ; button#set_active a
     initializer
       begin

@@ -72,9 +72,8 @@
     }
   },
   "sources": {
-    "tests/misc/audit.c": "4707fbd9cf9d2b4b97da7e3cc446e7ba",
-    "tests/misc/audit_included.h": "c2cc488143a476f69cf2ed04c3439e6e",
-    "tests/misc/audit_included_but_not_listed.h":
-      "c2cc488143a476f69cf2ed04c3439e6e"
+    "audit.c": "4707fbd9cf9d2b4b97da7e3cc446e7ba",
+    "audit_included.h": "c2cc488143a476f69cf2ed04c3439e6e",
+    "audit_included_but_not_listed.h": "c2cc488143a476f69cf2ed04c3439e6e"
   }
 }

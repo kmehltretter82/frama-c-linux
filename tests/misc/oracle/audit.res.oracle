@@ -1,12 +1,16 @@
 [kernel:audit] Warning: 
-  different hashes for tests/misc/audit.c: got 4707fbd9cf9d2b4b97da7e3cc446e7ba, expected 01010101010101010101010101010101
+  different hashes for audit.c: got 4707fbd9cf9d2b4b97da7e3cc446e7ba, expected <none> (not in list)
 [kernel:audit] Warning: 
-  different hashes for tests/misc/audit_included_but_not_listed.h: got c2cc488143a476f69cf2ed04c3439e6e, expected <none> (not in list)
+  different hashes for audit_included.h: got c2cc488143a476f69cf2ed04c3439e6e, expected <none> (not in list)
+[kernel:audit] Warning: 
+  different hashes for audit_included_but_not_listed.h: got c2cc488143a476f69cf2ed04c3439e6e, expected <none> (not in list)
 [kernel:audit] Warning: 
   missing files:
-  tests/misc/non_existing_file.h
-[kernel] Parsing tests/misc/audit.c (with preprocessing)
-[kernel:parser:decimal-float] tests/misc/audit.c:12: Warning: 
+  ./audit.c
+  ./audit_included.h
+  ./non_existing_file.h
+[kernel] Parsing audit.c (with preprocessing)
+[kernel:parser:decimal-float] audit.c:12: Warning: 
   Floating-point constant 2.1 is not represented exactly. Will use 0x1.0cccccccccccdp1.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
@@ -30,6 +34,6 @@
     f
 [inout] Inputs for function main:
     \nothing
-[kernel] Audit: sources list written to: tests/misc/result/audit-out.json
-[eva] Audit: eva configuration written to: tests/misc/result/audit-out.json
-[kernel] Wrote: tests/misc/result/audit-out.json
+[kernel] Audit: sources list written to: audit-out.json
+[eva] Audit: eva configuration written to: audit-out.json
+[kernel] Wrote: audit-out.json

@@ -1225,7 +1225,10 @@ let rec eval_term ~alarm_mode env t =
   | Toffset (_lbl, t) ->
     let r = eval_term ~alarm_mode env t in
     let add_offset _ offs acc = Ival.join offs acc in
-    let offs = Location_Bytes.fold_topset_ok add_offset r.eover Ival.bottom in
+    let offs =
+      try Location_Bytes.fold_topset_ok add_offset r.eover Ival.bottom
+      with Abstract_interp.Error_Top -> Ival.top
+    in
     let eover = Cvalue.V.inject_ival offs in
     { etype = Cil.intType;
       ldeps = r.ldeps;
@@ -1236,7 +1239,10 @@ let rec eval_term ~alarm_mode env t =
   | Tbase_addr (_lbl, t) ->
     let r = eval_term ~alarm_mode env t in
     let add_base b acc = V.join acc (V.inject b Ival.zero) in
-    let eover = Location_Bytes.fold_bases add_base r.eover V.bottom in
+    let eover =
+      try Location_Bytes.fold_bases add_base r.eover V.bottom
+      with Abstract_interp.Error_Top -> r.eover
+    in
     { etype = Cil.charPtrType;
       ldeps = r.ldeps;
       eover;
@@ -1269,7 +1275,10 @@ let rec eval_term ~alarm_mode env t =
       in
       Ival.join acc bl
     in
-    let bl = Location_Bytes.fold_bases add_block_length r.eover Ival.bottom in
+    let bl =
+      try Location_Bytes.fold_bases add_block_length r.eover Ival.bottom
+      with Abstract_interp.Error_Top -> Ival.top
+    in
     let eover = V.inject_ival bl in
     { etype = Cil.charPtrType;
       ldeps = r.ldeps;

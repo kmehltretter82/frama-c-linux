@@ -678,10 +678,8 @@ let rec flatten_sequence m = function
 (* --- Mapping                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let lift f e = F.e_prop (f (F.p_bool e))
-
 let rec map_condition f = function
-  | State s -> State (Mstate.apply (lift f) s)
+  | State s -> State (Mstate.apply (F.p_lift f) s)
   | Have p -> Have (f p)
   | Type p -> Type (f p)
   | When p -> When (f p)

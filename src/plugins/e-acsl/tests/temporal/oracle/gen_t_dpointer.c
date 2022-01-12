@@ -32,7 +32,7 @@ int main(void)
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Assertion";
       __gen_e_acsl_assert_data.pred_txt = "\\valid(p + i)";
-      __gen_e_acsl_assert_data.file = "tests/temporal/t_dpointer.c";
+      __gen_e_acsl_assert_data.file = "t_dpointer.c";
       __gen_e_acsl_assert_data.fct = "main";
       __gen_e_acsl_assert_data.line = 13;
       __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
@@ -78,7 +78,7 @@ int main(void)
         __gen_e_acsl_assert_data_3.blocking = 1;
         __gen_e_acsl_assert_data_3.kind = "RTE";
         __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(p + i)";
-        __gen_e_acsl_assert_data_3.file = "tests/temporal/t_dpointer.c";
+        __gen_e_acsl_assert_data_3.file = "t_dpointer.c";
         __gen_e_acsl_assert_data_3.fct = "main";
         __gen_e_acsl_assert_data_3.line = 15;
         __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
@@ -97,7 +97,7 @@ int main(void)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
       __gen_e_acsl_assert_data_2.pred_txt = "\\valid(*(p + i))";
-      __gen_e_acsl_assert_data_2.file = "tests/temporal/t_dpointer.c";
+      __gen_e_acsl_assert_data_2.file = "t_dpointer.c";
       __gen_e_acsl_assert_data_2.fct = "main";
       __gen_e_acsl_assert_data_2.line = 15;
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
@@ -145,7 +145,7 @@ int main(void)
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(p + 2)";
-      __gen_e_acsl_assert_data_5.file = "tests/temporal/t_dpointer.c";
+      __gen_e_acsl_assert_data_5.file = "t_dpointer.c";
       __gen_e_acsl_assert_data_5.fct = "main";
       __gen_e_acsl_assert_data_5.line = 21;
       __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_5);
@@ -164,7 +164,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(*(p + 2))";
-    __gen_e_acsl_assert_data_4.file = "tests/temporal/t_dpointer.c";
+    __gen_e_acsl_assert_data_4.file = "t_dpointer.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 21;
     __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_4);

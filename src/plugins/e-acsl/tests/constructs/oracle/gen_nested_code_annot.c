@@ -17,7 +17,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "x < y";
-    __gen_e_acsl_assert_data.file = "tests/constructs/nested_code_annot.i";
+    __gen_e_acsl_assert_data.file = "nested_code_annot.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 7;
     __e_acsl_assert(x < y,& __gen_e_acsl_assert_data);
@@ -32,7 +32,7 @@ int main(void)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Precondition";
       __gen_e_acsl_assert_data_2.pred_txt = "x == 0";
-      __gen_e_acsl_assert_data_2.file = "tests/constructs/nested_code_annot.i";
+      __gen_e_acsl_assert_data_2.file = "nested_code_annot.i";
       __gen_e_acsl_assert_data_2.fct = "main";
       __gen_e_acsl_assert_data_2.line = 8;
       __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data_2);
@@ -47,7 +47,7 @@ int main(void)
         __gen_e_acsl_assert_data_3.blocking = 1;
         __gen_e_acsl_assert_data_3.kind = "Assertion";
         __gen_e_acsl_assert_data_3.pred_txt = "\\false";
-        __gen_e_acsl_assert_data_3.file = "tests/constructs/nested_code_annot.i";
+        __gen_e_acsl_assert_data_3.file = "nested_code_annot.i";
         __gen_e_acsl_assert_data_3.fct = "main";
         __gen_e_acsl_assert_data_3.line = 12;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
@@ -63,7 +63,7 @@ int main(void)
           __gen_e_acsl_assert_data_4.blocking = 1;
           __gen_e_acsl_assert_data_4.kind = "Precondition";
           __gen_e_acsl_assert_data_4.pred_txt = "x == 0";
-          __gen_e_acsl_assert_data_4.file = "tests/constructs/nested_code_annot.i";
+          __gen_e_acsl_assert_data_4.file = "nested_code_annot.i";
           __gen_e_acsl_assert_data_4.fct = "main";
           __gen_e_acsl_assert_data_4.line = 14;
           __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data_4);
@@ -78,7 +78,7 @@ int main(void)
         __gen_e_acsl_assert_data_5.blocking = 1;
         __gen_e_acsl_assert_data_5.kind = "Postcondition";
         __gen_e_acsl_assert_data_5.pred_txt = "x == 1";
-        __gen_e_acsl_assert_data_5.file = "tests/constructs/nested_code_annot.i";
+        __gen_e_acsl_assert_data_5.file = "nested_code_annot.i";
         __gen_e_acsl_assert_data_5.fct = "main";
         __gen_e_acsl_assert_data_5.line = 15;
         __e_acsl_assert(x == 1,& __gen_e_acsl_assert_data_5);
@@ -94,7 +94,7 @@ int main(void)
             __gen_e_acsl_assert_data_6.blocking = 1;
             __gen_e_acsl_assert_data_6.kind = "Precondition";
             __gen_e_acsl_assert_data_6.pred_txt = "x == 1";
-            __gen_e_acsl_assert_data_6.file = "tests/constructs/nested_code_annot.i";
+            __gen_e_acsl_assert_data_6.file = "nested_code_annot.i";
             __gen_e_acsl_assert_data_6.fct = "main";
             __gen_e_acsl_assert_data_6.line = 18;
             __e_acsl_assert(x == 1,& __gen_e_acsl_assert_data_6);
@@ -109,7 +109,7 @@ int main(void)
           __gen_e_acsl_assert_data_7.blocking = 1;
           __gen_e_acsl_assert_data_7.kind = "Postcondition";
           __gen_e_acsl_assert_data_7.pred_txt = "x == 2";
-          __gen_e_acsl_assert_data_7.file = "tests/constructs/nested_code_annot.i";
+          __gen_e_acsl_assert_data_7.file = "nested_code_annot.i";
           __gen_e_acsl_assert_data_7.fct = "main";
           __gen_e_acsl_assert_data_7.line = 19;
           __e_acsl_assert(x == 2,& __gen_e_acsl_assert_data_7);
@@ -123,7 +123,7 @@ int main(void)
           __gen_e_acsl_assert_data_8.blocking = 1;
           __gen_e_acsl_assert_data_8.kind = "Assertion";
           __gen_e_acsl_assert_data_8.pred_txt = "\\false";
-          __gen_e_acsl_assert_data_8.file = "tests/constructs/nested_code_annot.i";
+          __gen_e_acsl_assert_data_8.file = "nested_code_annot.i";
           __gen_e_acsl_assert_data_8.fct = "main";
           __gen_e_acsl_assert_data_8.line = 21;
           __e_acsl_assert(0,& __gen_e_acsl_assert_data_8);
@@ -137,7 +137,7 @@ int main(void)
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Postcondition";
     __gen_e_acsl_assert_data_9.pred_txt = "x >= 1";
-    __gen_e_acsl_assert_data_9.file = "tests/constructs/nested_code_annot.i";
+    __gen_e_acsl_assert_data_9.file = "nested_code_annot.i";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 9;
     __e_acsl_assert(x >= 1,& __gen_e_acsl_assert_data_9);

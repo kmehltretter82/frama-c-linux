@@ -62,7 +62,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\sum(2, 10, \\lambda integer k; 2 * k) == 108";
-    __gen_e_acsl_assert_data.file = "tests/gmp-only/extended_quantifiers.i";
+    __gen_e_acsl_assert_data.file = "extended_quantifiers.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 7;
     __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data);
@@ -123,7 +123,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\sum(1, 10, \\lambda integer k; 1) == 10";
-    __gen_e_acsl_assert_data_2.file = "tests/gmp-only/extended_quantifiers.i";
+    __gen_e_acsl_assert_data_2.file = "extended_quantifiers.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 8;
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,& __gen_e_acsl_assert_data_2);
@@ -214,7 +214,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\numof(2, 10, \\lambda integer k; k - 2 >= 0) == 9";
-    __gen_e_acsl_assert_data_3.file = "tests/gmp-only/extended_quantifiers.i";
+    __gen_e_acsl_assert_data_3.file = "extended_quantifiers.i";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 10;
     __e_acsl_assert(__gen_e_acsl_eq_3 == 0,& __gen_e_acsl_assert_data_3);
@@ -272,7 +272,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "\\product(1, 10, \\lambda integer k; k) == 3628800";
-    __gen_e_acsl_assert_data_4.file = "tests/gmp-only/extended_quantifiers.i";
+    __gen_e_acsl_assert_data_4.file = "extended_quantifiers.i";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 12;
     __e_acsl_assert(__gen_e_acsl_eq_4 == 0,& __gen_e_acsl_assert_data_4);
@@ -333,7 +333,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "\\product(-10, 10, \\lambda integer k; k) == 0";
-    __gen_e_acsl_assert_data_5.file = "tests/gmp-only/extended_quantifiers.i";
+    __gen_e_acsl_assert_data_5.file = "extended_quantifiers.i";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 13;
     __e_acsl_assert(__gen_e_acsl_eq_5 == 0,& __gen_e_acsl_assert_data_5);

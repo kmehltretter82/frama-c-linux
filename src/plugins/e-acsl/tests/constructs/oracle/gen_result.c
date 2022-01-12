@@ -57,7 +57,7 @@ int __gen_e_acsl_h(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0";
-    __gen_e_acsl_assert_data.file = "tests/constructs/result.i";
+    __gen_e_acsl_assert_data.file = "result.i";
     __gen_e_acsl_assert_data.fct = "h";
     __gen_e_acsl_assert_data.line = 19;
     __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data);
@@ -83,7 +83,7 @@ int __gen_e_acsl_g(int x)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "\\result == \\old(x)";
-    __gen_e_acsl_assert_data.file = "tests/constructs/result.i";
+    __gen_e_acsl_assert_data.file = "result.i";
     __gen_e_acsl_assert_data.fct = "g";
     __gen_e_acsl_assert_data.line = 13;
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data);
@@ -96,7 +96,7 @@ int __gen_e_acsl_g(int x)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Postcondition";
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == Y";
-    __gen_e_acsl_assert_data_2.file = "tests/constructs/result.i";
+    __gen_e_acsl_assert_data_2.file = "result.i";
     __gen_e_acsl_assert_data_2.fct = "g";
     __gen_e_acsl_assert_data_2.line = 14;
     __e_acsl_assert(__retres == Y,& __gen_e_acsl_assert_data_2);
@@ -125,7 +125,7 @@ int __gen_e_acsl_f(int x)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "\\result == (int)(\\old(x) - \\old(x))";
-    __gen_e_acsl_assert_data.file = "tests/constructs/result.i";
+    __gen_e_acsl_assert_data.file = "result.i";
     __gen_e_acsl_assert_data.fct = "f";
     __gen_e_acsl_assert_data.line = 5;
     __e_acsl_assert(__retres == (int)(__gen_e_acsl_at - __gen_e_acsl_at_2),

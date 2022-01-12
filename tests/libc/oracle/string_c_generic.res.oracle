@@ -1,336 +1,336 @@
-[kernel] Parsing tests/libc/string_c_generic.c (with preprocessing)
+[kernel] Parsing string_c_generic.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:56.
-[eva] tests/libc/string_c_generic.c:56: 
+  Called from string_c_generic.c:56.
+[eva] string_c_generic.c:56: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:56: 
+[eva] string_c_generic.c:56: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:56: 
+[eva] string_c_generic.c:56: 
   function strcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:373: 
+[eva] FRAMAC_SHARE/libc/string.h:373: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
-[eva:alarm] share/libc/string.h:373: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:373: Warning: 
   function strcpy: postcondition 'equal_contents' got status unknown.
-[eva] share/libc/string.h:374: 
+[eva] FRAMAC_SHARE/libc/string.h:374: 
   function strcpy: postcondition 'result_ptr' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strcmp <- main.
-  Called from tests/libc/string_c_generic.c:57.
-[eva] tests/libc/string_c_generic.c:57: 
+  Called from string_c_generic.c:57.
+[eva] string_c_generic.c:57: 
   function strcmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:57: 
+[eva] string_c_generic.c:57: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva] share/libc/string.h:156: 
+[eva] FRAMAC_SHARE/libc/string.h:156: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
-[eva:alarm] share/libc/string.h:156: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:156: Warning: 
   function strcmp: postcondition 'acsl_c_equiv' got status unknown.
 [eva] Recording results for strcmp
 [eva] Done for function strcmp
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:58.
-[eva] tests/libc/string_c_generic.c:58: 
+  Called from string_c_generic.c:58.
+[eva] string_c_generic.c:58: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:58: 
+[eva] string_c_generic.c:58: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:58: 
+[eva] string_c_generic.c:58: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strcmp <- main.
-  Called from tests/libc/string_c_generic.c:59.
-[eva] tests/libc/string_c_generic.c:59: 
+  Called from string_c_generic.c:59.
+[eva] string_c_generic.c:59: 
   function strcmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:59: 
+[eva] string_c_generic.c:59: 
   function strcmp: precondition 'valid_string_s2' got status valid.
 [eva] Recording results for strcmp
 [eva] Done for function strcmp
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:60.
-[eva] tests/libc/string_c_generic.c:60: 
+  Called from string_c_generic.c:60.
+[eva] string_c_generic.c:60: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:60: 
+[eva] string_c_generic.c:60: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:60: 
+[eva] string_c_generic.c:60: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strcmp <- main.
-  Called from tests/libc/string_c_generic.c:61.
-[eva] tests/libc/string_c_generic.c:61: 
+  Called from string_c_generic.c:61.
+[eva] string_c_generic.c:61: 
   function strcmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:61: 
+[eva] string_c_generic.c:61: 
   function strcmp: precondition 'valid_string_s2' got status valid.
 [eva] Recording results for strcmp
 [eva] Done for function strcmp
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:62.
-[eva] tests/libc/string_c_generic.c:62: 
+  Called from string_c_generic.c:62.
+[eva] string_c_generic.c:62: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:62: 
+[eva] string_c_generic.c:62: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:62: 
+[eva] string_c_generic.c:62: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strcmp <- main.
-  Called from tests/libc/string_c_generic.c:63.
-[eva] tests/libc/string_c_generic.c:63: 
+  Called from string_c_generic.c:63.
+[eva] string_c_generic.c:63: 
   function strcmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:63: 
+[eva] string_c_generic.c:63: 
   function strcmp: precondition 'valid_string_s2' got status valid.
 [eva] Recording results for strcmp
 [eva] Done for function strcmp
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:65.
-[eva] tests/libc/string_c_generic.c:65: 
+  Called from string_c_generic.c:65.
+[eva] string_c_generic.c:65: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:65: 
+[eva] string_c_generic.c:65: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:65: 
+[eva] string_c_generic.c:65: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strcmp <- main.
-  Called from tests/libc/string_c_generic.c:66.
-[eva] tests/libc/string_c_generic.c:66: 
+  Called from string_c_generic.c:66.
+[eva] string_c_generic.c:66: 
   function strcmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:66: 
+[eva] string_c_generic.c:66: 
   function strcmp: precondition 'valid_string_s2' got status valid.
 [eva] Recording results for strcmp
 [eva] Done for function strcmp
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:67.
-[eva] tests/libc/string_c_generic.c:67: 
+  Called from string_c_generic.c:67.
+[eva] string_c_generic.c:67: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:67: 
+[eva] string_c_generic.c:67: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:67: 
+[eva] string_c_generic.c:67: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strcmp <- main.
-  Called from tests/libc/string_c_generic.c:68.
-[eva] tests/libc/string_c_generic.c:68: 
+  Called from string_c_generic.c:68.
+[eva] string_c_generic.c:68: 
   function strcmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:68: 
+[eva] string_c_generic.c:68: 
   function strcmp: precondition 'valid_string_s2' got status valid.
 [eva] Recording results for strcmp
 [eva] Done for function strcmp
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:69.
-[eva] tests/libc/string_c_generic.c:69: 
+  Called from string_c_generic.c:69.
+[eva] string_c_generic.c:69: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:69: 
+[eva] string_c_generic.c:69: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:69: 
+[eva] string_c_generic.c:69: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strcmp <- main.
-  Called from tests/libc/string_c_generic.c:70.
-[eva] tests/libc/string_c_generic.c:70: 
+  Called from string_c_generic.c:70.
+[eva] string_c_generic.c:70: 
   function strcmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:70: 
+[eva] string_c_generic.c:70: 
   function strcmp: precondition 'valid_string_s2' got status valid.
 [eva] Recording results for strcmp
 [eva] Done for function strcmp
 [eva] computing for function memset <- main.
-  Called from tests/libc/string_c_generic.c:72.
-[eva] tests/libc/string_c_generic.c:72: 
+  Called from string_c_generic.c:72.
+[eva] string_c_generic.c:72: 
   function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:134: 
+[eva] FRAMAC_SHARE/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-[eva:alarm] share/libc/string.h:134: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:134: Warning: 
   function memset: postcondition 'acsl_c_equiv' got status unknown.
-[eva] share/libc/string.h:135: 
+[eva] FRAMAC_SHARE/libc/string.h:135: 
   function memset: postcondition 'result_ptr' got status valid.
 [eva] Recording results for memset
 [eva] Done for function memset
 [eva] computing for function strncpy <- main.
-  Called from tests/libc/string_c_generic.c:73.
-[eva] tests/libc/string_c_generic.c:73: 
+  Called from string_c_generic.c:73.
+[eva] string_c_generic.c:73: 
   function strncpy: precondition 'valid_nstring_src' got status valid.
-[eva] tests/libc/string_c_generic.c:73: 
+[eva] string_c_generic.c:73: 
   function strncpy: precondition 'room_nstring' got status valid.
-[eva] tests/libc/string_c_generic.c:73: 
+[eva] string_c_generic.c:73: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.c:246: starting to merge loop iterations
-[eva] share/libc/string.h:385: 
+[eva] FRAMAC_SHARE/libc/string.c:246: starting to merge loop iterations
+[eva] FRAMAC_SHARE/libc/string.h:385: 
   function strncpy: postcondition 'result_ptr' got status valid.
-[eva] share/libc/string.h:386: 
+[eva] FRAMAC_SHARE/libc/string.h:386: 
   function strncpy: postcondition 'initialization' got status valid.
-[eva] share/libc/string.h:389: 
+[eva] FRAMAC_SHARE/libc/string.h:389: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
-[eva:alarm] share/libc/string.h:389: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:389: Warning: 
   function strncpy, behavior complete: postcondition 'equal_after_copy' got status unknown.
 [eva] Recording results for strncpy
 [eva] Done for function strncpy
 [eva] computing for function memcmp <- main.
-  Called from tests/libc/string_c_generic.c:74.
-[eva] tests/libc/string_c_generic.c:74: 
+  Called from string_c_generic.c:74.
+[eva] string_c_generic.c:74: 
   function memcmp: precondition 'valid_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:74: 
+[eva] string_c_generic.c:74: 
   function memcmp: precondition 'valid_s2' got status valid.
-[eva] tests/libc/string_c_generic.c:74: 
+[eva] string_c_generic.c:74: 
   function memcmp: precondition 'initialization,s1' got status valid.
-[eva] tests/libc/string_c_generic.c:74: 
+[eva] string_c_generic.c:74: 
   function memcmp: precondition 'initialization,s2' got status valid.
-[eva] tests/libc/string_c_generic.c:74: 
+[eva] string_c_generic.c:74: 
   function memcmp: precondition 'danglingness,s1' got status valid.
-[eva] tests/libc/string_c_generic.c:74: 
+[eva] string_c_generic.c:74: 
   function memcmp: precondition 'danglingness,s2' got status valid.
-[eva] share/libc/string.h:63: 
+[eva] FRAMAC_SHARE/libc/string.h:63: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva:alarm] share/libc/string.h:63: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:63: Warning: 
   function memcmp: postcondition 'logic_spec' got status unknown.
 [eva] Recording results for memcmp
 [eva] Done for function memcmp
 [eva] computing for function strncpy <- main.
-  Called from tests/libc/string_c_generic.c:78.
-[eva] tests/libc/string_c_generic.c:78: 
+  Called from string_c_generic.c:78.
+[eva] string_c_generic.c:78: 
   function strncpy: precondition 'valid_nstring_src' got status valid.
-[eva] tests/libc/string_c_generic.c:78: 
+[eva] string_c_generic.c:78: 
   function strncpy: precondition 'room_nstring' got status valid.
-[eva] tests/libc/string_c_generic.c:78: 
+[eva] string_c_generic.c:78: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:392: 
+[eva] FRAMAC_SHARE/libc/string.h:392: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva:alarm] share/libc/string.h:392: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:392: Warning: 
   function strncpy, behavior partial: postcondition 'equal_prefix' got status unknown.
 [eva] Recording results for strncpy
 [eva] Done for function strncpy
 [eva] computing for function strncmp <- main.
-  Called from tests/libc/string_c_generic.c:82.
-[eva] tests/libc/string_c_generic.c:82: 
+  Called from string_c_generic.c:82.
+[eva] string_c_generic.c:82: 
   function strncmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:82: 
+[eva] string_c_generic.c:82: 
   function strncmp: precondition 'valid_string_s2' got status valid.
-[eva] share/libc/string.c:154: starting to merge loop iterations
-[eva] share/libc/string.h:163: 
+[eva] FRAMAC_SHARE/libc/string.c:154: starting to merge loop iterations
+[eva] FRAMAC_SHARE/libc/string.h:163: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strncmp
-[eva:alarm] share/libc/string.h:163: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:163: Warning: 
   function strncmp: postcondition 'acsl_c_equiv' got status unknown.
 [eva] Recording results for strncmp
 [eva] Done for function strncmp
 [eva] computing for function strncmp <- main.
-  Called from tests/libc/string_c_generic.c:83.
-[eva] tests/libc/string_c_generic.c:83: 
+  Called from string_c_generic.c:83.
+[eva] string_c_generic.c:83: 
   function strncmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:83: 
+[eva] string_c_generic.c:83: 
   function strncmp: precondition 'valid_string_s2' got status valid.
 [eva] Recording results for strncmp
 [eva] Done for function strncmp
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:85.
-[eva] tests/libc/string_c_generic.c:85: 
+  Called from string_c_generic.c:85.
+[eva] string_c_generic.c:85: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:85: 
+[eva] string_c_generic.c:85: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:85: 
+[eva] string_c_generic.c:85: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strncat <- main.
-  Called from tests/libc/string_c_generic.c:86.
-[eva] tests/libc/string_c_generic.c:86: 
+  Called from string_c_generic.c:86.
+[eva] string_c_generic.c:86: 
   function strncat: precondition 'valid_nstring_src' got status valid.
-[eva] tests/libc/string_c_generic.c:86: 
+[eva] string_c_generic.c:86: 
   function strncat: precondition 'valid_string_dest' got status valid.
-[eva] tests/libc/string_c_generic.c:86: 
+[eva] string_c_generic.c:86: 
   function strncat, behavior partial: precondition 'room_string' got status valid.
 [eva] computing for function strlen <- strncat <- main.
-  Called from share/libc/string.c:209.
-[eva] share/libc/string.c:209: 
+  Called from FRAMAC_SHARE/libc/string.c:209.
+[eva] FRAMAC_SHARE/libc/string.c:209: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] share/libc/string.h:143: 
+[eva] FRAMAC_SHARE/libc/string.h:143: 
   function strlen: postcondition 'acsl_c_equiv' got status valid.
 [eva] Recording results for strlen
 [eva] Done for function strlen
-[eva] share/libc/string.h:443: 
+[eva] FRAMAC_SHARE/libc/string.h:443: 
   function strncat: postcondition 'result_ptr' got status valid.
-[eva] share/libc/string.h:458: 
+[eva] FRAMAC_SHARE/libc/string.h:458: 
   function strncat, behavior partial: postcondition 'sum_of_bounded_lengths' got status valid.
 [eva] Recording results for strncat
 [eva] Done for function strncat
 [eva] computing for function strcmp <- main.
-  Called from tests/libc/string_c_generic.c:88.
-[eva] tests/libc/string_c_generic.c:88: 
+  Called from string_c_generic.c:88.
+[eva] string_c_generic.c:88: 
   function strcmp: precondition 'valid_string_s1' got status valid.
-[eva] tests/libc/string_c_generic.c:88: 
+[eva] string_c_generic.c:88: 
   function strcmp: precondition 'valid_string_s2' got status valid.
 [eva] Recording results for strcmp
 [eva] Done for function strcmp
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/string_c_generic.c:90.
-[eva] tests/libc/string_c_generic.c:90: 
+  Called from string_c_generic.c:90.
+[eva] string_c_generic.c:90: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/string_c_generic.c:90: 
+[eva] string_c_generic.c:90: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/string_c_generic.c:90: 
+[eva] string_c_generic.c:90: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_generic.c:91.
-[eva] tests/libc/string_c_generic.c:91: 
+  Called from string_c_generic.c:91.
+[eva] string_c_generic.c:91: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] share/libc/string.h:177: 
+[eva] FRAMAC_SHARE/libc/string.h:177: 
   function strchr, behavior found: postcondition 'result_char' got status valid.
-[eva] share/libc/string.h:178: 
+[eva] FRAMAC_SHARE/libc/string.h:178: 
   function strchr, behavior found: postcondition 'result_same_base' got status valid.
-[eva] share/libc/string.h:179: 
+[eva] FRAMAC_SHARE/libc/string.h:179: 
   function strchr, behavior found: postcondition 'result_in_length' got status valid.
-[eva] share/libc/string.h:180: 
+[eva] FRAMAC_SHARE/libc/string.h:180: 
   function strchr, behavior found: postcondition 'result_valid_string' got status valid.
-[eva] share/libc/string.h:181: 
+[eva] FRAMAC_SHARE/libc/string.h:181: 
   cannot evaluate ACSL term, unsupported logic var p
-[eva:alarm] share/libc/string.h:181: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:181: Warning: 
   function strchr, behavior found: postcondition 'result_first_occur' got status unknown.
-[eva] share/libc/string.h:187: 
+[eva] FRAMAC_SHARE/libc/string.h:187: 
   function strchr, behavior default: postcondition 'result_null_or_same_base' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_generic.c:92.
-[eva] tests/libc/string_c_generic.c:92: 
+  Called from string_c_generic.c:92.
+[eva] string_c_generic.c:92: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] share/libc/string.h:184: 
+[eva] FRAMAC_SHARE/libc/string.h:184: 
   function strchr, behavior not_found: postcondition 'result_null' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strrchr <- main.
-  Called from tests/libc/string_c_generic.c:93.
-[eva] tests/libc/string_c_generic.c:93: 
+  Called from string_c_generic.c:93.
+[eva] string_c_generic.c:93: 
   function strrchr: precondition 'valid_string_s' got status valid.
 [eva] computing for function strlen <- strrchr <- main.
-  Called from share/libc/string.c:263.
-[eva] share/libc/string.c:263: 
+  Called from FRAMAC_SHARE/libc/string.c:263.
+[eva] FRAMAC_SHARE/libc/string.c:263: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strlen
 [eva] Done for function strlen
-[eva] share/libc/string.h:201: 
+[eva] FRAMAC_SHARE/libc/string.h:201: 
   function strrchr, behavior found: postcondition 'result_char' got status valid.
-[eva] share/libc/string.h:202: 
+[eva] FRAMAC_SHARE/libc/string.h:202: 
   function strrchr, behavior found: postcondition 'result_same_base' got status valid.
-[eva] share/libc/string.h:203: 
+[eva] FRAMAC_SHARE/libc/string.h:203: 
   function strrchr, behavior found: postcondition 'result_valid_string' got status valid.
-[eva] share/libc/string.h:209: 
+[eva] FRAMAC_SHARE/libc/string.h:209: 
   function strrchr, behavior default: postcondition 'result_null_or_same_base' got status valid.
 [eva] Recording results for strrchr
 [eva] Done for function strrchr
 [eva] computing for function strrchr <- main.
-  Called from tests/libc/string_c_generic.c:94.
-[eva] tests/libc/string_c_generic.c:94: 
+  Called from string_c_generic.c:94.
+[eva] string_c_generic.c:94: 
   function strrchr: precondition 'valid_string_s' got status valid.
-[eva] share/libc/string.c:263: Reusing old results for call to strlen
-[eva] share/libc/string.c:263: starting to merge loop iterations
-[eva] share/libc/string.h:206: 
+[eva] FRAMAC_SHARE/libc/string.c:263: Reusing old results for call to strlen
+[eva] FRAMAC_SHARE/libc/string.c:263: starting to merge loop iterations
+[eva] FRAMAC_SHARE/libc/string.h:206: 
   function strrchr, behavior not_found: postcondition 'result_null' got status valid.
 [eva] Recording results for strrchr
 [eva] Done for function strrchr

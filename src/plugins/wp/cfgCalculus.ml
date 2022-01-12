@@ -188,7 +188,7 @@ struct
   let prove_property env (p : WpPropId.pred_info) w =
     if is_selected ~goal:true env p then W.add_goal env.we p w else w
 
-  let prove_subproperty env (p : WpPropId.pred_info) ?deps prop stmt source w =
+  let prove_subproperty env p ?deps prop stmt source w =
     if is_selected ~goal:true env p
     then W.add_subgoal env.we ?deps p prop stmt source w
     else w
@@ -367,15 +367,31 @@ struct
         W.call_goal_precond env.we s kf es ~pre w_call
       else w_call
     in
-    match env.terminates with
-    | Some p when is_default_bhv env.mode && is_selected ~goal:true env p ->
-        let generated, callee_t = c.contract_terminates in
-        if generated then
-          Wp_parameters.warning ~once:true
-            "Missing terminates clause on call to %a, defaults to %a"
-            Kernel_function.pretty kf Cil_printer.pp_predicate callee_t ;
-        W.call_terminates env.we p s kf es ~callee_t w_pre
-    | _ -> w_pre
+    let callee_t =
+      (** TODO when kernel terminates complete: remove this code. *)
+      let generated, callee_t = c.contract_terminates in
+      if generated && env.terminates <> None then
+        Wp_parameters.warning ~once:true
+          "Missing terminates clause on call to %a, defaults to %a"
+          Kernel_function.pretty kf Cil_printer.pp_predicate callee_t ;
+      Some callee_t
+    in
+    let selected t = is_selected ~goal:true env t && is_default_bhv env.mode in
+    let in_cluster = CfgInfos.in_cluster ~caller:env.mode.kf kf in
+    let w_term = match env.terminates with
+      | Some t when selected t ->
+          W.call_terminates env.we s kf es t ?callee_t w_pre
+      | _ -> w_pre
+    in
+    let w_decr = match env.decreases with
+      | Some d when selected d && in_cluster ->
+          W.call_decreases env.we s kf es d
+            ?caller_t:(Option.map snd env.terminates)
+            ?callee_d:c.contract_decreases
+            w_term
+      | _ -> w_term
+    in
+    w_decr
 
   let do_complete_disjoint env w =
     if not (is_default_bhv env.mode) then w

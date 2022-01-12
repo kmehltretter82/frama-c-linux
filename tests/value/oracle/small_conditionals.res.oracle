@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/small_conditionals.i (no preprocessing)
+[kernel] Parsing small_conditionals.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

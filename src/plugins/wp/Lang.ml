@@ -783,7 +783,8 @@ struct
   let e_prop t = t
   let p_bools xs = xs
   let e_props xs = xs
-  let lift f x = f x
+  let e_lift f = f
+  let p_lift f = f
 
   let is_zero e = match QED.repr e with
     | Kint z -> Integer.equal z Integer.zero

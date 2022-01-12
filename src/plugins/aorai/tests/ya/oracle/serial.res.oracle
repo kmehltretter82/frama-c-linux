@@ -1,5 +1,5 @@
-[kernel] Parsing tests/ya/serial.c (with preprocessing)
-[kernel:annot:missing-spec] tests/ya/serial.c:56: Warning: 
+[kernel] Parsing serial.c (with preprocessing)
+[kernel:annot:missing-spec] serial.c:56: Warning: 
   Neither code nor specification for function Frama_C_show_aorai_state, generating default assigns from the prototype
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -18,23 +18,23 @@
   aorai_StatesHistory_1 ∈ {19}
   aorai_StatesHistory_2 ∈ {19}
 [eva] using specification for function Frama_C_interval
-[eva] tests/ya/serial.c:58: starting to merge loop iterations
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 100 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 300 states
-[eva:alarm] tests/ya/serial.c:33: Warning: 
+[eva] serial.c:58: starting to merge loop iterations
+[eva] serial.c:63: Trace partitioning superposing up to 100 states
+[eva] serial.c:63: Trace partitioning superposing up to 300 states
+[eva:alarm] serial.c:33: Warning: 
   assertion 'Aorai,aorai_smoke_test' got status invalid (stopping propagation).
-[aorai] tests/ya/serial.c:92: Wait1 <- Wait1 <- Complete
-[aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [8192..16383]
-[aorai] tests/ya/serial.c:92: Wait1 <- Wait1 <- Complete
-[aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [0..8191]
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 500 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 700 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 900 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1200 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1400 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1500 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1600 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1700 states
+[aorai] serial.c:92: Wait1 <- Wait1 <- Complete
+[aorai] serial.c:92: n in {5},x in [0..16383],y in [8192..16383]
+[aorai] serial.c:92: Wait1 <- Wait1 <- Complete
+[aorai] serial.c:92: n in {5},x in [0..16383],y in [0..8191]
+[eva] serial.c:63: Trace partitioning superposing up to 500 states
+[eva] serial.c:63: Trace partitioning superposing up to 700 states
+[eva] serial.c:63: Trace partitioning superposing up to 900 states
+[eva] serial.c:63: Trace partitioning superposing up to 1200 states
+[eva] serial.c:63: Trace partitioning superposing up to 1400 states
+[eva] serial.c:63: Trace partitioning superposing up to 1500 states
+[eva] serial.c:63: Trace partitioning superposing up to 1600 states
+[eva] serial.c:63: Trace partitioning superposing up to 1700 states
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function input_data_post_func:

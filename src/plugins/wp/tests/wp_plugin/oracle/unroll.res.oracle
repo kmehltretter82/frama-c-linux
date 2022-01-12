@@ -1,9 +1,8 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/unroll.i (no preprocessing)
+[kernel] Parsing unroll.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_plugin/unroll.i:20: Warning: 
-  Missing assigns clause (assigns 'everything' instead)
+[wp] unroll.i:20: Warning: Missing assigns clause (assigns 'everything' instead)
 ------------------------------------------------------------
   Function unrolled_loop
 ------------------------------------------------------------

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/enum.i (no preprocessing)
+[kernel] Parsing enum.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,8 +7,8 @@
    [1..2] ∈ {0}
   u[0] ∈ {2}
    [1..2] ∈ {0}
-[eva] tests/value/enum.i:16: starting to merge loop iterations
-[eva] tests/value/enum.i:20: assertion got status valid.
+[eva] enum.i:16: starting to merge loop iterations
+[eva] enum.i:20: assertion got status valid.
 [eva] Recording results for f
 [eva] done for function f
 [eva] ====== VALUES COMPUTED ======

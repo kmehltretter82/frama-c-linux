@@ -307,7 +307,6 @@ let mk_goal t ~title ~part ~axioms sequent =
   let sid = Printf.sprintf "%s-%d" t.main.Wpo.po_sid id in
   Wpo.({
       po_gid = gid ;
-      po_leg = "" ; (* no use for legacy name *)
       po_sid = sid ;
       po_name = Printf.sprintf "%s (%s)" title part ;
       po_idx = t.main.po_idx ;

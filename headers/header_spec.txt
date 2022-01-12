@@ -1756,6 +1756,8 @@ src/plugins/wp/TacInstance.ml: CEA_WP
 src/plugins/wp/TacInstance.mli: CEA_WP
 src/plugins/wp/TacLemma.ml: CEA_WP
 src/plugins/wp/TacLemma.mli: CEA_WP
+src/plugins/wp/TacModMask.ml: CEA_WP
+src/plugins/wp/TacModMask.mli: CEA_WP
 src/plugins/wp/TacNormalForm.ml: CEA_WP
 src/plugins/wp/TacNormalForm.mli: CEA_WP
 src/plugins/wp/TacOverflow.ml: CEA_WP

@@ -101,7 +101,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(t1.p) && \\valid(t1.q)";
-    __gen_e_acsl_assert_data.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data.file = "t_struct.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 30;
     __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data);
@@ -167,7 +167,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(t2.p) && !\\valid(t2.q)";
-    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_2.file = "t_struct.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 31;
     __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_2);
@@ -236,7 +236,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\valid(t2.p) && \\valid(t2.q)";
-    __gen_e_acsl_assert_data_3.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_3.file = "t_struct.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 34;
     __e_acsl_assert(__gen_e_acsl_and_9,& __gen_e_acsl_assert_data_3);
@@ -310,7 +310,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(t2.p) && \\valid(t2.q)";
-    __gen_e_acsl_assert_data_4.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_4.file = "t_struct.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 38;
     __e_acsl_assert(__gen_e_acsl_and_12,& __gen_e_acsl_assert_data_4);
@@ -381,7 +381,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "!\\valid(l.t.p) && \\valid(l.t.q)";
-    __gen_e_acsl_assert_data_5.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_5.file = "t_struct.c";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 41;
     __e_acsl_assert(__gen_e_acsl_and_15,& __gen_e_acsl_assert_data_5);
@@ -423,7 +423,7 @@ int main(void)
       __gen_e_acsl_assert_data_7.blocking = 1;
       __gen_e_acsl_assert_data_7.kind = "RTE";
       __gen_e_acsl_assert_data_7.pred_txt = "mem_access: \\valid_read(&lp->t.p)";
-      __gen_e_acsl_assert_data_7.file = "tests/temporal/t_struct.c";
+      __gen_e_acsl_assert_data_7.file = "t_struct.c";
       __gen_e_acsl_assert_data_7.fct = "main";
       __gen_e_acsl_assert_data_7.line = 44;
       __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_7);
@@ -442,7 +442,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "!\\valid(lp->t.p)";
-    __gen_e_acsl_assert_data_6.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_6.file = "t_struct.c";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 44;
     __e_acsl_assert(! __gen_e_acsl_and_16,& __gen_e_acsl_assert_data_6);
@@ -516,7 +516,7 @@ int main(void)
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
     __gen_e_acsl_assert_data_8.pred_txt = "!\\valid(tarr[0].p) && \\valid(tarr[0].q)";
-    __gen_e_acsl_assert_data_8.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_8.file = "t_struct.c";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 47;
     __e_acsl_assert(__gen_e_acsl_and_19,& __gen_e_acsl_assert_data_8);
@@ -591,7 +591,7 @@ int main(void)
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "!\\valid(larr[0].t.p) && \\valid(larr[0].t.q)";
-    __gen_e_acsl_assert_data_9.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_9.file = "t_struct.c";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 50;
     __e_acsl_assert(__gen_e_acsl_and_22,& __gen_e_acsl_assert_data_9);

@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp/cfg_loop_deps.i (no preprocessing)
+[kernel] Parsing cfg_loop_deps.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function function
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Check_Q' (file tests/wp/cfg_loop_deps.i, line 19):
+Goal Preservation of Invariant 'Check_Q' (file cfg_loop_deps.i, line 19):
 Let x = 1 + i.
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
@@ -35,13 +35,13 @@ Prove: P_Q(x).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Check_Q' (file tests/wp/cfg_loop_deps.i, line 19):
+Goal Establishment of Invariant 'Check_Q' (file cfg_loop_deps.i, line 19):
 Assume { (* Invariant 'Inv_P' *) Have: P_P(0). }
 Prove: P_Q(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Inv_P' (file tests/wp/cfg_loop_deps.i, line 18):
+Goal Preservation of Invariant 'Inv_P' (file cfg_loop_deps.i, line 18):
 Let x = 1 + i.
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
@@ -64,12 +64,12 @@ Prove: P_P(x).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Inv_P' (file tests/wp/cfg_loop_deps.i, line 18):
+Goal Establishment of Invariant 'Inv_P' (file cfg_loop_deps.i, line 18):
 Prove: P_P(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Inv_S' (file tests/wp/cfg_loop_deps.i, line 21):
+Goal Preservation of Invariant 'Inv_S' (file cfg_loop_deps.i, line 21):
 Let x = 1 + i.
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
@@ -96,7 +96,7 @@ Prove: P_S(x).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Inv_S' (file tests/wp/cfg_loop_deps.i, line 21):
+Goal Establishment of Invariant 'Inv_S' (file cfg_loop_deps.i, line 21):
 Assume {
   (* Invariant 'Inv_P' *)
   Have: P_P(0).
@@ -107,7 +107,7 @@ Prove: P_S(0).
 
 ------------------------------------------------------------
 
-Goal Check (file tests/wp/cfg_loop_deps.i, line 25):
+Goal Check (file cfg_loop_deps.i, line 25):
 Assume {
   Type: is_sint32(i).
   (* Invariant 'Inv_P' *)
@@ -129,7 +129,7 @@ Prove: P_W(i).
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp/cfg_loop_deps.i, line 22):
+Goal Loop assigns (file cfg_loop_deps.i, line 22):
 Prove: true.
 
 ------------------------------------------------------------

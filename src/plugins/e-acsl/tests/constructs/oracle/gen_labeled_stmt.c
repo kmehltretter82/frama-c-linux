@@ -20,7 +20,7 @@ int __gen_e_acsl_main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "X == 0";
-    __gen_e_acsl_assert_data.file = "tests/constructs/labeled_stmt.i";
+    __gen_e_acsl_assert_data.file = "labeled_stmt.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 10;
     __e_acsl_assert(X == 0,& __gen_e_acsl_assert_data);
@@ -39,7 +39,7 @@ int __gen_e_acsl_main(void)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Precondition";
       __gen_e_acsl_assert_data_2.pred_txt = "X == 1";
-      __gen_e_acsl_assert_data_2.file = "tests/constructs/labeled_stmt.i";
+      __gen_e_acsl_assert_data_2.file = "labeled_stmt.i";
       __gen_e_acsl_assert_data_2.fct = "main";
       __gen_e_acsl_assert_data_2.line = 13;
       __e_acsl_assert(X == 1,& __gen_e_acsl_assert_data_2);
@@ -52,7 +52,7 @@ int __gen_e_acsl_main(void)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Postcondition";
     __gen_e_acsl_assert_data_3.pred_txt = "X == 2";
-    __gen_e_acsl_assert_data_3.file = "tests/constructs/labeled_stmt.i";
+    __gen_e_acsl_assert_data_3.file = "labeled_stmt.i";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 13;
     __e_acsl_assert(X == 2,& __gen_e_acsl_assert_data_3);
@@ -79,7 +79,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "X == 3";
-    __gen_e_acsl_assert_data.file = "tests/constructs/labeled_stmt.i";
+    __gen_e_acsl_assert_data.file = "labeled_stmt.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 7;
     __e_acsl_assert(X == 3,& __gen_e_acsl_assert_data);

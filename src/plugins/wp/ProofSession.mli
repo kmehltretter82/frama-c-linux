@@ -25,7 +25,6 @@ type script =
   | Script of string
   | Deprecated of string
 
-val pp_script : Format.formatter -> script -> unit
 val pp_script_for : Format.formatter -> Wpo.t -> unit
 
 val get : Wpo.t -> script

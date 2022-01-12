@@ -1,4 +1,4 @@
-[kernel] Parsing tests/scope/scope.c (with preprocessing)
+[kernel] Parsing scope.c (with preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,14 +7,14 @@
   S2 ∈ {0}
   T[0..99] ∈ {0}
 [eva] computing for function Frama_C_interval <- f.
-  Called from tests/scope/scope.c:26.
+  Called from scope.c:26.
 [eva] using specification for function Frama_C_interval
-[eva] tests/scope/scope.c:26: 
+[eva] scope.c:26: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- f.
-  Called from tests/scope/scope.c:32.
-[eva] tests/scope/scope.c:32: 
+  Called from scope.c:32.
+[eva] scope.c:32: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for f

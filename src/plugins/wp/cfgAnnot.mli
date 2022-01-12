@@ -118,6 +118,7 @@ type contract = {
   contract_smoke : pred_info list ;
   contract_assigns : assigns ;
   contract_terminates : bool * predicate ; (* boolean: assumed terminates *)
+  contract_decreases : variant option ;
 }
 
 val get_call_contract : ?smoking:stmt -> kernel_function -> stmt -> contract

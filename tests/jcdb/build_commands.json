@@ -15,6 +15,7 @@
         "targets": [
             "jbdb.o",
             "jbdb2.o"
-        ]
+        ],
+        "directory": "."
     }
 ]

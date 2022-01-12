@@ -101,7 +101,7 @@ struct list *__gen_e_acsl_f(struct list *l)
         __gen_e_acsl_assert_data.blocking = 1;
         __gen_e_acsl_assert_data.kind = "RTE";
         __gen_e_acsl_assert_data.pred_txt = "mem_access: \\valid_read(&l->next)";
-        __gen_e_acsl_assert_data.file = "tests/memory/valid_in_contract.c";
+        __gen_e_acsl_assert_data.file = "valid_in_contract.c";
         __gen_e_acsl_assert_data.fct = "f";
         __gen_e_acsl_assert_data.line = 17;
         __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
@@ -135,7 +135,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Postcondition";
       __gen_e_acsl_assert_data_2.pred_txt = "B1: \\result == \\old(l)";
-      __gen_e_acsl_assert_data_2.file = "tests/memory/valid_in_contract.c";
+      __gen_e_acsl_assert_data_2.file = "valid_in_contract.c";
       __gen_e_acsl_assert_data_2.fct = "f";
       __gen_e_acsl_assert_data_2.line = 15;
       __e_acsl_assert(__retres == __gen_e_acsl_at,
@@ -154,7 +154,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Postcondition";
       __gen_e_acsl_assert_data_3.pred_txt = "B2: \\result == \\old(l)";
-      __gen_e_acsl_assert_data_3.file = "tests/memory/valid_in_contract.c";
+      __gen_e_acsl_assert_data_3.file = "valid_in_contract.c";
       __gen_e_acsl_assert_data_3.fct = "f";
       __gen_e_acsl_assert_data_3.line = 18;
       __e_acsl_assert(__retres == __gen_e_acsl_at_2,

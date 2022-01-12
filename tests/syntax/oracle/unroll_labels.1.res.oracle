@@ -1,4 +1,4 @@
-[kernel] Parsing tests/syntax/unroll_labels.i (no preprocessing)
+[kernel] Parsing unroll_labels.i (no preprocessing)
 [eva] Analyzing a complete application starting at main2
 [eva] Computing initial state
 [eva] Initial state computed

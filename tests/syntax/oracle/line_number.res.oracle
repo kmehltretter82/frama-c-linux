@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/line_number.c (with preprocessing)
-[kernel] tests/syntax/line_number.c:6: 
+[kernel] Parsing line_number.c (with preprocessing)
+[kernel] line_number.c:6: 
   syntax error:
   
   4     */

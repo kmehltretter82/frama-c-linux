@@ -1,5 +1,5 @@
 # frama-c -wp -wp-timeout 1 [...]
-[kernel] Parsing tests/wp_tip/overflow.i (no preprocessing)
+[kernel] Parsing overflow.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 2 goals scheduled
 [wp] [Script] Goal typed_lemma_j_incr_char : Valid

@@ -107,7 +107,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(p) && \\valid(q)";
-    __gen_e_acsl_assert_data.file = "tests/temporal/t_labels.c";
+    __gen_e_acsl_assert_data.file = "t_labels.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 26;
     __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data);
@@ -147,7 +147,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(p)";
-    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_labels.c";
+    __gen_e_acsl_assert_data_2.file = "t_labels.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 30;
     __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_2);

@@ -10,12 +10,12 @@
   min_fl ∈ {0}
   den ∈ {0}
 [eva] computing for function Frama_C_interval <- main.
-  Called from tests/float/absorb.c:15.
+  Called from absorb.c:15.
 [eva] using specification for function Frama_C_interval
-[eva] tests/float/absorb.c:15: 
+[eva] absorb.c:15: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/float/absorb.c:18: starting to merge loop iterations
+[eva] absorb.c:18: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

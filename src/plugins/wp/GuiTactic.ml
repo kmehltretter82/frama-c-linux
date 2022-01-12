@@ -89,7 +89,7 @@ class checkbox
         begin
           Wutil.on enabled button#set_visible ;
           Wutil.on tooltip button#set_tooltip ;
-          ignore title ;
+          Wutil.on title button#set_label ;
           ignore filter ;
           ignore vmin ;
           ignore vmax ;

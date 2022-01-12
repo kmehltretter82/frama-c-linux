@@ -1,13 +1,13 @@
-[kernel] Parsing tests/builtins/assert_builtin.i (no preprocessing)
-[kernel:annot:missing-spec] tests/builtins/assert_builtin.i:5: Warning: 
+[kernel] Parsing assert_builtin.i (no preprocessing)
+[kernel:annot:missing-spec] assert_builtin.i:5: Warning: 
   Neither code nor specification for function Frama_C_assert, generating default assigns from the prototype
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..9] ∈ {0}
-[eva] tests/builtins/assert_builtin.i:6: Call to builtin Frama_C_assert
-[eva] tests/builtins/assert_builtin.i:6: Warning: Frama_C_assert: unknown
+[eva] assert_builtin.i:6: Call to builtin Frama_C_assert
+[eva] assert_builtin.i:6: Warning: Frama_C_assert: unknown
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

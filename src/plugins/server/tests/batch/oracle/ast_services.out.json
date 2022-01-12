@@ -9,9 +9,9 @@
           "signature": "int g(int y);",
           "defined": true,
           "sloc": {
-            "dir": "tests/batch",
+            "dir": ".",
             "base": "ast_services.i",
-            "file": "tests/batch/ast_services.i",
+            "file": "ast_services.i",
             "line": 8
           }
         },
@@ -21,9 +21,9 @@
           "signature": "int f(int x);",
           "defined": true,
           "sloc": {
-            "dir": "tests/batch",
+            "dir": ".",
             "base": "ast_services.i",
-            "file": "tests/batch/ast_services.i",
+            "file": "ast_services.i",
             "line": 7
           }
         }

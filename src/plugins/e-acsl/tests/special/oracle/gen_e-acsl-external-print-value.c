@@ -19,7 +19,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 0;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\let x = value; \\false";
-    __gen_e_acsl_assert_data.file = "tests/special/e-acsl-external-print-value.c";
+    __gen_e_acsl_assert_data.file = "e-acsl-external-print-value.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 7;
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);

@@ -140,7 +140,7 @@ let load_project (host_window: Design.main_window_extension_points) =
   dialog#destroy ()
 
 let mk_project_markup p =
-  let name = Project.get_unique_name p in
+  let name = Extlib.html_escape (Project.get_unique_name p) in
   if Project.is_current p then "<b>" ^ name ^ "</b>" else name
 
 let reset ?filter (menu: GMenu.menu) =

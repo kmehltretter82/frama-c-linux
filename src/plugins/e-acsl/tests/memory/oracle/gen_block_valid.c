@@ -69,7 +69,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-    __gen_e_acsl_assert_data.file = "tests/memory/block_valid.c";
+    __gen_e_acsl_assert_data.file = "block_valid.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 19;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(p + 1)";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/block_valid.c";
+    __gen_e_acsl_assert_data_2.file = "block_valid.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 21;
     __e_acsl_assert(! __gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\valid(p)";
-    __gen_e_acsl_assert_data_3.file = "tests/memory/block_valid.c";
+    __gen_e_acsl_assert_data_3.file = "block_valid.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 24;
     __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_3);
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(p + 1)";
-    __gen_e_acsl_assert_data_4.file = "tests/memory/block_valid.c";
+    __gen_e_acsl_assert_data_4.file = "block_valid.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 26;
     __e_acsl_assert(! __gen_e_acsl_valid_4,& __gen_e_acsl_assert_data_4);
@@ -208,7 +208,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "\\valid(pmin)";
-    __gen_e_acsl_assert_data_5.file = "tests/memory/block_valid.c";
+    __gen_e_acsl_assert_data_5.file = "block_valid.c";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 44;
     __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_5);
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "\\valid(pmax)";
-    __gen_e_acsl_assert_data_6.file = "tests/memory/block_valid.c";
+    __gen_e_acsl_assert_data_6.file = "block_valid.c";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 45;
     __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_6);
@@ -269,7 +269,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
     __gen_e_acsl_assert_data_7.pred_txt = "!\\valid(pmin + diff)";
-    __gen_e_acsl_assert_data_7.file = "tests/memory/block_valid.c";
+    __gen_e_acsl_assert_data_7.file = "block_valid.c";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 47;
     __e_acsl_assert(! __gen_e_acsl_valid_7,& __gen_e_acsl_assert_data_7);
@@ -293,7 +293,7 @@ int main(int argc, char **argv)
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
     __gen_e_acsl_assert_data_8.pred_txt = "!\\valid(pmax - diff)";
-    __gen_e_acsl_assert_data_8.file = "tests/memory/block_valid.c";
+    __gen_e_acsl_assert_data_8.file = "block_valid.c";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 49;
     __e_acsl_assert(! __gen_e_acsl_valid_8,& __gen_e_acsl_assert_data_8);

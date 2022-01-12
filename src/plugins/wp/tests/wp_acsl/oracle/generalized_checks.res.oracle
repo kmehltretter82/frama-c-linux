@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/generalized_checks.i (no preprocessing)
+[kernel] Parsing generalized_checks.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -70,19 +70,19 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'A' in 'job'' in 'caller' at call 'job' (file tests/wp_acsl/generalized_checks.i, line 65)
+Goal Instance of 'Pre-condition 'A' in 'job'' in 'caller' at call 'job' (file generalized_checks.i, line 65)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'CA1' in 'job'' in 'caller' at call 'job' (file tests/wp_acsl/generalized_checks.i, line 65)
+Goal Instance of 'Pre-condition 'CA1' in 'job'' in 'caller' at call 'job' (file generalized_checks.i, line 65)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'CA2,ko' in 'job'' in 'caller' at call 'job' (file tests/wp_acsl/generalized_checks.i, line 65)
+Goal Instance of 'Pre-condition 'CA2,ko' in 'job'' in 'caller' at call 'job' (file generalized_checks.i, line 65)
 :
 Assume {
   Type: is_sint32(x).
@@ -150,23 +150,23 @@ Prove: true.
   Function loop
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'false_but_preserved' (file tests/wp_acsl/generalized_checks.i, line 70):
+Goal Preservation of Invariant 'false_but_preserved' (file generalized_checks.i, line 70):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'false_but_preserved' (file tests/wp_acsl/generalized_checks.i, line 70):
+Goal Establishment of Invariant 'false_but_preserved' (file generalized_checks.i, line 70):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Check 'implied_by_false_invariant' (file tests/wp_acsl/generalized_checks.i, line 74):
+Goal Check 'implied_by_false_invariant' (file generalized_checks.i, line 74):
 Assume { Type: is_sint32(i). (* Else *) Have: 10 <= i. }
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/generalized_checks.i, line 71):
+Goal Loop assigns (file generalized_checks.i, line 71):
 Prove: true.
 
 ------------------------------------------------------------

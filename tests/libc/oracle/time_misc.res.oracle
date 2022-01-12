@@ -1,54 +1,54 @@
-[kernel] Parsing tests/libc/time_misc.c (with preprocessing)
+[kernel] Parsing time_misc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] computing for function test_gettimeofday <- main.
-  Called from tests/libc/time_misc.c:37.
+  Called from time_misc.c:37.
 [eva] computing for function gettimeofday <- test_gettimeofday <- main.
-  Called from tests/libc/time_misc.c:7.
+  Called from time_misc.c:7.
 [eva] using specification for function gettimeofday
 [eva] Done for function gettimeofday
-[eva] tests/libc/time_misc.c:8: assertion got status valid.
-[eva] tests/libc/time_misc.c:9: assertion got status valid.
+[eva] time_misc.c:8: assertion got status valid.
+[eva] time_misc.c:9: assertion got status valid.
 [eva] Recording results for test_gettimeofday
 [eva] Done for function test_gettimeofday
 [eva] computing for function test_strftime <- main.
-  Called from tests/libc/time_misc.c:38.
+  Called from time_misc.c:38.
 [eva] computing for function time <- test_strftime <- main.
-  Called from tests/libc/time_misc.c:18.
+  Called from time_misc.c:18.
 [eva] using specification for function time
 [eva] Done for function time
 [eva] computing for function localtime <- test_strftime <- main.
-  Called from tests/libc/time_misc.c:19.
+  Called from time_misc.c:19.
 [eva] using specification for function localtime
-[eva] tests/libc/time_misc.c:19: 
+[eva] time_misc.c:19: 
   function localtime: precondition 'valid_timer' got status valid.
 [eva] Done for function localtime
 [eva] computing for function strftime <- test_strftime <- main.
-  Called from tests/libc/time_misc.c:21.
+  Called from time_misc.c:21.
 [eva] using specification for function strftime
-[eva] tests/libc/time_misc.c:21: 
+[eva] time_misc.c:21: 
   function strftime: precondition 'dst_has_room' got status valid.
-[eva] tests/libc/time_misc.c:21: 
+[eva] time_misc.c:21: 
   function strftime: precondition 'valid_format' got status valid.
-[eva] tests/libc/time_misc.c:21: 
+[eva] time_misc.c:21: 
   function strftime: precondition 'valid_tm' got status valid.
 [eva] Done for function strftime
 [eva] Recording results for test_strftime
 [eva] Done for function test_strftime
 [eva] computing for function test_ctime <- main.
-  Called from tests/libc/time_misc.c:39.
+  Called from time_misc.c:39.
 [eva] computing for function ctime <- test_ctime <- main.
-  Called from tests/libc/time_misc.c:31.
+  Called from time_misc.c:31.
 [eva] using specification for function ctime
-[eva] tests/libc/time_misc.c:31: 
+[eva] time_misc.c:31: 
   function ctime: precondition 'valid_timer' got status valid.
-[eva:alarm] tests/libc/time_misc.c:31: Warning: 
+[eva:alarm] time_misc.c:31: Warning: 
   function ctime: precondition 'initialization,init_timer' got status unknown.
 [eva] Done for function ctime
-[eva:alarm] tests/libc/time_misc.c:32: Warning: assertion got status unknown.
+[eva:alarm] time_misc.c:32: Warning: assertion got status unknown.
 [eva] Recording results for test_ctime
 [eva] Done for function test_ctime
 [eva] Recording results for main

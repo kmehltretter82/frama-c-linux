@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts179.i (no preprocessing)
+[kernel] Parsing bts179.i (no preprocessing)
 [sparecode] remove unused code...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -8,7 +8,7 @@
   X ∈ {0}
   Y ∈ {0}
 [eva] computing for function g <- main.
-  Called from tests/slicing/bts179.i:16.
+  Called from bts179.i:16.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main

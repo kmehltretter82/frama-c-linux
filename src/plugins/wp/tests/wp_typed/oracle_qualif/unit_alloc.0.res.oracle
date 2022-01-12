@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_typed/unit_alloc.i (no preprocessing)
+[kernel] Parsing unit_alloc.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 7 goals scheduled
@@ -20,7 +20,7 @@
   g                         1        -        1       100%
   h                         -        1        1       100%
 ------------------------------------------------------------
-[wp] tests/wp_typed/unit_alloc.i:34: Warning: 
+[wp] unit_alloc.i:34: Warning: 
   Memory model hypotheses for function 'h':
   /*@ behavior wp_typed:
         ensures \separated(\result, &x); */

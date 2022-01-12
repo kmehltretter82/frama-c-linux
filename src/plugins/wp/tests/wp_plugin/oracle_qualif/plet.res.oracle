@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/plet.i (no preprocessing)
+[kernel] Parsing plet.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 1 goal scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_GOAL : Valid

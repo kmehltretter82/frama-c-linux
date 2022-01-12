@@ -16,34 +16,25 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report tests/sarif/std_string.c -eva -then -mdr-sarif-deterministic -mdr-gen sarif -mdr-out tests/sarif/result/std_string.sarif",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report std_string.c -eva -then -mdr-sarif-deterministic -mdr-gen sarif -mdr-out ./std_string.sarif",
           "arguments": [
             "-journal-disable", "-check", "-no-autoload-plugins",
-            "-load-module=eva,from,scope,markdown_report",
-            "tests/sarif/std_string.c", "-eva", "-then",
-            "-mdr-sarif-deterministic", "-mdr-gen", "sarif", "-mdr-out",
-            "tests/sarif/result/std_string.sarif"
+            "-add-symbolic-path", ":.",
+            "-load-module=eva,from,scope,markdown_report", "std_string.c",
+            "-eva", "-then", "-mdr-sarif-deterministic", "-mdr-gen", "sarif",
+            "-mdr-out", "./std_string.sarif"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         }
       ],
       "originalUriBaseIds": {
-        "FRAMAC_SHARE": {
-          "uri": "file:///omitted-for-deterministic-output/"
-        },
-        "FRAMAC_LIB": { "uri": "file:///omitted-for-deterministic-output/" },
-        "FRAMAC_PLUGIN": {
-          "uri": "file:///omitted-for-deterministic-output/"
-        },
+        ".": { "uri": "file:///omitted-for-deterministic-output/" },
         "PWD": { "uri": "file:///omitted-for-deterministic-output/" }
       },
       "artifacts": [
         {
-          "location": {
-            "uri": "tests/sarif/std_string.c",
-            "uriBaseId": "PWD"
-          },
+          "location": { "uri": "std_string.c", "uriBaseId": "PWD" },
           "roles": [ "analysisTarget" ],
           "mimeType": "text/x-csrc"
         }

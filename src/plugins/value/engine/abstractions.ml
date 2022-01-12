@@ -74,16 +74,22 @@ module Config = struct
   let abstractions = ref []
   let dynamic_abstractions = ref []
 
-  let register ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
+  let register_domain_option ~name ~experimental ~descr =
     let descr = if experimental then "Experimental. " ^ descr else descr in
-    Value_parameters.register_domain ~name ~descr;
+    Value_parameters.register_domain ~name ~descr
+
+  let register ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
+    register_domain_option ~name ~experimental ~descr;
     let flag = Flag { name; experimental; priority; abstraction } in
     abstractions := flag :: !abstractions;
     flag
 
-  let dynamic_register ~name ~descr make =
-    Value_parameters.register_domain ~name ~descr;
-    dynamic_abstractions := (name, make) :: !dynamic_abstractions
+  let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
+    register_domain_option ~name ~experimental ~descr;
+    let make' () : flag =
+      Flag { name; experimental; priority; abstraction = make () }
+    in
+    dynamic_abstractions := (name,make') :: !dynamic_abstractions
 
   let configure () =
     let add_main_mode mode =

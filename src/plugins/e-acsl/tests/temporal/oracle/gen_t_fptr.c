@@ -82,7 +82,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(q)";
-    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_fptr.c";
+    __gen_e_acsl_assert_data_2.file = "t_fptr.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 19;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);

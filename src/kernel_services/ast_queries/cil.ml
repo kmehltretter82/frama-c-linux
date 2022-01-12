@@ -6047,19 +6047,30 @@ let increm64 (e: exp) i =
     false
     (new_exp ~loc:e.eloc (BinOp(bop, e, kinteger64 ~loc:e.eloc i, et)))
 
-exception LenOfArray
+type incorrect_array_length = Not_constant | Not_integer | Negative | Too_big
+
+let pp_incorrect_array_length fmt = function
+  | Not_constant -> Format.pp_print_string fmt "not a compile-time constant"
+  | Negative -> Format.pp_print_string fmt "negative"
+  | Not_integer -> Format.pp_print_string fmt "not an integral constant"
+  | Too_big -> Format.pp_print_string fmt "too big"
+
+exception LenOfArray of incorrect_array_length
+
 let lenOfArray64 eo =
   match eo with
-    None -> raise LenOfArray
+    None -> raise (LenOfArray Not_constant)
   | Some e -> begin
       match (constFold true e).enode with
       | Const(CInt64(ni, _, _)) when Integer.ge ni Integer.zero ->
         ni
-      | _ -> raise LenOfArray
+      | Const(CInt64 _) -> raise (LenOfArray Negative)
+      | Const _ -> raise (LenOfArray Not_integer)
+      | _ -> raise (LenOfArray Not_constant)
     end
 let lenOfArray eo =
   match Integer.to_int_opt (lenOfArray64 eo) with
-  | None -> raise LenOfArray
+  | None -> raise (LenOfArray Too_big)
   | Some l -> l
 
 (*** Make an initializer for zeroing a data type ***)

@@ -28,7 +28,7 @@ int f(int *p)
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Invariant";
       __gen_e_acsl_assert_data.pred_txt = "0 <= i <= 1";
-      __gen_e_acsl_assert_data.file = "tests/special/e-acsl-functions.c";
+      __gen_e_acsl_assert_data.file = "e-acsl-functions.c";
       __gen_e_acsl_assert_data.fct = "f";
       __gen_e_acsl_assert_data.line = 13;
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -49,7 +49,7 @@ int f(int *p)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Invariant";
       __gen_e_acsl_assert_data_2.pred_txt = "0 <= i <= 1";
-      __gen_e_acsl_assert_data_2.file = "tests/special/e-acsl-functions.c";
+      __gen_e_acsl_assert_data_2.file = "e-acsl-functions.c";
       __gen_e_acsl_assert_data_2.fct = "f";
       __gen_e_acsl_assert_data_2.line = 13;
       __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
@@ -114,7 +114,7 @@ int __gen_e_acsl_f(int *p)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "\\initialized(p)";
-    __gen_e_acsl_assert_data.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data.file = "e-acsl-functions.c";
     __gen_e_acsl_assert_data.fct = "f";
     __gen_e_acsl_assert_data.line = 9;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
@@ -132,7 +132,7 @@ int __gen_e_acsl_f(int *p)
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(p)";
-    __gen_e_acsl_assert_data_3.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data_3.file = "e-acsl-functions.c";
     __gen_e_acsl_assert_data_3.fct = "f";
     __gen_e_acsl_assert_data_3.line = 10;
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
@@ -140,7 +140,7 @@ int __gen_e_acsl_f(int *p)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Precondition";
     __gen_e_acsl_assert_data_2.pred_txt = "*p == 0";
-    __gen_e_acsl_assert_data_2.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data_2.file = "e-acsl-functions.c";
     __gen_e_acsl_assert_data_2.fct = "f";
     __gen_e_acsl_assert_data_2.line = 10;
     __e_acsl_assert(*p == 0,& __gen_e_acsl_assert_data_2);
@@ -158,7 +158,7 @@ int __gen_e_acsl_f(int *p)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "RTE";
     __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(p)";
-    __gen_e_acsl_assert_data_5.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data_5.file = "e-acsl-functions.c";
     __gen_e_acsl_assert_data_5.fct = "f";
     __gen_e_acsl_assert_data_5.line = 11;
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_5);
@@ -176,7 +176,7 @@ int __gen_e_acsl_f(int *p)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Postcondition";
     __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\old(*p)";
-    __gen_e_acsl_assert_data_4.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data_4.file = "e-acsl-functions.c";
     __gen_e_acsl_assert_data_4.fct = "f";
     __gen_e_acsl_assert_data_4.line = 11;
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_4);

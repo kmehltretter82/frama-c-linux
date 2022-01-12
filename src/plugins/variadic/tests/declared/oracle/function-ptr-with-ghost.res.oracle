@@ -1,11 +1,10 @@
-[variadic] tests/declared/function-ptr-with-ghost.i:4: 
-  Declaration of variadic function va_f.
-[variadic] tests/declared/function-ptr-with-ghost.i:2: 
+[variadic] function-ptr-with-ghost.i:4: Declaration of variadic function va_f.
+[variadic] function-ptr-with-ghost.i:2: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[kernel:annot:missing-spec] tests/declared/function-ptr-with-ghost.i:2: Warning: 
+[kernel:annot:missing-spec] function-ptr-with-ghost.i:2: Warning: 
   Neither code nor specification for function va_f, generating default assigns from the prototype
 [eva] using specification for function va_f
 [eva] done for function main

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/abs_addr.i (no preprocessing)
+[kernel] Parsing abs_addr.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,9 +6,9 @@
   NULL[rbits 1048576 to 2097151] ∈ [--..--]
   AutoTest[0..999] ∈ {0}
 [eva] computing for function TstRomUcmm <- main.
-  Called from tests/value/abs_addr.i:46.
-[eva] tests/value/abs_addr.i:18: starting to merge loop iterations
-[eva] tests/value/abs_addr.i:32: starting to merge loop iterations
+  Called from abs_addr.i:46.
+[eva] abs_addr.i:18: starting to merge loop iterations
+[eva] abs_addr.i:32: starting to merge loop iterations
 [eva] Recording results for TstRomUcmm
 [eva] Done for function TstRomUcmm
 [eva] Recording results for main

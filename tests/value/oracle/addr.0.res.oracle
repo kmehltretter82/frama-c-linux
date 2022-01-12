@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/addr.i (no preprocessing)
+[kernel] Parsing addr.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -8,7 +8,7 @@
   p ∈ {0}
   q ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/value/addr.i:20.
+  Called from addr.i:20.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main

@@ -1,15 +1,15 @@
-[kernel] Parsing tests/rte/addsub_typedef.c (with preprocessing)
+[kernel] Parsing addsub_typedef.c (with preprocessing)
 [rte] annotating function main
-[rte] tests/rte/addsub_typedef.c:11: Warning: 
+[rte] addsub_typedef.c:11: Warning: 
   guaranteed RTE:
   assert signed_overflow: 0x7fffffff + 0x7fffffff ≤ 2147483647;
-[rte] tests/rte/addsub_typedef.c:12: Warning: 
+[rte] addsub_typedef.c:12: Warning: 
   guaranteed RTE:
   assert signed_overflow: -2147483648 ≤ (int)(-0x7fffffff) - 0x7fffffff;
-[rte] tests/rte/addsub_typedef.c:13: Warning: 
+[rte] addsub_typedef.c:13: Warning: 
   guaranteed RTE:
   assert signed_overflow: -2147483647 ≤ (int)(-0x7fffffff) - 1;
-[rte] tests/rte/addsub_typedef.c:13: Warning: 
+[rte] addsub_typedef.c:13: Warning: 
   guaranteed RTE:
   assert
   signed_overflow: -2147483648 ≤ (int)(-((int)((int)(-0x7fffffff) - 1))) - 1;

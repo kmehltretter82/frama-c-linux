@@ -16,7 +16,7 @@ int main(void)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "x == 0";
-    __gen_e_acsl_assert_data.file = "tests/constructs/typedef.i";
+    __gen_e_acsl_assert_data.file = "typedef.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 9;
     __e_acsl_assert((int)x == 0,& __gen_e_acsl_assert_data);

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/metrics/referenced-by-acsl.c (with preprocessing)
+[kernel] Parsing referenced-by-acsl.c (with preprocessing)
 [metrics] Defined functions (2)
   =====================
    f (address taken) (0 call); main (0 call); 
@@ -57,10 +57,10 @@
   Coverage estimation = 50.0% 
   
   Unreached functions (1) =
-    <tests/metrics/referenced-by-acsl.c>: f;
+    <referenced-by-acsl.c>: f;
 [metrics] References to non-analyzed functions
   ------------------------------------
-  f referenced by an ACSL specification (at tests/metrics/referenced-by-acsl.c:7)
+  f referenced by an ACSL specification (at referenced-by-acsl.c:7)
 [metrics] Statements analyzed by Eva
   --------------------------
   2 stmts in analyzed functions, 2 stmts analyzed (100.0%)

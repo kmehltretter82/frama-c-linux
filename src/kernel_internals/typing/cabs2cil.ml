@@ -3384,7 +3384,13 @@ let rec setOneInit this o preinit =
     let pMaxIdx, pArray =
       match this  with
       | NoInitPre  -> (* No initializer so far here *)
-        ref idx, ref (Array.make (max 32 (idx + 1)) NoInitPre)
+        begin
+          try
+            ref idx, ref (Array.make (max 32 (idx + 1)) NoInitPre)
+          with Invalid_argument _ | Out_of_memory ->
+            Kernel.abort ~current:true
+              "array length too large: %d" ((max 32 (idx + 1)))
+        end
 
       | CompoundPre (pMaxIdx, pArray) ->
         if !pMaxIdx < idx then begin
@@ -3763,11 +3769,11 @@ let integerArrayLength (leno: exp option) : int =
   | None -> max_int
   | Some len ->
     try lenOfArray leno
-    with LenOfArray ->
-      Kernel.fatal ~current:true
-        "Array length %a is not a compile-time constant: \
-         no explicit initializer allowed."
-        Cil_printer.pp_exp len
+    with
+    | LenOfArray cause ->
+      Kernel.abort ~current:true
+        "Array length %a is %a: no explicit initializer allowed."
+        Cil_printer.pp_exp len Cil.pp_incorrect_array_length cause
 
 let find_field_offset cond (fidlist: fieldinfo list) : offset =
   (* Depth first search for the field. This appears to be what GCC does.

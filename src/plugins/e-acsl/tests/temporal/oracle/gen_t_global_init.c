@@ -63,7 +63,7 @@ void build_tree(tree_desc *desc)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(extra)";
-    __gen_e_acsl_assert_data.file = "tests/temporal/t_global_init.c";
+    __gen_e_acsl_assert_data.file = "t_global_init.c";
     __gen_e_acsl_assert_data.fct = "build_tree";
     __gen_e_acsl_assert_data.line = 34;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -206,7 +206,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid_read(p)";
-    __gen_e_acsl_assert_data.file = "tests/temporal/t_global_init.c";
+    __gen_e_acsl_assert_data.file = "t_global_init.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 49;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -256,7 +256,7 @@ int main(int argc, char const **argv)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "RTE";
       __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(p)";
-      __gen_e_acsl_assert_data_3.file = "tests/temporal/t_global_init.c";
+      __gen_e_acsl_assert_data_3.file = "t_global_init.c";
       __gen_e_acsl_assert_data_3.fct = "main";
       __gen_e_acsl_assert_data_3.line = 50;
       __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_3);
@@ -275,7 +275,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(*p)";
-    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_global_init.c";
+    __gen_e_acsl_assert_data_2.file = "t_global_init.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 50;
     __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_2);

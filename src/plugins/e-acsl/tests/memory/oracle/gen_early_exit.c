@@ -45,7 +45,7 @@ int goto_bts(void)
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Assertion";
       __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-      __gen_e_acsl_assert_data.file = "tests/memory/early_exit.c";
+      __gen_e_acsl_assert_data.file = "early_exit.c";
       __gen_e_acsl_assert_data.fct = "goto_bts";
       __gen_e_acsl_assert_data.line = 13;
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -89,7 +89,7 @@ int goto_bts(void)
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(p)";
-    __gen_e_acsl_assert_data_2.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_2.file = "early_exit.c";
     __gen_e_acsl_assert_data_2.fct = "goto_bts";
     __gen_e_acsl_assert_data_2.line = 18;
     __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
@@ -173,7 +173,7 @@ int goto_valid(void)
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Assertion";
       __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-      __gen_e_acsl_assert_data.file = "tests/memory/early_exit.c";
+      __gen_e_acsl_assert_data.file = "early_exit.c";
       __gen_e_acsl_assert_data.fct = "goto_valid";
       __gen_e_acsl_assert_data.line = 46;
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -209,7 +209,7 @@ int goto_valid(void)
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
       __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(q)";
-      __gen_e_acsl_assert_data_2.file = "tests/memory/early_exit.c";
+      __gen_e_acsl_assert_data_2.file = "early_exit.c";
       __gen_e_acsl_assert_data_2.fct = "goto_valid";
       __gen_e_acsl_assert_data_2.line = 47;
       __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
@@ -246,7 +246,7 @@ int goto_valid(void)
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Assertion";
       __gen_e_acsl_assert_data_3.pred_txt = "!\\valid(r)";
-      __gen_e_acsl_assert_data_3.file = "tests/memory/early_exit.c";
+      __gen_e_acsl_assert_data_3.file = "early_exit.c";
       __gen_e_acsl_assert_data_3.fct = "goto_valid";
       __gen_e_acsl_assert_data_3.line = 48;
       __e_acsl_assert(! __gen_e_acsl_and_3,& __gen_e_acsl_assert_data_3);
@@ -295,7 +295,7 @@ int goto_valid(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(p)";
-    __gen_e_acsl_assert_data_4.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_4.file = "early_exit.c";
     __gen_e_acsl_assert_data_4.fct = "goto_valid";
     __gen_e_acsl_assert_data_4.line = 56;
     __e_acsl_assert(! __gen_e_acsl_and_4,& __gen_e_acsl_assert_data_4);
@@ -331,7 +331,7 @@ int goto_valid(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "!\\valid(q)";
-    __gen_e_acsl_assert_data_5.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_5.file = "early_exit.c";
     __gen_e_acsl_assert_data_5.fct = "goto_valid";
     __gen_e_acsl_assert_data_5.line = 57;
     __e_acsl_assert(! __gen_e_acsl_and_5,& __gen_e_acsl_assert_data_5);
@@ -368,7 +368,7 @@ int goto_valid(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "!\\valid(r)";
-    __gen_e_acsl_assert_data_6.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_6.file = "early_exit.c";
     __gen_e_acsl_assert_data_6.fct = "goto_valid";
     __gen_e_acsl_assert_data_6.line = 58;
     __e_acsl_assert(! __gen_e_acsl_and_6,& __gen_e_acsl_assert_data_6);
@@ -440,7 +440,7 @@ int switch_valid(void)
           __gen_e_acsl_assert_data.blocking = 1;
           __gen_e_acsl_assert_data.kind = "Assertion";
           __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-          __gen_e_acsl_assert_data.file = "tests/memory/early_exit.c";
+          __gen_e_acsl_assert_data.file = "early_exit.c";
           __gen_e_acsl_assert_data.fct = "switch_valid";
           __gen_e_acsl_assert_data.line = 76;
           __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -477,7 +477,7 @@ int switch_valid(void)
           __gen_e_acsl_assert_data_2.blocking = 1;
           __gen_e_acsl_assert_data_2.kind = "Assertion";
           __gen_e_acsl_assert_data_2.pred_txt = "\\valid(q)";
-          __gen_e_acsl_assert_data_2.file = "tests/memory/early_exit.c";
+          __gen_e_acsl_assert_data_2.file = "early_exit.c";
           __gen_e_acsl_assert_data_2.fct = "switch_valid";
           __gen_e_acsl_assert_data_2.line = 77;
           __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
@@ -514,7 +514,7 @@ int switch_valid(void)
           __gen_e_acsl_assert_data_3.blocking = 1;
           __gen_e_acsl_assert_data_3.kind = "Assertion";
           __gen_e_acsl_assert_data_3.pred_txt = "\\valid(s)";
-          __gen_e_acsl_assert_data_3.file = "tests/memory/early_exit.c";
+          __gen_e_acsl_assert_data_3.file = "early_exit.c";
           __gen_e_acsl_assert_data_3.fct = "switch_valid";
           __gen_e_acsl_assert_data_3.line = 78;
           __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_3);
@@ -565,7 +565,7 @@ int switch_valid(void)
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(q)";
-    __gen_e_acsl_assert_data_4.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_4.file = "early_exit.c";
     __gen_e_acsl_assert_data_4.fct = "switch_valid";
     __gen_e_acsl_assert_data_4.line = 87;
     __e_acsl_assert(! __gen_e_acsl_and_4,& __gen_e_acsl_assert_data_4);
@@ -602,7 +602,7 @@ int switch_valid(void)
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
     __gen_e_acsl_assert_data_5.pred_txt = "!\\valid(p)";
-    __gen_e_acsl_assert_data_5.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_5.file = "early_exit.c";
     __gen_e_acsl_assert_data_5.fct = "switch_valid";
     __gen_e_acsl_assert_data_5.line = 88;
     __e_acsl_assert(! __gen_e_acsl_and_5,& __gen_e_acsl_assert_data_5);
@@ -639,7 +639,7 @@ int switch_valid(void)
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "\\valid(s)";
-    __gen_e_acsl_assert_data_6.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_6.file = "early_exit.c";
     __gen_e_acsl_assert_data_6.fct = "switch_valid";
     __gen_e_acsl_assert_data_6.line = 89;
     __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_6);
@@ -715,7 +715,7 @@ int while_valid(void)
             __gen_e_acsl_assert_data.blocking = 1;
             __gen_e_acsl_assert_data.kind = "Assertion";
             __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-            __gen_e_acsl_assert_data.file = "tests/memory/early_exit.c";
+            __gen_e_acsl_assert_data.file = "early_exit.c";
             __gen_e_acsl_assert_data.fct = "while_valid";
             __gen_e_acsl_assert_data.line = 108;
             __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -753,7 +753,7 @@ int while_valid(void)
             __gen_e_acsl_assert_data_2.blocking = 1;
             __gen_e_acsl_assert_data_2.kind = "Assertion";
             __gen_e_acsl_assert_data_2.pred_txt = "\\valid(q)";
-            __gen_e_acsl_assert_data_2.file = "tests/memory/early_exit.c";
+            __gen_e_acsl_assert_data_2.file = "early_exit.c";
             __gen_e_acsl_assert_data_2.fct = "while_valid";
             __gen_e_acsl_assert_data_2.line = 109;
             __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
@@ -791,7 +791,7 @@ int while_valid(void)
             __gen_e_acsl_assert_data_3.blocking = 1;
             __gen_e_acsl_assert_data_3.kind = "Assertion";
             __gen_e_acsl_assert_data_3.pred_txt = "\\valid(r)";
-            __gen_e_acsl_assert_data_3.file = "tests/memory/early_exit.c";
+            __gen_e_acsl_assert_data_3.file = "early_exit.c";
             __gen_e_acsl_assert_data_3.fct = "while_valid";
             __gen_e_acsl_assert_data_3.line = 110;
             __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_3);
@@ -838,7 +838,7 @@ int while_valid(void)
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Assertion";
       __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(p)";
-      __gen_e_acsl_assert_data_4.file = "tests/memory/early_exit.c";
+      __gen_e_acsl_assert_data_4.file = "early_exit.c";
       __gen_e_acsl_assert_data_4.fct = "while_valid";
       __gen_e_acsl_assert_data_4.line = 116;
       __e_acsl_assert(! __gen_e_acsl_and_4,& __gen_e_acsl_assert_data_4);
@@ -875,7 +875,7 @@ int while_valid(void)
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "Assertion";
       __gen_e_acsl_assert_data_5.pred_txt = "!\\valid(q)";
-      __gen_e_acsl_assert_data_5.file = "tests/memory/early_exit.c";
+      __gen_e_acsl_assert_data_5.file = "early_exit.c";
       __gen_e_acsl_assert_data_5.fct = "while_valid";
       __gen_e_acsl_assert_data_5.line = 117;
       __e_acsl_assert(! __gen_e_acsl_and_5,& __gen_e_acsl_assert_data_5);
@@ -912,7 +912,7 @@ int while_valid(void)
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "Assertion";
       __gen_e_acsl_assert_data_6.pred_txt = "\\valid(r)";
-      __gen_e_acsl_assert_data_6.file = "tests/memory/early_exit.c";
+      __gen_e_acsl_assert_data_6.file = "early_exit.c";
       __gen_e_acsl_assert_data_6.fct = "while_valid";
       __gen_e_acsl_assert_data_6.line = 118;
       __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_6);
@@ -972,7 +972,7 @@ void continue_valid(void)
         __gen_e_acsl_assert_data.blocking = 1;
         __gen_e_acsl_assert_data.kind = "Assertion";
         __gen_e_acsl_assert_data.pred_txt = "!\\valid(p)";
-        __gen_e_acsl_assert_data.file = "tests/memory/early_exit.c";
+        __gen_e_acsl_assert_data.file = "early_exit.c";
         __gen_e_acsl_assert_data.fct = "continue_valid";
         __gen_e_acsl_assert_data.line = 130;
         __e_acsl_assert(! __gen_e_acsl_and,& __gen_e_acsl_assert_data);
@@ -1009,7 +1009,7 @@ void continue_valid(void)
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "Assertion";
         __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(q)";
-        __gen_e_acsl_assert_data_2.file = "tests/memory/early_exit.c";
+        __gen_e_acsl_assert_data_2.file = "early_exit.c";
         __gen_e_acsl_assert_data_2.fct = "continue_valid";
         __gen_e_acsl_assert_data_2.line = 131;
         __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
@@ -1051,7 +1051,7 @@ void continue_valid(void)
         __gen_e_acsl_assert_data_3.blocking = 1;
         __gen_e_acsl_assert_data_3.kind = "Assertion";
         __gen_e_acsl_assert_data_3.pred_txt = "\\valid(p)";
-        __gen_e_acsl_assert_data_3.file = "tests/memory/early_exit.c";
+        __gen_e_acsl_assert_data_3.file = "early_exit.c";
         __gen_e_acsl_assert_data_3.fct = "continue_valid";
         __gen_e_acsl_assert_data_3.line = 135;
         __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_3);
@@ -1088,7 +1088,7 @@ void continue_valid(void)
         __gen_e_acsl_assert_data_4.blocking = 1;
         __gen_e_acsl_assert_data_4.kind = "Assertion";
         __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(q)";
-        __gen_e_acsl_assert_data_4.file = "tests/memory/early_exit.c";
+        __gen_e_acsl_assert_data_4.file = "early_exit.c";
         __gen_e_acsl_assert_data_4.fct = "continue_valid";
         __gen_e_acsl_assert_data_4.line = 136;
         __e_acsl_assert(! __gen_e_acsl_and_4,& __gen_e_acsl_assert_data_4);
@@ -1131,7 +1131,7 @@ void continue_valid(void)
           __gen_e_acsl_assert_data_5.blocking = 1;
           __gen_e_acsl_assert_data_5.kind = "Assertion";
           __gen_e_acsl_assert_data_5.pred_txt = "\\valid(p)";
-          __gen_e_acsl_assert_data_5.file = "tests/memory/early_exit.c";
+          __gen_e_acsl_assert_data_5.file = "early_exit.c";
           __gen_e_acsl_assert_data_5.fct = "continue_valid";
           __gen_e_acsl_assert_data_5.line = 141;
           __e_acsl_assert(__gen_e_acsl_and_5,& __gen_e_acsl_assert_data_5);
@@ -1168,7 +1168,7 @@ void continue_valid(void)
           __gen_e_acsl_assert_data_6.blocking = 1;
           __gen_e_acsl_assert_data_6.kind = "Assertion";
           __gen_e_acsl_assert_data_6.pred_txt = "\\valid(q)";
-          __gen_e_acsl_assert_data_6.file = "tests/memory/early_exit.c";
+          __gen_e_acsl_assert_data_6.file = "early_exit.c";
           __gen_e_acsl_assert_data_6.fct = "continue_valid";
           __gen_e_acsl_assert_data_6.line = 142;
           __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_6);
@@ -1217,7 +1217,7 @@ void continue_valid(void)
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
     __gen_e_acsl_assert_data_7.pred_txt = "!\\valid(p)";
-    __gen_e_acsl_assert_data_7.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_7.file = "early_exit.c";
     __gen_e_acsl_assert_data_7.fct = "continue_valid";
     __gen_e_acsl_assert_data_7.line = 150;
     __e_acsl_assert(! __gen_e_acsl_and_7,& __gen_e_acsl_assert_data_7);
@@ -1254,7 +1254,7 @@ void continue_valid(void)
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
     __gen_e_acsl_assert_data_8.pred_txt = "!\\valid(q)";
-    __gen_e_acsl_assert_data_8.file = "tests/memory/early_exit.c";
+    __gen_e_acsl_assert_data_8.file = "early_exit.c";
     __gen_e_acsl_assert_data_8.fct = "continue_valid";
     __gen_e_acsl_assert_data_8.line = 151;
     __e_acsl_assert(! __gen_e_acsl_and_8,& __gen_e_acsl_assert_data_8);

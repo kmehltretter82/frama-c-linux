@@ -175,7 +175,7 @@ let get_default_env_of_int var value =
    1 -> apply a filter (about pathname) to prepare oracles
    2 -> run tests from result directories (except make command)
 *)
-let dune_mode = ref (get_default_env_of_int "PTEST_DUNE_MODE" 0)
+let dune_mode = ref (get_default_env_of_int "PTEST_DUNE_MODE" 2)
 
 (** the name of the directory-wide configuration file*)
 let dir_config_file = "test_config"
