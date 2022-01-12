@@ -246,14 +246,29 @@ let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
 (* Hooks independent from cmdline ordering *)
 (**************************************************************************)
 
+
+
+let warn_if_another_compiler_builtin name =
+  try
+    let bt = Cil_builtins.Builtin_templates.find name in
+    let compiler = Option.get bt.compiler in
+    Kernel.warning ~wkey:Kernel.wkey_implicit_function_declaration
+      ~current:true ~once:true
+      "%s is a compiler builtin, %s" name
+      (Cil.allowed_machdep (Cil_builtins.string_of_compiler compiler));
+    true
+  with Not_found -> false
+
 (* This hook cannot be registered directly in Kernel or Cabs2cil, as it
    depends on Ast_info *)
 let on_call_to_undeclared_function vi =
   let name = vi.Cil_types.vname in
-  if not (Ast_info.is_frama_c_builtin name) then
-    Kernel.warning ~wkey:Kernel.wkey_implicit_function_declaration
-      ~current:true ~once:true
-      "Calling undeclared function %s. Old style K&R code?" name
+  if not (Ast_info.is_frama_c_builtin name) then begin
+    if not (warn_if_another_compiler_builtin name) then
+      Kernel.warning ~wkey:Kernel.wkey_implicit_function_declaration
+        ~current:true ~once:true
+        "Calling undeclared function %s. Old style K&R code?" name
+  end
 
 let () =
   Cabs2cil.register_implicit_prototype_hook on_call_to_undeclared_function
