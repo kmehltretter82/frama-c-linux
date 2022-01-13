@@ -1,5 +1,5 @@
 [kernel] Parsing addsub_unsigned_typedef.c (with preprocessing)
-[rte] annotating function main
+[rte:annot] annotating function main
 [rte] addsub_unsigned_typedef.c:14: Warning: 
   guaranteed RTE:
   assert unsigned_overflow: 0x80000000U + 0x80000000U ≤ 4294967295;

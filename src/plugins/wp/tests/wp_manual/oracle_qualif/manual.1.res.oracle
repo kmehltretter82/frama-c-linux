@@ -3,7 +3,7 @@
 [kernel] Parsing working_dir/swap.c (with preprocessing)
 [kernel] Parsing working_dir/swap2.h (with preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function swap
+[rte:annot] annotating function swap
 [wp] 8 goals scheduled
 [wp] [Alt-Ergo] Goal typed_swap_ensures_A : Valid
 [wp] [Qed] Goal typed_swap_ensures_B : Valid

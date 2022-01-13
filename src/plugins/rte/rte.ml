@@ -305,7 +305,8 @@ let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, r
   let size = Cil.bitsSizeOf t in
   if size <> Cil.bitsSizeOf (Cil.typeOf lexp) then
     (* size of result type should be size of left (promoted) operand *)
-    Options.warn "problem with bitsSize of %a: not treated" Printer.pp_exp exp;
+    Options.warning ~current:true ~once:true
+      "problem with bitsSize of %a: not treated" Printer.pp_exp exp;
   if op = Shiftlt then
     (* compute greatest representable "size bits" (signed) integer *)
     let maxValResult =

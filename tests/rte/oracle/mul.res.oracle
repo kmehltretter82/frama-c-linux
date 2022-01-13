@@ -1,5 +1,5 @@
 [kernel] Parsing mul.c (with preprocessing)
-[rte] annotating function main
+[rte:annot] annotating function main
 [rte] mul.c:22: Warning: 
   guaranteed RTE: assert signed_overflow: 0xffff * 0xffff ≤ 2147483647;
 [rte] mul.c:25: Warning: 

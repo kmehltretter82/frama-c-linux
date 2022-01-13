@@ -1,8 +1,8 @@
 # frama-c -wp -wp-rte [...]
 [kernel] Parsing chunk_typing_usable.i (no preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function usable_axiom
-[rte] annotating function usable_lemma
+[rte:annot] annotating function usable_axiom
+[rte:annot] annotating function usable_lemma
 [wp] 3 goals scheduled
 ---------------------------------------------
 --- Context 'typed_usable_lemma' Cluster 'Chunk' 

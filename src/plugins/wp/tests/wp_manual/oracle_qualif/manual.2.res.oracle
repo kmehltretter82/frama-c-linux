@@ -1,5 +1,5 @@
 # frama-c -wp -wp-rte [...]
-[rte] annotating function swap
+[rte:annot] annotating function swap
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   swap                      5        3        8       100%

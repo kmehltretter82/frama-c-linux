@@ -1,13 +1,13 @@
 [kernel] Warning: -slevel is a deprecated alias for option -eva-slevel.
   Please use -eva-slevel instead.
 [kernel] Parsing summary.i (no preprocessing)
-[rte] annotating function alarms
-[rte] annotating function bottom
+[rte:annot] annotating function alarms
+[rte:annot] annotating function bottom
 [rte] summary.i:15: Warning: guaranteed RTE: assert division_by_zero: 0 ≢ 0;
-[rte] annotating function dead
-[rte] annotating function logic
-[rte] annotating function main
-[rte] annotating function minimal
+[rte:annot] annotating function dead
+[rte:annot] annotating function logic
+[rte:annot] annotating function main
+[rte:annot] annotating function minimal
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

@@ -471,12 +471,13 @@ let annotate ?flags kf =
        comp Finite_float.accessor flags.finite_float |||
        comp Bool_value.accessor flags.bool_value
     then begin
-      Options.feedback "annotating function %a" Kernel_function.pretty kf;
+      Options.feedback ~dkey:Options.dkey_annot
+        "annotating function %a" Kernel_function.pretty kf;
       let warn = Options.Warn.get () in
       let on_alarm stmt ~invalid alarm =
         let ca, _ = register Generator.emitter kf stmt ~invalid alarm in
         if warn && invalid then
-          Options.warn "@[guaranteed RTE:@ %a@]"
+          Options.warning ~current:true ~once:true "@[guaranteed RTE:@ %a@]"
             Printer.pp_code_annotation ca
       in
       let vis = new annot_visitor kf flags on_alarm in

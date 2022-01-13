@@ -1,5 +1,5 @@
 [kernel] Parsing shift_unsigned.c (with preprocessing)
-[rte] annotating function main
+[rte:annot] annotating function main
 [rte] shift_unsigned.c:10: Warning: 
   guaranteed RTE: assert unsigned_overflow: 0x10000000U << 4 ≤ 4294967295;
 [rte] shift_unsigned.c:11: Warning: 
