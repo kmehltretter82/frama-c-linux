@@ -361,6 +361,15 @@ let rec is_same_list f l l' env =
     f h h' env && is_same_list f t t' env
   | _ -> false
 
+let is_same_unop o o' =
+  match o,o' with
+  | Neg, Neg -> true
+  | BNot, BNot -> true
+  | LNot, LNot -> true
+  | (Neg | BNot | LNot), _ -> false
+
+let is_same_binop _b _b' = false
+
 let rec is_same_type t t' env =
   match t, t' with
   | (TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _), _ ->
@@ -432,7 +441,27 @@ and is_same_local_init i i' env =
     end else `Body_changed
   | (AssignInit _| ConsInit _), _ -> `Body_changed
 
-and is_same_exp _e _e' _env = false
+and is_same_exp e e' env =
+  match e.enode, e'.enode with
+  | Const c, Const c' -> Cil_datatype.Constant.equal c c'
+  | Lval lv, Lval lv' -> is_same_lval lv lv' env
+  | SizeOf t, SizeOf t' -> is_same_type t t' env
+  | SizeOfE e, SizeOfE e' -> is_same_exp e e' env
+  | SizeOfStr s, SizeOfStr s' -> String.length s = String.length s'
+  | AlignOf t, AlignOf t' -> is_same_type t t' env
+  | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
+  | UnOp(op,e,t), UnOp(op',e',t') ->
+    is_same_unop op op' && is_same_exp e e' env && is_same_type t t' env
+  | BinOp(op,e1,e2,t), BinOp(op',e1',e2',t') ->
+    is_same_binop op op' && is_same_exp e1 e1' env && is_same_exp e2 e2' env
+    && is_same_type t t' env
+  | CastE(t,e), CastE(t',e') -> is_same_type t t' env && is_same_exp e e' env
+  | AddrOf lv, AddrOf lv' -> is_same_lval lv lv' env
+  | StartOf lv, StartOf lv' -> is_same_lval lv lv' env
+  | Info _, Info _ -> false (* should be removed from AST anyway *)
+  | (Const _ | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+    | AlignOfE _ | UnOp _ | BinOp _  | CastE _ | AddrOf _ | StartOf _
+    | Info _), _ -> false
 
 and is_same_lval (_h,_o) (_h',_o') _env = false
 
