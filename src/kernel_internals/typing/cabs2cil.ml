@@ -4020,7 +4020,8 @@ struct
     Pretty_utils.ksfprintf (fun e -> raise (LogicTypeError (loc,e))) msg
 
   let on_error f rollback x =
-    try f x with LogicTypeError _ as exn -> rollback(); raise exn
+    try f x with
+    | LogicTypeError (loc,e) as exn -> rollback (loc,e); raise exn
 
 end
 

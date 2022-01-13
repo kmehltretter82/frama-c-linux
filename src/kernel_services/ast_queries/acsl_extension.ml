@@ -152,7 +152,7 @@ module Extensions = struct
     let status = ext_info.status in
     let typer =  ext_info.typer in
     let normal_error = ref false in
-    let has_error () = normal_error := true in
+    let has_error _ = normal_error := true in
     let wrapper =
       typing_context.on_error (typer typing_context loc) has_error
     in
@@ -168,7 +168,7 @@ module Extensions = struct
     let status = ext_info.status in
     let typer =  ext_info.typer in
     let normal_error = ref false in
-    let has_error () = normal_error := true in
+    let has_error _ = normal_error := true in
     let wrapper =
       typing_context.on_error (typer typing_context loc) has_error
     in

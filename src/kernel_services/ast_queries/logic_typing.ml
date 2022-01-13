@@ -482,7 +482,6 @@ module Type_namespace =
     let hash : t -> int = Hashtbl.hash
   end)
 
-
 type typing_context = {
   is_loop: unit -> bool;
   anonCompFieldName : string;
@@ -520,7 +519,7 @@ type typing_context = {
     Lenv.t ->
     Logic_ptree.assigns -> Cil_types.assigns;
   error: 'a 'b. location -> ('a,formatter,unit,'b) format4 -> 'a;
-  on_error: 'a 'b. ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
+  on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
 }
 
 module Extensions = struct
@@ -656,7 +655,7 @@ module Make
        val find_logic_ctor: string -> logic_ctor_info
        val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
        val error: location -> ('a,formatter,unit, 'b) format4 -> 'a
-       val on_error: ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
+       val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
      end) =
 struct
 
@@ -4305,7 +4304,7 @@ struct
     let res = annot false a in
     finish_transaction (); res
 
-  let annot = C.on_error annot rollback_transaction
+  let annot = C.on_error annot (fun _ -> rollback_transaction ())
 
 end
 
