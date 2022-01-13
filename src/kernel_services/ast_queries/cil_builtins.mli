@@ -112,6 +112,10 @@ module Builtin_templates :
   State_builder.Hashtbl with type key = string
                          and type data = builtin_template
 
+module Gcc_builtin_templates_loaded : State_builder.Ref with type data = bool
+
+val init_gcc_builtin_templates : unit -> unit
+
 (** Register a new builtin. The function will be called after setting
     the machdep and initializing machine-dependent builtins. Hence, types
     such {!Cil.uint16_t} might be used if needed.

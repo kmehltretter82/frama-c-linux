@@ -182,6 +182,15 @@ module Builtin_templates =
       let size = 200
     end)
 
+module Gcc_builtin_templates_loaded =
+  State_builder.Ref
+    (Datatype.Bool)
+    (struct
+      let name = "Cil_builtins.Gcc_builtin_templates_loaded"
+      let dependencies = [ Builtin_templates.self ]
+      let default () = false
+    end)
+
 (* An actual instance of a builtin_template, with actual types. *)
 type builtin = {
   name: string;
@@ -202,20 +211,20 @@ struct
     let json = Json.from_file fp in
     member "data" json
 
-  let init_builtin_templates () =
-    let fp =
-      Datatype.Filepath.concat ~existence:Filepath.Must_exist
-        Fc_config.datadir "compliance/compiler_builtins.json"
-    in
+  let init_builtin_templates ?default_compiler fp =
     let json = parse fp in
     List.iter (fun (name, entry) ->
         let compiler =
-          entry |> member "compiler" |> to_string_option |>
-          Option.map to_compiler
+          if default_compiler <> None then default_compiler
+          else
+            entry |> member "compiler" |> to_string_option |>
+            Option.map to_compiler
         in
         let rettype = entry |> member "rettype" |> to_string in
         let args = entry |> member "args" |> to_list |> List.map to_string in
-        let variadic = entry |> member "variadic" |> to_bool in
+        let variadic =
+          entry |> member "variadic" |> to_bool_option |> Option.is_some
+        in
         let types =
           match entry |> member "types" with
           | `Null -> None
@@ -310,9 +319,9 @@ let build_type_table () : (string, typ option) Hashtbl.t =
 
 let parse_type ?(template="") type_table s =
   try
-    if Extlib.string_prefix "type" s then
-      (* replace 'type' (always at the beginning) with the template *)
-      let typ = template ^ (String.sub s 4 (String.length s - 4)) in
+    if String.get s 0 == 'T' then
+      (* replace 'T' (always at the beginning) with the template *)
+      let typ = template ^ (String.sub s 1 (String.length s - 1)) in
       Hashtbl.find type_table typ
     else
       Hashtbl.find type_table s
@@ -405,8 +414,26 @@ let instantiate_available_templates type_table name (entry : builtin_template) =
   | None ->
     make_builtin_as_list name
 
-let init_builtins () =
-  Json.init_builtin_templates ();
+let init_gcc_builtin_templates () =
+  let fp =
+    Datatype.Filepath.concat ~existence:Filepath.Must_exist
+      Fc_config.datadir "compliance/gcc_builtins.json"
+  in
+  Json.init_builtin_templates ~default_compiler:GCC fp;
+  Gcc_builtin_templates_loaded.set true
+
+let init_other_builtin_templates () =
+  let fp =
+    Datatype.Filepath.concat ~existence:Filepath.Must_exist
+      Fc_config.datadir "compliance/compiler_builtins.json"
+  in
+  Json.init_builtin_templates fp
+
+let init_builtins_from_json () =
+  (* For performance reasons, we avoid loading GCC builtins unless we are
+     using a GCC machdep *)
+  if Cil.gccMode () then init_gcc_builtin_templates ();
+  init_other_builtin_templates ();
   let type_table = build_type_table () in
   Builtin_templates.iter (fun name entry ->
       (* In the JSON file, each entry is possibly a template for
@@ -420,7 +447,7 @@ let init_builtins () =
     Kernel.fatal ~current:true "You must call initCIL before init_builtins" ;
   if Builtin_functions.length () <> 0 then
     Kernel.fatal ~current:true "Cil builtins already initialized." ;
-  init_builtins ();
+  init_builtins_from_json ();
   Queue.iter (fun f -> register_custom_builtin (f())) custom_builtins
 
 (** This is used as the location of the prototypes of builtin functions. *)

@@ -246,10 +246,12 @@ let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
 (* Hooks independent from cmdline ordering *)
 (**************************************************************************)
 
-
-
 let warn_if_another_compiler_builtin name =
   try
+    (* Before warning, we must make sure the builtins from other compilers
+       are loaded. *)
+    if not (Cil_builtins.Gcc_builtin_templates_loaded.get ()) then
+      Cil_builtins.init_gcc_builtin_templates ();
     let bt = Cil_builtins.Builtin_templates.find name in
     let compiler = Option.get bt.compiler in
     Kernel.warning ~wkey:Kernel.wkey_implicit_function_declaration

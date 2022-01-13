@@ -292,6 +292,7 @@ DISTRIB_FILES:=\
       share/compliance/c11_functions.json                               \
       share/compliance/c11_headers.json                                 \
       share/compliance/compiler_builtins.json                           \
+      share/compliance/gcc_builtins.json                                \
       share/compliance/glibc_functions.json                             \
       share/compliance/nonstandard_identifiers.json                     \
       share/compliance/posix_identifiers.json                           \
@@ -2009,6 +2010,7 @@ install:: install-lib-$(OCAMLBEST)
 	$(CP) share/compliance/c11_functions.json \
 	  share/compliance/c11_headers.json \
 	  share/compliance/compiler_builtins.json \
+	  share/compliance/gcc_builtins.json \
 	  share/compliance/glibc_functions.json \
 	  share/compliance/nonstandard_identifiers.json \
 	  share/compliance/posix_identifiers.json \
