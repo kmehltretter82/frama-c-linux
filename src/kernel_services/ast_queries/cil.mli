@@ -1015,28 +1015,6 @@ val stripTermCasts: term -> term
     "(A)(B)(x + (C)y)", but leave the (C) cast. *)
 val stripCasts: exp -> exp
 
-(** Removes info wrappers and return underlying expression *)
-val stripInfo: exp -> exp
-
-(** Removes casts and info wrappers and return underlying expression *)
-val stripCastsAndInfo: exp -> exp
-
-(** Removes casts and info wrappers,except last info wrapper, and return
-    underlying expression *)
-val stripCastsButLastInfo: exp -> exp
-
-(** Extracts term information in an expression information *)
-val exp_info_of_term: term -> exp_info
-
-(** Constructs a term from a term node and an expression information *)
-val term_of_exp_info: location -> term_node -> exp_info -> term
-
-(** Map some function on underlying expression if Info or else on expression *)
-val map_under_info: (exp -> exp) -> exp -> exp
-
-(** Apply some function on underlying expression if Info or else on expression *)
-val app_under_info: (exp -> unit) -> exp -> unit
-
 val typeOf: exp -> typ
 (** Compute the type of an expression. *)
 

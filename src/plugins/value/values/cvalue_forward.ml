@@ -376,8 +376,7 @@ let forward_minus_pp ~typ ev1 ev2 =
    The function must behave as if it was acting on unbounded integers *)
 let forward_binop_int ~typ ev1 op ev2 =
   match op with
-  | PlusPI
-  | IndexPI -> V.add_untyped (Bit_utils.osizeof_pointed typ) ev1 ev2
+  | PlusPI  -> V.add_untyped (Bit_utils.osizeof_pointed typ) ev1 ev2
   | MinusPI ->
     let int_base = Int_Base.neg (Bit_utils.osizeof_pointed typ) in
     V.add_untyped int_base ev1 ev2

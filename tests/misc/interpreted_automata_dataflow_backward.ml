@@ -10,7 +10,7 @@ struct
 
   let pretty fmt v =
     Pretty_utils.pp_iter ~sep:",@ " Set.iter Cil_datatype.Varinfo.pretty fmt v
-      
+
   let join v1 v2 =
     Set.union v1 v2
 
@@ -27,7 +27,7 @@ struct
     | AlignOf _ | AlignOfE _
     | AddrOf _ | StartOf _ ->
       Set.empty
-    | UnOp (_, e, _) | CastE (_,e) | Info (e,_) ->
+    | UnOp (_, e, _) | CastE (_,e) ->
       vars e
     | BinOp (_, e1, e2, _) ->
       Set.union (vars e1) (vars e2)
@@ -37,7 +37,7 @@ struct
   let transfer t v =
     let open Interpreted_automata in
     let r = match t with
-    | Skip | Prop _ | Leave _ | Return (None,_) -> 
+    | Skip | Prop _ | Leave _ | Return (None,_) ->
       v (* Nothing to do *)
     | Enter b ->
       Set.diff v (Set.of_list b.blocals) (* If unconditionnaly initialized, they should not be there *)

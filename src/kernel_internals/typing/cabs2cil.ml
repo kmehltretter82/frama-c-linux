@@ -208,7 +208,7 @@ let rec is_dangerous_offset = function
 
 let rec is_dangerous e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv -> is_dangerous_lval lv
-  | UnOp (_,e,_) | CastE(_,e) | Info(e,_) -> is_dangerous e
+  | UnOp (_,e,_) | CastE(_,e) -> is_dangerous e
   | BinOp(_,e1,e2,_) -> is_dangerous e1 || is_dangerous e2
   | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
     false
@@ -1379,12 +1379,12 @@ let rec is_boolean_result e =
      | None -> false)
   | CastE (_,e) -> is_boolean_result e
   | BinOp((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr),_,_,_) -> true
-  | BinOp((PlusA | PlusPI | IndexPI | MinusA | MinusPI | MinusPP | Mult
+  | BinOp((PlusA | PlusPI | MinusA | MinusPI | MinusPP | Mult
           | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr),_,_,_) -> false
   | UnOp(LNot,_,_) -> true
   | UnOp ((Neg | BNot),_,_) -> false
   | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-  | AlignOfE _ | AddrOf _ | StartOf _ | Info _ -> false
+  | AlignOfE _ | AddrOf _ | StartOf _ -> false
 
 (* Like Cil.mkCastT, but it calls typeForInsertedCast *)
 let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
@@ -5919,7 +5919,7 @@ and doExp local_env
             addOffsetLval (Index(e2'', NoOffset)) array
           | _ -> (* Turn into *(e1 + e2) *)
             mkMem
-              (new_exp ~loc:e1''.eloc (BinOp(IndexPI, e1'', e2'', t1)))
+              (new_exp ~loc:e1''.eloc (BinOp(PlusPI, e1'', e2'', t1)))
               NoOffset
         in
         (* Do some optimization of StartOf *)

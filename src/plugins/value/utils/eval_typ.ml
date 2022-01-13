@@ -138,7 +138,7 @@ let compatible_functions typ_pointer ?args kfs =
 let rec expr_contains_volatile expr =
   let rec aux expr = match expr.enode with
     | Lval lval -> lval_contains_volatile lval
-    | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> aux e
+    | UnOp (_, e, _) | CastE (_, e) -> aux e
     | AddrOf lv | StartOf lv -> lval_contains_volatile lv
     | BinOp (_, e1, e2, _) -> aux e1 || aux e2
     | _ -> false

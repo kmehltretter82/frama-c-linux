@@ -417,7 +417,7 @@ struct
     | Mult -> arith env (L.apply e_mul) (L.apply F.e_mul) a b
     | Div -> arith env (L.apply e_div) (L.apply F.e_div) a b
     | Mod -> L.apply e_mod (C.logic env a) (C.logic env b)
-    | PlusPI | IndexPI ->
+    | PlusPI ->
         let va = C.logic env a in
         let vb = C.logic env b in
         let te = Logic_typing.ctype_of_pointed a.term_type in

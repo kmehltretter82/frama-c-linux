@@ -265,7 +265,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   | PlusA, TFloat (fk, _) ->  backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Add
   | MinusA, TFloat (fk, _) -> backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Sub
 
-  | (PlusPI | IndexPI), TPtr _ -> backward_add_ptr typ ~res_value ~v1 ~v2 true
+  | PlusPI, TPtr _ -> backward_add_ptr typ ~res_value ~v1 ~v2 true
   | MinusPI, TPtr _ ->            backward_add_ptr typ ~res_value ~v1 ~v2 false
 
   | MinusPP, TInt _ ->

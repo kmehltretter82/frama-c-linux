@@ -46,7 +46,7 @@ let check_annot kf _ (a: identified_predicate) =
         warn typ vi t.term_loc
       | _ -> ()
     end
-    | TBinOp ((PlusPI | MinusPI | IndexPI),
+    | TBinOp ((PlusPI | MinusPI),
               ({term_node = TLval (TVar lvi, _)} |
                   {term_node = TCastE (_, {term_node = TLval (TVar lvi, _)})}),
               _)

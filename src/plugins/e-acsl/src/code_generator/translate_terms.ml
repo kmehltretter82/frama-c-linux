@@ -694,7 +694,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
       e, adata, env, Typed_number.C_number, ""
     end
-  | TBinOp(PlusPI | IndexPI | MinusPI as bop, t1, t2) ->
+  | TBinOp(PlusPI | MinusPI as bop, t1, t2) ->
     if Misc.is_set_of_ptr_or_array t1.term_type ||
        Misc.is_set_of_ptr_or_array t2.term_type then
       (* case of arithmetic over set of pointers (due to use of ranges)

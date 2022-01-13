@@ -33,7 +33,7 @@ val type_rel: Logic_ptree.relation -> Cil_types.relation
 
 (** Arithmetic binop conversion. Addition and Subtraction are always
     considered as being used on integers. It is the responsibility of the
-    user to introduce PlusPI/IndexPI, MinusPI and MinusPP where needed.
+    user to introduce PlusPI, MinusPI and MinusPP where needed.
     @since Nitrogen-20111001
 *)
 val type_binop: Logic_ptree.binop -> Cil_types.binop

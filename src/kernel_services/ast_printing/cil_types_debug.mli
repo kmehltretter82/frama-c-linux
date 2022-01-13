@@ -86,7 +86,6 @@ val pp_varinfo : Cil_types.varinfo Pretty_utils.formatter
 val pp_storage : Format.formatter -> Cil_types.storage -> unit
 val pp_exp : Cil_types.exp Pretty_utils.formatter
 val pp_exp_node : Format.formatter -> Cil_types.exp_node -> unit
-val pp_exp_info : Format.formatter -> Cil_types.exp_info -> unit
 val pp_constant : Format.formatter -> Cil_types.constant -> unit
 val pp_unop : Format.formatter -> Cil_types.unop -> unit
 val pp_binop : Format.formatter -> Cil_types.binop -> unit

@@ -219,13 +219,13 @@ module rec Transfer
       (match lv with
        | Var vi, _ -> Some vi
        | Mem e, _ -> base_addr e)
-    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) ->
+    | BinOp((PlusPI | MinusPI), e1, e2, _) ->
       if is_ptr_or_array_exp e1 then base_addr e1
       else begin
         assert (is_ptr_or_array_exp e2);
         base_addr e2
       end
-    | Info(e, _) | CastE(_, e) -> base_addr e
+    | CastE(_, e) -> base_addr e
     | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt
             | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
             _, _, _)
@@ -271,13 +271,13 @@ module rec Transfer
     | AddrOf(lhost, _) ->
       extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
       true
-    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) ->
+    | BinOp((PlusPI | MinusPI), e1, e2, _) ->
       if is_ptr_or_array_exp e1 then extend_from_addr state lv e1
       else begin
         assert (is_ptr_or_array_exp e2);
         extend_from_addr state lv e2
       end
-    | CastE(_, e) | Info(e, _) -> extend_from_addr state lv e
+    | CastE(_, e) -> extend_from_addr state lv e
     | _ -> state, false
 
   let handle_assignment state (lhost, _ as lv) e =
@@ -312,7 +312,7 @@ module rec Transfer
     | Tif(_, t1, t2) ->
       let varinfos = register_term kf varinfos t1 in
       register_term kf varinfos t2
-    | TBinOp((PlusPI | IndexPI | MinusPI), t1, t2) ->
+    | TBinOp((PlusPI | MinusPI), t1, t2) ->
       (match t1.term_type with
        | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t1
        | _ ->
@@ -765,12 +765,12 @@ let rec apply_on_vi_base_from_lval f ?kf ?stmt = function
 and apply_on_vi_base_from_exp f ?kf ?stmt e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv ->
     apply_on_vi_base_from_lval f ?kf ?stmt lv
-  | BinOp((PlusPI | IndexPI | MinusPI), e1, _, _) ->
+  | BinOp((PlusPI | MinusPI), e1, _, _) ->
     apply_on_vi_base_from_exp f ?kf ?stmt e1
   | BinOp(MinusPP, e1, e2, _) ->
     apply_on_vi_base_from_exp f ?kf ?stmt e1
     || apply_on_vi_base_from_exp f ?kf ?stmt e2
-  | Info(e, _) | CastE(_, e) -> apply_on_vi_base_from_exp f ?kf ?stmt e
+  | CastE(_, e) -> apply_on_vi_base_from_exp f ?kf ?stmt e
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt | Lt | Gt | Le
           | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr), _, _, _)
   | Const _ -> (* possible in case of static address *) false

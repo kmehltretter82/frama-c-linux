@@ -698,15 +698,6 @@ and exp_node =
       [TPtr(T)]. In C this operation is implicit, the [StartOf] operator is not
       printed. We have it in CIL because it makes the typing rules simpler. *)
 
-  | Info       of exp * exp_info
-  (** Additional information on the underlying expression *)
-
-(** Additional information on an expression *)
-and exp_info = {
-  exp_type : logic_type; (** when used as placeholder for a term *)
-  exp_name: string list;
-}
-
 (* ************************************************************************* *)
 (** {2 Constants} *)
 (* ************************************************************************* *)
@@ -759,12 +750,6 @@ and unop =
 and binop =
     PlusA    (** arithmetic + *)
   | PlusPI   (** pointer + integer *)
-  | IndexPI  (** pointer + integer but only when it arises from an expression
-                 [e\[i\]] when [e] is a pointer and
-                 not an array. This is semantically
-                 the same as PlusPI but CCured uses
-                 this as a hint that the integer is
-                 probably positive. *)
   | MinusA   (** arithmetic - *)
   | MinusPI  (** pointer - integer *)
   | MinusPP  (** pointer - pointer *)

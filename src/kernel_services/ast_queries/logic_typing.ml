@@ -1767,7 +1767,7 @@ struct
       Logic_const.tat ~loc (add_offset lv here_idx,lab)
     | _ ->
       let b =
-        { term_node = TBinOp (IndexPI, t, idx); term_name = [];
+        { term_node = TBinOp (PlusPI, t, idx); term_name = [];
           term_loc = loc;
           term_type = set_conversion t.term_type idx.term_type }
       in

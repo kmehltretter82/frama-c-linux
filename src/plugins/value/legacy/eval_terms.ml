@@ -535,7 +535,7 @@ let same_etype t1 t2 =
 let infer_binop_res_type op targ =
   match op with
   | PlusA | MinusA | Mult | Div -> targ
-  | PlusPI | MinusPI | IndexPI ->
+  | PlusPI | MinusPI ->
     assert (Cil.isPointerType targ); targ
   | MinusPP -> Cil.intType
   | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr ->
@@ -1354,7 +1354,7 @@ and eval_binop ~alarm_mode env op t1 t2 =
       int_or_float_op te1 (V.add_untyped_under ~factor) default
     in
     let eunder_op = match op with
-      | PlusPI | IndexPI -> begin
+      | PlusPI -> begin
           match Bit_utils.osizeof_pointed te1 with
           | Int_Base.Top -> fun _ _ -> V.bottom
           | Int_Base.Value _ as size -> add_untyped_op size

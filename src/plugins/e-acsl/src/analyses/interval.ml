@@ -849,7 +849,6 @@ let rec infer t =
   | Tlambda (_,_)
   | TConst (LStr _ | LWStr _)
   | TBinOp (PlusPI,_,_)
-  | TBinOp (IndexPI,_,_)
   | TBinOp (MinusPI,_,_)
   | TAddrOf _
   | TStartOf _

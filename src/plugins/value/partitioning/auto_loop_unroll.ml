@@ -226,7 +226,7 @@ let classify eval_ptr loop_effect lval =
   let rec is_const_expr expr =
     match expr.enode with
     | Lval lval -> classify_lval lval = Constant
-    | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> is_const_expr e
+    | UnOp (_, e, _) | CastE (_, e) -> is_const_expr e
     | BinOp (_, e1, e2, _) -> is_const_expr e1 && is_const_expr e2
     | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _
     | AlignOf _ | AlignOfE _ | AddrOf _ | StartOf _ -> true
@@ -262,7 +262,7 @@ let classify eval_ptr loop_effect lval =
 let rec get_lvalues expr =
   match expr.enode with
   | Lval lval -> [ lval ]
-  | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> get_lvalues e
+  | UnOp (_, e, _) | CastE (_, e) -> get_lvalues e
   | BinOp (_op, e1, e2, _typ) -> get_lvalues e1 @ get_lvalues e2
   | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _
   | AlignOf _ | AlignOfE _ | AddrOf _ | StartOf _ -> []
@@ -308,10 +308,9 @@ let transfer_assign lval exn f ~inner_loop acc instr =
 let cross_equality loop lval =
   (* If no such single equality can be found, return [lval] unchanged. *)
   let exception No_equality in
-  let rec find_lval expr x =
+  let find_lval expr _x =
     match expr.enode with
     | Lval lval -> lval
-    | Info (e, _) -> find_lval e x
     | _ -> raise No_equality
   in
   let transfer ~inner_loop lval instr =
@@ -367,7 +366,6 @@ module Make (Abstract: Abstractions.Eva) = struct
     let rec is_lval e = match e.enode with
       | Lval lv -> Cil_datatype.LvalStructEq.equal lval lv
       | CastE (typ, e) -> Cil.isIntegralType typ && is_lval e
-      | Info (e, _) -> is_lval e
       | _ -> false
     in
     match Cil.constFoldToInt expr with
@@ -383,7 +381,6 @@ module Make (Abstract: Abstractions.Eva) = struct
         then add_to_delta binop acc e1
         else raise NoIncrement
       | CastE (typ, e) when Cil.isIntegralType typ -> delta_assign lval e acc
-      | Info (e, _) -> delta_assign lval e acc
       | _ -> raise NoIncrement
 
   (* Computes an over-approximation of the increment of [lval] in the [loop].

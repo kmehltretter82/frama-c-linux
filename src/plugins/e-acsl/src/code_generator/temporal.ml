@@ -181,7 +181,7 @@ let assign ?(ltype) lhs rhs loc =
             base pointer and index so there should be no pointer arithmetic
             operations there. The following bit is to make sure of it. *)
          (match op with
-          | MinusPI | PlusPI | IndexPI -> assert false
+          | MinusPI | PlusPI -> assert false
           | _ -> ());
          base, Direct
        | _ -> assert false)
@@ -193,7 +193,7 @@ let assign ?(ltype) lhs rhs loc =
       | AddrOf _ -> rhs
       | Lval lv -> Cil.mkAddrOf ~loc lv
       | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
-      | UnOp _ | BinOp _ | CastE _ | StartOf _ | Info _ ->
+      | UnOp _ | BinOp _ | CastE _ | StartOf _ ->
         Options.abort "unsupported RHS %a" Printer.pp_exp rhs
     in Some (lhs, rhs, Copy)
   (* va_list is a builtin type, we assume it has no pointers here and treat

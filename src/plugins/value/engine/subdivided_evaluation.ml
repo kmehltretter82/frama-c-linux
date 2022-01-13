@@ -98,7 +98,7 @@ let gather_non_linear expr =
       if LvalMap.is_empty map && Cil.isArithmeticType (Cil.typeOfLval lv)
       then LvalMap.singleton lv (expr, d, LvalSet.empty)
       else map
-    | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> compute depth e
+    | UnOp (_, e, _) | CastE (_, e) -> compute depth e
     | BinOp (_, e1, e2, _) ->
       (* Lvalues that appear in [e1] and [e2] are bound to [expr]. *)
       let d = succ depth in union expr d (compute d e1) (compute d e2)

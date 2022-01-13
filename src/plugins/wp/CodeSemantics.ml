@@ -229,7 +229,7 @@ struct
     | Ge      -> Val (bool_of_comp env Cvalues.bool_leq M.loc_leq Cfloat.fle e2 e1)
     | LAnd    -> Val (Cvalues.bool_and (bool_of_exp env e1) (bool_of_exp env e2))
     | LOr     -> Val (Cvalues.bool_or  (bool_of_exp env e1) (bool_of_exp env e2))
-    | PlusPI | IndexPI ->
+    | PlusPI ->
         let te = Cil.typeOf_pointed (Cil.typeOf e1) in
         let obj = Ctypes.object_of te in
         Loc(M.shift (loc_of_exp env e1) obj (val_of_exp env e2))
@@ -325,8 +325,6 @@ struct
 
     | UnOp(op,e,ty) -> exp_unop env ty op e
     | BinOp(op,e1,e2,tr) -> exp_binop env tr op e1 e2
-
-    | Info(e,_) -> !s_exp env e
 
     | AlignOfE _ | AlignOf _
     | SizeOfE _ | SizeOf _ | SizeOfStr _ -> Val (Cvalues.constant_exp e)

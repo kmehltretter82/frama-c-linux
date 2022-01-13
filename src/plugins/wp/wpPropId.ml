@@ -625,7 +625,7 @@ let rec term_hints hs t =
   | TLval(lv,_) -> lval_hints hs lv
   | TAddrOf(lv,_) -> lval_hints hs lv
   | TCastE(_,t) -> term_hints hs t
-  | TBinOp((PlusPI|IndexPI|MinusPI),a,_) -> term_hints hs a
+  | TBinOp((PlusPI|MinusPI),a,_) -> term_hints hs a
   | Tlet(_,t) -> term_hints hs t
   | _ -> ()
 
