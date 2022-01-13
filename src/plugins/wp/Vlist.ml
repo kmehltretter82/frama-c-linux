@@ -174,11 +174,15 @@ let match_natural k =
       if 0 <= k then k else raise Not_found
   | _ -> raise Not_found
 
+(* Why3 definition: [\nth(e,k)] is undefined for [k<0 || k>=\length(e)].
+   So, the list cannot be destructured when the length is unknown  *)
 let rec get_nth k e =
   match F.repr e with
   | L.Fun( concat , list ) when concat == f_concat -> get_nth_list k list
   | L.Fun( elt , [x] ) when elt == f_elt ->
       get_nth_elt k x (fun _ -> raise Not_found)
+  | L.Fun( repeat , [x;n] ) when repeat == f_repeat ->
+      get_nth_repeat k x n (fun _ -> raise Not_found)
   | _ -> raise Not_found
 
 and get_nth_list k = function
@@ -187,11 +191,25 @@ and get_nth_list k = function
         match F.repr head with
         | L.Fun( elt , [x] ) when elt == f_elt ->
             get_nth_elt k x (fun k -> get_nth_list k tail)
+        | L.Fun( repeat , [x;n] ) when repeat == f_repeat ->
+            get_nth_repeat k x n (fun k -> get_nth_list k tail)
         | _ -> raise Not_found
       end
   | [] -> raise Not_found
+
 and get_nth_elt k x f =
   if k = 0 then x else (f (k-1))
+
+and get_nth_repeat k x n f =
+  let n = match_natural n in
+  if n = 0 then raise Not_found ;
+  let m = match_natural (rewrite_length x) in
+  if m = 0 then raise Not_found ;
+  let en = Integer.of_int n in
+  let em = Integer.of_int m in
+  let ek = Integer.of_int k in
+  if Integer.(ge ek (mul en em)) then f (k -(n*m))
+  else get_nth (k mod m) x
 
 let rewrite_nth s k =
   get_nth (match_natural k) s
@@ -230,8 +248,7 @@ let rec leftmost a ms =
         if F.decide (F.e_lt F.e_zero n) then
           (* 0<n ==> (u*^n) ^ ms ==  u ^ (u*^(n-1)) ^ ms *)
           leftmost u (v_repeat u (F.e_sub n F.e_one) :: ms)
-        else
-          a , ms
+        else a , ms
     end
   | _ -> a , ms
 
@@ -251,9 +268,23 @@ let rec rightmost ms a =
         | [] -> ms , a
         | e::es -> rightmost (ms @ List.rev es) e
       end
-  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat &&
-                                     (F.decide (F.e_lt F.e_zero n)) ->
-      rightmost (ms @ [v_repeat u (F.e_sub n F.e_one)]) u
+  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat -> begin
+      let exception RetryOnUnfold in
+      try (* tries to perform some rolling that do not depend on [n] *)
+        match List.rev ms with
+        | b::ms ->
+            let ms,b = rightmost (List.rev ms) b in
+            let us,u = rightmost [] u in
+            if not (F.decide (F.e_eq u b)) then raise RetryOnUnfold;
+            (*  u=b ==>  (ms ^ b ^ (us^u)*^n) == ms ^ (b^us)*^n) ^ u *)
+            ms @ [ v_repeat (v_concat (b::us) (F.typeof a)) n ], u
+        | _ -> raise RetryOnUnfold
+       with RetryOnUnfold ->
+         if F.decide (F.e_lt F.e_zero n) then
+           (* 0<n ==> ms ^ (u*^n) ==  ms ^ (u*^(n-1)) ^ u *)
+           rightmost (ms @ [v_repeat u (F.e_sub n F.e_one)]) u
+         else ms , a
+    end
   | _ -> ms , a
 
 (* [rightmost a] returns [s,xs] such that [a = x1 ^ ... ^ xn ^ s] *)
