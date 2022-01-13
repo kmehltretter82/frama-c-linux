@@ -157,10 +157,10 @@ def replace_line(lines, line_pattern, value, all_occurrences=False):
     else:
         sys.exit(f"error: no lines found matching pattern: {line_pattern}")
 
-# replaces '/' with '_' so that a valid target name is created
+# replaces '/' and '.' with '_' so that a valid target name is created
 def make_target_name(target):
     pp = blug_jbdb.prettify(target)
-    return pp.replace('/', '_')
+    return pp.replace('/', '_').replace('.', '_')
 
 # sources are pretty-printed relatively to the .frama-c directory, where the
 # GNUmakefile will reside
@@ -233,7 +233,7 @@ elif os.path.isfile(jbdb_path):
     for f in jbdb:
         jbdb_targets += [t for t in f["targets"] if blug_jbdb.filter_target(t)]
     if not jbdb_targets:
-        sys.exit(f"no targets found in JBDB ({jbdb})")
+        sys.exit(f"no targets found in JBDB ({jbdb_path})")
     if not targets:
         # no targets specified in command line; use all from JBDB
         targets = jbdb_targets
