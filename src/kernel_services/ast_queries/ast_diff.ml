@@ -260,9 +260,6 @@ let (&&>) (res,env) f =
     | `Body_changed -> `Body_changed, env
     | `Same_body | `Callees_changed -> `Callees_changed, env
 
-let (&&&) acc f =
-  let f env = (f env, env) in acc &&> f
-
 let empty_env =
   { compinfo = Cil_datatype.Compinfo.Map.empty;
     kernel_function = Kf.Map.empty;
@@ -419,24 +416,93 @@ and is_same_init i i' env =
 
 and is_same_initinfo i i' env = is_same_opt is_same_init i.init i'.init env
 
+and is_same_local_init i i' env =
+  match i, i' with
+  | AssignInit i, AssignInit i' ->
+    if is_same_init i i' env then `Same_body
+    else `Body_changed
+  | (ConsInit(c,args,Plain_func), ConsInit(c',args',Plain_func))
+  | (ConsInit(c,args,Constructor),ConsInit(c',args',Constructor))  ->
+    if is_same_varinfo c c' env &&
+       is_same_list is_same_exp args args' env
+    then begin
+      match gfun_correspondance c env with
+      | `Partial _ | `Not_present -> `Callees_changed
+      | `Same _ -> `Same_body
+    end else `Body_changed
+  | (AssignInit _| ConsInit _), _ -> `Body_changed
+
 and is_same_exp _e _e' _env = false
 
-and is_same_instr _i _i' _env = `Body_changed
+and is_same_lval (_h,_o) (_h',_o') _env = false
+
+and is_same_offset _o _o' _env = false
+
+and is_same_extended_asm a a' env =
+  let is_same_out (_,c,l) (_,c',l') env =
+    Datatype.String.equal c c' && is_same_lval l l' env
+  and is_same_in (_,c,e) (_,c',e') env =
+    Datatype.String.equal c c' && is_same_exp e e' env
+  in
+  is_same_list is_same_out a.asm_outputs a'.asm_outputs env &&
+  is_same_list is_same_in a.asm_inputs a'.asm_inputs env &&
+  is_same_list
+    (fun s1 s2 _ -> Datatype.String.equal s1 s2)
+    a.asm_clobbers a'.asm_clobbers env
+(* we don't check goto targets, as explained below for goto statements. *)
+
+and is_same_instr i i' env: body_correspondance*is_same_env =
+  match i,i' with
+  | Set(lv,e,_), Set(lv',e',_) ->
+    if is_same_lval lv lv' env && is_same_exp e e' env then
+      `Same_body, env
+    else
+      `Body_changed, env
+  | Call(lv,f,args,_), Call(lv',f',args',_) ->
+    if is_same_opt is_same_lval lv lv' env &&
+       is_same_exp f f' env &&
+       is_same_list is_same_exp args args' env
+    then begin
+      match f.enode with
+      | Lval(Var f,NoOffset) ->
+        (match gfun_correspondance f env with
+         | `Partial _ | `Not_present -> `Callees_changed, env
+         | `Same _ -> `Same_body, env)
+      | _ -> `Callees_changed, env
+      (* by default, we consider that indirect call might have changed *)
+    end else `Body_changed, env
+  | Local_init(v,i,_), Local_init(v',i',_) ->
+    if is_same_varinfo v v' env then begin
+      let env = add_locals [v] [v'] env in
+      let res = is_same_local_init i i' env in
+      res, env
+    end else `Body_changed, env
+  | Asm(a,c,e,_), Asm(a',c',e',_) ->
+    if Cil_datatype.Attributes.equal a a' &&
+       is_same_list (fun s1 s2 _ -> Datatype.String.equal s1 s2) c c' env &&
+       is_same_opt is_same_extended_asm e e' env
+    then
+      `Same_body, env
+    else `Body_changed, env
+  | Skip _, Skip _ -> `Same_body, env
+  | Code_annot _, Code_annot _ ->
+    (* should not be present in normalized AST *)
+    `Same_body, env
+  | _ -> `Body_changed, env
 
 and is_same_instr_list l l' env =
   match l, l' with
-  | [], [] -> `Same_body
-  | [], _ | _, [] -> `Body_changed
+  | [], [] -> `Same_body, env
+  | [], _ | _, [] -> `Body_changed, env
   | i::tl, i'::tl' ->
-    let res = is_same_instr i i' env in
-    fst ((res, env) &&& is_same_instr_list tl tl')
+    is_same_instr i i' env &&> is_same_instr_list tl tl'
 
 and is_same_stmt s s' env =
   if s.ghost = s'.ghost && Cil_datatype.Attributes.equal s.sattr s'.sattr then
     begin
       let res =
         match s.skind,s'.skind with
-        | Instr i, Instr i' -> is_same_instr i i' env, env
+        | Instr i, Instr i' -> is_same_instr i i' env
         | Return (r,_), Return(r', _) ->
           if is_same_opt is_same_exp r r' env then `Same_body, env
           else `Body_changed, env
@@ -446,7 +512,7 @@ and is_same_stmt s s' env =
         | If(e,b1,b2,_), If(e',b1',b2',_) ->
           if is_same_exp e e' env then begin
             is_same_block b1 b1' env &&>
-            (is_same_block b2 b2')
+            is_same_block b2 b2'
           end else `Body_changed, env
         | Switch(e,b,_,_), Switch(e',b',_,_) ->
           if is_same_exp e e' env then begin
@@ -471,8 +537,8 @@ and is_same_stmt s s' env =
             | [],_ | _, [] -> `Body_changed, env
             | (bind, b) :: tl, (bind', b') :: tl' ->
               is_same_binder bind bind' env &&>
-              (is_same_block b b') &&>
-              (is_same_catch_list tl tl')
+              is_same_block b b' &&>
+              is_same_catch_list tl tl'
           in
           is_same_block b b' env &&> is_same_catch_list c c'
         | TryFinally(b1,b2,_), TryFinally(b1',b2',_) ->
@@ -480,9 +546,9 @@ and is_same_stmt s s' env =
           (is_same_block b2 b2')
         | TryExcept(b1,(h,e),b2,_), TryExcept(b1',(h',e'),b2',_) ->
           if is_same_exp e e' env then begin
-            is_same_block b1 b1' env &&&
-            (is_same_instr_list h h') &&>
-            (is_same_block b2 b2')
+            is_same_block b1 b1' env &&>
+            is_same_instr_list h h' &&>
+            is_same_block b2 b2'
           end else `Body_changed, env
         | _ -> `Body_changed, env
       in
@@ -529,8 +595,6 @@ and is_same_binder b b' env =
     end else `Body_changed, env
   | Catch_all, Catch_all -> `Same_body, env
   | (Catch_exn _ | Catch_all), _ -> `Body_changed, env
-
-and is_same_offset _o _o' _env = false
 
 and is_same_funspec _s _s' _env = false
 
