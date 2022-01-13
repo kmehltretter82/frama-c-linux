@@ -67,9 +67,9 @@
   main                      5        2        7       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
-[rte] annotating function main
-[rte] annotating function stringCompare
-[rte] annotating function stringLength
+[rte:annot] annotating function main
+[rte:annot] annotating function stringCompare
+[rte:annot] annotating function stringLength
 [wp] 8 goals scheduled
 [wp] [Alt-Ergo] Goal typed_stringCompare_assert_rte_mem_access : Valid
 [wp] [Alt-Ergo] Goal typed_stringCompare_assert_rte_mem_access_2 : Valid
