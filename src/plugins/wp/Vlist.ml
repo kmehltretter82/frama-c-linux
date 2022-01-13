@@ -23,6 +23,9 @@
 (* -------------------------------------------------------------------------- *)
 (* --- VList Builtins                                                     --- *)
 (* -------------------------------------------------------------------------- *)
+let dkey = Wp_parameters.register_category "sequence"
+let debug fmt = Wp_parameters.debug ~dkey fmt
+let debugN level fmt = Wp_parameters.debug ~level ~dkey fmt
 
 open Lang
 open Lang.F
@@ -112,6 +115,26 @@ let () =
     add_builtin "\\concat" [A;A] f_concat ;
     add_builtin "\\repeat" [A;Z] f_repeat ;
   end
+
+let category e =
+  match F.repr e with
+  | Qed.Logic.Fun (f,_) when Fun.equal f f_nil -> "Nil"
+  | Qed.Logic.Fun (f,_) when Fun.equal f f_cons -> "Cons"
+  | Qed.Logic.Fun (f,_) when Fun.equal f f_nth -> "Nth"
+  | Qed.Logic.Fun (f,_) when Fun.equal f f_length -> "Length"
+  | Qed.Logic.Fun (f,_) when Fun.equal f f_concat -> "Concat"
+  | Qed.Logic.Fun (f,_) when Fun.equal f f_repeat -> "Repeat"
+  | _ -> "_"
+
+let rec pp_pattern fmt e =
+  match F.repr e with
+  | Qed.Logic.Fun (f, args) when Fun.equal f f_nil ||
+                                 Fun.equal f f_cons ||
+                                 Fun.equal f f_nth ||
+                                 Fun.equal f f_length ||
+                                 Fun.equal f f_concat ||
+                                 Fun.equal f f_repeat -> Format.fprintf fmt "(%s %a)" (category e) (Format.pp_print_list ~pp_sep:(fun fmt () -> Format.pp_print_string fmt " ") pp_pattern) args
+  | _ -> Format.pp_print_string fmt "_"
 
 (*--- Smart Constructors ---*)
 
@@ -215,7 +238,10 @@ let rec leftmost a ms =
 (* [leftmost a] returns [s,xs] such that [a = s ^ x1 ^ ... ^ xn] *)
 let leftmost a =
   let r = leftmost a [] in
-  (* Format.printf "@.leftmost %a@ = %a ^ ... (%d more)@." Lang.F.pp_term a  Lang.F.pp_term (fst r) (List.length (snd r)) ; *)
+  debugN 2 "Vlist.leftmost %a@ = %a (form: %s) ^ ... (%d more)@."
+    Lang.F.pp_term a
+    Lang.F.pp_term (fst r) (category (fst r))
+    (List.length (snd r)) ;
   r
 
 let rec rightmost ms a =
@@ -233,7 +259,10 @@ let rec rightmost ms a =
 (* [rightmost a] returns [s,xs] such that [a = x1 ^ ... ^ xn ^ s] *)
 let rightmost a =
   let r = rightmost [] a in
-  (* Format.printf "@.rightmost %a@ = %a ^ ... (%d more)@." Lang.F.pp_term a Lang.F.pp_term (fst r) (List.length (snd r)) ; *)
+  debugN 2 "Vlist.rightmost %a@ = (%d more) ... ^ %a (form: %s)@."
+    Lang.F.pp_term a
+    (List.length (fst r))
+    Lang.F.pp_term (snd r) (category (snd r));
   r
 
 let leftmost_eq a b =
@@ -290,7 +319,11 @@ let rec subsequence xs rs ys =
       subsequence xs rs ys
 
 let rewrite_eq a b =
+  debug "Vlist.rewrite_eq: tries to rewrite %a@ = %a@.- left pattern:  %a@.- right pattern: %a@."
+    Lang.F.pp_term a Lang.F.pp_term b
+    pp_pattern a pp_pattern b;
   match F.repr a , F.repr b with
+  | _ when a == b -> F.p_true
   | L.Fun(nil,[]) , _ when nil == f_nil -> rewrite_is_nil ~nil:a b
   | _ , L.Fun(nil,[]) when nil == f_nil -> rewrite_is_nil ~nil:b a
   | _ ->
