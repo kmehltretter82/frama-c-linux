@@ -361,14 +361,13 @@ let rec is_same_list f l l' env =
     f h h' env && is_same_list f t t' env
   | _ -> false
 
-let is_same_unop o o' =
-  match o,o' with
-  | Neg, Neg -> true
-  | BNot, BNot -> true
-  | LNot, LNot -> true
-  | (Neg | BNot | LNot), _ -> false
+module Unop = struct
+  type t = [%import: Cil_types.unop] [@@deriving eq]
+end
 
-let is_same_binop _b _b' = false
+module Binop = struct
+  type t = [%import: Cil_types.binop] [@@deriving eq]
+end
 
 let rec is_same_type t t' env =
   match t, t' with
@@ -451,9 +450,9 @@ and is_same_exp e e' env =
   | AlignOf t, AlignOf t' -> is_same_type t t' env
   | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
   | UnOp(op,e,t), UnOp(op',e',t') ->
-    is_same_unop op op' && is_same_exp e e' env && is_same_type t t' env
+    Unop.equal op op' && is_same_exp e e' env && is_same_type t t' env
   | BinOp(op,e1,e2,t), BinOp(op',e1',e2',t') ->
-    is_same_binop op op' && is_same_exp e1 e1' env && is_same_exp e2 e2' env
+    Binop.equal op op' && is_same_exp e1 e1' env && is_same_exp e2 e2' env
     && is_same_type t t' env
   | CastE(t,e), CastE(t',e') -> is_same_type t t' env && is_same_exp e e' env
   | AddrOf lv, AddrOf lv' -> is_same_lval lv lv' env
