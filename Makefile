@@ -671,6 +671,9 @@ check-logic-parser-wildcard:
 
 NON_OPAQUE_DEPS+= src/kernel_services/plugin_entry_points/dynamic
 
+# abstract_memory.cmi must _not_ inherit the '-rectypes' flag, so we
+# eagerly assign it _before_ adding -rectypes to the .cmo/.cmx files
+src/kernel_services/abstract_interp/abstract_memory.cmi: BFLAGS := $(BFLAGS)
 src/kernel_services/abstract_interp/abstract_memory.cmo: BFLAGS += -rectypes
 src/kernel_services/abstract_interp/abstract_memory.cmx: OFLAGS += -rectypes
 
