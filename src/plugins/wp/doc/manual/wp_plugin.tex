@@ -1050,6 +1050,7 @@ a second for the call to \verb+f2+. A last goal is generated at the call
 site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
 
 \subsubsection{Proof of \texttt{@terminates}}
+\label{ss-sec:plugin-terminates}
 
 In ACSL, a function can be specified to terminate when some condition \verb+P+ holds
 in pre-condition.
@@ -1132,8 +1133,7 @@ as specified by the options:
 recursive cluster (as defined in the ACSL manual) and shall terminate, WP checks that a
 \verb+decreases+ clause is available for the function. Proving that existing
 recursive calls might be unreachable is delegated to the proof of the
-\verb+decreases+ clause. Note however that, currenlty, the proof of \verb+decreases+
-clauses is not supported yet.
+\verb+decreases+ clause.
 
 \paragraph{Function pointers. } On a call via a function pointer, WP checks that
 a \verb+@calls+ is specified for this function pointer. If so, WP just behaves
