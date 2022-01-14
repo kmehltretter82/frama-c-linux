@@ -147,6 +147,15 @@ let _ignore =
     ~journalize:false
     Visit.get_annotations_exp
 
+let _ignore =
+  let kf = Kernel_function.ty in
+  Dynamic.register
+    ~plugin:"RteGen"
+    "all_statuses"
+    Datatype.(list (triple string (func2 kf bool unit) (func kf bool)))
+    ~journalize:false
+    Generator.all_statuses
+
 let main () =
   (* reset "rte generated" properties for all functions *)
   if Options.Enabled.get () then begin
