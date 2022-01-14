@@ -23,7 +23,6 @@
 (** Handling errors. *)
 open Error_types
 
-exception Ignored
 exception Typing_error of string
 exception Not_yet of string
 exception Not_memoized
@@ -33,9 +32,6 @@ val untypable: string -> 'a
 
 val not_yet: string -> 'a
 (** Not_yet_implemented error built from the given argument. *)
-
-val ignored: unit -> 'a
-(** Statement already signaled and marked as ignored *)
 
 val not_memoized : unit -> 'a
 (** @raise Not_memoized  when asking the preprocessed form of something that
