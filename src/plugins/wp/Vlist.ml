@@ -234,21 +234,22 @@ let rec leftmost a ms =
   | L.Fun( concat , e :: es ) when concat == f_concat ->
       leftmost e (es@ms)
   | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat -> begin
-      let exception RetryOnUnfold in
-      try (* tries to perform some rolling that do not depend on [n] *)
-        match ms with
-        | b::ms ->
-            let b,ms = leftmost b ms in
-            let u,us = leftmost u [] in
-            if not (F.decide (F.e_eq u b)) then raise RetryOnUnfold;
-            (*  u=b ==>  ((u^us)*^n) ^ b ^ ms  == u ^ (us^b)*^n) ^ ms *)
-            u, v_repeat (v_concat (us@[b]) (F.typeof a)) n :: ms
-        | _ -> raise RetryOnUnfold
-      with RetryOnUnfold ->
-        if F.decide (F.e_lt F.e_zero n) then
-          (* 0<n ==> (u*^n) ^ ms ==  u ^ (u*^(n-1)) ^ ms *)
-          leftmost u (v_repeat u (F.e_sub n F.e_one) :: ms)
-        else a , ms
+      match (* tries to perform some rolling that do not depend on [n] *)
+        (match ms with
+         | b::ms ->
+             let b,ms = leftmost b ms in
+             let u,us = leftmost u [] in
+             if F.decide (F.e_eq u b) then
+               (*  u=b ==>  ((u^us)*^n) ^ b ^ ms  == u ^ (us^b)*^n) ^ ms *)
+               Some (u, v_repeat (v_concat (us@[b]) (F.typeof a)) n :: ms)
+             else None
+         | _ -> None) with
+      | Some res -> res
+      | None ->
+          if F.decide (F.e_lt F.e_zero n) then
+            (* 0<n ==> (u*^n) ^ ms ==  u ^ (u*^(n-1)) ^ ms *)
+            leftmost u (v_repeat u (F.e_sub n F.e_one) :: ms)
+          else a , ms
     end
   | _ -> a , ms
 
@@ -269,21 +270,22 @@ let rec rightmost ms a =
         | e::es -> rightmost (ms @ List.rev es) e
       end
   | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat -> begin
-      let exception RetryOnUnfold in
-      try (* tries to perform some rolling that do not depend on [n] *)
-        match List.rev ms with
-        | b::ms ->
-            let ms,b = rightmost (List.rev ms) b in
-            let us,u = rightmost [] u in
-            if not (F.decide (F.e_eq u b)) then raise RetryOnUnfold;
-            (*  u=b ==>  (ms ^ b ^ (us^u)*^n) == ms ^ (b^us)*^n) ^ u *)
-            ms @ [ v_repeat (v_concat (b::us) (F.typeof a)) n ], u
-        | _ -> raise RetryOnUnfold
-       with RetryOnUnfold ->
-         if F.decide (F.e_lt F.e_zero n) then
-           (* 0<n ==> ms ^ (u*^n) ==  ms ^ (u*^(n-1)) ^ u *)
-           rightmost (ms @ [v_repeat u (F.e_sub n F.e_one)]) u
-         else ms , a
+      match (* tries to perform some rolling that do not depend on [n] *)
+        (match List.rev ms with
+         | b::ms ->
+             let ms,b = rightmost (List.rev ms) b in
+             let us,u = rightmost [] u in
+             if F.decide (F.e_eq u b) then
+               (*  u=b ==>  (ms ^ b ^ (us^u)*^n) == ms ^ (b^us)*^n) ^ u *)
+               Some (ms @ [ v_repeat (v_concat (b::us) (F.typeof a)) n ], u)
+             else None
+         | _ -> None) with
+      | Some res -> res
+      | None ->
+          if F.decide (F.e_lt F.e_zero n) then
+            (* 0<n ==> ms ^ (u*^n) ==  ms ^ (u*^(n-1)) ^ u *)
+            rightmost (ms @ [v_repeat u (F.e_sub n F.e_one)]) u
+          else ms , a
     end
   | _ -> ms , a
 
