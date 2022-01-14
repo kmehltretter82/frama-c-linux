@@ -910,7 +910,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	utils/unit_tests
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
-PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen Server
+PLUGIN_DEPENDENCIES:=Callgraph RteGen Server
 
 # These files are used by the GUI, but do not depend on Lablgtk
 VALUE_GUI_AUX:=gui_files/gui_types gui_files/gui_eval \
