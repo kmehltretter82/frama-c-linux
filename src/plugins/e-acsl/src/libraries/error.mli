@@ -68,6 +68,14 @@ val retrieve_preprocessing:
     The [string] argument and the formatter are used to display a message in
     case the preprocessing phase did not compute the required result. *)
 
+val pp_or_error:
+  (Format.formatter -> 'a -> unit) ->
+  Format.formatter ->
+  'a or_error ->
+  unit
+(** [pp_or_error pp] where [pp] is a formatter for ['a] returns a formatter for
+    ['a or_error]. *)
+
 (*
 Local Variables:
 compile-command: "make"

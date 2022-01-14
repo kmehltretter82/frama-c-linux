@@ -91,6 +91,11 @@ let retrieve_preprocessing analyse_name getter parameter pp =
       pp
       parameter
 
+let pp_or_error pp fmt a_or_error =
+  match a_or_error with
+  | Res a -> Format.fprintf fmt "@[%a@]" pp a
+  | Err err -> Format.fprintf fmt "@[%s@]" (Printexc.to_string err)
+
 (*
 Local Variables:
 compile-command: "make"
