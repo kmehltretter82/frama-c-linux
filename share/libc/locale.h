@@ -24,7 +24,7 @@
 #define __FC_LOCALE
 #include "features.h"
 __PUSH_FC_STDLIB
-
+#include "__fc_define_locale_t.h"
 __BEGIN_DECLS
 
 /* Structure giving information about numeric and monetary notation.  */
@@ -148,6 +148,11 @@ extern char *setlocale(int category, const char *locale);
   ensures result_current_locale: \result == __fc_locale;
 */
 extern struct lconv *localeconv(void);
+
+extern locale_t duplocale(locale_t);
+extern void freelocale(locale_t);
+extern locale_t newlocale(int, const char *, locale_t);
+extern locale_t uselocale(locale_t);
 
 __END_DECLS
 

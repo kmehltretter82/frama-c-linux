@@ -51,6 +51,7 @@
 #include "ifaddrs.h"
 #include "inttypes.h"
 #include "iso646.h"
+#include "langinfo.h"
 #include "libgen.h"
 #include "limits.h"
 #include "locale.h"

@@ -104,6 +104,21 @@ extern mode_t umask(mode_t cmask);
 #define S_TYPEISSHM(buf) ((buf)->st_mode - (buf)->st_mode)
 #define S_TYPEISTMO(buf) (0)
 
+// Non-POSIX; Linux-specific
+#define S_IRWXUGO (S_IRWXU|S_IRWXG|S_IRWXO)
+#define S_IALLUGO (S_ISUID|S_ISGID|S_ISVTX|S_IRWXUGO)
+#define S_IRUGO (S_IRUSR|S_IRGRP|S_IROTH)
+#define S_IWUGO (S_IWUSR|S_IWGRP|S_IWOTH)
+#define S_IXUGO (S_IXUSR|S_IXGRP|S_IXOTH)
+
+// Non-POSIX
+#define S_IFDOOR 0
+#define S_ISDOOR(m) 0
+
+// Non-POSIX
+#define UTIME_NOW ((1L << 30) - 1L)
+#define UTIME_OMIT ((1L << 30) - 2L)
+
 __END_DECLS
 __POP_FC_STDLIB
 #endif

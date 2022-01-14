@@ -699,8 +699,17 @@ extern int posix_memalign(void **memptr, size_t alignment, size_t size);
  */
 extern int mkstemp(char *templat);
 
+// This function may allocate memory for the result, which is not supported by
+// some plugins such as Eva. In such cases, it is preferable to use the stub
+// provided in stdlib.c.
 extern char *realpath(const char *restrict file_name,
                       char *restrict resolved_name);
+
+// Non-POSIX; GNU extension
+// This function may allocate memory for the result, which is not supported by
+// some plugins such as Eva. In such cases, it is preferable to use the stub
+// provided in stdlib.c.
+extern char *canonicalize_file_name(const char *path);
 
 __END_DECLS
 
