@@ -35,8 +35,6 @@
   x ∈ {1}
 [eva:final-states] Values at end of function main:
   x ∈ {0; 1}
-[rte:annot] annotating function f
-[rte:annot] annotating function main
 [report] Computing properties status...
 
 --------------------------------------------------------------------------------
