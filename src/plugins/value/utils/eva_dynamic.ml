@@ -20,10 +20,48 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+let get ~plugin name typ ~fallback =
+  try Dynamic.get ~plugin name typ
+  with Failure _ | Dynamic.(Unbound_value _ | Incompatible_type _) -> fallback
 
-val has_requires: spec -> bool
-val mark_invalid_initializers: unit -> unit
-val mark_unreachable: unit -> unit
-val mark_green_and_red: unit -> unit
-val c_labels: kernel_function -> Value_types.callstack -> Eval_terms.labels_states
+module Callgraph = struct
+  let plugin = "callgraph"
+
+  let iter_in_rev_order f =
+    let fallback = Globals.Functions.iter in
+    let typ = Datatype.(func (func Kernel_function.ty unit) unit) in
+    get ~plugin "iter_in_rev_order" typ ~fallback f
+
+  let accept_base kf v =
+    let fallback _ _ = true in
+    let typ = Datatype.(func2 Kernel_function.ty Base.ty bool) in
+    get ~plugin "accept_base" typ ~fallback kf v
+end
+
+module Scope = struct
+  let plugin = "scope"
+
+  let rm_asserts () =
+    let fallback () =
+      Value_parameters.warning
+        "The scope plugin is missing: cannot remove redundant alarms."
+    in
+    let typ = Datatype.(func unit unit) in
+    get ~plugin "rm_asserts" typ ~fallback ()
+end
+
+module RteGen = struct
+  let plugin = "RteGen"
+
+  let all_statuses () =
+    let kf = Kernel_function.ty in
+    let typ =
+      Datatype.(list (triple string (func2 kf bool unit) (func kf bool)))
+    in
+    get ~plugin "all_statuses" typ ~fallback:[]
+
+  let mark_generated_rte () =
+    let list = all_statuses () in
+    let mark kf = List.iter (fun (_kind, set, _get) -> set kf true) list in
+    Globals.Functions.iter (fun kf -> if !Db.Value.is_called kf then mark kf)
+end

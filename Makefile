@@ -856,7 +856,7 @@ endif
 # - try to keep the legacy Value before Eva
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	utils/eva_audit utils/value_perf utils/eva_annotations \
-	utils/value_util utils/red_statuses \
+	utils/eva_dynamic utils/value_util utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen \
 	partitioning/split_return \

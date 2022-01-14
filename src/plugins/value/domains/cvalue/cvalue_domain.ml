@@ -559,7 +559,7 @@ module State = struct
 
   let display_results () =
     Value_parameters.result "====== VALUES COMPUTED ======";
-    Callgraph.Uses.iter_in_rev_order display;
+    Eva_dynamic.Callgraph.iter_in_rev_order display;
     Value_parameters.result "%t" Value_perf.display
 
   let post_analysis _state =

@@ -108,10 +108,10 @@ let post_analysis () =
   (* Try to refine the 'Unknown' statuses that have been emitted during
      this analysis. *)
   Eval_annots.mark_green_and_red ();
-  Eval_annots.mark_rte ();
+  Eva_dynamic.RteGen.mark_generated_rte ();
   post_analysis_cleanup ~aborted:false;
   (* Remove redundant alarms *)
-  if Value_parameters.RmAssert.get () then !Db.Value.rm_asserts ()
+  if Value_parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ()
 
 (* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva
    analysis. Returns a function that restores previous signal behaviors after

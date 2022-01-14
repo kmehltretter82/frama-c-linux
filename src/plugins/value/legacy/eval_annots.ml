@@ -102,11 +102,6 @@ let mark_unreachable () =
   Annotations.iter_all_code_annot do_code_annot;
   Visitor.visitFramacFile unreach (Ast.get ())
 
-let mark_rte () =
-  let list = !Db.RteGen.get_all_status () in
-  let mark kf = List.iter (fun (_kind, set, _get) -> set kf true) list in
-  Globals.Functions.iter (fun kf -> if !Db.Value.is_called kf then mark kf)
-
 let c_labels kf cs =
   if !Db.Value.use_spec_instead_of_definition kf then
     Cil_datatype.Logic_label.Map.empty

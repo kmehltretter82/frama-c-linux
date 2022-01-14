@@ -20,10 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(** Access to other plugins API via {Dynamic.get}. *)
 
-val has_requires: spec -> bool
-val mark_invalid_initializers: unit -> unit
-val mark_unreachable: unit -> unit
-val mark_green_and_red: unit -> unit
-val c_labels: kernel_function -> Value_types.callstack -> Eval_terms.labels_states
+module Callgraph: sig
+  (** Iterates over all functions in the callgraph in reverse order, i.e. from
+      callees to callers. If callgraph is missing, the order is unspecified. *)
+  val iter_in_rev_order: (Kernel_function.t -> unit) -> unit
+
+  (** Returns [true] if [base] is a global, or a formal or local of either [kf]
+      or one of its callers. If callgraph is missing, always returns true. *)
+  val accept_base: Kernel_function.t -> Base.t -> bool
+end
+
+module Scope: sig
+  (** Removes redundant assertions. Warns if the scope plugin is missing. *)
+  val rm_asserts: unit -> unit
+end
+
+module RteGen: sig
+  (** Marks all RTE as generated. Does nothing if the rte plugin is missing. *)
+  val mark_generated_rte: unit -> unit
+end

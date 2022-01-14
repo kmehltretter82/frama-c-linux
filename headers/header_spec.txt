@@ -1483,6 +1483,8 @@ src/plugins/value/utils/eva_annotations.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_audit.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_audit.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/eva_dynamic.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/eva_dynamic.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/summary.ml: CEA_LGPL_OR_PROPRIETARY
