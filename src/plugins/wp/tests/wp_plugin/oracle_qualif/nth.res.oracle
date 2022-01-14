@@ -1,15 +1,34 @@
 # frama-c -wp [...]
 [kernel] Parsing nth.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] 4 goals scheduled
+[wp] 21 goals scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_access_16_16_ok : Valid
 [wp] [Alt-Ergo] Goal typed_lemma_access_4_4_ok : Valid
-[wp] [Alt-Ergo] Goal typed_lemma_access_repeat_concat_3_ok_lack : Unsuccess
+[wp] [Alt-Ergo] Goal typed_lemma_access_repeat_concat_3_ok_lack : Valid
 [wp] [Qed] Goal typed_lemma_eq_repeat_concat_3_ok : Valid
-[wp] Proved goals:    3 / 4
-  Qed:             1 
-  Alt-Ergo:        2  (unsuccess: 1)
+[wp] [Alt-Ergo] Goal typed_check_lemma_left_shift_repeat1_ok : Valid
+[wp] [Qed] Goal typed_check_lemma_left_shift_repeat2_ok : Valid
+[wp] [Alt-Ergo] Goal typed_check_lemma_left_unfold_repeat1_ok : Valid
+[wp] [Qed] Goal typed_check_lemma_left_unfold_repeat2_ok : Valid
+[wp] [Qed] Goal typed_check_lemma_negative_repeat_ok : Valid
+[wp] [Qed] Goal typed_check_lemma_nth_repeat_1_ok : Valid
+[wp] [Qed] Goal typed_check_lemma_nth_repeat_2_ok : Valid
+[wp] [Qed] Goal typed_check_lemma_nth_repeat_3_ok : Valid
+[wp] [Qed] Goal typed_check_lemma_nth_repeat_4_ok : Valid
+[wp] [Alt-Ergo] Goal typed_check_lemma_nth_repeat_undefined_1_ko : Unsuccess
+[wp] [Qed] Goal typed_check_lemma_repeat_nil_ok : Valid
+[wp] [Qed] Goal typed_check_lemma_repeat_one_ok : Valid
+[wp] [Alt-Ergo] Goal typed_check_lemma_repeat_repeated_ok : Valid
+[wp] [Alt-Ergo] Goal typed_check_lemma_right_shift_repeat1_ko : Valid
+[wp] [Qed] Goal typed_check_lemma_right_shift_repeat2_ko : Valid
+[wp] [Alt-Ergo] Goal typed_check_lemma_right_unfold_repeat1_ko : Valid
+[wp] [Qed] Goal typed_check_lemma_right_unfold_repeat2_ko : Valid
+[wp] Proved goals:   20 / 21
+  Qed:            12 
+  Alt-Ergo:        8  (unsuccess: 1)
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
-  Axiomatic Nth             1        2        4      75.0%
+  Axiomatic Equality        4        4        8       100%
+  Axiomatic MkRepeat        3        1        4       100%
+  Axiomatic Nth             5        3        9      88.9%
 ------------------------------------------------------------
