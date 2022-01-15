@@ -54,6 +54,12 @@ let options_ok () =
   Value_parameters.BuiltinsOverrides.iter (fun (kf, _) -> check_assigns kf);
   Value_parameters.UsePrototype.iter (fun kf -> check_assigns kf)
 
+let plugins_ok () =
+  if not (Plugin.is_present "inout") then
+    Value_parameters.warning
+      "The inout plugin is missing: some features are disabled, \
+       and the analysis may have degraded precision and performance."
+
 (* Do something tasteless in case the user did not put a spec on functions
    for which he set [-eva-use-spec]:  generate an incorrect one ourselves *)
 let generate_specs () =
@@ -73,6 +79,7 @@ let generate_specs () =
 let pre_analysis () =
   floats_ok ();
   options_ok ();
+  plugins_ok ();
   Split_return.pretty_strategies ();
   generate_specs ();
   Widen.precompute_widen_hints ();
