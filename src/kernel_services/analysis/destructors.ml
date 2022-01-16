@@ -279,22 +279,19 @@ class vis flag = object(self)
 
 end
 
-let treat_one_function flag kf =
-  if not (Cil_builtins.is_special_builtin (Kernel_function.get_name kf))
-  then begin
-    let my_flag = ref false in
-    let vis = new vis my_flag in
-    ignore (Visitor.visitFramacKf vis kf);
-    if !my_flag then begin
-      flag := true;
-      File.must_recompute_cfg (Kernel_function.get_definition kf)
-    end
-  end
-
-let add_destructor _ast =
-  let has_grown = ref false in
-  Globals.Functions.iter (treat_one_function has_grown);
-  if !has_grown then Ast.mark_as_grown ()
+let add_destructor file =
+  let is_builtin fundec = Cil_builtins.is_special_builtin fundec.svar.vname in
+  let process_one_global has_grown = function
+    | GFun (fundec, _) when not (is_builtin fundec) ->
+      let flag = ref false in
+      let visitor = new vis flag in
+      ignore (Visitor.visitFramacFunction visitor fundec);
+      if !flag then File.must_recompute_cfg fundec;
+      has_grown || !flag
+    | _ -> has_grown
+  in
+  let has_grown = Cil.foldGlobals file process_one_global false in
+  if has_grown then Ast.mark_as_grown ()
 
 let transform_category =
   File.register_code_transformation_category "expand_destructors"
