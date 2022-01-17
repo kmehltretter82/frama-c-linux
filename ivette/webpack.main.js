@@ -63,6 +63,11 @@ module.exports = {
       'dome/system$':  path.resolve( DOME , 'misc/system.ts' ),
       'dome/devtools': domeDevtools()
     }
+  },
+  devServer: {
+    watchOptions: {
+      ignored: '**/.#'
+    }
   }
 } ;
 

@@ -55,6 +55,11 @@ module.exports = {
       'dome':         path.resolve( DOME , 'renderer' ),
       'react-dom':    '@hot-loader/react-dom'
     }
+  },
+  devServer: {
+    watchOptions: {
+      ignored: '**/.#*'
+    }
   }
 } ;
 

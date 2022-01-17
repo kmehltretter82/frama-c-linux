@@ -51,8 +51,8 @@ const UPDATE = new Dome.Event('labview.library');
 
 class Library {
   modified: boolean;
-  virtual: {};
-  collection: {};
+  virtual: any;
+  collection: any;
   items: any[];
 
   constructor() {

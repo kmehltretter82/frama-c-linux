@@ -386,7 +386,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   // --- Focus
   // --------------------------------------------------------------------------
 
-  handleKey(_cm: CodeMirror.Editor, key: string, _evt: KeyboardEvent) {
+  handleKey(_cm: CodeMirror.Editor, key: string, _evt: Event) {
     switch (key) {
       case 'Esc':
         this.props.buffer?.setFocused(false);

@@ -31,7 +31,6 @@
 
 import React from 'react';
 import { Event, useEvent, find } from 'dome';
-import { debounce } from 'lodash';
 import { SVG } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
@@ -94,12 +93,6 @@ const BUTTON = 'dome-xToolBar-control dome-color-frame';
 const KIND = (kind: undefined | string) => (
   kind ? ` dome-xToolBar-${kind}` : ''
 );
-
-interface SELECT<A> {
-  selected?: boolean;
-  selection?: A;
-  value?: A;
-}
 
 export type ButtonKind =
   | 'default' | 'cancel' | 'warning' | 'positive' | 'negative';
@@ -268,6 +261,12 @@ export interface SearchFieldProps<A> {
   event?: null | Event<void>;
 }
 
+interface Searching {
+  pattern?: string;
+  timer?: NodeJS.Timeout | undefined;
+  onSearch?: ((p: string) => void);
+}
+
 /**
    Search Bar.
  */
@@ -277,18 +276,24 @@ export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
   const focus = () => inputRef.current?.focus();
   const [value, setValue] = React.useState('');
   const [index, setIndex] = React.useState(-1);
+  const searching = React.useRef<Searching>({});
   const { onHint, onSelect, onSearch, hints = [] } = props;
 
   // Find event trigger
   useEvent(props.event ?? find, focus);
 
   // Lookup trigger
-  const triggerLookup = React.useCallback(
-    debounce((pattern: string) => {
-      if (onSearch) onSearch(pattern);
-    }, DEBOUNCED_SEARCH),
-    [onSearch],
-  );
+  const triggerLookup = React.useCallback((pattern: string) => {
+    const s = searching.current;
+    s.pattern = pattern;
+    s.onSearch = onSearch;
+    if (!s.timer) {
+      s.timer = setTimeout(() => {
+        s.timer = undefined;
+        if (s.onSearch && s.pattern) s.onSearch(s.pattern);
+      }, DEBOUNCED_SEARCH);
+    }
+  }, [onSearch]);
 
   // Blur Event
   const onBlur = () => {

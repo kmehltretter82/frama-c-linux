@@ -217,10 +217,11 @@ class Dive {
       trigger: 'manual',
       appendTo: document.body,
       lazy: false,
-      onCreate: (instance: Tippy.Instance) => {
+      onCreate: (instance: any) => {
         const { popperInstance } = instance;
-        if (popperInstance)
+        if (popperInstance) {
           popperInstance.reference = (node as any).popperRef();
+        }
       },
     };
 
@@ -231,7 +232,8 @@ class Dive {
         ...common,
         content: node.data().values,
         placement: 'top',
-        distance: 10,
+        //distance: 10,
+        offset: [10, 10],
         arrow: true,
       }));
     }
@@ -241,7 +243,8 @@ class Dive {
         ...common,
         content: node.data().type,
         placement: 'bottom',
-        distance: 20,
+        //distance: 20,
+        offset: [20, 20],
         theme: 'light-border',
         arrow: false,
       }));

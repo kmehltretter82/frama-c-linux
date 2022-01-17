@@ -3,6 +3,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: [
     '@typescript-eslint',
+    'import',
   ],
   extends: [
     'airbnb-typescript',
@@ -32,15 +33,13 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
     // Allow functions without return type, even if exported function should have one
     "@typescript-eslint/explicit-function-return-type": "off",
-    // Allow function hoisting, even if it should be avoided
-    "no-use-before-define": [
-      "error",
-      { functions: false, classes: true, variables: true },
-    ],
-    "@typescript-eslint/no-use-before-define": [
-      "error",
-      { functions: false, classes: true, variables: true, typedefs: true },
-    ],
+    // Allow function hoisting, even if it should be avoided"
+    "@typescript-eslint/lines-between-class-members": "off",
+    "@typescript-eslint/space-before-function-paren": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "no-constant-condition": ["error", { "checkLoops": false }],
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": "off",
     // Prefer const when _all_ destructured values may be const
     "prefer-const": [
       "error",
@@ -51,7 +50,7 @@ module.exports = {
     // Allow return statements even if not strictly needed
     "no-useless-return": "off",
     // Forbid shadowing concerning variables
-    "no-shadow": "error",
+    "no-shadow": "off",
     // Force single class member per line
     "lines-between-class-members": [
       "error", "always", { "exceptAfterSingleLine": true }
@@ -68,6 +67,8 @@ module.exports = {
     "curly": "off",
     // Do not specify position for single commands
     "nonblock-statement-body-position": "off",
+    // Requires '+' to be applied on 2 numbers or 2 strings only
+    "@typescript-eslint/restrict-plus-operands": "error",
     // Allow ++/-- operators only in for-loops
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     // Force code to 80 columns, but for trailing comments
@@ -80,6 +81,8 @@ module.exports = {
     "react/jsx-one-expression-per-line": "off",
     // Allow property spreading since with aim at using TSC
     "react/jsx-props-no-spreading": "off",
+    // Allow using functions in JSX props
+    "react/jsx-no-bind": "off",
     // Allow all sorts of linebreaking for operators
     "operator-linebreak": "off",
     // Force curly brackets on newline if some item is

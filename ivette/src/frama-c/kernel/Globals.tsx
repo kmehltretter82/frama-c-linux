@@ -119,7 +119,7 @@ export default () => {
 
   function isSelected(fct: functionsData) {
     return multipleSelection?.allSelections.some(
-      (l) => fct.name === l?.fct
+      (l) => fct.name === l?.fct,
     );
   }
 

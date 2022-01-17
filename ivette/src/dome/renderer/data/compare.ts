@@ -56,10 +56,10 @@ export const isEqual = FastCompare;
 export function equal(_x: any, _y: any): 0 { return 0; }
 
 /** Primitive comparison works on this type. */
-export type bignum = bigint | number;
+export type BigNum = bigint | number;
 
 /** Detect Non-NaN numbers and big-ints. */
-export function isBigNum(x: any): x is bignum {
+export function isBigNum(x: any): x is BigNum {
   return (
     (typeof (x) === 'bigint') ||
     (typeof (x) === 'number' && !Number.isNaN(x))
@@ -91,7 +91,7 @@ export const string: Order<string> = primitive;
 /**
    Primitive comparison for (big) integers (non NaN numbers included).
  */
-export const bignum: Order<bignum> = primitive;
+export const bignum: Order<BigNum> = primitive;
 
 /**
    Primitive comparison for number (NaN included).
@@ -291,13 +291,13 @@ export function byAllFields<A>(order: ByAllFields<A>): Order<A> {
   };
 }
 
-export type dict<A> = undefined | null | { [key: string]: A };
+export type Dict<A> = undefined | null | { [key: string]: A };
 
 /**
    Compare dictionaries _wrt_ lexicographic order of entries.
 */
-export function dictionary<A>(order: Order<A>): Order<dict<A>> {
-  return (x: dict<A>, y: dict<A>) => {
+export function dictionary<A>(order: Order<A>): Order<Dict<A>> {
+  return (x: Dict<A>, y: Dict<A>) => {
     if (x === y) return 0;
     const dx = x ?? {};
     const dy = y ?? {};
@@ -398,29 +398,31 @@ export function tuple5<A, B, C, D, E>(
 // --- Structural Comparison
 // --------------------------------------------------------------------------
 
+/* eslint-disable no-shadow */
+
 /** @internal */
-enum RANK {
+enum IRANK {
   UNDEFINED,
   BOOLEAN, SYMBOL, NAN, BIGNUM,
   STRING,
-  ARRAY, OBJECT, FUNCTION
+  ARRAY, OBJECT, FUNCTION,
 }
 
 /** @internal */
-function rank(x: any): RANK {
+function rank(x: any): IRANK {
   const t = typeof x;
   switch (t) {
-    case 'undefined': return RANK.UNDEFINED;
-    case 'boolean': return RANK.BOOLEAN;
-    case 'symbol': return RANK.SYMBOL;
+    case 'undefined': return IRANK.UNDEFINED;
+    case 'boolean': return IRANK.BOOLEAN;
+    case 'symbol': return IRANK.SYMBOL;
     case 'number':
-      return Number.isNaN(x) ? RANK.NAN : RANK.BIGNUM;
+      return Number.isNaN(x) ? IRANK.NAN : IRANK.BIGNUM;
     case 'bigint':
-      return RANK.BIGNUM;
-    case 'string': return RANK.STRING;
-    case 'function': return RANK.FUNCTION;
+      return IRANK.BIGNUM;
+    case 'string': return IRANK.STRING;
+    case 'function': return IRANK.FUNCTION;
     case 'object':
-      return Array.isArray(x) ? RANK.ARRAY : RANK.OBJECT;
+      return Array.isArray(x) ? IRANK.ARRAY : IRANK.OBJECT;
   }
 }
 
