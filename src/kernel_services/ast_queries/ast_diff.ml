@@ -369,6 +369,10 @@ module Binop = struct
   type t = [%import: Cil_types.binop] [@@deriving eq]
 end
 
+module Ikind = struct
+  type t = [%import: Cil_types.ikind] [@@deriving eq]
+end
+
 let rec is_same_type t t' env =
   match t, t' with
   | (TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _), _ ->
@@ -404,11 +408,25 @@ let rec is_same_type t t' env =
     Cil_datatype.Attributes.equal a a'
   | (TPtr _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _), _ -> false
 
-and is_same_compinfo _ci _ci' _env = false
+and is_same_compinfo ci ci' env =
+  ci.cstruct = ci'.cstruct &&
+  Cil_datatype.Attributes.equal ci.cattr ci'.cattr &&
+  is_same_opt (is_same_list is_same_fieldinfo) ci.cfields ci'.cfields env
 
-and is_same_enuminfo _ei _ei' _env = false
+and is_same_enuminfo ei ei' env =
+  Cil_datatype.Attributes.equal ei.eattr ei'.eattr &&
+  Ikind.equal ei.ekind ei'.ekind &&
+  is_same_list is_same_enumitem ei.eitems ei'.eitems env
 
-and is_same_fieldinfo _fi _fi' _env = false
+and is_same_fieldinfo fi fi' env =
+  (* we don't compare names: it's the order in which they appear in the
+     definition of the aggregate that counts. *)
+  fi.forder = fi'.forder &&
+  is_same_type fi.ftype fi'.ftype env &&
+  is_same_opt (fun x y _ -> x = y) fi.fbitfield fi'.fbitfield env &&
+  Cil_datatype.Attributes.equal fi.fattr fi'.fattr
+
+and is_same_enumitem ei ei' env = is_same_exp ei.eival ei'.eival env
 
 and is_same_formal (_,t,a) (_,t',a') env =
   is_same_type t t' env && Cil_datatype.Attributes.equal a a'
@@ -442,9 +460,19 @@ and is_same_local_init i i' env =
     end else `Body_changed
   | (AssignInit _| ConsInit _), _ -> `Body_changed
 
+and is_same_constant c c' env =
+  match c,c' with
+  | CEnum ei, CEnum ei' ->
+    (match enumitem_correspondance ei env with
+     | `Same ei'' -> Cil_datatype.Enumitem.equal ei' ei''
+     | `Not_present -> false)
+  | CEnum _, _ | _, CEnum _ -> false
+  | (CInt64 _ | CStr _ | CWStr _ | CChr _ | CReal _), _ ->
+    Cil_datatype.Constant.equal c c'
+
 and is_same_exp e e' env =
   match e.enode, e'.enode with
-  | Const c, Const c' -> Cil_datatype.Constant.equal c c'
+  | Const c, Const c' -> is_same_constant c c' env
   | Lval lv, Lval lv' -> is_same_lval lv lv' env
   | SizeOf t, SizeOf t' -> is_same_type t t' env
   | SizeOfE e, SizeOfE e' -> is_same_exp e e' env
@@ -477,7 +505,10 @@ and is_same_offset o o' env =
   match (o,o') with
   | NoOffset, NoOffset -> true
   | Field (i,o), Field(i',o') ->
-    is_same_fieldinfo i i' env && is_same_offset o o' env
+    (match fieldinfo_correspondance i env with
+     | `Not_present -> false
+     | `Same i'' -> Cil_datatype.Fieldinfo.equal i' i'')
+    && is_same_offset o o' env
   | Index(i,o), Index(i',o') ->
     is_same_exp i i' env && is_same_offset o o' env
   | (NoOffset | Field _ | Index _), _ -> false
@@ -729,20 +760,52 @@ and compinfo_correspondance ?loc ci env =
         {env with compinfo = Cil_datatype.Compinfo.Map.add ci ci' env.compinfo}
       in
       let res = is_same_compinfo ci ci' env' in
-      if res then `Same ci' else `Not_present
+      if res then begin
+        (match ci.cfields, ci'.cfields with
+         | Some fl, Some fl' ->
+           (* by definition, if is_same_compinfo returns true,
+              we have the same number of fields in ci and ci'. *)
+           List.iter2 (fun fi fi' -> Fieldinfo.add fi (`Same fi')) fl fl'
+         | _ -> ());
+        `Same ci'
+      end else begin
+        (* fields are considered different, even if it might be possible
+           to consider that the beginning of the struct hasn't changed. *)
+        (match ci.cfields with
+         | Some fl -> List.iter (fun fi -> Fieldinfo.add fi `Not_present) fl
+         | None -> ());
+        `Not_present
+      end
   in
   match Cil_datatype.Compinfo.Map.find_opt ci env.compinfo with
   | Some ci' -> `Same ci'
   | None -> Compinfo.memo add ci
+
+(* Fieldinfo table is filled together with the Compinfo entry for the
+   corresponding aggregate type. *)
+and fieldinfo_correspondance ?loc:_loc fi _env = Fieldinfo.find fi
 
 and enuminfo_correspondance ?loc ei env =
   let add ei =
     match find_candidate_enuminfo ?loc ei with
     | None -> `Not_present
     | Some ei' ->
-      if is_same_enuminfo ei ei' env then `Same ei' else `Not_present
+      if is_same_enuminfo ei ei' env then begin
+        (* add items correspondance. By definition, we have
+           the same number of items here. *)
+        List.iter2 (fun ei ei' -> Enumitem.add ei (`Same ei'))
+          ei.eitems ei'.eitems;
+        `Same ei'
+      end else begin
+        (* consider that all items are different.
+           Might be refined at some point. *)
+        List.iter (fun ei -> Enumitem.add ei `Not_present) ei.eitems;
+        `Not_present
+      end
   in
   Enuminfo.memo add ei
+
+and enumitem_correspondance ?loc:_loc ei _env = Enumitem.find ei
 
 and gfun_correspondance ?loc vi env =
   let selection =
