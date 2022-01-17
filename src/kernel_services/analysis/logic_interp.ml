@@ -130,7 +130,7 @@ module DefaultLT (X:
         Pretty_utils.ksfprintf (fun e -> raise (Error (loc, e))) msg
 
       let on_error f rollback x =
-        try f x with Error _ as exn -> rollback (); raise exn
+        try f x with Error (loc,msg) as exn -> rollback (loc,msg); raise exn
 
     end)
 

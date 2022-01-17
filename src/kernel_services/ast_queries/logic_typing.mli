@@ -143,12 +143,14 @@ type typing_context = {
   error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
 
   (** [on_error f rollback x] will attempt to evaluate [f x]. If this triggers
-      an error while in [-continue-annot-error] mode, [rollback ()] will be
-      executed and the exception re-raised.
+      an error while in [-continue-annot-error] mode, [rollback (loc,cause)]
+      will be executed (where [loc] is the location of the error and [cause]
+      a text message indicating the issue) and the exception will be re-raised.
 
       @since Chlorine-20180501
+      @modify Frama-C+dev rollback takes as argument the error
   *)
-  on_error: 'a 'b. ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
+  on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
 }
 
 module Make
@@ -192,7 +194,7 @@ module Make
        val error: location -> ('a,Format.formatter,unit, 'b) format4 -> 'a
 
        (** see {!Logic_typing.typing_context}. *)
-       val on_error: ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
+       val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
 
      end) :
 sig
