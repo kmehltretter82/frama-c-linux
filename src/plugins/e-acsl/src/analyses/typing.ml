@@ -28,6 +28,8 @@ open Error_types
 
 let dkey = Options.dkey_typing
 
+module Error = Error.Make(struct let phase = dkey end)
+
 (* In order to properly handle recursive functions the typing method has to
    store the result of the fixpoint algorithm on intervals before typing
    the inner block of the function. To this end, we stop the recursive

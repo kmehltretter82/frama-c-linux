@@ -36,6 +36,9 @@ open Cil_types
 open Cil_datatype
 open Error_types
 
+module Error =
+  Error.Make(struct let phase = Options.register_category "bound variables" end)
+
 (** [error_msg quantif msg pp x] creates an error message from the string [msg]
     containing the value [x] pretty-printed by [pp] and the predicate [quantif]
     pretty-printed. *)
@@ -688,11 +691,11 @@ end
     | Pforall _ ->
       Quantifier.add
         p
-        (Err (Error.Not_yet "unguarded \\forall quantification"))
+        (Err (Error.make_not_yet "unguarded \\forall quantification"))
     | Pexists _ ->
       Quantifier.add
         p
-        (Err (Error.Not_yet "unguarded \\exists quantification"))
+        (Err (Error.make_not_yet "unguarded \\exists quantification"))
     | _ -> ()
 
   let do_user_predicates () =

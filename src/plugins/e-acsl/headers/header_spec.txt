@@ -145,6 +145,8 @@ src/code_generator/translate_terms.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_terms.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_utils.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_utils.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translation_error.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translation_error.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/typed_number.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/typed_number.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/builtins.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

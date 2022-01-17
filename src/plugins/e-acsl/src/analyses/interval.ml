@@ -26,6 +26,11 @@ open Cil_types
    devenir plus rapide, plus précis et plus mince".
    Also implements a support for real numbers. *)
 
+module Error =
+  Error.Make(struct
+    let phase = Options.register_category "interval inference"
+  end)
+
 (* ********************************************************************* *)
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)

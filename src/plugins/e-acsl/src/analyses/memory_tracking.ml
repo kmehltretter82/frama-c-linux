@@ -25,6 +25,9 @@ open Cil_datatype
 
 module Dataflow = Dataflow2
 
+module Error =
+  Error.Make(struct let phase = Options.register_category "memory tracking" end)
+
 let must_never_monitor vi =
   (* E-ACSL, please do not monitor yourself! *)
   Rtl.Symbols.mem_vi vi.vname

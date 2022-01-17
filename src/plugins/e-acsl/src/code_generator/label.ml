@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+module Error = Translation_error
 
 (* The keys are the stmts which were previously labeled, whereas the associated
    values are the new stmts containing the same labels. *)

@@ -79,6 +79,7 @@ CODE_GENERATOR_CMI:= \
 CODE_GENERATOR_CMI:=$(addprefix src/code_generator/, $(CODE_GENERATOR_CMI))
 
 SRC_CODE_GENERATOR:= \
+	translation_error \
 	smart_exp \
 	smart_stmt \
 	gmp \

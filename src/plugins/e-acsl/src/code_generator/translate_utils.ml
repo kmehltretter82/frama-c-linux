@@ -25,6 +25,7 @@
 module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
+module Error = Translation_error
 
 (**************************************************************************)
 (********************** Forward references ********************************)

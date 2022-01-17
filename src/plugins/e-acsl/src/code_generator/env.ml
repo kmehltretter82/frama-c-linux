@@ -24,6 +24,7 @@ module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 open Contract_types
+module Error = Translation_error
 
 type localized_scope =
   | LGlobal
