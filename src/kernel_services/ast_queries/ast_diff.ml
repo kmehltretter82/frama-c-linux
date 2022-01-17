@@ -121,7 +121,7 @@ let pretty_pc fmt =
   let open Format in
   function
   | `Spec_changed -> pp_print_string fmt "(spec changed)"
-  | `Body_changed -> pp_print_string fmt "(body_changed)"
+  | `Body_changed -> pp_print_string fmt "(body changed)"
   | `Callees_changed -> pp_print_string fmt "(callees changed)"
   | `Callees_spec_changed -> pp_print_string fmt "(callees and spec changed)"
 
@@ -408,6 +408,8 @@ and is_same_compinfo _ci _ci' _env = false
 
 and is_same_enuminfo _ei _ei' _env = false
 
+and is_same_fieldinfo _fi _fi' _env = false
+
 and is_same_formal (_,t,a) (_,t',a') env =
   is_same_type t t' env && Cil_datatype.Attributes.equal a a'
 
@@ -462,9 +464,23 @@ and is_same_exp e e' env =
     | AlignOfE _ | UnOp _ | BinOp _  | CastE _ | AddrOf _ | StartOf _
     | Info _), _ -> false
 
-and is_same_lval (_h,_o) (_h',_o') _env = false
+and is_same_lval lv lv' env =
+  is_same_pair is_same_lhost is_same_offset lv lv' env
 
-and is_same_offset _o _o' _env = false
+and is_same_lhost h h' env =
+  match h, h' with
+  | Var vi, Var vi' -> is_same_varinfo vi vi' env
+  | Mem p, Mem p' -> is_same_exp p p' env
+  | (Var _ | Mem _), _ -> false
+
+and is_same_offset o o' env =
+  match (o,o') with
+  | NoOffset, NoOffset -> true
+  | Field (i,o), Field(i',o') ->
+    is_same_fieldinfo i i' env && is_same_offset o o' env
+  | Index(i,o), Index(i',o') ->
+    is_same_exp i i' env && is_same_offset o o' env
+  | (NoOffset | Field _ | Index _), _ -> false
 
 and is_same_extended_asm a a' env =
   let is_same_out (_,c,l) (_,c',l') env =
