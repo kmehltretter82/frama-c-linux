@@ -51,7 +51,7 @@ end
 module InOutCallback =
   State_builder.Option_ref (Inout_type)
     (struct
-      let dependencies = [Db.Value.self]
+      let dependencies = [Self.state]
       let name = "Transfer_stmt.InOutCallback"
     end)
 
@@ -99,7 +99,7 @@ module DumpFileCounters =
   State_builder.Hashtbl (Datatype.String.Hashtbl) (Datatype.Int)
     (struct
       let size = 3
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
       let name = "Transfer_stmt.DumpFileCounters"
     end)
 

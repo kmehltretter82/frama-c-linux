@@ -134,7 +134,7 @@ struct
     let name = "Eva.Analysis.ComputationState"
     let pretty fmt s = Format.pp_print_string fmt (to_string s)
     let reprs = [ NotComputed ; Computing ; Computed ]
-    let dependencies = [ Db.Value.self ]
+    let dependencies = [ Self.state ]
     let default () = NotComputed
   end
 
@@ -224,7 +224,7 @@ let is_computed = Db.Value.is_computed
 let compute () =
   (* Nothing to recompute when Value has already been computed. This boolean
       is automatically cleared when an option of Value changes, because they
-      are registered as dependencies on [Db.Value.self] in {!Parameters}.*)
+      are registered as dependencies on [Self.state] in {!Parameters}.*)
   if not (is_computed ()) then force_compute ()
 
 (* Resets the Analyzer when the current project is changed. *)
@@ -233,4 +233,4 @@ let () =
     ~user_only:true (fun _ -> reset_analyzer ());
   Project.register_after_global_load_hook reset_analyzer
 
-let self = Db.Value.self
+let self = Self.state

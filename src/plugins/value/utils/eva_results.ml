@@ -29,7 +29,7 @@ module Is_Called =
     (Datatype.Bool)
     (struct
       let name = "Value.Eva_results.is_called"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
       let size = 17
     end)
 
@@ -50,7 +50,7 @@ module Callers =
     (Kernel_function.Map.Make(Stmt.Set))
     (struct
       let name = "Value.Eva_results.Callers"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
       let size = 17
     end)
 
@@ -202,9 +202,9 @@ let get_results () =
     initial_state; initial_args; alarms; statuses; main }
 
 let set_results results =
-  let selection = State_selection.with_dependencies Db.Value.self in
+  let selection = State_selection.with_dependencies Self.state in
   Project.clear ~selection ();
-  (* Those two functions may clear Db.Value.self. Start by them *)
+  (* Those two functions may clear Self.state. Start by them *)
   (* Initial state *)
   Db.Value.globals_set_initial_state results.initial_state;
   (* Initial args *)

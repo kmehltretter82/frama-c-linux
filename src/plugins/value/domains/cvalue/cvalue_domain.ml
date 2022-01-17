@@ -451,7 +451,7 @@ module State = struct
     module Storage =
       State_builder.Ref (Datatype.Bool)
         (struct
-          let dependencies = [Db.Value.self]
+          let dependencies = [Self.state]
           let name = name ^ ".Storage"
           let default () = false
         end)

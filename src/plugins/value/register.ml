@@ -24,10 +24,10 @@ open Cil_types
 open Locations
 
 let [@alert "-deprecated"] _self =
-  Db.register_compute "Value.compute" [ Db.Value.self ] Db.Value.compute
+  Db.register_compute "Value.compute" [ Self.state ] Db.Value.compute
     Analysis.compute
 
-let () = Parameters.ForceValues.set_output_dependencies [Db.Value.self]
+let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 
 let main () =
   (* Value computations *)
