@@ -234,7 +234,7 @@ let cleaned_outputs kf s =
 let pretty_stmt_info (main_ui:main_ui) kf stmt =
   (* Is it an accessible statement ? *)
   if Results.is_reachable stmt then begin
-    if Value_results.is_non_terminating_instr stmt then
+    if Eva_results.is_non_terminating_instr stmt then
       match stmt.skind with
       | Instr (Call (_, _, _, _)
               | Local_init (_, ConsInit _, _)) ->

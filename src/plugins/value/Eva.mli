@@ -450,7 +450,7 @@ module Eval_terms: sig
     Cil_types.predicate -> Locations.Zone.t option
 end
 
-module Value_results: sig
+module Eva_results: sig
   type results
 
   val get_results: unit -> results

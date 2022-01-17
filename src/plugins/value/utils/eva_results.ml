@@ -28,7 +28,7 @@ module Is_Called =
   Kernel_function.Make_Table
     (Datatype.Bool)
     (struct
-      let name = "Value.Value_results.is_called"
+      let name = "Value.Eva_results.is_called"
       let dependencies = [ Db.Value.self ]
       let size = 17
     end)
@@ -49,7 +49,7 @@ module Callers =
   Kernel_function.Make_Table
     (Kernel_function.Map.Make(Stmt.Set))
     (struct
-      let name = "Value.Value_results.Callers"
+      let name = "Value.Eva_results.Callers"
       let dependencies = [ Db.Value.self ]
       let size = 17
     end)
@@ -116,7 +116,7 @@ type stmt_by_callstack = Cvalue.Model.t Value_types.Callstack.Hashtbl.t
 
 module AlarmsStmt =
   Datatype.Pair_with_collections (Alarms) (Stmt)
-    (struct let module_name = "Value.Value_results.AlarmStmt" end)
+    (struct let module_name = "Value.Eva_results.AlarmStmt" end)
 
 type results = {
   main: Kernel_function.t option (** None means multiple functions *);

@@ -763,7 +763,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           let states =
             eval >>-: fun (call, recursion, valuation) ->
             (* Register the call. *)
-            Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
+            Eva_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
             (* Do the call. *)
             let c, states =
               do_one_call valuation stmt lval_option call recursion state

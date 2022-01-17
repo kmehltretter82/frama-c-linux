@@ -173,7 +173,7 @@ module Make (Abstract: Abstractions.Eva) = struct
      the callstack and additional information are printed. *)
   let compute_using_spec_or_body call_kinstr call recursion state =
     let kf = call.kf in
-    Value_results.mark_kf_as_called kf;
+    Eva_results.mark_kf_as_called kf;
     let global = match call_kinstr with Kglobal -> true | _ -> false in
     let pp = not global && Parameters.ValShowProgress.get () in
     let call_stack = Eva_utils.call_stack () in
@@ -292,7 +292,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     match Builtins.find_builtin_override call.kf with
     | None -> compute_and_cache_call stmt call recursion state
     | Some (name, builtin, cacheable, spec) ->
-      Value_results.mark_kf_as_called call.kf;
+      Eva_results.mark_kf_as_called call.kf;
       let kinstr = Kstmt stmt in
       let kf_name = Kernel_function.get_name call.kf in
       if Parameters.ValShowProgress.get ()

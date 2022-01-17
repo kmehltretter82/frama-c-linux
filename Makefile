@@ -887,7 +887,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/sign_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
-	utils/value_results \
+	utils/eva_results \
 	utils/summary \
 	domains/cvalue/builtins domains/cvalue/builtins_malloc \
 	domains/cvalue/builtins_string domains/cvalue/builtins_misc \
@@ -934,7 +934,7 @@ API_MLI := $(addprefix $(PLUGIN_DIR)/, \
   engine/analysis.mli utils/results.mli \
   parameters.mli utils/eva_annotations.mli \
   eval.mli domains/cvalue/builtins.mli \
-  legacy/eval_terms.mli utils/value_results.mli utils/unit_tests.mli)
+  legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli)
 
 $(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/gen-api.sh Makefile $(API_MLI)
 	$(PRINT_MAKING) $@
