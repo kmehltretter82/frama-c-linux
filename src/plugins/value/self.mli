@@ -20,48 +20,38 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let get ~plugin name typ ~fallback =
-  try Dynamic.get ~plugin name typ
-  with Failure _ | Dynamic.(Unbound_value _ | Incompatible_type _) -> fallback
+include Plugin.General_services
 
-module Callgraph = struct
-  let plugin = "callgraph"
+(** Debug categories responsible for printing initial and final states of Value.
+    Enabled by default, but can be disabled via the command-line:
+    -value-msg-key="-initial_state,-final_state" *)
+val dkey_initial_state : category
+val dkey_final_states : category
+val dkey_summary : category
 
-  let iter_in_rev_order f =
-    let fallback = Globals.Functions.iter in
-    let typ = Datatype.(func (func Kernel_function.ty unit) unit) in
-    get ~plugin "iter_in_rev_order" typ ~fallback f
+(** {2 Debug categories.} *)
 
-  let accept_base kf v =
-    let fallback _ _ = true in
-    let typ = Datatype.(func2 Kernel_function.ty Base.ty bool) in
-    get ~plugin "accept_base" typ ~fallback kf v
-end
+val dkey_pointer_comparison: category
+val dkey_cvalue_domain: category
+val dkey_incompatible_states: category
+val dkey_iterator : category
+val dkey_callbacks : category
+val dkey_widening : category
+val dkey_recursion : category
 
-module Scope = struct
-  let plugin = "scope"
+(** {2 Warning categories.} *)
 
-  let rm_asserts () =
-    let fallback () =
-      Self.warning
-        "The scope plugin is missing: cannot remove redundant alarms."
-    in
-    let typ = Datatype.(func unit unit) in
-    get ~plugin "rm_asserts" typ ~fallback ()
-end
-
-module RteGen = struct
-  let plugin = "RteGen"
-
-  let all_statuses () =
-    let kf = Kernel_function.ty in
-    let typ =
-      Datatype.(list (triple string (func2 kf bool unit) (func kf bool)))
-    in
-    get ~plugin "all_statuses" typ ~fallback:[]
-
-  let mark_generated_rte () =
-    let list = all_statuses () in
-    let mark kf = List.iter (fun (_kind, set, _get) -> set kf true) list in
-    Globals.Functions.iter (fun kf -> if !Db.Value.is_called kf then mark kf)
-end
+val wkey_alarm: warn_category
+val wkey_locals_escaping: warn_category
+val wkey_garbled_mix: warn_category
+val wkey_builtins_missing_spec: warn_category
+val wkey_builtins_override: warn_category
+val wkey_libc_unsupported_spec : warn_category
+val wkey_loop_unroll_auto : warn_category
+val wkey_loop_unroll_partial : warn_category
+val wkey_missing_loop_unroll : warn_category
+val wkey_missing_loop_unroll_for : warn_category
+val wkey_signed_overflow : warn_category
+val wkey_invalid_assigns : warn_category
+val wkey_experimental : warn_category
+val wkey_unknown_size : warn_category

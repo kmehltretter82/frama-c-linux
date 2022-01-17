@@ -41,13 +41,13 @@ type taint = {
   dependent_call: bool;
 }
 
-let dkey = Value_parameters.register_category "d-taint"
+let dkey = Self.register_category "d-taint"
 
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
-let dkey_debug = Value_parameters.register_category "d-taint-debug"
+let dkey_debug = Self.register_category "d-taint-debug"
 
-let wkey = Value_parameters.register_warn_category "taint"
+let wkey = Self.register_warn_category "taint"
 
 module LatticeTaint = struct
 
@@ -93,7 +93,7 @@ module LatticeTaint = struct
       let equal = Datatype.from_compare
 
       let pretty fmt t =
-        if Value_parameters.is_debug_key_enabled dkey_debug
+        if Self.is_debug_key_enabled dkey_debug
         then pp_state fmt t
         else pp_locs_only fmt t
 
@@ -507,14 +507,14 @@ module TaintLogic = struct
     let taint_term taint term =
       match eval_tlval_zone cvalue_env term with
       | None ->
-        Value_parameters.warning ~wkey ~current:true ~once:true
+        Self.warning ~wkey ~current:true ~once:true
           "Cannot evaluate term %a in taint annotation; ignoring."
           Printer.pp_term term;
         taint
       | Some (under, over) ->
         if not (Zone.equal under over)
         then
-          Value_parameters.warning ~wkey ~current:true ~once:true
+          Self.warning ~wkey ~current:true ~once:true
             "Cannot precisely evaluate term %a in taint annotation; \
              over-approximating."
             Printer.pp_term term;
@@ -568,7 +568,7 @@ let interpret_taint_logic
             in
             Abstract.Dom.set key taint state
           | _ ->
-            Value_parameters.warning ~wkey ~current:true ~once:true
+            Self.warning ~wkey ~current:true ~once:true
               "Invalid taint annotation %a; ignoring."
               Printer.pp_extended extension;
             state

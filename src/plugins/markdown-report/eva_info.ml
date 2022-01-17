@@ -231,7 +231,7 @@ let coverage_md_gen () =
   [ Block [Text summary_whole]; Block [Text summary ]]
 
 let domains_md_gen () =
-  let eva_domains = Eva.Value_parameters.enabled_domains () in
+  let eva_domains = Eva.Parameters.enabled_domains () in
   let domains = List.filter (fun (name, _) -> name <> "cvalue") eva_domains in
   let aux (name, descr) = (plain "domain" @ bold name), plain descr in
   List.map aux domains

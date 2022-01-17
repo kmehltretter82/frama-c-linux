@@ -119,8 +119,8 @@ let extern_report = { fuel = Infty; reduction = Neither; volatile = false }
 let dummy_report = { fuel = Loop; reduction = Neither; volatile = false }
 
 let no_fuel = -1
-let root_fuel () = Value_parameters.OracleDepth.get ()
-let backward_fuel () = Value_parameters.ReductionDepth.get ()
+let root_fuel () = Parameters.OracleDepth.get ()
+let backward_fuel () = Parameters.ReductionDepth.get ()
 
 let already_precise_loc_report ~for_writing ~reduction loc_report =
   (not for_writing || loc_report.for_writing)
@@ -137,7 +137,7 @@ let may_be_reduced_lval (host, offset) = match host with
   | Mem _ -> true
 
 let warn_pointer_comparison typ =
-  match Value_parameters.WarnPointerComparison.get () with
+  match Parameters.WarnPointerComparison.get () with
   | "none" -> false
   | "all" -> true
   | "pointer" -> Cil.isPointerType (Cil.unrollType typ)
@@ -145,7 +145,7 @@ let warn_pointer_comparison typ =
 
 let propagate_all_pointer_comparison typ =
   not (Cil.isPointerType typ)
-  || Value_parameters.UndefinedPointerComparisonPropagateAll.get ()
+  || Parameters.UndefinedPointerComparisonPropagateAll.get ()
 
 let comparison_kind = function
   | Eq | Ne -> Some Abstract_value.Equality
@@ -455,7 +455,7 @@ module Make
     else
       let v = Value.rewrap_integer range value in
       if range.Eval_typ.i_signed && not (Value.equal value v)
-      then Value_parameters.warning ~wkey:Value_parameters.wkey_signed_overflow
+      then Self.warning ~wkey:Self.wkey_signed_overflow
           ~current:true ~once:true "2's complement assumed for overflow";
       return v
 
@@ -575,7 +575,7 @@ module Make
       | Shiftlt ->
         let warn_negative = Kernel.LeftShiftNegative.get () in
         reduce_shift ~warn_negative typ arg1 arg2
-      | MinusPP when Value_parameters.WarnPointerSubstraction.get () ->
+      | MinusPP when Parameters.WarnPointerSubstraction.get () ->
         let kind = Abstract_value.Subtraction in
         let truth = Value.assume_comparable kind v1 v2 in
         let alarm () = Alarms.Differing_blocks (e1, e2) in
@@ -612,9 +612,9 @@ module Make
       else
         let zero_or_one = Value.(join zero one) in
         if Cil.isPointerType typ then
-          Value_parameters.result
+          Self.result
             ~current:true ~once:true
-            ~dkey:Value_parameters.dkey_pointer_comparison
+            ~dkey:Self.dkey_pointer_comparison
             "evaluating condition to {0; 1} instead of %a because of UPCPA"
             (Bottom.pretty pretty_zero_or_one) result;
         `Value zero_or_one
@@ -695,7 +695,7 @@ module Make
       in
       if warn ()
       then cast_integer overflow_kind expr ~src ~dst value
-      else if dst.i_signed && Value_parameters.WarnSignedConvertedDowncast.get ()
+      else if dst.i_signed && Parameters.WarnSignedConvertedDowncast.get ()
       then relaxed_signed_downcast expr ~src ~dst value
       else return (Value.rewrap_integer dst value)
 
@@ -1034,7 +1034,7 @@ module Make
     | Index (index_expr, remaining) ->
       let typ_pointed, array_size = match Cil.unrollType typ with
         | TArray (t, size, _) -> t, size
-        | t -> Value_parameters.fatal ~current:true
+        | t -> Self.fatal ~current:true
                  "Got type '%a'" Printer.pp_typ t
       in
       eval_offset context ~reduce_valid_index typ_pointed remaining >>=
@@ -1144,7 +1144,7 @@ module Make
        -eva-subdivide-non-linear. *)
     let subdivision =
       match subdivnb with
-      | None -> Value_parameters.LinearLevel.get ()
+      | None -> Parameters.LinearLevel.get ()
       | Some n -> n
     in
     let subdivided = false in
@@ -1618,16 +1618,16 @@ module Make
 
   (* Aborts the analysis when a function pointer is completely imprecise. *)
   let top_function_pointer funcexp =
-    if not (Value_parameters.Domains.mem "cvalue") then
-      Value_parameters.abort ~current:true
+    if not (Parameters.Domains.mem "cvalue") then
+      Self.abort ~current:true
         "Calls through function pointers are not supported without the cvalue \
          domain.";
     if Mark_noresults.no_memoization_enabled () then
-      Value_parameters.abort ~current:true
+      Self.abort ~current:true
         "Function pointer evaluates to anything. Try deactivating \
          option(s) -eva-no-results and -eva-no-results-function."
     else
-      Value_parameters.fatal ~current:true
+      Self.fatal ~current:true
         "Function pointer evaluates to anything. function %a"
         Printer.pp_exp funcexp
 

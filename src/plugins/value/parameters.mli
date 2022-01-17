@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Plugin.General_services
-
 module ForceValues: Parameter_sig.With_output
 
 module EnumerateCond: Parameter_sig.Bool
@@ -150,80 +148,6 @@ val configure_precision: unit -> unit
 val parameters_correctness: Typed_parameter.t list
 val parameters_tuning: Typed_parameter.t list
 
-(** Debug categories responsible for printing initial and final states of Value.
-    Enabled by default, but can be disabled via the command-line:
-    -value-msg-key="-initial_state,-final_state" *)
-val dkey_initial_state : category
-val dkey_final_states : category
-val dkey_summary : category
-
-(** Warning category used when emitting an alarm in "warning" mode. *)
-val wkey_alarm: warn_category
-
-(** Warning category used for the warning "locals escaping scope". *)
-val wkey_locals_escaping: warn_category
-
-(** Warning category used to print garbled mix *)
-val wkey_garbled_mix: warn_category
-
-(** Warning category used for "cannot use builtin due to missing spec" *)
-val wkey_builtins_missing_spec: warn_category
-
-(** Warning category used for "definition overridden by builtin" *)
-val wkey_builtins_override: warn_category
-
-(** Warning category used for calls to libc functions whose specification
-    is currently unsupported. *)
-val wkey_libc_unsupported_spec : warn_category
-
-(** Warning category used for "Automatic loop unrolling" *)
-val wkey_loop_unroll_auto : warn_category
-
-(** Warning category used for "loop not completely unrolled" *)
-val wkey_loop_unroll_partial : warn_category
-
-(** Warning category used to identify loops without unroll annotations *)
-val wkey_missing_loop_unroll : warn_category
-
-(** Warning category used to identify for loops without unroll annotations *)
-val wkey_missing_loop_unroll_for : warn_category
-
-(** Warning category for signed overflows *)
-val wkey_signed_overflow : warn_category
-
-(** Warning category for 'completely invalid' assigns clause *)
-val wkey_invalid_assigns : warn_category
-
-(** Warning category for experimental domains or features. *)
-val wkey_experimental : warn_category
-
-(** Warning category for 'size of type T cannot be computed'. *)
-val wkey_unknown_size : warn_category
-
-(** Debug category used to print information about invalid pointer comparisons*)
-val dkey_pointer_comparison: category
-
-(** Debug category used to print the cvalue domain on Frama_C_[dump|show]_each
-    functions. *)
-val dkey_cvalue_domain: category
-
-(* Print non-bottom product of states with no concretization, revealed by
-   an evaluation leading to bottom without alarms. *)
-val dkey_incompatible_states: category
-
-(** Debug category used to print information about the iteration *)
-val dkey_iterator : category
-
-(** Debug category used when using Eva callbacks when recording the results of
-    a function analysis. *)
-val dkey_callbacks : category
-
-(** Debug category used to print the usage of widenings. *)
-val dkey_widening : category
-
-(** Debug category used to print messages about recursive calls. *)
-val dkey_recursion : category
-
 (** Registers available cvalue builtins for the -eva-builtin option. *)
 val register_builtin: string -> unit
 
@@ -245,9 +169,3 @@ val use_builtin: Cil_types.kernel_function -> string -> unit
     value partitioning on the global variable [vi]. *)
 val use_global_value_partitioning: Cil_types.varinfo -> unit
 [@@@ api_end]
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -30,8 +30,8 @@ type call_init_state =
 
 let call_init_state kf =
   let str =
-    try Value_parameters.EqualityCallFunction.find kf
-    with Not_found -> Value_parameters.EqualityCall.get ()
+    try Parameters.EqualityCallFunction.find kf
+    with Not_found -> Parameters.EqualityCall.get ()
   in
   match str with
   | "all" -> ISCaller
@@ -39,7 +39,7 @@ let call_init_state kf =
   | "none" -> ISEmpty
   | _ -> assert false
 
-let dkey = Value_parameters.register_category "d-equality"
+let dkey = Self.register_category "d-equality"
 
 open Hcexprs
 

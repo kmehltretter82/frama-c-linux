@@ -271,7 +271,7 @@ and display_subtree fmt indentation subtree parent_duration curtime =
 ;;
 
 let display fmt =
-  if Value_parameters.ValShowPerf.get()
+  if Parameters.ValShowPerf.get()
   then begin
     Format.fprintf fmt "####### Value execution feedback #########\n";
     let current_time = (Sys.time()) in
@@ -299,7 +299,7 @@ let caller_callee_callinfo = function
 ;;
 
 let start_doing_perf callstack =
-  if Value_parameters.ValShowPerf.get()
+  if Parameters.ValShowPerf.get()
   then begin
     let time = Sys.time() in
     assert (callstack != []);
@@ -322,7 +322,7 @@ let start_doing_perf callstack =
 ;;
 
 let stop_doing_perf callstack =
-  if Value_parameters.ValShowPerf.get()
+  if Parameters.ValShowPerf.get()
   then begin
     let time = Sys.time() in
     let kf = fst (List.hd callstack) in
@@ -389,15 +389,15 @@ let start_doing_flamegraph callstack =
   | [] -> assert false
   | [_] ->
     (* Analysis of main *)
-    if not (Value_parameters.ValPerfFlamegraphs.is_empty ()) then begin
-      let file = Value_parameters.ValPerfFlamegraphs.get () in
+    if not (Parameters.ValPerfFlamegraphs.is_empty ()) then begin
+      let file = Parameters.ValPerfFlamegraphs.get () in
       try
         (* Flamegraphs must be computed. Set up the stack and the output file *)
         let oc = open_out (file:>string) in
         oc_flamegraph := Some oc;
         stack_flamegraph := [ (Sys.time (), 0.) ]
       with e ->
-        Value_parameters.error "cannot open flamegraph file: %s"
+        Self.error "cannot open flamegraph file: %s"
           (Printexc.to_string e);
         oc_flamegraph := None (* to be on the safe side  *)
     end

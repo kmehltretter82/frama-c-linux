@@ -51,7 +51,7 @@ let warn_empty_from list =
   | [] -> ()
   | (out, _) :: _ ->
     let source = fst out.it_content.term_loc in
-    Value_parameters.warning ~source ~once:true
+    Self.warning ~source ~once:true
       "@[no \\from part@ for clause '%a'@]"
       Printer.pp_assigns (Writes no_from)
 
@@ -124,14 +124,14 @@ let warn_on_missing_result_assigns kinstr kf spec =
   if return_used && not (List.for_all assigns_result spec.spec_behavior)
   then
     let source = fst (Kernel_function.get_location kf) in
-    Value_parameters.warning ~once:true ~source
+    Self.warning ~once:true ~source
       "@[no 'assigns \\result@ \\from ...'@ clause@ specified for@ function %a@]"
       Kernel_function.pretty kf
 
 let reduce_to_valid_location kind term loc =
   if Locations.(Location_Bits.(equal top loc.loc)) then
     begin
-      Value_parameters.error ~once:true ~current:true
+      Self.error ~once:true ~current:true
         "@[Cannot handle@ %a,@ location is too imprecise@ (%a).@ \
          Assuming it is not assigned,@ but be aware@ this is incorrect.@]"
         pp_assign_clause (kind, term) Locations.pretty loc;
@@ -142,8 +142,8 @@ let reduce_to_valid_location kind term loc =
     if Locations.is_bottom_loc valid then
       begin
         if kind = Assign && not (Locations.is_bottom_loc loc) then
-          Value_parameters.warning ~current:true ~once:true
-            ~wkey:Value_parameters.wkey_invalid_assigns
+          Self.warning ~current:true ~once:true
+            ~wkey:Self.wkey_invalid_assigns
             "@[Completely invalid destination@ for %a.@ \
              Ignoring.@]" pp_assign_clause (kind, term);
         None
@@ -313,8 +313,8 @@ module Make
         then
           begin
             ignore (Locations.Location_Bytes.track_garbled_mix cvalue);
-            Value_parameters.warning ~current:true ~once:true
-              ~wkey:Value_parameters.wkey_garbled_mix
+            Self.warning ~current:true ~once:true
+              ~wkey:Self.wkey_garbled_mix
               "The specification of function %a has generated a garbled mix \
                for %a."
               Kernel_function.pretty kf pp_assign_clause (Assign, assign)
@@ -488,7 +488,7 @@ module Make
         | _ ->
           let vi = Kernel_function.get_vi kf in
           if not (Cil.hasAttribute "FC_BUILTIN" vi.vattr) then
-            Value_parameters.warning ~current:true ~once:true
+            Self.warning ~current:true ~once:true
               "ignoring unsupported allocates clause"
       ) behaviors
 

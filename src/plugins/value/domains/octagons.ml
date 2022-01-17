@@ -42,7 +42,7 @@ let saturate_octagons = true
    option. In this case, the analysis of each function starts with an empty
    state, and the relations inferred in a function are not propagated back to
    the caller either. *)
-let intraprocedural () = not (Value_parameters.OctagonCall.get ())
+let intraprocedural () = not (Parameters.OctagonCall.get ())
 
 (* -------------------------------------------------------------------------- *)
 (*                  Basic types: pair of variables and Ival.t                 *)
@@ -732,7 +732,7 @@ module State = struct
           Format.fprintf fmt "@[%a@]" Octagons.pretty octagons
       end)
 
-  let log_category = Value_parameters.register_category "d-octagon"
+  let log_category = Self.register_category "d-octagon"
 
   let pretty_debug fmt { octagons; intervals; relations } =
     Format.fprintf fmt "@[<v> Octagons: %a@; Intervals: %a@; Relations: %a@]"
@@ -758,7 +758,7 @@ module State = struct
       if Octagons.for_all check_octagon t.octagons
       then t
       else
-        Value_parameters.abort
+        Self.abort
           "Incorrect octagon state computed by function %s:@ %a"
           msg pretty_debug t
 

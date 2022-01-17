@@ -46,7 +46,7 @@ let code_annotation_loc ca stmt =
 let mark_unreachable () =
   let mark ppt =
     if not (Property_status.automatically_computed ppt) then begin
-      Value_parameters.debug "Marking property %a as dead"
+      Self.debug "Marking property %a as dead"
         Description.pp_property ppt;
       let emit =
         Property_status.emit ~distinct:false Value_util.emitter ~hyps:[]
@@ -190,7 +190,7 @@ let mark_green_and_red () =
           Property_status.emit ~distinct Value_util.emitter ~hyps:[] ip status;
           let source = fst loc in
           let text_ca = code_annotation_text ca in
-          Value_parameters.result ~once:true ~source "%s%a got final status %s."
+          Self.result ~once:true ~source "%s%a got final status %s."
             text_ca Description.pp_named p text_status;
         in
         begin

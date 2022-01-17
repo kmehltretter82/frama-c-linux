@@ -189,9 +189,9 @@ let assume_comparable comparison v1 v2 =
     | Abstract_value.Relation ->
       let truth, reason = are_comparable_reason comparison v1 v2 in
       if reason <> `Ok then
-        Value_parameters.result
+        Self.result
           ~current:true ~once:true
-          ~dkey:Value_parameters.dkey_pointer_comparison
+          ~dkey:Self.dkey_pointer_comparison
           "invalid pointer comparison: %a" pp_incomparable_reason reason;
       truth
     | Abstract_value.Subtraction ->
@@ -357,7 +357,7 @@ let forward_minus_pp ~typ ev1 ev2 =
       else Ival.scale_div ~pos:true size minus_offs
     with Abstract_interp.Error_Top -> Ival.top
   in
-  if not (Value_parameters.WarnPointerSubstraction.get ()) then
+  if not (Parameters.WarnPointerSubstraction.get ()) then
     (* Generate garbled mix if the two pointers disagree on their base *)
     let minus_val = V.add_untyped Int_Base.minus_one ev1 ev2 in
     try
@@ -527,7 +527,7 @@ let eval_float_constant f fkind fstring =
   if Fc_float.is_nan f
   then V.inject_float Fval.nan
   else
-    let all_rounding = Value_parameters.AllRoundingModesConstants.get in
+    let all_rounding = Parameters.AllRoundingModesConstants.get in
     let fl, fu = match fstring with
       | Some "INFINITY" -> f, f (* Special case for the INFINITY macro. *)
       | Some string when fkind = Cil_types.FLongDouble || all_rounding () ->

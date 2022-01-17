@@ -24,7 +24,7 @@ open Cil_types
 open Eval
 open Locations
 
-let dkey = Value_parameters.register_category "d-symblocs"
+let dkey = Self.register_category "d-symblocs"
 
 module K = Hcexprs
 module V = Cvalue.V (* TODO: functorize (with locations too ?) *)
@@ -275,7 +275,7 @@ module Memory = struct
       let z =
         try K2Z.find k state.zones
         with Not_found ->
-          Value_parameters.abort "Missing zone for %a@.%a"
+          Self.abort "Missing zone for %a@.%a"
             K.HCE.pretty k pretty state
       in
       add_deps k v z acc
@@ -489,7 +489,7 @@ module D : Abstract_domain.Leaf
       | `Value loc -> loc.Eval.loc
     in
     if Precise_locs.(equal_loc loc_top r) then
-      Value_parameters.fatal "Unknown location for %a" Printer.pp_lval lv
+      Self.fatal "Unknown location for %a" Printer.pp_lval lv
     else r
 
   let get_val valuation = fun lv ->

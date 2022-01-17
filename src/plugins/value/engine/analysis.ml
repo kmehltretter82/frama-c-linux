@@ -209,7 +209,7 @@ let reset_analyzer () =
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
   Ast.compute ();
-  Value_parameters.configure_precision ();
+  Parameters.configure_precision ();
   if not (Kernel.AuditCheck.is_empty ()) then
     Eva_audit.check_configuration (Kernel.AuditCheck.get ());
   let kf, lib_entry = Globals.entry_point () in
@@ -224,7 +224,7 @@ let is_computed = Db.Value.is_computed
 let compute () =
   (* Nothing to recompute when Value has already been computed. This boolean
       is automatically cleared when an option of Value changes, because they
-      are registered as dependencies on [Db.Value.self] in {!Value_parameters}.*)
+      are registered as dependencies on [Db.Value.self] in {!Parameters}.*)
   if not (is_computed ()) then force_compute ()
 
 (* Resets the Analyzer when the current project is changed. *)

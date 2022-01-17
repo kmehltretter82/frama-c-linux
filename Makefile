@@ -857,7 +857,7 @@ endif
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
-PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
+PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	utils/eva_audit utils/value_perf utils/eva_annotations \
 	utils/eva_dynamic utils/value_util utils/red_statuses \
 	utils/mark_noresults \
@@ -932,7 +932,7 @@ PLUGIN_TYPES_TODOC:=$(addsuffix .mli,$(VALUE_TYPES))
 # Eva API.
 API_MLI := $(addprefix $(PLUGIN_DIR)/, \
   engine/analysis.mli utils/results.mli \
-  value_parameters.mli utils/eva_annotations.mli \
+  parameters.mli utils/eva_annotations.mli \
   eval.mli domains/cvalue/builtins.mli \
   legacy/eval_terms.mli utils/value_results.mli utils/unit_tests.mli)
 

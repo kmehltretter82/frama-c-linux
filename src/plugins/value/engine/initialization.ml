@@ -49,7 +49,7 @@ let padding_initialization ~local : padding_initialization =
     if Kernel.InitializedPaddingLocals.get ()
     then `Initialized else `Uninitialized
   else
-    match Value_parameters.InitializationPaddingGlobals.get () with
+    match Parameters.InitializationPaddingGlobals.get () with
     | "yes" -> `Initialized
     | "maybe" -> `MaybeInitialized
     | "no" -> `Uninitialized
@@ -62,8 +62,8 @@ let warn_unknown_size vi =
     false
   with Cil.SizeOfError (s, t)->
     let pp fmt v = Format.fprintf fmt "variable '%a'" Printer.pp_varinfo v in
-    Value_parameters.warning ~once:true ~current:true
-      ~wkey:Value_parameters.wkey_unknown_size
+    Self.warning ~once:true ~current:true
+      ~wkey:Self.wkey_unknown_size
       "@[during initialization@ of %a,@ size of@ type '%a'@ cannot be@ \
        computed@ (%s)@]" pp vi Printer.pp_typ t s;
     true
@@ -131,7 +131,7 @@ module Make
     match Transfer.assign state kinstr lval expr with
     | `Bottom ->
       if kinstr = Kglobal then
-        Value_parameters.warning ~once:true ~source:(fst expr.eloc)
+        Self.warning ~once:true ~source:(fst expr.eloc)
           "evaluation of initializer '%a' failed@." Printer.pp_exp expr;
       raise Initialization_failed
     | `Value v -> v
@@ -260,9 +260,9 @@ module Make
     | Declaration (_, _, None, _) -> state
     | Declaration (_, _, Some l, _)
     | Definition ({ sformals = l }, _) ->
-      if l <> [] && Value_parameters.InterpreterMode.get ()
+      if l <> [] && Parameters.InterpreterMode.get ()
       then
-        Value_parameters.abort "Entry point %a has arguments"
+        Self.abort "Entry point %a has arguments"
           Kernel_function.pretty kf
       else
         let var_kind = Abstract_domain.Formal kf in
@@ -273,7 +273,7 @@ module Make
      bind them in [state] *)
   let add_supplied_main_formals kf actuals state =
     match Domain.get_cvalue with
-    | None -> Value_parameters.abort "Function Db.Value.fun_set_args cannot be \
+    | None -> Self.abort "Function Db.Value.fun_set_args cannot be \
                                       used without the Cvalue domain"
     | Some get_cvalue ->
       let formals = Kernel_function.get_formals kf in
@@ -319,7 +319,7 @@ module Make
 
   (* Compute the initial state with all global variable initialized. *)
   let compute_global_state ~lib_entry () =
-    Value_parameters.debug ~level:2 "Computing globals values";
+    Self.debug ~level:2 "Computing globals values";
     let state = Domain.empty () in
     let initialize = initialize_global_variable ~lib_entry in
     try `Value (Globals.Vars.fold_in_file_order initialize state)
@@ -334,7 +334,7 @@ module Make
     Ast.self ::
     List.map
       (fun p -> State.get p.Typed_parameter.name)
-      Value_parameters.parameters_correctness
+      Parameters.parameters_correctness
 
   module InitialState =
     State_builder.Option_ref
@@ -379,7 +379,7 @@ module Make
       then cvalue_state
       else Cvalue.Model.filter_base print_base cvalue_state
     in
-    Value_parameters.printf ~dkey:Value_parameters.dkey_initial_state
+    Self.printf ~dkey:Self.dkey_initial_state
       ~header:(fun fmt -> Format.pp_print_string fmt
                   "Values of globals at initialization")
       "@[  %a@]" Cvalue.Model.pretty cvalue_state
@@ -388,17 +388,17 @@ module Make
     let init_state =
       if Db.Value.globals_use_supplied_state ()
       then begin
-        Value_parameters.feedback "Initial state supplied by user";
+        Self.feedback "Initial state supplied by user";
         supplied_state ()
       end
       else begin
-        Value_parameters.feedback "Computing initial state";
+        Self.feedback "Computing initial state";
         let state = global_state ~lib_entry in
-        Value_parameters.feedback "Initial state computed";
+        Self.feedback "Initial state computed";
         state
       end
     in
-    let b = Value_parameters.ResultsAll.get () in
+    let b = Parameters.ResultsAll.get () in
     Domain.Store.register_global_state b init_state;
     print_initial_cvalue_state init_state;
     init_state >>-: add_main_formals kf

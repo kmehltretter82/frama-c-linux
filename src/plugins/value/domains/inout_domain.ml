@@ -222,7 +222,7 @@ module D
 
   include Domain_builder.Complete (LatticeInout)
 
-  let log_category = Value_parameters.register_category "d-inout"
+  let log_category = Self.register_category "d-inout"
 
   let enter_scope _kind _vars state = state
   let leave_scope _kf vars state = Transfer.remove_variables vars state

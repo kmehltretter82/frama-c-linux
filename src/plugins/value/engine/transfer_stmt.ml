@@ -65,7 +65,7 @@ let current_kf_inout = InOutCallback.get_option
 
 (* Should we warn about indeterminate copies in the function [kf] ? *)
 let warn_indeterminate kf =
-  let params = Value_parameters.WarnCopyIndeterminate.get () in
+  let params = Parameters.WarnCopyIndeterminate.get () in
   Kernel_function.Set.mem kf params
 
 (* An assignment from a right scalar lvalue is interpreted as a copy when
@@ -91,7 +91,7 @@ let is_determinate kf =
 let subdivide_stmt = Value_util.get_subdivision
 
 let subdivide_kinstr = function
-  | Kglobal -> Value_parameters.LinearLevel.get ()
+  | Kglobal -> Parameters.LinearLevel.get ()
   | Kstmt stmt -> subdivide_stmt stmt
 
 (* Used to disambiguate files for Frama_C_dump_each_file directives. *)
@@ -137,12 +137,12 @@ module Make (Abstract: Abstractions.Eva) = struct
   let notify_unreachability fmt =
     if Domain.log_category = Domain_product.product_category
     then
-      Value_parameters.feedback ~level:1 ~current:true ~once:true
+      Self.feedback ~level:1 ~current:true ~once:true
         "The evaluation of %(%a%)@ led to bottom without alarms:@ at this point \
          the product of states has no possible concretization.@."
         fmt
     else
-      Value_parameters.warning ~current:true
+      Self.warning ~current:true
         "The evaluation of %(%a%)@ led to bottom without alarms:@ at this point \
          the abstract state has no possible concretization,@ which is probably \
          a bug."
@@ -151,8 +151,8 @@ module Make (Abstract: Abstractions.Eva) = struct
   let report_unreachability state (result, alarms) fmt =
     if result = `Bottom && Alarmset.is_empty alarms
     then begin
-      Value_parameters.debug ~current:true ~once:true ~level:1
-        ~dkey:Value_parameters.dkey_incompatible_states
+      Self.debug ~current:true ~once:true ~level:1
+        ~dkey:Self.dkey_incompatible_states
         "State without concretization: %a" Domain.pretty state;
       notify_unreachability fmt
     end
@@ -509,7 +509,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       >>= fun (valuation, loc, typ) ->
       if Int_Base.is_top (Location.size loc)
       then
-        Value_parameters.abort ~current:true
+        Self.abort ~current:true
           "Function argument %a has unknown size. Aborting"
           Printer.pp_exp expr;
       if determinate && Cil.isArithmeticOrPointerType (Cil.typeOfLval lv)
@@ -591,7 +591,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   let print_state =
     if Domain.log_category = Domain_product.product_category
     then Domain.pretty
-    else if Value_parameters.is_debug_key_enabled Domain.log_category
+    else if Self.is_debug_key_enabled Domain.log_category
     then
       fun fmt state ->
         Format.fprintf fmt "# %s:@ @[<hv>%a@]@ " Domain.name Domain.pretty state
@@ -599,7 +599,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Frama_C_dump_each functions. *)
   let dump_state name state =
-    Value_parameters.result ~current:true
+    Self.result ~current:true
       "%s:@\n@[<v>%a@]==END OF DUMP==%t"
       name print_state state Value_util.pp_callstack
 
@@ -607,7 +607,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   let show_expr =
     if Domain.log_category = Domain_product.product_category
     then Domain.show_expr
-    else if Value_parameters.is_debug_key_enabled Domain.log_category
+    else if Self.is_debug_key_enabled Domain.log_category
     then
       fun valuation state fmt exp ->
         Format.fprintf fmt "# %s: @[<hov>%a@]"
@@ -627,7 +627,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       Format.fprintf fmt "%a : @[<h>%t@]" Printer.pp_exp expr pp
     in
     let pp = Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pretty in
-    Value_parameters.result ~current:true
+    Self.result ~current:true
       "@[<v>%s:@ %a@]%t"
       name pp arguments Value_util.pp_callstack
 
@@ -672,7 +672,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Frama_C_show_each functions. *)
   let show_each ~subdivnb name arguments state =
-    Value_parameters.result ~current:true
+    Self.result ~current:true
       "@[<hv>%s:@ %a@]%t"
       name (pretty_arguments ~subdivnb state) arguments Value_util.pp_callstack
 
@@ -691,7 +691,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     let ch = open_out file in
     let fmt = Format.formatter_of_out_channel ch in
     let l = fst (Cil.CurrentLoc.get ()) in
-    Value_parameters.feedback ~current:true "Dumping state in file '%s'%t"
+    Self.feedback ~current:true "Dumping state in file '%s'%t"
       file Value_util.pp_callstack;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
       Datatype.Filepath.pretty l.Filepath.pos_path
@@ -705,7 +705,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   let dump_state_file ~subdivnb name arguments state =
     try dump_state_file_exc ~subdivnb name arguments state
     with e ->
-      Value_parameters.warning ~current:true ~once:true
+      Self.warning ~current:true ~once:true
         "Error during, or invalid call to Frama_C_dump_each_file (%s). Ignoring"
         (Printexc.to_string e)
 

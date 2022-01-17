@@ -22,7 +22,7 @@
 
 open Eval
 
-let dkey_card = Value_parameters.register_category "cardinal"
+let dkey_card = Self.register_category "cardinal"
 
 module Model = struct
 
@@ -161,7 +161,7 @@ module State = struct
 
   type state = Model.t * Locals_scoping.clobbered_set
 
-  let log_category = Value_parameters.dkey_cvalue_domain
+  let log_category = Self.dkey_cvalue_domain
 
   include Datatype.Make_with_collections (
     struct
@@ -405,7 +405,7 @@ module State = struct
   let bind_local state vi =
     let b = Base.of_varinfo vi in
     let offsm =
-      if Value_parameters.InitializedLocals.get () then
+      if Parameters.InitializedLocals.get () then
         let v = Cvalue.(V_Or_Uninitialized.initialized V.top_int) in
         match Cvalue.V_Offsetmap.size_from_validity (Base.validity b) with
         | `Bottom -> assert false
@@ -525,7 +525,7 @@ module State = struct
       if Cvalue.Model.is_reachable fst_values
       && not (Cvalue.Model.is_top fst_values)
       then begin
-        let print_cardinal = Value_parameters.is_debug_key_enabled dkey_card in
+        let print_cardinal = Self.is_debug_key_enabled dkey_card in
         let estimate =
           if print_cardinal
           then Cvalue.Model.cardinal_estimate values
@@ -551,22 +551,22 @@ module State = struct
                | _ -> ())
             (fun fmt -> Cvalue.Model.pretty_filter fmt values outs) in
         match fmt with
-        | None -> Value_parameters.printf
-                    ~dkey:Value_parameters.dkey_final_states ~header "%t" body
+        | None -> Self.printf
+                    ~dkey:Self.dkey_final_states ~header "%t" body
         | Some fmt -> Format.fprintf fmt "%t@.%t@," header body
       end
     with Kernel_function.No_Statement -> ()
 
   let display_results () =
-    Value_parameters.result "====== VALUES COMPUTED ======";
+    Self.result "====== VALUES COMPUTED ======";
     Eva_dynamic.Callgraph.iter_in_rev_order display;
-    Value_parameters.result "%t" Value_perf.display
+    Self.result "%t" Value_perf.display
 
   let post_analysis _state =
-    if Value_parameters.ForceValues.get ()
-    && Value_parameters.verbose_atleast 1
+    if Parameters.ForceValues.get ()
+    && Self.verbose_atleast 1
     && Plugin.is_present "inout"
-    then Value_parameters.ForceValues.output display_results
+    then Parameters.ForceValues.output display_results
 end
 
 let () = Db.Value.display := (fun fmt kf -> State.display ~fmt kf)

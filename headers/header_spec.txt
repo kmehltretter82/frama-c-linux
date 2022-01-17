@@ -1506,8 +1506,10 @@ src/plugins/value/utils/widen.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/widen.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/widen_hints_ext.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/widen_hints_ext.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/value_parameters.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/value_parameters.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/parameters.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/parameters.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/self.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/self.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/values/abstract_location.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/values/abstract_value.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/values/cvalue_backward.ml: CEA_LGPL_OR_PROPRIETARY

@@ -114,21 +114,21 @@ let value_panel pack (main_ui:main_ui) =
   in
   let box_1_1 = GPack.hbox ~packing:(w#attach ~left:1 ~top:1) () in
   let precision_refresh =
-    let tooltip = Value_parameters.Precision.parameter.Typed_parameter.help in
+    let tooltip = Parameters.Precision.parameter.Typed_parameter.help in
     Gtk_helper.on_int ~lower:(-1) ~upper:11 ~tooltip
       box_1_1 "precision (meta-option)"
-      Value_parameters.Precision.get
-      Value_parameters.Precision.set
+      Parameters.Precision.get
+      Parameters.Precision.set
   in
   let box_1_2 = GPack.hbox ~packing:(w#attach ~left:1 ~top:2) () in
   let slevel_refresh =
     let tooltip =
-      Value_parameters.SemanticUnrollingLevel.parameter.Typed_parameter.help
+      Parameters.SemanticUnrollingLevel.parameter.Typed_parameter.help
     in
     Gtk_helper.on_int ~lower:0 ~upper:1000000 ~tooltip
       box_1_2 "slevel"
-      Value_parameters.SemanticUnrollingLevel.get
-      Value_parameters.SemanticUnrollingLevel.set
+      Parameters.SemanticUnrollingLevel.get
+      Parameters.SemanticUnrollingLevel.set
   in
   let box_1_3 = GPack.hbox ~packing:(w#attach ~left:1 ~top:3) () in
   let validator s =

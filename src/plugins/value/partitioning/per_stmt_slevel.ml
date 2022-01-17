@@ -132,7 +132,7 @@ let compute kf =
        then NoMerge
        else Merge (fun s -> Cil_datatype.Stmt.Hashtbl.mem h_merge s))
     with Stack.Empty ->
-      Value_parameters.abort
+      Self.abort
         "Incorrectly nested slevel directives in function %a"
         Kernel_function.pretty kf
 
@@ -142,7 +142,7 @@ module ForKf = Kernel_function.Make_Table
     (struct
       let size = 17
       let dependencies =
-        [Ast.self; Value_parameters.SemanticUnrollingLevel.self;]
+        [Ast.self; Parameters.SemanticUnrollingLevel.self;]
       let name = "Value.Local_slevel.ForKf"
     end)
 

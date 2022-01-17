@@ -21,19 +21,19 @@
 (**************************************************************************)
 
 let should_memorize_function f =
-  Value_parameters.ResultsAll.get () &&
+  Parameters.ResultsAll.get () &&
   not (Cil_datatype.Fundec.Set.mem
-         f (Value_parameters.NoResultsFunctions.get ()))
+         f (Parameters.NoResultsFunctions.get ()))
 
 let () = Db.Value.no_results :=
     (fun fd -> not (should_memorize_function fd)
-               || not (Value_parameters.Domains.mem "cvalue"))
+               || not (Parameters.Domains.mem "cvalue"))
 
 (* Signal that some results are not stored. The gui, or some calls to
    Db.Value, may fail ungracefully *)
 let no_memoization_enabled () =
-  not (Value_parameters.ResultsAll.get ()) ||
-  not (Value_parameters.NoResultsFunctions.is_empty ())
+  not (Parameters.ResultsAll.get ()) ||
+  not (Parameters.NoResultsFunctions.is_empty ())
 
 
 

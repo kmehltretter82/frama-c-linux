@@ -40,7 +40,7 @@ val pp_callstack : Format.formatter -> unit
 
 (* TODO: Document the rest of this file. *)
 val emitter : Emitter.t
-val get_slevel : Kernel_function.t -> Value_parameters.SlevelFunction.value
+val get_slevel : Kernel_function.t -> Parameters.SlevelFunction.value
 val get_subdivision: stmt -> int
 val pretty_actuals :
   Format.formatter -> (Cil_types.exp * Cvalue.V.t) list -> unit
@@ -48,7 +48,7 @@ val pretty_current_cfunction_name : Format.formatter -> unit
 val warning_once_current : ('a, Format.formatter, unit) format -> 'a
 
 (** Emit an alarm, either as warning or as a result, according to
-    status associated to {!Value_parameters.wkey_alarm} *)
+    status associated to {!Self.wkey_alarm} *)
 val alarm_report: 'a Log.pretty_printer
 
 (** [protect f ~cleanup] runs [f]. On a user interruption or a Frama-C error,

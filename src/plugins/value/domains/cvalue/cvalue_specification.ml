@@ -66,7 +66,7 @@ let check_from pre_state asgn assigns_zone from found_froms =
   let found_direct_deps = found_deps.Function_Froms.Deps.data in
   let found_indirect_deps = found_deps.Function_Froms.Deps.indirect in
   let res_for_unknown txt =
-    Value_parameters.debug "found_direct deps %a stated_direct_deps %a \
+    Self.debug "found_direct deps %a stated_direct_deps %a \
                             found_indirect_deps %a stated_indirect_deps %a"
       Zone.pretty found_direct_deps Zone.pretty stated_direct_deps
       Zone.pretty found_indirect_deps Zone.pretty stated_indirect_deps;
@@ -84,12 +84,12 @@ let check_from pre_state asgn assigns_zone from found_froms =
 (* Display the message as result/warning depending on [status] *)
 let msg_status status ?current ?once ?source fmt =
   if status = Alarmset.True then
-    if Value_parameters.ValShowProgress.get ()
-    then Value_parameters.result ?current ?once ?source fmt
-    else Value_parameters.result ?current ?once ?source ~level:2 fmt
+    if Parameters.ValShowProgress.get ()
+    then Self.result ?current ?once ?source fmt
+    else Self.result ?current ?once ?source ~level:2 fmt
   else
-    Value_parameters.warning
-      ~wkey:Value_parameters.wkey_alarm ?current ?once ?source fmt
+    Self.warning
+      ~wkey:Self.wkey_alarm ?current ?once ?source fmt
 
 let pp_bhv fmt b =
   if not (Cil.is_default_behavior b)
@@ -139,7 +139,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
          let status_txt, vstatus, status =
            if not (Zone.is_included outputs assigns_union)
            then (
-             Value_parameters.debug
+             Self.debug
                "@[Cannot prove assigns clause@]@ \
                 @[<2>found assigns:  %a@]@ @[<2>stated assigns: %a@]"
                Zone.pretty outputs Zone.pretty assigns_union;

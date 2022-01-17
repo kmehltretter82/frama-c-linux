@@ -74,9 +74,9 @@ let emit_status ppt status =
 (* Display the message as result/warning depending on [status] *)
 let msg_status status ?current ?once ?source fmt =
   if status = Alarmset.True then
-    if Value_parameters.ValShowProgress.get ()
-    then Value_parameters.result ?current ?once ?source fmt
-    else Value_parameters.result ?current ?once ?source ~level:2 fmt
+    if Parameters.ValShowProgress.get ()
+    then Self.result ?current ?once ?source fmt
+    else Self.result ?current ?once ?source ~level:2 fmt
   else
     Value_util.alarm_report ?current ?once ?source fmt
 
@@ -236,7 +236,7 @@ let process_inactive_behavior kf call_ki behavior =
       end
     ) behavior.b_requires;
   if !emitted then
-    Value_parameters.result ~once:true ~current:true ~level:2
+    Self.result ~once:true ~current:true ~level:2
       "%a: assumes got status invalid; behavior not evaluated.%t"
       (pp_header kf) behavior Value_util.pp_callstack
 
@@ -258,7 +258,7 @@ let process_inactive_postconds kf inactive_bhvs =
            end
          ) b.b_post_cond;
        if !emitted then
-         Value_parameters.result ~once:true ~current:true ~level:2
+         Self.result ~once:true ~current:true ~level:2
            "%a: requires got status invalid; postconditions not evaluated.%t"
            (pp_header kf) b Value_util.pp_callstack;
     ) inactive_bhvs
@@ -421,7 +421,7 @@ module Make
         | Postcondition (PostLeaf | PostUseSpec) -> true
         | _ -> false)
        && pr.pred_content <> Pfalse then
-      Value_parameters.warning ~once:true ~source
+      Self.warning ~once:true ~source
         "@[%a:@ this postcondition@ evaluates to@ false@ in this@ context.\
          @ If it is valid,@ either@ a precondition@ was not@ verified@ \
          for this@ call%t,@ or some assigns/from@ clauses@ are \

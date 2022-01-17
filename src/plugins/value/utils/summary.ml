@@ -427,6 +427,6 @@ let print_summary fmt =
   Format.fprintf fmt "%s" bar
 
 let print_summary () =
-  let dkey = Value_parameters.dkey_summary in
+  let dkey = Self.dkey_summary in
   let header fmt = Format.fprintf fmt " ====== ANALYSIS SUMMARY ======" in
-  Value_parameters.printf ~header ~dkey ~level:1 "  @[<v>%t@]" print_summary
+  Self.printf ~header ~dkey ~level:1 "  @[<v>%t@]" print_summary

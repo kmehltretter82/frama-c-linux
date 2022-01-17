@@ -56,7 +56,7 @@ end
 module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
 
 let register_builtin name ?replace ?typ cacheable f =
-  Value_parameters.register_builtin name;
+  Parameters.register_builtin name;
   let builtin = (name, f, cacheable, typ) in
   Hashtbl.replace table name builtin;
   match replace with
@@ -84,7 +84,7 @@ let builtin_names_and_replacements () =
 let () =
   Cmdline.run_after_configuring_stage
     (fun () ->
-       if Value_parameters.BuiltinsList.get () then begin
+       if Parameters.BuiltinsList.get () then begin
          let stand_alone, replacements = builtin_names_and_replacements () in
          Log.print_on_output
            (fun fmt ->
@@ -152,8 +152,8 @@ let warn_builtin_override kf source bname =
   if Kernel_function.is_definition kf && not internal
   then
     let fname = Kernel_function.get_name kf in
-    Value_parameters.warning ~source ~once:true
-      ~wkey:Value_parameters.wkey_builtins_override
+    Self.warning ~source ~once:true
+      ~wkey:Self.wkey_builtins_override
       "function %s: definition will be overridden by %s"
       fname (if fname = bname then "its builtin" else "builtin " ^ bname)
 
@@ -161,8 +161,8 @@ let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
   let source = fst (Kernel_function.get_location kf) in
   if inconsistent_builtin_typ kf expected_typ
   then
-    Value_parameters.warning ~source ~once:true
-      ~wkey:Value_parameters.wkey_builtins_override
+    Self.warning ~source ~once:true
+      ~wkey:Self.wkey_builtins_override
       "The builtin %s will not be used for function %a of incompatible type.@ \
        (got: %a)."
       name Kernel_function.pretty kf
@@ -170,8 +170,8 @@ let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
   else
     match find_builtin_specification kf with
     | None ->
-      Value_parameters.warning ~source ~once:true
-        ~wkey:Value_parameters.wkey_builtins_missing_spec
+      Self.warning ~source ~once:true
+        ~wkey:Self.wkey_builtins_missing_spec
         "The builtin for function %a will not be used, as its frama-c libc \
          specification is not available."
         Kernel_function.pretty kf
@@ -183,7 +183,7 @@ let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
 let prepare_builtins () =
   BuiltinsOverride.clear ();
   Hashtbl.clear builtins_table;
-  let autobuiltins = Value_parameters.BuiltinsAuto.get () in
+  let autobuiltins = Parameters.BuiltinsAuto.get () in
   (* Links kernel functions to the registered builtins. *)
   Hashtbl.iter
     (fun name (bname, f, cacheable, typ) ->
@@ -195,7 +195,7 @@ let prepare_builtins () =
          with Not_found -> ())
     table;
   (* Overrides builtins attribution according to the -eva-builtin option. *)
-  Value_parameters.BuiltinsOverrides.iter
+  Parameters.BuiltinsOverrides.iter
     (fun (kf, name) ->
        prepare_builtin kf (Hashtbl.find table (Option.get name)))
 
@@ -275,11 +275,11 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
     process_result call post call_result
   with
   | Invalid_nb_of_args n ->
-    Value_parameters.abort ~current:true
+    Self.abort ~current:true
       "Invalid number of arguments for builtin %a: %d expected, %d found"
       Kernel_function.pretty call.kf n (List.length arguments)
   | Outside_builtin_possibilities ->
-    Value_parameters.fatal ~current:true
+    Self.fatal ~current:true
       "Call to builtin %a failed" Kernel_function.pretty call.kf
 
 (*

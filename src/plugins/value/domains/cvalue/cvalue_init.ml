@@ -25,7 +25,7 @@
 open Cil_types
 open Locations
 
-let dkey = Value_parameters.register_category "initial-state"
+let dkey = Self.register_category "initial-state"
 
 let add_initialized state loc v =
   Cvalue.Model.add_binding ~exact:true state loc v
@@ -45,8 +45,8 @@ let make_well hidden_base state loc =
 
 
 let warn_unknown_size_aux pp v (messt, t) =
-  Value_parameters.warning ~once:true ~current:true
-    ~wkey:Value_parameters.wkey_unknown_size
+  Self.warning ~once:true ~current:true
+    ~wkey:Self.wkey_unknown_size
     "@[during initialization@ of %a,@ size of@ type '%a'@ cannot be@ computed@ \
      (%s)@]" pp v Printer.pp_typ t messt
 
@@ -75,7 +75,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
     in
     match validity with
     | Base.Known (a,b)
-      when not (Value_parameters.AllocatedContextValid.get ()) ->
+      when not (Parameters.AllocatedContextValid.get ()) ->
       (* Weaken validity, because the created variables are not supposed
          to be valid *)
       (match valid with
@@ -86,7 +86,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
        | UnknownValidity -> Base.Unknown (a, None, b)
       )
     | Base.Unknown _ -> (* Unknown validity is caused by strange type *)
-      Value_parameters.result ~dkey "creating variable %s with imprecise \
+      Self.result ~dkey "creating variable %s with imprecise \
                                      size (type %a)" hidden_var_name Printer.pp_typ pointed_typ;
       validity
     | Base.Empty | Base.Known _ | Base.Invalid -> validity
@@ -100,7 +100,7 @@ let reject_empty_struct b offset typ =
   match Cil.unrollType typ with
   | TComp (ci, _) ->
     if ci.cfields = Some [] && not (Cil.acceptEmptyCompinfo ()) then
-      Value_parameters.abort ~current:true
+      Self.abort ~current:true
         "@[empty %ss@ are unsupported@ (type '%a',@ location %a%a)@ \
          in C99 (only allowed on GCC/MSVC machdep).@ Aborting.@]"
         (if ci.cstruct then "struct" else "union")
@@ -131,11 +131,11 @@ let initialize_var_using_type varinfo state =
     | TFun _ -> state
 
     | TPtr (typ, _) as full_typ
-      when depth <= Value_parameters.AutomaticContextMaxDepth.get () ->
+      when depth <= Parameters.AutomaticContextMaxDepth.get () ->
       let attr = Cil.typeAttrs full_typ in
       let libc = Cil.is_in_libc varinfo.vattr in
       let context_max_width =
-        Value_parameters.AutomaticContextMaxWidth.get ()
+        Parameters.AutomaticContextMaxWidth.get ()
       in begin
         match Cil.isVoidType typ, Cil.isFunctionType typ with
         | false, false -> (* non-void, non-function *)
@@ -176,7 +176,7 @@ let initialize_var_using_type varinfo state =
           in
           let value = Cvalue.V.inject hidden_base (Ival.zero) in
           let value =
-            if Value_parameters.AllocatedContextValid.get ()
+            if Parameters.AllocatedContextValid.get ()
             then value
             else Cvalue.V.join Cvalue.V.singleton_zero value
           in
@@ -204,7 +204,7 @@ let initialize_var_using_type varinfo state =
           let state = ref state in
           let typ = Cil.unrollType typ in
           let max_precise_size =
-            Value_parameters.AutomaticContextMaxWidth.get ()
+            Parameters.AutomaticContextMaxWidth.get ()
           in
           let locs = ref [] in
           for i = 0 to min psize (pred max_precise_size) do
@@ -272,7 +272,7 @@ let initialize_var_using_type varinfo state =
               (* We have probably initialized a struct with different fields.
                  We must perform offsetmap copies, that are slower *)
               if nb_fields * psize >= 5000 then
-                Value_parameters.result ~once:true ~current:true
+                Self.result ~once:true ~current:true
                   "Initializing a complex array of %d elements. This may \
                    take some time" size;
               let loc = ref last_loc.loc in
@@ -288,7 +288,7 @@ let initialize_var_using_type varinfo state =
           !state
         with
         | Cil.LenOfArray cause ->
-          Value_parameters.result ~once:true ~current:true
+          Self.result ~once:true ~current:true
             "problem with array size (%a), assuming 0"
             Cil.pp_incorrect_array_length cause;
           (* This is either a flexible array member (for which Cil
@@ -326,7 +326,7 @@ let initialize_var_using_type varinfo state =
       (* Union of arithmetic types *)
       bind_entire_loc Cvalue.V.top_int
 
-    | TPtr _ when Value_parameters.AllocatedContextValid.get () ->
+    | TPtr _ when Parameters.AllocatedContextValid.get () ->
       (* deep pointers map to NULL in this case *)
       bind_entire_loc Cvalue.V.singleton_zero
 

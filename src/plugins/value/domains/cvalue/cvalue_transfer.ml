@@ -98,10 +98,10 @@ let write_abstract_value state (lval, loc, typ) assigned_value =
   in
   match loc.Locations.loc with
   | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
-    Value_parameters.result
+    Self.result
       "State before degeneration:@\n======%a@\n======="
       Cvalue.Model.pretty state;
-    Value_parameters.fatal ~current:true
+    Self.fatal ~current:true
       "writing at a completely unknown address@[%a@].@\nAborting."
       Origin.pretty_as_reason orig
   | _ ->

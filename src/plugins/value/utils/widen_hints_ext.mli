@@ -24,7 +24,7 @@
 
 open Cil_types
 
-val dkey: Value_parameters.category
+val dkey: Self.category
 
 type hint_vars =
   | HintAllVars (* "all" vars: static hint *)

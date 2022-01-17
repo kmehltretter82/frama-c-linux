@@ -24,7 +24,7 @@ open Eval
 
 let counter = ref 0
 
-let product_category = Value_parameters.register_category "domain_product"
+let product_category = Self.register_category "domain_product"
 
 module Make
     (Value: Abstract_value.S)
@@ -174,7 +174,7 @@ module Make
   let show_expr =
     let (|-) f g = fun fmt exp -> f fmt exp; g fmt exp in
     let show_expr_one_side category name show_expr = fun fmt exp ->
-      if Value_parameters.is_debug_key_enabled category
+      if Self.is_debug_key_enabled category
       then Format.fprintf fmt "@,@]@[<v># %s: @[<hov>%a@]" name show_expr exp
     in
     let right_log = Right.log_category
@@ -204,7 +204,7 @@ module Make
 
   let pretty =
     let print_one_side fmt category name dump state =
-      if Value_parameters.is_debug_key_enabled category
+      if Self.is_debug_key_enabled category
       then Format.fprintf fmt "# %s:@ @[<hv>%a@]@ " name dump state
     in
     let right_log = Right.log_category

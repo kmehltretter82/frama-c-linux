@@ -24,13 +24,13 @@ open Cil_types
 open Eval
 open Apron
 
-let dkey = Value_parameters.register_category "d-apron"
+let dkey = Self.register_category "d-apron"
 
 let debug = false
 
 let abort exclog =
   let open Manager in
-  Value_parameters.fatal
+  Self.fatal
     "Apron manager error : %a in function %a.@.%s"
     print_exc exclog.exn print_funid exclog.funid exclog.msg
 
@@ -151,7 +151,7 @@ let reduce eval expr range =
          Since the denominator is not 1, the translation will fail later in
          [scalar_to_mpzf]. Thus we should catch this case here. *)
       if Interval.is_top interval then begin
-        if debug then Value_parameters.result ~current:true ~once:true
+        if debug then Self.result ~current:true ~once:true
             "imprecise expr %a" Apron.Texpr1.print_expr expr;
         top ()
       end
@@ -633,7 +633,7 @@ module Make (Man : Input) = struct
   let start_call _stmt call recursion valuation state =
     if recursion <> None
     then
-      Value_parameters.abort ~current:true
+      Self.abort ~current:true
         "The binding to APRON domains does not support recursive calls.";
     update valuation state >>- fun state ->
     let eval = make_eval state in

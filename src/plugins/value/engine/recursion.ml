@@ -47,7 +47,7 @@ let mark_unknown_requires kinstr kf funspec =
 let get_spec kinstr kf =
   let funspec = Annotations.funspec ~populate:false kf in
   if Cil.is_empty_funspec funspec then begin
-    Value_parameters.error ~current:true
+    Self.error ~current:true
       "@[Recursive call to %a@ without a specification.@ \
        Generating probably incomplete assigns to interpret the call.@ \
        Try to increase@ the %s parameter@ \
@@ -56,7 +56,7 @@ let get_spec kinstr kf =
          FRAMAC_SHARE/analysis-scripts/make_wrapper.py
       *)
       Kernel_function.pretty kf
-      Value_parameters.RecursiveUnroll.name
+      Parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
       Value_util.pp_callstack;
     Cil.CurrentLoc.set (Kernel_function.get_location kf);
@@ -64,9 +64,9 @@ let get_spec kinstr kf =
     Annotations.funspec kf
   end
   else
-    let depth = Value_parameters.RecursiveUnroll.get () in
+    let depth = Parameters.RecursiveUnroll.get () in
     let () =
-      Value_parameters.warning ~once:true ~current:true
+      Self.warning ~once:true ~current:true
         "@[Using specification of function %a@ for recursive calls%s.@ \
          Analysis of function %a@ is thus incomplete@ and its soundness@ \
          relies on the written specification.@]"
@@ -88,7 +88,7 @@ let _spec_for_recursive_call kf =
     let assigns = Infer_annotations.assigns_from_prototype kf in
     let bhv = Cil.mk_behavior ~assigns:(Writes assigns) () in
     let spec = { (Cil.empty_funspec ()) with spec_behavior = [bhv] } in
-    Value_parameters.error ~once:true
+    Self.error ~once:true
       "@[recursive@ call@ on@ an unspecified@ \
        function.@ Using@ potentially@ invalid@ inferred assigns '%t'@]"
       (fun fmt -> match assigns with
@@ -154,8 +154,8 @@ let make_stack (kf, depth) =
 let get_stack kf depth = VarStack.memo make_stack (kf, depth)
 
 let make_recursion call depth =
-  let dkey = Value_parameters.dkey_recursion in
-  Value_parameters.feedback ~dkey ~once:true ~current:true
+  let dkey = Self.dkey_recursion in
+  Self.feedback ~dkey ~once:true ~current:true
     "@[detected recursive call@ of function %a.@]"
     Kernel_function.pretty call.kf;
   let substitution = get_stack call.kf depth in

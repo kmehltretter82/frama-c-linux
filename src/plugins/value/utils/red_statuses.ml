@@ -194,7 +194,7 @@ let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
     dir file lnum kf alarm kind contexts status text
 
 let output file =
-  Value_parameters.feedback "Listing red statuses in file %a"
+  Self.feedback "Listing red statuses in file %a"
     Filepath.Normalized.pretty file;
   let channel = open_out (file:>string) in
   let fmt = Format.formatter_of_out_channel channel in
@@ -209,4 +209,4 @@ let output file =
   Format.fprintf fmt "@]%!"
 
 let report () =
-  Value_parameters.ReportRedStatuses.(if not (is_empty ()) then output (get ()))
+  Parameters.ReportRedStatuses.(if not (is_empty ()) then output (get ()))

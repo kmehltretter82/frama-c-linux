@@ -23,7 +23,7 @@
 open Cil_types
 open Eval
 
-let dkey = Value_parameters.register_category "nonlin"
+let dkey = Self.register_category "nonlin"
 
 (* ----------------- Occurrences of lvalues in expressions ------------------ *)
 
@@ -179,7 +179,7 @@ let compute_non_linear expr =
     let list = reverse_map map in
     List.iter
       (fun (e, lval) ->
-         Value_parameters.result ~current:true ~once:true ~dkey
+         Self.result ~current:true ~once:true ~dkey
            "non-linear '%a', lv '%a'" Printer.pp_exp e
            (Pretty_utils.pp_list ~sep:", " Printer.pp_lval) lval)
       list;
@@ -773,7 +773,7 @@ module Make
                 (subdivnb * nb) / (Integer.to_int_exn (pow 2 (nb - 1)))
               else subdivnb
             in
-            Value_parameters.result ~current:true ~once:true ~dkey
+            Self.result ~current:true ~once:true ~dkey
               "subdividing on %a"
               (Pretty_utils.pp_list ~sep:", " Printer.pp_lval) lvals;
             let subdivide =
@@ -905,7 +905,7 @@ module Make
         let v = get_cval value in
         if positive
         then Cvalue.V.contains_non_zero v
-        else if Value_parameters.UndefinedPointerComparisonPropagateAll.get ()
+        else if Parameters.UndefinedPointerComparisonPropagateAll.get ()
         then Cvalue.V.contains_zero v
         else Cvalue.V.is_included Cvalue.V.singleton_zero v
     in
@@ -943,7 +943,7 @@ module Make
      inoperative. Otherwise, it calls reduce_by_cond_enumerate with the
      value accessor for the cvalue component. *)
   let reduce_by_enumeration context valuation expr positive =
-    if activated && Value_parameters.EnumerateCond.get ()
+    if activated && Parameters.EnumerateCond.get ()
     then
       get_influential_exprs valuation expr >>- fun split_on ->
       reduce_by_cond_enumerate context valuation expr positive split_on
