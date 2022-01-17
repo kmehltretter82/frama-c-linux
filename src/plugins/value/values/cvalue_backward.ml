@@ -276,7 +276,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
 
   (* comparison operators *)
   | (Eq | Ne | Le | Lt | Ge | Gt), _ -> begin
-      let binop = Value_util.conv_comp binop in
+      let binop = Eva_utils.conv_comp binop in
       match V.is_included V.singleton_zero res_value,
             V.is_included V.singleton_one  res_value with
       | true, true  ->

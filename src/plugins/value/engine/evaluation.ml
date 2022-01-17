@@ -506,7 +506,7 @@ module Make
     match typ with
     | TFloat (fkind, _) ->
       res >>= fun (value, origin) ->
-      let expr = Value_util.lval_to_exp lval in
+      let expr = Eva_utils.lval_to_exp lval in
       remove_special_float expr fkind value >>=: fun new_value ->
       new_value, origin
     | TInt (IBool, _) ->
@@ -520,7 +520,7 @@ module Make
       else res
     | TPtr _ ->
       res >>= fun (value, origin) ->
-      let expr = Value_util.lval_to_exp lval in
+      let expr = Eva_utils.lval_to_exp lval in
       assume_pointer expr value >>=: fun new_value ->
       new_value, origin
     | _ -> res
@@ -627,7 +627,7 @@ module Make
     | Some kind ->
       let compute v1 v2 = Value.forward_binop typ_e1 op v1 v2 in
       (* Detect zero expressions created by the evaluator *)
-      let e1 = if Value_util.is_value_zero e1 then None else Some e1 in
+      let e1 = if Eva_utils.is_value_zero e1 then None else Some e1 in
       forward_comparison ~compute typ_e1 kind (e1, v1) arg2
     | None ->
       assume_valid_binop typ arg1 op arg2 >>=. fun (v1, v2) ->
@@ -1007,7 +1007,7 @@ module Make
     in
     eval_offset context ~reduce_valid_index:reduction typ offset
     >>= fun (offs, typ_offs, offset_volatile) ->
-    if for_writing && Value_util.is_const_write_invalid typ_offs
+    if for_writing && Eva_utils.is_const_write_invalid typ_offs
     then
       `Bottom,
       Alarmset.singleton ~status:Alarmset.False
@@ -1283,7 +1283,7 @@ module Make
     match expr.enode with
     | Lval _lv -> assert false
     | UnOp (LNot, e, _) ->
-      let cond = Value_util.normalize_as_cond e false in
+      let cond = Eva_utils.normalize_as_cond e false in
       (* TODO: should we compute the meet with the result of the call to
          Value.backward_unop? *)
       backward_eval fuel state cond (Some value)
@@ -1535,7 +1535,7 @@ module Make
     result, alarms
 
   let copy_lvalue ?(valuation=Cache.empty) ?subdivnb state lval =
-    let expr = Value_util.lval_to_exp lval
+    let expr = Eva_utils.lval_to_exp lval
     and context = root_context ?subdivnb state in
     try
       let record, report = Cache.find' valuation expr in
@@ -1588,7 +1588,7 @@ module Make
 
   let reduce ?valuation:(valuation=Cache.empty) state expr positive =
     (* Generate [e == 0] *)
-    let expr = Value_util.normalize_as_cond expr (not positive) in
+    let expr = Eva_utils.normalize_as_cond expr (not positive) in
     cache := valuation;
     (* Currently, no subdivisions are performed during the forward evaluation
        in this function, which is used to evaluate the conditions of if(…)

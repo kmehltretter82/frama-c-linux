@@ -91,7 +91,7 @@ let warn_imprecise_lval_read lv loc contents =
                pretty_param_b param
                Origin.pretty orig
            | Location_Bytes.Map _ -> ())
-        Value_util.pp_callstack
+        Eva_utils.pp_callstack
 
 (* Auxiliary function for [do_assign] below. When computing the
    result of [lv = exp], warn if the evaluation of [exp] results in
@@ -114,7 +114,7 @@ let warn_right_exp_imprecision lv loc_lv exp_val =
              "@ @[The imprecision@ originates@ from@ %a@]"
              Origin.pretty org)
       origin
-      Value_util.pp_callstack
+      Eva_utils.pp_callstack
   | Location_Bytes.Map _ -> ()
 
 

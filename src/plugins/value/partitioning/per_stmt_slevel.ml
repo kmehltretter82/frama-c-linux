@@ -70,7 +70,7 @@ let kf_contains_slevel_directive kf =
     (Kernel_function.get_definition kf).sallstmts
 
 let compute kf =
-  let default_slevel = Value_util.get_slevel kf in
+  let default_slevel = Eva_utils.get_slevel kf in
   if not (kf_contains_slevel_directive kf) then
     Global default_slevel (* No slevel directive *), NoMerge
   else

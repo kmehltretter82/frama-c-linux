@@ -86,13 +86,13 @@ let memcpy_check_indeterminate_offsetmap offsm =
     with Indeterminate v ->
       Self.debug ~current:true ~dkey ~once:true
         "@[In memcpy@ builtin:@ precise@ copy of@ indeterminate@ values %a@]%t"
-        V_Or_Uninitialized.pretty v Value_util.pp_callstack
+        V_Or_Uninitialized.pretty v Eva_utils.pp_callstack
 
 (* Create a dependency [\from arg_n] where n is the nth argument of the
    currently called function. *)
 let deps_nth_arg n =
   let open Function_Froms in
-  let (kf,_) = List.hd (Value_util.call_stack()) in
+  let (kf,_) = List.hd (Eva_utils.call_stack()) in
   try
     let vi = List.nth (Kernel_function.get_formals kf) n in
     Deps.add_data_dep Deps.bottom (Locations.zone_of_varinfo vi)
@@ -242,7 +242,7 @@ let frama_c_memcpy state actuals =
           | V_Or_Uninitialized.C_init_noesc _ -> ()
           | _ -> Self.result ~dkey ~current:true ~once:true
                    "@[In memcpy@ builtin:@ imprecise@ copy of@ indeterminate@ values@]%t"
-                   Value_util.pp_callstack
+                   Eva_utils.pp_callstack
         end;
         let updated_state =
           Cvalue.Model.add_indeterminate_binding
@@ -602,8 +602,8 @@ let frama_c_memset state actuals =
       with ImpreciseMemset reason ->
         Self.debug ~dkey ~current:true
           "Call to builtin precise_memset(%a) failed; %a%t"
-          Value_util.pretty_actuals actuals pretty_imprecise_memset_reason reason
-          Value_util.pp_callstack;
+          Eva_utils.pretty_actuals actuals pretty_imprecise_memset_reason reason
+          Eva_utils.pp_callstack;
         frama_c_memset_imprecise state dst v size
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 3)
@@ -629,7 +629,7 @@ let frama_c_interval_split _state actuals =
       | Ival.Not_Singleton_Int ->
         Self.abort
           "Invalid call to Frama_C_interval_split%a"
-          Value_util.pretty_actuals actuals
+          Eva_utils.pretty_actuals actuals
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 2)
 

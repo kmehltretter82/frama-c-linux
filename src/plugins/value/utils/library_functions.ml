@@ -64,7 +64,7 @@ let returned_value kf =
   | TBuiltin_va_list _ ->
     Self.error ~current:true ~once:true
       "functions returning variadic arguments must be stubbed%t"
-      Value_util.pp_callstack;
+      Eva_utils.pp_callstack;
     Cvalue.V.top_int
   | TVoid _ -> Cvalue.V.top (* this value will never be used *)
   | TFun _ | TNamed _ | TArray _ -> assert false

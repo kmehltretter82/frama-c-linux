@@ -102,7 +102,7 @@ module DegenerationPoints =
   Cil_state_builder.Stmt_hashtbl
     (Datatype.Bool)
     (struct
-      let name = "Value_util.Degeneration"
+      let name = "Eva_utils.Degeneration"
       let size = 17
       let dependencies = [ Db.Value.self ]
     end)
@@ -238,13 +238,13 @@ let rec normalize_as_cond expr positive =
 
 module PairExpBool =
   Datatype.Pair_with_collections(Cil_datatype.Exp)(Datatype.Bool)
-    (struct let module_name = "Value.Value_util.PairExpBool" end)
+    (struct let module_name = "Value.Eva_utils.PairExpBool" end)
 module MemoNormalizeAsCond =
   State_builder.Hashtbl
     (PairExpBool.Hashtbl)
     (Cil_datatype.Exp)
     (struct
-      let name = "Value_util.MemoNormalizeAsCond"
+      let name = "Eva_utils.MemoNormalizeAsCond"
       let size = 64
       let dependencies = [ Ast.self ]
     end)
@@ -255,7 +255,7 @@ module MemoLvalToExp =
   Cil_state_builder.Lval_hashtbl
     (Cil_datatype.Exp)
     (struct
-      let name = "Value_util.MemoLvalToExp"
+      let name = "Eva_utils.MemoLvalToExp"
       let size = 64
       let dependencies = [ Ast.self ]
     end)

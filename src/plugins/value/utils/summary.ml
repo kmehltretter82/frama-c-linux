@@ -148,7 +148,7 @@ end
 (* --- Function stats computation --- *)
 
 let get_status ip =
-  let eva_emitter = Value_util.emitter in
+  let eva_emitter = Eva_utils.emitter in
   let aux_status emitter status acc =
     let emitter = Emitter.Usable_emitter.get emitter.Property_status.emitter in
     if Emitter.equal eva_emitter emitter

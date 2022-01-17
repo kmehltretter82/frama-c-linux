@@ -708,7 +708,7 @@ module Make
 
   (* Builds the information for an lvalue. *)
   let get_info context valuation lval =
-    let lv_expr = Value_util.lval_to_exp lval in
+    let lv_expr = Eva_utils.lval_to_exp lval in
     (* Reevaluates the lvalue in the initial state, as its value could have
        been reduced in the evaluation of the complete expression, and we cannot
        omit the alarms for the removed values. *)

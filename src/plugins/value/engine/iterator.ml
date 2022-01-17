@@ -129,7 +129,7 @@ module Make_Dataflow
     let state = AnalysisParam.initial_state
     and call_kinstr = AnalysisParam.call_kinstr
     and ab = active_behaviors in
-    if Value_util.skip_specifications kf then
+    if Eva_utils.skip_specifications kf then
       States.singleton state
     else match Logic.check_fct_preconditions call_kinstr kf ab state with
       | `Bottom -> States.empty
@@ -246,9 +246,9 @@ module Make_Dataflow
     let asm_contracts = Annotations.code_annot stmt in
     match Logic_utils.extract_contract asm_contracts with
     | [] ->
-      Value_util.warning_once_current
+      Eva_utils.warning_once_current
         "assuming assembly code has no effects in function %t"
-        Value_util.pretty_current_cfunction_name;
+        Eva_utils.pretty_current_cfunction_name;
       id
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
@@ -324,7 +324,7 @@ module Make_Dataflow
     (* Check postconditions *)
     let check_postconditions = fun state ->
       post_conditions := true;
-      if Value_util.skip_specifications kf then
+      if Eva_utils.skip_specifications kf then
         [state]
       else match
           Logic.check_fct_postconditions kf active_behaviors Normal
@@ -368,7 +368,7 @@ module Make_Dataflow
       (* We do not interpret annotations that come from statement contracts
          and everything previously emitted by Value (currently, alarms) *)
       let filter e ca =
-        not (Logic_utils.is_contract ca || Emitter.equal e Value_util.emitter)
+        not (Logic_utils.is_contract ca || Emitter.equal e Eva_utils.emitter)
       in
       List.map fst (Annotations.code_annot_emitter ~filter stmt)
     in
@@ -448,7 +448,7 @@ module Make_Dataflow
     let states = Partitioning.contents f in
     let cvalue_states = gather_cvalues states in
     Db.Value.Compute_Statement_Callbacks.apply
-      (stmt, Value_util.call_stack (), cvalue_states)
+      (stmt, Eva_utils.call_stack (), cvalue_states)
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
@@ -586,7 +586,7 @@ module Make_Dataflow
     let f stmt (v,_) =
       let l = get_succ_tanks v in
       if not (List.for_all Partitioning.is_empty_tank l) then
-        Value_util.DegenerationPoints.replace stmt false
+        Eva_utils.DegenerationPoints.replace stmt false
     in
     StmtTable.iter f automaton.stmt_table;
     match !current_ki with
@@ -594,7 +594,7 @@ module Make_Dataflow
     | Kstmt s ->
       let englobing_kf = Kernel_function.find_englobing_kf s in
       if Kernel_function.equal englobing_kf kf then (
-        Value_util.DegenerationPoints.replace s true)
+        Eva_utils.DegenerationPoints.replace s true)
 
   (* If the postconditions have not been evaluated, mark them as true. *)
   let mark_postconds_as_true () =
@@ -698,7 +698,7 @@ module Make_Dataflow
     in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
-    let callstack = Value_util.call_stack () in
+    let callstack = Eva_utils.call_stack () in
     if Mark_noresults.should_memorize_function fundec then begin
       let register_pre = Domain.Store.register_state_before_stmt callstack
       and register_post = Domain.Store.register_state_after_stmt callstack in
@@ -780,7 +780,7 @@ module Computer
       Dataflow.merge_results ();
       let f = Kernel_function.get_definition kf in
       if Cil.hasAttribute "noreturn" f.svar.vattr && results <> [] then
-        Value_util.warning_once_current
+        Eva_utils.warning_once_current
           "function %a may terminate but has the noreturn attribute"
           Kernel_function.pretty kf;
       results, !Dataflow.cacheable
@@ -789,7 +789,7 @@ module Computer
       Dataflow.mark_degeneration ();
       Dataflow.merge_results ()
     in
-    Value_util.protect compute ~cleanup
+    Eva_utils.protect compute ~cleanup
 end
 
 

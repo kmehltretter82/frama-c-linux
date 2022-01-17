@@ -117,7 +117,7 @@ let watch_hook (stmt, _callstack, states) =
              "Watchpoint: %a %a%t"
              Printer.pp_exp name
              V.pretty vs
-             Value_util.pp_callstack;
+             Eva_utils.pp_callstack;
            if Integer.is_zero current ||
               (Cil_datatype.Stmt.Set.mem stmt set)
            then ()

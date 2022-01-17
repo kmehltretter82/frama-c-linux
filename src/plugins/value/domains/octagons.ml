@@ -319,7 +319,7 @@ module Rewriting = struct
       || (Ival.contains_zero ival && Ival.contains_non_zero ival)
       then []
       else
-        let comp = Value_util.conv_comp binop in
+        let comp = Eva_utils.conv_comp binop in
         let comp =
           if Ival.is_zero ival then Abstract_interp.Comp.inv comp else comp
         in
@@ -382,7 +382,7 @@ module Rewriting = struct
         else ival, overflow_alarms typ expr ival
     | BinOp ((Lt | Gt | Le | Ge | Eq as binop), e1, e2, _typ)
       when Cil.isIntegralType (Cil.typeOf e1) ->
-      let comp = Value_util.conv_comp binop in
+      let comp = Eva_utils.conv_comp binop in
       (* Evaluate [e1 - e2] and compare the resulting interval to the interval
          for which the comparison [e1 # e2] holds. *)
       let range = comparison_range comp in

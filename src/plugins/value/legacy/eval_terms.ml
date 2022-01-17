@@ -985,7 +985,7 @@ let forward_binop_by_type typ =
 let forward_binop typ v1 op v2 =
   match op with
   | Eq | Ne | Le | Lt | Ge | Gt ->
-    let comp = Value_util.conv_comp op in
+    let comp = Eva_utils.conv_comp op in
     if Cil.isPointerType typ || Cvalue_forward.are_comparable comp v1 v2
     then forward_binop_by_type typ v1 op v2
     else Cvalue.V.zero_or_one
@@ -1983,7 +1983,7 @@ and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
     let exact_location = eval_term_as_exact_locs ~alarm_mode env tl in
     let rtl = eval_term ~alarm_mode env tr in
     let cond_v = rtl.eover in
-    let comp = Value_util.conv_relation rel in
+    let comp = Eva_utils.conv_relation rel in
     match exact_location with
     | Logic_var logic_var ->
       let cvalue = LogicVarEnv.find logic_var env.logic_vars in
@@ -2395,7 +2395,7 @@ and eval_predicate env pred =
       in
       let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in
       (* Check if we are trying to write in a const l-value *)
-      if kind = Write && Value_util.is_const_write_invalid typ_pointed
+      if kind = Write && Eva_utils.is_const_write_invalid typ_pointed
       then False
       else
         let eover, eunder, indeterminate, empty =

@@ -62,7 +62,7 @@ type validity_hidden_base =
 let stdlib_attribute = Attr ("fc_stdlib_generated", [])
 
 let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
-  let hidden_var = Value_util.create_new_var hidden_var_name pointed_typ in
+  let hidden_var = Eva_utils.create_new_var hidden_var_name pointed_typ in
   if libc
   then hidden_var.vattr <- Cil.addAttribute stdlib_attribute hidden_var.vattr;
   hidden_var.vdescr <- Some name_desc;
@@ -340,7 +340,7 @@ let initialize_var_using_type varinfo state =
         Cabs2cil.fresh_global ("WELL_"^name)
       in
       let hidden_var =
-        Value_util.create_new_var hidden_var_name Cil.charType
+        Eva_utils.create_new_var hidden_var_name Cil.charType
       in
       hidden_var.vdescr <- Some (name_desc^"_WELL");
       let validity = Base.Known (Integer.zero, Bit_utils.max_bit_address ()) in

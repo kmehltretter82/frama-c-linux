@@ -162,7 +162,7 @@ let active_highlighter buffer localizable ~start ~stop =
         let degenerate =
           try
             Some (
-              if Value_util.DegenerationPoints.find stmt
+              if Eva_utils.DegenerationPoints.find stmt
               then (make_tag buffer ~name:"degeneration" [`BACKGROUND "orange"])
               else (make_tag buffer ~name:"unpropagated" [`BACKGROUND "yellow"])
             )
@@ -520,7 +520,7 @@ module Select (Eval: Eval) = struct
          | Mem _, NoOffset when Cil.isFunctionType ty -> begin
              (* Function pointers *)
              (* get the list of functions in the values *)
-             let e = Value_util.lval_to_exp lv in
+             let e = Eva_utils.lval_to_exp lv in
              let state =
                match ki with
                | Kglobal -> Eval.Analysis.get_global_state ()

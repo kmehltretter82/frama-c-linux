@@ -1500,8 +1500,8 @@ src/plugins/value/utils/value_perf.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/value_perf.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/value_results.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/value_results.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/utils/value_util.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/utils/value_util.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/eva_utils.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/eva_utils.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/widen.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/widen.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/widen_hints_ext.ml: CEA_LGPL_OR_PROPRIETARY

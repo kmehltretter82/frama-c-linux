@@ -56,7 +56,7 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 (* -------------------------- Auxiliary functions  -------------------------- *)
 
 let current_call_site () =
-  match Value_util.call_stack () with
+  match Eva_utils.call_stack () with
   | (_kf, Kstmt stmt) :: _ -> stmt
   | _ -> Cil.dummyStmt
 
@@ -66,7 +66,7 @@ let current_call_site () =
      these call site correspond to a different use of a malloc function,
      so it is interesting to keep their bases separated. *)
 let call_stack_no_wrappers () =
-  let stack = Value_util.call_stack () in
+  let stack = Eva_utils.call_stack () in
   assert (stack != []);
   let wrappers = Parameters.AllocFunctions.get() in
   let rec bottom_filter = function
@@ -158,7 +158,7 @@ let create_new_var stack prefix type_base weak =
     | Strong -> prefix
   in
   let name = Cabs2cil.fresh_global (base_name prefix stack) in
-  Value_util.create_new_var name type_base
+  Eva_utils.create_new_var name type_base
 
 (* This function adds a "_w" information to a variable. It should be used
    when a variable becomes weak, and supposes that the variable has been
@@ -167,7 +167,7 @@ let create_new_var stack prefix type_base weak =
 let mutate_name_to_weak vi =
   Self.warning ~wkey:wkey_weak_alloc ~current:true ~once:false
     "@[marking variable `%s' as weak@]%t" vi.vname
-    Value_util.pp_callstack;
+    Eva_utils.pp_callstack;
   try
     let prefix, remainder =
       Scanf.sscanf vi.vname "__%s@_%s" (fun s1 s2 -> (s1, s2))
@@ -328,7 +328,7 @@ let alloc_fresh weak deallocation prefix sizev _state =
   Self.result ~current:true ~once:true
     "@[allocating %svariable %a@]%t"
     (if weak = Weak then "weak " else "") Printer.pp_varinfo var
-    Value_util.pp_callstack;
+    Eva_utils.pp_callstack;
   let size_char = Bit_utils.sizeofchar () in
   (* Sizes are in bits *)
   let min_alloc = Int.(pred (mul size_char tsize.min_bytes)) in
@@ -530,7 +530,7 @@ let calloc_builtin state args =
   let size = Cvalue.V.mul nmemb sizev in
   let size_ok = alloc_size_ok size in
   if size_ok <> Alarmset.True then
-    Value_util.warning_once_current
+    Eva_utils.warning_once_current
       "calloc out of bounds: assert(nmemb * size <= SIZE_MAX)";
   let c_values =
     if size_ok = Alarmset.False (* size always overflows *)
@@ -876,7 +876,7 @@ let check_leaked_malloced_bases state _ =
   let alloced_bases = Dynamic_Alloc_Bases.get () in
   Base_hptmap.iter
     (fun base _ -> if check_if_base_is_leaked base state then
-        Value_util.warning_once_current "memory leak detected for %a"
+        Eva_utils.warning_once_current "memory leak detected for %a"
           Base.pretty base)
     alloced_bases;
   let c_clobbered = Base.SetLattice.bottom in

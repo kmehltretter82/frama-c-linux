@@ -49,7 +49,7 @@ let mark_unreachable () =
       Self.debug "Marking property %a as dead"
         Description.pp_property ppt;
       let emit =
-        Property_status.emit ~distinct:false Value_util.emitter ~hyps:[]
+        Property_status.emit ~distinct:false Eva_utils.emitter ~hyps:[]
       in
       let reach_p = Property.ip_reachable_ppt ppt in
       emit ppt Property_status.True;
@@ -73,7 +73,7 @@ let mark_unreachable () =
         let mark_status kf =
           (* Do not mark preconditions as dead if they are not analyzed in
              non-dead code. Otherwise, the consolidation does strange things. *)
-          if not (Value_util.skip_specifications kf) ||
+          if not (Eva_utils.skip_specifications kf) ||
              Builtins.is_builtin_overridden kf
           then begin
             (* Setup all precondition statuses for [kf]: maybe it has
@@ -187,7 +187,7 @@ let mark_green_and_red () =
             | `True -> Property_status.True, "valid"
             | `False -> Property_status.False_if_reachable, "invalid"
           in
-          Property_status.emit ~distinct Value_util.emitter ~hyps:[] ip status;
+          Property_status.emit ~distinct Eva_utils.emitter ~hyps:[] ip status;
           let source = fst loc in
           let text_ca = code_annotation_text ca in
           Self.result ~once:true ~source "%s%a got final status %s."
@@ -230,7 +230,7 @@ let mark_invalid_initializers () =
             let status = Property_status.False_and_reachable in
             let distinct = false (* see comment in mark_green_and_red above *) in
             Red_statuses.add_red_property Kglobal ip;
-            Property_status.emit ~distinct Value_util.emitter ~hyps:[] ip status;
+            Property_status.emit ~distinct Eva_utils.emitter ~hyps:[] ip status;
         end
       | _ -> ()
   in

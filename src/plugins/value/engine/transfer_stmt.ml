@@ -88,7 +88,7 @@ let is_determinate kf =
   (warn_indeterminate kf || !Db.Value.use_spec_instead_of_definition kf)
   && not (Ast_info.is_frama_c_builtin name)
 
-let subdivide_stmt = Value_util.get_subdivision
+let subdivide_stmt = Eva_utils.get_subdivision
 
 let subdivide_kinstr = function
   | Kglobal -> Parameters.LinearLevel.get ()
@@ -243,7 +243,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     | `Bottom ->
       Kernel.warning ~current:true ~once:true
         "@[<v>@[all target addresses were invalid. This path is \
-         assumed to be dead.@]%t@]" Value_util.pp_callstack;
+         assumed to be dead.@]%t@]" Eva_utils.pp_callstack;
       `Bottom
     | `Value (valuation, lloc, ltyp) ->
       (* Tries to interpret the assignment as a copy for the returned value
@@ -312,9 +312,9 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Returns the result of a call, and a boolean that indicates whether a
      builtin has been used to interpret the call. *)
   let process_call stmt call recursion valuation state =
-    Value_util.push_call_stack call.kf (Kstmt stmt);
+    Eva_utils.push_call_stack call.kf (Kstmt stmt);
     let cleanup () =
-      Value_util.pop_call_stack ();
+      Eva_utils.pop_call_stack ();
       (* Changed by compute_call_ref, called from process_call *)
       Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
     in
@@ -324,7 +324,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         (* Process the call according to the domain decision. *)
         match Domain.start_call stmt call recursion domain_valuation state with
         | `Value state ->
-          Domain.Store.register_initial_state (Value_util.call_stack ()) state;
+          Domain.Store.register_initial_state (Eva_utils.call_stack ()) state;
           !compute_call_ref stmt call recursion state
         | `Bottom ->
           { states = []; cacheable = Cacheable; builtin=false }
@@ -332,7 +332,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       cleanup ();
       res
     in
-    Value_util.protect process
+    Eva_utils.protect process
       ~cleanup:(fun () -> InOutCallback.clear (); cleanup ())
 
   (* ------------------- Retro propagation on formals ----------------------- *)
@@ -363,7 +363,7 @@ module Make (Abstract: Abstractions.Eva) = struct
             | `Top -> Precise_locs.loc_top
             | `Value record -> get record.loc
           in
-          let expr_zone = Value_util.zone_of_expr find_loc expr in
+          let expr_zone = Eva_utils.zone_of_expr find_loc expr in
           let written_zone = inout.Inout_type.over_outputs_if_termination in
           not (Locations.Zone.intersects expr_zone written_zone)
 
@@ -440,7 +440,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     | None, Some vi_ret -> `Value (Domain.leave_scope kf_callee [vi_ret] state)
     | Some _, None -> assert false
     | Some lval, Some vi_ret ->
-      let exp_ret_caller = Value_util.lval_to_exp  (Var vi_ret, NoOffset) in
+      let exp_ret_caller = Eva_utils.lval_to_exp  (Var vi_ret, NoOffset) in
       assign_ret state (Kstmt stmt) lval exp_ret_caller
       >>-: fun state -> Domain.leave_scope kf_callee [vi_ret] state
 
@@ -534,7 +534,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Create an Eval.call *)
   let create_call kf args =
     let return = Library_functions.get_retres_vi kf in
-    let callstack = Value_util.call_stack () in
+    let callstack = Eva_utils.call_stack () in
     let arguments, rest =
       let formals = Kernel_function.get_formals kf in
       let rec format_arguments acc args formals = match args, formals with
@@ -601,7 +601,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   let dump_state name state =
     Self.result ~current:true
       "%s:@\n@[<v>%a@]==END OF DUMP==%t"
-      name print_state state Value_util.pp_callstack
+      name print_state state Eva_utils.pp_callstack
 
   (* Idem as for [print_state]. *)
   let show_expr =
@@ -629,7 +629,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     let pp = Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pretty in
     Self.result ~current:true
       "@[<v>%s:@ %a@]%t"
-      name pp arguments Value_util.pp_callstack
+      name pp arguments Eva_utils.pp_callstack
 
   (* For non scalar expressions, prints the offsetmap of the cvalue domain. *)
   let show_offsm =
@@ -674,7 +674,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   let show_each ~subdivnb name arguments state =
     Self.result ~current:true
       "@[<hv>%s:@ %a@]%t"
-      name (pretty_arguments ~subdivnb state) arguments Value_util.pp_callstack
+      name (pretty_arguments ~subdivnb state) arguments Eva_utils.pp_callstack
 
   (* Frama_C_dump_each_file functions. *)
   let dump_state_file_exc ~subdivnb name arguments state =
@@ -692,7 +692,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     let fmt = Format.formatter_of_out_channel ch in
     let l = fst (Cil.CurrentLoc.get ()) in
     Self.feedback ~current:true "Dumping state in file '%s'%t"
-      file Value_util.pp_callstack;
+      file Eva_utils.pp_callstack;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
       Datatype.Filepath.pretty l.Filepath.pos_path
       l.Filepath.pos_lnum;
@@ -728,10 +728,10 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Legacy callbacks for the cvalue domain, usually called by
      {Cvalue_transfer.start_call}. *)
   let apply_cvalue_callback kf ki_call state =
-    let stack_with_call = (kf, ki_call) :: Value_util.call_stack () in
+    let stack_with_call = (kf, ki_call) :: Eva_utils.call_stack () in
     let cvalue_state = Domain.get_cvalue_or_top state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
-    Db.Value.merge_initial_state (Value_util.call_stack ()) cvalue_state;
+    Db.Value.merge_initial_state (Eva_utils.call_stack ()) cvalue_state;
     Db.Value.Call_Type_Value_Callbacks.apply
       (`Builtin None, cvalue_state, stack_with_call)
 
@@ -749,7 +749,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     let cacheable = ref Cacheable in
     let eval =
       functions >>-: fun functions ->
-      let current_kf = Value_util.current_kf () in
+      let current_kf = Eva_utils.current_kf () in
       let process_one_function kf valuation =
         (* The special Frama_C_ functions to print states are handled here. *)
         if apply_special_directives ~subdivnb kf args state

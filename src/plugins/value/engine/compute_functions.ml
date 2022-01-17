@@ -87,12 +87,12 @@ let pre_analysis () =
   Value_perf.reset ();
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
-  Value_util.DegenerationPoints.clear ();
+  Eva_utils.DegenerationPoints.clear ();
   Cvalue.V.clear_garbled_mix ();
-  Value_util.clear_call_stack ()
+  Eva_utils.clear_call_stack ()
 
 let post_analysis_cleanup ~aborted =
-  Value_util.clear_call_stack ();
+  Eva_utils.clear_call_stack ();
   (* Precompute consolidated states if required *)
   if Parameters.JoinResults.get () then
     Db.Value.Table_By_Callstack.iter
@@ -105,7 +105,7 @@ let post_analysis () =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
-  Value_util.dump_garbled_mix ();
+  Eva_utils.dump_garbled_mix ();
   (* Mark unreachable and RTE statuses. Only do this there, not when the
      analysis was aborted (hence, not in post_cleanup), because the
      propagation is incomplete. Also do not mark unreachable statutes if
@@ -176,7 +176,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     Value_results.mark_kf_as_called kf;
     let global = match call_kinstr with Kglobal -> true | _ -> false in
     let pp = not global && Parameters.ValShowProgress.get () in
-    let call_stack = Value_util.call_stack () in
+    let call_stack = Eva_utils.call_stack () in
     if pp then
       Self.feedback
         "@[computing for function %a.@\nCalled from %a.@]"
@@ -244,13 +244,13 @@ module Make (Abstract: Abstractions.Eva) = struct
         in
         call_result
       | Some (states, i) ->
-        let stack = Value_util.call_stack () in
+        let stack = Eva_utils.call_stack () in
         let cvalue = Abstract.Dom.get_cvalue_or_top init_state in
         Db.Value.Call_Type_Value_Callbacks.apply (`Memexec, cvalue, stack);
         (* Evaluate the preconditions of kf, to update the statuses
            at this call. *)
         let spec = Annotations.funspec call.kf in
-        if not (Value_util.skip_specifications call.kf) &&
+        if not (Eva_utils.skip_specifications call.kf) &&
            Eval_annots.has_requires spec
         then begin
           let ab = Logic.create init_state call.kf in
@@ -263,7 +263,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           Self.debug ~dkey
             "calling Record_Value_New callbacks on saved previous result";
         end;
-        let stack_with_call = Value_util.call_stack () in
+        let stack_with_call = Eva_utils.call_stack () in
         Db.Value.Record_Value_Callbacks_New.apply
           (stack_with_call, Value_types.Reuse i);
         (* call can be cached since it was cached once *)
@@ -310,7 +310,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
       match final_state with
       | `Bottom ->
-        let cs = Value_util.call_stack () in
+        let cs = Eva_utils.call_stack () in
         Db.Value.Call_Type_Value_Callbacks.apply (`Spec spec, cvalue_state, cs);
         let cacheable = Eval.Cacheable in
         Transfer.{states; cacheable; builtin=true}
@@ -337,14 +337,14 @@ module Make (Abstract: Abstractions.Eva) = struct
   let () = Transfer.compute_call_ref := compute_call
 
   let store_initial_state kf init_state =
-    Abstract.Dom.Store.register_initial_state (Value_util.call_stack ()) init_state;
+    Abstract.Dom.Store.register_initial_state (Eva_utils.call_stack ()) init_state;
     let cvalue_state = Abstract.Dom.get_cvalue_or_top init_state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, [kf, Kglobal])
 
   let compute kf init_state =
     let restore_signals = register_signal_handler () in
     let compute () =
-      Value_util.push_call_stack kf Kglobal;
+      Eva_utils.push_call_stack kf Kglobal;
       store_initial_state kf init_state;
       let call =
         { kf; callstack = []; arguments = []; rest = []; return = None; }
@@ -354,7 +354,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       in
       let final_states = List.map snd (final_result.Transfer.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
-      Value_util.pop_call_stack ();
+      Eva_utils.pop_call_stack ();
       Self.feedback "done for function %a" Kernel_function.pretty kf;
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis ();
@@ -366,7 +366,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis_cleanup ~aborted:true
     in
-    Value_util.protect compute ~cleanup
+    Eva_utils.protect compute ~cleanup
 
   let compute_from_entry_point kf ~lib_entry =
     pre_analysis ();
@@ -374,7 +374,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       (if lib_entry then "n in" else " ")
       Kernel_function.pretty kf;
     let initial_state =
-      Value_util.protect
+      Eva_utils.protect
         (fun () -> Init.initial_state_with_formals ~lib_entry kf)
         ~cleanup:(fun () -> post_analysis_cleanup ~aborted:true)
     in

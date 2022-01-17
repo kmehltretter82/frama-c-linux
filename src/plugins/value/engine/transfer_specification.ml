@@ -40,7 +40,7 @@ let find_default_behavior spec =
   List.find (fun b' -> b'.b_name = Cil.default_behavior_name) spec.spec_behavior
 
 let warn_empty_assigns () =
-  Value_util.warning_once_current
+  Eva_utils.warning_once_current
     "Cannot handle empty assigns clause. Assuming assigns \\nothing: \
      be aware this is probably incorrect."
 
@@ -109,9 +109,9 @@ let warn_on_missing_result_assigns kinstr kf spec =
   let return_used = match kinstr with
     | Kglobal -> true
     | Kstmt {skind = Instr (Call (lv, _, _, _))} ->
-      lv <> None || Value_util.postconditions_mention_result spec
+      lv <> None || Eva_utils.postconditions_mention_result spec
     | Kstmt {skind = Instr (Local_init(_,ConsInit(_,_,Constructor),_)) } ->
-      Value_util.postconditions_mention_result spec
+      Eva_utils.postconditions_mention_result spec
     | Kstmt {skind=Instr(Local_init(_,ConsInit(_,_,Plain_func),_))} -> true
     | _ -> assert false
   in
@@ -164,7 +164,7 @@ let precise_loc_of_assign env kind term =
     in
     if kind <> From then reduce_to_valid_location kind term loc else Some loc
   with Eval_terms.LogicEvalError e ->
-    Value_util.warning_once_current
+    Eva_utils.warning_once_current
       "@[<hov 0>@[<hov 2>cannot interpret %a@]%a;@ effects will be ignored@]"
       pp_assign_clause (kind, term) pp_eval_error e;
     None

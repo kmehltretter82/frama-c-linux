@@ -31,7 +31,7 @@ let mark_unknown_requires kinstr kf funspec =
     | Kglobal -> assert false
     | Kstmt stmt -> stmt
   in
-  let emitter = Value_util.emitter in
+  let emitter = Eva_utils.emitter in
   let status = Property_status.Dont_know in
   let emit_behavior behavior =
     let emit_predicate predicate =
@@ -58,7 +58,7 @@ let get_spec kinstr kf =
       Kernel_function.pretty kf
       Parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
-      Value_util.pp_callstack;
+      Eva_utils.pp_callstack;
     Cil.CurrentLoc.set (Kernel_function.get_location kf);
     ignore (!Annotations.populate_spec_ref kf funspec);
     Annotations.funspec kf

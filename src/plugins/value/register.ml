@@ -257,7 +257,7 @@ module Eval = struct
     bot_value (eval >>-: snd)
 
   let eval_lval ?with_alarms deps state lval =
-    let expr = Value_util.lval_to_exp lval in
+    let expr = Eva_utils.lval_to_exp lval in
     let res, valuation = eval_expr_with_valuation ?with_alarms deps state expr in
     let typ = match valuation with
       | None -> Cil.typeOfLval lval
@@ -413,7 +413,7 @@ module Export (Eval : Eval) = struct
   let lval_to_zone_with_deps_state state ~for_writing ~deps lv =
     let deps, r = lval_to_precise_loc_with_deps_state state ~deps lv in
     let r = (* No write effect if [lv] is const *)
-      if for_writing && (Value_util.is_const_write_invalid (Cil.typeOfLval lv))
+      if for_writing && (Eva_utils.is_const_write_invalid (Cil.typeOfLval lv))
       then Precise_locs.loc_bottom
       else r
     in

@@ -207,7 +207,7 @@ let for_all test ~default = function
 
 open CilE
 
-let emitter = Value_util.emitter
+let emitter = Eva_utils.emitter
 
 (* Printer that shows additional information about temporaries *)
 let local_printer: Printer.extensible_printer =
@@ -272,8 +272,8 @@ let loc = function
   | Cil_types.Kstmt s -> Cil_datatype.Stmt.loc s
 
 let report_alarm ki annot msg =
-  Value_util.alarm_report ~source:(fst (loc ki)) "@[%s.@ @[<hov 2>%a@]@]%t"
-    msg pr_annot annot Value_util.pp_callstack
+  Eva_utils.alarm_report ~source:(fst (loc ki)) "@[%s.@ @[<hov 2>%a@]@]%t"
+    msg pr_annot annot Eva_utils.pp_callstack
 
 let string_fkind = function
   | Cil_types.FFloat -> "float"
@@ -372,7 +372,7 @@ let emit_alarm kinstr alarm (status:status) =
   | Alarms.Invalid_bool _ ->
     register_alarm "trap representation of a _Bool lvalue"
 
-let height_alarm = let open Value_util in function
+let height_alarm = let open Eva_utils in function
     | Alarms.Division_by_zero e
     | Alarms.Index_out_of_bound (e,_)
     | Alarms.Invalid_pointer e

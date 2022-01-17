@@ -151,10 +151,10 @@ let check_fct_assigns kf ab ~pre_state found_froms =
            (pp_header kf) b
            status_txt
            pp_activity activity
-           Value_util.pp_callstack;
+           Eva_utils.pp_callstack;
          let emit_status ppt status =
            Property_status.emit
-             ~distinct:true Value_util.emitter ~hyps:[] ppt status
+             ~distinct:true Eva_utils.emitter ~hyps:[] ppt status
          in
          emit_status ip status;
          (* Now, checks the individual froms. *)
@@ -172,7 +172,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
                (pp_header kf) b
                status_txt
                pp_activity activity
-               Value_util.pp_callstack;
+               Eva_utils.pp_callstack;
              emit_status ip (conv_status status)
          in
          List.iter2 check_from assigns_deps assigns_zones)

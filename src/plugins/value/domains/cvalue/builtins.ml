@@ -264,7 +264,7 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
   let arguments = compute_arguments call.arguments call.rest in
   try
     let call_result = builtin pre arguments in
-    let call_stack = Value_util.call_stack () in
+    let call_stack = Eva_utils.call_stack () in
     let froms =
       match call_result with
       | Full result -> `Builtin result.c_from

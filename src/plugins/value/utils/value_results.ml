@@ -134,7 +134,7 @@ type results = {
 }
 
 let get_results () =
-  let vue = Emitter.get Value_util.emitter in
+  let vue = Emitter.get Eva_utils.emitter in
   let main = Some (fst (Globals.entry_point ())) in
   let module CS = Value_types.Callstack in
   let copy_states iter =
@@ -245,12 +245,12 @@ let set_results results =
   (* Alarms *)
   let aux_alarms (alarm, stmt) st =
     let ki = Cil_types.Kstmt stmt in
-    ignore (Alarms.register Value_util.emitter ki ~status:st alarm)
+    ignore (Alarms.register Eva_utils.emitter ki ~status:st alarm)
   in
   AlarmsStmt.Hashtbl.iter aux_alarms results.alarms;
   (* Statuses *)
   let aux_statuses ip st =
-    Property_status.emit Value_util.emitter ~hyps:[] ip st
+    Property_status.emit Eva_utils.emitter ~hyps:[] ip st
   in
   Property.Hashtbl.iter aux_statuses results.statuses;
   Db.Value.mark_as_computed ();
