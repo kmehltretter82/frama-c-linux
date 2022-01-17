@@ -22,6 +22,9 @@
 
 include Plugin.General_services
 
+val proxy: State_builder.Proxy.t
+val state: State.t
+
 (** Debug categories responsible for printing initial and final states of Value.
     Enabled by default, but can be disabled via the command-line:
     -value-msg-key="-initial_state,-final_state" *)

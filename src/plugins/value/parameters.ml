@@ -45,9 +45,8 @@ let kernel_parameters_correctness = [
 let parameters_correctness = ref Typed_parameter.Set.empty
 let parameters_tuning = ref Typed_parameter.Set.empty
 let add_dep p =
-  State_dependency_graph.add_codependencies
-    ~onto:Db.Value.self
-    [State.get p.Typed_parameter.name]
+  let state = State.get p.Typed_parameter.name in
+  State_builder.Proxy.extend [state] Self.proxy
 let add_correctness_dep p =
   if Typed_parameter.Set.mem p !parameters_correctness then
     Kernel.abort "adding correctness parameter %a twice"

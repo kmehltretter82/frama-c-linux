@@ -28,6 +28,20 @@ include Plugin.Register
         "automatically computes variation domains for the variables of the program"
     end)
 
+(* Do not add dependencies to Kernel parameters here, but at the top of
+   Parameters. *)
+let kernel_dependencies =
+  [ Ast.self;
+    Alarms.self;
+    Annotations.code_annot_state; ]
+
+let dependencies = Db.Value.self :: kernel_dependencies
+
+let proxy = State_builder.Proxy.(create "eva" Forward dependencies)
+let state = State_builder.Proxy.get proxy
+
+let () = State_builder.Proxy.extend [state] Db.Value.proxy
+
 let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
 let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
 
