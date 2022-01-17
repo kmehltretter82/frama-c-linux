@@ -560,7 +560,7 @@ module State = struct
   let display_results () =
     Self.result "====== VALUES COMPUTED ======";
     Eva_dynamic.Callgraph.iter_in_rev_order display;
-    Self.result "%t" Value_perf.display
+    Self.result "%t" Eva_perf.display
 
   let post_analysis _state =
     if Parameters.ForceValues.get ()

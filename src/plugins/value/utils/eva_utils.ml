@@ -31,13 +31,13 @@ let clear_call_stack () =
   call_stack := []
 
 let pop_call_stack () =
-  Value_perf.stop_doing !call_stack;
+  Eva_perf.stop_doing !call_stack;
   call_stack := List.tl !call_stack
 ;;
 
 let push_call_stack kf ki =
   call_stack := (kf,ki) :: !call_stack;
-  Value_perf.start_doing !call_stack
+  Eva_perf.start_doing !call_stack
 ;;
 
 

@@ -858,7 +858,7 @@ endif
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
-	utils/eva_audit utils/value_perf utils/eva_annotations \
+	utils/eva_audit utils/eva_perf utils/eva_annotations \
 	utils/eva_dynamic utils/eva_utils utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen \

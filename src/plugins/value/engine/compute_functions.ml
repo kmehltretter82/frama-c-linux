@@ -84,7 +84,7 @@ let pre_analysis () =
   generate_specs ();
   Widen.precompute_widen_hints ();
   Builtins.prepare_builtins ();
-  Value_perf.reset ();
+  Eva_perf.reset ();
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
