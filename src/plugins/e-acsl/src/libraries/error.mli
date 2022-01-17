@@ -23,57 +23,89 @@
 (** Handling errors. *)
 open Error_types
 
-exception Typing_error of string
-exception Not_yet of string
-exception Not_memoized
+(** Internal module holding the exception of [Error].
 
-val untypable: string -> 'a
-(** Type error built from the given argument. *)
+    The module is included into [S] later and should not be used directly.
+    However we need to have a separate module for the exception so that every
+    exception built by [Make] is the exact same type. *)
+module type Exn = sig
+  exception Typing_error of Options.category option * string
+  (** Typing error where the first element is the phase where the error occured
+      and the second element is the error message. *)
 
-val not_yet: string -> 'a
-(** Not_yet_implemented error built from the given argument. *)
+  exception Not_yet of Options.category option * string
+  (** "Not yet supported" error where the first element is the phase where the
+      error occured and the second element is the error message. *)
 
-val not_memoized : unit -> 'a
-(** @raise Not_memoized  when asking the preprocessed form of something that
-    was not preprocessed *)
+  exception Not_memoized of Options.category option
+  (** "Not memoized" error with the phase where the error occured. *)
+end
 
-val handle: ('a -> 'a) -> 'a -> 'a
-(** Run the closure with the given argument and handle potential errors.
-    Return the provide argument in case of errors. *)
+module type S = sig
+  include Exn
 
-val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b
-(** Run the closure with the given argument and handle potential errors.
-    Return the additional argument in case of errors. *)
+  val make_untypable: string -> exn
+  (** Make a [Typing_error] exception with the given message. *)
 
-val nb_untypable: unit -> int
-(** Number of untypable annotations. *)
+  val make_not_yet: string -> exn
+  (** Make a [Not_yet] exception with the given message. *)
 
-val nb_not_yet: unit -> int
-(** Number of not-yet-supported annotations. *)
+  val make_not_memoized: unit -> exn
+  (** Make a [Not_memoized] exception with the given message. *)
 
-val print_not_yet: string -> unit
-(** Print the "not yet" message without raising an exception. *)
+  val untypable: string -> 'a
+  (** @raise Typing_error with the given message. *)
 
-val retrieve_preprocessing:
-  string ->
-  ('a -> 'b or_error) ->
-  'a ->
-  (Format.formatter -> 'a -> unit) ->
-  'b
-(** Retrieve the result of a preprocessing phase, which possibly failed.
-    The [string] argument and the formatter are used to display a message in
-    case the preprocessing phase did not compute the required result. *)
+  val not_yet: string -> 'a
+  (** @raise Not_yet with the given message. *)
 
-val pp_or_error:
-  (Format.formatter -> 'a -> unit) ->
-  Format.formatter ->
-  'a or_error ->
-  unit
-(** [pp_or_error pp] where [pp] is a formatter for ['a] returns a formatter for
-    ['a or_error]. *)
+  val not_memoized: unit -> 'a
+  (** @raise Not_memoized *)
+
+  val print_not_yet: string -> unit
+  (** Print the "not yet supported" message without raising an exception. *)
+
+  val handle: ('a -> 'a) -> 'a -> 'a
+  (** Run the closure with the given argument and handle potential errors.
+      Return the provide argument in case of errors. *)
+
+  val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b
+  (** Run the closure with the given argument and handle potential errors.
+      Return the additional argument in case of errors. *)
+
+  val nb_untypable: unit -> int
+  (** Number of untypable annotations. *)
+
+  val nb_not_yet: unit -> int
+  (** Number of not-yet-supported annotations. *)
+
+  val retrieve_preprocessing:
+    string ->
+    ('a -> 'b or_error) ->
+    'a ->
+    (Format.formatter -> 'a -> unit) ->
+    'b
+  (** Retrieve the result of a preprocessing phase, which possibly failed.
+      The [string] argument and the formatter are used to display a message in
+      case the preprocessing phase did not compute the required result. *)
+
+  val pp_or_error:
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter ->
+    'a or_error ->
+    unit
+    (** [pp_or_error pp] where [pp] is a formatter for ['a] returns a formatter for
+        ['a or_error]. *)
+end
+
+(** Functor to build an [Error] module for a given [phase]. *)
+module Make(P: sig val phase:Options.category end): S
+
+(** The [Error] module implements [Error.S] with no phase. *)
+include S
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../../.."
 End:
 *)
