@@ -742,6 +742,7 @@ check_plugin(from_analysis,src/plugins/from,[support for from analysis],yes)
 
 plugin_require(from_analysis,eva)
 plugin_require(from_analysis,callgraph)
+plugin_require(from_analysis,postdominators)
 
 # gui
 #####
@@ -807,6 +808,13 @@ plugin_require(pdg,callgraph)
 check_plugin(postdominators,src/plugins/postdominators,
              [support for postdominators plugin],yes)
 
+# reduc
+############
+
+check_plugin(reduc,src/plugins/reduc,[support for reduc plugin],yes)
+plugin_require(reduc,eva)
+plugin_require(reduc,inout)
+
 # rte
 #####
 
@@ -848,7 +856,7 @@ plugin_require(sparecode,users)
 
 check_plugin(users,src/plugins/users,[support for users analysis],yes)
 plugin_require(users,eva)
-plugin_use(users,callgraph)
+plugin_require(users,callgraph)
 
 # value
 #######
