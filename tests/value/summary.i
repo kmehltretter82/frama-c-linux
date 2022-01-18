@@ -3,8 +3,8 @@
   STDOPT: +"-eva-msg-key=summary -main minimal"
   STDOPT: +"-eva-msg-key=summary -main bottom"
   STDOPT: +"-eva-msg-key=summary -main main"
-PLUGIN: @PTEST_PLUGIN@ rtegen
-  STDOPT: +"@RTE_TEST@ -eva-msg-key=summary -main main -slevel 0"
+  PLUGIN: @PTEST_PLUGIN@ rtegen
+  OPT: -machdep x86_32 @RTE_TEST@ -then @EVA_TEST@ -eva-msg-key=summary -main main -slevel 0
 */
 /* Tests the summary on the smallest possible program. */
 void minimalist ();

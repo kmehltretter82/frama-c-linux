@@ -54,6 +54,12 @@ let options_ok () =
   Value_parameters.BuiltinsOverrides.iter (fun (kf, _) -> check_assigns kf);
   Value_parameters.UsePrototype.iter (fun kf -> check_assigns kf)
 
+let plugins_ok () =
+  if not (Plugin.is_present "inout") then
+    Value_parameters.warning
+      "The inout plugin is missing: some features are disabled, \
+       and the analysis may have degraded precision and performance."
+
 (* Do something tasteless in case the user did not put a spec on functions
    for which he set [-eva-use-spec]:  generate an incorrect one ourselves *)
 let generate_specs () =
@@ -73,6 +79,7 @@ let generate_specs () =
 let pre_analysis () =
   floats_ok ();
   options_ok ();
+  plugins_ok ();
   Split_return.pretty_strategies ();
   generate_specs ();
   Widen.precompute_widen_hints ();
@@ -108,10 +115,10 @@ let post_analysis () =
   (* Try to refine the 'Unknown' statuses that have been emitted during
      this analysis. *)
   Eval_annots.mark_green_and_red ();
-  Eval_annots.mark_rte ();
+  Eva_dynamic.RteGen.mark_generated_rte ();
   post_analysis_cleanup ~aborted:false;
   (* Remove redundant alarms *)
-  if Value_parameters.RmAssert.get () then !Db.Value.rm_asserts ()
+  if Value_parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ()
 
 (* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva
    analysis. Returns a function that restores previous signal behaviors after

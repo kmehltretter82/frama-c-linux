@@ -227,9 +227,7 @@ let gui_compute_values (main_ui:main_ui) =
 
 let cleaned_outputs kf s =
   let outs = Db.Outputs.kinstr (Kstmt s) in
-  let accept =
-    Callgraph.Uses.accept_base ~with_formals:true ~with_locals:true kf
-  in
+  let accept = Eva_dynamic.Callgraph.accept_base kf in
   let filter = Locations.Zone.filter_base accept in
   Option.map filter outs
 

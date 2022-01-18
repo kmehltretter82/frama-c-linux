@@ -1,4 +1,5 @@
 [kernel] Parsing unknown_sizeof.i (no preprocessing)
+[eva] Warning: The inout plugin is missing: some features are disabled, and the analysis may have degraded precision and performance.
 [eva] Analyzing a complete application starting at main2
 [eva] Computing initial state
 [eva:unknown-size] unknown_sizeof.i:8: Warning: 

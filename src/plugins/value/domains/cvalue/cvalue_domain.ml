@@ -559,11 +559,13 @@ module State = struct
 
   let display_results () =
     Value_parameters.result "====== VALUES COMPUTED ======";
-    Callgraph.Uses.iter_in_rev_order display;
+    Eva_dynamic.Callgraph.iter_in_rev_order display;
     Value_parameters.result "%t" Value_perf.display
 
   let post_analysis _state =
-    if Value_parameters.ForceValues.get () && Value_parameters.verbose_atleast 1
+    if Value_parameters.ForceValues.get ()
+    && Value_parameters.verbose_atleast 1
+    && Plugin.is_present "inout"
     then Value_parameters.ForceValues.output display_results
 end
 

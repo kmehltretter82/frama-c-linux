@@ -856,7 +856,7 @@ endif
 # - try to keep the legacy Value before Eva
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	utils/eva_audit utils/value_perf utils/eva_annotations \
-	utils/value_util utils/red_statuses \
+	utils/eva_dynamic utils/value_util utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen \
 	partitioning/split_return \
@@ -910,7 +910,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	utils/unit_tests
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
-PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen Server
+PLUGIN_DEPENDENCIES:=Server
 
 # These files are used by the GUI, but do not depend on Lablgtk
 VALUE_GUI_AUX:=gui_files/gui_types gui_files/gui_eval \
