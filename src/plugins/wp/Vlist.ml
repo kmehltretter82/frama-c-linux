@@ -332,24 +332,35 @@ let rewrite_is_nil ~nil a =
       F.p_or (F.p_leq n F.e_zero) (p_is_nil u)
   | _ -> raise Not_found
 
+
+(* Ensures xs to be a sub-sequence of ys, otherwise raise Not_found
+   In such a case, (concat xs = concat ys) <==> (forall r in result, r = nil) *)
+let rec subsequence xs ys =
+    match xs , ys with
+    | [],ys -> ys
+    | x::rxs, y::rys ->
+        if (F.decide (e_eq x y)) then subsequence rxs rys else y :: subsequence xs rys
+    | _ -> raise Not_found
+
 let elements a =
   match F.repr a with
-  | L.Fun( nil , [] ) when nil == f_nil -> []
-  | L.Fun( concat , es ) when concat == f_concat -> es
-  | _ -> [a]
+  | L.Fun(concat,es) when concat == f_concat -> true, es
+  | _ -> false, [ a ]
 
-(* [omit rs x ys]: if ys = u.x.v returns (rs+u,v) with r in reverse order *)
+(* Ensures that [a] or [b] is a sub-sequence of the other, otherwise [raise Not_found]
+   In such a case, (concat xs = concat ys) <==> (forall r in result, r = nil) *)
+let subsequence a b =
+  let destruct_a, xs = elements a in
+  let destruct_b, ys = elements b in
+  if not (destruct_a || destruct_b) then raise Not_found;
+  let shortest,xs,ys = if List.length xs <= List.length ys then a,xs,ys else b,ys,xs in
+  let es = subsequence xs ys in
+  (* xs=ys <==> forall s in es ; s = nil *)
+  let nil = v_nil (F.typeof shortest) in
+  (* [s] are elements of [ys] (the longest sequence) and [nil] has the same type than the [shortest] sequence *)
+  let p_is_nil s = F.p_equal nil s in
+  F.p_all p_is_nil es
 
-let rec omit rs x = function
-  | [] -> raise Not_found
-  | y::ys -> if x == y then rs,ys else omit (y::rs) x ys
-
-let rec subsequence xs rs ys =
-  match xs with
-  | [] -> List.rev_append rs ys
-  | x::xs ->
-      let rs,ys = omit rs x ys in
-      subsequence xs rs ys
 
 let rewrite_eq a b =
   debug "Vlist.rewrite_eq: tries to rewrite %a@ = %a@.- left pattern:  %a@.- right pattern: %a@."
@@ -362,16 +373,7 @@ let rewrite_eq a b =
   | _ ->
       try leftmost_eq a b with Not_found ->
       try rightmost_eq a b with Not_found ->
-        let xs = elements a in
-        let ys = elements b in
-        let rs = if List.length xs < List.length ys
-          then subsequence xs [] ys
-          else subsequence ys [] xs
-        in
-        let pred = F.p_all (fun s -> F.p_equal s (v_nil (F.typeof s))) rs in
-        if F.decide (e_prop pred)
-        then F.p_true
-        else raise Not_found
+        subsequence a b
 
 (* All Simplifications *)
 
