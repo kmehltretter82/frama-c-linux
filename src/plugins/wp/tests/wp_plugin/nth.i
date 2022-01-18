@@ -57,7 +57,8 @@
                                    <==> (A ^ B ^ C ^ S ^ S) == S ;
 
 
-
+  check lemma subsequence1: ko: ( A ^ (S *^ N) ^ B ^ S ^ C ) == ( (S *^ N) ^ S )
+                           <==> ( A ^ B ^ C ^ C ) == C ;
 
   }
 */
