@@ -45,6 +45,7 @@ module ComputationState = struct
     | Analysis.NotComputed -> `String "not_computed"
     | Computing -> `String "computing"
     | Computed -> `String "computed"
+    | Aborted -> `String "aborted"
 end
 
 let _computation_signal =

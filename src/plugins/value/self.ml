@@ -28,6 +28,9 @@ include Plugin.Register
         "automatically computes variation domains for the variables of the program"
     end)
 
+let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
+let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
+
 (* Do not add dependencies to Kernel parameters here, but at the top of
    Parameters. *)
 let kernel_dependencies =
@@ -42,8 +45,53 @@ let state = State_builder.Proxy.get proxy
 
 let () = State_builder.Proxy.extend [state] Db.Value.proxy
 
-let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
-let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
+
+(* Current state of the analysis *)
+type computation_state = NotComputed | Computing | Computed | Aborted
+
+module ComputationState =
+struct
+  let to_string = function
+    | NotComputed -> "NotComputed"
+    | Computing -> "Computing"
+    | Computed -> "Computed"
+    | Aborted -> "Aborted"
+
+  module Prototype =
+  struct
+    include Datatype.Serializable_undefined
+    type t = computation_state
+    let name = "Eva.Analysis.ComputationState"
+    let pretty fmt s = Format.pp_print_string fmt (to_string s)
+    let reprs = [ NotComputed ; Computing ; Computed ; Aborted ]
+    let dependencies = [ state ]
+    let default () = NotComputed
+  end
+
+  module Datatype' = Datatype.Make (Prototype)
+  module Hook = Hook.Build (Prototype)
+  include (State_builder.Ref (Datatype') (Prototype))
+
+  let set s = set s; Hook.apply s
+  let () = add_hook_on_update (fun r -> Hook.apply !r)
+end
+
+let is_computed () =
+  match ComputationState.get () with
+  | Computed | Aborted -> true
+  | NotComputed | Computing -> false
+
+let current_computation_state = ComputationState.get
+let set_computation_state = ComputationState.set
+
+(* Register a hook on current computation state *)
+let register_computation_hook ?on f =
+  let f' = match on with
+    | None -> f
+    | Some s -> fun s' -> if s = s' then f s
+  in
+  ComputationState.Hook.extend f'
+
 
 (* Debug categories. *)
 let dkey_initial_state = register_category "initial-state"
