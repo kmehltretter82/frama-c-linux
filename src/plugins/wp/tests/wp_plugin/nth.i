@@ -35,6 +35,16 @@
 /*@
   axiomatic Equality {
 
+  check lemma constructor_elt: ok: [| 1 |] != [| 2 |] ;
+
+  check lemma not_nil_elt: ok: ([| 1 |] ^ A) != A ;
+
+
+  check lemma repeat1: ko: (S *^ N) == (S *^ M)
+                      <==> (  N == M || ( ((S *^ N) ^ A) == A && ((S *^ M) ^ A) == A ) ) ;
+
+  check lemma repeat2: ok: ( ((S *^ N) ^ S) *^ M ) == ( ( S ^ (S *^ N)) *^ M ) ;
+
   check lemma left_shift_repeat1:   ok: ( ((S ^ A ^ B) *^ N) ^ S ^ A ) == (S ^ C)
                                    <==> ( (    (A ^ B ^ S) *^ N) ^ A ) == (    C);
   check lemma left_unfold_repeat1:  ok: ( ((S ^ A ^ B) *^ 3) ^ A ^ S ) == (S ^ C)
