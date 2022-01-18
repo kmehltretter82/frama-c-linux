@@ -327,20 +327,20 @@ let rewrite_is_nil ~nil a =
       (* \concat (s1,...,sn)==[] <==> (s1==[] && ... && sn==[]) *)
       F.p_all p_is_nil es
   | L.Fun(elt,[_]) when elt == f_elt -> F.p_false (* [x]==[] <==> false *)
-  | L.Fun(repeat,[u;n]) when repeat == f_repeat ->
+  | L.Fun(repeat,[s;n]) when repeat == f_repeat ->
       (* (s *^ n)==[] <==> (s==[] || n<=0)  *)
-      F.p_or (F.p_leq n F.e_zero) (p_is_nil u)
+      F.p_or (F.p_leq n F.e_zero) (p_is_nil s)
   | _ -> raise Not_found
 
 
 (* Ensures xs to be a sub-sequence of ys, otherwise raise Not_found
    In such a case, (concat xs = concat ys) <==> (forall r in result, r = nil) *)
 let rec subsequence xs ys =
-    match xs , ys with
-    | [],ys -> ys
-    | x::rxs, y::rys ->
-        if (F.decide (e_eq x y)) then subsequence rxs rys else y :: subsequence xs rys
-    | _ -> raise Not_found
+  match xs , ys with
+  | [],ys -> ys
+  | x::rxs, y::rys ->
+      if (F.decide (e_eq x y)) then subsequence rxs rys else y :: subsequence xs rys
+  | _ -> raise Not_found
 
 let elements a =
   match F.repr a with
@@ -367,9 +367,19 @@ let rewrite_eq a b =
     Lang.F.pp_term a Lang.F.pp_term b
     pp_pattern a pp_pattern b;
   match F.repr a , F.repr b with
-  | _ when a == b -> F.p_true
   | L.Fun(nil,[]) , _ when nil == f_nil -> rewrite_is_nil ~nil:a b
   | _ , L.Fun(nil,[]) when nil == f_nil -> rewrite_is_nil ~nil:b a
+  | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
+    when repeat_a == f_repeat &&
+         repeat_b == f_repeat &&
+         F.decide (
+           let nil_a = v_nil (F.typeof a) in
+           let nil_b = v_nil (F.typeof b) in
+           F.e_or [ F.e_and [ F.e_eq x y; F.e_eq n m];
+                    F.e_and [F.e_eq a nil_b; F.e_eq nil_a b]]
+         ) ->
+      (* x *^ n == [] && y *^ m == []) || (x == y && n == m)  ==>  x *^ n == y *^ m *)
+      F.p_true
   | _ ->
       try leftmost_eq a b with Not_found ->
       try rightmost_eq a b with Not_found ->
