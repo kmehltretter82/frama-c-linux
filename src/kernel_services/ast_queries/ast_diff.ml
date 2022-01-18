@@ -361,6 +361,42 @@ let rec is_same_list f l l' env =
     f h h' env && is_same_list f t t' env
   | _ -> false
 
+let get_original_kf vi =
+  let selection =
+    State_selection.(
+      union
+        (with_dependencies Kernel_function.self)
+        (union
+           (with_dependencies Annotations.funspec_state)
+           (with_dependencies Annotations.code_annot_state)))
+  in
+  Project.on ~selection (Orig_project.get()) Globals.Functions.get vi
+
+let is_matching_varinfo vi vi' env =
+  try
+    if vi.vglob then begin
+      match Varinfo.find vi with
+      | `Not_present -> false
+      | `Same vi'' -> Cil_datatype.Varinfo.equal vi' vi''
+    end else begin
+      let vi'' = Cil_datatype.Varinfo.Map.find vi env.local_vars in
+      Cil_datatype.Varinfo.equal vi' vi''
+    end
+  with Not_found ->
+    Kernel.fatal "Unbound variable %a in AST diff"
+      Cil_datatype.Varinfo.pretty vi
+
+let is_matching_logic_info li li' env =
+  match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
+  | None ->
+    (match Logic_info.find li with
+     | `Not_present -> false
+     | `Same li'' -> Cil_datatype.Logic_info.equal li' li''
+     | exception Not_found ->
+       Kernel.fatal "Unbound logic symbol %a in AST diff"
+         Cil_datatype.Logic_info.pretty li)
+  | Some li'' -> Cil_datatype.Logic_info.equal li' li''
+
 module Unop = struct
   type t = [%import: Cil_types.unop] [@@deriving eq]
 end
@@ -372,6 +408,66 @@ end
 module Ikind = struct
   type t = [%import: Cil_types.ikind] [@@deriving eq]
 end
+
+module Predicate_kind = struct
+  type t = [%import: Cil_types.predicate_kind] [@@deriving eq]
+end
+
+let are_same_cd_clauses l l' =
+  let module StringSetSet = Set.Make(Datatype.String.Set) in
+  let of_list l =
+    List.fold_left
+      (fun acc l -> StringSetSet.add (Datatype.String.Set.of_list l) acc)
+      StringSetSet.empty l
+  in
+  StringSetSet.equal (of_list l) (of_list l')
+
+let rec is_same_predicate p p' env =
+  (* names are semantically irrelevant. *)
+  is_same_predicate_node p.pred_content p'.pred_content env
+
+and is_same_predicate_node p p' _env =
+  match p, p' with
+  | Pfalse, Pfalse -> true
+  | Ptrue, Ptrue -> true
+  | _ -> false
+
+and is_same_term _t _t' _env = false
+
+let is_same_toplevel_predicate p p' env =
+  Predicate_kind.equal p.tp_kind p'.tp_kind &&
+  is_same_predicate p.tp_statement p'.tp_statement env
+
+let is_same_identified_predicate p p' env =
+  is_same_toplevel_predicate p.ip_content p'.ip_content env
+
+let is_same_behavior _b _b' _env = false
+
+let is_same_variant (v,m) (v',m') env =
+  is_same_term v v' env && is_same_opt is_matching_logic_info m m' env
+
+let are_same_behaviors bhvs bhvs' env =
+  let treat_one_behavior acc b =
+    match List.partition (fun b' -> b.b_name = b'.b_name) acc with
+    | [], _ -> raise Exit
+    | [b'], acc ->
+      if is_same_behavior b b' env then acc else raise Exit
+    | _ ->
+      Kernel.fatal "found several behaviors with the same name %s" b.b_name
+  in
+  try
+    match List.fold_left treat_one_behavior bhvs' bhvs with
+    | [] -> true
+    | _ -> (* new behaviors appeared: spec has changed. *) false
+  with Exit -> false
+
+let is_same_funspec s s' env =
+  are_same_behaviors s.spec_behavior s'.spec_behavior env &&
+  is_same_opt is_same_variant s.spec_variant s'.spec_variant env &&
+  is_same_opt is_same_identified_predicate
+    s.spec_terminates s'.spec_terminates env &&
+  are_same_cd_clauses s.spec_complete_behaviors s'.spec_complete_behaviors &&
+  are_same_cd_clauses s.spec_disjoint_behaviors s'.spec_disjoint_behaviors
 
 let rec is_same_type t t' env =
   match t, t' with
@@ -497,7 +593,7 @@ and is_same_lval lv lv' env =
 
 and is_same_lhost h h' env =
   match h, h' with
-  | Var vi, Var vi' -> is_same_varinfo vi vi' env
+  | Var vi, Var vi' -> is_matching_varinfo vi vi' env
   | Mem p, Mem p' -> is_same_exp p p' env
   | (Var _ | Mem _), _ -> false
 
@@ -535,14 +631,17 @@ and is_same_instr i i' env: body_correspondance*is_same_env =
       `Body_changed, env
   | Call(lv,f,args,_), Call(lv',f',args',_) ->
     if is_same_opt is_same_lval lv lv' env &&
-       is_same_exp f f' env &&
        is_same_list is_same_exp args args' env
     then begin
-      match f.enode with
-      | Lval(Var f,NoOffset) ->
+      match f.enode, f'.enode with
+      | Lval(Var f,NoOffset), Lval(Var f', NoOffset) ->
         (match gfun_correspondance f env with
          | `Partial _ | `Not_present -> `Callees_changed, env
-         | `Same _ -> `Same_body, env)
+         | `Same f'' ->
+           if Cil_datatype.Varinfo.equal f' (Kf.get_vi f'') then
+             `Same_body, env
+           else
+             `Callees_changed, env)
       | _ -> `Callees_changed, env
       (* by default, we consider that indirect call might have changed *)
     end else `Body_changed, env
@@ -670,8 +769,6 @@ and is_same_binder b b' env =
     end else `Body_changed, env
   | Catch_all, Catch_all -> `Same_body, env
   | (Catch_exn _ | Catch_all), _ -> `Body_changed, env
-
-and is_same_funspec _s _s' _env = false
 
 (* correspondance of formals is supposed to have already been checked,
    and formals mapping to have been put in the local env
@@ -808,24 +905,22 @@ and enuminfo_correspondance ?loc ei env =
 and enumitem_correspondance ?loc:_loc ei _env = Enumitem.find ei
 
 and gfun_correspondance ?loc vi env =
-  let selection =
-    State_selection.(
-      union
-        (with_dependencies Kernel_function.self)
-        (union
-           (with_dependencies Annotations.funspec_state)
-           (with_dependencies Annotations.code_annot_state)))
-  in
-  let kf =
-    Project.on ~selection (Orig_project.get()) Globals.Functions.get vi
-  in
+  (* NB: we also take care of the correspondance between the underlying varinfo,
+     in case we have to refer to it directly, e.g. as an AddrOf argument.
+  *)
+  let kf = get_original_kf vi in
   let add kf =
     match find_candidate_func ?loc kf with
-    | None -> `Not_present
+    | None -> Varinfo.add vi `Not_present; `Not_present
     | Some kf' ->
       let formals = Kf.get_formals kf in
       let formals' = Kf.get_formals kf' in
-      if is_same_list is_same_varinfo formals formals' env then begin
+      if is_same_list is_same_varinfo formals formals' env &&
+         is_same_type (Kf.get_return_type kf) (Kf.get_return_type kf') env
+      then begin
+        (* from a variable point of view, e.g. if we take its address,
+           they are similar *)
+        Varinfo.add vi (`Same (Kf.get_vi kf'));
         (* we only add formals to global correspondance tables if some
            part of the kf is unchanged (otherwise, we can't reuse information
            about the formals anyways). Hence, we only add them into the local
@@ -856,7 +951,12 @@ and gfun_correspondance ?loc vi env =
         | true, ((`Body_changed|`Callees_changed) as c) ->
           formals_correspondance formals formals';
           `Partial(kf', c)
-      end else `Not_present
+      end else begin
+        (* signatures do not match, we consider that pointers
+           are not equivalent. *)
+        Varinfo.add vi `Not_present;
+        `Not_present
+      end
   in
   match Kf.Map.find_opt kf env.kernel_function with
   | Some kf' -> `Same kf'
