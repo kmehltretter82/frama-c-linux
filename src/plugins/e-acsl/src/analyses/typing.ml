@@ -199,8 +199,7 @@ module Memo: sig
     (term -> computed_info) ->
     term ->
     computed_info Error.result
-  val get: lenv:Function_params_ty.t -> term ->
-    computed_info Error.result
+  val get: lenv:Function_params_ty.t -> term -> computed_info Error.result
   val clear: unit -> unit
 end = struct
 

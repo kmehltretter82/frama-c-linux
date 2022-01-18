@@ -400,7 +400,6 @@ module Profile = struct
       (struct
         let module_name = "E_ACSL.Interval.Logic_function_env.Profile"
       end)
-  let is_included p1 p2 = List.for_all2 is_included p1 p2
 end
 
 (* Imperative environments *)
