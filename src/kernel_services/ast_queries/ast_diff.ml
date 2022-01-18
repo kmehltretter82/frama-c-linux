@@ -238,6 +238,8 @@ module Logic_info = Build_correspondance(Cil_datatype.Logic_info)
 
 module Logic_type_info = Build_correspondance(Cil_datatype.Logic_type_info)
 
+module Logic_ctor_info = Build_correspondance(Cil_datatype.Logic_ctor_info)
+
 module Fieldinfo = Build_correspondance(Cil_datatype.Fieldinfo)
 
 module Model_info = Build_correspondance(Cil_datatype.Model_info)
@@ -282,6 +284,9 @@ let add_logic_prms p p' env =
         Cil_datatype.Logic_var.Map.add lv lv' env.logic_local_vars }
   in
   List.fold_left2 add_one env p p'
+
+let add_logic_info v v' env =
+  { env with logic_info = Cil_datatype.Logic_info.Map.add v v' env.logic_info }
 
 let formals_correspondance f f' =
   let add_one v v' = Varinfo.add v (`Same v') in
@@ -397,6 +402,14 @@ let is_matching_logic_info li li' env =
          Cil_datatype.Logic_info.pretty li)
   | Some li'' -> Cil_datatype.Logic_info.equal li' li''
 
+let is_matching_logic_ctor c c' =
+  match Logic_ctor_info.find c with
+  | `Not_present -> false
+  | `Same c'' -> Cil_datatype.Logic_ctor_info.equal c' c''
+  | exception Not_found ->
+    Kernel.fatal "Unbound logic type constructor in AST diff"
+      Cil_datatype.Logic_ctor_info.pretty c
+
 module Unop = struct
   type t = [%import: Cil_types.unop] [@@deriving eq]
 end
@@ -413,6 +426,14 @@ module Predicate_kind = struct
   type t = [%import: Cil_types.predicate_kind] [@@deriving eq]
 end
 
+module Logic_builtin_label = struct
+  type t = [%import: Cil_types.logic_builtin_label] [@@deriving eq]
+end
+
+module Relation = struct
+  type t = [%import: Cil_types.relation] [@@deriving eq]
+end
+
 let are_same_cd_clauses l l' =
   let module StringSetSet = Set.Make(Datatype.String.Set) in
   let of_list l =
@@ -422,31 +443,181 @@ let are_same_cd_clauses l l' =
   in
   StringSetSet.equal (of_list l) (of_list l')
 
+let is_same_logic_label l l' _env =
+  match l, l' with
+  | StmtLabel s, StmtLabel s' ->
+    (match Stmt.find !s with
+     | `Not_present -> false
+     | `Same s'' | `Partial(s'',_) ->
+       Cil_datatype.Stmt.equal !s' s''
+     | exception Not_found -> false)
+  | FormalLabel s, FormalLabel s' -> Datatype.String.equal s s'
+  | BuiltinLabel l, BuiltinLabel l' -> Logic_builtin_label.equal l l'
+  | (StmtLabel _ | FormalLabel _ | BuiltinLabel _), _ -> false
+
 let rec is_same_predicate p p' env =
   (* names are semantically irrelevant. *)
   is_same_predicate_node p.pred_content p'.pred_content env
 
-and is_same_predicate_node p p' _env =
+and is_same_predicate_node p p' env =
   match p, p' with
   | Pfalse, Pfalse -> true
   | Ptrue, Ptrue -> true
-  | _ -> false
+  | Papp(p,labs,args), Papp(p',labs',args') ->
+    is_matching_logic_info p p' env &&
+    is_same_list is_same_logic_label labs labs' env &&
+    is_same_list is_same_term args args' env
+  | Pseparated t, Pseparated t' -> is_same_list is_same_term t t' env
+  | Prel (r,t1,t2), Prel(r',t1',t2') ->
+    Relation.equal r r' && is_same_term t1 t1' env && is_same_term t2 t2' env
+  | Pand(p1,p2), Pand(p1',p2')
+  | Por(p1,p2), Por(p1',p2')
+  | Pxor(p1,p2), Pxor(p1',p2')
+  | Pimplies(p1,p2), Pimplies(p1',p2')
+  | Piff(p1,p2), Piff(p1',p2') ->
+    is_same_predicate p1 p1' env && is_same_predicate p2 p2' env
+  | Pnot p, Pnot p' -> is_same_predicate p p' env
+  | Pif(t,p1,p2), Pif(t',p1',p2') ->
+    is_same_term t t' env &&
+    is_same_predicate p1 p1' env &&
+    is_same_predicate p2 p2' env
+  | Plet(v,p), Plet(v',p') ->
+    if is_same_logic_info v v' env then begin
+      let env = add_logic_info v v' env in
+      let env = add_logic_prms [v.l_var_info] [v'.l_var_info] env in
+      is_same_predicate p p' env
+    end else false
+  | Pforall(q,p), Pforall(q',p')
+  | Pexists(q,p), Pexists(q',p') ->
+    if is_same_list is_same_logic_var q q' env then begin
+      let env = add_logic_prms q q' env in
+      is_same_predicate p p' env
+    end else false
+  | Pat(p,l), Pat(p',l') ->
+    is_same_predicate p p' env && is_same_logic_label l l' env
+  | Pobject_pointer(l,t), Pobject_pointer(l',t')
+  | Pvalid_read(l,t), Pvalid_read(l',t')
+  | Pvalid(l,t), Pvalid(l',t')
+  | Pinitialized(l,t), Pinitialized(l',t')
+  | Pdangling(l,t), Pdangling(l',t')
+  | Pallocable(l,t), Pallocable(l',t')
+  | Pfreeable(l,t), Pfreeable(l',t') ->
+    is_same_logic_label l l' env && is_same_term t t' env
+  | Pfresh(l1,l2,p,s), Pfresh(l1',l2',p',s') ->
+    is_same_logic_label l1 l1' env &&
+    is_same_logic_label l2 l2' env &&
+    is_same_term p p' env &&
+    is_same_term s s' env
+  | Pvalid_function(t), Pvalid_function(t') -> is_same_term t t' env
+  | (Pfalse | Ptrue | Papp _ | Pseparated _ | Prel _ | Pand _ | Por _ | Pxor _
+    | Pimplies _ | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
+    | Pat _ | Pobject_pointer _ | Pvalid_read _ | Pvalid _ | Pinitialized _
+    | Pdangling _ | Pallocable _ | Pfreeable _ | Pfresh _
+    | Pvalid_function _), _ -> false
 
-and is_same_term _t _t' _env = false
+and is_same_logic_constant c c' env =
+  match c,c' with
+  | LEnum ei, LEnum ei' ->
+    (match enumitem_correspondance ei env with
+     | `Same ei'' -> Cil_datatype.Enumitem.equal ei' ei''
+     | `Not_present -> false)
+  | LEnum _, _ | _, LEnum _ -> false
+  | (Integer _ | LStr _ | LWStr _ | LChr _ | LReal _), _ ->
+    Cil_datatype.Logic_constant.equal c c'
 
-let is_same_toplevel_predicate p p' env =
+and is_same_term t t' env =
+  is_same_term_node t.term_node t'.term_node env
+
+and is_same_term_node t t' env =
+  match t,t' with
+  | TConst c, TConst c' -> is_same_logic_constant c c' env
+  | TLval lv, TLval lv' -> is_same_term_lval lv lv' env
+  | TSizeOf t, TSizeOf t'
+  | TAlignOf t, TAlignOf t' -> is_same_type t t' env
+  | TSizeOfE t, TSizeOfE t'
+  | TAlignOfE t, TAlignOfE t' -> is_same_term t t' env
+  | TSizeOfStr s, TSizeOfStr s' -> String.length s = String.length s'
+  | TUnOp(op,t), TUnOp(op',t') -> Unop.equal op op' && is_same_term t t' env
+  | TBinOp(op,t1,t2), TBinOp(op',t1',t2') ->
+    Binop.equal op op' && is_same_term t1 t2 env && is_same_term t1' t2' env
+  | TCastE(typ,term), TCastE(typ',term') ->
+    is_same_type typ typ' env && is_same_term term term' env
+  | TAddrOf lv, TAddrOf lv'
+  | TStartOf lv, TStartOf lv' -> is_same_term_lval lv lv' env
+  | Tapp(f,labs,args), Tapp(f',labs',args') ->
+    is_matching_logic_info f f' env &&
+    is_same_list is_same_logic_label labs labs' env &&
+    is_same_list is_same_term args args' env
+  | Tlambda(q,t), Tlambda(q',t') ->
+    if is_same_list is_same_logic_var q q' env then begin
+      let env = add_logic_prms q q' env in
+      is_same_term t t' env
+    end else false
+  | TDataCons(c,args), TDataCons(c',args') ->
+    is_matching_logic_ctor c c' &&
+    is_same_list is_same_term args args' env
+  | Tif(c,t1,t2), Tif(c',t1',t2') ->
+    is_same_term c c' env &&
+    is_same_term t1 t1' env &&
+    is_same_term t2 t2' env
+  | Tat(t,l), Tat(t',l') ->
+    is_same_term t t' env && is_same_logic_label l l' env
+  | Tbase_addr(l,t), Tbase_addr(l',t')
+  | Toffset(l,t), Toffset(l',t')
+  | Tblock_length(l,t), Tblock_length(l',t') ->
+    is_same_logic_label l l' env && is_same_term t t' env
+  | Tnull, Tnull -> true
+  | TLogic_coerce(typ,t), TLogic_coerce(typ',t') ->
+    is_same_logic_type typ typ' env && is_same_term t t' env
+  | TUpdate(a,o,v), TUpdate(a',o',v') ->
+    is_same_term a a' env &&
+    is_same_term_offset o o' env &&
+    is_same_term v v' env
+  | Ttypeof t, Ttypeof t' -> is_same_term t t' env
+  | Ttype t, Ttype t' -> is_same_type t t' env
+  | Tempty_set, Tempty_set -> true
+  | Tunion l, Tunion l'
+  | Tinter l, Tinter l' -> is_same_list is_same_term l l' env
+  | Tcomprehension(t,q,p), Tcomprehension(t',q',p') ->
+    if is_same_list is_same_logic_var q q' env then begin
+      let env = add_logic_prms q q' env in
+      is_same_term t t' env && is_same_opt is_same_predicate p p' env
+    end else false
+  | Trange(l,u), Trange(l',u') ->
+    is_same_opt is_same_term l l' env && is_same_opt is_same_term u u' env
+  | Tlet(v,t), Tlet(v',t') ->
+    if is_same_logic_info v v' env then begin
+      let env = add_logic_info v v' env in
+      let env = add_logic_prms [v.l_var_info] [v'.l_var_info] env in
+      is_same_term t t' env
+    end else false
+  | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
+    | TAlignOfE _ |  TUnOp _ | TBinOp _ | TCastE _ | TAddrOf _ | TStartOf _
+    | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _ | Tbase_addr _
+    | Toffset _ | Tblock_length _ | Tnull | TLogic_coerce _ | TUpdate _
+    | Ttypeof _ | Ttype _ | Tempty_set | Tunion _ | Tinter _ | Tcomprehension _
+    | Tlet _ | Trange _), _ -> false
+
+and is_same_term_lval (lh,lo) (lh',lo') env =
+  is_same_term_lhost lh lh' env && is_same_term_offset lo lo' env
+
+and is_same_term_lhost _lh _lh' _env = false
+
+and is_same_term_offset _lo _lo' _env = false
+
+and is_same_toplevel_predicate p p' env =
   Predicate_kind.equal p.tp_kind p'.tp_kind &&
   is_same_predicate p.tp_statement p'.tp_statement env
 
-let is_same_identified_predicate p p' env =
+and is_same_identified_predicate p p' env =
   is_same_toplevel_predicate p.ip_content p'.ip_content env
 
-let is_same_behavior _b _b' _env = false
+and is_same_behavior _b _b' _env = false
 
-let is_same_variant (v,m) (v',m') env =
+and is_same_variant (v,m) (v',m') env =
   is_same_term v v' env && is_same_opt is_matching_logic_info m m' env
 
-let are_same_behaviors bhvs bhvs' env =
+and are_same_behaviors bhvs bhvs' env =
   let treat_one_behavior acc b =
     match List.partition (fun b' -> b.b_name = b'.b_name) acc with
     | [], _ -> raise Exit
@@ -461,7 +632,7 @@ let are_same_behaviors bhvs bhvs' env =
     | _ -> (* new behaviors appeared: spec has changed. *) false
   with Exit -> false
 
-let is_same_funspec s s' env =
+and is_same_funspec s s' env =
   are_same_behaviors s.spec_behavior s'.spec_behavior env &&
   is_same_opt is_same_variant s.spec_variant s'.spec_variant env &&
   is_same_opt is_same_identified_predicate
@@ -469,7 +640,7 @@ let is_same_funspec s s' env =
   are_same_cd_clauses s.spec_complete_behaviors s'.spec_complete_behaviors &&
   are_same_cd_clauses s.spec_disjoint_behaviors s'.spec_disjoint_behaviors
 
-let rec is_same_type t t' env =
+and is_same_type t t' env =
   match t, t' with
   | (TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _), _ ->
     Cil_datatype.TypByName.equal t t'
@@ -791,8 +962,6 @@ and is_same_fundec f f' env: body_correspondance =
 
 and is_same_logic_type _t _t' _env = false
 
-and is_same_logic_param _lv _lv' _env = false
-
 and is_same_logic_info _li _li' _env = false
 
 and is_same_logic_type_info _ti _ti' _env = false
@@ -814,7 +983,7 @@ and is_same_logic_var lv lv' env =
 and find_candidate_logic_info ?loc:_loc li env =
   let candidates = Logic_env.find_all_logic_functions li.l_var_info.lv_name in
   let find_one li' =
-    is_same_list is_same_logic_param li.l_profile li'.l_profile env
+    is_same_list is_same_logic_var li.l_profile li'.l_profile env
   in
   let rec extract l =
     match l with
