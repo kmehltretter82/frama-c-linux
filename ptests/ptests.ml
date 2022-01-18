@@ -708,7 +708,7 @@ let mk_symbolic_link =
         symlink ~unlink:false ~to_dir ~link_dst ~link
       else if String.(link_dst <> (Unix.readlink link)) then (* goes elsewhere *)
         symlink ~unlink:true ~to_dir ~link_dst ~link
-      else symlink_there link (* is already there *)
+      else symlink_there ~link (* is already there *)
     in
     match infos.st_kind with
     | Unix.S_LNK
