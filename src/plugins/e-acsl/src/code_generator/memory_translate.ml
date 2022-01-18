@@ -272,7 +272,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   let lenv = Env.Local_vars.get env in
   Typing.type_term ~use_gmp_opt:false ~lenv size_term;
   let size, adata, env =
-    match Typing.get_number_ty size_term  ~lenv with
+    match Typing.get_number_ty size_term  ~logic_env with
     | Typing.Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)
@@ -480,7 +480,7 @@ let call_with_tset
     in
     (* There's no more quantifiers in the arguments now, we can call back
        [predicate_to_exp] to translate the predicate as usual *)
-    Typing.preprocess_predicate (Env.Local_vars.get env) p_quantified;
+    Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) p_quantified;
     !predicate_to_exp_ref ~adata kf env p_quantified
   | [] ->
     (* No arguments require quantifiers, so we can directly translate the

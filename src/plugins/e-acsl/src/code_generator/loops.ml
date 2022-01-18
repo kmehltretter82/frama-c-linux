@@ -66,10 +66,8 @@ let handle_annotations env kf stmt =
            | Some (t, measure_opt) ->
              let env = Env.set_annotation_kind env Variant in
              let env = Env.push env in
-             (* There cannot be bound logical variables since we cannot write
-                loops inside logic functions or predicates, hence lenv is []*)
-             Typing.type_term ~use_gmp_opt:true ~lenv:[] t;
-             let ty = Typing.get_typ ~lenv:[] t in
+             Typing.type_term ~use_gmp_opt:true t;
+             let ty = Typing.get_typ ~profile:(Env.Logic_env.get env) t in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
              let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =
@@ -99,7 +97,6 @@ let handle_annotations env kf stmt =
       | [] -> begin
           (* No statements remaining in the loop: variant check *)
           let env = Env.set_annotation_kind env Variant in
-          let lenv = Env.Local_vars.get env in
           match variant with
           | Some (t, e_old, Some measure) ->
             let env = Env.push env in
@@ -280,7 +277,6 @@ let handle_annotations env kf stmt =
 (**************************** Nested loops ********************************)
 (**************************************************************************)
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
-  let lenv = Env.Local_vars.get env in
   let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
   match lscope_vars with
   | [] ->
@@ -290,8 +286,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Typing.type_term ~use_gmp_opt:false ~lenv t1;
     Typing.type_term ~use_gmp_opt:false ~lenv t2;
     let ctx =
-      let ty1 = Typing.get_number_ty ~lenv t1 in
-      let ty2 = Typing.get_number_ty ~lenv t2 in
+      let ty1 = Typing.get_number_ty ~profile:(Env.Logic_env.get env) t1 in
+      let ty2 = Typing.get_number_ty ~profile:(Env.Logic_env.get env) t2 in
       Typing.join ty1 ty2
     in
     let t_plus_one ?ty t =
@@ -413,7 +409,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Env.Logic_binding.remove env logic_x;
     [ start ;  stmt ], env
   | Lvs_let(lv, t) :: lscope_vars' ->
-    let ty = Typing.get_typ ~lenv t in
+    let ty = Typing.get_typ ~logic_env t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, _, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in

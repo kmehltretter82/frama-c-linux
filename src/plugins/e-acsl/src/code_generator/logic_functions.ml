@@ -270,7 +270,6 @@ let generate_kf ~loc fname env ret_ty params_ty li =
     fundec.sbody.blocals <- blocks;
     List.iter
       (fun lvi ->
-         Interval.Env.remove lvi;
          ignore (Env.Logic_binding.remove env lvi))
       li.l_profile
   in
@@ -283,7 +282,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
 (* for each logic_info, associate its possible profiles, i.e. the types of its
    parameters + the generated varinfo for the function *)
 let memo_tbl:
-  kernel_function Typing.Function_params_ty.Hashtbl.t Logic_info.Hashtbl.t
+  kernel_function Interval.Profile.Hashtbl.t Logic_info.Hashtbl.t
   = Logic_info.Hashtbl.create 7
 
 let reset () = Logic_info.Hashtbl.clear memo_tbl
@@ -303,7 +302,7 @@ let add_generated_functions globals =
            :: acc
          in
          aux
-           (Typing.Function_params_ty.Hashtbl.fold_sorted
+           (Interval.Profile.Hashtbl.fold_sorted
               (fun _ -> add_fundecl)
               params
               acc)
@@ -324,7 +323,7 @@ let add_generated_functions globals =
   in
   let rev_globals =
     Logic_info.Hashtbl.fold_sorted
-      (fun _ -> Typing.Function_params_ty.Hashtbl.fold_sorted
+      (fun _ -> Interval.Profile.Hashtbl.fold_sorted
           (fun _ -> add_fundec))
       memo_tbl
       rev_globals
@@ -336,12 +335,16 @@ let add_generated_functions globals =
 let function_to_exp ~loc ?tapp fname env kf li params_ty args =
   let ret_ty =
     match tapp with
-    | Some tapp -> Typing.get_typ ~lenv:(Env.Local_vars.get env) tapp
+    | Some tapp ->
+      let logic_env = Env.Logic_env.get env in
+      Typing.get_typ ~logic_env tapp
     | None  -> (Cil_types.TInt (IInt, []))
   in
   let gen tbl =
     let vi, kf, gen_body = generate_kf fname ~loc env ret_ty params_ty li in
-    Typing.Function_params_ty.Hashtbl.add tbl params_ty kf;
+    (* TODO: Compute profile before *)
+    (* Interval.Profile.Hashtbl.add tbl params_ty kf; *)
+    Interval.Profile.Hashtbl.add tbl [] kf;
     vi, gen_body
   in
   (* memoise the function's varinfo *)
@@ -349,12 +352,14 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty args =
     try
       let h = Logic_info.Hashtbl.find memo_tbl li in
       try
-        let kf = Typing.Function_params_ty.Hashtbl.find h params_ty in
+        (* TODO: Compute profile before *)
+        (* let kf = Interval.Profile.Hashtbl.find h params_ty in *)
+        let kf = Interval.Profile.Hashtbl.find h [] in
         Kernel_function.get_vi kf,
         (fun () -> ()) (* body generation already planified *)
       with Not_found -> gen h
     with Not_found ->
-      let h = Typing.Function_params_ty.Hashtbl.create 7 in
+      let h = Interval.Profile.Hashtbl.create 7 in
       Logic_info.Hashtbl.add memo_tbl li h;
       gen h
   in
@@ -471,7 +476,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
               (fun targ earg (params_ty, args, adata, env) ->
                  let param_ty =
                    Typing.get_number_ty
-                     ~lenv:(Env.Local_vars.get env)
+                     ~profile:(Env.Local_vars.get env)
                      targ
                  in
                  let e, env =

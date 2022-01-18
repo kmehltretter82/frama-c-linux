@@ -62,7 +62,11 @@ let rec has_empty_quantif_with_false_negative = function
     end
 
 let () =
-  Labels.has_empty_quantif_ref := has_empty_quantif_with_false_negative
+  Labels.has_empty_quantif_ref :=
+    has_empty_quantif_with_false_negative
+      ~logic_env:(Interval.Logic_environment.create [] [])
+(* Since we do not support logic functions with labels, we do not need to
+   pass an actual logic environment *)
 
 module Label_ids =
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)

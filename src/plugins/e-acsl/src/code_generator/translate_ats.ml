@@ -238,8 +238,9 @@ let index_from_sizes_and_shifts ~loc sizes_and_shifts =
 let indexed_exp ~loc kf env e_at =
   let lscope_vars = Lscope.get_all (Env.Logic_scope.get env) in
   let lscope_vars = List.rev lscope_vars in
+  let logic_env = Env.Logic_env.get env in
   let sizes_and_shifts =
-    sizes_and_shifts_from_quantifs ~loc kf lscope_vars []
+    sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope_vars []
   in
   let t_index = index_from_sizes_and_shifts ~loc sizes_and_shifts in
   let lval_at_index, env = lval_at_index ~loc kf env (e_at, t_index) in
@@ -258,9 +259,10 @@ let translations: varinfo Error.result At_data.Hashtbl.t =
    [pred_or_term] in the current environment and returns the translated
    expression. *)
 let pretranslate_to_exp ~loc kf env pot =
-  Options.debug ~level:4 "pre-translating %a in local environment '%a'"
+  Options.debug ~level:4 "pre-translating %a in profile '%a'"
     Pred_or_term.pretty pot
-    Typing.Function_params_ty.pretty (Env.Local_vars.get env);
+    Interval.Profile.pretty
+    (Interval.Logic_environment.get_profile (Env.Logic_env.get env));
   let e, env, t_opt =
     let adata = Assert.no_data in
     match pot with
@@ -299,7 +301,8 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   Options.debug ~level:4
     "pre-translating %a in local environment '%a' with lscope '%a'"
     Pred_or_term.pretty pot
-    Typing.Function_params_ty.pretty (Env.Local_vars.get env)
+    Interval.Profile.pretty
+    (Interval.Logic_environment.get_profile (Env.Logic_env.get env))
     Lscope.D.pretty lscope;
   let term_to_exp = !term_to_exp_ref in
   let lscope_vars = Lscope.get_all lscope in
@@ -307,15 +310,15 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   let sizes_and_shifts =
     sizes_and_shifts_from_quantifs ~loc kf lscope_vars []
   in
+  let logic_env = Env.Logic_env.get env in
   (* Creating the pointer *)
   let ty = match pot with
     | PoT_pred _ ->
       Cil.intType
     | PoT_term t ->
-      let lenv = (Env.Local_vars.get env) in
-      begin match Typing.get_number_ty ~lenv t with
+      begin match Typing.get_number_ty ~logic_env t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
-          Typing.get_typ ~lenv t
+          Typing.get_typ ~logic_env t
         | Typing.(Rational | Real) ->
           Error.not_yet "\\at on purely logic variables and over real type"
         | Typing.Gmpz ->
@@ -339,10 +342,9 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
          let t_size =
            Logic_const.term ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
          in
-         let lenv = Env.Local_vars.get env in
-         Typing.type_term ~use_gmp_opt:false ~lenv t_size;
-         let malloc_stmt =
-           match Typing.get_number_ty ~lenv t_size with
+         let profile = Env.Logic_env.get env in
+         Typing.type_term ~use_gmp_opt:false ~profile t_size;
+         let malloc_stmt = match Typing.get_number_ty ~profile t_size with
            | Typing.C_integer IInt ->
              let e_size, _, _ =
                term_to_exp ~adata:Assert.no_data kf env t_size
@@ -396,7 +398,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
          variable declarations. *)
       [ Smart_stmt.block_stmt block ], env
     | PoT_term t ->
-      begin match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
+      begin match Typing.get_number_ty ~logic_env t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
           let env = Env.push env in
           let lval, env = lval_at_index ~loc kf env (e_at, t_index) in

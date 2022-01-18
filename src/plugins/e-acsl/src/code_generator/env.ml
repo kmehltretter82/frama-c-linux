@@ -77,7 +77,7 @@ type t = {
   (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
-  local_vars: Typing.Function_params_ty.t list;
+  logic_env_stack: Interval.Logic_environment.t list;
   (* type of variables used in calls to logic functions and predicates *)
   kinstr: kinstr;
   (* Current kinstr of the environment *)
@@ -112,7 +112,7 @@ let empty =
     var_mapping = Logic_var.Map.empty;
     loop_envs = [];
     cpt = 0;
-    local_vars = [];
+    logic_env_stack = [ Interval.Logic_environment.create [] [] ];
     kinstr = Kglobal }
 
 let top env = match env.env_stack with
@@ -540,21 +540,35 @@ module Context = struct
 
 end
 
-module Local_vars = struct
+module Logic_env = struct
 
-  let push_new env =
-    {env with local_vars = [] :: env.local_vars}
+  let push_new env l_profile profile =
+    {env with logic_env_stack =
+                (Interval.Logic_environment.create l_profile profile) ::
+                (env.logic_env_stack)}
 
-  let add env ty =
-    match env.local_vars with
-    | curr::stacked -> {env with local_vars = (ty :: curr) :: stacked}
+  let add_let_quantif_binding env x ival =
+    match env.logic_env_stack with
+    | curr::_ as logic_env ->
+      {env
+       with logic_env_stack =
+              (Interval.Logic_environment.add_let_quantif_binding curr x ival) ::
+              logic_env}
     | [] -> Options.fatal
-              "Trying to add local variable in a non-existing environment"
+              "logic environment stack is empty"
 
   let get env =
-    match env.local_vars with
-    | lenv :: _ -> lenv
-    | [] -> []
+    match env.logic_env_stack with
+    | curr::_ -> curr
+    | [] -> Options.fatal
+              "logic environment stack is empty"
+
+  let pop env =
+    match env.logic_env_stack with
+    | _::stacked -> {env with logic_env_stack = stacked}
+    | [] -> Options.fatal
+              "logic environment stack is empty"
+
 
 end
 

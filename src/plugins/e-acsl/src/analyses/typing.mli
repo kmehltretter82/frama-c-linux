@@ -60,8 +60,8 @@ type number_ty = private
   | Real
   | Nan
 
-module Function_params_ty:
-  Datatype.S_with_collections with type t = number_ty list
+(* module Function_params_ty: *)
+(*   Datatype.S_with_collections with type t = number_ty list *)
 
 (** {3 Smart constructors} *)
 
@@ -100,14 +100,14 @@ val join: number_ty -> number_ty -> number_ty
 val type_term:
   use_gmp_opt:bool ->
   ?ctx:number_ty ->
-  lenv:Function_params_ty.t ->
+  profile:Interval.Profile.t ->
   term ->
   unit
 (** Compute the type of each subterm of the given term in the given context. If
     [use_gmp_opt] is false, then the conversion to the given context is done
     even if -e-acsl-gmp-only is set. *)
 
-val type_named_predicate: lenv:Function_params_ty.t -> predicate -> unit
+val type_named_predicate: profile:Interval.Profile.t -> predicate -> unit
 (** Compute the type of each term of the given predicate. *)
 
 val clear: unit -> unit
@@ -119,35 +119,35 @@ val clear: unit -> unit
     {!type_named_predicate} has been previously computed for the given term or
     predicate. *)
 
-val get_number_ty: lenv:Function_params_ty.t -> term -> number_ty
+val get_number_ty: profile:Interval.Profile.t -> term -> number_ty
 (** @return the infered type for the given term. *)
 
-val get_integer_op: lenv:Function_params_ty.t -> term -> number_ty
+val get_integer_op: profile:Interval.Profile.t -> term -> number_ty
 (** @return the infered type for the top operation of the given term.
     It is meaningless to call this function over a non-arithmetical/logical
     operator. *)
 
 val get_integer_op_of_predicate:
-  lenv:Function_params_ty.t -> predicate -> number_ty
+  profile:Interval.Profile.t -> predicate -> number_ty
 (** @return the infered type for the top operation of the given predicate. *)
 
-val get_typ: lenv:Function_params_ty.t -> term -> typ
+val get_typ: profile:Interval.Profile.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
 
-val get_op: lenv:Function_params_ty.t -> term -> typ
+val get_op: profile:Interval.Profile.t -> term -> typ
 (** Get the type which the operation on top of the given term must be generated
     to. *)
 
-val get_cast: lenv:Function_params_ty.t -> term -> typ option
+val get_cast: profile:Interval.Profile.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
 
-val get_cast_of_predicate: lenv:Function_params_ty.t -> predicate -> typ option
+val get_cast_of_predicate: profile:Interval.Profile.t -> predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
 val unsafe_set:
   term ->
   ?ctx:number_ty ->
-  lenv:Function_params_ty.t ->
+  logic_env:Interval.Logic_environment.t ->
   number_ty ->
   unit
 (** Register that the given term has the given type in the given context (if
@@ -164,10 +164,10 @@ val type_program : file -> unit
 (** compute and store the type of all the terms that will be translated
     in a program *)
 
-val preprocess_predicate : Function_params_ty.t -> predicate -> unit
+val preprocess_predicate : Interval.Profile.t -> predicate -> unit
 (** compute and store the types of all the terms in a given predicate  *)
 
-val preprocess_rte : lenv:Function_params_ty.t -> code_annotation -> unit
+val preprocess_rte : profile:Interval.Profile.t -> code_annotation -> unit
 (** compute and store the type of all the terms in a code annotation *)
 
 (*

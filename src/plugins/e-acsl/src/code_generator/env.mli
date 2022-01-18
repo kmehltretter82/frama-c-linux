@@ -176,10 +176,11 @@ val set_rte: t -> bool -> t
 val generate_rte: t -> bool
 (** Returns the current value of RTE generation for the given environment *)
 
-module Local_vars: sig
-  val push_new: t -> t
-  val add: t -> Typing.number_ty -> t
-  val get: t -> Typing.Function_params_ty.t
+module Logic_env: sig
+  val push_new: t -> logic_var list -> Interval.ival list -> t
+  val add_let_quantif_binding : t -> logic_var -> Interval.ival -> t
+  val get: t -> Interval.Logic_environment.t
+  val pop: t -> t
 end
 
 (* ************************************************************************** *)

@@ -402,131 +402,125 @@ module Profile = struct
       end)
 end
 
-(* Imperative environments *)
-module rec Env: sig
-  val clear: unit -> unit
-  val add: Cil_types.logic_var -> ival -> unit
-  val find: Cil_types.logic_var -> ival
-  val remove: Cil_types.logic_var -> unit
-end = struct
+module Id_term_in_profile =
+  Datatype.Pair_with_collections
+    (Misc.Id_term)
+    (Profile)
+    (struct let module_name = "E_ACSL.Typing.Id_term_in_profile" end)
 
-  open Cil_datatype
-  let tbl: ival Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
+module Logic_environment : sig
+  type t
+  val add_let_quantif_binding : t -> logic_var -> ival -> t
+  val create : logic_var list -> ival list -> t
+  val find : t -> logic_var -> ival
+  val get_profile : t -> ival list
+end
+= struct
+  type env = (logic_var * ival) list
 
-  (* TODO: when adding, also join with the old value (if any). Would certainly
-     be the correct way to handle a \let in a recursive logic functions (if the
-     \let body depends on one formal) *)
-  let add = Logic_var.Hashtbl.add tbl
-  let remove = Logic_var.Hashtbl.remove tbl
-  let find = Logic_var.Hashtbl.find tbl
+  type t = { profile : logic_var list * Profile.t;
+             let_quantif_bind : env}
 
-  let clear () =
-    Logic_var.Hashtbl.clear tbl;
-    Logic_function_env.clear ()
+  let add_let_quantif_binding env x i =
+    { env with let_quantif_bind = (x, i) :: env.let_quantif_bind }
+
+  let create args params_ival =
+    { profile = args , params_ival;
+      let_quantif_bind = [] }
+
+  let find env x =
+    try List.assoc x env.let_quantif_bind
+    with Not_found ->
+      let rec find = function
+        |(y::_), (i ::_) when Cil_datatype.Logic_var.equal x y -> i
+        | (_ :: l) , (_ :: l') -> find (l, l')
+        | [] , _ :: _
+        | _ :: _, [] -> Options.abort "inconsistent function profile"
+        |[], [] -> raise Not_found
+      in find env.profile
+
+  let get_profile env = snd env.profile
 
 end
 
-(* Environment for handling logic functions *)
-and Logic_function_env: sig
-  val widen: infer:(term -> ival) -> term -> ival -> bool * ival
+(* Memoization module which retrieves the computed info of some terms. If the
+   info is already computed for a term, it is never recomputed *)
+module Memo: sig
+  val memo:
+    profile:Profile.t -> (term -> ival) -> term -> ival Error.or_error
+  val get: profile:Profile.t -> term -> ival Error.or_error
   val clear: unit -> unit
 end = struct
+  (* The comparison over terms is the physical equality. It cannot be the
+     structural one (given by [Cil_datatype.Term.equal]) for efficiency.
 
-  (* The environment associates to each term (denoting a logic function
-     application) a profile, i.e. the list of intervals for its formal
-     parameters.  It helps to type these applications.
+     By construction (see prepare_ast.ml), there are no physically equal terms
+     in the E-ACSL's generated AST, but
+     - type info of many terms are accessed several times
+     - the translation of E-ACSL guarded quantifications generates
+       new terms (see module {!Quantif}) which must be typed. The term
+       corresponding to the bound variable [x] is actually used twice: once in
+       the guard and once for encoding [x+1] when incrementing it. *)
+  let tbl : ival Error.or_error Misc.Id_term.Hashtbl.t =
+    Misc.Id_term.Hashtbl.create 97
 
-     For each pair of function name and profile, an interval containing the
-     result is also stored. It helps to generate the function definitions for
-     each logic function (for each function, one definition per profile) . *)
+  (* The interval of the logic function
+     \\@ logic integer f (integer x) = x + 1;
+     depends on the interval of [x]. The same term [x+1] can be infered to be
+     in different intervals if the function [f] is applied several times with
+     different arguments. In this case, we add the interval of [x] as a key
+     to retrieve the type of [x+1].
+     There are two other kinds of binders for logical variables: [TLet] and
+     the quantifiers, however in those cases, a term is only ever translated
+     once. Since we test with physical equality, the information is not needed
+     to determine the environment.*)
 
-  module Terms = Hashtbl.Make
-      (struct
-        type t = term
-        let equal = (==)
-        let hash = Cil_datatype.Term.hash
-      end)
+  let dep_tbl : ival Error.or_error Id_term_in_profile.Hashtbl.t
+    = Id_term_in_profile.Hashtbl.create 97
 
-  module LF =
-    Datatype.Pair_with_collections
-      (Datatype.String)
-      (Profile)
-      (struct
-        let module_name = "E_ACSL.Interval.Logic_function_env.LF"
-      end)
+  let get_dep profile t =
+    try Id_term_in_profile.Hashtbl.find dep_tbl (t,profile)
+    with Not_found -> Error.not_memoized ()
 
-  let terms: Profile.t Terms.t = Terms.create 7
-  let named_profiles = LF.Hashtbl.create 7
+  let get_nondep t =
+    try Misc.Id_term.Hashtbl.find tbl t
+    with Not_found -> Error.not_memoized ()
+
+  let get ~profile t =
+    match profile with
+    | [] -> get_nondep t
+    | _::_ -> get_dep profile t
+
+  let memo_nondep f t =
+    try Misc.Id_term.Hashtbl.find tbl t
+    with Not_found ->
+      let x =
+        try Error.Res (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+      in
+      Misc.Id_term.Hashtbl.add tbl t x;
+      x
+
+  let memo_dep f t profile =
+    try
+      Id_term_in_profile.Hashtbl.find dep_tbl (t, profile)
+    with Not_found ->
+      let x =
+        try Error.Res (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+      in
+      Id_term_in_profile.Hashtbl.add dep_tbl (t, profile) x;
+      x
+
+  let memo ~profile f t =
+    match profile with
+    | [] -> memo_nondep f t
+    | _::_ -> memo_dep f t profile
 
   let clear () =
-    Terms.clear terms;
-    LF.Hashtbl.clear named_profiles
-
-  let interv_of_typ_containing_interv = function
-    | Float _ | Rational | Real | Nan as x ->
-      x
-    | Ival i ->
-      try
-        let kind = ikind_of_ival i in
-        interv_of_typ (TInt(kind, []))
-      with Cil.Not_representable ->
-        top_ival
-
-  let rec map3 f l1 l2 l3 = match l1, l2, l3 with
-    | [], [], [] -> []
-    | x1 :: l1, x2 :: l2, x3 :: l3 -> f x1 x2 x3 :: map3 f l1 l2 l3
-    | _, _, _ -> invalid_arg "E_ACSL.Interval.map3"
-
-  let extract_profile ~infer old_profile t = match t.term_node with
-    | Tapp(li, _, args) ->
-      let old_profile = match old_profile with
-        | None -> List.map (fun _ -> bottom) li.l_profile
-        | Some p -> p
-      in
-      li.l_var_info.lv_name,
-      map3
-        (fun param old_i arg ->
-           let i = infer arg in
-           (* over-approximation of the interval to reach the fixpoint
-              faster, and to generate fewer specialized functions *)
-           let larger_i = interv_of_typ_containing_interv i in
-           (* merge the old profile and the new one *)
-           let new_i = join larger_i old_i in
-           Env.add param new_i;
-           new_i)
-        li.l_profile
-        old_profile
-        args
-    | _ ->
-      assert false
-
-  let widen_one_callsite ~infer old_profile t i =
-    let (_, p as named_p) = extract_profile ~infer old_profile t in
-    try
-      let old_i = LF.Hashtbl.find named_profiles named_p in
-      if is_included i old_i then true, p, old_i (* fixpoint reached *)
-      else begin
-        let j = join i old_i in
-        LF.Hashtbl.replace named_profiles named_p j;
-        false, p, j
-      end
-    with Not_found ->
-      LF.Hashtbl.add named_profiles named_p i;
-      false, p, i
-
-  let widen ~infer t i =
-    try
-      let old_p = Terms.find terms t in
-      let is_included, new_p, i = widen_one_callsite ~infer (Some old_p) t i in
-      if Profile.is_included new_p old_p then is_included, i
-      else begin
-        Terms.replace terms t new_p;
-        false, i
-      end
-    with Not_found ->
-      let is_included, p, i = widen_one_callsite ~infer None t i in
-      Terms.add terms t p;
-      is_included, i
+    Options.feedback ~dkey ~level:4 "clearing the typing tables";
+    Misc.Id_term.Hashtbl.clear tbl;
+    Id_term_in_profile.Hashtbl.clear dep_tbl
 
 end
 

@@ -93,12 +93,16 @@ val extended_interv_of_typ: Cil_types.typ -> t
 (** {3 Environment for interval computations} *)
 (* ************************************************************************** *)
 
-(** Environment which maps logic variables to intervals. This environment must
-    be extended from outside. *)
-module Env: sig
-  val clear: unit -> unit
-  val add: Cil_types.logic_var -> t -> unit
-  val remove: Cil_types.logic_var -> unit
+module Profile:
+  Datatype.S_with_collections with type t = ival list
+
+type profile = Profile.t
+
+module Logic_environment: sig
+  type t
+  val create: Cil_types.logic_var list -> ival list -> t
+  val add_let_quantif_binding: t -> Cil_types.logic_var -> ival -> t
+  val get_profile: t -> profile
 end
 
 (* ************************************************************************** *)
