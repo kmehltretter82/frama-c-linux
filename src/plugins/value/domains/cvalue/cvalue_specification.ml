@@ -67,7 +67,7 @@ let check_from pre_state asgn assigns_zone from found_froms =
   let found_indirect_deps = found_deps.Function_Froms.Deps.indirect in
   let res_for_unknown txt =
     Self.debug "found_direct deps %a stated_direct_deps %a \
-                            found_indirect_deps %a stated_indirect_deps %a"
+                found_indirect_deps %a stated_indirect_deps %a"
       Zone.pretty found_direct_deps Zone.pretty stated_direct_deps
       Zone.pretty found_indirect_deps Zone.pretty stated_indirect_deps;
     "unknown (cannot validate "^txt^" dependencies)",

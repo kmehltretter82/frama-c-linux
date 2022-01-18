@@ -48,8 +48,8 @@ let options_ok () =
   let check_assigns kf =
     if need_assigns kf then
       Self.error "@[no assigns@ specified@ for function '%a',@ for \
-                              which@ a builtin@ or the specification@ will be used.@ \
-                              Potential unsoundness.@]" Kernel_function.pretty kf
+                  which@ a builtin@ or the specification@ will be used.@ \
+                  Potential unsoundness.@]" Kernel_function.pretty kf
   in
   Parameters.BuiltinsOverrides.iter (fun (kf, _) -> check_assigns kf);
   Parameters.UsePrototype.iter (fun kf -> check_assigns kf)
@@ -67,7 +67,7 @@ let generate_specs () =
     if need_assigns kf then begin
       let spec = Annotations.funspec ~populate:false kf in
       Self.warning "Generating potentially incorrect assigns \
-                                for function '%a' for which option %s is set"
+                    for function '%a' for which option %s is set"
         Kernel_function.pretty kf Parameters.UsePrototype.option_name;
       (* The function populate_spec may emit a warning. Position a loc. *)
       Cil.CurrentLoc.set (Kernel_function.get_location kf);
@@ -382,7 +382,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     | `Bottom ->
       Abstract.Dom.Store.mark_as_computed ();
       Self.result "Eva not started because globals \
-                               initialization is not computable.";
+                   initialization is not computable.";
       Eval_annots.mark_invalid_initializers ()
     | `Value init_state ->
       compute kf init_state

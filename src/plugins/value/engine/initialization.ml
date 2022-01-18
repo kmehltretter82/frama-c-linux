@@ -274,7 +274,7 @@ module Make
   let add_supplied_main_formals kf actuals state =
     match Domain.get_cvalue with
     | None -> Self.abort "Function Db.Value.fun_set_args cannot be \
-                                      used without the Cvalue domain"
+                          used without the Cvalue domain"
     | Some get_cvalue ->
       let formals = Kernel_function.get_formals kf in
       if (List.length formals) <> List.length actuals then

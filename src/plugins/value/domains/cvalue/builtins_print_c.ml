@@ -283,7 +283,7 @@ let state_pretty cas fmt m =
                 | Z.Overflow
                 | Too_large_to_enumerate ->
                   Self.warning "base %s too large, \
-                                            will not print it" name
+                                will not print it" name
               end
           | _ -> ())
        m

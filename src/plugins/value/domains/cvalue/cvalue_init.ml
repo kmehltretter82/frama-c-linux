@@ -87,7 +87,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
       )
     | Base.Unknown _ -> (* Unknown validity is caused by strange type *)
       Self.result ~dkey "creating variable %s with imprecise \
-                                     size (type %a)" hidden_var_name Printer.pp_typ pointed_typ;
+                         size (type %a)" hidden_var_name Printer.pp_typ pointed_typ;
       validity
     | Base.Empty | Base.Known _ | Base.Invalid -> validity
     | Base.Variable _ -> (* should never happen (validity_from_type cannot

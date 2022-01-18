@@ -387,7 +387,7 @@ let add_domain (type v) dname mode (abstraction: v abstraction) (module Acc: Acc
 let warn_experimental flag =
   if flag.experimental then
     Self.(warning ~wkey:wkey_experimental
-                        "The %s domain is experimental." flag.name)
+            "The %s domain is experimental." flag.name)
 
 let build_domain config abstract =
   let build (Flag flag, mode) acc =
