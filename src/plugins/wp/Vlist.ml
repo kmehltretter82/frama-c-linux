@@ -372,11 +372,20 @@ let rewrite_eq a b =
   | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
     when repeat_a == f_repeat &&
          repeat_b == f_repeat &&
+         F.decide (F.e_eq x y) ->
+      (* ( s *^ n == s *^ m  <==>  (s *^ n == [] && y *^ m == []) || (n == m) *)
+      let nil_a = v_nil (F.typeof a) in
+      let nil_b = v_nil (F.typeof b) in
+      F.p_or (F.p_equal n m)
+             (F.p_and (F.p_equal a nil_b) (F.p_equal nil_a b))
+  | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
+    when repeat_a == f_repeat &&
+         repeat_b == f_repeat &&
          F.decide (
            let nil_a = v_nil (F.typeof a) in
            let nil_b = v_nil (F.typeof b) in
-           F.e_or [ F.e_and [ F.e_eq x y; F.e_eq n m];
-                    F.e_and [F.e_eq a nil_b; F.e_eq nil_a b]]
+           F.e_or [ F.e_and [F.e_eq x y; F.e_eq n m];
+                    F.e_and [F.e_eq a nil_b; F.e_eq nil_a b] ]
          ) ->
       (* x *^ n == [] && y *^ m == []) || (x == y && n == m)  ==>  x *^ n == y *^ m *)
       F.p_true
