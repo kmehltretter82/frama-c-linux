@@ -303,8 +303,19 @@ let leftmost_eq a b =
   let b , v = leftmost b in
   if u <> [] || v <> [] then
     match F.is_equal a b with
-    | L.Yes -> F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
-    | L.No -> F.p_false
+    | L.Yes ->
+        (* s ^ u1 ^ ...  = s ^ v1 ^ ...  <=>  u1 ^ ... = v1 ^ ... *)
+        F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
+    | L.No -> (match F.repr a, F.repr b with
+        | L.Fun( elt_a , [_] ), L.Fun( elt_b , [_] )
+          when elt_a == f_elt &&
+               elt_b == f_elt ->
+            (* a <> b ==>  [| a |] ^ u1 ^ ...  <> [| b |] ^ v1 ^ ... *)
+            F.p_false
+        | _ ->
+            (* unimplemented: a <> b && \length(a)=\length(b) ==>
+                                       a ^ u1 ^ ... <> b ^ v1 ^ ... *)
+            raise Not_found)
     | L.Maybe -> raise Not_found
   else
     raise Not_found
@@ -314,8 +325,19 @@ let rightmost_eq a b =
   let v , b = rightmost b in
   if u <> [] || v <> [] then
     match F.is_equal a b with
-    | L.Yes -> F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
-    | L.No -> F.p_false
+    | L.Yes ->
+        (* u1 ^ ... ^ s = v1 ^ ... ^ s  <=>  u1 ^ ... = v1 ^ ... *)
+        F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
+    | L.No -> (match F.repr a, F.repr b with
+        | L.Fun( elt_a , [_] ), L.Fun( elt_b , [_] )
+          when elt_a == f_elt &&
+               elt_b == f_elt ->
+            (* a <> b ==> u1 ^ ... ^ [| a |] <> v1 ^ ... ^ [| b |] *)
+            F.p_false
+        | _ ->
+            (* unimplemented: a <> b && \length(a)=\length(b) ==>
+                                       u1 ^ ... ^ a <> v1 ^ ... ^ b *)
+            raise Not_found)
     | L.Maybe -> raise Not_found
   else
     raise Not_found
@@ -377,7 +399,7 @@ let rewrite_eq a b =
       let nil_a = v_nil (F.typeof a) in
       let nil_b = v_nil (F.typeof b) in
       F.p_or (F.p_equal n m)
-             (F.p_and (F.p_equal a nil_b) (F.p_equal nil_a b))
+        (F.p_and (F.p_equal a nil_b) (F.p_equal nil_a b))
   | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
     when repeat_a == f_repeat &&
          repeat_b == f_repeat &&
