@@ -648,7 +648,7 @@ let rec infer ~logic_env t =
       in
       let n = Integer.of_int (find_idx 0 enumitem.eihost.eitems) in
       singleton n
-    | TLval lv -> infer_term_lval lv
+    | TLval lv -> infer_term_lval ~logic_env lv
     | TSizeOf ty -> infer_sizeof ty
     | TSizeOfE t -> infer_sizeof (get_cty t)
     | TSizeOfStr str -> singleton_of_int (String.length str + 1 (* '\0' *))
@@ -784,19 +784,19 @@ let rec infer ~logic_env t =
     | Ttype _
     | Tempty_set ->
       Nan
-  in Memo.memo ~profile:(logic_env.profile) compute t
+  in Memo.memo ~profile:(Logic_environment.get_profile logic_env) compute t
 
-and infer_term_lval (host, offset as tlv) =
+and infer_term_lval ~logic_env (host, offset as tlv) =
   match offset with
-  | TNoOffset -> infer_term_host host
+  | TNoOffset -> infer_term_host ~logic_env host
   | _ ->
     let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
     interv_of_typ ty
 
-and infer_term_host thost =
+and infer_term_host ~logic_env thost =
   match thost with
   | TVar v ->
-    (try Env.find v with Not_found ->
+    (try Logic_environment.find logic_env v with Not_found ->
      match v.lv_type with
      | Linteger -> top_ival
      | Ctype (TFloat(fk, _)) -> Float(fk, None)
@@ -815,9 +815,59 @@ and infer_term_host thost =
         Printer.pp_typ ty
         Printer.pp_term t
 
+let rec infer_predicate ~logic_env p =
+  match Logic_normalizer.get_pred p with
+  | PoT_term t -> ignore (infer ~logic_env t)
+  | PoT_pred p ->
+    match p.pred_content with
+    | Pfalse | Ptrue -> ()
+    | Papp(_, _, _) -> ()
+    (* TODO: Implement this case *)
+    | Pdangling _ -> ()
+    | Prel(_, t1, t2) ->
+      ignore (infer ~logic_env t1);
+      ignore (infer ~logic_env t2)
+    | Pand(p1, p2)
+    | Por(p1, p2)
+    | Pxor(p1, p2)
+    | Pimplies(p1, p2)
+    | Piff(p1, p2) ->
+      infer_predicate ~logic_env p1;
+      infer_predicate ~logic_env p2
+    | Pnot p ->
+      infer_predicate ~logic_env p;
+    | Pif(t, p1, p2) ->
+      ignore (infer ~logic_env t);
+      infer_predicate ~logic_env p1;
+      infer_predicate ~logic_env p2
+    | Plet(li, p) ->
+      let li_t = Misc.term_of_li li in
+      let li_v = li.l_var_info in
+      let i = infer ~logic_env li_t in
+      let logic_env =
+        Error.map (Logic_environment.add_let_quantif_binding logic_env li_v) i
+      in
+      (infer_predicate ~logic_env p)
+    | Pforall _
+    | Pexists _ -> ()
+    (* TODO:  *)
+    | Pseparated tlist ->
+      List.iter
+        (fun t -> ignore (infer ~logic_env t))
+        tlist;
+    | Pinitialized(_, t)
+    | Pfreeable(_, t)
+    | Pallocable(_, t)
+    | Pvalid(_, t)
+    | Pvalid_read(_, t)
+    | Pobject_pointer(_,t)
+    | Pvalid_function t ->
+      ignore (infer ~logic_env t);
+    | Pat(p, _) -> infer_predicate ~logic_env p
+    | Pfresh _ -> Error.not_yet "\\fresh"
+
 let infer t =
   let i = infer t in
-  Logic_function_env.clear();
   i
 
 include D
@@ -828,11 +878,11 @@ let typer_visitor ~logic_env = object
   (* global logic functions and predicates are evaluated are callsites *)
   method !glob_annot _ = Cil.SkipChildren
 
-  method !vterm t =
+  method !vpredicate p =
     (* Do not raise a warning for e-acsl errors at preprocessing time,
        those errrors are stored in the table and warnings are raised at
-       translation time*)
-    let _ = try ignore (infer ~logic_env t)
+       translation time *)
+    let _ = try infer_predicate ~logic_env p
       with Error.Not_yet _ | Error.Typing_error _  -> ()
     in
     Cil.SkipChildren
