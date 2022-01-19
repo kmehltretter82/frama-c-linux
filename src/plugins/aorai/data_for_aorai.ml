@@ -851,13 +851,13 @@ let type_expr metaenv env ?tr ?current e =
         && Logic_typing.is_integral_type t2.term_type
         then
           Logic_const.term
-            (TBinOp (IndexPI,t1,t2))
+            (TBinOp (PlusPI,t1,t2))
             (Logic_typing.type_of_pointed t1.term_type)
         else if Logic_utils.isLogicPointerType t2.term_type
              && Logic_typing.is_integral_type t1.term_type
         then
           Logic_const.term
-            (TBinOp (IndexPI,t2,t1))
+            (TBinOp (PlusPI,t2,t1))
             (Logic_typing.type_of_pointed t2.term_type)
         else if Logic_utils.isLogicArrayType t1.term_type
              && Logic_typing.is_integral_type t2.term_type

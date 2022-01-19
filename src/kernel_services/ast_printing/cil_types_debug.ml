@@ -400,11 +400,6 @@ and pp_exp_node fmt = function
   | CastE(typ,exp) -> Format.fprintf fmt "CastE(%a,%a)"       pp_typ typ  pp_exp exp
   | AddrOf(lval) -> Format.fprintf fmt "AddrOf(%a)"      pp_lval lval
   | StartOf(lval) -> Format.fprintf fmt "StartOf(%a)"     pp_lval lval
-  | Info(exp,exp_info) -> Format.fprintf fmt "Info(%a,%a)"        pp_exp exp  pp_exp_info exp_info
-
-and pp_exp_info fmt exp_info = Format.fprintf fmt "{exp_type=%a;exp_name=%a}"
-    pp_logic_type exp_info.exp_type
-    (pp_list pp_string) exp_info.exp_name
 
 and pp_constant fmt = function
   | CInt64(integer,ikind,string_option) ->
@@ -424,7 +419,6 @@ and pp_unop fmt = function
 and pp_binop fmt = function
   | PlusA -> Format.fprintf fmt "PlusA"
   | PlusPI -> Format.fprintf fmt "PlusPI"
-  | IndexPI -> Format.fprintf fmt "IndexPI"
   | MinusA -> Format.fprintf fmt "MinusA"
   | MinusPI -> Format.fprintf fmt "MinusPI"
   | MinusPP -> Format.fprintf fmt "MinusPP"

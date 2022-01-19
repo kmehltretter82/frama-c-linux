@@ -345,7 +345,6 @@ class annot_visitor kf flags on_alarm = object (self)
         | StartOf _ | AddrOf _ ->
           if self#do_pointer_value ()
           then self#generate_assertion Rte.pointer_value exp
-        | Info _
         | UnOp _
         | Const _
         | BinOp _ -> ()

@@ -40,7 +40,6 @@ let rec find_deps_no_transitivity state expr =
   (* The value of the expression [expr], just before executing the statement
      [instr], is a function of the values of the returned zones. *)
   match expr.enode with
-  | Info (e, _) -> find_deps_no_transitivity state e
   | AlignOfE _| AlignOf _| SizeOfStr _ |SizeOfE _| SizeOf _ | Const _
     -> Function_Froms.Deps.bottom
   | AddrOf lv  | StartOf lv ->

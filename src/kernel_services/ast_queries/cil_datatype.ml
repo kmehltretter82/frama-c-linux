@@ -1042,11 +1042,6 @@ struct
     | AddrOf _, _ -> 1
     | _, AddrOf _ -> -1
     | StartOf lv1, StartOf lv2 -> compare_lval ~strict lv1 lv2
-    | StartOf _, _ -> 1
-    | _, StartOf _ -> -1
-    | Info _, Info _ ->
-      Cmdline.Kernel_log.fatal
-        "[exp_compare] Info node is obsolete. Do not use it"
 
   and compare_lval ~strict (h1,o1) (h2,o2) =
     let res = compare_lhost ~strict h1 h2 in
@@ -1093,9 +1088,6 @@ struct
     | CastE(ty,e) -> hash_exp ((prime*acc) lxor Typ.hash ty) e
     | AddrOf lv -> hash_lval (prime*acc lxor 329) lv
     | StartOf lv -> hash_lval (prime*acc lxor 431) lv
-    | Info _ ->
-      Cmdline.Kernel_log.fatal
-        "Info node is deprecated and should not be used@."
   and hash_lval acc (h,o) =
     hash_offset ((prime * acc) lxor hash_lhost 856 h) o
   and hash_lhost acc = function

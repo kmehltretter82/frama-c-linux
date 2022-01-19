@@ -418,7 +418,7 @@ let is_boolean_binop op =
   let open Cil_types in
   match op with
   | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> true
-  | PlusA | PlusPI | IndexPI | MinusA | MinusPI | MinusPP
+  | PlusA | PlusPI | MinusA | MinusPI | MinusPP
   | Mult | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr -> false
 
 let float_builtin prefix fkind =
@@ -504,9 +504,6 @@ let rec expr_to_term ?(coerce=false) e =
     | CastE (ty,e) ->
       let coerce = Cil.isIntegralType (Cil.typeOf e) in
       let t = mk_cast ~loc ty (expr_to_term ~coerce e) in
-      t.term_node , t.term_type
-    | Info (e,_) ->
-      let t = expr_to_term ~coerce e in
       t.term_node , t.term_type
   in
   let v = mk_cast ~loc typ @@ Logic_const.term ~loc node ltyp in
@@ -891,7 +888,7 @@ let is_same_pconstant c1 c2 =
 let is_same_binop o1 o2 =
   match o1,o2 with
   | PlusA, PlusA
-  | (PlusPI | IndexPI), (PlusPI | IndexPI) (* Semantically equivalent *)
+  | PlusPI, PlusPI
   | MinusA, MinusA
   | MinusPI, MinusPI
   | MinusPP, MinusPP
@@ -912,7 +909,7 @@ let is_same_binop o1 o2 =
   | LAnd, LAnd
   | LOr, LOr ->
     true
-  | (PlusA | PlusPI | IndexPI | MinusA | MinusPI | MinusPP | Mult | Div
+  | (PlusA | PlusPI | MinusA | MinusPI | MinusPP | Mult | Div
     | Mod | Shiftlt | Shiftrt | Cil_types.Lt | Cil_types.Gt | Cil_types.Le
     | Cil_types.Ge | Cil_types.Eq | Cil_types.Ne
     | BAnd | BXor | BOr | LAnd | LOr), _ ->
@@ -2529,7 +2526,7 @@ and constFoldBinOpToInt ~machdep bop e1 e2 =
       match bop with
       | PlusA -> Some (Integer.add i1 i2)
       | MinusA -> Some (Integer.sub i1 i2)
-      | PlusPI | IndexPI | MinusPI | MinusPP -> None
+      | PlusPI | MinusPI | MinusPP -> None
       | Mult -> Some (Integer.mul i1 i2)
       | Div ->
         if Integer.(equal zero i2) && Integer.(is_zero (e_rem i1 i2)) then None

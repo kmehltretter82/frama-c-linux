@@ -39,7 +39,7 @@ let rec possible_value_of_integral_const = function
   | _ -> None
 
 and possible_value_of_integral_expr e =
-  match (stripInfo e).enode with
+  match e.enode with
   | Const c -> possible_value_of_integral_const c
   | _ -> None
 
@@ -53,13 +53,13 @@ let value_of_integral_expr e =
   | None -> assert false
   | Some i -> i
 
-let rec is_null_expr e = match (stripInfo e).enode with
+let rec is_null_expr e = match e.enode with
   | Const c when is_integral_const c ->
     Integer.equal (value_of_integral_const c) Integer.zero
   | CastE(_,e) -> is_null_expr e
   | _ -> false
 
-let rec is_non_null_expr e = match (stripInfo e).enode with
+let rec is_non_null_expr e = match e.enode with
   | Const c when is_integral_const c ->
     not (Integer.equal (value_of_integral_const c) Integer.zero)
   | CastE(_,e) -> is_non_null_expr e

@@ -148,7 +148,7 @@ let zarith ~loc bop t1 t2 =
   (* Check that we are building an arithmetic operation *)
   (match bop with
    | PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt -> ()
-   | PlusPI | IndexPI | MinusPI | MinusPP | Lt | Gt | Le | Ge | Eq | Ne | BAnd
+   | PlusPI | MinusPI | MinusPP | Lt | Gt | Le | Ge | Eq | Ne | BAnd
    | BXor | BOr | LAnd | LOr ->
      Options.fatal
        "Using Libc.zarith to build '%a' instead of an arithmetic operation"

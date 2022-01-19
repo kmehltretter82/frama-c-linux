@@ -543,7 +543,7 @@ let rec type_term
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t);
       dup Nan
 
-    | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
+    | TBinOp ((PlusPI | MinusPI), t1, t2) ->
       (* both [t1] and [t2] must be typed. *)
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t1);
       let ctx = type_offset t2 in

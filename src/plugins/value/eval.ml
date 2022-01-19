@@ -150,8 +150,8 @@ let compute_englobing_subexpr ~subexpr ~expr =
     else
       let sublist = match expr.enode with
         | UnOp (_, e, _)
-        | CastE (_, e)
-        | Info (e, _) -> compute e
+        | CastE (_, e) ->
+          compute e
         | BinOp (_, e1, e2, _) ->
           merge (compute e1) (compute e2)
         | Lval (host, offset) ->

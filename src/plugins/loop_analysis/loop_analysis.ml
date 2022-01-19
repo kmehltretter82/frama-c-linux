@@ -153,8 +153,6 @@ module Binary(* :BINARY_SEMILATTICE *) = struct
     | BinOp(MinusA,e1,e2,_) ->
       add (transfer_exp e1 load) (neg (transfer_exp e2 load))
     | CastE(_,e) -> transfer_exp e load
-    (* | BinOp((PlusPI|IndexPI|MinusA),_,_,_) -> assert false *)
-    (* | BinOp(_,_,_,_) -> Unknown *)
     | _ ->
       (match Cil.constFoldToInt ~machdep:true exp with
        | None -> Unknown

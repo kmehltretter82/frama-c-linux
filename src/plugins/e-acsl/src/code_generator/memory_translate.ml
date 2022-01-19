@@ -487,7 +487,7 @@ let call_with_tset
              if Misc.is_bitfield_pointers t.term_type then
                Error.not_yet "bitfield pointer";
              match t.term_node with
-             | TBinOp((PlusPI | IndexPI),
+             | TBinOp(PlusPI,
                       ptr,
                       ({ term_node = Trange _ } as r)) ->
                if Misc.is_set_of_ptr_or_array ptr.term_type then

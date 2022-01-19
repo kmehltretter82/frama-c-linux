@@ -129,7 +129,7 @@ let rec gather_lv_in_exp acc e =
   | Const _ | SizeOf _  | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
     acc
   | Lval lv | AddrOf lv | StartOf lv -> gather_lv_in_lv acc lv
-  | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> gather_lv_in_exp acc e
+  | UnOp (_, e, _) | CastE (_, e) -> gather_lv_in_exp acc e
   | BinOp (_, e1, e2, _) -> gather_lv_in_exp (gather_lv_in_exp acc e1) e2
 and gather_lv_in_lv acc (host, offset as lv) =
   let acc =

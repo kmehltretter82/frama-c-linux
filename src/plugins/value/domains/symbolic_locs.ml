@@ -121,7 +121,7 @@ let interesting_exp get_locs get_val e =
     match e.enode with
     | Lval _ ->
       not (Cvalue.V.cardinal_zero_or_one (get_val e))
-    | CastE (_, e) | UnOp (_, e, _) | Info (e, _) ->
+    | CastE (_, e) | UnOp (_, e, _) ->
       has_lvalue e
     | BinOp (op, e1, e2,_) ->
       not (is_comp op) && (has_lvalue e1 || has_lvalue e2)
@@ -134,7 +134,7 @@ let interesting_exp get_locs get_val e =
     not (Precise_locs.cardinal_zero_or_one (get_locs lv))
   | BinOp (op, e1, e2,_) ->
     not (is_comp op) && has_lvalue e1 && has_lvalue e2
-  | CastE _ | UnOp _ | Info _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
+  | CastE _ | UnOp _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
   | AlignOf _ | AlignOfE _ | StartOf _ | AddrOf _ ->
     false
 
@@ -145,7 +145,7 @@ and vars_exp (e: exp) = match e.enode with
     Base.Set.empty
   | AddrOf lv | StartOf lv | Lval lv ->
     vars_lv lv
-  | SizeOfE e | AlignOfE e | CastE (_,e) | UnOp (_,e,_) | Info (e,_) ->
+  | SizeOfE e | AlignOfE e | CastE (_,e) | UnOp (_,e,_) ->
     vars_exp e
   | BinOp (_,e1,e2,_) -> Base.Set.union (vars_exp e1) (vars_exp e2)
 and vars_host = function

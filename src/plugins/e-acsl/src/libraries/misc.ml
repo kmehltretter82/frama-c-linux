@@ -97,7 +97,7 @@ let rec ptr_base ~loc exp =
   | BinOp(op, lhs, _, _) ->
     (match op with
      (* Pointer arithmetic: split pointer and integer parts *)
-     | MinusPI | PlusPI | IndexPI -> ptr_base ~loc lhs
+     | MinusPI | PlusPI -> ptr_base ~loc lhs
      (* Other arithmetic: treat the whole expression as pointer address *)
      | MinusPP | PlusA | MinusA | Mult | Div | Mod
      | BAnd | BXor | BOr | Shiftlt | Shiftrt
@@ -112,7 +112,6 @@ let rec ptr_base ~loc exp =
     let exp, casts = strip_casts exp in
     let base = ptr_base ~loc exp in
     add_casts casts base
-  | Info (exp, _) -> ptr_base ~loc exp
   | Const _ | Lval _ | UnOp _ -> exp
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     -> assert false
@@ -211,7 +210,7 @@ let name_of_binop = function
   | Mult -> "mul"
   | PlusA -> "add"
   | MinusA -> "sub"
-  | MinusPP | MinusPI | IndexPI | PlusPI -> assert false
+  | MinusPP | MinusPI | PlusPI -> assert false
 
 module Id_term =
   Datatype.Make_with_collections

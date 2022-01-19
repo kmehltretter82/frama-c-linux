@@ -47,7 +47,7 @@ let name_of_mpz_arith_bop = function
   | BXor -> "__gmpz_xor"
   | Shiftlt -> "__gmpz_mul_2exp"
   | Shiftrt -> "__gmpz_tdiv_q_2exp"
-  | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr | PlusPI | IndexPI | MinusPI
+  | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr | PlusPI | MinusPI
   | MinusPP as bop ->
     Options.fatal
       "Operation '%a' either not arithmetic or not supported on GMP integers"

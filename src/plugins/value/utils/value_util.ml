@@ -280,7 +280,7 @@ let rec zone_of_expr find_loc expr =
     | Lval lval ->
       (* Dereference of an lvalue. *)
       zone_of_lval find_loc lval
-    | UnOp (_, e, _) | CastE (_, e) | Info (e, _) ->
+    | UnOp (_, e, _) | CastE (_, e) ->
       (* Unary operators. *)
       process e
     | BinOp (_, e1, e2, _) ->
@@ -329,7 +329,7 @@ let rec height_expr expr =
   match expr.enode with
   | Const _ | SizeOf _ | SizeOfStr _ | AlignOf _ -> 0
   | Lval lv | AddrOf lv | StartOf lv  -> height_lval lv + 1
-  | UnOp (_,e,_) | CastE (_, e) | Info (e,_) | SizeOfE e | AlignOfE e
+  | UnOp (_,e,_) | CastE (_, e) | SizeOfE e | AlignOfE e
     -> height_expr e + 1
   | BinOp (_,e1,e2,_) -> max (height_expr e1) (height_expr e2) + 1
 
