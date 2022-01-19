@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 (** Handling errors. *)
-open Error_types
 
 module type S = sig
   exception Typing_error of Options.category option * string
@@ -66,21 +65,13 @@ module type S = sig
 
   val retrieve_preprocessing:
     string ->
-    ('a -> 'b or_error) ->
+    ('a -> 'b Result.t) ->
     'a ->
     (Format.formatter -> 'a -> unit) ->
     'b
-  (** Retrieve the result of a preprocessing phase, which possibly failed.
-      The [string] argument and the formatter are used to display a message in
-      case the preprocessing phase did not compute the required result. *)
-
-  val pp_or_error:
-    (Format.formatter -> 'a -> unit) ->
-    Format.formatter ->
-    'a or_error ->
-    unit
-    (** [pp_or_error pp] where [pp] is a formatter for ['a] returns a formatter for
-        ['a or_error]. *)
+    (** Retrieve the result of a preprocessing phase, which possibly failed.
+        The [string] argument and the formatter are used to display a message in
+        case the preprocessing phase did not compute the required result. *)
 end
 
 (** Functor to build an [Error] module for a given [phase]. *)

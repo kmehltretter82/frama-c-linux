@@ -38,11 +38,8 @@ endif
 ###################
 
 # libraries
-LIBRARIES_CMI:= \
-	error_types
-LIBRARIES_CMI:=$(addprefix src/libraries/, $(LIBRARIES_CMI))
-
 SRC_LIBRARIES:= \
+	result \
 	error \
 	builtins \
 	functions \

@@ -20,7 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Types for E-ACSL errors *)
+(** Type holding a result or an exception *)
 
-(** Represent either a result of type ['a] or an error with an exception *)
-type 'a or_error = Res of 'a | Err of exn
+type 'a t = Res of 'a | Err of exn
+
+let pretty pp fmt result =
+  match result with
+  | Res a -> Format.fprintf fmt "@[%a@]" pp a
+  | Err err -> Format.fprintf fmt "@[%s@]" (Printexc.to_string err)

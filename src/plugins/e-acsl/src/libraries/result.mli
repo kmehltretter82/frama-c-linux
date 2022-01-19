@@ -20,36 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(** Type holding a result or an exception *)
 
-val get_preprocessed_quantifier:
-  predicate -> ((term * logic_var * term) list * predicate) Result.t
-(** @return the preprocessed of a quantified predicate the
-    [(term * logic_var * term) list] is the list of all the quantified variables
-    along with their syntactic guards, and the [predicate] is the goal: the
-    original predicate with all the quantifiers removed *)
+(** Represent either a result of type ['a] or an error with an exception *)
+type 'a t = Res of 'a | Err of exn
 
-val add_guard_for_small_type : logic_var -> predicate -> unit
-(** Adds an optional additional guard condition that comes from the typing *)
-
-val get_guard_for_small_type : logic_var -> predicate option
-(** @return the optional additional guard for a quantified logic variables. It
-    may happen that the syntactic guard of the variable can be refined with the
-    type of the variable, this additional predicate translates this refinement *)
-
-val replace : predicate -> (term * logic_var * term) list -> predicate -> unit
-(** Replace the computed guards. This is because the typing sometimes simplifies
-    the computed bounds, so we allow for storing new bounds *)
-
-val clear_guards : unit -> unit
-(** Clear the table of guard conditions for quantified variables *)
-
-val preprocess : file -> unit
-(** Preprocess all the quantified predicates in the ast and store the result
-    in an hashtable *)
-
-val preprocess_annot : code_annotation -> unit
-(** Preprocess the quantified predicate in a given code annotation *)
-
-val preprocess_predicate : predicate -> unit
-(** Preprocess the quantified predicate in a given predicate *)
+val pretty:
+  (Format.formatter -> 'a -> unit) ->
+  Format.formatter ->
+  'a t ->
+  unit
+(** [pretty pp] where [pp] is a formatter for ['a] returns a formatter for
+    ['a t]. *)

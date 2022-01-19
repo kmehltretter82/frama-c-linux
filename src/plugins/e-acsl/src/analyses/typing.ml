@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Error_types
 
 (* Implement Figure 4 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince". *)
@@ -199,9 +198,9 @@ module Memo: sig
     lenv:Function_params_ty.t ->
     (term -> computed_info) ->
     term ->
-    computed_info or_error
+    computed_info Result.t
   val get: lenv:Function_params_ty.t -> term ->
-    computed_info or_error
+    computed_info Result.t
   val clear: unit -> unit
 end = struct
 
@@ -219,7 +218,7 @@ end = struct
        the guard and once for encoding [x+1] when incrementing it. The
        memoization is only useful here and indeed prevent the generation of one
        extra variable in some cases. *)
-  let tbl : computed_info or_error Misc.Id_term.Hashtbl.t =
+  let tbl : computed_info Result.t Misc.Id_term.Hashtbl.t =
     Misc.Id_term.Hashtbl.create 97
 
   (* The type of the logic function
@@ -232,7 +231,7 @@ end = struct
      We distinguish the calls to the function by storing the type of the
      arguments corresponding to each call, and we weaken the typing so that it
      is invariant when the arguments have the same type. *)
-  let dep_tbl : computed_info or_error Id_term_with_lenv.Hashtbl.t
+  let dep_tbl : computed_info Result.t Id_term_with_lenv.Hashtbl.t
     = Id_term_with_lenv.Hashtbl.create 97
 
   let get_dep lenv t =
@@ -252,8 +251,8 @@ end = struct
     try Misc.Id_term.Hashtbl.find tbl t
     with Not_found ->
       let x =
-        try Res (f t)
-        with Error.Not_yet _ | Error.Typing_error _ as exn -> Err exn
+        try Result.Res (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Err exn
       in
       Misc.Id_term.Hashtbl.add tbl t x;
       x
@@ -263,8 +262,8 @@ end = struct
       Id_term_with_lenv.Hashtbl.find dep_tbl (t, lenv)
     with Not_found ->
       let x =
-        try Res (f t)
-        with Error.Not_yet _ | Error.Typing_error _ as exn -> Err exn
+        try Result.Res (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Err exn
       in
       Id_term_with_lenv.Hashtbl.add dep_tbl (t, lenv) x;
       x

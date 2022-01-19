@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Error_types
-
 (** Internal module holding the exception of [Error].
 
     The module is included into [Make_with_opt] later and should not be used
@@ -46,15 +44,10 @@ module type S = sig
   val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b
   val retrieve_preprocessing:
     string ->
-    ('a -> 'b or_error) ->
+    ('a -> 'b Result.t) ->
     'a ->
     (Format.formatter -> 'a -> unit) ->
     'b
-  val pp_or_error:
-    (Format.formatter -> 'a -> unit) ->
-    Format.formatter ->
-    'a or_error ->
-    unit
 end
 
 module Make_with_opt(P: sig val phase:Options.category option end): S = struct
@@ -112,19 +105,14 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
   let retrieve_preprocessing analyse_name getter parameter pp =
     try
       match getter parameter with
-      | Res res -> res
-      | Err exn -> raise exn
+      | Result.Res res -> res
+      | Result.Err exn -> raise exn
     with Not_memoized phase ->
       Options.fatal
         "@[%s was not performed on construct %a%a@]"
         analyse_name
         pp parameter
         pp_phase phase
-
-  let pp_or_error pp fmt a_or_error =
-    match a_or_error with
-    | Res a -> Format.fprintf fmt "@[%a@]" pp a
-    | Err err -> Format.fprintf fmt "@[%s@]" (Printexc.to_string err)
 end
 
 module Make(P: sig val phase:Options.category end): S =
