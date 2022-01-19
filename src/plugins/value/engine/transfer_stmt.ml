@@ -81,10 +81,12 @@ let do_copy_at = function
     with Not_found -> assert false
 
 (* Warn for call arguments that contain uninitialized/escaping except on
-   [Frama_C_show_each] directives or if the user disables these alarms. *)
+   [Frama_C_show_each] directives or if the user disables these alarms
+   on functions whose body is analyzed. *)
 let is_determinate kf =
   let name = Kernel_function.get_name kf in
-  warn_indeterminate kf && not (Ast_info.is_frama_c_builtin name)
+  (warn_indeterminate kf || !Db.Value.use_spec_instead_of_definition kf)
+  && not (Ast_info.is_frama_c_builtin name)
 
 let subdivide_stmt = Value_util.get_subdivision
 
