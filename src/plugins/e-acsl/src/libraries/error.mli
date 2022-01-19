@@ -73,12 +73,6 @@ module type S = sig
   (** Run the closure with the given argument and handle potential errors.
       Return the additional argument in case of errors. *)
 
-  val nb_untypable: unit -> int
-  (** Number of untypable annotations. *)
-
-  val nb_not_yet: unit -> int
-  (** Number of not-yet-supported annotations. *)
-
   val retrieve_preprocessing:
     string ->
     ('a -> 'b or_error) ->

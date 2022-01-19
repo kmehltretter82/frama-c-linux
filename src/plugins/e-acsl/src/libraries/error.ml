@@ -41,8 +41,6 @@ module type S = sig
   val print_not_yet: string -> unit
   val handle: ('a -> 'a) -> 'a -> 'a
   val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b
-  val nb_untypable: unit -> int
-  val nb_not_yet: unit -> int
   val retrieve_preprocessing:
     string ->
     ('a -> 'b or_error) ->
@@ -56,24 +54,6 @@ module type S = sig
     unit
 end
 
-module Nb_typing =
-  State_builder.Ref
-    (Datatype.Int)
-    (struct
-      let name = "E_ACSL.Error.Nb_typing"
-      let default () = 0
-      let dependencies = [ Ast.self ]
-    end)
-
-module Nb_not_yet =
-  State_builder.Ref
-    (Datatype.Int)
-    (struct
-      let name = "E_ACSL.Error.Nb_not_yet"
-      let default () = 0
-      let dependencies = [ Ast.self ]
-    end)
-
 module Make_with_opt(P: sig val phase:Options.category option end): S = struct
   include Exn_impl
 
@@ -84,9 +64,6 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
   let untypable msg = raise (make_untypable msg)
   let not_yet msg = raise (make_not_yet msg)
   let not_memoized () = raise (make_not_memoized ())
-
-  let nb_untypable = Nb_typing.get
-  let nb_not_yet = Nb_not_yet.get
 
   let pp_phase fmt phase =
     match phase with
@@ -104,8 +81,7 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
     in
     Options.warning
       ~once:true ~current:true
-      "@[%s@ Ignoring annotation.@]" msg;
-    Nb_not_yet.set (Nb_not_yet.get () + 1)
+      "@[%s@ Ignoring annotation.@]" msg
 
   let print_not_yet msg =
     do_print_not_yet P.phase msg
@@ -123,7 +99,6 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
       Options.warning
         ~once:true ~current:true
         "@[%s@ Ignoring annotation.@]" msg;
-      Nb_typing.set (Nb_typing.get () + 1);
       res
     | Not_yet (phase, s) ->
       do_print_not_yet phase s;
