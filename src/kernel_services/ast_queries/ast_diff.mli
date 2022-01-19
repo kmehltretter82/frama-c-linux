@@ -112,5 +112,11 @@ module Fundec:
   State_builder.Hashtbl
   with type key = fundec and type data = fundec correspondance
 
-(** [compare_ast prj] sets [prj] as the original project and fill the tables. *)
-val compare_ast: Project.t -> unit
+(** performs a comparison of AST between the current and the original
+    project, which must have been set beforehand.
+*)
+val compare_ast: unit-> unit
+
+(** [compare_from_prj prj] sets [prj] as the original project
+    and fill the tables. *)
+val compare_from_prj: Project.t -> unit

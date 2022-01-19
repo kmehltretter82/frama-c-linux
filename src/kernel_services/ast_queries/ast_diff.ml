@@ -1464,7 +1464,29 @@ let global_correspondance g =
   | GAnnot (g,_) -> gannot_correspondance g
   | GAsm _ | GPragma _ | GText _ -> ()
 
-let compare_ast prj =
-  Orig_project.set prj;
+
+let compare_ast () =
+  let prj = Orig_project.get () in
   let ast = Project.on prj Ast.get () in
   Cil.iterGlobals ast global_correspondance
+
+let compare_from_prj prj =
+  Orig_project.set prj;
+  compare_ast ()
+
+let prepare_project () =
+  if Kernel.AstDiff.get () then begin
+    let orig = Project.create_by_copy ~last:false
+        ("orig_" ^ Project.get_name (Project.current()))
+    in
+    Orig_project.set orig
+  end
+
+let () = Cmdline.run_after_configuring_stage prepare_project
+
+let compute_diff _ =
+  if Kernel.AstDiff.get () then begin
+    Ast.compute (); compare_ast ()
+  end
+
+let () = Cmdline.run_after_setting_files compute_diff
