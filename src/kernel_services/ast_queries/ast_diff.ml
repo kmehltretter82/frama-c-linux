@@ -391,6 +391,34 @@ let is_matching_varinfo vi vi' env =
     Kernel.fatal "Unbound variable %a in AST diff"
       Cil_datatype.Varinfo.pretty vi
 
+let is_matching_fieldinfo fi fi' =
+  match Fieldinfo.find fi with
+  | `Not_present -> false
+  | `Same fi'' -> Cil_datatype.Fieldinfo.equal fi' fi''
+  | exception Not_found ->
+    Kernel.fatal "Unbound field %a in AST diff"
+      Cil_datatype.Fieldinfo.pretty fi
+
+let is_matching_model_info mf mf' =
+  match Model_info.find mf with
+  | `Not_present -> false
+  | `Same mf'' -> Cil_datatype.Model_info.equal mf' mf''
+  | exception Not_found ->
+    Kernel.fatal "Unbound model field %a in AST diff"
+      Cil_datatype.Model_info.pretty  mf
+
+let is_matching_logic_var lv lv' env =
+  match lv.lv_origin, lv'.lv_origin with
+  | Some vi, Some vi' -> is_matching_varinfo vi vi' env
+  | None, None ->
+    (match Cil_datatype.Logic_var.Map.find_opt lv env.logic_local_vars with
+     | Some lv'' -> Cil_datatype.Logic_var.equal lv' lv''
+     | None ->
+       (match Logic_var.find lv with
+        | `Not_present -> false
+        | `Same lv'' -> Cil_datatype.Logic_var.equal lv' lv''))
+  | _ -> false
+
 let is_matching_logic_info li li' env =
   match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
   | None ->
@@ -601,9 +629,23 @@ and is_same_term_node t t' env =
 and is_same_term_lval (lh,lo) (lh',lo') env =
   is_same_term_lhost lh lh' env && is_same_term_offset lo lo' env
 
-and is_same_term_lhost _lh _lh' _env = false
+and is_same_term_lhost lh lh' env =
+  match lh, lh' with
+  | TVar lv, TVar lv' -> is_matching_logic_var lv lv' env
+  | TResult _, TResult _ -> true
+  | TMem p, TMem p' -> is_same_term p p' env
+  | (TVar _ | TResult _ | TMem _), _ -> false
 
-and is_same_term_offset _lo _lo' _env = false
+and is_same_term_offset lo lo' env =
+  match lo, lo' with
+  | TNoOffset, TNoOffset -> true
+  | TField(f,o), TField(f',o') ->
+    is_matching_fieldinfo f f' && is_same_term_offset o o' env
+  | TModel(f,o), TModel(f',o') ->
+    is_matching_model_info f f' && is_same_term_offset o o' env
+  | TIndex(i,o), TIndex(i',o') ->
+    is_same_term i i' env && is_same_term_offset o o' env
+  | (TNoOffset | TField _ | TModel _ | TIndex _), _ -> false
 
 and is_same_toplevel_predicate p p' env =
   Predicate_kind.equal p.tp_kind p'.tp_kind &&
@@ -772,10 +814,7 @@ and is_same_offset o o' env =
   match (o,o') with
   | NoOffset, NoOffset -> true
   | Field (i,o), Field(i',o') ->
-    (match fieldinfo_correspondance i env with
-     | `Not_present -> false
-     | `Same i'' -> Cil_datatype.Fieldinfo.equal i' i'')
-    && is_same_offset o o' env
+    is_matching_fieldinfo i i' && is_same_offset o o' env
   | Index(i,o), Index(i',o') ->
     is_same_exp i i' env && is_same_offset o o' env
   | (NoOffset | Field _ | Index _), _ -> false
