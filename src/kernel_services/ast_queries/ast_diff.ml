@@ -210,6 +210,7 @@ type is_same_env =
     logic_info: logic_info Cil_datatype.Logic_info.Map.t;
     logic_type_info: logic_type_info Cil_datatype.Logic_type_info.Map.t;
     logic_local_vars: logic_var Cil_datatype.Logic_var.Map.t;
+    logic_type_vars: string Datatype.String.Map.t;
   }
 
 module Build(H:Datatype.S_with_collections)(D:Datatype.S) =
@@ -262,6 +263,8 @@ let (&&>) (res,env) f =
     | `Body_changed -> `Body_changed, env
     | `Same_body | `Callees_changed -> `Callees_changed, env
 
+let (&&&) (res, env) f = if res then f env else false, env
+
 let empty_env =
   { compinfo = Cil_datatype.Compinfo.Map.empty;
     kernel_function = Kf.Map.empty;
@@ -269,6 +272,7 @@ let empty_env =
     logic_info = Cil_datatype.Logic_info.Map.empty;
     logic_type_info = Cil_datatype.Logic_type_info.Map.empty;
     logic_local_vars = Cil_datatype.Logic_var.Map.empty;
+    logic_type_vars = Datatype.String.Map.empty;
   }
 
 let add_locals f f' env =
@@ -287,6 +291,15 @@ let add_logic_prms p p' env =
 
 let add_logic_info v v' env =
   { env with logic_info = Cil_datatype.Logic_info.Map.add v v' env.logic_info }
+
+let logic_type_vars_env l l' env =
+  if List.length l = List.length l' then begin
+    let logic_type_vars =
+      List.fold_left2 (fun env s s' -> Datatype.String.Map.add s s' env)
+        env.logic_type_vars l l'
+    in
+    true, { env with logic_type_vars }
+  end else false, env
 
 let formals_correspondance f f' =
   let add_one v v' = Varinfo.add v (`Same v') in
@@ -435,8 +448,21 @@ let is_matching_logic_ctor c c' =
   | `Not_present -> false
   | `Same c'' -> Cil_datatype.Logic_ctor_info.equal c' c''
   | exception Not_found ->
-    Kernel.fatal "Unbound logic type constructor in AST diff"
+    Kernel.fatal "Unbound logic type constructor %a in AST diff"
       Cil_datatype.Logic_ctor_info.pretty c
+
+let is_matching_logic_type_info t t' =
+  match Logic_type_info.find t with
+  | `Not_present -> false
+  | `Same t'' -> Cil_datatype.Logic_type_info.equal t' t''
+  | exception Not_found ->
+    Kernel.fatal "Unbound logic type %a in AST diff"
+      Cil_datatype.Logic_type_info.pretty t
+
+let is_matching_logic_type_var a a' env =
+  match Datatype.String.Map.find_opt a env.logic_type_vars with
+  | None -> false
+  | Some a'' -> Datatype.String.equal a' a''
 
 module Unop = struct
   type t = [%import: Cil_types.unop] [@@deriving eq]
@@ -721,6 +747,77 @@ and is_same_funspec s s' env =
     s.spec_terminates s'.spec_terminates env &&
   are_same_cd_clauses s.spec_complete_behaviors s'.spec_complete_behaviors &&
   are_same_cd_clauses s.spec_disjoint_behaviors s'.spec_disjoint_behaviors
+
+and is_same_logic_type t t' env =
+  match t,t' with
+  | Ctype t, Ctype t' -> is_same_type t t' env
+  | Ltype (t,prms), Ltype (t',prms') ->
+    is_matching_logic_type_info t t' &&
+    is_same_list is_same_logic_type prms prms' env
+  | Lvar s, Lvar s' -> is_matching_logic_type_var s s' env
+  | Linteger, Linteger -> true
+  | Lreal, Lreal -> true
+  | Larrow(args,rt), Larrow(args', rt')  ->
+    is_same_list is_same_logic_type args args' env &&
+    is_same_logic_type rt rt' env
+  | (Ctype _ | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _),_ -> false
+
+and is_same_inductive_case (_,labs,tprms,p) (_,labs',tprms',p') env =
+  let res, env =
+    (is_same_list is_same_logic_label labs labs' env, env) &&&
+    logic_type_vars_env tprms tprms'
+  in
+  res && is_same_predicate p p' env
+
+and is_same_logic_body b b' env =
+  match b,b' with
+  | LBnone, LBnone -> true
+  | LBreads l, LBreads l' ->
+    is_same_list is_same_identified_term l l' env
+  | LBterm t, LBterm t' -> is_same_term t t' env
+  | LBpred p, LBpred p' -> is_same_predicate p p' env
+  | LBinductive l, LBinductive l' ->
+    is_same_list is_same_inductive_case l l' env
+  | (LBnone | LBreads _ | LBterm _ | LBpred _ | LBinductive _), _ -> false
+
+and is_same_logic_ctor_info c c' env =
+  (* we rely on order in the type declaration to match constructors,
+     not on names. *)
+  is_same_list is_same_logic_type c.ctor_params c'.ctor_params env
+
+and is_same_logic_type_def d d' env =
+  match d,d' with
+  | LTsum l, LTsum l' ->
+    if is_same_list is_same_logic_ctor_info l l' env then begin
+      List.iter2 (fun c c' -> Logic_ctor_info.add c (`Same c')) l l';
+      true
+    end else begin
+      List.iter (fun c -> Logic_ctor_info.add c `Not_present) l;
+      false
+    end
+  | LTsyn t, LTsyn t' -> is_same_logic_type t t' env
+  | (LTsum _ | LTsyn _), _ -> false
+
+and is_same_logic_info li li' env =
+  let res,env =
+    (is_same_list is_same_logic_label li.l_labels li'.l_labels env, env) &&&
+    logic_type_vars_env li.l_tparams li'.l_tparams &&&
+    logic_vars_env li.l_profile li'.l_profile
+  in
+  res && is_same_opt is_same_logic_type li.l_type li'.l_type env &&
+  is_same_logic_body li.l_body li'.l_body env
+
+and is_same_logic_type_info ti ti' env =
+  let res,env =
+    (Cil_datatype.Attributes.equal ti.lt_attr ti'.lt_attr, env) &&&
+    logic_type_vars_env ti.lt_params ti'.lt_params
+  in
+  res && is_same_opt is_same_logic_type_def ti.lt_def ti'.lt_def env
+
+and is_same_model_info mi mi' env =
+  is_same_type mi.mi_base_type mi'.mi_base_type env &&
+  is_same_logic_type mi.mi_field_type mi'.mi_field_type env &&
+  Cil_datatype.Attributes.equal mi.mi_attr mi'.mi_attr
 
 and is_same_type t t' env =
   match t, t' with
@@ -1039,14 +1136,6 @@ and is_same_fundec f f' env: body_correspondance =
    | `Body_changed -> ());
   res
 
-and is_same_logic_type _t _t' _env = false
-
-and is_same_logic_info _li _li' _env = false
-
-and is_same_logic_type_info _ti _ti' _env = false
-
-and is_same_model_info _mi _mi' _env = false
-
 (* only for locals and formals. Globals are treated by
    gvar_correspondance below. *)
 and is_same_varinfo vi vi' env =
@@ -1056,6 +1145,12 @@ and is_same_varinfo vi vi' env =
 and is_same_logic_var lv lv' env =
   is_same_logic_type lv.lv_type lv'.lv_type env &&
   Cil_datatype.Attributes.equal lv.lv_attr lv'.lv_attr
+
+and logic_vars_env l l' env =
+  if is_same_list is_same_logic_var l l' env then
+    true, add_logic_prms l l' env
+  else
+    false, env
 
 (* because of overloading, we have to check for a corresponding profile,
    leading to potentially recursive calls to is_same_* functions. *)
@@ -1125,10 +1220,6 @@ and compinfo_correspondance ?loc ci env =
   match Cil_datatype.Compinfo.Map.find_opt ci env.compinfo with
   | Some ci' -> `Same ci'
   | None -> Compinfo.memo add ci
-
-(* Fieldinfo table is filled together with the Compinfo entry for the
-   corresponding aggregate type. *)
-and fieldinfo_correspondance ?loc:_loc fi _env = Fieldinfo.find fi
 
 and enuminfo_correspondance ?loc ei env =
   let add ei =
@@ -1244,6 +1335,8 @@ and logic_type_correspondance ?loc ti env =
             Cil_datatype.Logic_type_info.Map.add ti ti' env.logic_type_info }
       in
       let res = is_same_logic_type_info ti ti' env in
+      (* In case of a sum type, the constructors table
+         is updated by is_same_logic_type_info. *)
       if res then `Same ti' else `Not_present
   in
   match Cil_datatype.Logic_type_info.Map.find_opt ti env.logic_type_info with
