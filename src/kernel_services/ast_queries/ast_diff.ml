@@ -253,6 +253,18 @@ module Kernel_function = Build_code_correspondance(Kernel_function)
 
 module Fundec = Build_correspondance(Cil_datatype.Fundec)
 
+let make_correspondance candidate has_same_spec code_corres =
+  match has_same_spec, code_corres with
+  | false, `Body_changed -> `Not_present
+  | false, `Callees_changed ->
+    `Partial(candidate,`Callees_spec_changed)
+  | false, `Same_body ->
+    `Partial(candidate, `Spec_changed)
+  | true, `Same_body ->
+    `Same candidate
+  | true, ((`Body_changed|`Callees_changed) as c) ->
+    `Partial(candidate, c)
+
 let (&&>) (res,env) f =
   match res with
   | `Body_changed -> `Body_changed, env
@@ -309,13 +321,6 @@ let logic_prms_correspondance p p' =
   let add_one lv lv' =
     Logic_var.add lv (`Same lv') in
   List.iter2 add_one p p'
-
-let update_stmt_correspondance s s' (corres,_) =
-  match corres with
-  | `Same_body -> Stmt.add s (`Same s')
-  | (`Spec_changed | `Callees_changed | `Callees_spec_changed) as c ->
-    Stmt.add s (`Partial(s',(c:>partial_correspondance)))
-  | `Body_changed -> ()
 
 (** TODO: use location info to detect potential renaming.
     Requires some information about syntactic diff. *)
@@ -491,6 +496,9 @@ end
 module Termination_kind = struct
   type t = [%import: Cil_types.termination_kind] [@@deriving eq]
 end
+
+let is_same_behavior_set l l' =
+  Datatype.String.Set.(equal (of_list l) (of_list l'))
 
 let are_same_cd_clauses l l' =
   let module StringSetSet = Set.Make(Datatype.String.Set) in
@@ -725,6 +733,36 @@ and is_same_behavior b b' env =
 and is_same_variant (v,m) (v',m') env =
   is_same_term v v' env && is_same_opt is_matching_logic_info m m' env
 
+and is_same_loop_pragma p p' env =
+  match p, p' with
+  | Unroll_specs l, Unroll_specs l' ->
+    is_same_list is_same_term l l' env
+  | Widen_hints l, Widen_hints l' ->
+    is_same_list is_same_term l l' env
+  | Widen_variables l, Widen_variables l' ->
+    is_same_list is_same_term l l' env
+  | (Unroll_specs _ | Widen_hints _ | Widen_variables _), _ -> false
+
+and is_same_slice_pragma p p' env =
+  match p, p' with
+  | SPexpr t, SPexpr t' -> is_same_term t t' env
+  | SPctrl, SPctrl -> true
+  | SPstmt, SPstmt -> true
+  | (SPexpr _ | SPctrl | SPstmt), _ -> false
+
+and is_same_impact_pragma p p' env =
+  match p, p' with
+  | IPexpr t, IPexpr t' -> is_same_term t t' env
+  | IPstmt, IPstmt -> true
+  | (IPexpr _ | IPstmt), _ -> false
+
+and is_same_pragma p p' env =
+  match p,p' with
+  | Loop_pragma p, Loop_pragma p' -> is_same_loop_pragma p p' env
+  | Slice_pragma p, Slice_pragma p' -> is_same_slice_pragma p p' env
+  | Impact_pragma p, Impact_pragma p' -> is_same_impact_pragma p p' env
+  | (Loop_pragma _ | Slice_pragma _ | Impact_pragma _), _ -> false
+
 and are_same_behaviors bhvs bhvs' env =
   let treat_one_behavior acc b =
     match List.partition (fun b' -> b.b_name = b'.b_name) acc with
@@ -747,6 +785,25 @@ and is_same_funspec s s' env =
     s.spec_terminates s'.spec_terminates env &&
   are_same_cd_clauses s.spec_complete_behaviors s'.spec_complete_behaviors &&
   are_same_cd_clauses s.spec_disjoint_behaviors s'.spec_disjoint_behaviors
+
+and is_same_code_annotation a a' env =
+  match a.annot_content, a'.annot_content with
+  | AAssert (bhvs, p), AAssert(bhvs',p') ->
+    is_same_behavior_set bhvs bhvs' && is_same_toplevel_predicate p p' env
+  | AStmtSpec (bhvs, s), AStmtSpec(bhvs', s') ->
+    is_same_behavior_set bhvs bhvs' && is_same_funspec s s' env
+  | AInvariant (bhvs, is_loop, p), AInvariant(bhvs', is_loop', p') ->
+    is_same_behavior_set bhvs bhvs' && is_loop = is_loop' &&
+    is_same_toplevel_predicate p p' env
+  | AVariant v, AVariant v' -> is_same_variant v v' env
+  | AAssigns(bhvs, a), AAssigns(bhvs', a') ->
+    is_same_behavior_set bhvs bhvs' && is_same_assigns a a' env
+  | AAllocation(bhvs, a), AAllocation(bhvs',a') ->
+    is_same_behavior_set bhvs bhvs' && is_same_allocation a a' env
+  | APragma p, APragma p' -> is_same_pragma p p' env
+  | AExtended _, AExtended _ -> true (*TODO: checks also for extended clauses*)
+  | (AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _ | AAssigns _
+    | AAllocation _ | APragma _ | AExtended _), _ -> false
 
 and is_same_logic_type t t' env =
   match t,t' with
@@ -1019,9 +1076,17 @@ and is_same_instr_list l l' env =
     is_same_instr i i' env &&> is_same_instr_list tl tl'
 
 and is_same_stmt s s' env =
-  if s.ghost = s'.ghost && Cil_datatype.Attributes.equal s.sattr s'.sattr then
-    begin
-      let res =
+  let selection =
+    State_selection.with_codependencies Annotations.code_annot_state
+  in
+  let annots =
+    Project.on ~selection (Orig_project.get()) Annotations.code_annot s
+  in
+  let annots' = Annotations.code_annot s' in
+  let annot_res = is_same_list is_same_code_annotation annots annots' env in
+  let code_res, env =
+    if s.ghost = s'.ghost && Cil_datatype.Attributes.equal s.sattr s'.sattr then
+      begin
         match s.skind,s'.skind with
         | Instr i, Instr i' -> is_same_instr i i' env
         | Return (r,_), Return(r', _) ->
@@ -1072,9 +1137,10 @@ and is_same_stmt s s' env =
             is_same_block b2 b2'
           end else `Body_changed, env
         | _ -> `Body_changed, env
-      in
-      update_stmt_correspondance s s' res; res
-    end else `Body_changed, env
+      end else `Body_changed, env
+  in
+  let res = make_correspondance s' annot_res code_res in
+  Stmt.add s res; code_res, env
 
 (* is_same_block will return its modified environment in order
    to update correspondance table with respect to locals, in case
@@ -1276,20 +1342,12 @@ and gfun_correspondance ?loc vi env =
           | true, true ->
             is_same_fundec (Kf.get_definition kf) (Kf.get_definition kf') env
         in
-        match same_spec, same_body with
-        | false, `Body_changed -> `Not_present
-        | false, `Callees_changed ->
-          formals_correspondance formals formals';
-          `Partial(kf',`Callees_spec_changed)
-        | false, `Same_body ->
-          formals_correspondance formals formals';
-          `Partial(kf', `Spec_changed)
-        | true, `Same_body ->
-          formals_correspondance formals formals';
-          `Same kf'
-        | true, ((`Body_changed|`Callees_changed) as c) ->
-          formals_correspondance formals formals';
-          `Partial(kf', c)
+        let res = make_correspondance kf' same_spec same_body in
+        (match res with
+         | `Not_present ->
+           List.iter (fun v -> Varinfo.add v `Not_present) formals;
+         | `Same _ | `Partial _ -> formals_correspondance formals formals');
+        res
       end else begin
         (* signatures do not match, we consider that pointers
            are not equivalent. *)
