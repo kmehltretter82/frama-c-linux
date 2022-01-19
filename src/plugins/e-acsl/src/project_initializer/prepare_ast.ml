@@ -23,7 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-let dkey = Options.dkey_prepare
+let dkey = Options.Dkey.prepare
 
 (**************************************************************************)
 (********************** Forward references ********************************)

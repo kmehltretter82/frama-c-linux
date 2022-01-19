@@ -41,12 +41,14 @@ val emitter: Emitter.t
 
 val must_visit: unit -> bool
 
-val dkey_prepare: category
-val dkey_bound_variables: category
-val dkey_interval: category
-val dkey_mtracking: category
-val dkey_typing: category
-val dkey_translation: category
+module Dkey: sig
+  val prepare: category
+  val bound_variables: category
+  val interval: category
+  val mtracking: category
+  val typing: category
+  val translation: category
+end
 
 val setup: ?rtl:bool -> unit -> unit
 (** Verify and initialize the options of the current project according to the

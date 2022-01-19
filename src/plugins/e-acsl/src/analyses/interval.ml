@@ -26,7 +26,7 @@ open Cil_types
    devenir plus rapide, plus précis et plus mince".
    Also implements a support for real numbers. *)
 
-module Error = Error.Make(struct let phase = Options.dkey_interval end)
+module Error = Error.Make(struct let phase = Options.Dkey.interval end)
 
 (* ********************************************************************* *)
 (* Basic datatypes and operations *)

@@ -23,7 +23,7 @@
 (** Generate C implementations of E-ACSL terms. *)
 
 open Cil_types
-let dkey = Options.dkey_translation
+let dkey = Options.Dkey.translation
 
 (**************************************************************************)
 (********************** Forward references ********************************)

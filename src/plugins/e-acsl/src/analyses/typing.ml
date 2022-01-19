@@ -25,7 +25,7 @@ open Cil_types
 (* Implement Figure 4 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince". *)
 
-let dkey = Options.dkey_typing
+let dkey = Options.Dkey.typing
 module Error = Error.Make(struct let phase = dkey end)
 
 (* In order to properly handle recursive functions the typing method has to

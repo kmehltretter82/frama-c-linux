@@ -20,4 +20,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Error.Make(struct let phase = Options.dkey_translation end)
+include Error.Make(struct let phase = Options.Dkey.translation end)

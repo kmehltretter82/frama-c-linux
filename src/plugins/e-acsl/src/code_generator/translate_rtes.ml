@@ -23,7 +23,7 @@
 (** Generate and translate RTE annotations. *)
 
 open Cil_types
-let dkey = Options.dkey_translation
+let dkey = Options.Dkey.translation
 
 let rte_annots pp elt kf env l =
   let old_kind = Env.annotation_kind env in

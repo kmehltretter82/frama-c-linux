@@ -25,7 +25,7 @@ open Cil_datatype
 
 module Dataflow = Dataflow2
 
-let dkey = Options.dkey_mtracking
+let dkey = Options.Dkey.mtracking
 module Error = Error.Make(struct let phase = dkey end)
 
 let must_never_monitor vi =
