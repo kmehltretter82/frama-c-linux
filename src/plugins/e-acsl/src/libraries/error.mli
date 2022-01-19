@@ -44,13 +44,13 @@ module type S = sig
   (** Make a [Not_memoized] exception with the given message. *)
 
   val untypable: string -> 'a
-  (** @raise Typing_error with the given message. *)
+  (** @raise Typing_error with the given message for the current phase. *)
 
   val not_yet: string -> 'a
-  (** @raise Not_yet with the given message. *)
+  (** @raise Not_yet with the given message for the current phase. *)
 
   val not_memoized: unit -> 'a
-  (** @raise Not_memoized *)
+  (** @raise Not_memoized for the current phase. *)
 
   val print_not_yet: string -> unit
   (** Print the "not yet supported" message without raising an exception. *)
