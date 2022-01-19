@@ -172,10 +172,14 @@ let emitter =
 
 let must_visit () = Run.get ()
 
-let dkey_analysis = register_category "analysis"
-let dkey_prepare = register_category "preparation"
-let dkey_translation = register_category "translation"
-let dkey_typing = register_category "typing"
+module Dkey = struct
+  let prepare = register_category "preparation"
+  let bound_variables = register_category "analysis:bound_variables"
+  let interval = register_category "analysis:interval_inference"
+  let mtracking = register_category "analysis:memory_tracking"
+  let typing = register_category "analysis:typing"
+  let translation = register_category "translation"
+end
 
 let setup ?(rtl=false) () =
   (* Variadic translation *)

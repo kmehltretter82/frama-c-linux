@@ -20,72 +20,105 @@
 (*                                                                        *)
 (**************************************************************************)
 
-exception Ignored
-let ignored () = raise Ignored
+(** Internal module holding the exception of [Error].
 
-exception Typing_error of string
-let untypable s = raise (Typing_error s)
+    The module is included into [Make_with_opt] later and should not be used
+    directly. However we need to have a separate module for the exception so
+    that every exception built by [Make] is the exact same type. *)
+module Exn = struct
+  exception Typing_error of Options.category option * string
+  exception Not_yet of Options.category option * string
+  exception Not_memoized of Options.category option
+end
 
-exception Not_yet of string
-let not_yet s = raise (Not_yet s)
+module type S = sig
+  include module type of Exn
+  val make_untypable: string -> exn
+  val make_not_yet: string -> exn
+  val make_not_memoized: unit -> exn
+  val untypable: string -> 'a
+  val not_yet: string -> 'a
+  val not_memoized: unit -> 'a
+  val print_not_yet: string -> unit
+  val handle: ('a -> 'a) -> 'a -> 'a
+  val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b
+  val retrieve_preprocessing:
+    string ->
+    ('a -> 'b Result.t) ->
+    'a ->
+    (Format.formatter -> 'a -> unit) ->
+    'b
+end
 
-exception Not_memoized
-let not_memoized () = raise Not_memoized
+module Make_with_opt(P: sig val phase:Options.category option end): S = struct
+  include Exn
 
-module Nb_typing =
-  State_builder.Ref
-    (Datatype.Int)
-    (struct
-      let name = "E_ACSL.Error.Nb_typing"
-      let default () = 0
-      let dependencies = [ Ast.self ]
-    end)
+  let make_untypable msg = Typing_error (P.phase, msg)
+  let make_not_yet msg = Not_yet (P.phase, msg)
+  let make_not_memoized () = Not_memoized P.phase
 
-let nb_untypable = Nb_typing.get
+  let untypable msg = raise (make_untypable msg)
+  let not_yet msg = raise (make_not_yet msg)
+  let not_memoized () = raise (make_not_memoized ())
 
-module Nb_not_yet =
-  State_builder.Ref
-    (Datatype.Int)
-    (struct
-      let name = "E_ACSL.Error.Nb_not_yet"
-      let default () = 0
-      let dependencies = [ Ast.self ]
-    end)
+  let pp_phase fmt phase =
+    match phase with
+    | Some phase ->
+      if Options.verbose_atleast 2 then
+        Format.fprintf fmt "@[@ in phase `%a'@]" Options.pp_category phase
+    | None -> ()
 
-let nb_not_yet = Nb_not_yet.get
+  let do_print_not_yet phase msg =
+    let msg =
+      Format.asprintf
+        "@[E-ACSL construct@ `%s'@ is not yet supported%a.@]"
+        msg
+        pp_phase phase
+    in
+    Options.warning
+      ~once:true ~current:true
+      "@[%s@ Ignoring annotation.@]" msg
 
-let print_not_yet msg =
-  let msg =
-    Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" msg
-  in
-  Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-  Nb_not_yet.set (Nb_not_yet.get () + 1)
+  let print_not_yet msg =
+    do_print_not_yet P.phase msg
 
-let generic_handle f res x =
-  try
-    f x
-  with
-  | Typing_error s ->
-    let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
-    Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-    Nb_typing.set (Nb_typing.get () + 1);
-    res
-  | Not_yet s ->
-    print_not_yet s;
-    res
-  | Ignored -> res
+  let generic_handle f res x =
+    try
+      f x
+    with
+    | Typing_error (phase, s) ->
+      let msg =
+        Format.asprintf "@[invalid E-ACSL construct@ `%s'%a.@]"
+          s
+          pp_phase phase
+      in
+      Options.warning
+        ~once:true ~current:true
+        "@[%s@ Ignoring annotation.@]" msg;
+      res
+    | Not_yet (phase, s) ->
+      do_print_not_yet phase s;
+      res
 
-let handle f x = generic_handle f x x
+  let handle f x = generic_handle f x x
 
-type 'a or_error = Res of 'a | Err of exn
+  let retrieve_preprocessing analyse_name getter parameter pp =
+    try
+      match getter parameter with
+      | Result.Res res -> res
+      | Result.Err exn -> raise exn
+    with Not_memoized phase ->
+      Options.fatal
+        "@[%s was not performed on construct %a%a@]"
+        analyse_name
+        pp parameter
+        pp_phase phase
+end
 
-let retrieve_preprocessing analyse_name getter parameter =
-  try
-    match getter parameter with
-    | Res res -> res
-    | Err exn -> raise exn
-  with Not_memoized ->
-    Options.fatal "%s was not performed on construct" analyse_name
+module Make(P: sig val phase:Options.category end): S =
+  Make_with_opt(struct let phase = Some P.phase end)
+
+include Make_with_opt(struct let phase = None end)
 
 (*
 Local Variables:

@@ -39,6 +39,7 @@ endif
 
 # libraries
 SRC_LIBRARIES:= \
+	result \
 	error \
 	builtins \
 	functions \
@@ -75,6 +76,7 @@ CODE_GENERATOR_CMI:= \
 CODE_GENERATOR_CMI:=$(addprefix src/code_generator/, $(CODE_GENERATOR_CMI))
 
 SRC_CODE_GENERATOR:= \
+	translation_error \
 	smart_exp \
 	smart_stmt \
 	gmp \
@@ -126,6 +128,7 @@ PLUGIN_CMO:= src/local_config \
 	$(SRC_CODE_GENERATOR) \
 	src/main
 PLUGIN_CMI:= \
+	$(LIBRARIES_CMI) \
 	$(CODE_GENERATOR_CMI)
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=yes

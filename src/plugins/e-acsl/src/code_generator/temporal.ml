@@ -27,6 +27,7 @@
 
 module RTL = Functions.RTL
 module Libc = Functions.Libc
+module Error = Translation_error
 open Cil_types
 open Cil_datatype
 

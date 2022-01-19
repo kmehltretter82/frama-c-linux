@@ -20,43 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Plugin.S (** implementation of Log.S for E-ACSL *)
+(** Type holding a result or an exception *)
 
-module Run: Parameter_sig.Bool
-module Valid: Parameter_sig.Bool
-module Gmp_only: Parameter_sig.Bool
-module Full_mtracking: Parameter_sig.Bool
-module Project_name: Parameter_sig.String
-module Builtins: Parameter_sig.String_set
-module Temporal_validity: Parameter_sig.Bool
-module Validate_format_strings: Parameter_sig.Bool
-module Replace_libc_functions: Parameter_sig.Bool
-module Assert_print_data: Parameter_sig.Bool
+(** Represent either a result of type ['a] or an error with an exception *)
+type 'a t = Res of 'a | Err of exn
 
-module Functions: Parameter_sig.Kernel_function_set
-module Instrument: Parameter_sig.Kernel_function_set
-
-val parameter_states: State.t list
-val emitter: Emitter.t
-
-val must_visit: unit -> bool
-
-module Dkey: sig
-  val prepare: category
-  val bound_variables: category
-  val interval: category
-  val mtracking: category
-  val typing: category
-  val translation: category
-end
-
-val setup: ?rtl:bool -> unit -> unit
-(** Verify and initialize the options of the current project according to the
-    options set by the user.
-    If [rtl] is true, then the project being modified is the RTL project. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)
+val pretty:
+  (Format.formatter -> 'a -> unit) ->
+  Format.formatter ->
+  'a t ->
+  unit
+(** [pretty pp] where [pp] is a formatter for ['a] returns a formatter for
+    ['a t]. *)

@@ -24,7 +24,7 @@
 
 open Cil_types
 open Cil_datatype
-let dkey = Options.dkey_translation
+let dkey = Options.Dkey.translation
 
 (**************************************************************************)
 (********************** Forward references ********************************)

@@ -23,8 +23,9 @@
 module E_acsl_label = Label (* [Label] is hidden when opening [Cil_datatype *)
 open Cil_types
 open Cil_datatype
+module Error = Translation_error
 
-let dkey = Options.dkey_translation
+let dkey = Options.Dkey.translation
 
 (* ************************************************************************** *)
 (* Expressions *)

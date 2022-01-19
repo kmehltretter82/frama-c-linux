@@ -71,6 +71,7 @@ let convert kf env loc ~is_forall quantif =
       "preprocessing of quantified predicate"
       Bound_variables.get_preprocessed_quantifier
       quantif
+      Printer.pp_predicate
   in
   match has_empty_quantif_with_false_negative bound_vars, is_forall with
   | true, true ->

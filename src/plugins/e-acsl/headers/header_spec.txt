@@ -145,6 +145,8 @@ src/code_generator/translate_terms.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_terms.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_utils.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_utils.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translation_error.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translation_error.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/typed_number.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/typed_number.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/builtins.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -159,6 +161,8 @@ src/libraries/logic_aggr.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/logic_aggr.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/misc.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/misc.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/libraries/result.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/libraries/result.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/varname.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/varname.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/local_config.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL

@@ -35,6 +35,8 @@
 open Cil_types
 open Cil_datatype
 
+module Error = Error.Make(struct let phase = Options.Dkey.bound_variables end)
+
 (** [error_msg quantif msg pp x] creates an error message from the string [msg]
     containing the value [x] pretty-printed by [pp] and the predicate [quantif]
     pretty-printed. *)
@@ -81,11 +83,11 @@ module Quantified_predicate =
 module Quantifier: sig
   val add:
     predicate ->
-    ((term * logic_var * term) list * predicate) Error.or_error ->
+    ((term * logic_var * term) list * predicate) Result.t ->
     unit
   val get:
     predicate ->
-    ((term * logic_var * term) list * predicate) Error.or_error
+    ((term * logic_var * term) list * predicate) Result.t
   (** getter and setter for the additional guard that intersects with the type
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
@@ -113,7 +115,7 @@ end = struct
     Cil_datatype.Logic_var.Hashtbl.add guard_tbl lv p
 
   let replace p guarded_vars goal =
-    Quantified_predicate.Hashtbl.replace tbl p (Error.Res (guarded_vars, goal))
+    Quantified_predicate.Hashtbl.replace tbl p (Result.Res (guarded_vars, goal))
 
   let clear () =
     Cil_datatype.Logic_var.Hashtbl.clear guard_tbl;
@@ -666,9 +668,9 @@ let compute_guards loc ~is_forall p bounded_vars hyps =
     let guards,goal = compute_quantif_guards p ~is_forall bounded_vars hyps in
     (* transform [guards] into [lscope_var list] *)
     let normalized_guards = List.map (normalize_guard ~loc) guards
-    in Quantifier.add p (Res (normalized_guards,goal))
+    in Quantifier.add p (Result.Res (normalized_guards,goal))
   with exn ->
-    Quantifier.add p (Err exn)
+    Quantifier.add p (Result.Err exn)
 
 module Preprocessor : sig
   val compute : file -> unit
@@ -687,11 +689,11 @@ end
     | Pforall _ ->
       Quantifier.add
         p
-        (Err (Error.Not_yet "unguarded \\forall quantification"))
+        (Result.Err (Error.make_not_yet "unguarded \\forall quantification"))
     | Pexists _ ->
       Quantifier.add
         p
-        (Err (Error.Not_yet "unguarded \\exists quantification"))
+        (Result.Err (Error.make_not_yet "unguarded \\exists quantification"))
     | _ -> ()
 
   let do_user_predicates () =

@@ -24,9 +24,13 @@
 
 open Cil_types
 
+module Options: sig
+  type category
+end
+
 module Error: sig
-  exception Typing_error of string
-  exception Not_yet of string
+  exception Typing_error of Options.category option * string
+  exception Not_yet of Options.category option * string
 end
 
 module Translate_terms: sig

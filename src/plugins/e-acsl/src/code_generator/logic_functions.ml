@@ -22,6 +22,7 @@
 
 open Cil_types
 open Cil_datatype
+module Error = Translation_error
 
 (**************************************************************************)
 (********************** Forward references ********************************)
