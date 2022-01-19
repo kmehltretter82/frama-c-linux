@@ -23,12 +23,7 @@
 (** Handling errors. *)
 open Error_types
 
-(** Internal module holding the exception of [Error].
-
-    The module is included into [S] later and should not be used directly.
-    However we need to have a separate module for the exception so that every
-    exception built by [Make] is the exact same type. *)
-module type Exn = sig
+module type S = sig
   exception Typing_error of Options.category option * string
   (** Typing error where the first element is the phase where the error occured
       and the second element is the error message. *)
@@ -39,10 +34,6 @@ module type Exn = sig
 
   exception Not_memoized of Options.category option
   (** "Not memoized" error with the phase where the error occured. *)
-end
-
-module type S = sig
-  include Exn
 
   val make_untypable: string -> exn
   (** Make a [Typing_error] exception with the given message. *)

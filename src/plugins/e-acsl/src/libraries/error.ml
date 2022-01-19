@@ -22,16 +22,19 @@
 
 open Error_types
 
-module Exn_impl = struct
+(** Internal module holding the exception of [Error].
+
+    The module is included into [Make_with_opt] later and should not be used
+    directly. However we need to have a separate module for the exception so
+    that every exception built by [Make] is the exact same type. *)
+module Exn = struct
   exception Typing_error of Options.category option * string
   exception Not_yet of Options.category option * string
   exception Not_memoized of Options.category option
 end
 
-module type Exn = module type of Exn_impl
-
 module type S = sig
-  include Exn
+  include module type of Exn
   val make_untypable: string -> exn
   val make_not_yet: string -> exn
   val make_not_memoized: unit -> exn
@@ -55,7 +58,7 @@ module type S = sig
 end
 
 module Make_with_opt(P: sig val phase:Options.category option end): S = struct
-  include Exn_impl
+  include Exn
 
   let make_untypable msg = Typing_error (P.phase, msg)
   let make_not_yet msg = Not_yet (P.phase, msg)
