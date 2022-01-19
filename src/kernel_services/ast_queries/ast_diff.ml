@@ -462,6 +462,10 @@ module Relation = struct
   type t = [%import: Cil_types.relation] [@@deriving eq]
 end
 
+module Termination_kind = struct
+  type t = [%import: Cil_types.termination_kind] [@@deriving eq]
+end
+
 let are_same_cd_clauses l l' =
   let module StringSetSet = Set.Make(Datatype.String.Set) in
   let of_list l =
@@ -654,7 +658,43 @@ and is_same_toplevel_predicate p p' env =
 and is_same_identified_predicate p p' env =
   is_same_toplevel_predicate p.ip_content p'.ip_content env
 
-and is_same_behavior _b _b' _env = false
+and is_same_identified_term t t' env =
+  is_same_term t.it_content t'.it_content env
+
+and is_same_post_cond (k,p) (k',p') env =
+  Termination_kind.equal k k' && is_same_identified_predicate p p' env
+
+and is_same_deps d d' env =
+  match d,d' with
+  | FromAny, FromAny -> true
+  | From l, From l' -> is_same_list is_same_identified_term l l' env
+  | (FromAny | From _), _ -> false
+
+and is_same_from (t,f) (t',f') env =
+  is_same_identified_term t t' env && is_same_deps f f' env
+
+and is_same_assigns a a' env =
+  match a,a' with
+  | WritesAny, WritesAny -> true
+  | Writes l, Writes l' -> is_same_list is_same_from l l' env
+  | (WritesAny | Writes _), _ -> false
+
+and is_same_allocation a a' env =
+  match a,a' with
+  | FreeAllocAny, FreeAllocAny -> true
+  | FreeAlloc(f,a), FreeAlloc(f',a') ->
+    is_same_list is_same_identified_term f f' env &&
+    is_same_list is_same_identified_term a a' env
+  | (FreeAllocAny | FreeAlloc _),_ -> false
+
+and is_same_behavior b b' env =
+  is_same_list is_same_identified_predicate b.b_requires b'.b_requires env &&
+  is_same_list is_same_identified_predicate b.b_assumes b'.b_assumes env &&
+  is_same_list is_same_post_cond b.b_post_cond b'.b_post_cond env &&
+  is_same_assigns b.b_assigns b'.b_assigns env &&
+  is_same_allocation b.b_allocation b'.b_allocation env
+(* TODO: also consider ACSL extensions, with the help of the plugins
+   that handle them. *)
 
 and is_same_variant (v,m) (v',m') env =
   is_same_term v v' env && is_same_opt is_matching_logic_info m m' env
