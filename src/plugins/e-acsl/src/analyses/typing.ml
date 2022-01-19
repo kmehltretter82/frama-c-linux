@@ -27,7 +27,6 @@ open Error_types
    devenir plus rapide, plus précis et plus mince". *)
 
 let dkey = Options.dkey_typing
-
 module Error = Error.Make(struct let phase = dkey end)
 
 (* In order to properly handle recursive functions the typing method has to

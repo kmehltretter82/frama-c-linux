@@ -25,8 +25,8 @@ open Cil_datatype
 
 module Dataflow = Dataflow2
 
-module Error =
-  Error.Make(struct let phase = Options.register_category "memory tracking" end)
+let dkey = Options.dkey_mtracking
+module Error = Error.Make(struct let phase = dkey end)
 
 let must_never_monitor vi =
   (* E-ACSL, please do not monitor yourself! *)
@@ -45,7 +45,6 @@ let must_never_monitor vi =
    left-values must be tracked by the memory model library *)
 (* ********************************************************************** *)
 
-let dkey = Options.dkey_analysis
 module Env: sig
   val has_heap_allocations: unit -> bool
   val check_heap_allocations: kernel_function -> unit

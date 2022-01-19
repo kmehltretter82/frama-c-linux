@@ -36,8 +36,7 @@ open Cil_types
 open Cil_datatype
 open Error_types
 
-module Error =
-  Error.Make(struct let phase = Options.register_category "bound variables" end)
+module Error = Error.Make(struct let phase = Options.dkey_bound_variables end)
 
 (** [error_msg quantif msg pp x] creates an error message from the string [msg]
     containing the value [x] pretty-printed by [pp] and the predicate [quantif]
