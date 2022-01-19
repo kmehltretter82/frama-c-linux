@@ -87,6 +87,10 @@ module Logic_type_info:
   State_builder.Hashtbl
   with type key = logic_type_info and type data = logic_type_info correspondance
 
+module Logic_ctor_info:
+  State_builder.Hashtbl
+  with type key = logic_ctor_info and type data = logic_ctor_info correspondance
+
 module Fieldinfo:
   State_builder.Hashtbl
   with type key = fieldinfo and type data = fieldinfo correspondance
