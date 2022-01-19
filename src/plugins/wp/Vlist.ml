@@ -162,10 +162,12 @@ let rewrite_length e =
   | L.Fun( elt , [_] ) when elt == f_elt -> F.e_one (* \length([x]) == 1 *)
   | L.Fun( concat , es ) when concat == f_concat -> (* \length(\concat(...,x_i,...)) == \sum(...,\length(x_i),...)  *)
       F.e_sum (List.map v_length es)
-  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat && (* n>=0 ==> (\length(u ^* n) == n * \length(u) *)
-                                     Cint.is_positive_or_null n ->
-      F.e_mul (v_length u) n
-  | _ -> raise Not_found (* NB. do not considers \Cons because they are removed *)
+  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat ->
+      (* \length(u ^* n) == if 0<=n then n * \length(u) else 0 *)
+      F.e_if (F.e_leq e_zero n) (F.e_mul n (v_length u)) e_zero
+  | _ ->
+      (* NB. do not considers \Cons because they are removed *)
+      raise Not_found 
 
 let match_natural k =
   match F.repr k with
@@ -306,17 +308,10 @@ let leftmost_eq a b =
     | L.Yes ->
         (* s ^ u1 ^ ...  = s ^ v1 ^ ...  <=>  u1 ^ ... = v1 ^ ... *)
         F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
-    | L.No -> (match F.repr a, F.repr b with
-        | L.Fun( elt_a , [_] ), L.Fun( elt_b , [_] )
-          when elt_a == f_elt &&
-               elt_b == f_elt ->
-            (* a <> b ==>  [| a |] ^ u1 ^ ...  <> [| b |] ^ v1 ^ ... *)
-            F.p_false
-        | _ ->
-            (* unimplemented: a <> b && \length(a)=\length(b) ==>
-                                       a ^ u1 ^ ... <> b ^ v1 ^ ... *)
-            raise Not_found)
-    | L.Maybe -> raise Not_found
+    | L.No when F.decide (F.e_eq (v_length a) (v_length b)) ->
+        (* a <> b && \length(a)=\length(b) ==> a ^ u1 ^ ... <> b ^ v1 ^ ... *)
+        F.p_false
+    | _ -> raise Not_found
   else
     raise Not_found
 
@@ -328,19 +323,13 @@ let rightmost_eq a b =
     | L.Yes ->
         (* u1 ^ ... ^ s = v1 ^ ... ^ s  <=>  u1 ^ ... = v1 ^ ... *)
         F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
-    | L.No -> (match F.repr a, F.repr b with
-        | L.Fun( elt_a , [_] ), L.Fun( elt_b , [_] )
-          when elt_a == f_elt &&
-               elt_b == f_elt ->
-            (* a <> b ==> u1 ^ ... ^ [| a |] <> v1 ^ ... ^ [| b |] *)
-            F.p_false
-        | _ ->
-            (* unimplemented: a <> b && \length(a)=\length(b) ==>
-                                       u1 ^ ... ^ a <> v1 ^ ... ^ b *)
-            raise Not_found)
-    | L.Maybe -> raise Not_found
+    | L.No when F.decide (F.e_eq (v_length a) (v_length b)) ->
+        (* a <> b && \length(a)=\length(b) ==> u1 ^ ... ^ a <> v1 ^ ... ^ b *)
+        F.p_false
+    | _ -> raise Not_found
   else
     raise Not_found
+
 
 let rewrite_is_nil ~nil a =
   let p_is_nil a = F.p_equal nil a  in
@@ -352,7 +341,8 @@ let rewrite_is_nil ~nil a =
   | L.Fun(repeat,[s;n]) when repeat == f_repeat ->
       (* (s *^ n)==[] <==> (s==[] || n<=0)  *)
       F.p_or (F.p_leq n F.e_zero) (p_is_nil s)
-  | _ -> raise Not_found
+  | _ ->
+      raise Not_found
 
 
 (* Ensures xs to be a sub-sequence of ys, otherwise raise Not_found
@@ -383,6 +373,25 @@ let subsequence a b =
   let p_is_nil s = F.p_equal nil s in
   F.p_all p_is_nil es
 
+let repeat_eq a x n b y m =
+  let e_eq_x_y = F.e_eq x y in
+  let e_eq_n_m = F.e_eq n m in
+  if F.decide e_eq_x_y then
+    (* s *^ n == s *^ m  <==>  ( n=m || (s *^ n == [] && s *^ m == []) ) *)
+    let nil_a = v_nil (F.typeof a) in
+    let nil_b = v_nil (F.typeof b) in
+    F.p_or (Lang.F.p_bool e_eq_n_m)
+      (F.p_and (F.p_equal a nil_b) (F.p_equal nil_a b))
+  else if F.decide e_eq_n_m then
+    (* x *^ n == y *^ n  <==> ( x == y || n<=0 ) *)
+    F.p_or (F.p_leq n e_zero) (Lang.F.p_bool e_eq_x_y)
+  else if F.decide (e_eq (v_length x) (v_length y)) then
+    (* \lenght(x)=\lenght(y)  ==> ( x *^ n == y *^ m  <==> ( m == n && x == y) || (x *^ n == [] && y *^ m == [] ) *)
+    let nil_a = v_nil (F.typeof a) in
+    let nil_b = v_nil (F.typeof b) in
+    F.p_or (F.p_and (F.p_bool e_eq_n_m) (Lang.F.p_bool e_eq_x_y))
+      (F.p_and (F.p_equal a nil_b) (F.p_equal nil_a b))
+  else raise Not_found
 
 let rewrite_eq a b =
   debug "Vlist.rewrite_eq: tries to rewrite %a@ = %a@.- left pattern:  %a@.- right pattern: %a@."
@@ -391,30 +400,21 @@ let rewrite_eq a b =
   match F.repr a , F.repr b with
   | L.Fun(nil,[]) , _ when nil == f_nil -> rewrite_is_nil ~nil:a b
   | _ , L.Fun(nil,[]) when nil == f_nil -> rewrite_is_nil ~nil:b a
-  | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
-    when repeat_a == f_repeat &&
-         repeat_b == f_repeat &&
-         F.decide (F.e_eq x y) ->
-      (* ( s *^ n == s *^ m  <==>  (s *^ n == [] && y *^ m == []) || (n == m) *)
-      let nil_a = v_nil (F.typeof a) in
-      let nil_b = v_nil (F.typeof b) in
-      F.p_or (F.p_equal n m)
-        (F.p_and (F.p_equal a nil_b) (F.p_equal nil_a b))
-  | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
-    when repeat_a == f_repeat &&
-         repeat_b == f_repeat &&
-         F.decide (
-           let nil_a = v_nil (F.typeof a) in
-           let nil_b = v_nil (F.typeof b) in
-           F.e_or [ F.e_and [F.e_eq x y; F.e_eq n m];
-                    F.e_and [F.e_eq a nil_b; F.e_eq nil_a b] ]
-         ) ->
-      (* x *^ n == [] && y *^ m == []) || (x == y && n == m)  ==>  x *^ n == y *^ m *)
-      F.p_true
-  | _ ->
-      try leftmost_eq a b with Not_found ->
-      try rightmost_eq a b with Not_found ->
-        subsequence a b
+  | _ -> try
+        match F.repr a , F.repr b with
+        | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
+          when repeat_a == f_repeat &&
+               repeat_b == f_repeat ->
+            repeat_eq a x n b y m
+        | _ ->
+            try leftmost_eq a b with Not_found ->
+            try rightmost_eq a b with Not_found ->
+              subsequence a b
+      with Not_found ->
+        if F.decide (F.e_neq (v_length a) (v_length b)) then
+          F.p_false
+        else raise Not_found
+
 
 (* All Simplifications *)
 
