@@ -1000,10 +1000,8 @@ and is_same_exp e e' env =
   | CastE(t,e), CastE(t',e') -> is_same_type t t' env && is_same_exp e e' env
   | AddrOf lv, AddrOf lv' -> is_same_lval lv lv' env
   | StartOf lv, StartOf lv' -> is_same_lval lv lv' env
-  | Info _, Info _ -> false (* should be removed from AST anyway *)
   | (Const _ | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-    | AlignOfE _ | UnOp _ | BinOp _  | CastE _ | AddrOf _ | StartOf _
-    | Info _), _ -> false
+    | AlignOfE _ | UnOp _ | BinOp _  | CastE _ | AddrOf _ | StartOf _),_-> false
 
 and is_same_lval lv lv' env =
   is_same_pair is_same_lhost is_same_offset lv lv' env
