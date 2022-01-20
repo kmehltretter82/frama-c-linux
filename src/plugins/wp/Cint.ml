@@ -147,12 +147,13 @@ let rec is_positive_or_null e = match F.repr e with
   | Logic.Fun( f , [e] ) when Fun.equal f f_lnot -> is_negative e
   | Logic.Fun( f , es ) when Fun.equal f f_land  -> List.exists is_positive_or_null es
   | Logic.Fun( f , es ) when Fun.equal f f_lor   -> List.for_all is_positive_or_null es
-  | Logic.Fun( f , es ) when Fun.equal f f_lxor   -> (match xor_sign es with | Some b -> b | _ -> false)
+  | Logic.Fun( f , es ) when Fun.equal f f_lxor  -> (match mul_xor_sign es with | Some b -> b | _ -> false)
   | Logic.Fun( f , es ) when Fun.equal f f_lsr || Fun.equal f f_lsl
     -> List.for_all is_positive_or_null es
   | _ -> (* try some improvement first then ask to qed *)
       let improved_is_positive_or_null e = match F.repr e with
         | Logic.Add es -> List.for_all is_positive_or_null es
+        | Logic.Mul es -> (match mul_xor_sign es with | Some b -> b | _ -> false)
         | Logic.Mod(e1,e2) when is_positive e2 || is_negative e2 ->
             (* e2<>0 ==> ( 0<=(e1 % e2) <=> 0<=e1 ) *)
             is_positive_or_null e1
@@ -163,20 +164,21 @@ let rec is_positive_or_null e = match F.repr e with
         | Logic.No | Logic.Maybe -> false
 and is_negative e = match F.repr e with
   | Logic.Fun( f , [e] ) when Fun.equal f f_lnot -> is_positive_or_null e
-  | Logic.Fun( f , es ) when Fun.equal f f_lor  -> List.exists is_negative es
-  | Logic.Fun( f , es ) when Fun.equal f f_land -> List.for_all is_negative es
-  | Logic.Fun( f , es ) when Fun.equal f f_lxor  -> (match xor_sign es with | Some b -> (not b) | _ -> false)
+  | Logic.Fun( f , es ) when Fun.equal f f_lor   -> List.exists is_negative es
+  | Logic.Fun( f , es ) when Fun.equal f f_land  -> List.for_all is_negative es
+  | Logic.Fun( f , es ) when Fun.equal f f_lxor  -> (match mul_xor_sign es with | Some b -> (not b) | _ -> false)
   | Logic.Fun( f , [k;n] ) when Fun.equal f f_lsr || Fun.equal f f_lsl
     -> is_positive_or_null n && is_negative k
   | _ -> (* try some improvement first then ask to qed *)
       let improved_is_negative e = match F.repr e with
         | Logic.Add es -> List.for_all is_negative es
+        | Logic.Mul es -> (match mul_xor_sign es with | Some b -> (not b) | _ -> false)
         | _ -> false
       in if improved_is_negative e then true
       else match F.is_true (F.e_lt e e_zero) with
         | Logic.Yes -> true
         | Logic.No | Logic.Maybe -> false
-and xor_sign es = try
+and mul_xor_sign es = try
     Some (List.fold_left (fun acc e ->
         if is_positive_or_null e then acc (* as previous *)
         else if is_negative e then (not acc) (* opposite sign *)
