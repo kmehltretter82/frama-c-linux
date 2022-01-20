@@ -39,7 +39,6 @@ endif
 
 # libraries
 SRC_LIBRARIES:= \
-	result \
 	error \
 	builtins \
 	functions \

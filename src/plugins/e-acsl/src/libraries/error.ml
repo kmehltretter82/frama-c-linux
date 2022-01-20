@@ -32,6 +32,7 @@ module Exn = struct
 end
 
 module type S = sig
+  type 'a result = ('a, exn) Result.t
   include module type of Exn
   val make_untypable: string -> exn
   val make_not_yet: string -> exn
@@ -44,13 +45,19 @@ module type S = sig
   val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b
   val retrieve_preprocessing:
     string ->
-    ('a -> 'b Result.t) ->
+    ('a -> 'b result) ->
     'a ->
     (Format.formatter -> 'a -> unit) ->
     'b
+  val pp_result:
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter ->
+    'a result ->
+    unit
 end
 
 module Make_with_opt(P: sig val phase:Options.category option end): S = struct
+  type 'a result = ('a, exn) Result.t
   include Exn
 
   let make_untypable msg = Typing_error (P.phase, msg)
@@ -105,14 +112,19 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
   let retrieve_preprocessing analyse_name getter parameter pp =
     try
       match getter parameter with
-      | Result.Res res -> res
-      | Result.Err exn -> raise exn
+      | Result.Ok res -> res
+      | Result.Error exn -> raise exn
     with Not_memoized phase ->
       Options.fatal
         "@[%s was not performed on construct %a%a@]"
         analyse_name
         pp parameter
         pp_phase phase
+
+  let pp_result pp fmt res =
+    match res with
+    | Result.Ok a -> Format.fprintf fmt "@[%a@]" pp a
+    | Result.Error err -> Format.fprintf fmt "@[%s@]" (Printexc.to_string err)
 end
 
 module Make(P: sig val phase:Options.category end): S =
