@@ -115,7 +115,7 @@ void lemma(unsigned a, unsigned b, unsigned k) {
   /* note: a5 is not simplified because Qed cannot infer that a&b is positive
    */
 
-  //@ check           ( a & (85 % b) & 0xFF ) == ( (a & (85 % b)) % 0x100 );
+  //@ check           ( a & ((b & 0xFFFF) % 55) & 0xFF ) == ( (a & ((b & 0xFFFF) % 55)) % 0x100 );
 
   //@ check zbit: a5: ( a & b & 77 & ((1 << k)-1) ) == ( (a & b & 77) % (1 << k) );
   /* note: a4 is not simplified because Qed cannot infer that k is positive

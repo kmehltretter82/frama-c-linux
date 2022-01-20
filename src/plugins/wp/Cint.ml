@@ -137,6 +137,12 @@ let match_mod t =
   | _ -> raise Not_found
 
 (* integration with qed should be improved! *)
+let is_positive t =
+  match F.repr t with
+  | Logic.Kint c -> Integer.le Integer.one c
+  | _ -> false
+
+(* integration with qed should be improved! *)
 let rec is_positive_or_null e = match F.repr e with
   | Logic.Fun( f , [e] ) when Fun.equal f f_lnot -> is_negative e
   | Logic.Fun( f , es ) when Fun.equal f f_land  -> List.exists is_positive_or_null es
@@ -147,7 +153,9 @@ let rec is_positive_or_null e = match F.repr e with
   | _ -> (* try some improvement first then ask to qed *)
       let improved_is_positive_or_null e = match F.repr e with
         | Logic.Add es -> List.for_all is_positive_or_null es
-        | Logic.Mod(e1,_) -> is_positive_or_null e1
+        | Logic.Mod(e1,e2) when is_positive e2 || is_negative e2 ->
+            (* e2<>0 ==> ( 0<=(e1 % e2) <=> 0<=e1 ) *)
+            is_positive_or_null e1
         | _ -> false
       in if improved_is_positive_or_null e then true
       else match F.is_true (F.e_leq e_zero e) with
