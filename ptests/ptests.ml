@@ -76,6 +76,26 @@ let str_string_match regex s n =
   let res = Str.string_match regex s n in
   Mutex.unlock str_mutex; res
 
+let str_string_match1 regexp line pos =
+  Mutex.lock str_mutex;
+  let res = if Str.string_match regexp line pos then
+      try
+        Some (Str.matched_group 1 line)
+      with Not_found -> None
+    else None
+  in
+  Mutex.unlock str_mutex; res
+
+let str_string_match2 regexp line pos =
+  Mutex.lock str_mutex;
+  let res = if Str.string_match regexp line pos then
+      try
+        Some ((Str.matched_group 1 line), (Str.matched_group 2 line))
+      with Not_found -> None
+    else None
+  in
+  Mutex.unlock str_mutex; res
+
 (* If regex1 matches inside s, adds suffix to the first occurrence of regex2.
    If matched, returns (replaced string, true), otherwise returns (s, false).
 *)
@@ -553,7 +573,7 @@ let parse_config_line =
   fun (key, value) ->
     match key with
     | "DEFAULT_SUITES" ->
-      let l = Str.split regexp_blank value in
+      let l = str_split regexp_blank value in
       default_suites := List.map (Filename.concat test_path) l
     | "TOPLEVEL_PATH" ->
       toplevel_path := value
@@ -570,14 +590,11 @@ let () =
       let regexp = Str.regexp "\\([^=]+\\)=\\(.*\\)" in
       while true do
         let line = input_line ch in
-        if Str.string_match regexp line 0 then
-          let key = Str.matched_group 1 line in
-          let value = Str.matched_group 2 line in
-          parse_config_line (key, value)
-        else begin
+        match str_string_match2 regexp line 0 with
+        | Some (key,value) -> parse_config_line (key, value)
+        | None ->
           Format.eprintf "Cannot interpret line '%s' in ptests_config@." line;
           exit 1
-        end
       done
     with
     | End_of_file ->
@@ -758,9 +775,8 @@ struct
         let expand_macro = function
           | Str.Text s -> s
           | Str.Delim s ->
-            if Str.string_match macro_regex s 0 then begin
-              try
-                let macro = Str.matched_group 1 s in
+            match str_string_match1 macro_regex s 0  with
+            | Some macro -> begin
                 (match macro with
                  | "PTEST_FILE" -> has_ptest_file := true
                  | "PTEST_OPT" -> has_ptest_opt := true
@@ -768,25 +784,23 @@ struct
                  | "frama-c-exe" -> has_frama_c_exe := true
                  | _ -> ());
                 if !verbosity >= 5 then lock_printf "%%     - macro is %s\n%!" macro;
-                let replacement = find macro macros in
-                if !verbosity >= 4 then
-                  lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
-                aux replacement
-              with
-              | Not_found -> s
-            end
-            else s
+                try
+                  let replacement = find macro macros in
+                  if !verbosity >= 4 then
+                    lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
+                  aux replacement
+                with Not_found -> s
+              end
+            | None -> s
         in
         String.concat "" (List.map expand_macro (Str.full_split macro_regex s))
       in
-      Mutex.lock str_mutex;
-      let r = try aux s
+      let r =
+        try aux s
         with e ->
-          Mutex.unlock str_mutex;
           lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
           raise e
       in
-      Mutex.unlock str_mutex;
       if !verbosity >= 4 then lock_printf "%% Expansion result: %s@." r;
       { has_ptest_file= !has_ptest_file;
         has_ptest_opt= !has_ptest_opt;
@@ -1332,7 +1346,7 @@ end = struct
                name = "run.config" && !special_config = ""  ||
                name = "run.config_" ^ !special_config
              in
-             let configs = Str.split split_config (String.trim names) in
+             let configs = str_split split_config (String.trim names) in
              if List.exists is_current_config configs then
                (* Found options for current config! *)
                scan_directives ~drop:false dir ~file:f scan_buffer default
@@ -1915,23 +1929,24 @@ let check_file_is_empty_or_nonexisting diff ~log_file =
 (* Searches for executable [s] in the directories contained in the PATH
      environment variable. Returns [None] if not found, or
      [Some <fullpath>] otherwise. *)
-let find_in_path s =
-  let s = trim_right s in
+let find_in_path =
   let path_separator = if Sys.os_type = "Win32" then ";" else ":" in
   let re_path_sep = Str.regexp path_separator in
-  let path_dirs = Str.split re_path_sep (Sys.getenv "PATH") in
-  let found = ref "" in
-  try
-    List.iter (fun dir ->
-        let fullname = dir ^ Filename.dir_sep ^ s in
-        if Sys.file_exists fullname then begin
-          found := fullname;
-          raise Exit
-        end
-      ) path_dirs;
-    None
-  with Exit ->
-    Some !found
+  fun s ->
+    let s = trim_right s in
+    let path_dirs = str_split re_path_sep (Sys.getenv "PATH") in
+    let found = ref "" in
+    try
+      List.iter (fun dir ->
+          let fullname = dir ^ Filename.dir_sep ^ s in
+          if Sys.file_exists fullname then begin
+            found := fullname;
+            raise Exit
+          end
+        ) path_dirs;
+      None
+    with Exit ->
+      Some !found
 
 (* filter commands are executed from the same directory than test commands *)
 let get_filter_cmd = match !dune_mode with
@@ -1954,7 +1969,7 @@ let do_filter =
       let log_ext = log_ext kind in
       let log_file = Filename.sanitize (log_prefix ^ log_ext ^ ".log") in
       let foracle = (Filename.basename log_prefix) ^ log_ext ^ ".oracle" in
-      let filter = Str.global_replace regexp_ptest_oracle foracle filter in
+      let filter = str_global_replace regexp_ptest_oracle foracle filter in
       let exec_name, params = command_partition filter in
       let exec_name =
         if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
