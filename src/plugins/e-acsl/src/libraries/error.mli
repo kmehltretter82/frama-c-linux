@@ -23,6 +23,9 @@
 (** Handling errors. *)
 
 module type S = sig
+  type 'a result = ('a, exn) Result.t
+  (** Represent either a result of type ['a] or an error with an exception. *)
+
   exception Typing_error of Options.category option * string
   (** Typing error where the first element is the phase where the error occured
       and the second element is the error message. *)
@@ -65,13 +68,21 @@ module type S = sig
 
   val retrieve_preprocessing:
     string ->
-    ('a -> 'b Result.t) ->
+    ('a -> 'b result) ->
     'a ->
     (Format.formatter -> 'a -> unit) ->
     'b
-    (** Retrieve the result of a preprocessing phase, which possibly failed.
-        The [string] argument and the formatter are used to display a message in
-        case the preprocessing phase did not compute the required result. *)
+  (** Retrieve the result of a preprocessing phase, which possibly failed.
+      The [string] argument and the formatter are used to display a message in
+      case the preprocessing phase did not compute the required result. *)
+
+  val pp_result:
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter ->
+    'a result ->
+    unit
+    (** [pp_result pp] where [pp] is a formatter for ['a] returns a formatter for
+        ['a result]. *)
 end
 
 (** Functor to build an [Error] module for a given [phase]. *)
