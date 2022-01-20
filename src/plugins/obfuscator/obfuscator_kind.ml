@@ -36,6 +36,8 @@ type k =
   | Type
   | Logic_type
   | Logic_constructor
+  | Axiomatic
+  | Lemma
 
 let name_of_kind = function
   | Behavior -> "behavior"
@@ -53,6 +55,8 @@ let name_of_kind = function
   | Type -> "type"
   | Logic_type -> "logic type"
   | Logic_constructor -> "logic constructor"
+  | Axiomatic -> "axiomatic"
+  | Lemma -> "lemma"
 
 let prefix = function
   | Behavior -> "B"
@@ -70,6 +74,8 @@ let prefix = function
   | Type -> "T"
   | Logic_type -> "LT"
   | Logic_constructor -> "LC"
+  | Axiomatic -> "A"
+  | Lemma -> "LE"
 
 include Datatype.Make_with_collections
     (struct
