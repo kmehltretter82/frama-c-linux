@@ -65,11 +65,17 @@ class all_exn =
         all_exn <- Cil_datatype.Typ.Set.add (purify t) all_exn;
         SkipChildren
       | _ -> DoChildren
+    method! vinst _ = SkipChildren
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
 
 let compute_all_exn () =
   let vis = new all_exn in
-  Visitor.visitFramacFileSameGlobals (vis:>Visitor.frama_c_visitor) (Ast.get());
+  Visitor.visitFramacFileFunctions (vis:>Visitor.frama_c_visitor) (Ast.get());
   vis#get_exn
 
 let all_exn () = All_exn.memo compute_all_exn
@@ -259,6 +265,11 @@ class exn_visit =
       in
       DoChildrenPost after_visit
 
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
 
 let compute_kf kf =
@@ -857,7 +868,7 @@ let prepare_file f =
 
 let remove_exn f =
   if Kernel.RemoveExn.get() then begin
-    Visitor.visitFramacFileSameGlobals (new exn_visit) f;
+    Visitor.visitFramacFileFunctions (new exn_visit) f;
     let vis = new erase_exn in
     Visitor.visitFramacFile (vis :> Visitor.frama_c_visitor) f;
     let funs = vis#modified_funcs in

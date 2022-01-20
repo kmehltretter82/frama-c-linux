@@ -871,6 +871,13 @@ let visitFramacFunction vis f =
   Option.iter vis#set_current_kf old_current_kf;
   vis#fill_global_tables; f'
 
+let visitFramacFileFunctions vis file =
+  let process_one_global = function
+    | GFun (fundec, _) -> ignore (visitFramacFunction vis fundec)
+    | _ -> ()
+  in
+  Cil.iterGlobals file process_one_global
+
 let visitFramacKf vis kf =
   let glob = Ast.def_or_last_decl (Kernel_function.get_vi kf) in
   ignore (visitFramacGlobal vis glob);

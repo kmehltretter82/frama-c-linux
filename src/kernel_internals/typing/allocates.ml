@@ -57,11 +57,15 @@ class vis_add_loop_allocates =
       );
       Cil.DoChildren
 
-    method! vinst _ = Cil.SkipChildren
-
+    method! vinst _ = SkipChildren
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
 
 let add_allocates_nothing () =
   Globals.Functions.iter add_allocates_nothing_funspec;
   let vis = new vis_add_loop_allocates in
-  Visitor.visitFramacFileSameGlobals vis (Ast.get ())
+  Visitor.visitFramacFileFunctions vis (Ast.get ())
