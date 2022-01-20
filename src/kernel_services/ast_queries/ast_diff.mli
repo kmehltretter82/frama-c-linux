@@ -54,62 +54,67 @@ type 'a code_correspondance =
   | `Partial of 'a * partial_correspondance
   ]
 
+module type Correspondance_table = sig
+  include State_builder.Hashtbl
+  val pretty_data: Format.formatter -> data -> unit
+end
+
 (** varinfos correspondances *)
 module Varinfo:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = varinfo and type data = varinfo correspondance
 
 module Compinfo:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = compinfo and type data = compinfo correspondance
 
 module Enuminfo:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = enuminfo and type data = enuminfo correspondance
 
 module Enumitem:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = enumitem and type data = enumitem correspondance
 
 module Typeinfo:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = typeinfo and type data = typeinfo correspondance
 
 module Stmt:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = stmt and type data = stmt code_correspondance
 
 module Logic_info:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = logic_info and type data = logic_info correspondance
 
 module Logic_type_info:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = logic_type_info and type data = logic_type_info correspondance
 
 module Logic_ctor_info:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = logic_ctor_info and type data = logic_ctor_info correspondance
 
 module Fieldinfo:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = fieldinfo and type data = fieldinfo correspondance
 
 module Model_info:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = model_info and type data = model_info correspondance
 
 module Logic_var:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = logic_var and type data = logic_var correspondance
 
 module Kernel_function:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = kernel_function
    and type data = kernel_function code_correspondance
 
 module Fundec:
-  State_builder.Hashtbl
+  Correspondance_table
   with type key = fundec and type data = fundec correspondance
 
 (** performs a comparison of AST between the current and the original

@@ -213,9 +213,19 @@ type is_same_env =
     logic_type_vars: string Datatype.String.Map.t;
   }
 
-module Build(H:Datatype.S_with_collections)(D:Datatype.S) =
-  State_builder.Hashtbl(H.Hashtbl)(D)
-    (Info(struct let name = "Ast_diff." ^ D.name end))
+module type Correspondance_table = sig
+  include State_builder.Hashtbl
+  val pretty_data: Format.formatter -> data -> unit
+end
+
+module Build(H:Datatype.S_with_collections)(D:Datatype.S):
+  Correspondance_table with type key = H.t and type data = D.t =
+struct
+  include
+    State_builder.Hashtbl(H.Hashtbl)(D)
+      (Info(struct let name = "Ast_diff." ^ D.name end))
+  let pretty_data = D.pretty
+end
 
 module Build_correspondance(H:Datatype.S_with_collections) =
   Build(H)(Correspondance.Make(H))
