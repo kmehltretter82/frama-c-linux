@@ -59,8 +59,8 @@ class constGlobSubstVisitorClass : cilVisitor = object
       if is_arithmetic_type typ && isConstType typ
       then ChangeDoChildrenPost ([g], List.map register)
       else DoChildren
-    | _ ->
-      DoChildren
+    | GFun _ -> DoChildren
+    | _ -> SkipChildren
 
   (* Visit expressions and replace lvals, with a registered varinfo in
      [vi_to_init_opt], with respective initializing constant expressions. *)
@@ -104,6 +104,10 @@ class constGlobSubstVisitorClass : cilVisitor = object
       end
     | _ ->
       DoChildren
+
+  method! vtype _ = SkipChildren
+  method! vspec _ = SkipChildren
+  method! vcode_annot _ = SkipChildren
 end
 
 let constGlobSubstVisitor = new constGlobSubstVisitorClass
