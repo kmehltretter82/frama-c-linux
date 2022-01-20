@@ -97,14 +97,14 @@ let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb 
         in
         let window = (original_source_view :> GText.view) in
         let page_num = w.notebook#page_num sw#coerce in
-        let b = Buffer.create 1024 in
-        let s = match Parse_env.open_source (filename :> string) with
+        let scan_references = Kernel.EagerLoadSources.get () in
+        let s =
+          match Parse_env.open_source ~scan_references (filename :> string) with
           | Error _msg ->
             let f = Filepath.Normalized.to_pretty_string filename in
             "Error: cannot open file '" ^ f ^ "'"
           | Ok s -> s
         in
-        Buffer.reset b;
         let (buffer:GText.buffer) = window#buffer in
         buffer#set_text s;
         let select_line ~line =

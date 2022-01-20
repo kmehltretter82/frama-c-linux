@@ -807,6 +807,15 @@ module BigIntsHex =
     let default = -1
   end)
 
+let () = Parameter_customize.set_group inout_source
+module EagerLoadSources =
+  False(struct
+    let module_name = "EagerLoadSources"
+    let option_name = "-eager-load-sources"
+    let help = "when loading a source, try to load all referenced sources \
+                in memory"
+  end)
+
 (* ************************************************************************* *)
 (** {2 Save/Load} *)
 (* ************************************************************************* *)

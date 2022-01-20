@@ -349,6 +349,9 @@ module FloatHex: Parameter_sig.Bool
 module BigIntsHex: Parameter_sig.Int
 (** Behavior of option "-hexadecimal-big-integers" *)
 
+module EagerLoadSources: Parameter_sig.Bool
+(** Behavior of option "-eager-load-sources" *)
+
 (* ************************************************************************* *)
 (** {2 Save/Load} *)
 (* ************************************************************************* *)

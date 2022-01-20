@@ -89,7 +89,7 @@ let scan_source_for_references ~workdir contents =
         store_referenced_source file
     ) lines
 
-let open_source fname =
+let open_source ~scan_references fname =
   let fp = Datatype.Filepath.of_string fname in
   try
     let s = SourceFiles.find fp in
@@ -108,7 +108,8 @@ let open_source fname =
       with Not_found ->
         None
     in
-    scan_source_for_references ~workdir contents;
+    if scan_references then
+      scan_source_for_references ~workdir contents;
     Ok contents
   with Sys_error s ->
     Error s

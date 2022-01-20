@@ -41,11 +41,6 @@ type file =
       * string list (* Extra arguments (already included in the command)
                        which must also be given to the logic preprocessor
                        (since Frama-C may preprocess twice each source). *)
-      * string option (* Working directory when running the preprocessor,
-                         if different from PWD when running Frama-C
-                         (None otherwise).
-                         Only a few options, such as -json-compilation-database,
-                         may set it. *)
       * cpp_opt_kind (* Whether the preprocessor is known to be compatible with
                         GCC-style options (mostly, -D and -I). *)
   | NoCPP of Filepath.Normalized.t (** filename of a preprocessed [.c] *)
@@ -59,7 +54,7 @@ module D =
       type t = file
       let name = "File"
       let reprs =
-        [ NeedCPP(Filepath.Normalized.empty, "", [], None, Unknown);
+        [ NeedCPP(Filepath.Normalized.empty, "", [], Unknown);
           NoCPP Filepath.Normalized.empty;
           External(Filepath.Normalized.empty, "")
         ]
@@ -73,13 +68,12 @@ module D =
           | External (f,p) ->
             Format.fprintf fmt "@[File.External (%a,%S)@]"
               Filepath.Normalized.pretty f p
-          | NeedCPP (f,cmd,extra,workdir,kind) ->
+          | NeedCPP (f,cmd,extra,kind) ->
             Format.fprintf
-              fmt "@[File.NeedCPP (%a,%S,%S,%a,%a)@]"
+              fmt "@[File.NeedCPP (%a,%S,%S,%a)@]"
               Filepath.Normalized.pretty f
               cmd
               (String.concat " " extra)
-              (Pretty_utils.pp_opt ~none:"<pwd>" Format.pp_print_string) workdir
               pretty_cpp_opt_kind kind
         in
         Type.par p_caller Type.Call fmt pp
@@ -94,17 +88,8 @@ let get_suffixes () =
     check_suffixes
     [ ".c"; ".i"; ".h" ]
 
-let get_filepath = function NeedCPP (s, _, _, _, _) | NoCPP s | External (s, _) -> s
+let get_filepath = function NeedCPP (s, _, _, _) | NoCPP s | External (s, _) -> s
 let get_name s = Filepath.Normalized.to_pretty_string (get_filepath s)
-
-(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
-   no function in its stdlib to resolve symbolic links (e.g. realpath)
-   for a given path. 'getcwd' always resolves them, but if the user
-   supplies a path with symbolic links, this may cause issues.
-   Instead of forcing the user to always provide resolved paths, we
-   currently choose to never resolve them.
-   We only resort to getcwd() to avoid issues when PWD does not exist. *)
-let get_cwd () = try Unix.getenv "PWD" with Not_found -> Sys.getcwd ()
 
 (* ************************************************************************* *)
 (** {2 Preprocessor command} *)
@@ -154,18 +139,6 @@ let from_filename ?cpp f =
         Filepath.Normalized.pretty f;
     if extra_by_file <> "" then [extra_by_file] else jcdb_flags
   in
-  let workdir =
-    if Kernel.JsonCompilationDatabase.is_set () then
-      let jcdb_path = (Kernel.JsonCompilationDatabase.get () :> string) in
-      let dir =
-        if Sys.is_directory jcdb_path then jcdb_path
-        else Filename.dirname jcdb_path
-      in
-      let cwd = get_cwd () in
-      if cwd <> dir then Some dir
-      else None
-    else None
-  in
   if Filename.check_suffix (f:>string) ".i" then begin
     NoCPP f
   end else
@@ -183,7 +156,7 @@ let from_filename ?cpp f =
         Kernel.warning ~once:true
           "Default pre-processor does not keep comments. Any ACSL annotation \
            on non-pre-processed file will be discarded.";
-      NeedCPP (f, cpp, extra, workdir, is_cpp_gnu_like ())
+      NeedCPP (f, cpp, extra, is_cpp_gnu_like ())
     end else
       Kernel.abort "No working pre-processor found. You can only analyze \
                     pre-processed .i files."
@@ -488,16 +461,13 @@ let adjust_pwd fp cpp_command =
       | None -> cwd
       | Some d -> (d:>string)
     in
-    if cwd <> dir then begin
-      Parse_env.set_workdir fp dir;
-      "cd " ^ dir ^ " && " ^ cpp_command
-      end
-    else cpp_command
-  else cpp_command
+    if cwd <> dir then Some dir, "cd " ^ dir ^ " && " ^ cpp_command
+    else None, cpp_command
+  else None, cpp_command
 
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
-  | NeedCPP (f, cmdl, extra, _workdir, is_gnu_like) ->
+  | NeedCPP (f, cmdl, extra, is_gnu_like) ->
     if not (Sys.file_exists (f :> string)) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
@@ -573,7 +543,9 @@ let build_cpp_cmd = function
         include_args define_args
     in
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
-    let cpp_command_with_chdir = adjust_pwd f cpp_command in
+    let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
+    if workdir <> None then
+      Parse_env.set_workdir ppf (Option.get workdir);
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
@@ -587,7 +559,7 @@ let parse_cabs cpp_command = function
     Kernel.feedback "Parsing %a (no preprocessing)"
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
-  | NeedCPP (f, cmdl, _extra, _workdir, is_gnu_like) ->
+  | NeedCPP (f, cmdl, _extra, is_gnu_like) ->
     let cpp_command, ppf, logic_pp_args = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;

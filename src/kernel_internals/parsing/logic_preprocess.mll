@@ -531,7 +531,8 @@ parse
   let file suffix cpp filename =
     reset ();
     let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
-    match Parse_env.open_source filename with
+    let scan_references = Kernel.EagerLoadSources.get () in
+    match Parse_env.open_source ~scan_references filename with
     | Error msg -> Kernel.abort "logic_preprocess: %s" msg
     | Ok source ->
       let lex = Lexing.from_string source in

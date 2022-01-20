@@ -64,7 +64,8 @@ let startParsing fname =
        You want to open %S and %S is still open"
       fname (Lexing.lexeme_start_p !current.lexbuf).Lexing.pos_fname
   end;
-  match Parse_env.open_source fname with
+  let scan_references = Kernel.EagerLoadSources.get () in
+  match Parse_env.open_source ~scan_references fname with
   | Error msg -> Kernel.fatal "%s" msg
   | Ok in_str ->
     let lexbuf = Lexing.from_string in_str in

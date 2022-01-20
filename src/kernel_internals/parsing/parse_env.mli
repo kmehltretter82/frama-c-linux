@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val open_source : string -> (string, string) result
+val open_source : scan_references:bool -> string -> (string, string) result
 
 val set_workdir : Filepath.Normalized.t -> string -> unit
 
