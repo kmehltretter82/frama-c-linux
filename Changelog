@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+o!  Kernel    [2022-02-19] Removed obsolete AST nodes IndexPI and Info
 o!  Kernel    [2021-12-03] Remove unused AST node Dcustom_annot and field
               fpadding_in_bits. Do not cache size of types in the AST but in
               a dedicated table.
