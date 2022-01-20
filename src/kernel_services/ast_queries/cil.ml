@@ -5263,6 +5263,14 @@ class constFoldVisitorClass (machdep: bool) : cilVisitor = object
     (* Do it bottom up *)
     ChangeDoChildrenPost (e, constFold machdep)
 
+  (* Optimization: only visits function and variable definitions. *)
+  method! vglob = function
+    | GFun _ | GVar _ -> DoChildren
+    | _ -> SkipChildren
+
+  method! vtype _ = SkipChildren
+  method! vspec _ = SkipChildren
+  method! vcode_annot _ = SkipChildren
 end
 let constFoldVisitor (machdep: bool) = new constFoldVisitorClass machdep
 
