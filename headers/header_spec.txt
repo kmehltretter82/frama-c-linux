@@ -294,6 +294,7 @@ share/libc/stdio.c: CEA_LGPL
 share/libc/stdio.h: CEA_LGPL
 share/libc/stdlib.c: CEA_LGPL
 share/libc/stdlib.h: CEA_LGPL
+share/libc/stdnoreturn.h: CEA_LGPL
 share/libc/string.c: CEA_LGPL
 share/libc/string.h: CEA_LGPL
 share/libc/strings.h: CEA_LGPL

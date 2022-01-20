@@ -237,6 +237,8 @@
 [eva] using specification for function mkstemp
 [eva] stdlib_h.c:82: 
   function mkstemp: precondition 'valid_template' got status valid.
+[eva] stdlib_h.c:82: 
+  function mkstemp: precondition 'template_len' got status valid.
 [eva] Done for function mkstemp
 [eva] computing for function drand48 <- main.
   Called from stdlib_h.c:86.

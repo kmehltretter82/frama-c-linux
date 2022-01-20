@@ -233,10 +233,29 @@
   function asctime: precondition 'initialization,init_timeptr' got status valid.
 [eva] Done for function asctime
 [eva:alarm] time_h.c:65: Warning: assertion got status unknown.
+[eva] computing for function localtime <- main.
+  Called from time_h.c:67.
+[eva] using specification for function localtime
+[eva] time_h.c:67: 
+  function localtime: precondition 'valid_timer' got status valid.
+[eva] Done for function localtime
+[eva] computing for function localtime_r <- main.
+  Called from time_h.c:69.
+[eva] using specification for function localtime_r
+[eva] time_h.c:69: 
+  function localtime_r: precondition 'valid_timer' got status valid.
+[eva] time_h.c:69: 
+  function localtime_r: precondition 'valid_result' got status valid.
+[eva] Done for function localtime_r
+[eva] computing for function localtime_r <- main.
+  Called from time_h.c:69.
+[eva] Done for function localtime_r
+[eva] time_h.c:70: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
+  __fc_errno ∈ [--..--]
   __fc_ctime[0..25] ∈ [--..--]
   __fc_time_tm ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
@@ -252,4 +271,6 @@
   t ∈ [--..--]
   res_time ∈ {{ NULL ; &mytime2 }} or UNINITIALIZED
   mytime2 ∈ [--..--] or UNINITIALIZED
+  localp ∈ {{ NULL ; &localr }}
+  localr ∈ [--..--] or UNINITIALIZED
   __retres ∈ {0; 1; 2}
