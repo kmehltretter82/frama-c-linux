@@ -395,13 +395,8 @@ let rec is_same_list f l l' env =
   | _ -> false
 
 let get_original_kf vi =
-  let selection =
-    State_selection.(
-      union
-        (with_dependencies Kernel_function.self)
-        (union
-           (with_dependencies Annotations.funspec_state)
-           (with_dependencies Annotations.code_annot_state)))
+  let selection = State_selection.of_list
+      [Kernel_function.self; Annotations.funspec_state; Globals.Functions.self]
   in
   Project.on ~selection (Orig_project.get()) Globals.Functions.get vi
 
