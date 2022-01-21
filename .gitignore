@@ -53,10 +53,6 @@ autom4te.cache
 /tests/crowbar/mutable
 /tests/crowbar/output-*
 /tests/crowbar/test_ghost_cfg
-/tests/fc_script/compile_commands.json
-/tests/journal/intra.byte
-/tests/misc/my_visitor_plugin/my_visitor.opt
-/tests/misc/my_visitor.sav
 /tests/spec/preprocess_dos.c
 /tests/*/*.opt
 
@@ -195,7 +191,6 @@ Makefile.plugin.generated
 # generated ML files
 
 /src/libraries/utils/json.ml
-/src/kernel_internals/runtime/toplevel_boot.ml
 /src/kernel_internals/runtime/fc_config.ml
 /src/kernel_internals/parsing/logic_lexer.ml
 /src/kernel_internals/parsing/logic_parser.ml
@@ -210,8 +205,6 @@ Makefile.plugin.generated
 /src/plugins/gui/dgraph_helper.ml
 /src/plugins/gui/GSourceView.ml
 /src/plugins/gui/GSourceView.mli
-/src/plugins/gui/GSourceView2.ml
-/src/plugins/gui/GSourceView2.mli
 /src/plugins/gui/gtk_compat.ml
 /src/plugins/markdown-report/META
 
