@@ -93,6 +93,11 @@ val join: number_ty -> number_ty -> number_ty
     semi-lattice. If one of the argument is {!Other}, the function assumes that
     the other argument is also {!Other}. In this case, the result is [Other]. *)
 
+val number_ty_bound_variable:
+  profile:Interval.profile ->
+  term * logic_var * term ->
+  number_ty
+
 (******************************************************************************)
 (** {2 Typing} *)
 (******************************************************************************)

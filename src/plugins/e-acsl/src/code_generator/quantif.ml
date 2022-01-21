@@ -43,22 +43,23 @@ let predicate_to_exp_ref
    [has_empty_quantif_with_false_negative] partially detects such cases:
    Case 1: an empty quantification was detected for sure, return true.
    Case 2: we don't know, return false. *)
-let rec has_empty_quantif_with_false_negative = function
+let rec has_empty_quantif_with_false_negative ~logic_env = function
   | [] ->
     (* case 2 *)
     false
   | (t1, _, t2) :: guards ->
-    let iv1 = Interval.(extract_ival (get t1)) in
-    let iv2 = Interval.(extract_ival (get t2)) in
+    let iv1 = Interval.(extract_ival (get ~logic_env t1)) in
+    let iv2 = Interval.(extract_ival (get ~logic_env t2)) in
     let lower_bound, _ = Ival.min_and_max iv1 in
     let _, upper_bound = Ival.min_and_max iv2 in
     begin
       match lower_bound, upper_bound with
       | Some lower_bound, Some upper_bound ->
         let res  = lower_bound >= upper_bound in
-        res (* case 1 *) || has_empty_quantif_with_false_negative guards
+        res (* case 1 *) ||
+        has_empty_quantif_with_false_negative guards ~logic_env
       | None, _ | _, None ->
-        has_empty_quantif_with_false_negative guards
+        has_empty_quantif_with_false_negative guards ~logic_env
     end
 
 let () =
@@ -80,7 +81,11 @@ let convert kf env loc ~is_forall quantif =
       quantif
       Printer.pp_predicate
   in
-  match has_empty_quantif_with_false_negative bound_vars, is_forall with
+  match (has_empty_quantif_with_false_negative
+           ~logic_env:(Env.Logic_env.get env)
+           bound_vars),
+        is_forall
+  with
   | true, true ->
     Cil.one ~loc, env
   | true, false ->
@@ -96,14 +101,17 @@ let convert kf env loc ~is_forall quantif =
         else z, o, fun e -> Smart_exp.lnot ~loc:e.eloc e
       in
       (* transform [bound_vars] into [lscope_var list],
-         and update logic scope in the process *)
-      let lvs_guards, env = List.fold_right
-          (fun (t1, lv, t2) (lvs_guards, env) ->
+         and update logic scope and logic environment in the process *)
+      let lvs_guards, env = List.fold_left
+          (fun (lvs_guards, env) (t1, lv, t2) ->
              let lvs = Lvs_quantif (t1, Rle, lv, Rlt, t2) in
              let env = Env.Logic_scope.extend env lvs in
+             let logic_env = Env.Logic_env.get env in
+             let env = Env.Logic_env.add_let_quantif_binding env lv
+                 Interval.(join (get ~logic_env t1) (get ~logic_env t2)) in
              lvs :: lvs_guards, env)
-          bound_vars
           ([], env)
+          bound_vars
       in
       let var_res, res, env =
         (* variable storing the result of the quantifier *)
@@ -157,6 +165,12 @@ let convert kf env loc ~is_forall quantif =
       end_loop.labels <- label :: end_loop.labels;
       end_loop_ref := end_loop;
       let env = Env.add_stmt env end_loop in
+      let
+        env = List.fold_left
+          (fun env _ -> Env.Logic_env.pop env)
+          env
+          lvs_guards
+      in
       res, env
     end
 

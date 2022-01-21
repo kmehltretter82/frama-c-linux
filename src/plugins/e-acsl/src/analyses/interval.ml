@@ -862,7 +862,65 @@ and infer_term_offset ~logic_env t =
     ignore (infer ~logic_env t);
     infer_term_offset ~logic_env toff
 
-let rec infer_predicate ~logic_env p =
+(* [type_bound_variables] infers an interval associated with each of
+   the provided bounds of a quantified variable, and provides a term
+   accordingly. It could happen that the bounds provided for a quantifier
+   [lv] are bigger than its type. [type_bound_variables] handles such cases
+   and provides smaller bounds whenever possible.
+   Let B be the inferred interval and R the range of [lv.typ]
+   - Case 1: B \subseteq R
+     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
+     Return: B
+   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
+     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
+     Return: B \intersect R
+   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
+     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
+     Return: R with a guard guaranteeing that [lv] does not overflow *)
+let rec infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
+  let get_res = Error.map (fun x -> x) in
+  let i1 = get_res (infer ~logic_env t1) in
+  let i2 = get_res (infer ~logic_env t2) in
+  let i = widen (join i1 i2) in
+  let t1, t2, i =
+    match lv.lv_type with
+    | Ltype _ | Lvar _ | Lreal | Larrow _ ->
+      Error.not_yet "quantification over non-integer type"
+    | Linteger -> t1, t2, i
+    | Ctype ty ->
+      let ity = extended_interv_of_typ ty in
+      if is_included i ity then
+        (* case 1 *)
+        t1, t2, i
+      else if is_singleton_int i1 &&
+              is_singleton_int i2 then
+        begin
+          (* case 2 *)
+          let i = meet i ity in
+          (* We can now update the bounds in the preprocessed form
+             that come from the meet of the two intervals *)
+          let min, max = Misc.finite_min_and_max (extract_ival i) in
+          let t1 = Logic_const.tint ~loc min in
+          let t2 = Logic_const.tint ~loc max in
+          t1, t2, i
+        end else
+        (* case 3 *)
+        let min, max = Misc.finite_min_and_max (extract_ival ity) in
+        let guard_lower = Logic_const.tint ~loc min in
+        let guard_upper = Logic_const.tint ~loc max in
+        let lv_term = Logic_const.tvar ~loc lv in
+        let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
+        let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
+        let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
+        ignore (infer_predicate ~logic_env guard);
+        Bound_variables.add_guard_for_small_type lv guard;
+        t1, t2, i
+  in
+  ignore (infer ~logic_env t1);
+  ignore (infer ~logic_env t2);
+  Logic_environment.add_let_quantif_binding logic_env lv i, (t1, lv, t2)
+
+and infer_predicate ~logic_env p =
   match Logic_normalizer.get_pred p with
   | PoT_term t -> ignore (infer ~logic_env t)
   | PoT_pred p ->
@@ -896,8 +954,26 @@ let rec infer_predicate ~logic_env p =
       in
       (infer_predicate ~logic_env p)
     | Pforall _
-    | Pexists _ -> ()
-    (* TODO:  *)
+    | Pexists _ ->
+      let guards, goal =
+        Error.retrieve_preprocessing
+          "quantified predicate"
+          Bound_variables.get_preprocessed_quantifier
+          p
+          Printer.pp_predicate
+      in
+      let loc = p.pred_loc in
+      let rec do_analysis guards new_guards logic_env = match guards with
+        | [] -> logic_env, new_guards
+        | guard :: guards ->
+          let  logic_env, new_guard =
+            infer_bound_variable ~loc ~logic_env guard
+          in
+          do_analysis guards (new_guard :: new_guards) logic_env
+      in
+      let logic_env, new_guards = do_analysis guards [] logic_env in
+      Bound_variables.replace p new_guards goal;
+      infer_predicate ~logic_env goal
     | Pseparated tlist ->
       List.iter
         (fun t -> ignore (infer ~logic_env t))

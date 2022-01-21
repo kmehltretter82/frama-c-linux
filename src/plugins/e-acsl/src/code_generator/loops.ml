@@ -290,9 +290,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Typing.preprocess_term ~use_gmp_opt:false ~logic_env t1;
     Typing.preprocess_term ~use_gmp_opt:false ~logic_env t2;
     let ctx =
-      let ty1 = Typing.get_number_ty ~logic_env t1 in
-      let ty2 = Typing.get_number_ty ~logic_env t2 in
-      Typing.join ty1 ty2
+      Typing.number_ty_bound_variable
+        ~profile:(Interval.Logic_environment.get_profile (Env.Logic_env.get env))
+        (t1, logic_x, t2)
     in
     let t_plus_one ?ty t =
       (* whenever provided, [ty] is known to be the type of the result *)

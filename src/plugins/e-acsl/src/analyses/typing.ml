@@ -702,88 +702,33 @@ and type_term_offset ~profile t = match t with
     ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
     type_term_offset ~profile toff
 
-(* [type_bound_variables] infers an interval associated with each of
-   the provided bounds of a quantified variable, and provides a term
-   accordingly. It could happen that the bounds provided for a quantifier
-   [lv] are bigger than its type. [type_bound_variables] handles such cases
-   and provides smaller bounds whenever possible.
-   Let B be the inferred interval and R the range of [lv.typ]
-   - Case 1: B \subseteq R
-     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
-     Return: B
-   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
-     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
-     Return: B \intersect R
-   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
-     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
-     Return: R with a guard guaranteeing that [lv] does not overflow *)
-and type_bound_variables ~loc ~profile (t1, lv, t2) =
-  let i1 = Interval.get t1 in
-  let i2 = Interval.get t2 in
+and number_ty_bound_variable ~profile (t1, lv, t2) =
+  let i1 = Interval.get_p ~profile t1 in
+  let i2 = Interval.get_p ~profile t2 in
   let i = Interval.(widen (join i1 i2)) in
-  let ctx = match lv.lv_type with
-    | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
-    | Ctype ty ->
-      (match Cil.unrollType ty with
-       | TInt(ik, _) | TEnum({ ekind = ik }, _) ->
-         mk_ctx ~use_gmp_opt:true (C_integer ik)
-       | ty ->
-         Options.fatal "unexpected C type %a for quantified variable %a"
-           Printer.pp_typ ty
-           Printer.pp_logic_var lv)
-    | lty ->
-      Options.fatal "unexpected logic type %a for quantified variable %a"
-        Printer.pp_logic_type lty
-        Printer.pp_logic_var lv
-  in
-  let t1, t2, i =
-    match lv.lv_type with
-    | Ltype _ | Lvar _ | Lreal | Larrow _ ->
-      Error.not_yet "quantification over non-integer type"
-    | Linteger -> t1, t2, i
-    | Ctype ty ->
-      let ity = Interval.extended_interv_of_typ ty in
-      if Interval.is_included i ity then
-        (* case 1 *)
-        t1, t2, i
-      else if Interval.is_singleton_int i1 &&
-              Interval.is_singleton_int i2 then
-        begin
-          (* case 2 *)
-          let i = Interval.meet i ity in
-          (* We can now update the bounds in the preprocessed form
-             that come from the meet of the two intervals *)
-          let min, max = Misc.finite_min_and_max (Interval.extract_ival i) in
-          let t1 = Logic_const.tint ~loc min in
-          let t2 = Logic_const.tint ~loc max in
-          t1, t2, i
-        end else
-        (* case 3 *)
-        let min, max = Misc.finite_min_and_max (Interval.extract_ival ity) in
-        let guard_lower = Logic_const.tint ~loc min in
-        let guard_upper = Logic_const.tint ~loc max in
-        let lv_term = Logic_const.tvar ~loc lv in
-        let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-        let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
-        let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-        ignore (type_predicate ~profile guard);
-        Bound_variables.add_guard_for_small_type lv guard;
-        t1, t2, i
-  in
+  match lv.lv_type with
+  | Linteger ->
+    mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
+  | Ctype ty ->
+    (match Cil.unrollType ty with
+     | TInt(ik, _) | TEnum({ ekind = ik}, _)-> join
+                        (ty_of_interv i)
+                        (mk_ctx ~use_gmp_opt:true (C_integer ik))
+     | ty ->
+       Options.fatal "unexpected C type %a for quantified variable %a"
+         Printer.pp_typ ty
+         Printer.pp_logic_var lv)
+  | lty ->
+    Options.fatal "unexpected logic type %a for quantified variable %a"
+      Printer.pp_logic_type lty
+      Printer.pp_logic_var lv
+
+and type_bound_variables ~profile (t1, lv, t2) =
+  let ctx= number_ty_bound_variable ~profile (t1, lv, t2) in
   (* forcing when typing bounds prevents to generate an extra useless
      GMP variable when --e-acsl-gmp-only *)
-  ignore (type_term ~use_gmp_opt:false ~ctx ~profile t1);
-  ignore (type_term ~use_gmp_opt:false ~ctx ~profile t2);
-  (* if we must generate GMP code, degrade the interval in order to
-     guarantee that [x] will be a GMP when typing the goal *)
-  let _ = match ctx with
-    | C_integer _ -> i
-    (* [ -\infty; +\infty ] *)
-    | Gmpz -> Interval.Ival (Ival.inject_range None None)
-    | C_float _ | Rational | Real | Nan ->
-      Options.fatal "unexpected quantification over %a" D.pretty ctx
-  in
-  (t1, lv, t2)
+  ignore(type_term ~use_gmp_opt:false ~ctx ~profile t1);
+  ignore(type_term ~use_gmp_opt:false ~ctx ~profile t2)
 
 and type_predicate ~profile p =
   let p = Logic_normalizer.get_pred p in
@@ -796,15 +741,12 @@ and type_predicate ~profile p =
       begin
         match li.l_body with
         | LBpred p ->
-          let typed_args =
-            type_args
-              ~use_gmp_opt:true
-              ~profile
-              li.l_profile
-              args
-              li.l_var_info.lv_name
-          in
-          ignore (type_predicate ~profile:typed_args p);
+          List.iter
+            (fun x -> ignore
+                (type_term ~use_gmp_opt: true ~profile x))
+            args;
+          let new_profile = List.map (Interval.get_p ~profile) args in
+          ignore (type_predicate ~profile:new_profile p);
         | LBnone -> ()
         | LBreads _ -> ()
         | LBinductive _ -> ()
@@ -855,12 +797,10 @@ and type_predicate ~profile p =
             p
             Printer.pp_predicate
         in
-        let guards =
-          List.map
-            (fun (t1, x, t2) ->
-               type_bound_variables ~loc:p.pred_loc ~profile (t1, x, t2))
-            guards
-        in Bound_variables.replace p guards goal;
+        List.iter
+          (fun (t1, x, t2) ->
+             type_bound_variables ~profile (t1, x, t2))
+          guards;
         (type_predicate ~profile goal).ty
       end
     | Pseparated tlist ->
@@ -970,7 +910,7 @@ let typing_visitor profile = object
        those errrors are stored in the table and warnings are raised at
        translation time *)
     ignore
-      (try type_named_predicate ~lenv p
+      (try type_named_predicate ~profile p
        with Error.Not_yet _ | Error.Typing_error _  -> ());
     Cil.SkipChildren
 end
