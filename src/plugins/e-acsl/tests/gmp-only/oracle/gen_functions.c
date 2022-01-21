@@ -308,8 +308,8 @@ int main(void)
     __gen_e_acsl_eq_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_app_2),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_c));
     __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_9,"c",0,c);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"h_char(c)",0,
-                                 __gen_e_acsl_h_char_2);
+    __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_9,"h_char(c)",0,
+                                  __gen_e_acsl_h_char_2);
     __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_9,"c",0,c);
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
@@ -337,8 +337,8 @@ int main(void)
     __gen_e_acsl_eq_5 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_app_3),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_s));
     __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_10,"s",0,s);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"h_short(s)",
-                                 0,__gen_e_acsl_h_short_2);
+    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_10,
+                                   "h_short(s)",0,__gen_e_acsl_h_short_2);
     __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_10,"s",0,s);
     __gen_e_acsl_assert_data_10.blocking = 1;
     __gen_e_acsl_assert_data_10.kind = "Assertion";

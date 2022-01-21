@@ -30,7 +30,7 @@ int __gen_e_acsl_main(int argc, char **argv)
     __e_acsl_store_block((void *)(& argv),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_k = 0;
+    __gen_e_acsl_k = 0L;
     while (1) {
       if (__gen_e_acsl_k <= (long)argc) ; else break;
       {
@@ -270,7 +270,7 @@ int __gen_e_acsl_main(int argc, char **argv)
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
           {.values = (void *)0};
         __gen_e_acsl_forall_2 = 1;
-        __gen_e_acsl_k_2 = 0;
+        __gen_e_acsl_k_2 = 0L;
         while (1) {
           if (__gen_e_acsl_k_2 <= (long)len) ; else break;
           {

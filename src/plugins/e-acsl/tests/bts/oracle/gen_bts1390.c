@@ -175,7 +175,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
       __gen_e_acsl_forall_2 = 1;
-      __gen_e_acsl_j = 0;
+      __gen_e_acsl_j = 0U;
       while (1) {
         {
           unsigned long __gen_e_acsl_offset;
