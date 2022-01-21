@@ -495,6 +495,11 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
         let gen_fname =
           Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
         in
+        let params_ival = match li.l_body with
+          | LBterm t -> Interval.get_widened_profile params_ival t
+          | LBpred _ -> params_ival
+          | _ -> assert false
+        in
         let vi, e, env =
           function_to_exp ~loc ?tapp gen_fname env kf li params_ty params_ival args
         in

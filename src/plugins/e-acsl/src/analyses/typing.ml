@@ -616,6 +616,7 @@ let rec type_term
                     ~profile x))
             args;
           let new_profile = List.map (Interval.get_p ~profile) args in
+          let new_profile = Interval.get_widened_profile new_profile t_body in
           let gmp,ctx_body = match li.l_type with
             | Some (Ctype typ) ->
               false, Some (number_ty_of_typ ~post:false typ)

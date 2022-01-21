@@ -143,6 +143,10 @@ val preprocess_code_annot :
 val preprocess_term :
   logic_env:Logic_environment.t -> Cil_types.term -> unit
 
+val get_widened_profile : profile -> Cil_types.term -> profile
+
+val clear : unit -> unit
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

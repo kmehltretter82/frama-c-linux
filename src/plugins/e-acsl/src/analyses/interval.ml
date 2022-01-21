@@ -443,12 +443,112 @@ end
 
 end
 
+(* Imperative environment to perform fixpoint algorithm for recursive
+   functions *)
+module LF_env : sig
+  val find : logic_info -> Profile.t -> ival
+
+  val clear : unit -> unit
+
+  val interv_of_typ_containing_interv : ival -> ival
+
+  val is_rec : logic_info -> bool
+
+  val fixpoint :
+    infer : (
+      ?force_infer:bool ->
+      logic_env: Logic_environment.t ->
+      term ->
+      ival Error.result)  ->
+    logic_info ->
+    Profile.t ->
+    term ->
+    ival ->
+    ival
+
+end
+= struct
+
+  module LFProf =
+    Datatype.Pair_with_collections (Cil_datatype.Logic_info) (Profile)
+      (struct
+        let module_name = "E_ACSL.Interval.LF_env.LFProf"
+      end)
+
+  let tbl = LFProf.Hashtbl.create 97
+
+  let clear () = LFProf.Hashtbl.clear tbl
+
+  let find li profile = LFProf.Hashtbl.find tbl (li,profile)
+
+  exception Recursive
+
+  let contain li = object
+    inherit Visitor.frama_c_inplace
+
+    method !vpredicate p =
+      match p.pred_content with
+      | Papp (li_app,_,_) when Cil_datatype.Logic_info.equal li li_app ->
+        raise Recursive;
+      | _ -> Cil.DoChildren
+
+    method !vterm t =
+      match t.term_node with
+      | Tapp(li_app,_,_) when Cil_datatype.Logic_info.equal li li_app ->
+        raise Recursive
+      | _ -> Cil.DoChildren
+
+  end
+
+  let is_rec li =
+    match li.l_body with
+    | LBpred p ->
+      (try ignore (Visitor.visitFramacPredicate (contain li) p); false
+       with Recursive -> true)
+    | LBterm t ->
+      (try ignore (Visitor.visitFramacTerm (contain li) t); false
+       with Recursive -> true)
+    | LBreads _ | LBnone  |LBinductive _ -> false
+
+  let interv_of_typ_containing_interv = function
+    | Float _ | Rational | Real | Nan as x ->
+      x
+    | Ival i ->
+      try
+        let kind = ikind_of_ival i in
+        interv_of_typ (TInt(kind, []))
+      with Cil.Not_representable ->
+        top_ival
+
+  let rec fixpoint ~(infer : ?force_infer:bool ->
+                     logic_env:Logic_environment.t ->
+                     term ->
+                     ival Error.result)
+      li args_ival t' ival =
+    LFProf.Hashtbl.replace tbl (li,args_ival) ival;
+    let get_res = Error.map (fun x -> x) in
+    let logic_env = Logic_environment.create li.l_profile args_ival in
+    let inferred_ival = get_res (infer ~force_infer:true ~logic_env t') in
+    if is_included inferred_ival ival
+    then
+      ival
+    else
+      fixpoint ~infer li args_ival t' inferred_ival
+
+end
+
 (* Memoization module which retrieves the computed info of some terms. If the
    info is already computed for a term, it is never recomputed *)
 module Memo: sig
   val memo:
-    profile:Profile.t -> (term -> ival) -> term -> ival Error.or_error
-  val get: profile:Profile.t -> term -> ival Error.or_error
+    force_infer:bool ->
+    profile:Profile.t ->
+    (term -> ival) ->
+    term ->
+    ival Error.result
+  val get: profile:Profile.t -> term -> ival Error.result
+  val get_widened_profile: Profile.t -> term -> Profile.t
+  val add_widened_profile: Profile.t -> term -> Profile.t -> unit
   val clear: unit -> unit
 end = struct
   (* The comparison over terms is the physical equality. It cannot be the
@@ -478,6 +578,21 @@ end = struct
   let dep_tbl : ival Error.result Id_term_in_profile.Hashtbl.t
     = Id_term_in_profile.Hashtbl.create 97
 
+  let widened_profile_tbl : Profile.t Id_term_in_profile.Hashtbl.t
+    = Id_term_in_profile.Hashtbl.create 97
+
+  let get_widened_profile profile t =
+    Id_term_in_profile.Hashtbl.find_def
+      widened_profile_tbl
+      (t,profile)
+      profile
+
+  let add_widened_profile profile t args_ival =
+    Id_term_in_profile.Hashtbl.add
+      widened_profile_tbl
+      (t,profile)
+      args_ival
+
   let get_dep profile t =
     try Id_term_in_profile.Hashtbl.find dep_tbl (t,profile)
     with Not_found -> Error.not_memoized ()
@@ -491,32 +606,49 @@ end = struct
     | [] -> get_nondep t
     | _::_ -> get_dep profile t
 
-  let memo_nondep f t =
-    try Misc.Id_term.Hashtbl.find tbl t
-    with Not_found ->
+  let memo_nondep ~force_infer f t =
+    if force_infer then
       let x =
         try
-          Error.Res (f t);
-        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+          Result.Ok (f t);
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
       in
-      Misc.Id_term.Hashtbl.add tbl t x;
+      Misc.Id_term.Hashtbl.replace tbl t x;
       x
+    else
+      try Misc.Id_term.Hashtbl.find tbl t
+      with Not_found ->
+        let x =
+          try
+            Result.Ok (f t);
+          with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
+        in
+        Misc.Id_term.Hashtbl.add tbl t x;
+        x
 
-  let memo_dep f t profile =
-    try
-      Id_term_in_profile.Hashtbl.find dep_tbl (t, profile)
-    with Not_found ->
+  let memo_dep ~force_infer f t profile =
+    if force_infer then
       let x =
-        try Error.Res (f t)
-        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+        try Result.Ok (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
       in
-      Id_term_in_profile.Hashtbl.add dep_tbl (t, profile) x;
+      Id_term_in_profile.Hashtbl.replace dep_tbl (t, profile) x;
       x
+    else
+      try
+        Id_term_in_profile.Hashtbl.find dep_tbl (t, profile)
+      with Not_found ->
+        let x =
+          try Result.Ok (f t)
+          with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
+        in
+        Id_term_in_profile.Hashtbl.add dep_tbl (t, profile) x;
+        x
 
-  let memo ~profile f t =
+  let memo ~force_infer ~profile f t =
     match profile with
-    | [] -> memo_nondep f t
-    | _::_ -> memo_dep f t profile
+    | [] -> memo_nondep ~force_infer f t
+    | _::_ -> memo_dep ~force_infer f t profile
 
   let clear () =
     Options.feedback ~level:4 "clearing the typing tables";
@@ -636,10 +768,12 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
      | Z.Overflow (* if the exponent of \product is too high *) -> top_ival)
   | _ -> Error.not_yet "extended quantifiers with non-integer parameters"
 
-let rec infer ~logic_env t =
+let rec infer ?(force_infer=false) ~logic_env t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   let get_res = Error.map (fun x -> x) in
   let t = Logic_normalizer.get_term t in
+  let infer_full = infer
+  and infer = infer ~force_infer in
   let compute t =
     match t.term_node with
     | TConst (Integer (n, _)) -> singleton n
@@ -777,14 +911,29 @@ let rec infer ~logic_env t =
          ignore (infer_predicate ~logic_env p);
          Ival Ival.zero_or_one
        | LBterm t' ->
-         (* No fixpoint for now *)
-         let args_ival =
-           List.map
-             (fun arg -> get_res (infer ~logic_env arg))
-             args
-         in
-         let logic_env = Logic_environment.create li.l_profile args_ival in
-         get_res (infer ~logic_env t')
+         if LF_env.is_rec li
+         then
+           let profile,args_ival =
+             let profile =
+               List.map
+                 (fun arg -> (get_res (infer ~logic_env arg)))
+                 args
+             in
+             profile, (List.map LF_env.interv_of_typ_containing_interv profile)
+           in
+           Memo.add_widened_profile profile t' args_ival;
+           try let res = LF_env.find li args_ival in
+             res;
+           with Not_found ->
+             LF_env.fixpoint ~infer:infer_full li args_ival t' (Ival Ival.bottom)
+         else
+           let args_ival =
+             List.map
+               (fun arg -> get_res (infer ~logic_env arg))
+               args
+           in
+           let logic_env = Logic_environment.create li.l_profile args_ival in
+           get_res (infer ~logic_env t')
        | LBnone when li.l_var_info.lv_name = "\\sum" ||
                      li.l_var_info.lv_name = "\\product" ->
          (match args with
@@ -864,7 +1013,11 @@ let rec infer ~logic_env t =
     | Ttype _
     | Tempty_set ->
       Nan
-  in Memo.memo ~profile:(Logic_environment.get_profile logic_env) compute t
+  in Memo.memo
+    ~force_infer
+    ~profile:(Logic_environment.get_profile logic_env)
+    compute
+    t
 
 and infer_term_lval ~logic_env (host, offset as tlv) =
   match offset with
@@ -1096,6 +1249,12 @@ let get_p ~profile t =
 
 let get ~logic_env =
   get_p ~profile:(Logic_environment.get_profile logic_env)
+
+let get_widened_profile = Memo.get_widened_profile
+
+let clear () =
+  Memo.clear();
+  LF_env.clear()
 
 type profile = Profile.t
 
