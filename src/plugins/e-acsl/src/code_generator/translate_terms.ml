@@ -318,12 +318,12 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), adata, env, Typed_number.C_number, ""
   | TUnOp(LNot, t) ->
-    let ty = Typing.get_op ~profile:(Env.Logic_env.get env) t in
+    let ty = Typing.get_op ~logic_env t in
     if Gmp_types.Z.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
-      let ctx = Typing.get_number_ty ~profile:(Env.Logic_env.get env) t in
-      Typing.type_term ~use_gmp_opt:true ~ctx ~profile:(Env.Logic_env.get env) zero;
+      let ctx = Typing.get_number_ty ~logic_env t in
+      Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
       let e, adata, env =
         Translate_utils.comparison_to_exp
           ~adata
@@ -388,7 +388,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
          possible values of [t2] *)
       (* guarding divisions and modulos *)
       let zero = Logic_const.tinteger 0 in
-      Typing.type_term ~use_gmp_opt:true ~ctx ~profile:(Env.Logic_env.get env) zero;
+      Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
       (* do not generate [e2] from [t2] twice *)
       let guard, _, env =
         let name = Misc.name_of_binop bop ^ "_guard" in
@@ -484,7 +484,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       let e1_name = term_to_name t1 in
       let e2_name = term_to_name t2 in
       let zero = Logic_const.tinteger 0 in
-      Typing.type_term ~use_gmp_opt:true ~ctx ~profile:(Env.Logic_env.get env) zero;
+      Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
       (* Check that e2 is representable in mp_bitcnt_t *)
       let coerce_guard, env =
         let name = e2_name ^ bop_name ^ "_guard" in
@@ -922,7 +922,8 @@ let untyped_to_exp typ t =
       | _ -> Typing.nan
   in
   let ctx = Option.map ctx_of_typ typ in
-  Typing.type_term ~use_gmp_opt:true ~lenv:[] ?ctx t;
+  let logic_env = Interval.Logic_environment.create [] [] in
+  Typing.preprocess_term ~use_gmp_opt:true ~logic_env ?ctx t;
   let env = Env.push Env.empty in
   let env = Env.set_rte env false in
   let e, _, env =

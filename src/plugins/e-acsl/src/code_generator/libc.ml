@@ -187,9 +187,9 @@ let check_integer_bounds ~from target =
     If [check_lower_bound] is set to false, then the lower bound check is not
     performed. *)
 let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
-  let profile = Env.Logic_env.get env in
-  Typing.type_term ~use_gmp_opt:false ~profile t;
-  match Typing.get_number_ty ~profile t with
+  let logic_env = Env.Logic_env.get env in
+  Typing.preprocess_term ~use_gmp_opt:false ~logic_env t;
+  match Typing.get_number_ty ~logic_env t with
   | Typing.Gmpz ->
     let e, _, env =
       Translate_utils.gmp_to_sizet

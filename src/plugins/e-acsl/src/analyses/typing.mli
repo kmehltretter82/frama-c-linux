@@ -97,17 +97,17 @@ val join: number_ty -> number_ty -> number_ty
 (** {2 Typing} *)
 (******************************************************************************)
 
-val type_term:
-  use_gmp_opt:bool ->
-  ?ctx:number_ty ->
-  profile:Interval.Profile.t ->
-  term ->
-  unit
+(* val type_term: *)
+(*   use_gmp_opt:bool -> *)
+(*   ?ctx:number_ty -> *)
+(*   ?profile:Interval.Profile.t -> *)
+(*   term -> *)
+(*   unit *)
 (** Compute the type of each subterm of the given term in the given context. If
     [use_gmp_opt] is false, then the conversion to the given context is done
     even if -e-acsl-gmp-only is set. *)
 
-val type_named_predicate: profile:Interval.Profile.t -> predicate -> unit
+(* val type_named_predicate: ?profile:Interval.Profile.t -> predicate -> unit *)
 (** Compute the type of each term of the given predicate. *)
 
 val clear: unit -> unit
@@ -180,6 +180,16 @@ val preprocess_rte :
   code_annotation ->
   unit
 (** compute and store the type of all the terms in a code annotation *)
+
+val preprocess_term:
+  use_gmp_opt:bool ->
+  ?ctx:number_ty ->
+  logic_env:Interval.Logic_environment.t ->
+  term ->
+  unit
+(** Compute the type of each subterm of the given term in the given context. If
+    [use_gmp_opt] is false, then the conversion to the given context is done
+    even if -e-acsl-gmp-only is set. *)
 
 (*
 Local Variables:

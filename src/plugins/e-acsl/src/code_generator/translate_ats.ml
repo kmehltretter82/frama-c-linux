@@ -182,11 +182,8 @@ let size_from_sizes_and_shifts ~loc = function
 
 (* Build the left-value corresponding to [*(at + index)]. *)
 let lval_at_index ~loc kf env (e_at, t_index) =
-  Typing.type_term
-    ~use_gmp_opt:false
-    ~ctx:Typing.c_int
-    ~lenv:(Env.Local_vars.get env)
-    t_index;
+  let logic_env = Env.Logic_env.get env in
+  Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.c_int ~logic_env t_index;
   let term_to_exp = !term_to_exp_ref in
   let e_index, _, env = term_to_exp ~adata:Assert.no_data kf env t_index in
   let e_index = Cil.constFold false e_index in
@@ -343,9 +340,8 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
          let t_size =
            Logic_const.term ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
          in
-         let profile = Env.Logic_env.get env in
-         Typing.type_term ~use_gmp_opt:false ~profile t_size;
-         let malloc_stmt = match Typing.get_number_ty ~profile t_size with
+         Typing.preprocess_term ~use_gmp_opt:false ~logic_env t_size;
+         let malloc_stmt = match Typing.get_number_ty ~logic_env t_size with
            | Typing.C_integer IInt ->
              let e_size, _, _ =
                term_to_exp ~adata:Assert.no_data kf env t_size

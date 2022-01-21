@@ -998,6 +998,11 @@ let preprocess_rte ~logic_env rte =
   let profile = Interval.Logic_environment.get_profile logic_env in
   type_code_annot profile rte
 
+let preprocess_term ~use_gmp_opt ?ctx ~logic_env t =
+  ignore (Interval.preprocess_term ~logic_env t);
+  let profile = Interval.Logic_environment.get_profile logic_env in
+  ignore (type_term ~use_gmp_opt ?ctx ~profile t);
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."
