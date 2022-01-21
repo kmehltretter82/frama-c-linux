@@ -773,7 +773,14 @@ let rec infer ~logic_env t =
     | Trange(None, _) | Trange(_, None) ->
       Options.abort "unbounded ranges are not part of E-ACSl"
 
-    | Tlet (_,_) -> assert false
+    | Tlet (li,t) ->
+      let li_t = Misc.term_of_li li in
+      let li_v = li.l_var_info in
+      let i1 = infer ~logic_env li_t in
+      let logic_env =
+        Error.map (Logic_environment.add_let_quantif_binding logic_env li_v) i1
+      in
+      get_res (infer ~logic_env t)
     | TConst (LReal lr) ->
       if lr.r_lower = lr.r_upper then Float(FDouble, Some lr.r_nearest)
       else Rational
