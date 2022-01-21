@@ -109,11 +109,38 @@ end
 (** {3 Inference system} *)
 (* ************************************************************************** *)
 
-val infer: Cil_types.term -> t
-(** [infer t] infers the smallest possible integer interval which the values
+(* val infer: Logic_environment.t -> Cil_types.term -> t *)
+(* [infer t] infers the smallest possible integer interval which the values
     of the term can fit in.
     @raise Is_a_real if the term is either a float or a real.
     @raise Not_a_number if the term does not represent any number. *)
+
+val get_p: profile:Profile.t -> Cil_types.term -> t
+(** @return the value computed by the interval inference phase *)
+
+val get: logic_env:Logic_environment.t -> Cil_types.term -> t
+(** @return the value computed by the interval inference phase, same as [get]
+    but with a full-fledged logic environment instead of a function profile *)
+
+
+(*****************************************************************************)
+(** {2 Interval processing} *)
+(*****************************************************************************)
+
+val infer_program : Cil_types.file -> unit
+(** compute and store the type of all the terms that will be translated
+    in a program *)
+
+val preprocess_predicate :
+  logic_env:Logic_environment.t -> Cil_types.predicate -> unit
+(** compute and store the type of all the terms in a code annotation *)
+
+val preprocess_code_annot :
+  logic_env:Logic_environment.t -> Cil_types.code_annotation -> unit
+(** compute and store the type of all the terms in a code annotation *)
+
+val preprocess_term :
+  logic_env:Logic_environment.t -> Cil_types.term -> unit
 
 (*
 Local Variables:

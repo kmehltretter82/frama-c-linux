@@ -29,6 +29,8 @@ let preprocess () =
   Logic_normalizer.preprocess ast;
   analyses_feedback "normalizing quantifiers";
   Bound_variables.preprocess ast;
+  analyses_feedback "infering interval of annotations";
+  Interval.infer_program ast;
   analyses_feedback "typing annotations";
   Typing.type_program ast;
   analyses_feedback

@@ -92,7 +92,7 @@ end
    where [t_size = tmax - tmin + (-1|0|1)] depending on whether the
                                           inequalities are strict or large
    and [t_shifted = lv - tmin + (-1|0)] (so that we start indexing at 0) *)
-let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
+let rec sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope sizes_and_shifts =
   match lscope with
   | [] ->
     sizes_and_shifts
@@ -117,7 +117,7 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
       | _ ->
         Options.fatal "Unexpected comparison operator"
     in
-    let iv = Interval.(extract_ival (infer t_size)) in
+    let iv = Interval.(extract_ival (get ~logic_env t_size)) in
     (* The EXACT amount of memory that is needed can be known at runtime. This
        is because the tightest bounds for the variables can be known at runtime.
        Example: In the following predicate
@@ -156,12 +156,12 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
     in
     (* Returning *)
     let sizes_and_shifts = (t_size, t_shifted) :: sizes_and_shifts in
-    sizes_and_shifts_from_quantifs ~loc kf lscope' sizes_and_shifts
+    sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope' sizes_and_shifts
   | (Lvs_let(_, t) | Lvs_global(_, t)) :: _
     when Misc.term_has_lv_from_vi t ->
     Error.not_yet "\\at with logic variable linked to C variable"
   | Lvs_let _ :: lscope' ->
-    sizes_and_shifts_from_quantifs ~loc kf lscope' sizes_and_shifts
+    sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope' sizes_and_shifts
   | Lvs_formal _ :: _ ->
     Error.not_yet "\\at using formal variable of a logic function"
   | Lvs_global _ :: _ ->
@@ -307,8 +307,9 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   let term_to_exp = !term_to_exp_ref in
   let lscope_vars = Lscope.get_all lscope in
   let lscope_vars = List.rev lscope_vars in
+  let logic_env = Env.Logic_env.get env in
   let sizes_and_shifts =
-    sizes_and_shifts_from_quantifs ~loc kf lscope_vars []
+    sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope_vars []
   in
   let logic_env = Env.Logic_env.get env in
   (* Creating the pointer *)

@@ -48,8 +48,8 @@ let rec has_empty_quantif_with_false_negative = function
     (* case 2 *)
     false
   | (t1, _, t2) :: guards ->
-    let iv1 = Interval.(extract_ival (infer t1)) in
-    let iv2 = Interval.(extract_ival (infer t2)) in
+    let iv1 = Interval.(extract_ival (get t1)) in
+    let iv2 = Interval.(extract_ival (get t2)) in
     let lower_bound, _ = Ival.min_and_max iv1 in
     let _, upper_bound = Ival.min_and_max iv2 in
     begin

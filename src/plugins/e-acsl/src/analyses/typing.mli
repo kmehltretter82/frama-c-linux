@@ -119,29 +119,30 @@ val clear: unit -> unit
     {!type_named_predicate} has been previously computed for the given term or
     predicate. *)
 
-val get_number_ty: profile:Interval.Profile.t -> term -> number_ty
+val get_number_ty: logic_env:Interval.Logic_environment.t -> term -> number_ty
 (** @return the infered type for the given term. *)
 
-val get_integer_op: profile:Interval.Profile.t -> term -> number_ty
+val get_integer_op: logic_env:Interval.Logic_environment.t -> term -> number_ty
 (** @return the infered type for the top operation of the given term.
     It is meaningless to call this function over a non-arithmetical/logical
     operator. *)
 
 val get_integer_op_of_predicate:
-  profile:Interval.Profile.t -> predicate -> number_ty
+  logic_env:Interval.Logic_environment.t -> predicate -> number_ty
 (** @return the infered type for the top operation of the given predicate. *)
 
-val get_typ: profile:Interval.Profile.t -> term -> typ
+val get_typ: logic_env:Interval.Logic_environment.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
 
-val get_op: profile:Interval.Profile.t -> term -> typ
+val get_op: logic_env:Interval.Logic_environment.t -> term -> typ
 (** Get the type which the operation on top of the given term must be generated
     to. *)
 
-val get_cast: profile:Interval.Profile.t -> term -> typ option
+val get_cast: logic_env:Interval.Logic_environment.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
 
-val get_cast_of_predicate: profile:Interval.Profile.t -> predicate -> typ option
+val get_cast_of_predicate:
+  logic_env:Interval.Logic_environment.t -> predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
 val unsafe_set:
@@ -160,14 +161,24 @@ val unsafe_set:
 val typ_of_lty: logic_type -> typ
 (** @return the C type that correponds to the given logic type. *)
 
+(*****************************************************************************)
+(** {2 Typing processing} *)
+(*****************************************************************************)
+
 val type_program : file -> unit
 (** compute and store the type of all the terms that will be translated
     in a program *)
 
-val preprocess_predicate : Interval.Profile.t -> predicate -> unit
+val preprocess_predicate :
+  logic_env:Interval.Logic_environment.t ->
+  predicate ->
+  unit
 (** compute and store the types of all the terms in a given predicate  *)
 
-val preprocess_rte : profile:Interval.Profile.t -> code_annotation -> unit
+val preprocess_rte :
+  logic_env:Interval.Logic_environment.t ->
+  code_annotation ->
+  unit
 (** compute and store the type of all the terms in a code annotation *)
 
 (*
