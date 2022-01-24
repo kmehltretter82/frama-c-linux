@@ -71,6 +71,20 @@ let str_global_replace regex repl s =
   let res = Str.global_replace regex repl s in
   Mutex.unlock str_mutex; res
 
+(* The match may start after [pos] (instead of [str_string_match]) *)
+let str_string_contains regexp s pos =
+  Mutex.lock str_mutex;
+  let res = try
+      ignore (Str.search_forward regexp s pos) ;
+      true
+    with Not_found -> false
+  in
+  Mutex.unlock str_mutex; res
+
+let str_string_contains_option opt =
+  let re = Str.regexp ("\\( \\|^\\)"^ opt ^ "\\( \\|=\\|$\\)") in
+  str_string_contains re
+
 let str_string_match regex s n =
   Mutex.lock str_mutex;
   let res = Str.string_match regex s n in
@@ -812,14 +826,9 @@ struct
 
   let expand_directive =
     let deprecated_opts = "(-load-module|-load-script)" in
-    let re = Str.regexp "\\(-load-module\\|-load-script\\)" in
+    let contains_deprecated_opts = str_string_contains_option "\\(-load-module\\|-load-script\\)" in
     fun ~file macros s ->
-      Mutex.lock str_mutex;
-      let contains =
-        try ignore (Str.search_forward re s 0); true
-        with Not_found -> false
-      in
-      Mutex.unlock str_mutex;
+      let contains = contains_deprecated_opts s 0 in
       if contains then lock_eprintf "%s: DEPRECATED direct use of %s option: %s@.Please use PLUGIN, MODULE, SCRIPT or LIBS directive instead of the deprecated option.@." file deprecated_opts s;
       expand macros s
 
