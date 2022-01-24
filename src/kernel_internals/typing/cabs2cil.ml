@@ -5503,24 +5503,21 @@ and makeCompType ghost (isstruct: bool)
         match widtho with
         | None -> None, ftype
         | Some w -> begin
+            let source = fst w.expr_loc in
             (match unrollType ftype with
              | TInt (_, _) -> ()
              | TEnum _ -> ()
              | _ ->
-               Kernel.error ~once:true ~source
+               Kernel.abort ~once:true ~source
                  "Base type for bitfield is not an integer type");
             match isIntegerConstant ghost w with
             | None ->
-              Kernel.error ~source
+              Kernel.abort ~source
                 "bitfield width is not a valid integer constant";
-              (* error  does not immediately stop execution.
-                 Hence, we return a placeholder here.
-              *)
-              Some 0, ftype
             | Some s as w ->
               begin
                 if s < 0 then
-                  Kernel.error ~source "negative bitfield width (%d)" s;
+                  Kernel.abort ~source "negative bitfield width (%d)" s;
                 try
                   if s > Cil.bitsSizeOf ftype then
                     Kernel.error ~source
@@ -5559,8 +5556,12 @@ and makeCompType ghost (isstruct: bool)
               anonCompFieldName ^ (string_of_int !anonCompFieldNameId)
             end
           | _ -> n
-        end else
+        end else begin
+          if fbitfield = Some 0 then
+            Kernel.error ~source:(fst cloc)
+              "named bitfield (%s) with zero width" n;
           n
+        end
       in
       let rec is_circular t =
         match Cil.unrollType t with
