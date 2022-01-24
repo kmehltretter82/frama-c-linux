@@ -312,7 +312,6 @@ let term_to_ptr_and_size ~adata ~loc kf env t =
   let adata, env =
     Assert.register
       ~loc:t.term_loc
-      kf
       env
       (Format.asprintf "%a" Printer.pp_exp sizeof)
       sizeof

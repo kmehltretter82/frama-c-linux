@@ -142,7 +142,7 @@ let convert kf env loc ~is_forall quantif =
         Loops.mk_nested_loops ~loc mk_innermost_block kf env lvs_guards
       in
       let env =
-        Env.add_stmt env kf (Smart_stmt.block_stmt (mkBlock stmts))
+        Env.add_stmt env (Smart_stmt.block_stmt (mkBlock stmts))
       in
       (* where to jump to go out of the loop *)
       let end_loop = mkEmptyStmt ~loc () in
@@ -150,7 +150,7 @@ let convert kf env loc ~is_forall quantif =
       let label = Label(label_name, loc, false) in
       end_loop.labels <- label :: end_loop.labels;
       end_loop_ref := end_loop;
-      let env = Env.add_stmt env kf end_loop in
+      let env = Env.add_stmt env end_loop in
       res, env
     end
 

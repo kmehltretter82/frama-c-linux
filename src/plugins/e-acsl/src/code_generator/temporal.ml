@@ -220,10 +220,10 @@ let mk_stmt_from_assign loc lhs rhs =
 (* ************************************************************************** *)
 
 (* Top-level handler for Set instructions *)
-let set_instr ?(post=false) current_stmt loc lhs rhs env kf =
+let set_instr ?(post=false) loc lhs rhs env kf =
   if Memory_tracking.must_monitor_lval ~kf lhs then
     Option.fold
-      ~some:(fun stmt -> Env.add_stmt ~before:current_stmt ~post env kf stmt)
+      ~some:(fun stmt -> Env.add_stmt ~post env stmt)
       ~none:env
       (mk_stmt_from_assign loc lhs rhs)
   else
@@ -237,14 +237,13 @@ let set_instr ?(post=false) current_stmt loc lhs rhs env kf =
 module Function_call: sig
   (* Top-level handler for Call instructions *)
   val instr:
-    stmt -> lval option -> exp -> exp list -> location ->
-    Env.t -> kernel_function ->
+    lval option -> exp -> exp list -> location -> Env.t -> kernel_function ->
     Env.t
 end = struct
 
   (* Track function arguments: export referents of arguments to a global
      structure so they can be retrieved once that function is called *)
-  let save_params current_stmt loc args env kf =
+  let save_params loc args env kf =
     let (env, _) = List.fold_left
         (fun (env, index) param ->
            let lv = Mem(param), NoOffset in
@@ -255,7 +254,7 @@ end = struct
                  let env =
                    if Memory_tracking.must_monitor_exp ~kf param then
                      let stmt = Mk.save_param ~loc flow rhs index in
-                     Env.add_stmt ~before:current_stmt ~post:false env kf stmt
+                     Env.add_stmt ~post:false env stmt
                    else env
                  in
                  (env, index+1))
@@ -267,7 +266,7 @@ end = struct
 
   (* Update local environment with a statement tracking temporal metadata
      associated with assignment [ret] = [func(args)]. *)
-  let call_with_ret ?(alloc=false) current_stmt loc ret env kf =
+  let call_with_ret ?(alloc=false) loc ret env =
     let rhs = Smart_exp.lval ~loc ret in
     let vals = assign ret rhs loc in
     (* Track referent numbers of assignments via function calls.
@@ -298,13 +297,13 @@ end = struct
             else
               Mk.handle_return_referent ~save:false ~loc (Cil.mkAddrOf ~loc lhs)
           in
-          Env.add_stmt ~before:current_stmt ~post:true env kf stmt)
+          Env.add_stmt ~post:true env stmt)
       ~none:env
       vals
 
   (* Update local environment with a statement tracking temporal metadata
      associated with memcpy/memset call *)
-  let call_memxxx current_stmt loc args fexp env kf =
+  let call_memxxx loc args fexp env =
     if Libc.is_memcpy fexp || Libc.is_memset fexp then
       let prefix = RTL.temporal_prefix in
       let name = match fexp.enode with
@@ -314,11 +313,11 @@ end = struct
       let stmt =
         Smart_stmt.rtl_call ~loc ~prefix name args
       in
-      Env.add_stmt ~before:current_stmt ~post:false env kf stmt
+      Env.add_stmt ~post:false env stmt
     else
       env
 
-  let instr current_stmt ret fexp args loc env kf =
+  let instr ret fexp args loc env kf =
     (* Add function calls to reset_parameters and reset_return before each
        function call regardless. They are not really required, as if the
        instrumentation is correct then the right parameters will be saved
@@ -331,27 +330,27 @@ end = struct
       let name = "reset_parameters" in
       Smart_stmt.rtl_call ~loc ~prefix name []
     in
-    let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in
+    let env = Env.add_stmt ~post:false env stmt in
     let stmt = Mk.reset_return_referent ~loc in
-    let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in
+    let env = Env.add_stmt ~post:false env stmt in
     (* Push parameters with either a call to a function pointer or a function
         definition otherwise there is no point. *)
     let has_def = Functions.has_fundef fexp in
     let env =
       if Cil.isFunctionType (Cil.typeOf fexp) || has_def then
-        save_params current_stmt loc args env kf
+        save_params loc args env kf
       else
         env
     in
     (* Handle special cases of memcpy/memset *)
-    let env = call_memxxx current_stmt loc args fexp env kf in
+    let env = call_memxxx loc args fexp env in
     (* Memory allocating functions have no definitions so below expression
        should capture them *)
     let alloc = not has_def in
     Option.fold
       ~some:(fun lhs ->
           if Memory_tracking.must_monitor_lval ~kf lhs then
-            call_with_ret ~alloc current_stmt loc lhs env kf
+            call_with_ret ~alloc loc lhs env
           else env)
       ~none:env
       ret
@@ -364,30 +363,29 @@ end
 module Local_init: sig
   (* Top-level handler for Local_init instructions *)
   val instr:
-    stmt -> varinfo -> local_init -> location -> Env.t -> kernel_function ->
-    Env.t
+    varinfo -> local_init -> location -> Env.t -> kernel_function -> Env.t
 end = struct
 
-  let rec handle_init current_stmt offset loc vi init env kf = match init with
+  let rec handle_init offset loc vi init env kf = match init with
     | SingleInit exp ->
-      set_instr ~post:true current_stmt loc (Var vi, offset) exp env kf
+      set_instr ~post:true loc (Var vi, offset) exp env kf
     | CompoundInit(_, inits) ->
       List.fold_left
         (fun acc (off, init) ->
            let off = Cil.addOffset off offset in
-           handle_init current_stmt off loc vi init acc kf)
+           handle_init off loc vi init acc kf)
         env
         inits
 
-  let instr current_stmt vi li loc env kf =
+  let instr vi li loc env kf =
     if Memory_tracking.must_monitor_vi ~kf vi then
       match li with
       | AssignInit init ->
-        handle_init current_stmt NoOffset loc vi init env kf
+        handle_init NoOffset loc vi init env kf
       | ConsInit(fexp, args, _) ->
         let ret = Some (Cil.var vi) in
         let fexp = Cil.evar ~loc fexp in
-        Function_call.instr current_stmt ret fexp args loc env kf
+        Function_call.instr ret fexp args loc env kf
     else
       env
 end
@@ -399,13 +397,13 @@ end
 
 (* Update local environment with a statement tracking temporal metadata
    associated with adding a function argument to a stack frame *)
-let track_argument ?(typ) param index env kf =
+let track_argument ?(typ) param index env =
   let typ = Option.value ~default:param.vtype typ in
   match Cil.unrollType typ with
   | TPtr _
   | TComp _ ->
     let stmt = Mk.pull_param ~loc:Location.unknown param index in
-    Env.add_stmt ~post:false env kf stmt
+    Env.add_stmt ~post:false env stmt
   | TInt _ | TFloat _ | TEnum _ | TBuiltin_va_list _ -> env
   | TNamed _ -> assert false
   | TVoid _ |TArray _ | TFun _ ->
@@ -418,20 +416,20 @@ let track_argument ?(typ) param index env kf =
 
 (* Update local environment [env] with statements tracking return value
    of a function. *)
-let handle_return_stmt loc ret env kf =
+let handle_return_stmt loc ret env =
   match ret.enode with
   | Lval lv ->
     if Cil.isPointerType (Cil.typeOfLval lv) then
       let exp = Cil.mkAddrOf ~loc lv in
       let stmt = Mk.handle_return_referent ~loc ~save:true exp in
-      Env.add_stmt ~post:false env kf stmt
+      Env.add_stmt ~post:false env stmt
     else
       env
   | _ -> Options.fatal "Something other than Lval in return"
 
 let handle_return_stmt loc ret env kf =
   if Memory_tracking.must_monitor_exp ~kf ret then
-    handle_return_stmt loc ret env kf
+    handle_return_stmt loc ret env
   else
     env
 (* }}} *)
@@ -442,14 +440,14 @@ let handle_return_stmt loc ret env kf =
 
 (* Update local environment [env] with statements tracking
    instruction [instr] *)
-let handle_instruction current_stmt instr env kf =
+let handle_instruction instr env kf =
   match instr with
   | Set(lv, exp, loc) ->
-    set_instr current_stmt loc lv exp env kf
+    set_instr loc lv exp env kf
   | Call(ret, fexp, args, loc) ->
-    Function_call.instr current_stmt ret fexp args loc env kf
+    Function_call.instr ret fexp args loc env kf
   | Local_init(vi, li, loc) ->
-    Local_init.instr current_stmt vi li loc env kf
+    Local_init.instr vi li loc env kf
   | Asm _ ->
     Options.warning ~once:true ~current:true
       "@[Analysis is potentially incorrect in presence of assembly code.@]";
@@ -501,7 +499,7 @@ let handle_function_parameters kf env =
         (fun (env, index) param ->
            let env =
              if Memory_tracking.must_monitor_vi ~kf param
-             then track_argument param index env kf
+             then track_argument param index env
              else env
            in
            env, index + 1)
@@ -514,7 +512,7 @@ let handle_function_parameters kf env =
 let handle_stmt stmt env kf =
   if is_enabled () then begin
     match stmt.skind with
-    | Instr instr -> handle_instruction stmt instr env kf
+    | Instr instr -> handle_instruction instr env kf
     | Return(ret, loc) ->
       Option.fold ~some:(fun ret -> handle_return_stmt loc ret env kf) ~none:env ret
     | Goto _ | Break _ | Continue _ | If _ | Switch _ | Loop _ | Block _

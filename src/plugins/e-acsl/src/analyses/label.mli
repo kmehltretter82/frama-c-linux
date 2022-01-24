@@ -22,14 +22,8 @@
 
 open Cil_types
 
-val move: kernel_function -> old:stmt -> stmt -> unit
-(** Move all labels of the [old] stmt onto the new [stmt]. *)
-
 val get_stmt: kernel_function -> logic_label -> stmt
 (** @return the statement where the logic label points to. *)
-
-val self: State.t
-(** Internal state *)
 
 val get_first_inner_stmt: stmt -> stmt
 (** If the given statement has a label, return the first statement of the block.

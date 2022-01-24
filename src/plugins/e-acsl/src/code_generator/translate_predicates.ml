@@ -78,7 +78,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
   | Papp (li, [], args) ->
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc kf env li args in
-    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
@@ -195,7 +195,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     e, adata, env
   | Pforall _ | Pexists _ ->
     let e, env = Quantif.quantif_to_exp kf env p in
-    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pat(p, BuiltinLabel Here) ->
     to_exp ~adata kf env p
@@ -204,7 +204,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     let pot = PoT_pred p' in
     if Lscope.is_used lscope pot then
       let e, env = At_with_lscope.to_exp ~loc kf env pot label in
-      let adata, env = Assert.register_pred ~loc kf env p e adata in
+      let adata, env = Assert.register_pred ~loc env p e adata in
       e, adata, env
     else begin
       (* convert [t'] to [e] in a separated local env *)
@@ -213,7 +213,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
         Translate_utils.at_to_exp_no_lscope kf env None label e
       in
       assert (sty = Typed_number.C_number);
-      let adata, env = Assert.register_pred ~loc kf env p e adata in
+      let adata, env = Assert.register_pred ~loc env p e adata in
       e, adata, env
     end
   | Pvalid_read(BuiltinLabel Here, t) as pc
@@ -227,7 +227,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
       let e, adata, env =
         Memory_translate.call_valid ~adata ~loc kf name Cil.intType env t p
       in
-      let adata, env = Assert.register_pred ~loc kf env p e adata in
+      let adata, env = Assert.register_pred ~loc env p e adata in
       e, adata, env
     in
     (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
@@ -266,7 +266,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
         tlist
         p
     in
-    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pinitialized(BuiltinLabel Here, t) ->
     let e, adata, env =
@@ -289,7 +289,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
              [ t ]
              p
          in
-         let adata, env = Assert.register_pred ~loc kf env p e adata in
+         let adata, env = Assert.register_pred ~loc env p e adata in
          e, adata, env)
     in
     e, adata, env
@@ -299,7 +299,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     let e, adata, env =
       Memory_translate.call ~adata ~loc kf "freeable" Cil.intType env t
     in
-    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pfreeable _ -> Env.not_yet env "labeled \\freeable"
   | Pfresh _ -> Env.not_yet env "\\fresh"
@@ -375,10 +375,7 @@ let do_it ?pred_to_print kf env p =
         e
         pred_to_print
     in
-    Env.add_stmt
-      env
-      kf
-      stmt
+    Env.add_stmt env stmt
   | Admit -> env
 
 let predicate_to_exp_without_rte ~adata kf env p =

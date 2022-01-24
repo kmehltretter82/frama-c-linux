@@ -38,7 +38,7 @@ module Rtl_call: sig
   (** Call the C function [__e_acsl_contract_init] *)
 
   val cleanup:
-    loc:location -> Env.t -> kernel_function -> exp -> Env.t
+    loc:location -> Env.t -> exp -> Env.t
   (** Call the C function [__e_acsl_contract_cleanup] *)
 
   val set_assumes:
@@ -47,17 +47,15 @@ module Rtl_call: sig
   (** Call the C function [__e_acsl_contract_set_behavior_assumes] *)
 
   val get_assumes:
-    loc:location -> result:varinfo -> Env.t -> kernel_function -> exp -> int ->
-    Env.t
+    loc:location -> result:varinfo -> Env.t -> exp -> int -> Env.t
   (** Call the C function [__e_acsl_contract_get_behavior_assumes] *)
 
   val partial_count_behaviors:
-    loc:location -> result:varinfo -> Env.t -> kernel_function -> exp ->
-    int list -> Env.t
+    loc:location -> result:varinfo -> Env.t -> exp -> int list -> Env.t
   (** Call the C function [__e_acsl_contract_partial_count_behaviors] *)
 
   val partial_count_all_behaviors:
-    loc:location -> result:varinfo -> Env.t -> kernel_function -> exp -> Env.t
+    loc:location -> result:varinfo -> Env.t -> exp -> Env.t
     (** Call the C function [__e_acsl_contract_partial_count_all_behaviors] *)
 
 end = struct
@@ -88,10 +86,9 @@ end = struct
              init_function_name
              [count_e] ])
 
-  let cleanup ~loc env kf contract =
+  let cleanup ~loc env contract =
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          "contract_clean"
@@ -108,25 +105,23 @@ end = struct
     in
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          "contract_set_behavior_assumes"
          [contract; idx_e; assumes_e])
 
-  let get_assumes ~loc ~result env kf contract idx =
+  let get_assumes ~loc ~result env contract idx =
     let idx_e = Cil.integer ~loc idx in
     let result = Cil.var result in
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          ~result
          "contract_get_behavior_assumes"
          [contract; idx_e])
 
-  let partial_count_behaviors ~loc ~result env kf contract idxes =
+  let partial_count_behaviors ~loc ~result env contract idxes =
     let idxes, count =
       List.fold_right
         (fun idx (idxes, count) ->
@@ -137,18 +132,16 @@ end = struct
     let result = Cil.var result in
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          ~result
          "contract_partial_count_behaviors"
          (contract :: Cil.integer ~loc count :: idxes))
 
-  let partial_count_all_behaviors ~loc ~result env kf contract =
+  let partial_count_all_behaviors ~loc ~result env contract =
     let result = Cil.var result in
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          ~result
@@ -214,12 +207,12 @@ let init kf env contract =
   else env
 
 (** Cleanup the C API for the given contract *)
-let cleanup kf env contract =
+let cleanup env contract =
   match contract.var with
   | None -> env
   | Some (_, e) ->
     let loc = contract.location in
-    Rtl_call.cleanup ~loc env kf e
+    Rtl_call.cleanup ~loc env e
 
 (** Retrieve the behavior index from its name for the given contract *)
 let get_bhvr_idx contract bhvr_name =
@@ -422,12 +415,11 @@ let check_other_requires kf env contract =
             ~loc
             ~result:assumes_vi
             env
-            kf
             contract_e
             idx
         in
         let stmt = Smart_stmt.if_stmt ~loc ~cond:assumes_e requires_blk in
-        Env.add_stmt env kf stmt
+        Env.add_stmt env stmt
   in
   List.fold_left
     do_behavior
@@ -477,7 +469,6 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract 
                 ~loc
                 ~result:vi
                 env
-                kf
                 contract_e
             in
             let complete_msg = "all behaviors complete" in
@@ -498,7 +489,6 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract 
                 ~loc
                 ~result:vi
                 env
-                kf
                 contract_e
                 args
             in
@@ -520,7 +510,6 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract 
         let adata, env =
           Assert.register
             ~loc
-            kf
             env
             "number of active behaviors"
             active_bhvrs_e
@@ -544,16 +533,15 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract 
            for the given clause *)
         Env.add_stmt
           env
-          kf
           (Smart_stmt.if_stmt
              ~loc
              ~cond:(Cil.mkBinOp ~loc Ne active_bhvrs_e (Cil.one ~loc))
              (Cil.mkBlock [ assert_complete_stmt; assert_disjoint_stmt ]))
           (* Otherwise just get the corresponding assertion *)
       else if must_translate_complete then
-        Env.add_stmt env kf assert_complete_stmt
+        Env.add_stmt env assert_complete_stmt
       else if must_translate_disjoint then
-        Env.add_stmt env kf assert_disjoint_stmt
+        Env.add_stmt env assert_disjoint_stmt
       else
         (* By construction, at least either [must_translate_complete] or
            [must_translate_disjoint] is true *)
@@ -754,12 +742,11 @@ let check_post_conds kf env contract =
             ~loc
             ~result:assumes_vi
             env
-            kf
             contract_e
             idx
         in
         let stmt = Smart_stmt.if_stmt ~loc ~cond:assumes_e post_cond_blk in
-        Env.add_stmt env kf stmt
+        Env.add_stmt env stmt
   in
   List.fold_left
     do_behavior
@@ -795,4 +782,4 @@ let translate_postconditions kf env =
     env
   in
   let env = Env.handle_error do_it env in
-  cleanup kf env contract
+  cleanup env contract

@@ -385,9 +385,7 @@ end
 let add_assert kf stmt annot =
   Annotations.add_assert Options.emitter ~kf stmt annot
 
-let add_stmt ?(post=false) ?before env kf stmt =
-  if not post then
-    Option.iter (fun old -> E_acsl_label.move kf ~old stmt) before;
+let add_stmt ?(post=false) env stmt =
   let local_env, tl = top env in
   let block = local_env.block_info in
   let block =
@@ -400,6 +398,7 @@ let add_stmt ?(post=false) ?before env kf stmt =
   { env with env_stack = local_env :: tl }
 
 let extend_stmt_in_place env stmt ~label block =
+  let stmt = E_acsl_label.get_first_inner_stmt stmt in
   let new_stmt = Smart_stmt.block_stmt block in
   let sk = stmt.skind in
   stmt.skind <- Block (Cil.mkBlock [ new_stmt; Smart_stmt.stmt sk ]);

@@ -134,7 +134,6 @@ let handle_annotations env kf stmt =
             let adata, env =
               Assert.register
                 ~loc
-                kf
                 env
                 (Format.asprintf "old %a" Printer.pp_term t_old)
                 e_old
@@ -143,7 +142,6 @@ let handle_annotations env kf stmt =
             let adata, env =
               Assert.register
                 ~loc
-                kf
                 env
                 (Format.asprintf "current %a" Printer.pp_term t)
                 e
@@ -185,7 +183,6 @@ let handle_annotations env kf stmt =
             let adata1, env =
               Assert.register
                 ~loc
-                kf
                 env
                 (Format.asprintf "old %a" Printer.pp_term t)
                 e_old
@@ -226,7 +223,6 @@ let handle_annotations env kf stmt =
                 in
                 Assert.register
                   ~loc
-                  kf
                   env
                   (Format.asprintf "current %a" Printer.pp_term t)
                   e
@@ -322,7 +318,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let lv_x = var var_x in
     let env = match ctx with
       | Typing.C_integer _ -> env
-      | Typing.Gmpz -> Env.add_stmt env kf (Gmp.init ~loc x)
+      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
       | Typing.(C_float _ | Rational | Real | Nan) -> assert false
     in
     (* build the inner loops and loop body *)

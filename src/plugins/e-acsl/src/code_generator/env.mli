@@ -90,12 +90,9 @@ val add_assert: kernel_function -> stmt -> predicate -> unit
 (** [add_assert env s p] associates the assertion [p] to the statement [s] in
     the environment [env]. *)
 
-val add_stmt: ?post:bool -> ?before:stmt -> t -> kernel_function -> stmt -> t
+val add_stmt: ?post:bool -> t -> stmt -> t
 (** [add_stmt env s] extends [env] with the new statement [s].
-    [before] may define which stmt the new one is included before. This is to
-    say that any labels attached to [before] are moved to [stmt]. [post]
-    indicates that [stmt] should be added after the target statement.
-    [before] and [post] are mutually exclusive. *)
+    [post] indicates that [stmt] should be added after the target statement. *)
 
 val extend_stmt_in_place: t -> stmt -> label:logic_label -> block -> t
 (** [extend_stmt_in_place env stmt ~label b] modifies [stmt] in place in
