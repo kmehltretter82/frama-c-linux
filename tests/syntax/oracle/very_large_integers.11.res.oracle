@@ -1,19 +1,19 @@
 [kernel] Parsing very_large_integers.c (with preprocessing)
-[kernel] very_large_integers.c:74: Warning: 
+[kernel] very_large_integers.c:84: Warning: 
   ignoring invalid aligned attribute: __aligned__(9223372036854775808)
-[kernel] very_large_integers.c:74: Warning: 
+[kernel] very_large_integers.c:84: Warning: 
   ignoring invalid aligned attribute: __aligned__((9223372036854775808)+
                                                    (9223372036854775808) )
-[kernel:annot-error] very_large_integers.c:114: Warning: 
+[kernel:annot-error] very_large_integers.c:132: Warning: 
   Invalid slevel directive. Ignoring code annotation
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[kernel:annot-error] very_large_integers.c:111: Warning: 
+[kernel:annot-error] very_large_integers.c:129: Warning: 
   invalid loop unrolling parameter; ignoring
-[kernel:annot-error] very_large_integers.c:113: Warning: 
+[kernel:annot-error] very_large_integers.c:131: Warning: 
   invalid loop unrolling parameter; ignoring
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
