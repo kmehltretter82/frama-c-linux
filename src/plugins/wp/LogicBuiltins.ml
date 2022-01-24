@@ -248,7 +248,7 @@ let add_ctor ~source name kinds ~library ~link () =
   let lfun = Lang.extern_s ~library ~category ~params ~link name in
   register ~source name kinds (LFUN lfun)
 
-let add_type ?source name ~library ?(link=Lang.infoprover name) () =
+let add_type ?source name ~library ?(link=name) () =
   let mdt = Lang.extern_t name ~link ~library in
   register_type ?source name (E_mdt mdt)
 

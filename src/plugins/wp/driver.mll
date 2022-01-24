@@ -282,7 +282,7 @@ and bal = parse
     match token input with
       | LINK f | ID f ->
         let link = conv_bal def (f,(bal input.lexbuf)) in
-        skip input; Lang.infoprover link
+        skip input; link
       | RECLINK l ->
         skip input ;
         begin try conv_bal def (List.assoc "why3" l);
@@ -294,7 +294,7 @@ and bal = parse
   let linkstring input =
     match recorstring input.lexbuf with
       | `String f ->
-        skip input ; Lang.infoprover f
+        skip input ; f
       | `RecString l ->
         skip input ;
         begin try List.assoc "why3" l

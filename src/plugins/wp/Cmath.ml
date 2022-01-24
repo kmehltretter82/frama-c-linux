@@ -30,7 +30,7 @@ let f_builtin ~library ?(injective=false) ?(result=Real) ?(params=[Real]) ?ext n
   let call =
     match ext with Some call -> call | None ->
       String.sub name 1 (String.length name - 1) in
-  let link = Lang.infoprover (Engine.F_call call) in
+  let link = Engine.F_call call in
   let category =
     let open Qed.Logic in
     if injective then Injection else Function

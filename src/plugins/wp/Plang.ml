@@ -75,7 +75,6 @@ class engine =
   object(self)
     inherit E.engine as super
     inherit Lang.idprinting
-    method infoprover w = w
 
     (* --- Types --- *)
 

@@ -38,8 +38,8 @@ let library = "vlist"
 (*--- Linked Symbols ---*)
 
 let t_list = "\\list"
-let l_list = Lang.infoprover "list"
-let l_concat = Lang.infoprover (E.F_right "concat")
+let l_list = "list"
+let l_concat = E.F_right "concat"
 let l_elt = E.(F_call "elt")
 let l_repeat = E.(F_call "repeat")
 

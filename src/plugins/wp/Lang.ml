@@ -104,14 +104,6 @@ let lemma_id l = Printf.sprintf "Q_%s" (avoid_leading_backlash l)
 
 (* -------------------------------------------------------------------------- *)
 
-type 'a infoprover = 'a
-
-(* generic way to have different informations for the provers *)
-
-let infoprover x = x
-
-let map_infoprover f i = f i
-
 type library = string
 
 type datakind = KValue | KInit
@@ -124,7 +116,7 @@ type adt =
 and mdt = string extern (** name to print to the provers *)
 and 'a extern = {
   ext_id      : int;
-  ext_link : 'a infoprover;
+  ext_link : 'a ;
   ext_library : library; (** a library which it depends on *)
   ext_debug   : string; (** just for printing during debugging *)
 }
@@ -314,7 +306,7 @@ let is_builtin_type ~name = function
   | _ -> false
 
 let datatype ~library name =
-  let m = new_extern ~link:(infoprover name) ~library ~debug:name in
+  let m = new_extern ~link:name ~library ~debug:name in
   Mtype m
 
 let record ~link ~library fts =
@@ -478,7 +470,7 @@ let symbolf
                | Right -> Engine.F_right n
              in
              let link = match link with
-               | None -> infoprover (conv name balance)
+               | None -> conv name balance
                | Some info -> info
              in
              Extern (new_extern ~library:th ~link ~debug:name) in
@@ -510,7 +502,7 @@ let extern_f
 let extern_p ~library ?bool ?prop ?link ?(params=[]) ?(coloring=false) () =
   let link =
     match bool,prop,link with
-    | Some b , Some p , None -> infoprover (Engine.F_bool_prop(b,p))
+    | Some b , Some p , None -> Engine.F_bool_prop(b,p)
     | _ , _ , Some info -> info
     | _ , _ , _ -> assert false
   in
@@ -526,8 +518,8 @@ let extern_p ~library ?bool ?prop ?link ?(params=[]) ?(coloring=false) () =
 
 let extern_fp ~library ?(params=[]) ?link ?(coloring=false) phi =
   let link = match link with
-    | None -> infoprover (Engine.F_call phi)
-    | Some link -> map_infoprover (fun phi -> Engine.F_call(phi)) link in
+    | None -> Engine.F_call phi
+    | Some link -> Engine.F_call link in
   Model {
     m_category = Logic.Function ;
     m_params = params ;
@@ -629,7 +621,6 @@ let parameters phi = Fun.parameters := phi
 
 class virtual idprinting =
   object(self)
-    method virtual infoprover: 'a. 'a infoprover -> 'a
     method virtual sanitize : string -> string
 
     method sanitize_type  = self#sanitize
@@ -637,8 +628,8 @@ class virtual idprinting =
     method sanitize_fun   = self#sanitize
 
     method datatype = function
-      | Mtype a -> self#infoprover a.ext_link
-      | Mrecord(a,_) -> self#infoprover a.ext_link
+      | Mtype a -> a.ext_link
+      | Mrecord(a,_) -> a.ext_link
       | Comp(c, KValue) -> self#sanitize_type (comp_id c)
       | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
@@ -650,7 +641,7 @@ class virtual idprinting =
       | ACSL f -> Engine.F_call (self#sanitize_fun (logic_id f))
       | CTOR c -> Engine.F_call (self#sanitize_fun (ctor_id c))
       | Model({m_source=Generated(_,n)}) -> Engine.F_call (self#sanitize_fun n)
-      | Model({m_source=Extern e}) -> self#infoprover e.ext_link
+      | Model({m_source=Extern e}) -> e.ext_link
   end
 
 let name_of_lfun = function
