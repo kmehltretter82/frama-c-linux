@@ -34,13 +34,9 @@ let library = "memory"
 let a_addr = Lang.datatype ~library "addr"
 let t_addr = L.Data(a_addr,[])
 let f_base   = Lang.extern_f ~library ~result:L.Int
-    ~link:{why3    = Qed.Engine.F_call "base";
-           coq     = Qed.Engine.F_subst("(base %1)");
-          } "base"
+    ~link:(Qed.Engine.F_subst ("base", "%1.base")) "base"
 let f_offset = Lang.extern_f ~library ~result:L.Int
-    ~link:{why3    = Qed.Engine.F_call "offset";
-           coq     = Qed.Engine.F_subst("(offset %1)");
-          } "offset"
+    ~link:(Qed.Engine.F_subst ("offset", "%1.offset")) "offset"
 let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
 let f_global = Lang.extern_f ~library ~result:t_addr ~category:L.Injection "global"
 let f_null   = Lang.extern_f ~library ~result:t_addr "null"
@@ -58,15 +54,8 @@ let ty_fst_arg = function
   | Some l :: _ -> l
   | _ -> raise Not_found
 
-let l_havoc = Qed.Engine.{
-    coq = F_call "fhavoc" ;
-    why3 = F_call "havoc" ;
-  }
-
-let l_set_init = Qed.Engine.{
-    coq = F_call "fset_init" ;
-    why3 = F_call "set_init" ;
-  }
+let l_havoc = Qed.Engine.F_call "havoc"
+let l_set_init = Qed.Engine.F_call "set_init"
 
 let p_valid_rd = Lang.extern_fp ~library "valid_rd"
 let p_valid_rw = Lang.extern_fp ~library "valid_rw"

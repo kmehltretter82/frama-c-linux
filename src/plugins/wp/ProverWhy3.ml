@@ -520,8 +520,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         in
         match lfun_name f, expected with
         | F_call s, _ -> apply_from_ns' s l sort
-        | Qed.Engine.F_subst _, _ ->
-            why3_failure "Driver link with subst not yet implemented"
+        | Qed.Engine.F_subst (s, _), _ -> apply_from_ns' s l sort
         | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
             let rec aux = function
               | [] -> why3_failure "Empty application"

@@ -81,10 +81,7 @@
     | `Default -> conv_bal default (name,default)
     | `Left  -> Qed.Engine.F_left name
     | `Right -> Qed.Engine.F_right name
-    | `Nary  ->
-        if Qed.Plib.is_template name
-        then Qed.Engine.F_subst name
-        else Qed.Engine.F_call name
+    | `Nary  -> Qed.Engine.F_call name
 
 }
 
