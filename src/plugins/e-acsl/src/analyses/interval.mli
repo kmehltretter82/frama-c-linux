@@ -88,6 +88,7 @@ val extended_interv_of_typ: Cil_types.typ -> t
     @raise Is_a_real if the given type is a float type.
     @raise Not_a_number if the given type does not represent any number. *)
 
+val plus_one : ival -> ival
 
 (* ************************************************************************** *)
 (** {3 Environment for interval computations} *)

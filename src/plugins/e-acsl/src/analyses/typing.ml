@@ -564,57 +564,39 @@ let rec type_term
         | LBpred p ->
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
+          List.iter
+            (fun x -> ignore
+                (type_term ~use_gmp_opt ~under_lambda ~arith_operand ~profile x))
+            args;
+          let new_profile = List.map (Interval.get_p ~profile) args in
           Stack.push
             (fun () ->
-               let typed_args =
-                 type_args
-                   ~use_gmp_opt
-                   ~profile
-                   li.l_profile
-                   args
-                   li.l_var_info.lv_name
-               in
-               ignore (type_predicate ~profile:typed_args p))
+               ignore (type_predicate ~profile:new_profile p))
             pending_typing;
           dup c_int
         | LBterm t_body ->
-          begin match li.l_type with
-            | None ->
-              assert false
-            | Some lty ->
-              (* TODO: what if the function returns a real? *)
-              let ty = ty_of_logic_ty ~term:t lty in
-              let type_args_and_body () =
-                let typed_args =
-                  type_args
-                    ~use_gmp_opt
-                    ~profile
-                    li.l_profile
-                    args
-                    li.l_var_info.lv_name
-                in
-                (* Since there are no global logic variables, the typing of the
-                   inner block of the function only depends on the function's
-                   own arguments, so the [~profile] parameter gets replaced with
-                   the type of the parameters in the current function calls *)
-                ignore (type_term ~use_gmp_opt ~profile:typed_args t_body)
-              in
-              Stack.push
-                pending_typing;
-              Stack.push
-                type_args_and_body
-                pending_typing;
-              dup ty
-          end
+          List.iter
+            (fun x -> ignore
+                (type_term ~use_gmp_opt ~under_lambda ~arith_operand ~profile x))
+            args;
+          let new_profile = List.map (Interval.get_p ~profile) args in
+          Stack.push
+            (fun () ->
+               ignore (type_term
+                         ~use_gmp_opt
+                         ~under_lambda:true
+                         ~arith_operand
+                         ?ctx
+                         ~profile:new_profile
+                         t_body))
+            pending_typing;
+          dup (ty_of_interv ?ctx ~use_gmp_opt (Interval.get_p ~profile t))
         | LBnone ->
           (match args with
            | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->
-             let anonymous =
-               Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
-             in
-             let ty_bound = Interval.get anonymous in
+             let ty_bound = Interval.(plus_one (get_p ~profile t2)) in
              let ty_bound =
-               ty_of_interv (Interval.join ty_bound (Interval.get t1))
+               ty_of_interv (Interval.join ty_bound (Interval.get_p ~profile t1))
              in
              ignore
                (type_term

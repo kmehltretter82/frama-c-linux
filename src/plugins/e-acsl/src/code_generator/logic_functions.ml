@@ -122,7 +122,7 @@ let generate_body ~loc kf env ret_ty ret_vi = function
   | LBnone |LBreads _ | LBinductive _ -> assert false
 
 (* Generate a kernel function from a given logic info [li] *)
-let generate_kf ~loc fname env ret_ty params_ty li =
+let generate_kf ~loc fname env ret_ty params_ty params_ival li =
   (* build the formal parameters *)
   let params, params_ty_vi =
     List.fold_right2
@@ -196,23 +196,9 @@ let generate_kf ~loc fname env ret_ty params_ty li =
     let env = Env.push env in
     (* fill the typing environment with the function's parameters
        before generating the code (code generation invokes typing) *)
-    let env = Env.Local_vars.push_new env in
+    let env = Env.Logic_env.push_new env li.l_profile params_ival in
     let env =
-      let add ty env =
-        Env.Local_vars.add env ty
-      in
-      (* The list of parameters has to respect the order of the parameters to
-         keep consistency with the typing. Hence the folding is on the right.
-         This is acceptable since in practice functions have few parameters *)
-      List.fold_right add params_ty env
-    in
-    let env =
-      let add env lvi vi =
-        let i = Interval.interv_of_typ vi.vtype in
-        Interval.Env.add lvi i;
-        Env.Logic_binding.add_binding env lvi vi
-      in
-      List.fold_left2 add env li.l_profile params
+      List.fold_left2 (Env.Logic_binding.add_binding) env li.l_profile params
     in
     let assigns_from =
       try Some (Assigns.get_assigns_from ~loc env li.l_profile li.l_var_info)
@@ -332,7 +318,7 @@ let add_generated_functions globals =
 
 (* Generate (and memoize) the function body and create the call to the
    generated function. *)
-let function_to_exp ~loc ?tapp fname env kf li params_ty args =
+let function_to_exp ~loc ?tapp fname env kf li params_ty params_ival args =
   let ret_ty =
     match tapp with
     | Some tapp ->
@@ -341,10 +327,9 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty args =
     | None  -> (Cil_types.TInt (IInt, []))
   in
   let gen tbl =
-    let vi, kf, gen_body = generate_kf fname ~loc env ret_ty params_ty li in
-    (* TODO: Compute profile before *)
-    (* Interval.Profile.Hashtbl.add tbl params_ty kf; *)
-    Interval.Profile.Hashtbl.add tbl [] kf;
+    let vi, kf, gen_body =
+      generate_kf fname ~loc env ret_ty params_ty params_ival li in
+    Interval.Profile.Hashtbl.add tbl params_ival kf;
     vi, gen_body
   in
   (* memoise the function's varinfo *)
@@ -352,9 +337,7 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty args =
     try
       let h = Logic_info.Hashtbl.find memo_tbl li in
       try
-        (* TODO: Compute profile before *)
-        (* let kf = Interval.Profile.Hashtbl.find h params_ty in *)
-        let kf = Interval.Profile.Hashtbl.find h [] in
+        let kf = Interval.Profile.Hashtbl.find h params_ival in
         Kernel_function.get_vi kf,
         (fun () -> ()) (* body generation already planified *)
       with Not_found -> gen h
@@ -454,7 +437,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
       begin
         raise_errors li.l_body;
         (* build the arguments and compute the integer_ty of the parameters *)
-        let params_ty, args, adata, env =
+        let params_ty, params_ival, args, adata, env =
           let eargs, adata, env =
             match eargs with
             | None ->
@@ -473,11 +456,15 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           in
           try
             List.fold_right2
-              (fun targ earg (params_ty, args, adata, env) ->
+              (fun targ earg (params_ty, params_ival ,args, adata, env) ->
+                 let logic_env = Env.Logic_env.get env in
                  let param_ty =
                    Typing.get_number_ty
-                     ~profile:(Env.Local_vars.get env)
+                     ~logic_env
                      targ
+                 in
+                 let param_ival =
+                   Interval.get ~logic_env targ
                  in
                  let e, env =
                    try
@@ -493,9 +480,13 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
                    with Typing.Not_a_number ->
                      earg, env
                  in
-                 param_ty :: params_ty, e :: args, adata, env)
+                 param_ty :: params_ty,
+                 param_ival :: params_ival,
+                 e :: args,
+                 adata,
+                 env)
               targs eargs
-              ([], [], adata ,env)
+              ([], [], [], adata ,env)
           with Invalid_argument _ ->
             Options.fatal
               "[Tapp] unexpected number of arguments when calling %s"
@@ -505,7 +496,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
         in
         let vi, e, env =
-          function_to_exp ~loc ?tapp gen_fname env kf li params_ty args
+          function_to_exp ~loc ?tapp gen_fname env kf li params_ty params_ival args
         in
         vi, e, adata, env
       end

@@ -525,6 +525,9 @@ end = struct
 
 end
 
+let plus_one i =
+  lift_arith_binop Ival.add_int i (singleton Integer.one)
+
 (* ********************************************************************* *)
 (* Main functions *)
 (* ********************************************************************* *)
@@ -636,6 +639,7 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
 let rec infer ~logic_env t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   let get_res = Error.map (fun x -> x) in
+  let t = Logic_normalizer.get_term t in
   let compute t =
     match t.term_node with
     | TConst (Integer (n, _)) -> singleton n
@@ -761,7 +765,49 @@ let rec infer ~logic_env t =
        | _ -> assert false)
     | Tnull  -> singleton_of_int 0
     | TLogic_coerce (_, t) -> get_res (infer ~logic_env t)
-    | Tapp (_,_,_) -> assert false
+    | Tapp (li,_,args) ->
+      (match li.l_body with
+       | LBpred p ->
+         let args_ival =
+           List.map
+             (fun arg -> get_res (infer ~logic_env arg))
+             args
+         in
+         let logic_env = Logic_environment.create li.l_profile args_ival in
+         ignore (infer_predicate ~logic_env p);
+         Ival Ival.zero_or_one
+       | LBterm t' ->
+         (* No fixpoint for now *)
+         let args_ival =
+           List.map
+             (fun arg -> get_res (infer ~logic_env arg))
+             args
+         in
+         let logic_env = Logic_environment.create li.l_profile args_ival in
+         get_res (infer ~logic_env t')
+       | LBnone when li.l_var_info.lv_name = "\\sum" ||
+                     li.l_var_info.lv_name = "\\product" ->
+         (match args with
+          | [ t1; t2; { term_node = Tlambda([ k ], _) } as lambda ] ->
+            let t1_iv = infer ~logic_env t1 in
+            let t2_iv = infer ~logic_env t2 in
+            let k_iv = Error.map2 join t1_iv t2_iv in
+            let logic_env_with_k =
+              Logic_environment.add_let_quantif_binding logic_env k k_iv
+            in
+            let lambda_iv = infer ~logic_env:logic_env_with_k lambda in
+            Error.map3 (infer_sum_product li.l_var_info) lambda_iv t1_iv t2_iv
+          | _ -> Error.not_yet "extended quantifiers without lambda term")
+       | LBnone
+       | LBreads _ ->
+         List.iter
+           (fun arg -> ignore (infer ~logic_env arg))
+           args;
+         (match li.l_type with
+          | None -> assert false
+          | Some ret_type -> interv_of_logic_typ ret_type)
+       | LBinductive _ ->
+         Error.not_yet "logic functions inductively defined")
 
     | Tunion _ -> Error.not_yet "tset union"
     | Tinter _ -> Error.not_yet "tset intersection"
@@ -877,7 +923,7 @@ and infer_term_offset ~logic_env t =
    - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
      Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
      Return: R with a guard guaranteeing that [lv] does not overflow *)
-let rec infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
+and infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
   let get_res = Error.map (fun x -> x) in
   let i1 = get_res (infer ~logic_env t1) in
   let i2 = get_res (infer ~logic_env t2) in
@@ -921,73 +967,87 @@ let rec infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
   Logic_environment.add_let_quantif_binding logic_env lv i, (t1, lv, t2)
 
 and infer_predicate ~logic_env p =
-  match Logic_normalizer.get_pred p with
-  | PoT_term t -> ignore (infer ~logic_env t)
-  | PoT_pred p ->
-    match p.pred_content with
-    | Pfalse | Ptrue -> ()
-    | Papp(_, _, _) -> ()
-    (* TODO: Implement this case *)
-    | Pdangling _ -> ()
-    | Prel(_, t1, t2) ->
-      ignore (infer ~logic_env t1);
-      ignore (infer ~logic_env t2)
-    | Pand(p1, p2)
-    | Por(p1, p2)
-    | Pxor(p1, p2)
-    | Pimplies(p1, p2)
-    | Piff(p1, p2) ->
-      infer_predicate ~logic_env p1;
-      infer_predicate ~logic_env p2
-    | Pnot p ->
-      infer_predicate ~logic_env p;
-    | Pif(t, p1, p2) ->
-      ignore (infer ~logic_env t);
-      infer_predicate ~logic_env p1;
-      infer_predicate ~logic_env p2
-    | Plet(li, p) ->
-      let li_t = Misc.term_of_li li in
-      let li_v = li.l_var_info in
-      let i = infer ~logic_env li_t in
-      let logic_env =
-        Error.map (Logic_environment.add_let_quantif_binding logic_env li_v) i
-      in
-      (infer_predicate ~logic_env p)
-    | Pforall _
-    | Pexists _ ->
-      let guards, goal =
-        Error.retrieve_preprocessing
-          "quantified predicate"
-          Bound_variables.get_preprocessed_quantifier
-          p
-          Printer.pp_predicate
-      in
-      let loc = p.pred_loc in
-      let rec do_analysis guards new_guards logic_env = match guards with
-        | [] -> logic_env, new_guards
-        | guard :: guards ->
-          let  logic_env, new_guard =
-            infer_bound_variable ~loc ~logic_env guard
-          in
-          do_analysis guards (new_guard :: new_guards) logic_env
-      in
-      let logic_env, new_guards = do_analysis guards [] logic_env in
-      Bound_variables.replace p new_guards goal;
-      infer_predicate ~logic_env goal
-    | Pseparated tlist ->
-      List.iter
-        (fun t -> ignore (infer ~logic_env t))
-        tlist;
-    | Pinitialized(_, t)
-    | Pfreeable(_, t)
-    | Pallocable(_, t)
-    | Pvalid(_, t)
-    | Pvalid_read(_, t)
-    | Pobject_pointer(_,t)
-    | Pvalid_function t ->
-      ignore (infer ~logic_env t);
-    | Pat(p, _) -> infer_predicate ~logic_env p
-    | Pfresh _ -> Error.not_yet "\\fresh"
+  let get_res = Error.map (fun x -> x) in
+  let p = Logic_normalizer.get_pred p in
+  match p.pred_content with
+  | Pfalse | Ptrue -> ()
+  | Papp(li, _, args) ->
+    (match li.l_body with
+     | LBpred p ->
+       let args_ival =
+         List.map
+           (fun arg -> get_res (infer ~logic_env arg))
+           args
+       in
+       let logic_env = Logic_environment.create li.l_profile args_ival in
+       ignore (infer_predicate ~logic_env p)
+     | LBnone -> ()
+     | LBreads _ -> ()
+     | LBinductive _ -> ()
+     | LBterm _ ->
+       Options.fatal "unexpected logic definition"
+         Printer.pp_predicate p
+    )
+  | Pdangling _ -> ()
+  | Prel(_, t1, t2) ->
+    ignore (infer ~logic_env t1);
+    ignore (infer ~logic_env t2)
+  | Pand(p1, p2)
+  | Por(p1, p2)
+  | Pxor(p1, p2)
+  | Pimplies(p1, p2)
+  | Piff(p1, p2) ->
+    infer_predicate ~logic_env p1;
+    infer_predicate ~logic_env p2
+  | Pnot p ->
+    infer_predicate ~logic_env p;
+  | Pif(t, p1, p2) ->
+    ignore (infer ~logic_env t);
+    infer_predicate ~logic_env p1;
+    infer_predicate ~logic_env p2
+  | Plet(li, p) ->
+    let li_t = Misc.term_of_li li in
+    let li_v = li.l_var_info in
+    let i = infer ~logic_env li_t in
+    let logic_env =
+      Error.map (Logic_environment.add_let_quantif_binding logic_env li_v) i
+    in
+    (infer_predicate ~logic_env p)
+  | Pforall _
+  | Pexists _ ->
+    let guards, goal =
+      Error.retrieve_preprocessing
+        "quantified predicate"
+        Bound_variables.get_preprocessed_quantifier
+        p
+        Printer.pp_predicate
+    in
+    let loc = p.pred_loc in
+    let rec do_analysis guards new_guards logic_env = match guards with
+      | [] -> logic_env, new_guards
+      | guard :: guards ->
+        let  logic_env, new_guard =
+          infer_bound_variable ~loc ~logic_env guard
+        in
+        do_analysis guards (new_guard :: new_guards) logic_env
+    in
+    let logic_env, new_guards = do_analysis guards [] logic_env in
+    Bound_variables.replace p new_guards goal;
+    infer_predicate ~logic_env goal
+  | Pseparated tlist ->
+    List.iter
+      (fun t -> ignore (infer ~logic_env t))
+      tlist;
+  | Pinitialized(_, t)
+  | Pfreeable(_, t)
+  | Pallocable(_, t)
+  | Pvalid(_, t)
+  | Pvalid_read(_, t)
+  | Pobject_pointer(_,t)
+  | Pvalid_function t ->
+    ignore (infer ~logic_env t);
+  | Pat(p, _) -> infer_predicate ~logic_env p
+  | Pfresh _ -> Error.not_yet "\\fresh"
 
 let infer t =
   let i = infer t in
