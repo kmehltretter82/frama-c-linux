@@ -108,7 +108,8 @@ int main(void)
   }
   /*@ assert !\valid(q); */ ;
   __retres = 0;
-  return_label: __e_acsl_store_block_duplicate((void *)(& q),(size_t)8);
+  return_label:
+  __e_acsl_store_block_duplicate((void *)(& q),(size_t)8);
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(arr));
   __e_acsl_memory_clean();

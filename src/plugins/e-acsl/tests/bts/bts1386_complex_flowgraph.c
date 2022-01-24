@@ -1,3 +1,7 @@
+/* run.config
+   STDOPT: #"-eva-slevel 5"
+*/
+
 /* MDH WCET BENCHMARK SUITE. File version $Id: duff.c,v 1.4 2005/12/21 09:43:07 jgn Exp $ */
 
 /*----------------------------------------------------------------------

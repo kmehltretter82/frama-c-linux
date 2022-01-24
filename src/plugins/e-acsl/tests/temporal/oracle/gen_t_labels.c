@@ -49,7 +49,8 @@ int main(int argc, char const **argv)
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)(& b));
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
-  LAB: __e_acsl_temporal_reset_parameters();
+  LAB:
+  __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& p),0U);
   __e_acsl_temporal_save_nreferent_parameter((void *)(& q),1U);
@@ -118,8 +119,9 @@ int main(int argc, char const **argv)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(p) && \valid(q); */ ;
+  LAB2:
   __e_acsl_full_init((void *)(& q));
-  LAB2: __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& p));
+  __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& p));
   q = p;
   {
     int __gen_e_acsl_initialized_3;

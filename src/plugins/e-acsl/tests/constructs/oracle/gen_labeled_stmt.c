@@ -17,7 +17,6 @@ int __gen_e_acsl_main(void)
   int __retres;
   goto L1;
   L1:
-  /*@ assert X == 0; */
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"X",0,X);
@@ -30,11 +29,10 @@ int __gen_e_acsl_main(void)
     __e_acsl_assert(X == 0,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
+  /*@ assert X == 0; */ ;
   X = 1;
   goto L2;
   L2:
-  /*@ requires X == 1;
-      ensures X == 2; */
   {
     {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -48,8 +46,10 @@ int __gen_e_acsl_main(void)
       __gen_e_acsl_assert_data_2.line = 13;
       __e_acsl_assert(X == 1,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-      X = 2;
     }
+    /*@ requires X == 1;
+        ensures X == 2; */
+    X = 2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"X",0,X);

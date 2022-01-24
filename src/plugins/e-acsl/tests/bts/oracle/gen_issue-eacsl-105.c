@@ -16,7 +16,6 @@ int f(void)
   __e_acsl_full_init((void *)(& a));
   goto lbl_1;
   lbl_2:
-  /*@ assert \valid(&a); */
   {
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -37,6 +36,7 @@ int f(void)
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
+  /*@ assert \valid(&a); */ ;
   __retres = 0;
   goto return_label;
   lbl_1: goto lbl_2;
