@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Tactical
+open Conditions
 
 class clear =
   object(_)
@@ -34,8 +35,38 @@ class clear =
       | Clause(Step step) ->
           let removed = [ "Cleared hypothesis", Conditions.Have Lang.F.p_true] in
           Applicable (Tactical.replace ~at:step.id removed)
-      | _ ->
-          Not_applicable
+      | Inside(Step step, remove) ->
+          let cond p = (* keep original kind of step *)
+            match step.condition with
+            | Type _ -> Type p
+            | Have _ -> Have p
+            | When _ -> When p
+            | Core _ -> Core p
+            | Init _ -> Init p
+            | _ -> assert false (* see above pattern matching *)
+          in
+          let rec collect p =
+            match Lang.F.p_expr p with
+            | And ps -> collect_list ps
+            | _ -> [ p ]
+          and collect_list = function
+            | [] -> []
+            | p :: l -> List.rev_append (List.rev @@ collect p) (collect_list l)
+          in
+          begin match step.condition with
+            | Type p | Have p | When p | Core p | Init p ->
+                let ps = Lang.F.e_props @@ collect p in
+                if List.mem remove ps then
+                  let ps = List.filter (fun x -> x <> remove) ps in
+                  let cond = cond @@ Lang.F.p_bool @@ Lang.F.e_and ps in
+                  let filtered = [ "Filtered", cond ] in
+                  Applicable (Tactical.replace ~at:step.id filtered)
+                else
+                  Not_applicable
+
+            | _ -> Not_applicable
+          end
+      | _ -> Not_applicable
   end
 
 let tactical = Tactical.export (new clear)
