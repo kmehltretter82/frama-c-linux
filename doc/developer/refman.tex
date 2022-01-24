@@ -841,8 +841,7 @@ to your needs. See \texttt{ocamlmerlin -help} for the list of flags.
 \subsection{Pre-defined macros for tests commands}\label{sec:ptests-macros}
 Ptests pre-defines a certain number of macros for each test about to be run.
 Figure~\ref{fig:ptests-macros} gives their definition.
-\begin{figure}[htbp]
-\begin{tabular}{|p{4.5cm}|p{10cm}|}
+\begin{longtable}{|p{4.5cm}|p{10cm}|}
 \hline
 Name & Expansion \\
 \hline
@@ -897,9 +896,8 @@ one for regular tests (if more than one \verb|OPT|).\\
 \hline
 \verb|frama-c-exe| & set to the value of the \verb|TOPLEVEL_PATH| variable from \verb|./tests/ptests_config| file\\
 \hline
-\end{tabular}
 \caption{Predefined macros for ptests}\label{fig:ptests-macros}
-\end{figure}
+\end{longtable}
 
 \section{Profiling with Landmarks} \label{refman:landmarks}\codeidxdef{Landmarks}
 
@@ -937,6 +935,17 @@ For quick usage of the library:
 
 Commonly used options include \verb+output=landmarks.log+ to output the result
 to a file instead of \texttt{stderr}.
+
+To instrument a single file: add \verb+[@@@landmark "auto"]+ at the beginning
+of the file.
+
+To instrument a single function: add \verb+[@landmark]+ after the \texttt{let},
+e.g.:
+
+\begin{lstlisting}
+  let[@landmark] add_visitor vis =
+\end{lstlisting}
+
 Check \url{https://github.com/LexiFi/landmarks} for its documentation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
