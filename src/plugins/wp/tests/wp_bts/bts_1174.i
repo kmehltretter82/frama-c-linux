@@ -1,5 +1,5 @@
 /* run.config_qualif
-   OPT: -wp -wp-prover coq -wp-model +real
+   OPT: -wp -wp-model +real
 */
 
 /*@ requires -10. <= x && x <= 10.; */

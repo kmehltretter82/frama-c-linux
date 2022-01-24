@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-prover coq -wp-timeout 240
+   DONTRUN:
 */
 
 typedef struct _list { int element; struct _list* next; } list;
