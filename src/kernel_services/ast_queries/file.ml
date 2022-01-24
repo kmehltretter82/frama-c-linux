@@ -991,7 +991,7 @@ let cleanup file =
         DoChildren
       | GFunDecl(s,_,_) ->
         Logic_utils.clear_funspec s;
-        DoChildren
+        SkipChildren
       | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _
       | GEnumTagDecl _ | GVar _ | GVarDecl _ | GAsm _ | GPragma _ | GText _
       | GAnnot _  ->
@@ -1003,6 +1003,13 @@ let cleanup file =
              Cfg.clearFileCFG ~clear_id:false f;
              Cfg.computeFileCFG f; f end
             else f)
+
+    method! vinst _ = SkipChildren
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
   in visitFramacFileSameGlobals visitor file
 
