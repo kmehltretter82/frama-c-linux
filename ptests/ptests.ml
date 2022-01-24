@@ -358,7 +358,7 @@ let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
 let macro_default_options = ref "-journal-disable -check -no-autoload-plugins"
 
 let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
-let macro_frama_c      = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"
+let macro_frama_c     = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"
 let default_toplevel = ref "@frama-c@"
 
 (* Those variables are read from a ptests_config file *)
@@ -1585,23 +1585,21 @@ end = struct
     let process_macros s = Macros.expand macros s in
     let toplevel =
       let toplevel = log_default_filter cmd.toplevel in
-      let in_toplevel,toplevel= Macros.does_expand macros toplevel in
-      if not cmd.execnow then begin
-        let has_ptest_file, options =
-          if in_toplevel.has_ptest_opt then in_toplevel.has_ptest_file, []
-          else
-            let in_option,options= Macros.does_expand macros cmd.options in
-            (in_option.has_ptest_file || in_toplevel.has_ptest_file),
-            (if in_toplevel.has_frama_c_exe then
-               [ process_macros "@PTEST_PRE_OPTIONS@" ;
-                 options ;
-                 process_macros "@PTEST_POST_OPTIONS@" ;
-               ]
-             else [ options ])
+      let in_toplevel,toplevel = Macros.does_expand macros toplevel in
+      if cmd.execnow || in_toplevel.has_ptest_opt then toplevel
+      else begin
+        let has_ptest_file,options =
+          let in_option,options = Macros.does_expand macros cmd.options in
+          (in_option.has_ptest_file || in_toplevel.has_ptest_file),
+          (if in_toplevel.has_frama_c_exe then
+             [ process_macros "@PTEST_PRE_OPTIONS@" ;
+               options ;
+               process_macros "@PTEST_POST_OPTIONS@" ;
+             ]
+           else [ options ])
         in
         String.concat " " (toplevel::(if has_ptest_file then options else ptest_file::options))
       end
-      else toplevel
     in
     let toplevel = get_ptest_toplevel cmd (dune_feature_cmd toplevel) in
     { cmd with
