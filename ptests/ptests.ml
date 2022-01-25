@@ -785,7 +785,11 @@ struct
       let has_frama_c_exe = ref false in
       if !verbosity >= 4 then lock_printf "%% Expand: %s@." s;
       if !verbosity >= 5 then print_macros macros;
+      let nb_loops = ref 0 in
       let rec aux s =
+        if !nb_loops > 100 then
+          fail "Possible infinite recursion in macro expands"
+        else incr nb_loops ;
         let expand_macro = function
           | Str.Text s -> s
           | Str.Delim s ->
