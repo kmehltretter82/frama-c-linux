@@ -1,6 +1,6 @@
 /* run.config*
  PLUGIN: @EVA_PLUGINS@ metrics
- EXECNOW: BIN @PTEST_NAME@.sav @frama-c@ -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' @PTEST_FILE@ -save @PTEST_NAME@.sav
+ EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' @PTEST_FILE@ -save @PTEST_NAME@.sav >@PTEST_NAME@_sav.res 2>@PTEST_NAME@_sav.err
  MODULE: check_libc_naming_conventions, check_const
    OPT: -load %{dep:@PTEST_NAME@.sav} -print -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' -eva @EVA_CONFIG@ -then -lib-entry -no-print
  MODULE:
