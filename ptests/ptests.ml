@@ -64,6 +64,13 @@ module Filename = struct
   let sanitize f = String.escaped f
 end
 
+let str_string_match1 regexp line pos =
+  if Str.string_match regexp line pos then
+    try
+      Some (Str.matched_group 1 line)
+    with Not_found -> None
+  else None
+
 (* removes first blanks *)
 let trim_right s =
   let n = ref (String.length s - 1) in
@@ -430,45 +437,61 @@ module Macros = struct
     StringMap.iter (fun key data -> Format.fprintf fmt "- %s -> %s@." key data) macros;
     Format.fprintf fmt "End macros@."
 
-  let does_expand macros s =
-    if !verbosity >=5 then begin
-      Format.printf "%%     - Looking for macros in string %s@. Existing %a@." s pp_macros macros;
-    end;
-    let nb_loops = ref 0 in
-    let rec aux n (ptest_file_matched,s as acc) =
-      incr nb_loops ;
-      if Str.string_match macro_regex s n then begin
-        let macro = Str.matched_group 2 s in
-        let ptest_file_matched = ptest_file_matched || macro = "PTEST_FILE" in
-        let start = Str.matched_group 1 s in
-        let rest = Str.matched_group 3 s in
-        let new_n = Str.group_end 1 in
-        let n, new_s =
-          if macro = "" then begin
-            new_n + 1, String.sub s 0 new_n ^ "@" ^ rest
-          end else begin
-            try
-              if !verbosity >= 5 then Format.printf "%%     - macro is %s@." macro;
-              let replacement =  StringMap.find macro macros in
-              if !verbosity >= 4 then
-                Format.printf "%%     - replacement for %s is %s@." macro replacement;
-              if !nb_loops > 100 then fail "Possible infinite recursivity in macro expands" ;
-              new_n,
-              String.sub s 0 n ^ start ^ replacement ^ rest
-            with
-            | Not_found -> Str.group_end 2 + 1, s
-          end
+type does_expand = {
+  has_ptest_file : bool;
+  has_ptest_opt : bool;
+  has_frama_c_exe : bool;
+}
+
+
+  let does_expand =
+    let macro_regex = Str.regexp "@\\([-A-Za-z_0-9]+\\)@" in
+    fun macros s ->
+      let has_ptest_file = ref false in
+      let has_ptest_opt = ref false in
+      let has_ptest_options = ref false in
+      let has_frama_c_exe = ref false in
+      if !verbosity >= 4 then Format.printf "%% Expand: %s@." s;
+      if !verbosity >= 5 then Format.printf "%a" pp_macros macros;
+      let nb_loops = ref 0 in
+      let rec aux s =
+        if !nb_loops > 100 then
+          fail "Possible infinite recursivity in macro expands"
+        else incr nb_loops ;
+        let expand_macro = function
+          | Str.Text s -> s
+          | Str.Delim s ->
+            match str_string_match1 macro_regex s 0  with
+            | Some macro -> begin
+                (match macro with
+                 | "PTEST_FILE" -> has_ptest_file := true
+                 | "PTEST_OPT" -> has_ptest_opt := true
+                 | "PTEST_OPTIONS" -> has_ptest_options := true
+                 | "frama-c-exe" -> has_frama_c_exe := true
+                 | _ -> ());
+                if !verbosity >= 5 then Format.printf "%%     - macro is %s\n%!" macro;
+                try
+                  let replacement = StringMap.find macro macros in
+                  if !verbosity >= 4 then
+                    Format.printf "%%     - replacement for %s is %s\n%!" macro replacement;
+                  aux replacement
+                with Not_found -> s
+              end
+            | None -> s
         in
-        if !verbosity >= 5 then Format.printf "%%    - New string is %s@." new_s;
-        let new_acc = ptest_file_matched, new_s in
-        if n <= String.length new_s then aux n new_acc else new_acc
-      end else acc
-    in
-    try
-      aux 0 (false,s)
-    with e ->
-      Format.eprintf "Uncaught exception %s@." (Printexc.to_string e);
-      raise e
+        String.concat "" (List.map expand_macro (Str.full_split macro_regex s))
+      in
+      let r =
+        try aux s
+        with e ->
+          Format.eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
+          raise e
+      in
+      if !verbosity >= 4 then Format.printf "%% Expansion result: %s@." r;
+      { has_ptest_file= !has_ptest_file;
+        has_ptest_opt= !has_ptest_opt;
+        has_frama_c_exe= !has_frama_c_exe;
+      }, r
 
   let expand (macros:t) s =
     snd (does_expand macros s)
