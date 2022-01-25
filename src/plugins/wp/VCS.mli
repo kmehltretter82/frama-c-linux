@@ -28,8 +28,6 @@
 
 type prover =
   | Why3 of Why3Provers.t (** Prover via WHY *)
-  | NativeAltErgo (** Direct Alt-Ergo *)
-  | NativeCoq     (** Direct Coq and Coqide *)
   | Qed           (** Qed Solver *)
   | Tactical      (** Interactive Prover *)
 

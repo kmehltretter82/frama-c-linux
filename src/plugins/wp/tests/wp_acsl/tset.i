@@ -1,11 +1,11 @@
 /* run.config_qualif
-   OPT: -wp -wp-prover alt-ergo,native:coq -wp-coq-script %{dep:@PTEST_DIR@/tset.s}
+   OPT: -wp -wp-prover alt-ergo
 */
 
 /*@
 
   lemma UNION_EQ:
-  \forall integer x,y ; 
+  \forall integer x,y ;
   (\union(0,x) == \union(0,y)) <==> (x==y) ;
 
   lemma UNION_LIFT:

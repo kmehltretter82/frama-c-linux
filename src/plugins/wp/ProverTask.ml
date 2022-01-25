@@ -302,7 +302,6 @@ let server ?procs () =
       let np = getprocs procs in
       let s = Task.server ~procs:np () in
       Why3Provers.set_procs np ;
-      Task.on_server_stop s Proof.savescripts ;
       server := Some s ; s
 
 (* -------------------------------------------------------------------------- *)

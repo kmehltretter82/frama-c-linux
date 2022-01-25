@@ -52,7 +52,6 @@ class engine :
     (**/**)
     inherit Lang.idprinting
     method sanitize : string -> string
-    method infoprover : 'a. 'a Lang.infoprover -> 'a
     method op_spaced : string -> bool
     (**/**)
   end

@@ -140,7 +140,7 @@ let lfun_name (lfun:Lang.lfun) =
   | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
   | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
   | Model({m_source=Generated(_,n)}) -> Qed.Engine.F_call n
-  | Model({m_source=Extern e}) -> e.Lang.ext_link.Lang.why3
+  | Model({m_source=Extern e}) -> e.Lang.ext_link
 
 
 let coerce ~cnv sort expected r =
@@ -151,8 +151,8 @@ let coerce ~cnv sort expected r =
   | _ -> r
 
 let name_of_adt = function
-  | Lang.Mtype a -> a.Lang.ext_link.Lang.why3
-  | Mrecord(a,_) -> a.Lang.ext_link.Lang.why3
+  | Lang.Mtype a -> a.Lang.ext_link
+  | Mrecord(a,_) -> a.Lang.ext_link
   | Comp (c, KValue) -> Lang.comp_id c
   | Comp (c, KInit) -> Lang.comp_init_id c
   | Atype lt -> Lang.type_id lt
@@ -520,8 +520,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         in
         match lfun_name f, expected with
         | F_call s, _ -> apply_from_ns' s l sort
-        | Qed.Engine.F_subst _, _ ->
-            why3_failure "Driver link with subst not yet implemented"
+        | Qed.Engine.F_subst (s, _), _ -> apply_from_ns' s l sort
         | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
             let rec aux = function
               | [] -> why3_failure "Empty application"

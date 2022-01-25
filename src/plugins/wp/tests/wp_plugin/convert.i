@@ -4,7 +4,6 @@
 
 /* run.config_qualif
    OPT:
-   OPT: -wp-prover native:alt-ergo -wp-report=%{dep:@PTEST_SUITE_DIR@/../native.report}
 */
 
 // --------------------------------------------------------------------------

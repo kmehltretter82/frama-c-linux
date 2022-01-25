@@ -106,9 +106,7 @@ struct
   let file_goal ~pid ~model ~prover =
     let ext = match prover with
       | Qed -> "qed"
-      | NativeAltErgo -> "mlw"
       | Why3 _ -> "why"
-      | NativeCoq -> "v"
       | Tactical -> "tac"
     in
     let id = WpPropId.get_propid pid in
@@ -117,9 +115,7 @@ struct
   let file_kf ~kf ~model ~prover =
     let ext = match prover with
       | Qed -> "qed"
-      | NativeAltErgo -> "mlw"
       | Why3 _ -> "why"
-      | NativeCoq -> "v"
       | Tactical -> "tac"
     in
     let id = (Kf.vi kf).vname in
@@ -470,7 +466,7 @@ module ProverType =
       type t = prover
       include Datatype.Undefined
       let name = "Wpo.prover"
-      let reprs = [ NativeAltErgo; NativeCoq; Qed ]
+      let reprs = [ Qed ]
     end)
 (* to get a "reasonable" API doc: *)
 let () = Type.set_ml_name ProverType.ty (Some "Wpo.prover")
