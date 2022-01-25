@@ -1,4 +1,6 @@
 /* run.config
+
+
  COMMENT: do not compare generated journals since they depend on current time
  PLUGIN: @EVA_PLUGINS@
    EXECNOW: BIN control_journal.ml @frama-c@ @PTEST_FILE@ -journal-enable -eva -deps -out @EVA_OPTIONS@ -main f -journal-name @PTEST_RESULT@/control_journal.ml > @DEV_NULL@ 2> @DEV_NULL@

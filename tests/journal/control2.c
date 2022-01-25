@@ -1,4 +1,6 @@
 /* run.config
+
+
  PLUGIN: @EVA_PLUGINS@
    EXECNOW: BIN control_journal2.ml @frama-c@ -journal-enable -eva -deps -out -main f -journal-name @PTEST_RESULT@/control_journal2.ml @PTEST_FILE@ > @DEV_NULL@ 2> @DEV_NULL@
  SCRIPT: @PTEST_RESULT@/control_journal2.ml

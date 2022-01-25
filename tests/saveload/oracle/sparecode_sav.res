@@ -6,15 +6,15 @@
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
 [eva] computing for function f <- main.
-  Called from sparecode.i:16.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
-  Called from sparecode.i:17.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
   Called from sparecode.i:18.
+[eva] Recording results for f
+[eva] Done for function f
+[eva] computing for function f <- main.
+  Called from sparecode.i:19.
+[eva] Recording results for f
+[eva] Done for function f
+[eva] computing for function f <- main.
+  Called from sparecode.i:20.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main
