@@ -1,6 +1,6 @@
 /* run.config
-
-
+ COMMENT: the following CMD redefinition omits adding @PTEST_FILE@ on purpose (due to -load)
+ CMD: @frama-c@ @PTEST_OPTIONS@
  PLUGIN: @EVA_PLUGINS@
    EXECNOW: BIN control_journal2.ml @frama-c@ -journal-enable -eva -deps -out -main f -journal-name @PTEST_RESULT@/control_journal2.ml @PTEST_FILE@ > @DEV_NULL@ 2> @DEV_NULL@
  SCRIPT: @PTEST_RESULT@/control_journal2.ml

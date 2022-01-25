@@ -1,4 +1,3 @@
-[kernel] Warning: ignoring source files specified on the command line while loading a global initial context.
 [eva] Analyzing a complete application starting at main2
 [eva] Computing initial state
 [eva] Initial state computed
