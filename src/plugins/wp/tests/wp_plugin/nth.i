@@ -40,7 +40,7 @@
   check lemma not_nil_elt: ok: ([| 1 |] ^ A) != A ;
 
 
-  check lemma repeat1: ko: (S *^ N) == (S *^ M)
+  check lemma repeat1: ok: (S *^ N) == (S *^ M)
                       <==> (  N == M || ( ((S *^ N) ^ A) == A && ((S *^ M) ^ A) == A ) ) ;
 
   check lemma repeat2: ok: ( ((S *^ N) ^ S) *^ M ) == ( ( S ^ (S *^ N)) *^ M ) ;
@@ -50,9 +50,9 @@
   check lemma left_unfold_repeat1:  ok: ( ((S ^ A ^ B) *^ 3) ^ A ^ S ) == (S ^ C)
                           <==> (  A ^ B ^ ((S ^ A ^ B) *^ 2) ^ A ^ S ) == (    C);
 
-  check lemma right_shift_repeat1:  ko: ( A ^ S ^ ((B ^ A ^ S) *^ N) ) == (C ^ S)
+  check lemma right_shift_repeat1:  ok: ( A ^ S ^ ((B ^ A ^ S) *^ N) ) == (C ^ S)
                                    <==> ( A ^ ((S ^ B ^ A    ) *^ N) ) == (C    );
-  check lemma right_unfold_repeat1: ko: ( S ^ A ^ ((B ^ A ^ S) *^ 3) ) == (C ^ S)
+  check lemma right_unfold_repeat1: ok: ( S ^ A ^ ((B ^ A ^ S) *^ 3) ) == (C ^ S)
                             <==> ( S ^ A ^ ((B ^ A ^ S) *^ 2) ^ B ^ A) == (C    );
 
 
@@ -61,13 +61,13 @@
   check lemma left_unfold_repeat2:  ok: ( ((S ^ A ^ B) *^ 3) ^         C) == (S ^ A)
                                    <==> (A ^ A ^ B ^ C ^ S) == A ;
 
-  check lemma right_shift_repeat2:  ko: ( C ^ A ^ S ^ ((B ^ A ^ S) *^ N) ) == (A ^ S)
+  check lemma right_shift_repeat2:  ok: ( C ^ A ^ S ^ ((B ^ A ^ S) *^ N) ) == (A ^ S)
                                    <==> ( (C ^ S) == S && (N<=0 || (A ^ B ^ S ^ S) == S) );
-  check lemma right_unfold_repeat2: ko: ( C ^         ((B ^ A ^ S) *^ 3) ) == (A ^ S)
+  check lemma right_unfold_repeat2: ok: ( C ^         ((B ^ A ^ S) *^ 3) ) == (A ^ S)
                                    <==> (A ^ B ^ C ^ S ^ S) == S ;
 
 
-  check lemma subsequence1: ko: ( A ^ (S *^ N) ^ B ^ S ^ C ) == ( (S *^ N) ^ S )
+  check lemma subsequence1: ok: ( A ^ (S *^ N) ^ B ^ S ^ C ) == ( (S *^ N) ^ S )
                            <==> ( A ^ B ^ C ^ C ) == C ;
 
   }
