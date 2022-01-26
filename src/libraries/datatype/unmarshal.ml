@@ -62,15 +62,17 @@ and structure =
 ;;
 
 let arch_sixtyfour = Sys.word_size = 64;;
-let arch_bigendian = (Obj.magic [| 0x00002600 |] : string).[1] <> 'L';;
-let arch_float_endianness = (Obj.magic 1.23530711838574823e-307 : string).[1];;
+let arch_bigendian =
+  (Obj.magic (Sys.opaque_identity [| 0x00002600 |]) : string).[1] <> 'L';;
+let arch_float_endianness =
+  (Obj.magic (Sys.opaque_identity 1.23530711838574823e-307) : string).[1];;
 
 let ill_formed reason =
   let msg = "input_value: ill-formed message" in
   failwith (if false(*debug*) then Printf.sprintf "%s (%s)" msg reason else msg)
 
-let zeroword = Obj.field (Obj.repr 0L) 0;;
-let null = zeroword;;
+(* Not actually null, but guaranteed to be a unique pointer *)
+let null = Obj.repr (Sys.opaque_identity (ref 0));;
 
 let id x = x;;
 
