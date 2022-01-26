@@ -109,7 +109,7 @@ let translate_va_builtin caller inst =
     if Cil.isIntegralType ty then begin
       let promoted_type = Cil.integralPromotion ty in
       if promoted_type <> ty then
-        Self.warning ~current:true
+        Self.warning ~current:true ~wkey:wkey_typing
           "Wrong type argument in va_start: %a is promoted to %a when used \
            in the variadic part of the arguments. (You should pass %a to \
            va_start)"
