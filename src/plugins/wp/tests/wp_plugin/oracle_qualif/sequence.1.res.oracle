@@ -33,16 +33,16 @@
 [wp] [Qed] Goal typed_caveat_loops_assigns_normal_part1 : Valid
 [wp] [Qed] Goal typed_caveat_loops_assigns_normal_part2 : Valid
 [wp] [Qed] Goal typed_caveat_loops_assigns_normal_part3 : Valid
-[wp] [Alt-Ergo] Goal typed_caveat_loops_g_called_ensures_ok_u1 : Valid
+[wp] [Qed] Goal typed_caveat_loops_g_called_ensures_ok_u1 : Valid
 [wp] [Qed] Goal typed_caveat_loops_g_called_ensures_ok_u2 : Valid
 [wp] [Alt-Ergo] Goal typed_caveat_loops_g_not_called_ensures_ok_v1 : Valid
 [wp] [Alt-Ergo] Goal typed_caveat_loops_g_not_called_ensures_ok_v2 : Valid
 [wp] Proved goals:   34 / 34
-  Qed:            22 
-  Alt-Ergo:       12
+  Qed:            23 
+  Alt-Ergo:       11
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   no_calls                  2        3        5       100%
   sequence                  8        2       10       100%
-  loops                    12        7       19       100%
+  loops                    13        6       19       100%
 ------------------------------------------------------------

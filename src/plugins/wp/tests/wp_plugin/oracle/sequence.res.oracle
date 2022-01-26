@@ -34,7 +34,7 @@ Assume {
   (* Call 'f' *)
   Have: L_call_obs(call_seq_3) = a_1.
 }
-Prove: nth(a_1, 1 + length(a)) = z.
+Prove: nth(a_1, 1 + i) = z.
 
 ------------------------------------------------------------
 
@@ -181,30 +181,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition for 'g_called' 'ok,u1' in 'loops':
-Let a = ([ y ] *^ i).
-Assume {
-  Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x) /\ is_sint32(y) /\
-      is_sint32(z).
-  (* Heap *)
-  Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
-  Have: L_call_obs(call_seq_0) = nil.
-  (* Pre-condition for 'g_called' *)
-  Have: 0 < n.
-  (* Call 'f' *)
-  Have: L_call_obs(call_seq_1) = [ x ].
-  (* Invariant 'ok,id_min' *)
-  Have: 0 <= i.
-  (* Invariant 'ok,id_max' *)
-  Have: i <= n.
-  (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
-  (* Else *)
-  Have: n <= i.
-  (* Call 'f' *)
-  Have: L_call_obs(call_seq_3) = [ x ] ^ a ^ [ z ].
-}
-Prove: length(a) = i.
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -240,7 +217,7 @@ Assume {
   (* Call 'f' *)
   Have: L_call_obs(call_seq_3) = [ x ] ^ a ^ [ z ].
 }
-Prove: length(a) = 0.
+Prove: i = 0.
 
 ------------------------------------------------------------
 
