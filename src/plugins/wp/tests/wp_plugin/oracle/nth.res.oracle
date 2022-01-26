@@ -11,9 +11,7 @@ Prove: true
 ------------------------------------------------------------
 
 Lemma left_shift_repeat1:
-Prove: let a_0 = (concat L_A L_B L_S) in
-       (L_C=(concat (repeat a_0 L_N) L_A))=
-       (L_C=(concat (repeat a_0 L_N) L_A))
+Prove: true
 
 ------------------------------------------------------------
 
@@ -23,9 +21,7 @@ Prove: true
 ------------------------------------------------------------
 
 Lemma left_unfold_repeat1:
-Prove: let a_0 = (concat L_S L_A L_B) in
-       (L_C=(concat L_A L_B (repeat a_0 2) L_A L_S))=
-       (L_C=(concat L_A L_B (repeat a_0 2) L_A L_S))
+Prove: true
 
 ------------------------------------------------------------
 
@@ -50,9 +46,7 @@ Prove: true
 ------------------------------------------------------------
 
 Lemma right_shift_repeat1:
-Prove: let a_0 = (concat L_S L_B L_A) in
-       (L_C=(concat L_A (repeat a_0 L_N)))=
-       (L_C=(concat L_A (repeat a_0 L_N)))
+Prove: true
 
 ------------------------------------------------------------
 
@@ -62,9 +56,7 @@ Prove: true
 ------------------------------------------------------------
 
 Lemma right_unfold_repeat1:
-Prove: let a_0 = (concat L_B L_A L_S) in
-       (L_C=(concat L_S L_A (repeat a_0 2) L_B L_A))=
-       (L_C=(concat L_S L_A (repeat a_0 2) L_B L_A))
+Prove: true
 
 ------------------------------------------------------------
 
@@ -97,8 +89,7 @@ Prove: true
 ------------------------------------------------------------
 
 Lemma repeat_repeated:
-Prove: let x_0 = ((land 1 L_N)*(land 2 L_M)) in
-       (P_P (repeat L_S x_0)) <-> (P_P (repeat L_S x_0))
+Prove: true
 
 ------------------------------------------------------------
 ------------------------------------------------------------

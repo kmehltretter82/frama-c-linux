@@ -147,7 +147,7 @@ let v_nil t = F.e_fun ~result:t f_nil []
 let v_elt e = F.e_fun f_elt [e]
 let v_concat es tau = F.e_fun f_concat es ~result:tau
 let v_length l = F.e_fun f_length [l]
-let v_repeat s n = F.e_fun f_repeat [s;n]
+let v_repeat s n tau = F.e_fun f_repeat [s;n] ~result:tau
 
 (* -------------------------------------------------------------------------- *)
 (* --- Rewriters                                                          --- *)
@@ -167,7 +167,7 @@ let rewrite_length e =
       F.e_if (F.e_leq e_zero n) (F.e_mul n (v_length u)) e_zero
   | _ ->
       (* NB. do not considers \Cons because they are removed *)
-      raise Not_found 
+      raise Not_found
 
 let match_natural k =
   match F.repr k with
@@ -228,7 +228,7 @@ let rewrite_repeat s n =
     | L.Fun( repeat , [s0 ; n0] ) (* n0>=0 && n>=0 ==> ((s0 *^ n0) *^ n) == (s0 *^ (n0 * n)) *)
       when (repeat == f_repeat) &&
            (Cint.is_positive_or_null n) &&
-           (Cint.is_positive_or_null n0) -> v_repeat s0 (F.e_mul n0 n)
+           (Cint.is_positive_or_null n0) -> v_repeat s0 (F.e_mul n0 n) (F.typeof s)
     | _ -> raise Not_found
 
 let rec leftmost a ms =
@@ -243,14 +243,14 @@ let rec leftmost a ms =
              let u,us = leftmost u [] in
              if F.decide (F.e_eq u b) then
                (*  u=b ==>  ((u^us)*^n) ^ b ^ ms  == u ^ (us^b)*^n) ^ ms *)
-               Some (u, v_repeat (v_concat (us@[b]) (F.typeof a)) n :: ms)
+               Some (u, v_repeat (v_concat (us@[b]) (F.typeof a)) n (F.typeof a) :: ms)
              else None
          | _ -> None) with
       | Some res -> res
       | None ->
           if F.decide (F.e_lt F.e_zero n) then
             (* 0<n ==> (u*^n) ^ ms ==  u ^ (u*^(n-1)) ^ ms *)
-            leftmost u (v_repeat u (F.e_sub n F.e_one) :: ms)
+            leftmost u (v_repeat u (F.e_sub n F.e_one) (F.typeof a) :: ms)
           else a , ms
     end
   | _ -> a , ms
@@ -279,14 +279,14 @@ let rec rightmost ms a =
              let us,u = rightmost [] u in
              if F.decide (F.e_eq u b) then
                (*  u=b ==>  (ms ^ b ^ (us^u)*^n) == ms ^ (b^us)*^n) ^ u *)
-               Some (ms @ [ v_repeat (v_concat (b::us) (F.typeof a)) n ], u)
+               Some (ms @ [ v_repeat (v_concat (b::us) (F.typeof a)) n (F.typeof a)], u)
              else None
          | _ -> None) with
       | Some res -> res
       | None ->
           if F.decide (F.e_lt F.e_zero n) then
             (* 0<n ==> ms ^ (u*^n) ==  ms ^ (u*^(n-1)) ^ u *)
-            rightmost (ms @ [v_repeat u (F.e_sub n F.e_one)]) u
+            rightmost (ms @ [v_repeat u (F.e_sub n F.e_one) (F.typeof a)]) u
           else ms , a
     end
   | _ -> ms , a
@@ -330,7 +330,6 @@ let rightmost_eq a b =
   else
     raise Not_found
 
-
 let rewrite_is_nil ~nil a =
   let p_is_nil a = F.p_equal nil a  in
   match F.repr a with
@@ -343,7 +342,6 @@ let rewrite_is_nil ~nil a =
       F.p_or (F.p_leq n F.e_zero) (p_is_nil s)
   | _ ->
       raise Not_found
-
 
 (* Ensures xs to be a sub-sequence of ys, otherwise raise Not_found
    In such a case, (concat xs = concat ys) <==> (forall r in result, r = nil) *)
@@ -386,15 +384,15 @@ let repeat_eq a x n b y m =
     (* x *^ n == y *^ n  <==> ( x == y || n<=0 ) *)
     F.p_or (F.p_leq n e_zero) (Lang.F.p_bool e_eq_x_y)
   else if F.decide (e_eq (v_length x) (v_length y)) then
-    (* \lenght(x)=\lenght(y)  ==> ( x *^ n == y *^ m  <==> ( m == n && x == y) || (x *^ n == [] && y *^ m == [] ) *)
+    (* \length(x)=\length(y)  ==> ( x *^ n == y *^ m  <==> ( m == n && x == y) || (x *^ n == [] && y *^ m == [] ) *)
     let nil_a = v_nil (F.typeof a) in
     let nil_b = v_nil (F.typeof b) in
     F.p_or (F.p_and (F.p_bool e_eq_n_m) (Lang.F.p_bool e_eq_x_y))
       (F.p_and (F.p_equal a nil_b) (F.p_equal nil_a b))
   else raise Not_found
 
-let rewrite_eq a b =
-  debug "Vlist.rewrite_eq: tries to rewrite %a@ = %a@.- left pattern:  %a@.- right pattern: %a@."
+let rewrite_eq_sequence a b =
+  debug "Vlist.rewrite_eq_sequence: tries to rewrite %a@ = %a@.- left pattern:  %a@.- right pattern: %a@."
     Lang.F.pp_term a Lang.F.pp_term b
     pp_pattern a pp_pattern b;
   match F.repr a , F.repr b with
@@ -415,6 +413,40 @@ let rewrite_eq a b =
           F.p_false
         else raise Not_found
 
+let rewrite_eq_length a b =
+  match F.repr a , F.repr b with
+  | L.Fun(length_a,[_]), L.Fun(length_b,[_]) when length_a == f_length &&
+                                                  length_b == f_length ->
+      (* N.B. cannot be simplified by the next patterns *)
+      raise Not_found
+  | _, L.Fun(length,[_]) when length == f_length &&
+                              F.decide (e_lt a e_zero) ->
+      (* a < 0  ==>  ( a=\length(b) <=> false ) *)
+      F.p_false
+  | L.Fun(length,[_]), _ when length == f_length &&
+                              F.decide (e_lt b e_zero) ->
+      (* b < 0  ==>  ( \length(a)<=b <=> false ) *)
+      F.p_false
+  | _ -> raise Not_found
+
+let rewrite_leq_length a b =
+  match F.repr a , F.repr b with
+  | L.Fun(length_a,[_]), L.Fun(length_b,[_]) when length_a == f_length &&
+                                                  length_b == f_length ->
+      (* N.B. cannot be simplified by the next patterns *)
+      raise Not_found
+  | L.Fun(length,[_]), _ when length == f_length &&
+                              F.decide (e_lt b e_zero) ->
+      (* b < 0  ==>  ( \length(a)<=b <=> false ) *)
+      F.e_false
+  (* N.B. the next rule does not allow to split on the sign of \length(a) with TIP
+     | _, L.Fun(length,[_]) when length == f_length &&
+                              F.decide (e_leq a e_zero) ->
+        (* a <= 0  ==>  ( a<=\length(b) <=> true ) *)
+      F.e_true
+  *)
+  | _ -> raise Not_found
+
 
 (* All Simplifications *)
 
@@ -425,9 +457,11 @@ let () =
       F.set_builtin_2' f_cons rewrite_cons ;
       F.set_builtin_2 f_repeat rewrite_repeat ;
       F.set_builtin_1 f_length rewrite_length ;
-      F.set_builtin_eqp f_concat rewrite_eq ;
-      F.set_builtin_eqp f_repeat rewrite_eq ;
-      F.set_builtin_eqp f_nil rewrite_eq ;
+      F.set_builtin_leq f_length rewrite_leq_length ;
+      F.set_builtin_eqp f_length rewrite_eq_length ;
+      F.set_builtin_eqp f_concat rewrite_eq_sequence ;
+      F.set_builtin_eqp f_repeat rewrite_eq_sequence ;
+      F.set_builtin_eqp f_nil rewrite_eq_sequence ;
     end
 
 (* -------------------------------------------------------------------------- *)
