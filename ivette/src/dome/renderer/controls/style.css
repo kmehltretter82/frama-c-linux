@@ -48,7 +48,6 @@
     background: #777 ;
 }
 
-.dome-window-inactive .dome-xBadge,
 .dome-disabled .dome-xBadge
 {
     background: #ccc ;
@@ -112,8 +111,7 @@
 }
 
 .dome-xButton:disabled,
-.dome-xButton:active:disabled,
-.dome-window-inactive .dome-xButton
+.dome-xButton:active:disabled
 {
     fill: #b0b0b0 ;
     border-color: #ccc ;

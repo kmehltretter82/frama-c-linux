@@ -185,16 +185,10 @@
 .dome-xSplitter-vpos-R { position: absolute; height: 1px; width: 100% }
 .dome-xSplitter-vpos-B { position: absolute; bottom: 0px; width: 100% }
 
-.dome-window-active .dome-xSplitter-hline,
-.dome-window-active .dome-xSplitter-vline
+.dome-xSplitter-hline,
+.dome-xSplitter-vline
 {
     background: #afafaf ;
-}
-
-.dome-window-inactive .dome-xSplitter-hline,
-.dome-window-inactive .dome-xSplitter-vline
-{
-    background: #d6d6d6 ;
 }
 
 /* -------------------------------------------------------------------------- */

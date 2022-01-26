@@ -38,11 +38,6 @@
     border-right-style: solid ;
 }
 
-.dome-window-inactive .dome-xTab.dome-inactive {
-    color: #606060 ;
-    border-color: inherit ;
-}
-
 .dome-xTab.dome-inactive:hover {
     background: #bababa ;
 }
@@ -51,11 +46,6 @@
     color: #606060 ;
     border-color: #9c9c9c ;
     background: #b4b4b4 ;
-}
-
-.dome-window-inactive .dome-xTab.dome-inactive {
-    color: #b0b0b0 ;
-    background: #e6e6e6 ;
 }
 
 /* Closing Tab button */
@@ -107,8 +97,8 @@
     padding: 0px ;
 }
 
-.dome-window-active .dome-xSideBar.dome-color-frame,
-.dome-window-active .dome-xSideBarSection-title.dome-color-frame
+.dome-xSideBar.dome-color-frame,
+.dome-xSideBarSection-title.dome-color-frame
 {
     background: #e3e8ec ;
 }
@@ -177,12 +167,8 @@
     scroll-margin-top: 30px;
 }
 
-.dome-window-active .dome-xSideBarItem.dome-active {
+.dome-xSideBarItem.dome-active {
     background: #ccc ;
-}
-
-.dome-window-inactive .dome-xSideBarItem.dome-active {
-    background: #ddd ;
 }
 
 .dome-xSideBarItem > .dome-xLabel {
@@ -258,12 +244,8 @@
     height: 18px ;
 }
 
-.dome-window-active .dome-xToolBar-vrule {
+.dome-xToolBar-vrule {
     background: #aaa ;
-}
-
-.dome-window-inactive .dome-xToolBar-vrule {
-    background: #ddd ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -294,61 +276,57 @@
 
 /* Background */
 
-.dome-window-active .dome-xToolBar-control {
+.dome-xToolBar-control {
     background-image: linear-gradient(to bottom, #e8e8e8 0, #f1f1f1 100%);
+    border-color: #bbb;
 }
 
-.dome-window-active .dome-xToolBar-control:hover:not(:disabled) {
+.dome-xToolBar-control:hover:not(:disabled) {
     background-color: #ffffff ;
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-positive:not(:disabled) {
+.dome-xToolBar-control.dome-xToolBar-positive:not(:disabled) {
     background-image: linear-gradient(to bottom, #34ff52 0%, #48fd64 100%);
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-positive:hover:not(:disabled) {
+.dome-xToolBar-control.dome-xToolBar-positive:hover:not(:disabled) {
     background-color: #00ff00 ;
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-negative:not(:disabled) {
+.dome-xToolBar-control.dome-xToolBar-negative:not(:disabled) {
     color: #ccc ;
     fill: #ccc ;
     background-image: linear-gradient(to bottom, #ec453e 0%, #ff4c47 100%);
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-negative:hover:not(:disabled) {
+.dome-xToolBar-control.dome-xToolBar-negative:hover:not(:disabled) {
     background-color: red ;
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-warning:not(:disabled) {
+.dome-xToolBar-control.dome-xToolBar-warning:not(:disabled) {
     background-image: linear-gradient(to bottom, #fece72 0%, #fcaa0e 100%);
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-warning:hover:not(:disabled) {
+.dome-xToolBar-control.dome-xToolBar-warning:hover:not(:disabled) {
     background-color: orange ;
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-cancel:not(:disabled) {
+.dome-xToolBar-control.dome-xToolBar-cancel:not(:disabled) {
     background-color: #c2c0c2 ;
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-cancel:hover:not(:disabled) {
+.dome-xToolBar-control.dome-xToolBar-cancel:hover:not(:disabled) {
     background-image: linear-gradient(to bottom, #e8e8e8 0, #f1f1f1 100%);
-}
-
-.dome-window-inactive .dome-xToolBar-control {
-    box-shadow: none ;
-    background-image: none ;
 }
 
 /* Activated */
 
-.dome-window-active .dome-xToolBar-control:active:not(:disabled) {
+.dome-xToolBar-control:active:not(:disabled) {
     fill: #ddd ;
     color: #ddd ;
     background-color: gray ;
@@ -357,21 +335,15 @@
 
 /* Disabled */
 
-.dome-window-active .dome-xToolBar-control:disabled {
+.dome-xToolBar-control:disabled {
     fill: #ccc ;
     color: #ccc ;
     box-shadow: none ;
-    border-color: #bbb ;
-}
-
-.dome-window-inactive .dome-xToolBar-control:disabled {
-    fill: #ccc ;
-    color: #ccc ;
 }
 
 /* Selected */
 
-.dome-window-active .dome-xToolBar-control.dome-selected {
+.dome-xToolBar-control.dome-selected {
     fill:  #fff;
     color: #fff;
     border: 1px solid transparent ;
@@ -379,30 +351,17 @@
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-selected:hover {
+.dome-xToolBar-control.dome-selected:hover {
     background-color: #888 ;
     background-image: none ;
 }
 
-.dome-window-inactive .dome-xToolBar-control.dome-selected:not(:disabled) {
-    fill:  #eee;
-    color: #eee;
-    background-color: #ccc ;
-}
-
 /* Selected & Disabled */
 
-.dome-window-active .dome-xToolBar-control.dome-selected:disabled {
+.dome-xToolBar-control.dome-selected:disabled {
     fill: #ccc ;
     color: #ccc ;
     border: 1px solid #bbb ;
-    background-color: #ddd ;
-}
-
-.dome-window-inactive .dome-xToolBar-control.dome-selected:disabled {
-    fill: #ccc ;
-    color: #ccc ;
-    border-color: #ddd ;
     background-color: #ddd ;
 }
 
@@ -459,11 +418,6 @@
     transition: width 0.4s ease-in-out ;
 }
 
-.dome-window-inactive .dome-xToolBar-control.dome-xToolBar-searchfield {
-    background-color: #f6f6f6 ;
-    border-color: #ddd ;
-}
-
 .dome-xToolBar-searchfield:focus,
 .dome-xToolBar-searchfield:hover,
 .dome-xToolBar-searchicon:hover + .dome-xToolBar-searchfield
@@ -479,10 +433,6 @@
     width: 0px;
     top: 2px ;
     left: 12px ;
-}
-
-.dome-window-inactive .dome-xToolBar-searchicon svg {
-    fill: #ccc ;
 }
 
 .dome-xToolBar-searchmenu {

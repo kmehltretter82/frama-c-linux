@@ -100,12 +100,8 @@
     vertical-align: baseline ;
 }
 
-.dome-window-active .dome-xTable-selected {
+.dome-xTable-selected {
     background: #8ce0fb ;
-}
-
-.dome-window-inactive .dome-xTable-selected {
-    background: #ccc ;
 }
 
 .dome-xTable-odd {
