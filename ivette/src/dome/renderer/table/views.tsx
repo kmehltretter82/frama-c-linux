@@ -45,6 +45,7 @@ import {
   TableHeaderRowProps,
   TableHeaderProps,
   TableCellDataGetter,
+  TableCellProps,
   TableCellRenderer,
   RowMouseEventHandlerParams,
 } from 'react-virtualized';
@@ -261,7 +262,7 @@ function makeDataRenderer(
   render: ((data: any) => ReactNode) = defaultRenderer,
   onContextMenu?: (row: any, index: number, dataKey: string) => void,
 ): TableCellRenderer {
-  return ((props) => {
+  return ((props : TableCellProps) => {
     const { cellData } = props;
     try {
       const contents = cellData ? render(cellData) : null;
