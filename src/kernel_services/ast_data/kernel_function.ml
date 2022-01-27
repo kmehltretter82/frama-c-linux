@@ -151,7 +151,7 @@ let compute () =
               with Not_found ->
                 Kernel.fatal "No kernel function for function %a"
                   Cil_datatype.Varinfo.pretty fd.svar)
-           | GVar _ -> Cil.DoChildren
+           | GVar _ -> Cil.SkipChildren
            | _ -> Cil.SkipChildren
          method! vinst _ = SkipChildren
          method! vexpr _ = SkipChildren
