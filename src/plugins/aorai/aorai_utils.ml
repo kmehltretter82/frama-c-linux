@@ -679,7 +679,6 @@ let add_global glob = globals_queue := glob :: !globals_queue
 (* Utilities for global variables *)
 let add_gvar ?init vi =
   let initinfo = {Cil_types.init} in
-  vi.vghost <- true;
   vi.vstorage <- NoStorage;
   add_global (GVar(vi,initinfo,vi.vdecl));
   Globals.Vars.add vi initinfo;
@@ -700,7 +699,7 @@ let mk_gvar ?init ~ty name =
       Globals.Vars.remove vi;
       vi
     with Not_found ->
-      Cil.makeGlobalVar name ty
+      Cil.makeGlobalVar ~ghost:true name ty
   in
   add_gvar ?init vi
 
