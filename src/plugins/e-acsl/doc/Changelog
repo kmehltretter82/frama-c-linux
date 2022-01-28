@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2022-01-28] Add Linux's pthread concurrency support.
 -* E-ACSL       [2021-12-03] Fix crash when creating an axiomatic with an
                 existing name in E-ACSL's RTL (frama-c/e-acsl#161).
 -* E-ACSL       [2021-12-01] Fix crash when binding a lambda-abstraction to a
