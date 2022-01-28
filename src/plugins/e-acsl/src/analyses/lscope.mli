@@ -41,8 +41,9 @@ val add: lscope_var -> t -> t
 
 val get_all: t -> lscope_var list
 (* Return the list of [lscope_var] of the given logic scope.
-   The first element is the first [lscope_var] that was added to [t], the
-   second element is the second [lscope_var] that was added to [t], an so on. *)
+   The first element is the last [lscope_var] that was added to [t], the
+   second element is the second to last [lscope_var] that was added to [t], and
+   so on. *)
 
 val is_used: t -> pred_or_term -> bool
 (* [is_used lscope pot] returns [true] iff [pot] uses a variable from

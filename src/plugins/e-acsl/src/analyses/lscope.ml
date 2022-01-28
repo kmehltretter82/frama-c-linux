@@ -33,7 +33,7 @@ let is_empty = function [] -> true | _ :: _ -> false
 
 let add lscope_var t = lscope_var :: t
 
-let get_all t = List.rev t
+let get_all t = t
 
 let exists lv t =
   let is_lv = function

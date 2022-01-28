@@ -236,6 +236,7 @@ let put_block_at_label env kf block label =
 let to_exp ~loc kf env pot label =
   let term_to_exp = !term_to_exp_ref in
   let lscope_vars = Lscope.get_all (Env.Logic_scope.get env) in
+  let lscope_vars = List.rev lscope_vars in
   let sizes_and_shifts =
     sizes_and_shifts_from_quantifs ~loc kf lscope_vars []
   in
@@ -349,6 +350,7 @@ let to_exp ~loc kf env pot label =
   in
   (* Storing loops *)
   let lscope_vars = Lscope.get_all (Env.Logic_scope.get env) in
+  let lscope_vars = List.rev lscope_vars in
   let env = Env.push env in
   let storing_loops_stmts, env =
     Loops.mk_nested_loops ~loc mk_innermost_block kf env lscope_vars
