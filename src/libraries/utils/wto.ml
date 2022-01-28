@@ -230,17 +230,32 @@ module Make(N:sig
 
 
   (* Types for the tail-recursive function of [visit]. *)
+
+  (* Whether to apply [min_loop] at the end of the visit of a vertex. *)
   type kind = Default | MinLoop
+
+  (* [visit] contains two recursive calls; its tail-recursive version is split
+     into several steps accordingly. For the visit of a vertex, this type
+     indicates the step that must be done. *)
   type step =
     | Start of kind
+    (* Starts the visit of a vertex. If [kind] = [MinLoop], then apply
+       [min_loop] between the previous and the resulting loop. *)
     | Continue
+    (* Resumes the visit of a vertex after the first recursive call. *)
     | End of N.t partition
+    (* Ends the visit of a vertex after the second recursive call. *)
     | Min_loop of loop
+    (* Apply [Min_loop] between [loop] (from the previous result) and the
+       current loop. *)
 
+  (* The list of steps that must be done, with their related vertex. It starts
+     with [init, Start Default] and grows for each original recursive call. *)
   type continuation = (N.t * step) list
 
   (** Tail-recursive version of the [visit] function above. *)
   let tail_recursive_visit ~pref state vertex partition =
+    (* Visit according to the next step to be done. *)
     let rec visit (cont: continuation) (loop, partition) =
       match cont with
       | [] -> loop, partition
