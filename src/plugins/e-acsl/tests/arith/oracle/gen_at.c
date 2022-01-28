@@ -181,26 +181,25 @@ void g(int *p, int *q)
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\at(*(p + \\at(*q,__invalid_label)),L2)",
-                                 0,__gen_e_acsl_at_2);
+                                 "\\at(*(p + \\at(*q,L1)),L2)",0,
+                                 __gen_e_acsl_at_2);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "\\at(*(p + \\at(*q,__invalid_label)),L2) == 2";
+    __gen_e_acsl_assert_data.pred_txt = "\\at(*(p + \\at(*q,L1)),L2) == 2";
     __gen_e_acsl_assert_data.file = "at.i";
     __gen_e_acsl_assert_data.fct = "g";
     __gen_e_acsl_assert_data.line = 29;
     __e_acsl_assert(__gen_e_acsl_at_2 == 2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
-  /*@ assert \at(*(p + \at(*q,__invalid_label)),L2) == 2; */ ;
+  /*@ assert \at(*(p + \at(*q,L1)),L2) == 2; */ ;
   L3:
-  /*@ assert \at(*(p + \at(*q,__invalid_label)),Here) == 2; */
   {
     int __gen_e_acsl_valid_read_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "*(p + \\at(*q,__invalid_label))",0,
+                                 "*(p + \\at(*q,L1))",0,
                                  *(p + __gen_e_acsl_at_3));
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
@@ -222,7 +221,7 @@ void g(int *p, int *q)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "\\at(*(p + \\at(*q,__invalid_label)),Here) == 2";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\at(*(p + \\at(*q,L1)),Here) == 2";
     __gen_e_acsl_assert_data_4.file = "at.i";
     __gen_e_acsl_assert_data_4.fct = "g";
     __gen_e_acsl_assert_data_4.line = 31;
@@ -230,6 +229,7 @@ void g(int *p, int *q)
                     & __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
+  /*@ assert \at(*(p + \at(*q,L1)),Here) == 2; */ ;
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(& p));
   return;
@@ -259,7 +259,6 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = __gen_e_acsl_h(0);
   L:
-  /*@ assert x == 0; */
   {
     __gen_e_acsl_at_3 = (long)x;
     __gen_e_acsl_at_2 = x + 1L;
@@ -277,6 +276,7 @@ int main(void)
       __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
+    /*@ assert x == 0; */ ;
   }
   __e_acsl_full_init((void *)(& x));
   x = 1;
@@ -286,43 +286,41 @@ int main(void)
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "\\at(x,__invalid_label)",0,__gen_e_acsl_at);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\at(x,L)",0,
+                                 __gen_e_acsl_at);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\at(x,__invalid_label) == 0";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\at(x,L) == 0";
     __gen_e_acsl_assert_data_2.file = "at.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 54;
     __e_acsl_assert(__gen_e_acsl_at == 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
-  /*@ assert \at(x,__invalid_label) == 0; */ ;
+  /*@ assert \at(x,L) == 0; */ ;
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_3,
-                                  "\\at(x + 1,__invalid_label)",0,
-                                  __gen_e_acsl_at_2);
+                                  "\\at(x + 1,L)",0,__gen_e_acsl_at_2);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
-    __gen_e_acsl_assert_data_3.pred_txt = "\\at(x + 1,__invalid_label) == 1";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\at(x + 1,L) == 1";
     __gen_e_acsl_assert_data_3.file = "at.i";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 55;
     __e_acsl_assert(__gen_e_acsl_at_2 == 1L,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
-  /*@ assert \at(x + 1,__invalid_label) == 1; */ ;
+  /*@ assert \at(x + 1,L) == 1; */ ;
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_4,
-                                  "\\at(x,__invalid_label)",0,
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_4,"\\at(x,L)",0,
                                   __gen_e_acsl_at_3);
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "\\at(x,__invalid_label) + 1 == 1";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\at(x,L) + 1 == 1";
     __gen_e_acsl_assert_data_4.file = "at.i";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 56;
@@ -330,7 +328,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
-  /*@ assert \at(x,__invalid_label) + 1 == 1; */ ;
+  /*@ assert \at(x,L) + 1 == 1; */ ;
   g(t,& x);
   __retres = 0;
   __e_acsl_delete_block((void *)(t));

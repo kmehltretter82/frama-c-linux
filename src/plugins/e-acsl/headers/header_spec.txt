@@ -79,6 +79,11 @@ share/e-acsl/observation_model/e_acsl_observation_model.c: CEA_LGPL_OR_PROPRIETA
 share/e-acsl/observation_model/e_acsl_observation_model.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl_rtl.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/analyses_datatype.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/analyses_datatype.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/analyses.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/analyses.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/analyses_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/bound_variables.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/bound_variables.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/e_acsl_visitor.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -87,6 +92,8 @@ src/analyses/exit_points.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/exit_points.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/interval.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/interval.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/label.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/label.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/logic_normalizer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -116,8 +123,6 @@ src/code_generator/gmp.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/gmp.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/injector.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/injector.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/label.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/label.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/libc.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/libc.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/literal_observer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

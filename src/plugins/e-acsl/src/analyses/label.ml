@@ -21,15 +21,36 @@
 (**************************************************************************)
 
 open Cil_types
+module Error = Error.Make(struct let phase = Options.Dkey.translation end)
 
-val move: kernel_function -> old:stmt -> stmt -> unit
-(** Move all labels of the [old] stmt onto the new [stmt]. *)
+let get_first_inner_stmt stmt =
+  match stmt.labels, stmt.skind with
+  | [], _ -> stmt
+  | _ :: _, Block { bstmts = dest_stmt :: _ } ->
+    dest_stmt
+  | labels, _ ->
+    Options.fatal "Unexpected stmt:\nlabels: [%a]\nstmt: %a"
+      (Pretty_utils.pp_list ~sep:"; " Cil_types_debug.pp_label) labels
+      Printer.pp_stmt stmt
 
-val get_stmt: kernel_function -> logic_label -> stmt
-(** @return the statement where the logic label points to. *)
-
-val self: State.t
-(** Internal state *)
+let get_stmt kf llabel =
+  let stmt = match llabel with
+    | StmtLabel { contents = stmt } -> stmt
+    | BuiltinLabel Here -> Error.not_yet "Label 'Here'"
+    | BuiltinLabel(Old | Pre) ->
+      (try Kernel_function.find_first_stmt kf
+       with Kernel_function.No_Statement -> assert false (* Frama-C invariant*))
+    | BuiltinLabel(Post) ->
+      (try Kernel_function.find_return kf
+       with Kernel_function.No_Statement -> assert false (* Frama-C invariant*))
+    | BuiltinLabel _ ->
+      Error.not_yet (Format.asprintf "Label '%a'" Printer.pp_logic_label llabel)
+    | FormalLabel _ ->
+      Error.not_yet "FormalLabel"
+  in
+  (* the pointed statement has been visited and modified by the injector:
+     get its new version. *)
+  get_first_inner_stmt stmt
 
 (*
 Local Variables:

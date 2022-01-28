@@ -49,12 +49,10 @@ void *memchr(void const *buf, int c, size_t n)
   __e_acsl_full_init((void *)(& __retres));
   __retres = (void *)0;
   return_label:
-  {
-    __e_acsl_delete_block((void *)(& buf));
-    __e_acsl_delete_block((void *)(& s));
-    __e_acsl_delete_block((void *)(& __retres));
-    return __retres;
-  }
+  __e_acsl_delete_block((void *)(& buf));
+  __e_acsl_delete_block((void *)(& s));
+  __e_acsl_delete_block((void *)(& __retres));
+  return __retres;
 }
 
 /*@ behavior exists:

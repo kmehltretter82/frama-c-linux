@@ -29,16 +29,15 @@ val is_writing_memory: varinfo -> bool
 
 val update_memory_model:
   loc:location ->
-  stmt:stmt ->
   ?result:lval ->
   Env.t ->
   kernel_function ->
   varinfo ->
   exp list ->
   lval option * Env.t
-(** [update_memory_model ~loc ~stmt env kf ?result caller args] generates code
-    in [env] to update the memory model after executing the libc function
-    [caller] with the given [args].
+(** [update_memory_model ~loc env kf ?result caller args] generates code in
+    [env] to update the memory model after executing the libc function [caller]
+    with the given [args].
     @return a tuple [result_opt, env] where [result_opt] is an option with
     the lvalue for the result of the function and [env] is the updated
     environement. *)

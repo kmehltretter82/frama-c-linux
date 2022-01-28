@@ -20,27 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the environment with statements which allocate/deallocate memory
-    blocks. *)
+(** Types used by E-ACSL analyses *)
 
 open Cil_types
-open Cil_datatype
 
-val store: Env.t -> kernel_function -> varinfo list -> Env.t
-(** For each variable of the given list, if necessary according to the mtracking
-    analysis, add a call to [__e_acsl_store_block] in the given environment. *)
+type lscope_var =
+  | Lvs_let of logic_var * term (* the expression to which the lv is binded *)
+  | Lvs_quantif of term * relation * logic_var * relation * term
+  | Lvs_formal of logic_var * logic_info (* the logic definition *)
+  | Lvs_global of logic_var * term (* same as Lvs_let *)
 
-val duplicate_store: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
-(** Same as [store], with a call to [__e_acsl_duplicate_store_block]. *)
+type lscope = lscope_var list
 
-val delete_from_list: Env.t -> kernel_function -> varinfo list -> Env.t
-(** Same as [store], with a call to [__e_acsl_delete_block]. *)
-
-val delete_from_set: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
-(** Same as [delete_from_list] with a set of variables instead of a list. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)
+type pred_or_term =
+  | PoT_pred of predicate
+  | PoT_term of term

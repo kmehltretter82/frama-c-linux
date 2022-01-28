@@ -20,24 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the environment with statements which allocate/deallocate memory
-    blocks. *)
-
 open Cil_types
-open Cil_datatype
 
-val store: Env.t -> kernel_function -> varinfo list -> Env.t
-(** For each variable of the given list, if necessary according to the mtracking
-    analysis, add a call to [__e_acsl_store_block] in the given environment. *)
+val get_stmt: kernel_function -> logic_label -> stmt
+(** @return the statement where the logic label points to. *)
 
-val duplicate_store: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
-(** Same as [store], with a call to [__e_acsl_duplicate_store_block]. *)
-
-val delete_from_list: Env.t -> kernel_function -> varinfo list -> Env.t
-(** Same as [store], with a call to [__e_acsl_delete_block]. *)
-
-val delete_from_set: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
-(** Same as [delete_from_list] with a set of variables instead of a list. *)
+val get_first_inner_stmt: stmt -> stmt
+(** If the given statement has a label, return the first statement of the block.
+    Otherwise return the given statement. *)
 
 (*
 Local Variables:

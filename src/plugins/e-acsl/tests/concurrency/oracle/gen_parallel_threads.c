@@ -454,14 +454,12 @@ void *read_value(void *arg)
     __e_acsl_delete_block((void *)(& idx));
   }
   return_label:
-  {
-    __e_acsl_delete_block((void *)(& arg));
-    __e_acsl_delete_block((void *)(& tmp_1));
-    __e_acsl_delete_block((void *)(& tmp_0));
-    __e_acsl_delete_block((void *)(& tmp));
-    __e_acsl_delete_block((void *)(& __retres));
-    return __retres;
-  }
+  __e_acsl_delete_block((void *)(& arg));
+  __e_acsl_delete_block((void *)(& tmp_1));
+  __e_acsl_delete_block((void *)(& tmp_0));
+  __e_acsl_delete_block((void *)(& tmp));
+  __e_acsl_delete_block((void *)(& __retres));
+  return __retres;
 }
 
 /*@ requires

@@ -21,14 +21,10 @@
 (**************************************************************************)
 
 open Cil_types
+open Cil_datatype
+open Analyses_types
 
-type lscope_var =
-  | Lvs_let of logic_var * term
-  | Lvs_quantif of term * relation * logic_var * relation * term
-  | Lvs_formal of logic_var * logic_info
-  | Lvs_global of logic_var * term
-
-type t = lscope_var list
+type t = lscope
 (* The logic scope is usually small, so a list is fine instead of a Map *)
 
 let empty = []
@@ -37,7 +33,10 @@ let is_empty = function [] -> true | _ :: _ -> false
 
 let add lscope_var t = lscope_var :: t
 
-let get_all t = List.rev t
+let remove lscope_var t =
+  List.filter (fun elt -> elt != lscope_var) t
+
+let get_all t = t
 
 let exists lv t =
   let is_lv = function
@@ -46,8 +45,6 @@ let exists lv t =
       Cil_datatype.Logic_var.equal lv lv'
   in
   List.exists is_lv t
-
-type pred_or_term = PoT_pred of predicate | PoT_term of term
 
 exception Lscope_used
 let is_used lscope pot =
@@ -64,6 +61,125 @@ let is_used lscope pot =
     false
   with Lscope_used ->
     true
+
+let rank_lvar = function
+  | Lvs_let _ -> 0
+  | Lvs_quantif _ -> 1
+  | Lvs_formal _ -> 2
+  | Lvs_global _ -> 3
+
+let hash_list f = List.fold_left (fun acc d -> 65537 * acc + f d) 1
+
+let pretty_lscope_var fmt lscope_var =
+  match lscope_var with
+  | Lvs_let (lv, t) ->
+    Format.fprintf fmt "@[Lvs_let (%a = %a)@]"
+      Printer.pp_logic_var lv
+      Printer.pp_term t
+  | Lvs_quantif (lt, lr, lv, rr, rt) ->
+    Format.fprintf fmt "@[Lvs_quantif (%a %a %a %a %a)@]"
+      Printer.pp_term lt
+      Printer.pp_relation lr
+      Printer.pp_logic_var lv
+      Printer.pp_relation rr
+      Printer.pp_term rt
+  | Lvs_formal (lv, li) ->
+    Format.fprintf fmt "@[Lvs_formal (%a, %a)@]"
+      Printer.pp_logic_var lv
+      Printer.pp_logic_info li
+  | Lvs_global (lv, t) ->
+    Format.fprintf fmt "@[Lvs_global (%a, %a)@]"
+      Printer.pp_logic_var lv
+      Printer.pp_term t
+
+module D = Datatype.Make(struct
+    type t = lscope
+
+    let name = "E_ACSL.Lscope"
+
+    let reprs =
+      let reprs =
+        List.fold_left
+          (fun reprs lv ->
+             List.fold_left
+               (fun reprs t -> Lvs_let (lv, t) :: reprs)
+               reprs
+               Term.reprs)
+          []
+          Logic_var.reprs
+      in
+      [ reprs; []]
+
+    include Datatype.Undefined
+
+    let compare lscope1 lscope2 =
+      let lscope_vars1 = get_all lscope1 in
+      let lscope_vars2 = get_all lscope2 in
+      Extlib.list_compare
+        (fun lscope_var1 lscope_var2 ->
+           let r1 = rank_lvar lscope_var1 in
+           let r2 = rank_lvar lscope_var2 in
+           if r1 <> r2 then r1 - r2 else
+             match lscope_var1, lscope_var2 with
+             | Lvs_let (lv1, t1), Lvs_let (lv2, t2) ->
+               let c = Logic_var.compare lv1 lv2 in
+               if c <> 0 then c else Term.compare t1 t2
+             | Lvs_quantif (lt1, lr1, lv1, rr1, rt1),
+               Lvs_quantif (lt2, lr2, lv2, rr2, rt2) ->
+               let c = Logic_var.compare lv1 lv2 in
+               let c =
+                 if c <> 0 then c
+                 else Term.compare lt1 lt2
+               in
+               let c =
+                 if c <> 0 then c
+                 else Term.compare rt1 rt2
+               in
+               let c =
+                 if c <> 0 then c
+                 else compare lr1 lr2
+               in
+               let c =
+                 if c <> 0 then c
+                 else compare rr1 rr2
+               in
+               c
+             | Lvs_formal (lv1, li1), Lvs_formal (lv2, li2) ->
+               let c = Logic_var.compare lv1 lv2 in
+               if c <> 0 then c else Logic_info.compare li1 li2
+             | Lvs_global (lv1, t1), Lvs_global (lv2, t2) ->
+               let c = Logic_var.compare lv1 lv2 in
+               if c <> 0 then c else Term.compare t1 t2
+             | (Lvs_let _ | Lvs_quantif _ | Lvs_formal _ | Lvs_global _), _ ->
+               assert false
+        )
+        lscope_vars1
+        lscope_vars2
+
+    let hash lscope =
+      let lscope_vars = get_all lscope in
+      hash_list
+        (fun lscope_var ->
+           match lscope_var with
+           | Lvs_let (lv, t) -> 2 * Logic_var.hash lv + 3 * Term.hash t
+           | Lvs_quantif (lt, lr, lv, rr, rt) ->
+             5 * Logic_var.hash lv
+             + 7 * Term.hash lt
+             + 11 * Term.hash rt
+             + 13 * Hashtbl.hash lr
+             + 17 * Hashtbl.hash rr
+           | Lvs_formal (lv, li) ->
+             19 * Logic_var.hash lv + 23 * Logic_info.hash li
+           | Lvs_global (lv, t) ->
+             29 * Logic_var.hash lv + 31 * Term.hash t
+        )
+        lscope_vars
+
+    let pretty fmt lscope =
+      let lscope_vars = List.rev lscope in
+      Format.fprintf fmt "@[[%a]@]"
+        (Pretty_utils.pp_list ~sep:",@ " pretty_lscope_var) lscope_vars
+  end)
 
 (*
 Local Variables:

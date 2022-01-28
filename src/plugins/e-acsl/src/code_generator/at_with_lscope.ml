@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Analyses_types
 
 (**************************************************************************)
 (********************** Forward references ********************************)
@@ -85,10 +86,10 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
   match lscope with
   | [] ->
     sizes_and_shifts
-  | Lscope.Lvs_quantif(tmin, _, _,  _, tmax) ::_
+  | Lvs_quantif(tmin, _, _,  _, tmax) ::_
     when Misc.term_has_lv_from_vi tmin || Misc.term_has_lv_from_vi tmax ->
     Error.not_yet "\\at with logic variable linked to C variable"
-  | Lscope.Lvs_quantif(tmin, rel1, lv, rel2, tmax) :: lscope' ->
+  | Lvs_quantif(tmin, rel1, lv, rel2, tmax) :: lscope' ->
     let t_size = Logic_const.term ~loc (TBinOp(MinusA, tmax, tmin)) Linteger in
     let t_size = match rel1, rel2 with
       | Rle, Rle ->
@@ -146,14 +147,14 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
     (* Returning *)
     let sizes_and_shifts = (t_size, t_shifted) :: sizes_and_shifts in
     sizes_and_shifts_from_quantifs ~loc kf lscope' sizes_and_shifts
-  | (Lscope.Lvs_let(_, t) | Lscope.Lvs_global(_, t)) :: _
+  | (Lvs_let(_, t) | Lvs_global(_, t)) :: _
     when Misc.term_has_lv_from_vi t ->
     Error.not_yet "\\at with logic variable linked to C variable"
-  | Lscope.Lvs_let _ :: lscope' ->
+  | Lvs_let _ :: lscope' ->
     sizes_and_shifts_from_quantifs ~loc kf lscope' sizes_and_shifts
-  | Lscope.Lvs_formal _ :: _ ->
+  | Lvs_formal _ :: _ ->
     Error.not_yet "\\at using formal variable of a logic function"
-  | Lscope.Lvs_global _ :: _ ->
+  | Lvs_global _ :: _ ->
     Error.not_yet "\\at using global logic variable"
 
 let size_from_sizes_and_shifts ~loc = function
@@ -235,14 +236,15 @@ let put_block_at_label env kf block label =
 let to_exp ~loc kf env pot label =
   let term_to_exp = !term_to_exp_ref in
   let lscope_vars = Lscope.get_all (Env.Logic_scope.get env) in
+  let lscope_vars = List.rev lscope_vars in
   let sizes_and_shifts =
     sizes_and_shifts_from_quantifs ~loc kf lscope_vars []
   in
   (* Creating the pointer *)
   let ty = match pot with
-    | Lscope.PoT_pred _ ->
+    | PoT_pred _ ->
       Cil.intType
-    | Lscope.PoT_term t ->
+    | PoT_term t ->
       let lenv = (Env.Local_vars.get env) in
       begin match Typing.get_number_ty ~lenv t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
@@ -310,7 +312,7 @@ let to_exp ~loc kf env pot label =
     let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
     let named_predicate_to_exp = !predicate_to_exp_ref ~adata:Assert.no_data in
     match pot with
-    | Lscope.PoT_pred p ->
+    | PoT_pred p ->
       let env = Env.push env in
       let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
       let e, _, env = named_predicate_to_exp kf env p in
@@ -324,7 +326,7 @@ let to_exp ~loc kf env pot label =
       (* We CANNOT return [block.bstmts] because it does NOT contain
          variable declarations. *)
       [ Smart_stmt.block_stmt block ], env
-    | Lscope.PoT_term t ->
+    | PoT_term t ->
       begin match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
           let env = Env.push env in
@@ -348,6 +350,7 @@ let to_exp ~loc kf env pot label =
   in
   (* Storing loops *)
   let lscope_vars = Lscope.get_all (Env.Logic_scope.get env) in
+  let lscope_vars = List.rev lscope_vars in
   let env = Env.push env in
   let storing_loops_stmts, env =
     Loops.mk_nested_loops ~loc mk_innermost_block kf env lscope_vars

@@ -62,7 +62,6 @@ int main(void)
     __e_acsl_delete_block((void *)(& a));
   }
   L:
-  /*@ assert !\valid(p); */
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -100,6 +99,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
+  /*@ assert !\valid(p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));
   __e_acsl_memory_clean();

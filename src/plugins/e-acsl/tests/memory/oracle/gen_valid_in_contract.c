@@ -41,11 +41,9 @@ struct list *f(struct list *l)
   __e_acsl_full_init((void *)(& __retres));
   __retres = (struct list *)0;
   return_label:
-  {
-    __e_acsl_delete_block((void *)(& l));
-    __e_acsl_delete_block((void *)(& __retres));
-    return __retres;
-  }
+  __e_acsl_delete_block((void *)(& l));
+  __e_acsl_delete_block((void *)(& __retres));
+  return __retres;
 }
 
 int main(void)

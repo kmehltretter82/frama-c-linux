@@ -56,7 +56,13 @@ SRC_PROJECT_INITIALIZER:=\
   $(addprefix src/project_initializer/, $(SRC_PROJECT_INITIALIZER))
 
 # analyses
+ANALYSES_CMI:= \
+	analyses_types
+ANALYSES_CMI:=$(addprefix src/analyses/, $(ANALYSES_CMI))
+
 SRC_ANALYSES:= \
+	analyses_datatype \
+	label \
 	rte \
 	lscope \
 	e_acsl_visitor \
@@ -66,7 +72,8 @@ SRC_ANALYSES:= \
 	typing \
 	literal_strings \
 	memory_tracking \
-	exit_points
+	exit_points \
+	analyses
 SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
 # code generator
@@ -79,7 +86,6 @@ SRC_CODE_GENERATOR:= \
 	smart_exp \
 	smart_stmt \
 	gmp \
-	label \
 	env \
 	assert \
 	rational \
@@ -128,6 +134,7 @@ PLUGIN_CMO:= src/local_config \
 	src/main
 PLUGIN_CMI:= \
 	$(LIBRARIES_CMI) \
+	$(ANALYSES_CMI) \
 	$(CODE_GENERATOR_CMI)
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=yes

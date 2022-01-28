@@ -17,7 +17,8 @@ char b(void)
     int c = 0;
     __e_acsl_store_block((void *)(& c),(size_t)4);
     __e_acsl_full_init((void *)(& c));
-    case 0: __e_acsl_store_block_duplicate((void *)(& c),(size_t)4);
+    case 0:
+    __e_acsl_store_block_duplicate((void *)(& c),(size_t)4);
     __e_acsl_delete_block((void *)(& c));
     goto d;
     int tmp = c;
@@ -26,10 +27,8 @@ char b(void)
     __e_acsl_delete_block((void *)(& tmp));
     __e_acsl_delete_block((void *)(& c));
   }
-  d: {
-       __e_acsl_full_init((void *)(& __retres));
-       __retres = (char)2;
-     }
+  d: __e_acsl_full_init((void *)(& __retres));
+     __retres = (char)2;
   __e_acsl_delete_block((void *)(& __retres));
   return __retres;
 }

@@ -290,7 +290,7 @@ let env_of_li ~adata ~loc kf env li =
       | Typing.Real ->
         Error.not_yet "real number"
     in
-    adata, Env.add_stmt env kf stmt
+    adata, Env.add_stmt env stmt
   | Ltype _ ->
     Env.not_yet env "user-defined logic type"
   | Lvar _ ->

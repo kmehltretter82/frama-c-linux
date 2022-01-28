@@ -20,27 +20,48 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the environment with statements which allocate/deallocate memory
-    blocks. *)
+(** Datatypes for analyses types *)
 
-open Cil_types
 open Cil_datatype
+open Analyses_types
 
-val store: Env.t -> kernel_function -> varinfo list -> Env.t
-(** For each variable of the given list, if necessary according to the mtracking
-    analysis, add a call to [__e_acsl_store_block] in the given environment. *)
+module PredOrTerm =
+  Datatype.Make_with_collections
+    (struct
+      type t = pred_or_term
 
-val duplicate_store: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
-(** Same as [store], with a call to [__e_acsl_duplicate_store_block]. *)
+      let name = "E_ACSL.PredOrTerm"
 
-val delete_from_list: Env.t -> kernel_function -> varinfo list -> Env.t
-(** Same as [store], with a call to [__e_acsl_delete_block]. *)
+      let reprs =
+        let reprs =
+          List.fold_left
+            (fun reprs t -> PoT_term t :: reprs)
+            []
+            Term.reprs
+        in
+        List.fold_left
+          (fun reprs p -> PoT_pred p :: reprs)
+          reprs
+          Predicate.reprs
 
-val delete_from_set: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
-(** Same as [delete_from_list] with a set of variables instead of a list. *)
+      include Datatype.Undefined
 
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)
+      let compare pot1 pot2 =
+        match pot1, pot2 with
+        | PoT_pred _, PoT_term _ -> -1
+        | PoT_term _, PoT_pred _ -> 1
+        | PoT_pred p1, PoT_pred p2 -> PredicateStructEq.compare p1 p2
+        | PoT_term t1, PoT_term t2 -> Term.compare t1 t2
+
+      let equal = Datatype.from_compare
+
+      let hash = function
+        | PoT_pred p -> 7 * PredicateStructEq.hash p
+        | PoT_term t -> 97 * Term.hash t
+
+      let pretty fmt = function
+        | PoT_pred p -> Printer.pp_predicate fmt p
+        | PoT_term t -> Printer.pp_term fmt t
+
+      let varname _ = "pred_or_term"
+    end)

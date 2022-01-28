@@ -20,10 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 
-module Build_env(X: sig type t end): sig
+module Build_env(X: sig
+    type t
+    val map_opt: (t -> t) option
+  end): sig
   val add: stmt -> X.t -> unit
   val find: stmt -> X.t (* may raise [Not_found] *)
   val get_all: stmt -> X.t list
@@ -32,11 +36,24 @@ module Build_env(X: sig type t end): sig
 end = struct
 
   let tbl = Stmt.Hashtbl.create 17
-  let add = Stmt.Hashtbl.add tbl
+  let add s x =
+    let s = E_acsl_label.get_first_inner_stmt s in
+    Stmt.Hashtbl.add tbl s x
 
-  let find stmt = Stmt.Hashtbl.find tbl stmt
-  let get_all stmt = try Stmt.Hashtbl.find_all tbl stmt with Not_found -> []
+  let find stmt =
+    let res = Stmt.Hashtbl.find tbl stmt in
+    match X.map_opt with
+    | Some map -> map res
+    | None -> res
+
+  let get_all stmt =
+    let res = try Stmt.Hashtbl.find_all tbl stmt with Not_found -> [] in
+    match X.map_opt with
+    | Some map -> List.map map res
+    | None -> res
+
   let is_empty () = Stmt.Hashtbl.length tbl = 0
+
   let clear () = Stmt.Hashtbl.clear tbl
 
 end
@@ -48,7 +65,10 @@ end
    scope variables given by set L', then the goto exists the scopes of
    variables given via set G' \ L'. Consequently, if those variables are
    tracked, they need to be removed from tracking. *)
-module SLocals = Build_env(struct type t = Varinfo.Set.t end)
+module SLocals = Build_env(struct
+    type t = Varinfo.Set.t
+    let map_opt = None
+  end)
 
 (* Statement to statement mapping indicating source/destination of a jump.
    For instance, break statements are mapped to switches or loops they jump
@@ -56,11 +76,23 @@ module SLocals = Build_env(struct type t = Varinfo.Set.t end)
    such information does not really be computed for gotos (since they already
    capture references to labelled statements they jumps to). Nevertheless it is
    done for consistency, so all required information is stored uniformly. *)
-module Exits = Build_env(struct type t = stmt end)
+module Exits = Build_env(struct
+    type t = stmt
+    (* Use [Labeled_stmts.get_first_inner_stmt] so that [find] and [get_all]
+       return the first statement of the labeled block instead of the labeled
+       statement. *)
+    let map_opt = Some E_acsl_label.get_first_inner_stmt
+  end)
 
 (* Map labelled statements back to gotos which lead to them and case statements
    back to the corresponding switch *)
-module LJumps = Build_env(struct type t = stmt end)
+module LJumps = Build_env(struct
+    type t = stmt
+    (* Use [Labeled_stmts.get_first_inner_stmt] so that [find] and [get_all]
+       return the first statement of the labeled block instead of the labeled
+       statement. *)
+    let map_opt = Some E_acsl_label.get_first_inner_stmt
+  end)
 
 let clear () =
   SLocals.clear ();

@@ -57,7 +57,8 @@ void duffcopy(char *to, char *from, int count)
         from ++;
         __e_acsl_initialize((void *)tmp,sizeof(char));
         *tmp = *tmp_0;
-        case 7: __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
+        case 7:
+        __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_0),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_1),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_2),(size_t)8);
@@ -81,7 +82,8 @@ void duffcopy(char *to, char *from, int count)
         from ++;
         __e_acsl_initialize((void *)tmp_1,sizeof(char));
         *tmp_1 = *tmp_2;
-        case 6: __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
+        case 6:
+        __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_0),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_1),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_2),(size_t)8);
@@ -105,7 +107,8 @@ void duffcopy(char *to, char *from, int count)
         from ++;
         __e_acsl_initialize((void *)tmp_3,sizeof(char));
         *tmp_3 = *tmp_4;
-        case 5: __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
+        case 5:
+        __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_0),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_1),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_2),(size_t)8);
@@ -129,7 +132,8 @@ void duffcopy(char *to, char *from, int count)
         from ++;
         __e_acsl_initialize((void *)tmp_5,sizeof(char));
         *tmp_5 = *tmp_6;
-        case 4: __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
+        case 4:
+        __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_0),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_1),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_2),(size_t)8);
@@ -153,7 +157,8 @@ void duffcopy(char *to, char *from, int count)
         from ++;
         __e_acsl_initialize((void *)tmp_7,sizeof(char));
         *tmp_7 = *tmp_8;
-        case 3: __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
+        case 3:
+        __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_0),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_1),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_2),(size_t)8);
@@ -177,7 +182,8 @@ void duffcopy(char *to, char *from, int count)
         from ++;
         __e_acsl_initialize((void *)tmp_9,sizeof(char));
         *tmp_9 = *tmp_10;
-        case 2: __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
+        case 2:
+        __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_0),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_1),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_2),(size_t)8);
@@ -201,7 +207,8 @@ void duffcopy(char *to, char *from, int count)
         from ++;
         __e_acsl_initialize((void *)tmp_11,sizeof(char));
         *tmp_11 = *tmp_12;
-        case 1: __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
+        case 1:
+        __e_acsl_store_block_duplicate((void *)(& tmp),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_0),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_1),(size_t)8);
         __e_acsl_store_block_duplicate((void *)(& tmp_2),(size_t)8);

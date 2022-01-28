@@ -77,8 +77,10 @@ type t = {
   (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
-  local_vars: Typing.Function_params_ty.t list
+  local_vars: Typing.Function_params_ty.t list;
   (* type of variables used in calls to logic functions and predicates *)
+  kinstr: kinstr;
+  (* Current kinstr of the environment *)
 }
 
 let empty_block =
@@ -110,7 +112,8 @@ let empty =
     var_mapping = Logic_var.Map.empty;
     loop_envs = [];
     cpt = 0;
-    local_vars = [] }
+    local_vars = [];
+    kinstr = Kglobal }
 
 let top env = match env.env_stack with
   | [] -> Options.fatal "Empty environment. That is unexpected."
@@ -160,7 +163,7 @@ let pop_loop env =
 (** {2 RTEs} *)
 (* ************************************************************************** *)
 
-let rte env b =
+let set_rte env b =
   let local_env, tl_env = top env in
   { env with env_stack = { local_env with rte = b } :: tl_env }
 
@@ -168,19 +171,15 @@ let generate_rte env =
   let local_env, _ = top env in
   local_env.rte
 
-let with_rte ~f env rte_value =
-  let old_rte_value = generate_rte env in
-  let env = rte env rte_value in
-  let env = f env in
-  let env = rte env old_rte_value in
-  env
+(* ************************************************************************** *)
+(** {2 Kinstr} *)
+(* ************************************************************************** *)
 
-let with_rte_and_result ~f env rte_value =
-  let old_rte_value = generate_rte env in
-  let env = rte env rte_value in
-  let other, env = f env in
-  let env = rte env old_rte_value in
-  other, env
+let set_kinstr env kinstr =
+  { env with kinstr = kinstr }
+
+let get_kinstr env =
+  env.kinstr
 
 (* ************************************************************************** *)
 
@@ -376,6 +375,7 @@ end
 module Logic_scope = struct
   let get env = env.lscope
   let extend env lvs = { env with lscope = Lscope.add lvs env.lscope }
+  let remove env lvs = { env with lscope = Lscope.remove lvs env.lscope }
   let set_reset env bool = { env with lscope_reset = bool }
   let get_reset env = env.lscope_reset
   let reset env =
@@ -386,9 +386,7 @@ end
 let add_assert kf stmt annot =
   Annotations.add_assert Options.emitter ~kf stmt annot
 
-let add_stmt ?(post=false) ?before env kf stmt =
-  if not post then
-    Option.iter (fun old -> E_acsl_label.move kf ~old stmt) before;
+let add_stmt ?(post=false) env stmt =
   let local_env, tl = top env in
   let block = local_env.block_info in
   let block =
@@ -401,6 +399,7 @@ let add_stmt ?(post=false) ?before env kf stmt =
   { env with env_stack = local_env :: tl }
 
 let extend_stmt_in_place env stmt ~label block =
+  let stmt = E_acsl_label.get_first_inner_stmt stmt in
   let new_stmt = Smart_stmt.block_stmt block in
   let sk = stmt.skind in
   stmt.skind <- Block (Cil.mkBlock [ new_stmt; Smart_stmt.stmt sk ]);
@@ -592,6 +591,41 @@ let pop_contract env =
   let _, env = pop_and_get_contract env in
   env
 
+(* ************************************************************************** *)
+(** {2 Utilities} *)
+(* ************************************************************************** *)
+
+let with_params_and_result ?rte ?kinstr ~f env =
+  let old_rte, env =
+    match rte with
+    | Some rte ->
+      Some (generate_rte env), set_rte env rte
+    | None -> None, env
+  in
+  let old_kinstr, env =
+    match kinstr with
+    | Some kinstr ->
+      Some (get_kinstr env), set_kinstr env kinstr
+    | None -> None, env
+  in
+  let other, env = f env in
+  let env =
+    match old_kinstr with
+    | Some kinstr -> set_kinstr env kinstr
+    | None -> env
+  in
+  let env =
+    match old_rte with
+    | Some rte -> set_rte env rte
+    | None -> env
+  in
+  other, env
+
+let with_params ?rte ?kinstr ~f env =
+  let (), env =
+    with_params_and_result ?rte ?kinstr ~f:(fun env -> (), f env) env
+  in
+  env
 
 (* debugging purpose *)
 let pretty fmt env =

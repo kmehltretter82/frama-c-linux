@@ -24,6 +24,7 @@
 
 open Cil_types
 open Cil_datatype
+open Analyses_types
 let dkey = Options.Dkey.translation
 
 (**************************************************************************)
@@ -77,7 +78,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
   | Papp (li, [], args) ->
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc kf env li args in
-    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
@@ -99,7 +100,8 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
     Extlib.flatten
-      (Env.with_rte_and_result env true
+      (Env.with_params_and_result
+         ~rte:true
          ~f:(fun env ->
              let e1, adata, env1 = to_exp ~adata kf env p1 in
              let e2, adata, env2 =
@@ -117,11 +119,13 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
                   e1
                   res2
                   (Cil.zero loc, env3))
-           ))
+           )
+         env)
   | Por(p1, p2) ->
     (* p1 || p2 <==> if p1 then true else p2 *)
     Extlib.flatten
-      (Env.with_rte_and_result env true
+      (Env.with_params_and_result
+         ~rte:true
          ~f:(fun env ->
              let e1, adata, env1 = to_exp ~adata kf env p1 in
              let env' = Env.push env1 in
@@ -140,7 +144,8 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
                   e1
                   (Cil.one loc, env')
                   res2)
-           ))
+           )
+         env)
   | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
@@ -165,7 +170,8 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     Smart_exp.lnot ~loc e, adata, env
   | Pif(t, p2, p3) ->
     Extlib.flatten
-      (Env.with_rte_and_result env true
+      (Env.with_params_and_result
+         ~rte:true
          ~f:(fun env ->
              let e1, adata, env1 = Translate_terms.to_exp ~adata kf env t in
              let e2, adata, env2 =
@@ -178,26 +184,32 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
              Extlib.nest
                adata
                (Translate_utils.conditional_to_exp ~loc kf None e1 res2 res3)
-           ))
+           )
+         env)
   | Plet(li, p) ->
-    let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
-    let env = Env.Logic_scope.extend env lvs in
+    (* Translate the term registered to the \let logic variable *)
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
+    (* Register the logic var to the logic scope *)
+    let lvs = Lvs_let(li.l_var_info, Misc.term_of_li li) in
+    let env = Env.Logic_scope.extend env lvs in
+    (* Translate the body of the \let *)
     let e, adata, env = to_exp ~adata kf env p in
+    (* Remove the logic var from the logic scope *)
+    let env = Env.Logic_scope.remove env lvs in
     Interval.Env.remove li.l_var_info;
     e, adata, env
   | Pforall _ | Pexists _ ->
     let e, env = Quantif.quantif_to_exp kf env p in
-    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pat(p, BuiltinLabel Here) ->
     to_exp ~adata kf env p
   | Pat(p', label) ->
     let lscope = Env.Logic_scope.get env in
-    let pot = Lscope.PoT_pred p' in
+    let pot = PoT_pred p' in
     if Lscope.is_used lscope pot then
       let e, env = At_with_lscope.to_exp ~loc kf env pot label in
-      let adata, env = Assert.register_pred ~loc kf env p e adata in
+      let adata, env = Assert.register_pred ~loc env p e adata in
       e, adata, env
     else begin
       (* convert [t'] to [e] in a separated local env *)
@@ -206,7 +218,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
         Translate_utils.at_to_exp_no_lscope kf env None label e
       in
       assert (sty = Typed_number.C_number);
-      let adata, env = Assert.register_pred ~loc kf env p e adata in
+      let adata, env = Assert.register_pred ~loc env p e adata in
       e, adata, env
     end
   | Pvalid_read(BuiltinLabel Here, t) as pc
@@ -220,7 +232,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
       let e, adata, env =
         Memory_translate.call_valid ~adata ~loc kf name Cil.intType env t p
       in
-      let adata, env = Assert.register_pred ~loc kf env p e adata in
+      let adata, env = Assert.register_pred ~loc env p e adata in
       e, adata, env
     in
     (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
@@ -259,7 +271,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
         tlist
         p
     in
-    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pinitialized(BuiltinLabel Here, t) ->
     let e, adata, env =
@@ -282,7 +294,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
              [ t ]
              p
          in
-         let adata, env = Assert.register_pred ~loc kf env p e adata in
+         let adata, env = Assert.register_pred ~loc env p e adata in
          e, adata, env)
     in
     e, adata, env
@@ -292,7 +304,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     let e, adata, env =
       Memory_translate.call ~adata ~loc kf "freeable" Cil.intType env t
     in
-    let adata, env = Assert.register_pred ~loc kf env p e adata in
+    let adata, env = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pfreeable _ -> Env.not_yet env "labeled \\freeable"
   | Pfresh _ -> Env.not_yet env "\\fresh"
@@ -303,7 +315,8 @@ and to_exp ~adata ?name kf ?rte env p =
   | PoT_pred p ->
     let rte = match rte with None -> Env.generate_rte env | Some b -> b in
     Extlib.flatten
-      (Env.with_rte_and_result env false
+      (Env.with_params_and_result
+         ~rte:false
          ~f:(fun env ->
              let e, adata, env =
                predicate_content_to_exp ~adata ?name kf env p
@@ -325,7 +338,8 @@ and to_exp ~adata ?name kf ?rte env p =
                   Typed_number.C_number
                   None
                   e)
-           ))
+           )
+         env)
 
 let generalized_untyped_to_exp ~adata ?name kf ?rte env p =
   (* If [rte] is true, it means we're translating the root predicate of an
@@ -366,10 +380,7 @@ let do_it ?pred_to_print kf env p =
         e
         pred_to_print
     in
-    Env.add_stmt
-      env
-      kf
-      stmt
+    Env.add_stmt env stmt
   | Admit -> env
 
 let predicate_to_exp_without_rte ~adata kf env p =
@@ -391,7 +402,7 @@ exception No_simple_translation of predicate
    However, it is correct to use it only in specific contexts. *)
 let untyped_to_exp p =
   let env = Env.push Env.empty in
-  let env = Env.rte env false in
+  let env = Env.set_rte env false in
   let e, _, env =
     try generalized_untyped_to_exp
           ~adata:Assert.no_data

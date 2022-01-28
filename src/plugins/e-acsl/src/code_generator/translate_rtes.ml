@@ -41,8 +41,10 @@ let rte_annots pp elt kf env l =
                 let lscope_reset_old = Env.Logic_scope.get_reset env in
                 let env = Env.Logic_scope.set_reset env false in
                 let env =
-                  Env.with_rte env false
+                  Env.with_params
+                    ~rte:false
                     ~f:(fun env -> Translate_predicates.do_it kf env p)
+                    env
                 in
                 let env = Env.Logic_scope.set_reset env lscope_reset_old in
                 env)

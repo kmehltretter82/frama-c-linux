@@ -19,7 +19,6 @@ int main(void)
   __e_acsl_full_init((void *)(& a));
   goto lbl_1;
   lbl_2:
-  /*@ assert \valid(p); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -54,12 +53,11 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
+  /*@ assert \valid(p); */ ;
   __retres = 0;
   goto return_label;
-  lbl_1: {
-           __e_acsl_full_init((void *)(& p));
-           p = & a;
-         }
+  lbl_1: __e_acsl_full_init((void *)(& p));
+         p = & a;
   goto lbl_2;
   return_label:
   {

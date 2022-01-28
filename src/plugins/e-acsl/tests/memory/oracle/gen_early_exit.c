@@ -61,7 +61,6 @@ int goto_bts(void)
     __e_acsl_delete_block((void *)(& a));
   }
   L:
-  /*@ assert !\valid(p); */
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -99,6 +98,7 @@ int goto_bts(void)
     __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
+  /*@ assert !\valid(p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));
   return __retres;
@@ -146,7 +146,6 @@ int goto_valid(void)
       }
     }
     FIRST:
-    /*@ assert \valid(p); */
     {
       int __gen_e_acsl_initialized;
       int __gen_e_acsl_and;
@@ -183,6 +182,7 @@ int goto_valid(void)
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
+    /*@ assert \valid(p); */ ;
     {
       int __gen_e_acsl_initialized_2;
       int __gen_e_acsl_and_2;
@@ -268,7 +268,6 @@ int goto_valid(void)
     __e_acsl_delete_block((void *)(& a1));
   }
   SECOND:
-  /*@ assert !\valid(p); */
   {
     int __gen_e_acsl_initialized_4;
     int __gen_e_acsl_and_4;
@@ -305,6 +304,7 @@ int goto_valid(void)
     __e_acsl_assert(! __gen_e_acsl_and_4,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
+  /*@ assert !\valid(p); */ ;
   {
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_5;
