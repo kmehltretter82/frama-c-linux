@@ -392,7 +392,7 @@ exception No_simple_translation of predicate
    However, it is correct to use it only in specific contexts. *)
 let untyped_to_exp p =
   let env = Env.push Env.empty in
-  let env = Env.rte env false in
+  let env = Env.set_rte env false in
   let e, _, env =
     try generalized_untyped_to_exp
           ~adata:Assert.no_data

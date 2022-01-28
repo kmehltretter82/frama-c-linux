@@ -169,8 +169,8 @@ val pop_loop: t -> t
 (** {2 RTEs} *)
 (* ************************************************************************** *)
 
-val rte: t -> bool -> t
-(** [rte env x] sets RTE generation to x for the given environment *)
+val set_rte: t -> bool -> t
+(** [set_rte env x] sets RTE generation to x for the given environment *)
 
 val generate_rte: t -> bool
 (** Returns the current value of RTE generation for the given environment *)

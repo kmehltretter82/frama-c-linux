@@ -163,7 +163,7 @@ let pop_loop env =
 (** {2 RTEs} *)
 (* ************************************************************************** *)
 
-let rte env b =
+let set_rte env b =
   let local_env, tl_env = top env in
   { env with env_stack = { local_env with rte = b } :: tl_env }
 
@@ -173,16 +173,16 @@ let generate_rte env =
 
 let with_rte ~f env rte_value =
   let old_rte_value = generate_rte env in
-  let env = rte env rte_value in
+  let env = set_rte env rte_value in
   let env = f env in
-  let env = rte env old_rte_value in
+  let env = set_rte env old_rte_value in
   env
 
 let with_rte_and_result ~f env rte_value =
   let old_rte_value = generate_rte env in
-  let env = rte env rte_value in
+  let env = set_rte env rte_value in
   let other, env = f env in
-  let env = rte env old_rte_value in
+  let env = set_rte env old_rte_value in
   other, env
 
 (* ************************************************************************** *)
