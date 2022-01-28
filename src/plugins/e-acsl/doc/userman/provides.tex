@@ -306,6 +306,101 @@ At the present stage of implementation \eacsl does not support generating
 executables with ABI different to the default one.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Concurrency Support}\label{sec:eacsl-gcc:concurrency}
+
+\subsubsection{How to Activate Concurrency}
+
+\eacsl supports the monitoring of Linux's \texttt{pthreads} concurrent code by
+using the option \longopt{concurrency} of  \eacslgcc.
+
+Example of compilation with concurrency support using \eacslgcc:
+\begin{shell}
+  \$ e-acsl-gcc.sh -c foo.c --concurrency -o foo.frama.c -O foo
+\end{shell}
+
+The concurrency support is a two part activation: first the
+\longopt{e-acsl-concurrency} \framac option is enabled to generate concurrent
+ready code, then when compiling the generated code, the preprocessor variable
+\texttt{E\_ACSL\_CONCURRENCY\_PTHREAD} is defined and the linker option
+\shortopt{pthread} is added.
+
+Example of compilation with concurrency support using \framac and \gcc directly
+(where \texttt{\$E\_ACSL\_SHARE} points to the \texttt{share/frama-c/e-acsl}
+folder of \framac and \texttt{\$E\_ACSL\_LIB} points to the
+\texttt{lib/frama-c/e-acsl} folder of \framac):
+\begin{shell}
+  \$ frama-c \
+        -remove-unused-specified-functions \
+        -machdep gcc_x86_64 \
+        -cpp-extra-args="-std=c99 -D_DEFAULT_SOURCE -D__NO_CTYPE \
+                         -D__FC_MACHDEP_X86_64" \
+        -no-frama-c-stdlib \
+        foo.c \
+        -e-acsl -e-acsl-concurrency \
+        -then-last -print -ocode foo.frama.c
+  \$ gcc \
+        -std=c99 -m64 -g -O2 -fno-builtin -fno-merge-constants \
+        -Wno-attributes -Wno-implicit-function-declaration \
+        -DE_ACSL_SEGMENT_MMODEL -DE_ACSL_CONCURRENCY_PTHREAD \
+        -I\$E_ACSL_SHARE \
+        -o foo.e-acsl \
+        foo.frama.c \
+        \$E_ACSL_SHARE/e_acsl_rtl.c \
+        -pthread \
+        \$E_ACSL_LIB/libeacsl-dlmalloc.a \
+        -lgmp -lm
+\end{shell}
+
+\subsubsection{Function Contracts Limitations}
+
+For now, the \eacsl language~\cite{eacsl} does not support concurrent access
+indications, so some care should be taken when writing specifications that
+access to the shared memory. As a workaround, the memory accesses inside the
+specification can be protected code outside the specification, for instance by
+acquiring and releasing a lock around \eacsl assertions.
+
+As an example, the following code acquire the lock on a mutex before accessing
+the shared global variable \texttt{a}. However, \eacsl will place the
+translation of the precondition before acquiring the lock, and the translation
+of the postcondition after releasing the lock. Therefore, their validity status
+may vary with respect to the thread interleaving.
+
+\begin{minipage}{\linewidth}
+\begin{ccode}
+/*@ requires \valid(a) && \initialized(a);
+    requires \valid(b) && \initialized(b);
+    ensures *a == \old(*a) + 1;
+    ensures *b == \old(*b) + *a; */
+void f() {
+  pthread_mutex_lock(&lock);
+  *a += 1;
+  *b += *a;
+  pthread_mutex_unlock(&lock);
+}
+\end{ccode}
+\end{minipage}
+
+The workaround here is to move the function contract to a statement contract
+surrounded by the lock:
+
+\begin{minipage}{\linewidth}
+\begin{ccode}
+void f() {
+  pthread_mutex_lock(&lock);
+  /*@ requires \valid(a) && \initialized(a);
+      requires \valid(b) && \initialized(b);
+      ensures *a == \old(*a) + 1;
+      ensures *b == \old(*b) + *a; */
+  {
+    *a += 1;
+    *b += *a;
+  }
+  pthread_mutex_unlock(&lock);
+}
+\end{ccode}
+\end{minipage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Documentation}\label{sec:eacsl-gcc:doc}
 
 For full up-to-date documentation of \eacslgcc see its man page:

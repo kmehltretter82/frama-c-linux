@@ -38,6 +38,7 @@
 #include "internals/e_acsl_debug.c"
 #include "internals/e_acsl_malloc.c"
 #include "internals/e_acsl_private_assert.c"
+#include "internals/e_acsl_rtl_error.c"
 #include "internals/e_acsl_rtl_io.c"
 #include "internals/e_acsl_rtl_string.c"
 #include "internals/e_acsl_shexec.c"

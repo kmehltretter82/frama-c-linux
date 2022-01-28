@@ -731,6 +731,17 @@ let consolidated_must_monitor_vi vi =
     Env.consolidated_mem vi
   end
 
+let concurrent_function_ref = ref None
+
+let abort_because_of_concurrent ~loc vi =
+  Cil.CurrentLoc.set loc;
+  Options.abort
+    ~current:true
+    "Found concurrent function %a and monitored memory properties.\n\
+     Please use option '-e-acsl-concurrency' to add concurrency support."
+    Printer.pp_varinfo vi
+
+
 let must_monitor_vi ?kf ?stmt vi =
   let _kf = match kf, stmt with
     | None, None | Some _, _ -> kf
@@ -739,26 +750,29 @@ let must_monitor_vi ?kf ?stmt vi =
   (* [JS 2013/05/07] that is unsound to take the env from the given stmt in
      presence of aliasing with an address (see tests address.i).
      TODO: could be optimized though *)
-  consolidated_must_monitor_vi vi
-(*  match stmt, kf with
-    | None, _ -> consolidated_must_monitor_vi vi
-    | Some _, None ->
-    assert false
-    | Some stmt, Some kf  ->
-    if not (Env.is_consolidated ()) then
-      ignore (consolidated_must_monitor_vi vi);
-    try
-      let tbl = Env.find kf in
+  let res = consolidated_must_monitor_vi vi in
+  (*  match stmt, kf with
+      | None, _ -> consolidated_must_monitor_vi vi
+      | Some _, None ->
+      assert false
+      | Some stmt, Some kf  ->
+      if not (Env.is_consolidated ()) then
+        ignore (consolidated_must_monitor_vi vi);
       try
-    let set = Stmt.Hashtbl.find tbl stmt in
-    Varinfo.Hptset.mem vi (Env.default_varinfos set)
+        let tbl = Env.find kf in
+        try
+      let set = Stmt.Hashtbl.find tbl stmt in
+      Varinfo.Hptset.mem vi (Env.default_varinfos set)
+        with Not_found ->
+      (* new statement *)
+      consolidated_must_monitor_vi vi
       with Not_found ->
-    (* new statement *)
-    consolidated_must_monitor_vi vi
-    with Not_found ->
-      (* [kf] is dead code *)
-      false
-*)
+        (* [kf] is dead code *)
+        false
+  *)
+  match res, !concurrent_function_ref with
+  | true, Some (loc, vi) -> abort_because_of_concurrent ~loc vi
+  | _, _ -> res
 
 let rec apply_on_vi_base_from_lval f ?kf ?stmt = function
   | Var vi, _ -> f ?kf ?stmt vi
@@ -822,6 +836,14 @@ let use_monitoring () =
   not (Env.is_empty ())
   || Options.Full_mtracking.get ()
   || Env.has_heap_allocations ()
+
+let found_concurrent_function ~loc vi =
+  if use_monitoring () then
+    abort_because_of_concurrent ~loc vi
+  else
+    match !concurrent_function_ref with
+    | None -> concurrent_function_ref := Some (loc, vi)
+    | Some _ -> ()
 
 (*
 Local Variables:

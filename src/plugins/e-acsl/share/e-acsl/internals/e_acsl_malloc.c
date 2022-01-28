@@ -22,6 +22,10 @@
 
 #include "e_acsl_malloc.h"
 
+#define eacsl_create_mspace export_alias(create_mspace)
+
+extern mspace eacsl_create_mspace(size_t, int);
+
 struct memory_spaces mem_spaces = {
     .rtl_mspace = NULL,
     .heap_mspace = NULL,
@@ -32,12 +36,16 @@ struct memory_spaces mem_spaces = {
     .heap_mspace_least = 0,
 };
 
+mspace eacsl_create_locked_mspace(size_t size) {
+  return eacsl_create_mspace(size, 1);
+}
+
 /* \brief Create two memory spaces, one for RTL and the other for application
    memory. This function *SHOULD* be called before any allocations are made
    otherwise execution fails */
 void eacsl_make_memory_spaces(size_t rtl_size, size_t heap_size) {
-  mem_spaces.rtl_mspace = eacsl_create_mspace(rtl_size, 0);
-  mem_spaces.heap_mspace = eacsl_create_mspace(heap_size, 0);
+  mem_spaces.rtl_mspace = eacsl_create_locked_mspace(rtl_size);
+  mem_spaces.heap_mspace = eacsl_create_locked_mspace(heap_size);
   /* Do not use `eacsl_mspace_least_addr` here, as it returns the address of the
      mspace header. */
   mem_spaces.rtl_start =

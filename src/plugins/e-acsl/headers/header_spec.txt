@@ -26,6 +26,7 @@ share/e-acsl/instrumentation_model/e_acsl_temporal_timestamp.h: CEA_LGPL_OR_PROP
 share/e-acsl/internals/e_acsl_alias.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_bits.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_bits.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/internals/e_acsl_concurrency.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_config.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_debug.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_debug.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -33,6 +34,8 @@ share/e-acsl/internals/e_acsl_malloc.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_malloc.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_private_assert.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_private_assert.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/internals/e_acsl_rtl_error.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/internals/e_acsl_rtl_error.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_rtl_io.c: MODIFIED_SPARETIMELABS
 share/e-acsl/internals/e_acsl_rtl_io.h: MODIFIED_SPARETIMELABS
 share/e-acsl/internals/e_acsl_rtl_string.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -56,6 +59,8 @@ share/e-acsl/observation_model/bittree_model/e_acsl_bittree_timestamp_retrieval.
 share/e-acsl/observation_model/internals/e_acsl_heap_tracking.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/internals/e_acsl_heap_tracking.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/internals/e_acsl_omodel_debug.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/observation_model/internals/e_acsl_patricia_trie.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/observation_model/internals/e_acsl_patricia_trie.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/internals/e_acsl_safe_locations.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/internals/e_acsl_safe_locations.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/internals/e_acsl_timestamp_retrieval.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -64,6 +69,8 @@ share/e-acsl/observation_model/segment_model/e_acsl_segment_omodel_debug.c: CEA_
 share/e-acsl/observation_model/segment_model/e_acsl_segment_timestamp_retrieval.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/segment_model/e_acsl_segment_tracking.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/segment_model/e_acsl_segment_tracking.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/observation_model/segment_model/e_acsl_shadow_concurrency.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/observation_model/segment_model/e_acsl_shadow_concurrency.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/segment_model/e_acsl_shadow_layout.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/segment_model/e_acsl_shadow_layout.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/e_acsl_heap.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -178,6 +185,8 @@ tests/test_config.in: .ignore
 tests/test_config_dev.in: .ignore
 tests/builtin/test_config: .ignore
 tests/builtin/test_config_dev: .ignore
+tests/concurrency/test_config: .ignore
+tests/concurrency/test_config_dev: .ignore
 tests/format/test_config: .ignore
 tests/format/test_config_dev: .ignore
 tests/full-mtracking/test_config: .ignore

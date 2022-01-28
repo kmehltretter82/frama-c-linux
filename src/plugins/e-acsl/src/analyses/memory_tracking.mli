@@ -42,6 +42,24 @@ val must_monitor_lval: ?kf:kernel_function -> ?stmt:stmt -> lval -> bool
 val must_monitor_exp: ?kf:kernel_function -> ?stmt:stmt -> exp -> bool
 (** Same as {!must_model_vi}, for expressions *)
 
+val found_concurrent_function: loc:location -> varinfo -> unit
+(** [found_concurrent_function ~loc fvi] signals to the memory tracking
+    sub-system that a concurrent function [fvi] has been found at [loc] while
+    parsing the sources. This function needs only to be called if the
+    concurrency support of E-ACSL is deactivated.
+
+    If the memory monitoring is in use when a concurrent function is found,
+    abort the parsing: the user needs to activate the concurrency support.
+
+    Otherwise store the information of the first concurrent function found.
+    Later if the memory monitoring is used because of memory properties to
+    verify, then abort the parsing: the user needs to activate the concurrency
+    support.
+
+    In summary, an analyzed source code can be concurrent with the concurrency
+    support of E-ACSL deactivated only if no memory properties are to be
+    verified. *)
+
 (*
   Local Variables:
   compile-command: "make -C ../../../../.."

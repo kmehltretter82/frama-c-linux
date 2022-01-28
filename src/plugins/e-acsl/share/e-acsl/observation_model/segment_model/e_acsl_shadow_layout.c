@@ -20,11 +20,13 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <errno.h>
 #include <stddef.h>
 
 #include "../../internals/e_acsl_malloc.h"
 #include "../../internals/e_acsl_private_assert.h"
+#include "../../internals/e_acsl_rtl_error.h"
+#include "../internals/e_acsl_safe_locations.h"
+#include "e_acsl_segment_tracking.h"
 
 #include "e_acsl_shadow_layout.h"
 
@@ -62,13 +64,13 @@ size_t increase_stack_limit(const size_t size) {
       rl.rlim_cur = stacksz;
       result = setrlimit(RLIMIT_STACK, &rl);
       if (result != 0) {
-        private_abort("setrlimit: %s \n", strerror(errno));
+        private_abort("setrlimit: %s \n", rtl_strerror(errno));
       }
     } else {
       stacksz = rl.rlim_cur;
     }
   } else {
-    private_abort("getrlimit: %s \n", strerror(errno));
+    private_abort("getrlimit: %s \n", rtl_strerror(errno));
   }
   return (size_t)stacksz;
 }
@@ -163,7 +165,7 @@ static size_t get_global_size() {
  */
 
 /*! \brief Return byte-size of the TLS segment */
-inline static size_t get_tls_size() {
+inline size_t get_tls_size() {
   return PGM_TLS_SIZE;
 }
 
@@ -219,7 +221,7 @@ static void grow_bounds_for_size(uintptr_t *min_bound, uintptr_t *max_bound,
 }
 
 /*! \brief Return start address of a program's TLS */
-static uintptr_t get_tls_start() {
+uintptr_t get_tls_start() {
   size_t tls_size = get_tls_size();
   uintptr_t data = (uintptr_t)&id_tdata, bss = (uintptr_t)&id_tbss;
   uintptr_t min_addr = data < bss ? data : bss;
@@ -350,7 +352,7 @@ static void init_shadow_layout_vdso() {
   // (using open() instead of fopen() to avoid a dynamic allocation)
   int maps_fd = open("/proc/self/maps", O_RDONLY);
   private_assert(maps_fd >= 0, "Unable to open /proc/self/maps: %s\n",
-                 strerror(errno));
+                 rtl_strerror(errno));
 
   int result;
   uintptr_t start, end;
@@ -370,7 +372,7 @@ static void init_shadow_layout_vdso() {
       end = 0;
       break;
     } else if (count < 0) {
-      DVABORT("Reading /proc/self/maps failed: %s\n", strerror(errno));
+      DVABORT("Reading /proc/self/maps failed: %s\n", rtl_strerror(errno));
       break;
     } else {
       // Scan the start and end addresses of the segment
@@ -379,7 +381,7 @@ static void init_shadow_layout_vdso() {
       DVASSERT(result == 2,
                "Scanning for addresses in /proc/self/maps failed, expected 2 "
                "addresses, found: %d, error: %s\n",
-               result, strerror(errno));
+               result, rtl_strerror(errno));
 
       if (start <= vdso && vdso < end) {
         break;
@@ -397,7 +399,7 @@ static void init_shadow_layout_vdso() {
           offset = lseek(maps_fd, -offset, SEEK_CUR);
           DVASSERT(offset != -1,
                    "Unable to move file offset of /proc/self/maps: %s\n",
-                   strerror(errno));
+                   rtl_strerror(errno));
           break;
         } else {
           // No newline found on the current buffer, continue reading the file
@@ -409,7 +411,7 @@ static void init_shadow_layout_vdso() {
 
   result = close(maps_fd);
   DVASSERT(result == 0, "Unable to close /proc/self/maps: %s\n",
-           strerror(errno));
+           rtl_strerror(errno));
 
   // Initialize the memory partition
   memory_partition *pvdso = &mem_layout.vdso;
@@ -675,7 +677,7 @@ void set_shadow_segment(memory_segment *seg, memory_segment *parent,
   seg->name = name;
   seg->shadow_ratio = ratio;
   seg->size = parent->size / seg->shadow_ratio;
-  seg->mspace = eacsl_create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
+  seg->mspace = eacsl_create_locked_mspace(seg->size + SHADOW_SEGMENT_PADDING);
   seg->start = (uintptr_t)eacsl_mspace_malloc(seg->mspace, 1);
   seg->end = seg->start + seg->size - 1;
   seg->shadow_offset = parent->start - seg->start;
@@ -704,6 +706,24 @@ void init_shadow_layout_main(int *argc_ref, char ***argv_ref) {
   init_shadow_layout_stack(argc_ref, argv_ref);
 
   mem_layout.is_initialized_main = 1;
+}
+
+void register_safe_locations(int thread_only) {
+  collect_safe_locations();
+  int count = get_safe_locations_count();
+  for (int i = 0; i < count; ++i) {
+    memory_location *loc = get_safe_location(i);
+    if (loc->is_on_static) {
+      void *addr = (void *)loc->address;
+      size_t len = loc->length;
+      if (!thread_only || IS_ON_THREAD(addr)) {
+        shadow_alloca(addr, len);
+        if (loc->is_initialized) {
+          unsafe_initialize(addr, len);
+        }
+      }
+    }
+  }
 }
 
 void clean_shadow_layout() {

@@ -88,6 +88,7 @@ void initialize_report_file(int *argc, char ***argv) {
 
 void describe_run() {
 #if defined(E_ACSL_VERBOSE)
+  RTL_IO_LOCK();
   rtl_printf(
       "/* ========================================================= */\n");
   rtl_printf(" * E-ACSL instrumented run\n");
@@ -99,5 +100,6 @@ void describe_run() {
   rtl_printf(" * Format Checks:   %s\n", E_ACSL_FORMAT_VALIDITY_DESC);
   rtl_printf(
       "/* ========================================================= */\n");
+  RTL_IO_UNLOCK();
 #endif
 }

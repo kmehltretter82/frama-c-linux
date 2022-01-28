@@ -29,11 +29,12 @@
 /* An array storing safe locations up to `safe_location_counter` position.
  * This array should be initialized via a below function called
  * `collect_safe_locations`. */
-static memory_location safe_locations[16];
-static int safe_location_counter = 0;
+static __thread memory_location safe_locations[16];
+static __thread int safe_location_counter = 0;
 
 #define add_safe_location(_addr, _len, _init, _on_static)                      \
   do {                                                                         \
+    safe_locations[safe_location_counter].name = #_addr;                       \
     safe_locations[safe_location_counter].address = _addr;                     \
     safe_locations[safe_location_counter].length = _len;                       \
     safe_locations[safe_location_counter].is_initialized = _init;              \
