@@ -24,11 +24,13 @@
 // --- Pivot Table
 // --------------------------------------------------------------------------
 
-import * as Path from 'path';
 import React from 'react';
 import { TitleBar } from 'ivette';
-import { Label } from 'dome/controls/labels';
+import * as Server from 'frama-c/server';
+import { Button } from 'dome/controls/buttons';
+import { LED } from 'dome/controls/displays';
 import { Scroll } from 'dome/layout/boxes';
+import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
 import * as PivotState from 'frama-c/api/plugins/pivot/general';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
@@ -49,16 +51,15 @@ export function Pivot(props: any) {
   );
 }
 
-export default function PivotTable() {
-  const rawData = States.useSyncValue(PivotState.pivotState) || [];
-  const data = new Array(rawData.length > 0 ? rawData.length-1 : 0);
+function PivotTable (rawData: PivotState.tableStateType): JSX.Element {
+  const data = new Array(rawData.length > 0 ? rawData.length - 1 : 0);
   if (rawData.length > 0) {
     const headers = rawData[0];
     for (let i = 1; i < rawData.length; i++) {
       const src = rawData[i];
-      data[i-1] = {};
+      data[i - 1] = {};
       for (let j = 0; j < headers.length; j++) {
-        data[i-1][headers[j]] = src[j];
+        data[i - 1][headers[j]] = src[j];
       }
     }
   }
@@ -96,15 +97,28 @@ function PivotTableBuild () : JSX.Element {
   }
   const err = error ? <div className="part"> {error} </div> : undefined;
   return (
-    <Scroll>
-      <TitleBar>
-        <Label
-          title="Pivot Title"
-          style={{ textAlign: 'center' }}
+    <div className="pivot-centered">
+      {err}
+      <div className="part">
+        <Button
+          icon="EXECUTE"
+          label="Compute"
+          title="Builds the pivot table. This may take a few moments."
+          onClick={ compute }
         />
-      </TitleBar>
-      <Pivot data={data} />
-    </Scroll>
+      </div>
+    </div>
+  );
+}
+
+export default function PivotTableComponent () : JSX.Element {
+  return (
+    <>
+      <TitleBar />
+      <Scroll>
+        <PivotTableBuild />
+      </Scroll>
+    </>
   );
 }
 
