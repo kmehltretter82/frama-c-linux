@@ -523,6 +523,7 @@ let pivot_signal =
     ~descr:(Markdown.plain "State of the pivot table source data.")
     ~output:(module TableState)
     ~get:PivotSourceState.get
+    ~add_hook:PivotSourceState.add_hook_on_update
     ()
 
 let compute () =
