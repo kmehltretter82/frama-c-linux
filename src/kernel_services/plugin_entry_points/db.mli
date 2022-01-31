@@ -37,7 +37,7 @@
    - {!File}: Cil file initialization
    - {!Globals}: global variables, functions and annotations
    - {!Annotations}: annotations associated with a statement
-   - {!Properties_status}: status of annotations
+   - {!Property_status}: status of annotations
    - {!Kernel_function}: C functions as seen by Frama-C
    - {!Stmts_graph}: the statement graph
    - {!Loop}: (natural) loops
