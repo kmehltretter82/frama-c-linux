@@ -71,7 +71,7 @@ function buildCxtMenu(
 ) {
   commands.push({
     content: content ? renderToString(content) : '',
-    select: action || (() => { }),
+    select: action || (() => { /* Do nothing */ }),
     enabled: !!action,
   });
 }
