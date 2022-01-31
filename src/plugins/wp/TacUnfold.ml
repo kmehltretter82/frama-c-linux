@@ -22,6 +22,7 @@
 
 open Lang
 open Tactical
+open Conditions
 
 (* -------------------------------------------------------------------------- *)
 (* --- Unfold Definition Tactical                                         --- *)
@@ -48,6 +49,8 @@ let range f es =
       (F.p_leq e (F.e_zint b)) in
   F.e_prop (F.p_all range es)
 
+(* Used only for non Multi selection *)
+
 let rec applicable ?at e f es = function
   | phi::others ->
       begin
@@ -61,6 +64,82 @@ let rec applicable ?at e f es = function
   | [] ->
       Not_applicable
 
+(* Used only for Multi selection *)
+
+module Smap = Qed.Idxmap.Make
+    (struct
+      type t = step
+      let id s = s.id
+    end)
+
+let condition original p = (* keep original kind of simple condition *)
+  match original.condition with
+  | Type _ -> Type p
+  | Have _ -> Have p
+  | When _ -> When p
+  | Core _ -> Core p
+  | Init _ -> Init p
+  | _ -> assert false
+
+let collect_term_to_unfold (g, m) = function
+  | Inside(Step step, unfold) ->
+      let l =
+        try Smap.find step m
+        with Not_found -> []
+      in
+      g, Smap.add step (unfold :: l) m
+  | Inside (Goal _, unfold) ->
+      begin match g with
+        | None -> Some [ unfold ], m
+        | Some g -> Some (unfold :: g), m
+      end
+  | _ -> raise Not_found
+
+let rec collect_unfold phis m e =
+  match phis with
+  | phi :: others ->
+      begin
+        try
+          match F.repr e with
+          | Qed.Logic.Fun(f,es) -> Lang.F.Tmap.add e (phi f es) m
+          | _ -> raise Not_found
+        with Not_found | Invalid_argument _ -> collect_unfold others m e
+      end
+  | [] -> m
+
+let unfolds_from_list phis es =
+  List.fold_left (collect_unfold phis) Lang.F.Tmap.empty es
+
+let unfolds_from_smap phis m =
+  Smap.map (fun _s es -> unfolds_from_list phis es) m
+
+let tactical_inside step unfolds sequent =
+  if Lang.F.Tmap.is_empty unfolds
+  then raise Not_found
+  else match step.condition with
+    | Type p | Have p | When p | Core p | Init p ->
+        let subst t = Lang.F.Tmap.find t unfolds in
+        let p = condition step @@ Lang.p_subst subst p in
+        snd @@ Tactical.replace_single ~at:step.id ("Unfolded", p) sequent
+    | _ -> raise Not_found
+
+let tactical_goal unfolds (seq, g) =
+  if Lang.F.Tmap.is_empty unfolds
+  then raise Not_found
+  else
+    let subst t = Lang.F.Tmap.find t unfolds in
+    seq, Lang.p_subst subst g
+
+let fold_selection goal_unfolds step_unfolds sequent =
+  "Unfolded multiple selection",
+  let add_goal = match goal_unfolds with
+    | None -> Extlib.id
+    | Some goal_unfolds -> tactical_goal goal_unfolds
+  in
+  add_goal @@ Smap.fold tactical_inside step_unfolds sequent
+
+let process (f: sequent -> string * sequent) s = [ f s ]
+
 class unfold =
   object
     inherit Tactical.make ~id:"Wp.unfold"
@@ -69,13 +148,21 @@ class unfold =
         ~params:[]
 
     method select _feedback (s : Tactical.selection) =
-      let at = Tactical.at s in
-      let e = Tactical.selected s in
-      match F.repr e with
-      | Qed.Logic.Fun(f,es) ->
-          applicable ?at e f es [ definition ; range ]
-      | _ -> Not_applicable
-
+      let unfoldings = [ definition ; range ] in
+      match s with
+      | Multi es ->
+          let goal, steps =
+            List.fold_left collect_term_to_unfold (None, Smap.empty) es in
+          let goal = Option.map (unfolds_from_list unfoldings) goal in
+          let steps = unfolds_from_smap unfoldings steps in
+          Applicable (process @@ fold_selection goal steps)
+      | s ->
+          let at = Tactical.at s in
+          let e = Tactical.selected s in
+          match F.repr e with
+          | Qed.Logic.Fun(f,es) ->
+              applicable ?at e f es unfoldings
+          | _ -> Not_applicable
   end
 
 let tactical = Tactical.export (new unfold)
