@@ -153,12 +153,7 @@ Prove: (a = 0) /\ (b = 0).
 ------------------------------------------------------------
 
 Goal Post-condition for 'true' (file bitwise.i, line 78) in 'bor_bool':
-Assume {
-  Type: is_bool(a) /\ is_bool(b).
-  (* Pre-condition for 'true' *)
-  Have: (a = 1) \/ (b = 1).
-}
-Prove: (a != 0) \/ (b != 0).
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
