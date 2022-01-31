@@ -715,7 +715,7 @@ export function send<In, Out>(
 
 function _resolved(id: string) {
   pending.delete(id);
-  if (pending.size == 0) {
+  if (pending.size === 0) {
     rqCount = 0;
     if (pollingTimer) {
       clearInterval(pollingTimer);

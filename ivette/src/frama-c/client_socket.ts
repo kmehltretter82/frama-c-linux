@@ -164,7 +164,7 @@ class SocketClient extends Client {
     if (len < 1) return;
     const hd = msg.readInt8(0);
     // 'S': 83, 'L': 76, 'W': 87
-    const phex = hd == 83 ? 4 : hd == 76 ? 8 : 16;
+    const phex = hd === 83 ? 4 : hd === 76 ? 8 : 16;
     if (len < phex) return;
     const size = Number.parseInt(msg.slice(1, phex).toString('ascii'), 16);
     const offset = phex + size;

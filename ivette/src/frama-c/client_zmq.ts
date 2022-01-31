@@ -95,7 +95,7 @@ class ZmqClient extends Client {
 
   /** Polling */
   poll(): void {
-    if (this.zmqSocket && this.queue.length == 0) {
+    if (this.zmqSocket && this.queue.length === 0) {
       this.queue.push('POLL');
     }
     this._flush();
