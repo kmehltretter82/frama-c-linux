@@ -64,7 +64,7 @@ Goal Post-condition (file cast_fits.i, line 37) in 'fits4':
 Let x = Mchar_0[shiftfield_F6_c6(p)].
 Let x_1 = Mchar_0[shiftfield_F3_c3(shift_S3(shiftfield_F5_ci5(p), 1))].
 Assume {
-  Type: is_sint8(x) /\ is_sint32(x) /\ is_sint8(x_1).
+  Type: is_sint8(x) /\ is_sint8(x_1).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ sconst(Mchar_0).
 }

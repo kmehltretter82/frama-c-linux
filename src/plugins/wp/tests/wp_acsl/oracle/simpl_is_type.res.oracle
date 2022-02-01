@@ -207,7 +207,7 @@ Assume {
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 < size_0) /\ is_sint32(i_1).
+  When: (0 <= i_1) /\ (i_1 < size_0).
   (* Pre-condition *)
   Have: 0 < size_0.
   (* Invariant *)
@@ -269,7 +269,7 @@ Assume {
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i) /\ is_sint32(i_1).
+  When: (0 <= i_1) /\ (i_1 <= i).
   (* Pre-condition *)
   Have: 0 < size_0.
   (* Invariant *)
@@ -308,7 +308,7 @@ Assume {
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
-  When: (i_1 < size_0) /\ (i < i_1) /\ is_sint32(i_1).
+  When: (i_1 < size_0) /\ (i < i_1).
   (* Pre-condition *)
   Have: 0 < size_0.
   (* Invariant *)
@@ -340,7 +340,7 @@ Assume {
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
-  When: (0 <= i) /\ (i < size_0) /\ is_sint32(i).
+  When: (0 <= i) /\ (i < size_0).
   (* Pre-condition *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < size_0) ->
       (Mint_0[shift_sint32(t, i_1)] < 0))).
@@ -457,7 +457,7 @@ Assume {
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
-  When: (0 <= i) /\ (i <= i_1) /\ is_sint32(i).
+  When: (0 <= i) /\ (i <= i_1).
   (* Pre-condition *)
   Have: 0 < size_0.
   (* Invariant *)

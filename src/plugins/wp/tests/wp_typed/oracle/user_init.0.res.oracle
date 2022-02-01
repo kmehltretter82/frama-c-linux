@@ -18,7 +18,7 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 < n) /\ is_sint32(i_1).
+  When: (0 <= i_1) /\ (i_1 < n).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a_1, n).
   (* Invariant 'Range' *)
@@ -43,7 +43,7 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: (i_1 <= i) /\ (0 <= i_1) /\ is_sint32(i_1).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a_1, n).
   (* Invariant 'Range' *)

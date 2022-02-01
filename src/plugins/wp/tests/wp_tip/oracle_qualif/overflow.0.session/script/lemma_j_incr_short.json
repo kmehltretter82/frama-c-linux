@@ -5,7 +5,7 @@
                                   "verdict": "valid", "time": 0.0098,
                                   "steps": 25 } ],
                   "Lower": [ { "prover": "Alt-Ergo:2.2.0",
-                               "verdict": "valid", "time": 0.0248,
+                               "verdict": "valid", "time": 0.0198,
                                "steps": 54 },
                              { "header": "Overflow", "tactic": "Wp.overflow",
                                "params": {},
