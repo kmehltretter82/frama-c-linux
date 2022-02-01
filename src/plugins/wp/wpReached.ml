@@ -123,9 +123,9 @@ let goto a b =
 let flow i f =
   if f = F_dead then F_dead else
     match i with
-    | Asm _ | Set _ -> F_effect
+    | Asm _ | Set _ | Local_init _ -> F_effect
     | Call _ -> F_call
-    | Local_init _ | Skip _ | Code_annot _ -> F_goto
+    | Skip _ | Code_annot _ -> F_goto
 
 let merge a b = match a,b with
   | F_dead , F_dead -> F_dead
