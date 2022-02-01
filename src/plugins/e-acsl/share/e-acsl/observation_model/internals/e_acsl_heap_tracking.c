@@ -60,8 +60,9 @@ void report_heap_leaks() {
   size_t size = eacsl_get_heap_allocation_size();
   size_t blocks = eacsl_get_heap_allocated_blocks();
   if (size) {
-    rtl_printf(" *** WARNING: Leaked %lu bytes of heap memory in %ld block%s\n",
-               size, blocks, (blocks == 1) ? "" : "s");
+    rtl_eprintf(
+        " *** WARNING: Leaked %lu bytes of heap memory in %ld block%s\n", size,
+        blocks, (blocks == 1) ? "" : "s");
   }
 #endif
 }
