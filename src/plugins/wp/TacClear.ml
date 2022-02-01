@@ -35,19 +35,19 @@ let condition original p = (* keep original kind of simple condition *)
 let tactical_step step =
   Tactical.replace_single ~at:step.id ("Removed", Conditions.Have Lang.F.p_true)
 
+module TermLset = Qed.Listset.Make(Lang.F.QED.Term)
+
 let tactical_inside step remove =
-  let rec collect p =
+  let remove = List.sort_uniq Lang.F.compare remove in
+  let collect p =
     match Lang.F.p_expr p with
-    | And ps -> collect_list ps
+    | And ps -> ps
     | _ -> [ p ]
-  and collect_list = function
-    | [] -> []
-    | p :: l -> List.rev_append (List.rev @@ collect p) (collect_list l)
   in
   begin match step.condition with
     | Type p | Have p | When p | Core p | Init p ->
         let ps = Lang.F.e_props @@ collect p in
-        let ps = List.filter (fun x -> not @@ List.mem x remove) ps in
+        let ps = TermLset.diff ps remove in
         let cond = condition step @@ Lang.F.p_bool @@ Lang.F.e_and ps in
         Tactical.replace_single ~at:step.id ("Filtered", cond)
 
