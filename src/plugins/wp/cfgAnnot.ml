@@ -410,25 +410,20 @@ let get_stmt_assigns kf stmt =
 (* --- Code Assertions                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-type code_assertions = {
-  code_admitted: WpPropId.pred_info list ;
-  code_verified: WpPropId.pred_info list ;
+type code_assertion = {
+  code_admitted: WpPropId.pred_info option ;
+  code_verified: WpPropId.pred_info option ;
 }
 
-let reverse_code_assertions a = {
-  code_admitted = List.rev a.code_admitted ;
-  code_verified = List.rev a.code_verified ;
-}
-
+(* Note: generated in REVERSE order *)
 module CodeAssertions = WpContext.StaticGenerator(CodeKey)
     (struct
       type key = CodeKey.t
-      type data = code_assertions
+      type data = code_assertion list
       let name = "Wp.CfgAnnot.CodeAssertions"
       let compile (kf,stmt) =
         let labels = NormAtLabels.labels_assert ~kf stmt in
         let normalize_pred p = NormAtLabels.preproc_annot labels p in
-        reverse_code_assertions @@
         Annotations.fold_code_annot
           begin fun _emitter ca l ->
             match ca.annot_content with
@@ -446,23 +441,23 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
                   normalize_pred a.tp_statement in
                 let admit = Logic_utils.use_predicate a.tp_kind in
                 let verif = Logic_utils.verify_predicate a.tp_kind in
-                let use flag p ps = if flag then p::ps else ps in
+                let use flag p = if flag then Some p else None in
                 {
-                  code_admitted = use admit p l.code_admitted ;
-                  code_verified = use verif p l.code_verified ;
-                }
+                  code_admitted = use admit p ;
+                  code_verified = use verif p ;
+                } :: l
             | _ -> l
-          end stmt {
-          code_admitted = [];
-          code_verified = [];
-        }
+          end stmt []
     end)
 
 let get_code_assertions ?(smoking=false) kf stmt =
   let ca = CodeAssertions.get (kf,stmt) in
+  (* Make sur that smoke tests are in the end so that it can see surely false
+     assertions associated to this statement, in particular RTE assertions.   *)
+  List.rev @@
   if smoking then
     let s = smoke kf ~id:"dead_code" ~unreachable:stmt () in
-    { ca with code_verified = s :: ca.code_verified }
+    { code_admitted = None ; code_verified = Some s } :: ca
   else ca
 
 (* -------------------------------------------------------------------------- *)
