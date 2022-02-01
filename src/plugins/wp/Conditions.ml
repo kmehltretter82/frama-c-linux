@@ -880,28 +880,47 @@ and letify_case sigma ~target ~export seq =
 (* --- External Simplifier                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* Simplify an expression. *)
 let simplify_exp solvers e =
   List.fold_left (fun e s -> s#simplify_exp e) e solvers
+
+(* Simplify the goal.
+    In any case must return a stronger formula. *)
 let simplify_goal solvers p =
   List.fold_left (fun p s -> s#simplify_goal p) p solvers
+
+(** Simplify an hypothesis before assuming it.
+    In any case must return a weaker formula. *)
 let simplify_hyp solvers p =
   List.fold_left (fun p s -> s#simplify_hyp p) p solvers
+
+(* Simplify a branch condition.
+   In any case must return an equivalent formula. *)
 let simplify_branch solvers p =
   List.fold_left (fun p s -> s#simplify_branch p) p solvers
 
 let apply_hyp modified solvers h =
-  let simple p =
+  let weaken_and_then_assume p =
     let p' = simplify_hyp solvers p in
     if not (Lang.F.eqp p p') then modified := true;
     List.iter (fun s -> s#assume p') solvers; p'
   in
+  let weaken_hyp p = match F.p_expr p with
+    | And ps ->
+        let unmodified,qs = List.fold_left (fun (unmodified,qs) p ->
+            let p' = weaken_and_then_assume p in
+            (unmodified && (Lang.F.eqp p p')), (p'::qs))
+            (true,[]) ps
+        in if unmodified then p else p_conj qs
+    | _ -> weaken_and_then_assume p
+  in
   match h.condition with
   | State s -> update_cond h (State (Mstate.apply (simplify_exp solvers) s))
-  | Init p -> update_cond h (Init (simple p))
-  | Type p -> update_cond h (Type (simple p))
-  | Have p -> update_cond h (Have (simple p))
-  | When p -> update_cond h (When (simple p))
-  | Core p -> update_cond h (Core (simple p))
+  | Init p -> update_cond h (Init (weaken_hyp p))
+  | Type p -> update_cond h (Type (weaken_hyp p))
+  | Have p -> update_cond h (Have (weaken_hyp p))
+  | When p -> update_cond h (When (weaken_hyp p))
+  | Core p -> update_cond h (Core (weaken_hyp p))
   | Branch(p,_,_) -> List.iter (fun s -> s#target p) solvers; h
   | Either _ -> h
 
