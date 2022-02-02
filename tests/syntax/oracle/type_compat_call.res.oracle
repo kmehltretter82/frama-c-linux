@@ -15,6 +15,8 @@ void h(uint8_t const *p);
 
 void m(int8_t const *p);
 
+void n(int volatile *p);
+
 int main(void)
 {
   int __retres;
@@ -28,6 +30,8 @@ int main(void)
   h((uint8_t const *)(& u));
   m((int8_t const *)(& c));
   m((int8_t const *)(& s));
+  int j = 51;
+  n((int volatile *)(& j));
   __retres = 0;
   return __retres;
 }

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -362,15 +362,13 @@ sig
   sig
     type t = sigma
     val create : ?pool:pool -> unit -> t
+    val copy : sigma -> sigma
 
     val fresh : t -> tau -> var
-    val get : t -> term -> term
+    val find : t -> term -> term
     val filter : t -> term -> bool
 
     val add : t -> term -> term -> unit
-    (** Must bind lc-closed terms, or raise Invalid_argument *)
-
-    val add_map : t -> term Tmap.t -> unit
     (** Must bind lc-closed terms, or raise Invalid_argument *)
 
     val add_fun : t -> (term -> term) -> unit

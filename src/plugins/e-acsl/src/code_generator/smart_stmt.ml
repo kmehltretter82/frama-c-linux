@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,27 +34,60 @@ let call_instr ~loc ?result e args = instr (Call(result, e, args, loc))
 
 let assigns ~loc ~result e = instr (Set(result, e, loc))
 
+let assigns_field ~loc vi name value =
+  let ty = vi.vtype in
+  let compinfo =
+    match Cil.unrollType ty with
+    | TComp (compinfo, _) -> compinfo
+    | _ ->
+      Options.fatal
+        "type of %a (%a) is not a structure"
+        Printer.pp_varinfo vi
+        Printer.pp_typ ty
+  in
+  let field =
+    try
+      Cil.getCompField compinfo name
+    with Not_found ->
+      Options.fatal
+        "Unable to find field '%s' in structure '%a'"
+        name
+        Printer.pp_typ ty
+  in
+  let result = Var vi, (Field (field, NoOffset)) in
+  assigns ~loc ~result value
+
 let if_stmt ~loc ~cond ?(else_blk=Cil.mkBlock []) then_blk =
   stmt (If (cond, then_blk, else_blk, loc))
 
 let break ~loc = stmt (Break loc)
 
-type annotation_kind =
-  | Assertion
-  | Precondition
-  | Postcondition
-  | Invariant
-  | RTE
-
-let kind_to_string loc k =
-  Cil.mkString
-    ~loc
-    (match k with
-     | Assertion -> "Assertion"
-     | Precondition -> "Precondition"
-     | Postcondition -> "Postcondition"
-     | Invariant -> "Invariant"
-     | RTE -> "RTE")
+let struct_local_init ~loc vi fields =
+  vi.vdefined <- true;
+  let ty = vi.vtype in
+  let compinfo =
+    match Cil.unrollType ty with
+    | TComp (compinfo, _) -> compinfo
+    | _ ->
+      Options.fatal
+        "type of %a (%a) is not a structure"
+        Printer.pp_varinfo vi
+        Printer.pp_typ ty
+  in
+  let fields =
+    List.map
+      (fun (name, e) ->
+         try
+           let field = Cil.getCompField compinfo name in
+           Field (field, NoOffset), SingleInit e
+         with Not_found ->
+           Options.fatal
+             "Unable to find field '%s' in structure '%a'"
+             name
+             Printer.pp_typ ty)
+      fields
+  in
+  instr (Local_init (vi, AssignInit (CompoundInit (ty, fields)), loc))
 
 let block stmt b = match b.bstmts with
   | [] ->
@@ -81,7 +114,7 @@ let do_call ~loc ?result vi args =
           | TPtr _, TArray _, _ -> assert false
           | _, _, _ -> arg
         in
-        let e = Cil.mkCast ~force:false ~newt:ty ~e in
+        let e = Cil.mkCast ~force:false ~newt:ty e in
         make_rev_args (e :: res) args_tl param_ty_tl
       | arg :: args_tl, [] when variadic -> make_rev_args (arg :: res) args_tl []
       | [], [] -> res
@@ -142,7 +175,7 @@ let named_store_stmt name ?str_size vi =
   let loc = vi.vdecl in
   let store = rtl_call ~loc name in
   match ty, str_size with
-  | TArray(_, Some _,_,_), None ->
+  | TArray(_, Some _,_), None ->
     store [ Cil.evar ~loc vi; Cil.sizeOf ~loc ty ]
   | TPtr(TInt(IChar, _), _), Some size ->
     store [ Cil.evar ~loc vi ; size ]
@@ -170,32 +203,20 @@ let delete_stmt ?(is_addr=false) vi =
   let loc = vi.vdecl in
   let mk = rtl_call ~loc "delete_block" in
   match is_addr, Cil.unrollType vi.vtype with
-  | _, TArray(_, Some _, _, _) | true, _ -> mk [ Cil.evar ~loc vi ]
+  | _, TArray(_, Some _, _) | true, _ -> mk [ Cil.evar ~loc vi ]
   | _ -> mk [ Cil.mkAddrOfVi vi ]
 
 let mark_readonly vi =
   let loc = vi.vdecl in
   rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
 
-let runtime_check_with_msg ~loc msg kind kf e =
-  let file = (fst loc).Filepath.pos_path in
-  let line = (fst loc).Filepath.pos_lnum in
-  rtl_call ~loc
-    "assert"
-    [ e;
-      kind_to_string loc kind;
-      Cil.mkString ~loc (Functions.RTL.get_original_name kf);
-      Cil.mkString ~loc msg;
-      Cil.mkString ~loc (Filepath.Normalized.to_pretty_string file);
-      Cil.integer loc line ]
-
-let runtime_check kind kf e p =
-  let loc = p.pred_loc in
-  let msg =
-    Kernel.Unicode.without_unicode
-      (Format.asprintf "%a@?" Printer.pp_predicate) p
-  in
-  runtime_check_with_msg ~loc msg kind kf e
+type annotation_kind =
+  | Assertion
+  | Precondition
+  | Postcondition
+  | Invariant
+  | Variant
+  | RTE
 
 (*
 Local Variables:

@@ -1,8 +1,7 @@
 /* run.config
 MODULE: @PTEST_NAME@
-STDOPT: +"-no-print"
+OPT: -no-autoload-plugins
 */
-
 int f(int);
 int g(int);
 

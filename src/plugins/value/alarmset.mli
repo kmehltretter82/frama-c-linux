@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -98,6 +98,7 @@ val exists: (alarm -> status -> bool) -> default:(status -> bool) -> t -> bool
 val for_all: (alarm -> status -> bool) -> default:(status -> bool) -> t -> bool
 
 val iter: (alarm -> status -> unit) -> t -> unit
+val fold : (alarm -> status -> 'a -> 'a) -> 'a -> t -> 'a
 
 (** Emits the alarms according to the given warn mode, at the given
     instruction. *)

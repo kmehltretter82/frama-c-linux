@@ -7,12 +7,15 @@
                  # an optional include, unnecessary if frama-c is in the PATH.
 FRAMAC ?= frama-c # FRAMAC is defined in path.mk when it is included, but the
                   # user can override it in the command-line.
-include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/prologue.mk
+ifeq ($(FRAMAC_SHARE),)
+  FRAMAC_SHARE := $(shell $(FRAMAC)-config -print-share-path)
+endif
+include $(FRAMAC_SHARE)/analysis-scripts/prologue.mk
 ###############################################################################
 
 # Edit below as needed. Suggested flags are optional.
 
-MACHDEP = x86_32
+MACHDEP = x86_64
 
 ## Preprocessing flags (for -cpp-extra-args)
 CPPFLAGS    += \
@@ -27,6 +30,9 @@ FCFLAGS     += \
 EVAFLAGS    += \
   -eva-warn-key builtins:missing-spec=abort \
 
+## WP-specific flags
+WPFLAGS    += \
+
 ## GUI-only flags
 FCGUIFLAGS += \
 
@@ -38,5 +44,5 @@ main.parse: \
   main.c \
 
 ### Epilogue. Do not modify this block. #######################################
-include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/epilogue.mk
+include $(FRAMAC_SHARE)/analysis-scripts/epilogue.mk
 ###############################################################################

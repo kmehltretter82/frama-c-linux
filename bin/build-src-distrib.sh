@@ -14,19 +14,19 @@ DEBUG=no
 # (special use of the 'case' construct)
 if test `echo $BASH_VERSION | sed "s/\([0-9]\).*/\1/" ` -lt 4; then
     echo "bash version >= 4 is required."
-    exit 99
+    exit 127
 fi
 
 # git-lfs needs to be installed
 if ! command -v git-lfs >/dev/null 2>/dev/null; then
     echo "git-lfs is required"
-    exit 99
+    exit 127
 fi
 
-# rgrep needs to be installed
-if ! command -v rgrep --version >/dev/null 2>/dev/null; then
-    echo "rgrep is required"
-    exit 99
+# grep needs to be installed
+if ! command -v grep --version >/dev/null 2>/dev/null; then
+    echo "grep is required"
+    exit 127
 fi
 
 function run {
@@ -100,7 +100,7 @@ function look_for_uncommited_changes {
 }
 
 function look_for_frama_c_dev {
-    rgrep -i "frama-c+dev" src &> /dev/null
+    grep -Iir "frama-c+dev" src &> /dev/null
     if [ "$?" == "0" ]; then
         echo "### WARNING: Remaining frama-c+dev occurrences in 'src'"
         proceed_anyway "Update API, then run the script again"
@@ -211,15 +211,17 @@ function fill_wiki {
     PAGE_NAME=Frama-C-${FRAMAC_VERSION_AND_CODENAME}.md
     WIKI_PAGE=$WIKI_DIR/$PAGE_NAME
     run "mkdir -p $WIKI_DIR/manuals"
-    run "sed -i -e '/<!-- LAST RELEASE -->/a \
-- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $WIKI_DIR/Home.md"
+    run "sed -e '/<!-- LAST RELEASE -->/a\\
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' -i.bak $WIKI_DIR/Home.md"
+    run "rm -f $WIKI_DIR/Home.md.bak"
     if test "$FINAL_RELEASE" = "yes"; then
         release_type="FINAL"
     else
         release_type="BETA"
     fi
-    run "sed -i -e '/<!-- LAST ${release_type} RELEASE -->/a \
-- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $WIKI_DIR/_sidebar.md"
+    run "sed -e '/<!-- LAST ${release_type} RELEASE -->/a\\
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' -i.bak $WIKI_DIR/_sidebar.md"
+    run "rm -f $WIKI_DIR/_sidebar.md.bak"
     echo "# Frama-C release ${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})" > $WIKI_PAGE
     echo "## Sources" >> $WIKI_PAGE
     run "cp $OUT_DIR/$TARGZ_FILENAME $WIKI_DIR/downloads"
@@ -251,18 +253,21 @@ function fill_wiki {
 function add_install_page {
     INSTALL_WEBPAGE=html/installations/$FRAMAC_VERSION_CODENAME_LOWER.md
     INSTALL_WEBPAGE_PATH=$WEBSITE_DIR/$INSTALL_WEBPAGE
+    EXT="$FRAMAC_VERSION_CODENAME (released on $(date +%Y-%m-%d))"
     echo "---" > $INSTALL_WEBPAGE_PATH
-    echo "layout: doc_page" >> $INSTALL_WEBPAGE_PATH
+    echo "layout: installation_page" >> $INSTALL_WEBPAGE_PATH
+    echo "version: $FRAMAC_VERSION_CODENAME_LOWER" >> $INSTALL_WEBPAGE_PATH
     echo "title: Installation instructions for $FRAMAC_VERSION_CODENAME" >> $INSTALL_WEBPAGE_PATH
     echo "---" >> $INSTALL_WEBPAGE_PATH
     echo >> $INSTALL_WEBPAGE_PATH
-    cat ./INSTALL.md >> $INSTALL_WEBPAGE_PATH
+    cat ./INSTALL.md |\
+    sed -e "s/^\(# Installing Frama-C\)$/\1 $EXT/" >> $INSTALL_WEBPAGE_PATH
 
     run "git -C $WEBSITE_DIR add $INSTALL_WEBPAGE"
 }
 
 function add_event_page {
-    EVENT_WEBPAGE=_events/framac-$FRAMAC_VERSION.md
+    EVENT_WEBPAGE=_events/framac-$FRAMAC_VERSION_SAFE.md
     EVENT_WEBPAGE_PATH=$WEBSITE_DIR/$EVENT_WEBPAGE
 
     if [ "$VERSION_MINOR" != 0 ]; then
@@ -278,7 +283,7 @@ function add_event_page {
     echo "---" > $EVENT_WEBPAGE_PATH
     echo "layout: default" >> $EVENT_WEBPAGE_PATH
     echo "date: $(date +\"%d-%m-%Y\")" >> $EVENT_WEBPAGE_PATH
-    echo "event: $TEXTUAL_VERSION" >> $EVENT_WEBPAGE_PATH
+    echo "short_title: $TEXTUAL_VERSION" >> $EVENT_WEBPAGE_PATH
     echo -n "title: " >> $EVENT_WEBPAGE_PATH
     if [ "$FINAL_RELEASE" = "no" ]; then
         echo -n "Beta release " >> $EVENT_WEBPAGE_PATH
@@ -443,10 +448,14 @@ function add_downloads {
     # Source distribution:
     run "cp $OUT_DIR/$TARGZ_FILENAME $DOWNLOAD_DIR"
     run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$TARGZ_FILENAME"
+    if test "$FINAL_RELEASE" = "yes"; then
+        run "cp $OUT_DIR/$TARGZ_FILENAME $DOWNLOAD_DIR/frama-c-source-dist.tar.gz"
+        run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-source-dist.tar.gz"
+    fi
 
     # API
-    run "cp $OUT_DIR/frama-c-api.tar.gz $DOWNLOAD_DIR/frama-c-api-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
-    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-api-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
+    run "cp $OUT_DIR/frama-c-api.tar.gz $DOWNLOAD_DIR/frama-c-$FRAMAC_VERSION_AND_CODENAME-api.tar.gz"
+    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-$FRAMAC_VERSION_AND_CODENAME-api.tar.gz"
 }
 
 function fill_website {
@@ -460,9 +469,9 @@ function fill_website {
 
 function create_website_branch {
     if test "$FINAL_RELEASE" = "yes"; then
-        BRANCH_NAME="release/stable-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME_LOWER"
+        BRANCH_NAME="release/stable-$FRAMAC_VERSION_SAFE-$FRAMAC_VERSION_CODENAME_LOWER"
     else
-        BRANCH_NAME="release/beta-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME_LOWER"
+        BRANCH_NAME="release/beta-$FRAMAC_VERSION_SAFE-$FRAMAC_VERSION_CODENAME_LOWER"
     fi
     # Chech whether release/<release> exists on the website
     git -C $WEBSITE_DIR show-ref --verify --quiet refs/heads/$BRANCH_NAME
@@ -470,6 +479,7 @@ function create_website_branch {
         echo "### Warning: branch $BRANCH_NAME already exists in $WEBSITE_DIR"
         echo "The script will ERASE this branch"
         proceed_anyway "Rename or erase the branch, then run the script again."
+        run "git -C $WEBSITE_DIR checkout master"
         run "git -C $WEBSITE_DIR branch -D $BRANCH_NAME"
     fi
 
@@ -487,7 +497,7 @@ function create_website_branch {
             run "git -C $WEBSITE_DIR checkout master"
             exit 1
     esac
-    run "git -C $WEBSITE_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+    run "git -C $WEBSITE_DIR commit -m \"$FRAMAC_VERSION_SAFE-$FRAMAC_VERSION_CODENAME release\""
 }
 
 function commit_wiki {
@@ -502,7 +512,7 @@ function commit_wiki {
             echo "Abort wiki update."
             exit 1
     esac
-    run "git -C $WIKI_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+    run "git -C $WIKI_DIR commit -m \"$FRAMAC_VERSION_SAFE-$FRAMAC_VERSION_CODENAME release\""
 }
 
 
@@ -520,10 +530,10 @@ function last_step_validation {
     This step will:
 
       - ask for a validation of the changes to website
-      - create a NEW branch on for the website
+      - create a NEW local branch for the website
 
       - ask for a validation of the changes to wiki
-      - commit changes to the wiki MASTER branch
+      - commit changes to the wiki MASTER local branch
 
     If you want to perform some additional checks it is probably time to stop.
 
@@ -562,10 +572,11 @@ if test \! -f VERSION ; then
 fi
 
 FRAMAC_VERSION=$(cat VERSION)
+FRAMAC_VERSION_SAFE="$(echo ${FRAMAC_VERSION} | sed -e "s/~/-/")"
 FRAMAC_TAG=$(git describe --tag)
 FRAMAC_VERSION_CODENAME=$(cat VERSION_CODENAME)
 FRAMAC_VERSION_CODENAME_LOWER=$(echo "$FRAMAC_VERSION_CODENAME" | tr '[:upper:]' '[:lower:]')
-FRAMAC_VERSION_AND_CODENAME="${FRAMAC_VERSION}-${FRAMAC_VERSION_CODENAME}"
+FRAMAC_VERSION_AND_CODENAME="${FRAMAC_VERSION_SAFE}-${FRAMAC_VERSION_CODENAME}"
 TARGZ_FILENAME=frama-c-${FRAMAC_VERSION_AND_CODENAME}.tar.gz
 
 VERSION_MODIFIER=$(cat VERSION | sed -e s/[0-9.]*\\\(.*\\\)/\\1/)
@@ -578,7 +589,7 @@ if [ "$VERSION_MODIFIER" == "+dev" ]; then
     proceed_anyway "Update VERSION and run the script again"
 fi
 
-if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
+if test  "$FRAMAC_VERSION_SAFE" != "$FRAMAC_TAG"; then
     echo "### WARNING: The current commit is not tagged with the current version:"
     echo "Frama-C Version: $FRAMAC_VERSION"
     echo "Frama-C Tag    : $FRAMAC_TAG"
@@ -731,7 +742,7 @@ case "${STEP}" in
         run "git worktree add -f --detach $BUILD_DIR $FRAMAC_BRANCH"
         run "cd $BUILD_DIR; autoconf"
         run "cd $BUILD_DIR; ./configure"
-        run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes src-distrib"
+        run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes DISTRIB=frama-c-${FRAMAC_VERSION_AND_CODENAME} src-distrib"
         # sanity check: markdown-report must be distributed
         run "tar tf $BUILD_DIR/$TARGZ_FILENAME | grep -q src/plugins/markdown-report"
         run "cp $BUILD_DIR/$TARGZ_FILENAME $OUT_DIR"
@@ -768,7 +779,7 @@ case "${STEP}" in
     8)
         step 8 "CHECK GENERATED DISTRIBUTION"
         assert_out_dir
-        TEST_DIR="$BUILD_DIR_ROOT/frama-c-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME"
+        TEST_DIR="$BUILD_DIR_ROOT/frama-c-${FRAMAC_VERSION_AND_CODENAME}"
         run "mkdir -p $BUILD_DIR_ROOT"
         run "rm -rf $TEST_DIR"
         run "cp $OUT_DIR/$TARGZ_FILENAME $BUILD_DIR_ROOT"
@@ -780,7 +791,7 @@ case "${STEP}" in
     9)
         step 9 "GENERATE OPAM FILE"
         assert_out_dir
-        run "cp opam/opam $OUT_DIR/opam"
+        cat opam/opam | grep -v "^version\:" | grep -v "^name\:" > $OUT_DIR/opam
         echo >> "$OUT_DIR/opam"
         echo "url {" >> "$OUT_DIR/opam"
         echo "  src: \"https://git.frama-c.com/pub/frama-c/-/wikis/downloads/$TARGZ_FILENAME\"" >> "$OUT_DIR/opam"
@@ -796,7 +807,6 @@ case "${STEP}" in
         echo "Bad entry: ${STEP}"
         echo "Exiting without doing anything.";
         exit 31
-        ;;
 esac
 
 exit 0

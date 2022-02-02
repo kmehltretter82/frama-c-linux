@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,6 +23,10 @@
 (** Calls to the GMP's API. *)
 
 open Cil_types
+
+val name_of_mpz_arith_bop: binop -> string
+(** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
+    corresponding to the [bop] arithmetic operation. *)
 
 val init: loc:location -> exp -> stmt
 (** build stmt [mpz_init(v)] or [mpq_init(v)] depending on typ of [v] *)

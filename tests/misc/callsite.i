@@ -1,6 +1,6 @@
 /* run.config
-   MODULE: @PTEST_NAME@
-   OPT:
+ MODULE: @PTEST_NAME@
+   OPT: -no-autoload-plugins
  */
 // Don't use -debug 1 option in the test command.
 

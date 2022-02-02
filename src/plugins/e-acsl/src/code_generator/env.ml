@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -54,6 +54,11 @@ type local_env = {
   rte: bool
 }
 
+type loop_env = {
+  variant: (term * logic_info option) option;
+  invariants: toplevel_predicate list;
+}
+
 type t = {
   lscope: Lscope.t;
   lscope_reset: bool;
@@ -67,10 +72,12 @@ type t = {
   (* Stack of contracts for active functions and statements *)
   var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
   (* records of C bindings for logic vars *)
-  loop_invariants: predicate list list;
-  (* list of loop invariants for each currently visited loops *)
+  loop_envs: loop_env list;
+  (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
+  local_vars: Typing.Function_params_ty.t list
+  (* type of variables used in calls to logic functions and predicates *)
 }
 
 let empty_block =
@@ -88,6 +95,9 @@ let empty_local_env =
     mp_tbl = empty_mp_tbl;
     rte = true }
 
+let empty_loop_env =
+  { variant = None;
+    invariants = [] }
 let empty =
   { lscope = Lscope.empty;
     lscope_reset = true;
@@ -97,8 +107,9 @@ let empty =
     env_stack = [];
     contract_stack = [];
     var_mapping = Logic_var.Map.empty;
-    loop_invariants = [];
-    cpt = 0 }
+    loop_envs = [];
+    cpt = 0;
+    local_vars = [] }
 
 let top env = match env.env_stack with
   | [] -> Options.fatal "Empty environment. That is unexpected."
@@ -113,15 +124,36 @@ let has_no_new_stmt env =
 (* ************************************************************************** *)
 
 let push_loop env =
-  { env with loop_invariants = [] :: env.loop_invariants }
+  { env with loop_envs = empty_loop_env :: env.loop_envs }
 
-let add_loop_invariant env inv = match env.loop_invariants with
+let top_loop_env env =
+  match env.loop_envs with
   | [] -> assert false
-  | invs :: tl -> { env with loop_invariants = (inv :: invs) :: tl }
+  | loop_env :: tl -> loop_env, tl
 
-let pop_loop env = match env.loop_invariants with
+let set_loop_variant ?measure env t =
+  let loop_env, tl = top_loop_env env in
+  let loop_env = { loop_env with variant = Some (t, measure) } in
+  { env with loop_envs = loop_env :: tl }
+
+let add_loop_invariant env inv =
+  match env.loop_envs with
   | [] -> assert false
-  | invs :: tl -> invs, { env with loop_invariants = tl }
+  | loop_env :: tl ->
+    let loop_env = { loop_env with invariants = inv :: loop_env.invariants} in
+    { env with loop_envs = loop_env :: tl }
+
+let top_loop_variant env =
+  let loop_env, _ = top_loop_env env in
+  loop_env.variant
+
+let top_loop_invariants env =
+  let loop_env, _ = top_loop_env env in
+  loop_env.invariants
+
+let pop_loop env =
+  let _, tl = top_loop_env env in
+  { env with loop_envs = tl }
 
 (* ************************************************************************** *)
 (** {2 RTEs} *)
@@ -321,8 +353,15 @@ module Logic_binding = struct
     try
       let varinfos = Logic_var.Map.find logic_v env.var_mapping in
       Stack.top varinfos
-    with Not_found | Stack.Empty ->
-      assert false
+    with
+    | Not_found ->
+      Options.fatal
+        "Unable to find logic var '%a' in environment mappings"
+        Printer.pp_logic_var logic_v
+    | Stack.Empty ->
+      Options.fatal
+        "Empty mapping stack for logic var '%a' in environment"
+        Printer.pp_logic_var logic_v
 
   let remove env logic_v =
     try
@@ -343,15 +382,8 @@ module Logic_scope = struct
     else env
 end
 
-let emitter =
-  Emitter.create
-    "E_ACSL"
-    [ Emitter.Code_annot ]
-    ~correctness:[ Options.Gmp_only.parameter ]
-    ~tuning:[]
-
 let add_assert kf stmt annot =
-  Annotations.add_assert emitter ~kf stmt annot
+  Annotations.add_assert Options.emitter ~kf stmt annot
 
 let add_stmt ?(post=false) ?before env kf stmt =
   if not post then
@@ -409,7 +441,7 @@ let transfer ~from env = match from.env_stack, env.env_stack with
 type where = Before | Middle | After
 let pop_and_get ?(split=false) env stmt ~global_clear where =
   let split = split && stmt.labels = [] in
-  (*  Options.feedback "pop_and_get from %a (%b)" Printer.pp_stmt stmt split;*)
+  (* Options.feedback "pop_and_get from %a (%b)" Printer.pp_stmt stmt split; *)
   let local_env, tl = top env in
   let clear =
     if global_clear then begin
@@ -505,6 +537,24 @@ module Context = struct
       env
     end else
       env
+
+end
+
+module Local_vars = struct
+
+  let push_new env =
+    {env with local_vars = [] :: env.local_vars}
+
+  let add env ty =
+    match env.local_vars with
+    | curr::stacked -> {env with local_vars = (ty :: curr) :: stacked}
+    | [] -> Options.fatal
+              "Trying to add local variable in a non-existing environment"
+
+  let get env =
+    match env.local_vars with
+    | lenv :: _ -> lenv
+    | [] -> []
 
 end
 

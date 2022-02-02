@@ -9,13 +9,11 @@ struct bitfields {
   bool j : 1;
 } t;
 
-int test(struct bitfields *a)
-{
+int test(struct bitfields *a) {
   return a->i;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   //@ assert \valid_read(&(t.j));
   //@ assert \valid_read(&(t.j) + (1..3));
   t.j = 1;

@@ -1,9 +1,9 @@
 /* run.config
-   OPT: -wp-driver %{dep:bit_test.driver}
+   OPT: -wp-driver %{dep:@PTEST_DIR@/bit_test.driver}
  */
 
 /* run.config_qualif
-   OPT: -wp-driver %{dep:bit_test.driver} -wp-prover why3:alt-ergo
+   OPT: -wp-driver %{dep:@PTEST_DIR@/bit_test.driver} -wp-prover why3:alt-ergo
 */
 
 /*@

@@ -38,9 +38,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'X' *)
-  Have: P_RX.
-  (* Pre-condition for 'X' *)
   Have: P_CX.
+  (* Pre-condition for 'X' *)
+  Have: P_RX.
   (* Assertion *)
   Have: P_Q.
 }
@@ -60,9 +60,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'X' *)
-  Have: P_RX.
-  (* Pre-condition for 'X' *)
   Have: P_CX.
+  (* Pre-condition for 'X' *)
+  Have: P_RX.
   (* Assertion *)
   Have: P_Q.
   (* Then *)
@@ -83,9 +83,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'X' *)
-  Have: P_RX.
-  (* Pre-condition for 'X' *)
   Have: P_CX.
+  (* Pre-condition for 'X' *)
+  Have: P_RX.
   (* Assertion *)
   Have: P_Q.
 }
@@ -101,9 +101,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'Y' *)
-  Have: P_RY.
-  (* Pre-condition for 'Y' *)
   Have: P_CY.
+  (* Pre-condition for 'Y' *)
+  Have: P_RY.
   (* Assertion *)
   Have: P_Q.
 }
@@ -123,9 +123,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'Y' *)
-  Have: P_RY.
-  (* Pre-condition for 'Y' *)
   Have: P_CY.
+  (* Pre-condition for 'Y' *)
+  Have: P_RY.
   (* Assertion *)
   Have: P_Q.
   (* Then *)
@@ -146,9 +146,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'Y' *)
-  Have: P_RY.
-  (* Pre-condition for 'Y' *)
   Have: P_CY.
+  (* Pre-condition for 'Y' *)
+  Have: P_RY.
   (* Assertion *)
   Have: P_Q.
 }
@@ -279,9 +279,9 @@ Assume {
   (* Pre-condition for 'X' *)
   Have: P_CX.
   (* Pre-condition for 'X' *)
-  Have: P_RX1.
-  (* Pre-condition for 'X' *)
   Have: P_RX.
+  (* Pre-condition for 'X' *)
+  Have: P_RX1.
 }
 Prove: q = p.
 

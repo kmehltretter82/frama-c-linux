@@ -1,11 +1,12 @@
 /* run.config*
-   PLUGIN: @PTEST_PLUGIN@ report
-   STDOPT: +"-report-print-properties -eva-warn-undefined-pointer-comparison none -eva-msg-key pointer-comparison -then -report -then -eva-warn-undefined-pointer-comparison pointer -then -report -then -eva-warn-undefined-pointer-comparison all -then -report"
-   STDOPT: +"-report-print-properties -eva-undefined-pointer-comparison-propagate-all -eva-warn-undefined-pointer-comparison none -eva-msg-key pointer-comparison -then -report -then -eva-warn-undefined-pointer-comparison pointer -then -report -then -eva-warn-undefined-pointer-comparison all -then -report"
+ PLUGIN: @PTEST_PLUGIN@ report
+   STDOPT: +" -report-print-properties -eva-warn-undefined-pointer-comparison none -eva-msg-key pointer-comparison -then -report -then -eva-warn-undefined-pointer-comparison pointer -then -report -then -eva-warn-undefined-pointer-comparison all -then -report"
+   STDOPT: +" -report-print-properties -eva-undefined-pointer-comparison-propagate-all -eva-warn-undefined-pointer-comparison none -eva-msg-key pointer-comparison -then -report -then -eva-warn-undefined-pointer-comparison pointer -then -report -then -eva-warn-undefined-pointer-comparison all -then -report"
+
 */
 
-int x,y,*p;
 
+int x,y,*p;
 
 int main(){
   p = &x;

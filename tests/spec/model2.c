@@ -1,5 +1,5 @@
 /* run.config
-DONTRUN: main test is in model1.c
+DONTRUN: main test is in %{dep:@PTEST_DIR@/model1.c}
 */
 
 #include "model1.h"

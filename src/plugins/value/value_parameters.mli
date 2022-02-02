@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -42,20 +42,15 @@ module OctagonCall: Parameter_sig.Bool
 
 module TracesUnrollLoop: Parameter_sig.Bool
 module TracesUnifyLoop: Parameter_sig.Bool
-module TracesDot: Parameter_sig.String
+module TracesDot: Parameter_sig.Filepath
 module TracesProject: Parameter_sig.Bool
-
-module EqualityStorage: Parameter_sig.Bool
-module SymbolicLocsStorage: Parameter_sig.Bool
-module GaugesStorage: Parameter_sig.Bool
-module ApronStorage: Parameter_sig.Bool
-module BitwiseOffsmStorage: Parameter_sig.Bool
 
 module AutomaticContextMaxDepth: Parameter_sig.Int
 module AutomaticContextMaxWidth: Parameter_sig.Int
 
 module AllRoundingModesConstants: Parameter_sig.Bool
 
+module NoResultsDomains: Parameter_sig.String_set
 module NoResultsFunctions: Parameter_sig.Fundec_set
 module ResultsAll: Parameter_sig.Bool
 
@@ -65,12 +60,12 @@ module WarnSignedConvertedDowncast: Parameter_sig.Bool
 module WarnPointerSubstraction: Parameter_sig.Bool
 module WarnCopyIndeterminate: Parameter_sig.Kernel_function_set
 
-module IgnoreRecursiveCalls: Parameter_sig.Bool
-
 module DescendingIteration: Parameter_sig.String
 module HierarchicalConvergence: Parameter_sig.Bool
 module WideningDelay: Parameter_sig.Int
 module WideningPeriod: Parameter_sig.Int
+
+module RecursiveUnroll: Parameter_sig.Int
 
 module SemanticUnrollingLevel: Parameter_sig.Int
 module SlevelFunction:
@@ -84,6 +79,8 @@ module DefaultLoopUnroll : Parameter_sig.Int
 module HistoryPartitioning : Parameter_sig.Int
 module ValuePartitioning : Parameter_sig.String_set
 module SplitLimit : Parameter_sig.Int
+module InterproceduralSplits : Parameter_sig.Bool
+module InterproceduralHistory : Parameter_sig.Bool
 
 module ArrayPrecisionLevel: Parameter_sig.Int
 
@@ -122,11 +119,11 @@ module SplitGlobalStrategy: State_builder.Ref with type data = Split_strategy.t
 
 module ValShowProgress: Parameter_sig.Bool
 module ValShowPerf: Parameter_sig.Bool
-module ValPerfFlamegraphs: Parameter_sig.String
+module ValPerfFlamegraphs: Parameter_sig.Filepath
 module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
-module ReportRedStatuses: Parameter_sig.String
-module NumerorsLogFile: Parameter_sig.String
+module ReportRedStatuses: Parameter_sig.Filepath
+module NumerorsLogFile: Parameter_sig.Filepath
 
 module MemExecAll: Parameter_sig.Bool
 
@@ -179,8 +176,11 @@ val wkey_builtins_override: warn_category
     is currently unsupported. *)
 val wkey_libc_unsupported_spec : warn_category
 
+(** Warning category used for "Automatic loop unrolling" *)
+val wkey_loop_unroll_auto : warn_category
+
 (** Warning category used for "loop not completely unrolled" *)
-val wkey_loop_unroll : warn_category
+val wkey_loop_unroll_partial : warn_category
 
 (** Warning category used to identify loops without unroll annotations *)
 val wkey_missing_loop_unroll : warn_category
@@ -196,6 +196,9 @@ val wkey_invalid_assigns : warn_category
 
 (** Warning category for experimental domains or features. *)
 val wkey_experimental : warn_category
+
+(** Warning category for 'size of type T cannot be computed'. *)
+val wkey_unknown_size : warn_category
 
 (** Debug category used to print information about invalid pointer comparisons*)
 val dkey_pointer_comparison: category
@@ -218,6 +221,12 @@ val dkey_callbacks : category
 (** Debug category used to print the usage of widenings. *)
 val dkey_widening : category
 
+(** Debug category used to print messages about recursive calls. *)
+val dkey_recursion : category
+
+(** Registers available cvalue builtins for the -eva-builtin option. *)
+val register_builtin: string -> unit
+
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> unit
 
@@ -227,6 +236,10 @@ val enabled_domains: unit -> (string * string) list
 (** [use_builtin kf b] adds a builtin override for function `kf` to
     builtin `b`. *)
 val use_builtin: Cil_types.kernel_function -> string -> unit
+
+(** [use_global_value_partitioning vi] enable value partitioning on the global
+    variable `vi`. *)
+val use_global_value_partitioning: Cil_types.varinfo -> unit
 
 (*
 Local Variables:

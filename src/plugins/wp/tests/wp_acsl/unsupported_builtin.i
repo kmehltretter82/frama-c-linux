@@ -1,6 +1,6 @@
 /* run.config
-  MODULE: @PTEST_NAME@
-    STDOPT:
+  SCRIPT: @PTEST_NAME@
+  OPT:
 */
 /* run.config_qualif
   DONTRUN:

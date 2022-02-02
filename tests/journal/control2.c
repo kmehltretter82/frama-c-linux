@@ -1,16 +1,12 @@
 /* run.config
-    EXECNOW: BIN control_journal2.ml @frama-c@ -journal-enable -eva -deps -out -main f -journal-name control_journal2.ml > @DEV_NULL@ 2> @DEV_NULL@
-  MODULE: control_journal2
-    EXECNOW: LOG control2_sav.res LOG control2_sav.err BIN control_journal_next2.ml @frama-c@ -journal-enable -lib-entry -journal-name control_journal_next2.ml > control2_sav.res 2> control2_sav.err
-  PLUGIN: callgraph @EVA_PLUGINS@
-  MODULE: control_journal_next2
-    OPT:
+ PLUGIN: @EVA_PLUGINS@
+   EXECNOW: BIN control_journal2.ml @frama-c@ -journal-enable -eva -deps -out -main f -journal-name @PTEST_RESULT@/control_journal2.ml @PTEST_FILE@ > @DEV_NULL@ 2> @DEV_NULL@
+ SCRIPT: @PTEST_RESULT@/control_journal2.ml
+   EXECNOW: LOG control2_sav.res LOG control2_sav.err BIN control_journal_next2.ml @frama-c@ -journal-enable -lib-entry -journal-name @PTEST_RESULT@/control_journal_next2.ml @PTEST_FILE@ > @PTEST_RESULT@/control2_sav.res 2> @PTEST_RESULT@/control2_sav.err
+ SCRIPT: @PTEST_RESULT@/control_journal_next2.ml
+   OPT:
 */
-
-
-/* The last OPT was testing reading from byte when generated from native */
 int x,y,c,d;
-
 void f() {
   int i;
   for(i=0; i<4 ; i++) {

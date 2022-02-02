@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,7 +24,6 @@ module Md = Markdown
 module Pkg = Package
 
 open Data
-open Kernel_main
 open Kernel_ast
 
 let package = Pkg.package ~title:"Property Services" ~name:"properties" ()
@@ -66,6 +65,7 @@ struct
 
   let t_assert = t_kind "assert" "Assertion"
   let t_check = t_kind "check" "Check"
+  let t_admit = t_kind "admit" "Hypothesis"
   let t_loop_invariant = t_loop "invariant"
   let t_loop_assigns = t_loop "assigns"
   let t_loop_variant = t_loop "variant"
@@ -81,6 +81,9 @@ struct
   let t_axiomatic = t_kind "axiomatic" "Axiomatic definitions"
   let t_axiom = t_kind "axiom" "Logical axiom"
   let t_lemma = t_kind "lemma" "Logical lemma"
+  let t_check_lemma = t_kind "check_lemma" "Logical check lemma"
+
+  let t_ext = t_kind "extension" "ACSL extension"
 
   let p_ext = Enum.prefix kinds ~name:"ext" ~var:"<clause>"
       ~descr:(Md.plain "ACSL extension `<clause>`")
@@ -105,17 +108,19 @@ struct
         | PKEnsures(_,Returns) -> t_returns
         | PKTerminates -> t_terminates
       end
-    | IPExtended { ie_ext={ ext_name } } -> Enum.instance p_ext ext_name
+    | IPExtended { ie_ext={ ext_name=_ } } -> t_ext
     | IPAxiomatic _ -> t_axiomatic
-    | IPAxiom _ -> t_axiom
-    | IPLemma _ -> t_lemma
+    | IPLemma { il_pred = { tp_kind = Admit } } -> t_axiom
+    | IPLemma { il_pred = { tp_kind = Assert } } -> t_lemma
+    | IPLemma { il_pred = { tp_kind = Check } } -> t_check_lemma
     | IPBehavior _ -> t_behavior
     | IPComplete _ -> t_complete
     | IPDisjoint _ -> t_disjoint
     | IPCodeAnnot { ica_ca={ annot_content } } ->
       begin match annot_content with
-        | AAssert (_, {tp_only_check = false}) -> t_assert
-        | AAssert (_, {tp_only_check = true }) -> t_check
+        | AAssert (_, {tp_kind = Assert}) -> t_assert
+        | AAssert (_, {tp_kind = Check }) -> t_check
+        | AAssert (_, {tp_kind = Admit }) -> t_admit
         | AStmtSpec _ -> t_code_contract
         | AInvariant(_,false,_) -> t_code_invariant
         | AInvariant(_,true,_) -> t_loop_invariant
@@ -123,7 +128,7 @@ struct
         | AAssigns _ -> t_loop_assigns
         | AAllocation _ -> t_loop_allocates
         | APragma _ -> t_loop_pragma
-        | AExtended(_,_,{ext_name}) -> Enum.instance p_loop_ext ext_name
+        | AExtended(_,_,{ext_name=_}) -> t_ext
       end
     | IPAllocation _ -> t_allocates
     | IPAssigns _ -> t_assigns
@@ -291,7 +296,7 @@ let () = States.column model ~name:"kinstr"
 
 let () = States.column model ~name:"source"
     ~descr:(Md.plain "Position")
-    ~data:(module LogSource)
+    ~data:(module Kernel_ast.Position)
     ~get:(fun ip -> Property.location ip |> fst)
 
 let () = States.column model ~name:"alarm"

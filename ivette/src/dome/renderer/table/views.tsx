@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Tables
 // --------------------------------------------------------------------------
@@ -387,7 +409,7 @@ class TableState<Key, Row> {
     const cwr = colws.get(rcol);
     const wl = cwl ? cwl + offset : 0;
     const wr = cwr ? cwr - offset : 0;
-    if (wl > 40 && wr > 40) {
+    if (wl > 25 && wr > 25) {
       const { resize } = this;
       resize.set(lcol, wl);
       resize.set(rcol, wr);
@@ -408,8 +430,8 @@ class TableState<Key, Row> {
       this.columns.forEach(({ id }) => {
         const cw = resize.get(id);
         const cv = visible.get(id);
-        if (cw) cws[id] = cw;
-        if (cv) cvs[id] = cv;
+        if (cw !== undefined) cws[id] = cw;
+        if (cv !== undefined) cvs[id] = cv;
       });
       const theSettings: TableSettings = { resize: cws, visible: cvs };
       Settings.setWindowSettings(userSettings, theSettings);

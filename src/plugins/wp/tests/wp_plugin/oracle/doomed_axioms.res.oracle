@@ -9,12 +9,18 @@
 Goal Wp_smoke_dead_loop in 'foo' at loop (file doomed_axioms.i, line 29):
 Assume {
   Type: is_sint32(n).
-  (* Invariant 'C' *)
-  Have: P_R(n).
+  (* Invariant 'A' *)
+  Have: P_P(0).
   (* Invariant 'B' *)
-  Have: P_Q(n).
+  Have: P_Q(0).
+  (* Invariant 'C' *)
+  Have: P_R(0).
   (* Invariant 'A' *)
   Have: P_P(n).
+  (* Invariant 'B' *)
+  Have: P_Q(n).
+  (* Invariant 'C' *)
+  Have: P_R(n).
 }
 Prove: false.
 
@@ -23,12 +29,18 @@ Prove: false.
 Goal Wp_smoke_dead_code in 'foo' at instruction (file doomed_axioms.i, line 30):
 Assume {
   Type: is_sint32(n) /\ is_sint32(x).
-  (* Invariant 'C' *)
-  Have: P_R(n).
+  (* Invariant 'A' *)
+  Have: P_P(0).
   (* Invariant 'B' *)
-  Have: P_Q(n).
+  Have: P_Q(0).
+  (* Invariant 'C' *)
+  Have: P_R(0).
   (* Invariant 'A' *)
   Have: P_P(n).
+  (* Invariant 'B' *)
+  Have: P_Q(n).
+  (* Invariant 'C' *)
+  Have: P_R(n).
   (* Then *)
   Have: 0 < x.
 }
@@ -39,12 +51,18 @@ Prove: false.
 Goal Wp_smoke_dead_code in 'foo' at return (file doomed_axioms.i, line 32):
 Assume {
   Type: is_sint32(n) /\ is_sint32(x).
-  (* Invariant 'C' *)
-  Have: P_R(n).
+  (* Invariant 'A' *)
+  Have: P_P(0).
   (* Invariant 'B' *)
-  Have: P_Q(n).
+  Have: P_Q(0).
+  (* Invariant 'C' *)
+  Have: P_R(0).
   (* Invariant 'A' *)
   Have: P_P(n).
+  (* Invariant 'B' *)
+  Have: P_Q(n).
+  (* Invariant 'C' *)
+  Have: P_R(n).
   (* Else *)
   Have: x <= 0.
 }
@@ -56,12 +74,18 @@ Goal Preservation of Invariant 'A' (file doomed_axioms.i, line 24):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
-  (* Invariant 'C' *)
-  Have: P_R(n).
+  (* Invariant 'A' *)
+  Have: P_P(0).
   (* Invariant 'B' *)
-  Have: P_Q(n).
+  Have: P_Q(0).
+  (* Invariant 'C' *)
+  Have: P_R(0).
   (* Invariant 'A' *)
   Have: P_P(n).
+  (* Invariant 'B' *)
+  Have: P_Q(n).
+  (* Invariant 'C' *)
+  Have: P_R(n).
   (* Then *)
   Have: 0 < x.
 }
@@ -78,20 +102,29 @@ Goal Preservation of Invariant 'B' (file doomed_axioms.i, line 25):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
-  (* Invariant 'C' *)
-  Have: P_R(n).
+  (* Invariant 'A' *)
+  Have: P_P(0).
   (* Invariant 'B' *)
-  Have: P_Q(n).
+  Have: P_Q(0).
+  (* Invariant 'C' *)
+  Have: P_R(0).
   (* Invariant 'A' *)
   Have: P_P(n).
+  (* Invariant 'B' *)
+  Have: P_Q(n).
+  (* Invariant 'C' *)
+  Have: P_R(n).
   (* Then *)
   Have: 0 < x.
+  (* Invariant 'A' *)
+  Have: P_P(x_1).
 }
 Prove: P_Q(x_1).
 
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'B' (file doomed_axioms.i, line 25):
+Assume { (* Invariant 'A' *) Have: P_P(0). }
 Prove: P_Q(0).
 
 ------------------------------------------------------------
@@ -100,20 +133,32 @@ Goal Preservation of Invariant 'C' (file doomed_axioms.i, line 26):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
-  (* Invariant 'C' *)
-  Have: P_R(n).
+  (* Invariant 'A' *)
+  Have: P_P(0).
   (* Invariant 'B' *)
-  Have: P_Q(n).
+  Have: P_Q(0).
+  (* Invariant 'C' *)
+  Have: P_R(0).
   (* Invariant 'A' *)
   Have: P_P(n).
+  (* Invariant 'B' *)
+  Have: P_Q(n).
+  (* Invariant 'C' *)
+  Have: P_R(n).
   (* Then *)
   Have: 0 < x.
+  (* Invariant 'A' *)
+  Have: P_P(x_1).
+  (* Invariant 'B' *)
+  Have: P_Q(x_1).
 }
 Prove: P_R(x_1).
 
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'C' (file doomed_axioms.i, line 26):
+Assume { (* Invariant 'A' *) Have: P_P(0). (* Invariant 'B' *) Have: P_Q(0).
+}
 Prove: P_R(0).
 
 ------------------------------------------------------------

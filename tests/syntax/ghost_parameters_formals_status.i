@@ -1,6 +1,6 @@
 /* run.config
-  MODULE: @PTEST_NAME@
-  STDOPT: +"-no-print"
+ MODULE: @PTEST_NAME@
+   OPT: -no-autoload-plugins
 */
 
 void declaration_void(void) /*@ ghost (int x, int y) */ ;

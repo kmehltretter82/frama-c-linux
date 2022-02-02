@@ -1,5 +1,5 @@
 /* run.config*
-   
+PLUGIN: @EVA_MAIN_PLUGINS@ from,inout
    OPT: @EVA_CONFIG@ -inout -deps -main inout_11_0
    OPT: @EVA_CONFIG@ -inout -deps -main inout_11_3
    OPT: @EVA_CONFIG@ -inout -deps -main never_terminate

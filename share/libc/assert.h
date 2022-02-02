@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -33,6 +33,9 @@ __BEGIN_DECLS
   assigns \nothing;
 */
 extern void __FC_assert(int c, const char* file, int line, const char*expr);
+
+#define static_assert _Static_assert
+
 
 __END_DECLS
 __POP_FC_STDLIB

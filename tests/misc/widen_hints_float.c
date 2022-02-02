@@ -1,7 +1,7 @@
 /* run.config*
+ PLUGIN: @EVA_PLUGINS@
    STDOPT: #"-eva-subdivide-non-linear 20"
 */
-
 
 #include "__fc_builtin.h"
 #include <math.h>

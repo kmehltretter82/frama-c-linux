@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -179,6 +179,7 @@ val at : selection -> int option
 val mapi : (int -> int -> 'a -> 'b) -> 'a list -> 'b list
 val insert : ?at:int -> (string * pred) list -> process
 val replace : at:int -> (string * condition) list -> process
+val replace_step : at:int -> condition list -> process
 val split : (string * pred) list -> process
 val rewrite : ?at:int -> (string * pred * term * term) list -> process
 (** For each pattern [(descr,guard,src,tgt)] replace [src] with [tgt]

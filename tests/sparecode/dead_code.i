@@ -1,5 +1,6 @@
 /* run.config
    STDOPT: +"-sparecode"
+PLUGIN: @PTEST_PLUGIN@ slicing
    STDOPT: +"-slicing-level 2 -slice-return main -then-on 'Slicing export' -print"
 */
 

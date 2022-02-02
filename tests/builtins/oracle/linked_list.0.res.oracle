@@ -7,7 +7,7 @@
   malloc_next_free ∈ {0}
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[0..1023] ∈ {0}
   __fc_errno ∈ [--..--]
   __fc_stderr ∈ {{ &__fc_initial_stderr }}
@@ -18,6 +18,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -49,7 +50,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[0..1023] ∈ {0}
   __fc_errno ∈ [--..--]
   __fc_stderr ∈ {{ &__fc_initial_stderr }}
@@ -60,6 +61,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -86,7 +88,7 @@
 [eva] linked_list.c:39: starting to merge loop iterations
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1}
         [4..1023] ∈ {0}
   __fc_errno ∈ [--..--]
@@ -98,6 +100,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -127,7 +130,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1}
         [4..1023] ∈ {0}
   __fc_errno ∈ [--..--]
@@ -139,6 +142,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -164,7 +168,7 @@
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2}
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY }}
         [bits 64 to 95] ∈ {0; 1; 2}
@@ -179,6 +183,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -208,7 +213,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2}
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY }}
         [bits 64 to 95] ∈ {0; 1; 2}
@@ -223,6 +228,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -248,7 +254,7 @@
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2; 3}
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY{[0], [8]} }}
         [bits 64 to 95] ∈ {0; 1; 2; 3}
@@ -265,6 +271,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -294,7 +301,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2; 3}
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY{[0], [8]} }}
         [bits 64 to 95] ∈ {0; 1; 2; 3}
@@ -311,6 +318,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -336,7 +344,7 @@
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY{[0], [8], [16]} }}
         [bits 64 to 95] ∈ [0..10]
@@ -355,6 +363,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -384,7 +393,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY{[0], [8], [16]} }}
         [bits 64 to 95] ∈ [0..10]
@@ -403,6 +412,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -428,7 +438,7 @@
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -449,6 +459,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -478,7 +489,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -499,6 +510,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -526,7 +538,7 @@
   out of bounds write. assert \valid(&curr->val);
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -791,6 +803,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -820,7 +833,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -1085,6 +1098,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -1110,7 +1124,7 @@
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -1375,6 +1389,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -1404,7 +1419,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -1669,6 +1684,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -1694,7 +1710,7 @@
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -1960,6 +1976,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}
@@ -1989,7 +2006,7 @@
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -2255,6 +2272,7 @@
   __fc_tmpnam[0..2047] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
   __fc_random48_init ∈ {0}

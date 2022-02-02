@@ -18,7 +18,7 @@ Prove: (Init_0[global(P_x_59)]=true).
 Goal Post-condition 'provable' in 'glob_arr':
 Assume {
   (* Heap *)
-  Type: cinits(Init_0).
+  Type: (region(G_ga_47) <= 0) /\ cinits(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
 }
@@ -29,7 +29,8 @@ Prove: (Init_0[shift_sint32(global(G_ga_47), i)]=true).
 Goal Post-condition 'unknown' in 'glob_arr':
 Assume {
   (* Heap *)
-  Type: (region(pga_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_ga_47) <= 0) /\ (region(pga_0.base) <= 0) /\
+      cinits(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
 }
@@ -41,13 +42,16 @@ Prove: (Init_0[shift_sint32(pga_0, i)]=true).
 ------------------------------------------------------------
 
 Goal Post-condition 'provable' in 'glob_var':
-Assume { (* Heap *) Type: cinits(Init_0). }
+Assume { (* Heap *) Type: (region(G_gx_41) <= 0) /\ cinits(Init_0). }
 Prove: (Init_0[global(G_gx_41)]=true).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'unknown' in 'glob_var':
-Assume { (* Heap *) Type: (region(px_0.base) <= 0) /\ cinits(Init_0). }
+Assume {
+  (* Heap *)
+  Type: (region(G_gx_41) <= 0) /\ (region(px_0.base) <= 0) /\ cinits(Init_0).
+}
 Prove: (Init_0[px_0]=true).
 
 ------------------------------------------------------------

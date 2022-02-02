@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: Check handling of literal strings. Because literal strings are
    COMMENT: replaced by variables we need to make sure that we take block
    COMMENT: numbers and not referent numbers in assignments

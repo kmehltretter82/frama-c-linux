@@ -1,7 +1,7 @@
 /* run.config*
- PLUGIN: metrics @EVA_PLUGINS@
- MODULE: check_libc_naming_conventions check_const
-   OPT: -print -cpp-extra-args='-nostdinc' -metrics -metrics-libc -eva @EVA_OPTIONS@ -then -lib-entry -no-print -metrics-no-libc
+ PLUGIN: @EVA_PLUGINS@ metrics
+ MODULE: check_libc_naming_conventions, check_const
+   OPT: -print -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' -metrics -metrics-libc -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
  MODULE:
    OPT: -print -print-libc -machdep x86_32
  MODULE: check_parsing_individual_headers
@@ -10,16 +10,11 @@
    OPT:
  MODULE: check_compliance
    OPT: -kernel-msg-key printer:attrs
- DEPS: ./check_full_libc.sh
- CMD: ./check_full_libc.sh
  MODULE:
+ CMD: %{dep:@PTEST_DIR@/check_full_libc.sh} @PTEST_SHARE_DIR@/libc
    OPT:
 **/
-
-
-
 #define __FC_REG_TEST
-
 // Some functions such as usleep() are only defined for older of POSIX headers,
 // while others may be defined only by newer ones, so it is not possible to
 // test all of them. We nevertheless define some headers to test additional
@@ -31,6 +26,7 @@
 #include "__fc_runtime.c"
 
 #include "alloca.h"
+#include "argz.h"
 #include "arpa/inet.h"
 #include "assert.h"
 #include "byteswap.h"
@@ -48,13 +44,16 @@
 #include "__fc_define_dev_t.h"
 #include "__fc_define_eof.h"
 #include "__fc_define_fd_set_t.h"
+#include "__fc_define_fds.h"
 #include "__fc_define_file.h"
 #include "__fc_define_fpos_t.h"
+#include "__fc_define_fs_cnt.h"
 #include "__fc_define_id_t.h"
 #include "__fc_define_ino_t.h"
 #include "__fc_define_intptr_t.h"
 #include "__fc_define_iovec.h"
 #include "__fc_define_key_t.h"
+#include "__fc_define_max_open_files.h"
 #include "__fc_define_mode_t.h"
 #include "__fc_define_nlink_t.h"
 #include "__fc_define_null.h"
@@ -69,17 +68,20 @@
 #include "__fc_define_ssize_t.h"
 #include "__fc_define_stat.h"
 #include "__fc_define_suseconds_t.h"
-#include "__fc_define_timespec.h"
 #include "__fc_define_time_t.h"
 #include "__fc_define_timer_t.h"
+#include "__fc_define_timespec.h"
+#include "__fc_define_timeval.h"
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_define_useconds_t.h"
 #include "__fc_define_wchar_t.h"
 #include "__fc_define_wint_t.h"
 #include "__fc_gcc_builtins.h"
 #include "__fc_inet.h"
+#include "__fc_integer.h"
+//#include "__fc_libc.h" //keep this; used by check_full_libc.sh
 #include "__fc_machdep.h"
-//#include "__fc_machdep_linux_shared.h"
+//#include "__fc_machdep_linux_shared.h" //keep this; used by check_full_libc.sh
 #include "fcntl.h"
 #include "__fc_select.h"
 #include "__fc_string_axiomatic.h"
@@ -117,6 +119,7 @@
 #include "setjmp.h"
 #include "signal.h"
 #include "stdarg.h"
+#include "stdatomic.h"
 #include "stdbool.h"
 #include "stddef.h"
 #include "stdint.h"
@@ -134,10 +137,12 @@
 #include "sys/random.h"
 #include "sys/resource.h"
 #include "sys/select.h"
+#include "sys/sendfile.h"
 #include "sys/shm.h"
 #include "sys/signal.h"
 #include "sys/socket.h"
 #include "sys/stat.h"
+#include "sys/statvfs.h"
 #include "sys/time.h"
 #include "sys/times.h"
 #include "sys/timex.h"
@@ -145,16 +150,17 @@
 #include "sys/uio.h"
 #include "sys/un.h"
 #include "sys/utsname.h"
+#include "sys/vfs.h"
 #include "sys/wait.h"
 #include "termios.h"
 #include "tgmath.h"
 #include "time.h"
 #include "unistd.h"
 #include "utime.h"
+#include "utmp.h"
 #include "utmpx.h"
 #include "wchar.h"
 #include "wctype.h"
-
 void main() {
   /* The variables below must be const; otherwise the preconditions
      and the assigns/from of some functions will not match */

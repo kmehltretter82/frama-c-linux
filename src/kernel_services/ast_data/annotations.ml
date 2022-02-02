@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -152,8 +152,8 @@ let () =
   Ast.add_linked_state code_annot_state;
   Code_annots.add_hook_on_remove
     (fun e stmt l ->
-      let kf = find_englobing_kf stmt in
-      List.iter (fun a -> clear_linked_to_annot kf stmt e a) !l)
+       let kf = find_englobing_kf stmt in
+       List.iter (fun a -> clear_linked_to_annot kf stmt e a) !l)
 
 (**************************************************************************)
 (** {2 Getting annotations} *)
@@ -1001,6 +1001,19 @@ let add_disjoint e kf ?stmt ?active l =
     Property_status.register (Property.ip_of_disjoint kf (kinstr stmt) active l)
   end
 
+let add_spec ?register_children e kf ?stmt ?active spec =
+  add_behaviors ?register_children e kf ?stmt ?active spec.spec_behavior;
+  Option.iter (fun variant -> add_decreases e kf variant) spec.spec_variant;
+  Option.iter
+    (fun terminates -> add_terminates e kf ?stmt ?active terminates)
+    spec.spec_terminates;
+  List.iter
+    (fun complete -> add_complete e kf ?stmt ?active complete)
+    spec.spec_complete_behaviors;
+  List.iter
+    (fun disjoint -> add_disjoint e kf ?stmt ?active disjoint)
+    spec.spec_disjoint_behaviors
+
 let extend_behavior
     e kf ?stmt ?active ?(behavior=Cil.default_behavior_name) set_bhv =
   (* Kernel.feedback "Function %a, behavior %s" Kf.pretty kf bhv_name;*)
@@ -1317,12 +1330,17 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
     fill_tables ca (Property.ip_of_code_annot kf stmt ca)
 
 let add_assert e ?kf stmt a =
-  let a = Logic_const.toplevel_predicate ~only_check:false a in
+  let a = Logic_const.toplevel_predicate ~kind:Assert a in
   let a = Logic_const.new_code_annotation (AAssert ([],a)) in
   add_code_annot e ?kf stmt a
 
 let add_check e ?kf stmt a =
-  let a = Logic_const.toplevel_predicate ~only_check:true a in
+  let a = Logic_const.toplevel_predicate ~kind:Check a in
+  let a = Logic_const.new_code_annotation (AAssert ([],a)) in
+  add_code_annot e ?kf stmt a
+
+let add_admit e ?kf stmt a =
+  let a = Logic_const.toplevel_predicate ~kind:Admit a in
   let a = Logic_const.new_code_annotation (AAssert ([],a)) in
   add_code_annot e ?kf stmt a
 
@@ -1354,7 +1372,7 @@ let dependencies_of_global annot =
 let rec remove_declared_global_annot logic_vars = function
   | Dfun_or_pred(li,_) | Dinvariant(li,_) | Dtype_annot(li,_) ->
     Cil_datatype.Logic_info.Set.remove li logic_vars
-  | Dvolatile _ | Dtype _ | Dlemma _ | Dmodel_annot _ | Dcustom_annot _
+  | Dvolatile _ | Dtype _ | Dlemma _ | Dmodel_annot _
   | Dextended _ ->
     logic_vars
   | Daxiomatic (_,l,_, _) ->
@@ -1389,9 +1407,9 @@ let insert_global_in_ast annot =
          Cil_datatype.Logic_info.Set.is_empty logic_vars
       then List.rev acc @ glob :: g :: l
       else begin
-          let deps = remove_declared_global c_vars logic_vars g in
-          insert_after deps (g :: acc) l
-        end
+        let deps = remove_declared_global c_vars logic_vars g in
+        insert_after deps (g :: acc) l
+      end
   in
   let globs = insert_after deps [] file.globals in
   file.globals <- globs
@@ -1596,9 +1614,9 @@ let remove_extended e kf ext =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
-           b.b_extended <- Extlib.filter_out ((==) ext) b.b_extended;
-           Property_status.remove
-             (Property.(ip_of_extended (ELContract kf) ext)))
+         b.b_extended <- Extlib.filter_out ((==) ext) b.b_extended;
+         Property_status.remove
+           (Property.(ip_of_extended (ELContract kf) ext)))
       spec.spec_behavior
   in
   remove_in_funspec e kf set_spec
@@ -1680,7 +1698,7 @@ let logic_info_of_global s =
     | Dfun_or_pred(li,_) | Dinvariant(li,_) | Dtype_annot(li,_) ->
       check_logic_info li acc
     | Daxiomatic (_,l, _, _) -> List.fold_left check_one acc l
-    | Dtype _ | Dvolatile _ | Dlemma _ | Dmodel_annot _ | Dcustom_annot _
+    | Dtype _ | Dvolatile _ | Dlemma _ | Dmodel_annot _
     | Dextended _
       -> acc
   in

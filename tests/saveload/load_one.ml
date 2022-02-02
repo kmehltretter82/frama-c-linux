@@ -1,10 +1,19 @@
-let () = at_exit (fun _ -> Sys.remove "load_one.sav")
+let ptest_file =
+  try
+    let session = Unix.getenv "FRAMAC_SESSION" in
+    if session = Unix.getcwd () then fun dir file -> dir ^ file
+    else fun _ file -> file
+  with Not_found -> fun dir file -> dir ^ file
+
+let sav_file = ptest_file "tests/saveload/result/" "load_one.sav"
+
+let () = at_exit (fun _ -> Sys.remove sav_file)
 
 let main () =
   let sparecode () =
     Sparecode.Register.get ~select_annot:false ~select_slice_pragma:false
   in
-  let fp = Filepath.Normalized.of_string "load_one.sav" in
+  let fp = Filepath.Normalized.of_string sav_file in
   let p = sparecode () in
   Project.save fp;
   Project.remove ~project:p ();
@@ -23,4 +32,3 @@ let main2 () =
   File.pretty_ast ~prj ()
 
 let () = Db.Main.extend main2
-

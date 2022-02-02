@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -386,6 +386,8 @@ extern int fgetpos(FILE * restrict stream,
   assigns *stream \from *stream, indirect:offset, indirect:whence;
   assigns \result, __fc_errno \from indirect:*stream, indirect:offset,
                                     indirect:whence;
+  ensures errno_set: __fc_errno \in {EAGAIN, EBADF, EFBIG, EINTR, EINVAL, EIO,
+                                     ENOSPC, EOVERFLOW, EPIPE, ESPIPE, ENXIO};
 */
 extern int fseek(FILE *stream, long int offset, int whence);
 
@@ -395,17 +397,20 @@ extern int fseek(FILE *stream, long int offset, int whence);
   assigns *stream \from *stream, indirect:offset, indirect:whence;
   assigns \result, __fc_errno \from indirect:*stream, indirect:offset,
                                     indirect:whence;
+  ensures errno_set: __fc_errno \in {EAGAIN, EBADF, EFBIG, EINTR, EINVAL, EIO,
+                                     ENOSPC, EOVERFLOW, EPIPE, ESPIPE, ENXIO};
 */
 extern int fseeko(FILE *stream, off_t offset, int whence);
 
 /*@
-  //missing: assigns errno (EAGAIN, EBADF, EFBIG, EINTR, EIO, ENOSPC, EPIPE,
-  //                        ESPIPE, ENXIO);
   requires valid_stream: \valid(stream);
   requires valid_pos: \valid_read(pos);
   requires initialization:pos: \initialized(pos);
   assigns *stream \from *pos;
   assigns \result \from indirect:*stream, indirect:*pos;
+  assigns __fc_errno \from __fc_errno, indirect:*stream, indirect:*pos;
+  ensures errno_set: __fc_errno \in {EAGAIN, EBADF, EFBIG, EINTR, EIO,
+                                     ENOSPC, EPIPE, ESPIPE, ENXIO};
 */
 extern int fsetpos(FILE *stream, const fpos_t *pos);
 
@@ -414,6 +419,7 @@ extern int fsetpos(FILE *stream, const fpos_t *pos);
   assigns \result, __fc_errno \from indirect:*stream ;
   ensures success_or_error:
     \result == -1 || (\result >= 0 && __fc_errno == \old(__fc_errno));
+  ensures errno_set: __fc_errno \in {EBADF, EOVERFLOW, ESPIPE};
 */
 extern long int ftell(FILE *stream);
 
@@ -422,6 +428,7 @@ extern long int ftell(FILE *stream);
   assigns \result, __fc_errno \from indirect:*stream ;
   ensures success_or_error:
     \result == -1 || (\result >= 0 && __fc_errno == \old(__fc_errno));
+  ensures errno_set: __fc_errno \in {EBADF, EOVERFLOW, ESPIPE};
 */
 extern off_t ftello(FILE *stream);
 
@@ -575,6 +582,22 @@ extern int pclose(FILE *stream);
 // No specification given; include "stdio.c" to use Frama-C's implementation
 ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 #endif
+
+// Non-POSIX; allocates memory, so requires 'stdio.c' to be included
+
+#include "__fc_alloc_axiomatic.h"
+
+/*@
+  requires valid_strp: \valid(strp);
+  requires valid_fmt: valid_read_string(fmt);
+  assigns __fc_heap_status \from indirect:fmt[0 ..], __fc_heap_status;
+  assigns \result \from indirect:fmt[0 ..], indirect:__fc_heap_status;
+  assigns *strp \from fmt[0 ..], indirect:__fc_heap_status;
+  //missing: variadic arguments
+  ensures result_error_or_written_byes: \result == -1 || \result >= 0;
+  allocates *strp;
+*/
+int asprintf(char **strp, const char *fmt, ...);
 
 __END_DECLS
 

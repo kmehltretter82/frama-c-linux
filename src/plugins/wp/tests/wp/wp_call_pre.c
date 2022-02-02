@@ -1,9 +1,8 @@
 /* run.config
 OPT: -wp-model Hoare -wp-no-simpl -wp-prop Rmain
-OPT: -wp-model Hoare -wp-no-simpl -wp-fct main 
+OPT: -wp-model Hoare -wp-no-simpl -wp-fct main
 OPT: -wp-model Hoare -wp-no-simpl -wp-prop Rf
 OPT: -wp-model Hoare -wp-no-simpl -wp-fct double_call
-OPT: -wp-model Hoare -wp-no-simpl -wp-fct stmt_pre -wp-prop Rstmt 
 */
 
 /* run.config_qualif
@@ -38,14 +37,6 @@ int main (void) {
 int call_main (void) {
   G = 1;
   return main ();
-}
-
-//@ requires 0 < G;
-int stmt_pre (void) {
-  int x = 0;
-  //@ requires qed_ok: Rstmt: G > x;
-  x = G - x;
-  return x;
 }
 
 // proving the preconditions on [g] call from the GUI should change the

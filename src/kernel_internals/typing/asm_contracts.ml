@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -103,7 +103,7 @@ let access_elts ~loc ?size tlv =
 let extract_mem_term ~loc acc tlv =
   match Logic_utils.unroll_type (Cil.typeOfTermLval tlv) with
   | Ctype (TPtr _ ) -> access_ptr_elts ~loc tlv :: acc
-  | Ctype (TArray(_,e,_,_)) ->
+  | Ctype (TArray(_,e,_)) ->
     let size = Option.bind e (Cil.constFoldToInt ~machdep:true) in
     access_elts ~loc ?size tlv :: acc
   | _ -> acc
@@ -143,7 +143,7 @@ class visit_assembly =
           let source = fst (Cil_datatype.Instr.loc i) in
           let once = true in
           Kernel.warning
-            ~once ~source
+            ~once ~source ~wkey:Kernel.wkey_asm
             "Clobber list contains \"memory\" argument. Assuming no \
              side effects beyond those mentioned in operands."
         end;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -193,14 +193,14 @@ let constructor ~basename ~params ~index ~addrof ~consistent =
       } ;
       Definitions.define_lemma {
         l_cluster = cluster ;
-        l_kind = `Axiom ;
+        l_kind = Admit ;
         l_name = Printf.sprintf "addrof_%s_%d" basename id ;
         l_forall = params ; l_types = 0 ; l_triggers = [] ;
         l_lemma = p_addrof ;
       } ;
       Definitions.define_lemma {
         l_cluster = cluster ;
-        l_kind = `Axiom ;
+        l_kind = Admit ;
         l_name = Printf.sprintf "consistent_%s_%d" basename id ;
         l_forall = params ; l_types = 0 ; l_triggers = [] ;
         l_lemma = p_consistent ;
@@ -208,7 +208,7 @@ let constructor ~basename ~params ~index ~addrof ~consistent =
       if p_index != F.p_true then
         Definitions.define_lemma {
           l_cluster = cluster ;
-          l_kind = `Axiom ;
+          l_kind = Admit ;
           l_name = Printf.sprintf "index_%s_%d" basename id ;
           l_forall = params @ [k] ; l_types = 0 ; l_triggers = [] ;
           l_lemma = p_index ;
@@ -242,7 +242,7 @@ struct
       match F.repr a with
       | L.Add es -> List.fold_left walk s es
       | L.Kint z ->
-          (try s + Integer.to_int z
+          (try s + Integer.to_int_exn z
            with Z.Overflow -> s)
       | _ -> s
     in walk 0 k
@@ -345,10 +345,10 @@ struct
     match F.repr a with
     | L.Add es -> List.fold_left get_linear poly es
     | L.Kint z ->
-        (try (Integer.to_int z,F.e_one)::poly
+        (try (Integer.to_int_exn z,F.e_one)::poly
          with Z.Overflow -> (1,a)::poly)
     | L.Times(c,e) ->
-        (try (Integer.to_int c,e)::poly
+        (try (Integer.to_int_exn c,e)::poly
          with Z.Overflow -> (1,a)::poly)
     | _ -> (1,a)::poly
 
@@ -827,10 +827,13 @@ end
 module LOADER = MemLoader.Make(MODEL)
 
 let load = LOADER.load
-let loadvalue = LOADER.loadvalue
+let load_init = LOADER.load_init
+let load_value = LOADER.load_value
 
 let stored = LOADER.stored
+let stored_init = LOADER.stored_init
 let copied = LOADER.copied
+let copied_init = LOADER.copied_init
 let assigned = LOADER.assigned
 let initialized = LOADER.initialized
 

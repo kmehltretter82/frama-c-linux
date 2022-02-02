@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,13 +26,18 @@
     by a list of components topologically ordered. *)
 type 'n component =
   | Component of 'n * 'n partition
-    (** A strongly connected component, described by its head node and the
-        remaining sub-components topologically ordered *)
+  (** A strongly connected component, described by its head node and the
+      remaining sub-components topologically ordered *)
   | Node of 'n
-    (** A single node without self loop *)
+  (** A single node without self loop *)
 
 (** A list of strongly connected components, sorted topologically *)
 and 'n partition = 'n component list
+
+let head = function
+  | [] -> None
+  | Component (n,_) :: _ -> Some n
+  | Node n :: _ -> Some n
 
 let fold_heads f acc l =
   let rec partition acc l =
@@ -43,7 +48,6 @@ let fold_heads f acc l =
       partition (f acc h) l
   in
   partition acc l
-
 
 let flatten wto =
   let rec f acc = function
@@ -74,7 +78,7 @@ let flatten wto =
    - Each time we visit a node n, we push it on a stack. After the
      visit, n is popped, unless a path exists from n to an element
      earlier on the stack. So the stack contains elements currently
-     visited or that belongs to a non-trivial scc. Moreover, they 
+     visited or that belongs to a non-trivial scc. Moreover, they
      are in topological order.
 
    About the proof of Tarjan:
@@ -187,10 +191,9 @@ module Make(N:sig
           let element = Stack.pop state.stack in
           DFN.remove state.dfn element;
           if not (N.equal element vertex) then begin
-            let best_head = match pref with
-              (** the strict is important because we are conservative *)
-              | Some cmp when cmp best_head element < 0 -> element
-              | _ -> best_head
+            (** the strict is important because we are conservative *)
+            let best_head =
+              if pref best_head element < 0 then element else best_head
             in
             reset_SCC best_head
           end
@@ -223,7 +226,7 @@ module Make(N:sig
 
   type pref = N.t -> N.t -> int
 
-  let partition ?pref ~init ~succs =
+  let partition ~pref ~init ~succs =
     let state = {dfn = DFN.create 17; num = 0; succs;
                  stack = Stack.create () } in
     let loop,component = visit ~pref state init [] in

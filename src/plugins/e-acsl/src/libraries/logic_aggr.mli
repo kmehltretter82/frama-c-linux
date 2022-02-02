@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,7 +25,7 @@ open Cil_types
 (** Utilities function for aggregate types. *)
 
 val get_array_typ_opt:
-  typ -> (typ * exp option * bitsSizeofTypCache * attributes) option
+  typ -> (typ * exp option * attributes) option
 (** @return the content of the array type if [ty] is an array, or None
     otherwise. *)
 

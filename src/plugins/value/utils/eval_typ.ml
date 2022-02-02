@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -78,7 +78,7 @@ let is_compatible_function ~typ_pointed ~typ_fun =
       Cil.isSigned ik1 = Cil.isSigned ik2 &&
       Cil.bitsSizeOfInt ik1 = Cil.bitsSizeOfInt ik2
     | TFloat (fk1, _), TFloat (fk2, _) -> fk1 = fk2
-    | TComp (ci1, _, _), TComp (ci2, _, _) ->
+    | TComp (ci1, _), TComp (ci2, _) ->
       Cil_datatype.Compinfo.equal ci1 ci2
     | _ -> false
   in
@@ -186,7 +186,7 @@ let ik_attrs_range ik attrs =
   let i_bits =
     match bitfield_size_attributes attrs with
     | None -> Cil.bitsSizeOfInt ik
-    | Some size -> Integer.to_int size
+    | Some size -> Integer.to_int_exn size
   in
   { i_bits; i_signed = Cil.isSigned ik }
 

@@ -1,9 +1,9 @@
 /* run.config
-   DEPS: unit_bitwise.h
+ DEPS: unit_bitwise.h
    OPT:
 */
 /* run.config_qualif
-   DEPS: unit_bitwise.h
+ DEPS: unit_bitwise.h
    OPT: -wp-prop="-ko"
    OPT: -wp-prop="ko"
 */

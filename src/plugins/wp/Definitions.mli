@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -48,7 +48,7 @@ type typedef = (tau,field,lfun) Qed.Engine.ftypedef
 type dlemma = {
   l_name  : string ;
   l_cluster : cluster ;
-  l_kind : lkind ;
+  l_kind : predicate_kind ;
   l_types : int ;
   l_forall : var list ;
   l_triggers : trigger list list ; (** OR of AND-triggers *)

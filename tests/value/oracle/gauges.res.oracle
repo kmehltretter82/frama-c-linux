@@ -340,7 +340,7 @@
   Called from gauges.c:367.
 [eva] gauges.c:306: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -400,7 +400,7 @@
 [eva] gauges.c:304: starting to merge loop iterations
 [eva] gauges.c:306: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -459,7 +459,7 @@
   ==END OF DUMP==
 [eva] gauges.c:306: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -518,7 +518,7 @@
   ==END OF DUMP==
 [eva] gauges.c:306: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -583,7 +583,7 @@
 [eva] gauges.c:324: starting to merge loop iterations
 [eva] gauges.c:325: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -644,7 +644,7 @@
 [eva] gauges.c:321: starting to merge loop iterations
 [eva] gauges.c:325: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}

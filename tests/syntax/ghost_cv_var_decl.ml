@@ -1,24 +1,3 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  This file is part of Frama-C.                                         *)
-(*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
-(*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
-(*           alternatives)                                                *)
-(*    INRIA (Institut National de Recherche en Informatique et en         *)
-(*           Automatique)                                                 *)
-(*                                                                        *)
-(*  you can redistribute it and/or modify it under the terms of the GNU   *)
-(*  Lesser General Public License as published by the Free Software       *)
-(*  Foundation, version 2.1.                                              *)
-(*                                                                        *)
-(*  It is distributed in the hope that it will be useful,                 *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
-(*  GNU Lesser General Public License for more details.                   *)
-(*                                                                        *)
-(**************************************************************************)
-
 open Cil_types
 
 let rec ghost_status fmt lval =
@@ -45,7 +24,7 @@ and in_array_ghost_status fmt lval =
   Format.fprintf fmt "%a" ghost_status lval
 and comp_ghost_status fmt lval =
   match Cil.typeOfLval lval with
-  | TComp({ cfields }, _, _) ->
+  | TComp({ cfields }, _) ->
     Format.fprintf fmt "{ " ;
     List.iter (field_ghost_status fmt lval) (Option.value ~default:[] cfields) ;
     Format.fprintf fmt " }"

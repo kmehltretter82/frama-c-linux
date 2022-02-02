@@ -1,5 +1,5 @@
 /* run.config_qualif
-   OPT: -wp -wp-prover native:coq -wp-coq-script tests/wp_bts/bts_1174.s -wp-model +real
+   OPT: -wp -wp-prover native:coq -wp-coq-script %{dep:@PTEST_DIR@/bts_1174.s} -wp-model +real
 */
 
 /*@ requires -10. <= x && x <= 10.; */

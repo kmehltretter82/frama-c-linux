@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -342,6 +342,17 @@ module Functions = struct
   let find_by_name fct_name =
     let vi = Datatype.String.Map.find fct_name (Iterator.State.get ()) in
     State.find vi
+
+  let find_all_by_orig_name ?cmp fct_name =
+    let l =
+      Datatype.String.Map.fold (fun _ vi acc ->
+          if vi.vorig_name = fct_name then (State.find vi) :: acc
+          else acc
+        ) (Iterator.State.get ()) []
+    in
+    match cmp with
+    | None -> l
+    | Some cmp -> List.sort cmp l
 
   let find_def_by_name fct_name =
     let vi = Datatype.String.Map.find fct_name (Iterator.State.get ()) in
@@ -745,13 +756,13 @@ module Types = struct
       | GCompTag (ci, _loc) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (TComp (ci, Cil.empty_size_cache (), []));
+        Types.add name_tag (TComp (ci, []));
         TypeNameToGlobal.replace name_tag g
 
       | GCompTagDecl (ci, _) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (TComp (ci, Cil.empty_size_cache (), []))
+        Types.add name_tag (TComp (ci, []))
 
       | _ -> ()
     in
@@ -835,6 +846,13 @@ let set_entry_point name lib =
     Kernel.MainFunction.unsafe_set name;
     Kernel.LibEntry.unsafe_set lib;
   end
+
+let is_entry_point ?when_lib_entry kf =
+  match when_lib_entry with
+  | Some value when Kernel.LibEntry.get () -> value
+  | _ ->
+    try Cil_datatype.Kf.equal kf @@ fst @@ entry_point ()
+    with No_such_entry_point _ -> false
 
 (* ************************************************************************* *)
 (** {2 Global Comments} *)

@@ -8,7 +8,7 @@ char *T = "bar";
 int G = 0;
 
 void f(void) {
-  /*@ assert T[G] == 'b'; */ ;
+  /*@ assert T[G] == 'b'; */;
   G++;
 }
 

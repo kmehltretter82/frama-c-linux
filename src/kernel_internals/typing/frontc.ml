@@ -41,7 +41,6 @@
 (*                          et Automatique).                                *)
 (****************************************************************************)
 
-
 (* Signal that we are in MS VC mode *) (* BY: never called *)
 let setMSVCMode () =
   Cprint.msvcMode := true

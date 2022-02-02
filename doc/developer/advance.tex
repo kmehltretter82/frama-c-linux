@@ -775,10 +775,13 @@ Section~\ref{ptests:directives}.
   \texttt{STDOPT} directives:
 
   \begin{listing-nonumber}
-    MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
+    MODULE: script.cmx
     STDOPT: +"-opt1" ...
     STDOPT: #"-opt2" ...
   \end{listing-nonumber}
+  The {\tt .cmx} extension is optional and the prefix {\tt @PTEST\_DIR@/}
+  is automatically added to the module names (the directive accepts a list
+  of modules that can be separed by blank or comma).
 
   In addition, if the same script {\tt tests/suite/script.ml}
   is shared by several test files in {\tt tests/suite},
@@ -946,27 +949,43 @@ Figure~\ref{fig:test-directives} shows all the directives that can be used in
 the configuration header of a test (or a test suite).
 \begin{figure}[ht]
 \begin{center}
-\begin{tabular}{|c|c|p{5cm}|l|}
+\begin{tabular}{|c|c|p{4.5cm}|p{5.2cm}|}
 \hline
 \textbf{Kind} & \textbf{Name} & \textbf{Specification} & \textbf{default}\\
 \hline
 \hline \multirow{4}{23mm}{\centering{Command}}
+& \texttt{PLUGIN}\nscodeidxdef{Test!Directive}{PLUGIN}
+& Plugins to be loaded with each subsequent run.
+& \texttt{from inout eva scope variadic} for tests under \texttt{./tests} directory
+\\
+& \texttt{SCRIPT}\nscodeidxdef{Test!Directive}{SCRIPT}
+& ML scripts to be loaded with each subsequent run (their compilation is performed by the \texttt{frama-c} command).
+& \textit{None}
+\\
+& \texttt{LIBS}\nscodeidxdef{Test!Directive}{LIBS}
+& Libraries to be loaded with each subsequent run (their compilation is not managed by \texttt{ptests} contrary to the modules of \texttt{MODULE} directive).
+& \textit{None}
+\\
 & \texttt{CMD}\nscodeidxdef{Test!Directive}{CMD}
 & Program to run
 & \texttt{./bin/toplevel.opt}
 \\
 & \texttt{OPT}\nscodeidxdef{Test!Directive}{OPT}
 & Options given to the program
-& \texttt{-val -out -input -deps}
+& \texttt{-val -out -input -deps} for tests under \texttt{./tests} directory
 \\
 & \texttt{STDOPT}\nscodeidxdef{Test!Directive}{STDOPT}
 & Add and remove options from the default set
 & \textit{None}
 \\
+& \texttt{EXIT}\nscodeidxdef{Test!Directive}{EXIT}
+& Indicate expected exit status if not 0.
+& \textit{None}
+\\
 & \texttt{LOG}\nscodeidxdef{Test!Directive}{LOG}
 & Add an additional file to compare against an oracle
 & \textit{None}
-\\ 
+\\
 & \texttt{EXECNOW}\nscodeidxdef{Test!Directive}{EXECNOW}
 & Run a command before the following commands. When specified in a configuration
 file, run it only once.
@@ -981,7 +1000,7 @@ file, run it only once.
 & \textit{None}
 \\
 & \texttt{FILTER}\nscodeidxdef{Test!Directive}{FILTER}
-& Command used to filter results
+& Command reading the standard input used to filter results. In such a command, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the basename of the oracle.
 & \textit{None}
 \\
 & \texttt{MODULE}\nscodeidxdef{Test!Directive}{MODULE}
@@ -1008,7 +1027,7 @@ and report a failure
 & selects the files to test
 & \texttt{.*\bss.\bss(c|i\bss)}
 \\
-\hline \multirow{2}{23mm}{\centering{Miscellaneous}}
+\hline \multirow{2}{23mm}{\centering{Misc.}}
 & \texttt{COMMENT}\nscodeidxdef{Test!Directive}{COMMENT}
 & Comment in the configuration
 & \textit{None}
@@ -1078,6 +1097,15 @@ the sequence above is read in order and defines a configuration level
   configuration).
   After an \texttt{OPT} or \texttt{STDOPT} directive is encountered,
   the set of additional \texttt{LOG} files is reset to its default.
+\item By default, \framac is expected to return successfully (i.e., with
+  an exit status of 0). If a test is supposed to lead to an error, an
+  \texttt{EXIT} directive must be used. It takes as argument an integer
+  (typically 1 to denote a user error) representing the expected exit status
+  for the subsequent tests. All tests triggered by \texttt{OPT} or
+  \texttt{STDOPT} directives encountered after the \texttt{EXIT} directive
+  will be expected to exit with the corresponding status, until a new
+  \texttt{EXIT} directive is encountered. (\texttt{EXIT: 0} will thus
+  indicate that subsequent tests are expected to exit normally).
 \item If there are several directives \texttt{OPT} in the same
   configuration level, they correspond to different test cases. The
   \texttt{OPT} directive(s) of a given configuration level replace(s)
@@ -1138,7 +1166,7 @@ or
   \texttt{@macro-name@} in a \texttt{CMD}, \texttt{LOG}, \texttt{OPT},
   \texttt{STDOPT} or \texttt{EXECNOW} directive at this configuration level
   or in any level below it will be replaced by \texttt{content}. Existing
-  pre-defined macros are listed in section~\ref{sec:ptests-macros}.
+  predefined macros are listed in section~\ref{sec:ptests-macros}.
 \item \texttt{MODULE}\nscodeidx{Test!Directive}{MODULE}
  directive takes as argument the name of a \texttt{.cmxs}
   module. It will then add a directive to compile this file with the
@@ -1146,12 +1174,31 @@ or
   \texttt{@PTEST\_MAKE\_MODULE@} defaults to \texttt{make -s}. Option
   \texttt{-load-module <MODULE>} will then be appended to any subsequent Frama-C
   command triggered by the test.
+\item \texttt{LIBS}\nscodeidx{Test!Directive}{LIBS}
+ directive takes as argument the name of a \texttt{.cmxs}
+  module. The \texttt{-load-module <LIBS>} will then be appended to any subsequent Frama-C command triggered by the test. The compilation is not managed by \texttt{ptests}.
+\item \texttt{SCRIPT}\nscodeidx{Test!Directive}{SCRIPT}
+ directive takes as argument the name of a \texttt{.ml}
+ file. The \texttt{-load-script <SCRIPT>} will then be appended to any subsequent Frama-C command triggered by the test.
 \item The \texttt{FILEREG}\nscodeidx{Test!Directive}{FILEREG}
   directive contains a regular expression indicating which files in
   the directory containing the current test suite are actually part of
   the suite. This directive is only
   usable in a \texttt{test\_config}\codeidx{test\_config}
   configuration file.
+\item The \texttt{FILTER}\nscodeidx{Test!Directive}{FILTER} directive specifies
+  a transformation on the test result files before the comparison to the oracles.
+  The filtering command read the result from the standard input and the oracle
+  will be compared with the standard output of that command.
+  In such a directive, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the
+  basename of the oracle.
+  That allows running a \texttt{diff} command with the oracle of another
+  test configuration \texttt{config}:
+  \begin{code}
+FILTER: diff --new-file @PTEST_DIR@/oracle_config/@PTEST_ORACLE@ -
+  \end{code}
+  Chaining multiple filter commands is possible by defining several \texttt{FILTER} directives (they are applied in the reverse order),
+  and an empty command drops the previous \texttt{FILTER} directives.
 \end{itemize}
 
 \begin{important}
@@ -3491,7 +3538,7 @@ source files is to use an option such as \verb+-include+ in GCC.
   Contents of \verb+tests/misc/custom_machdep/__fc_machdep_custom.h+, used as
   example for creating custom machdeps. Notice the unusual size for \verb+int+
   (3 bytes), selected for testing purposes only, and inconsistent with the
-  the chosen values for \verb+INT_MIN+ and \verb+INT_MAX+, which do not fit
+  chosen values for \verb+INT_MIN+ and \verb+INT_MAX+, which do not fit
   in 3 bytes.
 \lstinputlisting{../../tests/misc/custom_machdep/__fc_machdep_custom.h}
 \end{example}

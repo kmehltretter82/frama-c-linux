@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -111,6 +111,12 @@ let is_included i1 i2 = match i1, i2 with
   | Rational, (Ival _ | Float _) ->
     false
 
+let widen = function
+  | Ival iv ->
+    let min, max = Ival.min_and_max iv in
+    Ival (Ival.inject_range min max)
+  | Float _ | Rational | Real | Nan as i -> i
+
 let lift_unop f = function
   | Ival iv -> Ival (f iv)
   | Float _ ->
@@ -120,18 +126,32 @@ let lift_unop f = function
   | Rational | Real | Nan as i ->
     i
 
-let lift_binop ~safe_float f i1 i2 = match i1, i2 with
+let lift_arith_binop f i1 i2 = match i1, i2 with
+  | Ival i1, Ival i2 ->
+    Ival (f i1 i2)
+  | (Ival _ | Float _), Float _
+  | Float _, Ival _
+  | (Ival _ | Float _ | Rational), Rational
+  | Rational, (Ival _ | Float _) ->
+    Rational
+  | (Ival _ | Float _ | Rational | Real), Real
+  | Real, (Ival _ | Float _ | Rational) ->
+    Real
+  | (Ival _ | Float _ | Rational | Real | Nan), Nan
+  | Nan, (Ival _ | Float _ | Rational | Real) ->
+    Nan
+
+let join i1 i2 = match i1, i2 with
   | Ival iv, i when Ival.is_bottom iv -> i
   | i, Ival iv when Ival.is_bottom iv -> i
   | Ival i1, Ival i2 ->
-    Ival (f i1 i2)
-  | Float(k1, _), Float(k2, _) when safe_float ->
-    let k = if Stdlib.compare k1 k2 >= 0 then k1 else k2 in
+    Ival (Ival.join i1 i2)
+  | Float(k1, _), Float(k2, _) ->
+    let k = if Cil.frank k1 >= Cil.frank k2 then k1 else k2 in
     Float(k, None (* lost value, if any before *))
   | Ival iv, Float(k, _)
   | Float(k, _), Ival iv ->
-    if safe_float
-    then
+    begin
       match Ival.min_and_max iv with
       | None, None ->
         (* unbounded integers *)
@@ -140,7 +160,7 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
         (* if the interval of integers fits into the float types, then return
            this float type; otherwise return Rational *)
         (try
-           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
            let mini, maxi = to_float min, to_float max in
            let minf, maxf = match k with
              | FFloat ->
@@ -157,8 +177,7 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
            Rational)
       | None, Some _ | Some _, None ->
         assert false
-    else
-      Rational (* sound over-approximation *)
+    end
   | (Ival _ | Float _ | Rational), (Float _ | Rational)
   | Rational, Ival _ ->
     Rational
@@ -169,7 +188,92 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
   | Nan, (Ival _ | Float _ | Rational | Real) ->
     Nan
 
-let join = lift_binop ~safe_float:true Ival.join
+let meet i1 i2 = match i1, i2 with
+  | Ival iv, _ when Ival.is_bottom iv -> Ival iv
+  | _, Ival iv when Ival.is_bottom iv -> Ival iv
+  | Ival i1, Ival i2 ->
+    Ival (Ival.meet i1 i2)
+  | Float(k1, Some f1), Float(k2, Some f2) ->
+    if Float.equal f1 f2 then
+      let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
+      Float (k, Some f1)
+    else Ival Ival.bottom
+  | Float(k, Some f), Float(k', None)
+  | Float(k',None), Float(k, Some f) ->
+    let f_in_k' = match k' with
+      | FFloat ->
+        let minf,maxf =
+          Floating_point.most_negative_single_precision_float,
+          Floating_point.max_single_precision_float
+        in minf <= f && f <= maxf
+      | FDouble
+      | FLongDouble ->
+        true
+    in if f_in_k' then Float(k, Some f) else Ival Ival.bottom
+  | Float(k1, None), Float(k2, None) ->
+    let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
+    Float(k, None)
+  | Float(k, Some f), Ival iv
+  | Ival iv, Float(k, Some f) ->
+    begin
+      match Ival.min_and_max iv with
+      | None, None ->
+        (* unbounded integers *)
+        Float(k, Some f)
+      | Some min, Some max ->
+        (* if the float type fits into the interval of integers, then return
+           this float type; otherwise return Rational *)
+        (try
+           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
+           let mini, maxi = to_float min, to_float max in
+           if mini <= f && maxi >= f then Float(k, Some f) else Ival Ival.bottom
+         with Z.Overflow | Exit ->
+           Rational)
+      | None, Some _ | Some _, None ->
+        assert false
+    end
+  | Ival iv, Float(k, None)
+  | Float(k, None), Ival iv ->
+    begin
+      match Ival.min_and_max iv with
+      | None, None ->
+        (* unbounded integers *)
+        Float(k, None)
+      | Some min, Some max ->
+        (* if the float type fits into the interval of integers, then return
+           this float type; otherwise return Rational *)
+        (try
+           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
+           let mini, maxi = to_float min, to_float max in
+           let minf, maxf = match k with
+             | FFloat ->
+               Floating_point.most_negative_single_precision_float,
+               Floating_point.max_single_precision_float
+             | FDouble ->
+               -. Float.max_float,
+               Float.max_float
+             | FLongDouble ->
+               raise Exit
+           in
+           if mini <= minf && maxi >= maxf then Float(k, None) else Rational
+         with Z.Overflow | Exit ->
+           Rational)
+      | None, Some _ | Some _, None ->
+        assert false
+    end
+  | (Ival _ | Float _ | Rational), (Float _ | Rational)
+  | Rational, Ival _ ->
+    Rational
+  | (Ival _ | Float _ | Rational | Real), Real
+  | Real, (Ival _ | Float _ | Rational) ->
+    Real
+  | (Ival _ | Float _ | Rational | Real | Nan), Nan
+  | Nan, (Ival _ | Float _ | Rational | Real) ->
+    Nan
+
+let is_singleton_int = function
+  | Ival iv -> Ival.is_singleton_int iv
+  | Float _ | Rational | Real | Nan -> false
 
 (* TODO: soundness of any downcast is not checked *)
 let cast ~src ~dst = match src, dst with
@@ -185,6 +289,24 @@ let cast ~src ~dst = match src, dst with
        (in particular, from integer to float/real or conversely), it is
        certainly on purpose . *)
     dst
+
+(* a-b; or 0 if negative *)
+let length a b = Z.max Z.zero (Z.add Z.one (Z.sub a b))
+
+(* minimal distance between two intervals given by their respective lower and
+   upper bounds, i.e. the length between the lower bound of the second interval
+   bound and the upper bound of the first interval. *)
+let min_delta (_, max1) (min2, _) = match max1, min2 with
+  | Some m1, Some m2 -> length m2 m1
+  | _, None | None, _ -> Z.zero
+
+(* maximal distance between between two intervals given by their respective
+   lower and upper bounds, i.e. the length between the upper bound of the second
+   interval and the lower bound of the first interval.
+   @return None for \infty *)
+let max_delta (min1, _) (_, max2) = match min1, max2 with
+  | Some m1, Some m2 -> Some (length m2 m1)
+  | _, None | None, _ -> None
 
 (* ********************************************************************* *)
 (* constructors and destructors *)
@@ -230,6 +352,17 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
     Nan
   | TNamed _ ->
     assert false
+
+let extended_interv_of_typ ty = match interv_of_typ ty with
+  | Ival iv ->
+    let l,u = Ival.min_int iv, Ival.max_int iv in
+    let u = match u with
+      | Some u -> Some (Integer.add u Integer.one)
+      | None -> None
+    in
+    Ival (Ival.inject_range l u);
+  | Rational | Real | Nan | Float (_,_) as i
+    -> i
 
 let interv_of_logic_typ = function
   | Ctype ty -> interv_of_typ ty
@@ -399,14 +532,112 @@ end = struct
 end
 
 (* ********************************************************************* *)
-(* Main algorithm *)
+(* Main functions *)
 (* ********************************************************************* *)
 
 let infer_sizeof ty =
   try singleton_of_int (Cil.bytesSizeOf ty)
   with Cil.SizeOfError _ -> interv_of_typ Cil.theMachine.Cil.typeOfSizeOf
 
-let infer_alignof ty = singleton_of_int (Cil.bytesAlignOf ty)
+let infer_alignof ty =
+  try singleton_of_int (Cil.bytesAlignOf ty)
+  with Cil.SizeOfError _ -> interv_of_typ Cil.theMachine.Cil.typeOfSizeOf
+
+(* Infer the interval of an extended quantifier \sum or \product.
+   [lambda] is the interval of the lambda term, [min] (resp. [max]) is the
+   interval of the minimum (resp. maximum) and [oper] is the identifier of the
+   extended quantifier (\sum, or \product). The returned ival is the interval of
+   the extended quantifier. *)
+let infer_sum_product oper lambda min max = match lambda, min, max with
+  | Ival lbd_iv, Ival lb_iv, Ival ub_iv ->
+    (try
+       let min_lambda, max_lambda = Ival.min_and_max lbd_iv in
+       let minmax_lb = Ival.min_and_max lb_iv in
+       let minmax_ub = Ival.min_and_max ub_iv in
+       let lb, ub = match oper.lv_name with
+         | "\\sum" ->
+           (* the lower (resp. upper) bound is the min (resp. max) value of the
+              lambda term, times the min (resp. max) distance between them if
+              the sign is positive, or conversely if the sign is negative *)
+           let lb = match min_lambda with
+             | None -> None
+             | Some z ->
+               if Z.sign z = -1
+               then Option.map (Z.mul z) (max_delta minmax_lb minmax_ub)
+               else Some (Z.mul z (min_delta minmax_lb minmax_ub))
+           in
+           let ub = match max_lambda with
+             | None -> None
+             | Some z ->
+               if Z.sign z = -1
+               then Some (Z.mul z (min_delta minmax_lb minmax_ub))
+               else Option.map (Z.mul z) (max_delta minmax_lb minmax_ub)
+           in
+           lb, ub
+         | "\\product" ->
+           (* the lower (resp. upper) bound is the min (resp. max) value of the
+              lambda term in absolute value, power the min (resp. max) distance
+              between them if the sign is positive, or conversely for both the
+              lambda term and the exponent if the sign is negative. If the sign
+              is negative, the minimum is also negative. *)
+           let min, max =
+             match min_lambda, max_lambda with
+             | None, None as res -> res
+             | None, Some m | Some m, None -> Some m, None
+             | Some min, Some max ->
+               let abs_min = Z.abs min in
+               let abs_max = Z.abs max in
+               Some (Z.min abs_min abs_max), Some (Z.max abs_min abs_max)
+           in
+           let lb = match min_lambda with
+             | None -> None
+             | Some z ->
+               if Z.sign z = -1 then
+                 (* the lower bound is (possibly) negative *)
+                 Extlib.opt_map2
+                   (fun m max ->
+                      match min_lambda, max_lambda with
+                      | Some mil, Some mal when Z.lt (Z.abs mil) (Z.abs mal) ->
+                        (* [lambda] contains both positive and negative values
+                           and |mil| < |mal|: instead of [-mal^m], the min is
+                           optimized to [mil * mal^(m-1)] *)
+                        Z.mul mil (Z.pow max (Z.to_int m - 1))
+                      | None, _ | _, None | Some _, Some _ ->
+                        Z.neg (Z.pow max (Z.to_int m)))
+                   (max_delta minmax_lb minmax_ub)
+                   max
+               else
+                 (* all numbers are positive:
+                    the lower bound is necessarily positive *)
+                 Option.map
+                   (fun m -> Z.pow m (Z.to_int (min_delta minmax_lb minmax_ub)))
+                   min
+           in
+           let ub =
+             Extlib.opt_map2
+               (fun m max ->
+                  match max_lambda with
+                  | Some ml when Z.lt ml Z.zero && not (Z.equal m Z.one) ->
+                    (* when [lambda] is necessarily negative with an odd number
+                       of iterations (>1), the result is necessarily negative,
+                       so smaller than the maximal (positive) value. Therefore,
+                       it is possible to reduce the number of iteration by 1. *)
+                    let exp = Z.to_int m in
+                    Z.pow max (exp - exp mod 2)
+                  | None | Some _ ->
+                    Z.pow max (Z.to_int m))
+               (max_delta minmax_lb minmax_ub)
+               max
+           in
+           lb, ub
+         | s ->
+           Options.fatal "unexpect logic function '%s'" s
+       in
+       Ival (Ival.inject_range lb ub)
+     with
+     | Abstract_interp.Error_Bottom -> bottom
+     | Z.Overflow (* if the exponent of \product is too high *) -> top_ival)
+  | _ -> Error.not_yet "extended quantifiers with non-integer parameters"
 
 let rec infer t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
@@ -442,43 +673,43 @@ let rec infer t =
   | TBinOp (PlusA, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.add_int i1 i2
+    lift_arith_binop Ival.add_int i1 i2
   | TBinOp (MinusA, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.sub_int i1 i2
+    lift_arith_binop Ival.sub_int i1 i2
   | TBinOp (Mult, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.mul i1 i2
+    lift_arith_binop Ival.mul i1 i2
   | TBinOp (Div, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.div i1 i2
+    lift_arith_binop Ival.div i1 i2
   | TBinOp (Mod, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.c_rem i1 i2
+    lift_arith_binop Ival.c_rem i1 i2
   | TBinOp (Shiftlt, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.shift_left i1 i2
+    lift_arith_binop Ival.shift_left i1 i2
   | TBinOp (Shiftrt, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.shift_right i1 i2
+    lift_arith_binop Ival.shift_right i1 i2
   | TBinOp (BAnd, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.bitwise_and i1 i2
+    lift_arith_binop Ival.bitwise_and i1 i2
   | TBinOp (BXor, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.bitwise_xor i1 i2
+    lift_arith_binop Ival.bitwise_xor i1 i2
   | TBinOp (BOr, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.bitwise_or i1 i2
+    lift_arith_binop Ival.bitwise_or i1 i2
   | TCastE (ty, t) ->
     let src = infer t in
     let dst = interv_of_typ ty in
@@ -491,26 +722,38 @@ let rec infer t =
     infer t
   | TBinOp (MinusPP, t, _) ->
     (match Cil.unrollType (get_cty t) with
-     | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
-       (* the second argument must be in the same block than [t]. Consequently
-          the result of the difference belongs to [0; \block_length(t)] *)
-       let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
-       ival Integer.zero (Integer.of_int nb_bytes)
-     | TArray _ | TPtr _ ->
+     | TArray(_, _, _) as ta ->
+       begin
+         try
+           let n = Cil.bitsSizeOf ta in
+           (* the second argument must be in the same block than [t].
+              Consequently the result of the difference belongs to
+              [0; \block_length(t)] *)
+           let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
+           ival Integer.zero (Integer.of_int nb_bytes)
+         with Cil.SizeOfError _ ->
+           Lazy.force interv_of_unknown_block
+       end
+     | TPtr _ ->
        Lazy.force interv_of_unknown_block
      | _ -> assert false)
   | Tblock_length (_, t)
   | Toffset(_, t) ->
     (match Cil.unrollType (get_cty t) with
-     | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
-       let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
-       singleton_of_int nb_bytes
-     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block
+     | TArray(_, _, _) as ta ->
+       begin
+         try
+           let n = Cil.bitsSizeOf ta in
+           let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
+           singleton_of_int nb_bytes
+         with Cil.SizeOfError _ ->
+           Lazy.force interv_of_unknown_block
+       end
+     | TPtr _ -> Lazy.force interv_of_unknown_block
      | _ -> assert false)
   | Tnull  -> singleton_of_int 0
   | TLogic_coerce (_, t) -> infer t
-
-  | Tapp (li, _, _args) ->
+  | Tapp (li, lst, args) ->
     (match li.l_body with
      | LBpred _ ->
        Ival Ival.zero_or_one
@@ -528,6 +771,50 @@ let rec infer t =
            fixpoint i
        in
        fixpoint bottom
+     | LBnone when li.l_var_info.lv_name = "\\sum" ||
+                   li.l_var_info.lv_name = "\\product" ->
+       (match args with
+        | [ t1; t2; { term_node = Tlambda([ k ], _) } as lambda ] ->
+          let t1_iv = infer t1 in
+          let t2_iv = infer t2 in
+          let k_iv = join t1_iv t2_iv in
+          Env.add k k_iv;
+          let lambda_iv = infer lambda in
+          Env.remove k;
+          let t2incr =
+            Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
+          in
+          (* it is correct and precise to use k_ival to compute lambda_ival, but
+             not during the code generation since the type used for k is the
+             greatest type between the type of t1 and the type of t2+1, that is
+             why the ival associated to k is updated *)
+          Env.add k (join t1_iv (infer t2incr));
+          (* k is removed during code generation, it is needed for generating
+             the code of the lambda term *)
+          infer_sum_product li.l_var_info lambda_iv t1_iv t2_iv
+        | _ -> Error.not_yet "extended quantifiers without lambda term")
+     | LBnone when li.l_var_info.lv_name = "\\numof" ->
+       (match args with
+        | [ t1; t2; { term_node = Tlambda([ k ], p) } ] ->
+          let logic_info = Cil_const.make_logic_info "\\sum" in
+          logic_info.l_type <- li.l_type;
+          logic_info.l_tparams <- li.l_tparams;
+          logic_info.l_labels <- li.l_labels;
+          logic_info.l_profile <- li.l_profile;
+          logic_info.l_body <- li.l_body;
+          let numof_as_sum =
+            let conditional_term =
+              Logic_const.term
+                (Tif(p, Cil.lone (), Cil.lzero ())) Linteger
+            in
+            let lambda_term =
+              Logic_const.term (Tlambda([ k ], conditional_term)) Linteger
+            in
+            (Logic_const.term
+               (Tapp(logic_info, lst, [ t1; t2; lambda_term ])) Linteger)
+          in infer numof_as_sum
+        | _ ->
+          Options.fatal "unexpected input for an extended quantifier \\numof")
      | LBnone
      | LBreads _ ->
        (match li.l_type with
@@ -557,13 +844,15 @@ let rec infer t =
   | TConst (LReal lr) ->
     if lr.r_lower = lr.r_upper then Float(FDouble, Some lr.r_nearest)
     else Rational
+  | Tlambda ([ _ ],lt) ->
+    infer lt
+  | Tlambda (_,_)
   | TConst (LStr _ | LWStr _)
   | TBinOp (PlusPI,_,_)
   | TBinOp (IndexPI,_,_)
   | TBinOp (MinusPI,_,_)
   | TAddrOf _
   | TStartOf _
-  | Tlambda (_,_)
   | TDataCons (_,_)
   | Tbase_addr (_,_)
   | TUpdate (_,_,_)
@@ -594,17 +883,22 @@ and infer_term_host thost =
   | TMem t ->
     let ty = Logic_utils.logicCType t.term_type in
     match Cil.unrollType ty with
-    | TPtr(ty, _) | TArray(ty, _, _, _) ->
+    | TPtr(ty, _) | TArray(ty, _, _) ->
       interv_of_typ ty
     | _ ->
       Options.fatal "unexpected type %a for term %a"
         Printer.pp_typ ty
         Printer.pp_term t
 
+let infer t =
+  let i = infer t in
+  Logic_function_env.clear();
+  i
+
 include D
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
  *)

@@ -1,5 +1,5 @@
 /* run.config
-   CMD: @frama-c@ -wp -wp-prover none -wp-msg-key shell -wp-msg-key rte -wp-warn-key "pedantic-assigns=inactive" @PTEST_OPTIONS@
+   CMD: @frama-c@ -wp -wp-prover none -wp-share @PTEST_SHARE_DIR@ -wp-msg-key shell,rte -wp-warn-key "pedantic-assigns=inactive"
    OPT: -wp-rte -no-warn-invalid-bool -then -print -no-unicode
    OPT: -wp-rte -no-warn-signed-overflow -then -print -no-unicode
    OPT: -wp-rte -warn-unsigned-overflow -then -print -no-unicode

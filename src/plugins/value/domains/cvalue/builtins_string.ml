@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -154,7 +154,7 @@ let search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc =
   let size = kind.size in
   (* Reads will repeat themselves every [modu] bits. *)
   let modu = Integer.ppcm v_size size in
-  let max_reads = Integer.(to_int (e_div modu size)) in
+  let max_reads = Integer.(to_int_exn (e_div modu size)) in
   (* Performs [max_reads] consecutive reads from offsets {[min] + k[modu]},
      bound by [max]. *)
   let search_until ~max acc =
@@ -376,54 +376,44 @@ let do_search ~search ~stop_at_0 ~typ ~length ?limit = fun state args ->
   let size = bits_size typ in
   let signed = signed_char typ in
   let str = List.nth args 0 in
-  let result, alarm =
-    try
-      let str, valid = reduce_by_validity ~size str in
-      let search =
-        if Ival.is_bottom search
-        then searched_char ~size ~signed (List.nth args 1)
-        else search
-      in
-      (* When searching exactly 0, the search naturally stops at 0. *)
-      let stop_at_0 = if Ival.is_zero search then false else stop_at_0 in
-      let interpret_limit n =
-        let cvalue = List.nth args n in
-        let limit = Ival.scale size (Cvalue.V.project_ival cvalue) in
-        Ival.(narrow positive_integers limit)
-      in
-      let limit = Option.map interpret_limit limit in
-      let kind = { search; stop_at_0; size; signed; limit } in
-      let result, alarm = search_char kind ~length state str in
-      result, alarm || not valid
-    with | Abstract_interp.Error_Top
-         | Cvalue.V.Not_based_on_null -> return_top ~length str, true
-  in
-  let wrapper = if length then Eval_op.wrap_size_t else Eval_op.wrap_ptr in
-  if Cvalue.V.is_bottom result then None, alarm else wrapper result, alarm
+  try
+    let str, valid = reduce_by_validity ~size str in
+    let search =
+      if Ival.is_bottom search
+      then searched_char ~size ~signed (List.nth args 1)
+      else search
+    in
+    (* When searching exactly 0, the search naturally stops at 0. *)
+    let stop_at_0 = if Ival.is_zero search then false else stop_at_0 in
+    let interpret_limit n =
+      let cvalue = List.nth args n in
+      let limit = Ival.scale size (Cvalue.V.project_ival cvalue) in
+      Ival.(narrow positive_integers limit)
+    in
+    let limit = Option.map interpret_limit limit in
+    let kind = { search; stop_at_0; size; signed; limit } in
+    let result, alarm = search_char kind ~length state str in
+    result, alarm || not valid
+  with | Abstract_interp.Error_Top
+       | Cvalue.V.Not_based_on_null -> return_top ~length str, true
 
 (* Applies the [builtin] built by [do_search]. *)
 let apply_builtin _name builtin = fun state args ->
-  let args = List.map (fun (_, v, _) -> v) args in
+  let args = List.map snd args in
   let result, _alarm = builtin state args in
-  let res_cvalue = match result with
-    | None -> None, Cvalue.Model.bottom
-    | Some _ -> result, state
-  in
-  { Value_types.c_values = [ res_cvalue ];
-    c_clobbered = Base.SetLattice.bottom;
-    c_from = None;
-    c_cacheable = Value_types.Cacheable; }
+  let result = if Cvalue.V.is_bottom result then [] else [result] in
+  Builtins.Result result
 
 (* Builds, registers and exports a builtin for the C function [c_name]. *)
 let register_builtin c_name ~search ~stop_at_0 ~typ ~length ?limit =
   let name = "Frama_C_" ^ c_name in
   let f = do_search ~search ~stop_at_0 ~typ ~length ?limit in
   let builtin = apply_builtin name f in
-  Builtins.register_builtin name ~replace:c_name builtin;
+  Builtins.register_builtin name ~replace:c_name Cacheable builtin;
   f
 
 type str_builtin_sig =
-  Cvalue.Model.t -> Cvalue.V.t list -> Cvalue.V_Offsetmap.t option * bool
+  Cvalue.Model.t -> Cvalue.V.t list -> Cvalue.V.t * bool
 
 let frama_c_strlen_wrapper : str_builtin_sig =
   register_builtin "strlen"

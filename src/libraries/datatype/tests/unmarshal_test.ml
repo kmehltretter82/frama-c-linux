@@ -284,7 +284,7 @@ test v t_list4;;
 
 type t = A of int * int | B of int
 let l = [ A (3, 4); B 5 ]
-let t_l = 
+let t_l =
   t_list (Structure (Sum [| [| Abstract; Abstract |]; [| Abstract |] |]));;
 
 let test v ty =

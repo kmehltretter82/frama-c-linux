@@ -30,7 +30,7 @@ let add_throw_test f exn_type test init =
 
 let add_my_exn my_exn f =
   let c = Cil.evar (List.hd f.sformals) in
-  let exn_type = TComp(my_exn,{ scache = Not_Computed},[]) in
+  let exn_type = TComp(my_exn,[]) in
   let loc = Cil_datatype.Location.unknown in
   let init =
     CompoundInit(
@@ -59,8 +59,8 @@ let add_int_ptr_exn glob f =
   add_throw_test f Cil.intPtrType test init
 
 let add_catch my_exn my_exn2 f =
-  let exn_type = TComp(my_exn, { scache = Not_Computed }, []) in
-  let exn_type2 = TComp(my_exn2, {scache = Not_Computed }, []) in
+  let exn_type = TComp(my_exn, []) in
+  let exn_type2 = TComp(my_exn2, []) in
   let exn_field = Field (List.hd (Option.get my_exn.cfields), NoOffset) in
   let exn2_field = Field (List.hd (Option.get my_exn2.cfields), NoOffset) in
   let loc = Cil_datatype.Location.unknown in
@@ -177,5 +177,3 @@ let () = Frontc.add_syntactic_transformation add_exn_cabs
 let add_exn_cat = File.register_code_transformation_category "add_exn"
 
 let () = File.add_code_transformation_before_cleanup add_exn_cat add_exn
-
-

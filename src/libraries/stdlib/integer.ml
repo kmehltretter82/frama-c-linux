@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -19,6 +19,8 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+type 'a formatter = Format.formatter -> 'a -> unit
 
 type t = Z.t
 
@@ -97,9 +99,20 @@ let of_int = Z.of_int
 let of_int64 = Z.of_int64
 let of_int32 = Z.of_int32
 
-let to_int = Z.to_int
-let to_int64 = Z.to_int64
-let to_int32 = Z.to_int32
+let to_int_exn = Z.to_int
+let to_int64_exn = Z.to_int64
+let to_int32_exn = Z.to_int32
+
+(* These functions are deprecated (renamed to *_exn) and will be removed
+   in a future version. *)
+let to_int = to_int_exn
+let to_int64 = to_int64_exn
+let to_int32 = to_int32_exn
+
+let wrap to_int i = try Some (to_int i) with Z.Overflow -> None
+let to_int_opt = wrap Z.to_int
+let to_int64_opt = wrap Z.to_int64
+let to_int32_opt = wrap Z.to_int32
 
 let of_string = Z.of_string
 let to_string = Z.to_string
@@ -179,7 +192,10 @@ let pp_hex ?(nbits=1) ?(sep="") fmt v =
     ( Format.pp_print_string fmt "1x" ;
       pp_digits { nbits ; sep ; bsize=16 ;
                   bmask = bmask_hex ; pp = pp_hex_neg } fmt 0 (Z.lognot v) )
-let pretty ?(hexa=false) fmt v =
+let pretty fmt v =
+  Format.pp_print_string fmt (to_string v)
+
+let pretty_hex fmt v =
   let rec aux v =
     if gt v two_power_60 then
       let quo, rem = Z.ediv_rem v two_power_60 in
@@ -188,12 +204,9 @@ let pretty ?(hexa=false) fmt v =
     else
       Format.fprintf fmt "%LX" (to_int64 v)
   in
-  if hexa then
-    if equal v zero then Format.pp_print_string fmt "0"
-    else if gt v zero then (Format.pp_print_string fmt "0x"; aux v)
-    else (Format.pp_print_string fmt "-0x"; aux (Z.neg v))
-  else
-    Format.pp_print_string fmt (to_string v)
+  if equal v zero then Format.pp_print_string fmt "0"
+  else if gt v zero then (Format.pp_print_string fmt "0x"; aux v)
+  else (Format.pp_print_string fmt "-0x"; aux (Z.neg v))
 
 let is_one v = equal one v
 

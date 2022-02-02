@@ -2,8 +2,8 @@
    COMMENT: functions used in Contiki
 */
 
-#include <stdlib.h>
 #include <limits.h>
+#include <stdlib.h>
 
 struct list {
   struct list *next;
@@ -19,10 +19,10 @@ struct list {
   logic integer length(struct list *l) = length_aux(l, 0);
 */
 
-int main (void) {
+int main(void) {
   struct list node1, node2, node3;
   node1.next = &node2;
   node2.next = &node3;
   struct list *l = &node1;
-  /*@ assert length(l) == 3; */ ;
+  /*@ assert length(l) == 3; */;
 }

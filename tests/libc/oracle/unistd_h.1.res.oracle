@@ -555,13 +555,20 @@
   Called from unistd_h.c:104.
 [eva] Done for function pipe
 [eva] unistd_h.c:105: check 'ok' got status valid.
+[eva] computing for function sleep <- main.
+  Called from unistd_h.c:107.
+[eva] using specification for function sleep
+[eva] Done for function sleep
+[eva] computing for function sleep <- main.
+  Called from unistd_h.c:107.
+[eva] Done for function sleep
+[eva] unistd_h.c:108: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
+  __fc_fds[0..1023] ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
-  __fc_fds[0] ∈ {0}
-          [1..1023] ∈ [--..--]
   r ∈ {-1; 0}
   hostname[0..255] ∈ [--..--] or UNINITIALIZED
   fd ∈ [-1..1023]
@@ -582,4 +589,5 @@
   tty ∈ {{ NULL ; &__fc_ttyname[0] }}
   halfpipe ∈ UNINITIALIZED
   pipefd[0..1] ∈ [0..1023] or UNINITIALIZED
+  unslept ∈ [0..42]
   __retres ∈ {0; 1}

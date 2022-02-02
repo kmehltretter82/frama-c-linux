@@ -8,7 +8,7 @@
 [eva] initialized_copy.i:30: Frama_C_show_each_unreached:
 [eva] initialized_copy.i:38: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0}
   v ∈ [--..--]
   b_0 ∈ {1} or UNINITIALIZED
@@ -18,7 +18,7 @@
 [eva] initialized_copy.i:48: Frama_C_show_each_unreached:
 [eva] initialized_copy.i:65: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0}
   v ∈ [--..--]
   c_0[bits 0 to 7] ∈ {1} or UNINITIALIZED
@@ -45,7 +45,7 @@
 [eva:alarm] initialized_copy.i:98: Warning: assertion got status unknown.
 [eva] initialized_copy.i:102: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0}
   v ∈ [--..--]
   i_0 ∈ [0..9]
@@ -58,7 +58,7 @@
 [eva:alarm] initialized_copy.i:108: Warning: assertion got status unknown.
 [eva] initialized_copy.i:112: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0; 12} or UNINITIALIZED
   v ∈ [--..--]
   i_1 ∈ [0..9]
@@ -72,40 +72,38 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] initialized_copy.i:130: Frama_C_show_each_unreached:
-[eva:alarm] initialized_copy.i:135: Warning: 
-  accessing uninitialized left-value. assert \initialized(&a_6);
+[eva] computing for function g <- main.
+  Called from initialized_copy.i:135.
+[kernel:annot:missing-spec] initialized_copy.i:135: Warning: 
+  Neither code nor specification for function g, generating default assigns from the prototype
+[eva] using specification for function g
+[eva] Done for function g
+[eva] initialized_copy.i:136: Frama_C_show_each_unreached:
 [eva] computing for function f <- main.
   Called from initialized_copy.i:143.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] initialized_copy.i:144: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0; 12} or UNINITIALIZED
   v ∈ [--..--]
   a_7 ∈ {1} or UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] initialized_copy.i:151: Warning: 
-  accessing uninitialized left-value. assert \initialized(&a_8);
 [eva] computing for function g <- main.
   Called from initialized_copy.i:151.
-[kernel:annot:missing-spec] initialized_copy.i:151: Warning: 
-  Neither code nor specification for function g, generating default assigns from the prototype
-[eva] using specification for function g
 [eva] Done for function g
 [eva] initialized_copy.i:152: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0; 12} or UNINITIALIZED
   v ∈ [--..--]
-  a_8 ∈ {1}
+  a_8 ∈ {1} or UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] Recording results for main
 [eva] done for function main
-[eva] initialized_copy.i:135: 
-  assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   

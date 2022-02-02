@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,74 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Factory
-
 let dkey_main = Wp_parameters.register_category "main"
 let dkey_raised = Wp_parameters.register_category "raised"
-let wkey_smoke = Wp_parameters.register_warn_category "smoke"
-
-(* --------- Command Line ------------------- *)
-
-let cmdline () : setup =
-  begin
-    match Wp_parameters.Model.get () with
-    | ["Runtime"] ->
-        Wp_parameters.abort
-          "Model 'Runtime' is no more available.@\nIt will be reintroduced \
-           in a future release."
-    | ["Logic"] ->
-        Wp_parameters.warning ~once:true
-          "Deprecated 'Logic' model.@\nUse 'Typed' with option '-wp-ref' \
-           instead." ;
-        {
-          mheap = Factory.Typed MemTyped.Fits ;
-          mvar = Factory.Ref ;
-          cint = Cint.Natural ;
-          cfloat = Cfloat.Real ;
-        }
-    | ["Store"] ->
-        Wp_parameters.warning ~once:true
-          "Deprecated 'Store' model.@\nUse 'Typed' instead." ;
-        {
-          mheap = Factory.Typed MemTyped.Fits ;
-          mvar = Factory.Var ;
-          cint = Cint.Natural ;
-          cfloat = Cfloat.Real ;
-        }
-    | spec -> Factory.parse spec
-  end
-
-let set_model (s:setup) =
-  Wp_parameters.Model.set [Factory.ident s]
-
-(* --------- WP Computer -------------------- *)
-
-let computer () =
-  if Wp_parameters.Model.get () = ["Dump"]
-  then CfgDump.create ()
-  else CfgWP.computer (cmdline ()) (Driver.load_driver ())
 
 (* ------------------------------------------------------------------------ *)
 (* --- Memory Model Hypotheses                                          --- *)
 (* ------------------------------------------------------------------------ *)
-
-module Models = Set.Make(WpContext.MODEL)
-module Fmap = Kernel_function.Map
-
-let wp_iter_model ?ip ?index job =
-  begin
-    let pool : Models.t Fmap.t ref = ref Fmap.empty in
-    Wpo.iter ?ip ?index ~on_goal:(fun wpo ->
-        match Wpo.get_index wpo with
-        | Wpo.Axiomatic _ -> ()
-        | Wpo.Function(kf,_) ->
-            let m = Wpo.get_model wpo in
-            let ms = try Fmap.find kf !pool with Not_found -> Models.empty in
-            if not (Models.mem m ms) then
-              pool := Fmap.add kf (Models.add m ms) !pool ;
-      ) () ;
-    Fmap.iter (fun kf ms -> Models.iter (fun m -> job kf m) ms) !pool
-  end
 
 let wp_compute_memory_context model =
   let hypotheses_computer = WpContext.compute_hypotheses model in
@@ -179,12 +117,6 @@ let pp_warnings fmt wpo =
       | false , _ -> Format.fprintf fmt " (Stronger, %d warnings)" n
     end
 
-let launch task =
-  let server = ProverTask.server () in
-  (** Do on_server_stop save why3 session *)
-  Task.spawn server (Task.thread task) ;
-  Task.launch server
-
 (* ------------------------------------------------------------------------ *)
 (* ---  Prover Stats                                                    --- *)
 (* ------------------------------------------------------------------------ *)
@@ -225,6 +157,9 @@ let clear_scheduled () =
     exercised := 0 ;
     session := GOALS.empty ;
     provers := PM.empty ;
+    CfgInfos.trivial_terminates := 0 ;
+    WpReached.unreachable_proved := 0 ;
+    WpReached.unreachable_failed := 0 ;
   end
 
 let get_pstat p =
@@ -255,7 +190,6 @@ let add_time s t =
     end
 
 let do_list_scheduled goals =
-  clear_scheduled () ;
   Bag.iter
     (fun goal ->
        begin
@@ -503,25 +437,33 @@ let do_report_scheduled () =
     let plural = if !exercised > 1 then "s" else "" in
     Wp_parameters.result "%d goal%s generated" !exercised plural
   else
-  if !scheduled > 0 then
-    begin
-      let passed = GOALS.fold
-          (fun g n ->
-             if Wpo.is_passed g then succ n else n
-          ) !session 0 in
-      let mode = Cache.get_mode () in
-      if mode <> Cache.NoCache then do_report_cache_usage mode ;
-      Wp_parameters.result "%t"
-        begin fun fmt ->
-          Format.fprintf fmt "Proved goals: %4d / %d@\n" passed !scheduled ;
-          Pretty_utils.pp_items
-            ~min:12 ~align:`Left
-            ~title:(fun (prover,_) -> VCS.title_of_prover prover)
-            ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
-            ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
-            ~pp_item:do_report_prover_stats fmt ;
-        end ;
-    end
+    let total =
+      !scheduled +
+      !WpReached.unreachable_failed +
+      !WpReached.unreachable_proved +
+      !CfgInfos.trivial_terminates in
+    if total > 0 then
+      begin
+        let passed =
+          !WpReached.unreachable_proved + !CfgInfos.trivial_terminates
+        in
+        let passed = GOALS.fold
+            (fun g n ->
+               if Wpo.is_passed g then succ n else n
+            ) !session passed in
+        let mode = Cache.get_mode () in
+        if mode <> Cache.NoCache then do_report_cache_usage mode ;
+        Wp_parameters.result "%t"
+          begin fun fmt ->
+            Format.fprintf fmt "Proved goals: %4d / %d@\n" passed total ;
+            Pretty_utils.pp_items
+              ~min:12 ~align:`Left
+              ~title:(fun (prover,_) -> VCS.title_of_prover prover)
+              ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
+              ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
+              ~pp_item:do_report_prover_stats fmt ;
+          end ;
+      end
 
 let do_list_scheduled_result () =
   begin
@@ -748,11 +690,12 @@ let cmdline_run () =
     if fct <> Wp_parameters.Fct_none then
       begin
         Wp_parameters.feedback ~ontty:`Feedback "Running WP plugin...";
-        let computer = computer () in
+        let generator = Generator.create () in
+        let model = generator#model in
         Ast.compute ();
         Dyncall.compute ();
         if Wp_parameters.RTE.get () then
-          WpRTE.generate_all computer#model ;
+          WpRTE.generate_all model ;
         if Wp_parameters.has_dkey dkey_logicusage then
           begin
             LogicUsage.compute ();
@@ -768,14 +711,14 @@ let cmdline_run () =
         (** TODO entry point *)
         if Wp_parameters.has_dkey dkey_builtins then
           begin
-            WpContext.on_context (computer#model,WpContext.Global)
+            WpContext.on_context (model,WpContext.Global)
               LogicBuiltins.dump ();
           end ;
-        WpTarget.compute computer#model ;
-        wp_compute_memory_context computer#model ;
+        WpTarget.compute model ;
+        wp_compute_memory_context model ;
         if Wp_parameters.CheckMemoryContext.get () then
-          wp_insert_memory_context computer#model ;
-        let goals = Generator.compute_selection computer ~fct ~bhv ~prop () in
+          wp_insert_memory_context model ;
+        let goals = generator#compute_main ~fct ~bhv ~prop () in
         do_wp_proofs goals ;
         begin
           if fct <> Wp_parameters.Fct_all then
@@ -783,24 +726,9 @@ let cmdline_run () =
           else
             do_wp_print () ;
         end ;
-        do_wp_report computer#model ;
+        do_wp_report model ;
       end
   end
-
-(* ------------------------------------------------------------------------ *)
-(* ---  Register external functions                                     --- *)
-(* ------------------------------------------------------------------------ *)
-
-let deprecated name =
-  Wp_parameters.warning ~once:true ~current:false
-    "Dynamic '%s' now is deprecated. Use `Wp.VC` api instead." name
-
-let register name ty code =
-  let _ignore =
-    Dynamic.register ~plugin:"Wp" name ty
-      ~journalize:false (*LC: Because of Property is not journalizable. *)
-      (fun x -> deprecated name ; code x)
-  in ()
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Tracing WP Invocation                                           --- *)
@@ -812,10 +740,7 @@ let pp_wp_parameters fmt =
     if Wp_parameters.RTE.get () then Format.pp_print_string fmt " -wp-rte" ;
     let spec = Wp_parameters.Model.get () in
     if spec <> [] && spec <> ["Typed"] then
-      ( let descr =
-          if spec = ["Dump"] then "Dump"
-          else Factory.descr (Factory.parse spec)
-        in
+      ( let descr = Factory.descr (Factory.parse spec) in
         Format.fprintf fmt " -wp-model '%s'" descr ) ;
     if not (Wp_parameters.Let.get ()) then Format.pp_print_string fmt
         " -wp-no-let" ;

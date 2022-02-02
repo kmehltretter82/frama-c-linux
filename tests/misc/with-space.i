@@ -1,6 +1,4 @@
 /* run.config
-   MODULE: with\ space/module
+ SCRIPT: @PTEST_DIR@/with\ space/module
    OPT:
-COMMENT: TODO - dune migration has to be fixed
-DONTRUN:
  */

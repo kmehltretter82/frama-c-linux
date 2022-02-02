@@ -1,6 +1,6 @@
 /* run.config
-   MODULE: @PTEST_NAME@
-   OPT: -print
+ MODULE: Type_of_term
+   STDOPT:
 */
 
 int t [42];

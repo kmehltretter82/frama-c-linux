@@ -12,8 +12,10 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:548: 
   Declaration of variadic function dprintf.
+[variadic] FRAMAC_SHARE/libc/stdio.h:590: 
+  Declaration of variadic function asprintf.
 [variadic] scanf_loop.c:6: 
   Translating call to scanf to a call to the specialized version scanf_va_1.
 [eva] Analyzing a complete application starting at main
@@ -31,8 +33,8 @@
 #include "stddef.h"
 #include "stdio.h"
 int volatile nondet;
-/*@ requires valid_read_string(format);
-    requires \valid(param0);
+/*@ requires \valid(param0);
+    requires valid_read_string(format);
     ensures \initialized(param0);
     assigns \result, __fc_stdin->__fc_FILE_data, *param0;
     assigns \result
@@ -46,7 +48,7 @@ int volatile nondet;
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int scanf_va_1(char const * __restrict format, int *param0);
+int scanf_va_1(char const * restrict format, int *param0);
 
 int main(void)
 {

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,12 +36,15 @@ module Static = struct
     let join _ _ = ()
     let widen _ _ _ _ = ()
     let narrow _ _ = `Value ()
-
-    let storage () = false
   end
 
   include D
-  module Store = Domain_store.Make (D)
+  include Domain_builder.Complete
+      (struct
+        include D
+        let top = top
+        let join = join
+      end)
 end
 
 module Make
@@ -55,38 +58,26 @@ module Make
   type origin
 
   let eval_top = `Value (Value.top, None), Alarmset.all
-  let extract_expr _ _ _ = eval_top
-  let extract_lval _ _ _ _ _ = eval_top
-  let backward_location _ _ _ loc value = `Value (loc, value)
-  let reduce_further _ _ _  = []
+  let extract_expr ~oracle:_ _ _ _ = eval_top
+  let extract_lval ~oracle:_ _ _ _ _ _ = eval_top
 
   let update _ _ = `Value ()
   let assign _ _ _ _ _ _ = `Value ()
   let assume _ _ _ _ _ = `Value ()
-  let start_call _ _ _ _ = `Value ()
-  let finalize_call _ _ ~pre:_ ~post:_ = `Value ()
+  let start_call _ _ _ _ _ = `Value ()
+  let finalize_call _ _ _ ~pre:_ ~post:_ = `Value ()
   let show_expr _ _ _ _ = ()
 
   let logic_assign _ _ _ = ()
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ _ _ _ = `Value ()
 
   let enter_scope _ _ _ = ()
   let leave_scope _ _ _ = ()
-
-  let enter_loop _ _ = ()
-  let incr_loop_counter _ _ = ()
-  let leave_loop _ _ = ()
 
   let empty () = ()
   let initialize_variable _ _ ~initialized:_ _ _ = ()
   let initialize_variable_using_type _ _ _  = ()
 
   let relate _ _ () = Base.SetLattice.empty
-  let filter _ _ _ () = ()
-  let reuse _ _ ~current_input:() ~previous_output:() = ()
-
-  let post_analysis _ = ()
 end
 
 

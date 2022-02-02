@@ -1,5 +1,5 @@
 /* run.config*
-   
+ PLUGIN: @EVA_MAIN_PLUGINS@
    OPT: -eva @EVA_CONFIG@ -lib-entry -main f -absolute-valid-range 0x200-0x199 -eva-msg-key initial-state
 */
 

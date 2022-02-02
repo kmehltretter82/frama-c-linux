@@ -1,17 +1,37 @@
-#!/bin/sh
+#!/bin/sh -eu
 
-LIBC=$(frama-c -print-share-path)/libc
+# Script used by the test "fc_libc.c"
 
-for A in `find $LIBC -name "*.h" -printf "%P\n"`;
-do
-    if ! grep -q $A fc_libc.c ;
-    then echo "#include \"$A"\";
-    fi ;
-done;
+errors=0
 
-for A in `find $LIBC -name "*.c" -printf "%P\n"`;
-do
-    if ! grep -q $A $LIBC/__fc_runtime.c fc_libc.c ;
-    then echo Not included implementation \'$A\';
-    fi ;
-done;
+if [ "$#" -ge 1 ] && [ -d "$1" ]; then
+    cd "$1"
+else
+    cd share/libc
+fi
+
+for A in *.h */*.h; do
+    if ! grep -q $A ../../tests/libc/fc_libc.c
+    then
+        echo "missing include in tests/libc/fc_libc.c: $A"
+        errors=$((errors+1))
+    fi
+    if ! grep -q $A __fc_libc.h && [ "${A#__fc_}" = "$A" ]
+    then
+        echo "missing include in share/libc/__fc_libc.h: $A"
+        errors=$((errors+1))
+    fi
+done
+
+for A in *.c */*.c; do
+    if ! grep -q $A __fc_runtime.c ../../tests/libc/fc_libc.c
+    then
+        echo "missing include in share/libc/__fc_runtime.c or tests/libc/fc_libc.c: $A"
+        errors=$((errors+1))
+    fi
+done
+
+if [ $errors -gt 0 ]; then
+    echo "found $errors error(s) in libc"
+    exit 1
+fi

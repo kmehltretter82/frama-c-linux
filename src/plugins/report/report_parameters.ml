@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -73,11 +73,12 @@ module Proven =
 
 let () = Parameter_customize.set_group printing
 module CSVFile =
-  String
+  Filepath
     (struct
       let option_name = "-report-csv"
       let arg_name = "name"
-      let default = ""
+      let file_kind = "CSV"
+      let existence = Fc_Filepath.Indifferent
       let help = "if set, output properties as a csv file of the given name"
     end)
 
@@ -166,12 +167,13 @@ module InvalidStatus =
 
 let () = Parameter_customize.set_group monitoring
 module Output =
-  String
+  Filepath
     (struct
       let option_name = "-report-output"
       let arg_name = "*.json"
+      let file_kind = "JSON"
+      let existence = Fc_Filepath.Indifferent
       let help = "Output -report-classify in JSON format"
-      let default = ""
     end)
 
 let () = Parameter_customize.set_group monitoring
@@ -184,32 +186,35 @@ module AbsolutePath =
 
 let () = Parameter_customize.set_group monitoring
 module OutputReviews =
-  String
+  Filepath
     (struct
       let option_name = "-report-output-reviews"
       let arg_name = "file"
+      let file_kind = "Text"
+      let existence = Fc_Filepath.Indifferent
       let help = "Output number of reviews to <file>"
-      let default = ""
     end)
 
 let () = Parameter_customize.set_group monitoring
 module OutputErrors =
-  String
+  Filepath
     (struct
       let option_name = "-report-output-errors"
       let arg_name = "file"
+      let file_kind = "Text"
+      let existence = Fc_Filepath.Indifferent
       let help = "Output number of errors to <file>"
-      let default = ""
     end)
 
 let () = Parameter_customize.set_group monitoring
 module OutputUnclassified =
-  String
+  Filepath
     (struct
       let option_name = "-report-output-unclassified"
       let arg_name = "file"
+      let file_kind = "Text"
+      let existence = Fc_Filepath.Indifferent
       let help = "Output number of unclassified to <file>"
-      let default = ""
     end)
 
 let () = Parameter_customize.set_group monitoring

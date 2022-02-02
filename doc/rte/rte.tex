@@ -7,6 +7,9 @@
 \newcommand{\optnodowncast}{\mbox{\lstinline|-rte-no-downcast|}}
 \newcommand{\rte}{\textsf{RTE}\xspace}
 \newcommand{\framac}{\textsf{Frama-C}\xspace}
+\newcommand{\acsl}{\textsf{ACSL}\xspace}
+\newcommand{\gcc}{\textsf{Gcc}\xspace}
+\newcommand{\clang}{\textsf{Clang}\xspace}
 
 \tableofcontents
 
@@ -48,7 +51,7 @@ implementation choice.  Also note that annotations are dependent of the {\it
   machine dependency} used on Frama-C command-line, especially the size of
 integer types.
 
-The C language ISO standard \cite{standardc99} will be referred to as \cnn{} 
+The C language ISO standard \cite{standardc99} will be referred to as \cnn{}
 (of which specific paragraphs are cited, such as \mbox{6.2.5.9}).
 
 %%\section{Generated Annotations}
@@ -96,14 +99,14 @@ and thus has domain \lstinline|[-2147483648,2147483647]|, and that \lstinline|x|
 is an \lstinline|int|, the expression \lstinline|x+1| performs a signed integer
 overflow, and therefore has an undefined behavior, if and only if \lstinline|x|
 equals \lstinline|2147483647|.  This is independent of the fact that for most
-(if not all) C compilers and 32-bits architectures, one will get 
+(if not all) C compilers and 32-bits architectures, one will get
 \lstinline|x+1 = -2147483648| and no runtime error will happen.  But by strictly
-conforming to 
+conforming to
 the C standard, one cannot assert that the C compiler will not in fact generate
 code provoking a runtime error in this case, since it is allowed to do so.
-%% In fact, for an expression such as \lstinline|x/y| (for \lstinline|int x,y|), 
-%% the execution will most likely result in a floating point exception 
-%% when \lstinline|x = -2147483648, y = -1| (the result is \lstinline|2147483648|, which overflows). 
+%% In fact, for an expression such as \lstinline|x/y| (for \lstinline|int x,y|),
+%% the execution will most likely result in a floating point exception
+%% when \lstinline|x = -2147483648, y = -1| (the result is \lstinline|2147483648|, which overflows).
 Also note that from a security analysis point of view, an undefined behavior
 leading to a runtime error classifies as a denial of service (since the program
 terminates), while a signed integer overflow may very well lead to buffer
@@ -122,7 +125,7 @@ by making such wide-ranging and easily checkable assumptions.  {\bf Therefore
   representation.}
 %% value analysis makes the same assumption; also see value analyse manual 4.4.1
 
-%% Frama-C is not intended to work on non ISO conforming inputs (?), 
+%% Frama-C is not intended to work on non ISO conforming inputs (?),
 %% but conforming programs may still produce undefined behaviors. Well ...
 
 \section{Other annotations generated}
@@ -277,7 +280,7 @@ int main(void) {
 \end{listing-nonumber}
 
 \smallskip
-is in fact equivalent to: 
+is in fact equivalent to:
 
 \smallskip
 \begin{listing-nonumber}
@@ -312,7 +315,7 @@ whenever the result falls outside the range \lstinline|[-128,127]|.  Thus, with
 a single annotation, the \rte{} plug-in prevents both an undefined behavior
 (signed overflow) and an implementation defined behavior (signed downcasting).
 Note that the annotation for signed downcasting always entails the annotation
-for signed overflow. 
+for signed overflow.
 
 \subsection{Unary minus}
 
@@ -430,7 +433,7 @@ z = x >> y;
 
 \section{Left-values access}
 
-Dereferencing a pointer is an undefined behavior if: 
+Dereferencing a pointer is an undefined behavior if:
 \begin{itemize}
 
 \item the pointer has an invalid value: null pointer, misaligned address for the
@@ -443,7 +446,7 @@ Dereferencing a pointer is an undefined behavior if:
 \end{itemize}
 
 The \rte{} plug-in generates annotations to prevent this type of undefined
-behavior in a systematic way. It does so by deferring the check to the ACSL
+behavior in a systematic way. It does so by deferring the check to the \acsl{}
 built-in predicate \lstinline|valid(p)|: \lstinline|valid(s)| (where
 \lstinline|s| is a set of terms) holds if and only if dereferencing any
 $\lstinline|p| \in \lstinline|s|$ is safe (i.e. points to a safely allocated
@@ -511,7 +514,7 @@ int main(void) {
 }
 \end{listing-nonumber}
 
-% Note that in the call \lstinline|f(tab)|, the implicit conversion from array \lstinline|tab| to a pointer to the beginning of the array 
+% Note that in the call \lstinline|f(tab)|, the implicit conversion from array \lstinline|tab| to a pointer to the beginning of the array
 % \lstinline|&tab[0]| introduces a pointer dereferencing and thus the annotation \lstinline|\valid((int*) tab)|, which is equivalent to
 % \lstinline|\valid(&tab[0])|.
 
@@ -576,7 +579,7 @@ offers a way to generate assertions preventing unsigned arithmetic operations to
 overflow ({\it i.e.} involving computation of a modulo).
 
 Operations which are considered by \rte{} regarding unsigned overflows are
-addition, subtraction, multiplication. Negation (unary minus), left shift. 
+addition, subtraction, multiplication. Negation (unary minus), left shift.
 and right shift are not considered. The generated assertion requires the result
 of the operation (in non-modular arithmetic) to be less than the maximal
 representable value of its type, and nonnegative (for subtraction).
@@ -594,7 +597,7 @@ unsigned int f(unsigned int a, unsigned int b) {
 }
 \end{listing-nonumber}
 
-To generate assertions w.r.t. unsigned overflows, options 
+To generate assertions w.r.t. unsigned overflows, options
 \lstinline|-warn-unsigned-overflow| must be used. Here is the resulting
 file on a 32 bits target architecture (\lstinline|-machdep x86_32|):
 \begin{listing-nonumber}
@@ -681,7 +684,7 @@ int f(float v) {
 \section{Expressions not considered by \rte{}}
 
 An expression which is the operand of a \lstinline|sizeof| (or
-\lstinline|__alignof|, a GCC operator parsed by Cil) is ignored by \rte{}, as
+\lstinline|__alignof|, a \gcc{} operator parsed by Cil) is ignored by \rte{}, as
 are all its sub-expressions.  This is an approximation, since the operand of
 \lstinline|sizeof| may sometimes be evaluated at runtime, for instance on
 variable sized arrays: see the example in \cnn{} paragraph \mbox{6.5.3.4.7}.
@@ -710,7 +713,7 @@ preprocessing:
 
 \begin{listing-nonumber}
 typedef unsigned long size_t;
-/* compiler builtin: 
+/* compiler builtin:
    void *__builtin_alloca(unsigned int);   */
 size_t fsize3(int n)
 {
@@ -738,6 +741,60 @@ int main(void)
 
 \end{example}
 
+\section{Initialization}
+
+Reading an uninitialized value can be an undefined behavior in the two following
+cases:
+
+\begin{itemize}
+\item \mbox{ISO C11 6.3.2.1}\footnote{here we use C11 as it is clearer than C99}
+      a variable whose address is never taken is read before being initialized,
+\item a memory location that has never been initialized is read and it happens
+      that it was a trap representation for the type used for the access.
+\end{itemize}
+
+More generally, reading an uninitialized location always results in an
+indeterminate value (\mbox{6.7.9.10}). Such a value is either an unspecified
+value or a trap representation. Only reading a trap representation is an
+undefined behavior (\mbox{6.2.6.1.5}). It corresponds to the second case above.
+
+However for (most) types that do not have trap representation, reading an
+unspecified value is generally not a desirable behavior. Thus, \rte{} is
+stricter than the ISO C on many aspects and delegates one case of undefined
+behavior to the use of compiler warnings. We now detail the chosen tradeoff.
+
+If a value of a fundamental type (integers, floating point types, pointers, or
+a typedef of those) is read, it must be initialized except if it is a formal
+parameter or a global variable. We exclude formal parameters as its
+initialization status must be checked at the call point (\rte{} generates an
+annotation for this). We exclude global variables as they are initialized by
+default and any value stored in this variable must be initialized (\rte{}
+generates an annotation for this).
+
+As structures and unions never have trap representation, they can (and they are
+regularly) be manipulated while being partially initialized. Consequently,
+\rte{} does not require initialization for reads of a full union or structure
+(while reading fields with fundamental types is covered by the previous paragraph).
+As a consequence, the case of structures and unions \textit{whose address is
+ never taken, and being read before being initialized} is \textbf{not} covered
+by \rte{}. It is worth noting that
+this particular case is efficiently detected by a compiler warning (see
+\lstinline{-Wuninitialized} on \gcc{} and \clang{} for example) as it only
+requires local reasoning that is easy for compilers (but not that simple to
+express in \acsl{}).
+
+If you really need \rte{} to cover the previous case, please contact the
+Frama-C team.
+
+Finally, there are some cases when reading uninitialized values via a type that
+cannot have trap representation (for example \lstinline{unsigned char}) should
+be allowed, for example writing a \lstinline{memcpy} function. In this case, one
+can exclude this function from the range of function annotated with
+initialization properties by removing them from the set of functions to annotate
+(e.g. \lstinline{-rte-initialized="@all,-f"}). Note that the excluded functions
+must preserve the initialization of globals, as no assertions are generated for
+them.
+
 \section{Undefined behaviors not covered by \rte{}}
 
 One should be aware that \rte{} only covers a small subset of all possible
@@ -753,22 +810,16 @@ considered:
   producing a value outside of the representable range (\cnn{} 6.3.1.5)
 \item Conversion between two pointer types produces a result that is incorrectly
   aligned (\cnn{} 6.3.2.3)
-\item Use of a variable with automatic storage duration before its
-  initialization (\cnn{} 6.7.8.10): such a variable has an indeterminate value
-%% technically, not an undefined behavior (does not appear in the list of undefined behavior in 
-%% the relevant ANSI C ISO annex), but can as well be considered as one ;
-%% not treated by plug-in because too many annotations would be generated
-%% unless some dataflow analysis is performed
 \end{itemize}
 
 %% \Section{Others}
 %% ISO 6.3.1.3 / 6.3.1.4 / 6.3.1.5
 %% convert an integer type to another signed integer type that cannot represent its value: implementation defined.
 %% convert a real floating type to an integer: if the value of the integral part cannot be represented by the integer type, undefined.
-%% convert an integer to a real floating type : 
-%% if the value being converted is outside the range of values that can be represented, 
-%% undefined (does not happen with IEEE floating types, event if real floating = float and integer type = unsigned long long). 
-%% If in range but not exact, round to nearest higher or nearest lower representable value (implementation defined). 
+%% convert an integer to a real floating type :
+%% if the value being converted is outside the range of values that can be represented,
+%% undefined (does not happen with IEEE floating types, event if real floating = float and integer type = unsigned long long).
+%% If in range but not exact, round to nearest higher or nearest lower representable value (implementation defined).
 %% Value analysis rounds to nearest lower silently (?).
 %% demote a real floating type to another and procuce a value outside the range = undefined
 
@@ -800,7 +851,7 @@ unsigned overflows\\
 unsigned integer downcast\\
 \hline
 \lstinline|-warn-signed-overflow| & boolean (true) & Generate annotations for
-signed overflows \\ 
+signed overflows \\
 \hline
 \lstinline|-warn-signed-downcast| & boolean (false) & Generate annotations for
 signed integer downcast \\
@@ -836,23 +887,31 @@ invalid pointer arithmetic \\
 \hline
 \lstinline|-rte| & boolean (false) & Enable \rte{} plug-in \\
 \hline
-\lstinline|-rte-div| & boolean (false) & Generate annotations for division by
+\lstinline|-rte-div| & boolean (true) & Generate annotations for division by
 zero \\
-\hline
-\lstinline|-rte-shift| & boolean (false) & Generate annotations for left and right shift value out of bounds \\
-\hline
-\lstinline |-rte-mem| & boolean (false) & Generate annotations for validity of
-left-values access \\
 \hline
 \lstinline |-rte-float-to-int| & boolean (true) & Generate annotations for
 casts from floating-point to integer \\
 \hline
-\lstinline |-rte-trivial-annotations| & boolean (true) & Generate all annotations even when they trivially hold \\
+\lstinline |-rte-initialized| & set of function (none) & Generate annotations
+for initialization for the given set of functions \\
 \hline
-\lstinline |-rte-warn| & boolean (true) & Emit warning on broken annotations \\
+\lstinline |-rte-mem| & boolean (true) & Generate annotations for validity of
+left-values access \\
+\hline
+\lstinline |-rte-pointer-call| & boolean (true) & Generate annotations for
+validity of calls via function pointers \\
+\hline
+\lstinline|-rte-shift| & boolean (true) & Generate annotations for left and
+right shift value out of bounds \\
 \hline
 \lstinline |-rte-select| & set of function (all) & Run plug-in on a subset of C
 functions \\
+\hline
+\lstinline |-rte-trivial-annotations| & boolean (false) & Generate all
+annotations even when they trivially hold \\
+\hline
+\lstinline |-rte-warn| & boolean (true) & Emit warning on broken annotations \\
 \hline
 \end{tabular}
 \caption{\rte{} options} \label{options}

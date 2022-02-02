@@ -1,21 +1,19 @@
-/* run.config_qualif
-   OPT:
-*/
-
-/*@ 
-  requires \valid( p + (0..n-1) ); 
+/*@
+  requires \valid( p + (0..n-1) );
   assigns p[0..n-1];
  */
 void job(int *p,int n);
 
-typedef struct S {
+struct S {
   int size ;
   int value[50] ;
-} ;
+} s ;
 
-/*@ requires s.size < 50; */
-void complex(struct S s)
+/*@
+  requires s.size < 50;
+  assigns s.value[1..s.size];
+*/
+void complex(void)
 {
-  /*@ assigns s.value[1..s.size]; */
   job( & s.value[1] , s.size );
 }

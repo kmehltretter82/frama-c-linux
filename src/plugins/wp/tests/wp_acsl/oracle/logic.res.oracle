@@ -5,25 +5,25 @@
 [wp] logic.i:65: Warning: 
   Cast with incompatible pointers types (source: __anonstruct_Buint_4*)
      (target: uint32*)
-[wp] logic.i:49: Warning: Logic cast from struct (Tint2) not implemented yet
-[wp] logic.i:50: Warning: Logic cast from struct (Point) not implemented yet
-[wp] logic.i:51: Warning: 
-  Logic cast to struct (Point) from (int [2]) not implemented yet
-[wp] logic.i:52: Warning: Logic cast from struct (Point) not implemented yet
-[wp] logic.i:53: Warning: Logic cast from struct (Tint2) not implemented yet
-[wp] logic.i:54: Warning: Logic cast from struct (Buint) not implemented yet
-[wp] logic.i:55: Warning: 
-  Logic cast to struct (Buint) from (unsigned int) not implemented yet
-[wp] logic.i:56: Warning: Logic cast from struct (Tint6) not implemented yet
-[wp] logic.i:57: Warning: 
-  Logic cast to sized array (Triangle) from (int [6]) not implemented yet
-[wp] logic.i:58: Warning: Logic cast from struct (Tint6) not implemented yet
-[wp] logic.i:59: Warning: Logic cast from struct (Tint6) not implemented yet
-[wp] logic.i:60: Warning: 
-  Logic cast to sized array (int [2]) from (int [6]) not implemented yet
-[wp] logic.i:61: Warning: Logic cast from struct (Tint6) not implemented yet
 [wp] logic.i:62: Warning: 
   Logic cast to struct (Tint2) from (int [6]) not implemented yet
+[wp] logic.i:61: Warning: Logic cast from struct (Tint6) not implemented yet
+[wp] logic.i:60: Warning: 
+  Logic cast to sized array (int [2]) from (int [6]) not implemented yet
+[wp] logic.i:59: Warning: Logic cast from struct (Tint6) not implemented yet
+[wp] logic.i:58: Warning: Logic cast from struct (Tint6) not implemented yet
+[wp] logic.i:57: Warning: 
+  Logic cast to sized array (Triangle) from (int [6]) not implemented yet
+[wp] logic.i:56: Warning: Logic cast from struct (Tint6) not implemented yet
+[wp] logic.i:55: Warning: 
+  Logic cast to struct (Buint) from (unsigned int) not implemented yet
+[wp] logic.i:54: Warning: Logic cast from struct (Buint) not implemented yet
+[wp] logic.i:53: Warning: Logic cast from struct (Tint2) not implemented yet
+[wp] logic.i:52: Warning: Logic cast from struct (Point) not implemented yet
+[wp] logic.i:51: Warning: 
+  Logic cast to struct (Point) from (int [2]) not implemented yet
+[wp] logic.i:50: Warning: Logic cast from struct (Point) not implemented yet
+[wp] logic.i:49: Warning: Logic cast from struct (Tint2) not implemented yet
 ------------------------------------------------------------
   Function h
 ------------------------------------------------------------
@@ -64,6 +64,8 @@ Let a_3 = shift_S1(a, 0).
 Let m = Array_S1(a, 3, Mint_0).
 Assume {
   Type: IsArray_S1(m) /\ IsArray_S1(Array_S1(a_3, 3, Mint_0)).
+  (* Heap *)
+  Type: region(G_tr_35) <= 0.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -89,6 +91,8 @@ Let a_3 = shift_S1(a, 0).
 Let m = Array_S1(a, 3, Mint_0).
 Assume {
   Type: IsArray_S1(m) /\ IsArray_S1(Array_S1(a_3, 3, Mint_0)).
+  (* Heap *)
+  Type: region(G_tr_35) <= 0.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -114,6 +118,8 @@ Let a_3 = shift_S1(a, 0).
 Let m = Array_S1(a_3, 3, Mint_0).
 Assume {
   Type: IsArray_S1(Array_S1(a, 3, Mint_0)) /\ IsArray_S1(m).
+  (* Heap *)
+  Type: region(G_tr_35) <= 0.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -135,6 +141,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:49: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint2) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: (w.F1_y) = 11.
 
 ------------------------------------------------------------
@@ -143,6 +150,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:50: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Point) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------
@@ -151,6 +159,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:51: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Point) from (int [2]) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: (w.F1_y) = 11.
 
 ------------------------------------------------------------
@@ -159,6 +168,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:52: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Point) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -167,6 +177,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:53: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint2) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -175,6 +186,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:54: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Buint) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: w = 134480385.
 
 ------------------------------------------------------------
@@ -188,6 +200,8 @@ Let a_1 = shiftfield_F4_bytes(a).
 Let a_2 = Load_S4(a, Mint_0).
 Assume {
   Type: IsS4(a_2).
+  (* Heap *)
+  Type: region(G_tr_35) <= 0.
   (* Initializer *)
   Init: Mint_0[shift_uint8(a_1, 0)] = 1.
   (* Initializer *)
@@ -205,6 +219,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:56: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: (w[1].F1_y) = 21.
 
 ------------------------------------------------------------
@@ -213,6 +228,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:57: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to sized array (Triangle) from (int [6]) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: (w[1].F1_y) = 21.
 
 ------------------------------------------------------------
@@ -221,6 +237,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:58: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: w[4] = 30.
 
 ------------------------------------------------------------
@@ -229,6 +246,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:59: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -237,6 +255,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:60: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to sized array (int [2]) from (int [6]) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -245,6 +264,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:61: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------
@@ -253,6 +273,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:62: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Tint2) from (int [6]) not implemented yet
+Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------

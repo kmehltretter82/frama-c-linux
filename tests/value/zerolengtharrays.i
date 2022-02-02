@@ -1,3 +1,7 @@
+/* run.config*
+   STDOPT: +" -machdep gcc_x86_64"
+*/
+
 /* This is a test for the zero-sized arrays of GCC. */
 struct foo { int x; int y[0]; };
 struct bar { struct foo z; };

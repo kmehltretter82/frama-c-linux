@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -39,6 +39,22 @@ void* memcpy(void* restrict dest, const void* restrict src, size_t n)
     ((char*)dest)[i] = ((char*)src)[i];
   }
   return dest;
+}
+
+// Non-POSIX; GNU extension
+void* mempcpy(void* restrict dest, const void* restrict src, size_t n)
+{
+  size_t i;
+  /*@
+    loop invariant no_eva: 0 <= i <= n;
+    loop invariant no_eva: \forall ℤ k; 0 <= k < i ==> ((char*)dest)[k] == ((char*)src)[k];
+    loop assigns i, ((char*)dest)[0 .. n-1];
+    loop variant n - i;
+   */
+  for (i = 0; i < n; i++) {
+    ((char*)dest)[i] = ((char*)src)[i];
+  }
+  return (char*)dest + i;
 }
 
 // memoverlap: auxiliary function that returns
@@ -210,6 +226,16 @@ char* strcpy(char *dest, const char *src)
   return dest;
 }
 
+// POSIX.1-2008
+char* stpcpy(char *dest, const char *src)
+{
+  size_t i;
+  for (i = 0; src[i] != 0; i++)
+    dest[i] = src[i];
+  dest[i] = 0;
+  return dest + i;
+}
+
 char *strncpy(char *dest, const char *src, size_t n)
 {
   size_t i;
@@ -272,11 +298,11 @@ char *strstr(const char *haystack, const char *needle)
 }
 
 char __fc_strerror[64];
-static int __fc_strerror_init;
 
 char *strerror(int errnum)
 {
 #ifdef __FRAMAC__
+  static int __fc_strerror_init;
   if (!__fc_strerror_init) {
     Frama_C_make_unknown(__fc_strerror, 63);
     __fc_strerror[63] = 0;
@@ -318,11 +344,11 @@ char *strndup(const char *s, size_t n)
 }
 
 char __fc_strsignal[64];
-static int __fc_strsignal_init;
 
 char *strsignal(int signum)
 {
 #ifdef __FRAMAC__
+  static int __fc_strsignal_init;
   if (!__fc_strsignal_init) {
     Frama_C_make_unknown(__fc_strsignal, 63);
     __fc_strsignal[63] = 0;

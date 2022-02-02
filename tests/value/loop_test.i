@@ -1,8 +1,8 @@
 /* run.config*
+ PLUGIN: @EVA_MAIN_PLUGINS@
    OPT: -eva @EVA_CONFIG@ -main test_onzes
    OPT: -eva @EVA_CONFIG@ -main test_cent_onzes
 */
-
 
 /***************** var CMP cste **********************/
 int onze_0 (void) {

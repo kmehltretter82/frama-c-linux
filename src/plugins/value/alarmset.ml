@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -186,6 +186,10 @@ let combine s1 s2 =
 
 let iter f = function
   | Just m -> M.iter f m
+  | AllBut _ -> assert false
+
+let fold f acc = function
+  | Just m -> M.fold f m acc
   | AllBut _ -> assert false
 
 let exists test ~default = function
@@ -423,10 +427,7 @@ let emit_alarms kinstr map =
   let sorted_list = List.sort cmp list in
   List.iter (fun (alarm, status) -> emit_alarm kinstr alarm status) sorted_list;
   if Alarm_cache.length () >= Value_parameters.StopAtNthAlarm.get ()
-  then begin
-    Value_parameters.log "Stopping at nth alarm" ;
-    raise Db.Value.Aborted
-  end
+  then Value_parameters.abort "Stopping at nth alarm"
 
 let emit kinstr = function
   | Just map -> if not (M.is_empty map) then emit_alarms kinstr map

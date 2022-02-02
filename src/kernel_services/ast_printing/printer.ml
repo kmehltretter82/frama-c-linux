@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -96,7 +96,6 @@ class printer_with_annot () = object (self)
 
   method! reset () =
     super#reset ();
-    verbose <- Kernel.debug_atleast 1;
     declared_globs <- Cil_datatype.Varinfo.Set.empty;
     print_spec <- false
 

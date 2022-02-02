@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -39,6 +39,7 @@ val iter_kf : (Kernel_function.t -> unit) -> unit
 (** {2 Goal Selection} *)
 
 module WP          : Parameter_sig.Bool
+module Dump        : Parameter_sig.Bool
 module Behaviors   : Parameter_sig.String_list
 module Properties  : Parameter_sig.String_list
 module StatusAll   : Parameter_sig.Bool
@@ -99,6 +100,10 @@ module SimplifyForall : Parameter_sig.Bool
 module SimplifyType : Parameter_sig.Bool
 module CalleePreCond : Parameter_sig.Bool
 module PrecondWeakening : Parameter_sig.Bool
+module TerminatesExtDeclarations : Parameter_sig.Bool
+module TerminatesStdlibDeclarations : Parameter_sig.Bool
+module TerminatesDefinitions : Parameter_sig.Bool
+module TerminatesVariantHyp : Parameter_sig.Bool
 
 (** {2 Prover Interface} *)
 
@@ -151,6 +156,7 @@ module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
 module CheckMemoryContext: Parameter_sig.Bool
 module SmokeTests: Parameter_sig.Bool
+module SmokeDeadassumes: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
@@ -164,7 +170,6 @@ val get_session_dir : force:bool -> string -> Datatype.Filepath.t
 val get_output : unit -> Datatype.Filepath.t
 val get_output_dir : string -> Datatype.Filepath.t
 val make_output_dir : string -> unit
-val get_overflows : unit -> bool
 
 (** {2 Debugging Categories} *)
 val has_print_generated: unit -> bool

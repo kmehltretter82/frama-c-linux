@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,15 +30,15 @@ open Cil_datatype
 (** {3 About options} *)
 
 (** associate a level to each function in order to control how it will be
-* specialized. This is only a hint used when the tool has to make a choice,
-* but it doesn't forbid to the user to do whatever he wants
-* (like building slices for a [DontSlice] function). *)
+ * specialized. This is only a hint used when the tool has to make a choice,
+ * but it doesn't forbid to the user to do whatever he wants
+ * (like building slices for a [DontSlice] function). *)
 type level_option =
   | DontSlice (** don't build slice for the function :
                   ie. always call the source function. *)
   | DontSliceButComputeMarks
-              (** don't slice the called functions,
-              *   but compute the marks for them *)
+  (** don't slice the called functions,
+   *   but compute the marks for them *)
   | MinNbSlice (** try to use existing slices, create at most one *)
   | MaxNbSlice (** most precise slices
                    (but merge slices with the same visibility,
@@ -48,7 +48,7 @@ type level_option =
 
 (** Kinds of elementary marks. *)
 type mark = Cav of PdgTypes.Dpd.t
-            | Spare
+          | Spare
 
 let compare_mark m1 m2 =
   if m1 == m2 then 0
@@ -63,7 +63,7 @@ let compare_mark m1 m2 =
 type pdg_mark = {m1 : mark ; m2 : mark }
 
 let pdg_mark_packed_descr = Structural_descr.p_abstract
-  (* Ok: Dpd.t is in fact int *)
+(* Ok: Dpd.t is in fact int *)
 
 let compare_pdg_mark p1 p2 =
   if p1 == p2 then 0
@@ -72,22 +72,22 @@ let compare_pdg_mark p1 p2 =
     if r = 0 then compare_mark p1.m2 p2.m2 else r
 
 (** Type for all the informations related to any function,
-* even if we don't have its definition.  *)
+ * even if we don't have its definition.  *)
 type fct_info = {
   fi_kf : Cil_types.kernel_function;
   fi_def : Cil_types.fundec option;
   mutable fi_top : pdg_mark option;
-          (** indicates if the function is marked top (=> src visible) *)
+  (** indicates if the function is marked top (=> src visible) *)
   mutable fi_level_option : level_option;
-          (** level of specialisation for this function *)
+  (** level of specialisation for this function *)
   mutable fi_init_marks : ff_marks option;
-          (** the marks that must be in every slices of that function *)
+  (** the marks that must be in every slices of that function *)
   mutable fi_slices : fct_slice list ;
-          (** the list of the slices already computed for this function. *)
+  (** the list of the slices already computed for this function. *)
   mutable fi_next_ff_num : int;
-          (** the number to assign to the next slice. *)
+  (** the number to assign to the next slice. *)
   mutable f_called_by : called_by;
-          (** calls in slices that call source fct *)
+  (** calls in slices that call source fct *)
 }
 
 and
@@ -95,19 +95,19 @@ and
   called_by = (fct_slice * Cil_types.stmt) list
 
 and
-(** Function slice :
-    created as soon as there is a criterion to compute it,
-    even if the slice itself hasn't been computed yet.
+  (** Function slice :
+      created as soon as there is a criterion to compute it,
+      even if the slice itself hasn't been computed yet.
   *)
- fct_slice  = {
-    ff_fct : fct_info ;
-    ff_id : int ;
-    mutable ff_marks : ff_marks;
-    mutable ff_called_by : called_by
-    }
+  fct_slice  = {
+  ff_fct : fct_info ;
+  ff_id : int ;
+  mutable ff_marks : ff_marks;
+  mutable ff_called_by : called_by
+}
 
 and
-(** [fct_id] is used to identify either a source function or a sliced one.*)
+  (** [fct_id] is used to identify either a source function or a sliced one.*)
   fct_id =
   | FctSrc of fct_info  (** source function *)
   | FctSliced of fct_slice (** sliced function *)
@@ -115,7 +115,7 @@ and
 and
   called_fct =
   | CallSrc of fct_info option
-    (** call the source function (might be unknown if the call uses pointer) *)
+  (** call the source function (might be unknown if the call uses pointer) *)
   | CallSlice of fct_slice
 
 and
@@ -123,8 +123,8 @@ and
   call_info = called_fct option
 
 and
-(** main part of a slice = mapping between the function elements
-  * and information about them in the slice. *)
+  (** main part of a slice = mapping between the function elements
+    * and information about them in the slice. *)
   marks_index = (pdg_mark, call_info) PdgIndex.FctIndex.t
 
 and
@@ -133,28 +133,28 @@ and
 and
   project = { functions : fct_info Varinfo.Hashtbl.t;
               mutable actions : criterion list;
-              }
+            }
 
 and
-(** Slicing criterion at the application level.
-    When applied, they are translated into [fct_criterion]
-*)
- appli_criterion =
+  (** Slicing criterion at the application level.
+      When applied, they are translated into [fct_criterion]
+  *)
+  appli_criterion =
   | CaGlobalData of Locations.Zone.t
-    (** select all that is necessary to compute the given location. *)
+  (** select all that is necessary to compute the given location. *)
   | CaCall of fct_info
-    (** select all that is necessary to call the given function.
-    * Its application generates requests to add persistent selection
-    * to all the function callers. *)
+  (** select all that is necessary to call the given function.
+   * Its application generates requests to add persistent selection
+   * to all the function callers. *)
   | CaOther
 
 and
-(** Base criterion for the functions. These are the only one that can
-    really generate function slices. All the other criteria are
-    translated in more basic ones.
-    Note that to build such a base criterion, the PDG has to be already
-    computed.
-*)
+  (** Base criterion for the functions. These are the only one that can
+      really generate function slices. All the other criteria are
+      translated in more basic ones.
+      Note that to build such a base criterion, the PDG has to be already
+      computed.
+  *)
   fct_base_criterion = pdg_mark PdgMarks.select
 
 and
@@ -171,54 +171,54 @@ and
   node_or_dpds = CwNode | CwAddrDpds | CwDataDpds | CwCtrlDpds
 
 and
-(** Tells which marks we want to put in the slice of a function *)
- fct_user_crit =
+  (** Tells which marks we want to put in the slice of a function *)
+  fct_user_crit =
   (* | CuNodes of (pdg_node list * (node_or_dpds * pdg_mark) list) list *)
   | CuSelect of pdg_mark PdgMarks.select
   | CuTop of pdg_mark (** the function has probably no PDG,
                             but we nonetheless give a mark to propagate *)
 and
-(** kinds of actions that can be apply to a function *)
+  (** kinds of actions that can be apply to a function *)
   fct_crit =
   | CcUserMark of fct_user_crit
-      (** add marks to a slice *)
+  (** add marks to a slice *)
   | CcChooseCall of Cil_types.stmt
-      (** have to choose what function to call here. *)
+  (** have to choose what function to call here. *)
   | CcChangeCall of Cil_types.stmt * called_fct
-      (** call the [called_fct] for the given call [Cil_types.stmt] *)
+  (** call the [called_fct] for the given call [Cil_types.stmt] *)
   | CcMissingOutputs of Cil_types.stmt * (pdg_mark PdgMarks.select) * bool
-      (** this call is affected to a function that doesn't compute enough
-      * outputs : we will have to choose between adding outputs to that slice,
-      * or call another one. The boolean tells if the modifications would
-      * change the visibility of some outputs. *)
+  (** this call is affected to a function that doesn't compute enough
+   * outputs : we will have to choose between adding outputs to that slice,
+   * or call another one. The boolean tells if the modifications would
+   * change the visibility of some outputs. *)
   | CcMissingInputs of Cil_types.stmt * (pdg_mark PdgMarks.select) * bool
-      (** the function calls a slice that has been modified :
-      * and doesn't compute not enough inputs.
-      * We will have to choose between adding marks to this function,
-      * and call another slice.
-      * The boolean tells if the modifications would
-      * change the visibility of some inputs. *)
+  (** the function calls a slice that has been modified :
+   * and doesn't compute not enough inputs.
+   * We will have to choose between adding marks to this function,
+   * and call another slice.
+   * The boolean tells if the modifications would
+   * change the visibility of some inputs. *)
   | CcPropagate of (pdg_mark PdgMarks.select)
-     (** simply propagate the given marks *)
+  (** simply propagate the given marks *)
   | CcExamineCalls of pdg_mark PdgMarks.info_called_outputs
 and
-(** Slicing criterion for a function.  *)
+  (** Slicing criterion for a function.  *)
   fct_criterion =  {
   cf_fct : fct_id ;
-    (** Identification of the {b RESULT} of this filter.
-     * When it a a slice, it might be an existing slice that will be modified,
-      * or a new one will be created during application.
-      * When it is the source function, it means what the criterion has to be
-      * applied on each existing slice, and stored into the initial marks of
-      * the function.
-      *)
+  (** Identification of the {b RESULT} of this filter.
+   * When it a a slice, it might be an existing slice that will be modified,
+    * or a new one will be created during application.
+    * When it is the source function, it means what the criterion has to be
+    * applied on each existing slice, and stored into the initial marks of
+    * the function.
+  *)
   cf_info : fct_crit
 }
 and
-(** A slicing criterion is either an application level criterion,
-  * or a function level one.  *)
+  (** A slicing criterion is either an application level criterion,
+    * or a function level one.  *)
   criterion =
-  CrAppli of appli_criterion | CrFct of fct_criterion
+    CrAppli of appli_criterion | CrFct of fct_criterion
 
 (** {2 Internals values} *)
 
@@ -244,7 +244,7 @@ let dummy_fct_info = {
 let dummy_marks_index = PdgIndex.FctIndex.create 0
 
 let dummy_ff_marks = (PdgTypes.Pdg.top (Kernel_function.dummy ()),
-                        dummy_marks_index)
+                      dummy_marks_index)
 
 let dummy_fct_slice = {
   ff_fct = dummy_fct_info ;

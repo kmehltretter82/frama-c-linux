@@ -1,7 +1,7 @@
 /* run.config*
+  PLUGIN: @EVA_MAIN_PLUGINS@
    OPT: -print -eva @EVA_CONFIG@ -machdep x86_16
 */
-
 
 volatile unsigned char t[10];
 struct u { unsigned char f1; unsigned char f2;};

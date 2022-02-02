@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -69,7 +69,7 @@ let pp_tuple5
   Format.fprintf fmt "%(%)%a%(%)%a%(%)%a%(%)%a%(%)%a%(%)"
     pre fmt1 a sep fmt2 b sep fmt3 c sep fmt4 d sep fmt5 e suf
 
-let pp_integer fmt = Format.fprintf fmt "Integer(%a)" (Integer.pretty ~hexa:false)
+let pp_integer fmt = Format.fprintf fmt "Integer(%a)" Integer.pretty
 let pp_int64 fmt i64 = Format.fprintf fmt "Int64(%s)" (Int64.to_string i64)
 let pp_string = Format.pp_print_string
 let pp_bool = Format.pp_print_bool
@@ -126,16 +126,16 @@ and pp_typ fmt = function
   | TInt(ikind,attributes) -> Format.fprintf fmt "TInt(%a,%a)"  pp_ikind ikind  pp_attributes attributes
   | TFloat(fkind,attributes) -> Format.fprintf fmt "TFloat(%a,%a)"  pp_fkind fkind  pp_attributes attributes
   | TPtr(typ,attributes) -> Format.fprintf fmt "TPtr(%a,%a)"  pp_typ typ  pp_attributes attributes
-  | TArray(typ,exp_option,bitsSizeofTypCache,attributes) ->
-    Format.fprintf fmt "TArray(%a,%a,%a,%a)"  pp_typ typ  (pp_option pp_exp) exp_option
-      pp_bitsSizeofTypCache bitsSizeofTypCache  pp_attributes attributes
+  | TArray(typ,exp_option,attributes) ->
+    Format.fprintf fmt "TArray(%a,%a,%a)"  pp_typ typ  (pp_option pp_exp) exp_option
+      pp_attributes attributes
   | TFun(typ,string_typ_attributes_tuple_list_option,bool,attributes) ->
     Format.fprintf fmt "TFun(%a,%a,%a,%a)"  pp_typ typ
       (pp_option (pp_list (pp_tuple3 pp_string pp_typ pp_attributes))) string_typ_attributes_tuple_list_option
       pp_bool bool  pp_attributes attributes
   | TNamed(typeinfo,attributes) ->
     Format.fprintf fmt "TNamed(%a,%a)"  pp_typeinfo typeinfo  pp_attributes attributes
-  | TComp(compinfo,bitsSizeofTypCache,attributes) -> Format.fprintf fmt "TComp(%a,%a,%a)"  pp_compinfo compinfo  pp_bitsSizeofTypCache bitsSizeofTypCache  pp_attributes attributes
+  | TComp(compinfo,attributes) -> Format.fprintf fmt "TComp(%a,%a)"  pp_compinfo compinfo  pp_attributes attributes
   | TEnum(enuminfo,attributes) -> Format.fprintf fmt "TEnum(%a,%a)"  pp_enuminfo enuminfo  pp_attributes attributes
   | TBuiltin_va_list(attributes) -> Format.fprintf fmt "TBuiltin_va_list(%a)"  pp_attributes attributes
 
@@ -157,14 +157,6 @@ and pp_fkind fmt = function
   | FFloat -> Format.fprintf fmt "FFloat"
   | FDouble -> Format.fprintf fmt "FDouble"
   | FLongDouble -> Format.fprintf fmt "FLongDouble"
-
-and pp_bitsSizeofTyp fmt = function
-  | Not_Computed -> Format.fprintf fmt "Not_Computed"
-  | Computed(int) -> Format.fprintf fmt "Computed(%a)"  pp_int int
-  | Not_Computable(string,typ) -> Format.fprintf fmt "Not_Computable(%a,%a)"  pp_string string  pp_typ typ
-
-and pp_bitsSizeofTypCache fmt bitsSizeofTypCache = Format.fprintf fmt "{scache=%a}"
-    pp_bitsSizeofTyp bitsSizeofTypCache.scache
 
 and pp_attribute fmt = function
   | Attr(string,attrparam_list) ->
@@ -239,7 +231,6 @@ and pp_fieldinfo fmt fieldinfo =
        faddrof=%a;\
        fsize_in_bits=%a;\
        foffset_in_bits=%a;\
-       fpadding_in_bits=%a;\
        }"
       pp_compinfo fieldinfo.fcomp
       pp_string fieldinfo.forig_name
@@ -251,7 +242,6 @@ and pp_fieldinfo fmt fieldinfo =
       pp_bool fieldinfo.faddrof
       (pp_option pp_int) fieldinfo.fsize_in_bits
       (pp_option pp_int) fieldinfo.foffset_in_bits
-      (pp_option pp_int) fieldinfo.fpadding_in_bits
   else
     Format.fprintf fmt
       "{\
@@ -606,7 +596,7 @@ and pp_location fmt (pos_start,pos_end) =
 
 and pp_if_loc_known prefix suffix fmt loc =
   if print_locations &&
-     not (Filepath.Normalized.is_unknown (fst loc).Filepath.pos_path)
+     not (Filepath.Normalized.is_empty (fst loc).Filepath.pos_path)
   then Format.fprintf fmt "%s%a%s" prefix pp_location loc suffix
   else ()
 
@@ -882,9 +872,14 @@ and pp_identified_predicate fmt identified_predicate =
     identified_predicate.ip_id
     pp_toplevel_predicate identified_predicate.ip_content
 
+and pp_predicate_kind fmt = function
+  | Assert -> Format.fprintf fmt "Assert"
+  | Check -> Format.fprintf fmt "Check"
+  | Admit -> Format.fprintf fmt "Admit"
+
 and pp_toplevel_predicate fmt toplevel_predicate =
-  Format.fprintf fmt "{tp_only_check=%B;tp_statement=%a}"
-    toplevel_predicate.tp_only_check
+  Format.fprintf fmt "{tp_kind=%a;tp_statement=%a}"
+    pp_predicate_kind toplevel_predicate.tp_kind
     pp_predicate toplevel_predicate.tp_statement
 
 and pp_predicate fmt predicate = Format.fprintf fmt "{%a%apred_content=%a}"
@@ -1012,8 +1007,8 @@ and pp_global_annotation fmt = function
       pp_attributes attributes  pp_location location
   | Dtype(logic_type_info,location) ->
     Format.fprintf fmt "Dtype(%a,%a)"  pp_logic_type_info logic_type_info  pp_location location
-  | Dlemma(string,bool,logic_label_list,string_list,predicate,attributes,location) ->
-    Format.fprintf fmt "Dlemma(%a,%a,%a,%a,%a,%a,%a)"  pp_string string  pp_bool bool
+  | Dlemma(string,logic_label_list,string_list,predicate,attributes,location) ->
+    Format.fprintf fmt "Dlemma(%a,%a,%a,%a,%a,%a)"  pp_string string
       (pp_list pp_logic_label) logic_label_list (pp_list pp_string) string_list
       pp_toplevel_predicate predicate
       pp_attributes attributes  pp_location location
@@ -1023,16 +1018,11 @@ and pp_global_annotation fmt = function
     Format.fprintf fmt "Dtype_annot(%a,%a)"  pp_logic_info logic_info  pp_location location
   | Dmodel_annot(model_info,location) ->
     Format.fprintf fmt "Dmodel_annot(%a,%a)"  pp_model_info model_info  pp_location location
-  | Dcustom_annot(custom_tree,string,attributes,location) ->
-    Format.fprintf fmt "Dcustom_annot(%a,%a,%a,%a)"  pp_custom_tree custom_tree  pp_string string
-      pp_attributes attributes  pp_location location
   | Dextended (e,attr,loc) ->
     Format.fprintf fmt "Dextended(%a,%a,%a)"
       pp_acsl_extension e pp_attributes attr pp_location loc
 
-and pp_custom_tree fmt _custom_tree = Format.fprintf fmt "CustomDummy"
-
-and pp_variant fmt = pp_pair pp_term (pp_option pp_string) fmt
+and pp_variant fmt = pp_pair pp_term (pp_option pp_logic_info) fmt
 
 let pp_kinstr fmt = function
   | Kstmt(stmt) -> Format.fprintf fmt "Kstmt(%a)"  pp_stmt stmt

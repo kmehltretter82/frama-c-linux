@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,10 +27,14 @@ open Cil_types
 
 let dkey = Options.dkey_typing
 
-let compute_quantif_guards_ref
-  : (predicate -> logic_var list -> predicate ->
-     (term * relation * logic_var * relation * term) list) ref
-  = Extlib.mk_fun "compute_quantif_guards_ref"
+(* In order to properly handle recursive functions the typing method has to
+   store the result of the fixpoint algorithm on intervals before typing
+   the inner block of the function. To this end, we stop the recursive
+   depth-first descent of the AST at the level of function calls, and perform a
+   breadth-first descent from the functions calls. We achieve this with
+   a stack [pending_typing] which stores the roots of the functions calls from
+   which a new descent is starting *)
+let pending_typing : (unit -> unit) Stack.t = Stack.create ()
 
 (******************************************************************************)
 (** Datatype and constructor *)
@@ -174,11 +178,28 @@ type computed_info =
                          must be casted to. If [None], no cast needed. *)
   }
 
+(* Local environement = list of typed variables *)
+module Function_params_ty =
+  Datatype.List_with_collections
+    (D)
+    (struct let module_name = "E_ACSL.Typing.Function_params_ty" end)
+
+module Id_term_with_lenv =
+  Datatype.Pair_with_collections
+    (Misc.Id_term)
+    (Function_params_ty)
+    (struct let module_name = "E_ACSL.Typing.Id_term_with_lenv" end)
+
 (* Memoization module which retrieves the computed info of some terms. If the
    info is already computed for a term, it is never recomputed *)
 module Memo: sig
-  val memo: (term -> computed_info) -> term -> computed_info
-  val get: term -> computed_info
+  val memo:
+    lenv:Function_params_ty.t ->
+    (term -> computed_info) ->
+    term ->
+    computed_info Error.or_error
+  val get: lenv:Function_params_ty.t -> term ->
+    computed_info Error.or_error
   val clear: unit -> unit
 end = struct
 
@@ -192,27 +213,69 @@ end = struct
      - type info of many terms are accessed several times
      - the translation of E-ACSL guarded quantifications generates
        new terms (see module {!Quantif}) which must be typed. The term
-       corresponding to the bound variable [x] is actually used twice: once in the
-       guard and once for encoding [x+1] when incrementing it. The memoization is
-       only useful here and indeed prevent the generation of one extra variable in
-       some cases. *)
-  let tbl = Misc.Id_term.Hashtbl.create 97
+       corresponding to the bound variable [x] is actually used twice: once in
+       the guard and once for encoding [x+1] when incrementing it. The
+       memoization is only useful here and indeed prevent the generation of one
+       extra variable in some cases. *)
+  let tbl : computed_info Error.or_error Misc.Id_term.Hashtbl.t =
+    Misc.Id_term.Hashtbl.create 97
 
-  let get t =
+  (* The type of the logic function
+     \\@ logic integer f (integer x) = x + 1;
+     depends on the type of [x]. But our type system does not handle dependent
+     types, which could let us express this dependency natively. Instead,
+     we use the following trick to simulate the dependency: we type the
+     corresponding definition (in the example [x+1]) several times,
+     corresponding to the various calls to the function [f] in the program.
+     We distinguish the calls to the function by storing the type of the
+     arguments corresponding to each call, and we weaken the typing so that it
+     is invariant when the arguments have the same type. *)
+  let dep_tbl : computed_info Error.or_error Id_term_with_lenv.Hashtbl.t
+    = Id_term_with_lenv.Hashtbl.create 97
+
+  let get_dep lenv t =
+    try Id_term_with_lenv.Hashtbl.find dep_tbl (t,lenv)
+    with Not_found -> Error.not_memoized ()
+
+  let get_nondep t =
+    try Misc.Id_term.Hashtbl.find tbl t
+    with Not_found -> Error.not_memoized ()
+
+  let get ~lenv t =
+    match lenv with
+    | [] -> get_nondep t
+    | _::_ -> get_dep lenv t
+
+  let memo_nondep f t =
     try Misc.Id_term.Hashtbl.find tbl t
     with Not_found ->
-      Options.fatal
-        "[typing] type of term '%a' was never computed."
-        Printer.pp_term t
-
-  let memo f t =
-    try Misc.Id_term.Hashtbl.find tbl t
-    with Not_found ->
-      let x = f t in
+      let x =
+        try Error.Res (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+      in
       Misc.Id_term.Hashtbl.add tbl t x;
       x
 
-  let clear () = Misc.Id_term.Hashtbl.clear tbl
+  let memo_dep f t lenv =
+    try
+      Id_term_with_lenv.Hashtbl.find dep_tbl (t, lenv)
+    with Not_found ->
+      let x =
+        try Error.Res (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+      in
+      Id_term_with_lenv.Hashtbl.add dep_tbl (t, lenv) x;
+      x
+
+  let memo ~lenv f t =
+    match lenv with
+    | [] -> memo_nondep f t
+    | _::_ -> memo_dep f t lenv
+
+  let clear () =
+    Options.feedback ~dkey ~level:4 "clearing the typing tables";
+    Misc.Id_term.Hashtbl.clear tbl;
+    Id_term_with_lenv.Hashtbl.clear dep_tbl
 
 end
 
@@ -222,7 +285,7 @@ end
 
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
-let ty_of_interv ?ctx = function
+let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
   | Interval.Float(fk, _) -> C_float fk
   | Interval.Rational -> Rational
   | Interval.Real -> Real
@@ -232,8 +295,10 @@ let ty_of_interv ?ctx = function
       let kind = Interval.ikind_of_ival iv in
       (match ctx with
        | None
-       | Some (Gmpz | Nan) ->
+       | Some Nan ->
          C_integer kind
+       | Some Gmpz ->
+         if use_gmp_opt then Gmpz else C_integer kind
        | Some (C_integer ik as ctx) ->
          (* return [ctx] type for types smaller than int to prevent superfluous
             casts in the generated code *)
@@ -320,7 +385,13 @@ let type_letin li li_t =
 
 (* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
    iff [use_gmp_opt] is true. *)
-let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
+let rec type_term
+    ~use_gmp_opt
+    ?(under_lambda=false)
+    ?(arith_operand=false)
+    ?ctx
+    ~lenv
+    t =
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
   let compute_ctx ?ctx i =
@@ -346,13 +417,16 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | TSizeOfStr _
     | TAlignOf _ ->
       let i = Interval.infer t in
-      let ty = ty_of_interv ?ctx i in
+      (* a constant or a left value directly under a lambda should be a gmp
+         if the infered context for the lambda is gmp *)
+      let ty = ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       dup ty
 
     | TLval tlv ->
       let i = Interval.infer t in
-      let ty = ty_of_interv ?ctx i in
-      type_term_lval tlv;
+      let ty =  ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
+      type_term_lval ~lenv tlv;
+      (* Options.feedback "Type : %a" D.pretty ty; *)
       dup ty
 
     | Toffset(_, t')
@@ -361,15 +435,15 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | TAlignOfE t' ->
       let i = Interval.infer t in
       (* [t'] must be typed, but it is a pointer *)
-      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t');
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t');
       let ty = ty_of_interv ?ctx i in
       dup ty
 
     | TBinOp (MinusPP, t1, t2) ->
       let i = Interval.infer t in
       (* [t1] and [t2] must be typed, but they are pointers *)
-      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t1);
-      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t2);
       let ty = ty_of_interv ?ctx i in
       dup ty
 
@@ -377,7 +451,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       let i = Interval.infer t in
       let i' = Interval.infer t' in
       let ctx_res, ctx = compute_ctx ?ctx (Interval.join i i') in
-      ignore (type_term ~use_gmp_opt:true ~arith_operand:true ~ctx t');
+      ignore (type_term ~use_gmp_opt:true ~arith_operand:true ~ctx ~lenv t');
       (match unop with
        | LNot -> c_int, ctx_res (* converted into [t == 0] in case of GMP *)
        | Neg | BNot -> dup ctx_res)
@@ -401,9 +475,9 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         | _ -> true
       in
       let cast_first = cast_first t1 t2 in
-      ignore (type_term ~use_gmp_opt:true ~arith_operand:cast_first ~ctx t1);
+      ignore (type_term ~use_gmp_opt:true ~arith_operand:cast_first ~ctx ~lenv t1);
       ignore
-        (type_term ~use_gmp_opt:true ~arith_operand:(not cast_first) ~ctx t2);
+        (type_term ~use_gmp_opt:true ~arith_operand:(not cast_first) ~ctx ~lenv t2);
       dup ctx_res
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
@@ -413,8 +487,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       let ctx =
         mk_ctx ~use_gmp_opt:true (ty_of_interv ?ctx (Interval.join i1 i2))
       in
-      ignore (type_term ~use_gmp_opt:true ~ctx t1);
-      ignore (type_term ~use_gmp_opt:true ~ctx t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t2);
       let ty = match ctx with
         | Nan -> c_int
         | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx
@@ -426,8 +500,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       let i2 = Interval.infer t2 in
       let ty = ty_of_interv ?ctx (Interval.join i1 i2) in
       (* both operands fit in an int. *)
-      ignore (type_term ~use_gmp_opt:true ~ctx:c_int t1);
-      ignore (type_term ~use_gmp_opt:true ~ctx:c_int t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx:c_int ~lenv t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx:c_int ~lenv t2);
       dup ty
 
     | TCastE(_, t') ->
@@ -436,43 +510,43 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       (* nothing more to do: [i] is already more precise than what we could
          infer from the arguments of the cast. *)
       let ctx = ty_of_interv ?ctx i in
-      ignore (type_term ~use_gmp_opt:true ~ctx t');
+      ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t');
       dup ctx
 
     | Tif (t1, t2, t3) ->
       let ctx1 =
         mk_ctx ~use_gmp_opt:false c_int (* an int must be generated *)
       in
-      ignore (type_term ~use_gmp_opt:false ~ctx:ctx1 t1);
+      ignore (type_term ~use_gmp_opt:false ~ctx:ctx1 ~lenv t1);
       let i = Interval.infer t in
       let i2 = Interval.infer t2 in
       let i3 = Interval.infer t3 in
       let ctx = ty_of_interv ?ctx (Interval.join i (Interval.join i2 i3)) in
       let ctx = mk_ctx ~use_gmp_opt:true ctx in
-      ignore (type_term ~use_gmp_opt:true ~ctx t2);
-      ignore (type_term ~use_gmp_opt:true ~ctx t3);
+      ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t3);
       dup ctx
 
     | Tat (t, _)
     | TLogic_coerce (_, t) ->
-      dup (type_term ~use_gmp_opt ~arith_operand ?ctx t).ty
+      dup (type_term ~use_gmp_opt ~arith_operand ?ctx ~lenv t).ty
 
     | TAddrOf tlv
     | TStartOf tlv ->
       (* it is a pointer, but subterms must be typed. *)
-      type_term_lval tlv;
+      type_term_lval tlv ~lenv;
       dup Nan
 
     | Tbase_addr (_, t) ->
       (* it is a pointer, but subterms must be typed. *)
-      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t);
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t);
       dup Nan
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
       (* both [t1] and [t2] must be typed. *)
-      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t1);
       let ctx = type_offset t2 in
-      ignore (type_term ~use_gmp_opt:false ~ctx t2);
+      ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t2);
       dup Nan
 
     | Tapp(li, _, args) ->
@@ -481,7 +555,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
           (* a built-in is a C function, so the context is necessarily a C
              type. *)
           let ctx = ty_of_logic_ty lvi.lv_type in
-          ignore (type_term ~use_gmp_opt:false ~ctx arg)
+          ignore (type_term ~use_gmp_opt:false ~ctx ~lenv arg)
         in
         List.iter2 typ_arg li.l_profile args;
         (* [li.l_type is [None] for predicate only: not possible here.
@@ -491,26 +565,85 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         (* TODO: what if the type of the parameter is smaller than the infered
            type of the argument? For now, it is silently ignored (both
            statically and at runtime)... *)
-        List.iter (fun arg -> ignore (type_term ~use_gmp_opt:true arg)) args;
         (* TODO: recursive call in arguments of function call *)
         match li.l_body with
-        | LBpred _ ->
+        | LBpred p ->
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
+          Stack.push
+            (fun () ->
+               let typed_args =
+                 type_args
+                   ~use_gmp_opt
+                   ~lenv
+                   li.l_profile
+                   args
+                   li.l_var_info.lv_name
+               in
+               ignore (type_predicate ~lenv:typed_args p);
+               List.iter Interval.Env.remove li.l_profile)
+            pending_typing;
           dup c_int
-        | LBterm _ ->
+        | LBterm t_body ->
           begin match li.l_type with
             | None ->
               assert false
             | Some lty ->
               (* TODO: what if the function returns a real? *)
               let ty = ty_of_logic_ty ~term:t lty in
+              let type_args_and_body () =
+                let typed_args =
+                  type_args
+                    ~use_gmp_opt
+                    ~lenv
+                    li.l_profile
+                    args
+                    li.l_var_info.lv_name
+                in
+                (* Since there are no global logic variables, the typing of the
+                   inner block of the function only depends on the function's
+                   own arguments, so the [~lenv] parameter gets replaced with
+                   the type of the parameters in the current function calls *)
+                ignore (type_term ~use_gmp_opt ~lenv:typed_args t_body)
+              in
+              let clear_env () = List.iter Interval.Env.remove li.l_profile in
+              Stack.push
+                clear_env
+                pending_typing;
+              Stack.push
+                type_args_and_body
+                pending_typing;
               dup ty
           end
         | LBnone ->
-          Error.not_yet "logic functions with no definition nor reads clause"
+          (match args with
+           | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->
+             let anonymous =
+               Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
+             in
+             let ty_bound = Interval.infer anonymous in
+             let ty_bound =
+               ty_of_interv (Interval.join ty_bound (Interval.infer t1))
+             in
+             ignore
+               (type_term
+                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t1);
+             ignore
+               (type_term
+                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t2);
+             let ty = ty_of_interv (Interval.infer t) ~use_gmp_opt:true ?ctx in
+             (* Options.feedback "type of extended quantifier: %a" D.pretty ty; *)
+             ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
+             dup ty
+           | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
+             (* TODO : improve error message to distinguish error messages
+                corresponding to unsupported primitives and wrong application
+                of supported primitive
+                (one is a fatal and the other is a not_yet) *)
+             Error.not_yet "logic functions or predicates with no definition \
+                            nor reads clause")
         | LBreads _ ->
-          Error.not_yet "logic functions performing read accesses"
+          Error.not_yet "logic functions or predicates performing read accesses"
         | LBinductive _ ->
           Error.not_yet "inductive logic functions"
       end
@@ -522,8 +655,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Trange(None, _) | Trange(_, None) ->
       Options.abort "unbounded ranges are not part of E-ACSl"
     | Trange(Some n1, Some n2) ->
-      ignore (type_term ~use_gmp_opt n1);
-      ignore (type_term ~use_gmp_opt n2);
+      ignore (type_term ~use_gmp_opt ~lenv n1);
+      ignore (type_term ~use_gmp_opt ~lenv n2);
       let i = Interval.infer t in
       let ty = ty_of_interv ?ctx i in
       dup ty
@@ -531,9 +664,10 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Tlet(li, t) ->
       let li_t = Misc.term_of_li li in
       type_letin li li_t;
-      ignore (type_term ~use_gmp_opt:true li_t);
-      dup (type_term ~use_gmp_opt:true ?ctx t).ty
-
+      ignore (type_term ~use_gmp_opt:true ~lenv li_t);
+      dup (type_term ~use_gmp_opt:true ?ctx ~lenv t).ty
+    | Tlambda ([ _ ],lt) ->
+      dup (type_term ~use_gmp_opt:true ~under_lambda:true ?ctx ~lenv lt).ty;
     | Tlambda (_,_) -> Error.not_yet "lambda"
     | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"
@@ -544,190 +678,270 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Ttype _
     | Tempty_set  -> dup Nan
   in
-  Memo.memo
-    (fun t ->
-       let ty, op = infer t in
-       match ctx with
-       | None -> { ty; op; cast = None }
-       | Some ctx -> coerce ~arith_operand ~ctx ~op ty)
-    t
+  let t = Logic_normalizer.get_term t in
+  match
+    Memo.memo ~lenv
+      (fun t ->
+         let ty, op = infer t in
+         match ctx with
+         | None -> { ty; op; cast = None }
+         | Some ctx -> coerce ~arith_operand ~ctx ~op ty)
+      t
+  with
+  | Res res -> res
+  | Err exn -> raise exn
 
-and type_term_lval (host, offset) =
-  type_term_lhost host;
-  type_term_offset offset
+and type_term_lval ~lenv (host, offset) =
+  type_term_lhost ~lenv host;
+  type_term_offset ~lenv offset
 
-and type_term_lhost = function
+and type_term_lhost ~lenv t  = match t with
   | TVar _
   | TResult _ -> ()
-  | TMem t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan t)
+  | TMem t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t)
 
-and type_term_offset = function
+and type_term_offset ~lenv t = match t with
   | TNoOffset -> ()
   | TField(_, toff)
-  | TModel(_, toff) -> type_term_offset toff
+  | TModel(_, toff) -> type_term_offset ~lenv toff
   | TIndex(t, toff) ->
     let ctx = type_offset t in
-    ignore (type_term ~use_gmp_opt:false ~ctx t);
-    type_term_offset toff
+    ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t);
+    type_term_offset ~lenv toff
 
-let rec type_predicate p =
-  Cil.CurrentLoc.set p.pred_loc;
-  (* this pattern matching also follows the formal rules of the JFLA's paper *)
-  let op =
-    match p.pred_content with
-    | Pfalse | Ptrue -> c_int
-    | Papp(li, _, _) ->
-      begin match li.l_body with
-        | LBpred _ ->
-          (* No need to type subpredicates
-             since Papp will be transformed into Tapp in Translate:
-             a retyping is done there *)
-          c_int
-        | LBnone -> (* Eg: \is_finite *)
-          Error.not_yet "predicate with no definition nor reads clause"
-        | LBreads _ ->
-          Error.not_yet "predicate performing read accesses"
-        | LBinductive _ ->
-          Error.not_yet "inductive predicate"
-        | LBterm _ ->
-          Options.fatal "unexpected logic definition"
-            Printer.pp_predicate p
-      end
-    | Pdangling _ -> Error.not_yet "\\dangling"
-    | Prel(_, t1, t2) ->
-      let i1 = Interval.infer t1 in
-      let i2 = Interval.infer t2 in
-      let i = Interval.join i1 i2 in
-      let ctx = mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i) in
-      ignore (type_term ~use_gmp_opt:true ~ctx t1);
-      ignore (type_term ~use_gmp_opt:true ~ctx t2);
-      (match ctx with
-       | Nan -> c_int
-       | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx)
-    | Pand(p1, p2)
-    | Por(p1, p2)
-    | Pxor(p1, p2)
-    | Pimplies(p1, p2)
-    | Piff(p1, p2) ->
-      ignore (type_predicate p1);
-      ignore (type_predicate p2);
-      c_int
-    | Pnot p ->
-      ignore (type_predicate p);
-      c_int
-    | Pif(t, p1, p2) ->
-      let ctx = mk_ctx ~use_gmp_opt:false c_int in
-      ignore (type_term ~use_gmp_opt:false ~ctx t);
-      ignore (type_predicate p1);
-      ignore (type_predicate p2);
-      c_int
-    | Plet(li, p) ->
-      let li_t = Misc.term_of_li li in
-      type_letin li li_t;
-      ignore (type_term ~use_gmp_opt:true li_t);
-      (type_predicate p).ty
+and type_args params ~use_gmp_opt ~lenv args fname =
+  try
+    List.fold_right2
+      (fun lv t (typed_args : Function_params_ty.t) ->
+         let ty_arg = (type_term ~use_gmp_opt ~lenv t).ty in
+         begin
+           try
+             let typ_arg = typ_of_number_ty ty_arg in
+             Interval.Env.add lv (Interval.interv_of_typ typ_arg)
+           with Not_a_number -> ()
+         end;
+         ty_arg :: typed_args)
+      params
+      args
+      []
+  with Invalid_argument _ ->
+    Options.fatal "[Tapp] unexpected number of arguments when calling %s" fname
 
-    | Pforall(bounded_vars, { pred_content = Pimplies(hyps, goal) })
-    | Pexists(bounded_vars, { pred_content = Pand(hyps, goal) }) ->
-      let guards = !compute_quantif_guards_ref p bounded_vars hyps in
-      let iv_plus_one iv =
-        Interval.Ival (Ival.add_singleton_int Integer.one iv)
-      in
-      List.iter
-        (fun (t1, r1, x, r2, t2) ->
-           let i1 = Interval.infer t1 in
-           let i1 = match r1, i1 with
-             | Rlt, Interval.Ival iv -> iv_plus_one iv
-             | Rle, _ -> i1
-             | _ -> assert false
-           in
-           let i2 = Interval.infer t2 in
-           (* add one to [i2], since we increment the loop counter one more
-              time before going outside the loop. *)
-           let i2 = match r2, i2 with
-             | Rlt, _ -> i2
-             | Rle, Interval.Ival iv -> iv_plus_one iv
-             | _ -> assert false
-           in
-           let i = Interval.join i1 i2 in
-           let ctx = match x.lv_type with
-             | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
-             | Ctype ty ->
-               (match Cil.unrollType ty with
-                | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-                | ty ->
-                  Options.fatal "unexpected type %a for quantified variable %a"
-                    Printer.pp_typ ty
-                    Printer.pp_logic_var x)
-             | lty ->
-               Options.fatal "unexpected type %a for quantified variable %a"
-                 Printer.pp_logic_type lty
-                 Printer.pp_logic_var x
-           in
-           (* forcing when typing bounds prevents to generate an extra useless
-              GMP variable when --e-acsl-gmp-only *)
-           ignore (type_term ~use_gmp_opt:false ~ctx t1);
-           ignore (type_term ~use_gmp_opt:false ~ctx t2);
-           (* if we must generate GMP code, degrade the interval in order to
-              guarantee that [x] will be a GMP when typing the goal *)
-           let i = match ctx with
-             | C_integer _ -> i
-             | Gmpz -> Interval.top_ival (* [ -\infty; +\infty ] *)
-             | C_float _ | Rational | Real | Nan ->
-               Options.fatal "unexpected quantification over %a" D.pretty ctx
-           in
-           Interval.Env.add x i)
-        guards;
-      (type_predicate goal).ty
-
-    | Pseparated tlist ->
-      List.iter
-        (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan t))
-        tlist;
-      c_int
-    | Pinitialized(_, t)
-    | Pfreeable(_, t)
-    | Pallocable(_, t)
-    | Pvalid(_, t)
-    | Pvalid_read(_, t)
-    | Pobject_pointer(_,t)
-    | Pvalid_function t ->
-      ignore (type_term ~use_gmp_opt:false ~ctx:Nan t);
-      c_int
-
-    | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
-    | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
-    | Pat(p, _) -> (type_predicate p).ty
-    | Pfresh _ -> Error.not_yet "\\fresh"
+(* [type_bound_variables] infers an interval associated with each of
+   the provided bounds of a quantified variable, and provides a term
+   accordingly. It could happen that the bounds provided for a quantifier
+   [lv] are bigger than its type. [type_bound_variables] handles such cases
+   and provides smaller bounds whenever possible.
+   Let B be the inferred interval and R the range of [lv.typ]
+   - Case 1: B \subseteq R
+     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
+     Return: B
+   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
+     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
+     Return: B \intersect R
+   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
+     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
+     Return: R with a guard guaranteeing that [lv] does not overflow *)
+and type_bound_variables ~loc ~lenv (t1, lv, t2) =
+  let i1 = Interval.infer t1 in
+  let i2 = Interval.infer t2 in
+  let i = Interval.(widen (join i1 i2)) in
+  let ctx = match lv.lv_type with
+    | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
+    | Ctype ty ->
+      (match Cil.unrollType ty with
+       | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+       | ty ->
+         Options.fatal "unexpected C type %a for quantified variable %a"
+           Printer.pp_typ ty
+           Printer.pp_logic_var lv)
+    | lty ->
+      Options.fatal "unexpected logic type %a for quantified variable %a"
+        Printer.pp_logic_type lty
+        Printer.pp_logic_var lv
   in
-  coerce ~arith_operand:false ~ctx:c_int ~op c_int
+  let t1, t2, i =
+    match lv.lv_type with
+    | Ltype _ | Lvar _ | Lreal | Larrow _ ->
+      Error.not_yet "quantification over non-integer type"
+    | Linteger -> t1, t2, i
+    | Ctype ty ->
+      let ity = Interval.extended_interv_of_typ ty in
+      if Interval.is_included i ity then
+        (* case 1 *)
+        t1, t2, i
+      else if Interval.is_singleton_int i1 &&
+              Interval.is_singleton_int i2 then
+        begin
+          (* case 2 *)
+          let i = Interval.meet i ity in
+          (* We can now update the bounds in the preprocessed form
+             that come from the meet of the two intervals *)
+          let min, max = Misc.finite_min_and_max (Interval.extract_ival i) in
+          let t1 = Logic_const.tint ~loc min in
+          let t2 = Logic_const.tint ~loc max in
+          t1, t2, i
+        end else
+        (* case 3 *)
+        let min, max = Misc.finite_min_and_max (Interval.extract_ival ity) in
+        let guard_lower = Logic_const.tint ~loc min in
+        let guard_upper = Logic_const.tint ~loc max in
+        let lv_term = Logic_const.tvar ~loc lv in
+        let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
+        let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
+        let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
+        ignore (type_predicate ~lenv guard);
+        Bound_variables.add_guard_for_small_type lv guard;
+        t1, t2, i
+  in
+  (* forcing when typing bounds prevents to generate an extra useless
+     GMP variable when --e-acsl-gmp-only *)
+  ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t1);
+  ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t2);
+  (* if we must generate GMP code, degrade the interval in order to
+     guarantee that [x] will be a GMP when typing the goal *)
+  let i = match ctx with
+    | C_integer _ -> i
+    (* [ -\infty; +\infty ] *)
+    | Gmpz -> Interval.Ival (Ival.inject_range None None)
+    | C_float _ | Rational | Real | Nan ->
+      Options.fatal "unexpected quantification over %a" D.pretty ctx
+  in
+  Interval.Env.add lv i;
+  (t1, lv, t2)
 
-let type_term ~use_gmp_opt ?ctx t =
+and type_predicate ~lenv p =
+  match Logic_normalizer.get_pred p with
+  | PoT_term t -> type_term ~use_gmp_opt:true ~lenv t
+  | PoT_pred p ->
+    Cil.CurrentLoc.set p.pred_loc;
+    (* this pattern matching also follows the formal rules of the JFLA's paper *)
+    let op =
+      match p.pred_content with
+      | Pfalse | Ptrue -> c_int
+      | Papp(li, _, args) ->
+        begin
+          match li.l_body with
+          | LBpred p ->
+            let typed_args =
+              type_args
+                ~use_gmp_opt:true
+                ~lenv
+                li.l_profile
+                args
+                li.l_var_info.lv_name
+            in
+            ignore (type_predicate ~lenv:typed_args p);
+            List.iter Interval.Env.remove li.l_profile
+          | LBnone -> ()
+          | LBreads _ -> ()
+          | LBinductive _ -> ()
+          | LBterm _ ->
+            Options.fatal "unexpected logic definition"
+              Printer.pp_predicate p
+        end;
+        c_int
+      | Pdangling _ -> Error.not_yet "\\dangling"
+      | Prel(_, t1, t2) ->
+        let i1 = Interval.infer t1 in
+        let i2 = Interval.infer t2 in
+        let i = Interval.join i1 i2 in
+        let ctx = mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i) in
+        ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t1);
+        ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t2);
+        (match ctx with
+         | Nan -> c_int
+         | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx)
+      | Pand(p1, p2)
+      | Por(p1, p2)
+      | Pxor(p1, p2)
+      | Pimplies(p1, p2)
+      | Piff(p1, p2) ->
+        ignore (type_predicate ~lenv p1);
+        ignore (type_predicate ~lenv p2);
+        c_int
+      | Pnot p ->
+        ignore (type_predicate ~lenv p);
+        c_int
+      | Pif(t, p1, p2) ->
+        let ctx = mk_ctx ~use_gmp_opt:false c_int in
+        ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t);
+        ignore (type_predicate ~lenv p1);
+        ignore (type_predicate ~lenv p2);
+        c_int
+      | Plet(li, p) ->
+        let li_t = Misc.term_of_li li in
+        type_letin li li_t;
+        ignore (type_term ~use_gmp_opt:true ~lenv li_t);
+        (type_predicate ~lenv p).ty
+      | Pforall _
+      | Pexists _ ->
+        begin
+          let guards, goal =
+            Error.retrieve_preprocessing
+              "preprocessing of quantified predicate"
+              Bound_variables.get_preprocessed_quantifier
+              p
+          in
+          let guards =
+            List.map
+              (fun (t1, x, t2) ->
+                 type_bound_variables ~loc:p.pred_loc ~lenv (t1, x, t2))
+              guards
+          in Bound_variables.replace p guards goal;
+          (type_predicate ~lenv goal).ty
+        end
+      | Pseparated tlist ->
+        List.iter
+          (fun t ->
+             ignore
+               (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t))
+          tlist;
+        c_int
+      | Pinitialized(_, t)
+      | Pfreeable(_, t)
+      | Pallocable(_, t)
+      | Pvalid(_, t)
+      | Pvalid_read(_, t)
+      | Pobject_pointer(_,t)
+      | Pvalid_function t ->
+        ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t);
+        c_int
+      | Pat(p, _) -> (type_predicate ~lenv p).ty
+      | Pfresh _ -> Error.not_yet "\\fresh"
+    in
+    coerce ~arith_operand:false ~ctx:c_int ~op c_int
+
+let type_term ~use_gmp_opt ?ctx ~lenv t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
-  ignore (type_term ~use_gmp_opt ?ctx t)
+  ignore (type_term ~use_gmp_opt ?ctx ~lenv t);
+  while not (Stack.is_empty pending_typing) do
+    Stack.pop pending_typing ()
+  done
 
-let type_named_predicate ~must_clear p =
+let type_named_predicate ~lenv p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate p;
-  if must_clear then begin
-    Interval.Env.clear ();
-    Memo.clear ()
-  end;
-  ignore (type_predicate p)
+  ignore (type_predicate ~lenv p);
+  while not (Stack.is_empty pending_typing) do
+    Stack.pop pending_typing ()
+  done
 
-let unsafe_set t ?ctx ty =
+let unsafe_set t ?ctx ~lenv ty =
   let ctx = match ctx with None -> ty | Some ctx -> ctx in
   let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
-  ignore (Memo.memo mk t)
+  ignore (Memo.memo mk ~lenv t)
 
 (******************************************************************************)
 (** {2 Getters} *)
 (******************************************************************************)
 
-let get_number_ty t = (Memo.get t).ty
-let get_integer_op t = (Memo.get t).op
-let get_integer_op_of_predicate p = (type_predicate p).op
+let get_number_ty ~lenv t =
+  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t).ty
+let get_integer_op ~lenv t =
+  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t).op
+let get_integer_op_of_predicate ~lenv p = (type_predicate ~lenv p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
 let extract_typ t ty =
@@ -741,27 +955,62 @@ let extract_typ t ty =
   | Lvar _ -> Error.not_yet "unsupported logic type: type variable"
   | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
-let get_typ t =
-  let info = Memo.get t in
+let get_typ ~lenv t =
+  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
   extract_typ t info.ty
 
-let get_op t =
-  let info = Memo.get t in
+let get_op ~lenv t =
+  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
   extract_typ t info.op
 
-let get_cast t =
-  let info = Memo.get t in
+let get_cast ~lenv t =
+  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
-let get_cast_of_predicate p =
-  let info = type_predicate p in
+let get_cast_of_predicate ~lenv p =
+  let info = type_predicate ~lenv p in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> assert false
 
 let clear = Memo.clear
 
-module Datatype = D
+let typer_visitor lenv = object
+  inherit E_acsl_visitor.visitor
+
+  method !vpredicate p =
+    (* Do not raise a warning for e-acsl errors at preprocessing time,
+       those errrors are stored in the table and warnings are raised at
+       translation time*)
+    let _ = try type_named_predicate ~lenv p
+      with Error.Not_yet _ | Error.Typing_error _  -> ()
+    in
+    Cil.SkipChildren
+end
+
+let type_program ast =
+  Visitor.visitFramacFileSameGlobals
+    (typer_visitor [] :> Visitor.frama_c_inplace)
+    ast
+
+let type_code_annot lenv annot =
+  ignore
+    (Visitor.visitFramacCodeAnnotation
+       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       annot)
+
+let preprocess_predicate lenv p =
+  Logic_normalizer.preprocess_predicate p;
+  Bound_variables.preprocess_predicate p;
+  ignore
+    (Visitor.visitFramacPredicate
+       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       p)
+
+let preprocess_rte ~lenv rte =
+  Logic_normalizer.preprocess_annot rte;
+  Bound_variables.preprocess_annot rte;
+  type_code_annot lenv rte
 
 (*
 Local Variables:

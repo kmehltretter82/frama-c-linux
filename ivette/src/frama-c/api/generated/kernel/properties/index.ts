@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 /* --- Generated Frama-C Server API --- */
 
 /**
@@ -16,6 +38,14 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { bySource } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { jSource } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { jSourceSafe } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { source } from 'frama-c/api/kernel/ast';
+//@ts-ignore
 import { byTag } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { jTag } from 'frama-c/api/kernel/data';
@@ -23,14 +53,6 @@ import { jTag } from 'frama-c/api/kernel/data';
 import { jTagSafe } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { tag } from 'frama-c/api/kernel/data';
-//@ts-ignore
-import { bySource } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { jSource } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { jSourceSafe } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { source } from 'frama-c/api/kernel/services';
 
 /** Property Kinds */
 export enum propKind {
@@ -70,6 +92,8 @@ export enum propKind {
   assert = 'assert',
   /** Check */
   check = 'check',
+  /** Hypothesis */
+  admit = 'admit',
   /** Clause `@loop invariant` */
   loop_invariant = 'loop_invariant',
   /** Clause `@loop assigns` */
@@ -96,6 +120,10 @@ export enum propKind {
   axiom = 'axiom',
   /** Logical lemma */
   lemma = 'lemma',
+  /** Logical check lemma */
+  check_lemma = 'check_lemma',
+  /** ACSL extension */
+  extension = 'extension',
 }
 
 /** Loose decoder for `propKind` */
@@ -113,6 +141,7 @@ const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.properties.propKindTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const propKindTags: Server.GetRequest<null,tag[]>= propKindTags_internal;
@@ -159,6 +188,7 @@ const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.properties.propStatusTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const propStatusTags: Server.GetRequest<null,tag[]>= propStatusTags_internal;
@@ -218,6 +248,7 @@ const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.properties.alarmsTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const alarmsTags: Server.GetRequest<null,tag[]>= alarmsTags_internal;
@@ -298,6 +329,7 @@ const reloadStatus_internal: Server.GetRequest<null,null> = {
   name:   'kernel.properties.reloadStatus',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Force full reload for array [`status`](#status)  */
 export const reloadStatus: Server.GetRequest<null,null>= reloadStatus_internal;
@@ -316,6 +348,7 @@ const fetchStatus_internal: Server.GetRequest<
             removed: Json.jList(Json.jKey<'#property'>('#property')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
+  signals: [],
 };
 /** Data fetcher for array [`status`](#status)  */
 export const fetchStatus: Server.GetRequest<

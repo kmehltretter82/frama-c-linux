@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stdio.c"
-
+#include "__fc_builtin.h"
+volatile int nondet;
 int main() {
   FILE *stream;
   char *line = NULL;
@@ -18,5 +19,17 @@ int main() {
   }
   free(line);
   fclose(stream);
+
+  if (nondet) {
+    // Test asprintf without a C stub; the specification
+    // uses an unsupported 'allocates' clause, so 's' will
+    // point to invalid memory.
+    char *s;
+    int r = asprintf(&s, "bla %s", 42);
+    if (r == -1) return 1;
+    printf("%s", s);
+    free(s);
+  }
+
   return 0;
 }

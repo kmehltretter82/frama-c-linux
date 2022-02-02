@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -39,22 +39,22 @@ class annotateFunFromDeclspec =
   let recover_from_attr_param params attrparam =
     let rec aux = function
       | AInt i ->
-        Ast_info.constant_term 
-	  Cil_datatype.Location.unknown i
+        Ast_info.constant_term
+          Cil_datatype.Location.unknown i
       | AUnOp(Neg,AInt i) ->
         Ast_info.constant_term
-	  Cil_datatype.Location.unknown (Integer.neg i)
+          Cil_datatype.Location.unknown (Integer.neg i)
       | AStr s
       | ACons(s,[]) ->
         begin try
-		let v = List.find (fun v -> v.vname = s) params in
-		term_of_var v
+            let v = List.find (fun v -> v.vname = s) params in
+            term_of_var v
           with Not_found -> raise No_recovery end
       | ABinOp(bop,attr1,attr2) ->
         mkterm
-	  (TBinOp(bop,aux attr1,aux attr2)) 
-	  Linteger 
-	  Cil_datatype.Location.unknown
+          (TBinOp(bop,aux attr1,aux attr2))
+          Linteger
+          Cil_datatype.Location.unknown
       | ACons _
       | ASizeOf _
       | ASizeOfE _
@@ -84,49 +84,49 @@ class annotateFunFromDeclspec =
   let annotate_var params acc v =
     List.fold_left
       (fun acc attr ->
-        match recover_from_attribute params attr with
-        | None -> acc
-        | Some(name,args) ->
-          if name = "valid" || name = "valid_range" then
-            let t1 = term_of_var v in
-	    let t1 = Logic_utils.mk_logic_pointer_or_StartOf t1 in
-            let p = match name with
-              | "valid" ->
-                assert (args = []);
-                Logic_const.pvalid (Logic_const.here_label,t1)
-              | "valid_range" ->
-		let args = match args with
-		  | [ b1; b2 ] -> (Logic_const.here_label,t1,b1,b2)
-		  | _ -> assert false
-		in Logic_const.pvalid_range args
-              | _ -> assert false
-            in
-            let app =
-              Logic_const.new_predicate p
-            in
-            app :: acc
-          else
-            try
-              let p =
-                match Logic_env.find_all_logic_functions name with
-                | [i] -> i
-                | _ -> raise Not_found
-              in
-              assert (List.length p.l_profile = List.length(args) + 1);
-              assert (List.length p.l_labels <= 1);
-              let labels = 
-                match p.l_labels with
-                | [] -> []
-                | [_] -> [ Logic_const.here_label ]
-                | _ -> assert false
-              in
-              let args = term_of_var v :: args in
-              let app =
-                Logic_const.new_predicate
-                  (Logic_const.unamed (Papp(p,labels,args)))
-              in
-              app :: acc
-            with Not_found -> acc
+         match recover_from_attribute params attr with
+         | None -> acc
+         | Some(name,args) ->
+           if name = "valid" || name = "valid_range" then
+             let t1 = term_of_var v in
+             let t1 = Logic_utils.mk_logic_pointer_or_StartOf t1 in
+             let p = match name with
+               | "valid" ->
+                 assert (args = []);
+                 Logic_const.pvalid (Logic_const.here_label,t1)
+               | "valid_range" ->
+                 let args = match args with
+                   | [ b1; b2 ] -> (Logic_const.here_label,t1,b1,b2)
+                   | _ -> assert false
+                 in Logic_const.pvalid_range args
+               | _ -> assert false
+             in
+             let app =
+               Logic_const.new_predicate p
+             in
+             app :: acc
+           else
+             try
+               let p =
+                 match Logic_env.find_all_logic_functions name with
+                 | [i] -> i
+                 | _ -> raise Not_found
+               in
+               assert (List.length p.l_profile = List.length(args) + 1);
+               assert (List.length p.l_labels <= 1);
+               let labels =
+                 match p.l_labels with
+                 | [] -> []
+                 | [_] -> [ Logic_const.here_label ]
+                 | _ -> assert false
+               in
+               let args = term_of_var v :: args in
+               let app =
+                 Logic_const.new_predicate
+                   (Logic_const.unamed (Papp(p,labels,args)))
+               in
+               app :: acc
+             with Not_found -> acc
       ) acc (typeAttrs v.vtype)
   in
 
@@ -143,74 +143,74 @@ class annotateFunFromDeclspec =
       let insert_spec behavior =
         let ens =
           List.fold_left
-	    (fun acc attr ->
-	      match recover_from_attribute params attr with
-	      | None -> acc
-	      | Some(name,args) ->
-                if name = "valid" || name = "valid_range" then
-		  let t1 = Logic_const.tresult ~loc return_ty in
-		  let t1 = Logic_utils.mk_logic_pointer_or_StartOf t1 in
-		  let p = match name with
-		    | "valid" ->
-		      assert (args = []);
-		      Logic_const.pvalid (Logic_const.here_label,t1)
-		    | "valid_range" ->
-		      let args = match args with
-			| [ b1; b2 ] -> (Logic_const.here_label,t1,b1,b2)
-			| _ -> assert false
-		      in 
-		      Logic_const.pvalid_range args
-		    | _ -> assert false
-		  in
-                  let app =
-		    Logic_const.new_predicate p
-                  in
-                  (Normal, app) :: acc
-                else
-                  try
-		    let p =
-                      match Logic_env.find_all_logic_functions name with
-                      | [i] -> i
-                      | _ -> assert false
-		    in
-		    assert (List.length p.l_profile = List.length args + 1);
-		    assert (List.length p.l_labels <= 1);
-		    let res = Logic_const.tresult ~loc return_ty in
-		    let args = res :: args in
-		    let app =
-                      Logic_const.new_predicate
-                        (Logic_const.unamed (Papp(p,[],args)))
-		    in
-		    (Normal,app) :: acc
-                  with Not_found -> acc)
-	    behavior.b_post_cond
-	    (typeAttrs return_ty)
+            (fun acc attr ->
+               match recover_from_attribute params attr with
+               | None -> acc
+               | Some(name,args) ->
+                 if name = "valid" || name = "valid_range" then
+                   let t1 = Logic_const.tresult ~loc return_ty in
+                   let t1 = Logic_utils.mk_logic_pointer_or_StartOf t1 in
+                   let p = match name with
+                     | "valid" ->
+                       assert (args = []);
+                       Logic_const.pvalid (Logic_const.here_label,t1)
+                     | "valid_range" ->
+                       let args = match args with
+                         | [ b1; b2 ] -> (Logic_const.here_label,t1,b1,b2)
+                         | _ -> assert false
+                       in
+                       Logic_const.pvalid_range args
+                     | _ -> assert false
+                   in
+                   let app =
+                     Logic_const.new_predicate p
+                   in
+                   (Normal, app) :: acc
+                 else
+                   try
+                     let p =
+                       match Logic_env.find_all_logic_functions name with
+                       | [i] -> i
+                       | _ -> assert false
+                     in
+                     assert (List.length p.l_profile = List.length args + 1);
+                     assert (List.length p.l_labels <= 1);
+                     let res = Logic_const.tresult ~loc return_ty in
+                     let args = res :: args in
+                     let app =
+                       Logic_const.new_predicate
+                         (Logic_const.unamed (Papp(p,[],args)))
+                     in
+                     (Normal,app) :: acc
+                   with Not_found -> acc)
+            behavior.b_post_cond
+            (typeAttrs return_ty)
         in
-	let ppt_ensures b = 
-	  Property.ip_ensures_of_behavior kf Kglobal b 
-	in
-	List.iter Property_status.remove (ppt_ensures behavior);
+        let ppt_ensures b =
+          Property.ip_ensures_of_behavior kf Kglobal b
+        in
+        List.iter Property_status.remove (ppt_ensures behavior);
         behavior.b_post_cond <- ens;
-	List.iter Property_status.register (ppt_ensures behavior);
+        List.iter Property_status.register (ppt_ensures behavior);
       in
       let spec = Annotations.funspec ~populate:false kf in
       List.iter insert_spec spec.spec_behavior
   in
-object
-  inherit Visitor.frama_c_inplace
+  object
+    inherit Visitor.frama_c_inplace
 
-  method! vglob_aux = function
-  | GFun(f,_) ->
-    annotate_fun f.svar;
-    SkipChildren
-  | GFunDecl(_,v,_) ->
-    if not v.vdefined then annotate_fun v;
-    SkipChildren
-  | GAnnot _ -> DoChildren
-  | GCompTag _ | GType _ | GCompTagDecl _ | GEnumTagDecl _
-  | GEnumTag _ | GAsm _ | GPragma _ | GText _ | GVar _ | GVarDecl _ ->
-    SkipChildren
-end
+    method! vglob_aux = function
+      | GFun(f,_) ->
+        annotate_fun f.svar;
+        SkipChildren
+      | GFunDecl(_,v,_) ->
+        if not v.vdefined then annotate_fun v;
+        SkipChildren
+      | GAnnot _ -> DoChildren
+      | GCompTag _ | GType _ | GCompTagDecl _ | GEnumTagDecl _
+      | GEnumTag _ | GAsm _ | GPragma _ | GText _ | GVar _ | GVarDecl _ ->
+        SkipChildren
+  end
 
 let interpret file =
   let visitor = new annotateFunFromDeclspec in

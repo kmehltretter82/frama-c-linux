@@ -1,10 +1,11 @@
 /* run.config
- LIBS: ../libSelect ../libAnim
+ LIBS: libSelect libAnim
  MODULE: @PTEST_NAME@
-   OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -journal-disable
+   OPT: @EVA_OPTIONS@ -deps -slicing-level 3
 */
 
 int G1, G2, G3;
+
 void init (int a1, int a2, int a3);
 void add (int a1, int a2, int a3);
 void g (int a1, int a2, int a3);

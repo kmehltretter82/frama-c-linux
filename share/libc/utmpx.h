@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -26,6 +26,7 @@
 __PUSH_FC_STDLIB
 
 #include "__fc_define_pid_t.h"
+#include "stdint.h"
 #include "sys/time.h"
 
 __BEGIN_DECLS
@@ -41,6 +42,8 @@ struct utmpx {
   pid_t ut_pid;
   short ut_type;
   struct timeval ut_tv;
+  int32_t ut_addr_v6[4]; // not POSIX, but allowed by it
+  char __glibc_reserved[20]; // not POSIX, but allowed by it
 };
 
 #define EMPTY 0

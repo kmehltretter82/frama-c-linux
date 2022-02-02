@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -61,6 +61,12 @@ val varinfo_of_localizable : localizable -> varinfo option
 val typ_of_localizable: localizable -> typ option
 val loc_of_localizable : localizable -> location
 (** Might return [Location.unknown] *)
+
+val loc_to_localizable: ?precise_col:bool -> Filepath.position -> localizable option
+(** return the (hopefully) most precise localizable that contains the given
+    Filepath.position. If [precise_col] is [true], takes the column number into
+    account (possibly a more precise, but costly, result).
+    @since 24.0-Chromium *)
 
 module type Tag =
 sig

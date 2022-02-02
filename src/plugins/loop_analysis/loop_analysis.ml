@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,8 +40,6 @@ let add_loop_bound stmt n =
 module type BINARY_SEMILATTICE = sig
   include  Dataflows.JOIN_SEMILATTICE
 end
-
-let pretty_int = Integer.pretty ~hexa:false
 
 module Binary(* :BINARY_SEMILATTICE *) = struct
 
@@ -121,10 +119,10 @@ module Binary(* :BINARY_SEMILATTICE *) = struct
 
 
   let pretty fmt = function
-    | ConstantInt(i) -> Format.fprintf fmt "%a" pretty_int i
+    | ConstantInt(i) -> Format.fprintf fmt "%a" Integer.pretty i
     | AffineRef(v,i) -> Format.fprintf fmt "ref<%a>+%a"
                           Cil_datatype.Varinfo.pretty v
-                          pretty_int i
+                          Integer.pretty i
     | Unknown -> Format.fprintf fmt "unknown"
     | ConstantVar(v) -> Format.fprintf fmt "%a" Cil_datatype.Varinfo.pretty v
     | Boolean _ -> Format.fprintf fmt "bools"
@@ -285,9 +283,9 @@ module Store(* (B:sig *)
     if Integer.(equal increment one) then Format.fprintf fmt "++"
     else if Integer.(equal increment minus_one) then Format.fprintf fmt "--"
     else if Integer.(gt increment zero) then
-      Format.fprintf fmt " += %a" (Integer.pretty ~hexa:false) increment
+      Format.fprintf fmt " += %a" Integer.pretty increment
     else if Integer.(lt increment zero) then
-      Format.fprintf fmt " -= %a" (Integer.pretty ~hexa:false)
+      Format.fprintf fmt " -= %a" Integer.pretty
         (Integer.neg increment)
     else assert false (* should never happen *)
 
@@ -324,21 +322,21 @@ module Store(* (B:sig *)
     let value = (mem,conds) in
     let open Cil_types in
     let map_on_all_succs (mem,conds) =
-      List.map (fun x -> (Region_analysis.Edge(stmt,x),(mem,conds,x))) stmt.succs in
+      List.map (fun x -> (Region_analysis_sig.Edge(stmt,x),(mem,conds,x))) stmt.succs in
     match stmt.skind with
     | Instr(i) -> map_on_all_succs (do_instr i (mem,conds))
     | Return _ ->
-      [Region_analysis.Exit stmt, (mem,conds,Cil.dummyStmt)]
+      [Region_analysis_sig.Exit stmt, (mem,conds,Cil.dummyStmt)]
     | Loop _ | Goto _ | Break _ | Continue _ | Block _ | UnspecifiedSequence _ ->
       map_on_all_succs value
     | If _ ->
       let result = Dataflows.transfer_if_from_guard do_guard stmt value in
       List.map (fun (succ,(mem,cond)) ->
-          (Region_analysis.Edge(stmt,succ),(mem,cond,succ))) result
+          (Region_analysis_sig.Edge(stmt,succ),(mem,cond,succ))) result
     | Switch _ ->
       let result = Dataflows.transfer_switch_from_guard do_guard stmt value in
       List.map (fun (succ,(mem,cond)) ->
-          (Region_analysis.Edge(stmt,succ),(mem,cond,succ))) result
+          (Region_analysis_sig.Edge(stmt,succ),(mem,cond,succ))) result
     | Throw _ | TryCatch _ | TryExcept _ | TryFinally _ ->
       Options.abort "unsupported exception-related statement: %a"
         Printer.pp_stmt stmt
@@ -427,8 +425,8 @@ module Store(* (B:sig *)
         Options.debug "maybe_insert: function %a, found var %a, smaller: %b, \
                        initial %a, increment %a, bound %a, offset %a, binop '%a'"
           Kernel_function.pretty (Kernel_function.find_englobing_kf stmt)
-          Printer.pp_varinfo vi smaller pretty_int initial pretty_int increment
-          pretty_int bound pretty_int offset Printer.pp_binop binop;
+          Printer.pp_varinfo vi smaller Integer.pretty initial Integer.pretty increment
+          Integer.pretty bound Integer.pretty offset Printer.pp_binop binop;
         let bound = Integer.sub bound initial in
         let bound_offset =
           if smaller then Integer.sub bound offset
@@ -446,11 +444,11 @@ module Store(* (B:sig *)
             "termination condition may not be reached (infinite loop?)@;\
              loop amounts to: for (%a = 0; %a != %a; %a%a)"
             Printer.pp_varinfo vi
-            Printer.pp_varinfo vi pretty_int divident
+            Printer.pp_varinfo vi Integer.pretty divident
             Printer.pp_varinfo vi pretty_increment increment
         else
           try
-            let value = (Integer.to_int (Integer.c_div bound_offset increment)) in
+            let value = (Integer.to_int_exn (Integer.c_div bound_offset increment)) in
             let adjusted_value =
               if (binop = Cil_types.Le && Integer.(equal remainder zero))
               || (not Integer.(equal remainder zero))
@@ -462,7 +460,7 @@ module Store(* (B:sig *)
                 success := true;
                 add_loop_bound stmt adjusted_value
               end
-          with Z.Overflow -> (* overflow in Integer.to_int *)
+          with Z.Overflow -> (* overflow in Integer.to_int_exn *)
             ()
       (* TODO: check if this is useful and does not cause false alarms
          else
@@ -522,12 +520,12 @@ module Store(* (B:sig *)
                                    -   get_min_max_int_for_vi(%a)=%a"
                       Printer.pp_varinfo vi
                       (Pretty_utils.pp_pair
-                         (Pretty_utils.pp_opt pretty_int)
-                         (Pretty_utils.pp_opt pretty_int)) a
+                         (Pretty_utils.pp_opt Integer.pretty)
+                         (Pretty_utils.pp_opt Integer.pretty)) a
                       Printer.pp_varinfo vi'
                       (Pretty_utils.pp_pair
-                         (Pretty_utils.pp_opt pretty_int)
-                         (Pretty_utils.pp_opt pretty_int)) b
+                         (Pretty_utils.pp_opt Integer.pretty)
+                         (Pretty_utils.pp_opt Integer.pretty)) b
                 end
               | B.Ne(B.AffineRef(vi, offset),B.AffineRef(vi', offset')) ->
                 begin
@@ -572,7 +570,6 @@ module Store(* (B:sig *)
             () (* no value => cannot infer anything *)
       ) final_conds;
 
-    (* TODO: Use this table in a second pass, for the slevel analysis. *)
     if not !success then
       Options.debug "no success %a init %a body %a result %a"
         Cil_datatype.Stmt.pretty stmt pretty (value,conds)
@@ -642,3 +639,13 @@ let get_bounds stmt =
 
 let fold_bounds f acc =
   Loop_Max_Iteration.fold_sorted ~cmp:Cil_datatype.Stmt.compare f acc
+
+let display_results () =
+  let pretty_hashtbl fmt () =
+    Loop_Max_Iteration.iter_sorted
+      (fun stmt max ->
+         let loc = Cil_datatype.Stmt.loc stmt in
+         Format.fprintf fmt "%a: %i@," Printer.pp_location loc max)
+  in
+  Options.result "Maximum number of iterations by loop:@\n@[<v>%a@]"
+    pretty_hashtbl ()

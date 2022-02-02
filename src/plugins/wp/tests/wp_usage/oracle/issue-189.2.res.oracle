@@ -26,7 +26,7 @@ Prove: true.
   Memory model hypotheses for function 'f':
   /*@
      behavior wp_typed_caveat:
-       requires \separated(ptr, src);
        requires \valid(ptr);
+       requires \separated(ptr, src);
      */
   void f(char *ptr, char const *src, unsigned int idx);

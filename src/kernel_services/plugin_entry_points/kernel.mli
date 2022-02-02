@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -83,6 +83,8 @@ val dkey_parser: category
 
 val dkey_pp: category
 
+val dkey_pp_logic: category
+
 val dkey_print_attrs: category
 
 val dkey_print_bitfields: category
@@ -161,6 +163,8 @@ val wkey_int_conversion: warn_category
 
 val wkey_cert_exp_46: warn_category
 
+val wkey_cert_msc_37: warn_category
+
 val wkey_cert_msc_38: warn_category
 
 val wkey_cert_exp_10: warn_category
@@ -183,6 +187,19 @@ val wkey_acsl_extension: warn_category
 
 val wkey_cmdline: warn_category
 (** Command-line related warning, e.g. for invalid options given by the user *)
+
+val wkey_audit: warn_category
+(** Warning related to options '-audit-*'. *)
+
+val wkey_parser_unsupported: warn_category
+(** Warning related to unsupported parsing-related features. *)
+
+val wkey_asm: warn_category
+(** Warnings related to assembly code. *)
+
+val wkey_unnamed_typedef: warn_category
+(** Warning related to "unnamed typedef that does not introduce a struct
+    or enumeration type". *)
 
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
@@ -283,6 +300,10 @@ module Time: Parameter_sig.String
 module PrintCode : Parameter_sig.Bool
 (** Behavior of option "-print" *)
 
+module PrintAsIs : Parameter_sig.Bool
+(** Behavior of option "-print-as-is"
+    @since 24.0-Chromium *)
+
 module PrintMachdep : Parameter_sig.Bool
 (** Behavior of option "-print-machdep"
     @since Phosphorus-20170501-beta1 *)
@@ -307,7 +328,7 @@ end
 
 (** Behavior of option "-add-symbolic-path"
     @since Neon-20140301
-    @modify Frama-C+dev inversed argument order (now uses path:name) *)
+    @modify 23.0-Vanadium inversed argument order (now uses path:name) *)
 module SymbolicPath: Parameter_sig.Filepath_map with type value = string
 
 module FloatNormal: Parameter_sig.Bool
@@ -349,13 +370,17 @@ module Journal: sig
 
 end
 
-module Session_dir: Parameter_sig.String
+module Session_dir: Parameter_sig.Filepath
 (** Directory in which session files are searched.
-    @since Neon-20140301 *)
+    @since Neon-20140301
+    @modify 23.0-Vanadium parameter type is now Filepath instead of string
+*)
 
-module Config_dir: Parameter_sig.String
+module Config_dir: Parameter_sig.Filepath
 (** Directory in which config files are searched.
-    @since Neon-20140301 *)
+    @since Neon-20140301
+    @modify 23.0-Vanadium parameter type is now Filepath instead of string
+*)
 
 (* this stop special comment does not work as expected (and as explained in the
    OCamldoc manual, Section 15.2.2. It just skips all the rest of the file
@@ -411,6 +436,12 @@ module CppGnuLike: Parameter_sig.Bool
 
 module PrintCppCommands: Parameter_sig.Bool
 (** Behavior of option "-print-cpp-commands" *)
+
+module AuditPrepare: Parameter_sig.Filepath
+(** Behavior of option "-audit-prepare" *)
+
+module AuditCheck: Parameter_sig.Filepath
+(** Behavior of option "-audit-check" *)
 
 module FramaCStdLib: Parameter_sig.Bool
 (** Behavior of option "-frama-c-stdlib" *)

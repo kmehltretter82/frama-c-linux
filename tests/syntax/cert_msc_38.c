@@ -1,4 +1,5 @@
 /* run.config
+<<<<<<< HEAD
  EXIT: 1
    STDOPT: +"-cpp-extra-args='-DTEST_ASSERT'"
    STDOPT  : +"-cpp-extra-args='-DTEST_ERRNO'"
@@ -8,6 +9,26 @@
    STDOPT: +"-cpp-extra-args='-DTEST_VAARG'"
    STDOPT: +"-cpp-extra-args='-DTEST_VAEND'"
    STDOPT: +"-cpp-extra-args='-DTEST_SETJMP'"
+||||||| 754e522ceb
+STDOPT: +"-cpp-extra-args='-DTEST_ASSERT'"
+STDOPT: +"-cpp-extra-args='-DTEST_ERRNO'"
+STDOPT: +"-cpp-extra-args='-DTEST_MATHERRHANDLING'"
+STDOPT: +"-cpp-extra-args='-DTEST_VASTART'"
+STDOPT: +"-cpp-extra-args='-DTEST_VACOPY'"
+STDOPT: +"-cpp-extra-args='-DTEST_VAARG'"
+STDOPT: +"-cpp-extra-args='-DTEST_VAEND'"
+STDOPT: +"-cpp-extra-args='-DTEST_SETJMP'"
+=======
+ EXIT: 1
+  STDOPT: +"-cpp-extra-args='-DTEST_ASSERT'"
+  STDOPT: +"-cpp-extra-args='-DTEST_ERRNO'"
+  STDOPT: +"-cpp-extra-args='-DTEST_MATHERRHANDLING'"
+  STDOPT: +"-cpp-extra-args='-DTEST_VASTART'"
+  STDOPT: +"-cpp-extra-args='-DTEST_VACOPY'"
+  STDOPT: +"-cpp-extra-args='-DTEST_VAARG'"
+  STDOPT: +"-cpp-extra-args='-DTEST_VAEND'"
+  STDOPT: +"-cpp-extra-args='-DTEST_SETJMP'"
+>>>>>>> origin/master
 */
 #include <assert.h>
 #include <stdarg.h>

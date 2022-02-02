@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,6 +22,9 @@
 
 open Tactical
 open ProofScript
+
+let dkey_pp_allgoals =
+  Wp_parameters.register_category "script:allgoals"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Alternatives Ordering                                              --- *)
@@ -117,7 +120,7 @@ struct
     width : int ;
     auto : Strategy.heuristic list ;
     mutable signaled : bool ;
-    mutable backtrack : int ;
+    backtrack : int ;
     mutable backtracking : backtracking option ;
   }
 
@@ -389,12 +392,18 @@ let rec crawl env on_child node = function
 (* --- Main Process                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+let pp_subgoal env fmt node =
+  let main = Env.goal env None in
+  let wpo = Env.goal env (Some node) in
+  Format.fprintf fmt "%s subgoal:@\n%a" (Wpo.get_gid main) Wpo.pp_goal_flow wpo
+
 let schedule job =
   Task.spawn (ProverTask.server ()) (Task.thread (Task.todo job))
 
 let rec process env node =
   schedule
     begin fun () ->
+      Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" (pp_subgoal env) node ;
       if ProofEngine.proved node then
         ( Env.validate env ; Task.return () )
       else
@@ -407,6 +416,7 @@ let task
     ~depth ~width ~backtrack ~auto
     ~start ~progress ~result ~success wpo =
   begin fun () ->
+    Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" Wpo.pp_goal_flow wpo ;
     Prover.simplify ~start ~result wpo >>= fun succeed ->
     if succeed
     then

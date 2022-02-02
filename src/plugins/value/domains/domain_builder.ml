@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,22 +20,70 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Eval
+
 module type InputDomain = sig
-  include Abstract_domain.S
-  val storage: unit -> bool
+  include Datatype.S
+  val top: t
+  val join: t -> t -> t
 end
 
-module Complete
-    (Domain: InputDomain)
-= struct
+module type LeafDomain = sig
+  type t
 
-  include Domain
+  val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
+  val reduce_further: t -> exp -> 'v -> (exp * 'v) list
+
+  val evaluate_predicate:
+    t Abstract_domain.logic_environment -> t -> predicate -> Alarmset.status
+  val reduce_by_predicate:
+    t Abstract_domain.logic_environment -> t -> predicate -> bool -> t or_bottom
+  val interpret_acsl_extension:
+    acsl_extension -> t Abstract_domain.logic_environment -> t -> t
+
+  val enter_loop: stmt -> t -> t
+  val incr_loop_counter: stmt -> t -> t
+  val leave_loop: stmt -> t -> t
+
+  val filter: kernel_function -> [`Pre | `Post] -> Base.Hptset.t -> t -> t
+  val reuse:
+    kernel_function -> Base.Hptset.t ->
+    current_input:t -> previous_output:t -> t
+
+  val show_expr: 'a -> t -> Format.formatter -> exp -> unit
+  val post_analysis: t Bottom.or_bottom -> unit
+
+  module Store: Domain_store.S with type t := t
+
+  val key: t Abstract_domain.key
+end
+
+module Complete (Domain: InputDomain) = struct
+
+  let backward_location _state _lval _typ loc value = `Value (loc, value)
+  let reduce_further _state _expr _value = []
+
+  let evaluate_predicate _env _state _predicate = Alarmset.Unknown
+  let reduce_by_predicate _env state _predicate _positive = `Value state
+  let interpret_acsl_extension _extension _env state = state
+
+  let enter_loop _stmt state = state
+  let incr_loop_counter _stmt state = state
+  let leave_loop _stmt state = state
+
+  let filter _kf _kind _bases state = state
+  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
+
+  let show_expr _valuation _state fmt _expr =
+    Format.fprintf fmt "(not implemented)"
+
+  let post_analysis _state = ()
+
   module Store = Domain_store.Make (Domain)
 
   let key: Domain.t Structure.Key_Domain.key =
     Structure.Key_Domain.create_key Domain.name
-
-  let post_analysis _state = ()
 end
 
 open Simpler_domains
@@ -48,8 +96,7 @@ let simplify_call call =
   { kf = call.Eval.kf;
     arguments = List.map simplify_argument call.Eval.arguments;
     rest = List.map fst call.Eval.rest;
-    return = call.Eval.return;
-    recursive = call.Eval.recursive }
+    return = call.Eval.return; }
 
 module Make_Minimal
     (Value: Abstract_value.S)
@@ -69,10 +116,8 @@ module Make_Minimal
   let narrow x _y = `Value x
 
   let top_answer = `Value (Value.top, None), Alarmset.all
-  let extract_expr _oracle _state _expr = top_answer
-  let extract_lval _oracle _state _lval _typ _location = top_answer
-  let backward_location _state _lval _typ location value = `Value (location, value)
-  let reduce_further _state _expr _value = []
+  let extract_expr ~oracle:_ _context _state _expr = top_answer
+  let extract_lval ~oracle:_ _context _state _lval _typ _location = top_answer
 
   let update _valuation state = `Value state
 
@@ -82,17 +127,17 @@ module Make_Minimal
   let assume stmt expr positive _valuation state =
     Domain.assume stmt expr positive state
 
-  let start_call stmt call _valuation state =
-    `Value (Domain.start_call stmt (simplify_call call) state)
+  let start_call stmt call recursion _valuation state =
+    match recursion with
+    | None -> `Value (Domain.start_call stmt (simplify_call call) state)
+    | Some _ ->
+      (* TODO *)
+      Value_parameters.abort
+        "The domain %s does not support recursive call." Domain.name
 
-  let finalize_call stmt call ~pre ~post =
+  let finalize_call stmt call recursion ~pre ~post =
+    assert (recursion = None);
     Domain.finalize_call stmt (simplify_call call) ~pre ~post
-
-  let show_expr _valuation = Domain.show_expr
-
-  let enter_loop _stmt state = state
-  let incr_loop_counter _stmt state = state
-  let leave_loop _stmt state = state
 
   let initialize_variable lval _location ~initialized value state =
     Domain.initialize_variable lval ~initialized value state
@@ -102,12 +147,8 @@ module Make_Minimal
     Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
   let logic_assign _assigns _location _state = top
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ t _ _ = `Value t
 
   let relate _kf _bases _state = Base.SetLattice.top
-  let filter _kf _ _bases state = state
-  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
 end
 
 
@@ -134,10 +175,9 @@ module Complete_Minimal
            let mem_project = Datatype.never_any_project
          end)
        : Datatype.S_with_collections with type t := t)
-
-    let storage () = false
   end
 
+  include D
   include Complete (D)
 
 end
@@ -157,10 +197,9 @@ module Complete_Minimal_with_datatype
       (Datatype.With_collections
          (Domain) (struct let module_name = Domain.name end)
        : Datatype.S_with_collections with type t := t)
-
-    let storage () = false
   end
 
+  include D
   include Complete (D)
 
 end
@@ -187,21 +226,13 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
 
     let narrow x _y = `Value x
 
-    let extract_expr _oracle state expr =
+    let extract_expr ~oracle:_ _context state expr =
       let v = Domain.extract_expr state expr >>-: fun v -> v, None in
       v, Alarmset.all
 
-    let extract_lval _oracle state lval typ location =
-      let v =
-        Domain.extract_lval state lval typ location >>-: fun v ->
-        v, None
-      in
+    let extract_lval ~oracle:_ _context state lval typ location =
+      let v = Domain.extract_lval state lval typ location >>-: fun v -> v, None in
       v, Alarmset.all
-
-    let backward_location _state _lval _typ location value =
-      `Value (location, value)
-
-    let reduce_further _state _expr _value = []
 
     let find valuation expr =
       match valuation.Abstract_domain.find expr with
@@ -221,15 +252,18 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       Domain.assign kinstr lv expr value (record valuation) state
     let assume stmt expr positive valuation state =
       Domain.assume stmt expr positive (record valuation) state
-    let start_call stmt call valuation state =
-      `Value (Domain.start_call stmt call (record valuation) state)
-    let finalize_call = Domain.finalize_call
 
-    let show_expr _valuation = Domain.show_expr
+    let start_call stmt call recursion valuation state =
+      match recursion with
+      | None -> `Value (Domain.start_call stmt call (record valuation) state)
+      | Some _ ->
+        (* TODO *)
+        Value_parameters.abort
+          "The domain %s does not support recursive call." Domain.name
 
-    let enter_loop _stmt state = state
-    let incr_loop_counter _stmt state = state
-    let leave_loop _stmt state = state
+    let finalize_call stmt call recursion =
+      assert (recursion = None);
+      Domain.finalize_call stmt call
 
     let initialize_variable lval _location ~initialized value state =
       Domain.initialize_variable lval ~initialized value state
@@ -239,16 +273,11 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
     let logic_assign _assigns _location _state = top
-    let evaluate_predicate _ _ _ = Alarmset.Unknown
-    let reduce_by_predicate _ t _ _ = `Value t
 
     let relate _kf _bases _state = Base.SetLattice.top
-    let filter _kf _ _bases state = state
-    let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
-
-    let storage () = false
   end
 
+  include D
   include Complete (D)
 end
 
@@ -372,13 +401,14 @@ module Restrict
 
   let default_query = `Value (Value.top, None), Alarmset.all
 
-  let extract_expr oracle state expr =
-    make_query default_query (fun s -> Domain.extract_expr oracle s expr) state
+  let extract_expr ~oracle context state expr =
+    make_query default_query
+      (fun s -> Domain.extract_expr ~oracle context s expr) state
 
-  let extract_lval oracle state lval typ location =
+  let extract_lval ~oracle context state lval typ location =
     make_query
       default_query
-      (fun s -> Domain.extract_lval oracle s lval typ location)
+      (fun s -> Domain.extract_lval ~oracle context s lval typ location)
       state
 
   let backward_location state lval typ location value =
@@ -438,7 +468,7 @@ module Restrict
      - otherwise, only propagate the state from the call site to kill the
        properties that depend on locations written in the called functions. *)
 
-  let start_call stmt call valuation state =
+  let start_call stmt call recursion valuation state =
     (* Starts the call with mode [new_mode]. [previous_mode] is the current mode
        of the caller. *)
     let start_call_with_mode ?previous_mode ~new_mode state =
@@ -446,7 +476,7 @@ module Restrict
       then
         match previous_mode with
         | Some mode when mode.current.write ->
-          Domain.start_call stmt call valuation state >>-: fun state ->
+          Domain.start_call stmt call recursion valuation state >>-: fun state ->
           Some (state, new_mode)
         | _ ->
           `Value (Some (start_analysis call state, new_mode))
@@ -467,13 +497,13 @@ module Restrict
     | None, None ->
       `Value None
 
-  let finalize_call stmt call ~pre ~post =
+  let finalize_call stmt call recursion ~pre ~post =
     match pre, post with
     | None, _ | _, None -> `Value None
     | Some (pre, pre_mode), Some (post, post_mode) ->
       if post_mode.current.write
       then
-        Domain.finalize_call stmt call ~pre ~post >>-: fun state ->
+        Domain.finalize_call stmt call recursion ~pre ~post >>-: fun state ->
         Some (state, pre_mode)
       else
         `Value (Some (post, pre_mode))
@@ -516,6 +546,9 @@ module Restrict
       if mode.current.write
       then Some (f state, mode)
       else x
+
+  let interpret_acsl_extension extension env =
+    lift (Domain.interpret_acsl_extension extension (lift_env env))
 
   let enter_scope kind varinfos = lift (Domain.enter_scope kind varinfos)
   let leave_scope kf varinfos = lift (Domain.leave_scope kf varinfos)
@@ -562,9 +595,9 @@ module Restrict
 
   module Store = struct
 
-    let register_global_state state =
+    let register_global_state b state =
       let state = state >>-: get_state in
-      Domain.Store.register_global_state state
+      Domain.Store.register_global_state b state
 
     let lift_register f state = f (get_state state)
 
@@ -596,5 +629,7 @@ module Restrict
     let get_stmt_state_by_callstack ~after stmt =
       inject_table (Domain.Store.get_stmt_state_by_callstack ~after stmt)
 
+    let mark_as_computed = Domain.Store.mark_as_computed
+    let is_computed = Domain.Store.is_computed
   end
 end

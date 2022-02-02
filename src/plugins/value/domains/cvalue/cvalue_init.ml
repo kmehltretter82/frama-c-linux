@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,6 +46,7 @@ let make_well hidden_base state loc =
 
 let warn_unknown_size_aux pp v (messt, t) =
   Value_parameters.warning ~once:true ~current:true
+    ~wkey:Value_parameters.wkey_unknown_size
     "@[during initialization@ of %a,@ size of@ type '%a'@ cannot be@ computed@ \
      (%s)@]" pp v Printer.pp_typ t messt
 
@@ -97,11 +98,11 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
 
 let reject_empty_struct b offset typ =
   match Cil.unrollType typ with
-  | TComp (ci, _, _) ->
+  | TComp (ci, _) ->
     if ci.cfields = Some [] && not (Cil.acceptEmptyCompinfo ()) then
       Value_parameters.abort ~current:true
         "@[empty %ss@ are unsupported@ (type '%a',@ location %a%a)@ \
-         in C99 (only allowed as GCC/MSVC extension).@ Aborting.@]"
+         in C99 (only allowed on GCC/MSVC machdep).@ Aborting.@]"
         (if ci.cstruct then "struct" else "union")
         Printer.pp_typ typ Base.pretty b Printer.pp_offset offset
   | _ -> ()
@@ -146,7 +147,6 @@ let initialize_var_using_type varinfo state =
           let arr_pointed_typ =
             TArray(typ,
                    Some (Cil.kinteger64 ~loc:varinfo.vdecl i),
-                   Cil.empty_size_cache (),
                    [])
           in
           let hidden_var_name =
@@ -196,7 +196,7 @@ let initialize_var_using_type varinfo state =
         | true, true -> assert false (* inconsistent *)
       end
 
-    | TArray (typ, len, _, _) ->
+    | TArray (typ, len, _) ->
       begin try
           let size = Cil.lenOfArray len in
           let size_elt = Integer.of_int (Cil.bitsSizeOf typ) in
@@ -299,7 +299,7 @@ let initialize_var_using_type varinfo state =
           bind_entire_loc Cvalue.V.top_int;
       end
 
-    | TComp ({cstruct=true;} as compinfo, _, _) -> (* Struct *)
+    | TComp ({cstruct=true;} as compinfo, _) -> (* Struct *)
       reject_empty_struct b offset_orig typ;
       let treat_field state field =
         match field.fbitfield with
@@ -320,7 +320,7 @@ let initialize_var_using_type varinfo state =
           bind_entire_loc Cvalue.V.top_int;
       end
 
-    | TComp ({cstruct=false}, _, _) when Cil.is_fully_arithmetic typ ->
+    | TComp ({cstruct=false}, _) when Cil.is_fully_arithmetic typ ->
       reject_empty_struct b offset_orig typ;
       (* Union of arithmetic types *)
       bind_entire_loc Cvalue.V.top_int

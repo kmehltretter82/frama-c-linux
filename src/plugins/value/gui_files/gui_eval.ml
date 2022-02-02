@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,7 +41,7 @@ let classify_pre_post kf ip =
   let open Property in
   match ip with
   | IPPredicate {ip_kind = PKEnsures (_, Normal)} -> Some (GL_Post kf)
-  | IPPredicate {ip_kind=PKEnsures _} | IPAxiom _ | IPAxiomatic _ | IPLemma _
+  | IPPredicate {ip_kind=PKEnsures _} | IPAxiomatic _ | IPLemma _
   | IPTypeInvariant _ | IPGlobalInvariant _
   | IPOther _ | IPCodeAnnot _ | IPAllocation _ | IPReachable _
   | IPExtended _

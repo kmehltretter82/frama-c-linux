@@ -107,13 +107,20 @@ val set_acceptEmptyCompinfo: unit -> unit
     Note that if the selected machdep is GCC or MSVC, this call has no effect
     as these modes already allow empty compinfos.
 
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 
 val acceptEmptyCompinfo: unit -> bool
 (** whether we accept empty struct. Implied by {!Cil.msvcMode} and
     {!Cil.gccMode}, and can be forced by {!Cil.set_acceptEmptyCompinfo}
     otherwise.
+
+    @since 23.0-Vanadium
+*)
+
+val allowed_machdep: string -> string
+(** [allowed_machdep "machdep family"] provides a standard message for features
+    only allowed for a particular machdep.
 
     @since Frama-C+dev
 *)
@@ -303,6 +310,12 @@ val intType: typ
 (** unsigned int *)
 val uintType: typ
 
+(** short *)
+val shortType : typ
+
+(** unsigned short *)
+val ushortType : typ
+
 (** long *)
 val longType: typ
 
@@ -319,7 +332,7 @@ val ulongLongType: typ
     It is equivalent to the ISO C int16_t type but without using the
     corresponding header.
     Must only be called if such type exists in the current architecture.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val int16_t: unit -> typ
 
@@ -327,7 +340,7 @@ val int16_t: unit -> typ
     It is equivalent to the ISO C int32_t type but without using the
     corresponding header.
     Must only be called if such type exists in the current architecture.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val int32_t: unit -> typ
 
@@ -335,7 +348,7 @@ val int32_t: unit -> typ
     It is equivalent to the ISO C int64_t type but without using the
     corresponding header.
     Must only be called if such type exists in the current architecture.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val int64_t: unit -> typ
 
@@ -428,6 +441,11 @@ val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
     @since 18.0-Argon
 *)
 val has_flexible_array_member: typ -> bool
+(** [true] iff the given type has flexible array member.
+
+    @modify 24.0-Chromium in GCC/MSVC mode recursively searches in the type of the
+    last field.
+*)
 
 (** Unroll a type until it exposes a non
  * [TNamed]. Will collect all attributes appearing in [TNamed]!!! *)
@@ -595,8 +613,9 @@ val isArrayType: typ -> bool
 (** True if the argument is a struct of union type *)
 val isStructOrUnionType: typ -> bool
 
-(** Raised when {!Cil.lenOfArray} fails either because the length is [None]
-  * or because it is a non-constant expression *)
+(** Raised when {!Cil.lenOfArray} fails either because the length is [None],
+  * because it is a non-constant expression, or because it overflows an int.
+*)
 exception LenOfArray
 
 (** Call to compute the array length as present in the array type, to an
@@ -972,11 +991,14 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false])
     @modify Fluorine-20130401 add [force] argument
+    @modify 23.0-Vanadium change order or arguments
 *)
-val mkCastT: ?force:bool -> e:exp -> oldt:typ -> newt:typ -> exp
+val mkCastT: ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
-(** Like {!Cil.mkCastT} but uses typeOf to get [oldt] *)
-val mkCast: ?force:bool -> e:exp -> newt:typ -> exp
+(** Like {!Cil.mkCastT} but uses typeOf to get [oldt]
+    @modify 23.0-Vanadium change order or arguments
+*)
+val mkCast: ?force:bool -> newt:typ -> exp -> exp
 
 (** Equivalent to [stripCasts] for terms. *)
 val stripTermCasts: term -> term
@@ -1021,15 +1043,25 @@ val typeOf_array_elem : typ -> typ
 val is_fully_arithmetic: typ -> bool
 (** Returns [true] whenever the type contains only arithmetic types *)
 
-(** Convert a string representing a C integer literal to an expression.
-    Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL.
-*)
+(** Convert a string representing a C integer literal to an Integer.
+    Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL. *)
 val parseInt: string -> Integer.t
-val parseIntExp: loc:location -> string -> exp
-val parseIntLogic: loc:location -> string -> term
 
-(** Convert a string representing a C integer literal to an expression.
-    Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL *)
+(** Like [parseInt], but returns [Error message] in case of failure, instead of
+    aborting Frama-C.
+    @since 24.0-Chromium *)
+val parseIntRes: string -> (Integer.t, string) result
+
+(** Like [parseInt], but converts to an expression. *)
+val parseIntExp: loc:location -> string -> exp
+
+(** Like [parseIntExp], but returns [Error message] in case of failure, instead
+    of aborting Frama-C.
+    @since 24.0-Chromium *)
+val parseIntExpRes: loc:location -> string -> (exp, string) result
+
+(** Like [parseInt], but converts to a logic term. *)
+val parseIntLogic: loc:location -> string -> term
 
 val appears_in_expr: varinfo -> exp -> bool
 (** @return true if the given variable appears in the expression. *)
@@ -1110,21 +1142,41 @@ val mkPureExpr:
   ?loc:location -> exp -> stmt
 
 (** Make a loop. Can contain Break or Continue.
-    The kind of loop (While, For, DoWhile) is given by [sattr];
-    it is a While loop if unspecified. *)
-val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> stmt list
+    The kind of loop (while, for, dowhile) is given by [sattr]
+    (none by default). Use {!Cil.mkWhile} for a While loop.
+    @modify 23.0-Vanadium add unit argument. Default type is no longer While,
+            use {!Cil.mkWhile} instead.
+*)
+val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
+  stmt list
 
 (** Make a for loop for(i=start; i<past; i += incr) \{ ... \}. The body
     can contain Break but not Continue. Can be used with i a pointer
     or an integer. Start and done must have the same type but incr
-    must be an integer *)
-val mkForIncr:  iter:varinfo -> first:exp -> stopat:exp -> incr:exp
-  -> body:stmt list -> stmt list
+    must be an integer
+    @modify 23.0-Vanadium add unit argument
+*)
+val mkForIncr: ?sattr:attributes -> iter:varinfo -> first:exp -> stopat:exp ->
+  incr:exp -> body:stmt list -> unit -> stmt list
 
 (** Make a for loop for(start; guard; next) \{ ... \}. The body can
-    contain Break but not Continue !!! *)
-val mkFor: start:stmt list -> guard:exp -> next: stmt list ->
-  body: stmt list -> stmt list
+    contain Break but not Continue !!!
+    @modify 23.0-Vanadium add unit argument
+*)
+val mkFor: ?sattr:attributes -> start:stmt list -> guard:exp -> next: stmt list ->
+  body: stmt list -> unit -> stmt list
+
+(** Make a while loop.
+    @since 23.0-Vanadium
+*)
+val mkWhile: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
+  stmt list
+
+(** Make a do ... while loop.
+    @since 23.0-Vanadium
+*)
+val mkDoWhile: ?sattr:attributes -> body:stmt list -> guard:exp -> unit ->
+  stmt list
 
 (** creates a block with empty attributes from an unspecified sequence. *)
 val block_from_unspecified_sequence:
@@ -1194,7 +1246,7 @@ val partitionAttributes:  default:attributeClass ->
                 attribute list   (* AttrType *)
 
 (** Add an attribute. Maintains the attributes in sorted order of the second
-    argument *)
+    argument. The attribute is not added if it is already there. *)
 val addAttribute: attribute -> attributes -> attributes
 
 (** Add a list of attributes. Maintains the attributes in sorted order. The
@@ -1257,6 +1309,14 @@ val isGhostFormalVarinfo: varinfo -> bool
     @since 20.0-Calcium
 *)
 val isGhostFormalVarDecl: (string * typ * attributes) -> bool
+
+
+(** [true] iff the given variable is a const global variable with non extern
+    storage.
+
+    @since Frama-C+dev
+*)
+val isGlobalInitConst: varinfo -> bool
 
 (** Remove attributes whose name appears in the first argument that are
     present anywhere in the fully expanded version of the type.
@@ -1395,6 +1455,17 @@ val bitfield_attribute_name: string
 (** Name of the attribute that is automatically inserted (with an [AINT size]
     argument when querying the type of a field that is a bitfield *)
 
+val anonymous_attribute_name: string
+(** Name of the attribute that is inserted when generating a name for a varinfo
+    representing an anonymous function parameter.
+    @since 24.0-Chromium
+*)
+
+val anonymous_attribute: attribute
+(** attribute identifying anonymous function parameters
+    @since 24.0-Chromium
+*)
+
 (** Convert an expression into an attrparam, if possible. Otherwise raise
     NotAnAttrParam with the offending subexpression *)
 val expToAttrParam: exp -> attrparam
@@ -1412,13 +1483,13 @@ val global_attributes: global -> attributes
 
 (**
    Whether the given attributes contain libc indicators.
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val is_in_libc: attributes -> bool
 
 (**
    Whether the given global contains libc indicators.
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val global_is_in_libc: global -> bool
 
@@ -1760,22 +1831,6 @@ class type cilVisitor = object
 
 end
 
-(** Indicates how an extended behavior clause is supposed to be visited.
-    The default behavior is [DoChildren], which ends up visiting
-    each identified predicate in the list and leave the id as is.
-
-    @plugin development guide
-
-    @since Sodium-20150201
-    @modify Silicon-20161101
-    @deprecated 21.0-Scandium
-*)
-val register_behavior_extension:
-  string ->
-  (cilVisitor -> acsl_extension_kind -> (acsl_extension_kind) visitAction)
-  -> unit
-[@@ deprecated "Use Acsl_extension.register_behavior instead (arg: ~visitor)"]
-
 (**/**)
 class internal_genericCilVisitor:
   fundec option ref -> Visitor_behavior.t -> (unit->unit) Queue.t -> cilVisitor
@@ -2076,9 +2131,6 @@ val peepHole1: (instr -> instr list option) -> stmt list -> unit
     of the error *)
 exception SizeOfError of string * typ
 
-(** Create a fresh size cache with [Not_Computed] *)
-val empty_size_cache : unit -> bitsSizeofTypCache
-
 (** Give the unsigned kind corresponding to any integer kind *)
 val unsignedVersionOf : ikind -> ikind
 
@@ -2112,6 +2164,9 @@ val isSigned: ikind -> bool
 (** Returns the size of the given type, in bits. If this is the type of
     an lvalue which is a bitfield, the size of the bitfield is returned. *)
 val bitsSizeOfBitfield: typ -> int
+
+val selfTypSize: State.t
+(** Cache for sizeof *)
 
 (** Returns a unique number representing the integer
     conversion rank. *)
@@ -2170,7 +2225,8 @@ val sizeOf: loc:location -> typ -> exp
 
 (** The minimum alignment (in bytes) for a type. This function is
  * architecture dependent, so you should only call this after you call
- * {!Cil.initCIL}. *)
+ * {!Cil.initCIL}.
+ * Raises {!SizeOfError} when it cannot compute the alignment. *)
 val bytesAlignOf: typ -> int
 
 (** [intOfAttrparam a] tries to const-fold [a] into a numeric value.
@@ -2255,6 +2311,10 @@ val stmt_of_instr_list : ?loc:location -> instr list -> stmtkind
 (** Convert a C variable into the corresponding logic variable.
     The returned logic variable is unique for a given C variable. *)
 val cvar_to_lvar : varinfo -> logic_var
+
+(** Convert a C variable into a logic term.
+    @since 24.0-Chromium *)
+val cvar_to_term: loc:location -> varinfo -> term
 
 (** Make a temporary variable to use in annotations *)
 val make_temp_logic_var: logic_type -> logic_var
@@ -2341,11 +2401,6 @@ val set_extension_handler:
     If your name is not [Acsl_extension], do not call this
     @since 21.0-Scandium
 *)
-
-val set_deprecated_extension_handler:
-  handler:(string -> ext_category ->
-           (cilVisitor -> acsl_extension_kind -> acsl_extension_kind visitAction) ->
-           unit) -> unit
 
 (* ***********************************************************************)
 (** {2 Forward references} *)

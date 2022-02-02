@@ -25,6 +25,7 @@
 [wp] Goal typed_stringCompare_assert_rte_mem_access : not tried
 [wp] Goal typed_stringCompare_assert_rte_mem_access_2 : not tried
 [wp] Goal typed_stringCompare_assert_rte_mem_access_3 : not tried
+[wp] Goal typed_stringCompare_assert_length : not tried
 [wp] Goal typed_stringCompare_assert_different : not tried
 [wp] Goal typed_stringCompare_assert_rte_mem_access_4 : not tried
 [wp] Goal typed_stringCompare_assert_rte_mem_access_5 : not tried

@@ -12,7 +12,7 @@ int main(void) {
     goto L;
   }
 
- L:
+L:
   /*@ assert ! \valid(p); */
   return 0;
 }

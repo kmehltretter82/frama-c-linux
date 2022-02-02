@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 /* --- Generated Frama-C Server API --- */
 
 /**
@@ -48,6 +70,7 @@ const getCallstacks_internal: Server.GetRequest<marker[],callstack[]> = {
   name:   'plugins.eva.values.getCallstacks',
   input:  Json.jList(jMarker),
   output: Json.jList(jCallstack),
+  signals: [],
 };
 /** Callstacks for markers */
 export const getCallstacks: Server.GetRequest<marker[],callstack[]>= getCallstacks_internal;
@@ -67,6 +90,7 @@ const getCallstackInfo_internal: Server.GetRequest<
               stmt: Json.jKey<'#stmt'>('#stmt'),
               rank: Json.jNumber,
             })),
+  signals: [],
 };
 /** Callstack Description */
 export const getCallstackInfo: Server.GetRequest<
@@ -86,6 +110,7 @@ const getStmtInfo_internal: Server.GetRequest<
             rank: Json.jFail(Json.jNumber,'Number expected'),
             fct: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
           }),
+  signals: [],
 };
 /** Stmt Information */
 export const getStmtInfo: Server.GetRequest<
@@ -108,6 +133,7 @@ const getProbeInfo_internal: Server.GetRequest<
             stmt: Json.jKey<'#stmt'>('#stmt'),
             code: Json.jString,
           }),
+  signals: [],
 };
 /** Probe informations */
 export const getProbeInfo: Server.GetRequest<
@@ -116,37 +142,74 @@ export const getProbeInfo: Server.GetRequest<
     stmt?: Json.key<'#stmt'>, code?: string }
   >= getProbeInfo_internal;
 
+/** Evaluation of an expression or lvalue */
+export interface evaluation {
+  /** Textual representation of the value */
+  value: string;
+  /** Alarms raised by the evaluation */
+  alarms: [ "True" | "False" | "Unknown", string ][];
+  /** List of variables pointed by the value */
+  pointed_vars: [ string, marker ][];
+}
+
+/** Loose decoder for `evaluation` */
+export const jEvaluation: Json.Loose<evaluation> =
+  Json.jObject({
+    value: Json.jFail(Json.jString,'String expected'),
+    alarms: Json.jList(
+              Json.jTry(
+                Json.jPair(
+                  Json.jFail(
+                    Json.jUnion<"True" | "False" | "Unknown">(
+                      Json.jTag("True"),
+                      Json.jTag("False"),
+                      Json.jTag("Unknown"),
+                    ),'Union expected'),
+                  Json.jFail(Json.jString,'String expected'),
+                ))),
+    pointed_vars: Json.jList(
+                    Json.jTry(
+                      Json.jPair(
+                        Json.jFail(Json.jString,'String expected'),
+                        jMarkerSafe,
+                      ))),
+  });
+
+/** Safe decoder for `evaluation` */
+export const jEvaluationSafe: Json.Safe<evaluation> =
+  Json.jFail(jEvaluation,'Evaluation expected');
+
+/** Natural order for `evaluation` */
+export const byEvaluation: Compare.Order<evaluation> =
+  Compare.byFields
+    <{ value: string, alarms: [ "True" | "False" | "Unknown", string ][],
+       pointed_vars: [ string, marker ][] }>({
+    value: Compare.string,
+    alarms: Compare.array(Compare.pair(Compare.structural,Compare.string,)),
+    pointed_vars: Compare.array(Compare.pair(Compare.string,byMarker,)),
+  });
+
 const getValues_internal: Server.GetRequest<
   { callstack?: callstack, target: marker },
-  { v_else?: string, v_then?: string, v_after?: string, values?: string,
-    alarms: [ "True" | "False" | "Unknown", string ][] }
+  { v_else?: evaluation, v_then?: evaluation, v_after?: evaluation,
+    v_before?: evaluation }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getValues',
   input:  Json.jObject({ callstack: jCallstack, target: jMarkerSafe,}),
   output: Json.jObject({
-            v_else: Json.jString,
-            v_then: Json.jString,
-            v_after: Json.jString,
-            values: Json.jString,
-            alarms: Json.jList(
-                      Json.jTry(
-                        Json.jPair(
-                          Json.jFail(
-                            Json.jUnion<"True" | "False" | "Unknown">(
-                              Json.jTag("True"),
-                              Json.jTag("False"),
-                              Json.jTag("Unknown"),
-                            ),'Union expected'),
-                          Json.jFail(Json.jString,'String expected'),
-                        ))),
+            v_else: jEvaluation,
+            v_then: jEvaluation,
+            v_after: jEvaluation,
+            v_before: jEvaluation,
           }),
+  signals: [],
 };
 /** Abstract values for the given marker */
 export const getValues: Server.GetRequest<
   { callstack?: callstack, target: marker },
-  { v_else?: string, v_then?: string, v_after?: string, values?: string,
-    alarms: [ "True" | "False" | "Unknown", string ][] }
+  { v_else?: evaluation, v_then?: evaluation, v_after?: evaluation,
+    v_before?: evaluation }
   >= getValues_internal;
 
 /* ------------------------------------- */

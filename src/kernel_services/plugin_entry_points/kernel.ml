@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -86,6 +86,7 @@ let dkey_rmtmps = register_category "parser:rmtmps"
 let dkey_referenced = register_category "parser:referenced"
 
 let dkey_pp = register_category "pp"
+let dkey_pp_logic = register_category "pp:logic"
 let dkey_compilation_db = register_category "pp:compilation-db"
 
 let dkey_print_bitfields = register_category "printer:bitfields"
@@ -166,6 +167,8 @@ let wkey_int_conversion =
 
 let wkey_cert_exp_46 = register_warn_category "CERT:EXP:46"
 
+let wkey_cert_msc_37 = register_warn_category "CERT:MSC:37"
+
 let wkey_cert_msc_38 = register_warn_category "CERT:MSC:38"
 let () = set_warn_status wkey_cert_msc_38 Log.Werror
 
@@ -192,6 +195,15 @@ let () = set_warn_status wkey_decimal_float Log.Wonce
 let wkey_acsl_extension = register_warn_category "acsl-extension"
 
 let wkey_cmdline = register_warn_category "cmdline"
+
+let wkey_audit = register_warn_category "audit"
+let () = set_warn_status wkey_audit Log.Werror
+
+let wkey_parser_unsupported = register_warn_category "parser:unsupported"
+
+let wkey_asm = register_warn_category "asm:clobber"
+
+let wkey_unnamed_typedef = register_warn_category "parser:unnamed-typedef"
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
@@ -602,7 +614,7 @@ module SymbolicPath =
     (struct
       let option_name = "-add-symbolic-path"
       let module_name = "SymbolicPath"
-      let arg_name = "name_1:path_1,...,name_n:path_n"
+      let arg_name = "path_1:name_1,...,path_n:name_n"
       let existence = Filepath.Indifferent
       let file_kind = "directory"
       let help =
@@ -616,8 +628,7 @@ let () =
        (* keep module [Filepath] synchronized with [SymbolicPath] *)
        Filepath.reset_symbolic_dirs ();
        Datatype.Filepath.Map.iter
-         (fun n p -> Filepath.add_symbolic_dir p (n :> string))
-         map)
+         (fun n p -> Filepath.add_symbolic_dir p n) map)
 
 (* [SymbolicPath] is better to be not projectified,
    but must be saved: use a fake state for saving it without projectifying it *)
@@ -656,6 +667,17 @@ module PrintCode =
       let module_name = "PrintCode"
       let option_name = "-print"
       let help = "pretty print original code with its comments"
+    end)
+
+let () = Parameter_customize.set_group inout_source
+let () = Parameter_customize.do_not_projectify ()
+module PrintAsIs =
+  False
+    (struct
+      let module_name = "PrintAsIs"
+      let option_name = "-print-as-is"
+      let help = "when pretty-printing C code, try to print it as close as \
+                  possible to the internal (Cil) representation"
     end)
 
 let () = Parameter_customize.set_group inout_source
@@ -905,10 +927,12 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
 module Session_dir =
-  P.Empty_string
+  P.Filepath
     (struct
       let option_name = "-session"
-      let arg_name = ""
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
       let help = "directory in which session files are searched"
     end)
 let () = Plugin.session_is_set_ref := Session_dir.is_set
@@ -918,10 +942,12 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
 module Config_dir =
-  P.Empty_string
+  P.Filepath
     (struct
       let option_name = "-config"
-      let arg_name = ""
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
       let help = "directory in which configuration files are searched"
     end)
 let () = Plugin.config_is_set_ref := Config_dir.is_set
@@ -1037,6 +1063,41 @@ module PrintCppCommands =
       let option_name = "-print-cpp-commands"
       let help = "prints the preprocessing command(s) used by Frama-C \
                   and exits."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module AuditPrepare =
+  P.Filepath
+    (struct
+      let option_name = "-audit-prepare"
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "json"
+      let help = "produces audit-related information, such as the list of all \
+                  source files used during parsing (including those in include \
+                  directives) with checksums. Some plug-ins may produce \
+                  additional audit-related information. \
+                  Prints the information as JSON to the specified file, or \
+                  if the file is '-', prints as text to the standard output. \
+                  Requires -cpp-frama-c-compliant."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module AuditCheck =
+  P.Filepath
+    (struct
+      let option_name = "-audit-check"
+      let arg_name = "path"
+      let existence = Filepath.Must_exist
+      let file_kind = "json"
+      let help = "reads an audit JSON file (produced by -audit-prepare) and \
+                  checks compliance w.r.t. it; e.g., if the source files \
+                  were declared and have the expected checksum. \
+                  Raises a warning (with warning key 'audit') in case of \
+                  failed checks. \
+                  Requires -cpp-frama-c-compliant."
     end)
 
 let () = Parameter_customize.set_group parsing

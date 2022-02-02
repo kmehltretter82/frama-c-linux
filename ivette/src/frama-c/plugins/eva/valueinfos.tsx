@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Info Components
 // --------------------------------------------------------------------------
@@ -8,28 +30,34 @@ import { classes } from 'dome/misc/utils';
 import { Hpack, Vpack } from 'dome/layout/boxes';
 import { Code, Cell } from 'dome/controls/labels';
 import * as States from 'frama-c/states';
+import * as Ast from 'frama-c/api/kernel/ast';
+import { ModelProp } from 'frama-c/plugins/eva/model';
 
 // Locals
 import { EvaAlarm } from './cells';
 import { Callsite } from './stacks';
-import { useModel } from './model';
 
 // --------------------------------------------------------------------------
 // --- Stmt Printer
 // --------------------------------------------------------------------------
 
 interface StmtProps {
-  stmt?: string;
-  rank?: number;
+  stmt?: Ast.marker;
+  marker: Ast.marker;
+  short?: boolean;
 }
 
 export function Stmt(props: StmtProps) {
-  const { rank, stmt } = props;
-  if (rank === undefined || !stmt) return null;
-  const title = `Stmt at global rank ${rank} (internal id: ${stmt})`;
+  const { stmt, marker, short } = props;
+  if (!stmt) return null;
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+  const line = markersInfo.getData(marker)?.sloc?.line;
+  const filename = markersInfo.getData(marker)?.sloc?.base;
+  const title = markersInfo.getData(stmt)?.descr;
+  const text = short ? `@L${line}` : `@${filename}:${line}`;
   return (
     <span className="dome-text-cell eva-stmt" title={title}>
-      @S{rank}
+      {text}
     </span>
   );
 }
@@ -38,13 +66,13 @@ export function Stmt(props: StmtProps) {
 // --- Alarms Panel
 // --------------------------------------------------------------------------
 
-export function AlarmsInfos() {
-  const model = useModel();
+export function AlarmsInfos(props: ModelProp) {
+  const { model } = props;
   const probe = model.getFocused();
   if (probe) {
     const callstack = model.getCallstack();
     const domain = model.values.getValues(probe, callstack);
-    const alarms = domain?.alarms ?? [];
+    const alarms = domain?.v_before.alarms ?? [];
     if (alarms.length > 0) {
       const renderAlarm = ([status, alarm]: EvaAlarm) => {
         const className = `eva-alarm-info eva-alarm-${status}`;
@@ -66,13 +94,13 @@ export function AlarmsInfos() {
 // --- Stack Panel
 // --------------------------------------------------------------------------
 
-export function StackInfos() {
-  const model = useModel();
+export function StackInfos(props: ModelProp) {
+  const { model } = props;
   const [, setSelection] = States.useSelection();
   const focused = model.getFocused();
   const callstack = model.getCalls();
   if (callstack.length <= 1) return null;
-  const makeCallsite = ({ caller, stmt, rank }: Callsite) => {
+  const makeCallsite = ({ caller, stmt }: Callsite) => {
     if (!caller || !stmt) return null;
     const key = `${caller}@${stmt}`;
     const isFocused = focused?.marker === stmt;
@@ -103,7 +131,7 @@ export function StackInfos() {
         onDoubleClick={onDoubleClick}
       >
         {caller}
-        <Stmt stmt={stmt} rank={rank} />
+        <Stmt stmt={stmt} marker={stmt} />
       </Cell>
     );
   };

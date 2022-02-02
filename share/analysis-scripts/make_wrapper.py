@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -22,7 +22,7 @@
 #                                                                        #
 ##########################################################################
 
-# This script serves as wrapper to 'make' (when using the analysis-scripts
+# This script serves as wrapper to GNU make (when using the analysis-scripts
 # GNUmakefile template): it parses the output and suggests useful commands
 # whenever it can, by calling frama-c-script itself.
 
@@ -37,6 +37,16 @@ import tempfile
 MIN_PYTHON = (3, 6) # for automatic Path conversions
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
+
+# Check if GNU make is available and has the minimal required version
+# (4.0). Otherwise, this script will fail.
+# We first test with 'gmake', then 'make', then fail.
+make_cmd = "gmake"
+get_make_major_version_args = r" --version | grep 'GNU Make\s\+\([0-9]\+\)\..*$' | sed -E 's|GNU Make +([0-9]+)\..*|\1|'"
+if os.system(f"command -v {make_cmd} >{os.devnull} && test \"$({make_cmd} {get_make_major_version_args})\" -ge 4 2>{os.devnull}") != 0:
+    make_cmd = "make"
+    if os.system(f"command -v {make_cmd} >{os.devnull} && test \"$({make_cmd} {get_make_major_version_args})\" -ge 4 2>{os.devnull}") != 0:
+        sys.exit("error: could not find GNU make >= 4.0 (tried 'gmake' and 'make')")
 
 parser = argparse.ArgumentParser(description="""
 Builds the specified target, parsing the output to identify and recommend
@@ -54,7 +64,7 @@ if not framac_bin:
 framac_script = f"{framac_bin}/frama-c-script"
 
 output_lines = []
-cmd_list = ['make', "-C", make_dir] + args
+cmd_list = [make_cmd, "-C", make_dir] + args
 with subprocess.Popen(cmd_list,
                       stdout=subprocess.PIPE,
                       stderr=subprocess.PIPE) as proc:
@@ -69,12 +79,45 @@ with subprocess.Popen(cmd_list,
 
 re_missing_spec = re.compile("Neither code nor specification for function ([^,]+),")
 re_recursive_call_start = re.compile("detected recursive call")
-re_recursive_call_end = re.compile("Use -eva-ignore-recursive-calls to ignore")
+re_recursive_call_stack_start = re.compile("^\s+stack:")
+re_recursive_call_stack_end = re.compile("^\[")
 
 tips = []
 
 lines = iter(output_lines)
 for line in lines:
+    match = re_recursive_call_start.search(line)
+    if match:
+       def action():
+         print("Consider patching, stubbing or adding an ACSL " +
+               "specification to the recursive call, " +
+               "then re-run the analysis.")
+       while True:
+         msg_lines = []
+         match = re_recursive_call_start.search(line)
+         try:
+             while not match:
+                line = next(lines)
+                match = re_recursive_call_start.search(line)
+             match = None
+             while not match:
+                 line = next(lines)
+                 match = re_recursive_call_stack_start.search(line)
+             match = None
+             while not match:
+                  msg_lines.append(line)
+                  line = next(lines)
+                  match = re_recursive_call_stack_end.search(line)
+             # note: this ending line can also match re_missing_spec
+             tip = {"message": "Found recursive call at:\n" +
+                    "".join(msg_lines),
+                    "action":action
+                    }
+             tips.append(tip)
+             break
+         except StopIteration:
+             print("** Error: did not match expected regex before EOF")
+             assert False
     match = re_missing_spec.search(line)
     if match:
        fname = match.group(1)
@@ -109,30 +152,6 @@ for line in lines:
               "action":partial(action, fname)
        }
        tips.append(tip)
-    else:
-       match = re_recursive_call_start.search(line)
-       if match:
-          def action():
-             print("Consider patching or stubbing the recursive call, " +
-                   "then re-run the analysis.")
-          msg_lines = []
-          line = next(lines)
-          while True:
-             match = re_recursive_call_end.search(line)
-             if match:
-                tip = {"message": "Found recursive call at:\n" +
-                       "\n".join(msg_lines),
-                       "action":action
-                       }
-                tips.append(tip)
-                break
-             else:
-                msg_lines.append(line)
-                try:
-                   line = next(lines)
-                except StopIteration:
-                   print("** Error: EOF without ending recursive call stack?")
-                   assert False
 
 if tips != []:
    print("")

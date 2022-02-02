@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Diff Text Rendering
 // --------------------------------------------------------------------------
@@ -136,26 +158,24 @@ export function Diff3(props: Diff3Props) {
 export interface DiffProps {
   text?: string;
   diff?: string;
-  diffA?: string;
-  diffB?: string;
+  diff2?: string;
 }
 
 export function Diff(props: DiffProps) {
-  const { text, diff, diffA, diffB } = props;
+  const { text, diff, diff2 } = props;
   if (text === undefined)
-    return diff ? <>{diff}</> : null;
+    return null;
+  if (diff !== undefined && diff2 !== undefined)
+    return <Diff3 text={text} diffA={diff} diffB={diff2} />;
   if (diff !== undefined) {
     if (diff === text) return <>{text}</>;
     return <Diff2 text={text} diff={diff} />;
   }
-  if (diffA === undefined) {
-    if (diffB === undefined) return <>{text}</>;
-    return <Diff2 text={text} diff={diffB} />;
-  } if (diffB === undefined) {
-    if (diffA === undefined) return <>{text}</>;
-    return <Diff2 text={text} diff={diffA} />;
+  if (diff2 !== undefined) {
+    if (diff2 === text) return <>{text}</>;
+    return <Diff2 text={text} diff={diff2} />;
   }
-  return <Diff3 text={text} diffA={diffA} diffB={diffB} />;
+  return <>{text}</>;
 }
 
 // --------------------------------------------------------------------------

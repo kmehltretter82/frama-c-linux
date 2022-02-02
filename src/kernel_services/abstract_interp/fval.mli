@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -120,7 +120,7 @@ val subdiv_float_interval : kind -> t -> t * t
     log10f(3, FE_TONEAREST) < log10f(3, FE_DOWNWARD).
 
     Also, we have observed bugs in [powf], which is called when [kind=Float32].
- *)
+*)
 
 val exp : kind -> t -> t
 val log: kind -> t -> t

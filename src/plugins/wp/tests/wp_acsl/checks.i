@@ -1,14 +1,14 @@
 /* run.config
-   PLUGIN: @PTEST_PLUGIN@ report from,inout,eva,scope,variadic
-   OPT: -eva -then -report
+PLUGIN: wp,rtegen,scope,eva,report
+   OPT: -then -eva -then -report
+PLUGIN: wp,rtegen
    OPT: -wp-prop=@check
    OPT: -wp-prop=-@check
 */
 /* run.config_qualif
-   PLUGIN: @PTEST_PLUGIN@ report
+PLUGIN: wp,rtegen,report
    OPT: -wp-steps 5 -then -report
 */
-// note: eva and wp gives the same reporting
 //@ axiomatic A { predicate P reads \nothing ; }
 void main() {
   //@check  c1: P;
@@ -17,3 +17,4 @@ void main() {
   //@assert a2: P;
   ;
 }
+// note: eva and wp gives the same reporting

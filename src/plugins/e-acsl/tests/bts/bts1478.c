@@ -3,13 +3,13 @@
 */
 
 int global_i;
-int* global_i_ptr = &global_i;
+int *global_i_ptr = &global_i;
 int global_i = 0;
 
 /*@ requires global_i == 0;
     requires \valid(global_i_ptr);
     requires global_i_ptr == &global_i; */
-void loop(void) { }
+void loop(void) {}
 
 int main(void) {
   loop();

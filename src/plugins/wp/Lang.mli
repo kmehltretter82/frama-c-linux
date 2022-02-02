@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -92,6 +92,7 @@ and model = {
   m_result : sort ;
   m_typeof : tau option list -> tau ;
   m_source : source ;
+  m_coloring : bool ;
 }
 
 and source =
@@ -123,6 +124,7 @@ val extern_s :
   ?params:sort list ->
   ?sort:sort ->
   ?result:tau ->
+  ?coloring:bool ->
   ?typecheck:(tau option list -> tau) ->
   string -> lfun
 
@@ -134,6 +136,7 @@ val extern_f :
   ?params:sort list ->
   ?sort:sort ->
   ?result:tau ->
+  ?coloring:bool ->
   ?typecheck:(tau option list -> tau) ->
   ('a,Format.formatter,unit,lfun) format4 -> 'a
 (** balance just give a default when link is not specified *)
@@ -144,16 +147,17 @@ val extern_p :
   ?prop:string ->
   ?link:Engine.link infoprover ->
   ?params:sort list ->
+  ?coloring:bool ->
   unit -> lfun
 
 val extern_fp : library:library -> ?params:sort list ->
-  ?link:string infoprover -> string -> lfun
+  ?link:string infoprover -> ?coloring:bool -> string -> lfun
 
 val generated_f : ?context:bool -> ?category:lfun category ->
-  ?params:sort list -> ?sort:sort -> ?result:tau ->
+  ?params:sort list -> ?sort:sort -> ?result:tau -> ?coloring:bool ->
   ('a,Format.formatter,unit,lfun) format4 -> 'a
 
-val generated_p : ?context:bool -> string -> lfun
+val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
 
 val extern_t:
   string -> link:string infoprover -> library:library -> mdt
@@ -192,6 +196,8 @@ val parameters : (lfun -> sort list) -> unit (** definitions *)
 
 val name_of_lfun : lfun -> string
 val name_of_field : field -> string
+
+val is_coloring_lfun : lfun -> bool
 
 (** {2 Logic Formulae} *)
 
@@ -376,9 +382,9 @@ sig
 
   module Subst :
   sig
-    val get : sigma -> term -> term
+    val copy : sigma -> sigma
+    val find : sigma -> term -> term
     val add : sigma -> term -> term -> unit
-    val add_map : sigma -> term Tmap.t -> unit
     val add_fun : sigma -> (term -> term) -> unit
     val add_filter : sigma -> (term -> bool) -> unit
   end
@@ -520,6 +526,7 @@ module N: sig
   val ( >= ): F.cmp (** {! F.p_leq } with inversed argument *)
   val ( <> ): F.cmp (** {! F.p_neq } *)
 
+  val ( ==> ): F.operator (** {! F.p_imply } *)
   val ( && ): F.operator (** {! F.p_and } *)
   val ( || ): F.operator (** {! F.p_or } *)
   val not: F.pred -> F.pred (** {! F.p_not } *)

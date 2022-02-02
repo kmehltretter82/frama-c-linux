@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -42,7 +42,6 @@ type simple_call = {
   rest: exp list;                     (* Extra arguments. *)
   return: varinfo option;             (* Fake varinfo where the result of the
                                          call is stored. *)
-  recursive: bool;                    (* Is the call recursive? *)
 }
 
 (** Simplest interface for an abstract domain. No exchange of information with
@@ -79,7 +78,6 @@ module type Minimal = sig
   (** Pretty printers. *)
 
   val pretty: Format.formatter -> t -> unit
-  val show_expr: t -> Format.formatter -> exp -> unit
 end
 
 (** The simplest interface of domains, equipped with a frama-c datatype. *)
@@ -142,7 +140,4 @@ module type Simple_Cvalue = sig
 
   val enter_scope: Abstract_domain.variable_kind -> varinfo list -> t -> t
   val leave_scope: kernel_function -> varinfo list -> t -> t
-
-  (** Pretty printer. *)
-  val show_expr: t -> Format.formatter -> exp -> unit
 end

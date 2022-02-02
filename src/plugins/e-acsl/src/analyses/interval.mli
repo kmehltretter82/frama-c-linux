@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -62,6 +62,12 @@ include Datatype.S_with_collections with type t = ival
 
 val is_included: t -> t -> bool
 val join: t -> t -> t
+val meet: t -> t -> t
+
+val widen: t -> t
+(** @return the smallest interval containing a disjoint union of intervals *)
+
+val is_singleton_int: t -> bool
 
 val top_ival: t
 val ival: Integer.t -> Integer.t -> t
@@ -78,6 +84,13 @@ val interv_of_typ: Cil_types.typ -> t
 (** @return the smallest interval which contains the given C type.
     @raise Is_a_real if the given type is a float type.
     @raise Not_a_number if the given type does not represent any number. *)
+
+val extended_interv_of_typ: Cil_types.typ -> t
+(** @return the interval [n..m+1] when interv_of_typ returns [n..m].
+    It is in particular useful for computing bounds of quantified variables.
+    @raise Is_a_real if the given type is a float type.
+    @raise Not_a_number if the given type does not represent any number. *)
+
 
 (* ************************************************************************** *)
 (** {3 Environment for interval computations} *)
@@ -104,6 +117,6 @@ val infer: Cil_types.term -> t
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,7 +25,7 @@ module StringList = Datatype.List(Datatype.String)
 module Flags =
   State_builder.Hashtbl
     (Datatype.Filepath.Hashtbl)
-    (StringList)
+    (Datatype.Pair(Datatype.Filepath)(StringList))
     (struct
       let name ="JsonCompilationDatabase.Flags"
       let dependencies = [Kernel.JsonCompilationDatabase.self]
@@ -38,7 +38,15 @@ type arg_type =
   | Undefine of string
 
 let whitelisted_prefixes =
-  [Path "-I"; Path "-include"; Path "-imacros"; Define "-D"; Undefine "-U"]
+  [
+    Path "-I";
+    Path "-idirafter";
+    Path "-include";
+    Path "-imacros";
+    Path "-isystem";
+    Define "-D";
+    Undefine "-U"
+  ]
 
 let string_of_arg_type = function
     Path s | Define s | Undefine s -> s
@@ -131,48 +139,14 @@ let split_command_args s =
     never need quotes. *)
 let quote_define_argument arg = Format.sprintf "%S" arg
 
-let parse_entry jcdb_dir r =
-  let open Yojson.Basic.Util in
-  let filename = r |> member "file" |> to_string in
-  let dirname  = r |> member "directory" |> to_string_option |> Option.value ~default:jcdb_dir in
-  let dirname =
-    if Filename.is_relative dirname then Filename.concat jcdb_dir dirname
-    else dirname
-  in
-  let dirname = Filepath.normalize dirname in
-  let path = Datatype.Filepath.of_string ~base_name:dirname filename in
-
-  (* get the list of arguments, and a flag indicating if the arguments
-     were given via 'command' or 'arguments'; the latter require quoting *)
-  let string_option_list, requote =
-    (* Note: the JSON Compilation Databse specification specifies that
-       "either arguments or command is required", but does NOT specify what
-       happens when both are present. There is a LLVM commit from 2015
-       (https://reviews.llvm.org/D10365) that mentions:
-       "Arguments and Command can now be in the same compilation database for
-        the same file. Arguments are preferred when both are present."
-       The code below follows this behavior. *)
-    try
-      let args = List.map to_string (r |> member "arguments" |> to_list) in
-      args, true
-    with _ ->
-    try
-      let s = r |> member "command" |> to_string in
-      split_command_args s, false
-    with _ ->
-      Kernel.abort "compilation database: expected 'arguments' or 'command'"
-  in
-  (* conversion for '-I' flags *)
-  let convert_path arg =
-    if Filename.is_relative arg then Filename.concat dirname arg
-    else arg
-  in
+(* Filters and normalize useful flags: -I, -D, -U, ... *)
+let filter_useful_flags ~requote option_list =
   let convert_define arg =
     if requote then quote_define_argument arg else arg
   in
   let process_prefix prefix suffix =
     match prefix with
-    | Path s -> s ^ convert_path suffix
+    | Path s -> s ^ suffix
     | Define s -> s ^ convert_define suffix
     | Undefine s -> s ^ suffix
   in
@@ -208,24 +182,41 @@ let parse_entry jcdb_dir r =
             let new_arg = process_prefix prefix arg in
             (None, new_arg :: acc_res)
           end
-      ) (None, []) string_option_list
+      ) (None, []) option_list
   in
-  (* Note: the same file may be compiled several times, under different
-     (and possibly incompatible) configurations, leading to multiple
-     occurrences in the list. Since we cannot infer which of them is the
-     "right" one, we replace them with the latest ones found, warning the
-     user if previous flags were different. *)
-  let flags = List.rev res in
+  List.rev res
+
+(* The same file may be compiled several times, under different
+   (and possibly incompatible) configurations, leading to multiple
+   occurrences in the list. Since we cannot infer which of them is the
+   "right" one, we replace them with the latest ones found, warning the
+   user if previous flags were different. *)
+let update_flags_verbosely path (dir, flags) =
   try
-    let previous_flags = Flags.find path in
-    if previous_flags <> flags then
-      let removed_flags = List.filter (fun e -> not (List.mem e previous_flags)) flags in
+    let (previous_dir, previous_flags) = Flags.find path in
+    let must_replace = ref false in
+    if previous_dir <> dir then begin
+      Kernel.warning ~wkey:Kernel.wkey_jcdb
+        "@[<v>found different directories for '%a', replacing old directory.@ \
+         Old directory: %a@ \
+         New directory: %a@]"
+        Datatype.Filepath.pretty path
+        Datatype.Filepath.pretty previous_dir
+        Datatype.Filepath.pretty dir;
+      must_replace := true
+    end;
+    if previous_flags <> flags then begin
+      let removed_flags =
+        List.filter (fun e -> not (List.mem e previous_flags)) flags
+      in
       let removed_str =
         if removed_flags = [] then "" else
           Format.asprintf "@ Old flags no longer present: %a"
             (Pretty_utils.pp_list ~sep:" " Format.pp_print_string) removed_flags
       in
-      let added_flags = List.filter (fun e -> not (List.mem e flags)) previous_flags in
+      let added_flags =
+        List.filter (fun e -> not (List.mem e flags)) previous_flags
+      in
       let added_str =
         if added_flags = [] then "" else
           Format.asprintf "@ New flags not previously present: %a"
@@ -234,10 +225,65 @@ let parse_entry jcdb_dir r =
       Kernel.warning ~wkey:Kernel.wkey_jcdb
         "@[<v>found duplicate flags for '%a', replacing old flags.%s%s@]"
         Datatype.Filepath.pretty path removed_str added_str;
-      Flags.replace path flags
+      must_replace := true
+    end;
+    if !must_replace then
+      Flags.replace path (dir, flags)
   with
   | Not_found ->
-    Flags.add path flags
+    Flags.add path (dir, flags)
+
+let parse_build_entry jbdb_dir r =
+  let open Yojson.Basic.Util in
+  let filenames = r |> member "sources" |> to_list |> List.map to_string in
+  let dirname   = r |> member "directory" |> to_string in
+  let dirname =
+    if Filename.is_relative dirname then Filename.concat jbdb_dir dirname
+    else dirname
+  in
+  let dirname = Filepath.normalize dirname in
+  let args = List.map to_string (r |> member "arguments" |> to_list) in
+  let flags = filter_useful_flags ~requote:true args in
+  List.iter (fun filename ->
+      let path = Datatype.Filepath.of_string ~base_name:dirname filename in
+      let dirpath = Datatype.Filepath.of_string dirname in
+      update_flags_verbosely path (dirpath, flags)
+    ) filenames
+
+let parse_compilation_entry jcdb_dir r =
+  let open Yojson.Basic.Util in
+  let filename = r |> member "file" |> to_string in
+  let dirname  = r |> member "directory" |> to_string_option |> Option.value ~default:jcdb_dir in
+  let dirname =
+    if Filename.is_relative dirname then Filename.concat jcdb_dir dirname
+    else dirname
+  in
+  let dirname = Filepath.normalize dirname in
+  let path = Datatype.Filepath.of_string ~base_name:dirname filename in
+
+  (* get the list of arguments, and a flag indicating if the arguments
+     were given via 'command' or 'arguments'; the latter require quoting *)
+  let string_option_list, requote =
+    (* Note: the JSON Compilation Database specification specifies that
+       "either arguments or command is required", but does NOT specify what
+       happens when both are present. There is a LLVM commit from 2015
+       (https://reviews.llvm.org/D10365) that mentions:
+       "Arguments and Command can now be in the same compilation database for
+        the same file. Arguments are preferred when both are present."
+       The code below follows this behavior. *)
+    try
+      let args = List.map to_string (r |> member "arguments" |> to_list) in
+      args, true
+    with _ ->
+    try
+      let s = r |> member "command" |> to_string in
+      split_command_args s, false
+    with _ ->
+      Kernel.abort "compilation database: expected 'arguments' or 'command'"
+  in
+  let flags = filter_useful_flags ~requote string_option_list in
+  let dirpath = Datatype.Filepath.of_string dirname in
+  update_flags_verbosely path (dirpath, flags)
 
 let compute_flags_from_file () =
   let database = (Kernel.JsonCompilationDatabase.get () :> string) in
@@ -253,6 +299,14 @@ let compute_flags_from_file () =
       let r_list =
         Yojson.Basic.from_file jcdb_path |> Yojson.Basic.Util.to_list
       in
+      let is_build_database =
+        try
+          List.hd r_list |> Yojson.Basic.Util.member "sources" <> `Null
+        with _ -> false
+      in
+      let parse_entry =
+        if is_build_database then parse_build_entry else parse_compilation_entry
+      in
       List.iter (parse_entry jcdb_dir) r_list;
     with
     | Sys_error msg
@@ -264,10 +318,10 @@ let compute_flags_from_file () =
   Flags.mark_as_computed ()
 
 let get_flags f =
-  if not (Filepath.Normalized.is_unknown (Kernel.JsonCompilationDatabase.get ())) then begin
+  if not (Kernel.JsonCompilationDatabase.is_empty ()) then begin
     if not (Flags.is_computed ()) then compute_flags_from_file ();
     try
-      let flags = Flags.find f in
+      let (_, flags) = Flags.find f in
       Kernel.feedback ~dkey:Kernel.dkey_compilation_db
         "flags found for '%a': %a"  Datatype.Filepath.pretty f StringList.pretty flags;
       flags
@@ -277,6 +331,22 @@ let get_flags f =
       []
   end
   else []
+
+let get_dir f =
+  if not (Kernel.JsonCompilationDatabase.is_empty ()) then begin
+    if not (Flags.is_computed ()) then compute_flags_from_file ();
+    try
+      let (dir, _) = Flags.find f in
+      Kernel.feedback ~dkey:Kernel.dkey_compilation_db
+        "directory found for '%a': %a"
+        Datatype.Filepath.pretty f Datatype.Filepath.pretty dir;
+      Some dir
+    with Not_found ->
+      Kernel.feedback ~dkey:Kernel.dkey_compilation_db
+        "no directory found for '%a'" Datatype.Filepath.pretty f;
+      None
+  end
+  else None
 
 let has_entry f =
   if not (Flags.is_computed ()) then compute_flags_from_file ();

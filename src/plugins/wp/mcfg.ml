@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -65,16 +65,19 @@ module type S = sig
   val new_env : ?lvars:Cil_types.logic_var list -> kernel_function -> t_env
 
   val add_axiom : WpPropId.prop_id -> LogicUsage.logic_lemma -> unit
-  val add_hyp  : t_env -> WpPropId.pred_info -> t_prop -> t_prop
+  val add_hyp :
+    ?for_pid:WpPropId.prop_id -> t_env -> WpPropId.pred_info -> t_prop -> t_prop
   val add_goal : t_env -> WpPropId.pred_info -> t_prop -> t_prop
+  val add_subgoal : t_env -> WpPropId.pred_info -> ?deps:Property.Set.t ->
+    predicate -> stmt -> WpPropId.effect_source -> t_prop -> t_prop
 
   val add_assigns : t_env -> WpPropId.assigns_info -> t_prop -> t_prop
 
   (** [use_assigns env hid kind assgn goal] performs the havoc on the goal.
    * [hid] should be [None] iff [assgn] is [WritesAny],
    * and tied to the corresponding identified_property otherwise.*)
-  val use_assigns : t_env -> stmt option -> WpPropId.prop_id option ->
-    WpPropId.assigns_desc -> t_prop -> t_prop
+  val use_assigns : t_env ->
+    WpPropId.prop_id option -> WpPropId.assigns_desc -> t_prop -> t_prop
 
   val label  : t_env -> stmt option -> Clabels.c_label -> t_prop -> t_prop
   val init : t_env -> varinfo -> init option -> t_prop -> t_prop
@@ -100,6 +103,10 @@ module type S = sig
     kernel_function -> exp list ->
     pre: WpPropId.pred_info list ->
     t_prop -> t_prop
+
+  val call_terminates : t_env -> WpPropId.pred_info ->
+    stmt -> kernel_function -> exp list ->
+    callee_t:predicate -> t_prop -> t_prop
 
   val call : t_env -> stmt ->
     lval option -> kernel_function -> exp list ->

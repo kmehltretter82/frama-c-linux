@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,7 +28,20 @@
     - in case of temporal validity checks, adding the attribute "aligned" to
       variables that are not sufficiently aligned. *)
 
+open Cil_types
+
 val prepare: unit -> unit
+(** Prepare the AST *)
+
+val sound_verdict: unit -> varinfo
+(** @return the [varinfo] representing the E-ACSL global variable that indicates
+    whether the verdict emitted by E-ACSL is sound. *)
+
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
+
+val is_libc_writing_memory_ref: (varinfo -> bool) ref
 
 (*
 Local Variables:

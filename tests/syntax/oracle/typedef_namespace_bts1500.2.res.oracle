@@ -1,5 +1,5 @@
 [kernel] Parsing typedef_namespace_bts1500.c (with preprocessing)
-[kernel] typedef_namespace_bts1500.c:31: User Error: 
+[kernel] typedef_namespace_bts1500.c:32: User Error: 
   redefinition of 'digit' with different kind in the same scope.
   Previous declaration was at typedef_namespace_bts1500.c:7
 [kernel] User Error: stopping on file "typedef_namespace_bts1500.c" that has errors. Add

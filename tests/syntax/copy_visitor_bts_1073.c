@@ -1,10 +1,10 @@
 /* run.config
+PLUGIN: variadic
  MODULE: @PTEST_NAME@
    OPT:
  MODULE: @PTEST_NAME@_bis
    OPT: -test -then-on filtered -print
 */
-
 #include "stdio.h"
 
 int f(int x);

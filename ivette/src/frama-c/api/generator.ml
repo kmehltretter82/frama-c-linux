@@ -335,6 +335,10 @@ let makeDeclaration fmt names d =
     Format.fprintf fmt "  name:   '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
     Format.fprintf fmt "  input:  %a,@\n" makeParam input ;
     Format.fprintf fmt "  output: %a,@\n" makeParam output ;
+    Format.fprintf fmt "  signals: [%a],@\n"
+      (Pretty_utils.pp_list ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]"
+         (fun fmt s -> Format.fprintf fmt "{ name: '%s' }" s))
+         rq.rq_signals;
     Format.fprintf fmt "};@\n" ;
     makeDescr fmt d.d_descr ;
     Format.fprintf fmt
@@ -432,6 +436,19 @@ let depends d =
   match d.Pkg.d_kind with
   | D_loose(id,t) when makeLooseNeedSafe t -> [Pkg.Derived.safe id]
   | D_safe(id,t) when not (makeLooseNeedSafe t) -> [Pkg.Derived.loose id]
+  | D_value _ ->
+    let id = d.d_ident in
+    [
+      Pkg.Derived.signal id;
+      Pkg.Derived.getter id
+    ]
+  | D_state _ ->
+    let id = d.d_ident in
+    [
+      Pkg.Derived.signal id;
+      Pkg.Derived.getter id;
+      Pkg.Derived.setter id
+    ]
   | D_array _ ->
     let id = d.d_ident in
     let data = Pkg.Derived.data id in

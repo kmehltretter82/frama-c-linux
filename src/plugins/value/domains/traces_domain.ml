@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -690,7 +690,7 @@ module Traces = struct
       | edge :: tl ->
         match edge.edge_trans with
         | Loop (stmt',s,last) when Stmt.equal stmt' stmt ->
-          s, Graph.from_shape_id last
+          s, last
         | _ -> find_same_loop tl
     in
     let s,last = find_same_loop succs in
@@ -772,7 +772,7 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
       and iter_vertex l g =
         GraphShape.iter (fun k e -> f {node=k;loops=l}; List.iter (iter_edge k l) e) g
       in
-      iter_vertex [] (Graph.shape g)
+      iter_vertex [] g
     let iter_edges_e f g =
       let rec iter_edge k l e =
         f (Usual(k,e,l));
@@ -788,7 +788,7 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
             | [], Some back -> f (Back(back,l,k))
             | e, _ -> List.iter (iter_edge k l) e) g
       in
-      iter_vertex None [] (Graph.shape g)
+      iter_vertex None [] g
 
     let graph_attributes _ = []
     let default_vertex_attributes :
@@ -834,7 +834,7 @@ let rec complete_graph (graph:Graph.t) =
               | Msg _ -> e
               | Loop (stmt,s,g) ->
                 let n = e.edge_dst in
-                let g = Graph.shape (complete_graph (Graph.from_shape_id g)) in
+                let g = complete_graph g in
                 { edge_dst = n; edge_trans = Loop(stmt,s,g) }
             in
             Graph.join graph m, e)
@@ -843,175 +843,6 @@ let rec complete_graph (graph:Graph.t) =
       Graph.join graph (Graph.singleton k l)
     ) graph Graph.empty
 
-
-module Internal = struct
-  type nonrec state = state
-  type value = Cvalue.V.t
-  type location = Precise_locs.precise_location
-  type origin
-
-  include (Traces: sig
-             include Datatype.S_with_collections with type t = state
-             include Abstract_domain.Lattice with type state := state
-           end)
-
-  let log_category = Value_parameters.register_category "d-traces"
-
-  let assign ki lv e _v _valuation state =
-    let trans = Assign (ki, lv.Eval.lval, lv.Eval.ltyp, e) in
-    `Value (Traces.add_trans state trans)
-
-  let assume stmt e pos _valuation state =
-    let trans = Assume (stmt, e, pos) in
-    `Value (Traces.add_trans state trans)
-
-  let start_call stmt call _valuation state =
-    let kf = call.Eval.kf in
-    if Kernel_function.is_definition kf then
-      let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
-          (Kernel_function.is_definition call.Eval.kf) in
-      let state = Traces.add_trans state (Msg msg) in
-      let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
-      let state = Traces.add_trans state (EnterScope (kf, formals)) in
-      let state = List.fold_left (fun state arg ->
-          Traces.add_trans state
-            (Assign (Kstmt stmt, Cil.var arg.Eval.formal,
-                     arg.Eval.formal.Cil_types.vtype,
-                     arg.Eval.concrete))) state call.Eval.arguments in
-      `Value state
-    else
-      (** enter the scope of the dumb result variable *)
-      let var = call.Eval.return in
-      let state = match var with
-        | Some var -> Traces.add_trans state (EnterScope (kf, [var]))
-        | None -> state in
-      let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
-      let state = Traces.add_trans state
-          (CallDeclared (call.Eval.kf, exps, Option.map Cil.var var))
-      in `Value {state with call_declared_function = true}
-
-  let finalize_call _stmt call ~pre:_ ~post =
-    if post.call_declared_function
-    then `Value {post with call_declared_function = false}
-    else
-      let msg = Format.asprintf "finalize_call: %s" (Kernel_function.get_name call.Eval.kf) in
-      let state = Traces.add_trans post (Msg msg) in
-      `Value state
-
-  let update _valuation state = `Value state
-
-  let show_expr _valuation state fmt _expr = Traces.pretty fmt state
-
-  (* Memexec *)
-  (* This domains infers no relation between variables. *)
-  let relate _kf _bases _state = Base.SetLattice.bottom
-  (* Do not filter the state: the memexec cache will be applied only on function
-     calls for which the entry states are equal. This almost completely
-     disable memexec, but is always sound. *)
-  let filter _kf _kind _bases state = state
-  (* As memexec cache is only applied on equal entry states, the previous
-     output state is a correct output for the current input state. *)
-  let reuse _kf _bases ~current_input:_ ~previous_output:state = state
-
-  let empty () = Traces.empty
-  let initialize_variable lv _ ~initialized:_ _ state =
-    Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
-  let initialize_variable_using_type var_kind varinfo state =
-    let kind_str =
-      match var_kind with
-      | Abstract_domain.Global   -> "global"
-      | Abstract_domain.Local _  -> "local"
-      | Abstract_domain.Formal _ -> "formal"
-      | Abstract_domain.Result _ -> "result"
-    in
-    let msg =
-      Format.asprintf "initialize@ %s variable@ using@ type@ %a"
-        kind_str Varinfo.pretty varinfo
-    in
-    Traces.add_trans state (Msg msg)
-
-  (* TODO *)
-  let logic_assign _assign _location state =
-    Traces.add_trans state (Msg "logic assign")
-
-  (* Logic *)
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
-
-  let storage () = true
-
-  let top_query = `Value (Cvalue.V.top, None), Alarmset.all
-
-  let extract_expr _oracle _state _expr = top_query
-  let extract_lval _oracle _state _lv _typ _locs = top_query
-
-  let backward_location _state _lval _typ loc value =
-    `Value (loc, value)
-
-  let enter_loop stmt state =
-    let state = Traces.add_trans state (Msg "enter_loop") in
-    let state = if not (Value_parameters.TracesUnrollLoop.get ())
-      then Traces.add_loop stmt state
-      else { state with current = UnrollLoop(stmt,state.current) } in
-    state
-
-  let incr_loop_counter _ state =
-    match state.current with
-    | Base _ -> assert false
-    | UnrollLoop(_,_) -> state
-    | OpenLoop(stmt,s,last,_,g,l) ->
-      let last = Graph.join last g in
-      let last = if Value_parameters.TracesUnifyLoop.get () then
-          let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
-          let last = Graph.join last old_last in
-          assert (Node.equal s s');
-          Stmt.Hashtbl.add state.all_loop_start stmt (s,last);
-          last
-        else last
-      in
-      let current = OpenLoop(stmt,s,last,s,Graph.empty,l) in
-      let state = { state with current } in
-      (* Traces.add_trans state (Msg("incr_loop_counter")) *)
-      state
-
-  let leave_loop stmt' state =
-    match state.current with
-    | Base _ -> assert false (* absurd: we are in at least a loop *)
-    | UnrollLoop(_,l) -> { state with current = l }
-    | OpenLoop(stmt,s,last,old_current_node,g,current) ->
-      assert (Stmt.equal stmt stmt');
-      let state = { state with current } in
-      let last = if Value_parameters.TracesUnifyLoop.get () then
-          let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
-          let last = Graph.join last old_last in
-          assert (Node.equal s s');
-          Stmt.Hashtbl.add state.all_loop_start stmt (s,last);
-          last
-        else last
-      in
-      let state = if Graph.is_empty last then state
-        else Traces.add_trans state (Loop(stmt,s,Graph.shape last)) in
-      let state = Traces.copy_edges s old_current_node g state in
-      Traces.add_trans state (Msg "leave_loop")
-
-
-  let enter_scope kind vars state =
-    match kind with
-    | Abstract_domain.Global ->
-      { state with globals = vars @ state.globals }
-    | Abstract_domain.Formal kf ->
-      if Kernel_function.equal kf (fst (Globals.entry_point ()))
-      then { state with main_formals = vars @ state.main_formals }
-      else state
-    | Abstract_domain.(Local kf | Result kf) ->
-      Traces.add_trans state (EnterScope (kf, vars))
-
-  let leave_scope kf vars state =
-    Traces.add_trans state (LeaveScope (kf, vars))
-
-  let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
-
-end
 
 let dummy_loc = Location.unknown
 
@@ -1128,7 +959,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
           let exp = subst_in_exp var_map exp in
           let exp = if bloop then exp else Cil.new_exp ~loc:dummy_loc (UnOp(LNot,exp,Cil.intType)) in
           let body = stmts_of_cfg g nloop var_map locals None [] in
-          let acc = (List.rev (Cil.mkLoop ?sattr:None ~guard:exp ~body)) @ acc in
+          let acc = (List.rev (Cil.mkLoop ~guard:exp ~body ())) @ acc in
           stmts_of_cfg cfg n2 var_map locals return_exp acc
     end
   | l ->
@@ -1251,15 +1082,161 @@ let project_of_cfg vreturn s =
 (*   ) () *)
 
 
-let output_dot filename state =
-  let out = open_out filename in
-  Value_parameters.feedback ~dkey:Internal.log_category "@[Output dot produced to %s.@]" filename;
-  (** *)
-  GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
-  close_out out
-
 module D = struct
-  include Domain_builder.Complete (Internal)
+  type nonrec state = state
+  type value = Cvalue.V.t
+  type location = Precise_locs.precise_location
+  type origin
+
+  include (Traces: sig
+             include Datatype.S_with_collections with type t = state
+             include Abstract_domain.Lattice with type state := state
+           end)
+
+  include Domain_builder.Complete (Traces)
+
+  let log_category = Value_parameters.register_category "d-traces"
+
+  let assign ki lv e _v _valuation state =
+    let trans = Assign (ki, lv.Eval.lval, lv.Eval.ltyp, e) in
+    `Value (Traces.add_trans state trans)
+
+  let assume stmt e pos _valuation state =
+    let trans = Assume (stmt, e, pos) in
+    `Value (Traces.add_trans state trans)
+
+  let start_call stmt call _recursion _valuation state =
+    let kf = call.Eval.kf in
+    if Kernel_function.is_definition kf then
+      let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
+          (Kernel_function.is_definition call.Eval.kf) in
+      let state = Traces.add_trans state (Msg msg) in
+      let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
+      let state = Traces.add_trans state (EnterScope (kf, formals)) in
+      let state = List.fold_left (fun state arg ->
+          Traces.add_trans state
+            (Assign (Kstmt stmt, Cil.var arg.Eval.formal,
+                     arg.Eval.formal.Cil_types.vtype,
+                     arg.Eval.concrete))) state call.Eval.arguments in
+      `Value state
+    else
+      (** enter the scope of the dumb result variable *)
+      let var = call.Eval.return in
+      let state = match var with
+        | Some var -> Traces.add_trans state (EnterScope (kf, [var]))
+        | None -> state in
+      let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
+      let state = Traces.add_trans state
+          (CallDeclared (call.Eval.kf, exps, Option.map Cil.var var))
+      in `Value {state with call_declared_function = true}
+
+  let finalize_call _stmt call _recursion ~pre:_ ~post =
+    if post.call_declared_function
+    then `Value {post with call_declared_function = false}
+    else
+      let msg = Format.asprintf "finalize_call: %s" (Kernel_function.get_name call.Eval.kf) in
+      let state = Traces.add_trans post (Msg msg) in
+      `Value state
+
+  let update _valuation state = `Value state
+
+  (* Memexec *)
+  (* This domains infers no relation between variables. *)
+  let relate _kf _bases _state = Base.SetLattice.bottom
+
+  let empty () = Traces.empty
+  let initialize_variable lv _ ~initialized:_ _ state =
+    Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
+  let initialize_variable_using_type var_kind varinfo state =
+    let kind_str =
+      match var_kind with
+      | Abstract_domain.Global   -> "global"
+      | Abstract_domain.Local _  -> "local"
+      | Abstract_domain.Formal _ -> "formal"
+      | Abstract_domain.Result _ -> "result"
+    in
+    let msg =
+      Format.asprintf "initialize@ %s variable@ using@ type@ %a"
+        kind_str Varinfo.pretty varinfo
+    in
+    Traces.add_trans state (Msg msg)
+
+  (* TODO *)
+  let logic_assign _assign _location state =
+    Traces.add_trans state (Msg "logic assign")
+
+  let top_query = `Value (Cvalue.V.top, None), Alarmset.all
+
+  let extract_expr ~oracle:_ _context _state _expr = top_query
+  let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
+
+  let enter_loop stmt state =
+    let state = Traces.add_trans state (Msg "enter_loop") in
+    let state = if not (Value_parameters.TracesUnrollLoop.get ())
+      then Traces.add_loop stmt state
+      else { state with current = UnrollLoop(stmt,state.current) } in
+    state
+
+  let incr_loop_counter _ state =
+    match state.current with
+    | Base _ -> assert false
+    | UnrollLoop(_,_) -> state
+    | OpenLoop(stmt,s,last,_,g,l) ->
+      let last = Graph.join last g in
+      let last = if Value_parameters.TracesUnifyLoop.get () then
+          let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
+          let last = Graph.join last old_last in
+          assert (Node.equal s s');
+          Stmt.Hashtbl.add state.all_loop_start stmt (s,last);
+          last
+        else last
+      in
+      let current = OpenLoop(stmt,s,last,s,Graph.empty,l) in
+      let state = { state with current } in
+      (* Traces.add_trans state (Msg("incr_loop_counter")) *)
+      state
+
+  let leave_loop stmt' state =
+    match state.current with
+    | Base _ -> assert false (* absurd: we are in at least a loop *)
+    | UnrollLoop(_,l) -> { state with current = l }
+    | OpenLoop(stmt,s,last,old_current_node,g,current) ->
+      assert (Stmt.equal stmt stmt');
+      let state = { state with current } in
+      let last = if Value_parameters.TracesUnifyLoop.get () then
+          let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
+          let last = Graph.join last old_last in
+          assert (Node.equal s s');
+          Stmt.Hashtbl.add state.all_loop_start stmt (s,last);
+          last
+        else last
+      in
+      let state = if Graph.is_empty last then state
+        else Traces.add_trans state (Loop(stmt,s,last)) in
+      let state = Traces.copy_edges s old_current_node g state in
+      Traces.add_trans state (Msg "leave_loop")
+
+
+  let enter_scope kind vars state =
+    match kind with
+    | Abstract_domain.Global ->
+      { state with globals = vars @ state.globals }
+    | Abstract_domain.Formal kf ->
+      if Kernel_function.equal kf (fst (Globals.entry_point ()))
+      then { state with main_formals = vars @ state.main_formals }
+      else state
+    | Abstract_domain.(Local kf | Result kf) ->
+      Traces.add_trans state (EnterScope (kf, vars))
+
+  let leave_scope kf vars state =
+    Traces.add_trans state (LeaveScope (kf, vars))
+
+  let output_dot filename state =
+    let out = open_out filename in
+    Value_parameters.feedback ~dkey:log_category "@[Output dot produced to %s.@]" filename;
+    (** *)
+    GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
+    close_out out
 
   let post_analysis state =
     let return_stmt = Kernel_function.find_return (fst (Globals.entry_point ())) in
@@ -1268,7 +1245,7 @@ module D = struct
       | _ -> assert false in
     let header fmt = Format.fprintf fmt "Trace domains:" in
     let body = Bottom.pretty Traces.pretty in
-    Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state;
+    Value_parameters.printf ~dkey:log_category ~header " @[%a@]" body state;
     if Value_parameters.TracesProject.get () ||
        not (Value_parameters.TracesDot.is_default ()) then
       match state with
@@ -1278,7 +1255,7 @@ module D = struct
         Value_parameters.failure "The trace is TOP can't generate code"
       | `Value state ->
         if not (Value_parameters.TracesDot.is_default ())
-        then output_dot (Value_parameters.TracesDot.get ()) state;
+        then output_dot (Value_parameters.TracesDot.get ():>string) state;
         if Value_parameters.TracesProject.get ()
         then project_of_cfg return_exp state
 end

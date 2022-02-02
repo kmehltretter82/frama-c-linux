@@ -1,5 +1,5 @@
 /* run.config*
-   
+ PLUGIN: @EVA_MAIN_PLUGINS@ from,inout
    OPT: -eva @EVA_CONFIG@ -then -deps -out
    OPT: -eva @EVA_CONFIG@ -main main_uninit -then -deps -out
 */

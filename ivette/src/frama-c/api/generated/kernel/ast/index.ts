@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 /* --- Generated Frama-C Server API --- */
 
 /**
@@ -31,23 +53,48 @@ import { jTextSafe } from 'frama-c/api/kernel/data';
 import { tag } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { text } from 'frama-c/api/kernel/data';
-//@ts-ignore
-import { bySource } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { jSource } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { jSourceSafe } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { source } from 'frama-c/api/kernel/services';
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
   name:   'kernel.ast.compute',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Ensures that AST is computed */
 export const compute: Server.ExecRequest<null,null>= compute_internal;
+
+/** Emitted when the AST has been changed */
+export const changed: Server.Signal = {
+  name: 'kernel.ast.changed',
+};
+
+/** Source file positions. */
+export type source =
+  { dir: string, base: string, file: string, line: number };
+
+/** Loose decoder for `source` */
+export const jSource: Json.Loose<source> =
+  Json.jObject({
+    dir: Json.jFail(Json.jString,'String expected'),
+    base: Json.jFail(Json.jString,'String expected'),
+    file: Json.jFail(Json.jString,'String expected'),
+    line: Json.jFail(Json.jNumber,'Number expected'),
+  });
+
+/** Safe decoder for `source` */
+export const jSourceSafe: Json.Safe<source> =
+  Json.jFail(jSource,'Source expected');
+
+/** Natural order for `source` */
+export const bySource: Compare.Order<source> =
+  Compare.byFields
+    <{ dir: string, base: string, file: string, line: number }>({
+    dir: Compare.string,
+    base: Compare.string,
+    file: Compare.string,
+    line: Compare.number,
+  });
 
 /** Marker kind */
 export enum markerKind {
@@ -83,6 +130,7 @@ const markerKindTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.ast.markerKindTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const markerKindTags: Server.GetRequest<null,tag[]>= markerKindTags_internal;
@@ -113,6 +161,7 @@ const markerVarTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.ast.markerVarTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const markerVarTags: Server.GetRequest<null,tag[]>= markerVarTags_internal;
@@ -171,6 +220,7 @@ const reloadMarkerInfo_internal: Server.GetRequest<null,null> = {
   name:   'kernel.ast.reloadMarkerInfo',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Force full reload for array [`markerInfo`](#markerinfo)  */
 export const reloadMarkerInfo: Server.GetRequest<null,null>= reloadMarkerInfo_internal;
@@ -189,6 +239,7 @@ const fetchMarkerInfo_internal: Server.GetRequest<
             removed: Json.jList(Json.jString),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
+  signals: [],
 };
 /** Data fetcher for array [`markerInfo`](#markerinfo)  */
 export const fetchMarkerInfo: Server.GetRequest<
@@ -262,11 +313,30 @@ export const byLocation: Compare.Order<location> =
     marker: byMarker,
   });
 
+const getMainFunction_internal: Server.GetRequest<
+  null,
+  Json.key<'#fct'> |
+  undefined
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.getMainFunction',
+  input:  Json.jNull,
+  output: Json.jKey<'#fct'>('#fct'),
+  signals: [],
+};
+/** Get the current 'main' function. */
+export const getMainFunction: Server.GetRequest<
+  null,
+  Json.key<'#fct'> |
+  undefined
+  >= getMainFunction_internal;
+
 const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFunctions',
   input:  Json.jNull,
   output: Json.jList(Json.jKey<'#fct'>('#fct')),
+  signals: [],
 };
 /** Collect all functions in the AST */
 export const getFunctions: Server.GetRequest<null,Json.key<'#fct'>[]>= getFunctions_internal;
@@ -276,6 +346,7 @@ const printFunction_internal: Server.GetRequest<Json.key<'#fct'>,text> = {
   name:   'kernel.ast.printFunction',
   input:  Json.jKey<'#fct'>('#fct'),
   output: jText,
+  signals: [],
 };
 /** Print the AST of a function */
 export const printFunction: Server.GetRequest<Json.key<'#fct'>,text>= printFunction_internal;
@@ -348,6 +419,7 @@ const reloadFunctions_internal: Server.GetRequest<null,null> = {
   name:   'kernel.ast.reloadFunctions',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Force full reload for array [`functions`](#functions)  */
 export const reloadFunctions: Server.GetRequest<null,null>= reloadFunctions_internal;
@@ -366,6 +438,7 @@ const fetchFunctions_internal: Server.GetRequest<
             removed: Json.jList(Json.jKey<'#functions'>('#functions')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
+  signals: [],
 };
 /** Data fetcher for array [`functions`](#functions)  */
 export const fetchFunctions: Server.GetRequest<
@@ -390,15 +463,38 @@ const getInfo_internal: Server.GetRequest<marker,text> = {
   name:   'kernel.ast.getInfo',
   input:  jMarker,
   output: jText,
+  signals: [],
 };
 /** Get textual information about a marker */
 export const getInfo: Server.GetRequest<marker,text>= getInfo_internal;
+
+const getMarkerAt_internal: Server.GetRequest<
+  [ string, number, number ],
+  [ Json.key<'#fct'> | undefined, marker | undefined ]
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.getMarkerAt',
+  input:  Json.jTry(
+            Json.jTriple(
+              Json.jFail(Json.jString,'String expected'),
+              Json.jFail(Json.jNumber,'Number expected'),
+              Json.jFail(Json.jNumber,'Number expected'),
+            )),
+  output: Json.jTry(Json.jPair( Json.jKey<'#fct'>('#fct'), jMarker,)),
+  signals: [],
+};
+/** Returns the marker and function at a source file position, if any. Input: file path, line and column. */
+export const getMarkerAt: Server.GetRequest<
+  [ string, number, number ],
+  [ Json.key<'#fct'> | undefined, marker | undefined ]
+  >= getMarkerAt_internal;
 
 const getFiles_internal: Server.GetRequest<null,string[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFiles',
   input:  Json.jNull,
   output: Json.jList(Json.jString),
+  signals: [],
 };
 /** Get the currently analyzed source file names */
 export const getFiles: Server.GetRequest<null,string[]>= getFiles_internal;
@@ -408,6 +504,7 @@ const setFiles_internal: Server.SetRequest<string[],null> = {
   name:   'kernel.ast.setFiles',
   input:  Json.jList(Json.jString),
   output: Json.jNull,
+  signals: [],
 };
 /** Set the source file names to analyze. */
 export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;

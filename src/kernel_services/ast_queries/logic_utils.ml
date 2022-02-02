@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -96,7 +96,7 @@ let logicCType t =
 
 let plain_array_to_ptr ty =
   match unroll_type ty with
-  | Ctype(TArray(ty,lo,_,attr) as tarr) ->
+  | Ctype(TArray(ty,lo,attr) as tarr) ->
     let length_attr =
       match lo with
       | None -> []
@@ -275,7 +275,15 @@ let constant_to_lconstant c = match c with
     LReal (real_of_float s f)
 
 let lconstant_to_constant c = match c with
-  | Integer (i,s) -> CInt64(i,Cil.intKindForValue i false,s)
+  | Integer (i,s) ->
+    begin
+      try
+        CInt64(i,Cil.intKindForValue i false,s)
+      with Cil.Not_representable ->
+        Kernel.fatal
+          "Cannot represent logical integer in C: %a"
+          Integer.pretty i
+    end
   | LStr s -> CStr s
   | LWStr s -> CWStr s
   | LChr s -> CChr s
@@ -723,10 +731,9 @@ let rec add_attribute_glob_annot a g =
     Daxiomatic(n,List.map (add_attribute_glob_annot a) l,
                Cil.addAttribute a al,loc)
   | Dtype(ti,_) -> ti.lt_attr <- Cil.addAttribute a ti.lt_attr; g
-  | Dlemma(n,ax,labs,t,p,al,l) ->
-    Dlemma(n,ax,labs,t,p,Cil.addAttribute a al,l)
+  | Dlemma(n,labs,t,p,al,l) ->
+    Dlemma(n,labs,t,p,Cil.addAttribute a al,l)
   | Dmodel_annot (mi,_) -> mi.mi_attr <- Cil.addAttribute a mi.mi_attr; g
-  | Dcustom_annot(c,n,al,l) -> Dcustom_annot(c,n,Cil.addAttribute a al, l)
   | Dextended (e,al,l) -> Dextended(e,Cil.addAttribute a al,l)
 
 let behavior_has_only_assigns bhvs =
@@ -1092,7 +1099,7 @@ and is_same_predicate pred1 pred2 =
 
 
 and is_same_toplevel_predicate p1 p2 =
-  p1.tp_only_check = p2.tp_only_check &&
+  p1.tp_kind = p2.tp_kind &&
   is_same_predicate p1.tp_statement p2.tp_statement
 
 and is_same_identified_predicate p1 p2 =
@@ -1233,18 +1240,15 @@ let rec is_same_global_annotation ga1 ga2 =
     id1 = id2 && is_same_list is_same_global_annotation ga1 ga2
     && is_same_attributes attr1 attr2
   | Dtype (t1,_), Dtype (t2,_) -> is_same_logic_type_info t1 t2
-  | Dlemma(n1,ax1,labs1,typs1,st1,attr1,_),
-    Dlemma(n2,ax2,labs2,typs2,st2,attr2,_) ->
-    is_same_string n1 n2 && ax1 = ax2 &&
+  | Dlemma(n1,labs1,typs1,st1,attr1,_),
+    Dlemma(n2,labs2,typs2,st2,attr2,_) ->
+    is_same_string n1 n2 &&
     is_same_list is_same_logic_label labs1 labs2 &&
     is_same_list (=) typs1 typs2 && is_same_toplevel_predicate st1 st2 &&
     is_same_attributes attr1 attr2
   | Dinvariant (li1,_), Dinvariant (li2,_) -> is_same_logic_info li1 li2
   | Dtype_annot (li1,_), Dtype_annot (li2,_) -> is_same_logic_info li1 li2
   | Dmodel_annot (li1,_), Dmodel_annot (li2,_) -> is_same_model_info li1 li2
-  | Dcustom_annot (c1, n1, attr1, _),
-    Dcustom_annot (c2, n2, attr2, _) ->
-    is_same_string n1 n2 && c1 = c2 && is_same_attributes attr1 attr2
   | Dvolatile(t1,r1,w1,attr1,_), Dvolatile(t2,r2,w2,attr2,_) ->
     is_same_list is_same_identified_term t1 t2 &&
     is_same_opt (fun x y -> x.vname = y.vname) r1 r2 &&
@@ -1252,10 +1256,10 @@ let rec is_same_global_annotation ga1 ga2 =
     is_same_attributes attr1 attr2
   | Dextended(id1,_,_), Dextended(id2,_,_) -> id1 = id2
   | (Dfun_or_pred _ | Daxiomatic _ | Dtype _ | Dlemma _
-    | Dinvariant _ | Dtype_annot _ | Dcustom_annot _ | Dmodel_annot _
+    | Dinvariant _ | Dtype_annot _ | Dmodel_annot _
     | Dvolatile _ | Dextended _),
     (Dfun_or_pred _ | Daxiomatic _ | Dtype _ | Dlemma _
-    | Dinvariant _ | Dtype_annot _ | Dcustom_annot _ | Dmodel_annot _
+    | Dinvariant _ | Dtype_annot _ | Dmodel_annot _
     | Dvolatile _ | Dextended _) -> false
 
 let is_same_axiomatic ax1 ax2 =
@@ -2229,11 +2233,17 @@ let lhost_c_type thost =
      | _ -> assert false)
   | TResult ty -> ty
 
+let use_predicate = function Assert | Admit -> true | Check -> false
+let verify_predicate = function Assert | Check -> true | Admit -> false
+
 let is_assert ca =
-  match ca.annot_content with AAssert (_, p) -> not p.tp_only_check | _ -> false
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Assert | _ -> false
 
 let is_check ca =
-  match ca.annot_content with AAssert (_, p) -> p.tp_only_check | _ -> false
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Check | _ -> false
+
+let is_admit ca =
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Admit | _ -> false
 
 let is_contract ca =
   match ca.annot_content with AStmtSpec _ -> true | _ -> false
@@ -2639,7 +2649,7 @@ let const_fold_trange_bounds typ b e =
     | Some te -> extract (constFoldTermToInt te)
     | None ->
       match Cil.unrollType typ with
-      | TArray (_, Some size, _, _) ->
+      | TArray (_, Some size, _) ->
         Integer.pred (extract (Cil.isInteger size))
       | _ -> raise CannotSimplify
   in

@@ -1,7 +1,7 @@
 /* run.config*
-   PLUGIN: @PTEST_PLUGIN@ report
-   OPT: -machdep x86_32 -rte -then -eva @EVA_CONFIG@ -then -report -report-print-properties
-   OPT: -machdep x86_32 -eva @EVA_CONFIG@ -then -rte -then -report -report-print-properties
+PLUGIN: @EVA_MAIN_PLUGINS@ report rtegen
+   OPT: -machdep x86_32 @RTE_TEST@ -then -eva @EVA_CONFIG@ -then -report -report-print-properties
+   OPT: -machdep x86_32 -eva @EVA_CONFIG@ -then @RTE_TEST@  -then -report -report-print-properties
 */
 // Fuse with precond.c when bts #1208 is solved
 int x;

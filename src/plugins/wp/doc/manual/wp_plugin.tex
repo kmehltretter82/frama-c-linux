@@ -288,6 +288,11 @@ The user can select a hypothesis $H$, and change the goal to $\neg H$:
 
 $$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,\neg H} $$
 
+\paragraph{Clear} Remove Hypothesis\\
+The user can select a hypothesis $H$, and remove it from the context:
+
+$$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,G} $$
+
 \paragraph{Choice} Select a Goal Alternative\\
 When the goal is a disjunction, the user select one alternative and discard the others:
 $$ \TACTIC{\Delta\models\,\Gamma,G}{\Delta\models\,G} $$
@@ -301,7 +306,7 @@ $$ \TACTIC{ a = b }{ \bigwedge a.f_i = b.f_i } $$
 The user select a hypothesis (typically, a negation) and swap it with the goal.
 $$ \TACTIC{\Delta,H\models\,G}{\Delta,\neg G\models\,\neg H} $$
 
-\paragraph{Cut} Use Intermerdiate Hypothesis
+\paragraph{Cut} Use Intermediate Hypothesis
 The user introduce a new clause $C$ with the composer to prove the goal. There two variants of the tactic, made available by a menu in the tactic panel.
 
 The \textsf{Modus-Ponens} variant where the clause $C$ is used as an intermediate proof step:
@@ -322,10 +327,16 @@ $$\TACTIC{\Delta\models\,G}{%
 \paragraph{Definition} Unfold predicate and logic function definition\\
 The user simply select a term $f(e_1,\ldots,e_n)$ or a predicate $P(e_1,\ldots,e_n)$ which is replaced by its definition, when available.
 
-\paragraph{Filter} Erase Hypotheses \\
-The tactic is always applicable. It removes hypotheses from the goal on a variable used basis. When variables are compounds (record and arrays) a finer heuristics is used to detect which parts of the variable is relevant. A transitive closure of dependencies is also used. However, it is always possible that too many hypotheses are removed.
+\paragraph{Filter} Dependent Erasure of Hypotheses \\
+The tactic is always applicable. It removes hypotheses from the goal on a
+variable used basis. When variables are compounds (record and arrays) a finer
+heuristic is used to detect which parts of the variable is relevant. A
+transitive closure of dependencies is also used. However, it is always
+possible that too many hypotheses are removed.
 
-The tactic also have a variant where only hypotheses \emph{not relevant} to the goal are retained. This is useful to find absurd hypotheses that are completely disjoint from the goal.
+The tactic also have a variant where only hypotheses \emph{not relevant} to the
+goal are retained. This is useful to find absurd hypotheses that are completely
+disjoint from the goal.
 
 \paragraph{Instance} Instantiate properties\\
 The user selects a hypothesis with one or several $\forall$ quantifiers, or an $\exists$ quantified goal. Then, with the composer, the use choose to instantiate one or several of the quantified parameters. In case of $\forall$ quantifier over integer, a range of values can be instantiated instead.
@@ -487,19 +498,25 @@ $G(n) \equiv P(n)\Longrightarrow\,Q(n)$:
 \end{array}} \]
 
 \paragraph{Overflow} Integer Conversions \\
-This tactic rewrites machine integer conversions by identity,
-providing the converted value is in available range. The tactic applies on expression
-with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer name,
-\emph{eg.} \texttt{to\_uint32}.
+This tactic split machine integer conversions into three cases: value in integer
+range, lower than range and upper than range. The tactic applies on expression
+with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer
+name, \emph{eg.} \texttt{to\_uint32}.
 
 \[\TACTIC{\Delta\models G}{%
 \begin{array}[t]{rcl}
-\Delta\phantom{)} &\models & a \leq e \leq b \\
-\sigma(\Delta) & \models & \sigma(G)
+\sigma_{id}(\Delta) & \models & low \leq e \leq up \Rightarrow \sigma_{id}(G) \\
+\sigma_{+}(\Delta) & \models & low < e \Rightarrow \sigma_{+}(G) \\
+\sigma_{-}(\Delta) & \models & e < up \Rightarrow \sigma_{-}(G)
 \end{array}
 }\]
-where $\sigma = [ \mathtt{to\_iota}(e) \mapsto e ]$ and $[a..b]$ is the range
-of the \texttt{iota} integer domain.
+where
+\begin{itemize}
+  \item $[low..up]$ is the range of the \texttt{iota} integer domain,
+  \item $\sigma_{id} = [ \mathtt{to\_iota}(e) \mapsto e ]$,
+  \item $\sigma_{+}  = [ \mathtt{to\_iota}(e) \mapsto \mathtt{overflow}(e) ]$,
+  \item $\sigma_{-}  = [ \mathtt{to\_iota}(e) \mapsto \mathtt{overflow}(e) ]$.
+\end{itemize}
 
 \paragraph{Range} Enumerate a range of values for an integer term\\
 The user select any integer expression $e$ in the proof, and a range of numerical values $a\ldots b$. The proof goes by case for each $e=a\ldots e=b$, plus the side cases $e<a$ and $e>b$:
@@ -791,7 +808,8 @@ interface of the programmatic API.
     Recognized categories are: \texttt{@lemma}, \texttt{@requires}, \texttt{@assigns},
     \texttt{@ensures}, \texttt{@exits}, \texttt{@assert}, \texttt{@check},
     \texttt{@invariant}, \texttt{@variant}, \texttt{@breaks},
-    \texttt{@continues}, \texttt{@returns}, \\
+    \texttt{@continues}, \texttt{@returns}, \texttt{@terminates},\\
+    \texttt{@decreases},
     \texttt{\mbox{@complete\_behaviors}}, \texttt{\mbox{@disjoint\_behaviors}}.
     \\
     Properties can be prefixed with a minus sign to \emph{skip} the associated annotations.
@@ -808,6 +826,11 @@ interface of the programmatic API.
   for which the current status is already 'invalid' (default is: \texttt{no}).
 \item [\tt -wp-(no)-status-maybe] includes in the goal selection those properties with
   an undetermined status (default is: \texttt{yes}).
+\item [\tt -wp-(no)-legacy] use the legacy WP generator, if set to \texttt{no},
+  WP uses a recently developed generator (default is: \texttt{no}).
+\item [\tt -wp-dump] does not prove selected properties, but dumps the control
+  flow graph computed by WP, including code annotations, both DOT files and PDF
+  files into the directory specified by \texttt{-wp-out}.
 \end{description}
 
 \textbf{Remark:} options \texttt{-wp-status-xxx} are not taken into account
@@ -883,11 +906,6 @@ The available \textsf{WP} command-line options related to model selection are:
 \item[\tt -warn-(un)signed-(overflow|downcast)] those kernel options are
   used by the (default) arithmetic model \texttt{-wp-model +int} to interpret integer
   arithmetic. See section~\ref{wp-model-arith} for details.
-
-\item[\tt -wp-(no)-overflows] explicitly add to proof context the assumptions related
-  to overflows and downcasts selected. This is especially useful when casts are inserted
-  in \textsf{ACSL} contracts to ensure type-checking but are related to identity-casts
-  from the code. The option is \texttt{off} by default.
 
 \item[\tt -wp-literals] exports the contents of string literals
   to provers (default: \texttt{no}).
@@ -966,11 +984,25 @@ weakest precondition calculus.
   it is generally not necessary and it can generates a large number of
   verifications for structures with many (nested) fields. \texttt{-1} enables
   full unfolding.
+\item[\tt -wp-(no)-frama-c-stdlib-terminate] Frama-C stdlib functions without
+  \texttt{terminates} specification are considered to terminate when called
+  (default is: \texttt{no}).
+\item[\tt -wp-(no)-declarations-terminate] Undefined external functions without
+  \texttt{terminates} specification are considered to terminate when called
+  (default is: \texttt{no}).
+\item[\tt -wp-(no)-definitions-terminate] Defined functions without
+  \texttt{terminates} specification are considered to terminate when called
+  (default is: \texttt{no}).
+\item[\tt -wp-(no)-variant-with-terminates] prove \texttt{loop variant} under
+  the termination hypothesis (thus, under a
+  \texttt{terminates \textbackslash{}false}, any loop variant proof is trivial)
+  (default is: \texttt{no}).
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
-  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation (default is: \texttt{yes}).
+  thanks to the dedicated code annotation \verb+@calls f1,...,fn+ (default is: \texttt{yes}).
 \end{description}
 
 \subsubsection{ACSL extension \texttt{@calls}}
+\label{acsl:calls}
 
 The handling of functions pointers is done via the ACSL code annotation
 extension \verb+@calls+. For each call to a function pointer \verb+fp+
@@ -998,6 +1030,99 @@ These annotations split post-conditions to the dynamic call into two sub-goals: 
 a second for the call to \verb+f2+. A last goal is generated at the call
 site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
 
+\subsubsection{Proof of \texttt{@terminates}}
+
+In ACSL, a function can be specified to terminate when some condition \verb+P+ holds
+in pre-condition.
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+/*@ terminates P ; */
+void function(void){
+  ...
+}
+\end{lstlisting}
+
+If terminates verification is active (depending on \verb+-wp+ options) WP collects all function calls and loops
+and generate verification conditions (VCs) to prove them, as detailed below.
+
+\paragraph{Loop variants.} When a loop has a variant, no particular verification
+is generated for termination. However, if \verb+-wp-variant-with-terminates+ is
+active, the variant is verified only when \verb+P+ holds in pre-condition.
+Intuitively, this option means that variant has to decrease only if the function has to terminate. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i >= 0 ;
+void positive(int i){
+  /*@ loop invariant \at(i, Pre) >= 0 ==> 0 <= i <= \at(i, Pre) ;
+      loop assigns i ;
+      loop variant i ; // verified when i >= 0 at pre
+  */
+  while(i) --i;
+}
+\end{lstlisting}
+
+Note that when \verb+terminates \false+ is specified, any loop
+variant would trivially holds.
+
+When a loop does not have a variant, WP checks that the loop is unreachable
+when \verb+P+ holds in precondition, which means that a loop is allowed to not
+terminate when the function does not have to terminate. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i >= 0 ;
+void function(int i){
+  if(i < 0){
+    // note i >= 0 && i < 0 ==> \false
+    while(1);
+  }
+}
+\end{lstlisting}
+
+\paragraph{Function call.} When a function \verb+f+ is required to terminate on
+\verb+P+, and calling function \verb+g+ only terminates when \verb+Q+, WP tries to
+prove that \verb+P@pre ==> Q@call-point+. Indeed, for \verb+f+ to terminates while calling
+\verb+g+, then \verb+g+ shall terminate. Note that it
+means that if the function under verification shall terminate, any call to a
+non-terminating function shall be unreachable. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i <= 0 ;
+void f(int i) ;
+
+//@ terminates i >  0 ;
+void g(int i) ;
+
+/*@ requires i <= 0 ;
+    terminates \true ; */
+void caller(int i){
+  f(i); // succeeds
+  g(i); // fails, thus global termination is not proved
+}
+\end{lstlisting}
+
+When a called function does not have a terminates specification, WP assumes one
+as specified by the options:
+
+\begin{itemize}
+\item \verb+-wp-frama-c-stdlib-terminate+,
+\item \verb+-wp-declarations-terminate+,
+\item \verb+-wp-definitions-terminate+.
+\end{itemize}
+
+\paragraph{(Mutually) recursive function.} When a function is involved in a
+recursive cluster (as defined in the ACSL manual) and shall terminate, WP checks that a
+\verb+decreases+ clause is available for the function. Proving that existing
+recursive calls might be unreachable is delegated to the proof of the
+\verb+decreases+ clause. Note however that, currenlty, the proof of \verb+decreases+
+clauses is not supported yet.
+
+\paragraph{Function pointers. } On a call via a function pointer, WP checks that
+a \verb+@calls+ is specified for this function pointer. If so, WP just behaves
+as explained before for function calls. If such a specification is not available,
+WP considers that the pointed function might call the function under
+verification and thus that it is part of a recursive cluster and shall provide
+a \verb+decreases+ clause.
+
 \subsection{Smoke Tests}
 
 During modular deductive verification, inconsistencies in function requirements
@@ -1019,12 +1144,18 @@ inconsistent requirements, or on the loop with inconsistent invariants, and
 \textsf{WP} generates a user warning.
 
 \begin{description}
-\item[\tt -wp-(no)-smoke-tests] generates checks to detect inconsistencies.
-\item[\tt -wp-(no)-smoke-timeout] timeout to be used for trying to prove \verb+\false+
+\item[\tt -wp-(no)-smoke-tests] generates checks to detect inconsistencies
+  (default is: \texttt{no}).
+\item[\tt -wp-smoke-timeout] timeout to be used for trying to prove \verb+\false+
   on smoke-tests (default is \verb+2+ seconds).
-\item[\tt -wp-no-smoke-dead-code] exclude smoke tests for dead code.
-\item[\tt -wp-no-smoke-dead-loop] exclude smoke tests for inconsistent loop invariants.
-\item[\tt -wp-no-smoke-dead-call] exclude smoke tests for non-terminating calls.
+\item[\tt -wp-(no)-smoke-dead-assumes] includes smoke tests for dead assumes
+  (default is: \texttt{yes}).
+\item[\tt -wp-(no)-smoke-dead-call] includes smoke tests for non-terminating
+  calls (default is: \texttt{yes}).
+\item[\tt -wp-(no)-smoke-dead-code] includes smoke tests for dead code (default
+  is: \texttt{yes}).
+\item[\tt -wp-(no)-smoke-dead-loop] includes smoke tests for inconsistent loop
+  invariants (default is: \texttt{yes}).
 \end{description}
 
 When reporting prover results for smoke-tests, the \textsf{WP} displays

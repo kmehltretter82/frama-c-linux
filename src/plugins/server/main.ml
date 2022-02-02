@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -177,6 +177,7 @@ let execute server ?yield proc =
 (* -------------------------------------------------------------------------- *)
 
 type signal = string
+let signal_name s = s
 let signals = Hashtbl.create 32
 let signal s =
   if Hashtbl.mem signals s then
@@ -208,7 +209,7 @@ let kill_exec e = e.killed <- true
 let kill_request eq id e = if eq id e.id then e.killed <- true
 
 let process_request (server : 'a server) (request : 'a request) : unit =
-  if Senv.debug_atleast 1 then
+  if Senv.debug_atleast 1 && (Senv.debug_atleast 3 || request <> `Poll) then
     Senv.debug "%a" (pp_request server.pretty) request ;
   match request with
   | `Poll -> ()

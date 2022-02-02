@@ -37,15 +37,15 @@
   NON TERMINATING FUNCTION
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
-[nonterm] callstacks.i:4: Warning: 
+[nonterm:stmt] callstacks.i:4: Warning: 
   non-terminating loop
   stack: nt :: callstacks.i:8 <-
          f :: callstacks.i:13 <-
          g :: callstacks.i:18 <-
          h :: callstacks.i:23 <-
          main
-[nonterm] callstacks.i:8: Warning: unreachable return
-[nonterm] callstacks.i:13: Warning: unreachable return
-[nonterm] callstacks.i:18: Warning: unreachable return
-[nonterm] callstacks.i:23: Warning: unreachable return
+[nonterm:unreachable] callstacks.i:8: Warning: unreachable return
+[nonterm:unreachable] callstacks.i:13: Warning: unreachable return
+[nonterm:unreachable] callstacks.i:18: Warning: unreachable return
+[nonterm:unreachable] callstacks.i:23: Warning: unreachable return
 [nonterm] Analysis done.

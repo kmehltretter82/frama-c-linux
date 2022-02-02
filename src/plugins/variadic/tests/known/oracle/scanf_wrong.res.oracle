@@ -12,8 +12,10 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:548: 
   Declaration of variadic function dprintf.
+[variadic] FRAMAC_SHARE/libc/stdio.h:590: 
+  Declaration of variadic function asprintf.
 [variadic] scanf_wrong.c:8: 
   Translating call to scanf to a call to the specialized version scanf_va_1.
 [variadic] scanf_wrong.c:8: Warning: 
@@ -33,11 +35,11 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
-/*@ requires valid_read_string(format);
+/*@ requires \valid(param1);
     requires \valid(param2);
-    requires \valid(param1);
-    ensures \initialized(param2);
+    requires valid_read_string(format);
     ensures \initialized(param1);
+    ensures \initialized(param2);
     assigns \result, __fc_stdin->__fc_FILE_data, *param2, *param1,
             *(param0 + (0 ..));
     assigns \result
@@ -57,7 +59,7 @@
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int scanf_va_1(char const * __restrict format, char *param0, char *param1,
+int scanf_va_1(char const * restrict format, char *param0, char *param1,
                int *param2);
 
 int main(void)

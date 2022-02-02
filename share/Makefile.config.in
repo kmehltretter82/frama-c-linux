@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -33,20 +33,21 @@
 
 CYGPATH         ?=@CYGPATH@
 
-DESTDIR 	?=
-prefix		?=@prefix@
-exec_prefix	?=@exec_prefix@
+DESTDIR         ?=
+prefix          ?=@prefix@
+exec_prefix     ?=@exec_prefix@
 datarootdir     ?=@datarootdir@
 datadir         ?=@datadir@
-BINDIR		?=$(DESTDIR)@bindir@
-LIBDIR		?=$(DESTDIR)@libdir@
-DATADIR		?=$(DESTDIR)@datarootdir@
-MANDIR		?=$(DESTDIR)@mandir@
+BINDIR          ?=$(DESTDIR)@bindir@
+LIBDIR          ?=$(DESTDIR)@libdir@
+DATADIR         ?=$(DESTDIR)@datarootdir@
+MANDIR          ?=$(DESTDIR)@mandir@
+BASHCOMPDIR     ?=$(DESTDIR)@datarootdir@/bash-completion/completions
 
-FRAMAC_LIBDIR	?=$(LIBDIR)/frama-c
+FRAMAC_LIBDIR ?=$(LIBDIR)/frama-c
 FRAMAC_PLUGINDIR ?=$(FRAMAC_LIBDIR)/plugins
-FRAMAC_DATADIR 	?=$(DATADIR)/frama-c
-EMACS_DATADIR	?=$(DATADIR)/emacs/site-lisp
+FRAMAC_DATADIR ?=$(DATADIR)/frama-c
+EMACS_DATADIR ?=$(DATADIR)/emacs/site-lisp
 FRAMAC_DEFAULT_CPP ?=@FRAMAC_DEFAULT_CPP@
 FRAMAC_DEFAULT_CPP_ARGS ?= @FRAMAC_DEFAULT_CPP_ARGS@
 FRAMAC_GNU_CPP ?=@FRAMAC_GNU_CPP@
@@ -199,7 +200,7 @@ ENABLE_EVA                      ?=@ENABLE_EVA@
 LIBRARY_NAMES := findlib ocamlgraph num unix str dynlink bytes zarith yojson threads threads.posix bigarray
 
 ifeq ($(HAS_LANDMARKS),yes)
-LIBRARY_NAMES += landmarks landmarks.ppx
+LIBRARY_NAMES += landmarks landmarks-ppx
 endif
 
 ifneq ($(ENABLE_GUI),no)

@@ -1,7 +1,7 @@
 /* run.config*
- EXIT: 0
-   COMMENT: module also used by global_decl_loc.i
-   MODULE: global_decl_loc
+ COMMENT: with dune, the LIBS directive must be replaced by a MODULE directive (see also ./test_config file)
+
+ LIBS: global_decl_loc
    OPT: %{dep:@PTEST_DIR@/global_decl_loc.i}
 */
 extern int g;

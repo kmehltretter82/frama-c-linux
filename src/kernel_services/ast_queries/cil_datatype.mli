@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,12 +33,12 @@ open Datatype
 (** Auxiliary module for datatypes that can be pretty-printed. For those that
     do not have this signature, module {!Printer} must be used. *)
 module type S_with_pretty = sig
-  include S 
+  include S
   (**/**)
   val pretty_ref: (Format.formatter -> t -> unit) ref
 end
 module type S_with_collections_pretty = sig
-  include S_with_collections 
+  include S_with_collections
   (**/**)
   val pretty_ref: (Format.formatter -> t -> unit) ref
 end
@@ -65,16 +65,16 @@ module Location: sig
   include S_with_collections_pretty with type t = location
   val unknown: t
   val pretty_long : t Pretty_utils.formatter
-    (** Pretty the location under the form [file <f>, line <l>], without
-        the full-path to the file. The default pretty-printer [pretty] echoes
-        [<dir/f>:<l>] *)
+  (** Pretty the location under the form [file <f>, line <l>], without
+      the full-path to the file. The default pretty-printer [pretty] echoes
+      [<dir/f>:<l>] *)
   val pretty_line: t Pretty_utils.formatter
 
   (** Pretty-print both location start and end, including file, line and
       character offset.
 
       @since 22.0-Titanium
-   *)
+  *)
   val pretty_debug: t Pretty_utils.formatter
 
   (** Prints only the line of the location *)
@@ -85,10 +85,15 @@ module Location: sig
       starting position. Compares normalized filenames, lines and columns,
       but no absolute character offsets.
 
-      @since 22.0-Titanium
-   *)
-  val equal_start_semantic : location -> location -> bool
+      @since 23.0-Vanadium
+  *)
+  val compare_start_semantic : location -> location -> int
 
+  (** Equality using [compare_start_semantic].
+
+      @since 22.0-Titanium
+  *)
+  val equal_start_semantic : location -> location -> bool
 end
 
 module Localisation: Datatype.S with type t = localisation
@@ -119,10 +124,21 @@ module Enumitem: S_with_collections_pretty with type t = enumitem
 *)
 module Wide_string: S_with_collections with type t = int64 list
 
+
 (**
-   @since Oxygen-20120901 
+   @since Oxygen-20120901
 *)
-module Constant: S_with_collections_pretty with type t = constant
+module Constant: sig
+  include S_with_collections with type t = constant
+  val pretty_ref: (Format.formatter -> t -> unit) ref
+end
+
+(**
+   Same as {!Constant}, but comparison is strict, in the sense that it will take
+   into account textual representation if provided.
+   @since 24.0-Chromium
+*)
+module ConstantStrict: S_with_collections with type t = constant
 
 (** Note that the equality is based on eid. For structural equality, use
     {!ExpStructEq} *)
@@ -132,6 +148,12 @@ module Exp: sig
 end
 
 module ExpStructEq: S_with_collections with type t = exp
+
+(**
+   structural equality, with strict constant comparison as in {!ConstantStrict}
+   @since 24.0-Chromium
+*)
+module ExpStructEqStrict: S_with_collections with type t = exp
 
 module Fieldinfo: S_with_collections_pretty with type t = fieldinfo
 
@@ -154,41 +176,53 @@ end
 module Kinstr: sig
   include S_with_collections with type t = kinstr
   val kinstr_of_opt_stmt: stmt option -> kinstr
-    (** @since Nitrogen-20111001. *)
+  (** @since Nitrogen-20111001. *)
 
   val loc: t -> location
 end
 
 module Label: S_with_collections_pretty with type t = label
 
-(** Note that the equality is based on eid (for sub-expressions). 
+(** Note that the equality is based on eid (for sub-expressions).
     For structural equality, use {!LvalStructEq} *)
 module Lval: S_with_collections_pretty with type t = lval
 
 (**
-   @since Oxygen-20120901 
+   @since Oxygen-20120901
 *)
 module LvalStructEq: S_with_collections with type t = lval
 
-(** Same remark as for Lval. 
-    For structural equality, use {!OffsetStructEq}. *) 
+(**
+   structural equality, with strict constant comparison as in {!ConstantStrict}
+   @since 24.0-Chromium
+*)
+module LvalStructEqStrict: S_with_collections with type t = lval
+
+(** Same remark as for Lval.
+    For structural equality, use {!OffsetStructEq}. *)
 module Offset: S_with_collections_pretty with type t = offset
 
 (** @since Oxygen-20120901 *)
 module OffsetStructEq: S_with_collections with type t = offset
+
+(**
+   structural equality, with strict constant comparison as in {!ConstantStrict}
+   @since 24.0-Chromium
+*)
+module OffsetStructEqStrict: S_with_collections with type t = offset
 
 module Stmt_Id:  Hptmap.Id_Datatype with type t = stmt
 module Stmt: sig
   include S_with_collections_pretty with type t = stmt
   module Hptset: sig
     include Hptset.S with type elt = stmt
-                     and type 'a shape = 'a Hptmap.Shape(Stmt_Id).t
+                      and type 'a map = 'a Hptmap.Shape(Stmt_Id).t
     val self: State.t
   end
   val loc: t -> location
   val pretty_sid: Format.formatter -> t -> unit
-    (** Pretty print the sid of the statement
-        @since Nitrogen-20111001 *)
+  (** Pretty print the sid of the statement
+      @since Nitrogen-20111001 *)
 end
 
 module Attribute: S_with_collections_pretty with type t = attribute
@@ -199,19 +233,21 @@ module Attributes: S_with_collections with type t = attributes
 module Typ: sig
   include S_with_collections_pretty with type t = typ
   val toplevel_attr: t -> attributes
-    (** returns the attributes associated to the toplevel type, without adding
-        attributes from compinfo, enuminfo or typeinfo. Use {!Cil.typeAttrs}
-        to retrieve the complete set of attributes. *)
+  (** returns the attributes associated to the toplevel type, without adding
+      attributes from compinfo, enuminfo or typeinfo. Use {!Cil.typeAttrs}
+      to retrieve the complete set of attributes. *)
 end
 
 (** Types, with comparison over struct done by name and no unrolling. *)
 module TypByName: S_with_collections_pretty with type t = typ
 
 (** Types, with comparison over struct done by key and no unrolling
-    @since Fluorine-20130401 
- *)
+    @since Fluorine-20130401
+*)
 module TypNoUnroll: S_with_collections_pretty with type t = typ
 
+(** Types, with comparison over struct done by key and ignoring attributes. *)
+module TypNoAttrs: S_with_collections_pretty with type t = typ
 
 module Typeinfo: S_with_collections with type t = typeinfo
 
@@ -222,7 +258,7 @@ module Varinfo: sig
   include S_with_collections_pretty with type t = varinfo
   module Hptset: sig
     include Hptset.S with type elt = varinfo
-                     and type 'a shape = 'a Hptmap.Shape(Varinfo_Id).t
+                      and type 'a map = 'a Hptmap.Shape(Varinfo_Id).t
     val self: State.t
   end
   val dummy: t
@@ -277,9 +313,9 @@ module Logic_info: S_with_collections_pretty with type t = logic_info
 (** Logic_info with structural comparison:
     - name of the symbol
     - type of arguments
-    Note that polymorphism is ignored, in the sense that two symbols with
-    the same name and profile except for the name of their type variables
-    will compare unequal.
+      Note that polymorphism is ignored, in the sense that two symbols with
+      the same name and profile except for the name of their type variables
+      will compare unequal.
 
     @since 20.0-Calcium
 *)
@@ -311,9 +347,11 @@ module Logic_real: S_with_collections_pretty with type t = logic_real
 
 module Predicate: S_with_pretty with type t = predicate
 module Toplevel_predicate: S_with_pretty with type t = toplevel_predicate
-module Identified_predicate: 
+module Identified_predicate:
   S_with_collections_pretty with type t = identified_predicate
 (** @since Neon-20140301 *)
+module PredicateStructEq: S_with_collections_pretty with type t = predicate
+(** @since 24.0-Chromium *)
 
 (**************************************************************************)
 (** {3 Logic_ptree}

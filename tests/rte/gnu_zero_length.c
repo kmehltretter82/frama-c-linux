@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -print -machdep gcc_x86_32 -journal-disable
+   STDOPT: #" -print -machdep gcc_x86_32"
 */
 
 #include <stdlib.h>

@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -print -journal-disable mergestruct1.i mergestruct2.i
-   OPT: -print -journal-disable mergestruct2.i mergestruct1.i
+   OPT: -print %{dep:@PTEST_DIR@/mergestruct1.i} %{dep:@PTEST_DIR@/mergestruct2.i}
+   OPT: -print %{dep:@PTEST_DIR@/mergestruct2.i} %{dep:@PTEST_DIR@/mergestruct1.i}
 */
 struct s { float a; } s2;
 

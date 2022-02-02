@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -87,6 +87,9 @@ extern int memcmp (const void *s1, const void *s2, size_t n);
   @*/
 extern void *memchr(const void *s, int c, size_t n);
 
+// Non-POSIX; GNU extension
+extern void *memrchr(const void *s, int c, size_t n);
+
 // Copy memory
 
 /*@ requires valid_dest: valid_or_empty(dest, n);
@@ -100,6 +103,19 @@ extern void *memchr(const void *s, int c, size_t n);
   @*/
 extern void *memcpy(void *restrict dest,
 		    const void *restrict src, size_t n);
+
+// Non-POSIX; GNU extension
+/*@ requires valid_dest: valid_or_empty(dest, n);
+  @ requires valid_src: valid_read_or_empty(src, n);
+  @ requires separation:
+  @   \separated(((char *)dest)+(0..n-1),((char *)src)+(0..n-1));
+  @ assigns ((char*)dest)[0..n - 1] \from ((char*)src)[0..n-1];
+  @ assigns \result \from dest, n;
+  @ ensures copied_contents: memcmp{Post,Pre}((char*)dest,(char*)src,n) == 0;
+  @ ensures result_next_byte: \result == dest + n;
+  @*/
+extern void *mempcpy(void *restrict dest,
+                     const void *restrict src, size_t n);
 
 /*@ requires valid_dest: valid_or_empty(dest, n);
   @ requires valid_src: valid_read_or_empty(src, n);
@@ -333,7 +349,7 @@ extern char *strtok_r(char *restrict s, const char *restrict delim, char **restr
   @*/
 extern char *strsep (char **stringp, const char *delim);
 
-extern char __fc_strerror[64];
+__FC_EXTERN char __fc_strerror[64];
 char * const __fc_p_strerror = __fc_strerror;
 
 // Note: postcondition "result_nul_terminated" is only a temporary patch,
@@ -511,7 +527,7 @@ extern char *stpncpy(char *restrict dest, const char *restrict src, size_t n);
 //extern char *strerror_l(int errnum, locale_t locale);
 extern int strerror_r(int errnum, char *strerrbuf, size_t buflen);
 
-extern char __fc_strsignal[64];
+__FC_EXTERN char __fc_strsignal[64];
 char * const __fc_p_strsignal = __fc_strsignal;
 
 /*@ //missing: requires valid_signal(signum);

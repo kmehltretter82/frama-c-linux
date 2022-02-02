@@ -1,8 +1,7 @@
 /* run.config*
-  PLUGIN= inout eva
+ PLUGIN: @EVA_MAIN_PLUGINS@
   OPT: -machdep x86_32 -print -then -eva @EVA_CONFIG@ -lib-entry -no-print
 */
-
 typedef int INT[3][3];
 typedef int INT2[][3];
 typedef int INT3[2][7];

@@ -68,6 +68,7 @@
            transfer_stmt mem_exec iterator
            transfer_specification initialization analysis register compute_functions
            eva_annotations octagons traces_domain auto_loop_unroll domain_mode
+           multidim_domain eva_audit summary
 )
 ;  (public_interfaces (Eva))
   (flags -open Frama_c_kernel)

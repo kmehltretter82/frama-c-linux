@@ -450,7 +450,7 @@ class markReachableVisitor
          self#visitAttrs attrs;
          self#mark_enum e
 
-       | TComp(c, _, attrs) ->
+       | TComp(c, attrs) ->
          let old = is_reachable reachable_tbl (Comp c) in
          if not old then
            begin
@@ -481,7 +481,7 @@ class markReachableVisitor
        | TVoid a | TInt (_,a) | TFloat (_,a) | TBuiltin_va_list a ->
          self#visitAttrs a
        | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
-       | TArray(ty,sz, _, a) ->
+       | TArray(ty,sz, a) ->
          ignore (self#vtype ty); self#visitAttrs a;
          Option.iter (ignore $ (visitCilExpr (self:>cilVisitor))) sz
        | TFun (ty, args,_,a) ->
@@ -625,7 +625,7 @@ class markReferencedVisitor = object
         ti.treferenced <- true;
       end;
       DoChildren
-    | TComp (ci, _, _) ->
+    | TComp (ci, _) ->
       if not (Stack.is_empty inside_typ) then begin
         Kernel.debug ~current:true ~dkey "referenced: comp %s" ci.cname;
         ci.creferenced <- true;
@@ -852,11 +852,10 @@ let removeUnmarked isRoot ast reachable_tbl =
   in
   let keptGlobals, removedGlobals = List.partition filterGlobal ast.globals in
   ast.globals <- keptGlobals;
-  if Kernel.is_debug_key_enabled dkey then
+  if Kernel.is_debug_key_enabled dkey then begin
     List.iter (fun rg ->
         Kernel.debug ~dkey "removing global: %s" (global_type_and_name rg)
       ) removedGlobals;
-  if Kernel.is_debug_key_enabled dkey then
     List.iter (fun rg ->
         begin
           match rg with
@@ -866,12 +865,15 @@ let removeUnmarked isRoot ast reachable_tbl =
                 let kf = Globals.Functions.get vi in
                 Kernel.debug ~dkey "GFunDecl: %a@." Kernel_function.pretty_code kf
               with Not_found ->
-                Kernel.debug ~dkey "GFunDecl: not found for %a@." Printer.pp_varinfo vi;
+                Kernel.debug ~dkey
+                  "GFunDecl: %a (no associated kernel function)@."
+                  Printer.pp_varinfo vi;
             end
           | _ -> ()
         end;
         Kernel.debug ~dkey "kept global %s (%a)" (global_type_and_name rg) Printer.pp_global rg
       ) keptGlobals;
+  end;
   !removedLocals
 
 

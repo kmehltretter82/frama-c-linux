@@ -12,10 +12,10 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:548: 
   Declaration of variadic function dprintf.
-[variadic] printf_garbled_mix.c:8: 
-  Variadic builtin Frama_C_show_each_nb_printed left untransformed.
+[variadic] FRAMAC_SHARE/libc/stdio.h:590: 
+  Declaration of variadic function asprintf.
 [variadic] printf_garbled_mix.c:7: 
   Translating call to printf to a call to the specialized version printf_va_1.
 [eva] Analyzing a complete application starting at main
@@ -61,7 +61,7 @@ extern int ( /* missing proto */ Frama_C_show_each_nb_printed)();
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             param0;
  */
-int printf_va_1(char const * __restrict format, int param0);
+int printf_va_1(char const * restrict format, int param0);
 
 void main(void)
 {

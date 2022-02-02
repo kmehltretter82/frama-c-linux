@@ -1,11 +1,10 @@
 /* run.config*
-   OPT: @EVA_CONFIG@ -deps -show-indirect-deps
-   PLUGIN: users @PTEST_PLUGIN@
+  PLUGIN: @EVA_MAIN_PLUGINS@ from,users
    OPT: -calldeps -eva @EVA_CONFIG@ -users -then -input
+  PLUGIN: @EVA_MAIN_PLUGINS@ from
+   OPT: @EVA_CONFIG@ -deps -show-indirect-deps
 */
-int a,b,c,d;
-int x,y,z,t;
-
+int a,b,c,d, x,y,z,t;
 int g(int w)
 {
   return w + t;

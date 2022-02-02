@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,7 +41,7 @@ let length_exp ~loc kf env ~name array =
   let elem_typ, array_len =
     match Logic_aggr.get_array_typ_opt (Cil.typeOf array) with
     | None -> Options.fatal "Trying to retrieve the length of a non-array"
-    | Some (t, len, _, _) -> t, len
+    | Some (t, len, _) -> t, len
   in
   try
     let len = Cil.lenOfArray64 array_len in
@@ -214,6 +214,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
              ~stopat:len1_exp
              ~incr:(Cil.one ~loc)
              ~body:[ Smart_stmt.block_stmt body_blk ]
+             ()
           )
        )
     )
@@ -239,8 +240,16 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
           (Rle, Logic_utils.expr_to_term len, Logic_utils.expr_to_term len_orig)
       in
       let p = { p with pred_name = "array_coercion" :: p.pred_name } in
-      let stmt =
-        Smart_stmt.runtime_check Smart_stmt.RTE kf e p
+      Typing.preprocess_predicate (Env.Local_vars.get env) p;
+      let adata, env = Assert.empty ~loc kf env in
+      let adata, env =
+        Assert.register ~loc kf env "destination length" len adata
+      in
+      let adata, env =
+        Assert.register ~loc kf env "current length" len_orig adata
+      in
+      let stmt, env =
+        Assert.runtime_check ~adata ~pred_kind:Assert Smart_stmt.RTE kf env e p
       in
       stmt :: stmts, env
   in

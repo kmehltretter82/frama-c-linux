@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,14 +20,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open LogicUsage
+
 (* -------------------------------------------------------------------------- *)
-(* --- WP Calculus                                                        --- *)
+(* --- VC Generator                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-module VC( M : Sigs.Compiler ) : Mcfg.S
-module Computer( M : Sigs.Compiler ) :
+module type VCgen =
 sig
-  class wp : WpContext.model -> Generator.computer
+  include Mcfg.S
+  val register_lemma : logic_lemma -> unit
+  val compile_lemma : logic_lemma -> Wpo.t
+  val compile_wp : Wpo.index -> t_prop -> Wpo.t Bag.t
 end
 
-val computer : Factory.setup -> Factory.driver -> Generator.computer
+val vcgen : Factory.setup -> Factory.driver -> (module VCgen)
+
+(* -------------------------------------------------------------------------- *)

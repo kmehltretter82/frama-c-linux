@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
+type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer | Eva
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {
@@ -68,6 +68,7 @@ let descr_mheap d = function
   | ZeroAlias -> main d "zeroalias"
   | Hoare -> main d "hoare"
   | Typed p -> main d "typed" ; descr_mtyped d p
+  | Eva -> main d "eva"
 
 let descr_mvar d = function
   | Var -> ()
@@ -104,6 +105,9 @@ let describe s =
 (* --- Variable Proxy                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let validity x =
+  if RefUsage.is_nullable x then MemoryContext.Nullable else Valid
+
 module type Proxy = sig
   val datatype : string
   val param : Cil_types.varinfo -> MemoryContext.param
@@ -124,7 +128,7 @@ struct
     let module S = Datatype.String.Set in
     let open MemoryContext in
     if S.mem x.vname (get_addr ()) then ByAddr else
-    if S.mem x.vname (get_ctxt ()) then InContext else
+    if S.mem x.vname (get_ctxt ()) then InContext (validity x) else
     if S.mem x.vname (get_refs ()) then ByRef else
     if S.mem x.vname (get_vars ()) then ByValue else
       V.param x
@@ -170,9 +174,9 @@ let is_ptr x = Cil.isPointerType x.Cil_types.vtype
 let is_fun_ptr x = Cil.isFunctionType x.Cil_types.vtype
 let is_formal_ptr x = x.Cil_types.vformal && is_ptr x
 let is_init kf x =
-  WpStrategy.is_main_init kf ||
+  Globals.is_entry_point ~when_lib_entry:false kf ||
   Wp_parameters.AliasInit.get () ||
-  ( WpStrategy.isInitConst () && WpStrategy.isGlobalInitConst x )
+  ( Wp_parameters.Init.get () && Cil.isGlobalInitConst x )
 
 let refusage_param ~byref ~context x =
   let kf,init = match WpContext.get_scope () with
@@ -182,16 +186,19 @@ let refusage_param ~byref ~context x =
   | RefUsage.NoAccess -> MemoryContext.NotUsed
   | RefUsage.ByAddr -> MemoryContext.ByAddr
   | RefUsage.ByValue ->
-      if context && is_formal_ptr x then MemoryContext.InContext
+      if context && is_formal_ptr x then MemoryContext.InContext (validity x)
       else if is_ptr x && not (is_fun_ptr x) then MemoryContext.ByShift
       else MemoryContext.ByValue
   | RefUsage.ByRef ->
       if byref
-      then MemoryContext.ByRef
+      then
+        if RefUsage.is_nullable x
+        then MemoryContext.InContext Nullable
+        else MemoryContext.ByRef
       else MemoryContext.ByValue
   | RefUsage.ByArray ->
       if context && is_formal_ptr x
-      then MemoryContext.InArray
+      then MemoryContext.InArray (validity x)
       else MemoryContext.ByShift
 
 let refusage_iter ?kf ~init f = RefUsage.iter ?kf ~init (fun x _usage -> f x)
@@ -232,6 +239,8 @@ module Model_Typed_Var = Register(Var)(MemTyped)
 module Model_Typed_Ref = Register(Ref)(MemTyped)
 module Model_Caveat = Register(Caveat)(MemTyped)
 
+module MemVal = MemVal.Make(MemVal.Eva)
+
 module MakeCompiler(M:Sigs.Model) = struct
   module M = M
   module C = CodeSemantics.Make(M)
@@ -247,6 +256,7 @@ module Comp_MemTyped = MakeCompiler(MemTyped)
 module Comp_Typed_Var = MakeCompiler(Model_Typed_Var)
 module Comp_Typed_Ref = MakeCompiler(Model_Typed_Ref)
 module Comp_Caveat = MakeCompiler(Model_Caveat)
+module Comp_MemVal = MakeCompiler(MemVal)
 
 
 let compiler mheap mvar : (module Sigs.Compiler) =
@@ -259,6 +269,7 @@ let compiler mheap mvar : (module Sigs.Compiler) =
   | Typed _ , Raw     -> (module Comp_MemTyped)
   | Typed _ , Var     -> (module Comp_Typed_Var)
   | Typed _ , Ref     -> (module Comp_Typed_Ref)
+  | Eva, _            -> (module Comp_MemVal)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tuning                                                             --- *)
@@ -268,6 +279,7 @@ let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
   | Region -> MemRegion.configure ()
+  | Eva -> MemVal.configure ()
   | Typed p ->
       let rollback_memtyped = MemTyped.configure () in
       let orig_memtyped_pointer = Context.push MemTyped.pointer p in
@@ -337,6 +349,7 @@ let split ~warning (m:string) : string list =
     (fun c ->
        match c with
        | 'A' .. 'Z' -> Buffer.add_char buffer c
+       | '0' .. '9' -> Buffer.add_char buffer c
        | '_' | ',' | '@' | '+' | ' ' | '\t' | '\n' | '(' | ')' -> flush ()
        | _ -> warning (Printf.sprintf
                          "In model spec %S : unexpected character '%c'" m c)
@@ -351,6 +364,7 @@ let update_config ~warning m s = function
   | "TYPED" -> { s with mheap = Typed MemTyped.Fits }
   | "CAST" -> { s with mheap = Typed MemTyped.Unsafe }
   | "NOCAST" -> { s with mheap = Typed MemTyped.NoCast }
+  | "EVA" -> { s with mheap = Eva }
   | "CAVEAT" -> { s with mvar = Caveat }
   | "RAW" -> { s with mvar = Raw }
   | "REF" -> { s with mvar = Ref }

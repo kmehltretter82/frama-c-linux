@@ -159,6 +159,20 @@ void bug5() {
   }
 }
 
+void set_zero(char *c) { *c = 0; }
+
+/* Tests a bug with the bitwise domain and the memexec cache. */
+void bug6() {
+  char a;
+  set_zero(&a);
+  a = a ^ 1;
+  /* The memexec is used here, and the value for [a] must be removed from the
+     state, as it is written in [set_zero], even if it is not in the post-state,
+     as the bitwise domain infers values only for bitwise operations. */
+  set_zero(&a);
+  a = a ^ 1;
+}
+
 void main(void) {
   test1();
   test2();
@@ -172,4 +186,5 @@ void main(void) {
   bug3();
   bug4();
   bug5();
+  bug6();
 }

@@ -49,4 +49,4 @@ Prove: valid_rw(Malloc_0, p, 2).
        requires \separated(&_p__fc_fopen, {filename + (..), mode + (..)});
        ensures \separated(\result, &_p__fc_fopen);
      */
-  FILE *fopen(char const * __restrict filename, char const * __restrict mode);
+  FILE *fopen(char const * restrict filename, char const * restrict mode);

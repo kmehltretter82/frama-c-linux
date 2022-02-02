@@ -1,8 +1,8 @@
 /* run.config
    DONTRUN:
 */
+
 /* run.config_qualif
-   DEPS: config.sh
-   CMD: ./config.sh
+   CMD: %{dep:@PTEST_DIR@/config.sh}
    OPT:
 */

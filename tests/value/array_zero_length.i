@@ -1,4 +1,5 @@
 /* run.config*
+  PLUGIN: @EVA_MAIN_PLUGINS@
    OPT: -eva @EVA_CONFIG@ -machdep gcc_x86_32
    OPT: -eva @EVA_CONFIG@ -lib-entry -machdep gcc_x86_32
  EXIT: 1

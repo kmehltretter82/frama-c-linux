@@ -1,4 +1,4 @@
-/* run.config, run.config_2
+/* run.config
    COMMENT: pointer substraction
 */
 

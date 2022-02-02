@@ -3,22 +3,22 @@
   Calling undeclared function gm_f2. Old style K&R code?
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva] imprecise.c:27: Warning: 
+[eva:unknown-size] imprecise.c:27: Warning: 
   during initialization of variable 'v1', size of type 'struct s' cannot be
   computed (abstract type 'struct s')
-[eva] imprecise.c:27: Warning: 
+[eva:unknown-size] imprecise.c:27: Warning: 
   during initialization of variable 'v2', size of type 'struct s' cannot be
   computed (abstract type 'struct s')
-[eva] imprecise.c:28: Warning: 
+[eva:unknown-size] imprecise.c:28: Warning: 
   during initialization of variable 'v3', size of type 'struct u' cannot be
   computed (abstract type 'struct u')
-[eva] imprecise.c:28: Warning: 
+[eva:unknown-size] imprecise.c:28: Warning: 
   during initialization of variable 'v5', size of type 'struct u' cannot be
   computed (abstract type 'struct u')
-[eva] imprecise.c:83: Warning: 
+[eva:unknown-size] imprecise.c:83: Warning: 
   during initialization of variable 's1', size of type 'struct s' cannot be
   computed (abstract type 'struct s')
-[eva] imprecise.c:83: Warning: 
+[eva:unknown-size] imprecise.c:83: Warning: 
   during initialization of variable 's2', size of type 'struct s' cannot be
   computed (abstract type 'struct s')
 [eva] Initial state computed
@@ -56,7 +56,7 @@
 [eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
 [eva] imprecise.c:21: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
@@ -100,7 +100,7 @@
 [eva] imprecise.c:51: Call to builtin memset
 [eva:alarm] imprecise.c:51: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva] FRAMAC_SHARE/libc/string.h:118: 
+[eva] FRAMAC_SHARE/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:alarm] imprecise.c:53: Warning: out of bounds write. assert \valid(p2);
 [eva:alarm] imprecise.c:53: Warning: 
@@ -137,7 +137,7 @@
 [eva] Done for function gm_f1
 [eva] imprecise.c:76: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
@@ -175,7 +175,7 @@
 [eva] Done for function gm_f2
 [eva] imprecise.c:78: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
@@ -569,7 +569,7 @@
 [eva] Computing initial state
 [eva:initial-state] 
   creating variable S_0_t with imprecise size (type struct s [2])
-[eva] imprecise.c:29: Warning: 
+[eva:unknown-size] imprecise.c:29: Warning: 
   during initialization of variable 't', size of type 'struct s' cannot be
   computed (abstract type 'struct s')
 [eva:initial-state] 
@@ -611,7 +611,7 @@
 [eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
 [eva] imprecise.c:21: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
@@ -689,7 +689,7 @@
 [eva] Done for function gm_f1
 [eva] imprecise.c:76: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
@@ -730,7 +730,7 @@
 [eva] Done for function gm_f2
 [eva] imprecise.c:78: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}

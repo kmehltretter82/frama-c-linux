@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -220,8 +220,13 @@ let value_assigned = function
   | Assign v -> `Value v
   | Copy (_, copied) -> copied.v
 
-type logic_assign =
-  | Assigns of from
+type 'location logic_dependency =
+  { term: identified_term;
+    direct: bool;
+    location: 'location option; }
+
+type 'location logic_assign =
+  | Assigns of identified_term * 'location logic_dependency list
   | Allocates of identified_term
   | Frees of identified_term
 
@@ -235,13 +240,27 @@ type ('loc, 'value) argument = {
   avalue: ('loc, 'value) assigned;
 }
 
+
+type call_site = kernel_function * kinstr
+type callstack = call_site list
+
 type ('loc, 'value) call = {
   kf: kernel_function;
+  callstack: callstack;
   arguments: ('loc, 'value) argument list;
   rest: (exp * ('loc, 'value) assigned) list;
   return: varinfo option;
-  recursive: bool;
 }
+
+type recursion = {
+  depth: int;
+  substitution: (varinfo * varinfo) list;
+  base_substitution: Base.substitution;
+  withdrawal: varinfo list;
+  base_withdrawal: Base.Hptset.t;
+}
+
+type cacheable = Cacheable | NoCache | NoCacheCallers
 
 (*
 Local Variables:

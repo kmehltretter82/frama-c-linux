@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,11 +34,11 @@ open Lang.F
 
 module WpLog = Wp_parameters
 let constfold_ctyp = function
-  | TArray (_,Some {enode = (Const CInt64 _) },_,_) as ct -> ct
-  | TArray (ty,Some len,cache,attr) as ct -> begin
+  | TArray (_,Some {enode = (Const CInt64 _) },_) as ct -> ct
+  | TArray (ty,Some len,attr) as ct -> begin
       match Cil.constFold true len with
       | {enode = (Const CInt64 _) } as len ->
-          TArray(ty,Some len,cache,attr)
+          TArray(ty,Some len,attr)
       | _ -> ct
     end
   | ct -> ct
@@ -94,7 +94,7 @@ struct
     | C_float _ -> is_zero_float (M.load sigma obj l)
     | C_pointer _ -> is_zero_ptr (M.load sigma obj l)
     | C_comp { cfields = None } ->
-        Wp_parameters.fatal "0-initialization of an opaque structure"
+        p_true (* cannot say anything interesting here *)
     | C_comp { cfields = Some fields } ->
         p_all
           (fun f -> is_zero sigma (Ctypes.object_of f.ftype) (M.field l f))
@@ -451,7 +451,17 @@ struct
                  p_equal (val_of_exp sigma e) (cval v)
              | None -> is_zero sigma obj l
            in
-           value_hyp, (M.initialized sigma (Rloc(obj, l)))
+           let init_hyp = match init with
+             | Some { enode = Lval lv_init }
+               when Cil.(isStructOrUnionType @@ typeOfLval lv_init) ->
+                 let l_initializer = lval sigma lv_init in
+                 p_equal
+                   (M.load_init sigma obj l)
+                   (M.load_init sigma obj l_initializer)
+             | _ ->
+                 M.initialized sigma (Rloc(obj, l))
+           in
+           value_hyp, init_hyp
         ) () in
     match outcome with
     | Warning.Failed warn -> warn , (F.p_true, F.p_true)
@@ -486,10 +496,10 @@ struct
         let ct = constfold_ctyp ct in
         let acc = (* updated acc with default init of structure *)
           match ct with
-          | TComp ( { cfields = None },_,_) ->
+          | TComp ( { cfields = None },_) ->
               Wp_parameters.fatal
                 "Initializer for incomplete type %a" Cil_printer.pp_typ ct
-          | TComp ( { cstruct ; cfields = Some fields },_,_)
+          | TComp ( { cstruct ; cfields = Some fields },_)
             when cstruct && (* not for union... *)
                  (List.length initl) < (List.length fields) ->
               (* default init for unintialized field of a struct *)
@@ -512,7 +522,7 @@ struct
           | _ -> acc
         in
         match ct with
-        | TArray (ty,len,_,_) ->
+        | TArray (ty,len,_) ->
             let delayed =
               match len with (* number of required elements *)
               | Some {enode = (Const CInt64 (size,_,_))} ->

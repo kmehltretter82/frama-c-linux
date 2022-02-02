@@ -1,6 +1,6 @@
-/* run.config*
-PLUGIN: eva,inout,report
-OPT: @EVA_CONFIG@ -eva-no-show-progress -eva -eva-use-spec g1,g2,g3 -then -report
+/* run.config* 
+ PLUGIN: @EVA_MAIN_PLUGINS@ report
+   OPT: @EVA_CONFIG@ -eva-no-show-progress -eva -eva-use-spec g1,g2,g3 -then -report
 */
 
 /* Test what is printed when Value evaluates a post-condition:

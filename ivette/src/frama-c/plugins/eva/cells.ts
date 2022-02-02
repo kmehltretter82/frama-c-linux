@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Cells
 // --------------------------------------------------------------------------
@@ -70,15 +92,21 @@ export function leq(a: Size, b: Size): boolean {
 
 export type EvaStatus = 'True' | 'False' | 'Unknown';
 export type EvaAlarm = [EvaStatus, string];
-export type EvaState = 'Here' | 'After' | 'Then' | 'Else';
+export type EvaPointedVar = [string, Ast.marker];
+export type Evaluation = Values.evaluation;
+
+const emptyEvaluation: Values.evaluation = {
+  value: '',
+  alarms: [],
+  pointed_vars: [],
+};
 
 export interface EvaValues {
   errors?: string;
-  values?: string;
-  v_after?: string;
-  v_then?: string;
-  v_else?: string;
-  alarms?: EvaAlarm[];
+  v_before: Evaluation;
+  v_after?: Evaluation;
+  v_then?: Evaluation;
+  v_else?: Evaluation;
   size: Size;
 }
 
@@ -138,7 +166,7 @@ export class ValueCache {
     const cache = this.vcache;
     const cached = cache.get(key);
     if (cached) return cached;
-    const newValue: EvaValues = { values: '', size: EMPTY };
+    const newValue: EvaValues = { v_before: emptyEvaluation, size: EMPTY };
     if (callstack !== undefined && fct === undefined)
       return newValue;
     // callstack !== undefined ==> fct !== undefined)
@@ -147,11 +175,10 @@ export class ValueCache {
       .send(Values.getValues, { target: marker, callstack })
       .then((r) => {
         newValue.errors = undefined;
-        newValue.values = r.values;
+        if (r.v_before) newValue.v_before = r.v_before;
         newValue.v_after = r.v_after;
         newValue.v_then = r.v_then;
         newValue.v_else = r.v_else;
-        newValue.alarms = r.alarms;
         if (this.updateLayout(marker, fct, callstack, newValue))
           this.state.forceLayout();
         else
@@ -173,10 +200,10 @@ export class ValueCache {
     v: EvaValues,
   ): boolean {
     // measuring cell
-    let s = sizeof(v.values);
-    s = addS(s, v.v_after);
-    s = addS(s, v.v_then);
-    s = addS(s, v.v_else);
+    let s = sizeof(v.v_before.value);
+    s = addS(s, v.v_after?.value);
+    s = addS(s, v.v_then?.value);
+    s = addS(s, v.v_else?.value);
     v.size = s;
     // max cell size
     const { smax } = this;

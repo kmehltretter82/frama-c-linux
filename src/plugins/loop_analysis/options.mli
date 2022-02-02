@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,6 +23,3 @@
 include Plugin.S
 
 module Run:Parameter_sig.Bool
-module MaxIterations:Parameter_sig.Int
-module MaxSlevel:Parameter_sig.Int
-module NoBranches:Parameter_sig.Bool

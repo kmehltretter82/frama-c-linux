@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -50,6 +50,8 @@ jcdb_json = json.loads(open(arg).read())
 jcdb_dir = arg.parent
 out_json = {}
 
+replacements = set()
+
 nb_diffs = 0
 for entry in jcdb_json:
    if "file" in entry and os.path.isabs(entry["file"]):
@@ -57,6 +59,7 @@ for entry in jcdb_json:
       entry["file"] = os.path.relpath(entry["file"], jcdb_dir)
       if old_entry != entry["file"]:
          nb_diffs += 1
+         replacements.add(f"{old_entry} -> {entry['file']}")
       else:
          print(f"warning: absolute path could not be normalized: {entry['file']}")
    elif "directory" in entry and os.path.isabs(entry["directory"]):
@@ -64,12 +67,15 @@ for entry in jcdb_json:
       entry["directory"] = os.path.relpath(entry["directory"], jcdb_dir)
       if old_entry != entry["directory"]:
          nb_diffs += 1
+         replacements.add(f"{old_entry} -> {entry['directory']}")
       else:
          print(f"warning: absolute path could not be normalized: {entry['directory']}")
 
 if nb_diffs == 0:
    print(f"No changes to be applied to {arg}")
 else:
+   replacements_str = "\n".join(sorted(replacements))
+   print(f"Replacements to be made:\n{replacements_str}")
    yn = input(f"{nb_diffs} replacements to be applied. Normalize {arg}? [y/N] ")
    if yn.lower() == "y":
       with open(arg, 'w', encoding='utf-8') as outfile:

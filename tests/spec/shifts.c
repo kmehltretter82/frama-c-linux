@@ -1,6 +1,6 @@
 /* run.config
-   PLUGIN: @EVA_PLUGINS@
-   OPT: -eva @EVA_OPTIONS@ -deps -journal-disable
+PLUGIN: eva,scope,from
+   OPT: -eva @EVA_CONFIG@ -deps
 */
 int e;
 

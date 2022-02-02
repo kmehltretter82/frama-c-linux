@@ -17,7 +17,9 @@ TARGETS = \
 	loop-unroll-nested.log \
 	loop-unroll-insuf.log \
 	split-array.log \
-	split-fabs.log
+	split-fabs.log \
+	recursion-simple.log \
+	recursion-imprecise.log
 
 .SECONDEXPANSION:
 .PHONY: all clean
@@ -39,3 +41,5 @@ slevel.1.log: FCFLAGS += -eva-slevel 55
 slevel.2.log: FCFLAGS += -eva-slevel 28
 ilevel.2.log: FCFLAGS += -eva-ilevel 16
 split-fabs.log: FCFLAGS += -eva-domains equality
+recursion-simple.log: FCFLAGS += -eva-unroll-recursive-calls 10
+recursion-imprecise.log: FCFLAGS += -eva-unroll-recursive-calls 4

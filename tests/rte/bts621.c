@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print -then -no-print -rte -warn-signed-overflow -then -print
+   OPT: -print -then -no-print @RTE_TEST@ -warn-signed-overflow -then -print
 */
 /*@ ghost
   /@ assigns *p; @/

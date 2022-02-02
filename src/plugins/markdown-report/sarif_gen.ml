@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,8 +38,8 @@ let frama_c_sarif () =
        ~informationUri ())
 
 let get_remarks () =
-  let f = Mdr_params.Remarks.get () in
-  if f <> "" then Parse_remarks.get_remarks f
+  if not (Mdr_params.Remarks.is_empty ()) then
+    Parse_remarks.get_remarks (Mdr_params.Remarks.get ())
   else Datatype.String.Map.empty
 
 let get_remark remarks label =
@@ -149,8 +149,7 @@ let ip_is_in_libc ip =
       match ip with
       | IPAxiomatic {iax_attrs=attrs}
       | IPLemma {il_attrs=attrs}
-      | IPAxiom {il_attrs=attrs} ->
-        Cil.is_in_libc attrs
+        -> Cil.is_in_libc attrs
       | _ ->
         false
     end
@@ -206,6 +205,7 @@ let gen_status ip =
   Sarif_result.create ~ruleId:user_annot_id ~level ~locations ~message ()
 
 let gen_statuses () =
+  let cmp = Property.Ordered_by_function.compare in
   let f ip content =
     let exclude =
       is_alarm ip ||
@@ -213,7 +213,7 @@ let gen_statuses () =
     in
     if exclude then content else (gen_status ip) :: content
   in
-  List.rev (Property_status.fold f [])
+  List.rev (Property_status.fold_sorted ~cmp f [])
 
 let gen_artifacts () =
   let add_src_file f =
@@ -250,7 +250,21 @@ let gen_run remarks =
   let taxonomies = [ToolComponent.create ~name ~rules ()] in
   let results = results @ user_annot_results in
   let artifacts = gen_artifacts () in
-  let uriBases = ("PWD", Sys.getcwd ()) :: Filepath.all_symbolic_dirs () in
+  let symbolicDirs =
+    List.map (fun (key, (dir : Filepath.Normalized.t)) ->
+        (key, (dir :> string))
+      ) (Filepath.all_symbolic_dirs ())
+  in
+  (* TODO: we currently use Sys.getenv "PWD" instead of Sys.getcwd ()
+     because OCaml has no function in its stdlib to resolve symbolic links
+     (e.g. realpath) for a given path.
+     'getcwd' always resolves them, but if the user supplies a path with
+     symbolic links, this may cause issues.
+     Instead of forcing the user to always provide resolved paths, we
+     currently choose to never resolve them.
+     We only resort to getcwd() to avoid issues when PWD does not exist. *)
+  let pwd = try Sys.getenv "PWD" with Not_found -> Sys.getcwd () in
+  let uriBases = ("PWD", pwd) :: symbolicDirs in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->
         let baseUri =
@@ -273,13 +287,14 @@ let generate () =
   let remarks = get_remarks () in
   let runs = [ gen_run remarks ] in
   let json = Schema.create ~runs () |> Schema.to_yojson in
-  let file = Mdr_params.Output.get () in
-  if file = "" then
-    Log.print_on_output (fun fmt -> Yojson.Safe.pretty_print fmt json)
-  else
+  if not (Mdr_params.Output.is_empty ()) then
+    let file = Mdr_params.Output.get () in
     try
-      Command.write_file file
+      Command.write_file (file:>string)
         (fun out -> Yojson.Safe.pretty_to_channel ~std:true out json) ;
-      Mdr_params.result "Report %s generated" file
+      Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
     with Sys_error s ->
-      Mdr_params.abort "Unable to generate %s (%s)" file s
+      Mdr_params.abort "Unable to generate %a (%s)"
+        Filepath.Normalized.pretty file s
+  else
+    Log.print_on_output (fun fmt -> Yojson.Safe.pretty_print fmt json)

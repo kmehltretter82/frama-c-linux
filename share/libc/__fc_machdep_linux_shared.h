@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -270,5 +270,9 @@
 
 /* time.h */
 #define __FC_TIME_T long
+
+/* signal.h */
+#define __FC_NSIG 65
+#define __FC__NSIG __FC_NSIG
 
 #endif

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,8 +33,8 @@ let print_config () =
            FRAMAC_SHARE  = %S@\n  \
            FRAMAC_PLUGIN = %S%t@."
           Fc_config.version_and_codename
-          (String.concat ":" Fc_config.datadirs)
-          (String.concat ":" Fc_config.plugin_dir)
+          (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.datadirs))
+          (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.plugin_dir))
         (fun fmt ->
           if Fc_config.preprocessor = "" then
             Format.fprintf fmt "@\nWarning: no default pre-processor"
@@ -55,6 +55,7 @@ let print_config get value () =
   end
 
 let print_configl get value () =
+  let value = Filepath.Normalized.to_string_list value in
   if get () then begin
     Log.print_on_output (fun fmt -> (Format.fprintf fmt "%s%!" (String.concat "\n" value))) ;
     raise Cmdline.Exit
@@ -88,8 +89,8 @@ let () =
 
 (* Load Frama-c from disk if required *)
 let load_binary () =
-  let filepath = Kernel.LoadState.get () in
-  if filepath <> Filepath.Normalized.unknown then begin
+  if not (Kernel.LoadState.is_empty ()) then begin
+    let filepath = Kernel.LoadState.get () in
     try
       Project.load_all filepath
     with Project.IOError s ->
@@ -134,8 +135,8 @@ let () = Extlib.safe_at_exit time
 
 (* Save Frama-c on disk if required *)
 let save_binary error_extension =
-  let filename = Kernel.SaveState.get () in
-  if not (Filepath.Normalized.is_unknown filename) then begin
+  if not (Kernel.SaveState.is_empty ()) then begin
+    let filename = Kernel.SaveState.get () in
     Kernel.SaveState.clear ();
     let realname =
       match error_extension with
@@ -156,14 +157,14 @@ let save_binary error_extension =
 let () =
   (* implement a refinement of the behavior described in BTS #1388:
      - on normal exit: save
-     - on Sys.break, system error or feature request: do not save
+     - on Sys.break (Ctrl-C interruption): save, but add ".break" suffix
      - on user error: save, but add ".error" suffix
      - on fatal error or unexpected error: save, but add ".crash" suffix *)
   Cmdline.at_normal_exit (fun () -> save_binary None);
   Cmdline.at_error_exit
     (function
-      | Sys.Break | Sys_error _ | Log.FeatureRequest _ -> ()
-      | Log.AbortError _ -> save_binary (Some ".error")
+      | Sys.Break -> save_binary (Some ".break")
+      | Log.AbortError _ | Log.FeatureRequest _ -> save_binary (Some ".error")
       | _ -> save_binary (Some ".crash"))
 
 (* Write JSON files to disk if required *)
@@ -173,7 +174,12 @@ let flush_json_files () =
       Kernel.feedback "Wrote: %a" Filepath.Normalized.pretty fp)
     written
 
-let () = Cmdline.at_normal_exit (fun () -> flush_json_files ())
+(* Registers an exit hook that flushes Json objects and writes JSON files. This
+   hook must be run last (in case other hooks modifiy JSON objects), so it is
+   registered after the extended stage, when plug-ins have been loaded. *)
+let () =
+  Cmdline.run_after_extended_stage
+    (fun () -> Cmdline.at_normal_exit (fun () -> flush_json_files ()))
 
 let run_list_all_plugin_options () =
   if not (Kernel.AutocompleteHelp.is_empty ()) then begin

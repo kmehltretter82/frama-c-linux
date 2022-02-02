@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,15 +25,6 @@ open Cil_types
 (** Functions that translate a given ACSL annotation into the corresponding C
     statements (if any) for runtime assertion checking. These C statements are
     part of the resulting environment. *)
-
-val must_translate: Property.t -> bool
-(** Return true if the given property must be translated (ie. if the valid
-    properties must be translated or if its status is not [True]), false
-    otherwise. *)
-
-val must_translate_opt: Property.t option -> bool
-(** Same than [must_translate] but for [Property.t option]. Return false if the
-    option is [None]. *)
 
 val pre_funspec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
 (** Translate the preconditions of the given function contract in the
@@ -72,6 +63,6 @@ val post_code_annotation:
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

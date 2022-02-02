@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,6 +35,6 @@ module Make
     val compute_using_specification:
       warn:bool ->
       kinstr -> (Abstract.Loc.location, Abstract.Val.t) call -> spec ->
-      Abstract.Dom.t -> Abstract.Dom.t list or_bottom
+      Abstract.Dom.t -> (Partition.key*Abstract.Dom.t) list
 
   end

@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Eva Values
 // --------------------------------------------------------------------------
@@ -8,21 +30,22 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Hpack, Filler } from 'dome/layout/boxes';
+import { Inset } from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
 import { Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import { ModelProp, EvalStmt, EvalCond } from 'frama-c/plugins/eva/model';
 
 // Frama-C
 import * as States from 'frama-c/states';
 
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
-import { Diff, DiffProps } from './diffed';
-import { sizeof, EvaValues, EvaState } from './cells';
+import { Diff } from './diffed';
+import { sizeof, EvaValues, EvaPointedVar, Evaluation } from './cells';
 import { Probe } from './probes';
 import { Row } from './layout';
 import { Callsite } from './stacks';
-import { useModel } from './model';
 import { Stmt } from './valueinfos';
 import './style.css';
 
@@ -30,46 +53,27 @@ import './style.css';
 // --- Cell Diffs
 // --------------------------------------------------------------------------
 
-function isTrivial(v: EvaValues) {
-  return v.values === '{0; 1}' &&
-    v.v_then === '{1}' &&
-    v.v_else === '{0}';
-}
-
-function computeDiffs(
-  condition: boolean,
-  v: EvaValues,
-  vstate: EvaState,
-): DiffProps {
-  if (condition) {
-    const trv = isTrivial(v);
-    switch (vstate) {
-      case 'Here':
-      case 'After':
-        return trv ? { text: v.values } :
-          { text: v.values, diffA: v.v_then, diffB: v.v_else };
-      case 'Then':
-        return { text: v.v_then, diff: !trv ? v.values : undefined };
-      case 'Else':
-        return { text: v.v_else, diff: !trv ? v.values : undefined };
-    }
-  } else {
-    switch (vstate) {
-      case 'Here':
-      case 'Then':
-      case 'Else':
-        return { text: v.values, diff: v.v_after };
-      case 'After':
-        return { text: v.v_after, diff: v.values };
-    }
+function computeValueDiffs(v: EvaValues, vstate: EvalStmt | EvalCond) {
+  let here = v.v_before;
+  let diff: undefined | Evaluation;
+  let diff2: undefined | Evaluation;
+  function setValue(e?: Evaluation) { if (e) { here = e; diff = v.v_before; } }
+  switch (vstate) {
+    case 'Before': diff = v.v_after; break;
+    case 'After': setValue(v.v_after); break;
+    case 'Then': setValue(v.v_then); break;
+    case 'Else': setValue(v.v_else); break;
+    case 'Cond': diff = v.v_then; diff2 = v.v_else; break;
   }
+  const vdiffs = { text: here.value, diff: diff?.value, diff2: diff2?.value };
+  return { value: here, vdiffs };
 }
 
 // --------------------------------------------------------------------------
 // --- Table Cell
 // --------------------------------------------------------------------------
 
-interface TableCellProps {
+interface TableCellProps extends ModelProp {
   probe: Probe;
   row: Row;
 }
@@ -77,15 +81,16 @@ interface TableCellProps {
 const CELLPADDING = 12;
 
 function TableCell(props: TableCellProps) {
-  const model = useModel();
+  const { probe, row, model } = props;
   const [, setSelection] = States.useSelection();
-  const { probe, row } = props;
   const { kind, callstack } = row;
   const minWidth = CELLPADDING + WSIZER.dimension(probe.minCols);
   const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
   const style = { width: minWidth, maxWidth };
   let contents: React.ReactNode = props.probe.marker;
-  const { transient } = probe;
+  let valueText = '';
+  let pointedVars: EvaPointedVar[] = [];
+  const { transient, marker } = probe;
   const focused = model.getFocused();
   const isFocused = focused === probe;
 
@@ -93,15 +98,13 @@ function TableCell(props: TableCellProps) {
 
     // ---- Probe Contents
     case 'probes':
-      if (transient) {
-        contents = <span className="dome-text-label">« Probe »</span>;
-      } else {
-        const { stmt, rank, code, label } = probe;
+      {
+        const { stmt, code, label } = probe;
         const textClass = label ? 'dome-text-label' : 'dome-text-cell';
         contents = (
           <>
             <span className={textClass}>{label ?? code}</span>
-            <Stmt stmt={stmt} rank={rank} />
+            <Stmt stmt={stmt} marker={marker} short />
           </>
         );
       }
@@ -112,21 +115,24 @@ function TableCell(props: TableCellProps) {
     case 'callstack':
       {
         const domain = model.values.getValues(probe, callstack);
-        const { alarms = [] } = domain;
         const { condition } = probe;
         const vstate = condition ? model.getVcond() : model.getVstmt();
-        const vdiffs = computeDiffs(condition, domain, vstate);
+        const { value, vdiffs } = computeValueDiffs(domain, vstate);
+        valueText = value.value;
         const text = vdiffs.text ?? vdiffs.diff;
         const { cols, rows } = sizeof(text);
         let status = 'none';
-        if (alarms.length > 0) {
-          if (alarms.find(([st, _]) => st === 'False')) status = 'False';
+        if (value.alarms.length > 0) {
+          if (value.alarms.find(([st, _]) => st === 'False')) status = 'False';
           else status = 'Unknown';
         }
+        if (value.pointed_vars.length > 0)
+          pointedVars = value.pointed_vars;
         const alarmClass = `eva-cell-alarms eva-alarm-${status}`;
+        const title = 'At least one alarm is raised in one callstack';
         contents = (
           <>
-            <Icon className={alarmClass} size={10} id="WARNING" />
+            <Icon className={alarmClass} size={10} title={title} id="WARNING" />
             <SizedArea cols={cols} rows={rows}>
               <span className={`eva-state-${vstate}`}>
                 <Diff {...vdiffs} />
@@ -154,12 +160,36 @@ function TableCell(props: TableCellProps) {
     probe.setPersistent();
     if (probe.zoomable) probe.setZoomed(!probe.zoomed);
   };
+
+  async function onContextMenu() {
+    const items: Dome.PopupMenuItem[] = [];
+    const copyValue = () => navigator.clipboard.writeText(valueText);
+    if (valueText !== '')
+      items.push({ label: 'Copy to clipboard', onClick: copyValue });
+    if (items.length > 0 && pointedVars.length > 0)
+      items.push('separator');
+    pointedVars.forEach((lval) => {
+      const [text, lvalMarker] = lval;
+      const label = `Display values for ${text}`;
+      const location = { fct: probe.fct, marker: lvalMarker };
+      const onItemClick = () => model.addProbe(location);
+      items.push({ label, onClick: onItemClick });
+    });
+    if (items.length > 0)
+      items.push('separator');
+    const remove = () => model.removeProbe(probe);
+    const removeLabel = `Remove column for ${probe.code}`;
+    items.push({ label: removeLabel, onClick: remove });
+    if (items.length > 0) Dome.popupMenu(items);
+  }
+
   return (
     <div
       className={className}
       style={style}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
     >
       {contents}
     </div>
@@ -175,6 +205,9 @@ interface TableSectionProps {
   folded: boolean;
   foldable: boolean;
   onClick: () => void;
+  byCallstacks: boolean;
+  onCallstackClick: () => void;
+  close: () => void;
 }
 
 function TableSection(props: TableSectionProps) {
@@ -192,6 +225,21 @@ function TableSection(props: TableSectionProps) {
         onClick={onClick}
       />
       <Cell className="eva-fct-name">{fct}</Cell>
+      <Filler />
+      <IconButton
+        icon="ITEMS.LIST"
+        className="eva-probeinfo-button"
+        selected={props.byCallstacks}
+        title="Details by callstack"
+        onClick={props.onCallstackClick}
+      />
+      <Inset />
+      <IconButton
+        icon="CROSS"
+        className="eva-probeinfo-button"
+        title="Close"
+        onClick={props.close}
+      />
     </>
   );
 }
@@ -243,10 +291,11 @@ function TableHead(props: TableHeadProps) {
 interface TableRowProps {
   style: React.CSSProperties;
   index: number;
+  data: ModelProp;
 }
 
 function TableRow(props: TableRowProps) {
-  const model = useModel();
+  const { model } = props.data;
   const row = model.getRow(props.index);
   if (!row) return null;
   const { kind, probes } = row;
@@ -255,6 +304,7 @@ function TableRow(props: TableRowProps) {
     if (!fct) return null;
     const folded = model.isFolded(fct);
     const foldable = model.isFoldable(fct);
+    const byCallstacks = model.isByCallstacks(fct);
     return (
       <Hpack className="eva-function" style={props.style}>
         <TableSection
@@ -262,6 +312,9 @@ function TableRow(props: TableRowProps) {
           folded={folded}
           foldable={foldable}
           onClick={() => model.setFolded(fct, !folded)}
+          byCallstacks={byCallstacks}
+          onCallstackClick={() => model.setByCallstacks(fct, !byCallstacks)}
+          close={() => model.clearFunction(fct)}
         />
       </Hpack>
     );
@@ -283,6 +336,7 @@ function TableRow(props: TableRowProps) {
       key={probe.marker}
       probe={probe}
       row={row}
+      model={model}
     />
   );
   return (
@@ -310,16 +364,18 @@ export interface Dimension {
   height: number;
 }
 
-export interface ValuesPanelProps extends Dimension {
+export interface ValuesPanelProps extends Dimension, ModelProp {
   zoom: number;
 }
 
 export function ValuesPanel(props: ValuesPanelProps) {
-  const model = useModel();
-  const { zoom, width, height } = props;
+  const { zoom, width, height, model } = props;
   // --- reset line cache
   const listRef = React.useRef<VariableSizeList>(null);
+  const [rowCount, setRowCount] = React.useState(model.getRowCount());
   Dome.useEvent(model.laidout, () => {
+    // The layout has changed, so the number of rows may also have changed.
+    setRowCount(model.getRowCount());
     setImmediate(() => {
       const vlist = listRef.current;
       if (vlist) vlist.resetAfterIndex(0, true);
@@ -342,13 +398,13 @@ export function ValuesPanel(props: ValuesPanelProps) {
   return (
     <VariableSizeList
       ref={listRef}
-      itemCount={model.getRowCount()}
+      itemCount={rowCount}
       itemKey={model.getRowKey}
       itemSize={getRowHeight}
       estimatedItemSize={estimatedHeight}
       width={width}
       height={height}
-      itemData={model}
+      itemData={{ model }}
     >
       {TableRow}
     </VariableSizeList>

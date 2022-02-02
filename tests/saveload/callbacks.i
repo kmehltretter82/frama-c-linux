@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: LOG @PTEST_NAME@_initial.res LOG @PTEST_NAME@_initial.err BIN @PTEST_NAME@.sav @frama-c@ -out -calldeps -eva-show-progress -main main1 -save @PTEST_NAME@.sav > @PTEST_NAME@_initial.res 2> @PTEST_NAME@_initial.err
-   STDOPT: +"-load %{dep:@PTEST_NAME@.sav} -main main2 -then -main main3"
+   EXECNOW: LOG callbacks_initial.res LOG callbacks_initial.err BIN callbacks.sav @frama-c@ %{dep:@PTEST_DIR@/callbacks.i} -out -calldeps -eva-show-progress -main main1 -save @PTEST_RESULT@/callbacks.sav > @PTEST_RESULT@/callbacks_initial.res 2> @PTEST_RESULT@/callbacks_initial.err
+   STDOPT: +"-load %{dep:@PTEST_RESULT@/callbacks.sav} -main main2 -then -main main3"
 */
 
 /* This tests whether the callbacks for callwise inout and from survive after

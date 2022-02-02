@@ -1,6 +1,6 @@
 /* run.config
 MODULE: @PTEST_NAME@
-STDOPT:
+STDOPT: +"-no-autoload-plugins"
 */
 struct S { int x; int y; };
 typedef struct S T;

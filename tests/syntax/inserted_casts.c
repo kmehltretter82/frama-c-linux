@@ -1,7 +1,7 @@
 /* run.config
    MODULE: @PTEST_NAME@
-   STDOPT:
-   STDOPT: +"-machdep x86_64"
+   STDOPT: +"-no-autoload-plugins"
+   STDOPT: +"-no-autoload-plugins" +"-machdep x86_64"
 */
 #include "stddef.h"
 int f(int b)

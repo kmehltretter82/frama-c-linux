@@ -1,7 +1,7 @@
 /* run.config
-   MODULE: @PTEST_NAME@
-   OPT: -print
-   OPT: -remove-exn -print
+ MODULE: @PTEST_NAME@
+   OPT: -no-autoload-plugins -print
+   OPT: -no-autoload-plugins -remove-exn -print
  */
 struct my_exn { int e; };
 

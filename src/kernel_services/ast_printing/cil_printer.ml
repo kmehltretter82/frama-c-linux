@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,6 +27,53 @@ open Cil_datatype
 open Printer_api
 open Format
 
+let string_of_assert = function
+  | Assert -> "assert"
+  | Check -> "check"
+  | Admit -> "admit"
+
+let name_of_assert = function
+  | Assert -> "assertion"
+  | Check -> "check"
+  | Admit -> "admit"
+
+let string_of_lemma = function
+  | Assert -> "lemma"
+  | Check -> "check lemma"
+  | Admit -> "axiom"
+
+let ident_of_lemma = function
+  | Assert -> "lemma"
+  | Check -> "check_lemma"
+  | Admit -> "axiom"
+
+let string_of_predicate ~kw = function
+  | Assert -> kw
+  | Check -> "check " ^ kw
+  | Admit -> "admit " ^ kw
+
+let ident_of_predicate ~kw = function
+  | Assert -> kw
+  | Check -> "check_" ^ kw
+  | Admit -> "admit_" ^ kw
+
+let pp_assert_kind fmt kd = Format.pp_print_string fmt (string_of_assert kd)
+let pp_lemma_kind fmt kd = Format.pp_print_string fmt (string_of_lemma kd)
+let pp_predicate_kind ~kw fmt kd =
+  match kd with
+  | Assert -> Format.pp_print_string fmt kw
+  | Check ->
+    begin
+      Format.pp_print_string fmt "check " ;
+      Format.pp_print_string fmt kw ;
+    end
+  | Admit ->
+    begin
+      Format.pp_print_string fmt "admit " ;
+      Format.pp_print_string fmt kw ;
+    end
+
+
 module Extensions = struct
   let initialized = ref false
   let ref_print = ref (fun _ _ _ _ -> assert false)
@@ -45,12 +92,6 @@ module Extensions = struct
   let pp_short (printer) fmt {ext_name; ext_kind} =
     !ref_short_print ext_name printer fmt ext_kind
 
-  let ref_deprecated_handler = ref (fun _ _ _ -> assert false)
-  let set_deprecated_handler ~handler =
-    ref_deprecated_handler := handler
-
-  let deprecated_register name =
-    !ref_deprecated_handler name
 end
 let set_extension_handler = Extensions.set_handler
 
@@ -68,21 +109,6 @@ let () =
       "__fc_sig_err", "SIG_ERR";
     ]
 
-(* Deprecated functions *)
-let set_deprecated_extension_handler = Extensions.set_deprecated_handler
-
-let register_behavior_extension name =
-  Extensions.deprecated_register name Ext_contract
-
-let register_code_annot_extension name =
-  Extensions.deprecated_register name (Ext_code_annot Ext_here)
-
-let register_loop_annot_extension name =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_loop)
-
-let register_global_extension name =
-  Extensions.deprecated_register name Ext_global
-
 (* Internal attributes. Won't be pretty-printed *)
 let reserved_attributes = ref []
 let register_shallow_attribute s =
@@ -94,6 +120,7 @@ let () = register_shallow_attribute Cil.frama_c_ghost_formal
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
 let () = register_shallow_attribute Cil.frama_c_inlined
+let () = register_shallow_attribute Cil.anonymous_attribute_name
 
 let keep_attr = function
   | Attr _ as a -> not (List.mem (Cil.attributeName a) !reserved_attributes)
@@ -495,7 +522,15 @@ class cil_printer () = object (self)
 
   val mutable logic_printer_enabled = true
 
-  method reset () = ()
+  val mutable verbose = false
+  (* Do not add a value that depends on a
+     non-constant variable of the kernel here (e.g. [Kernel.Debug.get ()]). Due
+     to the way the pretty-printing class is instantiated, this value would be
+     evaluated too soon. Override the [reset] method instead. *)
+
+  method reset () =
+    verbose <- Kernel.debug_atleast 1;
+    state.print_cil_as_is <- Kernel.debug_atleast 1 || Kernel.PrintAsIs.get()
 
   method pp_keyword fmt s = pp_print_string fmt s
   method pp_acsl_keyword = self#pp_keyword
@@ -518,12 +553,6 @@ class cil_printer () = object (self)
     in
     (if block then Pretty_utils.pp_close_block else Format.fprintf)
       fmt "%(%)" suf
-
-  val mutable verbose = false
-  (* Do not add a value that depends on a
-     non-constant variable of the kernel here (e.g. [Kernel.Debug.get ()]). Due
-     to the way the pretty-printing class is instantiated, this value would be
-     evaluated too soon. Override the [reset] method instead. *)
 
   (* indicates whether we are printing ghost elements *)
   val mutable is_ghost = false
@@ -683,10 +712,10 @@ class cil_printer () = object (self)
     self#varname fmt v.vname
 
   method private no_ghost_at_first_level = function
-    | TArray(t, e, b, a) ->
+    | TArray(t, e, a) ->
       let t = Cil.typeRemoveAttributes [ "ghost" ] t in
       let a = Cil.dropAttribute "ghost" a in
-      TArray (t, e, b, a)
+      TArray (t, e, a)
     | t -> Cil.typeRemoveAttributes [ "ghost" ] t
 
   (* variable declaration *)
@@ -694,14 +723,29 @@ class cil_printer () = object (self)
     let stom, rest = Cil.separateStorageModifiers v.vattr in
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
     let v = { v with vtype = self#no_ghost_at_first_level v.vtype } in
+    let v =
+      if v.vformal && not state.print_cil_as_is then begin
+        match v.vtype with
+        | TPtr(t,a) when Cil.hasAttribute "arraylen" a ->
+          { v with vtype = TArray(t, None, a)}
+        | _ -> v
+      end
+      else v
+    in
+    let name =
+      if Cil.hasAttribute Cil.anonymous_attribute_name v.vattr
+      && not v.vreferenced && not state.print_cil_as_is
+      then
+        None
+      else Some (fun fmt -> self#varinfo fmt v)
+    in
     (* First the storage modifiers *)
     fprintf fmt "%s%a%a%s%a%a"
       (if v.vinline then "__inline " else "")
       self#storage v.vstorage
       self#attributes stom
       (if stom = [] then "" else " ")
-      (self#typ ?fundecl
-         (if v.vname = "" then None else Some (fun fmt -> self#varinfo fmt v)))
+      (self#typ ?fundecl name)
       v.vtype
       self#attributes rest
 
@@ -1919,7 +1963,7 @@ class cil_printer () = object (self)
     | TFloat(fkind, a) ->
       fprintf fmt "%a%a%a" self#fkind fkind self#attributes a pname true
 
-    | TComp (comp, _, a) -> (* A reference to a struct *)
+    | TComp (comp, a) -> (* A reference to a struct *)
       fprintf fmt
         "%a %a%a%a"
         self#pp_keyword (if comp.cstruct then "struct" else "union")
@@ -1965,17 +2009,33 @@ class cil_printer () = object (self)
       in
       self#typ (Some name'') fmt bt'
 
-    | TArray (elemt, lo, _, a) ->
-      (* qualifiers attributes are not supposed to be on the TArray,
-         but on the base type. (Besides, GCC and Clang do not parse the
-         result if the qualifier is misplaced. *)
+    | TArray (elemt, lo, a) ->
       let atts_elem, a = Cil.splitArrayAttributes a in
-      if atts_elem != [] then
+      let size_info,a =
+        List.partition
+          (fun a -> List.mem (Cil.attributeName a) ["arraylen"; "static"]) a
+      in
+      (* qualifiers attributes are not supposed to be on the TArray,
+         but on the base type, except in the case of a formal declaration. *)
+      if atts_elem <> [] && size_info = [] then
         Kernel.failure ~current:true
           "Found some incorrect attributes for array (%a). Please report."
           self#attributes atts_elem;
+      let sep fmt = if atts_elem <> [] then Format.pp_print_space fmt () in
+      let print_size_info fmt =
+        match size_info with
+        | [] -> printAttributes fmt a
+        | [Attr("arraylen",[s])]->
+          Format.fprintf fmt "%a%t%a"
+            printAttributes atts_elem sep self#attrparam s
+        | [Attr("static",[]); Attr("arraylen",[s])]
+        | [Attr("arraylen", [s]); Attr("static", [])] ->
+          Format.fprintf fmt "static%a@ %a"
+            printAttributes atts_elem self#attrparam s
+        | _ -> ()
+      in
       let name' fmt =
-        if a = [] then pname fmt false
+        if filter_printing_attributes a = [] then pname fmt false
         else if nameOpt = None then
           printAttributes fmt a
         else
@@ -1987,7 +2047,7 @@ class cil_printer () = object (self)
                name'
                (fun fmt ->
                   match lo with
-                  | None -> ()
+                  | None -> print_size_info fmt
                   | Some e -> self#exp fmt e)
            ))
         fmt
@@ -2075,7 +2135,12 @@ class cil_printer () = object (self)
        | "thread", [] when not (Cil.msvcMode ()) -> fprintf fmt "__thread"; false
        | "volatile", [] -> self#pp_keyword fmt "volatile"; false
        | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
-       | "restrict", [] -> fprintf fmt "__restrict"; false
+       | "restrict", [] ->
+         if Cil.msvcMode () then
+           fprintf fmt "__restrict"
+         else
+           self#pp_keyword fmt "restrict";
+         false
        | "missingproto", [] ->
          if self#display_comment () then fprintf fmt "/* missing proto */";
          false
@@ -2836,19 +2901,30 @@ class cil_printer () = object (self)
 
   method private decrement kw fmt (t, rel) = match rel with
     | None -> fprintf fmt "@[<2>%a@ %a;@]" self#pp_acsl_keyword kw self#term t
-    | Some str ->
-      (*TODO: replace this string with an interpreted variable*)
-      fprintf fmt "@[<2>%a@ %a@ %a@ %s;@]"
+    | Some li ->
+      fprintf fmt "@[<2>%a@ %a@ %a@ %a;@]"
         self#pp_acsl_keyword kw
         self#term t
         self#pp_acsl_keyword "for"
-        str
+        self#logic_info li
 
   method decreases fmt v = self#decrement "decreases" fmt v
   method variant fmt v = self#decrement "loop variant" fmt v
 
-  method private pp_only_check fmt p =
-    if p.tp_only_check then fprintf fmt "%a " self#pp_acsl_keyword "check"
+  method private pp_predicate_kind fmt = function
+    | Assert -> ()
+    | Check -> self#pp_acsl_keyword fmt "check" ; pp_print_char fmt ' '
+    | Admit -> self#pp_acsl_keyword fmt "admit" ; pp_print_char fmt ' '
+
+  method private pp_lemma_kind fmt = function
+    | Assert -> self#pp_acsl_keyword fmt "lemma"
+    | Admit -> self#pp_acsl_keyword fmt "axiom"
+    | Check ->
+      begin
+        self#pp_acsl_keyword fmt "check" ;
+        pp_print_char fmt ' ' ;
+        self#pp_acsl_keyword fmt "lemma" ;
+      end
 
   method assumes fmt p =
     fprintf fmt "@[<hov 2>%a@ %a;@]"
@@ -2857,7 +2933,7 @@ class cil_printer () = object (self)
 
   method requires fmt p =
     fprintf fmt "@[<hov 2>%a%a@ %a;@]"
-      self#pp_only_check p.ip_content
+      self#pp_predicate_kind p.ip_content.tp_kind
       self#pp_acsl_keyword "requires"
       self#identified_predicate p
 
@@ -2870,7 +2946,7 @@ class cil_printer () = object (self)
   method post_cond fmt (k,p) =
     let kw = get_termination_kind_name k in
     fprintf fmt "@[<hov 2>%a%a@ %a;@]"
-      self#pp_only_check p.ip_content
+      self#pp_predicate_kind p.ip_content.tp_kind
       self#pp_acsl_keyword kw
       self#identified_predicate p
 
@@ -3083,10 +3159,9 @@ class cil_printer () = object (self)
     in
     match ca.annot_content with
     | AAssert (behav,p) ->
-      let kw = if p.tp_only_check then "check" else "assert" in
       fprintf fmt "@[%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_acsl_keyword kw
+        self#pp_acsl_keyword (string_of_assert p.tp_kind)
         self#predicate p.tp_statement
     | APragma (Slice_pragma sp) ->
       fprintf fmt "@[%a@ %a;@]"
@@ -3115,13 +3190,13 @@ class cil_printer () = object (self)
     | AInvariant(behav,true, i) ->
       fprintf fmt "@[<2>%a%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_only_check i
+        self#pp_predicate_kind i.tp_kind
         self#pp_acsl_keyword "loop invariant"
         self#predicate i.tp_statement
     | AInvariant(behav,false,i) ->
       fprintf fmt "@[<2>%a%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_only_check i
+        self#pp_predicate_kind i.tp_kind
         self#pp_acsl_keyword "invariant"
         self#predicate i.tp_statement
     | AVariant v ->
@@ -3198,10 +3273,6 @@ class cil_printer () = object (self)
       current_label <- old_label
     | Dmodel_annot (mfi,_) ->
       self#model_info fmt mfi
-    | Dcustom_annot(_c, n ,_attr, _) ->
-      (* attributes are meant to be purely internal for now. *)
-      fprintf fmt "@[%a %s: <...>@]@\n"
-        self#pp_acsl_keyword "custom" n
     | Dinvariant (pred,_) ->
       let old_label = current_label in
       (match pred.l_labels with [l] -> current_label <- l | _ -> ());
@@ -3210,12 +3281,11 @@ class cil_printer () = object (self)
         self#logic_var pred.l_var_info
         self#predicate (pred_body pred.l_body);
       current_label <- old_label
-    | Dlemma(name, is_axiom, labels, tvars, pred, _attr, _) ->
+    | Dlemma(name, labels, tvars, pred, _attr, _) ->
       (* attributes are meant to be purely internal for now. *)
       let old_lab = current_label in
-      fprintf fmt "@[<hv 2>@[<hov 1>%a%a %a%a%a:@]@ %t%a;@]@\n"
-        self#pp_only_check pred
-        self#pp_acsl_keyword (if is_axiom then "axiom" else "lemma")
+      fprintf fmt "@[<hv 2>@[<hov 1>%a %a%a%a:@]@ %t%a;@]@\n"
+        self#pp_lemma_kind pred.tp_kind
         self#varname name
         self#labels labels
         self#polyTypePrms tvars

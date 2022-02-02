@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -24,13 +24,11 @@
 #define __FC_SELECT__
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_define_time_t.h"
-#include "__fc_define_suseconds_t.h"
 #include "__fc_define_fd_set_t.h"
 #include "__fc_define_sigset_t.h"
-
-#include "sys/time.h"
-
+#include "__fc_define_suseconds_t.h"
+#include "__fc_define_timeval.h"
+#include "__fc_define_timespec.h"
 __BEGIN_DECLS
 
 /* assigns \result \from nfds, *readfds, *writefds,*errorfds,*timeout,*sigmask;

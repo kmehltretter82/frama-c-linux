@@ -2,7 +2,12 @@
   (name aorai)
   (public_name frama-c-aorai.core)
   (flags -open Frama_c_kernel)
-  (libraries frama-c.kernel)
+ (libraries frama-c.kernel
+  (select aorai_eva_analysis.ml from
+   (frama-c-eva.core -> aorai_eva_analysis.enabled.ml)
+   (  -> aorai_eva_analysis.disabled.ml)
+  )
+ )
 )
 
 (ocamllex promelalexer_withexps promelalexer ltllexer yalexer)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -146,7 +146,7 @@ type output_type =
 (** get_file_type [extension] sets the output type according to [extension].
     Raises an error if [extension] is not among supported extensions or is empty.
 *)
-val get_file_type: string -> output_type;;
+val get_file_type: Filepath.Normalized.t -> output_type;;
 
 (** consider_function [vinfo] returns false if the varinfo is not a function we
     are interested in.
@@ -157,8 +157,7 @@ val get_file_type: string -> output_type;;
 val consider_function: libc:bool -> Cil_types.varinfo -> bool
 
 (** [consider_variable vinfo] returns false if the varinfo is not an object
-    variable we are interested in. Currently excluded variables are those
-    declared with attribute [__FRAMA_C_MODEL__].
+    variable we are interested in.
     If [libc] is false, do not consider variables from the Frama-C libc.
 *)
 val consider_variable: libc:bool -> Cil_types.varinfo -> bool

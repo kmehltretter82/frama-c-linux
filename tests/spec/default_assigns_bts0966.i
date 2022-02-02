@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @EVA_PLUGINS@ 
+PLUGIN: eva,scope
    OPT: -eva -print
  */
 int auto_states[4] ; //   = { 1 , 0 , 0, 0 };

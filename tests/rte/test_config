@@ -1,1 +1,3 @@
-PLUGIN: rtegen @EVA_PLUGINS@
+PLUGIN: rtegen
+
+OPT: @RTE_TEST@

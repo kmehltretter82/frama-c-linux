@@ -18,19 +18,19 @@ Qed.
 Goal typed_copy_loop_invariant_preserved.
 Hint copy,preserved.
 Proof.
-  intros.
-  assert (Hi_1: (1+i_1 <= i)%Z) by omega.
+  intros i n Li Ui Ln _ Hi Hn.
+  Require Import Lia.
+  assert (Hi_1: (1+i <= n)%Z) by lia.
   unfold is_uint32, to_uint32.
   unfold to_range.
-  intros.
   rewrite Z.add_0_l.
   repeat rewrite Z.sub_0_r.
-  unfold is_uint32 in H2.
-  assert (Bs: (1 + i_1 = 4294967296)%Z \/ (1 + i_1 < 4294967296)%Z) by omega.
-  inversion Bs.
-  - rewrite <- H4.
-    rewrite Z_mod_same ; omega.
-  - rewrite Z.mod_small ; omega.
+  unfold is_uint32 in Hi.
+  assert (Bs: (1 + i = 4294967296)%Z \/ (1 + i < 4294967296)%Z) by lia.
+  inversion_clear Bs as [ Eq | Lower ].
+  - rewrite <- Eq.
+    rewrite Z_mod_same ; lia.
+  - rewrite Z.mod_small ; lia.
 Qed.
 
 

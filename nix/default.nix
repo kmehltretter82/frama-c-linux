@@ -1,37 +1,55 @@
 # paramaterised derivation with dependencies injected (callPackage style)
-{ pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_08.ocaml", plugins ? { } }:
+{ pkgs, stdenv, src ? ../., opam2nix, ocaml ? pkgs.ocaml-ng.ocamlPackages_4_08.ocaml, plugins ? { } }:
 
-let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
-                "ppx_deriving" "ppx_deriving_yojson"
-                { name = "coq"; constraint = "=8.12.0";  }
-                { name = "alt-ergo" ; constraint = "=2.2.0"; }
-                { name = "why3" ; constraint = "=1.3.3"; }
-                { name = "why3-coq" ; constraint = "=1.3.3"; }
-                { name = "menhir"; constraint = "=20200624"; }
-                { name = "dune"; constraint = ">=2.8"; }
-                ] ++ opamPackages
-              );
-           ocamlAttr = ocaml_version;
-        };
-
+let mydir = builtins.getEnv("PWD");
+   mk-opam-selection = { name, opamSrc?{}, ... }: {
+      inherit ocaml;
+      src = opamSrc;
+      selection = "${mydir}/${name}-${ocaml.version}-opam-selection.nix";
+    };
+     opamPackages =
+      [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
+        "ppx_deriving" "ppx_deriving_yojson"
+        "coq=8.13.0" "alt-ergo=2.2.0"
+        "why3=1.4.0" "why3-coq=1.4.0"
+        "menhir=20211012" "dune=2.9.1"
+      ];
+    # only pure nix packages. See mk_deriv below for adding opam2nix packages
+    mk_buildInputs = { nixPackages ? [] } :
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages;
     # Extends the call to stdenv.mkDerivation with parameters common for all
     # frama-c derivations
     mk_deriv = args:
-        stdenv.mkDerivation ({
+      let my_opam_packages =
+            if args?opamPackages then
+              opamPackages ++ args.opamPackages
+            else opamPackages
+          ;
+          opam-selection = mk-opam-selection args;
+          buildInputs = args.buildInputs ++ opam2nix.buildInputs opam-selection;
+      in
+        stdenv.mkDerivation (
+          args //
+          {
             # Disable Nix's GCC hardening
             hardeningDisable = [ "all" ];
-        } // args);
+            inherit buildInputs;
+          })
+        //
+        { gen-opam-selection =
+            opam2nix.resolve opam-selection my_opam_packages; }
+    ;
 in
 
-rec {
-  inherit src mk_buildInputs;
+pkgs.lib.makeExtensible
+(self: {
+  inherit src mk_buildInputs opamPackages mk_deriv;
   buildInputs = mk_buildInputs {};
-  installed = main.out;
+  installed = self.main.out;
   main = mk_deriv {
         name = "frama-c";
-        inherit src buildInputs;
+        src = self.src;
+        buildInputs =self.buildInputs;
         outputs = [ "out" "build_dir" ];
         postPatch = ''
                patchShebangs .
@@ -73,9 +91,10 @@ rec {
 
   lint = mk_deriv {
         name = "frama-c-lint";
-        inherit src;
-        buildInputs = (mk_buildInputs { opamPackages = [ { name = "ocp-indent"; constraint = "=1.7.0"; } ];} )
-                      ++ [ pkgs.bc plugins.headache.installed ];
+        src = self.src;
+        opamPackages = [ "ocp-indent=1.7.0" "headache=1.05"];
+        buildInputs =
+          self.mk_buildInputs { nixPackages = [ pkgs.bc pkgs.clang_10 ]; };
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -88,18 +107,38 @@ rec {
         buildPhase = ''
                make lint
                make stats-lint
-               make check-headers
+               STRICT_HEADERS=yes make check-headers
         '';
         installPhase = ''
                true
         '';
   };
 
+  doc = mk_deriv {
+        name = "frama-c-doc";
+        buildInputs = self.buildInputs;
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postPatch = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+          true
+        '';
+        buildPhase = ''
+               make doc
+        '';
+        installPhase = ''
+               true
+        '';
+  } // { other-opam-selection = "main";};
+
   tests = mk_deriv {
         name = "frama-c-test";
-        inherit buildInputs;
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.buildInputs;
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -115,16 +154,14 @@ rec {
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "main"; };
 
   build-distrib-tarball = mk_deriv {
         name = "frama-c-build-distrib-tarball";
-        inherit src;
-        buildInputs = buildInputs ++ [ plugins.headache.installed ];
+        src = self.src;
+        buildInputs = self.buildInputs;
+        opamPackages = [ "headache=1.05" ];
         outputs = [ "out" ];
-        postPatch = ''
-               patchShebangs .
-        '';
         configurePhase = ''
                unset CC
                autoconf
@@ -142,9 +179,14 @@ rec {
 
   build-from-distrib-tarball = mk_deriv {
         name = "frama-c-build-from-distrib-tarball";
-        inherit buildInputs;
-        src = build-distrib-tarball.out ;
+        doCheck = true;
+        buildInputs = self.buildInputs;
+        opamPackages = self.build-distrib-tarball.opamPackages;
+        src = self.build-distrib-tarball.out ;
         outputs = [ "out" ];
+        postPatch = ''
+               patchShebangs .
+        '';
         configurePhase = ''
                unset CC
                autoconf
@@ -153,16 +195,21 @@ rec {
         buildPhase = ''
                 make -j 4
         '';
+        checkPhase = ''
+               make clean_share_link
+               make create_share_link
+               make tests -j4 PTESTS_OPTS="-error-code -j 4"
+        '';
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "build-distrib-tarball"; };
 
   wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
-        buildInputs = mk_buildInputs { };
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -175,7 +222,7 @@ rec {
                make create_share_link
                mkdir home
                HOME=$(pwd)/home
-               why3 config --detect
+               why3 config detect
                make src/plugins/wp/tests/test_config_qualif
                export FRAMAC_WP_CACHE=replay
                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
@@ -184,13 +231,13 @@ rec {
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "main"; };
 
   aorai-prove = mk_deriv {
         name = "frama-c-aorai-prove";
-        buildInputs = mk_buildInputs { };
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "test_config*" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -204,7 +251,7 @@ rec {
           make create_share_link
           mkdir home
           HOME=$(pwd)/home
-          why3 config --detect
+          why3 config detect
           make src/plugins/aorai/tests/ptests_config
           make PTESTS_OPTS="-config prove -error-code" Aorai_TESTS
         '';
@@ -212,13 +259,36 @@ rec {
         installPhase = ''
           true
         '';
-  };
+  } // { other-opam-selection = "main"; };
+
+  eva-tests = mk_deriv {
+        name = "frama-c-eva-tests";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postUnpack = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+            true
+        '';
+        buildPhase = ''
+               make clean_share_link
+               make create_share_link
+               export CONFIGS="equality bitwise symblocs gauges octagon"
+               src/plugins/value/vtests -j 4 -error-code
+        '';
+        installPhase = ''
+               true
+        '';
+  } // { other-opam-selection = "main"; };
 
   e-acsl-tests-dev = mk_deriv {
         name = "frama-c-e-acsl-tests-dev";
-        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -234,17 +304,18 @@ rec {
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "main"; };
 
   internal = mk_deriv {
         name = "frama-c-internal";
-        inherit src;
-        buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
-                    [ pkgs.getopt
-                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
-                      pkgs.swiProlog
-                      stdenv.cc.cc.lib
-        ];
+        src = self.src;
+        opamPackages = [ "xml-light" ];
+        buildInputs =
+          self.mk_buildInputs
+            { nixPackages =
+                [ pkgs.getopt pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
+                  pkgs.swiProlog stdenv.cc.cc.lib ];
+            };
         counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
         frama_clang_src = plugins.frama-clang.src;
@@ -293,15 +364,22 @@ rec {
                 sed -i src/plugins/pathcrawler/extern/eclipseCLP/RUNME -e "s/chmod 2755/chmod 755/g"
                 rm src/plugins/pathcrawler/extern/eclipseCLP/lib/x86_64_linux/dbi_mysql.so
                 rm src/plugins/pathcrawler/extern/eclipseCLP/lib/x86_64_linux/ic.so
-                autoPatchelf src/plugins/pathcrawler
+                rm src/plugins/pathcrawler/extern/eclipseCLP/lib/x86_64_linux/bitmap.so
+                rm -fr src/plugins/pathcrawler/extern/eclipseCLP/lib/i386_linux
+                rm src/plugins/pathcrawler/src/generator/COLIBRI/float_util_sparc_sunos5.so
+                rm src/plugins/pathcrawler/src/generator/COLIBRI/float_util_i386_linux.so.*
+                rm src/plugins/pathcrawler/share/bin/float_util_sparc_sunos5.so
+                find src/plugins/pathcrawler -name '*_i386_*.so' -delete
+                autoPatchelf src/plugins/pathcrawler/
                 make -j 4
                 ln -sr src/plugins/pathcrawler/share share/pc
                 # Setup Why3
                 mkdir home
                 HOME=$(pwd)/home
-                why3 config --detect
+                why3 config detect
                 # Setup WP related
                 export CAVEAT_IMPORTER_NIX_MODE=yes
+                export GENASSIGNS_NIX_MODE=yes
                 export FRAMAC_WP_CACHE=replay
                 export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
                 make tests -j4 PTESTS_OPTS="-error-code -j 4"
@@ -311,4 +389,4 @@ rec {
         '';
   };
 
-}
+})

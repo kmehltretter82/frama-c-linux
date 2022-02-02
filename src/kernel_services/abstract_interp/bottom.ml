@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -47,6 +47,10 @@ let non_bottom = function
   | `Value v -> v
   | `Bottom  -> assert false
 
+let value ~bottom = function
+  | `Value v -> v
+  | `Bottom -> bottom
+
 let equal equal x y = match x, y with
   | `Bottom, `Bottom     -> true
   | `Value vx, `Value vy -> equal vx vy
@@ -85,6 +89,9 @@ let iter f = function
   | `Bottom -> ()
   | `Value v -> f v
 
+let fold ~bottom f = function
+  | `Bottom -> bottom
+  | `Value v -> f v
 
 let counter = ref 0
 
@@ -139,6 +146,10 @@ module Bound_Lattice
   let join = join Lattice.join
   let is_included = is_included Lattice.is_included
 end
+
+let to_option = function
+  | `Bottom -> None
+  | `Value v -> Some v
 
 let to_list = function
   | `Bottom  -> []

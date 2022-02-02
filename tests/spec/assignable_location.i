@@ -53,3 +53,22 @@ int * from_address_to_reject(int f){
   //@ behavior rej_1: assigns l \from &lx ;
   return (void*)0 ;
 }
+
+typedef struct _M {
+  int x;
+} M;
+
+struct N {
+  int y;
+};
+
+//@ model M { struct N z; };
+//@ model M { int t; };
+
+M m;
+
+//@ requires x == &m.t;
+void refuse_address_of_model_field(int* x);
+
+//@ requires x == &m.z.y;
+void refuse_subfield_of_model_field(int* x);

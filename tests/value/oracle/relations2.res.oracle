@@ -20,7 +20,7 @@
   function bts2166: precondition 'n' got status unknown.
 [eva] relations2.i:15: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   sv ∈ [--..--]
   len ∈ [--..--]
   n ∈ [1..64]
@@ -50,7 +50,7 @@
 [eva] Done for function unsigned_interval
 [eva] relations2.i:33: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   sv ∈ [--..--]
   a[0..513] ∈ [--..--]
   i ∈ [1..512]
@@ -71,7 +71,7 @@
 [eva] relations2.i:32: starting to merge loop iterations
 [eva] relations2.i:33: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   sv ∈ [--..--]
   a[0..513] ∈ [--..--]
   i ∈ [1..512]
@@ -88,7 +88,7 @@
   ==END OF DUMP==
 [eva] relations2.i:33: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   sv ∈ [--..--]
   a[0..513] ∈ [--..--]
   i ∈ [1..512]
@@ -105,7 +105,7 @@
   ==END OF DUMP==
 [eva] relations2.i:33: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   sv ∈ [--..--]
   a[0..513] ∈ [--..--]
   i ∈ [1..512]

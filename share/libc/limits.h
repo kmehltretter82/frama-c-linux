@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -94,5 +94,10 @@
     process is limited to {ARG_MAX} bytes."
  */
 #define ARG_MAX 4096
+
+// POSIX; used by <sys/uio.h>.
+// Must be >= _XOPEN_IOV_MAX, which is 16.
+// 1024 is the value used by some Linux implementations.
+#define IOV_MAX 1024
 
 #endif

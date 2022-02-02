@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Splitters
 // --------------------------------------------------------------------------
@@ -20,6 +42,10 @@ import { AutoSizer, Size } from 'react-virtualized';
 export interface SplitterBaseProps {
   /** Window settings to store the splitter position. */
   settings?: string;
+  /** Ratio or size depending of the splitter:
+     - for 'horizontal' or 'vertical' split, ratio between the two panels;
+     - for other splits, size of the foldable component. */
+  defaultPosition?: number;
   /** Minimal margin from container edges (minimum `32`). */
   margin?: number;
   /** Splitter children components. */
@@ -173,7 +199,9 @@ interface SplitterLayoutProps extends SplitterFoldProps { layout: Layout }
 interface SplitterEngineProps extends SplitterLayoutProps { size: Size }
 
 function SplitterEngine(props: SplitterEngineProps) {
-  const [settings, setSettings] = Dome.useNumberSettings(props.settings, 0);
+  const defaultPosition = props.defaultPosition ?? 0;
+  const [settings, setSettings] =
+    Dome.useNumberSettings(props.settings, defaultPosition);
   const [dragging, setDragging] = React.useState<Dragging>(undefined);
   const { size, margin = 32, layout } = props;
   const { hsplit } = layout;
@@ -223,7 +251,7 @@ function SplitterEngine(props: SplitterEngineProps) {
   const onStop: DraggableEventHandler =
     (evt, _data) => {
       if (evt.metaKey || evt.altKey || evt.ctrlKey) {
-        setSettings(0);
+        setSettings(defaultPosition);
       } else if (unfold && dragging) {
         const offsetPos = dragging.position + dragging.offset - dragging.anchor;
         const newPos = inRange(M, D, offsetPos);

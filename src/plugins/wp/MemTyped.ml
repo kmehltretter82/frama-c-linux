@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -118,7 +118,6 @@ let pointer = Context.create "MemTyped.pointer"
 
 type chunk =
   | M_int of Ctypes.c_int
-  | M_char
   | M_f32
   | M_f64
   | M_pointer
@@ -141,7 +140,6 @@ struct
     | SInt64 -> 8
 
   let rank = function
-    | M_char -> -1
     | M_int i -> int_rank i
     | M_f32 -> 9
     | M_f64 -> 10
@@ -150,8 +148,8 @@ struct
     | T_init -> 13
   let hash = rank
   let name = function
+    | M_int i when Ctypes.is_char i -> "Mchar"
     | M_int _ -> "Mint"
-    | M_char -> "Mchar"
     | M_f32 -> "Mf32"
     | M_f64 -> "Mf64"
     | M_pointer -> "Mptr"
@@ -164,14 +162,14 @@ struct
     | M_int i -> Format.fprintf fmt "M%a" Ctypes.pp_int i
     | m -> Format.pp_print_string fmt (name m)
   let val_of_chunk = function
-    | M_int _ | M_char -> L.Int
+    | M_int _ -> L.Int
     | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
     | M_f64 -> Cfloat.tau_of_float Ctypes.Float64
     | M_pointer -> t_addr
     | T_alloc -> L.Int
     | T_init -> L.Bool
   let tau_of_chunk = function
-    | M_int _ | M_char -> L.Array(t_addr,L.Int)
+    | M_int _ -> L.Array(t_addr,L.Int)
     | M_pointer -> L.Array(t_addr,t_addr)
     | M_f32 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float32)
     | M_f64 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float64)
@@ -190,11 +188,10 @@ type loc = term (* of type addr *)
 (* --- Utilities on locations                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let m_int i = if Ctypes.is_char i then M_char else M_int i
 let m_float = function Float32 -> M_f32 | Float64 -> M_f64
 
 let rec footprint = function
-  | C_int i -> Heap.Set.singleton (m_int i)
+  | C_int i -> Heap.Set.singleton (M_int i)
   | C_float f -> Heap.Set.singleton (m_float f)
   | C_pointer _ -> Heap.Set.singleton M_pointer
   | C_array a -> footprint (object_of a.arr_element)
@@ -215,7 +212,7 @@ and all_value_chunks () =
       [ Ctypes.CBool ;
         SInt8 ; UInt8 ; SInt16 ; UInt16 ; SInt32 ; UInt32 ; SInt64 ; UInt64 ]
   in
-  Heap.Set.of_list (M_pointer :: M_char :: M_f32 :: M_f64 :: ints)
+  Heap.Set.of_list (M_pointer :: M_f32 :: M_f64 :: ints)
 
 let init_footprint _ _ = Heap.Set.singleton T_init
 let value_footprint obj _l = footprint obj
@@ -241,7 +238,7 @@ module OPAQUE_COMP_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
           d_definition = Logic result ;
         } ;
         Definitions.define_lemma {
-          l_kind = `Axiom ;
+          l_kind = Admit ;
           l_name = "Positive_Length_of_" ^ Lang.comp_id c ;
           l_types = 0 ; l_triggers = [] ; l_forall = [] ;
           l_cluster = Definitions.compinfo c ;
@@ -460,7 +457,7 @@ module STRING = WpContext.Generator(LITERAL)
         let alloc = F.e_get m base in (* The size is alloc-1 *)
         let sized = Cstring.str_len cst (F.e_add alloc F.e_minus_one) in
         Definitions.define_lemma {
-          l_kind = `Axiom ;
+          l_kind = Admit ;
           l_name = name ; l_types = 0 ;
           l_triggers = [] ; l_forall = [] ;
           l_lemma = p_forall [a] (p_imply m_linked sized) ;
@@ -471,7 +468,7 @@ module STRING = WpContext.Generator(LITERAL)
         let name = prefix ^ "_region" in
         let re = - Cstring.str_id cst in
         Definitions.define_lemma {
-          l_kind = `Axiom ;
+          l_kind = Admit ;
           l_name = name ; l_types = 0 ; l_triggers = [] ; l_forall = [] ;
           l_lemma = p_equal (e_fun f_region [base]) (e_int re) ;
           l_cluster = Cstring.cluster () ;
@@ -482,13 +479,15 @@ module STRING = WpContext.Generator(LITERAL)
         let name = prefix ^ "_literal" in
         let i = Lang.freshvar ~basename:"i" L.Int in
         let c = Cstring.char_at cst (e_var i) in
-        let addr = shift (a_global base) (C_int (Ctypes.c_char ())) (e_var i) in
-        let m = Lang.freshvar ~basename:"mchar" (Chunk.tau_of_chunk M_char) in
+        let ikind = Ctypes.c_char () in
+        let addr = shift (a_global base) (C_int ikind) (e_var i) in
+        let m =
+          Lang.freshvar ~basename:"mchar" (Chunk.tau_of_chunk (M_int ikind)) in
         let m_sconst = F.p_call p_sconst [e_var m] in
         let v = F.e_get (e_var m) addr in
         let read = F.p_equal c v in
         Definitions.define_lemma {
-          l_kind = `Axiom ;
+          l_kind = Admit ;
           l_name = name ; l_types = 0 ; l_triggers = [] ;
           l_forall = [m;i] ;
           l_cluster = Cstring.cluster () ;
@@ -512,7 +511,7 @@ module STRING = WpContext.Generator(LITERAL)
         } ;
         Definitions.define_lemma {
           l_name = prefix ^ "_base" ;
-          l_kind = `Axiom ;
+          l_kind = Admit ;
           l_types = 0 ; l_triggers = [] ; l_forall = [] ;
           l_lemma = F.p_lt base F.e_zero ;
           l_cluster = Cstring.cluster () ;
@@ -546,7 +545,7 @@ module BASE = WpContext.Generator(Varinfo)
         let name = prefix ^ "_region" in
         let re = if x.vglob then 0 else if x.vformal then 1 else 2 in
         Definitions.define_lemma {
-          l_kind = `Axiom ;
+          l_kind = Admit ;
           l_name = name ; l_types = 0 ; l_triggers = [] ; l_forall = [] ;
           l_lemma = p_equal (e_fun f_region [base]) (e_int re) ;
           l_cluster = cluster_globals () ;
@@ -570,7 +569,7 @@ module BASE = WpContext.Generator(Varinfo)
             let m_linked = p_call p_linked [m] in
             let base_size = p_equal (F.e_get m base) size in
             Definitions.define_lemma {
-              l_kind = `Axiom ;
+              l_kind = Admit ;
               l_name = name ; l_types = 0 ;
               l_triggers = [] ; l_forall = [] ;
               l_lemma = p_forall [a] (p_imply m_linked base_size) ;
@@ -579,7 +578,7 @@ module BASE = WpContext.Generator(Varinfo)
 
       let initialization prefix x base =
         match sizeof x with
-        | Some size when x.vformal || x.vglob ->
+        | Some size when Cvalues.always_initialized x ->
             let a = Lang.freshvar ~basename:"init" t_init in
             let m = e_var a in
             let init_access =
@@ -591,7 +590,7 @@ module BASE = WpContext.Generator(Varinfo)
             let m_init = p_call p_cinits [m] in
             let init_prop = p_forall [a] (p_imply m_init init_access) in
             Definitions.define_lemma {
-              l_kind = `Axiom ;
+              l_kind = Admit ;
               l_name = prefix ^ "_init" ; l_types = 0 ;
               l_triggers = [] ; l_forall = [] ;
               l_lemma = init_prop ;
@@ -709,25 +708,25 @@ struct
     | C_array _ -> assert false
 
   type block =
-    | Str of slot * int
-    | Arr of c_object * int (* delayed layout of a C type *)
+    | Str of slot * int64
+    | Arr of c_object * int64 (* delayed layout of a C type *)
     | Garbled
 
   let pp_block fmt = function
-    | Str(a,n) when n=1 -> pp_slot fmt a
-    | Str(a,n) -> Format.fprintf fmt "%a[%d]" pp_slot a n
-    | Arr(o,n) -> Format.fprintf fmt "{ctype %a}[%d]" Ctypes.pretty o n
+    | Str(a,n) when n=1L -> pp_slot fmt a
+    | Str(a,n) -> Format.fprintf fmt "%a[%Ld]" pp_slot a n
+    | Arr(o,n) -> Format.fprintf fmt "{ctype %a}[%Ld]" Ctypes.pretty o n
     | Garbled -> Format.fprintf fmt "..."
 
   let add_slot a n w =
-    assert (n >= 1) ;
+    assert (n >= 1L) ;
     match w with
-    | Str(b,m) :: w when eq_slot a b -> Str(b,m+n)::w
+    | Str(b,m) :: w when eq_slot a b -> Str(b,Int64.add m n)::w
     | _ -> Str(a,n) :: w
 
   let add_block p w =
     match p , w with
-    | Str(a,n) , Str(b,m)::w when eq_slot a b -> Str(b,n+m)::w
+    | Str(a,n) , Str(b,m)::w when eq_slot a b -> Str(b,Int64.add n m)::w
     | Garbled , Garbled::_ -> w
     | _ -> p :: w
 
@@ -744,33 +743,34 @@ struct
 
   (* requires n > 1 *)
   let rec add_many cobj n w = (* returns [layout obj]*n @ [w] *)
-    assert (n > 1) ;
+    assert (n > 1L) ;
     match cobj, w with
-    | C_array { arr_flat = Some a }, _ when a.arr_cell_nbr = 1 ->
+    | C_array { arr_flat = Some a }, _ when a.arr_cell_nbr = 1L ->
         add_many (Ctypes.object_of a.arr_cell) n w
-    | C_array _, Arr(o, m)::w when 0 = compare_ptr_conflated o cobj -> Arr(o, m+n)::w
+    | C_array _, Arr(o, m)::w when 0 = compare_ptr_conflated o cobj ->
+        Arr(o, Int64.add m n)::w
     | C_array _, _ -> Arr(cobj, n)::w
     | _  -> add_slot (get_slot cobj) n w
 
   let rec rlayout w = function (* returns [layout obj] @ [w] *)
     | C_array { arr_flat = Some a } ->
         let cobj = Ctypes.object_of a.arr_cell in
-        if a.arr_cell_nbr = 1
+        if a.arr_cell_nbr = 1L
         then rlayout w cobj
         else add_many cobj a.arr_cell_nbr w
     | C_array { arr_element = e } ->
         if Wp_parameters.ExternArrays.get () then
-          add_many (Ctypes.object_of e) max_int w
+          add_many (Ctypes.object_of e) Int64.max_int w
         else
           add_block Garbled w
-    | cobj -> add_slot (get_slot cobj) 1 w
+    | cobj -> add_slot (get_slot cobj) 1L w
 
   let layout (obj : c_object) : layout = rlayout [] obj
 
   let clayout (c: Cil_types.compinfo) : layout =
     match c.cfields with
     | None ->
-        rlayout [] (C_comp c)
+        [Garbled]
     | Some fields ->
         let flayout w f = rlayout w (Ctypes.object_of f.ftype) in
         List.fold_left flayout [] (List.rev fields)
@@ -778,12 +778,12 @@ struct
   type comparison = Srem of layout | Drem of layout | Equal | Mismatch
 
   let add_array o n w =
-    assert (n > 0) ;
-    if n=1 then rlayout w o else Arr(o, n)::w
+    assert (n > 0L) ;
+    if n=1L then rlayout w o else Arr(o, n)::w
 
   let decr_slot a n w =
-    assert (n >= 1);
-    if n=1 then w else Str(a, n-1)::w
+    assert (n >= 1L);
+    if n=1L then w else Str(a, Int64.pred n)::w
 
   let rec equal u v =
     match compare ~dst:u ~src:v with
@@ -793,8 +793,8 @@ struct
     match dst, src with
     | A a1, A a2 -> if eq_atom a1 a2 then Equal else Mismatch
     | S c1, S c2 | U c1, U c2 when Compinfo.equal c1 c2 -> Equal
-    | S c1, _    -> compare ~dst:(clayout c1) ~src:[Str(src,1)]
-    |    _, S c2 -> compare ~dst:[Str(dst,1)] ~src:(clayout c2)
+    | S c1, _    -> compare ~dst:(clayout c1) ~src:[Str(src,1L)]
+    |    _, S c2 -> compare ~dst:[Str(dst,1L)] ~src:(clayout c2)
     | U c1, U c2 ->  (* for union, the layouts must be equal *)
         if equal (clayout c1) (clayout c2) then Equal else Mismatch
     | U _, A _ -> Mismatch
@@ -821,10 +821,10 @@ struct
                   compare w1 w2
               | Equal ->
                   if n < m then
-                    let w2 = Str(a,m-n)::w2 in
+                    let w2 = Str(a,Int64.sub m n)::w2 in
                     compare w1 w2
                   else if n > m then
-                    let w1 = Str(a,n-m)::w1 in
+                    let w1 = Str(a,Int64.sub n m)::w1 in
                     compare w1 w2
                   else
                     (* n = m *)
@@ -835,28 +835,28 @@ struct
               match compare ~dst:(layout u) ~src:(layout v) with
               | Mismatch -> Mismatch
               | Drem u' ->
-                  let w1 = u' @ add_array u (n-1) w1 in
-                  let w2 =      add_array v (m-1) w2 in
+                  let w1 = u' @ add_array u (Int64.pred n) w1 in
+                  let w2 =      add_array v (Int64.pred m) w2 in
                   compare w1 w2
               | Srem v' ->
-                  let w1 =      add_array u (n-1) w1 in
-                  let w2 = v' @ add_array v (m-1) w2 in
+                  let w1 =      add_array u (Int64.pred n) w1 in
+                  let w2 = v' @ add_array v (Int64.pred m) w2 in
                   compare w1 w2
               | Equal ->
                   if n < m then
-                    let w2 = add_array v (m-n) w2 in
+                    let w2 = add_array v (Int64.sub m n) w2 in
                     compare w1 w2
                   else if n > m then
-                    let w1 = add_array u (n-m) w1 in
+                    let w1 = add_array u (Int64.sub n m) w1 in
                     compare w1 w2
                   else
                     (* n = m *)
                     compare w1 w2
             end
         | Arr(u,n) , Str _ ->
-            compare ~dst:((layout u) @ add_array u (n-1) w1) ~src
+            compare ~dst:((layout u) @ add_array u (Int64.pred n) w1) ~src
         | Str _ , Arr(v,n) ->
-            compare ~dst ~src:((layout v) @ add_array v (n-1) w2)
+            compare ~dst ~src:((layout v) @ add_array v (Int64.pred n) w2)
 
   let rec repeated ~dst ~src =
     match dst , src with
@@ -878,21 +878,21 @@ struct
               | Srem _ ->
                   false
               | Equal -> (* dst =?= repeated(src,n/m) *)
-                  n >= m && (n mod m = 0)
+                  n >= m && (Int64.rem n m = 0L)
             end
         | Arr(u,n) , Arr(v,m) ->
             begin
               match compare ~dst:(layout u) ~src:(layout v) with
               | Mismatch -> false
               | Drem u' ->
-                  let w1 = u' @ add_array u (n-1) [] in
-                  let w2 = add_array v (m-1) [] in
+                  let w1 = u' @ add_array u (Int64.pred  n) [] in
+                  let w2 = add_array v (Int64.pred m) [] in
                   let cmp = compare ~dst:w1 ~src:w2 in
                   repeated_result ~src cmp
               | Srem _ ->
                   false
               | Equal -> (* dst =?= repeated(src,n/m) *)
-                  n >= m && (n mod m = 0)
+                  n >= m && (Int64.rem n m = 0L)
             end
         | _ , _ -> repeated_compare ~dst ~src
       end
@@ -979,7 +979,6 @@ module ChunkContent = WpContext.Generator(Chunk)
       type data = lfun
 
       let int_kind = function
-        | M_char -> Ctypes.c_char ()
         | M_int k -> k
         | _ -> failwith "MemTyped asked constraint for non int type"
 
@@ -988,7 +987,7 @@ module ChunkContent = WpContext.Generator(Chunk)
         let p = Lang.freshvar ~basename:"m" (Chunk.tau_of_chunk c) in
         let m = e_var p in
         let name = Format.asprintf "is_%a_chunk" Ctypes.pp_int k in
-        let lfun = Lang.generated_p name in
+        let lfun = Lang.generated_p ~coloring:true name in
         let l = Lang.freshvar ~basename:"l" (Lang.t_addr()) in
         let is_int = Cint.range k in
         let def = p_forall [l] (is_int (F.e_get m (e_var l))) in
@@ -1004,7 +1003,7 @@ module ChunkContent = WpContext.Generator(Chunk)
     end)
 
 let is_chunk sigma = function
-  | M_int _ | M_char as m ->
+  | M_int _ as m ->
       F.p_call (ChunkContent.get m) [ Sigma.value sigma m ]
   | _ ->
       p_true
@@ -1033,7 +1032,7 @@ struct
   let to_region_pointer l = 0,l
   let of_region_pointer _ _ l = l
 
-  let load_int sigma i l = F.e_get (Sigma.value sigma (m_int i)) l
+  let load_int sigma i l = F.e_get (Sigma.value sigma (M_int i)) l
   let load_float sigma f l = F.e_get (Sigma.value sigma (m_float f)) l
   let load_pointer sigma _t l = F.e_get (Sigma.value sigma M_pointer) l
 
@@ -1060,7 +1059,7 @@ struct
 
   let updated sigma c l v = c , F.e_set (Sigma.value sigma c) l v
 
-  let store_int sigma i l v = updated sigma (m_int i) l v
+  let store_int sigma i l v = updated sigma (M_int i) l v
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
 
@@ -1074,22 +1073,29 @@ struct
   let set_init obj loc ~length _chunk ~current =
     let n = F.e_mul (length_of_object obj) length in
     F.e_fun f_set_init [current;loc;n]
-
+(*
   let monotonic_init s1 s2 =
     let m1 = Sigma.value s1 T_init in
     let m2 = Sigma.value s2 T_init in
     F.p_call p_monotonic [m1; m2]
-
+*)
 end
 
 module LOADER = MemLoader.Make(MODEL)
 
 let load = LOADER.load
+let load_init = LOADER.load_init
 let stored = LOADER.stored
+let stored_init = LOADER.stored_init
 let copied = LOADER.copied
-let assigned = LOADER.assigned
+let copied_init = LOADER.copied_init
 let initialized = LOADER.initialized
 let domain = LOADER.domain
+
+let assigned seq obj loc =
+  (* Maintain always initialized values initialized *)
+  Assert (p_call p_cinits [Sigma.value seq.post T_init]) ::
+  LOADER.assigned seq obj loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Comparison                                                     --- *)
@@ -1148,7 +1154,7 @@ let frame sigma =
   in
   wellformed_frame p_linked T_alloc @
   wellformed_frame p_cinits T_init @
-  wellformed_frame p_sconst M_char @
+  wellformed_frame p_sconst (M_int (Ctypes.c_char ())) @
   wellformed_frame p_framed M_pointer
 
 let alloc sigma xs =

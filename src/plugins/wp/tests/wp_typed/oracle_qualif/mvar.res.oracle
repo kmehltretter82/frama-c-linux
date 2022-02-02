@@ -13,7 +13,7 @@
  Functions                 WP     Alt-Ergo  Total   Success
   Job                       -        1        1       100%
 ------------------------------------------------------------
-[wp] tests/wp_typed/mvar.i:8: Warning: 
+[wp] mvar.i:8: Warning: 
   Memory model hypotheses for function 'Write':
   /*@
      behavior wp_typed:

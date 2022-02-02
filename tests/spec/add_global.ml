@@ -1,7 +1,7 @@
 open Cil_types
 
 let emitter =
-  Emitter.create "Fancy" [ Emitter.Global_annot ] ~correctness:[] ~tuning:[] 
+  Emitter.create "Fancy" [ Emitter.Global_annot ] ~correctness:[] ~tuning:[]
 
 class vis prj =
 object(self)
@@ -14,8 +14,8 @@ object(self)
         Daxiomatic
           ("MyAxiomatic",
            [ Dlemma(
-                 "myaxiom", true, [], [],
-                 Logic_const.(toplevel_predicate ptrue),
+                 "myaxiom", [], [],
+                 Logic_const.(toplevel_predicate ~kind:Admit ptrue),
                  [], Cil_datatype.Location.unknown)],
            [], Cil_datatype.Location.unknown)
       in

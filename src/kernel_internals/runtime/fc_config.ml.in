@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-# 24 "src/kernel_internals/runtime/config.ml.in"
+# 24 "src/kernel_internals/runtime/fc_config.ml.in"
 
 let version = "@VERSION@"
 let codename = "@VERSION_CODENAME@"
@@ -35,12 +35,15 @@ let is_gui = Frama_c_very_first.Gui_init.is_gui
 let lablgtk = "@LABLGTK@"
 
 let ocaml_wflags = "@WARNINGS@"
-let datadirs = Config_data.Sites.share
-let datadir = List.hd (List.rev Config_data.Sites.share)
+let datadirs = (List.map Filepath.Normalized.of_string Config_data.Sites.share)
+let datadir = List.hd (List.rev datadirs)
 
-let plugin_dir = Config_data.Sites.plugins
+let plugin_dir = List.map Filepath.Normalized.of_string Config_data.Sites.plugins
 
-let framac_libc = datadir ^ "/libc"
+let framac_libc = Filepath.Normalized.concat datadir "libc"
+
+let () = Filepath.add_symbolic_dir_list "FRAMAC_SHARE" datadirs
+let () = Filepath.add_symbolic_dir_list "FRAMAC_PLUGIN" plugin_dir
 
 let default_cpp = "@FRAMAC_DEFAULT_CPP@"
 

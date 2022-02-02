@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,3 +30,5 @@ val analyze: Kernel_function.t -> unit
 val get_bounds: stmt -> int option
 
 val fold_bounds: (stmt -> int -> 'a -> 'a) -> 'a -> 'a
+
+val display_results: unit -> unit

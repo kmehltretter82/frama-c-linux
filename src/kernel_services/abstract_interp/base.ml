@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -253,8 +253,8 @@ let is_weak = function
 
 (* Does a C type end by an empty struct? *)
 let rec final_empty_struct = function
-  | TArray (typ, _, _, _) -> final_empty_struct typ
-  | TComp (compinfo, _, _) ->
+  | TArray (typ, _, _) -> final_empty_struct typ
+  | TComp (compinfo, _) ->
     begin
       match compinfo.cfields with
       | Some [] | None -> true
@@ -349,13 +349,15 @@ let is_aligned_by b alignment =
   if Int.is_zero alignment
   then false
   else
-    match b with
-    | Var (v,_) | Allocated(v,_,_) ->
-      Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
-    | CLogic_Var (_, ty, _) ->
-      Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
-    | Null -> true
-    | String _ -> Int.is_one alignment
+    try
+      match b with
+      | Var (v,_) | Allocated(v,_,_) ->
+        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
+      | CLogic_Var (_, ty, _) ->
+        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
+      | Null -> true
+      | String _ -> Int.is_one alignment
+    with Cil.SizeOfError _ -> false
 
 let is_any_formal_or_local v =
   match v with
@@ -452,9 +454,12 @@ module Base = struct
         let varname = Datatype.undefined
       end)
   let id = id
+  let pretty_debug = pretty
 end
 
 include Base
+
+module Hptshape = Hptmap.Shape (Base)
 
 module Hptset = Hptset.Make
     (Base)
@@ -549,6 +554,16 @@ let of_string_exp e =
 
 module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 
+module BMap =
+  Hptmap.Make (Base) (Base) (Hptmap.Comp_unused)
+    (struct let v = [ [] ] end)
+    (struct let l = [ Ast.self ] end)
+
+type substitution = base Hptshape.map
+
+let substitution_from_list list =
+  let add map (key, elt) = BMap.add key elt map in
+  List.fold_left add BMap.empty list
 
 (*
 Local Variables:

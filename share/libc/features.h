@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -34,27 +34,12 @@
 #define __POP_FC_STDLIB
 #endif
 
-#if defined(__clang__) && defined(__cplusplus)
-# define __CLANG_IGNORE_ATTRS_PUSH__ \
-_Pragma("clang diagnostic push") \
-_Pragma("clang diagnostic ignored \"-Wunknown-attributes\"")
-# define __CLANG_IGNORE_ATTRS_POP__ \
-_Pragma("clang diagnostic pop")
-#else
-# define __CLANG_IGNORE_ATTRS_PUSH__
-# define __CLANG_IGNORE_ATTRS_POP__
-#endif
-
 #ifdef	__cplusplus
-# define __BEGIN_DECLS \
-extern "C" { \
-  __CLANG_IGNORE_ATTRS_PUSH__
-# define __END_DECLS \
-__CLANG_IGNORE_ATTRS_POP__ \
-}
+# define __BEGIN_DECLS	extern "C" {
+# define __END_DECLS	}
 #else
-# define __BEGIN_DECLS __CLANG_IGNORE_ATTRS_PUSH__
-# define __END_DECLS __CLANG_IGNORE_ATTRS_POP__
+# define __BEGIN_DECLS
+# define __END_DECLS
 #endif
 
 #undef __LEAF
@@ -115,6 +100,9 @@ __CLANG_IGNORE_ATTRS_POP__ \
 #ifndef __attribute_artificial__
 # define __attribute_artificial__ /* Ignore */
 #endif
+#ifndef __attribute_pure__
+# define __attribute_pure__ /* Ignore */
+#endif
 
 #undef __attribute_warn_unused_result__
 #define __attribute_warn_unused_result__ /* empty */
@@ -126,6 +114,18 @@ __CLANG_IGNORE_ATTRS_POP__ \
 #define __restrict__ __restrict
 
 #define __USE_ISOC99	1
+
+// When linking code including Frama-C's libc, we avoid adding 'extern'
+// to some variable declarations. In this case, __FC_EXTERN is defined to
+// the empty string. Otherwise, define it to 'extern'.
+#ifndef __FC_EXTERN
+#define __FC_EXTERN extern
+#endif
+
+// C11 §6.10.8.3 Conditional feature macros: Frama-C does not support complex.h
+#ifndef __STDC_NO_COMPLEX__
+#define __STDC_NO_COMPLEX__
+#endif
 
 /* end __FC_FEATURES_H */
 #endif

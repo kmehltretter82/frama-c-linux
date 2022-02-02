@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -55,14 +55,12 @@ let dump_to_json () =
     (* "ocamlc", `String Fc_config.ocamlc ;
      * "ocamlopt", `String Fc_config.ocamlopt ; *)
     "ocaml_wflags", `String Fc_config.ocaml_wflags ;
-    "datadir", `String Fc_config.datadir ;
-    "datadirs", list string Fc_config.datadirs ;
-    "framac_libc", `String Fc_config.framac_libc ;
-    (* "libdir", `String Fc_config.libdir ; *)
-    "plugin_dir", list string Fc_config.plugin_dir ;
-    (* "plugin_path", `String Fc_config.plugin_path ;
-     * "compilation_unit_names", list string Fc_config.compilation_unit_names ;
-     * "library_names", list string Fc_config.library_names ; *)
+    "datadir", `String (Fc_config.datadir:>string) ;
+    "datadirs",
+    list string (Filepath.Normalized.to_string_list Fc_config.datadirs) ;
+    "framac_libc", `String (Fc_config.framac_libc:>string) ;
+    "plugin_dir",
+    list string (Filepath.Normalized.to_string_list Fc_config.plugin_dir) ;
     "preprocessor", `String Fc_config.preprocessor ;
     "using_default_cpp", `Bool Fc_config.using_default_cpp ;
     "preprocessor_is_gnu_like", `Bool Fc_config.preprocessor_is_gnu_like ;

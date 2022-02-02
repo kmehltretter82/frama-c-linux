@@ -1,7 +1,7 @@
 /* run.config
-   EXECNOW: BIN bool.sav LOG bool_sav.res LOG bool_sav.err @frama-c@ -save bool.sav -machdep x86_32 -eva @EVA_OPTIONS@ > bool_sav.res 2> bool_sav.err
-   STDOPT: +"-load %{dep:bool.sav} -out -input -deps"
-   STDOPT: +"-load %{dep:bool.sav} -eva @EVA_OPTIONS@"
+   EXECNOW: BIN bool.sav LOG bool_sav.res LOG bool_sav.err @frama-c@ -save @PTEST_RESULT@/bool.sav -machdep x86_32 -eva @EVA_OPTIONS@ %{dep:@PTEST_DIR@/bool.c} > @PTEST_RESULT@/bool_sav.res 2> @PTEST_RESULT@/bool_sav.err
+   STDOPT: +"-load %{dep:@PTEST_RESULT@/bool.sav} -out -input -deps"
+   STDOPT: +"-load %{dep:@PTEST_RESULT@/bool.sav} -eva @EVA_OPTIONS@"
  */
 
 #include "stdbool.h"

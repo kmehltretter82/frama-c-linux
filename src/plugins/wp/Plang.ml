@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -108,14 +108,14 @@ class engine =
 
     method pp_int _ fmt z =
       try
-        let n = Integer.to_int z in
+        let n = Integer.to_int_exn z in
         if -256 <= n && n <= 256 then
           Format.pp_print_int fmt n
         else
           raise Z.Overflow
       with Z.Overflow ->
       match iformat with
-      | `Dec -> Integer.pretty ~hexa:false fmt z
+      | `Dec -> Integer.pretty fmt z
       | `Hex -> Integer.pp_hex ~sep:"," fmt z
       | `Bin -> Integer.pp_bin ~sep:"," fmt z
 

@@ -82,7 +82,7 @@ val new_raw_id: unit -> int
  * structure itself), and (4) an optional list of attributes to be associated
  * with the composite type, "None" means that the struct is incomplete.
  *
- * @since Frama-C+dev the 4th parameter is a function that returns an option.
+ * @since 23.0-Vanadium the 4th parameter is a function that returns an option.
  **)
 val mkCompInfo: bool ->      (* whether it is a struct or a union *)
   string -> (* name of the composite type; cannot be empty *)

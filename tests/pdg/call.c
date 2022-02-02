@@ -1,6 +1,6 @@
 /* run.config
    
-   STDOPT: +"-lib-entry -main g -pdg -pdg-dot call "
+   STDOPT: +"-lib-entry -main g -pdg -pdg-dot @PTEST_RESULT@/call "
 */
 
 /* Ne pas modifier : exemple utilisé dans le rapport. */

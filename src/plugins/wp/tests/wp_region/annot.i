@@ -1,10 +1,10 @@
 /* run.config
+   PLUGIN: wp
    OPT: -region-annot -print
-   EXECNOW: BIN ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i @frama-c-cmd@ %{dep:@PTEST_NAME@.i}                 -region-annot -print -ocode ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i > @DEV_NULL@ 2> @DEV_NULL@
-   EXECNOW: BIN ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i @frama-c-cmd@ %{dep:ocode_@PTEST_NAME@.0.execnow.i} -region-annot -print -ocode ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i > @DEV_NULL@ 2> @DEV_NULL@
-
-   EXECNOW: LOG   diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt    diff %{dep:ocode_@PTEST_NAME@.0.execnow.i} %{dep:ocode_@PTEST_NAME@.1.execnow.i} &> diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt
-COMMENT: The file diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt must be empty. 
+   EXECNOW: BIN ocode_@PTEST_NAME@_1.i @frama-c@ %{dep:@PTEST_DIR@/@PTEST_NAME@.i}            -region-annot -print -ocode @PTEST_RESULT@/ocode_@PTEST_NAME@_1.i > @DEV_NULL@ 2> @DEV_NULL@
+   EXECNOW: BIN ocode_@PTEST_NAME@_2.i @frama-c@ %{dep:@PTEST_RESULT@/ocode_@PTEST_NAME@_1.i} -region-annot -print -ocode @PTEST_RESULT@/ocode_@PTEST_NAME@_2.i > @DEV_NULL@ 2> @DEV_NULL@
+   EXECNOW: LOG  diff_@PTEST_NAME@.txt diff %{dep:@PTEST_RESULT@/ocode_@PTEST_NAME@_1.i} %{dep:@PTEST_RESULT@/ocode_@PTEST_NAME@_2.i} &> @PTEST_RESULT@/diff_@PTEST_NAME@.txt
+COMMENT: The file diff_@PTEST_NAME@.txt must be empty.
 COMMENT: So, that file has not to be present into the oracle directory since absent files are considered such as empty files.
  */
 

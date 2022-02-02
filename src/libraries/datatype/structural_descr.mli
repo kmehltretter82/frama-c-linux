@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -59,7 +59,7 @@ type t = private
       will be applied on any part of such a data. *)
 
   | Structure of structure
-  (** Provide a description of the representation of data. 
+  (** Provide a description of the representation of data.
       @plugin development guide *)
 
   | T_pack of single_pack (** Internal use only.
@@ -72,7 +72,7 @@ and structure = private
       the non-constant constructors of the type being described (in the order
       of their declarations in that type).  Each element of this latter array
       is an array of [t] that describes (in order) the fields of the
-      corresponding constructor. 
+      corresponding constructor.
       @plugin development guide *)
 
   | Array of pack (** The data is an array of values of the same type, each
@@ -83,7 +83,7 @@ and structure = private
 (* ********************************************************************** *)
 
 val pack: t -> pack
-(** Pack a structural descriptor in order to embed it inside another one. 
+(** Pack a structural descriptor in order to embed it inside another one.
     @plugin development guide *)
 
 val recursive_pack: recursive -> pack

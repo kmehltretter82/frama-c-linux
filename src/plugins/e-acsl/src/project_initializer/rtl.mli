@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -39,6 +39,9 @@ module Symbols: sig
   val find_vi: string -> varinfo
   (** @raise Unregistered if the given name is not part of the RTL. *)
 
+  val libc_replacement: varinfo -> varinfo
+  (** Given the varinfo of a C library function with an RTL replacement, return
+      the varinfo of the RTL function that replaces it. *)
 end
 
 (*

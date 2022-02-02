@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,10 +26,17 @@
     by default: we must thus silence spurious let rec warning (39). *)
 [@@@ warning "-39"]
 
+type 'a dict = (string * 'a) list
+
 module type Json_type = sig
   type t
   val of_yojson: Yojson.Safe.t -> t Ppx_deriving_yojson_runtime.error_or
   val to_yojson: t -> Yojson.Safe.t
+end
+
+module type Json_default = sig
+  include Json_type
+  val default: t
 end
 
 module Json_string: Json_type with type t = string =
@@ -74,7 +81,7 @@ end
 struct
   type t = string[@@deriving yojson]
   let sarif_github =
-    "https://github.com/oasis-tcs/sarif-spec/blob/master/Documents/CommitteeSpecificationDrafts/v2.1.0-CSD.1/sarif-schema-2.1.0.json"
+    "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json"
 end
 
 module Version: sig
@@ -92,6 +99,8 @@ module ArtifactLocation = struct
     uri: string;
     uriBaseId: (string [@default ""])
   }[@@deriving yojson]
+
+  type _t = t
 
   let create ~uri ?(uriBaseId = "") () = { uri; uriBaseId }
 
@@ -118,6 +127,8 @@ module Properties = struct
     tags: tags;
     additional_properties: Custom_properties.t
   }
+
+  type _t = t
 
   let default = { tags = []; additional_properties = [] }
 
@@ -153,6 +164,8 @@ module Message = struct
     properties: (Properties.t [@default Properties.default]);
   }[@@deriving yojson]
 
+  type _t = t
+
   let create
       ?(text="")
       ?(id="")
@@ -182,6 +195,8 @@ module MultiformatMessageString = struct
     properties: (Properties.t [@default Properties.default])
   }[@@deriving yojson]
 
+  type _t = t
+
   let create ~text ?(markdown="") ?(properties=Properties.default) () =
     { text; markdown; properties }
 
@@ -200,6 +215,8 @@ module ArtifactContent = struct
       properties: (Properties.t [@default Properties.default])
     }
   [@@deriving yojson]
+
+  type _t = t
 
   let create ?(text="") ?(binary="")
       ?(rendered=MultiformatMessageString.default)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -180,8 +180,6 @@ let warn_degrade reason =
      ".\n\
       View degraded to non-service graph.\n\
       (use -cg-no-services to avoid this warning)")
-
-exception Found_vertex of bool
 
 let main (window: Design.main_window_extension_points) =
   ignore

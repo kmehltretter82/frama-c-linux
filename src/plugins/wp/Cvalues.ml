@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -133,6 +133,9 @@ and init_comp_value value ci =
 let initialized_obj = init_value e_true
 let uninitialized_obj = init_value e_false
 
+let always_initialized x =
+  (x.vformal || x.vglob) && not @@ Cil.isStructOrUnionType x.vtype
+
 (* -------------------------------------------------------------------------- *)
 (* --- Length of empty compinfos                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -157,7 +160,7 @@ module OPAQUE_COMP_BYTES_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
         } ;
         let min_size = if Cil.acceptEmptyCompinfo () then e_zero else e_one in
         Definitions.define_lemma {
-          l_kind = `Axiom ; l_name ;
+          l_kind = Admit ; l_name ;
           l_types = 0 ; l_triggers = [] ; l_forall = [] ;
           l_cluster = Definitions.compinfo c ;
           l_lemma = Lang.F.(p_leq min_size (e_fun size []))
@@ -238,7 +241,7 @@ struct
 
   and is_record c s =
     Definitions.call_pred
-      (Lang.generated_p (C.prefix ^ Lang.comp_id c))
+      (Lang.generated_p ~coloring:true (C.prefix ^ Lang.comp_id c))
       (fun lfun ->
          let basename = if c.cstruct then "S" else "U" in
          let s = Lang.freshvar ~basename (Lang.t_comp c) in
@@ -258,7 +261,7 @@ struct
 
   and is_array elt ds t =
     Definitions.call_pred
-      (Lang.generated_p (array_name elt ds))
+      (Lang.generated_p ~coloring:true (array_name elt ds))
       (fun lfun ->
          let cluster =
            match elt with

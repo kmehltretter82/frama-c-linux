@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -125,6 +125,9 @@ module Base_checker = struct
       method! vvdec v =
         Kernel.debug
           ~dkey:Kernel.dkey_check "Declaration of %s(%d)" v.vname v.vid;
+        if v.vname = "" then
+          check_abort "variable of id %d and type %a has an empty name"
+            v.vid Cil_datatype.Typ.pretty v.vtype;
         if Varinfo.Hashtbl.mem known_vars v then
           (let v' = Varinfo.Hashtbl.find known_vars v in
            if v != v' then (* we can see the declaration twice
@@ -193,6 +196,8 @@ module Base_checker = struct
         Cil.DoChildren
 
       method! vlogic_var_decl lv =
+        if lv.lv_name = "" then
+          check_abort "logic variable of id %d has an empty name" lv.lv_id;
         Logic_var.Hashtbl.add known_logic_vars lv lv;
         match lv.lv_origin with
         (* lvkind for purely logical variables is checked at the parent level. *)
@@ -520,7 +525,7 @@ module Base_checker = struct
           local_vars <- Varinfo.Set.remove v local_vars;
         end else begin
           check_abort
-            "%t is present in a block's blocals but in the function's slocals"
+            "%t is present in a block's blocals but not in the function's slocals"
             prefix
         end
 
@@ -810,16 +815,17 @@ module Base_checker = struct
                   | None ->
                     check_abort "Trying to use predicate %a as a term"
                       Printer.pp_logic_var lvi
-                  | Some typ ->
+                  | Some rt ->
+                    let ft = Logic_const.make_arrow_type li.l_profile rt in
                     if
                       not
-                        (Logic_utils.is_instance_of li.l_tparams t.term_type typ)
+                        (Logic_utils.is_instance_of li.l_tparams t.term_type ft)
                     then
                       check_abort
                         "%a is declared with type %a. It cannot be used as \
                          a term of type %a"
                         Printer.pp_logic_var lvi
-                        Printer.pp_logic_type typ
+                        Printer.pp_logic_type ft
                         Printer.pp_logic_type t.term_type)
                with Not_found ->
                  check_abort
@@ -1083,7 +1089,7 @@ module Base_checker = struct
                "field %s of type %a is not present in environment"
                mi.mi_name Printer.pp_typ mi.mi_base_type);
           Cil.DoChildren
-        | Dlemma(_,_,labels,_,_,_,_) ->
+        | Dlemma(_,labels,_,_,_,_) ->
           let old_labels = logic_labels in
           logic_labels <- labels @ logic_labels;
           Cil.DoChildrenPost (fun g -> logic_labels <- old_labels; g)
@@ -1310,7 +1316,7 @@ module Base_checker = struct
 
       method! vtype ty =
         match ty with
-        | TArray (_, _, _, la) ->
+        | TArray (_, _, la) ->
           let elt, _ = Cil.splitArrayAttributes la in
           if elt != [] then
             Kernel.fatal

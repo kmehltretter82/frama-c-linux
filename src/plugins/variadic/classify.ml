@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,7 +41,7 @@ let find_function env s =
     None
 
 let mk_overload env names =
-  let vis = Extends.List.filter_map (find_function env) names in
+  let vis = List.filter_map (find_function env) names in
   let overload = List.map (fun vi -> Typ.params_types vi.vtype, vi) vis in
   Overload overload
 
@@ -66,7 +66,7 @@ let mk_aggregator env fun_name a_pos pname a_type =
       (* Get the aggregate type of elements *)
       let _,ptyp,_ = List.nth params a_pos in
       let a_param = pname, match ptyp with
-        | TArray (typ,_,_,_)
+        | TArray (typ,_,_)
         | TPtr (typ, _) -> typ
         | _ ->
           Self.warning ~current:true
@@ -110,6 +110,20 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
 (* Classification                                                           *)
 (* ************************************************************************ *)
 
+let is_frama_c_builtin name =
+  Ast_info.is_frama_c_builtin name ||
+  Cil_builtins.Builtin_functions.mem name ||
+  Extlib.string_prefix "__FRAMAC_" name (* Mthread prefixes *)
+
+let va_builtins = [
+  "__builtin_va_start";
+  "__builtin_va_copy";
+  "__builtin_va_arg";
+  "__builtin_va_end";
+]
+
+let is_va_builtin s = List.mem s va_builtins
+
 let classify_std env vi = match vi.vname with
   (* fcntl.h - Overloads of functions *)
   | "fcntl" -> mk_overload env
@@ -148,13 +162,19 @@ let classify_std env vi = match vi.vname with
 
   (* stropts.h *)
   | "ioctl"   -> mk_overload env ["__va_ioctl_void" ; "__va_ioctl_int" ; "__va_ioctl_ptr"]
-
+  | n when Extlib.string_prefix "__sync_" n -> Misc
+  | n when is_va_builtin n -> Misc
+  | n when is_frama_c_builtin n -> Builtin
   (* Anything else *)
   | _ -> Unknown
 
+let is_variadic_function vi =
+  match Cil.unrollType vi.vtype with
+  | TFun (_, _, b, _) -> b
+  |  _ -> false
 
 let classify env vi =
-  if Extends.Cil.is_variadic_function vi then begin
+  if is_variadic_function vi then begin
     Self.result ~level:2 ~current:true
       "Declaration of variadic function %s." vi.vname;
     Some {

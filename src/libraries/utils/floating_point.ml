@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -101,7 +101,7 @@ let make_float ~num ~den ~exp ~man_size ~min_exp ~max_exp =
     let rem2 = (* twice the remainder *)
       Integer.shift_left rem Integer.one
     in
-    let man = Integer.to_int64 man in
+    let man = Integer.to_int64_exn man in
     (* Format.printf "pre-round: num den man rem:@\n%a@\n@\n%a@\n@\n%Ld@\n@\n%a@."
             Datatype.Integer.pretty num Datatype.Integer.pretty den
             man Datatype.Integer.pretty rem; *)
@@ -452,7 +452,7 @@ let nextafter_aux ~is_f32 fincr fdecr x y =
   then y
   else if isnan x || isnan y then nan
   else if x = 0.0 (* or -0.0 *) then
-    if x < y then min_denormal_float is_f32 else -. (min_denormal_float is_f32)
+    if x < y then min_denormal_float ~is_f32 else -. (min_denormal_float ~is_f32)
     (* the following conditions might be simpler if we had unsigned ints
        (uint32/uint64) *)
   else if x = neg_infinity (* && y = neg_infinity *) then fdecr x

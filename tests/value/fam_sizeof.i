@@ -1,3 +1,7 @@
+/* run.config*
+   STDOPT: +" -machdep gcc_x86_64"
+*/
+
 // Tests related to flexible array members
 
 struct {
@@ -5,7 +9,7 @@ struct {
   char a[];
 } fam;
 
-struct _nested {
+struct S_nested {
   int level1;
   struct _s1 {
     int level2;
@@ -14,10 +18,13 @@ struct _nested {
       struct _s3 {
 	int level4;
 	int another4;
+  int a[];
       } s3;
     } s2;
   } s1;
-} nested;
+};
+
+struct S_nested nested ;
 
 typedef struct {
   int len;
@@ -43,6 +50,8 @@ int main() {
   unsigned long z1 = sizeof(fam);
   //@assert z1 == sizeof(int);
   unsigned long z2 = sizeof(nested);
+  unsigned long z2p = sizeof(struct S_nested);
+  //@assert z2 == z2p ;
   unsigned long z3 = sizeof(not_fam2);
   unsigned long z4 = sizeof(fam2);
   //@assert z4 == sizeof(int) + sizeof(not_fam2);

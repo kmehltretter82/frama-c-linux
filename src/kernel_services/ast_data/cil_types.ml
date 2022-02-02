@@ -200,7 +200,7 @@ and typ =
       {!Cil.charPtrType}, {!Cil.charConstPtrType} (pointer to a constant
       character), {!Cil.voidPtrType}, {!Cil.intPtrType} *)
 
-  | TArray of typ * exp option * bitsSizeofTypCache * attributes
+  | TArray of typ * exp option * attributes
   (** Array type. It indicates the base type and the array length. *)
 
   | TFun of typ * (string * typ * attributes) list option * bool * attributes
@@ -224,7 +224,7 @@ and typ =
       attributes are in addition to those given when the type name was
       defined. *)
 
-  | TComp of compinfo * bitsSizeofTypCache * attributes
+  | TComp of compinfo * attributes
   (** A reference to a struct or a union type. All references to the
       same struct or union must share the same compinfo among them and
       with a [GCompTag] global that precedes all uses (except maybe
@@ -264,14 +264,6 @@ and fkind =
     FFloat      (** [float] *)
   | FDouble     (** [double] *)
   | FLongDouble (** [long double] *)
-
-(** This is used to cache the computation of the size of types in bits. *)
-and bitsSizeofTyp =
-  | Not_Computed
-  | Computed of int
-  | Not_Computable of (string * typ) (** Explanation of the error *)
-
-and bitsSizeofTypCache = { mutable scache : bitsSizeofTyp}
 
 (* ************************************************************************* *)
 (** {2 Attributes} *)
@@ -349,7 +341,7 @@ and attrparam =
     assigned and that the fields have the right pointers to parents.).
     @plugin development guide
 
-    @since Frama-C+dev [cfields] is an option, [None] is used for incomplete
+    @since 23.0-Vanadium [cfields] is an option, [None] is used for incomplete
     types (in replacement of removed field [cdefined]) *)
 and compinfo = {
   mutable cstruct: bool;
@@ -444,10 +436,6 @@ and fieldinfo = {
   (** Offset at which the field starts in the structure.
       Do not read this field directly. Use {!Cil.fieldBitsOffset} or
       {!Cil.bitsOffset} instead. *)
-
-  mutable fpadding_in_bits: int option;
-  (** (Deprecated.) Store the size of the padding that follows the field, if any.
-      @deprecated only Jessie uses this *)
 }
 
 (* ************************************************************************* *)
@@ -1597,9 +1585,14 @@ and identified_predicate = {
   ip_content: toplevel_predicate; (** the predicate itself*)
 }
 
+and predicate_kind =
+  | Assert
+  | Check
+  | Admit
+
 (** main statement of an annotation. *)
 and toplevel_predicate = {
-  tp_only_check: bool;
+  tp_kind: predicate_kind;
   (** whether the annotation is only used to check that [ip_content] holds, but
       stays invisible for other verification tasks (see description of ACSL's
       check keyword).
@@ -1615,7 +1608,7 @@ and predicate = {
 }
 
 (** variant of a loop or a recursive function. *)
-and variant = term * string option
+and variant = term * logic_info option
 
 (** allocates and frees.
     @since Oxygen-20120901  *)
@@ -1670,13 +1663,8 @@ and spec = {
     Each extension is associated with a keyword, and can be either a global
     annotation, the clause of a function contract, a code annotation,
     or a loop annotation.
-    An extension can be registered through the following functions:
-    - [Logic_typing.register_xxx_extension] for parsing and type-checking
-    - [Cil_printer.register_xxx_extension] for pretty-printing an
-      extended clause
-    - [Cil.register_xxx_extension] for visiting an extended clause
-      where xxx can be either [global], [behavior], [code_annot] or
-      [loop annot] depending on the level at which the extension should be seen.
+    An extension can be registered through the function
+    [Acsl_extension.register_xxx].
 
     It is _not_ possible to register the same keyword for annotations at two
     different levels (e.g. [global] and [behavior]), as this would make the
@@ -1822,10 +1810,9 @@ and global_annotation =
   | Daxiomatic of string * global_annotation list * attributes * location
   | Dtype of logic_type_info * location (** declaration of a logic type. *)
   | Dlemma of
-      string * bool * logic_label list * string list *
+      string * logic_label list * string list *
       toplevel_predicate * attributes * location
-  (** definition of a lemma. The boolean flag is [true] if the property should
-      be taken as an axiom and [false] if it must be proved.  *)
+  (** definition of all kinds of lemmas (axioms are admit lemmas).  *)
   | Dinvariant of logic_info * location
   (** global invariant. The predicate does not have any argument. *)
   | Dtype_annot of logic_info * location
@@ -1835,15 +1822,6 @@ and global_annotation =
       argument of type t *)
   | Dextended of acsl_extension * attributes * location
   (** Extended global clause. *)
-  | Dcustom_annot of custom_tree * string * attributes * location
-  (*Custom declaration*)
-
-and custom_tree = CustomDummy
-(*
-  | CustomType of logic_type
-  | CustomLexpr of lexpr
-  | CustomOther of string * (custom_tree list)
-*)
 
 type kinstr =
   | Kstmt of stmt

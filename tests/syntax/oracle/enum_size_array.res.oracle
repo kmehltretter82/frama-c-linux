@@ -5,7 +5,7 @@ enum __anonenum_T_E_1 {
     TWO = 1,
     EN_NB = 2
 };
-int f_return_last(int * /*[2]*/ tab)
+int f_return_last(int tab[2])
 {
   int __retres;
   __retres = *(tab + (EN_NB - 1));

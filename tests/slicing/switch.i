@@ -1,8 +1,7 @@
 /*  run.config
- LIBS: ../libSelect
+ LIBS: libSelect
  MODULE: @PTEST_NAME@
- CMD: @frama-c@ @PTEST_OPTIONS@
-   OPT: @EVA_OPTIONS@ -deps -journal-disable
+   OPT: @EVA_OPTIONS@ -deps
 */
 int main (char choix) {
   int x = 0, y = 0, z = 0;

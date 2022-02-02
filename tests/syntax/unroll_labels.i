@@ -1,7 +1,16 @@
 /* run.config
+<<<<<<< HEAD
   PLUGIN: @EVA_PLUGINS@
   STDOPT: +"-eva @EVA_OPTIONS@"
   STDOPT: +"-eva @EVA_OPTIONS@ -main main2 -eva-slevel 3"
+||||||| 754e522ceb
+  STDOPT: +"-eva @EVA_CONFIG@"
+  STDOPT: +"-eva @EVA_CONFIG@ -main main2 -eva-slevel 3"
+=======
+PLUGIN: eva,scope
+  STDOPT: +"-eva @EVA_CONFIG@"
+  STDOPT: +"-eva @EVA_CONFIG@ -main main2 -eva-slevel 3"
+>>>>>>> origin/master
 */
 enum { SIX = 6 } ;
 volatile foo;

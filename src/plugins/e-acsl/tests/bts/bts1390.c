@@ -13,11 +13,12 @@
 void *memchr(const void *buf, int c, size_t n) {
   int i;
   char *s = buf;
-  for(i = 0; i < n; i++) {
-    if(*s == c) return s;
+  for (i = 0; i < n; i++) {
+    if (*s == c)
+      return s;
     s++;
   }
-  return (void*)0;
+  return (void *)0;
 }
 
 int main(void) {

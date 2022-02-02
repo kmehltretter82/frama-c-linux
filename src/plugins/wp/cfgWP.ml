@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,7 +35,15 @@ open Lang.F
 open Sigs
 open Wpo
 
-module VC( C : Sigs.Compiler ) =
+module type VCgen =
+sig
+  include Mcfg.S
+  val register_lemma : logic_lemma -> unit
+  val compile_lemma : logic_lemma -> Wpo.t
+  val compile_wp : Wpo.index -> t_prop -> Wpo.t Bag.t
+end
+
+module VC( C : Sigs.Compiler ) : VCgen =
 struct
 
   open C
@@ -47,7 +55,7 @@ struct
 
   type target =
     | Gprop of P.t
-    | Geffect of P.t * Stmt.t * effect_source
+    | Gsource of P.t * Stmt.t * effect_source
     | Gposteffect of P.t
 
   module TARGET =
@@ -57,33 +65,33 @@ struct
       | FromCode -> 1 | FromCall -> 2 | FromReturn -> 3
     let hash = function
       | Gprop p | Gposteffect p -> P.hash p
-      | Geffect(p,s,e) -> P.hash p * 37 + 41 * Stmt.hash s + hsrc e
+      | Gsource(p,s,e) -> P.hash p * 37 + 41 * Stmt.hash s + hsrc e
     let compare g1 g2 =
       if g1 == g2 then 0 else
         match g1,g2 with
         | Gprop p1 , Gprop p2 -> P.compare p1 p2
         | Gprop _ , _ -> (-1)
         | _ , Gprop _ -> 1
-        | Geffect(p1,s1,e1) , Geffect(p2,s2,e2) ->
+        | Gsource(p1,s1,e1) , Gsource(p2,s2,e2) ->
             let c = P.compare p1 p2 in
             if c <> 0 then c else
               let c = Stmt.compare s1 s2 in
               if c <> 0 then c else
                 hsrc e1 - hsrc e2
-        | Geffect _ , _ -> (-1)
-        | _ , Geffect _ -> 1
+        | Gsource _ , _ -> (-1)
+        | _ , Gsource _ -> 1
         | Gposteffect p1 , Gposteffect p2 -> P.compare p1 p2
     let equal g1 g2 = (compare g1 g2 = 0)
-    let prop_id = function Gprop p | Gposteffect p | Geffect(p,_,_) -> p
-    let source = function Gprop _ | Gposteffect _ -> None | Geffect(_,s,e) -> Some(s,e)
+    let prop_id = function Gprop p | Gposteffect p | Gsource(p,_,_) -> p
+    let source = function Gprop _ | Gposteffect _ -> None | Gsource(_,s,e) -> Some(s,e)
     let is_smoke_test = function
       | Gprop p -> WpPropId.is_smoke_test p
-      | Gposteffect _ | Geffect _ -> false
+      | Gposteffect _ | Gsource _ -> false
     let pretty fmt = function
       | Gprop p -> WpPropId.pretty fmt p
-      | Geffect(p,s,FromCode) -> Format.fprintf fmt "%a at sid:%d" WpPropId.pretty p s.sid
-      | Geffect(p,s,FromCall) -> Format.fprintf fmt "Call %a at sid:%d" WpPropId.pretty p s.sid
-      | Geffect(p,s,FromReturn) -> Format.fprintf fmt "Return %a at sid:%d" WpPropId.pretty p s.sid
+      | Gsource(p,s,FromCode) -> Format.fprintf fmt "%a at sid:%d" WpPropId.pretty p s.sid
+      | Gsource(p,s,FromCall) -> Format.fprintf fmt "Call %a at sid:%d" WpPropId.pretty p s.sid
+      | Gsource(p,s,FromReturn) -> Format.fprintf fmt "Return %a at sid:%d" WpPropId.pretty p s.sid
       | Gposteffect p -> Format.fprintf fmt "%a post-effect" WpPropId.pretty p
   end
 
@@ -144,8 +152,15 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let pp_vc fmt vc =
-    Format.fprintf fmt "%a"
-      (Pcond.dump_bundle ~clause:"Context" ~goal:vc.goal) vc.hyps
+    if Wp_parameters.debug_atleast 2 then
+      begin
+        List.iter
+          (Format.fprintf fmt "Have @[<hov 2>%a@]@." F.pp_pred)
+          (Conditions.extract vc.hyps) ;
+        Format.fprintf fmt "Goal @[<hov 2>%a@]@]@." F.pp_pred vc.goal ;
+      end
+    else
+      Pcond.dump_bundle ~clause:"Context" ~goal:vc.goal fmt vc.hyps
 
   let pp_vcs fmt vcs =
     let k = ref 0 in
@@ -423,10 +438,11 @@ struct
         (F.varsp goal) hs
     in xs , hs , goal
 
-  let add_vc target ?(warn=Warning.Set.empty) pred vcs =
+  let add_vc
+      target ?(warn=Warning.Set.empty) ?(deps=Property.Set.empty) pred vcs =
     let xs , hs , goal = introduction pred in
     let hyps = Conditions.intros hs Conditions.nil in
-    let vc = { empty_vc with goal=goal ; vars=xs ; hyps=hyps ; warn=warn } in
+    let vc = { empty_vc with goal ; vars=xs ; hyps ; warn ; deps } in
     Gmap.add target (Splitter.singleton vc) vcs
 
   (* ------------------------------------------------------------------------ *)
@@ -468,7 +484,7 @@ struct
 
   let add_axiom _id _l = ()
 
-  let add_hyp wenv (hpid,predicate) wp = in_wenv wenv wp
+  let add_hyp ?for_pid wenv (hpid,predicate) wp = in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
              ~severe:false ~effect:"Skip hypothesis"
@@ -477,7 +493,11 @@ struct
            | Warning.Result(warn,p) -> warn , [p]
            | Warning.Failed warn -> warn , []
          in
-         let vcs = gmap (assume_vc ~hpid ~warn hs) wp.vcs in
+         let assume_vc target vcs = match for_pid with
+           | Some id when not @@ PropId.equal id (TARGET.prop_id target) -> vcs
+           | _ -> Splitter.map (assume_vc ~hpid ~warn hs) vcs
+         in
+         let vcs = Gmap.mapi assume_vc wp.vcs in
          { wp with vcs = vcs })
 
   let add_goal wenv (gpid,predicate) wp = in_wenv wenv wp
@@ -490,6 +510,18 @@ struct
            | Warning.Failed warn -> warn,F.p_false
          in
          let vcs = add_vc (Gprop gpid) ~warn goal wp.vcs in
+         { wp with vcs = vcs })
+
+  let add_subgoal wenv (gpid,_) ?deps predicate stmt src wp = in_wenv wenv wp
+      (fun env wp ->
+         let outcome = Warning.catch
+             ~severe:true ~effect:"Degenerated goal"
+             (L.pred `Positive env) predicate in
+         let warn,goal = match outcome with
+           | Warning.Result(warn,goal) -> warn,goal
+           | Warning.Failed warn -> warn,F.p_false
+         in
+         let vcs = add_vc (Gsource(gpid, stmt, src)) ~warn ?deps goal wp.vcs in
          { wp with vcs = vcs })
 
   let add_assigns wenv (gpid,ainfo) wp = in_wenv wenv wp
@@ -562,7 +594,7 @@ struct
          in
          let target = match sloc with
            | None -> Gprop e.e_pid
-           | Some stmt -> Geffect(e.e_pid,stmt,source)
+           | Some stmt -> Gsource(e.e_pid,stmt,source)
          in
          Gmap.add target group vcs
       ) effects vcs
@@ -578,7 +610,7 @@ struct
       (fun e vcs ->
          let target = match stmt with
            | None -> Gprop e.e_pid
-           | Some s -> Geffect(e.e_pid,s,FromCode)
+           | Some s -> Gsource(e.e_pid,s,FromCode)
          in
          add_vc target ?warn F.p_false vcs)
       effects vcs
@@ -598,8 +630,9 @@ struct
     let sequence = { pre=s0 ; post=s1 } in
     sequence , assigned
 
-  let use_assigns wenv stmt hpid ainfo wp = in_wenv wenv wp
+  let use_assigns wenv hpid ainfo wp = in_wenv wenv wp
       begin fun env wp ->
+        let stmt = ainfo.a_stmt in
         match ainfo.a_assigns with
 
         | WritesAny ->
@@ -681,15 +714,28 @@ struct
     obj , domain , seq , loc
 
   let cc_stored lv seq loc obj expr =
-    if Cil.isVolatileLval lv &&
-       Cvalues.volatile ~warn:"unsafe write-access to volatile l-value" ()
-    then None
-    else Some
-        begin
-          match expr.enode with
-          | Lval lv -> M.copied seq obj loc (C.lval seq.pre lv)
-          | _ -> M.stored seq obj loc (C.val_of_exp seq.pre expr)
-        end
+    let intercept_volatile kind lv =
+      let warn = "unsafe " ^ kind ^ "-access to volatile l-value" in
+      Cil.isVolatileLval lv && Cvalues.volatile ~warn ()
+    in
+    if intercept_volatile "write" lv then None
+    else
+      let value = match expr.enode with
+        | Lval lv when not @@ intercept_volatile "read" lv ->
+            M.copied seq obj loc (C.lval seq.pre lv)
+        | _ ->
+            (* Note: a volatile lval will be compiled to an unknown value *)
+            M.stored seq obj loc (C.val_of_exp seq.pre expr)
+      in
+      let init = match expr.enode with
+        | Lval lv when intercept_volatile "read" lv ->
+            M.stored_init seq obj loc (Cvalues.initialized_obj obj)
+        | Lval lv when Cil.(isStructOrUnionType @@ typeOfLval lv) ->
+            M.copied_init seq obj loc (C.lval seq.pre lv)
+        | _ ->
+            M.stored_init seq obj loc (Cvalues.initialized_obj obj)
+      in
+      Some (value @ init)
 
   let assign wenv stmt lv expr wp = in_wenv wenv wp
       begin fun env wp ->
@@ -1005,6 +1051,52 @@ struct
              in { wp with vcs = vcs })
 
   (* -------------------------------------------------------------------------- *)
+  (* --- WP RULE : call terminates                                          --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let call_terminates wenv (gpid, caller_t) stmt kf es ~callee_t wp =
+    in_wenv wenv wp
+      (fun env wp ->
+         let gid = Gsource(gpid, stmt, FromCall) in
+         let outcome = Warning.catch
+             ~severe:true ~effect:"Can not prove call termination"
+             (L.pred `Positive env) caller_t
+         in
+         match outcome with
+         | Warning.Failed warn ->
+             let vcs = add_vc gid ~warn p_false wp.vcs in
+             { wp with vcs = vcs }
+         | Warning.Result(warn, caller_t) ->
+             let sigma = L.current env in
+             let outcome = Warning.catch
+                 ~severe:true ~effect:"Can not prove call preconditions"
+                 (List.map (C.exp sigma)) es in
+             match outcome with
+             | Warning.Failed warn2 ->
+                 let warn = W.union warn warn2 in
+                 let vcs = add_vc gid ~warn p_false wp.vcs in
+                 { wp with vcs = vcs }
+             | Warning.Result(warn2, vs) ->
+                 let warn = W.union warn warn2 in
+                 let init = L.mem_at env Clabels.init in
+                 let call = L.call kf vs in
+                 let call_e = L.mk_env ~here:sigma () in
+                 let call_f = L.call_pre init call sigma in
+                 let outcome = Warning.catch
+                     ~severe:true ~effect:"Can not prove call precondition"
+                     (L.in_frame call_f (L.pred `Positive call_e)) callee_t in
+                 match outcome with
+                 | Warning.Result(warn3,callee_t) ->
+                     let warn = W.union warn warn3 in
+                     let goal = p_imply caller_t callee_t in
+                     let vcs = add_vc gid ~warn goal wp.vcs in
+                     { wp with vcs = vcs }
+                 | Warning.Failed warn3 ->
+                     let warn = W.union warn warn3 in
+                     let vcs = add_vc gid ~warn p_false wp.vcs in
+                     { wp with vcs = vcs })
+
+  (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : call postcondition                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -1090,11 +1182,14 @@ struct
         }
     | Writes froms ->
         let env = L.move_at env0 cenv.sigma_pre in
-        let assigned = L.in_frame cenv.frame_pre
-            (L.assigned_of_froms env) froms in
-        let vcs_post = do_assigns ~descr:"Call Effects" ~source:FromCall
+        let cc_region = L.assigned_of_froms env in
+        let vcs_post =
+          let assigned = L.in_frame cenv.frame_post cc_region froms in
+          do_assigns ~descr:"Call Effects" ~source:FromCall
             ~stmt cenv.seq_post ~assigned wpost.effects wpost.vcs in
-        let vcs_exit = do_assigns ~descr:"Exit Effects" ~source:FromCall
+        let vcs_exit =
+          let assigned = L.in_frame cenv.frame_exit cc_region froms in
+          do_assigns ~descr:"Exit Effects" ~source:FromCall
             ~stmt cenv.seq_exit ~assigned wexit.effects wexit.vcs in
         let vcs_result =
           match cenv.loc_result with
@@ -1344,8 +1439,9 @@ struct
     else
       group.verifs <- Bag.concat group.verifs (make_vcqs target tags vc)
 
-  let compile collection index (wp : t_prop) =
+  let compile_wp index (wp : t_prop) =
     let groups = ref PMAP.empty in
+    let collection = ref Bag.empty in
     Gmap.iter_sorted
       (fun target -> Splitter.iter (group_vc groups target))
       wp.vcs ;
@@ -1383,121 +1479,56 @@ struct
           end
           pid group
 
-      end !groups
+      end !groups ;
+    !collection
 
-  let lemma = L.lemma
+  let register_lemma l = ignore (L.lemma l)
 
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- WPO Computer                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-module KFmap = Kernel_function.Map
-
-module Computer(M : Sigs.Compiler) =
-struct
-
-  module VCG = VC(M)
-  module WP = Calculus.Cfg(VCG)
-
-  let compile_lemma l = ignore (VCG.lemma l)
-
-  let prove_lemma collection l =
-    if l.lem_kind <> `Axiom then
-      begin
-        let id = WpPropId.mk_lemma_id l in
-        let def = VCG.lemma l in
-        let model = WpContext.get_model () in
-        let vca = {
-          Wpo.VC_Lemma.depends = l.lem_depends ;
-          Wpo.VC_Lemma.lemma = def ;
-          Wpo.VC_Lemma.sequent = None ;
-        } in
-        let index = match LogicUsage.section_of_lemma l.lem_name with
-          | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
-          | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
-        let mid = WpContext.MODEL.id model in
-        let sid = WpPropId.get_propid id in
-        let leg = WpPropId.get_legacy id in
-        let wpo = {
-          Wpo.po_model = model ;
-          Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
-          Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
-          Wpo.po_sid = sid ;
-          Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
-          Wpo.po_idx = index ;
-          Wpo.po_pid = id ;
-          Wpo.po_formula = Wpo.GoalLemma vca ;
-        } in
-        Wpo.add wpo ;
-        collection := Bag.append !collection wpo ;
-      end
-
-  let prove_strategy collection model kf strategy =
-    let cfg = WpStrategy.cfg_of_strategy strategy in
-    let bhv = WpStrategy.get_bhv strategy in
-    let index = Wpo.Function( kf , bhv ) in
-    if WpRTE.missing_guards model kf then
-      Wp_parameters.warning ~current:false ~once:true
-        "Missing RTE guards" ;
-    try
-      let (results,_) = WP.compute cfg strategy in
-      List.iter (VCG.compile collection index) results
-    with Warning.Error(source,reason) ->
-      Wp_parameters.failure
-        ~current:false "From %s: %s" source reason
-
-  class wp (model:WpContext.model) =
-    object
-      val mutable lemmas : LogicUsage.logic_lemma Bag.t = Bag.empty
-      val mutable annots : WpStrategy.strategy Bag.t KFmap.t = KFmap.empty
-      method lemma = true
-      method model = model
-
-      method add_lemma lemma = lemmas <- Bag.append lemmas lemma
-
-      method add_strategy strategy =
-        let kf = WpStrategy.get_kf strategy in
-        let sf = try KFmap.find kf annots with Not_found -> Bag.empty in
-        annots <- KFmap.add kf (Bag.append sf strategy) annots
-
-      method compute : Wpo.t Bag.t =
-        begin
-          let collection = ref Bag.empty in
-          Lang.F.release () ;
-          WpContext.on_context (model,WpContext.Global)
-            begin fun () ->
-              LogicUsage.iter_lemmas compile_lemma ;
-              Bag.iter (prove_lemma collection) lemmas ;
-            end () ;
-          KFmap.iter
-            (fun kf strategies ->
-               WpContext.on_context (model,WpContext.Kf kf)
-                 begin fun () ->
-                   LogicUsage.iter_lemmas compile_lemma ;
-                   Bag.iter (prove_strategy collection model kf) strategies ;
-                 end ()
-            ) annots ;
-          lemmas <- Bag.empty ;
-          annots <- KFmap.empty ;
-          Lang.F.release () ;
-          !collection
-        end
+  let compile_lemma l =
+    begin
+      let id = WpPropId.mk_lemma_id l in
+      let def = L.lemma l in
+      let model = WpContext.get_model () in
+      let vca = {
+        Wpo.VC_Lemma.depends = l.lem_depends ;
+        Wpo.VC_Lemma.lemma = def ;
+        Wpo.VC_Lemma.sequent = None ;
+      } in
+      let index = match LogicUsage.section_of_lemma l.lem_name with
+        | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
+        | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
+      let mid = WpContext.MODEL.id model in
+      let sid = WpPropId.get_propid id in
+      let leg = WpPropId.get_legacy id in
+      let wpo = {
+        Wpo.po_model = model ;
+        Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
+        Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
+        Wpo.po_sid = sid ;
+        Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
+        Wpo.po_idx = index ;
+        Wpo.po_pid = id ;
+        Wpo.po_formula = Wpo.GoalLemma vca ;
+      } in
+      Wpo.add wpo ; wpo
     end
 
 end
 
-(* Cache because computer functors can not be instantiated twice *)
-module COMPUTERS = Hashtbl.Make(WpContext.MODEL)
-let computers = COMPUTERS.create 1
+(* -------------------------------------------------------------------------- *)
+(* --- VCgen Cache                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
-let computer setup driver =
+(* Cache by Model Context *)
+let vcgenerators = WpContext.MINDEX.create 1
+
+let vcgen setup driver : (module VCgen) =
   let model = Factory.instance setup driver in
-  try COMPUTERS.find computers model
+  try WpContext.MINDEX.find vcgenerators model
   with Not_found ->
     let module M = (val Factory.(compiler setup.mheap setup.mvar)) in
-    let module VC = Computer(M) in
-    let generator = (new VC.wp model :> Generator.computer) in
-    COMPUTERS.add computers model generator ;
-    generator
+    let vcgen = (module VC(M) : VCgen) in
+    WpContext.MINDEX.add vcgenerators model vcgen ;
+    vcgen
+
+(* -------------------------------------------------------------------------- *)

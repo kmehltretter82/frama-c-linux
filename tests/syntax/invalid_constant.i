@@ -2,4 +2,5 @@
  EXIT: 1
    STDOPT:
 */
-int i = 0123456789; /* Invalid octal constant */
+/* Invalid octal constant */
+int i = 0123456789;

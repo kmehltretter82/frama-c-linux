@@ -52,5 +52,7 @@ int main() {
     return -1;
   }
 
+  //@ assert valid_nsig: NSIG >= 0;
+
   return 0;
 }

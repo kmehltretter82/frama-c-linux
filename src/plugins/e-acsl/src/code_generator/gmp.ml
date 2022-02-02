@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,6 +34,23 @@ let apply_on_var ~loc funname e =
     else assert false
   in
   Smart_stmt.rtl_call ~loc ~prefix funname [ e ]
+
+let name_of_mpz_arith_bop = function
+  | PlusA -> "__gmpz_add"
+  | MinusA -> "__gmpz_sub"
+  | Mult -> "__gmpz_mul"
+  | Div -> "__gmpz_tdiv_q"
+  | Mod -> "__gmpz_tdiv_r"
+  | BAnd -> "__gmpz_and"
+  | BOr -> "__gmpz_ior"
+  | BXor -> "__gmpz_xor"
+  | Shiftlt -> "__gmpz_mul_2exp"
+  | Shiftrt -> "__gmpz_tdiv_q_2exp"
+  | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr | PlusPI | IndexPI | MinusPI
+  | MinusPP as bop ->
+    Options.fatal
+      "Operation '%a' either not arithmetic or not supported on GMP integers"
+      Printer.pp_binop bop
 
 let init ~loc e = apply_on_var "init" ~loc e
 let clear ~loc e = apply_on_var "clear" ~loc e

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -79,32 +79,32 @@ let mem (sel, _) s = match sel with
   | Subset sel -> Selection.mem_vertex sel s
 
 include Datatype.Make
-(struct
-  include Datatype.Undefined
-  type t = state_selection
-  let name = "State_selection"
-  let reprs = [ full; empty; singleton State.dummy ]
-  let internal_pretty_code p_caller fmt (s, _) = match s with
-    | Full -> Format.fprintf fmt "@[State_selection.full@]"
-    | Subset sel ->
-      match Selection.fold_vertex (fun s acc -> s :: acc) sel [] with
-      | [] -> Format.fprintf fmt "@[State_selection.empty@]"
-      | [ s ] ->
-        let pp fmt =
-          Format.fprintf fmt "@[<hv 2>State_selection.singleton@;%a@]"
-            (State.internal_pretty_code Type.Call)
-            s
-        in
-        Type.par p_caller Type.Call fmt pp
-      | l ->
-        let module D = Datatype.List(State) in
-        let pp fmt =
-          Format.fprintf fmt "@[<hv 2>State_selection.of_list@;%a@]"
-            (D.internal_pretty_code Type.Call)
-            l
-        in
-        Type.par p_caller Type.Call fmt pp
- end)
+    (struct
+      include Datatype.Undefined
+      type t = state_selection
+      let name = "State_selection"
+      let reprs = [ full; empty; singleton State.dummy ]
+      let internal_pretty_code p_caller fmt (s, _) = match s with
+        | Full -> Format.fprintf fmt "@[State_selection.full@]"
+        | Subset sel ->
+          match Selection.fold_vertex (fun s acc -> s :: acc) sel [] with
+          | [] -> Format.fprintf fmt "@[State_selection.empty@]"
+          | [ s ] ->
+            let pp fmt =
+              Format.fprintf fmt "@[<hv 2>State_selection.singleton@;%a@]"
+                (State.internal_pretty_code Type.Call)
+                s
+            in
+            Type.par p_caller Type.Call fmt pp
+          | l ->
+            let module D = Datatype.List(State) in
+            let pp fmt =
+              Format.fprintf fmt "@[<hv 2>State_selection.of_list@;%a@]"
+                (D.internal_pretty_code Type.Call)
+                l
+            in
+            Type.par p_caller Type.Call fmt pp
+    end)
 
 module type S = sig
   val with_dependencies: State.t -> t
@@ -132,19 +132,19 @@ module Static = struct
     let rec visit acc v =
       next_vertices
         (fun v' acc ->
-          let e = v, v' in
-          if Selection.mem_edge_e acc e then acc
-          else visit (Selection.add_edge_e acc e) v')
+           let e = v, v' in
+           if Selection.mem_edge_e acc e then acc
+           else visit (Selection.add_edge_e acc e) v')
         State_dependency_graph.graph v acc
     in
     (* add [s] in the selection even if it has no ingoing/outgoing edges *)
     visit (Selection.add_vertex Selection.empty s) s
 
-  let with_dependencies s = 
+  let with_dependencies s =
     Subset (transitive_closure State_dependency_graph.G.fold_succ s),
     WDependencies s
 
-  let with_codependencies s = 
+  let with_codependencies s =
     Subset (transitive_closure State_dependency_graph.G.fold_pred s),
     WCoDependencies s
 
@@ -164,17 +164,17 @@ module Static = struct
         let selection =
           State_dependency_graph.G.fold_vertex
             (fun v acc ->
-              if Selection.mem_vertex sel2 v then acc
-              else Selection.add_vertex acc v)
+               if Selection.mem_vertex sel2 v then acc
+               else Selection.add_vertex acc v)
             State_dependency_graph.graph
             Selection.empty
         in
         let sel =
           State_dependency_graph.G.fold_edges
             (fun v1 v2 acc ->
-              if Selection.mem_vertex sel2 v1 || Selection.mem_vertex sel2 v2
-              then acc
-              else Selection.add_edge acc v1 v2)
+               if Selection.mem_vertex sel2 v1 || Selection.mem_vertex sel2 v2
+               then acc
+               else Selection.add_edge acc v1 v2)
             State_dependency_graph.graph
             selection
         in
@@ -205,22 +205,22 @@ module Static = struct
     | Subset sel -> Selection.nb_vertex sel
 
   let iter_succ f (sel, _) v = match sel with
-    | Full -> 
+    | Full ->
       State_dependency_graph.G.iter_succ f State_dependency_graph.graph v
     | Subset sel -> Selection.iter_succ f sel v
 
   let fold_succ f (sel, _) v acc = match sel with
-    | Full -> 
+    | Full ->
       State_dependency_graph.G.fold_succ f State_dependency_graph.graph v acc
     | Subset sel -> Selection.fold_succ f sel v acc
 
   let iter f (sel, _) = match sel with
-    | Full -> 
+    | Full ->
       State_dependency_graph.G.iter_vertex f State_dependency_graph.graph
     | Subset sel -> Selection.iter_vertex f sel
 
   let fold f (sel, _) acc = match sel with
-    | Full -> 
+    | Full ->
       State_dependency_graph.G.fold_vertex f State_dependency_graph.graph acc
     | Subset sel -> Selection.fold_vertex f sel acc
 
@@ -246,9 +246,9 @@ module Static = struct
     in
     iter_in_order
       (fun s ->
-        Format.fprintf fmt "\t state %S%s@\n"
-          (State.get_unique_name s)
-          (if mem s then "" else "(\"" ^ State.get_name s ^ "\")"))
+         Format.fprintf fmt "\t state %S%s@\n"
+           (State.get_unique_name s)
+           (if mem s then "" else "(\"" ^ State.get_name s ^ "\")"))
       sel;
     Format.pp_print_flush fmt ()
 

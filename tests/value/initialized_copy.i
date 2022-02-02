@@ -132,7 +132,7 @@ int main() {
 
   if (v) {
     int a;
-    g(a); // completely indeterminate. We also warn when the option is not active, as g has no body
+    g(a); // completely indeterminate.
     Frama_C_show_each_unreached();
   }
 
@@ -148,7 +148,7 @@ int main() {
     int a;
     if (v)
       a = 1;
-    g(a); // possibly determinate. We also warn when the option is not active, as g has no body
+    g(a); // possibly determinate.
     Frama_C_dump_each();
   }
 

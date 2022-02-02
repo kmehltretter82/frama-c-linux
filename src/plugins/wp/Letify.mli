@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,12 +29,7 @@ open Lang.F
 module Ground :
 sig
 
-  type subst = pred -> pred
-  val singleton : pred -> subst
-  val compute : pred array -> subst array * subst
-
   type env
-  val pretty : Format.formatter -> env -> unit
   val top : unit -> env
   val copy : env -> env
 

@@ -1,6 +1,6 @@
 /* run.config
    MODULE: @PTEST_NAME@
-   OPT:
+   OPT: -no-autoload-plugins
 */
 
 /*@ predicate foo(boolean a, boolean b) = a == b; */

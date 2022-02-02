@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -56,6 +56,10 @@ module Model_info: State_builder.Hashtbl
 (** @since Oxygen-20120901 *)
 module Lemmas: State_builder.Hashtbl
   with type key = string and type data = Cil_types.global_annotation
+
+(** @since 23.0-Vanadium *)
+module Axiomatics: State_builder.Hashtbl
+  with type key = string and type data = Cil_types.location
 
 val builtin_states: State.t list
 

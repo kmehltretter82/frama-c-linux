@@ -1,11 +1,11 @@
-/* run.config  NOFRAMAC: use execnow for proper sequencing of executions
-PLUGIN: markdown-report eva inout
-EXECNOW: LOG @PTEST_NAME@.parse.log LOG @PTEST_NAME@.parse.err LOG @PTEST_NAME@_parse.sav @frama-c@ -save @PTEST_NAME@_parse.sav > @PTEST_NAME@.parse.log 2> @PTEST_NAME@.parse.err
-EXECNOW: LOG @PTEST_NAME@.eva.log   LOG @PTEST_NAME@.eva.err   LOG @PTEST_NAME@_eva.sav   @frama-c-cmd@ -load %{dep:@PTEST_NAME@_parse.sav} -eva -save @PTEST_NAME@_eva.sav > @PTEST_NAME@.eva.log 2> @PTEST_NAME@.eva.err
-EXECNOW: LOG @PTEST_NAME@.sarif.log LOG @PTEST_NAME@.sarif.err LOG @PTEST_NAME@.sarif     @frama-c-cmd@ -load %{dep:@PTEST_NAME@_eva.sav} -then -mdr-out @PTEST_NAME@.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic > @PTEST_NAME@.sarif.log 2> @PTEST_NAME@.sarif.err
+/* run.config
+NOFRAMAC: use execnow for proper sequencing of executions
+EXECNOW: BIN @PTEST_NAME@_parse.sav LOG @PTEST_NAME@.parse.log LOG @PTEST_NAME@.parse.err @frama-c@ @PTEST_FILE@ -save @PTEST_RESULT@/@PTEST_NAME@_parse.sav > @PTEST_RESULT@/@PTEST_NAME@.parse.log 2> @PTEST_RESULT@/@PTEST_NAME@.parse.err
+EXECNOW: BIN @PTEST_NAME@_eva.sav LOG @PTEST_NAME@.eva.log LOG @PTEST_NAME@.eva.err @frama-c@ -load %{dep:@PTEST_RESULT@/@PTEST_NAME@_parse.sav} -eva -save @PTEST_RESULT@/@PTEST_NAME@_eva.sav > @PTEST_RESULT@/@PTEST_NAME@.eva.log 2> @PTEST_RESULT@/@PTEST_NAME@.eva.err
+EXECNOW: LOG @PTEST_NAME@.sarif LOG @PTEST_NAME@.sarif.log LOG @PTEST_NAME@.sarif.err @frama-c@ -load %{dep:@PTEST_RESULT@/@PTEST_NAME@_eva.sav} -then -mdr-out @PTEST_RESULT@/@PTEST_NAME@.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic > @PTEST_RESULT@/@PTEST_NAME@.sarif.log 2> @PTEST_RESULT@/@PTEST_NAME@.sarif.err
 */
-#include "__fc_builtin.h"
 
+#include "__fc_builtin.h"
 #define LENGTH 10
 
 int getValueFromArray(int *array, int len, int index) {

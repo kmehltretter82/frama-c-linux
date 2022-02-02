@@ -63,7 +63,7 @@ let startParsing fname =
   if !current != dummyinfo then begin
     Kernel.fatal
       "[Errorloc.startParsing] supports only one open file: \
-You want to open %S and %S is still open"
+       You want to open %S and %S is still open"
       fname (Lexing.lexeme_start_p !current.lexbuf).Lexing.pos_fname
   end;
   let inchan =
@@ -238,11 +238,11 @@ let parse_error ?(source=Cil_datatype.Position.of_lexing_pos (Lexing.lexeme_star
     Pretty_utils.ksfprintf (fun str ->
         Kernel.feedback ~source:start_pos "%s:@." str
           ~append:(fun fmt ->
-            Format.fprintf fmt "%a%a\n"
-              pp_location (start_pos, source)
-              pretty_token (Lexing.lexeme !current.lexbuf);
-            Format.fprintf fmt "%a@."
-              (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) source);
+              Format.fprintf fmt "%a%a\n"
+                pp_location (start_pos, source)
+                pretty_token (Lexing.lexeme !current.lexbuf);
+              Format.fprintf fmt "%a@."
+                (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) source);
         raise (Log.AbortError "kernel"))
       msg
 

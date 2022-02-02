@@ -1,6 +1,6 @@
 /* run.config
    MODULE: @PTEST_NAME@
-   OPT: 
+   OPT: -no-autoload-plugins
  */
 int main(void) {
     int x = 0;

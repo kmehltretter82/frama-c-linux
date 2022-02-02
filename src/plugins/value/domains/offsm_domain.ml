@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -89,7 +89,7 @@ module Memory = struct
 end
 
 
-module Internal  : Domain_builder.InputDomain
+module D : Abstract_domain.Leaf
   with type state = Memory.t
    and type value = offsm_or_top
    and type location = Precise_locs.precise_location
@@ -104,7 +104,8 @@ module Internal  : Domain_builder.InputDomain
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "Bitwise domain"
+  include Domain_builder.Complete (Memory)
+
   let log_category = dkey
 
   let empty _ = Memory.empty_map
@@ -112,10 +113,6 @@ module Internal  : Domain_builder.InputDomain
   let enter_scope _kind _vars state = state (* default is Top, nothing to do *)
   let leave_scope _kf vars state =
     Memory.remove_variables vars state
-
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
 
   let kill loc state =
     Memory.add_binding ~exact:true state loc V_Or_Uninitialized.top
@@ -157,13 +154,17 @@ module Internal  : Domain_builder.InputDomain
 
   let assume _ _ _ _ state = `Value state
 
-  let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
-  let start_call _stmt _call valuation state = update valuation state
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    Memory.remove_variables vars state
 
-  let show_expr _valuation _state _fmt _expr = ()
+  let start_call _stmt _call recursion valuation state =
+    update valuation state >>-: fun state ->
+    Extlib.opt_fold start_recursive_call recursion state
 
-  let extract_expr _oracle _state _exp =
+  let extract_expr ~oracle:_ _context _state _exp =
     `Value (Offsm_value.Offsm.top, None), Alarmset.all
 
   (* Basic 'find' on a location *)
@@ -176,7 +177,7 @@ module Internal  : Domain_builder.InputDomain
     then Offsm_value.Offsm.top
     else O o
 
-  let extract_lval _oracle state _lv typ locs =
+  let extract_lval ~oracle:_ _context state _lv typ locs =
     let o =
       if Cil.typeHasQualifier "volatile" typ ||
          not (Cil.isArithmeticOrPointerType typ)
@@ -194,20 +195,20 @@ module Internal  : Domain_builder.InputDomain
     in
     o, Alarmset.all
 
-  let backward_location _state _lval _typ loc value = `Value (loc, value)
-
-  let reduce_further _state _expr _value = []
-
   (* Memexec *)
   let relate _kf _bases _state = Base.SetLattice.empty
   let filter _kf _kind bases state =
-    Memory.filter_by_shape (Base.Hptset.shape bases) state
-  let reuse _kf _bases ~current_input:state ~previous_output:output =
+    Memory.filter_by_shape bases state
+
+  let reuse _kf bases ~current_input:input ~previous_output:output =
+    let input =
+      Memory.filter_base (fun b -> not (Base.Hptset.mem b bases)) input
+    in
     let state =
       match output with
       | Memory.Bottom | Memory.Top as state -> state
       | Memory.Map outputs ->
-        Memory.fold Memory.add_base outputs state
+        Memory.fold Memory.add_base outputs input
     in
     state
 
@@ -219,13 +220,4 @@ module Internal  : Domain_builder.InputDomain
   let logic_assign _assign location state =
     let loc = Precise_locs.imprecise_location location in
     kill loc state
-
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
-
-  let storage = Value_parameters.BitwiseOffsmStorage.get
-
 end
-
-
-module D = Domain_builder.Complete (Internal)

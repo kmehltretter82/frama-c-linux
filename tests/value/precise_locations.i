@@ -1,5 +1,5 @@
 /* run.config*
-   PLUGIN: @PTEST_PLUGIN@ report
+ PLUGIN: @PTEST_PLUGIN@ report
    STDOPT: +"-eva-widening-period 3 -then -inout -report -then -eva-plevel 250"
 */
 struct s {

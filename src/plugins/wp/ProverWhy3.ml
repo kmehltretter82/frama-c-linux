@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -67,7 +67,6 @@ type convert = {
   subst: Why3.Term.term Lang.F.Tmap.t;
   pool: Lang.F.pool;
   polarity: Cvalues.polarity;
-  in_goal: bool;
   incomplete_types: (string, Why3.Ty.tysymbol) Hashtbl.t;
   incomplete_symbols: (string, Why3.Term.lsymbol) Hashtbl.t;
   mutable convert_for_export: Lang.F.term Lang.F.Tmap.t;
@@ -124,13 +123,12 @@ let empty_context name : context = {
   env = get_why3_env ();
 }
 
-let empty_cnv ?(polarity=`NoPolarity) ?(in_goal=false) (ctx:context) : convert = {
+let empty_cnv ?(polarity=`NoPolarity) (ctx:context) : convert = {
   th = ctx.th;
   subst = Lang.F.Tmap.empty;
   pool = Lang.F.pool ();
   env = ctx.env;
   polarity;
-  in_goal;
   incomplete_symbols = Hashtbl.create 3;
   incomplete_types = Hashtbl.create 3;
   convert_for_export = Lang.F.Tmap.empty;
@@ -945,11 +943,12 @@ class visitor (ctx:context) c =
       id, t
 
     method on_dlemma l =
-      let kind = Why3.Decl.(if l.l_kind = `Axiom then Paxiom else Plemma) in
-      let cnv = empty_cnv ctx in
-      let id, t = self#make_lemma cnv l in
-      let decl = Why3.Decl.create_prop_decl kind id t in
-      ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+      if l.l_kind <> Check then
+        let kind = Why3.Decl.(if l.l_kind = Admit then Paxiom else Plemma) in
+        let cnv = empty_cnv ctx in
+        let id, t = self#make_lemma cnv l in
+        let decl = Why3.Decl.create_prop_decl kind id t in
+        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
 
     method on_dfun d =
       Wp_parameters.debug ~dkey:dkey_api "Define %a@." Lang.Fun.pretty d.d_lfun ;
@@ -1076,7 +1075,7 @@ let prove_goal ~id ~title ~name ?axioms t =
     end ;
   v#add_builtin_lib;
   v#vgoal axioms t;
-  let cnv = empty_cnv ~in_goal:true ~polarity:`Positive ctx in
+  let cnv = empty_cnv ~polarity:`Positive ctx in
   let t = convert cnv Prop (Lang.F.e_prop t) in
   let decl = Why3.Decl.create_prop_decl Pgoal goal_id t in
   let th = Why3.Theory.close_theory ctx.th in
@@ -1088,7 +1087,7 @@ let prove_goal ~id ~title ~name ?axioms t =
   end;
   th, decl
 
-let prove_prop ?axioms ~pid ~prop =
+let prove_prop ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let name = "WP" in
@@ -1103,15 +1102,15 @@ let task_of_wpo wpo =
   | Wpo.GoalAnnot v ->
       let pid = wpo.Wpo.po_pid in
       let axioms = v.Wpo.VC_Annot.axioms in
-      let prop = Wpo.GOAL.compute_proof v.Wpo.VC_Annot.goal in
+      let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
       (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
-      prove_prop ~pid ~prop ?axioms
+      prove_prop ~pid prop ?axioms
   | Wpo.GoalLemma v ->
       let lemma = v.Wpo.VC_Lemma.lemma in
       let depends = v.Wpo.VC_Lemma.depends in
       let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
       let axioms = Some(lemma.l_cluster,depends) in
-      prove_prop ~pid ~prop ?axioms
+      prove_prop ~pid prop ?axioms
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)
@@ -1121,7 +1120,7 @@ let prover_task env prover task =
   let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
-      env prover_config.driver prover_config.extra_drivers in
+      env prover_config in
   let remove_for_prover =
     if prover.prover_name = "Alt-Ergo"
     then Filter_axioms.remove_for_altergo
@@ -1203,7 +1202,7 @@ let ping_prover_call p =
       Wp_parameters.debug ~dkey
         "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
         Why3.Whyconf.print_prover p.prover
-        (Why3.Call_provers.print_prover_result ~json_model:false) pr
+        (Why3.Call_provers.print_prover_result ~json:false) pr
         VCS.pp_result r;
       Task.Return (Task.Result r)
 
@@ -1248,10 +1247,11 @@ let digest wpo drv prover task =
 let batch pconf driver ?script ~timeout ~steplimit prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
+    let memlimit = Why3.Whyconf.memlimit (Why3.Whyconf.get_main (Why3Provers.config ())) in
     let def = Why3.Call_provers.empty_limit in
-    { def with
-      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
+    { Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
       Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
+      Why3.Call_provers.limit_mem = memlimit;
     } in
   let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
     | None, _ -> false

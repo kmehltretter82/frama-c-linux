@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -24,10 +24,9 @@
 #define __FC_GETOPT_H
 #include "features.h"
 __PUSH_FC_STDLIB
-
+#include "unistd.h"
 __BEGIN_DECLS
 
-#include "unistd.h"
 
 /* GNU specific */
 struct option

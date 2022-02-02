@@ -6,14 +6,14 @@
   v ∈ [--..--]
 [eva:initial-state] 
   creating variable S_tb with imprecise size (type int [10][a])
-[eva] not_ct_array_arg.i:9: Warning: 
+[eva:unknown-size] not_ct_array_arg.i:9: Warning: 
   during initialization of variable 'tb', size of type 'int [a]' cannot be
   computed (Array with non-constant length.)
 [eva:alarm] not_ct_array_arg.i:10: Warning: 
   out of bounds write. assert \valid((int *)tb);
 [eva] not_ct_array_arg.i:11: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   a ∈ [--..--]
   tb ∈ {{ (int (*)[a])&S_tb }}
@@ -28,7 +28,7 @@
   pointer downcast. assert (unsigned int)(&tb) ≤ 2147483647;
 [eva] not_ct_array_arg.i:13: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   a ∈ [--..--]
   tb ∈ {{ (int (*)[a])&S_tb }}

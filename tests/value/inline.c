@@ -1,5 +1,5 @@
 /* run.config*
-   DEPS: inline.h
+ DEPS: inline.h
    DONTRUN: test for the gui only
 */
 

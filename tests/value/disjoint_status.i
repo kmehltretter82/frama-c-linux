@@ -1,6 +1,6 @@
 /* run.config*
-   PLUGIN: @PTEST_PLUGIN@ report
-   STDOPT: +"-then -report"
+ PLUGIN: @PTEST_PLUGIN@ report
+   STDOPT: +" -report"
 */
 int x;
 //@ requires ReqTrue: \true; ensures PostTrue: \true; // Test printing of ACSL names

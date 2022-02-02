@@ -13,7 +13,7 @@
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
  */
-int printf_va_1(char const * __restrict format);
+int printf_va_1(char const * restrict format);
 
 int main(void)
 {
@@ -39,7 +39,7 @@ int main(void)
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
  */
-int printf_va_1(char const * __restrict format);
+int printf_va_1(char const * restrict format);
 
 /*@ requires valid_read_string(format);
     assigns \result, __fc_stdout->__fc_FILE_data;
@@ -51,7 +51,7 @@ int printf_va_1(char const * __restrict format);
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
  */
-int printf_va_1(char const * __restrict format);
+int printf_va_1(char const * restrict format);
 
 int main(void)
 {

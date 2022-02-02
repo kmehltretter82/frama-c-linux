@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,7 +44,7 @@ let has_dkey (k:category) = is_debug_key_enabled k
 (* ---  WP Generation                                                   --- *)
 (* ------------------------------------------------------------------------ *)
 
-let wp_generation = add_group "Goal Selection"
+let wp_generation = add_group "Goal Generator"
 
 let () = Parameter_customize.set_group wp_generation
 let () = Parameter_customize.do_not_save ()
@@ -54,6 +54,14 @@ module WP =
     let help = "Generate proof obligations for all (selected) properties."
   end)
 let () = on_reset WP.clear
+
+let () = Parameter_customize.set_group wp_generation
+module Dump =
+  Action(struct
+    let option_name = "-wp-dump"
+    let help = "Dump WP calculus graph."
+  end)
+let () = on_reset Dump.clear
 
 let () = Parameter_customize.set_group wp_generation
 let () = Parameter_customize.do_not_save ()
@@ -98,12 +106,12 @@ module Properties =
       let arg_name = "p,..."
       let help =
         "Select properties based names and category.\n\
-         Use +name or +category to select properties and -name or -category\n\
+         Use +name or +category to select properties and -name or -category \
          to remove them from the selection. The '+' sign can be omitted.\n\
-         Categories are: @lemma, @requires, @assigns, @ensures, @exits,\n\
-         @assert, @invariant, @variant, @breaks, @continues, @returns,\n\
-         @complete_behaviors, @disjoint_behaviors and\n\
-         @check (which includes all check clauses)."
+         Categories are: @lemma, @requires, @assigns, @ensures, @exits, \
+         @assert, @invariant, @variant, @breaks, @continues, @returns, \
+         @complete_behaviors, @disjoint_behaviors, @terminates, \
+         @decreases and @check (which includes all check clauses)."
     end)
 let () = on_reset Properties.clear
 
@@ -190,7 +198,8 @@ module Model =
                   * '+raw' no logic variable\n\
                   * '+ref' by-reference-style pointers detection\n\
                   * '+nat/+int' natural / machine-integers arithmetics\n\
-                  * '+real/+float' real / IEEE floating point arithmetics"
+                  * '+real/+float' real / IEEE floating point arithmetics\n\
+                  * 'Eva' (experimental) based on the results from Eva plugin"
     end)
 
 let () = Parameter_customize.set_group wp_model
@@ -241,14 +250,6 @@ module ExternArrays =
   False(struct
     let option_name = "-wp-extern-arrays"
     let help = "Put some default size for extern arrays."
-  end)
-
-let () = Parameter_customize.set_group wp_model
-module Overflows =
-  False(struct
-    let option_name = "-wp-overflows"
-    let help = "Collect hypotheses for absence of overflow and downcast\n\
-                (incompatible with RTE generator plug-in)"
   end)
 
 let () = Parameter_customize.set_group wp_model
@@ -386,6 +387,13 @@ module SmokeTests =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadassumes =
+  True(struct
+    let option_name = "-wp-smoke-dead-assumes"
+    let help = "When generating smoke tests, look for dead assumes"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadcode =
   True(struct
     let option_name = "-wp-smoke-dead-code"
@@ -403,7 +411,7 @@ let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadloop =
   True(struct
     let option_name = "-wp-smoke-dead-loop"
-    let help = "When generating smoke tests, look for inconsistent loop invairants"
+    let help = "When generating smoke tests, look for inconsistent loop invariants"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -454,6 +462,36 @@ module PrecondWeakening =
   False(struct
     let option_name = "-wp-precond-weakening"
     let help = "Discard pre-conditions of side behaviours (sound but incomplete optimisation)."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module TerminatesExtDeclarations =
+  False(struct
+    let option_name = "-wp-declarations-terminate"
+    let help = "Undefined external functions without terminates specification \
+                are considered to terminate when called."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module TerminatesDefinitions =
+  False(struct
+    let option_name = "-wp-definitions-terminate"
+    let help = "Defined functions without terminates specification are \
+                considered to terminate when called."
+  end)
+
+module TerminatesStdlibDeclarations =
+  False(struct
+    let option_name = "-wp-frama-c-stdlib-terminate"
+    let help = "Frama-C stdlib functions without terminates specification \
+                are considered to terminate when called."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module TerminatesVariantHyp =
+  False(struct
+    let option_name = "-wp-variant-with-terminates"
+    let help = "Prove loop variant under the termination hypothesis."
   end)
 
 (* ------------------------------------------------------------------------ *)
@@ -1083,19 +1121,6 @@ module OutputDir =
   end)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Overflows                                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-let active_unless_rte option =
-  if RTE.get () || Dynamic.Parameter.Bool.get "-rte" () then
-    ( warning ~once:true
-        "Option %s incompatiable with RTE (ignored)" option ;
-      false )
-  else true
-
-let get_overflows () = Overflows.get () && active_unless_rte "-wp-overflows"
-
-(* -------------------------------------------------------------------------- *)
 (* --- Output Dir                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -1162,7 +1187,7 @@ let base_output () =
               | dir ->
                   make_output_dir dir ; dir in
       base_output := Some output;
-      Fc_Filepath.add_symbolic_dir "WPOUT" output ;
+      Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
       Datatype.Filepath.of_string output
   | Some output -> Datatype.Filepath.of_string output
 
@@ -1184,7 +1209,15 @@ let get_output_dir d =
 (* --- Session dir                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let default = Sys.getcwd () ^ "/.frama-c"
+(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
+   no function in its stdlib to resolve symbolic links (e.g. realpath)
+   for a given path. 'getcwd' always resolves them, but if the user
+   supplies a path with symbolic links, this may cause issues.
+   Instead of forcing the user to always provide resolved paths, we
+   currently choose to never resolve them.
+   We only resort to getcwd() to avoid issues when PWD does not exist. *)
+let default =
+  (try Sys.getenv "PWD" with Not_found -> Sys.getcwd ()) ^ "/.frama-c"
 
 let has_session () =
   Session.is_set () ||
@@ -1233,7 +1266,7 @@ let print_generated ?header file =
 let protect e =
   if debug_atleast 1 then false else
     match e with
-    | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | Sys.Break | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
     | _ -> true
 
 (* -------------------------------------------------------------------------- *)

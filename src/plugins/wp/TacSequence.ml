@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -59,7 +59,7 @@ class sequence =
       | Fun(f,[a;n]) when f == Vlist.f_repeat ->
           let result = F.typeof value in
           let at = Tactical.at s in
-          Applicable
+          Tactical.Applicable
             begin
               match self#get_field vmode with
               | `Sum ->

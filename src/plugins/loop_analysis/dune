@@ -1,8 +1,8 @@
 ( library
   (name LoopAnalysis)
   (public_name frama-c-loop-analysis.core)
-  (modules options region_analysis_sig region_analysis region_analysis_stmt loop_analysis slevel_analysis register LoopAnalysis)
-  (private_modules region_analysis_sig region_analysis region_analysis_stmt loop_analysis slevel_analysis register)
+  (modules options region_analysis_sig region_analysis region_analysis_stmt loop_analysis register LoopAnalysis)
+  (private_modules region_analysis_sig region_analysis region_analysis_stmt loop_analysis register)
   (flags -open Frama_c_kernel)
   (libraries frama-c.kernel)
 )

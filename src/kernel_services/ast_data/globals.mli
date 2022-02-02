@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -121,6 +121,16 @@ module Functions: sig
 
   val find_by_name : string -> kernel_function
   (** @raise Not_found if there is no function of this name. *)
+
+  val find_all_by_orig_name : ?cmp:(kernel_function -> kernel_function -> int) ->
+    string -> kernel_function list
+  (**
+     [find_all_by_orig_name ?cmp name] returns the list of functions whose original
+     name is [name], sorted according to [cmp]. If [cmp] is [None],
+     the resulting order is unspecified.
+
+     @since 23.0-Vanadium
+  *)
 
   val find_def_by_name : string -> kernel_function
   (** @raise Not_found if there is no function definition of this name. *)
@@ -282,6 +292,14 @@ val set_entry_point : string -> bool -> unit
     Moreover, clear the results of all the analysis which depend on
     [Kernel.MainFunction] or [Kernel.LibEntry].
     @plugin development guide *)
+
+val is_entry_point : ?when_lib_entry:bool -> kernel_function -> bool
+(** @return [true] iff the given kernel function is the entry point.
+    The optional parameter [when_lib_entry] overrides the result if we are
+    in -lib-entry mode.
+
+    @since Frama-C+dev
+*)
 
 (* ************************************************************************* *)
 (** {2 Comments} *)

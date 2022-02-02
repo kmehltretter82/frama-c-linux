@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -82,9 +82,11 @@ end
 
 include Datatype.S_with_collections with type t = base
 
-module Hptset: Hptset.S
-  with type elt = t
-   and type 'a shape = 'a Hptmap.Shape(Base).t
+module Hptshape: Hptmap_sig.Shape with type key = t
+                                   and type 'v map = 'v Hptmap.Shape(Base).t
+
+module Hptset: Hptset.S with type elt = t
+                         and type 'v map = 'v Hptshape.map
 
 module SetLattice: Lattice_type.Lattice_Set with module O = Hptset
 
@@ -224,6 +226,17 @@ val register_memory_var : Cil_types.varinfo -> validity -> t
 (** Memory variables are variables not present in the source of the program.
     They are created only to fill the contents of another variable.
     Their field [vsource] is set to false. *)
+
+
+(** {2 Substituting bases}
+    This is used to efficiently replace some bases by others in locations or
+    in memory states, for instance in {!Locations} or {!Lmap_sig}. *)
+
+type substitution = base Hptshape.map
+(** Type used for the substitution between bases. *)
+
+val substitution_from_list: (base * base) list -> substitution
+(** Creates a substitution from an association list. *)
 
 (*
 Local Variables:

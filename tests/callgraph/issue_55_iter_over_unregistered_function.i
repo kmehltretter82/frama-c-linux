@@ -1,8 +1,8 @@
 /* run.config
+PLUGIN: @PTEST_PLUGIN@ eva,scope,inout
    COMMENT: Test call to Callgraph.Uses.iter_on_callers/callees (through Inout)
    OPT: -inout
 */
-
 /*@ assigns *p \from x; */
 extern void f(int x, int *p);
 

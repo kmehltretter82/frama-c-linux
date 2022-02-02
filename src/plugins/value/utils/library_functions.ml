@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -71,7 +71,8 @@ let returned_value kf =
 
 
 let unsupported_specifications =
-  [ "glob", "glob.c";
+  [ "asprintf", "stdio.c";
+    "glob", "glob.c";
     "globfree", "glob.c";
     "getaddrinfo", "netdb.c";
     "getline", "stdio.c";
@@ -96,8 +97,7 @@ let unsupported_specs_tbl =
 let warn_unsupported_spec name =
   try
     let header = Hashtbl.find unsupported_specs_tbl name in
-    let path = Filename.(concat (concat Fc_config.datadir "libc") header) in
-    let path = Filepath.Normalized.of_string path in
+    let path = Filepath.Normalized.(concat (concat Fc_config.datadir "libc") header) in
     Value_parameters.warning ~once:true ~current:true
       ~wkey:Value_parameters.wkey_libc_unsupported_spec
       "@[The specification of function '%s' is currently not supported by Eva.@ \

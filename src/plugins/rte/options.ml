@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -64,11 +64,13 @@ module DoFloatToInt =
 
 (* annotates local variables and pointers read (aside from globals) initialization *)
 module DoInitialized =
-  False
+  Kernel_function_set
     (struct
       let option_name = "-rte-initialized"
-      let help = "when on, annotates local variables and pointers \
-                  reads with initialization tests"
+      let arg_name = "fct"
+      let help = "for each function in 'fct', annotates reads of non struct or \
+                  union values from local variables and pointers with \
+                  initialization tests, see documentation for more details"
     end)
 
 (* annotates invalid memory access (undefined behavior) *)

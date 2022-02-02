@@ -1,3 +1,10 @@
+/* run.config
+   OPT: -wp-rte
+*/
+/* run.config_qualif
+   OPT: -wp-rte
+*/
+
 struct S;
 
 extern struct S S1;
@@ -23,14 +30,14 @@ struct S* p ;
 //@ assigns *p ;
 void g(void);
 
-/*@ requires \initialized(p); 
+/*@ requires \initialized(p);
     requires \valid(p);
 */
 void initialized_assigns(void){
   g();
-  //@ check succeed: \initialized(p);
+  //@ check fails: \initialized(p); // struct initialization not monotonic
   //@ check succeed: \block_length(p) >= 0;
-  
+
   // while it can be proved in Coq, this is currently
   // too indirect for solvers.
   // @ check succeed: \block_length(p) >= \block_length(&S1);
@@ -62,4 +69,15 @@ void assigns_effect(int* p, float* q, char* c, struct S *a){
   //@ check fail: *p == \at(*p, Pre);
   //@ check fail: *q == \at(*q, Pre);
   //@ check succeed: *c == \at(*c, Pre);
+}
+
+// regression on MemTyped chunk typing
+
+void use(struct S * s);
+
+//@ requires \valid(uc) && \valid_read(sc) ;
+void chunk_typing(unsigned char* uc, signed char* sc){
+  struct S* s ;
+  *uc = *sc ;
+  use(s) ;
 }

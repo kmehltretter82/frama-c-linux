@@ -19,7 +19,7 @@
         - [Documentation files: (in `/INSTALL_DIR/share/frama-c/doc`)](#documentation-files-in-install_dirshareframa-cdoc)
         - [Object files: (in `/INSTALL_DIR/lib/frama-c`)](#object-files-in-install_dirlibframa-c)
         - [Plugin files: (in `/INSTALL_DIR/lib/frama-c/plugins`)](#plugin-files-in-install_dirlibframa-cplugins)
-        - [Man files: (in `/INSTALL_DIR/man/man1`)](#man-files-in-install_dirmanman1)
+        - [Man files: (in `/INSTALL_DIR/share/man/man1`)](#man-files-in-install_dirsharemanman1)
 - [Installing Additional Frama-C Plugins](#installing-additional-frama-c-plugins)
     - [HAVE FUN WITH FRAMA-C!](#have-fun-with-frama-c)
 
@@ -34,15 +34,12 @@ First you need to install opam, then you may install Frama-C using opam.
 
 Several Linux distributions already include an `opam` package.
 
-**Note:** make sure your opam version is >= 2.0.0.
-
 macOS has opam through Homebrew.
 
 Windows users can install opam via WSL (Windows Subsystem for Linux).
 
-If your system does not have an opam package >= 2.0.0, you can
-[compile it from source](#compiling-from-source),
-or use the provided opam binaries available at:
+If your system does not have an opam package >= 2, you can use the provided
+opam binaries available at:
 
 http://opam.ocaml.org/doc/Install.html
 
@@ -51,25 +48,30 @@ http://opam.ocaml.org/doc/Install.html
 The Frama-C package in opam is called `frama-c`, which includes both the
 command-line `frama-c` executable and the graphical interface `frama-c-gui`.
 
-`frama-c` has some non-OCaml dependencies, such as Gtk and GMP. In most
-systems, opam can take care of these external dependencies through
-its `depext` plug-in: issuing the two commands
+`frama-c` has some non-OCaml dependencies, such as Gtk and GMP. On most
+systems, `opam`'s `depext` mechanism can take care of installing these
+external dependencies. As of version
+2.1.0, `depext` is [directly included](https://opam.ocaml.org/blog/opam-2-1-0/#Seamless-integration-of-System-dependencies-handling-a-k-a-quot-depexts-quot)
+in `opam`, so that the following command should install everything, at
+least if your OS is supported by `depext` (and you have administrative
+rights):
 
-    # install Frama-C's dependencies
+    opam install frama-c
+
+For older `opam` versions, you have to install it
+separately and call it explicitely with the following commands, before
+installing Frama-C as above. Again, installing the external dependencies
+requires administrative rights.
+
+    # install Frama-C's dependencies with pre-2.1.0 opam
     opam install depext
     opam depext frama-c
 
-will install the appropriate system packages (this of course requires
-administrator rights on the system).
-
-If your system is not supported by `depext`, you will need to install
-Gtk, GtkSourceView, GnomeCanvas and GMP, including development libraries,
-separately. If you do so, please consider providing the system name and list of
-packages (e.g. via a [Gitlab issue](https://git.frama-c.com/pub/frama-c/issues/new))
-so that we can add it to the Frama-C `depext` package.
-
-    # install Frama-C
-    opam install frama-c
+If there are errors due to missing external dependencies, opam may emit a
+message indicating which packages to install. If this is not sufficient,
+there may be missing dependencies in opam's `depext` tool. In this case,
+you may [create a Gitlab issue](https://git.frama-c.com/pub/frama-c/issues/new)
+indicating your distribution and error message.
 
 ### Configuring provers for Frama-C/WP
 
@@ -86,13 +88,13 @@ Most provers are available on all platforms. After their installation,
 Why3 must be configured to make them available for Frama-C/WP:
 
 ```shell
-why3 config --detect
+why3 config detect
 ```
 
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C 22 (Titanium).
+for a set of packages that is known to work with Frama-C 24 (Chromium).
 
 ### Installing Custom Versions of Frama-C
 
@@ -105,8 +107,8 @@ own sources directly:
     opam remove --force frama-c
 
     # install Frama-C's dependencies
-    opam install depext
-    opam depext frama-c
+    opam install depext # only for opam < 2.1.0
+    opam depext frama-c # only for opam < 2.1.0
     opam install --deps-only frama-c
 
     # install custom version of frama-c
@@ -121,59 +123,38 @@ by Frama-C, they must of course be installed as well.
 ### Installing Frama-C on Windows via WSL
 
 Frama-C is developed on Linux, but it can be installed on Windows using the
-following tools:
+Windows Subsystem for Linux (WSL).
 
-- Windows Subsystem for Linux
-- VcXsrv (X server for Windows)
+**Note**: if you have WSL2 (Windows 11), you can run the graphical interface
+          directly, thanks to WSLg. If you are using WSL 1, you need to install
+          an X server for Windows, such as VcXsrv
+          (see section "Running the Frama-C GUI on WSL").
 
 #### Prerequisites: WSL + a Linux distribution
 
-For enabling WSL on Windows, you may follow these instructions
+To enable WSL on Windows, you may follow these instructions
 (we tested with Ubuntu 20.04 LTS;
 other distributions/versions should also work,
 but the instructions below may require some modifications).
 
-https://docs.microsoft.com/en-us/windows/wsl/install-win10
+https://docs.microsoft.com/en-us/windows/wsl/install
 
-Note: older builds of Windows 10 and systems without access to the
-      Microsoft Store may have no compatible Linux packages.
+Notes:
 
-##### PowerShell-based quick guide
-
-This is a quick guide based on running a PowerShell with administrator rights.
-Note that, depending on your build version of Windows 10, the Ubuntu package
-selected below may not work. If you are unsure, follow the above instructions
-from the Microsoft website.
-
-Inside PowerShell, run the following command to activate Windows Subsystem for Linux:
-
-```
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-```
-
-Then, reboot the operating system.
-
-After rebooting, run again the PowerShell terminal with administrator rights.
-Move to your user directory, download the distribution and install it:
-
-```
-cd C:\Users\<Your User Directory>
-Invoke-WebRequest -Uri https://aka.ms/wslubuntu2004 -OutFile Ubuntu.appx -UseBasicParsing
-Add-AppxPackage .\Ubuntu.appx
-```
-
-Ubuntu should now be available in the Windows menu. Run it and follow the
-instructions to create a user.
+- older builds of Windows 10 and systems without access to the
+  Microsoft Store may have no compatible Linux packages.
+- in WSL 1, Frama-C/WP cannot use Why3 because of some missing features in WSL
+  support, thus using WSL 2 is **highly recommended**.
 
 #### Installing opam and Frama-C on WSL
 
-For installing opam, some packages are required. The following commands can be
+To install opam, some packages are required. The following commands can be
 run to update the system and install those packages:
 
 ```
 sudo apt update
 sudo apt upgrade
-sudo apt install make m4 gcc opam yaru-theme-gtk yaru-theme-icon
+sudo apt install make m4 gcc opam gnome-icon-theme
 ```
 
 Then opam can be set up using these commands:
@@ -184,7 +165,11 @@ eval $(opam env)
 opam install -y depext
 ```
 
-Now, for installing Frama-C, run the following commands that will use `apt` to
+You can force a particular Ocaml version during `opam init` by using the option
+`-c <version>` if needed. For instance, you can try installing the OCaml version
+mentioned in the [reference configuration](reference-configuration.md).
+
+Now, to install Frama-C, run the following commands, which will use `apt` to
 install the dependencies of the opam packages and then install them:
 
 ```
@@ -194,26 +179,48 @@ opam depext --install -y frama-c
 
 #### Running the Frama-C GUI on WSL
 
-Microsoft WSL does not support graphical user interfaces directly. If you want
-to run Frama-C's GUI, you need to install an X server, such as VcXsrv or
-Cygwin/X. We present below how to install VcXsrv.
+If you have WSL2: a known issue with Frama-C 24.0 (Chromium), lablgtk3 and
+Wayland require prefixing the command running the Frama-C GUI with
+`GDK_BACKEND=x11`, as in:
+
+    GDK_BACKEND=x11 frama-c-gui <options>
+
+If you have WSL 1: WSL 1 does not support graphical user interfaces directly.
+If you want to run Frama-C's GUI, you need to install an X server,
+such as VcXsrv or Cygwin/X. We present below how to install VcXsrv.
 
 First, install VcXsrv from:
 
 https://sourceforge.net/projects/vcxsrv/
 
 The default installation settings should work.
-Now run it from the Windows menu (it is named XLaunch).
-On the first configuration screen, select "Multiple Windows". On the
-second, keep "Start no client" selected. On the third configuration step, add an
-additional parameter `-nocursor` in the field "Additional parameters for
-VcXsrv". You can save this configuration at the last step if you want, before
-clicking "Finish".
 
-Once it is done, the Xserver is ready. From WSL, run:
+Now run VcXsrv from the Windows menu (it is named XLaunch), the firewall
+must authorize both "Public" and "Private" domains. On the first configuration
+screen, select "Multiple Windows". On the second:
+
+- keep "Start no client" selected,
+- keep "Native opengl" selected,
+- select "Disable access control".
+
+Now specific settings must be provided in WSL. you can put the export commands
+in your `~/.bashrc` file, so this is done automatically when starting WSL.
+
+##### WSL 1
+
+The Xserver is ready. From WSL, run:
 
 ```
+export LIBGL_ALWAYS_INDIRECT=1
 export DISPLAY=:0
+frama-c-gui
+```
+
+##### WSL 2
+
+```
+export LIBGL_ALWAYS_INDIRECT=1
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
 frama-c-gui
 ```
 
@@ -300,8 +307,8 @@ Arch Linux: `pikaur -S frama-c`
 1. Install [opam](http://opam.ocaml.org/) and use it to get all of Frama-C's
    dependencies (including some external ones):
 
-        opam install depext
-        opam depext frama-c
+        opam install depext # only for opam < 2.1.0
+        opam depext frama-c # only for opam < 2.1.0
         opam install --deps-only frama-c
 
    If not using [opam](http://opam.ocaml.org/), you will need to install
@@ -331,7 +338,7 @@ See the `opam/opam` file, section `depends`, for compatible OCaml versions and
 required dependencies (except for those related to `lablgtk`, which are
 required for the GUI but otherwise optional).
 
-Section `deptops` lists optional dependencies.
+Section `depopts` lists optional dependencies.
 
 #### Configuration
 

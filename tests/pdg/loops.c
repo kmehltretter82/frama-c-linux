@@ -20,15 +20,15 @@ F=maybe_infinite
 
 Pour voir le CFG :
 
-bin/toplevel.opt -lib-entry -main $F -deps -verbose loops.c
+bin/toplevel.opt -lib-entry -main $F -deps -verbose @PTEST_DIR@/loops.c
 zgrviewer ./$F_cfg.dot
 
 Pour voir les postdominateurs :
-bin/toplevel.opt -lib-entry -main $F -fct-pdg $F -dot-postdom p loops.c ;
+bin/toplevel.opt -lib-entry -main $F -fct-pdg $F -dot-postdom p @PTEST_DIR@/loops.c ;
 zgrviewer ./p.$F.dot
 
 Pour voir le PDG :
-bin/toplevel.opt -lib-entry -main $F -fct-pdg $F -pdg-dot pdg loops.c ;
+bin/toplevel.opt -lib-entry -main $F -fct-pdg $F -pdg-dot pdg @PTEST_DIR@/loops.c ;
 zgrviewer ./pdg.$F.dot
 
 */
@@ -123,7 +123,7 @@ L :   n--;
     return n;
 }
 /* this function is similar to [test_ctrl_dpd_multiple] in
- * [dpds_intra.c] but the value analysis converges,
+ * [@PTEST_DIR@/dpds_intra.c] but the value analysis converges,
  * so we can see that [x=x+2;] has a control dependency on both [n<0] and [x<n].
  */
 int non_natural_loop (int n) {

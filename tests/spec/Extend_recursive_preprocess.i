@@ -1,8 +1,8 @@
 /* run.config
- PLUGIN:
  MODULE: @PTEST_NAME@
    OPT: -kernel-warn-key=annot-error=active -print
 */
+
 /*@ gl_foo foo1 {
     gl_fooo must_replace(x);
     gl_fooo must_not_replace(x);

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -234,9 +234,9 @@ let offsetmap_pretty cas name print_ampamp fmt offsm =
       let ek = Integer.succ ek in
       if Integer.is_zero (Integer.e_rem ek Integer.eight)
       then
-        let step = if iso then 1 else (Integer.to_int modu) / 8 in
-        let start = ref ((Integer.to_int bk) / 8) in
-        let ek = Integer.to_int ek in
+        let step = if iso then 1 else (Integer.to_int_exn modu) / 8 in
+        let start = ref ((Integer.to_int_exn bk) / 8) in
+        let ek = Integer.to_int_exn ek in
         let ek = ek / 8 in
         if ek / step > 1_000_000 (* arbitrary limit *) then
           raise Too_large_to_enumerate;
@@ -325,25 +325,17 @@ let pretty_state_as_c_assignments fmt state =
 let frama_c_dump_assert state _actuals =
   Value_parameters.result ~current:true "Frama_C_dump_assert_each called:@\n(%a)@\nEnd of Frama_C_dump_assert_each output"
     pretty_state_as_c_assert state;
-  { Value_types.c_values = [None, state];
-    c_clobbered = Base.SetLattice.bottom;
-    c_from = None;
-    c_cacheable = Value_types.NoCache;
-  }
+  Builtins.States [state]
 
-let () = Builtins.register_builtin "Frama_C_dump_assert_each" frama_c_dump_assert
+let () = Builtins.register_builtin "Frama_C_dump_assert_each" NoCache frama_c_dump_assert
 
 let frama_c_dump_assignments state _actuals =
   Value_parameters.result ~current:true "Frama_C_dump_assignment_each called:@\n%a@\nEnd of Frama_C_dump_assignment_each output"
     pretty_state_as_c_assignments state;
-  { Value_types.c_values = [None, state];
-    c_clobbered = Base.SetLattice.bottom;
-    c_from = None;
-    c_cacheable = Value_types.NoCache;
-  }
+  Builtins.States [state]
 
 let () =
-  Builtins.register_builtin "Frama_C_dump_assignments_each" frama_c_dump_assignments
+  Builtins.register_builtin "Frama_C_dump_assignments_each" NoCache frama_c_dump_assignments
 
 
 (*

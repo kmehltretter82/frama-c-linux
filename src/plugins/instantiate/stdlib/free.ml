@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -62,7 +62,7 @@ let make_behavior_no_deallocation loc ptr =
   let alloc = allocates_nothing () in
   make_behavior ~name:"no_allocation" ~assumes ~assigns ~ensures ~alloc ()
 
-let generate_spec _typ { svar = vi } loc =
+let generate_spec _typ loc { svar = vi } =
   let ptr = match Cil.getFormalsDecl vi with
     | [ ptr ] -> cvar_to_tvar ptr
     | _ -> unexpected "ill-formed fundec in specification generation"

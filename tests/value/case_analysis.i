@@ -1,6 +1,6 @@
 /* run.config*
+ PLUGIN: @EVA_MAIN_PLUGINS@
    OPT: -eva @EVA_CONFIG@ -eva-slevel 30 -float-normal
-
 */
 
 int sq,s;

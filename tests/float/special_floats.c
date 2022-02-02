@@ -28,19 +28,30 @@ void is_infinite () {
   double zero = -0.;
   /*@ check true: \is_finite(zero); */
   /*@ check false: !\is_finite(zero); */
+  /*@ check false: \is_infinite(zero); */
   /*@ check false: \is_plus_infinity(zero); */
   /*@ check false: \is_minus_infinity(zero); */
   double inf = INFINITY;
   /*@ check false: \is_finite(inf); */
   /*@ check true: !\is_finite(inf); */
+  /*@ check true: \is_infinite(inf); */
   /*@ check true: \is_plus_infinity(inf); */
   /*@ check false: \is_minus_infinity(inf); */
   double nan = NAN;
   /*@ check false: \is_finite(nan); */
   /*@ check true: !\is_finite(nan); */
+  /*@ check false: \is_infinite(nan); */
   /*@ check false: \is_plus_infinity(nan); */
   /*@ check false: \is_minus_infinity(nan); */
-  double d = any_double;
+  double d;
+  /* Tests the evaluation on imprecise values. */
+  d = rand ? zero : (rand ? -inf : nan);
+  /*@ check unknown:  \is_finite(d); */
+  /*@ check unknown: !\is_finite(d); */
+  /*@ check unknown:  \is_infinite(d); */
+  /*@ check false:    \is_plus_infinity(d); */
+  /*@ check unknown:  \is_minus_infinity(d); */
+  d = any_double;
   /* Tests the reduction by assertions. */
   if (rand) {
     /*@ assert \is_plus_infinity(d); */
@@ -51,8 +62,16 @@ void is_infinite () {
     Frama_C_show_each_neg_infinity(d);
   }
   if (rand) {
+    /*@ assert \is_infinite(d); */
+    Frama_C_show_each_infinities(d);
+  }
+  if (rand) {
     /*@ assert !\is_plus_infinity(d); */
     /*@ assert !\is_minus_infinity(d); */
+    Frama_C_show_each_finite_nan(d);
+  }
+  if (rand) {
+    /*@ assert !\is_infinite(d); */
     Frama_C_show_each_finite_nan(d);
   }
   if (rand) {
@@ -62,6 +81,10 @@ void is_infinite () {
   if (d > 0.) {
     /*@ assert !\is_finite(d); */
     Frama_C_show_each_pos_infinity(d);
+  }
+  if (d < 0.) {
+    /*@ assert \is_infinite(d); */
+    Frama_C_show_each_neg_infinity(d);
   }
 }
 

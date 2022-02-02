@@ -1,19 +1,43 @@
 \begin{syntax}
-  C-global-decl ::= "/*@" logic-def+ "*/"
+  C-external-declaration ::= "/*@" logic-def+ "*/"
   \
   logic-def ::= { logic-const-def } ;
           | logic-function-def ;
           | logic-predicate-def ;
+          | { lemma-def } ;
+          | { data-inv-def } ;
   \
-  type-expr ::= id;
+  { type-var } ::= { id } ;
   \
-  { logic-const-def } ::= { "logic" type-expr id "=" term ";" }
+  type-expr ::= { type-var } ; type variable
+  | id ;
+    { "<" type-expr } ;
+    { (, type-expr)* ">" } ; polymorphic type
   \
-  logic-function-def ::= "logic" type-expr id parameters "=" term ";"
+  { type-var-binders } ::= { "<" type-var };
+                       { (, type-var)* ">" }
   \
-  logic-predicate-def ::= "predicate" id parameters? "=" pred ";"
+  poly-id ::= id { type-var-binders } ; polymorphic object identifier
   \
-  parameters ::= "(" parameter (, parameter)* ")"
+  { logic-const-def } ::= { "logic" } ;
+      { type-expr poly-id } ;
+      { "=" term ";" }
+  \
+  logic-function-def ::= "logic" ;
+    type-expr ;
+    poly-id parameters ;
+    "=" term ";"
+  \
+  logic-predicate-def ::= "predicate" ;
+    poly-id parameters? ;
+    "=" pred ";"
+  \
+  parameters ::= "(" parameter ;
+    (, parameter)* ")"
   \
   parameter ::= type-expr id
+  \
+  { lemma-def } ::= { clause-kind? } ; 
+                    { "lemma" poly-id ":" };
+                      { pred ";" }
 \end{syntax}

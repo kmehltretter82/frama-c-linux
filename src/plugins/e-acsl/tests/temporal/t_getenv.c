@@ -1,10 +1,9 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: Check temporal validity of environment string (via getenv function)
 */
 
-#include <stdlib.h>
 #include <errno.h>
-
+#include <stdlib.h>
 
 int main(int argc, const char **argv) {
   char *g1 = NULL;

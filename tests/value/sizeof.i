@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-print"
+   STDOPT: +"-print -machdep gcc_x86_32"
 */
 
 int sz_str,sz_typ,align_str,align_typ;
@@ -34,10 +34,22 @@ void main2() {
   p->t[sizeof(s1.t)-i] = 2; 
 }
 
+/* Tests sizeof and alignof on void. Only valid in gcc machdeps. */
+void sizeof_void () {
+  void *p;
+  int size_void = sizeof(void);
+  int size_ptr = sizeof(p);
+  int size_void_expr = sizeof(*p);
+  int align_void = __alignof__(void);
+  int align_ptr = __alignof__(p);
+  int align_void_expr = __alignof__(*p);
+}
+
 void f(int sz) {}
 
 void main(int *p, int *q, int j) {
   main1();
   main2();
+  sizeof_void();
   f(sizeof(*p) * j); // must not crash with equality domain
 }

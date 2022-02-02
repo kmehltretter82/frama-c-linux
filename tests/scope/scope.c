@@ -1,12 +1,12 @@
 /* run.config
-   OPT: -eva @EVA_OPTIONS@ -main f -journal-disable
-   OPT: -eva @EVA_OPTIONS@ -main f2 -journal-disable
-   OPT: -eva @EVA_OPTIONS@ -main loop -journal-disable
+   OPT: -eva @EVA_CONFIG@ -main f
+   OPT: -eva @EVA_CONFIG@ -main f2
+   OPT: -eva @EVA_CONFIG@ -main loop
 */
 /*
- * bin/viewer.byte -main f scope.c -eva
- * bin/viewer.byte -main f2 scope.c -eva
- * bin/viewer.byte -main loop scope.c -eva
+ * bin/viewer.byte -main f @PTEST_DIR@/scope.c -eva
+ * bin/viewer.byte -main f2 @PTEST_DIR@/scope.c -eva
+ * bin/viewer.byte -main loop @PTEST_DIR@/scope.c -eva
  */
 
 #include "__fc_builtin.h"

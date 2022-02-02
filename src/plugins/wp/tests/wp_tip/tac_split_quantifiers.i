@@ -1,8 +1,9 @@
 /* run.config
    OPT: -wp -wp-prover none
 */
+
 /* run.config_qualif
-   MODULE: TacNOP
+   SCRIPT: TacNOP
    OPT: -wp -wp-par 1 -wp-prover script
 */
 

@@ -340,7 +340,7 @@ let computeFileCFG (f : file) =
 let labelAlphaTable : unit Alpha.alphaTable = Hashtbl.create 11
 
 let freshLabel (base:string) =
-  fst (Alpha.newAlphaName labelAlphaTable base ())
+  fst (Alpha.newAlphaName labelAlphaTable None base ())
 
 
 let xform_switch_block ?(keepSwitch=false) b =

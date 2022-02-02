@@ -10,7 +10,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
-[nonterm] n2.i:6: Warning: 
+[nonterm:stmt] n2.i:6: Warning: 
   non-terminating loop
   stack: main
 [nonterm] Analysis done.

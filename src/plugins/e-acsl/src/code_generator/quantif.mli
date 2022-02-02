@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,7 +33,11 @@ val quantif_to_exp:
 (* ***********************************************************************)
 
 val predicate_to_exp_ref:
-  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
+  (adata:Assert.t ->
+   kernel_function ->
+   Env.t ->
+   predicate ->
+   exp * Assert.t * Env.t) ref
 
 (*
 Local Variables:

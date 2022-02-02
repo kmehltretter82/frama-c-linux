@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"%{dep:bts0442.i}"
+STDOPT: +"@PTEST_DIR@/bts0442.i"
 */
 enum E { E0=0, E1=1} ve1=E1;
 void f (void) {

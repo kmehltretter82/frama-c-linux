@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,7 +33,6 @@ val possible_value_of_integral_const: constant -> Integer.t option
 val possible_value_of_integral_expr: exp -> Integer.t option
 val value_of_integral_const: constant -> Integer.t
 val value_of_integral_expr: exp -> Integer.t
-val constant_expr: loc:location -> Integer.t -> exp
 val is_null_expr: exp -> bool
 val is_non_null_expr: exp -> bool
 
@@ -65,21 +64,32 @@ val term_lvals_of_term: term -> term_lval list
 (** @return the list of all the term lvals of a given term.
     Purely syntactic function. *)
 
-val precondition : funspec -> predicate
+val precondition : goal:bool -> funspec -> predicate
 (** Builds the precondition from [b_assumes] and [b_requires] clauses.
-    @since Carbon-20101201 *)
+    With [~goal:true], only returns assert and check predicates.
+    With [~goal:false], only returns assert and admit predicates.
+    @since Carbon-20101201
+    @modify 23.0-Vanadium introduce [goal] flag
+*)
 
 val behavior_assumes : funbehavior -> predicate
 (** Builds the conjunction of the [b_assumes].
     @since Nitrogen-20111001 *)
 
-val behavior_precondition : funbehavior -> predicate
+val behavior_precondition : goal:bool -> funbehavior -> predicate
 (** Builds the precondition from [b_assumes] and [b_requires] clauses.
-    @since Carbon-20101201 *)
+    For flag [~goal] see {!Ast_info.precondition} above.
+    @since Carbon-20101201
+    @modify 23.0-Vanadium introduce [goal] flag
+*)
 
-val behavior_postcondition : funbehavior -> termination_kind -> predicate
+val behavior_postcondition :
+  goal:bool -> funbehavior -> termination_kind -> predicate
 (** Builds the postcondition from [b_assumes] and [b_post_cond] clauses.
-    @modify Boron-20100401 added termination kind as filtering argument. *)
+    For flag [~goal] see {Ast_info.precondition} above.
+    @modify Boron-20100401 added termination kind as filtering argument.
+    @modify 23.0-Vanadium introduce [goal] flag
+*)
 
 val disjoint_behaviors : funspec -> string list -> predicate
 (** Builds the [disjoint_behaviors] property for the behavior names.

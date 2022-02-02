@@ -38,22 +38,22 @@ open Unmarshal
 
 let l = [  512;  35;  62;  512;  42;  62;  17 ]
 
-let t_renumber_int = 
+let t_renumber_int =
   let tbl = Hashtbl.create 42 in
   let count = ref 0 in
-  let f x = 
+  let f x =
     match ((Obj.magic x) : int ) with
-    |  x -> 
-	let result = 
-	  try
-	    Hashtbl.find tbl x 
-	  with Not_found ->
-	    let c = !count in
-	    count := succ c;
-	    Hashtbl.add tbl x c;
-	    c
-	in
-	Obj.repr (result : int )
+    |  x ->
+      let result =
+        try
+          Hashtbl.find tbl x
+        with Not_found ->
+          let c = !count in
+          count := succ c;
+          Hashtbl.add tbl x c;
+          c
+      in
+      Obj.repr (result : int )
   in
   Transform (t_option t_int, f)
 
@@ -72,23 +72,23 @@ let () =
 
 let l = [ Some 512; Some 35; Some 62; Some 512; Some 42; Some 62; Some 17 ]
 
-let t_renumber_intopt = 
+let t_renumber_intopt =
   let tbl = Hashtbl.create 42 in
   let count = ref 0 in
-  let f x = 
+  let f x =
     match ((Obj.magic x) : int option) with
       None -> assert false
-    | Some x -> 
-	let result = 
-	  try
-	    Hashtbl.find tbl x 
-	  with Not_found ->
-	    let c = !count in
-	    count := succ c;
-	    Hashtbl.add tbl x c;
-	    c
-	in
-	Obj.repr (Some(result) : int option)
+    | Some x ->
+      let result =
+        try
+          Hashtbl.find tbl x
+        with Not_found ->
+          let c = !count in
+          count := succ c;
+          Hashtbl.add tbl x c;
+          c
+      in
+      Obj.repr (Some(result) : int option)
   in
   Transform (t_option t_int, f)
 
@@ -106,11 +106,11 @@ let () =
 
 let h = Hashtbl.create 12;;
 
-let () = 
+let () =
   Hashtbl.add h 34 "s34";
   Hashtbl.add h 63 "s63"
 
-let t_h1 = 
+let t_h1 =
   t_hashtbl_changedhashs Hashtbl.create Hashtbl.add t_renumber_int Abstract
 
 let () =
@@ -123,7 +123,7 @@ let () =
   Hashtbl.iter (fun k v -> Format.printf "%d %s@." k v) result;
   print_endline "fin test3"
 
-let t_h2 = 
+let t_h2 =
   t_hashtbl_unchangedhashs t_int Abstract
 
 let () =

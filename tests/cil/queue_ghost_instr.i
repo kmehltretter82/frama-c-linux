@@ -1,6 +1,6 @@
 /* run.config
  MODULE: @PTEST_NAME@
-  STDOPT:
+   OPT: -print
 */
 
 int main(){

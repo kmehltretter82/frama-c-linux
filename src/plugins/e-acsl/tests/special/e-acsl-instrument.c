@@ -1,7 +1,10 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: test option -e-acsl-instrument; cannot run Eva on this example
-   STDOPT:#"-e-acsl-instrument='@@all,-uninstrument1,-uninstrument2'"
-   MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-instrument @@@@all,-uninstrument1,-uninstrument2
+   STDOPT:#"-e-acsl-instrument='@all,-uninstrument1,-uninstrument2'"
+*/
+/* run.config_dev
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT --no-assert-print-data
+   MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-instrument @all,-uninstrument1,-uninstrument2
 */
 
 #include <stdarg.h>
@@ -13,11 +16,12 @@ int uninstrument1(int *p) {
 
 /*@ requires \valid(p); */
 int uninstrument2(int *p) {
-  { int *q = p;
+  {
+    int *q = p;
     *p = 0;
     goto L;
   }
- L:
+L:
   return 0;
 }
 
@@ -28,11 +32,12 @@ int instrument1(int *p) {
 
 /*@ requires \valid(p); */
 int instrument2(int *p) {
-  { int *q = p;
+  {
+    int *q = p;
     *p = 0;
     goto L;
   }
- L:
+L:
   return 0;
 }
 

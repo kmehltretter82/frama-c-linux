@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"%{dep:cpu_b.c} -machdep x86_16"
+   OPT: %{dep:@PTEST_DIR@/cpu_b.c} -machdep x86_16 -print
 */
 typedef unsigned short DWORD ;
 

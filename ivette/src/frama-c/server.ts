@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Frama-C Server
 // --------------------------------------------------------------------------
@@ -379,7 +401,7 @@ export interface Configuration {
   command?: string;
   /** Additional server arguments (default: empty). */
   params: string[];
-  /** Server socket (default: `ipc:///.frama-c.<pid>.io`). */
+  /** Server socket (default: `ipc:///tmp/ivette.frama-c.<pid>.io`). */
   sockaddr?: string;
   /** Shutdown timeout before server is hard killed, in milliseconds
    *  (default: 300ms). */
@@ -443,12 +465,14 @@ async function _launch() {
   }
   buffer.append('\n');
 
-  if (!cwd) cwd = System.getWorkingDir();
   if (!sockaddr) {
-    const socketfile = System.join(cwd, `.frama-c.${System.getPID()}.io`);
+    const tmp = System.getTempDir();
+    const pid = System.getPID();
+    const socketfile = System.join(tmp, `ivette.frama-c.${pid}.io`);
     System.atExit(() => System.remove(socketfile));
     sockaddr = `ipc://${socketfile}`;
   }
+  if (!cwd) cwd = System.getWorkingDir();
   logout = logout && System.join(cwd, logout);
   logerr = logerr && System.join(cwd, logerr);
   params = ['-server-zmq', sockaddr, '-then'].concat(params);
@@ -712,6 +736,11 @@ export enum RqKind {
   EXEC = 'EXEC'
 }
 
+/** Server signal. */
+export interface Signal {
+  name: string;
+}
+
 /** Server request. */
 export interface Request<Kd extends RqKind, In, Out> {
   kind: Kd;
@@ -721,11 +750,8 @@ export interface Request<Kd extends RqKind, In, Out> {
   input: Json.Loose<In>;
   /** Decoder of output parameters. */
   output: Json.Loose<Out>;
-}
-
-/** Server signal. */
-export interface Signal {
-  name: string;
+  /** Signals the request depends on */
+  signals: Array<Signal>;
 }
 
 export type GetRequest<In, Out> = Request<RqKind.GET, In, Out>;
@@ -821,25 +847,24 @@ async function _send() {
   // when busy, will be eventually re-triggered
   if (!zmqIsBusy) {
     const cmds = queueCmd;
-    if (!cmds.length && _waiting()) cmds.push('POLL');
-    if (cmds.length) {
-      zmqIsBusy = true;
-      const ids = queueId;
-      queueCmd = [];
-      queueId = [];
-      try {
-        await zmqSocket?.send(cmds);
-        const resp = await zmqSocket?.receive();
-        _receive(resp);
-      } catch (error) {
-        D.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
-        _cancel(ids);
-      }
-      zmqIsBusy = false;
-    } else {
-      // No pending command nor pending response
-      rqCount = 0;
+    if (!cmds.length) {
+      cmds.push('POLL');
+      if (!_waiting())
+        rqCount = 0; // No pending command nor pending response
     }
+    zmqIsBusy = true;
+    const ids = queueId;
+    queueCmd = [];
+    queueId = [];
+    try {
+      await zmqSocket?.send(cmds);
+      const resp = await zmqSocket?.receive();
+      _receive(resp);
+    } catch (error) {
+      D.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
+      _cancel(ids);
+    }
+    zmqIsBusy = false;
     STATUS.emit(status);
   }
 }

@@ -17,7 +17,7 @@
 [eva:alarm] annot_valid.i:29: Warning: assertion got status unknown.
 [eva:alarm] annot_valid.i:32: Warning: assertion got status unknown.
 [eva:alarm] annot_valid.i:35: Warning: assertion got status unknown.
-[eva:alarm] annot_valid.i:38: Warning: assertion got status unknown.
+[eva] annot_valid.i:38: assertion got status valid.
 [eva] annot_valid.i:41: assertion got status valid.
 [eva:alarm] annot_valid.i:44: Warning: 
   assertion got status invalid (stopping propagation).

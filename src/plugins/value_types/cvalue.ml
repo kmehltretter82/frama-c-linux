@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -193,7 +193,7 @@ module V = struct
           if o = NoOffset then
             let o' = match Cil.unrollType typ_base with
               | TArray _ -> Index (Cil.(zero Cil_builtins.builtinLoc), NoOffset)
-              | TComp (ci, _, _) -> Field (List.hd (Option.get ci.cfields), NoOffset)
+              | TComp (ci, _) -> Field (List.hd (Option.get ci.cfields), NoOffset)
               | _ -> raise Bit_utils.NoMatchingOffset
             in o', ok
           else o, ok
@@ -642,7 +642,7 @@ module V = struct
     else value
 
   let shift_bits ~topify ~offset ~size v =
-    let v = restrict_topint_to_size v (Integer.to_int size) in
+    let v = restrict_topint_to_size v (Integer.to_int_exn size) in
     shift_left_by_integer ~topify offset v
 
   let merge_distinct_bits ~topify ~conflate_bottom value acc =
@@ -908,6 +908,10 @@ module V_Or_Uninitialized = struct
       else t (* no update needed *)
     in
     removed, t'
+
+  let replace_base substitution t =
+    let modified, v = V.replace_base substitution (get_v t) in
+    modified, if modified then create (get_flags t) v else t
 
   let reduce_by_initializedness pos v =
     if pos then

@@ -1,8 +1,8 @@
 /* run.config
+ PLUGIN: @EVA_PLUGINS@
    STDOPT: #"-eva-msg-key widen-hints"
    OPT: -print
  */
-
 #include <stdlib.h>
 
 #define N 2

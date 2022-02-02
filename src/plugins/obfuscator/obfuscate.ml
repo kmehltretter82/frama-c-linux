@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -150,13 +150,13 @@ class visitor = object
       Cil.SkipChildren
     else begin
       Identified_predicate.Hashtbl.add id_pred_visited p ();
-      let { tp_only_check = only_check; tp_statement = pred } = p.ip_content in
+      let { tp_kind; tp_statement = pred } = p.ip_content in
       let names = pred.pred_name in
       let names' =
         List.map (Dictionary.fresh Obfuscator_kind.Predicate) names
       in
       let pred' = { pred with pred_name = names' } in
-      let ip_content = Logic_const.toplevel_predicate ~only_check pred' in
+      let ip_content = Logic_const.toplevel_predicate ~kind:tp_kind pred' in
       let p' = { p with ip_content } in
       Cil.ChangeDoChildrenPost (p', Extlib.id)
     end
@@ -169,8 +169,8 @@ class visitor = object
     | Daxiomatic(str, _, _, _) ->
       warn "axiomatic" str;
       Cil.DoChildren
-    | Dlemma(str, axiom, _, _, _, _, _) ->
-      warn (if axiom then "axiom" else "lemma") str;
+    | Dlemma(str, _, _, { tp_kind }, _, _) ->
+      warn (Cil_printer.string_of_lemma tp_kind) str;
       Cil.DoChildren
     | _ ->
       Cil.DoChildren

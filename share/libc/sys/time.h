@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -24,17 +24,12 @@
 #define __FC_SYS_TIME_H__
 #include "../features.h"
 __PUSH_FC_STDLIB
-__BEGIN_DECLS
-
-#include "../__fc_define_time_t.h"
-#include "../__fc_define_suseconds_t.h"
 #include "../__fc_define_fd_set_t.h"
-#include "../__fc_define_timespec.h"
+#include "../__fc_define_suseconds_t.h"
+#include "../__fc_define_time_t.h"
+#include "../__fc_define_timeval.h"
 #include "../__fc_string_axiomatic.h"
-struct timeval {
-  time_t         tv_sec;
-  suseconds_t    tv_usec;
-};
+__BEGIN_DECLS
 
 struct timezone {
   int tz_minuteswest;
@@ -99,8 +94,9 @@ extern int gettimeofday(struct timeval * restrict tv, void * restrict tz);
 */
 extern int settimeofday(const struct timeval *tv, const struct timezone *tz);
 
-#if (defined _POSIX_C_SOURCE && (_POSIX_C_SOURCE) >= 200112L) ||        \
-  (defined _XOPEN_SOURCE && (_XOPEN_SOURCE) >= 600)
+// Note: definitions related to itimerval are obsolescent in POSIX and may be
+// removed in future versions. Strictly conforming applications should not use
+// them.
 #define ITIMER_REAL    0
 #define ITIMER_VIRTUAL 1
 #define ITIMER_PROF    2
@@ -199,7 +195,6 @@ extern int getitimer(int which, struct itimerval *curr_value);
 extern int setitimer (int which,
       const struct itimerval *restrict new_value,
       struct itimerval *restrict old_value);
-#endif
 
 // Non-POSIX, non-C99 functions (present in Linux and most BSDs)
 extern void timeradd(struct timeval *a, struct timeval *b,

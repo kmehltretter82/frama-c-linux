@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -journal-disable -calldeps
+   OPT: -eva @EVA_CONFIG@ -calldeps
 */
 
 /*@ assigns \result \from min, max;

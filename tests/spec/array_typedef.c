@@ -1,6 +1,6 @@
 /*run.config
- PLUGIN: @EVA_PLUGINS@
- OPT: -print -eva @EVA_OPTIONS@ -journal-disable
+PLUGIN: eva, scope
+ OPT: -print -eva @EVA_CONFIG@
  */
 #define IP_FIELD 4
 typedef int ip_address[IP_FIELD];

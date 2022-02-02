@@ -1,6 +1,6 @@
 /* run.config
-   DEPS: volatile.h
-   OPT: %{dep:volatile_aux.c} -print -copy
+ DEPS: volatile.h
+   OPT: %{dep:@PTEST_DIR@/volatile_aux.c} -print -copy
 */
 #include "volatile.h"
 

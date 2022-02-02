@@ -1,8 +1,7 @@
 /* run.config
-  PLUGIN: slicing @EVA_PLUGINS@ 
+PLUGIN: @EVA_PLUGINS@ pdg slicing
   STDOPT: +"-eva -inout -pdg -calldeps -deps -then -slice-return main -then-last -print @EVA_OPTIONS@"
 */
-
 int Y, X;
 volatile v;
 

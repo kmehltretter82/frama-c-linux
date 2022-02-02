@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,17 +40,27 @@ val block_from_stmts: stmt list -> stmt
 (** Create a block statement from a statement list. *)
 
 val assigns: loc:location -> result:lval -> exp -> stmt
-(** [assigns ~loc ~result value] create a statement to assign the [value]
+(** [assigns ~loc ~result value] creates a statement to assign the [value]
     expression to the [result] lval. *)
+
+val assigns_field: loc:location -> varinfo -> string -> exp -> stmt
+(** [assigns_field ~loc vi field value] creates a statement to assign the
+    [value] expression to the [field] of the structure in the variable [vi]. *)
 
 val if_stmt:
   loc:location -> cond:exp -> ?else_blk:block -> block -> stmt
-(** [if ~loc ~cond ~then_blk ~else_blk] create an if statement with [cond]
+(** [if ~loc ~cond ~then_blk ~else_blk] creates an if statement with [cond]
     as condition and [then_blk] and [else_blk] as respectively "then" block and
     "else" block. *)
 
 val break: loc:location -> stmt
 (** Create a break statement *)
+
+val struct_local_init: loc:location -> varinfo -> (string * exp) list -> stmt
+(** [struct_local_init ~loc vi fields] creates a local initialization for the
+    structure variable [vi]. [fields] is a list of couple [(name, e)] where
+    [name] is the name of a field in the structure and [e] is the expression to
+    initialize that field. *)
 
 (* ********************************************************************** *)
 (* E-ACSL specific code: build calls to its RTL API *)
@@ -104,22 +114,8 @@ type annotation_kind =
   | Precondition
   | Postcondition
   | Invariant
+  | Variant
   | RTE
-
-val runtime_check:
-  annotation_kind -> kernel_function -> exp -> predicate -> stmt
-(** [runtime_check kind kf e p] generates a runtime check for predicate [p]
-    by building a call to [__e_acsl_assert]. [e] (or [!e] if [reverse] is set to
-    [true]) is the C translation of [p], [kf] is the current kernel_function and
-    [kind] is the annotation kind of [p]. *)
-
-val runtime_check_with_msg:
-  loc:location -> string -> annotation_kind -> kernel_function -> exp -> stmt
-(** [runtime_check_with_msg kind kf e msg] generates a runtime check for [e]
-    (or [!e] if [reverse] is [true]) by building a call to [__e_acsl_assert].
-    [msg] is the message printed if the runtime check fails. [loc] is the
-    location printed in the message if the runtime check fails. [kf] is the
-    current kernel_function and [kind] is the annotation kind of [p]. *)
 
 (*
 Local Variables:

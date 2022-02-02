@@ -1,2 +1,2 @@
-PLUGIN: @PTEST_PLUGIN@ metrics
+PLUGIN: metrics,scope
 OPT: -metrics

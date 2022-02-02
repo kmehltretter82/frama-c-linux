@@ -1,13 +1,11 @@
-/* run.config_ci
+/* run.config
    COMMENT: frama-c/e-acsl#91, test for misplaced delete_block of local variable
    in switch.
    STDOPT: #"-e-acsl-full-mtracking"
 */
 short a;
-char b()
-{
-  switch (a)
-  {
+char b() {
+  switch (a) {
     int c = 0;
   case 0:
     goto d;
@@ -19,8 +17,7 @@ d:
   return 2;
 }
 
-int main()
-{
+int main() {
   b();
   return 0;
 }

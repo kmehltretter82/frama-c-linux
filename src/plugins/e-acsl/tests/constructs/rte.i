@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config
  * COMMENT: Check that the RTE checks are generated for every part of a
  * behavior, and are generated at the right place.
  */
@@ -17,8 +17,8 @@
     requires \exists integer var; 0 <= var < l && var % l == var;
     ensures 1 % e == 1;
 */
-void test(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l) {
-}
+void test(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j,
+          int k, int l) {}
 
 int main(void) {
   test(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);

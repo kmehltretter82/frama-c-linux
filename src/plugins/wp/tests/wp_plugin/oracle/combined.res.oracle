@@ -20,11 +20,11 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i) /\ (i <= 50).
+  (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
             [shift_sint32(t, i_1)]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
   (* Then *)
   Have: i <= 49.
   (* Call 'f' *)
@@ -50,14 +50,16 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i) /\ (i <= 50).
+  (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       P_P(a[shift_sint32(t, i_2)]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
   (* Then *)
   Have: i <= 49.
   (* Call 'f' *)
   Have: P_P(v).
+  (* Invariant *)
+  Have: (-1) <= i.
 }
 Prove: P_P(a[shift_sint32(t, i) <- v][shift_sint32(t, i_1)]).
 
@@ -77,11 +79,11 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i) /\ (i <= 50).
+  (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
             [shift_sint32(t, i_1)]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
   (* Else *)
   Have: 50 <= i.
   (* Invariant *)
@@ -109,10 +111,10 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i_1) /\ (i_1 <= 50).
+  (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
       P_P(a[shift_sint32(t, i_2)]))).
-  (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 50).
   (* Else *)
   Have: 50 <= i_1.
   (* Invariant *)
@@ -155,9 +157,10 @@ Prove: true.
 
 Goal Loop assigns (file combined.c, line 36) (3/3):
 Call Result at line 38
-Let a = shift_sint32(t, j).
+Let x = j - 1.
+Let a = shift_sint32(t, x).
 Assume {
-  Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j).
+  Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(x).
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
@@ -165,17 +168,17 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i) /\ (i <= 50).
+  (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
             [shift_sint32(t, i_1)]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
   (* Else *)
   Have: 50 <= i.
   (* Invariant *)
-  Have: (A <= j) /\ (j <= 100).
+  Have: (A < j) /\ (j <= 101).
   (* Then *)
-  Have: j <= 99.
+  Have: j <= 100.
 }
 Prove: included(a, 1, shift_sint32(t, A), 100 - A).
 

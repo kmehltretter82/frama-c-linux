@@ -1,7 +1,7 @@
 /*run.config*
-  OPT: @EVA_CONFIG@ -inout -input-with-formals  -inout-with-formals -main main_main
+PLUGIN: @EVA_MAIN_PLUGINS@ inout
+  OPT: @EVA_CONFIG@ -inout -input-with-formals -inout-with-formals -main main_main
 */
-
 typedef unsigned char   BYTE;
 typedef  BYTE *     MESSAGE_ADDR_TYPE;
 

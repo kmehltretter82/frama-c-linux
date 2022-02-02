@@ -1,5 +1,5 @@
 [kernel] Parsing ast_services.i (no preprocessing)
-[server] Script "ast_services.json"
+[server] Script "./ast_services.json"
 [server] [GET] kernel.ast.fetchFunctions
 [server] [GET] kernel.ast.fetchFunctions
 [server] [GET] kernel.ast.printFunction

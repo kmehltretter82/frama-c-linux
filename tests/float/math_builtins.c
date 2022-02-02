@@ -722,6 +722,20 @@ void test_roundf() {
   float f32__c = roundf(f32__x);
 }
 
+void test_uninit() {
+  double a, b, r;
+  if (nondet) {
+    r = sqrt(a);
+    Frama_C_show_each_unreachable(r);
+  }
+  if (nondet) {
+    a = 0.5;
+    b = double_interval(0.25, 8.5);
+  }
+  r = sqrt(a);   // initialization alarm and reduction of a.
+  r = pow(b, a); // initialization alarm and reduction of b.
+}
+
 int main() {
   test_cos_det();
   test_sin_det();
@@ -769,6 +783,8 @@ int main() {
   test_ceilf();
   test_truncf();
   test_roundf();
+
+  test_uninit();
 
   return 0;
 }

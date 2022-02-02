@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -162,8 +162,6 @@ and identified_lemma = {
   il_loc : location
 }
 
-and identified_axiom = identified_lemma
-
 (** Specialization of a property at a given point, identified by a statement
     and a function, along with the predicate transposed at this point (if it
     can be) and the original property. *)
@@ -195,7 +193,6 @@ and identified_other = {
 and identified_property = private
   | IPPredicate of identified_predicate
   | IPExtended of identified_extended
-  | IPAxiom of identified_axiom
   | IPAxiomatic of identified_axiomatic
   | IPLemma of identified_lemma
   | IPBehavior of identified_behavior
@@ -213,6 +210,18 @@ and identified_property = private
   | IPOther of identified_other
 
 include Datatype.S_with_collections with type t = identified_property
+
+(** Datatype with alternative ordering, where properties are ordered according
+    the following criteria:
+    1. Kf name (global properties ranked first)
+    2. Kinstr
+    3. kind of property
+    4. id of the property
+
+    @since 23.0-Vanadium
+*)
+module Ordered_by_function:
+  Datatype.S_with_collections with type t = identified_property
 
 val short_pretty: Format.formatter -> t -> unit
 (** output a meaningful name for the property (e.g. the name of the
@@ -465,12 +474,6 @@ val ip_property_instance:
   kernel_function -> stmt -> Cil_types.identified_predicate option ->
   identified_property -> identified_property
 
-(** Builds an IPAxiom.
-    @since Carbon-20110201
-    @modify Oxygen-20120901 takes an identified_axiom instead of a string
-*)
-val ip_axiom: identified_axiom -> identified_property
-
 (** Build an IPLemma.
     @since Nitrogen-20111001
     @modify Oxygen-20120901 takes an identified_lemma instead of a string
@@ -517,6 +520,7 @@ val get_kinstr: identified_property -> kinstr
 val get_kf: identified_property -> kernel_function option
 val get_behavior: identified_property -> funbehavior option
 val get_names: identified_property -> string list
+val get_for_behaviors: identified_property -> string list
 
 val location: identified_property -> location
 (** returns the location of the property.

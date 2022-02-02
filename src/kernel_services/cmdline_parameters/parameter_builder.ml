@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -174,19 +174,18 @@ struct
     let add_negative_option name =
       let neg_name = negative_option_name name in
       let mk_help s =
-        if is_visible then
-          if X.default then s else s ^ default_message empty_string
-        else empty_string
+        if X.default then s else s ^ default_message empty_string
       in
-      let neg_help, neg_visible =
-        match
-          !Parameter_customize.negative_option_name_ref,
-          !Parameter_customize.negative_option_help_ref
-        with
-        | None, "" -> (* no user-specific config: no help *) empty_string, false
-        | Some _, "" ->
-          mk_help ("opposite of option \"" ^ name ^ "\""), is_visible
-        | _, s -> assert (s <> empty_string); mk_help s, is_visible
+      (* Add help messages even for invisible negative options, since
+         these messages are useful for option '-explain' *)
+      let s = !Parameter_customize.negative_option_help_ref in
+      let neg_visible, neg_help =
+        if s = empty_string then
+          !Parameter_customize.negative_option_name_ref <> None,
+          (if not X.default then "(set by default) " else "") ^
+          "opposite of option " ^ name ^ ", whose help message is:\n" ^ X.help
+        else
+          is_visible, mk_help s
       in
       generic_add_option neg_name neg_help neg_visible false;
       neg_name
@@ -480,7 +479,7 @@ struct
         (struct
           include Datatype.Filepath
           include X
-          let default () = Filepath.Normalized.unknown
+          let default () = Filepath.Normalized.empty
           let functor_name = "Filepath"
         end)
 
@@ -532,6 +531,7 @@ struct
       else
         p
 
+    let is_empty () = Filepath.Normalized.is_empty (get ())
   end
 
   (* ************************************************************************ *)
@@ -996,6 +996,7 @@ struct
 
     let mem e = E.Set.mem e (get ())
     let exists f = E.Set.exists f (get ())
+    let get_default () = X.default
 
   end
 
@@ -1212,6 +1213,8 @@ struct
     let append_before l = set (l @ get ())
     let append_after l = set (get () @ l)
 
+    let get_default () = X.default
+
   end
 
   module String_list(X: Parameter_sig.Input_with_arg) =
@@ -1408,6 +1411,7 @@ struct
 
     let find k = K.Map.find k (get ())
     let mem k = K.Map.mem k (get ())
+    let get_default () = X.default
     let () = find_ref := (fun k -> K.Map.find k (get_nomemo ()))
 
   end
@@ -1645,6 +1649,7 @@ struct
 
     let find k = K.Map.find k (get ())
     let mem k = K.Map.mem k (get ())
+    let get_default () = X.default
     let () = find_ref := (fun k -> K.Map.find k (get_nomemo ()))
 
   end

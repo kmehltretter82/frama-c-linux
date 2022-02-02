@@ -1,7 +1,7 @@
 /* run.config
- DONTRUN: bugfix in progress
+   DONTRUN: bugfix in progress
  MODULE: Type_of_term
-   OPT: -print
+   OPT: -no-autoload-plugins -print
 */
 
 /*@ lemma foo: \union(1) == \union(1.0); */

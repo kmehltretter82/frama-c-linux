@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -safe-arrays -rte -then -print
+   STDOPT: #"-safe-arrays "
  */
 
 struct S {

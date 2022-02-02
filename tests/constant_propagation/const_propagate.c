@@ -1,9 +1,9 @@
 /* run.config
-   OPT: -eva @EVA_OPTIONS@ -deps -out -input -journal-disable -then -scf
-   OPT: -scf @EVA_OPTIONS@ -main init -journal-disable -cast-from-constant -semantic-const-fold add3
+PLUGIN: @CONSTANT_PROPAGATION_PLUGINS@ from inout
+   OPT: -eva @EVA_OPTIONS@ -deps -out -input -scf
+   OPT: -scf @EVA_OPTIONS@ -main init -cast-from-constant -semantic-const-fold add3
 */
-int x,y,z;
-int TAB[10];
+int x,y,z, TAB[10];
 struct st { int a, b ; } s1, s2;
 typedef struct st ST ;
 void test_struct (void) {

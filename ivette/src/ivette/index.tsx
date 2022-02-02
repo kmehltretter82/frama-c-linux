@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 /* --------------------------------------------------------------------------*/
 /* --- Lab View Component                                                 ---*/
 /* --------------------------------------------------------------------------*/
@@ -8,11 +30,13 @@
  */
 
 import React from 'react';
+import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
+import Sandbox from './sandbox';
 
 /* --------------------------------------------------------------------------*/
 /* --- Items                                                              ---*/
@@ -200,6 +224,19 @@ export function registerToolbar(tools: ToolProps) {
 
 export function registerStatusbar(status: ToolProps) {
   Ext.STATUSBAR.register(status);
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Sandbox                                                            ---*/
+/* --------------------------------------------------------------------------*/
+
+if (DEVEL) {
+  registerComponent({
+    id: 'ivette.sandbox',
+    label: 'Sandbox',
+    title: 'Ivette Sandbox Component (only in DEVEL mode)',
+    children: <Sandbox />,
+  });
 }
 
 // --------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,7 +46,7 @@ exception Not_equal
 
 (** What we call a [Signature] a mapping between keys that represent either a
  * function input or output, and some information.
- *)
+*)
 module Signature : sig
 
   (** type of a signature where ['a] is the type of the information that we *
@@ -55,14 +55,14 @@ module Signature : sig
 
   (** key for input elements *)
   type in_key =
-      private
+    private
     | InCtrl (** input control point *)
     | InNum of int (** parameters numbered from 1 *)
     | InImpl of Locations.Zone.t (** key for implicit inputs.
                                      Used in function signatures only *)
 
   type out_key =
-      private
+    private
     | OutRet (** key for the output corresponding to the [return] *)
     | OutLoc of Locations.Zone.t (** key for output locations.
                                      used in call signatures only  *)
@@ -109,7 +109,7 @@ end
 module Key : sig
 
   type key =
-      private
+    private
     | SigKey of Signature.key
     (** key for an element of the function signature *)
     | VarDecl of Cil_types.varinfo   (** variable declaration *)
@@ -149,15 +149,15 @@ end
 (** Mapping between the function elements we are interested in and some
   * information. Used for instance to associate the nodes with the statements,
   * or the marks in a slice.
-  *)
+*)
 module FctIndex : sig
 
   (** this type is used to build indexes between program objects and some
       information such as the PDG nodes or the slicing marks.
       - ['ni] if the type of the information to store for each element,
       - ['ci] if the type of the information that can be attached to call
-      statements (calls are themselves composed of several elements, so ['ni]
-      information stored for each of them (['ni Signature.t])) *)
+        statements (calls are themselves composed of several elements, so ['ni]
+        information stored for each of them (['ni Signature.t])) *)
   type ('ni, 'ci) t
 
   val create : int -> ('ni, 'ci) t
@@ -170,9 +170,9 @@ module FctIndex : sig
       These function are _not_ called when an element is in one index,
       but not the other. It is assumed that [merge_x x bot = x]. *)
   val merge : ('ni, 'ci) t ->  ('ni, 'ci) t ->
-              ('ni -> 'ni -> 'ni) -> 
-              ('ci -> 'ci -> 'ci) ->
-              ('ni, 'ci) t
+    ('ni -> 'ni -> 'ni) ->
+    ('ci -> 'ci -> 'ci) ->
+    ('ni, 'ci) t
 
   (** get the information stored for the function signature *)
   val sgn :  ('ni, 'ci) t -> 'ni Signature.t

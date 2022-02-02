@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,8 +32,8 @@ type 't stmtaction =
     SDefault   (** The default action *)
   | SDone      (** Do not visit this statement or its successors *)
   | SUse of 't (** Visit the instructions and successors of this statement
-                  as usual, but use the specified state instead of the
-                  one that was passed to doStmt *)
+                   as usual, but use the specified state instead of the
+                   one that was passed to doStmt *)
 
 (** For if statements *)
 type 't guardaction =
@@ -84,7 +84,7 @@ module type ForwardsTransfer = sig
       first time (i.e. no previous data is associated with it). The data [d]
       is propagated to [s] from an unspecified preceding statement [s'].
       The result of the call is stored as the new data for [s].
-      
+
       [computeFirstPredecessor] usually leaves [d] unchanged, but may
       potentially change it. It is also possible to perform a side-effect,
       for dataflows that store information out of the type [t]. *)
@@ -101,7 +101,7 @@ module type ForwardsTransfer = sig
       The current location is updated before this function is called.
       The argument of type [stmt] is the englobing statement. *)
 
-  val doGuard: Cil_types.stmt -> Cil_types.exp -> t -> 
+  val doGuard: Cil_types.stmt -> Cil_types.exp -> t ->
     t guardaction * t guardaction
   (** Generate the successors [act_th, act_el] to an [If] statement. [act_th]
       (resp. [act_el]) corresponds to the case where the given expression
@@ -123,9 +123,9 @@ module type ForwardsTransfer = sig
       Can default to identity if nothing special is required. *)
 
   module StmtStartData: StmtStartData with type data = t
-(** For each statement id, the data at the start. Not found in the hash table
-    means nothing is known about the state at this point. At the end of the
-    analysis this means that the block is not reachable. *)
+  (** For each statement id, the data at the start. Not found in the hash table
+      means nothing is known about the state at this point. At the end of the
+      analysis this means that the block is not reachable. *)
 
 end
 
@@ -155,7 +155,7 @@ module type BackwardsTransfer = sig
   val name: string (** For debugging purposes, the name of the analysis *)
   val debug: bool (** Whether to turn on debugging *)
 
-  type t  
+  type t
   (** The type of the data we compute for each block start. In many
       presentations of backwards data flow analysis we maintain the data at the
       block end. This is not easy to do with JVML because a block has many
@@ -203,12 +203,12 @@ end
 
 module Backwards(T : BackwardsTransfer) : sig
   val compute: Cil_types.stmt list -> unit
-(** Fill in the T.stmtStartData, given a number of initial statements to start
-    from (the sinks for the backwards data flow). All of the statements (not
-    just the initial ones!) must have some entry in T.stmtStartData If you want
-    to use bottom for the initial data, you should pass the complete list of
-    statements to {!compute}, so that everything is visited.  {!find_stmts} may
-    be useful here. *)
+  (** Fill in the T.stmtStartData, given a number of initial statements to start
+      from (the sinks for the backwards data flow). All of the statements (not
+      just the initial ones!) must have some entry in T.stmtStartData If you want
+      to use bottom for the initial data, you should pass the complete list of
+      statements to {!compute}, so that everything is visited.  {!find_stmts} may
+      be useful here. *)
 end
 
 val find_stmts: Cil_types.fundec -> (Cil_types.stmt list * Cil_types.stmt list)

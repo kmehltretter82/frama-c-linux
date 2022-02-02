@@ -1,6 +1,6 @@
 /* run.config
  MODULE: @PTEST_NAME@
-   STDOPT:
+   OPT: -no-autoload-plugins -print
 */
 
 struct R_1 {

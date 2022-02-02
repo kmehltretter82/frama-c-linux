@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,16 +22,6 @@
 
 open Cil_types
 open Contract_types
-
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-let must_translate_ppt_ref : (Property.t -> bool) ref =
-  Extlib.mk_fun "must_translate_ppt_ref"
-
-let must_translate_ppt_opt_ref : (Property.t option -> bool) ref =
-  Extlib.mk_fun "must_translate_ppt_opt_ref"
 
 (**************************************************************************)
 (********************** Contract ********************************)
@@ -72,20 +62,12 @@ module Rtl_call: sig
 end = struct
   let init_function_name = "contract_init"
 
-  let init_kf_lazy =
-    lazy
-      (Globals.Functions.find_by_name
-         (Functions.RTL.mk_api_name init_function_name))
-
   let ctyp_lazy =
     lazy
       (Globals.Types.find_type
          Logic_typing.Typedef (Functions.RTL.mk_api_name "contract_t"))
 
   let init ~loc ~result_name env kf count =
-    (* Tell Eva to use init as a builtin *)
-    let init_kf = Lazy.force init_kf_lazy in
-    Dep_eva.use_builtin init_kf "Frama_C_malloc";
     (* Add a call to init in the environment *)
     let ty = TPtr(Lazy.force ctyp_lazy, []) in
     Env.new_var
@@ -116,8 +98,12 @@ end = struct
 
   let set_assumes ~loc env kf contract idx assumes =
     let idx_e = Cil.integer ~loc idx in
-    let assumes_e, env =
-      Translate.generalized_untyped_predicate_to_exp kf env assumes
+    let assumes_e, _, env =
+      Translate_predicates.generalized_untyped_to_exp
+        ~adata:Assert.no_data
+        kf
+        env
+        assumes
     in
     Env.add_stmt
       env
@@ -170,31 +156,19 @@ end = struct
 end
 
 (** Convert the given assumes clauses list to a single [predicate] *)
-let assumes_predicate assumes =
-  List.fold_left
-    (fun acc p ->
-       let pred = p.ip_content.tp_statement in
-       let loc = pred.pred_loc in
-       Logic_const.pand ~loc
-         (acc,
-          Logic_const.unamed ~loc pred.pred_content))
-    Logic_const.ptrue
-    assumes
-
-(** Create a [predicate] from the requires [identified_predicate] *)
-let requires_predicate requires =
-  let pred = requires.ip_content.tp_statement in
-  let loc = pred.pred_loc in
-  let p = Logic_const.unamed ~loc pred.pred_content
+let assumes_predicate env assumes =
+  let p =
+    List.fold_left
+      (fun acc p ->
+         let pred = p.ip_content.tp_statement in
+         let loc = pred.pred_loc in
+         Logic_const.pand ~loc
+           (acc,
+            Logic_const.unamed ~loc pred.pred_content))
+      Logic_const.ptrue
+      assumes
   in
-  p
-
-(** Create a [predicate] from the ensures [identified_predicate] *)
-let ensures_predicate ensures =
-  let pred = ensures.ip_content.tp_statement in
-  let loc = pred.pred_loc in
-  let p = Logic_const.unamed ~loc pred.pred_content
-  in
+  Typing.preprocess_predicate (Env.Local_vars.get env) p;
   p
 
 let create ~loc spec =
@@ -273,7 +247,7 @@ let setup_assumes kf env contract =
           if Cil.is_default_behavior b then
             env
           else
-            let assumes = assumes_predicate b.b_assumes in
+            let assumes = assumes_predicate env b.b_assumes in
             let loc = assumes.pred_loc in
             Cil.CurrentLoc.set loc;
             let idx = get_bhvr_idx contract b.b_name in
@@ -338,56 +312,80 @@ let fold_left_handle_error_with_args f (env, acc) l =
     (env, acc)
     l
 
-(** Insert requires check for the given contract in the environment *)
-let check_requires kf kinstr env contract =
+(** Insert requires check for the default behavior of the given contract in the
+    environment. *)
+let check_default_requires kf kinstr env contract =
+  let default_behavior =
+    Cil.find_default_behavior contract.spec
+  in
+  match default_behavior with
+  | Some b ->
+    fold_left_handle_error
+      (fun env ip_requires ->
+         if Translate_utils.must_translate
+             (Property.ip_of_requires kf kinstr b ip_requires) then
+           let tp_requires = ip_requires.ip_content in
+           let loc = tp_requires.tp_statement.pred_loc in
+           Cil.CurrentLoc.set loc;
+           Translate_predicates.do_it kf env tp_requires
+         else
+           env)
+      env
+      b.b_requires
+  | None -> env
+
+(** Insert requires check for the behaviors other than the default behavior of
+    the given contract in the environment *)
+let check_other_requires kf kinstr env contract =
   let get_or_create_assumes_var =
     mk_get_or_create_var kf Cil.intType "assumes_value"
   in
   let do_behavior env b =
     if Cil.is_default_behavior b then
-      fold_left_handle_error
-        (fun env requires ->
-           if !must_translate_ppt_ref
-               (Property.ip_of_requires kf kinstr b requires) then
-             (* If translating the default behavior, directly translate the
-                predicate *)
-             let requires = requires_predicate requires in
-             let loc = requires.pred_loc in
-             Cil.CurrentLoc.set loc;
-             Translate.translate_predicate kf env requires
-           else
-             env)
-        env
-        b.b_requires
+      env
     else
       (* Compute the assumes predicate for pretty-printing *)
-      let assumes = assumes_predicate b.b_assumes in
+      let assumes = assumes_predicate env b.b_assumes in
       (* Push a new env and check the requires of the behavior *)
       let env = Env.push env in
       let env, stmts =
         fold_left_handle_error_with_args
-          (fun (env, stmts) requires ->
-             if !must_translate_ppt_ref
-                 (Property.ip_of_requires kf kinstr b requires) then
-               let requires = requires_predicate requires in
-               let loc = requires.pred_loc in
-               Cil.CurrentLoc.set loc;
-               (* Prepend the name of the behavior *)
-               let requires =
-                 { requires with pred_name = b.b_name :: requires.pred_name }
-               in
-               (* Create runtime check *)
-               let requires_e, env =
-                 Translate.generalized_untyped_predicate_to_exp kf env requires
-               in
-               let stmt =
-                 Smart_stmt.runtime_check
-                   Smart_stmt.Precondition
-                   kf
-                   requires_e
-                   requires
-               in
-               env, stmt :: stmts
+          (fun (env, stmts) ip_requires ->
+             if Translate_utils.must_translate
+                 (Property.ip_of_requires kf kinstr b ip_requires) then
+               let tp_requires = ip_requires.ip_content in
+               let pred_kind = tp_requires.tp_kind in
+               match pred_kind with
+               | Assert | Check ->
+                 let requires = tp_requires.tp_statement in
+                 let loc = requires.pred_loc in
+                 Cil.CurrentLoc.set loc;
+                 (* Prepend the name of the behavior *)
+                 let requires =
+                   { requires with pred_name = b.b_name :: requires.pred_name }
+                 in
+                 Typing.preprocess_predicate (Env.Local_vars.get env) requires;
+                 (* Create runtime check *)
+                 let adata, env = Assert.empty ~loc kf env in
+                 let requires_e, adata, env =
+                   Translate_predicates.generalized_untyped_to_exp
+                     ~adata
+                     kf
+                     env
+                     requires
+                 in
+                 let stmt, env =
+                   Assert.runtime_check
+                     ~adata
+                     ~pred_kind
+                     Smart_stmt.Precondition
+                     kf
+                     env
+                     requires_e
+                     requires
+                 in
+                 env, stmt :: stmts
+               | Admit -> env, stmts
              else
                env, stmts)
           (env, [])
@@ -442,7 +440,6 @@ type translate_ppt =
     the number of active behaviors and creates assertions for the
     [ppt_to_translate]. *)
 let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env contract clauses =
-  let must_translate = !must_translate_ppt_ref in
   let loc = contract.location in
   Cil.CurrentLoc.set loc;
   let do_clause env bhvrs =
@@ -451,13 +448,15 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
     let must_translate_complete =
       match ppt_to_translate with
       | Both | Complete ->
-        must_translate (Property.ip_of_complete kf kinstr ~active bhvrs_list)
+        Translate_utils.must_translate
+          (Property.ip_of_complete kf kinstr ~active bhvrs_list)
       | Disjoint -> false
     in
     let must_translate_disjoint =
       match ppt_to_translate with
       | Both | Disjoint ->
-        must_translate (Property.ip_of_disjoint kf kinstr ~active bhvrs_list)
+        Translate_utils.must_translate
+          (Property.ip_of_disjoint kf kinstr ~active bhvrs_list)
       | Complete -> false
     in
 
@@ -512,16 +511,29 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
       in
 
       (* Create assertions for complete and disjoint behaviors checks *)
-      let create_assert_stmt bop msg =
-        Smart_stmt.runtime_check_with_msg
+      let create_assert_stmt env bop msg =
+        let adata, env = Assert.empty ~loc kf env in
+        let adata, env =
+          Assert.register
+            ~loc
+            kf
+            env
+            "number of active behaviors"
+            active_bhvrs_e
+            adata
+        in
+        Assert.runtime_check_with_msg
+          ~adata
           ~loc
           msg
+          ~pred_kind:Assert
           (Env.annotation_kind env)
           kf
+          env
           (Cil.mkBinOp ~loc bop active_bhvrs_e (Cil.one ~loc))
       in
-      let assert_complete_stmt = create_assert_stmt Ge complete_msg in
-      let assert_disjoint_stmt = create_assert_stmt Le disjoint_msg in
+      let assert_complete_stmt, env = create_assert_stmt env Ge complete_msg in
+      let assert_disjoint_stmt, env = create_assert_stmt env Le disjoint_msg in
 
       if must_translate_complete && must_translate_disjoint then
         (* Build an enclosing [if] if both complete and disjoint must be checked
@@ -560,8 +572,8 @@ let check_complete_and_disjoint kf kinstr env contract =
        - The disjoint list
 
        The behaviors of a clause are stored in a Set so that they are
-       automatically sorted, the duplicates are removed, and they can be compared
-       for equality.
+       automatically sorted, the duplicates are removed, and they can be
+       compared for equality.
     *)
     let completes =
       List.map
@@ -589,7 +601,9 @@ let check_complete_and_disjoint kf kinstr env contract =
     in
     (* Create a common variable to hold the number of active behavior for the
        current check *)
-    let get_or_create_var = mk_get_or_create_var kf Cil.intType "active_bhvrs" in
+    let get_or_create_var =
+      mk_get_or_create_var kf Cil.intType "active_bhvrs"
+    in
     (* Check the complete and disjoint clauses *)
     let check_bhvrs env ppt_to_translate bhvrs =
       check_active_behaviors
@@ -609,7 +623,7 @@ let check_complete_and_disjoint kf kinstr env contract =
     Cil.CurrentLoc.set contract.location;
     Options.warning
       ~current:true
-      "@[Some assumes clauses couldn't be translated.@ Ignoring complete and \
+      "@[Some assumes clauses could not be translated.@ Ignoring complete and \
        disjoint behaviors annotations.@]";
     env
   end
@@ -625,7 +639,7 @@ let check_post_conds kf kinstr env contract =
         (fun env ->
            let active = [] in (* TODO: 'for' behaviors, e-acsl#109 *)
            let ppt = Property.ip_assigns_of_behavior kf kinstr ~active b in
-           if b.b_assigns <> WritesAny && !must_translate_ppt_opt_ref ppt
+           if b.b_assigns <> WritesAny && Translate_utils.must_translate_opt ppt
            then Env.not_yet env "assigns clause in behavior";
            (* ignore b.b_extended since we never translate them *)
            env)
@@ -633,20 +647,19 @@ let check_post_conds kf kinstr env contract =
     in
     if Cil.is_default_behavior b then
       fold_left_handle_error
-        (fun env ((termination, post_cond) as tp) ->
-           if !must_translate_ppt_ref
+        (fun env ((termination, ip_post_cond) as tp) ->
+           if Translate_utils.must_translate
                (Property.ip_of_ensures kf kinstr b tp) then
-             let post_cond = ensures_predicate post_cond in
-             let loc = post_cond.pred_loc in
+             let tp_post_cond = ip_post_cond.ip_content in
+             let loc = tp_post_cond.tp_statement.pred_loc in
              Cil.CurrentLoc.set loc;
              match termination with
              | Normal ->
                (* If translating the default behavior, directly translate the
                   predicate *)
-               Translate.translate_predicate kf env post_cond
+               Translate_predicates.do_it kf env tp_post_cond
              | Exits | Breaks | Continues | Returns ->
-               Error.process_error
-                 (Error.not_yet "abnormal termination case in behavior");
+               Error.print_not_yet "abnormal termination case in behavior";
                env
            else
              env)
@@ -654,38 +667,57 @@ let check_post_conds kf kinstr env contract =
         b.b_post_cond
     else
       (* Compute the assumes predicate for pretty printing *)
-      let assumes = assumes_predicate b.b_assumes in
+      let assumes = assumes_predicate env b.b_assumes in
       (* Push a new env and check the ensures of the behavior *)
       let env = Env.push env in
       let env, stmts =
         fold_left_handle_error_with_args
-          (fun (env, stmts) ((termination, post_cond) as tp) ->
-             if !must_translate_ppt_ref
+          (fun (env, stmts) ((termination, ip_post_cond) as tp) ->
+             if Translate_utils.must_translate
                  (Property.ip_of_ensures kf kinstr b tp) then
-               let post_cond = ensures_predicate post_cond in
-               let loc = post_cond.pred_loc in
-               Cil.CurrentLoc.set loc;
-               match termination with
-               | Normal ->
-                 (* Prepend the name of the behavior *)
-                 let post_cond =
-                   { post_cond with pred_name = b.b_name :: post_cond.pred_name }
-                 in
-                 (* Create runtime check *)
-                 let post_cond_e, env =
-                   Translate.generalized_untyped_predicate_to_exp kf env post_cond
-                 in
-                 let stmt =
-                   Smart_stmt.runtime_check
-                     Smart_stmt.Postcondition
-                     kf
-                     post_cond_e
-                     post_cond
-                 in
-                 env, stmt :: stmts
-               | Exits | Breaks | Continues | Returns ->
-                 Error.process_error (Error.not_yet "abnormal termination case in behavior");
-                 env, stmts
+               let tp_post_cond = ip_post_cond.ip_content in
+               let pred_kind = tp_post_cond.tp_kind in
+               match pred_kind with
+               | Assert | Check -> begin
+                   let post_cond = tp_post_cond.tp_statement in
+                   let loc = post_cond.pred_loc in
+                   Cil.CurrentLoc.set loc;
+                   match termination with
+                   | Normal ->
+                     (* Prepend the name of the behavior *)
+                     let post_cond =
+                       { post_cond with
+                         pred_name = b.b_name :: post_cond.pred_name }
+                     in
+                     Typing.preprocess_predicate
+                       (Env.Local_vars.get env)
+                       post_cond;
+                     (* Create runtime check *)
+                     let adata, env = Assert.empty ~loc kf env in
+                     let post_cond_e, adata, env =
+                       Translate_predicates.generalized_untyped_to_exp
+                         ~adata
+                         kf
+                         env
+                         post_cond
+                     in
+                     let stmt, env =
+                       Assert.runtime_check
+                         ~adata
+                         ~pred_kind
+                         Smart_stmt.Postcondition
+                         kf
+                         env
+                         post_cond_e
+                         post_cond
+                     in
+                     env, stmt :: stmts
+                   | Exits | Breaks | Continues | Returns ->
+                     Error.print_not_yet
+                       "abnormal termination case in behavior";
+                     env, stmts
+                 end
+               | Admit -> env, stmts
              else
                env, stmts)
           (env, [])
@@ -734,9 +766,18 @@ let translate_preconditions kf kinstr env contract =
   let env = Env.set_annotation_kind env Smart_stmt.Precondition in
   let env = Env.push_contract env contract in
   let env = init kf env contract in
+  (* Start with translating the requires predicate of the default behavior. *)
+  let env =
+    Env.handle_error
+      (fun env -> check_default_requires kf kinstr env contract)
+      env
+  in
+  (* Then setup the assumes clauses of the contract. *)
   let env = setup_assumes kf env contract in
+  (* And finally translate the requires predicates of the rest of the behaviors,
+     skipping over the default behavior. *)
   let do_it env =
-    let env = check_requires kf kinstr env contract in
+    let env = check_other_requires kf kinstr env contract in
     let env = check_complete_and_disjoint kf kinstr env contract in
     env
   in

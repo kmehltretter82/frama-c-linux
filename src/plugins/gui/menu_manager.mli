@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -111,9 +111,9 @@ class type item = object
 
 end
 
-(** How to handle a Frama-C menu. 
+(** How to handle a Frama-C menu.
     @since Boron-20100401 *)
-class menu_manager: ?packing:(GObj.widget -> unit) -> host:Gtk_helper.host ->
+class menu_manager: ?packing:(GObj.widget -> unit) -> Gtk_helper.host ->
   object
 
     (** {2 API for plug-ins} *)

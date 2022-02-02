@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,22 +44,22 @@ let pretty fmt = function
   | Value i -> Format.fprintf fmt "<%a>" Int.pretty i
 
 include Datatype.Make
-(struct
-  type t = i (*= Top | Value of Integer.t *)
-  let name = "Int_Base.t"
-  let structural_descr =
-    Structural_descr.t_sum [| [| Datatype.Integer.packed_descr |] |]
-  let reprs = Top :: List.map (fun v -> Value v) Datatype.Integer.reprs
-  let equal = equal
-  let compare = compare
-  let hash = hash
-  let rehash = Datatype.identity
-  let copy = Extlib.id
-  let internal_pretty_code = Datatype.undefined
-  let pretty = pretty
-  let varname = Datatype.undefined
-  let mem_project = Datatype.never_any_project
- end)
+    (struct
+      type t = i (*= Top | Value of Integer.t *)
+      let name = "Int_Base.t"
+      let structural_descr =
+        Structural_descr.t_sum [| [| Datatype.Integer.packed_descr |] |]
+      let reprs = Top :: List.map (fun v -> Value v) Datatype.Integer.reprs
+      let equal = equal
+      let compare = compare
+      let hash = hash
+      let rehash = Datatype.identity
+      let copy = Extlib.id
+      let internal_pretty_code = Datatype.undefined
+      let pretty = pretty
+      let varname = Datatype.undefined
+      let mem_project = Datatype.never_any_project
+    end)
 
 let minus_one = Value Int.minus_one
 let one = Value Int.one
@@ -69,8 +69,8 @@ let top = Top
 let is_top v = (v = Top)
 let neg x =
   match x with
-    | Value v -> Value (Int.neg v)
-    | Top -> x
+  | Value v -> Value (Int.neg v)
+  | Top -> x
 let inject i = Value i
 
 let project = function

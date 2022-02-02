@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -52,10 +52,16 @@ module Make_Memory (Value: Value) = struct
   module Initial_Values = struct let v = [] end
   module Deps = struct let l = [Ast.self] end
 
-  include Hptmap.Make (Base) (Value)(Hptmap.Comp_unused) (Initial_Values) (Deps)
+  include Hptmap.Make
+      (Base.Base) (Value) (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
   let cache_name s =
     Hptmap_sig.PersistentCache ("Value." ^ Value.name ^ "." ^ s)
+
+  let disjoint_union =
+    let cache = cache_name "union" in
+    let decide _key _v1 _v2 = assert false in
+    join ~cache ~symmetric:true ~idempotent:true ~decide
 
   let narrow =
     let module E = struct exception Bottom end in
@@ -170,7 +176,7 @@ module Make_Memory (Value: Value) = struct
 
 end
 
-module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
+module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   let table = Hashtbl.create 17
   let () =
@@ -180,9 +186,10 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
     try Some (Hashtbl.find table name)
     with Not_found -> None
 
-  include Make_Memory (Value)
+  module M = Make_Memory (Value)
+  include M
 
-  let name = Info.name
+  include Domain_builder.Complete (M)
 
   type state = t
   type value = Value.t
@@ -196,17 +203,16 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   (* This function returns the information known about the location
      corresponding to [_lv], so that it may be used by the engine during
      evaluation. *)
-  let extract_lval _oracle state _lv typ loc =
+  let extract_lval ~oracle:_ _context state _lv typ loc =
     let v = find loc typ state in
     `Value (v, None), Alarmset.all
 
-  let extract_expr _oracle _state _expr = `Value (Value.top, None), Alarmset.all
+  let extract_expr ~oracle:_ _context _state _expr =
+    `Value (Value.top, None), Alarmset.all
 
   let backward_location state _lval typ loc _value =
     let new_value = find loc typ state in
     `Value (loc, new_value)
-
-  let reduce_further _state _expr _value = []
 
   (* This function binds [loc] to [v], of type [typ], in [state].
      [v] can be [`Bottom], which means that its contents are guaranteed
@@ -258,7 +264,14 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
      abstraction of the domain itself. *)
   let assume _stmt _expr _pos = update
 
-  let start_call _stmt call _valuation state =
+  let start_recusive_call recursion state =
+    let state = remove_variables recursion.withdrawal state in
+    (* No collision should occur in the substitution. *)
+    let decide _key _v1 _v2 = assert false in
+    snd (replace_key ~decide recursion.base_substitution state)
+
+  let start_call _stmt call recursion _valuation state =
+    let state = Extlib.opt_fold start_recusive_call recursion state in
     let bind_argument state argument =
       let typ = argument.formal.vtype in
       let loc = Main_locations.PLoc.eval_varinfo argument.formal in
@@ -268,8 +281,16 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
     let state = List.fold_left bind_argument state call.arguments in
     `Value state
 
-  let finalize_call _stmt call ~pre:_ ~post =
+  let finalize_recursive_call ~pre recursion state =
+    let inter = inter_with_shape recursion.base_withdrawal pre in
+    let state = disjoint_union state inter in
+    (* No collision should occur in the substitution. *)
+    let decide _key _v1 _v2 = assert false in
+    snd (replace_key ~decide recursion.base_substitution state)
+
+  let finalize_call _stmt call recursion ~pre ~post =
     let kf_name = Kernel_function.get_name call.kf in
+    let post = Extlib.opt_fold (finalize_recursive_call ~pre) recursion post in
     match find_builtin kf_name, call.return with
     | None, _ | _, None   -> `Value post
     | Some f, Some return ->
@@ -296,13 +317,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   let enter_scope _kind _vars state = state
   let leave_scope _kf vars state = remove_variables vars state
 
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
-
   let logic_assign _assign location state = remove location state
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
 
   let empty () = top
   let initialize_variable _lval _location ~initialized:_ _value state = state
@@ -311,7 +326,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   let relate _kf _bases _state = Base.SetLattice.empty
 
   let filter _kf _kind bases state =
-    filter (fun elt -> Base.Hptset.mem elt bases) state
+    M.filter (fun elt -> Base.Hptset.mem elt bases) state
 
   let reuse _kf bases ~current_input ~previous_output =
     let cache = Hptmap_sig.NoCache in
@@ -323,14 +338,6 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
       ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
       current_input previous_output
 
-  let storage () = true
-end
-
-
-module Make_Domain (Info: sig val name: string end) (Value: Value) =
-struct
-  module M = Make_Internal (Info) (Value)
-  include Domain_builder.Complete (M)
   let add = M.add
   let find = M.find
   let remove = M.remove

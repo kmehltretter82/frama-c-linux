@@ -1,11 +1,12 @@
 /* run.config
- MODULE: projectified_status
+ SCRIPT: projectified_status
    OPT:
- MODULE: no_hyp
+ SCRIPT: no_hyp
    OPT:
- MODULE: multi_emitters
+ SCRIPT: multi_emitters
    OPT:
 */
+
 void main() {
   int x = 1;
   /*@ assert \true; */

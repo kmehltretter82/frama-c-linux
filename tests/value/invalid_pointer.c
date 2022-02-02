@@ -167,6 +167,24 @@ void object_pointer_predicate () {
   }
 }
 
+/* CERT C UB 62. An attempt is made to access, or generate a pointer to just
+   past, a flexible array member of a structure when the referenced object
+   provides no elements for that array (6.7.2.1). */
+struct sfam {
+  int len;
+  char fam[];
+};
+
+void flexible_array_member() {
+  struct sfam s1 = { 0 };
+  if (undet) {
+    char *p = s1.fam + 1; // UB 62 (generate a pointer ...)
+  }
+  if (undet) {
+    char *p = s1.fam;
+    *(p+1) = 0; // UB 62 (access a pointer ...)
+  }
+}
 
 void main () {
   pointer_computation ();
@@ -176,6 +194,7 @@ void main () {
   union_pointer ();
   write_pointer ();
   object_pointer_predicate ();
+  flexible_array_member();
    // should not emit an alarm
   signal (SIGUSR1, SIG_IGN);
   signal (SIGUSR2, SIG_ERR);

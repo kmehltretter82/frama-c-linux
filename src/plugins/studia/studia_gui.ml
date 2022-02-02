@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,14 +40,14 @@ let ask_for_lval (main_ui:Design.main_window_extension_points) kf =
       ~title:"Input lvalue expression" ""
   in
   match txt with None | Some "" -> None
-  | Some txt ->
-    try
-      let term_lval = !Db.Properties.Interp.term_lval kf txt in
-      Some (txt, term_lval)
-    with e ->
-      main_ui#error "[ask for lval] '%s' invalid expression: %s@."
-        txt (Printexc.to_string e);
-      None
+               | Some txt ->
+                 try
+                   let term_lval = !Db.Properties.Interp.term_lval kf txt in
+                   Some (txt, term_lval)
+                 with e ->
+                   main_ui#error "[ask for lval] '%s' invalid expression: %s@."
+                     txt (Printexc.to_string e);
+                   None
 
 (** [kf_stmt_opt] is used if we want to ask the lval to the user in a popup *)
 let get_lval_opt main_ui kf localizable =
@@ -71,45 +71,45 @@ let eval_tlval =
 
 module Kfs_containing_highlighted_stmt =
   Kernel_function.Make_Table
-      (Datatype.String.Set)
-      (struct
-        let name = "Studia.Kf_containing_highlighted_stmt"
-        let size = 7
-        let dependencies = 
-	  [ (*Dependencies are managed manually by Make_StmtSetState*) ]
-       end)
+    (Datatype.String.Set)
+    (struct
+      let name = "Studia.Kf_containing_highlighted_stmt"
+      let size = 7
+      let dependencies =
+        [ (*Dependencies are managed manually by Make_StmtSetState*) ]
+    end)
 
 let default_icon_name = "gtk-apply"
 let default_icon = Datatype.String.Set.singleton default_icon_name
 
 
 module Make_StmtMapState (Info:sig val name: string end) =
-  struct
-    module D = Datatype
-    include State_builder.Ref
-    (Stmt.Map.Make(Datatype.String.Set))
-    (struct
-       let name = Info.name
-       let dependencies = [ Db.Value.self ]
-       let default () = Stmt.Map.empty
-     end)
+struct
+  module D = Datatype
+  include State_builder.Ref
+      (Stmt.Map.Make(Datatype.String.Set))
+      (struct
+        let name = Info.name
+        let dependencies = [ Db.Value.self ]
+        let default () = Stmt.Map.empty
+      end)
 
-   let set s =
-     set s;
-     Kfs_containing_highlighted_stmt.clear ();
-     Stmt.Map.iter
-       (fun stmt s ->
+  let set s =
+    set s;
+    Kfs_containing_highlighted_stmt.clear ();
+    Stmt.Map.iter
+      (fun stmt s ->
          let kf = Kernel_function.find_englobing_kf stmt in
          let prev =
            try Kfs_containing_highlighted_stmt.find kf
            with Not_found -> D.String.Set.empty
          in
          let union = D.String.Set.union prev s in
-	 Kfs_containing_highlighted_stmt.replace kf union)
-       s;
-     !update_column `Contents
+         Kfs_containing_highlighted_stmt.replace kf union)
+      s;
+    !update_column `Contents
 
-  end
+end
 
 (*
 module type StudiaCmdSig = sig
@@ -134,11 +134,11 @@ struct
   let clear () = State.clear()
 
   let help_writes = ("[writes] "
-      ^"highlight the statements that writes to the location pointed to \
-        by D at L")
+                     ^"highlight the statements that writes to the location pointed to \
+                       by D at L")
   let help_reads = ("[reads] "
-      ^"highlight the statements that reads the location pointed to \
-        by D at L")
+                    ^"highlight the statements that reads the location pointed to \
+                      by D at L")
 
   let indirect_icon = Datatype.String.Set.singleton "gtk-jump-to"
 
@@ -161,8 +161,8 @@ struct
     in
     Options.feedback "%s computed" s;
     match r with
-      | [] -> clear (); s ^ " computed; no statement found."
-      | defs -> State.set (conv defs); s ^ " computed"
+    | [] -> clear (); s ^ " computed; no statement found."
+    | defs -> State.set (conv defs); s ^ " computed"
 
   let tag_stmt stmt =
     try
@@ -183,9 +183,9 @@ module StudiaState =
   State_builder.Option_ref
     (Stmt)
     (struct
-       let name = "Studia.Highlighter.StudiaState"
-       let dependencies = [ Db.Value.self ]
-     end)
+      let name = "Studia.Highlighter.StudiaState"
+      let dependencies = [ Db.Value.self ]
+    end)
 
 let reset () =
   StudiaState.clear ();
@@ -227,23 +227,23 @@ let highlighter (buffer:Design.reactive_buffer) localizable ~start ~stop =
 
 let check_value (main_ui:Design.main_window_extension_points) =
   Db.Value.is_computed () ||
-    let answer = GToolbox.question_box
+  let answer = GToolbox.question_box
       ~title:("Eva Needed")
       ~buttons:[ "Run"; "Cancel" ]
       ("Eva has to be run first.\nThis can take some time.\n"
        ^"Do you want to run Eva now ?")
-    in
-    answer = 1 &&
-        match main_ui#full_protect ~cancelable:true !Db.Value.compute with
-        | Some _ -> true
-        | None -> false
+  in
+  answer = 1 &&
+  match main_ui#full_protect ~cancelable:true !Db.Value.compute with
+  | Some _ -> true
+  | None -> false
 
 
 (** To add a sensitive/unsensitive menu item to a [factory].
     The menu item is insensitive when [arg_opt = None],
     else, when the item is selected, the callback is called with the argument.
     If [uses_value] is true, check if the value analysis has been computed.
- *)
+*)
 let add_item (main_ui:Design.main_window_extension_points) ~uses_value menu name arg_opt callback =
   (* add the menu item *)
   let item = GMenu.menu_item ~label:name () in
@@ -276,8 +276,8 @@ let add_item (main_ui:Design.main_window_extension_points) ~uses_value menu name
                  else false))
 
 let selector (popup_factory:GMenu.menu GMenu.factory)
-             (main_ui:Design.main_window_extension_points)
-             ~button localizable =
+    (main_ui:Design.main_window_extension_points)
+    ~button localizable =
   if button = 3 then begin
     let submenu = popup_factory#add_submenu "Studia" in
     let submenu_factory = new GMenu.factory submenu in
@@ -290,7 +290,7 @@ let selector (popup_factory:GMenu.menu GMenu.factory)
     let add_menu_item name callback =
       add_item main_ui ~uses_value:true submenu name arg
         (fun arg ->
-          main_ui#protect ~cancelable:true (fun () -> callback main_ui arg))
+           main_ui#protect ~cancelable:true (fun () -> callback main_ui arg))
     in
     add_menu_item "Writes" (callback `Writes);
     add_menu_item "Reads" (callback `Reads);
@@ -302,42 +302,42 @@ let selector (popup_factory:GMenu.menu GMenu.factory)
       "Help" (Some()) (fun _ -> help main_ui) ;
   end
 
-let filetree_decorate main_ui = 
+let filetree_decorate main_ui =
   main_ui#file_tree#append_pixbuf_column
     ~title:"Studia"
     (fun globs ->
-      let icons = function
-        | GFun ({svar = v }, _) ->
-          (try Kfs_containing_highlighted_stmt.find  (Globals.Functions.get v)
-           with Not_found -> Datatype.String.Set.empty)
-        |  _ -> Datatype.String.Set.empty
-      in
-      let ids =
-        if Kfs_containing_highlighted_stmt.length () <> 0 then
-          let icons = List.fold_left
-            (fun acc glob -> Datatype.String.Set.union (icons glob) acc)
-            Datatype.String.Set.empty globs
-          in
-          if Datatype.String.Set.is_empty icons
-          then Datatype.String.Set.singleton ""
-          else icons
-        else
-          Datatype.String.Set.singleton ""
-      in
-      let icons =
-        if Datatype.String.Set.mem default_icon_name ids then
-          [default_icon_name]
-        else
-          Datatype.String.Set.elements
-            (Datatype.String.Set.remove default_icon_name ids)
-      in
-      List.map (fun icon -> `STOCK_ID icon) icons
+       let icons = function
+         | GFun ({svar = v }, _) ->
+           (try Kfs_containing_highlighted_stmt.find  (Globals.Functions.get v)
+            with Not_found -> Datatype.String.Set.empty)
+         |  _ -> Datatype.String.Set.empty
+       in
+       let ids =
+         if Kfs_containing_highlighted_stmt.length () <> 0 then
+           let icons = List.fold_left
+               (fun acc glob -> Datatype.String.Set.union (icons glob) acc)
+               Datatype.String.Set.empty globs
+           in
+           if Datatype.String.Set.is_empty icons
+           then Datatype.String.Set.singleton ""
+           else icons
+         else
+           Datatype.String.Set.singleton ""
+       in
+       let icons =
+         if Datatype.String.Set.mem default_icon_name ids then
+           [default_icon_name]
+         else
+           Datatype.String.Set.elements
+             (Datatype.String.Set.remove default_icon_name ids)
+       in
+       List.map (fun icon -> `STOCK_ID icon) icons
     )
     (fun _ -> Kfs_containing_highlighted_stmt.length () <> 0)
-    
+
 let main main_ui =
   main_ui#register_source_selector selector;
   main_ui#register_source_highlighter highlighter;
   update_column := (filetree_decorate main_ui)
-    
+
 let () = Design.register_extension main

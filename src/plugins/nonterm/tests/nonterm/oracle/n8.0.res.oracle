@@ -34,11 +34,11 @@
   NON TERMINATING FUNCTION
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
-[nonterm] n8.i:17: Warning: unreachable return
-[nonterm] n8.i:22: Warning: unreachable implicit return
-[nonterm] n8.i:31: Warning: unreachable implicit return
-[nonterm] n8.i:37: Warning: unreachable return
-[nonterm] n8.i:41: Warning: 
+[nonterm:unreachable] n8.i:17: Warning: unreachable return
+[nonterm:unreachable] n8.i:22: Warning: unreachable implicit return
+[nonterm:unreachable] n8.i:31: Warning: unreachable implicit return
+[nonterm:unreachable] n8.i:37: Warning: unreachable return
+[nonterm:stmt] n8.i:41: Warning: 
   non-terminating loop
   stack: main
 [nonterm] Analysis done.

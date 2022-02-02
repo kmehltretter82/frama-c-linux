@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,7 +35,7 @@ module ValueCoverage: Parameter_sig.With_output
 module AstType: Parameter_sig.String
 (** Set the ASTs on which the metrics should be computed *)
 
-module OutputFile: Parameter_sig.String
+module OutputFile: Parameter_sig.Filepath
 (** Pretty print metrics to the given file.
     The output format will be recognized through the extension.
     Supported extensions are:

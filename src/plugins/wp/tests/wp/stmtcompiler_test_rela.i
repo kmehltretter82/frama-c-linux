@@ -1,5 +1,5 @@
 /* run.config_qualif
-   MODULE: stmtcompiler_test_rela
+  SCRIPT: @PTEST_NAME@
    OPT: -wp-msg-key shell
 */
 int empty (int c){

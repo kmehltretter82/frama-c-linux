@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,14 +24,15 @@
 
 let () =
   begin
-    Wutil.share := Fc_config.datadir;
+    Wutil.share := (Fc_config.datadir :> string);
     Wutil.flush := (fun msg -> Gui_parameters.warning "%s" msg);
   end
 
 let framac_logo, framac_icon =
   try
     let img ext =
-      Some (GdkPixbuf.from_file (Fc_config.datadir ^ "/frama-c." ^ ext))
+      Some (GdkPixbuf.from_file
+              ((Fc_config.datadir:>string) ^ "/frama-c." ^ ext))
     in
     img "png", img "ico"
   with

@@ -8,7 +8,7 @@ struct __anonstruct_ss_1 {
    struct s s2 ;
 };
 struct __anonstruct_ss_1 ss;
-int f(int * /*[10]*/ t, int n, int *ptr)
+int f(int t[10], int n, int *ptr)
 {
   int __retres;
   int tmp = *(t + n);

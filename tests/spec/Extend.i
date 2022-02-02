@@ -1,6 +1,6 @@
 /* run.config
 MODULE: @PTEST_NAME@
-OPT: -copy -kernel-warn-key=annot-error=active
+OPT: -no-autoload-plugins -copy -kernel-warn-key=annot-error=active
 */
 
 /*@ foo x == 0;

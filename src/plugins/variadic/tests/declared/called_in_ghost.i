@@ -1,9 +1,8 @@
 /* run.config
-   MODULE: @PTEST_NAME@
+ SCRIPT: @PTEST_NAME@
    OPT: -kernel-warn-key ghost:bad-use=inactive -print
 */
 // Note: we deactivate "ghost:bad-use" to check that printing goes right
-
 /*@ assigns \nothing ; */
 void function(int e, ...);
 

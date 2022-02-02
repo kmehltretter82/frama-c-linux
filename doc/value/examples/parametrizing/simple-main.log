@@ -6,7 +6,7 @@
   
 [eva] simple-main.c:3: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   argc ∈ [--..--]
   argv ∈ {{ NULL ; &S_argv[0] }}
   __retres ∈ UNINITIALIZED

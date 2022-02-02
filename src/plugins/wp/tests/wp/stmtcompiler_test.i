@@ -1,5 +1,5 @@
 /* run.config
-   MODULE: stmtcompiler_test
+ SCRIPT: @PTEST_NAME@
    OPT: -wp-msg-key shell
 */
 int empty (int c){

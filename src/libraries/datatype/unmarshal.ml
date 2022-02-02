@@ -82,7 +82,7 @@ let getword ch =
   let c1 = Char.code (input_char ch) in
   let c0 = Char.code (input_char ch) in
   Int32.logor (Int32.shift_left (Int32.of_int c3) 24)
-              (Int32.of_int ((c2 lsl 16) lor (c1 lsl 8) lor c0))
+    (Int32.of_int ((c2 lsl 16) lor (c1 lsl 8) lor c0))
 ;;
 
 let read8s ch =
@@ -193,11 +193,11 @@ let readfloat_little =
   | '1' -> readfloat_same
   | '6' -> readfloat_reverse
   | '5' ->
-     begin
-       fun ch v i ->
-       readblock ch v (i * 8 + 4) 4;
-       readblock ch v (i * 8) 4;
-     end
+    begin
+      fun ch v i ->
+        readblock ch v (i * 8 + 4) 4;
+        readblock ch v (i * 8) 4;
+    end
   | _ -> fun _ch _v _i -> failwith "input_value: non-standard floats"
 ;;
 
@@ -206,31 +206,31 @@ let readfloat_big =
   | '1' -> readfloat_reverse
   | '6' -> readfloat_same
   | '5' ->
-     begin
-       fun ch v i ->
-       readblock_rev ch v (i * 8) 4;
-       readblock_rev ch v (i * 8 + 4) 4;
-     end
+    begin
+      fun ch v i ->
+        readblock_rev ch v (i * 8) 4;
+        readblock_rev ch v (i * 8 + 4) 4;
+    end
   | _ -> fun _ch _v _i -> failwith "input_value: non-standard floats"
 ;;
 
 (* Auxiliary functions for handling closures. *)
 
 (* Not used by Frama-C, causing problems with ARM, see:
-http://lists.gforge.inria.fr/pipermail/frama-c-discuss/2013-August/003702.html
-let (code_area_start, cksum) =
-  let s = Marshal.to_string id [Marshal.Closures] in
-  let cksum = String.sub s 0x1E 16 in
-  let c0 = Char.code s.[0x1D] in
-  let c1 = Char.code s.[0x1C] in
-  let c2 = Char.code s.[0x1B] in
-  let c3 = Char.code s.[0x1A] in
-  let ofs = Int32.logor (Int32.shift_left (Int32.of_int c3) 24)
+   http://lists.gforge.inria.fr/pipermail/frama-c-discuss/2013-August/003702.html
+   let (code_area_start, cksum) =
+   let s = Marshal.to_string id [Marshal.Closures] in
+   let cksum = String.sub s 0x1E 16 in
+   let c0 = Char.code s.[0x1D] in
+   let c1 = Char.code s.[0x1C] in
+   let c2 = Char.code s.[0x1B] in
+   let c3 = Char.code s.[0x1A] in
+   let ofs = Int32.logor (Int32.shift_left (Int32.of_int c3) 24)
                         (Int32.of_int ((c2 lsl 16) lor (c1 lsl 8) lor c0))
-  in
-  let start = Obj.add_offset (Obj.field (Obj.repr id) 0) (Int32.neg ofs) in
-  (start, cksum)
-;;
+   in
+   let start = Obj.add_offset (Obj.field (Obj.repr id) 0) (Int32.neg ofs) in
+   (start, cksum)
+   ;;
 *)
 
 let check_const ch s =
@@ -351,7 +351,7 @@ let rec get_structure t context =
 ;;
 
 (* let intext_magic_number_small = "\x84\x95\xA6\xBE";;
-let intext_magic_number_big = "\x84\x95\xA6\xBF";;
+   let intext_magic_number_big = "\x84\x95\xA6\xBF";;
 *)
 
 let input_val ch t =
@@ -391,93 +391,93 @@ let input_val ch t =
       match code with
 
       | 0x00 (* CODE_INT8 *) ->
-          let v = Obj.repr (read8s ch) in
-          return stk (do_transform t v)
+        let v = Obj.repr (read8s ch) in
+        return stk (do_transform t v)
       | 0x01 (* CODE_INT16 *) ->
-          let v = Obj.repr (read16s ch) in
-          return stk (do_transform t v)
+        let v = Obj.repr (read16s ch) in
+        return stk (do_transform t v)
       | 0x02 (* CODE_INT32 *) ->
-          let v = Obj.repr (read32s ch) in
-          return stk (do_transform t v)
+        let v = Obj.repr (read32s ch) in
+        return stk (do_transform t v)
       | 0x03 (* CODE_INT64 *) ->
-          if arch_sixtyfour then begin
-            let v = Obj.repr (read64s ch) in
-            return stk (do_transform t v)
-          end else begin
-            failwith "input_value: integer too large"
-          end
+        if arch_sixtyfour then begin
+          let v = Obj.repr (read64s ch) in
+          return stk (do_transform t v)
+        end else begin
+          failwith "input_value: integer too large"
+        end
 
       | 0x04 (* CODE_SHARED8 *) ->
-          let ofs = read8u ch in
-          read_shared stk ofs
+        let ofs = read8u ch in
+        read_shared stk ofs
       | 0x05 (* CODE_SHARED16 *) ->
-          let ofs = read16u ch in
-          read_shared stk ofs
+        let ofs = read16u ch in
+        read_shared stk ofs
       | 0x06 (* CODE_SHARED32 *) ->
-          let ofs = read32u ch in
-          read_shared stk ofs
+        let ofs = read32u ch in
+        read_shared stk ofs
       | 0x14 (* CODE_SHARED64 *) ->
-          let ofs = read64u ch in
-          read_shared stk ofs
+        let ofs = read64u ch in
+        read_shared stk ofs
 
       | 0x08 (* CODE_BLOCK32 *) ->
-          let (tag, size) = readheader32 ch in
-          read_block stk t tag size
+        let (tag, size) = readheader32 ch in
+        read_block stk t tag size
       | 0x13 (* CODE_BLOCK64 *) ->
-          let (tag, size) = readheader64 ch in
-          read_block stk t tag size
+        let (tag, size) = readheader64 ch in
+        read_block stk t tag size
 
       | 0x09 (* CODE_STRING8 *) ->
-          let len = read8u ch in
-          read_string stk t len
+        let len = read8u ch in
+        read_string stk t len
       | 0x0A (* CODE_STRING32 *) ->
-          let len = read32u ch in
-          read_string stk t len
+        let len = read32u ch in
+        read_string stk t len
       | 0x15 (* CODE_STRING64 *) ->
-          let len = read64u ch in
-          read_string stk t len
+        let len = read64u ch in
+        read_string stk t len
 
       | 0x0C (* CODE_DOUBLE_LITTLE *) ->
-          read_double stk t readfloat_little
+        read_double stk t readfloat_little
       | 0x0B (* CODE_DOUBLE_BIG *) ->
-          read_double stk t readfloat_big
+        read_double stk t readfloat_big
       | 0x0E (* CODE_DOUBLE_ARRAY8_LITTLE *) ->
-          let len = read8u ch in
-          read_double_array stk t len readfloat_little
+        let len = read8u ch in
+        read_double_array stk t len readfloat_little
       | 0x0D (* CODE_DOUBLE_ARRAY8_BIG *) ->
-          let len = read8u ch in
-          read_double_array stk t len readfloat_big
+        let len = read8u ch in
+        read_double_array stk t len readfloat_big
       | 0x07 (* CODE_DOUBLE_ARRAY32_LITTLE *) ->
-          let len = read32u ch in
-          read_double_array stk t len readfloat_little
+        let len = read32u ch in
+        read_double_array stk t len readfloat_little
       | 0x0F (* CODE_DOUBLE_ARRAY32_BIG *) ->
-          let len = read32u ch in
-          read_double_array stk t len readfloat_big
+        let len = read32u ch in
+        read_double_array stk t len readfloat_big
       | 0x17 (* CODE_DOUBLE_ARRAY64_LITTLE *) ->
-          let len = read64u ch in
-          read_double_array stk t len readfloat_little
+        let len = read64u ch in
+        read_double_array stk t len readfloat_little
       | 0x16 (* CODE_DOUBLE_ARRAY64_BIG *) ->
-          let len = read64u ch in
-          read_double_array stk t len readfloat_big
+        let len = read64u ch in
+        read_double_array stk t len readfloat_big
 
       | 0x10 (* CODE_CODEPOINTER *) ->
-	assert false
-(* NOT USED BY Frama-C 
-          let ofs = getword ch in
-          check_const ch cksum "input_value: code mismatch";
-	  let offset_pointer = Obj.add_offset code_area_start ofs in
-          return stk (do_transform t offset_pointer) *)
+        assert false
+      (* NOT USED BY Frama-C
+                let ofs = getword ch in
+                check_const ch cksum "input_value: code mismatch";
+          let offset_pointer = Obj.add_offset code_area_start ofs in
+                return stk (do_transform t offset_pointer) *)
       | 0x11 (* CODE_INFIXPOINTER *) ->
-          let ofs = getword ch in
-          let clos = intern_rec [] t in
-          return stk (Obj.add_offset (Obj.repr clos) ofs)
+        let ofs = getword ch in
+        let clos = intern_rec [] t in
+        return stk (Obj.add_offset (Obj.repr clos) ofs)
 
       | 0x12 | 0x19 (* CODE_CUSTOM (deprecated) or CODE_CUSTOM_FIXED *) ->
-          let id = read_customident ch in
-          let v = read_custom ch id in
-          let dest = !ctr in
-          ctr := dest + 1;
-          return_block stk t v dest
+        let id = read_customident ch in
+        let v = read_custom ch id in
+        let dest = !ctr in
+        ctr := dest + 1;
+        return_block stk t v dest
 
       | 0x18 (* CODE_CUSTOM_LEN *) ->
         let id = read_customident ch in
@@ -492,48 +492,48 @@ let input_val ch t =
         return_block stk t v dest
 
       | _ when code >= 0x80 (* PREFIX_SMALL_BLOCK *) ->
-          let tag = code land 0xF in
-          let size = (code lsr 4) land 0x7 in
-          read_block stk t tag size
+        let tag = code land 0xF in
+        let size = (code lsr 4) land 0x7 in
+        read_block stk t tag size
       | _ when code >= 0x40 (* PREFIX_SMALL_INT *) ->
-          let v = Obj.repr (code land 0x3F) in
-          return stk (do_transform t v)
+        let v = Obj.repr (code land 0x3F) in
+        return stk (do_transform t v)
       | _ when code >= 0x20 (* PREFIX_SMALL_STRING *) ->
-          let len = code land 0x1F in
-          read_string stk t len
+        let len = code land 0x1F in
+        read_string stk t len
 
       | _ ->
-	  ill_formed (Printf.sprintf "code 0x%x" code)
+        ill_formed (Printf.sprintf "code 0x%x" code)
     in
     match t with
     | Dynamic f ->
-	intern_rec stk (f ())
+      intern_rec stk (f ())
     | Abstract
     | Structure (Array _ | Sum _ | Dependent_pair _)
     | Transform _
     | Return _ ->
-	read_ch ()
+      read_ch ()
 
   and read_block stk t tag size =
     (* read one block of the given tag and size *)
     let (t1, alloc) = get_structure t true in
     begin match t1 with
-    | Abstract -> ()
-    | Structure (Dependent_pair(_, _)) ->
-	if tag >= 1 || size != 2 then begin
-	  ill_formed "dep pair"
-	end
-    | Structure (Sum a) ->
-	if tag >= Array.length a || size != Array.length a.(tag)
+      | Abstract -> ()
+      | Structure (Dependent_pair(_, _)) ->
+        if tag >= 1 || size != 2 then begin
+          ill_formed "dep pair"
+        end
+      | Structure (Sum a) ->
+        if tag >= Array.length a || size != Array.length a.(tag)
         then begin
           let s = Format.sprintf
               "structure sum tag=%d size=%d len=%d len-tag=%d"
-	      tag size (Array.length a) (Array.length a.(tag))
+              tag size (Array.length a) (Array.length a.(tag))
           in
-	  ill_formed s
-	end
-    | Structure (Array _) -> ()
-    | _ -> assert false
+          ill_formed s
+        end
+      | Structure (Array _) -> ()
+      | _ -> assert false
     end;
     let v = if alloc then Obj.new_block tag size else Obj.repr size in
     if size > 0 then begin
@@ -582,9 +582,9 @@ let input_val ch t =
       match stk with
       | [] -> assert false
       | f :: _ ->
-          let p = LA.get patch (!ctr - ofs) in
-          LA.set patch (!ctr - ofs) ((f.st_ctr, f.st_cur) :: p);
-          return stk null
+        let p = LA.get patch (!ctr - ofs) in
+        LA.set patch (!ctr - ofs) ((f.st_ctr, f.st_cur) :: p);
+        return stk null
     end else begin
       return stk v
     end
@@ -593,18 +593,18 @@ let input_val ch t =
     match stk with
     | [] -> Obj.obj v
     | f :: stk1 ->
-	let sz =
-	  if Obj.is_int f.st_obj
-          then (Obj.obj f.st_obj : int)
-          else begin
-            Obj.set_field f.st_obj f.st_cur v;
-            Obj.size f.st_obj
-          end
-	in
-	f.st_cur <- f.st_cur + 1;
-	if f.st_cur >= sz
-	then return_block stk1 f.st_ty f.st_obj f.st_ctr
-	else intern_rec stk (get_field_type f.st_ty f.st_constr f.st_cur v)
+      let sz =
+        if Obj.is_int f.st_obj
+        then (Obj.obj f.st_obj : int)
+        else begin
+          Obj.set_field f.st_obj f.st_cur v;
+          Obj.size f.st_obj
+        end
+      in
+      f.st_cur <- f.st_cur + 1;
+      if f.st_cur >= sz
+      then return_block stk1 f.st_ty f.st_obj f.st_ctr
+      else intern_rec stk (get_field_type f.st_ty f.st_constr f.st_cur v)
 
   and return_block stk t v dest =  (* call alloc, patch, and return *)
     let res = do_transform t v in
@@ -647,7 +647,7 @@ register_custom "_j"
   (if arch_bigendian then
      if arch_sixtyfour then readint64_big64 else readint64_big32
    else
-     if arch_sixtyfour then readint64_little64 else readint64_little32
+   if arch_sixtyfour then readint64_little64 else readint64_little32
   )
 ;;
 
@@ -679,7 +679,7 @@ register_custom "_i"
   (if arch_bigendian then
      if arch_sixtyfour then readint32_big64 else readint32_big32
    else
-     if arch_sixtyfour then readint32_little64 else readint32_little32
+   if arch_sixtyfour then readint32_little64 else readint32_little32
   )
 ;;
 
@@ -719,7 +719,7 @@ register_custom "_n"
   (if arch_bigendian then
      if arch_sixtyfour then readnativeint_big64 else readnativeint_big32
    else
-     if arch_sixtyfour then readnativeint_little64 else readnativeint_little32
+   if arch_sixtyfour then readnativeint_little64 else readnativeint_little32
   )
 ;;
 
@@ -789,20 +789,20 @@ let t_hashtbl_unchangedhashs key value =
 let t_hashtbl_changedhashs create add key value =
   Dynamic
     (fun () ->
-      let new_hashtbl = create 27 in
-      let return_new_hashtbl () = Obj.repr new_hashtbl in
-      let rec bucket =
-	Transform
-	  (Structure (Sum [| [| key; value; bucket |] |]),
-	  fun cell ->
-	    ( match Obj.obj cell with
-	      Empty -> ()
-	    | Cons (k, v, _) ->
-		add new_hashtbl k v);
-	    Obj.repr Empty
-	  )
-      in
-      Return (t_hashtbl bucket, return_new_hashtbl))
+       let new_hashtbl = create 27 in
+       let return_new_hashtbl () = Obj.repr new_hashtbl in
+       let rec bucket =
+         Transform
+           (Structure (Sum [| [| key; value; bucket |] |]),
+            fun cell ->
+              ( match Obj.obj cell with
+                  Empty -> ()
+                | Cons (k, v, _) ->
+                  add new_hashtbl k v);
+              Obj.repr Empty
+           )
+       in
+       Return (t_hashtbl bucket, return_new_hashtbl))
 
 (**** Sets ****)
 

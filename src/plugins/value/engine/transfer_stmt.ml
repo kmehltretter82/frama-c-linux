@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,24 +27,24 @@ open Eval
 module type S = sig
   type state
   type value
-  type location
+  type loc
   val assign: state -> kinstr -> lval -> exp -> state or_bottom
   val assume: state -> stmt -> exp -> bool -> state or_bottom
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    state list or_bottom * Value_types.cacheable
+    (Partition.key * state) list * Eval.cacheable
   val check_unspecified_sequence:
     stmt ->
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
   val enter_scope: kernel_function -> varinfo list -> state -> state
   type call_result = {
-    states: state list or_bottom;
-    cacheable: Value_types.cacheable;
+    states: (Partition.key * state) list;
+    cacheable: Eval.cacheable;
     builtin: bool;
   }
   val compute_call_ref:
-    (stmt -> (location, value) call -> state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
 (* Reference filled in by the callwise-inout callback *)
@@ -80,15 +80,11 @@ let do_copy_at = function
       not (warn_indeterminate kf)
     with Not_found -> assert false
 
-(* Warn for arguments that contain uninitialized/escaping if:
-   - kf is a non-special leaf function (TODO: should we keep this?)
-   - the user asked for this *)
+(* Warn for call arguments that contain uninitialized/escaping except on
+   [Frama_C_show_each] directives or if the user disables these alarms. *)
 let is_determinate kf =
   let name = Kernel_function.get_name kf in
-  warn_indeterminate kf
-  || not (Kernel_function.is_definition kf (* Should we keep this? *)
-          || (name >= "Frama_C" && name < "Frama_D")
-          || Builtins.is_builtin_overridden kf)
+  warn_indeterminate kf && not (Ast_info.is_frama_c_builtin name)
 
 let subdivide_stmt = Value_util.get_subdivision
 
@@ -105,6 +101,17 @@ module DumpFileCounters =
       let name = "Transfer_stmt.DumpFileCounters"
     end)
 
+module VarHashtbl = Cil_datatype.Varinfo.Hashtbl
+
+let substitution_visitor table = object
+  inherit Visitor.frama_c_copy (Project.current ())
+
+  method! vvrbl varinfo =
+    match VarHashtbl.find_opt table varinfo with
+    | None -> Cil.JustCopy
+    | Some vi -> Cil.ChangeTo vi
+end
+
 module Make (Abstract: Abstractions.Eva) = struct
 
   module Value = Abstract.Val
@@ -114,7 +121,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   type state = Domain.t
   type value = Value.t
-  type location = Location.location
+  type loc = Location.location
 
   (* When using a product of domains, a product of states may have no
      concretization (if the domains have inferred incompatible properties)
@@ -289,42 +296,42 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* ------------------------------------------------------------------------ *)
 
   type call_result = {
-    states: state list or_bottom;
-    cacheable: Value_types.cacheable;
+    states: (Partition.key * state) list;
+    cacheable: cacheable;
     builtin: bool;
   }
 
   (* Forward reference to [Eval_funs.compute_call] *)
-  let compute_call_ref
-    : (stmt -> (location, value) call -> Domain.state -> call_result) ref
+  let compute_call_ref :
+    (stmt -> (loc, value) call -> recursion option -> state ->
+     call_result) ref
     = ref (fun _ -> assert false)
 
   (* Returns the result of a call, and a boolean that indicates whether a
      builtin has been used to interpret the call. *)
-  let process_call stmt call valuation state =
+  let process_call stmt call recursion valuation state =
     Value_util.push_call_stack call.kf (Kstmt stmt);
     let cleanup () =
       Value_util.pop_call_stack ();
       (* Changed by compute_call_ref, called from process_call *)
       Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
     in
-    try
+    let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
       let res =
         (* Process the call according to the domain decision. *)
-        match Domain.start_call stmt call domain_valuation state with
+        match Domain.start_call stmt call recursion domain_valuation state with
         | `Value state ->
           Domain.Store.register_initial_state (Value_util.call_stack ()) state;
-          !compute_call_ref stmt call state
+          !compute_call_ref stmt call recursion state
         | `Bottom ->
-          { states = `Bottom; cacheable = Value_types.Cacheable; builtin=false }
+          { states = []; cacheable = Cacheable; builtin=false }
       in
       cleanup ();
       res
-    with Db.Value.Aborted as e ->
-      InOutCallback.clear ();
-      cleanup ();
-      raise e
+    in
+    Value_util.protect process
+      ~cleanup:(fun () -> InOutCallback.clear (); cleanup ())
 
   (* ------------------- Retro propagation on formals ----------------------- *)
 
@@ -449,13 +456,11 @@ module Make (Abstract: Abstractions.Eva) = struct
     Kernel_function.get_formals kf @ locals
 
   (* Do the call to one function. *)
-  let do_one_call valuation stmt lv call state =
+  let do_one_call valuation stmt lv call recursion state =
     let kf_callee = call.kf in
     let pre = state in
     (* Process the call according to the domain decision. *)
-    let call_result = process_call stmt call valuation state in
-    call_result.cacheable,
-    call_result.states >>- fun result ->
+    let call_result = process_call stmt call recursion valuation state in
     let leaving_vars = leaving_vars kf_callee in
     (* Do not try to reduce concrete arguments if a builtin was used. *)
     let gather_reduced_arguments =
@@ -472,28 +477,21 @@ module Make (Abstract: Abstractions.Eva) = struct
       >>- fun reductions ->
       (* The formals (and the locals) of the called function leave scope. *)
       let post = Domain.leave_scope kf_callee leaving_vars state in
+      let recursion = Option.map Recursion.revert recursion in
       (* Computes the state after the call, from the post state at the end of
          the called function, and the pre state at the call site. *)
-      Domain.finalize_call stmt call ~pre ~post >>- fun state ->
+      Domain.finalize_call stmt call recursion ~pre ~post >>- fun state ->
       (* Backward propagates the [reductions] on the concrete arguments. *)
       reduce_arguments reductions state >>- fun state ->
       treat_return ~kf_callee lv call.return stmt state
-    and process_recursive state =
-      (* When the call is recursive, formals have not been added to the
-         domains. Do not reduce them, and more importantly, do not remove
-         them from the scope. (Because the instance from the initial,
-         non-recursive, call are still present.) *)
-      Domain.finalize_call stmt call ~pre ~post:state >>- fun state ->
-      treat_return ~kf_callee lv call.return stmt state
     in
     let states =
-      let process = if call.recursive then process_recursive else process in
       List.fold_left
-        (fun acc return -> Bottom.add_to_list (process return) acc)
-        [] result
+        (fun acc (k,x) -> Bottom.add_to_list (process x >>-: fun y -> k,y) acc)
+        [] call_result.states
     in
     InOutCallback.clear ();
-    Bottom.bot_of_list states
+    call_result.cacheable, states
 
 
   (* ------------------- Evaluation of the arguments ------------------------ *)
@@ -533,30 +531,45 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Create an Eval.call *)
   let create_call kf args =
-    let recursive = Recursion.is_recursive_call kf in
     let return = Library_functions.get_retres_vi kf in
+    let callstack = Value_util.call_stack () in
     let arguments, rest =
-      if recursive then
-        (* For recursive calls, we evaluate 'assigns \result \from \nothing'
-           using a specification. We generate a dummy [call] object in which
-           formals are not present. This way, domains will not overwrite
-           the formals of the recursive function (which would be present
-           in scope twice). *)
-        [], []
-      else
-        let formals = Kernel_function.get_formals kf in
-        let rec format_arguments acc args formals = match args, formals with
-          | _, [] -> acc, args
-          | [], _ -> assert false
-          | (concrete, avalue) :: args, formal :: formals ->
-            let argument = { formal ; concrete; avalue } in
-            format_arguments (argument :: acc)  args formals
-        in
-        let arguments, rest = format_arguments [] args formals in
-        let arguments = List.rev arguments in
-        arguments, rest
+      let formals = Kernel_function.get_formals kf in
+      let rec format_arguments acc args formals = match args, formals with
+        | _, [] -> acc, args
+        | [], _ -> assert false
+        | (concrete, avalue) :: args, formal :: formals ->
+          let argument = { formal ; concrete; avalue } in
+          format_arguments (argument :: acc)  args formals
+      in
+      let arguments, rest = format_arguments [] args formals in
+      let arguments = List.rev arguments in
+      arguments, rest
     in
-    {kf; arguments; rest; return; recursive}
+    {kf; callstack; arguments; rest; return; }
+
+  let replace_value visitor substitution = function
+    | Assign value -> Assign (Value.replace_base substitution value)
+    | Copy (loc, flagged) ->
+      let v = flagged.v >>-: Value.replace_base substitution in
+      let flagged = { flagged with v } in
+      let lloc = Location.replace_base substitution loc.lloc in
+      let lval = Visitor.visitFramacLval visitor loc.lval in
+      let loc = { loc with lval; lloc } in
+      Copy (loc, flagged)
+
+  let replace_recursive_call recursion call =
+    let tbl = VarHashtbl.create 9 in
+    List.iter (fun (v1, v2) -> VarHashtbl.add tbl v1 v2) recursion.substitution;
+    let visitor = substitution_visitor tbl in
+    let base_substitution = recursion.base_substitution in
+    let replace_arg argument =
+      let concrete = Visitor.visitFramacExpr visitor argument.concrete in
+      let avalue = replace_value visitor base_substitution argument.avalue in
+      { argument with concrete; avalue }
+    in
+    let arguments = List.map replace_arg call.arguments in
+    { call with arguments; }
 
   let make_call ~subdivnb kf arguments valuation state =
     (* Evaluate the arguments of the call. *)
@@ -564,8 +577,9 @@ module Make (Abstract: Abstractions.Eva) = struct
     compute_actuals ~subdivnb ~determinate valuation state arguments
     >>=: fun (args, valuation) ->
     let call = create_call kf args in
-    call, valuation
-
+    let recursion = Recursion.make call in
+    let call = Extlib.opt_fold replace_recursive_call recursion call in
+    call, recursion, valuation
 
   (* ----------------- show_each and dump_each directives ------------------- *)
 
@@ -716,15 +730,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     let cvalue_state = Domain.get_cvalue_or_top state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
     Db.Value.merge_initial_state (Value_util.call_stack ()) cvalue_state;
-    let result =
-      { Value_types.c_values = [ None, cvalue_state] ;
-        c_clobbered = Base.SetLattice.bottom;
-        c_from = None;
-        c_cacheable = Value_types.Cacheable;
-      }
-    in
     Db.Value.Call_Type_Value_Callbacks.apply
-      (`Builtin result, cvalue_state, stack_with_call)
+      (`Builtin None, cvalue_state, stack_with_call)
 
 
   (* --------------------- Process the call statement ---------------------- *)
@@ -737,39 +744,42 @@ module Make (Abstract: Abstractions.Eva) = struct
       Eval.eval_function_exp ~subdivnb funcexp ~args state
     in
     Alarmset.emit ki_call alarms;
-    let cacheable = ref Value_types.Cacheable in
+    let cacheable = ref Cacheable in
     let eval =
-      functions >>- fun functions ->
+      functions >>-: fun functions ->
       let current_kf = Value_util.current_kf () in
       let process_one_function kf valuation =
         (* The special Frama_C_ functions to print states are handled here. *)
         if apply_special_directives ~subdivnb kf args state
         then
           let () = apply_cvalue_callback kf ki_call state in
-          `Value ([state])
+          [(Partition.Key.empty, state)]
         else
           (* Create the call. *)
           let eval, alarms = make_call ~subdivnb kf args valuation state in
           Alarmset.emit ki_call alarms;
-          eval >>- fun (call, valuation) ->
-          (* Register the call. *)
-          Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
-          (* Do the call. *)
-          let c, states = do_one_call valuation stmt lval_option call state in
-          (* If needed, propagate that callers cannot be cached. *)
-          if c = Value_types.NoCacheCallers then
-            cacheable := Value_types.NoCacheCallers;
-          states
+          let states =
+            eval >>-: fun (call, recursion, valuation) ->
+            (* Register the call. *)
+            Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
+            (* Do the call. *)
+            let c, states =
+              do_one_call valuation stmt lval_option call recursion state
+            in
+            (* If needed, propagate that callers cannot be cached. *)
+            if c = NoCacheCallers then
+              cacheable := NoCacheCallers;
+            states
+          in
+          Bottom.list_of_bot states
       in
       (* Process each possible function apart, and append the result list. *)
       let process acc (kf, valuation) =
-        let res = process_one_function kf valuation in
-        (Bottom.list_of_bot res) @ acc
+        process_one_function kf valuation @ acc
       in
-      let states_list = List.fold_left process [] functions in
-      Bottom.bot_of_list states_list
+      List.fold_left process [] functions
     in
-    eval, !cacheable
+    Bottom.list_of_bot eval, !cacheable
 
   (* ------------------------------------------------------------------------ *)
   (*                            Unspecified Sequence                          *)

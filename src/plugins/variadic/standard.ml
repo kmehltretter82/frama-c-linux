@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,14 +23,10 @@
 open Cil_types
 open Va_types
 open Options
-module Cil = Extends.Cil
 module List = Extends.List
 module Typ = Extends.Typ
-module Build = Va_build
 
-
-let params_types params =
-  List.map (fun (_,typ,_) -> typ) params
+type call_builder  = Cil_types.exp -> Cil_types.exp list -> Cil_types.instr
 
 let pp_prototype name fmt tparams =
   Format.fprintf fmt "%s(%a)"
@@ -44,12 +40,23 @@ let pp_overload name fmt l =
 
 let new_globals : (global list) ref = ref []
 
+(* State to store the number of fallback functions generated for a particular
+   function name. This number is used to generate a unique function name. *)
+module Fallback_counts =
+  State_builder.Hashtbl
+    (Datatype.String.Hashtbl)
+    (Datatype.Int)
+    (struct
+      let size = 17
+      let name = "fallback_counts"
+      let dependencies = [ Options.Enabled.self; Options.Strict.self ]
+    end)
 
 (* ************************************************************************ *)
 (* Call translation                                                         *)
 (* ************************************************************************ *)
 
-exception Translate_call_exn
+exception Translate_call_exn of varinfo
 
 (* Extended integer types (e.g. int8_t, uint_least16_t, int_fast32_t)
    do not have their own character modifiers, but instead use macros that are
@@ -135,11 +142,11 @@ let cast_arg i paramtyp exp =
           (i + 1)
           pretty_typ argtyp pretty_typ paramtyp
     end;
-  Cil.mkCast ~force:false ~e:exp ~newt:paramtyp
+  Cil.mkCast ~force:false ~newt:paramtyp exp
 
 
 (* cast a list of args to the tparams list of types and remove unused args *)
-let match_args tparams args =
+let match_args ~callee tparams args =
   (* Remove unused arguments *)
   let paramcount = List.length tparams
   and argcount = List.length args in
@@ -152,7 +159,7 @@ let match_args tparams args =
     Self.warning ~current:true
       "Not enough arguments: expected %d, given %d."
       paramcount argcount;
-    raise Translate_call_exn
+    raise (Translate_call_exn callee)
   );
 
   (* Translate params *)
@@ -163,12 +170,72 @@ let match_args tparams args =
 (* translate a call by applying argument matching/pruning and changing
    callee *)
 let match_call ~loc ~fundec scope mk_call new_callee new_tparams args =
-  let new_args, unused_args = match_args new_tparams args in
+  let new_args, unused_args = match_args ~callee:new_callee new_tparams args in
   let call = mk_call (Cil.evar ~loc new_callee) new_args in
   let reads =
     List.map (fun e -> Cil.mkPureExprInstr ~fundec ~scope e) unused_args
   in
   reads @ [call]
+
+(* ************************************************************************ *)
+(* Fallback calls                                                           *)
+(* ************************************************************************ *)
+
+let fallback_fun_call ~callee loc mk_call vf args =
+  let build_fallback_fun ~vf args =
+    let module Build =
+      Cil_builder.Stateful (struct let loc = vf.vf_decl.vdecl end)
+    in
+
+    (* Choose function name *)
+    let name = callee.vname in
+    let vorig_name = callee.vorig_name in
+    let count =
+      try Fallback_counts.find name
+      with Not_found -> 0
+    in
+    let count = count + 1 in
+    Fallback_counts.replace name count;
+    let new_name = name ^ "_fallback_" ^ (string_of_int count) in
+
+    (* Start building the function *)
+    let funvar = Build.open_function ~vorig_name new_name in
+
+    (* Set function return type and attributes *)
+    let ret_typ, params, _, attrs = Cil.splitFunctionType vf.vf_original_type in
+    Build.set_return_type' ret_typ;
+    List.iter Build.add_attribute attrs;
+    Build.add_stdlib_generated ();
+
+    (* Add parameters *)
+    let fixed_params_count = Typ.params_count vf.vf_original_type in
+    let add_static_param (name,typ,attributes) =
+      ignore (Build.parameter ~attributes typ name)
+    and add_variadic_param i e =
+      let typ = Cil.typeOf e in
+      ignore (Build.parameter typ ("param" ^ string_of_int i))
+    in
+    List.iter add_static_param (Option.get params);
+    List.iteri add_variadic_param (List.drop fixed_params_count args);
+
+    (* Build the default behaviour *)
+    let glob = Build.finish_declaration ~register:false () in
+    glob, Build.cil_varinfo funvar
+  in
+
+  (* Create the new callee *)
+  let glob, new_callee = build_fallback_fun ~vf args in
+  new_globals := glob :: !new_globals;
+
+  (* Store the translation *)
+  Replacements.add new_callee vf.vf_decl;
+
+  (* Translate the call *)
+  Self.result ~current:true ~level:2
+    "Fallback translation of call %s to a call to the specialized version %s."
+    vf.vf_decl.vorig_name new_callee.vname;
+  let call = mk_call (Cil.evar ~loc new_callee) args in
+  [call]
 
 (* ************************************************************************ *)
 (* Aggregator calls                                                         *)
@@ -178,8 +245,8 @@ let find_null exp_list =
   List.ifind (fun e -> Cil.isZero (Cil.constFold false e)) exp_list
 
 
-let aggregator_call
-    ~fundec ~ghost {a_target; a_pos; a_type; a_param} scope loc mk_call vf args =
+let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
+  let {a_target; a_pos; a_type; a_param} = aggregator in
   let name = vf.vf_decl.vorig_name
   and tparams = Typ.params_types a_target.vtype
   and pname, ptyp = a_param in
@@ -191,7 +258,7 @@ let aggregator_call
     Self.warning ~current:true
       "Not enough arguments: expected %d, given %d."
       paramcount argcount;
-    raise Translate_call_exn;
+    raise (Translate_call_exn vf.vf_decl);
   end;
 
   (* Compute the size of the aggregation *)
@@ -202,7 +269,7 @@ let aggregator_call
         with Not_found ->
           Self.warning ~current:true
             "Failed to find a sentinel (NULL pointer) in the argument list.";
-          raise Translate_call_exn;
+          raise (Translate_call_exn vf.vf_decl);
       end
   in
 
@@ -210,7 +277,7 @@ let aggregator_call
   let tparams_left = List.take a_pos tparams in
   let tparams_right = List.drop (a_pos + 1) tparams in
   let new_tparams = tparams_left @ List.make size ptyp @ tparams_right in
-  let new_args, unused_args = match_args new_tparams args in
+  let new_args, unused_args = match_args ~callee:vf.vf_decl new_tparams args in
 
   (* Split the arguments *)
   let args_left, args_rem = List.break a_pos new_args in
@@ -221,15 +288,21 @@ let aggregator_call
     "Translating call to %s to a call to %s."
     name a_target.vorig_name;
   let pname = if pname = "" then "param" else pname in
-  let vaggr, assigns =
-    Build.array_init ~loc fundec ~ghost scope pname ptyp args_middle
+
+  let module Build = Cil_builder.Stateful (struct let loc = loc end) in
+  Build.open_block ~into:fundec ~ghost ();
+  let init = match args_middle with (* C standard forbids arrays of size 0 *)
+    | [] -> [Build.of_init (Cil.makeZeroInit ~loc ptyp)]
+    | l -> List.map Build.of_exp l
   in
-  let new_arg = Cil.mkAddrOrStartOf ~loc (Cil.var vaggr) in
-  let new_args = args_left @ [new_arg] @ args_right in
-  let new_args,_ = match_args tparams new_args in
-  let call = mk_call (Cil.evar ~loc a_target) new_args in
-  let reads = List.map (Cil.mkPureExprInstr ~fundec ~scope ~loc) unused_args in
-  assigns :: reads @ [call]
+  let size = List.length init in
+  let vaggr = Build.(local (array ~size (of_ctyp ptyp)) pname ~init) in
+  let new_args = args_left @ [Build.(cil_exp ~loc (addr vaggr))] @ args_right in
+  let new_args,_ = match_args ~callee:vf.vf_decl tparams new_args in
+  Build.(List.iter pure (List.map of_exp unused_args));
+  Build.of_instr (mk_call (Cil.evar ~loc a_target) new_args);
+  Build.finish_instr_list ~scope ()
+
 
 (* ************************************************************************ *)
 (* Overloads calls                                                          *)
@@ -280,7 +353,7 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
          @[<v>       %a@]"
         name (pp_overload name) overload
         (pp_prototype name) (List.map Cil.typeOf args);
-      raise Translate_call_exn;
+      raise (Translate_call_exn vf.vf_decl);
     | [(tparams,vi)] -> (* Exactly one matching prototype *)
       tparams, vi
     | l -> (* Several matching prototypes *)
@@ -289,7 +362,7 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
          %a"
         name
         (pp_overload name) l;
-      raise Translate_call_exn;
+      raise (Translate_call_exn vf.vf_decl);
   in
 
   (* Store the translation *)
@@ -327,23 +400,23 @@ let find_global env name =
 
 let find_predicate name =
   match Logic_env.find_all_logic_functions name with
-  | f :: _q -> Some f (* TODO: should we warn in case of overloading? *)
+  | f :: _q -> f (* TODO: should we warn in case of overloading? *)
   | [] ->
     Self.warning ~once:true
       "Unable to locate ACSL predicate %s which should be in the Frama-C LibC. \
        Correct specifications can't be generated."
       name;
-    None
+    raise Not_found
 
 let find_field env structname fieldname =
   try
     let compinfo = Environment.find_struct env structname in
-    Some (Cil.getCompField compinfo fieldname)
+    Cil.getCompField compinfo fieldname
   with Not_found ->
     Self.warning ~once:true
       "Unable to locate %s field %s."
       structname fieldname;
-    None
+    raise Not_found
 
 let find_predicate_by_width typ narrow_name wide_name =
   match Cil.unrollTypeDeep typ with
@@ -358,189 +431,167 @@ let find_predicate_by_width typ narrow_name wide_name =
     Self.warning ~current:true
       "expected single/wide character pointer type, got %a (%a, unrolled %a)"
       Printer.pp_typ typ Cil_types_debug.pp_typ typ Cil_types_debug.pp_typ (Cil.unrollTypeDeep typ);
-    None
+    raise Not_found
 
-let build_fun_spec env loc vf format_fun tvparams formals =
+let valid_read_string typ =
+  find_predicate_by_width typ "valid_read_string" "valid_read_wstring"
+
+let valid_read_nstring typ =
+  find_predicate_by_width typ "valid_read_nstring" "valid_read_nwstring"
+
+let format_length typ =
+  find_predicate_by_width typ "format_length" "wformat_length"
+
+
+let build_specialized_fun env vf format_fun tvparams =
   let open Format_types in
-  let _ = () in
-  let fixed_params_count = Typ.params_count vf.vf_original_type in
-  let sformals, vformals = List.break fixed_params_count formals in
-  let here = Logic_const.here_label in
+  let module Build =
+    Cil_builder.Stateful (struct let loc = vf.vf_decl.vdecl end)
+  in
+
+  (* Choose function name *)
+  let name = vf.vf_decl.vorig_name in
+  vf.vf_specialization_count <- vf.vf_specialization_count + 1;
+  let new_name = name ^ "_va_" ^ (string_of_int vf.vf_specialization_count) in
+
+  (* Start building the function *)
+  let funvar = Build.open_function ~vorig_name:name new_name in
+
+  (* Set function return type and attributes *)
+  let ret_typ, params, _, attrs = Cil.splitFunctionType vf.vf_original_type in
+  Build.set_return_type' ret_typ;
+  List.iter Build.add_attribute attrs;
+  Build.add_stdlib_generated ();
+
+  (* Add parameters *)
+  let fresh_param_name =
+    let counter = ref 0 in
+    fun () ->
+      let p = "param" ^ string_of_int !counter in
+      incr counter;
+      p
+  in
+  let add_static_param (name,typ,attributes) =
+    (* create a new name for parameters which does not have one *)
+    let name = if name = "" then fresh_param_name () else name in
+    Build.parameter ~attributes typ name
+  and add_variadic_param (typ,_dir) =
+    let typ = if Cil.isIntegralType typ then
+        Cil.integralPromotion typ
+      else
+        typ
+    in
+    Build.parameter typ (fresh_param_name ())
+  in
+  let sformals = List.map add_static_param (Option.get params)
+  and vformals = List.map add_variadic_param tvparams
+  in
+
 
   (* Spec *)
-  let sources = ref []
-  and dests = ref []
-  and requires = ref []
-  and ensures = ref [] in
-  let iterm lval =
-    Logic_const.new_identified_term (Build.tlval ~loc lval)
-  and insert x t =
-    t := x :: !t
+  let sources = ref [] and dests = ref [] in
+  let add_source ?(indirect=false) s =
+    let s = (s :> Build.source) in
+    sources := (if indirect then Build.indirect s else s) :: !sources
+  and add_dest d =
+    dests := (d :> Build.exp) :: !dests
   in
-  let insert_source ?(indirect=false) lval =
-    let itlval = iterm lval in
-    let it_content = if indirect then
-        { itlval.it_content with
-          term_name = "indirect" :: itlval.it_content.term_name }
-      else itlval.it_content
-    in
-    let itlval = { itlval with Cil_types.it_content } in
-    insert itlval sources
-  and insert_dest lval =
-    insert (iterm lval) dests
-  and insert_require pred =
-    insert (Logic_const.new_predicate pred) requires
-  and insert_ensure pred =
-    insert (Normal, Logic_const.new_predicate pred) ensures
+  (* Add the lval to the list of sources/dests *)
+  let add_lval ~indirect lval = function
+    | (`ArgIn | `ArgInArray _) -> add_source ~indirect lval
+    | (`ArgOut | `ArgOutArray) -> add_dest lval
+    | `ArgInOut -> add_source ~indirect lval; add_dest lval
   in
-  let add_lval ~indirect (lval,dir) =
-    (* Add the lval to the list of sources/dests *)
-    begin match dir with
-      | (`ArgIn | `ArgInArray _) -> insert_source ~indirect lval
-      | (`ArgOut | `ArgOutArray) -> insert_dest lval
-      | `ArgInOut -> insert_source ~indirect lval; insert_dest lval
-    end
-  in
-  let add_var ?pos (vi,dir) =
+  let add_var ?pos ~indirect (v : Build.var) dir =
+    let ty = Build.cil_typeof v in
     (* Use the appropriate logical lval *)
     let lval = match dir with
-      | `ArgIn -> Build.lvar vi
-      | (`ArgInArray _ | `ArgOutArray) -> Build.trange_from_vi ~loc vi
-      | (`ArgOut | `ArgInOut) -> Build.tvarmem ~loc vi
+      | `ArgIn -> (v :> Build.lval)
+      | (`ArgInArray _ | `ArgOutArray) -> Build.(index v whole_right)
+      | (`ArgOut | `ArgInOut) -> Build.(mem v)
     in
+    add_lval ~indirect lval dir;
     (* Build requires/ensures *)
-    let term = Build.tvar ~loc vi in
-    begin match dir with
+    try match dir with
       | `ArgInArray None ->
-        let pred =
-          find_predicate_by_width vi.vtype "valid_read_string" "valid_read_wstring"
-        in
-        begin match pred with
-          | Some logic_info ->
-            let labels = List.map (fun _ -> here) logic_info.l_labels in
-            let p = Logic_const.papp ~loc (logic_info, labels, [term]) in
-            insert_require p
-          | None -> ()
-        end
+        Build.(requires (app (valid_read_string ty) [here] [v]))
 
       | `ArgInArray (Some precision) ->
-        assert (pos <> None);
-        let pred =
-          find_predicate_by_width vi.vtype "valid_read_nstring" "valid_read_nwstring"
+        let nterm = match precision with
+          | PStar ->
+            let size_arg = List.nth vformals (Option.get pos - 1) in
+            Build.(cast integer size_arg)
+          | PInt n ->
+            Build.of_int n
         in
-        begin match pred with
-          | Some logic_info ->
-            let labels = List.map (fun _ -> here) logic_info.l_labels in
-            let nterm = match precision with
-              | PStar ->
-                let n_vi = List.nth vformals (Option.get pos) in
-                Logic_utils.numeric_coerce Linteger (Build.tvar ~loc n_vi)
-              | PInt n -> Cil.lconstant ~loc (Integer.of_int n)
-            in
-            let p = Logic_const.papp ~loc (logic_info, labels, [term; nterm]) in
-            insert_require p
-          | None -> ()
-        end
+        Build.(requires (app (valid_read_nstring ty) [here] [(v :> Build.exp) ; nterm]))
 
       | `ArgOut ->
-        insert_require (Logic_const.pvalid ~loc (here,term));
-        insert_ensure (Logic_const.pinitialized ~loc (here,term))
+        Build.(requires (valid v));
+        Build.(ensures (initialized v))
 
       | _ -> ()
-    end;
-    (* Cil.hasAttribute "const" *)
-    add_lval (lval,dir)
+    with Not_found -> () (* Predicate not found *)
   in
-  let make_indirect iterm =
-    (* Add "indirect" to an identified term, if it isn't already *)
-    if List.mem "indirect" iterm.it_content.term_name then iterm
-    else
-      let it_content =
-        { iterm.it_content with
-          term_name = "indirect" :: iterm.it_content.term_name }
-      in
-      { iterm with it_content }
-  in
+
 
   (* Build variadic parameter source/dest list *)
-  let dirs = List.map snd tvparams in
-  let l = List.combine vformals dirs in
-  let pos = ref (-1) in
-  List.iter (incr pos; add_var ~indirect:false ~pos:!pos) l;
+  let l = List.combine vformals tvparams in
+  List.iteri (fun pos (v,(_,dir)) -> add_var ~indirect:false ~pos v dir) l;
 
   (* Add format source and additional parameters *)
-  let fmt_vi = List.nth sformals format_fun.f_format_pos in
-  add_var ~indirect:true (fmt_vi, `ArgInArray None);
+  let fmt = List.nth sformals format_fun.f_format_pos in
+  add_var ~indirect:true fmt (`ArgInArray None);
 
   (* Add buffer source/dest *)
-  let add_stream vi =
+  let add_stream v =
     (* assigns stream->__fc_FILE_data
          \from stream->__fc_FILE_data, __fc_FILE_id *)
-    begin match find_field env "__fc_FILE" "__fc_FILE_data" with
-      | Some fieldinfo ->
-        let varfield = Build.tvarfield ~loc vi fieldinfo in
-        add_lval ~indirect:false (varfield, `ArgInOut)
-      | None ->
-        add_var ~indirect:false (vi, `ArgInOut)
-    end;
-    begin match find_field env "__fc_FILE" "__fc_FILE_id" with
-      | Some fieldinfo ->
-        let varfield = Build.tvarfield ~loc vi fieldinfo in
-        add_lval ~indirect:true (varfield, `ArgIn)
-      | None -> ()
-    end
+    try
+      let f_data = find_field env "__fc_FILE" "__fc_FILE_data"
+      and f_id = find_field env "__fc_FILE" "__fc_FILE_id" in
+      add_lval ~indirect:false Build.(field v f_data) `ArgInOut;
+      add_lval ~indirect:true Build.(field v f_id) `ArgIn
+    with Not_found ->
+      add_var ~indirect:false v `ArgInOut
   in
 
   (* Add a bounded buffer *)
-  let add_buffer vi_buffer vi_size =
-    add_var ~indirect:true (vi_size, `ArgIn);
+  let add_buffer buffer size =
+    add_var ~indirect:true size `ArgIn;
     (* this is an snprintf-like function; compute and add its precondition:
        \valid(s + (0..n-1)) || \valid(s + (0..format_length(format)-1)) *)
-    let make_valid_range tvalid_length =
-      let tvar = Build.tvar ~loc vi_buffer
-      and tmin = Build.tzero ~loc
-      and tmax = Build.tminus ~loc tvalid_length (Build.tone ~loc) in
-      let toffs = Build.trange ~loc (Some tmin) (Some tmax) in
-      let term = Build.tbinop ~loc PlusPI tvar toffs in
-      Logic_const.pvalid ~loc (here, term)
+    let valid_range length =
+      Build.(valid (buffer + (zero -- (length - one))))
     in
-    let size_var = Build.tvar ~loc vi_size in
-    let left_pred = make_valid_range size_var in
-    let pred =
-      find_predicate_by_width vi_buffer.vtype "format_length" "wformat_length"
-    in
-    match pred with
-    | Some format_length ->
-      let labels = List.map (fun _ -> here) format_length.l_labels in
-      let fmt_var = Build.tvar ~loc fmt_vi in
-      let flen_app =
-        try Build.tapp ~loc format_length labels [fmt_var]
-        with Build.NotAFunction ->
-          Self.abort ~current:true
-            "%a should be a logic function, not a predicate"
-            Printer.pp_logic_var format_length.l_var_info
-      in
-      let right_pred = make_valid_range flen_app in
-      let p = Logic_const.por ~loc (left_pred, right_pred) in
-      insert_require p
-    | None -> insert_require left_pred
+    let left_pred = valid_range size in
+    try
+      let flen = format_length (Build.cil_typeof buffer) in
+      let right_pred = Build.(valid_range (app flen [here] [fmt])) in
+      Build.(requires (logor left_pred right_pred))
+    with
+    | Not_found -> Build.requires left_pred
+    | Build.NotAFunction li ->
+      Self.abort ~current:true
+        "%a should be a logic function, not a predicate"
+        Printer.pp_logic_var li.l_var_info
   in
 
   begin match format_fun.f_buffer, format_fun.f_kind with
     | StdIO, ScanfLike ->
       begin match find_global env "__fc_stdin" with
-        | Some vi -> add_stream vi
+        | Some vi -> add_stream (Build.var vi)
         | None -> ()
       end
     | StdIO, PrintfLike ->
       begin match find_global env "__fc_stdout" with
-        | Some vi -> add_stream vi
+        | Some vi -> add_stream (Build.var vi)
         | None -> ()
       end
     | Arg (i, _), ScanfLike ->
-      add_var ~indirect:true (List.nth sformals i, `ArgInArray None)
+      add_var ~indirect:true (List.nth sformals i) (`ArgInArray None)
     | Arg (i, size_pos), PrintfLike ->
-      add_var ~indirect:true (List.nth sformals i, `ArgOutArray);
+      add_var ~indirect:true (List.nth sformals i) (`ArgOutArray);
       begin match size_pos with
         | Some n ->
           add_buffer (List.nth sformals i) (List.nth sformals n)
@@ -550,40 +601,126 @@ let build_fun_spec env loc vf format_fun tvparams formals =
       add_stream (List.nth sformals i)
     | File i, _ ->
       let file = List.nth sformals i in
-      add_var ~indirect:true (file, `ArgIn);
+      add_var ~indirect:true file `ArgIn;
     | Syslog, _ -> ()
   end;
 
-  (* Build the assigns clause (without \result, for now; it will be added
-     separately) *)
-  let froms = List.map (fun iterm -> iterm, From !sources) !dests in
-
-  (* Add return value dest: it is different from above since it is _indirectly_
-     assigned from all sources *)
-  let rettyp = Cil.getReturnType vf.vf_decl.vtype in
-  let froms_for_result =
-    if Cil.isVoidType rettyp then []
-    else
-      [iterm (Build.tresult rettyp),
-       From (List.map make_indirect !sources)]
-  in
-  let assigns = Writes (froms_for_result @ froms) in
+  (* assign \result \from indirect:sources *)
+  if not (Cil.isVoidType ret_typ) then
+    Build.(assigns [result] (List.map indirect !sources));
+  (* assigns dests \from sources *)
+  Build.assigns !dests !sources;
 
   (* Build the default behaviour *)
-  let bhv = Cil.mk_behavior ~assigns
-      ~requires:!requires ~post_cond:!ensures () in
-  { (Cil.empty_funspec ()) with spec_behavior = [bhv] }
+  let glob = Build.finish_declaration ~register:false () in
+  glob, Build.cil_varinfo funvar
 
 
 (* --- Call translation --- *)
 
-let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
-  let name = vf.vf_decl.vorig_name
-  and params = Typ.params vf.vf_decl.vtype in
-  (* Remove the va_param parameter added during the declaration visit *)
-  let fixed_params_count = Typ.params_count vf.vf_original_type in
-  let sparams = List.take fixed_params_count params in
+let format_of_ikind = function
+  | IBool -> Some `hh, `u
+  | IChar -> None, `c
+  | ISChar -> Some `hh, `d
+  | IUChar -> Some `hh, `u
+  | IInt -> None, `d
+  | IUInt -> None, `u
+  | IShort -> Some `h, `d
+  | IUShort -> Some `h, `u
+  | ILong -> Some `l, `d
+  | IULong -> Some `l, `u
+  | ILongLong -> Some `ll, `d
+  | IULongLong -> Some `ll, `u
 
+let format_of_fkind k = function
+  | FFloat -> None, `f
+  | FDouble ->
+    (match k with
+     | Format_types.PrintfLike -> None, `f
+     | ScanfLike -> Some `l, `f)
+  | FLongDouble -> Some `L, `f
+
+let rec format_of_type vf k t =
+  match t with
+  | TInt (ikind,_) | TEnum ({ekind = ikind},_) -> format_of_ikind ikind
+  | TFloat (fkind,_) -> format_of_fkind k fkind
+  | TPtr(_,_) ->
+    (* technically, we might still want to write/read the actual pointer,
+       but this is not the most likely possibility. *)
+    if Cil.isCharPtrType t then
+      None, `s
+    else
+      None, `p
+  | TNamed ({tname;ttype},_) ->
+    (match tname with
+     | "size_t" -> Some `z, `u
+     | "ptrdiff_t" -> Some `t, `d
+     | "intmax_t" -> Some `j, `d
+     | "uintmax_t" -> Some `j, `u
+     (* not really standard, but that's what glibc does. *)
+     | "ssize_t" -> Some `z, `d
+     | _ -> format_of_type vf k ttype
+    )
+  (* in the case of a scanf-like function, it might happen
+     that we pass a void* whose actual type is coherent with
+     the format string itself, but this can't really be checked
+     here.
+  *)
+  | TVoid _ -> raise (Translate_call_exn vf.vf_decl)
+
+  (* these cases should not happen anyway *)
+  | TComp _
+  | TFun _
+  | TArray _
+  | TBuiltin_va_list _ -> raise (Translate_call_exn vf.vf_decl)
+
+let infer_format_from_args vf format_fun args =
+  let args = List.drop (format_fun.f_format_pos + 1) args in
+  let f_format (l,s) =
+    Format_types.(
+      Specification
+        { f_flags = [];
+          f_field_width = None;
+          f_precision = None;
+          f_length_modifier = l;
+          f_conversion_specifier = s;
+          f_capitalize = false;
+        })
+  in
+  let s_format (l,s) =
+    Format_types.(
+      Specification
+        { s_assignment_suppression = false;
+          s_field_width = None;
+          s_length_modifier = l;
+          s_conversion_specifier = s;
+        }
+    )
+  in
+  let treat_one_arg arg =
+    let t = Cil.typeOf arg in
+    let t =
+      match format_fun.f_kind with
+      | PrintfLike -> t
+      | ScanfLike ->
+        if not (Cil.isPointerType t) then begin
+          let source = fst arg.eloc in
+          Self.warning ~source
+            "Expecting pointer as parameter of scanf function. \
+             Argument %a has type %a"
+            Printer.pp_exp arg Printer.pp_typ t;
+          raise (Translate_call_exn vf.vf_decl);
+        end;
+        Cil.typeOf_pointed t
+    in
+    format_of_type vf format_fun.f_kind t
+  in
+  let format = List.map treat_one_arg args in
+  match format_fun.f_kind with
+  | PrintfLike -> Format_types.FFormat (List.map f_format format)
+  | ScanfLike -> Format_types.SFormat (List.map s_format format)
+
+let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   (* Extract the format if possible *)
   let format =
     try
@@ -591,12 +728,14 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
       match static_string format_arg with
       | None ->
         Self.warning ~current:true
-          "Call to function %s with non-static format argument:@ \
-           no specification will be generated." name;
-        raise Translate_call_exn (* No syntactic hint *)
+          "Call to function %s with non-static format argument: \
+           assuming that parameters are coherent with the format, and that \
+           no %%n specifiers are present in the actual string."
+          vf.vf_decl.vorig_name;
+        infer_format_from_args vf format_fun args
       | Some s -> Format_parser.parse_format format_fun.f_kind s
     with
-    | Format_parser.Invalid_format -> raise Translate_call_exn
+    | Format_parser.Invalid_format -> raise (Translate_call_exn vf.vf_decl)
   in
 
   (* Try to type expected parameters if possible *)
@@ -611,31 +750,11 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
          Note that due to cleanup, the type may have been defined in the \
          original code but not used anywhere."
         type_name;
-      raise Translate_call_exn
+      raise (Translate_call_exn vf.vf_decl)
   in
-  let new_param i (typ,_dir) =
-    let typ = if Cil.isIntegralType typ then
-        Cil.integralPromotion typ
-      else
-        typ
-    in
-    "param" ^ string_of_int i, typ, []
-  in
-  let vparams = List.mapi new_param tvparams in
-  let new_params = sparams @ vparams in
 
   (* Create the new callee *)
-  vf.vf_specialization_count <- vf.vf_specialization_count + 1;
-  let ret_typ, _, _, attributes = Cil.splitFunctionType vf.vf_decl.vtype in
-  let new_callee_typ = TFun (ret_typ, Some new_params, false, attributes)
-  and new_name = name ^ "_va_" ^ (string_of_int vf.vf_specialization_count)
-  and mk_spec formals = build_fun_spec env loc vf format_fun tvparams formals
-  in
-  let new_callee, glob =
-    Build.function_declaration ~vattr:[Attr ("fc_stdlib_generated", [])]
-      ~loc:vf.vf_decl.vdecl name new_callee_typ mk_spec
-  in
-  new_callee.vname <- new_name;
+  let glob, new_callee = build_specialized_fun env vf format_fun tvparams in
   new_globals := glob :: !new_globals;
 
   (* Store the translation *)
@@ -644,6 +763,6 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   (* Translate the call *)
   Self.result ~current:true ~level:2
     "Translating call to %s to a call to the specialized version %s."
-    name new_callee.vname;
-  let tparams = params_types new_params in
+    vf.vf_decl.vorig_name new_callee.vname;
+  let tparams = Typ.params_types new_callee.vtype in
   match_call ~loc ~fundec scope mk_call new_callee tparams args

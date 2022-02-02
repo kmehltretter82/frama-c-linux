@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Properties
 // --------------------------------------------------------------------------
@@ -10,6 +32,7 @@ import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import * as Settings from 'dome/data/settings';
 import { Label, Code } from 'dome/controls/labels';
+import { Icon } from 'dome/controls/icons';
 import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
@@ -19,9 +42,12 @@ import { Scroll, Folder } from 'dome/layout/boxes';
 
 import { RSplit } from 'dome/layout/splitters';
 
-import { source as SourceLoc } from 'frama-c/api/kernel/services';
-import { statusData as Property } from 'frama-c/api/kernel/properties';
+import * as Ast from 'frama-c/api/kernel/ast';
+import { statusData } from 'frama-c/api/kernel/properties';
 import * as Properties from 'frama-c/api/kernel/properties';
+import * as Eva from 'frama-c/api/plugins/eva/general';
+
+type Property = statusData & Eva.propertiesData;
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -72,6 +98,9 @@ const DEFAULTS: { [key: string]: boolean } = {
   'alarms.function_pointer': true,
   'alarms.union_initialization': true,
   'alarms.bool_value': true,
+  'eva.priority_only': false,
+  'eva.data_tainted_only': false,
+  'eva.ctrl_tainted_only': false,
 };
 
 function filter(path: string) {
@@ -171,10 +200,33 @@ function filterAlarm(alarm: string | undefined) {
   return filter('alarms.others');
 }
 
+function filterEva(p: Property) {
+  let b = true;
+  if (p.priority === false && filter('eva.priority_only'))
+    b = false;
+  switch (p.taint) {
+    case 'not_tainted':
+    case 'not_applicable':
+      if (filter('eva.data_tainted_only') || filter('eva.ctrl_tainted_only'))
+        b = false;
+      break;
+    case 'data_tainted':
+      if (filter('eva.ctrl_tainted_only'))
+        b = false;
+      break;
+    case 'control_tainted':
+      if (filter('eva.data_tainted_only'))
+        b = false;
+      break;
+  }
+  return b;
+}
+
 function filterProperty(p: Property) {
   return filterStatus(p.status)
-    && filterKind(p.kind)
-    && filterAlarm(p.alarm);
+      && filterKind(p.kind)
+      && filterAlarm(p.alarm)
+      && filterEva(p);
 }
 
 // --------------------------------------------------------------------------
@@ -193,15 +245,33 @@ const renderNames: Renderer<string[]> =
     return (label ? <Label label={label} /> : null);
   };
 
-const renderDir: Renderer<SourceLoc> =
-  (loc: SourceLoc) => (
+const renderDir: Renderer<Ast.source> =
+  (loc: Ast.source) => (
     <Code className="code-column" label={loc.dir} title={loc.file} />
   );
 
-const renderFile: Renderer<SourceLoc> =
-  (loc: SourceLoc) => (
+const renderFile: Renderer<Ast.source> =
+  (loc: Ast.source) => (
     <Code className="code-column" label={loc.base} title={loc.file} />
   );
+
+const renderPriority: Renderer<boolean> =
+  (prio: boolean) => (prio ? <Icon id="ATTENTION" /> : null);
+
+const renderTaint: Renderer<any> =
+  (taint: States.Tag) => {
+    let id = null;
+    let color = 'black';
+    switch (taint.name) {
+      case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
+      case 'data_tainted': id = 'DROP.FILLED'; color = '#FF8300'; break;
+      case 'control_tainted': id = 'DROP.FILLED'; color = '#73BBBB'; break;
+      case 'error': id = 'HELP'; break;
+      case 'not_applicable': id = 'MINUS'; break;
+      default:
+    }
+    return (id ? <Icon id={id} fill={color} title={taint.descr} /> : null);
+  };
 
 function ColumnCode<Row>(props: ColumnProps<Row, string>) {
   return <Column render={renderCode} {...props} />;
@@ -216,7 +286,7 @@ function ColumnTag<Row>(props: ColumnProps<Row, States.Tag>) {
 // -------------------------------------------------------------------------
 
 const bySource =
-  Compare.byFields<SourceLoc>({ file: Compare.alpha, line: Compare.number });
+  Compare.byFields<Ast.source>({ file: Compare.alpha, line: Compare.number });
 
 const byStatus =
   Compare.byRank(
@@ -233,6 +303,16 @@ const byStatus =
     'considered_valid',
   );
 
+const byTaint =
+  Compare.byRank(
+    'data_tainted',
+    'control_tainted',
+    'not_tainted',
+    'error',
+    'not_applicable',
+    'not_computed',
+  );
+
 const byProperty: Compare.ByFields<Property> = {
   status: byStatus,
   fct: Compare.defined(Compare.alpha),
@@ -243,10 +323,12 @@ const byProperty: Compare.ByFields<Property> = {
   predicate: Compare.defined(Compare.alpha),
   key: Compare.string,
   kinstr: Compare.structural,
+  priority: Compare.structural,
+  taint: byTaint,
 };
 
-const byDir = Compare.byFields<SourceLoc>({ dir: Compare.alpha });
-const byFile = Compare.byFields<SourceLoc>({ base: Compare.alpha });
+const byDir = Compare.byFields<Ast.source>({ dir: Compare.alpha });
+const byFile = Compare.byFields<Ast.source>({ base: Compare.alpha });
 
 const byColumn: Arrays.ByColumns<Property> = {
   dir: Compare.byFields<Property>({ source: byDir }),
@@ -287,13 +369,18 @@ const Reload = new Dome.Event('ivette.properties.reload');
 
 interface SectionProps {
   label: string;
+  unfold?: boolean;
   children: React.ReactNode;
 }
 
 function Section(props: SectionProps) {
   const settings = `properties-section-${props.label}`;
   return (
-    <Folder label={props.label} settings={settings}>
+    <Folder
+      label={props.label}
+      settings={settings}
+      defaultUnfold={props.unfold}
+    >
       {props.children}
     </Folder>
   );
@@ -301,6 +388,8 @@ function Section(props: SectionProps) {
 
 interface CheckFieldProps {
   label: string;
+  title?: string;
+  highligh?: boolean; // Highlights the label when the value is [highligh]
   path: string;
 }
 
@@ -309,8 +398,12 @@ function CheckField(props: CheckFieldProps) {
   const onChange = () => { setValue(); Reload.emit(); };
   return (
     <Checkbox
-      style={{ display: 'block' }}
+      style={{
+        display: 'block',
+        color: (props.highligh === value) ? 'red' : '',
+      }}
       label={props.label}
+      title={props.title}
       value={value}
       onChange={onChange}
     />
@@ -323,7 +416,7 @@ function PropertyFilter() {
   return (
     <Scroll>
       <CheckField label="Current function" path="currentFunction" />
-      <Section label="Status">
+      <Section label="Status" unfold>
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
         <CheckField label="Unknown" path="status.unknown" />
@@ -374,6 +467,23 @@ function PropertyFilter() {
         <CheckField label="Overlaps" path="alarms.overlap" />
         <CheckField label="Initialization of unions" path="alarms.union_initialization" />
       </Section>
+      <Section label="Eva">
+        <CheckField
+          label="High-priority only"
+          path="eva.priority_only"
+          title="Show only high-priority properties for the Eva analysis"
+        />
+        <CheckField
+          label="Data-tainted only"
+          path="eva.data_tainted_only"
+          title="Show only data-tainted properties according to the Eva taint domain"
+        />
+        <CheckField
+          label="Control-tainted only"
+          path="eva.ctrl_tainted_only"
+          title="Show only control-tainted properties according to the Eva taint domain"
+        />
+      </Section>
     </Scroll>
   );
 }
@@ -389,6 +499,7 @@ const PropertyColumns = () => {
   const statusDict = States.useTags(Properties.propStatusTags);
   const kindDict = States.useTags(Properties.propKindTags);
   const alarmDict = States.useTags(Properties.alarmsTags);
+  const taintDict = States.useTags(Eva.taintStatusTags);
 
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict.get(st) ?? { name: st }),
@@ -405,6 +516,11 @@ const PropertyColumns = () => {
       alarm === undefined ? alarm : (alarmDict.get(alarm) ?? { name: alarm })
     ),
     [alarmDict],
+  );
+
+  const getTaint = React.useCallback(
+    ({ taint }: Property) => (taintDict.get(taint) ?? { name: taint }),
+    [taintDict],
   );
 
   return (
@@ -436,6 +552,28 @@ const PropertyColumns = () => {
       />
       <ColumnCode id="predicate" label="Predicate" fill />
       <ColumnCode id="descr" label="Property" fill visible={false} />
+      <Column
+        id="priority"
+        label="Priority"
+        title="Properties invalid in some context of the Eva analysis"
+        icon="ATTENTION"
+        width={30}
+        visible={false}
+        align="center"
+        getter={(prop: Eva.propertiesData) => prop?.priority}
+        render={renderPriority}
+      />
+      <ColumnTag
+        id="taint"
+        label="Taint"
+        title="Properties tainted according to the Eva taint domain"
+        icon="PAINTBRUSH"
+        width={30}
+        visible={false}
+        align="center"
+        getter={getTaint}
+        render={renderTaint}
+      />
       <ColumnTag
         id="status"
         label="Status"
@@ -471,17 +609,26 @@ export default function RenderProperties() {
 
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const data = States.useSyncArray(Properties.status).getArray();
+  const kernelData = States.useSyncArray(Properties.status).getArray();
+  const evaData = States.useSyncArray(Eva.properties).getArray();
+
   useEffect(() => {
     model.removeAllData();
+    const data = new Array(kernelData.length);
+    for (let i = 0; i < kernelData.length; i++) {
+      const kernel = kernelData[i];
+      const { key } = kernel;
+      const eva = evaData.find((elt) => elt.key === key);
+      data[i] = { ...kernel, ...eva };
+    }
     model.updateData(data);
     model.reload();
-  }, [model, data]);
+  }, [model, kernelData, evaData]);
 
   const [selection, updateSelection] = States.useSelection();
 
   const [showFilter, flipFilter] =
-    Dome.useFlipSettings('ivette.properties.showFilter');
+    Dome.useFlipSettings('ivette.properties.showFilter', true);
 
   // Updating the filter
   Dome.useEvent(Reload, model.reload);
@@ -514,6 +661,7 @@ export default function RenderProperties() {
       </TitleBar>
       <RSplit
         settings="ivette.properties.filterSplit"
+        defaultPosition={200}
         unfold={showFilter}
       >
         <Table<string, Property>

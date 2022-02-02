@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -30,11 +30,6 @@ makefile_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 
 # Improves analysis time, at the cost of extra memory usage
 export FRAMA_C_MEMORY_FOOTPRINT = 8
-
-# FRAMAC is defined in path.mk when it is included, so the
-# line below will be safely ignored if this is the case.
-# Otherwise, the user may supply it to indicate which Frama-C binary to use.
-FRAMAC ?= frama-c
 
 # analysis.mk contains the main rules and targets
 include $(makefile_dir)/analysis.mk

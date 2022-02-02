@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,6 +36,61 @@ let () = Request.register ~package
     ~kind:`EXEC ~name:"compute"
     ~descr:(Md.plain "Ensures that AST is computed")
     ~input:(module Junit) ~output:(module Junit) Ast.compute
+
+let changed_signal = Request.signal ~package ~name:"changed"
+    ~descr:(Md.plain "Emitted when the AST has been changed")
+
+let ast_update_hook f =
+  Ast.add_hook_on_update f;
+  Ast.apply_after_computed (fun _ -> f ())
+
+let () = ast_update_hook (fun _ -> Request.emit changed_signal)
+
+(* -------------------------------------------------------------------------- *)
+(* --- File Positions                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Position =
+struct
+  type t = Filepath.position
+
+  let jtype = Data.declare ~package ~name:"source"
+      ~descr:(Md.plain "Source file positions.")
+      (Jrecord [
+          "dir", Jstring;
+          "base", Jstring;
+          "file", Jstring;
+          "line", Jnumber;
+        ])
+
+  let to_json p =
+    let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
+    let file =
+      if Server_parameters.has_relative_filepath ()
+      then path
+      else (p.Filepath.pos_path :> string)
+    in
+    `Assoc [
+      "dir"  , `String (Filename.dirname path) ;
+      "base" , `String (Filename.basename path) ;
+      "file" , `String file ;
+      "line" , `Int p.Filepath.pos_lnum ;
+    ]
+
+  let of_json js =
+    let fail () = failure_from_type_error "Invalid source format" js in
+    match js with
+    | `Assoc assoc ->
+      begin
+        match List.assoc "file" assoc, List.assoc "line" assoc with
+        | `String path, `Int line ->
+          Log.source ~file:(Filepath.Normalized.of_string path) ~line
+        | _, _ -> fail ()
+        | exception Not_found -> fail ()
+      end
+    | _ -> fail ()
+
+end
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Printers                                                          --- *)
@@ -198,7 +253,7 @@ struct
       States.column
         ~name:"sloc"
         ~descr:(Md.plain "Source location")
-        ~data:(module Kernel_main.LogSource)
+        ~data:(module Position)
         ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
         model
     in
@@ -207,7 +262,8 @@ struct
       ~name:"markerInfo"
       ~descr:(Md.plain "Marker informations")
       ~key:snd ~keyType:Jstring
-      ~iter model
+      ~iter ~add_reload_hook:ast_update_hook
+      model
 
   let create_tag = function
     | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
@@ -319,6 +375,19 @@ struct
     with Not_found -> Data.failure "Undefined function '%s'" key
 end
 
+module Fundec =
+struct
+  type t = fundec
+  let jtype = Pkg.Jkey "fundec"
+  let to_json fundec =
+    `String fundec.svar.vname
+  let of_json js =
+    let key = Js.to_string js in
+    try Kernel_function.get_definition (Globals.Functions.find_by_name key)
+    with Not_found | Kernel_function.No_Definition ->
+      Data.failure "Undefined function definition '%s'" key
+end
+
 module KfMarker = struct
   type record
   let record : record Record.signature = Record.signature ()
@@ -348,6 +417,15 @@ end
 (* -------------------------------------------------------------------------- *)
 (* --- Functions                                                          --- *)
 (* -------------------------------------------------------------------------- *)
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"getMainFunction"
+    ~descr:(Md.plain "Get the current 'main' function.")
+    ~input:(module Junit) ~output:(module Joption (Kf))
+    begin fun () ->
+      try Some (fst (Globals.entry_point ()))
+      with Globals.No_such_entry_point _ -> None
+    end
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"
@@ -452,14 +530,14 @@ struct
       States.column model
         ~name:"sloc"
         ~descr:(Md.plain "Source location")
-        ~data:(module Kernel_main.LogSource)
+        ~data:(module Position)
         ~get:(fun kf -> fst (Kernel_function.get_location kf));
       States.register_array model
         ~package ~key
         ~name:"functions"
         ~descr:(Md.plain "AST Functions")
         ~iter
-        ~add_reload_hook:Ast.add_hook_on_update ;
+        ~add_reload_hook:ast_update_hook
     end
 
 end
@@ -533,6 +611,31 @@ let () = Request.register ~package
     ~descr:(Md.plain "Get textual information about a marker")
     ~input:(module Marker) ~output:(module Jtext)
     Info.get_marker_info
+
+(* -------------------------------------------------------------------------- *)
+(* --- Marker at a position                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_kf_marker (file, line, col) =
+  let pos_path = Filepath.Normalized.of_string file in
+  let pos =
+    Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
+  in
+  let tag = Printer_tag.loc_to_localizable ~precise_col:true pos in
+  let kf = Option.bind tag Printer_tag.kf_of_localizable in
+  kf, tag
+
+let () =
+  let descr =
+    Md.plain
+      "Returns the marker and function at a source file position, if any. \
+       Input: file path, line and column."
+  in
+  Request.register
+    ~package ~descr ~kind:`GET ~name:"getMarkerAt"
+    ~input:(module Jtriple (Jstring) (Jint) (Jint))
+    ~output:(module Jpair (Joption (Kf)) (Joption (Marker)))
+    get_kf_marker
 
 (* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)

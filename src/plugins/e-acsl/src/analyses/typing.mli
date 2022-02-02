@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -60,7 +60,8 @@ type number_ty = private
   | Real
   | Nan
 
-module Datatype: Datatype.S_with_collections with type t = number_ty
+module Function_params_ty:
+  Datatype.S_with_collections with type t = number_ty list
 
 (** {3 Smart constructors} *)
 
@@ -96,17 +97,18 @@ val join: number_ty -> number_ty -> number_ty
 (** {2 Typing} *)
 (******************************************************************************)
 
-val type_term: use_gmp_opt:bool -> ?ctx:number_ty -> term -> unit
+val type_term:
+  use_gmp_opt:bool ->
+  ?ctx:number_ty ->
+  lenv:Function_params_ty.t ->
+  term ->
+  unit
 (** Compute the type of each subterm of the given term in the given context. If
     [use_gmp_opt] is false, then the conversion to the given context is done
     even if -e-acsl-gmp-only is set. *)
 
-val type_named_predicate: must_clear:bool -> predicate -> unit
-(** Compute the type of each term of the given predicate.
-
-    If {!must_clear} is true, the typing environment is reset before translating
-    the predicate. The environment should be reset when translating a new
-    assertion, and kept otherwise. *)
+val type_named_predicate: lenv:Function_params_ty.t -> predicate -> unit
+(** Compute the type of each term of the given predicate. *)
 
 val clear: unit -> unit
 (** Remove all the previously computed types. *)
@@ -117,31 +119,37 @@ val clear: unit -> unit
     {!type_named_predicate} has been previously computed for the given term or
     predicate. *)
 
-val get_number_ty: term -> number_ty
+val get_number_ty: lenv:Function_params_ty.t -> term -> number_ty
 (** @return the infered type for the given term. *)
 
-val get_integer_op: term -> number_ty
+val get_integer_op: lenv:Function_params_ty.t -> term -> number_ty
 (** @return the infered type for the top operation of the given term.
     It is meaningless to call this function over a non-arithmetical/logical
     operator. *)
 
-val get_integer_op_of_predicate: predicate -> number_ty
+val get_integer_op_of_predicate:
+  lenv:Function_params_ty.t -> predicate -> number_ty
 (** @return the infered type for the top operation of the given predicate. *)
 
-val get_typ: term -> typ
+val get_typ: lenv:Function_params_ty.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
 
-val get_op: term -> typ
+val get_op: lenv:Function_params_ty.t -> term -> typ
 (** Get the type which the operation on top of the given term must be generated
     to. *)
 
-val get_cast: term -> typ option
+val get_cast: lenv:Function_params_ty.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
 
-val get_cast_of_predicate: predicate -> typ option
+val get_cast_of_predicate: lenv:Function_params_ty.t -> predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
-val unsafe_set: term -> ?ctx:number_ty -> number_ty -> unit
+val unsafe_set:
+  term ->
+  ?ctx:number_ty ->
+  lenv:Function_params_ty.t ->
+  number_ty ->
+  unit
 (** Register that the given term has the given type in the given context (if
     any). No verification is done. *)
 
@@ -149,21 +157,22 @@ val unsafe_set: term -> ?ctx:number_ty -> number_ty -> unit
 (** {2 Typing/types-related utils} *)
 (*****************************************************************************)
 
-val ty_of_interv: ?ctx:number_ty -> Interval.t -> number_ty
+val ty_of_interv: ?ctx:number_ty -> ?use_gmp_opt:bool -> Interval.t -> number_ty
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 
 val typ_of_lty: logic_type -> typ
 (** @return the C type that correponds to the given logic type. *)
 
-(******************************************************************************)
-(** {2 Internal stuff} *)
-(******************************************************************************)
+val type_program : file -> unit
+(** compute and store the type of all the terms that will be translated
+    in a program *)
 
-val compute_quantif_guards_ref
-  : (predicate -> logic_var list -> predicate ->
-     (term * relation * logic_var * relation * term) list) ref
-(** Forward reference. *)
+val preprocess_predicate : Function_params_ty.t -> predicate -> unit
+(** compute and store the types of all the terms in a given predicate  *)
+
+val preprocess_rte : lenv:Function_params_ty.t -> code_annotation -> unit
+(** compute and store the type of all the terms in a code annotation *)
 
 (*
 Local Variables:

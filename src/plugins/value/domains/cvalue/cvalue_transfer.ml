@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -101,10 +101,9 @@ let write_abstract_value state (lval, loc, typ) assigned_value =
     Value_parameters.result
       "State before degeneration:@\n======%a@\n======="
       Cvalue.Model.pretty state;
-    Value_util.warning_once_current
+    Value_parameters.fatal ~current:true
       "writing at a completely unknown address@[%a@].@\nAborting."
-      Origin.pretty_as_reason orig;
-    raise Db.Value.Aborted
+      Origin.pretty_as_reason orig
   | _ ->
     let exact = Locations.cardinal_zero_or_one loc in
     let value =
@@ -204,14 +203,13 @@ let actualize_formals state arguments =
   in
   List.fold_left treat_one_formal state arguments
 
-let start_call _stmt call valuation state =
-  let state = update valuation state in
+let start_call _stmt call _recursion _valuation state =
   let with_formals = actualize_formals state call.arguments in
   let stack_with_call = Value_util.call_stack () in
   Db.Value.Call_Value_Callbacks.apply (with_formals, stack_with_call);
   `Value with_formals
 
-let finalize_call stmt call ~pre:_ ~post:state =
+let finalize_call stmt call _recursion ~pre:_ ~post:state =
   (* Deallocate memory allocated via alloca().
      To minimize computations, only do it for function definitions. *)
   let state' =

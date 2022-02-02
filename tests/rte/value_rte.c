@@ -1,8 +1,7 @@
 /* run.config
-PLUGIN: report @EVA_PLUGINS@
-OPT: -rte -then -eva @EVA_OPTIONS@ -then -report
+PLUGIN: @PTEST_PLUGIN@ eva,scope report
+STDOPT: +"-then -eva @EVA_OPTIONS@ -then -report"
 */
-
 #include "stdio.h"
 
 int main(){

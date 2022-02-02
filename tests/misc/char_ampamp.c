@@ -1,3 +1,8 @@
+/* run.config
+ PLUGIN: @EVA_PLUGINS@
+STDOPT:
+*/
+
 char c=1;
 int y;
 

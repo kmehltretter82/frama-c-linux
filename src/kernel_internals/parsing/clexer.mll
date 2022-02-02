@@ -161,6 +161,16 @@ let init_lexicon _ =
                "_Noreturn is a C11 keyword, use -c11 option to enable it");
            IDENT "_Noreturn"
          end);
+      ("_Static_assert",
+       fun loc ->
+         if Kernel.C11.get () then STATIC_ASSERT loc
+         else begin
+           Kernel.(
+             warning
+               ~wkey:wkey_conditional_feature
+               "_Static_assert is a C11 keyword, use -c11 option to enable it");
+           IDENT "_Static_assert"
+         end);
       ("__attribute__", fun loc -> ATTRIBUTE loc);
       ("__attribute", fun loc -> ATTRIBUTE loc);
       ("__blockattribute__", fun _ -> BLOCKATTRIBUTE);
@@ -238,8 +248,31 @@ let init_lexicon _ =
           let l =
             Seq.fold_left (fun acc c -> convert_char c :: acc) [] seq
           in
-          CST_STRING (List.rev l,loc)))
-    ]
+          CST_STRING (List.rev l,loc)));
+      (* The following C11 tokens are not yet supported, so we provide some
+         helpful error messages. Usage of 'fatal' instead of 'error' below
+         prevents duplicate error messages due to parsing errors. *)
+      ("_Alignas",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Alignas is currently unsupported by Frama-C.");
+      ("_Alignof",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Alignof is currently unsupported by Frama-C.");
+      ("_Complex",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Complex is currently unsupported by Frama-C.");
+      ("_Generic",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Generic is currently unsupported by Frama-C.");
+      ("_Imaginary",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Imaginary is currently unsupported by Frama-C.");
+     ]
 
 
 let is_c_keyword s = Hashtbl.mem lexicon s
@@ -487,8 +520,7 @@ let make_annot ~one_line default lexbuf s =
      *)
      | Logic_ptree.Acode_annot (loc,a) -> CODE_ANNOT (a, loc)
      | Logic_ptree.Aloop_annot (loc,a) -> LOOP_ANNOT (a,loc)
-     | Logic_ptree.Aattribute_annot (loc,a) -> ATTRIBUTE_ANNOT (a, loc)
-     | Logic_ptree.Acustom(loc,id, a) -> CUSTOM_ANNOT(a, id, loc))
+     | Logic_ptree.Aattribute_annot (loc,a) -> ATTRIBUTE_ANNOT (a, loc))
   | None -> (* error occured and annotation is discarded. Find a normal token. *)
     default lexbuf
 
@@ -924,6 +956,7 @@ and annot_one_line = parse
   | "" { annot_one_line_logic lexbuf }
 and annot_one_line_logic = parse
   | '\n' { make_annot ~one_line:true initial lexbuf (Buffer.contents buf) }
+  | eof { E.parse_error "Invalid C file: should end with a newline" }
   | _ as c { Buffer.add_char buf c; annot_one_line_logic lexbuf }
 
 {

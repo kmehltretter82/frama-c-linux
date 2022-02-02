@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -60,9 +60,6 @@ type red_alarm = {
   function_name:string;
   kind:string;
   acsl: string;
-  alarm_or_prop: Red_statuses.alarm_or_property;
-  (* Status here means 'final' status as emitted by all plugins. Currentlt not
-     shown. *)
   ip: Property.t;
   callstacks: int; (* Number of callstacks in which the red alarm occured. *)
 }
@@ -88,14 +85,12 @@ let make_red_alarm function_name ki alarm callstacks =
   let acsl =
     Format.asprintf "@[<hov>%a@]" Cil_datatype.Toplevel_predicate.pretty p
   in
-  let alarm_or_prop = Red_statuses.Alarm alarm in
-  { function_name; ip; kind; alarm_or_prop; acsl; callstacks }
+  { function_name; ip; kind; acsl; callstacks }
 
 let make_red_prop function_name ip callstacks =
   let kind = "property" (* TODO *) in
   let acsl = Format.asprintf "@[<hov>%a@]" Property.pretty ip in
-  let alarm_or_prop = Red_statuses.Prop ip in
-  { function_name; ip; kind; alarm_or_prop; acsl; callstacks }
+  { function_name; ip; kind; acsl; callstacks }
 
 
 

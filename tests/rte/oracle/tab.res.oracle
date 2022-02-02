@@ -14,7 +14,7 @@ double g4(typetab *t)
   return y;
 }
 
-double h4(double * /*[2]*/ t)
+double h4(double t[2])
 {
   double __retres;
   /*@ assert rte: mem_access: \valid_read(t + 0); */

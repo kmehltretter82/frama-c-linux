@@ -1,8 +1,8 @@
 /* run.config
-MODULE: Change_formals
-OPT: -cpp-extra-args="-DNO_PROTO" -then-on test -print
-OPT: -cpp-extra-args="-DNO_IMPLEM" -then-on test -print
-OPT: -then-on test -print
+ MODULE: Change_formals
+   OPT: -cpp-extra-args="-DNO_PROTO" -then-on test -print
+   OPT: -cpp-extra-args="-DNO_IMPLEM" -then-on test -print
+   OPT: -then-on test -print
 */
 
 #ifndef NO_PROTO

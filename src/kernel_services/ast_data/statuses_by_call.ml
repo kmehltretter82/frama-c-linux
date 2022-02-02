@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -174,8 +174,8 @@ let transpose_pred_at_callsite ~formals ~concretes id_pred =
     let new_pred = Cil.visitCilPredicateNode visitor pred.pred_content in
     let p_unnamed = Logic_const.unamed ~loc:pred.pred_loc new_pred in
     let p_named = { p_unnamed with pred_name = pred.pred_name } in
-    let only_check = id_pred.ip_content.tp_only_check in
-    Some (Logic_const.new_predicate ~only_check p_named)
+    let kind = id_pred.ip_content.tp_kind in
+    Some (Logic_const.new_predicate ~kind p_named)
   with Non_Transposable -> None
 
 

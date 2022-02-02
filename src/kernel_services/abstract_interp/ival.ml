@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,9 +28,9 @@ let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
 module type Type = sig
   (* Binary abstract operations do not model precisely float/integer operations.
-   It is the responsibility of the callers to have two operands of the same
-   implicit type. The only exception is for [singleton_zero], which is the
-   correct representation of [0.] *)
+     It is the responsibility of the callers to have two operands of the same
+     implicit type. The only exception is for [singleton_zero], which is the
+     correct representation of [0.] *)
   type t = private
     | Bottom
     | Int of Int_val.t
@@ -66,14 +66,14 @@ module Type : Type = struct
 
   let inject_singleton e =
     if Int.le Int.zero e && Int.le e Int.thirtytwo
-    then small_nums.(Int.to_int e)
+    then small_nums.(Int.to_int_exn e)
     else Int (Int_val.inject_singleton e)
 
   let inject_int i =
     try
       let e = Int_val.project_int i in
       if Int.le Int.zero e && Int.le e Int.thirtytwo
-      then small_nums.(Int.to_int e)
+      then small_nums.(Int.to_int_exn e)
       else Int i
     with Int_val.Not_Singleton ->
       if Int_val.(equal top i) then top else Int i
@@ -179,6 +179,10 @@ let contains_non_zero = function
 
 exception Not_Singleton_Int = Int_val.Not_Singleton
 
+let project_int_val = function
+  | Int i -> Some i
+  | Bottom | Float _ -> None
+
 let project_int = function
   | Int i -> Int_val.project_int i
   | Bottom | Float _ -> raise Not_Singleton_Int
@@ -241,7 +245,7 @@ let inject_interval ~min ~max ~rem ~modu =
 let subdivide ~size = function
   | Bottom -> raise Can_not_subdiv
   | Float fval ->
-    let fkind = match Integer.to_int size with
+    let fkind = match Integer.to_int_exn size with
       | 32 -> Fval.Single
       | 64 -> Fval.Double
       | _ -> raise Can_not_subdiv (* see Value/Value#105 *)
@@ -922,7 +926,7 @@ let cast_float_to_int_inverse ~single_precision i =
               [(int)((real)min-epsilon)] would return [min-1]. Hence, we can
               simply return the float corresponding to [min] -- which can be
               represented precisely given [exact_min] and [exact_max]. *)
-        Int.to_float min 
+        Int.to_float min
     in
     (* All operations are dual w.r.t. the min bound. *)
     let maxf =
@@ -1039,11 +1043,11 @@ let reinterpret_as_float kind i =
     let open Floating_point in
     match kind with
     | Cil_types.FDouble ->
-      let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64 v)) in
+      let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64_exn v)) in
       reinterpret
         64 Fval.Double conv bits_of_most_negative_double bits_of_max_double
     | Cil_types.FFloat ->
-      let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32 v)) in
+      let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32_exn v)) in
       reinterpret
         32 Fval.Single conv bits_of_most_negative_float bits_of_max_float
     | Cil_types.FLongDouble ->

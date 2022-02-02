@@ -23,10 +23,7 @@ Sequent: Assume {
            Then { Have: (node_0=true). }
            (* Set: tmp = c *)
            If (node_3=true)
-           Then {
-             Have: (Init_tmp_0=true) /\ (tmp_0 = c_2).
-             Have: (node_2=true).
-           }
+           Then { Have: tmp_0 = c_2. Have: (node_2=true). }
            (* Set: c = c + 100 *)
            If (node_4=true)
            Then { Have: (100 + c_3) = c_2. Have: (node_3=true). }
@@ -42,7 +39,7 @@ Sequent: Assume {
            (* Entering scope [tmp]: effect: (not Init_tmp_0) /\ (not ta_tmp_0) /\ ta_tmp_1 *)
            If (node_9=true)
            Then {
-             Have: (Init_tmp_1=false) /\ (ta_tmp_1=true) /\ (ta_tmp_2=false).
+             Have: (Init_tmp_0=false) /\ (ta_tmp_1=true) /\ (ta_tmp_2=false).
              Have: (node_6=true).
            }
            If (node_7=true)
@@ -62,10 +59,7 @@ Sequent: Assume {
            Then { Have: (node_10=true). }
            (* Set: tmp = c *)
            If (node_13=true)
-           Then {
-             Have: (Init_tmp_2=true) /\ (tmp_1 = c_5).
-             Have: (node_12=true).
-           }
+           Then { Have: tmp_1 = c_5. Have: (node_12=true). }
            (* Set: c = c + 100 *)
            If (node_14=true)
            Then { Have: (100 + c_6) = c_5. Have: (node_13=true). }
@@ -78,10 +72,10 @@ Sequent: Assume {
              Then { Have: (node_17=true). }
              Else { Have: (node_18=true). }
            }
-           (* Entering scope [tmp]: effect: (not Init_tmp_4) /\ (not ta_tmp_6) /\ ta_tmp_7 *)
+           (* Entering scope [tmp]: effect: (not Init_tmp_3) /\ (not ta_tmp_6) /\ ta_tmp_7 *)
            If (node_19=true)
            Then {
-             Have: (Init_tmp_3=false) /\ (ta_tmp_4=true) /\ (ta_tmp_5=false).
+             Have: (Init_tmp_1=false) /\ (ta_tmp_4=true) /\ (ta_tmp_5=false).
              Have: (node_16=true).
            }
            If (node_17=true)

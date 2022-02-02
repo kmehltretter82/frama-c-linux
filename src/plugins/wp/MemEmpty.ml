@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -99,8 +99,11 @@ let is_well_formed _s = p_true
 let source = "Empty Model"
 
 let load _sigma _obj () = Warning.error ~source "Can not load value in Empty model"
+let load_init _sigma _obj () =  Warning.error ~source "Can not load init in Empty model"
 let copied _s _obj () () = []
+let copied_init _s _obj () () = []
 let stored _s _obj () _ = []
+let stored_init _s _obj () _ = []
 let assigned _s _obj _sloc = []
 
 let no_pointer () = Warning.error ~source "Can not compare pointers in Empty model"

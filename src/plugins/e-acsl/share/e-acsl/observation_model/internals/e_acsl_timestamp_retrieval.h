@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -23,14 +23,14 @@
 /*! ***********************************************************************
  * \file
  * \brief Temporal timestamp retrieval
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_TIMESTAMP_RETRIEVAL_H
 #define E_ACSL_TIMESTAMP_RETRIEVAL_H
 
 #ifdef E_ACSL_TEMPORAL
 
-#include <stdint.h>
+#  include <stdint.h>
 
 /*! \brief Return origin time stamp associated with a memory block containing
  * address given by `ptr`. `0` indicates an invalid timestamp, i.e., timestamp

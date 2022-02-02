@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,7 +32,7 @@ let check_sequences file =
     | NoOffset,_ | _, NoOffset -> true
     | Field (f1,offs1), Field(f2,offs2) ->
       (* it's probably a bit overkill to check if any of the field is in
-         an union, as the types of offs1 and offs2 are very probably 
+         an union, as the types of offs1 and offs2 are very probably
          identical, but I don't have a Coq proof of that fact at the moment. *)
       (not f1.fcomp.cstruct || not f2.fcomp.cstruct) ||
       (f1.fname = f2.fname &&
@@ -116,14 +116,14 @@ let check_sequences file =
          let warn,_,_ =
            List.fold_left
              (fun ((warn,writes,reads) as res) (_,m,w,r,_) ->
-                (* the accumulator contains the lists of written 
+                (* the accumulator contains the lists of written
                    and read locations from the previous statements.
                    We check for overlapping between the following pairs:
                    - w vs writes
                    - r vs writes (modulo temporaries m as explained above).
                    - reads vs w (id. )
-                   As soon as we have identified a potential overlap, we
-                   output the whole unspecified sequence.
+                     As soon as we have identified a potential overlap, we
+                     output the whole unspecified sequence.
                 *)
                 if warn then res else begin
                   let new_writes = w @ writes in

@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -then -print
+   STDOPT:
  */
 
 void f(void) {

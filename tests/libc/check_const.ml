@@ -5,12 +5,13 @@ let non_const_exceptions = [
   "putenv";
 ]
 
-let warn_if_const string typ vi loc = 
+let warn_if_const string typ vi loc =
+  let bs = if string = "" then "\\" else "" in
   if Cil.typeHasQualifier "const" typ then
     Kernel.result ~source:(fst loc)
-      "'requires \\valid%s' of a const variable %a. \
-             You probably meant '\\valid_read%s' instead"
-      string Printer.pp_varinfo vi string
+      "'requires %svalid%s' of a const variable %a. \
+             You probably meant '%svalid_read%s' instead"
+      bs string Printer.pp_varinfo vi bs string
 
 let warn_if_not_const kf string typ vi loc =
   if not (List.mem (Kernel_function.get_name kf) non_const_exceptions) then

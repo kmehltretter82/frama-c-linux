@@ -67,7 +67,7 @@
  *     - v, V    - print first field width bits of a memory region given by a
  *      void pointer left-to-right (v) or right-to-left (V). Unless specified
  *      field-width of 8 is used.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_RTL_IO_H
 #define E_ACSL_RTL_IO_H
@@ -82,7 +82,7 @@ int rtl_printf(char *fmt, ...);
 int rtl_vprintf(char *fmt, va_list vlist);
 
 /* Same as printf but write to a string buffer */
-int rtl_sprintf(char* s, char *fmt, ...);
+int rtl_sprintf(char *s, char *fmt, ...);
 int rtl_vsprintf(char *s, char *fmt, va_list vlist);
 
 /* Same as printf but write to the error stream. */

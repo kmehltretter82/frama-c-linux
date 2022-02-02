@@ -13,7 +13,6 @@ TAGS
 .\#*
 .DS_Store
 *.tmp
-*.s
 
 #artifacts from execution
 frama_c_journal.ml
@@ -21,6 +20,7 @@ frama_c_journal.ml
 /frama-c-*.tar.gz
 /.merlin
 /headers/hdrck
+/headers/hdrck.exe
 
 #build
 /_opam/
@@ -55,11 +55,14 @@ autom4te.cache
 /tests/misc/my_visitor.sav
 /tests/spec/preprocess_dos.c
 /tests/*/*.opt
-/tests/pdg/*.dot
 
 /devel_tools/fc-time
 /devel_tools/fc-memuse
 /bin/ocamldep_transitive_closure
+/bin/check_newlines
+/bin/check_newlines.exe
+/bin/isutf8
+/bin/isutf8.exe
 
 #share
 /share/Makefile.config
@@ -109,10 +112,10 @@ autom4te.cache
 /doc/code/print_api/dynamic_plugins.mli
 /doc/code/print_api/_build/
 
-/doc/code/builtin
-/doc/code/studia
-/doc/code/qed
-/doc/code/wp
+/doc/developer/tutorial/viewcfg/src/META.frama-c-viewcfg
+/doc/developer/tutorial/viewcfg/src/Makefile
+/doc/developer/tutorial/viewcfg/src/gui/
+/doc/developer/tutorial/viewcfg/src/top/
 
 /doc/doxygen
 

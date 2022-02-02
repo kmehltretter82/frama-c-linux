@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -546,6 +546,15 @@ class pane (gprovers : GuiConfig.provers) =
           on_proof_context proof
             begin fun () ->
               text#clear ;
+              let main = ProofEngine.main proof in
+              if ProofSession.exists main then begin
+                text#printf
+                  (if ProofEngine.saved proof
+                   then "%a (@{<green>saved@})@."
+                   else "%a (@{<orange>modified@})@.")
+                  ProofSession.pp_script_for main ;
+                text#hrule ;
+              end ;
               scripter#tree proof ;
               text#hrule ;
               text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -449,7 +449,6 @@ struct
   type 'a dictionary = {
     values : (string,'a option) Hashtbl.t ;
     vindex : ('a,string) Hashtbl.t ;
-    mutable syntax : Markdown.text ;
     mutable published : (package * string) option ;
     mutable tags : tagInfo list ;
     mutable prefix : tagInfo list ;
@@ -468,7 +467,6 @@ struct
     published = None ;
     values = Hashtbl.create 0 ;
     vindex = Hashtbl.create 0 ;
-    syntax = [] ;
     prefix = [] ;
     tags = [] ;
     lookup = None ;

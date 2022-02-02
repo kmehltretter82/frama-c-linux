@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -43,11 +43,11 @@ let new_code_annotation annot =
 
 let fresh_code_annotation = AnnotId.next
 
-let toplevel_predicate ?(only_check=false) p =
-  { tp_only_check = only_check; tp_statement = p }
+let toplevel_predicate ?(kind=Assert) p =
+  { tp_kind = kind; tp_statement = p }
 
-let new_predicate ?only_check p =
-  { ip_id = PredicateId.next (); ip_content = toplevel_predicate ?only_check p }
+let new_predicate ?kind p =
+  { ip_id = PredicateId.next (); ip_content = toplevel_predicate ?kind p }
 
 let fresh_predicate_id = PredicateId.next
 
@@ -225,6 +225,11 @@ let plain_or_set f = function
 let transform_element f t = set_conversion (plain_or_set f t) t
 
 let is_plain_type ty = not (is_set_type ty)
+
+let make_arrow_type args rt =
+  match args with
+  | [] -> rt
+  | _ -> Larrow(List.map (fun x -> x.lv_type) args, rt)
 
 let rec is_boolean_type = function
   | Ltype ({ lt_name = s }, []) when s = Utf8_logic.boolean -> true

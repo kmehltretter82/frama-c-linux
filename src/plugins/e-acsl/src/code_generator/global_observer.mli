@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,9 +44,9 @@ val mk_init_function: unit -> varinfo * fundec
 (** Generate a new C function containing the observers for global variable
     declarations and initializations. *)
 
-val mk_clean_function: unit -> varinfo * fundec
+val mk_clean_function: unit -> (varinfo * fundec) option
 (** Generate a new C function containing the observers for global variable
-    de-allocations. *)
+    de-allocations if there are global variables. *)
 
 (*
 Local Variables:

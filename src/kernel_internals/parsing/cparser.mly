@@ -316,7 +316,6 @@ let in_ghost_block ?(battrs=[]) l =
 %token <Logic_ptree.code_annot * Cabs.cabsloc> CODE_ANNOT
 %token <Logic_ptree.code_annot list * Cabs.cabsloc> LOOP_ANNOT
 %token <string * Cabs.cabsloc> ATTRIBUTE_ANNOT
-%token <Logic_ptree.custom_tree  * string * Cabs.cabsloc> CUSTOM_ANNOT
 
 %token <string> IDENT
 %token <int64 list * Cabs.cabsloc> CST_CHAR
@@ -368,7 +367,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> IF TRY EXCEPT FINALLY
 %token ELSE
 
-%token<Cabs.cabsloc> ATTRIBUTE INLINE NORETURN ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
+%token<Cabs.cabsloc> ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
 %token LABEL__
 %token<Cabs.cabsloc> BUILTIN_VA_ARG
 %token BLOCKATTRIBUTE
@@ -469,7 +468,6 @@ ghost_globals:
 /*** Global Definition ***/
 global:
 | DECL             { GLOBANNOT $1 }
-| CUSTOM_ANNOT     { let (x,y,z) = $1 in CUSTOM(x,y,z) }
 | declaration      { $1 }
 | function_def     { $1 }
 
@@ -1080,6 +1078,20 @@ declaration:                                /* ISO 6.7.*/
           { doDeclaration (Some $1) ((snd $2)) (fst $2) $3 }
 |   SPEC decl_spec_list SEMICOLON
       { doDeclaration (Some $1) ((snd $2)) (fst $2) [] }
+|   static_assert_declaration
+      { let (e, m, loc) = $1 in STATIC_ASSERT (e, m, loc) }
+;
+
+static_assert_declaration:
+
+|   STATIC_ASSERT LPAREN expression RPAREN
+      {
+        ($3, "", $1)
+      }
+|   STATIC_ASSERT LPAREN expression COMMA string_constant RPAREN
+      {
+        ($3, fst $5, $1)
+      }
 ;
 
 init_declarator_list:                       /* ISO 6.7 */
@@ -1209,6 +1221,17 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
                                             :: $4 }
 /*(* MSVC allows pragmas in strange places *)*/
 |  pragma struct_decl_list                { $2 }
+
+/*(* C11 allows static_assert-declaration *)*/
+|  static_assert_declaration             {
+       let (e, m, loc) = $1 in
+       [ STATIC_ASSERT_FG (e, m, loc) ]
+   }
+
+|  static_assert_declaration      SEMICOLON struct_decl_list  {
+       let (e, m, loc) = $1 in
+       STATIC_ASSERT_FG (e, m, loc) :: $3
+   }
 
 ;
 field_decl_list: /* (* ISO 6.7.2 *) */
@@ -1528,7 +1551,7 @@ attribute:
 |   VOLATILE              { ("volatile",[]), $1 }
 |   GHOST                 { ("ghost",[]), $1 }
 |   ATTRIBUTE_ANNOT       { let annot, loc = $1 in
-			    ("$annot:" ^ annot, []), loc }
+			    (Cil.mkAttrAnnot annot, []), loc }
 ;
 
 /* (* sm: I need something that just includes __attribute__ and nothing more,

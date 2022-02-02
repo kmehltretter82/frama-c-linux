@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,6 +34,37 @@ let new_monitor ~split_limit = {
   split_values = Datatype.Integer.Set.empty;
 }
 
+module SplitMonitor = Datatype.Make_with_collections (
+  struct
+    include Datatype.Serializable_undefined
+    module Values = Datatype.Integer.Set
+
+    type t = split_monitor
+
+    let name = "Partition.SplitMonitor"
+
+    let reprs = [ new_monitor ~split_limit:0 ]
+
+    let structural_descr =
+      Structural_descr.t_record
+        [| Datatype.Int.packed_descr; Values.packed_descr |]
+
+    let compare m1 m2 =
+      let c = Int.compare m1.split_limit m2.split_limit in
+      if c <> 0 then c else Values.compare m1.split_values m2.split_values
+
+    let equal = Datatype.from_compare
+
+    let pretty fmt m =
+      Format.fprintf fmt "%d/%d" (Values.cardinal m.split_values) m.split_limit
+
+    let hash m =
+      hash (Datatype.Int.hash m.split_limit, Values.hash m.split_values)
+
+    let copy m =
+      { m with split_values = m.split_values }
+  end)
+
 (* --- Stamp rationing --- *)
 
 (* Stamps used to label states according to slevel.
@@ -53,10 +84,48 @@ let new_rationing ~limit ~merge = { current = ref 0; limit; merge }
 
 (* --- Keys --- *)
 
-module ExpMap = Cil_datatype.ExpStructEq.Map
-module IntPair = Datatype.Pair (Datatype.Int) (Datatype.Int)
-module LoopList = Datatype.List (IntPair)
-module BranchList = Datatype.List (Datatype.Int)
+type split_term = Eva_annotations.split_term =
+  | Expression of Cil_types.exp
+  | Predicate of Cil_types.predicate
+
+module SplitTerm = Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+
+    module Expressions = Cil_datatype.ExpStructEq
+    module Predicates = Cil_datatype.PredicateStructEq
+
+    type t = split_term
+
+    let name = "Partition.SplitTerm"
+
+    let reprs =
+      Stdlib.List.map (fun e -> Expression e) Expressions.reprs @
+      Stdlib.List.map (fun p -> Predicate p) Predicates.reprs
+
+    let structural_descr =
+      Structural_descr.t_sum [|
+        [| Expressions.packed_descr |] ;
+        [| Predicates.packed_descr |] |]
+
+    let compare x y =
+      match x, y with
+      | Expression e1, Expression e2 -> Expressions.compare e1 e2
+      | Predicate p1, Predicate p2 -> Logic_utils.compare_predicate p1 p2
+      | Expression _, Predicate _ -> 1
+      | Predicate _, Expression _ -> -1
+
+    let equal = Datatype.from_compare
+
+    let pretty fmt = function
+      | Expression e -> Printer.pp_exp fmt e
+      | Predicate p -> Printer.pp_predicate fmt p
+
+    let hash = function
+      | Expression e -> FCHashtbl.hash (1,Expressions.hash e)
+      | Predicate p -> FCHashtbl.hash (2,Predicates.hash p)
+  end)
+
+module SplitMap = SplitTerm.Map
 
 type branch = int
 
@@ -75,73 +144,142 @@ type branch = int
      (innermost loop first) It also stores the maximum number of unrolling ;
      this number varies from a state to another, as it is computed from
      an expression evaluated when we enter the loop.
-   - Static/Dynamic splits: track the splits applied to the state as a map
-     from the expression of the split to the value of this expression. Since
-     the split creates states in which the expression evalutates to a
+   - Splits: track the splits applied to the state as a map from the term of
+     the split to its value. Terms can be C expresssions or ACSL predicates.
+     Since the split creates states in which the expression evalutates to a
      singleton, the values of the map are integers.
      Static splits are only evaluated when the annotation is encountered
-     whereas dynamic splits are reevaluated regularly. *)
+     whereas dynamic splits are reevaluated regularly; a list of active
+     dynamic splits is also propagated in the key. *)
 type key = {
   ration_stamp : stamp;
   branches : branch list;
   loops : (int * int) list; (* current iteration / max unrolling *)
-  static_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
-  dynamic_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
+  splits : Integer.t SplitMap.t; (* term -> value *)
+  dynamic_splits : split_monitor SplitMap.t; (* term -> monitor *)
+}
+
+type call_return_policy = {
+  callee_splits: bool;
+  callee_history: bool;
+  caller_history: bool;
+  history_size: int;
 }
 
 module Key =
 struct
-  type t = key
+
+  module IntPair = Datatype.Pair (Datatype.Int) (Datatype.Int)
+  module Stamp = Datatype.Option (IntPair)
+  module BranchList = Datatype.List (Datatype.Int)
+  module LoopList = Datatype.List (IntPair)
+  module Splits = SplitMap.Make (Datatype.Integer)
+  module DSplits = SplitMap.Make (SplitMonitor)
 
   (* Initial key, before any partitioning *)
-  let zero = {
+  let empty = {
     ration_stamp = None;
     branches = [];
     loops = [];
-    static_split = ExpMap.empty;
-    dynamic_split = ExpMap.empty;
+    splits = SplitMap.empty;
+    dynamic_splits = SplitMap.empty;
   }
 
-  let compare k1 k2 =
-    let (<?>) c (cmp,x,y) =
-      if c = 0 then cmp x y else c
-    in
-    let compare_split (i1,_m1) (i2,_m2) =
-      Integer.compare i1 i2
-    in
-    Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
-    <?> (LoopList.compare, k1.loops, k2.loops)
-    <?> (ExpMap.compare compare_split, k1.static_split, k2.static_split)
-    <?> (ExpMap.compare compare_split, k1.dynamic_split, k2.dynamic_split)
-    <?> (BranchList.compare, k1.branches, k2.branches)
+  include Datatype.Make_with_collections (struct
+      include Datatype.Serializable_undefined
 
-  let pretty fmt key =
-    begin match key.ration_stamp with
-      | Some (n,_) -> Format.fprintf fmt "#%d" n
-      | None -> ()
-    end;
-    Pretty_utils.pp_list ~pre:"[@[" ~sep:" ;@ " ~suf:"@]]"
-      Format.pp_print_int
-      fmt
-      key.branches;
-    Pretty_utils.pp_list ~pre:"(@[" ~sep:" ;@ " ~suf:"@])"
-      (fun fmt (i,_j) -> Format.pp_print_int fmt i)
-      fmt
-      key.loops;
-    Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
-      (fun fmt (e,(i,_m)) -> Format.fprintf fmt "%a:%a"
-          Cil_printer.pp_exp e
-          (Integer.pretty ~hexa:false) i)
-      fmt
-      (ExpMap.bindings key.static_split @ ExpMap.bindings key.dynamic_split)
+      type t = key
+
+      let name = "Partition.Key"
+
+      let reprs = [ empty ]
+
+      let structural_descr =
+        Structural_descr.t_record [|
+          Stamp.packed_descr;
+          BranchList.packed_descr;
+          LoopList.packed_descr;
+          Splits.packed_descr;
+          DSplits.packed_descr;
+        |]
+
+      let compare k1 k2 =
+        let (<?>) c (cmp,x,y) =
+          if c = 0 then cmp x y else c
+        in
+        Stdlib.Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
+        <?> (LoopList.compare, k1.loops, k2.loops)
+        <?> (Splits.compare, k1.splits, k2.splits)
+        (* Ignore monitors in comparison *)
+        <?> (SplitMap.compare (fun _ _ -> 0), k1.dynamic_splits, k2.dynamic_splits)
+        <?> (BranchList.compare, k1.branches, k2.branches)
+
+      let equal = Datatype.from_compare
+
+      let hash k =
+        Stdlib.Hashtbl.hash (
+          Stamp.hash k.ration_stamp,
+          BranchList.hash k.branches,
+          LoopList.hash k.loops,
+          Splits.hash k.splits,
+          DSplits.hash k.dynamic_splits) (* Monitors probably shouldn't be hashed *)
+
+      let pretty fmt key =
+        begin match key.ration_stamp with
+          | Some (n,_) -> Format.fprintf fmt "#%d" n
+          | None -> ()
+        end;
+        Pretty_utils.pp_list ~pre:"[@[" ~sep:" ;@ " ~suf:"@]]"
+          Format.pp_print_int
+          fmt
+          key.branches;
+        Pretty_utils.pp_list ~pre:"(@[" ~sep:" ;@ " ~suf:"@])"
+          (fun fmt (i,_j) -> Format.pp_print_int fmt i)
+          fmt
+          key.loops;
+        Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
+          (fun fmt (t, i) -> Format.fprintf fmt "%a:%a"
+              SplitTerm.pretty t
+              Datatype.Integer.pretty i)
+          fmt
+          (SplitMap.bindings key.splits)
+    end)
 
   let exceed_rationing key = key.ration_stamp = None
+
+  let combine ~policy ~caller ~callee =
+    let keep_second _ v1 v2 =
+      match v1, v2 with
+      | None, None -> None
+      | Some x, None | (Some _ | None), Some x -> Some x
+    in
+    (* There is no need to preserve the uniqueness of ration stamps here, as
+       keys will always be given new stamps before the merge of identical keys.
+       This invariant depends on the sequence of operations performed by
+       the iterator and the trace_partitioning. *)
+    {
+      ration_stamp = None;
+      branches =
+        Extlib.list_first_n policy.history_size (
+          (if policy.callee_history then callee.branches else []) @
+          (if policy.caller_history then caller.branches else [])
+        );
+      loops = caller.loops;
+      splits =
+        if policy.callee_splits
+        then SplitMap.merge keep_second caller.splits callee.splits
+        else caller.splits;
+      dynamic_splits =
+        if policy.callee_splits
+        then SplitMap.merge keep_second caller.dynamic_splits callee.dynamic_splits
+        else caller.dynamic_splits;
+    }
 end
 
 
 (* --- Partitions --- *)
 
-module KMap = Map.Make (Key)
+module KMap = Key.Map
 
 type 'a partition = 'a KMap.t
 
@@ -155,8 +293,8 @@ let map = KMap.map
 let filter = KMap.filter
 let merge = KMap.merge
 
-let to_list (p : 'a partition) : 'a list =
-  KMap.fold (fun _k x l -> x :: l) p []
+let to_list (p : 'a partition) : (key * 'a) list =
+  KMap.fold (fun k x l -> (k, x) :: l) p []
 
 
 (* --- Partitioning actions --- *)
@@ -166,7 +304,7 @@ type unroll_limit =
   | IntLimit of int
   | AutoUnroll of Cil_types.stmt * int * int
 
-type split_kind = Static | Dynamic
+type split_kind = Eva_annotations.split_kind = Static | Dynamic
 
 type action =
   | Enter_loop of unroll_limit
@@ -175,8 +313,8 @@ type action =
   | Branch of branch * int
   | Ration of rationing
   | Restrict of Cil_types.exp * Integer.t list
-  | Split of Cil_types.exp * split_kind * split_monitor
-  | Merge of Cil_types.exp * split_kind
+  | Split of split_term * split_kind * split_monitor
+  | Merge of split_term
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -191,7 +329,7 @@ struct
   let empty = []
 
   let initial (p : 'a list) : t =
-    List.map (fun state -> Key.zero, state) p
+    List.map (fun state -> Key.empty, state) p
 
   let to_list (f : t) : state list =
     List.map snd f
@@ -311,7 +449,7 @@ struct
       let pp_count fmt =
         match count with
         | None -> ()
-        | Some c -> Format.fprintf fmt " (%a)" (Integer.pretty ~hexa:false) c
+        | Some c -> Format.fprintf fmt " (%a)" Integer.pretty c
       in
       fail ~exp "split on more than %d values%t prevented ; try to improve \
                  the analysis precision or look at the option -eva-split-limit \
@@ -320,13 +458,31 @@ struct
 
   let eval_exp_to_int state exp =
     let _valuation, ival = evaluate_exp_to_ival state exp in
-    try
-      Integer.to_int (Ival.project_int ival)
+    try Integer.to_int_exn (Ival.project_int ival)
     with
     | Ival.Not_Singleton_Int ->
       fail ~exp "this partitioning parameter must evaluate to a singleton"
-    | Failure _ ->
-      fail ~exp "this partitioning parameter is too big"
+    | Z.Overflow -> fail ~exp "this partitioning parameter overflows an integer"
+
+  let split_by_predicate state predicate =
+    let env =
+      let states = function _ -> Abstract.Dom.top in
+      Abstract_domain.{ states; result = None }
+    in
+    let source = fst (predicate.Cil_types.pred_loc) in
+    let aux positive =
+      Abstract.Dom.reduce_by_predicate env state predicate positive
+      >>-: fun state' ->
+      let x = Abstract.Dom.evaluate_predicate env state' predicate in
+      if x == Unknown
+      then
+        Value_parameters.warning ~source ~once:true
+          "failing to learn perfectly from split predicate";
+      if Abstract.Dom.equal state' state then raise Operation_failed;
+      let value = if positive then Integer.one else Integer.zero in
+      value, state'
+    in
+    Bottom.all [ aux true; aux false ]
 
   (* --- Applying partitioning actions onto flows --------------------------- *)
 
@@ -352,42 +508,42 @@ struct
             None
           end
 
-  let split_state ~monitor (kind : split_kind) (exp : Cil_types.exp)
-      (key : key) (state : state) : (key * state) list =
+  let split_state ~monitor term (key, state) : (key * state) list =
     try
-      let add value map = ExpMap.add exp (value, monitor) map in
-      let update_key (v,x) =
-        let k =
-          match kind with
-          | Static -> { key with static_split = add v key.static_split }
-          | Dynamic -> { key with dynamic_split = add v key.dynamic_split }
-        in
-        (k,x)
+      let update_key (v, x) =
+        { key with splits = SplitMap.add term v key.splits }, x
       in
-      List.map update_key (split_by_value ~monitor state exp)
-    with Operation_failed ->
-      [(key,state)]
+      let states =
+        match term with
+        | Expression exp -> split_by_value ~monitor state exp
+        | Predicate pred -> split_by_predicate state pred
+      in
+      List.map update_key states
+    with Operation_failed -> [(key,state)]
 
-  let split ~monitor (kind : split_kind) (exp : Cil_types.exp) (p : t) =
-    let add_split acc (key,state) =
-      split_state ~monitor kind exp key state @ acc
+  let split ~monitor (kind : split_kind) (term : split_term) (p : t) =
+    let add_split (key, state) =
+      let dynamic_splits =
+        match kind with
+        | Static -> SplitMap.remove term key.dynamic_splits
+        | Dynamic -> SplitMap.add term monitor key.dynamic_splits
+      in
+      let key = { key with dynamic_splits } in
+      split_state ~monitor term (key, state)
     in
-    List.fold_left add_split [] p
+    Transitioning.List.concat_map add_split p
 
   let update_dynamic_splits p =
     (* Update one state *)
-    let update_state acc (key,state) =
+    let update_state (key, state) =
       (* Split the states in the list l for the given exp *)
-      let update_exp exp (_i,monitor) l =
-        let resplit acc (k,x) =
-          split_state ~monitor Dynamic exp k x @ acc
-        in
-        List.fold_left resplit [] l
+      let update_exp term monitor l =
+        Transitioning.List.concat_map (split_state ~monitor term) l
       in
       (* Foreach exp in original state: split *)
-      ExpMap.fold update_exp key.dynamic_split [(key,state)] @ acc
+      SplitMap.fold update_exp key.dynamic_splits [(key,state)]
     in
-    List.fold_left update_state [] p
+    Transitioning.List.concat_map update_state p
 
   let map_keys (f : key -> state -> key) (p : t) : t =
     List.map (fun (k,x) -> f k x, x) p
@@ -412,8 +568,9 @@ struct
               match AutoLoopUnroll.compute ~max_unroll x stmt with
               | None -> min_unroll
               | Some i ->
-                Value_parameters.warning ~once:true ~current:true
-                  ~wkey:Value_parameters.wkey_loop_unroll
+                let source = fst (Cil_datatype.Stmt.loc stmt) in
+                Value_parameters.warning ~once:true ~current:true ~source
+                  ~wkey:Value_parameters.wkey_loop_unroll_auto
                   "Automatic loop unrolling.";
                 i
             with
@@ -434,7 +591,7 @@ struct
               if h >= limit then begin
                 if limit > 0 then
                   Value_parameters.warning ~once:true ~current:true
-                    ~wkey:Value_parameters.wkey_loop_unroll
+                    ~wkey:Value_parameters.wkey_loop_unroll_partial
                     "loop not completely unrolled";
                 k
               end
@@ -470,28 +627,26 @@ struct
         | Restrict (expr, expected_values) -> fun k s ->
           { k with ration_stamp = stamp_by_value expr expected_values s}
 
-        | Merge (exp, Static) -> fun k _x ->
-          { k with static_split = ExpMap.remove exp k.static_split }
-
-        | Merge (exp, Dynamic) -> fun k _x ->
-          { k with dynamic_split = ExpMap.remove exp k.dynamic_split }
+        | Merge term -> fun k _x ->
+          { k with splits = SplitMap.remove term k.splits;
+                   dynamic_splits = SplitMap.remove term k.dynamic_splits }
       in
       map_keys transfer p
 
-  let transfer_states (f : state -> state list) (p : t) : t =
+  let transfer (f : (key * state) -> (key * state) list) (p : t) : t =
     let n = ref 0 in
-    let transfer acc (k,x) =
-      let add =
+    let transfer acc key_state =
+      let add l (k, y) =
         match k.ration_stamp with
         (* No ration stamp, just add the state to the list *)
-        | None -> fun l y -> (k,y) :: l
+        | None -> (k, y) :: l
         (* There is a ration stamp, set the second part of the stamp to a unique transfer number *)
-        | Some (s,_) -> fun l y ->
+        | Some (s,_) ->
           let k' = { k with ration_stamp = Some (s, !n) } in
           incr n;
-          (k',y) :: l
+          (k', y) :: l
       in
-      List.fold_left add acc (f x)
+      List.fold_left add acc (f key_state)
     in
     List.fold_left transfer [] p
 

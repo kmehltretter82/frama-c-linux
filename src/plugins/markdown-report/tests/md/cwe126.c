@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-mdr-remarks %{dep:@PTEST_NAME@.remarks.md}"
+   OPT: -mdr-remarks %{dep:@PTEST_DIR@/@PTEST_NAME@.remarks.md}
  */
 
 /* extracted from Juliet test suite v1.3 for C

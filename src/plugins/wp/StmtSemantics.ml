@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -98,7 +98,7 @@ struct
                subst_formals = Varinfo.Map.empty} in
     env @* [
       Clabels.init, Cfg.node ();
-      Clabels.at_exit, Cfg.node();
+      Clabels.exit, Cfg.node();
     ]
 
   (* -------------------------------------------------------------------------- *)
@@ -380,7 +380,7 @@ struct
         @* [Clabels.init, env @: Clabels.init;
             Clabels.pre, pre_node; Clabels.here, pre_node;
             Clabels.next, post_node; Clabels.post, post_node;
-            Clabels.at_exit, env @: Clabels.at_exit]
+            Clabels.exit, env @: Clabels.exit]
       in
 
       (* TODO: Call inlining. *)
@@ -391,7 +391,7 @@ struct
       @^ result (env_call @* [(Clabels.here, return_node);
                               (Clabels.next, next_node)])
       @^ exit_status (env_call @* [(Clabels.here, exit_stop);
-                                   (Clabels.next, env @: Clabels.at_exit)])
+                                   (Clabels.next, env @: Clabels.exit)])
 
   and call
     : env -> lval option -> exp -> exp list -> paths
@@ -469,7 +469,7 @@ struct
         (fun acc post -> acc @^ post_cond Exits post_at_exit_env post)
         nop b.b_post_cond
       @^ goto post_normal_behavior  (env @: Clabels.post)
-      @^ goto post_at_exit_behavior (env @: Clabels.at_exit)
+      @^ goto post_at_exit_behavior (env @: Clabels.exit)
     in
     let env = env @* [Clabels.here, env @: Clabels.pre; Clabels.next, env @: Clabels.post] in
     parallel behavior env spec.spec_behavior
@@ -597,7 +597,7 @@ struct
     let next = (a.return_point,Vertex.Set.empty) in
     let wto =
       WTO.partition
-        ?pref:None (* natural loop keep the heads *)
+        ~pref:(fun _ _ -> 0) (* natural loops keep their heads *)
         ~succs:(UnrollUnnatural.G.succ g)
         ~init:here in
 
@@ -666,7 +666,7 @@ struct
   let init ~is_pre_main env =
     let ninit = (env @: Clabels.init) in
     let sinit = Sigma.create () in
-    (** todo WpStrategy.is_main_init, need to test that seq.pre is the
+    (** todo Globals.is_entry_point kf, need to test that seq.pre is the
         start of the function *)
     (** todo warning *)
     let cfg_init = Globals.Vars.fold_in_file_order
@@ -690,10 +690,10 @@ struct
       let sconst = Sigma.havoc_any ~call:false sinit in
       let havoc = Cfg.E.create {pre=sinit; post=sconst} Lang.F.p_true in
       let consts =
-        if WpStrategy.isInitConst () then
+        if Wp_parameters.Init.get () then
           Globals.Vars.fold_in_file_order
             (fun var _ cfg ->
-               if WpStrategy.isGlobalInitConst var
+               if Cil.isGlobalInitConst var
                then
                  let h = (C.unchanged sconst sinit var) in
                  let h = Cfg.P.create
@@ -770,7 +770,8 @@ struct
     let posts = { pre = Cfg.node (); post = Cfg.node () } in
     let env = empty_env kf @* [Clabels.pre,pres.post;Clabels.post,posts.pre] in
     (* initialization *)
-    let init = init ~is_pre_main:(WpStrategy.is_main_init kf)
+    let init =
+      init ~is_pre_main:(Globals.is_entry_point ~when_lib_entry:false kf)
         (env @* [Clabels.here,pres.pre]) in
     (* pre-condition *)
     let pre =

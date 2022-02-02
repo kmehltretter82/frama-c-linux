@@ -1,5 +1,5 @@
 /* run.config
- PLUGIN: pdg
+ PLUGIN: @EVA_PLUGINS@ pdg
  MODULE: @PTEST_NAME@
    OPT: -then -main main2
 */

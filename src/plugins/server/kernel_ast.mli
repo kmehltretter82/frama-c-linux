@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,7 +27,10 @@
 open Package
 open Cil_types
 
+module Position : Data.S with type t = Filepath.position
+
 module Kf : Data.S with type t = kernel_function
+module Fundec : Data.S with type t = fundec
 module Ki : Data.S with type t = kinstr
 module Stmt : Data.S with type t = stmt
 module Lval : Data.S with type t = kinstr * lval

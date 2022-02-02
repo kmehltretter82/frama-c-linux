@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 type tab = {
-  tab_name : string ;
   tab_file : Datatype.Filepath.t ;
   tab_page : int ;
   tab_select : line:int -> unit ;
@@ -172,7 +171,7 @@ let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb 
                                             Filepath.pos_bol = offset - col;
                                             Filepath.pos_cnum = offset;} in
                                  let localz =
-                                   Pretty_source.loc_to_localizable ~precise_col:true pos
+                                   Printer_tag.loc_to_localizable ~precise_col:true pos
                                  in
                                  click_cb localz
                                with Not_found ->
@@ -184,7 +183,6 @@ let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb 
                     ));
         let tab = {
           tab_file = filename ;
-          tab_name = name ;
           tab_select = select_line ;
           tab_page = page_num ;
           tab_source_view = original_source_view;

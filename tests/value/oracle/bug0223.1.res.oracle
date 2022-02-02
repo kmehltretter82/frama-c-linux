@@ -48,7 +48,7 @@
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function F:
-  \result FROM \nothing
+  \result FROM __x0; __x1
 [from] Function my_strcnmp:
   \result FROM n
 [from] Function h2:

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -43,10 +43,13 @@
     "__STDC_UTF_16__"; "__STDC_UTF_32__";
     (* 6.10.8.3 conditional feature macros *)
     "__STDC_ANALYZABLE__"; "__STDC_IEC_559__"; "__STDC_IEC_559_COMPLEX__";
-    "__STDC_LIB_EXT1__"; "__STD_NO_ATOMICS__"; "__STD_NO_COMPLEX__";
+    "__STDC_LIB_EXT1__"; "__STDC_NO_ATOMICS__"; "__STDC_NO_COMPLEX__";
     "__STDC_NO_THREADS__"; "__STDC_NO_VLA__";
     (* expanding assert, an ACSL keyword, is not a good idea. *)
-    "assert"]
+    "assert";
+    (* __nonnull is predefined by Clang on macOS. *)
+    "__nonnull";
+  ]
   let is_newline = ref CHAR
   let curr_file = ref ""
   let curr_line = ref 1
@@ -171,7 +174,10 @@
       Buffer.output_buffer ppfile preprocess_buffer;
       close_out ppfile;
       let cppname = Extlib.temp_file_cleanup_at_exit ~debug "cppannot" suffix in
-      let res = Sys.command (cpp ppname cppname) in
+      let pp_cmd = cpp ppname cppname in
+      Kernel.feedback ~dkey:Kernel.dkey_pp_logic
+        "logic preprocessing with \"%s\"" pp_cmd;
+      let res = Sys.command pp_cmd in
       let result_file =
         if res <> 0 then begin
           abort_preprocess "Preprocessor call exited with an error";

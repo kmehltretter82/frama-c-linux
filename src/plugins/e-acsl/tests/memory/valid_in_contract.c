@@ -6,7 +6,7 @@
 
 struct list {
   int element;
-  struct list * next;
+  struct list *next;
 };
 
 /*@
@@ -17,11 +17,13 @@ struct list {
   @  assumes ! \valid(l) || ! \valid(l->next);
   @  ensures \result == l;
 */
-struct list * f(struct list * l) {
+struct list *f(struct list *l) {
   /* length = 0 */
-  if(l == NULL) return l;
+  if (l == NULL)
+    return l;
   /* length = 1 : already sorted */
-  if(l->next == NULL) return l;
+  if (l->next == NULL)
+    return l;
 
   return NULL;
 }

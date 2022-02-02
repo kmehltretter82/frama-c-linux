@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -67,15 +67,15 @@ let menu entries ?width ?tooltip ~packing get set demon =
       match combo_box#active_iter with
       | None -> ()
       | Some row ->
-          let title = (combo_box#model#get ~row ~column) in
-          let (_,item) = List.find (fun (t,_) -> t=title) entries in
-          set item
+        let title = (combo_box#model#get ~row ~column) in
+        let (_,item) = List.find (fun (t,_) -> t=title) entries in
+        set item
     with Not_found -> ()
   in
   let rec lookup k item = function
     | [] -> raise Not_found
     | (_,value) :: entries ->
-        if value = item then k else lookup (succ k) item entries
+      if value = item then k else lookup (succ k) item entries
   in
   let update () =
     try combo_box#set_active (lookup 0 (get ()) entries)
@@ -93,7 +93,7 @@ let spinner ?(lower=0) ?(upper=max_int) ?width ?tooltip ~packing get set demon =
   let spin = GEdit.spin_button ~digits:0 ?width ~packing () in
   spin#adjustment#set_bounds
     ~lower:(float lower) ~upper:(float upper) ~step_incr:1. () ;
-  let callback () = 
+  let callback () =
     let a = spin#value_as_int in
     let b = get () in
     if a<>b then set a in

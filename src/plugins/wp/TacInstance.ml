@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -68,7 +68,7 @@ let rec complexity = function
 let cardinal limit bindings =
   let n = complexity bindings in
   if Integer.le n (Integer.of_int limit)
-  then Some (Integer.to_int n) else None
+  then Some (Integer.to_int_exn n) else None
 
 let rec bind_exists bindings property =
   match bindings with

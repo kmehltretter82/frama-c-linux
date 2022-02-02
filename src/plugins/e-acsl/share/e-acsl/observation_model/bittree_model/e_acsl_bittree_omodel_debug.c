@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -36,15 +36,15 @@ void describe_observation_model() {
     allocated or not.
     NOTE: Should have same signature in all models. */
 int allocated(uintptr_t addr, long size, uintptr_t base) {
-  return lookup_allocated((void*)addr, size, (void*)base) == NULL ? 0 : 1;
+  return lookup_allocated((void *)addr, size, (void *)base) == NULL ? 0 : 1;
 }
 
-int readonly (void *ptr) {
-  bt_block * blk = bt_find(ptr);
-  private_assert(blk != NULL, "Readonly on unallocated memory", NULL);
+int readonly(void *ptr) {
+  bt_block *blk = bt_find(ptr);
+  private_assert(blk != NULL, "Readonly on unallocated memory\n", NULL);
   return blk->is_readonly;
 }
 
 int writeable(uintptr_t addr, long size, uintptr_t base_ptr) {
-  return allocated(addr, size, base_ptr) && !readonly((void*)addr);
+  return allocated(addr, size, base_ptr) && !readonly((void *)addr);
 }

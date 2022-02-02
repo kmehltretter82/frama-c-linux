@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -26,11 +26,11 @@
 # for a given function name, via heuristic syntactic matching.
 
 import argparse
-import sys
+import function_finder
 import os
 import re
-import glob
-import function_finder
+import sys
+from pathlib import Path
 
 MIN_PYTHON = (3, 5) # for glob(recursive)
 if sys.version_info < MIN_PYTHON:
@@ -65,17 +65,20 @@ if not dirs:
 else:
     dirs = set(sys.argv[2:])
 
-files = []
+files = set()
 for d in dirs:
-    files += glob.glob(d + "/**/*.[ich]", recursive=True)
+    # The usage of Path.glob here prevents symbolic links from being
+    # followed, which is desirable in some situations. However, if you
+    # need them, try using glob.glob instead.
+    files.update(Path(d).glob("**/*.[ich]"))
 
 print("Looking for '%s' inside %d file(s)..." % (fname, len(files)))
 
 possible_declarators = []
 possible_definers = []
-re_fun = function_finder.prepare(fname)
+re_fun = function_finder.prepare_re_specific_name(fname)
 for f in files:
-    found = function_finder.find(re_fun, f)
+    found = function_finder.find_specific_name(re_fun, f)
     if found:
         if found == 1:
             possible_declarators.append(f)
@@ -95,7 +98,7 @@ else:
     relative_path = relative_path_to(reldir)
     if possible_declarators != []:
         print(f"Possible declarations for function '{fname}' in the following file(s){reldir_msg}:")
-        print("  " + "\n  ".join([os.path.relpath(path, start=reldir) for path in possible_declarators]))
+        print("  " + "\n  ".join(sorted([os.path.relpath(path, start=reldir) for path in possible_declarators])))
     if possible_definers != []:
         print(f"Possible definitions for function '{fname}' in the following file(s){reldir_msg}:")
-        print("  " + "\n  ".join([os.path.relpath(path, start=reldir) for path in possible_definers]))
+        print("  " + "\n  ".join(sorted([os.path.relpath(path, start=reldir) for path in possible_definers])))

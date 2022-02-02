@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -100,6 +100,14 @@ module Builtins =
       let help = "C functions which can be used in the E-ACSL specifications"
     end)
 
+module Assert_print_data =
+  True
+    (struct
+      let option_name = "-e-acsl-assert-print-data"
+      let help = "print data contributing to the failed assertion along with \
+                  the runtime error message"
+    end)
+
 module Functions =
   Kernel_function_set
     (struct
@@ -149,7 +157,18 @@ let parameter_states =
     Functions.self;
     Instrument.self ]
 
-let emitter = Emitter.create "E-ACSL" [ Funspec ] ~correctness:[] ~tuning:[]
+let emitter =
+  Emitter.create
+    "E_ACSL"
+    [ Emitter.Code_annot; Emitter.Funspec ]
+    ~correctness:[ Functions.parameter;
+                   Instrument.parameter;
+                   Validate_format_strings.parameter;
+                   Temporal_validity.parameter ]
+    ~tuning:[ Gmp_only.parameter;
+              Valid.parameter;
+              Replace_libc_functions.parameter;
+              Full_mtracking.parameter ]
 
 let must_visit () = Run.get ()
 
@@ -157,6 +176,35 @@ let dkey_analysis = register_category "analysis"
 let dkey_prepare = register_category "preparation"
 let dkey_translation = register_category "translation"
 let dkey_typing = register_category "typing"
+
+let setup ?(rtl=false) () =
+  (* Variadic translation *)
+  if Plugin.is_present "variadic" then begin
+    let opt_name = "-variadic-translation" in
+    if Dynamic.Parameter.Bool.get opt_name () then begin
+      if rtl then
+        (* If we are translating the RTL project, then we need to deactivate the
+           variadic translation. Indeed since we are translating the RTL in
+           isolation, we do not now if the variadic functions are used by the
+            user project and we cannot monomorphise them accordingly. *)
+        Dynamic.Parameter.Bool.off opt_name ()
+      else if Validate_format_strings.get () then begin
+        if Ast.is_computed () then
+          abort
+            "The variadic translation is incompatible with E-ACSL option \
+             '%s'.@ Please use option '-variadic-no-translation'."
+            Validate_format_strings.option_name;
+        warning ~once:true "deactivating variadic translation";
+        Dynamic.Parameter.Bool.off opt_name ();
+      end
+    end
+  end;
+  (* Additionnal kernel options while parsing the RTL project. *)
+  if rtl then begin
+    Kernel.Keep_unused_specified_functions.off ();
+    Kernel.CppExtraArgs.add
+      (Format.asprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
+  end
 
 (*
 Local Variables:

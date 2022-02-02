@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -57,63 +57,62 @@ end
 
 (** Output signature of the functor {!Set.Make}. *)
 module type S = sig
+  type 'a map
 
-    include Datatype.S_with_collections
-    include S_Basic_Compare with type t := t
-    (** The datatype of sets. *)
+  include Datatype.S_with_collections with type t = unit map
+  include S_Basic_Compare with type t := t
+  (** The datatype of sets. *)
 
-    val contains_single_elt: t -> elt option
+  val contains_single_elt: t -> elt option
 
-    val intersects: t -> t -> bool
-    (** [intersects s1 s2] returns [true] if and only if [s1] and [s2]
-        have an element in common *)
+  val intersects: t -> t -> bool
+  (** [intersects s1 s2] returns [true] if and only if [s1] and [s2]
+      have an element in common *)
 
-    type action = Neutral | Absorbing | Traversing of (elt -> bool)
+  type action = Neutral | Absorbing | Traversing of (elt -> bool)
 
-    val merge :
-      cache:Hptmap_sig.cache_type ->
-      symmetric:bool ->
-      idempotent:bool ->
-      decide_both:(elt -> bool) ->
-      decide_left:action ->
-      decide_right:action ->
-      t -> t -> t
+  val merge :
+    cache:Hptmap_sig.cache_type ->
+    symmetric:bool ->
+    idempotent:bool ->
+    decide_both:(elt -> bool) ->
+    decide_left:action ->
+    decide_right:action ->
+    t -> t -> t
 
-    type 'a shape
-    (** Shape of the set, ie. the unique shape of its OCaml value. *)
+  val from_map: 'a map -> t
 
-    val shape: t -> unit shape
-    (** Export the shape of the set. *)
+  val fold2_join_heterogeneous:
+    cache:Hptmap_sig.cache_type ->
+    empty_left:('a map -> 'b) ->
+    empty_right:(t -> 'b) ->
+    both:(elt -> 'a -> 'b) ->
+    join:('b -> 'b -> 'b) ->
+    empty:'b ->
+    t -> 'a map ->
+    'b
 
-    val from_shape: 'a shape -> t
-    (** Build a set from another [elt]-indexed map or set. *)
+  val replace: elt map -> t -> bool * t
+  (** [replace shape set] replaces the elements of [set] according to [shape].
+      The returned boolean indicates whether the set has been modified; it is
+      false when the intersection between [shape] and [set] is empty. *)
 
-    val fold2_join_heterogeneous:
-      cache:Hptmap_sig.cache_type ->
-      empty_left:('a shape -> 'b) ->
-      empty_right:(t -> 'b) ->
-      both:(elt -> 'a -> 'b) ->
-      join:('b -> 'b -> 'b) ->
-      empty:'b ->
-      t -> 'a shape ->
-      'b
+  (** Clear all the caches used internally by the functions of this module.
+      Those caches are not project-aware, so this function must be called
+      at least each a project switch occurs. *)
+  val clear_caches: unit -> unit
 
-    (** Clear all the caches used internally by the functions of this module.
-        Those caches are not project-aware, so this function must be called
-        at least each a project switch occurs. *)
-    val clear_caches: unit -> unit
-
-    val pretty_debug: t Pretty_utils.formatter
+  val pretty_debug: t Pretty_utils.formatter
 end
 
 module Make(X: Hptmap.Id_Datatype)
-  (Initial_Values : sig val v : X.t list list end)
-  (Datatype_deps: sig val l : State.t list end) :
-  sig
-    include S with type elt = X.t
-              and type 'a shape = 'a Hptmap.Shape(X).t
-    val self : State.t
-  end
+    (Initial_Values : sig val v : X.t list list end)
+    (Datatype_deps: sig val l : State.t list end) :
+sig
+  include S with type elt = X.t
+             and type 'a map = 'a Hptmap.Shape(X).map
+  val self : State.t
+end
 
 (*
 Local Variables:

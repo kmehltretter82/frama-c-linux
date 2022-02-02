@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -43,6 +43,10 @@ module type S = sig
 
   val to_value : location -> value
   val size : location -> Int_Base.t
+
+  (** [replace_base substitution location] replaces the variables represented
+      by the [location] according to [substitution]. *)
+  val replace_base: Base.substitution -> location -> location
 
   (** {3 Alarms } *)
 

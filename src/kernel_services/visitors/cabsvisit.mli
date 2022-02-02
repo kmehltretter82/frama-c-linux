@@ -48,7 +48,7 @@ open Cil
 
 type nameKind =
     NVar                                (** Variable or function prototype
-                                           name *)
+                                            name *)
   | NFun                                (** Function definition name *)
   | NField                              (** The name of a field *)
   | NType                               (** The name of a type *)
@@ -67,7 +67,7 @@ class type cabsVisitor = object
   method vtypespec: Cabs.typeSpecifier -> Cabs.typeSpecifier visitAction
   method vdecltype: Cabs.decl_type -> Cabs.decl_type visitAction
 
-      (* For each declaration we call vname *)
+  (* For each declaration we call vname *)
   method vname: nameKind -> Cabs.specifier -> Cabs.name -> Cabs.name visitAction
   method vspec: Cabs.specifier -> Cabs.specifier visitAction     (* specifier *)
   method vattr: Cabs.attribute -> Cabs.attribute list visitAction
@@ -82,7 +82,7 @@ class nopCabsVisitor: cabsVisitor
 
 
 val visitCabsTypeSpecifier: cabsVisitor ->
-                            Cabs.typeSpecifier -> Cabs.typeSpecifier
+  Cabs.typeSpecifier -> Cabs.typeSpecifier
 val visitCabsSpecifier: cabsVisitor -> Cabs.specifier -> Cabs.specifier
 
 (** Visits a decl_type. The bool argument is saying whether we are in a
@@ -94,9 +94,9 @@ val visitCabsBlock: cabsVisitor -> Cabs.block -> Cabs.block
 val visitCabsStatement: cabsVisitor -> Cabs.statement -> Cabs.statement list
 val visitCabsExpression: cabsVisitor -> Cabs.expression -> Cabs.expression
 val visitCabsAttributes: cabsVisitor -> Cabs.attribute list
-                                     -> Cabs.attribute list
+  -> Cabs.attribute list
 val visitCabsName: cabsVisitor -> nameKind
-                   -> Cabs.specifier -> Cabs.name -> Cabs.name
+  -> Cabs.specifier -> Cabs.name -> Cabs.name
 val visitCabsFile: cabsVisitor -> Cabs.file -> Cabs.file
 
 

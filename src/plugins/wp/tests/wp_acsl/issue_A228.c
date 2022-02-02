@@ -1,3 +1,7 @@
+/* run.config_qualif
+   OPT: -wp-steps 100
+ */
+
 _Bool A, B;
 
 /*@

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,8 +27,7 @@ let scope = function
 type row = Log.event
 
 type t =
-  { widget: (int*row) Wtable.columns;
-    append : row -> unit;
+  { append : row -> unit;
     clear : unit -> unit;}
 
 module Data = Indexer.Make(
@@ -78,7 +77,7 @@ let make ~packing ~callback =
       (fun (_,{evt_message=m}) -> [`TEXT m])
   in
   w#on_click (fun (_,w) c -> callback w c);
-  {widget=w;append=append;clear=clear}
+  {append=append;clear=clear}
 
 let append t message = t.append message
 

@@ -10,59 +10,19 @@
 < [eva] auto_loop_unroll.c:41: Frama_C_show_each_imprecise: [0..2147483647]
 ---
 > [eva] auto_loop_unroll.c:41: Frama_C_show_each_imprecise: {100}
-321,323c317
-< [eva:alarm] auto_loop_unroll.c:173: Warning: 
+328,330c324
+< [eva:alarm] auto_loop_unroll.c:204: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] auto_loop_unroll.c:175: Frama_C_show_each_imprecise: [0..2147483647]
+< [eva] auto_loop_unroll.c:206: Frama_C_show_each_imprecise: [0..2147483647]
 ---
-> [eva] auto_loop_unroll.c:175: Frama_C_show_each_imprecise: [1..9]
-325,326d318
-< [eva:alarm] auto_loop_unroll.c:181: Warning: 
+> [eva] auto_loop_unroll.c:206: Frama_C_show_each_imprecise: [1..9]
+332,333d325
+< [eva:alarm] auto_loop_unroll.c:212: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-329c321
-< [eva] auto_loop_unroll.c:183: Frama_C_show_each_imprecise: [0..2147483647]
+336c328
+< [eva] auto_loop_unroll.c:214: Frama_C_show_each_imprecise: [0..2147483647]
 ---
-> [eva] auto_loop_unroll.c:183: Frama_C_show_each_imprecise: [64..2147483647]
-372a365,406
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 200 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 300 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 400 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 500 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 600 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 700 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 800 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 900 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1000 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1100 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1200 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1300 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1400 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1500 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1600 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1700 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1800 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 1900 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2000 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2100 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2200 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2300 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2400 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2500 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2600 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2700 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2800 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 2900 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3000 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3100 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3200 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3300 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3400 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3500 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3600 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3700 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3800 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 3900 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 4000 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 4100 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 4200 states
-> [eva] auto_loop_unroll.c:276: Trace partitioning superposing up to 4300 states
+> [eva] auto_loop_unroll.c:214: Frama_C_show_each_imprecise: [64..2147483647]
+371,372d362
+< [eva:alarm] auto_loop_unroll.c:299: Warning: 
+<   signed overflow. assert i + 1 ≤ 2147483647;

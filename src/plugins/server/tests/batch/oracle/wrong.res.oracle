@@ -1,5 +1,5 @@
 [kernel] Parsing wrong.i (no preprocessing)
-[server] Script "wrong.json"
+[server] Script "./wrong.json"
 [server] User Error: [batch] "unknown request": request "kernel.unknown" not found
 [server] [GET] kernel.ast.printFunction
 [server] User Error: [kernel.ast.printFunction] Expected string, got object:

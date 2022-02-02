@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -45,7 +45,7 @@ let select_op f =
 let select_int n =
   match F.repr n with
   | Qed.Logic.Kint n ->
-      (try Integer.to_int n with Z.Overflow -> raise Not_found)
+      (try Integer.to_int_exn n with Z.Overflow -> raise Not_found)
   | _ -> raise Not_found
 
 class shift =

@@ -8,8 +8,8 @@ int posix_memalign(void **memptr, size_t alignment, size_t size);
 void *aligned_alloc(size_t alignment, size_t size);
 
 int main(int argc, const char **argv) {
-  char **memptr = malloc(sizeof(void*));
-  int res2 = posix_memalign((void**)memptr, 256, 15);
+  char **memptr = malloc(sizeof(void *));
+  int res2 = posix_memalign((void **)memptr, 256, 15);
 
   char *p = *memptr;
   /*@assert \valid(p); */

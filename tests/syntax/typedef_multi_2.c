@@ -1,5 +1,5 @@
 /* run.config
-DONTRUN: main test is at typedef_multi_1.c
+DONTRUN: main test is at %{dep:@PTEST_DIR@/typedef_multi_1.c}
 */
 
 #include "typedef_multi.h"

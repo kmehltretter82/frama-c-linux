@@ -20,13 +20,54 @@
 #   <Prover>: prover
 ###############################################################################
 
-#########################
+########################
 Plugin WP <next-release>
+########################
+
+- TIP         [2022-01-05] New tactic Clear: remove hypothesis
+-* WP         [2022-01-05] Fix loop invariant order
+- WP          [2022-01-05] Weaken check loop invariant
+- TIP         [2021-11-30] Extended Split tactic: can split in hypotheses, can
+                           split conjunctions into multiple hypotheses.
+- WP          [2021-11-08] Removed legacy WP engine and option -wp-legacy
+
+#########################
+Plugin WP 24.0 (Chromium)
 #########################
 
+- WP          [2021-10-25] Removes -wp-overflows option (unsound)
+- WP          [2021-06-11] Adds an experimental support of "terminates" clauses.
+                           Adds the options -wp-declaration-terminate and
+                           -wp-frama-c-stdlib to claim that external functions
+                           terminates.
+                           Adds -wp-definitions-terminate option to claim that
+                           defined function terminates.
+                           Adds -wp-variant-with-terminates to verify loop
+                           variants under the termination hypothesis.
+- WP          [2021-06-01] -wp-smoke-tests detects incoherent assumes when no
+                           requires are specified, can be disabled with new
+                           option -wp-smoke-dead-assumes
+- TIP         [2021-05-31] Generalized Overflow tactic
 
-- WP          [2020-01-25] Improved -wp-unfold-assigns <depth>
-			   Now recursively applies to all compounds
+#########################
+Plugin WP 23.1 (Vanadium)
+#########################
+
+- WP          [2021-07-15] Fix a crash related to opaque structures memory typing
+
+#########################
+Plugin WP 23.0 (Vanadium)
+#########################
+
+- WP          [2021-03-01] Section « Limitation & Roadmap » added to the WP manual.
+- WP          [2021-03-01] New internal WP engine, fixing many issues related to
+                           control flow graph and local variable scoping.
+                           Support for stmt contracts has been removed.
+                           Support for looping gotos has been removed.
+                           Altough unsound, the legacy engine is still
+                           accessible via -wp-legacy option.
+- WP          [2021-01-25] Improved -wp-unfold-assigns <depth>
+                           Now recursively applies to all compounds
 -* WP         [2020-01-20] Fixes opaque structures handling
 - TIP         [2020-11-06] New tactic: Sequence unrolling
 - TIP         [2020-11-05] New tactic: Induction

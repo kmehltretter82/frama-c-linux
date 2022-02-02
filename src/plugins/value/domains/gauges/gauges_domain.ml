@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -388,11 +388,8 @@ module G = struct
       | Some i -> MC.singleton b i
     in
     let join = MC.merge_disjoint in
-    let f =
-      MV.fold2_join_heterogeneous
-        ~cache ~empty_left ~empty_right ~both ~join ~empty
-    in
-    fun mv1 mv2 -> f mv1 (MV.shape mv2)
+    MV.fold2_join_heterogeneous
+      ~cache ~empty_left ~empty_right ~both ~join ~empty
 
   (* compute pointwise [mv - mc] *)
   let mv_minus_mc =
@@ -411,11 +408,8 @@ module G = struct
       MV.singleton b v'
     in
     let join = MV.merge_disjoint in
-    let f =
-      MV.fold2_join_heterogeneous
-        ~cache ~empty_left ~empty_right ~both ~join ~empty
-    in
-    fun mv mc -> f mv (MC.shape mc)
+    MV.fold2_join_heterogeneous
+      ~cache ~empty_left ~empty_right ~both ~join ~empty
 
   (* Implementation of the 'forget' operation. [nb] loop iterations have
      elapsed, and during one iteration, variables are incremented by [coeffs].
@@ -435,7 +429,7 @@ module G = struct
     in
     let join = MV.merge_disjoint in
     MV.fold2_join_heterogeneous
-      ~cache ~empty_left ~empty_right ~both ~join ~empty mv (MC.shape mc)
+      ~cache ~empty_left ~empty_right ~both ~join ~empty mv mc
 
   type multiple_iterations = { nb: Bounds.t; coeffs: MC. t}
 
@@ -464,19 +458,14 @@ module G = struct
     let widen _stmt ~widen_nb i1 i2 =
       let nb =
         if widen_nb then
-          let threshold =
-            None (* LoopAnalysis.Loop_analysis.get_bounds _stmt *)
-          in
-          (* TODO: since we cannot easily use LoopAnalysis here, we
-             should instead:
+          (* TODO:
              - collect the conditionals that exit the loop, as done
                for syntactic hints, if possible in a structured way
                (i.e. base + interval for which we exit the loop)
              - invert this interval using the gauges domain, to
                deduce the number of iterations from which we exit
              - use the max of those values as threshold. *)
-          let threshold = Option.map Integer.of_int threshold in
-          let (min, max as w) = Bounds.widen ?threshold i1.nb i2.nb in
+          let (min, max as w) = Bounds.widen i1.nb i2.nb in
           (* Limit min bound to 0 *)
           if min = None then (Some Integer.zero, max) else w
         else
@@ -486,7 +475,7 @@ module G = struct
 
     (* Keep only the variables of [mi.coeffs] already present in [mv]. *)
     let restrict mv mi =
-      { mi with coeffs = MC.inter_with_shape (MV.shape mv) mi.coeffs }
+      { mi with coeffs = MC.inter_with_shape mv mi.coeffs }
 
   end
 
@@ -1122,7 +1111,7 @@ end
 
 let dkey = Value_parameters.register_category "d-gauges"
 
-module D_Impl : Abstract_domain.S
+module D : Abstract_domain.Leaf
   with type state = G.t
    and type value = Cvalue.V.t
    and type location = Precise_locs.precise_location
@@ -1133,8 +1122,8 @@ module D_Impl : Abstract_domain.S
   type origin
 
   include G
+  include Domain_builder.Complete (struct include G let top = empty end)
 
-  let name = "Gauges domain"
   let log_category = dkey
 
   let empty _ = G.empty
@@ -1213,7 +1202,7 @@ module D_Impl : Abstract_domain.S
     try `Value (G.assign to_loc to_val lv.lval e state)
     with Unassignable -> `Value (kill lv.lloc state)
 
-  let finalize_call _stmt _call ~pre ~post =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     let state =
       match function_calls_handling with
       | FullInterprocedural -> post
@@ -1222,10 +1211,16 @@ module D_Impl : Abstract_domain.S
     in
     `Value state
 
-  let start_call _stmt call valuation state =
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    remove_variables vars state
+
+  let start_call _stmt call recursion valuation state =
     let state =
       match function_calls_handling with
-      | FullInterprocedural -> update valuation state
+      | FullInterprocedural ->
+        update valuation state >>-: fun state ->
+        Extlib.opt_fold start_recursive_call recursion state
       | IntraproceduralAll
       | IntraproceduralNonReferenced -> `Value G.empty
     in
@@ -1251,18 +1246,16 @@ module D_Impl : Abstract_domain.S
     let state = List.fold_left aux_arg state call.arguments in
     `Value state
 
-  let show_expr _valuation _state _fmt _expr = ()
-
   let enter_loop = G.enter_loop
   let incr_loop_counter _ = G.inc
   let leave_loop = G.leave_loop
 
   (* TODO: it would be interesting to return something here, but we
      currently need a valuation to perform the translation. *)
-  let extract_expr _oracle _state _exp =
+  let extract_expr ~oracle:_ _context _state _exp =
     `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_lval _oracle state _lv typ loc =
+  let extract_lval ~oracle:_ _context state _lv typ loc =
     let v =
       try
         let b = loc_to_base (Precise_locs.imprecise_location loc) typ in
@@ -1276,10 +1269,6 @@ module D_Impl : Abstract_domain.S
        and it is not clear that we know more than the Cvalue domain. *)
     `Value (v, None), Alarmset.all
 
-  let backward_location _state _lval _typ loc value = `Value (loc, value)
-
-  let reduce_further _state _expr _value = []
-
   (* Memexec *)
 
   let relate _kf _bases _state = match function_calls_handling with
@@ -1287,26 +1276,13 @@ module D_Impl : Abstract_domain.S
     | IntraproceduralAll
     | IntraproceduralNonReferenced -> Base.SetLattice.empty
 
-  let filter _kf _kind _bases state = state
-
-  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
-
   (* Initial state *)
   let initialize_variable_using_type _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
 
   (* Logic *)
   let logic_assign _assigns location state = kill location state
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
 
   let top = G.empty (* must not be used, not neutral w.r.t. join (because
                        join crashes...)!! *)
 end
-
-module D =
-  Domain_builder.Complete
-    (struct
-      include D_Impl
-      let storage = Value_parameters.GaugesStorage.get
-    end)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -89,15 +89,15 @@ module Make
       in
       value, alarms
 
-  let extract_expr oracle (left, right) expr =
+  let extract_expr ~oracle context (left, right) expr =
     merge
-      (Left.extract_expr oracle left expr)
-      (Right.extract_expr oracle right expr)
+      (Left.extract_expr ~oracle context left expr)
+      (Right.extract_expr ~oracle context right expr)
 
-  let extract_lval oracle (left, right) lval typ location =
+  let extract_lval ~oracle context (left, right) lval typ location =
     merge
-      (Left.extract_lval oracle left lval typ location)
-      (Right.extract_lval oracle right lval typ location)
+      (Left.extract_lval ~oracle context left lval typ location)
+      (Right.extract_lval ~oracle context right lval typ location)
 
   let backward_location (left, right) lval typ loc value =
     (* TODO: Loc.narrow *)
@@ -155,18 +155,20 @@ module Make
     Right.assume stmt expr positive (right_val valuation) right >>-: fun right ->
     left, right
 
-  let finalize_call stmt call ~pre ~post =
+  let finalize_call stmt call recursion ~pre ~post =
     let pre_left, pre_right = pre
     and left_state, right_state = post in
-    Left.finalize_call stmt call ~pre:pre_left ~post:left_state
+    Left.finalize_call stmt call recursion ~pre:pre_left ~post:left_state
     >>- fun left ->
-    Right.finalize_call stmt call ~pre:pre_right ~post:right_state
+    Right.finalize_call stmt call recursion ~pre:pre_right ~post:right_state
     >>-: fun right ->
     left, right
 
-  let start_call stmt call valuation (left, right) =
-    Left.start_call stmt call (left_val valuation) left >>- fun left ->
-    Right.start_call stmt call (right_val valuation) right >>-: fun right ->
+  let start_call stmt call recursion valuation (left, right) =
+    Left.start_call stmt call recursion (left_val valuation) left
+    >>- fun left ->
+    Right.start_call stmt call recursion (right_val valuation) right
+    >>-: fun right ->
     left, right
 
   let show_expr =
@@ -261,6 +263,11 @@ module Make
     Right.reduce_by_predicate right_env right pred positive >>-: fun right ->
     left, right
 
+  let interpret_acsl_extension extension env (left, right) =
+    let left_env, right_env = split_logic_env env in
+    Left.interpret_acsl_extension extension left_env left,
+    Right.interpret_acsl_extension extension right_env right
+
   let enter_scope kind vars (left, right) =
     Left.enter_scope kind vars left, Right.enter_scope kind vars right
   let leave_scope kf vars (left, right) =
@@ -322,9 +329,9 @@ module Make
     | `Bottom, _ | _, `Bottom -> `Bottom
 
   module Store = struct
-    let register_global_state state =
-      Left.Store.register_global_state (state >>-: fst);
-      Right.Store.register_global_state (state >>-: snd)
+    let register_global_state b state =
+      Left.Store.register_global_state b (state >>-: fst);
+      Right.Store.register_global_state b (state >>-: snd)
     let register_initial_state callstack (left, right) =
       Left.Store.register_initial_state callstack left;
       Right.Store.register_initial_state callstack right
@@ -357,6 +364,11 @@ module Make
       and right_tbl = Right.Store.get_stmt_state_by_callstack ~after stmt in
       merge_callstack_tbl left_tbl right_tbl
 
+    let mark_as_computed () =
+      Left.Store.mark_as_computed ();
+      Right.Store.mark_as_computed ()
+
+    let is_computed () = Left.Store.is_computed () && Right.Store.is_computed ()
   end
 
   let post_analysis = function

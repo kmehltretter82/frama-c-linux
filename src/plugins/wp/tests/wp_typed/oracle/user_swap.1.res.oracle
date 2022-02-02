@@ -44,8 +44,8 @@ Prove: true.
   Memory model hypotheses for function 'swap':
   /*@
      behavior wp_typed_ref:
-       requires \separated(a, b);
        requires \valid(a);
        requires \valid(b);
+       requires \separated(a, b);
      */
   void swap(int *a, int *b);

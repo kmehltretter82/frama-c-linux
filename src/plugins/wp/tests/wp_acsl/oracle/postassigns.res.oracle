@@ -147,7 +147,7 @@ Prove: true.
 Goal Preservation of Invariant (file postassigns.c, line 38):
 Assume {
   Type: is_sint32(N) /\ is_sint32(i) /\ is_sint32(1 + i).
-  (* Pre-condition *)
+  (* Invariant *)
   Have: 0 <= N.
   (* Invariant *)
   Have: (i <= N) /\ (0 <= i).
@@ -176,19 +176,20 @@ Prove: true.
 
 Goal Loop assigns (file postassigns.c, line 39) (3/3):
 Effect at line 42
-Let a = shift_sint32(p, i).
+Let x = i - 1.
+Let a = shift_sint32(p, x).
 Assume {
-  Type: is_sint32(N) /\ is_sint32(i).
+  Type: is_sint32(N) /\ is_sint32(i) /\ is_sint32(x).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, a, 1).
-  (* Pre-condition *)
+  (* Invariant *)
   Have: 0 <= N.
   (* Invariant *)
-  Have: (i <= N) /\ (0 <= i).
+  Have: (0 < i) /\ (i <= (1 + N)).
   (* Then *)
-  Have: i < N.
+  Have: i <= N.
 }
 Prove: included(a, 1, shift_sint32(p, 0), N).
 

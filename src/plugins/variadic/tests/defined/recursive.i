@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-eva-ignore-recursive-calls"
+STDOPT: +"-eva-unroll-recursive-calls 10"
 */
 int f(int a, ...){
   if(a <= 0)

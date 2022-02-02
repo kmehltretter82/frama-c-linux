@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -125,7 +125,15 @@ let insert base path_name =
       Array.set cache (hash land 255) (Some (path_name, path));
       path
 
-let cwd = insert dummy (Sys.getcwd())
+(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
+   no function in its stdlib to resolve symbolic links (e.g. realpath)
+   for a given path. 'getcwd' always resolves them, but if the user
+   supplies a path with symbolic links, this may cause issues.
+   Instead of forcing the user to always provide resolved paths, we
+   currently choose to never resolve them.
+   Note that, in rare situations (e.g. some Docker images), PWD does not
+   exist in the environment, so in that case, we fallback to Sys.getcwd. *)
+let cwd = insert dummy (try Sys.getenv "PWD" with Not_found -> Sys.getcwd ())
 
 type existence =
   | Must_exist
@@ -171,7 +179,7 @@ let symbolic_dirs = Hashtbl.create 3
 
 let add_symbolic_dir name dir =
   Hashtbl.replace symbolic_dirs name dir;
-  (insert cwd dir).symbolic_name <- Some name
+  (insert cwd (dir:>string)).symbolic_name <- Some name
 
 let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
 
@@ -260,6 +268,7 @@ module Normalized = struct
   let of_string ?existence ?base_name s = normalize ?existence ?base_name s
   let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
   let to_pretty_string s = pretty s
+  let to_string_list l = l
   let equal : t -> t -> bool = (=)
   let compare = String.compare
 
@@ -269,8 +278,10 @@ module Normalized = struct
     if case_sensitive then String.compare s1 s2
     else Extlib.compare_ignore_case s1 s2
 
-  let unknown = normalize ""
-  let is_unknown fp = equal fp unknown
+  let empty = normalize ""
+  let unknown = empty
+  let is_empty fp = equal fp empty
+  let is_unknown = is_empty
   let special_stdout = normalize "-"
   let is_special_stdout fp = equal fp special_stdout
 
@@ -321,10 +332,6 @@ let add_symbolic_dir_list name = function
            let path = Printf.sprintf "%s#%d" name (succ i) in
            add_symbolic_dir path d)
         ds
-
-let () = add_symbolic_dir_list "FRAMAC_SHARE" Fc_config.datadirs
-let () = add_symbolic_dir_list "FRAMAC_PLUGIN" Fc_config.plugin_dir
-
 
 (*
 Local Variables:

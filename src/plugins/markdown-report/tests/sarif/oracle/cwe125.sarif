@@ -1,6 +1,6 @@
 {
   "$schema":
-    "https://github.com/oasis-tcs/sarif-spec/blob/master/Documents/CommitteeSpecificationDrafts/v2.1.0-CSD.1/sarif-schema-2.1.0.json",
+    "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
   "version": "2.1.0",
   "runs": [
     {
@@ -16,49 +16,50 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -check tests/sarif/cwe125.c -save tests/sarif/result/cwe125_parse.sav",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report cwe125.c -save ./cwe125_parse.sav",
           "arguments": [
-            "-check", "tests/sarif/cwe125.c", "-save",
-            "tests/sarif/result/cwe125_parse.sav"
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-add-symbolic-path", ":.",
+            "-load-module=eva,from,scope,markdown_report", "cwe125.c",
+            "-save", "./cwe125_parse.sav"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         },
         {
           "commandLine":
-            "frama-c -check -load tests/sarif/result/cwe125_parse.sav -eva -save tests/sarif/result/cwe125_eva.sav",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_parse.sav -eva -save ./cwe125_eva.sav",
           "arguments": [
-            "-check", "-load", "tests/sarif/result/cwe125_parse.sav", "-eva",
-            "-save", "tests/sarif/result/cwe125_eva.sav"
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-add-symbolic-path", ":.",
+            "-load-module=eva,from,scope,markdown_report", "-load",
+            "./cwe125_parse.sav", "-eva", "-save", "./cwe125_eva.sav"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         },
         {
           "commandLine":
-            "frama-c -check -load tests/sarif/result/cwe125_eva.sav -then -mdr-out tests/sarif/result/cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_eva.sav -then -mdr-out ./cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
           "arguments": [
-            "-check", "-load", "tests/sarif/result/cwe125_eva.sav", "-then",
-            "-mdr-out", "tests/sarif/result/cwe125.sarif", "-mdr-gen",
-            "sarif", "-mdr-no-print-libc", "-mdr-sarif-deterministic"
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-add-symbolic-path", ":.",
+            "-load-module=eva,from,scope,markdown_report", "-load",
+            "./cwe125_eva.sav", "-then", "-mdr-out", "./cwe125.sarif",
+            "-mdr-gen", "sarif", "-mdr-no-print-libc",
+            "-mdr-sarif-deterministic"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         }
       ],
       "originalUriBaseIds": {
-        "FRAMAC_SHARE": {
-          "uri": "file:///omitted-for-deterministic-output/"
-        },
-        "FRAMAC_LIB": { "uri": "file:///omitted-for-deterministic-output/" },
-        "FRAMAC_PLUGIN": {
-          "uri": "file:///omitted-for-deterministic-output/"
-        },
+        ".": { "uri": "file:///omitted-for-deterministic-output/" },
         "PWD": { "uri": "file:///omitted-for-deterministic-output/" }
       },
       "artifacts": [
         {
-          "location": { "uri": "tests/sarif/cwe125.c", "uriBaseId": "PWD" },
+          "location": { "uri": "cwe125.c", "uriBaseId": "PWD" },
           "roles": [ "analysisTarget" ],
           "mimeType": "text/x-csrc"
         }
@@ -76,10 +77,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 21,
                   "startColumn": 8,
@@ -102,106 +100,12 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
                   "endLine": 27,
                   "endColumn": 38,
                   "byteLength": 38
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "user-spec",
-          "kind": "pass",
-          "level": "none",
-          "message": { "text": "assigns clause in function printf." },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
-                "region": {
-                  "startLine": 27,
-                  "endLine": 27,
-                  "endColumn": 6,
-                  "byteLength": 6
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "user-spec",
-          "kind": "pass",
-          "level": "none",
-          "message": { "text": "specialization of order at stmt 10." },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
-                "region": {
-                  "startLine": 36,
-                  "startColumn": 13,
-                  "endLine": 36,
-                  "endColumn": 37,
-                  "byteLength": 24
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "user-spec",
-          "kind": "pass",
-          "level": "none",
-          "message": {
-            "text": "from clause of term \\result in function printf."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
-                "region": {
-                  "startLine": 27,
-                  "endLine": 27,
-                  "endColumn": 6,
-                  "byteLength": 6
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "user-spec",
-          "kind": "pass",
-          "level": "none",
-          "message": { "text": "behavior default! in function printf." },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
-                "region": {
-                  "startLine": 27,
-                  "endLine": 27,
-                  "endColumn": 6,
-                  "byteLength": 6
                 }
               }
             }
@@ -217,15 +121,91 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
                   "endLine": 27,
                   "endColumn": 38,
                   "byteLength": 38
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "specialization of order at stmt 10." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
+                "region": {
+                  "startLine": 36,
+                  "startColumn": 13,
+                  "endLine": 36,
+                  "endColumn": 37,
+                  "byteLength": 24
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "behavior default! in function printf." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
+                "region": {
+                  "startLine": 27,
+                  "endLine": 27,
+                  "endColumn": 6,
+                  "byteLength": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "assigns clause in function printf." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
+                "region": {
+                  "startLine": 27,
+                  "endLine": 27,
+                  "endColumn": 6,
+                  "byteLength": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term \\result in function printf."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
+                "region": {
+                  "startLine": 27,
+                  "endLine": 27,
+                  "endColumn": 6,
+                  "byteLength": 6
                 }
               }
             }

@@ -4,20 +4,20 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] generalized_check.i:24: Warning: 
+[eva:alarm] generalized_check.i:23: Warning: 
   accessing uninitialized left-value. assert \initialized(&c);
 [eva] using specification for function f
-[eva:alarm] generalized_check.i:25: Warning: 
+[eva:alarm] generalized_check.i:24: Warning: 
   function f: precondition 'f_valid_x' got status unknown.
-[eva] generalized_check.i:10: Warning: no \from part for clause 'assigns *x;'
-[eva:alarm] generalized_check.i:26: Warning: 
+[eva] generalized_check.i:9: Warning: no \from part for clause 'assigns *x;'
+[eva:alarm] generalized_check.i:25: Warning: 
   check 'main_valid_ko' got status unknown.
-[eva:alarm] generalized_check.i:27: Warning: 
+[eva:alarm] generalized_check.i:26: Warning: 
   check 'main_p_content_ko' got status unknown.
-[eva:alarm] generalized_check.i:33: Warning: 
+[eva:alarm] generalized_check.i:32: Warning: 
   loop invariant 'false_but_preserved' got status invalid.
-[eva] generalized_check.i:36: starting to merge loop iterations
-[eva:alarm] generalized_check.i:37: Warning: 
+[eva] generalized_check.i:35: starting to merge loop iterations
+[eva:alarm] generalized_check.i:36: Warning: 
   check 'implied_by_false_invariant' got status invalid.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -29,8 +29,8 @@
   __retres ∈ {0}
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
-  3 functions analyzed (out of 3): 100% coverage.
-  In these functions, 25 statements reached (out of 28): 89% coverage.
+  2 functions analyzed (out of 3): 66% coverage.
+  In these functions, 25 statements reached (out of 25): 100% coverage.
   ----------------------------------------------------------------------------
   Some errors and warnings have been raised during the analysis:
     by the Eva analyzer:      0 errors    1 warning

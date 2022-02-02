@@ -1,5 +1,17 @@
 #! /usr/bin/env bash
 
+# GNU parallel needs to be installed
+if ! command -v parallel >/dev/null 2>/dev/null; then
+    echo "parallel is required"
+    exit 127
+fi
+
+# latexmk needs to be installed
+if ! command -v latexmk >/dev/null 2>/dev/null; then
+    echo "latexmk is required"
+    exit 127
+fi
+
 cd $(dirname $0)
 
 usage () {
@@ -20,7 +32,7 @@ fi
 set -e
 
 if [ ! -e acsl ]; then
-    echo "error: 'acsl' not in doc; clone git@github.com:acsl-language/acsl.git"
+    echo "error: 'acsl' not in doc; try: git clone git@github.com:acsl-language/acsl.git"
     exit 1
 fi
 
@@ -28,11 +40,14 @@ mkdir -p manuals
 
 
 FC_SUFFIX=$(cat ../VERSION)-$(cat ../VERSION_CODENAME)
+FC_SUFFIX="$(echo ${FC_SUFFIX} | sed -e "s/~/-/")"
 ACSL_SUFFIX=$(grep acslversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
+FC_VERSION=$(cat ../VERSION)
+ACSL_IMPLEM_VERSION=$(grep fcversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 EACSL_SUFFIX=$(grep 'newcommand{\\eacsllangversion' ../src/plugins/e-acsl/doc/refman/main.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 # sanity check
 if [ "$EACSL_SUFFIX" = "" ]; then
-    echo "error: could not retrive E-ACSL version from ../src/plugins/e-acsl/doc/refman/main.tex"
+    echo "error: could not retrieve E-ACSL version from ../src/plugins/e-acsl/doc/refman/main.tex"
     exit 1
 fi
 
@@ -83,4 +98,7 @@ $EACSL_DOC/refman/e-acsl.pdf,e-acsl.pdf,$EACSL_SUFFIX
 # Sanity check: version differences between Frama-C, ACSL and E-ACSL
 if [ "$ACSL_SUFFIX" != "$EACSL_SUFFIX" ]; then
     echo "WARNING: different versions for ACSL and E-ACSL manuals: $ACSL_SUFFIX versus $EACSL_SUFFIX"
+fi
+if [ "$ACSL_IMPLEM_VERSION" != "$FC_VERSION" ]; then
+    echo "WARNING: ACSL implementation refers to a different Frama-C version: $ACSL_IMPLEM_VERSION versus $FC_VERSION"
 fi

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -488,7 +488,7 @@ type typing_context = {
   anonCompFieldName : string;
   conditionalConversion : typ -> typ -> typ;
   find_macro : string -> lexpr;
-  find_var : ?label:string -> var:string -> logic_var;
+  find_var : ?label:string -> string -> logic_var;
   find_enum_tag : string -> exp * typ;
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
@@ -544,41 +544,10 @@ module Extensions = struct
   let typer_block name ~typing_context:typing_context ~loc =
     !ref_typer_block name typing_context loc
 
-  (* For deprecated functions *)
-  let ref_deprecated_handler = ref (fun _ _ _ _  -> assert false)
-
-  let set_deprecated_handler ~handler =
-    ref_deprecated_handler := handler
-
-  let deprecated_register name category status typer =
-    let typer typing_context loc = typer ~typing_context ~loc in
-    !ref_deprecated_handler name category status typer
 end
 let set_extension_handler = Extensions.set_handler
 let get_typer = Extensions.typer
 let get_typer_block = Extensions.typer_block
-
-(* Deprecated ACSL extensions functions *)
-let set_deprecated_extension_handler =
-  Extensions.set_deprecated_handler
-
-let register_behavior_extension name f =
-  Extensions.deprecated_register name Ext_contract f
-
-let register_global_extension name f =
-  Extensions.deprecated_register name Ext_global f
-
-let register_code_annot_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_here) f
-
-let register_code_annot_next_stmt_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_stmt) f
-
-let register_code_annot_next_loop_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_loop) f
-
-let register_code_annot_next_both_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_both) f
 
 let rec arithmetic_conversion ty1 ty2 =
   match unroll_type ty1, unroll_type ty2 with
@@ -670,7 +639,7 @@ module Make
        val anonCompFieldName : string
        val conditionalConversion : typ -> typ -> typ
        val find_macro : string -> lexpr
-       val find_var : ?label:string -> var:string -> logic_var
+       val find_var : ?label:string -> string -> logic_var
        val find_enum_tag : string -> exp * typ
        val find_comp_field: compinfo -> string -> offset
        val find_type : type_namespace -> string -> typ
@@ -796,7 +765,7 @@ struct
       ignore (Logic_env.find_model_field f ty); true
     with Not_found ->
       (match Cil.unrollType ty with
-       | TComp(comp,_,_) ->
+       | TComp(comp,_) ->
          List.exists
            (fun x -> x.fname = f)
            (Option.value ~default:[] comp.cfields)
@@ -804,7 +773,7 @@ struct
 
   let plain_type_of_c_field loc f ty =
     match Cil.unrollType ty with
-    | TComp (comp, _, attrs) ->
+    | TComp (comp, attrs) ->
       (try
          let attrs = Cil.filter_qualifier_attributes attrs in
          let field = C.find_comp_field comp f in
@@ -963,8 +932,7 @@ struct
           with Not_found ->
             ctxt.error loc "size of array must be an integral value";
       in
-      Ctype (TArray (ctype ty, size,
-                     Cil.empty_size_cache (),[]))
+      Ctype (TArray (ctype ty, size,[]))
     | LTpointer ty -> Ctype (TPtr (ctype ty, []))
     | LTenum e ->
       (try Ctype (ctxt.find_type Enum e)
@@ -1369,8 +1337,8 @@ struct
         result
       | TInt _, TPtr _ -> result
       | TPtr _, TInt _ -> result
-      | ((TArray (told,_,_,_) | TPtr (told,_)),
-         (TPtr (tnew,_) | TArray(tnew,_,_,_)))
+      | ((TArray (told,_,_) | TPtr (told,_)),
+         (TPtr (tnew,_) | TArray(tnew,_,_)))
         when is_same_c_type told tnew -> result
       | (TPtr _ | TArray _), (TPtr _ | TArray _)
         when isLogicNull e -> result
@@ -1397,7 +1365,7 @@ struct
         result
       | (TInt _ | TEnum _ | TPtr _ ), TVoid _ ->
         (ot, e)
-      | TComp (comp1, _, _), TComp (comp2, _, _)
+      | TComp (comp1, _), TComp (comp2, _)
         when comp1.ckey = comp2.ckey ->
         nt, e
       | _ ->
@@ -2070,7 +2038,7 @@ struct
       | _,typ ->
         { term with
           term_node = Tlambda(quants, term);
-          term_type = Larrow(List.map (fun x -> x.lv_type) quants,typ) }
+          term_type = make_arrow_type quants typ }
     in
     let rec aux known_vars kont term =
       match term.term_node with
@@ -2343,7 +2311,18 @@ struct
   let check_lval_kind m t =
     let rec aux t = match t.term_node with
       | Tempty_set -> m.accept_empty
+      (* Be careful with const lval, cases are:
+         - *host* is variable -> the assigned *lval* must not be const
+         - host is memory access -> check if it is a const field access
+      *)
       | TLval (lhost,loff) ->
+        let rec offsets = function
+          | TNoOffset -> true
+          | TIndex (_, n) -> offsets n
+          | TModel (_, n) -> m.accept_models && offsets n
+          | TField (f, n) ->
+            (not (Cil.isConstType f.ftype) || m.accept_const) && offsets n
+        in
         (not (isLogicArrayType t.term_type) || m.accept_array) &&
         (match lhost with
          | TVar v -> begin
@@ -2357,14 +2336,11 @@ struct
                           model variables are not supported. *)
              | Some v ->
                (not v.vformal || m.accept_formal) &&
-               (not (Cil.isConstType v.vtype) || m.accept_const)
+               (not (isConstType @@ logicCType t.term_type) || m.accept_const)
            end
          | TResult _ -> m.accept_models
          | _ -> true) &&
-        (match snd (Logic_utils.remove_term_offset loff) with
-         | TModel _ -> m.accept_models
-         | TField(f, _) -> not (Cil.isConstType f.ftype) || m.accept_const
-         | _ -> true)
+        offsets loff
       | TAddrOf lv when is_fct_ptr lv -> m.accept_func_ptr
       | TAddrOf lv | TStartOf lv ->
         m.accept_addrs &&
@@ -2615,7 +2591,7 @@ struct
         with Not_found ->
         try
           let label = Lenv.string_of_current_label env in
-          let info = ctxt.find_var ?label ~var:x in
+          let info = ctxt.find_var ?label x in
           (match info.lv_origin with
            | Some lv ->
              check_current_label loc env;
@@ -2971,7 +2947,7 @@ struct
         | _ -> [],tdef
       in
       var.l_type <- Some tdef.term_type;
-      var.l_var_info.lv_type <- tdef.term_type;
+      var.l_var_info.lv_type <- make_arrow_type args tdef.term_type;
       var.l_profile <- args;
       var.l_body <- LBterm tdef;
       let env = Lenv.add_logic_info ident var env in
@@ -3478,10 +3454,8 @@ struct
       in
       let var = Cil_const.make_logic_info_local x in
       var.l_profile <- args;
-      var.l_var_info.lv_type <-
-        (match typ with
-           None -> Ctype (Cil.voidType)
-         | Some t -> t);
+      let rt = Option.value typ ~default:(Ctype Cil.voidType) in
+      var.l_var_info.lv_type <- make_arrow_type args rt;
       var.l_type <- typ;
       var.l_body <- tdef;
       let env = Lenv.add_logic_info x var env in
@@ -3572,13 +3546,17 @@ struct
 
   let type_variant env = function
     | (t, None) -> (type_int_term (base_ctxt env) env t, None)
-    | (t, r) -> (term env t, r)
+    | (t, Some r) ->
+      let loc = t.lexpr_loc in
+      let t = term env t in
+      let li, _, _, _ = type_logic_app env loc r [] [t; t] in
+      (t, Some li)
 
   let id_predicate env pred = Logic_const.new_predicate (predicate env pred)
 
   let id_predicate_top env pred =
-    let { tp_only_check = only_check; tp_statement = pred } = pred in
-    Logic_const.new_predicate ~only_check (predicate env pred)
+    let { tp_kind = kind; tp_statement = pred } = pred in
+    Logic_const.new_predicate ~kind (predicate env pred)
 
   let id_term_ptr env t =
     let loc = t.lexpr_loc in
@@ -3832,10 +3810,10 @@ struct
   let code_annot loc current_behaviors current_return_type ca =
     let source = fst loc in
     let annot = match ca with
-      | AAssert (behav,{tp_only_check=only_check; tp_statement = p}) ->
+      | AAssert (behav,{tp_kind = kind; tp_statement = p}) ->
         check_behavior_names loc current_behaviors behav;
         let p = predicate (code_annot_env()) p in
-        let p = Logic_const.toplevel_predicate ~only_check p in
+        let p = Logic_const.toplevel_predicate ~kind p in
         Cil_types.AAssert(behav,p)
       | APragma (Impact_pragma sp) ->
         Cil_types.APragma
@@ -3862,10 +3840,10 @@ struct
         Cil_types.AStmtSpec (behav,my_spec)
       | AVariant v ->
         Cil_types.AVariant (type_variant (loop_annot_env ()) v)
-      | AInvariant (behav,f,{ tp_only_check = only_check; tp_statement = i}) ->
+      | AInvariant (behav,f,{ tp_kind = kind; tp_statement = i}) ->
         let env = if f then loop_annot_env () else code_annot_env () in
         check_behavior_names loc current_behaviors behav;
-        let p = Logic_const.toplevel_predicate ~only_check (predicate env i) in
+        let p = Logic_const.toplevel_predicate ~kind (predicate env i) in
         Cil_types.AInvariant (behav,f,p)
       | AAllocation (behav,fa) ->
         check_behavior_names loc current_behaviors behav;
@@ -4022,13 +4000,8 @@ struct
        - Polymorphism is not reflected on the lvar level.
        - However, such lvar should rarely if at all be seen under a Tvar.
     *)
-    (match p,t with
-       _,None -> ()
-     | [], Some t ->
-       info.l_var_info.lv_type <- t
-     | _,Some t ->
-       let typ = Larrow (List.map (fun x -> x.lv_type) p,t) in
-       info.l_var_info.lv_type <- typ);
+    let rt = Option.value t ~default:(Ctype Cil.voidType) in
+    info.l_var_info.lv_type <- make_arrow_type p rt;
     info.l_tparams <- poly;
     info.l_profile <- p;
     info.l_type <- t;
@@ -4163,9 +4136,16 @@ struct
       if in_axiomatic then
         (* Not supported yet. See issue 43 on ACSL's github repository. *)
         C.error loc "Nested axiomatic. Ignoring body of %s" id
-      else
+      else begin
+        let change oldloc =
+          C.error loc
+            "Duplicated axiomatics %s (first occurrence at %a)"
+            id Cil_printer.pp_location oldloc
+        in
         let l = List.map (annot true) decls in
+        ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
         Daxiomatic(id,l,[],loc)
+      end
     | LDtype(s,l,def) ->
       let env = init_type_variables loc l in
       let my_info =
@@ -4181,29 +4161,25 @@ struct
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;
       Dtype (my_info,loc)
-    | LDlemma (x,is_axiom, labels, poly,
-               { tp_only_check = only_check; tp_statement = e}) ->
+    | LDlemma (x,labels, poly, {tp_kind = kind; tp_statement = e}) ->
       if Logic_env.Lemmas.mem x then begin
         let old_def = Logic_env.Lemmas.find x in
+        let old_kind = match old_def with
+          | Dlemma(_,_,_,{tp_kind },_,_) -> tp_kind
+          | _ -> Assert in
         let old_loc = Cil_datatype.Global_annotation.loc old_def in
-        let is_axiom =
-          match old_def with
-          | Dlemma(_, is_axiom, _, _, _, _, _) -> is_axiom
-          | _ ->
-            Kernel.fatal ~current:true
-              "Logic_env.get_lemma must return Dlemma"
-        in
-        C.error loc "%s is already registered as %s (%a)"
-          x (if is_axiom then "axiom" else "lemma")
+        C.error loc "%a %s is already registered as %a (%a)"
+          Cil_printer.pp_lemma_kind kind x
+          Cil_printer.pp_lemma_kind old_kind
           Cil_datatype.Location.pretty old_loc
       end;
       let labels,env = annot_env loc labels poly in
-      let p = Logic_const.toplevel_predicate ~only_check (predicate env e) in
+      let p = Logic_const.toplevel_predicate ~kind (predicate env e) in
       let labels = match !Lenv.default_label with
         | None -> labels
         | Some lab -> [lab]
       in
-      let def = Dlemma (x,is_axiom, labels, poly,  p, [], loc) in
+      let def = Dlemma (x,labels, poly,  p, [], loc) in
       Logic_env.Lemmas.add x def;
       def
     | LDinvariant (s, e) ->
@@ -4232,33 +4208,39 @@ struct
         List.map
           (term_lval_assignable ctxt ~accept_formal ~accept_const env) tsets
       in
-      let checks_tsets_type fct ctyp =
+      let checks_tsets_type ~reads fct ctyp =
         List.iter
-          (fun t ->
-             let check t = match Logic_utils.unroll_type t with
-               | Ctype ctyp' -> Cil_datatype.Typ.equal ctyp ctyp'
-               | _ -> false
-             in
-             if not (Logic_const.plain_or_set check t.term_type) then
-               C.error t.term_loc "incompatible prototype of '%s' with %a"
-                 fct Cil_printer.pp_term t )
-          tsets
+          begin fun t ->
+            let check t = match Logic_utils.unroll_type t with
+              | Ctype ctyp' ->
+                ( reads || not (Cil.isConstType ctyp') )
+                && Cil_datatype.Typ.equal ctyp
+                  (Cil.type_remove_qualifier_attributes ctyp')
+              | _ -> false
+            in
+            if not (Logic_const.plain_or_set check t.term_type) then
+              C.error t.term_loc
+                "@[cannot use '%s' to %s volatile '%a'@]"
+                fct (if reads then "read" else "write")
+                Cil_printer.pp_term t
+          end tsets
       in
       let prototype_error s fct =
         C.error loc
           "incompatible prototype of '%s' with volatile %s declaration"
           fct s
       in
-      let volatile_type ret_typ arg1 error =
+      let volatile_type ~reads ret_typ arg1 error =
         (* note: type pointed to by arg1 may differ from the
            return type with respect to qualifiers *)
         if not (isPointerType arg1) then error ();
         let vol_typ = typeOf_pointed arg1 in
-        if not (Cil.isVolatileType vol_typ
-                && Cil_datatype.Typ.equal ret_typ
-                  (Cil.type_remove_qualifier_attributes vol_typ))
+        let base_typ = Cil.type_remove_qualifier_attributes vol_typ in
+        if not (Cil.isVolatileType vol_typ &&
+                ( reads || not (Cil.isConstType vol_typ) ) &&
+                Cil_datatype.Typ.equal ret_typ base_typ)
         then error ();
-        vol_typ
+        base_typ
       in
       let checks_reads_fct fct ty =
         let error () = prototype_error "reads" fct
@@ -4270,10 +4252,8 @@ struct
         | Some [_,arg1,_] when
             (not (isVoidType ret || is_varg_arg))
           -> (* matching prototype: T fct (volatile T *arg1) *)
-          let vol_typ = volatile_type ret arg1 error in
-          if Cil.isConstType vol_typ then
-            Kernel.warning ~current:true "Access function '%s' writes to volatile const locations" fct;
-          checks_tsets_type fct vol_typ (* tsets should have type: volatile T *)
+          let vol_typ = volatile_type ~reads:true ret arg1 error in
+          checks_tsets_type ~reads:true fct vol_typ (* tsets should have type: volatile T *)
         | _ ->
           error ()
       in
@@ -4288,8 +4268,8 @@ struct
             (not (isVoidType ret || is_varg_arg))
             && Cil_datatype.Typ.equal ret (Cil.type_remove_qualifier_attributes arg2)
           -> (* matching prototype: T fct (volatile T *arg1, T arg2) *)
-          let vol_typ = volatile_type ret arg1 error in
-          checks_tsets_type fct vol_typ (* tsets should have type: volatile T *)
+          let vol_typ = volatile_type ~reads:false ret arg1 error in
+          checks_tsets_type ~reads:false fct vol_typ (* tsets should have type: volatile T *)
         | _ ->
           error ()
       in
@@ -4326,8 +4306,6 @@ struct
     finish_transaction (); res
 
   let annot = C.on_error annot rollback_transaction
-
-  let custom _c = CustomDummy
 
 end
 

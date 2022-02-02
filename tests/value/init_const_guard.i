@@ -1,9 +1,9 @@
 /*run.config*
-  PLUGIN: @PTEST_PLUGIN@ report
+ PLUGIN: @PTEST_PLUGIN@ report
   STDOPT: +"-main f -report -then -main g -then -lib-entry -main f -then -main g"
 */
-
 /** Same test exists in WP tests. Please keep synchronized */
+
 
 
 int x ;

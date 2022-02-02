@@ -1,7 +1,7 @@
 /* run.config
- LIBS: ../libSelect
+ LIBS: libSelect
  MODULE: @PTEST_NAME@
-   OPT: @EVA_OPTIONS@ -deps -journal-disable
+   OPT: @EVA_OPTIONS@ -deps
 */
 
 int X, Y;

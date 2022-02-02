@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 /**
    Various kind of (modal) dialogs attached to the main application window.
    @packageDocumentation
@@ -135,7 +157,7 @@ export interface FileFilter {
 
 export interface FileDialogProps {
   /** Prompt message. */
-  message?: string;
+  title?: string;
   /** Open button label (default is « Open »). */
   label?: string;
   /** Initially selected path. */
@@ -174,11 +196,11 @@ export interface OpenDirProps extends FileDialogProps {
 export async function showOpenFile(
   props: OpenFileProps,
 ): Promise<string | undefined> {
-  const { message, label, path, hidden = false, filters } = props;
+  const { title, label, path, hidden = false, filters } = props;
   return remote.dialog.showOpenDialog(
     remote.getCurrentWindow(),
     {
-      message,
+      title,
       buttonLabel: label,
       defaultPath: path && defaultPath(path),
       properties: (hidden ? ['openFile', 'showHiddenFiles'] : ['openFile']),
@@ -197,12 +219,12 @@ export async function showOpenFile(
 export async function showOpenFiles(
   props: OpenFileProps,
 ): Promise<string[] | undefined> {
-  const { message, label, path, hidden, filters } = props;
+  const { title, label, path, hidden, filters } = props;
 
   return remote.dialog.showOpenDialog(
     remote.getCurrentWindow(),
     {
-      message,
+      title,
       buttonLabel: label,
       defaultPath: path && defaultPath(path),
       properties: (
@@ -235,11 +257,11 @@ export async function showOpenFiles(
 export async function showSaveFile(
   props: SaveFileProps,
 ): Promise<string | undefined> {
-  const { message, label, path, filters } = props;
+  const { title, label, path, filters } = props;
   return remote.dialog.showSaveDialog(
     remote.getCurrentWindow(),
     {
-      message,
+      title,
       buttonLabel: label,
       defaultPath: path,
       filters,
@@ -260,7 +282,7 @@ type openDirProperty =
 export async function showOpenDir(
   props: OpenDirProps,
 ): Promise<string | undefined> {
-  const { message, label, path, hidden } = props;
+  const { title, label, path, hidden } = props;
   const properties: openDirProperty[] = ['openDirectory'];
   if (hidden) properties.push('showHiddenFiles');
 
@@ -273,7 +295,7 @@ export async function showOpenDir(
   return remote.dialog.showOpenDialog(
     remote.getCurrentWindow(),
     {
-      message,
+      title,
       buttonLabel: label,
       defaultPath: path,
       properties,

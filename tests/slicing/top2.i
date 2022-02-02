@@ -1,6 +1,6 @@
 /* run.config
-* STDOPT: +"-slicing-level 2 -slice-pragma main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i "
-* STDOPT: +"-slicing-level 2 -slice-return main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i "
+* STDOPT: +"-slicing-level 2 -slice-pragma main -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
+* STDOPT: +"-slicing-level 2 -slice-return main -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
 */
 
 

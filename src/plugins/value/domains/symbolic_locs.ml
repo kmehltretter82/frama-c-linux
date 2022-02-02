@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -107,36 +107,36 @@ module K2V = struct
 
 end
 
-(* (* not used for now: too costly *)
-   let rec interesting_exp (e: exp) = match e.enode with
-   | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
-   | StartOf _ | AddrOf _ ->
-    false
-   | Lval lv -> true
-   | CastE (_,e) | UnOp (_,e,_) | Info (e,_) ->
-    interesting_exp e
-   | BinOp (op,e1,e2,_) ->
-    match op with
-    | Eq | Ne | Le | Ge | Lt | Gt -> false
-    | _ -> interesting_exp e1 || interesting_exp e2
-*)
+(* Whether the value of an expression should be retained by the domain:
+   - if the expression is an lvalue with a non-singleton location;
+   - if the expression is a binop between two expressions, each containing an
+     lvalue with a non-singleton value.
 
-(* computes whether an expression depends on a location with an imprecise
-   location *)
-let rec multiple_loc_exp get_locs (e: exp) = match e.enode with
-  | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
-  | StartOf _ | AddrOf _ ->
-    false
+   In both cases, the value will not be infered by the cvalue domain.
+   Otherwise, the value should be inferred by the cvalue domain, or can be
+   precisely computed from values inferred by the cvalue domain. *)
+let interesting_exp get_locs get_val e =
+  let is_comp = function Eq | Ne | Le | Ge | Lt | Gt -> true | _ -> false in
+  let rec has_lvalue e =
+    match e.enode with
+    | Lval _ ->
+      not (Cvalue.V.cardinal_zero_or_one (get_val e))
+    | CastE (_, e) | UnOp (_, e, _) | Info (e, _) ->
+      has_lvalue e
+    | BinOp (op, e1, e2,_) ->
+      not (is_comp op) && (has_lvalue e1 || has_lvalue e2)
+    | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
+    | StartOf _ | AddrOf _ ->
+      false
+  in
+  match e.enode with
   | Lval lv ->
     not (Precise_locs.cardinal_zero_or_one (get_locs lv))
-  | CastE (_,e) | UnOp (_,e,_) | Info (e,_) ->
-    multiple_loc_exp get_locs e
-  | BinOp (_,e1,e2,_) ->
-    multiple_loc_exp get_locs e1 || multiple_loc_exp get_locs e2
-
-let is_cond exp = match exp.enode with
-  | BinOp ((Eq | Ne | Le | Ge | Lt | Gt), _, _, _) -> true
-  | _ -> false
+  | BinOp (op, e1, e2,_) ->
+    not (is_comp op) && has_lvalue e1 && has_lvalue e2
+  | CastE _ | UnOp _ | Info _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
+  | AlignOf _ | AlignOfE _ | StartOf _ | AddrOf _ ->
+    false
 
 (* Locals and formals syntactically present in an expression or lvalue *)
 let rec vars_lv (h, o) = Base.Set.union (vars_host h) (vars_offset o)
@@ -421,8 +421,7 @@ module Memory = struct
         ~empty:K.HCESet.empty
     in
     fun bases t ->
-      let shape = Base.Hptset.shape bases in
-      K.HCESet.union (fold2 t.syntactic_deps shape) (fold2 t.deps shape)
+      K.HCESet.union (fold2 t.syntactic_deps bases) (fold2 t.deps bases)
 
   (* Projects a state [t] onto the set of bases [bases]; used by MemExec to
      efficiently compare different entry states for a function analysis.
@@ -432,9 +431,8 @@ module Memory = struct
      [reuse] if needed. *)
   let filter bases t =
     let keys = gather_keys bases t in
-    let key_shape = K.HCESet.shape keys in
-    let zones = K2Z.inter_with_shape key_shape t.zones in
-    let values = K2V.inter_with_shape key_shape t.values in
+    let zones = K2Z.inter_with_shape keys t.zones in
+    let values = K2V.inter_with_shape keys t.values in
     { values; zones; deps = B2K.empty; syntactic_deps = B2K.empty }
 
   (* Removes from [t] all information about keys whose dependencies intersect
@@ -442,12 +440,10 @@ module Memory = struct
      result. *)
   let diff bases t =
     let keys = gather_keys bases t in
-    let key_shape = K.HCESet.shape keys in
-    let values = K2V.diff_with_shape key_shape t.values in
-    let zones = K2Z.diff_with_shape key_shape t.zones in
-    let base_shape = Base.Hptset.shape bases in
-    let deps = B2K.diff_with_shape base_shape t.deps in
-    let syntactic_deps = B2K.diff_with_shape base_shape t.syntactic_deps in
+    let values = K2V.diff_with_shape keys t.values in
+    let zones = K2Z.diff_with_shape keys t.zones in
+    let deps = B2K.diff_with_shape bases t.deps in
+    let syntactic_deps = B2K.diff_with_shape bases t.syntactic_deps in
     { values; zones; deps; syntactic_deps }
 
   (* Merges all properties from [t] into [into]. *)
@@ -458,7 +454,7 @@ module Memory = struct
       syntactic_deps = B2K.union into.syntactic_deps t.syntactic_deps }
 end
 
-module Internal : Domain_builder.InputDomain
+module D : Abstract_domain.Leaf
   with type state = Memory.t
    and type value = V.t
    and type location = Precise_locs.precise_location
@@ -473,7 +469,8 @@ module Internal : Domain_builder.InputDomain
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "Symbolic locations domain"
+  include Domain_builder.Complete (Memory)
+
   let log_category = dkey
 
   let empty _ = Memory.empty_map
@@ -482,10 +479,6 @@ module Internal : Domain_builder.InputDomain
   let leave_scope _kf vars state =
     (* removed variables revert implicitly to Top *)
     Memory.remove_variables vars state
-
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
 
   (* build a [get_locs] function from a valuation *)
   let get_locs valuation =
@@ -499,6 +492,14 @@ module Internal : Domain_builder.InputDomain
       Value_parameters.fatal "Unknown location for %a" Printer.pp_lval lv
     else r
 
+  let get_val valuation = fun lv ->
+    match valuation.Abstract_domain.find lv with
+    | `Top -> Cvalue.V.top_int
+    | `Value v ->
+      match v.Eval.value.Eval.v with
+      | `Bottom -> Cvalue.V.bottom
+      | `Value v -> v
+
   (* update the state according to the information known in the valuation.
      Important, because on statements such as [if (t[i] + j <= 3)], the
      interesting information on [t[i]] is only in the valuation. *)
@@ -510,7 +511,7 @@ module Internal : Domain_builder.InputDomain
          time. *)
       match r.reductness, v.v, v.initialized, v.escaping with
       | (Created | Reduced), `Value v, true, false ->
-        if not (is_cond e) && multiple_loc_exp (get_locs valuation) e then
+        if interesting_exp (get_locs valuation) (get_val valuation) e then
           begin
             let k = K.HCE.of_exp e in
             (* remove the existing binding: the key may already be in
@@ -563,11 +564,15 @@ module Internal : Domain_builder.InputDomain
 
   let assume _stmt _exp _pos valuation state = update valuation state
 
-  let start_call _stmt _call valuation state = update valuation state
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    Memory.remove_variables vars state
 
-  let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let start_call _stmt _call recursion valuation state =
+    update valuation state >>-: fun state ->
+    Extlib.opt_fold start_recursive_call recursion state
 
-  let show_expr _valuation _state _fmt _expr = ()
+  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
   let top_query = `Value (V.top, None), Alarmset.all
 
@@ -576,24 +581,20 @@ module Internal : Domain_builder.InputDomain
      this point. Hence, the alarms have already been emitted, and we can
      return [Alarmset.none]. *)
 
-  let extract_expr _oracle state expr =
+  let extract_expr ~oracle:_ _context state expr =
     match Memory.find_expr expr state with
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none
 
-  let extract_lval _oracle state lv _typ _locs =
+  let extract_lval ~oracle:_ _context state lv _typ _locs =
     match Memory.find_lval lv state with
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none
 
-  let backward_location _state _lval _typ loc value =
-    (* Nothing to do. We could check if [[lval]] intersects [value] and
-       return [`Bottom] if it is not the case, but we have already supplied
-       [[lval]] during the forward propagation, so the intersection is probably
-       always non-empty. *)
-    `Value (loc, value)
-
-  let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
+  (* We could implement [backward_location if [[lval]] intersects [value] and
+     return [`Bottom] if it is not the case, but we have already supplied
+     [[lval]] during the forward propagation, so the intersection is probably
+     always non-empty. *)
 
   (* Memexec: the symbolic locations domain is relational, as it may infer a
      value for an expression or lvalue involving two different variables.
@@ -634,12 +635,4 @@ module Internal : Domain_builder.InputDomain
   let logic_assign _assigns location state =
     let loc = Precise_locs.imprecise_location location in
     Memory.kill loc state
-
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
-
-  let storage = Value_parameters.SymbolicLocsStorage.get
-
 end
-
-module D = Domain_builder.Complete (Internal)

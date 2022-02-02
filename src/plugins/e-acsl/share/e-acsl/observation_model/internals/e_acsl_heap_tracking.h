@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file
  * \brief Functionality to report/track memory leaks. Shared between models
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_HEAP_TRACKING
 #define E_ACSL_HEAP_TRACKING

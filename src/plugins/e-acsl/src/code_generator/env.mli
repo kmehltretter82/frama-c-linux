@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -93,7 +93,8 @@ val add_stmt: ?post:bool -> ?before:stmt -> t -> kernel_function -> stmt -> t
 (** [add_stmt env s] extends [env] with the new statement [s].
     [before] may define which stmt the new one is included before. This is to
     say that any labels attached to [before] are moved to [stmt]. [post]
-    indicates that [stmt] should be added after the target statement. *)
+    indicates that [stmt] should be added after the target statement.
+    [before] and [post] are mutually exclusive. *)
 
 val extend_stmt_in_place: t -> stmt -> label:logic_label -> block -> t
 (** [extend_stmt_in_place env stmt ~label b] modifies [stmt] in place in
@@ -153,12 +154,15 @@ val annotation_kind: t -> Smart_stmt.annotation_kind
 val set_annotation_kind: t -> Smart_stmt.annotation_kind -> t
 
 (* ************************************************************************** *)
-(** {2 Loop invariants} *)
+(** {2 Loop annotations} *)
 (* ************************************************************************** *)
 
 val push_loop: t -> t
-val add_loop_invariant: t -> predicate -> t
-val pop_loop: t -> predicate list * t
+val set_loop_variant: ?measure:logic_info -> t -> term -> t
+val add_loop_invariant: t -> toplevel_predicate -> t
+val top_loop_variant: t -> (term * logic_info option) option
+val top_loop_invariants: t -> toplevel_predicate list
+val pop_loop: t -> t
 
 (* ************************************************************************** *)
 (** {2 RTEs} *)
@@ -185,6 +189,12 @@ val with_rte_and_result: f:(t -> 'a * t) -> t -> bool -> 'a * t
     of the closure along with the updated environment.
     This function does not handle exceptions at all. The user must handle them
     either directly in the [f] closure or around the call to the function. *)
+
+module Local_vars: sig
+  val push_new: t -> t
+  val add: t -> Typing.number_ty -> t
+  val get: t -> Typing.Function_params_ty.t
+end
 
 (* ************************************************************************** *)
 (** {2 Context for error handling} *)

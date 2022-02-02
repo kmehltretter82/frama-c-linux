@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -85,7 +85,7 @@ let configure tag = function
   | StyleSet -> StyleSet
   | Style [] -> NoStyle
   | Style sty -> tag#set_properties sty ; StyleSet
-      
+
 (* -------------------------------------------------------------------------- *)
 (* --- Monomorphic Marker                                                 --- *)
 (* -------------------------------------------------------------------------- *)
@@ -110,7 +110,7 @@ class ['a] poly_marker
   object(self)
 
     (*--- Style Configuration ---*)
-    
+
     val mutable style_props = NoStyle
     val mutable hover_props = Style (List.assoc "hover" css_sheet)
     val mutable to_configure = true
@@ -125,7 +125,7 @@ class ['a] poly_marker
           hover_props <- configure hover hover_props ;
           to_configure <- false ;
         end
-        
+
     val mutable demon : (GdkEvent.Button.t -> 'a entry -> unit) list = []
     val mutable demon_click  : ('a entry -> unit) list = []
     val mutable demon_double : ('a entry -> unit) list = []
@@ -168,7 +168,7 @@ class ['a] poly_marker
         registry (p,q,{ hover ; click }) ;
         ignore (fire e demon_added) ;
       end
-      
+
     method wrap pp (fmt:Format.formatter) (w:'a) : unit =
       self#mark w pp fmt w
 
@@ -176,7 +176,7 @@ class ['a] poly_marker
       'b. 'a ->
       (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b -> unit =
       fun e pp fmt w ->
-        wrapper (fun p q -> self#add (p,q,e)) (fun fmt -> pp fmt w) fmt
+      wrapper (fun p q -> self#add (p,q,e)) (fun fmt -> pp fmt w) fmt
 
   end
 
@@ -212,7 +212,7 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
     val mutable index : blind Rangemap.t = Rangemap.empty
     val mutable hovered = None
     val mutable double = false
-    
+
     (* -------------------------------------------------------------------------- *)
     (* --- Text Initializer                                                   --- *)
     (* -------------------------------------------------------------------------- *)
@@ -289,10 +289,10 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
       match links with
       | Some marker -> marker
       | None ->
-          let marker = self#marker in
-          marker#set_style (List.assoc "link" css_sheet) ;
-          marker#set_hover (List.assoc "hover" css_sheet) ;
-          links <- Some marker ; marker
+        let marker = self#marker in
+        marker#set_style (List.assoc "link" css_sheet) ;
+        marker#set_hover (List.assoc "hover" css_sheet) ;
+        links <- Some marker ; marker
 
     method private link p name =
       let q = buffer#end_iter#offset in
@@ -320,7 +320,7 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
     method private css_style name props =
       let sty = TAG(buffer#create_tag ~name props) in
       Hashtbl.replace css name sty ; sty
-    
+
     method private tag name =
       if Hashtbl.mem marks name then MARK(buffer#end_iter#offset,name)
       else
@@ -343,17 +343,17 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
       match self#tag name with
       | PLAIN | LINK _ | MARK _ -> ()
       | TAG tag ->
-          let start = buffer#get_iter (`OFFSET p) in
-          let stop = buffer#get_iter (`OFFSET q) in
-          buffer#apply_tag tag ~start ~stop
+        let start = buffer#get_iter (`OFFSET p) in
+        let stop = buffer#get_iter (`OFFSET q) in
+        buffer#apply_tag tag ~start ~stop
 
     method remove_style name p q =
       match Hashtbl.find css name with
       | PLAIN | LINK _ | MARK _ -> ()
       | TAG tag ->
-          let start = buffer#get_iter (`OFFSET p) in
-          let stop = buffer#get_iter (`OFFSET q) in
-          buffer#remove_tag tag ~start ~stop
+        let start = buffer#get_iter (`OFFSET p) in
+        let stop = buffer#get_iter (`OFFSET q) in
+        buffer#remove_tag tag ~start ~stop
 
     method remove_all names =
       let start,stop = buffer#bounds in
@@ -376,18 +376,18 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
           | `BUTTON_PRESS -> double <- false ; false
           | `TWO_BUTTON_PRESS -> double <- true ; false
           | `BUTTON_RELEASE ->
-              begin
-                match hovered with
-                | None -> ()
-                | Some (_,_,blind) -> 
-                    blind.click double (GdkEvent.Button.cast evt)
-              end ; false
+            begin
+              match hovered with
+              | None -> ()
+              | Some (_,_,blind) ->
+                blind.click double (GdkEvent.Button.cast evt)
+            end ; false
           | `MOTION_NOTIFY ->
-              let offset = GtkText.Iter.get_offset iter in
-              let entry =
-                try Some(Rangemap.find offset offset index)
-                with Not_found -> None
-              in self#hover entry ; false
+            let offset = GtkText.Iter.get_offset iter in
+            let entry =
+              try Some(Rangemap.find offset offset index)
+              with Not_found -> None
+            in self#hover entry ; false
           | _ -> false
         in ( ignore (react#connect#event ~callback) ; reactive <- true )
 
@@ -396,21 +396,21 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
       | Some e0 , Some e when e == e0 -> ()
       | None , None -> ()
       | _ ->
-          begin
-            (match hovered with None -> () | Some (_,_,{hover}) ->
+        begin
+          (match hovered with None -> () | Some (_,_,{hover}) ->
               let start,stop = buffer#bounds in
               buffer#remove_tag hover ~start ~stop) ;
-            (match h with None -> () | Some (a,b,{hover}) ->
+          (match h with None -> () | Some (a,b,{hover}) ->
               let start = buffer#get_iter (`OFFSET a) in
               let stop = buffer#get_iter (`OFFSET b) in
               self#hover None ;
               buffer#apply_tag hover ~start ~stop) ;
-            hovered <- h
-          end
+          hovered <- h
+        end
 
     method private register e =
       index <- Rangemap.add e index
-    
+
     (* -------------------------------------------------------------------------- *)
     (* --- User API                                                           --- *)
     (* -------------------------------------------------------------------------- *)
@@ -420,19 +420,19 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
     method printf : 'a. ?scroll:bool ->
       ('a,Format.formatter,unit) format -> 'a =
       fun ?(scroll=autoscroll) text ->
-        (* Save current number of lines in the buffer *)
-        let line = view#buffer#line_count in
-        let finally fmt =
-          Format.pp_print_flush fmt () ;
-          Hashtbl.clear marks ;
-          hid <- 0 ;
-          ruled <- false ;
-          if scroll then
-            (* scrolling must be performed asynchronously using Gtk_helper.later,
-               otherwise it will not take into account the newly added text. *)
-            Wutil.later (self#scroll ~line)
-        in
-        Format.kfprintf finally self#fmt text
+      (* Save current number of lines in the buffer *)
+      let line = view#buffer#line_count in
+      let finally fmt =
+        Format.pp_print_flush fmt () ;
+        Hashtbl.clear marks ;
+        hid <- 0 ;
+        ruled <- false ;
+        if scroll then
+          (* scrolling must be performed asynchronously using Gtk_helper.later,
+             otherwise it will not take into account the newly added text. *)
+          Wutil.later (self#scroll ~line)
+      in
+      Format.kfprintf finally self#fmt text
 
     method hrule =
       if not ruled then
@@ -443,7 +443,7 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
           Format.pp_print_newline self#fmt () ;
           ruled <- true ;
         end
-    
+
     method lines = view#buffer#line_count
 
     method scroll ?line () =

@@ -437,6 +437,72 @@ void float_abs () {
   Frama_C_show_each_0_3(x);
 }
 
+/* Tests the evaluation of the [Tcomprehension] ACSL constructor. */
+void set_comprehension () {
+  int x = v;
+  if (v) {
+    //@ assert x \in { i | integer i; 10 <= i <= 100 };
+    Frama_C_show_each_10_100(x);
+  }
+  if (v) {
+    //@ assert x \in { i | int i; 10 <= i <= 100 };
+    Frama_C_show_each_10_100(x);
+  }
+  if (v) {
+    //@ assert x \in { 3*i + 1 | integer i; 10 <= i <= 100 };
+    Frama_C_show_each_31_301(x);
+  }
+  if (v) {
+    //@ assert x \in { i | integer i; 10 <= 2*i <= 100 };
+    Frama_C_show_each_5_50(x); // No reduction of i through the multiplication
+  }
+  if (v) {
+    //@ assert x \in { i-i | integer i; 10 <= i <= 100 };
+    Frama_C_show_each_0(x); // Imprecise evaluation of i-i in the logic
+  }
+  if (v) {
+    //@ assert x \in { i-i | integer i; 100 <= i <= 10 };
+    Frama_C_show_each_bottom(x); // No reduction on bottom
+  }
+  int a = Frama_C_interval(12, 24);
+  int b = Frama_C_interval(16, 32);
+  if (v) {
+    //@ assert x \in { i | integer i; a <= i <= b };
+    Frama_C_show_each_12_32(x);
+  }
+  if (v) {
+    //@ assert x \in { i | integer i; b <= i <= a };
+    Frama_C_show_each_16_24(x);
+  }
+  if (v) {
+    //@ assert x \in { 10*i + j | integer i, j; 2 <= i <= 6 && 3 < j < 9 };
+    Frama_C_show_each_24_68(x);
+  }
+  int t[15] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47};
+  if (v) {
+    //@ assert x \in { t[i] | integer i; 2 <= i <= 12 };
+    Frama_C_show_each_5_41(x);
+  }
+  if (v) {
+    //@ assert x \in { t[i] | integer i; 5 <= i <= 25 };
+    Frama_C_show_each(x); // No reduction because of the alarm
+  }
+}
+
+//@ assigns { p[i][j] | int i, j; a <= i <= b && 0 <= j < size } \from \nothing;
+void multi_memset (char **p, int a, int b, int size);
+
+/* Tests assigns clauses through locations defined with set comprehension. */
+void set_comprehension_assigns () {
+  char buf0[10] = {0};
+  char buf1[12] = {0};
+  char buf2[8] = {0};
+  char buf3[10] = {0};
+  char *p[4] = {&buf0, &buf1, &buf2, &buf3 };
+  // assigns the 10 first cells of buf1 and buf2. Others remain at 0.
+  multi_memset(p, 1, 2, 10);
+}
+
 void main () {
   eq_tsets();
   eq_char();
@@ -453,4 +519,6 @@ void main () {
   min_max_quantifier ();
   int_abs();
   float_abs();
+  set_comprehension();
+  set_comprehension_assigns();
 }

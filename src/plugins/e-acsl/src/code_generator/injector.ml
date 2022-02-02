@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,6 +37,38 @@ let replace_literal_string_in_exp env kf_opt (* None for globals *) e =
   | None -> e, env
   | Some kf -> Literal_observer.subst_all_literals_in_exp env kf e
 
+let replace_literal_strings_in_args env kf_opt (* None for globals *) args =
+  List.fold_right
+    (fun a (args, env) ->
+       let a, env = replace_literal_string_in_exp env kf_opt a in
+       a :: args, env)
+    args
+    ([], env)
+
+(* rewrite names of functions for which we have alternative definitions in the
+   RTL. *)
+let rename_caller ~loc caller args =
+  if Options.Replace_libc_functions.get ()
+  && Functions.RTL.has_rtl_replacement caller.vorig_name then begin
+    (* rewrite names of functions for which we have alternative definitions in
+       the RTL. *)
+    let fvi = Rtl.Symbols.libc_replacement caller in
+    fvi, args
+  end
+  else if Options.Validate_format_strings.get ()
+       && Functions.Libc.is_printf_name caller.vorig_name then
+    (* rewrite names of format functions (such as printf). This case differs
+       from the above because argument list of format functions is extended with
+       an argument describing actual variadic arguments *)
+    (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
+    let fvi = Rtl.Symbols.libc_replacement caller in
+    let fmt =
+      Functions.Libc.get_printf_argument_str ~loc caller.vorig_name args
+    in
+    fvi, fmt :: args
+  else
+    caller, args
+
 let rec inject_in_init env kf_opt vi off = function
   | SingleInit e as init ->
     if vi.vglob then Global_observer.add_initializer vi off init;
@@ -56,7 +88,7 @@ let rec inject_in_init env kf_opt vi off = function
     in
     CompoundInit(typ, List.rev l), env
 
-let inject_in_local_init loc env kf vi = function
+let inject_in_local_init ~loc ~stmt env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* add a store statement when creating a variable length array *)
@@ -64,72 +96,25 @@ let inject_in_local_init loc env kf vi = function
     let env = Env.add_stmt ~post:true env kf store in
     init, env
 
-  | ConsInit (fvi, args, kind)
-    when Options.Validate_format_strings.get ()
-      && Functions.Libc.is_printf_name fvi.vname
-    ->
-    (* rewrite libc function names (e.g., [printf]). *)
-    let name = Functions.RTL.libc_replacement_name fvi.vname in
-    let new_vi = try Builtins.find name with Not_found -> assert false in
-    let fmt = Functions.Libc.get_printf_argument_str ~loc fvi.vname args in
-    ConsInit(new_vi, fmt :: args, kind), env
-
-  | ConsInit (fvi, _, _) as init
-    when Options.Replace_libc_functions.get ()
-      && Functions.RTL.has_rtl_replacement fvi.vname
-    ->
-    (* rewrite names of functions for which we have alternative definitions in
-       the RTL. *)
-    fvi.vname <- Functions.RTL.libc_replacement_name fvi.vname;
-    init, env
+  | ConsInit (caller, args, kind) ->
+    let args, env = replace_literal_strings_in_args env (Some kf) args in
+    let caller, args = rename_caller ~loc caller args in
+    let _, env =
+      if Libc.is_writing_memory caller then begin
+        let result = Var vi, NoOffset in
+        Libc.update_memory_model ~loc ~stmt env kf ~result caller args
+      end else
+        None, env
+    in
+    ConsInit(caller, args, kind), env
 
   | AssignInit init ->
     let init, env = inject_in_init env (Some kf) vi NoOffset init in
     AssignInit init, env
 
-  | ConsInit(vi, l, ck) ->
-    let l, env =
-      List.fold_right
-        (fun e (l, env) ->
-           let e, env = replace_literal_string_in_exp env (Some kf) e in
-           e :: l, env)
-        l
-        ([], env)
-    in
-    ConsInit(vi, l, ck), env
-
 (* ************************************************************************** *)
 (* Instructions and statements *)
 (* ************************************************************************** *)
-
-(* rewrite names of functions for which we have alternative definitions in the
-   RTL. *)
-let rename_caller loc args exp = match exp.enode with
-  | Lval(Var vi, _)
-    when Options.Replace_libc_functions.get ()
-      && Functions.RTL.has_rtl_replacement vi.vname
-    ->
-    vi.vname <- Functions.RTL.libc_replacement_name vi.vname;
-    exp, args
-
-  | Lval(Var vi, _)
-    when Options.Validate_format_strings.get ()
-      && Functions.Libc.is_printf_name vi.vname
-    ->
-    (* rewrite names of format functions (such as printf). This case differs
-       from the above because argument list of format functions is extended with
-       an argument describing actual variadic arguments *)
-    (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-    let name = Functions.RTL.libc_replacement_name vi.vname in
-    (* variadic arguments descriptor *)
-    let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
-    (* get the library function we need. Cannot just rewrite the name as AST
-       check will then fail *)
-    let vi = try Rtl.Symbols.find_vi name with Not_found -> assert false in
-    Cil.evar vi, fmt :: args
-
-  | _ ->
-    exp, args
 
 (* TODO: should be better documented *)
 let add_initializer loc ?vi lv ?(post=false) stmt env kf =
@@ -167,15 +152,22 @@ let inject_in_instr env kf stmt = function
     Set(lv, e, loc), env
 
   | Call(result, caller, args, loc) ->
-    let args, env =
-      List.fold_right
-        (fun a (args, env) ->
-           let a, env = replace_literal_string_in_exp env (Some kf) a in
-           a :: args, env)
-        args
-        ([], env)
+    let args, env = replace_literal_strings_in_args env (Some kf) args in
+    let caller, args =
+      match caller.enode with
+      | Lval (Var fvi, _) ->
+        let fvi, args = rename_caller loc fvi args in
+        Cil.evar fvi, args
+      | _ -> caller, args
     in
-    let caller, args = rename_caller loc args caller in
+    (* if this is a call to a libc function that writes into a memory block then
+       manually update the memory model *)
+    let result, env =
+      match caller.enode with
+      | Lval (Var cvi, _) when Libc.is_writing_memory cvi ->
+        Libc.update_memory_model ~loc ~stmt env kf ?result cvi args
+      | _ -> result, env
+    in
     (* add statement tracking initialization of return values *)
     let env =
       match result with
@@ -200,7 +192,7 @@ let inject_in_instr env kf stmt = function
   | Local_init(vi, linit, loc) ->
     let lv = Var vi, NoOffset in
     let env = add_initializer loc ~vi lv ~post:true stmt env kf in
-    let linit, env = inject_in_local_init loc env kf vi linit in
+    let linit, env = inject_in_local_init ~loc ~stmt env kf vi linit in
     Local_init(vi, linit, loc), env
 
   (* nothing to do: *)
@@ -220,12 +212,15 @@ let add_new_block_in_stmt env kf stmt =
           stmt.ghost <- false;
           (* translate potential RTEs of ghost code *)
           let rtes = Rte.stmt ~warn:false kf stmt in
-          Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
+          List.iter
+            (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env))
+            rtes;
+          Translate_rtes.rte_annots Printer.pp_stmt stmt kf env rtes
         end else
           env
       in
-      (* handle loop invariants *)
-      let new_stmt, env = Loops.preserve_invariant env kf stmt in
+      (* handle loop annotations *)
+      let new_stmt, env = Loops.handle_annotations env kf stmt in
       new_stmt, env
     else
       stmt, env
@@ -607,7 +602,7 @@ let inject_in_fundec main fundec =
   let main = if Kernel_function.is_main kf then Some kf else main in
   Options.feedback ~dkey ~level:2 "function %a done."
     Kernel_function.pretty kf;
-  env, main
+  main
 
 (* ************************************************************************** *)
 (* The whole AST *)
@@ -626,64 +621,35 @@ let unghost_vi vi =
   | _ ->
     ()
 
-let inject_in_global (env, main) = function
-  (* library functions and built-ins *)
-  | GVarDecl(vi, _) | GVar(vi, _, _)
-  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-    Builtins.update vi.vname vi;
-    env, main
-
-  (* Cil built-ins and other library globals: nothing to do *)
-  | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
-    when Misc.is_fc_or_compiler_builtin vi ->
-    env, main
-  | g when Rtl.Symbols.mem_global g ->
-    env, main
-  (* generated function declaration: nothing to do *)
-  | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
-    env, main
-
-  (* variable declarations *)
-  | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
-    unghost_vi vi;
-    Global_observer.add vi;
-    env, main
-
-  (* variable definition *)
-  | GVar(vi, { init = None }, _) ->
+let inject_in_global main global =
+  let update_builtin vi = Builtins.update vi.vname vi; main in
+  let observe_and_unghost vi =
+    unghost_vi vi; Global_observer.add vi; main
+  in
+  let var_def vi init =
     Global_observer.add vi;
     unghost_vi vi;
-    env, main
-
-  | GVar(vi, { init = Some init }, _) ->
-    Global_observer.add vi;
-    unghost_vi vi;
-    let _init, env = inject_in_init env None vi NoOffset init in
-    (* ignore the new initializer that handles literal strings since they are
-       not substituted in global initializers (see
-       [replace_literal_string_in_exp]) *)
-    env, main
-
-  (* function definition *)
-  | GFun({ svar = vi } as fundec, _) ->
+    let _init, _env = inject_in_init Env.empty None vi NoOffset init in
+    (* ignore the new initializer that handles literal strings
+           since they are not substituted in global initializers
+           (see  [replace_literal_string_in_exp]) *)
+    main
+  in
+  let fun_def ({svar = vi} as fundec) =
     unghost_vi vi;
     inject_in_fundec main fundec
+  in
+  E_acsl_visitor.case_globals
+    ~default:(fun () -> main)
+    ~builtin:update_builtin
+    ~var_fun_decl:observe_and_unghost
+    ~var_init:observe_and_unghost
+    ~var_def
+    ~fun_def
+    global
 
-  (* other globals: nothing to do *)
-  | GType _
-  | GCompTag _
-  | GCompTagDecl _
-  | GEnumTag _
-  | GEnumTagDecl _
-  | GAsm _
-  | GPragma _
-  | GText _
-  | GAnnot _ (* do never read annotation from sources *)
-    ->
-    env, main
-
-(* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end] as
-   the last before [return] *)
+(* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end]
+   as the last before [return] *)
 let surround_function_with kf fundec stmt_begin stmt_end =
   let body = fundec.sbody in
   (* Insert last statement *)
@@ -710,8 +676,12 @@ let inject_global_handler file main =
     let vi_init, fundec_init = Global_observer.mk_init_function () in
     let cil_fct_init = GFun(fundec_init, Location.unknown) in
     (* Create [__e_acsl_globals_delete] function *)
-    let vi_clean, fundec_clean = Global_observer.mk_clean_function () in
-    let cil_fct_clean = GFun(fundec_clean, Location.unknown) in
+    let vi_and_fundec_clean_opt = Global_observer.mk_clean_function () in
+    let cil_fct_clean_opt =
+      Option.map
+        (fun (_, fundec_clean) -> GFun(fundec_clean, Location.unknown))
+        vi_and_fundec_clean_opt
+    in
     match main with
     | Some main ->
       let mk_fct_call vi =
@@ -730,14 +700,14 @@ let inject_global_handler file main =
       (* Create [__e_acsl_globals_init();] call *)
       let stmt_init = mk_fct_call vi_init in
       (* Create [__e_acsl_globals_delete();] call *)
-      let stmt_clean =
-        match fundec_clean.sbody.bstmts with
-        | [] -> None
-        | _ -> Some (mk_fct_call vi_clean)
+      let stmt_clean_opt =
+        Option.map
+          (fun (vi_clean, _) -> mk_fct_call vi_clean)
+          vi_and_fundec_clean_opt
       in
       (* Surround the content of main with the calls to
          [__e_acsl_globals_init();] and [__e_acsl_globals_delete();] *)
-      surround_function_with main main_fundec stmt_init stmt_clean;
+      surround_function_with main main_fundec stmt_init stmt_clean_opt;
       (* Retrieve all globals except main *)
       let main_vi = Globals.Functions.get_vi main in
       let new_globals =
@@ -758,9 +728,10 @@ let inject_global_handler file main =
         let globals_to_add = [ GFun(main_fundec, Location.unknown) ] in
         (* Prepend [__e_acsl_globals_clean] if not empty *)
         let globals_to_add =
-          match fundec_clean.sbody.bstmts with
-          | [] -> globals_to_add
-          | _ -> cil_fct_clean :: globals_to_add
+          Option.fold
+            ~none:globals_to_add
+            ~some:(fun cil_fct_clean -> cil_fct_clean :: globals_to_add)
+            cil_fct_clean_opt
         in
         (* Prepend [__e_acsl_globals_init] *)
         let globals_to_add = cil_fct_init :: globals_to_add in
@@ -782,25 +753,26 @@ let inject_global_handler file main =
         Global_observer.function_init_name
         Global_observer.function_clean_name;
       let globals_func =
-        match fundec_clean.sbody.bstmts with
-        | [] -> [ cil_fct_init ]
-        | _ -> [ cil_fct_init; cil_fct_clean ]
+        Option.fold
+          ~none:[ cil_fct_init ]
+          ~some:(fun cil_fct_clean -> [ cil_fct_init; cil_fct_clean ])
+          cil_fct_clean_opt
       in
       file.globals <- file.globals @ globals_func
 
 (** Add a call to [__e_acsl_memory_init] and [__e_acsl_memory_clean] if the
-    memory tracking analysis is running.
+    memory tracking analysis is running or if the option [assert-print-data] is
+    used.
     [__e_acsl_memory_init] initializes memory storage and potentially records
     program arguments. Parameters to [__e_acsl_memory_init] are addresses of
     program arguments or NULLs if [main] is declared without arguments.
     [__e_acsl_memory_clean] clean the memory allocated by
     [__e_acsl_memory_init]. *)
 let inject_mtracking_handler main =
-  (* Only inject memory init and memory clean if the memory model analysis is
-     running *)
-  if Memory_tracking.use_monitoring () then begin
+  if Memory_tracking.use_monitoring () ||
+     Options.Assert_print_data.get () then begin
     let loc = Location.unknown in
-    let nulls = [ Cil.zero loc ; Cil.zero loc ] in
+    let nulls = [ Smart_exp.null ~loc ; Smart_exp.null ~loc ] in
     let handle_main main =
       let fundec =
         try Kernel_function.get_definition main
@@ -832,8 +804,8 @@ let inject_mtracking_handler main =
   end
 
 let inject_in_file file =
-  let _env, main =
-    List.fold_left inject_in_global (Env.empty, None) file.globals
+  let main =
+    List.fold_left inject_in_global None file.globals
   in
   (* post-treatment *)
   (* extend [main] with forward initialization and put it at end *)
@@ -850,6 +822,8 @@ let reset_all ast =
   Logic_functions.reset ();
   Literal_strings.reset ();
   Global_observer.reset ();
+  Bound_variables.clear_guards ();
+  Logic_normalizer.clear ();
   Typing.clear ();
   (* reset some kernel states: *)
   (* reset the CFG that has been heavily modified by the code generation step *)
@@ -860,11 +834,24 @@ let reset_all ast =
   Ast.mark_as_grown ()
 
 let inject () =
-  Options.feedback ~level:2
-    "injecting annotations as code in project %a"
-    Project.pretty (Project.current ());
   Gmp_types.init ();
   let ast = Ast.get () in
+  let current_project = Project.current() in
+  Options.feedback ~level:2
+    "preprocessing annotations in project %a"
+    Project.pretty current_project;
+  Logic_normalizer.preprocess ast;
+  Options.feedback ~level:2
+    "normalizing quantifiers in project %a"
+    Project.pretty current_project;
+  Bound_variables.preprocess ast;
+  Options.feedback ~level:2
+    "typing annotations in project %a"
+    Project.pretty current_project;
+  Typing.type_program ast;
+  Options.feedback ~level:2
+    "injecting annotations as code in project %a"
+    Project.pretty current_project;
   inject_in_file ast;
   reset_all ast;
 

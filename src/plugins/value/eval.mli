@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -191,15 +191,29 @@ type ('loc, 'value) assigned =
 (* Extract the assigned value from a [value assigned]. *)
 val value_assigned : ('loc, 'value) assigned -> 'value or_bottom
 
-type logic_assign =
-  | Assigns of from
+(** The logic dependency of an ACSL assigns clause. *)
+type 'location logic_dependency =
+  { term: identified_term;
+    (** The ACSL term of the dependency, expressed in a \from clause. *)
+    direct: bool;
+    (** Whether the dependency is direct (default case), or has been declared
+        as "indirect", meaning that its value is only used in a conditional or
+        to compute an address. *)
+    location: 'location option;
+    (** The location of the dependency. [None] if the location could not be
+        evaluated, in which case a warning has been emitted. *)
+  }
+
+type 'location logic_assign =
+  | Assigns of identified_term * 'location logic_dependency list
+  (** assigns clause, with the dependencies of the \from clause.
+      An empty list means \nothing. *)
   | Allocates of identified_term
   | Frees of identified_term
 
 (* -------------------------------------------------------------------------- *)
 (**                       {2 Interprocedural Analysis }                       *)
 (* -------------------------------------------------------------------------- *)
-
 
 (** Argument of a function call. *)
 type ('loc, 'value) argument = {
@@ -208,17 +222,62 @@ type ('loc, 'value) argument = {
   avalue: ('loc, 'value) assigned;  (** The value of the concrete argument. *)
 }
 
+(** A call_stack is a list, telling which function was called at which
+    site. The head of the list tells about the latest call. *)
+
+(** A call site: the function called, and the call statement
+    (or [Kglobal] for the main function. *)
+type call_site = kernel_function * kinstr
+
+(* A call stack is a list of call sites. The head is the latest call.
+   The last element is the main function. *)
+type callstack = call_site list
+
 (** A function call. *)
 type ('loc, 'value) call = {
   kf: kernel_function;                        (** The called function. *)
+  callstack: callstack;                       (** The current callstack
+                                                  (without this call). *)
   arguments: ('loc, 'value) argument list;    (** The arguments of the call. *)
   rest: (exp * ('loc, 'value) assigned) list; (** Extra-arguments. *)
   return: varinfo option;                     (** Fake varinfo to store the
                                                   return value of the call.
                                                   Same varinfo for every
                                                   call to a given function. *)
-  recursive: bool;
 }
+
+(** Information needed to interpret a recursive call.
+    The local variables and formal parameters of different recursive calls
+    should not be mixed up. Those of the current call must be temporary withdraw
+    or replaced from the domain states before starting the new recursive call,
+    and the inverse transformation must be made at the end of the call. *)
+type recursion = {
+  depth: int;
+  (** Depth of the recursive call, i.e. the number of previous call to the
+      called function in the current callstack. *)
+  substitution: (varinfo * varinfo) list;
+  (** List of variables substitutions to be performed by the domains: for each
+      pair, the first variable must be replaced by the second one in the domain
+      state. *)
+  base_substitution: Base.substitution;
+  (** Same substitution as the previous field, for bases. *)
+  withdrawal: varinfo list;
+  (** List of variables to be temporary removed from the state at the start of a
+      new recursive call (by the function [start_call] of the abstract domains),
+      or to be put back in the state at the end of a recursive call (by the
+      function [finalize_call] of the abstract domains).  *)
+  base_withdrawal: Base.Hptset.t;
+  (** Same withdrawal as the previous field, for bases. *)
+}
+
+(** Can the results of a function call be cached with memexec? *)
+type cacheable =
+  | Cacheable      (** Functions whose result can be safely cached *)
+  | NoCache        (** Functions whose result should not be cached, but for
+                       which the caller can still be cached. Typically,
+                       functions printing something during the analysis. *)
+  | NoCacheCallers (** Functions for which neither the call, neither the
+                       callers, can be cached *)
 
 (*
 Local Variables:

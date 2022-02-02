@@ -1,6 +1,6 @@
 /* run.config
  MODULE: pp_lines
-    STDOPT:
+   STDOPT:
 */
 
 // Test locations when cabs2cil merges declarations and tentative definitions

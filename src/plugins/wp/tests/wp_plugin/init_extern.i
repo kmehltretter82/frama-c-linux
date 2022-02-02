@@ -1,9 +1,9 @@
 /* run.config
-   OPT: %{dep:init_linker.i}
+   OPT: %{dep:@PTEST_DIR@/init_linker.i}
  */
 
 /* run.config_qualif
-   OPT: %{dep:init_linker.i}
+   OPT: %{dep:@PTEST_DIR@/init_linker.i}
  */
 
 // To be linked with init_linker that defines the initial value of 'a'

@@ -1,4 +1,5 @@
 /* run.config
+PLUGIN: @EVA_PLUGINS@
    STDOPT: +"-machdep gcc_x86_64"
    STDOPT: +"-machdep msvc_x86_64"
  */
@@ -7,7 +8,6 @@
 // In GCC, its current (undocumented) behavior is equivalent to #pragma pack(),
 // that is, disable packing (reset to default). We emulate this behavior,
 // but with a warning.
-
 #include "pragma-pack-utils.h"
 
 #include <stdint.h>

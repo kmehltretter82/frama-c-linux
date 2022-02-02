@@ -44,7 +44,7 @@ let mk_array_type (is_gcc, typ, types, kind) length =
   let length =
     Option.map (Cil.kinteger ~loc Cil.(theMachine.kindOfSizeOf)) length
   in
-  (is_gcc, TArray (typ, length, { scache = Not_Computed }, []), types, kind)
+  (is_gcc, TArray (typ, length, []), types, kind)
 
 let mk_named_type (is_gcc, ttype, types, kind) =
   let tname = type_name () in
@@ -89,7 +89,7 @@ let mk_comp_type
     if nb_fields = 0 then GCompTagDecl (compinfo, loc)
     else GCompTag (compinfo,loc)
   in
-  (is_gcc, TComp (compinfo, { scache = Not_Computed }, []), glob :: types, kind)
+  (is_gcc, TComp (compinfo, []), glob :: types, kind)
 
 let mk_enum_type is_def is_gcc =
   let ename = type_name () in

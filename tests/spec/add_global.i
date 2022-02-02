@@ -1,6 +1,6 @@
 /* run.config
 MODULE: @PTEST_NAME@
-OPT: -print
+OPT: -no-autoload-plugins -print
 */
 
 int main () { return 0; }

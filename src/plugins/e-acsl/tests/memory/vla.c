@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: check variable-length arrays
+   STDOPT: +"-eva-precision=1"
 */
 
 int LEN = 10;

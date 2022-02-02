@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -82,11 +82,13 @@ let dkey_incompatible_states = register_category "incompatible-states"
 let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
+let dkey_recursion = register_category "recursion"
 
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate
-    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain]
+    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain;
+     dkey_recursion; ]
 
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"
@@ -96,16 +98,19 @@ let () = set_warn_status wkey_garbled_mix Log.Winactive
 let wkey_builtins_missing_spec = register_warn_category "builtins:missing-spec"
 let wkey_builtins_override = register_warn_category "builtins:override"
 let wkey_libc_unsupported_spec = register_warn_category "libc:unsupported-spec"
-let wkey_loop_unroll = register_warn_category "loop-unroll"
-let () = set_warn_status wkey_loop_unroll Log.Wfeedback
-let wkey_missing_loop_unroll = register_warn_category "missing-loop-unroll"
+let wkey_loop_unroll_auto = register_warn_category "loop-unroll:auto"
+let () = set_warn_status wkey_loop_unroll_auto Log.Wfeedback
+let wkey_loop_unroll_partial = register_warn_category "loop-unroll:partial"
+let () = set_warn_status wkey_loop_unroll_partial Log.Wfeedback
+let wkey_missing_loop_unroll = register_warn_category "loop-unroll:missing"
 let () = set_warn_status wkey_missing_loop_unroll Log.Winactive
-let wkey_missing_loop_unroll_for = register_warn_category "missing-loop-unroll:for"
+let wkey_missing_loop_unroll_for = register_warn_category "loop-unroll:missing:for"
 let () = set_warn_status wkey_missing_loop_unroll_for Log.Winactive
 let wkey_signed_overflow = register_warn_category "signed-overflow"
 let wkey_invalid_assigns = register_warn_category "invalid-assigns"
 let () = set_warn_status wkey_invalid_assigns Log.Wfeedback
 let wkey_experimental = register_warn_category "experimental"
+let wkey_unknown_size = register_warn_category "unknown-size"
 
 module ForceValues =
   WithOutput
@@ -135,7 +140,7 @@ module Domains =
       let option_name = "-eva-domains"
       let arg_name = "d1,...,dn"
       let help = "Enable a list of analysis domains."
-      let default = Datatype.String.Set.singleton "cvalue"
+      let default = Datatype.String.Set.of_list ["cvalue"]
     end)
 let () = add_precision_dep Domains.parameter
 
@@ -167,6 +172,16 @@ let create_domain_option name =
        warning "Option %s is deprecated. Use -eva-domains %s%s instead."
          option_name (if _new then "" else "-") name;
        if _new then Domains.add name else remove_domain name)
+
+let () = Parameter_customize.set_group performance
+module NoResultsDomains =
+  String_set
+    (struct
+      let option_name = "-eva-no-results-domain"
+      let arg_name = "domains"
+      let help = "Do not record the states of some domains during the analysis."
+    end)
+let () = add_dep NoResultsDomains.parameter
 
 (* List (name, descr) of available domains. *)
 let domains_ref = ref []
@@ -200,25 +215,28 @@ let register_domain ~name ~descr =
     Domains.option_name "eva" domains (domains_help ())
 
 (* Checks that a domain has been registered. *)
-let check_domain domain =
+let check_domain option_name domain =
   if domain = "help" || domain = "list"
   then domains_list ()
   else if not (List.exists (fun (name, _) -> name = domain) !domains_ref)
   then
     let pp_str_list = Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string in
-    abort "invalid domain %S for option -eva-domains.@.Possible domains are: %a"
-      domain pp_str_list (List.rev_map fst !domains_ref)
+    abort "invalid domain %S for option %s.@.Possible domains are: %a"
+      domain option_name pp_str_list (List.rev_map fst !domains_ref)
 
 let () =
-  Domains.add_set_hook
-    (fun _old domains -> Datatype.String.Set.iter check_domain domains)
+  let hook option_name = fun _old domains ->
+    Datatype.String.Set.iter (check_domain option_name) domains
+  in
+  Domains.add_set_hook (hook Domains.name);
+  NoResultsDomains.add_set_hook (hook NoResultsDomains.name)
 
 let () = Parameter_customize.set_group domains
 module DomainsFunction =
   Make_multiple_map
     (struct
       include Datatype.String
-      let of_string str = check_domain str; str
+      let of_string str = check_domain "-eva-domains-function" str; str
       let of_singleton_string = no_element_of_string
       let to_string str = str
     end)
@@ -351,11 +369,13 @@ module TracesUnifyLoop =
 let () = add_precision_dep TracesUnifyLoop.parameter
 
 let () = Parameter_customize.set_group domains
-module TracesDot = Empty_string
+module TracesDot = Filepath
     (struct
       let option_name = "-eva-traces-dot"
-      let help = "Output to the given filename the Cfg in dot format."
       let arg_name = "FILENAME"
+      let file_kind = "DOT"
+      let existence = Fc_Filepath.Indifferent
+      let help = "Output to the given filename the Cfg in dot format."
     end)
 
 let () = Parameter_customize.set_group domains
@@ -399,74 +419,9 @@ module JoinResults =
       let default = true
     end)
 
-let () = Parameter_customize.set_group performance
-module EqualityStorage =
-  Bool
-    (struct
-      let option_name = "-eva-equality-storage"
-      let help = "Store the states of the equality domain during \
-                  the analysis."
-      let default = true
-    end)
-let () = add_precision_dep EqualityStorage.parameter
-
-let () = Parameter_customize.set_group performance
-module SymbolicLocsStorage =
-  Bool
-    (struct
-      let option_name = "-eva-symbolic-locations-storage"
-      let help = "Store the states of the symbolic locations domain during \
-                  the analysis."
-      let default = true
-    end)
-let () = add_precision_dep SymbolicLocsStorage.parameter
-
-let () = Parameter_customize.set_group performance
-module GaugesStorage =
-  Bool
-    (struct
-      let option_name = "-eva-gauges-storage"
-      let help = "Store the states of the gauges domain during the analysis."
-      let default = true
-    end)
-let () = add_precision_dep GaugesStorage.parameter
-
-let () = Parameter_customize.set_group performance
-module ApronStorage =
-  Bool
-    (struct
-      let option_name = "-eva-apron-storage"
-      let help = "Store the states of the apron domains during the \
-                  analysis."
-      let default = false
-    end)
-let () = add_precision_dep ApronStorage.parameter
-
-let () = Parameter_customize.set_group performance
-module BitwiseOffsmStorage =
-  Bool
-    (struct
-      let option_name = "-eva-bitwise-storage"
-      let help = "Store the states of the bitwise domain during the \
-                  analysis."
-      let default = true
-    end)
-let () = add_precision_dep BitwiseOffsmStorage.parameter
-
 (* ------------------------------------------------------------------------- *)
 (* --- Non-standard alarms                                               --- *)
 (* ------------------------------------------------------------------------- *)
-
-let () = Parameter_customize.set_group alarms
-module AllRoundingModesConstants =
-  False
-    (struct
-      let option_name = "-eva-all-rounding-modes-constants"
-      let help = "Take into account the possibility of constants not being \
-                  converted to the nearest representable value, \
-                  or being converted to higher precision"
-    end)
-let () = add_correctness_dep AllRoundingModesConstants.parameter
 
 let () = Parameter_customize.set_group alarms
 module UndefinedPointerComparisonPropagateAll =
@@ -518,27 +473,34 @@ module WarnPointerSubstraction =
 let () = add_correctness_dep WarnPointerSubstraction.parameter
 
 let () = Parameter_customize.set_group alarms
+let () = Parameter_customize.is_invisible ()
 module IgnoreRecursiveCalls =
   False
     (struct
       let option_name = "-eva-ignore-recursive-calls"
-      let help =
-        "Pretend function calls that would be recursive do not happen. \
-         Causes unsoundness"
+      let help = "Deprecated."
     end)
-let () = add_correctness_dep IgnoreRecursiveCalls.parameter
+let () =
+  IgnoreRecursiveCalls.add_set_hook
+    (fun _old _new ->
+       warning
+         "@[Option -eva-ignore-recursive-calls has no effect.@ Recursive calls \
+          can be unrolled@ through option -eva-unroll-recursive-calls,@ or their \
+          specification is used@ to interpret them.@]")
 
 let () = Parameter_customize.set_group alarms
-
+let () = Parameter_customize.argument_may_be_fundecl ();
 module WarnCopyIndeterminate =
   Kernel_function_set
     (struct
       let option_name = "-eva-warn-copy-indeterminate"
       let arg_name = "f | @all"
-      let help = "Warn when a statement of the specified functions copies a \
-                  value that may be indeterminate (uninitialized or containing \
-                  escaping address). Set by default; can be deactivated for \
-                  function 'f' by '=-f', or for all functions by '=-@all'."
+      let help =
+        "Warn when a statement copies a value that may be indeterminate \
+         (uninitialized, containing an escaping address, or infinite/NaN \
+         floating-point value). \
+         Set by default; can be deactivated for function 'f' by '=-f', \
+         or for all functions by '=-@all'."
     end)
 let () = add_correctness_dep WarnCopyIndeterminate.parameter
 let () = WarnCopyIndeterminate.Category.(set_default (all ()))
@@ -680,6 +642,19 @@ module WideningPeriod =
 let () = WideningPeriod.set_range ~min:1 ~max:max_int
 let () = add_precision_dep WideningPeriod.parameter
 
+let () = Parameter_customize.set_group precision_tuning
+module RecursiveUnroll =
+  Int
+    (struct
+      let default = 0
+      let option_name = "-eva-unroll-recursive-calls"
+      let arg_name = "n"
+      let help = "Unroll <n> recursive calls before using the specification of \
+                  the recursive function to interpret the calls."
+    end)
+let () = RecursiveUnroll.set_range ~min:0 ~max:max_int
+let () = add_precision_dep RecursiveUnroll.parameter
+
 (* --- Partitioning --- *)
 
 let () = Parameter_customize.set_group precision_tuning
@@ -800,6 +775,9 @@ module ValuePartitioning =
     end)
 let () = add_precision_dep ValuePartitioning.parameter
 
+let use_global_value_partitioning vi =
+  ValuePartitioning.add vi.Cil_types.vname
+
 let () = Parameter_customize.set_group precision_tuning
 module SplitLimit =
   Int
@@ -812,6 +790,24 @@ module SplitLimit =
     end)
 let () = add_precision_dep SplitLimit.parameter
 let () = SplitLimit.set_range 0 max_int
+
+let () = Parameter_customize.set_group precision_tuning
+module InterproceduralSplits =
+  False
+    (struct
+      let option_name = "-eva-interprocedural-splits"
+      let help = "Keep partitioning splits through function returns"
+    end)
+let () = add_precision_dep InterproceduralSplits.parameter
+
+let () = Parameter_customize.set_group precision_tuning
+module InterproceduralHistory =
+  False
+    (struct
+      let option_name = "-eva-interprocedural-history"
+      let help = "Keep partitioning history through function returns"
+    end)
+let () = add_precision_dep InterproceduralHistory.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
@@ -871,16 +867,20 @@ module ILevel =
   Int
     (struct
       let option_name = "-eva-ilevel"
-      let default = 8
+      let default = 8 (* Must be synchronized with Int_set.small_cardinal. *)
       let arg_name = "n"
       let help =
         "Sets of integers are represented as sets up to <n> elements. \
          Above, intervals with congruence information are used \
-         (defaults to 8, must be between 4 and 128)"
+         (defaults to 8, must be above 2)"
     end)
 let () = add_precision_dep ILevel.parameter
 let () = ILevel.add_update_hook (fun _ i -> Int_set.set_small_cardinal i)
-let () = ILevel.set_range 4 256
+let () = ILevel.set_range 2 max_int
+
+let builtins = ref Datatype.String.Set.empty
+let register_builtin name = builtins := Datatype.String.Set.add name !builtins
+let mem_builtin name = Datatype.String.Set.mem name !builtins
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
@@ -892,12 +892,12 @@ module BuiltinsOverrides =
       let of_string ~key:kf ~prev:_ nameopt =
         begin match nameopt with
           | Some name ->
-            if not (!Db.Value.mem_builtin name) then
+            if not (mem_builtin name) then
               abort "option '-eva-builtin %a:%s': undeclared builtin '%s'@.\
                      declared builtins: @[%a@]"
                 Kernel_function.pretty kf name name
                 (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string)
-                (List.map fst (!Db.Value.registered_builtins ()))
+                (Datatype.String.Set.elements !builtins)
           | _ -> abort
                    "option '-eva-builtin':@ \
                     no builtin associated to function '%a',@ use '%a:<builtin>'"
@@ -918,7 +918,7 @@ let () = add_correctness_dep BuiltinsOverrides.parameter
 
 (* Exported in Eva.mli. *)
 let use_builtin key name =
-  if !Db.Value.mem_builtin name
+  if mem_builtin name
   then BuiltinsOverrides.add (key, Some name)
   else raise Not_found
 
@@ -1063,14 +1063,15 @@ module ValShowPerf =
 
 let () = Parameter_customize.set_group messages
 module ValPerfFlamegraphs =
-  String
+  Filepath
     (struct
       let option_name = "-eva-flamegraph"
+      let arg_name = "file"
+      let file_kind = "Text for flamegraph"
+      let existence = Fc_Filepath.Indifferent
       let help = "Dump a summary of the time spent analyzing function calls \
                   in a format suitable for the Flamegraph tool \
                   (http://www.brendangregg.com/flamegraphs.html)"
-      let arg_name = "file"
-      let default = ""
     end)
 
 
@@ -1096,11 +1097,12 @@ module PrintCallstacks =
 
 let () = Parameter_customize.set_group messages
 module ReportRedStatuses =
-  String
+  Filepath
     (struct
       let option_name = "-eva-report-red-statuses"
       let arg_name = "filename"
-      let default = ""
+      let file_kind = "CSV"
+      let existence = Fc_Filepath.Indifferent
       let help = "Output the list of \"red properties\" in a csv file of the \
                   given name. These are the properties which were invalid for \
                   some states. Their consolidated status may not be invalid, \
@@ -1109,13 +1111,14 @@ module ReportRedStatuses =
 
 let () = Parameter_customize.set_group messages
 module NumerorsLogFile =
-  String
+  Filepath
     (struct
       let option_name = "-eva-numerors-log-file"
+      let arg_name = "file"
+      let file_kind = "Text"
+      let existence = Fc_Filepath.Indifferent
       let help = "The Numerors domain will save each call to the DPRINT \
                   function in the given file"
-      let arg_name = "file"
-      let default = ""
     end)
 
 (* ------------------------------------------------------------------------- *)
@@ -1271,8 +1274,25 @@ let () = MallocLevel.set_range 0 max_int
 let () = add_precision_dep MallocLevel.parameter
 
 (* -------------------------------------------------------------------------- *)
-(* --- Deprecated aliases                                                 --- *)
+(* --- Deprecated options and aliases                                     --- *)
 (* -------------------------------------------------------------------------- *)
+
+let () = Parameter_customize.set_group alarms
+let () = Parameter_customize.is_invisible ()
+module AllRoundingModesConstants =
+  False
+    (struct
+      let option_name = "-eva-all-rounding-modes-constants"
+      let help = "Deprecated. Take into account the possibility of constants \
+                  not being converted to the nearest representable value, \
+                  or being converted to higher precision"
+    end)
+let () = add_correctness_dep AllRoundingModesConstants.parameter
+let () =
+  AllRoundingModesConstants.add_set_hook
+    (fun _old _new ->
+       warning "Option -eva-all-rounding-modes-constants is now deprecated.@ \
+                Please contact us if you need it.")
 
 let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   [ (module SemanticUnrollingLevel), "-slevel"

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,16 +28,16 @@
 (* ********************************************************************** *)
 
 val null : Format.formatter
-  (** Prints nothing.
-      @since Beryllium-20090901 *)
+(** Prints nothing.
+    @since Beryllium-20090901 *)
 
 val nullprintf :  ('a,Format.formatter,unit) format -> 'a
-  (** Discards the message and returns unit.
-      @since Beryllium-20090901 *)
+(** Discards the message and returns unit.
+    @since Beryllium-20090901 *)
 
 val with_null : (unit -> 'b) -> ('a,Format.formatter,unit,'b) format4 -> 'a
-  (** Discards the message and call the continuation.
-      @since Beryllium-20090901 *)
+(** Discards the message and call the continuation.
+    @since Beryllium-20090901 *)
 
 (* ********************************************************************** *)
 (** {2 pretty-printing to a string} *)
@@ -56,8 +56,8 @@ val ksfprintf:
 
 val to_string: ?margin:int -> (Format.formatter -> 'a -> unit) -> 'a -> string
 (** pretty-prints the supplied value into a string. [margin] is the
-  maximal width of the box before a line-break is inserted.
-  See {!Format.set_margin} *)
+    maximal width of the box before a line-break is inserted.
+    See {!Format.set_margin} *)
 
 (** {2 separators} *)
 
@@ -84,7 +84,7 @@ val pp_list: ?pre:sformat -> ?sep:sformat -> ?last:sformat -> ?suf:sformat ->
     - what to print if the list is empty (default: nothing)
 
     @modify Silicon-20161101 new optional argument [empty]
- *)
+*)
 
 val pp_array: ?pre:sformat -> ?sep:sformat -> ?suf:sformat -> ?empty:sformat ->
   (int,'a) formatter2 -> 'a array formatter
@@ -95,7 +95,7 @@ val pp_array: ?pre:sformat -> ?sep:sformat -> ?suf:sformat -> ?empty:sformat ->
     - what to print if the array is empty (default: nothing)
 
     @modify Silicon-20161101 new optional argument [empty]
- *)
+*)
 
 val pp_iter:
   ?pre:sformat -> ?sep:sformat -> ?suf:sformat ->
@@ -136,7 +136,7 @@ val pp_pair: ?pre:sformat -> ?sep:sformat -> ?suf:sformat ->
     - pre: open a box
     - sep: print a comma character
     - suf: close a box.
-    @since Magnesium-20151001 *)
+      @since Magnesium-20151001 *)
 
 val pp_flowlist:
   ?left:sformat -> ?sep:sformat -> ?right:sformat -> 'a formatter ->
@@ -168,7 +168,7 @@ val pp_items :
 (** Prints a collection of elements, with the possibility of aligning {i titles}
     with each others.
 
-    The collection of ['a] to print is provided by iterator [~iter] which 
+    The collection of ['a] to print is provided by iterator [~iter] which
     is called twice: one for computing the maximal size of {i titles},
     obtained {i via} function [~title] for each item. The second pass
     pretty-print each item using [~pp_item pp] where the passed [pp] printer
@@ -193,15 +193,15 @@ val pp_items :
     with [~pp_title]. Surrounding spaces are {i not} printed via [~pp_title].
 
     The (optional) parameters have the following meaning:
-     - [?align] alignment mode (default is [`Center])
-     - [?margin] is added to text size (default [0])
-     - [?min] minimum size ([~margin] included, default [0])
-     - [?max] maximum size ([~margin] included, default [80])
-     - [~title] returns the {i title} for each element (only size is relevant)
-     - [~iter] iterate over the elements to be printed
-     - [?pp_title] pretty-printer used to the (possibly truncated) title
+    - [?align] alignment mode (default is [`Center])
+    - [?margin] is added to text size (default [0])
+    - [?min] minimum size ([~margin] included, default [0])
+    - [?max] maximum size ([~margin] included, default [80])
+    - [~title] returns the {i title} for each element (only size is relevant)
+    - [~iter] iterate over the elements to be printed
+    - [?pp_title] pretty-printer used to the (possibly truncated) title
        (default is [Format.pp_print_string])
-     - [~pp_item] pretty-printer to print each element.
+    - [~pp_item] pretty-printer to print each element.
 
     There is also a low-level API to this feature, provided by {!marger},
     {!pp_margin} and {!add_margin} below.
@@ -213,9 +213,9 @@ val add_margin : marger -> ?margin:int -> ?min:int -> ?max:int -> string -> unit
 (** Updates the marger with new text dimension.
     The marger width is updated with the width of the provided text.
     The optional parameters are used to adjust the text width as follows:
-     - [?margin] is added to text size (default [0])
-     - [?min] minimum size ([~margin] included, default [0])
-     - [?max] maximum size ([~margin] included, default [80]) *)
+    - [?margin] is added to text size (default [0])
+    - [?min] minimum size ([~margin] included, default [0])
+    - [?max] maximum size ([~margin] included, default [80]) *)
 
 val pp_margin : ?align:align -> ?pp:string formatter -> marger -> string formatter
 (** Prints a text with margins {i wrt} to marger. If the text does not fit

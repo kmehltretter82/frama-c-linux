@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,11 +41,19 @@
 (** Partitioning keys attached to states. *)
 type key
 
+type call_return_policy = {
+  callee_splits: bool;
+  callee_history: bool;
+  caller_history: bool;
+  history_size: int;
+}
+
 module Key : sig
-  val zero : key (** Initial key: no partitioning. *)
-  val compare : key -> key -> int
-  val pretty : Format.formatter -> key -> unit
-  val exceed_rationing: key -> bool
+  include Datatype.S_with_collections with type t = key
+  val empty : t (** Initial key: no partitioning. *)
+  val exceed_rationing: t -> bool
+  val combine : policy:call_return_policy -> caller:t -> callee:t -> t
+  (** Recombinaison of keys after a call *)
 end
 
 (** Collection of states, each identified by a unique key. *)
@@ -54,7 +62,7 @@ type 'state partition
 val empty : 'a partition
 val is_empty : 'a partition -> bool
 val size : 'a partition -> int
-val to_list : 'a partition -> 'a list
+val to_list : 'a partition -> (key*'a) list
 val find : key -> 'a partition -> 'a
 val replace : key -> 'a -> 'a partition -> 'a partition
 val merge : (key -> 'a option -> 'b option -> 'c option) -> 'a partition ->
@@ -92,7 +100,12 @@ type unroll_limit =
       split point, and the key is then kept unchanged until a merge.
     - dynamic splits are regularly redone: the expression is re-evaluated, and
       states are then split or merged accordingly. *)
-type split_kind = Static | Dynamic
+type split_kind = Eva_annotations.split_kind = Static | Dynamic
+
+(** Splits can be performed according to a C expression or an ACSL predicate. *)
+type split_term = Eva_annotations.split_term =
+  | Expression of Cil_types.exp
+  | Predicate of Cil_types.predicate
 
 (** Split monitor: prevents splits from generating too many states. *)
 type split_monitor
@@ -137,7 +150,7 @@ type action =
       – all other states are joined together.
       Previous rationing is erased and replaced by this new stamping.
       Implementation of the option -eva-split-return. *)
-  | Split of Cil_types.exp * split_kind * split_monitor
+  | Split of split_term * split_kind * split_monitor
   (** [Split (exp, kind, monitor)] tries to separate states such as the [exp]
       evaluates to a singleton value in each state in the flow. If necessary and
       possible, splits states into multiple states. States in which the [exp]
@@ -145,7 +158,7 @@ type action =
       if [exp] evaluates to more than [limit] values, [limit] being the split
       limit of the [monitor]. A same monitor can be used for successive splits
       on different flows. *)
-  | Merge of Cil_types.exp * split_kind
+  | Merge of split_term
   (** Forgets the split of an expression: states that were kept separate only
       by the split of this expression will be joined together. *)
   | Update_dynamic_splits
@@ -177,8 +190,8 @@ sig
 
   val union : t -> t -> t
 
+  val transfer : ((key * state) -> (key * state) list) -> t -> t
   val transfer_keys : t -> action -> t
-  val transfer_states : (state -> state list) -> t -> t
 
   val iter : (state -> unit) -> t -> unit
   val filter_map: (key -> state -> state option) -> t -> t

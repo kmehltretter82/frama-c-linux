@@ -1,6 +1,6 @@
 /* run.config
-MODULE: @PTEST_NAME@
-OPT: -main f -print
+ MODULE: @PTEST_NAME@
+   OPT: -main f -no-autoload-plugins -print
 */
 
 static int f(void);

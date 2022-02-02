@@ -17,22 +17,153 @@
 Open Source Release <next-release>
 ##################################
 
+o!  Kernel    [2021-12-03] Remove unused AST node Dcustom_annot and field
+              fpadding_in_bits. Do not cache size of types in the AST but in
+              a dedicated table.
+-*  Logic     [2021-11-30] Fix type of expressions whose value are functions
+o!  Kernel    [2021-11-29] Integer.pretty does not have the optional argument
+              hexa anymore. Use Integer.pretty_hex or Integer.pp_hex if you
+              want to print integers in hexadecimal format.
+
+###################################
+Open Source Release 24.0 (Chromium)
+###################################
+
+-   ACSL      [2021-10-28] better type checks for volatile clauses
+-   Variadic  [2021-10-26] translates printf/scanf calls even if formatting
+              string is not constant, warning that it will assume arguments
+              match the format.
+-   Kernel    [2021-10-26] Support for C11's  _Static_assert
+-   Libc      [2021-10-26] Frama-C's libc #define _STDC_NO_COMPLEX as mandated by
+              ISO C11 for libraries without support for complex numbers
+-   Eva       [2021-10-19] New options to allow states partitioning to survive
+              function returns: -eva-interprocedural-split for disjunctions
+              from split annotations, and -eva-interprocedural-history for
+              disjunctions from the -eva-partition-history option.
+-   Eva       [2021-10-14] Supports the evaluation of ACSL set comprehension.
+-   Eva       [2021-10-14] On a SIGINT signal (Ctrl-C), the analysis is stopped
+              but partial results are saved if option -save is set.
+-*  Eva       [2021-10-12] Always checks the arguments of builtin calls for
+              alarms about initialization, escaping pointers and special
+              floating-point values, unless -eva-warn-copy-indeterminate is set.
+-*  Kernel    [2021-10-11] Fixes crashes on C integer constants overflowing
+              ocaml integers.
+-   Eva       [2021-10-06] Improves the precision of the octagon domain on
+              unsigned variables.
+-*  Eva       [2021-10-06] Fixes a soundness bug in the octagon domain on
+              integer downcasts wrapping around.
+-   Eva       [2021-09-10] Improves the symbolic-locations domain precision.
+-   Kernel    [2021-09-02] 0-sized flexible array members only available in
+              gcc_* machdeps, that now also support FAM in nested struct.
+-   Eva       [2021-07-26] Removes the maximum limit of option -eva-ilevel.
+-   Eva       [2021-07-26] New \tainted predicate to evaluate if the value of an
+              expression is tainted according to the taint domain.
+-o  Eva       [2021-07-25] Changes the Domain_builder.Complete functor to
+              automatically build more abstract domain functions.
+-*  Eva       [2021-06-24] Fixes a soundness bug of the bitwise domain with the
+              memexec cache.
+-*  Variadic  [2021-06-23] Create a fallback specialisation if there is an error
+              while translating a variadic call so that no variadic call are
+              left in the AST after Variadic.
+-   Eva       [2021-06-22] Reduction of "garbled mix" values by \valid and
+              \valid_read ACSL predicates.
+-   Eva       [2021-06-15] New experimental multidim domain to improve analysis
+              precision on arrays of structures and multidimensional arrays.
+-*  Eva       [2021-06-10] Fixes a crash in the octagon domain.
+o   Kernel    [2021-06-10] New module Cil_builder, simplifies C and ACSL code
+                           generation.
+o   Ptests    [2021-06-03] Add new PLUGIN directive and new predefined macros.
+-   Eva       [2021-06-01] Annotations split and dynamic_split can be applied
+              to logic predicates (in addition to terms).
+-   Eva       [2021-06-01] New annotation dynamic_split, similar to split, but
+              separates the analysis w.r.t. the current value of an expression
+              instead of the value it had at the annotation point: the partition
+              can be changed at an assignment to ensure that the expression
+              always evaluates to a singleton in each analysis state.
+-   Eva       [2021-05-20] New taint analysis via an experimental taint domain.
+              New annotations //@ taint … (for statements) and //@ taints … (in
+              function contracts) to initiate taint on lvalues.
+              Tainted properties can then be seen in the future GUI Ivette.
+-   Eva       [2021-05-11] Support for ACSL predicate \is_infinite.
+
+###################################
+Open Source Release 23.1 (Vanadium)
+###################################
+
+###################################
+Open Source Release 23.0 (Vanadium)
+###################################
+
+-*  Kernel    [2021-04-26] Do not crash on _Alignof(void): accept or properly
+              reject, depending on machdep. Fixes pub/frama-c#2551
+-   Eva       [2021-04-21] Partial support for recursion:
+              new option -eva-unroll-recursive-calls to precisely analyze the n
+              first recursive calls, before using the function specification
+              to interpret the remaining calls.
+              The unsound option -eva-ignore-recursive-calls has been removed.
+-!  RTE       [2021-04-16] -rte-initialized takes a set of functions as
+                           parameter (defaults to none)
+-   RTE       [2021-04-16] No more initialization warnings for full structures
+                           and unions reads. Initialization warnings for other
+                           types *without* trap representation. Refer to the
+                           documentation for more details.
+-*  Kernel    [2021-04-16] Pretty prints array formals in their original form.
+              Fixes pub/frama-c#392
+o!  Kernel    [2021-04-13] Removed deprecated function Filepath.pretty
+o!  Kernel    [2021-04-13] Filepath directories functions now return
+              Filepath.Normalized.t, Frama-C configuration and plugin
+              configuration getters updated accordingly
+o!  Kernel    [2021-04-09] Change the type of the measure from string to
+              logic_info in the variant AST node.
+o   Ptests    [2021-04-08] FILTER directive reads the standard input and can be
+              chained.
+-   Eva       [2021-04-02] Improved automatic loop unroll (-eva-auto-loop-unroll
+              option) of loops with goto or continue statements, or assigning
+              constant values to loop variants.
+-   Libc      [2021-03-31] In math.h specifications, new behaviors for cases
+              creating NaN or infinite values. These behaviors are allowed or
+              forbidden according to the -warn-special-float option.
+-*  Kernel    [2021-03-26] Raise an error if trying to merge a tentative
+              definition with a proper definition during linking
+o   Ptests    [2021-03-25] Modify MODULE directive.
+o   Ptests    [2021-03-24] Add new EXIT directive.
+-   Eva       [2021-03-15] Slightly more precise evaluation of ACSL quantifiers.
+o!  Eva       [2021-03-01] New signature for builtins, that are now registered
+              via Eva.mli instead of Db.Value.
+-   Eva       [2021-02-18] New "audit mode" to track file checksums, correctness
+              options and enabled warnings, via options -audit-prepare and
+              -audit-check.
+-   Aorai     [2021-02-09] New option for tracking last N states of the
+              automaton. Easier analysis of instrumented code with Eva.
+o!  Kernel    [2021-02-08] Avoid triggering warning 16 (unerasable optional
+              argument). Implies changing some labeled functions' signatures.
+-   ACSL      [2021-02-04] New admit annotations to express hypotheses to be
+              admitted but not verified by Frama-C.
+-   Eva       [2021-01-28] Improved automatic widening thresholds (widen hints):
+              use constant modulo as threshold, and infer thresholds globally
+              for global variables.
+-   Eva       [2021-01-21] Better interpretation of logical operators && and ||
+              (useful when option -keep-logical-operators is enabled).
 o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
               empty struct allowed only in specific machdeps.
               removed cdefined field
--*  RTE       [2021-01-13] remove spurious assert when comparing function
+-*  RTE       [2021-01-13] Remove spurious assert when comparing function
               pointer to NULL (fixes #@940)
--   Kernel    [2021-01-12] set default machdep to x86_64; allow setting machdep
-              via environment variable FRAMAC_MACHDEP.
--   Kernel    [2021-01-08] allow -add-symbolic-path to survive saves/loads and
+-   Kernel    [2021-01-12] Set default machdep to x86_64 (was x86_32);
+              allow setting machdep via environment variable FRAMAC_MACHDEP.
+-   Kernel    [2021-01-08] Allow -add-symbolic-path to survive saves/loads and
               invert argument order (path:name).
--   Libc      [2020-12-02] remove obsolete attribute FRAMA_C_MODEL in the libc.
+-*  Eva       [2020-12-05] Fixes a crash when subdividing the evaluation of
+              pointer expressions (via option -eva-subdivide-non-linear).
+-   Libc      [2020-12-02] Remove obsolete attribute FRAMA_C_MODEL in the libc.
               Fixes #@877.
--*  Logic     [2020-11-30] assigns clause can't mention const locations
+-*  Logic     [2020-11-30] The assigns clause can't mention const locations
               anymore. Fixes #@855.
 o   Kernel    [2020-11-27] Extract builtin-related functions from module Cil
               to module Cil_builtins. Code can be updated using
               `bin/migration_scripts/titanium2vanadium.sh`.
+-   Eva       [2020-11-26] Allow using Eva directives Frama_C_show_each and
+              Frama_C_dump_each in ghost code.
 -   Metrics   [2020-10-27] Add json output in addition to text and html.
 
 ###################################

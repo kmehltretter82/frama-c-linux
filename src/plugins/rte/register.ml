@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,7 +28,7 @@
    function *)
 let do_all_rte kf =
   let flags =
-    { Flags.all with
+    { (Flags.all ()) with
       Flags.signed_downcast = false;
       unsigned_downcast = false; }
   in
@@ -38,7 +38,7 @@ let do_all_rte kf =
    function *)
 let do_rte kf =
   let flags =
-    { Flags.all with
+    { (Flags.all ()) with
       Flags.unsigned_overflow = false;
       signed_downcast = false;
       unsigned_downcast = false; }

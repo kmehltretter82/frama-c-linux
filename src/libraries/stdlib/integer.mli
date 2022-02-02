@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,6 +22,8 @@
 
 (** Extension of [Big_int] compatible with [Zarith].
     @since Nitrogen-20111001 *)
+
+type 'a formatter = Format.formatter -> 'a -> unit
 
 type t = Z.t
 
@@ -122,9 +124,66 @@ val of_int : int -> t
 val of_int64 : Int64.t -> t
 val of_int32 : Int32.t -> t
 
-val to_int : t -> int (** @raise Z.Overflow if too big *)
-val to_int64 : t -> int64 (** @raise Z.Overflow if too big *)
-val to_int32 : t -> int32 (** @raise Z.Overflow if too big *)
+(**
+   @raise Z.Overflow if too big
+   @deprecated 24.0-Chromium Renamed to [to_int_exn].
+                           Also consider using [to_int_opt].
+*)
+val to_int : t -> int [@@deprecated]
+
+(**
+   @raise Z.Overflow if too big
+   @deprecated 24.0-Chromium Renamed to [to_int64_exn].
+                           Also consider using [to_int64_opt].
+*)
+val to_int64 : t -> int64 [@@deprecated]
+
+(**
+   @raise Z.Overflow if too big
+   @deprecated 24.0-Chromium Renamed to [to_int32_exn].
+                           Also consider using [to_int32_opt].
+*)
+val to_int32 : t -> int32 [@@deprecated]
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int_exn : t -> int
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int64_exn : t -> int64
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int32_exn : t -> int32
+
+(**
+   Returns [Some i] if the number can be converted to an [int],
+   or [None] otherwise.
+   @since 24.0-Chromium
+*)
+val to_int_opt : t -> int option
+
+(**
+   Returns [Some i] if the number can be converted to an [int64],
+   or [None] otherwise.
+   @since 24.0-Chromium
+*)
+val to_int64_opt : t -> int64 option
+
+(**
+   Returns [Some i] if the number can be converted to an [int32],
+   or [None] otherwise.
+   @since 24.0-Chromium
+*)
+val to_int32_opt : t -> int32 option
+
 
 val to_float : t -> float
 val of_float : float -> t
@@ -155,9 +214,12 @@ val to_string : t -> string
 val of_string : string -> t
 (** @raise Invalid_argument when the string cannot be parsed. *)
 
-val pretty : ?hexa:bool -> t Pretty_utils.formatter
+(** @modify Frama-C+dev remove optional `hexa` argument *)
+val pretty : t formatter
+(** @since Frama-C+dev *)
+val pretty_hex : t formatter
 
-val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
+val pp_bin : ?nbits:int -> ?sep:string -> t formatter
 (** Print binary format. Digits are output by blocs of 4 bits
     separated by [~sep] with at least [~nbits] total bits. If [nbits] is
     non positive, it will be ignored.
@@ -165,7 +227,7 @@ val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
     Positive values are prefixed with ["0b"] and negative values
     are printed as their 2-complement ([lnot]) with prefix ["1b"]. *)
 
-val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
+val pp_hex : ?nbits:int -> ?sep:string -> t formatter
 (** Print hexadecimal format. Digits are output by blocs of 16 bits
     (4 hex digits) separated by [~sep] with at least [~nbits] total bits.
     If [nbits] is non positive, it will be ignored.

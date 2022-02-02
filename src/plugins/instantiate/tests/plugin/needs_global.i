@@ -1,8 +1,7 @@
 /* run.config
-   MODULE: needs_globals
+  SCRIPT: @PTEST_NAME@
    OPT: -instantiate -check -print
 */
-
 int i ; // needed for already_one specifciation
 void already_one(void* parameter) ;
 

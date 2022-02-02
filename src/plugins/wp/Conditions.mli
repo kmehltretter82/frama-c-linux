@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -150,6 +150,10 @@ val insert : ?at:int -> step -> sequent -> sequent
     @raise Invalid_argument if the index is out of bounds. *)
 
 val replace : at:int -> step -> sequent -> sequent
+(** replace a step in the sequent, the one [at] the specified position.
+    @raise Invalid_argument if the index is out of bounds. *)
+
+val replace_by_step_list : at:int -> step list -> sequent -> sequent
 (** replace a step in the sequent, the one [at] the specified position.
     @raise Invalid_argument if the index is out of bounds. *)
 

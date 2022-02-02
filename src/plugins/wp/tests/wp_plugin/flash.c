@@ -1,16 +1,19 @@
 /* run.config
    OPT:
-   OPT: -wp-driver %{dep:flash.driver},%{dep:flash-ergo.driver}
- MODULE: flash
-   OPT: -wp-driver %{dep:flash.driver}
+ DEPS: flash.mlw
+   OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver},%{dep:@PTEST_DIR@/flash-ergo.driver}
+SCRIPT: flash
+   OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver}
 */
+
 /* run.config_qualif
-   DEPS: flash.mlw
    OPT: -wp-timeout 1
-   OPT: -wp-driver %{dep:flash.driver},%{dep:flash-ergo.driver}
- MODULE: flash
-   OPT: -wp-driver %{dep:flash.driver}
+ DEPS: flash.mlw
+   OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver},%{dep:@PTEST_DIR@/flash-ergo.driver}
+SCRIPT: @PTEST_NAME@
+   OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver}
 */
+
 /* -------------------------------------------------------------------------- */
 /* --- Observation of Sequence of Reads and Writes                        --- */
 /* -------------------------------------------------------------------------- */

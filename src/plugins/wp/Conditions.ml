@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -83,16 +83,16 @@ and sequence = {
   seq_vars : Vars.t ;
   seq_core : Pset.t ;
   seq_catg : category ;
-  seq_list : step list ;
+  seq_list : step list ; (* forall i . 0 <= i < n ==> Step_i *)
 }
 and condition =
-  | Type of pred
+  | Type of pred (* related to Type *)
   | Have of pred
-  | When of pred
+  | When of pred (* related to Condition *)
   | Core of pred
   | Init of pred
-  | Branch of pred * sequence * sequence
-  | Either of sequence list
+  | Branch of pred * sequence * sequence (* if Pred then Seq_1 else Seq_2 *)
+  | Either of sequence list (* exist i . 0 <= i < n && Sequence_i *)
   | State of Mstate.state
 
 (* -------------------------------------------------------------------------- *)
@@ -318,15 +318,19 @@ let pretty = ref (fun _fmt _seq -> ())
 
 let is_true = function { seq_catg = TRUE | EMPTY } -> true | _ -> false
 let is_empty = function { seq_catg = EMPTY } -> true | _ -> false
+let is_false = function { seq_catg = FALSE } -> true | _ -> false
 
 let is_absurd_h h = match h.condition with
-  | (Core p | When p | Have p) -> p == F.p_false
-  | _ -> false
+  | (Type p | Core p | When p | Have p | Init p) -> p == F.p_false
+  | Branch(_,p,q) -> is_false p && is_false q
+  | Either w -> List.for_all is_false w (* note: an empty w is an absurd hyp *)
+  | State _ -> false
 
 let is_trivial_h h = match h.condition with
   | State _ -> false
   | (Type p | Core p | When p | Have p | Init p) -> p == F.p_true
   | Branch(_,a,b) -> is_true a && is_true b
+  | Either [] -> false
   | Either w -> List.for_all is_true w
 
 let is_trivial_hs_p hs p = p == F.p_true || List.exists is_absurd_h hs
@@ -613,6 +617,7 @@ let core_branch step p a b =
   let condition =
     match a.seq_catg , b.seq_catg with
     | (TRUE | EMPTY) , (TRUE|EMPTY) -> Have p_true
+    | FALSE , FALSE -> Have p_false
     | _ -> Branch(p,a,b)
   in update_cond step condition
 
@@ -691,8 +696,9 @@ and map_steplist f = function
   | [] -> []
   | h::hs ->
       let h = map_step f h in
-      let hs = map_steplist f hs in
-      if is_trivial_h h then hs else h :: hs
+      if is_absurd_h h then [h] else
+        let hs = map_steplist f hs in
+        if is_trivial_h h then hs else h :: hs
 
 and map_sequence f s =
   sequence (map_steplist f s.seq_list)
@@ -736,8 +742,9 @@ and ground_flowdir ~fwd env = function
   | [] -> []
   | h::hs ->
       let h = ground_flow ~fwd env h in
-      let hs = ground_flowdir ~fwd env hs in
-      if is_trivial_h h then hs else h :: hs
+      if is_absurd_h h then [h] else
+        let hs = ground_flowdir ~fwd env hs in
+        if is_trivial_h h then hs else h :: hs
 
 let ground (hs,g) =
   let hs = ground_flowlist ~fwd:true (Ground.top ()) hs in
@@ -787,13 +794,12 @@ let letify_assume sref (_,step) =
           sref := Sigma.assume current p
   end ; current
 
-[@@@ warning "-32"]
 let rec letify_type sigma used p = match F.p_expr p with
   | And ps -> p_all (letify_type sigma used) ps
   | _ ->
       let p = Sigma.p_apply sigma p in
-      if Vars.intersect used (F.varsp p) then p else F.p_true
-[@@@ warning "+32"]
+      let vs = F.varsp p in
+      if Vars.intersect used vs || Vars.is_empty vs then p else F.p_true
 
 let rec letify_seq sigma0 ~target ~export (seq : step list) =
   let dseq = Array.map (dseq_of_step sigma0) (Array.of_list seq) in
@@ -1050,7 +1056,7 @@ struct
     | Some m -> m
     | None ->
         let m = Lang.sigma () in
-        F.Subst.add_map m s.def ;
+        F.Subst.add_fun m (fun e -> Tmap.find e s.def) ;
         s.cache <- Some m ; m
 
   let e_apply s e = F.e_subst (subst s) e
@@ -1298,22 +1304,31 @@ struct
       (fun fs e -> Fset.union fs (phi e))
       Fset.empty es
 
-  let rec gvars_of_term m t =
+  let rec gvars_of_term ~deep m t =
     try Tmap.find t m.footprint
     with Not_found ->
-    match F.repr t with
-    | Fun(f,[]) -> Gset.singleton f , Fset.empty
-    | Fun(f,_) -> Gset.empty , fset_of_lfun m f
-    | Rget(_,fd) -> Gset.empty , Fset.singleton fd
-    | Rdef fts -> Gset.empty ,
-                  List.fold_left (fun fs (f,_) -> Fset.add f fs)
-                    Fset.empty fts
-    | _ ->
-        let gs = ref FP.empty in
-        let collect m gs e = gs := FP.union !gs (gvars_of_term m e) in
+      let collect_subterms acc =
+        let gs = ref acc in
+        let collect m gs e = gs := FP.union !gs (gvars_of_term ~deep m e) in
         F.lc_iter (collect m gs) t ;
         let s = !gs in
         m.footprint <- Tmap.add t s m.footprint ; s
+      in
+      match F.repr t with
+      | Fun(f,[]) ->
+          Gset.singleton f , Fset.empty
+      | Fun(f,_) when not deep || is_coloring_lfun f ->
+          Gset.empty , fset_of_lfun ~deep m f
+      | Fun(f,_) ->
+          collect_subterms (Gset.empty , fset_of_lfun ~deep m f)
+      | Rget(_,fd) ->
+          Gset.empty , Fset.singleton fd
+      | Rdef fts ->
+          Gset.empty ,
+          List.fold_left (fun fs (f,_) -> Fset.add f fs)
+            Fset.empty fts
+      | _ ->
+          collect_subterms FP.empty
 
   and gvars_of_pred m p = gvars_of_term m (F.e_prop p)
 
@@ -1334,12 +1349,12 @@ struct
     let tf = Lang.tau_of_field fd in
     Fset.add fd (fset_of_tau tf)
 
-  and fset_of_lemma m d =
-    snd (gvars_of_pred m d.Definitions.l_lemma)
+  and fset_of_lemma ~deep m d =
+    snd (gvars_of_pred ~deep m d.Definitions.l_lemma)
 
   and fset_of_var x = fset_of_tau (F.tau_of_var x)
 
-  and fset_of_lfun m f =
+  and fset_of_lfun ~deep m f =
     try Gmap.find f m.footcalls
     with Not_found ->
       (* bootstrap recursive calls *)
@@ -1352,9 +1367,9 @@ struct
           let df =
             match d.d_definition with
             | Logic _ -> Fset.empty
-            | Function(_,_,t) -> snd (gvars_of_term m t)
-            | Predicate(_,p) -> snd (gvars_of_pred m p)
-            | Inductive ds -> fsetmap (fset_of_lemma m) ds
+            | Function(_,_,t) -> snd (gvars_of_term ~deep m t)
+            | Predicate(_,p) -> snd (gvars_of_pred ~deep m p)
+            | Inductive ds -> fsetmap (fset_of_lemma ~deep m) ds
           in Fset.union ds df
         with Not_found ->
           Fset.empty
@@ -1362,7 +1377,7 @@ struct
 
   let collect_have m p =
     begin
-      m.gs <- FP.union m.gs (gvars_of_pred m p) ;
+      m.gs <- FP.union m.gs (gvars_of_pred ~deep:true m p) ;
       m.xs <- Vars.union m.xs (F.varsp p) ;
     end
 
@@ -1381,7 +1396,7 @@ struct
     | _ ->
         if Vars.subset (F.varsp p) m.xs then
           begin
-            let gs = gvars_of_pred m p in
+            let gs = gvars_of_pred ~deep:false m p in
             if FP.subset gs m.gs then p else
             if FP.intersect gs m.gs then
               (m.fixpoint <- false ; m.gs <- FP.union gs m.gs ; p)
@@ -1419,6 +1434,7 @@ struct
       footcalls = Gmap.empty ;
     } in
     List.iter (collect_step m) seq.seq_list ; collect_have m g ;
+    Kernel.debug ~level:3 "Collected %a" pp_used m ;
     let rec loop () =
       m.fixpoint <- true ;
       let hs' = filter_steplist m seq.seq_list in
@@ -1721,14 +1737,15 @@ let step_at seq k =
 (* --- Insertion                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let in_sequence ~replace =
+let in_sequence_add_list ~replace =
   let rec in_list k h w =
     if k = 0 then
-      h :: (if replace
-            then match w with
-              | [] -> assert false
-              | _::w -> w
-            else w)
+      List.rev_append (List.rev h)
+        (if replace
+         then match w with
+           | [] -> assert false
+           | _::w -> w
+         else w)
     else
       match w with
       | [] -> assert false
@@ -1744,9 +1761,9 @@ let in_sequence ~replace =
     | Branch(p,a,b) ->
         let n = a.seq_size in
         if k < n then
-          Branch(p,in_sequence k h a,b)
+          Branch(p,in_sequence_add_list k h a,b)
         else
-          Branch(p,a,in_sequence (k-n) h b)
+          Branch(p,a,in_sequence_add_list (k-n) h b)
     | Either cs -> Either (in_case k h cs)
 
   and in_case k h = function
@@ -1754,11 +1771,13 @@ let in_sequence ~replace =
     | c::cs ->
         let n = c.seq_size in
         if k < n
-        then in_sequence k h c :: cs
+        then in_sequence_add_list k h c :: cs
         else c :: in_case (k-n) h cs
 
-  and in_sequence k h s = sequence (in_list k h s.seq_list)
-  in in_sequence
+  and in_sequence_add_list k h s = sequence (in_list k h s.seq_list)
+  in in_sequence_add_list
+
+let in_sequence ~replace id h = in_sequence_add_list ~replace id [h]
 
 let size seq = seq.seq_size
 
@@ -1773,6 +1792,12 @@ let replace ~at step sequent =
   let seq,goal = sequent in
   if 0 <= at && at <= seq.seq_size
   then in_sequence ~replace:true at step seq , goal
+  else raise Not_found
+
+let replace_by_step_list ~at step_list sequent =
+  let seq,goal = sequent in
+  if 0 <= at && at <= seq.seq_size
+  then in_sequence_add_list ~replace:true at step_list seq , goal
   else raise Not_found
 
 (* -------------------------------------------------------------------------- *)

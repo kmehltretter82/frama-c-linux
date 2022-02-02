@@ -1,6 +1,6 @@
 8a9,11
 > [eva] loopfun.i:23: starting to merge loop iterations
-> [eva:loop-unroll] loopfun.i:25: loop not completely unrolled
+> [eva:loop-unroll:partial] loopfun.i:25: loop not completely unrolled
 > [eva] loopfun.i:25: starting to merge loop iterations
 10a14
 > [eva] loopfun.i:26: starting to merge loop iterations

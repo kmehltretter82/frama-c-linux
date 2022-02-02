@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Aorai plug-in of Frama-C.                        */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*    INRIA (Institut National de Recherche en Informatique et en         */
@@ -77,7 +77,10 @@ promela
                 st::l
               ) observed_states []
             in
-            { states; trans = $3; metavariables = Datatype.String.Map.empty }
+            { states; trans = $3;
+              metavariables = Datatype.String.Map.empty;
+              observables = None;
+            }
         }
         | PROMELA_NEVER PROMELA_LBRACE states PROMELA_SEMICOLON 
             PROMELA_RBRACE EOF {
@@ -91,7 +94,11 @@ promela
                   st::l
                 ) observed_states []
               in
-              { states; trans = $3; metavariables = Datatype.String.Map.empty } }
+              { states; trans = $3;
+                metavariables = Datatype.String.Map.empty;
+                observables = None;
+              }
+          }
   ;
 
 states   

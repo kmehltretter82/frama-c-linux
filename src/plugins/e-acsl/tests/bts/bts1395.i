@@ -1,11 +1,12 @@
-/* run.config_ci
+/* run.config
    COMMENT: recursive function
-   STDOPT: +"-eva-ignore-recursive-calls"
+   STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 
 /*@ requires n > 0; */
 int fact(int n) {
-  if (n == 1) return 1;
+  if (n == 1)
+    return 1;
   return n * fact(n - 1);
 }
 

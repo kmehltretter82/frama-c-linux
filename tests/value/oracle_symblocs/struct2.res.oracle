@@ -4,24 +4,24 @@
 57,58d58
 <   accessing out of bounds index. assert 0 ≤ (int)(tab2[i] + j);
 < [eva:alarm] struct2.i:82: Warning: 
-79,80d78
+77,80d76
+<   accessing out of bounds index. assert 0 ≤ (int)(i + j);
+< [eva:alarm] struct2.i:185: Warning: 
 <   accessing out of bounds index. assert (int)(i + j) < 2;
 < [eva:alarm] struct2.i:185: Warning: 
-98c96
+98d93
 < [scope:rm_asserts] removing 2 assertion(s)
----
-> [scope:rm_asserts] removing 1 assertion(s)
-136,137c134
+136,137c131
 <   tab4[0] ∈ {0; 2}
 <       [1] ∈ {0}
 ---
 >   tab4[0..1] ∈ {0}
-140c137,138
+140c134,135
 <   tab6[0..1] ∈ {0; 2}
 ---
 >   tab6[0] ∈ {0}
 >       [1] ∈ {2}
-211c209
+211c206
 <            [9].a}; s1; s2; s5.e[0].b; s6.b; s8; tabl[0..1]; tab1[0..1];
 ---
 >            [9].a}; s1; s2; s5.e[0].b; s6.b; s8; tabl[0..1]; tab1[0];

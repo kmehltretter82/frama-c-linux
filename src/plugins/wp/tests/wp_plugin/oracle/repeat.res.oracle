@@ -19,11 +19,13 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_0).
   (* Pre-condition *)
-  Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
+  Have: L_sequence(calls_0) = nil.
   (* Invariant *)
-  Have: ([ 1, 2 ] *^ i) = a.
+  Have: 0 <= n.
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant *)
+  Have: ([ 1, 2 ] *^ i) = a.
   (* Then *)
   Have: i < n.
   (* Call 'f' *)
@@ -50,17 +52,21 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_1).
   (* Pre-condition *)
-  Have: (L_sequence(calls_1) = nil) /\ (0 <= n).
+  Have: L_sequence(calls_1) = nil.
   (* Invariant *)
-  Have: (a_2 *^ i) = a.
+  Have: 0 <= n.
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant *)
+  Have: (a_2 *^ i) = a.
   (* Then *)
   Have: i < n.
   (* Call 'f' *)
   Have: L_sequence(calls_2) = a ^ [ 1 ].
   (* Call 'g' *)
   Have: L_sequence(calls_3) = a_1.
+  (* Invariant *)
+  Have: (-1) <= i.
 }
 Prove: (a_2 *^ x) = a_1.
 
@@ -123,13 +129,15 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_0).
   (* Pre-condition *)
-  Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
+  Have: L_sequence(calls_0) = nil.
   (* Call 'f' *)
   Have: L_sequence(calls_1) = [ 1 ].
   (* Invariant *)
-  Have: L_sequence(calls_2) = a_1 ^ [ 1 ].
+  Have: 0 <= n.
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant *)
+  Have: L_sequence(calls_2) = a_1 ^ [ 1 ].
   (* Else *)
   Have: n <= i.
   (* Call 'g' *)
@@ -146,13 +154,15 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_0).
   (* Pre-condition *)
-  Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
+  Have: L_sequence(calls_0) = nil.
   (* Call 'f' *)
   Have: L_sequence(calls_1) = [ 1 ].
   (* Invariant *)
-  Have: L_sequence(calls_2) = a ^ [ 1 ].
+  Have: 0 <= n.
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant *)
+  Have: L_sequence(calls_2) = a ^ [ 1 ].
   (* Then *)
   Have: i < n.
   (* Call 'g' *)
@@ -179,19 +189,23 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_0).
   (* Pre-condition *)
-  Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
+  Have: L_sequence(calls_0) = nil.
   (* Call 'f' *)
   Have: L_sequence(calls_1) = [ 1 ].
   (* Invariant *)
-  Have: L_sequence(calls_2) = a_1 ^ [ 1 ].
+  Have: 0 <= n.
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
+  (* Invariant *)
+  Have: L_sequence(calls_2) = a_1 ^ [ 1 ].
   (* Then *)
   Have: i < n.
   (* Call 'g' *)
   Have: L_sequence(calls_3) = a_2.
   (* Call 'f' *)
   Have: L_sequence(calls_4) = a_1 ^ [ 1, 2, 1 ].
+  (* Invariant *)
+  Have: (-1) <= i.
 }
 Prove: (a *^ x) = a_2.
 

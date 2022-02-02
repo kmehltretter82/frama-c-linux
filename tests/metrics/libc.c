@@ -2,7 +2,7 @@
    STDOPT: #"-metrics-no-libc -metrics-eva-cover"
    STDOPT: #"-metrics-libc -metrics-eva-cover"
    LOG: libc.json
-   STDOPT: #"-metrics-libc -metrics-output libc.json"
+   STDOPT: #"-metrics-libc -metrics-output @PTEST_RESULT@/libc.json"
 */
 #include <ctype.h>
 #include <stdio.h> // defines external variables

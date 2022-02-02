@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Eval
 
 (** Mark the analysis as aborted. It will be stopped at the next safe point *)
 val signal_abort: unit -> unit
@@ -46,7 +45,7 @@ module Computer
 
     val compute:
       kernel_function -> kinstr -> Abstract.Dom.t ->
-      Abstract.Dom.t list or_bottom * Value_types.cacheable
+      (Partition.key * Abstract.Dom.t) list * Eval.cacheable
 
   end
 

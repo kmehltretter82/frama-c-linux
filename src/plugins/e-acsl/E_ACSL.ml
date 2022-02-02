@@ -26,7 +26,8 @@ open Cil_types
 
 module Error = Error
 
-module Translate = Translate
+module Translate_terms = Translate_terms
+module Translate_predicates = Translate_predicates
 
 module Functions = Functions
 

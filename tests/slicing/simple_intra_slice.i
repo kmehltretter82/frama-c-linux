@@ -1,11 +1,11 @@
 /* run.config
- LIBS: ../libSelect
+ LIBS: libSelect
  MODULE: @PTEST_NAME@
-   OPT: @EVA_OPTIONS@ -deps -no-slice-callers -journal-disable
+   OPT: @EVA_OPTIONS@ -deps -no-slice-callers
 */
-
 int Unknown;
 int G;
+
 
 /* on sélectionne le return.
    on doit garder juste a (pas G et b) */

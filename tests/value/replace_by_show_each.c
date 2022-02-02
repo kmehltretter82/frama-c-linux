@@ -1,7 +1,7 @@
 /* run.config*
- OPT: -eva @EVA_CONFIG@ -inout -calldeps
+ PLUGIN: @EVA_MAIN_PLUGINS@ from,inout
+   OPT: -eva @EVA_CONFIG@ -inout -calldeps
 */
-
 #define show_each_1 Frama_C_show_each_1
 #define show_each_2 Frama_C_show_each_2
 

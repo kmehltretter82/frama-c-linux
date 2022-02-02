@@ -2,7 +2,7 @@
 .\"                                                                        
 .\"  This file is part of the Frama-C's E-ACSL plug-in.                    
 .\"                                                                        
-.\"  Copyright (C) 2012-2020                                               
+.\"  Copyright (C) 2012-2021                                               
 .\"    CEA (Commissariat à l'énergie atomique et aux énergies              
 .\"         alternatives)                                                  
 .\"                                                                        
@@ -183,8 +183,19 @@ trigger failure if a NULL-pointer is used as an input to free function
 on assertion failure exit with the given integer code intead of raising an abort
 signal
 .TP
+.B --assert-print-data
+print data contributing to the failed assertion along with the runtime error
+message
+.TP
+.B --no-assert-print-data
+do notprint data contributing to the failed assertion along with the runtime
+error message
+.TP
 .B --external-assert=\fI<FILE>
 the filename that contains your own implementation of __e_acsl_assert
+.TP
+.B --external-print-value=\fI<FILE>
+the filename that contains your own implementation of __e_acsl_print_value
 .TP
 .B -m, --memory-model=\fI<model>
 memory model (i.e., a runtime library for checking memory related annotations)
@@ -269,12 +280,10 @@ instrumentation- or compile-time error
 
 instrument foo.c and output the instrumented code to \fIa.out.frama.c\fP.
 
-.B e-acsl-gcc.sh -P -c -ogen_foo.c -Ofoo foo.c
+.B e-acsl-gcc.sh -c -ogen_foo.c -Ofoo foo.c
 
 instrument \fIfoo.c\fP, output the instrumented code to \fIgen_foo.c\fP and
 compile \fIfoo.c\fP into \fIfoo\fP and \fIgen_foo.c\fP into \fIfoo.e-acsl\fP.
-The \fB-P\fP option specifies that the instrumentation should omit debug
-functionality.
 
 .B e-acsl-gcc.sh --memory-model=bittree -C gen_foo.c
 

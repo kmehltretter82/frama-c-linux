@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -106,7 +106,9 @@ process_file ()
    -e 's/Extlib\.the \([^~]\)/Option.get \1/g' \
    -e 's/Extlib\.opt_equal/Option.equal/g' \
    -e 's/Extlib\.opt_compare/Option.compare/g' \
-   -e 's/Extlib\.array_exists/Array.exists/g'
+   -e 's/Extlib\.array_exists/Array.exists/g' \
+   -e 's/Filepath\.Normalized\.is_unknown/Filepath.Normalized.is_empty/g' \
+   -e 's/Filepath\.Normalized\.unknown/Filepath.Normalized.empty/g'
 }
 
 apply_one_dir ()

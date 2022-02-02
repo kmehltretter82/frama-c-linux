@@ -1,19 +1,17 @@
-/* run.config
+/*run.config
  EXIT: 1
-   STDOPT: +"-machdep x86_64" +"%{dep:merge_attrs_align1.c}" +"%{dep:merge_attrs_align2.c}"
-   STDOPT: +"-machdep x86_64" +"%{dep:merge_attrs_align1.c}" +"%{dep:merge_attrs_align3.c}"
+  STDOPT: +"-machdep x86_64" +"@PTEST_DIR@/merge_attrs_align1.c" +"@PTEST_DIR@/merge_attrs_align2.c"
+  STDOPT: +"-machdep x86_64" +"@PTEST_DIR@/merge_attrs_align1.c" +"@PTEST_DIR@/merge_attrs_align3.c"
  EXIT: 0
-   STDOPT: +"-machdep x86_64" +"%{dep:merge_attrs_align1.c}" +"%{dep:merge_attrs_align4.c}"
-   STDOPT: +"-machdep x86_64" +"%{dep:merge_attrs_align2.c}" +"%{dep:merge_attrs_align3.c}"
+  STDOPT: +"-machdep x86_64" +"@PTEST_DIR@/merge_attrs_align1.c" +"@PTEST_DIR@/merge_attrs_align4.c"
+  STDOPT: +"-machdep x86_64" +"@PTEST_DIR@/merge_attrs_align2.c" +"@PTEST_DIR@/merge_attrs_align3.c"
  EXIT: 1
-   STDOPT: +"-machdep x86_64" +"%{dep:merge_attrs_align2.c}" +"%{dep:merge_attrs_align4.c}"
-   STDOPT: +"-machdep x86_64" +"%{dep:merge_attrs_align3.c}" +"%{dep:merge_attrs_align4.c}"
+  STDOPT: +"-machdep x86_64" +"@PTEST_DIR@/merge_attrs_align2.c" +"@PTEST_DIR@/merge_attrs_align4.c"
+  STDOPT: +"-machdep x86_64" +"@PTEST_DIR@/merge_attrs_align3.c" +"@PTEST_DIR@/merge_attrs_align4.c"
  */
-
 
 // for testing with GCC/Clang
 #ifndef __FRAMAC__
-
 extern int f1();
 extern int f2();
 extern int f3();

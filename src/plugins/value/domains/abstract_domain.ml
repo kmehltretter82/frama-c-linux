@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -65,24 +65,15 @@
       logical predicates, to the initialization of an initial state, and to the
       {!Mem_exec} cache.
 
-    The module type {!S_with_Structure} is {!S}, plus a special OCaml value
-    describing the internal structure of the domain and identifying it.
-    This structure enables automatic accessors to the domain when
-    combined to others. See {!Structure} for details.
-    {!S_with_Structure} is the interface to implement in order to introduce
-    a now domain in Eva.
+    The functor {!Domain_builder.Complete} automatically builds some of the
+    functions required by the {!S} signature. However, these functions can
+    also be redefined in the domain to achieve better precision or performance.
 
-    The module type {!Internal} contains some other functionalities needed by
-    the analyzer, but that can be automatically generated from the previous
-    one. The functor {!Domain_builder.Complete} produces an {!Internal} module
-    from a {!S_with_Structure} one.
+    Domains can then be lifted on more general values and locations through
+    {!Domain_lift.Make}, and be combined through {!Domain_product.Make}.
 
-    {!Internal} modules can then be lifted on more general values and locations
-    through {!Domain_lift.Make}, and be combined through {!Domain_product.Make}.
-
-    Finally, {!External} is the type of the final modules built and used by Eva.
-    It contains the generic accessors to specific domains, described in
-    {!Interface}.
+    Finally, a new domain can be registered in the Eva engine via
+    {!Abstractions.register}. See abstractions.mli for more details.
 *)
 
 (* The types of the Cil AST. *)
@@ -112,6 +103,17 @@ module type Lattice = sig
       without impeding the analysis: [meet x y = `Value x] is always sound. *)
 end
 
+(** Context from the engine evaluation about a domain query. *)
+type evaluation_context = {
+  root: bool;
+  (** Is the queried expression the "root" expression being evaluated, or is it
+      a sub-expression? *)
+  subdivision: int;
+  (** Maximum number of subdivisions for the current evaluation.
+      See {!Subdivided_evaluation} for more details. *)
+  subdivided: bool;
+  (** Is the current evaluation a subdivision of the complete evaluation? *)
+}
 
 (** Extraction of information: queries for values or locations inferred by a
     domain about expressions and lvalues.
@@ -137,20 +139,29 @@ module type Queries = sig
            value of the expression [exp], and [o] is the origin of the value,
            which can be None. *)
 
+  (** When evaluating an expression, the evaluation engine asks the domains
+      for abstract values and alarms at each lvalue (via [extract_lval]) and
+      each sub-expressions (via [extract_expr]).
+      In these queries:
+      - [oracle] is an evaluation function and can be used to find the answer
+        by evaluating some others expressions, especially by relational domain.
+        No recursive evaluation should be done by this function.
+      - [context] record gives some information about
+        the current evaluation. *)
+
   (** Query function for compound expressions:
-      [eval oracle t exp] returns the known value of [exp] by the state [t].
-      [oracle] is an evaluation function and can be used to find the answer
-      by evaluating some others expressions, especially by relational domain.
-      No recursive evaluation should be done by this function. *)
+      [extract_expr ~oracle context t exp] returns the known value of [exp]
+      by the state [t]. See above for more details on queries. *)
   val extract_expr :
-    (exp -> value evaluated) ->
+    oracle:(exp -> value evaluated) -> evaluation_context ->
     state -> exp -> (value * origin option) evaluated
 
   (** Query function for lvalues:
-      [find oracle t lval typ loc] returns the known value stored at
-      the location [loc] of the left value [lval] of type [typ]. *)
+      [extract_lval ~oracle context t lval typ loc] returns the known value
+      stored at the location [loc] of the left value [lval] of type [typ].
+      See above for more details on queries. *)
   val extract_lval :
-    (exp -> value evaluated) ->
+    oracle:(exp -> value evaluated) -> evaluation_context ->
     state -> lval -> typ -> location -> (value * origin option) evaluated
 
   (** [backward_location state lval typ loc v] reduces the location [loc] of the
@@ -158,12 +169,14 @@ module type Queries = sig
       [v] are kept.
       The returned location must be included in [loc], but it is always sound
       to return [loc] itself.
-      Also returns the value that may have the returned location, if not bottom. *)
+      Also returns the value that may have the returned location, if not bottom.
+      Defined by {!Domain_builder.Complete} with no reduction. *)
   val backward_location :
     state -> lval -> typ -> location -> value -> (location * value) or_bottom
 
   (** Given a reduction [expr] = [value], provides more reductions that may
-      be performed. *)
+      be performed.
+      Defined by {!Domain_builder.Complete} with no reduction. *)
   val reduce_further : state -> exp -> value -> (exp * value) list
 
 end
@@ -231,16 +244,27 @@ module type Transfer = sig
     stmt -> exp -> bool ->
     (value, location, origin) valuation -> state -> state or_bottom
 
-  (** [start_call stmt call valuation state] returns an initial state
+  (** [start_call stmt call recursion valuation state] returns an initial state
       for the analysis of a called function. In particular, this function
       should introduce the formal parameters in the state, if necessary.
       - [stmt] is the statement of the call site;
       - [call] represents the call: the called function and the arguments;
+      - [recursion] is the information needed to interpret a recursive call.
+        It is None if the call is not recursive.
       - [state] is the abstract state at the call site, before the call;
       - [valuation] is a cache for all values and locations computed during
-        the evaluation of the function and its arguments. *)
+        the evaluation of the function and its arguments.
+
+      On recursive calls, [recursion] contains some substitution of variables
+      to be applied on the domain state to prevent mixing up local variables
+      and formal parameters of different recursive calls.
+      See {!Eval.recursion} for more details.
+      This substitution has been applied on values and expressions in [call],
+      but not in the [valuation] given as argument. If the domain uses some
+      information from the [valuation] on a recursive call, it must apply the
+      substitution on it. *)
   val start_call:
-    stmt -> (location, value) call ->
+    stmt -> (location, value) call -> recursion option ->
     (value, location, origin) valuation -> state -> state or_bottom
 
   (** [finalize_call stmt call ~pre ~post] computes the state after a function
@@ -248,15 +272,19 @@ module type Transfer = sig
       end of the called function.
       - [stmt] is the statement of the call site;
       - [call] represents the function call and its arguments.
+      - [recursion] is the information needed to interpret a recursive call.
+        It is None if the call is not recursive.
       - [pre] and [post] are the states before and at the end of the call
         respectively. *)
   val finalize_call:
-    stmt -> (location, value) call -> pre:state -> post:state -> state or_bottom
+    stmt -> (location, value) call -> recursion option ->
+    pre:state -> post:state -> state or_bottom
 
-  (** Called on the Frama_C_show_each directives. Prints the internal properties
-      inferred by the domain in the [state] about the expression [exp]. Can use
-      the [valuation] resulting from the cooperative evaluation of the
-      expression. *)
+  (** Called on the Frama_C_domain_show_each directive. Prints the internal
+      properties inferred by the domain in the [state] about the expression
+      [exp]. Can use the [valuation] resulting from the cooperative evaluation of
+      the expression.
+      Defined by {!Domain_builder.Complete} but prints nothing. *)
   val show_expr:
     (value, location, origin) valuation ->
     state -> Format.formatter -> exp -> unit
@@ -325,7 +353,8 @@ module type Reuse = sig
     kernel_function -> Base.Hptset.t ->
     current_input:t -> previous_output:t -> t
 
-  (** The simplest implementation of [filter] and [reuse] is:
+  (** {!Domain_builtin.Complete} provides the simplest implementation of
+      [filter] and [reuse], which is:
         let filter _ _ _ state = state
         let reuse _ _ ~current_input:_ ~previous_output = previous_output
       This is correct as the cache will be triggered only for an initial state
@@ -364,19 +393,27 @@ module type S = sig
       interpreted and the pre-state in which the terms of the clause are
       evaluated. The clause can be an assigns, allocates or frees clause.
       [loc] is then the memory location concerned by the clause. *)
-  val logic_assign: (logic_assign * state) option -> location -> state -> state
+  val logic_assign:
+    (location logic_assign * state) option -> location -> state -> state
 
   (** Evaluates a [predicate] to a logical status in the current [state].
       The [logic_environment] contains the states at some labels and the
-      potential variable for \result. *)
+      potential variable for \result.
+      Defined by {!Domain_builder.Complete}: all predicates are Unknown. *)
   val evaluate_predicate:
     state logic_environment -> state -> predicate -> Alarmset.status
 
   (** [reduce_by_predicate env state pred b] reduces the current [state] by
       assuming that the predicate [pred] evaluates to [b]. [env] contains the
-      states at some labels and the potential variable for \result. *)
+      states at some labels and the potential variable for \result.
+      Defined by {!Domain_builder.Complete} with no reduction. *)
   val reduce_by_predicate:
     state logic_environment -> state -> predicate -> bool -> state or_bottom
+
+  (** Interprets an ACSL extension.
+      Defined by {!Domain_builder.Complete} as the identity. *)
+  val interpret_acsl_extension:
+    acsl_extension -> state logic_environment -> state -> state
 
   (** {3 Scoping and initialization } *)
 
@@ -420,6 +457,9 @@ module type S = sig
 
   (** {3 Miscellaneous } *)
 
+  (** Transfer functions called when entering/leaving a loop, and at each
+      loop iteration. Defined as identity by {!Domain_builder.Complete}. *)
+
   val enter_loop: stmt -> state -> state
   val incr_loop_counter: stmt -> state -> state
   val leave_loop: stmt -> state -> state
@@ -429,47 +469,24 @@ module type S = sig
   (** Category for the messages about the domain.
       Must be created through {!Value_parameters.register_category}. *)
   val log_category : Value_parameters.category
-end
-
-
-(** Automatic storage of the states computed during the analysis. *)
-module type Store = sig
-  type state
-  val register_global_state: state or_bottom -> unit
-  val register_initial_state: Value_types.callstack -> state -> unit
-  val register_state_before_stmt: Value_types.callstack -> stmt -> state -> unit
-  val register_state_after_stmt: Value_types.callstack -> stmt -> state -> unit
-
-  (** Allows accessing the states inferred by an Eva analysis after it has
-      been computed with the domain enabled. *)
-  val get_global_state: unit -> state or_bottom
-  val get_initial_state: kernel_function -> state or_bottom
-  val get_initial_state_by_callstack:
-    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
-
-  val get_stmt_state: after:bool -> stmt -> state or_bottom
-  val get_stmt_state_by_callstack:
-    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
-end
-
-(** Full implementation of domains. Automatically built by
-    {!Domain_builder.Complete} from an {!S_with_Structure} domain. *)
-module type Internal = sig
-  include S
-  module Store: Store with type state := state
 
   (** This function is called after the analysis. The argument is the state
       computed at the return statement of the main function. The function can
       also access all states stored in the Store module during the analysis.
-      If the analysis aborted, this function is not called. *)
+      If the analysis aborted, this function is not called.
+      Defined by {!Domain_builder.Complete} as doing nothing. *)
   val post_analysis: t or_bottom -> unit
+
+  (** Storage of the states computed by the analysis.
+      Automatically built by {!Domain_builder.Complete}. *)
+  module Store: Domain_store.S with type t := t
 end
 
 type 't key = 't Structure.Key_Domain.key
 
 (** Signature for a leaf module of a domain. *)
 module type Leaf = sig
-  include Internal
+  include S
 
   (** The key identifies the domain and the type [t] of its states. *)
   val key: t key

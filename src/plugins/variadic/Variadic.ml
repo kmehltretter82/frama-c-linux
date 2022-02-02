@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,4 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Nothing is exported statically. *)
+module Options: sig
+  (** When enabled, the plugin traverses the current AST, and translates
+      variadic functions, references to va_arg and variadic builtins to a
+      semantically code. *)
+  module Enabled : Parameter_sig.Bool
+  (** In strict mode, non-portable casts between integral types are forbidden
+      in calls to LibC's variadic functions. *)
+  module Strict : Parameter_sig.Bool
+end = Options

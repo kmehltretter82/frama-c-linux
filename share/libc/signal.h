@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -27,6 +27,7 @@
 
 #include "features.h"
 __PUSH_FC_STDLIB
+#include "__fc_machdep.h"
 #include "__fc_define_pid_t.h"
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_define_pthread_types.h"
@@ -100,6 +101,11 @@ extern void __fc_sig_err(int);
 
 #define SIGRTMIN 32
 #define SIGRTMAX 64
+
+#define NSIG __FC_NSIG
+#ifdef __FC__NSIG
+#define _NSIG __FC__NSIG
+#endif
 
 #define SA_NOCLDSTOP	0x00000001
 #define SA_NOCLDWAIT	0x00000002
@@ -201,7 +207,7 @@ extern int sigdelset(sigset_t *set, int signum);
 */
 extern int sigismember(const sigset_t *set, int signum);
 
-extern struct sigaction __fc_sigaction[SIGRTMAX+1];
+__FC_EXTERN struct sigaction __fc_sigaction[SIGRTMAX+1];
 struct sigaction *__fc_p_sigaction = __fc_sigaction;
 
 /*@ // missing: errno may be set to EINVAL when trying to set some signals

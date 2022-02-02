@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -99,7 +99,7 @@ let split_ext p =
   with Not_found -> p , ""
 
 let is_package =
-  let pkg = Str.regexp "[a-z-_][a-z-_0-9]*$" in
+  let pkg = Str.regexp "[a-z-_][a-z-_0-9.]*$" in
   fun name -> Str.string_match pkg name 0
 
 let is_meta =

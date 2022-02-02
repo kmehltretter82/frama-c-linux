@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -19,12 +19,6 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-
-
-module type Domain = sig
-  include Datatype.S_with_collections
-  include Abstract_domain.Reuse with type t := t
-end
 
 
 module SaveCounter =
@@ -47,19 +41,19 @@ exception TooImprecise
 let bases = function
   | Locations.Zone.Top (Base.SetLattice.Top, _) -> raise TooImprecise
   | Locations.Zone.Top (Base.SetLattice.Set s, _) -> s
-  | Locations.Zone.Map m -> Base.Hptset.from_shape (Locations.Zone.shape m)
+  | Locations.Zone.Map m -> Base.Hptset.from_map (Locations.Zone.shape m)
 
 
 let counter = ref 0
 
 module Make
     (Value : Datatype.S)
-    (Domain : Domain)
+    (Domain : Abstract_domain.S)
 = struct
 
   incr counter;
 
-  module CallOutput = Datatype.List (Domain)
+  module CallOutput = Datatype.List (Datatype.Pair (Partition.Key) (Domain))
 
   module StoredResult =
     Datatype.Triple
@@ -151,7 +145,7 @@ module Make
       else expand_inputs_with_relations (count - 1) kf expanded_bases state
 
   let store_computed_call kf input_state args
-      (call_result: Domain.t list Bottom.or_bottom) =
+      (call_result: (Partition.key * Domain.t) list) =
     match Transfer_stmt.current_kf_inout () with
     | None -> ()
     | Some inout ->
@@ -202,10 +196,8 @@ module Make
         let all_output_bases =
           Extlib.opt_fold Base.Hptset.add return_base all_output_bases
         in
-        let clear state = Domain.filter kf `Post all_output_bases state in
-        let call_result = match call_result with
-          | `Bottom -> []
-          | `Value list -> list
+        let clear (key,state) =
+          key, Domain.filter kf `Post all_output_bases state
         in
         let outputs = List.map clear call_result in
         let call_number = current_counter () in
@@ -254,7 +246,8 @@ module Make
           let bases, outputs, i = Domain.Hashtbl.find hstates st_filtered in
           (* We have found a previous execution, in which the outputs are
              [outputs]. Copy them in [state] and return this result. *)
-          let process output =
+          let process (key,output) =
+            key,
             Domain.reuse kf bases ~current_input:state ~previous_output:output
           in
           let outputs = List.map process outputs in
@@ -274,7 +267,7 @@ module Make
     | Not_found -> None
     | Result_found (outputs, i) ->
       let call_result = outputs in
-      Some (Bottom.bot_of_list call_result, i)
+      Some (call_result, i)
 
 end
 

@@ -25,6 +25,7 @@ module Value_parameters = Value_parameters
 module Eval_terms = Eval_terms
 module Unit_tests = Unit_tests
 module Eva_annotations = Eva_annotations
+module Builtins = Builtins
 module Private = struct
   module Abstractions = Eva__Abstractions
   module Analysis = Eva__Analysis

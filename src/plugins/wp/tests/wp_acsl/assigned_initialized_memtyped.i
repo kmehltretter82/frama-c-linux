@@ -1,8 +1,8 @@
 /* run.config
-  OPT: -wp-prop=CHECK
+  OPT: -wp-prop=CHECK,FAILS
 */
 /* run.config_qualif
-  OPT: -wp-prop=CHECK
+  OPT: -wp-prop=CHECK,FAILS
 */
 
 struct S {
@@ -33,7 +33,7 @@ void range(struct S* s){
   for(int i = 0; i < 10; ++i){
     if(1 <= i && i <= 4) s->a[i] = 1 ;
   }
-  //@ check CHECK: \initialized(s);
+  //@ check FAILS: \initialized(s); // memtyped assigns not monotonic
 }
 
 void field(struct S* s){
@@ -48,7 +48,7 @@ void field(struct S* s){
   for(int i = 0; i < 10; ++i){
     s->i++;
   }
-  //@ check CHECK: \initialized(s);
+  //@ check FAILS: \initialized(s); // memtyped assigns not monotonic
 }
 
 void array(struct S* s){
@@ -66,7 +66,7 @@ void array(struct S* s){
   for(int i = 0; i < 10; ++i){
     s->a[i] = 1 ;
   }
-  //@ check CHECK: \initialized(s);
+  //@ check FAILS: \initialized(s); // memtyped assigns not monotonic
 }
 
 void index(struct S* s){
@@ -81,7 +81,7 @@ void index(struct S* s){
   for(int i = 0; i < 10; ++i){
     if(i == 4) s->a[i] = 1 ;
   }
-  //@ check CHECK: \initialized(s);
+  //@ check FAILS: \initialized(s);  // memtyped assigns not monotonic
 }
 
 void descr(struct S* s){
@@ -96,7 +96,7 @@ void descr(struct S* s){
   for(int i = 0; i < 10; ++i){
     if(i == 0 || i == 2 || i == 4) s->a[i] = 1 ;
   }
-  //@ check CHECK: \initialized(s);
+  //@ check FAILS: \initialized(s);  // memtyped assigns not monotonic
 }
 
 void comp(struct S* s){
@@ -115,7 +115,7 @@ void comp(struct S* s){
     s->a[i] = 1 ;
     s->i++;
   }
-  //@ check CHECK: \initialized(s);
+  //@ check FAILS: \initialized(s); // memtyped assigns not monotonic
 }
 
 struct S glob ;
@@ -123,7 +123,7 @@ struct S * pg = &glob ;
 struct S * const cg = &glob ;
 
 void assigned_glob(void){
-  //@ check CHECK: \initialized(cg);
+  //@ check FAILS: \initialized(cg); // no default init for structs
   pg->i = 0;
   /*@
     loop invariant CHECK: 0 <= i <= 10 && \initialized(&pg->a[0 .. i-1]);
@@ -139,6 +139,6 @@ void assigned_glob(void){
     pg->a[i] = 1 ;
     pg->i++;
   }
-  //@ check CHECK: \initialized(pg);
-  //@ check CHECK: \initialized(cg);
+  //@ check FAILS: \initialized(pg); // memtyped assigns not monotonic
+  //@ check FAILS: \initialized(cg); // no default init for structs
 }

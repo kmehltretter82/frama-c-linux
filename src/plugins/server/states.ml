@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,7 +37,7 @@ let install signal hook = function
     in Request.on_signal signal install
 
 let install_emit signal add_hook =
-  install signal (fun () -> Request.emit signal) add_hook
+  install signal (fun _ -> Request.emit signal) add_hook
 
 (* -------------------------------------------------------------------------- *)
 (* --- Values                                                             --- *)
@@ -45,7 +45,7 @@ let install_emit signal add_hook =
 
 let register_value (type a) ~package ~name ~descr
     ~(output : a Request.output) ~get
-    ?(add_hook : unit callback option) ()
+    ?(add_hook : 'b callback option) ()
   =
   let open Markdown in
   let href = link ~name () in
@@ -68,7 +68,7 @@ let register_value (type a) ~package ~name ~descr
 
 let register_state (type a) ~package ~name ~descr
     ~(data : a data) ~get ~set
-    ?(add_hook : unit callback option) () =
+    ?(add_hook : 'b callback option) () =
   let open Markdown in
   let module D = (val data) in
   let href = link ~name () in
@@ -209,18 +209,14 @@ let reload array =
 let update array k =
   let m = content array in
   if not m.cleared then
-    begin
-      m.updates <- Kmap.add (array.key k) (Add k) m.updates ;
-      Request.emit array.signal ;
-    end
+    m.updates <- Kmap.add (array.key k) (Add k) m.updates ;
+  Request.emit array.signal
 
 let remove array k =
   let m = content array in
   if not m.cleared then
-    begin
-      m.updates <- Kmap.add (array.key k) Remove m.updates ;
-      Request.emit array.signal ;
-    end
+    m.updates <- Kmap.add (array.key k) Remove m.updates ;
+  Request.emit array.signal
 
 let signal array = array.signal
 

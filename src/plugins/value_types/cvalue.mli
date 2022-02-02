@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -225,6 +225,8 @@ module V_Or_Uninitialized : sig
 
   val unspecify_escaping_locals :
     exact:bool -> (V.M.key -> bool) -> t -> bool * t
+
+  val replace_base: Base.substitution -> t -> bool * t
 
   val map: (V.t -> V.t) -> t -> t
   val map2: (V.t -> V.t -> V.t) -> t -> t -> t

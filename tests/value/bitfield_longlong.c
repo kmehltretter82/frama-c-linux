@@ -1,14 +1,14 @@
 /* run.config*
+ PLUGIN: @EVA_MAIN_PLUGINS@
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args="-Dprintf=Frama_C_show_each"
 */
 struct X50 {
  long long int z:50;
 } s50 = { 2 };
- 
+
 struct X10 {
  long long int z:10;
 } s10 = { 2 };
-
 
 struct U32 {
   unsigned long z:32;

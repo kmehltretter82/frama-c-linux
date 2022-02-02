@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -499,8 +499,7 @@ let shared includes source =
         let server = ProverTask.server () in
         Task.on_server_stop server (fun () -> Hashtbl.clear shared_headers) ;
       end ;
-    let descr = Printf.sprintf "Coqc '%s'" source in
-    let shared = Task.shared ~descr ~retry:true
+    let shared = Task.shared ~retry:true
         (fun () -> (new runcoq includes source)#compile)
     in Hashtbl.add shared_headers source shared ; shared
 
@@ -655,7 +654,7 @@ let prove_annot wpo vcq ~mode =
     begin fun () ->
       let prop =
         WpContext.on_context (Wpo.get_context wpo)
-          GOAL.compute_proof vcq.VC_Annot.goal in
+          (GOAL.compute_proof ~pid:wpo.po_pid) vcq.VC_Annot.goal in
       prove_prop wpo ~mode ~axioms:None ~prop
     end
 

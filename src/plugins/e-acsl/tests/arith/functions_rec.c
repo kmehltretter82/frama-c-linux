@@ -1,6 +1,9 @@
-/* run.config_ci
+/* run.config
    COMMENT: recursive logic functions
-   STDOPT: +"-eva-ignore-recursive-calls"
+*/
+
+/*
+  STDOPT: +"-eva-unroll-recursive-calls 100"
 */
 
 /*@ logic integer f1(integer n) =
@@ -18,14 +21,21 @@
     n < 0x7fffffffffffffffL ? 0x7fffffffffffffffL :
     6; */
 
-int main (void) {
-   /*@ assert f1(0) == 0; */ ;
-   /*@ assert f1(1) == 1; */ ;
-   /*@ assert f1(100) == 5050; */ ;
+/*@ logic integer f5(integer n) =
+  n >= 0 ? 0 : f5(n + 1) + n; */
 
-   /*@ assert f2(7) == 1; */ ;
+int main(void) {
+  /*@ assert f1(0) == 0; */;
+  /*@ assert f1(1) == 1; */;
+  /*@ assert f1(100) == 5050; */;
 
-  /*@ assert f3(6) == -5; */ ;
+  /*@ assert f2(7) == 1; */;
 
-  /*@ assert f4(9) > 0; */ ;
+  /*@ assert f3(6) == -5; */;
+
+  /*@ assert f4(9) > 0; */;
+
+  /*@ assert f5(0) == 0; */
+
+  /*@ assert (\let n = (0 == 0) ? 0x7fffffffffffffffL : -1; f5(n) == 0);*/
 }

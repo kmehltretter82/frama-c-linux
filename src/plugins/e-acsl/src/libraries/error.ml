@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,11 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
+exception Ignored
+let ignored () = raise Ignored
+
 exception Typing_error of string
 let untypable s = raise (Typing_error s)
 
 exception Not_yet of string
 let not_yet s = raise (Not_yet s)
+
+exception Not_memoized
+let not_memoized () = raise Not_memoized
 
 module Nb_typing =
   State_builder.Ref
@@ -48,31 +54,38 @@ module Nb_not_yet =
 
 let nb_not_yet = Nb_not_yet.get
 
-let process_error = function
-  | Typing_error s ->
-    let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
-    Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-    Nb_typing.set (Nb_typing.get () + 1)
-  | Not_yet s ->
-    let msg =
-      Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" s
-    in
-    Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-    Nb_not_yet.set (Nb_not_yet.get () + 1)
-  | exn ->
-    Options.fatal
-      "Unexpected error in `Error.process_error`: %s"
-      (Printexc.to_string exn)
+let print_not_yet msg =
+  let msg =
+    Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" msg
+  in
+  Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
+  Nb_not_yet.set (Nb_not_yet.get () + 1)
 
 let generic_handle f res x =
   try
     f x
   with
-  | exn ->
-    process_error exn;
+  | Typing_error s ->
+    let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
+    Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
+    Nb_typing.set (Nb_typing.get () + 1);
     res
+  | Not_yet s ->
+    print_not_yet s;
+    res
+  | Ignored -> res
 
 let handle f x = generic_handle f x x
+
+type 'a or_error = Res of 'a | Err of exn
+
+let retrieve_preprocessing analyse_name getter parameter =
+  try
+    match getter parameter with
+    | Res res -> res
+    | Err exn -> raise exn
+  with Not_memoized ->
+    Options.fatal "%s was not performed on construct" analyse_name
 
 (*
 Local Variables:

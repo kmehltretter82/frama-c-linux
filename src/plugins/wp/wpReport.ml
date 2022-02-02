@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -517,7 +517,6 @@ type config = {
   mutable status_inconclusive : string ;
   mutable status_untried : string ;
 
-  mutable global_prefix : string ;
   mutable lemma_prefix : string ;
   mutable axiomatic_prefix : string ;
   mutable function_prefix : string ;
@@ -762,7 +761,6 @@ let export gstat specfile =
     status_untried = "     " ;
 
     lemma_prefix = "Lemma " ;
-    global_prefix = "(Global) " ;
     axiomatic_prefix = "Axiomatic " ;
     function_prefix = "" ;
     property_prefix = "" ;

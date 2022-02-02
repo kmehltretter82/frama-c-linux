@@ -13,7 +13,7 @@ Assume {
   Type: is_sint32_chunk(µ:Msint32@L1) /\ is_uint32_chunk(µ:Muint32@L1) /\
       is_uint32(`x_1) /\ is_sint32(`x_2).
   (* Heap *)
-  Type: framed(µ:Mptr@L1).
+  Type: (region(0) <= 0) /\ framed(µ:Mptr@L1).
   Stmt { L1:  }
   Stmt { x.a = `v;  }
   (* Call 'get_int' *)

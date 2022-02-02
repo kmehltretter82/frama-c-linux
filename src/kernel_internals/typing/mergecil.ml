@@ -535,12 +535,12 @@ let hash_type t =
     | TFloat (fkind,_) -> 5 * acc + Hashtbl.hash fkind
     | TPtr(t,_) when depth < 5 -> aux (7*acc) (depth+1) t
     | TPtr _ -> 7 * acc
-    | TArray (t,_,_,_) when depth < 5 -> aux (9*acc) (depth+1) t
+    | TArray (t,_,_) when depth < 5 -> aux (9*acc) (depth+1) t
     | TArray _ -> 9 * acc
     | TFun (r,_,_,_) when depth < 5 -> aux (11*acc) (depth+1) r
     | TFun _ -> 11 * acc
     | TNamed (t,_) -> 13 * acc + Hashtbl.hash t.tname
-    | TComp(c,_,_) ->
+    | TComp(c,_) ->
       let mul = if c.cstruct then 17 else 19 in
       mul * acc + Hashtbl.hash c.cname
     | TEnum (e,_) -> 23 * acc + Hashtbl.hash e.ename
@@ -618,7 +618,7 @@ module EnumMerging =
            (e2.ename <-
               fst
                 (Alpha.newAlphaName
-                   aeAlpha e2.ename Cil_datatype.Location.unknown);
+                   aeAlpha None e2.ename Cil_datatype.Location.unknown);
             Kernel.debug ~dkey:Kernel.dkey_linker
               "new anonymous name %s" e2.ename;
             false))))
@@ -650,7 +650,6 @@ let lcEq = PlainMerging.create_eq_table 111 (* Logic constructors *)
 
 let laEq = PlainMerging.create_eq_table 111 (* Axiomatics *)
 let llEq = PlainMerging.create_eq_table 111 (* Lemmas *)
-let lcusEq = PlainMerging.create_eq_table 111 (* Custom *)
 
 let lvEq = VolatileMerging.create_eq_table 111
 let mfEq = ModelMerging.create_eq_table 111
@@ -668,7 +667,6 @@ let ltSyn = PlainMerging.create_syn_table 111
 let lcSyn = PlainMerging.create_syn_table 111
 let laSyn = PlainMerging.create_syn_table 111
 let llSyn = PlainMerging.create_syn_table 111
-let lcusSyn = PlainMerging.create_syn_table 111
 let lvSyn = VolatileMerging.create_syn_table 111
 let mfSyn = ModelMerging.create_syn_table 111
 let extSyn = ExtMerging.create_syn_table 111
@@ -862,13 +860,11 @@ let rec global_annot_without_irrelevant_attributes ga =
   match ga with
   | Dvolatile(vi,rd,wr,attr,loc) ->
     Dvolatile(vi,rd,wr,drop_attributes_for_merge attr,loc)
-  | Dcustom_annot (c,n,attr,loc) ->
-    Dcustom_annot (c,n,drop_attributes_for_merge attr,loc)
   | Daxiomatic(n,l,attr,loc) ->
     Daxiomatic(n,List.map global_annot_without_irrelevant_attributes l,
                drop_attributes_for_merge attr,loc)
-  | Dlemma (id,ax,labs,typs,st,attr,loc) ->
-    Dlemma (id,ax,labs,typs,st,drop_attributes_for_merge attr,loc)
+  | Dlemma (id,labs,typs,st,attr,loc) ->
+    Dlemma (id,labs,typs,st,drop_attributes_for_merge attr,loc)
   | Dtype (lti,loc) ->
     Dtype (logic_type_info_without_irrelevant_attributes lti, loc)
   | Dextended (ext, attr, loc) ->
@@ -925,12 +921,6 @@ let rec global_annot_pass1 g = match g with
     ignore (ModelMerging.getNode
               mfEq mfSyn !currentFidx (mfi.mi_name,mfi.mi_base_type) mfi
               (Some (l, !currentDeclIdx)))
-  | Dcustom_annot (c, n, _, l) ->
-    Format.eprintf "Mergecil : custom@.";
-    CurrentLoc.set l;
-    ignore (PlainMerging.getNode
-              lcusEq lcusSyn !currentFidx n (n,(c,l))
-              (Some (l, !currentDeclIdx)))
   | Dinvariant (pi,l)  ->
     CurrentLoc.set l;
     ignore (LogicMerging.getNode
@@ -941,10 +931,10 @@ let rec global_annot_pass1 g = match g with
     ignore (PlainMerging.getNode ltEq ltSyn !currentFidx info.lt_name info
               (Some (l, !currentDeclIdx)))
 
-  | Dlemma (n,is_ax,labs,typs,st,attr,l) ->
+  | Dlemma (n,labs,typs,st,attr,l) ->
     CurrentLoc.set l;
     ignore (PlainMerging.getNode
-              llEq llSyn !currentFidx n (n,(is_ax,labs,typs,st,attr,l))
+              llEq llSyn !currentFidx n (n,(labs,typs,st,attr,l))
               (Some (l, !currentDeclIdx)))
   | Dextended(ext,_,l) ->
     CurrentLoc.set l;
@@ -1043,12 +1033,12 @@ let rec combineTypes (what: combineWhat)
    * leaking types from new to old  *)
   | TInt(IInt, olda), TEnum (ei, a) -> TEnum(ei, addAttributes olda a)
 
-  | TComp (oldci, _, olda) , TComp (ci, _, a) ->
+  | TComp (oldci, olda) , TComp (ci, a) ->
     matchCompInfo oldfidx oldci fidx ci;
     (* If we get here we were successful *)
-    TComp (oldci, empty_size_cache (), addAttributes olda a)
+    TComp (oldci, addAttributes olda a)
 
-  | TArray (oldbt, oldsz, _, olda), TArray (bt, sz, _, a) ->
+  | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
     let combbt = combineTypes CombineOther oldfidx oldbt fidx bt in
     let combinesz =
       match oldsz, sz with
@@ -1059,7 +1049,7 @@ let rec combineTypes (what: combineWhat)
         if same_int64 oldsz' sz' then oldsz else
           raise (Failure "different array sizes")
     in
-    TArray (combbt, combinesz, empty_size_cache (), addAttributes olda a)
+    TArray (combbt, combinesz, addAttributes olda a)
 
   | TPtr (oldbt, olda), TPtr (bt, a) ->
     TPtr (combineTypes CombineOther oldfidx oldbt fidx bt,
@@ -1403,7 +1393,7 @@ let update_compinfo ci =
   in
   Alpha.registerAlphaName sAlpha ci.cname loc;
   let orig_name = if ci.corig_name = "" then ci.cname else ci.corig_name in
-  let n, _ = Alpha.newAlphaName sAlpha orig_name loc in
+  let n, _ = Alpha.newAlphaName sAlpha None orig_name loc in
   let oldnode = PlainMerging.find true node in
   if oldnode == node then begin
     let node =
@@ -1440,7 +1430,7 @@ let rec update_type_repr t =
       | None -> Cil_datatype.Location.unknown
     in
     Alpha.registerAlphaName vtAlpha ti.tname loc;
-    let n,_ = Alpha.newAlphaName vtAlpha ti.torig_name loc in
+    let n,_ = Alpha.newAlphaName vtAlpha None ti.torig_name loc in
     let oldnode = PlainMerging.find true node in
     if oldnode == node then begin
       let node =
@@ -1463,8 +1453,8 @@ let rec update_type_repr t =
       PlainMerging.add_eq_table tEq (oldnode.nfidx, n) renamed_node;
     end;
     TNamed(node.ndata,attrs)
-  | TComp (ci,_,attrs) ->
-    TComp (update_compinfo ci, {scache = Not_Computed}, attrs)
+  | TComp (ci,attrs) ->
+    TComp (update_compinfo ci, attrs)
   | _ -> t
 
 let static_var_visitor = object
@@ -1569,15 +1559,15 @@ let matchLogicLemma oldfidx (oldid, _ as oldnode) fidx (id, _ as node) =
   let oldlnode = PlainMerging.getNode llEq llSyn oldfidx oldid oldnode None in
   let lnode = PlainMerging.getNode llEq llSyn fidx id node None in
   if oldlnode != lnode then begin
-    let (oldid,(oldax,oldlabs,oldtyps,oldst,oldattr,oldloc)) = oldlnode.ndata in
+    let (oldid,(oldlabs,oldtyps,oldst,oldattr,oldloc)) = oldlnode.ndata in
     let oldfidx = oldlnode.nfidx in
-    let (id,(ax,labs,typs,st,attr,loc)) = lnode.ndata in
+    let (id,(labs,typs,st,attr,loc)) = lnode.ndata in
     let fidx = lnode.nfidx in
     let oldattr = drop_attributes_for_merge oldattr in
     let attr = drop_attributes_for_merge attr in
     if Logic_utils.is_same_global_annotation
-        (Dlemma (oldid,oldax,oldlabs,oldtyps,oldst,oldattr,oldloc))
-        (Dlemma (id,ax,labs,typs,st,attr,loc))
+        (Dlemma (oldid,oldlabs,oldtyps,oldst,oldattr,oldloc))
+        (Dlemma (id,labs,typs,st,attr,loc))
     then begin
       if oldfidx < fidx then
         lnode.nrep <- oldlnode.nrep
@@ -1825,7 +1815,7 @@ let oneFilePass1 (f:file) : unit =
         else begin (* Go inside and clean the referenced flag for the
                     * declared tags *)
           match t.ttype with
-            TComp (ci, _, _ ) ->
+            TComp (ci, _ ) ->
             ci.creferenced <- false;
             (* Create a node for it *)
             ignore
@@ -1851,7 +1841,7 @@ let oneFilePass1 (f:file) : unit =
         let orig_name =
           if ei.eorig_name = "" then ei.ename else ei.eorig_name
         in
-        ignore (Alpha.newAlphaName aeAlpha orig_name l);
+        ignore (Alpha.newAlphaName aeAlpha None orig_name l);
         ei.ereferenced <- false;
         ignore
           (EnumMerging.getNode eEq eSyn !currentFidx ei ei
@@ -2083,7 +2073,7 @@ class renameVisitorClass =
      * is not a root. *)
     method! vtype (t: typ) =
       match t with
-        TComp (ci, _, a) when not ci.creferenced -> begin
+        TComp (ci, a) when not ci.creferenced -> begin
           match PlainMerging.findReplacement true sEq !currentFidx ci.cname with
             None ->
             Kernel.debug ~dkey:Kernel.dkey_linker "No renaming needed %s(%d)"
@@ -2093,11 +2083,9 @@ class renameVisitorClass =
             Kernel.debug ~dkey:Kernel.dkey_linker
               "Renaming use of %s(%d) to %s(%d)"
               ci.cname !currentFidx ci'.cname oldfidx;
-            ChangeTo (TComp (ci',
-                             empty_size_cache (),
-                             visitCilAttributes (self :> cilVisitor) a))
+            ChangeTo (TComp (ci', visitCilAttributes (self :> cilVisitor) a))
         end
-      | TComp(ci,_,_) ->
+      | TComp(ci,_) ->
         Kernel.debug ~dkey:Kernel.dkey_linker
           "%s(%d) referenced. No change" ci.cname !currentFidx;
         DoChildren
@@ -2362,20 +2350,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
              mfEq (!currentFidx,(mf'.mi_name,mf'.mi_base_type))).ndata;
       | Some _ -> ()
     end
-  | Dcustom_annot (_c, n, _, l) ->
-    begin
-      CurrentLoc.set l;
-      match
-        PlainMerging.findReplacement
-          true lcusEq !currentFidx n
-      with
-      | None ->
-        let g = visitCilGlobal renameVisitor g in
-        if not in_axiomatic then
-          mergePushGlobals g
-      | Some _ -> ()
-    end
-  | Dlemma (n,_,_,_,_,_,l) ->
+  | Dlemma (n,_,_,_,_,l) ->
     begin
       CurrentLoc.set l;
       match PlainMerging.findReplacement true llEq !currentFidx n with
@@ -2614,15 +2589,6 @@ let equalInitOpts (x: init option) (y: init option) : bool =
     | _,_ -> false
   end
 
-let merge_arg_names merged_args curr_args =
-  let do_one_arg merged_arg curr_arg =
-    (* if curr_arg is also anonymous, this doesn't do much,
-       but at least doesn't worsen things. *)
-    if merged_arg.vname = "" then merged_arg.vname <- curr_arg.vname
-  in
-  (* if both list have different lengths, merge should have failed earlier. *)
-  List.iter2 do_one_arg merged_args curr_args
-
 let update_formals_names merged_vi curr_vi =
   (* if the reference varinfo already has formals, everything
      is renamed accordingly. However, if the old prototype contains
@@ -2631,7 +2597,7 @@ let update_formals_names merged_vi curr_vi =
   match Cil.getFormalsDecl curr_vi with
   | curr_args ->
     (match Cil.getFormalsDecl merged_vi with
-     | merged_args -> merge_arg_names merged_args curr_args
+     | _ -> ()
      | exception Not_found ->
        (*existing prototype does not have formals list. Just use current one*)
        Cil.unsafeSetFormalsDecl merged_vi curr_args)
@@ -2670,7 +2636,7 @@ let oneFilePass2 (f: file) =
         (* Maybe it is static. Rename it then *)
         if vi.vstorage = Static then begin
           let newName, _ =
-            Alpha.newAlphaName vtAlpha vi.vname (CurrentLoc.get ())
+            Alpha.newAlphaName vtAlpha None vi.vname (CurrentLoc.get ())
           in
           let formals_decl =
             try Some (Cil.getFormalsDecl vi)
@@ -2759,20 +2725,13 @@ let oneFilePass2 (f: file) =
               (H.find emittedVarDefn vi'.vname) in
             (* previously defined; same initializer? *)
             if (equalInitOpts prevInitOpt init.init)
-            || (init.init = None) then (
+            then (
               false  (* do not emit *)
             )
-            else if prevInitOpt = None then (
-              (* The previous occurrence was only a tentative defn. Now,
-                 we have a real one. Set the correct value in the table,
-                 and tell that we need to change the previous into GVarDecl
-              *)
-              H.replace emittedVarDefn vi'.vname(vi',init.init,l);
-              replaceTentativeDefn:=true;
-              true
-            )
             else (
-              (* Both GVars have initializers. *)
+              (* Both GVars have initializers. Note that None in this
+                 context means a tentative definition turned into
+                 a default 0-initialization. *)
               Kernel.error ~current:true
                 "global var %s at %a has different initializer than %a"
                 vi'.vname
@@ -3026,7 +2985,7 @@ let oneFilePass2 (f: file) =
               if ci.corig_name = "" then ci.cname else ci.corig_name
             in
             let newname, _ =
-              Alpha.newAlphaName sAlpha orig_name (CurrentLoc.get ())
+              Alpha.newAlphaName sAlpha None orig_name (CurrentLoc.get ())
             in
             ci.cname <- newname;
             ci.creferenced <- true;
@@ -3055,7 +3014,7 @@ let oneFilePass2 (f: file) =
               if ei.eorig_name = "" then ei.ename else ei.eorig_name
             in
             let newname, _ =
-              Alpha.newAlphaName eAlpha orig_name (CurrentLoc.get ())
+              Alpha.newAlphaName eAlpha None orig_name (CurrentLoc.get ())
             in
             ei.ename <- newname;
             ei.ereferenced <- true;
@@ -3064,7 +3023,7 @@ let oneFilePass2 (f: file) =
             List.iter
               (fun item ->
                  let newname,_ =
-                   Alpha.newAlphaName vtAlpha item.eiorig_name item.eiloc
+                   Alpha.newAlphaName vtAlpha None item.eiorig_name item.eiloc
                  in
                  item.einame <- newname)
               ei.eitems;
@@ -3108,7 +3067,7 @@ let oneFilePass2 (f: file) =
           with
             None -> (* We must rename it and keep it *)
             let newname, _ =
-              Alpha.newAlphaName vtAlpha ti.torig_name (CurrentLoc.get ())
+              Alpha.newAlphaName vtAlpha None ti.torig_name (CurrentLoc.get ())
             in
             ti.tname <- newname;
             ti.treferenced <- true;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,14 +27,14 @@ type call_site = kernel_function * kinstr
 
 module Callsite = struct
   include Datatype.Pair_with_collections(Kernel_function)(Cil_datatype.Kinstr)
-    (struct let module_name = "Value_callbacks.Callpoint" end)
+      (struct let module_name = "Value_callbacks.Callpoint" end)
 
   let pretty fmt (kf, ki) =
     Format.fprintf fmt "%a@@%t" Kernel_function.pretty kf
       (fun fmt ->
-        match ki with
-        | Kglobal -> Format.pp_print_string fmt "<main>"
-        | Kstmt stmt -> Format.pp_print_int fmt stmt.sid
+         match ki with
+         | Kglobal -> Format.pp_print_string fmt "<main>"
+         | Kstmt stmt -> Format.pp_print_int fmt stmt.sid
       )
 end
 
@@ -114,18 +114,7 @@ type 'a callback_result =
   | NormalStore of 'a * int
   | Reuse of int
 
-type cacheable =
-  | Cacheable
-  | NoCache
-  | NoCacheCallers
-
-
-type call_result = {
-  c_values: (Cvalue.V_Offsetmap.t option * Cvalue.Model.t) list;
-  c_clobbered: Base.SetLattice.t;
-  c_cacheable: cacheable;
-  c_from: (Function_Froms.froms * Locations.Zone.t) option
-}
+type call_froms = (Function_Froms.froms * Locations.Zone.t) option
 
 type logic_dependencies = Locations.Zone.t Cil_datatype.Logic_label.Map.t
 
@@ -134,4 +123,3 @@ Local Variables:
 compile-command: "make -C ../../.."
 End:
 *)
-

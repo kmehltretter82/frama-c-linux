@@ -17,12 +17,12 @@
   local_frame               -        1        1       100%
   global_frame              5        -        5       100%
 ------------------------------------------------------------
-[wp] tests/wp_bts/bts_1828.i:56: Warning: 
+[wp] bts_1828.i:56: Warning: 
   Memory model hypotheses for function 'global_frame':
   /*@
      behavior wp_typed_ref:
-       requires \separated(zero, one);
        requires \valid(one);
        requires \valid(zero);
+       requires \separated(zero, one);
      */
   void global_frame(int *one, int arg);

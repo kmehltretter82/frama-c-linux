@@ -82,37 +82,47 @@
 [eva:alarm] builtins.c:81: Warning: 
   function log10: precondition 'arg_positive' got status invalid.
 [eva] builtins.c:85: Call to builtin exp
-[eva] builtins.c:85: function exp: precondition 'finite_arg' got status valid.
+[eva] builtins.c:85: function exp: precondition 'not_overflow' got status valid.
 [eva] builtins.c:85: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition 'not_plus_infinity' got status valid.
+[eva] builtins.c:85: function exp: precondition 'not_nan' got status valid.
 [eva] builtins.c:88: Call to builtin exp
-[eva] builtins.c:88: function exp: precondition 'finite_arg' got status valid.
+[eva] builtins.c:88: function exp: precondition 'not_overflow' got status valid.
 [eva] builtins.c:88: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition 'not_plus_infinity' got status valid.
+[eva] builtins.c:88: function exp: precondition 'not_nan' got status valid.
 [eva] builtins.c:91: Call to builtin exp
-[eva] builtins.c:91: function exp: precondition 'finite_arg' got status valid.
+[eva] builtins.c:91: function exp: precondition 'not_overflow' got status valid.
 [eva] builtins.c:91: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition 'not_plus_infinity' got status valid.
+[eva] builtins.c:91: function exp: precondition 'not_nan' got status valid.
 [eva:alarm] builtins.c:94: Warning: assertion got status unknown.
 [eva] builtins.c:95: Call to builtin exp
-[eva] builtins.c:95: function exp: precondition 'finite_arg' got status valid.
 [eva:alarm] builtins.c:95: Warning: 
-  function exp: precondition 'finite_domain' got status unknown.
+  function exp: precondition 'not_overflow' got status unknown.
+[eva] builtins.c:95: 
+  function exp: precondition 'not_plus_infinity' got status valid.
+[eva] builtins.c:95: function exp: precondition 'not_nan' got status valid.
 [eva] builtins.c:98: Call to builtin exp
-[eva] builtins.c:98: function exp: precondition 'finite_arg' got status valid.
 [eva:alarm] builtins.c:98: Warning: 
-  function exp: precondition 'finite_domain' got status invalid.
+  function exp: precondition 'not_overflow' got status invalid.
+[eva] builtins.c:98: 
+  function exp: no state left, precondition 'not_plus_infinity' got status valid.
+[eva] builtins.c:98: 
+  function exp: no state left, precondition 'not_nan' got status valid.
 [eva] builtins.c:102: Call to builtin log
 [eva] builtins.c:102: function log: precondition 'finite_arg' got status valid.
 [eva] builtins.c:102: 
   function log: precondition 'arg_positive' got status valid.
 [eva] builtins.c:103: assertion got status valid.
 [eva] builtins.c:104: Call to builtin exp
-[eva] builtins.c:104: function exp: precondition 'finite_arg' got status valid.
 [eva] builtins.c:104: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition 'not_overflow' got status valid.
+[eva] builtins.c:104: 
+  function exp: precondition 'not_plus_infinity' got status valid.
+[eva] builtins.c:104: function exp: precondition 'not_nan' got status valid.
 [eva:alarm] builtins.c:107: Warning: 
-  pointer downcast. assert (unsigned long)(&d) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&d) ≤ 2147483647;
 [eva:alarm] builtins.c:107: Warning: 
   non-finite double value. assert \is_finite((double)((int)(&d)));
 [eva] builtins.c:107: Call to builtin log
@@ -131,6 +141,7 @@
 [eva] builtins.c:111: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_log_exp:
+  __fc_errno ∈ [--..--]
   l1 ∈ {0} or UNINITIALIZED
   l2 ∈ {1.00063188031} or UNINITIALIZED
   l3 ∈ {1.09861228867} or UNINITIALIZED

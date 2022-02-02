@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,7 +24,7 @@
 
 include Plugin.General_services
 
-module Doc : Parameter_sig.String (** Generate documentation *)
+module Doc : Parameter_sig.Filepath (** Generate documentation *)
 module Polling : Parameter_sig.Int (** Idle waiting time (in ms) *)
 module AutoLog : Parameter_sig.Bool (** Monitor logs *)
 

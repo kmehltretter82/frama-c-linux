@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,8 +29,8 @@
    - We never build regions; the nesting of natural loops suffice.
 
    - We do not compose transfer functions. Instead, we rely on the
-   fact that Ocaml has first-class functions, and associate to "loop
-   edges" functions describing the behaviour of loops.
+     fact that Ocaml has first-class functions, and associate to "loop
+     edges" functions describing the behaviour of loops.
 
    The composition of region of the Dragon Book does not fit well the
    translation to terms, for which composition of transfer function
@@ -48,9 +48,7 @@
    of Nodes". It is maybe also possible to use the wto ordering of
    bourdoncle for this purpose. *)
 
-include Region_analysis_sig;;
-
-module Make(N:Node):sig
+module Make(N:Region_analysis_sig.Node):sig
   (* Function computing from an entry abstract value the "after"
      state, which is a map from each outgoing edge to its respective
      value. *)
@@ -60,7 +58,7 @@ struct
 
   let graph_size = N.Set.cardinal N.Graph.all_nodes
   let iter_nodes f = N.Set.iter f N.Graph.all_nodes
-  
+
   (****************************************************************)
   (* Back edges. *)
 
@@ -70,7 +68,7 @@ struct
     iter_nodes (fun n ->
         N.Graph.iter_succs n (fun head ->
             if N.DomTree.dominates head n
-            then N.Dict.set back_edges head 
+            then N.Dict.set back_edges head
                 (N.Set.add n (N.Dict.get back_edges head))));
     back_edges
   ;;
@@ -192,7 +190,7 @@ struct
 
       (* Compute for previous node if result not yet available. *)
       and get_edge pred n =
-        let edge = Edge(pred, n) in
+        let edge = Region_analysis_sig.Edge(pred, n) in
         try N.Edge_Dict.get edge_term edge
         with Not_found -> do_node pred; N.Edge_Dict.get edge_term edge
       in
@@ -215,7 +213,7 @@ struct
         N.Graph.iter_preds header (fun pred ->
             if (N.Set.mem pred tset) && (is_back_edge pred header)
             then
-              let edge = Edge(pred,header) in
+              let edge = Region_analysis_sig.Edge(pred,header) in
               let input = N.Edge_Dict.get edge_term edge in
               inputs := input::!inputs );
         N.join !inputs

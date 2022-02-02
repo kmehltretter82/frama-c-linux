@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,13 +23,13 @@
 include Plugin.S
 
 (** Value of [-mdr-out]. *)
-module Output: Parameter_sig.String
+module Output: Parameter_sig.Filepath
 
 (** Value of [-mdr-gen]. *)
 module Generate: Parameter_sig.String
 
 (** Value of [-mdr-remarks]. *)
-module Remarks: Parameter_sig.String
+module Remarks: Parameter_sig.Filepath
 
 (** Value of [-mdr-flamegraph]. *)
 module FlameGraph: Parameter_sig.String

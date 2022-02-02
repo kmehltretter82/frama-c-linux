@@ -1,6 +1,8 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: test option -e-acsl-no-valid
    STDOPT: #"@GLOBAL@ -eva -eva-verbose 0 -then -no-eva -e-acsl-no-valid"
+*/
+/* run.config_dev
    MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -eva -eva-verbose 0
    MACRO: ROOT_EACSL_GCC_OPTS_EXT --then --e-acsl-extra -e-acsl-no-valid
 */
@@ -28,7 +30,8 @@ void f(int *x, int *y) {
   { (*x)++; }
   /*@ loop invariant 0 <= i <= 1;
     @ loop variant 2 - i; */
-  for(int i = 0; i < 1; i++) /*@ assert 1 == 1; */ /*@ assert \valid(y); */ ;
+  for (int i = 0; i < 1; i++) /*@ assert 1 == 1; */ /*@ assert \valid(y); */
+    ;
 }
 
 int main(void) {

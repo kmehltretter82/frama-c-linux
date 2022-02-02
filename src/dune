@@ -58,6 +58,7 @@
 (copy_files# kernel_services/*.ml*)
 (copy_files# kernel_services/visitors/*.ml*)
 (copy_files# kernel_services/abstract_interp/*.ml*)
+(copy_files# kernel_services/ast_building/*.ml*)
 (copy_files# libraries/*.ml*)
 (copy_files# kernel_services/analysis/*.ml*)
 (copy_files# libraries/datatype/*.ml*)

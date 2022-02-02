@@ -18,7 +18,7 @@
 [wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_5_established : Valid
 [wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_6_preserved : Valid
 [wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_6_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_7_preserved : Valid
+[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_7_preserved : Valid
 [wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_7_established : Valid
 [wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_8_preserved : Valid
 [wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_8_established : Valid
@@ -38,19 +38,19 @@
 [wp] [Qed] Goal typed_ref_equal_elements_loop_variant_2_decrease : Valid
 [wp] [Qed] Goal typed_ref_equal_elements_loop_variant_2_positive : Valid
 [wp] Proved goals:   34 / 34
-  Qed:            18 
-  Alt-Ergo:       16
+  Qed:            19 
+  Alt-Ergo:       15
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  equal_elements           18       16       34       100%
+  equal_elements           19       15       34       100%
 ------------------------------------------------------------
-[wp] tests/wp_gallery/frama_c_exo3_solved.old.c:73: Warning: 
+[wp] frama_c_exo3_solved.old.c:73: Warning: 
   Memory model hypotheses for function 'equal_elements':
   /*@
      behavior wp_typed_ref:
-       requires \separated(v1, v2, a + (..));
        requires \valid(v1);
        requires \valid(v2);
+       requires \separated(v1, v2, a + (..));
      */
   void equal_elements(int *a, int *v1, int *v2);
 [wp] Running WP plugin...
@@ -77,5 +77,5 @@
   Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  equal_elements           29       21       50       100%
+  equal_elements           30       20       50       100%
 ------------------------------------------------------------

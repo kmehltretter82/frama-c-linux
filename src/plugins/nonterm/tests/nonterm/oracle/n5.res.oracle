@@ -30,10 +30,10 @@
   NON TERMINATING FUNCTION
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
-[nonterm] n5.i:12: Warning: 
+[nonterm:stmt] n5.i:12: Warning: 
   non-terminating function call
   stack: f :: n5.i:22 <- main
-[nonterm] n5.i:23: Warning: 
+[nonterm:stmt] n5.i:23: Warning: 
   non-terminating function call
   stack: main
 [nonterm] Analysis done.

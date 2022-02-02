@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -94,8 +94,8 @@ val size_from_validity:
 val map : (v -> v) -> t -> t
 
 type map2_decide =
-   ReturnLeft | ReturnRight | ReturnConstant of v | Recurse
-(** See the documentation of type {!Offsetmap_sig.map2_decide} *)
+    ReturnLeft | ReturnRight | ReturnConstant of v | Recurse
+  (** See the documentation of type {!Offsetmap_sig.map2_decide} *)
 
 val map2:
   Hptmap_sig.cache_type -> (t -> t -> map2_decide) -> (v -> v -> v) -> t -> t -> t

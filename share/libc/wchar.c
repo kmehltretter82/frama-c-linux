@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -89,6 +89,20 @@ wchar_t* wcsncat(wchar_t *dest, const wchar_t *src, size_t n)
   dest[dest_len + i] = L'\0';
 
   return dest;
+}
+
+/* Warning: read considerations about malloc() in Frama-C */
+#include "stdlib.h"
+wchar_t *wcsdup(const wchar_t *ws)
+{
+  size_t l = wcslen(ws) + 1;
+  wchar_t *p = malloc(sizeof(wchar_t) * l);
+  if (!p) {
+    errno = ENOMEM;
+    return 0;
+  }
+  wmemcpy(p, ws, l);
+  return p;
 }
 
 __POP_FC_STDLIB

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -168,6 +168,12 @@ module Config = struct
        to a statement."
       (module Traces_domain.D)
 
+  let multidim =
+    make 2 "multidim" ~experimental:true
+      "Improve the precision over arrays of structures or multidimensional \
+       arrays."
+      (module Multidim_domain)
+
   let printer =
     make 2 "printer"
       "Debug domain, only useful for developers. Prints the transfer functions \
@@ -313,7 +319,7 @@ let eq_value:
       | Abstract.Value.Leaf (key, _) -> Abstract.Value.eq_type key V.key
       | _ -> None
 
-let add_domain (type v) mode (abstraction: v abstraction) (module Acc: Acc) =
+let add_domain (type v) dname mode (abstraction: v abstraction) (module Acc: Acc) =
   let domain : (module internal_domain with type value = Acc.Val.t) =
     match abstraction.domain with
     | Functor make ->
@@ -333,15 +339,27 @@ let add_domain (type v) mode (abstraction: v abstraction) (module Acc: Acc) =
         let module Convert = Internal_Value.Convert (Acc.Val) (Struct) in
         (module Domain_lift.Make (Domain) (Convert))
   in
+  (* Set the name of the domain. *)
+  let module Domain = struct
+    include (val domain)
+    let name = dname
+    module Store = struct
+      include Store
+      let register_global_state storage state =
+        let no_results = Value_parameters.NoResultsDomains.mem dname in
+        register_global_state (storage && not no_results) state
+    end
+  end in
+  (* Restricts the domain according to [mode]. *)
   let domain : (module internal_domain with type value = Acc.Val.t) =
     match mode with
-    | None -> domain
+    | None -> (module Domain)
     | Some kf_modes ->
       let module Scope = struct let functions = kf_modes end in
       let module Domain =
         Domain_builder.Restrict
           (Acc.Val)
-          ((val domain))
+          (Domain)
           (Scope)
       in
       (module Domain)
@@ -368,7 +386,7 @@ let warn_experimental flag =
 let build_domain config abstract =
   let build (Flag flag, mode) acc =
     warn_experimental flag;
-    add_domain mode flag.abstraction acc
+    add_domain flag.name mode flag.abstraction acc
   in
   (* Domains in the [config] are sorted by increasing priority: domains with
      higher priority are added last: they will be at the top of the domains

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,9 +44,9 @@ let number_to_color n =
   let number = ref n in
   for _i = 0 to 7 do
     color := (!color lsl 1) +
-      (if !number land 1 <> 0 then 1 else 0) +
-      (if !number land 2 <> 0 then 256 else 0) +
-      (if !number land 4 <> 0 then 65536 else 0);
+             (if !number land 1 <> 0 then 1 else 0) +
+             (if !number land 2 <> 0 then 256 else 0) +
+             (if !number land 4 <> 0 then 65536 else 0);
     number := !number lsr 3
   done;
   !color
@@ -76,6 +76,14 @@ let uncurry f x = f (fst x) (snd x)
 
 let iter_uncurry2 iter f v =
   iter (fun a b -> f (a, b)) v
+
+(* ************************************************************************* *)
+(** {2 Tuples} *)
+(* ************************************************************************* *)
+
+let nest b (a, c) = (a, b), c
+
+let flatten ((a, b), c) = a, b, c
 
 (* ************************************************************************* *)
 (** {2 Lists} *)
@@ -148,25 +156,25 @@ let rec list_compare cmp_elt l1 l2 =
   if l1 == l2 then 0
   else
     match l1, l2 with
-      | [], [] -> assert false (* included in l1 == l2 above *)
-      | [], _ :: _ -> -1
-      | _ :: _, [] -> 1
-      | v1::r1, v2::r2 ->
-          let c = cmp_elt v1 v2 in
-          if c = 0 then list_compare cmp_elt r1 r2 else c
+    | [], [] -> assert false (* included in l1 == l2 above *)
+    | [], _ :: _ -> -1
+    | _ :: _, [] -> 1
+    | v1::r1, v2::r2 ->
+      let c = cmp_elt v1 v2 in
+      if c = 0 then list_compare cmp_elt r1 r2 else c
 
 let opt_of_list =
   function
-    | [] -> None
-    | [a] -> Some a
-    | _ -> raise (Invalid_argument "Extlib.opt_of_list")
+  | [] -> None
+  | [a] -> Some a
+  | _ -> raise (Invalid_argument "Extlib.opt_of_list")
 
 let rec find_opt f = function
   | [] -> raise Not_found
   | e :: q ->
-      match f e with
-        | None -> find_opt f q
-        | Some v -> v
+    match f e with
+    | None -> find_opt f q
+    | Some v -> v
 
 let iteri f l = let i = ref 0 in List.iter (fun x -> f !i x; incr i) l
 
@@ -227,14 +235,14 @@ let list_slice ?(first = 0) ?last l =
 
 let opt_fold f o b =
   match o with
-    | None -> b
-    | Some a -> f a b
+  | None -> b
+  | Some a -> f a b
 
 let merge_opt f k o1 o2 =
   match o1,o2 with
-    | None, None -> None
-    | Some x, None | None, Some x -> Some x
-    | Some x1, Some x2 -> Some (f k x1 x2)
+  | None, None -> None
+  | Some x, None | None, Some x -> Some x
+  | Some x1, Some x2 -> Some (f k x1 x2)
 
 let opt_filter f = function
   | None -> None
@@ -247,6 +255,10 @@ let the ~exn = function
 let opt_hash hash v = match v with
   | None -> 31179
   | Some v -> hash v
+
+let opt_map2 f x y = match x, y with
+  | None, _ | _, None -> None
+  | Some x, Some y -> Some (f x y)
 
 (* ************************************************************************* *)
 (** Booleans                                                                 *)

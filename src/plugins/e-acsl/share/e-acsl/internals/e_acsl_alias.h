@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -23,17 +23,17 @@
 /*! ***********************************************************************
  * \file
  * \brief Function aliasing
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_ALIAS_H
 #define E_ACSL_ALIAS_H
 
 /* Concatenation of 2 tokens */
-# define preconcat(x,y) x ## y
-# define concat(x,y) preconcat(x,y)
+#define preconcat(x, y) x##y
+#define concat(x, y)    preconcat(x, y)
 /** Prefix of public functions */
-# define export_prefix __e_acsl_
+#define export_prefix __e_acsl_
 /** Add public prefix to an identifier */
-# define export_alias(_n) concat(export_prefix, _n)
+#define export_alias(_n) concat(export_prefix, _n)
 
 #endif

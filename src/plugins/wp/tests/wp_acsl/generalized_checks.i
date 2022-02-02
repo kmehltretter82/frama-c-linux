@@ -72,9 +72,4 @@ void loop () {
    */
   for (int i = 0; i< 10; i++);
   /*@ check implied_by_false_invariant: j == 10; */
- l: /*@ check invariant \true; */ ;
-  if (j >= 10) goto l1;
-  j++;
-  goto l;
- l1 : ;
 }

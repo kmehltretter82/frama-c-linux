@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -39,7 +39,7 @@ end
     source locations where the operation took place. *)
 type origin =
   | Misalign_read of LocationLattice.t (** Read of not all the bits of a
-                                   pointer, typically through a pointer cast *)
+                                           pointer, typically through a pointer cast *)
   | Leaf of LocationLattice.t (** Result of a function without a body *)
   | Merge of LocationLattice.t (** Join between two control-flows *)
   | Arith of LocationLattice.t (** Arithmetic operation that cannot be

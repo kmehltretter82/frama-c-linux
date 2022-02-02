@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -322,11 +322,10 @@ class slocVisitor ~libc : sloc_visitor = object(self)
         | Dvolatile (_, _, _, _, _) -> " (Volatile) "
         | Daxiomatic (s, _, _, _) -> s
         | Dtype (lti, _) ->  lti.lt_name
-        | Dlemma (ln, _, _, _, _, _, _) ->  ln
+        | Dlemma (ln, _, _, _, _, _) ->  ln
         | Dinvariant (toto, _) -> toto.l_var_info.lv_name
         | Dtype_annot (ta, _) -> ta.l_var_info.lv_name
         | Dmodel_annot (mi, _) -> mi.mi_name
-        | Dcustom_annot (_c, _n, _, _) -> " (Custom) "
         | Dextended ({ext_name}, _, _) -> " (Extension " ^ ext_name ^ ")"
       end
 
@@ -734,25 +733,25 @@ let compute_on_cilast ~libc =
       "@[<v 0>Cil AST@ %t@]" cil_visitor#pp_detailed_text_metrics;
   (*  let r =  metrics_to_result cil_visitor in *)
   (* Print the result to file if required *)
-  let out_fname = Metrics_parameters.OutputFile.get () in
-  begin
-    if out_fname <> "" then
-      try
-        let oc = open_out_bin out_fname in
-        let fmt = Format.formatter_of_out_channel oc in
-        (match Metrics_base.get_file_type out_fname with
-         | Html -> dump_html fmt cil_visitor
-         | Text -> pp_with_funinfo fmt cil_visitor
-         | Json ->
-           let json = json_of_funinfo cil_visitor in
-           Yojson.pretty_print fmt json;
-           Format.fprintf fmt "@." (* ensure the file ends with a newline *)
-        );
-        close_out oc;
-      with Sys_error _ ->
-        Metrics_parameters.failure "Cannot open file %s.@." out_fname
-    else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
+  if not (Metrics_parameters.OutputFile.is_empty ()) then begin
+    let out_fname = Metrics_parameters.OutputFile.get () in
+    try
+      let oc = open_out_bin (out_fname:>string) in
+      let fmt = Format.formatter_of_out_channel oc in
+      (match Metrics_base.get_file_type out_fname with
+       | Html -> dump_html fmt cil_visitor
+       | Text -> pp_with_funinfo fmt cil_visitor
+       | Json ->
+         let json = json_of_funinfo cil_visitor in
+         Yojson.pretty_print fmt json;
+         Format.fprintf fmt "@." (* ensure the file ends with a newline *)
+      );
+      close_out oc;
+    with Sys_error _ ->
+      Metrics_parameters.failure "Cannot open file %a.@."
+        Filepath.Normalized.pretty out_fname
   end
+  else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
 
 (* Visitor for the recursive estimation of a stack size.
    Its arguments are the function currently being visited and the current
@@ -827,7 +826,7 @@ class locals_size_visitor kf callstack = object
         | Some size ->
           Metrics_parameters.debug "@[function %a:@;sizeof(%a) = %a (%s)@]"
             Kernel_function.pretty kf
-            Printer.pp_varinfo vi (Integer.pretty ~hexa:false) size
+            Printer.pp_varinfo vi Integer.pretty size
             (if vi.vtemp then "temp" else "non-temp");
           if vi.vtemp then
             locals_size_temps <- Integer.add locals_size_temps size
@@ -844,11 +843,11 @@ let compute_locals_size kf =
   ignore (Visitor.visitFramacKf (vis :> Visitor.frama_c_visitor) kf);
   Metrics_parameters.result "@[%a\t%a\t%a\t%a\t%a@]"
     Kernel_function.pretty kf
-    (Integer.pretty ~hexa:false) vis#get_locals_size_no_temps
-    (Integer.pretty ~hexa:false)
+    Integer.pretty vis#get_locals_size_no_temps
+    Integer.pretty
     (Integer.add vis#get_locals_size_no_temps vis#get_locals_size_temps)
-    (Integer.pretty ~hexa:false) vis#get_max_size_calls_no_temps
-    (Integer.pretty ~hexa:false)
+    Integer.pretty vis#get_max_size_calls_no_temps
+    Integer.pretty
     (Integer.add vis#get_max_size_calls_no_temps vis#get_max_size_calls_temps)
 ;;
 

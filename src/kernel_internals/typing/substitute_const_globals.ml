@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,7 +36,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
      'const' and respective initializers. *)
   method! vglob g =
     let rec is_arithmetic_type = function
-      | TArray (typ, _, _, _) -> is_arithmetic_type typ
+      | TArray (typ, _, _) -> is_arithmetic_type typ
       | TInt _ | TFloat _ | TEnum _ -> true
       | _ -> false
     in

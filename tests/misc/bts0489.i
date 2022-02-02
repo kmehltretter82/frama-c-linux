@@ -1,6 +1,6 @@
 /* run.config
-   MODULE: @PTEST_NAME@
-   OPT: 
+ MODULE: @PTEST_NAME@
+   OPT: -no-autoload-plugins
 */
 
 typedef unsigned char uint8_t;

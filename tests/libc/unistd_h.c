@@ -104,5 +104,8 @@ int main() {
   r = pipe(pipefd);
   //@ check ok: r == 0 || r == -1;
 
+  int unslept = sleep(42);
+  //@ assert 0 <= unslept <= 42;
+
   return 0;
 }

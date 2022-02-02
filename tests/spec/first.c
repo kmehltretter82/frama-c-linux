@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print %{dep:third.c} %{dep:second.c} -journal-disable
+   OPT: -print %{dep:@PTEST_DIR@/third.c} %{dep:@PTEST_DIR@/second.c}
 */
 /*@ behavior b:
   requires \valid(first);

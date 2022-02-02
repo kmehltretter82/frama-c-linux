@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -165,6 +165,10 @@ module type S_no_parameter = sig
   val is_default: unit -> bool
   (** Is the option equal to its default value? *)
 
+  val get_default: unit -> t
+  (** Get the default value for the option.
+      @since 24.0-Chromium *)
+
   val option_name: string
   (** Name of the option on the command-line
       @since Carbon-20110201  *)
@@ -293,7 +297,16 @@ module type With_output = sig
 end
 
 (** signature for normalized pathnames. *)
-module type Filepath = S with type t = Filepath.Normalized.t
+module type Filepath = sig
+  include S with type t = Filepath.Normalized.t
+
+  (**
+     Whether the Filepath is empty.
+
+     @since 23.0-Vanadium
+  *)
+  val is_empty: unit -> bool
+end
 
 (** signature for searching files in a specific directory. *)
 module type Specific_dir = sig

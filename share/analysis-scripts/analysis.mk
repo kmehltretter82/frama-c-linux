@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -35,6 +35,7 @@
 # EVAFLAGS      flags to use with the Eva plugin
 # EVABUILTINS   Eva builtins to be set (via -eva-builtin)
 # EVAUSESPECS   Eva functions to be overridden by specs (-eva-use-spec)
+# WPFLAGS       flags to use with the WP plugin
 #
 # FLAMEGRAPH    If set (to any value), running an analysis will produce an
 #               SVG + HTML flamegraph at the end.
@@ -65,32 +66,22 @@ ifneq (4.0,$(firstword $(sort $(MAKE_VERSION) 4.0)))
   $(error This Makefile requires Make >= 4.0 - available at http://ftp.gnu.org/gnu/make/)
 endif
 
-# Test if on a Mac (and therefore sed has fewer options)
-# Also test if /usr/bin/time is available, otherwise use the shell builtin
-# (which has less options)
-UNAME := $(shell uname -s)
-ifeq ($(UNAME),Darwin)
-  SED_UNBUFFERED:=sed
-ifneq (,$(wildcard /usr/bin/time))
+# Test if sed has the '--unbuffered' option (GNU sed has, but neither macOS'
+# nor Busybox' have it, in which case we ignore it)
+SED_UNBUFFERED:=sed$(shell sed --unbuffered //p /dev/null 2>/dev/null && echo " --unbuffered" || true)
+
+# If there is a GNU time in the PATH, which contains the desired options
+# (-f and -o), use them; otherwise, use any time (be it a shell builtin
+# or a command). 'env' allows bypassing shell builtins (if they exist),
+# since they usually don't have the required options.
+ifeq (OK,$(shell env time -f 'test' -o '/dev/null' echo OK || echo KO))
 define time_with_output
-  /usr/bin/time -p
+  env time -f 'user_time=%U\nmemory=%M' -o "$(1)"
 endef
 else
 define time_with_output
   time
 endef
-endif
-else
-  SED_UNBUFFERED:=sed --unbuffered
-ifneq (,$(wildcard /usr/bin/time))
-define time_with_output
-  /usr/bin/time -f 'user_time=%U\nmemory=%M' -o "$(1)"
-endef
-else
-define time_with_output
-  time
-endef
-endif
 endif
 
 # --- Utilities ---
@@ -125,6 +116,7 @@ EVAFLAGS   ?= \
   -calldeps -from-verbose 0 \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
+WPFLAGS    ?=
 FCFLAGS    ?=
 FCGUIFLAGS ?=
 
@@ -155,7 +147,7 @@ SHELL        := $(shell which bash)
 .FORCE:
 .SUFFIXES: # Disable make builtins
 
-%.parse/command %.eva/command:
+%.parse/command %.eva/command %.wp/command:
 	@#
 
 %.parse: SOURCES = $(filter-out %/command,$^)
@@ -182,7 +174,7 @@ SHELL        := $(shell which bash)
 	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(PARSE)))"
 	} >> $@/stats.txt
 	mv $@/{running,command}
-	touch $@ # Update timestamp and prevents remake if nothing changes
+	touch $@ # Update timestamp and prevent remake if nothing changes
 
 %.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(EVAFLAGS)
 %.eva: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
@@ -223,6 +215,34 @@ SHELL        := $(shell which bash)
 	fi
 	mv $@/{running,command}
 	touch $@ # Update timestamp and prevents remake if nothing changes
+
+%.wp: WP = $(FRAMAC) $(FCFLAGS) -wp $(WPFLAGS)
+%.wp: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
+%.wp: $$(PARSE_RESULT) $$(shell $(DIR)cmd-dep.sh $$@/command $$(WP)) $(if $(BENCHMARK),.FORCE,)
+	@$(call display_command,$(WP))
+	mkdir -p $@
+	mv -f $@/{command,running}
+	{
+	  $(call time_with_output,$@/stats.txt) \
+	    $(WP) \
+	      -load $(PARSE_RESULT)/framac.sav -save $@/framac.sav \
+	      -kernel-log w:$@/warnings.log \
+	      -wp-log w:$@/warnings.log \
+	      -then \
+	      -report-csv $@/alarms.csv -report-no-proven \
+	      -report-log w:$@/warnings.log \
+	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
+	} 2>&1 |
+	  tee $@/wp.log
+	{
+	  printf 'timestamp=%q\n' "$(HR_TIMESTAMP)";
+	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep ':\[\(wp\|kernel\)\]' | wc -l`";
+	  printf 'alarms=%s\n' "`expr $$(cat $@/alarms.csv | wc -l) - 1`";
+	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(WP)))";
+	  printf 'benchmark_tag=%s' "$(BENCHMARK)"
+	} >> $@/stats.txt
+	mv $@/{running,command}
+	touch $@ # Update timestamp and prevent remake if nothing changes
 
 %.gui: %
 	$(FRAMAC_GUI) $(FCGUIFLAGS) -load $^/framac.sav &

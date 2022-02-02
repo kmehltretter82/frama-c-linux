@@ -1,6 +1,6 @@
 ![Frama-C](share/frama-c.png?raw=true)
 
-[Frama-C](http://frama-c.com) is a platform dedicated to the analysis of
+[Frama-C](https://frama-c.com) is a platform dedicated to the analysis of
 source code written in C.
 
 ## A Collaborative Platform
@@ -23,27 +23,44 @@ Thanks to this approach, Frama-C provides sophisticated tools, including:
   (**From**, **Impact**, **Metrics**, **Occurrence**, **Scope**, etc.).
 
 These plug-ins share a common language and can exchange information via
-**[ACSL](http://frama-c.com/acsl.html)** (*ANSI/ISO C Specification Language*)
+**[ACSL](https://frama-c.com/acsl.html)** (*ANSI/ISO C Specification Language*)
 properties. Plug-ins can also collaborate via their APIs.
 
 ## Installation
 
-For more detailed information about installing opam/Frama-C,
-see [INSTALL.md](INSTALL.md).
+Frama-C is available through [opam](https://opam.ocaml.org/), the
+OCaml package manager. If you have it, simply run:
 
-Frama-C is available through [opam](http://opam.ocaml.org/), the
-OCaml package manager. This is the preferred installation method. Be sure
-to install opam v2.0 or higher. Then the following sequence of commands
-should install frama-c and its gui:
-
-    opam init
-    opam install depext
-    opam depext frama-c
     opam install frama-c
+
+or, for `opam` versions less than 2.1.0:
+
+    opam install depext # handles external (non-OCaml) dependencies
+    opam depext frama-c --install
 
 Frama-C is developed mainly in Linux, often tested in macOS
 (via Homebrew), and occasionally tested on Windows
 (via the Windows Subsystem for Linux).
+
+For detailed installation instructions and troubleshooting,
+see [INSTALL.md](INSTALL.md).
+
+### Development branch
+
+To install the development branch of Frama-C (updated nightly):
+
+    opam pin add frama-c --dev-repo
+
+This command will *pin* the development version of Frama-C and try to install it.
+If installation fails due to missing external dependencies, try using
+the same commands from the [Installation](#installation) section to get the
+external dependencies and then install Frama-C.
+
+### Distribution packages
+
+Some Linux distributions have a `frama-c` package, kindly provided by
+distribution packagers. Note that they may not correspond to the latest
+Frama-C release.
 
 ## Usage
 
@@ -65,7 +82,7 @@ To list all plug-ins, run:
     frama-c -plugins
 
 Each plug-in has a help command
-(`-<plugin>-help` or `-<plugin>-h`) that describes its several
+(`-<plugin>-help` or `-<plugin>-h`) that describes its own
 options.
 
 Finally, the list of options governing the behavior of Frama-C's kernel itself
@@ -96,13 +113,13 @@ via the GUI:
 ## Further reference
 
 - Links to user and developer manuals, Frama-C archives,
-  and plug-in manuals are available at <br> http://frama-c.com/html/get-frama-c.html
+  and plug-in manuals are available at <br> https://frama-c.com/html/get-frama-c.html
 
-- [StackOverflow](http://stackoverflow.com/questions/tagged/frama-c) has several
+- [StackOverflow](https://stackoverflow.com/questions/tagged/frama-c) has several
   questions with the `frama-c` tag, which is monitored by several members of the
   Frama-C community.
 
-- The [Frama-c-discuss mailing list](http://lists.gforge.inria.fr/cgi-bin/mailman/listinfo/frama-c-discuss)
+- The [Frama-c-discuss mailing list](https://groupes.renater.fr/sympa/info/frama-c-discuss)
   is used for announcements and general discussions.
 
 - The [Frama-C public repository](https://git.frama-c.com/pub/frama-c)
@@ -114,6 +131,6 @@ via the GUI:
   contains links to all manuals and plugins description, as well as tutorials, courses
 	and more.
 
-- The [Frama-C blog](http://frama-c.com/blog) has several posts about
+- The [Frama-C blog](https://frama-c.com/blog) has several posts about
   new developments of Frama-C, as well as general discussions about the C
   language, undefined behavior, floating-point computations, etc.

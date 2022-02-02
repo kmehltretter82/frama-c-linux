@@ -16,7 +16,7 @@
   ;; `M-x package-install [ret] company`
   (company-mode +1))
 
-(defun setup-txs-mode ()
+(defun setup-tsx-mode ()
   (interactive)
   (when (string-equal "tsx" (file-name-extension buffer-file-name))
     (setq web-mode-enable-auto-quoting nil)
@@ -34,7 +34,7 @@
 
 ;; Setup Tide for typescript with JSX syntax
 (require 'web-mode)
-(add-hook 'web-mode-hook #'setup-txs-mode)
+(add-hook 'web-mode-hook #'setup-tsx-mode)
 
 ;; Setup Typescript Indentation
 

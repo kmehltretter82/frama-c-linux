@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -204,6 +204,7 @@ type requestInfo = {
   rq_kind: [ `GET | `SET | `EXEC ];
   rq_input: paramInfo ;
   rq_output: paramInfo ;
+  rq_signals: string list ;
 }
 
 type arrayInfo = {
@@ -382,9 +383,9 @@ let resolve_readme ~plugin = function
     let file =
       match plugin with
       | Kernel ->
-        Printf.sprintf "%s/server/%s" Fc_config.datadir readme
+        Printf.sprintf "%s/server/%s" (Fc_config.datadir:>string) readme
       | Plugin name ->
-        Printf.sprintf "%s/%s/server/%s" Fc_config.datadir name readme
+        Printf.sprintf "%s/%s/server/%s" (Fc_config.datadir:>string) name readme
     in Some file
 
 (* -------------------------------------------------------------------------- *)

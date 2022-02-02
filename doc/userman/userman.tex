@@ -3,6 +3,9 @@
 
 \usepackage{graphicx}
 \usepackage{calc}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
 
 \include{macros}
 \input{./frama-c-affiliation.tex}
@@ -27,10 +30,7 @@
 \end{tabular}
 \vfill
 \begin{flushleft}
-  \textcopyright 2009-2020 CEA LIST
-
-This work has been supported by the ANR project CAT (ANR-05-RNTL-00301) and by
-the ANR project U3CAT (08-SEGI-021-01).
+  \textcopyright 2009-2021 CEA LIST
 \end{flushleft}
 \end{titlepage}
 
@@ -43,14 +43,17 @@ the ANR project U3CAT (08-SEGI-021-01).
 \addcontentsline{toc}{chapter}{Foreword}
 
 This is the user manual of \FramaC\footnote{\url{http://frama-c.com}}.  The
-content of this document corresponds to the version \framacversion (\today) of
-\FramaC. However the development of \FramaC is still ongoing: features
-described here may still evolve in the future.
+content of this document corresponds to the version \framacversion, on \today, of
+\FramaC.
 
 \section*{Acknowledgements}
 
 We gratefully thank all the people who contributed to this document: Patrick
 Baudin, Mickaël Delahaye, Philippe Hermann, Benjamin Monate and Dillon Pariente.
+
+\acknowledgeANR
+
+\acknowledgeEU
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -66,6 +69,7 @@ Baudin, Mickaël Delahaye, Philippe Hermann, Benjamin Monate and Dillon Pariente
 \include{user-report}
 \include{user-variadic}
 \include{user-analysis-scripts}
+\include{user-compliance}
 \include{user-errors}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

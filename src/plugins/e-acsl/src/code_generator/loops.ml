@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,29 +28,240 @@ open Cil_types
 (**************************************************************************)
 
 let translate_predicate_ref
-  : (kernel_function -> Env.t -> predicate -> Env.t) ref
+  : (kernel_function -> Env.t -> toplevel_predicate -> Env.t) ref
   = Extlib.mk_fun "translate_predicate_ref"
 
 let predicate_to_exp_ref
-  : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "predicate_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _p ->
+      Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
 let term_to_exp_ref
-  : (kernel_function -> Env.t -> term -> exp * Env.t) ref
-  = Extlib.mk_fun "term_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     term ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
 
 (**************************************************************************)
-(************************* Loop invariants ********************************)
+(************************* Loop annotations *******************************)
 (**************************************************************************)
 
-let preserve_invariant env kf stmt = match stmt.skind with
+let handle_annotations env kf stmt =
+  match stmt.skind with
   | Loop(_, ({ bstmts = stmts } as blk), loc, cont, break) ->
-    let rec handle_invariants (stmts, env as acc) = function
-      | [] ->
-        (* empty loop body: no need to verify the invariant twice *)
-        acc
+    (* Loop variant, save the current value of the variant *)
+    let stmts, env, variant =
+      Error.handle
+        (fun (stmts, env, _) ->
+           match Env.top_loop_variant env with
+           | Some (t, measure_opt) ->
+             let env = Env.set_annotation_kind env Smart_stmt.Variant in
+             let env = Env.push env in
+             (* There cannot be bound logical variables since we cannot write
+                loops inside logic functions or predicates, hence lenv is []*)
+             Typing.type_term ~use_gmp_opt:true ~lenv:[] t;
+             let ty = Typing.get_typ ~lenv:[] t in
+             if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
+             let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
+             let vi_old, e_old, env =
+               Env.new_var
+                 ~loc
+                 ~scope:Varname.Function
+                 ~name:"old_variant"
+                 env
+                 kf
+                 (Some t)
+                 ty
+                 (fun _ _ -> [])
+             in
+             let stmt =
+               Smart_stmt.assigns ~loc ~result:(Cil.var vi_old) e
+             in
+             let blk, env =
+               Env.pop_and_get env stmt ~global_clear:false Env.Middle
+             in
+             let stmts = Smart_stmt.block_stmt blk :: stmts in
+             stmts, env, Some (t, e_old, measure_opt)
+           | None -> stmts, env, None)
+        (stmts, env, None)
+    in
+    (* Auxiliary function to generate variant and invariant checks *)
+    let rec aux (stmts, env) = function
+      | [] -> begin
+          (* No statements remaining in the loop: variant check *)
+          let env = Env.set_annotation_kind env Smart_stmt.Variant in
+          let lenv = Env.Local_vars.get env in
+          match variant with
+          | Some (t, e_old, Some measure) ->
+            let env = Env.push env in
+            let t_old = { t with term_node = t.term_node } in
+            let tapp =
+              { term_node = Tapp(measure, [], [t_old; t]);
+                term_loc = loc;
+                term_name = [];
+                term_type = Linteger;}
+            in
+            Typing.type_term ~use_gmp_opt:true ~lenv tapp;
+            let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
+            let e_tapp, _, env =
+              Logic_functions.app_to_exp
+                ~adata:Assert.no_data
+                ~loc
+                ~tapp
+                kf
+                env
+                ~eargs:[e_old; e]
+                measure
+                [t_old; t]
+            in
+            let msg =
+              Format.asprintf
+                "%s(old %a, %a)"
+                measure.l_var_info.lv_name
+                Printer.pp_term t_old
+                Printer.pp_term t
+            in
+            let adata, env = Assert.empty ~loc kf env in
+            let adata, env =
+              Assert.register
+                ~loc
+                kf
+                env
+                (Format.asprintf "old %a" Printer.pp_term t_old)
+                e_old
+                adata
+            in
+            let adata, env =
+              Assert.register
+                ~loc
+                kf
+                env
+                (Format.asprintf "current %a" Printer.pp_term t)
+                e
+                adata
+            in
+            let stmt, env =
+              Assert.runtime_check_with_msg
+                ~adata
+                ~loc
+                msg
+                ~pred_kind:Assert
+                Smart_stmt.Variant
+                kf
+                env
+                e_tapp
+            in
+            let blk, env =
+              Env.pop_and_get env stmt ~global_clear:false Env.Middle
+            in
+            let stmts = Smart_stmt.block_stmt blk :: stmts in
+            stmts, env
+          | Some (t, e_old, None) ->
+            let env = Env.push env in
+            let t_old = Logic_utils.expr_to_term e_old in
+            let variant_pos =
+              Logic_const.prel ~loc (Rge, t_old, Logic_const.tinteger ~loc 0)
+            in
+            Typing.type_named_predicate ~lenv variant_pos;
+            let variant_pos_e, _, env =
+              !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_pos
+            in
+            let msg1 =
+              Format.asprintf
+                "(old %a) %a 0"
+                Printer.pp_term t
+                Printer.pp_relation Rge
+            in
+            let adata1, env = Assert.empty ~loc kf env in
+            let adata1, env =
+              Assert.register
+                ~loc
+                kf
+                env
+                (Format.asprintf "old %a" Printer.pp_term t)
+                e_old
+                adata1
+            in
+            let e_old_ge_zero_stmt, env =
+              Assert.runtime_check_with_msg
+                ~adata:adata1
+                ~loc
+                msg1
+                ~pred_kind:Assert
+                Smart_stmt.Variant
+                kf
+                env
+                variant_pos_e
+            in
+            let variant_dec =
+              Logic_const.prel ~loc (Rgt, t_old, t)
+            in
+            Typing.type_named_predicate ~lenv variant_dec;
+            let variant_dec_e, _, env =
+              !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_dec
+            in
+            let msg2 =
+              Format.asprintf
+                "(old %a) > %a"
+                Printer.pp_term t
+                Printer.pp_term t
+            in
+            let adata2, env = Assert.with_data_from ~loc kf env adata1 in
+            let adata2, env =
+              if Options.Assert_print_data.get () then
+                (* To be able to display to the user a meaningful message for
+                   the old value and the current value, we need to retrieve the
+                   expression for the term [t]. *)
+                let e, _, env =
+                  !term_to_exp_ref ~adata:Assert.no_data kf env t
+                in
+                Assert.register
+                  ~loc
+                  kf
+                  env
+                  (Format.asprintf "current %a" Printer.pp_term t)
+                  e
+                  adata2
+              else
+                adata2, env
+            in
+            let e_old_gt_e_stmt, env =
+              Assert.runtime_check_with_msg
+                ~adata:adata2
+                ~loc
+                msg2
+                ~pred_kind:Assert
+                Smart_stmt.Variant
+                kf
+                env
+                variant_dec_e
+            in
+            let stmt =
+              Smart_stmt.block_from_stmts
+                [ e_old_ge_zero_stmt;
+                  e_old_gt_e_stmt ]
+            in
+            let blk, env =
+              Env.pop_and_get env stmt ~global_clear:false Env.Middle
+            in
+            let stmts = Smart_stmt.block_stmt blk :: stmts in
+            stmts, env
+          | None ->
+            stmts, env
+        end
       | [ last ] ->
-        let invariants, env = Env.pop_loop env in
+        (* Last statement of the loop: invariant check *)
+        (* Optimisation to only verify invariant on a non-empty body loop. *)
+        let invariants = Env.top_loop_invariants env in
+        let env = Env.set_annotation_kind env Smart_stmt.Invariant in
         let env = Env.push env in
         let env =
           let translate_named_predicate = !translate_predicate_ref in
@@ -59,93 +270,34 @@ let preserve_invariant env kf stmt = match stmt.skind with
         let blk, env =
           Env.pop_and_get env last ~global_clear:false Env.Before
         in
-        Smart_stmt.block last blk :: stmts, env
-      | s :: tl ->
-        handle_invariants (s :: stmts, env) tl
+        aux (Smart_stmt.block last blk :: stmts, env) []
+      | hd :: tl -> aux (hd :: stmts, env) tl
     in
-    let env = Env.set_annotation_kind env Smart_stmt.Invariant in
-    let stmts, env = handle_invariants ([], env) stmts in
+    let stmts, env = aux ([], env) stmts in
+    (* The loop annotations have been handled, the loop environment can be
+       popped *)
+    let env = Env.pop_loop env in
     let new_blk = { blk with bstmts = List.rev stmts } in
-    { stmt with skind = Loop([], new_blk, loc, cont, break) },
-    env
+    { stmt with skind = Loop([], new_blk, loc, cont, break) }, env
   | _ ->
     stmt, env
 
 (**************************************************************************)
 (**************************** Nested loops ********************************)
 (**************************************************************************)
-
-(* It could happen that the bounds provided for a quantifier [lv] are bigger
-   than its type. [bounds_for_small_type] handles such cases
-   and provides smaller bounds whenever possible.
-   Let B be the inferred interval and R the range of [lv.typ]
-   - Case 1: B \subseteq R
-     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
-     Return: B
-   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
-     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
-     Return: B \intersect R
-   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
-     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
-     Return: R with a guard guaranteeing that [lv] does not overflow *)
-let bounds_for_small_type ~loc (t1, lv, t2) =
-  match lv.lv_type with
-  | Ltype _ | Lvar _ | Lreal | Larrow _ ->
-    Options.abort "quantification over non-integer type is not part of E-ACSL"
-
-  | Linteger ->
-    t1, t2, None
-
-  | Ctype ty ->
-    let iv1 = Interval.(extract_ival (infer t1)) in
-    let iv2 = Interval.(extract_ival (infer t2)) in
-    (* Ival.join is NOT correct here:
-       Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
-       but NOT [-3..300] *)
-    let iv = Ival.inject_range (Ival.min_int iv1) (Ival.max_int iv2) in
-    let ity = Interval.extract_ival (Interval.interv_of_typ ty) in
-    if Ival.is_included iv ity then
-      (* case 1 *)
-      t1, t2, None
-    else if Ival.is_singleton_int iv1 && Ival.is_singleton_int iv2 then begin
-      (* case 2 *)
-      let i = Ival.meet iv ity in
-      (* now we potentially have a better interval for [lv]
-         ==> update the binding *)
-      Interval.Env.replace lv (Interval.Ival i);
-      (* the smaller bounds *)
-      let min, max = Misc.finite_min_and_max i in
-      let t1 = Logic_const.tint ~loc min in
-      let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.number_ty_of_typ ~post:false ty in
-      (* we are assured that we will not have a GMP,
-         once again because we intersected with [ity] *)
-      Typing.type_term ~use_gmp_opt:false ~ctx t1;
-      Typing.type_term ~use_gmp_opt:false ~ctx t2;
-      t1, t2, None
-    end else
-      (* case 3 *)
-      let min, max = Misc.finite_min_and_max ity in
-      let guard_lower = Logic_const.tint ~loc min in
-      let guard_upper = Logic_const.tint ~loc max in
-      let lv_term = Logic_const.tvar ~loc lv in
-      let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-      let guard_upper = Logic_const.prel ~loc (Rle, lv_term, guard_upper) in
-      let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-      t1, t2, Some guard
-
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
-  let term_to_exp = !term_to_exp_ref in
+  let lenv = Env.Local_vars.get env in
+  let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
   match lscope_vars with
   | [] ->
     mk_innermost_block env
   | Lscope.Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
-    let t1, t2, guard_for_small_type_opt =
-      bounds_for_small_type ~loc (t1, logic_x, t2)
-    in
+    assert (rel1 == Rle && rel2 == Rlt);
+    Typing.type_term ~use_gmp_opt:false ~lenv t1;
+    Typing.type_term ~use_gmp_opt:false ~lenv t2;
     let ctx =
-      let ty1 = Typing.get_number_ty t1 in
-      let ty2 = Typing.get_number_ty t2 in
+      let ty1 = Typing.get_number_ty ~lenv t1 in
+      let ty2 = Typing.get_number_ty ~lenv t2 in
       Typing.join ty1 ty2
     in
     let t_plus_one ?ty t =
@@ -154,47 +306,20 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
       Option.iter
         (fun ty ->
-           Typing.unsafe_set tone ~ctx:ty ctx;
-           Typing.unsafe_set t ~ctx:ty ctx;
-           Typing.unsafe_set res ty)
+           Typing.unsafe_set tone ~ctx:ty ~lenv ctx;
+           Typing.unsafe_set t ~ctx:ty ~lenv ctx;
+           Typing.unsafe_set res ~lenv ty)
         ty;
       res
     in
-    let t1 = match rel1 with
-      | Rlt ->
-        let t = t_plus_one t1 in
-        Typing.type_term ~use_gmp_opt:false ~ctx t;
-        t
-      | Rle ->
-        t1
-      | Rgt | Rge | Req | Rneq ->
-        assert false
-    in
-    let t2_one, bop2 = match rel2 with
-      | Rlt ->
-        t2, Lt
-      | Rle ->
-        (* we increment the loop counter one more time (at the end of the
-           loop). Thus to prevent overflow, check the type of [t2+1]
-           instead of [t2]. *)
-        t_plus_one t2, Le
-      | Rgt | Rge | Req | Rneq ->
-        assert false
-    in
-    Typing.type_term ~use_gmp_opt:false ~ctx t2_one;
-    let ctx_one =
-      let ty1 = Typing.get_number_ty t1 in
-      let ty2 = Typing.get_number_ty t2_one in
-      Typing.join ty1 ty2
-    in
     let ty =
-      try Typing.typ_of_number_ty ctx_one
+      try Typing.typ_of_number_ty ctx
       with Typing.Not_a_number -> assert false
     in
     (* loop counter corresponding to the quantified variable *)
     let var_x, x, env = Env.Logic_binding.add ~ty env kf logic_x in
     let lv_x = var var_x in
-    let env = match ctx_one with
+    let env = match ctx with
       | Typing.C_integer _ -> env
       | Typing.Gmpz -> Env.add_stmt env kf (Gmp.init ~loc x)
       | Typing.(C_float _ | Rational | Real | Nan) -> assert false
@@ -204,23 +329,32 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'
     in
     (* initialize the loop counter to [t1] *)
-    let e1, env = term_to_exp kf (Env.push env) t1 in
+    let e1, _, env = term_to_exp kf (Env.push env) t1 in
     let init_blk, env = Env.pop_and_get
         env
         (Gmp.affect ~loc:e1.eloc lv_x x e1)
         ~global_clear:false
         Env.Middle
     in
-    (* generate the guard [x bop t2] *)
+    (* generate the guard [x < t2] *)
     let block_to_stmt b = Smart_stmt.block_stmt b in
     let tlv = Logic_const.tvar ~loc logic_x in
+    (* if [t2] is of the form [t2'+1], generate the guard [x <= t2']
+       to avoid the extra addition (relevant when computing with GMP) *)
     let guard =
-      (* must copy [t2] to force being typed again *)
-      Logic_const.term ~loc
-        (TBinOp(bop2, tlv, { t2 with term_node = t2.term_node } )) Linteger
+      match t2.term_node with
+      | TBinOp (PlusA, t2_minus_one, {term_node = TConst(Integer (n, _))}) when Integer.is_one n ->
+        Logic_const.term ~loc
+          (TBinOp(Le, tlv, { t2_minus_one with term_node = t2_minus_one.term_node }))
+          Linteger
+      | _ ->
+        (* must copy [t2] to force it being typed again *)
+        Logic_const.term ~loc
+          (TBinOp(Lt, tlv, { t2 with term_node = t2.term_node } ))
+          Linteger
     in
-    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
-    let guard_exp, env = term_to_exp kf (Env.push env) guard in
+    Typing.type_term ~use_gmp_opt:false ~lenv ~ctx:Typing.c_int guard;
+    let guard_exp, _, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
         env
@@ -235,8 +369,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let guard = block_to_stmt guard_blk in
     (* increment the loop counter [x++];
        previous typing ensures that [x++] fits type [ty] *)
-    let tlv_one = t_plus_one ~ty:ctx_one tlv in
-    let incr, env = term_to_exp kf (Env.push env) tlv_one in
+    let tlv_one = t_plus_one ~ty:ctx tlv in
+    let incr, _, env = term_to_exp kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
         env
         (Gmp.affect ~loc:incr.eloc lv_x x incr)
@@ -245,13 +379,27 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     (* generate the whole loop *)
     let next = block_to_stmt next_blk in
+    let guard_for_small_type_opt = Bound_variables.get_guard_for_small_type logic_x in
     let stmts, env = match guard_for_small_type_opt with
       | None ->
         guard :: body @ [ next ], env
       | Some p ->
-        let e, env = !predicate_to_exp_ref kf (Env.push env) p in
+        let adata, env = Assert.empty ~loc kf env in
+        let e, adata, env =
+          (* Even though p is considered a RTE, it was generated while
+             typing the loop, and was already typed at this moment. Thus
+             there is no need to type it again *)
+          !predicate_to_exp_ref adata kf (Env.push env) p
+        in
         let stmt, env =
-          Smart_stmt.runtime_check Smart_stmt.RTE kf e p, env
+          Assert.runtime_check
+            ~adata
+            ~pred_kind:Assert
+            Smart_stmt.RTE
+            kf
+            env
+            e
+            p
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Smart_stmt.block_stmt b in
@@ -271,9 +419,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Env.Logic_binding.remove env logic_x;
     [ start ;  stmt ], env
   | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ ~lenv t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
-    let e, env = term_to_exp kf env t in
+    let e, _, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in
     let init_set =
       if Gmp_types.Q.is_t ty then Rational.init_set else Gmp.init_set

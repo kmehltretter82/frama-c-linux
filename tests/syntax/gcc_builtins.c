@@ -1,8 +1,16 @@
 /* run.config
+  PLUGIN: variadic
    STDOPT: +"-machdep gcc_x86_32"
  */
+<<<<<<< HEAD
 
 #include "stdint.h"
+||||||| 754e522ceb
+
+#include "share/libc/stdint.h"
+=======
+#include "stdint.h"
+>>>>>>> origin/master
 
 #define likely(x)  __builtin_expect((x),1)
 #define unlikely(x)  __builtin_expect((x),0)

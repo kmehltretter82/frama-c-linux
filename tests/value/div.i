@@ -1,14 +1,14 @@
 /* run.config*
    STDOPT: #"-eva-remove-redundant-alarms"
-   OPT: -machdep x86_32 -rte -then -eva @EVA_CONFIG@
+   PLUGIN: @PTEST_PLUGIN@ rtegen
+   OPT: -machdep x86_32 @RTE_TEST@ -then -eva @EVA_CONFIG@
 */
 int X,Y,Z1,Z2,T,U1,U2,V,W1,W2;
 int a,b,d1,d2,d0,e;
 int t[5]={1,2,3};
 int *p;
 
-void main (void)
-{
+void main (void) {
   int i;
   volatile int c=0;
   while (c+1)

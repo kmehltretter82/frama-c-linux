@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,11 +31,30 @@ let package =
     ~readme:"eva.md"
     ()
 
-let () = Request.register ~package
-    ~kind:`GET ~name:"isComputed"
-    ~descr:(Markdown.plain "True if the Eva analysis has been done")
-    ~input:(module Data.Junit) ~output:(module Data.Jbool)
-    Db.Value.is_computed
+module ComputationState = struct
+  type t = Analysis.computation_state
+  let jtype =
+    Data.declare ~package
+      ~name:"computationStateType"
+      ~descr:(Markdown.plain "State of the computation of Eva Analysis.")
+      Package.(Junion [
+          Jtag "not_computed" ;
+          Jtag "computing" ;
+          Jtag "computed"])
+  let to_json = function
+    | Analysis.NotComputed -> `String "not_computed"
+    | Computing -> `String "computing"
+    | Computed -> `String "computed"
+end
+
+let _computation_signal =
+  States.register_value ~package
+    ~name:"computationState"
+    ~descr:(Markdown.plain "The current computation state of the analysis.")
+    ~output:(module ComputationState)
+    ~get:Analysis.current_computation_state
+    ~add_hook:Analysis.register_computation_hook
+    ()
 
 let is_computed kf =
   Db.Value.is_computed () &&
@@ -118,5 +137,302 @@ let () = Request.register ~package
     ~input:(module Kernel_ast.Kf)
     ~output:(module DeadCode)
     dead_code
+
+
+(* ----- Red and tainted alarms --------------------------------------------- *)
+
+
+module Taint = struct
+  open Server.Data
+  open Taint_domain
+
+  let dictionary = Enum.dictionary ()
+
+  let tag value name label short_descr long_descr =
+    Enum.tag ~name
+      ~label:(Markdown.plain label)
+      ~descr:(Markdown.bold (short_descr ^ ": ") @ Markdown.plain long_descr)
+      ~value dictionary
+
+  let tag_not_computed =
+    tag (Error NotComputed) "not_computed" ""
+      "Not computed" "the Eva taint domain has not been enabled, \
+                      or the Eva analysis has not been run"
+
+  let tag_error =
+    tag (Error LogicError) "error" "Error"
+      "Error" "the memory zone on which this property depends \
+               could not be computed"
+
+  let tag_not_applicable =
+    tag (Error Irrelevant) "not_applicable" "—"
+      "Not applicable" "no taint for this kind of property"
+
+  let tag_data_tainted =
+    tag (Ok Data) "data_tainted" "Tainted (data)"
+      "Data tainted"
+      "this property is related to a memory location that can be affected \
+       by an attacker"
+
+  let tag_control_tainted =
+    tag (Ok Control) "control_tainted" "Tainted (control)"
+      "Control tainted"
+      "this property is related to a memory location whose assignment depends \
+       on path conditions that can be affected by an attacker"
+
+  let tag_untainted =
+    tag (Ok None) "not_tainted" "Untainted"
+      "Untainted property" "this property is safe"
+
+  let () = Enum.set_lookup dictionary
+      begin function
+        | Error Taint_domain.NotComputed -> tag_not_computed
+        | Error Taint_domain.Irrelevant -> tag_not_applicable
+        | Error Taint_domain.LogicError -> tag_error
+        | Ok Data -> tag_data_tainted
+        | Ok Control -> tag_control_tainted
+        | Ok None -> tag_untainted
+      end
+
+  let data = Request.dictionary ~package ~name:"taintStatus"
+      ~descr:(Markdown.plain "Taint status of logical properties") dictionary
+
+  include (val data : S with type t = taint_result)
+end
+
+
+let model = States.model ()
+
+let () = States.column model ~name:"priority"
+    ~descr:(Markdown.plain "Is the property invalid in some context \
+                            of the analysis?")
+    ~data:(module Data.Jbool)
+    ~get:(fun ip -> Red_statuses.is_red ip)
+
+let () = States.column model ~name:"taint"
+    ~descr:(Markdown.plain "Is the property tainted according to \
+                            the Eva taint domain?")
+    ~data:(module Taint)
+    ~get:(fun ip -> Taint_domain.is_tainted_property ip)
+
+let _array =
+  States.register_array
+    ~package
+    ~name:"properties"
+    ~descr:(Markdown.plain "Status of Registered Properties")
+    ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
+    ~keyType:Kernel_ast.Marker.jproperty
+    ~iter:Property_status.iter
+    model
+
+
+(* ----- Analysis statistics -------------------------------------------- *)
+
+module AlarmCategory = struct
+  open Server.Data
+
+  module Tags =
+  struct
+    let dictionary = Enum.dictionary ()
+
+    (* Give a normal representation of the category *)
+    let repr =
+      let e = List.hd Cil_datatype.Exp.reprs in
+      let lv = List.hd Cil_datatype.Lval.reprs in
+      function
+      | Summary.Division_by_zero -> Alarms.Division_by_zero e
+      | Memory_access -> Memory_access (lv, For_reading)
+      | Index_out_of_bound-> Index_out_of_bound (e, None)
+      | Invalid_shift -> Invalid_shift (e, None)
+      | Overflow -> Overflow (Signed, e, Integer.one, Lower_bound)
+      | Uninitialized -> Uninitialized lv
+      | Dangling -> Dangling lv
+      | Nan_or_infinite -> Is_nan_or_infinite (e, FFloat)
+      | Float_to_int -> Float_to_int (e, Integer.one, Lower_bound)
+      | Other -> assert false
+
+    let register alarm_category =
+      let name, descr = match alarm_category with
+        | Summary.Other -> "other", "Any other alarm"
+        | alarm_category ->
+          let alarm = repr alarm_category in
+          Alarms.(get_short_name alarm, get_description alarm)
+      in
+      Enum.tag dictionary
+        ~name
+        ~label:(Markdown.plain name)
+        ~descr:(Markdown.plain descr)
+
+    let division_by_zero = register Division_by_zero
+    let memory_access = register Memory_access
+    let index_out_of_bound = register Index_out_of_bound
+    let invalid_shift = register Invalid_shift
+    let overflow = register Overflow
+    let uninitialized = register Uninitialized
+    let dangling = register Dangling
+    let nan_or_infinite = register Nan_or_infinite
+    let float_to_int = register Float_to_int
+    let other = register Other
+
+    let () = Enum.set_lookup dictionary
+        begin function
+          | Summary.Division_by_zero -> division_by_zero
+          | Memory_access -> memory_access
+          | Index_out_of_bound -> index_out_of_bound
+          | Invalid_shift -> invalid_shift
+          | Overflow -> overflow
+          | Uninitialized -> uninitialized
+          | Dangling -> dangling
+          | Nan_or_infinite -> nan_or_infinite
+          | Float_to_int -> float_to_int
+          | Other -> other
+        end
+  end
+
+  let name = "alarmCategory"
+  let descr = Markdown.plain
+      "The alarms are counted after being grouped by these categories"
+  let data = Request.dictionary ~package ~name ~descr Tags.dictionary
+
+  include (val data : S with type t = Summary.alarm_category)
+end
+
+module Coverage =
+struct
+  open Summary
+  type t = coverage
+  let jtype = Package.(
+      Jrecord [
+        "reachable",Jnumber ;
+        "dead",Jnumber ;
+      ])
+  let to_json x = `Assoc [
+      "reachable", `Int x.reachable ;
+      "dead", `Int x.dead ;
+    ]
+end
+
+module Events =
+struct
+  open Summary
+  let jtype = Package.(
+      Jrecord [
+        "errors",Jnumber ;
+        "warnings",Jnumber ;
+      ])
+  let to_json x = `Assoc [
+      "errors", `Int x.errors ;
+      "warnings", `Int x.warnings ;
+    ]
+end
+
+module Statuses =
+struct
+  open Summary
+  type t = statuses
+  let jtype =
+    Data.declare ~package
+      ~name:"statusesEntry"
+      ~descr:(Markdown.plain "Statuses count.")
+      Package.(Jrecord [
+          "valid",Jnumber ;
+          "unknown",Jnumber ;
+          "invalid",Jnumber ;
+        ])
+  let to_json x = `Assoc [
+      "valid", `Int x.valid ;
+      "unknown", `Int x.unknown ;
+      "invalid", `Int x.invalid ;
+    ]
+end
+
+module AlarmEntry =
+struct
+  let jtype =
+    Data.declare ~package
+      ~name:"alarmEntry"
+      ~descr:(Markdown.plain "Alarm count for each alarm category.")
+      Package.(Jrecord [
+          "category", AlarmCategory.jtype ;
+          "count", Jnumber ])
+  let to_json (a,c) =  `Assoc [
+      "category", AlarmCategory.to_json a ;
+      "count", `Int c ]
+end
+
+module Alarms =
+struct
+  type t = (AlarmCategory.t * int) list
+  let jtype = Package.Jlist AlarmEntry.jtype
+  let to_json x = `List (List.map AlarmEntry.to_json x)
+end
+
+module Statistics = struct
+  open Summary
+  type t = program_stats
+  let jtype =
+    Data.declare ~package
+      ~name:"programStatsType"
+      ~descr:(Markdown.plain "Statistics about an Eva analysis.")
+      Package.(Jrecord [
+          "progFunCoverage",Coverage.jtype ;
+          "progStmtCoverage",Coverage.jtype ;
+          "progAlarms", Alarms.jtype ;
+          "evaEvents",Events.jtype ;
+          "kernelEvents",Events.jtype ;
+          "alarmsStatuses",Statuses.jtype ;
+          "assertionsStatuses",Statuses.jtype ;
+          "precondsStatuses",Statuses.jtype ])
+  let to_json x = `Assoc [
+      "progFunCoverage", Coverage.to_json x.prog_fun_coverage ;
+      "progStmtCoverage", Coverage.to_json x.prog_stmt_coverage ;
+      "progAlarms", Alarms.to_json x.prog_alarms ;
+      "evaEvents", Events.to_json x.eva_events ;
+      "kernelEvents", Events.to_json x.kernel_events ;
+      "alarmsStatuses", Statuses.to_json x.alarms_statuses ;
+      "assertionsStatuses", Statuses.to_json x.assertions_statuses ;
+      "precondsStatuses", Statuses.to_json x.preconds_statuses ]
+end
+
+let _computed_signal =
+  States.register_value ~package
+    ~name:"programStats"
+    ~descr:(Markdown.plain
+              "Statistics about the last Eva analysis for the whole program")
+    ~output:(module Statistics)
+    ~get:Summary.compute_stats
+    ~add_hook:(Analysis.register_computation_hook ~on:Computed)
+    ()
+
+let _array =
+  let open Summary in
+  let model = States.model () in
+
+  States.column model ~name:"coverage"
+    ~descr:(Markdown.plain "Coverage of the Eva analysis")
+    ~data:(module Coverage)
+    ~get:(fun (_kf,stats) -> stats.fun_coverage);
+
+  States.column model ~name:"alarmCount"
+    ~descr:(Markdown.plain "Alarms raised by the Eva analysis by category")
+    ~data:(module Alarms)
+    ~get:(fun (_kf,stats) -> stats.fun_alarm_count);
+
+  States.column model ~name:"alarmStatuses"
+    ~descr:(Markdown.plain "Alarms statuses emitted by the Eva analysis")
+    ~data:(module Statuses)
+    ~get:(fun (_kf,stats) -> stats.fun_alarm_statuses);
+
+  States.register_array
+    ~package
+    ~name:"functionStats"
+    ~descr:(Markdown.plain
+              "Statistics about the last Eva analysis for each function")
+    ~key:(fun (fundec,_stats) -> fundec.svar.vname)
+    ~keyType:Kernel_ast.Fundec.jtype
+    ~iter:(fun f -> FunctionStats.iter (fun fundec s -> f (fundec,s)))
+    ~add_update_hook:FunctionStats.register_hook
+    model
+
 
 (**************************************************************************)

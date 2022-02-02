@@ -23,12 +23,12 @@ Assume {
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
-  (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
-  (* Invariant 'ok,id_max' *)
-  Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,id_min' *)
   Have: 0 <= i.
+  (* Invariant 'ok,id_max' *)
+  Have: if (0 <= n) then (i <= n) else (i <= 0).
+  (* Invariant 'ok,inv' *)
+  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
   (* Else *)
   Have: n <= i.
   (* Call 'f' *)
@@ -49,16 +49,18 @@ Assume {
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
-  (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
-  (* Invariant 'ok,id_max' *)
-  Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,id_min' *)
   Have: 0 <= i.
+  (* Invariant 'ok,id_max' *)
+  Have: if (0 <= n) then (i <= n) else (i <= 0).
+  (* Invariant 'ok,inv' *)
+  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
   (* Then *)
   Have: i < n.
   (* Call 'g' *)
   Have: L_call_obs(call_seq_3) = [ x ] ^ a ^ [ y ].
+  (* Invariant 'ok,id_min' *)
+  Have: (-1) <= i.
 }
 Prove: 0 <= n.
 
@@ -80,12 +82,12 @@ Assume {
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
-  (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
-  (* Invariant 'ok,id_max' *)
-  Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,id_min' *)
   Have: 0 <= i.
+  (* Invariant 'ok,id_max' *)
+  Have: if (0 <= n) then (i <= n) else (i <= 0).
+  (* Invariant 'ok,inv' *)
+  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
   (* Then *)
   Have: i < n.
   (* Call 'g' *)
@@ -112,16 +114,20 @@ Assume {
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
-  (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
-  (* Invariant 'ok,id_max' *)
-  Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,id_min' *)
   Have: 0 <= i.
+  (* Invariant 'ok,id_max' *)
+  Have: i <= n.
+  (* Invariant 'ok,inv' *)
+  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
   (* Then *)
   Have: i < n.
   (* Call 'g' *)
   Have: L_call_obs(call_seq_3) = [ x ] ^ a ^ [ y ].
+  (* Invariant 'ok,id_min' *)
+  Have: (-1) <= i.
+  (* Invariant 'ok,id_max' *)
+  Have: 0 <= n.
 }
 Prove: ([ y ] *^ x_1) = a ^ [ y ].
 
@@ -187,12 +193,12 @@ Assume {
   Have: 0 < n.
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
-  (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
-  (* Invariant 'ok,id_max' *)
-  Have: i <= n.
   (* Invariant 'ok,id_min' *)
   Have: 0 <= i.
+  (* Invariant 'ok,id_max' *)
+  Have: i <= n.
+  (* Invariant 'ok,inv' *)
+  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
   (* Else *)
   Have: n <= i.
   (* Call 'f' *)
@@ -223,12 +229,12 @@ Assume {
   Have: n <= 0.
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
-  (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
-  (* Invariant 'ok,id_max' *)
-  Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,id_min' *)
   Have: 0 <= i.
+  (* Invariant 'ok,id_max' *)
+  Have: if (0 <= n) then (i <= n) else (i <= 0).
+  (* Invariant 'ok,inv' *)
+  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
   (* Else *)
   Have: n <= i.
   (* Call 'f' *)
@@ -251,12 +257,12 @@ Assume {
   Have: n <= 0.
   (* Call 'f' *)
   Have: L_call_obs(call_seq_1) = [ x ].
-  (* Invariant 'ok,inv' *)
-  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
-  (* Invariant 'ok,id_max' *)
-  Have: if (0 <= n) then (i <= n) else (i <= 0).
   (* Invariant 'ok,id_min' *)
   Have: 0 <= i.
+  (* Invariant 'ok,id_max' *)
+  Have: if (0 <= n) then (i <= n) else (i <= 0).
+  (* Invariant 'ok,inv' *)
+  Have: L_call_obs(call_seq_2) = [ x ] ^ a.
   (* Else *)
   Have: n <= i.
   (* Call 'f' *)
@@ -278,7 +284,7 @@ Goal Post-condition 'ok,m2' in 'no_calls':
 Assume {
   (* Heap *)
   Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: length(L_call_nil) = 0.
@@ -294,7 +300,7 @@ Goal Post-condition 'ok,n2' in 'no_calls':
 Assume {
   (* Heap *)
   Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: L_call_nil = nil.
@@ -305,7 +311,7 @@ Goal Post-condition 'ok,n3' in 'no_calls':
 Assume {
   (* Heap *)
   Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: L_call_nil = nil.
@@ -319,7 +325,7 @@ Assume {
   Type: is_sint32(call_seq_0).
   (* Goal *)
   When: 0 <= a.
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: (L_call_nil = nil) \/ (a <= 0).
@@ -336,7 +342,7 @@ Assume {
   Type: is_sint32(a).
   (* Heap *)
   Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: (L_call_nil = nil) \/ (a <= 0).

@@ -7,11 +7,14 @@ The procedure for creating the source distribution.
 \begin{itemize}
 \item All tools needed to compile Frama-C (that you should have anyways)
 \item \texttt{bash} v4.0 or higher
-\item \texttt{rgrep}
 \item \texttt{git-lfs}
 \item GNU \texttt{parallel}
-\item a \TeX distribution
+\item a \TeX distribution (e.g. \TeX{}live),
+including notably the following utilities:
+\begin{itemize}
+\item \texttt{latexmk}
 \item (recommended) \texttt{texfot}
+\end{itemize}
 \end{itemize}
 
 \section{Final checks}
@@ -19,7 +22,7 @@ The procedure for creating the source distribution.
 \begin{itemize}
 
 \item Check plug-in dependencies in all \texttt{configure.*}, in case they have
-  changed: if you don't know them, ask to plug-in developers to verify them.
+  changed: if you don't know them, ask plug-in developers to verify them.
 
 \todo{should be done when the plugin is modified}
 
@@ -31,7 +34,8 @@ The procedure for creating the source distribution.
 
 \item Check the contents of \texttt{INSTALL.md} \todo{Should always be up to date}
   \begin{itemize}
-  \item In particular, check and update a full known good configuration for
+    \item Update the Frama-C version number in the `Reference configuration` section
+    \item In particular, check and update a full known good configuration for
     opam packages, including alt-ergo, why3, coq, etc.
     Use \verb+bin/check-reference-configuration.sh+ to help check if the
     configuration is ok. You can also try running
@@ -54,7 +58,7 @@ There are many administrative steps, coordinated by the release manager.
   (\url{git@github.com:acsl-language/acsl.git}) in the \texttt{doc}
   directory
 \item Update files \texttt{VERSION} and \texttt{VERSION\_CODENAME}
-  (for beta releases, add suffix \texttt{-beta})
+  (for beta releases, add suffix \texttt{\textasciitilde{}beta})
 \item [{\em Non-beta only}] Update file \texttt{ALL\_VERSIONS}. \todo{This section must be put somewhere else in the release manual}
 \item Update files
   \texttt{src/plugins/wp/Changelog} and
@@ -65,11 +69,21 @@ There are many administrative steps, coordinated by the release manager.
   % and check its contents.
 \item Update the Frama-C's authors list in files
   \texttt{src/plugins/gui/help\_manager.ml} and \texttt{opam/opam}.
+  Traditionally, an author is added if they have contributed 100+ LoC in
+  the release, as counted by:
+  \begin{verbatim}
+  git ls-files | \
+  xargs -n1 git blame --line-porcelain | \
+  sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
+  \end{verbatim}
+  (source for the command: \url{https://gist.github.com/amitchhajer/4461043})
 \item Recompile and test to check that all is fine.
 \item Check the documentation as per Section~\ref{update_doc}
 \item update the \texttt{opam} directory: update the version name and
   version number in the fields \texttt{version}, \texttt{doc} and
-  \texttt{depends} in \texttt{opam/opam}
+  \texttt{depends} in \texttt{opam/opam}. \textbf{NB:} for a beta version, be sure
+  to use a tilde \textasciitilde{} between the version number and \texttt{beta},
+  and not a dash \texttt{-}.
 \item Create the last commit
 \item Create the tag using \texttt{git tag \$(cat VERSION)} and push it (e.g. via \texttt{git push origin \$(cat VERSION)})
 \end{enumerate}
@@ -320,8 +334,20 @@ Please check that the distribution (sources and API) is OK:
   \texttt{/home/user/git/frama-c}. It should appear nowhere in the archive.
 \item check that \texttt{./configure \&\& make -j \&\& sudo make install} works fine
   (or check e.g. \texttt{./configure --prefix=\$PWD/build \&\& make -j \&\& make install});
+\item Alternatively, you can use \texttt{docker} to compile the archive against a
+  precise configuration:
+  \begin{itemize}
+    \item \verb+cp distributed/frama-c-<VERSION>.tar.gz developer_tools/docker+
+    \item \verb+cd developer_tools/docker+
+    \item \verb+make Dockerfile.dev+
+    \item \verb+docker build . -t framac/frama-c:dev --target frama-c-gui-slim \+\\
+          \verb+  -f Dockerfile.dev --build-arg=from_archive=frama-c-<VERSION>.tar.gz+
+    \end{itemize}
 \item test the installed binaries (especially the GUI). (On Linux, OCI tests
-  everything but the GUI);
+  everything but the GUI); If you've taken the \texttt{docker} route, you might
+  want to install the \href{https://github.com/mviereck/x11docker}{\texttt{x11docker}} script,
+  in order to be able to launch
+  \verb+x11docker framac/frama-c:dev frama-c-gui+
 \item redo the two steps above on Windows/WSL \expertise{André}\expertise{Allan},
   macOS \expertise{André}\expertise{Loïc}\\\expertise{Thibaud};
   \begin{itemize}
@@ -329,7 +355,7 @@ Please check that the distribution (sources and API) is OK:
   \item \verb+./configure --prefix="$PWD/build"+
   \item \verb+make+;
   \item \verb+make install+;
-  \item \verb+rm -f ~/.why3.conf; why3 config --detect+;
+  \item \verb+rm -f ~/.why3.conf; why3 config detect+;
   \item \verb+build/bin/frama-c tests/idct/*.c -eva -wp -wp-rte+
   \item If you have a GUI, replace \verb+frama-c+ above with \verb+frama-c-gui+
     and click around, see if things work (e.g. no segmentation faults).

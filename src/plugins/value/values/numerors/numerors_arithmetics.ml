@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -331,16 +331,16 @@ module Exact : Arithmetic with type forward = I.t = struct
       I.narrow x.exact (I.neg r.exact)
 
     let add x y r = [x ; y ; r] >>+ fun _ ->
-      I.backward_add ~prec:P.Real ~left:x.exact ~right:y.exact ~result:r.exact
+      I.backward_add ~prec:P.Real ~left:x.exact ~right:y.exact ~result:r.exact ()
 
     let sub x y r = [x ; y ; r] >>+ fun _ ->
-      I.backward_sub ~prec:P.Real ~left:x.exact ~right:y.exact ~result:r.exact
+      I.backward_sub ~prec:P.Real ~left:x.exact ~right:y.exact ~result:r.exact ()
 
     let mul x y r = [x ; y ; r] >>+ fun _ ->
-      I.backward_mul ~prec:P.Real ~left:x.exact ~right:y.exact ~result:r.exact
+      I.backward_mul ~prec:P.Real ~left:x.exact ~right:y.exact ~result:r.exact ()
 
     let div x y r = [x ; y ; r] >>+ fun _ ->
-      I.backward_div ~prec:P.Real ~left:x.exact ~right:y.exact ~result:r.exact
+      I.backward_div ~prec:P.Real ~left:x.exact ~right:y.exact ~result:r.exact ()
 
   end
 
@@ -378,16 +378,16 @@ module Approx : Arithmetic with type forward = I.t = struct
       I.narrow x.approx (I.neg r.approx)
 
     let add x y r = [x ; y ; r] >>+ fun prec ->
-      I.backward_add ~prec ~left:x.approx ~right:y.approx ~result:r.approx
+      I.backward_add ~prec ~left:x.approx ~right:y.approx ~result:r.approx ()
 
     let sub x y r = [x ; y ; r] >>+ fun prec ->
-      I.backward_sub ~prec ~left:x.approx ~right:y.approx ~result:r.approx
+      I.backward_sub ~prec ~left:x.approx ~right:y.approx ~result:r.approx ()
 
     let mul x y r = [x ; y ; r] >>+ fun prec ->
-      I.backward_mul ~prec ~left:x.approx ~right:y.approx ~result:r.approx
+      I.backward_mul ~prec ~left:x.approx ~right:y.approx ~result:r.approx ()
 
     let div x y r = [x ; y ; r] >>+ fun prec ->
-      I.backward_div ~prec ~left:x.approx ~right:y.approx ~result:r.approx
+      I.backward_div ~prec ~left:x.approx ~right:y.approx ~result:r.approx ()
 
   end
 

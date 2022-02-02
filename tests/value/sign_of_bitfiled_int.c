@@ -1,8 +1,8 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST" 
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST"
    OPT: -machdep ppc_32 -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST"
 */
-
 
 #ifndef PTEST
 #include <stdio.h>

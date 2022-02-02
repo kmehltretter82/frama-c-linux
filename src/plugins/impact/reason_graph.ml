@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -57,8 +57,6 @@ module Reason =
     (struct let module_name = "Impact.Reason_graph.Reason.t" end)
 
 type reason_graph = Reason.Set.t
-
-(** Map from a node to the kernel_function it belongs to *)
 
 type nodes_origin = Cil_types.kernel_function PdgTypes.Node.Map.t
 
@@ -217,7 +215,7 @@ let print_dot_graph reason =
       (Printexc.to_string exn)
 
 (* Very basic textual debugging function *)
-let print_reason reason =
+let _print_reason reason =
   let pp_node = !Db.Pdg.pretty_node false in
   let pp fmt (nsrc, ndst, reason) =
     Format.fprintf fmt "@[<v 2>%a -> %a (%s)@]"

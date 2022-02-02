@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -111,7 +111,7 @@ let tgr_buffer = 3145728 (* elasticity (internal overhead) *)
 
 type buffer = {
   mutable formatter : Format.formatter ; (* formatter on self (recursive) *)
-  mutable content : Buffer.t ;
+  content : Buffer.t ;
   mutable revtags : tag list ; (* in reverse order *)
   mutable stack : (int * tag list) list ; (* opened tag positions *)
 }

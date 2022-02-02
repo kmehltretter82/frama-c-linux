@@ -1,7 +1,16 @@
 /* run.config
+<<<<<<< HEAD
    MODULE: @PTEST_NAME@
  EXIT: 1
    STDOPT:
+||||||| 754e522ceb
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   STDOPT: +"-no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs"
+=======
+ MODULE: @PTEST_NAME@
+ EXIT: 1
+   STDOPT: +"-no-autoload-plugins"
+>>>>>>> origin/master
 */
 
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -99,6 +99,7 @@ val logic_constant : logic_constant -> term
 val constant_exp : exp -> term
 val constant_term : Cil_types.term -> term
 
+val always_initialized: varinfo -> bool
 val initialized_obj: c_object -> term
 val uninitialized_obj: c_object -> term
 

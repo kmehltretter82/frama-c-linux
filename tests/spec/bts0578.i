@@ -1,6 +1,6 @@
 /* run.config
-   MODULE: @PTEST_NAME@
-   OPT: -print
+ MODULE: @PTEST_NAME@
+   OPT: -print -no-autoload-plugins
 */
 
 /*@ behavior foo: ensures \true; */

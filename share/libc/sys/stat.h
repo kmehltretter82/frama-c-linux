@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -30,8 +30,11 @@ __BEGIN_DECLS
 #include "../__fc_string_axiomatic.h"
 
 extern int    chmod(const char *, mode_t);
+extern int    fchmodat(int fd, const char *path, mode_t mode, int flag);
 extern int    fchmod(int, mode_t);
 extern int    fstat(int, struct stat *);
+extern int    fstatat(int fd, const char *restrict path,
+                      struct stat *restrict buf, int flag);
 
 /*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG,
     //                               ENOENT, ENOMEM, ENOTDIR, EOVERFLOW,
@@ -95,6 +98,11 @@ extern int    stat(const char *pathname, struct stat *buf);
   assigns \result \from indirect:cmask;
 */
 extern mode_t umask(mode_t cmask);
+
+#define S_TYPEISMQ(buf) ((buf)->st_mode - (buf)->st_mode)
+#define S_TYPEISSEM(buf) ((buf)->st_mode - (buf)->st_mode)
+#define S_TYPEISSHM(buf) ((buf)->st_mode - (buf)->st_mode)
+#define S_TYPEISTMO(buf) (0)
 
 __END_DECLS
 __POP_FC_STDLIB

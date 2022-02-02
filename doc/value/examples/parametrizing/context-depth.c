@@ -1,4 +1,4 @@
-struct S { int v; struct S *next; };
+struct S { long v; struct S *next; };
 
 struct S s;
 

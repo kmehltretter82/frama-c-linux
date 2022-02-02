@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -87,13 +87,6 @@ val localizable_from_locs :
     visible in the current [Locs.state].
     This function is inefficient as it iterates on all the current
     [Locs.state]. *)
-
-val loc_to_localizable: ?precise_col:bool -> Filepath.position -> localizable option
-(** return the (hopefully) most precise localizable that contains the given
-    Filepath.position. If [precise_col] is [true], takes the column number into
-    account (possibly a more precise, but costly, result).
-    @since Nitrogen-20111001 *)
-
 
 (*
 Local Variables:

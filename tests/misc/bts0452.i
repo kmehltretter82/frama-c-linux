@@ -1,6 +1,6 @@
 /* run.config
-   MODULE: @PTEST_NAME@
-   OPT: -typecheck
+ MODULE: @PTEST_NAME@
+   OPT: -typecheck -no-autoload-plugins
 */
 /* must emit falls-through warning. */
 int f (int foo, char** args) {

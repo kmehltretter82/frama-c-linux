@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -106,6 +106,8 @@ let constant _ = function
 (* Extracting function pointers from an abstraction. Not implemented
    precisely *)
 let resolve_functions _ = `Top, true
+
+let replace_base _substitution t = t
 
 (** {2 Alarms} *)
 

@@ -1,5 +1,5 @@
 /* run.config*
-   PLUGIN: report @PTEST_PLUGIN@
+PLUGIN: report
  EXIT: 1
    OPT: -foobar -report-unclassified-error jazz
 */

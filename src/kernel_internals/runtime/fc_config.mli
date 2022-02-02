@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -56,20 +56,20 @@ val ocaml_wflags: string
 (** Warning flags used when compiling Frama-C.
     @since Chlorine-20180501 *)
 
-val datadirs: string list
+val datadirs: Filepath.Normalized.t list
 (** Directories where architecture independent files are in order of
     priority.
     @since 19.0-Potassium *)
 
-val datadir: string
+val datadir: Filepath.Normalized.t
   (** Last directory of datadirs (the directory of frama-c installation)
       @since 19.0-Potassium *)
 
-val framac_libc: string
+val framac_libc: Filepath.Normalized.t
   (** Directory where Frama-C libc headers are.
       @since 19.0-Potassium *)
 
-val plugin_dir: string list
+val plugin_dir: Filepath.Normalized.t list
 (** Directory where the Frama-C dynamic plug-ins are.
     @modify Magnesium-20151001 *)
 

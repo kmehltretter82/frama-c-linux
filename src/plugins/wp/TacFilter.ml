@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,7 +36,7 @@ class filter =
   object(self)
     inherit Tactical.make ~id:"Wp.filter"
         ~title:"Filter"
-        ~descr:"Erase Hypotheses"
+        ~descr:"Dependent Erasure of Hypotheses"
         ~params:[panti]
 
     method select feedback _sel =

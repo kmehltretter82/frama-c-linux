@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -289,7 +289,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
       | Field (fi, off) -> aux_offset fi.ftype off
       | Index (idx, off) -> begin
           match Cil.unrollType typ with
-          | TArray (typ_e, size, _, _) -> begin
+          | TArray (typ_e, size, _) -> begin
               aux_offset typ_e off;
               try
                 let size = Cil.lenOfArray64 size in

@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-rte-select fbug -rte -then -eva"
+   STDOPT: +"-rte-select fbug @RTE_TEST@ -then -eva"
 */
 
 int x1, y1, z1, z2; volatile int c, nondet;

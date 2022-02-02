@@ -1,7 +1,8 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: Off-by-one error where a pointer is made point to an adjacent block
    COMMENT: Note that this behaviour is not quaranteed by likely due to the
    COMMENT: way compiler allocates stack blocks
+   STDOPT: +"-eva-precision=1"
 */
 
 #include <stdint.h>
@@ -14,8 +15,8 @@ int main(void) {
      and that there is no gap betwee [arr] and [arr2]. This behaviour is
      compiler specific but still likely. At least this is the case for some
      current versions of GCC/Clang */
-  int arr  [] = {1, 2, 3, 4};
-  int arr2 [] = {1, 2, 3, 4};
+  int arr[] = {1, 2, 3, 4};
+  int arr2[] = {1, 2, 3, 4};
 
   /* Check that the above condition holds, otherwise there is no point
      having this test */

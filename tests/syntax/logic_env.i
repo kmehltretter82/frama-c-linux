@@ -1,6 +1,6 @@
 /* run.config
-MODULE: logic_env_script
-STDOPT: +"-no-print"
+ MODULE: logic_env_script
+   OPT: -no-autoload-plugins
 */
 
 //@ predicate foo(integer x) = x == 0;

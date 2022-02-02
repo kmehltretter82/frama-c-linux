@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of WP plug-in of Frama-C.                           #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat a l'energie atomique et aux energies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -61,31 +61,32 @@ PLUGIN_NAME:=Wp
 PLUGIN_CMO:= \
 	rformat wprop \
 	wp_parameters wp_error \
-	dyncall ctypes clabels \
 	Why3Provers \
-	Context Warning AssignsCompleteness MemoryContext wpContext \
+	Context Warning \
+	dyncall ctypes clabels \
+	AssignsCompleteness MemoryContext wpContext \
 	LogicUsage RefUsage \
 	Layout Region \
 	RegionAnnot RegionAccess RegionDump RegionAnalysis \
-	cil2cfg normAtLabels wpPropId wpStrategy mcfg \
+	normAtLabels wpPropId \
 	Lang Repr Matrix Passive Splitter \
 	LogicBuiltins Definitions \
 	Cmath Cint Cfloat Vset Vlist Cstring Cvalues \
 	Letify Cleaning \
-	Sigs Mstate Conditions \
+	Mstate Conditions \
 	Filtering \
 	Plang Pcfg Pcond \
 	CodeSemantics \
 	LogicCompiler \
 	LogicSemantics LogicAssigns  \
-	Sigma MemLoader \
+	Sigma MemLoader MemDebug \
 	MemEmpty MemZeroAlias MemVar \
-	MemMemory MemTyped MemRegion \
-	wpReached wpRTE wpAnnot wpTarget \
+	MemMemory MemTyped MemRegion MemVal \
+	wpReached wpRTE wpTarget \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
 	Footprint Tactical Strategy \
-	TacSplit TacChoice TacRange TacInduction \
+	TacClear TacSplit TacChoice TacRange TacInduction \
 	TacArray TacCompound TacUnfold \
 	TacHavoc TacInstance TacLemma \
 	TacFilter TacCut WpTac TacNormalForm \
@@ -96,11 +97,14 @@ PLUGIN_CMO:= \
 	ProverTask ProverErgo ProverCoq \
 	filter_axioms Cache ProverWhy3 \
 	driver prover ProverSearch ProverScript \
-	Generator Factory \
-	calculus cfgDump cfgWP \
-	register VC
+	Factory \
+	cfgInit cfgAnnot cfgInfos cfgCalculus \
+	cfgDump cfgWP \
+	cfgGenerator \
+	Generator register VC
 
-PLUGIN_CMI:=
+PLUGIN_CMI:= \
+  Sigs mcfg
 
 PLUGIN_GENERATED:= \
    $(PLUGIN_DIR)/script.ml \
@@ -234,16 +238,16 @@ WP_API_BASE= \
 	MemoryContext.mli \
 	LogicUsage.mli RefUsage.mli \
 	normAtLabels.mli \
-	wpPropId.mli mcfg.ml \
+	wpPropId.mli mcfg.mli \
 	Context.mli Warning.mli AssignsCompleteness.mli wpContext.mli \
 	Lang.mli Repr.mli Passive.mli Splitter.mli \
 	LogicBuiltins.mli Definitions.mli \
 	Cint.mli Cfloat.mli Vset.mli Cstring.mli \
-	Sigs.ml Mstate.mli Conditions.mli Filtering.mli \
+	Sigs.mli Mstate.mli Conditions.mli Filtering.mli \
 	Plang.mli Pcfg.mli Pcond.mli \
 	CodeSemantics.mli \
 	LogicCompiler.mli LogicSemantics.mli \
-	Sigma.mli MemVar.mli MemTyped.mli \
+	Sigma.mli MemVar.mli MemTyped.mli MemVal.mli \
 	CfgCompiler.mli StmtSemantics.mli \
 	Factory.mli driver.mli VCS.mli Tactical.mli Strategy.mli Auto.mli \
 	VC.mli wpo.mli ProverTask.mli prover.mli
@@ -320,7 +324,7 @@ clean::
 	rm -f $(Wp_DIR)/share/install.cm*
 
 $(Wp_DIR)/share/instwp: $(Wp_DIR)/share/install.ml
-	$(OCAMLC) $(WARNINGS) -o $@ unix.cma $^
+	$(OCAMLC) $(WARNINGS) -w -70 -o $@ unix.cma $^
 
 # --------------------------------------------------------------------------
 # --- Pre-Compiled Coq Libraries                                         ---

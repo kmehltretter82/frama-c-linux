@@ -1,7 +1,6 @@
 /* run.config
- PLUGIN:
  MODULE: @PTEST_NAME@
-  OPT:
+  OPT: -no-autoload-plugins
 */
 
 // Everything is done by the script

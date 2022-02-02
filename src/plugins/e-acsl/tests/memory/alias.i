@@ -2,8 +2,7 @@
    COMMENT: alias
 */
 
-void f(int* dest, int val)
-{
+void f(int *dest, int val) {
   int *ptr = dest;
   *ptr = val;
 }

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -74,9 +74,6 @@ val pp_global : Format.formatter -> Cil_types.global -> unit
 val pp_typ : Cil_types.typ Pretty_utils.formatter
 val pp_ikind : Format.formatter -> Cil_types.ikind -> unit
 val pp_fkind : Format.formatter -> Cil_types.fkind -> unit
-val pp_bitsSizeofTyp : Format.formatter -> Cil_types.bitsSizeofTyp -> unit
-val pp_bitsSizeofTypCache :
-  Format.formatter -> Cil_types.bitsSizeofTypCache -> unit
 val pp_attribute : Cil_types.attribute Pretty_utils.formatter
 val pp_attributes : Format.formatter -> Cil_types.attributes -> unit
 val pp_attrparam : Cil_types.attrparam Pretty_utils.formatter
@@ -158,7 +155,6 @@ val pp_funspec : Format.formatter -> Cil_types.funspec -> unit
 val pp_code_annotation : Cil_types.code_annotation Pretty_utils.formatter
 val pp_funbehavior : Format.formatter -> Cil_types.funbehavior -> unit
 val pp_global_annotation : Cil_types.global_annotation Pretty_utils.formatter
-val pp_custom_tree : Format.formatter -> Cil_types.custom_tree -> unit
 val pp_kinstr : Format.formatter -> Cil_types.kinstr -> unit
 val pp_cil_function : Format.formatter -> Cil_types.cil_function -> unit
 val pp_kernel_function : Format.formatter -> Cil_types.kernel_function -> unit

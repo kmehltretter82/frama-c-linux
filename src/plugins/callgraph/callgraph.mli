@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,15 +22,13 @@
 
 (** Callgraph plugin. *)
 
-module Options: module type of Options
-
-(* sig
- *   module Filename: Parameter_sig.String
- *   module Service_roots: Parameter_sig.Kernel_function_set
- *   module Uncalled: Parameter_sig.Bool
- *   module Uncalled_leaf: Parameter_sig.Bool
- *   module Services: Parameter_sig.Bool
- * end *)
+module Options: sig
+  module Filename: Parameter_sig.Filepath
+  module Service_roots: Parameter_sig.Kernel_function_set
+  module Uncalled: Parameter_sig.Bool
+  module Uncalled_leaf: Parameter_sig.Bool
+  module Services: Parameter_sig.Bool
+end
 
 module Cg: module type of Cg
 (** The callgraph itself *)

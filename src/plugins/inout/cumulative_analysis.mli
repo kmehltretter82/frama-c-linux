@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,10 +38,10 @@ val fold_implicit_initializer: typ -> bool
 
 
 val specialize_state_on_call: ?stmt:stmt -> kernel_function -> Db.Value.state
-  (** If the given statement is a call to the given function,
-      enrich the superposed memory state at this statement with
-      the formal arguments of this function. This is usually more precise
-      than the superposition of all initial states of the function  *)
+(** If the given statement is a call to the given function,
+    enrich the superposed memory state at this statement with
+    the formal arguments of this function. This is usually more precise
+    than the superposition of all initial states of the function  *)
 
 
 (** Frama-C visitor for cumulative analyses: we add a few useful methods.
@@ -51,17 +51,17 @@ class virtual ['a] cumulative_visitor : object
   inherit Visitor.frama_c_inplace
 
   method specialize_state_on_call: kernel_function -> Db.Value.state
-    (** If the current statement is a call to the given function,
-        enrich the superposed memory state at this statement with
-        the formal arguments of this function. Useful to do an analysis
-        with a limited amount of context *)
-  
+  (** If the current statement is a call to the given function,
+      enrich the superposed memory state at this statement with
+      the formal arguments of this function. Useful to do an analysis
+      with a limited amount of context *)
+
 
   method virtual compute_kf: kernel_function -> 'a
-    (** Virtual function to use when one needs to compute the effect
-        of a function call. This function carries implicitly a context:
-        thus calling [self#compute_kf k1; self#compute_kf k2]
-        is different from calling one within the other *)
+  (** Virtual function to use when one needs to compute the effect
+      of a function call. This function carries implicitly a context:
+      thus calling [self#compute_kf k1; self#compute_kf k2]
+      is different from calling one within the other *)
 end
 
 
@@ -72,7 +72,7 @@ class type virtual ['a] cumulative_class = object
 
   (** Result of the analysis *)
   method result: 'a
-    (** Adding partial results to the current ones *)
+  (** Adding partial results to the current ones *)
   method join: 'a -> unit
 
   (** Function that computes and returns the partial results on a funspec.
@@ -90,17 +90,17 @@ end
 
 
 module Make (X:
-  sig
-    val analysis_name: string
+             sig
+               val analysis_name: string
 
-    (** Type of the results *)
-    type t
-    module T: Datatype.S with type t = t
+               (** Type of the results *)
+               type t
+               module T: Datatype.S with type t = t
 
-    (** Class that implements the analysis. Must not deal with memoization,
-        as this is automatically done by the functor *)
-    class virtual do_it: [t] cumulative_class
-  end) :
+               (** Class that implements the analysis. Must not deal with memoization,
+                   as this is automatically done by the functor *)
+               class virtual do_it: [t] cumulative_class
+             end) :
 sig
 
   (** Module that contains the memoized results *)
@@ -110,17 +110,17 @@ sig
       Recursion in the dynamic call graphs are handled, provided the value
       analysis terminated without detecting a real recursion *)
   class do_it_cached: Kernel_function.t list ->
-  object
-    inherit X.do_it
+    object
+      inherit X.do_it
 
-    (** Internal methods that gives the functions for which a cycle
-        has been detected in the dynamic call-graph. Results cannot
-        be safely memoized if this set is not empty *)
-    method cycle: Kernel_function.Hptset.t
+      (** Internal methods that gives the functions for which a cycle
+          has been detected in the dynamic call-graph. Results cannot
+          be safely memoized if this set is not empty *)
+      method cycle: Kernel_function.Hptset.t
 
-    (** Memoized version of the analysis of a kernel-function *)
-    method compute_kf: kernel_function -> X.t
-  end
+      (** Memoized version of the analysis of a kernel-function *)
+      method compute_kf: kernel_function -> X.t
+    end
 
   (** Effects of the given kernel_function, using memoization *)
   val kernel_function: kernel_function -> X.t

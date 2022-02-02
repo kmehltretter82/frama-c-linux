@@ -1,10 +1,10 @@
 /* run.config*
  EXIT: 1
+ PLUGIN: eva
    OPT: -eva @EVA_CONFIG@ -main main1
    OPT: -eva @EVA_CONFIG@ -main main2
 */
 struct s;
-
 struct s s;
 
 void f(struct s) { // Argument has unknown size

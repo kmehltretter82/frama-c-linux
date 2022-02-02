@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,14 +38,6 @@ let offsetmap_of_loc location state =
     Bottom.join Cvalue.V_Offsetmap.join copy offsm_res
   in
   Precise_locs.fold aux location `Bottom
-
-let wrap_int i = Some (offsetmap_of_v ~typ:Cil.intType i)
-let wrap_ptr p = Some (offsetmap_of_v ~typ:Cil.intPtrType p)
-let wrap_double d = Some (offsetmap_of_v ~typ:Cil.doubleType d)
-let wrap_float d = Some (offsetmap_of_v ~typ:Cil.floatType d)
-let wrap_size_t i =
-  Some (offsetmap_of_v ~typ:(Cil.theMachine.Cil.typeOfSizeOf) i)
-let wrap_long_long i = Some (offsetmap_of_v ~typ:Cil.longLongType i)
 
 let v_uninit_of_offsetmap ~typ offsm =
   let size = Eval_typ.sizeof_lval_typ typ in
@@ -135,30 +127,22 @@ let reduce_by_initialized_defined f loc state =
     state
 
 let reduce_by_valid_loc ~positive access loc typ state =
-  try
-    let value = Cvalue.Model.find state loc in
-    if Cvalue.V.is_imprecise value then
-      (* we won't reduce anything anyway, and we may lose information if loc
-         contains misaligned data *)
-      raise Exit;
-    let loc_bits = Locations.loc_bytes_to_loc_bits value in
-    let size = Bit_utils.sizeof_pointed typ in
-    let value_as_loc = Locations.make_loc loc_bits size in
-    let reduced_value =
-      Locations.loc_to_loc_without_size
-        (if positive
-         then Locations.valid_part access value_as_loc
-         else Locations.invalid_part value_as_loc )
-    in
-    if V.equal value reduced_value
-    then state
-    else begin
-      if V.equal V.bottom reduced_value
-      then Cvalue.Model.bottom
-      else
-        Cvalue.Model.reduce_previous_binding state loc reduced_value
-    end
-  with Exit -> state
+  let value = Cvalue.Model.find state loc in
+  let loc_bits = Locations.loc_bytes_to_loc_bits value in
+  let size = Bit_utils.sizeof_pointed typ in
+  let value_as_loc = Locations.make_loc loc_bits size in
+  let reduced_value =
+    Locations.loc_to_loc_without_size
+      (if positive
+       then Locations.valid_part access value_as_loc
+       else Locations.invalid_part value_as_loc )
+  in
+  if V.equal value reduced_value
+  then state
+  else
+  if V.equal V.bottom reduced_value
+  then Cvalue.Model.bottom
+  else Cvalue.Model.reduce_previous_binding state loc reduced_value
 
 let make_loc_contiguous loc =
   try
@@ -182,14 +166,20 @@ let apply_on_all_locs f loc state =
   match loc.Locations.size with
   | Int_Base.Top -> state
   | Int_Base.Value _ as size ->
-    try
-      let loc = Locations.valid_part Locations.Read loc in
-      let loc = loc.Locations.loc in
-      let plevel = Value_parameters.ArrayPrecisionLevel.get() in
-      ignore (Locations.Location_Bits.cardinal_less_than loc plevel);
-      Locations.Location_Bits.fold_enum
-        (fun l acc -> f (Locations.make_loc l size) acc) loc state
-    with Not_less_than | Abstract_interp.Error_Top -> state
+    let loc = Locations.valid_part Locations.Read loc in
+    let plevel = Value_parameters.ArrayPrecisionLevel.get () in
+    let ilevel = Int_set.get_small_cardinal () in
+    let limit = max plevel ilevel in
+    let apply_f base ival state =
+      f Locations.(make_loc (Location_Bits.inject base ival) size) state
+    in
+    let aux base ival state =
+      if Ival.cardinal_is_less_than ival limit
+      then Ival.fold_enum (fun i acc -> apply_f base i acc) ival state
+      else state
+    in
+    try Locations.Location_Bits.fold_i aux loc.loc state
+    with Abstract_interp.Error_Top -> state
 
 (* Display [o] as a single value, when this is more readable and more precise
    than the standard display. *)

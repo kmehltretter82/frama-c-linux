@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,8 +25,8 @@
 open Cil_types
 open PdgIndex
 
-type nodes_and_undef = 
-    (PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option
+type nodes_and_undef =
+  (PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option
 
 let get_init_state pdg =
   try Pdg_state.get_init_state (PdgTypes.Pdg.get_states pdg)
@@ -43,21 +43,21 @@ let get_stmt_state pdg stmt =
 let find_node pdg key = FctIndex.find_info (PdgTypes.Pdg.get_index pdg) key
 
 (** notice that there can be several nodes if the statement is a call.
-* For If, Switch, ... the node represent only the condition
-* (see find_stmt_nodes below).
+ * For If, Switch, ... the node represent only the condition
+ * (see find_stmt_nodes below).
 *)
 let find_simple_stmt_nodes pdg stmt =
   let idx = PdgTypes.Pdg.get_index pdg in
   let key = Key.stmt_key stmt in
   (* The call below can raise Not_found if the statement is unreachable *)
   let nodes = FctIndex.find_all idx key in
-    match stmt.skind with
-      | Return _ -> (* also add OutRet *)
-          (try
-            let ret = FctIndex.find_all idx Key.output_key in
-              ret @ nodes
-          with Not_found -> nodes)
-      | _ -> nodes
+  match stmt.skind with
+  | Return _ -> (* also add OutRet *)
+    (try
+       let ret = FctIndex.find_all idx Key.output_key in
+       ret @ nodes
+     with Not_found -> nodes)
+  | _ -> nodes
 
 let rec add_stmt_nodes pdg nodes s =
   let s_nodes =
@@ -76,21 +76,21 @@ let rec add_stmt_nodes pdg nodes s =
   in
   match s.skind with
   | Switch (_,blk,_,_) | Loop (_, blk, _, _, _) | Block blk ->
-      Pdg_parameters.debug ~level:2
-        "   select_stmt_computation on composed stmt %d@." s.sid;
-      add_block_stmts_nodes nodes blk
+    Pdg_parameters.debug ~level:2
+      "   select_stmt_computation on composed stmt %d@." s.sid;
+    add_block_stmts_nodes nodes blk
   | UnspecifiedSequence seq ->
-      Pdg_parameters.debug ~level:2
-        "   select_stmt_computation on composed stmt %d@." s.sid;
-      add_block_stmts_nodes nodes (Cil.block_from_unspecified_sequence seq)
+    Pdg_parameters.debug ~level:2
+      "   select_stmt_computation on composed stmt %d@." s.sid;
+    add_block_stmts_nodes nodes (Cil.block_from_unspecified_sequence seq)
   | If (_,bthen,belse,_) ->
-      let nodes = add_block_stmts_nodes nodes bthen in
-      add_block_stmts_nodes nodes belse
+    let nodes = add_block_stmts_nodes nodes bthen in
+    add_block_stmts_nodes nodes belse
   | _ -> nodes
 
 (** notice that there can be several nodes if the statement is a call.
-* If the stmt is a composed instruction (block, etc), all the nodes of the
-* enclosed statements are considered.
+ * If the stmt is a composed instruction (block, etc), all the nodes of the
+ * enclosed statements are considered.
 *)
 let find_stmt_and_blocks_nodes pdg stmt =
   add_stmt_nodes pdg [] stmt
@@ -111,14 +111,14 @@ let find_loc_nodes pdg state loc =
       let init_nodes, init_undef = Pdg_state.get_loc_nodes state undef in
       let init_nodes = match loc with
         | Locations.Zone.Top(_,_) ->
-            begin
-              try (find_top_input_node pdg, None)::init_nodes
-              with Not_found -> init_nodes
-            end
+          begin
+            try (find_top_input_node pdg, None)::init_nodes
+            with Not_found -> init_nodes
+          end
         | _ -> init_nodes
       in
       let nodes = List.fold_left (fun acc n -> n::acc) nodes init_nodes in
-        nodes, init_undef
+      nodes, init_undef
     | None -> nodes, undef
   in
   nodes, undef
@@ -143,17 +143,17 @@ let find_location_nodes_at_stmt pdg stmt ~before loc =
     else match stmt.skind, stmt.succs with
       | Return _, [] -> get_nodes (get_last_state pdg)
       | _, [] -> (* no successors but not a return => unreachable *)
-          raise Not_found
+        raise Not_found
       | _, succs ->
-          get_stmts_nodes succs
+        get_stmts_nodes succs
   in nodes, undef_zone
 
 let find_location_nodes_at_end pdg loc =
   find_loc_nodes pdg (get_last_state pdg) loc
 
 (* be careful that begin is different from init because
-* init_state only contains implicit inputs
-* while begin contains only formal arguments *)
+ * init_state only contains implicit inputs
+ * while begin contains only formal arguments *)
 let find_location_nodes_at_begin pdg loc =
   let kf =  PdgTypes.Pdg.get_kf pdg in
   let stmts =
@@ -241,8 +241,8 @@ let add_node_in_list node node_list =
   else (node :: node_list), true
 
 (** add the node to the list. It it wasn't already in the list,
-* recursively call the same function on the successors or/and predecessors
-* according to the flags. *)
+ * recursively call the same function on the successors or/and predecessors
+ * according to the flags. *)
 let rec add_node_and_custom_dpds get_dpds node_list node =
   let node_list, added = add_node_in_list node node_list in
   if added
@@ -250,9 +250,9 @@ let rec add_node_and_custom_dpds get_dpds node_list node =
     let is_block = match PdgTypes.Node.elem_key node with
       | Key.SigKey (PdgIndex.Signature.In PdgIndex.Signature.InCtrl) -> true
       | Key.Stmt stmt ->
-          (match stmt.skind with
-               Block _ | UnspecifiedSequence _ -> true
-             | _ -> false)
+        (match stmt.skind with
+           Block _ | UnspecifiedSequence _ -> true
+         | _ -> false)
       | _ -> false
     in
     if is_block
@@ -275,7 +275,7 @@ let filter_nodes l =  List.map (fun (n,_) -> n) l
 
 (** gives the list of nodes that the given node depends on,
     without looking at the kind of dependency. *)
-let direct_dpds pdg node = 
+let direct_dpds pdg node =
   filter_nodes (PdgTypes.Pdg.get_all_direct_dpds pdg node)
 
 (** gives the list of nodes that the given node depends on,
@@ -311,7 +311,7 @@ let find_nodes_all_addr_dpds = find_nodes_all_x_dpds PdgTypes.Dpd.Addr
 (** {3 Forward} build sets of the nodes that depend on given nodes *)
 
 (** @return the list of nodes that directly depend on the given node *)
-let direct_uses pdg node = 
+let direct_uses pdg node =
   filter_nodes (PdgTypes.Pdg.get_all_direct_codpds pdg node)
 
 let direct_x_uses dpd_type pdg node =
@@ -343,7 +343,7 @@ let node_set_of_list l =
     intersects [called_selected_nodes]. *)
 let find_call_out_nodes_to_select
     pdg_called called_selected_nodes pdg_caller call_stmt
-    =
+  =
   Pdg_parameters.debug ~level:2
     "[pdg:find_call_out_nodes_to_select] for call sid:%d@."
     call_stmt.sid;
@@ -385,7 +385,7 @@ let find_in_nodes_to_select_for_this_call
         caller_nodes
     in
     if intersect then begin
-      Pdg_parameters.debug ~level:2 "\t+ %a@." 
+      Pdg_parameters.debug ~level:2 "\t+ %a@."
         PdgTypes.Node.pretty in_node;
       in_node::acc
     end else

@@ -1,13 +1,12 @@
 /* run.config
- COMMENT: dependency to FRAMA-C share directory is implicit
- MACRO: LIBC @FRAMAC_SHARE@/libc
- CMD: @frama-c-cmd@ @PTEST_OPTIONS@
-  OPT: @LIBC@/string.h @PTEST_FILE@ @PTEST_FILE@ -print
-  OPT: @PTEST_FILE@ @LIBC@/string.h @PTEST_FILE@ -print
-  OPT: @PTEST_FILE@ @PTEST_FILE@ @LIBC@/string.h -print
+OPT: @PTEST_SHARE_DIR@/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -cpp-extra-args="-I@PTEST_SHARE_DIR@/libc" -print
+OPT: @PTEST_FILE@ @PTEST_SHARE_DIR@/libc/string.h @PTEST_FILE@ -cpp-extra-args="-I@PTEST_SHARE_DIR@/libc" -print
+OPT: @PTEST_FILE@ @PTEST_FILE@ @PTEST_SHARE_DIR@/libc/string.h -cpp-extra-args="-I@PTEST_SHARE_DIR@/libc" -print
 */
+
 #include "string.h"
 #include "stdlib.h"
+
 char *
 strdup(const char *str)
 {

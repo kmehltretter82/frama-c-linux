@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Frama-C States
 // --------------------------------------------------------------------------
@@ -44,6 +66,7 @@ Server.onReady(async () => {
       name: 'kernel.project.getCurrent',
       input: Json.jNull,
       output: Json.jObject({ id: Json.jString }),
+      signals: [],
     };
     const current: { id?: string } = await Server.send(sr, null);
     currentProject = current.id;
@@ -87,6 +110,7 @@ export async function setProject(project: string) {
         name: 'kernel.project.setCurrent',
         input: Json.jString,
         output: Json.jNull,
+        signals: [],
       };
       await Server.send(sr, project);
       currentProject = project;
@@ -101,19 +125,28 @@ export async function setProject(project: string) {
 // --- Cached GET Requests
 // --------------------------------------------------------------------------
 
+/** Options to tweak the behavior of `useReques()`. Null values means
+    keeping the last result. */
 export interface UseRequestOptions<A> {
+  /** Returned value in case where the server goes offline. */
   offline?: A | null;
+  /** Temporary returned value when the request is pending. */
   pending?: A | null;
+  /** Returned value when the request fails. */
   onError?: A | null;
+  /** Re-send the request when any of the signals are sent. */
+  onSignals?: Server.Signal[];
 }
 
 /**
- * Cached GET request (Custom React Hook).
- *
- * Sends the specified GET request and returns its result. The request is send
- * asynchronously and cached until any change.
- *
- * Null values in options mean that the last obtained value is kept.
+  Cached GET request (Custom React Hook).
+
+  Sends the specified GET request and returns its result. The request is send
+  asynchronously and cached until any change in the request parameters or server
+  state. The change in the server state are tracked by the signals specified
+  when registering the request or by the one in options.onSignals if specified.
+
+  Options can be used to tune more precisely the behavior of the hook.
  */
 export function useRequest<In, Out>(
   rq: Server.GetRequest<In, Out>,
@@ -151,6 +184,14 @@ export function useRequest<In, Out>(
       state.current = footprint;
       trigger();
     }
+  });
+
+  const signals = options.onSignals ?? rq.signals;
+  React.useEffect(() => {
+    signals.forEach((s) => Server.onSignal(s, trigger));
+    return () => {
+      signals.forEach((s) => Server.offSignal(s, trigger));
+    };
   });
 
   return response;
@@ -352,7 +393,7 @@ class SyncArray<K, A> {
       let pending;
       /* eslint-disable no-await-in-loop */
       do {
-        const data = await Server.send(this.handler.fetch, 50);
+        const data = await Server.send(this.handler.fetch, 20000);
         const { reload = false, removed = [], updated = [] } = data;
         const { model } = this;
         if (reload) model.removeAllData();
@@ -733,5 +774,21 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [current, setCurrent] = useGlobalState(GlobalSelection);
   return [current, (action) => setCurrent(reducer(current, action))];
 }
+
+/** Resets the selected locations. */
+export async function resetSelection() {
+  GlobalSelection.setValue(emptySelection);
+  const main = await Server.send(Ast.getMainFunction, { });
+  // If the selection has already been modified, do not change it.
+  if (main && GlobalSelection.getValue() === emptySelection) {
+    GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
+  }
+}
+/* Select the main function when the current project changes and the selection
+   is still empty (which happens at the start of the GUI). */
+PROJECT.on(async () => {
+  if (GlobalSelection.getValue() === emptySelection)
+    resetSelection();
+});
 
 // --------------------------------------------------------------------------

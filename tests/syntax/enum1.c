@@ -1,6 +1,13 @@
 /* run.config
+<<<<<<< HEAD
    DEPS: enum.h
    STDOPT: +"%{dep:enum2.c}"
+||||||| 754e522ceb
+   STDOPT: +"tests/syntax/enum2.c"
+=======
+ DEPS: enum.h
+   STDOPT: +"%{dep:@PTEST_DIR@/enum2.c}"
+>>>>>>> origin/master
 */
 
 

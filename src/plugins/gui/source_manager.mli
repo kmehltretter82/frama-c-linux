@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,10 +28,10 @@ val selection_locked : bool ref
 (** Prevents the filetree callback from resetting the selected line when it
     was selected via a click in the original source viewer. *)
 
-val make: 
+val make:
   ?tab_pos:Gtk.Tags.position -> ?packing:(GObj.widget -> unit) -> unit -> t
 
-val load_file: 
+val load_file:
   t -> ?title:string -> filename:Datatype.Filepath.t -> ?line:int ->
   click_cb:(Pretty_source.localizable option -> unit) -> unit -> unit
 (** If [line] is 0 then the last line of the text is shown.

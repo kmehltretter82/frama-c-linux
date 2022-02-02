@@ -37,11 +37,9 @@ Goal Wp_smoke_default_requires in 'foo':
 Assume {
   Type: is_sint32(x).
   (* Pre-condition *)
-  Have: (x < 0) /\ P_REQUIRES(0, x).
-  (* Pre-condition for 'A' *)
-  Have: (P_ASSUMES(1, x) -> ((3 <= x) /\ P_REQUIRES(1, x))).
-  (* Pre-condition for 'B' *)
-  Have: (P_ASSUMES(2, x) -> P_REQUIRES(2, x)).
+  Have: P_REQUIRES(0, x).
+  (* Pre-condition *)
+  Have: x < 0.
 }
 Prove: false.
 
@@ -62,13 +60,13 @@ Goal Wp_smoke_B_requires in 'foo':
 Assume {
   Type: is_sint32(x).
   (* Pre-condition *)
-  Have: (x < 0) /\ P_REQUIRES(0, x).
-  (* Pre-condition for 'A' *)
-  Have: (P_ASSUMES(1, x) -> ((3 <= x) /\ P_REQUIRES(1, x))).
-  (* Pre-condition for 'B' *)
-  Have: P_REQUIRES(2, x).
+  Have: P_REQUIRES(0, x).
+  (* Pre-condition *)
+  Have: x < 0.
   (* Pre-condition for 'B' *)
   Have: P_ASSUMES(2, x).
+  (* Pre-condition for 'B' *)
+  Have: P_REQUIRES(2, x).
 }
 Prove: false.
 

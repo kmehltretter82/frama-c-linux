@@ -1,12 +1,12 @@
 /* run.config
- PLUGIN: constant_propagation @PTEST_PLUGIN@
- LIBS: ../libSelect
+ PLUGIN: @PTEST_PLUGIN@ constant_propagation sparecode
+ LIBS: libSelect
  MODULE: @PTEST_NAME@
-   OPT: @EVA_OPTIONS@ -deps -journal-disable
+   OPT: @EVA_OPTIONS@ -deps
 */
-
 //@ assigns \result \from x;
 int g (int x);
+
 int f (int c, int x) {
   int y = c ? 1 : -1;
   int r;

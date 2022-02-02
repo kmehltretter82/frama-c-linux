@@ -1,11 +1,13 @@
 /* run.config
    COMMENT: Test option -cg-function-pointers
    MODULE: @PTEST_NAME@
+   PLUGIN: @PTEST_PLUGIN@,eva
    OPT: -cg-function-pointers
    OPT: -cg-no-services -cg-function-pointers
    OPT: -cg-no-function-pointers
    OPT: -cg-no-services -cg-no-function-pointers
 */
+
 int (*fptr)(int);
 
 int f(int x) { return x; }

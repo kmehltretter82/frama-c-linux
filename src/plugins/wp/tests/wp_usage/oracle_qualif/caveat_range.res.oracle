@@ -22,7 +22,7 @@
  Functions                 WP     Alt-Ergo  Total   Success
   reset                     7        5       12       100%
 ------------------------------------------------------------
-[wp] tests/wp_usage/caveat_range.i:16: Warning: 
+[wp] caveat_range.i:16: Warning: 
   Memory model hypotheses for function 'reset':
   /*@ behavior wp_typed_caveat:
         requires \valid(p + (..)); */

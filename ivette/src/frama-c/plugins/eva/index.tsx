@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Eva Values
 // --------------------------------------------------------------------------
@@ -6,21 +28,32 @@
 import React from 'react';
 import * as Dome from 'dome';
 import * as Ivette from 'ivette';
+import * as Server from 'frama-c/server';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Vfill } from 'dome/layout/boxes';
 import { IconButton } from 'dome/controls/buttons';
 import { AutoSizer } from 'react-virtualized';
+import { Model } from './model';
 
 // Locals
 import { ProbeInfos } from './probeinfos';
 import { Dimension, ValuesPanel } from './valuetable';
 import { AlarmsInfos, StackInfos } from './valueinfos';
+import { } from './Summary';
+import { } from './Coverage';
 import './style.css';
 
 // --------------------------------------------------------------------------
 // --- Values Component
 // --------------------------------------------------------------------------
 
+const globalModelState = new GlobalState(new Model());
+
 function ValuesComponent() {
+  const [model] = useGlobalState(globalModelState);
+  model.mount();
+  Dome.useUpdate(model.changed, model.laidout);
+  Server.onShutdown(() => model.unmount());
   const [zoom, setZoom] = Dome.useNumberSettings('eva-zoom-factor', 0);
   return (
     <>
@@ -37,19 +70,20 @@ function ValuesComponent() {
         />
       </Ivette.TitleBar>
       <Vfill>
-        <ProbeInfos />
+        <ProbeInfos model={model} />
         <Vfill>
           <AutoSizer>
             {(dim: Dimension) => (
               <ValuesPanel
                 zoom={zoom}
+                model={model}
                 {...dim}
               />
             )}
           </AutoSizer>
         </Vfill>
-        <AlarmsInfos />
-        <StackInfos />
+        <AlarmsInfos model={model} />
+        <StackInfos model={model} />
       </Vfill>
     </>
   );
@@ -66,6 +100,16 @@ Ivette.registerComponent({
   label: 'Eva Values',
   title: 'Values inferred by the Eva analysis',
   children: <ValuesComponent />,
+});
+
+Ivette.registerView({
+  id: 'summary',
+  rank: 1,
+  label: 'Eva Summary',
+  layout: [
+    ['frama-c.plugins.eva_summary', 'frama-c.plugins.eva_coverage'],
+    'frama-c.messages',
+  ],
 });
 
 Ivette.registerView({

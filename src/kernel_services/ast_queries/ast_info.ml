@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -52,8 +52,6 @@ let value_of_integral_expr e =
   match possible_value_of_integral_expr e with
   | None -> assert false
   | Some i -> i
-
-let constant_expr ~loc i = new_exp ~loc (Const(CInt64(i,IInt,None)))
 
 let rec is_null_expr e = match (stripInfo e).enode with
   | Const c when is_integral_const c ->
@@ -108,24 +106,33 @@ let term_lvals_of_term t =
 let behavior_assumes b =
   Logic_const.pands (List.map Logic_const.pred_of_id_pred b.b_assumes)
 
-let behavior_postcondition b k =
+let take_ip ~goal (ip : identified_predicate) =
+  let { tp_kind ; tp_statement } = ip.ip_content in
+  let take_it =
+    if goal
+    then Logic_utils.verify_predicate tp_kind
+    else Logic_utils.use_predicate tp_kind in
+  if take_it then tp_statement else Logic_const.ptrue
+
+let behavior_postcondition ~goal b k =
   let assumes = Logic_const.pold (behavior_assumes b) in
   let postcondition =
     Logic_const.pands
-      (Extlib.filter_map (fun (x,_) -> x = k)
-         (Extlib.($) Logic_const.pred_of_id_pred snd) b.b_post_cond)
-  in
-  Logic_const.pimplies (assumes,postcondition)
+      (List.map
+         (fun (tk,ip) ->
+            if tk = k then take_ip ~goal ip else Logic_const.ptrue)
+         b.b_post_cond)
+  in Logic_const.pimplies (assumes,postcondition)
 
-let behavior_precondition b =
+let behavior_precondition ~goal b =
   let assumes = behavior_assumes b in
-  let requires = Logic_const.pands
-      (List.rev_map Logic_const.pred_of_id_pred b.b_requires)
-  in
-  Logic_const.pimplies (assumes,requires)
+  let requires =
+    Logic_const.pands
+      (List.map (take_ip ~goal) b.b_requires)
+  in Logic_const.pimplies (assumes,requires)
 
-let precondition spec =
-  Logic_const.pands (List.map behavior_precondition spec.spec_behavior)
+let precondition ~goal spec =
+  Logic_const.pands (List.map (behavior_precondition ~goal) spec.spec_behavior)
 
 (** find the behavior named [name] in the list *)
 let get_named_bhv bhv_list name =
@@ -394,34 +401,34 @@ let block_of_local (fdec:fundec) vi =
 (** {2 Types} *)
 (* ************************************************************************** *)
 
-let array_type ?length ?(attr=[]) ty = TArray(ty,length,empty_size_cache (),attr)
+let array_type ?length ?(attr=[]) ty = TArray(ty,length,attr)
 
 let direct_array_size ty =
   match unrollType ty with
-  | TArray(_ty,Some size,_,_) -> value_of_integral_expr size
-  | TArray(_ty,None,_,_) -> Integer.zero
+  | TArray(_ty,Some size,_) -> value_of_integral_expr size
+  | TArray(_ty,None,_) -> Integer.zero
   | _ -> assert false
 
 let rec array_size ty =
   match unrollType ty with
-  | TArray(elemty,Some _,_,_) ->
+  | TArray(elemty,Some _,_) ->
     if isArrayType elemty then
       Integer.mul (direct_array_size ty) (array_size elemty)
     else direct_array_size ty
-  | TArray(_,None,_,_) -> Integer.zero
+  | TArray(_,None,_) -> Integer.zero
   | _ -> assert false
 
 let direct_element_type ty = match unrollType ty with
-  | TArray(eltyp,_,_,_) -> eltyp
+  | TArray(eltyp,_,_) -> eltyp
   | _ -> assert false
 
 let element_type ty =
   let rec elem_type ty = match unrollType ty with
-    | TArray(eltyp,_,_,_) -> elem_type eltyp
+    | TArray(eltyp,_,_) -> elem_type eltyp
     | _ -> ty
   in
   match unrollType ty with
-  | TArray(eltyp,_,_,_) -> elem_type eltyp
+  | TArray(eltyp,_,_) -> elem_type eltyp
   | _ -> assert false
 
 let direct_pointed_type ty =

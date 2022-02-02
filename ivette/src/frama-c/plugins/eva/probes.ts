@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 /* --------------------------------------------------------------------------*/
 /* --- Probes                                                             ---*/
 /* --------------------------------------------------------------------------*/
@@ -16,17 +38,14 @@ import { ModelCallbacks } from './cells';
 
 const Ka = 'A'.charCodeAt(0);
 const Kz = 'Z'.charCodeAt(0);
-const LabelRing: string[] = [];
 const LabelSize = 12;
 let La = Ka;
 let Lk = 0;
 
 function newLabel() {
-  let lbl = LabelRing.shift();
-  if (lbl) return lbl;
   const a = La;
   const k = Lk;
-  lbl = String.fromCharCode(a);
+  const lbl = String.fromCharCode(a);
   if (a < Kz) {
     La++;
   } else {
@@ -52,12 +71,11 @@ export class Probe {
   loading = true;
   label?: string;
   code?: string;
-  stmt?: string;
+  stmt?: Ast.marker;
   rank?: number;
   minCols: number = LabelSize;
   maxCols: number = LabelSize;
-  byCallstacks = false;
-  zoomed = false;
+  zoomed = true;
   zoomable = false;
   effects = false;
   condition = false;
@@ -82,7 +100,10 @@ export class Probe {
         this.effects = effects;
         this.condition = condition;
         this.loading = false;
-        this.updateLabel();
+        if (code && code.length > LabelSize)
+          this.label = newLabel();
+        else
+          this.label = code;
       })
       .catch(() => {
         this.code = '(error)';
@@ -103,28 +124,9 @@ export class Probe {
   setPersistent() { this.updateTransient(false); }
   setTransient() { this.updateTransient(true); }
 
-  private updateLabel() {
-    const { transient, label, code } = this;
-    if (transient && label) {
-      LabelRing.push(label);
-      this.label = undefined;
-    }
-    if (!transient && !label && code && code.length > LabelSize)
-      this.label = newLabel();
-  }
-
   private updateTransient(tr: boolean) {
     if (this.transient !== tr) {
       this.transient = tr;
-      this.updateLabel();
-      this.model.forceLayout();
-    }
-  }
-
-  setByCallstacks(byCS: boolean) {
-    if (byCS !== this.byCallstacks) {
-      this.byCallstacks = byCS;
-      if (byCS) this.setPersistent();
       this.model.forceLayout();
     }
   }

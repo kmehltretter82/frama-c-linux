@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -139,7 +139,7 @@ val field : string -> t -> t
     Note: no other functions should modify the contents of [path]; any
     modifications will be overwritten when the cache is flushed.
 
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 
 (** Exception raised by the functions below when incompatible types are
@@ -150,19 +150,19 @@ exception CannotMerge of string
    [merge_object path json_obj] recursively merges the object [json_obj] into the
    JSON file [path]. If [path] does not exist, it is created.
    Merge consists in combining values with the same key, e.g. if [path]
-   already contains an object {"kernel": {"options": ["a"]}}, and
-   [json_obj] is {"kernel": {"options": ["b"]}}, the result will be
-   {"kernel": {"options": ["a", "b"]}}. Cannot merge heterogeneous
+   already contains an object [{"kernel": {"options": ["a"]}}], and
+   [json_obj] is [{"kernel": {"options": ["b"]}}], the result will be
+   [{"kernel": {"options": ["a", "b"]}}]. Cannot merge heterogeneous
    objects, i.e. in the previous example, if "options" were associated
    with a string in [path], trying to merge an array into it would
-   raise [JsonCannotMerge].
+   raise [CannotMerge].
    The merged object is updated in the memory cache.
 
-   @raise [CannotMerge] if the objects have conflicting types for
+   @raise CannotMerge if the objects have conflicting types for
    the same keys, or if the root JSON element is not an object.
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
-val merge_object : Filepath.Normalized.t -> Yojson.Basic.t -> unit
+val merge_object : Filepath.Normalized.t -> t -> unit
 
 (**
    [merge_list path json_array] merges the array [json_array] into the
@@ -170,22 +170,23 @@ val merge_object : Filepath.Normalized.t -> Yojson.Basic.t -> unit
    Unlike objects, arrays are merged by simply concatenating their list
    of elements.
 
-   @raise [CannotMerge] if the root JSON element is not an array.
-   @since Frama-C+dev
+   @raise CannotMerge if the root JSON element is not an array.
+   @since 23.0-Vanadium
 *)
-val merge_array : Filepath.Normalized.t -> Yojson.Basic.t -> unit
+val merge_array : Filepath.Normalized.t -> t -> unit
 
 (**
    [from_file path] opens [path] and stores its JSON object in
    a memory cache, to be used by the other related functions.
-   @since Frama-C+dev
+   @raise Yojson.Json_error if [path] is a malformed JSON file.
+   @since 23.0-Vanadium
 *)
-val from_file: Filepath.Normalized.t -> Yojson.Basic.t
+val from_file: Filepath.Normalized.t -> t
 
 (**
    Flushes the JSON objects in the cache. Returns the names of the written
    files.
 
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val flush_cache : unit -> Filepath.Normalized.t list

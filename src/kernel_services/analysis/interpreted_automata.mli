@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,6 +40,17 @@ type info =
   | NoneInfo
   | LoopHead of int (* level *)
 
+(** Control flow informations for outgoing edges, if any. *)
+type 'a control =
+  | Edges (** control flow is only given by vertex edges. *)
+  | Loop of 'a (** start of a Loop stmt, with breaking vertex. *)
+  | If of { cond: exp; vthen: 'a; velse: 'a }
+  (** edges are guaranteed to be two guards `Then` else `Else`
+      with the given condition and successor vertices. *)
+  | Switch of { value: exp; cases: (exp * 'a) list; default: 'a }
+  (** edges are guaranteed to be issued from a `switch()` statement with
+      the given cases and default vertices. *)
+
 (** Vertices are control points. When a vertice is the *start* of a statement,
     this statement is kept in vertex_stmt. Currently, this statement is kept for
     two reasons: to know when callbacks should be called and when annotations
@@ -49,6 +60,7 @@ type vertex = private {
   vertex_key : int;
   mutable vertex_start_of : Cil_types.stmt option;
   mutable vertex_info : info;
+  mutable vertex_control : vertex control;
 }
 
 type assert_kind =
@@ -134,16 +146,24 @@ module WTO : sig
   include Datatype.S with type t = wto
 end
 
-(** Get the interpreted automaton for the given kernel_function without annotations *)
+(** Get the automaton for the given kernel_function without annotations *)
 val get_automaton : Cil_types.kernel_function -> automaton
 (** Get the wto for the automaton of the given kernel_function *)
 val get_wto : Cil_types.kernel_function -> wto
 (** Extract an exit strategy from a component, i.e. a sub-wto where all
     vertices lead outside the wto without passing through the head. *)
 val exit_strategy : graph -> vertex Wto.component -> wto
-(** Output the automaton in dot format *)
-val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto -> automaton -> unit
 
+type 'a labeling =
+  [ `Stmt
+  | `Vertex
+  | `Both
+  | `Custom of Format.formatter -> 'a -> unit
+  ]
+
+(** Output the automaton in dot format *)
+val output_to_dot : out_channel -> ?labeling:vertex labeling -> ?wto:wto ->
+  automaton -> unit
 
 (** the position of a statement in a wto given as the list of
     component heads *)
@@ -187,7 +207,8 @@ module Compute: sig
       vertices lead outside the wto without passing through the head. *)
   val exit_strategy : graph -> vertex Wto.component -> wto
   (** Output the automaton in dot format *)
-  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto -> automaton -> unit
+  val output_to_dot : out_channel -> ?labeling:vertex labeling  -> ?wto:wto ->
+    automaton -> unit
 
 
   type wto_index_table
@@ -219,9 +240,10 @@ end
 module UnrollUnnatural : sig
   (** Could enter a loop only by head nodes *)
 
-
-  module Vertex_Set : Datatype.S_with_collections with type t = Vertex.Set.t
-  module Version :Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
+  module Vertex_Set:
+    Datatype.S_with_collections with type t = Vertex.Set.t
+  module Version:
+    Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
 
   module G : sig
     include Graph.Sig.I
@@ -238,7 +260,8 @@ module UnrollUnnatural : sig
     include Datatype.S with type t = Version.t Wto.partition
   end
 
-  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:WTO.t -> G.t -> unit
+  val output_to_dot : out_channel -> ?labeling:Version.t labeling ->
+    ?wto:WTO.t -> G.t -> unit
 
   val unroll_unnatural_loop :
     automaton -> wto -> Compute.wto_index_table -> G.t
@@ -247,9 +270,8 @@ end
 
 
 (** Dataflow computation: simple data-flow analysis using interpreted automata.
-    This is mostly intended as an example for using interpreted automata;
-    see also tests/misc/interpreted_automata_dataflow.ml for a complete example
-    using this dataflow. *)
+    See tests/misc/interpreted_automata_dataflow.ml for a complete example
+    using this dataflow computation. *)
 
 (** Input domain for a simple dataflow analysis. *)
 module type Domain =
@@ -272,8 +294,62 @@ sig
   val transfer : vertex transition ->  t -> t option
 end
 
-(** Builds a simple dataflow analysis over an input domain. *)
-module Dataflow (D : Domain) :
+(** Simple dataflow analysis *)
+module type DataflowAnalysis =
 sig
-  val fixpoint : Cil_types.kernel_function -> D.t -> D.t Vertex.Hashtbl.t
+  type state
+  type result
+
+  val fixpoint : ?wto:wto -> Cil_types.kernel_function ->  state -> result
+
+  module Result :
+  sig
+    (** Extract the result at the entry point of the analysed function *)
+    val at_entry : result -> state option
+
+    (** Extract the result at the return point of the analysed function (just
+        after the return transfer function) *)
+    val at_return : result -> state option
+
+    (** Extract the result obtained for the control point immediately before the
+        given statement *)
+    val before : result -> Cil_types.stmt -> state option
+
+    (** Extract the result obtained for the control point immediately after the
+        given statement *)
+    val after : result -> Cil_types.stmt -> state option
+
+    (** Iter on the results obtained at each vertex of the graph.
+        Do nothing  when the vertex is not reachable (for instance if transfer
+        returned None) *)
+    val iter_vertex : (vertex -> state -> unit) -> result -> unit
+
+    (** Iter on the results obtained before each statements of the function.
+        Do nothing  when the vertex is not reachable (for instance if transfer
+        returned None) *)
+    val iter_stmt : (Cil_types.stmt -> state -> unit) -> result -> unit
+
+    (** Output result to the given channel. Must be supplied with a pretty
+        printer for abstract values *)
+    val to_dot_output : (Format.formatter -> state -> unit) ->
+      result -> out_channel -> unit
+
+    (** Output result to a file with the given path. Must be supplied with
+        pretty printer for abstract values *)
+    val to_dot_file : (Format.formatter -> state -> unit) ->
+      result -> Filepath.Normalized.t -> unit
+
+    (** Extract the result as a table from control points to states *)
+    val as_table : result -> state Vertex.Hashtbl.t
+  end
 end
+
+(** Forward dataflow analysis. The domain must provide a forward [transfer]
+    function that computes the state after a transition from the state before. *)
+module ForwardAnalysis (D : Domain) : DataflowAnalysis
+  with type state = D.t
+
+(** Backward dataflow analysis. The domain must provide a backward [transfer]
+    function that computes the state before a transition from the state after. *)
+module BackwardAnalysis (D : Domain) : DataflowAnalysis
+  with type state = D.t

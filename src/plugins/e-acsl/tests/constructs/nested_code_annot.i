@@ -8,17 +8,18 @@ int main(void) {
   /*@ requires x == 0;
     @ ensures x >= 1; */
   {
-    if (x) /*@ assert \false; */ ;
-    else {
+    if (x) {
+      /*@ assert \false; */;
+    } else {
       /*@ requires x == 0;
-	@ ensures x == 1; */
+        @ ensures x == 1; */
       x++;
       if (x) {
-	/*@ requires x == 1;
-	  @ ensures x == 2; */
-	x++;
-      }
-      else /*@ assert \false; */ ;
+        /*@ requires x == 1;
+          @ ensures x == 2; */
+        x++;
+      } else /*@ assert \false; */
+        ;
     }
   }
   return 0;

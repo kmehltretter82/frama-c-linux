@@ -98,8 +98,8 @@ end
 module Rapid_forward_worklist(Fenv:FUNCTION_ENV):CONSULTABLE_WORKLIST = struct
 
   type t = { mutable changed: bool;
-	     mutable current_index: ordered_stmt; }
-    ;;
+             mutable current_index: ordered_stmt; }
+  ;;
 
   let w = { changed = false; current_index = Fenv.nb_stmts } ;;
   let insert _ord = w.changed <- true ;;
@@ -108,11 +108,11 @@ module Rapid_forward_worklist(Fenv:FUNCTION_ENV):CONSULTABLE_WORKLIST = struct
     then
       if w.changed
       then
-	(w.changed <- false;
-	 w.current_index <- 0;
-	 Some 0)
+        (w.changed <- false;
+         w.current_index <- 0;
+         Some 0)
       else
-	None
+        None
     else
       (w.current_index <- w.current_index + 1;
        Some w.current_index)
@@ -128,7 +128,7 @@ module Simple_forward_worklist(Fenv:FUNCTION_ENV):CONSULTABLE_WORKLIST = struct
 
   (* The worklist, and the current index. *)
   type t = { bv: Bitvector.t;
-	     mutable index: int };;
+             mutable index: int };;
 
   let w =
     let bv = Bitvector.create Fenv.nb_stmts in
@@ -140,17 +140,17 @@ module Simple_forward_worklist(Fenv:FUNCTION_ENV):CONSULTABLE_WORKLIST = struct
 
   let extract () =
     try let next = Bitvector.find_next_true w.bv w.index in
-	Bitvector.clear w.bv next;
-	w.index <- next;
-	Some next
+      Bitvector.clear w.bv next;
+      w.index <- next;
+      Some next
     with Not_found ->
-      (* Try to start over. *)
-      try let next = Bitvector.find_next_true w.bv 0 in
-	  Bitvector.clear w.bv next;
-	  w.index <- next;
-	  Some next
-      (* Nothing to do left. *)
-      with Not_found -> None
+    (* Try to start over. *)
+    try let next = Bitvector.find_next_true w.bv 0 in
+      Bitvector.clear w.bv next;
+      w.index <- next;
+      Some next
+    (* Nothing to do left. *)
+    with Not_found -> None
 
   let in_worklist ord = Bitvector.mem w.bv ord
 end
@@ -165,8 +165,8 @@ type direction = Forward | Backward;;
    statements inside a scc are handled before starting over on that
    scc. Iteration is done using the topological order of sccs. *)
 module Connected_component_worklist
-  (Dir:sig val direction:direction end)
-  (Fenv:FUNCTION_ENV)
+    (Dir:sig val direction:direction end)
+    (Fenv:FUNCTION_ENV)
   :CONSULTABLE_WORKLIST =
 struct
 
@@ -218,31 +218,31 @@ struct
   (* Next statement to be retrieved. *)
   let next = ref first
 
-    (* The current strongly connected component. Set it initially to
-       the one of [next] so that extraction directly returns the
-       initial [next]. *)
+  (* The current strongly connected component. Set it initially to
+     the one of [next] so that extraction directly returns the
+     initial [next]. *)
   let current_scc = ref (Fenv.connected_component !next);;
 
   Kernel.debug ~dkey:Kernel.dkey_dataflow_scc
     "First statement %d, first scc %d" !next !current_scc;;
 
-    (* We normally iterate using the ordered_stmt order. The only
-       exception is when we have to restart iteration on the current
-       strongly connected component. If this is the case,
-       must_restart_cc is set to [Some(x)], where [x] is the first
-       statement to be processed when we restart iterating on the
-       current scc. *)
+  (* We normally iterate using the ordered_stmt order. The only
+     exception is when we have to restart iteration on the current
+     strongly connected component. If this is the case,
+     must_restart_cc is set to [Some(x)], where [x] is the first
+     statement to be processed when we restart iterating on the
+     current scc. *)
   let must_restart_scc = ref None
 
   let insert ord =
     (* We always iterate in topological order or stay in same connected component order. *)
     assert ((is_further ord !next)
-	    || (Fenv.connected_component ord) = !current_scc);
+            || (Fenv.connected_component ord) = !current_scc);
     Workqueue.set ord;
     if is_strictly_nearer ord !next
     then must_restart_scc := match !must_restart_scc with
-    | None -> Some ord
-    | Some(x) -> Some(nearest ord x)
+        | None -> Some ord
+        | Some(x) -> Some(nearest ord x)
 
   let extract () =
 
@@ -292,24 +292,24 @@ struct
       let next_true_scc = Fenv.connected_component next_true in
       if next_true_scc = !current_scc
       then
-	select_same_scc next_true
+        select_same_scc next_true
       else
-	(* We reached the end of the current connected
-           component. The trick is that OCamlgraph's topological
-           ordering guarantees that elements of the same connected
-           component have contiguous indexes, so we know that we
-           have reached the end of the current scc. Check if we
-           should start over in the same scc, or continue to the
-           next scc. *)
-	match !must_restart_scc with
-	| None -> select_new_scc next_true
-	| Some(i) -> select_restart_scc i
+        (* We reached the end of the current connected
+                 component. The trick is that OCamlgraph's topological
+                 ordering guarantees that elements of the same connected
+                 component have contiguous indexes, so we know that we
+                 have reached the end of the current scc. Check if we
+                 should start over in the same scc, or continue to the
+                 next scc. *)
+        match !must_restart_scc with
+        | None -> select_new_scc next_true
+        | Some(i) -> select_restart_scc i
     with Not_found ->
-      (* We found no further statement with work to do, but the
-	 current scc may still contain some work. *)
-      match !must_restart_scc with
-      | None -> None
-      | Some(i) -> select_restart_scc i
+    (* We found no further statement with work to do, but the
+       current scc may still contain some work. *)
+    match !must_restart_scc with
+    | None -> None
+    | Some(i) -> select_restart_scc i
   ;;
 
   let in_worklist ord = Workqueue.mem ord
@@ -434,7 +434,7 @@ module Simple_backward(Fenv:FUNCTION_ENV)(P:BACKWARD_MONOTONE_PARAMETER) = struc
     let rec loop acc = function
       | i when i = Fenv.nb_stmts -> acc
       | i -> let acc = f acc (Fenv.to_stmt i) after.(i)
-	     in loop acc (i+1)
+        in loop acc (i+1)
     in loop init 0;;
 
   let iter_on_result f =
@@ -445,7 +445,7 @@ module Simple_backward(Fenv:FUNCTION_ENV)(P:BACKWARD_MONOTONE_PARAMETER) = struc
   let post_state stmt = after.(Fenv.to_ordered stmt)
   let pre_state stmt = P.transfer_stmt stmt (post_state stmt)
 
-    
+
 end
 (* Edge-based forward dataflow. It is edge-based because the transfer
    function can differentiate the state after a statement between
@@ -477,31 +477,31 @@ module type FORWARD_MONOTONE_PARAMETER_GENERIC_STORAGE = sig
 end
 
 module Forward_monotone_generic_storage
-  (Fenv:FUNCTION_ENV)
-  (P:FORWARD_MONOTONE_PARAMETER_GENERIC_STORAGE)
-  (W:CONSULTABLE_WORKLIST) =
+    (Fenv:FUNCTION_ENV)
+    (P:FORWARD_MONOTONE_PARAMETER_GENERIC_STORAGE)
+    (W:CONSULTABLE_WORKLIST) =
 struct
   List.iter (fun (stmt,state) ->
-    let ord = Fenv.to_ordered stmt in
-    P.set_before ord state;
-    W.insert ord) P.init;;
+      let ord = Fenv.to_ordered stmt in
+      P.set_before ord state;
+      W.insert ord) P.init;;
 
   let update_before (stmt, new_state) =
     let ord = Fenv.to_ordered stmt in
     CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
     let join =
       (* If we know that we already have to recompute before.(ord), we
-	 can omit the inclusion testing, and only perform the join. The
-	 rationale is that querying the worklist is cheap, while
-	 inclusion testing can be costly. *)
+         can omit the inclusion testing, and only perform the join. The
+         rationale is that querying the worklist is cheap, while
+         inclusion testing can be costly. *)
       if W.in_worklist ord
       then P.join new_state (P.get_before ord)
       else
-	let (join, is_included) =
-	  P.join_and_is_included new_state (P.get_before ord)
-	in
-	if not is_included then W.insert ord;
-	join
+        let (join, is_included) =
+          P.join_and_is_included new_state (P.get_before ord)
+        in
+        if not is_included then W.insert ord;
+        join
     in
     P.set_before ord join
   ;;
@@ -528,7 +528,7 @@ struct
     let rec loop acc = function
       | i when i = Fenv.nb_stmts -> acc
       | i -> let acc = f acc (Fenv.to_stmt i) (P.get_before i)
-	     in loop acc (i+1)
+        in loop acc (i+1)
     in loop init 0;;
 
   let iter_on_result f =
@@ -571,9 +571,9 @@ module Simple_forward(Fenv:FUNCTION_ENV)(P:FORWARD_MONOTONE_PARAMETER) = struct
     include P
     let before = Array.make Fenv.nb_stmts P.bottom;;
     List.iter (fun (stmt,state) ->
-      let ord = Fenv.to_ordered stmt in
-      before.(ord) <- state;
-      W.insert ord) P.init;;
+        let ord = Fenv.to_ordered stmt in
+        before.(ord) <- state;
+        W.insert ord) P.init;;
 
     let get_before ord = before.(ord);;
     let set_before ord value = before.(ord) <- value;;
@@ -604,7 +604,7 @@ let transfer_switch_from_guard transfer_guard stmt state =
     | Switch( cond, _, _, _) -> cond
     | _ ->
       Kernel.fatal ~current:true
-	"transfer_switch_from_guard on a non-Switch statement."
+        "transfer_switch_from_guard on a non-Switch statement."
   in
 
   let cases, default = Cil.separate_switch_succs stmt in
@@ -619,20 +619,20 @@ let transfer_switch_from_guard transfer_guard stmt state =
       (* We do nothing for Default, because we handle it last. *)
       | Label _ | Default _ -> input_state
       | Case (exp_case, _) ->
-	let if_equivalent_cond =
-	  match exp_case.enode with
-	  (* This helps when switch is used on boolean expressions. *)
-	  | Const (CInt64 (z,_,_))
-              when Integer.equal z Integer.zero ->
-	    Cil.new_exp ~loc:cond.eloc (UnOp(LNot,cond,Cil.intType))
-	  | _ -> Cil.new_exp exp_case.eloc
-            (BinOp (Eq, cond, exp_case, Cil.intType))
-	in
-	let (true_state, false_state) =
-	  transfer_guard stmt if_equivalent_cond input_state
-	in
-	result := (succ, true_state)::!result;
-	false_state
+        let if_equivalent_cond =
+          match exp_case.enode with
+          (* This helps when switch is used on boolean expressions. *)
+          | Const (CInt64 (z,_,_))
+            when Integer.equal z Integer.zero ->
+            Cil.new_exp ~loc:cond.eloc (UnOp(LNot,cond,Cil.intType))
+          | _ -> Cil.new_exp exp_case.eloc
+                   (BinOp (Eq, cond, exp_case, Cil.intType))
+        in
+        let (true_state, false_state) =
+          transfer_guard stmt if_equivalent_cond input_state
+        in
+        result := (succ, true_state)::!result;
+        false_state
     in
     List.fold_left do_one_label input_state succ.labels
   in

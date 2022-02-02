@@ -1,1 +1,2 @@
-OPT:  -eva @EVA_CONFIG@ -cpp-extra-args='-nostdinc -Ishare/libc'
+PLUGIN: @EVA_PLUGINS@
+OPT: -eva @EVA_CONFIG@ -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc'

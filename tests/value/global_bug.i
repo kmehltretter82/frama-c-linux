@@ -1,9 +1,9 @@
 /* run.config*
-   PLUGIN: @PTEST_PLUGIN@ report
-   STDOPT: +"-then -report"
+ PLUGIN: @PTEST_PLUGIN@ report
+   STDOPT: +"-report"
 */
 int i = 1;
-int G[2] = 
+int G[2] =
   {99<<63, 1};
 int j = 2;
 

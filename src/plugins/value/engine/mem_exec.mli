@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,11 +23,6 @@
 open Cil_types
 open Eval
 
-module type Domain = sig
-  include Datatype.S_with_collections
-  include Abstract_domain.Reuse with type t := t
-end
-
 (** Counter that must be used each time a new call is analyzed, in order
     to refer to it later *)
 val new_counter : unit -> int
@@ -37,7 +32,7 @@ val cleanup_results: unit -> unit
 
 module Make
     (Value : Datatype.S)
-    (Domain : Domain)
+    (Domain : Abstract_domain.S)
   : sig
 
     (** [store_computed_call kf init_state args call_results] memoizes the fact
@@ -46,7 +41,7 @@ module Make
         to be reused in subsequent calls *)
     val store_computed_call:
       kernel_function -> Domain.t -> Value.t or_bottom list ->
-      Domain.t list or_bottom ->
+      (Partition.key * Domain.t) list ->
       unit
 
     (** [reuse_previous_call kf init_state args] searches amongst the previous
@@ -57,7 +52,7 @@ module Make
         by the plugins that have registered Value callbacks.) *)
     val reuse_previous_call:
       kernel_function -> Domain.t -> Value.t or_bottom list ->
-      (Domain.t list or_bottom * int) option
+      ((Partition.key * Domain.t) list * int) option
   end
 
 

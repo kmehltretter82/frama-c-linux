@@ -2,4 +2,4 @@
 [kernel] non_natural_loop2.i:4: Warning: Non-natural loop detected.
 [loop] Warning: Could not analyze function main;
   it contains a non-natural loop
-[loop] Add this to your command line:
+[loop] Maximum number of iterations by loop:

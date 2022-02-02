@@ -13,7 +13,7 @@
   function strcmp: precondition 'valid_string_s1' got status valid.
 [eva] string_h.c:5: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:140: 
+[eva] FRAMAC_SHARE/libc/string.h:156: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcmp
 [eva:alarm] string_h.c:6: Warning: assertion got status unknown.
@@ -51,7 +51,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] string_h.c:24: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:227: 
+[eva] FRAMAC_SHARE/libc/string.h:243: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function strstr
 [eva:alarm] string_h.c:25: Warning: assertion got status unknown.
@@ -143,12 +143,8 @@
 [eva] string_h.c:75: 
   function strtok: precondition 'valid_string_delim' got status valid.
 [eva:alarm] string_h.c:75: Warning: 
-  function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status unknown.
-[eva:invalid-assigns] string_h.c:75: 
-  Completely invalid destination for assigns clause *(s + (0 ..)). Ignoring.
+  function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status invalid.
 [eva] Done for function strtok
-[eva:alarm] string_h.c:76: Warning: 
-  assertion 'unreachable_if_precise' got status invalid (stopping propagation).
 [eva] Recording results for test_strtok
 [eva] Done for function test_strtok
 [eva] computing for function test_strtok_r <- main.
@@ -232,12 +228,8 @@
 [eva] string_h.c:105: 
   function strtok_r: precondition 'valid_saveptr' got status valid.
 [eva:alarm] string_h.c:105: Warning: 
-  function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status unknown.
-[eva:invalid-assigns] string_h.c:105: 
-  Completely invalid destination for assigns clause *(s + (0 ..)). Ignoring.
+  function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status invalid.
 [eva] Done for function strtok_r
-[eva:alarm] string_h.c:106: Warning: 
-  assertion 'unreachable_if_precise' got status invalid (stopping propagation).
 [eva] Recording results for test_strtok_r
 [eva] Done for function test_strtok_r
 [eva] computing for function strdup <- main.
@@ -245,7 +237,7 @@
 [eva] using specification for function strdup
 [eva:libc:unsupported-spec] string_h.c:146: Warning: 
   The specification of function 'strdup' is currently not supported by Eva.
-  Consider adding FRAMAC_SHARE/libc/string.c to the analyzed source files.
+  Consider adding 'FRAMAC_SHARE/libc/string.c' to the analyzed source files.
 [eva] string_h.c:146: Warning: ignoring unsupported \allocates clause
 [eva] string_h.c:146: 
   function strdup: precondition 'valid_string_s' got status valid.
@@ -255,7 +247,7 @@
 [eva] using specification for function strndup
 [eva:libc:unsupported-spec] string_h.c:147: Warning: 
   The specification of function 'strndup' is currently not supported by Eva.
-  Consider adding FRAMAC_SHARE/libc/string.c to the analyzed source files.
+  Consider adding 'FRAMAC_SHARE/libc/string.c' to the analyzed source files.
 [eva] string_h.c:147: Warning: ignoring unsupported \allocates clause
 [eva] string_h.c:147: 
   function strndup: precondition 'valid_string_s' got status valid.
@@ -333,6 +325,8 @@
 [eva] string_h.c:154: Call to builtin strchr
 [eva] string_h.c:154: 
   function strchr: precondition 'valid_string_s' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:181: 
+  cannot evaluate ACSL term, unsupported logic var p
 [eva] computing for function strchrnul <- main.
   Called from string_h.c:155.
 [eva] using specification for function strchrnul
@@ -347,6 +341,20 @@
 [eva] string_h.c:158: 
   function strchrnul: precondition 'valid_string_s' got status valid.
 [eva] Done for function strchrnul
+[eva] computing for function mempcpy <- main.
+  Called from string_h.c:160.
+[eva] using specification for function mempcpy
+[eva] string_h.c:160: 
+  function mempcpy: precondition 'valid_dest' got status valid.
+[eva] string_h.c:160: 
+  function mempcpy: precondition 'valid_src' got status valid.
+[eva] string_h.c:160: 
+  function mempcpy: precondition 'separation' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:114: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
+[kernel] string_h.c:160: Warning: using size of 'void'
+[eva] Done for function mempcpy
+[eva:alarm] string_h.c:161: Warning: assertion 'imprecise' got status unknown.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -418,4 +426,7 @@
   nul1 ∈ {{ "haystack" + [0..8] }}
   chr2 ∈ {{ NULL ; "haystack" + {1} }}
   nul2 ∈ {{ "haystack" + [0..8] }}
+  pdest[0..8] ∈ [--..--] or UNINITIALIZED
+       [9] ∈ UNINITIALIZED
+  pend ∈ {{ &pdest[9] }}
   __retres ∈ {0}

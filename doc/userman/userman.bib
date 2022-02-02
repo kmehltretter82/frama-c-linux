@@ -16,22 +16,22 @@
 }
 
 @manual{acsl,
-  author = {Baudin, Patrick and Filli\^{a}tre, Jean-Christophe and 
+  author = {Baudin, Patrick and Cuoq, Pascal and Filli\^{a}tre, Jean-Christophe and
             March\'{e}, Claude and Monate, Benjamin and Moy, Yannick and
             Prevosto, Virgile},
-  month = mar,
-  title = {{ACSL: ANSI/ISO C Specification Language. Version 1.8}},
-  year = {2014}
+  month = nov,
+  title = {{ACSL: ANSI/ISO C Specification Language. Version 1.16}},
+  year = {2020}
 }
 
 @manual{acsl-implem,
-  author = {Baudin, Patrick and Pascal Cuoq and Filli\^{a}tre, Jean-Christophe 
-            and March\'{e}, Claude and Monate, Benjamin and Moy, Yannick and
+  author = {Baudin, Patrick and Cuoq, Pascal and Filli\^{a}tre, Jean-Christophe and
+            March\'{e}, Claude and Monate, Benjamin and Moy, Yannick and
             Prevosto, Virgile},
-  month = mar,
-  title = {ACSL: ANSI/ISO C Specification Language. Version 1.8 --- 
-           Frama-C Oxygen implementation.},
-  year = {2014}
+  month = nov,
+  title = {ACSL: ANSI/ISO C Specification Language. Version 1.16 -- as implemented
+  in Frama-C 22.0},
+  year = {2020}
 }
 
 @misc{slicing,
@@ -84,7 +84,7 @@
 @article{fac15,
 year={2015},
 journal={Formal Aspects of Computing},
-title={Frama-C: A software analysis perspective},
+title={{Frama-C}: A software analysis perspective},
 publisher={Springer London},
 keywords={Formal verification; Static analysis; Dynamic analysis; C},
 author={Kirchner, Florent and Kosmatov, Nikolai and Prevosto, Virgile and Signoles, Julien and Yakobowski, Boris},
@@ -105,9 +105,68 @@ note={Extended version of \cite{sefm12}},
 }
 
 @manual{eacsl,
-  title = {Frama-C's E-ACSL Plug-in},
-  author = {Julien Signoles},
-  year = {2015},
-  month = feb,
-  note = {\url{http://frama-c.com/eacsl.html}},
+  title  = {Frama-C's E-ACSL Plug-in},
+  author = {Julien Signoles and Basile Desloges and Kostyantyn Vorobyov},
+  note   = {\url{https://frama-c.com/fc-plugins/e-acsl.html}},
+}
+
+@phdthesis{secureflow1,
+  author = {Mounir Assaf},
+  title  = {{From Qualitative to Quantitative Program Analysis:
+ Permissive Enforcement of Secure Information Flow}},
+  year   = 2015,
+  month  = may,
+  school = {Universit\'e Rennes 1},
+}
+
+@inproceedings{secureflow2,
+  author = {Gerg\"o Barany and Julien Signoles},
+  title  = {{Hybrid Information Flow Analysis for Real-World C Code}},
+  booktitle  = {International Conference on Tests and Proofs (TAP'17)},
+  year   = 2017,
+  month  = jul,
+}
+
+@inproceedings{ltest,
+  author    = {Micha{\"{e}}l Marcozzi and
+               S{\'{e}}bastien Bardin and
+               Micka{\"{e}}l Delahaye and
+               Nikolai Kosmatov and
+               Virgile Prevosto},
+  title     = {Taming Coverage Criteria Heterogeneity with LTest},
+  booktitle = {2017 {IEEE} International Conference on Software Testing, Verification
+               and Validation, {ICST} 2017, Tokyo, Japan, March 13-17, 2017},
+  pages     = {500--507},
+  year      = {2017},
+}
+
+@manual{mthread,
+  author = {Boris Yakobowski and Richard Bonichon},
+  title  = {{Frama-C}'s {Mthread} plug-in},
+  year   = 2012,
+  note   = {\mbox{\url{http://frama-c.com/download/frama-c-mthread-manual.pdf}}},
+}
+
+@manual{framaclang,
+  author = {David Cok},
+  title  = {{Frama-C}'s {Frama-Clang} plug-in},
+  year   = 2021,
+  note   = {\mbox{\url{https://www.frama-c.com/download/frama-clang-manual.pdf}}},
+}
+
+@inproceedings{metacsl,
+  TITLE = {{MetAcsl: Specification and Verification of High-Level Properties}},
+  AUTHOR = {Robles, Virgile and Kosmatov, Nikolai and Pr{\'e}vosto, Virgile and Rilling, Louis and Le Gall, Pascale},
+  URL = {https://hal-cea.archives-ouvertes.fr/cea-02019790},
+  BOOKTITLE = {{TACAS 2019}},
+  ADDRESS = {Prague, Czech Republic},
+  SERIES = {LNCS},
+  VOLUME = {11427},
+  YEAR = {2019},
+  MONTH = Apr,
+  DOI = {10.1007/978-3-030-17462-0\_22},
+  KEYWORDS = {Frama-C ; meta-properties ; deductive verification ; formal specification},
+  PDF = {https://hal-cea.archives-ouvertes.fr/cea-02019790/file/main.pdf},
+  HAL_ID = {cea-02019790},
+  HAL_VERSION = {v1},
 }

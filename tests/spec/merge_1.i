@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"%{dep:merge_2.i}"
+   STDOPT: +"@PTEST_DIR@/merge_2.i"
  */
 /*@ requires \valid(s);
   @ assigns \nothing;

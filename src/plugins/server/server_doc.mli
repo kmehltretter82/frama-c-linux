@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -72,6 +72,6 @@ val package : Package.packageInfo -> unit
 
 (** Dumps all published pages of documentations. Unless [~meta:false], also
     generates METADATA for each page in [<filename>.json] for each page. *)
-val dump : root:string -> ?meta:bool -> unit -> unit
+val dump : root:Filepath.Normalized.t -> ?meta:bool -> unit -> unit
 
 (* -------------------------------------------------------------------------- *)

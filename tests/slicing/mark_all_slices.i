@@ -1,11 +1,11 @@
 /* run.config
- LIBS: ../libSelect
+ LIBS: libSelect
  MODULE: @PTEST_NAME@
-   OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -no-slice-callers -journal-disable
+   OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -no-slice-callers
 */
-
 int A, B, C, D;
 int A2, B2, C2, D2;
+
 int all (int x) {
   A = x;
   B = x;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,24 +21,24 @@
 (**************************************************************************)
 
 (** All these functions find the nodes needed for various kind of annotations.
-*
-* @raise Kernel_function.No_Definition on annotations for function declarations.
-*
-* *)
+ *
+ * @raise Kernel_function.No_Definition on annotations for function declarations.
+ *
+ * *)
 
 (** [data_info] is composed of [(node,z_part) list, undef_loc)]
-*             and correspond to data dependencies nodes.
-*             Can be None if we don't know how to compute them.
+ *             and correspond to data dependencies nodes.
+ *             Can be None if we don't know how to compute them.
 *)
 type data_info =
   ((PdgTypes.Node.t * Locations.Zone.t option) list
-  * Locations.Zone.t option) option
+   * Locations.Zone.t option) option
 
 (** [ctrl_info] correspond to control dependencies nodes *)
 type ctrl_info = PdgTypes.Node.t list
 
 (** [decl_info] correspond to the declarations nodes of the variables needed to
-* parse the annotation *)
+ * parse the annotation *)
 type decl_info =  PdgTypes.Node.t list
 
 (** @raise Not_found when the statement is unreachable. *)

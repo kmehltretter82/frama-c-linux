@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -444,7 +444,7 @@ $(NAME_OFLAGS):=$(OFLAGS) $(INCLUDE_FLAGS) $(PLUGIN_OFLAGS)
 # DO NOT include the plugin's own directory as search path for compiling
 # ml test scripts: they will be loaded in a separate phase, and will only see
 # the plugin through its static API
-$(NAME_TEST_BFLAGS):= $(BFLAGS) $(INCLUDE_EXT_FLAGS) $(PLUGIN_BFLAGS)
+$(NAME_TEST_BFLAGS):= $(BFLAGS) $(INCLUDE_EXT_FLAGS) $(PLUGIN_BFLAGS) -w -70
 $(NAME_TEST_OFLAGS):= $(OFLAGS) $(INCLUDE_EXT_FLAGS) $(PLUGIN_OFLAGS)
 
 $(TARGET_BFLAGS):= $(PLUGIN_LINK_BFLAGS)
@@ -1014,6 +1014,7 @@ $(PLUGIN_DIR)/@PLUGIN_NAME@_DEP_REDO:
 $(PLUGIN_DIR)/@PLUGIN_NAME@_DEP:
 $(PLUGIN_DIR)/@PLUGIN_NAME@_CLEAN:
 $(PLUGIN_DIR)/@PLUGIN_NAME@_CLEAN_DOC:
+$(PLUGIN_DIR)/@PLUGIN_NAME@_DIST_CLEAN:
 endif
 
 # Reset each "local" plugin variable

@@ -69,7 +69,7 @@ val finishParsing: unit -> unit (** Call this function to finish parsing and
     of context before and after. [ctx] defaults to 2.
     If [start_line] is specified, then all lines between [start_line] and
     [pos.pos_lnum] are considered part of the error.
- *)
+*)
 val pp_context_from_file:
   ?ctx:int -> ?start_line:int -> Format.formatter -> Filepath.position -> unit
 

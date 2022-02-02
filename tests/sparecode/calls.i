@@ -1,9 +1,9 @@
 /* run.config
    STDOPT: +"-sparecode-analysis"
+PLUGIN: @PTEST_PLUGIN@ slicing
    STDOPT: +"-slicing-level 2 -slice-return main -then-on 'Slicing export' -print"
 */
 int G;
-
 int f (int x, int y) {
   G = y;
   return x;

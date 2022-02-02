@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -432,7 +432,7 @@ let rec monitored_property ip =
   | IPDisjoint _ -> true
   | IPReachable {ir_kf=None} -> false
   | IPReachable {ir_kf=Some _} -> true
-  | IPAxiomatic _ | IPAxiom _ -> false
+  | IPAxiomatic _ -> false
   | IPLemma _ -> true
   | IPTypeInvariant _ | IPGlobalInvariant _ -> true
   | IPOther _ -> true
@@ -520,14 +520,14 @@ let report_dump fmt =
   end
 
 let report_output file =
-  R.feedback "Output %s@." file ;
-  Command.print_file file report_dump
+  R.feedback "Output %a@." Filepath.Normalized.pretty file;
+  Command.print_file (file:>string) report_dump
 
 let report_number name nb opt =
   if nb > 0 then R.feedback "%s%4d" name nb ;
   let file = opt () in
-  if file <> "" then
-    let out = open_out file in
+  if not (Filepath.Normalized.is_empty file) then
+    let out = open_out (file:>string) in
     output_string out (string_of_int nb) ;
     flush out ; close_out out
 
@@ -540,8 +540,7 @@ let classify () =
        (not (R.Stderr.get ()) &&
         not (R.Output.is_set ()))
     then report_console () ;
-    let file = R.Output.get () in
-    if file <> "" then report_output file ;
+    if not (R.Output.is_empty ()) then report_output (R.Output.get ());
     report_number "Reviews     : " !nb_reviews R.OutputReviews.get ;
     report_number "Errors      : " !nb_errors R.OutputErrors.get ;
     report_number "Unclassified: " !nb_unclassified R.OutputUnclassified.get ;

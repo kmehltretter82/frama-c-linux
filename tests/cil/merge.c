@@ -1,4 +1,4 @@
 /* run.config
-   STDOPT: +"%{dep:merge2.c}"
+   STDOPT: +"%{dep:@PTEST_DIR@/merge2.c}"
 */
-int x;
+extern int x;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -2225,6 +2225,12 @@ struct
       filter = [] ;
     }
 
+    let copy sigma = {
+      pool = POOL.create ~copy:sigma.pool () ;
+      shared = sigma.shared ;
+      filter = sigma.filter ;
+    }
+
     let validate fn e =
       if not (lc_closed e) then
         begin
@@ -2251,7 +2257,7 @@ struct
       | FUN(f,s) -> (try call f e with Not_found -> compute e s)
       | MAP(m,s) -> (try Tmap.find e m with Not_found -> compute e s)
 
-    let get sigma a = compute a sigma.shared
+    let find sigma a = compute a sigma.shared
 
     let filter sigma a =
       List.for_all (fun f -> f a) sigma.filter
@@ -2262,17 +2268,6 @@ struct
       sigma.shared <- match sigma.shared with
         | MAP(m,s) -> MAP (Tmap.add a b m,s)
         | (FUN _ | EMPTY) as s -> MAP (Tmap.add a b Tmap.empty,s)
-
-    let add_map sigma m =
-      if not (Tmap.is_empty m) then
-        begin
-          Tmap.iter
-            (fun a b ->
-               validate "Qed.Subst.add_map (domain)" a ;
-               validate "Qed.Subst.add_map (codomain)" b ;
-            ) m ;
-          sigma.shared <- MAP(m,sigma.shared)
-        end
 
     let add_fun sigma f =
       sigma.shared <- FUN(f,sigma.shared)
@@ -2302,7 +2297,7 @@ struct
     else e
 
   and compute mu sigma alpha e =
-    try Subst.get sigma e with Not_found ->
+    try Subst.find sigma e with Not_found ->
       let r =
         match e.repr with
         | Bvar(k,_) -> Intmap.find k alpha

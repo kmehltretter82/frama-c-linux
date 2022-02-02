@@ -1,6 +1,6 @@
 /* run.config
 MODULE: @PTEST_NAME@
-STDOPT: +"-machdep x86_32 -constfold"
+OPT: -machdep x86_32 -no-autoload-plugins -print -constfold
 */
 
 int main(void) {

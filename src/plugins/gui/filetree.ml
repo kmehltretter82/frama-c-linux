@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -104,7 +104,7 @@ struct
   type custom_tree =
     {finfo: TREE.t;
      mutable sons: custom_tree array;
-     mutable parent: custom_tree option;
+     parent: custom_tree option;
      fidx: int (* invariant: parent.(fidx)==myself *) }
 
   let inbound i a = i>=0 && i<Array.length a
@@ -236,7 +236,7 @@ end
 
 module MYTREE = struct
   type storage = { mutable name : string;
-                   mutable globals: global array;
+                   globals: global array;
                    mutable strikethrough: bool}
 
 
@@ -293,7 +293,8 @@ module MYTREE = struct
     Cil.hasAttribute "FC_BUILTIN" (Cil_datatype.Global.attr g)
 
   let comes_from_share filename =
-    Filepath.is_relative ~base_name:Fc_config.datadir filename
+    let path = Filepath.Normalized.of_string filename in
+    Filepath.is_relative ~base_name:Fc_config.datadir path
 
   let is_function t = match t with
     | MFile _ -> false
@@ -316,11 +317,10 @@ module MYTREE = struct
     | Dvolatile _ -> Some "volatile clause"
     | Daxiomatic (s, _, _,_) -> Some (global_name s)
     | Dtype (lti, _) -> Some (global_name lti.lt_name)
-    | Dlemma (s, _, _, _, _, _,_) -> Some (global_name s)
+    | Dlemma (s, _, _, _, _,_) -> Some (global_name s)
     | Dinvariant (li, _) -> Some (global_name li.l_var_info.lv_name)
     | Dtype_annot (li, _) -> Some (global_name li.l_var_info.lv_name)
     | Dmodel_annot (mf, _) -> Some (global_name mf.mi_name)
-    | Dcustom_annot _ -> Some "custom clause"
     | Dextended (e,_,_) -> Some ("ACSL extension " ^ (extension_name e))
 
   let make_list_globals hide sort_order globs =

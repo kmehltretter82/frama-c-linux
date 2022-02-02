@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -120,6 +120,33 @@ let rank_term = function
   | Toffset _ -> 31
   | TLogic_coerce _ -> 32
 
+let rank_predicate = function
+  | Pfalse -> 0
+  | Ptrue -> 1
+  | Papp _ -> 2
+  | Pseparated _ -> 3
+  | Prel _ -> 4
+  | Pand _ -> 5
+  | Por _ -> 6
+  | Pxor _ -> 7
+  | Pimplies _ -> 8
+  | Piff _ -> 9
+  | Pnot _ -> 10
+  | Pif _ -> 11
+  | Plet _ -> 12
+  | Pforall _ -> 13
+  | Pexists _ -> 14
+  | Pat _ -> 15
+  | Pobject_pointer _ -> 16
+  | Pvalid_read _ -> 17
+  | Pvalid _ -> 18
+  | Pvalid_function _ -> 19
+  | Pinitialized _ -> 20
+  | Pdangling _ -> 21
+  | Pallocable _ -> 22
+  | Pfreeable _ -> 23
+  | Pfresh _ -> 24
+
 
 (**************************************************************************)
 (** {3 Cabs types} *)
@@ -226,10 +253,15 @@ module Location = struct
   let to_lexing_loc (pos1, pos2) =
     Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
 
-  let equal_start_semantic (pos1, _) (pos2, _) =
-    Filepath.(Datatype.Filepath.equal pos1.pos_path pos2.pos_path
-              && pos1.pos_lnum = pos2.pos_lnum
-              && pos1.pos_cnum - pos1.pos_bol = pos2.pos_cnum - pos2.pos_bol)
+  let compare_start_semantic (pos1, _) (pos2, _) =
+    let open Filepath in
+    let c = Datatype.Filepath.compare pos1.pos_path pos2.pos_path in
+    if c <> 0 then c else
+      let c = pos1.pos_lnum - pos2.pos_lnum in
+      if c <> 0 then c else
+        (pos1.pos_cnum - pos1.pos_bol) - (pos2.pos_cnum - pos2.pos_bol)
+
+  let equal_start_semantic l1 l2 = compare_start_semantic l1 l2 = 0
 
 end
 
@@ -408,7 +440,8 @@ let compare_exp_struct_eq = Extlib.mk_fun "compare_exp_struct_eq"
 type type_compare_config =
   { by_name : bool;
     logic_type: bool;
-    unroll: bool }
+    unroll: bool;
+    no_attrs:bool; }
 
 let rec compare_attribute config a1 a2 = match a1, a2 with
   | Attr (s1, l1), Attr (s2, l2) ->
@@ -417,10 +450,12 @@ let rec compare_attribute config a1 a2 = match a1, a2 with
   | Attr _, AttrAnnot _ -> -1
   | AttrAnnot _, Attr _ -> 1
 and compare_attributes config  l1 l2 =
-  let l1, l2 = if config.logic_type
-    then !drop_non_logic_attributes l1, !drop_non_logic_attributes l2
-    else l1,l2
-  in compare_list (compare_attribute config) l1 l2
+  if config.no_attrs then 0
+  else
+    let l1, l2 = if config.logic_type
+      then !drop_non_logic_attributes l1, !drop_non_logic_attributes l2
+      else l1,l2
+    in compare_list (compare_attribute config) l1 l2
 and compare_attrparam_list config l1 l2 =
   compare_list (compare_attrparam config) l1 l2
 and compare_attrparam config a1 a2 = match a1, a2 with
@@ -488,7 +523,7 @@ and compare_type config t1 t2 =
       compare_chain
         (compare_type config) t1 t2
         (compare_attributes config) l1 l2
-    | TArray (t1', e1, _, l1), TArray (t2', e2, _, l2) ->
+    | TArray (t1', e1, l1), TArray (t2', e2, l2) ->
       compare_chain compare_array_sizes e1 e2
         (compare_chain
            (compare_type config) t1' t2'
@@ -502,7 +537,7 @@ and compare_type config t1 t2 =
       assert (not config.unroll);
       compare_chain (=?=) t1.tname t2.tname
         (compare_attributes config) a1 a2
-    | TComp (c1, _, l1), TComp (c2, _, l2) ->
+    | TComp (c1, l1), TComp (c2, l2) ->
       let res =
         if config.by_name
         then (=?=) c1.cname c2.cname
@@ -523,9 +558,8 @@ and compare_type config t1 t2 =
 and compare_arg_list  config l1 l2 =
   Option.compare
     (compare_list
-       (fun (_n1, t1, l1) (_n2, t2, l2) ->
-          (compare_chain (compare_type config) t1 t2
-             (compare_attributes config)) l1 l2
+       (fun (_n1, t1, _l1) (_n2, t2, _l2) ->
+          compare_type config t1 t2
        )) l1 l2
 
 let hash_attribute _config = function
@@ -545,14 +579,14 @@ let rec hash_type config t =
   | TFloat (f, l) -> Hashtbl.hash (f, 3, hash_attributes config l)
   | TPtr (t, l) ->
     Hashtbl.hash (hash_type config t, 4, hash_attributes config l)
-  | TArray (t, _, _, l) ->
+  | TArray (t, _, l) ->
     Hashtbl.hash (hash_type config t, 5, hash_attributes config l)
   | TFun (r, a, v, l) ->
     Hashtbl.hash
       (hash_type config r, 6, hash_args config a, v, hash_attributes config l)
   | TNamed (ti, l) ->
     Hashtbl.hash (ti.tname, 7, hash_attributes config l)
-  | TComp (c, _, l) ->
+  | TComp (c, l) ->
     Hashtbl.hash
       ((if config.by_name then Hashtbl.hash c.cname else c.ckey), 8,
        hash_attributes config l)
@@ -571,7 +605,9 @@ module Attribute=struct
   include Make_with_collections
       (struct
         type t = attribute
-        let config = { by_name = false; logic_type = false; unroll = true }
+        let config =
+          { by_name = false; logic_type = false;
+            unroll = true; no_attrs = false }
         let name = "Attribute"
         let reprs = [ AttrAnnot "" ]
         let compare = compare_attribute config
@@ -613,7 +649,9 @@ module Typ= struct
   include
     MakeTyp
       (struct
-        let config = { by_name = false; logic_type = false; unroll = true; }
+        let config =
+          { by_name = false; logic_type = false;
+            unroll = true; no_attrs = false}
         let name = "Typ"
       end)
   let toplevel_attr = function
@@ -622,8 +660,8 @@ module Typ= struct
     | TFloat (_, a) -> a
     | TNamed (_, a) -> a
     | TPtr (_, a) -> a
-    | TArray (_, _, _,a) -> a
-    | TComp (_, _, a) -> a
+    | TArray (_, _,a) -> a
+    | TComp (_, a) -> a
     | TEnum (_, a) -> a
     | TFun (_, _, _, a) -> a
     | TBuiltin_va_list a -> a
@@ -632,15 +670,26 @@ end
 module TypByName =
   MakeTyp
     (struct
-      let config = { by_name = true; logic_type = false; unroll = false; }
+      let config = { by_name = true; logic_type = false;
+                     unroll = false; no_attrs = false }
       let name = "TypByName"
     end)
 
 module TypNoUnroll =
   MakeTyp
     (struct
-      let config = { by_name = false; logic_type = false; unroll = false; }
+      let config = { by_name = false; logic_type = false;
+                     unroll = false; no_attrs = false }
       let name = "TypNoUnroll"
+    end)
+
+module TypNoAttrs =
+  MakeTyp
+    (struct
+      let config =
+        { by_name = false; logic_type = false;
+          unroll = true; no_attrs = true}
+      let name = "TypNoAttrs"
     end)
 
 module Typeinfo =
@@ -812,8 +861,8 @@ module Fieldinfo = struct
                            floc = loc;
                            faddrof = false;
                            fsize_in_bits = None;
-                           foffset_in_bits = None;
-                           fpadding_in_bits = None }
+                           foffset_in_bits = None
+                         }
                          :: acc)
                       acc
                       Location.reprs)
@@ -877,15 +926,26 @@ module Enumitem = struct
       end)
 end
 
-let compare_constant c1 c2 = match c1, c2 with
-  | CInt64(v1,k1,_), CInt64(v2,k2,_) ->
-    compare_chain Integer.compare v1 v2 Extlib.compare_basic k1 k2
+(* If [strict] is true, the comparaison of integer and floating-point constants
+   takes into account their textual representation (if any). Otherwise,
+   constants with the same type and value are equal even if their textual
+   representations differ. *)
+let compare_constant ~strict c1 c2 = match c1, c2 with
+  | CInt64(v1,k1,s1), CInt64(v2,k2,s2) ->
+    let r = compare_chain Integer.compare v1 v2 Extlib.compare_basic k1 k2 in
+    if r = 0 && strict
+    then Option.compare Datatype.String.compare s1 s2
+    else r
   | CStr s1, CStr s2 -> Datatype.String.compare s1 s2
   | CWStr s1, CWStr s2 -> compare_list Datatype.Int64.compare s1 s2
   | CChr c1, CChr c2 -> Datatype.Char.compare c1 c2
-  | CReal (f1,k1,_), CReal(f2,k2,_) ->
-    compare_chain Datatype.Float.compare f1 f2
-      Extlib.compare_basic k1 k2
+  | CReal (f1,k1,s1), CReal(f2,k2,s2) ->
+    let r =
+      compare_chain Datatype.Float.compare f1 f2 Extlib.compare_basic k1 k2
+    in
+    if r = 0 && strict
+    then Option.compare Datatype.String.compare s1 s2
+    else r
   | CEnum e1, CEnum e2 -> Enumitem.compare e1 e2
   | (CInt64 _, (CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _)) -> 1
   | (CStr _, (CWStr _ | CChr _ | CReal _ | CEnum _)) -> 1
@@ -902,16 +962,41 @@ let hash_const c =
   | CInt64 (n,k,_) -> Integer.hash n + Hashtbl.hash k
   | CEnum ei -> 95 + Enumitem.hash ei
 
+module type Make_cmp_input = sig
+  include Datatype.Make_input
+  val compare: strict:bool -> t -> t -> int
+end
+
+module Make_compare_non_strict(M: Make_cmp_input) =
+  Datatype.Make_with_collections(
+  struct
+    include M
+    let compare = M.compare ~strict:false
+  end)
+
+module Make_compare_strict(M: Make_cmp_input) =
+  Datatype.Make_with_collections(
+  struct
+    include M
+    let compare = M.compare ~strict:true
+    let name = M.name ^ "Strict"
+  end)
+
 module StructEq =
 struct
-  let rec compare_exp e1 e2 =
+  (* If [strict] is true, the comparaison of integer and floating-point constants
+     takes into account their textual representation (if any). Otherwise,
+     constants with the same type and value are equal even if their textual
+     representations differ. *)
+  let rec compare_exp ~strict e1 e2 =
+    let compare_exp = compare_exp ~strict in
     match e1.enode, e2.enode with
     | Const (CStr _), Const (CStr _)
     | Const (CWStr _), Const (CWStr _) -> compare e1.eid e2.eid
-    | Const c1, Const c2 -> compare_constant c1 c2
+    | Const c1, Const c2 -> compare_constant ~strict c1 c2
     | Const _, _ -> 1
     | _, Const _ -> -1
-    | Lval lv1, Lval lv2 -> compare_lval lv1 lv2
+    | Lval lv1, Lval lv2 -> compare_lval ~strict lv1 lv2
     | Lval _, _ -> 1
     | _, Lval _ -> -1
     | SizeOf t1, SizeOf t2 -> Typ.compare t1 t2
@@ -953,40 +1038,40 @@ struct
       if res = 0 then compare_exp e1 e2 else res
     | CastE _, _ -> 1
     | _, CastE _ -> -1
-    | AddrOf lv1, AddrOf lv2 -> compare_lval lv1 lv2
+    | AddrOf lv1, AddrOf lv2 -> compare_lval ~strict lv1 lv2
     | AddrOf _, _ -> 1
     | _, AddrOf _ -> -1
-    | StartOf lv1, StartOf lv2 -> compare_lval lv1 lv2
+    | StartOf lv1, StartOf lv2 -> compare_lval ~strict lv1 lv2
     | StartOf _, _ -> 1
     | _, StartOf _ -> -1
     | Info _, Info _ ->
       Cmdline.Kernel_log.fatal
         "[exp_compare] Info node is obsolete. Do not use it"
 
-  and compare_lval (h1,o1) (h2,o2) =
-    let res = compare_lhost h1 h2 in
-    if res = 0 then compare_offset o1 o2 else res
+  and compare_lval ~strict (h1,o1) (h2,o2) =
+    let res = compare_lhost ~strict h1 h2 in
+    if res = 0 then compare_offset ~strict o1 o2 else res
 
-  and compare_lhost h1 h2 =
+  and compare_lhost ~strict h1 h2 =
     match h1, h2 with
     | Var v1, Var v2 -> Varinfo.compare v1 v2
     | Var _, Mem _ -> 1
-    | Mem e1, Mem e2 -> compare_exp e1 e2
+    | Mem e1, Mem e2 -> compare_exp ~strict e1 e2
     | Mem _, Var _ -> -1
 
-  and compare_offset o1 o2 =
+  and compare_offset ~strict o1 o2 =
     match o1, o2 with
     | NoOffset, NoOffset -> 0
     | NoOffset, _ -> 1
     | _, NoOffset -> -1
     | Field(f1,o1), Field(f2, o2) ->
       let res = Fieldinfo.compare f1 f2 in
-      if res = 0 then compare_offset o1 o2 else res
+      if res = 0 then compare_offset ~strict o1 o2 else res
     | Field _, _ -> 1
     | _, Field _ -> -1
     | Index(e1, o1), Index(e2, o2) ->
-      let res = compare_exp e1 e2 in
-      if res = 0 then compare_offset o1 o2 else res
+      let res = compare_exp ~strict e1 e2 in
+      if res = 0 then compare_offset ~strict o1 o2 else res
 
   let prime = 83047
   let rec hash_exp acc e =
@@ -1028,35 +1113,43 @@ module Wide_string =
   Datatype.List_with_collections(Datatype.Int64)
     (struct let module_name = "Cil_datatype.Wide_string" end)
 
-module Constant =
+module Constant_input =
 struct
   let pretty_ref = Extlib.mk_fun "Cil_datatype.Constant.pretty_ref"
-  include Make_with_collections
-      (struct
-        include Datatype.Undefined
-        type t = constant
-        let name = "Constant"
-        let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
-        let compare = compare_constant
-        let hash = hash_const
-        let equal = Datatype.from_compare
-        let pretty fmt t = !pretty_ref fmt t
-      end)
+  include Datatype.Serializable_undefined
+  type t = constant
+  let name = "Constant"
+  let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
+  let compare = compare_constant
+  let hash = hash_const
+  let equal = Datatype.from_compare
+  let pretty fmt t = !pretty_ref fmt t
 end
 
-module ExpStructEq =
-  Make_with_collections
-    (struct
-      include Datatype.Undefined
-      type t = exp
-      let name = "ExpStructEq"
-      let reprs = [ Exp.dummy ]
-      let compare = StructEq.compare_exp
-      let hash = StructEq.hash_exp 7863
-      let equal = Datatype.from_compare
-      let pretty fmt t = !Exp.pretty_ref fmt t
-    end)
+module Constant = struct
+  include
+    Make_compare_non_strict(Constant_input)
+  let pretty_ref = Constant_input.pretty_ref
+end
+
+module ConstantStrict =
+  Make_compare_strict(Constant_input)
+
+module ExpStructEq_input = struct
+  include Datatype.Serializable_undefined
+  type t = exp
+  let name = "ExpStructEq"
+  let structural_descr = Structural_descr.t_abstract
+  let reprs = [ Exp.dummy ]
+  let compare = StructEq.compare_exp
+  let hash = StructEq.hash_exp 7863
+  let equal = Datatype.from_compare
+  let pretty fmt t = !Exp.pretty_ref fmt t
+end
+
+module ExpStructEq = Make_compare_non_strict(ExpStructEq_input)
 let () = compare_exp_struct_eq := ExpStructEq.compare
+module ExpStructEqStrict = Make_compare_strict(ExpStructEq_input)
 
 module Block = struct
   let pretty_ref = Extlib.mk_fun "Cil_datatype.Block.pretty_ref"
@@ -1142,20 +1235,24 @@ module Lval = struct
       end)
 end
 
-module LvalStructEq =
-  Make_with_collections
-    (struct
-      type t = lval
-      let name = "LvalStructEq"
-      let reprs = List.map (fun v -> Var v, NoOffset) Varinfo.reprs
-      let compare = StructEq.compare_lval
-      let equal = Datatype.from_compare
-      let hash = StructEq.hash_lval 13598
-      let copy = Datatype.undefined
-      let internal_pretty_code = Datatype.undefined
-      let pretty fmt x = !Lval.pretty_ref fmt x
-      let varname _ = "lv"
-    end)
+module LvalStructEq_input = struct
+  include Datatype.Serializable_undefined
+  type t = lval
+  let name = "LvalStructEq"
+  let reprs = List.map (fun v -> Var v, NoOffset) Varinfo.reprs
+  let structural_descr = Structural_descr.t_abstract
+  let compare = StructEq.compare_lval
+  let equal = Datatype.from_compare
+  let hash = StructEq.hash_lval 13598
+  let copy = Datatype.undefined
+  let internal_pretty_code = Datatype.undefined
+  let pretty fmt x = !Lval.pretty_ref fmt x
+  let varname _ = "lv"
+end
+
+module LvalStructEq = Make_compare_non_strict(LvalStructEq_input)
+
+module LvalStructEqStrict = Make_compare_strict(LvalStructEq_input)
 
 module Offset = struct
   let pretty_ref = ref (fun _ -> assert false)
@@ -1174,20 +1271,23 @@ module Offset = struct
       end)
 end
 
-module OffsetStructEq =
-  Make_with_collections
-    (struct
-      type t = offset
-      let name = "OffsetStructEq"
-      let reprs = [NoOffset]
-      let compare = StructEq.compare_offset
-      let equal = Datatype.from_compare
-      let hash = StructEq.hash_offset 75489
-      let copy = Datatype.undefined
-      let internal_pretty_code = Datatype.undefined
-      let pretty fmt x = !Offset.pretty_ref fmt x
-      let varname _ = "offs"
-    end)
+module OffsetStructEq_input = struct
+  include Datatype.Serializable_undefined
+  type t = offset
+  let name = "OffsetStructEq"
+  let reprs = [NoOffset]
+  let structural_descr = Structural_descr.t_abstract
+  let compare = StructEq.compare_offset
+  let equal = Datatype.from_compare
+  let hash = StructEq.hash_offset 75489
+  let copy = Datatype.undefined
+  let internal_pretty_code = Datatype.undefined
+  let pretty fmt x = !Offset.pretty_ref fmt x
+  let varname _ = "offs"
+end
+
+module OffsetStructEq = Make_compare_non_strict(OffsetStructEq_input)
+module OffsetStructEqStrict = Make_compare_strict(OffsetStructEq_input)
 
 (**************************************************************************)
 (** {3 ACSL types} *)
@@ -1390,7 +1490,8 @@ module Logic_info_structural = struct
           in
           if name_cmp <> 0 then name_cmp else begin
             let config =
-              { by_name = true ; logic_type = true ; unroll = true }
+              { by_name = true ; logic_type = true ;
+                unroll = true ; no_attrs = false }
             in
             let prm_cmp p1 p2 =
               compare_logic_type config p1.lv_type p2.lv_type
@@ -1432,7 +1533,8 @@ end
 module Logic_type =
   Make_Logic_type(
   struct
-    let config = { by_name = false; logic_type = true; unroll = true }
+    let config = { by_name = false; logic_type = true;
+                   unroll = true; no_attrs = false }
     let name = "Logic_type"
   end)
 
@@ -1440,14 +1542,16 @@ module Logic_type_ByName =
   Make_Logic_type(
   struct
     let name = "Logic_type_ByName"
-    let config = { by_name = true; logic_type = true; unroll = false }
+    let config = { by_name = true; logic_type = true;
+                   unroll = false; no_attrs = false }
   end)
 
 module Logic_type_NoUnroll =
   Make_Logic_type(
   struct
     let name = "Logic_type_NoUnroll"
-    let config = { by_name = false; logic_type = false; unroll = false }
+    let config = { by_name = false; logic_type = false;
+                   unroll = false; no_attrs = false }
   end)
 
 module Model_info = struct
@@ -1586,12 +1690,12 @@ let rec compare_term t1 t2 =
     | Tlet(x1,t1) , Tlet(x2,t2) ->
       let c = Logic_info.compare x1 x2 in
       if c <> 0 then c else compare_term t1 t2
-    | Tcomprehension (t1, q1, _p1), Tcomprehension (t2, q2, _p2) ->
+    | Tcomprehension (t1, q1, p1), Tcomprehension (t2, q2, p2) ->
       let c = compare_term t1 t2 in
       if c <> 0 then c
       else
         let cq = compare_list Logic_var.compare q1 q2 in
-        if cq <> 0 then cq else assert false (* TODO !*)
+        if cq <> 0 then cq else Option.compare compare_predicate p1 p2
     | TLogic_coerce(ty1,e1), TLogic_coerce(ty2,e2) ->
       let ct = Logic_type.compare ty1 ty2 in
       if ct <> 0 then ct
@@ -1645,12 +1749,88 @@ and compare_logic_label l1 l2 = match l1, l2 with
 
 and compare_ctor c1 c2 = String.compare c1.ctor_name c2.ctor_name
 
-and compare_bound b1 b2 = match b1, b2 with
-  | None , None -> 0
-  | Some _ , None -> 1
-  | None , Some _ -> (-1)
-  | Some x , Some y -> compare_term x y
+and compare_bound b1 b2 = Option.compare compare_term b1 b2
 
+and compare_predicate p1 p2 =
+  let r1 = rank_predicate p1.pred_content in
+  let r2 = rank_predicate p2.pred_content in
+  if r1 <> r2 then r1 - r2 else
+    match p1.pred_content, p2.pred_content with
+    | Pfalse, Pfalse -> 0
+    | Ptrue, Ptrue -> 0
+    | Papp(i1,labels1,args1), Papp(i2,labels2,args2) ->
+      let c = Logic_info.compare i1 i2 in
+      if c <> 0 then c
+      else
+        let c = compare_list compare_logic_label labels1 labels2 in
+        if c <> 0 then c
+        else compare_list compare_term args1 args2
+    | Prel(r1,lt1,rt1), Prel(r2,lt2,rt2) ->
+      let c = compare r1 r2 in
+      if c <> 0 then c
+      else
+        let c = compare_term lt1 lt2 in
+        if c <> 0 then c
+        else compare_term rt1 rt2
+    | Pand(lp1,rp1), Pand(lp2,rp2) | Por(lp1,rp1), Por(lp2,rp2)
+    | Pxor (lp1,rp1), Pxor(lp2,rp2) | Pimplies(lp1,rp1), Pimplies(lp2,rp2)
+    | Piff(lp1,rp1), Piff(lp2,rp2) ->
+      let c = compare_predicate lp1 lp2 in
+      if c <> 0 then c
+      else compare_predicate rp1 rp2
+    | Pnot p1, Pnot p2 ->
+      compare_predicate p1 p2
+    | Pif (c1,t1,e1), Pif(c2,t2,e2) ->
+      let c = compare_term c1 c2 in
+      if c <> 0 then c
+      else
+        let c = compare_predicate t1 t2 in
+        if c <> 0 then c
+        else compare_predicate e1 e2
+    | Plet (d1,p1), Plet(d2,p2) ->
+      let c = Logic_info.compare d1 d2 in
+      if c <> 0 then c
+      else compare_predicate p1 p2
+    | Pforall(q1,p1), Pforall(q2,p2) ->
+      let c = compare_list Logic_var.compare q1 q2 in
+      if c <> 0 then c
+      else compare_predicate p1 p2
+    | Pexists(q1,p1), Pexists(q2,p2) ->
+      let c = compare_list Logic_var.compare q1 q2 in
+      if c <> 0 then c
+      else compare_predicate p1 p2
+    | Pat(p1,l1), Pat(p2,l2) ->
+      let c = compare_logic_label l1 l2 in
+      if c <> 0 then c else compare_predicate p1 p2
+    | Pallocable (l1,t1), Pallocable (l2,t2)
+    | Pfreeable (l1,t1), Pfreeable (l2,t2)
+    | Pvalid (l1,t1), Pvalid (l2,t2)
+    | Pvalid_read (l1,t1), Pvalid_read (l2,t2)
+    | Pobject_pointer (l1,t1), Pobject_pointer (l2,t2)
+    | Pinitialized (l1,t1), Pinitialized (l2,t2)
+    | Pdangling (l1,t1), Pdangling (l2,t2) ->
+      let c = compare_logic_label l1 l2 in
+      if c <> 0 then c else compare_term t1 t2
+    | Pvalid_function t1, Pvalid_function t2 ->
+      compare_term t1 t2
+    | Pfresh (l1,m1,t1,n1), Pfresh (l2,m2,t2,n2) ->
+      let c = compare_logic_label l1 l2 in
+      if c <> 0 then c
+      else
+        let c = compare_logic_label m1 m2 in
+        if c <> 0 then c
+        else
+          let c = compare_term t1 t2 in
+          if c <> 0 then c
+          else compare_term n1 n2
+    | Pseparated(seps1), Pseparated(seps2) ->
+      compare_list compare_term seps1 seps2
+    | (Pfalse | Ptrue | Papp _ | Prel _ | Pand _ | Por _ | Pimplies _
+      | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
+      | Pat _ | Pvalid _ | Pvalid_read _ | Pobject_pointer _ | Pvalid_function _
+      | Pinitialized _ | Pdangling _
+      | Pfresh _ | Pallocable _ | Pfreeable _ | Pxor _ | Pseparated _
+      ), _ -> assert false
 
 exception StopRecursion of int
 
@@ -1675,25 +1855,25 @@ let rec hash_term (acc,depth,tot) t =
   else begin
     match t.term_node with
     | TConst c -> (acc + hash_logic_constant c, tot - 1)
-    | TLval lv -> hash_tlval (acc+19,depth - 1,tot -1) lv
-    | TSizeOf t -> (acc + 38 + Typ.hash t, tot - 1)
-    | TSizeOfE t -> hash_term (acc+57,depth -1, tot-1) t
-    | TSizeOfStr s -> (acc + 76 + Hashtbl.hash s, tot - 1)
-    | TAlignOf t -> (acc + 95 + Typ.hash t, tot - 1)
-    | TAlignOfE t -> hash_term (acc+114,depth-1,tot-1) t
-    | TUnOp(op,t) -> hash_term (acc+133+Hashtbl.hash op,depth-1,tot-2) t
+    | TLval lv -> hash_tlval (acc+2,depth - 1,tot -1) lv
+    | TSizeOf t -> (acc + 3 + Typ.hash t, tot - 1)
+    | TSizeOfE t -> hash_term (acc+5,depth -1, tot-1) t
+    | TSizeOfStr s -> (acc + 7 + Hashtbl.hash s, tot - 1)
+    | TAlignOf t -> (acc + 11 + Typ.hash t, tot - 1)
+    | TAlignOfE t -> hash_term (acc+13,depth-1,tot-1) t
+    | TUnOp(op,t) -> hash_term (acc+17+Hashtbl.hash op,depth-1,tot-2) t
     | TBinOp(bop,t1,t2) ->
       let hash1,tot1 =
-        hash_term (acc+152+Hashtbl.hash bop,depth-1,tot-2) t1
+        hash_term (acc+19+Hashtbl.hash bop,depth-1,tot-2) t1
       in
       hash_term (hash1,depth-1,tot1) t2
     | TCastE(ty,t) ->
       let hash1 = Typ.hash ty in
-      hash_term (acc+171+hash1,depth-1,tot-2) t
-    | TAddrOf lv -> hash_tlval (acc+190,depth-1,tot-1) lv
-    | TStartOf lv -> hash_tlval (acc+209,depth-1,tot-1) lv
+      hash_term (acc+23+hash1,depth-1,tot-2) t
+    | TAddrOf lv -> hash_tlval (acc+29,depth-1,tot-1) lv
+    | TStartOf lv -> hash_tlval (acc+31,depth-1,tot-1) lv
     | Tapp (li,labs,apps) ->
-      let hash1 = acc + 228 + Logic_info.hash li in
+      let hash1 = acc + 37 + Logic_info.hash li in
       let hash_lb (acc,tot) l =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + hash_label l,tot - 1)
@@ -1706,51 +1886,54 @@ let rec hash_term (acc,depth,tot) t =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + Logic_var.hash lv,tot-1)
       in
-      let (acc,tot) = List.fold_left hash_var (acc+247,tot-1) quants in
+      let (acc,tot) = List.fold_left hash_var (acc+41,tot-1) quants in
       hash_term (acc,depth-1,tot-1) t
     | TDataCons(ctor,args) ->
-      let hash = acc + 266 + Logic_ctor_info.hash ctor in
+      let hash = acc + 43 + Logic_ctor_info.hash ctor in
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
       List.fold_left hash_one_term (hash,tot-1) args
     | Tif(t1,t2,t3) ->
-      let hash1,tot1 = hash_term (acc+285,depth-1,tot) t1 in
+      let hash1,tot1 = hash_term (acc+47,depth-1,tot) t1 in
       let hash2,tot2 = hash_term (hash1,depth-1,tot1) t2 in
       hash_term (hash2,depth-1,tot2) t3
     | Tat(t,l) ->
-      let hash = acc + 304 + hash_label l in
+      let hash = acc + 53 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Tbase_addr (l,t) ->
-      let hash = acc + 323 + hash_label l in
+      let hash = acc + 59 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Tblock_length (l,t) ->
-      let hash = acc + 342 + hash_label l in
+      let hash = acc + 61 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Toffset (l,t) ->
-      let hash = acc + 351 + hash_label l in
+      let hash = acc + 67 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
-    | Tnull -> acc+361, tot - 1
+    | Tnull -> acc+71, tot - 1
     | TUpdate(t1,off,t2) ->
-      let hash1,tot1 = hash_term (acc+418,depth-1,tot-1) t1 in
+      let hash1,tot1 = hash_term (acc+73,depth-1,tot-1) t1 in
       let hash2,tot2 = hash_toffset (hash1,depth-1,tot1) off in
       hash_term (hash2,depth-1,tot2) t2
-    | Ttypeof t -> hash_term (acc+437,depth-1,tot-1) t
-    | Ttype t -> acc + 456 + Typ.hash t, tot - 1
-    | Tempty_set -> acc + 475, tot - 1
+    | Ttypeof t -> hash_term (acc+79,depth-1,tot-1) t
+    | Ttype t -> acc + 83 + Typ.hash t, tot - 1
+    | Tempty_set -> acc + 89, tot - 1
     | Tunion tl ->
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
-      List.fold_left hash_one_term (acc+494,tot-1) tl
+      List.fold_left hash_one_term (acc+97,tot-1) tl
     | Tinter tl ->
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
-      List.fold_left hash_one_term (acc+513,tot-1) tl
-    | Tcomprehension (t,quants,_) -> (* TODO: hash predicates *)
+      List.fold_left hash_one_term (acc+101,tot-1) tl
+    | Tcomprehension (t,quants,p) ->
       let hash_var (acc,tot) lv =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + Logic_var.hash lv,tot-1)
       in
-      let (acc,tot) = List.fold_left hash_var (acc+532,tot-1) quants in
-      hash_term (acc,depth-1,tot-1) t
+      let (acc,tot) = List.fold_left hash_var (acc+103,tot-1) quants in
+      let (acc,tot) = hash_term (acc,depth-1,tot-1) t in
+      (match p with
+       | None -> acc, tot - 1
+       | Some p -> hash_predicate (acc, depth - 1, tot - 1) p)
     | Trange(t1,t2) ->
-      let acc = acc + 551 in
+      let acc = acc + 107 in
       let acc,tot =
         match t1 with
           None -> acc,tot - 1
@@ -1763,9 +1946,9 @@ let rec hash_term (acc,depth,tot) t =
          | Some t -> hash_term (acc,depth-1,tot-1) t)
     | Tlet(li,t) ->
       hash_term
-        (acc + 570 + Hashtbl.hash li.l_var_info.lv_name, depth-1, tot-1)
+        (acc + 109 + Hashtbl.hash li.l_var_info.lv_name, depth-1, tot-1)
         t
-    | TLogic_coerce(_,e) -> hash_term (acc + 587, depth - 1, tot - 1) e
+    | TLogic_coerce(_,e) -> hash_term (acc + 113, depth - 1, tot - 1) e
   end
 
 and hash_tlval (acc,depth,tot) (h,o) =
@@ -1796,6 +1979,101 @@ and hash_toffset (acc, depth, tot) t =
     | TIndex (t, o) ->
       let hash, tot = hash_term (acc+73, depth - 1, tot - 1) t in
       hash_toffset (hash, depth - 1, tot) o
+  end
+
+and hash_predicate (acc, depth, tot) p =
+  if tot <= 0 || depth <= 0 then raise (StopRecursion acc)
+  else begin
+    match p.pred_content with
+    | Pfalse -> acc + 2, tot - 1
+    | Ptrue -> acc + 3, tot - 1
+    | Papp(li,labels,args) ->
+      let hash1 = acc + 5 + Logic_info.hash li in
+      let hash_lb (acc, tot) l =
+        if tot = 0 then raise (StopRecursion acc)
+        else (acc + hash_label l, tot - 1)
+      in
+      let hash_one_term (acc, tot) t = hash_term (acc, depth - 1, tot) t in
+      let res = List.fold_left hash_lb (hash1, tot - 1) labels in
+      List.fold_left hash_one_term res args
+    | Prel(r,lt,rt) ->
+      let hashr = acc + 7 + Hashtbl.hash r in
+      let hashlt, totlt = hash_term (hashr, depth - 1, tot - 1) lt in
+      hash_term (hashlt, depth - 1, totlt) rt
+    | Pand(lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 11, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Por(lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 13, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Pxor (lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 17, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Pimplies(lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 19, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Piff(lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 23, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Pnot p -> hash_predicate (acc + 29, depth - 1, tot - 1) p
+    | Pif (c,t,e) ->
+      let hashc, totc = hash_term (acc + 31, depth - 1, tot - 1) c in
+      let hasht, tott = hash_predicate (hashc, depth - 1, totc) t in
+      hash_predicate (hasht, depth - 1, tott) e
+    | Plet (d,p) ->
+      let hashli = acc + 37 + Logic_info.hash d in
+      hash_predicate (hashli, depth - 1, tot - 1) p
+    | Pforall(q,p) ->
+      let hash_var (acc, tot) lv =
+        if tot = 0 then raise (StopRecursion acc)
+        else (acc + Logic_var.hash lv, tot - 1)
+      in
+      let (acc, tot) = List.fold_left hash_var (acc + 41, tot - 1) q in
+      hash_predicate (acc, depth - 1, tot - 1) p
+    | Pexists(q,p) ->
+      let hash_var (acc, tot) lv =
+        if tot <= 0 then raise (StopRecursion acc)
+        else (acc + Logic_var.hash lv, tot - 1)
+      in
+      let (acc, tot) = List.fold_left hash_var (acc + 43, tot - 1) q in
+      hash_predicate (acc, depth - 1, tot - 1) p
+    | Pat(p,l) ->
+      let hashp, totp = hash_predicate (acc + 47, depth - 1, tot - 1) p in
+      hashp + hash_label l, totp - 1
+    | Pallocable (l,t) ->
+      let hashl = acc + 53 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pfreeable (l,t) ->
+      let hashl = acc + 59 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pvalid (l,t) ->
+      let hashl = acc + 61 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pvalid_read (l,t) ->
+      let hashl = acc + 67 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pobject_pointer (l,t) ->
+      let hashl = acc + 71 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pinitialized (l,t) ->
+      let hashl = acc + 73 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pdangling (l,t) ->
+      let hashl = acc + 79 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pvalid_function t ->
+      hash_term (acc + 83, depth - 1, tot - 1) t
+    | Pfresh (l,m,t,n) ->
+      let hashl = acc + 89 + hash_label l in
+      let hashm = hashl + hash_label m in
+      let hasht, tott = hash_term (hashm, depth - 1, tot - 3) t in
+      hash_term (hasht, depth - 1, tott) n
+    | Pseparated(seps) ->
+      let hash_one_term (acc, tot) t = hash_term (acc, depth - 1, tot) t in
+      List.fold_left
+        hash_one_term
+        (acc + 97, tot - 1)
+        seps
   end
 
 let hash_fct f t = try fst (f (0,10,100) t) with StopRecursion n -> n
@@ -1982,7 +2260,7 @@ module Global_annotation = struct
           | Dtype(t1,_), Dtype(t2,_) -> Logic_type_info.compare t1 t2
           | Dtype _, _ -> -1
           | _, Dtype _ -> 1
-          | Dlemma (l1,_,_,_,_,attr1,_), Dlemma(l2,_,_,_,_,attr2,_) ->
+          | Dlemma (l1,_,_,_,attr1,_), Dlemma(l2,_,_,_,attr2,_) ->
             let res = Datatype.String.compare l1 l2 in
             if res = 0 then Attributes.compare attr1 attr2 else res
           | Dlemma _, _ -> -1
@@ -1996,12 +2274,6 @@ module Global_annotation = struct
           | Dmodel_annot(l1,_), Dmodel_annot(l2,_) -> Model_info.compare l1 l2
           | Dmodel_annot _, _ -> -1
           | _, Dmodel_annot _ -> 1
-          | Dcustom_annot(_, n1, attr1, _),
-            Dcustom_annot(_, n2, attr2, _) ->
-            let res = Datatype.String.compare n1 n2 in
-            if res = 0 then Attributes.compare attr1 attr2 else res
-          | Dcustom_annot _, _ -> -1
-          | _, Dcustom_annot _ -> 1
           | Dextended (ext1, _, _), Dextended (ext2, _, _) ->
             Datatype.Int.compare ext1.ext_id ext2.ext_id
 
@@ -2017,11 +2289,10 @@ module Global_annotation = struct
           (* Empty axiomatic is weird but authorized. *)
           | Daxiomatic (_,g::_,_,_) -> 5 * hash g
           | Dtype (t,_) -> 7 * Logic_type_info.hash t
-          | Dlemma(n,_,_,_,_,_,_) -> 11 * Datatype.String.hash n
+          | Dlemma(n,_,_,_,_,_) -> 11 * Datatype.String.hash n
           | Dinvariant(l,_) -> 13 * Logic_info.hash l
           | Dtype_annot(l,_) -> 17 * Logic_info.hash l
           | Dmodel_annot(l,_) -> 19 * Model_info.hash l
-          | Dcustom_annot(_,n,_,_) -> 23 * Datatype.String.hash n
           | Dextended ({ext_id},_,_) -> 29 * Datatype.Int.hash ext_id
 
         let copy = Datatype.undefined
@@ -2031,24 +2302,22 @@ module Global_annotation = struct
     | Dfun_or_pred(_, loc)
     | Daxiomatic(_, _, _, loc)
     | Dtype (_, loc)
-    | Dlemma(_, _, _, _, _, _, loc)
+    | Dlemma(_, _, _, _, _, loc)
     | Dinvariant(_, loc)
     | Dtype_annot(_, loc) -> loc
     | Dmodel_annot(_, loc) -> loc
     | Dvolatile(_, _, _, _,loc) -> loc
-    | Dcustom_annot(_,_,_,loc) -> loc
     | Dextended(_,_,loc) -> loc
 
   let attr = function
     | Dfun_or_pred({ l_var_info = { lv_attr }}, _) -> lv_attr
     | Daxiomatic(_, _, attr, _) -> attr
     | Dtype ({lt_attr}, _) -> lt_attr
-    | Dlemma(_, _, _, _, _, attr, _) -> attr
+    | Dlemma(_, _, _, _, attr, _) -> attr
     | Dinvariant({ l_var_info = { lv_attr }}, _) -> lv_attr
     | Dtype_annot({ l_var_info = { lv_attr}}, _) -> lv_attr
     | Dmodel_annot({ mi_attr }, _) -> mi_attr
     | Dvolatile(_, _, _, attr, _) -> attr
-    | Dcustom_annot(_,_,attr,_) -> attr
     | Dextended (_,attr,_) -> attr
 end
 
@@ -2279,7 +2548,7 @@ module Toplevel_predicate = struct
         type t = toplevel_predicate
         let name = "Toplevel_predicate"
         let reprs =
-          [ { tp_statement = List.hd Predicate.reprs; tp_only_check = false }]
+          [ { tp_statement = List.hd Predicate.reprs; tp_kind = Assert }]
         let internal_pretty_code = Datatype.undefined
         let pretty fmt x = !pretty_ref fmt x
         let varname _ = "p"
@@ -2301,6 +2570,26 @@ module Identified_predicate = struct
         let internal_pretty_code = Datatype.undefined
         let pretty fmt x = !pretty_ref fmt x
         let varname _ = "id_predyes"
+      end)
+end
+
+module PredicateStructEq = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Make_with_collections
+      (struct
+        type t = predicate
+        let name = "PredicateStructEq"
+        let reprs =
+          [ { pred_name = [ "" ];
+              pred_loc = Location.unknown;
+              pred_content = Pfalse } ]
+        let compare = compare_predicate
+        let equal = Datatype.from_compare
+        let copy = Datatype.undefined
+        let hash = hash_fct hash_predicate
+        let internal_pretty_code = Datatype.undefined
+        let pretty fmt x = !pretty_ref fmt x
+        let varname _ = "p"
       end)
 end
 

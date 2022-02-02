@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -107,7 +107,7 @@ let selected = function
   | Compose code -> composed code
 
 let get_int_z z =
-  try Some (Integer.to_int z) with Z.Overflow -> None
+  try Some (Integer.to_int_exn z) with Z.Overflow -> None
 
 let get_int = function
   | Empty -> None
@@ -141,7 +141,7 @@ let rec pp_selection fmt = function
       Format.fprintf fmt "Term %d in %a" (Lang.F.QED.id t) pp_clause c
   | Clause c -> pp_clause fmt c
   | Compose(Cint k) ->
-      Format.fprintf fmt "Constant '%a'" (Integer.pretty ~hexa:false) k
+      Format.fprintf fmt "Constant '%a'" Integer.pretty k
   | Compose(Range(a,b)) ->
       Format.fprintf fmt "Range '%d..%d'" a b
   | Compose(Code(_,id,es)) ->
@@ -356,6 +356,15 @@ let replace ~at cases sequent =
        let step = Conditions.(step ~descr cond) in
        descr , Conditions.replace ~at step sequent)
     cases
+
+let replace_step ~at conditions sequent =
+  let step =
+    let s = Conditions.step_at (fst sequent) at in
+    (* keep original infos *)
+    Conditions.step ?descr:s.descr ?stmt:s.stmt ~deps:s.deps ~warn:s.warn
+  in
+  let conditions = List.map step conditions in
+  [ "Split conj", Conditions.replace_by_step_list ~at conditions sequent ]
 
 let split cases sequent =
   let hyps = fst sequent in

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -114,6 +114,35 @@ module Default =
     : Analyzer)
 
 
+(* Current state of the analysis *)
+type computation_state = NotComputed | Computing | Computed
+
+module ComputationState =
+struct
+  let to_string = function
+    | NotComputed -> "NotComputed"
+    | Computing -> "Computing"
+    | Computed -> "Computed"
+
+  module Prototype =
+  struct
+    include Datatype.Serializable_undefined
+    type t = computation_state
+    let name = "Eva.Analysis.ComputationState"
+    let pretty fmt s = Format.pp_print_string fmt (to_string s)
+    let reprs = [ NotComputed ; Computing ; Computed ]
+    let dependencies = [ Db.Value.self ]
+    let default () = NotComputed
+  end
+
+  module Datatype' = Datatype.Make (Prototype)
+  module Hook = Hook.Build (Prototype)
+  include (State_builder.Ref (Datatype') (Prototype))
+
+  let set s = set s; Hook.apply s
+  let () = add_hook_on_update (fun r -> Hook.apply !r)
+end
+
 (* Reference to the current configuration (built by Abstractions.configure from
    the parameters of Eva regarding the abstractions used in the analysis) and
    the current Analyzer module. *)
@@ -127,21 +156,26 @@ let current_analyzer () = (module (val (snd !ref_analyzer)): S)
    Useful for the GUI parts that depend on it. *)
 module Analyzer_Hook = Hook.Build (struct type t = (module S) end)
 
-(* Set of hooks called whenever the current Analyzer is computed.
-   Useful for the GUI parts that depend on it. *)
-module Computed_Hook = Hook.Build (struct type t = unit end)
-
 (* Register a new hook. *)
 let register_hook = Analyzer_Hook.extend
-
-(* Register a new computed hook. *)
-let register_computed_hook = Computed_Hook.extend
 
 (* Sets the current Analyzer module for a given configuration.
    Calls the hooks above. *)
 let set_current_analyzer config (analyzer: (module Analyzer)) =
   Analyzer_Hook.apply (module (val analyzer): S);
   ref_analyzer := (config, analyzer)
+
+(* Get the current computation state. *)
+let current_computation_state () =
+  ComputationState.get ()
+
+(* Register a hook on current computation state *)
+let register_computation_hook ?on f =
+  let f' = match on with
+    | None -> f
+    | Some s -> fun s' -> if s = s' then f s
+  in
+  ComputationState.Hook.extend f'
 
 let cvalue_initial_state () =
   let module A = (val snd !ref_analyzer) in
@@ -173,11 +207,14 @@ let reset_analyzer () =
 let force_compute () =
   Ast.compute ();
   Value_parameters.configure_precision ();
+  if not (Kernel.AuditCheck.is_empty ()) then
+    Eva_audit.check_configuration (Kernel.AuditCheck.get ());
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
+  ComputationState.set Computing; (* The new analyzer can be accesed through hooks *)
   let module Analyzer = (val snd !ref_analyzer) in
   Analyzer.compute_from_entry_point ~lib_entry kf ;
-  Computed_Hook.apply ()
+  ComputationState.set Computed
 
 (* Resets the Analyzer when the current project is changed. *)
 let () =
