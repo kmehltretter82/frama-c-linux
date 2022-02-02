@@ -9,13 +9,6 @@
 ------------------------------------------------------------
 
 Goal Assertion (file unit_call.i, line 14):
-Assume {
-  Type: is_sint32(r_1) /\ is_sint32(r).
-  (* Call 'f' *)
-  Have: r < 0.
-  (* Call 'f' *)
-  Have: 0 < r_1.
-}
-Prove: r != r_1.
+Prove: true.
 
 ------------------------------------------------------------

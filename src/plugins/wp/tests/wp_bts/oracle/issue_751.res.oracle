@@ -7,18 +7,7 @@
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'RANGE' (file issue_751.i, line 7):
-Let x = land(3840, R).
-Let x_1 = x / 256.
-Assume {
-  Type: is_sint32(R) /\ is_sint32(j) /\ is_sint32(1 + j).
-  (* Pre-condition *)
-  Have: (0 < x) /\ (x <= 2303).
-  (* Invariant 'RANGE' *)
-  Have: (0 <= j) /\ (j <= x_1).
-  (* Then *)
-  Have: j < x_1.
-}
-Prove: (-1) <= j.
+Prove: true.
 
 ------------------------------------------------------------
 

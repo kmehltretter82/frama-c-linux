@@ -35,23 +35,7 @@ Prove: Mint_0[shift_sint32(b, i)] = v[i].
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigns_path.i, line 16):
-Assume {
-  Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
-  (* Heap *)
-  Type: region(b.base) <= 0.
-  (* Pre-condition *)
-  Have: n <= 3.
-  (* Invariant *)
-  Have: 0 <= n.
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= n).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (Mint_0[shift_sint32(b, i_1)] = v[i_1]))).
-  (* Then *)
-  Have: i < n.
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 

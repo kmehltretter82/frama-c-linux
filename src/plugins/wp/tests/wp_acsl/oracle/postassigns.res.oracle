@@ -145,16 +145,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file postassigns.c, line 38):
-Assume {
-  Type: is_sint32(N) /\ is_sint32(i) /\ is_sint32(1 + i).
-  (* Invariant *)
-  Have: 0 <= N.
-  (* Invariant *)
-  Have: (i <= N) /\ (0 <= i).
-  (* Then *)
-  Have: i < N.
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 

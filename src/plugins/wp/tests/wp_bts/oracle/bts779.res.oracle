@@ -7,8 +7,6 @@
 ------------------------------------------------------------
 
 Goal Assertion (file bts779.i, line 6):
-Let x = Mint_0[shift_uint8(t, 0)].
-Assume { Type: is_uint8(x). (* Heap *) Type: region(t.base) <= 0. }
-Prove: x <= 255.
+Prove: true.
 
 ------------------------------------------------------------

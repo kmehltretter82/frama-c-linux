@@ -35,30 +35,7 @@ Prove: P_IsEqual(havoc(Mint_undef_0, Mint_0, a_1, i), a, b, i).
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file looplabels.i, line 18):
-Let a_1 = shift_sint32(b, 0).
-Let a_2 = shift_sint32(a, 0).
-Assume {
-  Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
-  (* Heap *)
-  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
-  (* Pre-condition *)
-  Have: 0 < n.
-  (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_2, n).
-  (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_1, n).
-  (* Pre-condition *)
-  Have: separated(a_2, n, a_1, n).
-  (* Invariant *)
-  Have: P_IsEqual(Mint_0, a, b, 0).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= n).
-  (* Invariant *)
-  Have: P_IsEqual(havoc(Mint_undef_0, Mint_0, a_1, n), a, b, i).
-  (* Then *)
-  Have: i < n.
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 
