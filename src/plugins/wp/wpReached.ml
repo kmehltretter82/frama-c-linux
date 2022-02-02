@@ -123,7 +123,11 @@ let goto a b =
 let flow i f =
   if f = F_dead then F_dead else
     match i with
-    | Asm _ | Set _ | Local_init _ -> F_effect
+    | Asm _ | Set _ -> F_effect
+    | Local_init _ ->
+        if Wp_parameters.SmokeDeadlocalinit.get ()
+        then F_effect
+        else F_goto
     | Call _ -> F_call
     | Skip _ | Code_annot _ -> F_goto
 

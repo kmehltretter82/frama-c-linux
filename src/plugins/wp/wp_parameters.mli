@@ -144,9 +144,10 @@ module MemoryContext: Parameter_sig.Bool
 module CheckMemoryContext: Parameter_sig.Bool
 module SmokeTests: Parameter_sig.Bool
 module SmokeDeadassumes: Parameter_sig.Bool
-module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
+module SmokeDeadlocalinit: Parameter_sig.Bool
+module SmokeDeadloop: Parameter_sig.Bool
 
 (** {2 Getters} *)
 

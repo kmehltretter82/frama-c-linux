@@ -413,6 +413,14 @@ module SmokeDeadcall =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadlocalinit =
+  False(struct
+    let option_name = "-wp-smoke-dead-local-init"
+    let help = "When generating smoke tests, look for dead local variables \
+                initialization"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadloop =
   True(struct
     let option_name = "-wp-smoke-dead-loop"
