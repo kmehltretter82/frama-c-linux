@@ -34,6 +34,6 @@ int h() {
 /*@ requires \is_finite(x);
     requires \is_finite(y);
     assigns \nothing;
-    ensures \result == 0;
+    ensures \true != \false;
 */
 int use_logic_builtin(double x, float y);

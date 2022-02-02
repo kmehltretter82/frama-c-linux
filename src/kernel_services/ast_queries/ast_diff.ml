@@ -442,22 +442,6 @@ let is_matching_logic_var lv lv' env =
         | `Same lv'' -> Cil_datatype.Logic_var.equal lv' lv''))
   | _ -> false
 
-let is_matching_logic_ctor c c' =
-  match Logic_ctor_info.find c with
-  | `Not_present -> false
-  | `Same c'' -> Cil_datatype.Logic_ctor_info.equal c' c''
-  | exception Not_found ->
-    Kernel.fatal "Unbound logic type constructor %a in AST diff"
-      Cil_datatype.Logic_ctor_info.pretty c
-
-let is_matching_logic_type_info t t' =
-  match Logic_type_info.find t with
-  | `Not_present -> false
-  | `Same t'' -> Cil_datatype.Logic_type_info.equal t' t''
-  | exception Not_found ->
-    Kernel.fatal "Unbound logic type %a in AST diff"
-      Cil_datatype.Logic_type_info.pretty t
-
 let is_matching_logic_type_var a a' env =
   match Datatype.String.Map.find_opt a env.logic_type_vars with
   | None -> false
@@ -614,7 +598,7 @@ and is_same_term_node t t' env =
       is_same_term t t' env
     end else false
   | TDataCons(c,args), TDataCons(c',args') ->
-    is_matching_logic_ctor c c' &&
+    is_matching_logic_ctor c c' env &&
     is_same_list is_same_term args args' env
   | Tif(c,t1,t2), Tif(c',t1',t2') ->
     is_same_term c c' env &&
@@ -803,7 +787,7 @@ and is_same_logic_type t t' env =
   match t,t' with
   | Ctype t, Ctype t' -> is_same_type t t' env
   | Ltype (t,prms), Ltype (t',prms') ->
-    is_matching_logic_type_info t t' &&
+    is_matching_logic_type_info t t' env &&
     is_same_list is_same_logic_type prms prms' env
   | Lvar s, Lvar s' -> is_matching_logic_type_var s s' env
   | Linteger, Linteger -> true
@@ -1358,16 +1342,16 @@ and is_matching_logic_info li li' env =
      | `Not_present -> false
      | `Same li'' -> Cil_datatype.Logic_info.equal li' li''
      | exception Not_found ->
-         (* builtins do not have a declaration in the AST *)
-         if Logic_env.is_builtin_logic_function li.l_var_info.lv_name then begin
-             let res = logic_info_correspondance li env in
-             Logic_info.add li res;
-             match res with
-               | `Not_present -> false
-               | `Same li'' -> Cil_datatype.Logic_info.equal li' li''
-           end else
-           Kernel.fatal "Unbound logic symbol %a in AST diff"
-             Cil_datatype.Logic_info.pretty li)
+       (* builtins do not have a declaration in the AST *)
+       if Logic_env.is_builtin_logic_function li.l_var_info.lv_name then begin
+         let res = logic_info_correspondance li env in
+         Logic_info.add li res;
+         match res with
+         | `Not_present -> false
+         | `Same li'' -> Cil_datatype.Logic_info.equal li' li''
+       end else
+         Kernel.fatal "Unbound logic symbol %a in AST diff"
+           Cil_datatype.Logic_info.pretty li)
   | Some li'' -> Cil_datatype.Logic_info.equal li' li''
 
 and logic_info_correspondance ?loc li env =
@@ -1392,6 +1376,42 @@ and logic_info_correspondance ?loc li env =
   match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
   | Some li' -> `Same li'
   | None -> Logic_info.memo add li
+
+and is_matching_logic_ctor c c' env =
+  match Logic_ctor_info.find c with
+  | `Not_present -> false
+  | `Same c'' -> Cil_datatype.Logic_ctor_info.equal c' c''
+  | exception Not_found ->
+    if Logic_env.is_builtin_logic_ctor c.ctor_name then
+      begin
+        let ty = c.ctor_type in
+        let res = logic_type_correspondance ty env in
+        Logic_type_info.add ty res;
+        if not (Logic_ctor_info.mem c) then
+          Kernel.fatal "Unbound builtin logic type constructor %a in AST diff"
+            Cil_datatype.Logic_ctor_info.pretty c;
+        is_matching_logic_ctor c c' env
+      end
+    else
+      Kernel.fatal "Unbound logic type constructor %a in AST diff"
+        Cil_datatype.Logic_ctor_info.pretty c
+
+and is_matching_logic_type_info t t' env =
+  match Logic_type_info.find t with
+  | `Not_present -> false
+  | `Same t'' -> Cil_datatype.Logic_type_info.equal t' t''
+  | exception Not_found ->
+    if Logic_env.is_builtin_logic_type t.lt_name then
+      begin
+        let res = logic_type_correspondance t env in
+        Logic_type_info.add t res;
+        (match res with
+         | `Same t'' -> Cil_datatype.Logic_type_info.equal t' t''
+         | `Not_present -> false)
+      end
+    else
+      Kernel.fatal "Unbound logic type %a in AST diff"
+        Cil_datatype.Logic_type_info.pretty t
 
 and logic_type_correspondance ?loc ti env =
   let add ti =
