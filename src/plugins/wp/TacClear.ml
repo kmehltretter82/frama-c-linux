@@ -21,6 +21,59 @@
 (**************************************************************************)
 
 open Tactical
+open Conditions
+
+let condition original p = (* keep original kind of simple condition *)
+  match original.condition with
+  | Type _ -> Type p
+  | Have _ -> Have p
+  | When _ -> When p
+  | Core _ -> Core p
+  | Init _ -> Init p
+  | _ -> assert false
+
+let tactical_step step =
+  Tactical.replace_single ~at:step.id ("Removed", Conditions.Have Lang.F.p_true)
+
+module TermLset = Qed.Listset.Make(Lang.F.QED.Term)
+
+let tactical_inside step remove =
+  let remove = List.sort_uniq Lang.F.compare remove in
+  let collect p =
+    match Lang.F.p_expr p with
+    | And ps -> ps
+    | _ -> [ p ]
+  in
+  begin match step.condition with
+    | Type p | Have p | When p | Core p | Init p ->
+        let ps = Lang.F.e_props @@ collect p in
+        let ps = TermLset.diff ps remove in
+        let cond = condition step @@ Lang.F.p_bool @@ Lang.F.e_and ps in
+        Tactical.replace_single ~at:step.id ("Filtered", cond)
+
+    | _ -> raise Not_found
+  end
+
+module Smap = Qed.Idxmap.Make
+    (struct
+      type t = step
+      let id s = s.id
+    end)
+
+let collect_remove m = function
+  | Inside(Step step, remove) ->
+      let l =
+        try Smap.find step m
+        with Not_found -> []
+      in
+      Smap.add step (remove :: l) m
+  | _ -> raise Not_found
+
+let fold_selection s seq =
+  let m = List.fold_left collect_remove Smap.empty s in
+  "Filtered", Smap.fold (fun s l seq -> snd @@ tactical_inside s l seq) m seq
+
+let process (f: sequent -> string * sequent) s = [ f s ]
 
 class clear =
   object(_)
@@ -32,10 +85,15 @@ class clear =
     method select _feedback sel =
       match sel with
       | Clause(Step step) ->
-          let removed = [ "Cleared hypothesis", Conditions.Have Lang.F.p_true] in
-          Applicable (Tactical.replace ~at:step.id removed)
-      | _ ->
-          Not_applicable
+          Applicable(process @@ tactical_step step)
+      | Inside(Step step, remove) ->
+          begin
+            try Applicable(process @@ tactical_inside step [remove])
+            with Not_found -> Not_applicable
+          end
+      | Multi es ->
+          Applicable (process @@ fold_selection es)
+      | _ -> Not_applicable
   end
 
 let tactical = Tactical.export (new clear)

@@ -16,6 +16,7 @@ class nop =
       match s with
       | Empty -> Not_applicable
       | Compose _
+      | Multi _
       | Inside _
       | Clause _ ->
           feedback#set_title "NOP" ;

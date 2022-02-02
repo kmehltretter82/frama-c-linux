@@ -623,7 +623,7 @@ class focused (wtext : Wtext.text) =
 
     method set_target tgt =
       match tgt with
-      | Tactical.Empty | Tactical.Compose _ ->
+      | Tactical.Empty | Tactical.Compose _ | Tactical.Multi _ ->
           begin
             pcond#set_target Term ;
             plang#clear_target ;

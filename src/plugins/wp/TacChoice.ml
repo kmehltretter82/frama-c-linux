@@ -45,7 +45,7 @@ class choice =
                 Applicable (fun (hs,_) -> ["Choice",(hs,F.p_bool q)])
             | _ -> Not_applicable
           end
-      | Empty | Compose _ | Clause _ | Inside(Step _,_) ->
+      | Empty | Compose _ | Clause _ | Inside(Step _,_) | Multi _ ->
           Not_applicable
   end
 
@@ -59,7 +59,7 @@ class absurd =
 
     method select _feedback (s : Tactical.selection) =
       match s with
-      | Empty | Compose _ | Inside _ | Clause(Goal _)
+      | Empty | Compose _ | Inside _ | Clause(Goal _) | Multi _
         -> Not_applicable
       | Clause(Step s) ->
           begin
@@ -85,7 +85,7 @@ class contrapose =
 
     method select _feedback (s : Tactical.selection) =
       match s with
-      | Empty | Compose _ | Inside _ | Clause(Goal _)
+      | Empty | Compose _ | Inside _ | Clause(Goal _) | Multi _
         -> Not_applicable
       | Clause(Step s) ->
           begin

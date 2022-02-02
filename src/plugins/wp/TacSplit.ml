@@ -187,7 +187,7 @@ class split =
         split_cmp at "Split (<)" x y
       in
       match s with
-      | Empty | Compose _ -> Not_applicable
+      | Empty | Compose _ | Multi _ -> Not_applicable
       | Inside(_,e) ->
           begin
             let at = Tactical.at s in
