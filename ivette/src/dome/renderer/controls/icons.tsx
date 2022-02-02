@@ -59,6 +59,8 @@ export interface SVGprops {
      Default is set to `-0.125` times the size).
    */
   offset?: number;
+  className?: string;
+  fill?: string;
 }
 
 /**
@@ -66,7 +68,7 @@ export interface SVGprops {
    Only returns the identified `<svg/>` element from Icon base.
  */
 export function SVG(props: SVGprops): null | JSX.Element {
-  const { id } = props;
+  const { id, className, fill } = props;
   if (!id) return null;
   const icon = Icons[id];
   if (!icon) return <>{id}</>;
@@ -82,9 +84,10 @@ export function SVG(props: SVGprops): null | JSX.Element {
       width={size}
       style={{ bottom: offset }}
       viewBox={viewBox}
+      className = {className}
     >
       {title && <title>{title}</title>}
-      <path d={path} />
+      <path d={path} fill={fill} />
     </svg>
   );
 }
