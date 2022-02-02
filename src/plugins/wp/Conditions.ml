@@ -890,7 +890,19 @@ let equivalent_branch solvers p =
   List.fold_left (fun p s -> s#equivalent_branch p) p solvers
 
 let apply_goal solvers p =
-  stronger_goal solvers p
+  let stronger_and_then_assume p =
+    let p' = stronger_goal solvers p in
+    List.iter (fun s -> s#assume (p_not p')) solvers;
+    p'
+  in
+  match F.p_expr p with
+  | Or ps ->
+      let unmodified,qs = List.fold_left (fun (unmodified,qs) p ->
+          let p' = stronger_and_then_assume p in
+          (unmodified && (Lang.F.eqp p p')), (p'::qs))
+          (true,[]) ps
+      in if unmodified then p else p_disj qs
+  | _ -> stronger_and_then_assume p
 
 let apply_hyp modified solvers h =
   let weaken_and_then_assume p =
