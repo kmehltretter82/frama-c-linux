@@ -39,6 +39,7 @@ Prove: table_of_base(G_z_33) = table_of_base(G_x_31).
 ------------------------------------------------------------
 
 Goal Check 'KO' (file base_offset.i, line 30):
-Prove: table_of_base(G_y_32) != table_of_base(G_x_31).
+Assume { (* Goal *) When: table_of_base(G_y_32) = table_of_base(G_x_31). }
+Prove: false.
 
 ------------------------------------------------------------

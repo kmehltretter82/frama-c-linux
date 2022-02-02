@@ -447,7 +447,10 @@ let rec exist_intro p =
       let _,t = e_open ~pool ~exists:true
           ~forall:false ~lambda:false (e_prop p) in
       exist_intro (F.p_bool t)
-  | _ ->
+  | _ -> (* Note: Qed implement De Morgan rules
+            such that [p] cannot match the
+            decomposable representations:
+            Not Or, Not Imply, Not Forall *)
       if Wp_parameters.Prenex.get ()
       then prenex_intro p
       else p
@@ -463,7 +466,11 @@ let rec exist_intros = function
           let _,t = F.QED.e_open ~pool ~exists:true
               ~forall:false ~lambda:false (e_prop p) in
           exist_intros ((F.p_bool t)::hs)
-      | _ -> p::(exist_intros hs)
+      | _ -> (* Note: Qed implement De Morgan rules
+                such that [p] cannot match the
+                decomposable representations:
+                Not Or, Not Imply, Not Forall *)
+          p::(exist_intros hs)
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -488,8 +495,17 @@ let rec forall_intro p =
           (hp @ hs), (p::ps)) ([],[]) qs
       in (* ORs qs  <==> ORs (hps ==> ps)
                     <==> ((ANDs hps) ==> ORs ps) *)
-      hps, (p_disj ps)
-  | _ -> [] , p
+      let hps,ps = List.fold_left (fun (hs,ps) q ->
+          match F.repr (F.e_prop q) with
+          | Neq _ -> ((F.p_not q)::hs), ps
+          | _ -> hs, (q::ps)) (hps,[]) ps
+      in (* ORs qs <==> ((ANDs hps) ==> ORs ps)) *)
+      hps, (F.p_disj ps)
+  | _ -> (* Note: Qed implement De Morgan rules
+            such that [p] cannot match the
+            decomposable representations:
+            Not And, Not Exists *)
+      [] , p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constructors                                                       --- *)

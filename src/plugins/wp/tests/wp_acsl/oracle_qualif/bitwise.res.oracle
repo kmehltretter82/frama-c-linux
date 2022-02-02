@@ -27,7 +27,7 @@
 [wp] [Qed] Goal typed_lshift_shift2_ensures_lsl3 : Valid
 [wp] [Qed] Goal typed_rshift_ensures : Valid
 [wp] [Qed] Goal typed_rshift_shift1_ensures_lsr1 : Valid
-[wp] [Alt-Ergo] Goal typed_bor_bool_true_ensures : Valid
+[wp] [Qed] Goal typed_bor_bool_true_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_bor_bool_false_ensures : Valid
 [wp] [Qed] Goal typed_band_bool_true_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_band_bool_false_ensures : Valid
@@ -42,8 +42,8 @@
 [wp] [Qed] Goal typed_lemma_check_7 : Valid
 [wp] [Qed] Goal typed_cast_uchar_ensures : Valid
 [wp] Proved goals:   38 / 38
-  Qed:            34 
-  Alt-Ergo:        4
+  Qed:            35 
+  Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   band                      8        -        8       100%
@@ -52,7 +52,7 @@
   bnot                      1        -        1       100%
   lshift                    4        -        4       100%
   rshift                    2        -        2       100%
-  bor_bool                  -        2        2       100%
+  bor_bool                  1        1        2       100%
   band_bool                 1        1        2       100%
   bxor_bool                 1        1        2       100%
   lemma                     7        -        7       100%
