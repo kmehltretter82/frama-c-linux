@@ -225,11 +225,13 @@ TEST_DEPENDENCIES += \
 	$(EACSL_PLUGIN_DIR)/tests/E_ACSL_test.cmxs
 endif
 
+ifneq ("$(PLUGIN_ENABLE)","no")
 # Add the test dependencies to the test targets, but also to
 # `plugins_ptests_config` so that they are built along with the main target.
 plugins_ptests_config: $(TEST_DEPENDENCIES)
 E_ACSL_TESTS E_ACSL_DEFAULT_TESTS: $(TEST_DEPENDENCIES)
 tests:: $(TEST_DEPENDENCIES)
+endif
 
 $(EACSL_PLUGIN_DIR)/tests/test_config: \
 		$(EACSL_PLUGIN_DIR)/tests/test_config.in \
@@ -293,10 +295,12 @@ $(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC) $(EACSL_PLUGIN_DIR)/Makefile
 	echo 'RANLIB       $@'
 	ranlib $@
 
+ifneq ("$(PLUGIN_ENABLE)","no")
 all:: $(EACSL_DLMALLOC_LIB)
 
 clean::
 	$(RM) $(EACSL_DLMALLOC_LIB)
+endif
 
 ############
 # Cleaning #
