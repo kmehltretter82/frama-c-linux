@@ -880,32 +880,25 @@ and letify_case sigma ~target ~export seq =
 (* --- External Simplifier                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Simplify an expression. *)
-let simplify_exp solvers e =
-  List.fold_left (fun e s -> s#simplify_exp e) e solvers
+let equivalent_exp solvers e =
+  List.fold_left (fun e s -> s#equivalent_exp e) e solvers
+let stronger_goal solvers p =
+  List.fold_left (fun p s -> s#stronger_goal p) p solvers
+let weaker_hyp solvers p =
+  List.fold_left (fun p s -> s#weaker_hyp p) p solvers
+let equivalent_branch solvers p =
+  List.fold_left (fun p s -> s#equivalent_branch p) p solvers
 
-(* Simplify the goal.
-    In any case must return a stronger formula. *)
-let simplify_goal solvers p =
-  List.fold_left (fun p s -> s#simplify_goal p) p solvers
-
-(** Simplify an hypothesis before assuming it.
-    In any case must return a weaker formula. *)
-let simplify_hyp solvers p =
-  List.fold_left (fun p s -> s#simplify_hyp p) p solvers
-
-(* Simplify a branch condition.
-   In any case must return an equivalent formula. *)
-let simplify_branch solvers p =
-  List.fold_left (fun p s -> s#simplify_branch p) p solvers
+let apply_goal solvers p =
+  stronger_goal solvers p
 
 let apply_hyp modified solvers h =
   let weaken_and_then_assume p =
-    let p' = simplify_hyp solvers p in
+    let p' = weaker_hyp solvers p in
     if not (Lang.F.eqp p p') then modified := true;
     List.iter (fun s -> s#assume p') solvers; p'
   in
-  let weaken_hyp p = match F.p_expr p with
+  let weaken p = match F.p_expr p with
     | And ps ->
         let unmodified,qs = List.fold_left (fun (unmodified,qs) p ->
             let p' = weaken_and_then_assume p in
@@ -915,19 +908,19 @@ let apply_hyp modified solvers h =
     | _ -> weaken_and_then_assume p
   in
   match h.condition with
-  | State s -> update_cond h (State (Mstate.apply (simplify_exp solvers) s))
-  | Init p -> update_cond h (Init (weaken_hyp p))
-  | Type p -> update_cond h (Type (weaken_hyp p))
-  | Have p -> update_cond h (Have (weaken_hyp p))
-  | When p -> update_cond h (When (weaken_hyp p))
-  | Core p -> update_cond h (Core (weaken_hyp p))
+  | State s -> update_cond h (State (Mstate.apply (equivalent_exp solvers) s))
+  | Init p -> update_cond h (Init (weaken p))
+  | Type p -> update_cond h (Type (weaken p))
+  | Have p -> update_cond h (Have (weaken p))
+  | When p -> update_cond h (When (weaken p))
+  | Core p -> update_cond h (Core (weaken p))
   | Branch(p,_,_) -> List.iter (fun s -> s#target p) solvers; h
   | Either _ -> h
 
 let decide_branch modified solvers h =
   match h.condition with
   | Branch(p,a,b) ->
-      let q = simplify_branch solvers p in
+      let q = equivalent_branch solvers p in
       if q != p then
         ( modified := true ; update_cond h (Branch(q,a,b)) )
       else h
@@ -958,7 +951,7 @@ let apply_simplifiers (solvers : simplifier list) (hs,g) =
       List.iter (fun s -> s#fixpoint) solvers ;
       let hs = List.map (decide_branch modified solvers) hs in
       let hs = List.fold_right (add_infer modified) solvers hs in
-      let p = simplify_goal solvers g in
+      let p = apply_goal solvers g in
       if p != g || !modified then
         Simplified (hs,p)
       else
