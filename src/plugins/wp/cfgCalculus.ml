@@ -221,11 +221,15 @@ struct
       Cil.CurrentLoc.set (Stmt.loc s) ;
       let smoking =
         is_default_bhv env.mode && env.dead s in
-      let ca = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
+      let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
+      let opt_fold f = Option.fold ~none:Extlib.id ~some:f in
+      let do_assert env CfgAnnot.{ code_admitted ; code_verified } w =
+        opt_fold (prove_property env) code_verified @@
+        opt_fold (use_property env) code_admitted w
+      in
       let pi =
         W.label env.we (Some s) (Clabels.stmt s) @@
-        List.fold_right (prove_property env) ca.code_verified @@
-        List.fold_right (use_property env) ca.code_admitted @@
+        List.fold_right (do_assert env) cas @@
         control env a s
       in
       Cil.CurrentLoc.set kl ; pi

@@ -449,8 +449,10 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
            let fs = collect_calls ~bhv kf stmt in
            let nv_loops, term_deps = collect_loops_no_variant kf stmt in
            let dead = unreachable infos src in
-           let ca = CfgAnnot.get_code_assertions kf stmt in
-           let ca_pids = List.map fst ca.code_verified in
+           let cas = CfgAnnot.get_code_assertions kf stmt in
+           let ca_pids =
+             Extlib.filter_map_opt
+               (fun CfgAnnot.{ code_verified=ca } -> Option.map fst ca) cas in
            let loop_pids = loop_contract_pids kf stmt in
            if dead then
              begin

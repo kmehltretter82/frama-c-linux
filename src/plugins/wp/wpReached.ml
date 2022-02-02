@@ -124,8 +124,12 @@ let flow i f =
   if f = F_dead then F_dead else
     match i with
     | Asm _ | Set _ -> F_effect
+    | Local_init _ ->
+        if Wp_parameters.SmokeDeadlocalinit.get ()
+        then F_effect
+        else F_goto
     | Call _ -> F_call
-    | Local_init _ | Skip _ | Code_annot _ -> F_goto
+    | Skip _ | Code_annot _ -> F_goto
 
 let merge a b = match a,b with
   | F_dead , F_dead -> F_dead
