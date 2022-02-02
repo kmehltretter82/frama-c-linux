@@ -1187,6 +1187,12 @@ let () =
     constglobfold
     syntactic_const_globals_substitution
 
+let populate_spec () =
+  let add_spec kf =
+    ignore @@ Populate_spec.populate_funspec kf (Annotations.funspec kf)
+  in
+  Globals.Functions.iter add_spec
+
 let prepare_cil_file ast =
   Kernel.feedback ~level:2 "preparing the AST";
   computeCFG ~clear_id:true ast;
@@ -1234,6 +1240,7 @@ let prepare_cil_file ast =
     Filecheck.check_ast ~ast "AST after annotation registration"
   end;
   Transform_after_cleanup.apply ast;
+  populate_spec () ;
   (* reset tables depending on AST in case they have been computed during
      the transformation. *)
   Ast.set_file ast
