@@ -89,7 +89,7 @@ static void *read_value(void *arg) {
     usleep(100);
   } while (!idx_written);
 
-  // Acquire a read lock so that the specification can check `writte[idx]` and
+  // Acquire a read lock so that the specification can check `written[idx]` and
   // `values[idx]`.
   pthread_rwlock_rdlock(lock);
   /*@ requires written[idx] == 1;
