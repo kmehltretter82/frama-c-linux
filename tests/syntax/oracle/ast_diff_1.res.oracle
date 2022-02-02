@@ -7,6 +7,10 @@
 [AST diff test] Variable x:  => x
 [AST diff test] Variable g:  => g
 [AST diff test] Variable h:  => h
+[AST diff test] Variable use_logic_builtin:  => use_logic_builtin
+[AST diff test] Variable x:  => x
+[AST diff test] Variable y:  => y
 [AST diff test] Function f:  => f
 [AST diff test] Function g: N/A
 [AST diff test] Function h: -> h (body changed)
+[AST diff test] Function use_logic_builtin:  => use_logic_builtin

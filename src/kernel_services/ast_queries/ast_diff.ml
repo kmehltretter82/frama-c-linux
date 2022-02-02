@@ -442,17 +442,6 @@ let is_matching_logic_var lv lv' env =
         | `Same lv'' -> Cil_datatype.Logic_var.equal lv' lv''))
   | _ -> false
 
-let is_matching_logic_info li li' env =
-  match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
-  | None ->
-    (match Logic_info.find li with
-     | `Not_present -> false
-     | `Same li'' -> Cil_datatype.Logic_info.equal li' li''
-     | exception Not_found ->
-       Kernel.fatal "Unbound logic symbol %a in AST diff"
-         Cil_datatype.Logic_info.pretty li)
-  | Some li'' -> Cil_datatype.Logic_info.equal li' li''
-
 let is_matching_logic_ctor c c' =
   match Logic_ctor_info.find c with
   | `Not_present -> false
@@ -1361,6 +1350,25 @@ and gfun_correspondance ?loc vi env =
   match Kf.Map.find_opt kf env.kernel_function with
   | Some kf' -> `Same kf'
   | None -> Kernel_function.memo add kf
+
+and is_matching_logic_info li li' env =
+  match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
+  | None ->
+    (match Logic_info.find li with
+     | `Not_present -> false
+     | `Same li'' -> Cil_datatype.Logic_info.equal li' li''
+     | exception Not_found ->
+         (* builtins do not have a declaration in the AST *)
+         if Logic_env.is_builtin_logic_function li.l_var_info.lv_name then begin
+             let res = logic_info_correspondance li env in
+             Logic_info.add li res;
+             match res with
+               | `Not_present -> false
+               | `Same li'' -> Cil_datatype.Logic_info.equal li' li''
+           end else
+           Kernel.fatal "Unbound logic symbol %a in AST diff"
+             Cil_datatype.Logic_info.pretty li)
+  | Some li'' -> Cil_datatype.Logic_info.equal li' li''
 
 and logic_info_correspondance ?loc li env =
   let add li =

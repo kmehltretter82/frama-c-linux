@@ -30,3 +30,10 @@ int h() {
     X = Y;
   return Y;
 }
+
+/*@ requires \is_finite(x);
+    requires \is_finite(y);
+    assigns \nothing;
+    ensures \result == 0;
+*/
+int use_logic_builtin(double x, float y);
