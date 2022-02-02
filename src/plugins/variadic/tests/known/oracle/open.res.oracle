@@ -1,15 +1,15 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:121: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:121: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:128: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:124: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:131: 
   Declaration of variadic function openat.
 [variadic] open.c:7: 
   Translating call to the specialized version open(char const *, int, mode_t).
-[variadic] open.c:7: Warning: 
+[variadic:typing] open.c:7: Warning: 
   Incorrect type for argument 3. The argument will be cast from int to mode_t.
 [variadic] open.c:8: 
   Translating call to the specialized version open(char const *, int).
-[variadic] open.c:9: Warning: 
+[variadic:prototype] open.c:9: Warning: 
   No matching prototype found for this call to open.
   Expected candidates:
          open(char const *, int)

@@ -23,7 +23,8 @@
 (** Generate C implementations of E-ACSL terms. *)
 
 open Cil_types
-let dkey = Options.dkey_translation
+open Analyses_types
+let dkey = Options.Dkey.translation
 
 (**************************************************************************)
 (********************** Forward references ********************************)
@@ -254,8 +255,8 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     in
     let final_stmt  = (Cil.mkBlock [ init_k_stmt; for_stmt ]) in
     Env.Logic_binding.remove env k;
-    let env = Env.add_stmt env kf (Smart_stmt.block_stmt final_stmt) in
-    let adata, env = Assert.register_term ~loc kf env t acc_as_exp adata in
+    let env = Env.add_stmt env (Smart_stmt.block_stmt final_stmt) in
+    let adata, env = Assert.register_term ~loc env t acc_as_exp adata in
     acc_as_exp, adata, env, Typed_number.C_number, ""
   | _ ->
     assert false
@@ -270,29 +271,29 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
     let e = Smart_exp.lval ~loc lv in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, name
   | TSizeOf ty ->
     let e = Cil.sizeOf ~loc ty in
-    let adata, env = Assert.register_term ~loc kf env ~force:true t e adata in
+    let adata, env = Assert.register_term ~loc env ~force:true t e adata in
     e, adata, env, Typed_number.C_number, "sizeof"
   | TSizeOfE t' ->
     let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
     let e = Cil.sizeOf ~loc (Cil.typeOf e') in
-    let adata, env = Assert.register_term ~loc kf env ~force:true t e adata in
+    let adata, env = Assert.register_term ~loc env ~force:true t e adata in
     e, adata, env, Typed_number.C_number, "sizeof"
   | TSizeOfStr s ->
     let e = Cil.new_exp ~loc (SizeOfStr s) in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, "sizeofstr"
   | TAlignOf ty ->
     let e = Cil.new_exp ~loc (AlignOf ty) in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, "alignof"
   | TAlignOfE t' ->
     let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
     let e = Cil.new_exp ~loc (AlignOfE e') in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
     let ty = Typing.get_typ ~lenv t in
@@ -378,7 +379,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
          all data. *)
       let adata2, env = Assert.empty ~loc kf env in
       let e2, adata2, env = t2_to_exp adata2 env in
-      let adata, env = Assert.merge_right ~loc kf env adata2 adata in
+      let adata, env = Assert.merge_right ~loc env adata2 adata in
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
       let ctx = Typing.get_number_ty ~lenv t in
@@ -466,8 +467,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
       let adata2, env = Assert.empty ~loc kf env in
       let e1, adata1, env = t1_to_exp adata1 env in
       let e2, adata2, env = t2_to_exp adata2 env in
-      let adata, env = Assert.merge_right ~loc kf env adata1 adata in
-      let adata, env = Assert.merge_right ~loc kf env adata2 adata in
+      let adata, env = Assert.merge_right ~loc env adata1 adata in
+      let adata, env = Assert.merge_right ~loc env adata2 adata in
       (* If the given term is an lvalue variable or a cast from an lvalue
          variable, retrieve the name of this variable. Otherwise return
          default *)
@@ -617,7 +618,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
         else
           (* Manual clean because [runtime_check] has not been called on
              [adata1]. *)
-          let env = Assert.clean ~loc kf env adata1 in
+          let env = Assert.clean ~loc env adata1 in
           None, env
       in
       let mk_stmts _ e =
@@ -640,7 +641,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
     (* t1 || t2 <==> if t1 then true else t2 *)
     let e, adata, env =
       Extlib.flatten
-        (Env.with_rte_and_result env true
+        (Env.with_params_and_result
+           ~rte:true
            ~f:(fun env ->
                let e1, adata, env1 = to_exp ~adata kf env t1 in
                let env' = Env.push env1 in
@@ -652,14 +654,16 @@ and context_insensitive_term_to_exp ~adata kf env t =
                  adata
                  (Translate_utils.conditional_to_exp
                     ~name:"or" ~loc kf (Some t) e1 (Cil.one loc, env') res2)
-             ))
+             )
+           env)
     in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
     let e, adata, env =
       Extlib.flatten
-        (Env.with_rte_and_result env true
+        (Env.with_params_and_result
+           ~rte:true
            ~f:(fun env ->
                let e1, adata, env1 = to_exp ~adata kf env t1 in
                let e2, adata, env2 =
@@ -671,7 +675,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
                  adata
                  (Translate_utils.conditional_to_exp
                     ~name:"and" ~loc kf (Some t) e1 res2 (Cil.zero loc, env3))
-             ))
+             )
+           env)
     in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
@@ -694,7 +699,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
       e, adata, env, Typed_number.C_number, ""
     end
-  | TBinOp(PlusPI | IndexPI | MinusPI as bop, t1, t2) ->
+  | TBinOp(PlusPI | MinusPI as bop, t1, t2) ->
     if Misc.is_set_of_ptr_or_array t1.term_type ||
        Misc.is_set_of_ptr_or_array t2.term_type then
       (* case of arithmetic over set of pointers (due to use of ranges)
@@ -741,12 +746,12 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     let e = Cil.mkAddrOf ~loc lv in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, "addrof"
   | TStartOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     let e = Cil.mkAddrOrStartOf ~loc lv in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, "startof"
   | Tapp(li, _, [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ])
     when li.l_body = LBnone && (li.l_var_info.lv_name = "\\sum" ||
@@ -758,7 +763,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | Tapp(li, [], args) ->
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env li args in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, "app"
   | Tapp(_, _ :: _, _) ->
     Env.not_yet env "logic functions with labels"
@@ -769,7 +774,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | Tif(t1, t2, t3) ->
     let e, adata, env =
       Extlib.flatten
-        (Env.with_rte_and_result env true
+        (Env.with_params_and_result
+           ~rte:true
            ~f:(fun env ->
                let e1, adata, env1 = to_exp ~adata kf env t1 in
                let e2, adata, env2 =
@@ -789,7 +795,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
                     e1
                     res2
                     res3)
-             ))
+             )
+           env)
     in
     e, adata, env, Typed_number.C_number, ""
   | Tat(t, BuiltinLabel Here) ->
@@ -797,17 +804,17 @@ and context_insensitive_term_to_exp ~adata kf env t =
     e, adata, env, Typed_number.C_number, ""
   | Tat(t', label) ->
     let lscope = Env.Logic_scope.get env in
-    let pot = Lscope.PoT_term t' in
+    let pot = PoT_term t' in
     if Lscope.is_used lscope pot then
       let e, env = At_with_lscope.to_exp ~loc kf env pot label in
-      let adata, env = Assert.register_term ~loc kf env t e adata in
+      let adata, env = Assert.register_term ~loc env t e adata in
       e, adata, env, Typed_number.C_number, ""
     else
       let e, _, env = to_exp ~adata:Assert.no_data kf (Env.push env) t' in
       let e, env, sty =
         Translate_utils.at_to_exp_no_lscope kf env (Some t) label e
       in
-      let adata, env = Assert.register_term ~loc kf env t e adata in
+      let adata, env = Assert.register_term ~loc env t e adata in
       e, adata, env, sty, ""
   | Tbase_addr(BuiltinLabel Here, t') ->
     let name = "base_addr" in
@@ -821,7 +828,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
         env
         t'
     in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, name
   | Tbase_addr _ -> Env.not_yet env "labeled \\base_addr"
   | Toffset(BuiltinLabel Here, t') ->
@@ -830,7 +837,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let e, adata, env =
       Memory_translate.call ~adata ~loc kf name size_t env t'
     in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, name
   | Toffset _ -> Env.not_yet env "labeled \\offset"
   | Tblock_length(BuiltinLabel Here, t') ->
@@ -839,7 +846,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let e, adata, env =
       Memory_translate.call ~adata ~loc kf name size_t env t'
     in
-    let adata, env = Assert.register_term ~loc kf env t e adata in
+    let adata, env = Assert.register_term ~loc env t e adata in
     e, adata, env, Typed_number.C_number, name
   | Tblock_length _ -> Env.not_yet env "labeled \\block_length"
   | Tnull ->
@@ -854,10 +861,15 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | Tcomprehension _ -> Env.not_yet env "tset comprehension"
   | Trange _ -> Env.not_yet env "range"
   | Tlet(li, t) ->
-    let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
-    let env = Env.Logic_scope.extend env lvs in
+    (* Translate the term registered to the \let logic variable *)
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
+    (* Register the logic var to the logic scope *)
+    let lvs = Lvs_let(li.l_var_info, Misc.term_of_li li) in
+    let env = Env.Logic_scope.extend env lvs in
+    (* Translate the body of the \let *)
     let e, adata, env = to_exp ~adata kf env t in
+    (* Remove the logic var from the logic scope *)
+    let env = Env.Logic_scope.remove env lvs in
     Interval.Env.remove li.l_var_info;
     e, adata, env, Typed_number.C_number, ""
 
@@ -872,7 +884,8 @@ and to_exp ~adata kf env t =
     (Env.Local_vars.get env);
   let t = Logic_normalizer.get_term t in
   Extlib.flatten
-    (Env.with_rte_and_result env false
+    (Env.with_params_and_result
+       ~rte:false
        ~f:(fun env ->
            let e, adata, env, sty, name =
              context_insensitive_term_to_exp ~adata kf env t
@@ -893,7 +906,8 @@ and to_exp ~adata kf env t =
                 sty
                 (Some t)
                 e)
-         ))
+         )
+       env)
 
 let () =
   Translate_utils.term_to_exp_ref := to_exp;
@@ -919,7 +933,7 @@ let untyped_to_exp typ t =
   let ctx = Option.map ctx_of_typ typ in
   Typing.type_term ~use_gmp_opt:true ~lenv:[] ?ctx t;
   let env = Env.push Env.empty in
-  let env = Env.rte env false in
+  let env = Env.set_rte env false in
   let e, _, env =
     try to_exp ~adata:Assert.no_data (Kernel_function.dummy ()) env t
     with Rtl.Symbols.Unregistered _ -> raise (No_simple_translation t)

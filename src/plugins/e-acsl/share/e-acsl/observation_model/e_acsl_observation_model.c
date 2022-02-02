@@ -93,6 +93,7 @@ int eacsl_separated(size_t count, ...) {
 /************************************************************************/
 
 #include "internals/e_acsl_heap_tracking.c"
+#include "internals/e_acsl_patricia_trie.c"
 #include "internals/e_acsl_safe_locations.c"
 
 /* Select memory model, either segment-based or bittree-based model should
@@ -102,6 +103,7 @@ int eacsl_separated(size_t count, ...) {
 #  include "segment_model/e_acsl_segment_omodel_debug.c"
 #  include "segment_model/e_acsl_segment_timestamp_retrieval.c"
 #  include "segment_model/e_acsl_segment_tracking.c"
+#  include "segment_model/e_acsl_shadow_concurrency.c"
 #  include "segment_model/e_acsl_shadow_layout.c"
 #elif defined E_ACSL_BITTREE_MMODEL
 #  include "bittree_model/e_acsl_bittree.c"

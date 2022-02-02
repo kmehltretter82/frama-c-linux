@@ -1,8 +1,8 @@
 # frama-c -wp -wp-rte [...]
 [kernel] Parsing bts_1360.i (no preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function foo_correct
-[rte] annotating function foo_wrong
+[rte:annot] annotating function foo_correct
+[rte:annot] annotating function foo_wrong
 [wp] 10 goals scheduled
 [wp] [Qed] Goal typed_foo_wrong_ensures : Valid
 [wp] [Qed] Goal typed_foo_wrong_assert_rte_mem_access : Valid

@@ -31,19 +31,6 @@ open Qed.Logic
 
 type library = string
 
-(** Name for external prover.
-
-    In case a Qed.Engine.link is used, [F_subst] patterns
-    are not supported for Why-3. *)
-type 'a infoprover = {
-  altergo: 'a;
-  why3   : 'a;
-  coq    : 'a;
-}
-(** generic way to have different informations for the provers *)
-
-val infoprover: 'a -> 'a infoprover
-(** same information for all the provers *)
 (** {2 Naming} Unique identifiers. *)
 
 val comp_id  : compinfo -> string
@@ -67,7 +54,7 @@ type adt = private (** A type is never registered in a Definition.t *)
 and mdt = string extern (** name to print to the provers *)
 and 'a extern = {
   ext_id     : int;
-  ext_link   : 'a infoprover;
+  ext_link   : 'a ;
   ext_library : library; (** a library which it depends on *)
   ext_debug  : string; (** just for printing during debugging *)
 }
@@ -105,7 +92,7 @@ val is_builtin_type : name:string -> tau -> bool
 val get_builtin_type : name:string -> adt
 val datatype : library:string -> string -> adt
 val record :
-  link:string infoprover -> library:string -> (string * tau) list -> adt
+  link:string -> library:string -> (string * tau) list -> adt
 val comp : compinfo -> adt
 val comp_init : compinfo -> adt
 val field : adt -> string -> field
@@ -119,7 +106,7 @@ type balance = Nary | Left | Right
 
 val extern_s :
   library:library ->
-  ?link:(Engine.link infoprover) ->
+  ?link:Engine.link ->
   ?category:lfun category ->
   ?params:sort list ->
   ?sort:sort ->
@@ -130,7 +117,7 @@ val extern_s :
 
 val extern_f :
   library:library ->
-  ?link:(Engine.link infoprover) ->
+  ?link:Engine.link ->
   ?balance:balance ->
   ?category:lfun category ->
   ?params:sort list ->
@@ -145,13 +132,13 @@ val extern_p :
   library:library ->
   ?bool:string ->
   ?prop:string ->
-  ?link:Engine.link infoprover ->
+  ?link:Engine.link ->
   ?params:sort list ->
   ?coloring:bool ->
   unit -> lfun
 
 val extern_fp : library:library -> ?params:sort list ->
-  ?link:string infoprover -> ?coloring:bool -> string -> lfun
+  ?link:string -> ?coloring:bool -> string -> lfun
 
 val generated_f : ?context:bool -> ?category:lfun category ->
   ?params:sort list -> ?sort:sort -> ?result:tau -> ?coloring:bool ->
@@ -160,7 +147,7 @@ val generated_f : ?context:bool -> ?category:lfun category ->
 val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
 
 val extern_t:
-  string -> link:string infoprover -> library:library -> mdt
+  string -> link:string -> library:library -> mdt
 
 (** {2 Sorting and Typing} *)
 
@@ -208,9 +195,6 @@ module Fun : Logic.Function with type t = lfun
 class virtual idprinting :
   object
     method virtual sanitize : string -> string
-
-    method virtual infoprover : 'a. 'a infoprover -> 'a
-    (** Specify the field to use in an infoprover *)
 
     method sanitize_type : string -> string
     (** Defaults to [self#sanitize] *)
@@ -356,7 +340,8 @@ sig
   val e_prop : pred -> term
   val p_bools : term list -> pred list
   val e_props : pred list -> term list
-  val lift : (term -> term) -> pred -> pred
+  val e_lift : (term -> term) -> pred -> pred
+  val p_lift : (pred -> pred) -> term -> term
 
   val p_not : pred -> pred
   val p_and : pred -> pred -> pred

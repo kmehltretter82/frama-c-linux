@@ -417,7 +417,7 @@ struct
     | Mult -> arith env (L.apply e_mul) (L.apply F.e_mul) a b
     | Div -> arith env (L.apply e_div) (L.apply F.e_div) a b
     | Mod -> L.apply e_mod (C.logic env a) (C.logic env b)
-    | PlusPI | IndexPI ->
+    | PlusPI ->
         let va = C.logic env a in
         let vb = C.logic env b in
         let te = Logic_typing.ctype_of_pointed a.term_type in
@@ -807,6 +807,23 @@ struct
     let addrs = C.logic env t in
     p_all (L.initialized sigma) (L.region (Ctypes.object_of te) addrs)
 
+  let call_pred env f ls es =
+    match C.logic_info env f with
+    | Some p ->
+        if ls <> [] || es <> [] then
+          Warning.error "Unexpected parameters for named predicate '%a'"
+            Logic_info.pretty f ; p
+    | None ->
+        let empty ls =
+          if ls <> [] then
+            Warning.error "Unexpected labels for purely logic '%a'"
+              Logic_info.pretty f ;
+        in
+        match LogicBuiltins.logic f with
+        | ACSLDEF -> C.call_pred env f ls es
+        | HACK phi -> empty ls ; F.p_bool (phi es)
+        | LFUN p -> empty ls ; p_call p es
+
   let predicate polarity env p =
     match p.pred_content with
     | Pfalse -> p_false
@@ -833,24 +850,7 @@ struct
           | _ -> Warning.error "\\subset requires 2 arguments"
         end
     | Papp(f,ls,ts) ->
-        begin
-          match C.logic_info env f with
-          | Some p ->
-              if ls <> [] || ts <> [] then
-                Warning.error "Unexpected parameters for named predicate '%a'"
-                  Logic_info.pretty f ; p
-          | None ->
-              let empty ls =
-                if ls <> [] then
-                  Warning.error "Unexpected labels for purely logic '%a'"
-                    Logic_info.pretty f ;
-              in
-              let es = List.map (val_of_term env) ts in
-              match LogicBuiltins.logic f with
-              | ACSLDEF -> C.call_pred env f ls es
-              | HACK phi -> empty ls ; F.p_bool (phi es)
-              | LFUN p -> empty ls ; p_call p es
-        end
+        call_pred env f ls @@ List.map (val_of_term env) ts
 
     | Plet( { l_var_info=v ; l_body=LBterm a } , p ) ->
         let va = C.logic env a in

@@ -56,11 +56,11 @@ val get_flow_annot : Cil_types.stmt -> flow_annotation list
 val get_subdivision_annot : Cil_types.stmt -> int list
 val get_allocation: Cil_types.stmt -> allocation_kind
 
-val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+val add_slevel_annot : emitter:Emitter.t ->
   Cil_types.stmt -> slevel_annotation -> unit
-val add_unroll_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+val add_unroll_annot : emitter:Emitter.t ->
   Cil_types.stmt -> unroll_annotation -> unit
-val add_flow_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+val add_flow_annot : emitter:Emitter.t ->
   Cil_types.stmt -> flow_annotation -> unit
-val add_subdivision_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+val add_subdivision_annot : emitter:Emitter.t ->
   Cil_types.stmt -> int -> unit

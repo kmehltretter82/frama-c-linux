@@ -20,11 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module E_acsl_label = Label (* [Label] is hidden when opening [Cil_datatype *)
 open Cil_types
 open Cil_datatype
+module Error = Translation_error
 
-let dkey = Options.dkey_translation
+let dkey = Options.Dkey.translation
 
 (* ************************************************************************** *)
 (* Expressions *)
@@ -49,19 +49,39 @@ let replace_literal_strings_in_args env kf_opt (* None for globals *) args =
    RTL. *)
 let rename_caller ~loc caller args =
   if Options.Replace_libc_functions.get ()
-  && Functions.RTL.has_rtl_replacement caller.vorig_name then begin
+  && Functions.Libc.has_replacement caller.vorig_name then begin
     (* rewrite names of functions for which we have alternative definitions in
        the RTL. *)
-    let fvi = Rtl.Symbols.libc_replacement caller in
+    let fvi =
+      Rtl.Symbols.replacement
+        ~get_name:Functions.Libc.replacement_name
+        caller
+    in
     fvi, args
   end
+  else if Functions.Concurrency.has_replacement caller.vorig_name then
+    if Options.Concurrency.get () then
+      let fvi =
+        Rtl.Symbols.replacement
+          ~get_name:Functions.Concurrency.replacement_name
+          caller
+      in
+      fvi, args
+    else begin
+      Memory_tracking.found_concurrent_function ~loc caller;
+      caller, args
+    end
   else if Options.Validate_format_strings.get ()
        && Functions.Libc.is_printf_name caller.vorig_name then
     (* rewrite names of format functions (such as printf). This case differs
        from the above because argument list of format functions is extended with
        an argument describing actual variadic arguments *)
     (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-    let fvi = Rtl.Symbols.libc_replacement caller in
+    let fvi =
+      Rtl.Symbols.replacement
+        ~get_name:Functions.Libc.replacement_name
+        caller
+    in
     let fmt =
       Functions.Libc.get_printf_argument_str ~loc caller.vorig_name args
     in
@@ -88,12 +108,12 @@ let rec inject_in_init env kf_opt vi off = function
     in
     CompoundInit(typ, List.rev l), env
 
-let inject_in_local_init ~loc ~stmt env kf vi = function
+let inject_in_local_init ~loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* add a store statement when creating a variable length array *)
     let store = Smart_stmt.store_stmt ~str_size:sz vi in
-    let env = Env.add_stmt ~post:true env kf store in
+    let env = Env.add_stmt ~post:true env store in
     init, env
 
   | ConsInit (caller, args, kind) ->
@@ -102,7 +122,7 @@ let inject_in_local_init ~loc ~stmt env kf vi = function
     let _, env =
       if Libc.is_writing_memory caller then begin
         let result = Var vi, NoOffset in
-        Libc.update_memory_model ~loc ~stmt env kf ~result caller args
+        Libc.update_memory_model ~loc env kf ~result caller args
       end else
         None, env
     in
@@ -125,19 +145,18 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
     in
     let must_model = Memory_tracking.must_monitor_lval ~stmt ~kf lv in
     if not (may_safely_ignore lv) && must_model then
-      let before = Cil.mkStmt ~valid_sid:true stmt.skind in
       let new_stmt =
         (* bitfields are not yet supported ==> no initializer.
            a [not_yet] will be raised in [Translate]. *)
         if Cil.isBitfield lv then Cil.mkEmptyStmt ()
         else Smart_stmt.initialize ~loc lv
       in
-      let env = Env.add_stmt ~post ~before env kf new_stmt in
+      let env = Env.add_stmt ~post env new_stmt in
       let env = match vi with
         | None -> env
         | Some vi ->
           let new_stmt = Smart_stmt.store_stmt vi in
-          Env.add_stmt ~post ~before env kf new_stmt
+          Env.add_stmt ~post env new_stmt
       in
       env
     else
@@ -165,7 +184,7 @@ let inject_in_instr env kf stmt = function
     let result, env =
       match caller.enode with
       | Lval (Var cvi, _) when Libc.is_writing_memory cvi ->
-        Libc.update_memory_model ~loc ~stmt env kf ?result cvi args
+        Libc.update_memory_model ~loc env kf ?result cvi args
       | _ -> result, env
     in
     (* add statement tracking initialization of return values *)
@@ -182,7 +201,7 @@ let inject_in_instr env kf stmt = function
         match args with
         | [ { enode = CastE (_, { enode = Lval (Var vi, NoOffset) }) } ] ->
           let delete_block = Smart_stmt.delete_stmt ~is_addr:true vi in
-          Env.add_stmt env kf delete_block
+          Env.add_stmt env delete_block
         | _ -> Options.fatal "The normalization of __fc_vla_free() has changed"
       else
         env
@@ -192,7 +211,7 @@ let inject_in_instr env kf stmt = function
   | Local_init(vi, linit, loc) ->
     let lv = Var vi, NoOffset in
     let env = add_initializer loc ~vi lv ~post:true stmt env kf in
-    let linit, env = inject_in_local_init ~loc ~stmt env kf vi linit in
+    let linit, env = inject_in_local_init ~loc env kf vi linit in
     Local_init(vi, linit, loc), env
 
   (* nothing to do: *)
@@ -234,7 +253,7 @@ let add_new_block_in_stmt env kf stmt =
   let new_stmt, env =
     (* Remove local variables which scopes ended via goto/break/continue. *)
     let del_vars = Exit_points.delete_vars stmt in
-    let env = Memory_observer.delete_from_set ~before:stmt env kf del_vars in
+    let env = Memory_observer.delete_from_set env kf del_vars in
     if Kernel_function.is_return_stmt kf stmt then
       let env =
         if Functions.check kf then
@@ -247,7 +266,7 @@ let add_new_block_in_stmt env kf stmt =
           let env = mk_post_env env stmt in
           (* also handle the postcondition of the function and clear the
              env *)
-          Translate_annots.post_funspec kf Kglobal env
+          Translate_annots.post_funspec kf env
         else
           env
       in
@@ -259,11 +278,6 @@ let add_new_block_in_stmt env kf stmt =
         Env.pop_and_get env new_stmt ~global_clear:true Env.After
       in
       let new_stmt = Smart_stmt.block stmt b in
-      if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
-        (* move the labels of the return to the new block in order to
-           evaluate the postcondition when jumping to them. *)
-        E_acsl_label.move kf stmt new_stmt
-      end;
       new_stmt, env
     else (* i.e. not (is_return stmt) *)
       (* must generate [pre_block] which includes [stmt] before generating
@@ -298,8 +312,6 @@ let add_new_block_in_stmt env kf stmt =
         else post_block
       in
       let res = Smart_stmt.block new_stmt post_block in
-      if not (Cil_datatype.Stmt.equal new_stmt res) then
-        E_acsl_label.move kf new_stmt res;
       res, env
   in
   Options.debug ~level:4
@@ -312,7 +324,7 @@ let add_new_block_in_stmt env kf stmt =
     The function [last_stmts] receives an optional argument [?return_stmt] with
     the innermost return statement if it exists. In that case the function needs
     to return this statement as the last statement. *)
-let insert_as_last_stmts_in_innermost_block ~last_stmts kf outer_block =
+let insert_as_last_stmts_in_innermost_block ~last_stmts outer_block =
   (* Retrieve the last innermost block *)
   let rec retrieve_innermost_last_return block =
     let l = List.rev block.bstmts in
@@ -333,7 +345,6 @@ let insert_as_last_stmts_in_innermost_block ~last_stmts kf outer_block =
     | Some return_stmt ->
       let b = Cil.mkBlock new_stmts in
       let new_stmt = Smart_stmt.block return_stmt b in
-      E_acsl_label.move kf return_stmt new_stmt;
       [ new_stmt ]
     | None -> new_stmts
   in
@@ -430,6 +441,7 @@ and inject_in_stmt env kf stmt =
     | Loop _ -> Env.push_loop env
     | _ -> env
   in
+  let env = Env.set_kinstr env (Kstmt stmt) in
   (* initial environment *)
   let env =
     if Kernel_function.is_first_stmt kf stmt then
@@ -445,7 +457,7 @@ and inject_in_stmt env kf stmt =
       (* translate the precondition of the function *)
       if Functions.check kf then
         let funspec = Annotations.funspec kf in
-        Translate_annots.pre_funspec kf Kglobal env funspec
+        Translate_annots.pre_funspec kf env funspec
       else env
     else
       env
@@ -465,7 +477,7 @@ and inject_in_stmt env kf stmt =
      (which adds initializers), otherwise init calls appear before store
      calls. *)
   let duplicates = Exit_points.store_vars stmt in
-  let env = Memory_observer.duplicate_store ~before:stmt env kf duplicates in
+  let env = Memory_observer.duplicate_store env kf duplicates in
   let skind, env = inject_in_substmt env kf stmt in
   stmt.skind <- skind;
   (* building the new block of code *)
@@ -519,7 +531,7 @@ and inject_in_block (env: Env.t) kf blk =
         stmts
     in
     (* select the precise location to inject these pieces of code *)
-    insert_as_last_stmts_in_innermost_block ~last_stmts kf blk ;
+    insert_as_last_stmts_in_innermost_block ~last_stmts blk ;
     (* allocate the memory blocks observing locals *)
     if Functions.instrument kf then
       blk.bstmts <-
@@ -650,7 +662,7 @@ let inject_in_global main global =
 
 (* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end]
    as the last before [return] *)
-let surround_function_with kf fundec stmt_begin stmt_end =
+let surround_function_with fundec stmt_begin stmt_end =
   let body = fundec.sbody in
   (* Insert last statement *)
   Option.iter
@@ -660,7 +672,7 @@ let surround_function_with kf fundec stmt_begin stmt_end =
          | Some return_stmt -> [ stmt_end; return_stmt ]
          | None -> [ stmt_end]
        in
-       insert_as_last_stmts_in_innermost_block ~last_stmts kf body)
+       insert_as_last_stmts_in_innermost_block ~last_stmts body)
     stmt_end;
   (* Insert first statement *)
   body.bstmts <- stmt_begin :: body.bstmts
@@ -707,7 +719,7 @@ let inject_global_handler file main =
       in
       (* Surround the content of main with the calls to
          [__e_acsl_globals_init();] and [__e_acsl_globals_delete();] *)
-      surround_function_with main main_fundec stmt_init stmt_clean_opt;
+      surround_function_with main_fundec stmt_init stmt_clean_opt;
       (* Retrieve all globals except main *)
       let main_vi = Globals.Functions.get_vi main in
       let new_globals =
@@ -798,7 +810,7 @@ let inject_mtracking_handler main =
       let args = args @ [ ptr_size ] in
       let init = Smart_stmt.rtl_call loc "memory_init" args in
       let clean = Smart_stmt.rtl_call loc "memory_clean" [] in
-      surround_function_with main fundec init (Some clean)
+      surround_function_with fundec init (Some clean)
     in
     Option.iter handle_main main
   end
@@ -818,13 +830,9 @@ let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
-  Memory_tracking.reset ();
   Logic_functions.reset ();
-  Literal_strings.reset ();
   Global_observer.reset ();
-  Bound_variables.clear_guards ();
-  Logic_normalizer.clear ();
-  Typing.clear ();
+  Analyses.reset ();
   (* reset some kernel states: *)
   (* reset the CFG that has been heavily modified by the code generation step *)
   Cfg.clearFileCFG ~clear_id:false ast;
@@ -834,23 +842,10 @@ let reset_all ast =
   Ast.mark_as_grown ()
 
 let inject () =
-  Gmp_types.init ();
   let ast = Ast.get () in
   let current_project = Project.current() in
   Options.feedback ~level:2
-    "preprocessing annotations in project %a"
-    Project.pretty current_project;
-  Logic_normalizer.preprocess ast;
-  Options.feedback ~level:2
-    "normalizing quantifiers in project %a"
-    Project.pretty current_project;
-  Bound_variables.preprocess ast;
-  Options.feedback ~level:2
-    "typing annotations in project %a"
-    Project.pretty current_project;
-  Typing.type_program ast;
-  Options.feedback ~level:2
-    "injecting annotations as code in project %a"
+    "injecting annotations as code in %a"
     Project.pretty current_project;
   inject_in_file ast;
   reset_all ast;

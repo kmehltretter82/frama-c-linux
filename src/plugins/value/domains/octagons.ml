@@ -260,8 +260,6 @@ module Rewriting = struct
         if may_overflow ~cast:true typ v then [] else rewrite evaluate e
       else []
 
-    | Info (e, _) -> rewrite evaluate e
-
     | _ -> []
 
   (* Rewrites the operation [e1 ± e2] into equivalent octagons ±(X±Y-value). *)

@@ -102,7 +102,8 @@ struct
     in
     List.rev (Annotations.fold_code_annot filter_add stmt [])
 
-  let add ~emitter ~loc stmt annot =
+  let add ~emitter stmt annot =
+    let loc = Cil_datatype.Stmt.loc stmt in
     let param = M.export annot in
     let extension = Logic_const.new_acsl_extension name loc false param in
     let annot_node = Cil_types.AExtended ([], is_loop_annot, extension) in
@@ -261,14 +262,14 @@ let add_slevel_annot = Slevel.add
 
 let add_unroll_annot = Unroll.add
 
-let add_flow_annot ~emitter ~loc stmt flow_annotation =
+let add_flow_annot ~emitter stmt flow_annotation =
   let f, annot =
     match flow_annotation with
     | FlowSplit (annot, Static) -> Split.add, annot
     | FlowSplit (annot, Dynamic) -> DynamicSplit.add, annot
     | FlowMerge annot -> Merge.add, annot
   in
-  f ~emitter ~loc stmt (annot, None)
+  f ~emitter stmt (annot, None)
 
 
 module Subdivision = Register (struct

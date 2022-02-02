@@ -21,7 +21,7 @@
   exo1                      6        4       10       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
-[rte] annotating function exo1
+[rte:annot] annotating function exo1
 [wp] 5 goals scheduled
 [wp] [Alt-Ergo] Goal typed_exo1_assert_rte_signed_overflow : Valid
 [wp] [Alt-Ergo] Goal typed_exo1_assert_rte_mem_access : Valid

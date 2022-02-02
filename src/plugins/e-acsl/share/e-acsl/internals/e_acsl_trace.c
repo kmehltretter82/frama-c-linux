@@ -77,19 +77,20 @@ static int native_backtrace(void **array, int size) {
 
 void trace() {
 #if E_ACSL_OS_IS_LINUX
+  RTL_IO_LOCK();
 
   int size = 24;
   void **bb = private_malloc(sizeof(void *) * size);
   native_backtrace(bb, size);
 
   char executable[PATH_MAX];
-  rtl_sprintf(executable, "/proc/%d/exe", getpid());
+  rtl_snprintf(executable, sizeof(executable), "/proc/%d/exe", getpid());
 
   STDERR("/** Backtrace **************************/\n");
   int counter = 0;
   while (*bb) {
-    char *addr = (char *)private_malloc(21);
-    rtl_sprintf(addr, "%p", *bb);
+    char addr[21];
+    rtl_snprintf(addr, sizeof(addr), "%p", *bb);
     char *ar[] = {"addr2line", "-f",       "-p", "-C", "-s",
                   "-e",        executable, addr, NULL};
     ipr_t *ipr = shexec(ar, NULL);
@@ -112,5 +113,6 @@ void trace() {
     counter++;
   }
   STDERR("/***************************************/\n");
+  RTL_IO_UNLOCK();
 #endif /* E_ACSL_OS_IS_LINUX */
 }

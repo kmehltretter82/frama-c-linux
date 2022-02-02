@@ -106,9 +106,7 @@ struct
   let file_goal ~pid ~model ~prover =
     let ext = match prover with
       | Qed -> "qed"
-      | NativeAltErgo -> "mlw"
       | Why3 _ -> "why"
-      | NativeCoq -> "v"
       | Tactical -> "tac"
     in
     let id = WpPropId.get_propid pid in
@@ -117,9 +115,7 @@ struct
   let file_kf ~kf ~model ~prover =
     let ext = match prover with
       | Qed -> "qed"
-      | NativeAltErgo -> "mlw"
       | Why3 _ -> "why"
-      | NativeCoq -> "v"
       | Tactical -> "tac"
     in
     let id = (Kf.vi kf).vname in
@@ -378,7 +374,6 @@ type formula =
 
 type po = t and t = {
     po_gid   : string ;  (* goal identifier *)
-    po_leg   : string ;  (* legacy goal identifier *)
     po_sid   : string ;  (* goal short identifier (without model) *)
     po_name  : string ;  (* goal informal name *)
     po_idx   : index ;   (* goal index *)
@@ -456,7 +451,6 @@ module S =
           po_pid = List.hd WpPropId.PropId.reprs;
           po_sid = "";
           po_gid = "";
-          po_leg = "";
           po_model = WpContext.MODEL.repr ;
           po_name = "dummy";
           po_formula = GoalAnnot VC_Annot.repr ;
@@ -472,7 +466,7 @@ module ProverType =
       type t = prover
       include Datatype.Undefined
       let name = "Wpo.prover"
-      let reprs = [ NativeAltErgo; NativeCoq; Qed ]
+      let reprs = [ Qed ]
     end)
 (* to get a "reasonable" API doc: *)
 let () = Type.set_ml_name ProverType.ty (Some "Wpo.prover")

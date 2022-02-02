@@ -314,8 +314,7 @@ module Precedence = struct
            (assoc_connector_level thisLevel && thisLevel == contextprec
             && not state.print_cil_as_is))
 
-  let getParenthLevel e = match (Cil.stripInfo e).enode with
-    | Info _ -> assert false
+  let getParenthLevel e = match e.enode with
     | BinOp(LAnd, _,_,_) -> and_level
     | BinOp(LOr, _,_,_) -> or_level
     (* Bit operations. *)
@@ -325,7 +324,7 @@ module Precedence = struct
     (* Additive. Shifts can have higher level than + or - but I want parentheses
        around them *)
     | BinOp((MinusA|MinusPP|MinusPI|PlusA|
-             PlusPI|IndexPI|Shiftlt|Shiftrt),_,_,_) -> additiveLevel
+             PlusPI|Shiftlt|Shiftrt),_,_,_) -> additiveLevel
     (* Multiplicative *)
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
@@ -354,7 +353,7 @@ module Precedence = struct
     (* Additive. Shifts can have higher level than + or - but I want parentheses
        around them *)
     | TBinOp((MinusA|MinusPP|MinusPI|PlusA|
-              PlusPI|IndexPI|Shiftlt|Shiftrt),_,_) -> additiveLevel
+              PlusPI|Shiftlt|Shiftrt),_,_) -> additiveLevel
     (* Multiplicative *)
     | TBinOp((Div|Mod|Mult),_,_) -> multiplicativeLevel
     | Tapp({ l_var_info },[],[_;_])
@@ -797,8 +796,7 @@ class cil_printer () = object (self)
     parent_non_decay <- false;
     let level = Precedence.getParenthLevel e in
     (* fprintf fmt "/* eid:%d */" e.eid; *)
-    match (Cil.stripInfo e).enode with
-    | Info _ -> assert false
+    match e.enode with
     | Const(c) -> self#constant fmt c
     | Lval(l) -> self#lval fmt l
 
@@ -854,7 +852,7 @@ class cil_printer () = object (self)
   method binop fmt b =
     fprintf fmt "%s"
       (match b with
-       | PlusA | PlusPI | IndexPI -> "+"
+       | PlusA | PlusPI -> "+"
        | MinusA | MinusPP | MinusPI -> "-"
        | Mult -> "*"
        | Div -> "/"
@@ -1001,7 +999,7 @@ class cil_printer () = object (self)
     | Set(lv,e,_) -> begin
         (* Be nice to some special cases *)
         match e.enode with
-          BinOp((PlusA|PlusPI|IndexPI),
+          BinOp((PlusA|PlusPI),
                 {enode = Lval(lv')},
                 {enode=Const(CInt64(one,_,_))},_)
           when LvalStructEq.equal lv lv' && Integer.equal one Integer.one
@@ -1018,7 +1016,7 @@ class cil_printer () = object (self)
             (self#lval_prec Precedence.indexLevel) lv
             instr_terminator
 
-        | BinOp((PlusA|PlusPI|IndexPI),
+        | BinOp((PlusA|PlusPI),
                 {enode = Lval(lv')},
                 {enode = Const(CInt64(mone,_,_))},_)
           when LvalStructEq.equal lv lv' && Integer.equal mone Integer.minus_one
@@ -1027,7 +1025,7 @@ class cil_printer () = object (self)
             (self#lval_prec Precedence.indexLevel) lv
             instr_terminator
 
-        | BinOp((PlusA|PlusPI|IndexPI|MinusA|MinusPP|MinusPI|BAnd|BOr|BXor|
+        | BinOp((PlusA|PlusPI|MinusA|MinusPP|MinusPI|BAnd|BOr|BXor|
                  Mult|Div|Mod|Shiftlt|Shiftrt) as bop,
                 {enode = Lval(lv')},e,_) when LvalStructEq.equal lv lv' ->
           fprintf fmt "%a %a= %a%s"
@@ -2419,7 +2417,7 @@ class cil_printer () = object (self)
   method term_binop fmt b =
     fprintf fmt "%s"
       (match b with
-       | PlusA | PlusPI | IndexPI -> "+"
+       | PlusA | PlusPI -> "+"
        | MinusA | MinusPP | MinusPI -> "-"
        | Mult -> "*"
        | Div -> "/"

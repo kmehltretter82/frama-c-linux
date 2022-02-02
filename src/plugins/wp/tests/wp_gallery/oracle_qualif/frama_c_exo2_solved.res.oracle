@@ -33,7 +33,7 @@
   max_subarray             12       10       22       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
-[rte] annotating function max_subarray
+[rte:annot] annotating function max_subarray
 [wp] 1 goal scheduled
 [wp] [Alt-Ergo] Goal typed_max_subarray_assert_rte_mem_access : Valid
 [wp] Proved goals:    1 / 1

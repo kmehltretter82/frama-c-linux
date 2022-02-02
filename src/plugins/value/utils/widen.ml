@@ -177,8 +177,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
         match expr.enode with
         | BinOp (Mod, _, modu, _typ) -> [modu]
         | BinOp (BAnd, e1, e2, _typ) -> [e1; e2]
-        | CastE (_, expr)
-        | Info (expr, _) -> find_candidates expr
+        | CastE (_, expr) -> find_candidates expr
         | _ -> []
       in
       let process expr =
@@ -295,7 +294,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
                 let size = Cil.lenOfArray64 size in
                 if Integer.(gt size zero) then
                   self#add_index_hints size idx
-              with Cil.LenOfArray -> ()
+              with Cil.LenOfArray _ -> ()
             end
           | _ -> ()
         end

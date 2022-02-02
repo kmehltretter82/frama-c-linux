@@ -209,7 +209,7 @@ class compound =
         | Clause (Step s) -> process_have feedback s
         | Clause (Goal p) -> process_goal feedback p
         | Inside(_,e) -> process_expand feedback ?at:(Tactical.at s) e
-        | Empty | Compose _ -> raise Not_found
+        | Empty | Compose _ | Multi _ -> raise Not_found
       in Applicable process
 
   end

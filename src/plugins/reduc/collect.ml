@@ -85,7 +85,7 @@ let rec collect_off typ =
   | TArray (arrtyp, e_opt, _) ->
     debug "Array of length %a" (Pretty_utils.pp_opt Printer.pp_exp) e_opt;
     begin try collect_array arrtyp [] (Cil.lenOfArray64 e_opt)
-      with Cil.LenOfArray -> [] end
+      with Cil.LenOfArray _ -> [] end
   | TVoid _ | TFun _ | TPtr _ | TEnum _ | TNamed _ | TBuiltin_va_list _
   | TComp ({cfields = None}, _)-> []
 

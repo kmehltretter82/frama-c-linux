@@ -65,7 +65,7 @@ let link_name = function
 
 let debug = function
   | F_call f | F_left f | F_right f | F_bool_prop(_,f)
-  | F_list(f,_) | F_subst f | F_assoc f -> f
+  | F_list(f,_) | F_subst (f, _) | F_assoc f -> f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Identifiers                                                        --- *)
@@ -451,7 +451,7 @@ struct
                       fc self#pp_atom x (plist w) xs
               in plist (self#callstyle,fc,fn) fmt xs
             end
-        | F_subst s, _ ->
+        | F_subst (_, s), _ ->
             let print = match self#callstyle with
               | CallVar | CallVoid -> self#pp_flow
               | CallApply -> self#pp_atom in

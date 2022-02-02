@@ -1,7 +1,8 @@
 /* run.config*
  PLUGIN: @EVA_PLUGINS@ metrics
+ EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' @PTEST_FILE@ -save @PTEST_NAME@.sav >@PTEST_NAME@_sav.res 2>@PTEST_NAME@_sav.err
  MODULE: check_libc_naming_conventions, check_const
-   OPT: -print -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' -metrics -metrics-libc -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
+   OPT: -load %{dep:@PTEST_NAME@.sav} -print -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' -eva @EVA_CONFIG@ -then -lib-entry -no-print
  MODULE:
    OPT: -print -print-libc -machdep x86_32
  MODULE: check_parsing_individual_headers
@@ -11,7 +12,8 @@
  MODULE: check_compliance
    OPT: -kernel-msg-key printer:attrs
  MODULE:
- CMD: %{dep:@PTEST_DIR@/check_full_libc.sh} @PTEST_SHARE_DIR@/libc
+   OPT: -load %{dep:@PTEST_NAME@.sav} -metrics -metrics-libc -then -lib-entry -metrics-no-libc | ./check_some_metrics.sh "> 100" "> 400" "< 2" "> 20" "= 1" "= 1" "= 0" "= 0" "= 0" "= 1"
+ CMD: %{dep:./check_full_libc.sh} @PTEST_SHARE_DIR@/libc
    OPT:
 **/
 #define __FC_REG_TEST
@@ -53,6 +55,7 @@
 #include "__fc_define_intptr_t.h"
 #include "__fc_define_iovec.h"
 #include "__fc_define_key_t.h"
+#include "__fc_define_locale_t.h"
 #include "__fc_define_max_open_files.h"
 #include "__fc_define_mode_t.h"
 #include "__fc_define_nlink_t.h"
@@ -97,6 +100,7 @@
 #include "ifaddrs.h"
 #include "inttypes.h"
 #include "iso646.h"
+#include "langinfo.h"
 #include "libgen.h"
 #include "limits.h"
 #include "locale.h"
@@ -125,6 +129,7 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "stdnoreturn.h"
 #include "string.h"
 #include "strings.h"
 #include "stropts.h"

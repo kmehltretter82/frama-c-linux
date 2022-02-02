@@ -1,6 +1,6 @@
 /* run.config
-   STDOPT: #"-metrics-no-libc -metrics-eva-cover"
-   STDOPT: #"-metrics-libc -metrics-eva-cover"
+ EXECNOW: LOG @PTEST_NAME@_metrics.res LOG @PTEST_NAME@_metrics.err @frama-c@ @PTEST_FILE@ -metrics -metrics-libc -then -metrics-no-libc | @PTEST_SUITE_DIR@/../libc/check_some_metrics.sh "> 5" "> 100" "= 0" "> 10" "= 2"  "= 6" "= 0" "= 0" "= 0" "= 4" >@PTEST_NAME@_metrics.res 2>@PTEST_NAME@_metrics.err
+   STDOPT: #"-metrics-eva-cover"
    LOG: libc.json
    STDOPT: #"-metrics-libc -metrics-output @PTEST_RESULT@/libc.json"
 */

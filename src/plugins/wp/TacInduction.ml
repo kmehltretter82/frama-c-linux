@@ -22,22 +22,26 @@
 
 open Lang
 
-type env = {
-  n : F.var ;
-  sigma : F.sigma ;
-  mutable hind : F.pred list ;
-}
+(* remove parts with n from p into hs accumulator *)
+let filter_pred n hs p  =
+  F.p_conj @@ List.filter
+    (fun p -> if F.occursp n p then (hs := p :: !hs ; false) else true)
+    (match F.p_expr p with And ps -> ps | _ -> [p])
 
-let rec strip env p =
-  match F.p_expr p with
-  | And ps -> F.p_all (strip env) ps
-  | _ ->
-      let p = F.p_subst env.sigma p in
-      if F.occursp env.n p then
-        ( env.hind <- p :: env.hind ; F.p_true )
-      else p
+(* remove parts with n from step s into hs accumulator *)
+let filter_step n hs s =
+  match s.Conditions.condition with
+  | (Have _ | Type _ | Core _ | Init _ | When _)  ->
+      Conditions.map_step (filter_pred n hs) s
+  | (State _ | Branch _ | Either _) as c ->
+      if F.Vars.mem n s.vars then
+        (hs := Conditions.pred_cond c :: !hs ; Conditions.step (Have F.p_true))
+      else s
 
-let process value n0 seq =
+let filter_seq n hs seq =
+  Conditions.sequence @@ List.map (filter_step n hs) @@ Conditions.list seq
+
+let process value n0 sequent =
 
   (* Transfrom seq into: hyps => (forall n, goal) *)
   let n = Lang.freshvar ~basename:"n" Qed.Logic.Int in
@@ -46,9 +50,10 @@ let process value n0 seq =
   let vi = F.e_var i in
   let sigma = Lang.sigma () in
   F.Subst.add sigma value vn ;
-  let env = { n ; sigma ; hind = [] } in
-  let hyps = Conditions.map_sequence (strip env) (fst seq) in
-  let goal_n = F.p_hyps env.hind @@ F.p_subst sigma (snd seq) in
+  let seq, goal = Conditions.map_sequent (F.p_subst sigma) sequent in
+  let hind = ref [] in
+  let seq = filter_seq n hind seq in
+  let goal_n = F.p_hyps !hind goal in
   let goal_i = F.p_subst_var n vi goal_n in
 
   (* Base: n = n0 *)
@@ -67,7 +72,7 @@ let process value n0 seq =
     F.p_hyps [F.p_lt vn n0; hind] goal_n in
 
   (* All Cases *)
-  List.map (fun (name,goal) -> name , (hyps,goal)) [
+  List.map (fun (name,goal) -> name , (seq,goal)) [
     "Base" , goal_base ;
     "Induction (sup)" , goal_sup ;
     "Induction (inf)" , goal_inf ;

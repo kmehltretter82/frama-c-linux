@@ -26,6 +26,8 @@ open Cil_types
    devenir plus rapide, plus précis et plus mince".
    Also implements a support for real numbers. *)
 
+module Error = Error.Make(struct let phase = Options.Dkey.interval end)
+
 (* ********************************************************************* *)
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
@@ -849,7 +851,6 @@ let rec infer t =
   | Tlambda (_,_)
   | TConst (LStr _ | LWStr _)
   | TBinOp (PlusPI,_,_)
-  | TBinOp (IndexPI,_,_)
   | TBinOp (MinusPI,_,_)
   | TAddrOf _
   | TStartOf _

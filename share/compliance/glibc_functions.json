@@ -929,6 +929,7 @@
         "mkfifo",
         "mknod",
         "mkstemp",
+        "mkstemps",
         "mktemp",
         "mktime",
         "mlock",

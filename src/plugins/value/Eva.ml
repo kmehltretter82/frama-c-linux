@@ -47,4 +47,5 @@ module Private = struct
   module Domain_builder = Eva__Domain_builder
   module Main_locations = Eva__Main_locations
   module Eval_annots = Eva__Eval_annots
+  module Eva_dynamic = Eva_dynamic
 end

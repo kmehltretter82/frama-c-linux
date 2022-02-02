@@ -88,6 +88,7 @@ src/dome/misc/register.js: CEA_LGPL
 src/dome/misc/system.ts: CEA_LGPL
 src/dome/misc/utils.ts: CEA_LGPL
 src/dome/renderer/controls/buttons.tsx: CEA_LGPL
+src/dome/renderer/controls/displays.tsx: CEA_LGPL
 src/dome/renderer/controls/gallery.json: .ignore
 src/dome/renderer/controls/icons.tsx: CEA_LGPL
 src/dome/renderer/controls/labels.tsx: CEA_LGPL
@@ -148,6 +149,9 @@ src/frama-c/api/generated/plugins/eva/general/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/eva/values/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/studia/studia/index.ts: CEA_LGPL
 src/frama-c/api/generator.ml: .ignore
+src/frama-c/client.ts: CEA_LGPL
+src/frama-c/client_socket.ts: CEA_LGPL
+src/frama-c/client_zmq.ts: CEA_LGPL
 src/frama-c/index.tsx: CEA_LGPL
 src/frama-c/kernel/ASTinfo.tsx: CEA_LGPL
 src/frama-c/kernel/ASTview.tsx: CEA_LGPL

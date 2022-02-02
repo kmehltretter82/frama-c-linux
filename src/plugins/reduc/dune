@@ -1,0 +1,18 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Reduc:" %{lib-available:frama-c-reduc.core} "\n")
+  )
+  )
+)
+
+(library
+ (name reduc)
+  (optional)
+  (public_name frama-c-reduc.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel frama-c-inout.core frama-c-eva.core)
+)
+
+(plugin (optional) (name reduc) (libraries frama-c-reduc.core) (site (frama-c plugins)))

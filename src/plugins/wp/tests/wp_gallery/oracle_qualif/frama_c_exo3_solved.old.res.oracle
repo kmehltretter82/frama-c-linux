@@ -54,7 +54,7 @@
      */
   void equal_elements(int *a, int *v1, int *v2);
 [wp] Running WP plugin...
-[rte] annotating function equal_elements
+[rte:annot] annotating function equal_elements
 [wp] 16 goals scheduled
 [wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access : Valid
 [wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access_2 : Valid

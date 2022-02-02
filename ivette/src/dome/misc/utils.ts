@@ -31,9 +31,9 @@
 
 import type { CSSProperties } from 'react';
 
-type falsy = undefined | boolean | null | '';
+type Falsy = undefined | boolean | null | '';
 
-export type ClassSpec = string | falsy | { [cname: string]: true | falsy };
+export type ClassSpec = string | Falsy | { [cname: string]: true | Falsy };
 
 /**
    Utility function to merge various HTML class properties
@@ -75,7 +75,7 @@ export function classes(
   return buffer.join(' ');
 }
 
-export type StyleSpec = falsy | CSSProperties;
+export type StyleSpec = Falsy | CSSProperties;
 
 /**
    Utility function to merge various CSS style properties

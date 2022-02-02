@@ -29,7 +29,7 @@
 [wp] [Qed] Goal typed_lshift_int_ensures_ok : Valid
 [wp] [Qed] Goal typed_rshift_int_ensures_ok : Valid
 [wp] [Qed] Goal typed_band1_uint_assert_ok : Valid
-[wp] [Alt-Ergo] Goal typed_band1_uint_assert_ok_2 : Valid
+[wp] [Qed] Goal typed_band1_uint_assert_ok_2 : Valid
 [wp] [Qed] Goal typed_band_uint_ensures_ok : Valid
 [wp] [Qed] Goal typed_bor_uint_ensures_ok : Valid
 [wp] [Qed] Goal typed_bxor_uint_ensures_ok : Valid
@@ -44,7 +44,7 @@
 [wp] [Qed] Goal typed_lshift_char_ensures_ok : Valid
 [wp] [Qed] Goal typed_rshift_char_ensures_ok : Valid
 [wp] [Qed] Goal typed_band1_uchar_assert_ok : Valid
-[wp] [Alt-Ergo] Goal typed_band1_uchar_assert_ok_2 : Valid
+[wp] [Qed] Goal typed_band1_uchar_assert_ok_2 : Valid
 [wp] [Alt-Ergo] Goal typed_band_uchar_ensures_ok : Valid
 [wp] [Qed] Goal typed_bor_uchar_ensures_ok : Valid
 [wp] [Qed] Goal typed_bxor_uchar_ensures_ok : Valid
@@ -53,9 +53,9 @@
 [wp] [Qed] Goal typed_lshift_uchar_ensures_ok : Valid
 [wp] [Alt-Ergo] Goal typed_rshift_uchar_ensures_ok : Valid
 [wp] [Qed] Goal typed_band1_ushort_assert_ok : Valid
-[wp] [Alt-Ergo] Goal typed_band1_ushort_assert_ok_2 : Valid
+[wp] [Qed] Goal typed_band1_ushort_assert_ok_2 : Valid
 [wp] [Qed] Goal typed_band1_ulong_assert_ok : Valid
-[wp] [Alt-Ergo] Goal typed_band1_ulong_assert_ok_2 : Valid
+[wp] [Qed] Goal typed_band1_ulong_assert_ok_2 : Valid
 [wp] [Qed] Goal typed_cast_ensures_ok : Valid
 [wp] [Qed] Goal typed_cast_assert_ok : Valid
 [wp] [Qed] Goal typed_cast_assert_ok_2 : Valid
@@ -65,8 +65,8 @@
 [wp] [Qed] Goal typed_cast_assert_ok_6 : Valid
 [wp] [Qed] Goal typed_cast_assert_ok_7 : Valid
 [wp] Proved goals:   61 / 61
-  Qed:            41 
-  Alt-Ergo:       20
+  Qed:            45 
+  Alt-Ergo:       16
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                    10        8       18       100%
@@ -78,7 +78,7 @@
   bnot_int                  1        -        1       100%
   lshift_int                1        -        1       100%
   rshift_int                1        -        1       100%
-  band1_uint                1        1        2       100%
+  band1_uint                2        -        2       100%
   band_uint                 1        -        1       100%
   bor_uint                  1        -        1       100%
   bxor_uint                 1        1        2       100%
@@ -91,14 +91,14 @@
   bnot_char                 -        1        1       100%
   lshift_char               1        -        1       100%
   rshift_char               1        -        1       100%
-  band1_uchar               1        1        2       100%
+  band1_uchar               2        -        2       100%
   band_uchar                -        1        1       100%
   bor_uchar                 1        -        1       100%
   bxor_uchar                1        1        2       100%
   bnot_uchar                1        -        1       100%
   lshift_uchar              1        -        1       100%
   rshift_uchar              -        1        1       100%
-  band1_ushort              1        1        2       100%
-  band1_ulong               1        1        2       100%
+  band1_ushort              2        -        2       100%
+  band1_ulong               2        -        2       100%
   cast                      8        -        8       100%
 ------------------------------------------------------------

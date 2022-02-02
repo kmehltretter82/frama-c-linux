@@ -102,35 +102,6 @@ let mark_unreachable () =
   Annotations.iter_all_code_annot do_code_annot;
   Visitor.visitFramacFile unreach (Ast.get ())
 
-let mark_rte () =
-  let _, mem, _ = !Db.RteGen.get_memAccess_status () in
-  let _, arith, _ = !Db.RteGen.get_divMod_status () in
-  let _, signed_ovf, _ = !Db.RteGen.get_signedOv_status () in
-  let _, unsigned_ovf, _ = !Db.RteGen.get_unsignedOv_status () in
-  let _, signed_downcast, _ = !Db.RteGen.get_signed_downCast_status () in
-  let _, unsigned_downcast, _ = !Db.RteGen.get_unsignedDownCast_status () in
-  let _, pointer_call, _ = !Db.RteGen.get_pointerCall_status () in
-  let _, float_to_int, _ = !Db.RteGen.get_float_to_int_status () in
-  let _, finite_float, _ = !Db.RteGen.get_finite_float_status () in
-  let b_signed_ovf = Kernel.SignedOverflow.get () in
-  let b_unsigned_ovf = Kernel.UnsignedOverflow.get () in
-  let b_signed_downcast = Kernel.SignedDowncast.get () in
-  let b_unsigned_downcast = Kernel.UnsignedDowncast.get () in
-  Globals.Functions.iter
-    (fun kf ->
-       if !Db.Value.is_called kf then (
-         mem kf true;
-         arith kf true;
-         pointer_call kf true;
-         if b_signed_ovf then signed_ovf kf true;
-         if b_unsigned_ovf then unsigned_ovf kf true;
-         if b_signed_downcast then signed_downcast kf true;
-         if b_unsigned_downcast then unsigned_downcast kf true;
-         float_to_int kf true;
-         finite_float kf true;
-       )
-    )
-
 let c_labels kf cs =
   if !Db.Value.use_spec_instead_of_definition kf then
     Cil_datatype.Logic_label.Map.empty

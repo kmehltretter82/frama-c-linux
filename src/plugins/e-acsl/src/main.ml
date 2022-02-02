@@ -30,11 +30,6 @@ module Resulting_projects =
       let dependencies = Ast.self :: Options.parameter_states
     end)
 
-let () =
-  State_dependency_graph.add_dependencies
-    ~from:Resulting_projects.self
-    [ Label.self ]
-
 let generate_code =
   Resulting_projects.memo
     (fun name ->
@@ -69,7 +64,13 @@ let generate_code =
               Kernel.SignedOverflow.unsafe_set signed;
               Kernel.UnsignedOverflow.unsafe_set unsigned
             in
-            Extlib.try_finally ~finally Injector.inject ();
+            Extlib.try_finally
+              ~finally
+              (fun () ->
+                 Gmp_types.init ();
+                 Analyses.preprocess ();
+                 Injector.inject ())
+              ();
             (* remove the RTE's results computed from E-ACSL: they are partial
                and associated with the wrong kernel function (the one of the old
                project). *)

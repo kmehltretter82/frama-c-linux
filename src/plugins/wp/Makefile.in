@@ -34,7 +34,7 @@ ifneq ("$(FRAMAC_INTERNAL)","yes")
 include $(FRAMAC_SHARE)/Makefile.config
 endif
 
-# Coq Resources Installation
+# Resources Installation
 include $(PLUGIN_DIR)/share/Makefile.resources
 
 # Extension of the GUI for wp is compilable
@@ -84,17 +84,17 @@ PLUGIN_CMO:= \
 	MemMemory MemTyped MemRegion MemVal \
 	wpReached wpRTE wpTarget \
 	CfgCompiler StmtSemantics \
-	VCS script proof wpo wpReport \
+	VCS script wpo wpReport \
 	Footprint Tactical Strategy \
 	TacClear TacSplit TacChoice TacRange TacInduction \
 	TacArray TacCompound TacUnfold \
 	TacHavoc TacInstance TacLemma \
 	TacFilter TacCut WpTac TacNormalForm \
-	TacRewrite TacBitwised TacBitrange TacBittest TacShift \
+	TacRewrite TacBitwised TacBitrange TacBittest TacModMask TacShift \
 	TacSequence \
 	TacCongruence TacOverflow Auto \
 	ProofSession ProofScript ProofEngine \
-	ProverTask ProverErgo ProverCoq \
+	ProverTask \
 	filter_axioms Cache ProverWhy3 \
 	driver prover ProverSearch ProverScript \
 	Factory \
@@ -158,7 +158,6 @@ endif
 
 WP_CONFIGURE_MAKEFILE= \
 	$(Wp_DIR)/Makefile.in \
-	$(Wp_DIR)/share/Makefile.coqwp \
 	$(Wp_DIR)/share/Makefile.resources \
 	$(CONFIG_STATUS_DIR)/config.status
 
@@ -303,15 +302,10 @@ clean::
 
 ## All relative to share/
 
-ALL_COQ_SOURCES= $(addprefix coqwp/, $(COQ_LIBS_CEA) $(COQ_LIBS_INRIA))
-ALL_COQ_BINARIES= $(addsuffix o, $(ALL_COQ_SOURCES))
-ALL_ERGO_SOURCES= $(addprefix ergo/, $(ERGO_LIBS_CEA) $(ERGO_LIBS_INRIA))
 ALL_WHY3_SOURCES= $(addprefix why3/frama_c_wp/, $(WHY3_LIBS_CEA))
 
 ALL_RESOURCES= \
 	wp.driver \
-	$(ALL_COQ_SOURCES) \
-	$(ALL_ERGO_SOURCES) \
 	$(ALL_WHY3_SOURCES)
 
 INSTALL_OPT?=
@@ -327,22 +321,6 @@ $(Wp_DIR)/share/instwp: $(Wp_DIR)/share/install.ml
 	$(OCAMLC) $(WARNINGS) -w -70 -o $@ unix.cma $^
 
 # --------------------------------------------------------------------------
-# --- Pre-Compiled Coq Libraries                                         ---
-# --------------------------------------------------------------------------
-
-WP_COQC_ENABLED=@COQC@
-
-ifeq ($(WP_COQC_ENABLED),yes)
-
-include $(Wp_DIR)/share/Makefile.coqwp
-
-byte:: coqwpcompile
-opt:: coqwpcompile
-clean:: wp-coq-clean
-
-endif #($(WP_COQC_ENABLED),yes)
-
-# --------------------------------------------------------------------------
 # --- Installation                                                       ---
 # --------------------------------------------------------------------------
 
@@ -352,7 +330,7 @@ install:: clean-install
 	$(INSTALL_SHARE) -p \
 		-i $(Wp_DIR)/share \
 		-d $(FRAMAC_DATADIR)/wp \
-		$(ALL_RESOURCES) -f -b $(ALL_COQ_BINARIES)
+		$(ALL_RESOURCES) -f -b
 
 uninstall::
 	$(PRINT_RM) WP shared files

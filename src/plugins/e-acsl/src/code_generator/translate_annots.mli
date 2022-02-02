@@ -26,7 +26,7 @@ open Cil_types
     statements (if any) for runtime assertion checking. These C statements are
     part of the resulting environment. *)
 
-val pre_funspec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
+val pre_funspec: kernel_function -> Env.t -> funspec -> Env.t
 (** Translate the preconditions of the given function contract in the
     environment. The contract is attached to the kernel_function.
 
@@ -34,7 +34,7 @@ val pre_funspec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
     taken to call {!post_funspec} at the right time to pop the right
     contract. *)
 
-val post_funspec: kernel_function -> kinstr -> Env.t -> Env.t
+val post_funspec: kernel_function -> Env.t -> Env.t
 (** Translate the postconditions of the current function contract in the
     environment.
 

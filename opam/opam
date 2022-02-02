@@ -142,13 +142,6 @@ depopts: [
   "zmq"
 ]
 
-messages: [
-  "The Frama-C/Wp now uses Why-3 for all provers (Cf. deprecated -wp-prover native:alt-ergo)"
-  {alt-ergo:installed}
-  "The Frama-C/Wp native support for Coq is deprecated and only activated with Coq.8.13.x (use TIP or Why-3 instead)."
-  {coq:installed}
-]
-
 post-messages: [
   "Why3 provers setup: rm -f ~/.why3.conf ; why3 config detect"
 ]

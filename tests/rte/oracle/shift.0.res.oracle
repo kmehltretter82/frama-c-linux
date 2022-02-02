@@ -1,5 +1,5 @@
 [kernel] Parsing shift.c (with preprocessing)
-[rte] annotating function main
+[rte:annot] annotating function main
 [rte] shift.c:13: Warning: 
   guaranteed RTE: assert signed_overflow: 5 << 30 ≤ 2147483647;
 [rte] shift.c:14: Warning: 

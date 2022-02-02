@@ -141,7 +141,7 @@ Moreover, the following lemmas are added to complement the reference ones:
 \vskip 1em
 \hrule
 \label{builtin-exp-log}
-\paragraph{$\builtin{exp}(x)$, $\builtin{log}(x)$ and $\builtin{log10}(x)$} are declared 
+\paragraph{$\builtin{exp}(x)$, $\builtin{log}(x)$ and $\builtin{log10}(x)$} are declared
 to be injective, monotonically increasing and are associated with the following simplifiers:
 \[
 \begin{array}{rcl@{\quad}l}
@@ -188,14 +188,14 @@ imported from \textsf{Why-3}.
 \vskip 1em
 \hrule
 \label{builtin-trigo}
-\paragraph{$\builtin{sin}(x)$, $\builtin{cos}(x)$ and $\builtin{tan}(x)$} trigonometric 
+\paragraph{$\builtin{sin}(x)$, $\builtin{cos}(x)$ and $\builtin{tan}(x)$} trigonometric
 operations. Useful lemmas are already defined in the reference implementation from
 \textsf{Why-3} library.
 
 \label{builtin-arctrigo}
-\paragraph{$\builtin{asin}(x)$, $\builtin{acos}(x)$ and $\builtin{atan}(x)$} trigonometric 
+\paragraph{$\builtin{asin}(x)$, $\builtin{acos}(x)$ and $\builtin{atan}(x)$} trigonometric
 operations. Except definition of $\builtin{atan}$ which is available from reference,
-definition for arc-$\builtin{sin}$ and arc-$\builtin{cos}$ have been added. Moreover, 
+definition for arc-$\builtin{sin}$ and arc-$\builtin{cos}$ have been added. Moreover,
 all the arc-trigonometric operations are declared to be injective. In addition, the
 following simplifiers are also registered:
 
@@ -216,7 +216,7 @@ and are actually provided by custom extensions installed in the \textsf{WP} shar
 \vskip 1em
 \hrule
 \label{builtin-hyperbolic}
-\paragraph{$\builtin{sinh}(x)$, $\builtin{cosh}(x)$ and $\builtin{tanh}(x)$} trigonometric 
+\paragraph{$\builtin{sinh}(x)$, $\builtin{cosh}(x)$ and $\builtin{tanh}(x)$} trigonometric
 operations. Useful lemmas are already defined in the reference implementation from
 \textsf{Why-3} library.
 
@@ -256,21 +256,21 @@ Since all the builtin symbols of \textsf{ACSL} are actually linked to the standa
 of \textsf{Why-3}, any user theory also referring to the standard symbols can be added to the proof
 environment by using option \verb+-wp-why-lib 'file...'+.
 
-Otherwise, a driver shall be written. For instance, the additional lemma regarding $\builtin{exp}$ 
-p.\pageref{builtin-hyperbolic} for \textsf{Alt-Ergo} is simply defined in the following way:
+Otherwise, a driver can be written. For instance, the additional lemma regarding $\builtin{exp}$
+p.\pageref{builtin-hyperbolic} for \textsf{Why3} is simply defined in the following way:
 
-\begin{logs} 
+\begin{logs}
     // MyExp.mlw file
-    axiom exp_pos : (forall x:real. (0.0 <  exp(x)))
+    axiom exp_pos : forall x:real. (0.0 <  exp(x))
 \end{logs}
 
-Of course, this piece of \textsf{Alt-Ergo} input file must be integrated after the symbol
+Of course, this piece of \textsf{Why3} input file must be integrated after the symbol
 \verb+exp+ has been defined. The corresponding driver is then:
 
 \begin{logs}
     // MyExp.driver file
     library exponential:
-    ergo.file += "MyExp.mlw" ;
+    why3.file += "MyExp.mlw" ;
 \end{logs}
 
 Such a driver, once loaded with option \verb+-wp-driver+, instructs \textsf{Frama-C/WP} to
@@ -278,5 +278,5 @@ append your extension file to the other necessary resources for library \verb+"e
 which the logic ACSL builtin \verb+\exp+ belongs to.
 
 The file \verb+share/wp/wp.driver+ located into the shared directory of \textsf{Frama-C},
-and the associated files in sub-directories \verb+share/wp/ergo+ and \verb+share/wp/why3+ shall provide
+and the associated files in sub-directory \verb+share/wp/why3+ shall provide
 all the necessary hints for extending the capabilities of \textsf{Frama-C/WP} in a similar way.

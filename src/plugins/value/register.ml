@@ -206,7 +206,7 @@ let rec eval_deps state e =
   | Lval lv -> eval_deps_lval state lv
   | BinOp (_,e1,e2,_) ->
     Locations.Zone.join (eval_deps state e1) (eval_deps state e2)
-  | CastE (_,e) | UnOp (_,e,_) | Info (e,_) ->
+  | CastE (_,e) | UnOp (_,e,_) ->
     eval_deps state e
   | AddrOf lv | StartOf lv -> eval_deps_addr state lv
 and eval_deps_lval state lv =

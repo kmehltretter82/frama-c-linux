@@ -45,9 +45,46 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "e_acsl_concurrency.h"
 #include "e_acsl_rtl_io.h"
 
-typedef void (*putcf)(void *, char);
+/*! \brief Test if we can still write `n + 1` characters to the buffer according
+    to the `count` variable. */
+#define TEST_COUNT_N(count, n) ((count) == NULL || *(count) > (n))
+
+/*! \brief Test if we can still write a character to the buffer according to
+    the `count` variable. */
+#define TEST_COUNT(count) TEST_COUNT_N(count, 0)
+
+/*! \brief Decrease the value of `*count` by `n` if `count` is not `NULL`. */
+#define DEC_COUNT_N(count, n)                                                  \
+  do {                                                                         \
+    if ((count) != NULL) {                                                     \
+      *(count) -= (n);                                                         \
+    }                                                                          \
+  } while (0)
+
+/*! \brief Decrease the value of `*count` by 1 if `count` is not `NULL`. */
+#define DEC_COUNT(count) DEC_COUNT_N(count, 1)
+
+typedef void (*putcf)(void *, size_t *, char);
+
+#ifdef E_ACSL_CONCURRENCY_PTHREAD
+static pthread_mutex_t rtl_io_global_mutex_value;
+
+static void rtl_io_initialize_global_mutex() {
+  pthread_mutexattr_t attr;
+  pthread_mutexattr_init(&attr);
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init(&rtl_io_global_mutex_value, &attr);
+  pthread_mutexattr_destroy(&attr);
+}
+
+pthread_mutex_t *rtl_io_global_mutex() {
+  E_ACSL_RUN_ONCE(rtl_io_initialize_global_mutex);
+  return &rtl_io_global_mutex_value;
+}
+#endif
 
 /* Unsigned long integers to string conversion (%u) */
 static void uli2a(unsigned long int num, unsigned int base, int uc, char *bf) {
@@ -209,28 +246,43 @@ static char a2i(char ch, char **src, int base, int *nump) {
   return ch;
 }
 
-static void putchw(void *putp, putcf putf, int n, char z, char *bf) {
+static void putchw(void *putp, size_t *count, putcf putf, int n, char z,
+                   char *bf) {
   char fc = z ? '0' : ' ';
   char ch;
   char *p = bf;
   while (*p++ && n > 0)
     n--;
   while (n-- > 0)
-    putf(putp, fc);
+    putf(putp, count, fc);
   while ((ch = *bf++))
-    putf(putp, ch);
+    putf(putp, count, ch);
 }
 
-static void putcp(void *p, char c) {
-  *(*((char **)p))++ = c;
+static void putcp(void *p, size_t *count, char c) {
+  if (TEST_COUNT(count)) {
+    *(*((char **)p))++ = c;
+    DEC_COUNT(count);
+  }
 }
 
-static void _format(void *putp, putcf putf, char *fmt, va_list va) {
+/** Load the data from the format string `fmt` and the variadic arguments `va`,
+ * convert them to character string equivalents and write the result to the
+ * stream `putp` with the function `putf` up to `count` characters.
+ * \param putp Pointer to a stream where the formatted string will be outputted.
+ * \param count Pointer to an integer representing the number of characters that
+ *        can still be written to `putp`, or `NULL` if there are no limits.
+ * \param putf Function pointer to write a character to a given stream.
+ * \param fmt Formatting string.
+ * \param va Arguments for the formatting string.
+ */
+static void _format(void *putp, size_t *count, putcf putf, char *fmt,
+                    va_list va) {
   char bf[256];
   char ch;
-  while ((ch = *(fmt++))) {
+  while ((ch = *(fmt++)) && TEST_COUNT(count)) {
     if (ch != '%') // if not '%' print character as is
-      putf(putp, ch);
+      putf(putp, count, ch);
     else { // otherwise do the print based on the format following '%'
       char lz = 0;
       char lng = 0; // long (i.e., 'l' specifier)
@@ -255,7 +307,7 @@ static void _format(void *putp, putcf putf, char *fmt, va_list va) {
           uli2a(va_arg(va, unsigned long int), 10, 0, bf);
         else
           ui2a(va_arg(va, unsigned int), 10, 0, bf);
-        putchw(putp, putf, w, lz, bf);
+        putchw(putp, count, putf, w, lz, bf);
         break;
       }
       case 'd': {
@@ -263,32 +315,32 @@ static void _format(void *putp, putcf putf, char *fmt, va_list va) {
           li2a(va_arg(va, unsigned long int), bf);
         else
           i2a(va_arg(va, int), bf);
-        putchw(putp, putf, w, lz, bf);
+        putchw(putp, count, putf, w, lz, bf);
         break;
       }
       case 'p':
         ptr2a(va_arg(va, void *), bf);
-        putchw(putp, putf, w, lz, bf);
+        putchw(putp, count, putf, w, lz, bf);
         break;
       case 'a':
         addr2a(va_arg(va, uintptr_t), bf);
-        putchw(putp, putf, w, lz, bf);
+        putchw(putp, count, putf, w, lz, bf);
         break;
       case 'b':
         bits2a(va_arg(va, long), w > 64 ? 64 : w ? w : 8, bf, 1);
-        putchw(putp, putf, 0, 0, bf);
+        putchw(putp, count, putf, 0, 0, bf);
         break;
       case 'B':
         bits2a(va_arg(va, long), w > 64 ? 64 : w ? w : 8, bf, 0);
-        putchw(putp, putf, 0, 0, bf);
+        putchw(putp, count, putf, 0, 0, bf);
         break;
       case 'v':
         pbits2a(va_arg(va, void *), w ? w : 8, bf, 1);
-        putchw(putp, putf, 0, 0, bf);
+        putchw(putp, count, putf, 0, 0, bf);
         break;
       case 'V':
         pbits2a(va_arg(va, void *), w ? w : 8, bf, 0);
-        putchw(putp, putf, 0, 0, bf);
+        putchw(putp, count, putf, 0, 0, bf);
         break;
       case 'x':
       case 'X':
@@ -296,29 +348,29 @@ static void _format(void *putp, putcf putf, char *fmt, va_list va) {
           uli2a(va_arg(va, unsigned long int), 16, (ch == 'X'), bf);
         else
           ui2a(va_arg(va, unsigned int), 16, (ch == 'X'), bf);
-        putchw(putp, putf, w, lz, bf);
+        putchw(putp, count, putf, w, lz, bf);
         break;
       case 'f': {
         double num = va_arg(va, double);
         int ord = (int)num;
         i2a(ord, bf);
-        putchw(putp, putf, w, lz, bf);
-        putf(putp, '.');
+        putchw(putp, count, putf, w, lz, bf);
+        putf(putp, count, '.');
         num = num - ord;
         num *= 1000;
         ord = (int)num;
         i2a(ord, bf);
-        putchw(putp, putf, w, lz, bf);
+        putchw(putp, count, putf, w, lz, bf);
         break;
       }
       case 'c':
-        putf(putp, (char)(va_arg(va, int)));
+        putf(putp, count, (char)(va_arg(va, int)));
         break;
       case 's':
-        putchw(putp, putf, w, 0, va_arg(va, char *));
+        putchw(putp, count, putf, w, 0, va_arg(va, char *));
         break;
       case '%':
-        putf(putp, ch);
+        putf(putp, count, ch);
       default:
         break;
       }
@@ -326,41 +378,58 @@ static void _format(void *putp, putcf putf, char *fmt, va_list va) {
   }
 }
 
-static void _charc_stdout(void *p, char c) {
-  write(STDOUT_FILENO, &c, 1);
+static void _charc_stdout(void *p, size_t *count, char c) {
+  if (TEST_COUNT(count)) {
+    write(STDOUT_FILENO, &c, 1);
+    DEC_COUNT(count);
+  }
 }
-static void _charc_stderr(void *p, char c) {
-  write(STDERR_FILENO, &c, 1);
+static void _charc_stderr(void *p, size_t *count, char c) {
+  if (TEST_COUNT(count)) {
+    write(STDERR_FILENO, &c, 1);
+    DEC_COUNT(count);
+  }
 }
-static void _charc_file(void *p, char c) {
-  write((size_t)p, &c, 1);
+static void _charc_file(void *p, size_t *count, char c) {
+  if (TEST_COUNT(count)) {
+    write((size_t)p, &c, 1);
+    DEC_COUNT(count);
+  }
 }
 
-static void _charc_literal(void *p, char c) {
+static void _charc_literal(void *p, size_t *count, char c) {
+#define CHARC_LITERAL_WRITE(s, n)                                              \
+  do {                                                                         \
+    if (TEST_COUNT_N(count, (n)-1)) {                                          \
+      write((size_t)p, s, n);                                                  \
+      DEC_COUNT_N(count, n);                                                   \
+    }                                                                          \
+  } while (0)
+
   switch (c) {
   case '\r':
-    write((size_t)p, "\\r", 2);
+    CHARC_LITERAL_WRITE("\\r", 2);
     break;
   case '\f':
-    write((size_t)p, "\\f", 2);
+    CHARC_LITERAL_WRITE("\\f", 2);
     break;
   case '\b':
-    write((size_t)p, "\\b", 2);
+    CHARC_LITERAL_WRITE("\\b", 2);
     break;
   case '\a':
-    write((size_t)p, "\\a", 2);
+    CHARC_LITERAL_WRITE("\\a", 2);
     break;
   case '\n':
-    write((size_t)p, "\\n", 2);
+    CHARC_LITERAL_WRITE("\\n", 2);
     break;
   case '\t':
-    write((size_t)p, "\\t", 2);
+    CHARC_LITERAL_WRITE("\\t", 2);
     break;
   case '\0':
-    write((size_t)p, "\\0", 2);
+    CHARC_LITERAL_WRITE("\\0", 2);
     break;
   default:
-    write((size_t)p, &c, 1);
+    CHARC_LITERAL_WRITE(&c, 1);
   }
 }
 
@@ -373,7 +442,9 @@ int rtl_printf(char *fmt, ...) {
 }
 
 int rtl_vprintf(char *fmt, va_list vlist) {
-  _format(NULL, _charc_stdout, fmt, vlist);
+  RTL_IO_LOCK();
+  _format(NULL, NULL, _charc_stdout, fmt, vlist);
+  RTL_IO_UNLOCK();
   return 1;
 }
 
@@ -386,7 +457,9 @@ int rtl_eprintf(char *fmt, ...) {
 }
 
 int rtl_veprintf(char *fmt, va_list vlist) {
-  _format(NULL, _charc_stderr, fmt, vlist);
+  RTL_IO_LOCK();
+  _format(NULL, NULL, _charc_stderr, fmt, vlist);
+  RTL_IO_UNLOCK();
   return 1;
 }
 
@@ -399,8 +472,10 @@ int rtl_dprintf(int fd, char *fmt, ...) {
 }
 
 int rtl_vdprintf(int fd, char *fmt, va_list vlist) {
+  RTL_IO_LOCK();
   intptr_t fd_long = fd;
-  _format((void *)fd_long, _charc_file, fmt, vlist);
+  _format((void *)fd_long, NULL, _charc_file, fmt, vlist);
+  RTL_IO_UNLOCK();
   return 1;
 }
 
@@ -413,7 +488,29 @@ int rtl_sprintf(char *s, char *fmt, ...) {
 }
 
 int rtl_vsprintf(char *s, char *fmt, va_list vlist) {
-  _format(&s, putcp, fmt, vlist);
-  putcp(&s, 0);
+  _format(&s, NULL, putcp, fmt, vlist);
+  putcp(&s, NULL, 0);
+  return 1;
+}
+
+int rtl_snprintf(char *s, size_t bufsize, char *fmt, ...) {
+  va_list va;
+  va_start(va, fmt);
+  int result = rtl_vsnprintf(s, bufsize, fmt, va);
+  va_end(va);
+  return result;
+}
+
+int rtl_vsnprintf(char *s, size_t bufsize, char *fmt, va_list vlist) {
+  if (bufsize > 0) {
+    if (bufsize > 1) {
+      // Only copy `bufsize - 1` characters
+      --bufsize;
+      _format(&s, &bufsize, putcp, fmt, vlist);
+      ++bufsize;
+    }
+    // In any case, put `\0` as the last written character
+    putcp(&s, &bufsize, 0);
+  }
   return 1;
 }

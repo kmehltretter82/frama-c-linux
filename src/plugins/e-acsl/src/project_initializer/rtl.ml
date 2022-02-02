@@ -51,7 +51,7 @@ module Symbols: sig
   val mem_vi: string -> bool
   exception Unregistered of string
   val find_vi: string -> varinfo (* may raise Unregistered *)
-  val libc_replacement: varinfo -> varinfo
+  val replacement: get_name:(string -> string) -> varinfo -> varinfo
   val _debug: unit -> unit
 end = struct
 
@@ -74,13 +74,13 @@ end = struct
     try Datatype.String.Hashtbl.find vars s
     with Not_found -> raise (Unregistered s)
 
-  let libc_replacement fvi =
-    let name = Functions.RTL.libc_replacement_name fvi.vorig_name in
+  let replacement ~get_name fvi =
+    let name = get_name fvi.vorig_name in
     try
       find_vi name
     with Unregistered _ ->
       Options.fatal
-        "Unable to find RTL function '%s' to replace libc function '%s'"
+        "Unable to find RTL function '%s' to replace function '%s'"
         name
         fvi.vname
 

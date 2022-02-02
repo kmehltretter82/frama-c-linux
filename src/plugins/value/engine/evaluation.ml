@@ -421,7 +421,7 @@ module Make
     | _ -> false
 
   let may_overflow = function
-    | Shiftlt | Mult | MinusPP | MinusPI | IndexPI | PlusPI
+    | Shiftlt | Mult | MinusPP | MinusPI | PlusPI
     | PlusA | Div | Mod | MinusA -> true
     | _ -> false
 
@@ -886,7 +886,6 @@ module Make
       v, reduction, volatile
     in
     match expr.enode with
-    | Info (e, _) -> internal_forward_eval context e
     | Const constant -> internal_forward_eval_constant context expr constant
     | Lval _lval -> assert false
 
@@ -1056,7 +1055,7 @@ module Make
               let size_expr = Option.get array_size in (* array_size exists *)
               assume_valid_index ~size ~size_expr ~index_expr index
           with
-          | Cil.LenOfArray -> `Value index, Alarmset.none (* unknown array size *)
+          | Cil.LenOfArray _ -> `Value index, Alarmset.none (* unknown array size *)
       in
       valid_index >>=: fun index ->
       Loc.forward_index typ_pointed index roffset, typ_offs,
@@ -1314,15 +1313,14 @@ module Make
         Value.backward_cast ~src_typ ~dst_typ ~src_val ~dst_val:value
         >>- function v -> backward_eval fuel state e v
       end
-    | Info (e, _) -> backward_eval fuel state e None
     | _ -> `Value ()
 
   and recursive_descent fuel state expr =
     match expr.enode with
     | Lval lval -> backward_lval fuel state lval
     | UnOp (_, e, _)
-    | CastE (_, e)
-    | Info (e, _) -> backward_eval fuel state e None
+    | CastE (_, e) ->
+      backward_eval fuel state e None
     | BinOp (_binop, e1, e2, _typ) ->
       backward_eval fuel state e1 None >>- fun () ->
       backward_eval fuel state e2 None
@@ -1490,8 +1488,8 @@ module Make
     match expr.enode with
     | Lval lval -> recursive_descent_lval state lval
     | UnOp (_, e, _)
-    | CastE (_, e)
-    | Info (e, _) -> second_forward_eval state e
+    | CastE (_, e) ->
+      second_forward_eval state e
     | BinOp (_binop, e1, e2, _typ) ->
       second_forward_eval state e1 >>- fun () ->
       second_forward_eval state e2

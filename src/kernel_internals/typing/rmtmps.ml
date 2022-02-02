@@ -790,8 +790,6 @@ let remove_unused_labels ?(is_removable=label_removable) func =
     (visitCilBlock (new removeUnusedLabels is_removable usedLabels) func.sbody)
 
 let removeUnmarked isRoot ast reachable_tbl =
-  let removedLocals = ref [] in
-
   let filterGlobal global =
     match global with
     (* unused global types, variables, and functions are simply removed *)
@@ -823,11 +821,7 @@ let removeUnmarked isRoot ast reachable_tbl =
         if (local.vtemp || local.vstorage = Static) &&
            not (is_reachable reachable_tbl (Var local)) then
           begin
-            (* along the way, record the interesting locals that were removed *)
-            let name = local.vname in
-            (Kernel.debug ~dkey "removing local: %s" name);
-            removedLocals :=
-              (func.svar.vname ^ "::" ^ name) :: !removedLocals;
+            Kernel.debug ~dkey "removing local: %s" local.vname;
             false
           end else true
       in
@@ -873,8 +867,7 @@ let removeUnmarked isRoot ast reachable_tbl =
         end;
         Kernel.debug ~dkey "kept global %s (%a)" (global_type_and_name rg) Printer.pp_global rg
       ) keptGlobals;
-  end;
-  !removedLocals
+  end
 
 
 (***********************************************************************
@@ -914,7 +907,7 @@ let removeUnused ?(isRoot=isExportedRoot) ast =
       markReferenced ast;
 
       (* take out the trash *)
-      ignore (removeUnmarked isRoot ast reachable_tbl)
+      removeUnmarked isRoot ast reachable_tbl
     end
 
 (*

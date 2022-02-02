@@ -58,7 +58,7 @@
   Memory model hypotheses for function 'call_reset_5_tps':
   /*@
      behavior wp_typed_ref:
-       requires \separated((struct T **)tps + (..), tps[9] + (0 .. 4));
+       requires \separated(tps[9] + (0 .. 4), (struct T **)tps + (..));
      */
   void call_reset_5_tps(void);
 [wp] reference_and_struct.i:88: Warning: 

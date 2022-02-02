@@ -72,3 +72,9 @@ void implem(int c, int d) { };
 struct S example_struct = { .my_func = implem };
 
 void test_func(struct S* s) { s->my_func(3,4); example_struct.my_func(5,6); }
+
+// Check that these definitions do not make obfuscate crash
+/*@ axiomatic A { predicate P(void (*galois_fp_old)()); } */
+/*@ axiomatic A1 { predicate P1(void (*galois_fp_old)()); } */
+void my_f() {}
+/*@ lemma OK: P(my_f) && P1(my_f); */

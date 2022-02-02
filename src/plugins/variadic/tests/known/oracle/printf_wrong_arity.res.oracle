@@ -18,11 +18,11 @@
   Declaration of variadic function asprintf.
 [variadic] printf_wrong_arity.c:8: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[variadic] printf_wrong_arity.c:8: Warning: 
+[variadic:typing] printf_wrong_arity.c:8: Warning: 
   Too many arguments: expected 2, given 3. Superfluous arguments will be removed.
 [variadic] printf_wrong_arity.c:9: 
   Translating call to printf to a call to the specialized version printf_va_2.
-[variadic] printf_wrong_arity.c:9: Warning: 
+[variadic:typing] printf_wrong_arity.c:9: Warning: 
   Not enough arguments: expected 3, given 2.
 [variadic] printf_wrong_arity.c:9: 
   Fallback translation of call printf to a call to the specialized version printf_va_2_fallback_1.
@@ -47,7 +47,6 @@
 #include "stdio.c"
 #include "stdio.h"
 #include "stdlib.h"
-#include "sys/types.h"
 /*@ requires valid_read_string(format);
     assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result

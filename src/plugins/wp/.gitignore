@@ -12,8 +12,6 @@
 /tests/*/oracle_*/dune
 /tests/*/result
 /tests/*/result_*
-/tests/*/*.sav
-/tests/*/*.out
 
 /doc/*/.make-class
 /doc/*/.make-icons

@@ -36,6 +36,8 @@
 
 /*! Simple representation of a safe location */
 struct memory_location {
+  /*! Name of the safe location (for debug purposes) */
+  const char *name;
   /*! Address */
   uintptr_t address;
   /*! Byte-length */

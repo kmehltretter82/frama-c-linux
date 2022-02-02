@@ -208,7 +208,7 @@ let rec is_dangerous_offset = function
 
 let rec is_dangerous e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv -> is_dangerous_lval lv
-  | UnOp (_,e,_) | CastE(_,e) | Info(e,_) -> is_dangerous e
+  | UnOp (_,e,_) | CastE(_,e) -> is_dangerous e
   | BinOp(_,e1,e2,_) -> is_dangerous e1 || is_dangerous e2
   | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
     false
@@ -1379,12 +1379,12 @@ let rec is_boolean_result e =
      | None -> false)
   | CastE (_,e) -> is_boolean_result e
   | BinOp((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr),_,_,_) -> true
-  | BinOp((PlusA | PlusPI | IndexPI | MinusA | MinusPI | MinusPP | Mult
+  | BinOp((PlusA | PlusPI | MinusA | MinusPI | MinusPP | Mult
           | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr),_,_,_) -> false
   | UnOp(LNot,_,_) -> true
   | UnOp ((Neg | BNot),_,_) -> false
   | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-  | AlignOfE _ | AddrOf _ | StartOf _ | Info _ -> false
+  | AlignOfE _ | AddrOf _ | StartOf _ -> false
 
 (* Like Cil.mkCastT, but it calls typeForInsertedCast *)
 let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
@@ -3384,7 +3384,13 @@ let rec setOneInit this o preinit =
     let pMaxIdx, pArray =
       match this  with
       | NoInitPre  -> (* No initializer so far here *)
-        ref idx, ref (Array.make (max 32 (idx + 1)) NoInitPre)
+        begin
+          try
+            ref idx, ref (Array.make (max 32 (idx + 1)) NoInitPre)
+          with Invalid_argument _ | Out_of_memory ->
+            Kernel.abort ~current:true
+              "array length too large: %d" ((max 32 (idx + 1)))
+        end
 
       | CompoundPre (pMaxIdx, pArray) ->
         if !pMaxIdx < idx then begin
@@ -3763,11 +3769,11 @@ let integerArrayLength (leno: exp option) : int =
   | None -> max_int
   | Some len ->
     try lenOfArray leno
-    with LenOfArray ->
-      Kernel.fatal ~current:true
-        "Array length %a is not a compile-time constant: \
-         no explicit initializer allowed."
-        Cil_printer.pp_exp len
+    with
+    | LenOfArray cause ->
+      Kernel.abort ~current:true
+        "Array length %a is %a: no explicit initializer allowed."
+        Cil_printer.pp_exp len Cil.pp_incorrect_array_length cause
 
 let find_field_offset cond (fidlist: fieldinfo list) : offset =
   (* Depth first search for the field. This appears to be what GCC does.
@@ -4014,7 +4020,8 @@ struct
     Pretty_utils.ksfprintf (fun e -> raise (LogicTypeError (loc,e))) msg
 
   let on_error f rollback x =
-    try f x with LogicTypeError _ as exn -> rollback(); raise exn
+    try f x with
+    | LogicTypeError (loc,e) as exn -> rollback (loc,e); raise exn
 
 end
 
@@ -5496,24 +5503,21 @@ and makeCompType ghost (isstruct: bool)
         match widtho with
         | None -> None, ftype
         | Some w -> begin
+            let source = fst w.expr_loc in
             (match unrollType ftype with
              | TInt (_, _) -> ()
              | TEnum _ -> ()
              | _ ->
-               Kernel.error ~once:true ~source
+               Kernel.abort ~once:true ~source
                  "Base type for bitfield is not an integer type");
             match isIntegerConstant ghost w with
             | None ->
-              Kernel.error ~source
+              Kernel.abort ~source
                 "bitfield width is not a valid integer constant";
-              (* error  does not immediately stop execution.
-                 Hence, we return a placeholder here.
-              *)
-              Some 0, ftype
             | Some s as w ->
               begin
                 if s < 0 then
-                  Kernel.error ~source "negative bitfield width (%d)" s;
+                  Kernel.abort ~source "negative bitfield width (%d)" s;
                 try
                   if s > Cil.bitsSizeOf ftype then
                     Kernel.error ~source
@@ -5552,8 +5556,12 @@ and makeCompType ghost (isstruct: bool)
               anonCompFieldName ^ (string_of_int !anonCompFieldNameId)
             end
           | _ -> n
-        end else
+        end else begin
+          if fbitfield = Some 0 then
+            Kernel.error ~source:(fst cloc)
+              "named bitfield (%s) with zero width" n;
           n
+        end
       in
       let rec is_circular t =
         match Cil.unrollType t with
@@ -5913,7 +5921,7 @@ and doExp local_env
             addOffsetLval (Index(e2'', NoOffset)) array
           | _ -> (* Turn into *(e1 + e2) *)
             mkMem
-              (new_exp ~loc:e1''.eloc (BinOp(IndexPI, e1'', e2'', t1)))
+              (new_exp ~loc:e1''.eloc (BinOp(PlusPI, e1'', e2'', t1)))
               NoOffset
         in
         (* Do some optimization of StartOf *)

@@ -46,6 +46,7 @@ module Private: sig
   module Domain_builder = Domain_builder
   module Main_locations = Main_locations
   module Eval_annots = Eval_annots
+  module Eva_dynamic = Eva_dynamic
 end
 
 
@@ -126,13 +127,18 @@ module Eva_annotations: sig
     | FlowMerge of split_term
     (** Merge states separated by a previous split. *)
 
-  val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+  val get_slevel_annot : Cil_types.stmt -> slevel_annotation option
+  val get_unroll_annot : Cil_types.stmt -> unroll_annotation list
+  val get_flow_annot : Cil_types.stmt -> flow_annotation list
+  val get_subdivision_annot : Cil_types.stmt -> int list
+
+  val add_slevel_annot : emitter:Emitter.t ->
     Cil_types.stmt -> slevel_annotation -> unit
-  val add_unroll_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+  val add_unroll_annot : emitter:Emitter.t ->
     Cil_types.stmt -> unroll_annotation -> unit
-  val add_flow_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+  val add_flow_annot : emitter:Emitter.t ->
     Cil_types.stmt -> flow_annotation -> unit
-  val add_subdivision_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+  val add_subdivision_annot : emitter:Emitter.t ->
     Cil_types.stmt -> int -> unit
 end
 

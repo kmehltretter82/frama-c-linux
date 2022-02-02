@@ -1,7 +1,7 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:121: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:121: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:128: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:124: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:131: 
   Declaration of variadic function openat.
 [variadic] fcntl.c:8: 
   Translating call to the specialized version fcntl(int, int).
@@ -9,7 +9,7 @@
   Translating call to the specialized version fcntl(int, int, int).
 [variadic] fcntl.c:10: 
   Translating call to the specialized version fcntl(int, int, struct flock *).
-[variadic] fcntl.c:16: Warning: 
+[variadic:prototype] fcntl.c:16: Warning: 
   No matching prototype found for this call to fcntl.
   Expected candidates:
          fcntl(int, int)
@@ -23,7 +23,7 @@
   Translating call to the specialized version fcntl(int, int).
 [variadic] fcntl.c:24: 
   Translating call to the specialized version fcntl(int, int, struct flock *).
-[variadic] fcntl.c:28: Warning: 
+[variadic:prototype] fcntl.c:28: Warning: 
   No matching prototype found for this call to fcntl.
   Expected candidates:
          fcntl(int, int)

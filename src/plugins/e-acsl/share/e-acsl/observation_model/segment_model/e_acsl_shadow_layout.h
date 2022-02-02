@@ -33,6 +33,7 @@
 
 #include "../../internals/e_acsl_config.h"
 #include "../../internals/e_acsl_malloc.h"
+#include "e_acsl_shadow_concurrency.h"
 
 /* Default size of a program's heap tracked via shadow memory */
 #ifndef E_ACSL_HEAP_SIZE
@@ -42,6 +43,11 @@
 /* Default size of a program's stack tracked via shadow memory */
 #ifndef E_ACSL_STACK_SIZE
 #  define E_ACSL_STACK_SIZE 16
+#endif
+
+/* Default size of a program's TLS tracked via shadow memory */
+#ifndef E_ACSL_TLS_SIZE
+#  define E_ACSL_TLS_SIZE 2
 #endif
 
 /* MAP_ANONYMOUS is a mmap flag indicating that the contents of allocated blocks
@@ -74,7 +80,7 @@
   However since the TLS is next to the VDSO segment in the program layout, the
   default size is small enough so that both segments do not overlap. */
 #ifndef PGM_TLS_SIZE
-#  define PGM_TLS_SIZE (2 * MB)
+#  define PGM_TLS_SIZE (E_ACSL_TLS_SIZE * MB)
 #endif
 
 /*! \brief Mspace padding used by shadow segments. This is to make sure that
@@ -107,6 +113,14 @@ size_t get_stack_size();
 /** Program heap information {{{ */
 /*! \brief Return the tracked size of a program's heap. */
 size_t get_heap_size();
+/** }}} */
+
+/** Thread-local storage information {{{ */
+/*! \brief Return byte-size of the TLS segment */
+size_t get_tls_size();
+
+/*! \brief Return start address of a program's TLS */
+uintptr_t get_tls_start();
 /** }}} */
 
 /** Shadow Layout {{{ */
@@ -263,6 +277,18 @@ void init_shadow_layout_pre_main();
  * of the program). */
 void init_shadow_layout_main(int *argc_ref, char ***argv_ref);
 
+/*! \brief Register safe locations in the memory model.
+ *  \param thread_only If true, only register safe locations specific to the
+           current thread, otherwise register all available safe locations. */
+void register_safe_locations(int thread_only);
+
+/*! \brief True value for the parameter of `register_safe_locations()`
+ *  function. */
+#define E_ACSL_REGISTER_THREAD_LOCS 1
+/*! \brief False value for the parameter of `register_safe_locations()`
+ *  function. */
+#define E_ACSL_REGISTER_ALL_LOCS 0
+
 /*! \brief Deallocate shadow regions used by runtime analysis */
 void clean_shadow_layout();
 /* }}} */
@@ -363,6 +389,13 @@ void clean_shadow_layout();
 #  define SECONDARY_VDSO_SHADOW(_addr)                                         \
     SHADOW_ACCESS(_addr, vdso_secondary_offset)
 
+/*! \brief Convert a thread address into its primary shadow counterpart */
+#  define PRIMARY_THREAD_SHADOW(_addr) primary_thread_shadow((uintptr_t)_addr)
+
+/*! \brief Convert a thread address into its secondary shadow counterpart */
+#  define SECONDARY_THREAD_SHADOW(_addr)                                       \
+    secondary_thread_shadow((uintptr_t)_addr)
+
 #elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Convert a text address into its primary shadow counterpart */
 #  define PRIMARY_TEXT_SHADOW(_addr) SHADOW_ACCESS(_addr, text_primary_offset)
@@ -431,6 +464,7 @@ void clean_shadow_layout();
      : IS_ON_GLOBAL(_addr) ? _region##_GLOBAL_SHADOW(_addr)                    \
      : IS_ON_TLS(_addr)    ? _region##_TLS_SHADOW(_addr)                       \
      : IS_ON_VDSO(_addr)   ? _region##_VDSO_SHADOW(_addr)                      \
+     : IS_ON_THREAD(_addr) ? _region##_THREAD_SHADOW(_addr)                    \
                            : (intptr_t)0)
 // clang-format on
 #elif E_ACSL_OS_IS_WINDOWS
@@ -478,11 +512,14 @@ void clean_shadow_layout();
 /*! \brief Evaluate to true if _addr is a VDSO address */
 #  define IS_ON_VDSO(_addr) IS_ON(_addr, mem_layout.vdso.application)
 
+/*! \brief Evaluate to true if _addr is a thread address */
+#  define IS_ON_THREAD(_addr) is_on_thread((uintptr_t)_addr)
+
 /*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
- * ::IS_ON_GLOBAL or ::IS_ON_TLS  */
+ * ::IS_ON_GLOBAL, ::IS_ON_TLS or ::IS_ON_THREAD */
 #  define IS_ON_STATIC(_addr)                                                  \
     (IS_ON_STACK(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr)             \
-     || IS_ON_VDSO(_addr))
+     || IS_ON_VDSO(_addr) || IS_ON_THREAD(_addr))
 #elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Evaluate to true if `_addr` is a text address */
 #  define IS_ON_TEXT(_addr)  IS_ON(_addr, mem_layout.text.application)
@@ -554,6 +591,14 @@ void clean_shadow_layout();
 /*! \brief Convert a VDSO address into its secondary temporal shadow counterpart */
 #    define TEMPORAL_SECONDARY_VDSO_SHADOW(_addr)                              \
       SHADOW_ACCESS(_addr, mem_layout.vdso.temporal_secondary.shadow_offset)
+
+/*! \brief Convert a thread address into its primary temporal shadow counterpart */
+#    define TEMPORAL_PRIMARY_THREAD_SHADOW(_addr)                              \
+      temporal_primary_thread_shadow((uintptr_t)_addr)
+
+/*! \brief Convert a thread address into its secondary temporal shadow counterpart */
+#    define TEMPORAL_SECONDARY_THREAD_SHADOW(_addr)                            \
+      temporal_secondary_thread_shadow((uintptr_t)_addr)
 
 #  elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Convert a text address into its primary temporal shadow counterpart */

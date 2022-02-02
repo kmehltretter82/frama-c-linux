@@ -11,13 +11,13 @@ Goal Post-condition 'P' in 'main':
 Assume {
   Type: IsS1_St(v) /\ IsS1_St(w).
   (* Initializer *)
-  Init: (w.F1_St_a) = 1.
-  (* Initializer *)
-  Init: (w.F1_St_b) = 2.
-  (* Initializer *)
   Init: (v.F1_St_a) = 1.
   (* Initializer *)
   Init: (v.F1_St_b) = 2.
+  (* Initializer *)
+  Init: (w.F1_St_a) = 1.
+  (* Initializer *)
+  Init: (w.F1_St_b) = 2.
 }
 Prove: EqS1_St(v, w).
 

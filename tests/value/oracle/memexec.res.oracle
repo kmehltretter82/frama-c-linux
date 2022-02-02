@@ -1,5 +1,5 @@
 [kernel] Parsing memexec.c (with preprocessing)
-[rte] annotating function fbug
+[rte:annot] annotating function fbug
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

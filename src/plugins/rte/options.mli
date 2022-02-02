@@ -35,7 +35,7 @@ module Trivial : Parameter_sig.Bool
 module Warn : Parameter_sig.Bool
 module FunctionSelection: Parameter_sig.Kernel_function_set
 
-val warn: ?source:Filepath.position -> ('a, Format.formatter, unit) format -> 'a
+val dkey_annot: category
 
 (*
 Local Variables:

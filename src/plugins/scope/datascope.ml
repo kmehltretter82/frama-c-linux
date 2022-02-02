@@ -28,11 +28,13 @@ open Cil_types
 let cat_rm_asserts_name = "rm_asserts"
 let () = Plugin.default_msg_keys [cat_rm_asserts_name]
 
+let name = "scope"
+
 module R =
   Plugin.Register
     (struct
-      let name = "scope"
-      let shortname = "scope"
+      let name = name
+      let shortname = name
       let help = "data dependencies higher level functions"
     end)
 
@@ -693,6 +695,15 @@ let () =
     (Db.Journalize
        ("Value.rm_asserts", Datatype.func Datatype.unit Datatype.unit))
     Db.Value.rm_asserts rm_asserts
+
+let rm_asserts =
+  Dynamic.register
+    ~comment:"Remove redundant alarms. Used by the Eva plugin."
+    ~plugin:name
+    "rm_asserts"
+    Datatype.(func unit unit)
+    ~journalize:true
+    rm_asserts
 
 (*
 Local Variables:

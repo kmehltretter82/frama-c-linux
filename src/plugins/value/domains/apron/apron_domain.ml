@@ -267,7 +267,6 @@ let rec translate_expr eval oracle expr = match expr.enode with
     Texpr1.(Binop (op', e1', e2', translate_typ typ, round))
   | CastE (typ, e)->
     coerce ~cast:true eval typ (translate_expr_linearize eval oracle e)
-  | Info (e, _) -> translate_expr eval oracle e
   | AddrOf _ | StartOf _  -> raise (Out_of_Scope "translate_expr addr")
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _  | AlignOfE _ ->
     match Cil.constFoldToInt expr with

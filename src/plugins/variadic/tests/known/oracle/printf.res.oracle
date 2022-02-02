@@ -80,7 +80,7 @@
   Translating call to printf to a call to the specialized version printf_va_25.
 [variadic] printf.c:69: 
   Translating call to printf to a call to the specialized version printf_va_26.
-[variadic] printf.c:71: Warning: 
+[variadic:libc:format] printf.c:71: Warning: 
   Flag ' ' and conversion specififer x are not compatibles.
 [variadic] printf.c:71: 
   Fallback translation of call printf to a call to the specialized version printf_fallback_1.
@@ -170,7 +170,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "strings.h"
-#include "sys/types.h"
 #include "time.h"
 #include "wchar.h"
 /*@ requires valid_read_string(format);

@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+o!  Kernel    [2022-02-19] Removed obsolete AST nodes IndexPI and Info
 o!  Kernel    [2021-12-03] Remove unused AST node Dcustom_annot and field
               fpadding_in_bits. Do not cache size of types in the AST but in
               a dedicated table.
@@ -29,6 +30,10 @@ o!  Kernel    [2021-11-29] Integer.pretty does not have the optional argument
 Open Source Release 24.0 (Chromium)
 ###################################
 
+-*  Eva       [2022-01-19] Always emits alarms about initialization, escaping
+              pointers and special floating-point values for the arguments of
+              calls to functions without body (or whose body is not analyzed),
+              even when -eva-warn-copy-indeterminate is unset.
 -   ACSL      [2021-10-28] better type checks for volatile clauses
 -   Variadic  [2021-10-26] translates printf/scanf calls even if formatting
               string is not constant, warning that it will assume arguments

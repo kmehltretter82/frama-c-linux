@@ -166,7 +166,7 @@ let syntactic_lvalues expr =
       let new_lvalues = gather e empty_lvalues in
       let new_addr = HCESet.union new_lvalues.read new_lvalues.addr in
       { lvalues with addr = HCESet.union new_addr lvalues.addr }
-    | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> gather e lvalues
+    | UnOp (_, e, _) | CastE (_, e) -> gather e lvalues
     | BinOp (_, e1, e2, _) -> gather e1 (gather e2 lvalues)
     | _ -> lvalues
   in

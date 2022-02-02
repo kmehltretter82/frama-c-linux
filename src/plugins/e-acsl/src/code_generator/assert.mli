@@ -46,55 +46,52 @@ val with_data_from: loc:location -> kernel_function -> Env.t -> t -> t * Env.t
     If [from] is a "no data" assertion context, then the new context is also a
     "no data" assertion context. *)
 
-val merge_right: loc:location -> kernel_function -> Env.t -> t -> t -> t * Env.t
-(** [merge_right ~loc kf env adata1 adata2] merges the assertion data of
-    [adata1] into [adata2] if [adata2] is not a "no data" assertion context. *)
+val merge_right: loc:location -> Env.t -> t -> t -> t * Env.t
+(** [merge_right ~loc env adata1 adata2] merges the assertion data of [adata1]
+    into [adata2] if [adata2] is not a "no data" assertion context. *)
 
-val clean: loc:location -> kernel_function -> Env.t -> t -> Env.t
-(** [clean ~loc kf env adata] generates a call to the C cleanup function for the
+val clean: loc:location -> Env.t -> t -> Env.t
+(** [clean ~loc env adata] generates a call to the C cleanup function for the
     assertion context. This function *must* be used if the assertion context is
     not given to [runtime_check] or [runtime_check_with_msg], otherwise the
     memory allocated in the C structure will not be freed. *)
 
 val register:
   loc:location ->
-  kernel_function ->
   Env.t ->
   ?force:bool ->
   string ->
   exp ->
   t ->
   t * Env.t
-(** [register ~loc kf env ?force name e adata] registers the data [e]
-    corresponding to the name [name] to the assertion context [adata].
+(** [register ~loc env ?force name e adata] registers the data [e] corresponding
+    to the name [name] to the assertion context [adata].
     If [force] is false (default), the data is not registered if the expression
     is a constant. If [force] is true, the data is registered even if the
     expression is a constant. *)
 
 val register_term:
   loc:location ->
-  kernel_function ->
   Env.t ->
   ?force:bool ->
   term ->
   exp ->
   t ->
   t * Env.t
-(** [register_term ~loc kf env ?force t e adata] registers the data [e]
+(** [register_term ~loc env ?force t e adata] registers the data [e]
     corresponding to the term [t] to the assertion context [adata]. The
     parameter [force] has the same signification than for the function
     [register]. *)
 
 val register_pred:
   loc:location ->
-  kernel_function ->
   Env.t ->
   ?force:bool ->
   predicate ->
   exp ->
   t ->
   t * Env.t
-(** [register_pred ~loc kf env ?force p e adata] registers the data [e]
+(** [register_pred ~loc env ?force p e adata] registers the data [e]
     corresponding to the predicate [p] to the assertion context [adata]. The
     parameter [force] has the same signification than for the function
     [register]. *)

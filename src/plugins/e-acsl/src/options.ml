@@ -108,6 +108,14 @@ module Assert_print_data =
                   the runtime error message"
     end)
 
+module Concurrency =
+  False
+    (struct
+      let option_name = "-e-acsl-concurrency"
+      let help = "activate the concurrency support of E-ACSL. The option \
+                  implies -e-acsl-full-mtracking."
+    end)
+
 module Functions =
   Kernel_function_set
     (struct
@@ -172,10 +180,14 @@ let emitter =
 
 let must_visit () = Run.get ()
 
-let dkey_analysis = register_category "analysis"
-let dkey_prepare = register_category "preparation"
-let dkey_translation = register_category "translation"
-let dkey_typing = register_category "typing"
+module Dkey = struct
+  let prepare = register_category "preparation"
+  let bound_variables = register_category "analysis:bound_variables"
+  let interval = register_category "analysis:interval_inference"
+  let mtracking = register_category "analysis:memory_tracking"
+  let typing = register_category "analysis:typing"
+  let translation = register_category "translation"
+end
 
 let setup ?(rtl=false) () =
   (* Variadic translation *)
@@ -198,6 +210,28 @@ let setup ?(rtl=false) () =
         Dynamic.Parameter.Bool.off opt_name ();
       end
     end
+  end;
+  (* Concurrency support *)
+  if Concurrency.get () then begin
+    if Full_mtracking.is_set () && not (Full_mtracking.get ()) then
+      abort
+        "The memory tracking dataflow analysis is incompatible@ \
+         with the concurrency support of E-ACSL.@ \
+         Please use option '-e-acsl-full-mtracking'.";
+    if not rtl && not (Full_mtracking.is_set ()) then
+      feedback
+        "Due to the large number of function pointers in concurrent@ \
+         code, the memory tracking dataflow analysis is deactivated@ \
+         when activating the concurrency support of E-ACSL.";
+    Full_mtracking.on ();
+    if Temporal_validity.get () then
+      abort
+        "The temporal analysis in valid annotations is incompatible@ \
+         with the concurrency support of E-ACSL.@ \
+         Please use '-e-acsl-no-temporal-validity' or '-e-acsl-no-concurrency'@ \
+         to deactivate one or the other.";
+    if rtl then
+      Kernel.CppExtraArgs.add "-DE_ACSL_CONCURRENCY_PTHREAD"
   end;
   (* Additionnal kernel options while parsing the RTL project. *)
   if rtl then begin

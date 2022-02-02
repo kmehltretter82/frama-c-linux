@@ -287,9 +287,10 @@ let initialize_var_using_type varinfo state =
           end;
           !state
         with
-        | Cil.LenOfArray ->
+        | Cil.LenOfArray cause ->
           Value_parameters.result ~once:true ~current:true
-            "no size specified for array, assuming 0";
+            "problem with array size (%a), assuming 0"
+            Cil.pp_incorrect_array_length cause;
           (* This is either a flexible array member (for which Cil
              implicitly returns a size of 0, so we are doing the proper
              thing), or an incomplete array (which is forbidden)  *)

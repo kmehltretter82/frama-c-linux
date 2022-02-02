@@ -32,7 +32,6 @@
 import React from 'react';
 import { classes } from 'dome/misc/utils';
 import { Icon } from './icons';
-import { LabelProps } from './labels';
 import './style.css';
 
 interface EVENT {
@@ -46,68 +45,6 @@ const DISABLED = ({ disabled = false, enabled = true }) => (
 const TRIGGER = (onClick?: () => void) => (evt?: EVENT) => {
   evt?.stopPropagation();
   if (onClick) onClick();
-};
-
-// --------------------------------------------------------------------------
-// --- LCD
-// --------------------------------------------------------------------------
-
-/** Button-like label. */
-export function LCD(props: LabelProps) {
-  const className = classes(
-    'dome-xButton dome-xBoxButton dome-text-code dome-xButton-lcd ',
-    props.className,
-  );
-  return (
-    <label
-      className={className}
-      title={props.title}
-      style={props.style}
-    >
-      {props.icon && <Icon id={props.icon} />}
-      {props.label}
-      {props.children}
-    </label>
-  );
-}
-
-// --------------------------------------------------------------------------
-// --- Led
-// --------------------------------------------------------------------------
-
-export type LEDstatus =
-  undefined | 'inactive' | 'active' | 'positive' | 'negative' | 'warning';
-
-export interface LEDprops {
-  /**
-  Led status:
-     - `'inactive'`: off (default)
-     - `'active'`: blue color
-     - `'positive'`: green color
-     - `'negative'`: red color
-     - `'warning'`: orange color
-   */
-  status?: LEDstatus;
-  /** Blinking Led (default: `false`). */
-  blink?: boolean;
-  /** Tooltip text. */
-  title?: string;
-  /** Additional CSS class. */
-  className?: string;
-  /** Additional CSS style. */
-  style?: React.CSSProperties;
-}
-
-export const LED = (props: LEDprops) => {
-  const className = classes(
-    'dome-xButton-led',
-    `dome-xButton-led-${props.status || 'inactive'}`,
-    props.blink && 'dome-xButton-blink',
-    props.className,
-  );
-  return (
-    <div className={className} title={props.title} style={props.style} />
-  );
 };
 
 // --------------------------------------------------------------------------
@@ -138,7 +75,7 @@ const LABEL = ({ disabled, label }: LABELprops) => (
 );
 
 export type ButtonKind =
-  'default' | 'active' | 'primary' | 'warning' | 'positive' | 'negative';
+  'default' | 'primary' | 'warning' | 'positive' | 'negative';
 
 export interface ButtonProps {
   /** Text of the label. Prepend to other children elements. */
@@ -169,7 +106,6 @@ export interface ButtonProps {
   focusable?: boolean;
   /** Styled bytton:
      - `'default'`: normal button;
-     - `'active'`: active normal button;
      - `'primary'`: primary button, in blue;
      - `'warning'`: warning button, in orange;
      - `'positive'`: positive button, in green;
@@ -558,15 +494,13 @@ export interface SelectProps {
    *   <optgroup label='…'>…</optgroup>
    *   <option value='…' disabled=… >…</option>
 
-   **Warning:** most non-positionning CSS properties might not
-   work on the`<select>` element due to the native rendering used
-   by Chrome.
-   You might use `-webkit-appearance: none` to cancel this behavior,
-   you will have to restyle the
-   component entirely, which is quite ugly by default.
  */
 export function Select(props: SelectProps) {
-  const { onChange, className = '', placeholder } = props;
+  const { onChange, placeholder } = props;
+  const className = classes(
+    'dome-xSelect dome-xBoxButton dome-xButton-default dome-xButton-label',
+    props.className,
+  );
   const disabled = onChange ? DISABLED(props) : true;
   const callback = (evt: React.ChangeEvent<HTMLSelectElement>) => {
     if (onChange) onChange(evt.target.value);
@@ -575,7 +509,7 @@ export function Select(props: SelectProps) {
     <select
       id={props.id}
       disabled={disabled}
-      className={`dome - xSelect ${className} `}
+      className={className}
       style={props.style}
       title={props.title}
       value={props.value}
@@ -583,7 +517,7 @@ export function Select(props: SelectProps) {
     >
       {placeholder && <option value="">— {placeholder} —</option>}
       {props.children}
-    </select>
+    </select >
   );
 }
 

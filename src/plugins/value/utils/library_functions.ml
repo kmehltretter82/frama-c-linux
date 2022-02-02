@@ -71,20 +71,22 @@ let returned_value kf =
 
 
 let unsupported_specifications =
-  [ "asprintf", "stdio.c";
+  [
+    "asprintf", "stdio.c";
+    "canonicalize_path_name", "stdlib.c";
+    "getaddrinfo", "netdb.c";
+    "getenv", "stdlib.c";
+    "getline", "stdio.c";
     "glob", "glob.c";
     "globfree", "glob.c";
-    "getaddrinfo", "netdb.c";
-    "getline", "stdio.c";
-    "strerror", "string.c";
-    "strdup", "string.c";
-    "strndup", "string.c";
-    "getenv", "stdlib.c";
     "posix_memalign", "stdlib.c";
     "putenv", "stdlib.c";
+    "realpath", "stdlib.c";
     "setenv", "stdlib.c";
+    "strdup", "string.c";
+    "strerror", "string.c";
+    "strndup", "string.c";
     "unsetenv", "stdlib.c";
-    "realpath", "stdlib.c"
   ]
 
 let unsupported_specs_tbl =

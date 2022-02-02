@@ -613,10 +613,17 @@ val isArrayType: typ -> bool
 (** True if the argument is a struct of union type *)
 val isStructOrUnionType: typ -> bool
 
+(** possible causes for raising {!Cil.LenOfArray} *)
+type incorrect_array_length = Not_constant | Not_integer | Negative | Too_big
+
+val pp_incorrect_array_length:
+  Format.formatter -> incorrect_array_length -> unit
+
 (** Raised when {!Cil.lenOfArray} fails either because the length is [None],
   * because it is a non-constant expression, or because it overflows an int.
 *)
-exception LenOfArray
+exception LenOfArray of incorrect_array_length
+
 
 (** Call to compute the array length as present in the array type, to an
   * integer. Raises {!Cil.LenOfArray} if not able to compute the length, such
@@ -1007,28 +1014,6 @@ val stripTermCasts: term -> term
     other expression constructs.  So we delete the (A) and (B) casts from
     "(A)(B)(x + (C)y)", but leave the (C) cast. *)
 val stripCasts: exp -> exp
-
-(** Removes info wrappers and return underlying expression *)
-val stripInfo: exp -> exp
-
-(** Removes casts and info wrappers and return underlying expression *)
-val stripCastsAndInfo: exp -> exp
-
-(** Removes casts and info wrappers,except last info wrapper, and return
-    underlying expression *)
-val stripCastsButLastInfo: exp -> exp
-
-(** Extracts term information in an expression information *)
-val exp_info_of_term: term -> exp_info
-
-(** Constructs a term from a term node and an expression information *)
-val term_of_exp_info: location -> term_node -> exp_info -> term
-
-(** Map some function on underlying expression if Info or else on expression *)
-val map_under_info: (exp -> exp) -> exp -> exp
-
-(** Apply some function on underlying expression if Info or else on expression *)
-val app_under_info: (exp -> unit) -> exp -> unit
 
 val typeOf: exp -> typ
 (** Compute the type of an expression. *)

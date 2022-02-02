@@ -915,8 +915,6 @@
   unsigned char __sync_sub_and_fetch_uint8_t(unsigned char volatile *__x0,
                                              unsigned char __x1 , ...);
   
-  void __sync_synchronize(...);
-  
   short __sync_val_compare_and_swap_int16_t(short volatile *__x0, short __x1,
                                             short __x2 , ...);
   

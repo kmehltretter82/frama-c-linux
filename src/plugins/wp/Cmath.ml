@@ -30,7 +30,7 @@ let f_builtin ~library ?(injective=false) ?(result=Real) ?(params=[Real]) ?ext n
   let call =
     match ext with Some call -> call | None ->
       String.sub name 1 (String.length name - 1) in
-  let link = Lang.infoprover (Engine.F_call call) in
+  let link = Engine.F_call call in
   let category =
     let open Qed.Logic in
     if injective then Injection else Function
@@ -180,21 +180,12 @@ let builtin_strict_leq lfun ~domain ~zero ~monotonic a b =
 (* -------------------------------------------------------------------------- *)
 
 let f_iabs =
-  extern_f ~library:"cmath"
-    ~link:{
-      altergo = Qed.Engine.F_call "abs_int";
-      why3     = Qed.Engine.F_call "IAbs.abs";
-      coq      = Qed.Engine.F_call "Z.abs";
-    } "\\iabs"
+  extern_f ~library:"cmath" ~link:(Qed.Engine.F_call "IAbs.abs") "\\iabs"
 
 let f_rabs =
   extern_f ~library:"cmath"
     ~result:Real ~params:[Sreal]
-    ~link:{
-      altergo = Qed.Engine.F_call "abs_real";
-      why3     = Qed.Engine.F_call "RAbs.abs";
-      coq      = Qed.Engine.F_call "R.abs";
-    } "\\rabs"
+    ~link:(Qed.Engine.F_call "RAbs.abs") "\\rabs"
 
 let () =
   begin

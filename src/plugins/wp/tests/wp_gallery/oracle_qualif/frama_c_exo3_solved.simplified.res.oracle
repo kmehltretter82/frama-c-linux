@@ -37,7 +37,7 @@
   pair                     16       10       26       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
-[rte] annotating function pair
+[rte:annot] annotating function pair
 [wp] 9 goals scheduled
 [wp] [Qed] Goal typed_pair_assert_rte_index_bound : Valid
 [wp] [Qed] Goal typed_pair_assert_rte_index_bound_2 : Valid

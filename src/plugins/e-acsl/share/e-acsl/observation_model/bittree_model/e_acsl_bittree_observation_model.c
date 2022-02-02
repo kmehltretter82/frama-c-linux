@@ -39,8 +39,6 @@
 /* Public API {{{ */
 /* Debug */
 #ifdef E_ACSL_DEBUG
-#  define eacsl_bt_print_block     export_alias(bt_print_block)
-#  define eacsl_bt_print_tree      export_alias(bt_print_tree)
 #  define eacsl_block_info         export_alias(block_info)
 #  define eacsl_store_block_debug  export_alias(store_block_debug)
 #  define eacsl_delete_block_debug export_alias(delete_block_debug)
@@ -304,23 +302,8 @@ void *eacsl_store_block(void *ptr, size_t size) {
 #endif
   bt_block *tmp = NULL;
   if (ptr) {
-    tmp = private_malloc(sizeof(bt_block));
-    tmp->ptr = (uintptr_t)ptr;
-    tmp->size = size;
-    tmp->init_ptr = NULL;
-    tmp->init_bytes = 0;
-    tmp->is_readonly = 0;
-    tmp->is_freeable = 0;
+    tmp = bt_alloc_block((uintptr_t)ptr, size);
     bt_insert(tmp);
-#ifdef E_ACSL_DEBUG
-    tmp->line = 0;
-    tmp->file = "undefined";
-#endif
-#ifdef E_ACSL_TEMPORAL
-    tmp->timestamp = NEW_TEMPORAL_TIMESTAMP();
-    tmp->temporal_shadow =
-        (size >= sizeof(void *)) ? private_malloc(size) : NULL;
-#endif
   }
   return tmp;
 }
@@ -355,12 +338,8 @@ void eacsl_delete_block(void *ptr) {
       private_abort("Attempt to delete untracked block\n");
 #endif
     if (tmp) {
-      bt_clean_block_init(tmp);
-#ifdef E_ACSL_TEMPORAL
-      private_free(tmp->temporal_shadow);
-#endif
       bt_remove(tmp);
-      private_free(tmp);
+      bt_free_block(tmp);
     }
   }
 }
@@ -654,4 +633,21 @@ void eacsl_block_info(char *p) {
   }
 }
 #endif
+/* }}} */
+
+/************************************************************************/
+/*** E-ACSL concurrency primitives {{{ ***/
+/************************************************************************/
+
+extern int pthread_create(pthread_t *restrict thread,
+                          const pthread_attr_t *restrict attr,
+                          pthread_routine_t start_routine, void *restrict arg);
+
+int eacsl_pthread_create(pthread_t *restrict thread,
+                         const pthread_attr_t *restrict original_attr,
+                         pthread_routine_t start_routine, void *restrict arg) {
+  private_abort("Concurrency is not supported for bittree model\n");
+  return EPERM;
+}
+
 /* }}} */

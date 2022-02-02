@@ -1,12 +1,12 @@
 # frama-c -wp -wp-rte [...]
 [kernel] Parsing opaque_struct.i (no preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function assigned_via_pointer
-[rte] annotating function assigns
-[rte] annotating function assigns_effect
-[rte] annotating function chunk_typing
-[rte] annotating function initialized_assigns
-[rte] annotating function uninitialized_assigns
+[rte:annot] annotating function assigned_via_pointer
+[rte:annot] annotating function assigns
+[rte:annot] annotating function assigns_effect
+[rte:annot] annotating function chunk_typing
+[rte:annot] annotating function initialized_assigns
+[rte:annot] annotating function uninitialized_assigns
 [kernel:annot:missing-spec] opaque_struct.i:79: Warning: 
   Neither code nor specification for function use, generating default assigns from the prototype
 ------------------------------------------------------------

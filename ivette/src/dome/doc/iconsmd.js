@@ -21,16 +21,15 @@ for ( var name in icons ) {
 index.sort();
 if (sections["Others"]) index.push("Others");
 
-console.log( '---' );
-console.log( 'subtitle: Icons Gallery' );
-console.log( '---' );
 console.log();
 
 // --- Gallery (per section) -----------------------------------------
 
 for ( var s = 0 ; s < index.length ; s++ ) {
   const section = index[s] ;
-  console.log( `## ${section} {#SECTION.${section}}` );
+  console.log( '<hr/>' );
+  console.log();
+  console.log( `## ${section}` );
   console.log();
   console.log( `  <div class="database">` );
 

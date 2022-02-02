@@ -248,11 +248,6 @@ let find_default_requires behaviors =
   try (List.find is_default_behavior behaviors).b_requires
   with Not_found -> []
 
-let rec stripInfo e =
-  match e.enode with
-  | Info(e',_) -> stripInfo e'
-  | _ -> e
-
 let rec addOffset (toadd: offset) (off: offset) : offset =
   match off with
   | NoOffset -> toadd
@@ -2210,8 +2205,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
   let vTyp t = visitCilType vis t in
   let vLval lv = visitCilLval vis lv in
   let new_exp e' = { e with enode = e' } in
-  match (stripInfo e).enode with
-  | Info _ -> assert false
+  match e.enode with
   | Const c ->
     let c' = visitCilConst vis c in
     if c' != c then new_exp (Const c') else e
@@ -3457,34 +3451,8 @@ let block_from_unspecified_sequence us =
 let rec stripCasts (e: exp) =
   match e.enode with CastE(_, e') -> stripCasts e' | _ -> e
 
-let rec stripCastsAndInfo (e: exp) =
-  match e.enode with Info(e',_) | CastE(_,e') -> stripCastsAndInfo e' | _ -> e
-
-let rec stripCastsButLastInfo (e: exp) =
-  match e.enode with
-    Info({enode = (Info _ | CastE _)} as e',_)
-  | CastE(_,e') ->
-    stripCastsButLastInfo e'
-  | _ -> e
-
 let rec stripTermCasts (t: term) =
   match t.term_node with TCastE(_, t') -> stripTermCasts t' | _ -> t
-
-let exp_info_of_term t = { exp_type = t.term_type; exp_name = t.term_name;}
-
-let term_of_exp_info loc tnode einfo =
-  {
-    term_node = tnode; term_loc = loc;
-    term_type = einfo.exp_type; term_name = einfo.exp_name;
-  }
-
-let map_under_info f e = match e.enode with
-  | Info(e,einfo) -> new_exp ~loc:e.eloc (Info(f e,einfo))
-  | _ -> f e
-
-let app_under_info f e = match e.enode with
-  | Info(e,_) -> f e
-  | _ -> f e
 
 (* Separate out the storage-modifier name attributes *)
 let separateStorageModifiers (al: attribute list) =
@@ -3708,8 +3676,7 @@ let no_op_coerce typ t =
 
 (**** Compute the type of an expression ****)
 let rec typeOf (e: exp) : typ =
-  match (stripInfo e).enode with
-  | Info _ -> assert false
+  match e.enode with
   | Const(CInt64 (_, ik, _)) -> TInt(ik, [])
 
   (* Character constants have type int.  ISO/IEC 9899:1999 (E),
@@ -4678,7 +4645,6 @@ and constFold (machdep: bool) (e: exp) : exp =
   | Lval lv -> new_exp ~loc (Lval (constFoldLval machdep lv))
   | AddrOf lv -> new_exp ~loc (AddrOf (constFoldLval machdep lv))
   | StartOf lv -> new_exp ~loc (StartOf (constFoldLval machdep lv))
-  | Info _ -> e (* Deprecated constructor *)
 
 and constFoldLval machdep (host,offset) =
   let newhost =
@@ -4745,8 +4711,6 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | (PlusA | MinusA), _, Const(CInt64(z,_,_))
         when Integer.equal z Integer.zero -> e1''
       | PlusPI, _, Const(CInt64(z,_,_))
-        when Integer.equal z Integer.zero -> e1''
-      | IndexPI, _, Const(CInt64(z,_,_))
         when Integer.equal z Integer.zero -> e1''
       | MinusPI, _, Const(CInt64(z,_,_))
         when Integer.equal z Integer.zero -> e1''
@@ -5806,8 +5770,7 @@ let isVariadicListType t = match unrollTypeSkel t with
   | TBuiltin_va_list _ -> true
   | _ -> false
 
-let rec isConstantGen f e = match (stripInfo e).enode with
-  | Info _ -> assert false
+let rec isConstantGen f e = match e.enode with
   | Const c -> f c
   | UnOp (_, e, _) -> isConstantGen f e
   | BinOp (_, e1, e2, _) -> isConstantGen f e1 && isConstantGen f e2
@@ -5946,7 +5909,7 @@ let mkBinOp ~loc op e1 e2 =
         (mkCastT t1 t1' e1) (mkCastT t2 t2' e2) t1'
   | (PlusA|MinusA)
     when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
-  | (PlusPI|MinusPI|IndexPI) when isPointerType t1 && isIntegralType t2 ->
+  | (PlusPI|MinusPI) when isPointerType t1 && isIntegralType t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
   | MinusPP when isPointerType t1 && isPointerType t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
@@ -6040,19 +6003,30 @@ let increm64 (e: exp) i =
     false
     (new_exp ~loc:e.eloc (BinOp(bop, e, kinteger64 ~loc:e.eloc i, et)))
 
-exception LenOfArray
+type incorrect_array_length = Not_constant | Not_integer | Negative | Too_big
+
+let pp_incorrect_array_length fmt = function
+  | Not_constant -> Format.pp_print_string fmt "not a compile-time constant"
+  | Negative -> Format.pp_print_string fmt "negative"
+  | Not_integer -> Format.pp_print_string fmt "not an integral constant"
+  | Too_big -> Format.pp_print_string fmt "too big"
+
+exception LenOfArray of incorrect_array_length
+
 let lenOfArray64 eo =
   match eo with
-    None -> raise LenOfArray
+    None -> raise (LenOfArray Not_constant)
   | Some e -> begin
       match (constFold true e).enode with
       | Const(CInt64(ni, _, _)) when Integer.ge ni Integer.zero ->
         ni
-      | _ -> raise LenOfArray
+      | Const(CInt64 _) -> raise (LenOfArray Negative)
+      | Const _ -> raise (LenOfArray Not_integer)
+      | _ -> raise (LenOfArray Not_constant)
     end
 let lenOfArray eo =
   match Integer.to_int_opt (lenOfArray64 eo) with
-  | None -> raise LenOfArray
+  | None -> raise (LenOfArray Too_big)
   | Some l -> l
 
 (*** Make an initializer for zeroing a data type ***)

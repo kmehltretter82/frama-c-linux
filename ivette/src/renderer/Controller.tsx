@@ -30,7 +30,8 @@ import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 
 import * as Toolbars from 'dome/frame/toolbars';
-import { LED, LEDstatus, IconButton } from 'dome/controls/buttons';
+import { IconButton } from 'dome/controls/buttons';
+import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
@@ -149,12 +150,12 @@ export const Control = () => {
   let stop = { enabled: false, onClick: () => { } };
   let reload = { enabled: false, onClick: () => { } };
 
-  switch (status.stage) {
-    case Server.Stage.OFF:
-    case Server.Stage.FAILURE:
+  switch (status) {
+    case Server.Status.OFF:
       play = { enabled: true, onClick: Server.start };
       break;
-    case Server.Stage.ON:
+    case Server.Status.ON:
+    case Server.Status.FAILURE:
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
       break;
@@ -357,44 +358,45 @@ Ivette.registerView({
 export const Status = () => {
   const status = Server.useStatus();
   const pending = Server.getPending();
-  let led: LEDstatus;
-  let blink;
-  let error;
+  let led: LEDstatus = 'inactive';
+  let icon = undefined;
+  let running = false;
+  let blink = false;
 
-  if (Server.hasErrorStatus(status)) {
-    led = 'negative';
-    blink = false;
-    error = status.error;
-  } else {
-    switch (status.stage) {
-      case Server.Stage.OFF:
-        led = 'inactive';
-        break;
-      case Server.Stage.STARTING:
-        led = 'active';
-        blink = true;
-        break;
-      case Server.Stage.ON:
-        led = pending > 0 ? 'positive' : 'active';
-        break;
-      case Server.Stage.HALTING:
-        led = 'negative';
-        blink = true;
-        break;
-      case Server.Stage.RESTARTING:
-        led = 'warning';
-        blink = true;
-        break;
-      default:
-        break;
-    }
+  switch (status) {
+    case Server.Status.OFF:
+      break;
+    case Server.Status.STARTING:
+      led = 'active';
+      blink = true;
+      running = true;
+      break;
+    case Server.Status.ON:
+      led = pending > 0 ? 'positive' : 'active';
+      running = true;
+      break;
+    case Server.Status.HALTING:
+      led = 'negative';
+      blink = true;
+      running = true;
+      break;
+    case Server.Status.RESTARTING:
+      led = 'warning';
+      blink = true;
+      running = true;
+      break;
+    case Server.Status.FAILURE:
+      led = 'negative';
+      blink = true;
+      running = false;
+      icon = 'WARNING';
+      break;
   }
 
   return (
     <>
       <LED status={led} blink={blink} />
-      <Code label={status.stage} />
-      {error && <Label icon="WARNING" label={error} />}
+      <Code icon={icon} label={running ? 'ON' : 'OFF'} />
       <Toolbars.Separator />
     </>
   );

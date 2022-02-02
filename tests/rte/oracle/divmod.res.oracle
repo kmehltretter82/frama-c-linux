@@ -1,5 +1,5 @@
 [kernel] Parsing divmod.c (with preprocessing)
-[rte] annotating function main
+[rte:annot] annotating function main
 [rte] divmod.c:13: Warning: 
   guaranteed RTE:
   assert

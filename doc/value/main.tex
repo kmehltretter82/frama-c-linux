@@ -371,7 +371,7 @@ frama-c -eva main_1.c >log
 \end{listing-nonumber}
 
 Frama-C has its own model of the target platform (the default target is
-a little-endian 32-bit platform). It also uses the host system's preprocessor.
+a little-endian 64-bit platform). It also uses the host system's preprocessor.
 If you want to do the analysis for a different platform than the host platform,
 you need to provide Frama-C with a way to pre-process the files as they
 would be during an actual compilation. 
@@ -579,7 +579,7 @@ use variable \lstinline|ONE| to detect endianness.
 Frama-C assumes a little-endian architecture
 by default, so \Eva{} is only analyzing the
 little-endian version of the library (Frama-C
-also assumes an IA-32 architecture, so we are only
+also assumes an IA-64 architecture, so we are only
 analyzing the library as compiled and run on this architecture).
 The big-endian version of the library could be analyzed
 by reproducing the same steps we are taking here for
@@ -1349,14 +1349,14 @@ An example of a program leading to a misaligned read is the following:
 \listinginput{1}{examples/misa.c}
 The value returned by the function \lstinline|main| is\\
 \lstinline|{{ garbled mix of &{ x; y } (origin: Misaligned { misa.c:6 }) }}|.\\
-The analyzer is by default configured for a 32-bit architecture, 
+The analyzer is by default configured for a 64-bit architecture,
 and that consequently the read memory access is not an out-of-bound access.
 If it was, an alarm would be emitted, and the
 analysis would go in a different direction.
 
 With the default target platform, the read access remains 
 within the bounds of array \lstinline|t|,
-but due to the offset of two bytes,
+but due to the offset of six bytes,
 the 32-bit word read is made of the last two bytes from \lstinline|t[0]|
 and the first two bytes from \lstinline|t[1]|.
 

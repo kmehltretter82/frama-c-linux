@@ -30,6 +30,7 @@
 *)
 
 open Cil_types
+open Analyses_types
 
 val preprocess : file -> unit
 (** Preprocess all the predicates of the ast and store the results *)
@@ -41,7 +42,7 @@ val preprocess_annot : code_annotation -> unit
 val preprocess_predicate : predicate -> unit
 (** Preprocess a predicate and its children and store the results  *)
 
-val get_pred : predicate -> Lscope.pred_or_term
+val get_pred : predicate -> pred_or_term
 (** Retrieve the preprocessed form of a predicate *)
 val get_term : term -> term
 (** Retrieve the preprocessed form of a term *)

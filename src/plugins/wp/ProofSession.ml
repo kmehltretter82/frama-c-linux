@@ -43,7 +43,6 @@ let legacies wpo =
   [
     jsonfile dscript wpo.po_gid ;
     jsonfile dmodel wpo.po_gid ;
-    jsonfile dmodel wpo.po_leg ;
   ]
 
 let get wpo =
@@ -62,12 +61,11 @@ let get wpo =
 
 let pp_file fmt s = Filepath.Normalized.(pretty fmt (of_string s))
 
-let pp_script fmt = function
-  | NoScript -> Format.pp_print_string fmt "no script file"
+let pp_script_for fmt wpo =
+  match get wpo with
   | Script f -> Format.fprintf fmt "script '%a'" pp_file f
-  | Deprecated f -> Format.fprintf fmt "script '%a' (deprecated)" pp_file f
-
-let pp_script_for fmt wpo = pp_script fmt (get wpo)
+  | Deprecated f -> Format.fprintf fmt "(deprecated) script '%a'" pp_file f
+  | _ -> Format.fprintf fmt "script '%a'" pp_file @@ filename ~force:false wpo
 
 let exists wpo =
   match get wpo with NoScript -> false | Script _ | Deprecated _ -> true

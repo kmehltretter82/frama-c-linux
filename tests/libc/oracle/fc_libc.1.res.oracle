@@ -1620,6 +1620,7 @@ extern size_t wcstombs(char * restrict s, wchar_t const * restrict pwcs,
 int posix_memalign(void **memptr, size_t alignment, size_t size);
 
 /*@ requires valid_template: valid_string(templat);
+    requires template_len: strlen(templat) ≥ 6;
     ensures
       result_error_or_valid_fd: \result ≡ -1 ∨ (0 ≤ \result < 16);
     assigns *(templat + (0 ..)), \result;
@@ -1628,7 +1629,20 @@ int posix_memalign(void **memptr, size_t alignment, size_t size);
  */
 extern int mkstemp(char *templat);
 
+/*@ requires valid_template: valid_string(templat);
+    requires template_len: strlen(templat) ≥ 6 + suffixlen;
+    requires non_negative_suffixlen: suffixlen ≥ 0;
+    ensures
+      result_error_or_valid_fd: \result ≡ -1 ∨ (0 ≤ \result < 16);
+    assigns *(templat + (0 ..)), \result;
+    assigns *(templat + (0 ..)) \from \nothing;
+    assigns \result \from \nothing;
+ */
+extern int mkstemps(char *templat, int suffixlen);
+
 char *realpath(char const * restrict file_name, char * restrict resolved_name);
+
+char *canonicalize_file_name(char const *path);
 
 /*@
 predicate non_escaping{L}(void *s, ℤ n) =
@@ -5284,6 +5298,8 @@ extern struct tm *gmtime(time_t const *timer);
     ensures
       result_null_or_internal_tm:
         \result ≡ &__fc_time_tm ∨ \result ≡ \null;
+    ensures
+      maybe_error: __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ≡ 75;
     assigns \result, __fc_time_tm;
     assigns \result \from __fc_p_time_tm;
     assigns __fc_time_tm \from *timer;
@@ -5437,6 +5453,22 @@ extern int clock_nanosleep(clockid_t clock_id, int flags,
  */
 extern struct tm *gmtime_r(time_t const * restrict timer,
                            struct tm * restrict result);
+
+/*@ requires valid_timer: \valid_read(timep);
+    requires valid_result: \valid(result);
+    ensures
+      result_null_or_initialized: initialization:
+        (\result ≡ \old(result) ∧ \initialized(\old(result))) ∨
+        \result ≡ \null;
+    ensures
+      maybe_error: __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ≡ 75;
+    assigns \result, *result, __fc_errno;
+    assigns \result \from (indirect: *timep), result;
+    assigns *result \from (indirect: *timep);
+    assigns __fc_errno \from (indirect: *timep);
+ */
+extern struct tm *localtime_r(time_t const * restrict timep,
+                              struct tm * restrict result);
 
 /*@ requires valid_request: \valid_read(rqtp);
     requires
@@ -6698,10 +6730,6 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 
 int asprintf(char **strp, char const *fmt, void * const *__va_params);
 
-/*@ assigns \result;
-    assigns \result \from maj, min; */
-extern dev_t makedev(int maj, int min);
-
 FILE __fc_initial_stdout =
   {.__fc_FILE_id = (unsigned int)1, .__fc_FILE_data = 0U};
 FILE *__fc_stdout = & __fc_initial_stdout;
@@ -7220,6 +7248,13 @@ char *realpath(char const * restrict file_name, char * restrict resolved_name)
   *(resolved_name + (realpath_len - 1)) = (char)'\000';
   __retres = resolved_name;
   return_label: return __retres;
+}
+
+char *canonicalize_file_name(char const *path)
+{
+  char *tmp;
+  tmp = realpath(path,(char *)0);
+  return tmp;
 }
 
 /*@ requires valid_dest: valid_or_empty(dest, n);
@@ -8690,6 +8725,9 @@ int __builtin_popcountl(unsigned long x);
     assigns \result \from (indirect: x);
  */
 int __builtin_popcountll(unsigned long long x);
+
+/*@ assigns \nothing; */
+void __sync_synchronize(void);
 
 /*@ logic 𝔹 bit_test(ℤ x, ℤ pos) = (x & (1 << pos)) ≢ 0;
 

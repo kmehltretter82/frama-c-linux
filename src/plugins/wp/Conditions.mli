@@ -177,6 +177,8 @@ val lemma : pred -> sequent
 val head : step -> pred (** Predicate for Have and such, Condition for Branch, True for Either *)
 val have : step -> pred (** Predicate for Have and such, True for any other *)
 
+val pred_cond : condition -> pred
+
 val condition : sequence -> pred (** With free variables kept. *)
 val close : sequent -> pred (** With free variables {i quantified}. *)
 

@@ -21,29 +21,24 @@
 /* ************************************************************************ */
 
 // --------------------------------------------------------------------------
-// --- Frama-C Server
+// --- Connection to Frama-C Server
 // --------------------------------------------------------------------------
 
 /**
- * Manage the current Frama-C server/client interface
- * @packageDocumentation
- * @module frama-c/server
+   Manage the current Frama-C server/client interface
+   @packageDocumentation
+   @module frama-c/server
 */
 
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
 import * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
-import { Request as ZmqRequest } from 'zeromq';
 import { ChildProcess } from 'child_process';
-
-// --------------------------------------------------------------------------
-// --- Pretty Printing (Browser Console)
-// --------------------------------------------------------------------------
-
-const D = new Dome.Debug('Server');
+import { client } from './client_socket';
+//import { client } from './client_zmq';
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -88,7 +83,7 @@ export class SIGNAL extends Dome.Event {
 // --------------------------------------------------------------------------
 
 /** Server stages. */
-export enum Stage {
+export enum Status {
   /** Server is off. */
   OFF = 'OFF',
   /** Server is starting, but not on yet. */
@@ -100,34 +95,7 @@ export enum Stage {
   /** Server is restarting. */
   RESTARTING = 'RESTARTING',
   /** Server is off upon failure. */
-  FAILURE = 'FAILURE'
-}
-
-export interface OkStatus {
-  readonly stage:
-  Stage.OFF | Stage.ON | Stage.STARTING | Stage.RESTARTING | Stage.HALTING;
-}
-
-export interface ErrorStatus {
-  readonly stage: Stage.FAILURE;
-  /** Failure message. */
-  readonly error: string;
-}
-
-export type Status = OkStatus | ErrorStatus;
-
-function okStatus(
-  s: Stage.OFF | Stage.ON | Stage.STARTING | Stage.RESTARTING | Stage.HALTING,
-) {
-  return { stage: s };
-}
-
-function errorStatus(error: string): ErrorStatus {
-  return { stage: Stage.FAILURE, error };
-}
-
-export function hasErrorStatus(s: Status): s is ErrorStatus {
-  return (s as ErrorStatus).error !== undefined;
+  FAILURE = 'FAILURE',
 }
 
 // --------------------------------------------------------------------------
@@ -135,45 +103,28 @@ export function hasErrorStatus(s: Status): s is ErrorStatus {
 // --------------------------------------------------------------------------
 
 /** The current server status. */
-let status: Status = okStatus(Stage.OFF);
+let status: Status = Status.OFF;
 
 /** Request counter. */
 let rqCount = 0;
 
-type IndexedPair<T, U> = {
-  [index: string]: [T, U];
-};
-
-type ResolvePromise = (value: Json.json) => void;
-type RejectPromise = (error: Error) => void;
-
-/** Pending promise callbacks (pairs of (resolve, reject)). */
-let pending: IndexedPair<ResolvePromise, RejectPromise> = {};
-
-/** Queue of server commands to be sent. */
-let queueCmd: string[] = [];
-
-/** Waiting request ids to be sent. */
-let queueId: string[] = [];
-
-/** Polling timeout and timer. */
-const pollingTimeout = 50;
-let pollingTimer: NodeJS.Timeout | undefined;
-
-/** Flushing timer. */
-let flushingTimer: NodeJS.Immediate | undefined;
+/** Pending Requests. */
+interface PendingRequest {
+  resolve: (data: Json.json) => void;
+  reject: (err?: string) => void;
+}
+const pending = new Map<string, PendingRequest>();
 
 /** Server process. */
 let process: ChildProcess | undefined;
 
-/** Killing timeout and timer for server process hard kill. */
-const killingTimeout = 300;
-let killingTimer: NodeJS.Timeout | undefined;
+/** Polling timeout when server is busy. */
+const pollingTimeout = 200;
+let pollingTimer: NodeJS.Timeout | undefined;
 
-/** ZMQ (REQ) socket. */
-let zmqSocket: ZmqRequest | undefined;
-/** Flag on whether ZMQ socket is busy. */
-let zmqIsBusy = false;
+/** Killing timeout and timer for server process hard kill. */
+const killingTimeout = 500;
+let killingTimer: NodeJS.Timeout | undefined;
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -205,14 +156,14 @@ export function useStatus(): Status {
  *  Whether the server is running and ready to handle requests.
  *  @return {boolean} Whether server stage is [[ON]].
  */
-export function isRunning(): boolean { return status.stage === Stage.ON; }
+export function isRunning(): boolean { return status === Status.ON; }
 
 /**
  *  Number of requests still pending.
  *  @return {number} Pending requests.
  */
 export function getPending(): number {
-  return _.reduce(pending, (n) => n + 1, 0);
+  return pending.size;
 }
 
 /**
@@ -232,16 +183,12 @@ export function onShutdown(callback: () => void) { SHUTDOWN.on(callback); }
 // --------------------------------------------------------------------------
 
 function _status(newStatus: Status) {
-  if (Dome.DEVEL && hasErrorStatus(newStatus)) {
-    D.error(newStatus.error);
-  }
-
   if (newStatus !== status) {
     const oldStatus = status;
     status = newStatus;
     STATUS.emit(newStatus);
-    if (oldStatus.stage === Stage.ON) SHUTDOWN.emit();
-    if (newStatus.stage === Stage.ON) READY.emit();
+    if (oldStatus === Status.ON) SHUTDOWN.emit();
+    if (newStatus === Status.ON) READY.emit();
   }
 }
 
@@ -257,22 +204,20 @@ function _status(newStatus: Status) {
  *  - Otherwise, the Frama-C server is spawned.
  */
 export async function start() {
-  switch (status.stage) {
-    case Stage.OFF:
-    case Stage.FAILURE:
-    case Stage.RESTARTING:
-      _status(okStatus(Stage.STARTING));
+  switch (status) {
+    case Status.OFF:
+    case Status.FAILURE:
+    case Status.RESTARTING:
+      _status(Status.STARTING);
       try {
         await _launch();
-        _status(okStatus(Stage.ON));
       } catch (error) {
-        D.error(error.toString());
-        buffer.append(error.toString(), '\n');
-        _exit(error);
+        buffer.log('[frama-c]', error);
+        _exit(false);
       }
       return;
-    case Stage.HALTING:
-      _status(okStatus(Stage.RESTARTING));
+    case Status.HALTING:
+      _status(Status.RESTARTING);
       return;
     default:
       return;
@@ -288,21 +233,17 @@ export async function start() {
  *
  *  - If the server is starting, it is hard killed.
  *  - If the server is running, it is shutdown gracefully.
- *  - If the server is restarting, restart is canceled.
  *  - Otherwise, this is a no-op.
  */
 export function stop() {
-  switch (status.stage) {
-    case Stage.STARTING:
-      _status(okStatus(Stage.HALTING));
+  switch (status) {
+    case Status.STARTING:
+      _status(Status.HALTING);
       _kill();
       return;
-    case Stage.ON:
-      _status(okStatus(Stage.HALTING));
+    case Status.ON:
+      _status(Status.HALTING);
       _shutdown();
-      return;
-    case Stage.RESTARTING:
-      _status(okStatus(Stage.HALTING));
       return;
     default:
       return;
@@ -321,12 +262,12 @@ export function stop() {
  *  - Otherwise, this is a no-op.
  */
 export function kill() {
-  switch (status.stage) {
-    case Stage.STARTING:
-    case Stage.ON:
-    case Stage.HALTING:
-    case Stage.RESTARTING:
-      _status(okStatus(Stage.HALTING));
+  switch (status) {
+    case Status.STARTING:
+    case Status.ON:
+    case Status.HALTING:
+    case Status.RESTARTING:
+      _status(Status.HALTING);
       _kill();
       return;
     default:
@@ -347,17 +288,17 @@ export function kill() {
  *  - Otherwise, this is a no-op.
  */
 export function restart() {
-  switch (status.stage) {
-    case Stage.OFF:
-    case Stage.FAILURE:
+  switch (status) {
+    case Status.OFF:
+    case Status.FAILURE:
       start();
       return;
-    case Stage.ON:
-      _status(okStatus(Stage.RESTARTING));
+    case Status.ON:
+      _status(Status.RESTARTING);
       _shutdown();
       return;
-    case Stage.HALTING:
-      _status(okStatus(Stage.RESTARTING));
+    case Status.HALTING:
+      _status(Status.RESTARTING);
       return;
     default:
       return;
@@ -376,11 +317,12 @@ export function restart() {
  *  - Otherwise, this is a no-op.
  */
 export function clear() {
-  switch (status.stage) {
-    case Stage.FAILURE:
-    case Stage.OFF:
+  switch (status) {
+    case Status.FAILURE:
+    case Status.OFF:
       buffer.clear();
-      _status(okStatus(Stage.OFF));
+      _clear();
+      _status(Status.OFF);
       return;
     default:
       return;
@@ -406,7 +348,7 @@ export interface Configuration {
   /** Shutdown timeout before server is hard killed, in milliseconds
    *  (default: 300ms). */
   timeout?: number;
-  /** Server polling period in milliseconds (default: 50ms). */
+  /** Server polling period in milliseconds (default: 200ms). */
   polling?: number;
   /** Process stdout log file (default: `undefined`). */
   logout?: string;
@@ -450,7 +392,7 @@ async function _launch() {
 
   buffer.clear();
   buffer.append('$', command);
-  const size = params.reduce((n: any, p: any) => n + p.length, 0);
+  const size = params.reduce((n, p) => n + p.length, 0);
   if (size < 40) {
     buffer.append('', ...params);
   } else {
@@ -466,16 +408,14 @@ async function _launch() {
   buffer.append('\n');
 
   if (!sockaddr) {
-    const tmp = System.getTempDir();
-    const pid = System.getPID();
-    const socketfile = System.join(tmp, `ivette.frama-c.${pid}.io`);
-    System.atExit(() => System.remove(socketfile));
-    sockaddr = `ipc://${socketfile}`;
+    const tmp = Dome.getTempDir();
+    const pid = Dome.getPID();
+    sockaddr = System.join(tmp, `ivette.frama-c.${pid}.io`);
   }
   if (!cwd) cwd = System.getWorkingDir();
   logout = logout && System.join(cwd, logout);
   logerr = logerr && System.join(cwd, logerr);
-  params = ['-server-zmq', sockaddr, '-then'].concat(params);
+  params = client.commandLine(sockaddr, params);
   const options = {
     cwd,
     stdout: { path: logout, pipe: true },
@@ -493,47 +433,33 @@ async function _launch() {
   process?.stdout?.on('data', logger);
   process?.stderr?.on('data', logger);
   process?.on('exit', (code: number | null, signal: string | null) => {
-    D.log('Process exited');
-
     if (signal) {
       // [signal] is non-null.
-      buffer.log('Signal:', signal);
-      const error = new Error(`Process terminated by the signal ${signal}`);
-      _exit(error);
+      buffer.log('[frama-c]', signal);
+      _exit(false);
       return;
     }
     // [signal] is null, hence [code] is non-null (cf. NodeJS doc).
     if (code) {
-      buffer.log('Exit:', code);
-      const error = new Error(`Process exited with code ${code}`);
-      _exit(error);
+      buffer.log('[frama-c] exit', code);
+      _exit(false);
     } else {
       // [code] is zero: normal exit w/o error.
-      _exit();
+      _exit(true);
     }
   });
   // Connect to Server
-  zmqSocket = new ZmqRequest();
-  zmqIsBusy = false;
-  zmqSocket.connect(sockaddr);
+  client.connect(sockaddr);
 }
 
 // --------------------------------------------------------------------------
 // --- Low-level Killing
 // --------------------------------------------------------------------------
 
-function _reset() {
-  D.log('Reset to initial configuration');
-
+function _clear() {
   rqCount = 0;
-  queueCmd = [];
-  queueId = [];
-  _.forEach(pending, ([, reject]) => reject(new Error('Server reset')));
-  pending = {};
-  if (flushingTimer) {
-    clearImmediate(flushingTimer);
-    flushingTimer = undefined;
-  }
+  pending.forEach((p: PendingRequest) => p.reject());
+  pending.clear();
   if (pollingTimer) {
     clearTimeout(pollingTimer);
     pollingTimer = undefined;
@@ -545,20 +471,13 @@ function _reset() {
 }
 
 function _kill() {
-  D.log('Hard kill');
-
-  _reset();
-  if (process) {
-    process.kill();
-  }
+  client.disconnect();
+  if (process) process.kill();
 }
 
 async function _shutdown() {
-  D.log('Shutdown');
-
-  _reset();
-  queueCmd.push('SHUTDOWN');
-  _flush();
+  _clear();
+  client.shutdown();
   const killingPromise = new Promise((resolve) => {
     if (!killingTimer) {
       if (process) {
@@ -573,21 +492,14 @@ async function _shutdown() {
   await killingPromise;
 }
 
-function _exit(error?: Error) {
-  _reset();
-  if (zmqSocket) {
-    zmqSocket.close();
-    zmqSocket = undefined;
-  }
-  zmqIsBusy = false;
+function _exit(error: boolean) {
+  _clear();
+  client.disconnect();
   process = undefined;
-  if (status.stage === Stage.RESTARTING) {
+  if (status === Status.RESTARTING) {
     setImmediate(start);
-  } else if (error) {
-    _status(errorStatus(error.toString()));
-  } else {
-    _status(okStatus(Stage.OFF));
   }
+  _status(error ? Status.FAILURE : Status.OFF);
 }
 
 // --------------------------------------------------------------------------
@@ -595,18 +507,19 @@ function _exit(error?: Error) {
 // --------------------------------------------------------------------------
 
 class SignalHandler {
-  id: any;
+  id: string;
   event: Dome.Event;
   active: boolean;
   listen: boolean;
+  handler: _.DebouncedFunc<() => void>;
 
-  constructor(id: any) {
+  constructor(id: string) {
     this.id = id;
     this.event = new SIGNAL(id);
     this.active = false;
     this.listen = false;
     this.sigon = this.sigon.bind(this);
-    this.sigoff = _.debounce(this.sigoff.bind(this), 1000);
+    this.sigoff = this.handler = debounce(this.sigoff.bind(this), 1000);
     this.unplug = this.unplug.bind(this);
   }
 
@@ -635,8 +548,7 @@ class SignalHandler {
   sigon() {
     if (this.active && !this.listen) {
       this.listen = true;
-      queueCmd.push('SIGON', this.id);
-      _flush();
+      client.sigOn(this.id);
     }
   }
 
@@ -645,14 +557,18 @@ class SignalHandler {
     if (!this.active && this.listen) {
       if (isRunning()) {
         this.listen = false;
-        queueCmd.push('SIGOFF', this.id);
-        _flush();
+        client.sigOff(this.id);
       }
     }
   }
 
+  emit() {
+    this.event.emit();
+  }
+
   unplug() {
     this.listen = false;
+    this.handler.cancel();
   }
 }
 
@@ -660,7 +576,7 @@ class SignalHandler {
 
 const signals: Map<string, SignalHandler> = new Map();
 
-function _signal(id: any) {
+function _signal(id: string): SignalHandler {
   let s = signals.get(id);
   if (!s) {
     s = new SignalHandler(id);
@@ -679,7 +595,7 @@ function _signal(id: any) {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function onSignal(s: Signal, callback: any) {
+export function onSignal(s: Signal, callback: () => void) {
   _signal(s.name).on(callback);
 }
 
@@ -691,7 +607,7 @@ export function onSignal(s: Signal, callback: any) {
  *  @param {string} id The signal identifier that was listen to.
  *  @param {function} callback The callback to remove.
  */
-export function offSignal(s: Signal, callback: any) {
+export function offSignal(s: Signal, callback: () => void) {
   _signal(s.name).off(callback);
 }
 
@@ -700,7 +616,7 @@ export function offSignal(s: Signal, callback: any) {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function useSignal(s: Signal, callback: any) {
+export function useSignal(s: Signal, callback: () => void) {
   React.useEffect(() => {
     onSignal(s, callback);
     return () => { offSignal(s, callback); };
@@ -718,7 +634,6 @@ READY.on(() => {
 SHUTDOWN.on(() => {
   signals.forEach((h: SignalHandler) => {
     h.unplug();
-    (h.sigoff as unknown as _.Cancelable).cancel();
   });
 });
 
@@ -733,7 +648,7 @@ export enum RqKind {
   /** Used to write data into the Frama-C server. */
   SET = 'SET',
   /** Used to make the Frama-C server execute a task. */
-  EXEC = 'EXEC'
+  EXEC = 'EXEC',
 }
 
 /** Server signal. */
@@ -758,7 +673,7 @@ export type GetRequest<In, Out> = Request<RqKind.GET, In, Out>;
 export type SetRequest<In, Out> = Request<RqKind.SET, In, Out>;
 export type ExecRequest<In, Out> = Request<RqKind.EXEC, In, Out>;
 
-export interface Killable<Data> extends Promise<Data> {
+export interface Response<Data> extends Promise<Data> {
   kill?: () => void;
 }
 
@@ -771,153 +686,86 @@ export interface Killable<Data> extends Promise<Data> {
 export function send<In, Out>(
   request: Request<RqKind, In, Out>,
   param: In,
-): Killable<Out> {
-  if (!isRunning()) return Promise.reject(new Error('Server not running'));
-  if (!request.name) return Promise.reject(new Error('Undefined request'));
+): Response<Out> {
+  if (!isRunning()) return Promise.reject('Server not running');
+  if (!request.name) return Promise.reject('Undefined request');
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
-  const data = JSON.stringify(param);
-  const promise: Killable<Out> = new Promise<Out>((resolve, reject) => {
-    const decodedResolve = (js: Json.json) => {
-      const result = Json.jTry(request.output)(js);
-      resolve(result);
+  const response: Response<Out> = new Promise<Out>((resolve, reject) => {
+    const unwrap = (js: Json.json) => {
+      const data = request.output(js);
+      resolve(data as unknown as Out);
     };
-    pending[rid] = [decodedResolve, reject];
+    pending.set(rid, { resolve: unwrap, reject });
   });
-  promise.kill = () => {
-    if (zmqSocket && pending[rid]) {
-      queueCmd.push('KILL', rid);
-      _flush();
-    }
-  };
-  queueCmd.push(request.kind, rid, request.name, data);
-  queueId.push(rid);
-  _flush();
-  return promise;
-}
-
-function _resolve(id: string | number, data: string) {
-  const [resolve] = pending[id];
-  if (resolve) {
-    delete pending[id];
-    resolve(JSON.parse(data));
-  }
-}
-
-function _reject(id: string | number, error: Error) {
-  const [, reject] = pending[id];
-  if (reject) {
-    delete pending[id];
-    reject(error);
-  }
-}
-
-function _cancel(ids: any[]) {
-  ids.forEach((rid) => _reject(rid, new Error('Canceled request')));
-}
-
-function _waiting() {
-  return _.find(pending, () => true) !== undefined;
-}
-
-// --------------------------------------------------------------------------
-// --- Server Command Queue
-// --------------------------------------------------------------------------
-
-function _flush() {
-  if (!flushingTimer) {
-    flushingTimer = setImmediate(() => {
-      flushingTimer = undefined;
-      _send();
-    });
-  }
-}
-
-function _poll() {
+  response.kill = () => pending.get(rid)?.reject();
+  client.send(request.kind, rid, request.name, param);
   if (!pollingTimer) {
-    const delay = (config && config.polling) || pollingTimeout;
-    pollingTimer = setTimeout(() => {
+    const polling = (config && config.polling) || pollingTimeout;
+    pollingTimer = setInterval(() => {
+      client.poll();
+    }, polling);
+  }
+  return response;
+}
+
+// --------------------------------------------------------------------------
+// --- Client Events
+// --------------------------------------------------------------------------
+
+function _resolved(id: string) {
+  pending.delete(id);
+  if (pending.size == 0) {
+    rqCount = 0;
+    if (pollingTimer) {
+      clearInterval(pollingTimer);
       pollingTimer = undefined;
-      _send();
-    }, delay);
+    }
   }
 }
 
-async function _send() {
-  // when busy, will be eventually re-triggered
-  if (!zmqIsBusy) {
-    const cmds = queueCmd;
-    if (!cmds.length) {
-      cmds.push('POLL');
-      if (!_waiting())
-        rqCount = 0; // No pending command nor pending response
-    }
-    zmqIsBusy = true;
-    const ids = queueId;
-    queueCmd = [];
-    queueId = [];
-    try {
-      await zmqSocket?.send(cmds);
-      const resp = await zmqSocket?.receive();
-      _receive(resp);
-    } catch (error) {
-      D.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
-      _cancel(ids);
-    }
-    zmqIsBusy = false;
-    STATUS.emit(status);
+client.onConnect((err?: Error) => {
+  if (err) {
+    _status(Status.FAILURE);
+  } else {
+    _status(Status.ON);
   }
-}
+});
 
-function _receive(resp: any) {
-  try {
-    let rid;
-    let data;
-    let err;
-    let cmd;
-    const shift = () => resp.shift().toString();
-    let unknownResponse = false;
-    while (resp.length && !unknownResponse) {
-      cmd = shift();
-      switch (cmd) {
-        case 'NONE':
-          break;
-        case 'DATA':
-          rid = shift();
-          data = shift();
-          _resolve(rid, data);
-          break;
-        case 'KILLED':
-          rid = shift();
-          _reject(rid, new Error('Killed'));
-          break;
-        case 'ERROR':
-          rid = shift();
-          err = shift();
-          _reject(rid, err);
-          break;
-        case 'REJECTED':
-          rid = shift();
-          _reject(rid, new Error('Rejected'));
-          break;
-        case 'SIGNAL':
-          rid = shift();
-          (new SIGNAL(rid)).emit();
-          break;
-        case 'WRONG':
-          err = shift();
-          D.error(`ZMQ Protocol Error: ${err}`);
-          break;
-        default:
-          D.error(`Unknown Response: ${cmd}`);
-          unknownResponse = true;
-          break;
-      }
-    }
-  } finally {
-    if (queueCmd.length) _flush();
-    else _poll();
+client.onData((id: string, data: Json.json) => {
+  const p = pending.get(id);
+  if (p) {
+    p.resolve(data);
+    _resolved(id);
   }
-}
+});
+
+client.onKilled((id: string) => {
+  const p = pending.get(id);
+  if (p) {
+    p.reject();
+    _resolved(id);
+  }
+});
+
+client.onRejected((id: string) => {
+  const p = pending.get(id);
+  if (p) {
+    p.reject('rejected');
+    _resolved(id);
+  }
+});
+
+client.onError((id: string, msg: string) => {
+  const p = pending.get(id);
+  if (p) {
+    p.reject(msg);
+    _resolved(id);
+  }
+});
+
+client.onSignal((id: string) => {
+  _signal(id).emit();
+});
 
 // --------------------------------------------------------------------------

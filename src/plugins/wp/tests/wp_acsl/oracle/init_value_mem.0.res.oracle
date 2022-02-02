@@ -14,13 +14,13 @@ Assume {
   (* Heap *)
   Type: region(G_v_20) <= 0.
   (* Initializer *)
-  Init: (w.F1_St_a) = 1.
-  (* Initializer *)
-  Init: (w.F1_St_b) = 2.
-  (* Initializer *)
   Init: Mint_0[shiftfield_F1_St_a(a)] = 1.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_St_b(a)] = 2.
+  (* Initializer *)
+  Init: (w.F1_St_a) = 1.
+  (* Initializer *)
+  Init: (w.F1_St_b) = 2.
 }
 Prove: EqS1_St(a_1, w).
 
@@ -34,13 +34,13 @@ Assume {
   (* Heap *)
   Type: region(G_v_20) <= 0.
   (* Initializer *)
-  Init: (w.F1_St_a) = 1.
-  (* Initializer *)
-  Init: (w.F1_St_b) = 2.
-  (* Initializer *)
   Init: Mint_0[shiftfield_F1_St_a(a)] = 1.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_St_b(a)] = 2.
+  (* Initializer *)
+  Init: (w.F1_St_a) = 1.
+  (* Initializer *)
+  Init: (w.F1_St_b) = 2.
 }
 Prove: EqS1_St(a_1, w).
 

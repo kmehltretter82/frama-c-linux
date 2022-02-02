@@ -24,6 +24,7 @@
 
 open Cil_types
 
+module Options = Options
 module Error = Error
 
 module Translate_terms = Translate_terms

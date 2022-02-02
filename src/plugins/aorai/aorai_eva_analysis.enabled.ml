@@ -70,9 +70,8 @@ let add_slevel_annotation vi kind =
   | Aorai_visitors.Aux_funcs.(Pre _ | Post _) ->
     let kf = Globals.Functions.get vi in
     let stmt = Kernel_function.find_first_stmt kf
-    and loc = Kernel_function.get_location kf
     and emitter = Aorai_option.emitter in
-    Eva.Eva_annotations.(add_slevel_annot ~emitter ~loc stmt SlevelFull)
+    Eva.Eva_annotations.(add_slevel_annot ~emitter stmt SlevelFull)
   | _ -> ()
 
 let add_slevel_annotations () =

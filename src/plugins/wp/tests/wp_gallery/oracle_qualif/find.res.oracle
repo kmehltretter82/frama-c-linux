@@ -54,9 +54,9 @@
   iter_ptr                  2        6        8       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
-[rte] annotating function find
-[rte] annotating function find_ptr
-[rte] annotating function iter_ptr
+[rte:annot] annotating function find
+[rte:annot] annotating function find_ptr
+[rte:annot] annotating function iter_ptr
 [wp] 3 goals scheduled
 [wp] [Alt-Ergo] Goal typed_find_assert_rte_mem_access : Valid
 [wp] [Alt-Ergo] Goal typed_find_assert_rte_signed_overflow : Valid
