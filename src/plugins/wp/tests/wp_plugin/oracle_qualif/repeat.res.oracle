@@ -33,7 +33,7 @@
 [wp] [Qed] Goal typed_unroll_assigns_normal_part10 : Valid
 [wp] [Qed] Goal typed_unroll_assigns_normal_part11 : Valid
 [wp] [Qed] Goal typed_induction_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_induction_loop_invariant_preserved : Valid
+[wp] [Qed] Goal typed_induction_loop_invariant_preserved : Valid
 [wp] [Qed] Goal typed_induction_loop_invariant_established : Valid
 [wp] [Alt-Ergo] Goal typed_induction_loop_invariant_2_preserved : Valid
 [wp] [Qed] Goal typed_induction_loop_invariant_2_established : Valid
@@ -42,7 +42,7 @@
 [wp] [Qed] Goal typed_induction_assigns_exit_part2 : Valid
 [wp] [Qed] Goal typed_induction_assigns_normal : Valid
 [wp] [Alt-Ergo] Goal typed_shifted_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_shifted_loop_invariant_preserved : Valid
+[wp] [Qed] Goal typed_shifted_loop_invariant_preserved : Valid
 [wp] [Qed] Goal typed_shifted_loop_invariant_established : Valid
 [wp] [Alt-Ergo] Goal typed_shifted_loop_invariant_2_preserved : Valid
 [wp] [Qed] Goal typed_shifted_loop_invariant_2_established : Valid
@@ -52,12 +52,12 @@
 [wp] [Qed] Goal typed_shifted_assigns_normal_part1 : Valid
 [wp] [Qed] Goal typed_shifted_assigns_normal_part2 : Valid
 [wp] Proved goals:   47 / 47
-  Qed:            42 
-  Alt-Ergo:        5
+  Qed:            44 
+  Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   master                    3        -        3       100%
   unroll                   25        -       25       100%
-  induction                 7        2        9       100%
-  shifted                   7        3       10       100%
+  induction                 8        1        9       100%
+  shifted                   8        2       10       100%
 ------------------------------------------------------------

@@ -5,7 +5,7 @@
 [wp] 12 goals scheduled
 [wp] [Alt-Ergo] Goal typed_caveat_reset_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_caveat_reset_ensures_2 : Valid
-[wp] [Alt-Ergo] Goal typed_caveat_reset_loop_invariant_preserved : Valid
+[wp] [Qed] Goal typed_caveat_reset_loop_invariant_preserved : Valid
 [wp] [Qed] Goal typed_caveat_reset_loop_invariant_established : Valid
 [wp] [Alt-Ergo] Goal typed_caveat_reset_loop_invariant_2_preserved : Valid
 [wp] [Qed] Goal typed_caveat_reset_loop_invariant_2_established : Valid
@@ -16,11 +16,11 @@
 [wp] [Qed] Goal typed_caveat_reset_loop_assigns_part3 : Valid
 [wp] [Qed] Goal typed_caveat_reset_assigns : Valid
 [wp] Proved goals:   12 / 12
-  Qed:             7 
-  Alt-Ergo:        5
+  Qed:             8 
+  Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  reset                     7        5       12       100%
+  reset                     8        4       12       100%
 ------------------------------------------------------------
 [wp] caveat_range.i:16: Warning: 
   Memory model hypotheses for function 'reset':

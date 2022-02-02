@@ -23,7 +23,7 @@
 [wp] [Alt-Ergo] Goal typed_job2_assigns_part7 : Valid
 [wp] [Qed] Goal typed_job2_assigns_part8 : Valid
 [wp] [Qed] Goal typed_job2_assigns_part9 : Valid
-[wp] [Alt-Ergo] Goal typed_job3_loop_invariant_preserved : Valid
+[wp] [Qed] Goal typed_job3_loop_invariant_preserved : Valid
 [wp] [Qed] Goal typed_job3_loop_invariant_established : Valid
 [wp] [Qed] Goal typed_job3_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_job3_loop_assigns_part2 : Valid
@@ -31,13 +31,13 @@
 [wp] [Qed] Goal typed_job3_assigns_part1 : Valid
 [wp] [Qed] Goal typed_job3_assigns_part2 : Valid
 [wp] Proved goals:   27 / 27
-  Qed:            23 
-  Alt-Ergo:        4
+  Qed:            24 
+  Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job1                     10        -       10       100%
   job2                      8        2       10       100%
-  job3                      5        2        7       100%
+  job3                      6        1        7       100%
 ------------------------------------------------------------
 [wp] postassigns.c:7: Warning: 
   Memory model hypotheses for function 'job1':

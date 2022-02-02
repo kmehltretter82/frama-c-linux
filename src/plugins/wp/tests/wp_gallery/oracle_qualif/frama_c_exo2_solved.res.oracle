@@ -5,7 +5,7 @@
 [wp] 22 goals scheduled
 [wp] [Alt-Ergo] Goal typed_max_subarray_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_max_subarray_ensures_2 : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_preserved : Valid
+[wp] [Qed] Goal typed_max_subarray_loop_invariant_preserved : Valid
 [wp] [Qed] Goal typed_max_subarray_loop_invariant_established : Valid
 [wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_2_preserved : Valid
 [wp] [Qed] Goal typed_max_subarray_loop_invariant_2_established : Valid
@@ -26,11 +26,11 @@
 [wp] [Qed] Goal typed_max_subarray_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_max_subarray_loop_variant_positive : Valid
 [wp] Proved goals:   22 / 22
-  Qed:            12 
-  Alt-Ergo:       10
+  Qed:            13 
+  Alt-Ergo:        9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  max_subarray             12       10       22       100%
+  max_subarray             13        9       22       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [rte:annot] annotating function max_subarray
@@ -41,5 +41,5 @@
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  max_subarray             12       11       23       100%
+  max_subarray             13       10       23       100%
 ------------------------------------------------------------
