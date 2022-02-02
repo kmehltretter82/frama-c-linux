@@ -415,7 +415,7 @@ type code_assertion = {
   code_verified: WpPropId.pred_info option ;
 }
 
-(* Note: generated in REVERSE order *)
+(* Note: collected in REVERSE order *)
 module CodeAssertions = WpContext.StaticGenerator(CodeKey)
     (struct
       type key = CodeKey.t
@@ -424,8 +424,13 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
       let compile (kf,stmt) =
         let labels = NormAtLabels.labels_assert ~kf stmt in
         let normalize_pred p = NormAtLabels.preproc_annot labels p in
-        Annotations.fold_code_annot
-          begin fun _emitter ca l ->
+        let all_annot = (* ensures that the order is the one displayed in GUI *)
+          List.sort
+            Cil_datatype.Code_annotation.compare
+            (Annotations.code_annot stmt)
+        in
+        List.fold_left
+          begin fun l ca ->
             match ca.annot_content with
             | AStmtSpec _ when not @@ is_assembly stmt ->
                 let source = fst (Cil_datatype.Stmt.loc stmt) in
@@ -447,7 +452,7 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
                   code_verified = use verif p ;
                 } :: l
             | _ -> l
-          end stmt []
+          end [] all_annot
     end)
 
 let get_code_assertions ?(smoking=false) kf stmt =
@@ -538,9 +543,14 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
           { loop_pred = p ;
             loop_hyp = NoHyp ; loop_est = None ; loop_ind = Some i }
         in
+        let all_annot = (* ensures that the order is the one displayed in GUI *)
+          List.rev @@ List.sort
+            Cil_datatype.Code_annotation.compare
+            (Annotations.code_annot stmt)
+        in
         default_assigns stmt @@
-        Annotations.fold_code_annot
-          begin fun _emitter ca l ->
+        List.fold_left
+          begin fun l ca ->
             match ca.annot_content with
             | AInvariant(_,true,inv) ->
                 let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
@@ -580,12 +590,13 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                       { l with loop_assigns = asgn :: l.loop_assigns }
                 end
             | _ -> l
-          end stmt {
-          loop_terminates = Some Logic_const.pfalse ;
-          loop_invariants = [] ;
-          loop_smoke = [] ;
-          loop_assigns = [] ;
-        }
+          end
+          { loop_terminates = Some Logic_const.pfalse ;
+            loop_invariants = [] ;
+            loop_smoke = [] ;
+            loop_assigns = [] ;
+          }
+          all_annot
     end)
 
 let get_loop_contract ?(smoking=false) ?terminates kf stmt =
