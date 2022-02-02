@@ -737,7 +737,7 @@ module Label = struct
         let reprs =
           [ Label("", Location.unknown, false); Default Location.unknown ]
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt l = !pretty_ref fmt l
         let varname = Datatype.undefined
         let hash = function
           | Default _ -> 7
@@ -1334,7 +1334,7 @@ module Builtin_logic_info = struct
         let equal i1 i2 = i1.bl_name = i2.bl_name
         let copy = Datatype.identity (* works only if an AST is never modified *)
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt li = !pretty_ref fmt li
         let varname = Datatype.undefined
       end)
 end
@@ -1352,7 +1352,7 @@ module Logic_type_info = struct
         let hash t = Hashtbl.hash t.lt_name
         let copy = Datatype.identity (* works only if an AST is never modified *)
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt lt = !pretty_ref fmt lt
         let varname = Datatype.undefined
       end)
 end
@@ -1372,7 +1372,7 @@ module Logic_ctor_info = struct
         let hash t = Hashtbl.hash t.ctor_name
         let copy = Datatype.identity (* works only if an AST is never modified *)
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt c = !pretty_ref fmt c
         let varname = Datatype.undefined
       end)
 end
@@ -1387,7 +1387,7 @@ module Initinfo = struct
           { init = None } ::
           List.map (fun t -> { init = Some (CompoundInit(t, [])) }) Typ.reprs
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt i = !pretty_ref fmt i
         let varname = Datatype.undefined
       end)
 end
@@ -1413,7 +1413,7 @@ module Logic_info = struct
         let hash i = Logic_var.hash i.l_var_info
         let copy = Datatype.undefined
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt li = !pretty_ref fmt li
         let varname _ = "logic_varinfo"
       end)
 end
@@ -1498,7 +1498,7 @@ module Logic_info_structural = struct
         let hash i = Logic_var.hash i.l_var_info
         let copy = Datatype.undefined
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt li = !Logic_info.pretty_ref fmt li
         let varname _ = "logic_varinfo"
       end)
 end
@@ -2085,7 +2085,7 @@ module Logic_constant = struct
         let hash = hash_logic_constant
         let copy = Datatype.undefined
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt lc = !pretty_ref fmt lc
         let varname _ = "lconst"
       end)
 end
@@ -2129,7 +2129,7 @@ module Identified_term = struct
           { it_id = x.it_id; it_content = Term.copy x.it_content }
         let hash x = x.it_id
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt t = !pretty_ref fmt t
         let varname _ = "id_term"
       end)
 end
@@ -2154,7 +2154,7 @@ module Term_lhost = struct
         let hash = hash_fct hash_tlhost
         let copy = Datatype.undefined
         let internal_pretty_code = Datatype.undefined
-        let pretty = !pretty_ref
+        let pretty fmt h = !pretty_ref fmt h
         let varname = Datatype.undefined
       end)
 end
@@ -2658,7 +2658,7 @@ module Fundec = struct
         let equal v1 v2 = v1.svar.vid = v2.svar.vid
         let rehash = Datatype.identity
         let copy = Datatype.undefined
-        let pretty = Datatype.undefined
+        let pretty fmt f = !pretty_ref fmt f
         let internal_pretty_code = Datatype.undefined
         let mem_project = Datatype.never_any_project
       end)
