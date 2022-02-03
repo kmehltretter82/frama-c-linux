@@ -40,17 +40,15 @@ module.exports = {
     "lines-between-class-members": [
       "error", "always", { "exceptAfterSingleLine": true }
     ],
-    // Disallow the use of var in favor of let and const
-    "no-var": "error",
     // Force curly brackets on newline if some item is
     "object-curly-newline": ["error", { "multiline": true }],
+    // Allow infinite loops but disallow constant if-then-else
+    "no-constant-condition": ["error", { "checkLoops": false }],
 
     // --- Safety rules ---
 
     // Be more strict on usage of useMemo and useRef
     "react-hooks/exhaustive-deps": "error",
-    // Forbid shadowing concerning variables
-    "no-shadow": "off",
     // Requires '+' to be applied on 2 numbers or 2 strings only
     "@typescript-eslint/restrict-plus-operands": "error",
     // Only use type safe comparison === as == between distinct type is not so obvious
@@ -64,12 +62,7 @@ module.exports = {
         "varsIgnorePattern": "^_",
         "argsIgnorePattern": "^_" }
     ],
-
-    // --- Laxism ---
-
-    // Allow type any until we have types for every external library
-    "@typescript-eslint/no-explicit-any": "off",
-    // Actually, allow any function without return type for now
-    "@typescript-eslint/explicit-function-return-type": "off",
+    // Disallow the use of var in favor of let and const
+    "no-var": "error",
   }
 };

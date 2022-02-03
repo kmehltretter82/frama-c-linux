@@ -98,15 +98,15 @@ export type Evaluation = Values.evaluation;
 const emptyEvaluation: Values.evaluation = {
   value: '',
   alarms: [],
-  pointed_vars: [],
+  pointedVars: [],
 };
 
 export interface EvaValues {
   errors?: string;
-  v_before: Evaluation;
-  v_after?: Evaluation;
-  v_then?: Evaluation;
-  v_else?: Evaluation;
+  vBefore: Evaluation;
+  vAfter?: Evaluation;
+  vThen?: Evaluation;
+  vElse?: Evaluation;
   size: Size;
 }
 
@@ -166,7 +166,7 @@ export class ValueCache {
     const cache = this.vcache;
     const cached = cache.get(key);
     if (cached) return cached;
-    const newValue: EvaValues = { v_before: emptyEvaluation, size: EMPTY };
+    const newValue: EvaValues = { vBefore: emptyEvaluation, size: EMPTY };
     if (callstack !== undefined && fct === undefined)
       return newValue;
     // callstack !== undefined ==> fct !== undefined)
@@ -175,7 +175,7 @@ export class ValueCache {
       .send(Values.getValues, { target: marker, callstack })
       .then((r) => {
         newValue.errors = undefined;
-        if (r.v_before) newValue.v_before = r.v_before;
+        if (r.vBefore) newValue.vBefore = r.v_before;
         newValue.v_after = r.v_after;
         newValue.v_then = r.v_then;
         newValue.v_else = r.v_else;
