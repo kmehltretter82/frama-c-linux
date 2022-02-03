@@ -1067,10 +1067,10 @@ class type simplifier =
     method fixpoint : unit
     method infer : F.pred list
 
-    method simplify_exp : F.term -> F.term
-    method simplify_hyp : F.pred -> F.pred
-    method simplify_branch : F.pred -> F.pred
-    method simplify_goal : F.pred -> F.pred
+    method equivalent_exp : F.term -> F.term
+    method weaker_hyp : F.pred -> F.pred
+    method equivalent_branch : F.pred -> F.pred
+    method stronger_goal : F.pred -> F.pred
   end
 
 let is_atomic_pred = function

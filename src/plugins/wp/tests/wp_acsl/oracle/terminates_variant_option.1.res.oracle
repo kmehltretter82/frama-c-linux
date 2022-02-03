@@ -46,18 +46,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 41):
-Assume {
-  Type: is_sint32(c1_0) /\ is_sint32(cpt_0) /\ is_sint32(cpt_0 - 1).
-  (* Goal *)
-  When: c1_0 != 0.
-  (* Invariant *)
-  Have: ((0 <= c1_0) -> ((cpt_0 <= c1_0) /\ (0 <= cpt_0))).
-  (* Else *)
-  Have: 2 <= cpt_0.
-  (* Invariant *)
-  Have: ((0 <= c1_0) -> (cpt_0 <= (1 + c1_0))).
-}
-Prove: 0 <= cpt_0.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

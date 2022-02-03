@@ -158,13 +158,11 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assertion 'qed_ok,A1' (file arith.i, line 16):
-Assume { Type: is_uint8(i). }
-Prove: 0 <= i.
+Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assertion 'qed_ok,A2' (file arith.i, line 17):
-Assume { Type: is_uint8(i). (* Assertion 'qed_ok,A1' *) Have: 0 <= i. }
-Prove: i <= 255.
+Prove: true.
 
 ------------------------------------------------------------

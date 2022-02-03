@@ -6,7 +6,7 @@
 [wp] [Alt-Ergo] Goal typed_memcpy_ensures_copied_contents : Valid
 [wp] [Qed] Goal typed_memcpy_ensures_result_ptr : Valid
 [wp] [Alt-Ergo] Goal typed_memcpy_loop_invariant_no_eva_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_memcpy_loop_invariant_no_eva_established : Valid
+[wp] [Qed] Goal typed_memcpy_loop_invariant_no_eva_established : Valid
 [wp] [Alt-Ergo] Goal typed_memcpy_loop_invariant_no_eva_2_preserved : Valid
 [wp] [Qed] Goal typed_memcpy_loop_invariant_no_eva_2_established : Valid
 [wp] [Qed] Goal typed_memcpy_loop_assigns_part1 : Valid
@@ -18,7 +18,7 @@
 [wp] [Alt-Ergo] Goal typed_memmove_ensures_copied_contents : Valid
 [wp] [Qed] Goal typed_memmove_ensures_result_ptr : Valid
 [wp] [Alt-Ergo] Goal typed_memmove_loop_invariant_no_eva_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_memmove_loop_invariant_no_eva_established : Valid
+[wp] [Qed] Goal typed_memmove_loop_invariant_no_eva_established : Valid
 [wp] [Alt-Ergo] Goal typed_memmove_loop_invariant_no_eva_2_preserved : Valid
 [wp] [Qed] Goal typed_memmove_loop_invariant_no_eva_2_established : Valid
 [wp] [Alt-Ergo] Goal typed_memmove_loop_invariant_no_eva_3_preserved : Valid
@@ -41,17 +41,17 @@
 [wp] [Qed] Goal typed_memmove_assigns_normal_part3 : Valid
 [wp] [Qed] Goal typed_memmove_assigns_normal_part4 : Valid
 [wp] [Qed] Goal typed_memmove_assigns_normal_part5 : Valid
-[wp] [Alt-Ergo] Goal typed_memmove_assigns_normal_part6 : Valid
+[wp] [Qed] Goal typed_memmove_assigns_normal_part6 : Valid
 [wp] [Qed] Goal typed_memmove_assigns_normal_part7 : Valid
 [wp] [Alt-Ergo] Goal typed_memmove_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_memmove_loop_variant_positive : Valid
 [wp] [Alt-Ergo] Goal typed_memmove_loop_variant_2_decrease : Valid
 [wp] [Qed] Goal typed_memmove_loop_variant_2_positive : Valid
 [wp] Proved goals:   44 / 44
-  Qed:            23 
-  Alt-Ergo:       21
+  Qed:            26 
+  Alt-Ergo:       18
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  memcpy                    6        6       12       100%
-  memmove                  17       15       32       100%
+  memcpy                    7        5       12       100%
+  memmove                  19       13       32       100%
 ------------------------------------------------------------

@@ -23,15 +23,15 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function exo1
 [wp] 5 goals scheduled
-[wp] [Alt-Ergo] Goal typed_exo1_assert_rte_signed_overflow : Valid
+[wp] [Qed] Goal typed_exo1_assert_rte_signed_overflow : Valid
 [wp] [Alt-Ergo] Goal typed_exo1_assert_rte_mem_access : Valid
 [wp] [Alt-Ergo] Goal typed_exo1_assert_rte_mem_access_2 : Valid
-[wp] [Alt-Ergo] Goal typed_exo1_assert_rte_signed_overflow_2 : Valid
-[wp] [Alt-Ergo] Goal typed_exo1_assert_rte_signed_overflow_3 : Valid
+[wp] [Qed] Goal typed_exo1_assert_rte_signed_overflow_2 : Valid
+[wp] [Qed] Goal typed_exo1_assert_rte_signed_overflow_3 : Valid
 [wp] Proved goals:    5 / 5
-  Qed:             0 
-  Alt-Ergo:        5
+  Qed:             3 
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  exo1                      6        9       15       100%
+  exo1                      9        6       15       100%
 ------------------------------------------------------------

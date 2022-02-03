@@ -1232,13 +1232,13 @@ let is_cint_simplifier =
             Lang.F.QED.f_map ~pool ~forall:false ~exists:false walk_both_pol t in
       Lang.F.p_bool (walk ~term_pol:(Polarity.from_bool is_goal) (Lang.F.e_prop p))
 
-    method simplify_exp (e : term) = e
+    method equivalent_exp (e : term) = e
 
-    method simplify_hyp p = self#simplify ~is_goal:false p
+    method weaker_hyp p = self#simplify ~is_goal:false p
 
-    method simplify_goal p = self#simplify ~is_goal:true p
+    method stronger_goal p = self#simplify ~is_goal:true p
 
-    method simplify_branch p = p
+    method equivalent_branch p = p
 
     method infer = []
   end
@@ -1292,19 +1292,19 @@ let mask_simplifier =
              end
            | _ -> ()) (F.e_prop p)
 
-    method simplify_exp e =
+    method equivalent_exp e =
       if Tmap.is_empty magnitude then e else
         Lang.e_subst (rewrite magnitude) e
 
-    method simplify_hyp p =
+    method weaker_hyp p =
       if Tmap.is_empty magnitude then p else
         Lang.p_subst (rewrite magnitude) p
 
-    method simplify_branch p =
+    method equivalent_branch p =
       if Tmap.is_empty magnitude then p else
         Lang.p_subst (rewrite magnitude) p
 
-    method simplify_goal p =
+    method stronger_goal p =
       if Tmap.is_empty magnitude then p else
         Lang.p_subst (rewrite magnitude) p
 
