@@ -30,11 +30,11 @@ import glob
 import json
 import logging
 import os
+from   pathlib import Path
 import re
 import shutil
 import sys
 import subprocess
-from pathlib import Path
 
 import function_finder
 

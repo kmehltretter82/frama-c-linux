@@ -26,15 +26,16 @@
 # of analyzing a new code base with Frama-C.
 
 import argparse
-import build_callgraph
-import function_finder
 import json
 import os
-from pathlib import Path
+from   pathlib import Path
 import re
 import subprocess
 import sys
 import tempfile
+
+import build_callgraph
+import function_finder
 
 #TODO : avoid relativizing paths when introducing too many ".." ;
 #TODO : accept directory as argument (--full-tree), and then do glob **/*.{c,i} inside

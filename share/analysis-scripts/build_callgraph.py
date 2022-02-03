@@ -25,9 +25,10 @@
 # This script finds files containing likely declarations and definitions
 # for a given function name, via heuristic syntactic matching.
 
-import sys
 import os
 import re
+import sys
+
 import function_finder
 
 arg = ""
