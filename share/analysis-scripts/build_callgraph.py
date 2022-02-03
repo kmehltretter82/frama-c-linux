@@ -30,6 +30,7 @@ import re
 import sys
 
 import function_finder
+import source_filter
 
 under_test = os.getenv("PTESTS_TESTING")
 
@@ -79,8 +80,7 @@ class Callgraph:
 def compute(files):
     cg = Callgraph()
     for f in files:
-        with open(f, encoding="ascii", errors='ignore') as data:
-            file_content = data.read()
+        file_content = source_filter.open_and_filter(f, not under_test)
         file_lines = file_content.splitlines(keepends=True)
         newlines = function_finder.compute_newline_offsets(file_lines)
         defs = function_finder.find_definitions_and_declarations(True, False, f, file_content, file_lines, newlines)

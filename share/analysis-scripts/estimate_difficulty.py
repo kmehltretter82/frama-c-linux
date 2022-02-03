@@ -36,6 +36,7 @@ import tempfile
 
 import build_callgraph
 import function_finder
+import source_filter
 
 #TODO : avoid relativizing paths when introducing too many ".." ;
 #TODO : accept directory as argument (--full-tree), and then do glob **/*.{c,i} inside
@@ -78,16 +79,16 @@ def get_framac_libc_function_statuses(framac, framac_share):
     return (defined, spec_only)
 
 re_include = re.compile(r'\s*#\s*include\s*("|<)([^">]+)("|>)')
-def grep_includes_in_file(file):
-    with open(file, "r", encoding="utf-8", errors='ignore') as f:
-        i = 0
-        for line in f.readlines():
-            i += 1
-            m = re_include.match(line)
-            if m:
-                kind = m.group(1)
-                header = m.group(2)
-                yield((i,kind,header))
+def grep_includes_in_file(filename):
+    file_content = source_filter.open_and_filter(filename, not under_test)
+    i = 0
+    for line in f.readlines():
+        i += 1
+        m = re_include.match(line)
+        if m:
+            kind = m.group(1)
+            header = m.group(2)
+            yield((i,kind,header))
 
 def get_includes(files):
     quote_includes = {}

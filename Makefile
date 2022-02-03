@@ -285,6 +285,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/results_display.py                         \
       share/analysis-scripts/script_for_creduce_fatal.sh                \
       share/analysis-scripts/script_for_creduce_non_fatal.sh            \
+      share/analysis-scripts/source_filter.py                           \
       share/analysis-scripts/summary.py                                 \
       share/analysis-scripts/template.mk                                \
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
@@ -1998,6 +1999,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/results_display.py \
 	  share/analysis-scripts/script_for_creduce_fatal.sh \
 	  share/analysis-scripts/script_for_creduce_non_fatal.sh \
+	  share/analysis-scripts/source_filter.py \
 	  share/analysis-scripts/summary.py \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts
