@@ -41,7 +41,7 @@ import './loader';
 // --- Main View
 // --------------------------------------------------------------------------
 
-export default (() => {
+export default function Application() {
   const [sidebar, flipSidebar] =
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
   const [viewbar, flipViewbar] =
@@ -95,6 +95,6 @@ export default (() => {
       </Toolbar.ToolBar>
     </Vfill>
   );
-});
+}
 
 // --------------------------------------------------------------------------

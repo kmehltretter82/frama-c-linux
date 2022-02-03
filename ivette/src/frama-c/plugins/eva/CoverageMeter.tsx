@@ -33,7 +33,7 @@ export function percent(coverage: CoverageProps): string {
   return `${(q * 100).toFixed(1)}%`;
 }
 
-export default function(props: { coverage: CoverageProps }) {
+export default function CoverageMeter(props: { coverage: CoverageProps }) {
   const { reachable, dead } = props.coverage;
   const total = reachable + dead;
 

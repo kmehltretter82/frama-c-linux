@@ -101,28 +101,30 @@ function EditorCommandFields(props: P.EditorCommandProps) {
 // --- Export Components
 // --------------------------------------------------------------------------
 
-export default (() => (
-  <Forms.Page>
-    <Forms.Section label="AST View" unfold>
-      <ThemeFields
-        target="Internal AST"
-        theme={P.AstTheme}
-        fontSize={P.AstFontSize}
-        wrapText={P.AstWrapText}
-      />
-    </Forms.Section>
-    <Forms.Section label="Source View" unfold>
-      <ThemeFields
-        target="Source Code"
-        theme={P.SourceTheme}
-        fontSize={P.SourceFontSize}
-        wrapText={P.SourceWrapText}
-      />
-    </Forms.Section>
-    <Forms.Section label="Editor Command" unfold>
-      <EditorCommandFields command={P.EditorCommand} />
-    </Forms.Section>
-  </Forms.Page>
-));
+export default function Preferences() {
+  return (
+    <Forms.Page>
+      <Forms.Section label="AST View" unfold>
+        <ThemeFields
+          target="Internal AST"
+          theme={P.AstTheme}
+          fontSize={P.AstFontSize}
+          wrapText={P.AstWrapText}
+        />
+      </Forms.Section>
+      <Forms.Section label="Source View" unfold>
+        <ThemeFields
+          target="Source Code"
+          theme={P.SourceTheme}
+          fontSize={P.SourceFontSize}
+          wrapText={P.SourceWrapText}
+        />
+      </Forms.Section>
+      <Forms.Section label="Editor Command" unfold>
+        <EditorCommandFields command={P.EditorCommand} />
+      </Forms.Section>
+    </Forms.Page>
+  )
+}
 
 // --------------------------------------------------------------------------

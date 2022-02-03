@@ -141,70 +141,76 @@ const GRIDITEM_PLAIN = { fill: 'both' };
 const GRIDITEM_HPANE = { fill: 'horizontal' };
 const GRIDITEM_VPANE = { fill: 'vertical' };
 
-const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
-  const { id: libId, label, title, layout = 'PLAIN', children } = comp;
-  const id = getItemId('components', libId);
-  let properties: any = { ...GRIDITEM };
-  switch (layout) {
-    case 'PLAIN':
-      properties = { ...properties, ...GRIDITEM_PLAIN };
-      break;
-    case 'HPANE':
-      properties = { ...properties, GRIDITEM_HPANE };
-      break;
-    case 'VPANE':
-      properties = { ...properties, GRIDITEM_VPANE };
-      break;
-    default:
-      console.warn(`[labviews] unexpected layout for ${id} component`, layout);
-      break;
-  }
-  Object.keys(properties).forEach((key) => {
-    const prop = comp[key];
-    if (prop) properties[key] = prop;
-  });
-  let CLOSING;
-  if (customize) {
-    CLOSING = (
-      <IconButton
-        className="labview-close"
-        offset={-1}
-        icon="CROSS"
-        onClick={() => onClose(id)}
-      />
+const makeGridItem = (customize: any, onClose: any) =>
+  function GridItem(comp: any) {
+    const { id: libId, label, title, layout = 'PLAIN', children } = comp;
+    const id = getItemId('components', libId);
+    let properties: any = { ...GRIDITEM };
+    switch (layout) {
+      case 'PLAIN':
+        properties = { ...properties, ...GRIDITEM_PLAIN };
+        break;
+      case 'HPANE':
+        properties = { ...properties, GRIDITEM_HPANE };
+        break;
+      case 'VPANE':
+        properties = { ...properties, GRIDITEM_VPANE };
+        break;
+      default:
+        console.warn(
+          `[labviews] unexpected layout for ${id} component`,
+          layout);
+        break;
+    }
+    Object.keys(properties).forEach((key) => {
+      const prop = comp[key];
+      if (prop) properties[key] = prop;
+    });
+    let CLOSING;
+    if (customize) {
+      CLOSING = (
+        <IconButton
+          className="labview-close"
+          offset={-1}
+          icon="CROSS"
+          onClick={() => onClose(id)}
+        />
+      );
+    }
+    return (
+      <Grids.GridItem
+        id={id}
+        className={properties.className}
+        handle={properties.handle}
+        resize={properties.resize}
+        fill={properties.fill}
+        shrink={properties.shrink}
+        minWidth={properties.minWidth}
+        minHeight={properties.minHeight}
+        width={properties.width}
+        height={properties.height}
+      >
+        <Vfill className="labview-content">
+          <Hbox className="labview-titlebar">
+            <Hfill>
+              <Catch label={id}>
+                <RenderElement id={`labview.title.${id}`}>
+                  <Label
+                    className="labview-handle"
+                    label={label}
+                    title={title} />
+                </RenderElement>
+              </Catch>
+            </Hfill>
+            {CLOSING}
+          </Hbox>
+          <TITLE.Provider value={{ id, label, title }}>
+            <Catch label={id}>{children}</Catch>
+          </TITLE.Provider>
+        </Vfill>
+      </Grids.GridItem>
     );
   }
-  return (
-    <Grids.GridItem
-      id={id}
-      className={properties.className}
-      handle={properties.handle}
-      resize={properties.resize}
-      fill={properties.fill}
-      shrink={properties.shrink}
-      minWidth={properties.minWidth}
-      minHeight={properties.minHeight}
-      width={properties.width}
-      height={properties.height}
-    >
-      <Vfill className="labview-content">
-        <Hbox className="labview-titlebar">
-          <Hfill>
-            <Catch label={id}>
-              <RenderElement id={`labview.title.${id}`}>
-                <Label className="labview-handle" label={label} title={title} />
-              </RenderElement>
-            </Catch>
-          </Hfill>
-          {CLOSING}
-        </Hbox>
-        <TITLE.Provider value={{ id, label, title }}>
-          <Catch label={id}>{children}</Catch>
-        </TITLE.Provider>
-      </Vfill>
-    </Grids.GridItem>
-  );
-};
 
 // --------------------------------------------------------------------------
 // --- Customization Views

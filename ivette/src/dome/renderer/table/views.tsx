@@ -262,7 +262,7 @@ function makeDataRenderer(
   render: ((data: any) => ReactNode) = defaultRenderer,
   onContextMenu?: (row: any, index: number, dataKey: string) => void,
 ): TableCellRenderer {
-  return ((props : TableCellProps) => {
+  return function TableCell(props: TableCellProps) {
     const { cellData } = props;
     try {
       const contents = cellData ? render(cellData) : null;
@@ -283,7 +283,7 @@ function makeDataRenderer(
       );
       return null;
     }
-  });
+  };
 }
 
 // --------------------------------------------------------------------------

@@ -95,7 +95,7 @@ function FctItem(props: FctItemProps) {
 // --- Globals Section(s)
 // --------------------------------------------------------------------------
 
-export default () => {
+export default function Globals() {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
@@ -198,6 +198,6 @@ export default () => {
     </Section>
   );
 
-};
+}
 
 // --------------------------------------------------------------------------
