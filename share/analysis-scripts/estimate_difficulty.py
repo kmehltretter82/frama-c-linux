@@ -41,10 +41,6 @@ import tempfile
 #TODO : try to check the presence of compiler builtins
 #TODO : try to check for pragmas
 
-MIN_PYTHON = (3, 5)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 parser = argparse.ArgumentParser(description="""
 Estimates the difficulty of analyzing a given code base""")
 parser.add_argument("--header-dirs", "-d", metavar='DIR', nargs='+',

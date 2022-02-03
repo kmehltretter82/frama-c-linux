@@ -38,11 +38,8 @@ from pathlib import Path
 
 import function_finder
 
-MIN_PYTHON = (3, 6) # for glob(recursive) and automatic Path conversions
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 script_dir = os.path.dirname(sys.argv[0])
+
 # Command-line parsing ########################################################
 
 parser = argparse.ArgumentParser(description="""Produces a GNUmakefile
@@ -201,7 +198,6 @@ def find_definitions(funcname, filename):
     file_lines = file_content.splitlines(keepends=True)
     newlines = function_finder.compute_newline_offsets(file_lines)
     defs = function_finder.find_definitions_and_declarations(True, False, filename, file_content, file_lines, newlines, funcname)
-    #print(f"found defs for {funcname}: {defs}")
     res = []
     for d in defs:
         defining_line = file_lines[d[2]-1]

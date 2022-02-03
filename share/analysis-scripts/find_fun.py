@@ -32,10 +32,6 @@ import re
 import sys
 from pathlib import Path
 
-MIN_PYTHON = (3, 5) # for glob(recursive)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 parser = argparse.ArgumentParser(description="""
 Looks for likely declarations/definitions of a function
 in files with extensions '.c', '.h' and '.i'.

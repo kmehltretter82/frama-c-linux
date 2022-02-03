@@ -30,10 +30,6 @@ import os
 import re
 import function_finder
 
-MIN_PYTHON = (3, 5) # for glob(recursive)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 debug = bool(os.getenv("DEBUG", False))
 
 arg = ""

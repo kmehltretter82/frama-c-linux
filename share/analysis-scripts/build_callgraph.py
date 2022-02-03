@@ -30,10 +30,6 @@ import os
 import re
 import function_finder
 
-MIN_PYTHON = (3, 5)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 arg = ""
 if len(sys.argv) < 2:
     print(f"usage: {sys.argv[0]} file...")
@@ -78,10 +74,8 @@ class Callgraph:
         return f"Callgraph({self.succs}, {self.edges})"
 
 def compute(files):
-    #print(f"Computing callgraph for {len(files)} file(s)...")
     cg = Callgraph()
     for f in files:
-        #print(f"Processing {os.path.relpath(f)}...")
         with open(f, encoding="ascii", errors='ignore') as data:
             file_content = data.read()
         file_lines = file_content.splitlines(keepends=True)
@@ -96,7 +90,6 @@ def compute(files):
                 if debug:
                     print(f"build_callgraph: {f}:{line}: {caller} -> {called}")
                 cg.add_edge(caller, called, loc)
-    #print(f"Callgraph computed ({len(cg.succs)} node(s), {len(cg.edges)} edge(s))")
     return cg
 
 def print_edge(cg, caller, called, padding="", end="\n"):
