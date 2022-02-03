@@ -1,6 +1,6 @@
 /* run.config
    NOFRAMAC: testing frama-c-script, not frama-c itself
-   EXECNOW: LOG recursions.res LOG recursions.err %{bin:frama-c-script} heuristic-detect-recursion @PTEST_FILE@ > @PTEST_RESULT@/recursions.res 2> @PTEST_RESULT@/recursions.err
+   EXECNOW: LOG recursions.res LOG recursions.err PTESTS_TESTING=1 %{bin:frama-c-script} heuristic-detect-recursion @PTEST_FILE@ > @PTEST_RESULT@/recursions.res 2> @PTEST_RESULT@/recursions.err
 */
 
 volatile int v;

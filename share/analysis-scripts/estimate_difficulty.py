@@ -54,6 +54,8 @@ if not header_dirs:
     header_dirs = []
 files = args["files"]
 
+under_test = os.getenv("PTESTS_TESTING")
+
 # gather information from several sources
 
 def extract_keys(l):

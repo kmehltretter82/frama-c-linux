@@ -31,6 +31,8 @@ import sys
 
 import function_finder
 
+under_test = os.getenv("PTESTS_TESTING")
+
 arg = ""
 if len(sys.argv) < 2:
     print(f"usage: {sys.argv[0]} file...")
