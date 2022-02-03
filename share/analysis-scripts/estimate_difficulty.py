@@ -244,7 +244,7 @@ if dyncallees:
 
 # unsupported C11-specific features
 
-c11_unsupported = ["_Alignas", "_Alignof", "_Generic", "_Static_assert"]
+c11_unsupported = ["_Alignas", "_Alignof", "_Complex", "_Generic", "_Imaginary"]
 
 for keyword in c11_unsupported:
     out = subprocess.Popen(["grep", "-n", '\\b' + keyword + '\\b'] + files + ["/dev/null"],
