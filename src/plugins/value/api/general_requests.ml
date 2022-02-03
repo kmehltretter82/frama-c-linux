@@ -468,4 +468,69 @@ let _array =
     model
 
 
+(* ----- Arbitrary ACSL term evaluation ------------------------------------- *)
+
+type eval_term_input = { at_stmt : stmt ; after : bool ; term : string }
+
+module EvalTermInput = struct
+  open Server.Data
+  type record
+  let record : record Record.signature = Record.signature ()
+
+  let at_stmt =
+    let descr = "The statement at which we will perform the evaluation." in
+    Record.field record ~name:"at_stmt" ~descr:(Markdown.plain descr)
+      (module Kernel_ast.Stmt)
+
+  let after =
+    let descr = "If true, evaluation is performed after <at_stmt> computation." in
+    Record.field record ~name:"after" ~descr:(Markdown.plain descr)
+      (module Data.Jbool)
+
+  let term =
+    let descr = "The term to be evaluated." in
+    Record.field record ~name:"term" ~descr:(Markdown.plain descr)
+      (module Data.Jstring)
+
+  let data =
+    Record.publish record ~package ~name:"evalTermInput"
+      ~descr:(Markdown.plain "<evalTerm> input")
+
+  module R : Record.S with type r = record = (val data)
+  type t = eval_term_input
+  let jtype = R.jtype
+
+  let of_json js =
+    let record = R.of_json js in
+    let at_stmt = R.get at_stmt record in
+    let after = R.get after record in
+    let term = R.get term record in
+    { at_stmt ; after ; term }
+end
+
+let logic_environment () =
+  let open Logic_typing in
+  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+
+let evaluate_term input =
+  let open Eval_terms in
+  let env = logic_environment () in
+  let kf = Kernel_function.find_englobing_kf input.at_stmt in
+  let term = !Db.Properties.Interp.term ~env kf input.term in
+  let state = Db.Value.get_stmt_state ~after:input.after input.at_stmt in
+  let v = (eval_term ~alarm_mode:Ignore (env_only_here state) term).eover in
+  Format.fprintf Format.str_formatter "%a" Cvalue.V.pretty v ;
+  Format.flush_str_formatter ()
+
+let descr =
+  "Evaluate a term in the abstract state of a given statement. \
+   The evaluation is performed after the statement computation \
+   if the given boolean is true."
+
+let () = Request.register ~package
+  ~kind:`GET ~name:"evalTerm" ~descr:(Markdown.plain descr)
+  ~input:(module EvalTermInput) ~output:(module Data.Jstring)
+  evaluate_term
+
+
 (**************************************************************************)

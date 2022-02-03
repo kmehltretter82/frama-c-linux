@@ -580,4 +580,45 @@ export const functionStats: State.Array<
   functionStatsData
   > = functionStats_internal;
 
+/** <evalTerm> input */
+export interface evalTermInput {
+  /** The statement at which we will perform the evaluation. */
+  at_stmt: Json.key<'#stmt'>;
+  /** If true, evaluation is performed after <at_stmt> computation. */
+  after: boolean;
+  /** The term to be evaluated. */
+  term: string;
+}
+
+/** Loose decoder for `evalTermInput` */
+export const jEvalTermInput: Json.Loose<evalTermInput> =
+  Json.jObject({
+    at_stmt: Json.jFail(Json.jKey<'#stmt'>('#stmt'),'#stmt expected'),
+    after: Json.jFail(Json.jBoolean,'Boolean expected'),
+    term: Json.jFail(Json.jString,'String expected'),
+  });
+
+/** Safe decoder for `evalTermInput` */
+export const jEvalTermInputSafe: Json.Safe<evalTermInput> =
+  Json.jFail(jEvalTermInput,'EvalTermInput expected');
+
+/** Natural order for `evalTermInput` */
+export const byEvalTermInput: Compare.Order<evalTermInput> =
+  Compare.byFields
+    <{ at_stmt: Json.key<'#stmt'>, after: boolean, term: string }>({
+    at_stmt: Compare.string,
+    after: Compare.boolean,
+    term: Compare.string,
+  });
+
+const evalTerm_internal: Server.GetRequest<evalTermInput,string> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.evalTerm',
+  input:  jEvalTermInput,
+  output: Json.jString,
+  signals: [],
+};
+/** Evaluate a term in the abstract state of a given statement. The evaluation is performed after the statement computation if the given boolean is true. */
+export const evalTerm: Server.GetRequest<evalTermInput,string>= evalTerm_internal;
+
 /* ------------------------------------- */
