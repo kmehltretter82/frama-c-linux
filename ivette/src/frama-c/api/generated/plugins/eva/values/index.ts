@@ -149,7 +149,7 @@ export interface evaluation {
   /** Alarms raised by the evaluation */
   alarms: [ "True" | "False" | "Unknown", string ][];
   /** List of variables pointed by the value */
-  pointed_vars: [ string, marker ][];
+  pointedVars: [ string, marker ][];
 }
 
 /** Loose decoder for `evaluation` */
@@ -167,12 +167,12 @@ export const jEvaluation: Json.Loose<evaluation> =
                     ),'Union expected'),
                   Json.jFail(Json.jString,'String expected'),
                 ))),
-    pointed_vars: Json.jList(
-                    Json.jTry(
-                      Json.jPair(
-                        Json.jFail(Json.jString,'String expected'),
-                        jMarkerSafe,
-                      ))),
+    pointedVars: Json.jList(
+                   Json.jTry(
+                     Json.jPair(
+                       Json.jFail(Json.jString,'String expected'),
+                       jMarkerSafe,
+                     ))),
   });
 
 /** Safe decoder for `evaluation` */
@@ -183,33 +183,33 @@ export const jEvaluationSafe: Json.Safe<evaluation> =
 export const byEvaluation: Compare.Order<evaluation> =
   Compare.byFields
     <{ value: string, alarms: [ "True" | "False" | "Unknown", string ][],
-       pointed_vars: [ string, marker ][] }>({
+       pointedVars: [ string, marker ][] }>({
     value: Compare.string,
     alarms: Compare.array(Compare.pair(Compare.structural,Compare.string,)),
-    pointed_vars: Compare.array(Compare.pair(Compare.string,byMarker,)),
+    pointedVars: Compare.array(Compare.pair(Compare.string,byMarker,)),
   });
 
 const getValues_internal: Server.GetRequest<
   { callstack?: callstack, target: marker },
-  { v_else?: evaluation, v_then?: evaluation, v_after?: evaluation,
-    v_before?: evaluation }
+  { vElse?: evaluation, vThen?: evaluation, vAfter?: evaluation,
+    vBefore?: evaluation }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getValues',
   input:  Json.jObject({ callstack: jCallstack, target: jMarkerSafe,}),
   output: Json.jObject({
-            v_else: jEvaluation,
-            v_then: jEvaluation,
-            v_after: jEvaluation,
-            v_before: jEvaluation,
+            vElse: jEvaluation,
+            vThen: jEvaluation,
+            vAfter: jEvaluation,
+            vBefore: jEvaluation,
           }),
   signals: [],
 };
 /** Abstract values for the given marker */
 export const getValues: Server.GetRequest<
   { callstack?: callstack, target: marker },
-  { v_else?: evaluation, v_then?: evaluation, v_after?: evaluation,
-    v_before?: evaluation }
+  { vElse?: evaluation, vThen?: evaluation, vAfter?: evaluation,
+    vBefore?: evaluation }
   >= getValues_internal;
 
 /* ------------------------------------- */

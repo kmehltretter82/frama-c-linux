@@ -175,10 +175,10 @@ export class ValueCache {
       .send(Values.getValues, { target: marker, callstack })
       .then((r) => {
         newValue.errors = undefined;
-        if (r.vBefore) newValue.vBefore = r.v_before;
-        newValue.v_after = r.v_after;
-        newValue.v_then = r.v_then;
-        newValue.v_else = r.v_else;
+        if (r.vBefore) newValue.vBefore = r.vBefore;
+        newValue.vAfter = r.vAfter;
+        newValue.vThen = r.vThen;
+        newValue.vElse = r.vElse;
         if (this.updateLayout(marker, fct, callstack, newValue))
           this.state.forceLayout();
         else
@@ -200,10 +200,10 @@ export class ValueCache {
     v: EvaValues,
   ): boolean {
     // measuring cell
-    let s = sizeof(v.v_before.value);
-    s = addS(s, v.v_after?.value);
-    s = addS(s, v.v_then?.value);
-    s = addS(s, v.v_else?.value);
+    let s = sizeof(v.vBefore.value);
+    s = addS(s, v.vAfter?.value);
+    s = addS(s, v.vThen?.value);
+    s = addS(s, v.vElse?.value);
     v.size = s;
     // max cell size
     const { smax } = this;
