@@ -64,5 +64,7 @@ module.exports = {
     ],
     // Disallow the use of var in favor of let and const
     "no-var": "error",
+    // Disallow the use of console.*, except for warnings and errors
+    "no-console": ["error", { allow: ["warn", "error"] }],
   }
 };
