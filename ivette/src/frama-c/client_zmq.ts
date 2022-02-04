@@ -62,7 +62,7 @@ class ZmqClient extends Client {
   }
 
   /** Send Request */
-  send(kind: string, id: string, request: string, data: any): void {
+  send(kind: string, id: string, request: string, data: string): void {
     if (this.zmqSocket) {
       this.queue.push(kind, id, request, data);
       this._flush();

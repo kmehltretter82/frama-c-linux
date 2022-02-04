@@ -327,11 +327,11 @@ class SyncState<A> {
 // --- Synchronized States Registry
 // --------------------------------------------------------------------------
 
-const syncStates = new Map<string, SyncState<any>>();
+const syncStates = new Map<string, SyncState<unknown>>();
 
 function getSyncState<A>(h: Handler<A>): SyncState<A> {
   const id = `${currentProject}@${h.name}`;
-  let s = syncStates.get(id);
+  let s = syncStates.get(id) as SyncState<A> | undefined;
   if (!s) {
     s = new SyncState(h);
     syncStates.set(id, s);
@@ -440,16 +440,16 @@ class SyncArray<K, A> {
 // --- Synchronized Arrays Registry
 // --------------------------------------------------------------------------
 
-const syncArrays = new Map<string, SyncArray<any, any>>();
+const syncArrays = new Map<string, SyncArray<unknown, unknown>>();
 
 function lookupSyncArray<K, A>(
   array: Array<K, A>,
 ): SyncArray<K, A> {
   const id = `${currentProject}@${array.name}`;
-  let st = syncArrays.get(id);
+  let st = syncArrays.get(id) as SyncArray<K,A> | undefined;
   if (!st) {
     st = new SyncArray(array);
-    syncArrays.set(id, st);
+    syncArrays.set(id, st as SyncArray<unknown, unknown>);
   }
   return st;
 }

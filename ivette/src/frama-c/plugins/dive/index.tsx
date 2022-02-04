@@ -56,8 +56,8 @@ interface Cxtcommand {
 }
 
 interface CytoscapeExtended extends Cytoscape.Core {
-  cxtmenu(options: any): void;
-  panzoom(options: any): void;
+  cxtmenu(options: unknown): void;
+  panzoom(options: unknown): void;
 }
 
 function callstackToString(callstack: API.callstack): string {
@@ -217,9 +217,12 @@ class Dive {
       trigger: 'manual',
       appendTo: document.body,
       lazy: false,
+      // Cytoscape extensions are not typed yet
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onCreate: (instance: any) => {
         const { popperInstance } = instance;
         if (popperInstance) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           popperInstance.reference = (node as any).popperRef();
         }
       },
@@ -272,14 +275,15 @@ class Dive {
   }
 
   /* eslint-disable no-restricted-syntax */
-  receiveGraph(data: any): Cytoscape.CollectionReturnValue {
+  receiveGraph(data: API.graphData): Cytoscape.CollectionReturnValue {
     let newNodes = this.cy.collection();
 
     for (const node of data.nodes) {
+      let stops = undefined
       if (typeof node.range === 'number')
-        node.stops = `0% ${node.range}% ${node.range}% 100%`;
+        stops = `0% ${node.range}% ${node.range}% 100%`;
 
-      let ele = this.cy.$id(node.id);
+      let ele = this.cy.$id(node.id.toString());
       if (ele.nonempty()) {
         ele.removeData();
         ele.data(node);
@@ -294,7 +298,7 @@ class Dive {
 
         ele = this.cy.add({
           group: 'nodes',
-          data: { ...node, parent },
+          data: { ...(node as { [k: string]: unknown }), stops, parent },
           classes: 'new',
         });
         this.addTips(ele);
@@ -320,10 +324,14 @@ class Dive {
     }
 
     for (const dep of data.deps) {
-      const src = this.cy.$id(dep.src);
-      const dst = this.cy.$id(dep.dst);
+      const src = this.cy.$id(dep.src.toString());
+      const dst = this.cy.$id(dep.dst.toString());
       this.cy.add({
-        data: { ...dep, source: dep.src, target: dep.dst },
+        data: {
+          ...(dep as { [k: string]: unknown }),
+          source: dep.src,
+          target: dep.dst
+        },
         group: 'edges',
         classes: src?.hasClass('new') || dst?.hasClass('new') ? 'new' : '',
       });
@@ -332,11 +340,11 @@ class Dive {
     return newNodes;
   }
 
-  receiveData(data: any): Cytoscape.NodeSingular {
+  receiveData(data: API.diffData): Cytoscape.NodeSingular | undefined {
     this.cy.startBatch();
 
     for (const id of data.sub)
-      this.remove(this.cy.$id(id));
+      this.remove(this.cy.$id(id.toString()));
 
     const newNodes = this.receiveGraph(data.add);
 
@@ -344,7 +352,8 @@ class Dive {
 
     this.recomputeLayout(newNodes);
 
-    return this.cy.$id(data.root);
+    const root = data.root
+    return root ? this.cy.$id(root.toString()) : undefined;
   }
 
   get layout(): string {
@@ -383,8 +392,8 @@ class Dive {
     }
   }
 
-  async exec<In, Out>(
-    request: Server.ExecRequest<In, Out>,
+  async exec<In>(
+    request: Server.ExecRequest<In, API.diffData | null>,
     param: In,
   ) {
     try {
@@ -417,7 +426,7 @@ class Dive {
     }
   }
 
-  static async setWindow(window: any): Promise<void> {
+  static async setWindow(window: API.explorationWindow): Promise<void> {
     if (Server.isRunning())
       await Server.send(API.window, window);
   }
@@ -433,7 +442,7 @@ class Dive {
       case 'overview':
         await Dive.setWindow({
           perception: { backward: 4, forward: 1 },
-          horizon: { backward: null, forward: null },
+          horizon: { backward: undefined, forward: undefined },
         });
         break;
       default: /* This is useless and impossible if the program is correctly

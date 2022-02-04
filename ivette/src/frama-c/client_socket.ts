@@ -95,7 +95,7 @@ class SocketClient extends Client {
   }
 
   /** Send Request */
-  send(kind: string, id: string, request: string, data: any): void {
+  send(kind: string, id: string, request: string, data: json): void {
     this.queue.push({ cmd: kind, id, request, data });
     this._flush();
   }
@@ -181,6 +181,7 @@ class SocketClient extends Client {
       const n1 = this.buffer.length;
       if (data === undefined || n0 <= n1) break;
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const cmd: any = JSON.parse(data);
         if (cmd !== null && typeof (cmd) === 'object') {
           switch (cmd.res) {
