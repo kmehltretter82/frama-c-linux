@@ -65,8 +65,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition for 'bit5' 'band7,zbit' in 'band':
-Assume { Type: is_sint32(a). (* Goal *) When: land(4095, a) = 85. }
-Prove: land(65535, a) != 21845.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -219,6 +218,21 @@ Prove: b != a.
 ------------------------------------------------------------
 
 Goal Post-condition (file bitwise.i, line 128) in 'cast_uchar':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_test,ok' (file bitwise.i, line 131):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_unset,ok' (file bitwise.i, line 132):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_set_unset,ok' (file bitwise.i, line 133):
 Prove: true.
 
 ------------------------------------------------------------

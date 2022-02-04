@@ -128,5 +128,8 @@ void lemma(unsigned a, unsigned b, unsigned k) {
 //@ ensures \result == (x & 0xFF) ;
 unsigned char cast_uchar(int x) {
   unsigned char c = x;
+  //@ check bit_test: ok: (c & (1 << 1)) == 0  ==> (c & 5) == (c & 7);
+  //@ check bit_unset: ok: (c & 0x77) == 0x66 ==> (x & 1) == 0 ;
+  //@ check bit_set_unset: ok: (c & 0x77) == 0x66 && (x & 5) == (x & 7) ==> (x & 4) == (x & 6) ;
   return c;
 }
