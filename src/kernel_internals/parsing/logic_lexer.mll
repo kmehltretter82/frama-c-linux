@@ -283,7 +283,7 @@
       end
 
   (* Update lexer buffer. *)
-  let update_line_loc lexbuf line =
+  let update_line_pos lexbuf line =
     let pos = lexbuf.Lexing.lex_curr_p in
     lexbuf.Lexing.lex_curr_p <-
       { pos with
@@ -291,10 +291,7 @@
 	Lexing.pos_bol = pos.Lexing.pos_cnum;
       }
 
-  let update_newline_loc lexbuf =
-    update_line_loc lexbuf (lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum + 1)
-
-  let update_file_loc lexbuf file =
+  let update_file_pos lexbuf file =
    let pos = lexbuf.Lexing.lex_curr_p in
     lexbuf.Lexing.lex_curr_p <- { pos with Lexing.pos_fname = file }
 
@@ -349,8 +346,8 @@ let utf8_char = ['\128'-'\254']+
 
 rule token = parse
   | space+ { token lexbuf }
-  | '\n' { update_newline_loc lexbuf; token lexbuf }
-  | comment_line '\n' { update_newline_loc lexbuf; token lexbuf }
+  | '\n' { Lexing.new_line lexbuf; token lexbuf }
+  | comment_line '\n' { Lexing.new_line lexbuf; token lexbuf }
   | comment_line eof { token lexbuf }
   | "*/" { lex_error lexbuf "unexpected block-comment closing" }
   | "/*" { if !accept_c_comments_into_acsl_spec
@@ -502,7 +499,7 @@ and chr buffer = parse
   | _  { Buffer.add_string buffer (lexeme lexbuf); chr buffer lexbuf }
 
 and hash = parse
-  '\n'		{ update_newline_loc lexbuf; token lexbuf}
+  '\n'		{ Lexing.new_line lexbuf; token lexbuf}
 | [' ''\t']		{ hash lexbuf}
 | rD+	        { (* We are seeing a line number. This is the number for the
                    * next line *)
@@ -517,14 +514,14 @@ and hash = parse
                        "Bad line number in preprocessed file: %s"  s;
                      (-1)
                  in
-                 update_line_loc lexbuf (lineno - 1);
+                 update_line_pos lexbuf (lineno - 1);
                   (* A file name may follow *)
 		  file lexbuf }
 | "line"        { hash lexbuf } (* MSVC line number info *)
 | _	        { endline lexbuf}
 
 and file =  parse
-        '\n'		        { update_newline_loc lexbuf; token lexbuf}
+        '\n'		        { Lexing.new_line lexbuf; token lexbuf}
 |	[' ''\t''\r']			{ file lexbuf}
 |	'"' ([^ '\012' '\t' '"']|"\\\"")* '"' {
     let n = Lexing.lexeme lexbuf in
@@ -532,38 +529,36 @@ and file =  parse
         ((String.length n) - 2) in
     let unescape = Str.regexp_string "\\\"" in
     let n1 = Str.global_replace unescape "\"" n1 in
-    update_file_loc lexbuf n1;
+    update_file_pos lexbuf n1;
     endline lexbuf
   }
 
 |	_			{ endline lexbuf}
 
 and endline = parse
-        '\n' 			{ update_newline_loc lexbuf; token lexbuf}
+        '\n' 			{ Lexing.new_line lexbuf; token lexbuf}
 |   eof                         { EOF }
 |	_			{ endline lexbuf}
 
 and comment = parse
-    '\n' { update_newline_loc lexbuf; comment lexbuf}
+    '\n' { Lexing.new_line lexbuf; comment lexbuf}
   | "*/" { token lexbuf}
   | eof  { lex_error lexbuf "non-terminating block-comment" }
   | _    { comment lexbuf}
 
 {
-  let set_initial_location dest_lexbuf src_loc =
-    Lexing.(
-      dest_lexbuf.lex_curr_p <-
-        { src_loc with
-          pos_bol = src_loc.pos_bol - src_loc.pos_cnum;
-          pos_cnum = 0; };
-    )
+  (* When Ocaml 4.11+ becomes mandatory, we can probably replace this with
+     Lexing.set_position. *)
+  let set_initial_position dest_lexbuf src_pos =
+    dest_lexbuf.Lexing.lex_curr_p <- src_pos;
+    dest_lexbuf.lex_abs_pos <- src_pos.pos_cnum
 
-  let parse_from_location f (loc, s : Filepath.position * string) =
+  let parse_from_position f (pos, s : Filepath.position * string) =
     let finally _ = Logic_utils.exit_kw_c_mode () in
     let output = Kernel.logwith finally ~wkey:Kernel.wkey_annot_error
     in
     let lb = from_string s in
-    set_initial_location lb (Cil_datatype.Position.to_lexing_pos loc);
+    set_initial_position lb (Cil_datatype.Position.to_lexing_pos pos);
     try
       let res = f token lb in
       Some (Cil_datatype.Position.of_lexing_pos lb.Lexing.lex_curr_p, res)
@@ -584,11 +579,11 @@ and comment = parse
         Kernel.fatal ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "Unknown error (%s)"
           (Printexc.to_string exn)
 
-  let lexpr = parse_from_location Logic_parser.lexpr_eof
+  let lexpr = parse_from_position Logic_parser.lexpr_eof
 
-  let annot = parse_from_location Logic_parser.annot
+  let annot = parse_from_position Logic_parser.annot
 
-  let spec = parse_from_location Logic_parser.spec
+  let spec = parse_from_position Logic_parser.spec
 
   let ext_spec lexbuf = try
       accept_c_comments_into_acsl_spec := true ;
