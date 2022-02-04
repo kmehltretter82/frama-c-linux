@@ -968,13 +968,13 @@ module Dom = struct
   let narrow t v dom =
     if Ival.is_bottom v then raise Lang.Contradiction
     else if is_top_ival v then dom
-    else Tmap.change (fun _ v old ->
-        match old with | None -> Some v
-                       | (Some old) as old' ->
-                           let v = Ival.narrow v old in
-                           if Ival.is_bottom v then raise Lang.Contradiction;
-                           if Ival.equal v old then old'
-                           else Some v) t v dom
+    else Tmap.change (fun _ v -> function
+        | None -> Some v
+        | (Some old) as old' ->
+            let v = Ival.narrow v old in
+            if Ival.is_bottom v then raise Lang.Contradiction;
+            if Ival.equal v old then old'
+            else Some v) t v dom
 
   let add_with_bot t v dom =
     if is_top_ival v then dom else Tmap.add t v dom
@@ -988,7 +988,7 @@ module Dom = struct
   let assume_cmp =
     let module Local = struct
       type t = Integer of Ival.t | Term of Ival.t option
-    end in fun cmp t1 t2 dom ->
+    end in fun cmp t1 t2 dom -> (* Requires an int type for [t1,t2] *)
       let encode t = match Lang.F.repr t with
         | Kint z -> Local.Integer (Ival.inject_singleton z)
         | _ -> Local.Term (try Some (Tmap.find t dom) with Not_found -> None)
@@ -1019,9 +1019,9 @@ module Dom = struct
             (add t2 (Ival.backward_comp_int_left cmp_sym v2 v1) dom)
 
   let assume_literal t dom = match Lang.F.repr t with
-    | Eq(a,b) -> assume_cmp Abstract_interp.Comp.Eq a b dom
-    | Leq(a,b) -> assume_cmp Abstract_interp.Comp.Le a b dom
-    | Lt(a,b) -> assume_cmp Abstract_interp.Comp.Lt a b dom
+    | Eq(a,b)  when is_int a && is_int b -> assume_cmp Abstract_interp.Comp.Eq a b dom
+    | Leq(a,b) when is_int a && is_int b -> assume_cmp Abstract_interp.Comp.Le a b dom
+    | Lt(a,b)  when is_int a && is_int b -> assume_cmp Abstract_interp.Comp.Lt a b dom
     | Fun(g,[a]) -> begin try
           let ubound =
             c_int_bounds_ival (is_cint g) (* may raise Not_found *) in
@@ -1153,15 +1153,15 @@ let is_cint_simplifier =
         var_domain := Ival.backward_comp_int_left op !var_domain dom
       in
       let rec reduce_on_neg var var_domain t =
-        match Lang.F.repr t with
+        match Lang.F.repr t with (* NB. [var] has an int type *)
         | _ when not (is_prop t) -> ()
-        | Leq(a,b) when Lang.F.equal a var ->
+        | Leq(a,b) when Lang.F.equal a var && is_int b ->
             reduce Abstract_interp.Comp.Le var_domain b
-        | Leq(b,a) when Lang.F.equal a var ->
+        | Leq(b,a) when Lang.F.equal a var && is_int b ->
             reduce Abstract_interp.Comp.Ge var_domain b
-        | Lt(a,b) when Lang.F.equal a var ->
+        | Lt(a,b) when Lang.F.equal a var && is_int b ->
             reduce Abstract_interp.Comp.Lt var_domain b
-        | Lt(b,a) when Lang.F.equal a var ->
+        | Lt(b,a) when Lang.F.equal a var  && is_int b->
             reduce Abstract_interp.Comp.Gt var_domain b
         | And l -> List.iter (reduce_on_neg var var_domain) l
         | Not p -> reduce_on_pos var var_domain p
@@ -1245,36 +1245,66 @@ let is_cint_simplifier =
 
 
 let mask_simplifier =
-  let update x m ctx =
-    Tmap.insert (fun _ m old -> if Integer.lt m old then (*better*) m else old)
-      x m ctx
-  and rewrite ctx e =
-    let reduce m x = match F.repr x with
-      | Kint v -> F.e_zint (Integer.logand m v)
-      | _ -> x
-    and collect ctx d x = try
-        let m = Tmap.find x ctx in
-        match d with
-        | None -> Some m
-        | Some m0 -> if Integer.lt m m0 then Some m else d
-      with Not_found -> d
-    in
+  let module Masks = struct
+    (* There is a contradiction when [m.unset & m.set != 0] *)
+    type t = { unset: Integer.t ; (* Mask of the bits set to 1 *)
+               set:Integer.t      (* Mask of the bits set to 1 *)
+             }
+    type ctx = t Tmap.t
+
+    let mk_mask ~unset ~set =
+      if not (Integer.equal Integer.zero (Integer.logand unset set))
+      then raise Lang.Contradiction;
+      { unset ; set }
+
+    let update ?(unset=Integer.zero) ?(set=Integer.zero) ctx x =
+      Tmap.insert (fun _ v old ->
+          mk_mask ~unset:(Integer.logor v.unset old.unset)
+            ~set:(Integer.logor v.set old.set))
+        x (mk_mask ~unset ~set) ctx
+
+    let assume ctx h = (* [rtx = assume ctx h] such that [h |- ctx ==> rtx] *)
+      try
+        match F.repr h with
+        | Fun(f,[x]) ->
+            let iota = is_cint f in
+            if not (Ctypes.signed iota) then
+              (* The uppest bits are unset *)
+              update ~unset:(Integer.lognot (snd (Ctypes.bounds iota))) ctx x
+            else ctx
+        | _ -> ctx
+      with Not_found -> ctx
+
+  end in
+  let rewrite ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
     match F.repr e with
     | Fun(f,es) when f == f_land ->
+        let reduce unset x = match F.repr x with
+          | Kint v -> F.e_zint (Integer.logand (Integer.lognot unset) v)
+          | _ -> x
+        and collect ctx unset_mask x = try
+            let m = Tmap.find x ctx in
+            let open Masks in
+            match unset_mask with
+            | None -> Some m.unset
+            | Some unset_mask -> Some (Integer.logand unset_mask m.unset)
+          with Not_found -> unset_mask
+        in
         begin
           match List.fold_left (collect ctx) None es with
           | None -> raise Not_found
-          | Some m -> F.e_fun f_land (List.map (reduce m) es)
+          | Some unset_mask ->
+              F.e_fun f_land (List.map (reduce unset_mask) es)
         end
     | _ -> raise Not_found
   in
   object
 
     (** Must be 2^n-1 *)
-    val mutable magnitude : Integer.t Tmap.t = Tmap.empty
+    val mutable masks : Masks.ctx = Tmap.empty
 
-    method name = "Rewrite unsigned masks"
-    method copy = {< magnitude = magnitude >}
+    method name = "Rewrite bitwise masks"
+    method copy = {< masks = masks >}
 
     method target _ = ()
     method infer = []
@@ -1282,31 +1312,23 @@ let mask_simplifier =
 
     method assume p =
       Lang.iter_consequence_literals
-        (fun p -> match F.repr p with
-           | Fun(f,[x]) -> begin
-               try
-                 let iota = is_cint f in
-                 if not (Ctypes.signed iota) then
-                   magnitude <- update x (snd (Ctypes.bounds iota)) magnitude
-               with Not_found -> ()
-             end
-           | _ -> ()) (F.e_prop p)
+        (fun p -> masks <- Masks.assume masks p) (F.e_prop p)
 
     method equivalent_exp e =
-      if Tmap.is_empty magnitude then e else
-        Lang.e_subst (rewrite magnitude) e
+      if Tmap.is_empty masks then e else
+        Lang.e_subst (rewrite masks) e
 
     method weaker_hyp p =
-      if Tmap.is_empty magnitude then p else
-        Lang.p_subst (rewrite magnitude) p
+      if Tmap.is_empty masks then p else
+        Lang.p_subst (rewrite masks) p
 
     method equivalent_branch p =
-      if Tmap.is_empty magnitude then p else
-        Lang.p_subst (rewrite magnitude) p
+      if Tmap.is_empty masks then p else
+        Lang.p_subst (rewrite masks) p
 
     method stronger_goal p =
-      if Tmap.is_empty magnitude then p else
-        Lang.p_subst (rewrite magnitude) p
+      if Tmap.is_empty masks then p else
+        Lang.p_subst (rewrite masks) p
 
   end
 
