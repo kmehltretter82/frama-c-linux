@@ -1,0 +1,111 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
+// --------------------------------------------------------------------------
+// --- Pivot Table
+// --------------------------------------------------------------------------
+
+import * as Path from 'path';
+import React from 'react';
+import { TitleBar } from 'ivette';
+import { Label } from 'dome/controls/labels';
+import { Scroll } from 'dome/layout/boxes';
+import * as States from 'frama-c/states';
+import * as PivotState from 'frama-c/api/plugins/pivot/general';
+import PivotTableUI from 'react-pivottable/PivotTableUI';
+import 'react-pivottable/pivottable.css';
+
+// --------------------------------------------------------------------------
+// --- Pivot Table for Properties
+// --------------------------------------------------------------------------
+
+export function Pivot(props: any) {
+  const [state, setState] = React.useState({});
+  return (
+    <PivotTableUI
+      data={props.data}
+      onChange={setState}
+      {...state}
+    />
+  );
+}
+
+export default function PivotTable() {
+  const rawData = States.useSyncValue(PivotState.pivotState) || [];
+  const data = new Array(rawData.length > 0 ? rawData.length-1 : 0);
+  if (rawData.length > 0) {
+    const headers = rawData[0];
+    for (let i = 1; i < rawData.length; i++) {
+      const src = rawData[i];
+      data[i-1] = {};
+      for (let j = 0; j < headers.length; j++) {
+        data[i-1][headers[j]] = src[j];
+      }
+    }
+  }
+  return (<Pivot data={data} />);
+}
+
+function PivotTableBuild () : JSX.Element {
+  const rawData = States.useSyncValue(PivotState.pivotState);
+  const [computing, setComputing] = React.useState(false);
+  const [error, setError] = React.useState('');
+  async function handleError (err: string) {
+    const msg =
+      `The pivot table could not be built: an error has occured (${err}).`;
+    setError(msg);
+    Status.setMessage({ text: msg, kind: 'error' });
+  }
+  async function compute () {
+    setComputing(true);
+    setError('');
+    Server.send(PivotState.compute, [])
+      .then(() => setComputing(false))
+      .catch((err) => { setComputing(false); handleError(err); });
+  }
+  if (rawData && rawData.length > 0) {
+    return (PivotTable(rawData));
+  }
+  if (computing) {
+    return (
+      <div className="pivot-centered">
+        <div>
+          <LED status="active" blink /> Computing…
+        </div>
+      </div>
+    );
+  }
+  const err = error ? <div className="part"> {error} </div> : undefined;
+  return (
+    <Scroll>
+      <TitleBar>
+        <Label
+          title="Pivot Title"
+          style={{ textAlign: 'center' }}
+        />
+      </TitleBar>
+      <Pivot data={data} />
+    </Scroll>
+  );
+}
+
+// --------------------------------------------------------------------------
