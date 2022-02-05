@@ -274,7 +274,6 @@ class Dive {
     });
   }
 
-  /* eslint-disable no-restricted-syntax */
   receiveGraph(data: API.graphData): Cytoscape.CollectionReturnValue {
     let newNodes = this.cy.collection();
 
