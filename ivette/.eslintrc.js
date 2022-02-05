@@ -35,22 +35,23 @@ module.exports = {
         allowConciseArrowFunctionExpressionsStartingWithVoid: true
       }
     ],
-    // Prefer const when _all_ destructured values may be const
-    "prefer-const": [
-      "error",
-      { "destructuring": "all", "ignoreReadBeforeAssign": false }
-    ],
     // Force single class member per line
     "lines-between-class-members": [
       "error", "always", { "exceptAfterSingleLine": true }
     ],
     // Force curly brackets on newline if some item is
     "object-curly-newline": ["error", { "multiline": true }],
-    // Allow infinite loops but disallow constant if-then-else
+    // Allow infinite loops but still disallow constant if-then-else
     "no-constant-condition": ["error", { "checkLoops": false }],
-    // Disallow explicit any types ; common workaround includes using 'unknown'
-    // when the type can't be infered
-    "@typescript-eslint/no-explicit-any": "error",
+    // Prefer const including when destructuring when _all_ destructured values
+    // may be const
+    "prefer-const": [
+      "error",
+      { "destructuring": "all", "ignoreReadBeforeAssign": false }
+    ],
+    // Disallow the use of console.*, except for warnings and errors, to
+    // prevent the release of code producing various debuging messages
+    "no-console": ["error", { allow: ["warn", "error"] }],
 
     // --- Safety rules ---
 
@@ -72,7 +73,8 @@ module.exports = {
     ],
     // Disallow the use of var in favor of let and const
     "no-var": "error",
-    // Disallow the use of console.*, except for warnings and errors
-    "no-console": ["error", { allow: ["warn", "error"] }],
+    // Disallow explicit any types ; common workaround includes using 'unknown'
+    // when the type can't be infered
+    "@typescript-eslint/no-explicit-any": "error",
   }
 };
