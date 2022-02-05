@@ -172,7 +172,6 @@ src/frama-c/plugins/dive/pkg.json: .ignore
 src/frama-c/plugins/dive/react-cytoscapejs.d.ts: CEA_LGPL
 src/frama-c/plugins/dive/style.json: .ignore
 src/frama-c/plugins/dive/tippy.css: .ignore
-src/frama-c/plugins/eva/.eslintrc.js: .ignore
 src/frama-c/plugins/eva/Coverage.tsx: CEA_LGPL
 src/frama-c/plugins/eva/CoverageMeter.tsx: CEA_LGPL
 src/frama-c/plugins/eva/Summary.tsx: CEA_LGPL
