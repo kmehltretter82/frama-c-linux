@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- ToolBars
 // --------------------------------------------------------------------------
@@ -232,7 +234,7 @@ export function Select(props: SelectionProps<string>) {
 
 const DEBOUNCED_SEARCH = 200;
 
-const scrollToRef = (r: undefined | HTMLLabelElement) => {
+const scrollToRef = (r: null | HTMLLabelElement) => {
   if (r) r.scrollIntoView({ block: 'nearest' });
 };
 

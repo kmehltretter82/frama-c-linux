@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Array Models
 // --------------------------------------------------------------------------
@@ -266,9 +268,9 @@ export class ArrayModel<Key, Row>
     }
   }
 
-  canSortBy(column: string) {
-    const columns = this.columns as any;
-    return columns[column] !== undefined;
+  canSortBy(column: string): boolean {
+    const columns = this.columns;
+    return !!columns && columns[column] !== undefined;
   }
 
   getSorting(): SortingInfo | undefined {
@@ -460,7 +462,7 @@ export class CompactModel<Key, Row> extends ArrayModel<Key, Row> {
   getkey: (d: Row) => Key;
 
   /** @param key - the key property of `Row` holding an entry identifier. */
-  constructor(getkey: any) {
+  constructor(getkey: (d: Row) => Key) {
     super();
     this.getkey = getkey;
   }

@@ -41,13 +41,13 @@ import './loader';
 // --- Main View
 // --------------------------------------------------------------------------
 
-export default function Application() {
+export default function Application(): JSX.Element {
   const [sidebar, flipSidebar] =
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
   const [viewbar, flipViewbar] =
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
   const hints = Extensions.useSearchHints();
-  const onSelectedHints = () => {
+  const onSelectedHints = (): void => {
     if (hints.length === 1) Extensions.onSearchHint(hints[0]);
   };
 

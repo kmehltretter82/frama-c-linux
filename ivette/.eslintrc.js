@@ -29,7 +29,11 @@ module.exports = {
     // Do not allow functions without return type, except function expressions (arrow functions)
     "@typescript-eslint/explicit-function-return-type": [
       "error",
-      { allowExpressions: true }
+      {
+        allowExpressions: true,
+        allowTypedFunctionExpressions: true,
+        allowConciseArrowFunctionExpressionsStartingWithVoid: true
+      }
     ],
     // Prefer const when _all_ destructured values may be const
     "prefer-const": [
@@ -44,6 +48,9 @@ module.exports = {
     "object-curly-newline": ["error", { "multiline": true }],
     // Allow infinite loops but disallow constant if-then-else
     "no-constant-condition": ["error", { "checkLoops": false }],
+    // Disallow explicit any types ; common workaround includes using 'unknown'
+    // when the type can't be infered
+    "@typescript-eslint/no-explicit-any": "error",
 
     // --- Safety rules ---
 
@@ -60,7 +67,8 @@ module.exports = {
         "vars": "local",
         "ignoreRestSiblings": true, // Useful to remove properties using rest properties
         "varsIgnorePattern": "^_",
-        "argsIgnorePattern": "^_" }
+        "argsIgnorePattern": "^_"
+      }
     ],
     // Disallow the use of var in favor of let and const
     "no-var": "error",

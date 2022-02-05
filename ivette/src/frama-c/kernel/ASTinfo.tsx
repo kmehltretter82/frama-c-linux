@@ -37,7 +37,7 @@ import { getInfo } from 'frama-c/api/kernel/ast';
 // --- Information Panel
 // --------------------------------------------------------------------------
 
-export default function ASTinfo() {
+export default function ASTinfo(): JSX.Element {
 
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [selection, updateSelection] = States.useSelection();
@@ -52,7 +52,7 @@ export default function ASTinfo() {
   }, [buffer, data]);
 
   // Callbacks
-  function onTextSelection(id: string) {
+  function onTextSelection(id: string): void {
     // For now, the only markers are functions.
     const location = { fct: id };
     updateSelection({ location });

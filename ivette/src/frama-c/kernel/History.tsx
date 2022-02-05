@@ -28,11 +28,11 @@ import React from 'react';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as States from 'frama-c/states';
 
-export default function History() {
+export default function History(): JSX.Element {
   const [selection, updateSelection] = States.useSelection();
 
-  const doPrevSelect = () => { updateSelection('HISTORY_PREV'); };
-  const doNextSelect = () => { updateSelection('HISTORY_NEXT'); };
+  const doPrevSelect = () => void updateSelection('HISTORY_PREV');
+  const doNextSelect = () => void updateSelection('HISTORY_NEXT');
 
   return (
     <Toolbar.ButtonGroup>

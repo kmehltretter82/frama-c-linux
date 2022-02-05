@@ -131,7 +131,7 @@ export class ValueCache {
     this.state = state;
   }
 
-  clear() {
+  clear(): void {
     this.smax = EMPTY;
     this.probes.clear();
     this.stacks.clear();
@@ -141,17 +141,17 @@ export class ValueCache {
 
   // --- Cached Measures
 
-  getMaxSize() { return this.smax; }
+  getMaxSize(): Size { return this.smax; }
 
-  getProbeSize(target: Ast.marker) {
+  getProbeSize(target: Ast.marker): Size {
     return this.probes.get(target) ?? EMPTY;
   }
 
-  private static stackKey(fct: string, callstack: Values.callstack) {
+  private static stackKey(fct: string, callstack: Values.callstack): string {
     return `${fct}::${callstack}`;
   }
 
-  getStackSize(fct: string, callstack: Values.callstack) {
+  getStackSize(fct: string, callstack: Values.callstack): Size {
     const key = ValueCache.stackKey(fct, callstack);
     return this.stacks.get(key) ?? EMPTY;
   }

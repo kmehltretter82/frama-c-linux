@@ -68,7 +68,7 @@ function buildCxtMenu(
   commands: Cxtcommand[],
   content?: JSX.Element,
   action?: () => void,
-) {
+): void {
   commands.push({
     content: content ? renderToString(content) : '',
     select: action || (() => { /* Do nothing */ }),
@@ -78,7 +78,7 @@ function buildCxtMenu(
 
 /* double click events for Cytoscape */
 
-function enableDoubleClickEvents(cy: Cytoscape.Core, delay = 350) {
+function enableDoubleClickEvents(cy: Cytoscape.Core, delay = 350): void {
   let last: Cytoscape.EventObject | undefined;
   cy.on('click', (e) => {
     if (last && last.target === e.target &&
@@ -145,7 +145,7 @@ class Dive {
     this.refresh();
   }
 
-  onCxtMenu(node: Cytoscape.NodeSingular) {
+  onCxtMenu(node: Cytoscape.NodeSingular): Cxtcommand[] {
     const data = node.data();
     const commands = [] as Cxtcommand[];
     buildCxtMenu(commands,
@@ -167,7 +167,7 @@ class Dive {
     return commands;
   }
 
-  remove(node: Cytoscape.NodeSingular) {
+  remove(node: Cytoscape.NodeSingular): void {
     const parent = node.parent();
     node.remove();
     this.cy.$id(`${node.id()}-more`).remove();
@@ -394,8 +394,8 @@ class Dive {
 
   async exec<In>(
     request: Server.ExecRequest<In, API.diffData | null>,
-    param: In,
-  ) {
+    param: In): Promise<Cytoscape.NodeSingular | undefined>
+   {
     try {
       if (Server.isRunning()) {
         await this.setMode();
@@ -408,10 +408,10 @@ class Dive {
       console.error(err);
     }
 
-    return null;
+    return undefined;
   }
 
-  async refresh() {
+  async refresh(): Promise<void> {
     try {
       if (Server.isRunning()) {
         const data = await Server.send(API.graph, {});
@@ -455,13 +455,13 @@ class Dive {
     this.exec(API.clear, null);
   }
 
-  async add(marker: string) {
+  async add(marker: string): Promise<void> {
     const node = await this.exec(API.add, marker);
     if (node)
       this.updateNodeSelection(node);
   }
 
-  async explore(node: Cytoscape.NodeSingular) {
+  async explore(node: Cytoscape.NodeSingular): Promise<void> {
     const id = parseInt(node.id(), 10);
     if (id)
       await this.exec(API.explore, id);
@@ -479,7 +479,7 @@ class Dive {
       this.exec(API.hide, id);
   }
 
-  async clickNode(node: Cytoscape.NodeSingular) {
+  async clickNode(node: Cytoscape.NodeSingular): Promise<void> {
     this.updateNodeSelection(node);
     await this.explore(node);
 
@@ -493,11 +493,13 @@ class Dive {
     node.unselectify();
   }
 
-  doubleClickNode(node: Cytoscape.NodeSingular) {
+  doubleClickNode(node: Cytoscape.NodeSingular): void {
     this.cy.animate({ fit: { eles: node, padding: 10 } });
   }
 
-  selectLocation(location: States.Location | undefined, doExplore: boolean) {
+  selectLocation(
+    location: States.Location | undefined,
+    doExplore: boolean): void {
     if (!location) {
       // Reset whole graph if no location is selected.
       this.clear();
@@ -515,7 +517,7 @@ class Dive {
   }
 
   updateNodeSelection(node: Cytoscape.NodeSingular): void {
-    const hasOrigin = (ele: Cytoscape.NodeSingular) => (
+    const hasOrigin = (ele: Cytoscape.NodeSingular): boolean => (
       _.some(ele.data().origins, this.selectedLocation)
     );
     this.cy.$(':selected').forEach(unselect);
@@ -529,7 +531,7 @@ class Dive {
   }
 }
 
-function GraphView() {
+function GraphView(): JSX.Element {
 
   // Hooks
   const [dive, setDive] = useState(() => new Dive());
@@ -539,7 +541,7 @@ function GraphView() {
   const [selectionMode, setSelectionMode] =
     Dome.useStringSettings('dive.selectionMode', 'follow');
 
-  function setCy(cy: Cytoscape.Core) {
+  function setCy(cy: Cytoscape.Core): void {
     if (cy !== dive.cy)
       setDive(new Dive(cy));
   }
@@ -569,30 +571,30 @@ function GraphView() {
   }, [dive, lock, selection, updateSelection]);
 
   // Layout selection
-  const selectLayout = (layout?: string) => {
+  const selectLayout = (layout?: string): void => {
     if (layout) {
       dive.layout = layout;
     }
   };
   const layoutsNames = ['cose-bilkent', 'dagre', 'cola', 'klay'];
-  const layoutItem = (id: string) => (
+  const layoutItem = (id: string): Dome.PopupMenuItem => (
     { id, label: id, checked: (id === dive.layout) }
   );
-  const layoutMenu = () => {
+  const layoutMenu = (): void => {
     Dome.popupMenu(layoutsNames.map(layoutItem), selectLayout);
   };
 
   // Selection mode
-  const selectMode = (id?: string) => id && setSelectionMode(id);
+  const selectMode = (id?: string) => void (id && setSelectionMode(id));
   const modes = [
     { id: 'follow', label: 'Follow selection' },
     { id: 'add', label: 'Add selection to the graph' },
   ];
   const checkMode =
-    (item: { id: string; label: string }) => (
+    (item: { id: string; label: string }): Dome.PopupMenuItem => (
       { checked: item.id === selectionMode, ...item }
     );
-  const modeMenu = () => {
+  const modeMenu = (): void => {
     Dome.popupMenu(modes.map(checkMode), selectMode);
   };
 

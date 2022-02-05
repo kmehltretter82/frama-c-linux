@@ -114,7 +114,7 @@ class ZmqClient extends Client {
   // --- Low-Level Management
   // --------------------------------------------------------------------------
 
-  _flush() {
+  _flush(): void {
     const socket = this.zmqSocket;
     if (socket) {
       const cmds = this.queue;
@@ -133,7 +133,7 @@ class ZmqClient extends Client {
     }
   }
 
-  _receive(resp: string[]) {
+  _receive(resp: string[]): void {
     try {
       this._decode(resp);
     } catch (err) {
@@ -145,8 +145,8 @@ class ZmqClient extends Client {
   }
 
   /* eslint-disable @typescript-eslint/indent */
-  _decode(resp: string[]) {
-    const shift = () => resp.shift() ?? '';
+  _decode(resp: string[]): void {
+    const shift = (): string => resp.shift() ?? '';
     while (resp.length) {
       const cmd = shift();
       switch (cmd) {

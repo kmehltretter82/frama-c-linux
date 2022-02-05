@@ -134,7 +134,7 @@ class SocketClient extends Client {
   // --- Low-Level Management
   // --------------------------------------------------------------------------
 
-  _flush() {
+  _flush(): void {
     if (this.running) {
       this.queue.forEach((cmd) => {
         this._send(Buffer.from(JSON.stringify(cmd), 'utf8'));
@@ -143,7 +143,7 @@ class SocketClient extends Client {
     }
   }
 
-  _send(data: Buffer) {
+  _send(data: Buffer): void {
     const s = this.socket;
     if (s) {
       const len = data.length;
@@ -173,7 +173,7 @@ class SocketClient extends Client {
     return msg.slice(phex, offset).toString('utf8');
   }
 
-  _receive(chunk: Buffer) {
+  _receive(chunk: Buffer): void {
     this.buffer = Buffer.concat([this.buffer, chunk]);
     while (true) {
       const n0 = this.buffer.length;

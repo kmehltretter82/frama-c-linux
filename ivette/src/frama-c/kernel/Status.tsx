@@ -46,11 +46,11 @@ const emptyMessage: MessageProps = { text: '', kind: 'none' };
 
 const GlobalMessage = new GlobalState(emptyMessage);
 
-export function setMessage(message: MessageProps) {
+export function setMessage(message: MessageProps): void {
   GlobalMessage.setValue(message);
 }
 
-export default function Message() {
+export default function Message(): JSX.Element {
   const [message] = useGlobalState(GlobalMessage);
   return (
     <>

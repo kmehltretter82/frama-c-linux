@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // --------------------------------------------------------------------------
 // --- JSON Utilities
 // --------------------------------------------------------------------------
@@ -62,14 +64,14 @@ export function parse(text: string, noError = false): json {
 /**
    Export JSON (or any data) as a compact string.
 */
-export function stringify(js: any) {
+export function stringify(js: any): string {
   return JSON.stringify(js, undefined, 0);
 }
 
 /**
    Export JSON (or any data) as a string with indentation.
  */
-export function pretty(js: any) {
+export function pretty(js: any): string {
   return JSON.stringify(js, undefined, 2);
 }
 

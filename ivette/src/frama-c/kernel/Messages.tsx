@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 import * as React from 'react';
 import * as Dome from 'dome';
 import { TitleBar } from 'ivette';

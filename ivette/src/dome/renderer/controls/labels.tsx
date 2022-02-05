@@ -29,7 +29,7 @@
    @module dome/controls/labels
 */
 
-import React from 'react';
+import React, { LegacyRef } from 'react';
 import { classes } from 'dome/misc/utils';
 import { Icon } from './icons';
 import './style.css';
@@ -63,7 +63,11 @@ export interface LabelProps {
 }
 
 const makeLabel = (className: string) =>
-  function Label(props: LabelProps, ref: any) {
+  function Label
+    (
+      props: LabelProps,
+      ref: LegacyRef<HTMLLabelElement> | undefined
+    ): JSX.Element {
     const { display = true } = props;
     const allClasses = classes(
       className,

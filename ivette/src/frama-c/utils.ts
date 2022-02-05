@@ -49,7 +49,7 @@ export function printTextWithTags(
   buffer: DomeBuffers.RichTextBuffer,
   contents: KernelData.text,
   options?: DomeBuffers.MarkerProps,
-) {
+): void {
   if (Array.isArray(contents)) {
     let marker = false;
     const tag = contents.shift();

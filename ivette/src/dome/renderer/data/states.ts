@@ -102,10 +102,10 @@ export class GlobalState<A> {
   }
 
   /** Current state value. */
-  getValue() { return this.value; }
+  getValue(): A { return this.value; }
 
   /** Notify callbacks on change, using _deep_ structural comparison. */
-  setValue(value: A) {
+  setValue(value: A): void {
     if (!isEqual(value, this.value)) {
       this.value = value;
       this.emitter.emit(UPDATE, value);
@@ -113,12 +113,12 @@ export class GlobalState<A> {
   }
 
   /** Callback Emitter. */
-  on(callback: (value: A) => void) {
+  on(callback: (value: A) => void): void {
     this.emitter.on(UPDATE, callback);
   }
 
   /** Callback Emitter. */
-  off(callback: (value: A) => void) {
+  off(callback: (value: A) => void): void {
     this.emitter.off(UPDATE, callback);
   }
 

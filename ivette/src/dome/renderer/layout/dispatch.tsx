@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Dispatch Layout
 // --------------------------------------------------------------------------
@@ -54,7 +56,7 @@ class ITEM {
     this.event = new Event(`dome-dispatch-${id}`);
   }
 
-  update(content: React.ReactNode) {
+  update(content: React.ReactNode): void {
     this.content = content;
     if (this.rendered) {
       this.rendered = false;

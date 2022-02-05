@@ -125,7 +125,7 @@ export class LayoutEngine {
     return 0;
   }
 
-  private push(p: Probe) {
+  private push(p: Probe): void {
     // --- sectionning
     const { fct } = p;
     if (fct !== this.byFct) {

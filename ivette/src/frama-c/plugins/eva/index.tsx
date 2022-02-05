@@ -49,7 +49,7 @@ import './style.css';
 
 const globalModelState = new GlobalState(new Model());
 
-function ValuesComponent() {
+function ValuesComponent(): JSX.Element {
   const [model] = useGlobalState(globalModelState);
   model.mount();
   Dome.useUpdate(model.changed, model.laidout);
