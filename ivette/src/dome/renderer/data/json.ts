@@ -106,8 +106,9 @@ export function identity<A>(v: A): A { return v; }
 // --- Primitives
 // --------------------------------------------------------------------------
 
-/** Always returns `undefined` on any input. */
-export const jNull: Safe<undefined> = () => undefined;
+/** 'null' or 'undefined'. */
+export const jNull: Loose<null> = (js: json) =>
+  js === null ? null : undefined
 
 /** Identity. */
 export const jAny: Safe<json> = (js: json) => js;

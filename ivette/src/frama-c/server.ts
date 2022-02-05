@@ -696,7 +696,7 @@ export function send<In, Out>(
   const response: Response<Out> = new Promise<Out>((resolve, reject) => {
     const unwrap = (js: Json.json) => {
       const data = request.output(js);
-      if (data)
+      if (data !== undefined)
         resolve(data);
       else
         reject('Wrong response type')
