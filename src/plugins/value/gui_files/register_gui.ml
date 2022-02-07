@@ -35,7 +35,7 @@ module UsedVarState =
     (struct
       let size = 17
       let name = "Value.Gui.UsedVarState"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Analysis.self ]
       (* [!Db.Inputs.self_external; !Db.Outputs.self_external] would be better
          dependencies, but this introduces a very problematic recursion between
          Value and Inout *)
@@ -67,7 +67,7 @@ let sync_filetree (filetree:Filetree.t) =
           try
             let vi = Kernel_function.get_vi kf in
             let strikethrough =
-              Analysis.is_computed () && not (!Db.Value.is_called kf)
+              Analysis.is_computed () && not (Results.is_called kf)
             in
             filetree#set_global_attribute ~strikethrough vi
           with Not_found -> ());
@@ -100,7 +100,7 @@ let hide_unused_function_or_var g =
   (match g with
    | GFun ({svar = vi}, _) | GFunDecl (_, vi, _) ->
      let kf = Globals.Functions.get vi in
-     not (!Db.Value.is_called kf)
+     not (Results.is_called kf)
    | GVarDecl (vi, _) | GVar (vi, _, _)  ->
      not (used_var vi)
    | _ -> false
@@ -233,7 +233,7 @@ let cleaned_outputs kf s =
 
 let pretty_stmt_info (main_ui:main_ui) kf stmt =
   (* Is it an accessible statement ? *)
-  if Db.Value.is_reachable_stmt stmt then begin
+  if Results.is_reachable stmt then begin
     if Value_results.is_non_terminating_instr stmt then
       match stmt.skind with
       | Instr (Call (_, _, _, _)
@@ -412,7 +412,7 @@ module Select (Eval: Eval) = struct
         (if unfocus <> [] then (kf, unfocus) :: acc_unfocus else acc_unfocus)
       in
       let focused, unfocused =
-        List.fold_left aux_focus ([], []) (!Db.Value.callers kf)
+        List.fold_left aux_focus ([], []) (Results.callsites kf)
       in
       List.iter (aux menu) focused;
       if unfocused <> [] then
