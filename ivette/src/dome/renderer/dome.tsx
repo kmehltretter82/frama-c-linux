@@ -50,6 +50,7 @@ import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import './style.css';
+import { State } from './data/states';
 
 // --------------------------------------------------------------------------
 // --- Context
@@ -711,7 +712,7 @@ export function useFlipSettings(
 export function useNumberSettings(
   key: string | undefined,
   defaultValue = 0,
-) {
+): State<number> {
   return Settings.useWindowSettings(
     key, Json.jNumber, defaultValue,
   );
