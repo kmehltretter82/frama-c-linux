@@ -83,6 +83,21 @@ function userFindInfo(
     focusedWindow.webContents.send('dome.ipc.find');
 }
 
+// function evaluateACSL(
+//   _item: MenuItem,
+//   focusedWindow: BrowserWindow | undefined,
+//   _evt: KeyboardEvent,
+// ) {
+//   if (focusedWindow)
+//     focusedWindow.webContents.send('dome.ipc.evaluate');
+// }
+
+// let evaluateVisible = false
+// ipcMain.on('dome.ipc.values.enabled', (_, args) => {
+//   console.log(args);
+//   evaluateVisible = args;
+// });
+
 // --------------------------------------------------------------------------
 // --- Menu Utilities
 // --------------------------------------------------------------------------
@@ -215,6 +230,12 @@ const editMenuItems: MenuSpec = [
     accelerator: 'CmdOrCtrl+F',
     click: userFindInfo,
   },
+  // {
+  //   label: 'Evaluate',
+  //   accelerator: 'CmdOrCtrl+E',
+  //   click: evaluateACSL,
+  //   enabled: evaluateVisible,
+  // }
 ];
 
 // --------------------------------------------------------------------------

@@ -27,15 +27,18 @@ import * as Dome from 'dome/dome';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Inset } from 'dome/frame/toolbars';
+import * as Toolbars from 'dome/frame/toolbars';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
+import { ipcRenderer } from 'electron';
 
 
 
@@ -898,6 +901,51 @@ class FunctionsManager {
 
 
 /* -------------------------------------------------------------------------- */
+/* --- Evaluation Mode Handling                                           --- */
+/* -------------------------------------------------------------------------- */
+
+export const evaluateEvent = new Dome.Event('dome.evaluate');
+ipcRenderer.on('dome.ipc.evaluate', () => evaluateEvent.emit());
+
+interface EvaluationModeProps {
+  computationState : Eva.computationStateType | undefined;
+  selection: States.Selection;
+  setLocPin: (loc: Location, pin: boolean) => void;
+}
+
+function evaluationMode(props: EvaluationModeProps): void {
+  const { computationState, selection, setLocPin } = props;
+  const handleError = (): void => {};
+  const addProbe = (result: [ string, Ast.marker ] | undefined): void => {
+    const fct = selection?.current?.fct;
+    const [_, loc] = result ?? [];
+    if (fct && loc) setLocPin({ fct, target: loc }, true);
+  };
+  React.useEffect(() => {
+    if (computationState !== 'computed') return () => {}
+    const onEnter = (pattern: string) => {
+      const marker = selection?.current?.marker;
+      const data = { at_stmt: marker, after: true, term: pattern };
+      Server.send(Eva.evalTerm, data).then(addProbe).catch(handleError);
+    };
+    const evalMode = {
+      title: 'Evaluation',
+      icon: 'TERMINAL',
+      className: 'eva-evaluation-mode',
+      hints: () => { return Promise.resolve([]); },
+      onEnter,
+      event: evaluateEvent,
+    };
+    Toolbars.RegisterMode.emit(evalMode);
+    return () => Toolbars.UnregisterMode.emit(evalMode);
+  });
+}
+
+/* -------------------------------------------------------------------------- */
+
+
+
+/* -------------------------------------------------------------------------- */
 /* --- Eva Table Complet Component                                        --- */
 /* -------------------------------------------------------------------------- */
 
@@ -1060,6 +1108,10 @@ function EvaTable(): JSX.Element {
     return StackInfos({ callsites, isSelected, setSelection: select, close });
   }, [ cs, setCS, select, getCallsites, selection ]);
   const { result: stackInfos } = Dome.usePromise(stackInfosPromise);
+
+  /* Handle Evaluation mode */
+  const computationState = States.useSyncValue(Eva.computationState);
+  evaluationMode({ computationState, selection, setLocPin });
 
   /* Builds the component */
   return (

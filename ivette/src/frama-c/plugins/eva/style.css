@@ -302,4 +302,9 @@ tr:first-of-type > .eva-table-callsite-box {
   background: var(--code-select);
 }
 
+.eva-evaluation-mode {
+  background: purple;
+  fill: white;
+}
+
 /* -------------------------------------------------------------------------- */

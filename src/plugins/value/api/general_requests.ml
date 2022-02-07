@@ -480,7 +480,7 @@ module EvalTermInput = struct
   let at_stmt =
     let descr = "The statement at which we will perform the evaluation." in
     Record.field record ~name:"at_stmt" ~descr:(Markdown.plain descr)
-      (module Kernel_ast.Stmt)
+      (module Kernel_ast.Marker)
 
   let after =
     let descr = "If true, evaluation is performed after <at_stmt> computation." in
@@ -497,30 +497,41 @@ module EvalTermInput = struct
       ~descr:(Markdown.plain "<evalTerm> input")
 
   module R : Record.S with type r = record = (val data)
-  type t = eval_term_input
+  type t = eval_term_input option
   let jtype = R.jtype
 
   let of_json js =
     let record = R.of_json js in
-    let at_stmt = R.get at_stmt record in
-    let after = R.get after record in
-    let term = R.get term record in
-    { at_stmt ; after ; term }
+    match R.get at_stmt record with
+    | PStmt (_, s) | PStmtStart (_, s)
+    | PLval (_, Kstmt s, _) | PExp (_, Kstmt s, _)
+    | PTermLval (_, Kstmt s, _, _)
+    | PVDecl (_, Kstmt s, _) ->
+      let after = R.get after record in
+      let term = R.get term record in
+      Some { at_stmt = s; after ; term }
+    | _ -> None
+
 end
+
+module EvalTermOutput =
+  Data.Joption (Data.Jpair (Data.Jstring) (Kernel_ast.Marker))
 
 let logic_environment () =
   let open Logic_typing in
   Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
 
-let evaluate_term input =
+let evaluate_term = Option.map @@ fun input ->
   let open Eval_terms in
   let env = logic_environment () in
   let kf = Kernel_function.find_englobing_kf input.at_stmt in
   let term = !Db.Properties.Interp.term ~env kf input.term in
   let state = Db.Value.get_stmt_state ~after:input.after input.at_stmt in
   let v = (eval_term ~alarm_mode:Ignore (env_only_here state) term).eover in
+  let exp = !Db.Properties.Interp.term_to_exp ~result:None term in
+  let loc = Printer_tag.PExp (Some kf, Kstmt input.at_stmt, exp) in
   Format.fprintf Format.str_formatter "%a" Cvalue.V.pretty v ;
-  Format.flush_str_formatter ()
+  (Format.flush_str_formatter (), loc)
 
 let descr =
   "Evaluate a term in the abstract state of a given statement. \
@@ -529,7 +540,7 @@ let descr =
 
 let () = Request.register ~package
   ~kind:`GET ~name:"evalTerm" ~descr:(Markdown.plain descr)
-  ~input:(module EvalTermInput) ~output:(module Data.Jstring)
+  ~input:(module EvalTermInput) ~output:(module EvalTermOutput)
   evaluate_term
 
 
