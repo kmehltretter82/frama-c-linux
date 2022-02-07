@@ -79,7 +79,7 @@ let get kf =
   if Users.is_computed () then
     find kf
   else begin
-    if Db.Value.is_computed () then begin
+    if Eva.Analysis.is_computed () then begin
       feedback "requiring again the computation of the value analysis";
       Project.clear
         ~selection:(State_selection.with_dependencies Db.Value.self)
@@ -87,7 +87,7 @@ let get kf =
     end else
       feedback ~level:2 "requiring the computation of the value analysis";
     add_value_hook ();
-    !Db.Value.compute ();
+    Eva.Analysis.compute ();
     find kf
   end
 
