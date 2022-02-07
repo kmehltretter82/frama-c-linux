@@ -31,5 +31,17 @@ int main() {
     free(s);
   }
 
+  if (nondet) {
+    // Test fmemopen, and that the resulting stream can be used.
+    char mode[3] = {0};
+    if (nondet) mode[0] = 'w';
+    if (nondet) mode[1] = '+';
+    stream = fmemopen(NULL, 3 * sizeof(int), mode);
+    if (!stream) return 1;
+    int arr[3] = {42, 10, 1};
+    int r = fwrite(arr, sizeof(int), 3, stream);
+    //@ assert r <= 3;
+  }
+
   return 0;
 }

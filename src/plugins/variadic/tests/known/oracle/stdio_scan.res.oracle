@@ -14,7 +14,7 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:548: 
   Declaration of variadic function dprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:590: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:608: 
   Declaration of variadic function asprintf.
 [variadic] stdio_scan.c:10: Warning: 
   Call to function fscanf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.

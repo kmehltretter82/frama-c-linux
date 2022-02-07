@@ -6728,6 +6728,8 @@ extern int pclose(FILE *stream);
 
 ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 
+FILE *fmemopen(void * restrict buf, size_t size, char const * restrict mode);
+
 int asprintf(char **strp, char const *fmt, void * const *__va_params);
 
 FILE __fc_initial_stdout =
@@ -6739,6 +6741,43 @@ FILE *__fc_stderr = & __fc_initial_stderr;
 FILE __fc_initial_stdin =
   {.__fc_FILE_id = (unsigned int)0, .__fc_FILE_data = 0U};
 FILE *__fc_stdin = & __fc_initial_stdin;
+/*@ requires valid_mode: valid_read_string(mode); */
+static _Bool is_valid_mode(char const *mode)
+{
+  _Bool __retres;
+  if (! ((int)*(mode + 0) != 'r')) 
+    if (! ((int)*(mode + 0) != 'w')) 
+      if (! ((int)*(mode + 0) != 'a')) {
+        __retres = (_Bool)0;
+        goto return_label;
+      }
+  if (! *(mode + 1)) {
+    __retres = (_Bool)1;
+    goto return_label;
+  }
+  if (! ((int)*(mode + 1) != 'b')) 
+    if (! ((int)*(mode + 1) != '+')) {
+      __retres = (_Bool)0;
+      goto return_label;
+    }
+  if (! *(mode + 2)) {
+    __retres = (_Bool)1;
+    goto return_label;
+  }
+  if ((int)*(mode + 2) == (int)*(mode + 1)) {
+    __retres = (_Bool)0;
+    goto return_label;
+  }
+  else 
+    if (! ((int)*(mode + 2) != 'b')) 
+      if (! ((int)*(mode + 2) != '+')) {
+        __retres = (_Bool)0;
+        goto return_label;
+      }
+  __retres = (_Bool)(! *(mode + 3));
+  return_label: return __retres;
+}
+
 ssize_t getline(char **lineptr, size_t *n, FILE *stream)
 {
   ssize_t __retres;
@@ -6863,6 +6902,72 @@ int asprintf(char **strp, char const *fmt, void * const *__va_params)
   Frama_C_make_unknown(*strp,len - 1U);
   *(*strp + (len - 1U)) = (char)0;
   __retres = (int)len;
+  return_label: return __retres;
+}
+
+/*@ requires
+      valid_or_null_buff:
+        buf ≡ \null ∨ \valid((char *)buf + (0 .. size - 1));
+    requires valid_mode: valid_read_string(mode);
+    ensures
+      result_error_or_valid:
+        \result ≡ \null ∨ \result ∈ &__fc_fopen[0 .. 16 - 1];
+    ensures
+      errno_set:
+        __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ∈ {22, 24, 12};
+    assigns __fc_errno, \result;
+    assigns __fc_errno
+      \from (indirect: buf), (indirect: size),
+            (indirect: *(mode + (0 .. strlen{Old}(mode))));
+    assigns \result
+      \from __fc_p_fopen, (indirect: buf), (indirect: size),
+            (indirect: *(mode + (0 .. strlen{Old}(mode))));
+    allocates \old(buf);
+ */
+FILE *fmemopen(void * restrict buf, size_t size, char const * restrict mode)
+{
+  FILE *__retres;
+  _Bool tmp;
+  int tmp_1;
+  int tmp_2;
+  tmp = is_valid_mode(mode);
+  if (! tmp) {
+    __fc_errno = 22;
+    __retres = (FILE *)0;
+    goto return_label;
+  }
+  if (! buf) {
+    if (size == (size_t)0) {
+      int tmp_0;
+      tmp_0 = Frama_C_interval(0,1);
+      if (tmp_0) {
+        __fc_errno = 22;
+        __retres = (FILE *)0;
+        goto return_label;
+      }
+    }
+    if ((int)*(mode + 1) != '+') 
+      if (*(mode + 1)) 
+        if ((int)*(mode + 2) != '+') {
+          __fc_errno = 22;
+          __retres = (FILE *)0;
+          goto return_label;
+        }
+    buf = malloc(size);
+    if (! buf) {
+      __fc_errno = 12;
+      __retres = (FILE *)0;
+      goto return_label;
+    }
+  }
+  tmp_1 = Frama_C_interval(0,1);
+  if (tmp_1) {
+    __fc_errno = 24;
+    __retres = (FILE *)0;
+    goto return_label;
+  }
+  tmp_2 = Frama_C_interval(0,16 - 1);
+  __retres = & __fc_fopen[tmp_2];
   return_label: return __retres;
 }
 

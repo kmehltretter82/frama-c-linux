@@ -21,6 +21,7 @@
 /**************************************************************************/
 
 #include "__fc_builtin.h"
+#include "stdbool.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "stdint.h" // for SIZE_MAX
@@ -36,6 +37,26 @@ FILE * __fc_stderr = &__fc_initial_stderr;
 
 FILE __fc_initial_stdin = {.__fc_FILE_id=0}; 
 FILE * __fc_stdin = &__fc_initial_stdin;
+
+// Returns 1 iff mode contains a valid mode string for fopen() and
+// related functions; that is, one of the following:
+// "r","w","a","rb","wb","ab","r+","w+","a+",
+// "rb+","r+b","wb+","w+b","ab+","a+b".
+/*@
+  requires valid_mode: valid_read_string(mode);
+ */
+static bool is_valid_mode(char const *mode) {
+  if (!(mode[0] != 'r' || mode[0] != 'w' || mode[0] != 'a')) return false;
+  // single-char mode string; ok
+  if (!mode[1]) return true;
+  // two- or three-char mode string
+  if (!(mode[1] != 'b' || mode[1] != '+')) return false;
+  // two-char mode string; ok
+  if (!mode[2]) return true;
+  if (mode[2] == mode[1] || !(mode[2] != 'b' || mode[2] != '+')) return false;
+  // a three-char mode string is ok; everything else is not
+  return !mode[3];
+}
 
 // inefficient but POSIX-conforming implementation of getline
 ssize_t getline(char **lineptr, size_t *n, FILE *stream) {
@@ -111,5 +132,43 @@ int asprintf(char **strp, const char *fmt, ...) {
   return len;
 }
 
+// TODO: this stub does not ensure that, when fclose is called on the
+// stream, the memory allocated here will be freed.
+// (there is currently no metadata field in FILE for this information).
+FILE *fmemopen(void *restrict buf, size_t size,
+               const char *restrict mode) {
+  if (!is_valid_mode(mode)) {
+    errno = EINVAL;
+    return NULL;
+  }
+  if (!buf) {
+    if (size == 0) {
+      // Some implementations may not support this; non-deterministically
+      // return an error
+      if (Frama_C_interval(0, 1)) {
+        errno = EINVAL;
+        return NULL;
+      }
+    }
+    if (mode[1] != '+' && (mode[1] && mode[2] != '+')) {
+      // null buffer requires an update ('+') mode
+      errno = EINVAL;
+      return NULL;
+    }
+    buf = malloc(size);
+    if (!buf) {
+      errno = ENOMEM;
+      return NULL;
+    }
+  }
+  // Code to emulate a possible exhaustion of open streams; there is currently
+  // no metadata in the FILE structure to indicate when a stream is available.
+  if (Frama_C_interval(0, 1)) {
+    // emulate 'too many open streams'
+    errno = EMFILE;
+    return NULL;
+  }
+  return &__fc_fopen[Frama_C_interval(0, __FC_FOPEN_MAX-1)];
+}
 
 __POP_FC_STDLIB
