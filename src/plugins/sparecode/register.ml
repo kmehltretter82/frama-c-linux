@@ -35,7 +35,7 @@ module Result =
     (struct
       let name = "Sparecode"
       let size = 7
-      let dependencies = [ Ast.self; Db.Value.self ] (* delayed, see below *)
+      let dependencies = [ Ast.self; Eva.Analysis.self ] (* delayed, see below *)
     end)
 
 let () =
