@@ -106,19 +106,21 @@ class occurrence = object (self)
 
   method! vlval lv =
     let ki = self#current_kinstr in
-    if Db.Value.is_accessible ki then begin
-      let z = !Db.Value.lval_to_zone ki lv in
-      try
-        Locations.Zone.fold_topset_ok
-          (fun b _ () ->
-             match b with
-             | Base.Var (vi, _) | Base.Allocated (vi, _, _) ->
-               Occurrences.add vi self#current_kf ki lv
-             | _ -> ()
-          ) z ()
-      with Abstract_interp.Error_Top ->
-        error ~current:true "Found completely imprecise value (%a). Ignoring@."
-          Printer.pp_lval lv
+    begin
+      match Eva.Results.(before_kinstr ki |> eval_address lv |> as_zone) with
+      | Result.Error _ -> (* ignore *) ()
+      | Ok z ->
+        try
+          Locations.Zone.fold_topset_ok
+            (fun b _ () ->
+               match b with
+               | Base.Var (vi, _) | Base.Allocated (vi, _, _) ->
+                 Occurrences.add vi self#current_kf ki lv
+               | _ -> ()
+            ) z ()
+        with Abstract_interp.Error_Top ->
+          error ~current:true "Found completely imprecise value (%a). Ignoring@."
+            Printer.pp_lval lv
     end;
     DoChildren
 
@@ -135,7 +137,7 @@ class occurrence = object (self)
     Db.yield ();
     super#vstmt_aux s
 
-  initializer !Db.Value.compute ()
+  initializer Eva.Analysis.compute ()
 
 end
 
