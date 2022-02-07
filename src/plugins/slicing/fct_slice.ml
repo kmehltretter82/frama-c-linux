@@ -55,8 +55,8 @@ let exists_fun_callers fpred kf =
     else begin
       table := Kernel_function.Set.add kf !table ;
       List.exists
-        (fun (kf,_) -> exists_fun_callers kf)
-        (!Db.Value.callers kf)
+        (fun kf -> exists_fun_callers kf)
+        (Eva.Results.callers kf)
     end
   in
   exists_fun_callers kf
@@ -146,16 +146,7 @@ end = struct
 
   let indirectly_called_src_functions call_id =
     let _, stmt = call_id in
-    let funcexp = match stmt.skind with
-      | Instr (Call (_,funcexp,_,_)) -> funcexp
-      | Instr (Local_init (_, ConsInit (f, _, _), _)) -> Cil.evar f
-      | _ -> assert false
-    in
-    let _, called_functions =
-      !Db.Value.expr_to_kernel_function
-        (Kstmt stmt) ~deps:(Some Locations.Zone.bottom) funcexp
-    in
-    Kernel_function.Hptset.elements called_functions
+    Eva.Results.callee stmt
 
   (** [call_id] is a call to [g] in [f].
    * we don't want [f] to call [g] anymore, so we have to update [g] [called_by]
@@ -1463,12 +1454,12 @@ let merge_fun_callers get_list get_value merge is_top acc kf =
           raise StopMerging (* acceleration when top is reached *)
       in
       let rec merge_fun_callers kf =
-        let merge_fun_caller (kf,_) = merge_fun_callers kf in
+        let merge_fun_caller kf = merge_fun_callers kf in
         let vf = Kernel_function.get_vi kf in
         if not (Cil_datatype.Varinfo.Set.mem vf !table) then begin
           table := Cil_datatype.Varinfo.Set.add vf !table ;
           List.iter (fun x -> merge (get_value x)) (get_list kf) ;
-          List.iter merge_fun_caller (!Db.Value.callers kf)
+          List.iter merge_fun_caller (Eva.Results.callers kf)
         end
         (*  else no way to add something, the [kf] contribution is already
             accumulated. *)

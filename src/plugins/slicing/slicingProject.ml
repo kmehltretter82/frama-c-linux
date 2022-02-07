@@ -222,13 +222,13 @@ let apply_appli_crit appli_crit =
   match appli_crit with
   | T.CaCall fi_to_call ->
     let kf_to_call = M.get_fi_kf fi_to_call in
-    let add_actions actions (kf_caller,_) =
+    let add_actions actions kf_caller =
       let fi_caller = M.get_kf_fi kf_caller in
       let mark = SlicingMarks.mk_user_spare in
       let action =
         SlicingActions.mk_crit_mark_calls fi_caller kf_to_call mark in
       action :: actions
-    in List.fold_left add_actions [] (!Db.Value.callers kf_to_call)
+    in List.fold_left add_actions [] (Eva.Results.callers kf_to_call)
   | _ ->
     SlicingParameters.not_yet_implemented
       "This slicing criterion on application"

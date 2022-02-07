@@ -234,7 +234,7 @@ module Visibility (SliceName : sig
   let annotation_visible ff_opt stmt annot =
     SlicingParameters.debug ~current:true ~level:2
       "[SlicingTransform.Visibility.annotation_visible] ?";
-    Db.Value.is_reachable_stmt stmt &&
+    Eva.Results.is_reachable stmt &&
     Alarms.find annot = None && (* Always drop alarms: the alarms table
                                    in the new project is not synchronized *)
     match ff_opt with
