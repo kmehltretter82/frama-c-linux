@@ -135,7 +135,7 @@
 [eva:libc:unsupported-spec] stdio_h.c:52: Warning: 
   The specification of function 'asprintf' is currently not supported by Eva.
   Consider adding 'FRAMAC_SHARE/libc/stdio.c' to the analyzed source files.
-[eva] stdio_h.c:52: Warning: ignoring unsupported \allocates clause
+[eva] stdio_h.c:52: Warning: ignoring unsupported allocates clause
 [eva] stdio_h.c:52: 
   function asprintf: precondition 'valid_strp' got status valid.
 [eva] stdio_h.c:52: 
@@ -157,7 +157,7 @@
 [eva:libc:unsupported-spec] stdio_h.c:58: Warning: 
   The specification of function 'fmemopen' is currently not supported by Eva.
   Consider adding 'FRAMAC_SHARE/libc/stdio.c' to the analyzed source files.
-[eva] stdio_h.c:58: Warning: ignoring unsupported \allocates clause
+[eva] stdio_h.c:58: Warning: ignoring unsupported allocates clause
 [eva] stdio_h.c:58: 
   function fmemopen: precondition 'valid_or_null_buff' got status valid.
 [eva] stdio_h.c:58: 

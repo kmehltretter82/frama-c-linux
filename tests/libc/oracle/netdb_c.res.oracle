@@ -186,7 +186,7 @@
 [eva] computing for function freeaddrinfo <- main.
   Called from netdb_c.c:61.
 [eva] using specification for function freeaddrinfo
-[eva] netdb_c.c:61: Warning: ignoring unsupported \allocates clause
+[eva] netdb_c.c:61: Warning: ignoring unsupported allocates clause
 [eva] netdb_c.c:61: 
   function freeaddrinfo: precondition 'addrinfo_valid' got status valid.
 [eva] Done for function freeaddrinfo
