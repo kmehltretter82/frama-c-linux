@@ -64,6 +64,14 @@ let compute_new_data old_zone l_zone l_dpds exact r_dpds =
     (true, zone)
   else (false, old_zone)
 
+let get_lval_zones ~for_writing stmt lval =
+  let state = Db.Value.get_stmt_state stmt in
+  let dpds, zone, exact =
+    !Db.Value.lval_to_zone_with_deps_state
+      state ~deps:(Some Locations.Zone.bottom) ~for_writing lval
+  in
+  dpds, exact, zone
+
 (* the call result can be processed like a normal assignment *)
 let process_call_res data stmt lvaloption froms =
   let data = match lvaloption with
@@ -73,7 +81,7 @@ let process_call_res data stmt lvaloption froms =
       let r_dpds = Function_Froms.Memory.collapse_return ret_dpds in
       let r_dpds = Function_Froms.Deps.to_zone r_dpds in
       let l_dpds, exact, l_zone =
-        Datascope.get_lval_zones ~for_writing:true  stmt lval in
+        get_lval_zones ~for_writing:true  stmt lval in
       compute_new_data data l_zone l_dpds exact r_dpds
   in data
 
@@ -144,20 +152,21 @@ let process_one_call data stmt lvaloption froms =
   used, data
 
 let process_call data_after stmt lvaloption funcexp args _loc =
-  let funcexp_dpds, called_functions =
-    !Db.Value.expr_to_kernel_function
-      (Kstmt stmt) ~deps:(Some Data.bottom) funcexp
+  let funcexp_dpds = Eva.Results.(before stmt |> expr_deps funcexp)
+  and called_functions =
+    Eva.Results.(before stmt |> eval_callee funcexp) |>
+    Result.value ~default:[]
   in
   let used, data =
     try
       let froms = !Db.From.Callwise.find (Kstmt stmt) in
       process_one_call data_after stmt lvaloption froms
     with Not_found -> (* don't have callwise (-calldeps option) *)
-      let do_call kf acc =
+      let do_call acc kf =
         (* notice that we use the same old data for each possible call *)
         (process_one_call data_after stmt lvaloption (!Db.From.get kf))::acc
       in
-      let l = Kernel_function.Hptset.fold do_call called_functions [] in
+      let l = List.fold_left do_call [] called_functions in
       (* in l, we have one result for each possible function called *)
       List.fold_left
         (fun (acc_u,acc_d) (u,d) -> (acc_u || u), Data.merge acc_d d)
@@ -167,10 +176,9 @@ let process_call data_after stmt lvaloption funcexp args _loc =
   if used then
     let data =
       (* no problem of order because parameters are disjoint for sure *)
-      Kernel_function.Hptset.fold
-        (fun kf data -> process_call_args data kf stmt args)
-        called_functions
-        data
+      List.fold_left
+        (fun data kf -> process_call_args data kf stmt args)
+        data called_functions
     in
     let data =  Data.merge funcexp_dpds data in
     used, data
@@ -213,7 +221,7 @@ module Computer (Param:sig val states : Ctx.t end) = struct
 
   let do_assign stmt lval exp data =
     let l_dpds, exact, l_zone =
-      Datascope.get_lval_zones ~for_writing:true stmt lval in
+      get_lval_zones ~for_writing:true stmt lval in
     let r_dpds = Data.exp_zone stmt exp in
     let used, data = compute_new_data data l_zone l_dpds exact r_dpds in
     let _ = if used then add_used_stmt stmt in
@@ -299,7 +307,7 @@ let compute_ctrl_info pdg ctrl_part used_stmts =
 let compute kf stmt lval =
   let f = Kernel_function.get_definition kf in
   let dpds, _exact, zone =
-    Datascope.get_lval_zones ~for_writing:false stmt lval in
+    get_lval_zones ~for_writing:false stmt lval in
   let zone = Data.merge dpds zone in
   debug1 "[zones] build for %a before %d in %a@\n"
     Data.pretty zone stmt.sid Kernel_function.pretty kf;
