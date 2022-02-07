@@ -807,7 +807,7 @@ end
 let get_internal =
   Internals.memo
     (fun kf ->
-       !Db.Value.compute ();
+       Eva.Analysis.compute ();
        try Internals.find kf (* The results may have been computed by the call
                                 to Value.compute *)
        with
