@@ -47,8 +47,8 @@ let syntactic ?(libc=Metrics_parameters.Libc.get ()) () =
 let () = ValueCoverage.set_output_dependencies [Db.Value.self; Libc.self]
 
 let value ~libc () =
-  !Db.Value.compute ();
-  if Db.Value.is_computed () then begin
+  Eva.Analysis.compute ();
+  if Eva.Analysis.is_computed () then begin
     let cov_metrics = Metrics_coverage.compute ~libc in
     let cov_printer = new Metrics_coverage.semantic_printer ~libc cov_metrics in
     Metrics_parameters.result "%t" cov_printer#pp_value_coverage;
