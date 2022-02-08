@@ -3399,9 +3399,13 @@ let rec setOneInit this o preinit =
           let l = Array.length !pArray in
           if l <= idx then begin
             let growBy = max (max 32 (idx + 1 - l)) (l / 2) in
-            let newarray = Array.make (growBy + idx) NoInitPre in
-            Array.blit !pArray 0 newarray 0 l;
-            pArray := newarray
+            try
+              let newarray = Array.make (growBy + idx) NoInitPre in
+              Array.blit !pArray 0 newarray 0 l;
+              pArray := newarray
+            with Invalid_argument _ | Out_of_memory ->
+              Kernel.abort ~current:true
+                "array length too large for Frama-C: %d" (idx)
           end
         end;
         pMaxIdx, pArray

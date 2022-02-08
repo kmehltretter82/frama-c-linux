@@ -1,9 +1,9 @@
 [kernel] Parsing very_large_integers.c (with preprocessing)
-[kernel] very_large_integers.c:60: User Error: 
+[kernel] very_large_integers.c:70: User Error: 
   integer constant too large in expression -9999999999999999999U
-[kernel] very_large_integers.c:60: User Error: 
+[kernel] very_large_integers.c:70: User Error: 
   integer constant too large in expression 9999999999999999999U
-[kernel] very_large_integers.c:60: Failure: 
+[kernel] very_large_integers.c:70: Failure: 
   INDEX_RANGE initialization designator is not a valid constant
 [kernel] User Error: stopping on file "very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
