@@ -238,7 +238,7 @@
 [eva:libc:unsupported-spec] string_h.c:146: Warning: 
   The specification of function 'strdup' is currently not supported by Eva.
   Consider adding 'FRAMAC_SHARE/libc/string.c' to the analyzed source files.
-[eva] string_h.c:146: Warning: ignoring unsupported \allocates clause
+[eva] string_h.c:146: Warning: ignoring unsupported allocates clause
 [eva] string_h.c:146: 
   function strdup: precondition 'valid_string_s' got status valid.
 [eva] Done for function strdup
@@ -248,7 +248,7 @@
 [eva:libc:unsupported-spec] string_h.c:147: Warning: 
   The specification of function 'strndup' is currently not supported by Eva.
   Consider adding 'FRAMAC_SHARE/libc/string.c' to the analyzed source files.
-[eva] string_h.c:147: Warning: ignoring unsupported \allocates clause
+[eva] string_h.c:147: Warning: ignoring unsupported allocates clause
 [eva] string_h.c:147: 
   function strndup: precondition 'valid_string_s' got status valid.
 [eva] Done for function strndup

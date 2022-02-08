@@ -45,14 +45,17 @@ int main() {
   fpos_t pos;
   fgetpos(f, &pos);
   fsetpos(f, &pos);
-
   int res_fclose = fclose(f);
 
-  char *s;
-  r = asprintf(&s, "bla %s", 42);
-  if (r == -1) return 1;
-  printf("%s", s);
-  free(s);
+  if (nondet) {
+    char *s;
+    r = asprintf(&s, "bla %s", 42);
+    if (r == -1) return 1;
+    printf("%s", s);
+    free(s);
+  }
+
+  fmemopen(0, 1, "w+"); // test to check that Eva emits warning about stdio.c
 
   return 0;
 }

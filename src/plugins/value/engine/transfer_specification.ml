@@ -489,7 +489,7 @@ module Make
           let vi = Kernel_function.get_vi kf in
           if not (Cil.hasAttribute "FC_BUILTIN" vi.vattr) then
             Value_parameters.warning ~current:true ~once:true
-              "ignoring unsupported \\allocates clause"
+              "ignoring unsupported allocates clause"
       ) behaviors
 
   (* Sound over-approximations of the effects of a function can be computed

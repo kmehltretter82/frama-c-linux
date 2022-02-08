@@ -8,6 +8,7 @@
   \return(fgets) == 0 (auto)
   \return(gets) == 0 (auto)
   \return(popen) == 0 (auto)
+  \return(fmemopen) == 0 (auto)
   \return(seed48) == 0 (auto)
   \return(calloc) == 0 (auto)
   \return(malloc) == 0 (auto)
@@ -185,7 +186,7 @@
 [eva] computing for function freeaddrinfo <- main.
   Called from netdb_c.c:61.
 [eva] using specification for function freeaddrinfo
-[eva] netdb_c.c:61: Warning: ignoring unsupported \allocates clause
+[eva] netdb_c.c:61: Warning: ignoring unsupported allocates clause
 [eva] netdb_c.c:61: 
   function freeaddrinfo: precondition 'addrinfo_valid' got status valid.
 [eva] Done for function freeaddrinfo

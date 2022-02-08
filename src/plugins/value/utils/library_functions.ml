@@ -74,6 +74,7 @@ let unsupported_specifications =
   [
     "asprintf", "stdio.c";
     "canonicalize_path_name", "stdlib.c";
+    "fmemopen", "stdio.c";
     "getaddrinfo", "netdb.c";
     "getenv", "stdlib.c";
     "getline", "stdio.c";
