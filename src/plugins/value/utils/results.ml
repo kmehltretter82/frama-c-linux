@@ -511,6 +511,14 @@ struct
     in
     req |> as_cvalue_model |>
     Result.fold ~error:(fun _ -> Locations.Zone.bottom) ~ok:compute_deps
+
+  let address_deps lval req =
+    let compute_deps cvalue =
+      Register.eval_deps_addr (cvalue, Locals_scoping.bottom ()) lval
+    in
+    req |> as_cvalue_model |>
+    Result.fold ~error:(fun _ -> Locations.Zone.bottom) ~ok:compute_deps
+
 end
 
 
@@ -553,6 +561,10 @@ let expr_deps exp req =
 let lval_deps lval req =
   let module E = Make () in
   E.lval_deps lval req
+
+let address_deps lval req =
+  let module E = Make () in
+  E.address_deps lval req
 
 
 (* Evaluation *)

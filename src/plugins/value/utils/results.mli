@@ -72,8 +72,9 @@ val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
 val as_cvalue_model : request -> Cvalue.Model.t result
 
 (* Dependencies *)
-val expr_deps : Cil_types.exp -> request -> Locations.Zone.t
-val lval_deps : Cil_types.lval -> request -> Locations.Zone.t
+val expr_deps : Cil_types.exp -> request -> Locations.Zone.t (* The zone of bits read to evaluate the expression, including adresses computation *)
+val lval_deps : Cil_types.lval -> request -> Locations.Zone.t (* The zone of bits read to evaluate the lvalue, including lvalue zone itself *)
+val address_deps : Cil_types.lval -> request -> Locations.Zone.t (* The zone of bits read to evaluate the lvalue, excluding the lvalue zone itself *)
 
 (* Evaluation *)
 val eval_var : Cil_types.varinfo -> request -> value evaluation
