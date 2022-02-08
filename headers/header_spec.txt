@@ -395,6 +395,8 @@ src/kernel_internals/parsing/logic_lexer.mll: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_parser.mly: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_preprocess.mli: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_preprocess.mll: CEA_INRIA_LGPL
+src/kernel_internals/parsing/parse_env.ml: CEA_LGPL
+src/kernel_internals/parsing/parse_env.mli: CEA_LGPL
 src/kernel_internals/runtime/README.md: .ignore
 src/kernel_internals/runtime/boot.ml: CEA_LGPL
 src/kernel_internals/runtime/boot.mli: CEA_LGPL
