@@ -19,14 +19,38 @@ module Analysis: sig
 end
 
 module Results: sig
-  (* Usage sketch :
+  (** Eva's result API is a work-in-progress interface to allow accessing the
+      analysis results once its completed. It is experimental and is very likely
+      to change in the future. It aims at replacing [Db.Value] but does not
+      completely covers all its usages yet. As for now, this interface as some
+      advantages over Db's :
   
-     Eva.Results.(before stmt |> in_callstack cs |> eval_var vi |> as_int |> value ~default:0)
+      - evaluations uses every available domains and not only Cvalue ;
+      - the caller may distinguish failure cases when a request is unsucessful ;
+      - working with callstacks is easy ;
+      - some common shortcuts are provided (e.g. for extracting ival directly) ;
+      - overall, individual functions are simpler.
   
-     or, if you prefer
+      The idea behind this API is that requests must be decomposed in several
+      steps. For instance, to evaluate an expression :
   
-     Eva.Results.(as_int (eval_var vi (in_callstack cs (before stmt))))
+      1. first, you have to state where you want to evaluate it,
+      2. optionally, you may specify in which callstack,
+      3. you choose the expression to evaluate,
+      4. you require a destination type to evaluate into.
+  
+      Usage sketch :
+  
+      Eva.Results.(
+        before stmt |> in_callstack cs |>
+        eval_var vi |> as_int |> default 0)
+  
+      or equivalently, if you prefer
+  
+      Eva.Results.(
+        default O (as_int (eval_var vi (in_callstack cs (before stmt))))
   *)
+  
   
   type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
   
@@ -39,99 +63,182 @@ module Results: sig
   type error = Bottom | Top | DisabledDomain
   type 'a result = ('a,error) Result.t
   
+  (** Results handling *)
+  
+  (** Translates an error to a human readable string. *)
   val string_of_error : error -> string
+  (** Pretty printer for errors. *)
   val pretty_error : Format.formatter -> error -> unit
+  (** Pretty printer for API's results. *)
   val pretty_result : (Format.formatter -> 'a -> unit) ->
     Format.formatter -> 'a result -> unit
   
-  (* Control point selection *)
-  val at_start : request
-  val at_end : request
-  val at_start_of : Cil_types.kernel_function -> request
-  val at_end_of : Cil_types.kernel_function -> request
-  val before : Cil_types.stmt -> request
-  val after : Cil_types.stmt -> request
-  val before_kinstr : Cil_types.kinstr -> request
-  val after_kinstr : Cil_types.kinstr -> request
-  
-  (* Callstack selection *)
-  val in_callstack : callstack -> request -> request
-  val in_callstacks : callstack list -> request -> request
-  val filter_callstack : (callstack -> bool) -> request -> request
-  
-  (* Working with callstacks *)
-  val callstacks : request -> callstack list
-  val by_callstack : request -> (callstack * request) list
-  val iter_callstacks : (callstack -> request -> unit) -> request -> unit
-  val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
-  
-  (* State requests *)
-  val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
-  val as_cvalue_model : request -> Cvalue.Model.t result
-  
-  (* Dependencies *)
-  val expr_deps : Cil_types.exp -> request -> Locations.Zone.t (* The zone of bits read to evaluate the expression, including adresses computation *)
-  val lval_deps : Cil_types.lval -> request -> Locations.Zone.t (* The zone of bits read to evaluate the lvalue, including lvalue zone itself *)
-  val address_deps : Cil_types.lval -> request -> Locations.Zone.t (* The zone of bits read to evaluate the lvalue, excluding the lvalue zone itself *)
-  
-  (* Evaluation *)
-  val eval_var : Cil_types.varinfo -> request -> value evaluation
-  val eval_lval : Cil_types.lval -> request -> value evaluation
-  val eval_exp : Cil_types.exp -> request -> value evaluation
-  
-  val eval_address : Cil_types.lval -> request -> address evaluation
-  
-  (* Returns the kernel functions into which the given expression may evaluate.
-     If the callee expression doesn't always evaluate to a function, those
-     spurious values are ignored. If it always evaluate to a non-function value
-     then the returned list is empty.
-     Raises [Stdlib.Invalid_argument] if the callee expression is not an lvalue
-     without offset.
-     Also see [callee] for a function which applies directly on Call
-     statements *)
-  val eval_callee : Cil_types.exp -> request -> Kernel_function.t list result
-  
-  (* Value conversion *)
-  val as_int : value evaluation -> int result
-  val as_integer : value evaluation -> Integer.t result
-  val as_float : value evaluation -> float result
-  val as_ival : value evaluation -> Ival.t result
-  val as_fval : value evaluation -> Fval.t result
-  val as_cvalue : value evaluation -> Cvalue.V.t result
-  
-  val as_location : address evaluation -> Locations.location result
-  val as_zone : ?access:Locations.access -> address evaluation ->
-    Locations.Zone.t result
-  
-  (* Evaluation properties *)
-  val is_initialized : value evaluation -> bool
-  val alarms : 'a evaluation -> Alarms.t list
-  
-  (* Reachability *)
-  val is_empty : request -> bool
-  val is_bottom : 'a evaluation -> bool
-  val is_called : Cil_types.kernel_function -> bool (* called during the analysis, not by the actual program *)
-  val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by the actual program *)
-  val is_reachable_kinstr : Cil_types.kinstr -> bool
-  
-  (* Callers / Callees / Callsites *)
-  val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
-  val callsites : Cil_types.kernel_function ->
-    (Cil_types.kernel_function * Cil_types.stmt list) list
-  
-  (* Returns the kernel functions called in the given statement.
-     If the callee expression doesn't always evaluate to a function, those
-     spurious values are ignored. If it always evaluate to a non-function value
-     then the returned list is empty.
-     Raises [Stdlib.Invalid_argument] if the statement is not a [Call]
-     instruction or a [Local_init] with [ConsInit] initializer. *)
-  val callee : Cil_types.stmt -> Kernel_function.t list
-  
-  (* Result conversion *)
-  (** [default d r] extract the value of r if r is Ok or use the default value d
+  (** [default d r] extracts the value of r if r is Ok or use the default value d
       otherwise.
       Equivalent to [Result.value ~default:d r] *)
   val default : 'a -> 'a result -> 'a
+  
+  (** Control point selection *)
+  
+  (** At the begining of the analysis, but after the initialization of globals. *)
+  val at_start : request
+  (** At the end of the analysis, after the main function has returned. *)
+  val at_end : request
+  (** At the start of the given function. *)
+  val at_start_of : Cil_types.kernel_function -> request
+  (** At the end of the given function. *)
+  val at_end_of : Cil_types.kernel_function -> request
+  (** Just before a statement is executed. *)
+  val before : Cil_types.stmt -> request
+  (** Just after a statement is executed. *)
+  val after : Cil_types.stmt -> request
+  (** Just before a statement or at the begining of analysis. *)
+  val before_kinstr : Cil_types.kinstr -> request
+  (** Just after a statement or at the end of analysis. *)
+  val after_kinstr : Cil_types.kinstr -> request
+  
+  
+  (** Callstack selection *)
+  
+  (** Only consider the given callstack. Replaces previous calls to [in_callstack]
+      or [in_callstacks]. *)
+  val in_callstack : callstack -> request -> request
+  (** Only consider all the callstacks in the given list. If previous calls to
+      [in_callstack] or [in_callstacks] were done, it takes the intersection. *)
+  val in_callstacks : callstack list -> request -> request
+  (** Only consider callstacks satisfying the given predicate. Several filters
+      can be added. If callstacks are also selected with [in_callstack] or
+      [in_callstacks], only the selected callstacks will be filtered. *)
+  val filter_callstack : (callstack -> bool) -> request -> request
+  
+  
+  (** Working with callstacks *)
+  
+  (** Retrieves the list of reachable callstacks from the given request. *)
+  val callstacks : request -> callstack list
+  (** Retrieves, a list of subrequest for each reachable callstack from
+      the given request. *)
+  val by_callstack : request -> (callstack * request) list
+  (** Iterate on the reachable callstacks from the request. *)
+  val iter_callstacks : (callstack -> request -> unit) -> request -> unit
+  (** Fold on the reachable callstacks from the request. *)
+  val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
+  
+  
+  (** State requests *)
+  
+  (** Returns the list of expressions which have been infered to be equal to
+      the given expression by the Equality domain. *)
+  val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
+  (** Returns the Cvalue model. *)
+  val as_cvalue_model : request -> Cvalue.Model.t result
+  
+  
+  (** Dependencies *)
+  
+  (** Computes (an overapproximation of) the zone of each bit that must be read to
+      evaluate the given expression, including all adresses computations. *)
+  val expr_deps : Cil_types.exp -> request -> Locations.Zone.t
+  (** Computes (an overapproximation of) the zone of each bit that must be read to
+      evaluate the given lvalue, including the lvalue zone itself. *)
+  val lval_deps : Cil_types.lval -> request -> Locations.Zone.t
+  (** Computes (an overapproximation of) the zone of each bit that must be read to
+      evaluate the given lvalue, excluding the lvalue zone itself. *)
+  val address_deps : Cil_types.lval -> request -> Locations.Zone.t
+  
+  
+  (** Evaluation *)
+  
+  (** Returns the variable's values infered by the analysis. *)
+  val eval_var : Cil_types.varinfo -> request -> value evaluation
+  (** Returns the lvalue's values infered by the analysis. *)
+  val eval_lval : Cil_types.lval -> request -> value evaluation
+  (** Returns the expression's values infered by the analysis. *)
+  val eval_exp : Cil_types.exp -> request -> value evaluation
+  
+  (** Returns the lvalue's addresses infered by the analysis. *)
+  val eval_address : Cil_types.lval -> request -> address evaluation
+  
+  (** Returns the kernel functions into which the given expression may evaluate.
+      If the callee expression doesn't always evaluate to a function, those
+      spurious values are ignored. If it always evaluate to a non-function value
+      then the returned list is empty.
+      Raises [Stdlib.Invalid_argument] if the callee expression is not an lvalue
+      without offset.
+      Also see [callee] for a function which applies directly on Call
+      statements. *)
+  val eval_callee : Cil_types.exp -> request -> Kernel_function.t list result
+  
+  
+  (** Evaluated values conversion *)
+  
+  (** In all the functions below, if Eva's infered value does not fit in the
+      required type, [Error Top] is returned, as Top is the only possible
+      over-approximation of the request. *)
+  
+  (** Convert into a singleton ocaml int *)
+  val as_int : value evaluation -> int result
+  (** Convert into a singleton unbounded integer *)
+  val as_integer : value evaluation -> Integer.t result
+  (** Convert into a floating point number *)
+  val as_float : value evaluation -> float result
+  (** Convert into a C number abstraction *)
+  val as_ival : value evaluation -> Ival.t result
+  (** Convert into an floating point abstraction *)
+  val as_fval : value evaluation -> Fval.t result
+  (** Convert into a C value abstraction *)
+  val as_cvalue : value evaluation -> Cvalue.V.t result
+  
+  (** Convert into a C location abstraction *)
+  val as_location : address evaluation -> Locations.location result
+  (** Convert into a Zone *)
+  val as_zone : ?access:Locations.access -> address evaluation ->
+    Locations.Zone.t result
+  
+  
+  (** Evaluation properties *)
+  
+  (** Returns whether the evaluated value is initialized or not. If the value have
+      been evaluated from a Cil expression, it is always considered initialized.
+  *)
+  val is_initialized : value evaluation -> bool
+  (** Returns the set of alarms emitted during the evaluation. *)
+  val alarms : 'a evaluation -> Alarms.t list
+  
+  
+  (** Reachability *)
+  
+  (** Returns true if there are no reachable states for the given request. *)
+  val is_empty : request -> bool
+  (** Returns true if an evaluation ended to bottom, i.e. if the given expression
+      or lvalue cannot be evaluated to a valid result for the given request. *)
+  val is_bottom : 'a evaluation -> bool
+  (** Returns true if a function have been analyzed. *)
+  val is_called : Cil_types.kernel_function -> bool
+  (** Returns true if a statement have been reached by the analysis. *)
+  val is_reachable : Cil_types.stmt -> bool
+  (** Returns true if a statement have been reached by the analysis, or if
+      the main function have been analyzed for [Kglobal]. *)
+  val is_reachable_kinstr : Cil_types.kinstr -> bool
+  
+  
+  (*** Callers / Callees / Callsites *)
+  
+  (** Returns the list of infered callers of the given function. *)
+  val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
+  (** Returns the list of infered callers, and for each of them, the list
+      of callsites (the call statements) inside. *)
+  val callsites : Cil_types.kernel_function ->
+    (Cil_types.kernel_function * Cil_types.stmt list) list
+  
+  (** Returns the kernel functions called in the given statement.
+      If the callee expression doesn't always evaluate to a function, those
+      spurious values are ignored. If it always evaluate to a non-function value
+      then the returned list is empty.
+      Raises [Stdlib.Invalid_argument] if the statement is not a [Call]
+      instruction or a [Local_init] with [ConsInit] initializer. *)
+  val callee : Cil_types.stmt -> Kernel_function.t list
+  
 end
 
 module Value_results: sig
