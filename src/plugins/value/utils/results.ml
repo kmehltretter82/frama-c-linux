@@ -739,7 +739,7 @@ let is_reachable_kinstr kinstr =
 let callers kf =
   let f = function
     | [] | [_] -> None
-    | _ :: (kf,_) :: _-> Some kf
+    | _ :: (caller,_) :: _-> Some caller
   in
   at_start_of kf |> callstacks |>
   List.filter_map f |> List.sort_uniq Kernel_function.compare
@@ -750,8 +750,10 @@ let callsites kf =
   let module Map = Kernel_function.Map in
   let f acc = function
     | [] | (_,Cil_types.Kglobal) :: _ -> acc
-    | (kf,Kstmt stmt) :: _->
-      Map.update kf (fun old -> Some (stmt :: Option.value ~default:[] old)) acc
+    | [(_,Kstmt _)] -> assert false (* End of callstacks should have no callsite *)
+    | (_kf,Kstmt stmt) :: (caller,_) :: _ -> (* kf = _kf *)
+      Map.update caller
+        (fun old -> Some (stmt :: Option.value ~default:[] old)) acc
   in
   at_start_of kf |> callstacks |>
   List.fold_left f Map.empty |> Map.to_seq |> List.of_seq |>
