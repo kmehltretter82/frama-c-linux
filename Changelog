@@ -6,10 +6,11 @@
 # Mark "+": change for Frama-C-commits audience (not in html version).        #
 # Mark "*": bug fixed.                                                        #
 # Mark "!": change that can break compatibility with existing development.    #
-# '#nnn'   : BTS entry #nnn                                                   #
-# '#!nnn'  : BTS private entry #nnn                                           #
+# '##nnn'  : Public Gitlab (pub/frama-c) issue
 # '#@nnn'  : Gitlab frama-c/frama-c issue                                     #
 # For compatibility with old change log formats:                              #
+# '#nnn'   : BTS entry #nnn (OBSOLETE)                                        #
+# '#!nnn'  : BTS private entry #nnn  (OBSOLETE)                               #
 # '#?nnn'  : OLD-BTS entry #nnn                                               #
 ###############################################################################
 
