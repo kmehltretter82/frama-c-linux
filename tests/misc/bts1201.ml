@@ -1,7 +1,7 @@
 let main () =
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   Globals.set_entry_point "main2" false;
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
 ;;
 
 let () = Db.Main.extend main
