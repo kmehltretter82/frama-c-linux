@@ -45,6 +45,105 @@ void eacsl_print_values(eacsl_assert_data_t *data) {
   }
 }
 
+/*! Print the given integer to `stream` */
+void eacsl_print_int_content(FILE *stream,
+                             eacsl_assert_data_int_content_t *int_content) {
+  if (int_content->is_enum) {
+    fprintf(stream, "<enum> ");
+  }
+  switch (int_content->kind) {
+  case E_ACSL_IBOOL:
+    fprintf(stream, "%d", int_content->value.value_bool);
+    break;
+  case E_ACSL_ICHAR:
+    fprintf(stream, "%d", int_content->value.value_char);
+    break;
+  case E_ACSL_ISCHAR:
+    fprintf(stream, "%hhd", int_content->value.value_schar);
+    break;
+  case E_ACSL_IUCHAR:
+    fprintf(stream, "%hhu", int_content->value.value_uchar);
+    break;
+  case E_ACSL_IINT:
+    fprintf(stream, "%d", int_content->value.value_int);
+    break;
+  case E_ACSL_IUINT:
+    fprintf(stream, "%u", int_content->value.value_uint);
+    break;
+  case E_ACSL_ISHORT:
+    fprintf(stream, "%hd", int_content->value.value_short);
+    break;
+  case E_ACSL_IUSHORT:
+    fprintf(stream, "%hu", int_content->value.value_ushort);
+    break;
+  case E_ACSL_ILONG:
+    fprintf(stream, "%ld", int_content->value.value_long);
+    break;
+  case E_ACSL_IULONG:
+    fprintf(stream, "%lu", int_content->value.value_ulong);
+    break;
+  case E_ACSL_ILONGLONG:
+    fprintf(stream, "%lld", int_content->value.value_llong);
+    break;
+  case E_ACSL_IULONGLONG:
+    fprintf(stream, "%llu", int_content->value.value_ullong);
+    break;
+  case E_ACSL_IMPZ:
+    __gmp_fprintf(stream, "%Zd", int_content->value.value_mpz);
+    break;
+  }
+}
+
+/*! Print the given real to `stream`. */
+void eacsl_print_real_content(FILE *stream,
+                              eacsl_assert_data_real_content_t *real_content) {
+  switch (real_content->kind) {
+  case E_ACSL_RFLOAT:
+    fprintf(stream, "%e", real_content->value.value_float);
+    break;
+  case E_ACSL_RDOUBLE:
+    fprintf(stream, "%le", real_content->value.value_double);
+    break;
+  case E_ACSL_RLONGDOUBLE:
+    fprintf(stream, "%Le", real_content->value.value_ldouble);
+    break;
+  case E_ACSL_RMPQ:
+    __gmp_fprintf(stream, "%Qd", real_content->value.value_mpq);
+    break;
+  }
+}
+
+void eacsl_print_value_content(FILE *stream, eacsl_assert_data_value_t *value) {
+  switch (value->type) {
+  case E_ACSL_INT:
+    eacsl_print_int_content(stream, &value->content.int_content);
+    break;
+  case E_ACSL_REAL:
+    eacsl_print_real_content(stream, &value->content.real_content);
+    break;
+  case E_ACSL_PTR:
+    fprintf(stream, "%p", value->content.value_ptr);
+    break;
+  case E_ACSL_ARRAY:
+    fprintf(stream, "<array>, address: %p", value->content.value_array);
+    break;
+  case E_ACSL_FUN:
+    fprintf(stream, "<function>");
+    break;
+  case E_ACSL_STRUCT:
+    fprintf(stream, "<struct>");
+    break;
+  case E_ACSL_UNION:
+    fprintf(stream, "<union>");
+    break;
+  case E_ACSL_OTHER:
+    fprintf(stream, "<other>");
+    break;
+  default:
+    fprintf(stream, "<unknown>");
+  }
+}
+
 #ifndef E_ACSL_EXTERNAL_ASSERT
 
 /*! \brief Return `str` id `cond` is true, an empty string otherwise. */
@@ -117,125 +216,17 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
 #endif
 
 #ifndef E_ACSL_EXTERNAL_PRINT_VALUE
-void eacsl_print_int_content(const char *name,
-                             eacsl_assert_data_int_content_t *int_content) {
-  switch (int_content->kind) {
-  case E_ACSL_IBOOL:
-    fprintf(stderr, "\t- %s: %s%d\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_bool);
-    break;
-  case E_ACSL_ICHAR:
-    fprintf(stderr, "\t- %s: %s%d\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_char);
-    break;
-  case E_ACSL_ISCHAR:
-    fprintf(stderr, "\t- %s: %s%hhd\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_schar);
-    break;
-  case E_ACSL_IUCHAR:
-    fprintf(stderr, "\t- %s: %s%hhu\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_uchar);
-    break;
-  case E_ACSL_IINT:
-    fprintf(stderr, "\t- %s: %s%d\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_int);
-    break;
-  case E_ACSL_IUINT:
-    fprintf(stderr, "\t- %s: %s%u\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_uint);
-    break;
-  case E_ACSL_ISHORT:
-    fprintf(stderr, "\t- %s: %s%hd\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_short);
-    break;
-  case E_ACSL_IUSHORT:
-    fprintf(stderr, "\t- %s: %s%hu\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_ushort);
-    break;
-  case E_ACSL_ILONG:
-    fprintf(stderr, "\t- %s: %s%ld\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_long);
-    break;
-  case E_ACSL_IULONG:
-    fprintf(stderr, "\t- %s: %s%lu\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_ulong);
-    break;
-  case E_ACSL_ILONGLONG:
-    fprintf(stderr, "\t- %s: %s%lld\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_llong);
-    break;
-  case E_ACSL_IULONGLONG:
-    fprintf(stderr, "\t- %s: %s%llu\n", name,
-            int_content->is_enum ? "<enum> " : "",
-            int_content->value.value_ullong);
-    break;
-  case E_ACSL_IMPZ:
-    __gmp_fprintf(stderr, "\t- %s: %s%Zd\n", name,
-                  int_content->is_enum ? "<enum> " : "",
-                  int_content->value.value_mpz);
-    break;
-  }
-}
-
-void eacsl_print_real_content(const char *name,
-                              eacsl_assert_data_real_content_t *real_content) {
-  switch (real_content->kind) {
-  case E_ACSL_RFLOAT:
-    fprintf(stderr, "\t- %s: %e\n", name, real_content->value.value_float);
-    break;
-  case E_ACSL_RDOUBLE:
-    fprintf(stderr, "\t- %s: %le\n", name, real_content->value.value_double);
-    break;
-  case E_ACSL_RLONGDOUBLE:
-    fprintf(stderr, "\t- %s: %Le\n", name, real_content->value.value_ldouble);
-    break;
-  case E_ACSL_RMPQ:
-    __gmp_fprintf(stderr, "\t- %s: %Qd\n", name, real_content->value.value_mpq);
-    break;
-  }
-}
-
 void eacsl_print_value(eacsl_assert_data_value_t *value) {
-  switch (value->type) {
-  case E_ACSL_INT:
-    eacsl_print_int_content(value->name, &value->content.int_content);
-    break;
-  case E_ACSL_REAL:
-    eacsl_print_real_content(value->name, &value->content.real_content);
-    break;
-  case E_ACSL_PTR:
-    fprintf(stderr, "\t- %s: %p\n", value->name, value->content.value_ptr);
-    break;
-  case E_ACSL_ARRAY:
-    fprintf(stderr, "\t- %s: <array>\n\t\t- address: %p\n", value->name,
-            value->content.value_array);
-    break;
-  case E_ACSL_FUN:
-    fprintf(stderr, "\t- %s: <function>\n", value->name);
-    break;
-  case E_ACSL_STRUCT:
-    fprintf(stderr, "\t- %s: <struct>\n", value->name);
-    break;
-  case E_ACSL_UNION:
-    fprintf(stderr, "\t- %s: <union>\n", value->name);
-    break;
-  case E_ACSL_OTHER:
-    fprintf(stderr, "\t- %s: <other>\n", value->name);
-    break;
-  default:
-    fprintf(stderr, "\t- %s: <unknown>\n", value->name);
-    break;
+  fprintf(stderr, "\t- %s: ", value->name);
+  if (value->type == E_ACSL_ARRAY) {
+    // The function `eacsl_print_value_content()` prints the content of an array
+    // on one line to be more generic towards alternative implementation.
+    // For the default implementation we can override it to print something more
+    // consistent with the way the name of the value is printed.
+    fprintf(stderr, "<array>\n\t\t- address: %p", value->content.value_array);
+  } else {
+    eacsl_print_value_content(stderr, value);
   }
+  fprintf(stderr, "\n");
 }
 #endif
