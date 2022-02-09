@@ -938,6 +938,14 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     Toolbars.RegisterMode.emit(evalMode);
     return () => Toolbars.UnregisterMode.emit(evalMode);
   });
+  Dome.addMenuItem({
+    menu: 'Edit',
+    id: 'EvaluateMenu',
+    type: 'normal',
+    label: 'Evaluate',
+    key: 'Cmd+E',
+    onClick: () => evaluateEvent.emit(),
+  });
 }
 
 /* -------------------------------------------------------------------------- */
