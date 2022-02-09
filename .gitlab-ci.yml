@@ -61,7 +61,6 @@ wp-qualif:
    - nix/frama-ci.sh build -A frama-c.wp-qualif
   tags:
    - nix
-  allow_failure: true
 
 aorai-prove:
   stage: tests
