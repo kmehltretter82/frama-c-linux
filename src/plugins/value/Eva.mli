@@ -10,10 +10,10 @@ module Analysis: sig
       specified for the entry point using {!Db.Value.fun_set_args}, and
       an incorrect number of them is given.
       @plugin development guide *)
-  
+
   val is_computed : unit -> bool
   (** Return [true] iff the value analysis has been done. *)
-  
+
   val self : State.t
   (** Internal state of Eva analysis from projects viewpoint. *)
 end
@@ -24,47 +24,47 @@ module Results: sig
       to change in the future. It aims at replacing [Db.Value] but does not
       completely covers all its usages yet. As for now, this interface as some
       advantages over Db's :
-  
+
       - evaluations uses every available domains and not only Cvalue ;
       - the caller may distinguish failure cases when a request is unsucessful ;
       - working with callstacks is easy ;
       - some common shortcuts are provided (e.g. for extracting ival directly) ;
       - overall, individual functions are simpler.
-  
+
       The idea behind this API is that requests must be decomposed in several
       steps. For instance, to evaluate an expression :
-  
+
       1. first, you have to state where you want to evaluate it,
       2. optionally, you may specify in which callstack,
       3. you choose the expression to evaluate,
       4. you require a destination type to evaluate into.
-  
+
       Usage sketch :
-  
+
       Eva.Results.(
         before stmt |> in_callstack cs |>
         eval_var vi |> as_int |> default 0)
-  
+
       or equivalently, if you prefer
-  
+
       Eva.Results.(
         default O (as_int (eval_var vi (in_callstack cs (before stmt))))
   *)
-  
-  
+
+
   type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
-  
+
   type request
-  
+
   type value
   type address
   type 'a evaluation
-  
+
   type error = Bottom | Top | DisabledDomain
   type 'a result = ('a,error) Result.t
-  
+
   (** Results handling *)
-  
+
   (** Translates an error to a human readable string. *)
   val string_of_error : error -> string
   (** Pretty printer for errors. *)
@@ -72,14 +72,14 @@ module Results: sig
   (** Pretty printer for API's results. *)
   val pretty_result : (Format.formatter -> 'a -> unit) ->
     Format.formatter -> 'a result -> unit
-  
+
   (** [default d r] extracts the value of r if r is Ok or use the default value d
       otherwise.
       Equivalent to [Result.value ~default:d r] *)
   val default : 'a -> 'a result -> 'a
-  
+
   (** Control point selection *)
-  
+
   (** At the begining of the analysis, but after the initialization of globals. *)
   val at_start : request
   (** At the end of the analysis, after the main function has returned. *)
@@ -96,10 +96,10 @@ module Results: sig
   val before_kinstr : Cil_types.kinstr -> request
   (** Just after a statement or at the end of analysis. *)
   val after_kinstr : Cil_types.kinstr -> request
-  
-  
+
+
   (** Callstack selection *)
-  
+
   (** Only consider the given callstack. Replaces previous calls to [in_callstack]
       or [in_callstacks]. *)
   val in_callstack : callstack -> request -> request
@@ -110,10 +110,10 @@ module Results: sig
       can be added. If callstacks are also selected with [in_callstack] or
       [in_callstacks], only the selected callstacks will be filtered. *)
   val filter_callstack : (callstack -> bool) -> request -> request
-  
-  
+
+
   (** Working with callstacks *)
-  
+
   (** Retrieves the list of reachable callstacks from the given request. *)
   val callstacks : request -> callstack list
   (** Retrieves, a list of subrequest for each reachable callstack from
@@ -123,19 +123,19 @@ module Results: sig
   val iter_callstacks : (callstack -> request -> unit) -> request -> unit
   (** Fold on the reachable callstacks from the request. *)
   val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
-  
-  
+
+
   (** State requests *)
-  
+
   (** Returns the list of expressions which have been infered to be equal to
       the given expression by the Equality domain. *)
   val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
   (** Returns the Cvalue model. *)
   val as_cvalue_model : request -> Cvalue.Model.t result
-  
-  
+
+
   (** Dependencies *)
-  
+
   (** Computes (an overapproximation of) the zone of each bit that must be read to
       evaluate the given expression, including all adresses computations. *)
   val expr_deps : Cil_types.exp -> request -> Locations.Zone.t
@@ -145,20 +145,20 @@ module Results: sig
   (** Computes (an overapproximation of) the zone of each bit that must be read to
       evaluate the given lvalue, excluding the lvalue zone itself. *)
   val address_deps : Cil_types.lval -> request -> Locations.Zone.t
-  
-  
+
+
   (** Evaluation *)
-  
+
   (** Returns the variable's values infered by the analysis. *)
   val eval_var : Cil_types.varinfo -> request -> value evaluation
   (** Returns the lvalue's values infered by the analysis. *)
   val eval_lval : Cil_types.lval -> request -> value evaluation
   (** Returns the expression's values infered by the analysis. *)
   val eval_exp : Cil_types.exp -> request -> value evaluation
-  
+
   (** Returns the lvalue's addresses infered by the analysis. *)
   val eval_address : Cil_types.lval -> request -> address evaluation
-  
+
   (** Returns the kernel functions into which the given expression may evaluate.
       If the callee expression doesn't always evaluate to a function, those
       spurious values are ignored. If it always evaluate to a non-function value
@@ -168,14 +168,14 @@ module Results: sig
       Also see [callee] for a function which applies directly on Call
       statements. *)
   val eval_callee : Cil_types.exp -> request -> Kernel_function.t list result
-  
-  
+
+
   (** Evaluated values conversion *)
-  
+
   (** In all the functions below, if Eva's infered value does not fit in the
       required type, [Error Top] is returned, as Top is the only possible
       over-approximation of the request. *)
-  
+
   (** Convert into a singleton ocaml int *)
   val as_int : value evaluation -> int result
   (** Convert into a singleton unbounded integer *)
@@ -188,26 +188,26 @@ module Results: sig
   val as_fval : value evaluation -> Fval.t result
   (** Convert into a C value abstraction *)
   val as_cvalue : value evaluation -> Cvalue.V.t result
-  
+
   (** Convert into a C location abstraction *)
   val as_location : address evaluation -> Locations.location result
   (** Convert into a Zone *)
   val as_zone : ?access:Locations.access -> address evaluation ->
     Locations.Zone.t result
-  
-  
+
+
   (** Evaluation properties *)
-  
+
   (** Returns whether the evaluated value is initialized or not. If the value have
       been evaluated from a Cil expression, it is always considered initialized.
   *)
   val is_initialized : value evaluation -> bool
   (** Returns the set of alarms emitted during the evaluation. *)
   val alarms : 'a evaluation -> Alarms.t list
-  
-  
+
+
   (** Reachability *)
-  
+
   (** Returns true if there are no reachable states for the given request. *)
   val is_empty : request -> bool
   (** Returns true if an evaluation ended to bottom, i.e. if the given expression
@@ -220,17 +220,17 @@ module Results: sig
   (** Returns true if a statement have been reached by the analysis, or if
       the main function have been analyzed for [Kglobal]. *)
   val is_reachable_kinstr : Cil_types.kinstr -> bool
-  
-  
+
+
   (*** Callers / Callees / Callsites *)
-  
+
   (** Returns the list of infered callers of the given function. *)
   val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
   (** Returns the list of infered callers, and for each of them, the list
       of callsites (the call statements) inside. *)
   val callsites : Cil_types.kernel_function ->
     (Cil_types.kernel_function * Cil_types.stmt list) list
-  
+
   (** Returns the kernel functions called in the given statement.
       If the callee expression doesn't always evaluate to a function, those
       spurious values are ignored. If it always evaluate to a non-function value
@@ -238,12 +238,12 @@ module Results: sig
       Raises [Stdlib.Invalid_argument] if the statement is not a [Call]
       instruction or a [Local_init] with [ConsInit] initializer. *)
   val callee : Cil_types.stmt -> Kernel_function.t list
-  
+
 end
 
 module Value_results: sig
   type results
-  
+
   val get_results: unit -> results
   val set_results: results -> unit
   val merge: results -> results -> results
@@ -257,12 +257,12 @@ end
 module Value_parameters: sig
   (** Returns the list (name, descr) of currently enabled abstract domains. *)
   val enabled_domains: unit -> (string * string) list
-  
+
   (** [use_builtin kf name] instructs the analysis to use the builtin [name]
       to interpret calls to function [kf].
       Raises [Not_found] if there is no builtin of name [name]. *)
   val use_builtin: Cil_types.kernel_function -> string -> unit
-  
+
   (** [use_global_value_partitioning vi] instructs the analysis to use
       value partitioning on the global variable [vi]. *)
   val use_global_value_partitioning: Cil_types.varinfo -> unit
@@ -270,7 +270,7 @@ end
 
 module Eval_terms: sig
   type labels_states = Cvalue.Model.t Cil_datatype.Logic_label.Map.t
-  
+
   (** Evaluation environment. Currently available are function Pre and Post, or
       the environment to evaluate an annotation *)
   type eval_env
@@ -288,7 +288,7 @@ end
 module Unit_tests: sig
   (** Currently tested by this module:
       - semantics of sign values. *)
-  
+
   (** Runs some programmatic tests on Eva. *)
   val run: unit -> unit
 end
@@ -296,47 +296,47 @@ end
 module Eva_annotations: sig
   (** Register special annotations to locally guide the partitioning of states
       performed by an Eva analysis:
-  
+
       - slevel annotations: "slevel default", "slevel merge" and "slevel i"
       - loop unroll annotations: "loop unroll term"
       - value partitioning annotations: "split term" and "merge term"
       - subdivision annotations: "subdivide i"
-  
+
       Widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
-  
+
   (** Annotations tweaking the behavior of the -eva-slevel paramter. *)
   type slevel_annotation =
     | SlevelMerge        (** Join all states separated by slevel. *)
     | SlevelDefault      (** Use the limit defined by -eva-slevel. *)
     | SlevelLocal of int (** Use the given limit instead of -eva-slevel. *)
     | SlevelFull         (** Remove the limit of number of separated states. *)
-  
+
   (** Loop unroll annotations. *)
   type unroll_annotation =
     | UnrollAmount of Cil_types.term (** Unroll the n first iterations. *)
     | UnrollFull (** Unroll amount defined by -eva-default-loop-unroll. *)
-  
+
   type split_kind = Static | Dynamic
-  
+
   type split_term =
     | Expression of Cil_types.exp
     | Predicate of Cil_types.predicate
-  
+
   (** Split/merge annotations for value partitioning.  *)
   type flow_annotation =
     | FlowSplit of split_term * split_kind
     (** Split states according to a term. *)
     | FlowMerge of split_term
     (** Merge states separated by a previous split. *)
-  
+
   type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
-  
+
   val get_slevel_annot : Cil_types.stmt -> slevel_annotation option
   val get_unroll_annot : Cil_types.stmt -> unroll_annotation list
   val get_flow_annot : Cil_types.stmt -> flow_annotation list
   val get_subdivision_annot : Cil_types.stmt -> int list
   val get_allocation: Cil_types.stmt -> allocation_kind
-  
+
   val add_slevel_annot : emitter:Emitter.t ->
     Cil_types.stmt -> slevel_annotation -> unit
   val add_unroll_annot : emitter:Emitter.t ->
@@ -361,18 +361,18 @@ end
 module Builtins: sig
   (** Eva analysis builtins for the cvalue domain, more efficient than their
       equivalent in C. *)
-  
+
   open Cil_types
-  
+
   exception Invalid_nb_of_args of int
   exception Outside_builtin_possibilities
-  
+
   (* Signature of a builtin: type of the result, and type of the arguments. *)
   type builtin_type = unit -> typ * typ list
-  
+
   (** Can the results of a builtin be cached? See {eval.mli} for more details.*)
   type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
-  
+
   type full_result = {
     c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
     (** A list of results, consisting of:
@@ -385,7 +385,7 @@ module Builtins: sig
     (** If not None, the froms of the function, and its sure outputs;
         i.e. the dependencies of the result and of each zone written to. *)
   }
-  
+
   (** The result of a builtin can be given in different forms. *)
   type call_result =
     | States of Cvalue.Model.t list
@@ -399,12 +399,12 @@ module Builtins: sig
         computed by the builtin. *)
     | Full of full_result
     (** See [full_result] type. *)
-  
+
   (** Type of a cvalue builtin, whose arguments are:
       - the memory state at the beginning of the function call;
       - the list of arguments of the function call. *)
   type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
-  
+
   (** [register_builtin name ?replace ?typ cacheable f] registers the function [f]
       as a builtin to be used instead of the C function of name [name].
       If [replace] is provided, the builtin is also used instead of the C function
@@ -414,8 +414,7 @@ module Builtins: sig
       The results of the builtin are cached according to [cacheable]. *)
   val register_builtin:
     string -> ?replace:string -> ?typ:builtin_type -> cacheable -> builtin -> unit
-  
+
   (** Has a builtin been registered with the given name? *)
   val is_builtin: string -> bool
 end
-
