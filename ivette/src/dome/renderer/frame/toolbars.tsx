@@ -321,7 +321,7 @@ export function unregisterSearchHints(id: string) {
   searchEvaluators.delete(id);
 }
 
-async function searchModeHints(pattern: string) {
+async function searchHints(pattern: string) {
   if (pattern === '') return [];
   const promises = Array.from(searchEvaluators).map(([_id, E]) => E(pattern));
   const hints = await Promise.all(promises);
@@ -333,9 +333,9 @@ const searchMode: ActionMode = {
   placeholder: "Search…",
   icon: "SEARCH",
   className: 'dome-xToolBar-searchMode',
-  hints: searchModeHints,
+  hints: searchHints,
   event: find,
-}
+};
 
 // --------------------------------------------------------------------------
 // --- ModalActionField mode button component
@@ -536,8 +536,8 @@ export function ModalActionField() {
   };
 
   // Hints provider for the mode of all modes.
-  const modesHints = React.useCallback((pattern: string) => {
-    const p = pattern.toLowerCase();
+  const modesHints = React.useCallback((input: string) => {
+    const p = input.toLowerCase();
     const fit = (m: ActionMode) => m.title.toLowerCase().includes(p);
     return Promise.resolve(Array.from(allModes).filter(fit).map(modeToHint));
   }, [allModes]);
