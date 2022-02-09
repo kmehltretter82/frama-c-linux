@@ -948,6 +948,11 @@ e.g.:
 
 Check \url{https://github.com/LexiFi/landmarks} for its documentation.
 
+\textbf{Note:} if you intend to use \texttt{ocamlprof} (via \texttt{ocamlcp} or
+\texttt{ocamloptp}), which does not support ppx extensions, and you have
+Landmarks installed, you need to explicitly disable Landmarks during Frama-C's
+configure: \verb+./configure --disable-landmarks+.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Local Variables:
 %%% TeX-master: "developer.tex"
