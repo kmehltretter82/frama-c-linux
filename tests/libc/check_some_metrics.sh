@@ -73,7 +73,7 @@ fi
 
 # conditions to be checked
 
-for ((run=1; run<=$runs; run++))
+for ((run=1; run<=runs; run++))
 do
     echo "Checking run $run..."
     check $run "Defined functions" "${checks[$run-1]}"
