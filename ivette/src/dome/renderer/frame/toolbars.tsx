@@ -288,7 +288,7 @@ export function byHint(a: Hint, b: Hint) {
 }
 
 /** Type alias for functions that build hints list from a pattern. */
-export type HintsEvaluator = (pattern: string) => Promise<Hint[]>
+export type HintsEvaluator = (pattern: string) => Promise<Hint[]>;
 
 /** Description of an action mode. */
 export interface ActionMode {
@@ -315,7 +315,7 @@ export interface ActionMode {
 // --------------------------------------------------------------------------
 
 const searchEnginesIds = new Set<string>();
-let searchEvaluators: HintsEvaluator[] = []
+let searchEvaluators: HintsEvaluator[] = [];
 
 export function registerSearchHints(id: string, search: HintsEvaluator) {
   if (!(id in searchEnginesIds)) {
@@ -324,7 +324,7 @@ export function registerSearchHints(id: string, search: HintsEvaluator) {
   }
 }
 
-async function searchModeHints(pattern: string) {
+async function searchHints(pattern: string) {
   if (pattern === '') return [];
   const promises = searchEvaluators.map((E: HintsEvaluator) => E(pattern));
   const hints = await Promise.all(promises);
@@ -336,9 +336,9 @@ const searchMode: ActionMode = {
   placeholder: "Search…",
   icon: "SEARCH",
   className: 'dome-xToolBar-searchMode',
-  hints: searchModeHints,
+  hints: searchHints,
   event: find,
-}
+};
 
 // --------------------------------------------------------------------------
 // --- ModalActionField mode button component
@@ -515,7 +515,7 @@ export function ModalActionField() {
   const [allModes] = React.useState<Set<ActionMode>>(new Set()); 
   React.useEffect(() => {
     const on = (m: ActionMode) => m.event?.on(changeMode(m));
-    const register = (m: ActionMode) => { allModes.add(m); on(m) };
+    const register = (m: ActionMode) => { allModes.add(m); on(m); };
     const off = (m: ActionMode) => m.event?.off(changeMode(m));
     const remove = (m: ActionMode) => { allModes.delete(m); off(m); reset(m); };
     RegisterMode.on(register); UnregisterMode.on(remove);
@@ -533,14 +533,14 @@ export function ModalActionField() {
   // Auxiliary function that build a Hint from an ActionMode.
   const modeToHint = (mode: ActionMode) => {
     const { title, icon } = mode;
-    const id = "ActionMode-"+ title + "-" + icon;
+    const id = 'ActionMode-' + title + '-' + icon;
     const value = () => { onModeChange(mode); };
     return { id, icon, label: title, title, value, rank: -1000 };
   };
 
   // Hints provider for the mode of all modes.
-  const modesHints = React.useCallback((pattern: string) => {
-    const p = pattern.toLowerCase();
+  const modesHints = React.useCallback((input: string) => {
+    const p = input.toLowerCase();
     const fit = (m: ActionMode) => m.title.toLowerCase().includes(p);
     return Promise.resolve(Array.from(allModes).filter(fit).map(modeToHint));
   }, [allModes]);
@@ -552,21 +552,21 @@ export function ModalActionField() {
     const title = "Mode selection";
     const placeholder = "Search mode";
     const icon = "TUNINGS";
-    const className = 'dome-xToolBar-modeOfModes'
+    const className = 'dome-xToolBar-modeOfModes';
     return { title, placeholder, icon, className, hints: modesHints };
-  }, []);
+  }, [modesHints]);
 
   // Build a new search engine for the search mode, adding available modes to
   // the possible search hints.
-  const searchModeHints = async (pattern: string) => {
-    const hints = await modesMode.hints(pattern);
+  const searchModeHints = React.useCallback(async (input: string) => {
+    const hs = await modesMode.hints(input);
     const notCurrent = (h: Hint) => !(h.title?.includes(current.title));
-    return hints.filter(notCurrent);
-  };
+    return hs.filter(notCurrent);
+  }, [current.title, modesMode]);
 
   // Register the new search engine.
-  const register = () => registerSearchHints("ModesMode", searchModeHints);
-  React.useEffect(register, [searchMode, modesMode]);
+  const register = () => registerSearchHints('ModesMode', searchModeHints);
+  React.useEffect(register, [searchModeHints]);
 
   // Build the component.
   const { title, placeholder } = current;
