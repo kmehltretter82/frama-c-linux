@@ -699,7 +699,7 @@ export function send<In, Out>(
       if (data !== undefined)
         resolve(data);
       else
-        reject('Wrong response type')
+        reject('Wrong response type');
     };
     pending.set(rid, { resolve: unwrap, reject });
   });

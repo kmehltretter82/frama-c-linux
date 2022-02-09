@@ -106,7 +106,7 @@ export function identity<A>(v: A): A { return v; }
 
 /** 'null' or 'undefined'. */
 export const jNull: Loose<null> = (js: json) =>
-  js === null ? null : undefined
+  js === null ? null : undefined;
 
 /** Identity. */
 export const jAny: Safe<json> = (js: json) => js;

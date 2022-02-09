@@ -281,7 +281,7 @@ class Dive {
     let newNodes = this.cy.collection();
 
     for (const node of data.nodes) {
-      let stops = undefined
+      let stops = undefined;
       if (typeof node.range === 'number')
         stops = `0% ${node.range}% ${node.range}% 100%`;
 
@@ -354,7 +354,7 @@ class Dive {
 
     this.recomputeLayout(newNodes);
 
-    const root = data.root
+    const root = data.root;
     return root ? this.cy.$id(root.toString()) : undefined;
   }
 

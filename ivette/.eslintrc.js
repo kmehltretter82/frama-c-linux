@@ -55,6 +55,9 @@ module.exports = {
 
     // --- Safety rules ---
 
+    // Requires semicolon at the end of each statement to prevent
+    // misinterpretetion errors
+    "semi": "error",
     // Be more strict on usage of useMemo and useRef
     "react-hooks/exhaustive-deps": "error",
     // Requires '+' to be applied on 2 numbers or 2 strings only

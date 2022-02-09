@@ -126,7 +126,7 @@ export default function Preferences() {
         <EditorCommandFields command={P.EditorCommand} />
       </Forms.Section>
     </Forms.Page>
-  )
+  );
 }
 
 // --------------------------------------------------------------------------

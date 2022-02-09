@@ -244,7 +244,7 @@ const makeGridItem = (customize: unknown, onClose: (id: string) => void) =>
         </Vfill>
       </Grids.GridItem>
     );
-  }
+  };
 
 // --------------------------------------------------------------------------
 // --- Customization Views
