@@ -34,7 +34,7 @@ do
     runs=$((runs+1))
 done
 
-regex=" *([a-zA-Z0-9\' -]+)+ +\(([0-9]+)\)"
+regex=" *([a-zA-Z0-9\'][a-zA-Z0-9\' -]+)+ +\(([0-9]+)\)"
 
 # tbl: stores mappings (<run>-<title>, <count>), where <run> is the
 # metrics run (1 or 2), <title> is the Metrics title for the category,
