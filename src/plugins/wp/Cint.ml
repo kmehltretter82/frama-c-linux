@@ -1445,10 +1445,29 @@ let mask_simplifier =
       r
 
   end in
-  let rewrite ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
+  let unary_op e f rewrite a =
+    (* reuse the previous term when not rewritten *)
+    let a' = rewrite a in if a'==a then e else f a'
+  in
+  let bin_op e f rewrite a b =
+    (* reuse the previous term when there is no rewriting *)
+    let a' = rewrite a and b' = rewrite b in
+    if a'==a && b'==b then e else f a' b'
+  in
+  let nary_op e es f rewrite xs =
+    (* reuse the previous term when there is no rewriting *)
+    let modified = ref false in
+    let xs = List.map2 (fun e x ->
+        let x = rewrite x in
+        if x==e then modified := true;
+        x) es xs
+    in if !modified then f xs else e
+  in
+  let rec rewrite ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
     match F.repr e with
-    | Fun(f,es) when f == f_land ->
-        Wp_parameters.debug ~dkey "Rewrite %a@." Lang.F.pp_term e;
+    | Fun(f,xs) when f == f_land ->
+        let es = List.map (rewrite ctx) xs in
+        Wp_parameters.debug ~dkey "Rewrite AND %a@." Lang.F.pp_term e;
         let reduce unset x = match F.repr x with
           | Kint v -> F.e_zint (Integer.logand (Integer.lognot unset) v)
           | _ -> x
@@ -1461,8 +1480,23 @@ let mask_simplifier =
         let unset_mask = List.fold_left (collect ctx) Integer.zero es in
         if Integer.is_zero unset_mask then e
         else if Integer.equal unset_mask Integer.minus_one then e_zero
-        else F.e_fun f_land (List.map (reduce unset_mask) es)
-    | _ -> raise Not_found
+        else nary_op e xs (F.e_fun f_land) (reduce unset_mask) es
+    | Fun(f,xs) when f == f_lor ->
+        nary_op e xs (F.e_fun f_lor) (rewrite ctx) xs
+    | Fun(f,[a]) when f == f_lnot ->
+        unary_op e (fun x -> F.e_fun f_lnot [x]) (rewrite ctx) a
+    | Not a -> unary_op e e_not (rewrite ctx) a
+    | Eq (a, b) -> bin_op e e_eq (rewrite ctx) a b
+    | Leq (a, b) -> bin_op e e_leq (rewrite ctx) a b
+    | Kint _ -> e
+    | _ when is_int e ->
+        let open Masks in
+        let v = eval ctx e in
+        if Integer.equal v.set (Integer.lognot v.unset) then
+          F.e_zint v.set
+        else e
+    | _ -> e
+
   in
   object
 
@@ -1482,19 +1516,24 @@ let mask_simplifier =
 
     method equivalent_exp e =
       if Tmap.is_empty masks then e else
-        Lang.e_subst (rewrite masks) e
+        (Wp_parameters.debug ~dkey "Rewrite Exp: %a@." Lang.F.pp_term e;
+         Lang.e_subst (rewrite masks) e)
 
     method weaker_hyp p =
       if Tmap.is_empty masks then p else
-        Lang.p_subst (rewrite masks) p
+        (Wp_parameters.debug ~dkey "Rewrite Hyp: %a@." Lang.F.pp_pred p;
+         Lang.p_subst (rewrite masks) p)
 
     method equivalent_branch p =
       if Tmap.is_empty masks then p else
-        Lang.p_subst (rewrite masks) p
+        (Wp_parameters.debug ~dkey "Rewrite Branch: %a@." Lang.F.pp_pred p;
+         Lang.p_subst (rewrite masks) p
+        )
 
     method stronger_goal p =
       if Tmap.is_empty masks then p else
-        Lang.p_subst (rewrite masks) p
+        (Wp_parameters.debug ~dkey "Rewrite Goal: %a@." Lang.F.pp_pred p;
+         Lang.p_subst (rewrite masks) p)
 
   end
 
