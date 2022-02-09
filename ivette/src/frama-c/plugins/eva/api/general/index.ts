@@ -584,8 +584,6 @@ export const functionStats: State.Array<
 export interface evalTermInput {
   /** The statement at which we will perform the evaluation. */
   at_stmt: marker;
-  /** If true, evaluation is performed after <at_stmt> computation. */
-  after: boolean;
   /** The term to be evaluated. */
   term: string;
 }
@@ -594,7 +592,6 @@ export interface evalTermInput {
 export const jEvalTermInput: Json.Loose<evalTermInput> =
   Json.jObject({
     at_stmt: jMarkerSafe,
-    after: Json.jFail(Json.jBoolean,'Boolean expected'),
     term: Json.jFail(Json.jString,'String expected'),
   });
 
@@ -605,32 +602,19 @@ export const jEvalTermInputSafe: Json.Safe<evalTermInput> =
 /** Natural order for `evalTermInput` */
 export const byEvalTermInput: Compare.Order<evalTermInput> =
   Compare.byFields
-    <{ at_stmt: marker, after: boolean, term: string }>({
+    <{ at_stmt: marker, term: string }>({
     at_stmt: byMarker,
-    after: Compare.boolean,
     term: Compare.string,
   });
 
-const evalTerm_internal: Server.GetRequest<
-  evalTermInput,
-  [ string, marker ] |
-  undefined
-  > = {
+const evalTerm_internal: Server.GetRequest<evalTermInput,marker | undefined> = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.evalTerm',
   input:  jEvalTermInput,
-  output: Json.jTry(
-            Json.jPair(
-              Json.jFail(Json.jString,'String expected'),
-              jMarkerSafe,
-            )),
+  output: jMarker,
   signals: [],
 };
 /** Evaluate a term in the abstract state of a given statement. The evaluation is performed after the statement computation if the given boolean is true. */
-export const evalTerm: Server.GetRequest<
-  evalTermInput,
-  [ string, marker ] |
-  undefined
-  >= evalTerm_internal;
+export const evalTerm: Server.GetRequest<evalTermInput,marker | undefined>= evalTerm_internal;
 
 /* ------------------------------------- */

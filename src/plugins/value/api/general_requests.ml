@@ -470,7 +470,7 @@ let _array =
 
 (* ----- Arbitrary ACSL term evaluation ------------------------------------- *)
 
-type eval_term_input = { at_stmt : stmt ; after : bool ; term : string }
+type eval_term_input = { at_stmt : stmt ; term : string }
 
 module EvalTermInput = struct
   open Server.Data
@@ -481,11 +481,6 @@ module EvalTermInput = struct
     let descr = "The statement at which we will perform the evaluation." in
     Record.field record ~name:"at_stmt" ~descr:(Markdown.plain descr)
       (module Kernel_ast.Marker)
-
-  let after =
-    let descr = "If true, evaluation is performed after <at_stmt> computation." in
-    Record.field record ~name:"after" ~descr:(Markdown.plain descr)
-      (module Data.Jbool)
 
   let term =
     let descr = "The term to be evaluated." in
@@ -507,31 +502,24 @@ module EvalTermInput = struct
     | PLval (_, Kstmt s, _) | PExp (_, Kstmt s, _)
     | PTermLval (_, Kstmt s, _, _)
     | PVDecl (_, Kstmt s, _) ->
-      let after = R.get after record in
       let term = R.get term record in
-      Some { at_stmt = s; after ; term }
+      Some { at_stmt = s ; term }
     | _ -> None
 
 end
 
-module EvalTermOutput =
-  Data.Joption (Data.Jpair (Data.Jstring) (Kernel_ast.Marker))
+module EvalTermOutput = Data.Joption (Kernel_ast.Marker)
 
 let logic_environment () =
   let open Logic_typing in
   Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
 
 let evaluate_term = Option.map @@ fun input ->
-  let open Eval_terms in
   let env = logic_environment () in
   let kf = Kernel_function.find_englobing_kf input.at_stmt in
   let term = !Db.Properties.Interp.term ~env kf input.term in
-  let state = Db.Value.get_stmt_state ~after:input.after input.at_stmt in
-  let v = (eval_term ~alarm_mode:Ignore (env_only_here state) term).eover in
   let exp = !Db.Properties.Interp.term_to_exp ~result:None term in
-  let loc = Printer_tag.PExp (Some kf, Kstmt input.at_stmt, exp) in
-  Format.fprintf Format.str_formatter "%a" Cvalue.V.pretty v ;
-  (Format.flush_str_formatter (), loc)
+  Printer_tag.PExp (Some kf, Kstmt input.at_stmt, exp)
 
 let descr =
   "Evaluate a term in the abstract state of a given statement. \

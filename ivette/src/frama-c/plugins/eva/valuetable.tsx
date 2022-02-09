@@ -913,19 +913,18 @@ interface EvaluationModeProps {
   setLocPin: (loc: Location, pin: boolean) => void;
 }
 
-function evaluationMode(props: EvaluationModeProps): void {
+function useEvaluationMode(props: EvaluationModeProps): void {
   const { computationState, selection, setLocPin } = props;
-  const handleError = (): void => {};
-  const addProbe = (result: [ string, Ast.marker ] | undefined): void => {
+  const handleError = (): void => { return; };
+  const addProbe = (target: Ast.marker | undefined): void => {
     const fct = selection?.current?.fct;
-    const [_, loc] = result ?? [];
-    if (fct && loc) setLocPin({ fct, target: loc }, true);
+    if (fct && target) setLocPin({ fct, target }, true);
   };
   React.useEffect(() => {
-    if (computationState !== 'computed') return () => {}
-    const onEnter = (pattern: string) => {
+    if (computationState !== 'computed') return () => { return; };
+    const onEnter = (pattern: string): void => {
       const marker = selection?.current?.marker;
-      const data = { at_stmt: marker, after: true, term: pattern };
+      const data = { at_stmt: marker, term: pattern };
       Server.send(Eva.evalTerm, data).then(addProbe).catch(handleError);
     };
     const evalMode = {
@@ -1111,7 +1110,7 @@ function EvaTable(): JSX.Element {
 
   /* Handle Evaluation mode */
   const computationState = States.useSyncValue(Eva.computationState);
-  evaluationMode({ computationState, selection, setLocPin });
+  useEvaluationMode({ computationState, selection, setLocPin });
 
   /* Builds the component */
   return (
