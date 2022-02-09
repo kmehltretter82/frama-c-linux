@@ -746,3 +746,64 @@ let () =
     set_files
 
 (* -------------------------------------------------------------------------- *)
+(* ----- Build a marker from an ACSL term ----------------------------------- *)
+(* -------------------------------------------------------------------------- *)
+
+type marker_term_input = { at_stmt : stmt ; term : string }
+
+module MarkerTermInput = struct
+  type record
+  let record : record Record.signature = Record.signature ()
+
+  let at_stmt =
+    let descr = "The statement at which we will build the marker." in
+    Record.field record ~name:"at_stmt" ~descr:(Markdown.plain descr)
+      (module Marker)
+
+  let term =
+    let descr = "The ACSL term." in
+    Record.field record ~name:"term" ~descr:(Markdown.plain descr)
+      (module Data.Jstring)
+
+  let data =
+    Record.publish record ~package ~name:"markerFromTermInput"
+      ~descr:(Markdown.plain "<markerFromTerm> input")
+
+  module R : Record.S with type r = record = (val data)
+  type t = marker_term_input option
+  let jtype = R.jtype
+
+  let of_json js =
+    let record = R.of_json js in
+    match R.get at_stmt record with
+    | PStmt (_, s) | PStmtStart (_, s)
+    | PLval (_, Kstmt s, _) | PExp (_, Kstmt s, _)
+    | PTermLval (_, Kstmt s, _, _)
+    | PVDecl (_, Kstmt s, _) ->
+      let term = R.get term record in
+      Some { at_stmt = s ; term }
+    | _ -> None
+
+end
+
+module MarkerTermOutput = Data.Joption (Marker)
+
+let logic_environment () =
+  let open Logic_typing in
+  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+
+let build_marker = Option.map @@ fun input ->
+  let env = logic_environment () in
+  let kf = Kernel_function.find_englobing_kf input.at_stmt in
+  let term = !Db.Properties.Interp.term ~env kf input.term in
+  let exp = !Db.Properties.Interp.term_to_exp ~result:None term in
+  Printer_tag.PExp (Some kf, Kstmt input.at_stmt, exp)
+
+let descr = "Build a marker from an ACSL term."
+
+let () = Request.register ~package
+  ~kind:`GET ~name:"markerFromTerm" ~descr:(Markdown.plain descr)
+  ~input:(module MarkerTermInput) ~output:(module MarkerTermOutput)
+  build_marker
+
+(**************************************************************************)

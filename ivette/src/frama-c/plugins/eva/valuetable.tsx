@@ -925,7 +925,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     const onEnter = (pattern: string): void => {
       const marker = selection?.current?.marker;
       const data = { at_stmt: marker, term: pattern };
-      Server.send(Eva.evalTerm, data).then(addProbe).catch(handleError);
+      Server.send(Ast.markerFromTerm, data).then(addProbe).catch(handleError);
     };
     const evalMode = {
       title: 'Evaluation',
