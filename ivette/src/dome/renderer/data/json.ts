@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any, no-console */
 
 // --------------------------------------------------------------------------
 // --- JSON Utilities
@@ -33,8 +33,6 @@
 */
 
 import { DEVEL } from 'dome/system';
-
-/* eslint-disable @typescript-eslint/naming-convention, no-shadow */
 
 export type json =
   undefined | null | boolean | number | string |

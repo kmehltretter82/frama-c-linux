@@ -44,6 +44,8 @@ import 'codemirror/lib/codemirror.css';
 const CSS_HOVERED = 'dome-xText-hover';
 const CSS_SELECTED = 'dome-xText-select';
 
+const D = new Dome.Debug('Dome');
+
 /* --------------------------------------------------------------------------*/
 /* --- View Properties                                                   --- */
 /* --------------------------------------------------------------------------*/
@@ -380,7 +382,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
       const cm = this.codeMirror;
       return cm && cm.scrollIntoView({ line, ch: 0 });
     } catch (_error) {
-      console.warn(`[Dome] Unable to scroll to line ${line}: out of range.`);
+      D.warn(`unable to scroll to line ${line}: out of range.`);
     }
   }
 

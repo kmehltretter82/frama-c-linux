@@ -30,8 +30,11 @@
 */
 
 import React from 'react';
+import { Debug } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { Button } from 'dome/controls/buttons';
+
+const D = new Debug('Dome');
 
 // --------------------------------------------------------------------------
 // --- Error Boundaries
@@ -75,7 +78,7 @@ export class Catch extends React.Component<CatchProps, CatchState, unknown> {
 
   logerr(): void {
     const { error, info } = this.state;
-    console.error('[dome] Catched error:', error, info);
+    D.error('catched error:', error, info);
   }
 
   reload(): void {

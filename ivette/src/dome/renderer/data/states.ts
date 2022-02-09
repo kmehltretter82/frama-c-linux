@@ -33,6 +33,9 @@
 import React from 'react';
 import Emitter from 'events';
 import isEqual from 'react-fast-compare';
+import { Debug } from 'dome';
+
+const D = new Debug('State');
 
 // --------------------------------------------------------------------------
 // --- State utilities
@@ -72,7 +75,7 @@ export function debug<A>(msg: string, st: State<A>): State<A> {
   const [value, setValue] = st;
   return [value, (v) => {
     setValue(v);
-    console.log(msg, v); // eslint-disable-line no-console
+    D.log(msg, v);
   }];
 }
 

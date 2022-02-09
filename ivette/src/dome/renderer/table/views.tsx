@@ -58,6 +58,7 @@ import { Trigger, Client, Sorting, SortingInfo, Model } from './models';
 
 import './style.css';
 
+const D = new Dome.Debug('Dome.table');
 const SVG = SVGraw as (props: { id: string; size?: number }) => JSX.Element;
 
 // --------------------------------------------------------------------------
@@ -250,8 +251,8 @@ function makeDataGetter(
     try {
       if (rowData !== undefined) return getter(rowData, dataKey);
     } catch (err) {
-      console.error(
-        '[Dome.table] Custom getter error',
+      D.error(
+        'custom getter error',
         'rowData:', rowData,
         'dataKey:', dataKey,
         err,
@@ -278,8 +279,8 @@ function makeDataRenderer(
       }
       return contents;
     } catch (err) {
-      console.error(
-        '[Dome.table] Custom renderer error',
+      D.error(
+        'custom renderer error',
         'dataKey:', props.dataKey,
         'cellData:', cellData,
         err,

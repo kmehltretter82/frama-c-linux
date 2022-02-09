@@ -31,6 +31,7 @@
    @module dome/table/arrays
 */
 
+import { Debug } from 'dome';
 import * as Compare from 'dome/data/compare';
 import type { ByFields, Order } from 'dome/data/compare';
 import {
@@ -38,6 +39,8 @@ import {
   Filter, Filtering,
   Model, Collection, forEach,
 } from './models';
+
+const D = new Debug('Dome');
 
 // --------------------------------------------------------------------------
 // --- Sorting Utilities
@@ -149,7 +152,7 @@ export class ArrayModel<Key, Row>
       });
       table.sort(this.sorter());
     } catch (err) {
-      console.warn('[Dome] error when rebuilding table:', err);
+      D.warn('error when rebuilding table:', err);
     }
     table.forEach((packed, index) => { packed.index = index; });
     this.table = table;

@@ -43,6 +43,8 @@ import { RenderElement } from 'dome/layout/dispatch';
 import './style.css';
 
 
+const Debug = new Dome.Debug('labviews');
+
 // --------------------------------------------------------------------------
 // --- Types
 // --------------------------------------------------------------------------
@@ -191,9 +193,7 @@ const makeGridItem = (customize: unknown, onClose: (id: string) => void) =>
       case undefined:
         break;
       default:
-        console.warn(
-          `[labviews] unexpected layout for ${id} component`,
-          layout);
+        Debug.warn(`unexpected layout for ${id} component`, layout);
         break;
     }
     Object.keys(properties).forEach((key) => {

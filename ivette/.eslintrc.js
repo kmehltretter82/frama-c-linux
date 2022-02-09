@@ -49,9 +49,9 @@ module.exports = {
       "error",
       { "destructuring": "all", "ignoreReadBeforeAssign": false }
     ],
-    // Disallow the use of console.*, except for warnings and errors, to
-    // prevent the release of code producing various debuging messages
-    "no-console": ["error", { allow: ["warn", "error"] }],
+    // Disallow the use of console.* to prevent the release of code producing
+    // various debuging messages
+    "no-console": "error",
 
     // --- Safety rules ---
 

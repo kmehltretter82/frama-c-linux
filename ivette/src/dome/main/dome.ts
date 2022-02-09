@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-console */
 
 /**
    ## Dome Application (Main Process)

@@ -26,6 +26,7 @@
 */
 
 /* eslint-disable max-len */
+/* eslint-disable no-console */
 
 // --------------------------------------------------------------------------
 // --- Evolved Spawn Process

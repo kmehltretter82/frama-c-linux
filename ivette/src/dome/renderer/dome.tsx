@@ -417,6 +417,7 @@ export interface MenuItemProps {
 */
 export function addMenuItem(props: MenuItemProps) {
   if (!props.id && props.type !== 'separator') {
+    // eslint-disable-next-line no-console
     console.error('[Dome] Missing menu-item identifier', props);
     return;
   }

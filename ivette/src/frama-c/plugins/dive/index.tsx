@@ -49,6 +49,9 @@ import '@fortawesome/fontawesome-free/js/all';
 import style from './style.json';
 import layouts from './layouts.json';
 
+
+const Debug = new Dome.Debug('dive');
+
 interface Cxtcommand {
   content: string;
   select: () => void;
@@ -404,7 +407,7 @@ class Dive {
       }
     }
     catch (err) {
-      console.error(err);
+      Debug.error(err);
     }
 
     return undefined;
@@ -421,7 +424,7 @@ class Dive {
       }
     }
     catch (err) {
-      console.error(err);
+      Debug.error(err);
     }
   }
 
