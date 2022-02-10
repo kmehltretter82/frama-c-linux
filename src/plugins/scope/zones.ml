@@ -154,8 +154,7 @@ let process_one_call data stmt lvaloption froms =
 let process_call data_after stmt lvaloption funcexp args _loc =
   let funcexp_dpds = Eva.Results.(before stmt |> expr_deps funcexp)
   and called_functions =
-    Eva.Results.(before stmt |> eval_callee funcexp) |>
-    Result.value ~default:[]
+    Eva.Results.(before stmt |> eval_callee funcexp |> default [])
   in
   let used, data =
     try

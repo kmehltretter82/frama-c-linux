@@ -85,9 +85,6 @@ let get_writes stmt lval =
     before stmt |> eval_address lval |> as_zone ~access:Write |>
     default Locations.Zone.bottom)
 
-let get_reads stmt lval =
-  Eva.Results.(before stmt |> lval_deps lval)
-
 (** Add to [stmt] to [lmap] for all the locations modified by the statement.
  * Something to do only for calls and assignments.
  * *)
@@ -410,7 +407,7 @@ let is_modified_by_edge kf z s1 s2 =
  * @raise Kernel_function.No_Definition if [kf] has no definition
 *)
 let get_data_scope_at_stmt kf stmt lval =
-  let zone = get_reads stmt lval in
+  let zone = Eva.Results.(before stmt |> lval_deps lval) in
   let allstmts, info = compute kf in
   let modif_stmts = InitSid.find info zone in
   let modifs_edge = is_modified_by_edge kf zone in
