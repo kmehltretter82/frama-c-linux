@@ -87,8 +87,12 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
+    let t1 = Logic_normalizer.get_term t1 in
+    let t2 = Logic_normalizer.get_term t2 in
     let ity =
-      Typing.get_integer_op_of_predicate ~logic_env p
+      Typing.join
+        (Typing.get_effective_ty ~logic_env t1)
+        (Typing.get_effective_ty ~logic_env t2)
     in
     Translate_utils.comparison_to_exp
       ~adata
