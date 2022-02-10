@@ -33,9 +33,6 @@ module D: Datatype.S with type t = lscope
 val empty: t
 (* Create an empty logic scope. *)
 
-val is_empty: t -> bool
-(* Check whether the given logic scope is empty. *)
-
 val add: lscope_var -> t -> t
 (* Return a new logic scope in which the given [lscope_var] has been added. *)
 

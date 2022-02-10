@@ -571,10 +571,6 @@ let not_yet env s =
   Context.save env;
   Error.not_yet s
 
-let untypable env s =
-  Context.save env;
-  Error.untypable s
-
 let push_contract env contract =
   { env with contract_stack = contract :: env.contract_stack }
 
@@ -586,10 +582,6 @@ let top_contract env =
 let pop_and_get_contract env =
   let hd, tl = top_contract env in
   hd, { env with contract_stack = tl }
-
-let pop_contract env =
-  let _, env = pop_and_get_contract env in
-  env
 
 (* ************************************************************************** *)
 (** {2 Utilities} *)

@@ -186,11 +186,6 @@ end
 (** {2 Context for error handling} *)
 (* ************************************************************************** *)
 
-module Context: sig
-  val save: t -> unit
-  val restore: t -> t
-end
-
 val handle_error: (t -> t) -> t -> t
 (** Run the closure with the given environment and handle potential errors.
     Restore the globals of the environment to the last time [Env.Context.save]
@@ -205,8 +200,6 @@ val handle_error_with_args: (t * 'a -> t * 'a) -> t * 'a -> t * 'a
 val not_yet: t -> string -> 'a
 (** Save the current context and raise [Error.Not_yet] exception. *)
 
-val untypable: t -> string -> 'a
-(** Save the current context and raise [Error.Typing_error] exception. *)
 
 (* ************************************************************************** *)
 (** {2 Current environment kinstr} *)
@@ -221,12 +214,8 @@ val get_kinstr: t -> kinstr
 
 val push_contract: t -> contract -> t
 (** Push a contract to the environment's stack *)
-val top_contract: t -> contract * contract list
-(** Return the top contract of the environment's stack *)
 val pop_and_get_contract: t -> contract * t
 (** Pop and return the top contract of the environment's stack *)
-val pop_contract: t -> t
-(** Pop the top contract of the environment's stack *)
 
 (* ************************************************************************** *)
 (** {2 Utilities} *)

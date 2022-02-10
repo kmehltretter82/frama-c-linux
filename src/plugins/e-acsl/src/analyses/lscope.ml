@@ -29,8 +29,6 @@ type t = lscope
 
 let empty = []
 
-let is_empty = function [] -> true | _ :: _ -> false
-
 let add lscope_var t = lscope_var :: t
 
 let remove lscope_var t =
