@@ -20,9 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let pred_opt_from_expr_state state e =
+let pred_opt_from_expr_state stmt e =
   try
-    Value2acsl.lval_to_predicate state e
+    Value2acsl.lval_to_predicate stmt e
   with
   | Cvalue.V.Not_based_on_null ->
     Misc.not_implemented ~what:"Value not based on null";
