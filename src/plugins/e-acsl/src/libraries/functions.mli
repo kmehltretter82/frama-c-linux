@@ -49,11 +49,6 @@ module RTL: sig
   (** Prefix a name (of a variable or a function) with a string that identifies
       it as belonging to the public API of E-ACSL runtime library *)
 
-  val mk_temporal_name: string -> string
-  (** Prefix a name (of a variable or a function) with a string that identifies
-      it as belonging to the public API of E-ACSL runtime library dealing
-      with temporal analysis. *)
-
   val mk_gen_name: string -> string
   (** Prefix a name (of a variable or a function) with a string indicating
       that this name has been generated during instrumentation phase. *)
@@ -64,10 +59,6 @@ module RTL: sig
 
   val is_generated_kf: kernel_function -> bool
   (** Same as [is_generated_name] but for kernel functions *)
-
-  val is_generated_literal_string_name: string -> bool
-  (** Same as [is_generated_name] but indicates that the name represents a local
-      variable that replaced a literal string. *)
 
   val get_original_name: kernel_function -> string
   (** Retrieve the name of the kernel function and strip prefix that indicates
@@ -93,29 +84,9 @@ module Libc: sig
   (** Return [true] if [exp] captures a function name that matches [memcpy] or
       an equivalent function *)
 
-  val is_memcpy_name: string -> bool
-  (** Same as [is_memcpy] but for strings *)
-
   val is_memset: exp -> bool
   (** Return [true] if [exp] captures a function name that matches [memset] or
       an equivalent function *)
-
-  val is_memset_name: string -> bool
-  (** Same as [is_memset] but for strings *)
-
-  val is_dyn_alloc: exp -> bool
-  (** Return [true] if [exp] captures a function name that matches a function
-      that dynamically allocates memory such as [malloc] or [calloc] *)
-
-  val is_dyn_alloc_name: string -> bool
-  (** Same as [is_dyn_alloc] but for strings *)
-
-  val is_dyn_free: exp -> bool
-  (** Return [true] if [exp] captures a function name that matches
-      a function that dynamically deallocates memory (e.g., [free]) *)
-
-  val is_dyn_free_name: string -> bool
-  (** Same as [is_dyn_free] but for strings *)
 
   val is_vla_free: exp -> bool
   (** Return [true] if [exp] captures a function name that matches
@@ -125,31 +96,11 @@ module Libc: sig
   (** Return [true] if [string] captures a function name that matches
       a function that deallocates memory for a variable-size array. *)
 
-  val is_vla_alloc: exp -> bool
-  (** Return [true] if [exp] captures a function name that matches
-      a function that deallocates memory for a variable-size array. *)
-
   val is_vla_alloc_name: string -> bool
   (** Same as [is_dyn_alloc] but for strings *)
 
-  val is_alloca: exp -> bool
-  (** Return [true] if [exp] captures a function name that matches
-      a function that allocates memory on stack. *)
-
-  val is_alloca_name: string -> bool
-  (** Same as [is_alloca] but for strings *)
-
-  val is_printf: exp -> bool
-  (** Return [true] if [exp] captures a function name that matches
-      a printf-like function such as [printf], [fprintf], [dprintf] etc. *)
-
   val is_printf_name: string -> bool
   (** Same as [is_printf] but for strings *)
-
-  val printf_fmt_position: string -> int
-  (** Given the name of a printf-like function (as determined by
-      [is_printf_name]) return the number of arguments preceding its variadic
-      arguments. *)
 
   val get_printf_argument_str: loc:location -> string -> exp list -> exp
   (** Given the name of a printf-like function and the list of its variadic

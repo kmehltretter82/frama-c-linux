@@ -37,4 +37,5 @@ let reset () =
   Literal_strings.reset ();
   Bound_variables.clear_guards ();
   Logic_normalizer.clear ();
+  Interval.Env.clear();
   Typing.clear ()

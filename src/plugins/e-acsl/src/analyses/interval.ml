@@ -409,7 +409,6 @@ module rec Env: sig
   val add: Cil_types.logic_var -> ival -> unit
   val find: Cil_types.logic_var -> ival
   val remove: Cil_types.logic_var -> unit
-  val replace: Cil_types.logic_var -> ival -> unit
 end = struct
 
   open Cil_datatype
@@ -420,7 +419,6 @@ end = struct
      \let body depends on one formal) *)
   let add = Logic_var.Hashtbl.add tbl
   let remove = Logic_var.Hashtbl.remove tbl
-  let replace = Logic_var.Hashtbl.replace tbl
   let find = Logic_var.Hashtbl.find tbl
 
   let clear () =
