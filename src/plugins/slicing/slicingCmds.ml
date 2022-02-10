@@ -55,6 +55,11 @@ let apply_all ~propagate_to_callers =
 
 let get_select_kf (fvar, _select) = Globals.Functions.get fvar
 
+let get_lval_zone ?(access=Locations.Read) stmt lval =
+  let open Eva.Results in
+  before stmt |> eval_address lval |> as_zone ~access
+  |> default Locations.Zone.bottom
+
 (** Utilities for [kinstr]. *)
 module Kinstr: sig
   val iter_from_func : (stmt -> unit) -> kernel_function -> unit
@@ -76,12 +81,8 @@ struct
       (* returns [read_zone] joined to [Zone.t read] by [lv], [Zone.t written] by [lv] *)
       (* The modified locations are [looking_for], those address are
          function of [deps]. *)
-      let zloc, deps =
-        Eva.Results.(
-          before stmt |> eval_address lv |> as_zone ~access:Locations.Write |>
-          default Locations.Zone.bottom,
-          before stmt |> address_deps lv)
-      in
+      let zloc = get_lval_zone ~access:Locations.Write stmt lv in
+      let deps = Eva.Results.(before stmt |> address_deps lv) in
       Locations.Zone.join read_zone deps, zloc
     in
     let call_process lv f args _loc =
@@ -320,10 +321,7 @@ let select_stmt_lval set mark lval_str ~before ki ~eval kf =
            let lval =
              !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term
            in
-           let zone =
-             Eva.Results.(before eval |> eval_address lval |> as_zone) |>
-             Result.value ~default:Locations.Zone.bottom
-           in
+           let zone = get_lval_zone eval lval in
            Locations.Zone.join zone acc)
         lval_str
         Locations.Zone.bottom
@@ -353,10 +351,7 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
              let lval_term = !Db.Properties.Interp.term_lval kf lval_str in
              let lval = !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term in
              let access = if for_writing then Locations.Write else Locations.Read in
-             let zone =
-               Eva.Results.(before eval |> eval_address lval |> as_zone ~access) |>
-               Result.value ~default:Locations.Zone.bottom
-             in
+             let zone = get_lval_zone ~access eval lval in
              Locations.Zone.join zone acc)
           lval_str Locations.Zone.bottom
       in SlicingParameters.debug ~level:3

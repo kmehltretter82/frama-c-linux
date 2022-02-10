@@ -54,9 +54,7 @@ let exists_fun_callers fpred kf =
     then false (* no way to call the initial [kf]. *)
     else begin
       table := Kernel_function.Set.add kf !table ;
-      List.exists
-        (fun kf -> exists_fun_callers kf)
-        (Eva.Results.callers kf)
+      List.exists exists_fun_callers (Eva.Results.callers kf)
     end
   in
   exists_fun_callers kf
@@ -1454,12 +1452,11 @@ let merge_fun_callers get_list get_value merge is_top acc kf =
           raise StopMerging (* acceleration when top is reached *)
       in
       let rec merge_fun_callers kf =
-        let merge_fun_caller kf = merge_fun_callers kf in
         let vf = Kernel_function.get_vi kf in
         if not (Cil_datatype.Varinfo.Set.mem vf !table) then begin
           table := Cil_datatype.Varinfo.Set.add vf !table ;
           List.iter (fun x -> merge (get_value x)) (get_list kf) ;
-          List.iter merge_fun_caller (Eva.Results.callers kf)
+          List.iter merge_fun_callers (Eva.Results.callers kf)
         end
         (*  else no way to add something, the [kf] contribution is already
             accumulated. *)
