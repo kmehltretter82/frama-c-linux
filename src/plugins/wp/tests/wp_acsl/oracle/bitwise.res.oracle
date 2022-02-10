@@ -217,22 +217,42 @@ Prove: b != a.
   Function cast_uchar
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise.i, line 128) in 'cast_uchar':
+Goal Post-condition (file bitwise.i, line 131) in 'cast_uchar':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_test,ok' (file bitwise.i, line 131):
+Goal Check 'bit_test,ok' (file bitwise.i, line 134):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_unset,ok' (file bitwise.i, line 132):
+Goal Check 'bit_test1,ok' (file bitwise.i, line 135):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_set_unset,ok' (file bitwise.i, line 133):
+Goal Check 'bit_unset,ok' (file bitwise.i, line 136):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_set_unset,ok' (file bitwise.i, line 137):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_set_unset2,ok' (file bitwise.i, line 138):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_defined,ok' (file bitwise.i, line 139):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_defined2,ok' (file bitwise.i, line 140):
 Prove: true.
 
 ------------------------------------------------------------
