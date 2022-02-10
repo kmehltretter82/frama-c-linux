@@ -1,5 +1,5 @@
 (* ledit -h jnl bin/toplevel.top -deps  -lib-entry g -slice-callers \
-                                 min_call.c
+                                 tests/slicing/min_call.c
 
 *)
 

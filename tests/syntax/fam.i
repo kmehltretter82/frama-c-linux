@@ -6,12 +6,14 @@
 
 // Tests related to flexible array members
 
-struct { // FAM declaration OK
+// FAM declaration OK
+struct {
   int len;
   char a[];
 } fam;
 
-struct {// static FAM initialization not allowed (unsupported GCC extension)
+// static FAM initialization not allowed (unsupported GCC extension)
+struct {
   int len;
   char a[];
 } fam2 = {1, {1, 2, 3, 4, 5, 6}};

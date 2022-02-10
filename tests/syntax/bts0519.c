@@ -5,6 +5,7 @@
  */
 
 int t[4];
+
 #ifdef ERR
 int q[static 3];
 #endif

@@ -12,6 +12,7 @@ int BadReturn2(int* p) {
   return;
 }
 
+
 int main() {
   int i = 3;
   BadReturn2(&i);

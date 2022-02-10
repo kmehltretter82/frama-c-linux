@@ -1,5 +1,5 @@
 /* run.config
-   OPT: @PTEST_FILE@ -print
+   OPT: -print
  */
 
 /*@

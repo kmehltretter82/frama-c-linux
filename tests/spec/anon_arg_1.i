@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"%{dep:anon_arg_2.i}"
+DONTRUN: main test in anon_arg_2.i
 */
 
 int f(int*, int);

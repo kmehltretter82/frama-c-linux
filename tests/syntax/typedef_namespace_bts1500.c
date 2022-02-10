@@ -5,6 +5,7 @@
    STDOPT: +"-cpp-extra-args='-DREDEFINITION'"
 */
 typedef int digit;
+
 struct S {
   digit d1;
   int const digit;

@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"%{dep:inline_def_bad_2.i}"
+STDOPT: +"@PTEST_DIR@/inline_def_bad_2.i"
 */
 
 extern inline f() { return 1; }

@@ -1,10 +1,5 @@
 /* run.config
-<<<<<<< HEAD
-   PLUGIN: @EVA_PLUGINS@
-||||||| 754e522ceb
-=======
 PLUGIN: eva,scope
->>>>>>> origin/master
    STDOPT: +"-inline-calls @all -kernel-msg-key printer:attrs"
    STDOPT: +"-inline-calls @inline"
    STDOPT: +"-inline-calls @inline -remove-inlined @inline"

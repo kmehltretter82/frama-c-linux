@@ -1,3 +1,0 @@
-(rule
- (action (with-stdout-to framac_share_path (run frama-c -print-share-path)))
-)

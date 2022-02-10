@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"%{dep:anon_arg_1.i}"
+STDOPT: #"@PTEST_DIR@/anon_arg_1.i @PTEST_FILE@"
 */
 
 /*@ requires \valid(p);

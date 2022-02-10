@@ -1,7 +1,7 @@
-(* ledit bin/toplevel.top -deps mark_all_slices.c
-  #use "select.ml";;
+(* ledit bin/toplevel.top -deps tests/slicing/mark_all_slices.c
+  #use "tests/slicing/select.ml";;
 ou
-  #use "mark_all_slices.ml";;
+  #use "tests/slicing/mark_all_slices.ml";;
 
 *)
 

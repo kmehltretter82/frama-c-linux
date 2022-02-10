@@ -1,10 +1,5 @@
 /* run.config
-<<<<<<< HEAD
-   PLUGIN: @EVA_PLUGINS@
-||||||| 754e522ceb
-=======
 PLUGIN: eva,scope
->>>>>>> origin/master
    STDOPT: +"-eva-slevel 100 -eva"
    STDOPT: +"-ulevel 1 -eva-slevel 100 -eva"
    STDOPT: +"-ulevel 2 -eva-slevel 100 -eva"
