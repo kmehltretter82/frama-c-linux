@@ -37,6 +37,7 @@ type env_t = {
   config: string
 ; dir: string
 ; dune_alias: string
+; absolute_tests_dir: string
 }
 
 module Filename = struct
@@ -130,14 +131,17 @@ let is_file_empty_or_nonexisting filename =
 let config_name ~env name =
   if env.config = "" then name else name ^ "_" ^ env.config
 
-let macro_default_options = ref "-journal-disable -check -no-autoload-plugins"
+let macro_post_options = ref "" (* value set to @PTEST_POST_OPTIONS@ macro *)
+let macro_pre_options  = ref "" (* value set to @PTEST_PRE_OPTIONS@  macro *)
+let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
+let macro_default_options = ref "-journal-disable -check -no-autoload-plugins -add-symbolic-path @PTEST_SESSION@"
+
 let macro_frama_c_exe = ref "frama-c"
-let macro_frama_c_only = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
-let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"
-let macro_frama_c = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@ @PTEST_FILE@"
+let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
+let macro_frama_c = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"
 let macro_frama_c_share = ref "../../../../install/default/share/frama-c/share"
 
-let default_toplevel = ref "@frama-c@ @PTEST_OPTIONS@"
+let default_toplevel = ref "@frama-c@"
 
 (** the files in [suites] whose name matches
       the pattern [test_file_regexp] will be considered as test files *)
@@ -210,7 +214,6 @@ let example_msg =
      @@PTEST_LOAD_OPTIONS@@ # The current list of options related to PLUGIN, MODULE, SCRIPT and LIBS to load.@  \
      @@PTEST_OPTIONS@@  # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
      @@frama-c-exe@@    # Shortcut defined as follow: %s@  \
-     @@frama-c-only@@   # Shortcut defined as follow: %s@  \
      @@frama-c@@        # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@    # Shortcut defined as follow: %s@  \
      @@FRAMAC_SHARE@@   # Shortcut defined as follow: %s@  \
@@ -244,7 +247,6 @@ let example_msg =
      @]"
     !macro_default_options
     !macro_frama_c_exe
-    !macro_frama_c_only
     !macro_frama_c
     !macro_frama_c_cmd
     !macro_frama_c_share
@@ -273,16 +275,20 @@ let rec argspec =
 
     ("-adds-default-options" , Arg.String (fun s -> macro_default_options := !macro_default_options ^ " " ^ s),
      " <options> Appends the <options> to the default value of the @PTEST_DEFAULT_OPTIONS@ macro");
+    ("-add-options-pre", Arg.String (fun s -> macro_pre_options := !macro_pre_options ^ " " ^ s),
+     "<options> Add additional options to be passed to the toplevels \
+      that will be launched. <options> are added before standard test options.");
+    ("-add-options-post", Arg.String (fun s -> macro_post_options := !macro_post_options ^ " " ^ s),
+     "<options> Add additional options to be passed to the toplevels \
+      that will be launched. <options> are added after standard test options");
 
     ("-macro-default-options" , Arg.String (fun s -> macro_default_options := s),
      " <value> Set the default value of the @PTEST_DEFAULT_OPTIONS@ macro (defaults to "^ !macro_default_options ^")");
     ("-macro-frama-c-exe", Arg.String (fun s -> macro_frama_c_exe := s),
      " <value> Set the default value of the @frama-c-exe@ macro (defaults to "^ !macro_frama_c_exe ^")");
-    ("-macro-frama-c-only", Arg.String (fun s -> macro_frama_c_only := s),
-     " <value> Set the default value of the @frama-c-only@ macro (defaults to "^ !macro_frama_c_only ^")");
-    ("-macro-frama-c-cmd", Arg.String (fun s -> macro_frama_c_only := s),
+    ("-macro-frama-c-cmd", Arg.String (fun s -> macro_frama_c_cmd := s),
      " <value> Set the default value of the @frama-c-cmd@ macro (defaults to "^ !macro_frama_c_cmd ^")");
-    ("-macro-frama-c", Arg.String (fun s -> macro_frama_c_only := s),
+    ("-macro-frama-c", Arg.String (fun s -> macro_frama_c := s),
      " <value> Set the @frama-c@ macro (defaults to "^ !macro_frama_c ^")");
 
     ("-dune-alias", Arg.String (fun s -> default_dune_alias := s),
@@ -509,18 +515,23 @@ type does_expand = {
     StringMap.add name (get name macros ^ expand macros def) macros
 
   let default_macros = add_list
-    [ "PTEST_DEPS",   "";
+    [ "frama-c-exe", !macro_frama_c_exe;
+      "frama-c-cmd", !macro_frama_c_cmd;
+      "frama-c",     !macro_frama_c;
+      "DEV_NULL",    dev_null;
+
+      "FRAMAC_SHARE",!macro_frama_c_share;
+
+      "PTEST_DEFAULT_OPTIONS", !macro_default_options;
+      "PTEST_OPTIONS",         !macro_options;
+      "PTEST_PRE_OPTIONS",     !macro_pre_options;
+      "PTEST_POST_OPTIONS",    !macro_post_options;
+
+      "PTEST_DEPS",   "";
       "PTEST_LIBS",   "";
       "PTEST_MODULE", "";
       "PTEST_SCRIPT", "";
       "PTEST_PLUGIN", "";
-      "PTEST_DEFAULT_OPTIONS", !macro_default_options;
-      "frama-c-exe", !macro_frama_c_exe;
-      "frama-c-only", !macro_frama_c_only;
-      "frama-c-cmd", !macro_frama_c_cmd;
-      "frama-c",     !macro_frama_c;
-      "FRAMAC_SHARE",!macro_frama_c_share;
-      "DEV_NULL",    dev_null;
     ] empty
 
 end
@@ -602,7 +613,8 @@ end = struct
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
     let ptest_vars =
-        [ "PTEST_CONFIG", ptest_config;
+        [ "PTEST_SESSION", env.absolute_tests_dir ^ "/_build/default:.";
+          "PTEST_CONFIG", ptest_config;
           "PTEST_DIR", ".";
           "PTEST_RESULT", ".";
           "PTEST_SUITE_DIR", "..";
@@ -1104,14 +1116,35 @@ let basic_command_string command =
   in
   let macros = (* set expanded macros that can be used into CMD directives *)
     Macros.add_list [
-      "PTEST_OPTIONS", Macros.expand command.macros command.options;
+      "PTEST_OPT", Macros.expand command.macros command.options;
       "PTEST_LOAD_OPTIONS", plugins_options;
     ] command.macros in
-  let raw_command = Macros.expand macros command.toplevel in
-  if command.timeout = "" then raw_command
-  else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
+  let toplevel =
+    let in_toplevel,toplevel = Macros.does_expand macros command.toplevel in
+    if command.execnow || in_toplevel.has_ptest_opt then toplevel
+    else begin
+      let has_ptest_file,options =
+        let in_option,options = Macros.does_expand macros command.options in
+        (in_option.has_ptest_file || in_toplevel.has_ptest_file),
+        (if in_toplevel.has_frama_c_exe then
+           [ Macros.expand macros "@PTEST_PRE_OPTIONS@" ;
+             options ;
+             Macros.expand macros "@PTEST_POST_OPTIONS@" ;
+           ]
+         else [ options ])
+      in
+      let options = List.filter (fun s -> s <> "") options in
+      let options = if has_ptest_file then options
+        else (Filename.basename command.file)::options
+      in
+      String.concat " " (toplevel::options)
+    end
+  in
+  let raw_command = if command.timeout = "" then toplevel
+    else "ulimit -t " ^ command.timeout ^ " && " ^ toplevel
+  in raw_command
 
-let print_list fmt l = List.iter (Format.fprintf fmt " %S") l
+let pp_list fmt l = List.iter (Format.fprintf fmt " %S") l
 module Fmt = struct
   let plugin_as_package fmt s = Format.fprintf fmt "frama-c-%s" s
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
@@ -1119,6 +1152,11 @@ module Fmt = struct
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
   let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s
 end
+let pp_command_deps fmt command =
+  Format.fprintf fmt "%a %S (package frama-c)%a"
+    pp_list command.deps.deps_cmd
+    command.file
+    Fmt.(list (package_as_deps (quote plugin_as_package))) command.deps.load_plugin
 
 let show_cmd =
   let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
@@ -1206,7 +1244,6 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     | None -> reslog,errlog
     | Some _ -> (log_prefix ^ ".res.unfiltered-log"),(log_prefix ^ ".err.unfiltered-log")
   in
-  let deps = command.deps in
   let accepted_exit_code = Format.sprintf "with-accepted-exit-codes %d" command.exit_code in
   let command_string = basic_command_string command in
   let filter_res,filter_err,wtest =
@@ -1253,29 +1290,27 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       "(rule ; %s\n  \
        (alias %S)\n  \
        (targets %S %S %a)\n  \
-       (deps %S %S %a %a %S (package frama-c)%a)\n  \
+       (deps %S %S %a %a)\n  \
        (action (run %s %%{dep:%s} %S %a))\n\
        )@."
-      (* rules: *)
+      (* rule: *)
       wtest.info
-      (* alias *)
+      (* alias: *)
       wrapper_basename
       (* targets: *)
       cmderrlog
       cmdreslog
-      print_list command.log_files
+      pp_list command.log_files
       (* deps: *)
       wtest.oracle_out
       wtest.oracle_err
-      print_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
-      print_list deps.deps_cmd
-      command.file
-      Fmt.(list (package_as_deps (quote plugin_as_package))) command.deps.load_plugin
+      pp_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
+      pp_command_deps command
       (* action: *)
       !wrapper_cmd
       wrapper_basename
       wtest.cmd
-      print_list (if command.filter = None then [] else [wtest.sedout ; wtest.sederr]);
+      pp_list (if command.filter = None then [] else [wtest.sedout ; wtest.sederr]);
 
     let wtest =
       { wtest with
@@ -1293,21 +1328,19 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       "(rule ; %s\n  \
        (alias %S)\n  \
        (targets %S %S %a)\n  \
-       (deps   %a %S (package frama-c)%a)\n  \
+       (deps   %a)\n  \
        (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
        )@."
-      (* rules: *)
+      (* rule: *)
       wtest.info
-      (* alias *)
+      (* alias: *)
       wrapper_basename
       (* targets: *)
       cmderrlog
       cmdreslog
-      print_list command.log_files
+      pp_list command.log_files
       (* deps: *)
-      print_list deps.deps_cmd
-      command.file
-      Fmt.(list (package_as_deps (quote plugin_as_package))) command.deps.load_plugin
+      pp_command_deps command
       (* action: *)
       cmderrlog
       cmdreslog
@@ -1321,12 +1354,13 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
          (deps %S)
          (action (with-stdout-to %S (with-accepted-exit-codes (or 0 1 2 125) (system %S))))\n\
          )@."
+        (* rule: *)
         txt
         command.nth
         command.file
-        (* deps *)
+        (* deps: *)
         fin
-        (*action *)
+        (* action: *)
         fout cmd
   in
   filter_rule "RES" cmdreslog reslog filter_res ;
@@ -1337,36 +1371,43 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
          (alias %s)\n  \
          (action (diff %S %S))\n\
          )@."
+        (* rule: *)
         n command.nth command.file
+        (* alias: *)
         (ptests_alias ~env)
+        (* action: *)
         (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
         log
     ) command.log_files;
   Format.fprintf result_fmt
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
-     (deps  %a %S (package frama-c)%a (universe))\n  \
+     (deps  %a (universe))\n  \
      (action (%s (system %S)))\n\
      )@."
+    (* rule: *)
     command.nth command.file
+    (* alias: *)
     (mk_alias command "exec")
-    print_list deps.deps_cmd
-    command.file
-    Fmt.(list (package_as_deps (quote plugin_as_package))) command.deps.load_plugin
+    (* deps: *)
+    pp_command_deps command
+    (* action: *)
     accepted_exit_code
     command_string
   ;
   Format.fprintf result_fmt
     "(rule ; SHOW TEST COMMAND #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
-     (deps  %a %S (package frama-c)%a (universe))\n  \
+     (deps  %a (universe))\n  \
      (action (system %S))\n\
      )@."
+    (* rule: *)
     command.nth command.file
+    (* alias: *)
     (mk_alias command "exec.show")
-    print_list deps.deps_cmd
-    command.file
-    Fmt.(list (package_as_deps (quote plugin_as_package))) command.deps.load_plugin
+    (* deps: *)
+    pp_command_deps command (* to get an updated build even in case of using the result *)
+    (* action: *)
     ("echo '" ^ show_cmd wtest.cmd ^"'");
 
   let diff_alias = log_prefix ^ ".diff" in
@@ -1376,7 +1417,9 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (alias %S)\n  \
      (action (diff %S %S))\n\
      )@."
+    (* alias: *)
     diff_alias
+    (* action: *)
     wtest.oracle_out
     reslog;
   Format.fprintf result_fmt
@@ -1384,7 +1427,9 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (alias %S)\n  \
      (action (diff %S %S))\n\
      )@."
-    diff_alias
+    (* alias: *)
+     diff_alias
+    (* action: *)
     wtest.oracle_err
     errlog;
   Format.fprintf result_fmt
@@ -1400,36 +1445,36 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   List.iter (oracle_target oracle_fmt oracle_subdir) command.log_files ;
   ()
 
-(** process a test file *)
-let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
+let deps_command macros deps =
+  let subst = Macros.expand macros in
+  let load_plugin = List.map subst deps.load_plugin in
+  let load_module = List.map subst deps.load_module in
+  let load_libs = List.map (fun s -> (subst s)^".cmxs") deps.load_libs in
+  let deps_cmd = List.map subst deps.deps_cmd in
+  { load_plugin; load_module; load_libs;
+    deps_cmd = load_libs @ load_module @ deps_cmd;
+  }
+
+let update_modules file modules deps =
+  if deps.load_module <> [] then begin
+    let plugin_libs = StringSet.union
+        (StringSet.of_list (List.map (Format.sprintf "frama-c-%s.core") deps.load_plugin))
+        (StringSet.of_list (List.map (fun s -> Filename.remove_extension (Filename.basename s))
+                              deps.load_libs))
+    in
+    List.iter (fun cmxs ->
+        let cmxs = Filename.remove_extension cmxs in
+        modules := StringMap.update cmxs (function
+            | None -> Some (plugin_libs,[file])
+            | Some (set,files) -> Some ((StringSet.inter set plugin_libs),file::files)
+          ) !modules) (StringSet.elements (StringSet.of_list deps.load_module));
+  end
+
+ (** process a test file *)
+let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
   let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
     let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
-    let deps_command macros deps =
-      let subst = Macros.expand macros in
-      let load_plugin = List.map subst deps.load_plugin in
-      let load_module = List.map subst deps.load_module in
-      let load_libs = List.map (fun s -> (subst s)^".cmxs") deps.load_libs in
-      let deps_cmd = List.map subst deps.deps_cmd in
-      { load_plugin; load_module; load_libs;
-        deps_cmd = load_libs @ load_module @ deps_cmd;
-      };
-    in
-    let update_modules deps =
-      if deps.load_module <> [] then begin
-        let plugin_libs = StringSet.union
-            (StringSet.of_list (List.map (Format.sprintf "frama-c-%s.core") deps.load_plugin))
-            (StringSet.of_list (List.map (fun s -> Filename.remove_extension (Filename.basename s))
-                                  deps.load_libs))
-        in
-        List.iter (fun cmxs ->
-            let cmxs = Filename.remove_extension cmxs in
-            modules := StringMap.update cmxs (function
-                | None -> Some (plugin_libs,[file])
-                | Some (set,files) -> Some ((StringSet.inter set plugin_libs),file::files)
-              ) !modules) (StringSet.elements (StringSet.of_list deps.load_module));
-      end
-    in
     let nb_files = List.length config.dc_commands in
     let make_cmd =
       let i = ref 0 in
@@ -1439,7 +1484,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
         let macros = ptest_vars ~nth macros in
         let log_files = List.map (Macros.expand macros) logs in
         let deps = deps_command macros deps in
-        update_modules deps;
+        update_modules file modules deps;
         command_string ~env ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files;
@@ -1463,9 +1508,9 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
        let nth = !e in
        incr e ;
        let macros = ptest_vars ~nth Macros.empty in
-       let deps = deps_command macros execnow.ex_deps in
-       update_modules deps;
        let cmd =
+         let deps = deps_command macros execnow.ex_deps in
+         update_modules file modules deps;
          { test_name; file; nb_files = nb_files_execnow; directory; nth;
            log_files = [];
            options = "";
@@ -1478,12 +1523,13 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
            deps = deps;
          }
        in
+       let cmd_string = basic_command_string cmd in
        let wtest = {
          default_wtest with
          dir = SubDir.get (SubDir.result_subdir ~env cmd.directory) ;
          info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
              nth (SubDir.get directory) file;
-         cmd = basic_command_string cmd;
+         cmd = cmd_string;
          log = List.map (Macros.expand cmd.macros) execnow.ex_log;
          bin = List.map (Macros.expand cmd.macros) execnow.ex_bin;
        }
@@ -1493,22 +1539,21 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
          Format.fprintf result_fmt
            "(rule ; %s\n  \
             (alias %s)\n  \
-            (deps %a %a %a (package frama-c)%a)\n  \
+            (deps %a %a %a)\n  \
             (targets %a %a)\n  \
             (action (run %s %%{dep:%s} %S))\n\
             )@."
-           (* rules: *)
+           (* rule: *)
            wtest.info
-           (* alias *)
+           (* alias: *)
            wrapper_basename
            (* deps: *)
-           print_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
-           print_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
-           print_list cmd.deps.deps_cmd
-           Fmt.(list (package_as_deps (quote plugin_as_package))) cmd.deps.load_plugin
+           pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
+           pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
+           pp_command_deps cmd
            (* targets: *)
-           print_list wtest.log
-           print_list wtest.bin
+           pp_list wtest.log
+           pp_list wtest.bin
            (* action: *)
            !wrapper_cmd
            wrapper_basename
@@ -1530,16 +1575,16 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
             (targets %a %a)\n  \
             (action (system %S))\n\
             )@."
-           (* rules: *)
+           (* rule: *)
            wtest.info
-           (* alias *)
+           (* alias: *)
            wrapper_basename
            (* deps: *)
-           print_list config.dc_deps
-           Fmt.(list (package_as_deps (quote plugin_as_package))) cmd.deps.load_plugin
+           pp_list config.dc_deps
+           pp_command_deps cmd
            (* targets: *)
-           print_list wtest.log
-           print_list wtest.bin
+           pp_list wtest.log
+           pp_list wtest.bin
            (* action: *)
            wtest.cmd
        end;
@@ -1549,16 +1594,15 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
        Format.fprintf result_fmt
          "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
           (alias %s)\n  \
-          (deps %a (package frama-c)%a (universe))\n  \
+          (deps  %a (universe))\n  \
           (action (system %S))\n\
           )@."
-         (* rules: *)
+         (* rule: *)
          nth file
-         (* alias *)
+         (* alias: *)
          (mk_alias cmd "execnow.show")
          (* deps: *)
-         print_list config.dc_deps
-         Fmt.(list (package_as_deps (quote plugin_as_package))) cmd.deps.load_plugin
+         pp_command_deps cmd (* to get an updated build even in case of using the result *)
          (* action: *)
          ("echo '" ^ show_cmd wtest.cmd ^"'");
        ;
@@ -1568,9 +1612,9 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
               (alias %s)\n  \
               (action (diff %S %S))\n\
               )@."
-             (* rules: *)
+             (* rule: *)
              n nth file
-             (* alias *)
+             (* alias: *)
              (ptests_alias ~env)
              (* action: *)
              (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
@@ -1578,19 +1622,19 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
          ) wtest.log
     in
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
-      let print_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
+      let pp_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
           "; TEST FILE %S\n\
            (alias (deps %a%a) (name %S)) ; to performs all sub-tests related to a file\n\
            (alias (deps %a%a) (name %S)) ; to reproduce and visualize the all sub-test outputs related to a file@."
           file
           (* alias #1 *)
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec.wtests" test_name i) config.dc_commands)
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
+          pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec.wtests" test_name i) config.dc_commands)
+          pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
           (Format.sprintf "%s.wtests" test_name)
           (* alias #2 *)
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
+          pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
+          pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
           file;
     end ;
     List.iter make_cmd config.dc_commands;
@@ -1650,11 +1694,12 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
             if test_pattern dir_config file
             then begin
               if !verbosity >= 2 then Format.printf "%% - Process test file %s ...@." file;
-              has_test := dispatcher ~env ~result_fmt ~oracle_fmt file directory dir_config modules || !has_test;
+              has_test := process_file ~env ~result_fmt ~oracle_fmt file directory dir_config modules || !has_test;
             end;
          ) dir_files;
        let n = ref 0 in
        StringMap.iter (fun cmxs (libs,files) ->
+           let cmxs = Filename.basename cmxs in
            let files = StringSet.elements (StringSet.of_list files) in
            incr n;
            Format.fprintf result_fmt
@@ -1663,16 +1708,16 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
               (modules %S)\n  \
               (modes plugin)\n  \
               (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a)\n  \
-              (flags -open Frama_c_kernel)\n\
+              (flags :standard -w -50-9-32-6-34 -open Frama_c_kernel)\n\
               )@."
              (* executable: *)
-             !n print_list files
+             !n pp_list files
              (* name: *)
              cmxs
              (* module: *)
              cmxs
              (* libraries: *)
-             print_list (StringSet.elements libs))
+             pp_list (StringSet.elements libs))
          !modules ;
        Format.fprintf result_fmt "@.";
        Format.fprintf oracle_fmt "@.";
@@ -1704,8 +1749,12 @@ let () =
     | [] -> [ "tests" ]
     | l -> l
   in
+  let pwd = Unix.getcwd () in
   List.iter (fun dir ->
       Format.printf "Test directory: %s@." dir;
+      let absolute_tests_dir = Filename.dirname
+          (if Filename.is_relative dir then Filename.concat pwd dir else dir)
+      in
       let suites = Ptests_config.parse ~dir in
       if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
       let nb = !nb_dune_files in
@@ -1713,7 +1762,7 @@ let () =
       StringMap.iter (fun config_mode suites ->
           if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
               (match config_mode with "" -> "DEFAULT" | s -> s) (StringMap.cardinal suites);
-          let env = { config = config_mode ; dir ; dune_alias = "" } in
+          let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_tests_dir} in
           let directory = SubDir.create ~with_subdir:false ~env dir in
           let config = Test_config.current_config ~env directory in
           let config = update_dir_ref directory config in

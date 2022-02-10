@@ -2,7 +2,7 @@
   (name frama_c_boot)
   (public_name frama-c.boot)
   (modules boot)
-  (flags -open Frama_c_kernel)
+  (flags :standard -open Frama_c_kernel)
   (libraries frama_c_kernel)
 )
 
@@ -23,7 +23,7 @@
   (public_name frama-c)
   (modules empty_file)
   (package frama-c)
-  (flags -open Frama_c_kernel -linkall)
+  (flags :standard -open Frama_c_kernel -linkall)
   (libraries frama-c.kernel frama-c.init.cmdline frama-c.boot)
 )
 
