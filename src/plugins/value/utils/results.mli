@@ -65,12 +65,15 @@ type 'a evaluation
 type error = Bottom | Top | DisabledDomain
 type 'a result = ('a,error) Result.t
 
+
 (** Results handling *)
 
 (** Translates an error to a human readable string. *)
 val string_of_error : error -> string
+
 (** Pretty printer for errors. *)
 val pretty_error : Format.formatter -> error -> unit
+
 (** Pretty printer for API's results. *)
 val pretty_result : (Format.formatter -> 'a -> unit) ->
   Format.formatter -> 'a result -> unit
@@ -80,20 +83,27 @@ val pretty_result : (Format.formatter -> 'a -> unit) ->
     Equivalent to [Result.value ~default:d r] *)
 val default : 'a -> 'a result -> 'a
 
+
 (** Control point selection *)
 
 (** At the start of the analysis, but after the initialization of globals. *)
 val at_start : request
+
 (** At the end of the analysis, after the main function has returned. *)
 val at_end : request
+
 (** At the start of the given function. *)
 val at_start_of : Cil_types.kernel_function -> request
+
 (** At the end of the given function. *)
 val at_end_of : Cil_types.kernel_function -> request
+
 (** Just before a statement is executed. *)
 val before : Cil_types.stmt -> request
+
 (** Just after a statement is executed. *)
 val after : Cil_types.stmt -> request
+
 (** Just before a statement or at the start of the analysis. *)
 val before_kinstr : Cil_types.kinstr -> request
 
@@ -103,9 +113,11 @@ val before_kinstr : Cil_types.kinstr -> request
 (** Only consider the given callstack. Replaces previous calls to [in_callstack]
     or [in_callstacks]. *)
 val in_callstack : callstack -> request -> request
+
 (** Only consider all the callstacks in the given list. If previous calls to
     [in_callstack] or [in_callstacks] were done, it takes the intersection. *)
 val in_callstacks : callstack list -> request -> request
+
 (** Only consider callstacks satisfying the given predicate. Several filters
     can be added. If callstacks are also selected with [in_callstack] or
     [in_callstacks], only the selected callstacks will be filtered. *)
@@ -116,11 +128,14 @@ val filter_callstack : (callstack -> bool) -> request -> request
 
 (** Returns the list of reachable callstacks from the given request. *)
 val callstacks : request -> callstack list
+
 (** Returns a list of subrequests for each reachable callstack from
     the given request. *)
 val by_callstack : request -> (callstack * request) list
+
 (** Iterates on the reachable callstacks from the request. *)
 val iter_callstacks : (callstack -> request -> unit) -> request -> unit
+
 (** Folds on the reachable callstacks from the request. *)
 val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
 
@@ -130,6 +145,7 @@ val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
 (** Returns the list of expressions which have been inferred to be equal to
     the given expression by the Equality domain. *)
 val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
+
 (** Returns the Cvalue model. *)
 val as_cvalue_model : request -> Cvalue.Model.t result
 
@@ -139,9 +155,11 @@ val as_cvalue_model : request -> Cvalue.Model.t result
 (** Computes (an overapproximation of) the memory zones that must be read to
     evaluate the given expression, including all adresses computations. *)
 val expr_deps : Cil_types.exp -> request -> Locations.Zone.t
+
 (** Computes (an overapproximation of) the memory zones that must be read to
     evaluate the given lvalue, including the lvalue zone itself. *)
 val lval_deps : Cil_types.lval -> request -> Locations.Zone.t
+
 (** Computes (an overapproximation of) the memory zones that must be read to
     evaluate the given lvalue, excluding the lvalue zone itself. *)
 val address_deps : Cil_types.lval -> request -> Locations.Zone.t
@@ -151,13 +169,17 @@ val address_deps : Cil_types.lval -> request -> Locations.Zone.t
 
 (** Returns (an overapproximation of) the possible values of the variable. *)
 val eval_var : Cil_types.varinfo -> request -> value evaluation
+
 (** Returns (an overapproximation of) the possible values of the lvalue. *)
 val eval_lval : Cil_types.lval -> request -> value evaluation
+
 (** Returns (an overapproximation of) the possible values of the expression. *)
 val eval_exp : Cil_types.exp -> request -> value evaluation
 
+
 (** Returns (an overapproximation of) the possible addresses of the lvalue. *)
 val eval_address : Cil_types.lval -> request -> address evaluation
+
 
 (** Returns the kernel functions into which the given expression may evaluate.
     If the callee expression doesn't always evaluate to a function, those
@@ -178,23 +200,31 @@ val eval_callee : Cil_types.exp -> request -> Kernel_function.t list result
 
 (** Converts the value into a singleton ocaml int. *)
 val as_int : value evaluation -> int result
+
 (** Converts the value into a singleton unbounded integer. *)
 val as_integer : value evaluation -> Integer.t result
+
 (** Converts the value into a floating point number. *)
 val as_float : value evaluation -> float result
+
 (** Converts the value into a C number abstraction. *)
 val as_ival : value evaluation -> Ival.t result
+
 (** Converts the value into a floating point abstraction. *)
 val as_fval : value evaluation -> Fval.t result
+
 (** Converts the value into a Cvalue abstraction. *)
 val as_cvalue : value evaluation -> Cvalue.V.t result
 
+
 (** Converts into a C location abstraction. *)
 val as_location : address evaluation -> Locations.location result
+
 (** Converts into a Zone. Error cases are converted into bottom or top zones
     accordingly. *)
 val as_zone: ?access:Locations.access -> address evaluation ->
   Locations.Zone.t
+
 (** Converts into a Zone result. *)
 val as_zone_result : ?access:Locations.access -> address evaluation ->
   Locations.Zone.t result
@@ -205,6 +235,7 @@ val as_zone_result : ?access:Locations.access -> address evaluation ->
 (** Returns whether the evaluated value is initialized or not. If the value have
     been evaluated from a Cil expression, it is always initialized. *)
 val is_initialized : value evaluation -> bool
+
 (** Returns the set of alarms emitted during the evaluation. *)
 val alarms : 'a evaluation -> Alarms.t list
 
@@ -213,13 +244,17 @@ val alarms : 'a evaluation -> Alarms.t list
 
 (** Returns true if there are no reachable states for the given request. *)
 val is_empty : request -> bool
+
 (** Returns true if an evaluation leads to bottom, i.e. if the given expression
     or lvalue cannot be evaluated to a valid result for the given request. *)
 val is_bottom : 'a evaluation -> bool
+
 (** Returns true if the function has been analyzed. *)
 val is_called : Cil_types.kernel_function -> bool
+
 (** Returns true if the statement has been reached by the analysis. *)
 val is_reachable : Cil_types.stmt -> bool
+
 (** Returns true if the statement has been reached by the analysis, or if
     the main function has been analyzed for [Kglobal]. *)
 val is_reachable_kinstr : Cil_types.kinstr -> bool
@@ -229,10 +264,12 @@ val is_reachable_kinstr : Cil_types.kinstr -> bool
 
 (** Returns the list of inferred callers of the given function. *)
 val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
+
 (** Returns the list of inferred callers, and for each of them, the list
     of callsites (the call statements) inside. *)
 val callsites : Cil_types.kernel_function ->
   (Cil_types.kernel_function * Cil_types.stmt list) list
+
 
 (** Returns the kernel functions called in the given statement.
     If the callee expression doesn't always evaluate to a function, those
