@@ -1,7 +1,7 @@
 /* run.config
-   STDOPT: +"-slice-calls main -journal-enable -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i"
+   STDOPT: +"-slice-calls main -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_RESULT@/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i"
 */
-// one bug about JOURNALIZATION and another one about slicing CALLS TO MAIN function.
+// bug about slicing CALLS TO MAIN function.
 double d1, d2, d3;
 int x1, x2, x3;
 int main2 (void) {

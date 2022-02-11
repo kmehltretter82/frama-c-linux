@@ -11,9 +11,9 @@ DEFAULT_SUITES= occurrence pretty_printing rte_manual
 # todo:
 IGNORE= DEFAULT_SUITES= journal libc metrics pdg rte
 
-DEFAULT_SUITES= scope sparecode value/traces
+DEFAULT_SUITES= scope slicing sparecode value/traces
 # todo:
-IGNORE= DEFAULT_SUITES= saveload slicing spec test value
+IGNORE= DEFAULT_SUITES= saveload spec test value
 
 
 # todo: fixes fc_script
