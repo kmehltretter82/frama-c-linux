@@ -1,3 +1,18 @@
+(** Eva public API.
+
+   The main modules are:
+   - Analysis: run the analysis.
+   - Results: access analysis results, especially the values of expressions
+      and memory locations of lvalues at each program point.
+
+   The following modules allow configuring the Eva analysis:
+   - Value_parameters: change the configuration of the analysis.
+   - Eva_annotations: add local annotations to guide the analysis.
+   - Builtins: register ocaml builtins to be used by the cvalue domain
+       instead of analysing the body of some C functions.
+
+   Other modules are for internal use only. *)
+
 (* This file is generated. Do not edit. *)
 
 module Analysis: sig
@@ -239,19 +254,6 @@ module Results: sig
 
 end
 
-module Value_results: sig
-  type results
-
-  val get_results: unit -> results
-  val set_results: results -> unit
-  val merge: results -> results -> results
-  val change_callstacks:
-    (Value_types.callstack -> Value_types.callstack) -> results -> results
-  (** Change the callstacks for the results for which this is meaningful.
-      For technical reasons, the top of the callstack must currently
-      be preserved. *)
-end
-
 module Value_parameters: sig
   (** Configuration of the analysis. *)
 
@@ -266,24 +268,6 @@ module Value_parameters: sig
   (** [use_global_value_partitioning vi] instructs the analysis to use
       value partitioning on the global variable [vi]. *)
   val use_global_value_partitioning: Cil_types.varinfo -> unit
-end
-
-module Eval_terms: sig
-  (** [annot_predicate_deps ~pre ~here p] computes the logic dependencies needed
-      to evaluate the predicate [p] in a code annotation in cvalue state [here],
-      in a function whose pre-state is [pre].
-      Returns None on either an evaluation error or on unsupported construct. *)
-  val annot_predicate_deps:
-    pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
-    Cil_types.predicate -> Locations.Zone.t option
-end
-
-module Unit_tests: sig
-  (** Currently tested by this module:
-      - semantics of sign values. *)
-
-  (** Runs some programmatic tests on Eva. *)
-  val run: unit -> unit
 end
 
 module Eva_annotations: sig
@@ -408,4 +392,35 @@ module Builtins: sig
 
   (** Has a builtin been registered with the given name? *)
   val is_builtin: string -> bool
+end
+
+module Eval_terms: sig
+  (** [annot_predicate_deps ~pre ~here p] computes the logic dependencies needed
+      to evaluate the predicate [p] in a code annotation in cvalue state [here],
+      in a function whose pre-state is [pre].
+      Returns None on either an evaluation error or on unsupported construct. *)
+  val annot_predicate_deps:
+    pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
+    Cil_types.predicate -> Locations.Zone.t option
+end
+
+module Value_results: sig
+  type results
+
+  val get_results: unit -> results
+  val set_results: results -> unit
+  val merge: results -> results -> results
+  val change_callstacks:
+    (Value_types.callstack -> Value_types.callstack) -> results -> results
+  (** Change the callstacks for the results for which this is meaningful.
+      For technical reasons, the top of the callstack must currently
+      be preserved. *)
+end
+
+module Unit_tests: sig
+  (** Currently tested by this module:
+      - semantics of sign values. *)
+
+  (** Runs some programmatic tests on Eva. *)
+  val run: unit -> unit
 end
