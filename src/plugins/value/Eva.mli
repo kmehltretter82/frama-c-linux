@@ -268,20 +268,13 @@ module Value_parameters: sig
 end
 
 module Eval_terms: sig
-  type labels_states = Cvalue.Model.t Cil_datatype.Logic_label.Map.t
-
-  (** Evaluation environment. Currently available are function Pre and Post, or
-      the environment to evaluate an annotation *)
-  type eval_env
-  val env_annot :
-    ?c_labels:labels_states -> pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
-    unit -> eval_env
-  (** Dependencies needed to evaluate a term or a predicate *)
-  type logic_deps = Locations.Zone.t Cil_datatype.Logic_label.Map.t
-  (** [predicate_deps env p] computes the logic dependencies needed to evaluate
-      [p] in the given evaluation environment [env].
-      @return None on either an evaluation error or on unsupported construct. *)
-  val predicate_deps: eval_env -> Cil_types.predicate -> logic_deps option
+  (** [annot_predicate_deps ~pre ~here p] computes the logic dependencies needed
+      to evaluate the predicate [p] in a code annotation in cvalue state [here],
+      in a function whose pre-state is [pre].
+      Returns None on either an evaluation error or on unsupported construct. *)
+  val annot_predicate_deps:
+    pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
+    Cil_types.predicate -> Locations.Zone.t option
 end
 
 module Unit_tests: sig
