@@ -1,1 +1,2 @@
-DEFAULT_SUITES= md sarif
+# todo: fixes package name
+IGNORE= DEFAULT_SUITES= md sarif
