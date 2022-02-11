@@ -58,7 +58,6 @@ let get_select_kf (fvar, _select) = Globals.Functions.get fvar
 let get_lval_zone ?(access=Locations.Read) stmt lval =
   let open Eva.Results in
   before stmt |> eval_address lval |> as_zone ~access
-  |> default Locations.Zone.bottom
 
 (** Utilities for [kinstr]. *)
 module Kinstr: sig

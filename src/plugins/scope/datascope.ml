@@ -81,9 +81,7 @@ module InitSid = struct
 end
 
 let get_writes stmt lval =
-  Eva.Results.(
-    before stmt |> eval_address lval |> as_zone ~access:Write |>
-    default Locations.Zone.bottom)
+  Eva.Results.(before stmt |> eval_address lval |> as_zone ~access:Write)
 
 (** Add to [stmt] to [lmap] for all the locations modified by the statement.
  * Something to do only for calls and assignments.

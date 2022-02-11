@@ -66,7 +66,7 @@ class find_write zlval = object (self)
           let direct_write = match lvopt with
             | None -> false
             | Some lv ->
-              Eva.Results.(before stmt |> eval_address lv |> as_zone) |>
+              Eva.Results.(before stmt |> eval_address lv |> as_zone_result) |>
               Result.fold ~ok:(Zone.intersects zlval) ~error:(fun _ -> false)
           in
           let effects =

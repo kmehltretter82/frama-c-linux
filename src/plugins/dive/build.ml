@@ -90,8 +90,7 @@ struct
     Result.value ~default:Locations.loc_bottom
 
   let to_zone kinstr lval =
-    before_kinstr kinstr |> eval_address lval |> as_zone |>
-    Result.value ~default:Locations.Zone.bottom
+    before_kinstr kinstr |> eval_address lval |> as_zone
 
   let to_callstacks stmt =
     before stmt |> callstacks

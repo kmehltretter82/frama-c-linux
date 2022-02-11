@@ -695,9 +695,15 @@ let as_location (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
   E.as_location E.v
 
-let as_zone ?(access=Locations.Read) (Address lvaluation) =
+let as_zone_result ?(access=Locations.Read) (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
   E.as_zone ~access E.v
+
+let as_zone ?access address =
+  match as_zone_result ?access address with
+  | Ok zone -> zone
+  | Error Bottom -> Locations.Zone.bottom
+  | Error (Top | DisabledDomain) -> Locations.Zone.top
 
 (* Evaluation properties *)
 

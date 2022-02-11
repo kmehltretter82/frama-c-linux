@@ -203,8 +203,12 @@ module Results: sig
 
   (** Converts into a C location abstraction. *)
   val as_location : address evaluation -> Locations.location result
-  (** Converts into a Zone. *)
-  val as_zone : ?access:Locations.access -> address evaluation ->
+  (** Converts into a Zone. Error cases are converted into bottom or top zones
+      accordingly. *)
+  val as_zone: ?access:Locations.access -> address evaluation ->
+    Locations.Zone.t
+  (** Converts into a Zone result. *)
+  val as_zone_result : ?access:Locations.access -> address evaluation ->
     Locations.Zone.t result
 
 

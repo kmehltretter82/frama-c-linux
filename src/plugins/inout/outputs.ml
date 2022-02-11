@@ -52,7 +52,7 @@ class virtual do_it_ = object(self)
     let bits_loc = Eva.Results.(
         before_kinstr self#current_kinstr |> eval_address lv |>
         as_zone ~access) in
-    Result.iter self#join bits_loc
+    self#join bits_loc
 
   method! vinst i =
     if Db.Value.is_reachable (Db.Value.noassert_get_state self#current_kinstr)

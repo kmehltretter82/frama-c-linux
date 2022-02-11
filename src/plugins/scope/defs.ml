@@ -168,8 +168,7 @@ let compute kf stmt lval =
   in
   Eva.Analysis.compute ();
   let zone = Eva.Results.(before stmt |> eval_address lval |> as_zone) in
-  Option.bind (Result.to_option zone) (compute_aux kf stmt) |>
-  Option.map extract
+  compute_aux kf stmt zone |> Option.map extract
 
 (* Variation of the function above. For each PDG node that has been found,
    we find whether it directly modifies [zone] through an affectation
@@ -220,8 +219,7 @@ let compute_with_def_type_zone kf stmt zone =
 let compute_with_def_type kf stmt lval =
   Eva.Analysis.compute ();
   let zone =
-    Eva.Results.(before stmt |> eval_address lval |> as_zone) |>
-    Result.value ~default:Locations.Zone.bottom
+    Eva.Results.(before stmt |> eval_address lval |> as_zone)
   in
   compute_with_def_type_zone kf stmt zone
 
