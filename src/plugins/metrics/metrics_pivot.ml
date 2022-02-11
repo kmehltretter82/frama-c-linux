@@ -282,7 +282,7 @@ let headers = ["Directory"; "Filename"; "Extension"; "Line Number";
 
 let add_entry_str entry =
   let dir, fname, ext, line = split_loc entry.loc in
-  let funcname = Option.fold ~none:"" ~some:Stdlib__fun.id entry.func in
+  let funcname = Option.fold ~none:"" ~some:Stdlib.Fun.id entry.func in
   let domain, kind = split_domain entry.domain in
   let names = string_of_string_list ":" entry.names in
   let entry = [dir; fname; ext; line; funcname;
@@ -512,7 +512,7 @@ module TableState = struct
     Data.declare ~package
       ~name:"tableStateType"
       ~descr:(Markdown.plain "State of the pivot table source data.")
-      Package.(Jlist (Jlist Jstring))
+      Package.(Jarray (Jarray Jstring))
   let to_json ll =
     `List (List.rev_map (fun l -> `List (List.map (fun s -> `String s) l)) ll)
 end

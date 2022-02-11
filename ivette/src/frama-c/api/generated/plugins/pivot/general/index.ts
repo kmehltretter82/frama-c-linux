@@ -41,13 +41,13 @@ import * as State from 'frama-c/states';
 /** State of the pivot table source data. */
 export type tableStateType = string[][];
 
-/** Loose decoder for `tableStateType` */
-export const jTableStateType: Json.Loose<tableStateType> =
-  Json.jList(Json.jList(Json.jString));
-
 /** Safe decoder for `tableStateType` */
 export const jTableStateTypeSafe: Json.Safe<tableStateType> =
-  jTableStateType;
+  Json.jArray(Json.jArray(Json.jFail(Json.jString,'String expected')));
+
+/** Loose decoder for `tableStateType` */
+export const jTableStateType: Json.Loose<tableStateType> =
+  Json.jTry(jTableStateTypeSafe);
 
 /** Natural order for `tableStateType` */
 export const byTableStateType: Compare.Order<tableStateType> =
