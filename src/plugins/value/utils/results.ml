@@ -233,7 +233,7 @@ struct
     | After stmt ->
       A.get_stmt_state_by_callstack ~after:true stmt |> by_callstack req
     | Initial ->
-      A.get_kinstr_state ~after:false Kglobal |> singleton []
+      A.get_global_state () |> singleton []
     | Start kf ->
       A.get_initial_state_by_callstack kf |> by_callstack req
 
@@ -242,13 +242,14 @@ struct
       Response.coercion @@ get_by_callstack req
     else
       let open Response in
-      match req.control_point with
-      | Before stmt ->
-        A.get_stmt_state ~after:false stmt |> consolidated
-      | After stmt ->
-        A.get_stmt_state ~after:true stmt |> consolidated
-      | _ ->
-        Response.coercion @@ get_by_callstack req
+      let state =
+        match req.control_point with
+        | Before stmt -> A.get_stmt_state ~after:false stmt
+        | After stmt -> A.get_stmt_state ~after:true stmt
+        | Start kf -> A.get_initial_state kf
+        | Initial -> A.get_global_state ()
+      in
+      consolidated state
 
   let convert : 'a or_top_bottom -> 'a result = function
     | `Top -> Result.error Top
