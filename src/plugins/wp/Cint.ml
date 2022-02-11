@@ -1287,7 +1287,7 @@ let mask_simplifier =
 
     let find t dom = Tmap.find t dom
 
-    let get t dom =
+    let get dom t =
       let r =
         match F.repr t with
         | Kint set -> { set; unset=Integer.lognot set }
@@ -1318,28 +1318,32 @@ let mask_simplifier =
                     else Some v) t v ctx
 
     let neutral_land = {set=Integer.minus_one ; unset=Integer.zero }
+    let eval_land eval es =
+      List.fold_left (fun {set;unset} x ->
+          let v = eval x in
+          { set=Integer.logand v.set set ;
+            unset=Integer.logor v.unset unset}) neutral_land es
+
     let neutral_lor = {set=Integer.zero ; unset=Integer.minus_one }
+    let eval_lor eval es =
+      List.fold_left (fun {set;unset} x ->
+          let v = eval x in
+          { set=Integer.logor v.set set ;
+            unset=Integer.logand v.unset unset}) neutral_lor es
+
     let eval ctx e = (* non recursive evaluation *)
       let r =
         try
           match F.repr e with
           | Kint set -> { set; unset=Integer.lognot set }
-          | Fun(f,es) when f == f_land ->
-              List.fold_left (fun {set;unset} x ->
-                  let v = get x ctx in
-                  { set=Integer.logand v.set set ;
-                    unset=Integer.logor v.unset unset}) neutral_land es
-          | Fun(f,es) when f == f_lor ->
-              List.fold_left (fun {set;unset} x ->
-                  let v = get x ctx in
-                  { set=Integer.logor v.set set ;
-                    unset=Integer.logand v.unset unset}) neutral_lor es
+          | Fun(f,es) when f == f_land -> eval_land (get ctx) es
+          | Fun(f,es) when f == f_lor -> eval_lor (get ctx) es
           | Fun(f,[x]) when f == f_lnot ->
-              let v = get x ctx in
+              let v = get ctx x in
               { unset=v.set ; set=v.unset }
           | Fun(f,[x]) ->
               let iota = to_cint f in
-              let v = get x ctx in
+              let v = get ctx x in
               if not (Ctypes.signed iota) then
                 (* The uppest bits are unset *)
                 let mask = snd (Ctypes.bounds iota) in
@@ -1434,13 +1438,13 @@ let mask_simplifier =
         | Eq(a,b) when is_int a && is_int b ->
             (* b may give a better constraint because it could be a constant *)
             let ctx = reduce ctx a (eval ctx b) in
-            reduce ctx b (get a ctx)
+            reduce ctx b (get ctx a)
         | _ -> ctx
       with Not_found -> ctx
 
     let eval ctx h =
       let ({set;unset} as v) = eval ctx h in
-      let r = try masks_narrow ~unset ~set (get h ctx) with Not_found -> v in
+      let r = try masks_narrow ~unset ~set (get ctx h) with Not_found -> v in
       Wp_parameters.debug ~dkey "Value %a@." pretty (h,r);
       r
 
@@ -1463,22 +1467,75 @@ let mask_simplifier =
         x) es xs
     in if !modified then f xs else e
   in
-  let rewrite_cst ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
+  let rewrite_cst ~highest ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
     match F.repr e with
     | Kint _ -> e
+    | Fun(f,[x;k]) when highest &&
+                        f == f_bit_positive -> (* rewrites [bit_test(x,k)] *)
+        (try let k = match_integer k in (* may raise Not_found *)
+           let v = Masks.eval ctx x in
+           let m = two_power_k k in (* may raise Not_found *)
+           if Masks.is_bottom v then
+             (* Does not rewrite [e] because the polarity is unknown *)
+             e
+           else if not (Integer.is_zero (Integer.logand v.Masks.set m)) then
+             (* [ctx] gives that the bit [k] of [x] is set *)
+             e_true
+           else if not (Integer.is_zero (Integer.logand v.Masks.unset m)) then
+             (* [ctx] gives that the bit [k] of [x] is unset *)
+             e_false
+           else e
+         with _ -> e)
+    | Eq (a, b) when highest ->
+        (try
+           let b = match_integer b in (* may raise Not_found *)
+           match F.repr a with
+           | Fun(f,es) when f == f_land ->
+               (* [k & t == b] specifies some bits of [t] *)
+               let k,es = match_list_head match_integer es in (* may raise Not_found *)
+               if not (Integer.is_zero (Integer.logand b (Integer.lognot k))) then
+                 (* [b] and [k] are such that the equality is false *)
+                 e_false
+               else
+                 let set = b (* the bits of [t] that have to be set *)
+                 and unset = (* the bits of [t] that have to be unset *)
+                   Integer.logand k (Integer.lognot b)
+                 and v = (* the current bits of [t] *)
+                   try Masks.find (F.e_fun f_land es) ctx
+                   with Not_found ->
+                     Masks.eval_land (fun i -> i) (List.map (Masks.eval ctx) es)
+                 in
+                 if Masks.is_bottom v then
+                   (* Does not rewrite [e] because the polarity is unknown *)
+                   e
+                 else if not (Integer.is_zero (Integer.logand set v.Masks.unset)) then
+                   (* Some bits of [t] that has to be set is unset *)
+                   e_false
+                 else if not (Integer.is_zero (Integer.logand unset v.Masks.set)) then
+                   (* Some bits of [t] that has to be unset is set *)
+                   e_false
+                 else if (Integer.equal (Integer.logand set v.Masks.set) set) &&
+                         (Integer.equal (Integer.logand unset v.Masks.unset) unset)
+                 then (* The bits of [t] that have to be set are set &&
+                         those that have to be unset are unset *)
+                   e_true
+                 else e
+           | _ -> e
+         with _ -> e)
     | _ when is_int e ->
         let open Masks in
         let v = eval ctx e in
         if Integer.equal v.set (Integer.lognot v.unset) then
+          (* [ctx] gives a value (0 or else 1) for all bits of [e] *)
           F.e_zint v.set
         else e
     | _ -> e
   in
-  let rec rewrite ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
+  let rec rewrite ~highest ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
     let e =
       match F.repr e with
       | Fun(f,xs) when f == f_land ->
-          let es = List.map (rewrite ctx) xs in
+          let es = List.map (rewrite ~highest ctx) xs in
           Wp_parameters.debug ~dkey "Rewrite AND %a@." Lang.F.pp_term e;
           let reduce unset x = match F.repr x with
             | Kint v -> F.e_zint (Integer.logand (Integer.lognot unset) v)
@@ -1494,13 +1551,19 @@ let mask_simplifier =
           else if Integer.equal unset_mask Integer.minus_one then e_zero
           else nary_op e xs (F.e_fun f_land) (reduce unset_mask) es
       | Fun(f,xs) -> (try
-                        nary_op e xs (F.e_fun ~result:(F.typeof e) f) (rewrite ctx) xs
+                        nary_op e xs (F.e_fun ~result:(F.typeof e) f) (rewrite ~highest ctx) xs
                       with _ -> e)
-      | Not a -> unary_op e e_not (rewrite ctx) a
-      | Eq (a, b) -> bin_op e e_eq (rewrite ctx) a b
-      | Leq (a, b) -> bin_op e e_leq (rewrite ctx) a b
+      | Not a -> unary_op e e_not (rewrite ~highest ctx) a
+      | And es -> nary_op e es e_and (rewrite ~highest ctx) es
+      | Or es -> nary_op e es e_or (rewrite ~highest ctx) es
+      | Imply(xs, b) ->
+          let l = b::xs in
+          nary_op e l (function b::xs -> e_imply xs b | _ -> assert false) (rewrite ~highest ctx) l
+      | Eq (a, b) -> bin_op e e_eq (rewrite ~highest ctx) a b
+      | Leq (a, b) -> bin_op e e_leq (rewrite ~highest ctx) a b
+      | Lt (a, b) -> bin_op e e_lt (rewrite ~highest ctx) a b
       | _ -> e
-    in rewrite_cst ctx e
+    in rewrite_cst ~highest ctx e
 
   in
   object
@@ -1522,23 +1585,25 @@ let mask_simplifier =
     method equivalent_exp e =
       if Tmap.is_empty masks then e else
         (Wp_parameters.debug ~dkey "Rewrite Exp: %a@." Lang.F.pp_term e;
-         rewrite masks e)
+         rewrite ~highest:true masks e)
 
     method weaker_hyp p =
       if Tmap.is_empty masks then p else
         (Wp_parameters.debug ~dkey "Rewrite Hyp: %a@." Lang.F.pp_pred p;
-         F.p_bool (rewrite masks (F.e_prop p)))
+         F.p_bool (rewrite ~highest:false  masks (F.e_prop p)))
 
     method equivalent_branch p =
       if Tmap.is_empty masks then p else
         (Wp_parameters.debug ~dkey "Rewrite Branch: %a@." Lang.F.pp_pred p;
-         F.p_bool (rewrite masks (F.e_prop p))
+         (* Does not rewrite [hyp] as much as possible.
+            Any way, contradiction may be found later when [hyp] will be assumed *)
+         F.p_bool (rewrite ~highest:true masks (F.e_prop p))
         )
 
     method stronger_goal p =
       if Tmap.is_empty masks then p else
         (Wp_parameters.debug ~dkey "Rewrite Goal: %a@." Lang.F.pp_pred p;
-         F.p_bool (rewrite masks (F.e_prop p)))
+         F.p_bool (rewrite ~highest:true masks (F.e_prop p)))
 
   end
 

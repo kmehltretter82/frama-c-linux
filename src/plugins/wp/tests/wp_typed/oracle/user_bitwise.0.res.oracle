@@ -93,8 +93,7 @@ Prove: (land(lor(to_uint64(lsl(x, n)), x_2), lsl(1, x_1)) != 0) <->
 ------------------------------------------------------------
 
 Goal Post-condition 'b0' in 'rr1':
-Assume { Type: is_uint32(x) /\ is_uint32(lsr(x, 1)). }
-Prove: (bit_test(x, 0) \/ bit_test(x, 32)) <-> bit_test(x, 0).
+Prove: true.
 
 ------------------------------------------------------------
 
