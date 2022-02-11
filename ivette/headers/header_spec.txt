@@ -147,7 +147,7 @@ src/frama-c/api/generated/kernel/services/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/dive/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/eva/general/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/eva/values/index.ts: CEA_LGPL
-src/frama-c/api/generated/plugins/metrics/pivot/index.ts: CEA_LGPL
+src/frama-c/api/generated/plugins/pivot/general/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/studia/studia/index.ts: CEA_LGPL
 src/frama-c/api/generator.ml: .ignore
 src/frama-c/client.ts: CEA_LGPL
