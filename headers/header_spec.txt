@@ -284,6 +284,7 @@ share/libc/semaphore.h: CEA_LGPL
 share/libc/setjmp.h: CEA_LGPL
 share/libc/signal.c: CEA_LGPL
 share/libc/signal.h: CEA_LGPL
+share/libc/stdalign.h: CEA_LGPL
 share/libc/stdarg.h: CEA_LGPL
 share/libc/stdatomic.c: CEA_LGPL
 share/libc/stdatomic.h: CEA_LGPL

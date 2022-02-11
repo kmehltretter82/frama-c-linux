@@ -93,6 +93,7 @@ skipping FRAMAC_SHARE/libc/complex.h
 [kernel] Parsing FRAMAC_SHARE/libc/semaphore.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/setjmp.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/signal.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/stdalign.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/stdarg.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/stdatomic.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/stdbool.h (with preprocessing)
