@@ -1256,7 +1256,6 @@ src/plugins/security_slicing/security_slicing_parameters.mli: CEA_LGPL_OR_PROPRI
 src/plugins/slicing/Slicing.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/api.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/api.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/slicing/bts336.c: .ignore
 src/plugins/slicing/fct_slice.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/fct_slice.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/printSlice.ml: CEA_LGPL_OR_PROPRIETARY
