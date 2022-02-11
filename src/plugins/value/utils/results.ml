@@ -44,8 +44,8 @@ type control_point =
 
 type request = {
   control_point : control_point;
-  selector : Callstack.Set.t option;
-  filter: (callstack -> bool) option;
+  selector : callstack list option;
+  filter: (callstack -> bool) list;
 }
 
 type error = Bottom | Top | DisabledDomain
@@ -67,7 +67,7 @@ let pretty_result f fmt r =
 let make control_point = {
   control_point;
   selector = None;
-  filter = None;
+  filter = [];
 }
 
 let before stmt = make (Before stmt)
@@ -81,23 +81,9 @@ let before_kinstr = function
   | Cil_types.Kglobal -> at_start
   | Kstmt stmt -> before stmt
 
-let in_callstacks l req =
-  let set = Callstack.Set.of_list l in
-  {
-    req with
-    selector = Some (Option.fold
-                       ~none:set
-                       ~some:(Callstack.Set.inter set)
-                       req.selector)
-  }
-
-let in_callstack cs req =
-  in_callstacks [cs] req
-
-let filter_callstack f req = {
-  req with
-  filter = Some (Option.fold ~none:f ~some:(fun g x -> g x && f x) req.filter)
-}
+let in_callstacks l req = { req with selector = Some l }
+let in_callstack cs req = { req with selector = Some [cs] }
+let filter_callstack f req = { req with filter = f :: req.filter }
 
 
 (* Manipulating request results *)
@@ -139,27 +125,23 @@ struct
     | `Top -> Top
     | `Bottom -> Bottom
     | `Value table ->
+      (* Filter *)
+      let add cs state acc =
+        if List.for_all (fun filter -> filter cs) req.filter
+        then (cs, state) :: acc
+        else acc
+      in
       (* Selection *)
       let l =
         match req.selector with
-        | None ->
-          let add cs state acc =
-            (cs,state) :: acc
-          in
-          Callstack.Hashtbl.fold add table []
+        | None -> Callstack.Hashtbl.fold add table []
         | Some selector ->
-          let add cs acc =
+          let add acc cs =
             match Callstack.Hashtbl.find_opt table cs with
-            | Some state -> (cs,state) :: acc
+            | Some state -> add cs state acc
             | None -> acc
           in
-          Callstack.Set.fold add selector []
-      in
-      (* Filter *)
-      let l =
-        match req.filter with
-        | None -> l
-        | Some filter -> List.filter (fun (cs,_) -> filter cs) l
+          List.fold_left add [] selector
       in
       ByCallstack l
 
@@ -269,7 +251,7 @@ struct
       { req with control_point=End main } |> get_by_callstack
 
   let rec get (req : request) : (_, unrestricted_response) Response.t =
-    if Option.is_some req.filter || Option.is_some req.selector then
+    if req.filter <> [] || Option.is_some req.selector then
       Response.coercion @@ get_by_callstack req
     else
       let open Response in

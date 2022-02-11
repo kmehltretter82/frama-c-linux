@@ -110,12 +110,12 @@ val before_kinstr : Cil_types.kinstr -> request
 
 (** Callstack selection *)
 
-(** Only consider the given callstack. Replaces previous calls to [in_callstack]
-    or [in_callstacks]. *)
+(** Only consider the given callstack.
+    Replaces previous calls to [in_callstack] or [in_callstacks]. *)
 val in_callstack : callstack -> request -> request
 
-(** Only consider all the callstacks in the given list. If previous calls to
-    [in_callstack] or [in_callstacks] were done, it takes the intersection. *)
+(** Only consider the callstacks from the given list.
+    Replaces previous calls to [in_callstack] or [in_callstacks]. *)
 val in_callstacks : callstack list -> request -> request
 
 (** Only consider callstacks satisfying the given predicate. Several filters
