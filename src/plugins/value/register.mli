@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Functions of the Value plugin registered in {!Db}. Only two functions
+(** Functions of the Value plugin registered in {!Db}. Only three functions
     are exported. *)
 
 val eval_deps : Cvalue_domain.State.t -> Cil_types.exp -> Locations.Zone.t

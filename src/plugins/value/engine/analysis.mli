@@ -88,9 +88,8 @@ val force_compute : unit -> unit
 
 [@@@ api_start]
 val compute : unit -> unit
-(** Compute the value analysis, if not already computed, using the entry
-    point of the current project. You may set it with
-    {!Globals.set_entry_point}.
+(** Computes the Eva analysis, if not already computed, using the entry point
+    of the current project. You may set it with {!Globals.set_entry_point}.
     @raise Globals.No_such_entry_point if the entry point is incorrect
     @raise Db.Value.Incorrect_number_of_arguments if some arguments are
     specified for the entry point using {!Db.Value.fun_set_args}, and
@@ -98,7 +97,7 @@ val compute : unit -> unit
     @plugin development guide *)
 
 val is_computed : unit -> bool
-(** Return [true] iff the value analysis has been done. *)
+(** Return [true] iff the Eva analysis has been done. *)
 
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)

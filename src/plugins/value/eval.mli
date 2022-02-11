@@ -273,12 +273,12 @@ type recursion = {
 [@@@ api_start]
 (** Can the results of a function call be cached with memexec? *)
 type cacheable =
-  | Cacheable      (** Functions whose result can be safely cached *)
+  | Cacheable      (** Functions whose result can be safely cached. *)
   | NoCache        (** Functions whose result should not be cached, but for
                        which the caller can still be cached. Typically,
                        functions printing something during the analysis. *)
   | NoCacheCallers (** Functions for which neither the call, neither the
-                       callers, can be cached *)
+                       callers, can be cached. *)
 [@@@ api_end]
 (*
 Local Variables:

@@ -20,18 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Note: widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
+
 [@@@ api_start]
-(** Register special annotations to locally guide the partitioning of states
-    performed by an Eva analysis:
+(** Register special annotations to locally guide the Eva analysis:
 
     - slevel annotations: "slevel default", "slevel merge" and "slevel i"
     - loop unroll annotations: "loop unroll term"
     - value partitioning annotations: "split term" and "merge term"
     - subdivision annotations: "subdivide i"
+*)
 
-    Widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
-
-(** Annotations tweaking the behavior of the -eva-slevel paramter. *)
+(** Annotations tweaking the behavior of the -eva-slevel parameter. *)
 type slevel_annotation =
   | SlevelMerge        (** Join all states separated by slevel. *)
   | SlevelDefault      (** Use the limit defined by -eva-slevel. *)
