@@ -31,6 +31,7 @@ val case_globals :
   ?var_fun_decl:(varinfo -> 'a) ->
   ?var_init:(varinfo -> 'a) ->
   ?var_def:(varinfo -> init -> 'a) ->
+  ?glob_annot:(global_annotation -> 'a) ->
   fun_def:(fundec -> 'a) ->
   global -> 'a
 (** Function to descend into the root of the ast according to the various cases
@@ -47,6 +48,7 @@ val case_globals :
       value
     - [var_def] is the case for variable definitions with an initialization
       value
+    - [glob_annot] is the case for global annotations
     - [fun_def] is the case for function definition. *)
 
 (** Visitor for managing the root of the AST, on the globals level, with the
@@ -64,5 +66,6 @@ class visitor :
     method var_fun_decl: varinfo -> global list Cil.visitAction
     method var_init: varinfo -> global list Cil.visitAction
     method var_def: varinfo -> init -> global list Cil.visitAction
+    method glob_annot: global_annotation -> global list Cil.visitAction
     method fun_def: fundec -> global list Cil.visitAction
   end
