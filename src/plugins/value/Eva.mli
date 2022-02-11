@@ -108,8 +108,6 @@ module Results: sig
   val after : Cil_types.stmt -> request
   (** Just before a statement or at the start of the analysis. *)
   val before_kinstr : Cil_types.kinstr -> request
-  (** Just after a statement or at the end of analysis. *)
-  val after_kinstr : Cil_types.kinstr -> request
 
 
   (** Callstack selection *)

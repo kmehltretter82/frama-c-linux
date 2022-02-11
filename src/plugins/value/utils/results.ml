@@ -81,10 +81,6 @@ let before_kinstr = function
   | Cil_types.Kglobal -> at_start
   | Kstmt stmt -> before stmt
 
-let after_kinstr = function
-  | Cil_types.Kglobal -> at_end
-  | Kstmt stmt -> after stmt
-
 let in_callstacks l req =
   let set = Callstack.Set.of_list l in
   {
