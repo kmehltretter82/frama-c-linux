@@ -128,6 +128,7 @@ let preprocessor = object
 
   (* Only logic functions and logic predicates are handled.
      E-acsl simply ignores all the other global annotations *)
+  method !glob_annot _ = Cil.DoChildren
   method !vannotation annot =
     match annot with
     | Dfun_or_pred _ -> Cil.DoChildren
