@@ -102,12 +102,13 @@ module Results: sig
   val at_start : request
 
   (** At the end of the analysis, after the main function has returned. *)
-  val at_end : request
+  val at_end : unit -> request
 
   (** At the start of the given function. *)
   val at_start_of : Cil_types.kernel_function -> request
 
-  (** At the end of the given function. *)
+  (** At the end of the given function.
+      @raises Kernel_function.No_statement if the function has no body. *)
   val at_end_of : Cil_types.kernel_function -> request
 
   (** Just before a statement is executed. *)

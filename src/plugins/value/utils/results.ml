@@ -36,9 +36,7 @@ type 'a by_callstack = (callstack * 'a) list
 
 type control_point =
   | Initial
-  | Final
   | Start of Cil_types.kernel_function
-  | End of Cil_types.kernel_function
   | Before of Cil_types.stmt
   | After of Cil_types.stmt
 
@@ -73,9 +71,9 @@ let make control_point = {
 let before stmt = make (Before stmt)
 let after stmt = make (After stmt)
 let at_start_of kf = make (Start kf)
-let at_end_of kf = make (End kf)
+let at_end_of kf = make (After (Kernel_function.find_return kf))
 let at_start = make Initial
-let at_end = make Final
+let at_end () = at_end_of (fst (Globals.entry_point ()))
 
 let before_kinstr = function
   | Cil_types.Kglobal -> at_start
@@ -186,25 +184,20 @@ struct
       | ByCallstack [] | Bottom -> default `Bottom
       | Top -> default `Top
 
+  let default = function
+    | `Bottom -> `Bottom
+    | `Top -> `Top
+
   let map_join : type c.
     ('a -> 'b) -> ('b -> 'b -> 'b) -> ('a, c) t -> 'b or_top_bottom =
     fun map join ->
-    let default = function
-      | `Bottom -> `Bottom
-      | `Top -> `Top
-    and map' x =
-      `Value (map x)
-    in
+    let map' x = `Value (map x) in
     map_reduce default map' (Bottom.Top.join join)
 
   let map_join' : type c. ('a -> 'b or_top_bottom) -> ('b -> 'b -> 'b) ->
     ('a, c) t -> 'b or_top_bottom =
     fun map join ->
-    let default = function
-      | `Bottom -> `Bottom
-      | `Top -> `Top
-    and map' = (map :> 'a -> 'b or_top_bottom) in
-    map_reduce default map' (Bottom.Top.join join)
+    map_reduce default map (Bottom.Top.join join)
 end
 
 
@@ -231,7 +224,7 @@ struct
     | Address: (EvalTypes.loc, 'c) Response.t * Cil_types.lval ->
         (address,'c) evaluation
 
-  let rec get_by_callstack (req : request) :
+  let get_by_callstack (req : request) :
     (_, restricted_to_callstack) Response.t =
     let open Response in
     match req.control_point with
@@ -243,14 +236,8 @@ struct
       A.get_kinstr_state ~after:false Kglobal |> singleton []
     | Start kf ->
       A.get_initial_state_by_callstack kf |> by_callstack req
-    | End kf ->
-      let stmt = Kernel_function.find_return kf in
-      { req with control_point=After stmt } |> get_by_callstack
-    | Final ->
-      let main, _lib_entry = Globals.entry_point () in
-      { req with control_point=End main } |> get_by_callstack
 
-  let rec get (req : request) : (_, unrestricted_response) Response.t =
+  let get (req : request) : (_, unrestricted_response) Response.t =
     if req.filter <> [] || Option.is_some req.selector then
       Response.coercion @@ get_by_callstack req
     else
@@ -260,12 +247,6 @@ struct
         A.get_stmt_state ~after:false stmt |> consolidated
       | After stmt ->
         A.get_stmt_state ~after:true stmt |> consolidated
-      | End kf ->
-        let stmt = Kernel_function.find_return kf in
-        { req with control_point=After stmt } |> get
-      | Final ->
-        let main, _lib_entry = Globals.entry_point () in
-        { req with control_point=End main } |> get
       | _ ->
         Response.coercion @@ get_by_callstack req
 
