@@ -434,6 +434,12 @@ module Macros = struct
 
   type t = string StringMap.t
 
+  let add_defaults ~defaults macros =
+    StringMap.merge (fun _k default cur ->
+        match cur with
+        | Some _ -> cur
+        | _ -> default) defaults macros
+
   let empty = StringMap.empty
 
   let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
@@ -1482,6 +1488,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
         let nth = !i in
         incr i ;
         let macros = ptest_vars ~nth macros in
+        let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
         let log_files = List.map (Macros.expand ~file macros) logs in
         let deps = deps_command ~file macros deps in
         update_modules ~file modules deps;
@@ -1508,6 +1515,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
        let nth = !e in
        incr e ;
        let macros = ptest_vars ~nth Macros.empty in
+       let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
        let cmd =
          let deps = deps_command ~file macros execnow.ex_deps in
          update_modules ~file modules deps;
