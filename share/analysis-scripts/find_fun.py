@@ -74,12 +74,15 @@ possible_declarators = []
 possible_definers = []
 re_fun = function_finder.prepare_re_specific_name(fname)
 for f in files:
-    found = function_finder.find_specific_name(re_fun, f)
-    if found:
-        if found == 1:
-            possible_declarators.append(f)
-        else:
-            possible_definers.append(f)
+    try:
+        found = function_finder.find_specific_name(re_fun, f)
+        if found:
+            if found == 1:
+                possible_declarators.append(f)
+            else:
+                possible_definers.append(f)
+    except OSError as e:
+        print(f"error opening '{f}' ({e.errno}, {e.strerror}), skipping file")
 
 def relative_path_to(start):
     return lambda p: os.path.relpath(p, start=start)
