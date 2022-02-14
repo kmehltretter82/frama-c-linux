@@ -103,6 +103,10 @@ struct
     | Top -> Top
     | Bottom -> Bottom
 
+  let is_bottom = function
+    | ByCallstack [] | Bottom -> true
+    | _ -> false
+
   (* Constructors *)
 
   let consolidated =
@@ -434,21 +438,10 @@ struct
       in
       Alarmset.fold add [] alarmset
 
-  let is_bottom : type a c. (a,c) evaluation -> bool =
-    fun res ->
-    let extract (x,_) = x >>>-: fun _ -> () in
-    let join () () = () in
-    let r = match res with
-      | LValue r ->
-        Response.map_join' extract join r
-      | Value r ->
-        Response.map_join' extract join r
-      | Address (r, _lval) ->
-        Response.map_join' extract join r
-    in
-    match r with
-    | `Bottom -> true
-    | `Top | `Value () -> false
+  let is_bottom : type a c. (a,c) evaluation -> bool = function
+    | LValue r -> Response.is_bottom r
+    | Value r -> Response.is_bottom r
+    | Address (r, _lval) -> Response.is_bottom r
 
   (* Dependencies *)
 
