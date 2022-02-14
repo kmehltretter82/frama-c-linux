@@ -40,7 +40,7 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 /** Button-like label. */
-export function LCD(props: LabelProps) {
+export function LCD(props: LabelProps): JSX.Element {
   const className = classes(
     'dome-xButton dome-xBoxButton dome-text-code dome-xButton-lcd ',
     props.className,
@@ -85,7 +85,7 @@ export interface LEDprops {
   style?: React.CSSProperties;
 }
 
-export const LED = (props: LEDprops) => {
+export const LED = (props: LEDprops): JSX.Element => {
   const className = classes(
     'dome-xButton-led',
     `dome-xButton-led-${props.status || 'inactive'}`,
@@ -116,7 +116,7 @@ export interface MeterProps {
   optimum?: number | 'LOW' | 'MEDIUM' | 'HIGH'; /** default is undefined */
 }
 
-export const Meter = (props: MeterProps) => {
+export const Meter = (props: MeterProps): JSX.Element => {
   const { className, style, value, optimum, ...ms } = props;
   const min = props.min ?? 0.0;
   const max = props.max ?? 1.0;

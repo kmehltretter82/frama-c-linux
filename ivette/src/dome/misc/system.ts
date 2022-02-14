@@ -26,6 +26,7 @@
 */
 
 /* eslint-disable max-len */
+/* eslint-disable no-console */
 
 // --------------------------------------------------------------------------
 // --- Evolved Spawn Process
@@ -98,12 +99,12 @@ const exitJobs: Callback[] = [];
 
    Exceptions thrown by the function are captured and reported on the console.
  */
-export function atExit(callback: Callback) {
+export function atExit(callback: Callback): void {
   exitJobs.push(callback);
 }
 
 /** Execute all pending exit jobs (and flush the list). */
-export function doExit() {
+export function doExit(): void {
   exitJobs.forEach((fn) => {
     try { fn(); }
     catch (err) { console.error('[Dome] atExit:', err); }
@@ -118,7 +119,7 @@ export function doExit() {
 let COMMAND_WDIR = '.';
 let COMMAND_ARGV: string[] = [];
 
-function setCommandLine(argv: string[], wdir: string) {
+function setCommandLine(argv: string[], wdir: string): void {
   COMMAND_ARGV = argv;
   COMMAND_WDIR = wdir;
 }
@@ -134,12 +135,12 @@ function setCommandLine(argv: string[], wdir: string) {
 
    See also [[dome.onCommand]]
 */
-export function getWorkingDir() { return COMMAND_WDIR; }
+export function getWorkingDir(): string { return COMMAND_WDIR; }
 
 /**
    Returns the current process ID.
  */
-export function getPID() { return process.pid; }
+export function getPID(): number { return process.pid; }
 
 /**
    Command-line arguments (Application Window).
@@ -151,7 +152,7 @@ export function getPID() { return process.pid; }
 
    See also [[dome.onCommand]]
 */
-export function getArguments() { return COMMAND_ARGV; }
+export function getArguments(): string[] { return COMMAND_ARGV; }
 
 // --------------------------------------------------------------------------
 // --- File Join
@@ -232,9 +233,9 @@ export function fileStat(path: string): Promise<fs.Stats> {
    Checks if a path exists and is a regular file
    (Synchronous check).
 */
-export function isFile(path: string) {
+export function isFile(path: string): boolean {
   try {
-    return path && fs.statSync(path).isFile();
+    return !!path && fs.statSync(path).isFile();
   } catch (_err) {
     return false;
   }
@@ -244,9 +245,9 @@ export function isFile(path: string) {
    Checks if a path exists and is a directory
    (Synchronous check).
 */
-export function isDirectory(path: string) {
+export function isDirectory(path: string): boolean {
   try {
-    return path && fs.statSync(path).isDirectory();
+    return !!path && fs.statSync(path).isDirectory();
   } catch (_err) {
     return false;
   }
@@ -256,7 +257,7 @@ export function isDirectory(path: string) {
    Checks if a path exists and is a file or directory
    (Synchronous check).
 */
-export function exists(path: string) {
+export function exists(path: string): boolean {
   try {
     if (!path) return false;
     const stats = fs.statSync(path);
@@ -321,7 +322,7 @@ export async function copyFile(srcPath: string, tgtPath: string): Promise<void> 
    On MacOS, `.DS_Store` entries are filtered out.
 */
 export async function readDir(path: string): Promise<string[]> {
-  const filterDir = (f: string) => f !== '.DS_Store';
+  const filterDir = (f: string): boolean => f !== '.DS_Store';
   const entries = await fs.promises.readdir(path, { encoding: 'utf-8', withFileTypes: true });
   return entries.map((fn) => fn.name).filter(filterDir);
 }
@@ -389,7 +390,7 @@ async function rmDirRec(path: string): Promise<void> {
       return;
     }
     if (stats.isDirectory()) {
-      const rmDirSub = (name: string) => {
+      const rmDirSub = (name: string): void => {
         rmDirRec(fspath.join(path, name));
       };
       const entries = await readDir(path);
@@ -476,7 +477,7 @@ interface Readable {
   unpipe(out: fs.WriteStream): void;
 }
 
-function pipeTee(std: Readable, fd: number) {
+function pipeTee(std: Readable, fd: number): void {
   if (!fd) return;
   const out = fs.createWriteStream('<ignored>', { fd, encoding: 'utf-8' });
   out.on('error', (err) => {

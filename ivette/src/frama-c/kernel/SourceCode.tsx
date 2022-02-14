@@ -60,7 +60,7 @@ const D = new Dome.Debug('Source Code');
 
 // The SourceCode component, producing the GUI part showing the source code
 // corresponding to the selected function.
-export default function SourceCode() {
+export default function SourceCode(): JSX.Element {
 
   // Hooks
   const [buffer] = React.useState(() => new RichTextBuffer());
@@ -91,7 +91,7 @@ export default function SourceCode() {
 
   // Updating the buffer content.
   const text = React.useMemo(async () => {
-    const onError = () => {
+    const onError = (): string => {
       if (file)
         D.error(`Fail to load source code file ${file}`);
       return '';
@@ -150,7 +150,7 @@ export default function SourceCode() {
   }, [buffer, selectCallback]);
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
-  async function launchEditor(_?: editor, pos?: position) {
+  async function launchEditor(_?: editor, pos?: position): Promise<void> {
     if (file !== '') {
       const selectedLine = pos ? (pos.line + 1).toString() : '1';
       const selectedChar = pos ? (pos.ch + 1).toString() : '1';
@@ -169,7 +169,7 @@ export default function SourceCode() {
     }
   }
 
-  async function contextMenu(editor?: editor, pos?: position) {
+  async function contextMenu(editor?: editor, pos?: position): Promise<void> {
     if (file !== '') {
       const items = [
         {

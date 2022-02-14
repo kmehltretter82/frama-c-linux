@@ -38,7 +38,7 @@ interface EVENT {
   stopPropagation: () => void;
 }
 
-const DISABLED = ({ disabled = false, enabled = true }) => (
+const DISABLED = ({ disabled = false, enabled = true }): boolean => (
   !!disabled || !enabled
 );
 
@@ -59,7 +59,7 @@ interface LABELprops {
   label: string;
 }
 
-const LABEL = ({ disabled, label }: LABELprops) => (
+const LABEL = ({ disabled, label }: LABELprops): JSX.Element => (
   <div className="dome-xButton-label">
     <div
       className="dome-xButton-label dome-control-enabled"
@@ -122,7 +122,7 @@ export interface ButtonProps {
 }
 
 /** Standard button. */
-export function Button(props: ButtonProps) {
+export function Button(props: ButtonProps): JSX.Element {
   const disabled = props.onClick ? DISABLED(props) : true;
   const {
     focusable = false, kind = 'default',
@@ -160,7 +160,7 @@ export function Button(props: ButtonProps) {
 // --------------------------------------------------------------------------
 
 /** Circled Icon Button. The label property is ignored. */
-export const CircButton = (props: ButtonProps) => {
+export const CircButton = (props: ButtonProps): JSX.Element => {
   const disabled = props.onClick ? DISABLED(props) : true;
   const {
     focusable = false, kind = 'default',
@@ -238,7 +238,7 @@ export interface IconButtonProps {
 }
 
 /** Borderless Icon Button. Label property is ignored. */
-export function IconButton(props: IconButtonProps) {
+export function IconButton(props: IconButtonProps): JSX.Element | null {
   const disabled = props.onClick ? DISABLED(props) : true;
   const {
     icon, title, className,
@@ -294,7 +294,7 @@ export interface CheckProps {
 }
 
 /** Checkbox button. */
-export const Checkbox = (props: CheckProps) => {
+export const Checkbox = (props: CheckProps): JSX.Element => {
   const { value, onChange } = props;
   const disabled = onChange ? DISABLED(props) : true;
   const callback = onChange && (() => onChange(!value));
@@ -318,7 +318,7 @@ export const Checkbox = (props: CheckProps) => {
 };
 
 /** Switch button. */
-export const Switch = (props: CheckProps) => {
+export const Switch = (props: CheckProps): JSX.Element => {
   const { onChange, value } = props;
   const disabled = onChange ? DISABLED(props) : true;
   const iconId = props.value ? 'SWITCH.ON' : 'SWITCH.OFF';
@@ -367,7 +367,7 @@ export interface RadioProps<A> {
 }
 
 /** Radio Button. See also [[RadioGroup]]. */
-export function Radio<A>(props: RadioProps<A>) {
+export function Radio<A>(props: RadioProps<A>): JSX.Element {
   const { onSelection, value, selection } = props;
   const disabled = onSelection ? DISABLED(props) : true;
   const checked = value === selection;
@@ -427,7 +427,7 @@ export interface RadioGroupProps<A> {
    The radio buttons inside a group are laidout in a vertical box with the
    additional styling properties.
 */
-export function RadioGroup<A>(props: RadioGroupProps<A>) {
+export function RadioGroup<A>(props: RadioGroupProps<A>): JSX.Element {
   const {
     className = '',
     style,
@@ -435,15 +435,16 @@ export function RadioGroup<A>(props: RadioGroupProps<A>) {
     onChange: onGroupSelect,
   } = props;
   const disabledGroup = onGroupSelect ? DISABLED(props) : true;
-  const makeRadio = (elt: any) => {
-    const radioProps = elt.props as RadioProps<A>;
+  const makeRadio = (elt: unknown): JSX.Element => {
+    const typedElt = elt as React.ReactElement<RadioProps<A>>;
+    const radioProps = typedElt.props;
     const disabled = disabledGroup || DISABLED(radioProps);
     const { onSelection: onRadioSelect } = radioProps;
-    const onSelection = (v: A) => {
+    const onSelection = (v: A): void => {
       if (onRadioSelect) onRadioSelect(v);
       if (onGroupSelect) onGroupSelect(v);
     };
-    return React.cloneElement(elt, {
+    return React.cloneElement(typedElt, {
       disabled,
       enabled: !disabled,
       selection,
@@ -495,14 +496,14 @@ export interface SelectProps {
    *   <option value='…' disabled=… >…</option>
 
  */
-export function Select(props: SelectProps) {
+export function Select(props: SelectProps): JSX.Element {
   const { onChange, placeholder } = props;
   const className = classes(
     'dome-xSelect dome-xBoxButton dome-xButton-default dome-xButton-label',
     props.className,
   );
   const disabled = onChange ? DISABLED(props) : true;
-  const callback = (evt: React.ChangeEvent<HTMLSelectElement>) => {
+  const callback = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
     if (onChange) onChange(evt.target.value);
   };
   return (
@@ -553,17 +554,17 @@ export interface FieldProps {
 /**
    Text Field.
 */
-export const Field = (props: FieldProps) => {
+export const Field = (props: FieldProps): JSX.Element => {
   const [current, setCurrent] = React.useState<string>();
   const { className = '', onChange, onEdited, value = '' } = props;
   const disabled = onChange ? DISABLED(props) : true;
   const theValue = current ?? value;
-  const ONCHANGE = (evt: React.ChangeEvent<HTMLInputElement>) => {
+  const ONCHANGE = (evt: React.ChangeEvent<HTMLInputElement>): void => {
     const text = evt.target.value || '';
     setCurrent(text);
     if (onEdited) onEdited(text);
   };
-  const ONKEYPRESS = (evt: React.KeyboardEvent) => {
+  const ONKEYPRESS = (evt: React.KeyboardEvent): void => {
     switch (evt.key) {
       case 'Enter':
         setCurrent(undefined);

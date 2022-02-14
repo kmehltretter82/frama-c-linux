@@ -68,7 +68,7 @@ interface FctItemProps {
   onSelection: (name: string) => void;
 }
 
-function FctItem(props: FctItemProps) {
+function FctItem(props: FctItemProps): JSX.Element {
   const { name, signature, main, stdlib, builtin, defined } = props.fct;
   const className = classes(
     main && 'globals-main',
@@ -95,7 +95,7 @@ function FctItem(props: FctItemProps) {
 // --- Globals Section(s)
 // --------------------------------------------------------------------------
 
-export default () => {
+export default function Globals(): JSX.Element {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
@@ -117,7 +117,7 @@ export default () => {
   const multipleSelectionActive = multipleSelection?.allSelections.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
-  function isSelected(fct: functionsData) {
+  function isSelected(fct: functionsData): boolean {
     return multipleSelection?.allSelections.some(
       (l) => fct.name === l?.fct,
     );
@@ -126,21 +126,21 @@ export default () => {
   // Currently selected function.
   const current: undefined | string = selection?.current?.fct;
 
-  function showFunction(fct: functionsData) {
+  function showFunction(fct: functionsData): boolean {
     const visible =
       (stdlib || !fct.stdlib)
       && (builtin || !fct.builtin)
       && (undef || fct.defined)
       && (!evaOnly || !evaComputed || (fct.eva_analyzed === true))
       && (!selected || !multipleSelectionActive || isSelected(fct));
-    return visible || (current && fct.name === current);
+    return visible || (!!current && fct.name === current);
   }
 
-  function onSelection(name: string) {
+  function onSelection(name: string): void {
     updateSelection({ location: { fct: name } });
   }
 
-  async function onContextMenu() {
+  async function onContextMenu(): Promise<void> {
     const items: Dome.PopupMenuItem[] = [
       {
         label: 'Show Frama-C builtins',
@@ -198,6 +198,6 @@ export default () => {
     </Section>
   );
 
-};
+}
 
 // --------------------------------------------------------------------------

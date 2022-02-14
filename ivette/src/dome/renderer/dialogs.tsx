@@ -44,7 +44,7 @@ const defaultItems: DialogButton<boolean>[] = [
   { value: true, label: 'Ok' },
 ];
 
-const valueLabel = (v: any) => {
+const valueLabel = (v: unknown): string => {
   switch (v) {
     case undefined: return 'Cancel';
     case true: return 'Ok';
@@ -53,15 +53,15 @@ const valueLabel = (v: any) => {
   }
 };
 
-const itemLabel = ({ value, label }: DialogButton<any>) => (
+const itemLabel = ({ value, label }: DialogButton<unknown>): string => (
   (label || valueLabel(value))
 );
 
-const isDefault = ({ value, label }: DialogButton<any>) => (
+const isDefault = ({ value, label }: DialogButton<unknown>): boolean => (
   (value === true || label === 'Ok' || label === 'Yes')
 );
 
-const isCancel = ({ value, label }: DialogButton<any>) => (
+const isCancel = ({ value, label }: DialogButton<unknown>): boolean => (
   (!value || label === 'Cancel' || label === 'No')
 );
 
@@ -142,7 +142,8 @@ export async function showMessageBox<A>(
 // --------------------------------------------------------------------------
 
 const defaultPath =
-  (path: string) => (filepath.extname(path) ? filepath.dirname(path) : path);
+  (path: string): string =>
+    (filepath.extname(path) ? filepath.dirname(path) : path);
 
 export interface FileFilter {
   /** Filter name. */

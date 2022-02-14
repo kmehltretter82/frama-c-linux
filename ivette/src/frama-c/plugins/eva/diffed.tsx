@@ -44,7 +44,7 @@ export class DiffBuffer {
     this.push = this.push.bind(this);
   }
 
-  clear() {
+  clear(): void {
     this.added = false;
     this.removed = false;
     this.value = '';
@@ -52,7 +52,7 @@ export class DiffBuffer {
     this.contents = [];
   }
 
-  push(c: Change) {
+  push(c: Change): void {
     if (!c.added && !c.removed) {
       this.flush();
       this.value += c.value;
@@ -66,7 +66,7 @@ export class DiffBuffer {
     }
   }
 
-  private flush() {
+  private flush(): void {
     const { value, added, removed } = this;
     if (added && removed) {
       if (value) {
@@ -99,7 +99,7 @@ export class DiffBuffer {
     return React.Children.toArray(this.contents);
   }
 
-  getScratch() {
+  getScratch(): string {
     this.flush();
     return this.scratch;
   }
@@ -115,7 +115,7 @@ export interface Diff2Props {
   diff: string;
 }
 
-export function Diff2(props: Diff2Props) {
+export function Diff2(props: Diff2Props): JSX.Element {
   const { text, diff } = props;
   const contents = React.useMemo<React.ReactNode>(() => {
     if (text === diff) return text;
@@ -137,7 +137,7 @@ export interface Diff3Props {
   diffB: string;
 }
 
-export function Diff3(props: Diff3Props) {
+export function Diff3(props: Diff3Props): JSX.Element {
   const { text, diffA, diffB } = props;
   const contents = React.useMemo<React.ReactNode>(() => {
     if (text === diffA && text === diffB) return text;
@@ -161,7 +161,8 @@ export interface DiffProps {
   diff2?: string;
 }
 
-export function Diff(props: DiffProps) {
+
+export function Diff(props: DiffProps): JSX.Element | null {
   const { text, diff, diff2 } = props;
   if (text === undefined)
     return null;

@@ -42,7 +42,7 @@ import { markerInfo } from 'frama-c/api/kernel/ast';
 
 type LocationId = States.Location & { id: number };
 
-export default function LocationsTable() {
+export default function LocationsTable(): JSX.Element {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
@@ -79,7 +79,7 @@ export default function LocationsTable() {
     [updateSelection],
   );
 
-  const reload = () => {
+  const reload = (): void => {
     const location = multipleSelections.allSelections[multipleSelections.index];
     updateSelection({ location });
   };

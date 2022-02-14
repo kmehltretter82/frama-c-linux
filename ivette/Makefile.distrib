@@ -172,7 +172,6 @@ DISTRIB_FILES += ivette/src/frama-c/plugins/dive/pkg.json
 DISTRIB_FILES += ivette/src/frama-c/plugins/dive/react-cytoscapejs.d.ts
 DISTRIB_FILES += ivette/src/frama-c/plugins/dive/style.json
 DISTRIB_FILES += ivette/src/frama-c/plugins/dive/tippy.css
-DISTRIB_FILES += ivette/src/frama-c/plugins/eva/.eslintrc.js
 DISTRIB_FILES += ivette/src/frama-c/plugins/eva/Coverage.tsx
 DISTRIB_FILES += ivette/src/frama-c/plugins/eva/CoverageMeter.tsx
 DISTRIB_FILES += ivette/src/frama-c/plugins/eva/Summary.tsx

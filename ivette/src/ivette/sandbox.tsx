@@ -29,6 +29,6 @@
 import React from 'react';
 import { Label } from 'dome/controls/labels';
 
-export default function Sandbox() {
+export default function Sandbox(): JSX.Element {
   return <Label>Hello World!</Label>;
 }

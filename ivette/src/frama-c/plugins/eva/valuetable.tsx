@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Eva Values
 // --------------------------------------------------------------------------
@@ -54,16 +56,16 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 function computeValueDiffs(v: EvaValues, vstate: EvalStmt | EvalCond) {
-  let here = v.v_before;
+  let here = v.vBefore;
   let diff: undefined | Evaluation;
   let diff2: undefined | Evaluation;
-  function setValue(e?: Evaluation) { if (e) { here = e; diff = v.v_before; } }
+  function setValue(e?: Evaluation) { if (e) { here = e; diff = v.vBefore; } }
   switch (vstate) {
-    case 'Before': diff = v.v_after; break;
-    case 'After': setValue(v.v_after); break;
-    case 'Then': setValue(v.v_then); break;
-    case 'Else': setValue(v.v_else); break;
-    case 'Cond': diff = v.v_then; diff2 = v.v_else; break;
+    case 'Before': diff = v.vAfter; break;
+    case 'After': setValue(v.vAfter); break;
+    case 'Then': setValue(v.vThen); break;
+    case 'Else': setValue(v.vElse); break;
+    case 'Cond': diff = v.vThen; diff2 = v.vElse; break;
   }
   const vdiffs = { text: here.value, diff: diff?.value, diff2: diff2?.value };
   return { value: here, vdiffs };
@@ -126,8 +128,8 @@ function TableCell(props: TableCellProps) {
           if (value.alarms.find(([st, _]) => st === 'False')) status = 'False';
           else status = 'Unknown';
         }
-        if (value.pointed_vars.length > 0)
-          pointedVars = value.pointed_vars;
+        if (value.pointedVars.length > 0)
+          pointedVars = value.pointedVars;
         const alarmClass = `eva-cell-alarms eva-alarm-${status}`;
         const title = 'At least one alarm is raised in one callstack';
         contents = (

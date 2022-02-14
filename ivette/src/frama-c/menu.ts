@@ -133,7 +133,7 @@ async function saveSession(): Promise<void> {
   return;
 }
 
-export function init() {
+export function init(): void {
   Dome.addMenuItem({
     menu: 'File',
     label: 'Set source files…',

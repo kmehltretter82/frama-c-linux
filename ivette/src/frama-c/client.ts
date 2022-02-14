@@ -39,7 +39,7 @@ export abstract class Client {
   abstract disconnect(): void;
 
   /** Send Request */
-  abstract send(kind: string, id: string, request: string, data: any): void;
+  abstract send(kind: string, id: string, request: string, data: json): void;
 
   /** Signal ON */
   abstract sigOn(id: string): void;

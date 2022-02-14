@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Server Controller
 // --------------------------------------------------------------------------
@@ -146,9 +148,9 @@ Dome.onCommand((argv: string[], cwd: string) => {
 export const Control = () => {
   const status = Server.useStatus();
 
-  let play = { enabled: false, onClick: () => { } };
-  let stop = { enabled: false, onClick: () => { } };
-  let reload = { enabled: false, onClick: () => { } };
+  let play = { enabled: false, onClick: () => { /* do nothing */ } };
+  let stop = { enabled: false, onClick: () => { /* do nothing */ } };
+  let reload = { enabled: false, onClick: () => { /* do nothing */ } };
 
   switch (status) {
     case Server.Status.OFF:

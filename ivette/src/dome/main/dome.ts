@@ -20,6 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-console */
+
 /**
    ## Dome Application (Main Process)
 
@@ -136,7 +139,7 @@ function obtainGlobalSettings() {
 // --- Window Settings & Frames
 // --------------------------------------------------------------------------
 
-type Store = { [key: string]: any };
+type Store = { [key: string]: unknown };
 
 interface Handle {
   window: BrowserWindow; // Also prevents Gc
@@ -175,7 +178,7 @@ ipcMain.on('dome.ipc.settings.sync', windowSyncSettings);
 // --- Patching Settings
 // --------------------------------------------------------------------------
 
-type Patch = { key: string; value: any };
+type Patch = { key: string; value: unknown };
 
 function applyPatches(data: Store, args: Patch[]) {
   args.forEach(({ key, value }) => {
@@ -222,7 +225,7 @@ ipcMain.on('dome.ipc.settings.storage', applyStorageSettings);
 // --- Renderer-Process Communication
 // --------------------------------------------------------------------------
 
-function broadcast(event: string, ...args: any[]) {
+function broadcast(event: string, ...args: unknown[]) {
   BrowserWindow.getAllWindows().forEach((w) => {
     w.webContents.send(event, ...args);
   });
@@ -340,7 +343,7 @@ function createBrowserWindow(
 
   const { frame, devtools, settings = {}, storage = {} } = configData;
   if (frame) {
-    const getInt = (v: any) => v && _.toSafeInteger(v);
+    const getInt = <A>(v: A) => v && _.toSafeInteger(v);
     options.x = getInt(frame.x);
     options.y = getInt(frame.y);
     options.width = getInt(frame.width);

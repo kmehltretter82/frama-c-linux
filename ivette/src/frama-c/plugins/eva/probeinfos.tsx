@@ -44,7 +44,7 @@ import { Stmt } from './valueinfos';
 // --- Probe Editor
 // --------------------------------------------------------------------------
 
-function ProbeEditor(props: ModelProp) {
+function ProbeEditor(props: ModelProp): JSX.Element | null {
   const { model } = props;
   const probe = model.getFocused();
   if (!probe || !probe.code) return null;
@@ -105,7 +105,7 @@ function ProbeEditor(props: ModelProp) {
 // --- Probe Panel
 // --------------------------------------------------------------------------
 
-export function ProbeInfos(props: ModelProp) {
+export function ProbeInfos(props: ModelProp): JSX.Element {
   const { model } = props;
   const probe = model.getFocused();
   const fct = probe?.fct;

@@ -20,6 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // --------------------------------------------------------------------------
 // --- Text Documents
 // --------------------------------------------------------------------------
@@ -31,6 +34,9 @@
 
 import Emitter from 'events';
 import CodeMirror from 'codemirror/lib/codemirror';
+import { Debug } from 'dome';
+
+const D = new Debug('Dome.text');
 
 export type Range = { from: CodeMirror.Position; to: CodeMirror.Position };
 
@@ -553,7 +559,7 @@ export class RichTextBuffer extends Emitter {
    */
   forEach(fn: (editor: CodeMirror.Editor) => void) {
     this.editors.forEach((cm) => {
-      try { fn(cm); } catch (e) { console.error('[Dome.text]', e); }
+      try { fn(cm); } catch (e) { D.error(e); }
     });
   }
 

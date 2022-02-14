@@ -20,6 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /**
    Dome Application (Renderer Process)
 
@@ -47,6 +50,7 @@ import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import './style.css';
+import { State } from './data/states';
 
 // --------------------------------------------------------------------------
 // --- Context
@@ -413,6 +417,7 @@ export interface MenuItemProps {
 */
 export function addMenuItem(props: MenuItemProps) {
   if (!props.id && props.type !== 'separator') {
+    // eslint-disable-next-line no-console
     console.error('[Dome] Missing menu-item identifier', props);
     return;
   }
@@ -708,7 +713,7 @@ export function useFlipSettings(
 export function useNumberSettings(
   key: string | undefined,
   defaultValue = 0,
-) {
+): State<number> {
   return Settings.useWindowSettings(
     key, Json.jNumber, defaultValue,
   );

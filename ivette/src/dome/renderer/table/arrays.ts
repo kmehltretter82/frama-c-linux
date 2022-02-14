@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Array Models
 // --------------------------------------------------------------------------
@@ -29,6 +31,7 @@
    @module dome/table/arrays
 */
 
+import { Debug } from 'dome';
 import * as Compare from 'dome/data/compare';
 import type { ByFields, Order } from 'dome/data/compare';
 import {
@@ -36,6 +39,8 @@ import {
   Filter, Filtering,
   Model, Collection, forEach,
 } from './models';
+
+const D = new Debug('Dome');
 
 // --------------------------------------------------------------------------
 // --- Sorting Utilities
@@ -147,7 +152,7 @@ export class ArrayModel<Key, Row>
       });
       table.sort(this.sorter());
     } catch (err) {
-      console.warn('[Dome] error when rebuilding table:', err);
+      D.warn('error when rebuilding table:', err);
     }
     table.forEach((packed, index) => { packed.index = index; });
     this.table = table;
@@ -266,9 +271,9 @@ export class ArrayModel<Key, Row>
     }
   }
 
-  canSortBy(column: string) {
-    const columns = this.columns as any;
-    return columns[column] !== undefined;
+  canSortBy(column: string): boolean {
+    const columns = this.columns;
+    return !!columns && columns[column] !== undefined;
   }
 
   getSorting(): SortingInfo | undefined {
@@ -460,7 +465,7 @@ export class CompactModel<Key, Row> extends ArrayModel<Key, Row> {
   getkey: (d: Row) => Key;
 
   /** @param key - the key property of `Row` holding an entry identifier. */
-  constructor(getkey: any) {
+  constructor(getkey: (d: Row) => Key) {
     super();
     this.getkey = getkey;
   }

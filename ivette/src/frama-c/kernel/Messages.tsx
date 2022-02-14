@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 import * as React from 'react';
 import * as Dome from 'dome';
 import { TitleBar } from 'ivette';
@@ -280,7 +282,7 @@ function MessageFilter(props: { filter: State<Filter> }) {
   );
 }
 
-function FilterRatio({ model }: { model: Arrays.ArrayModel<any, any> }) {
+function FilterRatio<K, R>({ model }: { model: Arrays.ArrayModel<K, R> }) {
   const [filtered, total] = [model.getRowCount(), model.getTotalRowCount()];
   const title = `${filtered} displayed messages / ${total} total messages`;
   return (

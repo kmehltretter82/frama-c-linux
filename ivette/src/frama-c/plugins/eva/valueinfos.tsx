@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Info Components
 // --------------------------------------------------------------------------
@@ -73,7 +75,7 @@ export function AlarmsInfos(props: ModelProp) {
   if (probe) {
     const callstack = model.getCallstack();
     const domain = model.values.getValues(probe, callstack);
-    const alarms = domain?.v_before.alarms ?? [];
+    const alarms = domain?.vBefore.alarms ?? [];
     if (alarms.length > 0) {
       const renderAlarm = ([status, alarm]: EvaAlarm) => {
         const className = `eva-alarm-info eva-alarm-${status}`;
