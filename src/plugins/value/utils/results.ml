@@ -381,7 +381,7 @@ struct
         assert (Int_Base.equal loc2.size size);
         make_loc loc size
       and extract loc =
-        loc  >>>-: get >>>-: Precise_locs.imprecise_location
+        loc >>>-: get >>>-: Precise_locs.imprecise_location
       in
       extract_loc res |> fst |> Response.map_join' extract join |> convert
 
@@ -429,14 +429,10 @@ struct
     match r with
     | `Bottom | `Top -> []
     | `Value alarmset ->
-      let open Alarmset in
-      let l = ref [] in
-      let add alarm = function
-        | True -> ()
-        | False | Unknown -> l := alarm :: !l
+      let add alarm status acc =
+        if status <> Alarmset.True then alarm :: acc else acc
       in
-      Alarmset.iter add alarmset;
-      !l
+      Alarmset.fold add [] alarmset
 
   let is_bottom : type a c. (a,c) evaluation -> bool =
     fun res ->
