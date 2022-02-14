@@ -127,7 +127,11 @@ val filter_callstack : (callstack -> bool) -> request -> request
 
 (** Working with callstacks *)
 
-(** Returns the list of reachable callstacks from the given request. *)
+(** Returns the list of reachable callstacks from the given request.
+    An empty list is returned if the request control point has not been
+    reached by the analysis, or if no information has been saved at this point
+    (for instance with the -eva-no-results option).
+    Use [is_empty request] to distinguish these two cases. *)
 val callstacks : request -> callstack list
 
 (** Returns a list of subrequests for each reachable callstack from
