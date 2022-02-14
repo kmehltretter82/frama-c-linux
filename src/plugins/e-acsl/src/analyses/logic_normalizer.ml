@@ -40,8 +40,8 @@ module Id_predicate =
 
 (* Memoization module which retrieves the preprocessed form of predicates *)
 module Memo: sig
-  val memo_pred: (predicate -> pred_or_term option) -> predicate -> unit
-  val get_pred: predicate -> pred_or_term
+  val memo_pred: (predicate -> predicate option) -> predicate -> unit
+  val get_pred: predicate -> predicate
   val memo_term : (term -> term option) -> term -> unit
   val get_term : term -> term
   val clear: unit -> unit
@@ -52,7 +52,7 @@ end = struct
 
   let get_pred p =
     try Id_predicate.Hashtbl.find tbl_pred p
-    with Not_found -> PoT_pred p
+    with Not_found -> p
 
   let memo_pred process p =
     try ignore (Id_predicate.Hashtbl.find tbl_pred p) with
@@ -97,7 +97,7 @@ let preprocess_pred ~loc p =
           | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
           | _ -> assert false
         in
-        Some (PoT_pred (Logic_const.pand ~loc (init, p_copy)))
+        Some (Logic_const.pand ~loc (init, p_copy))
       | _ -> None
     end
   | _ -> None

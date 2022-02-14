@@ -700,9 +700,8 @@ end
     let gannot a =
       match a with
       | Dfun_or_pred ({l_body = LBpred p},loc) ->
-        (match Logic_normalizer.get_pred p with
-         | PoT_pred p -> process_quantif ~loc p
-         | PoT_term _ -> ())
+        let p = Logic_normalizer.get_pred p in
+        process_quantif ~loc p
       | _ -> ()
     in
     Annotations.iter_global (fun _ a -> gannot a)
@@ -712,10 +711,9 @@ end
 
     method !vpredicate p =
       let loc = p.pred_loc in
-      match Logic_normalizer.get_pred p with
-      | PoT_pred p -> process_quantif ~loc p;
-        Cil.DoChildren
-      | PoT_term _ -> Cil.DoChildren
+      let p = Logic_normalizer.get_pred p in
+      process_quantif ~loc p;
+      Cil.DoChildren
 
   end
 
