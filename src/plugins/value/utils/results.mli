@@ -152,7 +152,7 @@ val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
 val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
 
 (** Returns the Cvalue model. *)
-val as_cvalue_model : request -> Cvalue.Model.t result
+val get_cvalue_model : request -> Cvalue.Model.t result
 
 
 (** Dependencies *)

@@ -311,7 +311,7 @@ struct
       in
       convert r
 
-  let as_cvalue_model req =
+  let get_cvalue_model req =
     match A.Dom.get_cvalue with
     | None ->
       Result.error DisabledDomain
@@ -453,7 +453,7 @@ struct
     let compute cvalue =
       eval_deps (cvalue, Locals_scoping.bottom ()) arg
     in
-    req |> as_cvalue_model |> Result.fold ~error ~ok:compute
+    req |> get_cvalue_model |> Result.fold ~error ~ok:compute
 
   let lval_deps = compute_deps Register.eval_deps_lval
   let expr_deps = compute_deps Register.eval_deps
@@ -486,9 +486,9 @@ let equality_class exp req =
   let module E = Make () in
   E.equality_class exp req
 
-let as_cvalue_model req =
+let get_cvalue_model req =
   let module E = Make () in
-  E.as_cvalue_model req
+  E.get_cvalue_model req
 
 
 (* Depedencies *)
