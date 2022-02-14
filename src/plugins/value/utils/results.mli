@@ -138,12 +138,6 @@ val callstacks : request -> callstack list
     the given request. *)
 val by_callstack : request -> (callstack * request) list
 
-(** Iterates on the reachable callstacks from the request. *)
-val iter_callstacks : (callstack -> request -> unit) -> request -> unit
-
-(** Folds on the reachable callstacks from the request. *)
-val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
-
 
 (** State requests *)
 

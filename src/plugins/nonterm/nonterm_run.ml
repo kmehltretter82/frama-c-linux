@@ -299,7 +299,7 @@ let collect_nonterminating_statements fd nonterm_stacks =
       | _ ->
         let source = fst (Stmt.loc stmt) in
         Self.debug ~source "processing stmt:@ %a" Printer.pp_stmt stmt;
-        let process_callstack cs _ =
+        let process_callstack cs =
           if Eva.Results.(after stmt |> in_callstack cs |> is_empty) then
             add_stack stmt cs
           else if match stmt.skind with Loop _ -> true | _ -> false then begin
@@ -315,7 +315,7 @@ let collect_nonterminating_statements fd nonterm_stacks =
             if all_out_edges_unreachable then add_stack stmt cs
           end
         in
-        Eva.Results.(before stmt |> iter_callstacks process_callstack)
+        List.iter process_callstack Eva.Results.(before stmt |> callstacks)
     ) vis#get_instr_stmts;
   !new_nonterm_stmts
 

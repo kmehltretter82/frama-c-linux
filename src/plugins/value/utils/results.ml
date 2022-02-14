@@ -153,14 +153,6 @@ struct
     | Top | Bottom -> [] (* What else to do when Top is given ? *)
     | ByCallstack l -> List.map fst l
 
-  (* Iter *)
-
-  let iter (f  : callstack -> 'a -> unit) :
-    ('a, restricted_to_callstack) t -> unit =
-    function
-    | Top | Bottom -> () (* What else to do when Top is given ? *)
-    | ByCallstack l -> List.iter (fun (cs,x) -> f cs x) l
-
   (* Fold *)
 
   let fold (f  : callstack -> 'a -> 'b -> 'b) (acc : 'b) :
@@ -262,18 +254,6 @@ struct
 
   let callstacks req =
     get_by_callstack req |> Response.callstacks
-
-  let iter_callstacks f req =
-    let f' cs _res =
-      f cs (in_callstack cs req)
-    in
-    get_by_callstack req |> Response.iter f'
-
-  let fold_callstacks f acc req =
-    let f' cs _res acc =
-      f cs (in_callstack cs req) acc
-    in
-    get_by_callstack req |> Response.fold f' acc
 
   let by_callstack req =
     let f cs _res acc =
@@ -466,14 +446,6 @@ end
 let callstacks req =
   let module E = Make () in
   E.callstacks req
-
-let iter_callstacks f acc =
-  let module E = Make () in
-  E.iter_callstacks f acc
-
-let fold_callstacks f acc req =
-  let module E = Make () in
-  E.fold_callstacks f acc req
 
 let by_callstack req =
   let module E = Make () in
