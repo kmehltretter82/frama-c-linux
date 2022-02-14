@@ -82,8 +82,7 @@ struct
     Result.value ~default:[]
 
   let to_cvalue kinstr lval =
-    before_kinstr kinstr |> eval_lval lval |> as_cvalue |>
-    Result.value ~default:Cvalue.V.bottom
+    before_kinstr kinstr |> eval_lval lval |> as_cvalue
 
   let to_location kinstr lval =
     before_kinstr kinstr |> eval_address lval |> as_location |>

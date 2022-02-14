@@ -135,8 +135,7 @@ class propagate project fnames ~cast_intro = object(self)
         | None -> raise Cannot_change
         | Some s -> s
       in
-      let evaled = Eva.Results.(
-          before stmt |> eval_exp expr |> as_cvalue |> default Cvalue.V.top) in
+      let evaled = Eva.Results.(before stmt |> eval_exp expr |> as_cvalue) in
       let b, m = Cvalue.V.find_lonely_binding evaled in
       let can_replace vi =
         (* can replace the current expr by [vi] iff (1) it is a source var, or

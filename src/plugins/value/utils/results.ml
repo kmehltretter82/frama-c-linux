@@ -553,13 +553,19 @@ let callee stmt =
 
 (* Value conversion *)
 
-let as_cvalue (Value evaluation) =
+let as_cvalue_result (Value evaluation) =
   let module E = (val evaluation : Evaluation) in
   E.as_cvalue E.v
 
+let as_cvalue evaluation =
+  match as_cvalue_result evaluation with
+  | Ok v -> v
+  | Error Bottom -> Cvalue.V.bottom
+  | Error (Top | DisabledDomain) -> Cvalue.V.top
+
 let as_ival evaluation =
   try
-    Result.map Cvalue.V.project_ival (as_cvalue evaluation)
+    Result.map Cvalue.V.project_ival (as_cvalue_result evaluation)
   with Cvalue.V.Not_based_on_null ->
     Result.error Top
 

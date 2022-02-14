@@ -216,8 +216,12 @@ val as_ival : value evaluation -> Ival.t result
 (** Converts the value into a floating point abstraction. *)
 val as_fval : value evaluation -> Fval.t result
 
+(** Converts the value into a Cvalue abstraction. Converts error cases
+    into bottom and top values accordingly. *)
+val as_cvalue : value evaluation -> Cvalue.V.t
+
 (** Converts the value into a Cvalue abstraction. *)
-val as_cvalue : value evaluation -> Cvalue.V.t result
+val as_cvalue_result : value evaluation -> Cvalue.V.t result
 
 
 (** Converts into a C location abstraction. *)
