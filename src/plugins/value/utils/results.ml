@@ -458,9 +458,15 @@ let equality_class exp req =
   let module E = Make () in
   E.equality_class exp req
 
-let get_cvalue_model req =
+let get_cvalue_model_result req =
   let module E = Make () in
   E.get_cvalue_model req
+
+let get_cvalue_model req =
+  match get_cvalue_model_result req with
+  | Ok state -> state
+  | Error Bottom -> Cvalue.Model.bottom
+  | Error (Top | DisabledDomain) -> Cvalue.Model.top
 
 
 (* Depedencies *)

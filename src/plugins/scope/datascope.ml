@@ -353,10 +353,8 @@ let compute_escaping_zones s1 s2 =
   if Base.Hptset.is_empty bases
   then Locations.Zone.bottom
   else
-    match Eva.Results.(before s1 |> get_cvalue_model) with
-    | Ok state -> gather_escaping_zones bases state
-    | Error Bottom -> Locations.Zone.bottom
-    | Error _ -> Locations.Zone.top
+    let cvalue_state = Eva.Results.(before s1 |> get_cvalue_model) in
+    gather_escaping_zones bases cvalue_state
 
 (* type pair_stmts = stmt * stmt *)
 module PairStmts =

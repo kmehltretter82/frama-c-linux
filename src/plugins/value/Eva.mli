@@ -157,8 +157,12 @@ module Results: sig
       the given expression by the Equality domain. *)
   val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
 
+  (** Returns the Cvalue state. Error cases are converted into the bottom or top
+      cvalue state accordingly. *)
+  val get_cvalue_model : request -> Cvalue.Model.t
+
   (** Returns the Cvalue model. *)
-  val get_cvalue_model : request -> Cvalue.Model.t result
+  val get_cvalue_model_result : request -> Cvalue.Model.t result
 
 
   (** Dependencies *)
