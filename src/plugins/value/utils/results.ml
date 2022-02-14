@@ -291,7 +291,8 @@ struct
       let hce = Hcexprs.HCE.of_exp exp in
       let extract' state =
         let equalities = Equality_domain.project (extract state) in
-        NonTrivial (Set.find hce equalities)
+        try NonTrivial (Set.find hce equalities)
+        with Not_found -> Trivial
       and reduce e1 e2 =
         match e1, e2 with
         | Trivial, _ | _, Trivial -> Trivial
