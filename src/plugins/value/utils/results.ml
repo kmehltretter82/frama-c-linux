@@ -452,27 +452,19 @@ struct
 
   (* Dependencies *)
 
-  let lval_deps lval req =
-    let compute_deps cvalue =
-      Register.eval_deps_lval (cvalue, Locals_scoping.bottom ()) lval
+  let compute_deps eval_deps arg req =
+    let error = function
+      | Bottom -> Locations.Zone.bottom
+      | Top | DisabledDomain -> Locations.Zone.top
     in
-    req |> as_cvalue_model |>
-    Result.fold ~error:(fun _ -> Locations.Zone.bottom) ~ok:compute_deps
-
-  let expr_deps exp req =
-    let compute_deps cvalue =
-      Register.eval_deps (cvalue, Locals_scoping.bottom ()) exp
+    let compute cvalue =
+      eval_deps (cvalue, Locals_scoping.bottom ()) arg
     in
-    req |> as_cvalue_model |>
-    Result.fold ~error:(fun _ -> Locations.Zone.bottom) ~ok:compute_deps
+    req |> as_cvalue_model |> Result.fold ~error ~ok:compute
 
-  let address_deps lval req =
-    let compute_deps cvalue =
-      Register.eval_deps_addr (cvalue, Locals_scoping.bottom ()) lval
-    in
-    req |> as_cvalue_model |>
-    Result.fold ~error:(fun _ -> Locations.Zone.bottom) ~ok:compute_deps
-
+  let lval_deps = compute_deps Register.eval_deps_lval
+  let expr_deps = compute_deps Register.eval_deps
+  let address_deps = compute_deps Register.eval_deps_addr
 end
 
 
