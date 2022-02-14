@@ -511,15 +511,13 @@ let address_deps lval req =
 module type Lvaluation =
 sig
   include module type of (Make ())
-  type restriction
-  val v : (address,restriction) evaluation
+  val v : (address, unrestricted_response) evaluation
 end
 
 module type Evaluation =
 sig
   include module type of (Make ())
-  type restriction
-  val v : (value,restriction) evaluation
+  val v : (value, unrestricted_response) evaluation
 end
 
 type 'a evaluation =
@@ -528,22 +526,11 @@ type 'a evaluation =
 
 let build_eval_lval_and_exp () =
   let module M = Make () in
-  let open Response in
-  let build = function
-    | M.LValue (Consolidated _)
-    | M.Value (Consolidated _) as eval ->
-      (module struct
-        include M
-        type restriction = unrestricted_response
-        let v = eval
-      end : Evaluation)
-    | M.LValue (ByCallstack _ | Top | Bottom)
-    | M.Value (ByCallstack _ | Top | Bottom) as eval ->
-      (module struct
-        include M
-        type restriction = restricted_to_callstack
-        let v = eval
-      end : Evaluation)
+  let build v =
+    (module struct
+      include M
+      let v = v
+    end : Evaluation)
   in
   let eval_lval lval req = build @@ M.eval_lval lval req in
   let eval_exp exp req = build @@ M.eval_exp exp req in
@@ -557,19 +544,11 @@ let eval_exp exp req = Value ((snd @@ build_eval_lval_and_exp ()) exp req)
 
 let eval_address lval req =
   let module M = Make () in
-  let open Response in
-  match M.eval_address lval req with
-  | M.Address (Consolidated _, _) as lval ->
-    Address (module struct
+  let v = M.eval_address lval req in
+  Address
+    (module struct
       include M
-      type restriction = unrestricted_response
-      let v = lval
-    end : Lvaluation)
-  | M.Address ((ByCallstack _ | Top | Bottom), _) as lval ->
-    Address (module struct
-      include M
-      type restriction = restricted_to_callstack
-      let v = lval
+      let v = v
     end : Lvaluation)
 
 let eval_callee exp req =
