@@ -696,18 +696,14 @@ end
         (Result.Error (Error.make_not_yet "unguarded \\exists quantification"))
     | _ -> ()
 
-  let do_user_predicates () =
-    let gannot a =
-      match a with
-      | Dfun_or_pred ({l_body = LBpred p},loc) ->
-        let p = Logic_normalizer.get_pred p in
-        process_quantif ~loc p
-      | _ -> ()
-    in
-    Annotations.iter_global (fun _ a -> gannot a)
-
   let preprocessor = object
     inherit E_acsl_visitor.visitor
+
+    method !glob_annot _ = Cil.DoChildren
+    method !vannotation annot =
+      match annot with
+      | Dfun_or_pred _ -> Cil.DoChildren
+      | _ -> Cil.SkipChildren
 
     method !vpredicate p =
       let loc = p.pred_loc in
@@ -720,8 +716,7 @@ end
   let compute ast =
     Visitor.visitFramacFileSameGlobals
       (preprocessor :> Visitor.frama_c_inplace)
-      ast;
-    do_user_predicates ()
+      ast
 
   let compute_annot annot =
     ignore
