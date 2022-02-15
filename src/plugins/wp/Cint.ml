@@ -1244,7 +1244,8 @@ let is_cint_simplifier =
     method infer = []
   end
 
-
+(* Mask Simplifier *)
+  
 let dkey = Wp_parameters.register_category "mask-simplifier"
 
 module Masks = struct
@@ -1262,6 +1263,14 @@ module Masks = struct
 
   let is_top v =
     Integer.is_zero v.unset && Integer.is_zero v.set
+
+  let is_one_set mask v =
+    if is_bottom v then false
+    else not (Integer.is_zero (Integer.logand mask v.set))
+
+  let is_one_unset mask v =
+    if is_bottom v then false
+    else not (Integer.is_zero (Integer.logand mask v.unset))
 
   [@@@ warning "-32"]
   let pretty fmt v =
@@ -1283,22 +1292,25 @@ module Masks = struct
 
   let eval_not eval ctx e =
     let v = eval ctx e in
-    mk ~set:v.unset ~unset:v.set
+    if is_bottom v then v
+    else mk ~set:v.unset ~unset:v.set
 
   let neutral_land = mk ~set:(Integer.minus_one) ~unset:Integer.zero
   let eval_land eval ctx es =
     List.fold_left (fun {set;unset} x ->
         let v = eval ctx x in
-        mk ~set:(Integer.logand v.set set)
-          ~unset:(Integer.logor v.unset unset))
+        if is_bottom v then v
+        else mk ~set:(Integer.logand v.set set)
+            ~unset:(Integer.logor v.unset unset))
       neutral_land es
 
   let neutral_lor = mk ~set:Integer.zero ~unset:(Integer.minus_one)
   let eval_lor eval ctx es =
     List.fold_left (fun {set;unset} x ->
         let v = eval ctx x in
-        mk ~set:(Integer.logor v.set set)
-          ~unset:(Integer.logand v.unset unset))
+        if is_bottom v then v
+        else mk ~set:(Integer.logor v.set set)
+            ~unset:(Integer.logand v.unset unset))
       neutral_lor es
 
   let of_integer set = mk ~set ~unset:(Integer.lognot set)
@@ -1359,14 +1371,28 @@ module MasksDomain = struct
         | Fun(f,es) when f == f_lor -> Masks.eval_lor get ctx es
         | Fun(f,[e]) when f == f_lnot -> Masks.eval_not get ctx e
         | Fun(f,[e]) ->
-            let iota = to_cint f in
+            let iota = to_cint f in (* may raise Not_found *)
             let v = get ctx e in
-            if not (Ctypes.signed iota) then
-              (* The uppest bits are unset *)
-              let mask = snd (Ctypes.bounds iota) in
-              Masks.mk ~set:(Integer.logand v.Masks.set mask)
-                ~unset:(Integer.logor v.Masks.unset (Integer.lognot mask))
-            else v
+            if Masks.is_bottom v then v
+            else
+              let min,max = Ctypes.bounds iota in
+              if not (Ctypes.signed iota) then
+                (* the uppest bits are unset *)
+                Masks.mk ~set:(Integer.logand v.Masks.set max)
+                  ~unset:(Integer.logor v.Masks.unset (Integer.lognot max))
+              else
+                let sign_bit_mask = Integer.succ max in
+                if Masks.is_one_unset sign_bit_mask v then
+                  (* The sign bit is set to 0.
+                     So, the uppest bits are unset *)
+                  Masks.mk ~set:(Integer.logand v.Masks.set max)
+                    ~unset:(Integer.logor v.Masks.unset min)
+                else if Masks.is_one_set sign_bit_mask v then
+                  (* The sign bit is set to 1.
+                     So, the uppest bits are set *)
+                  Masks.mk ~set:(Integer.logor v.Masks.set min)
+                    ~unset:(Integer.logand v.Masks.unset max)
+                else Masks.top
         | _ -> Masks.top
       with Not_found -> Masks.top
     in
@@ -1470,7 +1496,6 @@ module MasksDomain = struct
 
 end
 
-
 let mask_simplifier =
 
   let rewrite_cst ~highest ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
@@ -1480,17 +1505,18 @@ let mask_simplifier =
                         f == f_bit_positive -> (* rewrites [bit_test(x,k)] *)
         (try let k = match_integer k in (* may raise Not_found *)
            let v = MasksDomain.eval ~level:1 ctx x in
-           let m = two_power_k k in (* may raise Not_found *)
            if Masks.is_bottom v then
              (* Does not rewrite [e] because the polarity is unknown *)
              e
-           else if not (Integer.is_zero (Integer.logand v.Masks.set m)) then
-             (* [ctx] gives that the bit [k] of [x] is set *)
-             e_true
-           else if not (Integer.is_zero (Integer.logand v.Masks.unset m)) then
-             (* [ctx] gives that the bit [k] of [x] is unset *)
-             e_false
-           else e
+           else
+             let mask = two_power_k k in (* may raise Not_found *)
+             if Masks.is_one_set mask v then
+               (* [ctx] gives that the bit [k] of [x] is set *)
+               e_true
+             else if Masks.is_one_unset mask v then
+               (* [ctx] gives that the bit [k] of [x] is unset *)
+               e_false
+             else e
          with _ -> e)
     | Eq (a, b) when highest ->
         (try
@@ -1514,10 +1540,10 @@ let mask_simplifier =
                  if Masks.is_bottom v then
                    (* Does not rewrite [e] because the polarity is unknown *)
                    e
-                 else if not (Integer.is_zero (Integer.logand set v.Masks.unset)) then
+                 else if Masks.is_one_unset set v then
                    (* Some bits of [t] that has to be set is unset *)
                    e_false
-                 else if not (Integer.is_zero (Integer.logand unset v.Masks.set)) then
+                 else if Masks.is_one_set unset v then
                    (* Some bits of [t] that has to be unset is set *)
                    e_false
                  else if (Integer.equal (Integer.logand set v.Masks.set) set) &&
