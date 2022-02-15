@@ -26,7 +26,6 @@
 # analysis GNUmakefile, as automatically as possible.
 
 import argparse
-import glob
 import json
 import logging
 import os
@@ -82,7 +81,7 @@ elif debug == "stderr":
     logging.basicConfig(stream=sys.stderr, level=debug_level,
                         format='[%(levelname)s] %(message)s')
 elif debug:
-    logging.basicConfig(filename=debug, level=debug_level,
+    logging.basicConfig(filename=debug, level=debug_level, filemode='w',
                         format='[%(levelname)s] %(message)s')
 else:
     logging.basicConfig(level=logging.INFO,
@@ -105,13 +104,15 @@ blug = os.getenv('BLUG')
 if not blug:
     blug = shutil.which("blug")
     if not blug:
-        sys.exit(f"error: path to 'blug' binary must be in PATH or variable BLUG")
+        sys.exit("error: path to 'blug' binary must be in PATH or variable BLUG")
 blug = Path(blug)
 blug_dir = blug.resolve().parent
 blug_print = blug_dir / "blug-print"
 # to import blug_jbdb
-sys.path.insert(0, blug_dir)
+sys.path.insert(0, blug_dir.as_posix())
 import blug_jbdb
+from blug_jbdb import prettify
+
 
 # Auxiliary functions #########################################################
 
@@ -128,8 +129,8 @@ def ask_if_overwrite(path):
 
 def insert_lines_after(lines, line_pattern, new_lines):
     re_line = re.compile(line_pattern)
-    for i in range(0, len(lines)):
-        if re_line.search(lines[i]):
+    for i, line in enumerate(lines):
+        if re_line.search(line):
             for j, new_line in enumerate(new_lines):
                 lines.insert(i+1+j, new_line)
             return
@@ -137,32 +138,29 @@ def insert_lines_after(lines, line_pattern, new_lines):
 
 # delete the first occurrence of [line_pattern]
 def delete_line(lines, line_pattern):
-    nb_deleted = 0
     re_line = re.compile(line_pattern)
-    for i in range(0, len(lines)):
-        if re_line.search(lines[i]):
-            del (lines[i])
+    for i, line in enumerate(lines):
+        if re_line.search(line):
+            del lines[i]
             return
     sys.exit(f"error: no lines found matching pattern: {line_pattern}")
 
 def replace_line(lines, line_pattern, value, all_occurrences=False):
     replaced = False
     re_line = re.compile(line_pattern)
-    for i in range(0, len(lines)):
-        if re_line.search(lines[i]):
+    for i, line in enumerate(lines):
+        if re_line.search(line):
             lines[i] = value
             replaced = True
             if not all_occurrences:
                 return
     if replaced:
         return
-    else:
-        sys.exit(f"error: no lines found matching pattern: {line_pattern}")
+    sys.exit(f"error: no lines found matching pattern: {line_pattern}")
 
 # replaces '/' and '.' with '_' so that a valid target name is created
 def make_target_name(target):
-    pp = blug_jbdb.prettify(target)
-    return pp.replace('/', '_').replace('.', '_')
+    return prettify(target).replace('/', '_').replace('.', '_')
 
 # sources are pretty-printed relatively to the .frama-c directory, where the
 # GNUmakefile will reside
@@ -190,7 +188,7 @@ def copy_fc_stubs():
             ask_if_overwrite(dest)
         with open(dest,"w") as f:
             f.write("\n".join(fc_stubs))
-        logging.info(f"wrote: {dest}")
+        logging.info("wrote: %s", dest)
         fc_stubs_copied = True
     return dest
 
@@ -220,9 +218,9 @@ def find_definitions(funcname, filename):
 sources_map = dict()
 if sources:
     if not targets:
-        sys.exit(f"error: option --targets is mandatory when --sources is specified")
+        sys.exit("error: option --targets is mandatory when --sources is specified")
     if len(targets) > 1:
-        sys.exit(f"error: option --targets can only have a single target when --sources is specified")
+        sys.exit("error: option --targets can only have a single target when --sources is specified")
     sources_map[targets[0]] = [s for s in sources if blug_jbdb.filter_source(s)]
 elif os.path.isfile(jbdb_path):
     # JBDB exists
@@ -237,11 +235,11 @@ elif os.path.isfile(jbdb_path):
     if not targets:
         # no targets specified in command line; use all from JBDB
         targets = jbdb_targets
-    logging.info(f"Computing sources for each target ({len(targets)} target(s))...")
+    logging.info("Computing sources for each target (%d target(s))...", len(targets))
     unknown_targets = []
     graph = blug_jbdb.build_graph(jbdb)
     for target in targets:
-        if not (target in jbdb_targets):
+        if target not in jbdb_targets:
             unknown_targets.append(target)
         else:
             if unknown_targets != []:
@@ -253,17 +251,17 @@ elif os.path.isfile(jbdb_path):
         sys.exit("target(s) not found in JBDB:\n{targets_pretty}")
 else:
     if not jbdb_path:
-        sys.exit(f"error: either a JBDB or option --sources are required")
+        sys.exit("error: either a JBDB or option --sources are required")
     else:
         sys.exit(f"error: invalid JBDB path: '{jbdb_path}'")
 
-logging.debug(f"sources_map: {sources_map}")
-logging.debug(f"targets: {targets}")
+logging.debug("sources_map: %s", sorted([prettify(k) + ": " + ', '.join(sorted([prettify(s) for s in v])) for (k, v) in sources_map.items()]))
+logging.debug("targets: %s", sorted([prettify(t) for t in targets]))
 
 # check that source files exist
 unknown_sources = sorted({s for sources in sources_map.values() for s in sources if not s.exists()})
 if unknown_sources:
-    sys.exit(f"error: source(s) not found:\n" + "\n".join(unknown_sources))
+    sys.exit("error: source(s) not found:\n" + "\n".join([prettify(s) for s in unknown_sources]))
 
 # Check that the main function is defined exactly once per target.
 # note: this is only based on heuristics (and fails on a few real case studies),
@@ -278,16 +276,16 @@ for target, sources in sources_map.items():
         fundefs = find_definitions(main, source)
         main_definitions[target] += [(source, fundef[0], fundef[1]) for fundef in fundefs]
     if main_definitions[target] == []:
-        logging.warning(f"function '{main}' seems to be never defined in the sources of target '{blug_jbdb.prettify(target)}'")
+        logging.warning("function '%s' seems to be never defined in the sources of target '%s'", main, prettify(target))
     elif len(main_definitions[target]) > 1:
-        logging.warning(f"function '{main}' seems to be defined multiple times in the sources of target '{blug_jbdb.prettify(target)}':")
+        logging.warning("function '%s' seems to be defined multiple times in the sources of target '%s':", main, prettify(target))
         for (filename, line, _) in main_definitions[target]:
             print(f"- definition at {filename}:{line}")
 
 # End of checks; start writing GNUmakefile and stubs from templates ###########
 
 if not dot_framac_dir.is_dir():
-    logging.debug(f"creating {dot_framac_dir}")
+    logging.debug("creating %s", dot_framac_dir)
     dot_framac_dir.mkdir(parents=True, exist_ok=False)
 
 fc_config = json.loads(call_and_get_output([framac_bin / "frama-c", "-print-config-json"]))
@@ -304,7 +302,7 @@ if any_has_arguments:
     fc_stubs = copy_fc_stubs()
     for target in targets:
         if any(d[2] for d in main_definitions[target]):
-            logging.debug(f"target {blug_jbdb.prettify(target)} has main with args, adding fc_stubs.c to its sources")
+            logging.debug("target %s has main with args, adding fc_stubs.c to its sources", prettify(target))
             sources_map[target].insert(0, fc_stubs)
 
 gnumakefile = dot_framac_dir / "GNUmakefile"
@@ -313,9 +311,8 @@ template = lines_of_file(share_dir / "analysis-scripts" / "template.mk")
 
 if machdep:
     machdeps = fc_config['machdeps']
-    if not (machdep in machdeps):
-        logging.warning(f"unknown machdep ({machdep}) not in Frama-C's default machdeps:\n" +
-                        " ".join(machdeps))
+    if machdep not in machdeps:
+        logging.warning("unknown machdep (%s) not in Frama-C's default machdeps:\n%s", machdep, " ".join(machdeps))
     replace_line(template, "^MACHDEP = .*", f"MACHDEP = {machdep}")
 
 if jbdb_path:
@@ -331,18 +328,18 @@ for target, sources in reversed(sources_map.items()):
     pp_target = make_target_name(target)
     new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + [""]
     if any(d[2] for d in main_definitions[target]):
-        logging.debug(f"target {blug_jbdb.prettify(target)} has main with args, adding -main eva_main to its FCFLAGS")
+        logging.debug("target %s has main with args, adding -main eva_main to its FCFLAGS", prettify(target))
         new_lines += [f"{pp_target}.parse: FCFLAGS += -main eva_main", ""]
     insert_lines_after(template, "^### Each target <t>.eva", new_lines)
 
 gnumakefile.write_text("\n".join(template))
 
-logging.info(f"wrote: {gnumakefile}")
+logging.info("wrote: %s", gnumakefile)
 
 # write path.mk, but only if it does not exist.
 path_mk = dot_framac_dir / "path.mk"
 if not force and path_mk.exists():
-    logging.info(f"{path_mk} already exists, will not overwrite it")
+    logging.info("%s already exists, will not overwrite it", path_mk)
 else:
     path_mk.write_text(f"""FRAMAC_BIN={framac_bin}
 ifeq ($(wildcard $(FRAMAC_BIN)),)
@@ -352,4 +349,4 @@ FRAMAC=$(FRAMAC_BIN)/frama-c
 FRAMAC_GUI=$(FRAMAC_BIN)/frama-c-gui
 endif
 """)
-    logging.info(f"wrote: {path_mk}")
+    logging.info("wrote: %s", path_mk)
