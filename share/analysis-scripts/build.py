@@ -46,30 +46,32 @@ script_dir = os.path.dirname(sys.argv[0])
 parser = argparse.ArgumentParser(description="""Produces a GNUmakefile
 for analysis with Frama-C. Tries to use a build_commands.json file if
 available.""")
-parser.add_argument('--debug', metavar='FILE', default=None, nargs=1,
-                    help='enable debug mode, debugging to the specified file')
+parser.add_argument('--debug', metavar='FILE',
+                    help='enable debug mode and redirect output to the specified file')
 parser.add_argument('--force', action="store_true",
                     help='overwrite files without prompting')
-parser.add_argument('--jbdb', metavar='FILE', default=["build_commands.json"], nargs=1,
+parser.add_argument('--jbdb', metavar='FILE', default="build_commands.json",
                     help='path to JBDB (default: build_commands.json)')
 parser.add_argument('--machdep', metavar='MACHDEP',
                     help="analysis machdep (default: Frama-C's default)")
 parser.add_argument('--main', metavar='FUNCTION', default="main",
                     help='name of the main function (default: main)')
 parser.add_argument('--sources', metavar='FILE', nargs='+',
-                    help='list of sources to parse (overrides --jbdb)')
+                    help='list of sources to parse (overrides --jbdb)',
+                    type=Path)
 parser.add_argument('--targets', metavar='FILE', nargs='+',
                     help='targets to build. When using --sources, ' +
-                    'only a single target is allowed.')
+                    'only a single target is allowed.',
+                    type=Path)
 
-(wrapper_args, args) = parser.parse_known_args()
-force = wrapper_args.force
-jbdb_path = wrapper_args.jbdb[0]
-machdep = wrapper_args.machdep
-main = wrapper_args.main
-sources = wrapper_args.sources
-targets = wrapper_args.targets
-debug = wrapper_args.debug[0] if wrapper_args.debug else None
+args = parser.parse_args()
+force = args.force
+jbdb_path = args.jbdb
+machdep = args.machdep
+main = args.main
+sources = args.sources
+targets = args.targets
+debug = args.debug
 
 debug_level = logging.DEBUG if debug else logging.INFO
 # special values for debug filename
@@ -105,8 +107,8 @@ if not blug:
     if not blug:
         sys.exit(f"error: path to 'blug' binary must be in PATH or variable BLUG")
 blug = Path(blug)
-blug_dir = os.path.dirname(blug)
-blug_print = Path(blug_dir) / "blug-print"
+blug_dir = blug.resolve().parent
+blug_print = blug_dir / "blug-print"
 # to import blug_jbdb
 sys.path.insert(0, blug_dir)
 import blug_jbdb
@@ -245,18 +247,21 @@ elif os.path.isfile(jbdb_path):
             if unknown_targets != []:
                 continue # already found a problem; avoid useless computations
             sources = [s for s in blug_jbdb.collect_leaves(graph, [target]) if blug_jbdb.filter_source(s)]
-            sources_map[target] = sorted([blug_jbdb.prettify(source) for source in sources])
+            sources_map[target] = sorted(sources)
     if unknown_targets:
         targets_pretty = "\n".join(unknown_targets)
         sys.exit("target(s) not found in JBDB:\n{targets_pretty}")
 else:
-    sys.exit(f"error: either a JBDB or option --sources are required")
+    if not jbdb_path:
+        sys.exit(f"error: either a JBDB or option --sources are required")
+    else:
+        sys.exit(f"error: invalid JBDB path: '{jbdb_path}'")
 
 logging.debug(f"sources_map: {sources_map}")
 logging.debug(f"targets: {targets}")
 
 # check that source files exist
-unknown_sources = list({s for s in set([s for sources in sources_map.values() for s in sources]) if not Path(s).exists()})
+unknown_sources = sorted({s for sources in sources_map.values() for s in sources if not s.exists()})
 if unknown_sources:
     sys.exit(f"error: source(s) not found:\n" + "\n".join(unknown_sources))
 
