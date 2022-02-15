@@ -40,7 +40,11 @@ import 'react-pivottable/pivottable.css';
 // --- Pivot Table for Properties
 // --------------------------------------------------------------------------
 
-export function Pivot(props: any) {
+interface PivotTableProps {
+  data: string[][];
+}
+
+export function Pivot(props: PivotTableProps) : JSX.Element {
   const [state, setState] = React.useState({});
   return (
     <PivotTableUI
@@ -70,13 +74,13 @@ function PivotTableBuild () : JSX.Element {
   const rawData = States.useSyncValue(PivotState.pivotState);
   const [computing, setComputing] = React.useState(false);
   const [error, setError] = React.useState('');
-  async function handleError (err: string) {
+  async function handleError (err: string) : Promise<void> {
     const msg =
       `The pivot table could not be built: an error has occured (${err}).`;
     setError(msg);
     Status.setMessage({ text: msg, kind: 'error' });
   }
-  async function compute () {
+  async function compute () : Promise<void> {
     setComputing(true);
     setError('');
     Server.send(PivotState.compute, [])
