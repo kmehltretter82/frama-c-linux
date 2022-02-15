@@ -1281,28 +1281,29 @@ module Masks = struct
     mk ~unset:(Integer.logor unset v.unset)
       ~set:(Integer.logor set v.set)
 
-  let eval_not eval e =
-    let v = eval e in mk ~set:v.unset ~unset:v.set
+  let eval_not eval ctx e =
+    let v = eval ctx e in
+    mk ~set:v.unset ~unset:v.set
 
   let neutral_land = mk ~set:(Integer.minus_one) ~unset:Integer.zero
-  let eval_land eval es =
+  let eval_land eval ctx es =
     List.fold_left (fun {set;unset} x ->
-        let v = eval x in
+        let v = eval ctx x in
         mk ~set:(Integer.logand v.set set)
           ~unset:(Integer.logor v.unset unset))
       neutral_land es
 
   let neutral_lor = mk ~set:Integer.zero ~unset:(Integer.minus_one)
-  let eval_lor eval es =
+  let eval_lor eval ctx es =
     List.fold_left (fun {set;unset} x ->
-        let v = eval x in
+        let v = eval ctx x in
         mk ~set:(Integer.logor v.set set)
           ~unset:(Integer.logand v.unset unset))
       neutral_lor es
 
   let of_integer set = mk ~set ~unset:(Integer.lognot set)
-  let rewrite eval e =
-    let v = eval e in
+  let rewrite eval ctx e =
+    let v = eval ctx e in
     if Integer.equal v.set (Integer.lognot v.unset)
     then e_zint v.set (* all bits are specified *)
     else e
@@ -1349,14 +1350,14 @@ module MasksDomain = struct
                   if Masks.is_equal v old then old'
                   else Some v) t v ctx
 
-  let eval ctx e = (* non recursive evaluation *)
-    let r =
+  let eval ~level (ctx:t) t =
+    let eval get ctx e =
       try
         match F.repr e with
         | Kint set -> Masks.mk ~set ~unset:(Integer.lognot set)
-        | Fun(f,es) when f == f_land -> Masks.eval_land (get ctx) es
-        | Fun(f,es) when f == f_lor -> Masks.eval_lor (get ctx) es
-        | Fun(f,[e]) when f == f_lnot -> Masks.eval_not (get ctx) e
+        | Fun(f,es) when f == f_land -> Masks.eval_land get ctx es
+        | Fun(f,es) when f == f_lor -> Masks.eval_lor get ctx es
+        | Fun(f,[e]) when f == f_lnot -> Masks.eval_not get ctx e
         | Fun(f,[e]) ->
             let iota = to_cint f in
             let v = get ctx e in
@@ -1369,7 +1370,13 @@ module MasksDomain = struct
         | _ -> Masks.top
       with Not_found -> Masks.top
     in
-    Wp_parameters.debug ~dkey "Eval %a @." pretty (e,r);
+    let r = match level with
+      | 0 -> eval get ctx t (* from what is in the table for the sub-terms *)
+      | _ -> (* 0 + narrowing from from what is in the table for the term *)
+          let ({Masks.set;unset} as v) = eval get ctx t in
+          (try Masks.narrow ~unset ~set (get ctx t) with Not_found -> v)
+    in
+    Wp_parameters.debug ~dkey "Eval ~level:%d %a@." level pretty (t,r);
     r
 
   let rec reduce ctx t (v:Masks.t) =
@@ -1424,8 +1431,10 @@ module MasksDomain = struct
           end
         | _ -> ctx
     in
-    let {Masks.set;unset} = eval ctx t in
-    narrow ctx t (Masks.narrow ~unset ~set v)
+    let {Masks.set;unset} =
+      (* level 1 est unnecessary since the narrowing is done just after *)
+      eval ~level:0 ctx t
+    in narrow ctx t (Masks.narrow ~unset ~set v)
 
   (* @raises [Lang.Contradiction] when [h] introduces a contradiction *)
   let assume ctx h = (* [rtx = assume ctx h] such that [h |- ctx ==> rtx] *)
@@ -1454,16 +1463,10 @@ module MasksDomain = struct
         end
       | Eq(a,b) when is_int a && is_int b ->
           (* b may give a better constraint because it could be a constant *)
-          let ctx = reduce ctx a (eval ctx b) in
+          let ctx = reduce ctx a (eval ~level:1 ctx b) in
           reduce ctx b (get ctx a)
       | _ -> ctx
     with Not_found -> ctx
-
-  let eval ctx h =
-    let ({Masks.set;unset} as v) = eval ctx h in
-    let r = try Masks.narrow ~unset ~set (get ctx h) with Not_found -> v in
-    Wp_parameters.debug ~dkey "Value %a@." pretty (h,r);
-    r
 
 end
 
@@ -1476,7 +1479,7 @@ let mask_simplifier =
     | Fun(f,[x;k]) when highest &&
                         f == f_bit_positive -> (* rewrites [bit_test(x,k)] *)
         (try let k = match_integer k in (* may raise Not_found *)
-           let v = MasksDomain.eval ctx x in
+           let v = MasksDomain.eval ~level:1 ctx x in
            let m = two_power_k k in (* may raise Not_found *)
            if Masks.is_bottom v then
              (* Does not rewrite [e] because the polarity is unknown *)
@@ -1506,7 +1509,7 @@ let mask_simplifier =
                  and v = (* the current bits of [t] *)
                    try MasksDomain.find (F.e_fun f_land es) ctx
                    with Not_found ->
-                     Masks.eval_land (fun i -> i) (List.map (MasksDomain.eval ctx) es)
+                     Masks.eval_land (fun _ctx i -> i) ctx (List.map (MasksDomain.eval  ~level:1 ctx) es)
                  in
                  if Masks.is_bottom v then
                    (* Does not rewrite [e] because the polarity is unknown *)
@@ -1525,7 +1528,7 @@ let mask_simplifier =
                  else e
            | _ -> e
          with _ -> e)
-    | _ when is_int e -> Masks.rewrite (MasksDomain.eval ctx) e
+    | _ when is_int e -> Masks.rewrite (MasksDomain.eval ~level:1) ctx e
     | _ -> e
   in
 
@@ -1547,7 +1550,7 @@ let mask_simplifier =
             | Kint v -> F.e_zint (Integer.logand (Integer.lognot unset) v)
             | _ -> x
           and collect ctx unset_mask x = try
-              let m = MasksDomain.eval ctx x in
+              let m = MasksDomain.eval ~level:1 ctx x in
               Integer.logor unset_mask m.Masks.unset
             with Not_found -> unset_mask
           in
