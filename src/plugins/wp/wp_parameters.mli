@@ -120,6 +120,10 @@ module CacheDir: Parameter_sig.String
 module CachePrint: Parameter_sig.Bool
 module Drivers: Parameter_sig.String_list
 module Timeout: Parameter_sig.Int
+module FctTimeout:
+  Parameter_sig.Map
+  with type key = Cil_types.kernel_function
+   and type value = int
 module SmokeTimeout: Parameter_sig.Int
 module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
