@@ -1244,8 +1244,8 @@ let is_cint_simplifier =
     method infer = []
   end
 
-(* Mask Simplifier *)
-  
+(** Mask Simplifier **)
+
 let dkey = Wp_parameters.register_category "mask-simplifier"
 
 module Masks = struct
@@ -1396,11 +1396,17 @@ module MasksDomain = struct
         | _ -> Masks.top
       with Not_found -> Masks.top
     in
+    let eval_narrow eval_subterm ctx t =
+      let ({Masks.set;unset} as v) = eval eval_subterm ctx t in
+      (try Masks.narrow ~unset ~set (get ctx t) with Not_found -> v)
+    in
+    let rec eval_rec ctx t = eval_narrow eval_rec ctx t in
     let r = match level with
       | 0 -> eval get ctx t (* from what is in the table for the sub-terms *)
-      | _ -> (* 0 + narrowing from from what is in the table for the term *)
-          let ({Masks.set;unset} as v) = eval get ctx t in
-          (try Masks.narrow ~unset ~set (get ctx t) with Not_found -> v)
+      | 1 -> (* 0 + narrowing from from what is in the table for the term *)
+          eval_narrow get ctx t
+      | _ -> (* 1 + recursive *)
+          eval_rec ctx t
     in
     Wp_parameters.debug ~dkey "Eval ~level:%d %a@." level pretty (t,r);
     r
@@ -1458,7 +1464,8 @@ module MasksDomain = struct
         | _ -> ctx
     in
     let {Masks.set;unset} =
-      (* level 1 est unnecessary since the narrowing is done just after *)
+      (* level 1 est unnecessary since the narrowing is done just after,
+         level 2 may give better results *)
       eval ~level:0 ctx t
     in narrow ctx t (Masks.narrow ~unset ~set v)
 
@@ -1489,7 +1496,7 @@ module MasksDomain = struct
         end
       | Eq(a,b) when is_int a && is_int b ->
           (* b may give a better constraint because it could be a constant *)
-          let ctx = reduce ctx a (eval ~level:1 ctx b) in
+          let ctx = reduce ctx a (eval ~level:2 ctx b) in
           reduce ctx b (get ctx a)
       | _ -> ctx
     with Not_found -> ctx
