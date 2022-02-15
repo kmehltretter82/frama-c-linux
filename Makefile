@@ -825,6 +825,8 @@ PLUGIN_EXTRA_DIRS:=engine values domains api domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy partitioning utils gui_files \
 	api values/numerors domains/numerors
 PLUGIN_TESTS_DIRS+=value/traces
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/Eva.mli
+PLUGIN_DISTRIB_EXTERNAL+=gen-api.sh
 
 # Files for the binding to Apron domains. Only available if Apron is available.
 ifeq ($(HAS_APRON),yes)
@@ -908,7 +910,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/taint_domain \
 	$(APRON_CMO) $(NUMERORS_CMO) \
 	api/general_requests api/values_request \
-	utils/unit_tests
+	utils/unit_tests utils/results
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Server
@@ -927,7 +929,25 @@ VALUE_TYPES:=$(addprefix src/plugins/value_types/,\
 PLUGIN_TYPES_CMO:=$(VALUE_TYPES)
 PLUGIN_TYPES_TODOC:=$(addsuffix .mli,$(VALUE_TYPES))
 
+# Eva API.
+API_MLI := $(addprefix $(PLUGIN_DIR)/, \
+  engine/analysis.mli utils/results.mli \
+  value_parameters.mli utils/eva_annotations.mli \
+  eval.mli domains/cvalue/builtins.mli \
+  legacy/eval_terms.mli utils/value_results.mli utils/unit_tests.mli)
+
+$(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/gen-api.sh Makefile $(API_MLI)
+	$(PRINT_MAKING) $@
+	$(RM) $@ $@.tmp
+	$< $(API_MLI) > $@.tmp
+	$(CHMOD_RO) $@.tmp
+	$(MV) $@.tmp $@
+
+clean::
+	$(RM) $(PLUGIN_DIR)/Eva.mli
+
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
+
 
 #########
 # Reduc #

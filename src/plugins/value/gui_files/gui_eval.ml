@@ -24,7 +24,7 @@ open Cil_types
 open Gui_types
 
 let results_kf_computed kf =
-  Db.Value.is_computed () &&
+  Analysis.is_computed () &&
   match kf with
   | { fundec = Definition (fundec, _) } ->
     Mark_noresults.should_memorize_function fundec

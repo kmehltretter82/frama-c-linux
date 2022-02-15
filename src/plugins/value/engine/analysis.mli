@@ -28,10 +28,12 @@ module type Results = sig
   type value
   type location
 
+  val get_global_state: unit -> state or_bottom
   val get_stmt_state : after:bool -> stmt -> state or_bottom
-  val get_kinstr_state: after:bool -> kinstr -> state or_bottom
   val get_stmt_state_by_callstack:
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
+  val get_initial_state:
+    kernel_function -> state or_bottom
   val get_initial_state_by_callstack:
     kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
@@ -85,6 +87,23 @@ val register_computation_hook: ?on:computation_state ->
 
 val force_compute : unit -> unit
 (** Perform a full analysis, starting from the [main] function. *)
+
+[@@@ api_start]
+val compute : unit -> unit
+(** Computes the Eva analysis, if not already computed, using the entry point
+    of the current project. You may set it with {!Globals.set_entry_point}.
+    @raise Globals.No_such_entry_point if the entry point is incorrect
+    @raise Db.Value.Incorrect_number_of_arguments if some arguments are
+    specified for the entry point using {!Db.Value.fun_set_args}, and
+    an incorrect number of them is given.
+    @plugin development guide *)
+
+val is_computed : unit -> bool
+(** Return [true] iff the Eva analysis has been done. *)
+
+val self : State.t
+(** Internal state of Eva analysis from projects viewpoint. *)
+[@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t
 (** Return the initial state of the cvalue domain only. *)

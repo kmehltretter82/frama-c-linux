@@ -208,7 +208,7 @@ let impact_statement =
 
 
 let impact_statement_ui (main_ui:Design.main_window_extension_points) s =
-  let val_computed = Db.Value.is_computed () in
+  let val_computed = Eva.Analysis.is_computed () in
   ignore (impact_statement (*restriction*)Locations.Zone.top s);
   if not val_computed then
     main_ui#reset ()

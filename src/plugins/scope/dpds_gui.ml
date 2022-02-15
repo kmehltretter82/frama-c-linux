@@ -114,7 +114,7 @@ struct include State_builder.Ref
     (Stmt.Hptset)
     (struct
       let name = Info.name
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
       let default () = Stmt.Hptset.empty
     end)
 
@@ -137,7 +137,7 @@ struct
       (Stmt.Map.Make(Datatype.String.Set))
       (struct
         let name = Info.name
-        let dependencies = [ Db.Value.self ]
+        let dependencies = [ Eva.Analysis.self ]
         let default () = Stmt.Map.empty
       end)
 
@@ -222,7 +222,7 @@ module Pscope (* : (DpdCmdSig with type t_in = code_annotation) *) = struct
       (Code_annotation)
       (struct
         let name = "Dpds_gui.Highlighter.Pscope_warn"
-        let dependencies = [ Db.Value.self ]
+        let dependencies = [ Eva.Analysis.self ]
       end)
 
   let clear () = Pscope.clear(); Pscope_warn.clear()
@@ -323,7 +323,7 @@ module Zones : (DpdCmdSig with type t_in = lval)  = struct
          (Stmt.Hptset))
       (struct
         let name = "Dpds_gui.Highlighter.ZonesState"
-        let dependencies = [ Db.Value.self ]
+        let dependencies = [ Eva.Analysis.self ]
       end)
     let set s =
       set s;
@@ -392,7 +392,7 @@ module DpdsState =
     (Stmt)
     (struct
       let name = "Dpds_gui.Highlighter.DpdsState"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
     end)
 
 let reset () =
@@ -469,7 +469,7 @@ let highlighter (buffer:Design.reactive_buffer) localizable ~start ~stop =
   with Not_found -> ()
 
 let check_value (main_ui:Design.main_window_extension_points) =
-  if Db.Value.is_computed () then true
+  if Eva.Analysis.is_computed () then true
   else
     let answer = GToolbox.question_box
         ~title:("Eva Needed")
@@ -478,7 +478,7 @@ let check_value (main_ui:Design.main_window_extension_points) =
          ^"Do you want to run Eva with its current settings now?")
     in
     if answer = 1 then
-      match main_ui#full_protect ~cancelable:true !Db.Value.compute with
+      match main_ui#full_protect ~cancelable:true Eva.Analysis.compute with
       | Some _ ->
         main_ui#redisplay (); (* New alarms *)
         true

@@ -49,7 +49,7 @@ let main () =
      Inout_parameters.Output.get () && ShouldOutput.get ()
   then begin
     ShouldOutput.set false;
-    !Db.Value.compute ();
+    Eva.Analysis.compute ();
     Callgraph.Uses.iter_in_rev_order
       (fun kf ->
          if Kernel_function.is_definition kf && !Db.Value.is_called kf

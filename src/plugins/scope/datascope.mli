@@ -37,9 +37,3 @@ val rm_asserts : unit -> unit
 
 (** for internal use *)
 module R: Plugin.General_services
-
-val get_lval_zones:
-  for_writing:bool ->
-  Cil_types.stmt ->
-  Cil_types.lval ->
-  Locations.Zone.t * bool * Locations.Zone.t

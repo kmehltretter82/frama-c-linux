@@ -57,7 +57,7 @@ let _computation_signal =
     ()
 
 let is_computed kf =
-  Db.Value.is_computed () &&
+  Analysis.is_computed () &&
   match kf with
   | { fundec = Definition (fundec, _) } ->
     Mark_noresults.should_memorize_function fundec
@@ -66,7 +66,7 @@ let is_computed kf =
 module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 
 let callers kf =
-  let list = !Db.Value.callers kf in
+  let list = Value_results.callers kf in
   List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
 
 let () = Request.register ~package

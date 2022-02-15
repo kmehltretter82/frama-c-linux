@@ -206,7 +206,7 @@ let run typ expr =
   end;
   File.prepare_cil_file cil;
   Kernel.MainFunction.set "f";
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   let kf = Globals.Functions.find_by_name "f" in
   let r = Globals.Vars.find_from_astinfo "result" Cil_types.VGlobal in
   let ret = Kernel_function.find_return kf in

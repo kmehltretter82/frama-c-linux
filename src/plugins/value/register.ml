@@ -23,14 +23,9 @@
 open Cil_types
 open Locations
 
-let compute () =
-  (* Nothing to recompute when Value has already been computed. This boolean
-     is automatically cleared when an option of Value changes, because they
-     are registered as dependencies on [Db.Value.self] in {!Value_parameters}.*)
-  if not (Db.Value.is_computed ()) then Analysis.force_compute ()
-
-let _self =
-  Db.register_compute "Value.compute" [ Db.Value.self ] Db.Value.compute compute
+let [@alert "-deprecated"] _self =
+  Db.register_compute "Value.compute" [ Db.Value.self ] Db.Value.compute
+    Analysis.compute
 
 let () = Value_parameters.ForceValues.set_output_dependencies [Db.Value.self]
 

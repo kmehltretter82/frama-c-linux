@@ -80,53 +80,44 @@ module InitSid = struct
     Format.fprintf fmt "Lmap = %a@\n" LM.pretty lmap
 end
 
-let get_lval_zones ~for_writing stmt lval =
-  let state = Db.Value.get_stmt_state stmt in
-  let dpds, zone, exact =
-    !Db.Value.lval_to_zone_with_deps_state
-      state ~deps:(Some Locations.Zone.bottom) ~for_writing lval
-  in
-  dpds, exact, zone
+let get_writes stmt lval =
+  Eva.Results.(before stmt |> eval_address lval |> as_zone ~access:Write)
 
 (** Add to [stmt] to [lmap] for all the locations modified by the statement.
  * Something to do only for calls and assignments.
  * *)
 let register_modified_zones lmap stmt =
   let register lmap zone = InitSid.add_zone lmap zone stmt in
-  let aux_out kf out =
+  let aux_out out kf =
     let inout= !Db.Operational_inputs.get_internal_precise ~stmt kf in
     Locations.Zone.join out inout.Inout_type.over_outputs
   in
   match stmt.skind with
   | Instr (Set (lval, _, _)) ->
-    let _dpds, _, zone =
-      get_lval_zones ~for_writing:true  stmt lval
-    in
+    let zone = get_writes stmt lval in
     register lmap zone
   | Instr (Local_init(v, i, _)) ->
-    let _, _, zone = get_lval_zones ~for_writing:true stmt (Cil.var v) in
+    let zone = get_writes stmt (Cil.var v) in
     let lmap_init = register lmap zone in
     (match i with
      | AssignInit _ -> lmap_init
      | ConsInit(f,_,_) ->
        let kf = Globals.Functions.get f in
-       let out = aux_out kf Locations.Zone.bottom in
+       let out = aux_out Locations.Zone.bottom kf in
        register lmap_init out)
   | Instr (Call (dst,funcexp,_args,_)) ->
     begin
       let lmap = match dst with
         | None -> lmap
         | Some lval ->
-          let _dpds, _, zone =
-            get_lval_zones ~for_writing:true stmt lval
-          in
+          let zone = get_writes stmt lval in
           register lmap zone
       in
-      let _, kfs =
-        !Db.Value.expr_to_kernel_function ~deps:None (Kstmt stmt) funcexp
+      let kfs =
+        Eva.Results.(before stmt |> eval_callee funcexp |> default [])
       in
       let out =
-        Kernel_function.Hptset.fold aux_out kfs Locations.Zone.bottom
+        List.fold_left aux_out Locations.Zone.bottom kfs
       in
       register lmap out
     end
@@ -141,7 +132,7 @@ let compute kf =
   let f = Kernel_function.get_definition kf in
   let do_stmt lmap s =
     Cil.CurrentLoc.set (Cil_datatype.Stmt.loc s);
-    if Db.Value.is_reachable_stmt s
+    if Eva.Results.is_reachable s
     then register_modified_zones lmap s
     else lmap
   in
@@ -361,7 +352,9 @@ let compute_escaping_zones s1 s2 =
   let bases = List.fold_left filter Base.Hptset.empty locals in
   if Base.Hptset.is_empty bases
   then Locations.Zone.bottom
-  else gather_escaping_zones bases (Db.Value.get_stmt_state s1)
+  else
+    let cvalue_state = Eva.Results.(before s1 |> get_cvalue_model) in
+    gather_escaping_zones bases cvalue_state
 
 (* type pair_stmts = stmt * stmt *)
 module PairStmts =
@@ -392,7 +385,7 @@ module ModifEdge =
   Cil_state_builder.Kernel_function_hashtbl(HashPairStmtsZone)
     (struct
       let name = "Scope.Datatscope.ModifsEdge"
-      let dependencies = [Db.Value.self]
+      let dependencies = [Eva.Analysis.self]
       let size = 16
     end)
 
@@ -410,9 +403,7 @@ let is_modified_by_edge kf z s1 s2 =
  * @raise Kernel_function.No_Definition if [kf] has no definition
 *)
 let get_data_scope_at_stmt kf stmt lval =
-  let dpds, _, zone = get_lval_zones ~for_writing:false stmt lval in
-  (* TODO : is there something to do with 'exact' ? *)
-  let zone = Locations.Zone.join dpds zone in
+  let zone = Eva.Results.(before stmt |> lval_deps lval) in
   let allstmts, info = compute kf in
   let modif_stmts = InitSid.find info zone in
   let modifs_edge = is_modified_by_edge kf zone in
@@ -594,7 +585,7 @@ class check_annot_visitor = object(self)
 
   method! vglob_aux g = match g with
     | GFun (fdec, _loc) when
-        !Db.Value.is_called (Option.get self#current_kf) &&
+        Eva.Results.is_called (Option.get self#current_kf) &&
         not (!Db.Value.no_results fdec)
       ->
       Cil.DoChildren

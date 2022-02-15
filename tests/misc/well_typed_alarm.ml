@@ -1,5 +1,5 @@
 let main () =
-  !Db.Value.compute();
+  Eva.Analysis.compute();
   Filecheck.check_ast "Check alarm";
   File.pretty_ast ()
 

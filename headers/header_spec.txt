@@ -1316,7 +1316,7 @@ src/plugins/users/users_register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/users/users_register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/.merlin: .ignore
 src/plugins/value/Changelog_non_free: .ignore
-src/plugins/value/Eva.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/Eva.mli: .ignore
 src/plugins/value/alarmset.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/alarmset.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/api/general_requests.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1429,6 +1429,7 @@ src/plugins/value/engine/transfer_stmt.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/transfer_stmt.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/eval.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/eval.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/gen-api.sh: .ignore
 src/plugins/value/gui_files/gui_callstacks_filters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/gui_files/gui_callstacks_filters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/gui_files/gui_callstacks_manager.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1451,6 +1452,8 @@ src/plugins/value/legacy/function_args.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/legacy/function_args.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/register.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/results.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/results.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/auto_loop_unroll.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/auto_loop_unroll.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/partition.ml: CEA_LGPL_OR_PROPRIETARY

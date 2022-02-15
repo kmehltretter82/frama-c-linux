@@ -230,16 +230,21 @@ val register_builtin: string -> unit
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> unit
 
-(** Returns the list (name, descr) of currently enabled domains. *)
+[@@@ api_start]
+(** Configuration of the analysis. *)
+
+(** Returns the list (name, descr) of currently enabled abstract domains. *)
 val enabled_domains: unit -> (string * string) list
 
-(** [use_builtin kf b] adds a builtin override for function `kf` to
-    builtin `b`. *)
+(** [use_builtin kf name] instructs the analysis to use the builtin [name]
+    to interpret calls to function [kf].
+    Raises [Not_found] if there is no builtin of name [name]. *)
 val use_builtin: Cil_types.kernel_function -> string -> unit
 
-(** [use_global_value_partitioning vi] enable value partitioning on the global
-    variable `vi`. *)
+(** [use_global_value_partitioning vi] instructs the analysis to use
+    value partitioning on the global variable [vi]. *)
 val use_global_value_partitioning: Cil_types.varinfo -> unit
+[@@@ api_end]
 
 (*
 Local Variables:

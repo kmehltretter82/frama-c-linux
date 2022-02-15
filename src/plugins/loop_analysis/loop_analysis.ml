@@ -340,37 +340,18 @@ module Store(* (B:sig *)
         Printer.pp_stmt stmt
 
   let value_min_max stmt vi =
-    if (Db.Value.is_computed ()) then
+    if (Eva.Analysis.is_computed ()) then
       begin
         Options.feedback ~dkey ~once:true
           "value analysis computed, trying results";
-        if Db.Value.is_reachable_stmt stmt then
-          let state = Db.Value.get_stmt_state stmt in
-          try
-            let loc = Locations.loc_of_varinfo vi in
-            let v = Db.Value.find state loc in
-            let ival = Cvalue.V.project_ival v in
-            let omin, omax = Ival.min_and_max ival in
-            omin, omax
-          with
-          | Not_found ->
-            Options.feedback ~dkey "value_min_max: not found: %a@.\
-                                    function: %a, stmt: %a"
-              Printer.pp_varinfo vi Kernel_function.pretty
-              (Kernel_function.find_englobing_kf stmt) Printer.pp_stmt stmt;
-            None, None
-          | Cvalue.V.Not_based_on_null ->
-            Options.feedback ~dkey "value_min_max: not based on null: %a@.\
-                                    function: %a, stmt: %a"
-              Printer.pp_varinfo vi Kernel_function.pretty
-              (Kernel_function.find_englobing_kf stmt) Printer.pp_stmt stmt;
-            None, None
-        else
-          begin
+        let value = Eva.Results.(before stmt |> eval_var vi |> as_ival) in
+        match value with
+        | Result.Ok ival -> Ival.min_and_max ival
+        | Error e ->
+          if e = Eva.Results.Bottom then
             Options.feedback ~dkey "skipping unreachable stmt (function: %a)"
               Kernel_function.pretty (Kernel_function.find_englobing_kf stmt);
-            None, None
-          end
+          None, None
       end
     else
       begin
@@ -490,7 +471,7 @@ module Store(* (B:sig *)
             with Not_found -> ()
           end
         | c ->
-          if (Db.Value.is_computed ()) then
+          if (Eva.Analysis.is_computed ()) then
             begin
               let min_max_int = value_min_max stmt in
               match c with

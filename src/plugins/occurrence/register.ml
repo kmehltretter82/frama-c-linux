@@ -106,8 +106,8 @@ class occurrence = object (self)
 
   method! vlval lv =
     let ki = self#current_kinstr in
-    if Db.Value.is_accessible ki then begin
-      let z = !Db.Value.lval_to_zone ki lv in
+    begin
+      let z = Eva.Results.(before_kinstr ki |> eval_address lv |> as_zone) in
       try
         Locations.Zone.fold_topset_ok
           (fun b _ () ->
@@ -135,7 +135,7 @@ class occurrence = object (self)
     Db.yield ();
     super#vstmt_aux s
 
-  initializer !Db.Value.compute ()
+  initializer Eva.Analysis.compute ()
 
 end
 

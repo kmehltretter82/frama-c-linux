@@ -255,7 +255,7 @@ let () = Db.Main.extend output
 include
   PostDomDb
     (struct
-      let is_accessible = Db.Value.is_reachable_stmt
+      let is_accessible = Eva.Results.is_reachable
       let dependencies = [ Db.Value.self ]
       let name = "value"
       let eval_cond stmt _e =
