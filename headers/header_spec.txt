@@ -134,7 +134,6 @@ share/analysis-scripts/git_utils.py: CEA_LGPL
 share/analysis-scripts/heuristic_list_functions.py: CEA_LGPL
 share/analysis-scripts/list_files.py: CEA_LGPL
 share/analysis-scripts/list_functions.ml: CEA_LGPL
-share/analysis-scripts/make_template.py: CEA_LGPL
 share/analysis-scripts/make_wrapper.py: CEA_LGPL
 share/analysis-scripts/normalize_jcdb.py: CEA_LGPL
 share/analysis-scripts/parse-coverage.sh: .ignore

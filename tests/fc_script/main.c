@@ -1,7 +1,6 @@
 /* run.config
  NOFRAMAC: testing frama-c-script, not frama-c itself
- DEPS: for-find-fun2.c for-find-fun.c main.c main2.c main3.c
-   EXECNOW: LOG GNUmakefile LOG make_template.res LOG make_template.err PTESTS_TESTING=1 %{bin:frama-c-script} -C @PTEST_DIR@ make-template $(basename @PTEST_RESULT@) < %{dep:@PTEST_DIR@/make_template.input} > @PTEST_RESULT@/make_template.res 2> @PTEST_RESULT@/make_template.err
+ COMMENT: the 'build' command cannot be tested because it requires 'glub'.
  DEPS: main2.c main3.c main.c
    EXECNOW: LOG list_files.res LOG list_files.err PTESTS_TESTING=1 %{bin:frama-c-script} list-files %{dep:@PTEST_DIR@/list_files.json} > @PTEST_RESULT@/list_files.res 2> @PTEST_RESULT@/list_files.err
  DEPS: for-find-fun2.c for-find-fun.c for-list-functions.c main2.c main3.c main.c make-wrapper2.c make-wrapper3.c make-wrapper.c

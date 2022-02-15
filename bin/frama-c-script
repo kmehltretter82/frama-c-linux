@@ -95,10 +95,6 @@ usage() {
    echo "      definitions, with source location and number of statements."
    echo "      Accepts Frama-C options (e.g. -cpp-extra-args for parsing)."
    echo ""
-   echo "  - make-template [dir]"
-   echo "      Interactively prepares a template for analyses,"
-   echo "      writing it to dir/GNUmakefile [default: .frama-c]."
-   echo ""
    echo "  - make-wrapper target arg..."
    echo "      Runs 'make target arg...', parsing the output to suggest"
    echo "      useful commands in case of failure."
@@ -224,10 +220,6 @@ case "$command" in
     "build")
         shift;
         ${FRAMAC_SHARE}/analysis-scripts/build.py "$@";
-        ;;
-    "make-template")
-        shift;
-        "${FRAMAC_SHARE}"/analysis-scripts/make_template.py "$@";
         ;;
     "list-files")
         shift;

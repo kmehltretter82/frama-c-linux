@@ -275,7 +275,6 @@ DISTRIB_FILES:=\
       share/analysis-scripts/heuristic_list_functions.py                \
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/list_functions.ml                          \
-      share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/normalize_jcdb.py                          \
       share/analysis-scripts/parse-coverage.sh                          \
@@ -1990,7 +1989,6 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/git_utils.py \
 	  share/analysis-scripts/list_files.py \
 	  share/analysis-scripts/list_functions.ml \
-	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
 	  share/analysis-scripts/normalize_jcdb.py \
 	  share/analysis-scripts/parse-coverage.sh \
