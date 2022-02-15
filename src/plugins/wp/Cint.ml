@@ -944,6 +944,8 @@ let blsl i x y = overflow i (l_lsl x y) (* mult. by 2^y *)
 let blsr _i = l_lsr (* div. by 2^y, never overflow *)
 
 (** Simplifiers *)
+let dkey = Wp_parameters.register_category "is-cint-simplifier"
+
 let c_int_bounds_ival f  =
   let (umin,umax) = Ctypes.bounds f in
   Ival.inject_range (Some umin) (Some umax)
@@ -957,9 +959,13 @@ module IntDomain = struct
   let top = Tmap.empty
 
   [@@@ warning "-32"]
-  let pretty fmt dom =
+  let pretty fmt (k,v) =
+    Format.fprintf fmt "%a: %a" Lang.F.pp_term k Ival.pretty v
+
+  [@@@ warning "-32"]
+  let pretty_tbl fmt dom =
     Tmap.iter (fun k v ->
-        Format.fprintf fmt "%a: %a,@ " Lang.F.pp_term k Ival.pretty v)
+        Format.fprintf fmt "%a,@, " pretty (k,v))
       dom
 
   let find t dom = Tmap.find t dom
@@ -967,21 +973,27 @@ module IntDomain = struct
   let get t dom = try find t dom with Not_found -> Ival.top
 
   let narrow t v dom =
-    if Ival.is_bottom v then raise Lang.Contradiction
+    if Ival.is_bottom v then
+      (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+       raise Lang.Contradiction)
     else if is_top_ival v then dom
     else Tmap.change (fun _ v -> function
         | None -> Some v
         | (Some old) as old' ->
             let v = Ival.narrow v old in
-            if Ival.is_bottom v then raise Lang.Contradiction;
-            if Ival.equal v old then old'
+            if Ival.is_bottom v then
+              (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+               raise Lang.Contradiction)
+            else if Ival.equal v old then old'
             else Some v) t v dom
 
   let add_with_bot t v dom =
     if is_top_ival v then dom else Tmap.add t v dom
 
   let add t v dom =
-    if Ival.is_bottom v then raise Lang.Contradiction;
+    if Ival.is_bottom v then
+      (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+       raise Lang.Contradiction);
     add_with_bot t v dom
 
   let remove t dom = Tmap.remove t dom
@@ -989,7 +1001,7 @@ module IntDomain = struct
   let assume_cmp =
     let module Local = struct
       type t = Integer of Ival.t | Term of Ival.t option
-    end in fun cmp t1 t2 dom -> (* Requires an int type for [t1,t2] *)
+    end in fun cmp_str cmp t1 t2 dom -> (* Requires an int type for [t1,t2] *)
       let encode t = match Lang.F.repr t with
         | Kint z -> Local.Integer (Ival.inject_singleton z)
         | _ -> Local.Term (try Some (Tmap.find t dom) with Not_found -> None)
@@ -1001,7 +1013,10 @@ module IntDomain = struct
       match encode t1, encode t2 with
       | Local.Integer cst1, Local.Integer cst2 -> (* assume cmp cst1 cst2 *)
           if Abstract_interp.Comp.False = Ival.forward_comp_int cmp cst1 cst2
-          then raise Lang.Contradiction;
+          then
+            (Wp_parameters.debug ~dkey "* Assume FALSE: %a %s %a@."
+               pretty (t1,cst1) cmp_str pretty (t2,cst2);
+             raise Lang.Contradiction);
           dom
       | Local.Term None, Local.Term None ->
           dom (* nothing can be collected *)
@@ -1020,9 +1035,9 @@ module IntDomain = struct
             (add t2 (Ival.backward_comp_int_left cmp_sym v2 v1) dom)
 
   let assume_literal t dom = match Lang.F.repr t with
-    | Eq(a,b)  when is_int a && is_int b -> assume_cmp Abstract_interp.Comp.Eq a b dom
-    | Leq(a,b) when is_int a && is_int b -> assume_cmp Abstract_interp.Comp.Le a b dom
-    | Lt(a,b)  when is_int a && is_int b -> assume_cmp Abstract_interp.Comp.Lt a b dom
+    | Eq(a,b)  when is_int a && is_int b -> assume_cmp "==" Abstract_interp.Comp.Eq a b dom
+    | Leq(a,b) when is_int a && is_int b -> assume_cmp "<=" Abstract_interp.Comp.Le a b dom
+    | Lt(a,b)  when is_int a && is_int b -> assume_cmp "<" Abstract_interp.Comp.Lt a b dom
     | Fun(g,[a]) -> begin try
           let ubound =
             c_int_bounds_ival (is_cint g) (* may raise Not_found *) in
@@ -1034,7 +1049,10 @@ module IntDomain = struct
               let ubound =
                 c_int_bounds_ival (is_cint g) (* may raise Not_found *) in
               let v = Tmap.find a dom (* may raise Not_found *) in
-              if Ival.is_included v ubound then raise Lang.Contradiction;
+              if Ival.is_included v ubound then
+                (Wp_parameters.debug ~dkey "* Assume FALSE: %a -> %a@."
+                   Lang.F.pp_term t pretty (a,v);
+                 raise Lang.Contradiction);
               dom
             with Not_found -> dom
           end
@@ -1235,9 +1253,19 @@ let is_cint_simplifier =
 
     method equivalent_exp (e : term) = e
 
-    method weaker_hyp p = self#simplify ~is_goal:false p
+    method weaker_hyp p =
+      Wp_parameters.debug ~dkey "Rewrite Hyp: %a@." Lang.F.pp_pred p;
+      let r = self#simplify ~is_goal:false p in
+      if not (r == p) then
+        Wp_parameters.debug ~dkey "Hyp rewritten into: %a@." Lang.F.pp_pred r;
+      r
 
-    method stronger_goal p = self#simplify ~is_goal:true p
+    method stronger_goal p =
+      Wp_parameters.debug ~dkey "Rewrite Goal: %a@." Lang.F.pp_pred p;
+      let r = self#simplify ~is_goal:true p in
+      if not (r == p) then
+        Wp_parameters.debug ~dkey "Goal rewritten into: %a@." Lang.F.pp_pred r;
+      r
 
     method equivalent_branch p = p
 
@@ -1273,11 +1301,12 @@ module Masks = struct
     else not (Integer.is_zero (Integer.logand mask v.unset))
 
   [@@@ warning "-32"]
+  let pretty_mask fmt m =
+    if Integer.le Integer.zero m then Integer.pretty_hex fmt m
+    else Format.fprintf fmt "~%a" Integer.pretty_hex (Integer.lognot m)
+
+  [@@@ warning "-32"]
   let pretty fmt v =
-    let pretty_mask fmt m =
-      if Integer.le Integer.zero m then Integer.pretty_hex fmt m
-      else Format.fprintf fmt "~%a" Integer.pretty_hex (Integer.lognot m)
-    in
     if is_bottom v then Format.fprintf fmt "BOTTOM"
     else if is_top v then Format.fprintf fmt "TOP"
     else Format.fprintf fmt "set:%a unset:%a"
@@ -1327,12 +1356,12 @@ module MasksDomain = struct
 
   [@@@ warning "-32"]
   let pretty fmt (key,v) =
-    Format.fprintf fmt "%a:%a,@ "
+    Format.fprintf fmt "%a:%a"
       Lang.F.pp_term key Masks.pretty v
 
   [@@@ warning "-32"]
   let pretty_table fmt dom =
-    Tmap.iter (fun k v -> pretty fmt (k,v)) dom
+    Tmap.iter (fun k v -> Format.fprintf fmt "%a@," pretty (k,v)) dom
 
   let find t dom = Tmap.find t dom
 
@@ -1342,25 +1371,31 @@ module MasksDomain = struct
       | Kint k -> Masks.of_integer k
       | _ -> try find t dom with Not_found -> Masks.top
     in
-    Wp_parameters.debug ~dkey "Get %a @." pretty (t,r);
+    Wp_parameters.debug ~dkey "- Get %a@." pretty (t,r);
     r
 
   let narrow ctx t (v:Masks.t) =
     if Masks.is_top v then ctx
-    else if Masks.is_bottom v then raise Lang.Contradiction
+    else if Masks.is_bottom v then
+      (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+       raise Lang.Contradiction)
     else match F.repr t with
       | Kint _ -> ctx
       | _ ->
           Tmap.change (fun _ v -> function
               | None ->
-                  Wp_parameters.debug ~dkey "Assume %a@." pretty (t,v);
+                  Wp_parameters.debug ~dkey "* Assume %a@." pretty (t,v);
                   Some v
               | (Some old) as old' ->
                   let v = Masks.narrow ~unset:v.unset ~set:v.set old in
-                  Wp_parameters.debug ~dkey "Assume %a@." pretty (t,v);
-                  if Masks.is_bottom v then raise Lang.Contradiction;
-                  if Masks.is_equal v old then old'
-                  else Some v) t v ctx
+                  if Masks.is_bottom v then
+                    (Wp_parameters.debug ~dkey "* Assume FALSE: %a@."
+                       pretty (t,v);
+                     raise Lang.Contradiction)
+                  else if Masks.is_equal v old then old'
+                  else
+                    (Wp_parameters.debug ~dkey "* Assume %a@." pretty (t,v);
+                     Some v)) t v ctx
 
   let eval ~level (ctx:t) t =
     let eval get ctx e =
@@ -1408,20 +1443,23 @@ module MasksDomain = struct
       | _ -> (* 1 + recursive *)
           eval_rec ctx t
     in
-    Wp_parameters.debug ~dkey "Eval ~level:%d %a@." level pretty (t,r);
+    Wp_parameters.debug ~dkey "* Eval ~level:%d %a@." level pretty (t,r);
     r
 
   let rec reduce ctx t (v:Masks.t) =
-    Wp_parameters.debug ~dkey "Reduce %a@." pretty (t,v);
+    Wp_parameters.debug ~dkey "- Reduce %a@." pretty (t,v);
     let ctx =
       if Masks.is_top v then ctx (* no possible reduction *)
-      else if Masks.is_bottom v then raise Lang.Contradiction
+      else if Masks.is_bottom v then
+        (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+         raise Lang.Contradiction)
       else match F.repr t with
         | Fun(f,es) when f == f_land -> begin
             try
               let k,es = match_list_head match_integer es in
               (* N.B. requires v<>bottom *)
-              let unset = Integer.logand (Integer.logor v.Masks.set v.Masks.unset)
+              let unset = Integer.logand
+                  (Integer.logor v.Masks.set v.Masks.unset)
                   (Integer.logxor v.Masks.set k)
               in
               reduce ctx (F.e_fun f_land es) { v with unset }
@@ -1429,7 +1467,8 @@ module MasksDomain = struct
               if Integer.is_zero v.set then ctx else
                 List.fold_left (fun ctx t ->
                     (* bit(&ei... ,kv) ==> bit(ei,kv) *)
-                    reduce ctx t { Masks.top with Masks.set = v.Masks.set }) ctx es
+                    reduce ctx t { Masks.top with Masks.set = v.Masks.set })
+                  ctx es
           end
         | Fun(f,es) when f == f_lor -> begin
             try
@@ -1443,7 +1482,8 @@ module MasksDomain = struct
               if Integer.is_zero v.unset then ctx else
                 List.fold_left (fun ctx t ->
                     (* !bit(|ei... ,kv) ==>!bit(ei,kv) *)
-                    reduce ctx t { Masks.top with Masks.set = v.Masks.unset }) ctx es
+                    reduce ctx t { Masks.top with Masks.set = v.Masks.unset })
+                  ctx es
           end
         | Fun(f,[e]) when f == f_lnot ->
             reduce ctx e (Masks.mk ~set:v.Masks.unset ~unset:v.Masks.set)
@@ -1505,7 +1545,8 @@ end
 
 let mask_simplifier =
 
-  let rewrite_cst ~highest ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
+  (* [r = rewrite_cst ctx e] such that [ctx |- e = r] *)
+  let rewrite_cst ~highest ctx e =
     match F.repr e with
     | Kint _ -> e
     | Fun(f,[x;k]) when highest &&
@@ -1542,7 +1583,8 @@ let mask_simplifier =
                  and v = (* the current bits of [t] *)
                    try MasksDomain.find (F.e_fun f_land es) ctx
                    with Not_found ->
-                     Masks.eval_land (fun _ctx i -> i) ctx (List.map (MasksDomain.eval  ~level:1 ctx) es)
+                     Masks.eval_land (fun _ctx i -> i) ctx
+                       (List.map (MasksDomain.eval  ~level:1 ctx) es)
                  in
                  if Masks.is_bottom v then
                    (* Does not rewrite [e] because the polarity is unknown *)
@@ -1554,7 +1596,7 @@ let mask_simplifier =
                    (* Some bits of [t] that has to be unset is set *)
                    e_false
                  else if (Integer.equal (Integer.logand set v.Masks.set) set) &&
-                         (Integer.equal (Integer.logand unset v.Masks.unset) unset)
+                         (Integer.equal (Integer.logand unset v.unset) unset)
                  then (* The bits of [t] that have to be set are set &&
                          those that have to be unset are unset *)
                    e_true
@@ -1575,7 +1617,8 @@ let mask_simplifier =
     in if !modified then f xs else e
   in
 
-  let rewrite ~highest ctx e = (* [r = rewrite ctx e] such that [ctx |- e = r] *)
+  (* [r = rewrite ctx e] such that [ctx |- e = r] *)
+  let rewrite ~highest ctx e =
     let x =
       match F.repr e with
       | Fun(f,es) when f == f_land ->
@@ -1617,24 +1660,33 @@ let mask_simplifier =
     method equivalent_exp e =
       if Tmap.is_empty masks then e else
         (Wp_parameters.debug ~dkey "Rewrite Exp: %a@." Lang.F.pp_term e;
-         Lang.e_subst (rewrite ~highest:true masks) e)
+         let r = Lang.e_subst (rewrite ~highest:true masks) e in
+         if not (r==e) then Wp_parameters.debug ~dkey "Exp rewritten into: %a@." Lang.F.pp_term r;
+         r)
 
     method weaker_hyp p =
       if Tmap.is_empty masks then p else
         (Wp_parameters.debug ~dkey "Rewrite Hyp: %a@." Lang.F.pp_pred p;
          (* Does not rewrite [hyp] as much as possible.
             Any way, contradiction may be found later when [hyp] will be assumed *)
-         Lang.p_subst (rewrite ~highest:false masks) p)
+         let r = Lang.p_subst (rewrite ~highest:false masks) p in
+         if not (r==p) then Wp_parameters.debug ~dkey "Hyp rewritten into: %a@." Lang.F.pp_pred r;
+         r)
 
     method equivalent_branch p =
       if Tmap.is_empty masks then p else
         (Wp_parameters.debug ~dkey "Rewrite Branch: %a@." Lang.F.pp_pred p;
-         Lang.p_subst (rewrite ~highest:true masks) p)
+         let r = Lang.p_subst (rewrite ~highest:true masks) p in
+         if not (r==p) then Wp_parameters.debug ~dkey "Branch rewritten into: %a@." Lang.F.pp_pred r;
+         r)
 
     method stronger_goal p =
       if Tmap.is_empty masks then p else
         (Wp_parameters.debug ~dkey "Rewrite Goal: %a@." Lang.F.pp_pred p;
-         Lang.p_subst (rewrite ~highest:true masks) p)
+         let r = Lang.p_subst (rewrite ~highest:true masks) p in
+         if not (r==p) then Wp_parameters.debug ~dkey "Goal rewritten into: %a@." Lang.F.pp_pred r;
+         r
+        )
 
   end
 
