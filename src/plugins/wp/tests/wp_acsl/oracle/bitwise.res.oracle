@@ -256,6 +256,26 @@ Goal Check 'bit_defined2,ok' (file bitwise.i, line 140):
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Check 'bit_to_signed_positive,ok' (file bitwise.i, line 141):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed_positive2,ok' (file bitwise.i, line 142):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed_negative,ok' (file bitwise.i, line 143):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed_negative2,ok' (file bitwise.i, line 144):
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function lemma
 ------------------------------------------------------------

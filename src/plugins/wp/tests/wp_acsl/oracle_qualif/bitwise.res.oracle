@@ -2,7 +2,7 @@
 [kernel] Parsing bitwise.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 45 goals scheduled
+[wp] 49 goals scheduled
 [wp] [Qed] Goal typed_band_ensures : Valid
 [wp] [Qed] Goal typed_band_ensures_band0 : Valid
 [wp] [Qed] Goal typed_band_bit0_ensures_band1 : Valid
@@ -48,8 +48,12 @@
 [wp] [Qed] Goal typed_cast_uchar_check_bit_set_unset2_ok : Valid
 [wp] [Qed] Goal typed_cast_uchar_check_bit_defined_ok : Valid
 [wp] [Qed] Goal typed_cast_uchar_check_bit_defined2_ok : Valid
-[wp] Proved goals:   45 / 45
-  Qed:            42 
+[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_positive_ok : Valid
+[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_positive2_ok : Valid
+[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_negative_ok : Valid
+[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_negative2_ok : Valid
+[wp] Proved goals:   49 / 49
+  Qed:            46 
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -63,5 +67,5 @@
   band_bool                 1        1        2       100%
   bxor_bool                 1        1        2       100%
   lemma                     7        -        7       100%
-  cast_uchar                8        -        8       100%
+  cast_uchar               12        -       12       100%
 ------------------------------------------------------------
