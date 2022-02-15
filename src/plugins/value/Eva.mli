@@ -193,7 +193,8 @@ module Results: sig
 
 
   (** Returns (an overapproximation of) the possible addresses of the lvalue. *)
-  val eval_address : Cil_types.lval -> request -> address evaluation
+  val eval_address : ?for_writing:bool ->
+    Cil_types.lval -> request -> address evaluation
 
 
   (** Returns the kernel functions into which the given expression may evaluate.
@@ -241,12 +242,10 @@ module Results: sig
 
   (** Converts into a Zone. Error cases are converted into bottom or top zones
       accordingly. *)
-  val as_zone: ?access:Locations.access -> address evaluation ->
-    Locations.Zone.t
+  val as_zone: address evaluation -> Locations.Zone.t
 
   (** Converts into a Zone result. *)
-  val as_zone_result : ?access:Locations.access -> address evaluation ->
-    Locations.Zone.t result
+  val as_zone_result : address evaluation -> Locations.Zone.t result
 
 
   (** Evaluation properties *)
