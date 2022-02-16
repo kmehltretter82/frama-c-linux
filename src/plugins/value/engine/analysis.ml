@@ -184,10 +184,15 @@ let force_compute () =
   Analyzer.compute_from_entry_point ~lib_entry kf
 
 let compute () =
-  (* Nothing to recompute when Value has already been computed. This boolean
-      is automatically cleared when an option of Value changes, because they
+  (* Nothing to recompute when Eva has already been computed. This boolean
+      is automatically cleared when an option of Eva changes, because they
       are registered as dependencies on [Self.state] in {!Parameters}.*)
   if not (is_computed ()) then force_compute ()
+
+let compute =
+  let name = "Eva.Analysis.compute" in
+  let f = Journal.register name  Datatype.(func unit unit) compute in
+  fst (State_builder.apply_once name [ Self.state ] f)
 
 (* Resets the Analyzer when the current project is changed. *)
 let () =

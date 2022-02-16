@@ -23,15 +23,12 @@
 open Cil_types
 open Locations
 
-let [@alert "-deprecated"] _self =
-  Db.register_compute "Value.compute" [ Self.state ] Db.Value.compute
-    Analysis.compute
-
+let () = Db.Value.compute := Analysis.compute
 let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 
 let main () =
   (* Value computations *)
-  if Parameters.ForceValues.get () then !Db.Value.compute ();
+  if Parameters.ForceValues.get () then Analysis.compute ();
   if Analysis.is_computed () then Red_statuses.report ()
 
 let () = Db.Main.extend main
