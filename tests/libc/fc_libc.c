@@ -1,8 +1,8 @@
 /* run.config*
  PLUGIN: @EVA_PLUGINS@ metrics
- EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' @PTEST_FILE@ -save @PTEST_NAME@.sav >@PTEST_NAME@_sav.res 2>@PTEST_NAME@_sav.err
+ EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -cpp-extra-args='-nostdinc -I@FRAMAC_SHARE@/libc' @PTEST_FILE@ -save @PTEST_NAME@.sav >@PTEST_NAME@_sav.res 2>@PTEST_NAME@_sav.err
  MODULE: check_libc_naming_conventions, check_const
-   OPT: -load %{dep:@PTEST_NAME@.sav} -print -cpp-extra-args='-nostdinc -I@PTEST_SHARE_DIR@/libc' -eva @EVA_CONFIG@ -then -lib-entry -no-print
+   OPT: -load %{dep:@PTEST_NAME@.sav} -print -cpp-extra-args='-nostdinc -I@FRAMAC_SHARE@/libc' -eva @EVA_CONFIG@ -then -lib-entry -no-print
  MODULE:
    OPT: -print -print-libc -machdep x86_32
  MODULE: check_parsing_individual_headers
@@ -13,7 +13,7 @@
    OPT: -kernel-msg-key printer:attrs
  MODULE:
    OPT: -load %{dep:@PTEST_NAME@.sav} -metrics -metrics-libc -then -lib-entry -metrics-no-libc | ./check_some_metrics.sh "> 100" "> 400" "< 2" "> 20" "= 1" "= 1" "= 0" "= 0" "= 0" "= 1"
- CMD: %{dep:./check_full_libc.sh} @PTEST_SHARE_DIR@/libc
+ CMD: %{dep:./check_full_libc.sh} @FRAMAC_SHARE@/libc
    OPT:
 **/
 #define __FC_REG_TEST
