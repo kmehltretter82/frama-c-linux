@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-eva"
+   STDOPT: #"-eva"
 */
 
 void *p;
