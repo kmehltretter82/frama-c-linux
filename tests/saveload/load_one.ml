@@ -5,7 +5,7 @@ let ptest_file =
     else fun _ file -> file
   with Not_found -> fun dir file -> dir ^ file
 
-let sav_file = ptest_file "tests/saveload/result/" "load_one.sav"
+let sav_file = ptest_file "" "load_one.sav"
 
 let () = at_exit (fun _ -> Sys.remove sav_file)
 
