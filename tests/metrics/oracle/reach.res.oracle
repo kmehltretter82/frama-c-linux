@@ -108,8 +108,8 @@
     <reach.c>: baz; foo;
 [metrics] References to non-analyzed functions
   ------------------------------------
-  Function main references foo (at reach.c:26)
-  Initializer of t references baz (at reach.c:10)
+  Function main references foo (at reach.c:27)
+  Initializer of t references baz (at reach.c:11)
 [metrics] Statements analyzed by Eva
   --------------------------
   12 stmts in analyzed functions, 7 stmts analyzed (58.3%)
