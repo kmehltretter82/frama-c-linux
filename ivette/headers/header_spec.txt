@@ -147,6 +147,7 @@ src/frama-c/api/generated/kernel/services/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/dive/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/eva/general/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/eva/values/index.ts: CEA_LGPL
+src/frama-c/api/generated/plugins/pivot/general/index.ts: CEA_LGPL
 src/frama-c/api/generated/plugins/studia/studia/index.ts: CEA_LGPL
 src/frama-c/api/generator.ml: .ignore
 src/frama-c/client.ts: CEA_LGPL
@@ -159,6 +160,7 @@ src/frama-c/kernel/Globals.tsx: CEA_LGPL
 src/frama-c/kernel/History.tsx: CEA_LGPL
 src/frama-c/kernel/Locations.tsx: CEA_LGPL
 src/frama-c/kernel/Messages.tsx: CEA_LGPL
+src/frama-c/kernel/PivotTable.tsx: CEA_LGPL
 src/frama-c/kernel/Properties.tsx: CEA_LGPL
 src/frama-c/kernel/SourceCode.tsx: CEA_LGPL
 src/frama-c/kernel/Status.tsx: CEA_LGPL
@@ -189,6 +191,7 @@ src/frama-c/plugins/eva/style.css: .ignore
 src/frama-c/plugins/eva/summary.css: .ignore
 src/frama-c/plugins/eva/valueinfos.tsx: CEA_LGPL
 src/frama-c/plugins/eva/valuetable.tsx: CEA_LGPL
+src/frama-c/react-pivottable.d.ts: CEA_LGPL
 src/frama-c/server.ts: CEA_LGPL
 src/frama-c/states.ts: CEA_LGPL
 src/frama-c/utils.ts: CEA_LGPL

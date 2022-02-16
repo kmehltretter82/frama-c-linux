@@ -784,7 +784,7 @@ PLUGIN_NAME:=Metrics
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/metrics
 PLUGIN_CMO:= metrics_parameters css_html metrics_base metrics_acsl \
-	     metrics_cabs metrics_cilast metrics_coverage \
+	     metrics_cabs metrics_cilast metrics_coverage metrics_pivot \
 	     register
 PLUGIN_GUI_CMO:= metrics_gui register_gui
 PLUGIN_DEPENDENCIES:=Eva

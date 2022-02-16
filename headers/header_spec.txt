@@ -1009,6 +1009,8 @@ src/plugins/metrics/metrics_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/metrics_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/metrics_parameters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/metrics_parameters.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/metrics/metrics_pivot.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/metrics/metrics_pivot.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
