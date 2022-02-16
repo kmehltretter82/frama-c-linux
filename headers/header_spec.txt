@@ -116,6 +116,7 @@ ptests/ptests.ml: CEA_LGPL
 share/_frama-c: CEA_LGPL
 share/analysis-scripts/analysis.mk: CEA_LGPL
 share/analysis-scripts/benchmark_database.py: CEA_LGPL
+share/analysis-scripts/build.py: CEA_LGPL
 share/analysis-scripts/build_callgraph.py: CEA_LGPL
 share/analysis-scripts/clone.sh: .ignore
 share/analysis-scripts/creduce.sh: CEA_LGPL
@@ -133,7 +134,6 @@ share/analysis-scripts/git_utils.py: CEA_LGPL
 share/analysis-scripts/heuristic_list_functions.py: CEA_LGPL
 share/analysis-scripts/list_files.py: CEA_LGPL
 share/analysis-scripts/list_functions.ml: CEA_LGPL
-share/analysis-scripts/make_template.py: CEA_LGPL
 share/analysis-scripts/make_wrapper.py: CEA_LGPL
 share/analysis-scripts/normalize_jcdb.py: CEA_LGPL
 share/analysis-scripts/parse-coverage.sh: .ignore
@@ -143,6 +143,7 @@ share/analysis-scripts/README.md: .ignore
 share/analysis-scripts/results_display.py: CEA_LGPL
 share/analysis-scripts/script_for_creduce_fatal.sh: .ignore
 share/analysis-scripts/script_for_creduce_non_fatal.sh: .ignore
+share/analysis-scripts/source_filter.py: CEA_LGPL
 share/analysis-scripts/summary.py: CEA_LGPL
 share/analysis-scripts/template.mk: .ignore
 share/compliance/c11_functions.json: .ignore

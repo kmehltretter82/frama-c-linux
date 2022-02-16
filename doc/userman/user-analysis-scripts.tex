@@ -77,9 +77,11 @@ and presents an illustrative diagram.
 \subsection{Necessary Build Information}
 \label{sec:necessary-build-information}
 
-The command \texttt{frama-c-script make-template} can be used to generate the
-Makefile from a template. The user must fill in the following information,
-required for running an \Value analysis:
+The command \texttt{frama-c-script build} can be used to generate the
+Makefile from a template. To run an analysis with \Value, the following
+information is necessary\footnote{If a \texttt{build\_commands.json} file is
+available, \texttt{frama-c-script build} will try to fill in some of the data
+automatically.}:
 
 \begin{description}
 \item[machdep]: architectural information about the system where the code will
@@ -164,9 +166,9 @@ in section~\ref{sec:preprocessing}). This leads to a different workflow:
   In both cases, you will obtain a \texttt{compile\_commands.json} file.
 \item Run \texttt{frama-c-script list-files}. A list of the compiled files,
   along with files defining a \texttt{main} function, will be presented.
-\item Run \texttt{frama-c-script make-template} to create a template for
-  \FramaC/\Value. Answer ``yes'' when asked about using the
-  \texttt{compile\_commands.json} file.
+\item Run \texttt{frama-c-script build} to create a template for
+  \FramaC/\Value. It should detect the \texttt{compile\_commands.json} file
+  and add the option to enable it.
 \end{enumerate}
 
 Ideally, the above approach should result in a working template. In practice,
@@ -382,10 +384,11 @@ The most useful commands are described below.
 Run \texttt{frama-c-script help} for more details and optional arguments.
 
 \begin{description}
-\item[make-template]: creates the initial Makefile, based on a template.
+\item[build]: creates the initial Makefile, based on a template.
   This command creates a file named \texttt{.frama-c/GNUmakefile} with some
-  hardcoded sections, some sections filled in interactively by the user,
-  and comments indicating which parts may need change.
+  hardcoded sections, some sections filled in according to command-line
+  options, and some sections filled automatically with build information
+  (via a \texttt{build\_commands.json} file), if available.
   Once created, it enables the general workflow mentioned earlier.
 \item[make-wrapper <target> <args>]: calls \texttt{make <target> <args>} with
   a special wrapper: when running \Value, upon encountering one of a few known
@@ -421,8 +424,7 @@ Other commands, only useful in a few cases, are described below.
 The following commands require a JSON Compilation Database.
 
 \begin{description}
-\item[list-files]: lists all files in the given JCDB. Useful for filling
-  out the Makefile template when running \texttt{make-template}.
+\item[list-files]: lists all files in the given JCDB.
 \item[normalize-jcdb]: converts absolute paths inside a
   \texttt{compile\_commands.json} file into relative paths (w.r.t. PWD)
   when possible. Used to allow moving/versioning the directory containing

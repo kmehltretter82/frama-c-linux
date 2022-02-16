@@ -257,6 +257,7 @@ DISTRIB_FILES:=\
       $(LIBC_FILES)							\
       share/analysis-scripts/analysis.mk                                \
       share/analysis-scripts/benchmark_database.py                      \
+      share/analysis-scripts/build.py                                   \
       share/analysis-scripts/build_callgraph.py                         \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
@@ -274,7 +275,6 @@ DISTRIB_FILES:=\
       share/analysis-scripts/heuristic_list_functions.py                \
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/list_functions.ml                          \
-      share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/normalize_jcdb.py                          \
       share/analysis-scripts/parse-coverage.sh                          \
@@ -284,6 +284,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/results_display.py                         \
       share/analysis-scripts/script_for_creduce_fatal.sh                \
       share/analysis-scripts/script_for_creduce_non_fatal.sh            \
+      share/analysis-scripts/source_filter.py                           \
       share/analysis-scripts/summary.py                                 \
       share/analysis-scripts/template.mk                                \
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
@@ -1973,6 +1974,8 @@ install:: install-lib-$(OCAMLBEST)
 	$(CP) \
 	  share/analysis-scripts/analysis.mk \
 	  share/analysis-scripts/benchmark_database.py \
+	  share/analysis-scripts/build.py \
+	  share/analysis-scripts/build_callgraph.py \
 	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/clone.sh \
@@ -1986,7 +1989,6 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/git_utils.py \
 	  share/analysis-scripts/list_files.py \
 	  share/analysis-scripts/list_functions.ml \
-	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
 	  share/analysis-scripts/normalize_jcdb.py \
 	  share/analysis-scripts/parse-coverage.sh \
@@ -1995,6 +1997,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/results_display.py \
 	  share/analysis-scripts/script_for_creduce_fatal.sh \
 	  share/analysis-scripts/script_for_creduce_non_fatal.sh \
+	  share/analysis-scripts/source_filter.py \
 	  share/analysis-scripts/summary.py \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts

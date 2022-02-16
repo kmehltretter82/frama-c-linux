@@ -28,10 +28,6 @@
 import sys
 import build_callgraph
 
-MIN_PYTHON = (3, 5) # for glob(recursive)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 dotfile = None
 args = sys.argv[1:]
 if "--dot" in args:
