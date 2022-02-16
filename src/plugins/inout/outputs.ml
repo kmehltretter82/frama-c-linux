@@ -48,10 +48,10 @@ class virtual do_it_ = object(self)
     (* For local initializations, counts the written variable as an output of the
        function, even if it is const; thus, [for_writing] is false in this case. *)
   method private do_assign ~for_writing lv =
-    let access = if for_writing then Write else Read in
-    let bits_loc = Eva.Results.(
-        before_kinstr self#current_kinstr |> eval_address lv |>
-        as_zone ~access) in
+    let ki = self#current_kinstr in
+    let bits_loc =
+      Eva.Results.(before_kinstr ki |> eval_address ~for_writing lv |> as_zone)
+    in
     self#join bits_loc
 
   method! vinst i =
