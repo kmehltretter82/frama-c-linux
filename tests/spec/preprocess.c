@@ -1,5 +1,5 @@
 /* run.config
- PLUGIN: eva,scope
+ PLUGIN: eva,inout,scope
  DEPS: preprocess.h
    OPT: -eva @EVA_CONFIG@ -print
 */
