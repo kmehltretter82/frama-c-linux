@@ -24,11 +24,11 @@ bin/toplevel.opt -lib-entry -main $F -deps -verbose @PTEST_DIR@/loops.c
 zgrviewer ./$F_cfg.dot
 
 Pour voir les postdominateurs :
-bin/toplevel.opt -lib-entry -main $F -fct-pdg $F -dot-postdom p @PTEST_DIR@/loops.c ;
+bin/toplevel.opt -lib-entry -main $F -fct-pdg $F -dot-postdom p %{dep:@PTEST_DIR@/loops.c} ;
 zgrviewer ./p.$F.dot
 
 Pour voir le PDG :
-bin/toplevel.opt -lib-entry -main $F -fct-pdg $F -pdg-dot pdg @PTEST_DIR@/loops.c ;
+bin/toplevel.opt -lib-entry -main $F -fct-pdg $F -pdg-dot pdg %{dep:@PTEST_DIR@/loops.c} ;
 zgrviewer ./pdg.$F.dot
 
 */
