@@ -46,6 +46,8 @@ import {
   isApplicationWindow,
   isPreferencesWindow,
 } from 'dome' ;
+import '../colors/light.css';
+import '../colors/dark.css';
 
 // You can change the name of the main components,
 // provided you define the makefile variable

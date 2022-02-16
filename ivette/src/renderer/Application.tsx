@@ -35,7 +35,10 @@ import * as Sidebar from 'dome/frame/sidebars';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
+import { ipcRenderer } from 'electron';
+import * as Settings from 'dome/data/settings';
 import './loader';
+import * as Preferences from 'ivette/prefs';
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -50,6 +53,13 @@ export default function Application(): JSX.Element {
   const onSelectedHints = (): void => {
     if (hints.length === 1) Extensions.onSearchHint(hints[0]);
   };
+
+  const [ th, setTh ] = Settings.useGlobalSettings(Preferences.ColorTheme);
+  const change = (t: string) => ipcRenderer.invoke('theme-color:switch', t);
+  React.useState(() => change(th));
+  const other = th === 'dark' ? 'light' : 'dark';
+  const themeTitle = 'Switch to ' + other + ' theme';
+  const changeColorTheme = () => { change(other); setTh(other); };
 
   return (
     <Vfill>
@@ -69,6 +79,11 @@ export default function Application(): JSX.Element {
           onSearch={Extensions.searchHints}
           onHint={Extensions.onSearchHint}
           onSelect={onSelectedHints}
+        />
+        <Toolbar.Switch
+          title={themeTitle}
+          position={th === 'dark' ? 'right' : 'left'}
+          onClick={changeColorTheme}
         />
         <Toolbar.Button
           icon="ITEMS.GRID"

@@ -149,6 +149,31 @@ export function Button<A = undefined>(props: ButtonProps<A>) {
   );
 }
 
+export interface SwitchProps {
+  /** Switch tooltip. */
+  title?: string;
+  /** Switch position. */
+  position?: 'left' | 'right';
+  /** Click callback. */
+  onClick?: () => void;
+}
+
+/** Toolbar Switch. */
+export function Switch(props: SwitchProps) {
+  const { title = '', onClick = () => {}, position } = props;
+  const checked = position ? position === 'right' : undefined;
+  return (
+    <label className={'dome-xSwitch'}>
+      <input type={'checkbox'} checked={checked}/>
+      <span
+        className={'dome-xSwitch-slider'}
+        title={title}
+        onClick={onClick}
+      />
+    </label>
+  );
+}
+
 // --------------------------------------------------------------------------
 // --- Selection Props
 // --------------------------------------------------------------------------

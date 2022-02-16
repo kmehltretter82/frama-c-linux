@@ -48,8 +48,7 @@
     background: #777 ;
 }
 
-.dome-disabled .dome-xBadge
-{
+.dome-disabled .dome-xBadge {
     background: #ccc ;
     color: #eee ;
     fill: #eee ;
@@ -64,7 +63,6 @@
 /* -------------------------------------------------------------------------- */
 
 .dome-control-enabled {
-    color: #333 ;
     font-weight: normal ;
 }
 
@@ -83,8 +81,10 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Styling Buttons                                                    --- */
+/* --- Styling Buttons (may be factorized with xToolBar)                  --- */
 /* -------------------------------------------------------------------------- */
+
+/* Layout */
 
 .dome-xButton {
     flex: 0 0 auto ;
@@ -110,79 +110,129 @@
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
 }
 
-.dome-xButton:disabled,
-.dome-xButton:active:disabled
-{
-    fill: #b0b0b0 ;
-    border-color: #ccc ;
-    background-color: #f4f4f4 ;
+/* Disabled */
+
+.dome-xButton:disabled, .dome-xButton:active:disabled {
+    fill: var(--disabled-text);
+    color: var(--disabled-text);
+    border-color: var(--border-discrete) ;
     background-image: none;
 }
 
-.dome-xButton:active {
-    background-color: #ddd;
-    background-image: none;
-}
-
-.dome-xButton-default {
-    border-color: #c2c0c2 ;
-    background-color: #f4f4f4 ;
-}
-
-.dome-xButton-default:hover:not(:disabled) {
-    background-color: #fff ;
-}
+/* Selected */
 
 .dome-xButton-selected {
-    border-color: #c2c0c2 ;
-    background-color: #ccc ;
+    fill:  var(--info-text);
+    color: var(--info-text);
+    border: 1px solid transparent ;
+    background-color: var(--selected-button-img);
+    background-image: none;
 }
 
 .dome-xButton-selected:hover:not(:disabled) {
-    background-color: #fff ;
+    background-color: var(--selected-button-hover) ;
+    background-image: none ;
 }
 
-.dome-xButton-primary {
-    border-color: #888;
-    background-image: linear-gradient(to bottom, #449bef 0%, #4990e2 100%);
+/* Selected & Disabled */
+
+.dome-xButton-selected:disabled {
+    fill: var(--info-text) ;
+    color: var(--info-text) ;
+    border: 1px solid var(--border-discrete) ;
+}
+
+/* Default button behaviors */
+
+.dome-xButton-default:not(:disabled) {
+    color: var(--text);
+    border-color: var(--border);
+    background-image: var(--default-button-img);
+}
+
+.dome-xButton-default:hover:not(:disabled) {
+    background-color: var(--default-button-hover);
+    background-image: none;
+}
+
+.dome-xButton-default:active:not(:disabled) {
+    background-color: var(--default-button-active);
+    background-image: none;
+}
+
+/* Primary button behaviors */
+
+.dome-xButton-primary:not(:disabled) {
+    color: var(--text);
+    border-color: var(--border);
+    background-image: var(--primary-button-img);
 }
 
 .dome-xButton-primary:hover:not(:disabled) {
-    background-color: #00b6ff ;
+    background-color: var(--primary-button-hover);
     background-image: none ;
 }
 
-.dome-xButton-positive {
-    border-color: #888;
-    background-image: linear-gradient(to bottom, #60f577 0%, #3efb5b 100%);
+.dome-xButton-primary:active:not(:disabled) {
+    background-color: var(--primary-button-active);
+    background-image: none;
+}
+
+/* Positive button behaviors */
+
+.dome-xButton-positive:not(:disabled) {
+    color: var(--text);
+    border-color: var(--border);
+    background-image: var(--positive-button-img);
 }
 
 .dome-xButton-positive:hover:not(:disabled) {
-    background-color: #00ff00 ;
+    background-color: var(--positive-button-hover);
     background-image: none ;
 }
 
-.dome-xButton-negative {
-    border-color: #888;
-    fill: #333;
-    color: #333 ;
-    background-image: linear-gradient(to bottom, #ff827d 0%, #fb3832 100%);
+.dome-xButton-positive:active:not(:disabled) {
+    background-color: var(--positive-button-active);
+    background-image: none;
+}
+
+/* Negative button behaviors */
+
+.dome-xButton-negative:not(:disabled) {
+    color: var(--text);
+    border-color: var(--border);
+    background-image: var(--negative-button-img);
 }
 
 .dome-xButton-negative:hover:not(:disabled) {
-    background-color: #ff0000 ;
+    background-color: var(--negative-button-hover);
     background-image: none ;
 }
 
-.dome-xButton-warning {
-    border-color: #888;
-    background-image: linear-gradient(to bottom, #ffd483 0%, #ffb426 100%);
+.dome-xButton-negative:active:not(:disabled) {
+    background-color: var(--negative-button-active);
+    background-image: none;
+}
+
+/* Warning button behaviors */
+
+.dome-xButton-warning:not(:disabled) {
+    color: var(--text);
+    border-color: var(--border);
+    background-image: var(--warning-button-img);
 }
 
 .dome-xButton-warning:hover:not(:disabled) {
-    background-color: #ecdd09 ;
+    background-color: var(--warning-button-hover);
     background-image: none ;
 }
+
+.dome-xButton-warning:active:not(:disabled) {
+    background-color: var(--warning-button-active);
+    background-image: none;
+}
+
+/* Buttons' labels */
 
 .dome-xButton-label {
     position: relative ;

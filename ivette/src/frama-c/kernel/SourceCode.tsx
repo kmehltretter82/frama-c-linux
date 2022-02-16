@@ -83,7 +83,6 @@ export default function SourceCode(): JSX.Element {
   const { buttons: themeButtons, theme, fontSize, wrapText } =
     Preferences.useThemeButtons({
       target: 'Source Code',
-      theme: Preferences.SourceTheme,
       fontSize: Preferences.SourceFontSize,
       wrapText: Preferences.AstWrapText,
       disabled: !theFunction,

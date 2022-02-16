@@ -167,7 +167,6 @@ export default function ASTview() {
   const { buttons: themeButtons, theme, fontSize, wrapText } =
     Preferences.useThemeButtons({
       target: 'Internal AST',
-      theme: Preferences.AstTheme,
       fontSize: Preferences.AstFontSize,
       wrapText: Preferences.AstWrapText,
       disabled: !theFunction,

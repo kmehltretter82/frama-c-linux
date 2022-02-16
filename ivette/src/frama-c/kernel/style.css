@@ -14,21 +14,21 @@
 /* -------------------------------------------------------------------------- */
 
 .highlighted-marker {
-    background-color: #FFFF66;
+    background-color: var(--highlighted-marker);
 }
 
 .dead-code {
-    background-color: #BBB;
-    border-bottom: solid 0.1em #BBB;
+    background-color: var(--dead-code);
+    border-bottom: solid 0.1em var(--dead-code);
 }
 
 .non-terminating {
-    border-bottom: solid 0.2em #BBB;
+    border-bottom: solid 0.2em var(--non-terminating);
 }
 
 .bullet {
     width: 1.5em;
-    background: #DDD;
+    background: var(--code-bullet);
 }
 
 /* -------------------------------------------------------------------------- */

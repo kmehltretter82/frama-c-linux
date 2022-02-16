@@ -19,9 +19,9 @@
 .dome-xTable .ReactVirtualized__Table__headerRow {
     display: flex ;
     align-items: stretch ;
-    background: #eee ;
-    color: #555 ;
-    fill: #777 ;
+    background: var(--background-intense) ;
+    color: var(--text-discrete) ;
+    fill: var(--info-text) ;
 }
 
 .dome-xTable .ReactVirtualized__Table__headerColumn {
@@ -29,7 +29,7 @@
     padding-left: 4px ;
     padding-right: 4px ;
     margin: 0px ; /* Necessary for column alignement */
-    border-color: #cfcfcf ;
+    border-color: var(--border-discrete) ;
     border-bottom-width: 1px ;
     border-bottom-style: solid ;
 }
@@ -101,15 +101,15 @@
 }
 
 .dome-xTable-selected {
-    background: #8ce0fb ;
+    background: var(--selected-element) ;
 }
 
 .dome-xTable-odd {
-    background: #fdfdfd ;
+    background: var(--background-alterning-odd) ;
 }
 
 .dome-xTable-even {
-    background: #efefef ;
+    background: var(--background-alterning-even) ;
 }
 
 .ReactVirtualized__Table__row.dome-color-selected {

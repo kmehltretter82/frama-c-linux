@@ -33,13 +33,12 @@
 
 import React from 'react';
 
-import { popupMenu } from 'dome';
+// import { popupMenu } from 'dome';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
 
 import 'codemirror/mode/clike/clike';
-import 'codemirror/theme/ambiance.css';
-import 'codemirror/theme/solarized.css';
+import '../colors/dark-code.css';
 
 export const THEMES = [
   { id: 'default', label: 'Default' },
@@ -52,6 +51,7 @@ export const THEMES = [
 // --- AST View Preferences
 // --------------------------------------------------------------------------
 
+export const ColorTheme = new Settings.GString('color-theme', 'light');
 export const AstTheme = new Settings.GString('ASTview.theme', 'default');
 export const AstFontSize = new Settings.GNumber('ASTview.fontSize', 12);
 export const AstWrapText = new Settings.GFalse('ASTview.wrapText');
@@ -62,7 +62,6 @@ export const SourceWrapText = new Settings.GFalse('SourceCode.wrapText');
 
 export interface ThemeProps {
   target: string;
-  theme: Settings.GlobalSettings<string>;
   fontSize: Settings.GlobalSettings<number>;
   wrapText: Settings.GlobalSettings<boolean>;
   disabled?: boolean;
@@ -80,17 +79,13 @@ export interface ThemeControls {
 }
 
 export function useThemeButtons(props: ThemeProps): ThemeControls {
-  const [theme, setTheme] = Settings.useGlobalSettings(props.theme);
+  const [themeColors] = Settings.useGlobalSettings(ColorTheme);
+  const theme = themeColors === 'dark' ? 'dark-code' : 'default';
   const [fontSize, setFontSize] = Settings.useGlobalSettings(props.fontSize);
   const [wrapText, setWrapText] = Settings.useGlobalSettings(props.wrapText);
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
   const flipWrapText = () => setWrapText(!wrapText);
-  const selectTheme = (id?: string) => id && setTheme(id);
-  const themeItem = (th: { id: string; label: string }) => (
-    { checked: th.id === theme, ...th }
-  );
-  const themePopup = () => popupMenu(THEMES.map(themeItem), selectTheme);
   const { disabled = false } = props;
   return {
     theme,
@@ -111,12 +106,12 @@ export function useThemeButtons(props: ThemeProps): ThemeControls {
         disabled={disabled}
         title="Increase font size"
       />,
-      <IconButton
-        key="theme"
-        icon="PAINTBRUSH"
-        onClick={themePopup}
-        title="Choose theme"
-      />,
+      // <IconButton
+      //   key="theme"
+      //   icon="PAINTBRUSH"
+      //   onClick={themePopup}
+      //   title="Choose theme"
+      // />,
       <IconButton
         key="wrap"
         icon="WRAPTEXT"

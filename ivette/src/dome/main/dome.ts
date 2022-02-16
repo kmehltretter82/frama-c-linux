@@ -49,6 +49,7 @@ import {
   IpcMainEvent,
   shell,
   dialog,
+  nativeTheme,
 } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
 import SYS, * as System from 'dome/system';
@@ -619,3 +620,9 @@ ipcMain.handle(
 );
 
 // --------------------------------------------------------------------------
+
+ipcMain.handle('theme-color:switch', (_, theme: 'dark' | 'light') => {
+  // const theme = nativeTheme.shouldUseDarkColors ? 'light' : 'dark';
+  nativeTheme.themeSource = theme;
+  // return nativeTheme.shouldUseDarkColors;
+});

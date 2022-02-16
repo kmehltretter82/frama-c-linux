@@ -8,7 +8,6 @@
 }
 
 .eva-summary-box  {
-    background-color: white;
     height: 100%;
     width: 100%;
     display: flex;
@@ -74,7 +73,7 @@
 }
 
 .eva-summary .alarms-table tr:nth-child(2n) {
-    background-color: #eee;
+    background-color: var(--background-alterning-even);
 }
 
 .eva-summary .alarms-table td:nth-child(1) {
@@ -86,7 +85,7 @@
 }
 
 .eva-summary .statuses-table tr :nth-child(5) {
-  background-color: #ddd;
+  background-color: var(--background-intense);
 }
 
 .eva-summary td {

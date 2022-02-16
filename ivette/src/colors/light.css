@@ -1,0 +1,67 @@
+@media (prefers-color-scheme: light) {
+  :root {
+    --text: #333333;
+    --text-discrete: #606060;
+    --disabled-text: #b0b0b0;
+    --info-text: #777;
+    --info-text-discrete: #888;
+
+    --code-hover: lightgreen;
+    --code-select: #ffda95;
+    --code-select-hover: orange;
+    --dead-code: #bbb;
+    --non-terminating: #bbb;
+    --highlighted-marker: #ffff66;
+    --code-bullet: #ddd;
+
+    --splitter: #aaa;
+    --border: #afafaf;
+    --border-discrete: #d0d0d0;
+
+    --background: #e6e6e6;
+    --background-profound: #c0c0c0;
+    --background-profound-hover: #c6c6c6;
+    --background-disabled: #a0a0a0;
+    --background-disabled-hover: #a6a6a6;
+    --background-intense: #e0e0e0;
+    --background-softer: #f0f0f0;
+    --background-sidebar: #e3e8ec;
+    --background-button-hover: #c0c0c0;
+    --background-alterning-odd: #fdfdfd;
+    --background-alterning-even: #efefef;
+    --selected-element: #8ce0fb;
+
+    --default-button-img: linear-gradient(to bottom, #e8e8e8 0%, #f1f1f1 100%);
+    --default-button-hover: #ffffff;
+    --default-button-active: #f9f9f9;
+
+    --primary-button-img: linear-gradient(to bottom, #449bef 0%, #4990e2 100%);
+    --primary-button-hover: #00b6ff;
+    --primary-button-active: #ddd;
+
+    --positive-button-img: linear-gradient(to bottom, #34ff52 0%, #48fd64 100%);
+    --positive-button-hover: #ffffff;
+    --positive-button-active: #ffffff;
+
+    --negative-button-img: linear-gradient(to bottom, #ec453e 0%, #ff4c47 100%);
+    --negative-button-hover: red;
+    --negative-button-active: #ffffff;
+
+    --warning-button-img: linear-gradient(to bottom, #fece72 0%, #fcaa0e 100%);
+    --warning-button-hover: orange;
+    --warning-button-active: #ffffff;
+
+    --cancel-button-img: #c0c0c0;
+    --cancel-button-hover: #c4c4c4;
+    --cancel-button-active: #bcbcbc;
+
+    --selected-button-img: #afafaf;
+    --selected-button-hover: #a9a9a9;
+
+    --grid-layout-holder: lightblue;
+    --grid-layout-target: #64b4f0;
+
+    --error: darkorange;
+    --warning: darkorange;
+  }
+}
