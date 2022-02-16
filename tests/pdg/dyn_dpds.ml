@@ -30,7 +30,7 @@ let main _ =
   let kf =  Globals.Functions.find_def_by_name "main" in
   let pdg = !Db.Pdg.get kf in
   Format.printf "%a@." (!Db.Pdg.pretty ~bw:false) pdg;
-  !Db.Pdg.extract pdg (ptest_file "tests/pdg/result/" "dyn_dpds_0.dot");
+  !Db.Pdg.extract pdg (ptest_file "" "dyn_dpds_0.dot");
   let assert_sid = 5 in (* assert ( *p>G) *)
   let assert_stmt, kf = Kernel_function.find_from_sid assert_sid in
   let _assert_node =
@@ -51,6 +51,6 @@ let main _ =
   Format.printf "Warning : cannot select %a in this function...@\n"
     Locations.Zone.pretty undef;
   Format.printf "%a@." (!Db.Pdg.pretty ~bw:false) pdg;
-  !Db.Pdg.extract pdg (ptest_file "tests/pdg/result/" "dyn_dpds_1.dot")
+  !Db.Pdg.extract pdg (ptest_file "" "dyn_dpds_1.dot")
 
 let () = Db.Main.extend main
