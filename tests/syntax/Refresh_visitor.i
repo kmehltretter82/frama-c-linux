@@ -1,5 +1,5 @@
 /* run.config
- PLUGIN: eva,scope
+ PLUGIN: eva,inout,scope
  MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@
 */
