@@ -1,5 +1,5 @@
 /*run.config
- MACRO: SHARE @PTEST_SHARE_DIR@/compliance
+ MACRO: SHARE @FRAMAC_SHARE@/compliance
  NOFRAMAC:
   EXECNOW: LOG json_@PTEST_NAME@_1.txt python3 -m json.tool < @SHARE@/c11_functions.json | head -n 2 > @PTEST_RESULT@/json_@PTEST_NAME@_1.txt 2> @DEV_NULL@
   EXECNOW: LOG json_@PTEST_NAME@_2.txt python3 -m json.tool < @SHARE@/glibc_functions.json | head -n 2 > @PTEST_RESULT@/json_@PTEST_NAME@_2.txt 2> @DEV_NULL@
