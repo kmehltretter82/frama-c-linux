@@ -48,7 +48,7 @@ end = struct
       (struct
         let size = 17
         let name = "Occurrences.State"
-        let dependencies = [ Db.Value.self ]
+        let dependencies = [ Eva.Analysis.self ]
       end)
 
   module LastResult =

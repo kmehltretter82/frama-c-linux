@@ -29,7 +29,7 @@ module Tbl =
     (struct
       let name = "Functionwise dependencies"
       let size = 17
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
     end)
 let () = From_parameters.ForceDeps.set_output_dependencies [Tbl.self]
 

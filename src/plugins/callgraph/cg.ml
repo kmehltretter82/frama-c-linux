@@ -63,7 +63,7 @@ module State =
     (D)
     (struct
       let name = "Callgraph.Cg"
-      let dependencies = [ Db.Value.self; Globals.Functions.self ]
+      let dependencies = [ Eva.Analysis.self; Globals.Functions.self ]
     end)
 
 let self = State.self

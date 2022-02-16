@@ -779,7 +779,7 @@ end = struct
       (struct
          let name = "Components"
          let size = 7
-         let dependencies = [ Ast.self; Db.Value.self ]
+         let dependencies = [ Ast.self; Eva.Analysis.self ]
        end)
 
   let () =

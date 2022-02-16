@@ -226,7 +226,7 @@ module Kf_Coverage = Kernel_function.Make_Table
     (struct
       let name = "Metrics_coverage.Kf_coverage"
       let size = 7
-      let dependencies = [ Db.Value.self; Metrics_parameters.Libc.self ]
+      let dependencies = [ Eva.Analysis.self; Metrics_parameters.Libc.self ]
     end)
 
 let is_computed_by_fun () = Kf_Coverage.length () > 0

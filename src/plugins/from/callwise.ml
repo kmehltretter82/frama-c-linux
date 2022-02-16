@@ -29,7 +29,7 @@ module Tbl =
     (struct
       let name = "Callwise dependencies"
       let size = 17
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
     end)
 let () = From_parameters.ForceCallDeps.set_output_dependencies [Tbl.self]
 
@@ -199,7 +199,7 @@ let () = From_parameters.ForceCallDeps.add_update_hook
 let force_compute_all_calldeps ()=
   if Db.Value.is_computed () then
     Project.clear
-      ~selection:(State_selection.with_dependencies Db.Value.self)
+      ~selection:(State_selection.with_dependencies Eva.Analysis.self)
       ();
   !Db.Value.compute ()
 

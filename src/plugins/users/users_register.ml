@@ -44,7 +44,7 @@ module Users =
     (struct
       let name = "Users"
       let size = 17
-      let dependencies = [ Db.Value.self; ForceUsers.self ]
+      let dependencies = [ Eva.Analysis.self; ForceUsers.self ]
     end)
 
 let call_for_users (_state, call_stack) =
@@ -82,7 +82,7 @@ let get kf =
     if Eva.Analysis.is_computed () then begin
       feedback "requiring again the computation of the value analysis";
       Project.clear
-        ~selection:(State_selection.with_dependencies Db.Value.self)
+        ~selection:(State_selection.with_dependencies Eva.Analysis.self)
         ()
     end else
       feedback ~level:2 "requiring the computation of the value analysis";

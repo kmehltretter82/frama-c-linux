@@ -44,7 +44,7 @@ let syntactic ?(libc=Metrics_parameters.Libc.get ()) () =
        Metrics_parameters.result "%a"
          cov_printer#pp_reached_from_function kf)
 
-let () = ValueCoverage.set_output_dependencies [Db.Value.self; Libc.self]
+let () = ValueCoverage.set_output_dependencies [Eva.Analysis.self; Libc.self]
 
 let value ~libc () =
   Eva.Analysis.compute ();

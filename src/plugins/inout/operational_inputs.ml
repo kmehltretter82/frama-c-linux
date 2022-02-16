@@ -208,7 +208,7 @@ module Internals =
   Kernel_function.Make_Table(Inout_type)
     (struct
       let name = "Inout.Operational_inputs.Internals"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
       let size = 17
     end)
 
