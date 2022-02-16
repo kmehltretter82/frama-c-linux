@@ -1296,8 +1296,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       "(rule ; %s\n  \
        (alias %S)\n  \
        (targets %S %S %a)\n  \
-       (deps %S %S %a %a)\n  \
-       (action (run %s %%{dep:%s} %S %a))\n\
+       (deps %S %S %S %a %a)\n  \
+       (action (run %s %S %S %a))\n\
        )@."
       (* rule: *)
       wtest.info
@@ -1308,6 +1308,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       cmdreslog
       pp_list command.log_files
       (* deps: *)
+      wrapper_basename
       wtest.oracle_out
       wtest.oracle_err
       pp_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
