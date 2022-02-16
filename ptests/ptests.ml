@@ -1141,7 +1141,7 @@ let basic_command_string command =
       in
       let options = List.filter (fun s -> s <> "") options in
       let options = if has_ptest_file then options
-        else (Filename.basename command.file)::options
+        else (Filename.sanitize (Filename.basename command.file))::options
       in
       String.concat " " (toplevel::options)
     end
@@ -1172,9 +1172,9 @@ let show_cmd =
 let redirection ?reslog ?errlog cmd =
     match reslog, errlog with
     | None, None         -> cmd
-    | None, Some err     -> Format.sprintf "%s 2> %s" cmd err
-    | Some res, None     -> Format.sprintf "%s > %s" cmd res
-    | Some res, Some err -> Format.sprintf "%s > %s 2> %s" cmd res err
+    | None, Some err     -> Format.sprintf "%s 2> %S" cmd err
+    | Some res, None     -> Format.sprintf "%s > %S" cmd res
+    | Some res, Some err -> Format.sprintf "%s > %S 2> %S" cmd res err
 
 let ptests_alias ~env = config_name ~env (env.dune_alias ^ "_config")
 
