@@ -60,6 +60,7 @@
 (libc/stdlib.c as libc/stdlib.c)
 (libc/stdio.h as libc/stdio.h)
 (libc/__fc_define_fd_set_t.h as libc/__fc_define_fd_set_t.h)
+(libc/__fc_define_fds.h as libc/__fc_define_fds.h)
 (libc/locale.h as libc/locale.h)
 (libc/features.h as libc/features.h)
 (libc/getopt.h as libc/getopt.h)
