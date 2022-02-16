@@ -22,8 +22,24 @@
 
 (** Datatypes for analyses types *)
 
+open Cil_types
 open Analyses_types
 
 module Annotation_kind: Datatype.S with type t = annotation_kind
 
 module PredOrTerm: Datatype.S_with_collections with type t = pred_or_term
+
+module AtData: sig
+  include Datatype.S_with_collections with type t = at_data
+
+  val create:
+    ?error:exn ->
+    kernel_function ->
+    kinstr ->
+    lscope ->
+    pred_or_term ->
+    logic_label ->
+    at_data
+    (** [create ?error kf kinstr lscope pot label] creates an [at_data] from the
+        given arguments. *)
+end

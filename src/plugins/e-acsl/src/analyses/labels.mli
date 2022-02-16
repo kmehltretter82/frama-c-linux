@@ -20,51 +20,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Labeled term and predicates pre-analysis *)
+(** Labeled term and predicates pre-analysis.
+
+    This pre-analysis records, for each labeled term or predicate, the place
+    where the translation must happen.
+
+    The list of labeled term or predicates to be translated for a given
+    statement is provided by [Labels.at_for_stmt]. *)
 
 open Cil_types
-open Analyses_types
+open Analyses_datatype
 
 val get_first_inner_stmt: stmt -> stmt
 (** If the given statement has a label, return the first statement of the block.
     Otherwise return the given statement. *)
 
-(** Manage labeled terms and predicates translation *)
-module Translation : sig
-  (** Represents a labeled translation *)
-  type t =
-    | Done of exp
-    (** The translation is done and the result is the expression [e] *)
-    | Queued
-    (** The translation needs to be done in a statement preceding the statement
-        where the labeled term or predicate is used. *)
-    | Inplace
-    (** The translation can be done when translating the statement where the
-        labeled term or predicate is used. *)
-
-  val at_for_stmt: stmt -> at_data list Error.result
-  (** @return the list of labeled predicates and terms to be translated on the
-      given statement. *)
-
-  val set: ?force:bool -> at_data -> t Error.result -> unit
-  (** Sets the translation for the given labeled term or predicate.
-
-      If a translation already exists, then the behavior depend on the existing
-      translation and the new translation:
-      - If the new translation is an error, keep the old translation except if
-        [force] is true;
-      - If the existing translation is an error and the new translation is a result,
-        always keep the new translation;
-      - If both translation are results:
-        -- if the old is Queued and the new one is Queued or Done, then keep the
-           new one;
-        -- if one is Queued and the other is Inplace, then store Queued;
-        -- if both are Inplace then keep Inplace
-        -- other combinations are errors. *)
-
-  val get: at_data -> t Error.result
-  (** @return the translation for the given labeled term or predicate. *)
-end
+val at_for_stmt: stmt -> AtData.Set.t Error.result
+(** @return the set of labeled predicates and terms to be translated on the
+    given statement.
+    @raise Not_memoized if the labels pre-analysis was not run. *)
 
 val preprocess: file -> unit
 (** Analyse sources to find the statements where a labeled predicate or term
@@ -73,19 +47,12 @@ val preprocess: file -> unit
 val reset: unit -> unit
 (** Reset the results of the pre-anlaysis. *)
 
-val pp_at_data: Format.formatter -> at_data -> unit
-(** Printer for [at_data]. *)
-
 val _debug: unit -> unit
 (** Print internal state of labels translation. *)
 
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)
-
-val must_translate_ppt_ref: (Property.t -> bool) ref
-
-val must_translate_ppt_opt_ref: (Property.t option -> bool) ref
 
 val has_empty_quantif_ref: ((term * logic_var * term) list -> bool) ref
 

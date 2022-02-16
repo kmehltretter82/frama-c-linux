@@ -61,9 +61,9 @@ ANALYSES_CMI:= \
 ANALYSES_CMI:=$(addprefix src/analyses/, $(ANALYSES_CMI))
 
 SRC_ANALYSES:= \
+	lscope \
 	analyses_datatype \
 	rte \
-	lscope \
 	e_acsl_visitor \
 	logic_normalizer \
 	bound_variables \
