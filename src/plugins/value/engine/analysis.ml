@@ -27,6 +27,7 @@ type computation_state = Self.computation_state =
   | NotComputed | Computing | Computed | Aborted
 let current_computation_state = Self.current_computation_state
 let register_computation_hook = Self.register_computation_hook
+let is_computed = Self.is_computed
 
 module type Results = sig
   type state
@@ -77,7 +78,7 @@ module Make (Abstract: Abstractions.S) = struct
 
   let get_stmt_state ~after stmt =
     let fundec = Kernel_function.(get_definition (find_englobing_kf stmt)) in
-    if Mark_noresults.should_memorize_function fundec && Db.Value.is_computed ()
+    if Mark_noresults.should_memorize_function fundec && is_computed ()
     then Abstract.Dom.Store.get_stmt_state ~after stmt
     else `Value Abstract.Dom.top
 
@@ -181,8 +182,6 @@ let force_compute () =
   Self.set_computation_state Computing;
   let module Analyzer = (val snd !ref_analyzer) in
   Analyzer.compute_from_entry_point ~lib_entry kf
-
-let is_computed = Db.Value.is_computed
 
 let compute () =
   (* Nothing to recompute when Value has already been computed. This boolean

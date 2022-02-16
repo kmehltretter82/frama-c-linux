@@ -32,7 +32,7 @@ let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 let main () =
   (* Value computations *)
   if Parameters.ForceValues.get () then !Db.Value.compute ();
-  if Db.Value.is_computed () then Red_statuses.report ()
+  if Analysis.is_computed () then Red_statuses.report ()
 
 let () = Db.Main.extend main
 
