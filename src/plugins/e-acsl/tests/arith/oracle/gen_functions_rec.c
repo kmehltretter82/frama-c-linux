@@ -400,10 +400,11 @@ int __gen_e_acsl_f2(int n)
                                  "__gen_e_acsl_f2_19",0,__gen_e_acsl_f2_19);
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "RTE";
-    __gen_e_acsl_assert_data_7.pred_txt = "division_by_zero: __gen_e_acsl_f2_19 != 0";
+    __gen_e_acsl_assert_data_7.pred_txt = "__gen_e_acsl_f2_19 != 0";
     __gen_e_acsl_assert_data_7.file = "functions_rec.c";
     __gen_e_acsl_assert_data_7.fct = "f2";
     __gen_e_acsl_assert_data_7.line = 13;
+    __gen_e_acsl_assert_data_7.name = "division_by_zero";
     __e_acsl_assert(__gen_e_acsl_f2_19 != 0,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_19 != 0; */
@@ -479,10 +480,11 @@ int __gen_e_acsl_f2_2(long n)
                                  "__gen_e_acsl_f2_14",0,__gen_e_acsl_f2_14);
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "RTE";
-    __gen_e_acsl_assert_data_6.pred_txt = "division_by_zero: __gen_e_acsl_f2_14 != 0";
+    __gen_e_acsl_assert_data_6.pred_txt = "__gen_e_acsl_f2_14 != 0";
     __gen_e_acsl_assert_data_6.file = "functions_rec.c";
     __gen_e_acsl_assert_data_6.fct = "f2_2";
     __gen_e_acsl_assert_data_6.line = 13;
+    __gen_e_acsl_assert_data_6.name = "division_by_zero";
     __e_acsl_assert(__gen_e_acsl_f2_14 != 0,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_14 != 0; */
@@ -565,10 +567,11 @@ int __gen_e_acsl_f2_3(__e_acsl_mpz_struct * n)
                                  "__gen_e_acsl_f2_9",0,__gen_e_acsl_f2_9);
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "RTE";
-    __gen_e_acsl_assert_data_5.pred_txt = "division_by_zero: __gen_e_acsl_f2_9 != 0";
+    __gen_e_acsl_assert_data_5.pred_txt = "__gen_e_acsl_f2_9 != 0";
     __gen_e_acsl_assert_data_5.file = "functions_rec.c";
     __gen_e_acsl_assert_data_5.fct = "f2_3";
     __gen_e_acsl_assert_data_5.line = 13;
+    __gen_e_acsl_assert_data_5.name = "division_by_zero";
     __e_acsl_assert(__gen_e_acsl_f2_9 != 0,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_9 != 0; */

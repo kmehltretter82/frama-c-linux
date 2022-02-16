@@ -146,10 +146,11 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "offset_lesser_or_eq_than_SIZE_MAX:\n  (\\let size = sizeof(char) * (((nmemb * size - 1) - 0) + 1);\n   size <= 0? 0: size)\n  <= 18446744073709551615";
+    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(char) * (((nmemb * size - 1) - 0) + 1);\n size <= 0? 0: size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_2.fct = "fread";
     __gen_e_acsl_assert_data_2.line = 351;
+    __gen_e_acsl_assert_data_2.name = "offset_lesser_or_eq_than_SIZE_MAX";
     __e_acsl_assert(__gen_e_acsl_le_2 <= 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gen_e_acsl_size_3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
@@ -161,10 +162,11 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
-    __gen_e_acsl_assert_data.pred_txt = "valid_ptr_block: \\valid((char *)ptr + (0 .. nmemb * size - 1))";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid((char *)ptr + (0 .. nmemb * size - 1))";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data.fct = "fread";
     __gen_e_acsl_assert_data.line = 351;
+    __gen_e_acsl_assert_data.name = "valid_ptr_block";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
@@ -179,10 +181,11 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  "\\valid(stream)",0,__gen_e_acsl_valid_2);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Precondition";
-    __gen_e_acsl_assert_data_3.pred_txt = "valid_stream: \\valid(stream)";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid(stream)";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_3.fct = "fread";
     __gen_e_acsl_assert_data_3.line = 352;
+    __gen_e_acsl_assert_data_3.name = "valid_stream";
     __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gmpz_clear(__gen_e_acsl_size);
@@ -233,10 +236,11 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "RTE";
-    __gen_e_acsl_assert_data_4.pred_txt = "size_lesser_or_eq_than_SIZE_MAX: __retres * size <= 18446744073709551615";
+    __gen_e_acsl_assert_data_4.pred_txt = "__retres * size <= 18446744073709551615";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_4.fct = "fread";
     __gen_e_acsl_assert_data_4.line = 350;
+    __gen_e_acsl_assert_data_4.name = "size_lesser_or_eq_than_SIZE_MAX";
     __e_acsl_assert(__gen_e_acsl_le_3 <= 0,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __gen_e_acsl_size_5 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_3));
@@ -271,10 +275,11 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                    "\\old(nmemb)",0,__gen_e_acsl_at);
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Postcondition";
-    __gen_e_acsl_assert_data_5.pred_txt = "size_read: \\result <= \\old(nmemb)";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\result <= \\old(nmemb)";
     __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_5.fct = "fread";
     __gen_e_acsl_assert_data_5.line = 356;
+    __gen_e_acsl_assert_data_5.name = "size_read";
     __e_acsl_assert(__retres <= __gen_e_acsl_at,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
@@ -346,10 +351,11 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "RTE";
-    __gen_e_acsl_assert_data_7.pred_txt = "offset_lesser_or_eq_than_SIZE_MAX:\n  (\\let size = sizeof(char) * (((\\result * \\old(size) - 1) - 0) + 1);\n   size <= 0? 0: size)\n  <= 18446744073709551615";
+    __gen_e_acsl_assert_data_7.pred_txt = "(\\let size = sizeof(char) * (((\\result * \\old(size) - 1) - 0) + 1);\n size <= 0? 0: size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_7.fct = "fread";
     __gen_e_acsl_assert_data_7.line = 357;
+    __gen_e_acsl_assert_data_7.name = "offset_lesser_or_eq_than_SIZE_MAX";
     __e_acsl_assert(__gen_e_acsl_le_5 <= 0,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __gen_e_acsl_size_8 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
@@ -361,10 +367,11 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  0,__gen_e_acsl_initialized);
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Postcondition";
-    __gen_e_acsl_assert_data_6.pred_txt = "initialization:\n  \\initialized((char *)\\old(ptr) + (0 .. \\result * \\old(size) - 1))";
+    __gen_e_acsl_assert_data_6.pred_txt = "\\initialized((char *)\\old(ptr) + (0 .. \\result * \\old(size) - 1))";
     __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_6.fct = "fread";
     __gen_e_acsl_assert_data_6.line = 357;
+    __gen_e_acsl_assert_data_6.name = "initialization";
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __e_acsl_delete_block((void *)(& stream));

@@ -202,10 +202,11 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                                     (void *)(& __gen_e_acsl_at_2));
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_2)";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(__gen_e_acsl_at_2)";
       __gen_e_acsl_assert_data_5.file = "bts1307.i";
       __gen_e_acsl_assert_data_5.fct = "bar";
       __gen_e_acsl_assert_data_5.line = 26;
+      __gen_e_acsl_assert_data_5.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
@@ -220,10 +221,11 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                                       (void *)(& __gen_e_acsl_at));
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at)";
+      __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(__gen_e_acsl_at)";
       __gen_e_acsl_assert_data_6.file = "bts1307.i";
       __gen_e_acsl_assert_data_6.fct = "bar";
       __gen_e_acsl_assert_data_6.line = 26;
+      __gen_e_acsl_assert_data_6.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
       if (*__gen_e_acsl_at == *__gen_e_acsl_at_2) {
@@ -272,10 +274,11 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                                         (void *)(& __gen_e_acsl_at_5));
         __gen_e_acsl_assert_data_7.blocking = 1;
         __gen_e_acsl_assert_data_7.kind = "RTE";
-        __gen_e_acsl_assert_data_7.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_5)";
+        __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(__gen_e_acsl_at_5)";
         __gen_e_acsl_assert_data_7.file = "bts1307.i";
         __gen_e_acsl_assert_data_7.fct = "bar";
         __gen_e_acsl_assert_data_7.line = 26;
+        __gen_e_acsl_assert_data_7.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read_3,
                         & __gen_e_acsl_assert_data_7);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
@@ -309,10 +312,11 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       }
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "UnderEstimate_Motoring:\n  *\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)?\n    *\\old(Mtmin_in) != 0.:\n    0.85 * *\\old(Mwmin) != 0.";
+      __gen_e_acsl_assert_data_4.pred_txt = "*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85 * *\\old(Mwmin) != 0.";
       __gen_e_acsl_assert_data_4.file = "bts1307.i";
       __gen_e_acsl_assert_data_4.fct = "bar";
       __gen_e_acsl_assert_data_4.line = 26;
+      __gen_e_acsl_assert_data_4.name = "UnderEstimate_Motoring";
       __e_acsl_assert(__gen_e_acsl_if,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
@@ -473,10 +477,11 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_add));
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "OverEstimate_Motoring:\n  *\\old(Mtmax_out) != *\\old(Mtmax_in) + (5 - ((5 / 80) * *\\old(Mwmax)) * 0.4)";
+      __gen_e_acsl_assert_data_4.pred_txt = "*\\old(Mtmax_out) != *\\old(Mtmax_in) + (5 - ((5 / 80) * *\\old(Mwmax)) * 0.4)";
       __gen_e_acsl_assert_data_4.file = "bts1307.i";
       __gen_e_acsl_assert_data_4.fct = "foo";
       __gen_e_acsl_assert_data_4.line = 11;
+      __gen_e_acsl_assert_data_4.name = "OverEstimate_Motoring";
       __e_acsl_assert(__gen_e_acsl_ne != 0,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       __gmpq_clear(__gen_e_acsl_);

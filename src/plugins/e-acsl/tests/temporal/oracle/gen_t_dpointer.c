@@ -81,10 +81,11 @@ int main(void)
                                                       (void *)(& p));
         __gen_e_acsl_assert_data_3.blocking = 1;
         __gen_e_acsl_assert_data_3.kind = "RTE";
-        __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(p + i)";
+        __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(p + i)";
         __gen_e_acsl_assert_data_3.file = "t_dpointer.c";
         __gen_e_acsl_assert_data_3.fct = "main";
         __gen_e_acsl_assert_data_3.line = 15;
+        __gen_e_acsl_assert_data_3.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
@@ -148,10 +149,11 @@ int main(void)
                                                       (void *)(& p));
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(p + 2)";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(p + 2)";
       __gen_e_acsl_assert_data_5.file = "t_dpointer.c";
       __gen_e_acsl_assert_data_5.fct = "main";
       __gen_e_acsl_assert_data_5.line = 21;
+      __gen_e_acsl_assert_data_5.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,

@@ -360,10 +360,11 @@ int main(void)
       else __gen_e_acsl_and_7 = 0;
       __gen_e_acsl_assert_data_8.blocking = 1;
       __gen_e_acsl_assert_data_8.kind = "RTE";
-      __gen_e_acsl_assert_data_8.pred_txt = "mem_access: \\valid_read(p)";
+      __gen_e_acsl_assert_data_8.pred_txt = "\\valid_read(p)";
       __gen_e_acsl_assert_data_8.file = "t_memcpy.c";
       __gen_e_acsl_assert_data_8.fct = "main";
       __gen_e_acsl_assert_data_8.line = 40;
+      __gen_e_acsl_assert_data_8.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and_7,& __gen_e_acsl_assert_data_8);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
@@ -415,10 +416,11 @@ int main(void)
                                                       (void *)(& p));
       __gen_e_acsl_assert_data_10.blocking = 1;
       __gen_e_acsl_assert_data_10.kind = "RTE";
-      __gen_e_acsl_assert_data_10.pred_txt = "mem_access: \\valid_read(p + 1)";
+      __gen_e_acsl_assert_data_10.pred_txt = "\\valid_read(p + 1)";
       __gen_e_acsl_assert_data_10.file = "t_memcpy.c";
       __gen_e_acsl_assert_data_10.fct = "main";
       __gen_e_acsl_assert_data_10.line = 41;
+      __gen_e_acsl_assert_data_10.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read_2,
                       & __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
@@ -485,10 +487,11 @@ int main(void)
       else __gen_e_acsl_and_10 = 0;
       __gen_e_acsl_assert_data_12.blocking = 1;
       __gen_e_acsl_assert_data_12.kind = "RTE";
-      __gen_e_acsl_assert_data_12.pred_txt = "mem_access: \\valid_read(q)";
+      __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read(q)";
       __gen_e_acsl_assert_data_12.file = "t_memcpy.c";
       __gen_e_acsl_assert_data_12.fct = "main";
       __gen_e_acsl_assert_data_12.line = 42;
+      __gen_e_acsl_assert_data_12.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and_10,& __gen_e_acsl_assert_data_12);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
@@ -540,10 +543,11 @@ int main(void)
                                                       (void *)(& q));
       __gen_e_acsl_assert_data_14.blocking = 1;
       __gen_e_acsl_assert_data_14.kind = "RTE";
-      __gen_e_acsl_assert_data_14.pred_txt = "mem_access: \\valid_read(q + 1)";
+      __gen_e_acsl_assert_data_14.pred_txt = "\\valid_read(q + 1)";
       __gen_e_acsl_assert_data_14.file = "t_memcpy.c";
       __gen_e_acsl_assert_data_14.fct = "main";
       __gen_e_acsl_assert_data_14.line = 43;
+      __gen_e_acsl_assert_data_14.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read_4,
                       & __gen_e_acsl_assert_data_14);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
@@ -624,10 +628,11 @@ int main(void)
       else __gen_e_acsl_and_13 = 0;
       __gen_e_acsl_assert_data_16.blocking = 1;
       __gen_e_acsl_assert_data_16.kind = "RTE";
-      __gen_e_acsl_assert_data_16.pred_txt = "mem_access: \\valid_read(q)";
+      __gen_e_acsl_assert_data_16.pred_txt = "\\valid_read(q)";
       __gen_e_acsl_assert_data_16.file = "t_memcpy.c";
       __gen_e_acsl_assert_data_16.fct = "main";
       __gen_e_acsl_assert_data_16.line = 48;
+      __gen_e_acsl_assert_data_16.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and_13,& __gen_e_acsl_assert_data_16);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_15,
@@ -679,10 +684,11 @@ int main(void)
                                                       (void *)(& q));
       __gen_e_acsl_assert_data_18.blocking = 1;
       __gen_e_acsl_assert_data_18.kind = "RTE";
-      __gen_e_acsl_assert_data_18.pred_txt = "mem_access: \\valid_read(q + 1)";
+      __gen_e_acsl_assert_data_18.pred_txt = "\\valid_read(q + 1)";
       __gen_e_acsl_assert_data_18.file = "t_memcpy.c";
       __gen_e_acsl_assert_data_18.fct = "main";
       __gen_e_acsl_assert_data_18.line = 49;
+      __gen_e_acsl_assert_data_18.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read_6,
                       & __gen_e_acsl_assert_data_18);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
@@ -748,10 +754,11 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
                                  __gen_e_acsl_at);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Postcondition";
-    __gen_e_acsl_assert_data_3.pred_txt = "result_ptr: \\result == \\old(s)";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\result == \\old(s)";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_3.fct = "memset";
     __gen_e_acsl_assert_data_3.line = 135;
+    __gen_e_acsl_assert_data_3.name = "result_ptr";
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_delete_block((void *)(& s));
@@ -846,10 +853,11 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                                                   (void *)(& dest));
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "RTE";
-    __gen_e_acsl_assert_data_4.pred_txt = "separated_guard: \\valid_read((char *)dest + (0 .. n - 1))";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read((char *)dest + (0 .. n - 1))";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_4.fct = "memcpy";
     __gen_e_acsl_assert_data_4.line = 98;
+    __gen_e_acsl_assert_data_4.name = "separated_guard";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
@@ -878,10 +886,11 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                                                     (void *)(& src));
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "RTE";
-    __gen_e_acsl_assert_data_5.pred_txt = "separated_guard: \\valid_read((char *)src + (0 .. n - 1))";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read((char *)src + (0 .. n - 1))";
     __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_5.fct = "memcpy";
     __gen_e_acsl_assert_data_5.line = 98;
+    __gen_e_acsl_assert_data_5.name = "separated_guard";
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"dest",dest);
@@ -927,10 +936,11 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                                  0,__gen_e_acsl_separated);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Precondition";
-    __gen_e_acsl_assert_data_3.pred_txt = "separation:\n  \\separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1))";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1))";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_3.fct = "memcpy";
     __gen_e_acsl_assert_data_3.line = 98;
+    __gen_e_acsl_assert_data_3.name = "separation";
     __e_acsl_assert(__gen_e_acsl_separated,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_temporal_reset_parameters();
@@ -957,10 +967,11 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                                  __gen_e_acsl_at);
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Postcondition";
-    __gen_e_acsl_assert_data_7.pred_txt = "result_ptr: \\result == \\old(dest)";
+    __gen_e_acsl_assert_data_7.pred_txt = "\\result == \\old(dest)";
     __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_7.fct = "memcpy";
     __gen_e_acsl_assert_data_7.line = 102;
+    __gen_e_acsl_assert_data_7.name = "result_ptr";
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __e_acsl_delete_block((void *)(& src));

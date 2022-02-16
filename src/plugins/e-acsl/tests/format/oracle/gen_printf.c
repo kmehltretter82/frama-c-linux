@@ -640,10 +640,11 @@ void test_specifier_application(char const *allowed, char const *fmt,
     else __gen_e_acsl_and = 0;
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "alloca_bounds: 0 < sizeof(char) * (int)(len + 1) <= 18446744073709551615";
+    __gen_e_acsl_assert_data.pred_txt = "0 < sizeof(char) * (int)(len + 1) <= 18446744073709551615";
     __gen_e_acsl_assert_data.file = "printf.c";
     __gen_e_acsl_assert_data.fct = "test_specifier_application";
     __gen_e_acsl_assert_data.line = 55;
+    __gen_e_acsl_assert_data.name = "alloca_bounds";
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -766,10 +767,11 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "RTE";
-    __gen_e_acsl_assert_data_6.pred_txt = "size_lesser_or_eq_than_SIZE_MAX:\n  __gen_e_acsl_strcpy_src_size + 1 <= 18446744073709551615";
+    __gen_e_acsl_assert_data_6.pred_txt = "__gen_e_acsl_strcpy_src_size + 1 <= 18446744073709551615";
     __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_6.fct = "strcpy";
     __gen_e_acsl_assert_data_6.line = 367;
+    __gen_e_acsl_assert_data_6.name = "size_lesser_or_eq_than_SIZE_MAX";
     __e_acsl_assert(__gen_e_acsl_le <= 0,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __gen_e_acsl_size = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
@@ -788,10 +790,11 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
                                  (void *)__gen_e_acsl_at);
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Postcondition";
-    __gen_e_acsl_assert_data_8.pred_txt = "result_ptr: \\result == \\old(dest)";
+    __gen_e_acsl_assert_data_8.pred_txt = "\\result == \\old(dest)";
     __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_8.fct = "strcpy";
     __gen_e_acsl_assert_data_8.line = 374;
+    __gen_e_acsl_assert_data_8.name = "result_ptr";
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     __e_acsl_delete_block((void *)(& src));
@@ -879,10 +882,11 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       else __gen_e_acsl_and = 0;
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(__retres)";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(__retres)";
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_3.fct = "strchr";
       __gen_e_acsl_assert_data_3.line = 177;
+      __gen_e_acsl_assert_data_3.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
@@ -897,19 +901,21 @@ char *__gen_e_acsl_strchr(char const *s, int c)
                                    __gen_e_acsl_base_addr_2);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "found: result_same_base: \\base_addr(\\result) == \\base_addr(\\old(s))";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\base_addr(\\result) == \\base_addr(\\old(s))";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_4.fct = "strchr";
       __gen_e_acsl_assert_data_4.line = 178;
+      __gen_e_acsl_assert_data_4.name = "found/result_same_base";
       __e_acsl_assert(__gen_e_acsl_base_addr == __gen_e_acsl_base_addr_2,
                       & __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Postcondition";
-      __gen_e_acsl_assert_data_2.pred_txt = "found: result_char: *\\result == (char)\\old(c)";
+      __gen_e_acsl_assert_data_2.pred_txt = "*\\result == (char)\\old(c)";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_2.fct = "strchr";
       __gen_e_acsl_assert_data_2.line = 177;
+      __gen_e_acsl_assert_data_2.name = "found/result_char";
       __e_acsl_assert((int)*__retres == (int)((char)__gen_e_acsl_at),
                       & __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -923,10 +929,11 @@ char *__gen_e_acsl_strchr(char const *s, int c)
                                    (void *)__retres);
       __gen_e_acsl_assert_data_8.blocking = 1;
       __gen_e_acsl_assert_data_8.kind = "Postcondition";
-      __gen_e_acsl_assert_data_8.pred_txt = "not_found: result_null: \\result == \\null";
+      __gen_e_acsl_assert_data_8.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_8.fct = "strchr";
       __gen_e_acsl_assert_data_8.line = 184;
+      __gen_e_acsl_assert_data_8.name = "not_found/result_null";
       __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_8);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
@@ -954,10 +961,11 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       }
       __gen_e_acsl_assert_data_9.blocking = 1;
       __gen_e_acsl_assert_data_9.kind = "Postcondition";
-      __gen_e_acsl_assert_data_9.pred_txt = "default: result_null_or_same_base:\n  \\result == \\null || \\base_addr(\\result) == \\base_addr(\\old(s))";
+      __gen_e_acsl_assert_data_9.pred_txt = "\\result == \\null || \\base_addr(\\result) == \\base_addr(\\old(s))";
       __gen_e_acsl_assert_data_9.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_9.fct = "strchr";
       __gen_e_acsl_assert_data_9.line = 187;
+      __gen_e_acsl_assert_data_9.name = "default/result_null_or_same_base";
       __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_9);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     }
@@ -1011,10 +1019,11 @@ pid_t __gen_e_acsl_fork(void)
     }
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
-    __gen_e_acsl_assert_data.pred_txt = "result_ok_child_or_error: \\result == 0 || \\result > 0 || \\result == -1";
+    __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result > 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "fork";
     __gen_e_acsl_assert_data.line = 846;
+    __gen_e_acsl_assert_data.name = "result_ok_child_or_error";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     return __retres;
@@ -1070,10 +1079,11 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
                                    "\\valid(stat_loc)",0,__gen_e_acsl_valid);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Precondition";
-      __gen_e_acsl_assert_data.pred_txt = "stat_loc_non_null: valid_stat_loc: \\valid(stat_loc)";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(stat_loc)";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/sys/wait.h";
       __gen_e_acsl_assert_data.fct = "waitpid";
       __gen_e_acsl_assert_data.line = 95;
+      __gen_e_acsl_assert_data.name = "stat_loc_non_null/valid_stat_loc";
       __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
@@ -1097,10 +1107,11 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     }
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Postcondition";
-    __gen_e_acsl_assert_data_2.pred_txt = "result_ok_or_error: \\result == -1 || \\result >= 0";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\result == -1 || \\result >= 0";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/sys/wait.h";
     __gen_e_acsl_assert_data_2.fct = "waitpid";
     __gen_e_acsl_assert_data_2.line = 87;
+    __gen_e_acsl_assert_data_2.name = "result_ok_or_error";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
@@ -1130,10 +1141,11 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     }
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Postcondition";
-    __gen_e_acsl_assert_data_3.pred_txt = "initialization: stat_loc_init_on_success:\n  \\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/sys/wait.h";
     __gen_e_acsl_assert_data_3.fct = "waitpid";
     __gen_e_acsl_assert_data_3.line = 89;
+    __gen_e_acsl_assert_data_3.name = "initialization/stat_loc_init_on_success";
     __e_acsl_assert(__gen_e_acsl_implies,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
@@ -1154,10 +1166,11 @@ void __gen_e_acsl_exit(int status)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
-    __gen_e_acsl_assert_data.pred_txt = "never_terminates: \\false";
+    __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
     __gen_e_acsl_assert_data.line = 473;
+    __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
   }
@@ -1175,10 +1188,11 @@ void __gen_e_acsl_abort(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
-    __gen_e_acsl_assert_data.pred_txt = "never_terminates: \\false";
+    __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "abort";
     __gen_e_acsl_assert_data.line = 460;
+    __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
   }
