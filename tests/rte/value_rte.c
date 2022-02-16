@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: @PTEST_PLUGIN@ eva,scope report
+PLUGIN: @PTEST_PLUGIN@ eva,inout,scope report
 STDOPT: +"-then -eva @EVA_OPTIONS@ -then -report"
 */
 #include "stdio.h"
