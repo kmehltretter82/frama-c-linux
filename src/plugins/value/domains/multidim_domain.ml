@@ -384,6 +384,7 @@ struct
         let value = get state (Location.of_lval oracle lval) in
         Value_or_Uninitialized.get_v (Bottom.non_bottom value) (* TODO: handle exception *)
       | Const (CInt64 (i,_,_)) -> Value.inject_int i
+      | Const (CReal (f,_,_)) -> Value.inject_float (Fval.singleton (Fval.F.of_float f))
       | UnOp (op, e, typ) -> Value.forward_unop typ op (oracle e)
       | BinOp (op, e1, e2, TFloat (fkind, _)) ->
         Value.forward_binop_float (Fval.kind fkind) (oracle e1) op (oracle e2)
