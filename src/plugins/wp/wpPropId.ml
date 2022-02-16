@@ -42,10 +42,12 @@ type prop_kind =
   | PKPropLoop    (** loop property used as hypothesis inside a loop. *)
   | PKVarDecr     (** computation related to the decreasing of a variant in a loop *)
   | PKVarPos      (** computation related to a loop variant being positive *)
+  | PKVarRel      (** computation related to a generalized loop variant *)
   | PKAFctOut     (** computation related to the function assigns on normal termination *)
   | PKAFctExit    (** computation related to the function assigns on exit termination *)
   | PKTerminates  (** computation related to the termination *)
-  | PKSmoke      (** expected to fail *)
+  | PKDecreases   (** computation related to the decreases clause *)
+  | PKSmoke       (** expected to fail *)
   | PKPre of kernel_function * stmt * Property.t
   (** precondition for function
       at stmt, property of the require. Many information that should come
@@ -74,7 +76,6 @@ let tactical ~gid =
 (* --- Category                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let kind_of_id p = p.p_kind
 let parts_of_id p = p.p_part
 let property_of_id p = p.p_prop
 let doomed_if_valid p = p.p_doomed
@@ -124,6 +125,7 @@ let mk_loop_inv kf s ca =
 let mk_inv_hyp_id    kf s ca = mk_prop PKPropLoop  (mk_annot_id kf s ca)
 let mk_var_decr_id   kf s ca = mk_prop PKVarDecr (mk_annot_id kf s ca)
 let mk_var_pos_id    kf s ca = mk_prop PKVarPos  (mk_annot_id kf s ca)
+let mk_var_id kf s ca = mk_prop PKVarRel (mk_annot_id kf s ca)
 
 let mk_loop_from_id kf s ca from =
   let id = Property.ip_of_from kf (Kstmt s) (Property.Id_loop ca) from in
@@ -150,8 +152,8 @@ let mk_disj_bhv_id (kf,ki,active,disj)  =
   mk_prop PKProp (Property.ip_of_disjoint kf ki active disj)
 let mk_compl_bhv_id (kf,ki,active,comp) =
   mk_prop PKProp (Property.ip_of_complete kf ki active comp)
-let mk_decrease_id (kf, s, x)  =
-  mk_prop PKProp (Property.ip_of_decreases kf s x)
+let mk_decrease_id kf s x  =
+  mk_prop PKDecreases (Property.ip_of_decreases kf s x)
 
 let mk_lemma_id l = mk_prop PKProp (LogicUsage.ip_lemma l)
 
@@ -212,13 +214,15 @@ let kind_order = function
   | PKPreserved -> 3
   | PKVarPos -> 4
   | PKVarDecr -> 5
-  | PKPropLoop -> 6
-  | PKAFctOut -> 7
-  | PKAFctExit -> 8
-  | PKCheck -> 9
-  | PKTactic -> 10
-  | PKSmoke -> 11
-  | PKTerminates -> 12
+  | PKVarRel -> 6
+  | PKPropLoop -> 7
+  | PKAFctOut -> 8
+  | PKAFctExit -> 9
+  | PKCheck -> 10
+  | PKTactic -> 11
+  | PKSmoke -> 12
+  | PKTerminates -> 13
+  | PKDecreases -> 14
 
 let compare_kind k1 k2 = match k1, k2 with
     PKPre (kf1, ki1, p1), PKPre (kf2, ki2, p2) ->
@@ -324,64 +328,6 @@ struct
 
 end
 
-module LegacyNames :
-sig
-  val get_prop_id_name: prop_id -> string
-end = struct
-
-  let base_id_prop_txt = Property.LegacyNames.get_prop_name_id
-
-  let basename_of_prop_id p =
-    match p.p_kind , p.p_prop with
-    | (PKTactic | PKCheck | PKProp | PKPropLoop | PKSmoke | PKTerminates) , p ->
-        base_id_prop_txt p
-    | PKEstablished , p -> base_id_prop_txt p ^ "_established"
-    | PKPreserved , p -> base_id_prop_txt p ^ "_preserved"
-    | PKVarDecr , p -> base_id_prop_txt p ^ "_decrease"
-    | PKVarPos , p -> base_id_prop_txt p ^ "_positive"
-    | PKAFctOut , p -> base_id_prop_txt p ^ "_normal"
-    | PKAFctExit , p -> base_id_prop_txt p ^ "_exit"
-    | PKPre(_kf,stmt,pre) , _ ->
-        let kf_name_of_stmt =
-          Kernel_function.get_name
-            (Kernel_function.find_englobing_kf stmt)
-        in Printf.sprintf "%s_call_%s" kf_name_of_stmt (base_id_prop_txt pre)
-
-  (** function used to normalize basename *)
-  let normalize_basename s =
-    (* truncates basename in order to limit length of file name *)
-    let max_len = Wp_parameters.TruncPropIdFileName.get () in
-    if max_len > 0 && String.length s > max_len then
-      if max_len > 3 then (String.sub s 0 (max_len-3)) ^ "___"
-      else String.sub s 0 max_len
-    else s
-
-  (** returns the normalized basename of the property. *)
-  let get_prop_id_basename p =
-    let basename = basename_of_prop_id p in
-    let basename = match p.p_part with
-      | None -> basename
-      | Some(k,n) ->
-          if n < 10 then Printf.sprintf "%s_part%d" basename (succ k) else
-          if n < 100 then Printf.sprintf "%s_part%02d" basename (succ k) else
-          if n < 1000 then Printf.sprintf "%s_part%03d" basename (succ k) else
-            Printf.sprintf "%s_part%06d" basename (succ k)
-    in normalize_basename basename
-
-
-  module UniquifyPropId = NameUniquify(PropIdRaw)(struct
-      let name = "WpProperty"
-      let basename = get_prop_id_basename
-    end)
-
-
-  (** returns a unique name identifying the property.
-      This name is built from the basename of the property. *)
-  let get_prop_id_name pid =
-    UniquifyPropId.unique_basename pid
-
-end
-
 (* -------------------------------------------------------------------------- *)
 (* --- Naming Properties                                                  --- *)
 (* -------------------------------------------------------------------------- *)
@@ -416,12 +362,11 @@ struct
 
   let get_prop_id_base p =
     match p.p_kind , p.p_prop with
-    | (PKTactic | PKCheck | PKProp | PKPropLoop | PKSmoke | PKTerminates) , p ->
-        get_ip p
     | PKEstablished , p -> get_ip p ^ "_established"
     | PKPreserved , p -> get_ip p ^ "_preserved"
     | PKVarDecr , p -> get_ip p ^ "_decrease"
     | PKVarPos , p -> get_ip p ^ "_positive"
+    | PKVarRel , p -> get_ip p ^ "_relation"
     | PKAFctOut , p -> get_ip p ^ "_normal"
     | PKAFctExit , p -> get_ip p ^ "_exit"
     | PKPre(callee_kf,stmt,pre) , _ ->
@@ -438,6 +383,9 @@ struct
                ip_string)
         in
         call_string^"_"^ip_string
+    | _ , p ->
+        get_ip p
+
 
   let get_prop_id_basename p =
     let basename = get_prop_id_base p in
@@ -462,9 +410,6 @@ end
 (* -------------------------------------------------------------------------- *)
 (* --- Naming Accessors                                                   --- *)
 (* -------------------------------------------------------------------------- *)
-
-let get_legacy = LegacyNames.get_prop_id_name
-(** Legacy property PO name *)
 
 let get_propid = Names.get_prop_id_name
 (** Name related to a property PO *)
@@ -567,9 +512,11 @@ let label_of_kind = function
   | PKPreserved -> "Preservation"
   | PKVarDecr -> "Decreasing"
   | PKVarPos -> "Positive"
+  | PKVarRel -> "Relation"
   | PKAFctOut -> "Function assigns"
   | PKAFctExit -> "Exit assigns"
   | PKTerminates -> "Terminates"
+  | PKDecreases -> "Decreases"
   | PKPre(kf,_,_) ->
       Printf.sprintf "Precondition for '%s'" (Kernel_function.get_name kf)
 
@@ -586,11 +533,13 @@ struct
     | None -> ()
     | Some(k,n) -> fprintf fmt " (%d/%d)" (succ k) n
   let pp_subprop fmt p = match p.p_kind with
-    | PKProp | PKTactic | PKCheck | PKPropLoop | PKSmoke | PKTerminates -> ()
+    | PKProp | PKTactic | PKCheck | PKPropLoop | PKSmoke
+    | PKTerminates | PKDecreases -> ()
     | PKEstablished -> pp_print_string fmt " (established)"
     | PKPreserved -> pp_print_string fmt " (preserved)"
     | PKVarDecr -> pp_print_string fmt " (decrease)"
     | PKVarPos -> pp_print_string fmt " (positive)"
+    | PKVarRel -> pp_print_string fmt " (relation)"
     | PKAFctOut -> pp_print_string fmt " (return)"
     | PKAFctExit -> pp_print_string fmt " (exit)"
     | PKPre(kf,_,_) -> fprintf fmt " (call '%s')" (Kernel_function.get_name kf)
@@ -662,9 +611,11 @@ let propid_hints hs p =
   | PKPreserved , _ -> add_required hs "preserved"
   | PKVarDecr , _ -> add_required hs "decrease"
   | PKVarPos , _ -> add_required hs "positive"
+  | PKVarRel , _ -> add_required hs "relation"
   | PKAFctOut , _ -> add_required hs "return"
   | PKAFctExit , _ -> add_required hs "exit"
   | PKTerminates , _ -> add_required hs "terminates"
+  | PKDecreases , _ -> add_required hs "decreases"
   | PKPre(kf,st,_) , _ ->
       add_required hs ("precond-" ^ Kernel_function.get_name kf) ;
       stmt_hints hs st
@@ -674,7 +625,7 @@ let rec term_hints hs t =
   | TLval(lv,_) -> lval_hints hs lv
   | TAddrOf(lv,_) -> lval_hints hs lv
   | TCastE(_,t) -> term_hints hs t
-  | TBinOp((PlusPI|IndexPI|MinusPI),a,_) -> term_hints hs a
+  | TBinOp((PlusPI|MinusPI),a,_) -> term_hints hs a
   | Tlet(_,t) -> term_hints hs t
   | _ -> ()
 
@@ -739,12 +690,13 @@ let prop_id_keys p =
 
 let pp_goal_kind fmt = function
   | PKTactic | PKSmoke | PKCheck
-  | PKProp | PKPropLoop | PKAFctOut | PKAFctExit | PKTerminates
+  | PKProp | PKPropLoop | PKAFctOut | PKAFctExit | PKTerminates | PKDecreases
   | PKPre _ -> ()
   | PKEstablished -> Format.pp_print_string fmt "Establishment of "
   | PKPreserved -> Format.pp_print_string fmt "Preservation of "
   | PKVarDecr -> Format.pp_print_string fmt "Decreasing of "
   | PKVarPos -> Format.pp_print_string fmt "Positivity of "
+  | PKVarRel -> Format.pp_print_string fmt "Follows relation "
 
 let pp_goal_part fmt = function
   | None -> ()
@@ -934,6 +886,7 @@ let pp_assigns_desc fmt a = Wp_error.pp_assigns fmt a.a_assigns
 (*----------------------------------------------------------------------------*)
 
 type pred_info = prop_id * Cil_types.predicate
+type variant_info = prop_id * Cil_types.variant
 
 let mk_pred_info id p = (id, p)
 let pred_info_id (id, _) = id
@@ -1048,7 +1001,8 @@ let split_map f pid gs =
 
 let subproofs id = match id.p_kind with
   | PKCheck -> 0
-  | PKProp | PKSmoke | PKTactic | PKPre _ | PKPropLoop | PKTerminates -> 1
+  | PKProp | PKSmoke | PKTactic | PKPre _ | PKPropLoop
+  | PKTerminates | PKDecreases | PKVarRel -> 1
   | PKEstablished | PKPreserved
   | PKVarDecr | PKVarPos
   | PKAFctExit | PKAFctOut -> 2
@@ -1056,7 +1010,7 @@ let subproofs id = match id.p_kind with
 let subproof_idx id = match id.p_kind with
   | PKCheck -> (-1) (* 0/0 *)
   | PKProp | PKTactic | PKPre _ | PKSmoke | PKPropLoop
-  | PKTerminates -> 0 (* 1/1 *)
+  | PKTerminates | PKDecreases | PKVarRel -> 0 (* 1/1 *)
   | PKPreserved  -> 0 (* 1/2 *)
   | PKEstablished-> 1 (* 2/2 *)
   | PKVarDecr    -> 0 (* 1/2 *)
@@ -1106,7 +1060,8 @@ let get_induction p =
       | IPAssigns {ias_kf; ias_kinstr=Kstmt stmt} -> Some (ias_kf, stmt)
       | _ -> None
   in match p.p_kind with
-  | PKCheck|PKSmoke |PKAFctOut|PKAFctExit|PKPre _ | PKTactic| PKTerminates ->
+  | PKCheck | PKSmoke | PKAFctOut | PKAFctExit | PKPre _
+  | PKTactic | PKTerminates | PKDecreases ->
       None
   | PKProp ->
       let loop_stmt_opt = match get_stmt (property_of_id p) with
@@ -1124,7 +1079,7 @@ let get_induction p =
             (* loop assigns *) Some stmt
         | _ -> None (* assert false ??? *)
       in loop_stmt_opt
-  | PKEstablished|PKVarDecr|PKVarPos|PKPreserved ->
+  | PKEstablished|PKVarDecr|PKVarPos|PKVarRel|PKPreserved ->
       (match get_stmt (property_of_id p) with
        | None -> None | Some (_, s) -> Some s)
 

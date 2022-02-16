@@ -20,16 +20,35 @@
 #   <Prover>: prover
 ###############################################################################
 
-#########################
+########################
 Plugin WP <next-release>
+########################
+
+- WP          [2022-02-02] New option -wp-smoke-dead-local-init, smoke tests on
+                           local variables initialization
+- WP          [2022-01-25] Removed deprecated "native:coq" prover
+- WP          [2022-01-25] Removed deprecated "native:alt-ergo" prover
+- WP          [2022-01-10] Supported general variant measure
+- WP          [2022-01-10] Supported decreases clause
+- TIP         [2022-01-10] New tactic Mod-Mask: rewrite bitmask into/from modulo
+- TIP         [2022-01-05] New tactic Clear: remove hypothesis
+-* WP         [2022-01-05] Fixed loop invariant order
+- WP          [2022-01-05] Weakened loop invariant verification (in particular
+                           for check loop invariant)
+- TIP         [2021-11-30] Extended Split tactic: can split in hypotheses, can
+                           split conjunctions into multiple hypotheses.
+- WP          [2021-11-08] Removed legacy WP engine and option -wp-legacy
+
+#########################
+Plugin WP 24.0 (Chromium)
 #########################
 
 - WP          [2021-10-25] Removes -wp-overflows option (unsound)
 - WP          [2021-06-11] Adds an experimental support of "terminates" clauses.
                            Adds the options -wp-declaration-terminate and
-                          -wp-frama-c-stdlib to claims that external functions
+                           -wp-frama-c-stdlib to claim that external functions
                            terminates.
-                           Adds -wp-declarations-terminate option to claims that
+                           Adds -wp-definitions-terminate option to claim that
                            defined function terminates.
                            Adds -wp-variant-with-terminates to verify loop
                            variants under the termination hypothesis.

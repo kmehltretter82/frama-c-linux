@@ -569,7 +569,7 @@ let memo_aux_variable tr counter used_prms vi =
     let my_type =
       match counter with
       | None -> vi.vtype
-      | Some _ -> TArray(vi.vtype,None,{scache=Not_Computed},[])
+      | Some _ -> TArray(vi.vtype,None,[])
     in
     let my_var =
       Cil.makeGlobalVar (get_fresh ("aorai_" ^ vi.vname)) my_type
@@ -851,13 +851,13 @@ let type_expr metaenv env ?tr ?current e =
         && Logic_typing.is_integral_type t2.term_type
         then
           Logic_const.term
-            (TBinOp (IndexPI,t1,t2))
+            (TBinOp (PlusPI,t1,t2))
             (Logic_typing.type_of_pointed t1.term_type)
         else if Logic_utils.isLogicPointerType t2.term_type
              && Logic_typing.is_integral_type t1.term_type
         then
           Logic_const.term
-            (TBinOp (IndexPI,t2,t1))
+            (TBinOp (PlusPI,t2,t1))
             (Logic_typing.type_of_pointed t2.term_type)
         else if Logic_utils.isLogicArrayType t1.term_type
              && Logic_typing.is_integral_type t2.term_type
@@ -1152,7 +1152,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
       (* TODO: makes it an integer *)
       let counter =
         let ty = if needs_pebble then
-            Cil_types.TArray (Cil.intType,None,{scache=Not_Computed},[])
+            Cil_types.TArray (Cil.intType,None,[])
           else Cil.intType
         in (* We won't always need a counter *)
         lazy (

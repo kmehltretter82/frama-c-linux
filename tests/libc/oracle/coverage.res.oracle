@@ -1,12 +1,12 @@
-[kernel] Parsing tests/libc/coverage.c (with preprocessing)
-[kernel] Parsing share/libc/string.c (with preprocessing)
+[kernel] Parsing coverage.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/string.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function strlen <- main.
-  Called from tests/libc/coverage.c:9.
+  Called from coverage.c:9.
 [eva] Recording results for strlen
 [eva] Done for function strlen
 [eva] Recording results for main
@@ -28,7 +28,7 @@
   main: 4 stmts out of 4 (100.0%)
 [metrics] Eva coverage statistics
   =======================
-  Syntactically reachable functions = 2 (out of 114)
+  Syntactically reachable functions = 2 (out of 115)
   Semantically reached functions = 2
   Coverage estimation = 100.0%
 [metrics] Statements analyzed by Eva

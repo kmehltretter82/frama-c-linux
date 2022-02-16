@@ -1,7 +1,5 @@
 /* run.config
  LIBS: libSelect
  MODULE: @PTEST_NAME@
-   OPT: @EVA_OPTIONS@ -machdep x86_32 -ulevel -1 -deps -slicing-level 2
+   STDOPT: +"-ulevel -1 -deps -slicing-level 2" #"%{dep:@PTEST_SUITE_DIR@/../test/adpcm.c}"
 */
-
-#include "../test/adpcm.c"

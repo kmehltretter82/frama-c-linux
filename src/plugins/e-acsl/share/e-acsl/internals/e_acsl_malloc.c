@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -22,22 +22,35 @@
 
 #include "e_acsl_malloc.h"
 
+#define eacsl_create_mspace export_alias(create_mspace)
+
+extern mspace eacsl_create_mspace(size_t, int);
+
 struct memory_spaces mem_spaces = {
     .rtl_mspace = NULL,
     .heap_mspace = NULL,
+    .rtl_start = 0,
+    .rtl_end = 0,
     .heap_start = 0,
     .heap_end = 0,
     .heap_mspace_least = 0,
 };
 
+mspace eacsl_create_locked_mspace(size_t size) {
+  return eacsl_create_mspace(size, 1);
+}
+
 /* \brief Create two memory spaces, one for RTL and the other for application
    memory. This function *SHOULD* be called before any allocations are made
    otherwise execution fails */
 void eacsl_make_memory_spaces(size_t rtl_size, size_t heap_size) {
-  mem_spaces.rtl_mspace = eacsl_create_mspace(rtl_size, 0);
-  mem_spaces.heap_mspace = eacsl_create_mspace(heap_size, 0);
+  mem_spaces.rtl_mspace = eacsl_create_locked_mspace(rtl_size);
+  mem_spaces.heap_mspace = eacsl_create_locked_mspace(heap_size);
   /* Do not use `eacsl_mspace_least_addr` here, as it returns the address of the
      mspace header. */
+  mem_spaces.rtl_start =
+      (uintptr_t)eacsl_mspace_malloc(mem_spaces.rtl_mspace, 1);
+  mem_spaces.rtl_end = mem_spaces.rtl_start + rtl_size;
   mem_spaces.heap_start =
       (uintptr_t)eacsl_mspace_malloc(mem_spaces.heap_mspace, 1);
   mem_spaces.heap_end = mem_spaces.heap_start + heap_size;

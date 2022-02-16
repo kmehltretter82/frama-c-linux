@@ -21,27 +21,34 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import { Meter } from 'dome/controls/displays';
 
 export interface Coverage {
   reachable: number;
   dead: number;
 }
 
+export interface CoverageProps {
+  coverage: Coverage;
+}
+
+
 export function percent(coverage: Coverage): string {
   const q = coverage.reachable / (coverage.reachable + coverage.dead);
   return `${(q * 100).toFixed(1)}%`;
 }
 
-export default function (props: {coverage: Coverage}) {
+export default function CoverageMeter(props: CoverageProps): JSX.Element {
   const { reachable, dead } = props.coverage;
   const total = reachable + dead;
 
   return (
-    <meter
+    <Meter
       min={0}
       max={total}
-      low={0.8 * total}
-      optimum={total}
+      low={0.50 * total}
+      high={0.85 * total}
+      optimum='HIGH'
       value={reachable}
     />
   );

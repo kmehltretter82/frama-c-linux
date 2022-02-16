@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -108,6 +108,14 @@ module Assert_print_data =
                   the runtime error message"
     end)
 
+module Concurrency =
+  False
+    (struct
+      let option_name = "-e-acsl-concurrency"
+      let help = "activate the concurrency support of E-ACSL. The option \
+                  implies -e-acsl-full-mtracking."
+    end)
+
 module Functions =
   Kernel_function_set
     (struct
@@ -172,10 +180,65 @@ let emitter =
 
 let must_visit () = Run.get ()
 
-let dkey_analysis = register_category "analysis"
-let dkey_prepare = register_category "preparation"
-let dkey_translation = register_category "translation"
-let dkey_typing = register_category "typing"
+module Dkey = struct
+  let prepare = register_category "preparation"
+  let bound_variables = register_category "analysis:bound_variables"
+  let interval = register_category "analysis:interval_inference"
+  let mtracking = register_category "analysis:memory_tracking"
+  let typing = register_category "analysis:typing"
+  let translation = register_category "translation"
+end
+
+let setup ?(rtl=false) () =
+  (* Variadic translation *)
+  if Plugin.is_present "variadic" then begin
+    let opt_name = "-variadic-translation" in
+    if Dynamic.Parameter.Bool.get opt_name () then begin
+      if rtl then
+        (* If we are translating the RTL project, then we need to deactivate the
+           variadic translation. Indeed since we are translating the RTL in
+           isolation, we do not now if the variadic functions are used by the
+            user project and we cannot monomorphise them accordingly. *)
+        Dynamic.Parameter.Bool.off opt_name ()
+      else if Validate_format_strings.get () then begin
+        if Ast.is_computed () then
+          abort
+            "The variadic translation is incompatible with E-ACSL option \
+             '%s'.@ Please use option '-variadic-no-translation'."
+            Validate_format_strings.option_name;
+        warning ~once:true "deactivating variadic translation";
+        Dynamic.Parameter.Bool.off opt_name ();
+      end
+    end
+  end;
+  (* Concurrency support *)
+  if Concurrency.get () then begin
+    if Full_mtracking.is_set () && not (Full_mtracking.get ()) then
+      abort
+        "The memory tracking dataflow analysis is incompatible@ \
+         with the concurrency support of E-ACSL.@ \
+         Please use option '-e-acsl-full-mtracking'.";
+    if not rtl && not (Full_mtracking.is_set ()) then
+      feedback
+        "Due to the large number of function pointers in concurrent@ \
+         code, the memory tracking dataflow analysis is deactivated@ \
+         when activating the concurrency support of E-ACSL.";
+    Full_mtracking.on ();
+    if Temporal_validity.get () then
+      abort
+        "The temporal analysis in valid annotations is incompatible@ \
+         with the concurrency support of E-ACSL.@ \
+         Please use '-e-acsl-no-temporal-validity' or '-e-acsl-no-concurrency'@ \
+         to deactivate one or the other.";
+    if rtl then
+      Kernel.CppExtraArgs.add "-DE_ACSL_CONCURRENCY_PTHREAD"
+  end;
+  (* Additionnal kernel options while parsing the RTL project. *)
+  if rtl then begin
+    Kernel.Keep_unused_specified_functions.off ();
+    Kernel.CppExtraArgs.add
+      (Format.asprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
+  end
 
 (*
 Local Variables:

@@ -41,8 +41,6 @@ module type BINARY_SEMILATTICE = sig
   include  Dataflows.JOIN_SEMILATTICE
 end
 
-let pretty_int = Integer.pretty ~hexa:false
-
 module Binary(* :BINARY_SEMILATTICE *) = struct
 
   (* Affine expression whose coefficients are the loop counters. The
@@ -121,10 +119,10 @@ module Binary(* :BINARY_SEMILATTICE *) = struct
 
 
   let pretty fmt = function
-    | ConstantInt(i) -> Format.fprintf fmt "%a" pretty_int i
+    | ConstantInt(i) -> Format.fprintf fmt "%a" Integer.pretty i
     | AffineRef(v,i) -> Format.fprintf fmt "ref<%a>+%a"
                           Cil_datatype.Varinfo.pretty v
-                          pretty_int i
+                          Integer.pretty i
     | Unknown -> Format.fprintf fmt "unknown"
     | ConstantVar(v) -> Format.fprintf fmt "%a" Cil_datatype.Varinfo.pretty v
     | Boolean _ -> Format.fprintf fmt "bools"
@@ -155,8 +153,6 @@ module Binary(* :BINARY_SEMILATTICE *) = struct
     | BinOp(MinusA,e1,e2,_) ->
       add (transfer_exp e1 load) (neg (transfer_exp e2 load))
     | CastE(_,e) -> transfer_exp e load
-    (* | BinOp((PlusPI|IndexPI|MinusA),_,_,_) -> assert false *)
-    (* | BinOp(_,_,_,_) -> Unknown *)
     | _ ->
       (match Cil.constFoldToInt ~machdep:true exp with
        | None -> Unknown
@@ -285,9 +281,9 @@ module Store(* (B:sig *)
     if Integer.(equal increment one) then Format.fprintf fmt "++"
     else if Integer.(equal increment minus_one) then Format.fprintf fmt "--"
     else if Integer.(gt increment zero) then
-      Format.fprintf fmt " += %a" (Integer.pretty ~hexa:false) increment
+      Format.fprintf fmt " += %a" Integer.pretty increment
     else if Integer.(lt increment zero) then
-      Format.fprintf fmt " -= %a" (Integer.pretty ~hexa:false)
+      Format.fprintf fmt " -= %a" Integer.pretty
         (Integer.neg increment)
     else assert false (* should never happen *)
 
@@ -344,37 +340,18 @@ module Store(* (B:sig *)
         Printer.pp_stmt stmt
 
   let value_min_max stmt vi =
-    if (Db.Value.is_computed ()) then
+    if (Eva.Analysis.is_computed ()) then
       begin
         Options.feedback ~dkey ~once:true
           "value analysis computed, trying results";
-        if Db.Value.is_reachable_stmt stmt then
-          let state = Db.Value.get_stmt_state stmt in
-          try
-            let loc = Locations.loc_of_varinfo vi in
-            let v = Db.Value.find state loc in
-            let ival = Cvalue.V.project_ival v in
-            let omin, omax = Ival.min_and_max ival in
-            omin, omax
-          with
-          | Not_found ->
-            Options.feedback ~dkey "value_min_max: not found: %a@.\
-                                    function: %a, stmt: %a"
-              Printer.pp_varinfo vi Kernel_function.pretty
-              (Kernel_function.find_englobing_kf stmt) Printer.pp_stmt stmt;
-            None, None
-          | Cvalue.V.Not_based_on_null ->
-            Options.feedback ~dkey "value_min_max: not based on null: %a@.\
-                                    function: %a, stmt: %a"
-              Printer.pp_varinfo vi Kernel_function.pretty
-              (Kernel_function.find_englobing_kf stmt) Printer.pp_stmt stmt;
-            None, None
-        else
-          begin
+        let value = Eva.Results.(before stmt |> eval_var vi |> as_ival) in
+        match value with
+        | Result.Ok ival -> Ival.min_and_max ival
+        | Error e ->
+          if e = Eva.Results.Bottom then
             Options.feedback ~dkey "skipping unreachable stmt (function: %a)"
               Kernel_function.pretty (Kernel_function.find_englobing_kf stmt);
-            None, None
-          end
+          None, None
       end
     else
       begin
@@ -427,8 +404,8 @@ module Store(* (B:sig *)
         Options.debug "maybe_insert: function %a, found var %a, smaller: %b, \
                        initial %a, increment %a, bound %a, offset %a, binop '%a'"
           Kernel_function.pretty (Kernel_function.find_englobing_kf stmt)
-          Printer.pp_varinfo vi smaller pretty_int initial pretty_int increment
-          pretty_int bound pretty_int offset Printer.pp_binop binop;
+          Printer.pp_varinfo vi smaller Integer.pretty initial Integer.pretty increment
+          Integer.pretty bound Integer.pretty offset Printer.pp_binop binop;
         let bound = Integer.sub bound initial in
         let bound_offset =
           if smaller then Integer.sub bound offset
@@ -446,7 +423,7 @@ module Store(* (B:sig *)
             "termination condition may not be reached (infinite loop?)@;\
              loop amounts to: for (%a = 0; %a != %a; %a%a)"
             Printer.pp_varinfo vi
-            Printer.pp_varinfo vi pretty_int divident
+            Printer.pp_varinfo vi Integer.pretty divident
             Printer.pp_varinfo vi pretty_increment increment
         else
           try
@@ -494,7 +471,7 @@ module Store(* (B:sig *)
             with Not_found -> ()
           end
         | c ->
-          if (Db.Value.is_computed ()) then
+          if (Eva.Analysis.is_computed ()) then
             begin
               let min_max_int = value_min_max stmt in
               match c with
@@ -522,12 +499,12 @@ module Store(* (B:sig *)
                                    -   get_min_max_int_for_vi(%a)=%a"
                       Printer.pp_varinfo vi
                       (Pretty_utils.pp_pair
-                         (Pretty_utils.pp_opt pretty_int)
-                         (Pretty_utils.pp_opt pretty_int)) a
+                         (Pretty_utils.pp_opt Integer.pretty)
+                         (Pretty_utils.pp_opt Integer.pretty)) a
                       Printer.pp_varinfo vi'
                       (Pretty_utils.pp_pair
-                         (Pretty_utils.pp_opt pretty_int)
-                         (Pretty_utils.pp_opt pretty_int)) b
+                         (Pretty_utils.pp_opt Integer.pretty)
+                         (Pretty_utils.pp_opt Integer.pretty)) b
                 end
               | B.Ne(B.AffineRef(vi, offset),B.AffineRef(vi', offset')) ->
                 begin

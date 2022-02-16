@@ -27,7 +27,7 @@
  */
 
 import filepath from 'path';
-import { remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------
@@ -44,7 +44,7 @@ const defaultItems: DialogButton<boolean>[] = [
   { value: true, label: 'Ok' },
 ];
 
-const valueLabel = (v: any) => {
+const valueLabel = (v: unknown): string => {
   switch (v) {
     case undefined: return 'Cancel';
     case true: return 'Ok';
@@ -53,15 +53,15 @@ const valueLabel = (v: any) => {
   }
 };
 
-const itemLabel = ({ value, label }: DialogButton<any>) => (
+const itemLabel = ({ value, label }: DialogButton<unknown>): string => (
   (label || valueLabel(value))
 );
 
-const isDefault = ({ value, label }: DialogButton<any>) => (
+const isDefault = ({ value, label }: DialogButton<unknown>): boolean => (
   (value === true || label === 'Ok' || label === 'Yes')
 );
 
-const isCancel = ({ value, label }: DialogButton<any>) => (
+const isCancel = ({ value, label }: DialogButton<unknown>): boolean => (
   (!value || label === 'Cancel' || label === 'No')
 );
 
@@ -122,10 +122,9 @@ export async function showMessageBox<A>(
 
   if (cancelId === defaultId) cancelId = -1;
 
-  return remote.dialog.showMessageBox(
-    remote.getCurrentWindow(),
+  return ipcRenderer.invoke('dome.dialog.showMessageBox',
     {
-      type: kind,
+      'type': kind,
       message,
       detail: details,
       defaultId,
@@ -143,7 +142,8 @@ export async function showMessageBox<A>(
 // --------------------------------------------------------------------------
 
 const defaultPath =
-  (path: string) => (filepath.extname(path) ? filepath.dirname(path) : path);
+  (path: string): string =>
+    (filepath.extname(path) ? filepath.dirname(path) : path);
 
 export interface FileFilter {
   /** Filter name. */
@@ -197,8 +197,7 @@ export async function showOpenFile(
   props: OpenFileProps,
 ): Promise<string | undefined> {
   const { title, label, path, hidden = false, filters } = props;
-  return remote.dialog.showOpenDialog(
-    remote.getCurrentWindow(),
+  return ipcRenderer.invoke('dome.dialog.showOpenDialog',
     {
       title,
       buttonLabel: label,
@@ -221,8 +220,7 @@ export async function showOpenFiles(
 ): Promise<string[] | undefined> {
   const { title, label, path, hidden, filters } = props;
 
-  return remote.dialog.showOpenDialog(
-    remote.getCurrentWindow(),
+  return ipcRenderer.invoke('dome.dialog.showOpenDialog',
     {
       title,
       buttonLabel: label,
@@ -258,8 +256,7 @@ export async function showSaveFile(
   props: SaveFileProps,
 ): Promise<string | undefined> {
   const { title, label, path, filters } = props;
-  return remote.dialog.showSaveDialog(
-    remote.getCurrentWindow(),
+  return ipcRenderer.invoke('dome.dialog.showSaveDialog',
     {
       title,
       buttonLabel: label,
@@ -292,8 +289,7 @@ export async function showOpenDir(
     default: break;
   }
 
-  return remote.dialog.showOpenDialog(
-    remote.getCurrentWindow(),
+  return ipcRenderer.invoke('dome.dialog.showOpenDialog',
     {
       title,
       buttonLabel: label,

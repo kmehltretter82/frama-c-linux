@@ -482,7 +482,6 @@ module Type_namespace =
     let hash : t -> int = Hashtbl.hash
   end)
 
-
 type typing_context = {
   is_loop: unit -> bool;
   anonCompFieldName : string;
@@ -520,7 +519,7 @@ type typing_context = {
     Lenv.t ->
     Logic_ptree.assigns -> Cil_types.assigns;
   error: 'a 'b. location -> ('a,formatter,unit,'b) format4 -> 'a;
-  on_error: 'a 'b. ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
+  on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
 }
 
 module Extensions = struct
@@ -656,7 +655,7 @@ module Make
        val find_logic_ctor: string -> logic_ctor_info
        val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
        val error: location -> ('a,formatter,unit, 'b) format4 -> 'a
-       val on_error: ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
+       val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
      end) =
 struct
 
@@ -765,7 +764,7 @@ struct
       ignore (Logic_env.find_model_field f ty); true
     with Not_found ->
       (match Cil.unrollType ty with
-       | TComp(comp,_,_) ->
+       | TComp(comp,_) ->
          List.exists
            (fun x -> x.fname = f)
            (Option.value ~default:[] comp.cfields)
@@ -773,7 +772,7 @@ struct
 
   let plain_type_of_c_field loc f ty =
     match Cil.unrollType ty with
-    | TComp (comp, _, attrs) ->
+    | TComp (comp, attrs) ->
       (try
          let attrs = Cil.filter_qualifier_attributes attrs in
          let field = C.find_comp_field comp f in
@@ -932,8 +931,7 @@ struct
           with Not_found ->
             ctxt.error loc "size of array must be an integral value";
       in
-      Ctype (TArray (ctype ty, size,
-                     Cil.empty_size_cache (),[]))
+      Ctype (TArray (ctype ty, size,[]))
     | LTpointer ty -> Ctype (TPtr (ctype ty, []))
     | LTenum e ->
       (try Ctype (ctxt.find_type Enum e)
@@ -1338,8 +1336,8 @@ struct
         result
       | TInt _, TPtr _ -> result
       | TPtr _, TInt _ -> result
-      | ((TArray (told,_,_,_) | TPtr (told,_)),
-         (TPtr (tnew,_) | TArray(tnew,_,_,_)))
+      | ((TArray (told,_,_) | TPtr (told,_)),
+         (TPtr (tnew,_) | TArray(tnew,_,_)))
         when is_same_c_type told tnew -> result
       | (TPtr _ | TArray _), (TPtr _ | TArray _)
         when isLogicNull e -> result
@@ -1366,7 +1364,7 @@ struct
         result
       | (TInt _ | TEnum _ | TPtr _ ), TVoid _ ->
         (ot, e)
-      | TComp (comp1, _, _), TComp (comp2, _, _)
+      | TComp (comp1, _), TComp (comp2, _)
         when comp1.ckey = comp2.ckey ->
         nt, e
       | _ ->
@@ -1768,7 +1766,7 @@ struct
       Logic_const.tat ~loc (add_offset lv here_idx,lab)
     | _ ->
       let b =
-        { term_node = TBinOp (IndexPI, t, idx); term_name = [];
+        { term_node = TBinOp (PlusPI, t, idx); term_name = [];
           term_loc = loc;
           term_type = set_conversion t.term_type idx.term_type }
       in
@@ -2039,7 +2037,7 @@ struct
       | _,typ ->
         { term with
           term_node = Tlambda(quants, term);
-          term_type = Larrow(List.map (fun x -> x.lv_type) quants,typ) }
+          term_type = make_arrow_type quants typ }
     in
     let rec aux known_vars kont term =
       match term.term_node with
@@ -2948,7 +2946,7 @@ struct
         | _ -> [],tdef
       in
       var.l_type <- Some tdef.term_type;
-      var.l_var_info.lv_type <- tdef.term_type;
+      var.l_var_info.lv_type <- make_arrow_type args tdef.term_type;
       var.l_profile <- args;
       var.l_body <- LBterm tdef;
       let env = Lenv.add_logic_info ident var env in
@@ -3455,10 +3453,8 @@ struct
       in
       let var = Cil_const.make_logic_info_local x in
       var.l_profile <- args;
-      var.l_var_info.lv_type <-
-        (match typ with
-           None -> Ctype (Cil.voidType)
-         | Some t -> t);
+      let rt = Option.value typ ~default:(Ctype Cil.voidType) in
+      var.l_var_info.lv_type <- make_arrow_type args rt;
       var.l_type <- typ;
       var.l_body <- tdef;
       let env = Lenv.add_logic_info x var env in
@@ -4003,13 +3999,8 @@ struct
        - Polymorphism is not reflected on the lvar level.
        - However, such lvar should rarely if at all be seen under a Tvar.
     *)
-    (match p,t with
-       _,None -> ()
-     | [], Some t ->
-       info.l_var_info.lv_type <- t
-     | _,Some t ->
-       let typ = Larrow (List.map (fun x -> x.lv_type) p,t) in
-       info.l_var_info.lv_type <- typ);
+    let rt = Option.value t ~default:(Ctype Cil.voidType) in
+    info.l_var_info.lv_type <- make_arrow_type p rt;
     info.l_tparams <- poly;
     info.l_profile <- p;
     info.l_type <- t;
@@ -4216,33 +4207,39 @@ struct
         List.map
           (term_lval_assignable ctxt ~accept_formal ~accept_const env) tsets
       in
-      let checks_tsets_type fct ctyp =
+      let checks_tsets_type ~reads fct ctyp =
         List.iter
-          (fun t ->
-             let check t = match Logic_utils.unroll_type t with
-               | Ctype ctyp' -> Cil_datatype.Typ.equal ctyp ctyp'
-               | _ -> false
-             in
-             if not (Logic_const.plain_or_set check t.term_type) then
-               C.error t.term_loc "incompatible prototype of '%s' with %a"
-                 fct Cil_printer.pp_term t )
-          tsets
+          begin fun t ->
+            let check t = match Logic_utils.unroll_type t with
+              | Ctype ctyp' ->
+                ( reads || not (Cil.isConstType ctyp') )
+                && Cil_datatype.Typ.equal ctyp
+                  (Cil.type_remove_qualifier_attributes ctyp')
+              | _ -> false
+            in
+            if not (Logic_const.plain_or_set check t.term_type) then
+              C.error t.term_loc
+                "@[cannot use '%s' to %s volatile '%a'@]"
+                fct (if reads then "read" else "write")
+                Cil_printer.pp_term t
+          end tsets
       in
       let prototype_error s fct =
         C.error loc
           "incompatible prototype of '%s' with volatile %s declaration"
           fct s
       in
-      let volatile_type ret_typ arg1 error =
+      let volatile_type ~reads ret_typ arg1 error =
         (* note: type pointed to by arg1 may differ from the
            return type with respect to qualifiers *)
         if not (isPointerType arg1) then error ();
         let vol_typ = typeOf_pointed arg1 in
-        if not (Cil.isVolatileType vol_typ
-                && Cil_datatype.Typ.equal ret_typ
-                  (Cil.type_remove_qualifier_attributes vol_typ))
+        let base_typ = Cil.type_remove_qualifier_attributes vol_typ in
+        if not (Cil.isVolatileType vol_typ &&
+                ( reads || not (Cil.isConstType vol_typ) ) &&
+                Cil_datatype.Typ.equal ret_typ base_typ)
         then error ();
-        vol_typ
+        base_typ
       in
       let checks_reads_fct fct ty =
         let error () = prototype_error "reads" fct
@@ -4254,10 +4251,8 @@ struct
         | Some [_,arg1,_] when
             (not (isVoidType ret || is_varg_arg))
           -> (* matching prototype: T fct (volatile T *arg1) *)
-          let vol_typ = volatile_type ret arg1 error in
-          if Cil.isConstType vol_typ then
-            Kernel.warning ~current:true "Access function '%s' writes to volatile const locations" fct;
-          checks_tsets_type fct vol_typ (* tsets should have type: volatile T *)
+          let vol_typ = volatile_type ~reads:true ret arg1 error in
+          checks_tsets_type ~reads:true fct vol_typ (* tsets should have type: volatile T *)
         | _ ->
           error ()
       in
@@ -4272,8 +4267,8 @@ struct
             (not (isVoidType ret || is_varg_arg))
             && Cil_datatype.Typ.equal ret (Cil.type_remove_qualifier_attributes arg2)
           -> (* matching prototype: T fct (volatile T *arg1, T arg2) *)
-          let vol_typ = volatile_type ret arg1 error in
-          checks_tsets_type fct vol_typ (* tsets should have type: volatile T *)
+          let vol_typ = volatile_type ~reads:false ret arg1 error in
+          checks_tsets_type ~reads:false fct vol_typ (* tsets should have type: volatile T *)
         | _ ->
           error ()
       in
@@ -4309,9 +4304,7 @@ struct
     let res = annot false a in
     finish_transaction (); res
 
-  let annot = C.on_error annot rollback_transaction
-
-  let custom _c = CustomDummy
+  let annot = C.on_error annot (fun _ -> rollback_transaction ())
 
 end
 

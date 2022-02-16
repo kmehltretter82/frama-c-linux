@@ -4,21 +4,19 @@
   Declaration of variadic function execle.
 [variadic] FRAMAC_SHARE/libc/unistd.h:810: 
   Declaration of variadic function execlp.
-[variadic] tests/known/exec.c:9: Translating call to execle to a call to execve.
-[variadic] tests/known/exec.c:11: Warning: 
+[variadic] exec.c:9: Translating call to execle to a call to execve.
+[variadic:typing] exec.c:11: Warning: 
   Too many arguments: expected 5, given 6. Superfluous arguments will be removed.
-[variadic] tests/known/exec.c:11: Translating call to execl to a call to execv.
-[variadic] tests/known/exec.c:12: Warning: 
+[variadic] exec.c:11: Translating call to execl to a call to execv.
+[variadic:typing] exec.c:12: Warning: 
   Too many arguments: expected 4, given 5. Superfluous arguments will be removed.
-[variadic] tests/known/exec.c:12: 
-  Translating call to execlp to a call to execvp.
-[variadic] tests/known/exec.c:13: Warning: 
+[variadic] exec.c:12: Translating call to execlp to a call to execvp.
+[variadic:typing] exec.c:13: Warning: 
   Too many arguments: expected 4, given 6. Superfluous arguments will be removed.
-[variadic] tests/known/exec.c:13: 
-  Translating call to execle to a call to execve.
-[variadic] tests/known/exec.c:15: Warning: 
+[variadic] exec.c:13: Translating call to execle to a call to execve.
+[variadic] exec.c:15: Warning: 
   Failed to find a sentinel (NULL pointer) in the argument list.
-[variadic] tests/known/exec.c:15: 
+[variadic] exec.c:15: 
   Fallback translation of call execlp to a call to the specialized version execlp_fallback_1.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -26,10 +24,10 @@
 [eva] using specification for function execve
 [eva] using specification for function execv
 [eva] using specification for function execvp
-[kernel:annot:missing-spec] tests/known/exec.c:15: Warning: 
+[kernel:annot:missing-spec] exec.c:15: Warning: 
   Neither code nor specification for function execlp_fallback_1, generating default assigns from the prototype
 [eva] using specification for function execlp_fallback_1
-[eva:invalid-assigns] tests/known/exec.c:15: 
+[eva:invalid-assigns] exec.c:15: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.
 [eva] done for function main

@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Text Documents
 // --------------------------------------------------------------------------
@@ -41,6 +43,8 @@ import 'codemirror/lib/codemirror.css';
 
 const CSS_HOVERED = 'dome-xText-hover';
 const CSS_SELECTED = 'dome-xText-select';
+
+const D = new Dome.Debug('Dome');
 
 /* --------------------------------------------------------------------------*/
 /* --- View Properties                                                   --- */
@@ -383,7 +387,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
       const cm = this.codeMirror;
       return cm && cm.scrollIntoView({ line, ch: 0 });
     } catch (_error) {
-      console.warn(`[Dome] Unable to scroll to line ${line}: out of range.`);
+      D.warn(`unable to scroll to line ${line}: out of range.`);
     }
   }
 
@@ -391,7 +395,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   // --- Focus
   // --------------------------------------------------------------------------
 
-  handleKey(_cm: CodeMirror.Editor, key: string, _evt: KeyboardEvent) {
+  handleKey(_cm: CodeMirror.Editor, key: string, _evt: Event) {
     switch (key) {
       case 'Esc':
         this.props.buffer?.setFocused(false);

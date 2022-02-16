@@ -38,24 +38,21 @@ import { ModelCallbacks } from './cells';
 
 const Ka = 'A'.charCodeAt(0);
 const Kz = 'Z'.charCodeAt(0);
-const LabelRing: string[] = [];
 const LabelSize = 12;
 let La = Ka;
 let Lk = 0;
 
-function newLabel() {
-  let lbl = LabelRing.shift();
-  if (lbl) return lbl;
+function newLabel(): string {
   const a = La;
   const k = Lk;
-  lbl = String.fromCharCode(a);
+  const lbl = String.fromCharCode(a);
   if (a < Kz) {
     La++;
   } else {
     La = Ka;
     Lk++;
   }
-  return k > 0 ? lbl + k : lbl;
+  return k > 0 ? `${lbl}${k}` : lbl;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -78,8 +75,7 @@ export class Probe {
   rank?: number;
   minCols: number = LabelSize;
   maxCols: number = LabelSize;
-  byCallstacks = false;
-  zoomed = false;
+  zoomed = true;
   zoomable = false;
   effects = false;
   condition = false;
@@ -91,7 +87,7 @@ export class Probe {
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
   }
 
-  requestProbeInfo() {
+  requestProbeInfo(): void {
     this.loading = true;
     this.label = '…';
     Server
@@ -104,7 +100,10 @@ export class Probe {
         this.effects = effects;
         this.condition = condition;
         this.loading = false;
-        this.updateLabel();
+        if (code && code.length > LabelSize)
+          this.label = newLabel();
+        else
+          this.label = code;
       })
       .catch(() => {
         this.code = '(error)';
@@ -122,36 +121,17 @@ export class Probe {
   // --- Internal State
   // --------------------------------------------------------------------------
 
-  setPersistent() { this.updateTransient(false); }
-  setTransient() { this.updateTransient(true); }
+  setPersistent(): void { this.updateTransient(false); }
+  setTransient(): void { this.updateTransient(true); }
 
-  private updateLabel() {
-    const { transient, label, code } = this;
-    if (transient && label) {
-      LabelRing.push(label);
-      this.label = undefined;
-    }
-    if (!transient && !label && code && code.length > LabelSize)
-      this.label = newLabel();
-  }
-
-  private updateTransient(tr: boolean) {
+  private updateTransient(tr: boolean): void {
     if (this.transient !== tr) {
       this.transient = tr;
-      this.updateLabel();
       this.model.forceLayout();
     }
   }
 
-  setByCallstacks(byCS: boolean) {
-    if (byCS !== this.byCallstacks) {
-      this.byCallstacks = byCS;
-      if (byCS) this.setPersistent();
-      this.model.forceLayout();
-    }
-  }
-
-  setZoomed(zoomed: boolean) {
+  setZoomed(zoomed: boolean): void {
     if (zoomed !== this.zoomed) {
       this.zoomed = zoomed;
       this.model.forceLayout();

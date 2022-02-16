@@ -1,4 +1,4 @@
 /* run.config
-   OPT: tests/cil/merge.c -print
+   STDOPT: +"%{dep:@PTEST_DIR@/merge.c}"
  */
 int x =2;

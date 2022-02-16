@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -112,20 +112,20 @@
 #ifdef E_ACSL_DEBUG
 #  define DVALIDATE_ALIGNMENT(_addr)                                           \
     DVASSERT(((uintptr_t)_addr) % HEAP_SEGMENT == 0,                           \
-             "Heap base address %a is unaligned", _addr)
+             "Heap base address %a is unaligned\n", _addr)
 
 #  define DVALIDATE_MEMORY_PRE_MAIN_INIT                                       \
     DVASSERT(mem_layout.is_initialized_pre_main != 0,                          \
-             "Un-initialized pre-main shadow layout", NULL)
+             "Un-initialized pre-main shadow layout\n", NULL)
 
 #  define DVALIDATE_MEMORY_MAIN_INIT                                           \
     DVASSERT(mem_layout.is_initialized_main != 0,                              \
-             "Un-initialized main shadow layout", NULL)
+             "Un-initialized main shadow layout\n", NULL)
 
 #  define DVALIDATE_MEMORY_INIT                                                \
     DVASSERT(mem_layout.is_initialized_pre_main != 0                           \
                  && mem_layout.is_initialized_main != 0,                       \
-             "Un-initialized shadow layout", NULL)
+             "Un-initialized shadow layout\n", NULL)
 
 /* Debug function making sure that the order of program segments is as expected
  * and that the program and the shadow segments used do not overlap. */
@@ -138,9 +138,9 @@ void validate_shadow_layout();
 /* Assert that boundaries of a block [_addr, _addr+_size] are within a segment
  * given by `_s`. `_s` is either HEAP, STACK, TLS, GLOBAL or STATIC. */
 #  define DVALIDATE_IS_ON(_addr, _size, _s)                                    \
-    DVASSERT(IS_ON_##_s(_addr), "Address %a not on %s", _addr, #_s);           \
-    DVASSERT(IS_ON_##_s(_addr + _size), "Address %a not on %s", _addr + _size, \
-             #_s)
+    DVASSERT(IS_ON_##_s(_addr), "Address %a not on %s\n", _addr, #_s);         \
+    DVASSERT(IS_ON_##_s(_addr + _size), "Address %a not on %s\n",              \
+             _addr + _size, #_s)
 
 /* Assert that [_addr, _addr+_size] are within heap segment */
 #  define DVALIDATE_IS_ON_HEAP(_addr, _size) DVALIDATE_IS_ON(_addr, _size, HEAP)
@@ -401,11 +401,19 @@ void static_store_temporal_referent(uintptr_t addr, uint32_t ref);
 #endif /*}}} E_ACSL_TEMPORAL*/
 /* }}} */
 
-/* Static initialization {{{ */
-/*! \brief The following function marks n bytes starting from the address
- * given by addr as initialized. `size` equating to zero indicates that the
- * whole block should be marked as initialized.  */
+/* Initialization {{{ */
+
+/*! \brief Unsafe version of `eacsl_initialize()` that does not lock the memory
+    model. */
+void unsafe_initialize(void *ptr, size_t n);
+
+/*! \brief The following function marks n bytes on a static region starting from
+ * the address given by addr as initialized. `size` equating to zero indicates
+ * that the whole block should be marked as initialized.  */
 void initialize_static_region(uintptr_t addr, long size);
+
+/*! \brief Mark n bytes on the heap starting from address addr as initialized */
+void initialize_heap_region(uintptr_t addr, long len);
 /* }}} */
 
 /* Read-only {{{ */
@@ -418,6 +426,27 @@ void mark_readonly_region(uintptr_t addr, long size);
 /* }}} */
 
 /* Heap allocation {{{ (malloc/calloc) */
+
+/*! \brief Unsafe version of `malloc()` that does not lock the memory model. */
+void *unsafe_malloc(size_t size);
+
+/*! \brief Unsafe version of `calloc()` that does not lock the memory model. */
+void *unsafe_calloc(size_t nbr_elt, size_t size_elt);
+
+/*! \brief Unsafe version of `realloc()` that does not lock the memory model. */
+void *unsafe_realloc(void *ptr, size_t size);
+
+/*! \brief Unsafe version of `free()` that does not lock the memory model. */
+void unsafe_free(void *ptr);
+
+/*! \brief Unsafe version of `aligned_alloc()` that does not lock the memory
+    model. */
+void *unsafe_aligned_alloc(size_t alignment, size_t size);
+
+/*! \brief Unsafe version of `posix_memalign()` that does not lock the memory
+    model. */
+int unsafe_posix_memalign(void **memptr, size_t alignment, size_t size);
+
 /** \brief Return shadowed copy of a memory chunk on a program's heap using.
  * If `init` parameter is set to a non-zero value the memory occupied by the
  * resulting block is set to be initialized and uninitialized otherwise. */
@@ -443,13 +472,16 @@ void *shadow_copy(const void *ptr, size_t size, int init);
  * only legal if both `p` and `p+i` point to the same block. */
 int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr);
 
-/*! \brief  Return a non-zero value if a given address is a base address of a
+/*! \brief Unsafe version of `eacsl_freeable()` that does not lock the memory
+ * model.
+ *
+ * Return a non-zero value if a given address is a base address of a
  * heap-allocated memory block that `addr` belongs to.
  *
  * As some of the other functions, \b \\freeable can be expressed using
  * ::IS_ON_HEAP, ::heap_allocated and ::_base_addr. Here direct
  * implementation is preferred for performance reasons. */
-int eacsl_freeable(void *ptr);
+int unsafe_freeable(void *ptr);
 
 /*! \brief Querying information about a specific heap memory address.
  * This function is similar to ::static_info except it returns data
@@ -474,16 +506,11 @@ uint32_t heap_temporal_info(uintptr_t addr, int origin);
 void heap_store_temporal_referent(uintptr_t addr, uint32_t ref);
 #endif /*}}} E_ACSL_TEMPORAL*/
 
-/* Heap initialization {{{ */
-/*! \brief Mark n bytes on the heap starting from address addr as initialized */
-void initialize_heap_region(uintptr_t addr, long len);
-/* }}} */
-
 /* Internal state print (debug mode) {{{ */
 #ifdef E_ACSL_DEBUG
 /* ! \brief Print human-readable representation of a byte in a primary
  * shadow */
-void printbyte(unsigned char c, char buf[]);
+void printbyte(unsigned char c, char buf[], size_t bufsize);
 
 /*! \brief Print human-readable (well, ish) representation of a memory block
  * using primary and secondary shadows. */

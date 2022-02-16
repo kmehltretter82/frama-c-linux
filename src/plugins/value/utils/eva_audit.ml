@@ -26,7 +26,7 @@ let get_correctness_parameters () =
     let value = Typed_parameter.get_value param in
     (name, value)
   in
-  List.map get (Value_parameters.parameters_correctness)
+  List.map get (Parameters.parameters_correctness)
 
 let parameters_of_json json =
   try
@@ -45,8 +45,8 @@ let parameters_of_json json =
 let print_correctness_parameters path =
   let parameters = get_correctness_parameters () in
   if Filepath.Normalized.is_special_stdout path then begin
-    Value_parameters.feedback "Correctness parameters of the analysis:";
-    let print (name, value) = Value_parameters.printf "  %s: %s" name value in
+    Self.feedback "Correctness parameters of the analysis:";
+    let print (name, value) = Self.printf "  %s: %s" name value in
     List.iter print parameters
   end else begin
     let json = List.map (fun (name, value) -> name, `String value) parameters in
@@ -106,10 +106,10 @@ let print_warning_status path name (module Plugin: Log.Messages) =
       let pp_categories =
         Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string
       in
-      Value_parameters.feedback "Audit: %s warning categories:" name;
-      Value_parameters.printf "  Enabled: @[%a@]"
+      Self.feedback "Audit: %s warning categories:" name;
+      Self.printf "  Enabled: @[%a@]"
         pp_categories (List.map fst enabled);
-      Value_parameters.printf "  Disabled: @[%a@]"
+      Self.printf "  Disabled: @[%a@]"
         pp_categories (List.map fst disabled)
     end
   else begin
@@ -139,7 +139,7 @@ let check_configuration path =
     let json = Json.from_file path in
     check_correctness_parameters json;
     check_warning_status json "Kernel" (module Kernel);
-    check_warning_status json "Eva" (module Value_parameters)
+    check_warning_status json "Eva" (module Self)
   with Yojson.Json_error msg ->
     Kernel.abort "error reading JSON file %a: %s"
       Filepath.Normalized.pretty path msg
@@ -148,9 +148,9 @@ let print_configuration path =
   try
     print_correctness_parameters path;
     print_warning_status path "Kernel" (module Kernel);
-    print_warning_status path "Eva" (module Value_parameters);
+    print_warning_status path "Eva" (module Self);
     if not (Filepath.Normalized.is_special_stdout path) then
-      Value_parameters.feedback "Audit: eva configuration written to: %a"
+      Self.feedback "Audit: eva configuration written to: %a"
         Filepath.Normalized.pretty path;
   with Json.CannotMerge _ ->
     Kernel.failure "%s: error when writing json file %a."

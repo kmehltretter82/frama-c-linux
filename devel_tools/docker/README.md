@@ -14,8 +14,8 @@ Frama-C versions. For each version, there are three images: one
 for the command-line version `frama-c`; a stripped-down version of the former,
 for a slimmer image, but which does not allow recompilation of Frama-C
 or of any external plugin; and a third image including the graphical
-interface (`frama-c-gui`), to be used with Singularity or other tools enabling
-graphical interfaces from within a Docker image.
+interface (`frama-c-gui`), to be used with Singularity, x11docker, or any other
+tool which enables running a graphical application from a Docker image.
 
 Run `make` to get a list of targets.
 
@@ -28,6 +28,14 @@ the Docker Hub.
 Some commands in this section are those used by the above Makefile;
 others allow creating different images (e.g. with the Frama-C sources)
 which are not directly available as Makefile targets.
+
+Note: a Dockerfile is needed for the commands below.
+      For most versions, running `make Dockerfile.dev` and then using it
+      (adding `-f Dockerfile.dev` to the commands below) is enough.
+      However, if specific build commands or dependencies are needed,
+      you can copy the generated Dockerfile
+      (e.g. `cp Dockerfile.dev Dockerfile`) and adapt it as needed,
+      before running one of the commands below.
 
 - Build slim development image (from public Git master branch):
 

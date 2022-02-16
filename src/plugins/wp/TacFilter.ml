@@ -36,7 +36,7 @@ class filter =
   object(self)
     inherit Tactical.make ~id:"Wp.filter"
         ~title:"Filter"
-        ~descr:"Erase Hypotheses"
+        ~descr:"Dependent Erasure of Hypotheses"
         ~params:[panti]
 
     method select feedback _sel =

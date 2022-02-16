@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/loop_test.i (no preprocessing)
+[kernel] Parsing loop_test.i (no preprocessing)
 [eva] Analyzing a complete application starting at test_cent_onzes
 [eva] Computing initial state
 [eva] Initial state computed
@@ -24,53 +24,53 @@
   c8 ∈ {0}
   c9 ∈ {0}
 [eva] computing for function cent_onze_0 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:101.
-[eva] tests/value/loop_test.i:57: starting to merge loop iterations
+  Called from loop_test.i:101.
+[eva] loop_test.i:57: starting to merge loop iterations
 [eva] Recording results for cent_onze_0
 [eva] Done for function cent_onze_0
 [eva] computing for function cent_onze_1 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:102.
-[eva] tests/value/loop_test.i:60: starting to merge loop iterations
+  Called from loop_test.i:102.
+[eva] loop_test.i:60: starting to merge loop iterations
 [eva] Recording results for cent_onze_1
 [eva] Done for function cent_onze_1
 [eva] computing for function cent_onze_2 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:103.
-[eva] tests/value/loop_test.i:64: starting to merge loop iterations
+  Called from loop_test.i:103.
+[eva] loop_test.i:64: starting to merge loop iterations
 [eva] Recording results for cent_onze_2
 [eva] Done for function cent_onze_2
 [eva] computing for function cent_onze_3 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:104.
-[eva] tests/value/loop_test.i:68: starting to merge loop iterations
+  Called from loop_test.i:104.
+[eva] loop_test.i:68: starting to merge loop iterations
 [eva] Recording results for cent_onze_3
 [eva] Done for function cent_onze_3
 [eva] computing for function cent_onze_4 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:105.
-[eva] tests/value/loop_test.i:72: starting to merge loop iterations
+  Called from loop_test.i:105.
+[eva] loop_test.i:72: starting to merge loop iterations
 [eva] Recording results for cent_onze_4
 [eva] Done for function cent_onze_4
 [eva] computing for function cent_onze_5 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:106.
-[eva] tests/value/loop_test.i:77: starting to merge loop iterations
+  Called from loop_test.i:106.
+[eva] loop_test.i:77: starting to merge loop iterations
 [eva] Recording results for cent_onze_5
 [eva] Done for function cent_onze_5
 [eva] computing for function cent_onze_6 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:107.
-[eva] tests/value/loop_test.i:80: starting to merge loop iterations
+  Called from loop_test.i:107.
+[eva] loop_test.i:80: starting to merge loop iterations
 [eva] Recording results for cent_onze_6
 [eva] Done for function cent_onze_6
 [eva] computing for function cent_onze_7 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:108.
-[eva] tests/value/loop_test.i:84: starting to merge loop iterations
+  Called from loop_test.i:108.
+[eva] loop_test.i:84: starting to merge loop iterations
 [eva] Recording results for cent_onze_7
 [eva] Done for function cent_onze_7
 [eva] computing for function cent_onze_8 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:109.
-[eva] tests/value/loop_test.i:88: starting to merge loop iterations
+  Called from loop_test.i:109.
+[eva] loop_test.i:88: starting to merge loop iterations
 [eva] Recording results for cent_onze_8
 [eva] Done for function cent_onze_8
 [eva] computing for function cent_onze_9 <- test_cent_onzes.
-  Called from tests/value/loop_test.i:110.
-[eva] tests/value/loop_test.i:92: starting to merge loop iterations
+  Called from loop_test.i:110.
+[eva] loop_test.i:92: starting to merge loop iterations
 [eva] Recording results for cent_onze_9
 [eva] Done for function cent_onze_9
 [eva] Recording results for test_cent_onzes

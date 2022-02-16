@@ -1,9 +1,11 @@
 /* run.config
-   EXECNOW: LOG isset_sav.res LOG isset_sav.err BIN isset.sav @frama-c@ -quiet -eva @EVA_OPTIONS@ -save tests/saveload/result/isset.sav tests/saveload/isset.c > ./tests/saveload/result/isset_sav.res 2> ./tests/saveload/result/isset_sav.err
-   STDOPT: +"-quiet -load ./tests/saveload/result/isset.sav"
-   STDOPT: +"-load ./tests/saveload/result/isset.sav"
-   STDOPT: +"-eva @EVA_OPTIONS@ -load ./tests/saveload/result/isset.sav"
-   STDOPT: +"-quiet -eva @EVA_OPTIONS@ -load ./tests/saveload/result/isset.sav"
+ COMMENT: the following CMD redefinition omits adding @PTEST_FILE@ on purpose (due to -load)
+ CMD: @frama-c@ @PTEST_OPTIONS@
+   EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -quiet -eva @EVA_OPTIONS@ -save @PTEST_NAME@.sav @PTEST_FILE@ > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
+   STDOPT: +"-quiet -load %{dep:@PTEST_NAME@.sav}"
+   STDOPT: +"-load %{dep:@PTEST_NAME@.sav}"
+   STDOPT: +"-eva @EVA_OPTIONS@ -load %{dep:@PTEST_NAME@.sav}"
+   STDOPT: +"-quiet -eva @EVA_OPTIONS@ -load %{dep:@PTEST_NAME@.sav}"
 */
 
 int main() {

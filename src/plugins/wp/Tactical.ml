@@ -79,6 +79,7 @@ type selection =
   | Clause of clause
   | Inside of clause * term
   | Compose of compose
+  | Multi of selection list
 
 and compose =
   | Cint of Integer.t
@@ -105,6 +106,7 @@ let selected = function
   | Inside(_,t) -> t
   | Clause c -> e_prop (head c)
   | Compose code -> composed code
+  | Multi _s -> e_true (* For now, do not provide this *)
 
 let get_int_z z =
   try Some (Integer.to_int_exn z) with Z.Overflow -> None
@@ -141,11 +143,15 @@ let rec pp_selection fmt = function
       Format.fprintf fmt "Term %d in %a" (Lang.F.QED.id t) pp_clause c
   | Clause c -> pp_clause fmt c
   | Compose(Cint k) ->
-      Format.fprintf fmt "Constant '%a'" (Integer.pretty ~hexa:false) k
+      Format.fprintf fmt "Constant '%a'" Integer.pretty k
   | Compose(Range(a,b)) ->
       Format.fprintf fmt "Range '%d..%d'" a b
   | Compose(Code(_,id,es)) ->
       Format.fprintf fmt "@[<hov 2>Compose '%s'" id ;
+      List.iter (fun e -> Format.fprintf fmt "(%a)" pp_selection e) es ;
+      Format.fprintf fmt "@]"
+  | Multi es ->
+      Format.fprintf fmt "@[<hov 2>Multi-selection" ;
       List.iter (fun e -> Format.fprintf fmt "(%a)" pp_selection e) es ;
       Format.fprintf fmt "@]"
 
@@ -161,6 +167,8 @@ let compose id es =
     | _ -> Compose(Code(e,id,es))
   with Not_found -> Empty
 
+let multi es = Multi es
+
 let findhead (s:selection) e =
   match s with
   | Empty -> None
@@ -172,6 +180,7 @@ let findhead (s:selection) e =
       else None
   | Compose(Code(v,_,_)) as s ->
       if v == e then Some s else None
+  | Multi _ -> None
 
 let rec lookup (s:selection) e q =
   match findhead s e with
@@ -334,7 +343,7 @@ class type feedback =
 (* -------------------------------------------------------------------------- *)
 
 let at = function
-  | Empty | Clause (Goal _) | Inside(Goal _,_) | Compose _ -> None
+  | Empty | Clause (Goal _) | Inside(Goal _,_) | Compose _ | Multi _ -> None
   | Clause (Step s) | Inside(Step s,_) -> Some s.id
 
 let mapi f cases =
@@ -356,6 +365,19 @@ let replace ~at cases sequent =
        let step = Conditions.(step ~descr cond) in
        descr , Conditions.replace ~at step sequent)
     cases
+
+let replace_single ~at (descr,cond) sequent =
+  let step = Conditions.(step ~descr cond) in
+  descr , Conditions.replace ~at step sequent
+
+let replace_step ~at conditions sequent =
+  let step =
+    let s = Conditions.step_at (fst sequent) at in
+    (* keep original infos *)
+    Conditions.step ?descr:s.descr ?stmt:s.stmt ~deps:s.deps ~warn:s.warn
+  in
+  let conditions = List.map step conditions in
+  [ "Split conj", Conditions.replace_by_step_list ~at conditions sequent ]
 
 let split cases sequent =
   let hyps = fst sequent in

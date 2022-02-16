@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Info Components
 // --------------------------------------------------------------------------
@@ -31,11 +33,11 @@ import { Hpack, Vpack } from 'dome/layout/boxes';
 import { Code, Cell } from 'dome/controls/labels';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/api/kernel/ast';
+import { ModelProp } from 'frama-c/plugins/eva/model';
 
 // Locals
 import { EvaAlarm } from './cells';
 import { Callsite } from './stacks';
-import { useModel } from './model';
 
 // --------------------------------------------------------------------------
 // --- Stmt Printer
@@ -48,9 +50,10 @@ interface StmtProps {
 }
 
 export function Stmt(props: StmtProps) {
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+
   const { stmt, marker, short } = props;
   if (!stmt) return null;
-  const markersInfo = States.useSyncArray(Ast.markerInfo);
   const line = markersInfo.getData(marker)?.sloc?.line;
   const filename = markersInfo.getData(marker)?.sloc?.base;
   const title = markersInfo.getData(stmt)?.descr;
@@ -66,13 +69,13 @@ export function Stmt(props: StmtProps) {
 // --- Alarms Panel
 // --------------------------------------------------------------------------
 
-export function AlarmsInfos() {
-  const model = useModel();
+export function AlarmsInfos(props: ModelProp) {
+  const { model } = props;
   const probe = model.getFocused();
   if (probe) {
     const callstack = model.getCallstack();
     const domain = model.values.getValues(probe, callstack);
-    const alarms = domain?.alarms ?? [];
+    const alarms = domain?.vBefore.alarms ?? [];
     if (alarms.length > 0) {
       const renderAlarm = ([status, alarm]: EvaAlarm) => {
         const className = `eva-alarm-info eva-alarm-${status}`;
@@ -94,8 +97,8 @@ export function AlarmsInfos() {
 // --- Stack Panel
 // --------------------------------------------------------------------------
 
-export function StackInfos() {
-  const model = useModel();
+export function StackInfos(props: ModelProp) {
+  const { model } = props;
   const [, setSelection] = States.useSelection();
   const focused = model.getFocused();
   const callstack = model.getCalls();

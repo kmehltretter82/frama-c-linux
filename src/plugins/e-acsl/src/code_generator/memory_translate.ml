@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+module Error = Translation_error
 
 (**************************************************************************)
 (********************** Forward references ********************************)
@@ -143,10 +144,12 @@ let call ~adata ~loc kf name ctx env t =
   assert (name = "base_addr" || name = "block_length"
           || name = "offset" || name ="freeable");
   let (e, adata), env =
-    Env.with_rte_and_result env true
+    Env.with_params_and_result
+      ~rte:true
       ~f:(fun env ->
           let e, adata, env = !term_to_exp_ref ~adata kf env t in
           (e, adata), env)
+      env
   in
   let e, env =
     Env.rtl_call_to_new_var
@@ -198,7 +201,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   in
   (* s *)
   let ty = match Cil.unrollType (Misc.cty ptr.term_type) with
-    | TPtr(ty, _) | TArray(ty, _, _, _) -> ty
+    | TPtr(ty, _) | TArray(ty, _, _) -> ty
     | _ -> assert false
   in
   let s = Logic_const.term ~loc (TSizeOf ty) Linteger in
@@ -212,12 +215,18 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
           Logic_const.term ~loc (TBinOp(Mult, s, n1)) Linteger))
       (Ctype typ_charptr)
   in
-  Typing.type_term ~use_gmp_opt:false ~ctx:Typing.nan ptr;
+  Typing.type_term
+    ~use_gmp_opt:false
+    ~ctx:Typing.nan
+    ~lenv:(Env.Local_vars.get env)
+    ptr;
   let (ptr, adata), env =
-    Env.with_rte_and_result env true
+    Env.with_params_and_result
+      ~rte:true
       ~f:(fun env ->
           let e, adata, env = !term_to_exp_ref ~adata kf env ptr in
           (e, adata), env)
+      env
   in
   (* size *)
   let size_term =
@@ -260,9 +269,10 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     in
     Logic_const.term ~loc (Tlet (size_term_info, size_term_if)) Linteger
   in
-  Typing.type_term ~use_gmp_opt:false size_term;
+  let lenv = Env.Local_vars.get env in
+  Typing.type_term ~use_gmp_opt:false ~lenv size_term;
   let size, adata, env =
-    match Typing.get_number_ty size_term  ~lenv:(Env.Local_vars.get env) with
+    match Typing.get_number_ty size_term  ~lenv with
     | Typing.Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)
@@ -290,17 +300,18 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
    [p] is the predicate under test. *)
 let term_to_ptr_and_size ~adata ~loc kf env t =
   let (e, adata), env =
-    Env.with_rte_and_result env true
+    Env.with_params_and_result
+      ~rte:true
       ~f:(fun env ->
           let e, adata, env = !term_to_exp_ref ~adata kf env t in
           (e, adata), env)
+      env
   in
   let ty = Misc.cty t.term_type in
   let sizeof = Smart_exp.ptr_sizeof ~loc ty in
   let adata, env =
     Assert.register
       ~loc:t.term_loc
-      kf
       env
       (Format.asprintf "%a" Printer.pp_exp sizeof)
       sizeof
@@ -481,7 +492,7 @@ let call_with_tset
              if Misc.is_bitfield_pointers t.term_type then
                Error.not_yet "bitfield pointer";
              match t.term_node with
-             | TBinOp((PlusPI | IndexPI),
+             | TBinOp(PlusPI,
                       ptr,
                       ({ term_node = Trange _ } as r)) ->
                if Misc.is_set_of_ptr_or_array ptr.term_type then

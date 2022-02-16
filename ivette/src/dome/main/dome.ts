@@ -20,6 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-console */
+
 /**
    ## Dome Application (Main Process)
 
@@ -45,6 +48,7 @@ import {
   BrowserWindowConstructorOptions,
   IpcMainEvent,
   shell,
+  dialog,
 } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
 import SYS, * as System from 'dome/system';
@@ -125,7 +129,7 @@ function saveGlobalSettings() {
 }
 
 function obtainGlobalSettings() {
-  if (!GlobalSettings) {
+  if (_.isEmpty(GlobalSettings)) {
     GlobalSettings = loadSettings(PATH_GLOBAL_SETTINGS);
   }
   return GlobalSettings;
@@ -135,7 +139,7 @@ function obtainGlobalSettings() {
 // --- Window Settings & Frames
 // --------------------------------------------------------------------------
 
-type Store = { [key: string]: any };
+type Store = { [key: string]: unknown };
 
 interface Handle {
   window: BrowserWindow; // Also prevents Gc
@@ -174,9 +178,9 @@ ipcMain.on('dome.ipc.settings.sync', windowSyncSettings);
 // --- Patching Settings
 // --------------------------------------------------------------------------
 
-type patch = { key: string; value: any };
+type Patch = { key: string; value: unknown };
 
-function applyPatches(data: Store, args: patch[]) {
+function applyPatches(data: Store, args: Patch[]) {
   args.forEach(({ key, value }) => {
     if (value === null) {
       delete data[key];
@@ -186,7 +190,7 @@ function applyPatches(data: Store, args: patch[]) {
   });
 }
 
-function applyWindowSettings(event: IpcMainEvent, args: patch[]) {
+function applyWindowSettings(event: IpcMainEvent, args: Patch[]) {
   const handle = WindowHandles.get(event.sender.id);
   if (handle) {
     applyPatches(handle.settings, args);
@@ -194,7 +198,7 @@ function applyWindowSettings(event: IpcMainEvent, args: patch[]) {
   }
 }
 
-function applyStorageSettings(event: IpcMainEvent, args: patch[]) {
+function applyStorageSettings(event: IpcMainEvent, args: Patch[]) {
   const handle = WindowHandles.get(event.sender.id);
   if (handle) {
     applyPatches(handle.storage, args);
@@ -202,7 +206,7 @@ function applyStorageSettings(event: IpcMainEvent, args: patch[]) {
   }
 }
 
-function applyGlobalSettings(event: IpcMainEvent, args: patch[]) {
+function applyGlobalSettings(event: IpcMainEvent, args: Patch[]) {
   applyPatches(obtainGlobalSettings(), args);
   BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
     const contents = w.webContents;
@@ -221,7 +225,7 @@ ipcMain.on('dome.ipc.settings.storage', applyStorageSettings);
 // --- Renderer-Process Communication
 // --------------------------------------------------------------------------
 
-function broadcast(event: string, ...args: any[]) {
+function broadcast(event: string, ...args: unknown[]) {
   BrowserWindow.getAllWindows().forEach((w) => {
     w.webContents.send(event, ...args);
   });
@@ -274,7 +278,7 @@ function getURL() {
   return `file://${__dirname}/index.html`;
 }
 
-function navigateURL(sender: Electron.webContents) {
+function navigateURL(sender: Electron.WebContents) {
   return (event: Electron.Event, url: string) => {
     event.preventDefault();
     const href = new URL(url);
@@ -328,6 +332,7 @@ function createBrowserWindow(
     backgroundColor: '#f0f0f0',
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
       additionalArguments: [browserArguments],
     },
     ...config,
@@ -338,7 +343,7 @@ function createBrowserWindow(
 
   const { frame, devtools, settings = {}, storage = {} } = configData;
   if (frame) {
-    const getInt = (v: any) => v && _.toSafeInteger(v);
+    const getInt = <A>(v: A) => v && _.toSafeInteger(v);
     options.x = getInt(frame.x);
     options.y = getInt(frame.y);
     options.width = getInt(frame.width);
@@ -521,6 +526,15 @@ function restoreDefaultSettings() {
 
 ipcMain.on('dome.menu.settings', showSettingsWindow);
 ipcMain.on('dome.menu.defaults', restoreDefaultSettings);
+ipcMain.on('dome.app.paths', (event) => {
+  event.returnValue = {
+    'home': app.getPath('home'),
+    'desktop': app.getPath('desktop'),
+    'documents': app.getPath('documents'),
+    'downloads': app.getPath('downloads'),
+    'temp': app.getPath('temp'),
+  };
+});
 
 // --------------------------------------------------------------------------
 // --- Main Application Starter
@@ -584,5 +598,24 @@ export function setMenuItem(spec: Menubar.CustomMenuItem) {
 ipcMain.on('dome.ipc.menu.addmenu', (_evt, label) => addMenu(label));
 ipcMain.on('dome.ipc.menu.addmenuitem', (_evt, spec) => addMenuItem(spec));
 ipcMain.on('dome.ipc.menu.setmenuitem', (_evt, spec) => setMenuItem(spec));
+
+// --------------------------------------------------------------------------
+// --- Dialogs Management
+// --------------------------------------------------------------------------
+
+ipcMain.handle(
+  'dome.dialog.showMessageBox',
+  (_evt, props) => dialog.showMessageBox(props),
+);
+
+ipcMain.handle(
+  'dome.dialog.showOpenDialog',
+  (_evt, props) => dialog.showOpenDialog(props),
+);
+
+ipcMain.handle(
+  'dome.dialog.showSaveDialog',
+  (_evt, props) => dialog.showSaveDialog(props),
+);
 
 // --------------------------------------------------------------------------

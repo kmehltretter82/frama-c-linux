@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -32,7 +32,7 @@
 /* Assert that a memory block [_addr, _addr + _size] is nullified */
 #  define DVALIDATE_NULLIFIED(_addr, _size)                                    \
     DVASSERT(zeroed_out((void *)_addr, _size),                                 \
-             "Block [%a, %a+%lu] not nullified", _addr, _addr, _size)
+             "Block [%a, %a+%lu] not nullified\n", _addr, _addr, _size)
 
 /* Assert that memory block [_addr, _addr + _size] is allocated */
 #  define DVALIDATE_ALLOCATED(_addr, _size, _base)                             \

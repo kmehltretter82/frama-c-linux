@@ -26,6 +26,7 @@
 */
 
 /* eslint-disable max-len */
+/* eslint-disable no-console */
 
 // --------------------------------------------------------------------------
 // --- Evolved Spawn Process
@@ -36,9 +37,6 @@ import Emitter from 'events';
 import Exec from 'child_process';
 import fspath from 'path';
 import fs from 'fs';
-import { app, remote } from 'electron';
-
-declare const __static: string;
 
 // --------------------------------------------------------------------------
 // --- Platform Specificities
@@ -101,12 +99,12 @@ const exitJobs: Callback[] = [];
 
    Exceptions thrown by the function are captured and reported on the console.
  */
-export function atExit(callback: Callback) {
+export function atExit(callback: Callback): void {
   exitJobs.push(callback);
 }
 
 /** Execute all pending exit jobs (and flush the list). */
-export function doExit() {
+export function doExit(): void {
   exitJobs.forEach((fn) => {
     try { fn(); }
     catch (err) { console.error('[Dome] atExit:', err); }
@@ -121,31 +119,10 @@ export function doExit() {
 let COMMAND_WDIR = '.';
 let COMMAND_ARGV: string[] = [];
 
-function SET_COMMAND(argv: string[], wdir: string) {
+function setCommandLine(argv: string[], wdir: string): void {
   COMMAND_ARGV = argv;
   COMMAND_WDIR = wdir;
 }
-
-// --------------------------------------------------------------------------
-// --- User's Directories
-// --------------------------------------------------------------------------
-
-const appProxy = app || remote.app;
-
-/** Returns user's home directory. */
-export function getHome() { return appProxy.getPath('home'); }
-
-/** Returns user's desktop directory. */
-export function getDesktop() { return appProxy.getPath('desktop'); }
-
-/** Returns user's documents directory. */
-export function getDocuments() { return appProxy.getPath('documents'); }
-
-/** Returns user's downloads directory. */
-export function getDownloads() { return appProxy.getPath('downloads'); }
-
-/** Returns temporary directory. */
-export function getTempDir() { return appProxy.getPath('temp'); }
 
 /**
    Working directory (Application Window).
@@ -158,12 +135,12 @@ export function getTempDir() { return appProxy.getPath('temp'); }
 
    See also [[dome.onCommand]]
 */
-export function getWorkingDir() { return COMMAND_WDIR; }
+export function getWorkingDir(): string { return COMMAND_WDIR; }
 
 /**
    Returns the current process ID.
  */
-export function getPID() { return process.pid; }
+export function getPID(): number { return process.pid; }
 
 /**
    Command-line arguments (Application Window).
@@ -175,18 +152,7 @@ export function getPID() { return process.pid; }
 
    See also [[dome.onCommand]]
 */
-export function getArguments() { return COMMAND_ARGV; }
-
-/** Returns path of static assets.
-
-    Returns the path to the associated `./static/<...path>` of your
-    application. The `./static/` directory is automatically packed
-    into your application by Dome thanks to `electron-webpack` default
-    configuration.
-*/
-export function getStatic(...path: string[]) {
-  return fspath.join(__static, ...path);
-}
+export function getArguments(): string[] { return COMMAND_ARGV; }
 
 // --------------------------------------------------------------------------
 // --- File Join
@@ -267,9 +233,9 @@ export function fileStat(path: string): Promise<fs.Stats> {
    Checks if a path exists and is a regular file
    (Synchronous check).
 */
-export function isFile(path: string) {
+export function isFile(path: string): boolean {
   try {
-    return path && fs.statSync(path).isFile();
+    return !!path && fs.statSync(path).isFile();
   } catch (_err) {
     return false;
   }
@@ -279,9 +245,9 @@ export function isFile(path: string) {
    Checks if a path exists and is a directory
    (Synchronous check).
 */
-export function isDirectory(path: string) {
+export function isDirectory(path: string): boolean {
   try {
-    return path && fs.statSync(path).isDirectory();
+    return !!path && fs.statSync(path).isDirectory();
   } catch (_err) {
     return false;
   }
@@ -291,7 +257,7 @@ export function isDirectory(path: string) {
    Checks if a path exists and is a file or directory
    (Synchronous check).
 */
-export function exists(path: string) {
+export function exists(path: string): boolean {
   try {
     if (!path) return false;
     const stats = fs.statSync(path);
@@ -308,14 +274,10 @@ export function exists(path: string) {
 /**
    Reads a textual file contents.
 
-   Promisified
-   [Node `fs.readFile`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_readfile_path_options_callback)
-   using `UTF-8` encoding.
+   Promisified `fs.readFile` using `utf-8` encoding.
  */
 export function readFile(path: string): Promise<string> {
-  return new Promise((result, reject) => {
-    fs.readFile(path, 'UTF-8', (err, data) => (err ? reject(err) : result(data)));
-  });
+  return fs.promises.readFile(path, { encoding: 'utf-8' });
 }
 
 // --------------------------------------------------------------------------
@@ -325,14 +287,10 @@ export function readFile(path: string): Promise<string> {
 /**
    Writes a textual content in a file.
 
-   Promisified
-   [Node `fs.writeFile`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_writefile_file_data_options_callback)
-   using `UTF-8` encoding.
+   Promisified `fs.writeFile` using `utf-8` encoding.
  */
-export function writeFile(path: string, content: string): Promise<void> {
-  return new Promise((result, reject) => {
-    fs.writeFile(path, content, 'UTF-8', (err) => (err ? reject(err) : result()));
-  });
+export async function writeFile(path: string, content: string): Promise<void> {
+  return fs.promises.writeFile(path, content, { encoding: 'utf-8' });
 }
 
 // --------------------------------------------------------------------------
@@ -344,14 +302,10 @@ export function writeFile(path: string, content: string): Promise<void> {
    @param srcPath - the source file path
    @param tgtPath - the target file path
 
-   Promisified
-   [Node `fs.copyFile`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_copyfile_src_dest_flags_callback)
-   using `UTF-8` encoding.
+   Promisified `fs.copyFile`.
  */
-export function copyFile(srcPath: string, tgtPath: string): Promise<void> {
-  return new Promise((result, reject) => {
-    fs.copyFile(srcPath, tgtPath, (err) => (err ? reject(err) : result()));
-  });
+export async function copyFile(srcPath: string, tgtPath: string): Promise<void> {
+  return fs.promises.copyFile(srcPath, tgtPath);
 }
 
 // --------------------------------------------------------------------------
@@ -362,24 +316,15 @@ export function copyFile(srcPath: string, tgtPath: string): Promise<void> {
    Reads a directory.
    @returns directory contents (local names)
 
-   Promisified
-   [Node `fs.readdir`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_readdir_path_options_callback).
+   Promisified `fs.readdir`.
 
-   Uses `UTF-8` encoding to obtain (relative) file names instead of byte buffers. On MacOS, `.DS_Store` entries
-   are filtered out.
+   Uses `utf-8` encoding to obtain (relative) file names instead of byte buffers.
+   On MacOS, `.DS_Store` entries are filtered out.
 */
-export function readDir(path: string): Promise<string[]> {
-  const filterDir = (f: string) => f !== '.DS_Store';
-  return new Promise((result, reject) => {
-    fs.readdir(
-      path,
-      { encoding: 'UTF-8', withFileTypes: true },
-      (err: NodeJS.ErrnoException | null, files: fs.Dirent[]) => {
-        if (err) reject(err);
-        else result(files.map((fn) => fn.name).filter(filterDir));
-      },
-    );
-  });
+export async function readDir(path: string): Promise<string[]> {
+  const filterDir = (f: string): boolean => f !== '.DS_Store';
+  const entries = await fs.promises.readdir(path, { encoding: 'utf-8', withFileTypes: true });
+  return entries.map((fn) => fn.name).filter(filterDir);
 }
 
 // --------------------------------------------------------------------------
@@ -441,10 +386,11 @@ async function rmDirRec(path: string): Promise<void> {
   try {
     const stats = fs.statSync(path);
     if (stats.isFile()) {
-      return remove(path);
+      await remove(path);
+      return;
     }
     if (stats.isDirectory()) {
-      const rmDirSub = (name: string) => {
+      const rmDirSub = (name: string): void => {
         rmDirRec(fspath.join(path, name));
       };
       const entries = await readDir(path);
@@ -506,9 +452,9 @@ atExit(() => {
 export type StdPipe = { path?: string | undefined; mode?: number; pipe?: boolean };
 export type StdOptions = undefined | 'null' | 'ignore' | 'pipe' | StdPipe;
 
-type stdio = { io: number | 'pipe' | 'ignore' | 'ipc'; fd?: number };
+type StdIO = { io: number | 'pipe' | 'ignore' | 'ipc'; fd?: number };
 
-function stdSpec(spec: StdOptions, isOutput: boolean): stdio {
+function stdSpec(spec: StdOptions, isOutput: boolean): StdIO {
   switch (spec) {
     case undefined:
       return { io: isOutput ? 'pipe' : 'ignore' };
@@ -531,9 +477,9 @@ interface Readable {
   unpipe(out: fs.WriteStream): void;
 }
 
-function pipeTee(std: Readable, fd: number) {
+function pipeTee(std: Readable, fd: number): void {
   if (!fd) return;
-  const out = fs.createWriteStream('<ignored>', { fd, encoding: 'UTF-8' });
+  const out = fs.createWriteStream('<ignored>', { fd, encoding: 'utf-8' });
   out.on('error', (err) => {
     console.warn('[Dome] can not pipe:', err);
     std.unpipe(out);
@@ -627,11 +573,11 @@ export function spawn(
     const err = child.stderr;
 
     if (out && stdout.fd) {
-      out.setEncoding('UTF-8');
+      out.setEncoding('utf-8');
       pipeTee(out, stdout.fd);
     }
     if (err && stderr.fd) {
-      err.setEncoding('UTF-8');
+      err.setEncoding('utf-8');
       pipeTee(err, stderr.fd);
     }
 
@@ -651,7 +597,7 @@ const WINDOW_PREFERENCES_ARGV = '--dome-preferences-window';
 // --------------------------------------------------------------------------
 
 export default {
-  SET_COMMAND,
+  setCommandLine,
   WINDOW_APPLICATION_ARGV,
   WINDOW_PREFERENCES_ARGV,
 };

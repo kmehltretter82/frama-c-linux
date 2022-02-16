@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -36,6 +36,8 @@
 
 /*! Simple representation of a safe location */
 struct memory_location {
+  /*! Name of the safe location (for debug purposes) */
+  const char *name;
   /*! Address */
   uintptr_t address;
   /*! Byte-length */

@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_hoare/alias_escapes_hypotheses.i (no preprocessing)
+[kernel] Parsing alias_escapes_hypotheses.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -39,13 +39,13 @@ Prove: true.
   Function fp1
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_escapes_hypotheses.i, line 28) in 'fp1' (1/2):
+Goal Assigns (file alias_escapes_hypotheses.i, line 28) in 'fp1' (1/2):
 Effect at line 30
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_escapes_hypotheses.i, line 28) in 'fp1' (2/2):
+Goal Assigns (file alias_escapes_hypotheses.i, line 28) in 'fp1' (2/2):
 Effect at line 31
 Prove: true.
 
@@ -54,7 +54,7 @@ Prove: true.
   Function fp2
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_escapes_hypotheses.i, line 34) in 'fp2':
+Goal Assigns (file alias_escapes_hypotheses.i, line 34) in 'fp2':
 Effect at line 36
 Prove: true.
 
@@ -63,28 +63,28 @@ Prove: true.
   Function fp3
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_escapes_hypotheses.i, line 39) in 'fp3':
+Goal Assigns (file alias_escapes_hypotheses.i, line 39) in 'fp3':
 Effect at line 41
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_hoare/alias_escapes_hypotheses.i:13: Warning: 
+[wp] alias_escapes_hypotheses.i:13: Warning: 
   Memory model hypotheses for function 'f1':
   /*@ behavior wp_typed:
         ensures \separated(\result, &a); */
   int *f1(void);
-[wp] tests/wp_hoare/alias_escapes_hypotheses.i:24: Warning: 
+[wp] alias_escapes_hypotheses.i:24: Warning: 
   Memory model hypotheses for function 'f3':
   /*@ behavior wp_typed:
         ensures \separated(\result, &x); */
   int *f3(int x);
-[wp] tests/wp_hoare/alias_escapes_hypotheses.i:29: Warning: 
+[wp] alias_escapes_hypotheses.i:29: Warning: 
   Memory model hypotheses for function 'fp1':
   /*@ behavior wp_typed:
         requires \separated(p, &a);
         ensures \separated(p, &a); */
   void fp1(int **p);
-[wp] tests/wp_hoare/alias_escapes_hypotheses.i:40: Warning: 
+[wp] alias_escapes_hypotheses.i:40: Warning: 
   Memory model hypotheses for function 'fp3':
   /*@ behavior wp_typed:
         ensures \separated(p, &x); */

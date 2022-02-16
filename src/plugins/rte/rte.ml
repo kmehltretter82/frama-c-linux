@@ -84,7 +84,7 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
       check_array_access default off fi.ftype true
     | Index (e, off) ->
       match Cil.unrollType typ with
-      | TArray (bt, Some size, _, _) ->
+      | TArray (bt, Some size, _) ->
         if Kernel.SafeArrays.get () || not in_struct then begin
           (* Generate an assertion for this access, then go deeper in
              case other accesses exist *)
@@ -95,7 +95,7 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
              [-unsafe-arrays]. Honor the option and generate only
              the default [\valid] assertion *)
           check_array_access true off bt in_struct
-      | TArray (bt, None, _, _) -> check_array_access true off bt in_struct
+      | TArray (bt, None, _) -> check_array_access true off bt in_struct
       | _ -> assert false
   in
   match lv with
@@ -305,7 +305,8 @@ let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, r
   let size = Cil.bitsSizeOf t in
   if size <> Cil.bitsSizeOf (Cil.typeOf lexp) then
     (* size of result type should be size of left (promoted) operand *)
-    Options.warn "problem with bitsSize of %a: not treated" Printer.pp_exp exp;
+    Options.warning ~current:true ~once:true
+      "problem with bitsSize of %a: not treated" Printer.pp_exp exp;
   if op = Shiftlt then
     (* compute greatest representable "size bits" (signed) integer *)
     let maxValResult =

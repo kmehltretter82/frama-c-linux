@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
-[kernel] Parsing tests/wp_plugin/sequence.i (no preprocessing)
+[kernel] Parsing sequence.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 39 goals scheduled
@@ -25,9 +25,9 @@
 [wp] [Alt-Ergo] Goal typed_caveat_sequence_g_not_called_ensures_ok_q3 : Valid
 [wp] [Qed] Goal typed_caveat_loops_ensures_ok_first : Valid
 [wp] [Alt-Ergo] Goal typed_caveat_loops_ensures_ok_last : Valid
-[wp] [Alt-Ergo] Goal typed_caveat_loops_loop_invariant_ok_id_max_preserved : Valid
+[wp] [Qed] Goal typed_caveat_loops_loop_invariant_ok_id_max_preserved : Valid
 [wp] [Qed] Goal typed_caveat_loops_loop_invariant_ok_id_max_established : Valid
-[wp] [Alt-Ergo] Goal typed_caveat_loops_loop_invariant_ok_id_min_preserved : Valid
+[wp] [Qed] Goal typed_caveat_loops_loop_invariant_ok_id_min_preserved : Valid
 [wp] [Qed] Goal typed_caveat_loops_loop_invariant_ok_id_min_established : Valid
 [wp] [Alt-Ergo] Goal typed_caveat_loops_loop_invariant_ok_inv_preserved : Valid
 [wp] [Qed] Goal typed_caveat_loops_loop_invariant_ok_inv_established : Valid
@@ -38,16 +38,16 @@
 [wp] [Qed] Goal typed_caveat_loops_assigns_normal_part1 : Valid
 [wp] [Qed] Goal typed_caveat_loops_assigns_normal_part2 : Valid
 [wp] [Qed] Goal typed_caveat_loops_assigns_normal_part3 : Valid
-[wp] [Alt-Ergo] Goal typed_caveat_loops_g_called_ensures_ok_u1 : Valid
+[wp] [Qed] Goal typed_caveat_loops_g_called_ensures_ok_u1 : Valid
 [wp] [Qed] Goal typed_caveat_loops_g_called_ensures_ok_u2 : Valid
 [wp] [Alt-Ergo] Goal typed_caveat_loops_g_not_called_ensures_ok_v1 : Valid
 [wp] [Alt-Ergo] Goal typed_caveat_loops_g_not_called_ensures_ok_v2 : Valid
 [wp] Proved goals:   39 / 39
-  Qed:            25 
-  Alt-Ergo:       14
+  Qed:            28 
+  Alt-Ergo:       11
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   no_calls                  5        5       10       100%
   sequence                  8        2       10       100%
-  loops                    12        7       19       100%
+  loops                    15        4       19       100%
 ------------------------------------------------------------

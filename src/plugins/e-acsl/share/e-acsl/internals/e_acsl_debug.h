@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -71,7 +71,9 @@ int dlog_fd;
 #  define DASSERT(_e) private_assert(_e, TOSTRING(_e), NULL)
 
 /*! \brief Debug-time assertion based on vassert (see e_acsl_assert.h) */
-#  define DVASSERT(_expr, _fmt, ...) private_assert(_expr, _fmt, __VA_ARGS__)
+#  define DVASSERT(_expr, _fmt_and_args...) private_assert(_expr, _fmt_and_args)
+
+#  define DVABORT(_fmt_and_args...) private_abort(_fmt_and_args)
 
 /*! \brief Initialize debug report file:
  *  - open file descriptor
@@ -96,6 +98,7 @@ int debug_stop_number;
 #  define DVLOG(...)
 #  define DASSERT(_e)
 #  define DVASSERT(_expr, _fmt, ...)
+#  define DVABORT(_fmt, ...)
 #endif // E_ACSL_DEBUG
 // }}}
 

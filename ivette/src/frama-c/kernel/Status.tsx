@@ -21,48 +21,48 @@
 /* ************************************************************************ */
 
 /* --------------------------------------------------------------------------*/
-/* --- Frama-C Selection History                                          ---*/
+/* --- Frama-C Status Message                                             ---*/
 /* --------------------------------------------------------------------------*/
 
 import React from 'react';
 import { Code } from 'dome/controls/labels';
-import { LED, IconButton } from 'dome/controls/buttons';
+import { IconButton } from 'dome/controls/buttons';
+import { LED } from 'dome/controls/displays';
 import { Icon } from 'dome/controls/icons';
 import * as Toolbars from 'dome/frame/toolbars';
 import { GlobalState, useGlobalState } from 'dome/data/states';
+import * as Server from 'frama-c/server';
 
 export type kind =
   'none' | 'info' | 'warning' | 'error' | 'success' | 'progress';
 
-export interface Message {
+export interface MessageProps {
   kind: kind;
   text: string;
   title?: string;
 }
 
-const emptyMessage: Message = { text: '', kind: 'none' };
+const emptyMessage: MessageProps = { text: '', kind: 'none' };
 
 const GlobalMessage = new GlobalState(emptyMessage);
 
-export function setMessage(message: Message) {
+export function setMessage(message: MessageProps): void {
   GlobalMessage.setValue(message);
 }
 
-export default function Message() {
+export default function Message(): JSX.Element {
   const [message] = useGlobalState(GlobalMessage);
-
   return (
     <>
       <Toolbars.Space />
-      { message.kind === 'progress' && <LED status="active" blink /> }
-      { message.kind === 'success' && <Icon id="CHECK" fill="green" /> }
-      { message.kind === 'warning' && <Icon id="ATTENTION" /> }
-      { message.kind === 'error' && <Icon id="CROSS" fill="red" /> }
-      { message.kind === 'info' && <Icon id="CIRC.INFO" /> }
+      {message.kind === 'progress' && <LED status="active" blink />}
+      {message.kind === 'success' && <Icon id="CHECK" fill="green" />}
+      {message.kind === 'warning' && <Icon id="ATTENTION" />}
+      {message.kind === 'error' && <Icon id="CROSS" fill="red" />}
+      {message.kind === 'info' && <Icon id="CIRC.INFO" />}
       <Code label={message.text} title={message.title} />
-      <Toolbars.Space />
       <IconButton
-        icon="CROSS"
+        icon="CIRC.CLOSE"
         onClick={() => setMessage(emptyMessage)}
         visible={message !== emptyMessage}
         title="Hide current message"
@@ -70,6 +70,13 @@ export default function Message() {
       <Toolbars.Space />
     </>
   );
+}
+
+/* Callback on server events */
+
+{
+  Server.onReady(() => setMessage(emptyMessage));
+  Server.onShutdown(() => setMessage(emptyMessage));
 }
 
 /* --------------------------------------------------------------------------*/

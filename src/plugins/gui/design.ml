@@ -862,7 +862,14 @@ class main_window () : main_window_extension_points =
   let () = main_window#set_default_size ~width ~height in
   let () = main_window#set_geometry_hints ~min_size:(1,1) main_window#coerce in
   let watch_cursor = Gdk.Cursor.create `WATCH in
-  let arrow_cursor = Gdk.Cursor.create `ARROW in
+  (* NOTE: the ARROW cursor is not available under some specific configurations,
+     e.g. WSLg + lablgtk3 + Wayland; so we avoid using it here.
+     Testing indicates only the following cursors are available:
+     BOTTOM_LEFT_CORNER, BOTTOM_RIGHT_CORNER, BOTTOM_SIDE, CROSSHAIR, HAND1,
+     LEFT_PTR, LEFT_SIDE, RIGHT_SIDE, TOP_LEFT_CORNER, TOP_RIGHT_CORNER,
+     TOP_SIDE, WATCH, XTERM
+  *)
+  let arrow_cursor = Gdk.Cursor.create `LEFT_PTR in
 
   (* On top one finds the menubar *)
   let toplevel_vbox = GPack.box `VERTICAL ~packing:main_window#add () in
@@ -1753,7 +1760,7 @@ class main_window () : main_window_extension_points =
           let opt_tag_name =
             match typ with
             | TNamed (ti, _) -> Some (Logic_typing.Typedef, ti.torig_name)
-            | TComp (ci, _, _) ->
+            | TComp (ci, _) ->
               let tag = if ci.cstruct then Logic_typing.Struct
                 else Logic_typing.Union
               in

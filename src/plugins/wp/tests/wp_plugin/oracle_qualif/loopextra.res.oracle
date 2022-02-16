@@ -1,10 +1,10 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/loopextra.i (no preprocessing)
+[kernel] Parsing loopextra.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_plugin/loopextra.i:6: Warning: 
+[wp] loopextra.i:6: Warning: 
   Missing assigns clause (assigns 'everything' instead)
-[wp] tests/wp_plugin/loopextra.i:3: Warning: 
+[wp] loopextra.i:3: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 3 goals scheduled
 [wp] [Qed] Goal typed_f_assert : Valid

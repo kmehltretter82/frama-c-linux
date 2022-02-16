@@ -102,7 +102,7 @@ export interface Filtering<Key, Row> {
 export type Collection<A> = undefined | null | A | Collection<A>[];
 
 /** Iterator over collection. */
-export function forEach<A>(data: Collection<A>, fn: (elt: A) => void) {
+export function forEach<A>(data: Collection<A>, fn: (elt: A) => void): void {
   if (Array.isArray(data)) data.forEach((e) => forEach(e, fn));
   else if (data !== undefined && data !== null) fn(data);
 }
@@ -201,7 +201,7 @@ export abstract class Model<Key, Row> {
      delegates to [[updateIndex]].
      All views that might be rendering the specified item will be updated.
   */
-  update(key: Key) {
+  update(key: Key): void {
     const k = this.getIndexOf(key);
     if (k !== undefined && 0 <= k) this.updateIndex(k);
   }
@@ -211,7 +211,7 @@ export abstract class Model<Key, Row> {
      @param first - the first updated item index
      @param last - the last updated item index (defaults to `first`)
   */
-  updateIndex(first: number, last = first) {
+  updateIndex(first: number, last = first): void {
     if (first <= last) {
       this.clients.forEach(({ lower, upper, update }) => {
         if (update && first <= upper && lower <= last) update();
@@ -223,7 +223,7 @@ export abstract class Model<Key, Row> {
      Re-render all views.
      Bound to this.
   */
-  reload() {
+  reload(): void {
     this.clients.forEach(({ reload }) => reload && reload());
   }
 
@@ -271,7 +271,7 @@ export abstract class Model<Key, Row> {
    @return a number that can be used to memoize other effects
  */
 
-export function useModel(model: Model<any, any>, sync = true): number {
+export function useModel<K, R>(model: Model<K, R>, sync = true): number {
   const [age, setAge] = React.useState(0);
   React.useEffect(() => {
     if (sync) {

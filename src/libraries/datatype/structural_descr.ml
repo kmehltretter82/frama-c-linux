@@ -147,8 +147,12 @@ let poly f = function
 let is_abstract_array a =
   Array.for_all (fun x -> x = Pack Unmarshal.Abstract) a
 
+let is_unknown_array a =
+  Array.exists (fun x -> x = Nopack) a
+
 let poly_arr f a =
-  if is_abstract_array a then Abstract
+  if is_unknown_array a then Unknown
+  else if is_abstract_array a then Abstract
   else
     try
       let d = f (Array.mapi (pack_to_unmarshal 0) a) in
@@ -177,7 +181,8 @@ let t_map_unchanged_compares = poly2 Unmarshal.t_map_unchangedcompares
 let t_hashtbl_unchanged_hashs = poly2 (Unmarshal.t_hashtbl_unchangedhashs)
 
 let t_sum a =
-  if Array.for_all (is_abstract_array) a then Abstract
+  if Array.exists is_unknown_array a then Unknown
+  else if Array.for_all is_abstract_array a then Abstract
   else Structure (Sum a)
 
 (* ********************************************************************** *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -84,13 +84,13 @@ let with_data_from ~loc kf env from =
             "assert_copy_values"
             [ adata.data_ptr; from.data_ptr ]
         in
-        Env.add_stmt env kf stmt
+        Env.add_stmt env stmt
       else env
     in
     Some { adata with data_registered = from.data_registered }, env
   | None -> None, env
 
-let merge_right ~loc kf env adata1 adata2 =
+let merge_right ~loc env adata1 adata2 =
   match adata1, adata2 with
   | Some adata1, Some adata2 when adata1.data_registered ->
     let stmt =
@@ -103,16 +103,16 @@ let merge_right ~loc kf env adata1 adata2 =
       { adata2 with
         data_registered = true }
     in
-    let env = Env.add_stmt env kf stmt in
+    let env = Env.add_stmt env stmt in
     Some adata2, env
   | Some _, Some adata | None, Some adata -> Some adata, env
   | Some _, None | None, None -> None, env
 
-let clean ~loc kf env adata =
+let clean ~loc env adata =
   match adata with
   | Some { data_registered; data_ptr } when data_registered->
     let clean_stmt = Smart_stmt.rtl_call ~loc "assert_clean" [ data_ptr ] in
-    Env.add_stmt env kf clean_stmt
+    Env.add_stmt env clean_stmt
   | Some _ | None ->
     env
 
@@ -130,7 +130,7 @@ let ikind_to_string = function
   | ILongLong -> "longlong"
   | IULongLong -> "ulonglong"
 
-let do_register_data ~loc kf env { data_ptr } name e =
+let do_register_data ~loc env { data_ptr } name e =
   let ty = Cil.typeOf e in
   let fct, args =
     if Gmp_types.Z.is_t ty then
@@ -146,8 +146,8 @@ let do_register_data ~loc kf env { data_ptr } name e =
       | TPtr _ -> "ptr", [ e ]
       | TArray _ -> "array", [ e ]
       | TFun _ -> "fun", []
-      | TComp ({ cstruct = true }, _, _) -> "struct", []
-      | TComp ({ cstruct = false }, _, _) -> "union", []
+      | TComp ({ cstruct = true }, _) -> "struct", []
+      | TComp ({ cstruct = false }, _) -> "union", []
       | TEnum ({ ekind }, _) -> ikind_to_string ekind, [ Cil.one ~loc; e ]
       | TVoid _
       | TBuiltin_va_list _ -> "other", []
@@ -160,9 +160,9 @@ let do_register_data ~loc kf env { data_ptr } name e =
   let name = Cil.mkString ~loc name in
   let args = data_ptr :: name :: args in
   let stmt = Smart_stmt.rtl_call ~loc fct args in
-  Env.add_stmt env kf stmt
+  Env.add_stmt env stmt
 
-let register ~loc kf env ?(force=false) name e adata =
+let register ~loc env ?(force=false) name e adata =
   if Options.Assert_print_data.get () then
     match adata, e.enode with
     | Some adata, Const _ when not force ->
@@ -176,23 +176,23 @@ let register ~loc kf env ?(force=false) name e adata =
       Some adata, env
     | Some adata, _ ->
       let adata = { adata with data_registered = true } in
-      Some adata, do_register_data ~loc kf env adata name e
+      Some adata, do_register_data ~loc env adata name e
     | None, _ -> None, env
   else
     adata, env
 
-let register_term ~loc kf env ?force t e adata =
+let register_term ~loc env ?force t e adata =
   let name = Format.asprintf "@[%a@]" Printer.pp_term t in
-  register ~loc kf env name ?force e adata
+  register ~loc env name ?force e adata
 
-let register_pred ~loc kf env ?force p e adata =
+let register_pred ~loc env ?force p e adata =
   if Env.annotation_kind env == Smart_stmt.RTE then
     (* When translating RTE, we do not want to print the result of the predicate
        because they should be the only predicate in an assertion clause. *)
     adata, env
   else
     let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
-    register ~loc kf env name ?force e adata
+    register ~loc env name ?force e adata
 
 let kind_to_string loc k =
   Cil.mkString

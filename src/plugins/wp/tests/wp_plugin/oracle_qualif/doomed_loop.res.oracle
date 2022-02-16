@@ -1,17 +1,17 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/doomed_loop.i (no preprocessing)
+[kernel] Parsing doomed_loop.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 8 goals scheduled
 [wp] [Failed] Smoke-test typed_foo_wp_smoke_dead_loop_s2
        Qed: Valid
-[wp] tests/wp_plugin/doomed_loop.i:22: Warning: Failed smoke-test
+[wp] doomed_loop.i:22: Warning: Failed smoke-test
 [wp] [Failed] Smoke-test typed_foo_wp_smoke_dead_code_s7
        Qed: Valid
-[wp] tests/wp_plugin/doomed_loop.i:23: Warning: Failed smoke-test
+[wp] doomed_loop.i:23: Warning: Failed smoke-test
 [wp] [Failed] Smoke-test typed_foo_wp_smoke_dead_code_s9
        Qed: Valid
-[wp] tests/wp_plugin/doomed_loop.i:25: Warning: Failed smoke-test
+[wp] doomed_loop.i:25: Warning: Failed smoke-test
 [wp] [Qed] Goal typed_foo_loop_invariant_A_preserved : Valid
 [wp] [Alt-Ergo] Goal typed_foo_loop_invariant_A_established : Unsuccess
 [wp] [Qed] Goal typed_foo_loop_invariant_B_preserved : Valid

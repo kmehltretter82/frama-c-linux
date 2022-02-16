@@ -280,6 +280,22 @@ val stmtFallsThrough: Cil_types.stmt -> bool
 
 val fieldsToInit: Cil_types.compinfo -> string option -> Cil_types.offset list
 
+(**
+   Returns a mapping (pos_start, pos_end, funcname) for each function
+   declaration and definition, spanning the entire function, including
+   its specification (if it has one).
+
+   Currently, for function declarations, the location ends at the function
+   name, before the formal parameter list. For definitions, it spans until the
+   closing brace.
+
+   Note that the list is _not_ sorted, and must be further processed
+   for efficient data retrieval.
+
+   @since Frama-C+dev
+*)
+val func_locs : unit -> (Filepath.position * Filepath.position * string) list
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

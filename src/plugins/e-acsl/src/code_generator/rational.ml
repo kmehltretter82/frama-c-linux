@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -223,7 +223,7 @@ let name_arith_bop = function
   | Mult -> "__gmpq_mul"
   | Div -> "__gmpq_div"
   | Mod | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
-  | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
+  | Shiftlt | Shiftrt | PlusPI | MinusPI | MinusPP -> assert false
 
 let binop ~loc bop e1 e2 env kf t_opt =
   let name = name_arith_bop bop in

@@ -89,12 +89,17 @@ let new_env ?lvars kf : t_env = ignore lvars ; kf
 
 let add_axiom _p _l = ()
 
-let add_hyp _env (pid,pred) k =
+let add_hyp ?for_pid _env (pid,pred) k =
+  ignore(for_pid);
   let u = node () in
   if Wp_parameters.debug_atleast 1 then
-    Format.fprintf !out "  %a [ color=green , label=\"Assume %a\" ] ;@." pretty u Printer.pp_predicate pred
+    Format.fprintf !out "  %a [ color=green , label=\"Assume %a%a\"] ;@."
+      pretty u Printer.pp_predicate pred
+      (Pretty_utils.pp_opt ~pre:" for" WpPropId.pretty) for_pid
   else
-    Format.fprintf !out "  %a [ color=green , label=\"Assume %a\" ] ;@." pretty u WpPropId.pp_propid pid ;
+    Format.fprintf !out "  %a [ color=green , label=\"Assume %a%a\"] ;@."
+      pretty u WpPropId.pp_propid pid
+      (Pretty_utils.pp_opt ~pre:" for" WpPropId.pretty) for_pid ;
   link u k ; u
 
 let add_goal env (pid,pred) k =
@@ -106,12 +111,12 @@ let add_goal env (pid,pred) k =
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 
-let add_subgoal env (pid, t_pred) prop stmt _source k =
+let add_subgoal env (pid, _) ?deps prop stmt _source k =
+  ignore deps ;
   let u = node () in
   if Wp_parameters.debug_atleast 1 then
-    Format.fprintf !out "  %a [ color=red , label=\"Prove %a @@ %a (%a)\" ] ;@."
+    Format.fprintf !out "  %a [ color=red , label=\"Prove %a (%a)\" ] ;@."
       pretty u
-      Printer.pp_predicate t_pred
       Cil_printer.pp_stmt stmt
       Printer.pp_predicate prop
   else
@@ -239,16 +244,49 @@ let call_goal_precond env _stmt kf _es ~pre k =
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 
-let call_terminates env (_gpid, prop) _stmt kf _es ~callee_t k =
-  let _ = callee_t in
+let call_terminates env _stmt kf _es (_gpid, prop) ?callee_t k =
   let u = node () in
-  Format.fprintf !out "  %a [ color=red , label=\"Prove PreCond %a%t\" ] ;@."
+  let pp_opt_pred = Pretty_utils.pp_opt ~none:"FALSE" Printer.pp_predicate in
+  Format.fprintf !out "  %a [ color=red , label=\"Prove Terminates %a%t\" ] ;@."
     pretty u Kernel_function.pretty kf
     begin fun fmt ->
       if Wp_parameters.debug_atleast 1 then
         Format.fprintf fmt "\n@[<hov 2>Terminates if %a[%s] ==> %a[%a];@]"
           Printer.pp_predicate prop "Caller"
-          Printer.pp_predicate callee_t Kernel_function.pretty kf
+          pp_opt_pred callee_t
+          Kernel_function.pretty kf
+    end ;
+  Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
+  merge env u k
+
+let call_decreases env _s kf _es (_id, (caller_d, rel)) ?caller_t ?callee_d k =
+  let u = node () in
+  let pp_opt_pred = Pretty_utils.pp_opt ~none:"TRUE" Printer.pp_predicate in
+  let pp_rel fmt callee_d =
+    match rel with
+    | None ->
+        Format.fprintf fmt "%a ==> %a[%a] < %a[%s] && %a[%a] >= 0"
+          pp_opt_pred caller_t
+          Printer.pp_term callee_d Kernel_function.pretty kf
+          Printer.pp_term caller_d "Caller"
+          Printer.pp_term callee_d Kernel_function.pretty kf
+    | Some rel ->
+        Format.fprintf fmt "%a ==> %a(%a[%s], %a[%a])"
+          pp_opt_pred caller_t
+          Printer.pp_logic_info rel
+          Printer.pp_term caller_d "Caller"
+          Printer.pp_term callee_d Kernel_function.pretty kf
+  in
+  Format.fprintf !out "  %a [ color=red , label=\"Prove Decreases %a%t\" ] ;@."
+    pretty u Kernel_function.pretty kf
+    begin fun fmt ->
+      match callee_d with
+      | None ->
+          Format.fprintf fmt "\n@[<hov 2>Decreases if %a ==> FALSE;@]"
+            pp_opt_pred caller_t
+      | Some (callee_d, _) ->
+          if Wp_parameters.debug_atleast 1 then
+            Format.fprintf fmt "\n@[<hov 2>Decreases if %a;@]" pp_rel callee_d
     end ;
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k

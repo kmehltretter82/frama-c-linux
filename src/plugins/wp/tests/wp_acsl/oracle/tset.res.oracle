@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/tset.i (no preprocessing)
+[kernel] Parsing tset.i (no preprocessing)
 [wp] Running WP plugin...
 ------------------------------------------------------------
   Global

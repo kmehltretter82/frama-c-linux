@@ -1,5 +1,5 @@
 /* run.config
-OPT: -json-compilation-database @PTEST_DIR@/build_commands.json -print
+OPT: -json-compilation-database %{dep:@PTEST_DIR@/build_commands.json} -print
 */
 
 int f1 () {

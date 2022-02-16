@@ -118,6 +118,13 @@ val acceptEmptyCompinfo: unit -> bool
     @since 23.0-Vanadium
 *)
 
+val allowed_machdep: string -> string
+(** [allowed_machdep "machdep family"] provides a standard message for features
+    only allowed for a particular machdep.
+
+    @since Frama-C+dev
+*)
+
 (* ************************************************************************* *)
 (** {2 Values for manipulating globals} *)
 (* ************************************************************************* *)
@@ -436,7 +443,7 @@ val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
 val has_flexible_array_member: typ -> bool
 (** [true] iff the given type has flexible array member.
 
-    @modify Frama-C+dev in GCC/MSVC mode recursively searches in the type of the
+    @modify 24.0-Chromium in GCC/MSVC mode recursively searches in the type of the
     last field.
 *)
 
@@ -606,10 +613,17 @@ val isArrayType: typ -> bool
 (** True if the argument is a struct of union type *)
 val isStructOrUnionType: typ -> bool
 
+(** possible causes for raising {!Cil.LenOfArray} *)
+type incorrect_array_length = Not_constant | Not_integer | Negative | Too_big
+
+val pp_incorrect_array_length:
+  Format.formatter -> incorrect_array_length -> unit
+
 (** Raised when {!Cil.lenOfArray} fails either because the length is [None],
   * because it is a non-constant expression, or because it overflows an int.
 *)
-exception LenOfArray
+exception LenOfArray of incorrect_array_length
+
 
 (** Call to compute the array length as present in the array type, to an
   * integer. Raises {!Cil.LenOfArray} if not able to compute the length, such
@@ -1001,28 +1015,6 @@ val stripTermCasts: term -> term
     "(A)(B)(x + (C)y)", but leave the (C) cast. *)
 val stripCasts: exp -> exp
 
-(** Removes info wrappers and return underlying expression *)
-val stripInfo: exp -> exp
-
-(** Removes casts and info wrappers and return underlying expression *)
-val stripCastsAndInfo: exp -> exp
-
-(** Removes casts and info wrappers,except last info wrapper, and return
-    underlying expression *)
-val stripCastsButLastInfo: exp -> exp
-
-(** Extracts term information in an expression information *)
-val exp_info_of_term: term -> exp_info
-
-(** Constructs a term from a term node and an expression information *)
-val term_of_exp_info: location -> term_node -> exp_info -> term
-
-(** Map some function on underlying expression if Info or else on expression *)
-val map_under_info: (exp -> exp) -> exp -> exp
-
-(** Apply some function on underlying expression if Info or else on expression *)
-val app_under_info: (exp -> unit) -> exp -> unit
-
 val typeOf: exp -> typ
 (** Compute the type of an expression. *)
 
@@ -1042,7 +1034,7 @@ val parseInt: string -> Integer.t
 
 (** Like [parseInt], but returns [Error message] in case of failure, instead of
     aborting Frama-C.
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 val parseIntRes: string -> (Integer.t, string) result
 
 (** Like [parseInt], but converts to an expression. *)
@@ -1050,7 +1042,7 @@ val parseIntExp: loc:location -> string -> exp
 
 (** Like [parseIntExp], but returns [Error message] in case of failure, instead
     of aborting Frama-C.
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 val parseIntExpRes: loc:location -> string -> (exp, string) result
 
 (** Like [parseInt], but converts to a logic term. *)
@@ -1303,6 +1295,14 @@ val isGhostFormalVarinfo: varinfo -> bool
 *)
 val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 
+
+(** [true] iff the given variable is a const global variable with non extern
+    storage.
+
+    @since Frama-C+dev
+*)
+val isGlobalInitConst: varinfo -> bool
+
 (** Remove attributes whose name appears in the first argument that are
     present anywhere in the fully expanded version of the type.
     @since Oxygen-20120901
@@ -1443,12 +1443,12 @@ val bitfield_attribute_name: string
 val anonymous_attribute_name: string
 (** Name of the attribute that is inserted when generating a name for a varinfo
     representing an anonymous function parameter.
-    @since Frama-C+dev
+    @since 24.0-Chromium
 *)
 
 val anonymous_attribute: attribute
 (** attribute identifying anonymous function parameters
-    @since Frama-C+dev
+    @since 24.0-Chromium
 *)
 
 (** Convert an expression into an attrparam, if possible. Otherwise raise
@@ -2116,9 +2116,6 @@ val peepHole1: (instr -> instr list option) -> stmt list -> unit
     of the error *)
 exception SizeOfError of string * typ
 
-(** Create a fresh size cache with [Not_Computed] *)
-val empty_size_cache : unit -> bitsSizeofTypCache
-
 (** Give the unsigned kind corresponding to any integer kind *)
 val unsignedVersionOf : ikind -> ikind
 
@@ -2298,7 +2295,7 @@ val stmt_of_instr_list : ?loc:location -> instr list -> stmtkind
 val cvar_to_lvar : varinfo -> logic_var
 
 (** Convert a C variable into a logic term.
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 val cvar_to_term: loc:location -> varinfo -> term
 
 (** Make a temporary variable to use in annotations *)

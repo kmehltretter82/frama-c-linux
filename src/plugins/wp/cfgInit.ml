@@ -26,31 +26,31 @@ module Make(W : Mcfg.S) =
 struct
 
   let compute_global_init wenv filter obj =
-    Globals.Vars.fold_in_file_order
+    Globals.Vars.fold_in_file_rev_order
       (fun var initinfo obj ->
+
          if var.vstorage = Extern then obj else
            let do_init = match filter with
              | `All -> true
-             | `InitConst -> WpStrategy.isGlobalInitConst var
+             | `InitConst -> Cil.isGlobalInitConst var
            in if not do_init then obj
-           else
-             let old_loc = Cil.CurrentLoc.get () in
+           else let old_loc = Cil.CurrentLoc.get () in
              Cil.CurrentLoc.set var.vdecl ;
              let obj = W.init wenv var initinfo.init obj in
              Cil.CurrentLoc.set old_loc ; obj
       ) obj
 
   let process_global_const wenv obj =
-    Globals.Vars.fold_in_file_order
+    Globals.Vars.fold_in_file_rev_order
       (fun var _initinfo obj ->
-         if WpStrategy.isGlobalInitConst var
+         if Cil.isGlobalInitConst var
          then W.const wenv var obj
          else obj
       ) obj
 
   (* WP of global initializations. *)
   let process_global_init wenv kf obj =
-    if WpStrategy.is_main_init kf then
+    if Globals.is_entry_point ~when_lib_entry:false kf then
       begin
         let obj = W.label wenv None Clabels.init obj in
         compute_global_init wenv `All obj
@@ -58,14 +58,14 @@ struct
     else if W.has_init wenv then
       begin
         let obj =
-          if WpStrategy.isInitConst ()
+          if Wp_parameters.Init.get ()
           then process_global_const wenv obj else obj in
         let obj = W.use_assigns wenv None WpPropId.mk_init_assigns obj in
         let obj = W.label wenv None Clabels.init obj in
         compute_global_init wenv `All obj
       end
     else
-    if WpStrategy.isInitConst ()
+    if Wp_parameters.Init.get ()
     then compute_global_init wenv `InitConst obj
     else obj
 

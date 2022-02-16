@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/terminates_variant_option.i (no preprocessing)
+[kernel] Parsing terminates_variant_option.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [CFG] Goal f1_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
@@ -10,7 +10,7 @@
   Function f1
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/terminates_variant_option.i, line 37):
+Goal Preservation of Invariant (file terminates_variant_option.i, line 37):
 Assume {
   Type: is_sint32(c1_0) /\ is_sint32(cpt_0) /\ is_sint32(cpt_0 - 1).
   (* Residual *)
@@ -26,17 +26,17 @@ Prove: (0 < cpt_0) /\ (cpt_0 <= (1 + c1_0)).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/terminates_variant_option.i, line 37):
+Goal Establishment of Invariant (file terminates_variant_option.i, line 37):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/terminates_variant_option.i, line 38):
+Goal Loop assigns (file terminates_variant_option.i, line 38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 41):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 41):
 Assume {
   Type: is_sint32(cpt_0).
   (* Invariant *)
@@ -46,7 +46,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 41):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 41):
 Assume {
   Type: is_sint32(c1_0) /\ is_sint32(cpt_0) /\ is_sint32(cpt_0 - 1).
   (* Residual *)
@@ -55,6 +55,8 @@ Assume {
   Have: ((0 <= c1_0) -> ((cpt_0 <= c1_0) /\ (0 <= cpt_0))).
   (* Else *)
   Have: 2 <= cpt_0.
+  (* Invariant *)
+  Have: ((0 <= c1_0) -> (cpt_0 <= (1 + c1_0))).
 }
 Prove: 0 <= cpt_0.
 
@@ -63,12 +65,12 @@ Prove: 0 <= cpt_0.
   Function fails_decreases
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/terminates_variant_option.i, line 26):
+Goal Loop assigns (file terminates_variant_option.i, line 26):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 29):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 29):
 Assume {
   Type: is_uint32(i_1) /\ is_uint32(i) /\ is_sint32(keep_going_0).
   (* Then *)
@@ -81,7 +83,7 @@ Prove: i < i_1.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 29):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 29):
 Prove: true.
 
 ------------------------------------------------------------
@@ -89,7 +91,7 @@ Prove: true.
   Function fails_positive
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/terminates_variant_option.i, line 15):
+Goal Preservation of Invariant (file terminates_variant_option.i, line 15):
 Let x = Mint_0[p].
 Assume {
   Type: is_sint32(v) /\ is_sint32(x) /\ is_sint32(v - 1).
@@ -106,37 +108,39 @@ Prove: (0 < v) /\ (v <= (1 + x)).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/terminates_variant_option.i, line 15):
+Goal Establishment of Invariant (file terminates_variant_option.i, line 15):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/terminates_variant_option.i, line 16) (1/2):
+Goal Loop assigns (file terminates_variant_option.i, line 16) (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/terminates_variant_option.i, line 16) (2/2):
+Goal Loop assigns (file terminates_variant_option.i, line 16) (2/2):
 Effect at line 19
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 19):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 19):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 19):
 Let x = Mint_0[p].
 Assume {
-  Type: is_sint32(v) /\ is_sint32(x).
+  Type: is_sint32(v) /\ is_sint32(x) /\ is_sint32(v - 1).
   (* Heap *)
   Type: region(p.base) <= 0.
   (* Invariant *)
   Have: ((0 <= x) -> ((0 <= v) /\ (v <= x))).
   (* Then *)
   Have: v != 0.
+  (* Invariant *)
+  Have: ((0 <= x) -> ((0 < v) /\ (v <= (1 + x)))).
 }
 Prove: 0 <= v.
 
@@ -150,12 +154,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 54):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 54):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 54):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 54):
 Prove: false.
 
 ------------------------------------------------------------
@@ -168,12 +172,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 61):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 61):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 61):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 61):
 Prove: false.
 
 ------------------------------------------------------------

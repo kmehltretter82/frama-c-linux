@@ -70,7 +70,7 @@ let kf_contains_slevel_directive kf =
     (Kernel_function.get_definition kf).sallstmts
 
 let compute kf =
-  let default_slevel = Value_util.get_slevel kf in
+  let default_slevel = Eva_utils.get_slevel kf in
   if not (kf_contains_slevel_directive kf) then
     Global default_slevel (* No slevel directive *), NoMerge
   else
@@ -132,7 +132,7 @@ let compute kf =
        then NoMerge
        else Merge (fun s -> Cil_datatype.Stmt.Hashtbl.mem h_merge s))
     with Stack.Empty ->
-      Value_parameters.abort
+      Self.abort
         "Incorrectly nested slevel directives in function %a"
         Kernel_function.pretty kf
 
@@ -142,7 +142,7 @@ module ForKf = Kernel_function.Make_Table
     (struct
       let size = 17
       let dependencies =
-        [Ast.self; Value_parameters.SemanticUnrollingLevel.self;]
+        [Ast.self; Parameters.SemanticUnrollingLevel.self;]
       let name = "Value.Local_slevel.ForKf"
     end)
 

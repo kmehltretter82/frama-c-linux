@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/loops.c (with preprocessing)
+[kernel] Parsing loops.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at dead_code
 [eva] Computing initial state
 [eva] Initial state computed

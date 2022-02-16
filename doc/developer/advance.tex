@@ -959,7 +959,7 @@ the configuration header of a test (or a test suite).
 & \texttt{from inout eva scope variadic} for tests under \texttt{./tests} directory
 \\
 & \texttt{SCRIPT}\nscodeidxdef{Test!Directive}{SCRIPT}
-& ML scripts to be loaded with each subsequent run (their compilation is performed by the \texttt{frama-c] command).
+& ML scripts to be loaded with each subsequent run (their compilation is performed by the \texttt{frama-c} command).
 & \textit{None}
 \\
 & \texttt{LIBS}\nscodeidxdef{Test!Directive}{LIBS}
@@ -2487,10 +2487,10 @@ following.
 ~
 
 \begin{ocamlcode}
-!Db.Value.compute();
-Kernel.feedback "%B" (Db.Value.is_computed ()); (* true *)
+Eva.Analysis.compute();
+Kernel.feedback "%B" (Eva.Analysis.is_computed ()); (* true *)
 Globals.set_entry_point "f" true;
-Kernel.feedback "%B" (Db.Value.is_computed ()); (* false *)
+Kernel.feedback "%B" (Eva.Analysis.is_computed ()); (* false *)
 \end{ocamlcode}
 As the value analysis has been automatically reset when setting the entry point,
 the above code outputs
@@ -2548,7 +2548,7 @@ let compute_info (kf,vi) = ...
 let memoize s =
   try Stmt.Hashtbl.find state s
   with Not_found -> Stmt.Hashtbl.add state s (compute_info s)
-let run () = ... !Db.Value.compute (); ... memoize some_stmt ...
+let run () = ... Eva.Analysis.compute (); ... memoize some_stmt ...
 \end{ocamlcode}
 
 However, if one puts this code inside \framac, it does not work because this
@@ -2570,7 +2570,7 @@ module State =
      end)
 let compute_info (kf,vi) = ...
 let memoize = State.memo compute_info
-let run () = ... !Db.Value.compute (); ... memoize some_stmt ...
+let run () = ... Eva.Analysis.compute (); ... memoize some_stmt ...
 \end{ocamlcode}
 A quick look on this code shows that the declaration of the state itself is more
 complicated (it uses a functor application) but its use is
@@ -2870,14 +2870,14 @@ value analysis has never been computed previously)
 \scodeidx{Project}{IOError}
 \begin{ocamlcode}
 let print_computed () =
-  Kernel.feedback "%B" (Db.Value.is_computed ())
+  Kernel.feedback "%B" (Eva.Analysis.is_computed ())
 in
 print_computed ();   (* false *)
 let old = Project.current () in
 try
   let foo = Project.load ~name:"foo" "foo.sav" in
   Project.set_current foo;
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   print_computed ();   (* true *)
   Project.set_current old;
   print_computed ()    (* false *)
@@ -2913,13 +2913,13 @@ The following code is equivalent to the one given in
 Example~\ref{ex:set_current}.
 \begin{ocamlcode}
 let print_computed () =
-  Value_parameters.feedback "%B" (Db.Value.is_computed ())
+  Value_parameters.feedback "%B" (Eva.Analysis.is_computed ())
 in
 print_computed ();   (* false *)
 try
   let foo = Project.load ~name:"foo" "foo.sav" in
   Project.on foo
-    (fun () -> !Db.Value.compute (); print_computed () (* true *)) ();
+    (fun () -> Eva.Analysis.compute (); print_computed () (* true *)) ();
   print_computed ()    (* false *)
 with Project.IOError _ ->
   exit 1

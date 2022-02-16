@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -90,7 +90,7 @@ void eacsl_temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
     eacsl_temporal_memcpy(ptr, tpar->ptr, size);
     break;
   default:
-    private_assert(0, "Unreachable", NULL);
+    private_abort("Unreachable\n");
   }
 }
 

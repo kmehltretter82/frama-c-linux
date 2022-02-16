@@ -121,7 +121,7 @@ let merge_addrof (map:map) v1 v2 =
 
 let rec cc_exp (map:map) exp =
   match exp.enode with
-  | BinOp( (PlusPI | IndexPI | MinusPI) , a , b , _ ) ->
+  | BinOp( (PlusPI | MinusPI) , a , b , _ ) ->
       cc_read map b ;
       let { addrof = pointed } as addr = cc_addr map a in
       acs_shift pointed (Eval exp) ;
@@ -134,7 +134,6 @@ let rec cc_exp (map:map) exp =
       }
   | Lval lv -> Read_at (Cil.typeOfLval lv , cc_lval map lv)
   | CastE(ty,e) -> cast ty (cc_exp map e)
-  | Info(e,_) -> cc_exp map e
   | Const (CStr _ | CWStr _) -> Addr_of (cc_string map exp)
   | Const (CInt64 _ | CChr _ | CEnum _ | CReal _)
   | SizeOf _ | SizeOfE _ | SizeOfStr _
@@ -251,7 +250,7 @@ and cc_term_value (map:map) (term:term) =
             shift = false ;
           }
       end
-  | TBinOp( (PlusPI | IndexPI | MinusPI) , a , b ) ->
+  | TBinOp( (PlusPI | MinusPI) , a , b ) ->
       begin
         cc_term map b ;
         let { addrof = pointed } as addr = cc_term_addr map a in

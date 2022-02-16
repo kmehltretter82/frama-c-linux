@@ -226,12 +226,12 @@ struct
 
   let mk_full_descr d =
     let descr =
-      if rehash == undefined then
-        if Descr.is_unmarshable d then Descr.unmarshable
-        else begin
-          check rehash "rehash" name "descriptor";
-          assert false
-        end
+      if Descr.is_unmarshable d then Descr.unmarshable
+      else
+      if rehash == undefined then begin
+        check rehash "rehash" name "descriptor";
+        assert false
+      end
       else
       if rehash == identity then d
       else
@@ -1928,7 +1928,7 @@ module Integer =
         in
         Type.par par Type.Call fmt pp
       (* TODO: this should take into account kernel's option -big-ints-hex *)
-      let pretty = Integer.pretty ~hexa:false
+      let pretty = Integer.pretty
       let varname _ = "integer_n"
       let mem_project = never_any_project
     end)

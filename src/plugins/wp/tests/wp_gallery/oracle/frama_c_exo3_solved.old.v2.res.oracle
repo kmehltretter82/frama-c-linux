@@ -1,7 +1,7 @@
 # frama-c -wp -wp-rte -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_gallery/frama_c_exo3_solved.old.v2.c (with preprocessing)
+[kernel] Parsing frama_c_exo3_solved.old.v2.c (with preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function equal_elements
+[rte:annot] annotating function equal_elements
 [wp] Goal typed_ref_equal_elements_ensures_v1_good : not tried
 [wp] Goal typed_ref_equal_elements_ensures_v2_good : not tried
 [wp] Goal typed_ref_equal_elements_ensures_v1_v2_diff : not tried
@@ -53,7 +53,7 @@
 [wp] Goal typed_ref_equal_elements_loop_variant_positive : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_2_decrease : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_2_positive : not tried
-[wp] tests/wp_gallery/frama_c_exo3_solved.old.v2.c:56: Warning: 
+[wp] frama_c_exo3_solved.old.v2.c:56: Warning: 
   Memory model hypotheses for function 'equal_elements':
   /*@
      behavior wp_typed_ref:

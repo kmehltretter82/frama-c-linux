@@ -97,6 +97,7 @@ let j_step = j_select "clause-step"
 let j_ingoal = j_select "inside-goal"
 let j_instep = j_select "inside-step"
 let j_compose = j_select "compose"
+let j_multi = j_select "multi"
 let j_kint = j_select "kint"
 let j_range = j_select "range"
 let j_id a = "id" , `String a
@@ -135,6 +136,9 @@ let rec json_of_selection = function
       let n,m = occur (Conditions.head s) e in
       `Assoc [ j_instep ; j_at s ; j_kind s ; j_occur n ;
                j_term e ; j_pattern m ]
+
+  | Multi es ->
+      `Assoc (j_multi :: j_args es)
 
 and j_args = function
   | [] -> []
@@ -184,6 +188,9 @@ let rec selection_of_json ((hs,g) as s : sequent) js =
         let id = j_id js in
         let args = j_args js in
         Tactical.compose id (List.map (selection_of_json s) args)
+    | "multi" ->
+        let args = j_args js in
+        Tactical.multi @@ List.map (selection_of_json s) args
     | "kint" -> Tactical.cint (j_val js)
     | "range" -> Tactical.range (j_min js) (j_max js)
     | _ -> raise Not_found

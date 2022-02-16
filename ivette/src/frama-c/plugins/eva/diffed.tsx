@@ -44,7 +44,7 @@ export class DiffBuffer {
     this.push = this.push.bind(this);
   }
 
-  clear() {
+  clear(): void {
     this.added = false;
     this.removed = false;
     this.value = '';
@@ -52,7 +52,7 @@ export class DiffBuffer {
     this.contents = [];
   }
 
-  push(c: Change) {
+  push(c: Change): void {
     if (!c.added && !c.removed) {
       this.flush();
       this.value += c.value;
@@ -66,7 +66,7 @@ export class DiffBuffer {
     }
   }
 
-  private flush() {
+  private flush(): void {
     const { value, added, removed } = this;
     if (added && removed) {
       if (value) {
@@ -99,7 +99,7 @@ export class DiffBuffer {
     return React.Children.toArray(this.contents);
   }
 
-  getScratch() {
+  getScratch(): string {
     this.flush();
     return this.scratch;
   }
@@ -115,7 +115,7 @@ export interface Diff2Props {
   diff: string;
 }
 
-export function Diff2(props: Diff2Props) {
+export function Diff2(props: Diff2Props): JSX.Element {
   const { text, diff } = props;
   const contents = React.useMemo<React.ReactNode>(() => {
     if (text === diff) return text;
@@ -137,7 +137,7 @@ export interface Diff3Props {
   diffB: string;
 }
 
-export function Diff3(props: Diff3Props) {
+export function Diff3(props: Diff3Props): JSX.Element {
   const { text, diffA, diffB } = props;
   const contents = React.useMemo<React.ReactNode>(() => {
     if (text === diffA && text === diffB) return text;
@@ -158,26 +158,25 @@ export function Diff3(props: Diff3Props) {
 export interface DiffProps {
   text?: string;
   diff?: string;
-  diffA?: string;
-  diffB?: string;
+  diff2?: string;
 }
 
-export function Diff(props: DiffProps) {
-  const { text, diff, diffA, diffB } = props;
+
+export function Diff(props: DiffProps): JSX.Element | null {
+  const { text, diff, diff2 } = props;
   if (text === undefined)
-    return diff ? <>{diff}</> : null;
+    return null;
+  if (diff !== undefined && diff2 !== undefined)
+    return <Diff3 text={text} diffA={diff} diffB={diff2} />;
   if (diff !== undefined) {
     if (diff === text) return <>{text}</>;
     return <Diff2 text={text} diff={diff} />;
   }
-  if (diffA === undefined) {
-    if (diffB === undefined) return <>{text}</>;
-    return <Diff2 text={text} diff={diffB} />;
-  } if (diffB === undefined) {
-    if (diffA === undefined) return <>{text}</>;
-    return <Diff2 text={text} diff={diffA} />;
+  if (diff2 !== undefined) {
+    if (diff2 === text) return <>{text}</>;
+    return <Diff2 text={text} diff={diff2} />;
   }
-  return <Diff3 text={text} diffA={diffA} diffB={diffB} />;
+  return <>{text}</>;
 }
 
 // --------------------------------------------------------------------------

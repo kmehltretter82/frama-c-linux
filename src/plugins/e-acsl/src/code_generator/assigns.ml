@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,7 +35,7 @@ let rec is_ptr_free typ = match Cil.unrollType typ with
   | TInt (_, _)
   | TFloat (_, _) -> true
   | TPtr (_, _) -> false
-  | TArray (ty, _, _, _) -> is_ptr_free ty
+  | TArray (ty, _, _) -> is_ptr_free ty
   | TFun (_, _, _, _) ->
     (* a function cannot be an argument of a function *)
     assert false
@@ -44,7 +44,7 @@ let rec is_ptr_free typ = match Cil.unrollType typ with
     assert false
   | TEnum (_, _)
   | TBuiltin_va_list _ -> true
-  | TComp (cinfo, _, _) ->
+  | TComp (cinfo, _) ->
     match cinfo.cfields with
     | None -> raise NoAssigns
     | Some fields ->

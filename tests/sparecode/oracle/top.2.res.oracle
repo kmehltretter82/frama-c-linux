@@ -1,4 +1,4 @@
-[kernel] Parsing tests/sparecode/top.i (no preprocessing)
+[kernel] Parsing top.i (no preprocessing)
 [sparecode] remove unused code...
 [sparecode] selecting function main_top_not_used outputs and entry point
 [eva] Analyzing a complete application starting at main_top_not_used
@@ -7,14 +7,14 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function main_top <- main_top_not_used.
-  Called from tests/sparecode/top.i:32.
+  Called from top.i:32.
 [eva] computing for function f <- main_top <- main_top_not_used.
-  Called from tests/sparecode/top.i:21.
+  Called from top.i:21.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main_top
 [eva] Done for function main_top
-[eva] tests/sparecode/top.i:33: Reusing old results for call to f
+[eva] top.i:33: Reusing old results for call to f
 [eva] Recording results for main_top_not_used
 [eva] done for function main_top_not_used
 [pdg] computing for function main_top_not_used
@@ -46,7 +46,7 @@
 [sparecode] look for annotations in function print
 [pdg] computing for function print
 [from] Computing for function print
-[kernel:annot:missing-spec] tests/sparecode/top.i:22: Warning: 
+[kernel:annot:missing-spec] top.i:22: Warning: 
   Neither code nor specification for function print, generating default assigns from the prototype
 [from] Done for function print
 [pdg] done for function print

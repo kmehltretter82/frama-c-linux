@@ -30,7 +30,7 @@ module Precisions = struct
 
   type t = Simple | Double | Long_Double | Real
 
-  let rp () = Value_parameters.Numerors_Real_Size.get ()
+  let rp () = Parameters.Numerors_Real_Size.get ()
 
   let pretty fmt = function
     | Simple -> Format.fprintf fmt "Simple"
@@ -125,7 +125,7 @@ module Mode = struct
   type t = Abs_From_Rel | Rel_From_Abs | No_Interaction | With_Interactions
 
   let get () =
-    match Value_parameters.Numerors_Mode.get () with
+    match Parameters.Numerors_Mode.get () with
     | "relative" -> Rel_From_Abs
     | "absolute" -> Abs_From_Rel
     | "none" -> No_Interaction

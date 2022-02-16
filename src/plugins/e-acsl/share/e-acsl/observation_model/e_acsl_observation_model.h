@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -31,6 +31,8 @@
 #ifndef E_ACSL_OBSERVATION_MODEL_H
 #define E_ACSL_OBSERVATION_MODEL_H
 
+#include <errno.h>
+#include <pthread.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -81,6 +83,9 @@
 #define eacsl_mark_readonly export_alias(mark_readonly)
 #define eacsl_initialize    export_alias(initialize)
 #define eacsl_full_init     export_alias(full_init)
+
+/* Concurrency */
+#define eacsl_pthread_create export_alias(pthread_create)
 
 /* }}} */
 
@@ -392,6 +397,36 @@ int eacsl_initialized(void *ptr, size_t size) __attribute__((FC_BUILTIN));
 /*@ assigns \result \from indirect:count;
   @ ensures \result == 0 || \result == 1; */
 int eacsl_separated(size_t count, ...) __attribute__((FC_BUILTIN));
+
+/* }}} */
+
+/************************************************************************/
+/*** E-ACSL concurrency primitives {{{ ***/
+/************************************************************************/
+
+/*! \brief Function pointer to a function given to \p pthread_create. */
+typedef void *(*pthread_routine_t)(void *);
+
+/*! \brief Drop-in replacement for \p pthread_create with memory tracking
+ *  enabled.
+ *
+ *  For further information, see \p pthread_create(3).
+ */
+// Specification extracted from share/libc/pthread.h in Frama-C
+/*@ requires valid_thread: \valid(thread);
+    requires valid_null_attr: attr == \null || \valid_read(attr);
+    requires valid_routine: \valid_function(start_routine);
+    requires valid_null_arg: arg == \null || \valid((char*)arg);
+    assigns *thread \from *attr;
+    assigns \result \from indirect:*attr;
+    ensures success_or_error:
+      \result == 0 ||
+      \result == EAGAIN || \result == EINVAL || \result == EPERM;
+ */
+int eacsl_pthread_create(pthread_t *restrict thread,
+                         const pthread_attr_t *restrict attr,
+                         pthread_routine_t start_routine, void *restrict arg)
+    __attribute__((FC_BUILTIN));
 
 /* }}} */
 

@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -38,6 +38,7 @@
 #include "internals/e_acsl_debug.c"
 #include "internals/e_acsl_malloc.c"
 #include "internals/e_acsl_private_assert.c"
+#include "internals/e_acsl_rtl_error.c"
 #include "internals/e_acsl_rtl_io.c"
 #include "internals/e_acsl_rtl_string.c"
 #include "internals/e_acsl_shexec.c"

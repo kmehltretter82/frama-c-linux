@@ -50,10 +50,12 @@ typedef unsigned int u_int;
 typedef unsigned short u_short;
 typedef unsigned char u_char;
 
-// Note: makedev (non-POSIX) is usually a macro; in case of problems,
-// consider redefining this.
-/*@ assigns \result \from maj, min; */
-extern dev_t makedev(int maj, int min);
+// The macros below are non-POSIX; the definitions below should allow
+// parsing coreutils.
+# define major(dev)  (((dev) >> 8) & 0xff)
+# define minor(dev)  ((dev) & 0xff)
+# define makedev(maj, min)  (((maj) << 8) | (min))
+
 #define __u_char_defined
 #endif
 

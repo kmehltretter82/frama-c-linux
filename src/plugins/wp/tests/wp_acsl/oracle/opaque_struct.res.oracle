@@ -1,13 +1,13 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_acsl/opaque_struct.i (no preprocessing)
+[kernel] Parsing opaque_struct.i (no preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function assigned_via_pointer
-[rte] annotating function assigns
-[rte] annotating function assigns_effect
-[rte] annotating function chunk_typing
-[rte] annotating function initialized_assigns
-[rte] annotating function uninitialized_assigns
-[kernel:annot:missing-spec] tests/wp_acsl/opaque_struct.i:79: Warning: 
+[rte:annot] annotating function assigned_via_pointer
+[rte:annot] annotating function assigns
+[rte:annot] annotating function assigns_effect
+[rte:annot] annotating function chunk_typing
+[rte:annot] annotating function initialized_assigns
+[rte:annot] annotating function uninitialized_assigns
+[kernel:annot:missing-spec] opaque_struct.i:79: Warning: 
   Neither code nor specification for function use, generating default assigns from the prototype
 ------------------------------------------------------------
   Axiomatic 'test'
@@ -31,7 +31,7 @@ Prove: 0<=BytesLength_of_S1_S
   Function assigned_via_pointer
 ------------------------------------------------------------
 
-Goal Check 'fail' (file tests/wp_acsl/opaque_struct.i, line 60):
+Goal Check 'fail' (file opaque_struct.i, line 60):
 Let a = havoc(Mint_undef_0, Mint_0, p, Length_of_S1_S).
 Let a_1 = havoc(Mint_undef_3, Mint_3, p, Length_of_S1_S).
 Let a_2 = havoc(Mint_undef_5, Mint_5, p, Length_of_S1_S).
@@ -65,12 +65,12 @@ Prove: EqS1_S(Load_S1_S(p, a, a_8, a_4, a_5, a_1, a_6, a_2, a_7, a_3,
   Function assigns
 ------------------------------------------------------------
 
-Goal Check 'fail' (file tests/wp_acsl/opaque_struct.i, line 24):
+Goal Check 'fail' (file opaque_struct.i, line 24):
 Prove: EqS1_S(S1_0, S1_1).
 
 ------------------------------------------------------------
 
-Goal Check 'succeed' (file tests/wp_acsl/opaque_struct.i, line 25):
+Goal Check 'succeed' (file opaque_struct.i, line 25):
 Prove: true.
 
 ------------------------------------------------------------
@@ -78,7 +78,7 @@ Prove: true.
   Function assigns_effect
 ------------------------------------------------------------
 
-Goal Check 'fail' (file tests/wp_acsl/opaque_struct.i, line 69):
+Goal Check 'fail' (file opaque_struct.i, line 69):
 Let x = Mint_0[p].
 Let a_1 = havoc(Mint_undef_0, Mint_0, a, Length_of_S1_S).
 Let a_2 = a_1[p].
@@ -95,7 +95,7 @@ Prove: a_2 = x.
 
 ------------------------------------------------------------
 
-Goal Check 'fail' (file tests/wp_acsl/opaque_struct.i, line 70):
+Goal Check 'fail' (file opaque_struct.i, line 70):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
@@ -108,7 +108,7 @@ Prove: of_f32(havoc(Mf32_undef_0, Mf32_0, a, Length_of_S1_S)[q])
 
 ------------------------------------------------------------
 
-Goal Check 'succeed' (file tests/wp_acsl/opaque_struct.i, line 71):
+Goal Check 'succeed' (file opaque_struct.i, line 71):
 Let x = Mchar_0[c].
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, Length_of_S1_S).
 Let a_2 = a_1[c].
@@ -127,12 +127,12 @@ Prove: a_2 = x.
   Function chunk_typing
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/opaque_struct.i, line 81):
+Goal Assertion 'rte,mem_access' (file opaque_struct.i, line 81):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/opaque_struct.i, line 81):
+Goal Assertion 'rte,mem_access' (file opaque_struct.i, line 81):
 Prove: true.
 
 ------------------------------------------------------------
@@ -140,7 +140,7 @@ Prove: true.
   Function initialized_assigns
 ------------------------------------------------------------
 
-Goal Check 'fails' (file tests/wp_acsl/opaque_struct.i, line 38):
+Goal Check 'fails' (file opaque_struct.i, line 38):
 Let a = havoc(Init_undef_0, Init_0, p, Length_of_S1_S).
 Assume {
   (* Heap *)
@@ -156,7 +156,7 @@ Prove: IsInit_S1_S(p, a).
 
 ------------------------------------------------------------
 
-Goal Check 'succeed' (file tests/wp_acsl/opaque_struct.i, line 39):
+Goal Check 'succeed' (file opaque_struct.i, line 39):
 Let x = p.base.
 Assume {
   (* Heap *)
@@ -171,7 +171,7 @@ Prove: 0 <= (BytesLength_of_S1_S * (Malloc_0[x] / Length_of_S1_S)).
   Function uninitialized_assigns
 ------------------------------------------------------------
 
-Goal Check 'fail' (file tests/wp_acsl/opaque_struct.i, line 54):
+Goal Check 'fail' (file opaque_struct.i, line 54):
 Let a = havoc(Init_undef_0, Init_0, p, Length_of_S1_S).
 Assume {
   (* Heap *)
@@ -185,7 +185,7 @@ Prove: !IsInit_S1_S(p, a).
 
 ------------------------------------------------------------
 
-Goal Check 'fail' (file tests/wp_acsl/opaque_struct.i, line 55):
+Goal Check 'fail' (file opaque_struct.i, line 55):
 Let a = havoc(Init_undef_0, Init_0, p, Length_of_S1_S).
 Assume {
   (* Heap *)
@@ -198,17 +198,17 @@ Assume {
 Prove: IsInit_S1_S(p, a).
 
 ------------------------------------------------------------
-[wp] tests/wp_acsl/opaque_struct.i:31: Warning: 
+[wp] opaque_struct.i:31: Warning: 
   Memory model hypotheses for function 'g':
   /*@ behavior wp_typed:
         requires \separated(p, &S1, &S2, &p); */
   void g(void);
-[wp] tests/wp_acsl/opaque_struct.i:64: Warning: 
+[wp] opaque_struct.i:64: Warning: 
   Memory model hypotheses for function 'assign':
   /*@ behavior wp_typed:
         requires \separated(a, &S1, &S2); */
   void assign(struct S *a);
-[wp] tests/wp_acsl/opaque_struct.i:67: Warning: 
+[wp] opaque_struct.i:67: Warning: 
   Memory model hypotheses for function 'assigns_effect':
   /*@
      behavior wp_typed:
@@ -218,12 +218,12 @@ Prove: IsInit_S1_S(p, a).
        requires \separated(q, &S1, &S2);
      */
   void assigns_effect(int *p_0, float *q, char *c, struct S *a);
-[wp] tests/wp_acsl/opaque_struct.i:76: Warning: 
+[wp] opaque_struct.i:76: Warning: 
   Memory model hypotheses for function 'use':
   /*@ behavior wp_typed:
         requires \separated(s, &S1, &S2); */
   void use(struct S *s);
-[wp] tests/wp_acsl/opaque_struct.i:79: Warning: 
+[wp] opaque_struct.i:79: Warning: 
   Memory model hypotheses for function 'chunk_typing':
   /*@
      behavior wp_typed:

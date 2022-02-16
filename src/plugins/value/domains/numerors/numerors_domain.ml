@@ -86,10 +86,10 @@ module Domain = struct
   include Simple_memory.Make_Domain (Name) (Numerors_Value)
 
   let post_analysis f =
-    if not (Value_parameters.NumerorsLogFile.is_empty ()) then
+    if not (Parameters.NumerorsLogFile.is_empty ()) then
       match f with
       | `Value _ ->
-        let log = open_out (Value_parameters.NumerorsLogFile.get ():>string) in
+        let log = open_out (Parameters.NumerorsLogFile.get ():>string) in
         let fmt = Format.formatter_of_out_channel log in
         List.iter (fun f -> f fmt ()) !Numerors_Value.dprint_callstack ;
         close_out log

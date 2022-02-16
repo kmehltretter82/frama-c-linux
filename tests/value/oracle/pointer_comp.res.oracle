@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/pointer_comp.c (with preprocessing)
+[kernel] Parsing pointer_comp.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -15,29 +15,29 @@
       [4] ∈ {0}
   s1 ∈ {0}
   s2[0..7] ∈ {0}
-[eva:alarm] tests/value/pointer_comp.c:37: Warning: 
+[eva:alarm] pointer_comp.c:37: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s2[9]), (void *)0);
-[eva:alarm] tests/value/pointer_comp.c:38: Warning: 
+[eva:alarm] pointer_comp.c:38: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)(&s2[9]), (void *)(&s2[9]));
-[eva:alarm] tests/value/pointer_comp.c:41: Warning: 
+[eva:alarm] pointer_comp.c:41: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)(&str1), (void *)(&str2));
-[eva:alarm] tests/value/pointer_comp.c:42: Warning: 
+[eva:alarm] pointer_comp.c:42: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s1), (void *)(&s2));
-[eva:alarm] tests/value/pointer_comp.c:43: Warning: 
+[eva:alarm] pointer_comp.c:43: Warning: 
   pointer comparison.
   assert \pointer_comparable((void (*)())(&f), (void (*)())(&g));
-[eva:alarm] tests/value/pointer_comp.c:46: Warning: 
+[eva:alarm] pointer_comp.c:46: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s1), (void *)0);
-[eva:alarm] tests/value/pointer_comp.c:47: Warning: 
+[eva:alarm] pointer_comp.c:47: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s1 + 1), (void *)0);
-[eva:alarm] tests/value/pointer_comp.c:48: Warning: 
+[eva:alarm] pointer_comp.c:48: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s2[8]), (void *)0);
-[eva:alarm] tests/value/pointer_comp.c:50: Warning: 
+[eva:alarm] pointer_comp.c:50: Warning: 
   pointer comparison.
   assert \pointer_comparable((void (*)())(&f), (void (*)())0);
-[eva:alarm] tests/value/pointer_comp.c:51: Warning: 
+[eva:alarm] pointer_comp.c:51: Warning: 
   pointer comparison. assert \pointer_comparable((void (*)())p, (void (*)())0);
 [eva] Recording results for main
 [eva] done for function main

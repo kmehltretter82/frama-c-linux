@@ -83,4 +83,4 @@ Dec. -386334727
 Hex. 1xE8F8_FFF9
 Bin. 1b1110_1000_1111_1000_1111_1111_1111_1001
 --------------------------------------------------
-[kernel] Parsing tests/misc/pp_bin_hex.i (no preprocessing)
+[kernel] Parsing pp_bin_hex.i (no preprocessing)

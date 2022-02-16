@@ -1,12 +1,12 @@
-[kernel] Parsing tests/dive/unfocused_callers.i (no preprocessing)
+[kernel] Parsing unfocused_callers.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva:alarm] tests/dive/unfocused_callers.i:16: Warning: 
+[eva:alarm] unfocused_callers.i:16: Warning: 
   non-finite float value.
   assert \is_finite(\add_float(tmp, tmp_0));
   (tmp from f1(x), tmp_0 from f2(x))
-[eva:alarm] tests/dive/unfocused_callers.i:16: Warning: 
+[eva:alarm] unfocused_callers.i:16: Warning: 
   non-finite float value.
   assert \is_finite(\add_float(\add_float(tmp, tmp_0), tmp_1));
   (tmp from f1(x), tmp_0 from f2(x), tmp_1 from f3(x))
@@ -23,4 +23,4 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[dive] output to tests/dive/result/unfocused_callers.dot
+[dive] output to unfocused_callers.dot

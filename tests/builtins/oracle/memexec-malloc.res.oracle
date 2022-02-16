@@ -1,51 +1,51 @@
-[kernel] Parsing tests/builtins/memexec-malloc.c (with preprocessing)
+[kernel] Parsing memexec-malloc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..1999] ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/builtins/memexec-malloc.c:23.
-[eva] tests/builtins/memexec-malloc.c:10: starting to merge loop iterations
+  Called from memexec-malloc.c:23.
+[eva] memexec-malloc.c:10: starting to merge loop iterations
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/builtins/memexec-malloc.c:24.
+  Called from memexec-malloc.c:24.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] tests/builtins/memexec-malloc.c:25: Reusing old results for call to f
-[eva] tests/builtins/memexec-malloc.c:26: Frama_C_show_each: [0..1999]
-[eva] tests/builtins/memexec-malloc.c:27: Frama_C_show_each: [0..1999]
-[eva] tests/builtins/memexec-malloc.c:28: Frama_C_show_each: [0..1999]
-[eva] tests/builtins/memexec-malloc.c:29: Reusing old results for call to f
+[eva] memexec-malloc.c:25: Reusing old results for call to f
+[eva] memexec-malloc.c:26: Frama_C_show_each: [0..1999]
+[eva] memexec-malloc.c:27: Frama_C_show_each: [0..1999]
+[eva] memexec-malloc.c:28: Frama_C_show_each: [0..1999]
+[eva] memexec-malloc.c:29: Reusing old results for call to f
 [eva] computing for function alloc <- main.
-  Called from tests/builtins/memexec-malloc.c:31.
-[eva] tests/builtins/memexec-malloc.c:15: Call to builtin malloc
-[eva] tests/builtins/memexec-malloc.c:15: allocating variable __malloc_main_l31
+  Called from memexec-malloc.c:31.
+[eva] memexec-malloc.c:15: Call to builtin malloc
+[eva] memexec-malloc.c:15: allocating variable __malloc_main_l31
 [eva] Recording results for alloc
 [eva] Done for function alloc
 [eva] computing for function alloc <- main.
-  Called from tests/builtins/memexec-malloc.c:32.
-[eva] tests/builtins/memexec-malloc.c:15: Call to builtin malloc
-[eva] tests/builtins/memexec-malloc.c:15: allocating variable __malloc_main_l32
+  Called from memexec-malloc.c:32.
+[eva] memexec-malloc.c:15: Call to builtin malloc
+[eva] memexec-malloc.c:15: allocating variable __malloc_main_l32
 [eva] Recording results for alloc
 [eva] Done for function alloc
 [eva] computing for function k <- main.
-  Called from tests/builtins/memexec-malloc.c:34.
+  Called from memexec-malloc.c:34.
 [eva] computing for function alloc <- k <- main.
-  Called from tests/builtins/memexec-malloc.c:19.
-[eva] tests/builtins/memexec-malloc.c:15: Call to builtin malloc
-[eva] tests/builtins/memexec-malloc.c:15: allocating variable __malloc_k_l19
+  Called from memexec-malloc.c:19.
+[eva] memexec-malloc.c:15: Call to builtin malloc
+[eva] memexec-malloc.c:15: allocating variable __malloc_k_l19
 [eva] Recording results for alloc
 [eva] Done for function alloc
 [eva] Recording results for k
 [eva] Done for function k
 [eva] computing for function k <- main.
-  Called from tests/builtins/memexec-malloc.c:35.
+  Called from memexec-malloc.c:35.
 [eva] computing for function alloc <- k <- main.
-  Called from tests/builtins/memexec-malloc.c:19.
-[eva] tests/builtins/memexec-malloc.c:15: Call to builtin malloc
-[eva] tests/builtins/memexec-malloc.c:15: allocating variable __malloc_k_l19_0
+  Called from memexec-malloc.c:19.
+[eva] memexec-malloc.c:15: Call to builtin malloc
+[eva] memexec-malloc.c:15: allocating variable __malloc_k_l19_0
 [eva] Recording results for alloc
 [eva] Done for function alloc
 [eva] Recording results for k

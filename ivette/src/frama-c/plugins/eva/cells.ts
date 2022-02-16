@@ -92,15 +92,21 @@ export function leq(a: Size, b: Size): boolean {
 
 export type EvaStatus = 'True' | 'False' | 'Unknown';
 export type EvaAlarm = [EvaStatus, string];
-export type EvaState = 'Here' | 'After' | 'Then' | 'Else';
+export type EvaPointedVar = [string, Ast.marker];
+export type Evaluation = Values.evaluation;
+
+const emptyEvaluation: Values.evaluation = {
+  value: '',
+  alarms: [],
+  pointedVars: [],
+};
 
 export interface EvaValues {
   errors?: string;
-  values?: string;
-  v_after?: string;
-  v_then?: string;
-  v_else?: string;
-  alarms?: EvaAlarm[];
+  vBefore: Evaluation;
+  vAfter?: Evaluation;
+  vThen?: Evaluation;
+  vElse?: Evaluation;
   size: Size;
 }
 
@@ -125,7 +131,7 @@ export class ValueCache {
     this.state = state;
   }
 
-  clear() {
+  clear(): void {
     this.smax = EMPTY;
     this.probes.clear();
     this.stacks.clear();
@@ -135,17 +141,17 @@ export class ValueCache {
 
   // --- Cached Measures
 
-  getMaxSize() { return this.smax; }
+  getMaxSize(): Size { return this.smax; }
 
-  getProbeSize(target: Ast.marker) {
+  getProbeSize(target: Ast.marker): Size {
     return this.probes.get(target) ?? EMPTY;
   }
 
-  private static stackKey(fct: string, callstack: Values.callstack) {
+  private static stackKey(fct: string, callstack: Values.callstack): string {
     return `${fct}::${callstack}`;
   }
 
-  getStackSize(fct: string, callstack: Values.callstack) {
+  getStackSize(fct: string, callstack: Values.callstack): Size {
     const key = ValueCache.stackKey(fct, callstack);
     return this.stacks.get(key) ?? EMPTY;
   }
@@ -160,7 +166,7 @@ export class ValueCache {
     const cache = this.vcache;
     const cached = cache.get(key);
     if (cached) return cached;
-    const newValue: EvaValues = { values: '', size: EMPTY };
+    const newValue: EvaValues = { vBefore: emptyEvaluation, size: EMPTY };
     if (callstack !== undefined && fct === undefined)
       return newValue;
     // callstack !== undefined ==> fct !== undefined)
@@ -169,11 +175,10 @@ export class ValueCache {
       .send(Values.getValues, { target: marker, callstack })
       .then((r) => {
         newValue.errors = undefined;
-        newValue.values = r.values;
-        newValue.v_after = r.v_after;
-        newValue.v_then = r.v_then;
-        newValue.v_else = r.v_else;
-        newValue.alarms = r.alarms;
+        if (r.vBefore) newValue.vBefore = r.vBefore;
+        newValue.vAfter = r.vAfter;
+        newValue.vThen = r.vThen;
+        newValue.vElse = r.vElse;
         if (this.updateLayout(marker, fct, callstack, newValue))
           this.state.forceLayout();
         else
@@ -195,10 +200,10 @@ export class ValueCache {
     v: EvaValues,
   ): boolean {
     // measuring cell
-    let s = sizeof(v.values);
-    s = addS(s, v.v_after);
-    s = addS(s, v.v_then);
-    s = addS(s, v.v_else);
+    let s = sizeof(v.vBefore.value);
+    s = addS(s, v.vAfter?.value);
+    s = addS(s, v.vThen?.value);
+    s = addS(s, v.vElse?.value);
     v.size = s;
     // max cell size
     const { smax } = this;

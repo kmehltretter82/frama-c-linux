@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,20 +26,17 @@
 open Cil_types
 open Cil_datatype
 
-val store: ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
+val store: Env.t -> kernel_function -> varinfo list -> Env.t
 (** For each variable of the given list, if necessary according to the mtracking
     analysis, add a call to [__e_acsl_store_block] in the given environment. *)
 
-val duplicate_store:
-  ?before:stmt -> Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
+val duplicate_store: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
 (** Same as [store], with a call to [__e_acsl_duplicate_store_block]. *)
 
-val delete_from_list:
-  ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
+val delete_from_list: Env.t -> kernel_function -> varinfo list -> Env.t
 (** Same as [store], with a call to [__e_acsl_delete_block]. *)
 
-val delete_from_set:
-  ?before:stmt -> Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
+val delete_from_set: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
 (** Same as [delete_from_list] with a set of variables instead of a list. *)
 
 (*

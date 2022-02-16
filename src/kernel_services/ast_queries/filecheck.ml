@@ -815,16 +815,17 @@ module Base_checker = struct
                   | None ->
                     check_abort "Trying to use predicate %a as a term"
                       Printer.pp_logic_var lvi
-                  | Some typ ->
+                  | Some rt ->
+                    let ft = Logic_const.make_arrow_type li.l_profile rt in
                     if
                       not
-                        (Logic_utils.is_instance_of li.l_tparams t.term_type typ)
+                        (Logic_utils.is_instance_of li.l_tparams t.term_type ft)
                     then
                       check_abort
                         "%a is declared with type %a. It cannot be used as \
                          a term of type %a"
                         Printer.pp_logic_var lvi
-                        Printer.pp_logic_type typ
+                        Printer.pp_logic_type ft
                         Printer.pp_logic_type t.term_type)
                with Not_found ->
                  check_abort
@@ -1315,7 +1316,7 @@ module Base_checker = struct
 
       method! vtype ty =
         match ty with
-        | TArray (_, _, _, la) ->
+        | TArray (_, _, la) ->
           let elt, _ = Cil.splitArrayAttributes la in
           if elt != [] then
             Kernel.fatal

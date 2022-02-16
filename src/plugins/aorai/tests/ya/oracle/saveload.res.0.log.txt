@@ -1,1 +1,1 @@
-[kernel] Parsing tests/ya/saveload.i (no preprocessing)
+[kernel] Parsing saveload.i (no preprocessing)

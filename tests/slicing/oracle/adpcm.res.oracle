@@ -1,4 +1,5 @@
-[kernel] Parsing tests/slicing/adpcm.c (with preprocessing)
+[kernel] Parsing adpcm.c (with preprocessing)
+[kernel] Parsing tests/test/adpcm.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

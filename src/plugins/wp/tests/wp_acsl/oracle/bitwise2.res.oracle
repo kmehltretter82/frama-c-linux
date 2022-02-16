@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/bitwise2.i (no preprocessing)
+[kernel] Parsing bitwise2.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function job1
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise2.i, line 2) in 'job1':
+Goal Post-condition (file bitwise2.i, line 2) in 'job1':
 Prove: true.
 
 ------------------------------------------------------------
@@ -14,7 +14,7 @@ Prove: true.
   Function job1bis
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise2.i, line 7) in 'job1bis':
+Goal Post-condition (file bitwise2.i, line 7) in 'job1bis':
 Prove: true.
 
 ------------------------------------------------------------
@@ -22,7 +22,7 @@ Prove: true.
   Function job2
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise2.i, line 12) in 'job2':
+Goal Post-condition (file bitwise2.i, line 12) in 'job2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -30,7 +30,7 @@ Prove: true.
   Function job3
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise2.i, line 17) in 'job3':
+Goal Post-condition (file bitwise2.i, line 17) in 'job3':
 Prove: true.
 
 ------------------------------------------------------------
@@ -38,7 +38,7 @@ Prove: true.
   Function job4
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise2.i, line 22) in 'job4':
+Goal Post-condition (file bitwise2.i, line 22) in 'job4':
 Prove: true.
 
 ------------------------------------------------------------

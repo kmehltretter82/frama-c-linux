@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/assigned_initialized_memtyped.i (no preprocessing)
+[kernel] Parsing assigned_initialized_memtyped.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function array
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 69):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 69):
 Let m = Init_0[shiftfield_F1_S_i(s) <- true].
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
@@ -55,13 +55,13 @@ Prove: true.
   Function assigned_glob
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 126):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 126):
 Assume { (* Heap *) Type: (region(G_glob_82) <= 0) /\ cinits(Init_0). }
 Prove: IsInit_S1_S(global(G_glob_82), Init_0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 129):
+Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 129):
 Let a = shiftfield_F1_S_a(pg_0).
 Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(pg_0) <- true],
             shift_sint32(a, 0), 10).
@@ -85,12 +85,12 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 129):
+Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 129):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 142):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 142):
 Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
 Let a = havoc(Init_undef_0, m, pg_0, 11).
 Let a_1 = shiftfield_F1_S_a(pg_0).
@@ -119,7 +119,7 @@ Prove: IsInit_S1_S(pg_0, a).
 
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 143):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 143):
 Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
 Let a = havoc(Init_undef_0, m, pg_0, 11).
 Let a_1 = shiftfield_F1_S_a(pg_0).
@@ -178,30 +178,14 @@ Prove: true.
 
 Goal Loop assigns 'CHECK' (3/3):
 Effect at line 139
-Assume {
-  Type: is_sint32(i_1) /\ is_sint32(i).
-  (* Heap *)
-  Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
-      linked(Malloc_0).
-  (* Goal *)
-  When: !invalid(Malloc_0, shift_sint32(shiftfield_F1_S_a(pg_0), i), 1).
-  (* Invariant 'CHECK' *)
-  Have: (0 <= i_1) /\ (i_1 <= 10).
-  (* Else *)
-  Have: 10 <= i_1.
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
-  (* Then *)
-  Have: i <= 9.
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function comp
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 118):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 118):
 Let m = Init_0[shiftfield_F1_S_i(s) <- true].
 Let a = havoc(Init_undef_0, m, s, 11).
 Let a_1 = shiftfield_F1_S_a(s).
@@ -242,29 +226,14 @@ Prove: true.
 
 Goal Loop assigns 'CHECK' (3/3):
 Effect at line 115
-Assume {
-  Type: is_sint32(i_1) /\ is_sint32(i).
-  (* Heap *)
-  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
-  (* Goal *)
-  When: !invalid(Malloc_0, shift_sint32(shiftfield_F1_S_a(s), i), 1).
-  (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10).
-  (* Else *)
-  Have: 10 <= i_1.
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
-  (* Then *)
-  Have: i <= 9.
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function descr
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 99):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 99):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shiftfield_F1_S_i(s).
 Let a_2 = shift_sint32(a, 0).
@@ -353,7 +322,7 @@ Prove: true.
   Function field
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 51):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 51):
 Let a = shiftfield_F1_S_i(s).
 Let a_1 = shiftfield_F1_S_a(s).
 Let a_2 = havoc(Init_undef_0, Init_0[a <- true], shift_sint32(a_1, 0), 10).
@@ -393,7 +362,7 @@ Prove: true.
   Function index
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 84):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 84):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
             shift_sint32(a, 0), 10).
@@ -439,7 +408,7 @@ Prove: true.
   Function initialize
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 16):
+Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 16):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
             shift_sint32(a, 0), 10).
@@ -462,12 +431,12 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 16):
+Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 16):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 21):
+Goal Check 'CHECK' (file assigned_initialized_memtyped.i, line 21):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
             shift_sint32(a, 0), 10).
@@ -508,7 +477,7 @@ Prove: true.
   Function range
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 36):
+Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 36):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = havoc(Init_undef_1, Init_0[shiftfield_F1_S_i(s) <- true],
             shift_sint32(a, 0), 10).

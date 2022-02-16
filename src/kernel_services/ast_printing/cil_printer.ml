@@ -314,8 +314,7 @@ module Precedence = struct
            (assoc_connector_level thisLevel && thisLevel == contextprec
             && not state.print_cil_as_is))
 
-  let getParenthLevel e = match (Cil.stripInfo e).enode with
-    | Info _ -> assert false
+  let getParenthLevel e = match e.enode with
     | BinOp(LAnd, _,_,_) -> and_level
     | BinOp(LOr, _,_,_) -> or_level
     (* Bit operations. *)
@@ -325,7 +324,7 @@ module Precedence = struct
     (* Additive. Shifts can have higher level than + or - but I want parentheses
        around them *)
     | BinOp((MinusA|MinusPP|MinusPI|PlusA|
-             PlusPI|IndexPI|Shiftlt|Shiftrt),_,_,_) -> additiveLevel
+             PlusPI|Shiftlt|Shiftrt),_,_,_) -> additiveLevel
     (* Multiplicative *)
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
@@ -354,7 +353,7 @@ module Precedence = struct
     (* Additive. Shifts can have higher level than + or - but I want parentheses
        around them *)
     | TBinOp((MinusA|MinusPP|MinusPI|PlusA|
-              PlusPI|IndexPI|Shiftlt|Shiftrt),_,_) -> additiveLevel
+              PlusPI|Shiftlt|Shiftrt),_,_) -> additiveLevel
     (* Multiplicative *)
     | TBinOp((Div|Mod|Mult),_,_) -> multiplicativeLevel
     | Tapp({ l_var_info },[],[_;_])
@@ -712,10 +711,10 @@ class cil_printer () = object (self)
     self#varname fmt v.vname
 
   method private no_ghost_at_first_level = function
-    | TArray(t, e, b, a) ->
+    | TArray(t, e, a) ->
       let t = Cil.typeRemoveAttributes [ "ghost" ] t in
       let a = Cil.dropAttribute "ghost" a in
-      TArray (t, e, b, a)
+      TArray (t, e, a)
     | t -> Cil.typeRemoveAttributes [ "ghost" ] t
 
   (* variable declaration *)
@@ -727,7 +726,7 @@ class cil_printer () = object (self)
       if v.vformal && not state.print_cil_as_is then begin
         match v.vtype with
         | TPtr(t,a) when Cil.hasAttribute "arraylen" a ->
-          { v with vtype = TArray(t, None, { scache = Not_Computed }, a)}
+          { v with vtype = TArray(t, None, a)}
         | _ -> v
       end
       else v
@@ -797,8 +796,7 @@ class cil_printer () = object (self)
     parent_non_decay <- false;
     let level = Precedence.getParenthLevel e in
     (* fprintf fmt "/* eid:%d */" e.eid; *)
-    match (Cil.stripInfo e).enode with
-    | Info _ -> assert false
+    match e.enode with
     | Const(c) -> self#constant fmt c
     | Lval(l) -> self#lval fmt l
 
@@ -854,7 +852,7 @@ class cil_printer () = object (self)
   method binop fmt b =
     fprintf fmt "%s"
       (match b with
-       | PlusA | PlusPI | IndexPI -> "+"
+       | PlusA | PlusPI -> "+"
        | MinusA | MinusPP | MinusPI -> "-"
        | Mult -> "*"
        | Div -> "/"
@@ -1001,7 +999,7 @@ class cil_printer () = object (self)
     | Set(lv,e,_) -> begin
         (* Be nice to some special cases *)
         match e.enode with
-          BinOp((PlusA|PlusPI|IndexPI),
+          BinOp((PlusA|PlusPI),
                 {enode = Lval(lv')},
                 {enode=Const(CInt64(one,_,_))},_)
           when LvalStructEq.equal lv lv' && Integer.equal one Integer.one
@@ -1018,7 +1016,7 @@ class cil_printer () = object (self)
             (self#lval_prec Precedence.indexLevel) lv
             instr_terminator
 
-        | BinOp((PlusA|PlusPI|IndexPI),
+        | BinOp((PlusA|PlusPI),
                 {enode = Lval(lv')},
                 {enode = Const(CInt64(mone,_,_))},_)
           when LvalStructEq.equal lv lv' && Integer.equal mone Integer.minus_one
@@ -1027,7 +1025,7 @@ class cil_printer () = object (self)
             (self#lval_prec Precedence.indexLevel) lv
             instr_terminator
 
-        | BinOp((PlusA|PlusPI|IndexPI|MinusA|MinusPP|MinusPI|BAnd|BOr|BXor|
+        | BinOp((PlusA|PlusPI|MinusA|MinusPP|MinusPI|BAnd|BOr|BXor|
                  Mult|Div|Mod|Shiftlt|Shiftrt) as bop,
                 {enode = Lval(lv')},e,_) when LvalStructEq.equal lv lv' ->
           fprintf fmt "%a %a= %a%s"
@@ -1963,7 +1961,7 @@ class cil_printer () = object (self)
     | TFloat(fkind, a) ->
       fprintf fmt "%a%a%a" self#fkind fkind self#attributes a pname true
 
-    | TComp (comp, _, a) -> (* A reference to a struct *)
+    | TComp (comp, a) -> (* A reference to a struct *)
       fprintf fmt
         "%a %a%a%a"
         self#pp_keyword (if comp.cstruct then "struct" else "union")
@@ -2009,7 +2007,7 @@ class cil_printer () = object (self)
       in
       self#typ (Some name'') fmt bt'
 
-    | TArray (elemt, lo, _, a) ->
+    | TArray (elemt, lo, a) ->
       let atts_elem, a = Cil.splitArrayAttributes a in
       let size_info,a =
         List.partition
@@ -2419,7 +2417,7 @@ class cil_printer () = object (self)
   method term_binop fmt b =
     fprintf fmt "%s"
       (match b with
-       | PlusA | PlusPI | IndexPI -> "+"
+       | PlusA | PlusPI -> "+"
        | MinusA | MinusPP | MinusPI -> "-"
        | Mult -> "*"
        | Div -> "/"
@@ -3273,10 +3271,6 @@ class cil_printer () = object (self)
       current_label <- old_label
     | Dmodel_annot (mfi,_) ->
       self#model_info fmt mfi
-    | Dcustom_annot(_c, n ,_attr, _) ->
-      (* attributes are meant to be purely internal for now. *)
-      fprintf fmt "@[%a %s: <...>@]@\n"
-        self#pp_acsl_keyword "custom" n
     | Dinvariant (pred,_) ->
       let old_label = current_label in
       (match pred.l_labels with [l] -> current_label <- l | _ -> ());

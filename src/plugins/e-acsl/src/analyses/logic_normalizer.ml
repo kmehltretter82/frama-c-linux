@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
-
-type pred_or_term = Lscope.pred_or_term
+open Analyses_types
 
 module Id_predicate =
   Datatype.Make_with_collections
@@ -53,7 +52,7 @@ end = struct
 
   let get_pred p =
     try Id_predicate.Hashtbl.find tbl_pred p
-    with Not_found -> Lscope.PoT_pred p
+    with Not_found -> PoT_pred p
 
   let memo_pred process p =
     try ignore (Id_predicate.Hashtbl.find tbl_pred p) with
@@ -90,27 +89,17 @@ let preprocess_pred ~loc p =
             ~loc
             (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
         in
-        (* need to store a copy, to avoid p to appear in its own preprocessed form (otherwise it loops) *)
+        (* need to store a copy, to avoid p to appear in its own preprocessed
+           form (otherwise it loops) *)
         let p_copy =
           match p.pred_content with
           | Pvalid_read _ -> Logic_const.pvalid_read ~loc (llabel, t)
           | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
           | _ -> assert false
         in
-        Some (Lscope.PoT_pred (Logic_const.pand ~loc (init, p_copy)))
+        Some (PoT_pred (Logic_const.pand ~loc (init, p_copy)))
       | _ -> None
     end
-  | Papp(li, labels, args) ->
-    (* Simply use the implementation of Tapp(li, labels, args). To achieve this,
-       we create a clone of [li] for which the type is transformed from [None]
-       (type of predicates) to [Some boolean] (typed as a term). *)
-    let prj = Project.current () in
-    let o = object inherit Visitor.frama_c_copy prj end in
-    let li = Visitor.visitFramacLogicInfo o li in
-    let lty = Logic_const.boolean_type in
-    li.l_type <- Some lty;
-    let tapp = Logic_const.term ~loc (Tapp(li, labels, args)) lty in
-    Some (Lscope.PoT_term tapp)
   | _ -> None
 
 let preprocess_term ~loc t =

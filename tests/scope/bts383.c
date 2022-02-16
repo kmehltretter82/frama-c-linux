@@ -1,13 +1,13 @@
 /* run.config
    OPT: -eva @EVA_CONFIG@ -print -scope-verbose 1 -eva-remove-redundant-alarms -eva-context-width 3
 */
-/* 
+/*
    echo '!Db.Scope.check_asserts();;' \
-   | bin/toplevel.top -eva tests/scope/bts383.c 
+   | bin/toplevel.top -eva bts383.c
 */
 int v;
 void if1 (int * p) {
-  if (*p > 0) 
+  if (*p > 0)
     v = *p;
 }
 int if2 (int c, int * p) {

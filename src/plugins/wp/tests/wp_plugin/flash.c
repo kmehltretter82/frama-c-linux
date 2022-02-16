@@ -1,15 +1,15 @@
 /* run.config
    OPT:
-   OPT: -wp-driver tests/wp_plugin/flash.driver,tests/wp_plugin/flash-ergo.driver
 SCRIPT: flash
-   OPT: -wp-driver tests/wp_plugin/flash.driver
+   OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver}
 */
+
 /* run.config_qualif
    OPT: -wp-timeout 1
-   OPT: -wp-driver tests/wp_plugin/flash.driver,tests/wp_plugin/flash-ergo.driver
-SCRIPT: flash
-   OPT: -wp-driver tests/wp_plugin/flash.driver
+SCRIPT: @PTEST_NAME@
+   OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver}
 */
+
 /* -------------------------------------------------------------------------- */
 /* --- Observation of Sequence of Reads and Writes                        --- */
 /* -------------------------------------------------------------------------- */
@@ -18,7 +18,7 @@ SCRIPT: flash
 
 /*@
   axiomatic EVENT {
-  type event = 
+  type event =
   | RdAt_int(int *)
   | WrAt_int(int *)
   ;
@@ -43,7 +43,7 @@ SCRIPT: flash
 
 //@ghost int RD_time ;
 
-/*@ 
+/*@
   axiomatic RD {
   logic index RD_current{L} reads RD_time;
   logic index RD_update( index idx , int *p ) reads \nothing;
@@ -69,7 +69,7 @@ int RD(int *p);
 
 //@ ghost int WR_time ;
 
-/*@ 
+/*@
   axiomatic WR {
   logic index WR_current{L} reads WR_time;
   logic index WR_update( index idx , int *p ) reads \nothing;

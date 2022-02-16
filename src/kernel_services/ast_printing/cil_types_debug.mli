@@ -74,9 +74,6 @@ val pp_global : Format.formatter -> Cil_types.global -> unit
 val pp_typ : Cil_types.typ Pretty_utils.formatter
 val pp_ikind : Format.formatter -> Cil_types.ikind -> unit
 val pp_fkind : Format.formatter -> Cil_types.fkind -> unit
-val pp_bitsSizeofTyp : Format.formatter -> Cil_types.bitsSizeofTyp -> unit
-val pp_bitsSizeofTypCache :
-  Format.formatter -> Cil_types.bitsSizeofTypCache -> unit
 val pp_attribute : Cil_types.attribute Pretty_utils.formatter
 val pp_attributes : Format.formatter -> Cil_types.attributes -> unit
 val pp_attrparam : Cil_types.attrparam Pretty_utils.formatter
@@ -89,7 +86,6 @@ val pp_varinfo : Cil_types.varinfo Pretty_utils.formatter
 val pp_storage : Format.formatter -> Cil_types.storage -> unit
 val pp_exp : Cil_types.exp Pretty_utils.formatter
 val pp_exp_node : Format.formatter -> Cil_types.exp_node -> unit
-val pp_exp_info : Format.formatter -> Cil_types.exp_info -> unit
 val pp_constant : Format.formatter -> Cil_types.constant -> unit
 val pp_unop : Format.formatter -> Cil_types.unop -> unit
 val pp_binop : Format.formatter -> Cil_types.binop -> unit
@@ -158,7 +154,6 @@ val pp_funspec : Format.formatter -> Cil_types.funspec -> unit
 val pp_code_annotation : Cil_types.code_annotation Pretty_utils.formatter
 val pp_funbehavior : Format.formatter -> Cil_types.funbehavior -> unit
 val pp_global_annotation : Cil_types.global_annotation Pretty_utils.formatter
-val pp_custom_tree : Format.formatter -> Cil_types.custom_tree -> unit
 val pp_kinstr : Format.formatter -> Cil_types.kinstr -> unit
 val pp_cil_function : Format.formatter -> Cil_types.cil_function -> unit
 val pp_kernel_function : Format.formatter -> Cil_types.kernel_function -> unit

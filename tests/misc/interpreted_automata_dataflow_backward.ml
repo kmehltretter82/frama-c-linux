@@ -10,7 +10,7 @@ struct
 
   let pretty fmt v =
     Pretty_utils.pp_iter ~sep:",@ " Set.iter Cil_datatype.Varinfo.pretty fmt v
-      
+
   let join v1 v2 =
     Set.union v1 v2
 
@@ -27,7 +27,7 @@ struct
     | AlignOf _ | AlignOfE _
     | AddrOf _ | StartOf _ ->
       Set.empty
-    | UnOp (_, e, _) | CastE (_,e) | Info (e,_) ->
+    | UnOp (_, e, _) | CastE (_,e) ->
       vars e
     | BinOp (_, e1, e2, _) ->
       Set.union (vars e1) (vars e2)
@@ -37,7 +37,7 @@ struct
   let transfer t v =
     let open Interpreted_automata in
     let r = match t with
-    | Skip | Prop _ | Leave _ | Return (None,_) -> 
+    | Skip | Prop _ | Leave _ | Return (None,_) ->
       v (* Nothing to do *)
     | Enter b ->
       Set.diff v (Set.of_list b.blocals) (* If unconditionnaly initialized, they should not be there *)
@@ -57,6 +57,13 @@ end
 
 module Dataflow = Interpreted_automata.BackwardAnalysis (LivenessDomain)
 
+let ptest_file =
+  try
+    let session = Unix.getenv "FRAMAC_SESSION" in
+    if session = Unix.getcwd () then fun dir file -> dir ^ file
+    else fun _ file -> file
+  with Not_found -> fun dir file -> dir ^ file
+
 let run () =
   let main_kf, _ = Globals.entry_point () in
   (* Run the analysis *)
@@ -64,8 +71,7 @@ let run () =
   (* Output to dot *)
   let filepath =
     let open Filename in
-    let (/) = concat in
-    dirname __FILE__ / "result" / remove_extension (basename __FILE__) ^ ".dot"
+    ptest_file (dirname __FILE__ ^ "/result/") (remove_extension (basename __FILE__) ^ ".dot")
   in
   let filepath = Filepath.Normalized.of_string filepath in
   Dataflow.Result.to_dot_file LivenessDomain.pretty results filepath

@@ -169,3 +169,47 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Messages                                                           --- */
+/* -------------------------------------------------------------------------- */
+
+.message-cell {
+    user-select: text;
+    cursor: default;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 98%;
+}
+
+.message-page {
+    user-select: text;
+    white-space: pre-line;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Pivot table                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.pivot-centered {
+    user-select: text;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    height: 80%;
+}
+
+.pivot-centered .part {
+    user-select: text;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.pivot-centered .dome-xButton-led {
+    display: inline-block;
+    vertical-align: baseline;
+}
+
+/* -------------------------------------------------------------------------- */

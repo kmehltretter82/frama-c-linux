@@ -23,6 +23,7 @@
 include Plugin.S
 
 val reset : unit -> unit
+val hypothesis : 'a Log.pretty_printer
 
 (** {2 Function Selection} *)
 
@@ -40,7 +41,6 @@ val iter_kf : (Kernel_function.t -> unit) -> unit
 
 module WP          : Parameter_sig.Bool
 module Dump        : Parameter_sig.Bool
-module Legacy      : Parameter_sig.Bool
 module Behaviors   : Parameter_sig.String_list
 module Properties  : Parameter_sig.String_list
 module StatusAll   : Parameter_sig.Bool
@@ -102,7 +102,7 @@ module SimplifyType : Parameter_sig.Bool
 module CalleePreCond : Parameter_sig.Bool
 module PrecondWeakening : Parameter_sig.Bool
 module TerminatesExtDeclarations : Parameter_sig.Bool
-module TerminatesFCDeclarations : Parameter_sig.Bool
+module TerminatesStdlibDeclarations : Parameter_sig.Bool
 module TerminatesDefinitions : Parameter_sig.Bool
 module TerminatesVariantHyp : Parameter_sig.Bool
 
@@ -118,29 +118,15 @@ module CacheEnv: Parameter_sig.Bool
 module CacheDir: Parameter_sig.String
 module CachePrint: Parameter_sig.Bool
 module Drivers: Parameter_sig.String_list
-module Script: Parameter_sig.String
-module UpdateScript: Parameter_sig.Bool
 module Timeout: Parameter_sig.Int
 module SmokeTimeout: Parameter_sig.Int
 module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
 module TimeMargin: Parameter_sig.Int
-module CoqTimeout: Parameter_sig.Int
-module CoqCompiler : Parameter_sig.String
-module CoqIde : Parameter_sig.String
-module CoqProject : Parameter_sig.String
 module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool
-module CoqLibs: Parameter_sig.String_list
-module CoqTactic: Parameter_sig.String
-module Hints: Parameter_sig.Int
-module TryHints: Parameter_sig.Bool
 module Why3Flags: Parameter_sig.String_list
-module AltErgo: Parameter_sig.String
-module AltGrErgo: Parameter_sig.String
-module AltErgoLibs: Parameter_sig.String_list
-module AltErgoFlags: Parameter_sig.String_list
 
 module Auto: Parameter_sig.String_list
 module AutoDepth: Parameter_sig.Int
@@ -158,9 +144,10 @@ module MemoryContext: Parameter_sig.Bool
 module CheckMemoryContext: Parameter_sig.Bool
 module SmokeTests: Parameter_sig.Bool
 module SmokeDeadassumes: Parameter_sig.Bool
-module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
+module SmokeDeadlocalinit: Parameter_sig.Bool
+module SmokeDeadloop: Parameter_sig.Bool
 
 (** {2 Getters} *)
 

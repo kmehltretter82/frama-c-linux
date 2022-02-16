@@ -54,9 +54,8 @@ PLUGIN_CMO:= \
 	pool kind term \
 	plib pretty export \
 	export_whycore \
-	export_altergo \
 	export_why3 \
-	export_coq \
+
 
 PLUGIN_CMI:= logic engine
 
@@ -67,7 +66,7 @@ PLUGIN_OFLAGS:=
 PLUGIN_GENERATED:= $(PLUGIN_DIR)/Qed.mli
 
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLED)
-PLUGIN_DISTRIB_EXTERNAL:= Makefile 
+PLUGIN_DISTRIB_EXTERNAL:= Makefile
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
@@ -87,9 +86,7 @@ QED_API= \
 	pool.mli kind.mli term.mli \
 	plib.mli pretty.mli engine.mli export.mli \
 	export_whycore.mli \
-	export_altergo.mli \
 	export_why3.mli \
-	export_coq.mli \
 
 QED_MLI=$(addprefix $(Qed_DIR)/, $(QED_API))
 

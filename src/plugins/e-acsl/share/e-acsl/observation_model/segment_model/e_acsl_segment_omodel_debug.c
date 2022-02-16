@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -31,8 +31,10 @@
 
 void describe_observation_model() {
   rtl_printf(" * Memory tracking: %s\n", E_ACSL_MMODEL_DESC);
-  rtl_printf(" *   Heap  %d MB\n", E_ACSL_HEAP_SIZE);
-  rtl_printf(" *   Stack %d MB\n", E_ACSL_STACK_SIZE);
+  rtl_printf(" *           Heap %d MB\n", E_ACSL_HEAP_SIZE);
+  rtl_printf(" *          Stack %d MB\n", E_ACSL_STACK_SIZE);
+  rtl_printf(" *            TLS %d MB\n", E_ACSL_TLS_SIZE);
+  rtl_printf(" *   Thread stack %d MB\n", E_ACSL_THREAD_STACK_SIZE);
 }
 
 int allocated(uintptr_t addr, long size, uintptr_t base) {

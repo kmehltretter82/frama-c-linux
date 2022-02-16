@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/from_global.i (no preprocessing)
+[kernel] Parsing from_global.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,7 +9,7 @@
   D ∈ {0}
   E ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/value/from_global.i:13.
+  Called from from_global.i:13.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main

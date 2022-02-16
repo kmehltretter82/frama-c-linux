@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/broken_loop.i (no preprocessing)
+[kernel] Parsing broken_loop.i (no preprocessing)
 [eva] Analyzing a complete application starting at loop
 [eva] Computing initial state
 [eva] Initial state computed

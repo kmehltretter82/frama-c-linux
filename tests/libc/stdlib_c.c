@@ -53,5 +53,8 @@ int main() {
   free(resolved_name);
   realpath_res = realpath("/bin/ls", NULL);
 
+  char *canon = canonicalize_file_name("/bin/../etc");
+  free(canon);
+
   return 0;
 }

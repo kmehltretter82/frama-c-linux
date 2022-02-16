@@ -65,7 +65,7 @@ let () =
 
 let warning warn s =
   if warn then
-    Value_parameters.result ~current:true ~once:true s
+    Self.result ~current:true ~once:true s
   else
     Pretty_utils.nullprintf s
 
@@ -129,7 +129,7 @@ let rec gather_lv_in_exp acc e =
   | Const _ | SizeOf _  | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
     acc
   | Lval lv | AddrOf lv | StartOf lv -> gather_lv_in_lv acc lv
-  | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> gather_lv_in_exp acc e
+  | UnOp (_, e, _) | CastE (_, e) -> gather_lv_in_exp acc e
   | BinOp (_, e1, e2, _) -> gather_lv_in_exp (gather_lv_in_exp acc e1) e2
 and gather_lv_in_lv acc (host, offset as lv) =
   let acc =
@@ -182,13 +182,13 @@ let aux_split f state = function
         in
         f ~warn:true lv state max_card
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
-        Value_parameters.warning ~current:true ~once:true
+        Self.warning ~current:true ~once:true
           "Cannot use non-constant split level %a" V.pretty card;
         [state]
     in
     Builtins.States states
   | _ ->
-    Value_parameters.warning ~current:true ~once:true
+    Self.warning ~current:true ~once:true
       "Cannot interpret split directive. Ignoring";
     Builtins.States [state]
 

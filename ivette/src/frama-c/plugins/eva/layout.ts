@@ -87,7 +87,7 @@ export class LayoutEngine {
 
   // --- Probe Buffer
   private byFct?: string; // current function
-  private byStk?: boolean; // callstack probes
+  private byStk = new Map<string, boolean>(); // callstack probes
   private skip?: boolean; // skip current function
   private rowSize: Size = EMPTY;
   private buffer: Probe[] = [];
@@ -104,8 +104,9 @@ export class LayoutEngine {
     };
   }
 
-  layout(ps: Probe[]): Row[] {
+  layout(ps: Probe[], byCallstacks: Map<string, boolean>): Row[] {
     this.chained = undefined;
+    this.byStk = byCallstacks;
     ps.sort(LayoutEngine.order).forEach(this.push);
     return this.flush();
   }
@@ -114,23 +115,19 @@ export class LayoutEngine {
     const fp = p.fct;
     const fq = q.fct;
     if (fp === fq) {
-      const cp = p.byCallstacks;
-      const cq = q.byCallstacks;
-      if (!cp && cq) return (-1);
-      if (cp && !cq) return (+1);
+      const rp = p.rank ?? 0;
+      const rq = q.rank ?? 0;
+      if (rp < rq) return (-1);
+      if (rp > rq) return (+1);
+      if (p.marker < q.marker) return (-1);
+      if (p.marker > q.marker) return (+1);
     }
-    const rp = p.rank ?? 0;
-    const rq = q.rank ?? 0;
-    if (rp < rq) return (-1);
-    if (rp > rq) return (+1);
-    if (p.marker < q.marker) return (-1);
-    if (p.marker > q.marker) return (+1);
     return 0;
   }
 
-  private push(p: Probe) {
+  private push(p: Probe): void {
     // --- sectionning
-    const { fct, byCallstacks: stk } = p;
+    const { fct } = p;
     if (fct !== this.byFct) {
       this.flush();
       this.rows.push({
@@ -141,11 +138,8 @@ export class LayoutEngine {
         hlines: 1,
       });
       this.byFct = fct;
-      this.byStk = stk;
+      this.csRowsCounter = 1;
       this.skip = this.folded(fct);
-    } else if (stk !== this.byStk) {
-      this.flush();
-      this.byStk = stk;
     }
     if (this.skip) return;
     // --- chaining
@@ -160,7 +154,7 @@ export class LayoutEngine {
     p.minCols = s.cols;
     p.maxCols = Math.max(p.minCols, probeSize.cols);
     // --- queueing
-    if (!stk && s.cols + this.rowSize.cols > this.margin)
+    if (s.cols + this.rowSize.cols > this.margin)
       this.flush();
     this.rowSize = addH(this.rowSize, s);
     this.rowSize.cols += CELL_PADDING;
@@ -169,12 +163,14 @@ export class LayoutEngine {
 
   // --- Flush Rows
 
+  private csRowsCounter = 1;
+
   private flush(): Row[] {
     const ps = this.buffer;
     const rs = this.rows;
     const fct = this.byFct;
     if (fct && ps.length > 0) {
-      const stk = this.byStk;
+      const stk = this.byStk.get(fct);
       const hlines = this.rowSize.rows;
       if (stk) {
         // --- by callstacks
@@ -182,26 +178,27 @@ export class LayoutEngine {
         const stacks = this.stacks.getStacks(...markers);
         const summary = fct ? this.stacks.getSummary(fct) : false;
         const callstacks = stacks.length;
+        const { csRowsCounter } = this;
         rs.push({
-          key: `P:${fct}`,
+          key: `P:${fct}:${csRowsCounter}`,
           kind: 'probes',
           probes: ps,
           stackCount: callstacks,
           fct,
           hlines: 1,
         });
-        if (summary) rs.push({
-          key: `V:${fct}`,
+        if (summary && callstacks > 1) rs.push({
+          key: `V:${fct}:${csRowsCounter}`,
           kind: 'values',
           probes: ps,
           stackIndex: -1,
           stackCount: stacks.length,
           fct,
-          hlines: 1,
+          hlines,
         });
         stacks.forEach((cs, k) => {
           rs.push({
-            key: `C:${fct}:${cs}`,
+            key: `C:${fct}:${csRowsCounter}:${cs}`,
             kind: 'callstack',
             probes: ps,
             stackIndex: k,
@@ -231,6 +228,7 @@ export class LayoutEngine {
     }
     this.buffer = [];
     this.rowSize = EMPTY;
+    this.csRowsCounter++;
     return rs;
   }
 

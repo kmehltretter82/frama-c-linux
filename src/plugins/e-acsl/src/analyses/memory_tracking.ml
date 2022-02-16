@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,6 +25,9 @@ open Cil_datatype
 
 module Dataflow = Dataflow2
 
+let dkey = Options.Dkey.mtracking
+module Error = Error.Make(struct let phase = dkey end)
+
 let must_never_monitor vi =
   (* E-ACSL, please do not monitor yourself! *)
   Rtl.Symbols.mem_vi vi.vname
@@ -42,7 +45,6 @@ let must_never_monitor vi =
    left-values must be tracked by the memory model library *)
 (* ********************************************************************** *)
 
-let dkey = Options.dkey_analysis
 module Env: sig
   val has_heap_allocations: unit -> bool
   val check_heap_allocations: kernel_function -> unit
@@ -219,13 +221,13 @@ module rec Transfer
       (match lv with
        | Var vi, _ -> Some vi
        | Mem e, _ -> base_addr e)
-    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) ->
+    | BinOp((PlusPI | MinusPI), e1, e2, _) ->
       if is_ptr_or_array_exp e1 then base_addr e1
       else begin
         assert (is_ptr_or_array_exp e2);
         base_addr e2
       end
-    | Info(e, _) | CastE(_, e) -> base_addr e
+    | CastE(_, e) -> base_addr e
     | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt
             | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
             _, _, _)
@@ -271,13 +273,13 @@ module rec Transfer
     | AddrOf(lhost, _) ->
       extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
       true
-    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) ->
+    | BinOp((PlusPI | MinusPI), e1, e2, _) ->
       if is_ptr_or_array_exp e1 then extend_from_addr state lv e1
       else begin
         assert (is_ptr_or_array_exp e2);
         extend_from_addr state lv e2
       end
-    | CastE(_, e) | Info(e, _) -> extend_from_addr state lv e
+    | CastE(_, e) -> extend_from_addr state lv e
     | _ -> state, false
 
   let handle_assignment state (lhost, _ as lv) e =
@@ -312,7 +314,7 @@ module rec Transfer
     | Tif(_, t1, t2) ->
       let varinfos = register_term kf varinfos t1 in
       register_term kf varinfos t2
-    | TBinOp((PlusPI | IndexPI | MinusPI), t1, t2) ->
+    | TBinOp((PlusPI | MinusPI), t1, t2) ->
       (match t1.term_type with
        | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t1
        | _ ->
@@ -729,6 +731,17 @@ let consolidated_must_monitor_vi vi =
     Env.consolidated_mem vi
   end
 
+let concurrent_function_ref = ref None
+
+let abort_because_of_concurrent ~loc vi =
+  Cil.CurrentLoc.set loc;
+  Options.abort
+    ~current:true
+    "Found concurrent function %a and monitored memory properties.\n\
+     Please use option '-e-acsl-concurrency' to add concurrency support."
+    Printer.pp_varinfo vi
+
+
 let must_monitor_vi ?kf ?stmt vi =
   let _kf = match kf, stmt with
     | None, None | Some _, _ -> kf
@@ -737,26 +750,29 @@ let must_monitor_vi ?kf ?stmt vi =
   (* [JS 2013/05/07] that is unsound to take the env from the given stmt in
      presence of aliasing with an address (see tests address.i).
      TODO: could be optimized though *)
-  consolidated_must_monitor_vi vi
-(*  match stmt, kf with
-    | None, _ -> consolidated_must_monitor_vi vi
-    | Some _, None ->
-    assert false
-    | Some stmt, Some kf  ->
-    if not (Env.is_consolidated ()) then
-      ignore (consolidated_must_monitor_vi vi);
-    try
-      let tbl = Env.find kf in
+  let res = consolidated_must_monitor_vi vi in
+  (*  match stmt, kf with
+      | None, _ -> consolidated_must_monitor_vi vi
+      | Some _, None ->
+      assert false
+      | Some stmt, Some kf  ->
+      if not (Env.is_consolidated ()) then
+        ignore (consolidated_must_monitor_vi vi);
       try
-    let set = Stmt.Hashtbl.find tbl stmt in
-    Varinfo.Hptset.mem vi (Env.default_varinfos set)
+        let tbl = Env.find kf in
+        try
+      let set = Stmt.Hashtbl.find tbl stmt in
+      Varinfo.Hptset.mem vi (Env.default_varinfos set)
+        with Not_found ->
+      (* new statement *)
+      consolidated_must_monitor_vi vi
       with Not_found ->
-    (* new statement *)
-    consolidated_must_monitor_vi vi
-    with Not_found ->
-      (* [kf] is dead code *)
-      false
-*)
+        (* [kf] is dead code *)
+        false
+  *)
+  match res, !concurrent_function_ref with
+  | true, Some (loc, vi) -> abort_because_of_concurrent ~loc vi
+  | _, _ -> res
 
 let rec apply_on_vi_base_from_lval f ?kf ?stmt = function
   | Var vi, _ -> f ?kf ?stmt vi
@@ -765,12 +781,12 @@ let rec apply_on_vi_base_from_lval f ?kf ?stmt = function
 and apply_on_vi_base_from_exp f ?kf ?stmt e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv ->
     apply_on_vi_base_from_lval f ?kf ?stmt lv
-  | BinOp((PlusPI | IndexPI | MinusPI), e1, _, _) ->
+  | BinOp((PlusPI | MinusPI), e1, _, _) ->
     apply_on_vi_base_from_exp f ?kf ?stmt e1
   | BinOp(MinusPP, e1, e2, _) ->
     apply_on_vi_base_from_exp f ?kf ?stmt e1
     || apply_on_vi_base_from_exp f ?kf ?stmt e2
-  | Info(e, _) | CastE(_, e) -> apply_on_vi_base_from_exp f ?kf ?stmt e
+  | CastE(_, e) -> apply_on_vi_base_from_exp f ?kf ?stmt e
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt | Lt | Gt | Le
           | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr), _, _, _)
   | Const _ -> (* possible in case of static address *) false
@@ -820,6 +836,14 @@ let use_monitoring () =
   not (Env.is_empty ())
   || Options.Full_mtracking.get ()
   || Env.has_heap_allocations ()
+
+let found_concurrent_function ~loc vi =
+  if use_monitoring () then
+    abort_because_of_concurrent ~loc vi
+  else
+    match !concurrent_function_ref with
+    | None -> concurrent_function_ref := Some (loc, vi)
+    | Some _ -> ()
 
 (*
 Local Variables:

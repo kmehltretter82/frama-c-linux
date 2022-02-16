@@ -297,7 +297,6 @@
 %token TYPEOF BSTYPE
 %token WITH CONST
 %token INITIALIZED DANGLING
-%token CUSTOM
 %token LSQUAREPIPE RSQUAREPIPE
 %token IN
 %token PI
@@ -1328,19 +1327,6 @@ annot:
 | annotation EOF  { $1 }
 | is_acsl_spec any EOF { Aspec }
 | decl_list EOF   { Adecl ($1) }
-| CUSTOM any_identifier COLON custom_tree EOF { Acustom(loc (),$2, $4) }
-;
-
-custom_tree:
-| TYPE type_spec  { CustomType $2 }
-| LOGIC lexpr     { CustomLexpr $2 }
-| any_identifier_non_logic  { CustomOther($1,[]) }
-| any_identifier_non_logic LPAR custom_tree_list RPAR  { CustomOther($1,$3) }
-;
-
-custom_tree_list:
-| custom_tree   { [$1] }
-| custom_tree COMMA custom_tree_list  { $1::$3 }
 ;
 
 annotation:
@@ -1881,10 +1867,6 @@ any_identifier:
 | keyword { $1 }
 ;
 
-any_identifier_non_logic:
-| identifier_or_typename { $1 }
-| non_logic_keyword { $1 }
-
 identifier_or_typename: /* allowed as C field names */
 | TYPENAME { $1 } /* followed by the same list than 'identifier' */
 | IDENTIFIER { $1 }
@@ -2025,7 +2007,6 @@ non_logic_keyword:
 | is_acsl_spec   { $1 }
 | is_acsl_decl_or_code_annot { $1 }
 | is_acsl_other  { $1 }
-| CUSTOM { "custom" (* token that cannot be used in C fields *) }
 ;
 
 bs_keyword:

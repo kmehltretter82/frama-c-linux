@@ -1,195 +1,187 @@
-[kernel] Parsing tests/syntax/ghost_cv_var_decl.c (with preprocessing)
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:15: 
-  'g1' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:25: 
-  'g1' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:26: 
-  'g2' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:35: 
+[kernel] Parsing ghost_cv_var_decl.c (with preprocessing)
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:15: 'g1' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:25: 'g1' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:26: 'g2' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:35: 
   'g0' elements are already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:48: 
-  'g0' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:178: 
-  'b' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:187: 
-  'b' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:194: 
-  'b' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:203: 
-  'b' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:210: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:48: 'g0' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:178: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:187: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:194: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:203: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:210: 
   'b' elements are already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:219: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:219: 
   'b' elements are already ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:11
+[kernel] ghost_cv_var_decl.c:11
    f_ints: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:12
+[kernel] ghost_cv_var_decl.c:12
    ng: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:14
+[kernel] ghost_cv_var_decl.c:14
    g0: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:15
+[kernel] ghost_cv_var_decl.c:15
    g1: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:18
+[kernel] ghost_cv_var_decl.c:18
    f_ptrs: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:19
+[kernel] ghost_cv_var_decl.c:19
    ng: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:22
+[kernel] ghost_cv_var_decl.c:22
    g: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:23
+[kernel] ghost_cv_var_decl.c:23
    g0: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:25
+[kernel] ghost_cv_var_decl.c:25
    g1: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:26
+[kernel] ghost_cv_var_decl.c:26
    g2: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:30
+[kernel] ghost_cv_var_decl.c:30
    f_arrays: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:31
+[kernel] ghost_cv_var_decl.c:31
    ng: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:34
+[kernel] ghost_cv_var_decl.c:34
    g: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:35
+[kernel] ghost_cv_var_decl.c:35
    g0: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:43
+[kernel] ghost_cv_var_decl.c:43
    f_structs: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:44
+[kernel] ghost_cv_var_decl.c:44
    ng: normal -> { field: normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:47
+[kernel] ghost_cv_var_decl.c:47
    g: ghost -> { field: ghost }
-[kernel] tests/syntax/ghost_cv_var_decl.c:48
+[kernel] ghost_cv_var_decl.c:48
    g0: ghost -> { field: ghost }
-[kernel] tests/syntax/ghost_cv_var_decl.c:55
+[kernel] ghost_cv_var_decl.c:55
    named: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:56
+[kernel] ghost_cv_var_decl.c:56
    a: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:57
+[kernel] ghost_cv_var_decl.c:57
    ptr: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:76
+[kernel] ghost_cv_var_decl.c:76
    nesting_non_ghost: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:77
+[kernel] ghost_cv_var_decl.c:77
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:78
+[kernel] ghost_cv_var_decl.c:78
    ptr: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:79
+[kernel] ghost_cv_var_decl.c:79
    array: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:81
+[kernel] ghost_cv_var_decl.c:81
    pptr: normal -> normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:82
+[kernel] ghost_cv_var_decl.c:82
    parray: normal -> normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:83
+[kernel] ghost_cv_var_decl.c:83
    aptr: normal -> normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:84
+[kernel] ghost_cv_var_decl.c:84
    aarray: normal -> normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:86
+[kernel] ghost_cv_var_decl.c:86
    sp: normal -> { field: normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:87
+[kernel] ghost_cv_var_decl.c:87
    sa: normal -> { field: normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:88
+[kernel] ghost_cv_var_decl.c:88
    spa: normal -> { field: normal -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:89
+[kernel] ghost_cv_var_decl.c:89
    sap: normal -> { field: normal -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:91
+[kernel] ghost_cv_var_decl.c:91
    psp: normal -> normal -> { field: normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:92
+[kernel] ghost_cv_var_decl.c:92
    psa: normal -> normal -> { field: normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:93
+[kernel] ghost_cv_var_decl.c:93
    pspa: normal -> normal -> { field: normal -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:94
+[kernel] ghost_cv_var_decl.c:94
    psap: normal -> normal -> { field: normal -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:96
+[kernel] ghost_cv_var_decl.c:96
    asp: normal -> normal -> { field: normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:97
+[kernel] ghost_cv_var_decl.c:97
    asa: normal -> normal -> { field: normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:98
+[kernel] ghost_cv_var_decl.c:98
    aspa: normal -> normal -> { field: normal -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:99
+[kernel] ghost_cv_var_decl.c:99
    asap: normal -> normal -> { field: normal -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:104
+[kernel] ghost_cv_var_decl.c:104
    nesting_ghost: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:106
+[kernel] ghost_cv_var_decl.c:106
    a: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:107
+[kernel] ghost_cv_var_decl.c:107
    ptr: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:108
+[kernel] ghost_cv_var_decl.c:108
    ptrg: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:110
+[kernel] ghost_cv_var_decl.c:110
    array: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:112
+[kernel] ghost_cv_var_decl.c:112
    pptr: ghost -> normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:113
+[kernel] ghost_cv_var_decl.c:113
    pptrg: ghost -> ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:114
+[kernel] ghost_cv_var_decl.c:114
    pptrgg: ghost -> ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:116
+[kernel] ghost_cv_var_decl.c:116
    parray: ghost -> normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:117
+[kernel] ghost_cv_var_decl.c:117
    parrayg: ghost -> ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:119
+[kernel] ghost_cv_var_decl.c:119
    aptr: ghost -> ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:120
+[kernel] ghost_cv_var_decl.c:120
    aptrg: ghost -> ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:122
+[kernel] ghost_cv_var_decl.c:122
    aarray: ghost -> ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:124
+[kernel] ghost_cv_var_decl.c:124
    sp: ghost -> { field: ghost -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:125
+[kernel] ghost_cv_var_decl.c:125
    sa: ghost -> { field: ghost -> ghost }
-[kernel] tests/syntax/ghost_cv_var_decl.c:126
+[kernel] ghost_cv_var_decl.c:126
    spa: ghost -> { field: ghost -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:127
+[kernel] ghost_cv_var_decl.c:127
    sap: ghost -> { field: ghost -> ghost -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:129
+[kernel] ghost_cv_var_decl.c:129
    psp: ghost -> normal -> { field: normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:130
+[kernel] ghost_cv_var_decl.c:130
    pspg: ghost -> ghost -> { field: ghost -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:132
+[kernel] ghost_cv_var_decl.c:132
    psa: ghost -> normal -> { field: normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:133
+[kernel] ghost_cv_var_decl.c:133
    psag: ghost -> ghost -> { field: ghost -> ghost }
-[kernel] tests/syntax/ghost_cv_var_decl.c:135
+[kernel] ghost_cv_var_decl.c:135
    pspa: ghost -> normal -> { field: normal -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:136
+[kernel] ghost_cv_var_decl.c:136
    pspag: ghost -> ghost -> { field: ghost -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:138
+[kernel] ghost_cv_var_decl.c:138
    psap: ghost -> normal -> { field: normal -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:139
+[kernel] ghost_cv_var_decl.c:139
    psapg: ghost -> ghost -> { field: ghost -> ghost -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:141
+[kernel] ghost_cv_var_decl.c:141
    asp: ghost -> ghost -> { field: ghost -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:142
+[kernel] ghost_cv_var_decl.c:142
    asa: ghost -> ghost -> { field: ghost -> ghost }
-[kernel] tests/syntax/ghost_cv_var_decl.c:143
+[kernel] ghost_cv_var_decl.c:143
    aspa: ghost -> ghost -> { field: ghost -> normal -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:144
+[kernel] ghost_cv_var_decl.c:144
    asap: ghost -> ghost -> { field: ghost -> ghost -> normal }
-[kernel] tests/syntax/ghost_cv_var_decl.c:174
+[kernel] ghost_cv_var_decl.c:174
    foo_1: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:174
+[kernel] ghost_cv_var_decl.c:174
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:178
+[kernel] ghost_cv_var_decl.c:178
    foo_2: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:178
+[kernel] ghost_cv_var_decl.c:178
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:178
+[kernel] ghost_cv_var_decl.c:178
    b: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:182
+[kernel] ghost_cv_var_decl.c:182
    foo_3: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:182
+[kernel] ghost_cv_var_decl.c:182
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:182
+[kernel] ghost_cv_var_decl.c:182
    b: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:182
+[kernel] ghost_cv_var_decl.c:182
    c: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:186
+[kernel] ghost_cv_var_decl.c:186
    bar_1: normal
 [kernel] :0
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:187
+[kernel] ghost_cv_var_decl.c:187
    bar_2: normal
 [kernel] :0
    a: normal
 [kernel] :0
    b: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:188
+[kernel] ghost_cv_var_decl.c:188
    bar_3: normal
 [kernel] :0
    a: normal
@@ -197,35 +189,35 @@
    b: ghost
 [kernel] :0
    c: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:190
+[kernel] ghost_cv_var_decl.c:190
    pfoo_1: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:190
+[kernel] ghost_cv_var_decl.c:190
    a: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:194
+[kernel] ghost_cv_var_decl.c:194
    pfoo_2: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:194
+[kernel] ghost_cv_var_decl.c:194
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:194
+[kernel] ghost_cv_var_decl.c:194
    b: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:198
+[kernel] ghost_cv_var_decl.c:198
    pfoo_3: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:198
+[kernel] ghost_cv_var_decl.c:198
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:198
+[kernel] ghost_cv_var_decl.c:198
    b: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:198
+[kernel] ghost_cv_var_decl.c:198
    c: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:202
+[kernel] ghost_cv_var_decl.c:202
    pbar_1: normal
 [kernel] :0
    a: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:203
+[kernel] ghost_cv_var_decl.c:203
    pbar_2: normal
 [kernel] :0
    a: normal
 [kernel] :0
    b: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:204
+[kernel] ghost_cv_var_decl.c:204
    pbar_3: normal
 [kernel] :0
    a: normal
@@ -233,63 +225,63 @@
    b: ghost -> ghost
 [kernel] :0
    c: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:206
+[kernel] ghost_cv_var_decl.c:206
    afoo_1: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:206
+[kernel] ghost_cv_var_decl.c:206
    a: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:210
+[kernel] ghost_cv_var_decl.c:210
    afoo_2: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:210
+[kernel] ghost_cv_var_decl.c:210
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:210
+[kernel] ghost_cv_var_decl.c:210
    b: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:214
+[kernel] ghost_cv_var_decl.c:214
    afoo_3: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:214
+[kernel] ghost_cv_var_decl.c:214
    a: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:214
+[kernel] ghost_cv_var_decl.c:214
    b: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:218
+[kernel] ghost_cv_var_decl.c:218
    abar_1: normal
 [kernel] :0
    a: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:219
+[kernel] ghost_cv_var_decl.c:219
    abar_2: normal
 [kernel] :0
    a: normal
 [kernel] :0
    b: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:220
+[kernel] ghost_cv_var_decl.c:220
    abar_3: normal
 [kernel] :0
    a: normal
 [kernel] :0
    b: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:223
+[kernel] ghost_cv_var_decl.c:223
    reference_functions: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:228
+[kernel] ghost_cv_var_decl.c:228
    v: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:229
+[kernel] ghost_cv_var_decl.c:229
    gp: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:234
+[kernel] ghost_cv_var_decl.c:234
    ng: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:235
+[kernel] ghost_cv_var_decl.c:235
    ga: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:248
+[kernel] ghost_cv_var_decl.c:248
    x: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:242
+[kernel] ghost_cv_var_decl.c:242
    i: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:243
+[kernel] ghost_cv_var_decl.c:243
    p: normal -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:245
+[kernel] ghost_cv_var_decl.c:245
    gp1: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:246
+[kernel] ghost_cv_var_decl.c:246
    gp2: ghost -> normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:248
+[kernel] ghost_cv_var_decl.c:248
    x: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:250
+[kernel] ghost_cv_var_decl.c:250
    main: normal
-[kernel] tests/syntax/ghost_cv_var_decl.c:251
+[kernel] ghost_cv_var_decl.c:251
    value: ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:252
+[kernel] ghost_cv_var_decl.c:252
    __retres: normal

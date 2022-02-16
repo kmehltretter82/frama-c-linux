@@ -438,10 +438,11 @@ struct
         (F.varsp goal) hs
     in xs , hs , goal
 
-  let add_vc target ?(warn=Warning.Set.empty) pred vcs =
+  let add_vc
+      target ?(warn=Warning.Set.empty) ?(deps=Property.Set.empty) pred vcs =
     let xs , hs , goal = introduction pred in
     let hyps = Conditions.intros hs Conditions.nil in
-    let vc = { empty_vc with goal=goal ; vars=xs ; hyps=hyps ; warn=warn } in
+    let vc = { empty_vc with goal ; vars=xs ; hyps ; warn ; deps } in
     Gmap.add target (Splitter.singleton vc) vcs
 
   (* ------------------------------------------------------------------------ *)
@@ -483,7 +484,7 @@ struct
 
   let add_axiom _id _l = ()
 
-  let add_hyp wenv (hpid,predicate) wp = in_wenv wenv wp
+  let add_hyp ?for_pid wenv (hpid,predicate) wp = in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
              ~severe:false ~effect:"Skip hypothesis"
@@ -492,7 +493,11 @@ struct
            | Warning.Result(warn,p) -> warn , [p]
            | Warning.Failed warn -> warn , []
          in
-         let vcs = gmap (assume_vc ~hpid ~warn hs) wp.vcs in
+         let assume_vc target vcs = match for_pid with
+           | Some id when not @@ PropId.equal id (TARGET.prop_id target) -> vcs
+           | _ -> Splitter.map (assume_vc ~hpid ~warn hs) vcs
+         in
+         let vcs = Gmap.mapi assume_vc wp.vcs in
          { wp with vcs = vcs })
 
   let add_goal wenv (gpid,predicate) wp = in_wenv wenv wp
@@ -507,7 +512,7 @@ struct
          let vcs = add_vc (Gprop gpid) ~warn goal wp.vcs in
          { wp with vcs = vcs })
 
-  let add_subgoal wenv (gpid, _) predicate stmt source wp = in_wenv wenv wp
+  let add_subgoal wenv (gpid,_) ?deps predicate stmt src wp = in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
              ~severe:true ~effect:"Degenerated goal"
@@ -516,7 +521,7 @@ struct
            | Warning.Result(warn,goal) -> warn,goal
            | Warning.Failed warn -> warn,F.p_false
          in
-         let vcs = add_vc (Gsource(gpid, stmt, source)) ~warn goal wp.vcs in
+         let vcs = add_vc (Gsource(gpid, stmt, src)) ~warn ?deps goal wp.vcs in
          { wp with vcs = vcs })
 
   let add_assigns wenv (gpid,ainfo) wp = in_wenv wenv wp
@@ -1049,47 +1054,137 @@ struct
   (* --- WP RULE : call terminates                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let call_terminates wenv (gpid, caller_t) stmt kf es ~callee_t wp =
+  let call_terminates wenv stmt kf args (id, caller_t) ?callee_t wp =
     in_wenv wenv wp
       (fun env wp ->
-         let gid = Gsource(gpid, stmt, FromCall) in
          let outcome = Warning.catch
-             ~severe:true ~effect:"Can not prove call termination"
+             ~severe:true
+             ~effect:"Considering that call must always terminate"
              (L.pred `Positive env) caller_t
          in
+         let warn, caller_t = match outcome with
+           | Warning.Failed warn -> warn, p_true
+           | Warning.Result (warn, p) -> warn, p
+         in
+         let prove_terminates ~warn p =
+           add_vc (Gsource(id, stmt, FromCall)) ~warn (p_imply caller_t p)
+         in
+         let sigma = L.current env in
+         let outcome = Warning.catch
+             ~severe:true
+             ~effect:"Considering non terminating callee"
+             (List.map (C.exp sigma)) args in
          match outcome with
-         | Warning.Failed warn ->
-             let vcs = add_vc gid ~warn p_false wp.vcs in
+         | Warning.Failed warn2 ->
+             let warn = W.union warn warn2 in
+             let vcs = prove_terminates ~warn p_false wp.vcs in
              { wp with vcs = vcs }
-         | Warning.Result(warn, caller_t) ->
-             let sigma = L.current env in
-             let outcome = Warning.catch
-                 ~severe:true ~effect:"Can not prove call preconditions"
-                 (List.map (C.exp sigma)) es in
-             match outcome with
-             | Warning.Failed warn2 ->
-                 let warn = W.union warn warn2 in
-                 let vcs = add_vc gid ~warn p_false wp.vcs in
-                 { wp with vcs = vcs }
-             | Warning.Result(warn2, vs) ->
-                 let warn = W.union warn warn2 in
-                 let init = L.mem_at env Clabels.init in
-                 let call = L.call kf vs in
-                 let call_e = L.mk_env ~here:sigma () in
-                 let call_f = L.call_pre init call sigma in
-                 let outcome = Warning.catch
-                     ~severe:true ~effect:"Can not prove call precondition"
-                     (L.in_frame call_f (L.pred `Positive call_e)) callee_t in
-                 match outcome with
-                 | Warning.Result(warn3,callee_t) ->
-                     let warn = W.union warn warn3 in
-                     let goal = p_imply caller_t callee_t in
-                     let vcs = add_vc gid ~warn goal wp.vcs in
-                     { wp with vcs = vcs }
-                 | Warning.Failed warn3 ->
-                     let warn = W.union warn warn3 in
-                     let vcs = add_vc gid ~warn p_false wp.vcs in
-                     { wp with vcs = vcs })
+         | Warning.Result(warn2, args) ->
+             let warn = W.union warn warn2 in
+             let compile_callee = function
+               | None ->
+                   Warning.error "No terminates clause for %a"
+                     Kernel_function.pretty kf
+               | Some callee_t ->
+                   let init = L.mem_at env Clabels.init in
+                   let call = L.call kf args in
+                   let call_e = L.mk_env ~here:sigma () in
+                   let call_f = L.call_pre init call sigma in
+                   L.in_frame call_f (L.pred `Positive call_e) callee_t
+             in
+             let outcome =
+               Warning.catch
+                 ~severe:true ~effect:"Considering non terminating callee"
+                 compile_callee callee_t
+             in
+             let warn2, callee_t = match outcome with
+               | Warning.Failed warn -> warn, p_false
+               | Warning.Result(warn,callee_t) -> warn, callee_t
+             in
+             let warn = W.union warn warn2 in
+             let vcs = prove_terminates ~warn callee_t wp.vcs in
+             { wp with vcs = vcs })
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- WP RULE : call decreases                                           --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let call_decreases wenv stmt kf args (id, caller_d) ?caller_t ?callee_d wp =
+    in_wenv wenv wp
+      (fun env wp ->
+         let compile_caller_t caller_t =
+           if not @@ Wp_parameters.TerminatesVariantHyp.get () then p_true
+           else match caller_t with
+             | None -> p_true
+             | Some t -> (L.pred `Positive env) t
+         in
+         let outcome = Warning.catch
+             ~severe:true
+             ~effect:"Considering that call must always decrease"
+             compile_caller_t caller_t
+         in
+         let warn, caller_t = match outcome with
+           | Warning.Failed warn -> warn, p_true
+           | Warning.Result (warn, p) -> warn, p
+         in
+         let prove_decreases ~warn p =
+           add_vc (Gsource(id, stmt, FromCall)) ~warn (p_imply caller_t p)
+         in
+         let sigma = L.current env in
+         let outcome = Warning.catch
+             ~severe:true
+             ~effect:"Considering non decreasing call"
+             (List.map (C.exp sigma)) args in
+         match outcome with
+         | Warning.Failed warn2 ->
+             let warn = W.union warn warn2 in
+             let vcs = prove_decreases ~warn p_false wp.vcs in
+             { wp with vcs = vcs }
+         | Warning.Result(warn2, args) ->
+             let warn = W.union warn warn2 in
+             let init = L.mem_at env Clabels.init in
+             let call = L.call kf args in
+             let call_e = L.mk_env ~here:sigma () in
+             let call_f = L.call_pre init call sigma in
+             let compile_decreases (caller_d, callee_d) =
+               match caller_d, callee_d with
+               | _, None ->
+                   Warning.error "No decreases clause for %a"
+                     Kernel_function.pretty kf
+               | (_, r), Some (_, r')
+                 when not @@ Option.equal Logic_utils.is_same_logic_info r r' ->
+                   let none : Pretty_utils.sformat = "<None>" in
+                   Warning.error
+                     "On call to %a, relation (%a) does not match caller (%a)"
+                     Kernel_function.pretty kf
+                     (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r
+                     (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r'
+               | (caller_d, rel), Some (callee_d,_ ) ->
+                   let rel caller callee = match rel with
+                     | None ->
+                         p_and (p_leq e_zero callee) (p_lt callee caller)
+                     | Some rel ->
+                         (L.in_frame call_f (L.call_pred call_e))
+                           rel [] [caller ; callee]
+                   in
+                   let caller_d = L.term env caller_d in
+                   let callee_d =
+                     (L.in_frame call_f (L.term call_e)) callee_d in
+                   rel caller_d callee_d
+             in
+             let outcome =
+               Warning.catch
+                 ~severe:true ~effect:"Considering non decreasing call"
+                 compile_decreases (caller_d, callee_d)
+             in
+             let warn2, pred = match outcome with
+               | Warning.Failed warn -> warn, p_false
+               | Warning.Result (warn, p) -> warn, p
+             in
+             let warn = W.union warn warn2 in
+             let vcs = prove_decreases ~warn pred wp.vcs in
+             { wp with vcs = vcs })
+
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : call postcondition                                       --- *)
@@ -1403,7 +1498,6 @@ struct
       po_pid = pid ;
       po_sid = "" ;
       po_gid = "" ;
-      po_leg = "" ;
       po_name = "" ;
       po_idx = index ;
       po_formula = GoalAnnot vcq ;
@@ -1462,12 +1556,10 @@ struct
         WpPropId.split_bag
           begin fun po_pid wpo ->
             let po_sid = WpPropId.get_propid po_pid in
-            let po_leg = WpPropId.get_legacy po_pid in
             let po_gid = Printf.sprintf "%s_%s" mid po_sid in
-            let po_leg = Printf.sprintf "%s_%s" mid po_leg in
             let po_name = Pretty_utils.to_string WpPropId.pretty_local pid in
             let wpo =
-              { wpo with po_pid ; po_sid ; po_gid ; po_leg ; po_name }
+              { wpo with po_pid ; po_sid ; po_gid ; po_name }
             in
             Wpo.add wpo ;
             collection := Bag.append !collection wpo ;
@@ -1494,11 +1586,9 @@ struct
         | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
       let mid = WpContext.MODEL.id model in
       let sid = WpPropId.get_propid id in
-      let leg = WpPropId.get_legacy id in
       let wpo = {
         Wpo.po_model = model ;
         Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
-        Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
         Wpo.po_sid = sid ;
         Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
         Wpo.po_idx = index ;

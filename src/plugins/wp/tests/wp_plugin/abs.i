@@ -1,13 +1,13 @@
 /* run.config
-   OPT: -wp-driver tests/wp_plugin/abs.driver
+ COMMENT: depends from files mentionned into "abs.driver"
+ DEPS: abs.why
+   OPT: -wp-driver %{dep:@PTEST_DIR@/abs.driver}
  */
-
 /* run.config_qualif
-   OPT: -wp -wp-driver tests/wp_plugin/abs.driver -wp-prover alt-ergo
-   OPT: -wp -wp-driver tests/wp_plugin/abs.driver -wp-prover native:coq -wp-coq-script tests/wp_plugin/abs.script
-   OPT: -wp -wp-driver tests/wp_plugin/abs.driver -wp-prover native:alt-ergo
+ COMMENT: depends from files mentionned into "abs.driver"
+ DEPS: abs.why
+   OPT: -wp -wp-driver %{dep:@PTEST_DIR@/abs.driver} -wp-prover alt-ergo
 */
-
 /*@ axiomatic Absolute { logic integer ABS(integer x) ; } */
 
 /*@ ensures \result == ABS(x) ; */

@@ -204,10 +204,10 @@ module PrintProject = struct
   let iter_edges_src_fun f =
     let do_kf_calls kf =
       let fi = SlicingMacros.get_kf_fi kf in
-      let doit (kf_caller,_) =
+      let doit kf_caller =
         let fi_caller = SlicingMacros.get_kf_fi kf_caller in
         f ((Src fi_caller, Src fi), None)
-      in List.iter doit (!Db.Value.callers kf)
+      in List.iter doit (Eva.Results.callers kf)
     in
     Globals.Functions.iter do_kf_calls
 

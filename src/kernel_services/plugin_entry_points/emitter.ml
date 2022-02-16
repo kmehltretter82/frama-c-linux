@@ -23,10 +23,6 @@
 (* Modules [Hashtbl] and [Kernel] are not usable here. Thus use above modules
    instead. *)
 
-(**************************************************************************)
-(** {2 Datatype} *)
-(**************************************************************************)
-
 type kind = Property_status | Alarm | Code_annot | Funspec | Global_annot
 
 type emitter =
@@ -34,6 +30,59 @@ type emitter =
     kinds: kind list;
     tuning_parameters: Typed_parameter.t list;
     correctness_parameters: Typed_parameter.t list }
+
+(**************************************************************************)
+(** {2 Implementation for Plug-in Developers} *)
+(**************************************************************************)
+
+let names: unit Datatype.String.Hashtbl.t = Datatype.String.Hashtbl.create 7
+
+let create name kinds ~correctness ~tuning =
+  if Datatype.String.Hashtbl.mem names name then
+    Kernel.fatal "emitter %s already exists with the same parameters" name;
+  let e =
+    { name = name;
+      kinds = kinds;
+      correctness_parameters = correctness;
+      tuning_parameters = tuning }
+  in
+  Datatype.String.Hashtbl.add names name ();
+  e
+
+let dummy = create "dummy" [] ~correctness:[] ~tuning:[]
+
+let get_name e = e.name
+
+let correctness_parameters e =
+  List.map (fun p -> p.Typed_parameter.name) e.correctness_parameters
+
+let tuning_parameters e =
+  List.map (fun p -> p.Typed_parameter.name) e.tuning_parameters
+
+let end_user =
+  create
+    "End-User"
+    [ Property_status; Code_annot; Funspec; Global_annot ]
+    ~correctness:[]
+    ~tuning:[]
+
+let kernel =
+  create
+    "Frama-C kernel"
+    [ Property_status; Funspec ]
+    ~correctness:[]
+    ~tuning:[]
+
+let orphan =
+  create
+    "Orphan"
+    [ Code_annot; Funspec; Global_annot ]
+    ~correctness:[]
+    ~tuning:[]
+
+(**************************************************************************)
+(** {2 Datatype} *)
+(**************************************************************************)
 
 module D =
   Datatype.Make_with_collections
@@ -106,7 +155,7 @@ module Usable_emitter = struct
         let mem_project = Datatype.never_any_project
       end)
 
-  let get e =
+  let unsafe_get e =
     let get_params map =
       Datatype.String.Map.fold
         (fun s _ acc -> Typed_parameter.get s :: acc)
@@ -117,6 +166,13 @@ module Usable_emitter = struct
       kinds = e.u_kinds;
       correctness_parameters = get_params e.correctness_values;
       tuning_parameters = get_params e.tuning_values }
+
+  (* In some cases, e.g. when loading a state with a different set
+     of plugins loaded, the original emitter might not be available,
+     leading to discarding annotations. Let the kernel adopt them. *)
+  let get e =
+    try unsafe_get e
+    with Not_found -> orphan
 
   let get_name e = e.u_name
   let get_unique_name e = Format.asprintf "%a" pretty e
@@ -133,55 +189,6 @@ module Usable_emitter = struct
     Format.fprintf fmt "%s %s" s v
 
 end
-
-(**************************************************************************)
-(** {2 Implementation for Plug-in Developers} *)
-(**************************************************************************)
-
-let names: unit Datatype.String.Hashtbl.t = Datatype.String.Hashtbl.create 7
-
-let create name kinds ~correctness ~tuning =
-  if Datatype.String.Hashtbl.mem names name then
-    Kernel.fatal "emitter %s already exists with the same parameters" name;
-  let e =
-    { name = name;
-      kinds = kinds;
-      correctness_parameters = correctness;
-      tuning_parameters = tuning }
-  in
-  Datatype.String.Hashtbl.add names name ();
-  e
-
-let dummy = create "dummy" [] ~correctness:[] ~tuning:[]
-
-let get_name e = e.name
-
-let correctness_parameters e =
-  List.map (fun p -> p.Typed_parameter.name) e.correctness_parameters
-
-let tuning_parameters e =
-  List.map (fun p -> p.Typed_parameter.name) e.tuning_parameters
-
-let end_user =
-  create
-    "End-User"
-    [ Property_status; Code_annot; Funspec; Global_annot ]
-    ~correctness:[]
-    ~tuning:[]
-
-let kernel =
-  create
-    "Frama-C kernel"
-    [ Property_status; Funspec ]
-    ~correctness:[]
-    ~tuning:[]
-
-let orphan =
-  create
-    "Orphan"
-    [ Code_annot; Funspec; Global_annot ]
-    ~correctness:[]
-    ~tuning:[]
 
 (**************************************************************************)
 (** {2 State of all known emitters} *)

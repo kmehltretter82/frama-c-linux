@@ -288,6 +288,11 @@ The user can select a hypothesis $H$, and change the goal to $\neg H$:
 
 $$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,\neg H} $$
 
+\paragraph{Clear} Remove Hypothesis\\
+The user can select a hypothesis $H$, and remove it from the context:
+
+$$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,G} $$
+
 \paragraph{Choice} Select a Goal Alternative\\
 When the goal is a disjunction, the user select one alternative and discard the others:
 $$ \TACTIC{\Delta\models\,\Gamma,G}{\Delta\models\,G} $$
@@ -301,7 +306,7 @@ $$ \TACTIC{ a = b }{ \bigwedge a.f_i = b.f_i } $$
 The user select a hypothesis (typically, a negation) and swap it with the goal.
 $$ \TACTIC{\Delta,H\models\,G}{\Delta,\neg G\models\,\neg H} $$
 
-\paragraph{Cut} Use Intermerdiate Hypothesis
+\paragraph{Cut} Use Intermediate Hypothesis
 The user introduce a new clause $C$ with the composer to prove the goal. There two variants of the tactic, made available by a menu in the tactic panel.
 
 The \textsf{Modus-Ponens} variant where the clause $C$ is used as an intermediate proof step:
@@ -322,10 +327,16 @@ $$\TACTIC{\Delta\models\,G}{%
 \paragraph{Definition} Unfold predicate and logic function definition\\
 The user simply select a term $f(e_1,\ldots,e_n)$ or a predicate $P(e_1,\ldots,e_n)$ which is replaced by its definition, when available.
 
-\paragraph{Filter} Erase Hypotheses \\
-The tactic is always applicable. It removes hypotheses from the goal on a variable used basis. When variables are compounds (record and arrays) a finer heuristics is used to detect which parts of the variable is relevant. A transitive closure of dependencies is also used. However, it is always possible that too many hypotheses are removed.
+\paragraph{Filter} Dependent Erasure of Hypotheses \\
+The tactic is always applicable. It removes hypotheses from the goal on a
+variable used basis. When variables are compounds (record and arrays) a finer
+heuristic is used to detect which parts of the variable is relevant. A
+transitive closure of dependencies is also used. However, it is always
+possible that too many hypotheses are removed.
 
-The tactic also have a variant where only hypotheses \emph{not relevant} to the goal are retained. This is useful to find absurd hypotheses that are completely disjoint from the goal.
+The tactic also have a variant where only hypotheses \emph{not relevant} to the
+goal are retained. This is useful to find absurd hypotheses that are completely
+disjoint from the goal.
 
 \paragraph{Instance} Instantiate properties\\
 The user selects a hypothesis with one or several $\forall$ quantifiers, or an $\exists$ quantified goal. Then, with the composer, the use choose to instantiate one or several of the quantified parameters. In case of $\forall$ quantifier over integer, a range of values can be instantiated instead.
@@ -486,10 +497,29 @@ $G(n) \equiv P(n)\Longrightarrow\,Q(n)$:
 \Delta,\; \forall i,\, n < i \leq b \Longrightarrow G(i) \; & \models G(n)
 \end{array}} \]
 
+\paragraph{Mod-Mask} Rewrite bitmask into/from modulo \\
+This tactic is used to rewrite a bitmask into a modulo (or a modulo into a
+bitmask) when possible. The user selects an expression $e$ of the form
+$b \% m$ (resp. $b \& m$ - $\texttt{land b m}$) than can be rewritten into
+$b \& (m+1)$ (resp. $b \% (m - 1)$), if $0 \leq b$ and $m$ is a positive power
+of 2 (resp. $m + 1$ is a positive power of 2). When selecting an expression
+$x \& y$, both directions $x \% (y - 1)$ and $y \% (x - 1)$ can be considered.
+
+Since establishing that $m$ is a positive power of 2 can be hard, the tactic has
+several behaviors. If \textsf{Qed} can prove immediately that an operand $m$ (or
+$m+1$ for bitmaks) is a positive power of 2, the tactic only generates the guard
+$0 \leq b$ and the rewritten goal. If it is not the case, the tactic appears
+with the name ``Mod-Mask (hard)'' in the GUI. In this situation, the guard
+consists of two conditions: $0 \leq b$ and $m$ (or $m+1$) is a positive power of
+2. This guard involves an existential quantification, so it can be hard to
+prove. When the selected term is a bitmask, the tactic cannot decide itself the
+direction of the modulo, thus a checkbox is added in the configuration of the
+tactic to select the direction of rewriting.
+
 \paragraph{Overflow} Integer Conversions \\
 This tactic split machine integer conversions into three cases: value in integer
 range, lower than range and upper than range. The tactic applies on expression
-with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer
+with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a machine-integer type
 name, \emph{eg.} \texttt{to\_uint32}.
 
 \[\TACTIC{\Delta\models G}{%
@@ -797,7 +827,8 @@ interface of the programmatic API.
     Recognized categories are: \texttt{@lemma}, \texttt{@requires}, \texttt{@assigns},
     \texttt{@ensures}, \texttt{@exits}, \texttt{@assert}, \texttt{@check},
     \texttt{@invariant}, \texttt{@variant}, \texttt{@breaks},
-    \texttt{@continues}, \texttt{@returns}, \\
+    \texttt{@continues}, \texttt{@returns}, \texttt{@terminates},\\
+    \texttt{@decreases},
     \texttt{\mbox{@complete\_behaviors}}, \texttt{\mbox{@disjoint\_behaviors}}.
     \\
     Properties can be prefixed with a minus sign to \emph{skip} the associated annotations.
@@ -986,7 +1017,7 @@ weakest precondition calculus.
   \texttt{terminates \textbackslash{}false}, any loop variant proof is trivial)
   (default is: \texttt{no}).
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
-  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation (default is: \texttt{yes}).
+  thanks to the dedicated code annotation \verb+@calls f1,...,fn+ (default is: \texttt{yes}).
 \end{description}
 
 \subsubsection{ACSL extension \texttt{@calls}}
@@ -1017,6 +1048,99 @@ int caller(int (*fp)(int)){
 These annotations split post-conditions to the dynamic call into two sub-goals: one for call to \verb+f1+ and
 a second for the call to \verb+f2+. A last goal is generated at the call
 site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
+
+\subsubsection{Proof of \texttt{@terminates}}
+\label{ss-sec:plugin-terminates}
+
+In ACSL, a function can be specified to terminate when some condition \verb+P+ holds
+in pre-condition.
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+/*@ terminates P ; */
+void function(void){
+  ...
+}
+\end{lstlisting}
+
+If terminates verification is active (depending on \verb+-wp+ options) WP collects all function calls and loops
+and generate verification conditions (VCs) to prove them, as detailed below.
+
+\paragraph{Loop variants.} When a loop has a variant, no particular verification
+is generated for termination. However, if \verb+-wp-variant-with-terminates+ is
+active, the variant is verified only when \verb+P+ holds in pre-condition.
+Intuitively, this option means that variant has to decrease only if the function has to terminate. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i >= 0 ;
+void positive(int i){
+  /*@ loop invariant \at(i, Pre) >= 0 ==> 0 <= i <= \at(i, Pre) ;
+      loop assigns i ;
+      loop variant i ; // verified when i >= 0 at pre
+  */
+  while(i) --i;
+}
+\end{lstlisting}
+
+Note that when \verb+terminates \false+ is specified, any loop
+variant would trivially holds.
+
+When a loop does not have a variant, WP checks that the loop is unreachable
+when \verb+P+ holds in precondition, which means that a loop is allowed to not
+terminate when the function does not have to terminate. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i >= 0 ;
+void function(int i){
+  if(i < 0){
+    // note i >= 0 && i < 0 ==> \false
+    while(1);
+  }
+}
+\end{lstlisting}
+
+\paragraph{Function call.} When a function \verb+f+ is required to terminate on
+\verb+P+, and calling function \verb+g+ only terminates when \verb+Q+, WP tries to
+prove that \verb+P@pre ==> Q@call-point+. Indeed, for \verb+f+ to terminates while calling
+\verb+g+, then \verb+g+ shall terminate. Note that it
+means that if the function under verification shall terminate, any call to a
+non-terminating function shall be unreachable. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i <= 0 ;
+void f(int i) ;
+
+//@ terminates i >  0 ;
+void g(int i) ;
+
+/*@ requires i <= 0 ;
+    terminates \true ; */
+void caller(int i){
+  f(i); // succeeds
+  g(i); // fails, thus global termination is not proved
+}
+\end{lstlisting}
+
+When a called function does not have a terminates specification, WP assumes one
+as specified by the options:
+
+\begin{itemize}
+\item \verb+-wp-frama-c-stdlib-terminate+,
+\item \verb+-wp-declarations-terminate+,
+\item \verb+-wp-definitions-terminate+.
+\end{itemize}
+
+\paragraph{(Mutually) recursive function.} When a function is involved in a
+recursive cluster (as defined in the ACSL manual) and shall terminate, WP checks that a
+\verb+decreases+ clause is available for the function. Proving that existing
+recursive calls might be unreachable is delegated to the proof of the
+\verb+decreases+ clause.
+
+\paragraph{Function pointers. } On a call via a function pointer, WP checks that
+a \verb+@calls+ is specified for this function pointer. If so, WP just behaves
+as explained before for function calls. If such a specification is not available,
+WP considers that the pointed function might call the function under
+verification and thus that it is part of a recursive cluster and shall provide
+a \verb+decreases+ clause.
 
 \subsection{Smoke Tests}
 
@@ -1049,12 +1173,14 @@ inconsistent requirements, or on the loop with inconsistent invariants, and
   calls (default is: \texttt{yes}).
 \item[\tt -wp-(no)-smoke-dead-code] includes smoke tests for dead code (default
   is: \texttt{yes}).
+\item[\tt -wp-(no)-smoke-dead-local-init] includes smoke tests for dead local
+  variables initialization (default is: \texttt{no}).
 \item[\tt -wp-(no)-smoke-dead-loop] includes smoke tests for inconsistent loop
   invariants (default is: \texttt{yes}).
 \end{description}
 
 When reporting prover results for smoke-tests, the \textsf{WP} displays
-``Failed'' when some prover succeed in discharing the \verb+\false+ proof-obligation
+``Failed'' when some prover succeeds in discharging the \verb+\false+ proof-obligation
 and ``Passed'' when all the provers result are unknown or interrupted.
 In the final prover statistics, the interrupted smoke tests are \emph{not} reported, since
 they are considered valid tests.

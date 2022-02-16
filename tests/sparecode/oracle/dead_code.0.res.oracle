@@ -1,4 +1,4 @@
-[kernel] Parsing tests/sparecode/dead_code.i (no preprocessing)
+[kernel] Parsing dead_code.i (no preprocessing)
 [sparecode] remove unused code...
 [sparecode] selecting function main outputs and entry point
 [eva] Analyzing a complete application starting at main

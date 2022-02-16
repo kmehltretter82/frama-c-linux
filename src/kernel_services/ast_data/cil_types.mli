@@ -200,7 +200,7 @@ and typ =
       {!Cil.charPtrType}, {!Cil.charConstPtrType} (pointer to a constant
       character), {!Cil.voidPtrType}, {!Cil.intPtrType} *)
 
-  | TArray of typ * exp option * bitsSizeofTypCache * attributes
+  | TArray of typ * exp option * attributes
   (** Array type. It indicates the base type and the array length. *)
 
   | TFun of typ * (string * typ * attributes) list option * bool * attributes
@@ -224,7 +224,7 @@ and typ =
       attributes are in addition to those given when the type name was
       defined. *)
 
-  | TComp of compinfo * bitsSizeofTypCache * attributes
+  | TComp of compinfo * attributes
   (** A reference to a struct or a union type. All references to the
       same struct or union must share the same compinfo among them and
       with a [GCompTag] global that precedes all uses (except maybe
@@ -264,14 +264,6 @@ and fkind =
     FFloat      (** [float] *)
   | FDouble     (** [double] *)
   | FLongDouble (** [long double] *)
-
-(** This is used to cache the computation of the size of types in bits. *)
-and bitsSizeofTyp =
-  | Not_Computed
-  | Computed of int
-  | Not_Computable of (string * typ) (** Explanation of the error *)
-
-and bitsSizeofTypCache = { mutable scache : bitsSizeofTyp}
 
 (* ************************************************************************* *)
 (** {2 Attributes} *)
@@ -444,10 +436,6 @@ and fieldinfo = {
   (** Offset at which the field starts in the structure.
       Do not read this field directly. Use {!Cil.fieldBitsOffset} or
       {!Cil.bitsOffset} instead. *)
-
-  mutable fpadding_in_bits: int option;
-  (** (Deprecated.) Store the size of the padding that follows the field, if any.
-      @deprecated only Jessie uses this *)
 }
 
 (* ************************************************************************* *)
@@ -710,15 +698,6 @@ and exp_node =
       [TPtr(T)]. In C this operation is implicit, the [StartOf] operator is not
       printed. We have it in CIL because it makes the typing rules simpler. *)
 
-  | Info       of exp * exp_info
-  (** Additional information on the underlying expression *)
-
-(** Additional information on an expression *)
-and exp_info = {
-  exp_type : logic_type; (** when used as placeholder for a term *)
-  exp_name: string list;
-}
-
 (* ************************************************************************* *)
 (** {2 Constants} *)
 (* ************************************************************************* *)
@@ -771,12 +750,6 @@ and unop =
 and binop =
     PlusA    (** arithmetic + *)
   | PlusPI   (** pointer + integer *)
-  | IndexPI  (** pointer + integer but only when it arises from an expression
-                 [e\[i\]] when [e] is a pointer and
-                 not an array. This is semantically
-                 the same as PlusPI but CCured uses
-                 this as a hint that the integer is
-                 probably positive. *)
   | MinusA   (** arithmetic - *)
   | MinusPI  (** pointer - integer *)
   | MinusPP  (** pointer - pointer *)
@@ -1834,15 +1807,6 @@ and global_annotation =
       argument of type t *)
   | Dextended of acsl_extension * attributes * location
   (** Extended global clause. *)
-  | Dcustom_annot of custom_tree * string * attributes * location
-  (*Custom declaration*)
-
-and custom_tree = CustomDummy
-(*
-  | CustomType of logic_type
-  | CustomLexpr of lexpr
-  | CustomOther of string * (custom_tree list)
-*)
 
 type kinstr =
   | Kstmt of stmt

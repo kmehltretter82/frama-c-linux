@@ -20,6 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // --------------------------------------------------------------------------
 // --- Text Documents
 // --------------------------------------------------------------------------
@@ -31,6 +34,9 @@
 
 import Emitter from 'events';
 import CodeMirror from 'codemirror/lib/codemirror';
+import { Debug } from 'dome';
+
+const D = new Debug('Dome.text');
 
 export type Range = { from: CodeMirror.Position; to: CodeMirror.Position };
 
@@ -113,6 +119,8 @@ function byVisibleTag(lmin: number, lmax: number) {
 // --- Buffer
 // --------------------------------------------------------------------------
 
+export type TextMarker = CodeMirror.TextMarker<CodeMirror.MarkerRange>;
+
 export interface RichTextBufferProps {
 
   /**
@@ -184,7 +192,7 @@ export class RichTextBuffer extends Emitter {
   private cssmarkers = new Map<string, CSSMarker>();
 
   // Indexed by marker user identifier
-  private textmarkers = new Map<string, CodeMirror.TextMarker[]>();
+  private textmarkers = new Map<string, TextMarker[]>();
 
   private decorator?: Decorator;
   private edited = false;
@@ -327,7 +335,7 @@ export class RichTextBuffer extends Emitter {
 
   /** Lookup for the text markers associated with a marker identifier.
       Remove the marked tags from the buffered tag array. */
-  findTextMarker(id: string): CodeMirror.TextMarker[] {
+  findTextMarker(id: string): TextMarker[] {
     this.doFlushText();
     this.bufferedTags.forEach((tg, idx) => {
       if (tg?.id === id) {
@@ -470,8 +478,10 @@ export class RichTextBuffer extends Emitter {
       let line = Infinity;
       this.findTextMarker(position).forEach((tm) => {
         const rg = tm.find();
-        const ln = rg.from.line;
-        if (ln < line) line = ln;
+        if (rg && rg.from) {
+          const ln = rg.from.line;
+          if (ln < line) line = ln;
+        }
       });
       if (line !== Infinity)
         this.emit('scroll', line);
@@ -497,7 +507,7 @@ export class RichTextBuffer extends Emitter {
 
   private onChange(
     _editor: CodeMirror.Editor,
-    change: CodeMirror.EditorChangeLinkedList,
+    change: CodeMirror.EditorChange,
   ) {
     if (change.origin !== 'buffer') {
       this.setEdited(true);
@@ -549,7 +559,7 @@ export class RichTextBuffer extends Emitter {
    */
   forEach(fn: (editor: CodeMirror.Editor) => void) {
     this.editors.forEach((cm) => {
-      try { fn(cm); } catch (e) { console.error('[Dome.text]', e); }
+      try { fn(cm); } catch (e) { D.error(e); }
     });
   }
 

@@ -1,11 +1,13 @@
 /* run.config
+ DEPS: compile_commands.json
+ COMMENT: parsing option are defined in the default json file "compile_commands.json"
    OPT: -json-compilation-database @PTEST_DIR@ -print
-   OPT: @PTEST_DIR@/jcdb2.c -json-compilation-database @PTEST_DIR@/with_arguments.json -print
+ DEPS:
+   OPT: %{dep:@PTEST_DIR@/jcdb2.c} -json-compilation-database %{dep:@PTEST_DIR@/with_arguments.json} -print
  MODULE: @PTEST_NAME@
-   OPT: -json-compilation-database @PTEST_DIR@/with_arguments.json -no-autoload-plugins
+   OPT: -json-compilation-database %{dep:@PTEST_DIR@/with_arguments.json}
  MODULE:
-   EXECNOW: LOG list_files.res LOG list_files.err share/analysis-scripts/list_files.py @PTEST_DIR@/compile_commands_working.json > @PTEST_DIR@/result/list_files.res 2> @PTEST_DIR@/result/list_files.err
-   EXECNOW: LOG logic-pp-include.res LOG logic-pp-include.err @frama-c@ -json-compilation-database @PTEST_DIR@/logic-pp-include @PTEST_DIR@/logic-pp-include/no-stdio.c -print > @PTEST_DIR@/result/logic-pp-include.res 2> @PTEST_DIR@/result/logic-pp-include.err
+   EXECNOW: LOG list_files.res LOG list_files.err %{bin:frama-c-script} list-files %{dep:@PTEST_DIR@/compile_commands_working.json} > @PTEST_RESULT@/list_files.res 2> @PTEST_RESULT@/list_files.err
 */
 
 #include <stdio.h>

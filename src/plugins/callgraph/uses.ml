@@ -73,6 +73,15 @@ let iter_in_rev_order =
   in
   fun f -> I.iter (Cg.get ()) f
 
+let _iter_in_rev_order =
+  Dynamic.register
+    ~comment:"Iterate over all the functions in the callgraph in reverse order"
+    ~plugin:Options.name
+    "iter_in_rev_order"
+    Datatype.(func (func Kernel_function.ty unit) unit)
+    ~journalize:false
+    iter_in_rev_order
+
 let iter_on_aux iter_dir f kf =
   let cg = Cg.get () in
   if Cg.G.mem_vertex cg kf then
@@ -115,6 +124,16 @@ let accept_base ~with_formals ~with_locals kf v =
    | true,  true, Definition (fundec, _) -> Base.is_formal_or_local v fundec
    | true , _, Declaration (_, vd, _, _) -> Base.is_formal_of_prototype v vd)
   || is_local_or_formal_of_caller v kf
+
+let _accept_base =
+  Dynamic.register
+    ~comment:"Returns [true] if the given base is a global, \
+              or a formal or local of either [kf] or one of its callers"
+    ~plugin:Options.name
+    "accept_base"
+    Datatype.(func2 Kernel_function.ty Base.ty bool)
+    ~journalize:false
+    (fun kf b -> accept_base ~with_formals:true ~with_locals:true kf b)
 
 let nb_calls () =
   let g = Cg.get () in

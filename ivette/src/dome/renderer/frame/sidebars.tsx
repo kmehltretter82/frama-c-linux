@@ -50,7 +50,7 @@ export interface SideBarProps {
 /**
    Container for sidebar items.
  */
-export function SideBar(props: SideBarProps) {
+export function SideBar(props: SideBarProps): JSX.Element {
   const className = classes(
     'dome-xSideBar',
     'dome-color-frame',
@@ -68,7 +68,7 @@ export function SideBar(props: SideBarProps) {
 // --------------------------------------------------------------------------
 
 export type BadgeElt = undefined | null | string | number | React.ReactNode;
-export type Badge = BadgeElt | BadgeElt[];
+export type Badges = BadgeElt | BadgeElt[];
 
 const makeBadgeElt = (elt: BadgeElt): React.ReactNode => {
   if (elt === undefined || elt === null) return null;
@@ -81,7 +81,7 @@ const makeBadgeElt = (elt: BadgeElt): React.ReactNode => {
   }
 };
 
-const makeBadge = (elt: Badge): React.ReactNode => {
+const makeBadge = (elt: Badges): React.ReactNode => {
   if (Array.isArray(elt))
     return elt.map(makeBadgeElt);
   return makeBadgeElt(elt);
@@ -91,7 +91,12 @@ const makeBadge = (elt: Badge): React.ReactNode => {
 // --- SideBar Section Hide/Show Button
 // --------------------------------------------------------------------------
 
-const HideShow = (props: { onClick: () => void; visible: boolean }) => (
+interface HideShowProps {
+  onClick: () => void;
+  visible: boolean;
+}
+
+const HideShow = (props: HideShowProps): JSX.Element => (
   <label
     className="dome-xSideBarSection-hideshow dome-text-label"
     onClick={props.onClick}
@@ -120,7 +125,7 @@ export interface SectionProps {
   /** Disabled sections are made unvisible. */
   disabled?: boolean;
   /** Badge summary (only visible when folded). */
-  summary?: Badge;
+  summary?: Badges;
   /** Right-click callback. */
   onContextMenu?: () => void;
   /** Section contents. */
@@ -137,7 +142,7 @@ export interface SectionProps {
 
    Sections with no items are not displayed.
 */
-export function Section(props: SectionProps) {
+export function Section(props: SectionProps): JSX.Element | null {
 
   const [state, flipState] = useFlipSettings(
     props.settings,
@@ -184,7 +189,7 @@ export interface ItemProps {
   /** Item tooltip text. */
   title?: string;
   /** Badge. */
-  badge?: Badge;
+  badge?: Badges;
   /** Enabled item. */
   enabled?: boolean;
   /** Disabled item (dimmed). */
@@ -204,7 +209,7 @@ export interface ItemProps {
 }
 
 /** Sidebar Items. */
-export function Item(props: ItemProps) {
+export function Item(props: ItemProps): JSX.Element {
   const { selected = false, disabled = false, enabled = true } = props;
   const isDisabled = disabled || !enabled;
   const ref = React.useRef<HTMLDivElement>(null);

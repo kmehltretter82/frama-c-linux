@@ -1,44 +1,44 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_acsl/chunk_typing.i (no preprocessing)
+[kernel] Parsing chunk_typing.i (no preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function function
+[rte:annot] annotating function function
 ------------------------------------------------------------
   Function function
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/chunk_typing.i, line 15) in 'function':
-Let a = shift_sint8(i8_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, 10).
-Let a_2 = shift_uint8(u8_0, 0).
-Let a_3 = havoc(Mint_undef_0, Mint_0, a_2, 10).
-Let a_4 = shift_sint16(i16_0, 0).
-Let a_5 = havoc(Mint_undef_1, Mint_1, a_4, 10).
-Let a_6 = shift_uint16(u16_0, 0).
-Let a_7 = havoc(Mint_undef_2, Mint_2, a_6, 10).
-Let a_8 = shift_sint32(i32_0, 0).
-Let a_9 = havoc(Mint_undef_3, Mint_3, a_8, 10).
-Let a_10 = shift_uint32(u32_0, 0).
-Let a_11 = havoc(Mint_undef_4, Mint_4, a_10, 10).
-Let a_12 = shift_sint64(i64_0, 0).
-Let a_13 = havoc(Mint_undef_5, Mint_5, a_12, 10).
-Let a_14 = shift_uint64(u64_0, 0).
-Let a_15 = havoc(Mint_undef_6, Mint_6, a_14, 10).
-Let a_16 = a_1[shift_sint8(i8_0, i)].
-Let a_17 = a_3[shift_uint8(u8_0, i)].
-Let a_18 = a_5[shift_sint16(i16_0, i)].
-Let a_19 = a_7[shift_uint16(u16_0, i)].
-Let a_20 = a_9[shift_sint32(i32_0, i)].
-Let a_21 = a_11[shift_uint32(u32_0, i)].
-Let a_22 = a_13[shift_sint64(i64_0, i)].
+Goal Post-condition (file chunk_typing.i, line 15) in 'function':
+Let a = shift_uint64(u64_0, 0).
+Let a_1 = havoc(Mint_undef_6, Mint_6, a, 10).
+Let a_2 = shift_sint64(i64_0, 0).
+Let a_3 = havoc(Mint_undef_5, Mint_5, a_2, 10).
+Let a_4 = shift_uint32(u32_0, 0).
+Let a_5 = havoc(Mint_undef_4, Mint_4, a_4, 10).
+Let a_6 = shift_sint32(i32_0, 0).
+Let a_7 = havoc(Mint_undef_3, Mint_3, a_6, 10).
+Let a_8 = shift_uint16(u16_0, 0).
+Let a_9 = havoc(Mint_undef_2, Mint_2, a_8, 10).
+Let a_10 = shift_sint16(i16_0, 0).
+Let a_11 = havoc(Mint_undef_1, Mint_1, a_10, 10).
+Let a_12 = shift_uint8(u8_0, 0).
+Let a_13 = havoc(Mint_undef_0, Mint_0, a_12, 10).
+Let a_14 = shift_sint8(i8_0, 0).
+Let a_15 = havoc(Mchar_undef_0, Mchar_0, a_14, 10).
+Let a_16 = a_15[shift_sint8(i8_0, i)].
+Let a_17 = a_13[shift_uint8(u8_0, i)].
+Let a_18 = a_11[shift_sint16(i16_0, i)].
+Let a_19 = a_9[shift_uint16(u16_0, i)].
+Let a_20 = a_7[shift_sint32(i32_0, i)].
+Let a_21 = a_5[shift_uint32(u32_0, i)].
+Let a_22 = a_3[shift_sint64(i64_0, i)].
 Assume {
   Type: IsArray_sint8(x) /\ is_sint16_chunk(Mint_1) /\
       is_sint32_chunk(Mint_3) /\ is_sint64_chunk(Mint_5) /\
       is_sint8_chunk(Mchar_0) /\ is_uint16_chunk(Mint_2) /\
       is_uint32_chunk(Mint_4) /\ is_uint64_chunk(Mint_6) /\
-      is_uint8_chunk(Mint_0) /\ is_sint32(i_1) /\ is_sint16_chunk(a_5) /\
-      is_sint32_chunk(a_9) /\ is_sint64_chunk(a_13) /\ is_sint8_chunk(a_1) /\
-      is_uint16_chunk(a_7) /\ is_uint32_chunk(a_11) /\
-      is_uint64_chunk(a_15) /\ is_uint8_chunk(a_3).
+      is_uint8_chunk(Mint_0) /\ is_sint32(i_1) /\ is_sint16_chunk(a_11) /\
+      is_sint32_chunk(a_7) /\ is_sint64_chunk(a_3) /\ is_sint8_chunk(a_15) /\
+      is_uint16_chunk(a_9) /\ is_uint32_chunk(a_5) /\ is_uint64_chunk(a_1) /\
+      is_uint8_chunk(a_13).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -50,151 +50,56 @@ Assume {
   (* Initializer *)
   Init: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (x[i_2] = 0))).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a, 10) /\
-      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_2, 10).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_15[shift_uint64(u64_0, i_2)] = 8))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_13[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_11[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_9[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_7[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_5[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_3[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      (a_1[shift_sint8(i8_0, i_2)] = 1))).
+  Have: valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
+      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
+      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_12, 10).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
+      (a_15[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
+      (a_13[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
+      (a_11[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
+      (a_9[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
+      (a_7[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
+      (a_5[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
+      (a_3[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
+      (a_1[shift_uint64(u64_0, i_2)] = 8))).
   (* Else *)
   Have: 10 <= i_1.
 }
 Prove: (a_16 = (1 + x[i])) /\ (a_17 = (1 + a_16)) /\ (a_18 = (1 + a_17)) /\
     (a_19 = (1 + a_18)) /\ (a_20 = (1 + a_19)) /\ (a_21 = (1 + a_20)) /\
-    (a_22 = (1 + a_21)) /\ (a_15[shift_uint64(u64_0, i)] = (1 + a_22)).
+    (a_22 = (1 + a_21)) /\ (a_1[shift_uint64(u64_0, i)] = (1 + a_22)).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 31):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_0, Mint_0, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_3, Mint_3, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_1, Mint_1, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_4, Mint_4, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_2, Mint_2, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_5, Mint_5, a_22, 10).
-Assume {
-  Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
-      is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
-      is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
-      is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_11[a_6 <- 2]).
-  (* Heap *)
-  Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
-      (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
-      (region(u16_0.base) <= 0) /\ (region(u32_0.base) <= 0) /\
-      (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_23[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_21[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_19[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_17[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_sint8(i8_0, i_1)] = 1))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
-  (* Then *)
-  Have: i <= 9.
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_7, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_6, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_5, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
-  (* Assertion 'rte,signed_overflow' *)
-  Have: i <= 2147483646.
-}
-Prove: (-1) <= i.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 31):
+Goal Preservation of Invariant (file chunk_typing.i, line 31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 32):
+Goal Establishment of Invariant (file chunk_typing.i, line 31):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file chunk_typing.i, line 32):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -203,36 +108,36 @@ Let a_4 = shift_uint16(u16_0, i).
 Let a_5 = shift_sint16(i16_0, i).
 Let a_6 = shift_uint8(u8_0, i).
 Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_0, Mint_0, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_3, Mint_3, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_1, Mint_1, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_4, Mint_4, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_2, Mint_2, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_5, Mint_5, a_22, 10).
-Let a_24 = a_9[a_7 <- 1].
+Let a_8 = shift_uint64(u64_0, 0).
+Let a_9 = havoc(Mint_undef_5, Mint_5, a_8, 10).
+Let a_10 = shift_sint64(i64_0, 0).
+Let a_11 = havoc(Mint_undef_2, Mint_2, a_10, 10).
+Let a_12 = shift_uint32(u32_0, 0).
+Let a_13 = havoc(Mint_undef_4, Mint_4, a_12, 10).
+Let a_14 = shift_sint32(i32_0, 0).
+Let a_15 = havoc(Mint_undef_1, Mint_1, a_14, 10).
+Let a_16 = shift_uint16(u16_0, 0).
+Let a_17 = havoc(Mint_undef_3, Mint_3, a_16, 10).
+Let a_18 = shift_sint16(i16_0, 0).
+Let a_19 = havoc(Mint_undef_0, Mint_0, a_18, 10).
+Let a_20 = shift_uint8(u8_0, 0).
+Let a_21 = havoc(Mint_undef_6, Mint_6, a_20, 10).
+Let a_22 = shift_sint8(i8_0, 0).
+Let a_23 = havoc(Mchar_undef_0, Mchar_0, a_22, 10).
+Let a_24 = a_23[a_7 <- 1].
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_24) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_11[a_6 <- 2]).
+      is_sint32(1 + i) /\ is_sint16_chunk(a_19) /\ is_sint32_chunk(a_15) /\
+      is_sint64_chunk(a_11) /\ is_sint8_chunk(a_23) /\
+      is_uint16_chunk(a_17) /\ is_uint32_chunk(a_13) /\
+      is_uint64_chunk(a_9) /\ is_uint8_chunk(a_21) /\
+      is_sint16_chunk(a_19[a_5 <- 3]) /\ is_sint32_chunk(a_15[a_3 <- 5]) /\
+      is_sint64_chunk(a_11[a_1 <- 7]) /\ is_sint8_chunk(a_24) /\
+      is_uint16_chunk(a_17[a_4 <- 4]) /\ is_uint32_chunk(a_13[a_2 <- 6]) /\
+      is_uint64_chunk(a_9[a <- 8]) /\ is_uint8_chunk(a_21[a_6 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -240,38 +145,38 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint64(u64_0, i_2)] = 8))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint8(i8_0, i_2)] = 1))).
+  Have: valid_rw(Malloc_0, a_18, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
+      valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_22, 10) /\
+      valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
+      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_20, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_23[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_21[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_19[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_17[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_15[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_13[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_11[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_9[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -292,55 +197,58 @@ Assume {
   Have: valid_rw(Malloc_0, a, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
 }
 Prove: a_24[shift_sint8(i8_0, i_1)] = 1.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 32):
+Goal Establishment of Invariant (file chunk_typing.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 33):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_0, Mint_0, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_1, Mint_1, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_4, Mint_4, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_2, Mint_2, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_5, Mint_5, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_3, Mint_3, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_6, Mint_6, a_22, 10).
-Let a_24 = a_11[a_6 <- 2].
+Goal Preservation of Invariant (file chunk_typing.i, line 33):
+Let a = shift_sint8(i8_0, 0).
+Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, 10).
+Let a_2 = shift_sint8(i8_0, i).
+Let a_3 = a_1[a_2 <- 1].
+Let a_4 = shift_uint64(u64_0, i).
+Let a_5 = shift_sint64(i64_0, i).
+Let a_6 = shift_uint32(u32_0, i).
+Let a_7 = shift_sint32(i32_0, i).
+Let a_8 = shift_uint16(u16_0, i).
+Let a_9 = shift_sint16(i16_0, i).
+Let a_10 = shift_uint8(u8_0, i).
+Let a_11 = shift_uint64(u64_0, 0).
+Let a_12 = havoc(Mint_undef_6, Mint_6, a_11, 10).
+Let a_13 = shift_sint64(i64_0, 0).
+Let a_14 = havoc(Mint_undef_3, Mint_3, a_13, 10).
+Let a_15 = shift_uint32(u32_0, 0).
+Let a_16 = havoc(Mint_undef_5, Mint_5, a_15, 10).
+Let a_17 = shift_sint32(i32_0, 0).
+Let a_18 = havoc(Mint_undef_2, Mint_2, a_17, 10).
+Let a_19 = shift_uint16(u16_0, 0).
+Let a_20 = havoc(Mint_undef_4, Mint_4, a_19, 10).
+Let a_21 = shift_sint16(i16_0, 0).
+Let a_22 = havoc(Mint_undef_1, Mint_1, a_21, 10).
+Let a_23 = shift_uint8(u8_0, 0).
+Let a_24 = havoc(Mint_undef_0, Mint_0, a_23, 10).
+Let a_25 = a_24[a_10 <- 2].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_4) /\ is_uint32_chunk(Mint_5) /\
       is_uint64_chunk(Mint_6) /\ is_uint8_chunk(Mint_0) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_24).
+      is_sint32(1 + i) /\ is_sint16_chunk(a_22) /\ is_sint32_chunk(a_18) /\
+      is_sint64_chunk(a_14) /\ is_sint8_chunk(a_1) /\
+      is_uint16_chunk(a_20) /\ is_uint32_chunk(a_16) /\
+      is_uint64_chunk(a_12) /\ is_uint8_chunk(a_24) /\
+      is_sint16_chunk(a_22[a_9 <- 3]) /\ is_sint32_chunk(a_18[a_7 <- 5]) /\
+      is_sint64_chunk(a_14[a_5 <- 7]) /\ is_sint8_chunk(a_3) /\
+      is_uint16_chunk(a_20[a_8 <- 4]) /\ is_uint32_chunk(a_16[a_6 <- 6]) /\
+      is_uint64_chunk(a_12[a_4 <- 8]) /\ is_uint8_chunk(a_25).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -348,40 +256,48 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint64(u64_0, i_2)] = 8))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint8(i8_0, i_2)] = 1))).
+  Have: valid_rw(Malloc_0, a_21, 10) /\ valid_rw(Malloc_0, a_17, 10) /\
+      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a, 10) /\
+      valid_rw(Malloc_0, a_19, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
+      valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_23, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_1[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_24[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_22[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_20[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_18[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_16[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_14[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_12[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_2, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_10, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_9, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_8, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_7, 1).
   (* Assertion 'rte,mem_access' *)
@@ -390,65 +306,64 @@ Assume {
   Have: valid_rw(Malloc_0, a_5, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_3[shift_sint8(i8_0, i_2)] = 1))).
 }
-Prove: a_24[shift_uint8(u8_0, i_1)] = 2.
+Prove: a_25[shift_uint8(u8_0, i_1)] = 2.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 33):
+Goal Establishment of Invariant (file chunk_typing.i, line 33):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 34):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_0, Mint_0, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_3, Mint_3, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_1, Mint_1, a_16, 10).
+Goal Preservation of Invariant (file chunk_typing.i, line 34):
+Let a = shift_uint8(u8_0, 0).
+Let a_1 = havoc(Mint_undef_6, Mint_6, a, 10).
+Let a_2 = shift_uint8(u8_0, i).
+Let a_3 = a_1[a_2 <- 2].
+Let a_4 = shift_sint8(i8_0, 0).
+Let a_5 = havoc(Mchar_undef_0, Mchar_0, a_4, 10).
+Let a_6 = shift_sint8(i8_0, i).
+Let a_7 = a_5[a_6 <- 1].
+Let a_8 = shift_uint64(u64_0, i).
+Let a_9 = shift_sint64(i64_0, i).
+Let a_10 = shift_uint32(u32_0, i).
+Let a_11 = shift_sint32(i32_0, i).
+Let a_12 = shift_uint16(u16_0, i).
+Let a_13 = shift_sint16(i16_0, i).
+Let a_14 = shift_uint64(u64_0, 0).
+Let a_15 = havoc(Mint_undef_5, Mint_5, a_14, 10).
+Let a_16 = shift_sint64(i64_0, 0).
+Let a_17 = havoc(Mint_undef_2, Mint_2, a_16, 10).
 Let a_18 = shift_uint32(u32_0, 0).
 Let a_19 = havoc(Mint_undef_4, Mint_4, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_2, Mint_2, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_5, Mint_5, a_22, 10).
-Let a_24 = a_13[a_5 <- 3].
+Let a_20 = shift_sint32(i32_0, 0).
+Let a_21 = havoc(Mint_undef_1, Mint_1, a_20, 10).
+Let a_22 = shift_uint16(u16_0, 0).
+Let a_23 = havoc(Mint_undef_3, Mint_3, a_22, 10).
+Let a_24 = shift_sint16(i16_0, 0).
+Let a_25 = havoc(Mint_undef_0, Mint_0, a_24, 10).
+Let a_26 = a_25[a_13 <- 3].
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_24) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_11[a_6 <- 2]).
+      is_sint32(1 + i) /\ is_sint16_chunk(a_25) /\ is_sint32_chunk(a_21) /\
+      is_sint64_chunk(a_17) /\ is_sint8_chunk(a_5) /\
+      is_uint16_chunk(a_23) /\ is_uint32_chunk(a_19) /\
+      is_uint64_chunk(a_15) /\ is_uint8_chunk(a_1) /\
+      is_sint16_chunk(a_26) /\ is_sint32_chunk(a_21[a_11 <- 5]) /\
+      is_sint64_chunk(a_17[a_9 <- 7]) /\ is_sint8_chunk(a_7) /\
+      is_uint16_chunk(a_23[a_12 <- 4]) /\ is_uint32_chunk(a_19[a_10 <- 6]) /\
+      is_uint64_chunk(a_15[a_8 <- 8]) /\ is_uint8_chunk(a_3).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -456,107 +371,118 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
+  Have: valid_rw(Malloc_0, a_24, 10) /\ valid_rw(Malloc_0, a_20, 10) /\
+      valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
+      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a, 10).
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint64(u64_0, i_2)] = 8))).
+      (a_5[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint64(i64_0, i_2)] = 7))).
+      (a_1[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_25[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_23[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_21[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_19[shift_uint32(u32_0, i_2)] = 6))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint32(i32_0, i_2)] = 5))).
+      (a_17[shift_sint64(i64_0, i_2)] = 7))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint8(i8_0, i_2)] = 1))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
+      (a_15[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_7, 1).
-  (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_6, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_5, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_2, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
+  Have: valid_rw(Malloc_0, a_13, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
+  Have: valid_rw(Malloc_0, a_12, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_11, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_10, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_9, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_8, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_7[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_3[shift_uint8(u8_0, i_2)] = 2))).
 }
-Prove: a_24[shift_sint16(i16_0, i_1)] = 3.
+Prove: a_26[shift_sint16(i16_0, i_1)] = 3.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 34):
+Goal Establishment of Invariant (file chunk_typing.i, line 34):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 35):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
+Goal Preservation of Invariant (file chunk_typing.i, line 35):
+Let a = shift_sint16(i16_0, 0).
+Let a_1 = havoc(Mint_undef_1, Mint_1, a, 10).
+Let a_2 = shift_sint16(i16_0, i).
+Let a_3 = a_1[a_2 <- 3].
+Let a_4 = shift_uint8(u8_0, 0).
+Let a_5 = havoc(Mint_undef_6, Mint_6, a_4, 10).
 Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
+Let a_7 = a_5[a_6 <- 2].
 Let a_8 = shift_sint8(i8_0, 0).
 Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_1, Mint_1, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_0, Mint_0, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_2, Mint_2, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_4, Mint_4, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_3, Mint_3, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_5, Mint_5, a_22, 10).
-Let a_24 = a_15[a_4 <- 4].
+Let a_10 = shift_sint8(i8_0, i).
+Let a_11 = a_9[a_10 <- 1].
+Let a_12 = shift_uint64(u64_0, i).
+Let a_13 = shift_sint64(i64_0, i).
+Let a_14 = shift_uint32(u32_0, i).
+Let a_15 = shift_sint32(i32_0, i).
+Let a_16 = shift_uint16(u16_0, i).
+Let a_17 = shift_uint64(u64_0, 0).
+Let a_18 = havoc(Mint_undef_5, Mint_5, a_17, 10).
+Let a_19 = shift_sint64(i64_0, 0).
+Let a_20 = havoc(Mint_undef_3, Mint_3, a_19, 10).
+Let a_21 = shift_uint32(u32_0, 0).
+Let a_22 = havoc(Mint_undef_4, Mint_4, a_21, 10).
+Let a_23 = shift_sint32(i32_0, 0).
+Let a_24 = havoc(Mint_undef_2, Mint_2, a_23, 10).
+Let a_25 = shift_uint16(u16_0, 0).
+Let a_26 = havoc(Mint_undef_0, Mint_0, a_25, 10).
+Let a_27 = a_26[a_16 <- 4].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_0) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_24) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_11[a_6 <- 2]).
+      is_sint32(1 + i) /\ is_sint16_chunk(a_1) /\ is_sint32_chunk(a_24) /\
+      is_sint64_chunk(a_20) /\ is_sint8_chunk(a_9) /\
+      is_uint16_chunk(a_26) /\ is_uint32_chunk(a_22) /\
+      is_uint64_chunk(a_18) /\ is_uint8_chunk(a_5) /\ is_sint16_chunk(a_3) /\
+      is_sint32_chunk(a_24[a_15 <- 5]) /\ is_sint64_chunk(a_20[a_13 <- 7]) /\
+      is_sint8_chunk(a_11) /\ is_uint16_chunk(a_27) /\
+      is_uint32_chunk(a_22[a_14 <- 6]) /\ is_uint64_chunk(a_18[a_12 <- 8]) /\
+      is_uint8_chunk(a_7).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -564,107 +490,122 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
+  Have: valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_23, 10) /\
+      valid_rw(Malloc_0, a_19, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
+      valid_rw(Malloc_0, a_25, 10) /\ valid_rw(Malloc_0, a_21, 10) /\
+      valid_rw(Malloc_0, a_17, 10) /\ valid_rw(Malloc_0, a_4, 10).
   (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint64(u64_0, i_2)] = 8))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
+  Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_9[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_5[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_1[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_26[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_24[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_22[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_20[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_18[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_7, 1).
+  Have: valid_rw(Malloc_0, a_10, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_6, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_5, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
-  (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_2, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
+  Have: valid_rw(Malloc_0, a_16, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
+  Have: valid_rw(Malloc_0, a_15, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_14, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_13, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_12, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_11[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_7[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_3[shift_sint16(i16_0, i_2)] = 3))).
 }
-Prove: a_24[shift_uint16(u16_0, i_1)] = 4.
+Prove: a_27[shift_uint16(u16_0, i_1)] = 4.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 35):
+Goal Establishment of Invariant (file chunk_typing.i, line 35):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 36):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_1, Mint_1, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_3, Mint_3, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_0, Mint_0, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_4, Mint_4, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_2, Mint_2, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_5, Mint_5, a_22, 10).
-Let a_24 = a_17[a_3 <- 5].
+Goal Preservation of Invariant (file chunk_typing.i, line 36):
+Let a = shift_uint16(u16_0, 0).
+Let a_1 = havoc(Mint_undef_3, Mint_3, a, 10).
+Let a_2 = shift_uint16(u16_0, i).
+Let a_3 = a_1[a_2 <- 4].
+Let a_4 = shift_sint16(i16_0, 0).
+Let a_5 = havoc(Mint_undef_1, Mint_1, a_4, 10).
+Let a_6 = shift_sint16(i16_0, i).
+Let a_7 = a_5[a_6 <- 3].
+Let a_8 = shift_uint8(u8_0, 0).
+Let a_9 = havoc(Mint_undef_6, Mint_6, a_8, 10).
+Let a_10 = shift_uint8(u8_0, i).
+Let a_11 = a_9[a_10 <- 2].
+Let a_12 = shift_sint8(i8_0, 0).
+Let a_13 = havoc(Mchar_undef_0, Mchar_0, a_12, 10).
+Let a_14 = shift_sint8(i8_0, i).
+Let a_15 = a_13[a_14 <- 1].
+Let a_16 = shift_uint64(u64_0, i).
+Let a_17 = shift_sint64(i64_0, i).
+Let a_18 = shift_uint32(u32_0, i).
+Let a_19 = shift_sint32(i32_0, i).
+Let a_20 = shift_uint64(u64_0, 0).
+Let a_21 = havoc(Mint_undef_5, Mint_5, a_20, 10).
+Let a_22 = shift_sint64(i64_0, 0).
+Let a_23 = havoc(Mint_undef_2, Mint_2, a_22, 10).
+Let a_24 = shift_uint32(u32_0, 0).
+Let a_25 = havoc(Mint_undef_4, Mint_4, a_24, 10).
+Let a_26 = shift_sint32(i32_0, 0).
+Let a_27 = havoc(Mint_undef_0, Mint_0, a_26, 10).
+Let a_28 = a_27[a_19 <- 5].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_0) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_24) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_11[a_6 <- 2]).
+      is_sint32(1 + i) /\ is_sint16_chunk(a_5) /\ is_sint32_chunk(a_27) /\
+      is_sint64_chunk(a_23) /\ is_sint8_chunk(a_13) /\
+      is_uint16_chunk(a_1) /\ is_uint32_chunk(a_25) /\
+      is_uint64_chunk(a_21) /\ is_uint8_chunk(a_9) /\ is_sint16_chunk(a_7) /\
+      is_sint32_chunk(a_28) /\ is_sint64_chunk(a_23[a_17 <- 7]) /\
+      is_sint8_chunk(a_15) /\ is_uint16_chunk(a_3) /\
+      is_uint32_chunk(a_25[a_18 <- 6]) /\ is_uint64_chunk(a_21[a_16 <- 8]) /\
+      is_uint8_chunk(a_11).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -672,107 +613,126 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint64(u64_0, i_2)] = 8))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint8(i8_0, i_2)] = 1))).
+  Have: valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_26, 10) /\
+      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
+      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_24, 10) /\
+      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_13[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_9[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_5[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_1[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_27[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_25[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_23[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_21[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_7, 1).
+  Have: valid_rw(Malloc_0, a_14, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_10, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_6, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_5, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
-  (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_2, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
+  Have: valid_rw(Malloc_0, a_19, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
+  Have: valid_rw(Malloc_0, a_18, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_17, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_16, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_15[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_11[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_7[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_3[shift_uint16(u16_0, i_2)] = 4))).
 }
-Prove: a_24[shift_sint32(i32_0, i_1)] = 5.
+Prove: a_28[shift_sint32(i32_0, i_1)] = 5.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 36):
+Goal Establishment of Invariant (file chunk_typing.i, line 36):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 37):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_1, Mint_1, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_4, Mint_4, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_2, Mint_2, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_0, Mint_0, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_3, Mint_3, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_5, Mint_5, a_22, 10).
-Let a_24 = a_19[a_2 <- 6].
+Goal Preservation of Invariant (file chunk_typing.i, line 37):
+Let a = shift_sint32(i32_0, 0).
+Let a_1 = havoc(Mint_undef_2, Mint_2, a, 10).
+Let a_2 = shift_sint32(i32_0, i).
+Let a_3 = a_1[a_2 <- 5].
+Let a_4 = shift_uint16(u16_0, 0).
+Let a_5 = havoc(Mint_undef_4, Mint_4, a_4, 10).
+Let a_6 = shift_uint16(u16_0, i).
+Let a_7 = a_5[a_6 <- 4].
+Let a_8 = shift_sint16(i16_0, 0).
+Let a_9 = havoc(Mint_undef_1, Mint_1, a_8, 10).
+Let a_10 = shift_sint16(i16_0, i).
+Let a_11 = a_9[a_10 <- 3].
+Let a_12 = shift_uint8(u8_0, 0).
+Let a_13 = havoc(Mint_undef_6, Mint_6, a_12, 10).
+Let a_14 = shift_uint8(u8_0, i).
+Let a_15 = a_13[a_14 <- 2].
+Let a_16 = shift_sint8(i8_0, 0).
+Let a_17 = havoc(Mchar_undef_0, Mchar_0, a_16, 10).
+Let a_18 = shift_sint8(i8_0, i).
+Let a_19 = a_17[a_18 <- 1].
+Let a_20 = shift_uint64(u64_0, i).
+Let a_21 = shift_sint64(i64_0, i).
+Let a_22 = shift_uint32(u32_0, i).
+Let a_23 = shift_uint64(u64_0, 0).
+Let a_24 = havoc(Mint_undef_5, Mint_5, a_23, 10).
+Let a_25 = shift_sint64(i64_0, 0).
+Let a_26 = havoc(Mint_undef_3, Mint_3, a_25, 10).
+Let a_27 = shift_uint32(u32_0, 0).
+Let a_28 = havoc(Mint_undef_0, Mint_0, a_27, 10).
+Let a_29 = a_28[a_22 <- 6].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_4) /\ is_uint32_chunk(Mint_0) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_24) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_11[a_6 <- 2]).
+      is_sint32(1 + i) /\ is_sint16_chunk(a_9) /\ is_sint32_chunk(a_1) /\
+      is_sint64_chunk(a_26) /\ is_sint8_chunk(a_17) /\
+      is_uint16_chunk(a_5) /\ is_uint32_chunk(a_28) /\
+      is_uint64_chunk(a_24) /\ is_uint8_chunk(a_13) /\
+      is_sint16_chunk(a_11) /\ is_sint32_chunk(a_3) /\
+      is_sint64_chunk(a_26[a_21 <- 7]) /\ is_sint8_chunk(a_19) /\
+      is_uint16_chunk(a_7) /\ is_uint32_chunk(a_29) /\
+      is_uint64_chunk(a_24[a_20 <- 8]) /\ is_uint8_chunk(a_15).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -780,107 +740,130 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint64(u64_0, i_2)] = 8))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint8(i8_0, i_2)] = 1))).
+  Have: valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a, 10) /\
+      valid_rw(Malloc_0, a_25, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
+      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_27, 10) /\
+      valid_rw(Malloc_0, a_23, 10) /\ valid_rw(Malloc_0, a_12, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_17[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_13[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_9[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_5[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_1[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_28[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_26[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_24[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_7, 1).
+  Have: valid_rw(Malloc_0, a_18, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_14, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_10, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_6, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_5, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
-  (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_2, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
+  Have: valid_rw(Malloc_0, a_22, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
+  Have: valid_rw(Malloc_0, a_21, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_20, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_19[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_15[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_11[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_7[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_3[shift_sint32(i32_0, i_2)] = 5))).
 }
-Prove: a_24[shift_uint32(u32_0, i_1)] = 6.
+Prove: a_29[shift_uint32(u32_0, i_1)] = 6.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 37):
+Goal Establishment of Invariant (file chunk_typing.i, line 37):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 38):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
+Goal Preservation of Invariant (file chunk_typing.i, line 38):
+Let a = shift_uint32(u32_0, 0).
+Let a_1 = havoc(Mint_undef_4, Mint_4, a, 10).
 Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
+Let a_3 = a_1[a_2 <- 6].
+Let a_4 = shift_sint32(i32_0, 0).
+Let a_5 = havoc(Mint_undef_2, Mint_2, a_4, 10).
+Let a_6 = shift_sint32(i32_0, i).
+Let a_7 = a_5[a_6 <- 5].
+Let a_8 = shift_uint16(u16_0, 0).
+Let a_9 = havoc(Mint_undef_3, Mint_3, a_8, 10).
+Let a_10 = shift_uint16(u16_0, i).
+Let a_11 = a_9[a_10 <- 4].
 Let a_12 = shift_sint16(i16_0, 0).
 Let a_13 = havoc(Mint_undef_1, Mint_1, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_3, Mint_3, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_2, Mint_2, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_4, Mint_4, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_0, Mint_0, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_5, Mint_5, a_22, 10).
-Let a_24 = a_21[a_1 <- 7].
+Let a_14 = shift_sint16(i16_0, i).
+Let a_15 = a_13[a_14 <- 3].
+Let a_16 = shift_uint8(u8_0, 0).
+Let a_17 = havoc(Mint_undef_6, Mint_6, a_16, 10).
+Let a_18 = shift_uint8(u8_0, i).
+Let a_19 = a_17[a_18 <- 2].
+Let a_20 = shift_sint8(i8_0, 0).
+Let a_21 = havoc(Mchar_undef_0, Mchar_0, a_20, 10).
+Let a_22 = shift_sint8(i8_0, i).
+Let a_23 = a_21[a_22 <- 1].
+Let a_24 = shift_uint64(u64_0, i).
+Let a_25 = shift_sint64(i64_0, i).
+Let a_26 = shift_uint64(u64_0, 0).
+Let a_27 = havoc(Mint_undef_5, Mint_5, a_26, 10).
+Let a_28 = shift_sint64(i64_0, 0).
+Let a_29 = havoc(Mint_undef_0, Mint_0, a_28, 10).
+Let a_30 = a_29[a_25 <- 7].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_0) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_24) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_11[a_6 <- 2]).
+      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_5) /\
+      is_sint64_chunk(a_29) /\ is_sint8_chunk(a_21) /\
+      is_uint16_chunk(a_9) /\ is_uint32_chunk(a_1) /\
+      is_uint64_chunk(a_27) /\ is_uint8_chunk(a_17) /\
+      is_sint16_chunk(a_15) /\ is_sint32_chunk(a_7) /\
+      is_sint64_chunk(a_30) /\ is_sint8_chunk(a_23) /\
+      is_uint16_chunk(a_11) /\ is_uint32_chunk(a_3) /\
+      is_uint64_chunk(a_27[a_24 <- 8]) /\ is_uint8_chunk(a_19).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -888,107 +871,134 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
+  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a_28, 10) /\ valid_rw(Malloc_0, a_20, 10) /\
+      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a, 10) /\
+      valid_rw(Malloc_0, a_26, 10) /\ valid_rw(Malloc_0, a_16, 10).
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= 10).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint64(u64_0, i_2)] = 8))).
+      (a_21[shift_sint8(i8_0, i_2)] = 1))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
+      (a_17[shift_uint8(u8_0, i_2)] = 2))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_13[shift_sint16(i16_0, i_2)] = 3))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
+      (a_9[shift_uint16(u16_0, i_2)] = 4))).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint8(i8_0, i_2)] = 1))).
+      (a_5[shift_sint32(i32_0, i_2)] = 5))).
   (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_1[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_29[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_27[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_7, 1).
+  Have: valid_rw(Malloc_0, a_22, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_18, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_14, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_10, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_6, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_5, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
-  (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_2, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
+  Have: valid_rw(Malloc_0, a_25, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
+  Have: valid_rw(Malloc_0, a_24, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_23[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_19[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_15[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_11[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_7[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_3[shift_uint32(u32_0, i_2)] = 6))).
 }
-Prove: a_24[shift_sint64(i64_0, i_1)] = 7.
+Prove: a_30[shift_sint64(i64_0, i_1)] = 7.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 38):
+Goal Establishment of Invariant (file chunk_typing.i, line 38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 39):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_1, Mint_1, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_4, Mint_4, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_2, Mint_2, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_5, Mint_5, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_3, Mint_3, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_0, Mint_0, a_22, 10).
-Let a_24 = a_23[a <- 8].
+Goal Preservation of Invariant (file chunk_typing.i, line 39):
+Let a = shift_sint64(i64_0, 0).
+Let a_1 = havoc(Mint_undef_3, Mint_3, a, 10).
+Let a_2 = shift_sint64(i64_0, i).
+Let a_3 = a_1[a_2 <- 7].
+Let a_4 = shift_uint32(u32_0, 0).
+Let a_5 = havoc(Mint_undef_5, Mint_5, a_4, 10).
+Let a_6 = shift_uint32(u32_0, i).
+Let a_7 = a_5[a_6 <- 6].
+Let a_8 = shift_sint32(i32_0, 0).
+Let a_9 = havoc(Mint_undef_2, Mint_2, a_8, 10).
+Let a_10 = shift_sint32(i32_0, i).
+Let a_11 = a_9[a_10 <- 5].
+Let a_12 = shift_uint16(u16_0, 0).
+Let a_13 = havoc(Mint_undef_4, Mint_4, a_12, 10).
+Let a_14 = shift_uint16(u16_0, i).
+Let a_15 = a_13[a_14 <- 4].
+Let a_16 = shift_sint16(i16_0, 0).
+Let a_17 = havoc(Mint_undef_1, Mint_1, a_16, 10).
+Let a_18 = shift_sint16(i16_0, i).
+Let a_19 = a_17[a_18 <- 3].
+Let a_20 = shift_uint8(u8_0, 0).
+Let a_21 = havoc(Mint_undef_6, Mint_6, a_20, 10).
+Let a_22 = shift_uint8(u8_0, i).
+Let a_23 = a_21[a_22 <- 2].
+Let a_24 = shift_sint8(i8_0, 0).
+Let a_25 = havoc(Mchar_undef_0, Mchar_0, a_24, 10).
+Let a_26 = shift_sint8(i8_0, i).
+Let a_27 = a_25[a_26 <- 1].
+Let a_28 = shift_uint64(u64_0, i).
+Let a_29 = shift_uint64(u64_0, 0).
+Let a_30 = havoc(Mint_undef_0, Mint_0, a_29, 10).
+Let a_31 = a_30[a_28 <- 8].
 Assume {
   Type: is_sint16_chunk(Mint_1) /\ is_sint32_chunk(Mint_2) /\
       is_sint64_chunk(Mint_3) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_4) /\ is_uint32_chunk(Mint_5) /\
       is_uint64_chunk(Mint_0) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint32(1 + i) /\ is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_24) /\ is_uint8_chunk(a_11[a_6 <- 2]).
+      is_sint32(1 + i) /\ is_sint16_chunk(a_17) /\ is_sint32_chunk(a_9) /\
+      is_sint64_chunk(a_1) /\ is_sint8_chunk(a_25) /\
+      is_uint16_chunk(a_13) /\ is_uint32_chunk(a_5) /\
+      is_uint64_chunk(a_30) /\ is_uint8_chunk(a_21) /\
+      is_sint16_chunk(a_19) /\ is_sint32_chunk(a_11) /\
+      is_sint64_chunk(a_3) /\ is_sint8_chunk(a_27) /\
+      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_7) /\
+      is_uint64_chunk(a_31) /\ is_uint8_chunk(a_23).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -996,93 +1006,116 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_23[shift_uint64(u64_0, i_2)] = 8))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_21[shift_sint64(i64_0, i_2)] = 7))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_19[shift_uint32(u32_0, i_2)] = 6))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_17[shift_sint32(i32_0, i_2)] = 5))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_15[shift_uint16(u16_0, i_2)] = 4))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_13[shift_sint16(i16_0, i_2)] = 3))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_11[shift_uint8(u8_0, i_2)] = 2))).
-  (* Invariant *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (a_9[shift_sint8(i8_0, i_2)] = 1))).
+  Have: valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
+      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_24, 10) /\
+      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a_29, 10) /\ valid_rw(Malloc_0, a_20, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_25[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_21[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_17[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_13[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_9[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_5[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_1[shift_sint64(i64_0, i_2)] = 7))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_30[shift_uint64(u64_0, i_2)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_7, 1).
+  Have: valid_rw(Malloc_0, a_26, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_22, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_18, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_14, 1).
+  (* Assertion 'rte,mem_access' *)
+  Have: valid_rw(Malloc_0, a_10, 1).
   (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_6, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_5, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
-  (* Assertion 'rte,mem_access' *)
   Have: valid_rw(Malloc_0, a_2, 1).
   (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
+  Have: valid_rw(Malloc_0, a_28, 1).
   (* Assertion 'rte,signed_overflow' *)
   Have: i <= 2147483646.
+  (* Invariant *)
+  Have: (-1) <= i.
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_27[shift_sint8(i8_0, i_2)] = 1))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_23[shift_uint8(u8_0, i_2)] = 2))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_19[shift_sint16(i16_0, i_2)] = 3))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_15[shift_uint16(u16_0, i_2)] = 4))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_11[shift_sint32(i32_0, i_2)] = 5))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_7[shift_uint32(u32_0, i_2)] = 6))).
+  (* Invariant *)
+  Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
+      (a_3[shift_sint64(i64_0, i_2)] = 7))).
 }
-Prove: a_24[shift_uint64(u64_0, i_1)] = 8.
+Prove: a_31[shift_uint64(u64_0, i_1)] = 8.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 39):
+Goal Establishment of Invariant (file chunk_typing.i, line 39):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 45):
-Let a = shift_sint8(i8_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, 10).
-Let a_2 = shift_uint8(u8_0, 0).
-Let a_3 = havoc(Mint_undef_6, Mint_6, a_2, 10).
-Let a_4 = shift_sint16(i16_0, 0).
-Let a_5 = havoc(Mint_undef_0, Mint_0, a_4, 10).
-Let a_6 = shift_uint16(u16_0, 0).
-Let a_7 = havoc(Mint_undef_3, Mint_3, a_6, 10).
-Let a_8 = shift_sint32(i32_0, 0).
-Let a_9 = havoc(Mint_undef_1, Mint_1, a_8, 10).
-Let a_10 = shift_uint32(u32_0, 0).
-Let a_11 = havoc(Mint_undef_4, Mint_4, a_10, 10).
-Let a_12 = shift_sint64(i64_0, 0).
-Let a_13 = havoc(Mint_undef_2, Mint_2, a_12, 10).
-Let a_14 = shift_uint64(u64_0, 0).
-Let a_15 = havoc(Mint_undef_5, Mint_5, a_14, 10).
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 45):
+Let a = shift_uint64(u64_0, 0).
+Let a_1 = havoc(Mint_undef_5, Mint_5, a, 10).
+Let a_2 = shift_sint64(i64_0, 0).
+Let a_3 = havoc(Mint_undef_2, Mint_2, a_2, 10).
+Let a_4 = shift_uint32(u32_0, 0).
+Let a_5 = havoc(Mint_undef_4, Mint_4, a_4, 10).
+Let a_6 = shift_sint32(i32_0, 0).
+Let a_7 = havoc(Mint_undef_1, Mint_1, a_6, 10).
+Let a_8 = shift_uint16(u16_0, 0).
+Let a_9 = havoc(Mint_undef_3, Mint_3, a_8, 10).
+Let a_10 = shift_sint16(i16_0, 0).
+Let a_11 = havoc(Mint_undef_0, Mint_0, a_10, 10).
+Let a_12 = shift_uint8(u8_0, 0).
+Let a_13 = havoc(Mint_undef_6, Mint_6, a_12, 10).
+Let a_14 = shift_sint8(i8_0, 0).
+Let a_15 = havoc(Mchar_undef_0, Mchar_0, a_14, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_5) /\ is_sint32_chunk(a_9) /\
-      is_sint64_chunk(a_13) /\ is_sint8_chunk(a_1) /\ is_uint16_chunk(a_7) /\
-      is_uint32_chunk(a_11) /\ is_uint64_chunk(a_15) /\ is_uint8_chunk(a_3).
+      is_sint16_chunk(a_11) /\ is_sint32_chunk(a_7) /\
+      is_sint64_chunk(a_3) /\ is_sint8_chunk(a_15) /\ is_uint16_chunk(a_9) /\
+      is_uint32_chunk(a_5) /\ is_uint64_chunk(a_1) /\ is_uint8_chunk(a_13).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1090,36 +1123,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a, 10) /\
-      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_2, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_7[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_5[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_3[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_1[shift_sint8(i8_0, i_1)] = 1))).
+  Have: valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
+      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
+      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
+      valid_rw(Malloc_0, a, 10) /\ valid_rw(Malloc_0, a_12, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_15[shift_sint8(i8_0, i_1)] = 1))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_13[shift_uint8(u8_0, i_1)] = 2))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_11[shift_sint16(i16_0, i_1)] = 3))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_9[shift_uint16(u16_0, i_1)] = 4))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_7[shift_sint32(i32_0, i_1)] = 5))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_5[shift_uint32(u32_0, i_1)] = 6))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_3[shift_sint64(i64_0, i_1)] = 7))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_1[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
 }
@@ -1127,33 +1160,34 @@ Prove: valid_rw(Malloc_0, shift_sint8(i8_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 46):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 46):
 Let a = shift_sint8(i8_0, i).
-Let a_1 = shift_sint8(i8_0, 0).
-Let a_2 = havoc(Mchar_undef_0, Mchar_0, a_1, 10).
-Let a_3 = shift_uint8(u8_0, 0).
-Let a_4 = havoc(Mint_undef_6, Mint_6, a_3, 10).
-Let a_5 = shift_sint16(i16_0, 0).
-Let a_6 = havoc(Mint_undef_0, Mint_0, a_5, 10).
-Let a_7 = shift_uint16(u16_0, 0).
-Let a_8 = havoc(Mint_undef_3, Mint_3, a_7, 10).
-Let a_9 = shift_sint32(i32_0, 0).
-Let a_10 = havoc(Mint_undef_1, Mint_1, a_9, 10).
-Let a_11 = shift_uint32(u32_0, 0).
-Let a_12 = havoc(Mint_undef_4, Mint_4, a_11, 10).
-Let a_13 = shift_sint64(i64_0, 0).
-Let a_14 = havoc(Mint_undef_2, Mint_2, a_13, 10).
-Let a_15 = shift_uint64(u64_0, 0).
-Let a_16 = havoc(Mint_undef_5, Mint_5, a_15, 10).
+Let a_1 = shift_uint64(u64_0, 0).
+Let a_2 = havoc(Mint_undef_5, Mint_5, a_1, 10).
+Let a_3 = shift_sint64(i64_0, 0).
+Let a_4 = havoc(Mint_undef_2, Mint_2, a_3, 10).
+Let a_5 = shift_uint32(u32_0, 0).
+Let a_6 = havoc(Mint_undef_4, Mint_4, a_5, 10).
+Let a_7 = shift_sint32(i32_0, 0).
+Let a_8 = havoc(Mint_undef_1, Mint_1, a_7, 10).
+Let a_9 = shift_uint16(u16_0, 0).
+Let a_10 = havoc(Mint_undef_3, Mint_3, a_9, 10).
+Let a_11 = shift_sint16(i16_0, 0).
+Let a_12 = havoc(Mint_undef_0, Mint_0, a_11, 10).
+Let a_13 = shift_uint8(u8_0, 0).
+Let a_14 = havoc(Mint_undef_6, Mint_6, a_13, 10).
+Let a_15 = shift_sint8(i8_0, 0).
+Let a_16 = havoc(Mchar_undef_0, Mchar_0, a_15, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_6) /\ is_sint32_chunk(a_10) /\
-      is_sint64_chunk(a_14) /\ is_sint8_chunk(a_2) /\ is_uint16_chunk(a_8) /\
-      is_uint32_chunk(a_12) /\ is_uint64_chunk(a_16) /\
-      is_uint8_chunk(a_4) /\ is_sint8_chunk(a_2[a <- 1]).
+      is_sint16_chunk(a_12) /\ is_sint32_chunk(a_8) /\
+      is_sint64_chunk(a_4) /\ is_sint8_chunk(a_16) /\
+      is_uint16_chunk(a_10) /\ is_uint32_chunk(a_6) /\
+      is_uint64_chunk(a_2) /\ is_uint8_chunk(a_14) /\
+      is_sint8_chunk(a_16[a <- 1]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1161,36 +1195,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_9, 10) /\
-      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_1, 10) /\
-      valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
-      valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_3, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_16[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_14[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_12[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_10[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_8[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_6[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_4[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_2[shift_sint8(i8_0, i_1)] = 1))).
+  Have: valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
+      valid_rw(Malloc_0, a_3, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
+      valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_5, 10) /\
+      valid_rw(Malloc_0, a_1, 10) /\ valid_rw(Malloc_0, a_13, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_16[shift_sint8(i8_0, i_1)] = 1))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_14[shift_uint8(u8_0, i_1)] = 2))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_12[shift_sint16(i16_0, i_1)] = 3))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_10[shift_uint16(u16_0, i_1)] = 4))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_8[shift_sint32(i32_0, i_1)] = 5))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_6[shift_uint32(u32_0, i_1)] = 6))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_4[shift_sint64(i64_0, i_1)] = 7))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_2[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1200,35 +1234,35 @@ Prove: valid_rw(Malloc_0, shift_uint8(u8_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 47):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 47):
 Let a = shift_uint8(u8_0, i).
 Let a_1 = shift_sint8(i8_0, i).
-Let a_2 = shift_sint8(i8_0, 0).
-Let a_3 = havoc(Mchar_undef_0, Mchar_0, a_2, 10).
-Let a_4 = shift_uint8(u8_0, 0).
-Let a_5 = havoc(Mint_undef_6, Mint_6, a_4, 10).
-Let a_6 = shift_sint16(i16_0, 0).
-Let a_7 = havoc(Mint_undef_0, Mint_0, a_6, 10).
-Let a_8 = shift_uint16(u16_0, 0).
-Let a_9 = havoc(Mint_undef_3, Mint_3, a_8, 10).
-Let a_10 = shift_sint32(i32_0, 0).
-Let a_11 = havoc(Mint_undef_1, Mint_1, a_10, 10).
-Let a_12 = shift_uint32(u32_0, 0).
-Let a_13 = havoc(Mint_undef_4, Mint_4, a_12, 10).
-Let a_14 = shift_sint64(i64_0, 0).
-Let a_15 = havoc(Mint_undef_2, Mint_2, a_14, 10).
-Let a_16 = shift_uint64(u64_0, 0).
-Let a_17 = havoc(Mint_undef_5, Mint_5, a_16, 10).
+Let a_2 = shift_uint64(u64_0, 0).
+Let a_3 = havoc(Mint_undef_5, Mint_5, a_2, 10).
+Let a_4 = shift_sint64(i64_0, 0).
+Let a_5 = havoc(Mint_undef_2, Mint_2, a_4, 10).
+Let a_6 = shift_uint32(u32_0, 0).
+Let a_7 = havoc(Mint_undef_4, Mint_4, a_6, 10).
+Let a_8 = shift_sint32(i32_0, 0).
+Let a_9 = havoc(Mint_undef_1, Mint_1, a_8, 10).
+Let a_10 = shift_uint16(u16_0, 0).
+Let a_11 = havoc(Mint_undef_3, Mint_3, a_10, 10).
+Let a_12 = shift_sint16(i16_0, 0).
+Let a_13 = havoc(Mint_undef_0, Mint_0, a_12, 10).
+Let a_14 = shift_uint8(u8_0, 0).
+Let a_15 = havoc(Mint_undef_6, Mint_6, a_14, 10).
+Let a_16 = shift_sint8(i8_0, 0).
+Let a_17 = havoc(Mchar_undef_0, Mchar_0, a_16, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_7) /\ is_sint32_chunk(a_11) /\
-      is_sint64_chunk(a_15) /\ is_sint8_chunk(a_3) /\ is_uint16_chunk(a_9) /\
-      is_uint32_chunk(a_13) /\ is_uint64_chunk(a_17) /\
-      is_uint8_chunk(a_5) /\ is_sint8_chunk(a_3[a_1 <- 1]) /\
-      is_uint8_chunk(a_5[a <- 2]).
+      is_sint16_chunk(a_13) /\ is_sint32_chunk(a_9) /\
+      is_sint64_chunk(a_5) /\ is_sint8_chunk(a_17) /\
+      is_uint16_chunk(a_11) /\ is_uint32_chunk(a_7) /\
+      is_uint64_chunk(a_3) /\ is_uint8_chunk(a_15) /\
+      is_sint8_chunk(a_17[a_1 <- 1]) /\ is_uint8_chunk(a_15[a <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1236,36 +1270,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_2, 10) /\
-      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
-      valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_4, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_17[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_7[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_5[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_3[shift_sint8(i8_0, i_1)] = 1))).
+  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
+      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
+      valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
+      valid_rw(Malloc_0, a_2, 10) /\ valid_rw(Malloc_0, a_14, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_17[shift_sint8(i8_0, i_1)] = 1))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_15[shift_uint8(u8_0, i_1)] = 2))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_13[shift_sint16(i16_0, i_1)] = 3))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_11[shift_uint16(u16_0, i_1)] = 4))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_9[shift_sint32(i32_0, i_1)] = 5))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_7[shift_uint32(u32_0, i_1)] = 6))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_5[shift_sint64(i64_0, i_1)] = 7))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_3[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1277,37 +1311,37 @@ Prove: valid_rw(Malloc_0, shift_sint16(i16_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 48):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 48):
 Let a = shift_sint16(i16_0, i).
 Let a_1 = shift_uint8(u8_0, i).
 Let a_2 = shift_sint8(i8_0, i).
-Let a_3 = shift_sint8(i8_0, 0).
-Let a_4 = havoc(Mchar_undef_0, Mchar_0, a_3, 10).
-Let a_5 = shift_uint8(u8_0, 0).
-Let a_6 = havoc(Mint_undef_6, Mint_6, a_5, 10).
-Let a_7 = shift_sint16(i16_0, 0).
-Let a_8 = havoc(Mint_undef_0, Mint_0, a_7, 10).
-Let a_9 = shift_uint16(u16_0, 0).
-Let a_10 = havoc(Mint_undef_3, Mint_3, a_9, 10).
-Let a_11 = shift_sint32(i32_0, 0).
-Let a_12 = havoc(Mint_undef_1, Mint_1, a_11, 10).
-Let a_13 = shift_uint32(u32_0, 0).
-Let a_14 = havoc(Mint_undef_4, Mint_4, a_13, 10).
-Let a_15 = shift_sint64(i64_0, 0).
-Let a_16 = havoc(Mint_undef_2, Mint_2, a_15, 10).
-Let a_17 = shift_uint64(u64_0, 0).
-Let a_18 = havoc(Mint_undef_5, Mint_5, a_17, 10).
+Let a_3 = shift_uint64(u64_0, 0).
+Let a_4 = havoc(Mint_undef_5, Mint_5, a_3, 10).
+Let a_5 = shift_sint64(i64_0, 0).
+Let a_6 = havoc(Mint_undef_2, Mint_2, a_5, 10).
+Let a_7 = shift_uint32(u32_0, 0).
+Let a_8 = havoc(Mint_undef_4, Mint_4, a_7, 10).
+Let a_9 = shift_sint32(i32_0, 0).
+Let a_10 = havoc(Mint_undef_1, Mint_1, a_9, 10).
+Let a_11 = shift_uint16(u16_0, 0).
+Let a_12 = havoc(Mint_undef_3, Mint_3, a_11, 10).
+Let a_13 = shift_sint16(i16_0, 0).
+Let a_14 = havoc(Mint_undef_0, Mint_0, a_13, 10).
+Let a_15 = shift_uint8(u8_0, 0).
+Let a_16 = havoc(Mint_undef_6, Mint_6, a_15, 10).
+Let a_17 = shift_sint8(i8_0, 0).
+Let a_18 = havoc(Mchar_undef_0, Mchar_0, a_17, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_8) /\ is_sint32_chunk(a_12) /\
-      is_sint64_chunk(a_16) /\ is_sint8_chunk(a_4) /\
-      is_uint16_chunk(a_10) /\ is_uint32_chunk(a_14) /\
-      is_uint64_chunk(a_18) /\ is_uint8_chunk(a_6) /\
-      is_sint16_chunk(a_8[a <- 3]) /\ is_sint8_chunk(a_4[a_2 <- 1]) /\
-      is_uint8_chunk(a_6[a_1 <- 2]).
+      is_sint16_chunk(a_14) /\ is_sint32_chunk(a_10) /\
+      is_sint64_chunk(a_6) /\ is_sint8_chunk(a_18) /\
+      is_uint16_chunk(a_12) /\ is_uint32_chunk(a_8) /\
+      is_uint64_chunk(a_4) /\ is_uint8_chunk(a_16) /\
+      is_sint16_chunk(a_14[a <- 3]) /\ is_sint8_chunk(a_18[a_2 <- 1]) /\
+      is_uint8_chunk(a_16[a_1 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1315,36 +1349,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
-      valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_3, 10) /\
-      valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_13, 10) /\
-      valid_rw(Malloc_0, a_17, 10) /\ valid_rw(Malloc_0, a_5, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_18[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_16[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_14[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_12[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_10[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_8[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_6[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_4[shift_sint8(i8_0, i_1)] = 1))).
+  Have: valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_9, 10) /\
+      valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_17, 10) /\
+      valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
+      valid_rw(Malloc_0, a_3, 10) /\ valid_rw(Malloc_0, a_15, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_18[shift_sint8(i8_0, i_1)] = 1))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_16[shift_uint8(u8_0, i_1)] = 2))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_14[shift_sint16(i16_0, i_1)] = 3))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_12[shift_uint16(u16_0, i_1)] = 4))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_10[shift_sint32(i32_0, i_1)] = 5))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_8[shift_uint32(u32_0, i_1)] = 6))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_6[shift_sint64(i64_0, i_1)] = 7))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_4[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1358,38 +1392,38 @@ Prove: valid_rw(Malloc_0, shift_uint16(u16_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 49):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 49):
 Let a = shift_uint16(u16_0, i).
 Let a_1 = shift_sint16(i16_0, i).
 Let a_2 = shift_uint8(u8_0, i).
 Let a_3 = shift_sint8(i8_0, i).
-Let a_4 = shift_sint8(i8_0, 0).
-Let a_5 = havoc(Mchar_undef_0, Mchar_0, a_4, 10).
-Let a_6 = shift_uint8(u8_0, 0).
-Let a_7 = havoc(Mint_undef_6, Mint_6, a_6, 10).
-Let a_8 = shift_sint16(i16_0, 0).
-Let a_9 = havoc(Mint_undef_0, Mint_0, a_8, 10).
-Let a_10 = shift_uint16(u16_0, 0).
-Let a_11 = havoc(Mint_undef_3, Mint_3, a_10, 10).
-Let a_12 = shift_sint32(i32_0, 0).
-Let a_13 = havoc(Mint_undef_1, Mint_1, a_12, 10).
-Let a_14 = shift_uint32(u32_0, 0).
-Let a_15 = havoc(Mint_undef_4, Mint_4, a_14, 10).
-Let a_16 = shift_sint64(i64_0, 0).
-Let a_17 = havoc(Mint_undef_2, Mint_2, a_16, 10).
-Let a_18 = shift_uint64(u64_0, 0).
-Let a_19 = havoc(Mint_undef_5, Mint_5, a_18, 10).
+Let a_4 = shift_uint64(u64_0, 0).
+Let a_5 = havoc(Mint_undef_5, Mint_5, a_4, 10).
+Let a_6 = shift_sint64(i64_0, 0).
+Let a_7 = havoc(Mint_undef_2, Mint_2, a_6, 10).
+Let a_8 = shift_uint32(u32_0, 0).
+Let a_9 = havoc(Mint_undef_4, Mint_4, a_8, 10).
+Let a_10 = shift_sint32(i32_0, 0).
+Let a_11 = havoc(Mint_undef_1, Mint_1, a_10, 10).
+Let a_12 = shift_uint16(u16_0, 0).
+Let a_13 = havoc(Mint_undef_3, Mint_3, a_12, 10).
+Let a_14 = shift_sint16(i16_0, 0).
+Let a_15 = havoc(Mint_undef_0, Mint_0, a_14, 10).
+Let a_16 = shift_uint8(u8_0, 0).
+Let a_17 = havoc(Mint_undef_6, Mint_6, a_16, 10).
+Let a_18 = shift_sint8(i8_0, 0).
+Let a_19 = havoc(Mchar_undef_0, Mchar_0, a_18, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_9) /\ is_sint32_chunk(a_13) /\
-      is_sint64_chunk(a_17) /\ is_sint8_chunk(a_5) /\
-      is_uint16_chunk(a_11) /\ is_uint32_chunk(a_15) /\
-      is_uint64_chunk(a_19) /\ is_uint8_chunk(a_7) /\
-      is_sint16_chunk(a_9[a_1 <- 3]) /\ is_sint8_chunk(a_5[a_3 <- 1]) /\
-      is_uint16_chunk(a_11[a <- 4]) /\ is_uint8_chunk(a_7[a_2 <- 2]).
+      is_sint16_chunk(a_15) /\ is_sint32_chunk(a_11) /\
+      is_sint64_chunk(a_7) /\ is_sint8_chunk(a_19) /\
+      is_uint16_chunk(a_13) /\ is_uint32_chunk(a_9) /\
+      is_uint64_chunk(a_5) /\ is_uint8_chunk(a_17) /\
+      is_sint16_chunk(a_15[a_1 <- 3]) /\ is_sint8_chunk(a_19[a_3 <- 1]) /\
+      is_uint16_chunk(a_13[a <- 4]) /\ is_uint8_chunk(a_17[a_2 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1397,36 +1431,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
-      valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_4, 10) /\
-      valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
-      valid_rw(Malloc_0, a_18, 10) /\ valid_rw(Malloc_0, a_6, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_19[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_17[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_7[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_5[shift_sint8(i8_0, i_1)] = 1))).
+  Have: valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
+      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
+      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
+      valid_rw(Malloc_0, a_4, 10) /\ valid_rw(Malloc_0, a_16, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_19[shift_sint8(i8_0, i_1)] = 1))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_17[shift_uint8(u8_0, i_1)] = 2))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_15[shift_sint16(i16_0, i_1)] = 3))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_13[shift_uint16(u16_0, i_1)] = 4))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_11[shift_sint32(i32_0, i_1)] = 5))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_9[shift_uint32(u32_0, i_1)] = 6))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_7[shift_sint64(i64_0, i_1)] = 7))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_5[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1442,40 +1476,40 @@ Prove: valid_rw(Malloc_0, shift_sint32(i32_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 50):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 50):
 Let a = shift_sint32(i32_0, i).
 Let a_1 = shift_uint16(u16_0, i).
 Let a_2 = shift_sint16(i16_0, i).
 Let a_3 = shift_uint8(u8_0, i).
 Let a_4 = shift_sint8(i8_0, i).
-Let a_5 = shift_sint8(i8_0, 0).
-Let a_6 = havoc(Mchar_undef_0, Mchar_0, a_5, 10).
-Let a_7 = shift_uint8(u8_0, 0).
-Let a_8 = havoc(Mint_undef_6, Mint_6, a_7, 10).
-Let a_9 = shift_sint16(i16_0, 0).
-Let a_10 = havoc(Mint_undef_0, Mint_0, a_9, 10).
-Let a_11 = shift_uint16(u16_0, 0).
-Let a_12 = havoc(Mint_undef_3, Mint_3, a_11, 10).
-Let a_13 = shift_sint32(i32_0, 0).
-Let a_14 = havoc(Mint_undef_1, Mint_1, a_13, 10).
-Let a_15 = shift_uint32(u32_0, 0).
-Let a_16 = havoc(Mint_undef_4, Mint_4, a_15, 10).
-Let a_17 = shift_sint64(i64_0, 0).
-Let a_18 = havoc(Mint_undef_2, Mint_2, a_17, 10).
-Let a_19 = shift_uint64(u64_0, 0).
-Let a_20 = havoc(Mint_undef_5, Mint_5, a_19, 10).
+Let a_5 = shift_uint64(u64_0, 0).
+Let a_6 = havoc(Mint_undef_5, Mint_5, a_5, 10).
+Let a_7 = shift_sint64(i64_0, 0).
+Let a_8 = havoc(Mint_undef_2, Mint_2, a_7, 10).
+Let a_9 = shift_uint32(u32_0, 0).
+Let a_10 = havoc(Mint_undef_4, Mint_4, a_9, 10).
+Let a_11 = shift_sint32(i32_0, 0).
+Let a_12 = havoc(Mint_undef_1, Mint_1, a_11, 10).
+Let a_13 = shift_uint16(u16_0, 0).
+Let a_14 = havoc(Mint_undef_3, Mint_3, a_13, 10).
+Let a_15 = shift_sint16(i16_0, 0).
+Let a_16 = havoc(Mint_undef_0, Mint_0, a_15, 10).
+Let a_17 = shift_uint8(u8_0, 0).
+Let a_18 = havoc(Mint_undef_6, Mint_6, a_17, 10).
+Let a_19 = shift_sint8(i8_0, 0).
+Let a_20 = havoc(Mchar_undef_0, Mchar_0, a_19, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_10) /\ is_sint32_chunk(a_14) /\
-      is_sint64_chunk(a_18) /\ is_sint8_chunk(a_6) /\
-      is_uint16_chunk(a_12) /\ is_uint32_chunk(a_16) /\
-      is_uint64_chunk(a_20) /\ is_uint8_chunk(a_8) /\
-      is_sint16_chunk(a_10[a_2 <- 3]) /\ is_sint32_chunk(a_14[a <- 5]) /\
-      is_sint8_chunk(a_6[a_4 <- 1]) /\ is_uint16_chunk(a_12[a_1 <- 4]) /\
-      is_uint8_chunk(a_8[a_3 <- 2]).
+      is_sint16_chunk(a_16) /\ is_sint32_chunk(a_12) /\
+      is_sint64_chunk(a_8) /\ is_sint8_chunk(a_20) /\
+      is_uint16_chunk(a_14) /\ is_uint32_chunk(a_10) /\
+      is_uint64_chunk(a_6) /\ is_uint8_chunk(a_18) /\
+      is_sint16_chunk(a_16[a_2 <- 3]) /\ is_sint32_chunk(a_12[a <- 5]) /\
+      is_sint8_chunk(a_20[a_4 <- 1]) /\ is_uint16_chunk(a_14[a_1 <- 4]) /\
+      is_uint8_chunk(a_18[a_3 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1483,36 +1517,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_13, 10) /\
-      valid_rw(Malloc_0, a_17, 10) /\ valid_rw(Malloc_0, a_5, 10) /\
-      valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
-      valid_rw(Malloc_0, a_19, 10) /\ valid_rw(Malloc_0, a_7, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_20[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_18[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_16[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_14[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_12[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_10[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_8[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_6[shift_sint8(i8_0, i_1)] = 1))).
+  Have: valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
+      valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_19, 10) /\
+      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_9, 10) /\
+      valid_rw(Malloc_0, a_5, 10) /\ valid_rw(Malloc_0, a_17, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_20[shift_sint8(i8_0, i_1)] = 1))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_18[shift_uint8(u8_0, i_1)] = 2))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_16[shift_sint16(i16_0, i_1)] = 3))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_14[shift_uint16(u16_0, i_1)] = 4))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_12[shift_sint32(i32_0, i_1)] = 5))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_10[shift_uint32(u32_0, i_1)] = 6))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_8[shift_sint64(i64_0, i_1)] = 7))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_6[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1530,41 +1564,41 @@ Prove: valid_rw(Malloc_0, shift_uint32(u32_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 51):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 51):
 Let a = shift_uint32(u32_0, i).
 Let a_1 = shift_sint32(i32_0, i).
 Let a_2 = shift_uint16(u16_0, i).
 Let a_3 = shift_sint16(i16_0, i).
 Let a_4 = shift_uint8(u8_0, i).
 Let a_5 = shift_sint8(i8_0, i).
-Let a_6 = shift_sint8(i8_0, 0).
-Let a_7 = havoc(Mchar_undef_0, Mchar_0, a_6, 10).
-Let a_8 = shift_uint8(u8_0, 0).
-Let a_9 = havoc(Mint_undef_6, Mint_6, a_8, 10).
-Let a_10 = shift_sint16(i16_0, 0).
-Let a_11 = havoc(Mint_undef_0, Mint_0, a_10, 10).
-Let a_12 = shift_uint16(u16_0, 0).
-Let a_13 = havoc(Mint_undef_3, Mint_3, a_12, 10).
-Let a_14 = shift_sint32(i32_0, 0).
-Let a_15 = havoc(Mint_undef_1, Mint_1, a_14, 10).
-Let a_16 = shift_uint32(u32_0, 0).
-Let a_17 = havoc(Mint_undef_4, Mint_4, a_16, 10).
-Let a_18 = shift_sint64(i64_0, 0).
-Let a_19 = havoc(Mint_undef_2, Mint_2, a_18, 10).
-Let a_20 = shift_uint64(u64_0, 0).
-Let a_21 = havoc(Mint_undef_5, Mint_5, a_20, 10).
+Let a_6 = shift_uint64(u64_0, 0).
+Let a_7 = havoc(Mint_undef_5, Mint_5, a_6, 10).
+Let a_8 = shift_sint64(i64_0, 0).
+Let a_9 = havoc(Mint_undef_2, Mint_2, a_8, 10).
+Let a_10 = shift_uint32(u32_0, 0).
+Let a_11 = havoc(Mint_undef_4, Mint_4, a_10, 10).
+Let a_12 = shift_sint32(i32_0, 0).
+Let a_13 = havoc(Mint_undef_1, Mint_1, a_12, 10).
+Let a_14 = shift_uint16(u16_0, 0).
+Let a_15 = havoc(Mint_undef_3, Mint_3, a_14, 10).
+Let a_16 = shift_sint16(i16_0, 0).
+Let a_17 = havoc(Mint_undef_0, Mint_0, a_16, 10).
+Let a_18 = shift_uint8(u8_0, 0).
+Let a_19 = havoc(Mint_undef_6, Mint_6, a_18, 10).
+Let a_20 = shift_sint8(i8_0, 0).
+Let a_21 = havoc(Mchar_undef_0, Mchar_0, a_20, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_11) /\ is_sint32_chunk(a_15) /\
-      is_sint64_chunk(a_19) /\ is_sint8_chunk(a_7) /\
-      is_uint16_chunk(a_13) /\ is_uint32_chunk(a_17) /\
-      is_uint64_chunk(a_21) /\ is_uint8_chunk(a_9) /\
-      is_sint16_chunk(a_11[a_3 <- 3]) /\ is_sint32_chunk(a_15[a_1 <- 5]) /\
-      is_sint8_chunk(a_7[a_5 <- 1]) /\ is_uint16_chunk(a_13[a_2 <- 4]) /\
-      is_uint32_chunk(a_17[a <- 6]) /\ is_uint8_chunk(a_9[a_4 <- 2]).
+      is_sint16_chunk(a_17) /\ is_sint32_chunk(a_13) /\
+      is_sint64_chunk(a_9) /\ is_sint8_chunk(a_21) /\
+      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_11) /\
+      is_uint64_chunk(a_7) /\ is_uint8_chunk(a_19) /\
+      is_sint16_chunk(a_17[a_3 <- 3]) /\ is_sint32_chunk(a_13[a_1 <- 5]) /\
+      is_sint8_chunk(a_21[a_5 <- 1]) /\ is_uint16_chunk(a_15[a_2 <- 4]) /\
+      is_uint32_chunk(a_11[a <- 6]) /\ is_uint8_chunk(a_19[a_4 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1572,36 +1606,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_10, 10) /\ valid_rw(Malloc_0, a_14, 10) /\
-      valid_rw(Malloc_0, a_18, 10) /\ valid_rw(Malloc_0, a_6, 10) /\
-      valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_21[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_19[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_17[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_7[shift_sint8(i8_0, i_1)] = 1))).
+  Have: valid_rw(Malloc_0, a_16, 10) /\ valid_rw(Malloc_0, a_12, 10) /\
+      valid_rw(Malloc_0, a_8, 10) /\ valid_rw(Malloc_0, a_20, 10) /\
+      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_10, 10) /\
+      valid_rw(Malloc_0, a_6, 10) /\ valid_rw(Malloc_0, a_18, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_21[shift_sint8(i8_0, i_1)] = 1))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_19[shift_uint8(u8_0, i_1)] = 2))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_17[shift_sint16(i16_0, i_1)] = 3))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_15[shift_uint16(u16_0, i_1)] = 4))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_13[shift_sint32(i32_0, i_1)] = 5))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_11[shift_uint32(u32_0, i_1)] = 6))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_9[shift_sint64(i64_0, i_1)] = 7))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_7[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1621,7 +1655,7 @@ Prove: valid_rw(Malloc_0, shift_sint64(i64_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 52):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 52):
 Let a = shift_sint64(i64_0, i).
 Let a_1 = shift_uint32(u32_0, i).
 Let a_2 = shift_sint32(i32_0, i).
@@ -1629,35 +1663,35 @@ Let a_3 = shift_uint16(u16_0, i).
 Let a_4 = shift_sint16(i16_0, i).
 Let a_5 = shift_uint8(u8_0, i).
 Let a_6 = shift_sint8(i8_0, i).
-Let a_7 = shift_sint8(i8_0, 0).
-Let a_8 = havoc(Mchar_undef_0, Mchar_0, a_7, 10).
-Let a_9 = shift_uint8(u8_0, 0).
-Let a_10 = havoc(Mint_undef_6, Mint_6, a_9, 10).
-Let a_11 = shift_sint16(i16_0, 0).
-Let a_12 = havoc(Mint_undef_0, Mint_0, a_11, 10).
-Let a_13 = shift_uint16(u16_0, 0).
-Let a_14 = havoc(Mint_undef_3, Mint_3, a_13, 10).
-Let a_15 = shift_sint32(i32_0, 0).
-Let a_16 = havoc(Mint_undef_1, Mint_1, a_15, 10).
-Let a_17 = shift_uint32(u32_0, 0).
-Let a_18 = havoc(Mint_undef_4, Mint_4, a_17, 10).
-Let a_19 = shift_sint64(i64_0, 0).
-Let a_20 = havoc(Mint_undef_2, Mint_2, a_19, 10).
-Let a_21 = shift_uint64(u64_0, 0).
-Let a_22 = havoc(Mint_undef_5, Mint_5, a_21, 10).
+Let a_7 = shift_uint64(u64_0, 0).
+Let a_8 = havoc(Mint_undef_5, Mint_5, a_7, 10).
+Let a_9 = shift_sint64(i64_0, 0).
+Let a_10 = havoc(Mint_undef_2, Mint_2, a_9, 10).
+Let a_11 = shift_uint32(u32_0, 0).
+Let a_12 = havoc(Mint_undef_4, Mint_4, a_11, 10).
+Let a_13 = shift_sint32(i32_0, 0).
+Let a_14 = havoc(Mint_undef_1, Mint_1, a_13, 10).
+Let a_15 = shift_uint16(u16_0, 0).
+Let a_16 = havoc(Mint_undef_3, Mint_3, a_15, 10).
+Let a_17 = shift_sint16(i16_0, 0).
+Let a_18 = havoc(Mint_undef_0, Mint_0, a_17, 10).
+Let a_19 = shift_uint8(u8_0, 0).
+Let a_20 = havoc(Mint_undef_6, Mint_6, a_19, 10).
+Let a_21 = shift_sint8(i8_0, 0).
+Let a_22 = havoc(Mchar_undef_0, Mchar_0, a_21, 10).
 Assume {
   Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
       is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
       is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_12) /\ is_sint32_chunk(a_16) /\
-      is_sint64_chunk(a_20) /\ is_sint8_chunk(a_8) /\
-      is_uint16_chunk(a_14) /\ is_uint32_chunk(a_18) /\
-      is_uint64_chunk(a_22) /\ is_uint8_chunk(a_10) /\
-      is_sint16_chunk(a_12[a_4 <- 3]) /\ is_sint32_chunk(a_16[a_2 <- 5]) /\
-      is_sint64_chunk(a_20[a <- 7]) /\ is_sint8_chunk(a_8[a_6 <- 1]) /\
-      is_uint16_chunk(a_14[a_3 <- 4]) /\ is_uint32_chunk(a_18[a_1 <- 6]) /\
-      is_uint8_chunk(a_10[a_5 <- 2]).
+      is_sint16_chunk(a_18) /\ is_sint32_chunk(a_14) /\
+      is_sint64_chunk(a_10) /\ is_sint8_chunk(a_22) /\
+      is_uint16_chunk(a_16) /\ is_uint32_chunk(a_12) /\
+      is_uint64_chunk(a_8) /\ is_uint8_chunk(a_20) /\
+      is_sint16_chunk(a_18[a_4 <- 3]) /\ is_sint32_chunk(a_14[a_2 <- 5]) /\
+      is_sint64_chunk(a_10[a <- 7]) /\ is_sint8_chunk(a_22[a_6 <- 1]) /\
+      is_uint16_chunk(a_16[a_3 <- 4]) /\ is_uint32_chunk(a_12[a_1 <- 6]) /\
+      is_uint8_chunk(a_20[a_5 <- 2]).
   (* Heap *)
   Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
       (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
@@ -1665,36 +1699,36 @@ Assume {
       (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_11, 10) /\ valid_rw(Malloc_0, a_15, 10) /\
-      valid_rw(Malloc_0, a_19, 10) /\ valid_rw(Malloc_0, a_7, 10) /\
-      valid_rw(Malloc_0, a_13, 10) /\ valid_rw(Malloc_0, a_17, 10) /\
-      valid_rw(Malloc_0, a_21, 10) /\ valid_rw(Malloc_0, a_9, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_22[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_20[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_18[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_16[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_14[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_12[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_10[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_8[shift_sint8(i8_0, i_1)] = 1))).
+  Have: valid_rw(Malloc_0, a_17, 10) /\ valid_rw(Malloc_0, a_13, 10) /\
+      valid_rw(Malloc_0, a_9, 10) /\ valid_rw(Malloc_0, a_21, 10) /\
+      valid_rw(Malloc_0, a_15, 10) /\ valid_rw(Malloc_0, a_11, 10) /\
+      valid_rw(Malloc_0, a_7, 10) /\ valid_rw(Malloc_0, a_19, 10).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_22[shift_sint8(i8_0, i_1)] = 1))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_20[shift_uint8(u8_0, i_1)] = 2))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_18[shift_sint16(i16_0, i_1)] = 3))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_16[shift_uint16(u16_0, i_1)] = 4))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_14[shift_sint32(i32_0, i_1)] = 5))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_12[shift_uint32(u32_0, i_1)] = 6))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_10[shift_sint64(i64_0, i_1)] = 7))).
+  (* Invariant *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_8[shift_uint64(u64_0, i_1)] = 8))).
   (* Then *)
   Have: i <= 9.
   (* Assertion 'rte,mem_access' *)
@@ -1716,167 +1750,74 @@ Prove: valid_rw(Malloc_0, shift_uint64(u64_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,signed_overflow' (file tests/wp_acsl/chunk_typing.i, line 44):
-Let a = shift_uint64(u64_0, i).
-Let a_1 = shift_sint64(i64_0, i).
-Let a_2 = shift_uint32(u32_0, i).
-Let a_3 = shift_sint32(i32_0, i).
-Let a_4 = shift_uint16(u16_0, i).
-Let a_5 = shift_sint16(i16_0, i).
-Let a_6 = shift_uint8(u8_0, i).
-Let a_7 = shift_sint8(i8_0, i).
-Let a_8 = shift_sint8(i8_0, 0).
-Let a_9 = havoc(Mchar_undef_0, Mchar_0, a_8, 10).
-Let a_10 = shift_uint8(u8_0, 0).
-Let a_11 = havoc(Mint_undef_6, Mint_6, a_10, 10).
-Let a_12 = shift_sint16(i16_0, 0).
-Let a_13 = havoc(Mint_undef_0, Mint_0, a_12, 10).
-Let a_14 = shift_uint16(u16_0, 0).
-Let a_15 = havoc(Mint_undef_3, Mint_3, a_14, 10).
-Let a_16 = shift_sint32(i32_0, 0).
-Let a_17 = havoc(Mint_undef_1, Mint_1, a_16, 10).
-Let a_18 = shift_uint32(u32_0, 0).
-Let a_19 = havoc(Mint_undef_4, Mint_4, a_18, 10).
-Let a_20 = shift_sint64(i64_0, 0).
-Let a_21 = havoc(Mint_undef_2, Mint_2, a_20, 10).
-Let a_22 = shift_uint64(u64_0, 0).
-Let a_23 = havoc(Mint_undef_5, Mint_5, a_22, 10).
-Assume {
-  Type: is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
-      is_sint64_chunk(Mint_2) /\ is_sint8_chunk(Mchar_0) /\
-      is_uint16_chunk(Mint_3) /\ is_uint32_chunk(Mint_4) /\
-      is_uint64_chunk(Mint_5) /\ is_uint8_chunk(Mint_6) /\ is_sint32(i) /\
-      is_sint16_chunk(a_13) /\ is_sint32_chunk(a_17) /\
-      is_sint64_chunk(a_21) /\ is_sint8_chunk(a_9) /\
-      is_uint16_chunk(a_15) /\ is_uint32_chunk(a_19) /\
-      is_uint64_chunk(a_23) /\ is_uint8_chunk(a_11) /\
-      is_sint16_chunk(a_13[a_5 <- 3]) /\ is_sint32_chunk(a_17[a_3 <- 5]) /\
-      is_sint64_chunk(a_21[a_1 <- 7]) /\ is_sint8_chunk(a_9[a_7 <- 1]) /\
-      is_uint16_chunk(a_15[a_4 <- 4]) /\ is_uint32_chunk(a_19[a_2 <- 6]) /\
-      is_uint64_chunk(a_23[a <- 8]) /\ is_uint8_chunk(a_11[a_6 <- 2]).
-  (* Heap *)
-  Type: (region(i16_0.base) <= 0) /\ (region(i32_0.base) <= 0) /\
-      (region(i64_0.base) <= 0) /\ (region(i8_0.base) <= 0) /\
-      (region(u16_0.base) <= 0) /\ (region(u32_0.base) <= 0) /\
-      (region(u64_0.base) <= 0) /\ (region(u8_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: valid_rw(Malloc_0, a_12, 10) /\ valid_rw(Malloc_0, a_16, 10) /\
-      valid_rw(Malloc_0, a_20, 10) /\ valid_rw(Malloc_0, a_8, 10) /\
-      valid_rw(Malloc_0, a_14, 10) /\ valid_rw(Malloc_0, a_18, 10) /\
-      valid_rw(Malloc_0, a_22, 10) /\ valid_rw(Malloc_0, a_10, 10).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_23[shift_uint64(u64_0, i_1)] = 8))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_21[shift_sint64(i64_0, i_1)] = 7))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_19[shift_uint32(u32_0, i_1)] = 6))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_17[shift_sint32(i32_0, i_1)] = 5))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_15[shift_uint16(u16_0, i_1)] = 4))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_13[shift_sint16(i16_0, i_1)] = 3))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_11[shift_uint8(u8_0, i_1)] = 2))).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (a_9[shift_sint8(i8_0, i_1)] = 1))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10).
-  (* Then *)
-  Have: i <= 9.
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_7, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_6, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_5, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_4, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_3, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_2, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a_1, 1).
-  (* Assertion 'rte,mem_access' *)
-  Have: valid_rw(Malloc_0, a, 1).
-}
-Prove: i <= 2147483646.
-
-------------------------------------------------------------
-
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (1/9):
+Goal Assertion 'rte,signed_overflow' (file chunk_typing.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (2/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (1/9):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file chunk_typing.i, line 40) (2/9):
 Effect at line 45
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (3/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (3/9):
 Effect at line 46
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (4/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (4/9):
 Effect at line 47
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (5/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (5/9):
 Effect at line 48
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (6/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (6/9):
 Effect at line 49
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (7/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (7/9):
 Effect at line 50
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (8/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (8/9):
 Effect at line 51
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (9/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (9/9):
 Effect at line 52
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_acsl/chunk_typing.i, line 44):
+Goal Decreasing of Loop variant at loop (file chunk_typing.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_acsl/chunk_typing.i, line 44):
+Goal Positivity of Loop variant at loop (file chunk_typing.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_acsl/chunk_typing.i:21: Warning: 
+[wp] chunk_typing.i:21: Warning: 
   Memory model hypotheses for function 'function':
   /*@
      behavior wp_typed:

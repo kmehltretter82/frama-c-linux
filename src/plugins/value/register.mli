@@ -20,6 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Functions of the Value plugin registered in {!Db}.
+(** Functions of the Value plugin registered in {!Db}. Only three functions
+    are exported. *)
 
-    Nothing is exported. *)
+val eval_deps : Cvalue_domain.State.t -> Cil_types.exp -> Locations.Zone.t
+val eval_deps_lval : Cvalue_domain.State.t -> Cil_types.lval -> Locations.Zone.t
+val eval_deps_addr : Cvalue_domain.State.t -> Cil_types.lval -> Locations.Zone.t

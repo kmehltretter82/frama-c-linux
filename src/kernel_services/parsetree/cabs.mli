@@ -173,8 +173,6 @@ and definition =
   | STATIC_ASSERT of expression * string * cabsloc
   | LINKAGE of string * cabsloc * definition list (* extern "C" { ... } *)
   | GLOBANNOT of Logic_ptree.decl list
-  (** Logical declaration (axiom, logic, etc.)*)
-  | CUSTOM of Logic_ptree.custom_tree * string * cabsloc
 
 (** the file name, and then the list of toplevel forms.
     @plugin development guide *)

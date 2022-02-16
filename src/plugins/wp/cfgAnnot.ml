@@ -202,18 +202,25 @@ let get_terminates_clause kf =
    *      - then handled in a Some case (as user defined) and returns Defined *)
   let defined p =
     Defined (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p) in
-  let populate_true () =
+  let populate_true ?(silence=false) () =
     let p = Logic_const.new_predicate @@ Logic_const.ptrue in
-    Wp_parameters.warning
-      ~source:(fst @@ Kernel_function.get_location kf) ~once:true
-      "Missing terminates clause for %a, populates 'terminates \\true'"
-      Kernel_function.pretty kf ;
+    if not silence then
+      Wp_parameters.warning
+        ~source:(fst @@ Kernel_function.get_location kf) ~once:true
+        "Missing terminates clause for %a, populates 'terminates \\true'"
+        Kernel_function.pretty kf ;
     Annotations.add_terminates wp_populate_terminates kf p ;
     defined p
   in
+  let kf_vi = Kernel_function.get_vi kf in
+  let kf_name = Kernel_function.get_name kf in
   match Annotations.terminates kf with
+  | None
+    when Cil_builtins.is_builtin kf_vi
+      || Cil_builtins.is_special_builtin kf_name ->
+      populate_true ~silence:true ()
   | None when Kernel_function.is_in_libc kf ->
-      if not @@ Wp_parameters.TerminatesFCDeclarations.get ()
+      if not @@ Wp_parameters.TerminatesStdlibDeclarations.get ()
       then Assumed Logic_const.pfalse
       else populate_true ()
   | None when Kernel_function.is_definition kf ->
@@ -237,6 +244,21 @@ let get_terminates_hyp kf =
   | Defined (_, p) -> false, p
   | Assumed p -> true, p
 
+let check_variant_relation = function
+  | (_, None) -> ()
+  | (_, Some rel) ->
+      Wp_parameters.hypothesis ~once:true
+        "'%a' relation must be well-founded" Cil_printer.pp_logic_info rel
+
+let get_decreases_goal kf =
+  let defined t = WpPropId.mk_decrease_id kf Kglobal t, t in
+  match Annotations.decreases ~populate:false kf with
+  | None -> None
+  | Some v -> check_variant_relation v ; Some (defined v)
+
+let get_decreases_hyp kf =
+  Annotations.decreases ~populate:false kf
+
 (* -------------------------------------------------------------------------- *)
 (* --- Contracts                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -249,6 +271,7 @@ type contract = {
   contract_smoke : WpPropId.pred_info list ;
   contract_assigns : Cil_types.assigns ;
   contract_terminates : bool * Cil_types.predicate ;
+  contract_decreases : Cil_types.variant option ;
 }
 
 let assigns_upper_bound behaviors =
@@ -325,6 +348,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           | Writes froms -> Writes (normalize_froms Normal froms)
         in
         let terminates = get_terminates_hyp kf in
+        let decreases = get_decreases_hyp kf in
         {
           contract_cond = List.rev !wcond ;
           contract_hpre = List.rev !whpre ;
@@ -333,6 +357,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           contract_smoke = [] ;
           contract_assigns = assigns ;
           contract_terminates = terminates ;
+          contract_decreases = decreases ;
         }
     end)
 
@@ -379,33 +404,33 @@ let get_stmt_assigns kf stmt =
               ) l s.spec_behavior
         | _ -> l
       end stmt []
-  in if asgn = [] then [WpPropId.empty_assigns_info] else asgn
+  in if asgn = [] then [WpPropId.mk_stmt_any_assigns_info stmt] else asgn
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Assertions                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-type code_assertions = {
-  code_admitted: WpPropId.pred_info list ;
-  code_verified: WpPropId.pred_info list ;
+type code_assertion = {
+  code_admitted: WpPropId.pred_info option ;
+  code_verified: WpPropId.pred_info option ;
 }
 
-let reverse_code_assertions a = {
-  code_admitted = List.rev a.code_admitted ;
-  code_verified = List.rev a.code_verified ;
-}
-
+(* Note: collected in REVERSE order *)
 module CodeAssertions = WpContext.StaticGenerator(CodeKey)
     (struct
       type key = CodeKey.t
-      type data = code_assertions
+      type data = code_assertion list
       let name = "Wp.CfgAnnot.CodeAssertions"
       let compile (kf,stmt) =
         let labels = NormAtLabels.labels_assert ~kf stmt in
         let normalize_pred p = NormAtLabels.preproc_annot labels p in
-        reverse_code_assertions @@
-        Annotations.fold_code_annot
-          begin fun _emitter ca l ->
+        let all_annot = (* ensures that the order is the one displayed in GUI *)
+          List.sort
+            Cil_datatype.Code_annotation.compare
+            (Annotations.code_annot stmt)
+        in
+        List.fold_left
+          begin fun l ca ->
             match ca.annot_content with
             | AStmtSpec _ when not @@ is_assembly stmt ->
                 let source = fst (Cil_datatype.Stmt.loc stmt) in
@@ -421,50 +446,68 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
                   normalize_pred a.tp_statement in
                 let admit = Logic_utils.use_predicate a.tp_kind in
                 let verif = Logic_utils.verify_predicate a.tp_kind in
-                let use flag p ps = if flag then p::ps else ps in
+                let use flag p = if flag then Some p else None in
                 {
-                  code_admitted = use admit p l.code_admitted ;
-                  code_verified = use verif p l.code_verified ;
-                }
+                  code_admitted = use admit p ;
+                  code_verified = use verif p ;
+                } :: l
             | _ -> l
-          end stmt {
-          code_admitted = [];
-          code_verified = [];
-        }
+          end [] all_annot
     end)
 
 let get_code_assertions ?(smoking=false) kf stmt =
   let ca = CodeAssertions.get (kf,stmt) in
+  (* Make sur that smoke tests are in the end so that it can see surely false
+     assertions associated to this statement, in particular RTE assertions.   *)
+  List.rev @@
   if smoking then
     let s = smoke kf ~id:"dead_code" ~unreachable:stmt () in
-    { ca with code_verified = s :: ca.code_verified }
+    { code_admitted = None ; code_verified = Some s } :: ca
   else ca
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loop Invariants                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-type loop_contract = {
-  loop_terminates: predicate option;
-  (* to be verified at loop entry *)
-  loop_established: WpPropId.pred_info list;
-  (* to be assumed for loop current *)
-  loop_invariants: WpPropId.pred_info list;
-  (* to be proved after loop invariants *)
-  loop_smoke: WpPropId.pred_info list;
-  (* to be verified after loop body *)
-  loop_preserved: WpPropId.pred_info list;
-  (* assigned by loop body *)
-  loop_assigns: WpPropId.assigns_full_info list;
+let mk_variant_properties kf s ca v =
+  let vpos_id = WpPropId.mk_var_pos_id kf s ca in
+  let vdecr_id = WpPropId.mk_var_decr_id kf s ca in
+  let loc = v.term_loc in
+  let lcurr = Clabels.to_logic (Clabels.loop_current s) in
+  let vcurr = Logic_const.tat ~loc (v, lcurr) in
+  let zero = Cil.lzero ~loc () in
+  let vpos = Logic_const.prel ~loc (Rle, zero, vcurr) in
+  let vdecr = Logic_const.prel ~loc (Rlt, v, vcurr) in
+  (vpos_id, vpos), (vdecr_id, vdecr)
+
+let mk_variant_relation_property kf s ca v li =
+  check_variant_relation (v, Some li) ;
+  let vid = WpPropId.mk_var_id kf s ca in
+  let loc = v.term_loc in
+  let lcurr = Clabels.to_logic (Clabels.loop_current s) in
+  let vcurr = Logic_const.tat ~loc (v, lcurr) in
+  let variant = Logic_const.papp ~loc (li,[],[vcurr ; v]) in
+  (vid, variant)
+
+type loop_hypothesis =
+  | NoHyp
+  | Check of WpPropId.prop_id
+  | Always of WpPropId.prop_id
+
+type loop_invariant = {
+  loop_hyp : loop_hypothesis ;
+  loop_est : WpPropId.prop_id option ;
+  loop_ind : WpPropId.prop_id option ;
+  loop_pred : Cil_types.predicate ;
 }
 
-let reverse_loop_contract l = {
-  loop_terminates = l.loop_terminates ;
-  loop_established = List.rev l.loop_established ;
-  loop_invariants = List.rev l.loop_invariants ;
-  loop_preserved = List.rev l.loop_preserved ;
-  loop_assigns = List.rev l.loop_assigns ;
-  loop_smoke = List.rev l.loop_smoke ;
+type loop_contract = {
+  loop_terminates: predicate option;
+  loop_invariants : loop_invariant list ;
+  (* to be proved after loop invariants *)
+  loop_smoke: WpPropId.pred_info list;
+  (* assigned by loop body *)
+  loop_assigns: WpPropId.assigns_full_info list;
 }
 
 let default_assigns stmt l =
@@ -483,43 +526,57 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
         let normalize_pred p = NormAtLabels.preproc_annot labels p in
         let normalize_annot (i,p) = i, normalize_pred p in
         let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
+        let intro_terminates_variant ~loc (pid, v) =
+          pid,
+          let t = snd @@ get_terminates_hyp kf in
+          if Wp_parameters.TerminatesVariantHyp.get () then begin
+            if Logic_utils.is_same_predicate t Logic_const.pfalse then
+              Wp_parameters.warning
+                ~source:(fst loc) ~once:true
+                "Loop variant is always trivially verified \
+                 (terminates \\false)" ;
+            Logic_const.pimplies (t, v)
+          end else v
+        in
+        let variant_as_inv ~loc (i, p) =
+          let i, p = intro_terminates_variant ~loc @@ normalize_annot (i, p) in
+          { loop_pred = p ;
+            loop_hyp = NoHyp ; loop_est = None ; loop_ind = Some i }
+        in
+        let all_annot = (* ensures that the order is the one displayed in GUI *)
+          List.rev @@ List.sort
+            Cil_datatype.Code_annotation.compare
+            (Annotations.code_annot stmt)
+        in
         default_assigns stmt @@
-        reverse_loop_contract @@
-        Annotations.fold_code_annot
-          begin fun _emitter ca l ->
+        List.fold_left
+          begin fun l ca ->
             match ca.annot_content with
             | AInvariant(_,true,inv) ->
-                let p = normalize_pred inv.tp_statement in
                 let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
                 let g_est, g_ind = WpPropId.mk_loop_inv kf stmt ca in
                 let admit = Logic_utils.use_predicate inv.tp_kind in
                 let verif = Logic_utils.verify_predicate inv.tp_kind in
-                let use flag id p ps = if flag then (id,p) :: ps else ps in
-                { l with
-                  loop_established = use verif g_est p l.loop_established ;
-                  loop_invariants  = use admit g_hyp p l.loop_invariants ;
-                  loop_preserved   = use verif g_ind p l.loop_preserved ;
-                }
-            | AVariant(term, None) ->
-                let vpos , vdec =
-                  WpStrategy.mk_variant_properties kf stmt ca term in
-                let intro_terminates (pid, v) =
-                  pid,
-                  let t = snd @@ get_terminates_hyp kf in
-                  if Wp_parameters.TerminatesVariantHyp.get () then begin
-                    if Logic_utils.is_same_predicate t Logic_const.pfalse then
-                      Wp_parameters.warning
-                        ~source:(fst term.term_loc) ~once:true
-                        "Loop variant is always trivially verified \
-                         (terminates \\false)" ;
-                    Logic_const.pimplies (t, v)
-                  end else v
+                let loop_hyp = if admit then Always g_hyp else Check g_hyp in
+                let use flag id = if flag then Some id else None in
+                let inv =
+                  { loop_pred = normalize_pred inv.tp_statement ;
+                    loop_hyp ;
+                    loop_est = use verif g_est ;
+                    loop_ind = use verif g_ind ; }
                 in
+                { l with
+                  loop_invariants  = inv :: l.loop_invariants ; }
+            | AVariant(term, None) ->
+                let vpos , vdec = mk_variant_properties kf stmt ca term in
+                let vpos = variant_as_inv ~loc:term.term_loc vpos in
+                let vdec = variant_as_inv ~loc:term.term_loc vdec in
                 { l with loop_terminates = None ;
-                         loop_preserved =
-                           intro_terminates (normalize_annot vdec) ::
-                           intro_terminates (normalize_annot vpos) ::
-                           l.loop_preserved }
+                         loop_invariants = vdec :: vpos :: l.loop_invariants }
+            | AVariant(term, Some rel) ->
+                let vrel = mk_variant_relation_property kf stmt ca term rel in
+                let vrel = variant_as_inv ~loc:term.term_loc vrel in
+                { l with loop_invariants = vrel :: l.loop_invariants }
             | AAssigns(_,WritesAny) ->
                 let asgn = WpPropId.mk_loop_any_assigns_info stmt in
                 { l with loop_assigns = asgn :: l.loop_assigns }
@@ -533,14 +590,13 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                       { l with loop_assigns = asgn :: l.loop_assigns }
                 end
             | _ -> l
-          end stmt {
-          loop_terminates = Some Logic_const.pfalse ;
-          loop_established = [] ;
-          loop_invariants = [] ;
-          loop_preserved = [] ;
-          loop_smoke = [] ;
-          loop_assigns = [] ;
-        }
+          end
+          { loop_terminates = Some Logic_const.pfalse ;
+            loop_invariants = [] ;
+            loop_smoke = [] ;
+            loop_assigns = [] ;
+          }
+          all_annot
     end)
 
 let get_loop_contract ?(smoking=false) ?terminates kf stmt =

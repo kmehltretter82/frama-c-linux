@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,7 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-let dkey = Options.dkey_prepare
+let dkey = Options.Dkey.prepare
 
 (**************************************************************************)
 (********************** Forward references ********************************)
@@ -203,7 +203,34 @@ let dup_global loc spec sound_verdict_vi kf vi new_vi =
       let e = Emitter.Usable_emitter.get ep.emitter in
       if ep.logical_consequence
       then logical_consequence e new_ip ep.properties
-      else emit e new_ip ~hyps:ep.properties status
+      else
+        let status, hyps =
+          match status, ep.properties with
+          | True, _ | Dont_know, _
+          | False_and_reachable, [] | False_if_reachable, [] ->
+            (* Valid emission: either [true] status with arbitrary hypotheses or
+               [false] status with empty hypotheses. *)
+            status, ep.properties
+          | False_and_reachable, [ IPReachable _ ]
+          | False_if_reachable, [ IPReachable _ ] ->
+            (* [False] status with a reachability hypothesis: remove the
+               hypothesis and set the status to [False_if_reachable]. *)
+            False_if_reachable, []
+          | False_and_reachable, hyps | False_if_reachable, hyps ->
+            (* Invalid emission: [false] status with arbitrary hypotheses. *)
+            Options.fatal
+              "Property with status '%s' and non-empty hypotheses:\n\
+               * Property: %a\n\
+               * Hypotheses:\n- %a"
+              (match status with
+               | True -> "True"
+               | Dont_know -> "Dont_know"
+               | False_if_reachable -> "False_if_reachable"
+               | False_and_reachable -> "False_and_reachable")
+              Property.short_pretty new_ip
+              (Pretty_utils.pp_list ~sep:"\n- " Property.short_pretty) hyps
+        in
+        emit e new_ip ~hyps status
     in
     match get old_ip with
     | Never_tried ->
@@ -212,9 +239,9 @@ let dup_global loc spec sound_verdict_vi kf vi new_vi =
       List.iter (cp s) epl
     | Inconsistent icst ->
       List.iter (cp True) icst.valid;
-      (* either the program is reachable and [False_and_reachable] is
-         fine, or the program point is not reachable and it does not
-         matter for E-ACSL that checks it at runtime. *)
+      (* Copy invalid properties with [False_and_reachable], if a reachability
+         hypothesis is present then the [cp] function will convert it to
+         [False_if_reachable]. *)
       List.iter (cp False_and_reachable) icst.invalid
   in
   let ips kf s = Property.ip_of_spec kf Kglobal ~active:[] s in
@@ -299,14 +326,130 @@ let require_alignment vi algn =
 (* Visiting the globals *)
 (* ********************************************************************** *)
 
+(** Module for ensuring absence of term sharing *)
+module Term_sharing: sig
+  val add: term -> unit
+  val mem: term -> bool
+  val clear: unit -> unit
+end
+=
+struct
+  let terms = Misc.Id_term.Hashtbl.create 7
+  let add t = Misc.Id_term.Hashtbl.add terms t ()
+  let mem t = Misc.Id_term.Hashtbl.mem terms t
+  let clear () = Misc.Id_term.Hashtbl.clear terms
+end
+
+(** Module to move labels to an enclosing block *)
+module Labeled_stmts: sig
+  (* [add_moved_stmt old new] records that the labels have been moved from
+     statement [old] to statement [new]. *)
+  val add_moved_stmt: stmt -> stmt -> unit
+
+  (* [add_stmt_ref s_ref] adds the reference [s_ref] to the list of references
+     to update to the moved labeled statement. *)
+  val add_stmt_ref: stmt ref -> unit
+
+  (* [add_stmt s] adds the statement [s] to the list of statements to update
+     so that inner statement fields are updated to the moved labeled
+     statements. *)
+  val add_stmt: stmt -> unit
+
+  (* [set_fundec_has_label ()] sets the boolean indicating that the current
+     [fundec] has some labeled statements. *)
+  val set_fundec_has_label: unit -> unit
+
+  (* [clear ()] clears the internal fields of the module. *)
+  val clear: unit -> unit
+
+  (* [get_moved_stmt old], if [old] was a labeled statement, returns the new
+     statement where the labels have been moved, otherwise returns [old]. *)
+  val get_moved_stmt: stmt -> stmt
+
+  (* [update_in_fundec fundec] updates the function [fundec] with the updated
+     labeled statements. *)
+  val update_in_fundec: fundec -> unit
+end
+=
+struct
+  (* Hold the association between the original statement with labels and the
+     statement where the labels have been moved. *)
+  let moved_labels: stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
+
+  (* List of [ref stmt] that need to be updated if they point to a labeled
+     statement. *)
+  let stmt_refs: stmt ref list ref = ref []
+
+  (* List of [stmt] containing other statements that need to be udpated if
+     they point to a labeled statement. *)
+  let stmts: stmt list ref = ref []
+
+  (* True if the current [fundec] had a label, false otherwise. *)
+  let fundec_has_label: bool ref = ref false
+
+  let clear () =
+    Stmt.Hashtbl.clear moved_labels;
+    stmt_refs := [];
+    stmts := [];
+    fundec_has_label := false
+
+  let add_moved_stmt stmt new_stmt =
+    Stmt.Hashtbl.add moved_labels stmt new_stmt
+  let add_stmt_ref s_ref = stmt_refs := s_ref :: !stmt_refs
+  let add_stmt s = stmts := s :: !stmts
+  let set_fundec_has_label () = fundec_has_label := true
+
+  (* If the given statement had labels that have been moved, return the new
+     labeled statement, otherwise return the given statement. *)
+  let get_moved_stmt stmt =
+    try Stmt.Hashtbl.find moved_labels stmt
+    with Not_found -> stmt
+
+  (* Visitor to update statements that contain labeled statements such as
+     [switch] or [loop]. *)
+  let stmt_updater =
+    object
+      inherit Visitor.frama_c_inplace
+
+      method !vstmt_aux stmt =
+        match stmt.skind with
+        | Switch (e, b, slist, loc) ->
+          let slist = List.map get_moved_stmt slist in
+          stmt.skind <- Switch (e, b, slist, loc);
+          Cil.ChangeTo stmt
+        | Loop (ca, b, loc, cont_stmt_opt, brk_stmt_opt) ->
+          let continue_stmt_opt =
+            Option.map get_moved_stmt cont_stmt_opt
+          in
+          let break_stmt_opt = Option.map get_moved_stmt brk_stmt_opt in
+          stmt.skind <- Loop (ca, b, loc, continue_stmt_opt, break_stmt_opt);
+          Cil.ChangeTo stmt
+        | _ -> Cil.SkipChildren
+    end
+
+  let update_in_fundec fundec =
+    (* Update all [ref stmt] retrieved with the visitor. *)
+    List.iter
+      (fun s_ref -> s_ref := get_moved_stmt !s_ref)
+      !stmt_refs;
+    (* Update all [stmt] retrieved with the visitor. *)
+    List.iter
+      (fun s ->
+         ignore @@ Visitor.visitFramacStmt stmt_updater s)
+      !stmts;
+    (* If a label was found in the function, update the CFG. *)
+    if !fundec_has_label then begin
+      Cfg.clearCFGinfo ~clear_id:false fundec;
+      Cfg.cfgFun fundec;
+    end
+
+end
+
 (* perform a few modifications in the [kf]'s code and annotations that are
    required by E-ACSL's analyses and transformations *)
 let prepare_fundec kf =
   let o = object
     inherit Visitor.frama_c_inplace
-
-    (* table for ensuring absence of term sharing *)
-    val terms = Misc.Id_term.Hashtbl.create 7
 
     (* substitute function's varinfos by their duplicate in function calls *)
     method !vvrbl vi =
@@ -338,17 +481,77 @@ let prepare_fundec kf =
     method !vterm _ =
       Cil.DoChildrenPost
         (fun t ->
-           if Misc.Id_term.Hashtbl.mem terms t then
+           if Term_sharing.mem t then
              { t with term_node = t.term_node }
            else begin
-             Misc.Id_term.Hashtbl.add terms t ();
+             Term_sharing.add t;
              t
            end)
 
     method !videntified_predicate _ =
       (* when entering a new annotation, clear the context to keep it small:
          anyway, no sharing is possible between two identified predicates *)
-      Misc.Id_term.Hashtbl.clear terms;
+      Term_sharing.clear ();
+      Cil.DoChildren
+
+    method !vfunc _ =
+      Labeled_stmts.clear ();
+      Cil.DoChildrenPost
+        (fun fundec ->
+           Labeled_stmts.update_in_fundec fundec;
+           fundec)
+
+    method !vstmt_aux _ =
+      Cil.DoChildrenPost
+        (fun stmt ->
+           (* Save the [ref stmt] and [stmt] contained in the current stmt to
+              update them at the end of the function visit. *)
+           begin
+             match stmt.skind with
+             | Goto(s_ref, _) ->
+               Labeled_stmts.add_stmt_ref s_ref
+             | Switch _ | Loop _ ->
+               Labeled_stmts.add_stmt stmt
+             | UnspecifiedSequence seq ->
+               List.iter
+                 (fun (_, _, _, _, s_ref_list) ->
+                    List.iter
+                      Labeled_stmts.add_stmt_ref
+                      s_ref_list)
+                 seq
+             | Instr (Asm (_, _, extasm_opt, _)) ->
+               Option.iter
+                 (function { asm_gotos } ->
+                    List.iter
+                      Labeled_stmts.add_stmt_ref
+                      asm_gotos)
+                 extasm_opt
+             | _ -> ()
+           end;
+           (* If the current statement has labels, create an enclosing block and
+              move the labels to it. *)
+           match stmt.labels with
+           | [] -> stmt
+           | _ :: _ ->
+             let labels = stmt.labels in
+             let new_stmt =
+               Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt ]))
+             in
+             stmt.labels <- [];
+             new_stmt.labels <- labels;
+             Labeled_stmts.set_fundec_has_label ();
+             Labeled_stmts.add_moved_stmt stmt new_stmt;
+             new_stmt)
+
+    method !vlogic_label ll =
+      (* Since the logic labels can only reference previous labels, we can
+         update the [ref stmt] of [StmtLabel] directly here. *)
+      begin
+        match ll with
+        | StmtLabel s_ref ->
+          s_ref := Labeled_stmts.get_moved_stmt !s_ref;
+        | BuiltinLabel _ | FormalLabel _ -> ()
+      end;
       Cil.DoChildren
 
   end in

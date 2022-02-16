@@ -206,6 +206,10 @@ module Position =  struct
   let pp_with_col fmt pos =
     Format.fprintf fmt "%a char %d" pretty pos
       (pos.Filepath.pos_cnum - pos.Filepath.pos_bol)
+  let pretty_debug fmt pos =
+    Format.fprintf fmt "%a:%d:%d"
+      Datatype.Filepath.pretty pos.Filepath.pos_path
+      pos.Filepath.pos_lnum pos.Filepath.pos_cnum
 end
 
 module Location = struct
@@ -242,11 +246,8 @@ module Location = struct
       Format.fprintf fmt "generated"
 
   let pretty_debug fmt loc =
-    Format.fprintf fmt "(%a:%d:%d,%a:%d:%d)"
-      Datatype.Filepath.pretty (fst loc).Filepath.pos_path
-      (fst loc).Filepath.pos_lnum (fst loc).Filepath.pos_cnum
-      Datatype.Filepath.pretty (snd loc).Filepath.pos_path
-      (snd loc).Filepath.pos_lnum (snd loc).Filepath.pos_cnum
+    Format.fprintf fmt "(%a,%a)"
+      Position.pretty_debug (fst loc) Position.pretty_debug (snd loc)
 
   let of_lexing_loc (pos1, pos2) =
     Position.of_lexing_pos pos1, Position.of_lexing_pos pos2
@@ -440,7 +441,8 @@ let compare_exp_struct_eq = Extlib.mk_fun "compare_exp_struct_eq"
 type type_compare_config =
   { by_name : bool;
     logic_type: bool;
-    unroll: bool }
+    unroll: bool;
+    no_attrs:bool; }
 
 let rec compare_attribute config a1 a2 = match a1, a2 with
   | Attr (s1, l1), Attr (s2, l2) ->
@@ -449,10 +451,12 @@ let rec compare_attribute config a1 a2 = match a1, a2 with
   | Attr _, AttrAnnot _ -> -1
   | AttrAnnot _, Attr _ -> 1
 and compare_attributes config  l1 l2 =
-  let l1, l2 = if config.logic_type
-    then !drop_non_logic_attributes l1, !drop_non_logic_attributes l2
-    else l1,l2
-  in compare_list (compare_attribute config) l1 l2
+  if config.no_attrs then 0
+  else
+    let l1, l2 = if config.logic_type
+      then !drop_non_logic_attributes l1, !drop_non_logic_attributes l2
+      else l1,l2
+    in compare_list (compare_attribute config) l1 l2
 and compare_attrparam_list config l1 l2 =
   compare_list (compare_attrparam config) l1 l2
 and compare_attrparam config a1 a2 = match a1, a2 with
@@ -520,7 +524,7 @@ and compare_type config t1 t2 =
       compare_chain
         (compare_type config) t1 t2
         (compare_attributes config) l1 l2
-    | TArray (t1', e1, _, l1), TArray (t2', e2, _, l2) ->
+    | TArray (t1', e1, l1), TArray (t2', e2, l2) ->
       compare_chain compare_array_sizes e1 e2
         (compare_chain
            (compare_type config) t1' t2'
@@ -534,7 +538,7 @@ and compare_type config t1 t2 =
       assert (not config.unroll);
       compare_chain (=?=) t1.tname t2.tname
         (compare_attributes config) a1 a2
-    | TComp (c1, _, l1), TComp (c2, _, l2) ->
+    | TComp (c1, l1), TComp (c2, l2) ->
       let res =
         if config.by_name
         then (=?=) c1.cname c2.cname
@@ -576,14 +580,14 @@ let rec hash_type config t =
   | TFloat (f, l) -> Hashtbl.hash (f, 3, hash_attributes config l)
   | TPtr (t, l) ->
     Hashtbl.hash (hash_type config t, 4, hash_attributes config l)
-  | TArray (t, _, _, l) ->
+  | TArray (t, _, l) ->
     Hashtbl.hash (hash_type config t, 5, hash_attributes config l)
   | TFun (r, a, v, l) ->
     Hashtbl.hash
       (hash_type config r, 6, hash_args config a, v, hash_attributes config l)
   | TNamed (ti, l) ->
     Hashtbl.hash (ti.tname, 7, hash_attributes config l)
-  | TComp (c, _, l) ->
+  | TComp (c, l) ->
     Hashtbl.hash
       ((if config.by_name then Hashtbl.hash c.cname else c.ckey), 8,
        hash_attributes config l)
@@ -602,7 +606,9 @@ module Attribute=struct
   include Make_with_collections
       (struct
         type t = attribute
-        let config = { by_name = false; logic_type = false; unroll = true }
+        let config =
+          { by_name = false; logic_type = false;
+            unroll = true; no_attrs = false }
         let name = "Attribute"
         let reprs = [ AttrAnnot "" ]
         let compare = compare_attribute config
@@ -644,7 +650,9 @@ module Typ= struct
   include
     MakeTyp
       (struct
-        let config = { by_name = false; logic_type = false; unroll = true; }
+        let config =
+          { by_name = false; logic_type = false;
+            unroll = true; no_attrs = false}
         let name = "Typ"
       end)
   let toplevel_attr = function
@@ -653,8 +661,8 @@ module Typ= struct
     | TFloat (_, a) -> a
     | TNamed (_, a) -> a
     | TPtr (_, a) -> a
-    | TArray (_, _, _,a) -> a
-    | TComp (_, _, a) -> a
+    | TArray (_, _,a) -> a
+    | TComp (_, a) -> a
     | TEnum (_, a) -> a
     | TFun (_, _, _, a) -> a
     | TBuiltin_va_list a -> a
@@ -663,15 +671,26 @@ end
 module TypByName =
   MakeTyp
     (struct
-      let config = { by_name = true; logic_type = false; unroll = false; }
+      let config = { by_name = true; logic_type = false;
+                     unroll = false; no_attrs = false }
       let name = "TypByName"
     end)
 
 module TypNoUnroll =
   MakeTyp
     (struct
-      let config = { by_name = false; logic_type = false; unroll = false; }
+      let config = { by_name = false; logic_type = false;
+                     unroll = false; no_attrs = false }
       let name = "TypNoUnroll"
+    end)
+
+module TypNoAttrs =
+  MakeTyp
+    (struct
+      let config =
+        { by_name = false; logic_type = false;
+          unroll = true; no_attrs = true}
+      let name = "TypNoAttrs"
     end)
 
 module Typeinfo =
@@ -843,8 +862,8 @@ module Fieldinfo = struct
                            floc = loc;
                            faddrof = false;
                            fsize_in_bits = None;
-                           foffset_in_bits = None;
-                           fpadding_in_bits = None }
+                           foffset_in_bits = None
+                         }
                          :: acc)
                       acc
                       Location.reprs)
@@ -1024,11 +1043,6 @@ struct
     | AddrOf _, _ -> 1
     | _, AddrOf _ -> -1
     | StartOf lv1, StartOf lv2 -> compare_lval ~strict lv1 lv2
-    | StartOf _, _ -> 1
-    | _, StartOf _ -> -1
-    | Info _, Info _ ->
-      Cmdline.Kernel_log.fatal
-        "[exp_compare] Info node is obsolete. Do not use it"
 
   and compare_lval ~strict (h1,o1) (h2,o2) =
     let res = compare_lhost ~strict h1 h2 in
@@ -1075,9 +1089,6 @@ struct
     | CastE(ty,e) -> hash_exp ((prime*acc) lxor Typ.hash ty) e
     | AddrOf lv -> hash_lval (prime*acc lxor 329) lv
     | StartOf lv -> hash_lval (prime*acc lxor 431) lv
-    | Info _ ->
-      Cmdline.Kernel_log.fatal
-        "Info node is deprecated and should not be used@."
   and hash_lval acc (h,o) =
     hash_offset ((prime * acc) lxor hash_lhost 856 h) o
   and hash_lhost acc = function
@@ -1472,7 +1483,8 @@ module Logic_info_structural = struct
           in
           if name_cmp <> 0 then name_cmp else begin
             let config =
-              { by_name = true ; logic_type = true ; unroll = true }
+              { by_name = true ; logic_type = true ;
+                unroll = true ; no_attrs = false }
             in
             let prm_cmp p1 p2 =
               compare_logic_type config p1.lv_type p2.lv_type
@@ -1514,7 +1526,8 @@ end
 module Logic_type =
   Make_Logic_type(
   struct
-    let config = { by_name = false; logic_type = true; unroll = true }
+    let config = { by_name = false; logic_type = true;
+                   unroll = true; no_attrs = false }
     let name = "Logic_type"
   end)
 
@@ -1522,14 +1535,16 @@ module Logic_type_ByName =
   Make_Logic_type(
   struct
     let name = "Logic_type_ByName"
-    let config = { by_name = true; logic_type = true; unroll = false }
+    let config = { by_name = true; logic_type = true;
+                   unroll = false; no_attrs = false }
   end)
 
 module Logic_type_NoUnroll =
   Make_Logic_type(
   struct
     let name = "Logic_type_NoUnroll"
-    let config = { by_name = false; logic_type = false; unroll = false }
+    let config = { by_name = false; logic_type = false;
+                   unroll = false; no_attrs = false }
   end)
 
 module Model_info = struct
@@ -2252,12 +2267,6 @@ module Global_annotation = struct
           | Dmodel_annot(l1,_), Dmodel_annot(l2,_) -> Model_info.compare l1 l2
           | Dmodel_annot _, _ -> -1
           | _, Dmodel_annot _ -> 1
-          | Dcustom_annot(_, n1, attr1, _),
-            Dcustom_annot(_, n2, attr2, _) ->
-            let res = Datatype.String.compare n1 n2 in
-            if res = 0 then Attributes.compare attr1 attr2 else res
-          | Dcustom_annot _, _ -> -1
-          | _, Dcustom_annot _ -> 1
           | Dextended (ext1, _, _), Dextended (ext2, _, _) ->
             Datatype.Int.compare ext1.ext_id ext2.ext_id
 
@@ -2277,7 +2286,6 @@ module Global_annotation = struct
           | Dinvariant(l,_) -> 13 * Logic_info.hash l
           | Dtype_annot(l,_) -> 17 * Logic_info.hash l
           | Dmodel_annot(l,_) -> 19 * Model_info.hash l
-          | Dcustom_annot(_,n,_,_) -> 23 * Datatype.String.hash n
           | Dextended ({ext_id},_,_) -> 29 * Datatype.Int.hash ext_id
 
         let copy = Datatype.undefined
@@ -2292,7 +2300,6 @@ module Global_annotation = struct
     | Dtype_annot(_, loc) -> loc
     | Dmodel_annot(_, loc) -> loc
     | Dvolatile(_, _, _, _,loc) -> loc
-    | Dcustom_annot(_,_,_,loc) -> loc
     | Dextended(_,_,loc) -> loc
 
   let attr = function
@@ -2304,7 +2311,6 @@ module Global_annotation = struct
     | Dtype_annot({ l_var_info = { lv_attr}}, _) -> lv_attr
     | Dmodel_annot({ mi_attr }, _) -> mi_attr
     | Dvolatile(_, _, _, attr, _) -> attr
-    | Dcustom_annot(_,_,attr,_) -> attr
     | Dextended (_,attr,_) -> attr
 end
 

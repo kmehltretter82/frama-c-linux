@@ -74,16 +74,22 @@ module Config = struct
   let abstractions = ref []
   let dynamic_abstractions = ref []
 
-  let register ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
+  let register_domain_option ~name ~experimental ~descr =
     let descr = if experimental then "Experimental. " ^ descr else descr in
-    Value_parameters.register_domain ~name ~descr;
+    Parameters.register_domain ~name ~descr
+
+  let register ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
+    register_domain_option ~name ~experimental ~descr;
     let flag = Flag { name; experimental; priority; abstraction } in
     abstractions := flag :: !abstractions;
     flag
 
-  let dynamic_register ~name ~descr make =
-    Value_parameters.register_domain ~name ~descr;
-    dynamic_abstractions := (name, make) :: !dynamic_abstractions
+  let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
+    register_domain_option ~name ~experimental ~descr;
+    let make' () : flag =
+      Flag { name; experimental; priority; abstraction = make () }
+    in
+    dynamic_abstractions := (name,make') :: !dynamic_abstractions
 
   let configure () =
     let add_main_mode mode =
@@ -91,9 +97,9 @@ module Config = struct
       (main, Domain_mode.Mode.all) :: mode
     in
     let add config (name, make) =
-      let enabled = Value_parameters.Domains.mem name in
+      let enabled = Parameters.Domains.mem name in
       try
-        let mode = Value_parameters.DomainsFunction.find name in
+        let mode = Parameters.DomainsFunction.find name in
         let mode = if enabled then add_main_mode mode else mode in
         add (make (), Some mode) config
       with Not_found ->
@@ -234,7 +240,7 @@ module Internal_Value = struct
       end)
 
   let void_value () =
-    Value_parameters.fatal
+    Self.fatal
       "Cannot register a value module from a Void structure."
 
   let add_value_structure value internal =
@@ -346,7 +352,7 @@ let add_domain (type v) dname mode (abstraction: v abstraction) (module Acc: Acc
     module Store = struct
       include Store
       let register_global_state storage state =
-        let no_results = Value_parameters.NoResultsDomains.mem dname in
+        let no_results = Parameters.NoResultsDomains.mem dname in
         register_global_state (storage && not no_results) state
     end
   end in
@@ -380,8 +386,8 @@ let add_domain (type v) dname mode (abstraction: v abstraction) (module Acc: Acc
 
 let warn_experimental flag =
   if flag.experimental then
-    Value_parameters.(warning ~wkey:wkey_experimental
-                        "The %s domain is experimental." flag.name)
+    Self.(warning ~wkey:wkey_experimental
+            "The %s domain is experimental." flag.name)
 
 let build_domain config abstract =
   let build (Flag flag, mode) acc =

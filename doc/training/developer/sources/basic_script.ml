@@ -10,7 +10,7 @@ let run f () =
   incr nb_entry_points;
   Kernel.MainFunction.set f;
   Kernel.LibEntry.on ();
-  !Db.Value.compute ()
+  Eva.Analysis.compute ()
 
 (*# Main driver function*)
 let all_entry_points () =

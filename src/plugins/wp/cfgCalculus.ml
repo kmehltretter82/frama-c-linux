@@ -140,6 +140,7 @@ struct
     succ: Cfg.vertex -> Cfg.G.edge list;
     dead: stmt -> bool ;
     terminates: WpPropId.pred_info option ;
+    decreases: WpPropId.variant_info option ;
     we: W.t_env;
     wp: W.t_prop option Vhash.t; (* None is used for non-dag detection *)
     mutable wk: W.t_prop; (* end point *)
@@ -181,16 +182,23 @@ struct
         then W.add_assigns env.we ai w
         else w
 
-  let use_property env (p : WpPropId.pred_info) w =
-    if is_selected ~goal:false env p then W.add_hyp env.we p w else w
+  let use_property ?for_pid env (p : WpPropId.pred_info) w =
+    if is_selected ~goal:false env p then W.add_hyp ?for_pid env.we p w else w
 
   let prove_property env (p : WpPropId.pred_info) w =
     if is_selected ~goal:true env p then W.add_goal env.we p w else w
 
-  let prove_subproperty env (p : WpPropId.pred_info) prop stmt source w =
+  let prove_subproperty env p ?deps prop stmt source w =
     if is_selected ~goal:true env p
-    then W.add_subgoal env.we p prop stmt source w
+    then W.add_subgoal env.we ?deps p prop stmt source w
     else w
+
+  let on_selected_terminates env f =
+    match env.terminates with
+    | Some t when is_default_bhv env.mode && is_selected ~goal:true env t ->
+        f env t
+    | _ ->
+        Extlib.id
 
   (* --- Decomposition of WP Rules --- *)
 
@@ -213,11 +221,15 @@ struct
       Cil.CurrentLoc.set (Stmt.loc s) ;
       let smoking =
         is_default_bhv env.mode && env.dead s in
-      let ca = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
+      let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
+      let opt_fold f = Option.fold ~none:Extlib.id ~some:f in
+      let do_assert env CfgAnnot.{ code_admitted ; code_verified } w =
+        opt_fold (prove_property env) code_verified @@
+        opt_fold (use_property env) code_admitted w
+      in
       let pi =
         W.label env.we (Some s) (Clabels.stmt s) @@
-        List.fold_right (prove_property env) ca.code_verified @@
-        List.fold_right (use_property env) ca.code_admitted @@
+        List.fold_right (do_assert env) cas @@
         control env a s
       in
       Cil.CurrentLoc.set kl ; pi
@@ -251,14 +263,37 @@ struct
       | None, _ | _, None -> w (* no terminates goal or nothing to prove *)
       | Some t, Some prop -> prove_subproperty env t prop s FromCode w
     in
+    let prove_invariant env pid pred w =
+      match pid with None -> w | Some pid -> prove_property env (pid, pred) w
+    in
+    let assume_invariant env (hyp: CfgAnnot.loop_hypothesis) pred ind w =
+      match hyp with
+      | NoHyp -> w
+      | Check pid -> use_property ?for_pid:ind env (pid, pred) w
+      | Always pid -> use_property env (pid, pred) w
+    in
+    let established env CfgAnnot.{ loop_hyp; loop_ind; loop_est; loop_pred } w =
+      prove_invariant env loop_est loop_pred @@
+      assume_invariant env loop_hyp loop_pred loop_ind w
+    in
+    let loop_current_hyp env CfgAnnot.{ loop_hyp ; loop_ind ; loop_pred } w =
+      assume_invariant env loop_hyp loop_pred loop_ind w
+    in
+    let preserved env CfgAnnot.{ loop_hyp ; loop_ind ; loop_pred } w =
+      prove_invariant env loop_ind loop_pred @@
+      begin match loop_hyp with
+        | CfgAnnot.Always pid -> use_property env (pid, loop_pred)
+        | _ -> Extlib.id (* we never assume this one for checks *)
+      end w
+    in
     insert_terminates @@
-    List.fold_right (prove_property env) lc.loop_established @@
+    List.fold_right (established env) lc.loop_invariants @@
     List.fold_right (use_assigns env) lc.loop_assigns @@
     W.label env.we None (Clabels.loop_current s) @@
-    List.fold_right (use_property env) lc.loop_invariants @@
+    List.fold_right (loop_current_hyp env) lc.loop_invariants @@
     List.fold_right (prove_property env) lc.loop_smoke @@
     let q =
-      List.fold_right (prove_property env) lc.loop_preserved @@
+      List.fold_right (preserved env) lc.loop_invariants @@
       List.fold_right (prove_assigns env) lc.loop_assigns @@
       W.empty in
     ( Vhash.replace env.wp a (Some q) ; successors env a )
@@ -336,15 +371,31 @@ struct
         W.call_goal_precond env.we s kf es ~pre w_call
       else w_call
     in
-    match env.terminates with
-    | Some p when is_default_bhv env.mode && is_selected ~goal:true env p ->
-        let generated, callee_t = c.contract_terminates in
-        if generated then
-          Wp_parameters.warning ~once:true
-            "Missing terminates clause on call to %a, defaults to %a"
-            Kernel_function.pretty kf Cil_printer.pp_predicate callee_t ;
-        W.call_terminates env.we p s kf es ~callee_t w_pre
-    | _ -> w_pre
+    let callee_t =
+      (** TODO when kernel terminates complete: remove this code. *)
+      let generated, callee_t = c.contract_terminates in
+      if generated && env.terminates <> None then
+        Wp_parameters.warning ~once:true
+          "Missing terminates clause on call to %a, defaults to %a"
+          Kernel_function.pretty kf Cil_printer.pp_predicate callee_t ;
+      Some callee_t
+    in
+    let selected t = is_selected ~goal:true env t && is_default_bhv env.mode in
+    let in_cluster = CfgInfos.in_cluster ~caller:env.mode.kf kf in
+    let w_term = match env.terminates with
+      | Some t when selected t ->
+          W.call_terminates env.we s kf es t ?callee_t w_pre
+      | _ -> w_pre
+    in
+    let w_decr = match env.decreases with
+      | Some d when selected d && in_cluster ->
+          W.call_decreases env.we s kf es d
+            ?caller_t:(Option.map snd env.terminates)
+            ?callee_d:c.contract_decreases
+            w_term
+      | _ -> w_term
+    in
+    w_decr
 
   let do_complete_disjoint env w =
     if not (is_default_bhv env.mode) then w
@@ -355,13 +406,40 @@ struct
       List.fold_right (prove_property env) complete @@
       List.fold_right (prove_property env) disjoint w
 
+  let do_terminates_deps env w =
+    match env.body with
+    | None -> w
+    | Some _ ->
+        let deps = CfgInfos.terminates_deps env.mode.infos in
+        let return = Kernel_function.find_return env.mode.kf in
+        let prove goal env t w =
+          prove_subproperty env t ~deps goal return FromReturn w
+        in
+        if CfgInfos.is_recursive env.mode.kf then
+          (* there is a dependency on terminates or decreases is missing *)
+          let goal =
+            if None <> env.decreases then Logic_const.ptrue
+            else begin
+              WpLog.warning ~once:true
+                "No 'decreases' clause on recursive function '%a', \
+                 cannot prove termination"
+                Kernel_function.pretty env.mode.kf ;
+              Logic_const.pfalse
+            end
+          in
+          on_selected_terminates env (prove goal) w
+        else
+        if not @@ Property.Set.is_empty deps then
+          on_selected_terminates env (prove Logic_const.ptrue) w
+        else w
+
   let do_global_init env w =
     I.process_global_init env.we env.mode.kf @@
     W.scope env.we [] SC_Global w
 
   let do_preconditions env ~formals (b : CfgAnnot.behavior) w =
     let kf = env.mode.kf in
-    let init = WpStrategy.is_main_init kf in
+    let init = Globals.is_entry_point ~when_lib_entry:false kf in
     let side_behaviors =
       if init || WpLog.PrecondWeakening.get () then []
       else CfgAnnot.get_preconditions ~goal:false kf in
@@ -377,7 +455,6 @@ struct
     List.fold_right (use_property env) side_behaviors @@
     (* frame-in *)
     W.scope env.we formals SC_Frame_in w
-
 
   let do_post env ~formals (b : CfgAnnot.behavior) w =
     W.label env.we None Clabels.post @@
@@ -415,9 +492,10 @@ struct
          WpLog.SmokeDeadcode.get ()
       then CfgInfos.smoking infos else (fun _ -> false) in
     let terminates = CfgAnnot.get_terminates_goal kf in
+    let decreases = CfgAnnot.get_decreases_goal kf in
     let env = {
       mode ; props ; body ;
-      succ ; dead ; terminates ;
+      succ ; dead ; terminates ; decreases ;
       we = W.new_env kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;
@@ -428,6 +506,7 @@ struct
     let bhv = CfgAnnot.get_behavior_goals kf ~smoking ~exits mode.bhv in
     begin
       W.close env.we @@
+      do_terminates_deps env @@
       do_global_init env @@
       do_preconditions env ~formals bhv @@
       do_complete_disjoint env @@

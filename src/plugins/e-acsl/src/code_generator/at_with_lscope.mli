@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,6 +22,7 @@
 
 open Cil_types
 open Cil_datatype
+open Analyses_types
 
 (* Convert \at on terms or predicates in which we can find purely
    logic variable. *)
@@ -32,7 +33,7 @@ open Cil_datatype
 
 val to_exp:
   loc:Location.t -> kernel_function -> Env.t ->
-  Lscope.pred_or_term -> logic_label -> exp * Env.t
+  pred_or_term -> logic_label -> exp * Env.t
 
 (*****************************************************************************)
 (**************************** Handling memory ********************************)

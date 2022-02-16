@@ -1,7 +1,7 @@
-[kernel] Parsing tests/value/widen_on_non_monotonic.i (no preprocessing)
-[kernel:typing:implicit-function-declaration] tests/value/widen_on_non_monotonic.i:57: Warning: 
+[kernel] Parsing widen_on_non_monotonic.i (no preprocessing)
+[kernel:typing:implicit-function-declaration] widen_on_non_monotonic.i:57: Warning: 
   Calling undeclared function fn1. Old style K&R code?
-[kernel:typing:implicit-function-declaration] tests/value/widen_on_non_monotonic.i:58: Warning: 
+[kernel:typing:implicit-function-declaration] widen_on_non_monotonic.i:58: Warning: 
   Calling undeclared function fn2. Old style K&R code?
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -17,11 +17,11 @@
   j ∈ {0}
   k ∈ {0}
 [eva] computing for function main1 <- main.
-  Called from tests/value/widen_on_non_monotonic.i:71.
-[eva] tests/value/widen_on_non_monotonic.i:25: starting to merge loop iterations
-[eva] tests/value/widen_on_non_monotonic.i:23: starting to merge loop iterations
-[eva] tests/value/widen_on_non_monotonic.i:26: starting to merge loop iterations
-[eva:alarm] tests/value/widen_on_non_monotonic.i:27: Warning: 
+  Called from widen_on_non_monotonic.i:71.
+[eva] widen_on_non_monotonic.i:25: starting to merge loop iterations
+[eva] widen_on_non_monotonic.i:23: starting to merge loop iterations
+[eva] widen_on_non_monotonic.i:26: starting to merge loop iterations
+[eva:alarm] widen_on_non_monotonic.i:27: Warning: 
   signed overflow. assert -2147483648 ≤ b - 1;
 [eva] Recording results for main1
 [eva] Done for function main1

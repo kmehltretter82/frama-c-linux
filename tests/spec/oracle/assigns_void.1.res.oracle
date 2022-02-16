@@ -1,12 +1,12 @@
-[kernel] Parsing tests/spec/assigns_void.c (with preprocessing)
+[kernel] Parsing assigns_void.c (with preprocessing)
 [eva] Analyzing a complete application starting at g
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- g.
-  Called from tests/spec/assigns_void.c:11.
-[kernel:annot:missing-spec] tests/spec/assigns_void.c:11: Warning: 
+  Called from assigns_void.c:11.
+[kernel:annot:missing-spec] assigns_void.c:11: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
 [eva] using specification for function f
 [eva] Done for function f

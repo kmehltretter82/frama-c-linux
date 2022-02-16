@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -77,19 +77,20 @@ static int native_backtrace(void **array, int size) {
 
 void trace() {
 #if E_ACSL_OS_IS_LINUX
+  RTL_IO_LOCK();
 
   int size = 24;
   void **bb = private_malloc(sizeof(void *) * size);
   native_backtrace(bb, size);
 
   char executable[PATH_MAX];
-  rtl_sprintf(executable, "/proc/%d/exe", getpid());
+  rtl_snprintf(executable, sizeof(executable), "/proc/%d/exe", getpid());
 
-  STDOUT("/** Backtrace **************************/\n");
+  STDERR("/** Backtrace **************************/\n");
   int counter = 0;
   while (*bb) {
-    char *addr = (char *)private_malloc(21);
-    rtl_sprintf(addr, "%p", *bb);
+    char addr[21];
+    rtl_snprintf(addr, sizeof(addr), "%p", *bb);
     char *ar[] = {"addr2line", "-f",       "-p", "-C", "-s",
                   "-e",        executable, addr, NULL};
     ipr_t *ipr = shexec(ar, NULL);
@@ -99,18 +100,19 @@ void trace() {
       if (outs) {
         outs[strlen(outs) - 1] = '\0';
         if (strlen(outs) && endswith(outs, "??:0") && endswith(outs, "??:?")) {
-          STDOUT("%s%s\n", prefix, outs);
+          STDERR("%s%s\n", prefix, outs);
         }
       } else {
         char *errs = (char *)ipr->stderrs;
         if (errs) {
-          STDOUT("%s\n", errs);
+          STDERR("%s\n", errs);
         }
       }
     }
     bb++;
     counter++;
   }
-  STDOUT("/***************************************/\n");
+  STDERR("/***************************************/\n");
+  RTL_IO_UNLOCK();
 #endif /* E_ACSL_OS_IS_LINUX */
 }

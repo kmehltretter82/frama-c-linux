@@ -118,7 +118,6 @@ class pane (gprovers : GuiConfig.provers) =
   let iformat = new iformat in
   let rformat = new rformat in
   let strategies = new GuiTactic.strategies () in
-  let native = List.mem "native:alt-ergo" (Wp_parameters.Provers.get ()) in
   object(self)
 
     val mutable state : state = Empty
@@ -140,15 +139,11 @@ class pane (gprovers : GuiConfig.provers) =
             Config.config_float ~key:"GuiGoal.palette" ~default:0.8 content
           );
         layout#populate (Wbox.panel ~top:toolbar content#widget) ;
-        let native_ergo =
-          if native then [
-            new GuiProver.prover ~console:text ~prover:VCS.NativeAltErgo
-          ] else [] in
         let why3_provers =
           List.map
             (fun dp -> new GuiProver.prover ~console:text ~prover:(VCS.Why3 dp))
             (Why3.Whyconf.Sprover.elements gprovers#get) in
-        provers <- native_ergo @ why3_provers ;
+        provers <- why3_provers ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
         palette#add_tool strategies#tool ;
         Strategy.iter strategies#register ;
@@ -275,7 +270,6 @@ class pane (gprovers : GuiConfig.provers) =
           autofocus#set mode ; self#update
 
     method private provers =
-      (if native then [ VCS.NativeAltErgo ] else []) @
       (List.map (fun dp -> VCS.Why3 dp)
          (Why3.Whyconf.Sprover.elements gprovers#get))
 
@@ -547,17 +541,21 @@ class pane (gprovers : GuiConfig.provers) =
             begin fun () ->
               text#clear ;
               let main = ProofEngine.main proof in
-              if ProofSession.exists main then begin
+              if ProofSession.exists main then
                 text#printf
                   (if ProofEngine.saved proof
                    then "%a (@{<green>saved@})@."
                    else "%a (@{<orange>modified@})@.")
+                  ProofSession.pp_script_for main
+              else
+                text#printf "%a (@{<blue>not created@})@."
                   ProofSession.pp_script_for main ;
-                text#hrule ;
-              end ;
+              text#hrule ;
               scripter#tree proof ;
               text#hrule ;
               text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+              text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
+              text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
               text#hrule ;
               scripter#status proof ;
             end ()

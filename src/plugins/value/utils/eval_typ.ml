@@ -78,7 +78,7 @@ let is_compatible_function ~typ_pointed ~typ_fun =
       Cil.isSigned ik1 = Cil.isSigned ik2 &&
       Cil.bitsSizeOfInt ik1 = Cil.bitsSizeOfInt ik2
     | TFloat (fk1, _), TFloat (fk2, _) -> fk1 = fk2
-    | TComp (ci1, _, _), TComp (ci2, _, _) ->
+    | TComp (ci1, _), TComp (ci2, _) ->
       Cil_datatype.Compinfo.equal ci1 ci2
     | _ -> false
   in
@@ -138,7 +138,7 @@ let compatible_functions typ_pointer ?args kfs =
 let rec expr_contains_volatile expr =
   let rec aux expr = match expr.enode with
     | Lval lval -> lval_contains_volatile lval
-    | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> aux e
+    | UnOp (_, e, _) | CastE (_, e) -> aux e
     | AddrOf lv | StartOf lv -> lval_contains_volatile lv
     | BinOp (_, e1, e2, _) -> aux e1 || aux e2
     | _ -> false

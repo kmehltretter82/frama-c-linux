@@ -160,7 +160,6 @@ let get_definitionloc (d : definition) : cabsloc =
   | LINKAGE (_, l, _) -> l
   | GLOBANNOT({Logic_ptree.decl_loc = l }::_) -> l
   | GLOBANNOT [] -> assert false
-  | CUSTOM (_,_,l) -> l
 
 let get_statementloc (s : statement) : cabsloc =
   begin

@@ -1,4 +1,5 @@
-[kernel] Parsing tests/slicing/variadic.c (with preprocessing)
+[kernel] Parsing variadic.c (with preprocessing)
+[kernel] Parsing tests/pdg/variadic.c (with preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

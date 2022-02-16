@@ -46,10 +46,10 @@ let code_annotation_loc ca stmt =
 let mark_unreachable () =
   let mark ppt =
     if not (Property_status.automatically_computed ppt) then begin
-      Value_parameters.debug "Marking property %a as dead"
+      Self.debug "Marking property %a as dead"
         Description.pp_property ppt;
       let emit =
-        Property_status.emit ~distinct:false Value_util.emitter ~hyps:[]
+        Property_status.emit ~distinct:false Eva_utils.emitter ~hyps:[]
       in
       let reach_p = Property.ip_reachable_ppt ppt in
       emit ppt Property_status.True;
@@ -73,7 +73,7 @@ let mark_unreachable () =
         let mark_status kf =
           (* Do not mark preconditions as dead if they are not analyzed in
              non-dead code. Otherwise, the consolidation does strange things. *)
-          if not (Value_util.skip_specifications kf) ||
+          if not (Eva_utils.skip_specifications kf) ||
              Builtins.is_builtin_overridden kf
           then begin
             (* Setup all precondition statuses for [kf]: maybe it has
@@ -101,35 +101,6 @@ let mark_unreachable () =
   in
   Annotations.iter_all_code_annot do_code_annot;
   Visitor.visitFramacFile unreach (Ast.get ())
-
-let mark_rte () =
-  let _, mem, _ = !Db.RteGen.get_memAccess_status () in
-  let _, arith, _ = !Db.RteGen.get_divMod_status () in
-  let _, signed_ovf, _ = !Db.RteGen.get_signedOv_status () in
-  let _, unsigned_ovf, _ = !Db.RteGen.get_unsignedOv_status () in
-  let _, signed_downcast, _ = !Db.RteGen.get_signed_downCast_status () in
-  let _, unsigned_downcast, _ = !Db.RteGen.get_unsignedDownCast_status () in
-  let _, pointer_call, _ = !Db.RteGen.get_pointerCall_status () in
-  let _, float_to_int, _ = !Db.RteGen.get_float_to_int_status () in
-  let _, finite_float, _ = !Db.RteGen.get_finite_float_status () in
-  let b_signed_ovf = Kernel.SignedOverflow.get () in
-  let b_unsigned_ovf = Kernel.UnsignedOverflow.get () in
-  let b_signed_downcast = Kernel.SignedDowncast.get () in
-  let b_unsigned_downcast = Kernel.UnsignedDowncast.get () in
-  Globals.Functions.iter
-    (fun kf ->
-       if !Db.Value.is_called kf then (
-         mem kf true;
-         arith kf true;
-         pointer_call kf true;
-         if b_signed_ovf then signed_ovf kf true;
-         if b_unsigned_ovf then unsigned_ovf kf true;
-         if b_signed_downcast then signed_downcast kf true;
-         if b_unsigned_downcast then unsigned_downcast kf true;
-         float_to_int kf true;
-         finite_float kf true;
-       )
-    )
 
 let c_labels kf cs =
   if !Db.Value.use_spec_instead_of_definition kf then
@@ -216,10 +187,10 @@ let mark_green_and_red () =
             | `True -> Property_status.True, "valid"
             | `False -> Property_status.False_if_reachable, "invalid"
           in
-          Property_status.emit ~distinct Value_util.emitter ~hyps:[] ip status;
+          Property_status.emit ~distinct Eva_utils.emitter ~hyps:[] ip status;
           let source = fst loc in
           let text_ca = code_annotation_text ca in
-          Value_parameters.result ~once:true ~source "%s%a got final status %s."
+          Self.result ~once:true ~source "%s%a got final status %s."
             text_ca Description.pp_named p text_status;
         in
         begin
@@ -259,7 +230,7 @@ let mark_invalid_initializers () =
             let status = Property_status.False_and_reachable in
             let distinct = false (* see comment in mark_green_and_red above *) in
             Red_statuses.add_red_property Kglobal ip;
-            Property_status.emit ~distinct Value_util.emitter ~hyps:[] ip status;
+            Property_status.emit ~distinct Eva_utils.emitter ~hyps:[] ip status;
         end
       | _ -> ()
   in

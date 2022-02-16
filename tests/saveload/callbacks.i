@@ -1,6 +1,8 @@
 /* run.config
-   EXECNOW: LOG callbacks_initial.res LOG callbacks_initial.err BIN callbacks.sav @frama-c@ tests/saveload/callbacks.i -out -calldeps -eva-show-progress -main main1 -save ./tests/saveload/result/callbacks.sav > ./tests/saveload/result/callbacks_initial.res 2> ./tests/saveload/result/callbacks_initial.err
-   STDOPT: +"-load ./tests/saveload/result/callbacks.sav -main main2 -then -main main3"
+ COMMENT: the following CMD redefinition omits adding @PTEST_FILE@ on purpose (due to -load)
+ CMD: @frama-c@ @PTEST_OPTIONS@
+   EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ @PTEST_FILE@ -out -calldeps -eva-show-progress -main main1 -save @PTEST_NAME@.sav > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
+   STDOPT: +"-load %{dep:@PTEST_NAME@.sav} -main main2 -then -main main3"
 */
 
 /* This tests whether the callbacks for callwise inout and from survive after

@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "23.1"
+version: "24.0"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -23,6 +23,7 @@ authors: [
   "Thibaud Antignac"
   "Gergö Barany"
   "Patrick Baudin"
+  "Thibaut Benjamin"
   "Allan Blanchard"
   "Lionel Blatter"
   "François Bobot"
@@ -57,16 +58,17 @@ authors: [
   "Dario Pinto"
   "Virgile Prevosto"
   "Armand Puccetti"
+  "Félix Ridoux"
   "Virgile Robles"
   "Muriel Roger"
   "Julien Signoles"
   "Kostyantyn Vorobyov"
   "Boris Yakobowski"
 ]
-homepage: "http://frama-c.com/"
+homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-23.0-Vanadium.pdf"
+doc: "http://frama-c.com/download/user-manual-24.0-beta-Chromium.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"
@@ -85,7 +87,7 @@ tags: [
 ]
 
 build: [
-  ["autoconf"] {pinned}
+  ["autoconf"] {dev}
   ["./configure" "--prefix" prefix
                  "--mandir=%{man}%"
   ]
@@ -115,7 +117,7 @@ depends: [
   ( "alt-ergo-free" | "alt-ergo" )
   "conf-graphviz" { post }
   "conf-time" { with-test }
-  "ocaml" { >= "4.08.1" & < "4.13.0" }
+  "ocaml" { >= "4.08.1" }
   "ocamlfind" # needed beyond build stage, used by -load-module
   "ocamlgraph" { >= "1.8.8" }
   "why3" { >= "1.4.0" & < "1.5~" }
@@ -133,13 +135,6 @@ depopts: [
   "ppx_deriving"
   "ppx_deriving_yojson"
   "zmq"
-]
-
-messages: [
-  "The Frama-C/Wp now uses Why-3 for all provers (Cf. deprecated -wp-prover native:alt-ergo)"
-  {alt-ergo:installed}
-  "The Frama-C/Wp native support for Coq is deprecated and only activated with Coq.8.12.x (use TIP or Why-3 instead)."
-  {coq:installed}
 ]
 
 post-messages: [

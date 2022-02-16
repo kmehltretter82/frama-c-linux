@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -39,8 +39,6 @@
 /* Public API {{{ */
 /* Debug */
 #ifdef E_ACSL_DEBUG
-#  define eacsl_bt_print_block     export_alias(bt_print_block)
-#  define eacsl_bt_print_tree      export_alias(bt_print_tree)
 #  define eacsl_block_info         export_alias(block_info)
 #  define eacsl_store_block_debug  export_alias(store_block_debug)
 #  define eacsl_delete_block_debug export_alias(delete_block_debug)
@@ -212,7 +210,7 @@ int eacsl_initialized(void *ptr, size_t size) {
 size_t eacsl_block_length(void *ptr) {
   bt_block *blk = bt_find(ptr);
   /* Hard failure when un-allocated memory is used */
-  private_assert(blk != NULL, "\\block_length of unallocated memory", NULL);
+  private_assert(blk != NULL, "\\block_length of unallocated memory\n", NULL);
   return blk->size;
 }
 
@@ -258,14 +256,14 @@ int eacsl_valid_read(void *ptr, size_t size, void *ptr_base,
 /* return the base address of the block containing ptr */
 void *eacsl_base_addr(void *ptr) {
   bt_block *tmp = bt_find(ptr);
-  private_assert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
+  private_assert(tmp != NULL, "\\base_addr of unallocated memory\n", NULL);
   return (void *)tmp->ptr;
 }
 
 /* return the offset of `ptr` within its block */
 size_t eacsl_offset(void *ptr) {
   bt_block *tmp = bt_find(ptr);
-  private_assert(tmp != NULL, "\\offset of unallocated memory", NULL);
+  private_assert(tmp != NULL, "\\offset of unallocated memory\n", NULL);
   return ((uintptr_t)ptr - tmp->ptr);
 }
 /* }}} */
@@ -304,23 +302,8 @@ void *eacsl_store_block(void *ptr, size_t size) {
 #endif
   bt_block *tmp = NULL;
   if (ptr) {
-    tmp = private_malloc(sizeof(bt_block));
-    tmp->ptr = (uintptr_t)ptr;
-    tmp->size = size;
-    tmp->init_ptr = NULL;
-    tmp->init_bytes = 0;
-    tmp->is_readonly = 0;
-    tmp->is_freeable = 0;
+    tmp = bt_alloc_block((uintptr_t)ptr, size);
     bt_insert(tmp);
-#ifdef E_ACSL_DEBUG
-    tmp->line = 0;
-    tmp->file = "undefined";
-#endif
-#ifdef E_ACSL_TEMPORAL
-    tmp->timestamp = NEW_TEMPORAL_TIMESTAMP();
-    tmp->temporal_shadow =
-        (size >= sizeof(void *)) ? private_malloc(size) : NULL;
-#endif
   }
   return tmp;
 }
@@ -345,22 +328,18 @@ void eacsl_delete_block(void *ptr) {
 #ifdef E_ACSL_DEBUG
   /* Make sure the recorded block is not NULL */
   if (!ptr)
-    private_abort("Attempt to delete NULL block");
+    private_abort("Attempt to delete NULL block\n");
 #endif
   if (ptr != NULL) {
     bt_block *tmp = bt_lookup(ptr);
 #ifdef E_ACSL_DEBUG
     /* Make sure the removed block exists in the tracked allocation */
     if (!tmp)
-      private_abort("Attempt to delete untracked block");
+      private_abort("Attempt to delete untracked block\n");
 #endif
     if (tmp) {
-      bt_clean_block_init(tmp);
-#ifdef E_ACSL_TEMPORAL
-      private_free(tmp->temporal_shadow);
-#endif
       bt_remove(tmp);
-      private_free(tmp);
+      bt_free_block(tmp);
     }
   }
 }
@@ -373,7 +352,7 @@ void *eacsl_store_block_duplicate(void *ptr, size_t size) {
 #ifdef E_ACSL_DEBUG
       /* Make sure that duplicate block, if so is of the same length */
       if (tmp->size != size)
-        private_abort("Attempt to store duplicate block of different length");
+        private_abort("Attempt to store duplicate block of different length\n");
 #endif
       eacsl_delete_block(ptr);
     }
@@ -637,7 +616,7 @@ void eacsl_delete_block_debug(char *file, int line, void *ptr) {
   bt_block *tmp = bt_lookup(ptr);
   if (!tmp) {
     private_abort(
-        "Block with base address %a not found in the memory model at %s:%d",
+        "Block with base address %a not found in the memory model at %s:%d\n",
         ptr, file, line);
   }
   eacsl_delete_block(ptr);
@@ -654,4 +633,21 @@ void eacsl_block_info(char *p) {
   }
 }
 #endif
+/* }}} */
+
+/************************************************************************/
+/*** E-ACSL concurrency primitives {{{ ***/
+/************************************************************************/
+
+extern int pthread_create(pthread_t *restrict thread,
+                          const pthread_attr_t *restrict attr,
+                          pthread_routine_t start_routine, void *restrict arg);
+
+int eacsl_pthread_create(pthread_t *restrict thread,
+                         const pthread_attr_t *restrict original_attr,
+                         pthread_routine_t start_routine, void *restrict arg) {
+  private_abort("Concurrency is not supported for bittree model\n");
+  return EPERM;
+}
+
 /* }}} */

@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- AST Source Code
 // --------------------------------------------------------------------------
@@ -189,9 +191,11 @@ export default function ASTview() {
             const markers = buffer.findTextMarker(prop.key);
             markers.forEach((marker) => {
               const pos = marker.find();
-              buffer.forEach((cm) => {
-                cm.setGutterMarker(pos.from.line, 'bullet', bullet);
-              });
+              if (pos) {
+                buffer.forEach((cm) => {
+                  cm.setGutterMarker(pos.from.line, 'bullet', bullet);
+                });
+              }
             });
           }
         }

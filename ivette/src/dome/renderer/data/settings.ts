@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- States
 // --------------------------------------------------------------------------
@@ -314,10 +316,10 @@ export function setWindowSettings(
    Local window settings are stored in the `.<appName>` file of the working
    directory, or in the closest one in parent directories, if any.
  */
-export function useWindowSettings<A extends JSON.json>(
+export function useWindowSettings<A>(
   key: string | undefined,
-  decoder: JSON.Loose<A>,
-  defaultValue: A,
+  decoder: JSON.Loose<A & JSON.json>,
+  defaultValue: A & JSON.json,
 ) {
   return useSettings({
     decoder,
@@ -398,12 +400,12 @@ export function setLocalStorage(
   if (key) LocalStorageDriver.save(key, value);
 }
 
-export function useLocalStorage<A extends JSON.json>(
+export function useLocalStorage<A>(
   key: string | undefined,
-  decoder: JSON.Loose<A>,
-  defaultValue: A,
+  decoder: JSON.Loose<A & JSON.json>,
+  defaultValue: A & JSON.json,
 ) {
-  return useSettings({
+  return useSettings<A & JSON.json>({
     decoder,
     encoder: JSON.identity,
     defaultValue,

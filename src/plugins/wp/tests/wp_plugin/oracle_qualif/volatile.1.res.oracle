@@ -1,25 +1,16 @@
 # frama-c -wp -wp-no-volatile [...]
-[kernel] Parsing tests/wp_plugin/volatile.i (no preprocessing)
+[kernel] Parsing volatile.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_plugin/volatile.i:16: Warning: 
-  unsafe volatile access to (term) l-value
-[wp] tests/wp_plugin/volatile.i:15: Warning: 
-  unsafe write-access to volatile l-value
-[wp] tests/wp_plugin/volatile.i:22: Warning: 
-  unsafe volatile access to (term) l-value
-[wp] tests/wp_plugin/volatile.i:21: Warning: 
-  unsafe read-access to volatile l-value
-[wp] tests/wp_plugin/volatile.i:36: Warning: 
-  unsafe volatile access to (term) l-value
-[wp] tests/wp_plugin/volatile.i:36: Warning: 
-  unsafe volatile access to (term) l-value
-[wp] tests/wp_plugin/volatile.i:35: Warning: 
-  unsafe write-access to volatile l-value
-[wp] tests/wp_plugin/volatile.i:35: Warning: 
-  unsafe read-access to volatile l-value
-[wp] tests/wp_plugin/volatile.i:45: Warning: 
-  unsafe read-access to volatile l-value
+[wp] volatile.i:16: Warning: unsafe volatile access to (term) l-value
+[wp] volatile.i:15: Warning: unsafe write-access to volatile l-value
+[wp] volatile.i:22: Warning: unsafe volatile access to (term) l-value
+[wp] volatile.i:21: Warning: unsafe read-access to volatile l-value
+[wp] volatile.i:36: Warning: unsafe volatile access to (term) l-value
+[wp] volatile.i:36: Warning: unsafe volatile access to (term) l-value
+[wp] volatile.i:35: Warning: unsafe write-access to volatile l-value
+[wp] volatile.i:35: Warning: unsafe read-access to volatile l-value
+[wp] volatile.i:45: Warning: unsafe read-access to volatile l-value
 [wp] 5 goals scheduled
 [wp] [Qed] Goal typed_job_assigns_assert_KO_WHEN_VOLATILE : Valid
 [wp] [Qed] Goal typed_job_read_assert_KO_WHEN_VOLATILE : Valid
@@ -37,7 +28,7 @@
   job_struct_assigns        1        -        1       100%
   default_init              -        1        1       100%
 ------------------------------------------------------------
-[wp] tests/wp_plugin/volatile.i:33: Warning: 
+[wp] volatile.i:33: Warning: 
   Memory model hypotheses for function 'job_struct_assigns':
   /*@ behavior wp_typed:
         requires \separated(p, &sv); */

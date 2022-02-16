@@ -1,16 +1,16 @@
-[kernel] Parsing tests/libc/locale_h.c (with preprocessing)
+[kernel] Parsing locale_h.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function localeconv <- main.
-  Called from tests/libc/locale_h.c:4.
+  Called from locale_h.c:4.
 [eva] using specification for function localeconv
 [eva] Done for function localeconv
-[eva:alarm] tests/libc/locale_h.c:5: Warning: 
+[eva:alarm] locale_h.c:5: Warning: 
   out of bounds read. assert \valid_read(&lc->decimal_point);
-[eva:alarm] tests/libc/locale_h.c:5: Warning: 
+[eva:alarm] locale_h.c:5: Warning: 
   out of bounds read. assert \valid_read(lc->decimal_point + 0);
 [eva] Recording results for main
 [eva] done for function main

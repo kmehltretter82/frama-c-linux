@@ -1,6 +1,6 @@
   method! vstmt_aux s =
     let color = 
-      if Db.Value.is_computed () then
+      if Eva.Analysis.is_computed () then
 	let state = Db.Value.get_stmt_state s in
 	let reachable = Db.Value.is_reachable state in
 	if reachable then "fillcolor=\"#ccffcc\" style=filled"

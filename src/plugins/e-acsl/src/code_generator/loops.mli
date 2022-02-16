@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,6 +23,7 @@
 (** Loop specific actions. *)
 
 open Cil_types
+open Analyses_types
 
 (**************************************************************************)
 (************************* Loop annotations *******************************)
@@ -40,7 +41,7 @@ val handle_annotations:
 
 val mk_nested_loops:
   loc:location -> (Env.t -> stmt list * Env.t) -> kernel_function -> Env.t ->
-  Lscope.lscope_var list -> stmt list * Env.t
+  lscope_var list -> stmt list * Env.t
 (** [mk_nested_loops ~loc mk_innermost_block kf env lvars] creates nested
     loops (with the proper statements for initializing the loop counters)
     from the list of logic variables [lvars]. Quantified variables create

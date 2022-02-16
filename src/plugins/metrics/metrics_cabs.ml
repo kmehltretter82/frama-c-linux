@@ -116,7 +116,6 @@ class metricsCabsVisitor = object(self)
     | PRAGMA _
     | STATIC_ASSERT _
     | LINKAGE _
-    | CUSTOM _
     | GLOBANNOT _ -> Cil.DoChildren;
 
   method! vexpr expr =

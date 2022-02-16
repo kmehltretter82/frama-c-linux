@@ -26,5 +26,4 @@ val has_requires: spec -> bool
 val mark_invalid_initializers: unit -> unit
 val mark_unreachable: unit -> unit
 val mark_green_and_red: unit -> unit
-val mark_rte: unit -> unit
 val c_labels: kernel_function -> Value_types.callstack -> Eval_terms.labels_states

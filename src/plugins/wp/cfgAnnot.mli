@@ -57,18 +57,19 @@ val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 
 val get_terminates_goal : kernel_function -> pred_info option
+val get_decreases_goal : kernel_function -> variant_info option
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-type code_assertions = {
-  code_admitted: pred_info list ;
-  code_verified: pred_info list ;
+type code_assertion = {
+  code_admitted: pred_info option ;
+  code_verified: pred_info option ;
 }
 
 val get_code_assertions :
-  ?smoking:bool -> kernel_function -> stmt -> code_assertions
+  ?smoking:bool -> kernel_function -> stmt -> code_assertion list
 
 val get_unreachable : kernel_function -> stmt -> prop_id
 val get_stmt_assigns : kernel_function -> stmt -> assigns_full_info list
@@ -77,22 +78,33 @@ val get_stmt_assigns : kernel_function -> stmt -> assigns_full_info list
 (* --- Property Accessors : Loop Contracts                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+type loop_hypothesis =
+  | NoHyp
+  | Check of WpPropId.prop_id
+  | Always of WpPropId.prop_id
+
+type loop_invariant = {
+  loop_hyp : loop_hypothesis ;
+  loop_est : WpPropId.prop_id option ;
+  loop_ind : WpPropId.prop_id option ;
+  loop_pred : Cil_types.predicate ;
+}
+
 type loop_contract = {
   loop_terminates: predicate option;
-  (** to be verified at loop entry *)
-  loop_established: pred_info list;
-  (** to be assumed for loop current *)
-  loop_invariants: pred_info list;
+  loop_invariants: loop_invariant list;
   (** to be proved after loop invariants *)
   loop_smoke: pred_info list;
-  (** to be verified after loop body *)
-  loop_preserved: pred_info list;
   (** assigned by loop body *)
   loop_assigns: assigns_full_info list;
 }
 
 val get_loop_contract : ?smoking:bool -> ?terminates:predicate ->
   kernel_function -> stmt -> loop_contract
+
+val mk_variant_properties :
+  kernel_function -> stmt -> code_annotation -> term -> pred_info * pred_info
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Call Contracts                                --- *)
@@ -106,6 +118,7 @@ type contract = {
   contract_smoke : pred_info list ;
   contract_assigns : assigns ;
   contract_terminates : bool * predicate ; (* boolean: assumed terminates *)
+  contract_decreases : variant option ;
 }
 
 val get_call_contract : ?smoking:stmt -> kernel_function -> stmt -> contract

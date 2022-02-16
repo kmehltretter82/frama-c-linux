@@ -450,7 +450,7 @@ class markReachableVisitor
          self#visitAttrs attrs;
          self#mark_enum e
 
-       | TComp(c, _, attrs) ->
+       | TComp(c, attrs) ->
          let old = is_reachable reachable_tbl (Comp c) in
          if not old then
            begin
@@ -481,7 +481,7 @@ class markReachableVisitor
        | TVoid a | TInt (_,a) | TFloat (_,a) | TBuiltin_va_list a ->
          self#visitAttrs a
        | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
-       | TArray(ty,sz, _, a) ->
+       | TArray(ty,sz, a) ->
          ignore (self#vtype ty); self#visitAttrs a;
          Option.iter (ignore $ (visitCilExpr (self:>cilVisitor))) sz
        | TFun (ty, args,_,a) ->
@@ -625,7 +625,7 @@ class markReferencedVisitor = object
         ti.treferenced <- true;
       end;
       DoChildren
-    | TComp (ci, _, _) ->
+    | TComp (ci, _) ->
       if not (Stack.is_empty inside_typ) then begin
         Kernel.debug ~current:true ~dkey "referenced: comp %s" ci.cname;
         ci.creferenced <- true;
@@ -790,8 +790,6 @@ let remove_unused_labels ?(is_removable=label_removable) func =
     (visitCilBlock (new removeUnusedLabels is_removable usedLabels) func.sbody)
 
 let removeUnmarked isRoot ast reachable_tbl =
-  let removedLocals = ref [] in
-
   let filterGlobal global =
     match global with
     (* unused global types, variables, and functions are simply removed *)
@@ -823,11 +821,7 @@ let removeUnmarked isRoot ast reachable_tbl =
         if (local.vtemp || local.vstorage = Static) &&
            not (is_reachable reachable_tbl (Var local)) then
           begin
-            (* along the way, record the interesting locals that were removed *)
-            let name = local.vname in
-            (Kernel.debug ~dkey "removing local: %s" name);
-            removedLocals :=
-              (func.svar.vname ^ "::" ^ name) :: !removedLocals;
+            Kernel.debug ~dkey "removing local: %s" local.vname;
             false
           end else true
       in
@@ -873,8 +867,7 @@ let removeUnmarked isRoot ast reachable_tbl =
         end;
         Kernel.debug ~dkey "kept global %s (%a)" (global_type_and_name rg) Printer.pp_global rg
       ) keptGlobals;
-  end;
-  !removedLocals
+  end
 
 
 (***********************************************************************
@@ -914,7 +907,7 @@ let removeUnused ?(isRoot=isExportedRoot) ast =
       markReferenced ast;
 
       (* take out the trash *)
-      ignore (removeUnmarked isRoot ast reachable_tbl)
+      removeUnmarked isRoot ast reachable_tbl
     end
 
 (*

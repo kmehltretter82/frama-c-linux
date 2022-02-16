@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/long_ident.c (with preprocessing)
+[kernel] Parsing long_ident.c (with preprocessing)
 /* *********************************** */
 /* start of dictionary for obfuscation */
 /* *********************************** */

@@ -3,7 +3,8 @@
 */
 
 /* run.config_qualif
-   OPT: -load-module tests/wp_tip/TacNOP.ml -wp -wp-par 1 -wp-prover script
+   SCRIPT: TacNOP
+   OPT: -wp -wp-par 1 -wp-prover script
 */
 
 

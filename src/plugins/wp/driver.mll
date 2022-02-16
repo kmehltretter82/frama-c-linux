@@ -81,10 +81,7 @@
     | `Default -> conv_bal default (name,default)
     | `Left  -> Qed.Engine.F_left name
     | `Right -> Qed.Engine.F_right name
-    | `Nary  ->
-        if Qed.Plib.is_template name
-        then Qed.Engine.F_subst name
-        else Qed.Engine.F_call name
+    | `Nary  -> Qed.Engine.F_call name
 
 }
 
@@ -285,30 +282,24 @@ and bal = parse
     match token input with
       | LINK f | ID f ->
         let link = conv_bal def (f,(bal input.lexbuf)) in
-        skip input; Lang.infoprover link
+        skip input; link
       | RECLINK l ->
         skip input ;
-        begin try
-          {Lang.altergo = conv_bal def (List.assoc "altergo" l);
-                why3    = conv_bal def (List.assoc "why3" l);
-                coq     = conv_bal def (List.assoc "coq" l) }
+        begin try conv_bal def (List.assoc "why3" l);
         with Not_found ->
-          failwith "a link must contain an entry for 'altergo', 'why3' and 'coq'"
+          failwith "a link must contain an entry for 'why3'"
         end
       | _ -> failwith "Missing link symbol"
 
   let linkstring input =
     match recorstring input.lexbuf with
       | `String f ->
-        skip input ; Lang.infoprover f
+        skip input ; f
       | `RecString l ->
         skip input ;
-        begin try
-          {Lang.altergo = List.assoc "altergo" l;
-                why3    = List.assoc "why3" l;
-                coq     = List.assoc "coq" l }
+        begin try List.assoc "why3" l
         with Not_found ->
-          failwith "a link must contain an entry for 'altergo', 'why3' and 'coq'"
+          failwith "a link must contain an entry for 'why3'"
         end
       | _ -> failwith "Missing link symbol"
 

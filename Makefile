@@ -257,6 +257,7 @@ DISTRIB_FILES:=\
       $(LIBC_FILES)							\
       share/analysis-scripts/analysis.mk                                \
       share/analysis-scripts/benchmark_database.py                      \
+      share/analysis-scripts/build.py                                   \
       share/analysis-scripts/build_callgraph.py                         \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
@@ -274,7 +275,6 @@ DISTRIB_FILES:=\
       share/analysis-scripts/heuristic_list_functions.py                \
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/list_functions.ml                          \
-      share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/normalize_jcdb.py                          \
       share/analysis-scripts/parse-coverage.sh                          \
@@ -284,6 +284,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/results_display.py                         \
       share/analysis-scripts/script_for_creduce_fatal.sh                \
       share/analysis-scripts/script_for_creduce_non_fatal.sh            \
+      share/analysis-scripts/source_filter.py                           \
       share/analysis-scripts/summary.py                                 \
       share/analysis-scripts/template.mk                                \
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
@@ -535,6 +536,7 @@ KERNEL_CMO=\
 	src/kernel_services/visitors/visitor_behavior.cmo		\
 	src/kernel_services/ast_queries/cil.cmo                      \
 	src/kernel_services/ast_queries/cil_builtins.cmo             \
+	src/kernel_internals/parsing/parse_env.cmo                     \
 	src/kernel_internals/parsing/errorloc.cmo                      \
 	src/kernel_services/ast_printing/cil_printer.cmo                \
 	src/kernel_services/ast_printing/cil_descriptive_printer.cmo    \
@@ -671,6 +673,9 @@ check-logic-parser-wildcard:
 
 NON_OPAQUE_DEPS+= src/kernel_services/plugin_entry_points/dynamic
 
+# abstract_memory.cmi must _not_ inherit the '-rectypes' flag, so we
+# eagerly assign it _before_ adding -rectypes to the .cmo/.cmx files
+src/kernel_services/abstract_interp/abstract_memory.cmi: BFLAGS := $(BFLAGS)
 src/kernel_services/abstract_interp/abstract_memory.cmo: BFLAGS += -rectypes
 src/kernel_services/abstract_interp/abstract_memory.cmx: OFLAGS += -rectypes
 
@@ -780,7 +785,7 @@ PLUGIN_NAME:=Metrics
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/metrics
 PLUGIN_CMO:= metrics_parameters css_html metrics_base metrics_acsl \
-	     metrics_cabs metrics_cilast metrics_coverage \
+	     metrics_cabs metrics_cilast metrics_coverage metrics_pivot \
 	     register
 PLUGIN_GUI_CMO:= metrics_gui register_gui
 PLUGIN_DEPENDENCIES:=Eva
@@ -821,6 +826,8 @@ PLUGIN_EXTRA_DIRS:=engine values domains api domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy partitioning utils gui_files \
 	api values/numerors domains/numerors
 PLUGIN_TESTS_DIRS+=value/traces
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/Eva.mli
+PLUGIN_DISTRIB_EXTERNAL+=gen-api.sh
 
 # Files for the binding to Apron domains. Only available if Apron is available.
 ifeq ($(HAS_APRON),yes)
@@ -851,9 +858,9 @@ endif
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
-PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
-	utils/eva_audit utils/value_perf utils/eva_annotations \
-	utils/value_util utils/red_statuses \
+PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
+	utils/eva_audit utils/eva_perf utils/eva_annotations \
+	utils/eva_dynamic utils/eva_utils utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen \
 	partitioning/split_return \
@@ -881,7 +888,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/sign_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
-	utils/value_results \
+	utils/eva_results \
 	utils/summary \
 	domains/cvalue/builtins domains/cvalue/builtins_malloc \
 	domains/cvalue/builtins_string domains/cvalue/builtins_misc \
@@ -904,10 +911,10 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/taint_domain \
 	$(APRON_CMO) $(NUMERORS_CMO) \
 	api/general_requests api/values_request \
-	utils/unit_tests
+	utils/unit_tests utils/results
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
-PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen Server
+PLUGIN_DEPENDENCIES:=Server
 
 # These files are used by the GUI, but do not depend on Lablgtk
 VALUE_GUI_AUX:=gui_files/gui_types gui_files/gui_eval \
@@ -923,7 +930,25 @@ VALUE_TYPES:=$(addprefix src/plugins/value_types/,\
 PLUGIN_TYPES_CMO:=$(VALUE_TYPES)
 PLUGIN_TYPES_TODOC:=$(addsuffix .mli,$(VALUE_TYPES))
 
+# Eva API.
+API_MLI := $(addprefix $(PLUGIN_DIR)/, \
+  engine/analysis.mli utils/results.mli \
+  parameters.mli utils/eva_annotations.mli \
+  eval.mli domains/cvalue/builtins.mli \
+  legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli)
+
+$(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/gen-api.sh Makefile $(API_MLI)
+	$(PRINT_MAKING) $@
+	$(RM) $@ $@.tmp
+	$< $(API_MLI) > $@.tmp
+	$(CHMOD_RO) $@.tmp
+	$(MV) $@.tmp $@
+
+clean::
+	$(RM) $(PLUGIN_DIR)/Eva.mli
+
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
+
 
 #########
 # Reduc #
@@ -1949,6 +1974,8 @@ install:: install-lib-$(OCAMLBEST)
 	$(CP) \
 	  share/analysis-scripts/analysis.mk \
 	  share/analysis-scripts/benchmark_database.py \
+	  share/analysis-scripts/build.py \
+	  share/analysis-scripts/build_callgraph.py \
 	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/clone.sh \
@@ -1962,7 +1989,6 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/git_utils.py \
 	  share/analysis-scripts/list_files.py \
 	  share/analysis-scripts/list_functions.ml \
-	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
 	  share/analysis-scripts/normalize_jcdb.py \
 	  share/analysis-scripts/parse-coverage.sh \
@@ -1971,6 +1997,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/results_display.py \
 	  share/analysis-scripts/script_for_creduce_fatal.sh \
 	  share/analysis-scripts/script_for_creduce_non_fatal.sh \
+	  share/analysis-scripts/source_filter.py \
 	  share/analysis-scripts/summary.py \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts

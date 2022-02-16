@@ -8,9 +8,9 @@ let run () =
       ~last:false
       "default"
   in
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   Project.set_current p_default;
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   ()
 
 let () = Db.Main.extend run 

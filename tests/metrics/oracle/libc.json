@@ -39,6 +39,7 @@
     { "fileno": { "calls": 0, "address_taken": false } },
     { "fileno_unlocked": { "calls": 0, "address_taken": false } },
     { "flockfile": { "calls": 0, "address_taken": false } },
+    { "fmemopen": { "calls": 0, "address_taken": false } },
     { "fopen": { "calls": 0, "address_taken": false } },
     { "fork": { "calls": 0, "address_taken": false } },
     { "fputc": { "calls": 0, "address_taken": false } },

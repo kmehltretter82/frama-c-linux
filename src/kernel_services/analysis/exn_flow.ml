@@ -290,7 +290,7 @@ let get_type_tag t =
     | TFloat(FDouble,_) -> "d"
     | TFloat (FLongDouble,_) -> "ld"
     | TPtr(t,_) -> "p" ^ aux t
-    | TArray(t,_,_,_) -> "a" ^ aux t
+    | TArray(t,_,_) -> "a" ^ aux t
     | TFun(rt,l,_,_) ->
       let base = "fun" ^ aux rt in
       (match l with
@@ -298,7 +298,7 @@ let get_type_tag t =
        | Some l ->
          List.fold_left (fun acc (_,t,_) -> acc ^ aux t) base l)
     | TNamed _ -> Kernel.fatal "named type not correctly unrolled"
-    | TComp (s,_,_) -> (if s.cstruct then "S" else "U") ^ s.cname
+    | TComp (s,_) -> (if s.cstruct then "S" else "U") ^ s.cname
     | TEnum (e,_) -> "E" ^ e.ename
     | TBuiltin_va_list _ -> "va"
   in "__fc_" ^ aux t
@@ -358,7 +358,7 @@ let generate_exn_union e exns =
     let kind = (exn_kind_name, TEnum (e,[]), None, [], loc) in
     let obj =
       (exn_obj_name,
-       TComp(exn_kind_union, { scache = Not_Computed } , []), None, [], loc)
+       TComp(exn_kind_union, []), None, [], loc)
     in
     Some [uncaught; kind; obj]
   in
@@ -552,7 +552,7 @@ class erase_exn =
         let e = generate_exn_enum exns in
         let u,s = generate_exn_union e exns in
         let exn =
-          Cil.makeGlobalVar "__fc_exn" (TComp (s,{scache = Not_Computed},[]))
+          Cil.makeGlobalVar "__fc_exn" (TComp (s,[]))
         in
         self#update_enum_bindings e exns;
         self#update_union_bindings u exns;
@@ -563,7 +563,7 @@ class erase_exn =
           GCompTag (u,loc) ::
           GEnumTag (e,loc) :: new_types;
         exn_var <- Some exn;
-        let exn_init = Cil.makeZeroInit ~loc (TComp(s,{scache=Not_Computed},[]))
+        let exn_init = Cil.makeZeroInit ~loc (TComp(s,[]))
         in
         let gexn_var = GVar(exn, { init = Some exn_init }, loc) in
         ChangeDoChildrenPost(

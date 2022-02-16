@@ -1,4 +1,4 @@
-[kernel] Parsing tests/float/init_float.i (no preprocessing)
+[kernel] Parsing init_float.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -13,9 +13,9 @@
   l ∈ [--..--]
   Ha[0..4] ∈ [-1.9999999999999998*2^1023 .. 1.9999999999999998*2^1023]
   THa[0..4] ∈ [-1.9999999999999998*2^1023 .. 1.9999999999999998*2^1023]
-[eva:alarm] tests/float/init_float.i:16: Warning: 
+[eva:alarm] init_float.i:16: Warning: 
   function main: precondition -1000.0 ≤ x ≤ 1000.0 got status unknown.
-[eva:alarm] tests/float/init_float.i:17: Warning: 
+[eva:alarm] init_float.i:17: Warning: 
   function main: precondition 0.0 ≤ s.y ≤ 0.0 got status unknown.
 [eva] Recording results for main
 [eva] done for function main

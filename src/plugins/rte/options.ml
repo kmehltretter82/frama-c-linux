@@ -125,7 +125,8 @@ module FunctionSelection =
       let help = "select <fun> for analysis (default all functions)"
     end)
 
-let warn ?source fmt = warning ?source ~current:true ~once:true fmt
+let dkey_annot = register_category "annot"
+let () = add_debug_keys dkey_annot
 
 (*
 Local Variables:

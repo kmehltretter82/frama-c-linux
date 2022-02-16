@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_typed/multi_matrix_types.i (no preprocessing)
+[kernel] Parsing multi_matrix_types.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
@@ -253,7 +253,7 @@ end
   Function job
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/multi_matrix_types.i, line 10) in 'job':
+Goal Post-condition (file multi_matrix_types.i, line 10) in 'job':
 Let a = Load_S1_S(p, Mint_0, Mint_1, Mint_2).
 Let a_1 = Load_S1_S(p, Mint_0, Mint_1[shiftfield_F1_S_f(p) <- v], Mint_2).
 Assume {

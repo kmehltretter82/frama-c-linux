@@ -241,9 +241,17 @@ let constant e =
       begin
         try Integer.to_int64_exn k
         with Z.Overflow ->
-          Warning.error "Array size too large (%a)" (Integer.pretty ~hexa:true) k
+          Warning.error "Array size too large (%a)" Integer.pretty_hex k
       end
   | _ -> Warning.error "Non-constant expression (%a)" Printer.pp_exp e
+
+let array_size = function
+  | None -> None
+  | Some e ->
+      match constant e with
+      | 0L when Cil.gccMode () || Cil.msvcMode () -> None
+      | 0L -> Warning.error "0 sized array %s" (Cil.allowed_machdep "GCC/MSVC")
+      | n  -> Some n
 
 let get_int e =
   match (Cil.constFold true e).enode with
@@ -258,7 +266,7 @@ let get_int64 e =
 let dimension t =
   let rec flat k d = function
     | TNamed (r,_) -> flat k d r.ttype
-    | TArray(ty,Some e,_,_) ->
+    | TArray(ty,Some e,_) ->
         flat (succ k) (Int64.mul d (constant e)) ty
     | te -> k , d , te
   in flat 1 Int64.one t
@@ -278,10 +286,10 @@ let rec object_of typ =
   | TPtr(typ,_) -> C_pointer (if Cil.isVoidType typ then Cil.charType else typ)
   | TFun _ -> C_pointer Cil.voidType
   | TEnum ({ekind=i},_) -> C_int (c_int i)
-  | TComp (comp,_,_) -> C_comp comp
-  | TArray (typ_elt,e_opt,_,_) ->
+  | TComp (comp,_) -> C_comp comp
+  | TArray (typ_elt,e_opt,_) ->
       begin
-        match e_opt with
+        match array_size e_opt with
         | None ->
             C_array {
               arr_element = typ_elt;
@@ -292,7 +300,7 @@ let rec object_of typ =
             C_array {
               arr_element = typ_elt ;
               arr_flat = Some {
-                  arr_size = Int64.to_int (constant e) ;
+                  arr_size = Int64.to_int e ;
                   arr_dim = dim ;
                   arr_cell = ty_cell ;
                   arr_cell_nbr = ncells ;
@@ -462,7 +470,7 @@ let sizeof_defined = function
   | C_array { arr_flat = None } -> false
   | _ -> true
 
-let typ_comp cinfo = TComp(cinfo,Cil.empty_size_cache(),[])
+let typ_comp cinfo = TComp(cinfo,[])
 
 let bits_sizeof_comp cinfo = Cil.bitsSizeOf (typ_comp cinfo)
 
@@ -471,7 +479,7 @@ let bits_sizeof_array ainfo =
   | Some a ->
       let csize = Cil.kinteger64
           ~loc:Cil_builtins.builtinLoc (Z.of_int64 a.arr_cell_nbr) in
-      let ctype = TArray(a.arr_cell,Some csize,Cil.empty_size_cache(),[]) in
+      let ctype = TArray(a.arr_cell,Some csize,[]) in
       Cil.bitsSizeOf ctype
   | None ->
       if WpLog.ExternArrays.get () then

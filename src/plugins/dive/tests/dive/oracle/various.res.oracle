@@ -1,12 +1,12 @@
-[kernel] Parsing tests/dive/various.i (no preprocessing)
+[kernel] Parsing various.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva] tests/dive/various.i:10: starting to merge loop iterations
-[eva:alarm] tests/dive/various.i:13: Warning: 
+[eva] various.i:10: starting to merge loop iterations
+[eva:alarm] various.i:13: Warning: 
   non-finite float value.
   assert \is_finite((float)\mul_double((double)y, (double)2.0));
-[eva:alarm] tests/dive/various.i:27: Warning: 
+[eva:alarm] various.i:27: Warning: 
   non-finite float value. assert \is_finite(\add_float(y, w));
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
@@ -21,4 +21,4 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[dive] output to tests/dive/result/various.dot
+[dive] output to various.dot

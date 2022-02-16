@@ -1,45 +1,28 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/combined.c (with preprocessing)
+[kernel] Parsing combined.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function job
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_plugin/combined.c, line 27):
+Goal Assertion (file combined.c, line 27):
 Assume { Type: is_sint32(A). }
 Prove: (50 <= A) /\ (A <= 100).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_plugin/combined.c, line 29):
-Assume {
-  Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(v) /\ is_sint32(1 + i).
-  (* Heap *)
-  Type: region(t.base) <= 0.
-  (* Assertion *)
-  Have: (50 <= A) /\ (A <= 100).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
-            [shift_sint32(t, i_1)]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
-  (* Then *)
-  Have: i <= 49.
-  (* Call 'f' *)
-  Have: P_P(v).
-}
-Prove: (-1) <= i.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file tests/wp_plugin/combined.c, line 29):
+Goal Preservation of Invariant (file combined.c, line 29):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_plugin/combined.c, line 30):
+Goal Establishment of Invariant (file combined.c, line 29):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file combined.c, line 30):
 Let a = havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(v) /\ is_sint32(1 + i).
@@ -50,25 +33,27 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i) /\ (i <= 50).
+  (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       P_P(a[shift_sint32(t, i_2)]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
   (* Then *)
   Have: i <= 49.
   (* Call 'f' *)
   Have: P_P(v).
+  (* Invariant *)
+  Have: (-1) <= i.
 }
 Prove: P_P(a[shift_sint32(t, i) <- v][shift_sint32(t, i_1)]).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_plugin/combined.c, line 30):
+Goal Establishment of Invariant (file combined.c, line 30):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_plugin/combined.c, line 35):
+Goal Preservation of Invariant (file combined.c, line 35):
 Let x = 1 + j.
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(x).
@@ -77,11 +62,11 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i) /\ (i <= 50).
+  (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
             [shift_sint32(t, i_1)]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
   (* Else *)
   Have: 50 <= i.
   (* Invariant *)
@@ -93,12 +78,12 @@ Prove: A <= x.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_plugin/combined.c, line 35):
+Goal Establishment of Invariant (file combined.c, line 35):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_plugin/combined.c, line 40):
+Goal Assertion (file combined.c, line 40):
 Let a = havoc(Mint_undef_1, Mint_0, shift_sint32(t, 0), 50).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i_1) /\ is_sint32(j).
@@ -109,10 +94,10 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i_1) /\ (i_1 <= 50).
+  (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
       P_P(a[shift_sint32(t, i_2)]))).
-  (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 50).
   (* Else *)
   Have: 50 <= i_1.
   (* Invariant *)
@@ -125,39 +110,40 @@ Prove: P_P(havoc(Mint_undef_0, a, shift_sint32(t, A), 100 - A)
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_plugin/combined.c, line 31) (1/3):
+Goal Loop assigns (file combined.c, line 31) (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_plugin/combined.c, line 31) (2/3):
+Goal Loop assigns (file combined.c, line 31) (2/3):
 Effect at line 33
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_plugin/combined.c, line 31) (3/3):
+Goal Loop assigns (file combined.c, line 31) (3/3):
 Call Result at line 33
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_plugin/combined.c, line 36) (1/3):
+Goal Loop assigns (file combined.c, line 36) (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_plugin/combined.c, line 36) (2/3):
+Goal Loop assigns (file combined.c, line 36) (2/3):
 Effect at line 38
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_plugin/combined.c, line 36) (3/3):
+Goal Loop assigns (file combined.c, line 36) (3/3):
 Call Result at line 38
-Let a = shift_sint32(t, j).
+Let x = j - 1.
+Let a = shift_sint32(t, x).
 Assume {
-  Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j).
+  Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(x).
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
@@ -165,17 +151,17 @@ Assume {
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
+  Have: (0 <= i) /\ (i <= 50).
+  (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
             [shift_sint32(t, i_1)]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
   (* Else *)
   Have: 50 <= i.
   (* Invariant *)
-  Have: (A <= j) /\ (j <= 100).
+  Have: (A < j) /\ (j <= 101).
   (* Then *)
-  Have: j <= 99.
+  Have: j <= 100.
 }
 Prove: included(a, 1, shift_sint32(t, A), 100 - A).
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,11 +31,7 @@ let create_rtl_ast prj =
     prj
     (fun () ->
        (* compute the RTL AST in the standard E-ACSL setting *)
-       if Plugin.is_present "variadic" then
-         Dynamic.Parameter.Bool.off "-variadic-translation" ();
-       Kernel.Keep_unused_specified_functions.off ();
-       Kernel.CppExtraArgs.add
-         (Format.asprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
+       Options.setup ~rtl:true ();
        Kernel.Files.set [ rtl_file () ];
        Ast.get ())
     ()
@@ -55,7 +51,7 @@ module Symbols: sig
   val mem_vi: string -> bool
   exception Unregistered of string
   val find_vi: string -> varinfo (* may raise Unregistered *)
-  val libc_replacement: varinfo -> varinfo
+  val replacement: get_name:(string -> string) -> varinfo -> varinfo
   val _debug: unit -> unit
 end = struct
 
@@ -78,13 +74,13 @@ end = struct
     try Datatype.String.Hashtbl.find vars s
     with Not_found -> raise (Unregistered s)
 
-  let libc_replacement fvi =
-    let name = Functions.RTL.libc_replacement_name fvi.vorig_name in
+  let replacement ~get_name fvi =
+    let name = get_name fvi.vorig_name in
     try
       find_vi name
     with Unregistered _ ->
       Options.fatal
-        "Unable to find RTL function '%s' to replace libc function '%s'"
+        "Unable to find RTL function '%s' to replace function '%s'"
         name
         fvi.vname
 
@@ -236,7 +232,7 @@ let lookup_rtl_globals rtl_ast =
         Assocs.add_kf g kf
       in
       do_it ~add ~assoc (fun _ -> Globals.Functions.mem_name vi.vname) acc l g
-    | GAnnot (Daxiomatic (name, galist, _, _), _) as g :: l ->
+    | GAnnot (Daxiomatic (name, galist, _, _) as ga, _) as g :: l ->
       (* processing axiomatics *)
       let fun_or_preds =
         (* extract the functions and predicates from the axiomatic *)
@@ -268,19 +264,43 @@ let lookup_rtl_globals rtl_ast =
            all its functions and predicates are in the user's project. If only
            some of them are in it then it is an error, and if none of them are
            then the axiomatic is not in the user's project. *)
-        if exists && not forall then
-          Options.abort
-            "@[The following logic functions or predicates@ \
-             are in conflict with logic functions or predicates from the@ \
-             axiomatic '%s' in the E-ACSL runtime library, please rename@ \
-             them:@ %a@]"
-            name
-            (Pretty_utils.pp_list
-               ~sep:",@ "
-               Printer.pp_logic_info)
-            conflicting_lis
-        else
-          forall
+        let in_user_prj =
+          if exists && not forall then
+            Options.abort
+              "@[The following logic functions or predicates@ \
+               are in conflict with logic functions or predicates from the@ \
+               axiomatic '%s' in the E-ACSL runtime library, please rename@ \
+               them:@ %a@]"
+              name
+              (Pretty_utils.pp_list
+                 ~sep:",@ "
+                 Printer.pp_logic_info)
+              conflicting_lis
+          else
+            forall
+        in
+        (* If the axiomatic is not "in the user's project", check if a different
+           axiomatic with the same name is in it. *)
+        if not in_user_prj then begin
+          let ip_from_ga = Property.ip_of_global_annotation ga in
+          let found =
+            try
+              Property_status.iter
+                (fun ppt ->
+                   if List.exists (Property.equal ppt) ip_from_ga
+                   then raise Exit);
+              false
+            with Exit ->
+              true
+          in
+          if found then
+            Options.abort
+              "@[The axiomatic '%s' is in conflict with an@ \
+               axiomatic with the same name in the E-ACSL runtime library,@ \
+               please rename it.@]"
+              name
+        end;
+        in_user_prj
       in
       let assoc _g =
         List.iter

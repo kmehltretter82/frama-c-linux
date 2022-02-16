@@ -1,11 +1,11 @@
-[kernel] Parsing tests/value/struct_array.i (no preprocessing)
+[kernel] Parsing struct_array.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva:alarm] tests/value/struct_array.i:15: Warning: 
+[eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z1) ≤ 2147483647;
-[eva:alarm] tests/value/struct_array.i:15: Warning: 
+[eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z2) ≤ 2147483647;
-[eva:alarm] tests/value/struct_array.i:15: Warning: 
+[eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z4) ≤ 2147483647;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
@@ -47,18 +47,18 @@
   s2 ∈ {0}
   s3 ∈ {0}
 [eva] computing for function main1 <- main.
-  Called from tests/value/struct_array.i:56.
-[eva:alarm] tests/value/struct_array.i:35: Warning: 
+  Called from struct_array.i:56.
+[eva:alarm] struct_array.i:35: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
-[eva:alarm] tests/value/struct_array.i:35: Warning: 
+[eva:alarm] struct_array.i:35: Warning: 
   accessing out of bounds index. assert v < 22;
-[eva:alarm] tests/value/struct_array.i:36: Warning: 
+[eva:alarm] struct_array.i:36: Warning: 
   out of bounds write. assert \valid(outp);
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/struct_array.i:57.
-[eva] tests/value/struct_array.i:41: 
+  Called from struct_array.i:57.
+[eva] struct_array.i:41: 
   Frama_C_show_each:
   .a ∈ {1}
   .t[0] ∈ {2}
@@ -70,10 +70,10 @@
   .t[6] ∈ {8}
   .b ∈ {9}
 [eva] computing for function f1 <- main2 <- main.
-  Called from tests/value/struct_array.i:42.
+  Called from struct_array.i:42.
 [eva] using specification for function f1
 [eva] Done for function f1
-[eva] tests/value/struct_array.i:43: 
+[eva] struct_array.i:43: 
   Frama_C_show_each:
   .a ∈ {1}
   .t[0] ∈ {2}
@@ -84,10 +84,10 @@
   .t[5..6] ∈ [--..--]
   .b ∈ {9}
 [eva] computing for function f2 <- main2 <- main.
-  Called from tests/value/struct_array.i:44.
+  Called from struct_array.i:44.
 [eva] using specification for function f2
 [eva] Done for function f2
-[eva] tests/value/struct_array.i:45: 
+[eva] struct_array.i:45: 
   Frama_C_show_each:
   .a ∈ {1}
   .t[0..2] ∈ [--..--]
@@ -97,15 +97,15 @@
   .t[6] ∈ {8}
   .b ∈ {9}
 [eva] computing for function f3 <- main2 <- main.
-  Called from tests/value/struct_array.i:46.
+  Called from struct_array.i:46.
 [eva] using specification for function f3
 [eva] Done for function f3
-[eva] tests/value/struct_array.i:47: 
+[eva] struct_array.i:47: 
   Frama_C_show_each: .a ∈ {1}
                      .t[0..6] ∈ [--..--]
                      .b ∈ {9}
-[eva] tests/value/struct_array.i:50: assertion got status valid.
-[eva] tests/value/struct_array.i:51: Frama_C_show_each_reach:
+[eva] struct_array.i:50: assertion got status valid.
+[eva] struct_array.i:51: Frama_C_show_each_reach:
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
@@ -240,11 +240,11 @@
       [19].p; [20].p; [21].p}; s; s1; s2; s3
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva:alarm] tests/value/struct_array.i:15: Warning: 
+[eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z1) ≤ 2147483647;
-[eva:alarm] tests/value/struct_array.i:15: Warning: 
+[eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z2) ≤ 2147483647;
-[eva:alarm] tests/value/struct_array.i:15: Warning: 
+[eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z4) ≤ 2147483647;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
@@ -286,16 +286,16 @@
   s2 ∈ {0}
   s3 ∈ {0}
 [eva] computing for function main1 <- main.
-  Called from tests/value/struct_array.i:56.
-[eva:alarm] tests/value/struct_array.i:35: Warning: 
+  Called from struct_array.i:56.
+[eva:alarm] struct_array.i:35: Warning: 
   out of bounds read. assert \valid_read(&T[v].p);
-[eva:alarm] tests/value/struct_array.i:36: Warning: 
+[eva:alarm] struct_array.i:36: Warning: 
   out of bounds write. assert \valid(outp);
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/struct_array.i:57.
-[eva] tests/value/struct_array.i:41: 
+  Called from struct_array.i:57.
+[eva] struct_array.i:41: 
   Frama_C_show_each:
   .a ∈ {1}
   .t[0] ∈ {2}
@@ -307,9 +307,9 @@
   .t[6] ∈ {8}
   .b ∈ {9}
 [eva] computing for function f1 <- main2 <- main.
-  Called from tests/value/struct_array.i:42.
+  Called from struct_array.i:42.
 [eva] Done for function f1
-[eva] tests/value/struct_array.i:43: 
+[eva] struct_array.i:43: 
   Frama_C_show_each:
   .a ∈ {1}
   .t[0] ∈ {2}
@@ -319,9 +319,9 @@
   .t[4] ∈ {6}
   {.t[5..6]; .b} ∈ [--..--]
 [eva] computing for function f2 <- main2 <- main.
-  Called from tests/value/struct_array.i:44.
+  Called from struct_array.i:44.
 [eva] Done for function f2
-[eva] tests/value/struct_array.i:45: 
+[eva] struct_array.i:45: 
   Frama_C_show_each:
   {.a; .t[0..2]} ∈ [--..--]
   .t[3] ∈ {5}
@@ -330,10 +330,10 @@
   .t[6] ∈ {8}
   .b ∈ {9}
 [eva] computing for function f3 <- main2 <- main.
-  Called from tests/value/struct_array.i:46.
+  Called from struct_array.i:46.
 [eva] Done for function f3
-[eva] tests/value/struct_array.i:47: Frama_C_show_each: [--..--]
-[eva:alarm] tests/value/struct_array.i:50: Warning: 
+[eva] struct_array.i:47: Frama_C_show_each: [--..--]
+[eva:alarm] struct_array.i:50: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for main2
 [eva] Done for function main2

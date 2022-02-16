@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,6 +34,8 @@
 *)
 open Cil_types
 open Cil_datatype
+
+module Error = Error.Make(struct let phase = Options.Dkey.bound_variables end)
 
 (** [error_msg quantif msg pp x] creates an error message from the string [msg]
     containing the value [x] pretty-printed by [pp] and the predicate [quantif]
@@ -81,11 +83,11 @@ module Quantified_predicate =
 module Quantifier: sig
   val add:
     predicate ->
-    ((term * logic_var * term) list * predicate) Error.or_error ->
+    ((term * logic_var * term) list * predicate) Error.result ->
     unit
   val get:
     predicate ->
-    ((term * logic_var * term) list * predicate) Error.or_error
+    ((term * logic_var * term) list * predicate) Error.result
   (** getter and setter for the additional guard that intersects with the type
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
@@ -113,7 +115,7 @@ end = struct
     Cil_datatype.Logic_var.Hashtbl.add guard_tbl lv p
 
   let replace p guarded_vars goal =
-    Quantified_predicate.Hashtbl.replace tbl p (Error.Res (guarded_vars, goal))
+    Quantified_predicate.Hashtbl.replace tbl p (Result.Ok (guarded_vars, goal))
 
   let clear () =
     Cil_datatype.Logic_var.Hashtbl.clear guard_tbl;
@@ -666,9 +668,9 @@ let compute_guards loc ~is_forall p bounded_vars hyps =
     let guards,goal = compute_quantif_guards p ~is_forall bounded_vars hyps in
     (* transform [guards] into [lscope_var list] *)
     let normalized_guards = List.map (normalize_guard ~loc) guards
-    in Quantifier.add p (Res (normalized_guards,goal))
+    in Quantifier.add p (Result.Ok (normalized_guards,goal))
   with exn ->
-    Quantifier.add p (Err exn)
+    Quantifier.add p (Result.Error exn)
 
 module Preprocessor : sig
   val compute : file -> unit
@@ -684,21 +686,31 @@ end
       compute_guards loc ~is_forall:true p bound_vars goal
     | Pexists(bound_vars, ({ pred_content = Pand(_, _) } as goal)) ->
       compute_guards loc ~is_forall:false p bound_vars goal
-    | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
-    | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
+    | Pforall _ ->
+      Quantifier.add
+        p
+        (Result.Error (Error.make_not_yet "unguarded \\forall quantification"))
+    | Pexists _ ->
+      Quantifier.add
+        p
+        (Result.Error (Error.make_not_yet "unguarded \\exists quantification"))
     | _ -> ()
+
+  let do_user_predicates () =
+    let gannot a =
+      match a with
+      | Dfun_or_pred ({l_body = LBpred p},loc) ->
+        (match Logic_normalizer.get_pred p with
+         | PoT_pred p -> process_quantif ~loc p
+         | PoT_term _ -> ())
+      | _ -> ()
+    in
+    Annotations.iter_global (fun _ a -> gannot a)
 
   let preprocessor = object
     inherit E_acsl_visitor.visitor
 
-    (* Only logic functions and logic predicates are handled.
-       E-acsl simply ignores all the other global annotations *)
-    method !vannotation annot =
-      match annot with
-      | Dfun_or_pred _ -> Cil.DoChildren
-      | _ -> Cil.SkipChildren
-
-    method !vpredicate  p =
+    method !vpredicate p =
       let loc = p.pred_loc in
       match Logic_normalizer.get_pred p with
       | PoT_pred p -> process_quantif ~loc p;
@@ -710,7 +722,8 @@ end
   let compute ast =
     Visitor.visitFramacFileSameGlobals
       (preprocessor :> Visitor.frama_c_inplace)
-      ast
+      ast;
+    do_user_predicates ()
 
   let compute_annot annot =
     ignore

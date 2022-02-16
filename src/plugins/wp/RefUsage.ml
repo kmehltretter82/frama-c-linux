@@ -357,16 +357,13 @@ and expr (e:Cil_types.exp) : model = match e.enode with
   (* Unary *)
   | UnOp((Neg|BNot|LNot),e,_) -> mexpr e
 
-  (* Jessie *)
-  | Info(e,_) -> expr e
-
   (* Binary *)
   | BinOp( (MinusPP|PlusA|MinusA|Mult|Div|Mod
            |Shiftlt|Shiftrt|BAnd|BXor|BOr|LAnd|LOr
            |Lt|Gt|Le|Ge|Eq|Ne), a,b,_ ) -> m_vcup (expr a) (vexpr b)
 
   (* Shifts *)
-  | BinOp((PlusPI|IndexPI|MinusPI),a,b,_) -> shift (expr a) (vexpr b)
+  | BinOp((PlusPI|MinusPI),a,b,_) -> shift (expr a) (vexpr b)
 
   (* Casts *)
   | CastE(ty_tgt,e) -> cast (cast_ctyp ty_tgt (Cil.typeOf e)) (expr e)
@@ -419,7 +416,7 @@ and term (env:ctx) (t:term) : model = match t.term_node with
             |Lt|Gt|Le|Ge|Eq|Ne), a,b )  -> m_vcup (term env a) (vterm env b)
 
   (* Shifts *)
-  | TBinOp((PlusPI|IndexPI|MinusPI),a,b) -> shift (term env a) (vterm env b)
+  | TBinOp((PlusPI|MinusPI),a,b) -> shift (term env a) (vterm env b)
 
   (* Casts *)
   | TCastE(ty_tgt,t) -> cast (cast_ltyp ty_tgt t.term_type) (term env t)

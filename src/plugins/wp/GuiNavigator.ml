@@ -261,8 +261,6 @@ class behavior
           | _ ->
               let mode = match mode , prover with
                 | Some m , _ -> m
-                | None , VCS.NativeCoq -> VCS.Edit
-                | None , VCS.NativeAltErgo -> VCS.Fix
                 | _ -> if VCS.is_auto prover then VCS.Batch else VCS.Fix in
               schedule (Prover.prove w ~mode ~result prover) ;
               refresh w
@@ -289,8 +287,6 @@ class behavior
 
     val popup_qed  = new Widget.popup ()
     val popup_tip  = new Widget.popup ()
-    val popup_ergo = new Widget.popup ()
-    val popup_coq  = new Widget.popup ()
     val popup_why3_auto = new Widget.popup ()
     val popup_why3_inter = new Widget.popup ()
     val mutable popup_target = None
@@ -332,10 +328,6 @@ class behavior
         popup_why3_inter#add_item ~label:"Check Script" ~callback:(self#popup_run VCS.Batch) ;
         popup_why3_inter#add_item ~label:"Edit Script" ~callback:(self#popup_run VCS.Edit) ;
         popup_why3_inter#add_item ~label:"Fixup Script" ~callback:(self#popup_run VCS.FixUpdate) ;
-        self#add_popup_proofmodes popup_ergo
-          [ "Run",Batch ; "Open Altgr-Ergo on Fail",Edit ; "Open Altgr-Ergo",Edit ] ;
-        self#add_popup_proofmodes popup_coq
-          [ "Check Proof",Batch ; "Edit on Fail",Edit ; "Edit Proof",Edit ] ;
       end
 
     method private popup w p =
@@ -345,8 +337,6 @@ class behavior
         match p with
         | None | Some Tactical -> popup_tip#run ()
         | Some Qed -> popup_qed#run ()
-        | Some NativeCoq -> popup_coq#run ()
-        | Some NativeAltErgo -> popup_ergo#run ()
         | Some (Why3 _ as p) ->
             if VCS.is_auto p
             then popup_why3_auto#run ()
@@ -414,7 +404,7 @@ let model_varinfo :
   | PTermLval(Some kf, _, _, (TVar {lv_origin=Some x},TNoOffset))
     when button=1 && RefUsage.is_computed () ->
       begin
-        let init = WpStrategy.is_main_init kf in
+        let init = Globals.is_entry_point ~when_lib_entry:false kf in
         let acc = RefUsage.get ~kf ~init x in
         let model = match acc with
           | RefUsage.NoAccess -> "any"

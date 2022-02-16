@@ -129,7 +129,6 @@ let mkCompInfo
           faddrof = false;
           fsize_in_bits = None;
           foffset_in_bits = None;
-          fpadding_in_bits = None;
         })) (mkfspec comp) in
   comp.cfields <- flds;
   comp

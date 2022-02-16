@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,29 +30,12 @@ module Resulting_projects =
       let dependencies = Ast.self :: Options.parameter_states
     end)
 
-let () =
-  State_dependency_graph.add_dependencies
-    ~from:Resulting_projects.self
-    [ Label.self ]
-
 let generate_code =
   Resulting_projects.memo
     (fun name ->
        Options.feedback "beginning translation.";
        Temporal.enable (Options.Temporal_validity.get ());
-       if Plugin.is_present "variadic" then begin
-         let opt_name = "-variadic-translation" in
-         if Dynamic.Parameter.Bool.get opt_name () &&
-            Options.Validate_format_strings.get () then begin
-           if Ast.is_computed () then
-             Options.abort
-               "The variadic translation is incompatible with E-ACSL option \
-                '%s'.@ Please use option '-variadic-no-translation'."
-               Options.Validate_format_strings.option_name
-               Options.warning "deactivating variadic translation";
-           Dynamic.Parameter.Bool.off opt_name ();
-         end
-       end;
+       Options.setup ();
        (* slightly more efficient to copy the project before computing the AST
           if it is not yet computed *)
        let rtl_prj_name = Options.Project_name.get () ^ " RTL" in
@@ -81,7 +64,13 @@ let generate_code =
               Kernel.SignedOverflow.unsafe_set signed;
               Kernel.UnsignedOverflow.unsafe_set unsigned
             in
-            Extlib.try_finally ~finally Injector.inject ();
+            Extlib.try_finally
+              ~finally
+              (fun () ->
+                 Gmp_types.init ();
+                 Analyses.preprocess ();
+                 Injector.inject ())
+              ();
             (* remove the RTE's results computed from E-ACSL: they are partial
                and associated with the wrong kernel function (the one of the old
                project). *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,7 +26,10 @@
     - generating a new definition for functions with contract;
     - removing term sharing;
     - in case of temporal validity checks, adding the attribute "aligned" to
-      variables that are not sufficiently aligned. *)
+      variables that are not sufficiently aligned;
+    - create a block around a labeled statement to hold the labels so that the
+      code generation does not need to change the statement holding the label.
+*)
 
 open Cil_types
 

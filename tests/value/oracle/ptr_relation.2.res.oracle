@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/ptr_relation.i (no preprocessing)
+[kernel] Parsing ptr_relation.i (no preprocessing)
 [eva] Analyzing a complete application starting at main2
 [eva] Computing initial state
 [eva] Initial state computed
@@ -17,11 +17,11 @@
   tab_ptr_fct2[0] ∈ {{ &f2 }}
               [1] ∈ {{ &g2 }}
 [eva] computing for function g2 <- main2.
-  Called from tests/value/ptr_relation.i:38.
+  Called from ptr_relation.i:38.
 [eva] Recording results for g2
 [eva] Done for function g2
 [eva] computing for function f2 <- main2.
-  Called from tests/value/ptr_relation.i:38.
+  Called from ptr_relation.i:38.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] Recording results for main2

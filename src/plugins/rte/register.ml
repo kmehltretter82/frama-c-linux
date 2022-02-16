@@ -147,12 +147,23 @@ let _ignore =
     ~journalize:false
     Visit.get_annotations_exp
 
+let _ignore =
+  let kf = Kernel_function.ty in
+  Dynamic.register
+    ~plugin:"RteGen"
+    "all_statuses"
+    Datatype.(list (triple string (func2 kf bool unit) (func kf bool)))
+    ~journalize:false
+    Generator.all_statuses
+
 let main () =
   (* reset "rte generated" properties for all functions *)
   if Options.Enabled.get () then begin
-    Options.feedback ~level:2 "generating annotations";
+    Options.feedback ~dkey:Options.dkey_annot ~level:2
+      "generating annotations";
     !Db.RteGen.compute ();
-    Options.feedback ~level:2 "annotations computed"
+    Options.feedback ~dkey:Options.dkey_annot ~level:2
+      "annotations computed"
   end
 
 let () = Db.Main.extend main

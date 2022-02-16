@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,8 +22,9 @@
 
 open Cil_types
 open Cil
+open Analyses_types
 
-(** Forward reference for [Translate.predicate_to_exp]. *)
+(** Forward reference for [Translate_predicates.to_exp]. *)
 let predicate_to_exp_ref
   : (adata:Assert.t ->
      kernel_function ->
@@ -68,9 +69,10 @@ let convert kf env loc ~is_forall quantif =
   (* guarded quantification over integers (or a subtype of integer) *)
   let bound_vars, goal =
     Error.retrieve_preprocessing
-      "quantified predicate"
+      "preprocessing of quantified predicate"
       Bound_variables.get_preprocessed_quantifier
       quantif
+      Printer.pp_predicate
   in
   match has_empty_quantif_with_false_negative bound_vars, is_forall with
   | true, true ->
@@ -91,7 +93,7 @@ let convert kf env loc ~is_forall quantif =
          and update logic scope in the process *)
       let lvs_guards, env = List.fold_right
           (fun (t1, lv, t2) (lvs_guards, env) ->
-             let lvs = Lscope.Lvs_quantif (t1, Rle, lv, Rlt, t2) in
+             let lvs = Lvs_quantif (t1, Rle, lv, Rlt, t2) in
              let env = Env.Logic_scope.extend env lvs in
              lvs :: lvs_guards, env)
           bound_vars
@@ -140,7 +142,7 @@ let convert kf env loc ~is_forall quantif =
         Loops.mk_nested_loops ~loc mk_innermost_block kf env lvs_guards
       in
       let env =
-        Env.add_stmt env kf (Smart_stmt.block_stmt (mkBlock stmts))
+        Env.add_stmt env (Smart_stmt.block_stmt (mkBlock stmts))
       in
       (* where to jump to go out of the loop *)
       let end_loop = mkEmptyStmt ~loc () in
@@ -148,7 +150,7 @@ let convert kf env loc ~is_forall quantif =
       let label = Label(label_name, loc, false) in
       end_loop.labels <- label :: end_loop.labels;
       end_loop_ref := end_loop;
-      let env = Env.add_stmt env kf end_loop in
+      let env = Env.add_stmt env end_loop in
       res, env
     end
 

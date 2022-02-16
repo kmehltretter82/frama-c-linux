@@ -38,7 +38,7 @@ export class Streamer {
     this.v0 = v0;
   }
 
-  push(v: number) {
+  push(v: number): void {
     const { vs } = this;
     vs.push(Math.round(v));
     if (vs.length > 200) vs.shift();
@@ -71,7 +71,7 @@ export class FontSizer {
     this.p = new Streamer(p);
   }
 
-  push(x: number, y: number) {
+  push(x: number, y: number): void {
     const a0 = this.a;
     const b0 = this.b;
     if (x !== a0 && a0 !== 0) {
@@ -84,19 +84,19 @@ export class FontSizer {
     this.b = y;
   }
 
-  capacity(y: number) {
+  capacity(y: number): number {
     const k = this.k.mean();
     const p = this.p.mean();
     return Math.round(0.5 + (y - p) / k);
   }
 
-  dimension(n: number) {
+  dimension(n: number): number {
     const k = this.k.mean();
     const p = this.p.mean();
     return p + n * k;
   }
 
-  dump(x: string) {
+  dump(x: string): string {
     const k = this.k.mean();
     const p = this.p.mean();
     return `${k}.${x}+${p}`;
@@ -109,7 +109,7 @@ export class FontSizer {
 /* --------------------------------------------------------------------------*/
 
 export const WSIZER = new FontSizer(7, 6);
-export const HSIZER = new FontSizer(14, 6);
+export const HSIZER = new FontSizer(15, 6);
 
 export interface SizedAreaProps {
   cols: number;
@@ -117,7 +117,7 @@ export interface SizedAreaProps {
   children?: React.ReactNode;
 }
 
-export function SizedArea(props: SizedAreaProps) {
+export function SizedArea(props: SizedAreaProps): JSX.Element {
   const { rows, cols, children } = props;
   const refSizer = React.useCallback(
     (ref: null | HTMLDivElement) => {

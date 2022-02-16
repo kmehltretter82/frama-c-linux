@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,16 +22,7 @@
 
 open Cil_types
 open Contract_types
-
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-let must_translate_ppt_ref : (Property.t -> bool) ref =
-  Extlib.mk_fun "must_translate_ppt_ref"
-
-let must_translate_ppt_opt_ref : (Property.t option -> bool) ref =
-  Extlib.mk_fun "must_translate_ppt_opt_ref"
+module Error = Translation_error
 
 (**************************************************************************)
 (********************** Contract ********************************)
@@ -47,7 +38,7 @@ module Rtl_call: sig
   (** Call the C function [__e_acsl_contract_init] *)
 
   val cleanup:
-    loc:location -> Env.t -> kernel_function -> exp -> Env.t
+    loc:location -> Env.t -> exp -> Env.t
   (** Call the C function [__e_acsl_contract_cleanup] *)
 
   val set_assumes:
@@ -56,17 +47,15 @@ module Rtl_call: sig
   (** Call the C function [__e_acsl_contract_set_behavior_assumes] *)
 
   val get_assumes:
-    loc:location -> result:varinfo -> Env.t -> kernel_function -> exp -> int ->
-    Env.t
+    loc:location -> result:varinfo -> Env.t -> exp -> int -> Env.t
   (** Call the C function [__e_acsl_contract_get_behavior_assumes] *)
 
   val partial_count_behaviors:
-    loc:location -> result:varinfo -> Env.t -> kernel_function -> exp ->
-    int list -> Env.t
+    loc:location -> result:varinfo -> Env.t -> exp -> int list -> Env.t
   (** Call the C function [__e_acsl_contract_partial_count_behaviors] *)
 
   val partial_count_all_behaviors:
-    loc:location -> result:varinfo -> Env.t -> kernel_function -> exp -> Env.t
+    loc:location -> result:varinfo -> Env.t -> exp -> Env.t
     (** Call the C function [__e_acsl_contract_partial_count_all_behaviors] *)
 
 end = struct
@@ -97,10 +86,9 @@ end = struct
              init_function_name
              [count_e] ])
 
-  let cleanup ~loc env kf contract =
+  let cleanup ~loc env contract =
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          "contract_clean"
@@ -109,7 +97,7 @@ end = struct
   let set_assumes ~loc env kf contract idx assumes =
     let idx_e = Cil.integer ~loc idx in
     let assumes_e, _, env =
-      Translate.generalized_untyped_predicate_to_exp
+      Translate_predicates.generalized_untyped_to_exp
         ~adata:Assert.no_data
         kf
         env
@@ -117,25 +105,23 @@ end = struct
     in
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          "contract_set_behavior_assumes"
          [contract; idx_e; assumes_e])
 
-  let get_assumes ~loc ~result env kf contract idx =
+  let get_assumes ~loc ~result env contract idx =
     let idx_e = Cil.integer ~loc idx in
     let result = Cil.var result in
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          ~result
          "contract_get_behavior_assumes"
          [contract; idx_e])
 
-  let partial_count_behaviors ~loc ~result env kf contract idxes =
+  let partial_count_behaviors ~loc ~result env contract idxes =
     let idxes, count =
       List.fold_right
         (fun idx (idxes, count) ->
@@ -146,18 +132,16 @@ end = struct
     let result = Cil.var result in
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          ~result
          "contract_partial_count_behaviors"
          (contract :: Cil.integer ~loc count :: idxes))
 
-  let partial_count_all_behaviors ~loc ~result env kf contract =
+  let partial_count_all_behaviors ~loc ~result env contract =
     let result = Cil.var result in
     Env.add_stmt
       env
-      kf
       (Smart_stmt.rtl_call
          ~loc
          ~result
@@ -223,12 +207,12 @@ let init kf env contract =
   else env
 
 (** Cleanup the C API for the given contract *)
-let cleanup kf env contract =
+let cleanup env contract =
   match contract.var with
   | None -> env
   | Some (_, e) ->
     let loc = contract.location in
-    Rtl_call.cleanup ~loc env kf e
+    Rtl_call.cleanup ~loc env e
 
 (** Retrieve the behavior index from its name for the given contract *)
 let get_bhvr_idx contract bhvr_name =
@@ -324,7 +308,8 @@ let fold_left_handle_error_with_args f (env, acc) l =
 
 (** Insert requires check for the default behavior of the given contract in the
     environment. *)
-let check_default_requires kf kinstr env contract =
+let check_default_requires kf env contract =
+  let kinstr = Env.get_kinstr env in
   let default_behavior =
     Cil.find_default_behavior contract.spec
   in
@@ -332,12 +317,12 @@ let check_default_requires kf kinstr env contract =
   | Some b ->
     fold_left_handle_error
       (fun env ip_requires ->
-         if !must_translate_ppt_ref
+         if Translate_utils.must_translate
              (Property.ip_of_requires kf kinstr b ip_requires) then
            let tp_requires = ip_requires.ip_content in
            let loc = tp_requires.tp_statement.pred_loc in
            Cil.CurrentLoc.set loc;
-           Translate.translate_predicate kf env tp_requires
+           Translate_predicates.do_it kf env tp_requires
          else
            env)
       env
@@ -346,10 +331,11 @@ let check_default_requires kf kinstr env contract =
 
 (** Insert requires check for the behaviors other than the default behavior of
     the given contract in the environment *)
-let check_other_requires kf kinstr env contract =
+let check_other_requires kf env contract =
   let get_or_create_assumes_var =
     mk_get_or_create_var kf Cil.intType "assumes_value"
   in
+  let kinstr = Env.get_kinstr env in
   let do_behavior env b =
     if Cil.is_default_behavior b then
       env
@@ -361,7 +347,7 @@ let check_other_requires kf kinstr env contract =
       let env, stmts =
         fold_left_handle_error_with_args
           (fun (env, stmts) ip_requires ->
-             if !must_translate_ppt_ref
+             if Translate_utils.must_translate
                  (Property.ip_of_requires kf kinstr b ip_requires) then
                let tp_requires = ip_requires.ip_content in
                let pred_kind = tp_requires.tp_kind in
@@ -378,7 +364,7 @@ let check_other_requires kf kinstr env contract =
                  (* Create runtime check *)
                  let adata, env = Assert.empty ~loc kf env in
                  let requires_e, adata, env =
-                   Translate.generalized_untyped_predicate_to_exp
+                   Translate_predicates.generalized_untyped_to_exp
                      ~adata
                      kf
                      env
@@ -429,12 +415,11 @@ let check_other_requires kf kinstr env contract =
             ~loc
             ~result:assumes_vi
             env
-            kf
             contract_e
             idx
         in
         let stmt = Smart_stmt.if_stmt ~loc ~cond:assumes_e requires_blk in
-        Env.add_stmt env kf stmt
+        Env.add_stmt env stmt
   in
   List.fold_left
     do_behavior
@@ -449,8 +434,8 @@ type translate_ppt =
 (** For each set of behavior names in [clauses], [check_active_behaviors] counts
     the number of active behaviors and creates assertions for the
     [ppt_to_translate]. *)
-let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env contract clauses =
-  let must_translate = !must_translate_ppt_ref in
+let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract clauses =
+  let kinstr = Env.get_kinstr env in
   let loc = contract.location in
   Cil.CurrentLoc.set loc;
   let do_clause env bhvrs =
@@ -459,13 +444,15 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
     let must_translate_complete =
       match ppt_to_translate with
       | Both | Complete ->
-        must_translate (Property.ip_of_complete kf kinstr ~active bhvrs_list)
+        Translate_utils.must_translate
+          (Property.ip_of_complete kf kinstr ~active bhvrs_list)
       | Disjoint -> false
     in
     let must_translate_disjoint =
       match ppt_to_translate with
       | Both | Disjoint ->
-        must_translate (Property.ip_of_disjoint kf kinstr ~active bhvrs_list)
+        Translate_utils.must_translate
+          (Property.ip_of_disjoint kf kinstr ~active bhvrs_list)
       | Complete -> false
     in
 
@@ -482,7 +469,6 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
                 ~loc
                 ~result:vi
                 env
-                kf
                 contract_e
             in
             let complete_msg = "all behaviors complete" in
@@ -503,7 +489,6 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
                 ~loc
                 ~result:vi
                 env
-                kf
                 contract_e
                 args
             in
@@ -525,7 +510,6 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
         let adata, env =
           Assert.register
             ~loc
-            kf
             env
             "number of active behaviors"
             active_bhvrs_e
@@ -549,16 +533,15 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
            for the given clause *)
         Env.add_stmt
           env
-          kf
           (Smart_stmt.if_stmt
              ~loc
              ~cond:(Cil.mkBinOp ~loc Ne active_bhvrs_e (Cil.one ~loc))
              (Cil.mkBlock [ assert_complete_stmt; assert_disjoint_stmt ]))
           (* Otherwise just get the corresponding assertion *)
       else if must_translate_complete then
-        Env.add_stmt env kf assert_complete_stmt
+        Env.add_stmt env assert_complete_stmt
       else if must_translate_disjoint then
-        Env.add_stmt env kf assert_disjoint_stmt
+        Env.add_stmt env assert_disjoint_stmt
       else
         (* By construction, at least either [must_translate_complete] or
            [must_translate_disjoint] is true *)
@@ -571,7 +554,7 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
 
 (** Insert complete and disjoint behaviors check for the given contract in the
     environement *)
-let check_complete_and_disjoint kf kinstr env contract =
+let check_complete_and_disjoint kf env contract =
   (* Only translate the complete and disjoint clauses if all the assumes clauses
      could be translated *)
   if contract.all_assumes_translated then
@@ -581,8 +564,8 @@ let check_complete_and_disjoint kf kinstr env contract =
        - The disjoint list
 
        The behaviors of a clause are stored in a Set so that they are
-       automatically sorted, the duplicates are removed, and they can be compared
-       for equality.
+       automatically sorted, the duplicates are removed, and they can be
+       compared for equality.
     *)
     let completes =
       List.map
@@ -610,14 +593,15 @@ let check_complete_and_disjoint kf kinstr env contract =
     in
     (* Create a common variable to hold the number of active behavior for the
        current check *)
-    let get_or_create_var = mk_get_or_create_var kf Cil.intType "active_bhvrs" in
+    let get_or_create_var =
+      mk_get_or_create_var kf Cil.intType "active_bhvrs"
+    in
     (* Check the complete and disjoint clauses *)
     let check_bhvrs env ppt_to_translate bhvrs =
       check_active_behaviors
         ~ppt_to_translate
         ~get_or_create_var
         kf
-        kinstr
         env
         contract
         bhvrs
@@ -636,17 +620,18 @@ let check_complete_and_disjoint kf kinstr env contract =
   end
 
 (** Insert ensures check for the given contract in the environement *)
-let check_post_conds kf kinstr env contract =
+let check_post_conds kf env contract =
   let get_or_create_assumes_var =
     mk_get_or_create_var kf Cil.intType "assumes_value"
   in
+  let kinstr = Env.get_kinstr env in
   let do_behavior env b =
     let env =
       Env.handle_error
         (fun env ->
            let active = [] in (* TODO: 'for' behaviors, e-acsl#109 *)
            let ppt = Property.ip_assigns_of_behavior kf kinstr ~active b in
-           if b.b_assigns <> WritesAny && !must_translate_ppt_opt_ref ppt
+           if b.b_assigns <> WritesAny && Translate_utils.must_translate_opt ppt
            then Env.not_yet env "assigns clause in behavior";
            (* ignore b.b_extended since we never translate them *)
            env)
@@ -655,7 +640,7 @@ let check_post_conds kf kinstr env contract =
     if Cil.is_default_behavior b then
       fold_left_handle_error
         (fun env ((termination, ip_post_cond) as tp) ->
-           if !must_translate_ppt_ref
+           if Translate_utils.must_translate
                (Property.ip_of_ensures kf kinstr b tp) then
              let tp_post_cond = ip_post_cond.ip_content in
              let loc = tp_post_cond.tp_statement.pred_loc in
@@ -664,7 +649,7 @@ let check_post_conds kf kinstr env contract =
              | Normal ->
                (* If translating the default behavior, directly translate the
                   predicate *)
-               Translate.translate_predicate kf env tp_post_cond
+               Translate_predicates.do_it kf env tp_post_cond
              | Exits | Breaks | Continues | Returns ->
                Error.print_not_yet "abnormal termination case in behavior";
                env
@@ -680,7 +665,7 @@ let check_post_conds kf kinstr env contract =
       let env, stmts =
         fold_left_handle_error_with_args
           (fun (env, stmts) ((termination, ip_post_cond) as tp) ->
-             if !must_translate_ppt_ref
+             if Translate_utils.must_translate
                  (Property.ip_of_ensures kf kinstr b tp) then
                let tp_post_cond = ip_post_cond.ip_content in
                let pred_kind = tp_post_cond.tp_kind in
@@ -702,7 +687,7 @@ let check_post_conds kf kinstr env contract =
                      (* Create runtime check *)
                      let adata, env = Assert.empty ~loc kf env in
                      let post_cond_e, adata, env =
-                       Translate.generalized_untyped_predicate_to_exp
+                       Translate_predicates.generalized_untyped_to_exp
                          ~adata
                          kf
                          env
@@ -757,26 +742,25 @@ let check_post_conds kf kinstr env contract =
             ~loc
             ~result:assumes_vi
             env
-            kf
             contract_e
             idx
         in
         let stmt = Smart_stmt.if_stmt ~loc ~cond:assumes_e post_cond_blk in
-        Env.add_stmt env kf stmt
+        Env.add_stmt env stmt
   in
   List.fold_left
     do_behavior
     env
     contract.spec.spec_behavior
 
-let translate_preconditions kf kinstr env contract =
+let translate_preconditions kf env contract =
   let env = Env.set_annotation_kind env Smart_stmt.Precondition in
   let env = Env.push_contract env contract in
   let env = init kf env contract in
   (* Start with translating the requires predicate of the default behavior. *)
   let env =
     Env.handle_error
-      (fun env -> check_default_requires kf kinstr env contract)
+      (fun env -> check_default_requires kf env contract)
       env
   in
   (* Then setup the assumes clauses of the contract. *)
@@ -784,18 +768,18 @@ let translate_preconditions kf kinstr env contract =
   (* And finally translate the requires predicates of the rest of the behaviors,
      skipping over the default behavior. *)
   let do_it env =
-    let env = check_other_requires kf kinstr env contract in
-    let env = check_complete_and_disjoint kf kinstr env contract in
+    let env = check_other_requires kf env contract in
+    let env = check_complete_and_disjoint kf env contract in
     env
   in
   Env.handle_error do_it env
 
-let translate_postconditions kf kinstr env =
+let translate_postconditions kf env =
   let env = Env.set_annotation_kind env Smart_stmt.Postcondition in
   let contract, env = Env.pop_and_get_contract env in
   let do_it env =
-    let env = check_post_conds kf kinstr env contract in
+    let env = check_post_conds kf env contract in
     env
   in
   let env = Env.handle_error do_it env in
-  cleanup kf env contract
+  cleanup env contract

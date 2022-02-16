@@ -365,14 +365,7 @@ let code_annot_emitter ?filter stmt =
   try
     let tbl = Code_annots.find stmt in
     let filter e l acc =
-      let e =
-        try Emitter.Usable_emitter.get e
-        with Not_found ->
-          (* in some cases, e.g. when loading a state with a different set
-             of plugins loaded, the original emitter might not be available,
-             leading to discarding annotations. Let the kernel adopt them. *)
-          Emitter.orphan
-      in
+      let e = Emitter.Usable_emitter.get e in
       match filter with
       | None -> List.map (fun a -> a, e) l @ acc
       | Some f ->
@@ -1372,7 +1365,7 @@ let dependencies_of_global annot =
 let rec remove_declared_global_annot logic_vars = function
   | Dfun_or_pred(li,_) | Dinvariant(li,_) | Dtype_annot(li,_) ->
     Cil_datatype.Logic_info.Set.remove li logic_vars
-  | Dvolatile _ | Dtype _ | Dlemma _ | Dmodel_annot _ | Dcustom_annot _
+  | Dvolatile _ | Dtype _ | Dlemma _ | Dmodel_annot _
   | Dextended _ ->
     logic_vars
   | Daxiomatic (_,l,_, _) ->
@@ -1698,7 +1691,7 @@ let logic_info_of_global s =
     | Dfun_or_pred(li,_) | Dinvariant(li,_) | Dtype_annot(li,_) ->
       check_logic_info li acc
     | Daxiomatic (_,l, _, _) -> List.fold_left check_one acc l
-    | Dtype _ | Dvolatile _ | Dlemma _ | Dmodel_annot _ | Dcustom_annot _
+    | Dtype _ | Dvolatile _ | Dlemma _ | Dmodel_annot _
     | Dextended _
       -> acc
   in

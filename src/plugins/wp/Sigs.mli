@@ -796,6 +796,11 @@ sig
       underlying memory model. *)
   val pred : polarity -> env -> Cil_types.predicate -> pred
 
+  (** Compile a predicate call. *)
+  val call_pred:
+    env -> Cil_types.logic_info -> Cil_types.logic_label list -> term list ->
+    pred
+
   (** Compile a term representing a set of memory locations into an abstract
       region.  *)
   val region : env -> Cil_types.term -> region

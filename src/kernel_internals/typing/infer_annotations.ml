@@ -77,7 +77,7 @@ let assigns_from_prototype kf =
        type *)
     let rec mk_offset set typ =
       match Cil.unrollType typ with
-      | TArray (typ_elem, size, _, _) ->
+      | TArray (typ_elem, size, _) ->
         let range = match size with
           | None -> make_range None
           | Some size ->

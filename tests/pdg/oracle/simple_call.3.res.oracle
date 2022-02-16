@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/simple_call.c (with preprocessing)
+[kernel] Parsing simple_call.c (with preprocessing)
 [eva] Analyzing a complete application starting at call_multiple_global_outputs
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,7 +9,7 @@
   S ∈ [--..--]
 [eva] computing for function multiple_global_outputs <- 
                           call_multiple_global_outputs.
-  Called from tests/pdg/simple_call.c:39.
+  Called from simple_call.c:39.
 [eva] Recording results for multiple_global_outputs
 [eva] Done for function multiple_global_outputs
 [eva] Recording results for call_multiple_global_outputs

@@ -25,7 +25,7 @@ open Cvalue
 
 let propagate_all_comparison typ =
   not (Cil.isPointerType typ) ||
-  Value_parameters.UndefinedPointerComparisonPropagateAll.get ()
+  Parameters.UndefinedPointerComparisonPropagateAll.get ()
 
 let backward_int_relation typ op v1 v2 =
   let v1' = V.backward_comp_int_left op v1 v2 in
@@ -35,14 +35,14 @@ let backward_int_relation typ op v1 v2 =
   && not (Cvalue_forward.are_comparable op v1 v2)
   then begin
     if not (Cvalue.V.equal v1 v1' || Cvalue.V.is_bottom v1') then
-      Value_parameters.result
+      Self.result
         ~current:true ~once:true
-        ~dkey:Value_parameters.dkey_pointer_comparison
+        ~dkey:Self.dkey_pointer_comparison
         "not reducing %a to %a because of UPCPA" V.pretty v1 V.pretty v1';
     if not (Cvalue.V.equal v2 v2' || Cvalue.V.is_bottom v2') then
-      Value_parameters.result
+      Self.result
         ~current:true ~once:true
-        ~dkey:Value_parameters.dkey_pointer_comparison
+        ~dkey:Self.dkey_pointer_comparison
         "not reducing %a to %a because of UPCPA" V.pretty v2 V.pretty v2';
     None
   end
@@ -265,7 +265,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   | PlusA, TFloat (fk, _) ->  backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Add
   | MinusA, TFloat (fk, _) -> backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Sub
 
-  | (PlusPI | IndexPI), TPtr _ -> backward_add_ptr typ ~res_value ~v1 ~v2 true
+  | PlusPI, TPtr _ -> backward_add_ptr typ ~res_value ~v1 ~v2 true
   | MinusPI, TPtr _ ->            backward_add_ptr typ ~res_value ~v1 ~v2 false
 
   | MinusPP, TInt _ ->
@@ -276,7 +276,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
 
   (* comparison operators *)
   | (Eq | Ne | Le | Lt | Ge | Gt), _ -> begin
-      let binop = Value_util.conv_comp binop in
+      let binop = Eva_utils.conv_comp binop in
       match V.is_included V.singleton_zero res_value,
             V.is_included V.singleton_one  res_value with
       | true, true  ->
@@ -372,7 +372,7 @@ let downcast_enabled ~ik_src ~ik_dst =
     Kernel.SignedDowncast.get () ||
     (* In this case, -eva-warn-signed-converted-downcast behaves exactly
        as -warn-signed-downcast *)
-    (Cil.isSigned ik_src && Value_parameters.WarnSignedConvertedDowncast.get ())
+    (Cil.isSigned ik_src && Parameters.WarnSignedConvertedDowncast.get ())
   else Kernel.UnsignedDowncast.get ()
 
 (* see .mli *)

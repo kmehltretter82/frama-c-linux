@@ -22,9 +22,9 @@ CPPFLAGS    += \
 
 ## General flags
 FCFLAGS     += \
-  -json-compilation-database ../compile_commands.json \
+  -json-compilation-database ./compile_commands.json \
   -main eva_main \
-  -add-symbolic-path=..:. \
+  -add-symbolic-path=.:. \
   -kernel-warn-key annot:missing-spec=abort \
   -kernel-warn-key typing:implicit-function-declaration=abort \
 
@@ -44,11 +44,11 @@ TARGETS = fc_script_main.eva
 ### Each target <t>.eva needs a rule <t>.parse with source files as prerequisites
 fc_script_main.parse: \
   fc_stubs.c \
-  ../for-find-fun.c \
-  ../for-find-fun2.c \
-  ../main.c \
-  ../main2.c \
-  ../main3.c \
+  ./for-find-fun.c \
+  ./for-find-fun2.c \
+  ./main.c \
+  ./main2.c \
+  ./main3.c \
 
 ### Epilogue. Do not modify this block. #######################################
 include $(FRAMAC_SHARE)/analysis-scripts/epilogue.mk

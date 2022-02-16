@@ -216,7 +216,7 @@ let value_pretty cas print_ampamp lv s_bytes fmt v =
     else find_typ_assignment candidate_types
   with
   | V.Not_based_on_null -> ()
-  | Not_found -> Value_parameters.result "Unknown size %d for %s" s_bytes lv
+  | Not_found -> Self.result "Unknown size %d for %s" s_bytes lv
 
 
 let value_uninit_pretty cas prampamp lv s fmt = function
@@ -282,8 +282,8 @@ let state_pretty cas fmt m =
                 with
                 | Z.Overflow
                 | Too_large_to_enumerate ->
-                  Value_parameters.warning "base %s too large, \
-                                            will not print it" name
+                  Self.warning "base %s too large, \
+                                will not print it" name
               end
           | _ -> ())
        m
@@ -323,14 +323,14 @@ let pretty_state_as_c_assignments fmt state =
 
 
 let frama_c_dump_assert state _actuals =
-  Value_parameters.result ~current:true "Frama_C_dump_assert_each called:@\n(%a)@\nEnd of Frama_C_dump_assert_each output"
+  Self.result ~current:true "Frama_C_dump_assert_each called:@\n(%a)@\nEnd of Frama_C_dump_assert_each output"
     pretty_state_as_c_assert state;
   Builtins.States [state]
 
 let () = Builtins.register_builtin "Frama_C_dump_assert_each" NoCache frama_c_dump_assert
 
 let frama_c_dump_assignments state _actuals =
-  Value_parameters.result ~current:true "Frama_C_dump_assignment_each called:@\n%a@\nEnd of Frama_C_dump_assignment_each output"
+  Self.result ~current:true "Frama_C_dump_assignment_each called:@\n%a@\nEnd of Frama_C_dump_assignment_each output"
     pretty_state_as_c_assignments state;
   Builtins.States [state]
 

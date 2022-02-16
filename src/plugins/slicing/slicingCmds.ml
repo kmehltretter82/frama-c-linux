@@ -55,6 +55,10 @@ let apply_all ~propagate_to_callers =
 
 let get_select_kf (fvar, _select) = Globals.Functions.get fvar
 
+let get_lval_zone ?(access=Locations.Read) stmt lval =
+  let open Eva.Results in
+  before stmt |> eval_address lval |> as_zone ~access
+
 (** Utilities for [kinstr]. *)
 module Kinstr: sig
   val iter_from_func : (stmt -> unit) -> kernel_function -> unit
@@ -71,17 +75,14 @@ struct
     * i.e. directly means when [ki] is a call,
       it doesn't don't look at the assigns clause of the called function. *)
   let get_rw_zone stmt = (* returns [Zone.t read],[Zone.t written] *)
-    assert (Db.Value.is_computed ());
+    assert (Eva.Analysis.is_computed ());
     let lval_process read_zone stmt lv =
       (* returns [read_zone] joined to [Zone.t read] by [lv], [Zone.t written] by [lv] *)
       (* The modified locations are [looking_for], those address are
          function of [deps]. *)
-      let state = Db.Value.get_stmt_state stmt in
-      let deps, zloc, _exact =
-        !Db.Value.lval_to_zone_with_deps_state
-          state ~deps:(Some read_zone) ~for_writing:true lv
-      in
-      deps, zloc
+      let zloc = get_lval_zone ~access:Locations.Write stmt lv in
+      let deps = Eva.Results.(before stmt |> address_deps lv) in
+      Locations.Zone.join read_zone deps, zloc
     in
     let call_process lv f args _loc =
       (* returns  [Zone.t read] by [lv, f, args], [Zone.t written] by [lv] *)
@@ -184,8 +185,8 @@ let select_entry_point_and_some_inputs_outputs set ~mark kf ~return ~outputs ~in
       add_to_selection set selection
   in if ((Locations.Zone.equal Locations.Zone.bottom outputs) && not return) ||
         (try
-           let ki = Kernel_function.find_return kf
-           in if Db.Value.is_reachable_stmt ki then
+           let stmt = Kernel_function.find_return kf
+           in if Eva.Results.is_reachable stmt then
              false
            else
              begin
@@ -210,8 +211,8 @@ let select_entry_point_and_some_inputs_outputs set ~mark kf ~return ~outputs ~in
 (* apply [select ~spare] on each callsite of [kf] and add the returned selection
    to [set]. *)
 let generic_select_func_calls select_stmt set ~spare kf =
-  assert (Db.Value.is_computed ());
-  let callers = !Db.Value.callers kf in
+  assert (Eva.Analysis.is_computed ());
+  let callers = Eva.Results.callsites kf in
   let select_calls acc (caller, stmts) =
     List.fold_left (fun acc s -> select_stmt acc ~spare s caller) acc stmts
   in
@@ -245,7 +246,7 @@ let select_func_calls_to set ~spare kf =
         let nspare = not spare in
         SlicingMarks.mk_user_mark ~data:nspare ~addr:nspare ~ctrl:nspare
       in
-      assert (Db.Value.is_computed ());
+      assert (Eva.Analysis.is_computed ());
       let outputs = !Db.Outputs.get_external kf in
       select_entry_point_and_some_inputs_outputs set ~mark kf
         ~return:true
@@ -308,7 +309,7 @@ let select_stmt_zone set mark zone ~before ki kf =
     or after (c.f. boolean [~before]) the statement [ki].
     Note: add also a transparent selection on the whole statement. *)
 let select_stmt_lval set mark lval_str ~before ki ~eval kf =
-  assert (Db.Value.is_computed ());
+  assert (Eva.Analysis.is_computed ());
   if Datatype.String.Set.is_empty lval_str
   then set
   else
@@ -319,11 +320,7 @@ let select_stmt_lval set mark lval_str ~before ki ~eval kf =
            let lval =
              !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term
            in
-           let state = Db.Value.get_stmt_state eval in
-           let _deps, zone, _exact =
-             !Db.Value.lval_to_zone_with_deps_state
-               ~deps:None ~for_writing:false state lval
-           in
+           let zone = get_lval_zone eval lval in
            Locations.Zone.join zone acc)
         lval_str
         Locations.Zone.bottom
@@ -342,7 +339,7 @@ let select_stmt_lval set mark lval_str ~before ki ~eval kf =
       i.e. when [ki_opt] is a call, the selection doesn't look at the assigns clause
       of a call. *)
 let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
-  assert (Db.Value.is_computed ());
+  assert (Eva.Analysis.is_computed ());
   let zone_option ~for_writing lval_str =
     if Datatype.String.Set.is_empty lval_str
     then None
@@ -352,11 +349,8 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
           (fun lval_str acc ->
              let lval_term = !Db.Properties.Interp.term_lval kf lval_str in
              let lval = !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term in
-             let state = Db.Value.get_stmt_state eval in
-             let _deps, zone, _exact =
-               !Db.Value.lval_to_zone_with_deps_state
-                 state ~for_writing ~deps:None lval
-             in
+             let access = if for_writing then Locations.Write else Locations.Read in
+             let zone = get_lval_zone ~access eval lval in
              Locations.Zone.join zone acc)
           lval_str Locations.Zone.bottom
       in SlicingParameters.debug ~level:3
@@ -389,7 +383,7 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
         | None ->
           Globals.Functions.iter
             (fun kf ->
-               if !Db.Value.is_called kf then
+               if Eva.Results.is_called kf then
                  if not (!Db.Value.use_spec_instead_of_definition kf)
                  then (* Called function with source code: just looks at its stmt *)
                    Kinstr.iter_from_func (select_rw_from_stmt kf) kf
@@ -413,7 +407,7 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
                          ~return:false ~inputs ~outputs:Locations.Zone.bottom
 
                    in
-                   assert (!Db.Value.is_called kf) ; (* otherwise [!Db.Outputs.get_external kf] gives weird results *)
+                   assert (Eva.Results.is_called kf) ; (* otherwise [!Db.Outputs.get_external kf] gives weird results *)
                    select_inter_zone select_wr zone_wr_opt (!Db.Outputs.get_external kf) ;
                    select_inter_zone select_rd zone_rd_opt (!Db.Inputs.get_external kf)
                  end

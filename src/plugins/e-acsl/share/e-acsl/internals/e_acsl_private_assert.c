@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -30,14 +30,6 @@
 #include "e_acsl_trace.h"
 
 #include "e_acsl_private_assert.h"
-
-#define prepend_file_line(file, line, fmt)                                     \
-  do {                                                                         \
-    char *afmt = "%s:%d: %s\n";                                                \
-    char buf[strlen(fmt) + strlen(afmt) + PATH_MAX + 11];                      \
-    rtl_sprintf(buf, afmt, file, line, fmt);                                   \
-    fmt = buf;                                                                 \
-  } while (0)
 
 void raise_abort(const char *file, int line) {
 #ifdef E_ACSL_DEBUG
@@ -69,7 +61,7 @@ void private_assert_fail(int expr, const char *file, int line, char *fmt, ...) {
   if (!expr) {
     char *afmt = "%s:%d: %s";
     char buf[strlen(fmt) + strlen(afmt) + PATH_MAX + 11];
-    rtl_sprintf(buf, afmt, file, line, fmt);
+    rtl_snprintf(buf, sizeof(buf), afmt, file, line, fmt);
     fmt = buf;
 
     va_list va;

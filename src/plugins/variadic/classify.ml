@@ -35,7 +35,7 @@ let find_function env s =
   try
     Some (Environment.find_function env s)
   with Not_found ->
-    Self.warning
+    Self.warning ~wkey:wkey_libc_framac
       "Unable to locate function %s which should be in the Frama-C LibC."
       s;
     None
@@ -56,7 +56,7 @@ let mk_aggregator env fun_name a_pos pname a_type =
       (* Check that pos is a valid position in the list *)
       assert (a_pos >= 0);
       if a_pos >= List.length params then begin
-        Self.warning ~current:true
+        Self.warning ~current:true ~wkey:wkey_libc
           "The standard function %s should have at least %d parameters."
           fun_name
           (a_pos + 1);
@@ -66,10 +66,10 @@ let mk_aggregator env fun_name a_pos pname a_type =
       (* Get the aggregate type of elements *)
       let _,ptyp,_ = List.nth params a_pos in
       let a_param = pname, match ptyp with
-        | TArray (typ,_,_,_)
+        | TArray (typ,_,_)
         | TPtr (typ, _) -> typ
         | _ ->
-          Self.warning ~current:true
+          Self.warning ~current:true ~wkey:wkey_libc
             "The parameter %d of standard function %s should be \
              of array type."
             (a_pos + 1)
@@ -93,7 +93,7 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
   and n_actual_args = List.length (Typ.params vi.vtype) in
   if n_actual_args < n_expected_args then
     begin
-      Self.warning ~current:true
+      Self.warning ~current:true ~wkey:wkey_libc
         "The standard function %s was expected to have at least %d fixed \
          parameters but only has %d.@ \
          No variadic translation will be performed."

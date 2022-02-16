@@ -1,4 +1,4 @@
-[kernel] Parsing tests/spec/unfinished-oneline-acsl-comment.i (no preprocessing)
+[kernel] Parsing unfinished-oneline-acsl-comment.i (no preprocessing)
 [kernel] :0: 
   Invalid C file: should end with a newline:
   Location: between <unknown> and 6:7, before or at token: 

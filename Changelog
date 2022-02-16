@@ -6,10 +6,11 @@
 # Mark "+": change for Frama-C-commits audience (not in html version).        #
 # Mark "*": bug fixed.                                                        #
 # Mark "!": change that can break compatibility with existing development.    #
-# '#nnn'   : BTS entry #nnn                                                   #
-# '#!nnn'  : BTS private entry #nnn                                           #
+# '##nnn'  : Public Gitlab (pub/frama-c) issue
 # '#@nnn'  : Gitlab frama-c/frama-c issue                                     #
 # For compatibility with old change log formats:                              #
+# '#nnn'   : BTS entry #nnn (OBSOLETE)                                        #
+# '#!nnn'  : BTS private entry #nnn  (OBSOLETE)                               #
 # '#?nnn'  : OLD-BTS entry #nnn                                               #
 ###############################################################################
 
@@ -17,10 +18,32 @@
 Open Source Release <next-release>
 ##################################
 
+*   Kernel    [2022-02-08] Reject array whose size is too big with a proper
+              error message instead of a crash (fixes ##2590)
+o!  Kernel    [2022-01-19] Removed obsolete AST nodes IndexPI and Info
+o!  Kernel    [2021-12-03] Remove unused AST node Dcustom_annot and field
+              fpadding_in_bits. Do not cache size of types in the AST but in
+              a dedicated table.
+-*  Logic     [2021-11-30] Fix type of expressions whose value are functions
+o!  Kernel    [2021-11-29] Integer.pretty does not have the optional argument
+              hexa anymore. Use Integer.pretty_hex or Integer.pp_hex if you
+              want to print integers in hexadecimal format.
+
 ###################################
 Open Source Release 24.0 (Chromium)
 ###################################
 
+-*  Eva       [2022-01-19] Always emits alarms about initialization, escaping
+              pointers and special floating-point values for the arguments of
+              calls to functions without body (or whose body is not analyzed),
+              even when -eva-warn-copy-indeterminate is unset.
+-   ACSL      [2021-10-28] better type checks for volatile clauses
+-   Variadic  [2021-10-26] translates printf/scanf calls even if formatting
+              string is not constant, warning that it will assume arguments
+              match the format.
+-   Kernel    [2021-10-26] Support for C11's  _Static_assert
+-   Libc      [2021-10-26] Frama-C's libc #define _STDC_NO_COMPLEX as mandated by
+              ISO C11 for libraries without support for complex numbers
 -   Eva       [2021-10-19] New options to allow states partitioning to survive
               function returns: -eva-interprocedural-split for disjunctions
               from split annotations, and -eva-interprocedural-history for

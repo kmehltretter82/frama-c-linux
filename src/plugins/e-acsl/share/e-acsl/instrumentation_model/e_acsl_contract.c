@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -77,7 +77,7 @@ struct contract_t {
 contract_t *contract_init(size_t size) {
   // Allocate memory for the structure
   contract_t *c = malloc(sizeof(contract_t));
-  DVASSERT(c != NULL, "Unable to allocate %d bytes of memory for contract_t",
+  DVASSERT(c != NULL, "Unable to allocate %d bytes of memory for contract_t\n",
            sizeof(contract_t));
 
   // Compute the number of char needed to store `size` behaviors, assuming
@@ -89,7 +89,7 @@ contract_t *contract_init(size_t size) {
     c->assumes = calloc(c->char_count, sizeof(char));
     DVASSERT(c->assumes != NULL,
              "Unable to allocate %d cells of %d bytes of memory for "
-             "contract_t::assumes",
+             "contract_t::assumes\n",
              c->char_count, sizeof(char));
   } else {
     c->assumes = NULL;
@@ -110,7 +110,7 @@ void contract_clean(contract_t *c) {
 void contract_set_behavior_assumes(contract_t *c, size_t i, int assumes) {
   size_t char_idx = find_char_index(i);
   DVASSERT(char_idx < c->char_count,
-           "Out of bound char index %d (char_count: %d)", char_idx,
+           "Out of bound char index %d (char_count: %d)\n", char_idx,
            c->char_count);
   size_t bit_idx = find_bit_index(i);
   assumes = normalize_to_boolean(assumes);
@@ -121,7 +121,7 @@ void contract_set_behavior_assumes(contract_t *c, size_t i, int assumes) {
 int contract_get_behavior_assumes(const contract_t *c, size_t i) {
   size_t char_idx = find_char_index(i);
   DVASSERT(char_idx < c->char_count,
-           "Out of bound char index %d (char_count: %d)", char_idx,
+           "Out of bound char index %d (char_count: %d)\n", char_idx,
            c->char_count);
   size_t bit_idx = find_bit_index(i);
   int result = c->assumes[char_idx] & (1 << bit_idx);

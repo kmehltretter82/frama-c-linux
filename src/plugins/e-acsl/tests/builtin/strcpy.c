@@ -1,8 +1,10 @@
 /* run.config
-   COMMENT: Test `strcpy` and `strncpy` E-ACSL built-ins
+ COMMENT: Test `strcpy` and `strncpy` E-ACSL built-ins
+ DEPS: @PTESTS_DEPS@ utils/signalled.h
+   STDOPT:
 */
 
-#include "../utils/signalled.h"
+#include "utils/signalled.h"
 #include <stdlib.h>
 #include <string.h>
 

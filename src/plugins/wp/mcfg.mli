@@ -65,9 +65,10 @@ module type S = sig
   val new_env : ?lvars:Cil_types.logic_var list -> kernel_function -> t_env
 
   val add_axiom : WpPropId.prop_id -> LogicUsage.logic_lemma -> unit
-  val add_hyp  : t_env -> WpPropId.pred_info -> t_prop -> t_prop
+  val add_hyp :
+    ?for_pid:WpPropId.prop_id -> t_env -> WpPropId.pred_info -> t_prop -> t_prop
   val add_goal : t_env -> WpPropId.pred_info -> t_prop -> t_prop
-  val add_subgoal : t_env -> WpPropId.pred_info ->
+  val add_subgoal : t_env -> WpPropId.prop_id * 'a -> ?deps:Property.Set.t ->
     predicate -> stmt -> WpPropId.effect_source -> t_prop -> t_prop
 
   val add_assigns : t_env -> WpPropId.assigns_info -> t_prop -> t_prop
@@ -103,9 +104,15 @@ module type S = sig
     pre: WpPropId.pred_info list ->
     t_prop -> t_prop
 
-  val call_terminates : t_env -> WpPropId.pred_info ->
-    stmt -> kernel_function -> exp list ->
-    callee_t:predicate -> t_prop -> t_prop
+  val call_terminates : t_env -> stmt ->
+    kernel_function -> exp list ->
+    WpPropId.pred_info -> ?callee_t:predicate -> t_prop -> t_prop
+
+  val call_decreases : t_env -> stmt ->
+    kernel_function -> exp list ->
+    WpPropId.variant_info ->
+    ?caller_t: predicate ->
+    ?callee_d: variant -> t_prop -> t_prop
 
   val call : t_env -> stmt ->
     lval option -> kernel_function -> exp list ->

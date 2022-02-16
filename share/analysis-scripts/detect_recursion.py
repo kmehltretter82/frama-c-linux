@@ -28,10 +28,6 @@
 import sys
 import build_callgraph
 
-MIN_PYTHON = (3, 5) # for glob(recursive)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 arg = ""
 if len(sys.argv) < 2:
     print(f"usage: {sys.argv[0]} [file1 file2 ...]")

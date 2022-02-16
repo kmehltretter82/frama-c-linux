@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -39,10 +39,10 @@ uint32_t origin_timestamp(void *ptr) {
 uintptr_t temporal_referent_shadow(void *ptr) {
   bt_block *blk = bt_find(ptr);
   private_assert(blk != NULL,
-                 "referent timestamp on unallocated memory address %a",
+                 "referent timestamp on unallocated memory address %a\n",
                  (uintptr_t)ptr);
   private_assert(blk->temporal_shadow != NULL,
-                 "no temporal shadow of block with base address",
+                 "no temporal shadow of block with base address\n",
                  (uintptr_t)blk->ptr);
   return (uintptr_t)blk->temporal_shadow + eacsl_offset(ptr);
 }

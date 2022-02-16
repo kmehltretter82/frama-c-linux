@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -50,6 +50,7 @@ void eacsl_print_values(eacsl_assert_data_t *data) {
 void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
   if (eacsl_runtime_sound_verdict) {
     if (!predicate) {
+      RTL_IO_LOCK();
       // clang-format off
       STDERR("%s: In function '%s'\n"
              "%s:%d: Error: %s failed:\n"
@@ -60,6 +61,7 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
              data->pred_txt);
       // clang-format on
       eacsl_print_values(data);
+      RTL_IO_UNLOCK();
       if (data->blocking) {
 #  ifndef E_ACSL_NO_ASSERT_FAIL /* Do fail on assertions */
 #    ifdef E_ACSL_FAIL_EXITCODE /* Fail by exit with a given code */
@@ -72,6 +74,7 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
     }
 #  ifdef E_ACSL_DEBUG_ASSERT
     else {
+      RTL_IO_LOCK();
       // clang-format off
       STDERR("%s: In function '%s'\n"
              "%s:%d: %s valid:\n"
@@ -81,9 +84,11 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
              data->pred_txt);
       // clang-format on
       eacsl_print_values(data);
+      RTL_IO_UNLOCK();
     }
 #  endif
   } else {
+    RTL_IO_LOCK();
     // clang-format off
     STDERR("%s: In function '%s'\n"
            "%s:%d: Warning: no sound verdict for %s (guess: %s).\n"
@@ -94,6 +99,7 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
            data->pred_txt);
     // clang-format on
     eacsl_print_values(data);
+    RTL_IO_UNLOCK();
   }
 }
 #endif

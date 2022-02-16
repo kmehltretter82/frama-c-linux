@@ -1,29 +1,10 @@
-## Ivette
+## Dome
 
-Main entry points:
-- [frama-c/server](modules/frama_c_server.html) Frama-C Server interaction (low level)
-- [frama-c/states](modules/frama_c_states.html) high-level request management
-
-## Command Line
-
-The following options are recognized by `./bin/frama-c-gui`:
-
-- `--cwd` working directory of Frama-C server
-- `--command` path to Frama-C binary
-- `--socket` ZeroMQ socket address of the server
-
-The default working directory is the current one.
-The default command is the local `bin/frama-c` of source installation.
-The default socket is `ipc:///.frama-c.<pid>.io`.
-
-## Dome Guides
-
-- [Dome Framework](guides/dome.md.html)
-- [Quick Start](guides/quickstart.md.html)
-- [Live Editing](guides/hotreload.md.html)
-- [Application Design](guides/application.md.html)
-- [Application Development](guides/development.md.html)
-- [Styling Components](guides/styling.md.html)
-- [Custom Hooks](guides/hooks.md.html)
-- [Icon Gallery](guides/icons.md.html)
-- [Glossary](guides/glossary.md.html)
+- [Dome Framework](src/dome/doc/guides/dome.md)
+- [Quick Start](src/dome/doc/guides/quickstart.md)
+- [Live Editing](src/dome/doc/guides/hotreload.md)
+- [Application Design](src/dome/doc/guides/guides/application.md)
+- [Application Development](src/dome/doc/guides/development.md)
+- [Styling Components](src/dome/doc/guides/styling.md)
+- [Custom Hooks](src/dome/doc/guides/hooks.md)
+- [Glossary](src/dome/doc/guides/glossary.md)

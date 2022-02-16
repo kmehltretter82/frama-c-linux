@@ -14,9 +14,21 @@
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT_OCTAL"
    STDOPT: #"-cpp-extra-args=-DEVA_UNROLL -eva -kernel-warn-key annot-error=error"
    STDOPT: #"-cpp-extra-args=-DCABS_DOWHILE"
+   STDOPT: #"-cpp-extra-args=-DARRAY_INIT1"
+   STDOPT: #"-cpp-extra-args=-DARRAY_INIT2"
+   STDOPT: #"-cpp-extra-args=-DARRAY_INIT3"
+   STDOPT: #"-cpp-extra-args=-DARRAY_INIT4"
    EXIT: 0
    STDOPT: #"-cpp-extra-args=-DUNROLL_PRAGMA"
 */
+
+
+
+
+
+
+
+// Lines intentionally left blank to minimize future oracle changes
 
 volatile int nondet;
 #ifdef BITFIELD
@@ -83,6 +95,32 @@ typedef struct {
 
 #ifdef LOGIC_CONSTANT_OCTAL
 //@ type too_large_logic_array_octal = int[09876543210];
+#endif
+
+#ifdef ARRAY_INIT1
+// Previously caused Invalid_argument(Array.make)
+int a1[] = {[72057594037927936] = 0};
+#endif
+
+#ifdef ARRAY_INIT2
+struct arri2 {
+  int a[7205759403792795];
+};
+struct st {
+  struct arri2 a;
+};
+// Previously caused Out of memory
+struct st s = {
+  {{[7205759403792793 ... 7205759403792793] = 0}}
+};
+#endif
+
+#ifdef ARRAY_INIT3
+int ai3[] = {0xdead, [72057594037927936] = 0xbeef};
+#endif
+#ifdef ARRAY_INIT4
+// Previously caused Out of memory
+int ai4[] = {1, [7205759403792793] = 11};
 #endif
 
 int main() {

@@ -131,12 +131,12 @@ let cast_arg i paramtyp exp =
       | Strict | Tolerated -> ()
       | (NonPortable | NonStrict) when not (Strict.get ()) -> ()
       | NonPortable ->
-        Self.warning ~current:true
+        Self.warning ~current:true ~wkey:wkey_typing
           "Possible portability issues with enum type for argument %d \
            (use -variadic-no-strict to avoid this warning)."
           (i + 1)
       | NonStrict | Never ->
-        Self.warning ~current:true
+        Self.warning ~current:true ~wkey:wkey_typing
           "Incorrect type for argument %d. \
            The argument will be cast from %a to %a."
           (i + 1)
@@ -151,12 +151,12 @@ let match_args ~callee tparams args =
   let paramcount = List.length tparams
   and argcount = List.length args in
   if argcount > paramcount  then
-    Self.warning ~current:true
+    Self.warning ~current:true ~wkey:wkey_typing
       "Too many arguments: expected %d, given %d. \
        Superfluous arguments will be removed."
       paramcount argcount
   else if argcount < paramcount then (
-    Self.warning ~current:true
+    Self.warning ~current:true ~wkey:wkey_typing
       "Not enough arguments: expected %d, given %d."
       paramcount argcount;
     raise (Translate_call_exn callee)
@@ -255,7 +255,7 @@ let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
   let argcount = List.length args
   and paramcount = List.length tparams in
   if argcount < paramcount then begin
-    Self.warning ~current:true
+    Self.warning ~current:true ~wkey:wkey_typing
       "Not enough arguments: expected %d, given %d."
       paramcount argcount;
     raise (Translate_call_exn vf.vf_decl);
@@ -345,7 +345,7 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
   let tparams, new_callee =
     match filter_matching_prototypes overload args with
     | [] -> (* No matching prototype *)
-      Self.warning ~current:true
+      Self.warning ~current:true ~wkey:wkey_prototype
         "@[No matching prototype found for this call to %s.@.\
          Expected candidates:@.\
          @[<v>       %a@]@.\
@@ -357,7 +357,7 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
     | [(tparams,vi)] -> (* Exactly one matching prototype *)
       tparams, vi
     | l -> (* Several matching prototypes *)
-      Self.warning ~current:true
+      Self.warning ~current:true ~wkey:wkey_prototype
         "Ambiguous call to %s. Matching candidates are: \
          %a"
         name
@@ -392,7 +392,7 @@ let find_global env name =
   try
     Some (Environment.find_global env name)
   with Not_found ->
-    Self.warning ~once:true
+    Self.warning ~once:true ~wkey:wkey_libc_framac
       "Unable to locate global %s which should be in the Frama-C LibC. \
        Correct specifications can't be generated."
       name;
@@ -402,7 +402,7 @@ let find_predicate name =
   match Logic_env.find_all_logic_functions name with
   | f :: _q -> f (* TODO: should we warn in case of overloading? *)
   | [] ->
-    Self.warning ~once:true
+    Self.warning ~once:true ~wkey:wkey_libc_framac
       "Unable to locate ACSL predicate %s which should be in the Frama-C LibC. \
        Correct specifications can't be generated."
       name;
@@ -428,7 +428,7 @@ let find_predicate_by_width typ narrow_name wide_name =
         Cil.theMachine.Cil.wcharType ->
     find_predicate wide_name
   | _ ->
-    Self.warning ~current:true
+    Self.warning ~current:true ~wkey:wkey_typing
       "expected single/wide character pointer type, got %a (%a, unrolled %a)"
       Printer.pp_typ typ Cil_types_debug.pp_typ typ Cil_types_debug.pp_typ (Cil.unrollTypeDeep typ);
     raise Not_found
@@ -705,7 +705,7 @@ let infer_format_from_args vf format_fun args =
       | ScanfLike ->
         if not (Cil.isPointerType t) then begin
           let source = fst arg.eloc in
-          Self.warning ~source
+          Self.warning ~source ~wkey:wkey_typing
             "Expecting pointer as parameter of scanf function. \
              Argument %a has type %a"
             Printer.pp_exp arg Printer.pp_typ t;

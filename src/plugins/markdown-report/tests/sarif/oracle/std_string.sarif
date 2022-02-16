@@ -16,34 +16,25 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report tests/sarif/std_string.c -eva -then -mdr-sarif-deterministic -mdr-gen sarif -mdr-out tests/sarif/result/std_string.sarif",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report std_string.c -eva -then -mdr-sarif-deterministic -mdr-gen sarif -mdr-out ./std_string.sarif",
           "arguments": [
             "-journal-disable", "-check", "-no-autoload-plugins",
-            "-load-module=eva,from,scope,markdown_report",
-            "tests/sarif/std_string.c", "-eva", "-then",
-            "-mdr-sarif-deterministic", "-mdr-gen", "sarif", "-mdr-out",
-            "tests/sarif/result/std_string.sarif"
+            "-add-symbolic-path", ":.",
+            "-load-module=eva,from,scope,markdown_report", "std_string.c",
+            "-eva", "-then", "-mdr-sarif-deterministic", "-mdr-gen", "sarif",
+            "-mdr-out", "./std_string.sarif"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         }
       ],
       "originalUriBaseIds": {
-        "FRAMAC_SHARE": {
-          "uri": "file:///omitted-for-deterministic-output/"
-        },
-        "FRAMAC_LIB": { "uri": "file:///omitted-for-deterministic-output/" },
-        "FRAMAC_PLUGIN": {
-          "uri": "file:///omitted-for-deterministic-output/"
-        },
+        ".": { "uri": "file:///omitted-for-deterministic-output/" },
         "PWD": { "uri": "file:///omitted-for-deterministic-output/" }
       },
       "artifacts": [
         {
-          "location": {
-            "uri": "tests/sarif/std_string.c",
-            "uriBaseId": "PWD"
-          },
+          "location": { "uri": "std_string.c", "uriBaseId": "PWD" },
           "roles": [ "analysisTarget" ],
           "mimeType": "text/x-csrc"
         }
@@ -11285,9 +11276,9 @@
                   "uriBaseId": "FRAMAC_SHARE"
                 },
                 "region": {
-                  "startLine": 700,
+                  "startLine": 701,
                   "startColumn": 11,
-                  "endLine": 700,
+                  "endLine": 701,
                   "endColumn": 18,
                   "byteLength": 7
                 }
@@ -11322,6 +11313,29 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
+          "message": { "text": "template_len." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 695,
+                  "startColumn": 25,
+                  "endLine": 695,
+                  "endColumn": 45,
+                  "byteLength": 20
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
           "message": { "text": "result_error_or_valid_fd." },
           "locations": [
             {
@@ -11331,9 +11345,9 @@
                   "uriBaseId": "FRAMAC_SHARE"
                 },
                 "region": {
-                  "startLine": 697,
+                  "startLine": 698,
                   "startColumn": 36,
-                  "endLine": 698,
+                  "endLine": 699,
                   "endColumn": 53,
                   "byteLength": 70
                 }
@@ -11354,9 +11368,9 @@
                   "uriBaseId": "FRAMAC_SHARE"
                 },
                 "region": {
-                  "startLine": 695,
+                  "startLine": 696,
                   "startColumn": 10,
-                  "endLine": 695,
+                  "endLine": 696,
                   "endColumn": 22,
                   "byteLength": 12
                 }
@@ -11380,9 +11394,9 @@
                   "uriBaseId": "FRAMAC_SHARE"
                 },
                 "region": {
-                  "startLine": 695,
+                  "startLine": 696,
                   "startColumn": 10,
-                  "endLine": 695,
+                  "endLine": 696,
                   "endColumn": 22,
                   "byteLength": 12
                 }
@@ -11405,9 +11419,198 @@
                   "uriBaseId": "FRAMAC_SHARE"
                 },
                 "region": {
-                  "startLine": 696,
+                  "startLine": 697,
                   "startColumn": 10,
-                  "endLine": 696,
+                  "endLine": 697,
+                  "endColumn": 17,
+                  "byteLength": 7
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "behavior default! in function mkstemps." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 714,
+                  "startColumn": 11,
+                  "endLine": 714,
+                  "endColumn": 19,
+                  "byteLength": 8
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "valid_template." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 706,
+                  "startColumn": 27,
+                  "endLine": 706,
+                  "endColumn": 48,
+                  "byteLength": 21
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "template_len." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 707,
+                  "startColumn": 25,
+                  "endLine": 707,
+                  "endColumn": 57,
+                  "byteLength": 32
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "non_negative_suffixlen." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 708,
+                  "startColumn": 35,
+                  "endLine": 708,
+                  "endColumn": 49,
+                  "byteLength": 14
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "result_error_or_valid_fd." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 711,
+                  "startColumn": 36,
+                  "endLine": 712,
+                  "endColumn": 53,
+                  "byteLength": 70
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "assigns clause in function mkstemps." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 709,
+                  "startColumn": 10,
+                  "endLine": 709,
+                  "endColumn": 22,
+                  "byteLength": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text":
+              "from clause of term *(templat + (0 ..)) in function mkstemps."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 709,
+                  "startColumn": 10,
+                  "endLine": 709,
+                  "endColumn": 22,
+                  "byteLength": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term \\result in function mkstemps."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 710,
+                  "startColumn": 10,
+                  "endLine": 710,
                   "endColumn": 17,
                   "byteLength": 7
                 }

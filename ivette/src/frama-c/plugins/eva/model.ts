@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Eva Values
 // --------------------------------------------------------------------------
@@ -36,12 +38,15 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 // Model
 import { Probe } from './probes';
 import { StacksCache, Callsite } from './stacks';
-import { ModelCallbacks, ValueCache, EvaState } from './cells';
+import { ModelCallbacks, ValueCache } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
 export interface ModelLayout extends LayoutProps {
   location?: States.Location;
 }
+
+export type EvalStmt = 'Before' | 'After';
+export type EvalCond = 'Cond' | 'Then' | 'Else';
 
 /* --------------------------------------------------------------------------*/
 /* --- EVA Values Model                                                   ---*/
@@ -64,14 +69,15 @@ export class Model implements ModelCallbacks {
 
   // --- Probes
 
-  private vstmt: EvaState = 'After';
-  private vcond: EvaState = 'Here';
+  private vstmt: EvalStmt = 'Before';
+  private vcond: EvalCond = 'Cond';
   private selected?: Probe;
   private focused?: Probe;
   private callstack?: Values.callstack;
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
   private folded = new Map<string, boolean>(); // folded functions
+  private byCallstacks = new Map<string, boolean>();
 
   getFocused() { return this.focused; }
   isFocused(p: Probe | undefined) { return this.focused === p; }
@@ -91,14 +97,31 @@ export class Model implements ModelCallbacks {
     return undefined;
   }
 
+  addProbe(location: States.Location) {
+    const { fct, marker } = location;
+    if (fct && marker) {
+      const probe = new Probe(this, fct, marker);
+      probe.setPersistent();
+      probe.requestProbeInfo();
+      this.probes.set(marker, probe);
+      this.forceLayout();
+    }
+  }
+
+  removeProbe(probe: Probe) {
+    probe.setTransient();
+    if (this.selected === probe)
+      this.clearSelection();
+  }
+
   getStacks(p: Probe | undefined): Values.callstack[] {
     return p ? this.stacks.getStacks(p.marker) : [];
   }
 
-  getVstmt(): EvaState { return this.vstmt; }
-  getVcond(): EvaState { return this.vcond; }
-  setVstmt(s: EvaState) { this.vstmt = s; this.forceUpdate(); }
-  setVcond(s: EvaState) { this.vcond = s; this.forceUpdate(); }
+  getVstmt(): EvalStmt { return this.vstmt; }
+  getVcond(): EvalCond { return this.vcond; }
+  setVstmt(s: EvalStmt) { this.vstmt = s; this.forceUpdate(); }
+  setVcond(s: EvalCond) { this.vcond = s; this.forceUpdate(); }
 
   isFolded(fct: string): boolean {
     return (this.focused?.fct !== fct) && (this.folded.get(fct) ?? false);
@@ -111,6 +134,28 @@ export class Model implements ModelCallbacks {
   setFolded(fct: string, folded: boolean) {
     this.folded.set(fct, folded);
     this.forceLayout();
+  }
+
+  isByCallstacks(fct: string): boolean {
+    return this.byCallstacks.get(fct) ?? false;
+  }
+
+  setByCallstacks(fct: string, b: boolean) {
+    this.byCallstacks.set(fct, b);
+    this.forceLayout();
+  }
+
+  clearFunction(fct: string) {
+    let selected = false;
+    this.probes.forEach((p) => {
+      if (p.fct === fct) {
+        p.setTransient();
+        if (this.selected === p)
+          selected = true;
+      }
+    });
+    if (selected)
+      this.clearSelection();
   }
 
   // --- Caches
@@ -151,7 +196,7 @@ export class Model implements ModelCallbacks {
   }
 
   isSelectedRow(row: Row): boolean {
-    if (!this.focused?.byCallstacks) return false;
+    if (!this.byCallstacks) return false;
     const cs = this.callstack;
     return cs !== undefined && cs === row.callstack;
   }
@@ -182,14 +227,8 @@ export class Model implements ModelCallbacks {
 
   metaSelection(location: States.Location) {
     const p = this.getProbe(location);
-    if (p) {
-      if (p.transient) {
-        if (this.focused?.byCallstacks)
-          p.setByCallstacks(true);
-        else
-          p.setPersistent();
-      }
-    }
+    if (p && p.transient)
+      p.setPersistent();
   }
 
   clearSelection() {
@@ -228,7 +267,7 @@ export class Model implements ModelCallbacks {
       this.stacks,
       this.isFolded,
     );
-    this.rows = engine.layout(toLayout);
+    this.rows = engine.layout(toLayout, this.byCallstacks);
     this.laidout.emit();
     this.lock = false;
   }
@@ -272,26 +311,6 @@ export class Model implements ModelCallbacks {
 
 }
 
-// --------------------------------------------------------------------------
-// --- EVA Model Hook
-// --------------------------------------------------------------------------
-
-let MODEL: Model | undefined;
-
-Server.onShutdown(() => {
-  if (MODEL) {
-    MODEL.unmount();
-    MODEL = undefined;
-  }
-});
-
-export function useModel(): Model {
-  if (!MODEL) {
-    MODEL = new Model();
-    MODEL.mount();
-  }
-  Dome.useUpdate(MODEL.changed, MODEL.laidout);
-  return MODEL;
+export interface ModelProp {
+  model: Model;
 }
-
-// --------------------------------------------------------------------------

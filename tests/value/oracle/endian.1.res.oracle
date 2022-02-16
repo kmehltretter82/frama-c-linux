@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/endian.i (no preprocessing)
+[kernel] Parsing endian.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,11 +7,11 @@
   UU ∈ {0}
   undet ∈ [--..--]
 [eva] computing for function main0 <- main.
-  Called from tests/value/endian.i:101.
+  Called from endian.i:101.
 [eva] Recording results for main0
 [eva] Done for function main0
 [eva] computing for function interpret_bits <- main.
-  Called from tests/value/endian.i:102.
+  Called from endian.i:102.
 [eva] Recording results for interpret_bits
 [eva] Done for function interpret_bits
 [eva] Recording results for main

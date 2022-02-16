@@ -48,7 +48,7 @@ let ftau = function
 let ft_suffix = function Float32 -> "f32" | Float64 -> "f64"
 let pp_suffix fmt ft = Format.pp_print_string fmt (ft_suffix ft)
 
-let link phi = Lang.infoprover (Qed.Engine.F_call phi)
+let link phi = Qed.Engine.F_call phi
 
 (* Qed exact representations, linked to f32/f64 *)
 let fq32 = extern_f ~library ~result:t32 ~link:(link "to_f32") "q32"

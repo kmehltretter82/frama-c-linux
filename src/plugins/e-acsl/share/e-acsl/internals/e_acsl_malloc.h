@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -28,7 +28,7 @@
  * is split into two mspaces (memory spaces). Memory allocation itself is
  * delegated to a slightly customised version of dlmalloc shipped with the
  * RTL. The overall pattern is as follows:
- *    mspace space = eacsl_create_mspace(capacity, locks);
+ *    mspace space = eacsl_create_locked_mspace(capacity);
  *    char *p = eacsl_mspace_malloc(space, size);
  **************************************************************************/
 
@@ -44,9 +44,9 @@
 #define KB        (1024)      //!< Bytes in a kilobyte
 #define MB        (1024 * KB) //!< Bytes in a megabyte
 #define GB        (1024 * MB) //!< Bytes in a gigabyte
-#define KB_SZ(_s) (_s / KB)   //!< Convert bytes to kilobytes
-#define MB_SZ(_s) (_s / MB)   //!< Convert bytes to megabytes
-#define GB_SZ(_s) (_s / GB)   //!< Convert bytes to gigabytes
+#define KB_SZ(_s) ((_s) / KB) //!< Convert bytes to kilobytes
+#define MB_SZ(_s) ((_s) / MB) //!< Convert bytes to megabytes
+#define GB_SZ(_s) ((_s) / GB) //!< Convert bytes to gigabytes
 
 /************************************************************************/
 /*** Mspace initialization {{{ ***/
@@ -70,7 +70,7 @@ void eacsl_destroy_memory_spaces();
 /*** Mspace allocators (from dlmalloc) {{{ ***/
 /************************************************************************/
 
-#define eacsl_create_mspace         export_alias(create_mspace)
+#define eacsl_create_locked_mspace  export_alias(create_locked_mspace)
 #define eacsl_destroy_mspace        export_alias(destroy_mspace)
 #define eacsl_mspace_least_addr     export_alias(mspace_least_addr)
 #define eacsl_mspace_malloc         export_alias(mspace_malloc)
@@ -85,13 +85,15 @@ typedef void *mspace;
 struct memory_spaces {
   mspace rtl_mspace;           /* `private` (RTL) mspace */
   mspace heap_mspace;          /* `public` (application) mspace */
+  uintptr_t rtl_start;         /* least address in RTL mspace */
+  uintptr_t rtl_end;           /* greatest address in RTL mspace */
   uintptr_t heap_start;        /* least address in application mspace */
   uintptr_t heap_end;          /* greatest address in application mspace */
   uintptr_t heap_mspace_least; /* Initial least address in heap mspace */
 };
 extern struct memory_spaces mem_spaces;
 
-extern mspace eacsl_create_mspace(size_t, int);
+/* Original functions from dlmalloc */
 extern size_t eacsl_destroy_mspace(mspace);
 extern void *eacsl_mspace_malloc(mspace, size_t);
 extern void eacsl_mspace_free(mspace, void *);
@@ -100,6 +102,10 @@ extern void *eacsl_mspace_realloc(mspace msp, void *, size_t);
 extern void *eacsl_mspace_aligned_alloc(mspace, size_t, size_t);
 extern int eacsl_mspace_posix_memalign(mspace, void **, size_t, size_t);
 extern void *eacsl_mspace_least_addr(mspace);
+
+/*! \brief Wrapper around `eacsl_create_mspace` to always create a thread-safe
+ *  mspace. */
+mspace eacsl_create_locked_mspace(size_t size);
 
 /* }}} */
 

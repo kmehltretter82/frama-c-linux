@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -20,11 +20,15 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "../../instrumentation_model/e_acsl_temporal_timestamp.h"
 #include "../../internals/e_acsl_bits.h"
+#include "../../internals/e_acsl_rtl_error.h"
 #include "../../internals/e_acsl_rtl_string.h"
 #include "../internals/e_acsl_omodel_debug.h"
 #include "e_acsl_shadow_layout.h"
@@ -222,7 +226,7 @@ void validate_shadow_layout() {
         uintptr_t *dest = segments[j];
         const char *dest_name = segment_names[j];
         DVASSERT(src[1] < dest[0] || src[0] > dest[1],
-                 "Segment %s [%a, %a] overlaps with segment %s [%a, %a]",
+                 "Segment %s [%a, %a] overlaps with segment %s [%a, %a]\n",
                  src_name, src[0], src[1], dest_name, dest[0], dest[1]);
       }
     }
@@ -413,7 +417,7 @@ uintptr_t static_info(uintptr_t addr, char type) {
       case 'L': /* Length */
         return sec_shadow[0];
       default:
-        DASSERT(0 && "Unknown static query type");
+        DVABORT("Unknown static query type\n");
       }
     } else {
       switch (type) {
@@ -424,7 +428,7 @@ uintptr_t static_info(uintptr_t addr, char type) {
       case 'L': /* Length */
         return short_lengths[code];
       default:
-        DASSERT(0 && "Unknown static query type");
+        DVABORT("Unknown static query type\n");
       }
     }
   }
@@ -583,8 +587,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
   }
 }
 
-void *malloc(size_t size) {
-
+void *unsafe_malloc(size_t size) {
   size_t alloc_size = ALLOC_SIZE(size);
 
   /* Return NULL if the size is too large to be aligned */
@@ -603,7 +606,7 @@ void *malloc(size_t size) {
   return res;
 }
 
-void *calloc(size_t nmemb, size_t size) {
+void *unsafe_calloc(size_t nmemb, size_t size) {
   /* Since both `nmemb` and `size` are both of size `size_t` the multiplication
    * of the arguments (which gives the actual allocation size) might lead to an
    * integer overflow. The below code checks for an overflow and sets the
@@ -630,7 +633,7 @@ void *calloc(size_t nmemb, size_t size) {
 }
 
 void *shadow_copy(const void *ptr, size_t size, int init) {
-  char *ret = (init) ? calloc(1, size) : malloc(size);
+  char *ret = (init) ? unsafe_calloc(1, size) : unsafe_malloc(size);
   private_assert(ret != NULL, "Shadow copy failed\n", NULL);
   /* Shadow copy is internal, therefore heap status should not be updated.
      Since it is set via `set_heap_segment`, it needs to be reverted back. */
@@ -677,7 +680,7 @@ static void unset_heap_segment(void *ptr, int init, const char *function) {
   }
 }
 
-void free(void *ptr) {
+void unsafe_free(void *ptr) {
   if (ptr == NULL) {
 /* Fail if instructed to treat NULL input to free as invalid. */
 #ifdef E_ACSL_FREE_VALID_ADDRESS
@@ -687,7 +690,7 @@ void free(void *ptr) {
   }
 
   if (ptr != NULL) { /* NULL is a valid behaviour */
-    if (eacsl_freeable(ptr)) {
+    if (unsafe_freeable(ptr)) {
       unset_heap_segment(ptr, 1, "free");
       public_free(ptr);
     } else {
@@ -698,17 +701,17 @@ void free(void *ptr) {
 /* }}} */
 
 /* Heap reallocation (realloc) {{{ */
-void *realloc(void *ptr, size_t size) {
+void *unsafe_realloc(void *ptr, size_t size) {
   char *res = NULL; /* Resulting pointer */
   /* If the pointer is NULL then realloc is equivalent to malloc(size) */
   if (ptr == NULL)
-    return malloc(size);
+    return unsafe_malloc(size);
   /* If the pointer is not NULL and the size is zero then realloc is
    * equivalent to free(ptr) */
   else if (ptr != NULL && size == 0) {
-    free(ptr);
+    unsafe_free(ptr);
   } else {
-    if (eacsl_freeable(ptr)) { /* ... and can be used as an input to `free` */
+    if (unsafe_freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
       res = public_realloc(ptr, alloc_size);
       DVALIDATE_ALIGNMENT(res);
@@ -767,7 +770,8 @@ void *realloc(void *ptr, size_t size) {
           DVASSERT(
               keep_bytes <= alloc_size / 8 && keep_bytes < old_alloc_size / 8,
               "Attempt to access out of bound init shadow. Accessing %lu bytes, \
-            old init shadow size: %lu bytes, new init shadow size: %lu bytes.",
+            old init shadow size: %lu bytes, new init shadow size: %lu \
+            bytes.\n",
               keep_bytes, old_alloc_size / 8, alloc_size / 8);
           memcpy(new_init_shadow, old_init_shadow, keep_bytes);
           memset(old_init_shadow, 0, old_alloc_size / 8);
@@ -784,7 +788,7 @@ void *realloc(void *ptr, size_t size) {
             DVASSERT(
                 idx < alloc_size / 8,
                 "Attempt to access out of bound init shadow. Accessing index %lu \
-              with init shadow of size %lu bytes.",
+              with init shadow of size %lu bytes.\n",
                 idx, alloc_size / 8);
             unsigned char mask = 0;
             setbits64(rem_keep_bits, mask);
@@ -805,7 +809,7 @@ void *realloc(void *ptr, size_t size) {
             DVASSERT(
                 (idx + count) <= alloc_size / 8,
                 "Attempt to access out of bound init shadow. Accessing %lu bytes \
-              from index %lu with init shadow of size %lu bytes.",
+              from index %lu with init shadow of size %lu bytes.\n",
                 count, idx, alloc_size / 8);
             memset(new_init_shadow + idx, 0, count);
           }
@@ -820,7 +824,7 @@ void *realloc(void *ptr, size_t size) {
 /* }}} */
 
 /* Heap aligned allocation (aligned_alloc) {{{ */
-void *aligned_alloc(size_t alignment, size_t size) {
+void *unsafe_aligned_alloc(size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2
@@ -839,7 +843,7 @@ void *aligned_alloc(size_t alignment, size_t size) {
 /* }}} */
 
 /* Heap aligned allocation (posix_memalign) {{{ */
-int posix_memalign(void **memptr, size_t alignment, size_t size) {
+int unsafe_posix_memalign(void **memptr, size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
@@ -850,7 +854,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
   /* Make sure that the first argument to posix memalign is indeed allocated */
   private_assert(
       allocated((uintptr_t)memptr, sizeof(void *), (uintptr_t)memptr),
-      "\\invalid memptr in  posix_memalign", NULL);
+      "\\invalid memptr in  posix_memalign\n", NULL);
 
   int res = public_posix_memalign(memptr, alignment, size);
   if (!res) {
@@ -890,7 +894,7 @@ int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
   return 0;
 }
 
-int eacsl_freeable(void *ptr) { /* + */
+int unsafe_freeable(void *ptr) { /* + */
   uintptr_t addr = (uintptr_t)ptr;
   /* Address is not on the program's heap, so cannot be freed */
   if (!IS_ON_HEAP(addr))
@@ -930,7 +934,7 @@ uintptr_t heap_info(uintptr_t addr, char type) {
        * between the input address and the base address of the block. */
     return addr - *aligned_shadow;
   default:
-    DASSERT(0 && "Unknown heap query type");
+    DVABORT("Unknown heap query type\n");
   }
   return 0;
 }
@@ -1017,17 +1021,24 @@ void initialize_heap_region(uintptr_t addr, long len) {
 }
 /* }}} */
 
+/* Heap or static initialization {{{ */
+void unsafe_initialize(void *ptr, size_t n) {
+  TRY_SEGMENT((uintptr_t)ptr, initialize_heap_region((uintptr_t)ptr, n),
+              initialize_static_region((uintptr_t)ptr, n))
+}
+/* }}} */
+
 /* Internal state print (debug mode) {{{ */
 #ifdef E_ACSL_DEBUG
-void printbyte(unsigned char c, char buf[]) {
+void printbyte(unsigned char c, char buf[], size_t bufsize) {
   if (c >> 2 < LONG_BLOCK_INDEX_START) {
-    rtl_sprintf(buf, "PRIMARY: I{%u} RO{%u} OF{%2u} => %u[%u]",
-                checkbit(INIT_BIT, c), checkbit(READONLY_BIT, c), c >> 2,
-                short_lengths[c >> 2], short_offsets[c >> 2]);
+    rtl_snprintf(buf, bufsize, "PRIMARY: I{%u} RO{%u} OF{%2u} => %u[%u]",
+                 checkbit(INIT_BIT, c), checkbit(READONLY_BIT, c), c >> 2,
+                 short_lengths[c >> 2], short_offsets[c >> 2]);
   } else {
-    rtl_sprintf(buf, "SECONDARY:  I{%u} RO{%u} OF{%u} => %4u",
-                checkbit(INIT_BIT, c), checkbit(READONLY_BIT, c), (c >> 2),
-                (c >> 2) - LONG_BLOCK_INDEX_START);
+    rtl_snprintf(buf, bufsize, "SECONDARY:  I{%u} RO{%u} OF{%u} => %4u",
+                 checkbit(INIT_BIT, c), checkbit(READONLY_BIT, c), (c >> 2),
+                 (c >> 2) - LONG_BLOCK_INDEX_START);
   }
 }
 
@@ -1041,12 +1052,12 @@ void print_static_shadows(uintptr_t addr, size_t size) {
   int i, j = 0;
   for (i = 0; i < size; i++) {
     sec_buf[0] = '\0';
-    printbyte(prim_shadow[i], prim_buf);
+    printbyte(prim_shadow[i], prim_buf, sizeof(prim_buf));
     if (IS_LONG_BLOCK(size) && (i % LONG_BLOCK) == 0) {
       j += 2;
       if (i < LONG_BLOCK_BOUNDARY(size)) {
-        rtl_sprintf(sec_buf, " %a  SZ{%u} OF{%u}", &sec_shadow[j],
-                    sec_shadow[j - 2], sec_shadow[j - 1]);
+        rtl_snprintf(sec_buf, sizeof(sec_buf), " %a  SZ{%u} OF{%u}",
+                     &sec_shadow[j], sec_shadow[j - 2], sec_shadow[j - 1]);
       }
       if (i) {
         DLOG("---------------------------------------------\n");
@@ -1103,14 +1114,28 @@ void print_heap_shadows(uintptr_t addr) {
 }
 
 void print_shadows(uintptr_t addr, size_t size) {
+  RTL_IO_LOCK();
   if (IS_ON_STATIC(addr))
     print_static_shadows(addr, size);
   else if (IS_ON_HEAP(addr))
     print_heap_shadows(addr);
+  RTL_IO_UNLOCK();
 }
 
 void print_memory_segment(struct memory_segment *p, char *lab, int off) {
-  DLOG("   %s: %lu MB [%a, %a]", lab, MB_SZ(p->size), p->start, p->end);
+#  ifdef E_ACSL_DEBUG
+  const char *unit = "MB";
+  size_t size = MB_SZ(p->size);
+  if (size == 0) {
+    unit = "kB";
+    size = KB_SZ(p->size);
+  }
+  if (size == 0) {
+    unit = "B";
+    size = p->size;
+  }
+  DLOG("   %s: %lu %s [%a, %a]", lab, size, unit, p->start, p->end);
+#  endif
   if (off)
     DLOG("{ Offset: %ld }", p->shadow_offset);
   DLOG("\n");
@@ -1126,7 +1151,35 @@ void print_memory_partition(struct memory_partition *p) {
 #  endif
 }
 
+#  if E_ACSL_OS_IS_LINUX
+/*! \brief Print the content of the `/proc/self/maps` file that is used to
+    retrieve the addresses informations of some segments. */
+static void print_all_segments() {
+  FILE *maps = fopen("/proc/self/maps", "r");
+  DVASSERT(maps != NULL, "Unable to open /proc/self/maps: %s\n",
+           rtl_strerror(errno));
+
+  int result;
+  char buffer[255];
+  uintptr_t start, end;
+  while (fgets(buffer, sizeof(buffer), maps) != NULL) {
+    result = sscanf(buffer, "%" SCNxPTR "-%" SCNxPTR, &start, &end);
+    if (result == 2) {
+      char *remaining = strchr(buffer, ' ');
+      DLOG("%a - %a %s", start, end, remaining ? remaining : buffer);
+    } else {
+      DLOG("%s", buffer);
+    }
+  }
+
+  result = fclose(maps);
+  DVASSERT(result == 0, "Unable to close /proc/self/maps: %s\n",
+           rtl_strerror(errno));
+}
+#  endif
+
 void print_shadow_layout() {
+  RTL_IO_LOCK();
   DLOG(">>> HEAP ---------------------\n");
   print_memory_partition(&mem_layout.heap);
   DLOG(">>> STACK --------------------\n");
@@ -1136,6 +1189,10 @@ void print_shadow_layout() {
   print_memory_partition(&mem_layout.global);
   DLOG(">>> TLS ----------------------\n");
   print_memory_partition(&mem_layout.tls);
+  DLOG(">>> VDSO ---------------------\n");
+  print_memory_partition(&mem_layout.vdso);
+  // DLOG(">>> /proc/self/maps ----------\n");
+  // print_all_segments();
 #  elif E_ACSL_OS_IS_WINDOWS
   DLOG(">>> TEXT ---------------------\n");
   print_memory_partition(&mem_layout.text);
@@ -1149,6 +1206,7 @@ void print_shadow_layout() {
   print_memory_partition(&mem_layout.rdata);
 #  endif
   DLOG(">>> --------------------------\n");
+  RTL_IO_UNLOCK();
 }
 
 const char *which_segment(uintptr_t addr) {

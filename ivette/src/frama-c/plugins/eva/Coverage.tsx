@@ -32,7 +32,7 @@ import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/api/plugins/eva/general';
 import CoverageMeter, { percent } from './CoverageMeter';
 
-type key = Json.key<'#fct'>;
+type key = Json.key<'#fundec'>;
 type stats = Eva.functionStatsData;
 
 // --- Coverage Table ---

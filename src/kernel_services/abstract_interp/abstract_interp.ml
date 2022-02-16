@@ -381,10 +381,10 @@ module Int = struct
   let pretty fmt v =
     if not (Kernel.BigIntsHex.is_default ()) then
       let max = of_int (Kernel.BigIntsHex.get ()) in
-      if gt (abs v) max then Integer.pretty ~hexa:true fmt v
-      else Integer.pretty ~hexa:false fmt v
+      if gt (abs v) max then Integer.pretty_hex fmt v
+      else Integer.pretty fmt v
     else
-      Integer.pretty ~hexa:false fmt v
+      Integer.pretty fmt v
 
   (** execute [f] on [inf], [inf + step], ... *)
   let fold f ~inf ~sup ~step acc =

@@ -73,7 +73,7 @@ let match_selection = function
             else Some (false, e, f_nf_hyp s e)
         | _ -> None
       end
-  | Inside(_,_) | Compose _ | Empty -> None
+  | Inside(_,_) | Compose _ | Empty | Multi _ -> None
 
 class normal_form =
   object

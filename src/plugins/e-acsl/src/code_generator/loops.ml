@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,6 +22,7 @@
 
 open Cil
 open Cil_types
+open Analyses_types
 
 (**************************************************************************)
 (********************** Forward references ********************************)
@@ -65,8 +66,10 @@ let handle_annotations env kf stmt =
            | Some (t, measure_opt) ->
              let env = Env.set_annotation_kind env Smart_stmt.Variant in
              let env = Env.push env in
-             Typing.type_term ~use_gmp_opt:true t;
-             let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
+             (* There cannot be bound logical variables since we cannot write
+                loops inside logic functions or predicates, hence lenv is []*)
+             Typing.type_term ~use_gmp_opt:true ~lenv:[] t;
+             let ty = Typing.get_typ ~lenv:[] t in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
              let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =
@@ -96,6 +99,7 @@ let handle_annotations env kf stmt =
       | [] -> begin
           (* No statements remaining in the loop: variant check *)
           let env = Env.set_annotation_kind env Smart_stmt.Variant in
+          let lenv = Env.Local_vars.get env in
           match variant with
           | Some (t, e_old, Some measure) ->
             let env = Env.push env in
@@ -106,15 +110,18 @@ let handle_annotations env kf stmt =
                 term_name = [];
                 term_type = Linteger;}
             in
-            Typing.type_term ~use_gmp_opt:true tapp;
+            Typing.type_term ~use_gmp_opt:true ~lenv tapp;
             let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
             let e_tapp, _, env =
-              Logic_functions.tapp_to_exp
+              Logic_functions.app_to_exp
                 ~adata:Assert.no_data
+                ~loc
+                ~tapp
                 kf
                 env
                 ~eargs:[e_old; e]
-                tapp
+                measure
+                [t_old; t]
             in
             let msg =
               Format.asprintf
@@ -127,7 +134,6 @@ let handle_annotations env kf stmt =
             let adata, env =
               Assert.register
                 ~loc
-                kf
                 env
                 (Format.asprintf "old %a" Printer.pp_term t_old)
                 e_old
@@ -136,7 +142,6 @@ let handle_annotations env kf stmt =
             let adata, env =
               Assert.register
                 ~loc
-                kf
                 env
                 (Format.asprintf "current %a" Printer.pp_term t)
                 e
@@ -164,7 +169,7 @@ let handle_annotations env kf stmt =
             let variant_pos =
               Logic_const.prel ~loc (Rge, t_old, Logic_const.tinteger ~loc 0)
             in
-            Typing.type_named_predicate variant_pos;
+            Typing.type_named_predicate ~lenv variant_pos;
             let variant_pos_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_pos
             in
@@ -178,7 +183,6 @@ let handle_annotations env kf stmt =
             let adata1, env =
               Assert.register
                 ~loc
-                kf
                 env
                 (Format.asprintf "old %a" Printer.pp_term t)
                 e_old
@@ -198,7 +202,7 @@ let handle_annotations env kf stmt =
             let variant_dec =
               Logic_const.prel ~loc (Rgt, t_old, t)
             in
-            Typing.type_named_predicate variant_dec;
+            Typing.type_named_predicate ~lenv variant_dec;
             let variant_dec_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_dec
             in
@@ -219,7 +223,6 @@ let handle_annotations env kf stmt =
                 in
                 Assert.register
                   ~loc
-                  kf
                   env
                   (Format.asprintf "current %a" Printer.pp_term t)
                   e
@@ -280,17 +283,18 @@ let handle_annotations env kf stmt =
 (**************************** Nested loops ********************************)
 (**************************************************************************)
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
+  let lenv = Env.Local_vars.get env in
   let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
   match lscope_vars with
   | [] ->
     mk_innermost_block env
-  | Lscope.Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
+  | Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
     assert (rel1 == Rle && rel2 == Rlt);
-    Typing.type_term ~use_gmp_opt:false t1;
-    Typing.type_term ~use_gmp_opt:false t2;
+    Typing.type_term ~use_gmp_opt:false ~lenv t1;
+    Typing.type_term ~use_gmp_opt:false ~lenv t2;
     let ctx =
-      let ty1 = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t1 in
-      let ty2 = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t2 in
+      let ty1 = Typing.get_number_ty ~lenv t1 in
+      let ty2 = Typing.get_number_ty ~lenv t2 in
       Typing.join ty1 ty2
     in
     let t_plus_one ?ty t =
@@ -299,9 +303,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
       Option.iter
         (fun ty ->
-           Typing.unsafe_set tone ~ctx:ty ctx;
-           Typing.unsafe_set t ~ctx:ty ctx;
-           Typing.unsafe_set res ty)
+           Typing.unsafe_set tone ~ctx:ty ~lenv ctx;
+           Typing.unsafe_set t ~ctx:ty ~lenv ctx;
+           Typing.unsafe_set res ~lenv ty)
         ty;
       res
     in
@@ -314,7 +318,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let lv_x = var var_x in
     let env = match ctx with
       | Typing.C_integer _ -> env
-      | Typing.Gmpz -> Env.add_stmt env kf (Gmp.init ~loc x)
+      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
       | Typing.(C_float _ | Rational | Real | Nan) -> assert false
     in
     (* build the inner loops and loop body *)
@@ -346,7 +350,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           (TBinOp(Lt, tlv, { t2 with term_node = t2.term_node } ))
           Linteger
     in
-    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
+    Typing.type_term ~use_gmp_opt:false ~lenv ~ctx:Typing.c_int guard;
     let guard_exp, _, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
@@ -411,8 +415,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     (* remove logic binding before returning *)
     Env.Logic_binding.remove env logic_x;
     [ start ;  stmt ], env
-  | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
-    let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
+  | Lvs_let(lv, t) :: lscope_vars' ->
+    let ty = Typing.get_typ ~lenv t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, _, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in
@@ -427,10 +431,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Env.Logic_binding.remove env lv;
     (* return *)
     let_stmt :: stmts, env
-  | Lscope.Lvs_formal _ :: _ ->
+  | Lvs_formal _ :: _ ->
     Error.not_yet
       "creating nested loops from formal variable of a logic function"
-  | Lscope.Lvs_global _ :: _ ->
+  | Lvs_global _ :: _ ->
     Error.not_yet
       "creating nested loops from global logic variable"
 

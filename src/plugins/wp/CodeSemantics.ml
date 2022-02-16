@@ -34,11 +34,11 @@ open Lang.F
 
 module WpLog = Wp_parameters
 let constfold_ctyp = function
-  | TArray (_,Some {enode = (Const CInt64 _) },_,_) as ct -> ct
-  | TArray (ty,Some len,cache,attr) as ct -> begin
+  | TArray (_,Some {enode = (Const CInt64 _) },_) as ct -> ct
+  | TArray (ty,Some len,attr) as ct -> begin
       match Cil.constFold true len with
       | {enode = (Const CInt64 _) } as len ->
-          TArray(ty,Some len,cache,attr)
+          TArray(ty,Some len,attr)
       | _ -> ct
     end
   | ct -> ct
@@ -229,7 +229,7 @@ struct
     | Ge      -> Val (bool_of_comp env Cvalues.bool_leq M.loc_leq Cfloat.fle e2 e1)
     | LAnd    -> Val (Cvalues.bool_and (bool_of_exp env e1) (bool_of_exp env e2))
     | LOr     -> Val (Cvalues.bool_or  (bool_of_exp env e1) (bool_of_exp env e2))
-    | PlusPI | IndexPI ->
+    | PlusPI ->
         let te = Cil.typeOf_pointed (Cil.typeOf e1) in
         let obj = Ctypes.object_of te in
         Loc(M.shift (loc_of_exp env e1) obj (val_of_exp env e2))
@@ -325,8 +325,6 @@ struct
 
     | UnOp(op,e,ty) -> exp_unop env ty op e
     | BinOp(op,e1,e2,tr) -> exp_binop env tr op e1 e2
-
-    | Info(e,_) -> !s_exp env e
 
     | AlignOfE _ | AlignOf _
     | SizeOfE _ | SizeOf _ | SizeOfStr _ -> Val (Cvalues.constant_exp e)
@@ -496,10 +494,10 @@ struct
         let ct = constfold_ctyp ct in
         let acc = (* updated acc with default init of structure *)
           match ct with
-          | TComp ( { cfields = None },_,_) ->
+          | TComp ( { cfields = None },_) ->
               Wp_parameters.fatal
                 "Initializer for incomplete type %a" Cil_printer.pp_typ ct
-          | TComp ( { cstruct ; cfields = Some fields },_,_)
+          | TComp ( { cstruct ; cfields = Some fields },_)
             when cstruct && (* not for union... *)
                  (List.length initl) < (List.length fields) ->
               (* default init for unintialized field of a struct *)
@@ -522,7 +520,7 @@ struct
           | _ -> acc
         in
         match ct with
-        | TArray (ty,len,_,_) ->
+        | TArray (ty,len,_) ->
             let delayed =
               match len with (* number of required elements *)
               | Some {enode = (Const CInt64 (size,_,_))} ->

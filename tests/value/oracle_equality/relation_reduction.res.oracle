@@ -1,7 +1,7 @@
 24,27d23
-< [eva:alarm] tests/value/relation_reduction.i:20: Warning: 
+< [eva:alarm] relation_reduction.i:20: Warning: 
 <   accessing out of bounds index. assert 0 ≤ y;
-< [eva:alarm] tests/value/relation_reduction.i:20: Warning: 
+< [eva:alarm] relation_reduction.i:20: Warning: 
 <   accessing out of bounds index. assert y < 9;
 34,37c30,33
 <   R1 ∈ [-2147483648..2147483637]

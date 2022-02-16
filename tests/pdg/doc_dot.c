@@ -1,8 +1,8 @@
 /* run.config
- STDOPT: +"-lib-entry -main g -fct-pdg g -pdg-dot tests/pdg/result/doc"
+ STDOPT: +"-lib-entry -main g -fct-pdg g -pdg-dot @PTEST_RESULT@/doc"
 */
 /* To build the svg file:
- * dot -Tsvg tests/pdg/result/doc.g.dot > tests/pdg/result/doc.g.svg
+ * dot -Tsvg @PTEST_RESULT@/doc.g.dot > @PTEST_RESULT@/doc.g.svg
  */
 int G1, G2, T[10];
 

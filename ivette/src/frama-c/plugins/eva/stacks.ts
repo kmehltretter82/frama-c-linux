@@ -64,7 +64,7 @@ export class StacksCache {
     this.model = state;
   }
 
-  clear() {
+  clear(): void {
     this.stacks.clear();
     this.calls.clear();
   }
@@ -77,7 +77,7 @@ export class StacksCache {
     return this.summary.get(fct) ?? true;
   }
 
-  setSummary(fct: string, s: boolean) {
+  setSummary(fct: string, s: boolean): void {
     this.summary.set(fct, s);
     this.model.forceLayout();
   }
@@ -117,7 +117,7 @@ export class StacksCache {
   // --- Fetchers
   // --------------------------------------------------------------------------
 
-  private requestStacks(key: string, markers: Ast.marker[]) {
+  private requestStacks(key: string, markers: Ast.marker[]): void {
     Server
       .send(Values.getCallstacks, markers)
       .then((stacks: callstacks) => {
@@ -127,7 +127,7 @@ export class StacksCache {
       });
   }
 
-  private requestCalls(cs: Values.callstack) {
+  private requestCalls(cs: Values.callstack): void {
     Server
       .send(Values.getCallstackInfo, cs)
       .then((calls) => {

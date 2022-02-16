@@ -20,25 +20,30 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 import * as React from 'react';
 import * as Dome from 'dome';
 import { TitleBar } from 'ivette';
 
 import { IconButton } from 'dome/controls/buttons';
-import { Label, Cell, Data } from 'dome/controls/labels';
+import { Label, Cell } from 'dome/controls/labels';
+import { Page } from 'dome/text/pages';
 import { Icon } from 'dome/controls/icons';
-import { Scroll } from 'dome/layout/boxes';
-import { RSplit } from 'dome/layout/splitters';
+import { Scroll, Vbox } from 'dome/layout/boxes';
+import { RSplit, BSplit } from 'dome/layout/splitters';
 import * as Forms from 'dome/layout/forms';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import * as Compare from 'dome/data/compare';
 
+import { State, GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/api/kernel/ast';
 import * as Kernel from 'frama-c/api/kernel/services';
 
 type Message = Kernel.messageData;
+type logkind = Kernel.logkind;
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -49,88 +54,76 @@ interface Search {
   message?: string;
 }
 
-interface KindFilter {
-  result?: boolean;
-  feedback?: boolean;
-  debug?: boolean;
-  warning?: boolean;
-  error?: boolean;
-  failure?: boolean;
-}
-
-interface PluginFilter {
-  kernel?: boolean;
-  aorai?: boolean;
-  dive?: boolean;
-  eacsl?: boolean;
-  eva?: boolean;
-  from?: boolean;
-  impact?: boolean;
-  inout?: boolean;
-  metrics?: boolean;
-  nonterm?: boolean;
-  pdg?: boolean;
-  report?: boolean;
-  rte?: boolean;
-  scope?: boolean;
-  server?: boolean;
-  slicing?: boolean;
-  variadic?: boolean;
-  wp?: boolean;
-  others?: boolean;
-}
+type KindFilter = Record<logkind, boolean>;
+type PluginFilter = { [key: string]: boolean };
+type EmitterFilter = {
+  kernel: boolean;
+  plugins: PluginFilter;
+  others: boolean; // default for Frama-C plugins not in the plugins field.
+};
 
 interface Filter {
   currentFct: boolean;
   search: Search;
   kind: KindFilter;
-  plugin: PluginFilter;
+  emitter: EmitterFilter;
 }
+
+/* Only warnings and errors are shown by default. */
+const kindFilter: KindFilter = {
+  RESULT: false,
+  FEEDBACK: false,
+  DEBUG: false,
+  WARNING: true,
+  ERROR: true,
+  FAILURE: true,
+};
+
+/* The fields must be exactly the short names of Frama-C plugins used in
+   messages. They are all shown by default. */
+const pluginFilter: PluginFilter = {
+  'aorai': true,
+  'dive': true,
+  'e-acsl': true,
+  'eva': true,
+  'from': true,
+  'impact': true,
+  'inout': true,
+  'metrics': true,
+  'nonterm': true,
+  'pdg': true,
+  'report': true,
+  'rte': true,
+  'scope': true,
+  'server': true,
+  'slicing': true,
+  'variadic': true,
+  'wp': true,
+};
+
+const emitterFilter = {
+  kernel: true,
+  plugins: pluginFilter,
+  others: true,
+};
 
 const defaultFilter: Filter = {
   currentFct: false,
   search: {},
-  kind: {
-    result: false,
-    feedback: false,
-    debug: false,
-  },
-  plugin: {},
+  kind: kindFilter,
+  emitter: emitterFilter,
 };
 
 function filterKind(filter: KindFilter, msg: Message) {
-  const hide =
-    (filter.result === false && msg.kind === 'RESULT')
-    || (filter.feedback === false && msg.kind === 'FEEDBACK')
-    || (filter.debug === false && msg.kind === 'DEBUG')
-    || (filter.warning === false && msg.kind === 'WARNING')
-    || (filter.error === false && msg.kind === 'ERROR')
-    || (filter.failure === false && msg.kind === 'FAILURE');
-  return !hide;
+  return filter[msg.kind];
 }
 
-function filterPlugin(filter: PluginFilter, msg: Message) {
-  switch (msg.plugin) {
-    case 'kernel': return !(filter.kernel === false);
-    case 'aorai': return !(filter.aorai === false);
-    case 'dive': return !(filter.dive === false);
-    case 'e-acsl': return !(filter.eacsl === false);
-    case 'eva': return !(filter.eva === false);
-    case 'from': return !(filter.from === false);
-    case 'impact': return !(filter.impact === false);
-    case 'inout': return !(filter.inout === false);
-    case 'metrics': return !(filter.metrics === false);
-    case 'nonterm': return !(filter.nonterm === false);
-    case 'pdg': return !(filter.pdg === false);
-    case 'report': return !(filter.report === false);
-    case 'rte': return !(filter.rte === false);
-    case 'scope': return !(filter.scope === false);
-    case 'server': return !(filter.server === false);
-    case 'slicing': return !(filter.slicing === false);
-    case 'variadic': return !(filter.variadic === false);
-    case 'wp': return !(filter.wp === false);
-    default: return !(filter.others === false);
-  }
+function filterEmitter(filter: EmitterFilter, msg: Message) {
+  if (msg.plugin === 'kernel')
+    return filter.kernel;
+  if (msg.plugin in filter.plugins)
+    return filter.plugins[msg.plugin];
+  return filter.others;
 }
 
 function searchCategory(search: string | undefined, msg: string | undefined) {
@@ -177,7 +170,7 @@ function searchString(search: string | undefined, msg: string) {
 
 function filterSearched(search: Search, msg: Message) {
   return (searchString(search.message, msg.message) &&
-          searchCategory(search.category, msg.category));
+    searchCategory(search.category, msg.category));
 }
 
 function filterFunction(filter: Filter, kf: string | undefined, msg: Message) {
@@ -188,121 +181,108 @@ function filterFunction(filter: Filter, kf: string | undefined, msg: Message) {
 
 function filterMessage(filter: Filter, kf: string | undefined, msg: Message) {
   return (filterFunction(filter, kf, msg) &&
-          filterSearched(filter.search, msg) &&
-          filterKind(filter.kind, msg) &&
-          filterPlugin(filter.plugin, msg));
+    filterSearched(filter.search, msg) &&
+    filterKind(filter.kind, msg) &&
+    filterEmitter(filter.emitter, msg));
 }
 
 // --------------------------------------------------------------------------
 // --- Filters panel and ratio
 // --------------------------------------------------------------------------
 
-function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
-  const state = props.filter;
-  const search = Forms.useProperty(state, 'search');
-  const categoryState = Forms.useProperty(search, 'category');
-  const messageState = Forms.useProperty(search, 'message');
-
-  const kind = Forms.useProperty(state, 'kind');
-  function kindState(path: keyof KindFilter) {
-    return Forms.useDefault(Forms.useProperty(kind, path), true);
-  }
-
-  const plugin = Forms.useProperty(state, 'plugin');
-  function pluginState(path: keyof PluginFilter) {
-    return Forms.useDefault(Forms.useProperty(plugin, path), true);
-  }
-
+function Section(p: Forms.SectionProps) {
+  const settings = `ivette.messages.filter.${p.label}`;
   return (
-    <Scroll>
-      <Forms.Page className="message-search">
-        <Forms.CheckboxField
-          label="Current function"
-          title="Only show messages emitted at the current function"
-          state={Forms.useProperty(state, 'currentFct')}
-        />
-        <Forms.Section
-          label="Search"
-          unfold
-          settings="ivette.messages.search"
-        >
-          <Forms.TextField
-            label="Category"
-            state={categoryState}
-            placeholder="Category"
-            title={'Search in message category.\n'
-                 + 'Use -<name> to hide some categories.'}
-          />
-          <Forms.TextField
-            label="Message"
-            state={messageState}
-            placeholder="Message"
-            title={'Search in message text.\n'
-                 + 'Case-insensitive by default.\n'
-                 + 'Use "text" for an exact case-sensitive search.'}
-          />
-        </Forms.Section>
-        <Forms.Section
-          label="Kind"
-          unfold
-          settings="ivette.messages.filterKind"
-        >
-          <Forms.CheckboxField label="Result" state={kindState('result')} />
-          <Forms.CheckboxField label="Feedback" state={kindState('feedback')} />
-          <Forms.CheckboxField label="Debug" state={kindState('debug')} />
-          <Forms.CheckboxField label="Warning" state={kindState('warning')} />
-          <Forms.CheckboxField label="Error" state={kindState('error')} />
-          <Forms.CheckboxField label="Failure" state={kindState('failure')} />
-        </Forms.Section>
-        <Forms.Section
-          label="Emitter"
-          unfold
-          settings="ivette.messages.filterEmitter"
-        >
-          <div className="message-emitter-category">
-            <Forms.CheckboxField label="Kernel" state={pluginState('kernel')} />
-          </div>
-          <div className="message-emitter-category">
-            <Forms.CheckboxField label="Aoraï" state={pluginState('aorai')} />
-            <Forms.CheckboxField label="Dive" state={pluginState('dive')} />
-            <Forms.CheckboxField label="E-ACSL" state={pluginState('eacsl')} />
-            <Forms.CheckboxField label="Eva" state={pluginState('eva')} />
-            <Forms.CheckboxField label="From" state={pluginState('from')} />
-            <Forms.CheckboxField label="Impact" state={pluginState('impact')} />
-            <Forms.CheckboxField label="InOut" state={pluginState('inout')} />
-            <Forms.CheckboxField
-              label="Metrics"
-              state={pluginState('metrics')}
-            />
-            <Forms.CheckboxField
-              label="NonTerm"
-              state={pluginState('nonterm')}
-            />
-            <Forms.CheckboxField label="Pdg" state={pluginState('pdg')} />
-            <Forms.CheckboxField label="Report" state={pluginState('report')} />
-            <Forms.CheckboxField label="RTE" state={pluginState('rte')} />
-            <Forms.CheckboxField label="Scope" state={pluginState('scope')} />
-            <Forms.CheckboxField label="Server" state={pluginState('server')} />
-            <Forms.CheckboxField
-              label="Slicing"
-              state={pluginState('slicing')}
-            />
-            <Forms.CheckboxField
-              label="Variadic"
-              state={pluginState('variadic')}
-            />
-            <Forms.CheckboxField label="WP" state={pluginState('wp')} />
-          </div>
-          <div className="message-emitter-category">
-            <Forms.CheckboxField label="Others" state={pluginState('others')} />
-          </div>
-        </Forms.Section>
-      </Forms.Page>
-    </Scroll>
+    <Forms.Section label={p.label} unfold settings={settings}>
+      {p.children}
+    </Forms.Section>
   );
 }
 
-function FilterRatio({ model }: { model: Arrays.ArrayModel<any, any> }) {
+function Checkbox(p: Forms.CheckboxFieldProps) {
+  const lbl = p.label.charAt(0).toUpperCase() + p.label.slice(1).toLowerCase();
+  return <Forms.CheckboxField label={lbl} state={p.state} />;
+}
+
+function MessageKindCheckbox(props: {
+  kind: logkind,
+  kindState: Forms.FieldState<KindFilter>,
+}) {
+  const { kind, kindState } = props;
+  const state = Forms.useProperty(kindState, kind);
+  return <Checkbox label={kind} state={state} />;
+}
+
+function PluginCheckbox(props: {
+  plugin: string,
+  pluginState: Forms.FieldState<PluginFilter>,
+}) {
+  const state = Forms.useProperty(props.pluginState, props.plugin);
+  return <Checkbox label={props.plugin} state={state} />;
+}
+
+function MessageFilter(props: { filter: State<Filter> }) {
+  const state = Forms.useValid(props.filter);
+  const search = Forms.useProperty(state, 'search');
+  const categoryState = Forms.useProperty(search, 'category');
+  const messageState = Forms.useProperty(search, 'message');
+  const kindState = Forms.useProperty(state, 'kind');
+  const kindCheckboxes =
+    Object.keys(kindFilter).map((k) => (
+      <MessageKindCheckbox key={k} kind={k as logkind} kindState={kindState} />
+    ));
+  const emitterState = Forms.useProperty(state, 'emitter');
+  const kernelState = Forms.useProperty(emitterState, 'kernel');
+  const othersState = Forms.useProperty(emitterState, 'others');
+  const pluginState = Forms.useProperty(emitterState, 'plugins');
+  const pluginCheckboxes =
+    Object.keys(pluginFilter).map((p) => (
+      <PluginCheckbox key={p} plugin={p} pluginState={pluginState} />
+    ));
+
+  return (
+    <Forms.Page className="message-search">
+      <Forms.CheckboxField
+        label="Current function"
+        title="Only show messages emitted at the current function"
+        state={Forms.useProperty(state, 'currentFct')}
+      />
+      <Section label="Search">
+        <Forms.TextField
+          label="Category"
+          state={categoryState}
+          placeholder="Category"
+          title={'Search in message category.\n'
+            + 'Use -<name> to hide some categories.'}
+        />
+        <Forms.TextField
+          label="Message"
+          state={messageState}
+          placeholder="Message"
+          title={'Search in message text.\n'
+            + 'Case-insensitive by default.\n'
+            + 'Use "text" for an exact case-sensitive search.'}
+        />
+      </Section>
+      <Section label="Kind">
+        {kindCheckboxes}
+      </Section>
+      <Section label="Emitter">
+        <div className="message-emitter-category">
+          <Forms.CheckboxField label='Kernel' state={kernelState} />
+        </div>
+        <div className="message-emitter-category">
+          {pluginCheckboxes}
+        </div>
+        <div className="message-emitter-category">
+          <Forms.CheckboxField label='Others' state={othersState} />
+        </div>
+      </Section>
+    </Forms.Page>
+  );
+}
+
+function FilterRatio<K, R>({ model }: { model: Arrays.ArrayModel<K, R> }) {
   const [filtered, total] = [model.getRowCount(), model.getTotalRowCount()];
   const title = `${filtered} displayed messages / ${total} total messages`;
   return (
@@ -316,7 +296,7 @@ function FilterRatio({ model }: { model: Arrays.ArrayModel<any, any> }) {
 // --- Messages Columns
 // --------------------------------------------------------------------------
 
-const renderKind: Renderer<Kernel.logkind> = (kind: Kernel.logkind) => {
+const renderKind: Renderer<logkind> = (kind: logkind) => {
   const label = kind.toLocaleLowerCase();
   let icon = '';
   let color = 'black';
@@ -334,7 +314,7 @@ const renderCell: Renderer<string> =
   (text: string) => (<Cell title={text}>{text}</Cell>);
 
 const renderMessage: Renderer<string> =
-  (text: string) => (<Data title={text}> {text} </Data>);
+  (text: string) => (<div title={text} className="message-cell"> {text} </div>);
 
 const renderDir: Renderer<Ast.source> =
   (loc: Ast.source) => (<Cell label={loc.dir} title={loc.file} />);
@@ -365,7 +345,7 @@ const MessageColumns = () => (
       id="category"
       label="Category"
       title="Only for warning and debug messages"
-      width={120}
+      width={150}
       render={renderCell}
     />
     <Column
@@ -377,7 +357,7 @@ const MessageColumns = () => (
     <Column
       id="fct"
       label="Function"
-      width={120}
+      width={150}
       render={renderCell}
     />
     <Column
@@ -421,13 +401,18 @@ const byMessage: Compare.ByFields<Message> = {
   source: Compare.defined(bySource),
 };
 
+const globalFilterState = new GlobalState(defaultFilter);
+
 export default function RenderMessages() {
 
-  const model = React.useMemo(() => (
-    new Arrays.CompactModel<string, Message>((msg: Message) => msg.key)
-  ), []);
+  const [model] = React.useState(() => {
+    const f = (msg: Message) => msg.key;
+    const m = new Arrays.CompactModel<string, Message>(f);
+    m.setOrderingByFields(byMessage);
+    return m;
+  });
+
   const data = States.useSyncArray(Kernel.message).getArray();
-  model.setOrderingByFields(byMessage);
 
   React.useEffect(() => {
     model.removeAllData();
@@ -435,17 +420,19 @@ export default function RenderMessages() {
     model.reload();
   }, [model, data]);
 
-  const filterState = Forms.useState<Filter>(defaultFilter);
+  const filterState = useGlobalState(globalFilterState);
+  const [filter] = filterState;
   const [selection, updateSelection] = States.useSelection();
   const selectedFct = selection?.current?.fct;
+  const [message, setMessage] = React.useState('');
 
   React.useEffect(() => {
-    const [filter] = filterState;
     model.setFilter((msg: Message) => filterMessage(filter, selectedFct, msg));
-  }, [model, filterState, selectedFct]);
+  }, [model, filter, selectedFct]);
 
   const onMessageSelection = React.useCallback(
-    ({ fct, marker }: Message) => {
+    ({ fct, marker, message: msg }: Message) => {
+      setMessage(msg);
       if (fct && marker) {
         const location = { fct, marker };
         updateSelection({ location });
@@ -455,6 +442,20 @@ export default function RenderMessages() {
 
   const [showFilter, flipFilter] =
     Dome.useFlipSettings('ivette.messages.showFilter', true);
+
+  const MessagePanel = (
+    <Vbox style={{ height: '100%' }}>
+      <IconButton
+        icon="CROSS"
+        title="Close"
+        onClick={() => setMessage('')}
+        style={{ margin: '0 auto' }}
+      />
+      <Scroll>
+        <Page className="message-page"> {message} </Page>
+      </Scroll>
+    </Vbox>
+  );
 
   return (
     <>
@@ -472,15 +473,24 @@ export default function RenderMessages() {
         defaultPosition={225}
         unfold={showFilter}
       >
-        <Table<string, Message>
-          model={model}
-          sorting={model}
-          onSelection={onMessageSelection}
-          settings="ivette.messages.table"
+        <BSplit
+          settings="ivette.messages.messageSplit"
+          defaultPosition={90}
+          unfold={message !== ''}
         >
-          <MessageColumns />
-        </Table>
-        <MessageFilter filter={filterState} />
+          <Table<string, Message>
+            model={model}
+            sorting={model}
+            onSelection={onMessageSelection}
+            settings="ivette.messages.table"
+          >
+            <MessageColumns />
+          </Table>
+          {MessagePanel}
+        </BSplit>
+        <Scroll>
+          <MessageFilter filter={filterState} />
+        </Scroll>
       </RSplit>
     </>
   );

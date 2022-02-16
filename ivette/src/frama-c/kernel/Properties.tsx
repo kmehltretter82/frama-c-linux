@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Properties
 // --------------------------------------------------------------------------
@@ -224,9 +226,9 @@ function filterEva(p: Property) {
 
 function filterProperty(p: Property) {
   return filterStatus(p.status)
-      && filterKind(p.kind)
-      && filterAlarm(p.alarm)
-      && filterEva(p);
+    && filterKind(p.kind)
+    && filterAlarm(p.alarm)
+    && filterEva(p);
 }
 
 // --------------------------------------------------------------------------
@@ -258,7 +260,7 @@ const renderFile: Renderer<Ast.source> =
 const renderPriority: Renderer<boolean> =
   (prio: boolean) => (prio ? <Icon id="ATTENTION" /> : null);
 
-const renderTaint: Renderer<any> =
+const renderTaint: Renderer<States.Tag> =
   (taint: States.Tag) => {
     let id = null;
     let color = 'black';
@@ -335,7 +337,8 @@ const byColumn: Arrays.ByColumns<Property> = {
   file: Compare.byFields<Property>({ source: byFile }),
 };
 
-class PropertyModel extends Arrays.CompactModel<Json.key<'#status'>, Property> {
+class PropertyModel
+  extends Arrays.CompactModel<Json.key<'#property'>, Property> {
 
   private filterFun?: string;
 

@@ -107,39 +107,34 @@ api:
 # --- Ivette Documentation
 # --------------------------------------------------------------------------
 
+.PHONY: icons
+
 VERSION=$(shell echo "console.log(require('./package.json').version)" | node -)
 
 DOC_ICONS_CSS= src/dome/doc/gallery.css
 DOC_ICONS_MAKE= src/dome/doc/iconsmd.js
+DOC_ICONS_GALLERY= src/dome/doc/guides/icons.md
 DOC_ICONS_DATA= src/dome/renderer/controls/gallery.json
 DOC_GUIDES= src/dome/doc/guides
 
 NODEBIN= ./node_modules/.bin
 
-doc: $(NODEBIN)/typedoc
+DOCDIRS= src/ivette src/dome/renderer src/dome/utils src/frama-c/api
+DOCFILES= src/frama-c/server.ts src/frama-c/states.ts $(shell find $(DOCDIRS) -name "*.ts" -or -name "*.tsx")
+
+icons: $(DOC_ICONS_GALLERY)
+
+$(DOC_ICONS_GALLERY): $(DOC_ICONS_MAKE) $(DOC_ICONS_DATA)
+	@rm -f $@
+	@node $(DOC_ICONS_MAKE) $(DOC_ICONS_DATA) > src/dome/doc/guides/icons.md
+	@chmod a-w $@
+
+doc: $(NODEBIN)/typedoc icons
 	@echo "\n[Ivette] documentation"
 	@rm -fr doc/html
-	@yarn run typedoc
-	@mkdir -p doc/html/guides
-	@echo "\n[Ivette] guides"
-	@node $(DOC_ICONS_MAKE) $(DOC_ICONS_DATA) > doc/html/guides/icons.md
-	@cp $(DOC_ICONS_CSS) doc/html/assets/css/
-	@find $(DOC_GUIDES) -name "*.md" -exec cp -f {} doc/html/guides/ \;
-	@find doc/html/guides -name "*.md" -print -exec pandoc \
-		--standalone --toc --toc-depth=2 --to html \
-		--template doc/pandoc/template.html \
-		--metadata title="Ivette Documentation" \
-		--metadata version="v$(VERSION)" \
-		--metadata-file=doc/pandoc/index.json \
-		--lua-filter doc/pandoc/href.lua \
-		{} -o {}.html \; -delete
+	@yarn run typedoc $(DOCFILES)
 	@echo "\n[Ivette] main page"
 	@echo "   file://$(PWD)/doc/html/index.html"
-
-# For searching the doc
-serve: $(NODEBIN)/serve
-	@echo "[Ivette] serve doc documentation"
-	@yarn run serve doc/html
 
 $(NODEBIN)/%:
 	@echo "[Node] install package $*"

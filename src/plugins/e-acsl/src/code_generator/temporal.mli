@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,9 +29,6 @@ open Cil_types
 
 val enable: bool -> unit
 (** Enable/disable temporal transformations *)
-
-val is_enabled: unit -> bool
-(** Return a boolean value indicating whether temporal analysis is enabled *)
 
 val handle_function_parameters: kernel_function -> Env.t -> Env.t
 (** [handle_function_parameters kf env] updates the local environment [env],

@@ -1,5 +1,6 @@
 /* run.config
-   STDOPT: +"tests/spec/axiom_included_1.c"
+  DEPS: axiom_included.h
+   STDOPT: +"%{dep:@PTEST_DIR@/axiom_included_1.c}"
 */
 
 #include "axiom_included.h"

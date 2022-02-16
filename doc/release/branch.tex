@@ -49,19 +49,19 @@ allowed to push/merge).
 
 \section{Creating the milestones}
 
-Create the milestones for the next release on \textsf{Mantis}
-\expertise{Julien} and \textsf{Gitlab}
-\expertise{François, Julien}
+Create the milestone for the next release on \textsf{Gitlab},
+in the Frama-C group
+\expertise{François, Julien}.
 
 
 \section{BTS}
 
-Check both \textsf{BTS}. All issues should have been at least acknowledged:  no more issues with status 'New' or only 'Assigned' should remain.
+Check public issue tracker at \url{https://git.frama-c.com/pub/frama-c/issues/} All issues should have been at least acknowledged: at least they should be assigned to someone, preferably tagged appropriately.
 
-Send a mail on the frama-c-commits mailing list: each user/developer should have a
+Send a message to the Frama-C channel on LSL's Mattermost.
+Each developer should have a
 look at their own assigned/monitored/reported issues. Depending on their severity,
 the issues should be tagged with the current release, or with the next one.
-
 
 \section{Changelog}
 
@@ -70,7 +70,7 @@ but also so that merge requests add information in the proper part of
 the Changelog.
 
 \begin{itemize}
-\item Add the following in the Changelog, in \texttt{stable/element}
+\item Add the following in the Changelogs, in \texttt{stable/element}
 \begin{verbatim}
  ####################################
  Open Source Release <nb> (<element>)
@@ -84,6 +84,30 @@ This should go directly below
  ##################################
 \end{verbatim}
 
+The changelogs to update are the global Frama-C changelog and each plugin
+changelog in \texttt{src/plugins}.
+
+\item Check the manuals if they contain a changelog, usually in files named
+\texttt{changes.tex} or a variation of it. Add the following in
+\texttt{stable/element}
+\begin{verbatim}
+\section*{<nb> (<element>)}
+\end{verbatim}
+
+This should go directly below
+\begin{verbatim}
+\section*{\framacversion}
+\end{verbatim}
+
+and this line should be commented out.
+
+\begin{itemize}
+  \item \emph{Take care to adapt the format of the version according to the
+        content of the file}.
+  \item \emph{Check for manual changelogs in \texttt{doc/}, but also in
+        \texttt{src/plugins/**/doc}}.
+\end{itemize}
+
 \item Merge this branch in \texttt{master}
 \end{itemize}
 
@@ -91,9 +115,31 @@ From now on, Changelog items corresponding to MR merged into \texttt{master}
 must be placed between these two banners. This should minimize conflicts when
 merging back \texttt{stable/element} into \texttt{master}.
 
-\todo{Do the same thing in the manuals that contain a Changelog?}
-
 \todo{Can we simplify this?}
+
+\section{Copyright}
+
+Check that the date in copyright headers is correct. If not then the script
+\texttt{headers/updates-headers.sh} can be used to update them.
+
+\begin{itemize}
+  \item Update the dates in the license files in:
+  \begin{itemize}
+    \item \texttt{headers/close-source/*}
+    \item \texttt{headers/open-source/*}
+    \item \texttt{ivette/headers/close-source/*}
+    \item \texttt{ivette/headers/open-source/*}
+    \item \texttt{src/plugins/e-acsl/headers/close-source/*}
+    \item \texttt{src/plugins/e-acsl/headers/open-source/*}
+  \end{itemize}
+  \item Update the headers with the following commands:
+  \begin{itemize}
+    \item \texttt{./headers/updates-headers.sh headers/header\_spec.txt headers/open-source}
+    \item \texttt{./headers/updates-headers.sh ivette/headers/header\_spec.txt headers/open-source ivette}
+    \item \texttt{./headers/updates-headers.sh src/plugins/e-acsl/headers/header\_spec.txt src/plugins/e-acsl/headers/open-source src/plugins/e-acsl}
+  \end{itemize}
+  \item Check if some copyright are left to update by \texttt{grep}-ing the date in the sources: \texttt{grep -r -e "-yyyy" .}
+\end{itemize}
 
 %%%Local Variables:
 %%%TeX-master: "release"

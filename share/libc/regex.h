@@ -25,10 +25,16 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_size_t.h"
-
+#include "__fc_define_ssize_t.h"
 __BEGIN_DECLS
 
-struct re_pattern_buffer { size_t re_nsub;  };
+struct re_pattern_buffer {
+  struct re_dfa_t *buffer; // Non-POSIX
+  size_t allocated; // Non-POSIX
+  char *fastmap; // Non-POSIX
+  unsigned char *translate; // Non-POSIX
+  size_t re_nsub;
+};
 
 typedef struct re_pattern_buffer regex_t;
 
@@ -64,7 +70,15 @@ typedef enum __fc_reg_errcode_t
   REG_ERPAREN	  
 } reg_errcode_t;
 
-typedef int regoff_t;
+typedef ssize_t regoff_t;
+
+// Non-POSIX
+struct re_registers
+{
+  size_t num_regs;
+  regoff_t *start;
+  regoff_t *end;
+};
 
 typedef struct __fc_regmatch_t
 {

@@ -43,6 +43,6 @@ int main(int argc, char **argv)
 
 /*
 Local Variables:
-compile-command: "cd ../.. && ptests.byte -show -config gcc tests/libc/time.c"
+compile-command: "cd ../.. && ptests.byte -show -config gcc @PTEST_DIR@/time.c"
 End:
 */

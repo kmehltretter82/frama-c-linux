@@ -1,7 +1,7 @@
 /* run.config
 EXIT: 1
-  STDOPT: +"tests/syntax/inconsistent_decl_2.i"
-  STDOPT: +"tests/syntax/inconsistent_decl_2.i"+"-cpp-extra-args='-DWITH_PROTO'"
+  STDOPT: +"@PTEST_DIR@/inconsistent_decl_2.i"
+  STDOPT: +"@PTEST_DIR@/inconsistent_decl_2.i"+"-cpp-extra-args='-DWITH_PROTO'"
 */
 
 #ifdef WITH_PROTO

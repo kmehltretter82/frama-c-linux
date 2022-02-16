@@ -49,7 +49,7 @@ let v_uninit_of_offsetmap ~typ offsm =
     V_Offsetmap.find ~validity ~conflate_bottom:false ~offsets ~size offsm
 
 let backward_comp_int_left positive comp l r =
-  if (Value_parameters.UndefinedPointerComparisonPropagateAll.get())
+  if (Parameters.UndefinedPointerComparisonPropagateAll.get())
   && not (Cvalue_forward.are_comparable comp l r)
   then l
   else
@@ -166,14 +166,20 @@ let apply_on_all_locs f loc state =
   match loc.Locations.size with
   | Int_Base.Top -> state
   | Int_Base.Value _ as size ->
-    try
-      let loc = Locations.valid_part Locations.Read loc in
-      let loc = loc.Locations.loc in
-      let plevel = Value_parameters.ArrayPrecisionLevel.get() in
-      ignore (Locations.Location_Bits.cardinal_less_than loc plevel);
-      Locations.Location_Bits.fold_enum
-        (fun l acc -> f (Locations.make_loc l size) acc) loc state
-    with Not_less_than | Abstract_interp.Error_Top -> state
+    let loc = Locations.valid_part Locations.Read loc in
+    let plevel = Parameters.ArrayPrecisionLevel.get () in
+    let ilevel = Int_set.get_small_cardinal () in
+    let limit = max plevel ilevel in
+    let apply_f base ival state =
+      f Locations.(make_loc (Location_Bits.inject base ival) size) state
+    in
+    let aux base ival state =
+      if Ival.cardinal_is_less_than ival limit
+      then Ival.fold_enum (fun i acc -> apply_f base i acc) ival state
+      else state
+    in
+    try Locations.Location_Bits.fold_i aux loc.loc state
+    with Abstract_interp.Error_Top -> state
 
 (* Display [o] as a single value, when this is more readable and more precise
    than the standard display. *)

@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print tests/spec/multiple_decl_def_2.c
+   OPT: -print %{dep:@PTEST_DIR@/multiple_decl_def_2.c}
 */
 
 /* see bug #43 && #128 */

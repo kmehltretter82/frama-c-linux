@@ -124,8 +124,12 @@ let flow i f =
   if f = F_dead then F_dead else
     match i with
     | Asm _ | Set _ -> F_effect
+    | Local_init _ ->
+        if Wp_parameters.SmokeDeadlocalinit.get ()
+        then F_effect
+        else F_goto
     | Call _ -> F_call
-    | Local_init _ | Skip _ | Code_annot _ -> F_goto
+    | Skip _ | Code_annot _ -> F_goto
 
 let merge a b = match a,b with
   | F_dead , F_dead -> F_dead
@@ -375,5 +379,54 @@ let set_doomed emitter pid =
       in
       List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
   | Property.OLGlob _ | Property.OLContract _ -> ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Status of Unreachable Annotations                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let dkey = Wp_parameters.register_category "reach" (* debugging key *)
+let debug fmt = Wp_parameters.debug ~dkey fmt
+
+let unreachable_proved = ref 0
+let unreachable_failed = ref 0
+
+let wp_unreachable =
+  Emitter.create
+    "Unreachable Annotations"
+    [ Emitter.Property_status ]
+    ~correctness:[] (* TBC *)
+    ~tuning:[] (* TBC *)
+
+let set_unreachable pid =
+  if WpPropId.is_smoke_test pid then
+    begin
+      let source = WpPropId.source_of_id pid in
+      set_doomed wp_unreachable pid ;
+      incr unreachable_failed ;
+      Wp_parameters.warning ~source "Failed smoke-test"
+    end
+  else
+    let open Property in
+    let emit = function
+      | IPPredicate {ip_kind = PKAssumes _} -> ()
+      | p ->
+          debug "unreachable annotation %a@." Property.pretty p;
+          Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
+    in
+    let pids = match WpPropId.property_of_id pid with
+      | IPPredicate {ip_kind = PKAssumes _} -> []
+      | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
+          let active = Datatype.String.Set.elements ib_active in
+          (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
+          (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
+      | IPExtended _ -> []
+      (* Extended clauses might concern anything. Don't validate them
+         unless we know exactly what is going on. *)
+      | p ->
+          incr unreachable_proved ;
+          Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
+            WpPropId.pp_propid pid ; [p]
+    in
+    List.iter emit pids
 
 (* -------------------------------------------------------------------------- *)

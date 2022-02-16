@@ -35,6 +35,11 @@ let warning ?wkey ?current = match current with
   | None -> warning ?wkey ~current:true
   | Some b -> warning ?wkey ~current:b
 
+let wkey_hyp = register_warn_category "hypothesis"
+
+let hypothesis ?current ?source ?emitwith ?echo ?once ?append text =
+  warning ~wkey:wkey_hyp ?current ?source ?emitwith ?echo ?once ?append text
+
 let resetdemon = ref []
 let on_reset f = resetdemon := f :: !resetdemon
 let reset () = List.iter (fun f -> f ()) !resetdemon
@@ -54,13 +59,6 @@ module WP =
     let help = "Generate proof obligations for all (selected) properties."
   end)
 let () = on_reset WP.clear
-
-let () = Parameter_customize.set_group wp_generation
-module Legacy =
-  False(struct
-    let option_name = "-wp-legacy"
-    let help = "Use legacy generator engine."
-  end)
 
 let () = Parameter_customize.set_group wp_generation
 module Dump =
@@ -113,12 +111,12 @@ module Properties =
       let arg_name = "p,..."
       let help =
         "Select properties based names and category.\n\
-         Use +name or +category to select properties and -name or -category\n\
+         Use +name or +category to select properties and -name or -category \
          to remove them from the selection. The '+' sign can be omitted.\n\
-         Categories are: @lemma, @requires, @assigns, @ensures, @exits,\n\
-         @assert, @invariant, @variant, @breaks, @continues, @returns,\n\
-         @complete_behaviors, @disjoint_behaviors and\n\
-         @check (which includes all check clauses)."
+         Categories are: @lemma, @requires, @assigns, @ensures, @exits, \
+         @assert, @invariant, @variant, @breaks, @continues, @returns, \
+         @complete_behaviors, @disjoint_behaviors, @terminates, \
+         @decreases and @check (which includes all check clauses)."
     end)
 let () = on_reset Properties.clear
 
@@ -415,6 +413,14 @@ module SmokeDeadcall =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadlocalinit =
+  False(struct
+    let option_name = "-wp-smoke-dead-local-init"
+    let help = "When generating smoke tests, look for dead local variables \
+                initialization"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadloop =
   True(struct
     let option_name = "-wp-smoke-dead-loop"
@@ -487,7 +493,7 @@ module TerminatesDefinitions =
                 considered to terminate when called."
   end)
 
-module TerminatesFCDeclarations =
+module TerminatesStdlibDeclarations =
   False(struct
     let option_name = "-wp-frama-c-stdlib-terminate"
     let help = "Frama-C stdlib functions without terminates specification \
@@ -888,105 +894,6 @@ module BackTrack = Int
     end)
 
 let () = Parameter_customize.set_group wp_prover_options
-module Script =
-  String(struct
-    let option_name = "-wp-coq-script"
-    let arg_name = "f.script"
-    let default = ""
-    let help = "Set user's file for Coq proofs."
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module UpdateScript =
-  True(struct
-    let option_name = "-wp-update-coq-script"
-    let help = "If turned off, do not save or modify user's proofs."
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module CoqTimeout =
-  Int(struct
-    let option_name = "-wp-coq-timeout"
-    let default = 30
-    let arg_name = "n"
-    let help =
-      Printf.sprintf
-        "Set the timeout (in seconds) for Coq (default: %d)." default
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module CoqCompiler =
-  String(struct
-    let option_name = "-wp-coqc"
-    let default = "coqc"
-    let arg_name = "cmd"
-    let help =
-      Printf.sprintf
-        "Set the command line to run Coq Compiler (default 'coqc')."
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module CoqIde =
-  String(struct
-    let option_name = "-wp-coqide"
-    let default = "coqide"
-    let arg_name = "cmd"
-    let help =
-      Printf.sprintf
-        "Set the command line to run CoqIde (default 'coqide')\n\
-         If the command-line contains 'emacs' (case insentive),\n\
-         a coq-project file is used instead of coq options."
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module CoqProject =
-  String(struct
-    let option_name = "-wp-coq-project"
-    let default = "_CoqProject"
-    let arg_name = "file"
-    let help =
-      Printf.sprintf
-        "Set the Coq-Project file to used with Proof General (default '_CoqProject')"
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module CoqTactic =
-  String
-    (struct
-      let option_name = "-wp-coq-tactic"
-      let arg_name = "proof"
-      let default = "auto with zarith"
-      let help = "Default tactic for Coq"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module TryHints =
-  False
-    (struct
-      let option_name = "-wp-coq-tryhints"
-      let help = "Try scripts from other goals (see also -wp-hints)"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module Hints =
-  Int
-    (struct
-      let option_name = "-wp-coq-hints"
-      let arg_name = "n"
-      let default = 3
-      let help = "Maximum number of proposed Coq scripts (default 3)"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module CoqLibs =
-  String_list
-    (struct
-      let option_name = "-wp-coq-lib"
-      let arg_name = "*.v,*.vo"
-      let help = "Additional libraries for Coq"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
 let () = Parameter_customize.no_category ()
 module Why3Flags =
   String_list
@@ -994,43 +901,6 @@ module Why3Flags =
       let option_name = "-wp-why3-opt"
       let arg_name = "option,..."
       let help = "Additional options for Why3"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module AltErgo =
-  String(struct
-    let option_name = "-wp-alt-ergo"
-    let default = "alt-ergo"
-    let arg_name = "<cmd>"
-    let help = "Command to run alt-ergo (default: 'alt-ergo')"
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module AltGrErgo =
-  String(struct
-    let option_name = "-wp-altgr-ergo"
-    let default = "altgr-ergo"
-    let arg_name = "<cmd>"
-    let help = "Command to run alt-ergo user interface (default: 'altgr-ergo')"
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
-module AltErgoLibs =
-  String_list
-    (struct
-      let option_name = "-wp-alt-ergo-lib"
-      let arg_name = "*.mlw"
-      let help = "Additional library file for Alt-Ergo"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
-let () = Parameter_customize.no_category ()
-module AltErgoFlags =
-  String_list
-    (struct
-      let option_name = "-wp-alt-ergo-opt"
-      let arg_name = "option,..."
-      let help = "Additional options for Alt-Ergo"
     end)
 
 (* ------------------------------------------------------------------------ *)

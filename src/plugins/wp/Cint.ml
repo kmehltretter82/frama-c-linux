@@ -59,7 +59,8 @@ let library = "cint"
 let make_fun_int op i =
   Lang.extern_f ~library ~result:Logic.Int "%s_%a" op Ctypes.pp_int i
 let make_pred_int op i =
-  Lang.extern_f ~library ~result:Logic.Prop "%s_%a" op Ctypes.pp_int i
+  Lang.extern_f
+    ~library ~result:Logic.Prop ~coloring:true "%s_%a" op Ctypes.pp_int i
 
 (* let fun_int op = Ctypes.imemo (make_fun_int op) *) (* unused for now *)
 (* let pred_int op = Ctypes.imemo (make_pred_int op) *) (* unused for now *)
@@ -125,17 +126,37 @@ let match_integer t =
   | Logic.Kint c -> c
   | _ -> raise Not_found
 
+let match_to_cint t =
+  match F.repr t with
+  | Logic.Fun( conv , [a] ) -> (to_cint conv), a
+  | _ -> raise Not_found
+
+let match_mod t =
+  match F.repr t with
+  | Logic.Mod (e1, e2) -> e1, e2
+  | _ -> raise Not_found
+
+(* integration with qed should be improved! *)
+let is_positive t =
+  match F.repr t with
+  | Logic.Kint c -> Integer.le Integer.one c
+  | _ -> false
+
 (* integration with qed should be improved! *)
 let rec is_positive_or_null e = match F.repr e with
   | Logic.Fun( f , [e] ) when Fun.equal f f_lnot -> is_negative e
   | Logic.Fun( f , es ) when Fun.equal f f_land  -> List.exists is_positive_or_null es
   | Logic.Fun( f , es ) when Fun.equal f f_lor   -> List.for_all is_positive_or_null es
-  | Logic.Fun( f , es ) when Fun.equal f f_lxor   -> (match xor_sign es with | Some b -> b | _ -> false)
+  | Logic.Fun( f , es ) when Fun.equal f f_lxor  -> (match mul_xor_sign es with | Some b -> b | _ -> false)
   | Logic.Fun( f , es ) when Fun.equal f f_lsr || Fun.equal f f_lsl
     -> List.for_all is_positive_or_null es
   | _ -> (* try some improvement first then ask to qed *)
       let improved_is_positive_or_null e = match F.repr e with
         | Logic.Add es -> List.for_all is_positive_or_null es
+        | Logic.Mul es -> (match mul_xor_sign es with | Some b -> b | _ -> false)
+        | Logic.Mod(e1,e2) when is_positive e2 || is_negative e2 ->
+            (* e2<>0 ==> ( 0<=(e1 % e2) <=> 0<=e1 ) *)
+            is_positive_or_null e1
         | _ -> false
       in if improved_is_positive_or_null e then true
       else match F.is_true (F.e_leq e_zero e) with
@@ -143,20 +164,21 @@ let rec is_positive_or_null e = match F.repr e with
         | Logic.No | Logic.Maybe -> false
 and is_negative e = match F.repr e with
   | Logic.Fun( f , [e] ) when Fun.equal f f_lnot -> is_positive_or_null e
-  | Logic.Fun( f , es ) when Fun.equal f f_lor  -> List.exists is_negative es
-  | Logic.Fun( f , es ) when Fun.equal f f_land -> List.for_all is_negative es
-  | Logic.Fun( f , es ) when Fun.equal f f_lxor  -> (match xor_sign es with | Some b -> (not b) | _ -> false)
+  | Logic.Fun( f , es ) when Fun.equal f f_lor   -> List.exists is_negative es
+  | Logic.Fun( f , es ) when Fun.equal f f_land  -> List.for_all is_negative es
+  | Logic.Fun( f , es ) when Fun.equal f f_lxor  -> (match mul_xor_sign es with | Some b -> (not b) | _ -> false)
   | Logic.Fun( f , [k;n] ) when Fun.equal f f_lsr || Fun.equal f f_lsl
     -> is_positive_or_null n && is_negative k
   | _ -> (* try some improvement first then ask to qed *)
       let improved_is_negative e = match F.repr e with
         | Logic.Add es -> List.for_all is_negative es
+        | Logic.Mul es -> (match mul_xor_sign es with | Some b -> (not b) | _ -> false)
         | _ -> false
       in if improved_is_negative e then true
       else match F.is_true (F.e_lt e e_zero) with
         | Logic.Yes -> true
         | Logic.No | Logic.Maybe -> false
-and xor_sign es = try
+and mul_xor_sign es = try
     Some (List.fold_left (fun acc e ->
         if is_positive_or_null e then acc (* as previous *)
         else if is_negative e then (not acc) (* opposite sign *)
@@ -167,7 +189,7 @@ let match_positive_or_null e =
   if not (is_positive_or_null e) then raise Not_found;
   e
 
-let match_power2, _match_power2_minus1 =
+let match_power2, match_power2_minus1 =
   let highest_bit_number =
     let hsb p = if p land 2 = 0 then 0 else 1
     in let hsb p = let n = p lsr 2 in if n = 0 then hsb p else 2 + hsb n
@@ -197,7 +219,7 @@ let match_power2, _match_power2_minus1 =
   in let match_power2_minus1 e = match F.repr e with
       | Logic.Kint z when is_power2 (Integer.succ z) ->
           e_zint (highest_bit_number (Integer.succ z))
-      | _ -> raise Not_found
+      | _ -> match_power2 (e_add e_one e)
   in match_power2, match_power2_minus1
 
 let match_fun op t =
@@ -250,6 +272,7 @@ let match_positive_or_null_integer_arg2 =
 let match_integer_extraction = match_list_head match_integer
 
 let match_power2_extraction = match_list_extraction match_power2
+let match_power2_minus1_extraction = match_list_extraction match_power2_minus1
 let match_binop_one_extraction binop = match_list_extraction (match_binop_one_arg1 binop)
 
 
@@ -600,26 +623,65 @@ let smp_lnot = function
 (* --- Comparision with L-AND / L-OR / L-NOT                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let smp_leq_with_land a b =
-  let es = match_fun f_land a in
-  let a1,_ = match_list_head match_positive_or_null_integer es in
-  if F.decide (F.e_leq (e_zint a1) b)
+let smp_leq_improved f a b =
+  ignore (match_fun f b) ; (* It must be an improved of [is_positive_or_null f(args)] *)
+  (* a <= 0 && 0 <= f(args) *)
+  if F.decide (F.e_leq a F.e_zero) && is_positive_or_null b
   then e_true
   else raise Not_found
+
+let smp_leq_with_land a b =
+  try
+    let es = match_fun f_land a in
+    let a1,_ = match_list_head match_positive_or_null_integer es in
+    if F.decide (F.e_leq (e_zint a1) b)
+    then e_true
+    else raise Not_found
+  with Not_found ->
+    (* a <= 0 && 0 <= (x&y) ==> a <= (x & y) *)
+    smp_leq_improved f_land a b
 
 let smp_eq_with_land a b =
   let es = match_fun f_land a in
   try
-    let b1 = match_integer b in
-    try (* (b1&~a2)!=0 ==> (b1==(a2&e) <=> false) *)
-      let a2,_ = match_integer_extraction es in
-      if Integer.is_zero (Integer.logand b1 (Integer.lognot a2))
-      then raise Not_found ;
-      e_false
-    with Not_found when b == e_minus_one ->
-      (* -1==(a1&a2) <=> (-1==a1 && -1==a2) *)
-      F.e_and (List.map (e_eq b) es)
-  with Not_found -> introduction_bit_test_positive es b
+    try
+      let b1 = match_integer b in
+      try (* (b1&~a2)!=0 ==> (b1==(a2&e) <=> false) *)
+        let a2,_ = match_integer_extraction es in
+        if Integer.is_zero (Integer.logand b1 (Integer.lognot a2))
+        then raise Not_found ;
+        e_false
+      with Not_found when b == e_minus_one ->
+        (* -1==(a1&a2) <=> (-1==a1 && -1==a2) *)
+        F.e_and (List.map (e_eq b) es)
+    with Not_found -> introduction_bit_test_positive es b
+  with Not_found ->
+  try
+    (* k>=0 & b1>=0 ==> (b1 & ((1 << k) -1) == b1 % (1 << k)  <==> true) *)
+    let b1,b2 = match_mod b in
+    let k = match_power2 b2 in
+    (* note: a positive or null k is required by match_power2, match_power2_minus1 *)
+    let k',_,es = match_power2_minus1_extraction es in
+    if not ((is_positive_or_null b1) &&
+            (F.decide (F.e_eq k k')) &&
+            (F.decide (F.e_eq b1 (F.e_fun f_land es))))
+    then raise Not_found ;
+    F.e_true
+  with Not_found ->
+    (* k in {8,16,32,64} ==> (b1 & ((1 << k) -1) == to_cint_unsigned_bits(k, b1)  <==> true *)
+    let iota,b1 = match_to_cint b in
+    if Ctypes.signed iota then raise Not_found ;
+    let n = Ctypes.i_bits iota in
+    if n = 1 then
+      (* rejects [to_bool()] that is not a modulo *)
+      raise Not_found ;
+    let k',_,es = match_power2_minus1_extraction es in
+    let k' = match_integer k' in
+    let k = Integer.of_int n in
+    if not ((Integer.equal k k') &&
+            (F.decide (F.e_eq b1 (F.e_fun f_land es))))
+    then raise Not_found ;
+    F.e_true
 
 let smp_eq_with_lor a b =
   let b1 = match_integer b in
@@ -736,7 +798,11 @@ let smp_eq_with_lsl a b =
   try smp_eq_with_lsl_cst a b
   with Not_found -> smp_cmp_with_lsl e_eq a b
 
-let smp_leq_with_lsl a0 b0 = smp_cmp_with_lsl e_leq a0 b0
+let smp_leq_with_lsl a b =
+  try smp_cmp_with_lsl e_leq a b
+  with Not_found ->
+    (* a <= 0 && 0 <= (x << y) ==> a <= (x << y) *)
+    smp_leq_improved f_lsl a b
 
 let smp_eq_with_lsr a0 b0 =
   try
@@ -779,6 +845,7 @@ let smp_leq_with_lsr x y =
       let k = two_power_k p in
       e_leq x (e_div a (e_zint k))
   with Not_found ->
+  try
     let a,p = match_fun f_lsr x |> match_positive_or_null_integer_arg2 in
     (* (a >> p) <= y with p >= 0 *)
     if y == e_zero then
@@ -788,6 +855,10 @@ let smp_leq_with_lsr x y =
       (* p >= 0 ==> ( (a >> p) <= y <==> a/(2**p) <= y ) *)
       let k = two_power_k p in
       e_leq (e_div a (e_zint k)) y
+  with Not_found ->
+    (* x <= y && 0 <= (a&b) ==> x <= (a >> b) *)
+    smp_leq_improved f_lsr x y
+
 
 (* Rewritting at export *)
 let bitk_export k e = F.e_fun ~result:Logic.Bool f_bit_export [e;k]
@@ -817,10 +888,10 @@ let () =
            no creation of [e_fun f_bit_stdlib args] *)
         let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
         let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
-        let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot smp_lnot in
-        let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor
+        let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot smp_lnot ~leq:(smp_leq_improved f_lnot) in
+        let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor ~leq:(smp_leq_improved f_lxor)
             (smp2 f_lxor Integer.logxor) in
-        let bi_lor  = mk_builtin "f_lor" f_lor  ~eq:smp_eq_with_lor
+        let bi_lor  = mk_builtin "f_lor" f_lor  ~eq:smp_eq_with_lor ~leq:(smp_leq_improved f_lor)
             (smp2 f_lor  Integer.logor) in
         let bi_land = mk_builtin "f_land" f_land ~eq:smp_eq_with_land ~leq:smp_leq_with_land
             smp_land in
@@ -1161,13 +1232,13 @@ let is_cint_simplifier =
             Lang.F.QED.f_map ~pool ~forall:false ~exists:false walk_both_pol t in
       Lang.F.p_bool (walk ~term_pol:(Polarity.from_bool is_goal) (Lang.F.e_prop p))
 
-    method simplify_exp (e : term) = e
+    method equivalent_exp (e : term) = e
 
-    method simplify_hyp p = self#simplify ~is_goal:false p
+    method weaker_hyp p = self#simplify ~is_goal:false p
 
-    method simplify_goal p = self#simplify ~is_goal:true p
+    method stronger_goal p = self#simplify ~is_goal:true p
 
-    method simplify_branch p = p
+    method equivalent_branch p = p
 
     method infer = []
   end
@@ -1221,19 +1292,19 @@ let mask_simplifier =
              end
            | _ -> ()) (F.e_prop p)
 
-    method simplify_exp e =
+    method equivalent_exp e =
       if Tmap.is_empty magnitude then e else
         Lang.e_subst (rewrite magnitude) e
 
-    method simplify_hyp p =
+    method weaker_hyp p =
       if Tmap.is_empty magnitude then p else
         Lang.p_subst (rewrite magnitude) p
 
-    method simplify_branch p =
+    method equivalent_branch p =
       if Tmap.is_empty magnitude then p else
         Lang.p_subst (rewrite magnitude) p
 
-    method simplify_goal p =
+    method stronger_goal p =
       if Tmap.is_empty magnitude then p else
         Lang.p_subst (rewrite magnitude) p
 

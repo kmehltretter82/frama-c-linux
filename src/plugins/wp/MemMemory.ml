@@ -34,15 +34,9 @@ let library = "memory"
 let a_addr = Lang.datatype ~library "addr"
 let t_addr = L.Data(a_addr,[])
 let f_base   = Lang.extern_f ~library ~result:L.Int
-    ~link:{altergo = Qed.Engine.F_subst("%1.base");
-           why3    = Qed.Engine.F_call "base";
-           coq     = Qed.Engine.F_subst("(base %1)");
-          } "base"
+    ~link:(Qed.Engine.F_subst ("base", "%1.base")) "base"
 let f_offset = Lang.extern_f ~library ~result:L.Int
-    ~link:{altergo = Qed.Engine.F_subst("%1.offset");
-           why3    = Qed.Engine.F_call "offset";
-           coq     = Qed.Engine.F_subst("(offset %1)");
-          } "offset"
+    ~link:(Qed.Engine.F_subst ("offset", "%1.offset")) "offset"
 let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
 let f_global = Lang.extern_f ~library ~result:t_addr ~category:L.Injection "global"
 let f_null   = Lang.extern_f ~library ~result:t_addr "null"
@@ -60,17 +54,8 @@ let ty_fst_arg = function
   | Some l :: _ -> l
   | _ -> raise Not_found
 
-let l_havoc = Qed.Engine.{
-    coq = F_call "fhavoc" ;
-    altergo = F_call "havoc" ;
-    why3 = F_call "havoc" ;
-  }
-
-let l_set_init = Qed.Engine.{
-    coq = F_call "fset_init" ;
-    altergo = F_call "set_init" ;
-    why3 = F_call "set_init" ;
-  }
+let l_havoc = Qed.Engine.F_call "havoc"
+let l_set_init = Qed.Engine.F_call "set_init"
 
 let p_valid_rd = Lang.extern_fp ~library "valid_rd"
 let p_valid_rw = Lang.extern_fp ~library "valid_rw"
@@ -80,15 +65,15 @@ let p_separated = Lang.extern_fp ~library "separated"
 let p_included = Lang.extern_fp ~library "included"
 let p_eqmem = Lang.extern_fp ~library "eqmem"
 let f_havoc = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_havoc "havoc"
-let f_region = Lang.extern_f ~library ~result:L.Int "region" (* base -> region *)
-let p_framed = Lang.extern_fp ~library "framed" (* m-pointer -> prop *)
-let p_linked = Lang.extern_fp ~library "linked" (* allocation-table -> prop *)
-let p_sconst = Lang.extern_fp ~library "sconst" (* int-memory -> prop *)
+let f_region = Lang.extern_f ~coloring:true ~library ~result:L.Int "region" (* base -> region *)
+let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* m-pointer -> prop *)
+let p_linked = Lang.extern_fp ~coloring:true ~library "linked" (* allocation-table -> prop *)
+let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst" (* int-memory -> prop *)
 let p_addr_lt = Lang.extern_p ~library ~bool:"addr_lt_bool" ~prop:"addr_lt" ()
 let p_addr_le = Lang.extern_p ~library ~bool:"addr_le_bool" ~prop:"addr_le" ()
 let f_set_init =
   Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_set_init "set_init"
-let p_cinits = Lang.extern_fp ~library "cinits" (* initializaton-table -> prop *)
+let p_cinits = Lang.extern_fp ~coloring:true ~library "cinits" (* initializaton-table -> prop *)
 let p_is_init_r = Lang.extern_fp ~library "is_init_range"
 let p_monotonic = Lang.extern_fp ~library "monotonic_init"
 

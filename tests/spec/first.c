@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print tests/spec/third.c tests/spec/second.c
+   OPT: -print %{dep:@PTEST_DIR@/third.c} %{dep:@PTEST_DIR@/second.c}
 */
 /*@ behavior b:
   requires \valid(first);

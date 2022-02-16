@@ -1,9 +1,9 @@
-#!/bin/sh -e
+#!/usr/bin/env bash
 ##########################################################################
 #                                                                        #
 #  This file is part of the Frama-C's E-ACSL plug-in.                    #
 #                                                                        #
-#  Copyright (C) 2012-2020                                               #
+#  Copyright (C) 2012-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -23,11 +23,30 @@
 
 # Convenience wrapper for small runs of E-ACSL Frama-C plugin
 
-# Base dir of this script
-BASEDIR="$(realpath `dirname $0`)"
+# The -e option is not present in the sha-bang on purpose, the error() function
+# should be used after each command that may fail.
+
+# Portable realpath using pwd
+realpath() {
+  if [ -e "$1" ]; then
+    if [ -d "$1" ]; then
+      (cd "$1" && pwd)
+    else
+      local name=$(basename "$1")
+      local dir=$(cd $(dirname "$1") && pwd)
+      echo $dir/$name
+    fi
+    return 0
+  else
+    echo "realpath: no such file or directory: '$1'" 1>&2
+    return 1
+  fi
+}
 
 # Print a message to STDERR and exit. If the second argument (exit code)
 # is provided and it is '0' then do nothing.
+# /!\ Use this function after each command that may fail with the second
+# argument set to $?
 error () {
   if [ -z "$2" ] || ! [ "$2" = 0 ]; then
     echo "e-acsl-gcc: fatal error: $1" 1>&2
@@ -40,6 +59,10 @@ warning () {
   echo "e-acsl-gcc: warning: $1" 1>&2
 }
 
+# Base dir of this script
+BASEDIR="$(realpath `dirname $0`)"
+error "unable to find base dir of script" $?
+
 # True if the script is launched from the E-ACSL sources, false otherwise
 is_development_version() {
   test -f "$BASEDIR/../E_ACSL.mli"
@@ -47,13 +70,13 @@ is_development_version() {
 
 # Check if a given executable name can be found by in the PATH
 has_tool() {
-  which "$@" >/dev/null 2>&1 && return 0 || return 1
+  command -v "$@" >/dev/null 2>&1 && return 0 || return 1
 }
 
 # Check if a given executable name is indeed an executable or can be found
 # in the $PATH. Abort the execution if not.
 check_tool() {
-   { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
+   { has_tool "$1" || test -e "$1"; } || error "No executable '$1' found";
 }
 
 # Check if a given Frama-C executable name is indeed an executable, can be found
@@ -61,7 +84,7 @@ check_tool() {
 # in the binary folder of the development version. Abort the execution if not.
 retrieve_framac_path() {
   if has_tool "$1"; then
-    echo $(which "$1")
+    echo $(command -v "$1")
   elif [ -e "$1" ]; then
     echo "$1"
   elif [ -e "$BASEDIR/$1" ]; then
@@ -69,7 +92,8 @@ retrieve_framac_path() {
   elif is_development_version && [ -e "$BASEDIR/../../../../bin/$1" ]; then
     echo "$BASEDIR/../../../../bin/$1"
   else
-    error "No executable $1 or $BASEDIR/$1 found"
+    echo "No executable '$1' or '$BASEDIR/$1' found"
+    return 1
   fi
 }
 
@@ -103,21 +127,30 @@ is_number() {
   fi
 }
 
-# Portable realpath using pwd
-realpath() {
-  if [ -e "$1" ]; then
-    if [ -d "$1" ]; then
-      (cd "$1" && pwd)
-    else
-      local name=$(basename "$1")
-      local dir=$(cd $(dirname "$1") && pwd)
-      echo $dir/$name
-    fi
-    return 0
-  else
-    echo "realpath: no such file or directory: '$1'" 1>&2
-    return 1
-  fi
+# Retrieve the zone size for a given zone name and limit
+# - $1: the zone name
+# - $2: the zone size
+# - $3: the minimum zone size
+# Return $2 if it is a positive number greater or equal than $3, otherwise
+# return an error message with an error code of 1.
+get_zone_size() {
+  local name="$1"
+  local n="$2"
+  local lim="$3"
+
+  local zone_size="$(is_number "$n" $lim)"
+  case $zone_size in
+    '-')
+      echo "invalid number for $name: '$n'"
+      return 1
+    ;;
+    '<')
+      echo "$name limit less than minimal size [$lim]"
+      return 1
+    ;;
+    *) echo $zone_size
+  esac;
+  return 0
 }
 
 # Split a comma-separated string into a space-separated string, remove
@@ -229,7 +262,10 @@ mmodel_features() {
   case $model in
     bittree) flags="-DE_ACSL_BITTREE_MMODEL" ;;
     segment) flags="-DE_ACSL_SEGMENT_MMODEL" ;;
-    *) error "Memory model '$model' is not available in this distribution" ;;
+    *)
+      echo "Memory model '$model' is not available in this distribution"
+      return 1
+    ;;
   esac
 
   # Temporal analysis
@@ -255,6 +291,16 @@ mmodel_features() {
   # Set heap shadow size
   if [ -n "$OPTION_HEAP_SIZE" ]; then
     flags="$flags -DE_ACSL_HEAP_SIZE=$OPTION_HEAP_SIZE"
+  fi
+
+  # Set TLS shadow size
+  if [ -n "$OPTION_TLS_SIZE" ]; then
+    flags="$flags -DE_ACSL_TLS_SIZE=$OPTION_TLS_SIZE"
+  fi
+
+  # Set thread stack size
+  if [ -n "$OPTION_THREAD_STACK_SIZE" ]; then
+    flags="$flags -DE_ACSL_THREAD_STACK_SIZE=$OPTION_THREAD_STACK_SIZE"
   fi
 
   # Set runtime verosity flags
@@ -300,13 +346,13 @@ check_getopt;
 LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,full-mtracking,gmp,
   quiet,logfile:,ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
-  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
+  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,concurrency,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
-  temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
-  external-assert:,assert-print-data,no-assert-print-data,external-print-value:,
-  validate-format-strings,no-trace,libc-replacements,with-dlmalloc:,
-  dlmalloc-from-sources,dlmalloc-compile-only,dlmalloc-compile-flags:,
-  odlmalloc:,ar:,ranlib:,mbits:"
+  temporal,weak-validity,stack-size:,heap-size:,zone-sizes:,rt-verbose,
+  free-valid-address,external-assert:,assert-print-data,no-assert-print-data,
+  external-print-value:,validate-format-strings,no-trace,libc-replacements,
+  with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
+  dlmalloc-compile-flags:,odlmalloc:,ar:,ranlib:,mbits:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -332,7 +378,8 @@ OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
 OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
-OPTION_FULL_MTRACKING=                      # Instrument as much as possible
+OPTION_FULL_MTRACKING=                   # Instrument as much as possible
+OPTION_CONCURRENCY=                      # Activate concurrency support
 OPTION_GMP=                              # Use GMP integers everywhere
 OPTION_EACSL_MMODELS="segment"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
@@ -349,8 +396,10 @@ OPTION_VALIDATE_FORMAT_STRINGS= # Runtime format string validation
 OPTION_LIBC_REPLACEMENTS= # Replace libc functions with RTL definitions
 OPTION_RTE_SELECT=        # Generate assertions for these functions only
 OPTION_THEN=              # Adds -then in front of -e-acsl in FC command.
-OPTION_STACK_SIZE=32      # Size of a heap shadow space (in MB)
-OPTION_HEAP_SIZE=128      # Size of a stack shadow space (in MB)
+OPTION_STACK_SIZE=        # Size of a heap shadow space (in MB)
+OPTION_HEAP_SIZE=         # Size of a stack shadow space (in MB)
+OPTIONS_TLS_SIZE=         # Size of a TLS shadow space (in MB)
+OPTIONS_THREAD_STACK_SIZE=  # Size of a thread stack shadow space (in MB)
 OPTION_KEEP_GOING=        # Report failing assertions but do not abort execution
 OPTION_EXTERNAL_ASSERT="" # Use custom definition of assert function
 OPTION_ASSERT_PRINT_DATA= # Print data contributing to a failed runtime assertion
@@ -364,6 +413,8 @@ OPTION_OUTPUT_DLMALLOC=""                # Name of the compiled dlmalloc
 SUPPORTED_MMODELS="bittree,segment" # Supported memory model names
 MIN_STACK=16 # Minimal size of a tracked program stack
 MIN_HEAP=64 # Minimal size of a tracked program heap
+MIN_TLS=1 # Minimal size of a tracked program TLS
+MIN_THREAD_STACK=4 # Minimal size of a tracked program thread stack
 
 manpage() {
   printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
@@ -543,16 +594,21 @@ do
       shift;
       OPTION_GMP="-e-acsl-gmp-only"
     ;;
+    # Concurrency support
+    --concurrency)
+      shift;
+      OPTION_CONCURRENCY="-e-acsl-concurrency"
+    ;;
     # Supply Frama-C executable name
     -I|--frama-c)
       shift;
-      OPTION_FRAMAC="$(which $1)"
+      OPTION_FRAMAC="$(command -v $1 || echo $1)"
       shift;
     ;;
     # Supply GCC executable name
     -G|--gcc)
       shift;
-      OPTION_CC="$(which $1)"
+      OPTION_CC="$(command -v $1 || echo $1)"
       shift;
     ;;
     # Specify EACSL_SHARE directory (where C runtime library lives) by hand
@@ -590,6 +646,7 @@ do
       shift;
       # Convert comma-separated string into white-space separated string
       OPTION_EACSL_MMODELS="`echo $1 | sed -s 's/,/ /g'`"
+      error "unable to parse '$1' with sed" $?
       shift;
     ;;
     # Print names of the supported memody models.
@@ -636,6 +693,8 @@ do
     ;;
     # Set heap shadow size
     --heap-size)
+      warning "--heap-size is a deprecated option."
+      warning "Please use --zone-sizes instead."
       shift;
       zone_size="$(is_number "$1" $MIN_HEAP)"
       case $zone_size in
@@ -648,6 +707,8 @@ do
     ;;
     # Set stack shadow size
     --stack-size)
+      warning "--stack-size is a deprecated option."
+      warning "Please use --zone-sizes instead."
       shift;
       zone_size="$(is_number "$1" $MIN_STACK)"
       case $zone_size in
@@ -655,6 +716,52 @@ do
         '<') error "stack limit less than minimal size [$MIN_STACK"] ;;
         *) OPTION_STACK_SIZE=$zone_size ;;
       esac;
+      shift;
+    ;;
+    --zone-sizes)
+      shift;
+      zone_help_msg="available zone names for option --zone-sizes:
+  - stack
+  - heap
+  - tls
+  - thread-stack
+The size is given in MB.
+"
+      IFS=',' read -ra sizes <<< "$1"
+      for size in "${sizes[@]}"; do
+        IFS=':' read -ra size_arr <<< "$size"
+        if [ "${#size_arr[@]}" -eq "2" ]; then
+          zone_name="${size_arr[0]}"
+          zone_size="${size_arr[1]}"
+          case $zone_name in
+            stack)
+              OPTION_STACK_SIZE="$(get_zone_size $zone_name "$zone_size" $MIN_STACK)"
+              error "$OPTION_STACK_SIZE" $?
+            ;;
+            heap)
+              OPTION_HEAP_SIZE="$(get_zone_size $zone_name "$zone_size" $MIN_HEAP)"
+              error "$OPTION_HEAP_SIZE" $?
+            ;;
+            tls)
+              OPTION_TLS_SIZE="$(get_zone_size $zone_name "$zone_size" $MIN_TLS)"
+              error "$OPTION_TLS_SIZE" $?
+            ;;
+            thread-stack)
+              OPTION_THREAD_STACK_SIZE="$(get_zone_size $zone_name "$zone_size" $MIN_THREAD_STACK)"
+              error "$OPTION_THREAD_STACK_SIZE" $?
+            ;;
+            *)
+              error "invalid zone name: '$zone_name'
+$zone_help_msg"
+            ;;
+          esac
+        elif [ "${#size_arr[@]}" -eq "1" ] && [ "${size_arr[0]}" == "help" ]; then
+          printf "e-acsl-gcc.sh - $zone_help_msg"
+          exit 1
+        else
+          error "invalid zone size format: '$size' (expected 'name:number')"
+        fi
+      done
       shift;
     ;;
     # Custom runtime assert function
@@ -696,12 +803,12 @@ do
     ;;
     --ar)
       shift;
-      OPTION_AR="$(which $1)"
+      OPTION_AR="$(command -v $1 || echo $1)"
       shift;
     ;;
     --ranlib)
       shift;
-      OPTION_RANLIB="$(which $1)"
+      OPTION_RANLIB="$(command -v $1 || echo $1)"
       shift;
     ;;
     --with-dlmalloc)
@@ -746,6 +853,7 @@ fi
 
 # Check Frama-C and GCC executable names
 OPTION_FRAMAC="$(retrieve_framac_path "$OPTION_FRAMAC")"
+error "$OPTION_FRAMAC" $?
 check_tool "$OPTION_CC"
 
 # Frama-C directories
@@ -757,6 +865,7 @@ FRAMAC="$OPTION_FRAMAC"
 if is_development_version; then
   # Development version
   DEVELOPMENT="$(realpath "$BASEDIR/..")"
+  error "unable to find parent dir of base dir" $?
   # Check if the project has been built, as if this is a non-installed
   # version that has not been built Frama-C will fallback to an installed one
   # for instrumentation but still use local RTL
@@ -799,7 +908,7 @@ GCCMACHDEP="-m$MACHDEPFLAGS"
 
 # RTE flags
 RTE_FLAGS="$(rte_options "$OPTION_RTE" "$OPTION_RTE_SELECT")"
-error "Invalid argument $1 to --rte|-a option" $?
+error "Invalid argument '$RTE_FLAGS' to --rte|-a option" $?
 
 # Frama-C and related flags
 # Additional flags passed to Frama-C preprocessor via `-cpp-extra-args`
@@ -831,6 +940,12 @@ else
   OPT_LDFLAGS=""
 fi
 
+# Concurrency support
+if [ -n "$OPTION_CONCURRENCY" ]; then
+  OPT_CPPFLAGS="$OPT_CPPFLAGS -DE_ACSL_CONCURRENCY_PTHREAD"
+  OPT_LDFLAGS="$OPT_LDFLAGS -pthread"
+fi
+
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
@@ -860,7 +975,8 @@ if [ "`basename $CC`" = 'clang' ]; then
     -Wno-incompatible-pointer-types-discards-qualifiers"
 fi
 
-CPPFLAGS="$OPTION_CPPFLAGS"
+CPPFLAGS="$OPTION_CPPFLAGS
+  $OPT_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS
   $OPT_LDFLAGS"
 
@@ -912,6 +1028,8 @@ if [ "$OPTION_DLMALLOC_FROM_SOURCES" = "1" -o \
     -DONLY_MSPACES \
     -DMALLOC_ALIGNMENT=32 \
     -DMSPACE_PREFIX=__e_acsl_ \
+    -DUSE_LOCKS=1 \
+    -DUSE_SPIN_LOCKS=1 \
     $OPTION_DLMALLOC_COMPILE_FLAGS
   "
 
@@ -978,6 +1096,7 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_DEBUG
     $OPTION_VALIDATE_FORMAT_STRINGS
     $OPTION_ASSERT_PRINT_DATA
+    $OPTION_CONCURRENCY
     -e-acsl-share="$EACSL_SHARE"
     -then-last"
 fi
@@ -1027,6 +1146,7 @@ if [ -n "$OPTION_COMPILE" ]; then
     # RTL sources
     EACSL_RTL="$EACSL_SHARE/e_acsl_rtl.c"
     EACSL_MMODEL_FEATURES="$(mmodel_features $model)"
+    error "$EACSL_MMODEL_FEATURES" $?
     ($OPTION_ECHO;
      $CC \
        $EACSL_MMODEL_FEATURES \

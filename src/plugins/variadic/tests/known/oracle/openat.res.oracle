@@ -1,28 +1,28 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:121: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:121: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:128: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:124: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:131: 
   Declaration of variadic function openat.
-[variadic] tests/known/openat.c:8: 
+[variadic] openat.c:8: 
   Translating call to the specialized version openat(int, char const *, int, mode_t).
-[variadic] tests/known/openat.c:9: 
+[variadic] openat.c:9: 
   Translating call to the specialized version openat(int, char const *, int, mode_t).
-[variadic] tests/known/openat.c:9: Warning: 
+[variadic:typing] openat.c:9: Warning: 
   Incorrect type for argument 4. The argument will be cast from int to mode_t.
-[variadic] tests/known/openat.c:10: Warning: 
+[variadic:prototype] openat.c:10: Warning: 
   No matching prototype found for this call to openat.
   Expected candidates:
          openat(int, char const *, int)
          openat(int, char const *, int, mode_t)
   Given arguments:
          openat(int, char const *, int, double)
-[variadic] tests/known/openat.c:10: 
+[variadic] openat.c:10: 
   Fallback translation of call openat to a call to the specialized version openat_fallback_1.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function __va_openat_mode_t
-[kernel:annot:missing-spec] tests/known/openat.c:10: Warning: 
+[kernel:annot:missing-spec] openat.c:10: Warning: 
   Neither code nor specification for function openat_fallback_1, generating default assigns from the prototype
 [eva] using specification for function openat_fallback_1
 [eva] done for function main

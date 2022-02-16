@@ -41,6 +41,7 @@ type selection =
   | Clause of clause
   | Inside of clause * term
   | Compose of compose
+  | Multi of selection list
 
 and compose = private
   | Cint of Integer.t
@@ -51,6 +52,7 @@ val int : int -> selection
 val cint : Integer.t -> selection
 val range : int -> int -> selection
 val compose : string -> selection list -> selection
+val multi : selection list -> selection
 val get_int : selection -> int option
 val destruct : selection -> selection list
 
@@ -179,6 +181,8 @@ val at : selection -> int option
 val mapi : (int -> int -> 'a -> 'b) -> 'a list -> 'b list
 val insert : ?at:int -> (string * pred) list -> process
 val replace : at:int -> (string * condition) list -> process
+val replace_single : at:int -> string * condition -> sequent -> string * sequent
+val replace_step : at:int -> condition list -> process
 val split : (string * pred) list -> process
 val rewrite : ?at:int -> (string * pred * term * term) list -> process
 (** For each pattern [(descr,guard,src,tgt)] replace [src] with [tgt]

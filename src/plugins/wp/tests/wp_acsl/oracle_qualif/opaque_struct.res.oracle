@@ -1,13 +1,13 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_acsl/opaque_struct.i (no preprocessing)
+[kernel] Parsing opaque_struct.i (no preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function assigned_via_pointer
-[rte] annotating function assigns
-[rte] annotating function assigns_effect
-[rte] annotating function chunk_typing
-[rte] annotating function initialized_assigns
-[rte] annotating function uninitialized_assigns
-[kernel:annot:missing-spec] tests/wp_acsl/opaque_struct.i:79: Warning: 
+[rte:annot] annotating function assigned_via_pointer
+[rte:annot] annotating function assigns
+[rte:annot] annotating function assigns_effect
+[rte:annot] annotating function chunk_typing
+[rte:annot] annotating function initialized_assigns
+[rte:annot] annotating function uninitialized_assigns
+[kernel:annot:missing-spec] opaque_struct.i:79: Warning: 
   Neither code nor specification for function use, generating default assigns from the prototype
 [wp] 15 goals scheduled
 [wp] [Alt-Ergo] Goal typed_check_lemma_fail : Unsuccess
@@ -40,17 +40,17 @@
   assigns_effect            -        1        3      33.3%
   chunk_typing              2        -        2       100%
 ------------------------------------------------------------
-[wp] tests/wp_acsl/opaque_struct.i:31: Warning: 
+[wp] opaque_struct.i:31: Warning: 
   Memory model hypotheses for function 'g':
   /*@ behavior wp_typed:
         requires \separated(p, &S1, &S2, &p); */
   void g(void);
-[wp] tests/wp_acsl/opaque_struct.i:64: Warning: 
+[wp] opaque_struct.i:64: Warning: 
   Memory model hypotheses for function 'assign':
   /*@ behavior wp_typed:
         requires \separated(a, &S1, &S2); */
   void assign(struct S *a);
-[wp] tests/wp_acsl/opaque_struct.i:67: Warning: 
+[wp] opaque_struct.i:67: Warning: 
   Memory model hypotheses for function 'assigns_effect':
   /*@
      behavior wp_typed:
@@ -60,12 +60,12 @@
        requires \separated(q, &S1, &S2);
      */
   void assigns_effect(int *p_0, float *q, char *c, struct S *a);
-[wp] tests/wp_acsl/opaque_struct.i:76: Warning: 
+[wp] opaque_struct.i:76: Warning: 
   Memory model hypotheses for function 'use':
   /*@ behavior wp_typed:
         requires \separated(s, &S1, &S2); */
   void use(struct S *s);
-[wp] tests/wp_acsl/opaque_struct.i:79: Warning: 
+[wp] opaque_struct.i:79: Warning: 
   Memory model hypotheses for function 'chunk_typing':
   /*@
      behavior wp_typed:

@@ -1,5 +1,5 @@
 # frama-c -wp -wp-no-let [...]
-[kernel] Parsing tests/wp_plugin/dynamic.i (no preprocessing)
+[kernel] Parsing dynamic.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 5 goals scheduled
@@ -15,7 +15,7 @@
  Functions                 WP     Alt-Ergo  Total   Success
   guarded_call              3        2        5       100%
 ------------------------------------------------------------
-[wp] tests/wp_plugin/dynamic.i:43: Warning: 
+[wp] dynamic.i:43: Warning: 
   Memory model hypotheses for function 'guarded_call':
   /*@ behavior wp_typed:
         requires \separated(p, &X); */

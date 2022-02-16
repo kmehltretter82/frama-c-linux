@@ -1,4 +1,4 @@
-[kernel] Parsing tests/spec/type_of_term.i (no preprocessing)
+[kernel] Parsing type_of_term.i (no preprocessing)
 [type_of_term] Term: *(p + (..)), type is set<int>
 [type_of_term] Host: *(p + (..)), type is set<int>
 [type_of_term] Offset: , type is set<int>

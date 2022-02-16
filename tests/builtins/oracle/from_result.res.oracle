@@ -1,37 +1,37 @@
-[kernel] Parsing tests/builtins/from_result.c (with preprocessing)
+[kernel] Parsing from_result.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function bar <- main.
-  Called from tests/builtins/from_result.c:32.
-[eva] tests/builtins/from_result.c:18: Call to builtin malloc
-[eva] tests/builtins/from_result.c:18: allocating variable __malloc_bar_l18
+  Called from from_result.c:32.
+[eva] from_result.c:18: Call to builtin malloc
+[eva] from_result.c:18: allocating variable __malloc_bar_l18
 [eva] Recording results for bar
 [eva] Done for function bar
 [eva] computing for function bar <- main.
-  Called from tests/builtins/from_result.c:33.
-[eva] tests/builtins/from_result.c:18: Call to builtin malloc
-[eva] tests/builtins/from_result.c:18: allocating variable __malloc_bar_l18_0
+  Called from from_result.c:33.
+[eva] from_result.c:18: Call to builtin malloc
+[eva] from_result.c:18: allocating variable __malloc_bar_l18_0
 [eva] Recording results for bar
 [eva] Done for function bar
 [eva] computing for function create_t <- main.
-  Called from tests/builtins/from_result.c:34.
+  Called from from_result.c:34.
 [eva] using specification for function create_t
 [eva] Done for function create_t
 [eva] computing for function create_t1 <- main.
-  Called from tests/builtins/from_result.c:35.
+  Called from from_result.c:35.
 [eva] using specification for function create_t1
 [eva] Done for function create_t1
 [eva] computing for function change_t <- main.
-  Called from tests/builtins/from_result.c:36.
+  Called from from_result.c:36.
 [eva] Recording results for change_t
 [eva] Done for function change_t
 [eva] computing for function foo <- main.
-  Called from tests/builtins/from_result.c:37.
+  Called from from_result.c:37.
 [eva] using specification for function foo
-[eva] tests/builtins/from_result.c:29: Warning: 
+[eva] from_result.c:29: Warning: 
   no 'assigns \result \from ...' clause specified for function foo
 [eva] Done for function foo
 [eva] Recording results for main

@@ -69,6 +69,8 @@ let dkey_file_print_one = register_category "file:print-one"
 
 let dkey_file_transform = register_category "file:transformation"
 
+let dkey_file_source = register_category "file:source"
+
 let dkey_filter = register_category "filter"
 
 let dkey_globals = register_category "globals"
@@ -200,6 +202,13 @@ let wkey_audit = register_warn_category "audit"
 let () = set_warn_status wkey_audit Log.Werror
 
 let wkey_parser_unsupported = register_warn_category "parser:unsupported"
+
+let wkey_asm = register_warn_category "asm:clobber"
+
+let wkey_unnamed_typedef = register_warn_category "parser:unnamed-typedef"
+
+let wkey_file_not_found = register_warn_category "file:not-found"
+let () = set_warn_status wkey_file_not_found Log.Wfeedback
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
@@ -610,7 +619,7 @@ module SymbolicPath =
     (struct
       let option_name = "-add-symbolic-path"
       let module_name = "SymbolicPath"
-      let arg_name = "name_1:path_1,...,name_n:path_n"
+      let arg_name = "path_1:name_1,...,path_n:name_n"
       let existence = Filepath.Indifferent
       let file_kind = "directory"
       let help =
@@ -796,6 +805,15 @@ module BigIntsHex =
     let help = "display integers larger than <max> using hexadecimal \
                 notation"
     let default = -1
+  end)
+
+let () = Parameter_customize.set_group inout_source
+module EagerLoadSources =
+  False(struct
+    let module_name = "EagerLoadSources"
+    let option_name = "-eager-load-sources"
+    let help = "when loading a source, try to load all referenced sources \
+                in memory"
   end)
 
 (* ************************************************************************* *)

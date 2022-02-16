@@ -92,7 +92,7 @@ let msg_help_libraries =
    undefined functions."
 
 let check_value_computed (main_ui:Design.main_window_extension_points) =
-  if Db.Value.is_computed () then true
+  if Eva.Analysis.is_computed () then true
   else
     let answer = GToolbox.question_box
         ~title:("Eva Needed")
@@ -102,7 +102,7 @@ let check_value_computed (main_ui:Design.main_window_extension_points) =
          ^"Do you want to run Eva with its current settings now?")
     in
     if answer = 1 then
-      match main_ui#full_protect ~cancelable:true !Db.Value.compute with
+      match main_ui#full_protect ~cancelable:true Eva.Analysis.compute with
       | Some _ ->
         main_ui#redisplay (); (* New alarms *)
         true
@@ -116,7 +116,7 @@ let gui_apply_action (main_ui:Design.main_window_extension_points) f x ~info =
 
 let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
     (main_ui:Design.main_window_extension_points) ~button localizable =
-  if (not (Db.Value.is_computed ()))
+  if (not (Eva.Analysis.is_computed ()))
   then
     ignore
       (popup_factory#add_item "Enable _slicing"
@@ -126,7 +126,7 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
                 Enabled.set true;
                 !update_column `Visibility
               in
-              if (not (Db.Value.is_computed ())) then begin
+              if (not (Eva.Analysis.is_computed ())) then begin
                 if check_value_computed main_ui then enable ()
               end
               else enable ()
@@ -344,7 +344,7 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
     in
     let some_kf_from_vi vi =
       try let kf = Globals.Functions.get vi in
-        if !Db.Value.is_called kf then Some kf else None
+        if Eva.Results.is_called kf then Some kf else None
       with Not_found -> None in
     let some_kf_from_lv  lv =
       match lv with
@@ -352,7 +352,7 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
       | _ -> None
     in
     let some_kf_ki_lv kf stmt lvopt =
-      if !Db.Value.is_called kf && Db.Value.is_reachable_stmt stmt
+      if Eva.Results.is_called kf && Eva.Results.is_reachable stmt
       then Some (kf, stmt, lvopt) else None
     in
     begin  (* add menu for slicing and scope plug-in *)
@@ -386,7 +386,7 @@ let slicing_highlighter(buffer:Design.reactive_buffer) localizable ~start ~stop=
     let highlight () =
       let buffer = buffer#buffer in
       let ki = Pretty_source.ki_of_localizable localizable in
-      if Db.Value.is_accessible ki then
+      if Eva.Results.is_reachable_kinstr ki then
         let unused_code_area =
           Gtk_helper.make_tag buffer
             ~name:"slicing_unused" [`STRIKETHROUGH true ]
@@ -443,7 +443,7 @@ let slicing_highlighter(buffer:Design.reactive_buffer) localizable ~start ~stop=
           end
         in
         let tag_stmt kf stmt pb pe =
-          assert (Db.Value.is_reachable_stmt stmt) ;
+          assert (Eva.Results.is_reachable stmt) ;
           apply_on_one_project_and_merge_slices
             kf
             pb
@@ -554,7 +554,7 @@ let slicing_panel (main_ui:Design.main_window_extension_points) =
       (gui_set_slicing_level main_ui)
   in
   let refresh () =
-    let value_is_computed = Db.Value.is_computed () in
+    let value_is_computed = Eva.Analysis.is_computed () in
     let enabled = Enabled.get () in
     enabled_button#misc#set_sensitive value_is_computed ;
     slice_undef_button#misc#set_sensitive enabled ;

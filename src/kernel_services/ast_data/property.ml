@@ -1682,7 +1682,6 @@ let ip_of_code_annot_single kf stmt ca = match ip_of_code_annot kf stmt ca with
 (* Must ensure that the first property is the best one in order to represent
    the annotation (see ip_of_global_annotation_single) *)
 let ip_of_global_annotation a =
-  let once = true in
   let rec aux acc = function
     | Daxiomatic(iax_name, l, iax_attrs, _) ->
       let iax_props = List.fold_left aux [] l in
@@ -1710,10 +1709,6 @@ let ip_of_global_annotation a =
       in
       IPTypeInvariant {iti_name=l.l_var_info.lv_name;
                        iti_type; iti_pred; iti_loc} :: acc
-    | Dcustom_annot(_c, _n, _, _) ->
-      (* TODO *)
-      Kernel.warning ~once "ignoring status of custom annotation";
-      acc
     | Dmodel_annot _ | Dfun_or_pred _ | Dvolatile _ | Dtype _ ->
       (* no associated status for these annotations *)
       acc

@@ -1,10 +1,10 @@
-[kernel] Parsing tests/value/domains.i (no preprocessing)
+[kernel] Parsing domains.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/value/domains.i:19: starting to merge loop iterations
+[eva] domains.i:19: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

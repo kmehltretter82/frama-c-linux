@@ -101,7 +101,7 @@ _Bool band_bool(_Bool a, _Bool b) { return (_Bool)(((int)a & (int)b) != 0); }
  */
 _Bool bxor_bool(_Bool a, _Bool b) { return (_Bool)(((int)a ^ (int)b) != 0); }
 
-void lemma(unsigned a, unsigned b) {
+void lemma(unsigned a, unsigned b, unsigned k) {
   //@ check zbit: a1: ~(a + ~a)  == 0;
   //@ check zbit: a2: ~(a | ~a)  == 0;
   //@ check zbit: a3:  (a & ~a)  == 0;
@@ -110,4 +110,23 @@ void lemma(unsigned a, unsigned b) {
   //@ check           (~a --> a) == a;
   //@ check           (a --> ~a) == ~a;
   //@ check           (~a == ~b) ==> (a == b);
+
+  //@ check zbit: a4: ( a & b & 0xFF ) == ( (a & b) % 0x100 );
+  /* note: a5 is not simplified because Qed cannot infer that a&b is positive
+   */
+
+  //@ check           ( a & ((b & 0xFFFF) % 55) & 0xFF ) == ( (a & ((b & 0xFFFF) % 55)) % 0x100 );
+
+  //@ check zbit: a5: ( a & b & 77 & ((1 << k)-1) ) == ( (a & b & 77) % (1 << k) );
+  /* note: a4 is not simplified because Qed cannot infer that k is positive
+   */
+
+  //@ check           ( a & b & 77 & ((1 << (k & 55))-1) ) == ( (a & b & 77) % (1 << (k & 55)) );
+
+}
+
+//@ ensures \result == (x & 0xFF) ;
+unsigned char cast_uchar(int x) {
+  unsigned char c = x;
+  return c;
 }

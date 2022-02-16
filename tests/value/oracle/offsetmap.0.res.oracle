@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/offsetmap.i (no preprocessing)
+[kernel] Parsing offsetmap.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -24,21 +24,21 @@
   a2 ∈ {0}
   s[0..9999999] ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/value/offsetmap.i:75.
-[eva] tests/value/offsetmap.i:19: starting to merge loop iterations
-[eva] tests/value/offsetmap.i:29: starting to merge loop iterations
-[eva:alarm] tests/value/offsetmap.i:51: Warning: 
+  Called from offsetmap.i:75.
+[eva] offsetmap.i:19: starting to merge loop iterations
+[eva] offsetmap.i:29: starting to merge loop iterations
+[eva:alarm] offsetmap.i:51: Warning: 
   pointer downcast. assert (unsigned int)(&x2) ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- main.
-  Called from tests/value/offsetmap.i:76.
-[eva:alarm] tests/value/offsetmap.i:66: Warning: 
+  Called from offsetmap.i:76.
+[eva:alarm] offsetmap.i:66: Warning: 
   accessing out of bounds index. assert 0 ≤ i_0;
-[eva:alarm] tests/value/offsetmap.i:66: Warning: 
+[eva:alarm] offsetmap.i:66: Warning: 
   accessing out of bounds index. assert i_0 < 10000000;
 [eva] Recording results for g
-[kernel] tests/value/offsetmap.i:68: 
+[kernel] offsetmap.i:68: 
   more than 200(10000000) elements to enumerate. Approximating.
 [eva] Done for function g
 [eva] Recording results for main

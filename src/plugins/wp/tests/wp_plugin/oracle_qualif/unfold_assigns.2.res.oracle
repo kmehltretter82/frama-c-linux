@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/unfold_assigns.i (no preprocessing)
+[kernel] Parsing unfold_assigns.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 28 goals scheduled

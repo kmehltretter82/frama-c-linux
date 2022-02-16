@@ -25,12 +25,12 @@ open Abstract_interp
 open Locations
 open Cvalue
 
-let dkey = Value_parameters.register_category "malloc"
+let dkey = Self.register_category "malloc"
 
-let wkey_weak_alloc = Value_parameters.register_warn_category "malloc:weak"
-let () = Value_parameters.set_warn_status wkey_weak_alloc Log.Winactive
+let wkey_weak_alloc = Self.register_warn_category "malloc:weak"
+let () = Self.set_warn_status wkey_weak_alloc Log.Winactive
 
-let wkey_imprecise_alloc = Value_parameters.register_warn_category
+let wkey_imprecise_alloc = Self.register_warn_category
     "malloc:imprecise"
 
 (* ---------------------- Dynamically allocated bases ----------------------- *)
@@ -56,7 +56,7 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 (* -------------------------- Auxiliary functions  -------------------------- *)
 
 let current_call_site () =
-  match Value_util.call_stack () with
+  match Eva_utils.call_stack () with
   | (_kf, Kstmt stmt) :: _ -> stmt
   | _ -> Cil.dummyStmt
 
@@ -66,9 +66,9 @@ let current_call_site () =
      these call site correspond to a different use of a malloc function,
      so it is interesting to keep their bases separated. *)
 let call_stack_no_wrappers () =
-  let stack = Value_util.call_stack () in
+  let stack = Eva_utils.call_stack () in
   assert (stack != []);
-  let wrappers = Value_parameters.AllocFunctions.get() in
+  let wrappers = Parameters.AllocFunctions.get() in
   let rec bottom_filter = function
     | [] -> assert false
     | [_] as stack -> stack (* Do not empty the stack completely *)
@@ -158,16 +158,16 @@ let create_new_var stack prefix type_base weak =
     | Strong -> prefix
   in
   let name = Cabs2cil.fresh_global (base_name prefix stack) in
-  Value_util.create_new_var name type_base
+  Eva_utils.create_new_var name type_base
 
 (* This function adds a "_w" information to a variable. It should be used
    when a variable becomes weak, and supposes that the variable has been
    created by one of the functions of this module. Mutating variables name
    is not a good idea in general, but we take the risk here. *)
 let mutate_name_to_weak vi =
-  Value_parameters.warning ~wkey:wkey_weak_alloc ~current:true ~once:false
+  Self.warning ~wkey:wkey_weak_alloc ~current:true ~once:false
     "@[marking variable `%s' as weak@]%t" vi.vname
-    Value_util.pp_callstack;
+    Eva_utils.pp_callstack;
   try
     let prefix, remainder =
       Scanf.sscanf vi.vname "__%s@_%s" (fun s1 s2 -> (s1, s2))
@@ -234,22 +234,22 @@ let guess_intended_malloc_type stack sizev constant_size =
 let type_from_nb_elems tsize =
   let typ = tsize.elem_typ in
   match tsize.nb_elems with
-  | None -> TArray (typ, None, Cil.empty_size_cache (), [])
+  | None -> TArray (typ, None, [])
   | Some nb ->
     if Int.equal Int.one nb
     then typ
     else
       let loc = Cil.CurrentLoc.get () in
       let esize_arr = Cil.kinteger64 ~loc nb in (* [nb] fits in size_t *)
-      TArray (typ, Some esize_arr, Cil.empty_size_cache (), [])
+      TArray (typ, Some esize_arr, [])
 
 (* Generalize a type into an array type without size. Useful for variables
    whose size is mutated. *)
 let weaken_type typ =
   match Cil.unrollType typ with
-  | TArray (_, None, _, _) -> typ
-  | TArray (typ, Some _, _, _) | typ ->
-    TArray (typ, None, Cil.empty_size_cache (), [])
+  | TArray (_, None, _) -> typ
+  | TArray (typ, Some _, _) | typ ->
+    TArray (typ, None, [])
 
 (* size for which the base is certain to be valid *)
 let size_sure_valid b = match Base.validity b with
@@ -299,7 +299,7 @@ let add_zeroes = add_v (V_Or_Uninitialized.initialized Cvalue.V.singleton_zero)
    [returns_null]: if given, forces the result to consider/ignore the
    possibility of failure, despite -eva-alloc-returns-null. *)
 let wrap_fallible_alloc ?returns_null ret orig_state state_after_alloc =
-  let default_returns_null = Value_parameters.AllocReturnsNull.get () in
+  let default_returns_null = Parameters.AllocReturnsNull.get () in
   let returns_null = Option.value ~default:default_returns_null returns_null in
   let success = Some ret, state_after_alloc in
   if returns_null
@@ -325,10 +325,10 @@ let alloc_fresh weak deallocation prefix sizev _state =
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
   let type_base = type_from_nb_elems tsize in
   let var = create_new_var stack prefix type_base weak in
-  Value_parameters.result ~current:true ~once:true
+  Self.result ~current:true ~once:true
     "@[allocating %svariable %a@]%t"
     (if weak = Weak then "weak " else "") Printer.pp_varinfo var
-    Value_util.pp_callstack;
+    Eva_utils.pp_callstack;
   let size_char = Bit_utils.sizeofchar () in
   (* Sizes are in bits *)
   let min_alloc = Int.(pred (mul size_char tsize.min_bytes)) in
@@ -381,10 +381,10 @@ let string_of_region = function
 let create_weakest_base region =
   let stack = [ fst (Globals.entry_point ()), Kglobal ] in
   let type_base =
-    TArray (Cil.charType, None, Cil.empty_size_cache (), [])
+    TArray (Cil.charType, None, [])
   in
   let var = create_new_var stack "alloc" type_base Weak in
-  Value_parameters.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
+  Self.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
     "allocating a single weak variable for ALL dynamic allocations %s: %a"
     (string_of_region region) Printer.pp_varinfo var;
   let min_alloc = Int.minus_one in
@@ -434,7 +434,7 @@ let update_variable_validity ?(make_weak=false) base sizev =
     if not (Int.equal variable_v.Base.min_alloc min_sure_bits) ||
        not (Int.equal variable_v.Base.max_alloc max_valid_bits)
     then begin
-      Value_parameters.result ~dkey ~current:true ~once:false
+      Self.result ~dkey ~current:true ~once:false
         "@[resizing variable `%a'@ (%a) to fit %a@]"
         Printer.pp_varinfo vi
         pp_validity (variable_v.Base.min_alloc, variable_v.Base.max_alloc)
@@ -447,11 +447,11 @@ let update_variable_validity ?(make_weak=false) base sizev =
     Base.update_variable_validity variable_v
       ~weak:make_weak ~min_alloc:min_sure_bits ~max_alloc:max_valid_bits;
     base, max_valid_bits
-  | _ -> Value_parameters.fatal "base is not Allocated: %a" Base.pretty base
+  | _ -> Self.fatal "base is not Allocated: %a" Base.pretty base
 
 let alloc_by_stack region prefix sizev state =
   let stack = call_stack_no_wrappers () in
-  let max_level = Value_parameters.MallocLevel.get () in
+  let max_level = Parameters.MallocLevel.get () in
   let all_vars =
     try MallocedByStack.find stack
     with Not_found -> []
@@ -530,7 +530,7 @@ let calloc_builtin state args =
   let size = Cvalue.V.mul nmemb sizev in
   let size_ok = alloc_size_ok size in
   if size_ok <> Alarmset.True then
-    Value_util.warning_once_current
+    Eva_utils.warning_once_current
       "calloc out of bounds: assert(nmemb * size <= SIZE_MAX)";
   let c_values =
     if size_ok = Alarmset.False (* size always overflows *)
@@ -635,11 +635,11 @@ let resolve_bases_to_free arg =
 let free_aux state ~strong bases_to_remove  =
   (* TODO: reduce on arg if it is an lval *)
   if strong then begin
-    Value_parameters.debug ~current:true ~dkey "strong free on bases: %a"
+    Self.debug ~current:true ~dkey "strong free on bases: %a"
       Base.Hptset.pretty bases_to_remove;
     free ~exact:true bases_to_remove state
   end else begin
-    Value_parameters.debug ~current:true ~dkey "weak free on bases: %a"
+    Self.debug ~current:true ~dkey "weak free on bases: %a"
       Base.Hptset.pretty bases_to_remove;
     free ~exact:false bases_to_remove state
   end
@@ -692,7 +692,7 @@ let free_automatic_bases stack state =
   in
   if Base.Hptset.is_empty bases_to_free then state
   else begin
-    Value_parameters.result ~current:true ~once:true
+    Self.result ~current:true ~once:true
       "freeing automatic bases: %a" Base.Hptset.pretty bases_to_free;
     let state', _changed = free_aux state ~strong:true bases_to_free in
     (* TODO: propagate 'freed' bases for From? *)
@@ -738,7 +738,7 @@ let realloc_copy_one size ~src_state ~dst_state new_base b =
    be created: if [Weak], convergence is ensured using a malloc builtin
    that converges.  If [Strong], a new base is created for each call. *)
 let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
-  Value_parameters.debug ~dkey "bases_to_realloc: %a"
+  Self.debug ~dkey "bases_to_realloc: %a"
     Base.Hptset.pretty bases_to_realloc;
   assert (not (Model.(equal state bottom || equal state top)));
   let _size_valid, size_max = extract_size sizev in (* bytes everywhere *)
@@ -876,7 +876,7 @@ let check_leaked_malloced_bases state _ =
   let alloced_bases = Dynamic_Alloc_Bases.get () in
   Base_hptmap.iter
     (fun base _ -> if check_if_base_is_leaked base state then
-        Value_util.warning_once_current "memory leak detected for %a"
+        Eva_utils.warning_once_current "memory leak detected for %a"
           Base.pretty base)
     alloced_bases;
   let c_clobbered = Base.SetLattice.bottom in

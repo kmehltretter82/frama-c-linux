@@ -1,9 +1,9 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_gallery/find.i (no preprocessing)
+[kernel] Parsing find.i (no preprocessing)
 [wp] Running WP plugin...
-[rte] annotating function find
-[rte] annotating function find_ptr
-[rte] annotating function iter_ptr
+[rte:annot] annotating function find
+[rte:annot] annotating function find_ptr
+[rte:annot] annotating function iter_ptr
 [wp] Goal typed_find_complete_found_not_found : trivial
 [wp] Goal typed_find_disjoint_found_not_found : trivial
 [wp] Goal typed_find_ensures_Range : not tried

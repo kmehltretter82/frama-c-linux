@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -20,17 +20,25 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <errno.h>
 #include <stddef.h>
 
 #include "../../internals/e_acsl_malloc.h"
 #include "../../internals/e_acsl_private_assert.h"
+#include "../../internals/e_acsl_rtl_error.h"
+#include "../internals/e_acsl_safe_locations.h"
+#include "e_acsl_segment_tracking.h"
 
 #include "e_acsl_shadow_layout.h"
 
 #if E_ACSL_OS_IS_LINUX
 
+#  include <fcntl.h>
+#  include <inttypes.h>
+#  include <stdio.h>
+#  include <string.h>
+#  include <sys/auxv.h>
 #  include <sys/resource.h>
+#  include <unistd.h>
 
 /** Program stack information {{{ */
 
@@ -56,13 +64,13 @@ size_t increase_stack_limit(const size_t size) {
       rl.rlim_cur = stacksz;
       result = setrlimit(RLIMIT_STACK, &rl);
       if (result != 0) {
-        private_abort("setrlimit: %s \n", strerror(errno));
+        private_abort("setrlimit: %s \n", rtl_strerror(errno));
       }
     } else {
       stacksz = rl.rlim_cur;
     }
   } else {
-    private_abort("getrlimit: %s \n", strerror(errno));
+    private_abort("getrlimit: %s \n", rtl_strerror(errno));
   }
   return (size_t)stacksz;
 }
@@ -70,7 +78,7 @@ size_t increase_stack_limit(const size_t size) {
 size_t get_stack_size() {
   struct rlimit rlim;
   private_assert(!getrlimit(RLIMIT_STACK, &rlim),
-                 "Cannot detect program's stack size", NULL);
+                 "Cannot detect program's stack size\n", NULL);
   return rlim.rlim_cur;
 }
 
@@ -157,43 +165,146 @@ static size_t get_global_size() {
  */
 
 /*! \brief Return byte-size of the TLS segment */
-inline static size_t get_tls_size() {
+inline size_t get_tls_size() {
   return PGM_TLS_SIZE;
 }
 
 static __thread int id_tdata = 1;
 static __thread int id_tbss;
 
+/*! \brief Macro to update `bound` to `value` if `bound op value`.
+    `op` needs to be a relational operator. */
+#  define update_bound_if(bound, op, value)                                    \
+    do {                                                                       \
+      if ((bound)op(value)) {                                                  \
+        (bound) = (value);                                                     \
+      }                                                                        \
+    } while (0)
+
+/*! \brief Update `*min_bound` and `*max_bound` with the shadow bounds of the
+    given memory partition. */
+static void update_bounds_from_partition(uintptr_t *min_bound,
+                                         uintptr_t *max_bound,
+                                         memory_partition *part) {
+  update_bound_if(*min_bound, >, part->primary.start);
+  update_bound_if(*max_bound, <, part->primary.end);
+  update_bound_if(*min_bound, >, part->secondary.start);
+  update_bound_if(*max_bound, <, part->secondary.end);
+#  ifdef E_ACSL_TEMPORAL
+  update_bound_if(*min_bound, >, part->temporal_primary.start);
+  update_bound_if(*max_bound, <, part->temporal_primary.end);
+  update_bound_if(*min_bound, >, part->temporal_secondary.start);
+  update_bound_if(*max_bound, <, part->temporal_secondary.end);
+#  endif
+}
+
+/*! \brief Grow `*min_bound` or `*max_bound` for the given `size` depending of
+    the growth direction of the heap. */
+static void grow_bounds_for_size(uintptr_t *min_bound, uintptr_t *max_bound,
+                                 size_t size) {
+  memory_partition *pheap = &mem_layout.heap;
+  if (pheap->primary.end < pheap->application.start) {
+    // Since the application space is allocated before the primary heap shadow
+    // space, we know that the heap grows downwards.
+    *min_bound -= size;
+#  ifdef E_ACSL_TEMPORAL
+    *min_bound -= size;
+#  endif
+  } else {
+    // Since the application space is allocated before the primary heap shadow
+    // space, we know that the heap grows upwards.
+    *max_bound += size;
+#  ifdef E_ACSL_TEMPORAL
+    *max_bound += size;
+#  endif
+  }
+}
+
 /*! \brief Return start address of a program's TLS */
-static uintptr_t get_tls_start() {
+uintptr_t get_tls_start() {
   size_t tls_size = get_tls_size();
   uintptr_t data = (uintptr_t)&id_tdata, bss = (uintptr_t)&id_tbss;
-  /* It could happen that the shadow allocated before bss is too big.
-    Indeed allocating PGM_TLS_SIZE/2 could cause an overlap with the other
-    shadow segments AND heap.application (in case the latter is too big too).
-    In such cases, take the smallest available address (the max used +1). */
-  uintptr_t tls_start_half = (data > bss ? bss : data) - tls_size / 2;
-  memory_partition pheap = mem_layout.heap, pglobal = mem_layout.global;
-  uintptr_t max_shadow = pheap.primary.end;
-  max_shadow =
-      pheap.secondary.end > max_shadow ? pheap.secondary.end : max_shadow;
-  max_shadow =
-      pglobal.primary.end > max_shadow ? pglobal.primary.end : max_shadow;
-  max_shadow =
-      pglobal.secondary.end > max_shadow ? pglobal.secondary.end : max_shadow;
-  max_shadow =
-      pheap.application.end > max_shadow ? pheap.application.end : max_shadow;
-  /* Shadow stacks are not yet allocated at his point since
-     init_shadow_layout_stack is called after
-     init_shadow_layout_heap_global_tls (for reasons related to memory
-     initialization in presence of things like GCC constructors).
-     We must leave sufficient space for them. */
-  max_shadow = max_shadow + 1 +
-               /* One for primary, one for secondary. If ratio is changed in
-                  init_shadow_layout_stack then update required here.
-                  TODO: if stack too big ==> problem */
-               2 * get_stack_size();
-  return tls_start_half > max_shadow ? tls_start_half : max_shadow;
+  uintptr_t min_addr = data < bss ? data : bss;
+  uintptr_t max_addr = data > bss ? data : bss;
+
+  // We do not exactly know the bounds of the TLS, we can only guess an
+  // approximation. To do that, we take TLS's known addresses and add a buffer
+  // around them. Since the TLS in Linux is positionned around the heap, we can
+  // check if the approximation overlaps with heap space and adjust it
+  // accordingly. The heap spaces allocated for E-ACSL are of course application
+  // heap and rtl spaces, but also shadow memory spaces.
+  memory_partition *pheap = &mem_layout.heap;
+  memory_partition *pglobal = &mem_layout.global;
+  memory_partition *pvdso = &mem_layout.vdso;
+  uintptr_t min_bound = mem_spaces.rtl_start;
+  uintptr_t max_bound = mem_spaces.rtl_end;
+  update_bound_if(min_bound, >, pheap->application.start);
+  update_bound_if(max_bound, <, pheap->application.end);
+  update_bounds_from_partition(&min_bound, &max_bound, pheap);
+  update_bounds_from_partition(&min_bound, &max_bound, pglobal);
+  update_bounds_from_partition(&min_bound, &max_bound, pvdso);
+
+  if (mem_layout.is_initialized_main) {
+    memory_partition *pstack = &mem_layout.stack;
+    update_bounds_from_partition(&min_bound, &max_bound, pstack);
+  } else {
+    // Shadow spaces for the stack are not yet allocated at this point, we can
+    // estimate the bounds by manually adding the spaces (the `2 *` is for
+    // primary and secondary shadows).
+    // If the ratio between application and shadow space is changed in
+    // `init_shadow_layout_stack()`, then the sizes must be updated here.
+    grow_bounds_for_size(&min_bound, &max_bound, 2 * E_ACSL_STACK_SIZE * MB);
+  }
+
+  if (mem_layout.is_initialized_pre_main) {
+    memory_partition *ptls = &mem_layout.tls;
+    update_bounds_from_partition(&min_bound, &max_bound, ptls);
+  } else {
+    // Shadow spaces for the main thread TLS are not yet allocated at this
+    // point, we can estimate the bounds by manually adding the spaces (the
+    // `2 *` is for primary and secondary shadows).
+    // If the ratio between application and shadow space is changed in
+    // `init_shadow_layout_tls()`, then the sizes must be updated here.
+    grow_bounds_for_size(&min_bound, &max_bound, 2 * tls_size);
+  }
+
+  // Estimate the location of the TLS area by centering it on a known TLS
+  // address and moving it to not overlap the known heap space
+  uintptr_t tls_start = 0, tls_end = 0;
+  if (min_addr > max_bound) {
+    // The TLS is located after the heap space
+    uintptr_t tls_start_half = min_addr - tls_size / 2;
+    tls_start = tls_start_half > max_bound ? tls_start_half : max_bound + 1;
+    tls_end = tls_start + tls_size - 1;
+  } else if (max_addr < min_bound) {
+    // The TLS is located before the heap space
+    uintptr_t tls_end_half = max_addr + tls_size / 2;
+    tls_end = tls_end_half < min_bound ? tls_end_half : min_bound - 1;
+    tls_start = tls_end - tls_size + 1;
+  } else {
+    // The TLS is located in the middle of known heap space, this situation is
+    // currently unsupported
+    private_abort("Unsupported TLS area in the middle of heap area.\n"
+                  "Example bss TLS address: %a\n"
+                  "Example data TLS address: %a\n"
+                  "Estimated bounds of heap area: [%a, %a]\n",
+                  bss, data, min_bound, max_bound);
+  }
+
+  private_assert(tls_start <= min_addr && max_addr <= tls_end,
+                 "Configured TLS size smaller than actual TLS size\n"
+                 "Configured TLS size: %" PRIxPTR " MB\n"
+                 "Minimum supported TLS size for this execution: %" PRIxPTR
+                 " MB (%" PRIxPTR " B)\n",
+                 MB_SZ(tls_size),
+                 // The minimum actual size is found by substracting the lesser
+                 // known TLS address to the greater one. Since we estimate the
+                 // start of the TLS by doing `min_addr - tls_size / 2`, we need
+                 // to multiply `max_addr - min_addr` by 2 so that both
+                 // addresses are covered.
+                 MB_SZ((max_addr - min_addr) * 2), (max_addr - min_addr) * 2);
+
+  return tls_start;
 }
 
 /* }}} */
@@ -219,6 +330,7 @@ static void init_shadow_layout_tls() {
   memory_partition *ptls = &mem_layout.tls;
   set_application_segment(&ptls->application, get_tls_start(), get_tls_size(),
                           "tls", NULL);
+  /* Changes of the ratio in the following would require changes in get_tls_start */
   set_shadow_segment(&ptls->primary, &ptls->application, 1, "tls_primary");
   set_shadow_segment(&ptls->secondary, &ptls->application, 1, "tls_secondary");
 #  ifdef E_ACSL_TEMPORAL
@@ -229,12 +341,99 @@ static void init_shadow_layout_tls() {
 #  endif
 }
 
+static void init_shadow_layout_vdso() {
+  // Retrieve the start address of the VDSO segment
+  uintptr_t vdso = getauxval(AT_SYSINFO_EHDR);
+  private_assert(
+      vdso != 0,
+      "Start address of VDSO segment not found in auxiliary vector.\n");
+
+  // Use /proc/self/maps to retrieve the end address of the VDSO segment
+  // (using open() instead of fopen() to avoid a dynamic allocation)
+  int maps_fd = open("/proc/self/maps", O_RDONLY);
+  private_assert(maps_fd >= 0, "Unable to open /proc/self/maps: %s\n",
+                 rtl_strerror(errno));
+
+  int result;
+  uintptr_t start, end;
+  ssize_t count;
+  off_t offset;
+  char *newline;
+  // Buffer to read /proc/self/maps. 255 should be enough to read one line.
+  char buffer[255];
+  while (1) {
+    count = read(maps_fd, buffer, sizeof(buffer) - 1);
+    if (count == 0) {
+      // If the VDSO segment has not been found, use 0 as start and end
+      // addresses
+      DVABORT("VDSO segment not found at address %a in /proc/self/maps\n",
+              vdso);
+      start = 0;
+      end = 0;
+      break;
+    } else if (count < 0) {
+      DVABORT("Reading /proc/self/maps failed: %s\n", rtl_strerror(errno));
+      break;
+    } else {
+      // Scan the start and end addresses of the segment
+      buffer[count] = '\0';
+      result = sscanf(buffer, "%" SCNxPTR "-%" SCNxPTR, &start, &end);
+      DVASSERT(result == 2,
+               "Scanning for addresses in /proc/self/maps failed, expected 2 "
+               "addresses, found: %d, error: %s\n",
+               result, rtl_strerror(errno));
+
+      if (start <= vdso && vdso < end) {
+        break;
+      }
+
+      // Set the file offset to the next line
+      do {
+        // Look for a newline character
+        buffer[count] = '\0';
+        newline = strchr(buffer, '\n');
+        if (newline != NULL) {
+          // Newline character found, set the file offset to the character
+          // after the newline
+          offset = count - (newline - buffer + 1);
+          offset = lseek(maps_fd, -offset, SEEK_CUR);
+          DVASSERT(offset != -1,
+                   "Unable to move file offset of /proc/self/maps: %s\n",
+                   rtl_strerror(errno));
+          break;
+        } else {
+          // No newline found on the current buffer, continue reading the file
+          count = read(maps_fd, buffer, sizeof(buffer) - 1);
+        }
+      } while (count > 0);
+    }
+  }
+
+  result = close(maps_fd);
+  DVASSERT(result == 0, "Unable to close /proc/self/maps: %s\n",
+           rtl_strerror(errno));
+
+  // Initialize the memory partition
+  memory_partition *pvdso = &mem_layout.vdso;
+  set_application_segment(&pvdso->application, start, end - start, "vdso",
+                          NULL);
+  set_shadow_segment(&pvdso->primary, &pvdso->application, 1, "vdso_primary");
+  set_shadow_segment(&pvdso->secondary, &pvdso->application, 1,
+                     "vdso_secondary");
+#  ifdef E_ACSL_TEMPORAL
+  set_shadow_segment(&pvdso->temporal_primary, &pvdso->application, 1,
+                     "temporal_vdso_primary");
+  set_shadow_segment(&pvdso->temporal_secondary, &pvdso->application, 1,
+                     "temporal_vdso_secondary");
+#  endif
+}
+
 static void init_shadow_layout_stack(int *argc_ref, char ***argv_ref) {
   memory_partition *pstack = &mem_layout.stack;
   set_application_segment(&pstack->application,
                           get_stack_start(argc_ref, argv_ref), get_stack_size(),
                           "stack", NULL);
-  /* Changes of the ratio in the following will require changes in get_tls_start */
+  /* Changes of the ratio in the following would require changes in get_tls_start */
   set_shadow_segment(&pstack->primary, &pstack->application, 1,
                      "stack_primary");
   set_shadow_segment(&pstack->secondary, &pstack->application, 1,
@@ -478,7 +677,7 @@ void set_shadow_segment(memory_segment *seg, memory_segment *parent,
   seg->name = name;
   seg->shadow_ratio = ratio;
   seg->size = parent->size / seg->shadow_ratio;
-  seg->mspace = eacsl_create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
+  seg->mspace = eacsl_create_locked_mspace(seg->size + SHADOW_SEGMENT_PADDING);
   seg->start = (uintptr_t)eacsl_mspace_malloc(seg->mspace, 1);
   seg->end = seg->start + seg->size - 1;
   seg->shadow_offset = parent->start - seg->start;
@@ -489,6 +688,7 @@ void init_shadow_layout_pre_main() {
 
 #if E_ACSL_OS_IS_LINUX
   init_shadow_layout_global();
+  init_shadow_layout_vdso();
   init_shadow_layout_tls();
 #elif E_ACSL_OS_IS_WINDOWS
   HANDLE module = GetModuleHandle(NULL);
@@ -506,6 +706,24 @@ void init_shadow_layout_main(int *argc_ref, char ***argv_ref) {
   init_shadow_layout_stack(argc_ref, argv_ref);
 
   mem_layout.is_initialized_main = 1;
+}
+
+void register_safe_locations(int thread_only) {
+  collect_safe_locations();
+  int count = get_safe_locations_count();
+  for (int i = 0; i < count; ++i) {
+    memory_location *loc = get_safe_location(i);
+    if (loc->is_on_static) {
+      void *addr = (void *)loc->address;
+      size_t len = loc->length;
+      if (!thread_only || IS_ON_THREAD(addr)) {
+        shadow_alloca(addr, len);
+        if (loc->is_initialized) {
+          unsafe_initialize(addr, len);
+        }
+      }
+    }
+  }
 }
 
 void clean_shadow_layout() {

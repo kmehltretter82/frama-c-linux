@@ -30,8 +30,11 @@
 */
 
 import React from 'react';
+import { Debug } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { Button } from 'dome/controls/buttons';
+
+const D = new Debug('Dome');
 
 // --------------------------------------------------------------------------
 // --- Error Boundaries
@@ -42,7 +45,7 @@ import { Button } from 'dome/controls/buttons';
    @param reload - callback for re-rendering the faulty component
  */
 export interface ErrorRenderer {
-  (error: any, info: any, reload: () => void): JSX.Element;
+  (error: unknown, info: unknown, reload: () => void): JSX.Element;
 }
 
 export interface CatchProps {
@@ -53,14 +56,14 @@ export interface CatchProps {
 }
 
 interface CatchState {
-  error?: any;
-  info?: any;
+  error?: unknown;
+  info?: unknown;
 }
 
 /**
    React Error Boundaries.
  */
-export class Catch extends React.Component<CatchProps, CatchState, {}> {
+export class Catch extends React.Component<CatchProps, CatchState, unknown> {
 
   constructor(props: CatchProps) {
     super(props);
@@ -69,20 +72,20 @@ export class Catch extends React.Component<CatchProps, CatchState, {}> {
     this.reload = this.reload.bind(this);
   }
 
-  componentDidCatch(error: any, info: any) {
+  componentDidCatch(error: unknown, info: unknown): void {
     this.setState({ error, info });
   }
 
-  logerr() {
+  logerr(): void {
     const { error, info } = this.state;
-    console.error('[dome] Catched error:', error, info);
+    D.error('catched error:', error, info);
   }
 
-  reload() {
+  reload(): void {
     this.setState({ error: undefined, info: undefined });
   }
 
-  render() {
+  render(): JSX.Element {
     const { error, info } = this.state;
     if (error) {
       const { onError, label = 'Error' } = this.props;
@@ -93,7 +96,7 @@ export class Catch extends React.Component<CatchProps, CatchState, {}> {
           <Button
             icon="WARNING"
             kind="warning"
-            title={error}
+            title={typeof(error) === 'string' ? error : undefined}
             onClick={this.logerr}
           />
           <Button icon="RELOAD" onClick={this.reload} />
@@ -101,7 +104,7 @@ export class Catch extends React.Component<CatchProps, CatchState, {}> {
         </div>
       );
     }
-    return this.props.children || null;
+    return (<>{this.props.children}</>);
   }
 }
 

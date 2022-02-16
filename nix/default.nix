@@ -12,6 +12,7 @@ let mydir = builtins.getEnv("PWD");
         "ppx_deriving" "ppx_deriving_yojson"
         "coq=8.13.0" "alt-ergo=2.2.0"
         "why3=1.4.0" "why3-coq=1.4.0"
+        "menhir=20211012"
       ];
     # only pure nix packages. See mk_deriv below for adding opam2nix packages
     mk_buildInputs = { nixPackages ? [] } :
@@ -378,6 +379,7 @@ pkgs.lib.makeExtensible
                 why3 config detect
                 # Setup WP related
                 export CAVEAT_IMPORTER_NIX_MODE=yes
+                export GENASSIGNS_NIX_MODE=yes
                 export FRAMAC_WP_CACHE=replay
                 export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
                 make tests -j4 PTESTS_OPTS="-error-code -j 4"

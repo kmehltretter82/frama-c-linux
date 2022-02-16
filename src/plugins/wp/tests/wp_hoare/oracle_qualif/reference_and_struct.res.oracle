@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_hoare/reference_and_struct.i (no preprocessing)
+[kernel] Parsing reference_and_struct.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 32 goals scheduled
@@ -49,19 +49,19 @@
   call_on_array_in_struct_global   3   1      4       100%
   call_array_in_struct_param   5     -        5       100%
 ------------------------------------------------------------
-[wp] tests/wp_hoare/reference_and_struct.i:15: Warning: 
+[wp] reference_and_struct.i:15: Warning: 
   Memory model hypotheses for function 'reset':
   /*@ behavior wp_typed_ref:
         requires \valid(p); */
   void reset(struct T *p);
-[wp] tests/wp_hoare/reference_and_struct.i:48: Warning: 
+[wp] reference_and_struct.i:48: Warning: 
   Memory model hypotheses for function 'call_reset_5_tps':
   /*@
      behavior wp_typed_ref:
-       requires \separated((struct T **)tps + (..), tps[9] + (0 .. 4));
+       requires \separated(tps[9] + (0 .. 4), (struct T **)tps + (..));
      */
   void call_reset_5_tps(void);
-[wp] tests/wp_hoare/reference_and_struct.i:88: Warning: 
+[wp] reference_and_struct.i:88: Warning: 
   Memory model hypotheses for function 'load_5':
   /*@
      behavior wp_typed_ref:

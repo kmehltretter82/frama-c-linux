@@ -665,7 +665,7 @@ module Traces = struct
   let join c1 c2 =
     if c1.call_declared_function <> c2.call_declared_function
     then
-      Value_parameters.fatal "@[<hv>@[At the same time inside and outside a function call:@]@ %a@ %a@]"
+      Self.fatal "@[<hv>@[At the same time inside and outside a function call:@]@ %a@ %a@]"
         pretty c1 pretty c2
     else
       match view c1, view c2 with
@@ -728,7 +728,7 @@ module Traces = struct
         else
           Format.printf "@[<hv 2>@[widen %a@]@]@." Stmt.pretty_sid stmt'
       end;
-    if not (Value_parameters.TracesUnrollLoop.get ())
+    if not (Parameters.TracesUnrollLoop.get ())
     then c2
     else begin
       match c2.current with
@@ -954,7 +954,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
             Some (exp1, n1', b1, n2')
           | _ -> None in
         match is_while with
-        | None -> Value_parameters.not_yet_implemented "Traces_domain: Loop without condition"
+        | None -> Self.not_yet_implemented "Traces_domain: Loop without condition"
         | Some(exp,nloop,bloop,n2) ->
           let exp = subst_in_exp var_map exp in
           let exp = if bloop then exp else Cil.new_exp ~loc:dummy_loc (UnOp(LNot,exp,Cil.intType)) in
@@ -972,7 +972,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
       | _ -> None in
     let stmt =
       match is_if with
-      | None -> Value_parameters.not_yet_implemented "Traces_domain: switch at node(%a)" Node.pretty current
+      | None -> Self.not_yet_implemented "Traces_domain: switch at node(%a)" Node.pretty current
       | Some(exp,n1,n2) ->
         let exp = subst_in_exp var_map exp in
         let block1 = Cil.mkBlock (stmts_of_cfg cfg n1 var_map locals return_exp []) in
@@ -1007,7 +1007,7 @@ let project_of_cfg vreturn s =
             in
             let locals = ref [] in
             let graph = match s.current with | Base (_,g) -> g | _ ->
-              Value_parameters.fatal "Traces.project_of_cfg used with open loops" in
+              Self.fatal "Traces.project_of_cfg used with open loops" in
             let stmts = stmts_of_cfg graph s.start var_map locals return_equal [] in
             let sbody = Cil.mkBlock (stmts@[return_stmt])  in
             sbody.Cil_types.blocals <- blocals;
@@ -1095,7 +1095,7 @@ module D = struct
 
   include Domain_builder.Complete (Traces)
 
-  let log_category = Value_parameters.register_category "d-traces"
+  let log_category = Self.register_category "d-traces"
 
   let assign ki lv e _v _valuation state =
     let trans = Assign (ki, lv.Eval.lval, lv.Eval.ltyp, e) in
@@ -1172,7 +1172,7 @@ module D = struct
 
   let enter_loop stmt state =
     let state = Traces.add_trans state (Msg "enter_loop") in
-    let state = if not (Value_parameters.TracesUnrollLoop.get ())
+    let state = if not (Parameters.TracesUnrollLoop.get ())
       then Traces.add_loop stmt state
       else { state with current = UnrollLoop(stmt,state.current) } in
     state
@@ -1183,7 +1183,7 @@ module D = struct
     | UnrollLoop(_,_) -> state
     | OpenLoop(stmt,s,last,_,g,l) ->
       let last = Graph.join last g in
-      let last = if Value_parameters.TracesUnifyLoop.get () then
+      let last = if Parameters.TracesUnifyLoop.get () then
           let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
           let last = Graph.join last old_last in
           assert (Node.equal s s');
@@ -1203,7 +1203,7 @@ module D = struct
     | OpenLoop(stmt,s,last,old_current_node,g,current) ->
       assert (Stmt.equal stmt stmt');
       let state = { state with current } in
-      let last = if Value_parameters.TracesUnifyLoop.get () then
+      let last = if Parameters.TracesUnifyLoop.get () then
           let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
           let last = Graph.join last old_last in
           assert (Node.equal s s');
@@ -1233,7 +1233,7 @@ module D = struct
 
   let output_dot filename state =
     let out = open_out filename in
-    Value_parameters.feedback ~dkey:log_category "@[Output dot produced to %s.@]" filename;
+    Self.feedback ~dkey:log_category "@[Output dot produced to %s.@]" filename;
     (** *)
     GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
     close_out out
@@ -1245,18 +1245,18 @@ module D = struct
       | _ -> assert false in
     let header fmt = Format.fprintf fmt "Trace domains:" in
     let body = Bottom.pretty Traces.pretty in
-    Value_parameters.printf ~dkey:log_category ~header " @[%a@]" body state;
-    if Value_parameters.TracesProject.get () ||
-       not (Value_parameters.TracesDot.is_default ()) then
+    Self.printf ~dkey:log_category ~header " @[%a@]" body state;
+    if Parameters.TracesProject.get () ||
+       not (Parameters.TracesDot.is_default ()) then
       match state with
       | `Bottom ->
-        Value_parameters.failure "The trace is Bottom can't generate code"
+        Self.failure "The trace is Bottom can't generate code"
       | `Value state when state ==Traces.top ->
-        Value_parameters.failure "The trace is TOP can't generate code"
+        Self.failure "The trace is TOP can't generate code"
       | `Value state ->
-        if not (Value_parameters.TracesDot.is_default ())
-        then output_dot (Value_parameters.TracesDot.get ():>string) state;
-        if Value_parameters.TracesProject.get ()
+        if not (Parameters.TracesDot.is_default ())
+        then output_dot (Parameters.TracesDot.get ():>string) state;
+        if Parameters.TracesProject.get ()
         then project_of_cfg return_exp state
 end
 

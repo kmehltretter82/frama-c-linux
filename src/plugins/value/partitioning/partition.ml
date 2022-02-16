@@ -372,7 +372,7 @@ struct
   let fail ~exp message =
     let source = fst exp.Cil_types.eloc in
     let warn_and_raise message =
-      Value_parameters.warning ~source ~once:true "%s" message;
+      Self.warning ~source ~once:true "%s" message;
       raise Operation_failed
     in
     Pretty_utils.ksfprintf warn_and_raise message
@@ -449,7 +449,7 @@ struct
       let pp_count fmt =
         match count with
         | None -> ()
-        | Some c -> Format.fprintf fmt " (%a)" (Integer.pretty ~hexa:false) c
+        | Some c -> Format.fprintf fmt " (%a)" Integer.pretty c
       in
       fail ~exp "split on more than %d values%t prevented ; try to improve \
                  the analysis precision or look at the option -eva-split-limit \
@@ -476,7 +476,7 @@ struct
       let x = Abstract.Dom.evaluate_predicate env state' predicate in
       if x == Unknown
       then
-        Value_parameters.warning ~source ~once:true
+        Self.warning ~source ~once:true
           "failing to learn perfectly from split predicate";
       if Abstract.Dom.equal state' state then raise Operation_failed;
       let value = if positive then Integer.one else Integer.zero in
@@ -502,7 +502,7 @@ struct
           if Cvalue.V.cardinal_zero_or_one (get value)
           then Some (stamp, 0)
           else begin
-            Value_parameters.result ~once:true ~current:true
+            Self.result ~once:true ~current:true
               "cannot properly split on \\result == %a"
               Abstract_interp.Int.pretty i;
             None
@@ -569,8 +569,8 @@ struct
               | None -> min_unroll
               | Some i ->
                 let source = fst (Cil_datatype.Stmt.loc stmt) in
-                Value_parameters.warning ~once:true ~current:true ~source
-                  ~wkey:Value_parameters.wkey_loop_unroll_auto
+                Self.warning ~once:true ~current:true ~source
+                  ~wkey:Self.wkey_loop_unroll_auto
                   "Automatic loop unrolling.";
                 i
             with
@@ -590,8 +590,8 @@ struct
             | (h, limit) :: tl ->
               if h >= limit then begin
                 if limit > 0 then
-                  Value_parameters.warning ~once:true ~current:true
-                    ~wkey:Value_parameters.wkey_loop_unroll_partial
+                  Self.warning ~once:true ~current:true
+                    ~wkey:Self.wkey_loop_unroll_partial
                     "loop not completely unrolled";
                 k
               end

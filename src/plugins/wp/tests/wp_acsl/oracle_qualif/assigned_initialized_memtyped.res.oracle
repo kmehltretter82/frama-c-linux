@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/assigned_initialized_memtyped.i (no preprocessing)
+[kernel] Parsing assigned_initialized_memtyped.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 42 goals scheduled
@@ -33,7 +33,7 @@
 [wp] [Alt-Ergo] Goal typed_comp_check_FAILS : Unsuccess
 [wp] [Qed] Goal typed_comp_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_comp_loop_assigns_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_comp_loop_assigns_part3 : Valid
+[wp] [Qed] Goal typed_comp_loop_assigns_part3 : Valid
 [wp] [Alt-Ergo] Goal typed_assigned_glob_check_FAILS : Unsuccess
 [wp] [Alt-Ergo] Goal typed_assigned_glob_loop_invariant_CHECK_preserved : Valid
 [wp] [Qed] Goal typed_assigned_glob_loop_invariant_CHECK_established : Valid
@@ -44,10 +44,10 @@
 [wp] [Qed] Goal typed_assigned_glob_loop_assigns_part3 : Valid
 [wp] [Qed] Goal typed_assigned_glob_loop_assigns_2_part1 : Valid
 [wp] [Qed] Goal typed_assigned_glob_loop_assigns_2_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_assigned_glob_loop_assigns_2_part3 : Valid
+[wp] [Qed] Goal typed_assigned_glob_loop_assigns_2_part3 : Valid
 [wp] Proved goals:   33 / 42
-  Qed:            27 
-  Alt-Ergo:        6  (unsuccess: 9)
+  Qed:            29 
+  Alt-Ergo:        4  (unsuccess: 9)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   initialize                4        2        6       100%
@@ -56,6 +56,6 @@
   array                     3        -        4      75.0%
   index                     3        -        4      75.0%
   descr                     4        1        6      83.3%
-  comp                      2        1        4      75.0%
-  assigned_glob             6        2       11      72.7%
+  comp                      3        -        4      75.0%
+  assigned_glob             7        1       11      72.7%
 ------------------------------------------------------------

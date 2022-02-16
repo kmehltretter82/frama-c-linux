@@ -21,15 +21,24 @@
 #                                                                        #
 ##########################################################################
 
-# Accept '-check' to avoid issues with ptests
-while [ $# -ge 1 ] && [ "$1" = "-check" ]; do
-    shift
+WORKING_DIR="."
+while [ "$1" != "" ] ; do
+    case "$1" in
+        -check) shift;;
+        -C) shift; WORKING_DIR="$1";;
+        *) break;;
+    esac
+   shift
 done
 
 usage() {
-   echo "usage: $0 cmd [args]"
+   echo "usage: $0 [-C working-dir] cmd [args]"
    echo ""
    echo "  where cmd is:"
+   echo ""
+   echo "  - build [--jbdb build_commands.json] [--sources file...]"
+   echo "      Produces a GNUmakefile for Frama-C analyses."
+   echo "      Uses a build_commands.json if available."
    echo ""
    echo "  - configure machdep"
    echo "      Runs an existing configure script to only consider files"
@@ -86,10 +95,6 @@ usage() {
    echo "      definitions, with source location and number of statements."
    echo "      Accepts Frama-C options (e.g. -cpp-extra-args for parsing)."
    echo ""
-   echo "  - make-template [dir]"
-   echo "      Interactively prepares a template for analyses,"
-   echo "      writing it to dir/GNUmakefile [default: .frama-c]."
-   echo ""
    echo "  - make-wrapper target arg..."
    echo "      Runs 'make target arg...', parsing the output to suggest"
    echo "      useful commands in case of failure."
@@ -111,6 +116,8 @@ if [ $# -lt 1 ]; then
 fi
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
+cd "$WORKING_DIR"
+
 # All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
 # directory containing frama-c, frama-c-config and frama-c-script.
 export FRAMAC_BIN="$DIR"
@@ -118,6 +125,7 @@ FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
 fi
+
 command="$1"
 
 # [check_path_exists path]: if [path] exists,
@@ -209,9 +217,9 @@ case "$command" in
     "help" | "-help" | "--help" | "-h")
         usage 0;
         ;;
-    "make-template")
+    "build")
         shift;
-        "${FRAMAC_SHARE}"/analysis-scripts/make_template.py "$@";
+        ${FRAMAC_SHARE}/analysis-scripts/build.py "$@";
         ;;
     "list-files")
         shift;

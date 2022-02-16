@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -63,8 +63,12 @@ typedef struct temporal_parameter temporal_parameter;
 /*! \brief External array used to transfer parameters from one function
  * to another.
  *
- * WARNING! NOT thread-safe! A better way would probably have it as
- * __thread so it is local to every thread. */
+ * WARNING! NOT thread-safe! First these global variables are not protected from
+ * concurrent accesses. Second the temporal system stores parameters before
+ * calling a function and pulls them inside the function. This is completely
+ * incompatible with a concurrent call since the parameters will be stored on
+ * one thread and pulled from another thread some later time, maybe after other
+ * synchronous calls. */
 static temporal_parameter parameter_referents[MAX_PARAMETERS];
 static uint32_t return_referent;
 

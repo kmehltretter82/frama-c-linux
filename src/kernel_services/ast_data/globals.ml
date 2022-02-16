@@ -756,13 +756,13 @@ module Types = struct
       | GCompTag (ci, _loc) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (TComp (ci, Cil.empty_size_cache (), []));
+        Types.add name_tag (TComp (ci, []));
         TypeNameToGlobal.replace name_tag g
 
       | GCompTagDecl (ci, _) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (TComp (ci, Cil.empty_size_cache (), []))
+        Types.add name_tag (TComp (ci, []))
 
       | _ -> ()
     in
@@ -846,6 +846,13 @@ let set_entry_point name lib =
     Kernel.MainFunction.unsafe_set name;
     Kernel.LibEntry.unsafe_set lib;
   end
+
+let is_entry_point ?when_lib_entry kf =
+  match when_lib_entry with
+  | Some value when Kernel.LibEntry.get () -> value
+  | _ ->
+    try Cil_datatype.Kf.equal kf @@ fst @@ entry_point ()
+    with No_such_entry_point _ -> false
 
 (* ************************************************************************* *)
 (** {2 Global Comments} *)

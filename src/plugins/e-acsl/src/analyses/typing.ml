@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,7 +25,8 @@ open Cil_types
 (* Implement Figure 4 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince". *)
 
-let dkey = Options.dkey_typing
+let dkey = Options.Dkey.typing
+module Error = Error.Make(struct let phase = dkey end)
 
 (* In order to properly handle recursive functions the typing method has to
    store the result of the fixpoint algorithm on intervals before typing
@@ -194,12 +195,12 @@ module Id_term_with_lenv =
    info is already computed for a term, it is never recomputed *)
 module Memo: sig
   val memo:
-    ?lenv:Function_params_ty.t ->
+    lenv:Function_params_ty.t ->
     (term -> computed_info) ->
     term ->
-    computed_info Error.or_error
-  val get: ?lenv:Function_params_ty.t -> term ->
-    computed_info Error.or_error
+    computed_info Error.result
+  val get: lenv:Function_params_ty.t -> term ->
+    computed_info Error.result
   val clear: unit -> unit
 end = struct
 
@@ -217,7 +218,7 @@ end = struct
        the guard and once for encoding [x+1] when incrementing it. The
        memoization is only useful here and indeed prevent the generation of one
        extra variable in some cases. *)
-  let tbl : computed_info Error.or_error Misc.Id_term.Hashtbl.t =
+  let tbl : computed_info Error.result Misc.Id_term.Hashtbl.t =
     Misc.Id_term.Hashtbl.create 97
 
   (* The type of the logic function
@@ -230,7 +231,7 @@ end = struct
      We distinguish the calls to the function by storing the type of the
      arguments corresponding to each call, and we weaken the typing so that it
      is invariant when the arguments have the same type. *)
-  let dep_tbl : computed_info Error.or_error Id_term_with_lenv.Hashtbl.t
+  let dep_tbl : computed_info Error.result Id_term_with_lenv.Hashtbl.t
     = Id_term_with_lenv.Hashtbl.create 97
 
   let get_dep lenv t =
@@ -241,7 +242,7 @@ end = struct
     try Misc.Id_term.Hashtbl.find tbl t
     with Not_found -> Error.not_memoized ()
 
-  let get ?(lenv=[]) t =
+  let get ~lenv t =
     match lenv with
     | [] -> get_nondep t
     | _::_ -> get_dep lenv t
@@ -250,8 +251,8 @@ end = struct
     try Misc.Id_term.Hashtbl.find tbl t
     with Not_found ->
       let x =
-        try Error.Res (f t)
-        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+        try Result.Ok (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
       in
       Misc.Id_term.Hashtbl.add tbl t x;
       x
@@ -261,13 +262,13 @@ end = struct
       Id_term_with_lenv.Hashtbl.find dep_tbl (t, lenv)
     with Not_found ->
       let x =
-        try Error.Res (f t)
-        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+        try Result.Ok (f t)
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
       in
       Id_term_with_lenv.Hashtbl.add dep_tbl (t, lenv) x;
       x
 
-  let memo ?(lenv=[]) f t =
+  let memo ~lenv f t =
     match lenv with
     | [] -> memo_nondep f t
     | _::_ -> memo_dep f t lenv
@@ -390,7 +391,7 @@ let rec type_term
     ?(under_lambda=false)
     ?(arith_operand=false)
     ?ctx
-    ?(lenv=[])
+    ~lenv
     t =
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
@@ -542,7 +543,7 @@ let rec type_term
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t);
       dup Nan
 
-    | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
+    | TBinOp ((PlusPI | MinusPI), t1, t2) ->
       (* both [t1] and [t2] must be typed. *)
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~lenv t1);
       let ctx = type_offset t2 in
@@ -688,8 +689,8 @@ let rec type_term
          | Some ctx -> coerce ~arith_operand ~ctx ~op ty)
       t
   with
-  | Res res -> res
-  | Err exn -> raise exn
+  | Result.Ok res -> res
+  | Result.Error exn -> raise exn
 
 and type_term_lval ~lenv (host, offset) =
   type_term_lhost ~lenv host;
@@ -810,7 +811,7 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
   Interval.Env.add lv i;
   (t1, lv, t2)
 
-and type_predicate ?(lenv=[]) p =
+and type_predicate ~lenv p =
   match Logic_normalizer.get_pred p with
   | PoT_term t -> type_term ~use_gmp_opt:true ~lenv t
   | PoT_pred p ->
@@ -879,9 +880,10 @@ and type_predicate ?(lenv=[]) p =
         begin
           let guards, goal =
             Error.retrieve_preprocessing
-              "quantified predicate"
+              "preprocessing of quantified predicate"
               Bound_variables.get_preprocessed_quantifier
               p
+              Printer.pp_predicate
           in
           let guards =
             List.map
@@ -893,7 +895,9 @@ and type_predicate ?(lenv=[]) p =
         end
       | Pseparated tlist ->
         List.iter
-          (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan t))
+          (fun t ->
+             ignore
+               (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t))
           tlist;
         c_int
       | Pinitialized(_, t)
@@ -903,14 +907,14 @@ and type_predicate ?(lenv=[]) p =
       | Pvalid_read(_, t)
       | Pobject_pointer(_,t)
       | Pvalid_function t ->
-        ignore (type_term ~use_gmp_opt:false ~ctx:Nan t);
+        ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t);
         c_int
       | Pat(p, _) -> (type_predicate ~lenv p).ty
       | Pfresh _ -> Error.not_yet "\\fresh"
     in
     coerce ~arith_operand:false ~ctx:c_int ~op c_int
 
-let type_term ~use_gmp_opt ?ctx ?(lenv=[]) t =
+let type_term ~use_gmp_opt ?ctx ~lenv t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx ~lenv t);
@@ -918,7 +922,7 @@ let type_term ~use_gmp_opt ?ctx ?(lenv=[]) t =
     Stack.pop pending_typing ()
   done
 
-let type_named_predicate ?(lenv=[]) p =
+let type_named_predicate ~lenv p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate p;
   ignore (type_predicate ~lenv p);
@@ -926,19 +930,19 @@ let type_named_predicate ?(lenv=[]) p =
     Stack.pop pending_typing ()
   done
 
-let unsafe_set t ?ctx ty =
+let unsafe_set t ?ctx ~lenv ty =
   let ctx = match ctx with None -> ty | Some ctx -> ctx in
   let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
-  ignore (Memo.memo mk t)
+  ignore (Memo.memo mk ~lenv t)
 
 (******************************************************************************)
 (** {2 Getters} *)
 (******************************************************************************)
 
 let get_number_ty ~lenv t =
-  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t).ty
+  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term).ty
 let get_integer_op ~lenv t =
-  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t).op
+  (Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term).op
 let get_integer_op_of_predicate ~lenv p = (type_predicate ~lenv p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
@@ -954,15 +958,18 @@ let extract_typ t ty =
   | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
 let get_typ ~lenv t =
-  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
+  let info =
+    Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term in
   extract_typ t info.ty
 
 let get_op ~lenv t =
-  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
+  let info =
+    Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term  in
   extract_typ t info.op
 
 let get_cast ~lenv t =
-  let info = Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t in
+  let info =
+    Error.retrieve_preprocessing "typing" (Memo.get ~lenv) t Printer.pp_term in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 

@@ -6,12 +6,10 @@
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:150: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:151: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
+  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:149: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
@@ -22,7 +20,7 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] tests/libc/file.c:12: Warning: 
+[eva:alarm] file.c:12: Warning: 
   function __gen_e_acsl_fread: precondition 'valid_stream' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:351: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
@@ -70,80 +68,80 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
   function __gen_e_acsl_fread: postcondition 'initialization' got status unknown.
-[eva:alarm] tests/libc/file.c:13: Warning: 
+[eva:alarm] file.c:13: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:13: Warning: 
+[eva:alarm] file.c:13: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:15: Warning: 
+[eva:alarm] file.c:15: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:15: Warning: 
+[eva:alarm] file.c:15: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:15: Warning: 
+[eva:alarm] file.c:15: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/libc/file.c:15: Warning: assertion got status unknown.
-[eva:alarm] tests/libc/file.c:18: Warning: 
+[eva:alarm] file.c:15: Warning: assertion got status unknown.
+[eva:alarm] file.c:18: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:18: Warning: 
+[eva:alarm] file.c:18: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:18: Warning: 
+[eva:alarm] file.c:18: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/libc/file.c:18: Warning: assertion got status unknown.
-[eva:alarm] tests/libc/file.c:21: Warning: 
+[eva:alarm] file.c:18: Warning: assertion got status unknown.
+[eva:alarm] file.c:21: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:21: Warning: 
+[eva:alarm] file.c:21: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:21: Warning: 
+[eva:alarm] file.c:21: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/libc/file.c:21: Warning: assertion got status unknown.
-[eva:alarm] tests/libc/file.c:24: Warning: 
+[eva:alarm] file.c:21: Warning: assertion got status unknown.
+[eva:alarm] file.c:24: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:24: Warning: 
+[eva:alarm] file.c:24: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:24: Warning: 
+[eva:alarm] file.c:24: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/libc/file.c:24: Warning: assertion got status unknown.
-[eva:alarm] tests/libc/file.c:27: Warning: 
+[eva:alarm] file.c:24: Warning: assertion got status unknown.
+[eva:alarm] file.c:27: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:27: Warning: 
+[eva:alarm] file.c:27: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:27: Warning: 
+[eva:alarm] file.c:27: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/libc/file.c:27: Warning: assertion got status unknown.
-[eva:alarm] tests/libc/file.c:29: Warning: 
+[eva:alarm] file.c:27: Warning: assertion got status unknown.
+[eva:alarm] file.c:29: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:29: Warning: 
+[eva:alarm] file.c:29: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:35: Warning: 
+[eva:alarm] file.c:35: Warning: 
   function __gen_e_acsl_fread: precondition 'valid_stream' got status unknown.
-[eva:alarm] tests/libc/file.c:36: Warning: 
+[eva:alarm] file.c:36: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:36: Warning: 
+[eva:alarm] file.c:36: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:37: Warning: 
+[eva:alarm] file.c:37: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:37: Warning: 
+[eva:alarm] file.c:37: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/libc/file.c:37: Warning: assertion got status unknown.
-[eva:alarm] tests/libc/file.c:38: Warning: 
+[eva:alarm] file.c:37: Warning: assertion got status unknown.
+[eva:alarm] file.c:38: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] tests/libc/file.c:38: Warning: 
+[eva:alarm] file.c:38: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.

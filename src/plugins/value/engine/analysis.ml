@@ -28,10 +28,12 @@ module type Results = sig
   type value
   type location
 
+  val get_global_state: unit -> state or_bottom
   val get_stmt_state : after:bool -> stmt -> state or_bottom
-  val get_kinstr_state: after:bool -> kinstr -> state or_bottom
   val get_stmt_state_by_callstack:
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
+  val get_initial_state:
+    kernel_function -> state or_bottom
   val get_initial_state_by_callstack:
     kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
@@ -74,12 +76,13 @@ module Make (Abstract: Abstractions.S) = struct
     then Abstract.Dom.Store.get_stmt_state ~after stmt
     else `Value Abstract.Dom.top
 
-  let get_kinstr_state ~after = function
-    | Kglobal -> Abstract.Dom.Store.get_global_state ()
-    | Kstmt stmt -> get_stmt_state ~after stmt
+  let get_global_state = Abstract.Dom.Store.get_global_state
 
   let get_stmt_state_by_callstack =
     Abstract.Dom.Store.get_stmt_state_by_callstack
+
+  let get_initial_state =
+    Abstract.Dom.Store.get_initial_state
 
   let get_initial_state_by_callstack =
     Abstract.Dom.Store.get_initial_state_by_callstack
@@ -206,7 +209,7 @@ let reset_analyzer () =
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
   Ast.compute ();
-  Value_parameters.configure_precision ();
+  Parameters.configure_precision ();
   if not (Kernel.AuditCheck.is_empty ()) then
     Eva_audit.check_configuration (Kernel.AuditCheck.get ());
   let kf, lib_entry = Globals.entry_point () in
@@ -216,8 +219,18 @@ let force_compute () =
   Analyzer.compute_from_entry_point ~lib_entry kf ;
   ComputationState.set Computed
 
+let is_computed = Db.Value.is_computed
+
+let compute () =
+  (* Nothing to recompute when Value has already been computed. This boolean
+      is automatically cleared when an option of Value changes, because they
+      are registered as dependencies on [Db.Value.self] in {!Parameters}.*)
+  if not (is_computed ()) then force_compute ()
+
 (* Resets the Analyzer when the current project is changed. *)
 let () =
   Project.register_after_set_current_hook
     ~user_only:true (fun _ -> reset_analyzer ());
   Project.register_after_global_load_hook reset_analyzer
+
+let self = Db.Value.self

@@ -75,7 +75,6 @@ class engine =
   object(self)
     inherit E.engine as super
     inherit Lang.idprinting
-    method infoprover w = w.altergo
 
     (* --- Types --- *)
 
@@ -115,7 +114,7 @@ class engine =
           raise Z.Overflow
       with Z.Overflow ->
       match iformat with
-      | `Dec -> Integer.pretty ~hexa:false fmt z
+      | `Dec -> Integer.pretty fmt z
       | `Hex -> Integer.pp_hex ~sep:"," fmt z
       | `Bin -> Integer.pp_bin ~sep:"," fmt z
 

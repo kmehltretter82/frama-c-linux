@@ -1,15 +1,17 @@
 /* run.config
+ COMMENT: the following CMD redefinition omits adding @PTEST_FILE@ on purpose (due to -load)
+ CMD: @frama-c@ @PTEST_OPTIONS@
  MODULE: deps_A
-   EXECNOW: LOG deps_sav.res LOG deps_sav.err BIN deps.sav @frama-c@ -eva @EVA_OPTIONS@ -out -input -deps @PTEST_FILE@ -save ./tests/saveload/result/deps.sav > ./tests/saveload/result/deps_sav.res 2> ./tests/saveload/result/deps_sav.err
-   STDOPT: +"-load ./tests/saveload/result/deps.sav -eva @EVA_OPTIONS@ -out -input -deps "
+   EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -eva @EVA_OPTIONS@ -out -input -deps @PTEST_FILE@ -save @PTEST_NAME@.sav > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
+   STDOPT: +"-load %{dep:@PTEST_NAME@.sav} -eva @EVA_OPTIONS@ -out -input -deps "
  MODULE: deps_B
-   STDOPT: +"-load ./tests/saveload/result/deps.sav  -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_NAME@.sav}  -out -input -deps "
  MODULE: deps_C
-   STDOPT: +"-load ./tests/saveload/result/deps.sav  -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_NAME@.sav}  -out -input -deps "
  MODULE: deps_D
-   STDOPT: +"-load ./tests/saveload/result/deps.sav  -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_NAME@.sav}  -out -input -deps "
  MODULE: deps_E
-   STDOPT: +"-load ./tests/saveload/result/deps.sav  -out -input -deps "
+   STDOPT: +"-load %{dep:@PTEST_NAME@.sav}  -out -input -deps "
 */
 
 int main() {

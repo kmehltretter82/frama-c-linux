@@ -150,7 +150,13 @@ class deadCallsVisitor fmt ~libc cov_metrics =
         match self#current_kf with
         | None ->
           (match current_initializer with
-           | None -> assert false
+           | None ->
+             (* This can happen in the rare cases a function is referenced by
+                a specification *)
+             Format.fprintf fmt
+               "@[<h>%s referenced by an ACSL specification (at %a)@]@ "
+               vi.vname
+               Location.pretty (Cil.CurrentLoc.get ())
            | Some vinit ->
              Format.fprintf fmt
                "@[<h>Initializer of %s references %s (at %t)@]@ "
@@ -209,7 +215,7 @@ class coverageByFun = object
 
   method! vstmt s =
     total <- total + 1;
-    if Db.Value.is_reachable_stmt s then value <- value + 1;
+    if Eva.Results.is_reachable s then value <- value + 1;
     Cil.DoChildren
 
   method result = (total, value)
@@ -238,12 +244,12 @@ let compute_coverage_for kf =
   with Kernel_function.No_Definition -> ()
 
 let compute_coverage_by_fun () =
-  if Db.Value.is_computed () && not (is_computed_by_fun ())
+  if Eva.Analysis.is_computed () && not (is_computed_by_fun ())
   then
     let libc = Metrics_parameters.Libc.get () in
     Globals.Functions.iter
       (fun kf ->
-         if !Db.Value.is_called kf &&
+         if Eva.Results.is_called kf &&
             Metrics_base.consider_function ~libc (Kernel_function.get_vi kf)
          then compute_coverage_for kf)
 
@@ -258,12 +264,12 @@ let compute_syntactic ~libc kf =
 let dkey_sem = Metrics_parameters.register_category "semantic-visitor"
 
 let compute_semantic ~libc =
-  assert (Db.Value.is_computed ());
+  assert (Eva.Analysis.is_computed ());
   let res = ref Varinfo.Set.empty in
   (* Just iter on all the functions and consult the appropriate table *)
   Globals.Functions.iter
     (fun kf ->
-       if !Db.Value.is_called kf &&
+       if Eva.Results.is_called kf &&
           Metrics_base.consider_function ~libc
             (Kernel_function.get_vi kf)
        then begin
@@ -354,7 +360,7 @@ class semantic_printer ~libc (cov_metrics : coverage_metrics) = object(self)
 
   (* uses semantic *)
   method pp_value_coverage fmt =
-    assert (Db.Value.is_computed ());
+    assert (Eva.Analysis.is_computed ());
     let all = self#all_funs in
     let syntactic = cov_metrics.syntactic
     and semantic = cov_metrics.semantic in
@@ -419,7 +425,7 @@ let percent_coverage ~libc cov_metrics =
 ;;
 
 let compute ~libc =
-  assert (Db.Value.is_computed ());
+  assert (Eva.Analysis.is_computed ());
   let semantic = compute_semantic ~libc in
   let main = fst (Globals.entry_point ()) in
   let syntactic, initializers = compute_syntactic ~libc main in

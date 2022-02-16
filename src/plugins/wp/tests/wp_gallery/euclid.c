@@ -5,7 +5,7 @@
 
 /*
   run.config_qualif
-  OPT: -wp-rte -wp-smoke-tests -wp-driver tests/wp_gallery/euclid.wp
+  OPT: -wp-rte -wp-smoke-tests -wp-driver %{dep:@PTEST_DIR@/euclid.wp}
 */
 
 /*@

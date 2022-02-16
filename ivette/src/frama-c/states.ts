@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Frama-C States
 // --------------------------------------------------------------------------
@@ -72,7 +74,7 @@ Server.onReady(async () => {
     currentProject = current.id;
     PROJECT.emit();
   } catch (error) {
-    D.error(`Fail to retrieve the current project. ${error.toString()}`);
+    D.error(`Fail to retrieve the current project. ${error}`);
   }
 });
 
@@ -116,7 +118,7 @@ export async function setProject(project: string) {
       currentProject = project;
       PROJECT.emit();
     } catch (error) {
-      D.error(`Fail to set the current project. ${error.toString()}`);
+      D.error(`Fail to set the current project. ${error}`);
     }
   }
 }
@@ -171,7 +173,7 @@ export function useRequest<In, Out>(
         const r = await Server.send(rq, params);
         update(r);
       } catch (error) {
-        D.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
+        D.error(`Fail in useRequest '${rq.name}'. ${error}`);
         update(options.onError);
       }
     } else {
@@ -300,7 +302,7 @@ class SyncState<A> {
     } catch (error) {
       D.error(
         `Fail to set value of SyncState '${this.handler.name}'.`,
-        `${error.toString()}`,
+        `${error}`,
       );
     }
   }
@@ -308,13 +310,16 @@ class SyncState<A> {
   async update() {
     try {
       this.upToDate = true;
-      const v = await Server.send(this.handler.getter, null);
-      this.value = v;
+      this.value = undefined;
+      if (Server.isRunning()) {
+        const v = await Server.send(this.handler.getter, null);
+        this.value = v;
+      }
       this.UPDATE.emit();
     } catch (error) {
       D.error(
         `Fail to update SyncState '${this.handler.name}'.`,
-        `${error.toString()}`,
+        `${error}`,
       );
     }
   }
@@ -324,11 +329,11 @@ class SyncState<A> {
 // --- Synchronized States Registry
 // --------------------------------------------------------------------------
 
-const syncStates = new Map<string, SyncState<any>>();
+const syncStates = new Map<string, SyncState<unknown>>();
 
 function getSyncState<A>(h: Handler<A>): SyncState<A> {
   const id = `${currentProject}@${h.name}`;
-  let s = syncStates.get(id);
+  let s = syncStates.get(id) as SyncState<A> | undefined;
   if (!s) {
     s = new SyncState(h);
     syncStates.set(id, s);
@@ -407,7 +412,7 @@ class SyncArray<K, A> {
     } catch (error) {
       D.error(
         `Fail to retrieve the value of syncArray '${this.handler.name}.`,
-        `${error.toString()}`,
+        `${error}`,
       );
     } finally {
       this.fetching = false;
@@ -426,7 +431,7 @@ class SyncArray<K, A> {
     } catch (error) {
       D.error(
         `Fail to set reload of syncArray '${this.handler.name}'.`,
-        `${error.toString()}`,
+        `${error}`,
       );
     }
   }
@@ -437,16 +442,16 @@ class SyncArray<K, A> {
 // --- Synchronized Arrays Registry
 // --------------------------------------------------------------------------
 
-const syncArrays = new Map<string, SyncArray<any, any>>();
+const syncArrays = new Map<string, SyncArray<unknown, unknown>>();
 
 function lookupSyncArray<K, A>(
   array: Array<K, A>,
 ): SyncArray<K, A> {
   const id = `${currentProject}@${array.name}`;
-  let st = syncArrays.get(id);
+  let st = syncArrays.get(id) as SyncArray<K,A> | undefined;
   if (!st) {
     st = new SyncArray(array);
-    syncArrays.set(id, st);
+    syncArrays.set(id, st as SyncArray<unknown, unknown>);
   }
   return st;
 }
@@ -477,7 +482,7 @@ export function useSyncArray<K, A>(
 ): CompactModel<K, A> {
   Dome.useUpdate(PROJECT);
   const st = lookupSyncArray(arr);
-  React.useEffect(st.update);
+  React.useEffect(() => st.update(), [st]);
   Server.useSignal(arr.signal, st.fetch);
   useModel(st.model, sync);
   return st.model;
@@ -763,6 +768,7 @@ export type Hovered = Location | undefined;
 export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
 export const GlobalHovered = new GlobalState<Hovered>(undefined);
 export const GlobalSelection = new GlobalState<Selection>(emptySelection);
+
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
 export function setHovered(h: Hovered) { GlobalHovered.setValue(h); }
@@ -785,12 +791,19 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
 /** Resets the selected locations. */
 export async function resetSelection() {
   GlobalSelection.setValue(emptySelection);
-  const main = await Server.send(Ast.getMainFunction, {});
-  // If the selection has already been modified, do not change it.
-  if (main && GlobalSelection.getValue() === emptySelection) {
-    GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
+  if (Server.isRunning()) {
+    try {
+      const main = await Server.send(Ast.getMainFunction, {});
+      // If the selection has already been modified, do not change it.
+      if (main && GlobalSelection.getValue() === emptySelection) {
+        GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
+      }
+    } catch (err) {
+      if (err) D.warn('Request error', err);
+    }
   }
 }
+
 /* Select the main function when the current project changes and the selection
    is still empty (which happens at the start of the GUI). */
 PROJECT.on(async () => {

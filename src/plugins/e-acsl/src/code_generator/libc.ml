@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,7 +25,7 @@
 open Cil_types
 
 (* Retrieve the name of the caller function. [vorig_name] is used instead of
-   [vname] because some plugins like "Variadic" may change the value of [vname] 
+   [vname] because some plugins like "Variadic" may change the value of [vname]
    for some functions like [sprintf]. *)
 let get_caller_name caller =
   caller.vorig_name
@@ -148,7 +148,7 @@ let zarith ~loc bop t1 t2 =
   (* Check that we are building an arithmetic operation *)
   (match bop with
    | PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt -> ()
-   | PlusPI | IndexPI | MinusPI | MinusPP | Lt | Gt | Le | Ge | Eq | Ne | BAnd
+   | PlusPI | MinusPI | MinusPP | Lt | Gt | Le | Ge | Eq | Ne | BAnd
    | BXor | BOr | LAnd | LOr ->
      Options.fatal
        "Using Libc.zarith to build '%a' instead of an arithmetic operation"
@@ -187,11 +187,11 @@ let check_integer_bounds ~from target =
     If [check_lower_bound] is set to false, then the lower bound check is not
     performed. *)
 let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
-  Typing.type_term ~use_gmp_opt:false t;
+  Typing.type_term ~use_gmp_opt:false ~lenv:(Env.Local_vars.get env) t;
   match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
   | Typing.Gmpz ->
     let e, _, env =
-      Translate.gmp_to_sizet
+      Translate_utils.gmp_to_sizet
         ~adata:Assert.no_data
         ~loc
         ~name
@@ -203,7 +203,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
     e, env
   | Typing.(C_integer _ | C_float _) as nty ->
     (* We know that [t] can be translated to a C type, so we start with that *)
-    let e, _, env = Translate.term_to_exp ~adata:Assert.no_data kf env t in
+    let e, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf env t in
     (* Then we can check if the expression will fit in a [size_t] *)
     let sizet = Cil.(theMachine.typeOfSizeOf) in
     let sizet_kind = Cil.(theMachine.kindOfSizeOf) in
@@ -224,7 +224,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
           Logic_const.prel ~loc (Rge, t, Cil.lzero ~loc ())
         in
         let adata, env = Assert.empty ~loc kf env in
-        let adata, env = Assert.register_term ~loc kf env t e adata in
+        let adata, env = Assert.register_term ~loc env t e adata in
         let assertion, env =
           Assert.runtime_check
             ~adata
@@ -248,9 +248,9 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
         let upper_guard_pp = Logic_const.prel ~loc (Rle, t, sizet_max_t) in
         let upper_guard = Cil.mkBinOp ~loc Le e sizet_max_e in
         let adata, env = Assert.empty ~loc kf env in
-        let adata, env = Assert.register_term ~loc kf env t e adata in
+        let adata, env = Assert.register_term ~loc env t e adata in
         let adata, env =
-          Assert.register ~loc kf env "SIZE_MAX" sizet_max_e adata
+          Assert.register ~loc env "SIZE_MAX" sizet_max_e adata
         in
         let assertion, env =
           Assert.runtime_check
@@ -292,7 +292,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
       Printer.pp_term t
 
 (** Code generation of [update_memory_model] for [strcat] and [strncat]. *)
-let process_strcat ~loc ~stmt ?result env kf ?size_e dest_e src_e =
+let process_strcat ~loc ?result env kf ?size_e dest_e src_e =
   let src_size_vi, src_size_e, src_size_stmt, env =
     strlen ~loc ~name:"strcat_src_size" env kf src_e
   in
@@ -341,22 +341,21 @@ let process_strcat ~loc ~stmt ?result env kf ?size_e dest_e src_e =
   let initialize_blk = Smart_stmt.block_stmt initialize_blk in
   let env =
     List.fold_right
-      (fun pre_stmt env -> Env.add_stmt ~before:stmt env kf pre_stmt)
+      (fun pre_stmt env -> Env.add_stmt env pre_stmt)
       pre_stmts
       env
   in
-  let env = Env.add_stmt ~post:true env kf initialize_blk in
+  let env = Env.add_stmt ~post:true env initialize_blk in
   result, env
 
-let update_memory_model ~loc ~stmt ?result env kf caller args =
+let update_memory_model ~loc ?result env kf caller args =
   let name = get_caller_name caller in
   let post = true in
-  let before = stmt in
   match name, args with
   | "memset", [ dest_e; _; size_e ] | "memcpy", [ dest_e; _; size_e ]
   | "memmove", [ dest_e; _; size_e ] ->
     let initialize = Smart_stmt.rtl_call ~loc "initialize" [dest_e; size_e] in
-    let env = Env.add_stmt ~post env kf initialize in
+    let env = Env.add_stmt ~post env initialize in
     result, env
   | "memset", _ | "memcpy", _ | "memmove", _ -> wrong_number_of_arguments name
 
@@ -396,7 +395,7 @@ let update_memory_model ~loc ~stmt ?result env kf caller args =
       Env.pop_and_get env initialize ~global_clear:false Env.Middle
     in
     let env =
-      Env.add_stmt ~post env kf (Smart_stmt.block_stmt initialize_blk)
+      Env.add_stmt ~post env (Smart_stmt.block_stmt initialize_blk)
     in
     Some result, env
   | "fread", _ -> wrong_number_of_arguments name
@@ -420,8 +419,8 @@ let update_memory_model ~loc ~stmt ?result env kf caller args =
       Env.pop_and_get env initialize ~global_clear:false Env.Middle
     in
     let initialize_blk = Smart_stmt.block_stmt initialize_blk in
-    let env = Env.add_stmt ~before env kf src_size_stmt in
-    let env = Env.add_stmt ~post env kf initialize_blk in
+    let env = Env.add_stmt env src_size_stmt in
+    let env = Env.add_stmt ~post env initialize_blk in
     result, env
   | "strcpy", _ -> wrong_number_of_arguments name
 
@@ -429,16 +428,16 @@ let update_memory_model ~loc ~stmt ?result env kf caller args =
     let initialize =
       Smart_stmt.rtl_call ~loc "initialize" [ dest_e; size_e ]
     in
-    let env = Env.add_stmt ~post env kf initialize in
+    let env = Env.add_stmt ~post env initialize in
     result, env
   | "strncpy", _ -> wrong_number_of_arguments name
 
   | "strcat", [ dest_e; src_e ] ->
-    process_strcat ~loc ~stmt ?result env kf dest_e src_e
+    process_strcat ~loc ?result env kf dest_e src_e
   | "strcat", _ -> wrong_number_of_arguments name
 
   | "strncat", [ dest_e; src_e; size_e ] ->
-    process_strcat ~loc ~stmt ?result env kf ~size_e dest_e src_e
+    process_strcat ~loc ?result env kf ~size_e dest_e src_e
   | "strncat", _ -> wrong_number_of_arguments name
 
   | "sprintf", buffer_e :: _ :: _  ->
@@ -462,7 +461,7 @@ let update_memory_model ~loc ~stmt ?result env kf caller args =
         ~cond:(Cil.mkBinOp ~loc Ge result_e (Cil.zero ~loc))
         then_blk
     in
-    let env = Env.add_stmt ~post env kf if_res_pos_stmt in
+    let env = Env.add_stmt ~post env if_res_pos_stmt in
     Some result, env
   | "sprintf", _ -> wrong_number_of_arguments name
 
@@ -530,7 +529,7 @@ let update_memory_model ~loc ~stmt ?result env kf caller args =
         ~cond:(Cil.mkBinOp ~loc LAnd res_pos size_strict_pos)
         blk
     in
-    let env = Env.add_stmt ~post env kf if_res_pos_stmt in
+    let env = Env.add_stmt ~post env if_res_pos_stmt in
     Some result, env
   | "snprintf", _ ->
     wrong_number_of_arguments name
@@ -544,7 +543,7 @@ let update_memory_model ~loc ~stmt ?result env kf caller args =
     let unsound =
       Smart_stmt.assigns ~loc ~result:(Cil.var sound_verdict_vi) (Cil.zero ~loc)
     in
-    let env = Env.add_stmt ~post env kf unsound in
+    let env = Env.add_stmt ~post env unsound in
     result, env
   | _ ->
     (* If this error is raised, check that the call to

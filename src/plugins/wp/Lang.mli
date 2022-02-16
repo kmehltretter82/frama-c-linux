@@ -31,19 +31,6 @@ open Qed.Logic
 
 type library = string
 
-(** Name for external prover.
-
-    In case a Qed.Engine.link is used, [F_subst] patterns
-    are not supported for Why-3. *)
-type 'a infoprover = {
-  altergo: 'a;
-  why3   : 'a;
-  coq    : 'a;
-}
-(** generic way to have different informations for the provers *)
-
-val infoprover: 'a -> 'a infoprover
-(** same information for all the provers *)
 (** {2 Naming} Unique identifiers. *)
 
 val comp_id  : compinfo -> string
@@ -67,7 +54,7 @@ type adt = private (** A type is never registered in a Definition.t *)
 and mdt = string extern (** name to print to the provers *)
 and 'a extern = {
   ext_id     : int;
-  ext_link   : 'a infoprover;
+  ext_link   : 'a ;
   ext_library : library; (** a library which it depends on *)
   ext_debug  : string; (** just for printing during debugging *)
 }
@@ -92,6 +79,7 @@ and model = {
   m_result : sort ;
   m_typeof : tau option list -> tau ;
   m_source : source ;
+  m_coloring : bool ;
 }
 
 and source =
@@ -104,7 +92,7 @@ val is_builtin_type : name:string -> tau -> bool
 val get_builtin_type : name:string -> adt
 val datatype : library:string -> string -> adt
 val record :
-  link:string infoprover -> library:string -> (string * tau) list -> adt
+  link:string -> library:string -> (string * tau) list -> adt
 val comp : compinfo -> adt
 val comp_init : compinfo -> adt
 val field : adt -> string -> field
@@ -118,22 +106,24 @@ type balance = Nary | Left | Right
 
 val extern_s :
   library:library ->
-  ?link:(Engine.link infoprover) ->
+  ?link:Engine.link ->
   ?category:lfun category ->
   ?params:sort list ->
   ?sort:sort ->
   ?result:tau ->
+  ?coloring:bool ->
   ?typecheck:(tau option list -> tau) ->
   string -> lfun
 
 val extern_f :
   library:library ->
-  ?link:(Engine.link infoprover) ->
+  ?link:Engine.link ->
   ?balance:balance ->
   ?category:lfun category ->
   ?params:sort list ->
   ?sort:sort ->
   ?result:tau ->
+  ?coloring:bool ->
   ?typecheck:(tau option list -> tau) ->
   ('a,Format.formatter,unit,lfun) format4 -> 'a
 (** balance just give a default when link is not specified *)
@@ -142,21 +132,22 @@ val extern_p :
   library:library ->
   ?bool:string ->
   ?prop:string ->
-  ?link:Engine.link infoprover ->
+  ?link:Engine.link ->
   ?params:sort list ->
+  ?coloring:bool ->
   unit -> lfun
 
 val extern_fp : library:library -> ?params:sort list ->
-  ?link:string infoprover -> string -> lfun
+  ?link:string -> ?coloring:bool -> string -> lfun
 
 val generated_f : ?context:bool -> ?category:lfun category ->
-  ?params:sort list -> ?sort:sort -> ?result:tau ->
+  ?params:sort list -> ?sort:sort -> ?result:tau -> ?coloring:bool ->
   ('a,Format.formatter,unit,lfun) format4 -> 'a
 
-val generated_p : ?context:bool -> string -> lfun
+val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
 
 val extern_t:
-  string -> link:string infoprover -> library:library -> mdt
+  string -> link:string -> library:library -> mdt
 
 (** {2 Sorting and Typing} *)
 
@@ -193,6 +184,8 @@ val parameters : (lfun -> sort list) -> unit (** definitions *)
 val name_of_lfun : lfun -> string
 val name_of_field : field -> string
 
+val is_coloring_lfun : lfun -> bool
+
 (** {2 Logic Formulae} *)
 
 module ADT : Logic.Data with type t = adt
@@ -202,9 +195,6 @@ module Fun : Logic.Function with type t = lfun
 class virtual idprinting :
   object
     method virtual sanitize : string -> string
-
-    method virtual infoprover : 'a. 'a infoprover -> 'a
-    (** Specify the field to use in an infoprover *)
 
     method sanitize_type : string -> string
     (** Defaults to [self#sanitize] *)
@@ -350,7 +340,8 @@ sig
   val e_prop : pred -> term
   val p_bools : term list -> pred list
   val e_props : pred list -> term list
-  val lift : (term -> term) -> pred -> pred
+  val e_lift : (term -> term) -> pred -> pred
+  val p_lift : (pred -> pred) -> term -> term
 
   val p_not : pred -> pred
   val p_and : pred -> pred -> pred
@@ -376,9 +367,9 @@ sig
 
   module Subst :
   sig
-    val get : sigma -> term -> term
+    val copy : sigma -> sigma
+    val find : sigma -> term -> term
     val add : sigma -> term -> term -> unit
-    val add_map : sigma -> term Tmap.t -> unit
     val add_fun : sigma -> (term -> term) -> unit
     val add_filter : sigma -> (term -> bool) -> unit
   end
@@ -585,16 +576,18 @@ class type simplifier =
     method infer : F.pred list
     (** Add new hypotheses implied by the original hypothesis. *)
 
-    method simplify_exp : F.term -> F.term
-    (** Currently simplify an expression. *)
-    method simplify_hyp : F.pred -> F.pred
-    (** Currently simplify an hypothesis before assuming it. In any
-        case must return a weaker formula. *)
-    method simplify_branch : F.pred -> F.pred
-    (** Currently simplify a branch condition. In any case must return an
-        equivalent formula. *)
-    method simplify_goal : F.pred -> F.pred
-    (** Simplify the goal. In any case must return a stronger formula. *)
+    method equivalent_exp : F.term -> F.term
+    (** Currently simplify an expression.
+        It must returns a equivalent formula from the assumed hypotheses. *)
+    method weaker_hyp : F.pred -> F.pred
+    (** Currently simplify an hypothesis before assuming it.
+        It must return a weaker formula from the assumed hypotheses. *)
+    method equivalent_branch : F.pred -> F.pred
+    (** Currently simplify a branch condition.
+        It must return an equivalent formula from the assumed hypotheses. *)
+    method stronger_goal : F.pred -> F.pred
+    (** Simplify the goal.
+        It must return a stronger formula from the assumed hypotheses. *)
   end
 
 (* -------------------------------------------------------------------------- *)

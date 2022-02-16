@@ -4,6 +4,7 @@
     // "incremental": true,                   /* Enable incremental compilation */
     "target": "esnext",                       /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
     "module": "esnext",                       /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
+    "skipLibCheck": true,
     // "lib": [],                             /* Specify library files to be included in the compilation. */
     "allowJs": true,                          /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */
@@ -89,30 +90,16 @@
   ],
   "typedocOptions": {
     "name": "Ivette Documentation",
-    "mode": "modules",
     "out": "doc/html",
     "includeVersion": true,
     "disableSources": true,
     "excludePrivate": true,
-    "excludeNotExported": true,
     "excludeExternals": true,
     "categorizeByGroup": false,
     "categoryOrder": [ "Hooks", "Components", "*", "Other" ],
-    "stripInternal": true,
-    "listInvalidSymbolLinks":true,
     "hideGenerator":true,
-    "readme": "./README.md",
-    "inputFiles": [
-      "doc/pages",
-      "src/ivette/index.tsx",
-      "src/ivette/prefs.tsx",
-      "src/frama-c/server.ts",
-      "src/frama-c/states.ts",
-      "src/frama-c/utils.ts",
-      "src/frama-c/api/generated",
-      "src/dome/renderer",
-      "src/dome/misc/utils.ts",
-      "src/dome/misc/system.ts",
-    ]
+    "includes": "src/dome/doc/guides",
+    "customCss": "src/dome/doc/gallery.css",
+    "readme": "none"
   }
 }

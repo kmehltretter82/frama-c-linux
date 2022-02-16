@@ -1019,13 +1019,12 @@ module G = struct
 
       | BinOp (op, e1, e2, _) -> aux_binop (Cil.typeOf e) op e1 e2
 
-      |  Info _ -> assert false
     and aux_binop typ_res op e1 e2 =
       let g = match op with
         | PlusA -> Gauge.add (aux e1) (aux e2)
         | Mult -> Gauge.mul (aux e1) (aux e2)
         | MinusA -> Gauge.sub (aux e1) (aux e2)
-        | PlusPI | IndexPI ->
+        | PlusPI ->
           Gauge.add (aux e1) (Gauge.mul_ct (ptr_size e1) (aux e2))
         | MinusPI ->
           Gauge.add (aux e1) (Gauge.neg (Gauge.mul_ct (ptr_size e1) (aux e2)))
@@ -1109,7 +1108,7 @@ module G = struct
 
 end
 
-let dkey = Value_parameters.register_category "d-gauges"
+let dkey = Self.register_category "d-gauges"
 
 module D : Abstract_domain.Leaf
   with type state = G.t

@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2012-2020                                               */
+/*  Copyright (C) 2012-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -22,8 +22,8 @@
 
 /*! ***********************************************************************
  * \file
- * \brief Patricia Trie API
- **************************************************************************/
+ * \brief Bittree API
+***************************************************************************/
 
 #ifndef E_ACSL_BITTREE
 #define E_ACSL_BITTREE
@@ -31,9 +31,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* Public API {{{ */
+/* Debug */
+#ifdef E_ACSL_DEBUG
+#  define eacsl_bt_print_block export_alias(bt_print_block)
+#  define eacsl_bt_print_tree  export_alias(bt_print_tree)
+#endif
+/* }}} */
+
 /*! \brief Structure representing an allocated memory block */
 struct bt_block {
-  size_t ptr;              //!< Base address
+  uintptr_t ptr;           //!< Base address
   size_t size;             //!< Block length (in bytes)
   unsigned char *init_ptr; //!< Per-bit initialization
   size_t init_bytes;       //!< Number of initialized bytes within a block
@@ -51,54 +59,43 @@ struct bt_block {
 
 typedef struct bt_block bt_block;
 
-/*! \brief Structure representing a bittree node */
-struct bt_node {
-  int is_leaf;
-  size_t addr, mask;
-  struct bt_node *left, *right, *parent;
-  bt_block *leaf;
-};
-
-typedef struct bt_node bt_node;
-
 /*! \brief Remove a block from the structure */
-static void bt_remove(bt_block *b);
+void bt_remove(bt_block *b);
 
 /*! \brief Add a block to the structure */
-static void bt_insert(bt_block *b);
+void bt_insert(bt_block *b);
 
 /*! \brief Look-up a memory block by its base address
   NB: The function assumes that such a block exists. */
-static bt_block *bt_lookup(void *ptr);
+bt_block *bt_lookup(void *ptr);
 
 /*! \brief Find a memory block containing a given memory address
  *
  * Return block B such that:
  *  `\base_addr(B->ptr) <= ptr < (\base_addr(B->ptr) + size)`
  *  or NULL if such a block does not exist. */
-static bt_block *bt_find(void *ptr);
+bt_block *bt_find(void *ptr);
 
 /*! \brief Erase the contents of the structure */
-static void bt_clean(void);
+void bt_clean(void);
 
 /*! \brief Erase information about a block's initialization */
-static void bt_clean_block_init(bt_block *b);
+void bt_clean_block_init(bt_block *b);
 
-/*! \brief Erase all information about a given block */
-static void bt_clean_block(bt_block *b);
+/*! \brief Allocates a `bt_block` for a block of memory at address `ptr` and
+    with the given size. */
+bt_block *bt_alloc_block(uintptr_t ptr, size_t size);
+
+/*! \brief Frees the given `bt_block`. */
+void bt_free_block(bt_block *blk);
 
 #ifdef E_ACSL_DEBUG
 /*! \brief Print information about a given block */
-static void eacsl_bt_print_block(bt_block *b);
-
-/*! \brief Recursively print the contents of the bittree starting from a
- * given node */
-/*@ assigns \nothing; */
-static void bt_print_node(bt_node *ptr, int depth);
+void eacsl_bt_print_block(bt_block *b);
 
 /*! \brief Print the contents of the entire bittree */
 /*@ assigns \nothing; */
-static void bt_print();
+void eacsl_bt_print_tree();
 #endif
 
 #endif // E_ACSL_BITTREE

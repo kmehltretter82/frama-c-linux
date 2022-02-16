@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/simple_call.c (with preprocessing)
+[kernel] Parsing simple_call.c (with preprocessing)
 [eva] Analyzing a complete application starting at call_mix_G1_G2
 [eva] Computing initial state
 [eva] Initial state computed
@@ -8,12 +8,12 @@
   G2 ∈ [--..--]
   S ∈ [--..--]
 [eva] computing for function mix_G1_G2 <- call_mix_G1_G2.
-  Called from tests/pdg/simple_call.c:28.
+  Called from simple_call.c:28.
 [eva] Recording results for mix_G1_G2
 [eva] Done for function mix_G1_G2
-[eva:alarm] tests/pdg/simple_call.c:31: Warning: 
+[eva:alarm] simple_call.c:31: Warning: 
   signed overflow. assert -2147483648 ≤ x1 + x2;
-[eva:alarm] tests/pdg/simple_call.c:31: Warning: 
+[eva:alarm] simple_call.c:31: Warning: 
   signed overflow. assert x1 + x2 ≤ 2147483647;
 [eva] Recording results for call_mix_G1_G2
 [eva] done for function call_mix_G1_G2

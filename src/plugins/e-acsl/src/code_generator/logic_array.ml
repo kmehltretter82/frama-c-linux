@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,12 +41,12 @@ let length_exp ~loc kf env ~name array =
   let elem_typ, array_len =
     match Logic_aggr.get_array_typ_opt (Cil.typeOf array) with
     | None -> Options.fatal "Trying to retrieve the length of a non-array"
-    | Some (t, len, _, _) -> t, len
+    | Some (t, len, _) -> t, len
   in
   try
     let len = Cil.lenOfArray64 array_len in
     (Cil.kinteger64 ~loc len), env
-  with Cil.LenOfArray ->
+  with Cil.LenOfArray _ ->
     (* check RTE on the array before accessing its block length and offset *)
     let env = !translate_rte_ref kf env array in
     (* helper function *)
@@ -243,10 +243,10 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       Typing.preprocess_predicate (Env.Local_vars.get env) p;
       let adata, env = Assert.empty ~loc kf env in
       let adata, env =
-        Assert.register ~loc kf env "destination length" len adata
+        Assert.register ~loc env "destination length" len adata
       in
       let adata, env =
-        Assert.register ~loc kf env "current length" len_orig adata
+        Assert.register ~loc env "current length" len_orig adata
       in
       let stmt, env =
         Assert.runtime_check ~adata ~pred_kind:Assert Smart_stmt.RTE kf env e p
@@ -278,7 +278,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
                        (res_value ~flip:true ()) ])
   in
   (* Build the statement in the current env *)
-  let env = Env.add_stmt env kf stmt in
+  let env = Env.add_stmt env stmt in
 
   (* Return the result expression with the result of the comparison *)
   comparison_exp, env

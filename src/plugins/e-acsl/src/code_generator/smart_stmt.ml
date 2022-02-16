@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2020                                               *)
+(*  Copyright (C) 2012-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,7 +38,7 @@ let assigns_field ~loc vi name value =
   let ty = vi.vtype in
   let compinfo =
     match Cil.unrollType ty with
-    | TComp (compinfo, _, _) -> compinfo
+    | TComp (compinfo, _) -> compinfo
     | _ ->
       Options.fatal
         "type of %a (%a) is not a structure"
@@ -67,7 +67,7 @@ let struct_local_init ~loc vi fields =
   let ty = vi.vtype in
   let compinfo =
     match Cil.unrollType ty with
-    | TComp (compinfo, _, _) -> compinfo
+    | TComp (compinfo, _) -> compinfo
     | _ ->
       Options.fatal
         "type of %a (%a) is not a structure"
@@ -175,7 +175,7 @@ let named_store_stmt name ?str_size vi =
   let loc = vi.vdecl in
   let store = rtl_call ~loc name in
   match ty, str_size with
-  | TArray(_, Some _,_,_), None ->
+  | TArray(_, Some _,_), None ->
     store [ Cil.evar ~loc vi; Cil.sizeOf ~loc ty ]
   | TPtr(TInt(IChar, _), _), Some size ->
     store [ Cil.evar ~loc vi ; size ]
@@ -203,7 +203,7 @@ let delete_stmt ?(is_addr=false) vi =
   let loc = vi.vdecl in
   let mk = rtl_call ~loc "delete_block" in
   match is_addr, Cil.unrollType vi.vtype with
-  | _, TArray(_, Some _, _, _) | true, _ -> mk [ Cil.evar ~loc vi ]
+  | _, TArray(_, Some _, _) | true, _ -> mk [ Cil.evar ~loc vi ]
   | _ -> mk [ Cil.mkAddrOfVi vi ]
 
 let mark_readonly vi =

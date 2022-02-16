@@ -125,7 +125,7 @@ module HCE = struct
 
   let to_exp h = match get h with
     | E e -> e
-    | LV lv -> Value_util.lval_to_exp lv
+    | LV lv -> Eva_utils.lval_to_exp lv
 
   let to_lval h = match get h with
     | E _ -> None
@@ -138,7 +138,7 @@ module HCE = struct
   let replace kind ~late ~heir h = match get h with
     | E e ->
       let e = E.replace kind ~late ~heir e in
-      if Value_util.height_expr e > height_limit
+      if Eva_utils.height_expr e > height_limit
       then raise NonExchangeable
       else of_exp e
     | LV lval -> if Lval.equal lval late then of_exp heir else h
@@ -166,7 +166,7 @@ let syntactic_lvalues expr =
       let new_lvalues = gather e empty_lvalues in
       let new_addr = HCESet.union new_lvalues.read new_lvalues.addr in
       { lvalues with addr = HCESet.union new_addr lvalues.addr }
-    | UnOp (_, e, _) | CastE (_, e) | Info (e, _) -> gather e lvalues
+    | UnOp (_, e, _) | CastE (_, e) -> gather e lvalues
     | BinOp (_, e1, e2, _) -> gather e1 (gather e2 lvalues)
     | _ -> lvalues
   in

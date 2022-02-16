@@ -232,4 +232,9 @@ char *realpath(const char *restrict file_name, char *restrict resolved_name)
   return resolved_name;
 }
 
+char *canonicalize_file_name(const char *path) {
+  return realpath(path, NULL);
+}
+
+
 __POP_FC_STDLIB

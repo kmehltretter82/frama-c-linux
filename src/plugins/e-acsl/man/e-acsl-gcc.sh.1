@@ -2,7 +2,7 @@
 .\"                                                                        
 .\"  This file is part of the Frama-C's E-ACSL plug-in.                    
 .\"                                                                        
-.\"  Copyright (C) 2012-2020                                               
+.\"  Copyright (C) 2012-2021                                               
 .\"    CEA (Commissariat à l'énergie atomique et aux énergies              
 .\"         alternatives)                                                  
 .\"                                                                        
@@ -102,6 +102,9 @@ use the \fBFrama-C\fP standard library instead of a system-wide one.
 .B -M, --full-mtracking
 maximize memory-related instrumentation.
 .TP
+.B --concurrency
+enable concurrency support.
+.TP
 .B --temporal
 enable checking for temporal memory errors in \\\fBvalid\fP and \\\fBvalid_read\fP predicates.
 .TP
@@ -167,11 +170,14 @@ Valid arguments are:
 restrict annotations to a given list of functions.
 \fIOPTSTRING\fP is a comma-separated string comprising function names.
 .TP
-.B --stack-size=\fI<NUMBER>
-set the size (in MB) of the stack shadow space
-.TP
-.B --heap-size=\fI<NUMBER>
-set the size (in MB) of the heap shadow space
+.B --zone-sizes=\fI<NAME1:SIZE1,...,NAMEN:SIZEN>
+set the size (in MB) of the given zones.
+
+Valid zone names are:
+  \fIstack\fP        \- stack shadow space
+  \fIheap\fP         \- heap shadow space
+  \fItls\fP          \- TLS shadow space
+  \fIthread-stack\fP \- thread stack shadow space
 .TP
 .B -k, --keep-going
 continue execution after an assertion failure

@@ -24,7 +24,7 @@ open Cil_types
 open Eval
 open Locations
 
-let dkey = Value_parameters.register_category "d-symblocs"
+let dkey = Self.register_category "d-symblocs"
 
 module K = Hcexprs
 module V = Cvalue.V (* TODO: functorize (with locations too ?) *)
@@ -121,7 +121,7 @@ let interesting_exp get_locs get_val e =
     match e.enode with
     | Lval _ ->
       not (Cvalue.V.cardinal_zero_or_one (get_val e))
-    | CastE (_, e) | UnOp (_, e, _) | Info (e, _) ->
+    | CastE (_, e) | UnOp (_, e, _) ->
       has_lvalue e
     | BinOp (op, e1, e2,_) ->
       not (is_comp op) && (has_lvalue e1 || has_lvalue e2)
@@ -134,7 +134,7 @@ let interesting_exp get_locs get_val e =
     not (Precise_locs.cardinal_zero_or_one (get_locs lv))
   | BinOp (op, e1, e2,_) ->
     not (is_comp op) && has_lvalue e1 && has_lvalue e2
-  | CastE _ | UnOp _ | Info _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
+  | CastE _ | UnOp _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
   | AlignOf _ | AlignOfE _ | StartOf _ | AddrOf _ ->
     false
 
@@ -145,7 +145,7 @@ and vars_exp (e: exp) = match e.enode with
     Base.Set.empty
   | AddrOf lv | StartOf lv | Lval lv ->
     vars_lv lv
-  | SizeOfE e | AlignOfE e | CastE (_,e) | UnOp (_,e,_) | Info (e,_) ->
+  | SizeOfE e | AlignOfE e | CastE (_,e) | UnOp (_,e,_) ->
     vars_exp e
   | BinOp (_,e1,e2,_) -> Base.Set.union (vars_exp e1) (vars_exp e2)
 and vars_host = function
@@ -275,7 +275,7 @@ module Memory = struct
       let z =
         try K2Z.find k state.zones
         with Not_found ->
-          Value_parameters.abort "Missing zone for %a@.%a"
+          Self.abort "Missing zone for %a@.%a"
             K.HCE.pretty k pretty state
       in
       add_deps k v z acc
@@ -379,7 +379,7 @@ module Memory = struct
     else
       let k = K.HCE.of_lval lv in
       let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
-      let z_lv_indirect = Value_util.indirect_zone_of_lval get_z lv in
+      let z_lv_indirect = Eva_utils.indirect_zone_of_lval get_z lv in
       if Locations.Zone.intersects z_lv z_lv_indirect then
         (* The location of [lv] intersects with the zones needed to compute
            itself, the equality would not hold. *)
@@ -395,7 +395,7 @@ module Memory = struct
       state
     else
       let k = K.HCE.of_exp e in
-      let z = Value_util.zone_of_expr get_z e in
+      let z = Eva_utils.zone_of_expr get_z e in
       add_key k v z state
 
   let find k state =
@@ -489,7 +489,7 @@ module D : Abstract_domain.Leaf
       | `Value loc -> loc.Eval.loc
     in
     if Precise_locs.(equal_loc loc_top r) then
-      Value_parameters.fatal "Unknown location for %a" Printer.pp_lval lv
+      Self.fatal "Unknown location for %a" Printer.pp_lval lv
     else r
 
   let get_val valuation = fun lv ->

@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/assigns_range.i (no preprocessing)
+[kernel] Parsing assigns_range.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -64,7 +64,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_acsl/assigns_range.i, line 8) in 'assigns_t1_an_element'' in 'call_assigns_all' at call 'assigns_t1_an_element' (file tests/wp_acsl/assigns_range.i, line 37)
+Goal Instance of 'Pre-condition (file assigns_range.i, line 8) in 'assigns_t1_an_element'' in 'call_assigns_all' at call 'assigns_t1_an_element' (file assigns_range.i, line 37)
 :
 Assume {
   Type: is_sint32(i) /\ is_sint32(j).
@@ -75,36 +75,21 @@ Prove: i <= 19.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_acsl/assigns_range.i, line 13) in 'assigns_t2_bound'' in 'call_assigns_all' at call 'assigns_t2_bound' (file tests/wp_acsl/assigns_range.i, line 38)
+Goal Instance of 'Pre-condition (file assigns_range.i, line 13) in 'assigns_t2_bound'' in 'call_assigns_all' at call 'assigns_t2_bound' (file assigns_range.i, line 38)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_acsl/assigns_range.i, line 18) in 'assigns_t3_inf_bound'' in 'call_assigns_all' at call 'assigns_t3_inf_bound' (file tests/wp_acsl/assigns_range.i, line 39)
+Goal Instance of 'Pre-condition (file assigns_range.i, line 18) in 'assigns_t3_inf_bound'' in 'call_assigns_all' at call 'assigns_t3_inf_bound' (file assigns_range.i, line 39)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_acsl/assigns_range.i, line 23) in 'assigns_t4_sup_bound'' in 'call_assigns_all' at call 'assigns_t4_sup_bound' (file tests/wp_acsl/assigns_range.i, line 40)
+Goal Instance of 'Pre-condition (file assigns_range.i, line 23) in 'assigns_t4_sup_bound'' in 'call_assigns_all' at call 'assigns_t4_sup_bound' (file assigns_range.i, line 40)
 :
-Assume {
-  Type: is_sint32(i) /\ is_sint32(j).
-  (* Heap *)
-  Type: IsArray_sint32(t2_0) /\ IsArray_sint32(t3_0).
-  (* Pre-condition *)
-  Have: (0 <= i) /\ (i <= j) /\ (j <= 19).
-  (* Call 'assigns_t1_an_element' *)
-  Have: i <= 19.
-  (* Call Effects *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 19) ->
-      (((i_1 < i) \/ (j < i_1)) -> (t2_1[i_1] = t2_0[i_1])))).
-  (* Call Effects *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 19) ->
-      (((i_1 < i) \/ (20 <= i_1)) -> (t3_1[i_1] = t3_0[i_1])))).
-}
-Prove: 0 <= j.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -137,7 +122,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_acsl/assigns_range.i, line 8) in 'assigns_t1_an_element'' in 'call_assigns_t1' at call 'assigns_t1_an_element' (file tests/wp_acsl/assigns_range.i, line 49)
+Goal Instance of 'Pre-condition (file assigns_range.i, line 8) in 'assigns_t1_an_element'' in 'call_assigns_t1' at call 'assigns_t1_an_element' (file assigns_range.i, line 49)
 :
 Assume { Type: is_sint32(i). (* Pre-condition *) Have: (5 <= i) /\ (i <= 7).
 }
@@ -188,7 +173,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_acsl/assigns_range.i, line 13) in 'assigns_t2_bound'' in 'call_assigns_t2' at call 'assigns_t2_bound' (file tests/wp_acsl/assigns_range.i, line 57)
+Goal Instance of 'Pre-condition (file assigns_range.i, line 13) in 'assigns_t2_bound'' in 'call_assigns_t2' at call 'assigns_t2_bound' (file assigns_range.i, line 57)
 :
 Assume { Type: is_sint32(i). (* Pre-condition *) Have: (5 <= i) /\ (i <= 7).
 }
@@ -235,13 +220,8 @@ Prove: i <= 0.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_acsl/assigns_range.i, line 23) in 'assigns_t4_sup_bound'' in 'call_assigns_t4' at call 'assigns_t4_sup_bound' (file tests/wp_acsl/assigns_range.i, line 65)
+Goal Instance of 'Pre-condition (file assigns_range.i, line 23) in 'assigns_t4_sup_bound'' in 'call_assigns_t4' at call 'assigns_t4_sup_bound' (file assigns_range.i, line 65)
 :
-Assume {
-  Type: is_sint32(i) /\ is_sint32(j).
-  (* Pre-condition *)
-  Have: (0 <= i) /\ (i <= j) /\ (j <= 19).
-}
-Prove: 0 <= j.
+Prove: true.
 
 ------------------------------------------------------------

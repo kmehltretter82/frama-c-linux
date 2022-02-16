@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -eva @EVA_OPTIONS@ -scf
+   OPT: -eva @EVA_OPTIONS@ -then -scf
 */
 
 void f(int *x) { (*x)++; }
