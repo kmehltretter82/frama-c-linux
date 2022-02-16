@@ -837,6 +837,7 @@ let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
+  Translate_ats.reset ();
   Logic_functions.reset ();
   Global_observer.reset ();
   Analyses.reset ();

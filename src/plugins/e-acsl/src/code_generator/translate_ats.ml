@@ -250,23 +250,29 @@ let indexed_exp ~loc kf env e_at =
 (* Translation *)
 (* ************************************************************************** *)
 
+(* Table storing the [varinfo] with the translation of a given [at_data]. *)
+let translations: varinfo Error.result AtData.Hashtbl.t =
+  AtData.Hashtbl.create 17
+
+(* [pretranslate_to_exp ~loc kf env pot] immediately translates the given
+   [pred_or_term] in the current environment and return the translated
+   expression. *)
 let pretranslate_to_exp ~loc kf env pot =
   Options.debug ~level:4 "pre-translating %a in local environment '%a'"
     PredOrTerm.pretty pot
     Typing.Function_params_ty.pretty (Env.Local_vars.get env);
-  let t_opt =
-    match pot with
-    | PoT_term t -> Some t
-    | PoT_pred _ -> None
-  in
-  let e, _ , env =
+  let e, env, t_opt =
     let adata = Assert.no_data in
     match pot with
-    | PoT_term t -> !term_to_exp_ref ~adata ~inplace:true kf env t
-    | PoT_pred p -> !predicate_to_exp_ref ~adata ~inplace:true kf env p
+    | PoT_term t ->
+      let e, _, env = !term_to_exp_ref ~adata ~inplace:true kf env t in
+      e, env, Some t
+    | PoT_pred p ->
+      let e, _, env = !predicate_to_exp_ref ~adata ~inplace:true kf env p in
+      e, env, None
   in
   let ty = Cil.typeOf e in
-  let _, var_e, env =
+  let var_vi, _, env =
     Env.new_var
       ~loc
       ~scope:Function
@@ -281,7 +287,7 @@ let pretranslate_to_exp ~loc kf env pot =
          in
          [ init_set ~loc (Cil.var var_vi) var_e e ])
   in
-  var_e, env
+  var_vi, env
 
 (* [pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot] immediately
    translates the given [pred_or_term] in the current environment for each value
@@ -317,7 +323,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
       end
   in
   let ty_ptr = TPtr(ty, []) in
-  let _, e_at, env = Env.new_var
+  let vi_at, e_at, env = Env.new_var
       ~loc
       ~name:"at"
       ~scope:Varname.Function
@@ -428,84 +434,122 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   (* Put block in the current env *)
   let env = Env.add_stmt env (Smart_stmt.block_stmt storing_loops_block) in
   (* Returning *)
-  e_at, env
+  vi_at, env
+
+(* Set holding the C labels defined in the function currently being visited. *)
+let clabels_ref: Logic_label.Set.t ref = ref Logic_label.Set.empty
+
+(* [is_label_defined label] returns [true] if [label] is either a C label that
+   has been defined, a built-in label or a formal label, and return false if
+   [label] is a C label that has not been defined. *)
+let is_label_defined label =
+  match label with
+  | StmtLabel _ when Logic_label.Set.mem label !clabels_ref ->
+    true
+  | StmtLabel _ ->
+    false
+  | BuiltinLabel _ | FormalLabel _ ->
+    true
 
 let for_stmt env kf stmt =
+  Options.debug ~level:4 "pre-translating ats for stmt %d at %a"
+    stmt.sid
+    Printer.pp_location (Stmt.loc stmt);
+
+  (* At the start of a function, reset the set of defined C labels. *)
+  if Kernel_function.is_first_stmt kf stmt then
+    clabels_ref := Logic_label.Set.empty;
+
+  (* If the current statement has labels, add the C label to the set. *)
+  begin match stmt.labels with
+    | [] -> ()
+    | _ :: _ ->
+      clabels_ref := Logic_label.Set.add (StmtLabel (ref stmt)) !clabels_ref
+  end;
+
+  (* Retrieve the set of [\at()] to translate for the given statement. *)
   let at_for_stmt =
     Error.retrieve_preprocessing
-      "blabla"
-      Labels.Translation.at_for_stmt
+      "labels pre-analysis"
+      Labels.at_for_stmt
       stmt
       Printer.pp_stmt
   in
-  Options.debug ~level:4 "pre-translating %d ats for stmt %d at %a"
-    (List.length at_for_stmt)
-    stmt.sid
-    Printer.pp_location (Stmt.loc stmt);
+
+  (* Translate the [\at()]. *)
   let stmt_translations = PredOrTerm.Hashtbl.create 7 in
-  List.fold_left
-    (fun env ((_, _, lscope, pot, _) as at_data) ->
-       let e_or_err, env =
-         try
-           match PredOrTerm.Hashtbl.find_opt stmt_translations pot with
-           | Some e_or_err -> e_or_err, env
-           | None ->
+  AtData.Set.fold
+    (fun ({ lscope; pot; error } as at_data) env ->
+       let vi_or_err, env =
+         let vi_or_err = PredOrTerm.Hashtbl.find_opt stmt_translations pot in
+         match error, vi_or_err with
+         | Some exn, (Some _ | None) ->
+           (* If there was an error during the pre-analysis, then store it
+              instead of the translation. *)
+           Result.Error exn, env
+         | None, Some vi_or_err ->
+           (* If the same [pred_or_term] has already been translated on this
+              statement, return its translation. *)
+           vi_or_err, env
+         | None, None ->
+           (* Otherwise translate it. *)
+           try
              let loc = Stmt.loc stmt in
-             let e, env =
+             let vi, env =
                if Lscope.is_used lscope pot then
                  pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot
                else
                  pretranslate_to_exp ~loc kf env pot
              in
-             (Result.Ok (Labels.Translation.Done e)), env
-         with Error.(Typing_error _ | Not_yet _) as exn ->
-           (Result.Error exn), env
+             Result.Ok vi, env
+           with Error.(Typing_error _ | Not_yet _) as exn ->
+             Result.Error exn, env
        in
-       PredOrTerm.Hashtbl.replace stmt_translations pot e_or_err;
-       Labels.Translation.set ~force:true at_data e_or_err;
+       PredOrTerm.Hashtbl.replace stmt_translations pot vi_or_err;
+       AtData.Hashtbl.replace translations at_data vi_or_err;
        env)
-    env
     at_for_stmt
+    env
 
 let to_exp ~loc ~adata kf env pot label =
   let kinstr = Env.get_kinstr env in
   let lscope = Env.Logic_scope.get env in
-  try
-    let e_or_err = Labels.Translation.get (kf, kinstr, lscope, pot, label) in
-    let e, adata, env =
-      match e_or_err with
-      | Result.Ok (Labels.Translation.Done e) ->
+  let at = AtData.create kf kinstr lscope pot label in
+  if is_label_defined label then
+    try
+      let vi_or_err = AtData.Hashtbl.find translations at in
+      match vi_or_err with
+      | Result.Ok vi ->
         let e, env =
           if Lscope.is_used lscope pot then
-            indexed_exp ~loc kf env e
+            indexed_exp ~loc kf env (Smart_exp.lval ~loc (Cil.var vi))
           else
-            e, env
+            Smart_exp.lval ~loc (Cil.var vi), env
         in
-        let adata, env =
+        let adata, env=
           Assert.register_pred_or_term ~loc env pot e adata
         in
         e, adata, env
-      | Result.Ok Labels.Translation.Inplace -> begin
-          match pot with
-          | PoT_term t -> !term_to_exp_ref ~adata ~inplace:true kf env t
-          | PoT_pred p -> !predicate_to_exp_ref ~adata ~inplace:true kf env p
-        end
-      | Result.Ok Labels.Translation.Queued ->
-        let potstr =
-          match pot with PoT_term _ -> "term" | PoT_pred _ -> "predicate"
-        in
-        Options.abort ~source:(fst loc)
-          "%s '%a' was used before being translated.@ \
-           This usually happen when using a label defined after the place@ \
-           where the %s should be translated"
-          potstr
-          PredOrTerm.pretty pot
-          potstr
       | Result.Error exn ->
         Env.Context.save env;
         raise exn
+    with Not_found ->begin
+        match pot with
+        | PoT_term t -> !term_to_exp_ref ~adata ~inplace:true kf env t
+        | PoT_pred p -> !predicate_to_exp_ref ~adata ~inplace:true kf env p
+      end
+  else
+    let potstr =
+      match pot with PoT_term _ -> "Term" | PoT_pred _ -> "Predicate"
     in
-    e, adata, env
-  with Not_found ->
-    Options.fatal ~source:(fst loc) "no translation for %a"
-      Labels.pp_at_data (kf, kinstr, lscope, pot, label)
+    Options.abort ~source:(fst loc)
+      "%s '%a' was used before being translated.@ \
+       This usually happens when using a label defined after the place@ \
+       where the %s should be translated"
+      potstr
+      PredOrTerm.pretty pot
+      potstr
+
+let reset () =
+  AtData.Hashtbl.clear translations;
+  clabels_ref := Logic_label.Set.empty

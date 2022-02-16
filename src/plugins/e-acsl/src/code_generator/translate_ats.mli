@@ -46,6 +46,9 @@ val to_exp:
     The expression is either translated in-place or retrieved from a
     pre-translation phase. *)
 
+val reset: unit -> unit
+(** Clear the stored translations. *)
+
 (*****************************************************************************)
 (**************************** Handling memory ********************************)
 (*****************************************************************************)
