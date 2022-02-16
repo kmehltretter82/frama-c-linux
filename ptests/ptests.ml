@@ -965,6 +965,7 @@ end = struct
       "frama-c-cmd",  !macro_frama_c_cmd;
       "frama-c",      !macro_frama_c;
       "DEV_NULL",     dev_null;
+      "FRAMAC_SHARE",           get_default_env "FRAMAC_SHARE" "";
       "PTEST_DEFAULT_OPTIONS",  default_options;
       "PTEST_OPTIONS",          !macro_options;
       "PTEST_PRE_OPTIONS",      !macro_pre_options;
