@@ -75,6 +75,10 @@ let must_translate_opt = function
   | None -> false
   | Some ppt -> must_translate ppt
 
+let () =
+  E_acsl_visitor.must_translate_ppt_ref := must_translate;
+  E_acsl_visitor.must_translate_ppt_opt_ref := must_translate_opt
+
 let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   let lenv = Env.Local_vars.get env in
   let pp = match pp with Some size_pp -> size_pp | None -> t in
