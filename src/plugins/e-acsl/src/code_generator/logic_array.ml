@@ -249,7 +249,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
         Assert.register ~loc env "current length" len_orig adata
       in
       let stmt, env =
-        Assert.runtime_check ~adata ~pred_kind:Assert Smart_stmt.RTE kf env e p
+        Assert.runtime_check ~adata ~pred_kind:Assert RTE kf env e p
       in
       stmt :: stmts, env
   in

@@ -24,6 +24,7 @@
     general functions to create assertion statements. *)
 
 open Cil_types
+open Analyses_types
 
 type t
 (** Type to hold the data contributing to an assertion. *)
@@ -99,7 +100,7 @@ val register_pred:
 val runtime_check:
   adata:t ->
   pred_kind:predicate_kind ->
-  Smart_stmt.annotation_kind ->
+  annotation_kind ->
   kernel_function ->
   Env.t ->
   exp ->
@@ -121,7 +122,7 @@ val runtime_check_with_msg:
   ?name:string ->
   string ->
   pred_kind:predicate_kind ->
-  Smart_stmt.annotation_kind ->
+  annotation_kind ->
   kernel_function ->
   Env.t ->
   exp ->

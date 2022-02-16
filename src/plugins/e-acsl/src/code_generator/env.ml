@@ -23,6 +23,7 @@
 module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
+open Analyses_types
 open Contract_types
 module Error = Translation_error
 
@@ -63,7 +64,7 @@ type loop_env = {
 type t = {
   lscope: Lscope.t;
   lscope_reset: bool;
-  annotation_kind: Smart_stmt.annotation_kind;
+  annotation_kind: annotation_kind;
   new_global_vars: (varinfo * localized_scope) list;
   (* generated variables. The scope indicates the level where the variable
      should be added. *)
@@ -104,7 +105,7 @@ let empty_loop_env =
 let empty =
   { lscope = Lscope.empty;
     lscope_reset = true;
-    annotation_kind = Smart_stmt.Assertion;
+    annotation_kind = Assertion;
     new_global_vars = [];
     global_mp_tbl = empty_mp_tbl;
     env_stack = [];

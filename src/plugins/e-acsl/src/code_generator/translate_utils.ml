@@ -100,7 +100,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
         Assert.runtime_check
           ~adata:adata_lower_guard
           ~pred_kind:Assert
-          Smart_stmt.RTE
+          RTE
           kf
           env
           lower_guard
@@ -130,7 +130,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
     Assert.runtime_check
       ~adata:adata_upper_guard
       ~pred_kind:Assert
-      Smart_stmt.RTE
+      RTE
       kf
       env
       upper_guard

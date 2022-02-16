@@ -64,7 +64,7 @@ let handle_annotations env kf stmt =
         (fun (stmts, env, _) ->
            match Env.top_loop_variant env with
            | Some (t, measure_opt) ->
-             let env = Env.set_annotation_kind env Smart_stmt.Variant in
+             let env = Env.set_annotation_kind env Variant in
              let env = Env.push env in
              (* There cannot be bound logical variables since we cannot write
                 loops inside logic functions or predicates, hence lenv is []*)
@@ -98,7 +98,7 @@ let handle_annotations env kf stmt =
     let rec aux (stmts, env) = function
       | [] -> begin
           (* No statements remaining in the loop: variant check *)
-          let env = Env.set_annotation_kind env Smart_stmt.Variant in
+          let env = Env.set_annotation_kind env Variant in
           let lenv = Env.Local_vars.get env in
           match variant with
           | Some (t, e_old, Some measure) ->
@@ -153,7 +153,7 @@ let handle_annotations env kf stmt =
                 ~loc
                 msg
                 ~pred_kind:Assert
-                Smart_stmt.Variant
+                Variant
                 kf
                 env
                 e_tapp
@@ -194,7 +194,7 @@ let handle_annotations env kf stmt =
                 ~loc
                 msg1
                 ~pred_kind:Assert
-                Smart_stmt.Variant
+                Variant
                 kf
                 env
                 variant_pos_e
@@ -236,7 +236,7 @@ let handle_annotations env kf stmt =
                 ~loc
                 msg2
                 ~pred_kind:Assert
-                Smart_stmt.Variant
+                Variant
                 kf
                 env
                 variant_dec_e
@@ -258,7 +258,7 @@ let handle_annotations env kf stmt =
         (* Last statement of the loop: invariant check *)
         (* Optimisation to only verify invariant on a non-empty body loop. *)
         let invariants = Env.top_loop_invariants env in
-        let env = Env.set_annotation_kind env Smart_stmt.Invariant in
+        let env = Env.set_annotation_kind env Invariant in
         let env = Env.push env in
         let env =
           let translate_named_predicate = !translate_predicate_ref in
@@ -392,7 +392,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           Assert.runtime_check
             ~adata
             ~pred_kind:Assert
-            Smart_stmt.RTE
+            RTE
             kf
             env
             e

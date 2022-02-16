@@ -24,4 +24,6 @@
 
 open Analyses_types
 
+module Annotation_kind: Datatype.S with type t = annotation_kind
+
 module PredOrTerm: Datatype.S_with_collections with type t = pred_or_term

@@ -525,7 +525,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
           Assert.runtime_check
             ~adata:adata2
             ~pred_kind:Assert
-            Smart_stmt.RTE
+            RTE
             kf
             env
             coerce_guard
@@ -605,7 +605,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
               Assert.runtime_check
                 ~adata:adata1
                 ~pred_kind:Assert
-                Smart_stmt.RTE
+                RTE
                 kf
                 env
                 e1_guard

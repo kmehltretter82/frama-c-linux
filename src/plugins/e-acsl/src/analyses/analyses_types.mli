@@ -35,3 +35,11 @@ type lscope = lscope_var list
 type pred_or_term =
   | PoT_pred of predicate
   | PoT_term of term
+
+type annotation_kind =
+  | Assertion
+  | Precondition
+  | Postcondition
+  | Invariant
+  | Variant
+  | RTE

@@ -25,6 +25,24 @@
 open Cil_datatype
 open Analyses_types
 
+module Annotation_kind =
+  Datatype.Make
+    (struct
+      type t = annotation_kind
+      let name = "E_ACSL.Annotation_kind"
+      let reprs = [ Assertion ]
+      include Datatype.Undefined
+
+      let pretty fmt akind =
+        match akind with
+        | Assertion -> Format.fprintf fmt "Assertion"
+        | Precondition -> Format.fprintf fmt "Precondition"
+        | Postcondition -> Format.fprintf fmt "Postcondition"
+        | Invariant -> Format.fprintf fmt "Invariant"
+        | Variant -> Format.fprintf fmt "Variant"
+        | RTE -> Format.fprintf fmt "RTE"
+    end)
+
 module PredOrTerm =
   Datatype.Make_with_collections
     (struct
