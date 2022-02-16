@@ -1387,7 +1387,11 @@ module Masks = struct
              So, the highest bits are set *)
           mk ~set:(Integer.logor v.set min)
             ~unset:(Integer.logand v.unset max)
-        else top
+        else
+          (* The sign is unknown.
+             So, the highest bits are unknown. *)
+          mk ~set:(Integer.logand v.set max)
+            ~unset:(Integer.logand v.unset max)
 
   let of_integer set = mk ~set ~unset:(Integer.lognot set)
   let rewrite eval ctx e =

@@ -276,6 +276,16 @@ Goal Check 'bit_to_signed_negative2,ok' (file bitwise.i, line 144):
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Check 'bit_to_signed,ok' (file bitwise.i, line 145):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed2,ok' (file bitwise.i, line 146):
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function lemma
 ------------------------------------------------------------
