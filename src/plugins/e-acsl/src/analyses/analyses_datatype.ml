@@ -44,12 +44,12 @@ module Annotation_kind =
         | RTE -> Format.fprintf fmt "RTE"
     end)
 
-module PredOrTerm =
+module Pred_or_term =
   Datatype.Make_with_collections
     (struct
       type t = pred_or_term
 
-      let name = "E_ACSL.PredOrTerm"
+      let name = "E_ACSL.Pred_or_term"
 
       let reprs =
         let reprs =
@@ -85,13 +85,12 @@ module PredOrTerm =
       let varname _ = "pred_or_term"
     end)
 
-(** Extended logic label module to associate a statement to a label when
-    necessary. For instance, the label `Old` is associated with its contract
-    statement to be able to distinguish two `Old` annotations in the same
-    function. On the contrary the `Pre` label does not have an associated
-    statement because this label designate the same location for all contracts
-    in the same function. *)
-module ExtLogicLabel: sig
+(** [Ext_logic_label] associates a statement to a label when necessary. For
+    instance, the label `Old` is associated with its contract statement to
+    distinguish two `Old` annotations in the same function. On the contrary, the
+    `Pre` label does not have an associated statement because this label
+    represents the same location for all contracts in the same function. *)
+module Ext_logic_label: sig
   include Datatype.S_with_collections with type t = logic_label * stmt option
 
   val from: kinstr -> logic_label -> logic_label * stmt option
@@ -102,11 +101,11 @@ end = struct
       (Datatype.Option_with_collections
          (Stmt)
          (struct
-           let module_name = "E_ACSL.Labels.ExtLogicLabel.StmtOption"
+           let module_name = "E_ACSL.Labels.Ext_logic_label.StmtOption"
          end))
-      (struct let module_name = "E_ACSL.Labels.ExtLogicLabel" end)
+      (struct let module_name = "E_ACSL.Labels.Ext_logic_label" end)
 
-  (* Override [pretty] to print a more compact representation of [ExtLogicLabel]
+  (* Override [pretty] to print a more compact representation of [Ext_logic_label]
      for debugging purposes. *)
   let pretty fmt (label, from_stmt_opt) =
     match from_stmt_opt with
@@ -163,14 +162,14 @@ let basic_kinstr_hash kinstr =
   | Kglobal -> 1 lsl 29
   | Kstmt _ -> 1 lsl 31
 
-module AtData = struct
+module At_data = struct
   let create ?error kf kinstr lscope pot label =
     { kf; kinstr; lscope; pot; label; error }
 
   include Datatype.Make_with_collections
       (struct
         type t = at_data
-        let name = "E_ACSL.AtData"
+        let name = "E_ACSL.At_data"
 
         let reprs =
           List.fold_left
@@ -185,7 +184,7 @@ module AtData = struct
                            acc
                            Logic_label.reprs)
                       acc
-                      PredOrTerm.reprs)
+                      Pred_or_term.reprs)
                  acc
                  Kinstr.reprs)
             []
@@ -216,33 +215,33 @@ module AtData = struct
             else cmp
           in
           let cmp =
-            if cmp = 0 then PredOrTerm.compare pot1 pot2
+            if cmp = 0 then Pred_or_term.compare pot1 pot2
             else cmp
           in
           if cmp = 0 then
-            let extlabel1 = ExtLogicLabel.from kinstr1 label1 in
-            let extlabel2 = ExtLogicLabel.from kinstr2 label2 in
-            ExtLogicLabel.compare extlabel1 extlabel2
+            let extlabel1 = Ext_logic_label.from kinstr1 label1 in
+            let extlabel2 = Ext_logic_label.from kinstr2 label2 in
+            Ext_logic_label.compare extlabel1 extlabel2
           else cmp
 
         let equal = Datatype.from_compare
 
         let hash { kf; kinstr; lscope; pot; label } =
-          let extlabel = ExtLogicLabel.from kinstr label in
+          let extlabel = Ext_logic_label.from kinstr label in
           Hashtbl.hash
             (Kf.hash kf,
              basic_kinstr_hash kinstr,
              Lscope.D.hash lscope,
-             PredOrTerm.hash pot,
-             ExtLogicLabel.hash extlabel)
+             Pred_or_term.hash pot,
+             Ext_logic_label.hash extlabel)
 
         let pretty fmt { kf; kinstr; lscope; pot; label } =
-          let extlabel = ExtLogicLabel.from kinstr label in
+          let extlabel = Ext_logic_label.from kinstr label in
           Format.fprintf fmt "@[(%a, %a, %a, %a, %a)@]"
             Kf.pretty kf
             basic_pp_kinstr kinstr
             Lscope.D.pretty lscope
-            PredOrTerm.pretty pot
-            ExtLogicLabel.pretty extlabel
+            Pred_or_term.pretty pot
+            Ext_logic_label.pretty extlabel
       end)
 end

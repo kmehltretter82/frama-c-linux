@@ -37,7 +37,7 @@ type pred_or_term =
   | PoT_term of term
 
 (** Type uniquely representing a [predicate] or [term] with an associated
-    [label], and all the information necessary for its translation. *)
+    [label], and the necessary information for its translation. *)
 type at_data = {
   (** [kernel_function] englobing the [pred_or_term]. *)
   kf: kernel_function;

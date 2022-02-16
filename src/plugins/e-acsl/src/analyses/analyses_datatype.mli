@@ -27,9 +27,9 @@ open Analyses_types
 
 module Annotation_kind: Datatype.S with type t = annotation_kind
 
-module PredOrTerm: Datatype.S_with_collections with type t = pred_or_term
+module Pred_or_term: Datatype.S_with_collections with type t = pred_or_term
 
-module AtData: sig
+module At_data: sig
   include Datatype.S_with_collections with type t = at_data
 
   val create:

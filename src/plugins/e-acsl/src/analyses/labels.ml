@@ -58,7 +58,7 @@ let preprocess_done = ref false
 
 (** Associate a statement with the [at_data] that need to be translated on
     this statement. *)
-let at_data_for_stmts: AtData.Set.t ref Stmt.Hashtbl.t =
+let at_data_for_stmts: At_data.Set.t ref Stmt.Hashtbl.t =
   Stmt.Hashtbl.create 17
 
 (** Add [data] to the list of [at_data] that must be translated on the
@@ -69,23 +69,23 @@ let add_at_for_stmt data stmt =
     try
       Stmt.Hashtbl.find at_data_for_stmts stmt
     with Not_found ->
-      let ats_ref = ref AtData.Set.empty in
+      let ats_ref = ref At_data.Set.empty in
       Stmt.Hashtbl.add at_data_for_stmts stmt ats_ref;
       ats_ref
   in
   let old_data =
     try
-      AtData.Set.find data !ats_ref
+      At_data.Set.find data !ats_ref
     with Not_found ->
-      ats_ref := AtData.Set.add data !ats_ref;
+      ats_ref := At_data.Set.add data !ats_ref;
       data
   in
   match old_data.error, data.error with
   | Some _, None ->
     (* Replace the old data that has an error with the new data that do not
        have one. *)
-    ats_ref := AtData.Set.remove old_data !ats_ref;
-    ats_ref := AtData.Set.add data !ats_ref
+    ats_ref := At_data.Set.remove old_data !ats_ref;
+    ats_ref := At_data.Set.add data !ats_ref
   | Some _, Some _
   | None, Some _
   | None, None ->
@@ -97,7 +97,7 @@ let add_at_for_stmt data stmt =
 let at_for_stmt stmt =
   if !preprocess_done then
     let ats_ref =
-      Stmt.Hashtbl.find_def at_data_for_stmts stmt (ref AtData.Set.empty)
+      Stmt.Hashtbl.find_def at_data_for_stmts stmt (ref At_data.Set.empty)
     in
     Result.Ok !ats_ref
   else
@@ -126,10 +126,10 @@ module Process: sig
   end
 
   val term: ?error:exn -> Env.t -> term -> unit
-  (** Traverse the given term to analyse labeled predicates and terms. *)
+  (** Traverse the given term to analyze its labeled predicates and terms. *)
 
   val predicate: ?error:exn -> Env.t -> predicate -> unit
-  (** Traverse the given predicate to analyse the labeled predicates and
+  (** Traverse the given predicate to analyze its labeled predicates and
       terms. *)
 
 end = struct
@@ -177,7 +177,7 @@ end = struct
   (** Analyse the predicate or term [pot] and the label [label] to decide where
       the predicate or term must be translated. *)
   let process ?error env pot label =
-    Env.( (* locally open Env to be able to access the fields of Env.t *)
+    Env.( (* locally open Env to access to the fields of Env.t *)
       let msg s =
         Format.asprintf
           "%s '%a' within %s annotation '%a' in '%a'"
@@ -187,7 +187,7 @@ end = struct
            | Kglobal -> "function"
            | Kstmt _ -> "statement")
           Annotation_kind.pretty env.akind
-          PredOrTerm.pretty pot
+          Pred_or_term.pretty pot
       in
       let error, dest_stmt_opt =
         match env.kinstr, env.akind, label with
@@ -199,7 +199,7 @@ end = struct
           Options.fatal "%s" (msg "invalid use of C label")
 
         (* Assertions *)
-        (* - Pre label corresponds to the first statement of the function *)
+        (* - Pre label corresponding to the first statement of the function *)
         | Kstmt _, Assertion, BuiltinLabel Pre ->
           error, Some (Kernel_function.find_first_stmt env.kf)
         (* - In-place translation for label Here *)
@@ -296,7 +296,7 @@ end = struct
           (* Register the current labeled pred_or_term to the destination
              statement for a later translation *)
           let at =
-            AtData.create ?error env.kf env.kinstr env.lscope pot label
+            At_data.create ?error env.kf env.kinstr env.lscope pot label
           in
           add_at_for_stmt at dest_stmt;
         | None ->
@@ -439,7 +439,7 @@ end = struct
           else begin
             (* We want to process the bounds and the predicate with the same
                environment as the translation (done in [Quantif.convert]). As a
-               result the [lscope] is first built with a [fold_right] on the
+               result, the [lscope] is first built with a [fold_right] on the
                [bound_vars], then once the [lscope] is entirely built, the terms
                of the bounds and the predicate of the goal are analyzed. *)
             let env =
@@ -493,8 +493,8 @@ end = struct
          arguments *)
       let error = do_term ?error env t in
       (* Since we do not know how the labels are used with the arguments,
-         for each argument, register a not_yet error with each label of the
-         function so that each possible combination gracefully raise an error
+         for each argument, register a [Not_yet] error with each label of the
+         function so that each possible combination gracefully raises an error
          to the user. *)
       List.fold_left
         (fun error label -> process ?error env (PoT_term t) label)
@@ -555,10 +555,10 @@ let _debug () =
        Options.feedback ~level:2 "| - stmt %d at %a"
          stmt.sid
          Printer.pp_location (Stmt.loc stmt);
-       AtData.Set.iter
+       At_data.Set.iter
          (fun at ->
             Options.feedback ~level:2 "|    - at %a"
-              AtData.pretty at)
+              At_data.pretty at)
          !ats_ref
     )
     at_data_for_stmts
