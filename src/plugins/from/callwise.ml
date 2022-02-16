@@ -201,7 +201,7 @@ let force_compute_all_calldeps ()=
     Project.clear
       ~selection:(State_selection.with_dependencies Eva.Analysis.self)
       ();
-  !Db.Value.compute ()
+  Eva.Analysis.compute ()
 
 (* Registration for call-wise from *)
 let () =

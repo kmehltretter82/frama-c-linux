@@ -228,7 +228,7 @@ let compute () =
   (* optimize with [Value] when either it is already computed or someone
      requires it anyway *)
   if Dynamic.Parameter.Bool.get "-eva" () then begin
-    !Db.Value.compute ();
+    Eva.Analysis.compute ();
     semantic_compute g
   end else
     (if Eva.Analysis.is_computed () then semantic_compute else syntactic_compute) g;

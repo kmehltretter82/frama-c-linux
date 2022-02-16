@@ -53,7 +53,7 @@ let call_for_users (_state, call_stack) =
   | (current_function, _call_site) :: tail ->
     if tail = [] then begin
       (* End of Value analysis, we record that Users has run. We should not
-         do this after the explicit call to Db.Value.compute later in this
+         do this after the explicit call to Eva.Analysis.compute later in this
          file, as Value can run on its own and execute Users while doing so.*)
       Users.mark_as_computed ()
     end;

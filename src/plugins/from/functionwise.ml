@@ -92,7 +92,7 @@ let () =
 
 
 let force_compute_all () =
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   Callgraph.Uses.iter_in_rev_order
     (fun kf ->
        if Kernel_function.is_definition kf && !Db.Value.is_called kf
