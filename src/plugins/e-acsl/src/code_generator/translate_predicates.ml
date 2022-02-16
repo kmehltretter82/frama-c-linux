@@ -305,11 +305,11 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
       immediately translated or if [Translate_ats] should be used to retrieve
       the translation.
     - [name]: name to use for generated variables.
-    - [kf]: The enclosing function.
+    - [kf]: the enclosing function.
     - [rte]: if true, generate and translate RTE before translating the
       predicate.
-    - [env]: The current environment.
-    - [p]: The predicate to translate. *)
+    - [env]: the current environment.
+    - [p]: the predicate to translate. *)
 and to_exp ~adata ?inplace ?name kf ?rte env p =
   let p = Logic_normalizer.get_pred p in
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in

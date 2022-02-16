@@ -251,15 +251,15 @@ let indexed_exp ~loc kf env e_at =
 (* ************************************************************************** *)
 
 (* Table storing the [varinfo] with the translation of a given [at_data]. *)
-let translations: varinfo Error.result AtData.Hashtbl.t =
-  AtData.Hashtbl.create 17
+let translations: varinfo Error.result At_data.Hashtbl.t =
+  At_data.Hashtbl.create 17
 
 (* [pretranslate_to_exp ~loc kf env pot] immediately translates the given
    [pred_or_term] in the current environment and return the translated
    expression. *)
 let pretranslate_to_exp ~loc kf env pot =
   Options.debug ~level:4 "pre-translating %a in local environment '%a'"
-    PredOrTerm.pretty pot
+    Pred_or_term.pretty pot
     Typing.Function_params_ty.pretty (Env.Local_vars.get env);
   let e, env, t_opt =
     let adata = Assert.no_data in
@@ -298,7 +298,7 @@ let pretranslate_to_exp ~loc kf env pot =
 let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   Options.debug ~level:4
     "pre-translating %a in local environment '%a' with lscope '%a'"
-    PredOrTerm.pretty pot
+    Pred_or_term.pretty pot
     Typing.Function_params_ty.pretty (Env.Local_vars.get env)
     Lscope.D.pretty lscope;
   let term_to_exp = !term_to_exp_ref in
@@ -477,11 +477,11 @@ let for_stmt env kf stmt =
   in
 
   (* Translate the [\at()]. *)
-  let stmt_translations = PredOrTerm.Hashtbl.create 7 in
-  AtData.Set.fold
+  let stmt_translations = Pred_or_term.Hashtbl.create 7 in
+  At_data.Set.fold
     (fun ({ lscope; pot; error } as at_data) env ->
        let vi_or_err, env =
-         let vi_or_err = PredOrTerm.Hashtbl.find_opt stmt_translations pot in
+         let vi_or_err = Pred_or_term.Hashtbl.find_opt stmt_translations pot in
          match error, vi_or_err with
          | Some exn, (Some _ | None) ->
            (* If there was an error during the pre-analysis, then store it
@@ -505,8 +505,8 @@ let for_stmt env kf stmt =
            with Error.(Typing_error _ | Not_yet _) as exn ->
              Result.Error exn, env
        in
-       PredOrTerm.Hashtbl.replace stmt_translations pot vi_or_err;
-       AtData.Hashtbl.replace translations at_data vi_or_err;
+       Pred_or_term.Hashtbl.replace stmt_translations pot vi_or_err;
+       At_data.Hashtbl.replace translations at_data vi_or_err;
        env)
     at_for_stmt
     env
@@ -514,10 +514,10 @@ let for_stmt env kf stmt =
 let to_exp ~loc ~adata kf env pot label =
   let kinstr = Env.get_kinstr env in
   let lscope = Env.Logic_scope.get env in
-  let at = AtData.create kf kinstr lscope pot label in
+  let at = At_data.create kf kinstr lscope pot label in
   if is_label_defined label then
     try
-      let vi_or_err = AtData.Hashtbl.find translations at in
+      let vi_or_err = At_data.Hashtbl.find translations at in
       match vi_or_err with
       | Result.Ok vi ->
         let e, env =
@@ -547,9 +547,9 @@ let to_exp ~loc ~adata kf env pot label =
        This usually happens when using a label defined after the place@ \
        where the %s should be translated"
       potstr
-      PredOrTerm.pretty pot
+      Pred_or_term.pretty pot
       potstr
 
 let reset () =
-  AtData.Hashtbl.clear translations;
+  At_data.Hashtbl.clear translations;
   clabels_ref := Logic_label.Set.empty
