@@ -1,5 +1,5 @@
 /* run.config*
-   OPT:  -cpp-extra-args=-I@PTEST_SHARE_DIR@ @EVA_CONFIG@ -eva-alloc-builtin fresh -deps
+   OPT:  -cpp-extra-args=-I@FRAMAC_SHARE@ @EVA_CONFIG@ -eva-alloc-builtin fresh -deps
 */
 
 #include "libc/stdlib.c"
