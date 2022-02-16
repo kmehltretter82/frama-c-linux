@@ -9,7 +9,7 @@
    EXECNOW: LOG find_fun3.res LOG find_fun3.err PTESTS_TESTING=1 %{bin:frama-c-script} find-fun false_positive @PTEST_DIR@ > @PTEST_RESULT@/find_fun3.res 2> @PTEST_RESULT@/find_fun3.err
  DEPS:
    EXECNOW: LOG list_functions.res LOG list_functions.err PTESTS_TESTING=1 %{bin:frama-c-script} list-functions %{dep:@PTEST_DIR@/for-find-fun2.c} %{dep:@PTEST_DIR@/for-list-functions.c} > @PTEST_RESULT@/list_functions.res 2> @PTEST_RESULT@/list_functions.err
-   EXECNOW: LOG list_functions2.res LOG list_functions2.err LOG list_functions2.json PTESTS_TESTING=1 %{bin:frama-c-script} list-functions %{dep:@PTEST_DIR@/for-find-fun2.c} %{dep:@PTEST_DIR@/for-list-functions.c -list-functions-declarations} -list-functions-output @PTEST_RESULT@/list_functions2.json -list-functions-debug 1 > @PTEST_RESULT@/list_functions2.res 2> @PTEST_RESULT@/list_functions2.err
+   EXECNOW: LOG list_functions2.res LOG list_functions2.err LOG list_functions2.json PTESTS_TESTING=1 %{bin:frama-c-script} list-functions %{dep:@PTEST_DIR@/for-find-fun2.c} %{dep:@PTEST_DIR@/for-list-functions.c} -list-functions-declarations -list-functions-output @PTEST_RESULT@/list_functions2.json -list-functions-debug 1 > @PTEST_RESULT@/list_functions2.res 2> @PTEST_RESULT@/list_functions2.err
  */
 
 
