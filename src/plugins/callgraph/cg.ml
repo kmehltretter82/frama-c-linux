@@ -231,7 +231,7 @@ let compute () =
     !Db.Value.compute ();
     semantic_compute g
   end else
-    (if Db.Value.is_computed () then semantic_compute else syntactic_compute) g;
+    (if Eva.Analysis.is_computed () then semantic_compute else syntactic_compute) g;
   g
 
 let get () = State.memo compute

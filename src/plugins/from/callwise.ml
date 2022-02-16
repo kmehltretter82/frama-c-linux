@@ -197,7 +197,7 @@ let () = From_parameters.ForceCallDeps.add_update_hook
 
 
 let force_compute_all_calldeps ()=
-  if Db.Value.is_computed () then
+  if Eva.Analysis.is_computed () then
     Project.clear
       ~selection:(State_selection.with_dependencies Eva.Analysis.self)
       ();
