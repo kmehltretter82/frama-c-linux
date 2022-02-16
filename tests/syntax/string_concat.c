@@ -1,5 +1,5 @@
 /* run.config*
-PLUGIN: eva,scope variadic
+PLUGIN: eva,inout,scope,variadic
 TIMEOUT: 600
 OPT: -eva
 */
