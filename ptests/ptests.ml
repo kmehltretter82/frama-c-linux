@@ -440,7 +440,8 @@ let example_msg =
      @@PTEST_OPTIONS@@          # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
      @@frama-c@@                # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@            # Shortcut defined as follow: %s@  \
-     @@frama-c-exe@@            # set to the value of the 'TOPLEVEL_PATH' variable from './tests/ptests_config' file.@  \
+     @@frama-c-exe@@            # set to the value of the 'TOPLEVEL_PATH' variable defined in the './tests/ptests_config' file.@  \
+     @@FRAMAC_SHARE@@           # set to the value of the 'FRAMAC_SHARE' variable defined in the './tests/ptests_config' file.@  \
      @@DEV_NULL@@               # set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
      @]@ \
      @[<v 1>\
