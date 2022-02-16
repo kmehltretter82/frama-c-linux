@@ -42,10 +42,10 @@ import { IconButton } from 'dome/controls/buttons';
 
 interface MarkerKindProps { label: string; title: string }
 
-const MarkerKind = (props: MarkerKindProps) => {
+function MarkerKind(props: MarkerKindProps): JSX.Element {
   const { label, title } = props;
   return <span className="astinfo-markerkind" title={title}>{label}</span>;
-};
+}
 
 const GMARKER =
   <MarkerKind label="M" title="Generic Marker" />;
@@ -92,7 +92,7 @@ interface InfoItemProps {
   descr: DATA.text;
 }
 
-function InfoItem(props: InfoItemProps) {
+function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <div className="astinfo-infos">
       <div
@@ -128,7 +128,7 @@ interface InfoSectionProps {
   onRemove: () => void;
 }
 
-function MarkInfos(props: InfoSectionProps) {
+function MarkInfos(props: InfoSectionProps): JSX.Element {
   const [unfold, setUnfold] = React.useState(true);
   const [more, setMore] = React.useState(false);
   const { marker, markerInfo } = props;
@@ -213,11 +213,13 @@ class InfoMarkers {
   private selection: Mark[] = [];
   private pinned = new Map<string, boolean>();
 
-  setSelected(location?: States.Location, pinned = false) {
+  setSelected(location?: States.Location, pinned = false): void {
     const fct = location?.fct;
     const marker = location?.marker;
-    const keep = (m: Mark) => m.marker === marker || this.isPinned(m.marker);
-    const self = (m: Mark) => m.marker === marker;
+    const keep =
+      (m: Mark): boolean => m.marker === marker || this.isPinned(m.marker);
+    const self =
+      (m: Mark): boolean => m.marker === marker;
     this.selection = this.selection.filter(keep);
     if (fct && marker && !this.selection.some(self)) {
       this.selection.push({ fct, marker });
@@ -230,12 +232,12 @@ class InfoMarkers {
     return (marker !== undefined) && (this.pinned.get(marker) ?? false);
   }
 
-  setPinned(marker: AST.marker, pinned: boolean) {
+  setPinned(marker: AST.marker, pinned: boolean): void {
     this.pinned.set(marker, pinned);
     reload.emit();
   }
 
-  removeMarker(marker: AST.marker) {
+  removeMarker(marker: AST.marker): void {
     this.selection = this.selection.filter((m) => m.marker !== marker);
     this.pinned.delete(marker);
     reload.emit();
@@ -257,7 +259,7 @@ function openFilter(
   const menuItems = infos.map((info) => {
     const fs = filter.split(':');
     const checked = !fs.some((m) => m === info.id);
-    const onClick = () => {
+    const onClick = (): void => {
       const newFs =
         checked
           ? fs.concat(info.id)
@@ -279,7 +281,7 @@ function openFilter(
 // --- Information Panel
 // --------------------------------------------------------------------------
 
-export default function ASTinfo() {
+export default function ASTinfo(): JSX.Element {
   // Hooks
   Dome.useUpdate(reload);
   const markers = React.useMemo(() => new InfoMarkers(), []);
@@ -298,17 +300,18 @@ export default function ASTinfo() {
     markers.setSelected(loc, true);
   });
   // Rendering
-  const renderMark = (mark: Mark) => {
+  const renderMark = (mark: Mark): JSX.Element | null => {
     const { marker } = mark;
     const markerInfo = markerInfos.getData(marker);
     if (!markerInfo) return null;
     const pinned = markers.isPinned(marker);
     const isSelected = selected === marker;
     const isHovered = hovered === marker;
-    const onPin = () => markers.setPinned(marker, !pinned);
-    const onRemove = () => markers.removeMarker(marker);
-    const onHover = (h: boolean) => States.setHovered(h ? mark : undefined);
-    const onSelect = () => States.setSelection(mark);
+    const onPin = () => void markers.setPinned(marker, !pinned);
+    const onRemove = () => void markers.removeMarker(marker);
+    const onSelect = () => void States.setSelection(mark);
+    const onHover =
+      (h: boolean): void => States.setHovered(h ? mark : undefined);
     return (
       <MarkInfos
         key={marker}

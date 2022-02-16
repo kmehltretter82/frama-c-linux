@@ -27,7 +27,7 @@
 /**
  * @packageDocumentation
  * @module frama-c/utils
-*/
+ */
 
 import React from 'react';
 import * as Dome from 'dome';
@@ -85,9 +85,9 @@ interface MarkerProps {
   children?: React.ReactNode;
 }
 
-function Marker(props: MarkerProps) {
+function Marker(props: MarkerProps): JSX.Element {
   const { marker, onMarker, children } = props;
-  const onClick = () => { if (onMarker) onMarker(marker); };
+  const onClick = (): void => { if (onMarker) onMarker(marker); };
   return (
     <span
       className="kernel-text-marker"
@@ -128,7 +128,7 @@ export interface TextProps {
   className?: string;
 }
 
-export function Text(props: TextProps) {
+export function Text(props: TextProps): JSX.Element {
   const className = classes('kernel-text', 'dome-text-code', props.className);
   return <div className={className}>{makeContents(props.text)}</div>;
 }
