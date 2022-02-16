@@ -27,11 +27,11 @@ let [@alert "-deprecated"] _self =
   Db.register_compute "Value.compute" [ Db.Value.self ] Db.Value.compute
     Analysis.compute
 
-let () = Value_parameters.ForceValues.set_output_dependencies [Db.Value.self]
+let () = Parameters.ForceValues.set_output_dependencies [Db.Value.self]
 
 let main () =
   (* Value computations *)
-  if Value_parameters.ForceValues.get () then !Db.Value.compute ();
+  if Parameters.ForceValues.get () then !Db.Value.compute ();
   if Db.Value.is_computed () then Red_statuses.report ()
 
 let () = Db.Main.extend main
@@ -60,7 +60,7 @@ let assigns_inputs_to_zone state assigns =
           acc
           l
       with Eval_terms.LogicEvalError e ->
-        Value_parameters.warning ~current:true ~once:true
+        Self.warning ~current:true ~once:true
           "Failed to interpret inputs in assigns clause '%a'%a"
           Printer.pp_from asgn eval_error_reason e;
         Zone.top
@@ -79,7 +79,7 @@ let assigns_outputs_aux ~eval ~bot ~top ~join state ~result assigns =
         let z = eval env out in
         join z acc
       with Eval_terms.LogicEvalError e ->
-        Value_parameters.warning ~current:true ~once:true
+        Self.warning ~current:true ~once:true
           "Failed to interpret assigns clause '%a'%a"
           Printer.pp_term out eval_error_reason e;
         join top acc
@@ -133,7 +133,7 @@ let use_spec_instead_of_definition kf =
   not (Kernel_function.is_definition kf) ||
   Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
   Builtins.is_builtin_overridden kf ||
-  Kernel_function.Set.mem kf (Value_parameters.UsePrototype.get ())
+  Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
 
 let eval_predicate ~pre ~here p =
   let open Eval_terms in
@@ -257,7 +257,7 @@ module Eval = struct
     bot_value (eval >>-: snd)
 
   let eval_lval ?with_alarms deps state lval =
-    let expr = Value_util.lval_to_exp lval in
+    let expr = Eva_utils.lval_to_exp lval in
     let res, valuation = eval_expr_with_valuation ?with_alarms deps state expr in
     let typ = match valuation with
       | None -> Cil.typeOfLval lval
@@ -413,7 +413,7 @@ module Export (Eval : Eval) = struct
   let lval_to_zone_with_deps_state state ~for_writing ~deps lv =
     let deps, r = lval_to_precise_loc_with_deps_state state ~deps lv in
     let r = (* No write effect if [lv] is const *)
-      if for_writing && (Value_util.is_const_write_invalid (Cil.typeOfLval lv))
+      if for_writing && (Eva_utils.is_const_write_invalid (Cil.typeOfLval lv))
       then Precise_locs.loc_bottom
       else r
     in

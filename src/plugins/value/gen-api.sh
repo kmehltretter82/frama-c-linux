@@ -8,7 +8,7 @@ printf '(** Eva public API.
       and memory locations of lvalues at each program point.
 
    The following modules allow configuring the Eva analysis:
-   - Value_parameters: change the configuration of the analysis.
+   - Parameters: change the configuration of the analysis.
    - Eva_annotations: add local annotations to guide the analysis.
    - Builtins: register ocaml builtins to be used by the cvalue domain
        instead of analysing the body of some C functions.

@@ -54,7 +54,7 @@ let compute_actual state e =
     let o =
       try offsetmap_of_lv state lv
       with Abstract_interp.Error_Top ->
-        Value_parameters.abort ~current:true
+        Self.abort ~current:true
           "Function argument %a has unknown size. Aborting" Printer.pp_exp e;
     in begin
       match o with

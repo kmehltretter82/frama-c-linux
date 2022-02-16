@@ -22,7 +22,7 @@
 
 open Cil_types
 
-let dkey = Value_parameters.register_category "widen-hints"
+let dkey = Self.register_category "widen-hints"
 
 let error ?msg loc typing_context =
   typing_context.Logic_typing.error loc
@@ -126,12 +126,12 @@ let widen_hint_terms_of_terms terms =
           in
           Some (hint_lval, hint_thresholds)
         | _ ->
-          Value_parameters.debug ~source:(fst lval_term.term_loc) ~dkey
+          Self.debug ~source:(fst lval_term.term_loc) ~dkey
             "invalid var_term: %a@." Printer.pp_term lval_term;
           raise Invalid_hint
       end
     | _ ->
-      Value_parameters.debug ~dkey "invalid terms: %a@."
+      Self.debug ~dkey "invalid terms: %a@."
         (Pretty_utils.pp_list ~sep:", " Printer.pp_term) terms;
       raise Invalid_hint
   with

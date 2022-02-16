@@ -371,7 +371,7 @@ struct
 
   let as_zone ~access res =
     let response_loc, lv = extract_loc res in
-    let is_const_lv = Value_util.is_const_write_invalid (Cil.typeOfLval lv) in
+    let is_const_lv = Eva_utils.is_const_write_invalid (Cil.typeOfLval lv) in
     (* No write effect if [lv] is const *)
     if access=Locations.Write && is_const_lv
     then Result.ok Locations.Zone.bottom

@@ -111,7 +111,7 @@ let non_bottom_narrow a b =
   match I.narrow a b with
   | `Value v -> v
   | `Bottom ->
-    Value_parameters.fatal
+    Self.fatal
       "Numerors: a narrowing leads incorrectly to bottom.@ \
        Narrow between %a@ and %a."
       I.pretty a I.pretty b

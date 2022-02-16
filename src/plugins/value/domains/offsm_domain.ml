@@ -30,7 +30,7 @@ let store_redundant = false
     unsoundnesses in the domain through testing, because many more expressions
     end up being handled. *)
 
-let dkey = Value_parameters.register_category "d-bitwise"
+let dkey = Self.register_category "d-bitwise"
 
 module Default_offsetmap = struct
   open Cvalue

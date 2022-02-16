@@ -148,7 +148,7 @@ end
 (* --- Function stats computation --- *)
 
 let get_status ip =
-  let eva_emitter = Value_util.emitter in
+  let eva_emitter = Eva_utils.emitter in
   let aux_status emitter status acc =
     let emitter = Emitter.Usable_emitter.get emitter.Property_status.emitter in
     if Emitter.equal eva_emitter emitter
@@ -427,6 +427,6 @@ let print_summary fmt =
   Format.fprintf fmt "%s" bar
 
 let print_summary () =
-  let dkey = Value_parameters.dkey_summary in
+  let dkey = Self.dkey_summary in
   let header fmt = Format.fprintf fmt " ====== ANALYSIS SUMMARY ======" in
-  Value_parameters.printf ~header ~dkey ~level:1 "  @[<v>%t@]" print_summary
+  Self.printf ~header ~dkey ~level:1 "  @[<v>%t@]" print_summary

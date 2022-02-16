@@ -28,10 +28,10 @@ module Make
     (Abstract: Abstractions.Eva)
     (Kf : sig val kf: kernel_function end) =
 struct
-  module Parameters = Partitioning_parameters.Make (Kf)
+  module Partition_parameters = Partitioning_parameters.Make (Kf)
 
   open Kf
-  open Parameters
+  open Partition_parameters
 
   module Domain = Abstract.Dom
 
@@ -217,13 +217,13 @@ struct
   let transfer = Flow.transfer
 
   let output_slevel : int -> unit =
-    let slevel_display_step = Value_parameters.ShowSlevel.get () in
+    let slevel_display_step = Parameters.ShowSlevel.get () in
     let max_displayed = ref 0 in
     fun x ->
       if x >= !max_displayed + slevel_display_step
       then
         let rounded = x / slevel_display_step * slevel_display_step in
-        Value_parameters.feedback ~once:true ~current:true
+        Self.feedback ~once:true ~current:true
           "Trace partitioning superposing up to %d states"
           rounded;
         max_displayed := rounded
@@ -231,7 +231,7 @@ struct
   let partitioning_feedback dest flow stmt =
     output_slevel dest.incoming_states;
     (* Debug information. *)
-    Value_parameters.debug ~dkey:Value_parameters.dkey_iterator ~current:true
+    Self.debug ~dkey:Self.dkey_iterator ~current:true
       "reached statement %d with %d incoming states, %d to propagate"
       stmt.sid dest.incoming_states (flow_size flow)
 
@@ -279,7 +279,7 @@ struct
           else begin
             (* Propagate the join of the two states *)
             if is_loop_head then
-              Value_parameters.feedback ~level:1 ~once:true ~current:true
+              Self.feedback ~level:1 ~once:true ~current:true
                 "starting to merge loop iterations";
             Some (Domain.join previous_state current_state)
           end
@@ -321,8 +321,8 @@ struct
           Some curr
           (* Apply widening *)
         else begin
-          Value_parameters.feedback ~level:1 ~once:true ~current:true
-            ~dkey:Value_parameters.dkey_widening
+          Self.feedback ~level:1 ~once:true ~current:true
+            ~dkey:Self.dkey_widening
             "applying a widening at this point";
           (* We join the previous widening state with the previous iteration
              state so as to allow the intermediate(s) iteration(s) (between

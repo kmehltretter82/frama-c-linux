@@ -114,21 +114,21 @@ let value_panel pack (main_ui:main_ui) =
   in
   let box_1_1 = GPack.hbox ~packing:(w#attach ~left:1 ~top:1) () in
   let precision_refresh =
-    let tooltip = Value_parameters.Precision.parameter.Typed_parameter.help in
+    let tooltip = Parameters.Precision.parameter.Typed_parameter.help in
     Gtk_helper.on_int ~lower:(-1) ~upper:11 ~tooltip
       box_1_1 "precision (meta-option)"
-      Value_parameters.Precision.get
-      Value_parameters.Precision.set
+      Parameters.Precision.get
+      Parameters.Precision.set
   in
   let box_1_2 = GPack.hbox ~packing:(w#attach ~left:1 ~top:2) () in
   let slevel_refresh =
     let tooltip =
-      Value_parameters.SemanticUnrollingLevel.parameter.Typed_parameter.help
+      Parameters.SemanticUnrollingLevel.parameter.Typed_parameter.help
     in
     Gtk_helper.on_int ~lower:0 ~upper:1000000 ~tooltip
       box_1_2 "slevel"
-      Value_parameters.SemanticUnrollingLevel.get
-      Value_parameters.SemanticUnrollingLevel.set
+      Parameters.SemanticUnrollingLevel.get
+      Parameters.SemanticUnrollingLevel.set
   in
   let box_1_3 = GPack.hbox ~packing:(w#attach ~left:1 ~top:3) () in
   let validator s =
@@ -162,7 +162,7 @@ let active_highlighter buffer localizable ~start ~stop =
         let degenerate =
           try
             Some (
-              if Value_util.DegenerationPoints.find stmt
+              if Eva_utils.DegenerationPoints.find stmt
               then (make_tag buffer ~name:"degeneration" [`BACKGROUND "orange"])
               else (make_tag buffer ~name:"unpropagated" [`BACKGROUND "yellow"])
             )
@@ -234,7 +234,7 @@ let cleaned_outputs kf s =
 let pretty_stmt_info (main_ui:main_ui) kf stmt =
   (* Is it an accessible statement ? *)
   if Results.is_reachable stmt then begin
-    if Value_results.is_non_terminating_instr stmt then
+    if Eva_results.is_non_terminating_instr stmt then
       match stmt.skind with
       | Instr (Call (_, _, _, _)
               | Local_init (_, ConsInit _, _)) ->
@@ -520,7 +520,7 @@ module Select (Eval: Eval) = struct
          | Mem _, NoOffset when Cil.isFunctionType ty -> begin
              (* Function pointers *)
              (* get the list of functions in the values *)
-             let e = Value_util.lval_to_exp lv in
+             let e = Eva_utils.lval_to_exp lv in
              let state =
                match ki with
                | Kglobal -> Eval.Analysis.get_global_state ()

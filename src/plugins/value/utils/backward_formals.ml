@@ -79,7 +79,7 @@ module WrittenFormals =
     (struct
       let size = 17
       let dependencies = [Ast.self]
-      let name = "Value_util.WrittenFormals"
+      let name = "Eva_utils.WrittenFormals"
     end)
 
 let written_formals = WrittenFormals.memo written_formals

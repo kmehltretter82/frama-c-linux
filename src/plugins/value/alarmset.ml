@@ -180,7 +180,7 @@ let combine s1 s2 =
      this alarm should be consistent. *)
   try merge ~combine:true intersect s1 s2
   with Inconsistent ->
-    Value_parameters.fatal ~current:true
+    Self.fatal ~current:true
       "Inconsistent combination of two alarm maps %a and %a."
       pretty s1 pretty s2
 
@@ -207,7 +207,7 @@ let for_all test ~default = function
 
 open CilE
 
-let emitter = Value_util.emitter
+let emitter = Eva_utils.emitter
 
 (* Printer that shows additional information about temporaries *)
 let local_printer: Printer.extensible_printer =
@@ -272,8 +272,8 @@ let loc = function
   | Cil_types.Kstmt s -> Cil_datatype.Stmt.loc s
 
 let report_alarm ki annot msg =
-  Value_util.alarm_report ~source:(fst (loc ki)) "@[%s.@ @[<hov 2>%a@]@]%t"
-    msg pr_annot annot Value_util.pp_callstack
+  Eva_utils.alarm_report ~source:(fst (loc ki)) "@[%s.@ @[<hov 2>%a@]@]%t"
+    msg pr_annot annot Eva_utils.pp_callstack
 
 let string_fkind = function
   | Cil_types.FFloat -> "float"
@@ -372,7 +372,7 @@ let emit_alarm kinstr alarm (status:status) =
   | Alarms.Invalid_bool _ ->
     register_alarm "trap representation of a _Bool lvalue"
 
-let height_alarm = let open Value_util in function
+let height_alarm = let open Eva_utils in function
     | Alarms.Division_by_zero e
     | Alarms.Index_out_of_bound (e,_)
     | Alarms.Invalid_pointer e
@@ -426,14 +426,14 @@ let emit_alarms kinstr map =
   let list = M.bindings map in
   let sorted_list = List.sort cmp list in
   List.iter (fun (alarm, status) -> emit_alarm kinstr alarm status) sorted_list;
-  if Alarm_cache.length () >= Value_parameters.StopAtNthAlarm.get ()
-  then Value_parameters.abort "Stopping at nth alarm"
+  if Alarm_cache.length () >= Parameters.StopAtNthAlarm.get ()
+  then Self.abort "Stopping at nth alarm"
 
 let emit kinstr = function
   | Just map -> if not (M.is_empty map) then emit_alarms kinstr map
   (* TODO: use GADT to avoid this assert false ? *)
   | AllBut  _ ->
-    Value_parameters.abort ~current:true ~once:true
+    Self.abort ~current:true ~once:true
       "All alarms may arise: \
        abstract state too imprecise to continue the analysis."
 

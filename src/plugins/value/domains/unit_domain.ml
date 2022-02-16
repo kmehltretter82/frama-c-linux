@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let log_key = Value_parameters.register_category "unit-domain"
+let log_key = Self.register_category "unit-domain"
 
 module Static = struct
   module D = struct

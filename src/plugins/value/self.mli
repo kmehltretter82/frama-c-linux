@@ -20,32 +20,38 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Eva_utils
+include Plugin.General_services
 
+(** Debug categories responsible for printing initial and final states of Value.
+    Enabled by default, but can be disabled via the command-line:
+    -value-msg-key="-initial_state,-final_state" *)
+val dkey_initial_state : category
+val dkey_final_states : category
+val dkey_summary : category
 
-let frama_C_assert state actuals =
-  let do_bottom () =
-    warning_once_current "Frama_C_assert: false";
-    Cvalue.Model.bottom
-  in
-  match actuals with
-  | [arg_exp, arg] ->
-    let state =
-      if Cvalue.V.is_zero arg
-      then do_bottom ()
-      else if Cvalue.V.contains_zero arg
-      then begin
-        let state = !Db.Value.reduce_by_cond state arg_exp true in
-        if Cvalue.Model.is_reachable state
-        then (warning_once_current "Frama_C_assert: unknown"; state)
-        else do_bottom ()
-      end
-      else begin
-        warning_once_current "Frama_C_assert: true";
-        state
-      end
-    in
-    Builtins.States [ state ]
-  | _ -> raise (Builtins.Invalid_nb_of_args 1)
+(** {2 Debug categories.} *)
 
-let () = Builtins.register_builtin "Frama_C_assert" NoCache frama_C_assert
+val dkey_pointer_comparison: category
+val dkey_cvalue_domain: category
+val dkey_incompatible_states: category
+val dkey_iterator : category
+val dkey_callbacks : category
+val dkey_widening : category
+val dkey_recursion : category
+
+(** {2 Warning categories.} *)
+
+val wkey_alarm: warn_category
+val wkey_locals_escaping: warn_category
+val wkey_garbled_mix: warn_category
+val wkey_builtins_missing_spec: warn_category
+val wkey_builtins_override: warn_category
+val wkey_libc_unsupported_spec : warn_category
+val wkey_loop_unroll_auto : warn_category
+val wkey_loop_unroll_partial : warn_category
+val wkey_missing_loop_unroll : warn_category
+val wkey_missing_loop_unroll_for : warn_category
+val wkey_signed_overflow : warn_category
+val wkey_invalid_assigns : warn_category
+val wkey_experimental : warn_category
+val wkey_unknown_size : warn_category

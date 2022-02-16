@@ -33,8 +33,8 @@ let check_signals, signal_abort =
      end),
   (fun () -> signal_emitted := true)
 
-let dkey = Value_parameters.dkey_iterator
-let dkey_callbacks = Value_parameters.dkey_callbacks
+let dkey = Self.dkey_iterator
+let dkey_callbacks = Self.dkey_callbacks
 
 let blocks_share_locals b1 b2 =
   match b1.blocals, b2.blocals with
@@ -74,17 +74,17 @@ module Make_Dataflow
   type descending_strategy = NoIteration | FullIteration | ExitIteration
 
   let descending_iteration : descending_strategy =
-    match Value_parameters.DescendingIteration.get () with
+    match Parameters.DescendingIteration.get () with
     | "no" -> NoIteration
     | "exits" -> ExitIteration
     | "full" -> FullIteration
     | _ -> assert false
 
   let hierachical_convergence : bool =
-    Value_parameters.HierarchicalConvergence.get ()
+    Parameters.HierarchicalConvergence.get ()
 
   let interpreter_mode =
-    Value_parameters.InterpreterMode.get ()
+    Parameters.InterpreterMode.get ()
 
   (* Ideally, the slevel parameter should not be used anymore in this file
      but it is still required for logic interpretation *)
@@ -129,7 +129,7 @@ module Make_Dataflow
     let state = AnalysisParam.initial_state
     and call_kinstr = AnalysisParam.call_kinstr
     and ab = active_behaviors in
-    if Value_util.skip_specifications kf then
+    if Eva_utils.skip_specifications kf then
       States.singleton state
     else match Logic.check_fct_preconditions call_kinstr kf ab state with
       | `Bottom -> States.empty
@@ -246,9 +246,9 @@ module Make_Dataflow
     let asm_contracts = Annotations.code_annot stmt in
     match Logic_utils.extract_contract asm_contracts with
     | [] ->
-      Value_util.warning_once_current
+      Eva_utils.warning_once_current
         "assuming assembly code has no effects in function %t"
-        Value_util.pretty_current_cfunction_name;
+        Eva_utils.pretty_current_cfunction_name;
       id
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
@@ -324,7 +324,7 @@ module Make_Dataflow
     (* Check postconditions *)
     let check_postconditions = fun state ->
       post_conditions := true;
-      if Value_util.skip_specifications kf then
+      if Eva_utils.skip_specifications kf then
         [state]
       else match
           Logic.check_fct_postconditions kf active_behaviors Normal
@@ -368,7 +368,7 @@ module Make_Dataflow
       (* We do not interpret annotations that come from statement contracts
          and everything previously emitted by Value (currently, alarms) *)
       let filter e ca =
-        not (Logic_utils.is_contract ca || Emitter.equal e Value_util.emitter)
+        not (Logic_utils.is_contract ca || Emitter.equal e Eva_utils.emitter)
       in
       List.map fst (Annotations.code_annot_emitter ~filter stmt)
     in
@@ -448,7 +448,7 @@ module Make_Dataflow
     let states = Partitioning.contents f in
     let cvalue_states = gather_cvalues states in
     Db.Value.Compute_Statement_Callbacks.apply
-      (stmt, Value_util.call_stack (), cvalue_states)
+      (stmt, Eva_utils.call_stack (), cvalue_states)
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
@@ -527,7 +527,7 @@ module Make_Dataflow
     | [b,f,succ] -> (* One successor - continue simulation *)
       simulate succ (b,f)
     | _ -> (* Several successors - failure *)
-      Value_parameters.abort "Do not know which branch to take. Stopping."
+      Self.abort "Do not know which branch to take. Stopping."
 
   let reset_component (vertex_list : vertex list) : unit =
     let reset_edge (_,e,_) =
@@ -560,7 +560,7 @@ module Make_Dataflow
       while
         not (process_vertex ~widening:true v) || !iteration_count = 0
       do
-        Value_parameters.debug ~dkey "iteration %d" !iteration_count;
+        Self.debug ~dkey "iteration %d" !iteration_count;
         iterate_list w;
         incr iteration_count;
       done;
@@ -568,11 +568,11 @@ module Make_Dataflow
       let l =  match descending_iteration with
         | NoIteration -> []
         | ExitIteration ->
-          Value_parameters.debug ~dkey
+          Self.debug ~dkey
             "propagating descending values through exit paths";
           Wto.flatten (exit_strategy graph component)
         | FullIteration ->
-          Value_parameters.debug ~dkey
+          Self.debug ~dkey
             "propagating descending values through the loop";
           v :: Wto.flatten w
       in
@@ -586,7 +586,7 @@ module Make_Dataflow
     let f stmt (v,_) =
       let l = get_succ_tanks v in
       if not (List.for_all Partitioning.is_empty_tank l) then
-        Value_util.DegenerationPoints.replace stmt false
+        Eva_utils.DegenerationPoints.replace stmt false
     in
     StmtTable.iter f automaton.stmt_table;
     match !current_ki with
@@ -594,7 +594,7 @@ module Make_Dataflow
     | Kstmt s ->
       let englobing_kf = Kernel_function.find_englobing_kf s in
       if Kernel_function.equal englobing_kf kf then (
-        Value_util.DegenerationPoints.replace s true)
+        Eva_utils.DegenerationPoints.replace s true)
 
   (* If the postconditions have not been evaluated, mark them as true. *)
   let mark_postconds_as_true () =
@@ -698,7 +698,7 @@ module Make_Dataflow
     in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
-    let callstack = Value_util.call_stack () in
+    let callstack = Eva_utils.call_stack () in
     if Mark_noresults.should_memorize_function fundec then begin
       let register_pre = Domain.Store.register_state_before_stmt callstack
       and register_post = Domain.Store.register_state_after_stmt callstack in
@@ -708,26 +708,26 @@ module Make_Dataflow
     end;
     if not (Db.Value.Record_Value_Superposition_Callbacks.is_empty ())
     then begin
-      if Value_parameters.ValShowProgress.get () then
-        Value_parameters.debug ~dkey:dkey_callbacks
+      if Parameters.ValShowProgress.get () then
+        Self.debug ~dkey:dkey_callbacks
           "now calling Record_Value_Superposition callbacks";
       Db.Value.Record_Value_Superposition_Callbacks.apply
         (callstack, unmerged_pre_cvalues);
     end;
     if not (Db.Value.Record_Value_Callbacks.is_empty ())
     then begin
-      if Value_parameters.ValShowProgress.get () then
-        Value_parameters.debug ~dkey:dkey_callbacks
+      if Parameters.ValShowProgress.get () then
+        Self.debug ~dkey:dkey_callbacks
           "now calling Record_Value callbacks";
       Db.Value.Record_Value_Callbacks.apply
         (callstack, merged_pre_cvalues)
     end;
     if not (Db.Value.Record_Value_Callbacks_New.is_empty ())
     then begin
-      if Value_parameters.ValShowProgress.get () then
-        Value_parameters.debug ~dkey:dkey_callbacks
+      if Parameters.ValShowProgress.get () then
+        Self.debug ~dkey:dkey_callbacks
           "now calling Record_Value_New callbacks";
-      if Value_parameters.MemExecAll.get () then
+      if Parameters.MemExecAll.get () then
         Db.Value.Record_Value_Callbacks_New.apply
           (callstack,
            Value_types.NormalStore ((merged_pre_cvalues, merged_post_cvalues),
@@ -739,8 +739,8 @@ module Make_Dataflow
     end;
     if not (Db.Value.Record_Value_After_Callbacks.is_empty ())
     then begin
-      if Value_parameters.ValShowProgress.get () then
-        Value_parameters.debug ~dkey:dkey_callbacks
+      if Parameters.ValShowProgress.get () then
+        Self.debug ~dkey:dkey_callbacks
           "now calling Record_After_Value callbacks";
       Db.Value.Record_Value_After_Callbacks.apply
         (callstack, merged_post_cvalues);
@@ -774,13 +774,13 @@ module Computer
     in
     let compute () =
       let results = Dataflow.compute () in
-      if Value_parameters.ValShowProgress.get () then
-        Value_parameters.feedback "Recording results for %a"
+      if Parameters.ValShowProgress.get () then
+        Self.feedback "Recording results for %a"
           Kernel_function.pretty kf;
       Dataflow.merge_results ();
       let f = Kernel_function.get_definition kf in
       if Cil.hasAttribute "noreturn" f.svar.vattr && results <> [] then
-        Value_util.warning_once_current
+        Eva_utils.warning_once_current
           "function %a may terminate but has the noreturn attribute"
           Kernel_function.pretty kf;
       results, !Dataflow.cacheable
@@ -789,7 +789,7 @@ module Computer
       Dataflow.mark_degeneration ();
       Dataflow.merge_results ()
     in
-    Value_util.protect compute ~cleanup
+    Eva_utils.protect compute ~cleanup
 end
 
 

@@ -31,13 +31,13 @@ let clear_call_stack () =
   call_stack := []
 
 let pop_call_stack () =
-  Value_perf.stop_doing !call_stack;
+  Eva_perf.stop_doing !call_stack;
   call_stack := List.tl !call_stack
 ;;
 
 let push_call_stack kf ki =
   call_stack := (kf,ki) :: !call_stack;
-  Value_perf.start_doing !call_stack
+  Eva_perf.start_doing !call_stack
 ;;
 
 
@@ -47,7 +47,7 @@ let current_kf () =
 let call_stack () = !call_stack
 
 let pp_callstack fmt =
-  if Value_parameters.PrintCallstacks.get () then
+  if Parameters.PrintCallstacks.get () then
     Format.fprintf fmt "@ stack: %a"
       Value_types.Callstack.pretty (call_stack())
 ;;
@@ -58,27 +58,27 @@ let emitter =
   Emitter.create
     "Eva"
     [ Emitter.Property_status; Emitter.Alarm ]
-    ~correctness:Value_parameters.parameters_correctness
-    ~tuning:Value_parameters.parameters_tuning
+    ~correctness:Parameters.parameters_correctness
+    ~tuning:Parameters.parameters_tuning
 
 let () = Db.Value.emitter := emitter
 
 let get_slevel kf =
-  try Value_parameters.SlevelFunction.find kf
-  with Not_found -> Value_parameters.SemanticUnrollingLevel.get ()
+  try Parameters.SlevelFunction.find kf
+  with Not_found -> Parameters.SemanticUnrollingLevel.get ()
 
 let get_subdivision_option stmt =
   try
     let kf = Kernel_function.find_englobing_kf stmt in
-    Value_parameters.LinearLevelFunction.find kf
-  with Not_found -> Value_parameters.LinearLevel.get ()
+    Parameters.LinearLevelFunction.find kf
+  with Not_found -> Parameters.LinearLevel.get ()
 
 let get_subdivision stmt =
   match Eva_annotations.get_subdivision_annot stmt with
   | [] -> get_subdivision_option stmt
   | [x] -> x
   | x :: _ ->
-    Value_parameters.warning ~current:true ~once:true
+    Self.warning ~current:true ~once:true
       "Several subdivision annotations at the same statement; selecting %i\
        and ignoring the others." x;
     x
@@ -91,18 +91,18 @@ let pretty_current_cfunction_name fmt =
   Kernel_function.pretty fmt (current_kf())
 
 let warning_once_current fmt =
-  Value_parameters.warning ~current:true ~once:true fmt
+  Self.warning ~current:true ~once:true fmt
 
 (* Emit alarms in "non-warning" mode *)
 let alarm_report ?current ?source ?emitwith ?echo ?once ?append =
-  Value_parameters.warning ~wkey:Value_parameters.wkey_alarm
+  Self.warning ~wkey:Self.wkey_alarm
     ?current ?source ?emitwith ?echo ?once ?append
 
 module DegenerationPoints =
   Cil_state_builder.Stmt_hashtbl
     (Datatype.Bool)
     (struct
-      let name = "Value_util.Degeneration"
+      let name = "Eva_utils.Degeneration"
       let size = 17
       let dependencies = [ Db.Value.self ]
     end)
@@ -112,7 +112,7 @@ let protect_only_once = ref true
 let protect f ~cleanup =
   let catch () = !protect_only_once && not (Kernel.SaveState.is_empty ()) in
   let cleanup () =
-    Value_parameters.feedback ~once:true "Clean up and save partial results.";
+    Self.feedback ~once:true "Clean up and save partial results.";
     try cleanup ()
     with e ->
       protect_only_once := false;
@@ -201,7 +201,7 @@ let zero e =
     let ik = Cil.(theMachine.upointKind) in
     let zero = Cil.new_exp ~loc (Const (CInt64 (Integer.zero, ik, None))) in
     Cil.mkCast ~force:true ~newt:typ zero
-  | typ -> Value_parameters.fatal ~current:true "non-scalar type %a"
+  | typ -> Self.fatal ~current:true "non-scalar type %a"
              Printer.pp_typ typ
 
 let eq_with_zero positive e =
@@ -238,13 +238,13 @@ let rec normalize_as_cond expr positive =
 
 module PairExpBool =
   Datatype.Pair_with_collections(Cil_datatype.Exp)(Datatype.Bool)
-    (struct let module_name = "Value.Value_util.PairExpBool" end)
+    (struct let module_name = "Value.Eva_utils.PairExpBool" end)
 module MemoNormalizeAsCond =
   State_builder.Hashtbl
     (PairExpBool.Hashtbl)
     (Cil_datatype.Exp)
     (struct
-      let name = "Value_util.MemoNormalizeAsCond"
+      let name = "Eva_utils.MemoNormalizeAsCond"
       let size = 64
       let dependencies = [ Ast.self ]
     end)
@@ -255,7 +255,7 @@ module MemoLvalToExp =
   Cil_state_builder.Lval_hashtbl
     (Cil_datatype.Exp)
     (struct
-      let name = "Value_util.MemoLvalToExp"
+      let name = "Eva_utils.MemoLvalToExp"
       let size = 64
       let dependencies = [ Ast.self ]
     end)
@@ -268,7 +268,7 @@ let dump_garbled_mix () =
   let l = Cvalue.V.get_garbled_mix () in
   if l <> [] then
     let pp_one fmt v = Format.fprintf fmt "@[<hov 2>%a@]" Cvalue.V.pretty v in
-    Value_parameters.warning ~wkey:Value_parameters.wkey_garbled_mix
+    Self.warning ~wkey:Self.wkey_garbled_mix
       "Garbled mix generated during analysis:@.\
        @[<v>%a@]"
       (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep:"@ " pp_one) l
@@ -347,7 +347,7 @@ and height_offset = function
 
 
 let skip_specifications kf =
-  Value_parameters.SkipLibcSpecs.get () &&
+  Parameters.SkipLibcSpecs.get () &&
   Kernel_function.is_definition kf &&
   Cil.is_in_libc (Kernel_function.get_vi kf).vattr
 

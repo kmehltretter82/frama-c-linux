@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val product_category: Value_parameters.category
+val product_category: Self.category
 
 module Make
     (Value: Abstract_value.S)

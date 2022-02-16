@@ -47,7 +47,7 @@ let get_retres_vi = Retres.memo
            let name = Format.asprintf "\\result<%a>" Kernel_function.pretty kf in
            Some (Cil.makeVarinfo false false name typ)
          with Cil.SizeOfError _ ->
-           Value_parameters.abort ~current:true
+           Self.abort ~current:true
              "function %a returns a value of unknown size. Aborting"
              Kernel_function.pretty kf
     )
@@ -62,9 +62,9 @@ let returned_value kf =
   | TFloat (FDouble, _)
   | TFloat (FLongDouble, _) -> Cvalue.V.top_float
   | TBuiltin_va_list _ ->
-    Value_parameters.error ~current:true ~once:true
+    Self.error ~current:true ~once:true
       "functions returning variadic arguments must be stubbed%t"
-      Value_util.pp_callstack;
+      Eva_utils.pp_callstack;
     Cvalue.V.top_int
   | TVoid _ -> Cvalue.V.top (* this value will never be used *)
   | TFun _ | TNamed _ | TArray _ -> assert false
@@ -100,8 +100,8 @@ let unsupported_specs_tbl =
 let warn_unsupported_spec name =
   try
     let header = Hashtbl.find unsupported_specs_tbl name in
-    Value_parameters.warning ~once:true ~current:true
-      ~wkey:Value_parameters.wkey_libc_unsupported_spec
+    Self.warning ~once:true ~current:true
+      ~wkey:Self.wkey_libc_unsupported_spec
       "@[The specification of function '%s' is currently not supported by Eva.@ \
        Consider adding '%a'@ to the analyzed source files.@]"
       name Filepath.Normalized.pretty

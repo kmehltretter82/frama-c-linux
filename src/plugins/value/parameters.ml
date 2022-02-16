@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Self
+
 (* Dependencies to kernel options *)
 let kernel_parameters_correctness = [
   Kernel.MainFunction.parameter;
@@ -60,57 +62,6 @@ let add_precision_dep p =
   parameters_tuning := Typed_parameter.Set.add p !parameters_tuning
 
 let () = List.iter add_correctness_dep kernel_parameters_correctness
-
-include Plugin.Register
-    (struct
-      let name = "Eva"
-      let shortname = "eva"
-      let help =
-        "automatically computes variation domains for the variables of the program"
-    end)
-
-let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
-let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
-
-(* Debug categories. *)
-let dkey_initial_state = register_category "initial-state"
-let dkey_final_states = register_category "final-states"
-let dkey_summary = register_category "summary"
-let dkey_pointer_comparison = register_category "pointer-comparison"
-let dkey_cvalue_domain = register_category "d-cvalue"
-let dkey_incompatible_states = register_category "incompatible-states"
-let dkey_iterator = register_category "iterator"
-let dkey_callbacks = register_category "callbacks"
-let dkey_widening = register_category "widening"
-let dkey_recursion = register_category "recursion"
-
-let () =
-  let activate dkey = add_debug_keys dkey in
-  List.iter activate
-    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain;
-     dkey_recursion; ]
-
-(* Warning categories. *)
-let wkey_alarm = register_warn_category "alarm"
-let wkey_locals_escaping = register_warn_category "locals-escaping"
-let wkey_garbled_mix = register_warn_category "garbled-mix"
-let () = set_warn_status wkey_garbled_mix Log.Winactive
-let wkey_builtins_missing_spec = register_warn_category "builtins:missing-spec"
-let wkey_builtins_override = register_warn_category "builtins:override"
-let wkey_libc_unsupported_spec = register_warn_category "libc:unsupported-spec"
-let wkey_loop_unroll_auto = register_warn_category "loop-unroll:auto"
-let () = set_warn_status wkey_loop_unroll_auto Log.Wfeedback
-let wkey_loop_unroll_partial = register_warn_category "loop-unroll:partial"
-let () = set_warn_status wkey_loop_unroll_partial Log.Wfeedback
-let wkey_missing_loop_unroll = register_warn_category "loop-unroll:missing"
-let () = set_warn_status wkey_missing_loop_unroll Log.Winactive
-let wkey_missing_loop_unroll_for = register_warn_category "loop-unroll:missing:for"
-let () = set_warn_status wkey_missing_loop_unroll_for Log.Winactive
-let wkey_signed_overflow = register_warn_category "signed-overflow"
-let wkey_invalid_assigns = register_warn_category "invalid-assigns"
-let () = set_warn_status wkey_invalid_assigns Log.Wfeedback
-let wkey_experimental = register_warn_category "experimental"
-let wkey_unknown_size = register_warn_category "unknown-size"
 
 module ForceValues =
   WithOutput
@@ -848,7 +799,7 @@ module SplitReturn =
 module SplitGlobalStrategy = State_builder.Ref (Split_strategy)
     (struct
       let default () = Split_strategy.NoSplit
-      let name = "Value_parameters.SplitGlobalStrategy"
+      let name = "Parameters.SplitGlobalStrategy"
       let dependencies = [SplitReturn.self]
     end)
 let () =
@@ -1440,11 +1391,3 @@ let parameters_correctness =
   Typed_parameter.Set.elements !parameters_correctness
 let parameters_tuning =
   Typed_parameter.Set.elements !parameters_tuning
-
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

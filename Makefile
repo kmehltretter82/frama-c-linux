@@ -857,9 +857,9 @@ endif
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
-PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
-	utils/eva_audit utils/value_perf utils/eva_annotations \
-	utils/eva_dynamic utils/value_util utils/red_statuses \
+PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
+	utils/eva_audit utils/eva_perf utils/eva_annotations \
+	utils/eva_dynamic utils/eva_utils utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen \
 	partitioning/split_return \
@@ -887,7 +887,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/sign_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
-	utils/value_results \
+	utils/eva_results \
 	utils/summary \
 	domains/cvalue/builtins domains/cvalue/builtins_malloc \
 	domains/cvalue/builtins_string domains/cvalue/builtins_misc \
@@ -932,9 +932,9 @@ PLUGIN_TYPES_TODOC:=$(addsuffix .mli,$(VALUE_TYPES))
 # Eva API.
 API_MLI := $(addprefix $(PLUGIN_DIR)/, \
   engine/analysis.mli utils/results.mli \
-  value_parameters.mli utils/eva_annotations.mli \
+  parameters.mli utils/eva_annotations.mli \
   eval.mli domains/cvalue/builtins.mli \
-  legacy/eval_terms.mli utils/value_results.mli utils/unit_tests.mli)
+  legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli)
 
 $(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/gen-api.sh Makefile $(API_MLI)
 	$(PRINT_MAKING) $@

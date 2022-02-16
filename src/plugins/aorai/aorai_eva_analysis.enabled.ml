@@ -80,7 +80,7 @@ let add_slevel_annotations () =
 let add_partitioning varname =
   match Data_for_aorai.get_varinfo_option varname with
   | None -> ()
-  | Some vi -> Eva.Value_parameters.use_global_value_partitioning vi
+  | Some vi -> Eva.Parameters.use_global_value_partitioning vi
 
 let add_state_variables_partitioning () =
   add_partitioning Data_for_aorai.curState;

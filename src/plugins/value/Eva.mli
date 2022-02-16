@@ -6,7 +6,7 @@
       and memory locations of lvalues at each program point.
 
    The following modules allow configuring the Eva analysis:
-   - Value_parameters: change the configuration of the analysis.
+   - Parameters: change the configuration of the analysis.
    - Eva_annotations: add local annotations to guide the analysis.
    - Builtins: register ocaml builtins to be used by the cvalue domain
        instead of analysing the body of some C functions.
@@ -300,7 +300,7 @@ module Results: sig
 
 end
 
-module Value_parameters: sig
+module Parameters: sig
   (** Configuration of the analysis. *)
 
   (** Returns the list (name, descr) of currently enabled abstract domains. *)
@@ -450,7 +450,7 @@ module Eval_terms: sig
     Cil_types.predicate -> Locations.Zone.t option
 end
 
-module Value_results: sig
+module Eva_results: sig
   type results
 
   val get_results: unit -> results
