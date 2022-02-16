@@ -1,7 +1,8 @@
 /* run.config
-   MODULE: @PTEST_NAME@
+ MODULE: @PTEST_NAME@
    OPT: -eva @EVA_OPTIONS@ -deps
 */
+
 
 int x,y,z;
 int TAB[10];

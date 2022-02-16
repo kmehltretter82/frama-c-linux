@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-eva"
+   STDOPT: #"-eva"
 */
 
 struct st {
