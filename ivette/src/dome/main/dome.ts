@@ -621,7 +621,7 @@ ipcMain.handle(
 
 // --------------------------------------------------------------------------
 
-ipcMain.handle('theme-color:switch', (_, theme: 'dark' | 'light') => {
+ipcMain.handle('theme-color:switch', (_evt, theme: 'dark' | 'light') => {
   // const theme = nativeTheme.shouldUseDarkColors ? 'light' : 'dark';
   nativeTheme.themeSource = theme;
   // return nativeTheme.shouldUseDarkColors;

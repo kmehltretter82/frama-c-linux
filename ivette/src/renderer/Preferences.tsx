@@ -46,28 +46,15 @@ import * as P from 'ivette/prefs';
 // --------------------------------------------------------------------------
 
 function ThemeFields(props: P.ThemeProps) {
-  const theme = Forms.useDefined(Forms.useValid(
-    Settings.useGlobalSettings(props.theme),
-  ));
   const fontsize = Forms.useValid(
     Settings.useGlobalSettings(props.fontSize),
   );
   const wraptext = Forms.useValid(
     Settings.useGlobalSettings(props.wrapText),
   );
-  const options = P.THEMES.map(({ id, label }) => (
-    <option key={id} value={id} label={label} />
-  ));
   const { target } = props;
   return (
     <>
-      <Forms.SelectField
-        state={theme}
-        label="Theme"
-        title={`Set the color theme of ${target}`}
-      >
-        {options}
-      </Forms.SelectField>
       <Forms.SliderField
         state={fontsize}
         label="Font Size"
@@ -109,7 +96,6 @@ export default function Preferences() {
       <Forms.Section label="AST View" unfold>
         <ThemeFields
           target="Internal AST"
-          theme={P.AstTheme}
           fontSize={P.AstFontSize}
           wrapText={P.AstWrapText}
         />
@@ -117,7 +103,6 @@ export default function Preferences() {
       <Forms.Section label="Source View" unfold>
         <ThemeFields
           target="Source Code"
-          theme={P.SourceTheme}
           fontSize={P.SourceFontSize}
           wrapText={P.SourceWrapText}
         />
