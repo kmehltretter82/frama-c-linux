@@ -55,6 +55,9 @@ val pp_debug: Format.formatter -> localizable -> unit
 
 module Localizable: Datatype.S_with_collections with type t = localizable
 
+val localizable_of_global : global -> localizable
+val localizable_of_kf : kernel_function -> localizable
+
 val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr
 val varinfo_of_localizable : localizable -> varinfo option
