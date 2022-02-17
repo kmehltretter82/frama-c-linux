@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -35,20 +35,23 @@ import frama_c_results
 import results_display
 import benchmark_database
 
+
 class OperationException(Exception):
     pass
 
+
 def build_make_environment(framac):
     if framac is None:
-        env = { **os.environ }
+        env = {**os.environ}
         args = []
     else:
-        env = { **os.environ,  'PATH' : f"{framac}/bin:{os.environ['PATH']}" }
+        env = { **os.environ,  "PATH" : f"{framac}/bin:{os.environ['PATH']}" }
         args = [
             f"FRAMAC_BIN={framac}/bin",
             f"FRAMAC={framac}/bin/frama-c"
         ]
     return env, args
+
 
 def list_targets(dir):
     if not os.path.isdir(dir):
@@ -59,7 +62,8 @@ def list_targets(dir):
         ["make", "--directory", dir, "--quiet", "display-targets"] + args,
         env=env,
         stdout=subprocess.PIPE,
-        encoding='ascii')
+        encoding="ascii",
+    )
     targets = res.stdout.split()
     res = []
     for target in targets:
@@ -69,28 +73,34 @@ def list_targets(dir):
             res += list_targets(target)
     return res
 
+
 def clone_frama_c(clonedir, hash):
     print("Cloning Frama-C", hash, "...")
     res = subprocess.run(
         ["./scripts/clone.sh", "--clone-dir", clonedir, hash],
         stdout=subprocess.PIPE,
-        encoding='ascii')
+        encoding="ascii",
+    )
     if res.returncode != 0:
         raise OperationException("Cannot clone repository. Try to manually"
             "remove the broken clone in " + clonedir)
-    return res.stdout.strip() + '/build'
+    return res.stdout.strip() + "/build"
 
 def run_make(framac, benchmark_tag=None):
-    args = ['make', '--keep-going', 'all']
+    args = ["make", "--keep-going", "all"]
     env, var_args = build_make_environment(framac)
     if benchmark_tag is None:
-        args += ['-j', str(os.cpu_count ())]
+        args += ["-j", str(os.cpu_count())]
     else:
-        args += ['BENCHMARK=' + benchmark_tag]
-    return subprocess.Popen(args + var_args, env=env,
+        args += ["BENCHMARK=" + benchmark_tag]
+    return subprocess.Popen(
+        args + var_args,
+        env=env,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
-        preexec_fn=os.setsid)
+        preexec_fn=os.setsid,
+    )
+
 
 def terminate_process(process):
     if process is None:
@@ -101,30 +111,33 @@ def terminate_process(process):
             pass
         except ProcessLookupError:
             pass
-        output,errors = process.communicate()
+        output, errors = process.communicate()
         return errors
 
+
 def smart_rename(target):
-    target = re.sub('^\./', '', target)
-    target = re.sub('main\.eva$', '', target)
-    target = re.sub('\.eva$', '', target)
-    target = re.sub('\.frama-c/', '', target)
-    target = re.sub('qds/frama-c', 'qds', target)
+    target = re.sub("^\./", "", target)
+    target = re.sub("main\.eva$", "", target)
+    target = re.sub("\.eva$", "", target)
+    target = re.sub("\.frama-c/", "", target)
+    target = re.sub("qds/frama-c", "qds", target)
     return target
 
+
 def is_running(target):
-    return os.path.isfile(target + '/running')
+    return os.path.isfile(target + "/running")
+
 
 def poll_results(targets, benchmark_tag):
     results = []
     for target in targets:
-        filename = target + '/stats.txt'
+        filename = target + "/stats.txt"
         result = frama_c_results.read(filename)
         result["target"] = target
         result["target_name"] = smart_rename(target)
         result["is_running"] = is_running(target)
-        result["up_to_date"] = benchmark_tag is None or benchmark_tag == result['benchmark_tag']
-        results.append(result);
+        result["up_to_date"] = benchmark_tag is None or benchmark_tag == result["benchmark_tag"]
+        results.append(result)
     return results
 
 
@@ -136,7 +149,7 @@ def run_analyses(display, database, framac, benchmark_tag):
     next_poll = time.time()
 
     def update():
-        nonlocal  display, database, targets, benchmark_tag, results
+        nonlocal display, database, targets, benchmark_tag, results
         results = poll_results(targets, benchmark_tag)
         if not database is None:
             database.update(results)
@@ -156,11 +169,11 @@ def run_analyses(display, database, framac, benchmark_tag):
         print("Analyzes interrupted by user.")
     except Exception as e:
         # terminate_process below is somehow blocking the exception printing
-        errors += bytearray(str(e), 'ascii')
+        errors += bytearray(str(e), "ascii")
         raise e
     finally:
         errors += terminate_process(process)
-    return results,errors
+    return results, errors
 
 
 parser = argparse.ArgumentParser(
@@ -168,25 +181,25 @@ parser = argparse.ArgumentParser(
                 "directory with a Makefile having two rules: 'all', a target "
                 "that runs the analysis, and 'display-targets', the target that "
                 "lists the built results.")
-parser.add_argument('rev', nargs='?', metavar="REVISION",
+parser.add_argument("rev", nargs="?", metavar="REVISION",
     help="a Frama-C revision to use for analyses (default: use the "
         "default configuration for Frama-C)")
-parser.add_argument('-b', '--benchmark',
+parser.add_argument("-b", "--benchmark",
     action="store_true",
     help="sets benchmark mode: do not run analyses in parallel and rerun all "
         "analyses")
-parser.add_argument('-v', '--vs',
+parser.add_argument("-v", "--vs",
     action="store", metavar="REVISION", default="master",
     help="a revision to compare the results to")
-parser.add_argument('-c', '--comment',
+parser.add_argument("-c", "--comment",
     action="store", metavar="COMMENT",
     help="when benchmarking, add this comment inside the database")
-parser.add_argument('-p', '--repository-path',
+parser.add_argument("-p", "--repository-path",
     action="store", metavar="PATH",
     help="don't clone Frama-C, use this git repository instead")
 
 
-errors = b''
+errors = b""
 
 try:
     args = parser.parse_args()
@@ -204,10 +217,10 @@ try:
         gitdir = framac
 
     if args.benchmark:
-        benchmark_tag=str(uuid.uuid1())
+        benchmark_tag = str(uuid.uuid1())
         print("Running benchmarks with benchmark tag", benchmark_tag, "...")
     else:
-        benchmark_tag=None
+        benchmark_tag = None
         print("Running analyses ...")
 
     benchmark_comment = args.comment
@@ -225,6 +238,6 @@ try:
     results_display.PlainDisplay().print_table(results)
 
 except OperationException as e:
-    errors += bytearray(str(e), 'ascii')
+    errors += bytearray(str(e), "ascii")
 
-sys.stderr.buffer.write(errors + b'\n')
+sys.stderr.buffer.write(errors + b"\n")

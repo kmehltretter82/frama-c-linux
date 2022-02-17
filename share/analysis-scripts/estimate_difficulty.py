@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -22,32 +22,39 @@
 #                                                                        #
 ##########################################################################
 
-# This script uses several heuristics to try and estimate the difficulty
-# of analyzing a new code base with Frama-C.
+"""This script uses several heuristics to try and estimate the difficulty
+of analyzing a new code base with Frama-C."""
 
 import argparse
 import json
 import os
-from   pathlib import Path
+from pathlib import Path
 import re
 import subprocess
 import sys
 import tempfile
 
 import build_callgraph
-import function_finder
 import source_filter
 
-#TODO : avoid relativizing paths when introducing too many ".." ;
-#TODO : accept directory as argument (--full-tree), and then do glob **/*.{c,i} inside
-#TODO : try to check the presence of compiler builtins
-#TODO : try to check for pragmas
+# TODO : avoid relativizing paths when introducing too many ".." ;
+# TODO : accept directory as argument (--full-tree), and then do glob **/*.{c,i} inside
+# TODO : try to check the presence of compiler builtins
+# TODO : try to check for pragmas
+# TODO : detect absence of 'main' function (library)
 
-parser = argparse.ArgumentParser(description="""
-Estimates the difficulty of analyzing a given code base""")
-parser.add_argument("--header-dirs", "-d", metavar='DIR', nargs='+',
-                    help='directories containing headers (default: .frama-c)')
-parser.add_argument("files", nargs='+', help='source files')
+parser = argparse.ArgumentParser(
+    description="""
+Estimates the difficulty of analyzing a given code base"""
+)
+parser.add_argument(
+    "--header-dirs",
+    "-d",
+    metavar="DIR",
+    nargs="+",
+    help="directories containing headers (default: .frama-c)",
+)
+parser.add_argument("files", nargs="+", help="source files")
 args = vars(parser.parse_args())
 
 header_dirs = args["header_dirs"]
@@ -59,18 +66,33 @@ under_test = os.getenv("PTESTS_TESTING")
 
 # gather information from several sources
 
+
 def extract_keys(l):
     return [list(key.keys())[0] for key in l]
 
+
 def get_framac_libc_function_statuses(framac, framac_share):
-    (_metrics_handler, metrics_tmpfile) = tempfile.mkstemp(prefix="fc_script_est_diff", suffix=".json")
+    (_handler, metrics_tmpfile) = tempfile.mkstemp(prefix="fc_script_est_diff", suffix=".json")
     if debug:
-        print(f"metrics_tmpfile: {metrics_tmpfile}")
+        print("metrics_tmpfile: %s", metrics_tmpfile)
     fc_runtime = framac_share / "libc" / "__fc_runtime.c"
     fc_libc_headers = framac_share / "libc" / "__fc_libc.h"
-    subprocess.run([framac, "-no-autoload-plugins", fc_runtime, fc_libc_headers,
-                    "-load-module", "metrics", "-metrics", "-metrics-libc",
-                    "-metrics-output", metrics_tmpfile], stdout=subprocess.DEVNULL, check=True)
+    subprocess.run(
+        [
+            framac,
+            "-no-autoload-plugins",
+            fc_runtime,
+            fc_libc_headers,
+            "-load-module",
+            "metrics",
+            "-metrics",
+            "-metrics-libc",
+            "-metrics-output",
+            metrics_tmpfile,
+        ],
+        stdout=subprocess.DEVNULL,
+        check=True,
+    )
     with open(metrics_tmpfile) as f:
         metrics_json = json.load(f)
     os.remove(metrics_tmpfile)
@@ -78,7 +100,10 @@ def get_framac_libc_function_statuses(framac, framac_share):
     spec_only = extract_keys(metrics_json["specified-only-functions"])
     return (defined, spec_only)
 
+
 re_include = re.compile(r'\s*#\s*include\s*("|<)([^">]+)("|>)')
+
+
 def grep_includes_in_file(filename):
     file_content = source_filter.open_and_filter(filename, not under_test)
     i = 0
@@ -88,23 +113,25 @@ def grep_includes_in_file(filename):
         if m:
             kind = m.group(1)
             header = m.group(2)
-            yield((i,kind,header))
+            yield (i, kind, header)
+
 
 def get_includes(files):
     quote_includes = {}
     chevron_includes = {}
     for filename in files:
         for line, kind, header in grep_includes_in_file(filename):
-            if kind == '<':
+            if kind == "<":
                 includes = chevron_includes[header] if header in chevron_includes else []
             else:
                 includes = quote_includes[header] if header in quote_includes else []
             includes.append((filename, line))
-            if kind == '<':
+            if kind == "<":
                 chevron_includes[header] = includes
             else:
                 quote_includes[header] = includes
     return chevron_includes, quote_includes
+
 
 debug = os.getenv("DEBUG")
 verbose = False
@@ -112,15 +139,19 @@ verbose = False
 print("Building callgraph...")
 cg = build_callgraph.compute(files)
 
-framac_bin = os.getenv('FRAMAC_BIN')
+framac_bin = os.getenv("FRAMAC_BIN")
 if not framac_bin:
     sys.exit("error: FRAMAC_BIN not in environment")
 framac = Path(framac_bin) / "frama-c"
 
-framac_share = Path(subprocess.check_output([framac, '-no-autoload-plugins', '-print-share-path']).decode())
+framac_share = Path(
+    subprocess.check_output([framac, "-no-autoload-plugins", "-print-share-path"]).decode()
+)
 
 print("Computing data about libc/POSIX functions...")
-libc_defined_functions, libc_specified_functions = get_framac_libc_function_statuses(framac, framac_share)
+libc_defined_functions, libc_specified_functions = get_framac_libc_function_statuses(
+    framac, framac_share
+)
 
 with open(framac_share / "compliance" / "c11_functions.json") as f:
     c11_functions = json.load(f)["data"]
@@ -159,16 +190,21 @@ print(f"Estimating difficulty for {len(callees)} function calls...")
 warnings = 0
 
 for callee in sorted(callees):
+
     def callee_status(status, standard, reason):
         global warnings
         if status == "warning":
             warnings += 1
         if verbose or debug or status == "warning":
             print(f"- {status}: {callee} ({standard}) {reason}")
-    is_problematic = callee in posix_identifiers and "notes" in posix_identifiers[callee] and "fc-support" in posix_identifiers[callee]["notes"] and posix_identifiers[callee]["notes"]["fc-support"] == "problematic"
+
+    try:
+        is_problematic = posix_identifiers[callee]["notes"]["fc-support"] == "problematic"
+    except KeyError:
+        is_problematic = False
     if callee in posix_identifiers:
         used_headers.add(posix_identifiers[callee]["header"])
-    status_emitted = False # to avoid re-emitting a message for functions in both C11 and POSIX
+    status_emitted = False  # to avoid re-emitting a message for functions in both C11 and POSIX
     if callee in c11_functions:
         standard = "C11"
         # check that the callee is not a macro or type (e.g. va_arg);
@@ -205,7 +241,11 @@ for callee in sorted(callees):
                     callee_status("ok", standard, "is handled by the Variadic plug-in")
                     status_emitted = True
                 elif is_problematic:
-                    callee_status("warning", standard, "is known to be problematic for code analysis")
+                    callee_status(
+                        "warning",
+                        standard,
+                        "is known to be problematic for code analysis",
+                    )
                     status_emitted = True
             if not status_emitted:
                 callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
@@ -213,11 +253,12 @@ for callee in sorted(callees):
 print(f"Function-related warnings: {warnings}")
 
 if (verbose or debug) and used_headers:
-    print(f"used headers:")
+    print("used headers:")
     for header in sorted(used_headers):
         print(f"  <{header}>")
 
 (chevron_includes, quote_includes) = get_includes(files)
+
 
 def is_local_header(header_dirs, header):
     for d in header_dirs:
@@ -225,6 +266,7 @@ def is_local_header(header_dirs, header):
         if Path(path / header).exists():
             return True
     return False
+
 
 print(f"Estimating difficulty for {len(chevron_includes)} '#include <header>' directives...")
 non_posix_headers = []
@@ -260,22 +302,31 @@ if dyncallees:
 
 # unsupported C11-specific features
 
-c11_unsupported = ["_Alignas", "_Alignof", "_Complex", "_Generic", "_Imaginary",
-                   "alignas", "alignof" # stdalign.h may use these symbols instead of the C11 keywords
-                   ];
+c11_unsupported = [
+    "_Alignas",
+    "_Alignof",
+    "_Complex",
+    "_Generic",
+    "_Imaginary",
+    "alignas",
+    "alignof",  # stdalign.h may use these symbols
+]
 
 for keyword in c11_unsupported:
-    out = subprocess.Popen(["grep", "-n", '\\b' + keyword + '\\b'] + files + ["/dev/null"],
-                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    lines = out.communicate()[0].decode('utf-8').splitlines()
+    out = subprocess.Popen(
+        ["grep", "-n", "\\b" + keyword + "\\b"] + files + ["/dev/null"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    lines = out.communicate()[0].decode("utf-8").splitlines()
     if lines:
         n = len(lines)
-        print(f"- warning: found {n} line{'s' if n > 1 else ''} with occurrences of unsupported C11 construct '{keyword}'")
+        print(
+            f"- warning: found {n} line{'s' if n > 1 else ''} with occurrences of \
+unsupported C11 construct '{keyword}'"
+        )
 
 # assembly code
 
 if "asm" in callees or "__asm" in callees or "__asm__" in callees:
-    print(f"- warning: code seems to contain inline assembly ('asm(...)')")
-
-# TODO:
-# - detect absence of 'main' function (library)
+    print("- warning: code seems to contain inline assembly ('asm(...)')")

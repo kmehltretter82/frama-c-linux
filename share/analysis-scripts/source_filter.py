@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -21,9 +21,9 @@
 #                                                                        #
 ##########################################################################
 
-# This file provides some functions to open and filter source files
-# before they are used by other scripts. These filters help improve
-# the efficiency of regex-based heuristics.
+"""This file provides some functions to open and filter source files
+before they are used by other scripts. These filters help improve
+the efficiency of regex-based heuristics."""
 
 # These filters require external tools, either in the PATH, or in
 # environment variables (the latter has higher priority than the former).
@@ -38,33 +38,46 @@
 # does _not_ lead to an error.
 
 import os
-from   pathlib import Path
+from pathlib import Path
 import shutil
 import subprocess
 import sys
 
 # warnings about missing commands are disabled during testing
-emit_warns = os.getenv("PTESTS_TESTING") == None
+emit_warns = os.getenv("PTESTS_TESTING") is None
 
 # Returns a Path to the command binary, or None if it is not found
 # Emits a warning the first time it looks for a command
 warned = {}
+
+
 def get_command(command, env_var_name):
     p = os.getenv(env_var_name)
     if not p:
         p = shutil.which(command)
     if not p:
         if emit_warns and command not in warned:
-            print(f"info: optional external command '{command}' not found in PATH; consider installing it or setting environment variable {env_var_name}")
+            print(
+                f"info: optional external command '{command}' not found in PATH; \
+consider installing it or setting environment variable {env_var_name}"
+            )
             warned[command] = True
         return None
     return Path(p)
 
+
 def run_and_check(command_and_args, input_data):
     try:
-        return subprocess.check_output(command_and_args, input=input_data, stderr=None, encoding="ascii", errors="ignore")
+        return subprocess.check_output(
+            command_and_args,
+            input=input_data,
+            stderr=None,
+            encoding="ascii",
+            errors="ignore",
+        )
     except subprocess.CalledProcessError as e:
         sys.exit(f"error running command: {command_and_args}\n{e}")
+
 
 def filter_with_scc(input_data):
     scc = get_command("scc", "SCC")
@@ -73,17 +86,21 @@ def filter_with_scc(input_data):
     else:
         return input_data
 
+
 def filter_with_astyle(input_data):
     astyle = get_command("astyle", "ASTYLE")
     if astyle:
-        return run_and_check([astyle, "--keep-one-line-blocks", "--keep-one-line-statements"], input_data)
+        return run_and_check(
+            [astyle, "--keep-one-line-blocks", "--keep-one-line-statements"], input_data
+        )
     else:
         return input_data
+
 
 def open_and_filter(filename, apply_filters):
     # we ignore encoding errors and use ASCII to avoid issues when
     # opening files with different encodings (UTF-8, ISO-8859, etc)
-    with open(filename, "r", encoding="ascii", errors='ignore') as f:
+    with open(filename, "r", encoding="ascii", errors="ignore") as f:
         data = f.read()
     if apply_filters:
         data = filter_with_astyle(filter_with_scc(data))

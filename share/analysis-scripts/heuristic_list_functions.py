@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -22,22 +22,22 @@
 #                                                                        #
 ##########################################################################
 
-# This script uses heuristics to list all function definitions and
-# declarations in a set of files.
+"""This script uses heuristics to list all function definitions and
+declarations in a set of files."""
 
 import sys
 import os
-import re
 import function_finder
 
-debug = bool(os.getenv("DEBUG", False))
+debug = os.getenv("DEBUG")
 
 arg = ""
 if len(sys.argv) < 4:
-   print("usage: %s want_defs want_decls file..." % sys.argv[0])
-   print("       looks for likely function definitions and/or declarations")
-   print("       in the specified files.")
-   sys.exit(1)
+    print("usage: %s want_defs want_decls file..." % sys.argv[0])
+    print("       looks for likely function definitions and/or declarations")
+    print("       in the specified files.")
+    sys.exit(1)
+
 
 def boolish_string(s):
     if s.lower() == "true" or s == "1":
@@ -46,16 +46,19 @@ def boolish_string(s):
         return False
     sys.exit(f"error: expected 'true', 'false', 0 or 1; got: {s}")
 
+
 want_defs = boolish_string(sys.argv[1])
 want_decls = boolish_string(sys.argv[2])
 files = sys.argv[3:]
 
 for f in files:
-    with open(f, encoding="ascii", errors='ignore') as data:
+    with open(f, encoding="ascii", errors="ignore") as data:
         file_content = data.read()
     file_lines = file_content.splitlines(keepends=True)
     newlines = function_finder.compute_newline_offsets(file_lines)
-    defs_and_decls = function_finder.find_definitions_and_declarations(want_defs, want_decls, f, file_content, file_lines, newlines)
+    defs_and_decls = function_finder.find_definitions_and_declarations(
+        want_defs, want_decls, f, file_content, file_lines, newlines
+    )
     for (funcname, is_def, start, end, _offset) in defs_and_decls:
         if is_def:
             print(f"{os.path.relpath(f)}:{start}:{end}: {funcname} (definition)")

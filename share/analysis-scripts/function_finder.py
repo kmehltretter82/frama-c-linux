@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -22,7 +21,7 @@
 #                                                                        #
 ##########################################################################
 
-# Exports find_function_in_file, to be used by other scripts
+"""Exports find_function_in_file, to be used by other scripts"""
 
 import bisect
 import os
@@ -41,48 +40,70 @@ import re
 
 # auxiliary regexes
 c_identifier = "[a-zA-Z_][a-zA-Z0-9_]*"
-c_id_maybe_pointer = c_identifier + "\**"
+c_id_maybe_pointer = c_identifier + "[*]*"
 optional_c_id = "(?:" + c_identifier + ")?"
-non_empty_whitespace = "[ \t\r\n]+" # includes newline/CR
-whitespace = "[ \t\r\n]*" # includes newline/CR
-type_prefix = c_id_maybe_pointer + "(?:\s+\**" + c_id_maybe_pointer + ")*" + non_empty_whitespace + "\**"
+non_empty_whitespace = r"[ \t\r\n]+"  # includes newline/CR
+whitespace = "[ \t\r\n]*"  # includes newline/CR
+type_prefix = (
+    c_id_maybe_pointer + r"(?:\s+[*]*" + c_id_maybe_pointer + ")*" + non_empty_whitespace + "[*]*"
+)
 optional_type_prefix = "(?:" + type_prefix + whitespace + ")?"
-argument_list = "\([^)]*\)"
+argument_list = r"\([^)]*\)"
 
-debug = bool(os.getenv("DEBUG", False))
+debug = os.getenv("DEBUG", False)
 
 # Precomputes the regex for 'fname'
 def prepare_re_specific_name(fname):
-    re_fun = re.compile("^" + optional_type_prefix + fname + whitespace +
-                        argument_list + whitespace +
-                        optional_c_id + whitespace + "(;|{)", flags=re.DOTALL | re.MULTILINE)
+    re_fun = re.compile(
+        "^"
+        + optional_type_prefix
+        + fname
+        + whitespace
+        + argument_list
+        + whitespace
+        + optional_c_id
+        + whitespace
+        + "(;|{)",
+        flags=re.DOTALL | re.MULTILINE,
+    )
     return re_fun
+
 
 # Returns 0 if not found, 1 if declaration, 2 if definition
 def find_specific_name(prepared_re, f):
-   with open(f, encoding="ascii", errors='ignore') as data:
-      file_content = data.read()
-      has_decl_or_def = prepared_re.search(file_content)
-      if has_decl_or_def is None:
-          return 0
-      else:
-         is_decl = has_decl_or_def.group(1) == ";"
-         return 1 if is_decl else 2
+    with open(f, encoding="ascii", errors="ignore") as data:
+        file_content = data.read()
+        has_decl_or_def = prepared_re.search(file_content)
+        if has_decl_or_def is None:
+            return 0
+        else:
+            is_decl = has_decl_or_def.group(1) == ";"
+            return 1 if is_decl else 2
 
 
 # matches function definitions or declarations
 # if funcname is not None, only matches for the specified
 # function name
 def compute_re_def_or_decl(funcname):
-    id = funcname if funcname else c_identifier
-    return re.compile("^" + optional_type_prefix +
-                      "(" + id + ")" + whitespace +
-                      argument_list + whitespace +
-                      optional_c_id + whitespace + "(;|{)",
-                      flags=re.DOTALL | re.MULTILINE)
+    ident = funcname if funcname else c_identifier
+    return re.compile(
+        "^"
+        + optional_type_prefix
+        + "("
+        + ident
+        + ")"
+        + whitespace
+        + argument_list
+        + whitespace
+        + optional_c_id
+        + whitespace
+        + "(;|{)",
+        flags=re.DOTALL | re.MULTILINE,
+    )
+
 
 # matches function calls
-re_funcall = re.compile("(" + c_identifier + ")" + whitespace + "\(")
+re_funcall = re.compile("(" + c_identifier + ")" + whitespace + r"\(")
 
 # Computes the offset (in bytes) of each '\n' in the file,
 # returning them as a list
@@ -94,11 +115,13 @@ def compute_newline_offsets(file_lines):
         offsets.append(current)
     return offsets
 
+
 # Returns the line number (starting at 1) containing the character
 # of offset [offset].
 # [offsets] is the sorted list of offsets for newline characters in the file.
 def line_of_offset(offsets, offset):
     return bisect.bisect_right(offsets, offset) + 1
+
 
 # Returns the line number (starting at 1) of each line starting with '}'
 # as its first character.
@@ -110,16 +133,17 @@ def compute_closing_braces(file_lines):
     braces = []
     for i, line in enumerate(file_lines, start=1):
         # note: lines contain '\n', so they are never empty
-        if line[0] == '}':
+        if line[0] == "}":
             braces.append(i)
     # Special heuristics: if the last line contains whitespace + '}',
     # assume it closes a function.
-    last_line_number = len(file_lines)+1
-    if file_lines != [] and not (last_line_number in braces):
+    last_line_number = len(file_lines) + 1
+    if file_lines != [] and last_line_number not in braces:
         last_line = file_lines[-1].lstrip()
-        if len(last_line) >= 1 and last_line[0] == '}':
+        if len(last_line) >= 1 and last_line[0] == "}":
             braces.append(last_line_number)
     return braces
+
 
 # Returns the first element of [line_numbers] greater than [n], or [None]
 # if all numbers are smaller than [n] (this may happen e.g. when no
@@ -133,6 +157,7 @@ def get_first_line_after(line_numbers, n):
         # could not find line (e.g. for closing braces); return None
         return None
 
+
 # Returns a list of tuples (fname, is_def, line_start, line_end, terminator_offset)
 # for each function definition or declaration.
 # If [want_defs] is True, definitions are included.
@@ -143,7 +168,9 @@ def get_first_line_after(line_numbers, n):
 # [terminator_offset] is used by the caller to filter the function prototype
 # itself and avoid considering it as a call. For function definitions,
 # this is the opening brace; for function declarations, this is the semicolon.
-def find_definitions_and_declarations(want_defs, want_decls, filename, file_content, file_lines, newlines, funcname=None):
+def find_definitions_and_declarations(
+    want_defs, want_decls, filename, file_content, file_lines, newlines, funcname=None
+):
     braces = compute_closing_braces(file_lines)
     res = []
     re_fundef_or_decl = compute_re_def_or_decl(funcname)
@@ -162,7 +189,7 @@ def find_definitions_and_declarations(want_defs, want_decls, filename, file_cont
         else:
             if not want_defs:
                 continue
-            definition = file_content[match.start(1):newlines[start-1]]
+            definition = file_content[match.start(1) : newlines[start - 1]]
             # try "single-line function heuristic":
             # assume the function is defined as 'type f(...) { code; }',
             # in a single line
@@ -172,20 +199,25 @@ def find_definitions_and_declarations(want_defs, want_decls, filename, file_cont
                 end = get_first_line_after(braces, start)
                 if not end:
                     # no closing braces found; try again the "single-line function heuristic"
-                    def_start_newline_offset = newlines[start-1]
                     line_of_opening_brace = line_of_offset(newlines, terminator_offset)
-                    if start == line_of_opening_brace and definition.rstrip()[-1] == '}':
+                    if start == line_of_opening_brace and definition.rstrip()[-1] == "}":
                         # assume the '}' is closing the '{' from the same line
                         end = line_of_opening_brace
                     else:
                         # no opening brace; assume a false positive and skip definition
-                        print(f"{os.path.relpath(filename)}:{start}:closing brace not found, " +
-                              f"skipping potential definition of '{funcname}'")
+                        print(
+                            f"{os.path.relpath(filename)}:{start}:closing brace not found, \
+skipping potential definition of '{funcname}'"
+                        )
                         continue
         if debug:
-            print(f"function_finder: {'def' if is_def else 'decl'} of {funcname} between {start} and {end}")
+            print(
+                f"function_finder: {'def' if is_def else 'decl'} of \
+{funcname} between {start} and {end}"
+            )
         res.append((funcname, is_def, start, end, terminator_offset))
     return res
+
 
 # list of identifiers which are never function calls
 calls_blacklist = ["if", "while", "for", "return", "sizeof", "switch", "_Alignas"]
@@ -205,15 +237,16 @@ def find_calls(file_content, newlines):
             res.append((funcname, line, offset))
     return res
 
+
 # Returns the caller of [call], that is, the function whose definition
 # contains the line where [call] happens.
 # Returns [None] if there is no function at such line (i.e. a false positive).
 #
 # [defs] must be sorted in ascending order.
 def find_caller(defs, call):
-    (called, line, offset) = call
+    (_called, line, offset) = call
     for (fname, _is_def, start, end, brace_offset) in defs:
-        if line >= start and line <= end and offset > brace_offset:
+        if start <= line <= end and offset > brace_offset:
             return fname
         elif start > line:
             return None

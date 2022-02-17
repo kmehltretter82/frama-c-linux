@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -22,34 +22,48 @@
 #                                                                        #
 ##########################################################################
 
-# This script finds files containing likely declarations and definitions
-# for a given function name, via heuristic syntactic matching.
+"""This script finds files containing likely declarations and definitions
+for a given function name, via heuristic syntactic matching."""
 
 import argparse
-import function_finder
 import os
 import re
 import sys
 from pathlib import Path
 
-parser = argparse.ArgumentParser(description="""
+import function_finder
+
+parser = argparse.ArgumentParser(
+    description="""
 Looks for likely declarations/definitions of a function
 in files with extensions '.c', '.h' and '.i'.
 If any directories are specified, looks inside them,
 otherwise looks inside PWD and /usr/include.
-Subdirectories are always considered recursively.""")
+Subdirectories are always considered recursively."""
+)
 
-parser.add_argument('--directory', '-C', metavar='DIR', default=".", nargs=1,
-                    help='print paths relative to directory DIR (default: .)')
-parser.add_argument('funcname', help='function name to search')
-parser.add_argument('dir', nargs='*', help='directories where to search (if empty: PWD /usr/include)')
+parser.add_argument(
+    "--directory",
+    "-C",
+    metavar="DIR",
+    default=".",
+    nargs=1,
+    help="print paths relative to directory DIR (default: .)",
+)
+parser.add_argument("funcname", help="function name to search")
+parser.add_argument(
+    "dir",
+    nargs="*",
+    type=Path,
+    help="directories where to search (if empty: PWD /usr/include)",
+)
 args = vars(parser.parse_args())
 
 reldir = args["directory"][0]
 fname = args["funcname"]
 dirs = args["dir"]
 
-if re.match('[a-zA-Z_][a-zA-Z0-9_]*$', fname) == None:
+if re.match("[a-zA-Z_][a-zA-Z0-9_]*$", fname) is None:
     print("error: function name contains invalid characters: %s" % fname)
     print("       (only letters/digits/underscore allowed)")
     sys.exit(1)
@@ -57,16 +71,16 @@ if re.match('[a-zA-Z_][a-zA-Z0-9_]*$', fname) == None:
 dirs = set(dirs)
 if not dirs:
     pwd = os.getcwd()
-    dirs = [pwd, "/usr/include"]
+    dirs = [Path(pwd), Path("/usr/include")]
 else:
-    dirs = set(sys.argv[2:])
+    dirs = [Path(p) for p in set(sys.argv[2:])]
 
 files = set()
 for d in dirs:
     # The usage of Path.glob here prevents symbolic links from being
     # followed, which is desirable in some situations. However, if you
     # need them, try using glob.glob instead.
-    files.update(Path(d).glob("**/*.[ich]"))
+    files.update(d.glob("**/*.[ich]"))
 
 print("Looking for '%s' inside %d file(s)..." % (fname, len(files)))
 
@@ -84,20 +98,31 @@ for f in files:
     except OSError as e:
         print(f"error opening '{f}' ({e.errno}, {e.strerror}), skipping file")
 
+
 def relative_path_to(start):
     return lambda p: os.path.relpath(p, start=start)
 
-if possible_declarators == [] and possible_definers == []:
+
+if not possible_declarators and not possible_definers:
     print("No declaration/definition found for function '%s'" % fname)
+    sys.exit(0)
+
+if reldir != ".":
+    reldir_msg = f" (relative to '{reldir}')"
 else:
-    if reldir != ".":
-        reldir_msg = f" (relative to '{reldir}')"
-    else:
-        reldir_msg = ""
-    relative_path = relative_path_to(reldir)
-    if possible_declarators != []:
-        print(f"Possible declarations for function '{fname}' in the following file(s){reldir_msg}:")
-        print("  " + "\n  ".join(sorted([os.path.relpath(path, start=reldir) for path in possible_declarators])))
-    if possible_definers != []:
-        print(f"Possible definitions for function '{fname}' in the following file(s){reldir_msg}:")
-        print("  " + "\n  ".join(sorted([os.path.relpath(path, start=reldir) for path in possible_definers])))
+    reldir_msg = ""
+relative_path = relative_path_to(reldir)
+if possible_declarators:
+    print(f"Possible declarations for function '{fname}' in the following file(s){reldir_msg}:")
+    print(
+        "  "
+        + "\n  ".join(
+            sorted([os.path.relpath(path, start=reldir) for path in possible_declarators])
+        )
+    )
+if possible_definers:
+    print(f"Possible definitions for function '{fname}' in the following file(s){reldir_msg}:")
+    print(
+        "  "
+        + "\n  ".join(sorted([os.path.relpath(path, start=reldir) for path in possible_definers]))
+    )
