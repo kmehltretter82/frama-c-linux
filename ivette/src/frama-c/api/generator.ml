@@ -19,7 +19,7 @@ module OUT = Self.String
     (struct
       let option_name = "-server-tsc-out"
       let arg_name = "path"
-      let default = "src/frama-c"
+      let default = "src"
       let help = Printf.sprintf "Output directory (default is '%s')" default
     end)
 

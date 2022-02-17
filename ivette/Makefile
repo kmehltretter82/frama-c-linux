@@ -115,7 +115,7 @@ api:
 	@find src/frama-c -path "*/api/*" -name "*.ts" -exec rm -f {} \;
 	../bin/frama-c.byte \
 		-load-module src/frama-c/api/generator.ml \
-		-server-tsc -server-tsc-out "src"
+		-server-tsc
 	@find src/frama-c -path "*/api/*" -name "*.ts" \
 		-exec headache \
 			-h ../headers/open-source/CEA_LGPL \
