@@ -114,7 +114,7 @@ let run () =
   (* Output to dot *)
   let filepath =
     let open Filename in
-    ptest_file ((dirname __FILE__) ^ "/result/") (remove_extension (basename __FILE__) ^ ".dot")
+    ptest_file "" (remove_extension (basename __FILE__) ^ ".dot")
   in
   let filepath = Filepath.Normalized.of_string filepath in
   Dataflow.Result.to_dot_file ConstantsDomain.pretty results filepath;
