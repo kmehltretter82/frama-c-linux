@@ -2,55 +2,13 @@
 /* --- Probe Panel                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-.light-theme {
-
-  --eva-info-text: #777;
-  --eva-info-background: #ccc;
-
-  --eva-stmt-label: grey;
-  --eva-code-background: lightgrey;
-
-  --eva-callsite-background: #eee;
-  --eva-callsite-fill: #7cacbb;
-
-  --eva-focused: #cbe4cb;
-  --eva-focused-transient: #f9dca6;
-
-  --eva-state-before: #95f5ff;
-  --eva-state-after: #fff819;
-  --eva-state-then: #c8e06e;
-  --eva-state-else: #ff834e;
-
-}
-
-.dark-theme {
-
-  --eva-info-text: #748a8d;
-  --eva-info-background: #082032;
-
-  --eva-stmt-label: #849a9d;
-  --eva-code-background: #334756;
-
-  --eva-callsite-background: #eee;
-  --eva-callsite-fill: #7cacbb;
-
-  --eva-focused: #cbe4cb;
-  --eva-focused-transient: #f9dca6;
-
-  --eva-state-before: #95f5ff;
-  --eva-state-after: #fff819;
-  --eva-state-then: #c8e06e;
-  --eva-state-else: #ff834e;
-
-}
-
 .eva-probeinfo {
     min-height: 32px;
     padding-left: 6px;
     padding-top: 2px;
     padding-bottom: 4px;
     width: 100%;
-    background: var(--eva-info-background);
+    background: var(--background-profound);
     display: flex;
 }
 
@@ -63,10 +21,10 @@
 .eva-probeinfo-code {
     flex: 0 1 auto;
     height: fit-content;
-    background: var(--eva-code-background);
+    background: var(--background-intense);
     min-width: 120px;
     width: auto;
-    border: thin solid black;
+    border: thin solid var(--border);
     padding-left: 6px;
     padding-right: 6px;
     border-radius: 4px;
@@ -98,7 +56,7 @@
 .eva-info {
     width: 100%;
     flex-wrap: wrap;
-    background: var(--eva-info-background);
+    background: var(--background-profound);
     padding-top: 3px;
     padding-left: 12px;
     padding-bottom: 2px;
@@ -106,19 +64,19 @@
 
 .eva-callsite {
     flex: 0 0 auto;
-    fill: var(--eva-callsite-fill);
-    background: var(--eva-callsite-background);
+    fill: var(--selected-element);
+    background: var(--background-softer);
     border-radius: 4px;
-    border: thin solid black;
+    border: thin solid var(--border);
     padding-right: 7px;
 }
 
 .eva-callsite.eva-focused {
-    background: var(--eva-focused);
+    background: var(--warning-button-color);
 }
 
 .eva-callsite.eva-focused.eva-transient {
-    background: var(--eva-focused-transient);
+    background: var(--code-select);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -140,16 +98,16 @@
 }
 
 .eva-alarm-none { display: none; }
-.eva-alarm-True { fill: green; }
-.eva-alarm-False { fill: #fb4e4a; }
-.eva-alarm-Unknown { fill: darkorange; }
+.eva-alarm-True { fill: var(--eva-alarms-true); }
+.eva-alarm-False { fill: var(--eva-alarms-false); }
+.eva-alarm-Unknown { fill: var(--eva-alarms-unknown); }
 
 /* -------------------------------------------------------------------------- */
 /* --- Styling Values                                                     --- */
 /* -------------------------------------------------------------------------- */
 
 .eva-stmt {
-    color: var(--eva-stmt-label);
+    color: var(--info-text);
     text-select: none;
 }
 
@@ -177,19 +135,19 @@
 
 .eva-function {
     padding-top: 0px;
-    background: var(--eva-info-background);
+    background: var(--background-profound);
 }
 
 .eva-head {
     padding-top: 2px;
-    color: var(--eva-info-text);
+    color: var(--info-text);
     text-align: center;
-    border-left: thin solid black;
-    border-bottom: thin solid black;
+    border-left: thin solid var(--border);
+    border-bottom: thin solid var(--border);
 }
 
 .eva-probes .eva-head {
-    border-top: thin solid black;
+    border-top: thin solid var(--border);
 }
 
 .eva-phantom {
@@ -214,8 +172,8 @@
 
 .eva-cell {
     flex: 1 1 auto;
-    border-right: thin solid black;
-    border-bottom: thin solid black;
+    border-right: thin solid var(--border);
+    border-bottom: thin solid var(--border);
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -236,13 +194,13 @@
 }
 
 .eva-cell:nth-child(2) {
-    border-left: thin solid black;
+    border-left: thin solid var(--border);
 }
 
 .eva-probes .eva-cell {
     padding: 2px 4px;
     text-align: center;
-    border-top: thin solid black;
+    border-top: thin solid var(--border);
 }
 
 .eva-cell * {
@@ -275,50 +233,42 @@
 /* --- Probes --- */
 
 .eva-probes .eva-cell {
-    background: #cbe4cb;
+    background: var(--eva-probes-pinned);
 }
 
 .eva-probes .eva-focused {
-    background: #02da02;
+    background: var(--eva-probes-pinned-focused);
 }
 
 .eva-probes .eva-transient {
-    background: #fff0d5;
+    background: var(--eva-probes-transient);
 }
 
 .eva-probes .eva-transient.eva-focused {
-    background: orange;
+    background: var(--eva-probes-transient-focused);
 }
 
 
 /* --- Values / Callstacks --- */
 
 .eva-values .eva-cell {
-    background: #eee;
-}
-
-.eva-values .eva-focused {
-    background: #e1e8f7;
-}
-
-.eva-values .eva-transient.eva-focused {
-    background: #fff0d5;
+    background: var(--background-alterning-odd);
 }
 
 .eva-callstack.eva-row-odd .eva-cell {
-    background: #eee;
+    background: var(--background-alterning-odd);
 }
 
 .eva-callstack.eva-row-even .eva-cell {
-    background: #e2e8e8;
+    background: var(--background-alterning-even);
 }
 
 .eva-callstack.eva-row-aligned {
-    background: lightblue;
+    background: var(--grid-layout-holder);
 }
 
 .eva-callstack.eva-row-selected {
-    background: #f9dca6;
+    background: var(--code-select);
 }
 
 /* -------------------------------------------------------------------------- */

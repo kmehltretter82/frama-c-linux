@@ -53,19 +53,19 @@ body {
 }
 
 .dome-color-dragzone:hover {
-    background: #808080 ;
-    opacity: 0.2 ;
+    background: var(--grid-layout-holder) ;
+    opacity: 0.4 ;
     transition: opacity .1s linear 0.1s , background .1s linear 0.1s ;
 }
 
 .dome-color-dragging {
-    background: #64b4f0 ;
+    background: var(--grid-layout-target) ;
     opacity: 0.5 ;
     transition: opacity .1s linear 0.1s , background .1s linear 0.1s ;
 }
 
 div.dome-dragged {
-    background: lightblue ;
+    background: var(--grid-layout-holder) ;
     border: none ;
 }
 

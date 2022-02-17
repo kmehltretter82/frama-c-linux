@@ -78,9 +78,14 @@ export interface ThemeControls {
   wrapText: boolean;
 }
 
-export function useThemeButtons(props: ThemeProps): ThemeControls {
+export function useThemeColors() {
   const [themeColors] = Settings.useGlobalSettings(ColorTheme);
-  const theme = themeColors === 'dark' ? 'dark-code' : 'default';
+  return themeColors === 'dark' ? 'dark-code' : 'default';
+}
+
+export function useThemeButtons(props: ThemeProps): ThemeControls {
+  // const [themeColors] = Settings.useGlobalSettings(ColorTheme);
+  // const theme = themeColors === 'dark' ? 'dark-code' : 'default';
   const [fontSize, setFontSize] = Settings.useGlobalSettings(props.fontSize);
   const [wrapText, setWrapText] = Settings.useGlobalSettings(props.wrapText);
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
@@ -88,7 +93,7 @@ export function useThemeButtons(props: ThemeProps): ThemeControls {
   const flipWrapText = () => setWrapText(!wrapText);
   const { disabled = false } = props;
   return {
-    theme,
+    theme: useThemeColors(),
     fontSize,
     wrapText,
     buttons: [

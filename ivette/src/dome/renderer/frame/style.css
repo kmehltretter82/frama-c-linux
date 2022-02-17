@@ -494,9 +494,7 @@
 }
 
 .dome-xSwitch input {
-  opacite: 0;
-  width: 0;
-  height: 0;
+  visibility: hidden;
 }
 
 .dome-xSwitch-slider {
@@ -525,14 +523,6 @@
   transition: .4s;
   border-radius: 50%;
 }
-
-/* input:checked + .dome-xSwitch-slider { */
-/*   background-color: #2196F3; */
-/* } */
-
-/* input:focus + .dome-xSwitch-slider { */
-/*   box-shadow: 0 0 1px #2196F3; */
-/* } */
 
 input:checked + .dome-xSwitch-slider:before {
   -webkit-transform: translateX(13px);

@@ -35,8 +35,6 @@
 /* --- Extensibility                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-/* TODO: Find why it does not work on my computer */
-
 .dome-xBoxes-pack
 {
     flex: 0 0 auto ;
@@ -57,16 +55,6 @@
 {
     flex: 1 1 auto ;
     overflow: auto ;
-}
-
-.dome-xBoxes-scroll::-webkit-scrollbar-track {
-  background: orange;
-}
-
-.dome-xBoxes-scroll::-webkit-scrollbar-thumb {
-  background-color: blue;
-  border-radius: 20px;
-  border: 3px solid orange;
 }
 
 .dome-container > .dome-xBoxes-fill

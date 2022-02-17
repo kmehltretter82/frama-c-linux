@@ -27,6 +27,7 @@
 import React from 'react';
 import * as States from 'frama-c/states';
 import * as Utils from 'frama-c/utils';
+import * as Preferences from 'ivette/prefs';
 
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
@@ -65,7 +66,7 @@ export default function ASTinfo(): JSX.Element {
         <Text
           buffer={buffer}
           mode="text"
-          theme="default"
+          theme={Preferences.useThemeColors()}
           onSelection={onTextSelection}
           readOnly
         />

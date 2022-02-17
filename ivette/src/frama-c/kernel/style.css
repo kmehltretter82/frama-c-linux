@@ -66,15 +66,6 @@
     display: none; /* Hide label, only use placeholder */
 }
 
-.message-search input::placeholder {
-    font-style: italic;
-}
-
-.message-search input {
-    vertical-align: middle;
-    margin: 2px 4px 2px 0px;
-}
-
 .message-search .dome-xForm-field {
     margin: 0px 4px;
     display: inline-block;

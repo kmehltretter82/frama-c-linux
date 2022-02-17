@@ -39,19 +39,19 @@
     margin: 1px ;
     padding: 1px 6px 1px 6px ;
     height: 16px ;
-    fill: #dedede ;
-    color: #dedede ;
+    fill: var(--background-intense) ;
+    color: var(--background-intense) ;
     font-family: sans-serif ;
     font-size: smaller ;
     font-weight: bold ;
     border-radius: 8px ;
-    background: #777 ;
+    background: var(--info-text) ;
 }
 
 .dome-disabled .dome-xBadge {
-    background: #ccc ;
-    color: #eee ;
-    fill: #eee ;
+    background: var(--background-profound) ;
+    color: var(--background-intense) ;
+    fill: var(--background-intense) ;
 }
 
 .dome-xBadge label {
@@ -67,8 +67,8 @@
 }
 
 .dome-control-disabled {
-    color: #b0b0b0 ;
-    fill: #b0b0b0 ;
+    color: var(--disabled-text) ;
+    fill: var(--disabled-text) ;
     font-weight: lighter ;
 }
 
@@ -257,16 +257,16 @@
 
 .dome-xButton-lcd {
     text-align: right ;
-    color: #61611a ;
-    background-color: #b2b798 ;
-    border-color: #c2c0c2 ;
+    color: var(--lcd-button-color) ;
+    background-color: var(--lcd-button-background) ;
+    border-color: var(--border) ;
 }
 
 .dome-xButton-led {
     display: inline ;
     position: relative ;
     bottom: -2px ;
-    border-color: #999 ;
+    border-color: var(--border) ;
     border-style: solid ;
     border-width: 1px ;
     border-radius: 50% ;
@@ -281,51 +281,44 @@
 }
 
 .dome-xButton-led-active {
-    background: radial-gradient( circle at center , #9fd2f9 , #81c9ff );
+    background: var(--default-led-img);
 }
 
 .dome-xButton-led-positive {
-    background: radial-gradient( circle at center , #50c140, #279c16 );
+    background: var(--positive-led-img);
 }
 
 .dome-xButton-led-negative {
-    background: radial-gradient( circle at center , #ff5b56 , #f75a55c7 );
+    background: var(--negative-led-img);
 }
 
 .dome-xButton-led-warning {
-    background: radial-gradient( circle at center , #ffc749 , #ecd44f );
+    background: var(--warning-led-img);
 }
 
 /* -------------------------------------------------------------------------- */
 /* --- Styling Meters                                                     --- */
 /* -------------------------------------------------------------------------- */
 
-
-meter.dome-xMeter {
-    background: white;
-    border-radius: 5px;
-    box-shadow:
-        0 0 4px 4px rgba(0,0,0,0.15) inset;
-    height: 16px;
-    width: 70px;
+meter::-webkit-meter-bar {
+  height: 14px;
+  width: 70px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: none;
+  box-shadow: 0px 3px 2px -3px var(--text) inset;
 }
 
-meter.dome-xMeter::-webkit-meter-bar {
-    background: transparent;
-    border-radius: 5px;
-    height: 14px;
+meter::-webkit-meter-optimum-value {
+  background: var(--meter-optimum);
 }
 
-meter.dome-xMeter::-webkit-meter-optimum-value {
-    background: linear-gradient(to bottom, #4a0 0%, #8f0 20%, #4a0 100%);
+meter::-webkit-meter-suboptimum-value {
+  background: var(--meter-subopti);
 }
 
-meter.dome-xMeter::-webkit-meter-suboptimum-value {
-    background: linear-gradient(to bottom, #aa0 0%, #ff0 20%, #aa0 100%);
-}
-
-meter.dome-xMeter::-webkit-meter-even-less-good-value  {
-    background: linear-gradient(to bottom, #a40 0%, #f80 20%, #a40 100%);
+meter::-webkit-meter-even-less-good-value  {
+  background: var(--meter-evenless);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -361,22 +354,25 @@ meter.dome-xMeter::-webkit-meter-even-less-good-value  {
     background: transparent ;
 }
 
-.dome-xIconButton:hover { fill: #000 ; background: #c0c0c0 ; }
+.dome-xIconButton:hover {
+  fill: var(--text) ;
+  background: var(--background-profound-hover) ;
+}
 
-.dome-xIconButton-default { fill: #777 ; }
+.dome-xIconButton-default { fill: var(--info-text) ; }
 
-.dome-xIconButton-selected:not(:hover) { fill: #449bef ; }
-.dome-xIconButton-selected:hover { fill: #c54dae ; }
+.dome-xIconButton-selected:not(:hover) { fill: var(--activated-button-color) ; }
+.dome-xIconButton-selected:hover { fill: var(--activated-button-hover) ; }
 
-.dome-xIconButton-positive { fill: #279c16 ; }
+.dome-xIconButton-positive { fill: var(--positive-button-color) ; }
 
-.dome-xIconButton-negative { fill: #fb3832 ; }
+.dome-xIconButton-negative { fill: var(--negative-button-color) ; }
 
-.dome-xIconButton-warning { fill: orange ; }
+.dome-xIconButton-warning { fill: var(--warning-button-color) ; }
 
 .dome-xIconButton.dome-control-disabled,
 .dome-xIconButton.dome-control-disabled:hover {
-    fill: #aeafae ;
+    fill: var(--disabled-text) ;
     background: inherit ;
 }
 

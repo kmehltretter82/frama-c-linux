@@ -49,6 +49,9 @@
 
 .cm-s-dark-code .CodeMirror-activeline-background { background: var(--background); }
 .cm-s-dark-code .CodeMirror-matchingbracket { background: #928374; color:#282828 !important; }
+.cm-s-dark-code .CodeMirror-scrollbar-filler {
+  background-color: var(--background-profound);
+}
 
 .cm-s-dark-code span.cm-builtin { color: #fe8039; }
 .cm-s-dark-code span.cm-tag { color: #fe8039; }

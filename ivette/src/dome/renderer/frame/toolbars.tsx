@@ -164,12 +164,8 @@ export function Switch(props: SwitchProps) {
   const checked = position ? position === 'right' : undefined;
   return (
     <label className={'dome-xSwitch'}>
-      <input type={'checkbox'} checked={checked}/>
-      <span
-        className={'dome-xSwitch-slider'}
-        title={title}
-        onClick={onClick}
-      />
+      <input type={'checkbox'} checked={checked} onChange={onClick} />
+      <span className={'dome-xSwitch-slider'} title={title} />
     </label>
   );
 }
