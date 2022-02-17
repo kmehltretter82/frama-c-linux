@@ -82,9 +82,11 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 
 SERVER_API= \
 	package.mli \
+	jbuffer.mli \
 	data.mli \
 	request.mli \
 	states.mli \
+	main.mli \
 	kernel_main.mli \
 	kernel_ast.mli \
 	kernel_properties.mli
