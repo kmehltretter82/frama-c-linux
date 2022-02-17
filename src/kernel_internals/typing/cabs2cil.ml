@@ -84,7 +84,11 @@ end
 
 let func_locs () = FuncLocs.get ()
 
-let stripUnderscore s =
+(* Attributes which are entirely unsupported by Frama-C and must cause a
+   parsing error, since their behavior requires non-standard parsing *)
+let unsupported_attributes = ["vector_size"]
+
+let stripUnderscore ?(checkUnsupported=true) s =
   if String.length s = 1 then begin
     if s = "_" then
       Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
@@ -93,6 +97,8 @@ let stripUnderscore s =
     let res = Extlib.strip_underscore s in
     if res = "" then
       Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+    if checkUnsupported && List.mem res unsupported_attributes then
+      Kernel.error ~current:true "unsupported attribute: %s" s;
     res
   end
 
@@ -4124,7 +4130,6 @@ let continueUsed () =
   match !continues with
   | [] -> Kernel.fatal ~current:true "not in a loop"
   | (While lr | NotWhile lr) :: _ -> !lr <> ""
-
 
 (****** TYPE SPECIFIERS *******)
 
