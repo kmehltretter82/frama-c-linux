@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ##################################
 
+*   Kernel    [2022-02-17] Reject programs using unsupported
+              vector_size attribute (fixes ##2573)
 *   Kernel    [2022-02-08] Reject array whose size is too big with a proper
               error message instead of a crash (fixes ##2590)
 o!  Kernel    [2022-01-19] Removed obsolete AST nodes IndexPI and Info
