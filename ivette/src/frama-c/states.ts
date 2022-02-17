@@ -39,7 +39,7 @@ import { Order } from 'dome/data/compare';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
-import * as Ast from 'frama-c/api/kernel/ast';
+import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
 
 const PROJECT = new Dome.Event('frama-c.project');
@@ -448,7 +448,7 @@ function lookupSyncArray<K, A>(
   array: Array<K, A>,
 ): SyncArray<K, A> {
   const id = `${currentProject}@${array.name}`;
-  let st = syncArrays.get(id) as SyncArray<K,A> | undefined;
+  let st = syncArrays.get(id) as SyncArray<K, A> | undefined;
   if (!st) {
     st = new SyncArray(array);
     syncArrays.set(id, st as SyncArray<unknown, unknown>);

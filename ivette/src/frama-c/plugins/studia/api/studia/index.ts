@@ -25,7 +25,7 @@
 /**
    Studia
    @packageDocumentation
-   @module frama-c/api/plugins/studia/studia
+   @module frama-c/plugins/studia/api/studia
 */
 
 //@ts-ignore
@@ -38,13 +38,13 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byMarker } from 'frama-c/api/kernel/ast';
+import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarker } from 'frama-c/api/kernel/ast';
+import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'frama-c/api/kernel/ast';
+import { jMarkerSafe } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { marker } from 'frama-c/api/kernel/ast';
+import { marker } from 'frama-c/kernel/api/ast';
 
 /** Statements that read or write a location. */
 export interface effects {

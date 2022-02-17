@@ -44,10 +44,10 @@ import { Scroll, Folder } from 'dome/layout/boxes';
 
 import { RSplit } from 'dome/layout/splitters';
 
-import * as Ast from 'frama-c/api/kernel/ast';
-import { statusData } from 'frama-c/api/kernel/properties';
-import * as Properties from 'frama-c/api/kernel/properties';
-import * as Eva from 'frama-c/api/plugins/eva/general';
+import * as Ast from 'frama-c/kernel/api/ast';
+import { statusData } from 'frama-c/kernel/api/properties';
+import * as Properties from 'frama-c/kernel/api/properties';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 
 type Property = statusData & Eva.propertiesData;
 

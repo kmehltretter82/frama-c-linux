@@ -25,7 +25,7 @@
 /**
    Ast Services
    @packageDocumentation
-   @module frama-c/api/kernel/ast
+   @module frama-c/kernel/api/ast
 */
 
 //@ts-ignore
@@ -38,21 +38,21 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byTag } from 'frama-c/api/kernel/data';
+import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { byText } from 'frama-c/api/kernel/data';
+import { byText } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTag } from 'frama-c/api/kernel/data';
+import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTagSafe } from 'frama-c/api/kernel/data';
+import { jTagSafe } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jText } from 'frama-c/api/kernel/data';
+import { jText } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTextSafe } from 'frama-c/api/kernel/data';
+import { jTextSafe } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { tag } from 'frama-c/api/kernel/data';
+import { tag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { text } from 'frama-c/api/kernel/data';
+import { text } from 'frama-c/kernel/api/data';
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,

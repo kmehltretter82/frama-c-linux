@@ -33,7 +33,7 @@ import * as Dome from 'dome';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import * as Values from 'frama-c/api/plugins/eva/values';
+import * as Values from 'frama-c/plugins/eva/api/values';
 
 // Model
 import { Probe } from './probes';

@@ -23,9 +23,9 @@
 /* --- Generated Frama-C Server API --- */
 
 /**
-   Pivot Table Services
+   Informations
    @packageDocumentation
-   @module frama-c/api/plugins/pivot/general
+   @module frama-c/kernel/api/data
 */
 
 //@ts-ignore
@@ -38,52 +38,59 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 
-/** State of the pivot table source data. */
-export type tableStateType = string[][];
+/** Markdown (inlined) text. */
+export type markdown = string;
 
-/** Safe decoder for `tableStateType` */
-export const jTableStateTypeSafe: Json.Safe<tableStateType> =
-  Json.jArray(Json.jArray(Json.jFail(Json.jString,'String expected')));
+/** Loose decoder for `markdown` */
+export const jMarkdown: Json.Loose<markdown> = Json.jString;
 
-/** Loose decoder for `tableStateType` */
-export const jTableStateType: Json.Loose<tableStateType> =
-  Json.jTry(jTableStateTypeSafe);
+/** Safe decoder for `markdown` */
+export const jMarkdownSafe: Json.Safe<markdown> =
+  Json.jFail(Json.jString,'String expected');
 
-/** Natural order for `tableStateType` */
-export const byTableStateType: Compare.Order<tableStateType> =
-  Compare.array(Compare.array(Compare.string));
+/** Natural order for `markdown` */
+export const byMarkdown: Compare.Order<markdown> = Compare.string;
 
-/** Signal for state [`pivotState`](#pivotstate)  */
-export const signalPivotState: Server.Signal = {
-  name: 'plugins.pivot.general.signalPivotState',
-};
+/** Rich text format uses `[tag; …text ]` to apply the tag `tag` to the enclosed text. Empty tag `""` can also used to simply group text together. */
+export type text = null | string | text[];
 
-const getPivotState_internal: Server.GetRequest<null,tableStateType> = {
-  kind: Server.RqKind.GET,
-  name:   'plugins.pivot.general.getPivotState',
-  input:  Json.jNull,
-  output: jTableStateType,
-  signals: [],
-};
-/** Getter for state [`pivotState`](#pivotstate)  */
-export const getPivotState: Server.GetRequest<null,tableStateType>= getPivotState_internal;
+/** Loose decoder for `text` */
+export const jText: Json.Loose<text> =
+  (_x: any) => Json.jUnion<null | string | text[]>(
+                 Json.jNull,
+                 Json.jString,
+                 Json.jList(jText),
+               )(_x);
 
-const pivotState_internal: State.Value<tableStateType> = {
-  name: 'plugins.pivot.general.pivotState',
-  signal: signalPivotState,
-  getter: getPivotState,
-};
-/** State of the pivot table source data. */
-export const pivotState: State.Value<tableStateType> = pivotState_internal;
+/** Safe decoder for `text` */
+export const jTextSafe: Json.Safe<text> =
+  (_x: any) => Json.jFail(jText,'Text expected')(_x);
 
-const compute_internal: Server.ExecRequest<null,null> = {
-  kind: Server.RqKind.EXEC,
-  name:   'plugins.pivot.general.compute',
-  input:  Json.jNull,
-  output: Json.jNull,
-  signals: [],
-};
-/** Computes the pivot table. */
-export const compute: Server.ExecRequest<null,null>= compute_internal;
+/** Natural order for `text` */
+export const byText: Compare.Order<text> =
+  (_x: any, _y: any) => Compare.structural(_x,_y);
+
+/** Enum Tag Description */
+export type tag = { name: string, label: markdown, descr: markdown };
+
+/** Loose decoder for `tag` */
+export const jTag: Json.Loose<tag> =
+  Json.jObject({
+    name: Json.jFail(Json.jString,'String expected'),
+    label: jMarkdownSafe,
+    descr: jMarkdownSafe,
+  });
+
+/** Safe decoder for `tag` */
+export const jTagSafe: Json.Safe<tag> = Json.jFail(jTag,'Tag expected');
+
+/** Natural order for `tag` */
+export const byTag: Compare.Order<tag> =
+  Compare.byFields
+    <{ name: string, label: markdown, descr: markdown }>({
+    name: Compare.alpha,
+    label: byMarkdown,
+    descr: byMarkdown,
+  });
 
 /* ------------------------------------- */
