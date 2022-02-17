@@ -144,11 +144,6 @@ let check_sequences file =
        | _ -> ());
       Cil.DoChildren
 
-    (* Optimization: only visits function definitions. *)
-    method! vglob = function
-      | GFun _ -> Cil.DoChildren
-      | _ -> Cil.SkipChildren
-
     method! vinst _ = SkipChildren
     method! vexpr _ = SkipChildren
     method! vlval _ = SkipChildren
@@ -157,4 +152,4 @@ let check_sequences file =
     method! vcode_annot _ = SkipChildren
   end
   in
-  Cil.visitCilFileSameGlobals check_unspec file
+  Cil.visitCilFileFunctions check_unspec file

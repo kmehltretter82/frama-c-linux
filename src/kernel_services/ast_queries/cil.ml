@@ -5365,6 +5365,13 @@ let visitCilFileSameGlobals (vis : cilVisitor) (f : file) : unit =
     ignore
       (doVisitCil vis (Visitor_behavior.cfile vis#behavior) (post_file vis) childrenFileSameGlobals f)
 
+let visitCilFileFunctions vis file =
+  let process_one_global = function
+    | GFun (fundec, _) -> ignore (visitCilFunction vis fundec)
+    | _ -> ()
+  in
+  iterGlobals file process_one_global
+
 let childrenFileCopy vis f =
   let fGlob g = visitCilGlobal vis g in
   (* Scan the globals. Make sure this is tail recursive. *)
