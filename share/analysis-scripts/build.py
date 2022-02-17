@@ -107,7 +107,6 @@ if not blug:
         sys.exit("error: path to 'blug' binary must be in PATH or variable BLUG")
 blug = Path(blug)
 blug_dir = blug.resolve().parent
-blug_print = blug_dir / "blug-print"
 # to import blug_jbdb
 sys.path.insert(0, blug_dir.as_posix())
 import blug_jbdb
@@ -199,7 +198,8 @@ def find_definitions(funcname, filename):
     file_content = source_filter.open_and_filter(filename, not under_test)
     file_lines = file_content.splitlines(keepends=True)
     newlines = function_finder.compute_newline_offsets(file_lines)
-    defs = function_finder.find_definitions_and_declarations(True, False, filename, file_content, file_lines, newlines, funcname)
+    defs = function_finder.find_definitions_and_declarations(
+        True, False, filename, file_content, file_lines, newlines, funcname)
     res = []
     for d in defs:
         defining_line = file_lines[d[2]-1]
@@ -213,6 +213,22 @@ def find_definitions(funcname, filename):
         res.append((d[2], has_args))
     return res
 
+def list_partition(f, l):
+    """Equivalent to OCaml's List.partition: returns 2 lists with the elements of l,
+    partitioned according to predicate f."""
+    l1 = []
+    l2 = []
+    for e in l:
+        if f(l):
+            l1.append(e)
+        else:
+            l2.append(e)
+    return l1, l2
+
+def pp_list(l):
+    """Applies prettify to a list of sources/targets and sorts the result."""
+    return sorted([prettify(e) for e in l])
+
 # End of auxiliary functions ##################################################
 
 sources_map = dict()
@@ -220,34 +236,47 @@ if sources:
     if not targets:
         sys.exit("error: option --targets is mandatory when --sources is specified")
     if len(targets) > 1:
-        sys.exit("error: option --targets can only have a single target when --sources is specified")
-    sources_map[targets[0]] = [s for s in sources if blug_jbdb.filter_source(s)]
+        sys.exit("error: option --targets can only have a single target \
+        when --sources is specified")
+    sources_map[targets[0]] = sources
 elif os.path.isfile(jbdb_path):
     # JBDB exists
     with open(jbdb_path, "r") as data:
         jbdb = json.load(data)
     blug_jbdb.absolutize_jbdb(jbdb)
-    jbdb_targets = []
+    filter_source, filter_target = blug_jbdb.get_filters("c-programs")
+    # program_targets are those we prefer, and the only ones used in "automatic" mode;
+    # non_program_targets are only used if the user specified them in the command line.
+    program_targets = []
+    non_program_targets = []
     for f in jbdb:
-        jbdb_targets += [t for t in f["targets"] if blug_jbdb.filter_target(t)]
-    if not jbdb_targets:
+        programs, other_targets = list_partition(filter_target, f["targets"])
+        program_targets += programs
+        non_program_targets += other_targets
+    logging.debug("program_targets: %s", pp_list(program_targets))
+    logging.debug("non_program_targets: %s", pp_list(non_program_targets))
+    all_jbdb_targets = program_targets + non_program_targets
+    if not all_jbdb_targets:
         sys.exit(f"no targets found in JBDB ({jbdb_path})")
     if not targets:
-        # no targets specified in command line; use all from JBDB
-        targets = jbdb_targets
+        # no targets specified in command line; use all programs from JBDB
+        targets = program_targets
     logging.info("Computing sources for each target (%d target(s))...", len(targets))
-    unknown_targets = []
+    unknown_targets_from_cmdline = []
     graph = blug_jbdb.build_graph(jbdb)
     for target in targets:
-        if target not in jbdb_targets:
-            unknown_targets.append(target)
+        if target not in all_jbdb_targets:
+            unknown_targets_from_cmdline.append(target)
+            # do not return immediately; we want to report all invalid targets at once
         else:
-            if unknown_targets != []:
-                continue # already found a problem; avoid useless computations
-            sources = [s for s in blug_jbdb.collect_leaves(graph, [target]) if blug_jbdb.filter_source(s)]
-            sources_map[target] = sorted(sources)
-    if unknown_targets:
-        targets_pretty = "\n".join(unknown_targets)
+            if unknown_targets_from_cmdline != []:
+                continue # keep looping to accumulate all invalid targets, but avoid extra work
+            sources = blug_jbdb.collect_leaves(graph, [target])
+            c_sources, non_c_sources = list_partition(filter_source, sources)
+            logging.debug("non_c_sources: %s", pp_list(non_c_sources))
+            sources_map[target] = c_sources
+    if unknown_targets_from_cmdline:
+        targets_pretty = "\n".join(unknown_targets_from_cmdline)
         sys.exit("target(s) not found in JBDB:\n{targets_pretty}")
 else:
     if not jbdb_path:
@@ -255,13 +284,16 @@ else:
     else:
         sys.exit(f"error: invalid JBDB path: '{jbdb_path}'")
 
-logging.debug("sources_map: %s", sorted([prettify(k) + ": " + ', '.join(sorted([prettify(s) for s in v])) for (k, v) in sources_map.items()]))
-logging.debug("targets: %s", sorted([prettify(t) for t in targets]))
+logging.debug("sources_map: %s",
+              sorted([prettify(k) + ": " + ', '.join(pp_list(v))
+                      for (k, v) in sources_map.items()]))
+logging.debug("targets: %s", pp_list(targets))
 
 # check that source files exist
-unknown_sources = sorted({s for sources in sources_map.values() for s in sources if not s.exists()})
+unknown_sources = sorted({s for sources in sources_map.values()
+                          for s in sources if not s.exists()})
 if unknown_sources:
-    sys.exit("error: source(s) not found:\n" + "\n".join([prettify(s) for s in unknown_sources]))
+    sys.exit("error: source(s) not found:\n" + "\n".join(pp_list(unknown_sources)))
 
 # Check that the main function is defined exactly once per target.
 # note: this is only based on heuristics (and fails on a few real case studies),
@@ -276,9 +308,11 @@ for target, sources in sources_map.items():
         fundefs = find_definitions(main, source)
         main_definitions[target] += [(source, fundef[0], fundef[1]) for fundef in fundefs]
     if main_definitions[target] == []:
-        logging.warning("function '%s' seems to be never defined in the sources of target '%s'", main, prettify(target))
+        logging.warning("function '%s' seems to be never defined in the sources of target '%s'",
+                        main, prettify(target))
     elif len(main_definitions[target]) > 1:
-        logging.warning("function '%s' seems to be defined multiple times in the sources of target '%s':", main, prettify(target))
+        logging.warning("function '%s' seems to be defined multiple times in the sources of \
+        target '%s':", main, prettify(target))
         for (filename, line, _) in main_definitions[target]:
             print(f"- definition at {filename}:{line}")
 
@@ -302,7 +336,8 @@ if any_has_arguments:
     fc_stubs = copy_fc_stubs()
     for target in targets:
         if any(d[2] for d in main_definitions[target]):
-            logging.debug("target %s has main with args, adding fc_stubs.c to its sources", prettify(target))
+            logging.debug("target %s has main with args, adding fc_stubs.c to its sources",
+                          prettify(target))
             sources_map[target].insert(0, fc_stubs)
 
 gnumakefile = dot_framac_dir / "GNUmakefile"
@@ -312,11 +347,13 @@ template = lines_of_file(share_dir / "analysis-scripts" / "template.mk")
 if machdep:
     machdeps = fc_config['machdeps']
     if machdep not in machdeps:
-        logging.warning("unknown machdep (%s) not in Frama-C's default machdeps:\n%s", machdep, " ".join(machdeps))
+        logging.warning("unknown machdep (%s) not in Frama-C's default machdeps:\n%s",
+                        machdep, " ".join(machdeps))
     replace_line(template, "^MACHDEP = .*", f"MACHDEP = {machdep}")
 
 if jbdb_path:
-    insert_lines_after(template, "^FCFLAGS", [f"  -json-compilation-database {rel_prefix(jbdb_path)} \\"])
+    insert_lines_after(template, "^FCFLAGS",
+                       [f"  -json-compilation-database {rel_prefix(jbdb_path)} \\"])
 
 targets_eva = ([f"  {make_target_name(target)}.eva \\" for target in targets])
 replace_line(template, "^TARGETS = main.eva", "TARGETS = \\")
@@ -328,7 +365,8 @@ for target, sources in reversed(sources_map.items()):
     pp_target = make_target_name(target)
     new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + [""]
     if any(d[2] for d in main_definitions[target]):
-        logging.debug("target %s has main with args, adding -main eva_main to its FCFLAGS", prettify(target))
+        logging.debug("target %s has main with args, adding -main eva_main to its FCFLAGS",
+                      prettify(target))
         new_lines += [f"{pp_target}.parse: FCFLAGS += -main eva_main", ""]
     insert_lines_after(template, "^### Each target <t>.eva", new_lines)
 
