@@ -37,6 +37,7 @@
 #include "dirent.h"
 #include "dlfcn.h"
 #include "endian.h"
+#include "err.h"
 #include "errno.h"
 #include "fcntl.h"
 #include "features.h"

@@ -237,6 +237,7 @@ share/libc/ctype.h: CEA_LGPL
 share/libc/dirent.h: CEA_LGPL
 share/libc/dlfcn.h: CEA_LGPL
 share/libc/endian.h: CEA_LGPL
+share/libc/err.h: CEA_LGPL
 share/libc/errno.c: CEA_LGPL
 share/libc/errno.h: CEA_LGPL
 share/libc/fcntl.h: CEA_LGPL
