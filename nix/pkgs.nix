@@ -6,6 +6,7 @@ let
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
     # Tests
+    main-tests = oself.callPackage ./main-tests.nix {};
   };
   overlay = self: super: {
     niv = (import sources.niv {}).niv;

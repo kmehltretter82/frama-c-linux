@@ -63,6 +63,8 @@ stdenv.mkDerivation rec {
     python3
   ];
 
+  outputs = [ "out" "build_dir" ];
+
   preConfigure = ''
     autoconf
   '';
@@ -70,6 +72,12 @@ stdenv.mkDerivation rec {
   installFlags = [
     "FRAMAC_INSTALLDIR=$(out)"
   ];
+
+  postInstall = ''
+    mkdir -p $build_dir
+    tar -cf $build_dir/dir.tar .
+    pwd > $build_dir/old_pwd
+  '';
 
   meta = {
     description = "An extensible and collaborative platform dedicated to source-code analysis of C software";
