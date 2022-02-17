@@ -40,6 +40,30 @@ sig
   val iter: ?kf:kernel_function -> init:bool -> (varinfo -> unit) -> unit
 end
 
+module Raw : VarUsage =
+struct
+  let datatype = "Raw"
+  let param _x = MemoryContext.ByValue
+  let iter ?kf ~init f =
+    begin
+      ignore init ;
+      Globals.Vars.iter (fun x _initinfo -> f x) ;
+      match kf with
+      | None -> ()
+      | Some kf -> List.iter f (Kernel_function.get_formals kf) ;
+    end
+end
+
+module Static : VarUsage =
+struct
+  let datatype = "Static"
+  let param x =
+    let open Cil_types in
+    if x.vaddrof || Cil.isArrayType x.vtype || Cil.isPointerType x.vtype
+    then MemoryContext.ByAddr else MemoryContext.ByValue
+  let iter = Raw.iter
+end
+
 module Make(V : VarUsage)(M : Sigs.Model) =
 struct
 

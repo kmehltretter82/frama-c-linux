@@ -34,4 +34,12 @@ sig
 
 end
 
+(** VarUsage naive instance.
+    It reports a by-value access for all variables. *)
+module Raw : VarUsage
+
+(** VarUsage that uses only Cil-Static infos. *)
+module Static : VarUsage
+
+(** Create a mixed Hoare Memory Model from VarUsage instance. *)
 module Make(V : VarUsage)(M : Sigs.Model) : Sigs.Model
