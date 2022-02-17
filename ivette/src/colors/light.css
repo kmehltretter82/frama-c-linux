@@ -89,7 +89,7 @@
     --eva-probes-pinned: #cbe4cb;
     --eva-probes-pinned-focused: #02da02;
     --eva-probes-transient: #fff0d5;
-    --eva-probes-transient-focused: orange
+    --eva-probes-transient-focused: orange;
     --eva-alarms-true: green;
     --eva-alarms-false: #fb4e4a;
     --eva-alarms-unknown: darkorange;
