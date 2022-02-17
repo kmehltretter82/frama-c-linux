@@ -239,6 +239,11 @@ val as_zone_result : address evaluation -> Locations.Zone.t result
 
 (** Evaluation properties *)
 
+
+(** Does the evaluated abstraction represents only one possible C value or
+    memory location? *)
+val is_singleton : 'a evaluation -> bool
+
 (** Returns whether the evaluated value is initialized or not. If the value have
     been evaluated from a Cil expression, it is always initialized. *)
 val is_initialized : value evaluation -> bool
