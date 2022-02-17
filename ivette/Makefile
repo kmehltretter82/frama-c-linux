@@ -72,6 +72,8 @@ $(LOADER): $(PACKAGES) ./configure.js ./Makefile
 # --- Frama-C Source Distrib
 # --------------------------------------------------------------------------
 
+.PHONY: update-distrib-files update-distrib-plugins
+
 SRC_DISTRIB=Makefile.distrib
 SRC_HEADERS=headers/header_spec.txt
 
@@ -81,8 +83,23 @@ update-distrib-files:
 	@rm -f $(SRC_HEADERS)
 	@for f in `git ls-files .` ;\
 	 do \
-		echo "DISTRIB_FILES += ivette/$$f" >> $(SRC_DISTRIB) ;\
-		headers/register.sh "$$f" >> $(SRC_HEADERS) ; \
+	   echo "DISTRIB_FILES += ivette/$$f" >> $(SRC_DISTRIB) ;\
+	   headers/register.sh "$$f" >> $(SRC_HEADERS) ; \
+	 done
+	@chmod a-w $(SRC_DISTRIB)
+	@chmod a-w $(SRC_HEADERS)
+
+update-distrib-plugins: update-distrib-files
+	@chmod a+w $(SRC_DISTRIB)
+	@chmod a+w $(SRC_HEADERS)
+	@for repo in `find . -type d -name ".git"` ;\
+	 do \
+	   echo "Distributing $$repo" ;\
+	   for f in `git -C $$repo ls-files .` ;\
+	   do \
+	     echo "DISTRIB_FILES += ivette/$$f" >> $(SRC_DISTRIB) ;\
+	     headers/register.sh "$$f" >> $(SRC_HEADERS) ; \
+	   done \
 	 done
 	@chmod a-w $(SRC_DISTRIB)
 	@chmod a-w $(SRC_HEADERS)
