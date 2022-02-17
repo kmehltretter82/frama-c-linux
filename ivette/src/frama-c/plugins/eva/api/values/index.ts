@@ -25,7 +25,7 @@
 /**
    Eva Values
    @packageDocumentation
-   @module frama-c/api/plugins/eva/values
+   @module frama-c/plugins/eva/api/values
 */
 
 //@ts-ignore
@@ -38,13 +38,13 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byMarker } from 'frama-c/api/kernel/ast';
+import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarker } from 'frama-c/api/kernel/ast';
+import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'frama-c/api/kernel/ast';
+import { jMarkerSafe } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { marker } from 'frama-c/api/kernel/ast';
+import { marker } from 'frama-c/kernel/api/ast';
 
 /** Emitted when EVA results has changed */
 export const changed: Server.Signal = {

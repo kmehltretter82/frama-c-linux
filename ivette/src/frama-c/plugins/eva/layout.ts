@@ -24,7 +24,7 @@
 /* --- Layout                                                             ---*/
 /* --------------------------------------------------------------------------*/
 
-import { callstack } from 'frama-c/api/plugins/eva/values';
+import { callstack } from 'frama-c/plugins/eva/api/values';
 import { Probe } from './probes';
 import { StacksCache } from './stacks';
 import { Size, EMPTY, leq, addH, ValueCache } from './cells';

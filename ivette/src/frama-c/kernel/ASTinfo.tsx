@@ -31,7 +31,7 @@ import * as Utils from 'frama-c/utils';
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { getInfo } from 'frama-c/api/kernel/ast';
+import { getInfo } from 'frama-c/kernel/api/ast';
 
 // --------------------------------------------------------------------------
 // --- Information Panel

@@ -25,7 +25,7 @@
 /**
    Eva General Services
    @packageDocumentation
-   @module frama-c/api/plugins/eva/general
+   @module frama-c/plugins/eva/api/general
 */
 
 //@ts-ignore
@@ -38,21 +38,21 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byMarker } from 'frama-c/api/kernel/ast';
+import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarker } from 'frama-c/api/kernel/ast';
+import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'frama-c/api/kernel/ast';
+import { jMarkerSafe } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { marker } from 'frama-c/api/kernel/ast';
+import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { byTag } from 'frama-c/api/kernel/data';
+import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTag } from 'frama-c/api/kernel/data';
+import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTagSafe } from 'frama-c/api/kernel/data';
+import { jTagSafe } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { tag } from 'frama-c/api/kernel/data';
+import { tag } from 'frama-c/kernel/api/data';
 
 /** State of the computation of Eva Analysis. */
 export type computationStateType = "not_computed" | "computing" | "computed";
