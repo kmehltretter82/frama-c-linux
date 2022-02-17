@@ -1,0 +1,29 @@
+let
+  sources = import ./sources.nix {};
+  ocamlOverlay = oself: osuper: {
+    # External Packages
+    why3 = oself.callPackage ./why3.nix {};
+    # Builds
+    frama-c = oself.callPackage ./frama-c.nix {};
+    # Tests
+  };
+  overlay = self: super: {
+    niv = (import sources.niv {}).niv;
+    ocaml-ng = super.lib.mapAttrs (
+      name: value:
+        if builtins.hasAttr "overrideScope'" value
+        then value.overrideScope' ocamlOverlay
+        else value
+    ) super.ocaml-ng;
+    inherit (super.callPackage sources."gitignore.nix" {}) gitignoreSource;
+    why3 = throw "don't use pkgs.why3 but ocaml-ng.ocamlPackages_4_XX.why3";
+    framac = throw "don't use pkgs.framac but ocaml-ng.ocamlPackages_4_XX.frama-c";
+    frama-c = throw "don't use pkgs.framac but ocaml-ng.ocamlPackages_4_XX.frama-c";
+  };
+  pkgs = import sources.nixpkgs {
+    # alt-ergo
+    config.allowUnfree = true;
+    overlays = [ overlay ];
+  };
+in
+pkgs

@@ -5,11 +5,17 @@ stages:
  - distrib_and_compatibility
  - make_public
 
-variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
-    OCAML: "4_08"
+################################################################################
+### VARIABLES (todo)
+
+# variables:
+#     CURRENT: $CI_COMMIT_REF_NAME
+#     DEFAULT: "master"
+#     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+#     OCAML: "4_08"
+
+################################################################################
+### GIT UPDATE
 
 check-no-old-frama-c:
   stage: git-update
@@ -23,14 +29,17 @@ check-no-old-frama-c:
 git-update:
   stage: git-update
   script:
-   - nix/frama-ci.sh instantiate --eval -A frama-c.src.outPath
+   - nix-instantiate --eval nix/pkgs.nix -A ocamlPackages.frama-c.src.outPath
   tags:
    - nix
+
+################################################################################
+### BUILD
 
 frama-c:
   stage: build
   script:
-   - nix/frama-ci.sh build -A frama-c.main
+   - nix-build nix/pkgs.nix -A ocamlPackages.frama-c
   artifacts:
     when: on_failure
     paths:
@@ -40,196 +49,205 @@ frama-c:
   tags:
    - nix
 
-lint:
-  stage: build
-  script:
-   - nix/frama-ci.sh build -A frama-c.lint
-  coverage: '/lint coverage: \d+\.\d+/'
-  tags:
-   - nix
+################################################################################
+### TESTS
 
-tests:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A frama-c.tests
-  tags:
-   - nix
+################################################################################
+### DISTRIB
 
-wp-qualif:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A frama-c.wp-qualif
-  tags:
-   - nix
-  allow_failure: true
+################################################################################
+### PUBLIC
 
-aorai-prove:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A frama-c.aorai-prove
-  tags:
-   - nix
-  allow_failure: true
+# lint:
+#   stage: build
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.lint
+#   coverage: '/lint coverage: \d+\.\d+/'
+#   tags:
+#    - nix
 
-genassigns:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A genassigns.tests
-  tags:
-   - nix
+# tests:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.tests
+#   tags:
+#    - nix
 
-frama-clang:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A frama-clang.tests
-  tags:
-   - nix
+# wp-qualif:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.wp-qualif
+#   tags:
+#    - nix
+#   allow_failure: true
 
-counter-examples:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A counter-examples.tests
-  tags:
-   - nix
+# aorai-prove:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.aorai-prove
+#   tags:
+#    - nix
+#   allow_failure: true
 
-acsl-importer:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A acsl-importer.tests
-  tags:
-   - nix
+# genassigns:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A genassigns.tests
+#   tags:
+#    - nix
 
-volatile:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A volatile.tests
-  tags:
-   - nix
+# frama-clang:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A frama-clang.tests
+#   tags:
+#    - nix
 
-metacsl:
-  stage: tests
-  script:
-  - nix/frama-ci.sh build -A meta.tests
-  tags:
-  - nix
+# counter-examples:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A counter-examples.tests
+#   tags:
+#    - nix
 
-Security:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A security.tests
-  tags:
-   - nix
+# acsl-importer:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A acsl-importer.tests
+#   tags:
+#    - nix
 
-CFP:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A context-from-precondition.tests
-  tags:
-   - nix
+# volatile:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A volatile.tests
+#   tags:
+#    - nix
 
-eva-tests:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A frama-c.eva-tests
-  tags:
-   - nix
-  allow_failure: true
+# metacsl:
+#   stage: tests
+#   script:
+#   - nix/frama-ci.sh build -A meta.tests
+#   tags:
+#   - nix
 
-build-distrib-tarball:
-  stage: build
-  script:
-   - nix/frama-ci.sh build -A frama-c.build-distrib-tarball
-  tags:
-   - nix
+# Security:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A security.tests
+#   tags:
+#    - nix
 
-build-from-distrib-tarball:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A frama-c.build-from-distrib-tarball
-  tags:
-   - nix
+# CFP:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A context-from-precondition.tests
+#   tags:
+#    - nix
 
-doc:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A frama-c.doc
-  tags:
-   - nix
-  allow_failure: true
+# eva-tests:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.eva-tests
+#   tags:
+#    - nix
+#   allow_failure: true
 
-.build_template: &internal_template
-  stage: distrib_and_compatibility
-  tags:
-   - nix
+# build-distrib-tarball:
+#   stage: build
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.build-distrib-tarball
+#   tags:
+#    - nix
 
-internal:
-  <<: *internal_template
-  script:
-   - nix/frama-ci.sh build -A frama-c.internal
-  when: manual
+# build-from-distrib-tarball:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.build-from-distrib-tarball
+#   tags:
+#    - nix
+
+# doc:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.doc
+#   tags:
+#    - nix
+#   allow_failure: true
+
+# .build_template: &internal_template
+#   stage: distrib_and_compatibility
+#   tags:
+#    - nix
+
+# internal:
+#   <<: *internal_template
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.internal
+#   when: manual
 
 
-internal_nightly:
-  <<: *internal_template
-  script:
-   - nix/frama-ci.sh build -A frama-c.internal
-  only:
-  - schedules
+# internal_nightly:
+#   <<: *internal_template
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.internal
+#   only:
+#   - schedules
 
 
-.build_template: &frama-c-ocaml
-  stage: distrib_and_compatibility
-  script:
-   - nix/frama-ci.sh build -A frama-c.tests
-  tags:
-   - nix
+# .build_template: &frama-c-ocaml
+#   stage: distrib_and_compatibility
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.tests
+#   tags:
+#    - nix
 
-frama-c-ocaml-4.13:
-  variables:
-    OCAML: "4_13"
-  <<: *frama-c-ocaml
+# frama-c-ocaml-4.13:
+#   variables:
+#     OCAML: "4_13"
+#   <<: *frama-c-ocaml
 
-caveat-importer:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A caveat-importer.tests
-  tags:
-   - nix
+# caveat-importer:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A caveat-importer.tests
+#   tags:
+#    - nix
 
-mthread:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A mthread.tests
-  tags:
-   - nix
+# mthread:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A mthread.tests
+#   tags:
+#    - nix
 
-pathcrawler:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A pathcrawler.tests
-  tags:
-   - nix
+# pathcrawler:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A pathcrawler.tests
+#   tags:
+#    - nix
 
-e-acsl-tests-dev:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A frama-c.e-acsl-tests-dev
-  tags:
-   - nix
+# e-acsl-tests-dev:
+#   stage: tests
+#   script:
+#    - nix/frama-ci.sh build -A frama-c.e-acsl-tests-dev
+#   tags:
+#    - nix
 
-ivette:
-  stage: build
-  image: node:lts-gallium
-  cache:
-    paths:
-    - ivette/node_modules/
-  script:
-   - node --version
-   - npm --version
-   - yarn --version
-   - make -C ivette
-  tags:
-    - docker
+# ivette:
+#   stage: build
+#   image: node:lts-gallium
+#   cache:
+#     paths:
+#     - ivette/node_modules/
+#   script:
+#    - node --version
+#    - npm --version
+#    - yarn --version
+#    - make -C ivette
+#   tags:
+#     - docker
 
 # make_public stage is used to push the current master branch of Frama-C and
 # associated plugins from the internal frama-c group to the public pub group.

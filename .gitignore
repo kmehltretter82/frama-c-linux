@@ -215,6 +215,10 @@ _build
 *.install
 /config.sed
 
+# Nix
+
+/result*
+
 #######################
 # should remain empty #
 #######################
