@@ -7,7 +7,6 @@
 /config.log
 /Makefile
 /.depend
-/local_config.ml
 /config.status
 /autom4te.cache
 /ptests_local_config.ml
@@ -69,5 +68,4 @@ lib/libeacsl-rtl-bittree.a
 lib/libeacsl-rtl-segment.a
 lib/libeacsl-rtl-bittree-dbg.a
 lib/libeacsl-rtl-segment-dbg.a
-src/local_config.ml
 src/dependencies/dep_eva.ml
