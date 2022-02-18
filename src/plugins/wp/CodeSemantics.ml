@@ -38,7 +38,7 @@ let constfold_ctyp = function
   | TArray (ty,Some len,attr) as ct -> begin
       match Cil.constFold true len with
       | {enode = (Const CInt64 _) } as len ->
-          TArray(ty,Some len,attr)
+        TArray(ty,Some len,attr)
       | _ -> ct
     end
   | ct -> ct
@@ -94,23 +94,23 @@ struct
     | C_float _ -> is_zero_float (M.load sigma obj l)
     | C_pointer _ -> is_zero_ptr (M.load sigma obj l)
     | C_comp { cfields = None } ->
-        p_true (* cannot say anything interesting here *)
+      p_true (* cannot say anything interesting here *)
     | C_comp { cfields = Some fields } ->
-        p_all
-          (fun f -> is_zero sigma (Ctypes.object_of f.ftype) (M.field l f))
-          fields
+      p_all
+        (fun f -> is_zero sigma (Ctypes.object_of f.ftype) (M.field l f))
+        fields
     | C_array a ->
-        (*TODO[LC] make zero-initializers model-dependent.
-                   For instance, a[N][M] becomes a[N*M] in MemTyped,
-                   but not in MemVar *)
-        let x = Lang.freshvar ~basename:"k" Logic.Int in
-        let k = e_var x in
-        let obj = Ctypes.object_of a.arr_element in
-        let range = match a.arr_flat with
-          | None -> []
-          | Some f -> [ p_leq e_zero k ; p_lt k (e_int f.arr_size) ] in
-        let init = is_zero sigma obj (M.shift l obj k) in
-        p_forall [x] (p_hyps range init)
+      (*TODO[LC] make zero-initializers model-dependent.
+                 For instance, a[N][M] becomes a[N*M] in MemTyped,
+                 but not in MemVar *)
+      let x = Lang.freshvar ~basename:"k" Logic.Int in
+      let k = e_var x in
+      let obj = Ctypes.object_of a.arr_element in
+      let range = match a.arr_flat with
+        | None -> []
+        | Some f -> [ p_leq e_zero k ; p_lt k (e_int f.arr_size) ] in
+      let init = is_zero sigma obj (M.shift l obj k) in
+      p_forall [x] (p_hyps range init)
 
   let is_exp_range sigma l obj a b v =
     let x = Lang.freshvar ~basename:"k" Logic.Int in
@@ -120,11 +120,11 @@ struct
       match v with
       | None -> is_zero sigma obj (M.shift l obj k)
       | Some v ->
-          let elt = (M.load sigma obj (M.shift l obj k)) in
-          if Ctypes.is_pointer obj then
-            M.loc_eq (cloc elt) (cloc v)
-          else
-            p_equal (cval elt) (cval v)
+        let elt = (M.load sigma obj (M.shift l obj k)) in
+        if Ctypes.is_pointer obj then
+          M.loc_eq (cloc elt) (cloc v)
+        else
+          p_equal (cval elt) (cval v)
     in
     p_forall [x] (p_hyps range init)
 
@@ -150,10 +150,10 @@ struct
     | NoOffset -> l
     | Field(f,offset) -> loc_of_offset env (M.field l f) f.ftype offset
     | Index(e,offset) ->
-        let k = val_of_exp env e in
-        let te = Cil.typeOf_array_elem typ in
-        let obj = Ctypes.object_of te in
-        loc_of_offset env (M.shift l obj k) te offset
+      let k = val_of_exp env e in
+      let te = Cil.typeOf_array_elem typ in
+      let obj = Ctypes.object_of te in
+      loc_of_offset env (M.shift l obj k) te offset
 
   let lval env (lhost,offset) =
     loc_of_offset env (loc_of_lhost env lhost) (Cil.typeOfLhost lhost) offset
@@ -172,7 +172,7 @@ struct
       | C_float _ , LNot -> Cvalues.bool_eq (val_of_exp env e) e_zero_real
       | C_pointer _ , LNot -> Cvalues.is_true (M.is_null (loc_of_exp env e))
       | _ ->
-          Warning.error "Undefined unary operator (%a)" Printer.pp_typ typ
+        Warning.error "Undefined unary operator (%a)" Printer.pp_typ typ
     in Val v
 
   (* -------------------------------------------------------------------------- *)
@@ -197,11 +197,11 @@ struct
       Cvalues.is_true (lop (loc_of_exp env e1) (loc_of_exp env e2))
     else match Cil.unrollType t1 with
       | TFloat(f,_) ->
-          let p = fop (Ctypes.c_float f)
-              (val_of_exp env e1) (val_of_exp env e2) in
-          e_if (F.e_prop p) e_one e_zero
+        let p = fop (Ctypes.c_float f)
+            (val_of_exp env e1) (val_of_exp env e2) in
+        e_if (F.e_prop p) e_one e_zero
       | _ ->
-          iop (val_of_exp env e1) (val_of_exp env e2)
+        iop (val_of_exp env e1) (val_of_exp env e2)
 
   let bool_of_exp env e =
     match Ctypes.object_of (Cil.typeOf e) with
@@ -230,17 +230,17 @@ struct
     | LAnd    -> Val (Cvalues.bool_and (bool_of_exp env e1) (bool_of_exp env e2))
     | LOr     -> Val (Cvalues.bool_or  (bool_of_exp env e1) (bool_of_exp env e2))
     | PlusPI ->
-        let te = Cil.typeOf_pointed (Cil.typeOf e1) in
-        let obj = Ctypes.object_of te in
-        Loc(M.shift (loc_of_exp env e1) obj (val_of_exp env e2))
+      let te = Cil.typeOf_pointed (Cil.typeOf e1) in
+      let obj = Ctypes.object_of te in
+      Loc(M.shift (loc_of_exp env e1) obj (val_of_exp env e2))
     | MinusPI ->
-        let te = Cil.typeOf_pointed (Cil.typeOf e1) in
-        let obj = Ctypes.object_of te in
-        Loc(M.shift (loc_of_exp env e1) obj (e_opp (val_of_exp env e2)))
+      let te = Cil.typeOf_pointed (Cil.typeOf e1) in
+      let obj = Ctypes.object_of te in
+      Loc(M.shift (loc_of_exp env e1) obj (e_opp (val_of_exp env e2)))
     | MinusPP ->
-        let te = Cil.typeOf_pointed (Cil.typeOf e1) in
-        let obj = Ctypes.object_of te in
-        Val(M.loc_diff obj (loc_of_exp env e1) (loc_of_exp env e2))
+      let te = Cil.typeOf_pointed (Cil.typeOf e1) in
+      let obj = Ctypes.object_of te in
+      Val(M.loc_diff obj (loc_of_exp env e1) (loc_of_exp env e2))
 
   (* -------------------------------------------------------------------------- *)
   (* --- Cast                                                               --- *)
@@ -250,40 +250,40 @@ struct
     match Ctypes.object_of tr , Ctypes.object_of te with
 
     | C_int ir , C_int ie ->
-        let v = cval ve in
-        Val( if Ctypes.sub_c_int ie ir then v else Cint.downcast ir v )
+      let v = cval ve in
+      Val( if Ctypes.sub_c_int ie ir then v else Cint.downcast ir v )
 
     | C_float fr , C_float fe ->
-        let v = cval ve in
-        Val( if Ctypes.equal_float fe fr then v else
-               Cfloat.float_of_real fr (Cfloat.real_of_float fe v) )
+      let v = cval ve in
+      Val( if Ctypes.equal_float fe fr then v else
+             Cfloat.float_of_real fr (Cfloat.real_of_float fe v) )
 
     | C_int ir , C_float fr ->
-        Val(Cint.of_real ir (Cfloat.real_of_float fr (cval ve)))
+      Val(Cint.of_real ir (Cfloat.real_of_float fr (cval ve)))
 
     | C_float fr , C_int _ ->
-        Val(Cfloat.float_of_real fr (Cmath.real_of_int (cval ve)))
+      Val(Cfloat.float_of_real fr (Cmath.real_of_int (cval ve)))
 
     | C_pointer tr , C_pointer te ->
-        let obj_r = Ctypes.object_of tr in
-        let obj_e = Ctypes.object_of te in
-        if Ctypes.compare obj_r obj_e = 0
-        then ve
-        else Loc (M.cast {pre=obj_e;post=obj_r} (cloc ve))
+      let obj_r = Ctypes.object_of tr in
+      let obj_e = Ctypes.object_of te in
+      if Ctypes.compare obj_r obj_e = 0
+      then ve
+      else Loc (M.cast {pre=obj_e;post=obj_r} (cloc ve))
 
     | C_pointer te , C_int _ ->
-        let e = cval ve in
-        Loc(if F.equal e (F.e_zero) then M.null
-            else M.loc_of_int (Ctypes.object_of te) e)
+      let e = cval ve in
+      Loc(if F.equal e (F.e_zero) then M.null
+          else M.loc_of_int (Ctypes.object_of te) e)
 
     | C_int ir , C_pointer _ ->
-        Val (M.int_of_loc ir (cloc ve))
+      Val (M.int_of_loc ir (cloc ve))
 
     | t1, t2 when Ctypes.equal t1 t2 -> ve
 
     | _ ->
-        Warning.error "cast (%a) into (%a) not yet implemented"
-          Printer.pp_typ te Printer.pp_typ tr
+      Warning.error "cast (%a) into (%a) not yet implemented"
+        Printer.pp_typ te Printer.pp_typ tr
 
   (* -------------------------------------------------------------------------- *)
   (* --- Undefined Exp                                                      --- *)
@@ -306,22 +306,22 @@ struct
     | Const c -> Val (Cvalues.constant c)
 
     | Lval lv ->
-        if Cil.isVolatileLval lv &&
-           Cvalues.volatile ~warn:"unsafe read-access to volatile l-value" ()
-        then exp_undefined e
-        else
-          let loc = lval env lv in
-          let typ = Cil.typeOfLval lv in
-          let obj = Ctypes.object_of typ in
-          let data = M.load env obj loc in
-          Lang.assume (Cvalues.is_object obj data) ;
-          data
+      if Cil.isVolatileLval lv &&
+         Cvalues.volatile ~warn:"unsafe read-access to volatile l-value" ()
+      then exp_undefined e
+      else
+        let loc = lval env lv in
+        let typ = Cil.typeOfLval lv in
+        let obj = Ctypes.object_of typ in
+        let data = M.load env obj loc in
+        Lang.assume (Cvalues.is_object obj data) ;
+        data
 
     | AddrOf lv ->
-        Loc (lval env lv)
+      Loc (lval env lv)
 
     | StartOf lv ->
-        Loc (Cvalues.startof ~shift:M.shift (lval env lv) (Cil.typeOfLval lv))
+      Loc (Cvalues.startof ~shift:M.shift (lval env lv) (Cil.typeOfLval lv))
 
     | UnOp(op,e,ty) -> exp_unop env ty op e
     | BinOp(op,e1,e2,tr) -> exp_binop env tr op e1 e2
@@ -357,18 +357,18 @@ struct
     | Loc p , Loc q -> M.loc_eq p q
     | Val a , Val b -> p_equal a b
     | _ ->
-        if is_ptr t
-        then M.loc_eq (cloc v1) (cloc v2)
-        else p_equal (cval v1) (cval v2)
+      if is_ptr t
+      then M.loc_eq (cloc v1) (cloc v2)
+      else p_equal (cval v1) (cval v2)
 
   let neq_t is_ptr t v1 v2 =
     match v1 , v2 with
     | Loc p , Loc q -> M.loc_neq p q
     | Val a , Val b -> p_neq a b
     | _ ->
-        if is_ptr t
-        then M.loc_neq (cloc v1) (cloc v2)
-        else p_neq (cval v1) (cval v2)
+      if is_ptr t
+      then M.loc_neq (cloc v1) (cloc v2)
+      else p_neq (cval v1) (cval v2)
 
   let equal_typ t v1 v2 = eq_t Cil.isPointerType t v1 v2
   let equal_obj obj v1 v2 = eq_t Ctypes.is_pointer obj v1 v2
@@ -400,13 +400,13 @@ struct
     | BinOp( Ge,   e1,e2,_) -> compare env p_leq M.loc_leq Cfloat.fle e2 e1
 
     | _ ->
-        begin
-          match Ctypes.object_of (Cil.typeOf e) with
-          | C_int _ -> p_neq (val_of_exp env e) e_zero
-          | C_float _ -> p_neq (val_of_exp env e) e_zero_real
-          | C_pointer _ -> p_not (M.is_null (loc_of_exp env e))
-          | obj -> Warning.error "Condition from (%a)" Ctypes.pretty obj
-        end
+      begin
+        match Ctypes.object_of (Cil.typeOf e) with
+        | C_int _ -> p_neq (val_of_exp env e) e_zero
+        | C_float _ -> p_neq (val_of_exp env e) e_zero_real
+        | C_pointer _ -> p_not (M.is_null (loc_of_exp env e))
+        | obj -> Warning.error "Condition from (%a)" Ctypes.pretty obj
+      end
 
   (* -------------------------------------------------------------------------- *)
   (* --- BootStrapping                                                      --- *)
@@ -445,19 +445,19 @@ struct
            let l = lval sigma lv in
            let value_hyp = match init with
              | Some e ->
-                 let v = M.load sigma obj l in
-                 p_equal (val_of_exp sigma e) (cval v)
+               let v = M.load sigma obj l in
+               p_equal (val_of_exp sigma e) (cval v)
              | None -> is_zero sigma obj l
            in
            let init_hyp = match init with
              | Some { enode = Lval lv_init }
                when Cil.(isStructOrUnionType @@ typeOfLval lv_init) ->
-                 let l_initializer = lval sigma lv_init in
-                 p_equal
-                   (M.load_init sigma obj l)
-                   (M.load_init sigma obj l_initializer)
+               let l_initializer = lval sigma lv_init in
+               p_equal
+                 (M.load_init sigma obj l)
+                 (M.load_init sigma obj l_initializer)
              | _ ->
-                 M.initialized sigma (Rloc(obj, l))
+               M.initialized sigma (Rloc(obj, l))
            in
            value_hyp, init_hyp
         ) () in
@@ -488,117 +488,117 @@ struct
     match init with
 
     | SingleInit exp ->
-        init_value ~sigma lv (Cil.typeOfLval lv) (Some exp) :: acc
+      init_value ~sigma lv (Cil.typeOfLval lv) (Some exp) :: acc
 
     | CompoundInit ( ct , initl ) ->
-        let ct = constfold_ctyp ct in
-        let acc = (* updated acc with default init of structure *)
-          match ct with
-          | TComp ( { cfields = None },_) ->
-              Wp_parameters.fatal
-                "Initializer for incomplete type %a" Cil_printer.pp_typ ct
-          | TComp ( { cstruct ; cfields = Some fields },_)
-            when cstruct && (* not for union... *)
-                 (List.length initl) < (List.length fields) ->
-              (* default init for unintialized field of a struct *)
-              List.fold_left
-                (fun acc f ->
-                   if List.exists
-                       (function
-                         | Field(g,_),_ -> Fieldinfo.equal f g
-                         | _ ->  WpLog.fatal "Kernel invariant broken into an initializer")
-                       initl
-                   then acc
-                   else
-                     let init =
-                       init_value ~sigma
-                         (Cil.addOffsetLval (Field(f, NoOffset)) lv)
-                         f.ftype None in
-                     init :: acc)
-                acc (List.rev fields)
-
-          | _ -> acc
-        in
+      let ct = constfold_ctyp ct in
+      let acc = (* updated acc with default init of structure *)
         match ct with
-        | TArray (ty,len,_) ->
-            let delayed =
-              match len with (* number of required elements *)
-              | Some {enode = (Const CInt64 (size,_,_))} ->
-                  (size, None)
-              | _ -> (* CIL invariant broken. *)
-                  WpLog.fatal "CIL invariant broken: unknown initialized array size"
-            in
-            let make_quant acc = function
-              (* adds delayed initializations from info about
-                 the last consecutive indices having
-                 the same value, but that have not yet initialized. *)
-              | (_,None) -> acc (* nothing was delayed *)
-              | (il,Some (i0,_,exp)) when Integer.lt il i0 ->
-                  (* Added pred: \forall i \in [il .. i0] ; t[i]==exp *)
-                  init_range ~sigma lv ty il i0 (Some exp) :: acc
-              | (_il,Some (_i0,off,exp)) ->
-                  (* case [_il=_i0], so uses [off] corresponding to [_i0]
-                     Added pred: t[i]==exp*)
-                  let lv = Cil.addOffsetLval off lv in
-                  init_value ~sigma lv ty (Some exp) :: acc
-            in
-            let add_missing_indices acc i0 = function
-              (* adds eventual default value for missing indices. *)
-              | (i1, _) ->
-                  if Integer.ge i0 i1 then (* no hole *) acc
-                  else (* defaults values
-                          Added pred: \forall i \in [i0 .. i1[ ; t[i]==default *)
-                    init_range ~sigma lv ty i0 (Integer.pred i1) None :: acc
-            in
-            let acc, delayed =
-              List.fold_left
-                (fun (acc,delayed) (off,init) ->
-                   let off = constfold_coffset off in
-                   let idx,acc = match off with
-                     | Index({enode=Const CInt64 (idx,_,_)}, _) ->
-                         (match delayed with
-                          | (iprev, _) when Integer.lt iprev idx ->
-                              (* CIL invariant broken.
-                                 without that invariant, an algo with a 2sd pass
-                                 is required for introducing default values *)
-                              WpLog.fatal "CIL invariant broken: unordered initializer";
-                          | _ -> ()) ;
-                         idx,
-                         (* adds default values for missing indices *)
-                         add_missing_indices acc (Integer.succ idx) delayed
-                     | _ -> (* CIL invariant broken. *)
-                         WpLog.fatal "CIL invariant broken: unknown initialized index"
-                   in
-                   match off, init with (* only simple init can be delayed *)
-                   | Index(_, NoOffset), SingleInit init -> begin
-                       match delayed with
-                       | (i_prev,(Some (_,_,init_delayed) as delayed_info))
-                         when Wp_parameters.InitWithForall.get ()
-                           && Integer.equal (Integer.pred i_prev) idx
-                           && ExpStructEq.equal init_delayed init ->
-                           acc, (idx,delayed_info)
-                       | _ -> (* flush the delayed init, and store the new one *)
-                           let acc = make_quant acc delayed in
-                           acc, (idx, Some (idx,off,init))
-                     end
-                   | Index(_, _),_ ->
-                       (* flush the delayed init, and adds the current one *)
-                       let acc = make_quant acc delayed in
-                       let lv = Cil.addOffsetLval off lv in
-                       (init_variable ~sigma lv init acc), (idx, None)
-                   | _ -> WpLog.fatal "CIL invariant broken: not an index"
-                )
-                (acc,delayed)
-                (List.rev initl)
-            in
-            let acc = make_quant acc delayed in
-            add_missing_indices acc Integer.zero delayed
-        | _ ->
-            List.fold_left
-              (fun acc (off,init) ->
+        | TComp ( { cfields = None },_) ->
+          Wp_parameters.fatal
+            "Initializer for incomplete type %a" Cil_printer.pp_typ ct
+        | TComp ( { cstruct ; cfields = Some fields },_)
+          when cstruct && (* not for union... *)
+               (List.length initl) < (List.length fields) ->
+          (* default init for unintialized field of a struct *)
+          List.fold_left
+            (fun acc f ->
+               if List.exists
+                   (function
+                     | Field(g,_),_ -> Fieldinfo.equal f g
+                     | _ ->  WpLog.fatal "Kernel invariant broken into an initializer")
+                   initl
+               then acc
+               else
+                 let init =
+                   init_value ~sigma
+                     (Cil.addOffsetLval (Field(f, NoOffset)) lv)
+                     f.ftype None in
+                 init :: acc)
+            acc (List.rev fields)
+
+        | _ -> acc
+      in
+      match ct with
+      | TArray (ty,len,_) ->
+        let delayed =
+          match len with (* number of required elements *)
+          | Some {enode = (Const CInt64 (size,_,_))} ->
+            (size, None)
+          | _ -> (* CIL invariant broken. *)
+            WpLog.fatal "CIL invariant broken: unknown initialized array size"
+        in
+        let make_quant acc = function
+          (* adds delayed initializations from info about
+             the last consecutive indices having
+             the same value, but that have not yet initialized. *)
+          | (_,None) -> acc (* nothing was delayed *)
+          | (il,Some (i0,_,exp)) when Integer.lt il i0 ->
+            (* Added pred: \forall i \in [il .. i0] ; t[i]==exp *)
+            init_range ~sigma lv ty il i0 (Some exp) :: acc
+          | (_il,Some (_i0,off,exp)) ->
+            (* case [_il=_i0], so uses [off] corresponding to [_i0]
+               Added pred: t[i]==exp*)
+            let lv = Cil.addOffsetLval off lv in
+            init_value ~sigma lv ty (Some exp) :: acc
+        in
+        let add_missing_indices acc i0 = function
+          (* adds eventual default value for missing indices. *)
+          | (i1, _) ->
+            if Integer.ge i0 i1 then (* no hole *) acc
+            else (* defaults values
+                    Added pred: \forall i \in [i0 .. i1[ ; t[i]==default *)
+              init_range ~sigma lv ty i0 (Integer.pred i1) None :: acc
+        in
+        let acc, delayed =
+          List.fold_left
+            (fun (acc,delayed) (off,init) ->
+               let off = constfold_coffset off in
+               let idx,acc = match off with
+                 | Index({enode=Const CInt64 (idx,_,_)}, _) ->
+                   (match delayed with
+                    | (iprev, _) when Integer.lt iprev idx ->
+                      (* CIL invariant broken.
+                         without that invariant, an algo with a 2sd pass
+                         is required for introducing default values *)
+                      WpLog.fatal "CIL invariant broken: unordered initializer";
+                    | _ -> ()) ;
+                   idx,
+                   (* adds default values for missing indices *)
+                   add_missing_indices acc (Integer.succ idx) delayed
+                 | _ -> (* CIL invariant broken. *)
+                   WpLog.fatal "CIL invariant broken: unknown initialized index"
+               in
+               match off, init with (* only simple init can be delayed *)
+               | Index(_, NoOffset), SingleInit init -> begin
+                   match delayed with
+                   | (i_prev,(Some (_,_,init_delayed) as delayed_info))
+                     when Wp_parameters.InitWithForall.get ()
+                       && Integer.equal (Integer.pred i_prev) idx
+                       && ExpStructEq.equal init_delayed init ->
+                     acc, (idx,delayed_info)
+                   | _ -> (* flush the delayed init, and store the new one *)
+                     let acc = make_quant acc delayed in
+                     acc, (idx, Some (idx,off,init))
+                 end
+               | Index(_, _),_ ->
+                 (* flush the delayed init, and adds the current one *)
+                 let acc = make_quant acc delayed in
                  let lv = Cil.addOffsetLval off lv in
-                 init_variable ~sigma lv init acc)
-              acc (List.rev initl)
+                 (init_variable ~sigma lv init acc), (idx, None)
+               | _ -> WpLog.fatal "CIL invariant broken: not an index"
+            )
+            (acc,delayed)
+            (List.rev initl)
+        in
+        let acc = make_quant acc delayed in
+        add_missing_indices acc Integer.zero delayed
+      | _ ->
+        List.fold_left
+          (fun acc (off,init) ->
+             let lv = Cil.addOffsetLval off lv in
+             init_variable ~sigma lv init acc)
+          acc (List.rev initl)
 
   let init ~sigma v = function
     | None -> [init_value ~sigma (Cil.var v) v.vtype None]

@@ -39,14 +39,14 @@ class choice =
     method select _feedback (s : Tactical.selection) =
       match s with
       | Inside(Goal p,q) ->
-          begin
-            match F.e_expr p with
-            | Qed.Logic.Or qs when List.memq q qs ->
-                Applicable (fun (hs,_) -> ["Choice",(hs,F.p_bool q)])
-            | _ -> Not_applicable
-          end
+        begin
+          match F.e_expr p with
+          | Qed.Logic.Or qs when List.memq q qs ->
+            Applicable (fun (hs,_) -> ["Choice",(hs,F.p_bool q)])
+          | _ -> Not_applicable
+        end
       | Empty | Compose _ | Clause _ | Inside(Step _,_) | Multi _ ->
-          Not_applicable
+        Not_applicable
   end
 
 class absurd =
@@ -62,17 +62,17 @@ class absurd =
       | Empty | Compose _ | Inside _ | Clause(Goal _) | Multi _
         -> Not_applicable
       | Clause(Step s) ->
-          begin
-            match s.condition with
-            | Have p | When p | Core p | Init p | Type p ->
-                let absurd seq =
-                  let emp = Conditions.(step (Have F.p_true)) in
-                  let seq = Conditions.replace ~at:s.id emp seq in
-                  [ "Absurd" , (fst seq , F.p_not p) ]
-                in Applicable absurd
-            | Branch _ | Either _ | State _ ->
-                Not_applicable
-          end
+        begin
+          match s.condition with
+          | Have p | When p | Core p | Init p | Type p ->
+            let absurd seq =
+              let emp = Conditions.(step (Have F.p_true)) in
+              let seq = Conditions.replace ~at:s.id emp seq in
+              [ "Absurd" , (fst seq , F.p_not p) ]
+            in Applicable absurd
+          | Branch _ | Either _ | State _ ->
+            Not_applicable
+        end
   end
 
 class contrapose =
@@ -88,19 +88,19 @@ class contrapose =
       | Empty | Compose _ | Inside _ | Clause(Goal _) | Multi _
         -> Not_applicable
       | Clause(Step s) ->
-          begin
-            match s.condition with
-            | Have p | When p | Core p | Init p | Type p ->
-                let contrapose (hs,goal) =
-                  let descr = "Contrapose" in
-                  let goal = F.p_not goal in
-                  let goal = Conditions.(step ~descr (Have goal)) in
-                  let hs = Conditions.replace ~at:s.id goal (hs , F.p_false) in
-                  [ "Contrapose" , (fst hs , F.p_not p) ]
-                in Applicable contrapose
-            | Branch _ | Either _ | State _ ->
-                Not_applicable
-          end
+        begin
+          match s.condition with
+          | Have p | When p | Core p | Init p | Type p ->
+            let contrapose (hs,goal) =
+              let descr = "Contrapose" in
+              let goal = F.p_not goal in
+              let goal = Conditions.(step ~descr (Have goal)) in
+              let hs = Conditions.replace ~at:s.id goal (hs , F.p_false) in
+              [ "Contrapose" , (fst hs , F.p_not p) ]
+            in Applicable contrapose
+          | Branch _ | Either _ | State _ ->
+            Not_applicable
+        end
 
   end
 

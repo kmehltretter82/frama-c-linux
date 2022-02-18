@@ -54,9 +54,9 @@ let flush () =
     match !fc with
     | None -> ()
     | Some (fout,file) ->
-        close_out fout ;
-        ignore (Sys.command
-                  (Printf.sprintf "dot -Tpdf %s.dot > %s.pdf" file file))
+      close_out fout ;
+      ignore (Sys.command
+                (Printf.sprintf "dot -Tpdf %s.dot > %s.pdf" file file))
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -128,9 +128,9 @@ let pp_assigns fmt = function
   | Cil_types.WritesAny -> Format.pp_print_string fmt " \\everything"
   | Cil_types.Writes [] -> Format.pp_print_string fmt " \\nothing"
   | Cil_types.Writes froms ->
-      List.iter
-        (fun (t,_) -> Format.fprintf fmt "@ %a" Printer.pp_identified_term t)
-        froms
+    List.iter
+      (fun (t,_) -> Format.fprintf fmt "@ %a" Printer.pp_identified_term t)
+      froms
 
 let add_assigns env (pid,_) k =
   let u = node () in
@@ -142,11 +142,11 @@ let use_assigns _env region d k =
   let u = node () in
   begin match region with
     | None ->
-        Format.fprintf !out "  %a [ color=orange , label=\"Havoc All\" ] ;@." pretty u
+      Format.fprintf !out "  %a [ color=orange , label=\"Havoc All\" ] ;@." pretty u
     | Some pid ->
-        Format.fprintf !out "  %a [ color=orange , label=\"Havoc %a:\n@[<hov 2>assigns%a;@]\" ] ;@."
-          pretty u WpPropId.pp_propid pid
-          pp_assigns d.WpPropId.a_assigns
+      Format.fprintf !out "  %a [ color=orange , label=\"Havoc %a:\n@[<hov 2>assigns%a;@]\" ] ;@."
+        pretty u WpPropId.pp_propid pid
+        pp_assigns d.WpPropId.a_assigns
   end ;
   link u k ; u
 
@@ -155,9 +155,9 @@ let label _env stmt label k =
     let u = node () in
     ( match stmt with
       | None ->
-          Format.fprintf !out "  %a [ label=\"Label %a\" ] ;@." pretty u Clabels.pretty label
+        Format.fprintf !out "  %a [ label=\"Label %a\" ] ;@." pretty u Clabels.pretty label
       | Some s ->
-          Format.fprintf !out "  %a [ label=\"Label %a (Stmt s%d)\" ] ;@." pretty u Clabels.pretty label s.Cil_types.sid
+        Format.fprintf !out "  %a [ label=\"Label %a (Stmt s%d)\" ] ;@." pretty u Clabels.pretty label s.Cil_types.sid
     ) ;
     link u k ; u
 
@@ -172,10 +172,10 @@ let return _env _stmt r k =
   begin
     match r with
     | None ->
-        Format.fprintf !out "  %a [ color=orange , label=\"Return\" ] ;@." pretty u
+      Format.fprintf !out "  %a [ color=orange , label=\"Return\" ] ;@." pretty u
     | Some e ->
-        Format.fprintf !out "  %a [ color=orange , label=\"Return %a\" ] ;@." pretty u
-          Printer.pp_exp e
+      Format.fprintf !out "  %a [ color=orange , label=\"Return %a\" ] ;@." pretty u
+        Printer.pp_exp e
   end ;
   link u k ; u
 
@@ -265,28 +265,28 @@ let call_decreases env _s kf _es (_id, (caller_d, rel)) ?caller_t ?callee_d k =
   let pp_rel fmt callee_d =
     match rel with
     | None ->
-        Format.fprintf fmt "%a ==> %a[%a] < %a[%s] && %a[%a] >= 0"
-          pp_opt_pred caller_t
-          Printer.pp_term callee_d Kernel_function.pretty kf
-          Printer.pp_term caller_d "Caller"
-          Printer.pp_term callee_d Kernel_function.pretty kf
+      Format.fprintf fmt "%a ==> %a[%a] < %a[%s] && %a[%a] >= 0"
+        pp_opt_pred caller_t
+        Printer.pp_term callee_d Kernel_function.pretty kf
+        Printer.pp_term caller_d "Caller"
+        Printer.pp_term callee_d Kernel_function.pretty kf
     | Some rel ->
-        Format.fprintf fmt "%a ==> %a(%a[%s], %a[%a])"
-          pp_opt_pred caller_t
-          Printer.pp_logic_info rel
-          Printer.pp_term caller_d "Caller"
-          Printer.pp_term callee_d Kernel_function.pretty kf
+      Format.fprintf fmt "%a ==> %a(%a[%s], %a[%a])"
+        pp_opt_pred caller_t
+        Printer.pp_logic_info rel
+        Printer.pp_term caller_d "Caller"
+        Printer.pp_term callee_d Kernel_function.pretty kf
   in
   Format.fprintf !out "  %a [ color=red , label=\"Prove Decreases %a%t\" ] ;@."
     pretty u Kernel_function.pretty kf
     begin fun fmt ->
       match callee_d with
       | None ->
-          Format.fprintf fmt "\n@[<hov 2>Decreases if %a ==> FALSE;@]"
-            pp_opt_pred caller_t
+        Format.fprintf fmt "\n@[<hov 2>Decreases if %a ==> FALSE;@]"
+          pp_opt_pred caller_t
       | Some (callee_d, _) ->
-          if Wp_parameters.debug_atleast 1 then
-            Format.fprintf fmt "\n@[<hov 2>Decreases if %a;@]" pp_rel callee_d
+        if Wp_parameters.debug_atleast 1 then
+          Format.fprintf fmt "\n@[<hov 2>Decreases if %a;@]" pp_rel callee_d
     end ;
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k

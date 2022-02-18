@@ -103,15 +103,15 @@ let rec lookup push clause ~nbits ~priority p =
   let open Qed.Logic in
   match F.repr p with
   | And ps | Or ps ->
-      List.iter (lookup push clause ~priority ~nbits) ps
+    List.iter (lookup push clause ~priority ~nbits) ps
   | Imply(hs,p) ->
-      List.iter (lookup push clause ~priority ~nbits) (p::hs)
+    List.iter (lookup push clause ~priority ~nbits) (p::hs)
   | Eq(x,y) | Neq(x,y) when F.is_int x && F.is_int y ->
-      let bx = is_bitwised x in
-      let by = is_bitwised y in
-      if bx || by then
-        let priority = if bx && by then priority else priority *. 0.8 in
-        push (strategy ~priority ~nbits Tactical.(Inside(clause,p)))
+    let bx = is_bitwised x in
+    let by = is_bitwised y in
+    if bx || by then
+      let priority = if bx && by then priority else priority *. 0.8 in
+      push (strategy ~priority ~nbits Tactical.(Inside(clause,p)))
   | _ -> ()
 
 class autobitwise =

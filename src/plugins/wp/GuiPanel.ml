@@ -56,12 +56,12 @@ let wp_rte_generated s =
   match kf_of_selection s with
   | None -> false
   | Some kf ->
-      if Wp_parameters.RTE.get () then
-        let mem = Wp_rte_generated.mem kf in
-        if not mem then
-          Wp_rte_generated.add kf () ;
-        not mem
-      else false
+    if Wp_parameters.RTE.get () then
+      let mem = Wp_rte_generated.mem kf in
+      if not mem then
+        Wp_rte_generated.add kf () ;
+      not mem
+    else false
 
 let with_model action kf =
   let setup = Factory.parse (Wp_parameters.Model.get ()) in

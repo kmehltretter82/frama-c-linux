@@ -103,8 +103,8 @@ let dotcluster cluster : Dotgraph.record =
   | Garbled -> `Label "Garbled"
   | Chunk v -> dotvalue v
   | Layout { sizeof ; layout } ->
-      let label = Printf.sprintf "sizeof:%d" sizeof in
-      `Hbox (`Label label :: List.map dotrange layout)
+    let label = Printf.sprintf "sizeof:%d" sizeof in
+    `Hbox (`Label label :: List.map dotrange layout)
 
 let dotchunk mem : Dotgraph.record =
   let open Layout in
@@ -113,12 +113,12 @@ let dotchunk mem : Dotgraph.record =
   | Mraw(_,Some r) -> dotpointed ~label:"Raw" r
   | Mref r -> dotpointed ~label:"Ref" r
   | Mmem(rt,v) ->
-      let prefix = if Layout.Root.indexed rt then "Mem " else "Var " in
-      dotvalue ~prefix v
+    let prefix = if Layout.Root.indexed rt then "Mem " else "Var " in
+    dotvalue ~prefix v
   | Mcomp(_,ovl) ->
-      let range rg = dotrange
-          ~prefix:(if Overlay.once rg.reg ovl then "D" else "C") rg in
-      `Hbox (List.map range ovl)
+    let range rg = dotrange
+        ~prefix:(if Overlay.once rg.reg ovl then "D" else "C") rg in
+    `Hbox (List.map range ovl)
 
 let dotregion dot map region node =
   begin
@@ -215,14 +215,14 @@ let dotregion dot map region node =
           (function
             | Fvar _ -> ()
             | Farray r ->
-                G.edge dot (R.get r) node (`Label "[]"::attr_froms)
+              G.edge dot (R.get r) node (`Label "[]"::attr_froms)
             | Fderef r ->
-                G.edge dot (R.get r) node (`Label "*"::attr_froms)
+              G.edge dot (R.get r) node (`Label "*"::attr_froms)
             | Findex r ->
-                G.edge dot (R.get r) node (`Label "+(..)"::attr_froms)
+              G.edge dot (R.get r) node (`Label "+(..)"::attr_froms)
             | Ffield(r,ofs) ->
-                let label = Printf.sprintf "+%d" ofs in
-                G.edge dot (R.get r) node (`Label label::attr_froms)
+              let label = Printf.sprintf "+%d" ofs in
+              G.edge dot (R.get r) node (`Label label::attr_froms)
           ) (Region.get_froms map region)
       end ;
     Region.iter_copies map

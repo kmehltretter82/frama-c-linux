@@ -46,10 +46,10 @@ let tactical_inside step remove =
   in
   begin match step.condition with
     | Type p | Have p | When p | Core p | Init p ->
-        let ps = Lang.F.e_props @@ collect p in
-        let ps = TermLset.diff ps remove in
-        let cond = condition step @@ Lang.F.p_bool @@ Lang.F.e_and ps in
-        Tactical.replace_single ~at:step.id ("Filtered", cond)
+      let ps = Lang.F.e_props @@ collect p in
+      let ps = TermLset.diff ps remove in
+      let cond = condition step @@ Lang.F.p_bool @@ Lang.F.e_and ps in
+      Tactical.replace_single ~at:step.id ("Filtered", cond)
 
     | _ -> raise Not_found
   end
@@ -62,11 +62,11 @@ module Smap = Qed.Idxmap.Make
 
 let collect_remove m = function
   | Inside(Step step, remove) ->
-      let l =
-        try Smap.find step m
-        with Not_found -> []
-      in
-      Smap.add step (remove :: l) m
+    let l =
+      try Smap.find step m
+      with Not_found -> []
+    in
+    Smap.add step (remove :: l) m
   | _ -> raise Not_found
 
 let fold_selection s seq =
@@ -85,14 +85,14 @@ class clear =
     method select _feedback sel =
       match sel with
       | Clause(Step step) ->
-          Applicable(process @@ tactical_step step)
+        Applicable(process @@ tactical_step step)
       | Inside(Step step, remove) ->
-          begin
-            try Applicable(process @@ tactical_inside step [remove])
-            with Not_found -> Not_applicable
-          end
+        begin
+          try Applicable(process @@ tactical_inside step [remove])
+          with Not_found -> Not_applicable
+        end
       | Multi es ->
-          Applicable (process @@ fold_selection es)
+        Applicable (process @@ fold_selection es)
       | _ -> Not_applicable
   end
 

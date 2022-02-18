@@ -71,47 +71,47 @@ type env = {
 
 let rec collect rank = function
   | [] ->
-      {
-        size_var = [] ;
-        size_val = [] ;
-        index_var = [] ;
-        index_val = [] ;
-        index_range = [] ;
-        index_offset = [] ;
-        length = Some e_one ;
-      }
+    {
+      size_var = [] ;
+      size_val = [] ;
+      index_var = [] ;
+      index_val = [] ;
+      index_range = [] ;
+      index_offset = [] ;
+      length = Some e_one ;
+    }
   | d::ds ->
-      let denv = collect (succ rank) ds in
-      let k_base = match rank with 0 -> "i" | 1 -> "j" | _ -> "k" in
-      let k_var = Lang.freshvar ~basename:k_base Qed.Logic.Int in
-      let k_val = e_var k_var in
-      let k_ofs = e_prod (k_val :: denv.size_val) in
-      match d with
-      | `Ext ->
-          { denv with
-            index_var = k_var :: denv.index_var ;
-            index_val = k_val :: denv.index_val ;
-            index_offset = k_ofs :: denv.index_offset ;
-            length = None ;
-          }
-      | `Fix ->
-          let n_base = match rank with 0 -> "n" | 1 -> "m" | _ -> "d" in
-          let n_var = Lang.freshvar ~basename:n_base Qed.Logic.Int in
-          let n_val = e_var n_var in
-          let k_inf = p_leq e_zero k_val in
-          let k_sup = p_lt k_val n_val in
-          let length = match denv.length with
-            | None -> None
-            | Some len -> Some (e_mul n_val len)
-          in {
-            size_var = n_var :: denv.size_var ;
-            size_val = n_val :: denv.size_val ;
-            index_var = k_var :: denv.index_var ;
-            index_val = k_val :: denv.index_val ;
-            index_offset = k_ofs :: denv.index_offset ;
-            index_range = k_inf :: k_sup :: denv.index_range ;
-            length ;
-          }
+    let denv = collect (succ rank) ds in
+    let k_base = match rank with 0 -> "i" | 1 -> "j" | _ -> "k" in
+    let k_var = Lang.freshvar ~basename:k_base Qed.Logic.Int in
+    let k_val = e_var k_var in
+    let k_ofs = e_prod (k_val :: denv.size_val) in
+    match d with
+    | `Ext ->
+      { denv with
+        index_var = k_var :: denv.index_var ;
+        index_val = k_val :: denv.index_val ;
+        index_offset = k_ofs :: denv.index_offset ;
+        length = None ;
+      }
+    | `Fix ->
+      let n_base = match rank with 0 -> "n" | 1 -> "m" | _ -> "d" in
+      let n_var = Lang.freshvar ~basename:n_base Qed.Logic.Int in
+      let n_val = e_var n_var in
+      let k_inf = p_leq e_zero k_val in
+      let k_sup = p_lt k_val n_val in
+      let length = match denv.length with
+        | None -> None
+        | Some len -> Some (e_mul n_val len)
+      in {
+        size_var = n_var :: denv.size_var ;
+        size_val = n_val :: denv.size_val ;
+        index_var = k_var :: denv.index_var ;
+        index_val = k_val :: denv.index_val ;
+        index_offset = k_ofs :: denv.index_offset ;
+        index_range = k_inf :: k_sup :: denv.index_range ;
+        length ;
+      }
 
 let cc_env = collect 0
 
@@ -132,10 +132,10 @@ let rec do_merge ds1 ds2 =
   | [] , [] -> []
   | [] , _ | _ , [] -> raise Exit
   | d1::ds1 , d2::ds2 ->
-      let d = match d1 , d2 with
-        | None , _ | _ , None -> None
-        | Some n1 , Some n2 -> if n1=n2 then d1 else raise Exit
-      in d :: do_merge ds1 ds2
+    let d = match d1 , d2 with
+      | None , _ | _ , None -> None
+      | Some n1 , Some n2 -> if n1=n2 then d1 else raise Exit
+    in d :: do_merge ds1 ds2
 
 let merge ds1 ds2 =
   try Some(do_merge ds1 ds2)
