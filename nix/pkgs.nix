@@ -21,6 +21,7 @@ let
     ) super.ocaml-ng;
     inherit (super.callPackage sources."gitignore.nix" {}) gitignoreSource;
     why3 = throw "don't use pkgs.why3 but ocaml-ng.ocamlPackages_4_XX.why3";
+    camlzip = throw "don't use pkgs.camlzip but ocaml-ng.ocamlPackages_4_XX.camlzip";
     framac = throw "don't use pkgs.framac but ocaml-ng.ocamlPackages_4_XX.frama-c";
     frama-c = throw "don't use pkgs.framac but ocaml-ng.ocamlPackages_4_XX.frama-c";
   };
