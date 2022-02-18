@@ -398,7 +398,7 @@ class SyncArray<K, A> {
       let pending;
       /* eslint-disable no-await-in-loop */
       do {
-        const data = await Server.send(this.handler.fetch, 33);
+        const data = await Server.send(this.handler.fetch, 20000);
         const { reload = false, removed = [], updated = [] } = data;
         const { model } = this;
         if (reload) model.removeAllData();
