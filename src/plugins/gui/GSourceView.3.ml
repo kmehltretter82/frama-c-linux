@@ -24,13 +24,13 @@
 include GSourceView3
 
 let make_marker_attributes
-  ~(source:source_view)
-  ~(category:string)
-  ~(priority: int)
-  ?(background: Gdk.rgba option)
-  ?(pixbuf:GdkPixbuf.pixbuf option)
-  ?(icon_name:string option)
-  () =
+    ~(source:source_view)
+    ~(category:string)
+    ~(priority: int)
+    ?(background: Gdk.rgba option)
+    ?(pixbuf:GdkPixbuf.pixbuf option)
+    ?(icon_name:string option)
+    () =
   let my_attributes = GSourceView3.source_mark_attributes () in
   Option.iter my_attributes#set_background background;
   Option.iter my_attributes#set_pixbuf pixbuf;

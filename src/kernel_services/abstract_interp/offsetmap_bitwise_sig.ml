@@ -30,133 +30,133 @@
     instead. *)
 
 module type S = sig
-type v (** Type of the values stored in the offsetmap *)
-include Datatype.S (** Datatype for the offsetmap *)
+  type v (** Type of the values stored in the offsetmap *)
+  include Datatype.S (** Datatype for the offsetmap *)
 
-type intervals
+  type intervals
 
-(** {2 Pretty-printing} *)
+  (** {2 Pretty-printing} *)
 
-val pretty: t Pretty_utils.formatter
-val pretty_generic :
-  ?typ:Cil_types.typ ->
-  ?pretty_v:(Format.formatter -> v -> unit) ->
-  ?skip_v:(v -> bool) ->
-  ?sep:string ->
-  unit ->
-  Format.formatter -> t -> unit
+  val pretty: t Pretty_utils.formatter
+  val pretty_generic :
+    ?typ:Cil_types.typ ->
+    ?pretty_v:(Format.formatter -> v -> unit) ->
+    ?skip_v:(v -> bool) ->
+    ?sep:string ->
+    unit ->
+    Format.formatter -> t -> unit
 
-val pretty_debug: t Pretty_utils.formatter
-
-
-(** {2 Join and inclusion testing} *)
-
-val join : t -> t -> t
-val is_included : t -> t -> bool
+  val pretty_debug: t Pretty_utils.formatter
 
 
-(** {2 Finding values} *)
+  (** {2 Join and inclusion testing} *)
 
-val find : Int_Intervals_sig.itv -> t -> v
-val find_iset : validity:Base.validity -> intervals -> t -> v
-
-
-(** {2 Adding values} *)
-
-val add_binding_intervals :
-  validity:Base.validity ->
-  exact:bool -> intervals -> v -> t -> t Bottom.or_bottom
-
-val add_binding_ival :
-  validity:Base.validity ->
-  exact:bool -> Ival.t -> size:Int_Base.t -> v -> t -> t Bottom.or_bottom
+  val join : t -> t -> t
+  val is_included : t -> t -> bool
 
 
-(** {2 Creating an offsetmap} *)
+  (** {2 Finding values} *)
 
-(** [size] must be strictly greater than zero. *)
-val create: size:Integer.t -> v -> t
-
-val empty: t
-(** offsetmap containing no interval. *)
-
-val size_from_validity:
-  Base.validity -> Integer.t Bottom.or_bottom
-(** [size_from_validity v] returns the size to be used when creating a
-    new offsetmap for a base with validity [v]. This is a convention that
-    should be shared by all modules that create offsetmaps.
-    Returns [`Bottom] iff [v] is [Invalid].
-    @since Aluminium-20160501 *)
+  val find : Int_Intervals_sig.itv -> t -> v
+  val find_iset : validity:Base.validity -> intervals -> t -> v
 
 
-(** {2 Iterators} *)
+  (** {2 Adding values} *)
 
-val map : (v -> v) -> t -> t
+  val add_binding_intervals :
+    validity:Base.validity ->
+    exact:bool -> intervals -> v -> t -> t Bottom.or_bottom
 
-type map2_decide =
-    ReturnLeft | ReturnRight | ReturnConstant of v | Recurse
-  (** See the documentation of type {!Offsetmap_sig.map2_decide} *)
-
-val map2:
-  Hptmap_sig.cache_type -> (t -> t -> map2_decide) -> (v -> v -> v) -> t -> t -> t
-(** See the documentation of function {!Offsetmap_sig.map2_on_values}. *)
+  val add_binding_ival :
+    validity:Base.validity ->
+    exact:bool -> Ival.t -> size:Int_Base.t -> v -> t -> t Bottom.or_bottom
 
 
-val fold :          (intervals -> v -> 'a -> 'a) -> t -> 'a -> 'a
-val fold_fuse_same: (intervals -> v -> 'a -> 'a) -> t -> 'a -> 'a
-(** Same behavior as [fold], except if two disjoint intervals [r1] and [r2]
-    are mapped to the same value and boolean. In this case, [fold] will call
-    its argument [f] on [r1], then on [r2]. [fold_fuse_same] will call it
-    directly on [r1 U r2], where U is the join on sets of intervals. *)
+  (** {2 Creating an offsetmap} *)
 
-val fold_itv:
-  ?direction:[`LTR | `RTL] ->
-  entire:bool ->
-  (Int_Intervals_sig.itv -> v -> 'a -> 'a) ->
-  Int_Intervals_sig.itv ->
-  t -> 'a -> 'a
-(** See documentation of {!Offsetmap_sig.fold_between}. *)
+  (** [size] must be strictly greater than zero. *)
+  val create: size:Integer.t -> v -> t
 
-(** [fold_join f join vempty itvs m] is an implementation of [fold] that
-    restricts itself to the intervals in [itvs]. Unlike in [fold] (where the
-    equivalent of [f] operates on an accumulator), [f] returns a value on each
-    sub-interval independently. The results are joined using [joined].
-    [vempty] is the value that must be returned on {!Int_Intervals.bottom}.
-    This function uses a cache internally. Hence, it must be partially
-    applied to its first three arguments. If you do not need a cache, use
-    [fold] instead. *)
-val fold_join_itvs:
-  cache:Hptmap_sig.cache_type ->
-  (Integer.t -> Integer.t -> v -> 'a) ->
-  ('a -> 'a -> 'a) ->
-  'a ->
-  intervals -> t -> 'a
+  val empty: t
+  (** offsetmap containing no interval. *)
+
+  val size_from_validity:
+    Base.validity -> Integer.t Bottom.or_bottom
+  (** [size_from_validity v] returns the size to be used when creating a
+      new offsetmap for a base with validity [v]. This is a convention that
+      should be shared by all modules that create offsetmaps.
+      Returns [`Bottom] iff [v] is [Invalid].
+      @since Aluminium-20160501 *)
 
 
-(** {2 Shape} *)
+  (** {2 Iterators} *)
 
-val is_single_interval: t -> bool
-(** [is_single_interval o] is true if the offsetmap [o] contains a single
-    binding. *)
+  val map : (v -> v) -> t -> t
 
-val single_interval_value: t -> v option
-(** [single_interval_value o] returns [Some v] if [o] contains a single
-    interval, to which [v] is bound, and [None] otherwise. *)
+  type map2_decide =
+      ReturnLeft | ReturnRight | ReturnConstant of v | Recurse
+    (** See the documentation of type {!Offsetmap_sig.map2_decide} *)
 
-val is_same_value: t -> v -> bool
-(** [is_same_value o v] is true if the offsetmap [o] contains a single
-    binding to [v], or is the empty offsetmap. *)
+  val map2:
+    Hptmap_sig.cache_type -> (t -> t -> map2_decide) -> (v -> v -> v) -> t -> t -> t
+  (** See the documentation of function {!Offsetmap_sig.map2_on_values}. *)
 
 
-(** {2 Misc} *)
+  val fold :          (intervals -> v -> 'a -> 'a) -> t -> 'a -> 'a
+  val fold_fuse_same: (intervals -> v -> 'a -> 'a) -> t -> 'a -> 'a
+  (** Same behavior as [fold], except if two disjoint intervals [r1] and [r2]
+      are mapped to the same value and boolean. In this case, [fold] will call
+      its argument [f] on [r1], then on [r2]. [fold_fuse_same] will call it
+      directly on [r1 U r2], where U is the join on sets of intervals. *)
 
-(** Clear the caches local to this module. Beware that they are not
-    project-aware, and that you must call them at every project switch. *)
-val clear_caches: unit -> unit
+  val fold_itv:
+    ?direction:[`LTR | `RTL] ->
+    entire:bool ->
+    (Int_Intervals_sig.itv -> v -> 'a -> 'a) ->
+    Int_Intervals_sig.itv ->
+    t -> 'a -> 'a
+  (** See documentation of {!Offsetmap_sig.fold_between}. *)
+
+  (** [fold_join f join vempty itvs m] is an implementation of [fold] that
+      restricts itself to the intervals in [itvs]. Unlike in [fold] (where the
+      equivalent of [f] operates on an accumulator), [f] returns a value on each
+      sub-interval independently. The results are joined using [joined].
+      [vempty] is the value that must be returned on {!Int_Intervals.bottom}.
+      This function uses a cache internally. Hence, it must be partially
+      applied to its first three arguments. If you do not need a cache, use
+      [fold] instead. *)
+  val fold_join_itvs:
+    cache:Hptmap_sig.cache_type ->
+    (Integer.t -> Integer.t -> v -> 'a) ->
+    ('a -> 'a -> 'a) ->
+    'a ->
+    intervals -> t -> 'a
 
 
-(**/**)
+  (** {2 Shape} *)
 
-val imprecise_write_msg: string ref
+  val is_single_interval: t -> bool
+  (** [is_single_interval o] is true if the offsetmap [o] contains a single
+      binding. *)
+
+  val single_interval_value: t -> v option
+  (** [single_interval_value o] returns [Some v] if [o] contains a single
+      interval, to which [v] is bound, and [None] otherwise. *)
+
+  val is_same_value: t -> v -> bool
+  (** [is_same_value o v] is true if the offsetmap [o] contains a single
+      binding to [v], or is the empty offsetmap. *)
+
+
+  (** {2 Misc} *)
+
+  (** Clear the caches local to this module. Beware that they are not
+      project-aware, and that you must call them at every project switch. *)
+  val clear_caches: unit -> unit
+
+
+  (**/**)
+
+  val imprecise_write_msg: string ref
 
 end
