@@ -460,7 +460,7 @@ async function _launch() {
 
 function _clear() {
   rqCount = 0;
-  pending.forEach((p: PendingRequest) => p.reject());
+  pending.forEach((p: PendingRequest) => p.reject('clear'));
   pending.clear();
   if (pollingTimer) {
     clearTimeout(pollingTimer);
@@ -695,15 +695,19 @@ export function send<In, Out>(
   rqCount += 1;
   const response: Response<Out> = new Promise<Out>((resolve, reject) => {
     const unwrap = (js: Json.json) => {
-      const data = request.output(js);
-      if (data !== undefined)
-        resolve(data);
-      else
-        reject('Wrong response type');
+      try {
+        const data = request.output(js);
+        if (data !== undefined)
+          resolve(data);
+        else
+          reject('Wrong response type');
+      } catch (err) {
+        reject(`Decoding Error (${err})`);
+      }
     };
     pending.set(rid, { resolve: unwrap, reject });
   });
-  response.kill = () => pending.get(rid)?.reject();
+  response.kill = () => pending.get(rid)?.reject('kill');
   client.send(request.kind, rid, request.name, param as unknown as Json.json);
   if (!pollingTimer) {
     const polling = (config && config.polling) || pollingTimeout;
@@ -748,7 +752,7 @@ client.onData((id: string, data: Json.json) => {
 client.onKilled((id: string) => {
   const p = pending.get(id);
   if (p) {
-    p.reject();
+    p.reject('killed');
     _resolved(id);
   }
 });
@@ -764,7 +768,7 @@ client.onRejected((id: string) => {
 client.onError((id: string, msg: string) => {
   const p = pending.get(id);
   if (p) {
-    p.reject(msg);
+    p.reject(`{error (${msg})`);
     _resolved(id);
   }
 });

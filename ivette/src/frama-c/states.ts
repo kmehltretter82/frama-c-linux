@@ -398,7 +398,7 @@ class SyncArray<K, A> {
       let pending;
       /* eslint-disable no-await-in-loop */
       do {
-        const data = await Server.send(this.handler.fetch, 20000);
+        const data = await Server.send(this.handler.fetch, 33);
         const { reload = false, removed = [], updated = [] } = data;
         const { model } = this;
         if (reload) model.removeAllData();
@@ -411,8 +411,8 @@ class SyncArray<K, A> {
       /* eslint-enable no-await-in-loop */
     } catch (error) {
       D.error(
-        `Fail to retrieve the value of syncArray '${this.handler.name}.`,
-        `${error}`,
+        `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
+        error,
       );
     } finally {
       this.fetching = false;
