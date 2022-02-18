@@ -114,7 +114,7 @@ api:
 	@echo "[Ivette] Generating TypeScript API"
 	@find src/frama-c -path "*/api/*" -name "*.ts" -exec rm -f {} \;
 	../bin/frama-c.byte \
-		-load-module src/frama-c/api/generator.ml \
+		-load-module src/frama-c/api_generator.ml \
 		-server-tsc
 	@find src/frama-c -path "*/api/*" -name "*.ts" \
 		-exec headache \
