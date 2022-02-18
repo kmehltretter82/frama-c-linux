@@ -458,20 +458,20 @@ async function _launch(): Promise<void> {
   process?.stdout?.on('data', logger);
   process?.stderr?.on('data', logger);
   process?.on('exit', (code: number | null, signal: string | null) => {
-    if (signal) {
-      // [signal] is non-null.
+    if (signal !== null) {
       buffer.log('[frama-c]', signal);
       _exit(false);
       return;
     }
-    // [signal] is null, hence [code] is non-null (cf. NodeJS doc).
-    if (code) {
+    if (code !== 0) {
       buffer.log('[frama-c] exit', code);
-      _exit(false);
-    } else {
-      // [code] is zero: normal exit w/o error.
       _exit(true);
+      return;
     }
+    if (Dome.DEVEL)
+      buffer.log('[frama-c] terminated.');
+    _exit(false);
+    return;
   });
   // Connect to Server
   client.connect(sockaddr);
