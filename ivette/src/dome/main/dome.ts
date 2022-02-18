@@ -621,8 +621,12 @@ ipcMain.handle(
 
 // --------------------------------------------------------------------------
 
-ipcMain.handle('theme-color:switch', (_evt, theme: 'dark' | 'light') => {
-  // const theme = nativeTheme.shouldUseDarkColors ? 'light' : 'dark';
+type themes = 'dark' | 'light' | 'system';
+
+ipcMain.handle('theme-color:switch', (_evt, theme: themes) => {
   nativeTheme.themeSource = theme;
-  // return nativeTheme.shouldUseDarkColors;
+});
+
+ipcMain.handle('theme-color:which-system', () => {
+  return nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
 });

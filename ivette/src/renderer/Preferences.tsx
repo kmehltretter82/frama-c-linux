@@ -72,6 +72,22 @@ function ThemeFields(props: P.ThemeProps) {
   );
 }
 
+function ColorThemeFields() {
+  const [theme, setTheme] = Settings.useGlobalSettings(P.ColorTheme);
+  const elements = P.THEMES.map(({ id, label }) => {
+    return <option value={id} key={id}>{label}</option>;
+  });
+  const set = (t: string | undefined) => {
+    if (t) { P.forceThemeUpdate(t); setTheme(t); }
+  };
+  return (
+    <Forms.SelectField label={'Color theme'} state={[theme, undefined, set]}>
+      {elements}
+    </Forms.SelectField>
+  );
+
+}
+
 // --------------------------------------------------------------------------
 // --- Editor Command Forms
 // --------------------------------------------------------------------------
@@ -93,6 +109,9 @@ function EditorCommandFields(props: P.EditorCommandProps) {
 export default function Preferences() {
   return (
     <Forms.Page>
+      <Forms.Section label="Theme" unfold>
+        <ColorThemeFields/>
+      </Forms.Section>
       <Forms.Section label="AST View" unfold>
         <ThemeFields
           target="Internal AST"

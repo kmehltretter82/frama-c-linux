@@ -35,7 +35,6 @@ import * as Sidebar from 'dome/frame/sidebars';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
-import { ipcRenderer } from 'electron';
 import * as Settings from 'dome/data/settings';
 import './loader';
 import * as Preferences from 'ivette/prefs';
@@ -55,7 +54,7 @@ export default function Application(): JSX.Element {
   };
 
   const [ th, setTh ] = Settings.useGlobalSettings(Preferences.ColorTheme);
-  const change = (t: string) => ipcRenderer.invoke('theme-color:switch', t);
+  const change = Preferences.forceThemeUpdate;
   React.useState(() => change(th));
   const other = th === 'dark' ? 'light' : 'dark';
   const themeTitle = 'Switch to ' + other + ' theme';

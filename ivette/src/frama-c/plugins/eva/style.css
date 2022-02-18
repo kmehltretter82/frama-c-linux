@@ -242,6 +242,7 @@
 
 .eva-probes .eva-transient {
     background: var(--eva-probes-transient);
+    align-items: center;
 }
 
 .eva-probes .eva-transient.eva-focused {

@@ -77,7 +77,7 @@ function buildServerConfig(argv: string[], cwd?: string) {
   let command;
   let sockaddr;
   let cwdir = cwd;
-  for (let k = 0; k < argv.length; k++) {
+  for (let k = 0; k < (argv ? argv.length : 0); k++) {
     const v = argv[k];
     switch (v) {
       case '--cwd':
