@@ -25,7 +25,7 @@
 /**
    Property Services
    @packageDocumentation
-   @module frama-c/api/kernel/properties
+   @module frama-c/kernel/api/properties
 */
 
 //@ts-ignore
@@ -38,21 +38,21 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { bySource } from 'frama-c/api/kernel/ast';
+import { bySource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jSource } from 'frama-c/api/kernel/ast';
+import { jSource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jSourceSafe } from 'frama-c/api/kernel/ast';
+import { jSourceSafe } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { source } from 'frama-c/api/kernel/ast';
+import { source } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { byTag } from 'frama-c/api/kernel/data';
+import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTag } from 'frama-c/api/kernel/data';
+import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTagSafe } from 'frama-c/api/kernel/data';
+import { jTagSafe } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { tag } from 'frama-c/api/kernel/data';
+import { tag } from 'frama-c/kernel/api/data';
 
 /** Property Kinds */
 export enum propKind {

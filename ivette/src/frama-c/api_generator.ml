@@ -15,19 +15,11 @@ module TSC = Self.Action
       let help = "Generate TypeScript API"
     end)
 
-module API = Self.String
-    (struct
-      let option_name = "-server-tsc-pkg"
-      let arg_name = "dir"
-      let default = "frama-c/api"
-      let help = Printf.sprintf "Output package (default is '%s')" default
-     end)
-
 module OUT = Self.String
     (struct
       let option_name = "-server-tsc-out"
-      let arg_name = "dir"
-      let default = "src/frama-c/api/generated"
+      let arg_name = "path"
+      let default = "src"
       let help = Printf.sprintf "Output directory (default is '%s')" default
     end)
 
@@ -491,20 +483,28 @@ let ranking ds =
 (* --- Package Generator                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
+let pkg_path ~plugin ~package =
+  String.concat "/" @@
+  let pkg = "api" :: package in
+  "frama-c" ::
+  match plugin with
+  | Pkg.Kernel -> "kernel" :: pkg
+  | Pkg.Plugin p -> "plugins" :: p :: pkg
+
 let makeIgnore fmt msg =
   Format.fprintf fmt "//@ts-ignore@\n" ;
   Format.fprintf fmt msg
 
-let makePackage pkg name fmt =
+(* path shall be [pkg_path] of [pkg] *)
+let makePackage pkg path fmt =
   begin
     let open Pkg in
-    let framac = API.get () in
     Format.fprintf fmt "/* --- Generated Frama-C Server API --- */@\n@\n" ;
     Format.fprintf fmt "/**@\n   %s@\n" pkg.p_title ;
     if pkg.p_descr <> [] then
       Format.fprintf fmt "@\n   @[<hov 0>%a@]@\n@\n" pp_descr pkg.p_descr ;
     Format.fprintf fmt "   @@packageDocumentation@\n" ;
-    Format.fprintf fmt "   @@module %s/%s@\n" framac name ;
+    Format.fprintf fmt "   @@module %s@\n" path ;
     Format.fprintf fmt "*/@\n@." ;
     let names = Pkg.resolve ~keywords pkg in
     makeIgnore fmt "import * as Json from 'dome/data/json';@\n" ;
@@ -513,17 +513,16 @@ let makePackage pkg name fmt =
     makeIgnore fmt "import * as State from 'frama-c/states';@\n" ;
     Format.pp_print_newline fmt () ;
     Pkg.IdMap.iter
-      (fun id name ->
-         if id.plugin <> pkg.p_plugin ||
-            id.package <> pkg.p_package
+      (fun { name = iname ; plugin ; package } name ->
+         if plugin <> pkg.p_plugin || package <> pkg.p_package
          then
-           let pkg = Pkg.name_of_pkg ~sep:"/" id.plugin id.package in
-           if id.name = name then
-             makeIgnore fmt "import { %s } from '%s/%s';@\n"
-               name framac pkg
+           let path = pkg_path ~plugin ~package in
+           if iname = name then
+             makeIgnore fmt "import { %s } from '%s';@\n"
+               name path
            else
-             makeIgnore fmt "import { %s: %s } from '%s/%s';@\n"
-               id.name name framac pkg
+             makeIgnore fmt "import { %s: %s } from '%s';@\n"
+               iname name path
       ) names ;
     List.iter
       (makeDeclaration fmt names)
@@ -540,13 +539,14 @@ let generate () =
   begin
     Pkg.iter
       begin fun pkg ->
-        Self.feedback "Package %a" Pkg.pp_pkgname pkg ;
-        let name = Pkg.name_of_pkginfo ~sep:"/" pkg in
-        let file = Printf.sprintf "%s/%s/index.ts" (OUT.get ()) name in
+        let path = pkg_path ~plugin:pkg.p_plugin ~package:pkg.p_package in
+        Self.feedback "Package %s" path ;
+        let out = OUT.get () in
+        let file = Printf.sprintf "%s/%s/index.ts" out path in
         let dir = Filename.dirname file in
         if not (Sys.file_exists dir && Sys.is_directory dir) then
           Extlib.mkdir ~parents:true dir 0o755 ;
-        Command.print_file file (makePackage pkg name) ;
+        Command.print_file file (makePackage pkg path) ;
       end
   end
 

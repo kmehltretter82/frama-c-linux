@@ -25,7 +25,7 @@
 /**
    Project Management
    @packageDocumentation
-   @module frama-c/api/kernel/project
+   @module frama-c/kernel/api/project
 */
 
 //@ts-ignore

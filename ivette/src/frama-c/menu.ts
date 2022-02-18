@@ -27,8 +27,8 @@
 import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
 import * as Server from 'frama-c/server';
-import * as Services from 'frama-c/api/kernel/services';
-import * as Ast from 'frama-c/api/kernel/ast';
+import * as Services from 'frama-c/kernel/api/services';
+import * as Ast from 'frama-c/kernel/api/ast';
 import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
 
@@ -44,7 +44,7 @@ const allFilter = {
 async function parseFiles(files: string[]): Promise<void> {
   Status.setMessage({ text: 'Parsing source files…', kind: 'progress' });
   await Server.send(Ast.setFiles, files);
-  await Server.send(Ast.compute, { });
+  await Server.send(Ast.compute, {});
   Status.setMessage({ text: 'Source files parsed.', kind: 'success' });
   return;
 }

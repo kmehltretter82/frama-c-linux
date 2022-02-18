@@ -25,8 +25,8 @@
 // --------------------------------------------------------------------------
 
 import * as Server from 'frama-c/server';
-import * as Ast from 'frama-c/api/kernel/ast';
-import * as Values from 'frama-c/api/plugins/eva/values';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as Values from 'frama-c/plugins/eva/api/values';
 
 import { ModelCallbacks } from './cells';
 

@@ -28,7 +28,7 @@ import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
-import * as API from 'frama-c/api/plugins/dive';
+import * as API from 'frama-c/plugins/dive/api';
 
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
@@ -396,8 +396,7 @@ class Dive {
 
   async exec<In>(
     request: Server.ExecRequest<In, API.diffData | null>,
-    param: In): Promise<Cytoscape.NodeSingular | undefined>
-   {
+    param: In): Promise<Cytoscape.NodeSingular | undefined> {
     try {
       if (Server.isRunning()) {
         await this.setMode();

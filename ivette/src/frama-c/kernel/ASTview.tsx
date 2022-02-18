@@ -38,10 +38,10 @@ import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
 
-import * as Ast from 'frama-c/api/kernel/ast';
-import * as Properties from 'frama-c/api/kernel/properties';
-import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
-import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as Properties from 'frama-c/kernel/api/properties';
+import { getCallers, getDeadCode } from 'frama-c/plugins/eva/api/general';
+import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)

@@ -32,7 +32,7 @@ import { LED } from 'dome/controls/displays';
 import { Scroll } from 'dome/layout/boxes';
 import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
-import * as PivotState from 'frama-c/api/plugins/pivot/general';
+import * as PivotState from 'frama-c/plugins/pivot/api/general';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
 import 'react-pivottable/pivottable.css';
 
@@ -44,7 +44,7 @@ interface PivotTableProps {
   data: string[][];
 }
 
-export function Pivot(props: PivotTableProps) : JSX.Element {
+export function Pivot(props: PivotTableProps): JSX.Element {
   const [state, setState] = React.useState({});
   return (
     <PivotTableUI
@@ -55,7 +55,7 @@ export function Pivot(props: PivotTableProps) : JSX.Element {
   );
 }
 
-function PivotTable (rawData: PivotState.tableStateType): JSX.Element {
+function PivotTable(rawData: PivotState.tableStateType): JSX.Element {
   const data = new Array(rawData.length > 0 ? rawData.length - 1 : 0);
   if (rawData.length > 0) {
     const headers = rawData[0];
@@ -70,17 +70,17 @@ function PivotTable (rawData: PivotState.tableStateType): JSX.Element {
   return (<Pivot data={data} />);
 }
 
-function PivotTableBuild () : JSX.Element {
+function PivotTableBuild(): JSX.Element {
   const rawData = States.useSyncValue(PivotState.pivotState);
   const [computing, setComputing] = React.useState(false);
   const [error, setError] = React.useState('');
-  async function handleError (err: string) : Promise<void> {
+  async function handleError(err: string): Promise<void> {
     const msg =
       `The pivot table could not be built: an error has occured (${err}).`;
     setError(msg);
     Status.setMessage({ text: msg, kind: 'error' });
   }
-  async function compute () : Promise<void> {
+  async function compute(): Promise<void> {
     setComputing(true);
     setError('');
     Server.send(PivotState.compute, [])
@@ -108,14 +108,14 @@ function PivotTableBuild () : JSX.Element {
           icon="EXECUTE"
           label="Compute"
           title="Builds the pivot table. This may take a few moments."
-          onClick={ compute }
+          onClick={compute}
         />
       </div>
     </div>
   );
 }
 
-export default function PivotTableComponent () : JSX.Element {
+export default function PivotTableComponent(): JSX.Element {
   return (
     <>
       <TitleBar />
