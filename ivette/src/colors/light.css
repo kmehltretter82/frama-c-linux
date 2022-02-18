@@ -39,6 +39,7 @@
     --lcd-button-color: #61611a;
     --lcd-button-background: #b2b798;
 
+    --default-button-color: #e8e8e8;
     --default-led-img: radial-gradient(circle at center, #9fd2f9, #81c9ff);
     --default-button-img: linear-gradient(to bottom, #e8e8e8 0%, #f1f1f1 100%);
     --default-button-hover: #ffffff;

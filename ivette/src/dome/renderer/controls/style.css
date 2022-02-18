@@ -11,6 +11,7 @@
 
 .dome-xLabel .dome-xIcon {
     margin-right: 4px ;
+    fill: var(--info-text-discrete);
 }
 
 .dome-xLabel.dome-text-descr {
