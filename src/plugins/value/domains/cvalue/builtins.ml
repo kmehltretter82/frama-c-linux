@@ -50,7 +50,7 @@ let builtins_table = Hashtbl.create 17
 
 module Info = struct
   let name = "Eva.Builtins.BuiltinsOverride"
-  let dependencies = [ Db.Value.self ]
+  let dependencies = [ Self.state ]
 end
 (** Set of functions overridden by a builtin. *)
 module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)

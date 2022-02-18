@@ -129,6 +129,8 @@ module Value : sig
   val emitter: Emitter.t ref
   (** Emitter used by Value to emit statuses *)
 
+  val proxy: State_builder.Proxy.t
+
   val self : State.t
   (** Internal state of the value analysis from projects viewpoint.
       @plugin development guide *)

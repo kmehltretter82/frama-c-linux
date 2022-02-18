@@ -33,7 +33,7 @@ module Retres =
 let () = Ast.add_monotonic_state Retres.self
 
 let () =
-  State_dependency_graph.add_dependencies ~from:Retres.self [ Db.Value.self ]
+  State_dependency_graph.add_dependencies ~from:Retres.self [ Self.state ]
 
 let get_retres_vi = Retres.memo
     (fun kf ->

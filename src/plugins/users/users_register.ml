@@ -44,7 +44,7 @@ module Users =
     (struct
       let name = "Users"
       let size = 17
-      let dependencies = [ Db.Value.self; ForceUsers.self ]
+      let dependencies = [ Eva.Analysis.self; ForceUsers.self ]
     end)
 
 let call_for_users (_state, call_stack) =
@@ -53,7 +53,7 @@ let call_for_users (_state, call_stack) =
   | (current_function, _call_site) :: tail ->
     if tail = [] then begin
       (* End of Value analysis, we record that Users has run. We should not
-         do this after the explicit call to Db.Value.compute later in this
+         do this after the explicit call to Eva.Analysis.compute later in this
          file, as Value can run on its own and execute Users while doing so.*)
       Users.mark_as_computed ()
     end;
@@ -82,7 +82,7 @@ let get kf =
     if Eva.Analysis.is_computed () then begin
       feedback "requiring again the computation of the value analysis";
       Project.clear
-        ~selection:(State_selection.with_dependencies Db.Value.self)
+        ~selection:(State_selection.with_dependencies Eva.Analysis.self)
         ()
     end else
       feedback ~level:2 "requiring the computation of the value analysis";

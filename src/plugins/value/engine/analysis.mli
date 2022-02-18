@@ -72,7 +72,7 @@ val register_hook: ((module S) -> unit) -> unit
     is changed. This happens when a new analysis is run with different
     abstractions than before, or when the current project is changed. *)
 
-type computation_state = NotComputed | Computing | Computed
+type computation_state = NotComputed | Computing | Computed | Aborted
 (** Computation state of the analysis. *)
 
 val current_computation_state : unit -> computation_state

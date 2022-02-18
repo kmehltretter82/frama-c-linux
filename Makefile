@@ -812,8 +812,9 @@ PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=callgraph
 PLUGIN_TESTS_LIB:=tests/callgraph/function_pointer.ml
-$(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
+PLUGIN_DEPENDENCIES:=Eva
 
+$(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 ##################
 # Evolved Value Analysis #
@@ -1058,6 +1059,8 @@ PLUGIN_CMO:= postdominators_parameters print compute
 PLUGIN_NO_TEST:=yes
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
+PLUGIN_DEPENDENCIES:=Eva
+
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 #########

@@ -26,8 +26,8 @@
 module ShouldOutput =
   State_builder.True_ref
     (struct
-      let dependencies = [Db.Value.self] (* To be completed if some computations
-                                            use some other results than value *)
+      let dependencies = [Eva.Analysis.self] (* To be completed if some computations
+                                                use some other results than Eva *)
       let name = "Inout.Register.ShouldOuput"
     end)
 let () = Inout_parameters.Output.add_set_hook

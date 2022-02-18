@@ -208,7 +208,7 @@ module Internals =
   Kernel_function.Make_Table(Inout_type)
     (struct
       let name = "Inout.Operational_inputs.Internals"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
       let size = 17
     end)
 
@@ -801,7 +801,7 @@ let get_internal =
     (fun kf ->
        Eva.Analysis.compute ();
        try Internals.find kf (* The results may have been computed by the call
-                                to Value.compute *)
+                                to Eva.Analysis.compute *)
        with
        | Not_found ->
          if!Db.Value.use_spec_instead_of_definition kf then
