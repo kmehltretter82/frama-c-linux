@@ -69,6 +69,11 @@ stdenv.mkDerivation rec {
     autoconf
   '';
 
+  buildPhase = ''
+    make config.sed
+    dune build --display short @install
+  '';
+
   installFlags = [
     "FRAMAC_INSTALLDIR=$(out)"
   ];
