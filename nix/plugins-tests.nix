@@ -19,19 +19,15 @@ stdenv.mkDerivation rec {
   sourceRoot = ".";
 
   buildInputs = frama-c.buildInputs ++ [
-    alt-ergo
+    alt-ergo # only for WP qualif
     frama-c
     perl
     time
     which
   ];
 
-  postPatch = ''
-    find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
-    patchShebangs .
-  '';
-
   # Keep main configuration
+  # Only for WP qualif -> replace with true after split
   configurePhase = ''
     mkdir home
     HOME=$(pwd)/home
