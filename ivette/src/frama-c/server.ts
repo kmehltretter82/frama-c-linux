@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Connection to Frama-C Server
 // --------------------------------------------------------------------------
@@ -41,6 +39,28 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { ChildProcess } from 'child_process';
 import { client } from './client_socket';
 //import { client } from './client_zmq';
+
+// --------------------------------------------------------------------------
+// --- Server Status
+// --------------------------------------------------------------------------
+
+/** Server stages. */
+export enum Status {
+  /** Server is off. */
+  OFF = 'OFF',
+  /** Server is starting, but not on yet. */
+  STARTING = 'STARTING',
+  /** Server is on. */
+  ON = 'ON',
+  /** Server is halting, but not off yet. */
+  HALTING = 'HALTING',
+  /** Server is restarting. */
+  RESTARTING = 'RESTARTING',
+  /** Server is off upon failure. */
+  FAILURE = 'FAILURE',
+}
+
+const unreachable = (_c: never): never => { throw ('unreachable'); };
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -78,26 +98,6 @@ export class SIGNAL extends Dome.Event {
   constructor(signal: string) {
     super(`frama-c.server.signal.${signal}`);
   }
-}
-
-// --------------------------------------------------------------------------
-// --- Server Status
-// --------------------------------------------------------------------------
-
-/** Server stages. */
-export enum Status {
-  /** Server is off. */
-  OFF = 'OFF',
-  /** Server is starting, but not on yet. */
-  STARTING = 'STARTING',
-  /** Server is on. */
-  ON = 'ON',
-  /** Server is halting, but not off yet. */
-  HALTING = 'HALTING',
-  /** Server is restarting. */
-  RESTARTING = 'RESTARTING',
-  /** Server is off upon failure. */
-  FAILURE = 'FAILURE',
 }
 
 // --------------------------------------------------------------------------
@@ -172,19 +172,23 @@ export function getPending(): number {
  *  Register callback on `READY` event.
  *  @param {function} callback Invoked when the server enters [[ON]] stage.
  */
-export function onReady(callback: () => void) { READY.on(callback); }
+export function onReady(callback: () => void): void {
+  READY.on(callback);
+}
 
 /**
  *  Register callback on `SHUTDOWN` event.
  *  @param {function} callback Invoked when the server leaves [[ON]] stage.
  */
-export function onShutdown(callback: () => void) { SHUTDOWN.on(callback); }
+export function onShutdown(callback: () => void): void {
+  SHUTDOWN.on(callback);
+}
 
 // --------------------------------------------------------------------------
 // --- Status Update
 // --------------------------------------------------------------------------
 
-function _status(newStatus: Status) {
+function _status(newStatus: Status): void {
   if (newStatus !== status) {
     const oldStatus = status;
     status = newStatus;
@@ -205,7 +209,7 @@ function _status(newStatus: Status) {
  *  - If the server is halting, it will restart.
  *  - Otherwise, the Frama-C server is spawned.
  */
-export async function start() {
+export async function start(): Promise<void> {
   switch (status) {
     case Status.OFF:
     case Status.FAILURE:
@@ -221,8 +225,11 @@ export async function start() {
     case Status.HALTING:
       _status(Status.RESTARTING);
       return;
-    default:
+    case Status.ON:
+    case Status.STARTING:
       return;
+    default:
+      unreachable(status);
   }
 }
 
@@ -235,20 +242,30 @@ export async function start() {
  *
  *  - If the server is starting, it is hard killed.
  *  - If the server is running, it is shutdown gracefully.
+ *  - If the server is halting, it is hard killed.
  *  - Otherwise, this is a no-op.
  */
-export function stop() {
+export function stop(): void {
   switch (status) {
     case Status.STARTING:
       _status(Status.HALTING);
       _kill();
       return;
     case Status.ON:
+    case Status.HALTING:
       _status(Status.HALTING);
       _shutdown();
       return;
-    default:
+    case Status.RESTARTING:
+      _status(Status.HALTING);
       return;
+    case Status.OFF:
+      return;
+    case Status.FAILURE:
+      _status(Status.OFF);
+      return;
+    default:
+      unreachable(status);
   }
 }
 
@@ -260,20 +277,25 @@ export function stop() {
  *  Terminate the server.
  *
  *  - If the server is either starting, running or shutting down,
- *  it is hard killed and restart is canceled.
+ *    it is hard killed.
  *  - Otherwise, this is a no-op.
  */
-export function kill() {
+export function kill(): void {
   switch (status) {
-    case Status.STARTING:
     case Status.ON:
     case Status.HALTING:
+    case Status.STARTING:
     case Status.RESTARTING:
       _status(Status.HALTING);
       _kill();
       return;
-    default:
+    case Status.OFF:
       return;
+    case Status.FAILURE:
+      _status(Status.OFF);
+      return;
+    default:
+      unreachable(status);
   }
 }
 
@@ -289,7 +311,7 @@ export function kill() {
  *  and finally schedule a reboot on exit.
  *  - Otherwise, this is a no-op.
  */
-export function restart() {
+export function restart(): void {
   switch (status) {
     case Status.OFF:
     case Status.FAILURE:
@@ -302,8 +324,11 @@ export function restart() {
     case Status.HALTING:
       _status(Status.RESTARTING);
       return;
-    default:
+    case Status.STARTING:
+    case Status.RESTARTING:
       return;
+    default:
+      unreachable(status);
   }
 }
 
@@ -318,15 +343,13 @@ export function restart() {
  *  clear the console and set server stage to [[OFF]].
  *  - Otherwise, this is a no-op.
  */
-export function clear() {
+export function clear(): void {
   switch (status) {
-    case Status.FAILURE:
     case Status.OFF:
+    case Status.FAILURE:
       buffer.clear();
       _clear();
       _status(Status.OFF);
-      return;
-    default:
       return;
   }
 }
@@ -365,7 +388,7 @@ let config: Configuration = { command: 'frama-c', params: [] };
  *  Set the current server configuration.
  *  @param {Configuration} sc Server configuration.
  */
-export function setConfig(sc: Configuration) {
+export function setConfig(sc: Configuration): void {
   config = { ...sc };
 }
 
@@ -381,7 +404,7 @@ export function getConfig(): Configuration {
 // --- Low-level Launching
 // --------------------------------------------------------------------------
 
-async function _launch() {
+async function _launch(): Promise<void> {
   let {
     env,
     cwd,
@@ -426,7 +449,7 @@ async function _launch() {
   };
   // Launch Process
   process = await System.spawn(command, params, options);
-  const logger = (text: string | string[]) => {
+  const logger = (text: string | string[]): void => {
     buffer.append(text);
     if (text.indexOf('\n') >= 0) {
       buffer.scroll();
@@ -458,7 +481,7 @@ async function _launch() {
 // --- Low-level Killing
 // --------------------------------------------------------------------------
 
-function _clear() {
+function _clear(): void {
   rqCount = 0;
   pending.forEach((p: PendingRequest) => p.reject('clear'));
   pending.clear();
@@ -472,12 +495,12 @@ function _clear() {
   }
 }
 
-function _kill() {
+function _kill(): void {
   client.disconnect();
   if (process) process.kill();
 }
 
-async function _shutdown() {
+async function _shutdown(): Promise<void> {
   _clear();
   client.shutdown();
   const killingPromise = new Promise((resolve) => {
@@ -494,7 +517,7 @@ async function _shutdown() {
   await killingPromise;
 }
 
-function _exit(error: boolean) {
+function _exit(error: boolean): void {
   _clear();
   client.disconnect();
   process = undefined;
@@ -525,7 +548,7 @@ class SignalHandler {
     this.unplug = this.unplug.bind(this);
   }
 
-  on(callback: () => void) {
+  on(callback: () => void): void {
     const e = this.event;
 
     const n = e.listenerCount();
@@ -536,7 +559,7 @@ class SignalHandler {
     }
   }
 
-  off(callback: () => void) {
+  off(callback: () => void): void {
     const e = this.event;
     e.off(callback);
     const n = e.listenerCount();
@@ -547,7 +570,7 @@ class SignalHandler {
   }
 
   /* Bound to this */
-  sigon() {
+  sigon(): void {
     if (this.active && !this.listen) {
       this.listen = true;
       client.sigOn(this.id);
@@ -555,7 +578,7 @@ class SignalHandler {
   }
 
   /* Bound to this, Debounced */
-  sigoff() {
+  sigoff(): void {
     if (!this.active && this.listen) {
       if (isRunning()) {
         this.listen = false;
@@ -564,11 +587,11 @@ class SignalHandler {
     }
   }
 
-  emit() {
+  emit(): void {
     this.event.emit();
   }
 
-  unplug() {
+  unplug(): void {
     this.listen = false;
     this.handler.cancel();
   }
@@ -597,7 +620,7 @@ function _signal(id: string): SignalHandler {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function onSignal(s: Signal, callback: () => void) {
+export function onSignal(s: Signal, callback: () => void): void {
   _signal(s.name).on(callback);
 }
 
@@ -609,7 +632,7 @@ export function onSignal(s: Signal, callback: () => void) {
  *  @param {string} id The signal identifier that was listen to.
  *  @param {function} callback The callback to remove.
  */
-export function offSignal(s: Signal, callback: () => void) {
+export function offSignal(s: Signal, callback: () => void): void {
   _signal(s.name).off(callback);
 }
 
@@ -618,7 +641,7 @@ export function offSignal(s: Signal, callback: () => void) {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function useSignal(s: Signal, callback: () => void) {
+export function useSignal(s: Signal, callback: () => void): void {
   React.useEffect(() => {
     onSignal(s, callback);
     return () => { offSignal(s, callback); };
@@ -694,7 +717,7 @@ export function send<In, Out>(
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
   const response: Response<Out> = new Promise<Out>((resolve, reject) => {
-    const unwrap = (js: Json.json) => {
+    const unwrap = (js: Json.json): void => {
       try {
         const data = request.output(js);
         if (data !== undefined)
@@ -722,7 +745,7 @@ export function send<In, Out>(
 // --- Client Events
 // --------------------------------------------------------------------------
 
-function _resolved(id: string) {
+function _resolved(id: string): void {
   pending.delete(id);
   if (pending.size === 0) {
     rqCount = 0;
