@@ -10,6 +10,7 @@ let
     frama-c = oself.callPackage ./frama-c.nix {};
     # Tests
     main-tests = oself.callPackage ./main-tests.nix {};
+    plugins-tests = oself.callPackage ./plugins-tests.nix {};
   };
   overlay = self: super: {
     niv = (import sources.niv {}).niv;

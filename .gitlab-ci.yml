@@ -59,6 +59,13 @@ main-tests:
   tags:
     - nix
 
+plugins-tests:
+  stage: tests
+  script:
+    - nix-build nix/pkgs.nix -A ocamlPackages.plugins-tests
+  tags:
+    - nix
+
 ################################################################################
 ### DISTRIB
 
