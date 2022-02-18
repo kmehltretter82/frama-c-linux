@@ -160,7 +160,7 @@ export interface SwitchProps {
 
 /** Toolbar Switch. */
 export function Switch(props: SwitchProps) {
-  const { title = '', onClick = () => {}, position } = props;
+  const { title = '', onClick, position } = props;
   const checked = position ? position === 'right' : undefined;
   return (
     <label className={'dome-xSwitch'}>

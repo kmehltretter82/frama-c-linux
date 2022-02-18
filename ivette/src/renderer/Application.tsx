@@ -58,7 +58,7 @@ export default function Application(): JSX.Element {
   React.useState(() => change(th));
   const other = th === 'dark' ? 'light' : 'dark';
   const themeTitle = 'Switch to ' + other + ' theme';
-  const changeColorTheme = () => { change(other); setTh(other); };
+  const changeColorTheme: () => void = () => { change(other); setTh(other); };
 
   return (
     <Vfill>
