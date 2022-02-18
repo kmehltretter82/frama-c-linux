@@ -271,7 +271,8 @@ let communicate server =
     Queue.clear server.q_out ;
     server.s_signal <- Sigs.empty ;
     message.callback !pool ;
-    Option.iter raise error ; true
+    Option.iter raise error ;
+    true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Yielding & Signaling                                               --- *)
