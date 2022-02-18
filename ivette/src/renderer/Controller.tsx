@@ -362,7 +362,7 @@ export const Status = () => {
   const pending = Server.getPending();
   let led: LEDstatus = 'inactive';
   let icon = undefined;
-  let running = false;
+  let running = 'OFF';
   let blink = false;
 
   switch (status) {
@@ -371,26 +371,26 @@ export const Status = () => {
     case Server.Status.STARTING:
       led = 'active';
       blink = true;
-      running = true;
+      running = 'BOOT';
       break;
     case Server.Status.ON:
       led = pending > 0 ? 'positive' : 'active';
-      running = true;
+      running = 'ON';
       break;
     case Server.Status.HALTING:
       led = 'negative';
       blink = true;
-      running = true;
+      running = 'HALT';
       break;
     case Server.Status.RESTARTING:
       led = 'warning';
       blink = true;
-      running = true;
+      running = 'REBOOT';
       break;
     case Server.Status.FAILURE:
       led = 'negative';
       blink = true;
-      running = false;
+      running = 'ERR';
       icon = 'WARNING';
       break;
   }
@@ -398,7 +398,7 @@ export const Status = () => {
   return (
     <>
       <LED status={led} blink={blink} />
-      <Code icon={icon} label={running ? 'ON' : 'OFF'} />
+      <Code icon={icon} label={running} />
       <Toolbars.Separator />
     </>
   );
