@@ -2,7 +2,9 @@ let
   sources = import ./sources.nix {};
   ocamlOverlay = oself: osuper: {
     # External Packages
+    alt-ergo = oself.callPackage ./alt-ergo.nix {};
     camlzip = oself.callPackage ./camlzip.nix {};
+    psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
     why3 = oself.callPackage ./why3.nix {};
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
