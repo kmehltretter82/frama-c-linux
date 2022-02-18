@@ -265,7 +265,6 @@
 .dome-xButton-led {
     display: inline ;
     position: relative ;
-    bottom: -2px ;
     border-color: var(--border) ;
     border-style: solid ;
     border-width: 1px ;

@@ -26,7 +26,7 @@
 
 
 .cm-s-dark-code div.CodeMirror-selected {
-  background: var(--info-text-discrete);
+  background: #3e4b5d;
 }
 
 .cm-s-dark-code span.cm-meta { color: #83a598; }

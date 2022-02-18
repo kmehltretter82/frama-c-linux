@@ -356,8 +356,8 @@
 .dome-xToolBar-control:disabled {
     fill: var(--disabled-text) ;
     color: var(--disabled-text) ;
+    border-color: var(--background-intense) ;
     box-shadow: none ;
-    border-color: var(--border-discrete) ;
 }
 
 /* Selected */
@@ -396,28 +396,33 @@
 
 .dome-xToolBar-group .dome-xToolBar-control {
     margin: 0 ;
+    border-radius: 0;
+}
+
+.dome-xToolBar-group > .dome-xToolBar-control:first-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.dome-xToolBar-group > .dome-xToolBar-control:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 .dome-xToolBar-group .dome-xToolBar-control:not(:first-child) {
     border-left: 0 ;
 }
 
-.dome-xToolBar-group > .dome-xToolBar-control:first-child {
-    border-top-right-radius: 0 ;
-    border-bottom-right-radius: 0 ;
+.dome-xToolBar-group .dome-xToolBar-control:not(:last-child) {
+    border-right: 0 ;
 }
 
-.dome-xToolBar-group > .dome-xToolBar-control:last-child {
-    border-top-left-radius: 0 ;
-    border-bottom-left-radius: 0 ;
+.dome-xToolBar-group .dome-xToolBar-control:not(:disabled):not(:last-child) {
+  border-right: 1px solid var(--border);
 }
 
-.dome-xToolBar-group > .dome-xToolBar-control:first-child:last-child {
-    border-radius: 4px ;
-}
-
-.dome-xToolBar-group > .dome-xToolBar-control:not(:first-child):not(:last-child) {
-    border-radius: 0 ;
+.dome-xToolBar-control:disabled + .dome-xToolBar-control:not(:disabled) {
+  border-left: 1px solid var(--border);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -466,6 +471,7 @@
 }
 
 .dome-xToolBar-searchitem {
+    color: var(--text);
     display: block ;
     width: 100% ;
     margin-left: 0px ;
