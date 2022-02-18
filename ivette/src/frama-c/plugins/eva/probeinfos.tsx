@@ -57,7 +57,11 @@ function ProbeEditor(props: ModelProp): JSX.Element | null {
   const { zoomable } = probe;
   return (
     <>
-      <Label className="eva-probeinfo-label">{label}</Label>
+      <Label
+        display={label !== code}
+        className="eva-probeinfo-label">
+        {label}
+      </Label>
       <div className="eva-probeinfo-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
@@ -67,6 +71,7 @@ function ProbeEditor(props: ModelProp): JSX.Element | null {
         className="eva-probeinfo-button"
         display={zoomable}
         selected={zoomed}
+        title="Resize cells to fit values"
         onClick={() => { if (probe) probe.setZoomed(!zoomed); }}
       />
       <IconButton
