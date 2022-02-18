@@ -96,11 +96,11 @@ struct
       method pp_int amode fmt k = match amode with
         | Aint -> pp_print_string fmt (Z.to_string k)
         | Areal ->
-            if Z.lt k Z.zero then
-              (* unary minus is -. instead of - in Why3... *)
-              fprintf fmt "-.%s.0" (Z.to_string (Z.neg k))
-            else
-              fprintf fmt "%s.0" (Z.to_string k)
+          if Z.lt k Z.zero then
+            (* unary minus is -. instead of - in Why3... *)
+            fprintf fmt "-.%s.0" (Z.to_string (Z.neg k))
+          else
+            fprintf fmt "%s.0" (Z.to_string k)
 
       method pp_real fmt r =
         if Z.equal r.Q.den Z.one then
@@ -196,23 +196,23 @@ struct
       method pp_forall tau fmt = function
         | [] -> ()
         | x::xs ->
-            fprintf fmt "@[<hov 2>forall %a" self#pp_var x ;
-            List.iter (fun x -> fprintf fmt "@ %a" self#pp_var x) xs ;
-            fprintf fmt "@ : %a.@]" self#pp_tau tau ;
+          fprintf fmt "@[<hov 2>forall %a" self#pp_var x ;
+          List.iter (fun x -> fprintf fmt "@ %a" self#pp_var x) xs ;
+          fprintf fmt "@ : %a.@]" self#pp_tau tau ;
 
       method pp_intros tau fmt = function
         | [] -> ()
         | x::xs ->
-            fprintf fmt "@[<hov 2>forall %a" self#pp_var x ;
-            List.iter (fun x -> fprintf fmt "@ %a" self#pp_var x) xs ;
-            fprintf fmt "@ : %a@]" self#pp_tau tau ;
+          fprintf fmt "@[<hov 2>forall %a" self#pp_var x ;
+          List.iter (fun x -> fprintf fmt "@ %a" self#pp_var x) xs ;
+          fprintf fmt "@ : %a@]" self#pp_tau tau ;
 
       method pp_exists tau fmt = function
         | [] -> ()
         | x::xs ->
-            fprintf fmt "@[<hov 2>exists %a" self#pp_var x ;
-            List.iter (fun x -> fprintf fmt "@ %a" self#pp_var x) xs ;
-            fprintf fmt "@ : %a.@]" self#pp_tau tau ;
+          fprintf fmt "@[<hov 2>exists %a" self#pp_var x ;
+          List.iter (fun x -> fprintf fmt "@ %a" self#pp_var x) xs ;
+          fprintf fmt "@ : %a.@]" self#pp_tau tau ;
 
       method pp_trigger fmt t =
         let rec pretty fmt = function
@@ -227,18 +227,18 @@ struct
           | F_call f, _
           | F_bool_prop (f,_), Cterm
           | F_bool_prop (_,f), Cprop ->
-              Plib.pp_call_apply ~f pretty fmt ts
+            Plib.pp_call_apply ~f pretty fmt ts
           | F_left f, _ -> Plib.pp_fold_apply ~f pretty fmt ts
           | F_right f, _ -> Plib.pp_fold_apply_rev ~f pretty fmt (List.rev ts)
           | F_assoc op, _ -> Plib.pp_assoc ~op pretty fmt ts
           | F_subst (_, s), _ -> Plib.substitute_list pretty s fmt ts
           | F_list(fc,fn) , _ ->
-              let rec plist fc fn fmt = function
-                | [] -> pp_print_string fmt fn
-                | x::xs ->
-                    fprintf fmt "[<hov 2>(%s@ %a@ %a)@]" fc
-                      pretty x (plist fc fn) xs
-              in plist fc fn fmt ts
+            let rec plist fc fn fmt = function
+              | [] -> pp_print_string fmt fn
+              | x::xs ->
+                fprintf fmt "[<hov 2>(%s@ %a@ %a)@]" fc
+                  pretty x (plist fc fn) xs
+            in plist fc fn fmt ts
         in fprintf fmt "@[<hov 2>%a@]" pretty t
 
       (* -------------------------------------------------------------------------- *)
@@ -293,11 +293,11 @@ struct
               ) xs ;
             match cmode with
             | Cprop ->
-                fprintf fmt " =@ @[<hov 0>%a@]@]@\n"
-                  self#pp_prop e
+              fprintf fmt " =@ @[<hov 0>%a@]@]@\n"
+                self#pp_prop e
             | Cterm ->
-                fprintf fmt " : %a =@ @[<hov 0>%a@]@]@\n"
-                  self#pp_tau t (self#pp_expr t) e
+              fprintf fmt " : %a =@ @[<hov 0>%a@]@]@\n"
+                self#pp_tau t (self#pp_expr t) e
           end
 
       method declare_fixpoint ~prefix fmt f xs t e =

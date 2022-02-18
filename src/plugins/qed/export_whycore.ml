@@ -51,9 +51,9 @@ struct
   let rec full_triggers = function
     | [] -> []
     | ts :: tgs ->
-        match List.filter full_trigger ts with
-        | [] -> full_triggers tgs
-        | ts -> ts :: full_triggers tgs
+      match List.filter full_trigger ts with
+      | [] -> full_triggers tgs
+      | ts -> ts :: full_triggers tgs
 
   class virtual engine =
     object(self)
@@ -110,15 +110,15 @@ struct
             (fun i (f,v) ->
                ( match i , base with
                  | (Isingle | Ifirst) , Some r ->
-                     fprintf fmt "@ %a with" self#pp_flow r
+                   fprintf fmt "@ %a with" self#pp_flow r
                  | _ -> () ) ;
                ( match i with
                  | Ifirst | Imiddle ->
-                     fprintf fmt "@ @[<hov 2>%s = %a ;@]"
-                       (self#field f) self#pp_flow v
+                   fprintf fmt "@ @[<hov 2>%s = %a ;@]"
+                     (self#field f) self#pp_flow v
                  | Isingle | Ilast ->
-                     fprintf fmt "@ @[<hov 2>%s = %a@]"
-                       (self#field f) self#pp_flow v )
+                   fprintf fmt "@ @[<hov 2>%s = %a@]"
+                     (self#field f) self#pp_flow v )
             ) fvs ;
           fprintf fmt "@ %s@]" right ;
         end
@@ -150,30 +150,30 @@ struct
 
       method declare_type fmt adt n = function
         | Tabs ->
-            self#pp_declare_adt fmt adt n ;
-            pp_print_newline fmt ()
+          self#pp_declare_adt fmt adt n ;
+          pp_print_newline fmt ()
         | Tdef def ->
-            self#pp_declare_def fmt adt n def ;
-            pp_print_newline fmt ()
+          self#pp_declare_def fmt adt n def ;
+          pp_print_newline fmt ()
         | Tsum cases ->
-            self#pp_declare_sum fmt adt n cases ;
-            pp_print_newline fmt ()
+          self#pp_declare_sum fmt adt n cases ;
+          pp_print_newline fmt ()
         | Trec fts ->
-            begin
-              Format.fprintf fmt "@[<hv 0>@[<hv 2>" ;
-              self#pp_declare_adt fmt adt n ;
-              let left,right = self#op_record in
-              fprintf fmt " = %s" left ;
-              Plib.iteri
-                (fun index (f,t) ->
-                   match index with
-                   | Isingle | Ilast ->
-                       fprintf fmt "@ @[<hov 2>%s : %a@]" (self#field f) self#pp_tau t
-                   | Imiddle | Ifirst ->
-                       fprintf fmt "@ @[<hov 2>%s : %a@] ;" (self#field f) self#pp_tau t
-                ) fts ;
-              fprintf fmt "@] %s@]@\n" right ;
-            end
+          begin
+            Format.fprintf fmt "@[<hv 0>@[<hv 2>" ;
+            self#pp_declare_adt fmt adt n ;
+            let left,right = self#op_record in
+            fprintf fmt " = %s" left ;
+            Plib.iteri
+              (fun index (f,t) ->
+                 match index with
+                 | Isingle | Ilast ->
+                   fprintf fmt "@ @[<hov 2>%s : %a@]" (self#field f) self#pp_tau t
+                 | Imiddle | Ifirst ->
+                   fprintf fmt "@ @[<hov 2>%s : %a@] ;" (self#field f) self#pp_tau t
+              ) fts ;
+            fprintf fmt "@] %s@]@\n" right ;
+          end
 
       method pp_declare_symbol t fmt f =
         let name = link_name (self#link f) in

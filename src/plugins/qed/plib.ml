@@ -47,23 +47,23 @@ type 'a printer2 = formatter -> 'a -> 'a -> unit
 let pp_call_var ~f pp fmt = function
   | [] -> pp_print_string fmt f
   | x::xs ->
-      fprintf fmt "@[<hov 2>%s(%a" f pp x ;
-      List.iter (fun y -> fprintf fmt ",@ %a" pp y) xs ;
-      fprintf fmt ")@]"
+    fprintf fmt "@[<hov 2>%s(%a" f pp x ;
+    List.iter (fun y -> fprintf fmt ",@ %a" pp y) xs ;
+    fprintf fmt ")@]"
 
 let pp_call_void ~f pp fmt = function
   | [] -> fprintf fmt "%s()" f
   | x::xs ->
-      fprintf fmt "@[<hov 2>%s(%a" f pp x ;
-      List.iter (fun y -> fprintf fmt ",@ %a" pp y) xs ;
-      fprintf fmt ")@]"
+    fprintf fmt "@[<hov 2>%s(%a" f pp x ;
+    List.iter (fun y -> fprintf fmt ",@ %a" pp y) xs ;
+    fprintf fmt ")@]"
 
 let pp_call_apply ~f pp fmt = function
   | [] -> pp_print_string fmt f
   | xs ->
-      fprintf fmt "@[<hov 2>(%s" f ;
-      List.iter (fun y -> fprintf fmt "@ %a" pp y) xs ;
-      fprintf fmt ")@]"
+    fprintf fmt "@[<hov 2>(%s" f ;
+    List.iter (fun y -> fprintf fmt "@ %a" pp y) xs ;
+    fprintf fmt ")@]"
 
 let pp_binop ~op pp fmt a b =
   fprintf fmt "%a@ %s %a" pp a op pp b
@@ -76,7 +76,7 @@ let print_not_empty s fmt = function
 let pp_assoc ?e ~op pp fmt = function
   | [] -> print_not_empty op fmt e
   | x::xs ->
-      pp fmt x ; List.iter (fun y -> fprintf fmt " %s@ %a" op pp y) xs
+    pp fmt x ; List.iter (fun y -> fprintf fmt " %s@ %a" op pp y) xs
 
 let rec pp_fold_binop ?e ~op pp fmt = function
   | [] -> print_not_empty op fmt e
@@ -106,14 +106,14 @@ let rec pp_fold_apply_rev ?e ~f pp fmt = function
 let pp_listcompact ~sep pp fmt = function
   | [] -> ()
   | x::xs ->
-      pp fmt x ;
-      List.iter (fun x -> fprintf fmt "%s@,%a" sep pp x) xs
+    pp fmt x ;
+    List.iter (fun x -> fprintf fmt "%s@,%a" sep pp x) xs
 
 let pp_listsep ~sep pp fmt = function
   | [] -> ()
   | x::xs ->
-      pp fmt x ;
-      List.iter (fun x -> fprintf fmt "%s@ %a" sep pp x) xs
+    pp fmt x ;
+    List.iter (fun x -> fprintf fmt "%s@ %a" sep pp x) xs
 
 type index = Isingle | Ifirst | Ilast | Imiddle
 
@@ -121,11 +121,11 @@ let iteri f = function
   | [] -> ()
   | [x] -> f Isingle x
   | x::xs ->
-      let rec iterk f = function
-        | [] -> ()
-        | [x] -> f Ilast x
-        | x::xs -> f Imiddle x ; iterk f xs
-      in f Ifirst x ; iterk f xs
+    let rec iterk f = function
+      | [] -> ()
+      | [x] -> f Ilast x
+      | x::xs -> f Imiddle x ; iterk f xs
+    in f Ifirst x ; iterk f xs
 
 let iterk f xs =
   let rec step f k = function
@@ -137,8 +137,8 @@ let mapk f xs =
   let rec step f k = function
     | [] -> []
     | x::xs ->
-        let y = f k x in
-        y :: step f (succ k) xs
+      let y = f k x in
+      y :: step f (succ k) xs
   in step f 0 xs
 
 (** the regexp shouldn't match empty *)

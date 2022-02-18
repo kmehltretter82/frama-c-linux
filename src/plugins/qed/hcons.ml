@@ -58,8 +58,8 @@ let rec compare_list cmp xs ys =
     | [] , _ :: _ -> -1
     | _ :: _ , [] -> 1
     | x::xs , y::ys ->
-        let c = cmp x y in
-        if c = 0 then compare_list cmp xs ys else c
+      let c = cmp x y in
+      if c = 0 then compare_list cmp xs ys else c
 
 let rec equal_list eq xs ys =
   xs == ys ||

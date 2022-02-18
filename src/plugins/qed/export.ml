@@ -88,10 +88,10 @@ let sanitize ~to_lowercase base =
     let c = base.[i] in
     match c with
     | '0' .. '9' | 'a' .. 'z' | '_' ->
-        Buffer.add_char p c
+      Buffer.add_char p c
     | 'A' .. 'Z' ->
-        Buffer.add_char p
-          (if to_lowercase then Char.lowercase_ascii c else c)
+      Buffer.add_char p
+        (if to_lowercase then Char.lowercase_ascii c else c)
     | _ -> ()
   done ;
   Buffer.contents p
@@ -238,7 +238,7 @@ struct
   let rec binders q k vars e =
     match T.repr e with
     | Bind(q',t,e) when q'=q ->
-        binders q (succ k) (add_var k t vars) (lc_repr e)
+      binders q (succ k) (add_var k t vars) (lc_repr e)
     | _ -> k,vars,e
 
   let rec lambda k kts e =
@@ -251,11 +251,11 @@ struct
     | Bind((Forall|Exists),_,_) | True | False -> true
     | Not a -> has_prop_form link a
     | Fun(f,_) ->
-        begin
-          match link f with
-          | F_bool_prop _ -> true
-          | _ -> T.Fun.sort f = Sprop
-        end
+      begin
+        match link f with
+        | F_bool_prop _ -> true
+        | _ -> T.Fun.sort f = Sprop
+      end
     | _ -> false
 
   (* -------------------------------------------------------------------------- *)
@@ -386,16 +386,16 @@ struct
       method private pp_unop ~op fmt x =
         match op with
         | Assoc op | Op op ->
-            if self#op_spaced op (*&& self#is_atomic x*) then
-              fprintf fmt "%s %a" op self#pp_flow x
-            else
-              fprintf fmt "%s%a" op self#pp_atom x
+          if self#op_spaced op (*&& self#is_atomic x*) then
+            fprintf fmt "%s %a" op self#pp_flow x
+          else
+            fprintf fmt "%s%a" op self#pp_atom x
         | Call f -> self#pp_call ~f fmt [x]
 
       method private pp_binop ~op fmt x y =
         match op with
         | Assoc op | Op op ->
-            fprintf fmt "%a %s@ %a" self#pp_atom x op self#pp_atom y
+          fprintf fmt "%a %s@ %a" self#pp_atom x op self#pp_atom y
         | Call f -> self#pp_call ~f fmt [x;y]
 
       method private pp_binop_term ~op fmt x y =
@@ -406,56 +406,56 @@ struct
         | Assoc op -> Plib.pp_assoc ~op self#pp_atom fmt xs
         | Op op -> Plib.pp_fold_binop ~op self#pp_atom fmt xs
         | Call f ->
-            match self#callstyle with
-            | CallVar | CallVoid ->
-                Plib.pp_fold_call  ~f self#pp_flow fmt xs
-            | CallApply ->
-                Plib.pp_fold_apply ~f self#pp_atom fmt xs
+          match self#callstyle with
+          | CallVar | CallVoid ->
+            Plib.pp_fold_call  ~f self#pp_flow fmt xs
+          | CallApply ->
+            Plib.pp_fold_apply ~f self#pp_atom fmt xs
 
       method pp_fun cmode fct fmt xs =
         match self#link fct, cmode with
         | F_call f, _
         | F_bool_prop (f,_), Cterm
         | F_bool_prop (_,f), Cprop ->
-            self#pp_callsorts ~f fmt (Fun.params fct) xs
+          self#pp_callsorts ~f fmt (Fun.params fct) xs
         | F_assoc op, _ -> Plib.pp_assoc ~e:"?" ~op self#pp_atom fmt xs
         | F_left f, _ ->
-            begin
-              match self#callstyle with
-              | CallVar | CallVoid ->
-                  Plib.pp_fold_call ~f self#pp_flow fmt xs
-              | CallApply ->
-                  Plib.pp_fold_apply ~f self#pp_atom fmt xs
-            end
+          begin
+            match self#callstyle with
+            | CallVar | CallVoid ->
+              Plib.pp_fold_call ~f self#pp_flow fmt xs
+            | CallApply ->
+              Plib.pp_fold_apply ~f self#pp_atom fmt xs
+          end
         | F_right f, _ ->
-            begin
-              let xs = List.rev xs in
-              match self#callstyle with
-              | CallVar | CallVoid ->
-                  Plib.pp_fold_call_rev ~f self#pp_flow fmt xs
-              | CallApply ->
-                  Plib.pp_fold_apply_rev ~f self#pp_atom fmt xs
-            end
+          begin
+            let xs = List.rev xs in
+            match self#callstyle with
+            | CallVar | CallVoid ->
+              Plib.pp_fold_call_rev ~f self#pp_flow fmt xs
+            | CallApply ->
+              Plib.pp_fold_apply_rev ~f self#pp_atom fmt xs
+          end
         | F_list(fc,fn), _ ->
-            begin
-              let rec plist w fmt xs =
-                let style,fc,fn = w in
-                match style , xs with
-                | (CallVar|CallApply) , [] -> pp_print_string fmt fn
-                | CallVoid , [] -> fprintf fmt "%s()" fn
-                | (CallVar|CallVoid) , x::xs ->
-                    fprintf fmt "@[<hov 2>%s(@,%a,@,%a)@]"
-                      fc self#pp_flow x (plist w) xs
-                | CallApply , x::xs ->
-                    fprintf fmt "@[<hov 2>(%s@ %a @ %a)@]"
-                      fc self#pp_atom x (plist w) xs
-              in plist (self#callstyle,fc,fn) fmt xs
-            end
+          begin
+            let rec plist w fmt xs =
+              let style,fc,fn = w in
+              match style , xs with
+              | (CallVar|CallApply) , [] -> pp_print_string fmt fn
+              | CallVoid , [] -> fprintf fmt "%s()" fn
+              | (CallVar|CallVoid) , x::xs ->
+                fprintf fmt "@[<hov 2>%s(@,%a,@,%a)@]"
+                  fc self#pp_flow x (plist w) xs
+              | CallApply , x::xs ->
+                fprintf fmt "@[<hov 2>(%s@ %a @ %a)@]"
+                  fc self#pp_atom x (plist w) xs
+            in plist (self#callstyle,fc,fn) fmt xs
+          end
         | F_subst (_, s), _ ->
-            let print = match self#callstyle with
-              | CallVar | CallVoid -> self#pp_flow
-              | CallApply -> self#pp_atom in
-            Plib.substitute_list print s fmt xs
+          let print = match self#callstyle with
+            | CallVar | CallVoid -> self#pp_flow
+            | CallApply -> self#pp_atom in
+          Plib.substitute_list print s fmt xs
 
       method virtual pp_apply : cmode -> term -> term list printer
 
@@ -498,21 +498,21 @@ struct
             (fun _ ->
                match self#op_real_of_int with
                | Op op | Assoc op ->
-                   begin
-                     match flow with
-                     | Atom -> fprintf fmt "(%s %a)" op self#pp_atom e
-                     | Flow -> fprintf fmt "%s %a" op self#pp_atom e
-                   end
+                 begin
+                   match flow with
+                   | Atom -> fprintf fmt "(%s %a)" op self#pp_atom e
+                   | Flow -> fprintf fmt "%s %a" op self#pp_atom e
+                 end
                | Call f ->
-                   begin
-                     match self#callstyle with
-                     | CallVar | CallVoid ->
-                         fprintf fmt "%s(%a)" f self#pp_flow e
-                     | CallApply ->
-                         match flow with
-                         | Atom -> fprintf fmt "(%s %a)" f self#pp_atom e
-                         | Flow -> fprintf fmt "%s %a" f self#pp_atom e
-                   end)
+                 begin
+                   match self#callstyle with
+                   | CallVar | CallVoid ->
+                     fprintf fmt "%s(%a)" f self#pp_flow e
+                   | CallApply ->
+                     match flow with
+                     | Atom -> fprintf fmt "(%s %a)" f self#pp_atom e
+                     | Flow -> fprintf fmt "%s %a" f self#pp_atom e
+                 end)
         else match flow with
           | Flow -> self#pp_flow fmt e
           | Atom -> self#pp_atom fmt e
@@ -529,10 +529,10 @@ struct
           begin fun _ ->
             match phi (amode mode) with
             | Assoc op | Op op ->
-                if self#op_spaced op then
-                  fprintf fmt "%s %a" op (self#pp_arith_arg Atom) a
-                else
-                  fprintf fmt "%s%a" op (self#pp_arith_arg Atom) a
+              if self#op_spaced op then
+                fprintf fmt "%s %a" op (self#pp_arith_arg Atom) a
+              else
+                fprintf fmt "%s%a" op (self#pp_arith_arg Atom) a
             | Call f -> self#pp_arith_call ~f fmt [a]
           end
 
@@ -542,7 +542,7 @@ struct
           begin fun _ ->
             match phi (amode mode) with
             | Assoc op | Op op ->
-                Plib.pp_binop ~op (self#pp_arith_arg Atom) fmt a b
+              Plib.pp_binop ~op (self#pp_arith_arg Atom) fmt a b
             | Call f -> self#pp_arith_call ~f fmt [a;b]
           end
 
@@ -554,11 +554,11 @@ struct
             | Assoc op -> Plib.pp_assoc ~e:"?" ~op (self#pp_arith_arg Atom) fmt xs
             | Op op -> Plib.pp_fold_binop ~e:"?" ~op (self#pp_arith_arg Atom) fmt xs
             | Call f ->
-                match self#callstyle with
-                | CallVar | CallVoid ->
-                    Plib.pp_fold_call ~e:"?" ~f (self#pp_arith_arg Flow) fmt xs
-                | CallApply ->
-                    Plib.pp_fold_apply ~e:"?" ~f (self#pp_arith_arg Atom) fmt xs
+              match self#callstyle with
+              | CallVar | CallVoid ->
+                Plib.pp_fold_call ~e:"?" ~f (self#pp_arith_arg Flow) fmt xs
+              | CallApply ->
+                Plib.pp_fold_apply ~e:"?" ~f (self#pp_arith_arg Atom) fmt xs
           end
 
       method private pp_arith_cmp ~phi fmt a b =
@@ -567,33 +567,33 @@ struct
         let gmode = if is_real then Mreal else Mint in
         match phi (cmode mode) amode with
         | Assoc op | Op op ->
-            self#with_mode gmode
-              (fun emode ->
-                 let scope =
-                   match emode with
-                   | Mpositive | Mnegative
-                   | Mterm | Mterm_int | Mterm_real -> self#op_scope amode
-                   | Mint | Mreal -> None
-                 in match scope with
-                 | None ->
-                     begin
-                       fprintf fmt "@[<hov 2>" ;
-                       Plib.pp_binop ~op (self#pp_arith_arg Atom) fmt a b ;
-                       fprintf fmt "@]" ;
-                     end
-                 | Some s ->
-                     begin
-                       fprintf fmt "@[<hov 1>(" ;
-                       Plib.pp_binop ~op (self#pp_arith_arg Atom) fmt a b ;
-                       fprintf fmt ")%s@]" s ;
-                     end)
+          self#with_mode gmode
+            (fun emode ->
+               let scope =
+                 match emode with
+                 | Mpositive | Mnegative
+                 | Mterm | Mterm_int | Mterm_real -> self#op_scope amode
+                 | Mint | Mreal -> None
+               in match scope with
+               | None ->
+                 begin
+                   fprintf fmt "@[<hov 2>" ;
+                   Plib.pp_binop ~op (self#pp_arith_arg Atom) fmt a b ;
+                   fprintf fmt "@]" ;
+                 end
+               | Some s ->
+                 begin
+                   fprintf fmt "@[<hov 1>(" ;
+                   Plib.pp_binop ~op (self#pp_arith_arg Atom) fmt a b ;
+                   fprintf fmt ")%s@]" s ;
+                 end)
         | Call f ->
-            begin
-              fprintf fmt "@[<hov 2>" ;
-              self#with_mode gmode
-                (fun _ -> self#pp_arith_call ~f fmt [a;b]) ;
-              fprintf fmt "@]" ;
-            end
+          begin
+            fprintf fmt "@[<hov 2>" ;
+            self#with_mode gmode
+              (fun _ -> self#pp_arith_call ~f fmt [a;b]) ;
+            fprintf fmt "@]" ;
+          end
 
       method pp_times fmt k e =
         if Z.equal k Z.minus_one
@@ -651,11 +651,11 @@ struct
         | Assoc op -> Plib.pp_assoc ~e:"?" ~op pp_atom fmt xs
         | Op op -> Plib.pp_fold_binop ~e:"?" ~op pp_atom fmt xs
         | Call f ->
-            match self#callstyle with
-            | CallVar | CallVoid ->
-                Plib.pp_fold_call ~e:"?" ~f pp_flow fmt xs
-            | CallApply ->
-                Plib.pp_fold_apply ~e:"?" ~f pp_atom fmt xs
+          match self#callstyle with
+          | CallVar | CallVoid ->
+            Plib.pp_fold_call ~e:"?" ~f pp_flow fmt xs
+          | CallApply ->
+            Plib.pp_fold_apply ~e:"?" ~f pp_atom fmt xs
 
       (* -------------------------------------------------------------------------- *)
       (* --- Equality                                                           --- *)
@@ -693,31 +693,31 @@ struct
         match T.repr e with
 
         | Bind(Lambda,t,e) ->
-            let e = lc_repr e in
-            let n,kts,e = lambda 1 [0,t] e in
-            let last = Bvars.order (lc_vars e) + n - 1 in
-            let binder (k,t) = bind_bvar (last-k) t index self#sanitize , t in
-            let xts = List.map binder kts in
-            self#pp_lambda fmt xts ;
-            self#pp_binders fmt e
+          let e = lc_repr e in
+          let n,kts,e = lambda 1 [0,t] e in
+          let last = Bvars.order (lc_vars e) + n - 1 in
+          let binder (k,t) = bind_bvar (last-k) t index self#sanitize , t in
+          let xts = List.map binder kts in
+          self#pp_lambda fmt xts ;
+          self#pp_binders fmt e
 
         | Bind((Forall|Exists) as q,t,e) ->
-            let e = lc_repr e in
-            let n,vars,e = binders q 1 (add_var 0 t TauMap.empty) e in
-            let last = Bvars.order (lc_vars e) + n - 1 in
-            TauMap.iter
-              (fun t ks ->
-                 let binder k = bind_bvar (last-k) t index self#sanitize in
-                 let xs = List.fold_left (fun xs k -> binder k :: xs) [] ks in
-                 match q with
-                 | Forall -> fprintf fmt "%a@ " (self#pp_forall t) xs
-                 | Exists -> fprintf fmt "%a@ " (self#pp_exists t) xs
-                 | Lambda -> assert false
-              ) vars ;
-            self#pp_binders fmt e
+          let e = lc_repr e in
+          let n,vars,e = binders q 1 (add_var 0 t TauMap.empty) e in
+          let last = Bvars.order (lc_vars e) + n - 1 in
+          TauMap.iter
+            (fun t ks ->
+               let binder k = bind_bvar (last-k) t index self#sanitize in
+               let xs = List.fold_left (fun xs k -> binder k :: xs) [] ks in
+               match q with
+               | Forall -> fprintf fmt "%a@ " (self#pp_forall t) xs
+               | Exists -> fprintf fmt "%a@ " (self#pp_exists t) xs
+               | Lambda -> assert false
+            ) vars ;
+          self#pp_binders fmt e
 
         | _ ->
-            self#pp_shared fmt e
+          self#pp_shared fmt e
 
       (* -------------------------------------------------------------------------- *)
       (* --- Sharing                                                            --- *)
@@ -739,11 +739,11 @@ struct
       method subterms f e =
         match T.repr e with
         | Rdef fts ->
-            begin
-              match T.record_with fts with
-              | None -> T.lc_iter f e
-              | Some(a,fts) -> f a ; List.iter (fun (_,e) -> f e) fts
-            end
+          begin
+            match T.record_with fts with
+            | None -> T.lc_iter f e
+            | Some(a,fts) -> f a ; List.iter (fun (_,e) -> f e) fts
+          end
         | _ -> T.lc_iter f e
 
       method virtual pp_let : Format.formatter -> pmode -> string -> term -> unit
@@ -818,34 +818,34 @@ struct
           self#op_minus amode
         with
         | Assoc add , Assoc sub , Op minus ->
-            let factor x = match T.repr x with
-              | Kint z when Z.lt z Z.zero-> (false,T.e_zint (Z.neg z))
-              | Kreal r when Q.lt r Q.zero -> (false,T.e_real (Q.neg r))
-              | Times(k,y) when Z.lt k Z.zero -> (false,T.e_times (Z.neg k) y)
-              | _ -> (true,x) in
-            let sxs = List.map factor xs in
-            let sxs = List.stable_sort
-                (fun (s1,e1) (s2,e2) ->
-                   match s1,s2 with
-                   | true,true | false,false ->
-                       Stdlib.compare (T.weigth e1) (T.weigth e2)
-                   | true,false -> (-1)
-                   | false,true -> 1
-                ) sxs in
-            Plib.iteri
-              (fun i (s,x) ->
-                 begin
-                   match i , s with
-                   | (Ifirst | Isingle) , false ->
-                       if self#op_spaced minus && self#is_atomic x
-                       then fprintf fmt "%s " minus
-                       else pp_print_string fmt minus
-                   | (Ifirst | Isingle) , true -> ()
-                   | (Imiddle | Ilast) , true -> fprintf fmt "@ %s " add
-                   | (Imiddle | Ilast) , false -> fprintf fmt "@ %s " sub
-                 end ;
-                 self#pp_arith_arg Atom fmt x
-              ) sxs
+          let factor x = match T.repr x with
+            | Kint z when Z.lt z Z.zero-> (false,T.e_zint (Z.neg z))
+            | Kreal r when Q.lt r Q.zero -> (false,T.e_real (Q.neg r))
+            | Times(k,y) when Z.lt k Z.zero -> (false,T.e_times (Z.neg k) y)
+            | _ -> (true,x) in
+          let sxs = List.map factor xs in
+          let sxs = List.stable_sort
+              (fun (s1,e1) (s2,e2) ->
+                 match s1,s2 with
+                 | true,true | false,false ->
+                   Stdlib.compare (T.weigth e1) (T.weigth e2)
+                 | true,false -> (-1)
+                 | false,true -> 1
+              ) sxs in
+          Plib.iteri
+            (fun i (s,x) ->
+               begin
+                 match i , s with
+                 | (Ifirst | Isingle) , false ->
+                   if self#op_spaced minus && self#is_atomic x
+                   then fprintf fmt "%s " minus
+                   else pp_print_string fmt minus
+                 | (Ifirst | Isingle) , true -> ()
+                 | (Imiddle | Ilast) , true -> fprintf fmt "@ %s " add
+                 | (Imiddle | Ilast) , false -> fprintf fmt "@ %s " sub
+               end ;
+               self#pp_arith_arg Atom fmt x
+            ) sxs
         | _ -> self#pp_arith_nary ~phi:(self#op_add) fmt xs
 
       method pp_repr fmt e =
