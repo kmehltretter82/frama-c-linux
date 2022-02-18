@@ -30,8 +30,11 @@
     --background-button-hover: #c0c0c0;
     --background-alterning-odd: #fdfdfd;
     --background-alterning-even: #efefef;
-    --selected-element: #8ce0fb;
     --background-interaction: white;
+    --background-report: white;
+
+    --selected-element: #8ce0fb;
+    --checked-element: #54abef;
 
     --lcd-button-color: #61611a;
     --lcd-button-background: #b2b798;

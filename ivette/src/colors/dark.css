@@ -4,7 +4,7 @@
     --text-discrete: #879da0;
     --disabled-text: #506679;
     --info-text: #748a8d;
-    --info-text-discrete: #778d94;
+    --info-text-discrete: #778094;
     --text-highlighted: #d4eaed;
 
     --code-hover: #005137;
@@ -30,8 +30,11 @@
     --background-button-hover: #c0c0c0;
     --background-alterning-odd: #354154;
     --background-alterning-even: #475366;
-    --selected-element: #68758e;
     --background-interaction: #4c596b;
+    --background-report: #1e2b3d;
+
+    --selected-element: #082032;
+    --checked-element: #68758e;
 
     --lcd-button-color: #21211a;
     --lcd-button-background: #727798;

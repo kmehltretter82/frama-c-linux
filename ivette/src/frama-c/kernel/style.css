@@ -92,6 +92,7 @@
 .message-page {
     user-select: text;
     white-space: pre-line;
+    background-color: var(--background-report);
 }
 
 /* -------------------------------------------------------------------------- */
