@@ -95,12 +95,13 @@ export function useThemeColors() {
 export function useThemeButtons(props: ThemeProps): ThemeControls {
   const [fontSize, setFontSize] = Settings.useGlobalSettings(props.fontSize);
   const [wrapText, setWrapText] = Settings.useGlobalSettings(props.wrapText);
+  const theme = useThemeColors();
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
   const flipWrapText = () => setWrapText(!wrapText);
   const { disabled = false } = props;
   return {
-    theme: useThemeColors(),
+    theme,
     fontSize,
     wrapText,
     buttons: [

@@ -40,6 +40,7 @@ import { getInfo } from 'frama-c/kernel/api/ast';
 
 export default function ASTinfo(): JSX.Element {
 
+  const theme = Preferences.useThemeColors();
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [selection, updateSelection] = States.useSelection();
   const marker = selection?.current?.marker;
@@ -65,7 +66,7 @@ export default function ASTinfo(): JSX.Element {
         <Text
           buffer={buffer}
           mode="text"
-          theme={Preferences.useThemeColors()}
+          theme={theme}
           onSelection={onTextSelection}
           readOnly
         />

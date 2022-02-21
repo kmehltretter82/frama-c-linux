@@ -197,6 +197,7 @@ export const Control = () => {
 const editor = new RichTextBuffer();
 
 const RenderConsole = () => {
+  const theme = Preferences.useThemeColors();
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
@@ -331,7 +332,7 @@ const RenderConsole = () => {
         buffer={edited ? editor : Server.buffer}
         mode="text"
         readOnly={!edited}
-        theme={Preferences.useThemeColors()}
+        theme={theme}
       />
     </>
   );
