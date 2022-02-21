@@ -1249,6 +1249,7 @@ export function SelectField(props: SelectFieldProps) {
   return (
     <Field
       {...props}
+      offset={5}
       error={error}
       htmlFor={id}
     >
