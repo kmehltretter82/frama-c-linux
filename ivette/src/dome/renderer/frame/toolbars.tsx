@@ -152,19 +152,32 @@ export function Button<A = undefined>(props: ButtonProps<A>) {
 export interface SwitchProps {
   /** Switch tooltip. */
   title?: string;
-  /** Switch position. */
+  /** Additional class. */
+  className?: string;
+  /** Additional style. */
+  style?: React.CSSProperties;
+  /** Defaults to `true`. */
+  enabled?: boolean;
+  /** Defaults to `false`. */
+  disabled?: boolean;
+  /** Switch position. Default to left. */
   position?: 'left' | 'right';
   /** Click callback. */
-  onClick?: () => void;
+  onChange?: (newPosition: 'left' | 'right') => void;
 }
 
 /** Toolbar Switch. */
 export function Switch(props: SwitchProps) {
-  const { title = '', onClick, position } = props;
-  const checked = position ? position === 'right' : undefined;
+  const { position = 'left', onChange } = props;
+  const { title = '', className = '', style } = props;
+  const { enabled = true, disabled = false } = props;
+  const slide = (p: 'left' | 'right') => p === 'left' ? 'right' : 'left';
+  const callback = onChange && (() => onChange(slide(position)));
+  const checked = position === 'right';
+  if (disabled || !enabled) return <></>;
   return (
-    <label className={'dome-xSwitch'}>
-      <input type={'checkbox'} checked={checked} onChange={onClick} />
+    <label className={'dome-xSwitch ' + className} style={style} >
+      <input type={'checkbox'} checked={checked} onChange={callback} />
       <span className={'dome-xSwitch-slider'} title={title} />
     </label>
   );

@@ -80,9 +80,10 @@ export default function Application(): JSX.Element {
           onSelect={onSelectedHints}
         />
         <Toolbar.Switch
+          disabled={!Dome.DEVEL}
           title={themeTitle}
           position={th === 'dark' ? 'right' : 'left'}
-          onClick={changeColorTheme}
+          onChange={changeColorTheme}
         />
         <Toolbar.Button
           icon="ITEMS.GRID"
