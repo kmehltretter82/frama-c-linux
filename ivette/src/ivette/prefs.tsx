@@ -44,7 +44,7 @@ import { ipcRenderer } from 'electron';
 export const THEMES = [
   { id: 'light', label: 'Light' },
   { id: 'dark', label: 'Dark' },
-  { id: 'system', label: 'System' },
+  { id: 'system', label: 'System Defaults' },
 ];
 
 // --------------------------------------------------------------------------
@@ -86,7 +86,7 @@ ipcRenderer.on('dome.ipc.settings.defaults', () => {
 export function useThemeColors() {
   const [themeColors] = Settings.useGlobalSettings(ColorTheme);
   const invoke = () => ipcRenderer.invoke('theme-color:which-system');
-  const { result } : { result: 'dark' | 'light' } = usePromise(invoke());
+  const { result }: { result: 'dark' | 'light' } = usePromise(invoke());
   if (themeColors === 'system')
     return result === 'dark' ? 'dark-code' : 'default';
   return themeColors === 'dark' ? 'dark-code' : 'default';

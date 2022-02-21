@@ -39,13 +39,13 @@ import React from 'react';
 
 import * as Settings from 'dome/data/settings';
 import * as Forms from 'dome/layout/forms';
-import * as P from 'ivette/prefs';
+import * as IvettePrefs from 'ivette/prefs';
 
 // --------------------------------------------------------------------------
 // --- Font Forms
 // --------------------------------------------------------------------------
 
-function ThemeFields(props: P.ThemeProps) {
+function ThemeFields(props: IvettePrefs.ThemeProps) {
   const fontsize = Forms.useValid(
     Settings.useGlobalSettings(props.fontSize),
   );
@@ -73,12 +73,12 @@ function ThemeFields(props: P.ThemeProps) {
 }
 
 function ColorThemeFields() {
-  const [theme, setTheme] = Settings.useGlobalSettings(P.ColorTheme);
-  const elements = P.THEMES.map(({ id, label }) => {
+  const [theme, setTheme] = Settings.useGlobalSettings(IvettePrefs.ColorTheme);
+  const elements = IvettePrefs.THEMES.map(({ id, label }) => {
     return <option value={id} key={id}>{label}</option>;
   });
   const set = (t: string | undefined) => {
-    if (t) { P.forceThemeUpdate(t); setTheme(t); }
+    if (t) { IvettePrefs.forceThemeUpdate(t); setTheme(t); }
   };
   return (
     <Forms.SelectField label={'Color theme'} state={[theme, undefined, set]}>
@@ -91,7 +91,7 @@ function ColorThemeFields() {
 // --------------------------------------------------------------------------
 // --- Editor Command Forms
 // --------------------------------------------------------------------------
-function EditorCommandFields(props: P.EditorCommandProps) {
+function EditorCommandFields(props: IvettePrefs.EditorCommandProps) {
   const cmd = Forms.useDefined(Forms.useValid(
     Settings.useGlobalSettings(props.command),
   ));
@@ -110,24 +110,24 @@ export default function Preferences() {
   return (
     <Forms.Page>
       <Forms.Section label="Theme" unfold>
-        <ColorThemeFields/>
+        <ColorThemeFields />
       </Forms.Section>
       <Forms.Section label="AST View" unfold>
         <ThemeFields
           target="Internal AST"
-          fontSize={P.AstFontSize}
-          wrapText={P.AstWrapText}
+          fontSize={IvettePrefs.AstFontSize}
+          wrapText={IvettePrefs.AstWrapText}
         />
       </Forms.Section>
       <Forms.Section label="Source View" unfold>
         <ThemeFields
           target="Source Code"
-          fontSize={P.SourceFontSize}
-          wrapText={P.SourceWrapText}
+          fontSize={IvettePrefs.SourceFontSize}
+          wrapText={IvettePrefs.SourceWrapText}
         />
       </Forms.Section>
       <Forms.Section label="Editor Command" unfold>
-        <EditorCommandFields command={P.EditorCommand} />
+        <EditorCommandFields command={IvettePrefs.EditorCommand} />
       </Forms.Section>
     </Forms.Page>
   );
