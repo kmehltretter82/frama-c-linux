@@ -4,6 +4,7 @@ let
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     camlzip = oself.callPackage ./camlzip.nix {};
+    ocp-indent = oself.callPackage ./ocp-indent.nix {};
     psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
     why3 = oself.callPackage ./why3.nix {};
     # Builds
