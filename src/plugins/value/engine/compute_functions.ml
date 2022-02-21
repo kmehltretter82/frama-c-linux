@@ -212,8 +212,8 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Interprets a [call] at callsite [kinstr] in the state [state] by analyzing
      the body of the called function. *)
-  let compute_using_body fundec kinstr call state =
-    let result = Computer.compute call.kf kinstr state in
+  let compute_using_body fundec ~save_results kinstr call state =
+    let result = Computer.compute ~save_results call.kf kinstr state in
     Summary.FunctionStats.recompute fundec;
     result
 
@@ -246,8 +246,10 @@ module Make (Abstract: Abstractions.Eva) = struct
     let call_stack = Eva_utils.call_stack () in
     let compute, kind =
       match target with
-      | `Def (fundec, _) -> compute_using_body fundec, `Def
-      | `Spec funspec -> compute_using_spec funspec, `Spec funspec
+      | `Def (fundec, save_results) ->
+        compute_using_body fundec ~save_results, `Def
+      | `Spec funspec ->
+        compute_using_spec funspec, `Spec funspec
     in
     Db.Value.Call_Type_Value_Callbacks.apply (kind, cvalue_state, call_stack);
     let resulting_states, cacheable = compute kinstr call state in

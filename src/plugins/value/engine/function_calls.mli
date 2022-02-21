@@ -25,7 +25,8 @@ open Cil_types
 (** What is used for the analysis of a given function:
     - a Cvalue builtin (and other domains use the specification)
     - the function specification
-    - the function body. *)
+    - the function body. The boolean indicates whether the resulting states
+      must be recorded at each statement of this function. *)
 type analysis_target =
   [ `Builtin of string * Builtins.builtin * Eval.cacheable * funspec
   | `Spec of Cil_types.funspec
