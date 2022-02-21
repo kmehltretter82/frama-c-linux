@@ -3,7 +3,7 @@
   (public_name frama-c-report.core)
   (modules report_parameters scan dump csv register classify Report)
   (private_modules report_parameters scan dump csv register classify)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel)
 )
 

@@ -11,7 +11,7 @@
  (name from)
   (optional)
   (public_name frama-c-from.core)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -6-9-50)
   (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-postdominators.core)
 )
 

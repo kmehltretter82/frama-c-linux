@@ -2,6 +2,6 @@
   (name from_gui)
   (public_name frama-c-from.gui)
   (optional)
-  (flags -open Frama_c_kernel -open Frama_c_gui)
+  (flags -open Frama_c_kernel -open Frama_c_gui :standard -w -9)
   (libraries frama-c.kernel frama-c.gui frama-c-from.core)
 )

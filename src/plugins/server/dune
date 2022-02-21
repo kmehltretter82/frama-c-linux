@@ -1,7 +1,7 @@
 ( library
   (name server)
   (public_name frama-c-server.core)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -9-50)
  (libraries frama-c.kernel
   (select server_zmq.ml from
      (zmq -> server_zmq.ok.ml)

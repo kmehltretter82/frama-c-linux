@@ -2,7 +2,7 @@
   (name security_slicing)
  (public_name frama-c-security_slicing.core)
   (modules security_slicing_parameters components)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel)
 )
 
@@ -14,7 +14,7 @@
   (public_name frama-c-security_slicing.gui)
   (optional)
   (modules register_gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Security_slicing)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Security_slicing :standard  -w -6-9)
   (libraries security_slicing frama-c.kernel frama-c.gui)
 )
 

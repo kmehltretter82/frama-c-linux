@@ -11,7 +11,7 @@
  (name reduc)
   (optional)
   (public_name frama-c-reduc.core)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -6-9)
   (libraries frama-c.kernel frama-c-inout.core frama-c-eva.core)
 )
 

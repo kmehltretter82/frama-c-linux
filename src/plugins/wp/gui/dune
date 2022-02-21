@@ -2,6 +2,6 @@
   (name wp_gui)
   (public_name frama-c-wp.gui)
   (optional)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Wp)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Wp :standard)
   (libraries frama-c-wp.core frama-c.kernel frama-c.gui why3 qed lablgtk2)
 )

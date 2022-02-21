@@ -72,7 +72,7 @@
            general_requests values_request taint_domain
 )
 ;  (public_interfaces (Eva))
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -6-9-50)
  (libraries frama-c.kernel frama-c-server.core
             ; frama-c-callgraph.core frama-c-rtegen.core frama-c-loop-analysis.core
             ; frama-c-scope.core
@@ -84,7 +84,7 @@
 ( library
   (name numerors)
   (public_name frama-c-eva.numerors)
-  (flags -open Frama_c_kernel -open Eva.Private)
+  (flags -open Frama_c_kernel -open Eva.Private :standard -w -6)
   (modules numerors_domain numerors_utils numerors_float numerors_interval numerors_arithmetics numerors_value)
   (libraries frama-c.kernel frama-c-eva.core gmp)
   (optional)
@@ -95,7 +95,7 @@
 ( library
   (name apron_domain)
   (public_name frama-c-eva.apron)
-  (flags -open Frama_c_kernel -open Eva.Private)
+  (flags -open Frama_c_kernel -open Eva.Private :standard -w -9)
   (modules apron_domain)
   (libraries frama-c.kernel frama-c-eva.core apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
   (optional)
@@ -109,7 +109,7 @@
   (optional)
   (modules gui_callstacks_filters gui_callstacks_manager gui_eval gui_types register_gui gui_red)
 ;  (public_interfaces ())
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva.Private)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva.Private :standard -w -6-9-50)
   (libraries eva frama-c.kernel frama-c.gui)
 )
 
