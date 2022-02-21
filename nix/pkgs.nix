@@ -9,6 +9,7 @@ let
     why3 = oself.callPackage ./why3.nix {};
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
+    lint = oself.callPackage ./lint.nix {};
     # Tests
     main-tests = oself.callPackage ./main-tests.nix {};
     plugins-tests = oself.callPackage ./plugins-tests.nix {};

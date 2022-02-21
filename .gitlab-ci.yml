@@ -49,6 +49,14 @@ frama-c:
   tags:
     - nix
 
+lint:
+  stage: build
+  script:
+   - nix-build nix/pkgs.nix -A ocamlPackages.lint
+  coverage: '/lint coverage: \d+\.\d+/'
+  tags:
+   - nix
+
 ################################################################################
 ### TESTS
 
@@ -71,14 +79,6 @@ plugins-tests:
 
 ################################################################################
 ### PUBLIC
-
-# lint:
-#   stage: build
-#   script:
-#    - nix/frama-ci.sh build -A frama-c.lint
-#   coverage: '/lint coverage: \d+\.\d+/'
-#   tags:
-#    - nix
 
 # wp-qualif:
 #   stage: tests
