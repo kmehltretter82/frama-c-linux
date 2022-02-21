@@ -77,7 +77,6 @@ module ProverSearch = ProverSearch
 module WpRTE = WpRTE
 module Rformat = Rformat
 module WpContext = WpContext
-module WpStrategy = WpStrategy
 module Why3Provers = Why3Provers
 module ProverWhy3 = ProverWhy3
 module Cache = Cache
