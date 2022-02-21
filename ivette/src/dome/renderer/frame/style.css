@@ -410,11 +410,11 @@
 }
 
 .dome-xToolBar-group .dome-xToolBar-control:not(:first-child) {
-    border-left: 0 ;
+    border-left: 1px solid transparent;
 }
 
 .dome-xToolBar-group .dome-xToolBar-control:not(:last-child) {
-    border-right: 0 ;
+    border-right: 1px solid transparent;
 }
 
 .dome-xToolBar-group .dome-xToolBar-control:not(:disabled):not(:last-child) {
