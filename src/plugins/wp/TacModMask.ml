@@ -65,59 +65,59 @@ class modmask =
       in
       match Lang.F.repr e with
       | Mod(a, m) ->
-          begin
-            try
-              let m = Cint.l_lsl e_one @@ Cint.match_power2 m in
-              let n = Cint.l_and a (m - e_one) in
-              let cond = a >= e_zero in
+        begin
+          try
+            let m = Cint.l_lsl e_one @@ Cint.match_power2 m in
+            let n = Cint.l_and a (m - e_one) in
+            let cond = a >= e_zero in
 
-              update_display ~hard:false ~active_field:false ;
-              Applicable (on_cond "Mask Guard" cond @@ replace_with "Mask" n)
+            update_display ~hard:false ~active_field:false ;
+            Applicable (on_cond "Mask Guard" cond @@ replace_with "Mask" n)
 
-            with Not_found ->
-              let power_of_2 =
-                let v = Lang.freshvar ~basename:"n" Lang.t_int in
-                let tv = e_var v in
-                p_exists [v] (e_zero <= tv && m = Cint.l_lsl e_one tv)
-              in
-              let cond = (a >= e_zero && e_zero < m && power_of_2) in
-              let n = Cint.l_and a (m - e_one) in
+          with Not_found ->
+            let power_of_2 =
+              let v = Lang.freshvar ~basename:"n" Lang.t_int in
+              let tv = e_var v in
+              p_exists [v] (e_zero <= tv && m = Cint.l_lsl e_one tv)
+            in
+            let cond = (a >= e_zero && e_zero < m && power_of_2) in
+            let n = Cint.l_and a (m - e_one) in
 
-              update_display ~hard:true ~active_field:false ;
-              Applicable (on_cond "Mask Guard" cond @@ replace_with "Mask" n)
-          end
+            update_display ~hard:true ~active_field:false ;
+            Applicable (on_cond "Mask Guard" cond @@ replace_with "Mask" n)
+        end
 
       | Fun( f , [ a ; b ] ) when Lang.Fun.equal f Cint.f_land ->
-          begin
-            try
-              let a, m =
-                try b, Cint.match_power2_minus1 a
-                with Not_found -> a, Cint.match_power2_minus1 b
-              in
+        begin
+          try
+            let a, m =
+              try b, Cint.match_power2_minus1 a
+              with Not_found -> a, Cint.match_power2_minus1 b
+            in
 
-              let cond = a >= e_zero in
-              let n = a mod (Cint.l_lsl e_one m) in
+            let cond = a >= e_zero in
+            let n = a mod (Cint.l_lsl e_one m) in
 
-              update_display ~hard:false ~active_field:false ;
-              Applicable (on_cond "Mod Guard" cond @@ replace_with "Mod" n)
+            update_display ~hard:false ~active_field:false ;
+            Applicable (on_cond "Mod Guard" cond @@ replace_with "Mod" n)
 
-            with Not_found ->
-              let a, m = if self#get_field v_revert then b, a else a, b in
-              let plus_1_power_of_2 =
-                let v = Lang.freshvar ~basename:"n" Lang.t_int in
-                let tv = e_var v in
-                p_exists [v] (e_zero <= tv && m + e_one = Cint.l_lsl e_one tv)
-              in
-              let cond = (a >= e_zero && e_zero <= m && plus_1_power_of_2) in
-              let n = a mod (m + e_one) in
+          with Not_found ->
+            let a, m = if self#get_field v_revert then b, a else a, b in
+            let plus_1_power_of_2 =
+              let v = Lang.freshvar ~basename:"n" Lang.t_int in
+              let tv = e_var v in
+              p_exists [v] (e_zero <= tv && m + e_one = Cint.l_lsl e_one tv)
+            in
+            let cond = (a >= e_zero && e_zero <= m && plus_1_power_of_2) in
+            let n = a mod (m + e_one) in
 
-              update_display ~hard:true ~active_field:true ;
-              Applicable (on_cond "Mod Guard" cond @@ replace_with "Mod" n)
-          end
+            update_display ~hard:true ~active_field:true ;
+            Applicable (on_cond "Mod Guard" cond @@ replace_with "Mod" n)
+        end
 
       | _ ->
-          update_display ~hard:false ~active_field:false ;
-          Not_applicable
+        update_display ~hard:false ~active_field:false ;
+        Not_applicable
   end
 
 let modmask = Tactical.export (new modmask)

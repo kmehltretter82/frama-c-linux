@@ -66,7 +66,7 @@ let find_opt s =
   | Why3.Whyconf.ProverNotFound _
   | Why3.Whyconf.ParseFilterProver _
   | Why3.Whyconf.ProverAmbiguity _  ->
-      None
+    None
 
 type fallback = Exact of t | Fallback of t | NotFound
 
@@ -74,18 +74,18 @@ let find_fallback name =
   match find_opt name with
   | Some prv -> Exact prv
   | None ->
-      (* Why3 should deal with this intermediate case *)
-      match find_opt (String.lowercase_ascii name) with
-      | Some prv -> Exact prv
-      | None ->
-          match String.split_on_char ',' name with
-          | shortname :: _ :: _ ->
-              begin
-                match find_opt (String.lowercase_ascii shortname) with
-                | Some prv -> Fallback prv
-                | None -> NotFound
-              end
-          | _ -> NotFound
+    (* Why3 should deal with this intermediate case *)
+    match find_opt (String.lowercase_ascii name) with
+    | Some prv -> Exact prv
+    | None ->
+      match String.split_on_char ',' name with
+      | shortname :: _ :: _ ->
+        begin
+          match find_opt (String.lowercase_ascii shortname) with
+          | Some prv -> Fallback prv
+          | None -> NotFound
+        end
+      | _ -> NotFound
 
 let print_why3 = Why3.Whyconf.prover_parseable_format
 let print_wp s =

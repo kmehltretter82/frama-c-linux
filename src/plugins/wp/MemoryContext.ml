@@ -78,31 +78,31 @@ let set x p w =
   | NotUsed -> w
   | ByAddr -> { w with by_addr = Var x :: w.by_addr }
   | ByRef ->
-      if Cil.isFunctionType x.vtype then w else
-        { w with context = Ptr x :: w.context }
+    if Cil.isFunctionType x.vtype then w else
+      { w with context = Ptr x :: w.context }
   | InContext v ->
-      if Cil.isFunctionType x.vtype then w else
-        begin match v with
-          | Nullable -> { w with nullable = Ptr x :: w.nullable }
-          | Valid -> { w with context = Ptr x :: w.context }
-        end
+    if Cil.isFunctionType x.vtype then w else
+      begin match v with
+        | Nullable -> { w with nullable = Ptr x :: w.nullable }
+        | Valid -> { w with context = Ptr x :: w.context }
+      end
   | InArray v ->
-      if Cil.isFunctionType x.vtype then w else
-        begin match v with
-          | Nullable -> { w with nullable = Arr x :: w.nullable }
-          | Valid -> { w with context = Arr x :: w.context }
-        end
+    if Cil.isFunctionType x.vtype then w else
+      begin match v with
+        | Nullable -> { w with nullable = Arr x :: w.nullable }
+        | Valid -> { w with context = Arr x :: w.context }
+      end
   | ByValue | ByShift ->
-      if x.vghost then w else
-      if Cil.isFunctionType x.vtype then w else
-      if x.vglob && (x.vstorage <> Static || x.vaddrof) then
-        let z = if Cil.isArrayType x.vtype then Arr x else Var x in
-        { w with globals = z :: w.globals }
-      else
-      if x.vformal && Cil.isPointerType x.vtype then
-        let z = if p = ByShift then Arr x else Ptr x in
-        { w with to_heap = z :: w.to_heap }
-      else w
+    if x.vghost then w else
+    if Cil.isFunctionType x.vtype then w else
+    if x.vglob && (x.vstorage <> Static || x.vaddrof) then
+      let z = if Cil.isArrayType x.vtype then Arr x else Var x in
+      { w with globals = z :: w.globals }
+    else
+    if x.vformal && Cil.isPointerType x.vtype then
+      let z = if p = ByShift then Arr x else Ptr x in
+      { w with to_heap = z :: w.to_heap }
+    else w
 
 (* -------------------------------------------------------------------------- *)
 (* --- Building Annotations                                               --- *)
@@ -113,32 +113,32 @@ open Logic_const
 let rec ptr_of = function
   | Ctype t -> Ctype (TPtr(t, []))
   | t when Logic_typing.is_set_type t ->
-      let t = Logic_typing.type_of_set_elem t in
-      Logic_const.make_set_type (ptr_of t)
+    let t = Logic_typing.type_of_set_elem t in
+    Logic_const.make_set_type (ptr_of t)
   | _ -> assert false
 
 let rec addr_of_lval ?loc term =
   let typ = ptr_of term.term_type in
   match term.term_node with
   | TLval lv ->
-      Logic_utils.mk_logic_AddrOf ?loc lv typ
+    Logic_utils.mk_logic_AddrOf ?loc lv typ
   | TCastE (_, t) | TLogic_coerce (_, t) ->
-      addr_of_lval ?loc t
+    addr_of_lval ?loc t
   | Tif(c, t, e) ->
-      let t = addr_of_lval ?loc t in
-      let e = addr_of_lval ?loc e in
-      Logic_const.term ?loc (Tif(c, t, e)) typ
+    let t = addr_of_lval ?loc t in
+    let e = addr_of_lval ?loc e in
+    Logic_const.term ?loc (Tif(c, t, e)) typ
   | Tat( _, _) ->
-      term
+    term
   | Tunion l ->
-      let l = List.map (addr_of_lval ?loc) l in
-      Logic_const.term ?loc (Tunion l) typ
+    let l = List.map (addr_of_lval ?loc) l in
+    Logic_const.term ?loc (Tunion l) typ
   | Tinter l ->
-      let l = List.map (addr_of_lval ?loc) l in
-      Logic_const.term ?loc (Tinter l) typ
+    let l = List.map (addr_of_lval ?loc) l in
+    Logic_const.term ?loc (Tinter l) typ
   | Tcomprehension (t, qs, p) ->
-      let t = addr_of_lval ?loc t in
-      Logic_const.term ?loc (Tcomprehension (t,qs,p)) typ
+    let t = addr_of_lval ?loc t in
+    Logic_const.term ?loc (Tcomprehension (t,qs,p)) typ
   | _ -> term
 
 let type_of_zone = function
@@ -168,35 +168,35 @@ let zone_to_term ?(to_char=false) loc zone =
   | Var vi -> loc_range (term ~loc (TAddrOf(lval vi)) typ)
   | Ptr vi -> loc_range (term ~loc (TLval(lval vi)) typ)
   | Arr vi ->
-      let ptr =
-        if Cil.isArrayType vi.vtype
-        then term ~loc (TStartOf (lval vi)) typ
-        else term ~loc (TLval(lval vi)) typ
-      in
-      let ptr =
-        if not to_char then ptr
-        else Logic_utils.mk_cast ~loc Cil.charPtrType ptr
-      in
-      let range = trange ~loc (None, None) in
-      term ~loc (TBinOp(PlusPI, ptr, range)) ptr.term_type
+    let ptr =
+      if Cil.isArrayType vi.vtype
+      then term ~loc (TStartOf (lval vi)) typ
+      else term ~loc (TLval(lval vi)) typ
+    in
+    let ptr =
+      if not to_char then ptr
+      else Logic_utils.mk_cast ~loc Cil.charPtrType ptr
+    in
+    let range = trange ~loc (None, None) in
+    term ~loc (TBinOp(PlusPI, ptr, range)) ptr.term_type
 
 let region_to_term loc = function
   | [] -> term ~loc Tempty_set (Ctype Cil.charPtrType)
   | [z] -> zone_to_term loc z
   | x :: tl as l ->
-      let fst = type_of_zone x in
-      let tl = List.map type_of_zone tl in
-      let to_char = not (List.for_all (Cil_datatype.Typ.equal fst) tl) in
-      let set_typ =
-        make_set_type (Ctype (if to_char then Cil.charPtrType else fst))
-      in
-      term ~loc (Tunion (List.map (zone_to_term ~to_char loc) l)) set_typ
+    let fst = type_of_zone x in
+    let tl = List.map type_of_zone tl in
+    let to_char = not (List.for_all (Cil_datatype.Typ.equal fst) tl) in
+    let set_typ =
+      make_set_type (Ctype (if to_char then Cil.charPtrType else fst))
+    in
+    term ~loc (Tunion (List.map (zone_to_term ~to_char loc) l)) set_typ
 
 let separated_list ?loc = function
   | [] | [ _ ] -> ptrue
   | l ->
-      let comp = Cil_datatype.Term.compare in
-      pseparated ?loc (List.sort comp l)
+    let comp = Cil_datatype.Term.compare in
+    pseparated ?loc (List.sort comp l)
 
 let term_separated_from_regions loc assigned l =
   separated_list ~loc (assigned :: List.map (region_to_term loc) l)
@@ -237,13 +237,13 @@ let welltyped zones =
   let rec partition_by_type t acc l =
     match l, acc with
     | [], _ ->
-        acc
+      acc
     | x :: l, [] ->
-        partition_by_type (type_of_zone x) [[x]] l
+      partition_by_type (type_of_zone x) [[x]] l
     | x :: l, p :: acc' when Cil_datatype.Typ.equal t (type_of_zone x) ->
-        partition_by_type t ((x :: p) :: acc') l
+      partition_by_type t ((x :: p) :: acc') l
     | x :: l, acc ->
-        partition_by_type (type_of_zone x) ([x] :: acc) l
+      partition_by_type (type_of_zone x) ([x] :: acc) l
   in
   let compare_zone a b =
     Cil_datatype.Typ.compare (type_of_zone a) (type_of_zone b) in
@@ -290,18 +290,18 @@ let main_separation loc globals context nullable heaps =
         (* trivial cases *)
         | [] -> [] | [_] -> []
         | p :: l ->
-            let acc_sep q = List.cons @@ separated_nullable (p, q) in
-            List.fold_right acc_sep l @@ collect_pairs l
+          let acc_sep q = List.cons @@ separated_nullable (p, q) in
+          List.fold_right acc_sep l @@ collect_pairs l
       in
       collect_pairs nullable
     in
     match nullable with
     | [] -> List.map no_nullable l_zones
     | nullable ->
-        let t_nullable = regions_to_terms nullable in
-        let sep_nullable = nullable_inter t_nullable in
-        let fold n = List.fold_right (acc_with_nullable n) l_zones in
-        List.fold_right fold t_nullable sep_nullable
+      let t_nullable = regions_to_terms nullable in
+      let sep_nullable = nullable_inter t_nullable in
+      let fold n = List.fold_right (acc_with_nullable n) l_zones in
+      List.fold_right fold t_nullable sep_nullable
 
 (* Filter assigns *)
 let assigned_locations kf filter =
@@ -319,16 +319,16 @@ let assigned_via_pointers kf =
   let rec assigned_via_pointer t =
     match t.term_node with
     | TLval (TMem _, _) ->
-        true
+      true
     | TCastE (_, t) | TLogic_coerce (_, t)
     | Tcomprehension(t, _, _) | Tat (t, _) ->
-        assigned_via_pointer t
+      assigned_via_pointer t
     | Tunion l | Tinter l ->
-        List.exists assigned_via_pointer l
+      List.exists assigned_via_pointer l
     | Tif (_, t1, t2) ->
-        assigned_via_pointer t1 || assigned_via_pointer t2
+      assigned_via_pointer t1 || assigned_via_pointer t2
     | _ ->
-        false
+      false
   in
   assigned_locations kf assigned_via_pointer
 
@@ -410,15 +410,15 @@ let compute_behavior kf name hypotheses_computer =
   match reqs, ens with
   | [], [] -> None
   | reqs, ens ->
-      Some {
-        b_name = Annotations.fresh_behavior_name kf ("wp_" ^  name) ;
-        b_requires = reqs ;
-        b_assumes = [] ;
-        b_post_cond = ens ;
-        b_assigns = WritesAny ;
-        b_allocation = FreeAllocAny ;
-        b_extended = []
-      }
+    Some {
+      b_name = Annotations.fresh_behavior_name kf ("wp_" ^  name) ;
+      b_requires = reqs ;
+      b_assumes = [] ;
+      b_post_cond = ens ;
+      b_assigns = WritesAny ;
+      b_allocation = FreeAllocAny ;
+      b_extended = []
+    }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Memoization                                                        --- *)
@@ -472,11 +472,11 @@ let warn kf name hyp_computer =
   match get_behavior kf name hyp_computer with
   | None -> ()
   | Some bhv ->
-      Wp_parameters.warning
-        ~current:false ~once:true ~source:(fst(Kernel_function.get_location kf))
-        "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
-        (Kernel_function.get_name kf)
-        (print_memory_context kf bhv)
+    Wp_parameters.warning
+      ~current:false ~once:true ~source:(fst(Kernel_function.get_location kf))
+      "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
+      (Kernel_function.get_name kf)
+      (print_memory_context kf bhv)
 
 let emitter =
   Emitter.(create "Wp.Hypotheses" [Funspec] ~correctness:[] ~tuning:[])

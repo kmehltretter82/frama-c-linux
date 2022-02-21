@@ -1117,7 +1117,6 @@ src/plugins/print_api/lexer.mli: CEA_LGPL
 src/plugins/print_api/print_interface.ml: CEA_LGPL
 src/plugins/print_api/print_interface.mli: CEA_LGPL
 src/plugins/qed/.gitignore: .ignore
-src/plugins/qed/.ocp-indent: .ignore
 src/plugins/qed/Makefile: CEA_WP
 src/plugins/qed/bvars.ml: CEA_WP
 src/plugins/qed/bvars.mli: CEA_WP
@@ -1589,7 +1588,6 @@ src/plugins/variadic/translate.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/translate.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/va_types.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/wp/.gitignore: .ignore
-src/plugins/wp/.ocp-indent: .ignore
 src/plugins/wp/AssignsCompleteness.ml: CEA_WP
 src/plugins/wp/AssignsCompleteness.mli: CEA_WP
 src/plugins/wp/Auto.ml: CEA_WP

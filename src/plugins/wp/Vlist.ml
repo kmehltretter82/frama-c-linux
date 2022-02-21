@@ -161,19 +161,19 @@ let rewrite_length e =
   | L.Fun( nil , [] ) when nil == f_nil -> F.e_zero (* \length([]) == 0 *)
   | L.Fun( elt , [_] ) when elt == f_elt -> F.e_one (* \length([x]) == 1 *)
   | L.Fun( concat , es ) when concat == f_concat -> (* \length(\concat(...,x_i,...)) == \sum(...,\length(x_i),...)  *)
-      F.e_sum (List.map v_length es)
+    F.e_sum (List.map v_length es)
   | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat ->
-      (* \length(u ^* n) == if 0<=n then n * \length(u) else 0 *)
-      F.e_if (F.e_leq e_zero n) (F.e_mul n (v_length u)) e_zero
+    (* \length(u ^* n) == if 0<=n then n * \length(u) else 0 *)
+    F.e_if (F.e_leq e_zero n) (F.e_mul n (v_length u)) e_zero
   | _ ->
-      (* NB. do not considers \Cons because they are removed *)
-      raise Not_found
+    (* NB. do not considers \Cons because they are removed *)
+    raise Not_found
 
 let match_natural k =
   match F.repr k with
   | L.Kint z ->
-      let k = try Integer.to_int_exn z with Z.Overflow -> raise Not_found in
-      if 0 <= k then k else raise Not_found
+    let k = try Integer.to_int_exn z with Z.Overflow -> raise Not_found in
+    if 0 <= k then k else raise Not_found
   | _ -> raise Not_found
 
 (* Why3 definition: [\nth(e,k)] is undefined for [k<0 || k>=\length(e)].
@@ -182,21 +182,21 @@ let rec get_nth k e =
   match F.repr e with
   | L.Fun( concat , list ) when concat == f_concat -> get_nth_list k list
   | L.Fun( elt , [x] ) when elt == f_elt ->
-      get_nth_elt k x (fun _ -> raise Not_found)
+    get_nth_elt k x (fun _ -> raise Not_found)
   | L.Fun( repeat , [x;n] ) when repeat == f_repeat ->
-      get_nth_repeat k x n (fun _ -> raise Not_found)
+    get_nth_repeat k x n (fun _ -> raise Not_found)
   | _ -> raise Not_found
 
 and get_nth_list k = function
   | head::tail ->
-      begin
-        match F.repr head with
-        | L.Fun( elt , [x] ) when elt == f_elt ->
-            get_nth_elt k x (fun k -> get_nth_list k tail)
-        | L.Fun( repeat , [x;n] ) when repeat == f_repeat ->
-            get_nth_repeat k x n (fun k -> get_nth_list k tail)
-        | _ -> raise Not_found
-      end
+    begin
+      match F.repr head with
+      | L.Fun( elt , [x] ) when elt == f_elt ->
+        get_nth_elt k x (fun k -> get_nth_list k tail)
+      | L.Fun( repeat , [x;n] ) when repeat == f_repeat ->
+        get_nth_repeat k x n (fun k -> get_nth_list k tail)
+      | _ -> raise Not_found
+    end
   | [] -> raise Not_found
 
 and get_nth_elt k x f =
@@ -234,24 +234,24 @@ let rewrite_repeat s n =
 let rec leftmost a ms =
   match F.repr a with
   | L.Fun( concat , e :: es ) when concat == f_concat ->
-      leftmost e (es@ms)
+    leftmost e (es@ms)
   | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat -> begin
       match (* tries to perform some rolling that do not depend on [n] *)
         (match ms with
          | b::ms ->
-             let b,ms = leftmost b ms in
-             let u,us = leftmost u [] in
-             if F.decide (F.e_eq u b) then
-               (*  u=b ==>  ((u^us)*^n) ^ b ^ ms  == u ^ (us^b)*^n) ^ ms *)
-               Some (u, v_repeat (v_concat (us@[b]) (F.typeof a)) n (F.typeof a) :: ms)
-             else None
+           let b,ms = leftmost b ms in
+           let u,us = leftmost u [] in
+           if F.decide (F.e_eq u b) then
+             (*  u=b ==>  ((u^us)*^n) ^ b ^ ms  == u ^ (us^b)*^n) ^ ms *)
+             Some (u, v_repeat (v_concat (us@[b]) (F.typeof a)) n (F.typeof a) :: ms)
+           else None
          | _ -> None) with
       | Some res -> res
       | None ->
-          if F.decide (F.e_lt F.e_zero n) then
-            (* 0<n ==> (u*^n) ^ ms ==  u ^ (u*^(n-1)) ^ ms *)
-            leftmost u (v_repeat u (F.e_sub n F.e_one) (F.typeof a) :: ms)
-          else a , ms
+        if F.decide (F.e_lt F.e_zero n) then
+          (* 0<n ==> (u*^n) ^ ms ==  u ^ (u*^(n-1)) ^ ms *)
+          leftmost u (v_repeat u (F.e_sub n F.e_one) (F.typeof a) :: ms)
+        else a , ms
     end
   | _ -> a , ms
 
@@ -267,27 +267,27 @@ let leftmost a =
 let rec rightmost ms a =
   match F.repr a with
   | L.Fun( concat , es ) when concat == f_concat ->
-      begin match List.rev es with
-        | [] -> ms , a
-        | e::es -> rightmost (ms @ List.rev es) e
-      end
+    begin match List.rev es with
+      | [] -> ms , a
+      | e::es -> rightmost (ms @ List.rev es) e
+    end
   | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat -> begin
       match (* tries to perform some rolling that do not depend on [n] *)
         (match List.rev ms with
          | b::ms ->
-             let ms,b = rightmost (List.rev ms) b in
-             let us,u = rightmost [] u in
-             if F.decide (F.e_eq u b) then
-               (*  u=b ==>  (ms ^ b ^ (us^u)*^n) == ms ^ (b^us)*^n) ^ u *)
-               Some (ms @ [ v_repeat (v_concat (b::us) (F.typeof a)) n (F.typeof a)], u)
-             else None
+           let ms,b = rightmost (List.rev ms) b in
+           let us,u = rightmost [] u in
+           if F.decide (F.e_eq u b) then
+             (*  u=b ==>  (ms ^ b ^ (us^u)*^n) == ms ^ (b^us)*^n) ^ u *)
+             Some (ms @ [ v_repeat (v_concat (b::us) (F.typeof a)) n (F.typeof a)], u)
+           else None
          | _ -> None) with
       | Some res -> res
       | None ->
-          if F.decide (F.e_lt F.e_zero n) then
-            (* 0<n ==> ms ^ (u*^n) ==  ms ^ (u*^(n-1)) ^ u *)
-            rightmost (ms @ [v_repeat u (F.e_sub n F.e_one) (F.typeof a)]) u
-          else ms , a
+        if F.decide (F.e_lt F.e_zero n) then
+          (* 0<n ==> ms ^ (u*^n) ==  ms ^ (u*^(n-1)) ^ u *)
+          rightmost (ms @ [v_repeat u (F.e_sub n F.e_one) (F.typeof a)]) u
+        else ms , a
     end
   | _ -> ms , a
 
@@ -306,11 +306,11 @@ let leftmost_eq a b =
   if u <> [] || v <> [] then
     match F.is_equal a b with
     | L.Yes ->
-        (* s ^ u1 ^ ...  = s ^ v1 ^ ...  <=>  u1 ^ ... = v1 ^ ... *)
-        F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
+      (* s ^ u1 ^ ...  = s ^ v1 ^ ...  <=>  u1 ^ ... = v1 ^ ... *)
+      F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
     | L.No when F.decide (F.e_eq (v_length a) (v_length b)) ->
-        (* a <> b && \length(a)=\length(b) ==> a ^ u1 ^ ... <> b ^ v1 ^ ... *)
-        F.p_false
+      (* a <> b && \length(a)=\length(b) ==> a ^ u1 ^ ... <> b ^ v1 ^ ... *)
+      F.p_false
     | _ -> raise Not_found
   else
     raise Not_found
@@ -321,11 +321,11 @@ let rightmost_eq a b =
   if u <> [] || v <> [] then
     match F.is_equal a b with
     | L.Yes ->
-        (* u1 ^ ... ^ s = v1 ^ ... ^ s  <=>  u1 ^ ... = v1 ^ ... *)
-        F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
+      (* u1 ^ ... ^ s = v1 ^ ... ^ s  <=>  u1 ^ ... = v1 ^ ... *)
+      F.p_equal (v_concat u (F.typeof a)) (v_concat v (F.typeof a))
     | L.No when F.decide (F.e_eq (v_length a) (v_length b)) ->
-        (* a <> b && \length(a)=\length(b) ==> u1 ^ ... ^ a <> v1 ^ ... ^ b *)
-        F.p_false
+      (* a <> b && \length(a)=\length(b) ==> u1 ^ ... ^ a <> v1 ^ ... ^ b *)
+      F.p_false
     | _ -> raise Not_found
   else
     raise Not_found
@@ -334,14 +334,14 @@ let rewrite_is_nil ~nil a =
   let p_is_nil a = F.p_equal nil a  in
   match F.repr a with
   | L.Fun(concat,es) when concat == f_concat ->
-      (* \concat (s1,...,sn)==[] <==> (s1==[] && ... && sn==[]) *)
-      F.p_all p_is_nil es
+    (* \concat (s1,...,sn)==[] <==> (s1==[] && ... && sn==[]) *)
+    F.p_all p_is_nil es
   | L.Fun(elt,[_]) when elt == f_elt -> F.p_false (* [x]==[] <==> false *)
   | L.Fun(repeat,[s;n]) when repeat == f_repeat ->
-      (* (s *^ n)==[] <==> (s==[] || n<=0)  *)
-      F.p_or (F.p_leq n F.e_zero) (p_is_nil s)
+    (* (s *^ n)==[] <==> (s==[] || n<=0)  *)
+    F.p_or (F.p_leq n F.e_zero) (p_is_nil s)
   | _ ->
-      raise Not_found
+    raise Not_found
 
 (* Ensures xs to be a sub-sequence of ys, otherwise raise Not_found
    In such a case, (concat xs = concat ys) <==> (forall r in result, r = nil) *)
@@ -349,7 +349,7 @@ let rec subsequence xs ys =
   match xs , ys with
   | [],ys -> ys
   | x::rxs, y::rys ->
-      if (F.decide (e_eq x y)) then subsequence rxs rys else y :: subsequence xs rys
+    if (F.decide (e_eq x y)) then subsequence rxs rys else y :: subsequence xs rys
   | _ -> raise Not_found
 
 let elements a =
@@ -399,46 +399,46 @@ let rewrite_eq_sequence a b =
   | L.Fun(nil,[]) , _ when nil == f_nil -> rewrite_is_nil ~nil:a b
   | _ , L.Fun(nil,[]) when nil == f_nil -> rewrite_is_nil ~nil:b a
   | _ -> try
-        match F.repr a , F.repr b with
-        | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
-          when repeat_a == f_repeat &&
-               repeat_b == f_repeat ->
-            repeat_eq a x n b y m
-        | _ ->
-            try leftmost_eq a b with Not_found ->
-            try rightmost_eq a b with Not_found ->
-              subsequence a b
-      with Not_found ->
-        if F.decide (F.e_neq (v_length a) (v_length b)) then
-          F.p_false
-        else raise Not_found
+      match F.repr a , F.repr b with
+      | L.Fun(repeat_a, [x;n]), L.Fun(repeat_b, [y;m])
+        when repeat_a == f_repeat &&
+             repeat_b == f_repeat ->
+        repeat_eq a x n b y m
+      | _ ->
+        try leftmost_eq a b with Not_found ->
+        try rightmost_eq a b with Not_found ->
+          subsequence a b
+    with Not_found ->
+      if F.decide (F.e_neq (v_length a) (v_length b)) then
+        F.p_false
+      else raise Not_found
 
 let rewrite_eq_length a b =
   match F.repr a , F.repr b with
   | L.Fun(length_a,[_]), L.Fun(length_b,[_]) when length_a == f_length &&
                                                   length_b == f_length ->
-      (* N.B. cannot be simplified by the next patterns *)
-      raise Not_found
+    (* N.B. cannot be simplified by the next patterns *)
+    raise Not_found
   | _, L.Fun(length,[_]) when length == f_length &&
                               F.decide (e_lt a e_zero) ->
-      (* a < 0  ==>  ( a=\length(b) <=> false ) *)
-      F.p_false
+    (* a < 0  ==>  ( a=\length(b) <=> false ) *)
+    F.p_false
   | L.Fun(length,[_]), _ when length == f_length &&
                               F.decide (e_lt b e_zero) ->
-      (* b < 0  ==>  ( \length(a)<=b <=> false ) *)
-      F.p_false
+    (* b < 0  ==>  ( \length(a)<=b <=> false ) *)
+    F.p_false
   | _ -> raise Not_found
 
 let rewrite_leq_length a b =
   match F.repr a , F.repr b with
   | L.Fun(length_a,[_]), L.Fun(length_b,[_]) when length_a == f_length &&
                                                   length_b == f_length ->
-      (* N.B. cannot be simplified by the next patterns *)
-      raise Not_found
+    (* N.B. cannot be simplified by the next patterns *)
+    raise Not_found
   | L.Fun(length,[_]), _ when length == f_length &&
                               F.decide (e_lt b e_zero) ->
-      (* b < 0  ==>  ( \length(a)<=b <=> false ) *)
-      F.e_false
+    (* b < 0  ==>  ( \length(a)<=b <=> false ) *)
+    F.e_false
   (* N.B. the next rule does not allow to split on the sign of \length(a) with TIP
      | _, L.Fun(length,[_]) when length == f_length &&
                               F.decide (e_leq a e_zero) ->
@@ -500,37 +500,37 @@ class type engine =
 
 let rec export (engine : #engine) fmt = function
   | [] ->
-      begin match engine#callstyle with
-        | E.CallVoid -> Format.pp_print_string fmt "nil()"
-        | E.CallVar|E.CallApply -> Format.pp_print_string fmt "nil"
-      end
+    begin match engine#callstyle with
+      | E.CallVoid -> Format.pp_print_string fmt "nil()"
+      | E.CallVar|E.CallApply -> Format.pp_print_string fmt "nil"
+    end
   | e::es ->
-      begin match F.repr e with
-        | L.Fun( elt , [x] ) when elt == f_elt ->
-            apply engine fmt "cons" x es
-        | _ ->
-            apply engine fmt "concat" e es
-      end
+    begin match F.repr e with
+      | L.Fun( elt , [x] ) when elt == f_elt ->
+        apply engine fmt "cons" x es
+      | _ ->
+        apply engine fmt "concat" e es
+    end
 
 and apply (engine : #engine) fmt f x es =
   match engine#callstyle with
   | E.CallVar | E.CallVoid ->
-      Format.fprintf fmt "@[<hov 2>%s(@,%a,@,%a)@]"
-        f engine#pp_flow x (export engine) es
+    Format.fprintf fmt "@[<hov 2>%s(@,%a,@,%a)@]"
+      f engine#pp_flow x (export engine) es
   | E.CallApply ->
-      Format.fprintf fmt "@[<hov 2>(%s@ %a@ %a)@]"
-        f engine#pp_atom x (export engine) es
+    Format.fprintf fmt "@[<hov 2>(%s@ %a@ %a)@]"
+      f engine#pp_atom x (export engine) es
 
 
 let export_rewriter_concat es tau =
   match es with
   | [] -> v_nil (vlist_get_tau tau)
   | e::es ->
-      begin match F.repr e with
-        | L.Fun( elt , [x] ) when Lang.Fun.equal elt f_elt ->
-            e_fun ?result:tau f_cons [x;e_fun ?result:tau f_concat es]
-        | _ -> raise Not_found
-      end
+    begin match F.repr e with
+      | L.Fun( elt , [x] ) when Lang.Fun.equal elt f_elt ->
+        e_fun ?result:tau f_cons [x;e_fun ?result:tau f_concat es]
+      | _ -> raise Not_found
+    end
 
 let () =
   Lang.For_export.set_builtin' f_concat export_rewriter_concat
@@ -540,10 +540,10 @@ let () =
 let rec collect xs = function
   | [] -> List.rev xs , []
   | (e::es) as w ->
-      begin match F.repr e with
-        | L.Fun( elt , [x] ) when elt == f_elt -> collect (x::xs) es
-        | _ -> List.rev xs , w
-      end
+    begin match F.repr e with
+      | L.Fun( elt , [x] ) when elt == f_elt -> collect (x::xs) es
+      | _ -> List.rev xs , w
+    end
 
 let list engine fmt xs = Qed.Plib.pp_listsep ~sep:"," engine#pp_flow fmt xs
 
@@ -557,10 +557,10 @@ let rec pp_concat (engine : #engine) fmt es =
     match es with
     | [] -> ()
     | m::ms ->
-        if xs <> [] then Format.fprintf fmt " ^@ " ;
-        engine#pp_atom fmt m ;
-        if ms <> [] then
-          ( Format.fprintf fmt " ^@ " ; pp_concat engine fmt ms )
+      if xs <> [] then Format.fprintf fmt " ^@ " ;
+      engine#pp_atom fmt m ;
+      if ms <> [] then
+        ( Format.fprintf fmt " ^@ " ; pp_concat engine fmt ms )
   end
 
 let pretty (engine : #engine) fmt es =

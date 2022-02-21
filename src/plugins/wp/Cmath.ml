@@ -68,18 +68,18 @@ let builtin_truncate f e =
   | Kint _ -> e
   | Kreal r when Q.(equal r zero) -> e_zero
   | Kreal r ->
-      begin
-        try
-          (* Waiting for Z-Arith to have truncation to big-int *)
-          let truncated = int_of_float (Q.to_float r) in
-          let reversed = Q.of_int truncated in
-          let base = F.e_int truncated in
-          if Q.equal r reversed then base else
-          if f == f_ceil && Q.(lt zero r) then F.(e_add base e_one) else
-          if f == f_floor && Q.(lt r zero) then F.(e_sub base e_one) else
-            base
-        with _ -> raise Not_found
-      end
+    begin
+      try
+        (* Waiting for Z-Arith to have truncation to big-int *)
+        let truncated = int_of_float (Q.to_float r) in
+        let reversed = Q.of_int truncated in
+        let base = F.e_int truncated in
+        if Q.equal r reversed then base else
+        if f == f_ceil && Q.(lt zero r) then F.(e_add base e_one) else
+        if f == f_floor && Q.(lt r zero) then F.(e_sub base e_one) else
+          base
+      with _ -> raise Not_found
+    end
   | Fun( f , [e] ) when f == f_real_of_int -> e
   | _ -> raise Not_found
 
@@ -104,17 +104,17 @@ let builtin_positive_eq lfun ~domain ~zero ~injective a b =
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
       when injective && f == lfun && f' == lfun && domain a && domain b ->
-        (* injective a in domain && b in domain -> ( f(a) = f(b) <-> a = b ) *)
-        e_eq a b
+      (* injective a in domain && b in domain -> ( f(a) = f(b) <-> a = b ) *)
+      e_eq a b
     | Fun(f,[a]) , _ when f == lfun && domain a ->
-        if QED.eval_lt b zero then
-          (* a in domain && b < 0 -> ( f(a) = b <-> false ) *)
-          e_false
-        else
-        if QED.eval_eq zero b then
-          (* a in domain && b = 0 -> ( f(a) = 0 <-> a = 0 ) *)
-          e_eq a zero
-        else raise Not_found
+      if QED.eval_lt b zero then
+        (* a in domain && b < 0 -> ( f(a) = b <-> false ) *)
+        e_false
+      else
+      if QED.eval_eq zero b then
+        (* a in domain && b = 0 -> ( f(a) = 0 <-> a = 0 ) *)
+        e_eq a zero
+      else raise Not_found
     | _ -> raise Not_found
   end
 
@@ -125,20 +125,20 @@ let builtin_positive_leq lfun ~domain ~zero ~monotonic a b =
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
       when monotonic && f == lfun && f' == lfun && domain a && domain b ->
-        (* increasing && a in domain && b in domain -> ( f(a) <= f(b) <-> a <= b) *)
-        e_leq a b
+      (* increasing && a in domain && b in domain -> ( f(a) <= f(b) <-> a <= b) *)
+      e_leq a b
     | Fun(f,[a]) , _ when f == lfun && domain a ->
-        if QED.eval_lt b zero then
-          (* a in domain && b < 0 -> ( f(a) <= b <-> false ) *)
-          e_false
-        else
-        if QED.eval_eq zero b then
-          (* a in domain && b = 0 -> ( f(a) <= b <-> a = 0 )*)
-          e_eq a zero
-        else raise Not_found
+      if QED.eval_lt b zero then
+        (* a in domain && b < 0 -> ( f(a) <= b <-> false ) *)
+        e_false
+      else
+      if QED.eval_eq zero b then
+        (* a in domain && b = 0 -> ( f(a) <= b <-> a = 0 )*)
+        e_eq a zero
+      else raise Not_found
     | _ , Fun(f,[b]) when f == lfun && domain b && QED.eval_leq a zero ->
-        (* b in domain && a <= 0 -> ( a <= f(b) <-> true *)
-        e_true
+      (* b in domain && a <= 0 -> ( a <= f(b) <-> true *)
+      e_true
     | _ -> raise Not_found
   end
 
@@ -149,11 +149,11 @@ let builtin_strict_eq lfun ~domain ~zero ~injective a b =
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
       when injective && f == lfun && f' == lfun && domain a && domain b ->
-        (* injective && a in domain && b in domain -> ( f(a) = f(b) <-> a = b ) *)
-        e_eq a b
+      (* injective && a in domain && b in domain -> ( f(a) = f(b) <-> a = b ) *)
+      e_eq a b
     | Fun(f,[a]) , _ when f == lfun && domain a && QED.eval_leq b zero ->
-        (* a in domain && b <= 0 -> ( f(a) = b <-> false ) *)
-        e_false
+      (* a in domain && b <= 0 -> ( f(a) = b <-> false ) *)
+      e_false
     | _ -> raise Not_found
   end
 
@@ -164,14 +164,14 @@ let builtin_strict_leq lfun ~domain ~zero ~monotonic a b =
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
       when monotonic && f == lfun && f' == lfun && domain a && domain b ->
-        (* increasing && a in domain && b in domain -> ( f(a) <= f(b) <-> a <= b ) *)
-        e_leq a b
+      (* increasing && a in domain && b in domain -> ( f(a) <= f(b) <-> a <= b ) *)
+      e_leq a b
     | Fun(f,[a]) , _ when f == lfun && domain a && QED.eval_leq b zero ->
-        (* a in domain && b <= 0 -> ( f(a) <= b <-> false ) *)
-        e_false
+      (* a in domain && b <= 0 -> ( f(a) <= b <-> false ) *)
+      e_false
     | _ , Fun(f,[b]) when f == lfun && domain b && QED.eval_leq a zero ->
-        (* b in domain && a <= 0 -> ( a <= f(b) <-> true ) *)
-        e_true
+      (* b in domain && a <= 0 -> ( a <= f(b) <-> true ) *)
+      e_true
     | _ -> raise Not_found
   end
 
@@ -202,10 +202,10 @@ let builtin_abs f z e =
   | Kint k -> e_zint (Integer.abs k)
   | Kreal r when Q.lt r Q.zero -> e_real (Q.neg r)
   | _ ->
-      match is_true (e_leq z e) with
-      | Yes -> e
-      | No -> e_opp e
-      | Maybe -> raise Not_found
+    match is_true (e_leq z e) with
+    | Yes -> e
+    | No -> e_opp e
+    | Maybe -> raise Not_found
 
 let builtin_iabs_eq = builtin_positive_eq f_iabs
     ~domain:domain_abs ~zero:e_zero ~injective:false
@@ -233,7 +233,7 @@ let builtin_sqrt e =
   | Kreal r when r == Q.zero -> F.e_zero_real (* srqt(0)==0 *)
   | Kreal r when r == Q.one -> F.e_one_real (* srqt(1)==1 *)
   | Mul[a;b] when eval_eq a b -> (* a==b ==> sqrt(a*b)==|a| *)
-      e_fun f_rabs [a] (* a is smaller *)
+    e_fun f_rabs [a] (* a is smaller *)
   | _ -> raise Not_found
 
 let builtin_sqrt_eq = builtin_positive_eq f_sqrt
@@ -261,9 +261,9 @@ let builtin_exp e =
   match F.repr e with
   | Kreal r when r == Q.zero -> F.e_one_real (* exp(0)==1 *)
   | Times(n,r) when n == Z.minus_one -> (* exp(-r) = 1/exp(r) *)
-      F.e_div F.e_one_real (F.e_fun f_exp [r])
+    F.e_div F.e_one_real (F.e_fun f_exp [r])
   | Fun( f , [x] ) when f == f_log && domain_log x ->
-      (* 0<x ==> exp(log(x)) = x *) x
+    (* 0<x ==> exp(log(x)) = x *) x
   | _ -> raise Not_found
 
 let builtin_log e =
@@ -272,8 +272,8 @@ let builtin_log e =
   | Kreal r when r == Q.one -> F.e_zero_real (* log(1) == 0 *)
   | Fun( f , [x] ) when f == f_exp -> x (* log(exp(x)) == x *)
   | Fun( f , [x;n] ) when f == f_pow && domain_log x ->
-      (* 0<x ==> log(x^n) == n*log(x) *)
-      F.e_mul n (F.e_fun f_log [x])
+    (* 0<x ==> log(x^n) == n*log(x) *)
+    F.e_mul n (F.e_fun f_log [x])
   | _ -> raise Not_found
 
 (* a^n = e^(n.log a) *)

@@ -87,12 +87,12 @@ struct
     | Aget(a,k) -> TgGet(of_exp Cterm a,of_exp Cterm k)
     | Aset(a,k,v) -> TgSet(of_exp Cterm a,of_exp Cterm k,of_exp Cterm v)
     | Fun(f,ts) ->
-        let ts = List.map (of_exp Cterm) ts in
-        begin
-          match mode with
-          | Cterm -> TgFun(f,ts)
-          | Cprop -> TgProp(f,ts)
-        end
+      let ts = List.map (of_exp Cterm) ts in
+      begin
+        match mode with
+        | Cterm -> TgFun(f,ts)
+        | Cprop -> TgProp(f,ts)
+      end
     | _ -> TgAny
 
   let of_term t = of_exp Cterm t
@@ -227,9 +227,9 @@ let axiomatic ax =
 let section = function
   | Toplevel 0 -> cluster ~id:"Axiomatic" ~title:"Global Definitions" ()
   | Toplevel n ->
-      let id = "Axiomatic" ^ string_of_int n in
-      let title = Printf.sprintf "Global Definitions (continued #%d)" n in
-      cluster ~id ~title ()
+    let id = "Axiomatic" ^ string_of_int n in
+    let title = Printf.sprintf "Global Definitions (continued #%d)" n in
+    cluster ~id ~title ()
   | Axiomatic ax -> axiomatic ax
 
 let compinfo c =
@@ -319,12 +319,12 @@ class virtual visitor main =
                 | None -> Qed.Engine.Tabs
                 | Some (LTsyn lt) -> Qed.Engine.Tdef (self#vtau_of_ltype lt)
                 | Some (LTsum cs) ->
-                    let cases = List.map
-                        (fun c ->
-                           Lang.CTOR c ,
-                           List.map self#vtau_of_ltype c.ctor_params
-                        ) cs in
-                    Qed.Engine.Tsum cases
+                  let cases = List.map
+                      (fun c ->
+                         Lang.CTOR c ,
+                         List.map self#vtau_of_ltype c.ctor_params
+                      ) cs in
+                  Qed.Engine.Tsum cases
               in self#on_type t def ;
             end
         end
@@ -402,7 +402,7 @@ class virtual visitor main =
       | Acst _ -> self#on_library "const"
       | Eq _ | Neq _ | Leq _ | Lt _
       | And _ | Or _ | Not _ | Imply _ | If _ ->
-          if bool then self#on_library "bool"
+        if bool then self#on_library "bool"
 
     method vterm t =
       if not (Tset.mem t terms) then
@@ -452,10 +452,10 @@ class virtual visitor main =
     method private vlfun f =
       match Symbol.find f with
       | exception Not_found ->
-          Wp_parameters.fatal "Undefined symbol '%a'" Fun.pretty f
+        Wp_parameters.fatal "Undefined symbol '%a'" Fun.pretty f
       | d ->
-          let c = d.d_cluster in
-          if self#do_local c then self#vdfun d
+        let c = d.d_cluster in
+        if self#do_local c then self#vdfun d
 
     method vsymbol f =
       if not (DF.mem f symbols) then
@@ -471,19 +471,19 @@ class virtual visitor main =
       | Qed.Engine.TgAny -> ()
       | Qed.Engine.TgVar x -> self#vparam x
       | Qed.Engine.TgGet(a,k) ->
-          begin
-            self#vtrigger a ;
-            self#vtrigger k ;
-          end
+        begin
+          self#vtrigger a ;
+          self#vtrigger k ;
+        end
       | Qed.Engine.TgSet(a,k,v) ->
-          begin
-            self#vtrigger a ;
-            self#vtrigger k ;
-            self#vtrigger v ;
-          end
+        begin
+          self#vtrigger a ;
+          self#vtrigger k ;
+          self#vtrigger v ;
+        end
       | Qed.Engine.TgFun(f,tgs)
       | Qed.Engine.TgProp(f,tgs) ->
-          self#vsymbol f ; List.iter self#vtrigger tgs
+        self#vsymbol f ; List.iter self#vtrigger tgs
 
     method private vdlemma a =
       if not (DS.mem a.l_name dlemmas) then
@@ -529,20 +529,20 @@ class virtual visitor main =
     method vgoal (axioms : axioms option) prop =
       match axioms with
       | None ->
-          (* Visit a goal *)
-          begin
-            let hs = LogicUsage.proof_context () in
-            List.iter self#vlemma hs ;
-            self#vpred prop ;
-          end
+        (* Visit a goal *)
+        begin
+          let hs = LogicUsage.proof_context () in
+          List.iter self#vlemma hs ;
+          self#vpred prop ;
+        end
       | Some(cluster,hs) ->
-          (* Visit the goal corresponding to a lemma *)
-          begin
-            self#section (cluster_title cluster) ;
-            self#set_local cluster ;
-            List.iter self#vlemma hs ;
-            self#vpred prop ;
-          end
+        (* Visit the goal corresponding to a lemma *)
+        begin
+          self#section (cluster_title cluster) ;
+          self#set_local cluster ;
+          List.iter self#vlemma hs ;
+          self#vpred prop ;
+        end
 
     method vtypes = (* Visit the types *)
       rev_iter self#vcomp main.c_records ;

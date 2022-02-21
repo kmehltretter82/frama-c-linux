@@ -34,13 +34,13 @@ let definition f es =
   let d = find_symbol f in
   match d.d_definition with
   | Function(_,_,u) ->
-      let sigma = Lang.subst d.d_params es in
-      F.e_subst sigma u
+    let sigma = Lang.subst d.d_params es in
+    F.e_subst sigma u
   | Predicate(_,p) ->
-      let sigma = Lang.subst d.d_params es in
-      F.e_prop (F.p_subst sigma p)
+    let sigma = Lang.subst d.d_params es in
+    F.e_prop (F.p_subst sigma p)
   | _ ->
-      raise Not_found
+    raise Not_found
 
 let range f es =
   let a,b = Ctypes.bounds (Cint.is_cint f) in
@@ -53,16 +53,16 @@ let range f es =
 
 let rec applicable ?at e f es = function
   | phi::others ->
-      begin
-        try
-          let v = phi f es in
-          let d = Pretty_utils.sfprintf "Unfold '%a'" Lang.Fun.pretty f in
-          Applicable (Tactical.rewrite ?at [d,F.p_true,e,v])
-        with Not_found | Invalid_argument _ ->
-          applicable ?at e f es others
-      end
+    begin
+      try
+        let v = phi f es in
+        let d = Pretty_utils.sfprintf "Unfold '%a'" Lang.Fun.pretty f in
+        Applicable (Tactical.rewrite ?at [d,F.p_true,e,v])
+      with Not_found | Invalid_argument _ ->
+        applicable ?at e f es others
+    end
   | [] ->
-      Not_applicable
+    Not_applicable
 
 (* Used only for Multi selection *)
 
@@ -83,28 +83,28 @@ let condition original p = (* keep original kind of simple condition *)
 
 let collect_term_to_unfold (g, m) = function
   | Inside(Step step, unfold) ->
-      let l =
-        try Smap.find step m
-        with Not_found -> []
-      in
-      g, Smap.add step (unfold :: l) m
+    let l =
+      try Smap.find step m
+      with Not_found -> []
+    in
+    g, Smap.add step (unfold :: l) m
   | Inside (Goal _, unfold) ->
-      begin match g with
-        | None -> Some [ unfold ], m
-        | Some g -> Some (unfold :: g), m
-      end
+    begin match g with
+      | None -> Some [ unfold ], m
+      | Some g -> Some (unfold :: g), m
+    end
   | _ -> raise Not_found
 
 let rec collect_unfold phis m e =
   match phis with
   | phi :: others ->
-      begin
-        try
-          match F.repr e with
-          | Qed.Logic.Fun(f,es) -> Lang.F.Tmap.add e (phi f es) m
-          | _ -> raise Not_found
-        with Not_found | Invalid_argument _ -> collect_unfold others m e
-      end
+    begin
+      try
+        match F.repr e with
+        | Qed.Logic.Fun(f,es) -> Lang.F.Tmap.add e (phi f es) m
+        | _ -> raise Not_found
+      with Not_found | Invalid_argument _ -> collect_unfold others m e
+    end
   | [] -> m
 
 let unfolds_from_list phis es =
@@ -118,9 +118,9 @@ let tactical_inside step unfolds sequent =
   then raise Not_found
   else match step.condition with
     | Type p | Have p | When p | Core p | Init p ->
-        let subst t = Lang.F.Tmap.find t unfolds in
-        let p = condition step @@ Lang.p_subst subst p in
-        snd @@ Tactical.replace_single ~at:step.id ("Unfolded", p) sequent
+      let subst t = Lang.F.Tmap.find t unfolds in
+      let p = condition step @@ Lang.p_subst subst p in
+      snd @@ Tactical.replace_single ~at:step.id ("Unfolded", p) sequent
     | _ -> raise Not_found
 
 let tactical_goal unfolds (seq, g) =
@@ -151,18 +151,18 @@ class unfold =
       let unfoldings = [ definition ; range ] in
       match s with
       | Multi es ->
-          let goal, steps =
-            List.fold_left collect_term_to_unfold (None, Smap.empty) es in
-          let goal = Option.map (unfolds_from_list unfoldings) goal in
-          let steps = unfolds_from_smap unfoldings steps in
-          Applicable (process @@ fold_selection goal steps)
+        let goal, steps =
+          List.fold_left collect_term_to_unfold (None, Smap.empty) es in
+        let goal = Option.map (unfolds_from_list unfoldings) goal in
+        let steps = unfolds_from_smap unfoldings steps in
+        Applicable (process @@ fold_selection goal steps)
       | s ->
-          let at = Tactical.at s in
-          let e = Tactical.selected s in
-          match F.repr e with
-          | Qed.Logic.Fun(f,es) ->
-              applicable ?at e f es unfoldings
-          | _ -> Not_applicable
+        let at = Tactical.at s in
+        let e = Tactical.selected s in
+        match F.repr e with
+        | Qed.Logic.Fun(f,es) ->
+          applicable ?at e f es unfoldings
+        | _ -> Not_applicable
   end
 
 let tactical = Tactical.export (new unfold)

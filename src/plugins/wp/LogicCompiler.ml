@@ -105,11 +105,11 @@ struct
   let has_ltype ltype t =
     match Logic_utils.unroll_type ~unroll_typedef:false ltype with
     | Ltype (lt, _) ->
-        if not (Typedefs.mem lt) then !compile_logic_type ltype ;
-        begin match Typedefs.find lt with
-          | Some lfun -> F.p_call lfun [t]
-          | None -> p_true
-        end
+      if not (Typedefs.mem lt) then !compile_logic_type ltype ;
+      begin match Typedefs.find lt with
+        | Some lfun -> F.p_call lfun [t]
+        | None -> p_true
+      end
     | Ctype typ -> Cvalues.has_ctype typ t
     | _ -> p_true
 
@@ -280,8 +280,8 @@ struct
   let get_call = function
     | { call = Some call } -> call
     | { descr } ->
-        Wp_parameters.fatal
-          "Frame '%s' has is outside a function definition" descr
+      Wp_parameters.fatal
+        "Frame '%s' has is outside a function definition" descr
 
   let formal x =
     try
@@ -303,19 +303,19 @@ struct
     match f.result with
     | Some r -> r
     | None ->
-        let tr = return_type f.kf in
-        let basename = Kernel_function.get_name f.kf in
-        let x = fresh_cvar ~basename tr in
-        let r = R_var x in
-        f.result <- Some r ; r
+      let tr = return_type f.kf in
+      let basename = Kernel_function.get_name f.kf in
+      let x = fresh_cvar ~basename tr in
+      let r = R_var x in
+      f.result <- Some r ; r
 
   let status () =
     let f = get_call (Context.get cframe) in
     match f.status with
     | Some x -> x
     | None ->
-        let x = fresh_cvar ~basename:"status" Cil.intType in
-        f.status <- Some x ; x
+      let x = fresh_cvar ~basename:"status" Cil.intType in
+      f.status <- Some x ; x
 
   let trigger tg =
     if tg <> Qed.Engine.TgAny then
@@ -407,14 +407,14 @@ struct
   let rec profile_env vars domain sigv = function
     | [] -> { vars=vars ; lhere=None ; current=None } , domain , List.rev sigv
     | lv :: profile ->
-        let x = param_of_lv lv in
-        let h = has_ltype lv.lv_type (e_var x) in
-        let v = Cvalues.plain lv.lv_type (e_var x) in
-        profile_env
-          (Logic_var.Map.add lv v vars)
-          (h::domain)
-          ((lv,x)::sigv)
-          profile
+      let x = param_of_lv lv in
+      let h = has_ltype lv.lv_type (e_var x) in
+      let v = Cvalues.plain lv.lv_type (e_var x) in
+      profile_env
+        (Logic_var.Map.add lv v vars)
+        (h::domain)
+        ((lv,x)::sigv)
+        profile
 
   let default_label env = function
     | [l] -> move_at env (mem_frame (Clabels.of_logic l))
@@ -528,29 +528,29 @@ struct
     match l.l_type with
     | None -> ()
     | Some tr ->
-        match Cvalues.ldomain tr with
-        | None -> ()
-        | Some p ->
-            let name = "T" ^ Lang.logic_id l in
-            let vs = List.map e_var ldef.d_params in
-            let rec conditions vs sigp =
-              match vs , sigp with
-              | v::vs , Sig_value lv :: sigp ->
-                  let cond = has_ltype lv.lv_type v in
-                  cond :: conditions vs sigp
-              | _ -> [] in
-            let result = F.e_fun ldef.d_lfun vs in
-            let lemma = p_hyps (conditions vs sigp) (p result) in
-            let trigger = Trigger.of_term result in
-            Definitions.define_lemma {
-              l_name = name ;
-              l_kind = Admit ;
-              l_types = ldef.d_types ;
-              l_forall = ldef.d_params ;
-              l_triggers = [[trigger]] ;
-              l_cluster = ldef.d_cluster ;
-              l_lemma = lemma ;
-            }
+      match Cvalues.ldomain tr with
+      | None -> ()
+      | Some p ->
+        let name = "T" ^ Lang.logic_id l in
+        let vs = List.map e_var ldef.d_params in
+        let rec conditions vs sigp =
+          match vs , sigp with
+          | v::vs , Sig_value lv :: sigp ->
+            let cond = has_ltype lv.lv_type v in
+            cond :: conditions vs sigp
+          | _ -> [] in
+        let result = F.e_fun ldef.d_lfun vs in
+        let lemma = p_hyps (conditions vs sigp) (p result) in
+        let trigger = Trigger.of_term result in
+        Definitions.define_lemma {
+          l_name = name ;
+          l_kind = Admit ;
+          l_types = ldef.d_types ;
+          l_forall = ldef.d_params ;
+          l_triggers = [[trigger]] ;
+          l_cluster = ldef.d_cluster ;
+          l_lemma = lemma ;
+        }
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiling Pure Logic Function                                      --- *)
@@ -639,15 +639,15 @@ struct
     match F.repr r with
     | Qed.Logic.Kint c -> CST c
     | _ ->
-        let ldef = {
-          d_lfun = ACSL l ;
-          d_types = List.length l.l_tparams ;
-          d_params = xs ;
-          d_cluster = cluster ;
-          d_definition = Function(tau,is_recursive l,r) ;
-        } in
-        Definitions.define_symbol ldef ;
-        type_for_signature l ldef s ; SIG s
+      let ldef = {
+        d_lfun = ACSL l ;
+        d_types = List.length l.l_tparams ;
+        d_params = xs ;
+        d_cluster = cluster ;
+        d_definition = Function(tau,is_recursive l,r) ;
+      } in
+      Definitions.define_symbol ldef ;
+      type_for_signature l ldef s ; SIG s
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiling Logic Predicate with Definition                          --- *)
@@ -670,15 +670,15 @@ struct
   let heap_case labels_used support = function
     | Sig_value _ -> support
     | Sig_chunk(chk,l_case) ->
-        let l_ind =
-          try LabelMap.find l_case labels_used
-          with Not_found -> LabelSet.empty
-        in
-        let l_chk =
-          try Heap.Map.find chk support
-          with Not_found -> LabelSet.empty
-        in
-        Heap.Map.add chk (LabelSet.union l_chk l_ind) support
+      let l_ind =
+        try LabelMap.find l_case labels_used
+        with Not_found -> LabelSet.empty
+      in
+      let l_chk =
+        try Heap.Map.find chk support
+        with Not_found -> LabelSet.empty
+      in
+      Heap.Map.add chk (LabelSet.union l_chk l_ind) support
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiling Inductive Logic                                          --- *)
@@ -736,14 +736,14 @@ struct
     Signature.update l (SIG s_rec) ;
     match l.l_body with
     | LBnone ->
-        let vars = match section with
-          | Toplevel _ -> []
-          | Axiomatic a -> Varinfo.Set.elements a.ax_reads
-        in if l.l_labels <> [] && vars = [] then
-          Wp_parameters.warning ~once:true ~current:false
-            "No definition for '%s' interpreted as reads nothing"
-            l.l_var_info.lv_name ;
-        compile_lbnone cluster l vars
+      let vars = match section with
+        | Toplevel _ -> []
+        | Axiomatic a -> Varinfo.Set.elements a.ax_reads
+      in if l.l_labels <> [] && vars = [] then
+        Wp_parameters.warning ~once:true ~current:false
+          "No definition for '%s' interpreted as reads nothing"
+          l.l_var_info.lv_name ;
+      compile_lbnone cluster l vars
     | LBterm t -> compile_lbterm cluster l t
     | LBpred p -> compile_lbpred cluster l p
     | LBreads ts -> compile_lbreads cluster l ts
@@ -756,44 +756,44 @@ struct
   let define_type cluster lt =
     let constrainer = match lt with
       | { lt_def = Some(LTsum(ctors)) ; lt_name ; lt_params=[] } ->
-          let frame = logic_frame lt_name [] in
-          in_frame frame
-            begin fun () ->
-              let lfun = Lang.generated_p ~coloring:true ("is_" ^ lt_name) in
-              let tau_lt = Lang.tau_of_ltype (Ltype(lt, [])) in
-              Typedefs.update lt (Some lfun) ;
-              let term_constraint ltyp =
-                let v = Lang.freshvar ~basename:"p" (Lang.tau_of_ltype ltyp) in
-                v, (has_ltype ltyp (Lang.F.e_var v))
-              in
-              let ctor_to_prop = function
-                | { ctor_name = l_name ; ctor_params = ts } as const ->
-                    let vs, cs = List.split (List.map term_constraint ts) in
-                    let ts = List.map Lang.F.e_var vs in
-                    let const = F.e_fun ~result:tau_lt (CTOR const) ts in
-                    let is_lt = F.p_call lfun [const] in
-                    {
-                      l_name ;
-                      l_types = 0 ;
-                      l_kind = Admit ;
-                      l_triggers = [frame.triggers] ;
-                      l_forall = vs ;
-                      l_cluster = cluster ;
-                      l_lemma = p_hyps cs is_lt ;
-                    }
-              in
-              let cases = List.map ctor_to_prop ctors in
-              Definitions.define_symbol {
-                d_lfun = lfun ;
-                d_types = 0 ;
-                d_params = [ Lang.freshvar ~basename:"v" tau_lt ] ;
-                d_cluster = cluster ;
-                d_definition = Inductive cases
-              } ;
-              Some lfun
-            end ()
+        let frame = logic_frame lt_name [] in
+        in_frame frame
+          begin fun () ->
+            let lfun = Lang.generated_p ~coloring:true ("is_" ^ lt_name) in
+            let tau_lt = Lang.tau_of_ltype (Ltype(lt, [])) in
+            Typedefs.update lt (Some lfun) ;
+            let term_constraint ltyp =
+              let v = Lang.freshvar ~basename:"p" (Lang.tau_of_ltype ltyp) in
+              v, (has_ltype ltyp (Lang.F.e_var v))
+            in
+            let ctor_to_prop = function
+              | { ctor_name = l_name ; ctor_params = ts } as const ->
+                let vs, cs = List.split (List.map term_constraint ts) in
+                let ts = List.map Lang.F.e_var vs in
+                let const = F.e_fun ~result:tau_lt (CTOR const) ts in
+                let is_lt = F.p_call lfun [const] in
+                {
+                  l_name ;
+                  l_types = 0 ;
+                  l_kind = Admit ;
+                  l_triggers = [frame.triggers] ;
+                  l_forall = vs ;
+                  l_cluster = cluster ;
+                  l_lemma = p_hyps cs is_lt ;
+                }
+            in
+            let cases = List.map ctor_to_prop ctors in
+            Definitions.define_symbol {
+              d_lfun = lfun ;
+              d_types = 0 ;
+              d_params = [ Lang.freshvar ~basename:"v" tau_lt ] ;
+              d_cluster = cluster ;
+              d_definition = Inductive cases
+            } ;
+            Some lfun
+          end ()
       | { lt_def = Some(LTsum(_)) ; lt_params=_ } ->
-          Wp_parameters.not_yet_implemented "Type parameters for sum types"
+        Wp_parameters.not_yet_implemented "Type parameters for sum types"
       | _ -> None
     in
     Typedefs.update lt constrainer ;
@@ -836,37 +836,37 @@ struct
       let cluster = Definitions.section section in
       match section with
       | Toplevel _ ->
-          Signature.memoize (compile_logic cluster section) phi
+        Signature.memoize (compile_logic cluster section) phi
       | Axiomatic ax ->
-          (* force compilation of entire axiomatics *)
-          define_axiomatic cluster ax ;
-          try Signature.find phi
-          with Not_found ->
-            Wp_parameters.fatal ~current:true
-              "Axiomatic '%s' compiled, but '%a' not"
-              ax.ax_name Printer.pp_logic_var phi.l_var_info
+        (* force compilation of entire axiomatics *)
+        define_axiomatic cluster ax ;
+        try Signature.find phi
+        with Not_found ->
+          Wp_parameters.fatal ~current:true
+            "Axiomatic '%s' compiled, but '%a' not"
+            ax.ax_name Printer.pp_logic_var phi.l_var_info
 
   let rec logic_type t =
     match Logic_utils.unroll_type ~unroll_typedef:false t with
     | Ctype _ -> ()
     | Linteger | Lreal | Lvar _ | Larrow _ -> ()
     | Ltype(lt,ps) ->
-        List.iter logic_type ps ;
-        if not (Typedefs.mem lt) then
-          begin
-            Typedefs.update lt None ;
-            if not (Lang.is_builtin lt) &&
-               not (Logic_const.is_boolean_type t)
-            then
-              let section = LogicUsage.section_of_type lt in
-              let cluster = Definitions.section section in
-              match section with
-              | Toplevel _ ->
-                  define_type cluster lt
-              | Axiomatic ax ->
-                  (* force compilation of entire axiomatics *)
-                  define_axiomatic cluster ax
-          end
+      List.iter logic_type ps ;
+      if not (Typedefs.mem lt) then
+        begin
+          Typedefs.update lt None ;
+          if not (Lang.is_builtin lt) &&
+             not (Logic_const.is_boolean_type t)
+          then
+            let section = LogicUsage.section_of_type lt in
+            let cluster = Definitions.section section in
+            match section with
+            | Toplevel _ ->
+              define_type cluster lt
+            | Axiomatic ax ->
+              (* force compilation of entire axiomatics *)
+              define_axiomatic cluster ax
+        end
   let () = compile_logic_type := logic_type
 
   let logic_profile phi =
@@ -883,9 +883,9 @@ struct
     match phi_labels, labels with
     | [], [] -> LabelMap.empty
     | l1 :: phi_labels, l2 :: labels ->
-        let l1 = Clabels.of_logic l1 in
-        let l2 = Clabels.of_logic l2 in
-        LabelMap.add l1 (mem_at env l2) (bind_labels env phi_labels labels)
+      let l1 = Clabels.of_logic l1 in
+      let l2 = Clabels.of_logic l2 in
+      LabelMap.add l1 (mem_at env l2) (bind_labels env phi_labels labels)
     | _ -> Wp_parameters.fatal "Incorrect by AST typing"
 
   let call_params env
@@ -901,12 +901,12 @@ struct
       (function
         | Sig_value lv -> Logic_var.Map.find lv mparams
         | Sig_chunk(c,l) ->
-            let sigma =
-              try LabelMap.find l mlabels
-              with Not_found ->
-                Wp_parameters.fatal "*** Label %a not-found@." Clabels.pretty l
-            in
-            M.Sigma.value sigma c
+          let sigma =
+            try LabelMap.find l mlabels
+            with Not_found ->
+              Wp_parameters.fatal "*** Label %a not-found@." Clabels.pretty l
+          in
+          M.Sigma.value sigma c
       ) sparam
 
   let call_fun env
@@ -917,8 +917,8 @@ struct
     match signature phi with
     | CST c -> e_zint c
     | SIG sparam ->
-        let es = call_params env phi labels sparam parameters in
-        F.e_fun ~result (ACSL phi) es
+      let es = call_params env phi labels sparam parameters in
+      F.e_fun ~result (ACSL phi) es
 
   let call_pred env
       (phi:logic_info)
@@ -927,8 +927,8 @@ struct
     match signature phi with
     | CST _ -> assert false
     | SIG sparam ->
-        let es = call_params env phi labels sparam parameters in
-        F.p_call (ACSL phi) es
+      let es = call_params env phi labels sparam parameters in
+      F.p_call (ACSL phi) es
 
   (* -------------------------------------------------------------------------- *)
   (* --- Variable Bindings                                                  --- *)

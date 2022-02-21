@@ -31,18 +31,18 @@ let around f k n =
   match f k with
   | Some s -> s
   | None ->
-      let rec scan f k i n =
-        match f (k-i) with
+    let rec scan f k i n =
+      match f (k-i) with
+      | Some s -> s
+      | None ->
+        match f (k+i) with
         | Some s -> s
         | None ->
-            match f (k+i) with
-            | Some s -> s
-            | None ->
-                let j = succ i in
-                if k+j < n || j <= k then
-                  scan f k j n
-                else raise Not_found
-      in scan f k 1 n
+          let j = succ i in
+          if k+j < n || j <= k then
+            scan f k j n
+          else raise Not_found
+    in scan f k 1 n
 
 let s_kind s = match s.condition with
   | Have _ | When _ | Core _ -> "have"
@@ -122,23 +122,23 @@ let rec json_of_selection = function
   | Compose code -> json_of_compose code
 
   | Clause (Goal p) ->
-      `Assoc[ j_goal ; j_pred p ; j_ppattern p ]
+    `Assoc[ j_goal ; j_pred p ; j_ppattern p ]
 
   | Clause (Step s) ->
-      let p = Conditions.head s in
-      `Assoc[ j_step ; j_at s ; j_kind s ; j_pred p ; j_ppattern p ]
+    let p = Conditions.head s in
+    `Assoc[ j_step ; j_at s ; j_kind s ; j_pred p ; j_ppattern p ]
 
   | Inside(Goal p,e) ->
-      let n,m = occur p e in
-      `Assoc [ j_ingoal ; j_occur n ; j_term e ; j_pattern m ]
+    let n,m = occur p e in
+    `Assoc [ j_ingoal ; j_occur n ; j_term e ; j_pattern m ]
 
   | Inside(Step s,e) ->
-      let n,m = occur (Conditions.head s) e in
-      `Assoc [ j_instep ; j_at s ; j_kind s ; j_occur n ;
-               j_term e ; j_pattern m ]
+    let n,m = occur (Conditions.head s) e in
+    `Assoc [ j_instep ; j_at s ; j_kind s ; j_occur n ;
+             j_term e ; j_pattern m ]
 
   | Multi es ->
-      `Assoc (j_multi :: j_args es)
+    `Assoc (j_multi :: j_args es)
 
 and j_args = function
   | [] -> []
@@ -171,26 +171,26 @@ let rec selection_of_json ((hs,g) as s : sequent) js =
     let key = js >? "select" |> Json.string in
     match key with
     | "clause-goal" ->
-        check_pattern ~pattern:(j_pattern js) g ;
-        Clause (Goal g)
+      check_pattern ~pattern:(j_pattern js) g ;
+      Clause (Goal g)
     | "clause-step" ->
-        let pattern = j_pattern js in
-        let s = locate_step ~at:(j_at js) ~kind:(j_kind js) ~pattern hs in
-        Clause (Step s)
+      let pattern = j_pattern js in
+      let s = locate_step ~at:(j_at js) ~kind:(j_kind js) ~pattern hs in
+      Clause (Step s)
     | "inside-goal" ->
-        let occur = j_occur js , j_pattern js in
-        Inside(Goal g , lookup_occur ~occur g )
+      let occur = j_occur js , j_pattern js in
+      Inside(Goal g , lookup_occur ~occur g )
     | "inside-step" ->
-        let occur = j_occur js , j_pattern js in
-        let s,e = locate_inside ~at:(j_at js) ~kind:(j_kind js) ~occur hs in
-        Inside(Step s,e)
+      let occur = j_occur js , j_pattern js in
+      let s,e = locate_inside ~at:(j_at js) ~kind:(j_kind js) ~occur hs in
+      Inside(Step s,e)
     | "compose" ->
-        let id = j_id js in
-        let args = j_args js in
-        Tactical.compose id (List.map (selection_of_json s) args)
+      let id = j_id js in
+      let args = j_args js in
+      Tactical.compose id (List.map (selection_of_json s) args)
     | "multi" ->
-        let args = j_args js in
-        Tactical.multi @@ List.map (selection_of_json s) args
+      let args = j_args js in
+      Tactical.multi @@ List.map (selection_of_json s) args
     | "kint" -> Tactical.cint (j_val js)
     | "range" -> Tactical.range (j_min js) (j_max js)
     | _ -> raise Not_found
@@ -202,11 +202,11 @@ let selection_target js = js >? "target" |> Json.string
 let json_of_named = function
   | None -> `Null
   | Some a ->
-      `Assoc Tactical.[
-          "id" , `String a.vid ;
-          "title" , `String a.title ;
-          "descr" , `String a.descr ;
-        ]
+    `Assoc Tactical.[
+        "id" , `String a.vid ;
+        "title" , `String a.title ;
+        "descr" , `String a.descr ;
+      ]
 
 let named_of_json find js =
   try
@@ -226,45 +226,45 @@ let json_of_param (tac : tactical) = function
   | Spinner(fd,_) -> ident fd , Json.of_int (tac#get_field fd)
   | Composer(fd,_) -> ident fd , json_of_selection (tac#get_field fd)
   | Selector(fd,options,equal) ->
-      ident fd , `String
-        begin
-          try
-            let a = tac#get_field fd in
-            let v = List.find (fun v -> equal v.value a) options in
-            v.vid
-          with _ -> "default"
-        end
+    ident fd , `String
+      begin
+        try
+          let a = tac#get_field fd in
+          let v = List.find (fun v -> equal v.value a) options in
+          v.vid
+        with _ -> "default"
+      end
   | Search(fd,_,_) ->
-      ident fd , json_of_named (tac#get_field fd)
+    ident fd , json_of_named (tac#get_field fd)
 
 let param_of_json (tac : tactical) seq js = function
   | Checkbox fd ->
-      tac#set_field fd
-        (try Json.bool (Json.field (ident fd) js)
-         with _ -> default fd)
+    tac#set_field fd
+      (try Json.bool (Json.field (ident fd) js)
+       with _ -> default fd)
   | Spinner(fd,_) ->
-      tac#set_field fd
-        (try Json.int (Json.field (ident fd) js)
-         with _ -> default fd)
+    tac#set_field fd
+      (try Json.int (Json.field (ident fd) js)
+       with _ -> default fd)
   | Composer(fd,_) ->
-      let sel = (try selection_of_json seq (Json.field (ident fd) js)
-                 with _ -> default fd) in
-      tac#set_field fd sel
+    let sel = (try selection_of_json seq (Json.field (ident fd) js)
+               with _ -> default fd) in
+    tac#set_field fd sel
   | Selector(fd,options,_) ->
-      tac#set_field fd
-        begin
-          try
-            let jid = Json.string (Json.field (ident fd) js) in
-            let v = List.find (fun v -> v.vid = jid) options in
-            v.value
-          with _ -> default fd
-        end
+    tac#set_field fd
+      begin
+        try
+          let jid = Json.string (Json.field (ident fd) js) in
+          let v = List.find (fun v -> v.vid = jid) options in
+          v.value
+        with _ -> default fd
+      end
   | Search(fd,_,find) ->
-      tac#set_field fd
-        begin
-          try named_of_json find (Json.field (ident fd) js)
-          with _ -> None
-        end
+    tac#set_field fd
+      begin
+        try named_of_json find (Json.field (ident fd) js)
+        with _ -> None
+      end
 
 let json_of_parameters (tac : tactical) =
   `Assoc (List.map (json_of_param tac) tac#params)
@@ -302,9 +302,9 @@ let json_of_tactic t js =
 
 let children_of_json = function
   | `List js ->
-      Wp_parameters.warning ~current:false ~once:true
-        "Deprecated script(s) found ; consider using prover 'tip'" ;
-      List.map (fun j -> "",j) js
+    Wp_parameters.warning ~current:false ~once:true
+      "Deprecated script(s) found ; consider using prover 'tip'" ;
+    List.map (fun j -> "",j) js
   | `Assoc fs -> fs
   | _ -> []
 
@@ -380,8 +380,8 @@ let rec pending_any = function
   | [] -> 1
   | [a] -> pending a
   | a::s ->
-      let n = pending a in
-      if n = 0 then 0 else min n (pending_any s)
+    let n = pending a in
+    if n = 0 then 0 else min n (pending_any s)
 
 let rec subgoals n = function
   | [] -> n
@@ -407,10 +407,10 @@ and alternative js =
   match prover_of_json js with
   | Some prover -> Prover(prover,result_of_json js)
   | None ->
-      match tactic_of_json js with
-      | Some(tactic, children) ->
-          a_tactic tactic (List.map subscript children)
-      | None -> Error("Invalid Tactic",js)
+    match tactic_of_json js with
+    | Some(tactic, children) ->
+      a_tactic tactic (List.map subscript children)
+    | None -> Error("Invalid Tactic",js)
 
 let rec encode script = `List (alternatives script)
 

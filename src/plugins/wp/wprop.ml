@@ -77,7 +77,7 @@ struct
         match Info.property key with
         | Later ip -> ip
         | Proxy(ip,emitter,ips) ->
-            Property_status.logical_consequence emitter ip ips ; ip
+          Property_status.logical_consequence emitter ip ips ; ip
       in
       List.iter (fun f -> f key ip) !hooks ;
       H.add key ip ; ip

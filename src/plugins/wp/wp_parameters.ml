@@ -164,8 +164,8 @@ let iter_fct phi = function
   | Fct_none -> ()
   | Fct_all -> Globals.Functions.iter phi
   | Fct_skip fs ->
-      Globals.Functions.iter
-        (fun kf -> if not (Fct.mem kf fs) then phi kf)
+    Globals.Functions.iter
+      (fun kf -> if not (Fct.mem kf fs) then phi kf)
   | Fct_list fs -> Fct.iter phi fs
 
 let get_kfs () =
@@ -1028,14 +1028,14 @@ let unique_tmp = ref None
 let make_tmp_dir () =
   match !unique_tmp with
   | None ->
-      let tmp =
-        try Extlib.temp_dir_cleanup_at_exit "wp"
-        with Extlib.Temp_file_error s ->
-          abort "Cannot create temporary file: %s" s
-      in
-      unique_tmp := Some tmp ;
-      debug ~dkey "Created temporary directory '%s'" tmp ;
-      tmp
+    let tmp =
+      try Extlib.temp_dir_cleanup_at_exit "wp"
+      with Extlib.Temp_file_error s ->
+        abort "Cannot create temporary file: %s" s
+    in
+    unique_tmp := Some tmp ;
+    debug ~dkey "Created temporary directory '%s'" tmp ;
+    tmp
   | Some tmp -> tmp
 
 let make_gui_dir () =
@@ -1058,14 +1058,14 @@ let base_output () =
   | None -> let output =
               match OutputDir.get () with
               | "" ->
-                  if !Fc_config.is_gui
-                  then make_gui_dir ()
-                  else make_tmp_dir ()
+                if !Fc_config.is_gui
+                then make_gui_dir ()
+                else make_tmp_dir ()
               | dir ->
-                  make_output_dir dir ; dir in
-      base_output := Some output;
-      Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
-      Datatype.Filepath.of_string output
+                make_output_dir dir ; dir in
+    base_output := Some output;
+    Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
+    Datatype.Filepath.of_string output
   | Some output -> Datatype.Filepath.of_string output
 
 let get_output () =

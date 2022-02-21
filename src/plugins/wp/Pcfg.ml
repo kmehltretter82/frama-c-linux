@@ -91,13 +91,13 @@ let rec find env e =
 and lookup env e = function
   | [] -> Term
   | lbl :: others ->
-      try match Mstate.lookup lbl.state e with
-        | Sigs.Mterm -> raise Not_found
-        | Sigs.Maddr lv -> Addr lv
-        | Sigs.Mlval (lv, KValue) -> Lval(lv,flag lbl)
-        | Sigs.Mlval (lv, KInit) -> Init(lv,flag lbl)
-        | Sigs.Mchunk (m, _) -> Chunk(m,flag lbl)
-      with Not_found -> lookup env e others
+    try match Mstate.lookup lbl.state e with
+      | Sigs.Mterm -> raise Not_found
+      | Sigs.Maddr lv -> Addr lv
+      | Sigs.Mlval (lv, KValue) -> Lval(lv,flag lbl)
+      | Sigs.Mlval (lv, KInit) -> Init(lv,flag lbl)
+      | Sigs.Mchunk (m, _) -> Chunk(m,flag lbl)
+    with Not_found -> lookup env e others
 
 let is_ref x k = (k == F.e_zero) && Cil.isPointerType x.vtype
 let is_atomic = function
@@ -109,11 +109,11 @@ let iter f lbl = Mstate.iter f lbl.state
 
 let is_copy env lbl = function
   | Sigs.Mstore( lv , value ) ->
-      begin
-        match find env value with
-        | Lval(lv0,lbl0) -> lbl0 == lbl && Mstate.equal lv lv0
-        | _ -> false
-      end
+    begin
+      match find env value with
+      | Lval(lv0,lbl0) -> lbl0 == lbl && Mstate.equal lv lv0
+      | _ -> false
+    end
 
 let updates env seq vars =
   Bag.filter
@@ -132,8 +132,8 @@ let sequence_point a b =
   if a != b then
     match a,b with
     | Some p , Some q ->
-        if not (List.memq q p.next) then p.next <- q :: p.next ;
-        if not (List.memq p q.prev) then q.prev <- p :: q.prev ;
+      if not (List.memq q p.next) then p.next <- q :: p.next ;
+      if not (List.memq p q.prev) then q.prev <- p :: q.prev ;
     | None , _ | _ , None -> ()
 
 let rec control env prev sequence next =
@@ -142,29 +142,29 @@ let rec control env prev sequence next =
 and ctrl env prev steps next = match steps with
   | [] -> next
   | s :: others ->
-      let open Conditions in
-      match s.condition with
-      | Type _ | Have _ | When _ | Core _ | Init _ ->
-          (* Sequence of Labels on Hyp *)
-          ctrl env prev others next
-      | Branch(_,cthen,celse) ->
-          let next = ctrl env None others next in
-          control env prev cthen next ;
-          control env prev celse next ;
-          None
-      | Either cases ->
-          let next = ctrl env None others next in
-          List.iter (fun s -> control env prev s next) cases ;
-          None
-      | State _ ->
-          try
-            let here = Some (at env ~id:s.id) in
-            sequence_point prev here ;
-            let next = ctrl env here others next in
-            sequence_point here next ;
-            here
-          with Not_found ->
-            ctrl env prev others next
+    let open Conditions in
+    match s.condition with
+    | Type _ | Have _ | When _ | Core _ | Init _ ->
+      (* Sequence of Labels on Hyp *)
+      ctrl env prev others next
+    | Branch(_,cthen,celse) ->
+      let next = ctrl env None others next in
+      control env prev cthen next ;
+      control env prev celse next ;
+      None
+    | Either cases ->
+      let next = ctrl env None others next in
+      List.iter (fun s -> control env prev s next) cases ;
+      None
+    | State _ ->
+      try
+        let here = Some (at env ~id:s.id) in
+        sequence_point prev here ;
+        let next = ctrl env here others next in
+        sequence_point here next ;
+        here
+      with Not_found ->
+        ctrl env prev others next
 
 (* -------------------------------------------------------------------------- *)
 (* --- Priority Queue                                                     --- *)
@@ -185,8 +185,8 @@ let register seq =
          let open Conditions in
          match s with
          | { id ; stmt ; descr ; condition = State m } ->
-             let label = label env ~id ?stmt ?descr m in
-             let r = pool descr in r := label :: !r
+           let label = label env ~id ?stmt ?descr m in
+           let r = pool descr in r := label :: !r
          | { condition = Type _ | Have _ | When _ | Core _ | Init _ } -> ()
          | { condition = Branch(_,cthen,celse) } -> push cthen ; push celse
          | { condition = Either cases } -> List.iter push cases
@@ -224,19 +224,19 @@ class virtual engine =
 
     method pp_lval fmt = function
       | Mvar x , [] ->
-          Format.pp_print_string fmt x.vname
+        Format.pp_print_string fmt x.vname
       | Mvar x , [Mindex k] when is_ref x k ->
-          Format.fprintf fmt "*%s" x.vname
+        Format.fprintf fmt "*%s" x.vname
       | Mvar x , ofs ->
-          Format.fprintf fmt "@[<hov 2>%s%a@]" x.vname self#pp_offset ofs
+        Format.fprintf fmt "@[<hov 2>%s%a@]" x.vname self#pp_offset ofs
       | host , [] ->
-          Format.fprintf fmt "*%a" self#pp_host host
+        Format.fprintf fmt "*%a" self#pp_host host
       | host , Mfield fd :: ofs ->
-          Format.fprintf fmt "@[<hov 2>%a@,->%s%a@]"
-            self#pp_host host fd.fname self#pp_offset ofs
+        Format.fprintf fmt "@[<hov 2>%a@,->%s%a@]"
+          self#pp_host host fd.fname self#pp_offset ofs
       | host , ((Mindex _ :: _) as ofs) ->
-          Format.fprintf fmt "@[<hov 2>%a@,%a@]"
-            self#pp_host host self#pp_offset ofs
+        Format.fprintf fmt "@[<hov 2>%a@,%a@]"
+          self#pp_host host self#pp_offset ofs
 
     method pp_init fmt lv =
       Format.fprintf fmt "initialized(%a)" self#pp_lval lv
@@ -245,7 +245,7 @@ class virtual engine =
       | Mvar x , [] -> Format.fprintf fmt "&%s" x.vname
       | Mmem p , [] -> self#pp_atom fmt p
       | Mmem p , [Mindex k] ->
-          Format.fprintf fmt "%a + %a" self#pp_atom p self#pp_atom k
+        Format.fprintf fmt "%a + %a" self#pp_atom p self#pp_atom k
       | lv -> Format.fprintf fmt "&(%a)" self#pp_lval lv
 
     method pp_label fmt lbl =
