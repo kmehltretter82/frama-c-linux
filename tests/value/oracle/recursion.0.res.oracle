@@ -133,6 +133,13 @@
 [eva:alarm] recursion.c:182: Warning: 
   function even_ptr: postcondition got status unknown.
 [eva:recursion] recursion.c:174: detected recursive call of function even_ptr.
+[eva] recursion.c:174: Warning: 
+  Using specification of function even_ptr for recursive calls.
+  Analysis of function even_ptr is thus incomplete and its soundness
+  relies on the written specification.
+[eva] using specification for function even_ptr
+[eva:alarm] recursion.c:175: Warning: 
+  accessing uninitialized left-value. assert \initialized(&x);
 [eva] recursion.c:383: Frama_C_show_each_1: {1}, {1}
 [eva] recursion.c:386: Frama_C_show_each_0: {0}, {0}
 [eva] using specification for function Frama_C_interval

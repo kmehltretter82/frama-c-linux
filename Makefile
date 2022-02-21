@@ -908,8 +908,9 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
+	engine/recursion engine/function_calls \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
-	engine/recursion engine/transfer_stmt engine/transfer_specification \
+	engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
 	domains/taint_domain \
