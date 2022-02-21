@@ -4,10 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
-[eva] computing for function f <- h.
-  Called from slice_no_body.i:21.
 [kernel:annot:missing-spec] slice_no_body.i:21: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
+[eva] computing for function f <- h.
+  Called from slice_no_body.i:21.
 [eva] using specification for function f
 [eva] Done for function f
 [eva] computing for function f <- h.

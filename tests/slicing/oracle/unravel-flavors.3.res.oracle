@@ -61,10 +61,10 @@
   signed overflow. assert yellow + green ≤ 2147483647;
 [eva] computing for function send1 <- main.
   Called from unravel-flavors.i:60.
-[eva] computing for function printf <- send1 <- main.
-  Called from unravel-flavors.i:19.
 [kernel:annot:missing-spec] unravel-flavors.i:19: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
+[eva] computing for function printf <- send1 <- main.
+  Called from unravel-flavors.i:19.
 [eva] using specification for function printf
 [eva] Done for function printf
 [eva] Recording results for send1

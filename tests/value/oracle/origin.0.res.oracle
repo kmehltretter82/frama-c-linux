@@ -110,10 +110,10 @@
 [eva] Done for function origin_arithmetic_3
 [eva] computing for function origin_leaf_1 <- main.
   Called from origin.i:97.
-[eva] computing for function g <- origin_leaf_1 <- main.
-  Called from origin.i:38.
 [kernel:annot:missing-spec] origin.i:38: Warning: 
   Neither code nor specification for function g, generating default assigns from the prototype
+[eva] computing for function g <- origin_leaf_1 <- main.
+  Called from origin.i:38.
 [eva] using specification for function g
 [eva] Done for function g
 [eva] Recording results for origin_leaf_1

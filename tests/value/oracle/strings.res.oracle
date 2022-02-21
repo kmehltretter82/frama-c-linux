@@ -40,10 +40,10 @@
   Z ∈ {0}
 [eva] computing for function string_reads <- main.
   Called from strings.i:142.
-[eva] computing for function u <- string_reads <- main.
-  Called from strings.i:39.
 [kernel:annot:missing-spec] strings.i:39: Warning: 
   Neither code nor specification for function u, generating default assigns from the prototype
+[eva] computing for function u <- string_reads <- main.
+  Called from strings.i:39.
 [eva] using specification for function u
 [eva] Done for function u
 [eva:alarm] strings.i:39: Warning: 

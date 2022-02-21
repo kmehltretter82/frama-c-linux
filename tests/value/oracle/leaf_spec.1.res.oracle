@@ -4,10 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function f <- main1.
-  Called from leaf_spec.i:27.
 [kernel:annot:missing-spec] leaf_spec.i:27: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
+[eva] computing for function f <- main1.
+  Called from leaf_spec.i:27.
 [eva] using specification for function f
 [eva:invalid-assigns] leaf_spec.i:27: 
   Completely invalid destination for assigns clause *x. Ignoring.

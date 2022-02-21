@@ -186,10 +186,10 @@
 [eva] Done for function main9
 [eva] computing for function main10 <- main.
   Called from assigns_from.i:244.
-[eva] computing for function c <- main10 <- main.
-  Called from assigns_from.i:152.
 [kernel:annot:missing-spec] assigns_from.i:152: Warning: 
   Neither code nor specification for function c, generating default assigns from the prototype
+[eva] computing for function c <- main10 <- main.
+  Called from assigns_from.i:152.
 [eva] using specification for function c
 [eva] Done for function c
 [eva] assigns_from.i:152: starting to merge loop iterations

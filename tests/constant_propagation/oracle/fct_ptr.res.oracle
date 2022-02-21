@@ -7,10 +7,10 @@
   pf ∈ {0}
 [eva] computing for function g <- main.
   Called from fct_ptr.i:15.
-[eva] computing for function f <- g <- main.
-  Called from fct_ptr.i:8.
 [kernel:annot:missing-spec] fct_ptr.i:8: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
+[eva] computing for function f <- g <- main.
+  Called from fct_ptr.i:8.
 [eva] using specification for function f
 [eva] Done for function f
 [eva] Recording results for g

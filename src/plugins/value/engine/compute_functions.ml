@@ -177,11 +177,6 @@ module Make (Abstract: Abstractions.Eva) = struct
     let global = match call_kinstr with Kglobal -> true | _ -> false in
     let pp = not global && Parameters.ValShowProgress.get () in
     let call_stack = Eva_utils.call_stack () in
-    if pp then
-      Self.feedback
-        "@[computing for function %a.@\nCalled from %a.@]"
-        Value_types.Callstack.pretty_short call_stack
-        Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc call_kinstr);
     let use_spec =
       match recursion with
       | Some { depth } when depth >= Parameters.RecursiveUnroll.get () ->
@@ -194,6 +189,11 @@ module Make (Abstract: Abstractions.Eva) = struct
           then `Spec (Annotations.funspec kf)
           else `Def def
     in
+    if pp then
+      Self.feedback
+        "@[computing for function %a.@\nCalled from %a.@]"
+        Value_types.Callstack.pretty_short call_stack
+        Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc call_kinstr);
     let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
     let resulting_states, cacheable = match use_spec with
       | `Spec spec ->
