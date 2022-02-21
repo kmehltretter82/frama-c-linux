@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Main React Component rendered by './index.js'
 // --------------------------------------------------------------------------
@@ -32,76 +30,76 @@
  */
 
 import React from 'react';
-
-import { usePromise } from 'dome/dome';
+import * as Dome from 'dome';
+import * as Themes from 'dome/themes';
+import * as Toolbar from 'dome/frame/toolbars';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
-
 import 'codemirror/mode/clike/clike';
-import '../colors/dark-code.css';
-import { ipcRenderer } from 'electron';
-
-export const THEMES = [
-  { id: 'light', label: 'Light' },
-  { id: 'dark', label: 'Dark' },
-  { id: 'system', label: 'System Defaults' },
-];
 
 // --------------------------------------------------------------------------
 // --- AST View Preferences
 // --------------------------------------------------------------------------
 
-export const ColorTheme = new Settings.GString('color-theme', 'system');
 export const AstFontSize = new Settings.GNumber('ASTview.fontSize', 12);
 export const AstWrapText = new Settings.GFalse('ASTview.wrapText');
 export const SourceFontSize = new Settings.GNumber('SourceCode.fontSize', 12);
 export const SourceWrapText = new Settings.GFalse('SourceCode.wrapText');
 
-export interface ThemeProps {
-  target: string;
+/* -------------------------------------------------------------------------- */
+/* --- Theme Switcher Button                                              --- */
+/* -------------------------------------------------------------------------- */
+
+const themeEntries: Dome.PopupMenuItem[] = [
+  { id: 'light', label: 'Switch to Light Theme' },
+  { id: 'dark', label: 'Switch to Dark Theme' },
+  { id: 'system', label: 'Switch to System Default' },
+];
+
+export function ThemeSwitch(): JSX.Element {
+  const [theme, setTheme] = Themes.useColorTheme();
+  const other = theme === 'dark' ? 'light' : 'dark';
+  const title = `Switch to ${other} theme (right-click for full choice)`;
+  const onChange = (): void => setTheme(other);
+  const onPopup = (): void => Dome.popupMenu(
+    themeEntries,
+    (th) => setTheme(Themes.jColorSettings(th))
+  );
+  return (
+    <Toolbar.Switch
+      disabled={!Dome.DEVEL}
+      title={title}
+      checked={theme === 'dark'}
+      onChange={onChange}
+      onContextMenu={onPopup}
+    />
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Editor Icon Buttons
+// --------------------------------------------------------------------------
+
+export interface EditorProps {
   fontSize: Settings.GlobalSettings<number>;
   wrapText: Settings.GlobalSettings<boolean>;
   disabled?: boolean;
 }
 
-// --------------------------------------------------------------------------
-// --- Icon Buttons
-// --------------------------------------------------------------------------
-
-export interface ThemeControls {
+export interface EditorControls {
   buttons: React.ReactNode;
-  theme: string;
   fontSize: number;
   wrapText: boolean;
 }
 
-export function forceThemeUpdate(theme: string) {
-  ipcRenderer.invoke('theme-color:switch', theme);
-}
-
-ipcRenderer.on('dome.ipc.settings.defaults', () => {
-  forceThemeUpdate('system');
-});
-
-export function useThemeColors() {
-  const [themeColors] = Settings.useGlobalSettings(ColorTheme);
-  const invoke = () => ipcRenderer.invoke('theme-color:which-system');
-  const { result }: { result: 'dark' | 'light' } = usePromise(invoke());
-  if (themeColors === 'system')
-    return result === 'dark' ? 'dark-code' : 'default';
-  return themeColors === 'dark' ? 'dark-code' : 'default';
-}
-
-export function useThemeButtons(props: ThemeProps): ThemeControls {
+export function useEditorButtons(props: EditorProps): EditorControls {
+  const { disabled = false } = props;
   const [fontSize, setFontSize] = Settings.useGlobalSettings(props.fontSize);
   const [wrapText, setWrapText] = Settings.useGlobalSettings(props.wrapText);
-  const theme = useThemeColors();
-  const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
-  const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
-  const flipWrapText = () => setWrapText(!wrapText);
-  const { disabled = false } = props;
+  const zoomIn = (): void => setFontSize(fontSize + 2);
+  const zoomOut = (): void => setFontSize(fontSize - 2);
+  const flipWrapText = (): void => setWrapText(!wrapText);
   return {
-    theme,
     fontSize,
     wrapText,
     buttons: [
@@ -109,6 +107,7 @@ export function useThemeButtons(props: ThemeProps): ThemeControls {
         key="zoom.out"
         icon="ZOOM.OUT"
         onClick={zoomOut}
+        enabled={fontSize > 4}
         disabled={disabled}
         title="Decrease font size"
       />,
@@ -116,6 +115,7 @@ export function useThemeButtons(props: ThemeProps): ThemeControls {
         key="zoom.in"
         icon="ZOOM.IN"
         onClick={zoomIn}
+        enabled={fontSize < 48}
         disabled={disabled}
         title="Increase font size"
       />,
@@ -123,6 +123,7 @@ export function useThemeButtons(props: ThemeProps): ThemeControls {
         key="wrap"
         icon="WRAPTEXT"
         selected={wrapText}
+        disabled={disabled}
         onClick={flipWrapText}
         title="Wrap text"
       />,

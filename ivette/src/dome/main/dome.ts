@@ -620,13 +620,28 @@ ipcMain.handle(
 );
 
 // --------------------------------------------------------------------------
+// --- Native Theme
+// --------------------------------------------------------------------------
 
-type themes = 'dark' | 'light' | 'system';
-
-ipcMain.handle('theme-color:switch', (_evt, theme: themes) => {
-  nativeTheme.themeSource = theme;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ipcMain.handle('dome.ipc.theme.setSource', (_evt, theme) => {
+  switch (theme) {
+    case 'dark':
+    case 'light':
+    case 'system':
+      nativeTheme.themeSource = theme;
+      return;
+    default:
+      console.warn('[dome] unknown theme', theme);
+  }
 });
 
-ipcMain.handle('theme-color:which-system', () => {
+ipcMain.handle('dome.ipc.theme.getDefault', () => {
   return nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
 });
+
+nativeTheme.on('updated', () => {
+  broadcast('dome.theme.updated');
+});
+
+// --------------------------------------------------------------------------

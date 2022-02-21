@@ -164,9 +164,8 @@ export default function ASTview() {
   const multipleSelections = selection?.multiple.allSelections;
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
-  const { buttons: themeButtons, theme, fontSize, wrapText } =
-    Preferences.useThemeButtons({
-      target: 'Internal AST',
+  const { buttons: themeButtons, fontSize, wrapText } =
+    Preferences.useEditorButtons({
       fontSize: Preferences.AstFontSize,
       wrapText: Preferences.AstWrapText,
       disabled: !theFunction,
@@ -310,7 +309,6 @@ export default function ASTview() {
       <Text
         buffer={buffer}
         mode="text/x-csrc"
-        theme={theme}
         fontSize={fontSize}
         lineWrapping={wrapText}
         selection={theMarker}

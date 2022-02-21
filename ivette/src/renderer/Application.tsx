@@ -35,9 +35,8 @@ import * as Sidebar from 'dome/frame/sidebars';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
-import * as Settings from 'dome/data/settings';
+import * as IvettePrefs from 'ivette/prefs';
 import './loader';
-import * as Preferences from 'ivette/prefs';
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -52,14 +51,6 @@ export default function Application(): JSX.Element {
   const onSelectedHints = (): void => {
     if (hints.length === 1) Extensions.onSearchHint(hints[0]);
   };
-
-  const [ th, setTh ] = Settings.useGlobalSettings(Preferences.ColorTheme);
-  const change = Preferences.forceThemeUpdate;
-  React.useState(() => change(th));
-  const other = th === 'dark' ? 'light' : 'dark';
-  const themeTitle = 'Switch to ' + other + ' theme';
-  const changeColorTheme: () => void = () => { change(other); setTh(other); };
-
   return (
     <Vfill>
       <Toolbar.ToolBar>
@@ -79,12 +70,7 @@ export default function Application(): JSX.Element {
           onHint={Extensions.onSearchHint}
           onSelect={onSelectedHints}
         />
-        <Toolbar.Switch
-          disabled={!Dome.DEVEL}
-          title={themeTitle}
-          position={th === 'dark' ? 'right' : 'left'}
-          onChange={changeColorTheme}
-        />
+        <IvettePrefs.ThemeSwitch />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"

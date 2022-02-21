@@ -80,9 +80,8 @@ export default function SourceCode(): JSX.Element {
   const filename = Path.parse(file).base;
 
   // Title bar buttons, along with the parameters for our text.
-  const { buttons: themeButtons, theme, fontSize, wrapText } =
-    Preferences.useThemeButtons({
-      target: 'Source Code',
+  const { buttons: themeButtons, fontSize, wrapText } =
+    Preferences.useEditorButtons({
       fontSize: Preferences.SourceFontSize,
       wrapText: Preferences.AstWrapText,
       disabled: !theFunction,
@@ -202,7 +201,6 @@ export default function SourceCode(): JSX.Element {
       <Text
         buffer={buffer}
         mode="text/x-csrc"
-        theme={theme}
         fontSize={fontSize}
         lineWrapping={wrapText}
         selection={theMarker}

@@ -39,13 +39,41 @@ import React from 'react';
 
 import * as Settings from 'dome/data/settings';
 import * as Forms from 'dome/layout/forms';
+import * as Themes from 'dome/themes';
 import * as IvettePrefs from 'ivette/prefs';
 
 // --------------------------------------------------------------------------
-// --- Font Forms
+// --- Theme Fields
 // --------------------------------------------------------------------------
 
-function ThemeFields(props: IvettePrefs.ThemeProps) {
+const themeOptions: Forms.MenuFieldOption<Themes.ColorSettings>[] = [
+  { value: 'light', label: 'Light Theme' },
+  { value: 'dark', label: 'Dark Theme' },
+  { value: 'system', label: 'System Defaults' },
+];
+
+function ThemeFields(): JSX.Element {
+  const state = Forms.useValid(Themes.useColorThemeSettings());
+  return (
+    <Forms.MenuField<Themes.ColorSettings>
+      label="Color Theme"
+      title="Select global color theme for the application"
+      state={state}
+      defaultValue='system'
+      options={themeOptions}
+    />
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Editor Fields
+// --------------------------------------------------------------------------
+
+interface EditorFieldProps extends IvettePrefs.EditorProps {
+  target: string;
+}
+
+function EditorFields(props: EditorFieldProps) {
   const fontsize = Forms.useValid(
     Settings.useGlobalSettings(props.fontSize),
   );
@@ -72,21 +100,7 @@ function ThemeFields(props: IvettePrefs.ThemeProps) {
   );
 }
 
-function ColorThemeFields() {
-  const [theme, setTheme] = Settings.useGlobalSettings(IvettePrefs.ColorTheme);
-  const elements = IvettePrefs.THEMES.map(({ id, label }) => {
-    return <option value={id} key={id}>{label}</option>;
-  });
-  const set = (t: string | undefined) => {
-    if (t) { IvettePrefs.forceThemeUpdate(t); setTheme(t); }
-  };
-  return (
-    <Forms.SelectField label={'Color theme'} state={[theme, undefined, set]}>
-      {elements}
-    </Forms.SelectField>
-  );
 
-}
 
 // --------------------------------------------------------------------------
 // --- Editor Command Forms
@@ -110,17 +124,17 @@ export default function Preferences() {
   return (
     <Forms.Page>
       <Forms.Section label="Theme" unfold>
-        <ColorThemeFields />
+        <ThemeFields />
       </Forms.Section>
       <Forms.Section label="AST View" unfold>
-        <ThemeFields
+        <EditorFields
           target="Internal AST"
           fontSize={IvettePrefs.AstFontSize}
           wrapText={IvettePrefs.AstWrapText}
         />
       </Forms.Section>
       <Forms.Section label="Source View" unfold>
-        <ThemeFields
+        <EditorFields
           target="Source Code"
           fontSize={IvettePrefs.SourceFontSize}
           wrapText={IvettePrefs.SourceWrapText}

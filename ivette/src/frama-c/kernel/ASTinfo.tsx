@@ -27,7 +27,6 @@
 import React from 'react';
 import * as States from 'frama-c/states';
 import * as Utils from 'frama-c/utils';
-import * as Preferences from 'ivette/prefs';
 
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
@@ -40,7 +39,6 @@ import { getInfo } from 'frama-c/kernel/api/ast';
 
 export default function ASTinfo(): JSX.Element {
 
-  const theme = Preferences.useThemeColors();
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [selection, updateSelection] = States.useSelection();
   const marker = selection?.current?.marker;
@@ -66,7 +64,6 @@ export default function ASTinfo(): JSX.Element {
         <Text
           buffer={buffer}
           mode="text"
-          theme={theme}
           onSelection={onTextSelection}
           readOnly
         />

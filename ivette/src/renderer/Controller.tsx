@@ -37,8 +37,6 @@ import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import * as Preferences from 'ivette/prefs';
-
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 
@@ -197,7 +195,6 @@ export const Control = () => {
 const editor = new RichTextBuffer();
 
 const RenderConsole = () => {
-  const theme = Preferences.useThemeColors();
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
@@ -332,7 +329,6 @@ const RenderConsole = () => {
         buffer={edited ? editor : Server.buffer}
         mode="text"
         readOnly={!edited}
-        theme={theme}
       />
     </>
   );
