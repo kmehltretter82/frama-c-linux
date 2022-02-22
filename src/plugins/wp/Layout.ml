@@ -51,8 +51,8 @@ struct
       | Field _ , _ -> (-1)
       | _ , Field _ -> 1
       | Index(ta,n) , Index(tb,m) ->
-          let cmp = Typ.compare ta tb in
-          if cmp <> 0 then cmp else Stdlib.compare n m
+        let cmp = Typ.compare ta tb in
+        if cmp <> 0 then cmp else Stdlib.compare n m
 
   let equal a b = (compare a b = 0)
 
@@ -69,11 +69,11 @@ struct
   let index ty =
     match Cil.unrollType ty with
     | TArray(te,n,_) ->
-        begin
-          match Option.bind n Ctypes.get_int with
-          | None -> failwith "Wp.Layout: unkown array size"
-          | Some n -> Index(te,n)
-        end
+      begin
+        match Option.bind n Ctypes.get_int with
+        | None -> failwith "Wp.Layout: unkown array size"
+        | Some n -> Index(te,n)
+      end
     | _ -> failwith "Wp.Layout: not an array-type"
 
   let rec typeof_chain ty = function [] -> ty | _::ds -> typeof_chain ty ds
@@ -81,13 +81,13 @@ struct
   let rec pp_chain ty fmt = function
     | [] -> ()
     | d::ds ->
-        let next =
-          Format.pp_print_cut fmt () ;
-          match d with
-          | Index(t,n) when Typ.equal t ty ->
-              Format.fprintf fmt "[%d]" n ; t
-          | d -> Format.fprintf fmt "%a" pretty d ; typeof d
-        in pp_chain next fmt ds
+      let next =
+        Format.pp_print_cut fmt () ;
+        match d with
+        | Index(t,n) when Typ.equal t ty ->
+          Format.fprintf fmt "[%d]" n ; t
+        | d -> Format.fprintf fmt "%a" pretty d ; typeof d
+      in pp_chain next fmt ds
 
   module H = Compinfo.Hashtbl
 
@@ -286,9 +286,9 @@ struct
   let pretty fmt = function
     | [] -> ()
     | d::ds ->
-        Format.fprintf fmt "@[<hov 1>[%d" d ;
-        List.iter (fun d -> Format.fprintf fmt ",@,%d" d) ds ;
-        Format.fprintf fmt "]@]"
+      Format.fprintf fmt "@[<hov 1>[%d" d ;
+      List.iter (fun d -> Format.fprintf fmt ",@,%d" d) ds ;
+      Format.fprintf fmt "]@]"
 
   let rec sizeof n = function [] -> n | d::ds -> sizeof (n*d) ds
 
@@ -302,9 +302,9 @@ struct
   let rec join s da db len =
     match da , db with
     | d::da , d'::db when d = d' ->
-        let s' = s * d in
-        if len mod s' = 0 then d :: join s' da db len else
-          join_array s len
+      let s' = s * d in
+      if len mod s' = 0 then d :: join s' da db len else
+        join_array s len
     | _ -> join_array s len
 
   let rec merge d1 d2 =
@@ -349,14 +349,14 @@ struct
     let len = max (ra.ofs + ra.len) (rb.ofs + rb.len) - ofs in
     begin match ra.dim , rb.dim with
       | Dim(s,da) , Dim(s',db) when s = s' ->
-          if len mod s = 0 then
-            let ta = abs (ra.ofs - rb.ofs) in
-            let tb = abs (ra.ofs + ra.len - rb.ofs - rb.len) in
-            if ta mod s = 0 && tb mod s = 0 then
-              let reg = mu ~raw:false ra.reg rb.reg in
-              let ds = Matrix.join s da db len in
-              let dim = Dim(s,ds) in
-              aligned := Some { ofs ; len ; reg ; dim }
+        if len mod s = 0 then
+          let ta = abs (ra.ofs - rb.ofs) in
+          let tb = abs (ra.ofs + ra.len - rb.ofs - rb.len) in
+          if ta mod s = 0 && tb mod s = 0 then
+            let reg = mu ~raw:false ra.reg rb.reg in
+            let ds = Matrix.join s da db len in
+            let dim = Dim(s,ds) in
+            aligned := Some { ofs ; len ; reg ; dim }
       | _ -> ()
     end ;
     match !aligned with
@@ -367,8 +367,8 @@ struct
 
   let flatten rg = match rg.dim with
     | Dim(s,ds) when ds <> [] ->
-        let n = Matrix.sizeof 1 ds in
-        { rg with dim = Dim(s,Matrix.array [] n) }
+      let n = Matrix.sizeof 1 ds in
+      { rg with dim = Dim(s,Matrix.array [] n) }
     | _ -> rg
 
   let included p n { ofs ; len } =
@@ -395,24 +395,24 @@ struct
     match ova , ovb with
     | [],ovc | ovc,[] -> ovc
     | ra::wa , rb::wb ->
-        let sa = ra.ofs + ra.len in
-        let sb = rb.ofs + rb.len in
-        if sa <= rb.ofs then ra :: merge pp mu wa ovb else
-        if sb <= ra.ofs then rb :: merge pp mu ova wb else
-        if sa < sb then
-          merge pp mu wa (Range.overlap pp mu ra rb :: wb)
-        else
-          merge pp mu (Range.overlap pp mu ra rb :: wa) wb
+      let sa = ra.ofs + ra.len in
+      let sb = rb.ofs + rb.len in
+      if sa <= rb.ofs then ra :: merge pp mu wa ovb else
+      if sb <= ra.ofs then rb :: merge pp mu ova wb else
+      if sa < sb then
+        merge pp mu wa (Range.overlap pp mu ra rb :: wb)
+      else
+        merge pp mu (Range.overlap pp mu ra rb :: wa) wb
 
   let rec pack eq = function
     | ({ dim = Dim(s ,da) } as ra ) ::
       ({ dim = Dim(s',db) } as rb ) ::
       ovl when eq ra.reg rb.reg && s = s' && ra.ofs + ra.len = rb.ofs ->
-        let len = ra.len + rb.len in
-        let ds = Matrix.join s da db len in
-        pack eq ({ ofs = ra.ofs ; len ; reg = ra.reg ; dim = Dim(s,ds) } :: ovl)
+      let len = ra.len + rb.len in
+      let ds = Matrix.join s da db len in
+      pack eq ({ ofs = ra.ofs ; len ; reg = ra.reg ; dim = Dim(s,ds) } :: ovl)
     | rg :: ovl ->
-        rg :: pack eq ovl
+      rg :: pack eq ovl
     | [] -> []
 
   let flatten ovl = List.map Range.flatten ovl
@@ -475,9 +475,9 @@ struct
     | Garbled -> Format.pp_print_string fmt "garbled"
     | Chunk v -> Value.pretty pp fmt v
     | Layout { sizeof ; layout } ->
-        Overlay.pretty
-          ~title:(fun fmt -> Format.fprintf fmt "sizeof:%d" sizeof)
-          pp fmt layout
+      Overlay.pretty
+        ~title:(fun fmt -> Format.fprintf fmt "sizeof:%d" sizeof)
+        pp fmt layout
 
   let deref ~pointed (_,typ) =
     match Cil.unrollType typ with
@@ -490,64 +490,64 @@ struct
     if s = Cil.bitsSizeOf typ then Some (List.rev rds) else
       match Cil.unrollType typ with
       | TArray( te , Some e , _ ) ->
-          begin match Ctypes.get_int e with
-            | None -> None
-            | Some n -> get_dim s (if n = 1 then rds else n::rds) te
-          end
+        begin match Ctypes.get_int e with
+          | None -> None
+          | Some n -> get_dim s (if n = 1 then rds else n::rds) te
+        end
       | _ -> None
 
   let shift_may cache pp offset reg ~inline cluster =
     match offset , cluster with
     | _ , Garbled -> None
     | _ , Empty ->
-        let sizeof = Offset.container cache offset in
-        Some { sizeof ; layout = [] }
+      let sizeof = Offset.container cache offset in
+      Some { sizeof ; layout = [] }
     | Field fd , Chunk v ->
-        begin
-          let s = Value.sizeof v in
-          match get_dim s [] fd.ftype with
-          | None -> None
-          | Some ds ->
-              let dim = Dim(s,ds) in
-              Some (Compound.field cache fd reg dim)
-        end
+      begin
+        let s = Value.sizeof v in
+        match get_dim s [] fd.ftype with
+        | None -> None
+        | Some ds ->
+          let dim = Dim(s,ds) in
+          Some (Compound.field cache fd reg dim)
+      end
     | Index(te,n) , Chunk v ->
-        begin
-          let s = Value.sizeof v in
-          match get_dim s (Matrix.array [] n) te with
-          | None -> None
-          | Some ds ->
-              let dim = Dim(s,ds) in
-              Some (Compound.index te n reg dim)
-        end
+      begin
+        let s = Value.sizeof v in
+        match get_dim s (Matrix.array [] n) te with
+        | None -> None
+        | Some ds ->
+          let dim = Dim(s,ds) in
+          Some (Compound.index te n reg dim)
+      end
     | Field fd , Layout d ->
-        let (ofs,len),sizeof = Offset.range_field cache fd in
-        if d.sizeof = len then
-          let layout =
-            if inline then
-              List.map (Range.shift ofs) d.layout
-            else
-              [ { ofs ; len ; reg ; dim=Dim(len,[]) } ]
-          in Some { sizeof ; layout }
-        else None
+      let (ofs,len),sizeof = Offset.range_field cache fd in
+      if d.sizeof = len then
+        let layout =
+          if inline then
+            List.map (Range.shift ofs) d.layout
+          else
+            [ { ofs ; len ; reg ; dim=Dim(len,[]) } ]
+        in Some { sizeof ; layout }
+      else None
     | Index(te,n) , Layout {
         sizeof = s ;
         layout = [ { ofs=0 ; len ; reg ; dim = Dim(se,dse) } ]
       }
       when inline && s = len && Cil.bitsSizeOf te = len ->
-        let dim = Dim(se,Matrix.array dse n) in
-        Some (Compound.index te n reg dim)
+      let dim = Dim(se,Matrix.array dse n) in
+      Some (Compound.index te n reg dim)
     | Index(te,n) , Layout { sizeof } ->
-        let size = Cil.bitsSizeOf te in
-        if sizeof = size then
-          let dim = Dim(size,Matrix.array [] n) in
-          Some (Compound.index te n reg dim)
-        else
-          ( if Wp.has_dkey garbled_key then
-              Wp.debug ~dkey:garbled_key
-                "@[<hv 0>Garbled Offset:@ Index= {%a}[%d];@ Cluster= %a;@]"
-                Cil_datatype.Typ.pretty te n (pretty pp) cluster ;
-            None )
+      let size = Cil.bitsSizeOf te in
+      if sizeof = size then
+        let dim = Dim(size,Matrix.array [] n) in
+        Some (Compound.index te n reg dim)
+      else
+        ( if Wp.has_dkey garbled_key then
+            Wp.debug ~dkey:garbled_key
+              "@[<hv 0>Garbled Offset:@ Index= {%a}[%d];@ Cluster= %a;@]"
+              Cil_datatype.Typ.pretty te n (pretty pp) cluster ;
+          None )
 
   let shift cache pp offset reg ~inline cluster =
     match shift_may cache pp offset reg ~inline cluster
@@ -558,23 +558,23 @@ struct
     match a,b with
     | Empty , c | c , Empty -> c
     | Chunk va , Chunk vb ->
-        begin match Value.merge (mu ~raw:false) va vb with
-          | None -> Garbled
-          | Some v -> Chunk v
-        end
+      begin match Value.merge (mu ~raw:false) va vb with
+        | None -> Garbled
+        | Some v -> Chunk v
+      end
     | Layout { layout = [ { ofs=0 ; len=la ; reg=ra ; dim=Dim(s,da) } ] } ,
       Layout { layout = [ { ofs=0 ; len=lb ; reg=rb ; dim=Dim(s',db) } ] }
       when s = s' ->
-        let reg = mu ~raw:false ra rb in
-        let len = max la lb in
-        let ds = Matrix.join s da db len in
-        let layout = [ { ofs=0 ; len ; reg ; dim=Dim(s,ds) } ] in
-        Layout { sizeof = len ; layout }
+      let reg = mu ~raw:false ra rb in
+      let len = max la lb in
+      let ds = Matrix.join s da db len in
+      let layout = [ { ofs=0 ; len ; reg ; dim=Dim(s,ds) } ] in
+      Layout { sizeof = len ; layout }
     | Layout { sizeof ; layout = la } ,
       Layout { sizeof = s ; layout = lb }
       when s = sizeof ->
-        let layout = Overlay.merge pp mu la lb in
-        Layout { sizeof ;  layout }
+      let layout = Overlay.merge pp mu la lb in
+      Layout { sizeof ;  layout }
     | _ -> Garbled
 
   let merge pp mu a b =
@@ -587,7 +587,7 @@ struct
 
   let reshape ~eq ~flat ~pack = function
     | Layout layout when flat || pack ->
-        Layout (Compound.reshape ~eq ~flat ~pack layout)
+      Layout (Compound.reshape ~eq ~flat ~pack layout)
     | cluster -> cluster
 
 end
@@ -650,9 +650,9 @@ struct
       | Rnone,s | s,Rnone -> s
       | Rtop,_ | _,Rtop -> Rtop
       | _ ->
-          match merge_var a b with
-          | Some x -> merge_field x a b
-          | None -> Rtop
+        match merge_var a b with
+        | Some x -> merge_field x a b
+        | None -> Rtop
 
   let indexed = function
     | Rnone | Rfield _ -> false

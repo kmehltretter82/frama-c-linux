@@ -62,11 +62,11 @@ struct
     let rec aux ((res,rest) as acc) = function
       | [] -> List.rev_append res rest
       | ((k,v) as i) :: resti ->
-          (match f k v with
-           | None -> (* remove *) aux ((rev_append_until i rest res),resti) resti
-           | Some v' ->
-               if v'==v then (* add idem *) aux acc resti
-               else (* add new *) aux (((k,v')::(rev_append_until i rest res)),resti) resti)
+        (match f k v with
+         | None -> (* remove *) aux ((rev_append_until i rest res),resti) resti
+         | Some v' ->
+           if v'==v then (* add idem *) aux acc resti
+           else (* add new *) aux (((k,v')::(rev_append_until i rest res)),resti) resti)
     in aux ([],l) l
 
   (* good sharing *)
@@ -75,8 +75,8 @@ struct
     let rec aux ((res,rest) as acc) = function
       | [] -> List.rev_append res rest
       | i :: resti ->
-          if f i then (* add idem *) aux acc resti
-          else (* remove *) aux ((rev_append_until i rest res),resti) resti
+        if f i then (* add idem *) aux acc resti
+        else (* remove *) aux ((rev_append_until i rest res),resti) resti
     in aux ([],l) l
 
   (* good sharing *)
@@ -85,8 +85,8 @@ struct
     let rec aux ((res,rest) as acc) ((res',rest') as acc') = function
       | [] -> (List.rev_append res rest), (List.rev_append res' rest')
       | ((k,v) as i) :: resti ->
-          if f k v then aux acc ((rev_append_until i rest' res'),resti) resti
-          else aux ((rev_append_until i rest res),resti) acc' resti
+        if f k v then aux acc ((rev_append_until i rest' res'),resti) resti
+        else aux ((rev_append_until i rest res),resti) acc' resti
     in aux ([],l) ([],l) l
 
   (* good sharing *)
@@ -94,14 +94,14 @@ struct
     let rec aux = function
       | [] -> (match f k v None with None -> l | Some w -> l @ [k,w])
       | ((k',v') as a)::next->
-          let c = K.compare k k' in
-          if c < 0 then l
-          else if c = 0 then
-            match f k v (Some v') with
-            | None -> append_until a l next
-            | Some w -> if w==v' then l
-                else append_until a l ((k, w) :: next)
-          else (* c > 0 *) aux next
+        let c = K.compare k k' in
+        if c < 0 then l
+        else if c = 0 then
+          match f k v (Some v') with
+          | None -> append_until a l next
+          | Some w -> if w==v' then l
+            else append_until a l ((k, w) :: next)
+        else (* c > 0 *) aux next
     in aux l
 
   (* good sharing *)
@@ -109,13 +109,13 @@ struct
     let rec aux = function
       | [] -> l @ [k,v]
       | (((k',v') as a)::next) as w ->
-          let c = K.compare k k' in
-          if c < 0 then append_until a l ((k,v) :: w)
-          else if c = 0 then
-            let w = f k v v'
-            in if w==v' then l
-            else append_until a l ((k, w) :: next)
-          else (* c > 0 *) aux next
+        let c = K.compare k k' in
+        if c < 0 then append_until a l ((k,v) :: w)
+        else if c = 0 then
+          let w = f k v v'
+          in if w==v' then l
+          else append_until a l ((k, w) :: next)
+        else (* c > 0 *) aux next
     in aux l
 
   (* good sharing *)
@@ -124,10 +124,10 @@ struct
   let rec findk k = function
     | [] -> raise Not_found
     | ((k0,_) as e) :: next ->
-        let c = K.compare k k0 in
-        if c < 0 then raise Not_found else
-        if c > 0 then findk k next else
-          e
+      let c = K.compare k k0 in
+      if c < 0 then raise Not_found else
+      if c > 0 then findk k next else
+        e
 
   let find k m = snd (findk k m)
 
@@ -147,9 +147,9 @@ struct
   let rec mapf f = function
     | [] -> []
     | (k,x)::m ->
-        match f k x with
-        | Some y -> (k,y)::mapf f m
-        | None -> mapf f m
+      match f k x with
+      | Some y -> (k,y)::mapf f m
+      | None -> mapf f m
 
   let fold f m a = List.fold_left (fun a (k,v) -> f k v a) a m
 
@@ -157,21 +157,21 @@ struct
     match w1 , w2 with
     | [] , _ | _ , [] -> []
     | (k1,v1)::r1 , (k2,v2)::r2 ->
-        let c = K.compare k1 k2 in
-        if c < 0 then inter f r1 w2 else
-        if c > 0 then inter f w1 r2 else
-          (k1,f k1 v1 v2) :: inter f r1 r2
+      let c = K.compare k1 k2 in
+      if c < 0 then inter f r1 w2 else
+      if c > 0 then inter f w1 r2 else
+        (k1,f k1 v1 v2) :: inter f r1 r2
 
   let rec interf f w1 w2 =
     match w1 , w2 with
     | [] , _ | _ , [] -> []
     | (k1,v1)::r1 , (k2,v2)::r2 ->
-        let c = K.compare k1 k2 in
-        if c < 0 then interf f r1 w2 else
-        if c > 0 then interf f w1 r2 else
-          match f k1 v1 v2 with
-          | None -> interf f r1 r2
-          | Some v12 -> (k1,v12) :: interf f r1 r2
+      let c = K.compare k1 k2 in
+      if c < 0 then interf f r1 w2 else
+      if c > 0 then interf f w1 r2 else
+        match f k1 v1 v2 with
+        | None -> interf f r1 r2
+        | Some v12 -> (k1,v12) :: interf f r1 r2
 
   (* good sharing with w1 *)
   let interq f w1 w2 =
@@ -180,13 +180,13 @@ struct
       | [] , _ ->    (* no addition *) List.rev_append res o1
       | a1::_, [] -> (* no addition *) List.rev_append res (List.rev (rev_append_until a1 o1 []))
       | ((k1,v1) as a1)::r1 , (k2,v2)::r2 ->
-          let c = K.compare k1 k2 in
-          if c < 0 then (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 w2
-          else if c > 0 then (* remove a2 *) aux acc w1 r2
-          else match f k1 v1 v2 with
-            | None -> (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 r2
-            | Some w -> if w==v1 then (* adding a1 *) aux acc r1 r2
-                else (* adding w *) aux (((k1,w)::(rev_append_until a1 o1 res)), r1) r1 r2
+        let c = K.compare k1 k2 in
+        if c < 0 then (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 w2
+        else if c > 0 then (* remove a2 *) aux acc w1 r2
+        else match f k1 v1 v2 with
+          | None -> (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 r2
+          | Some w -> if w==v1 then (* adding a1 *) aux acc r1 r2
+            else (* adding w *) aux (((k1,w)::(rev_append_until a1 o1 res)), r1) r1 r2
     in aux ([],w1) w1 w2
 
   (* good sharing with w1 *)
@@ -196,13 +196,13 @@ struct
       | [] , _ -> (* no addition *) List.rev_append res o1
       | _ , [] -> (* adding w1 *) List.rev_append res o1
       | ((k1,v1) as a1)::r1 , (k2,v2)::r2 ->
-          let c = K.compare k1 k2 in
-          if c < 0 then (* adding a1 *) aux acc r1 w2
-          else if c > 0 then (* skip *) aux acc w1 r2
-          else match f k1 v1 v2 with
-            | None -> (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 r2
-            | Some w -> if w==v1 then (* adding a1 *) aux acc r1 r2
-                else (* adding w *) aux (((k1,w)::(rev_append_until a1 o1 res)), r1) r1 r2
+        let c = K.compare k1 k2 in
+        if c < 0 then (* adding a1 *) aux acc r1 w2
+        else if c > 0 then (* skip *) aux acc w1 r2
+        else match f k1 v1 v2 with
+          | None -> (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 r2
+          | Some w -> if w==v1 then (* adding a1 *) aux acc r1 r2
+            else (* adding w *) aux (((k1,w)::(rev_append_until a1 o1 res)), r1) r1 r2
     in aux ([],w1) w1 w2
 
   (* good sharing with w1 *)
@@ -212,12 +212,12 @@ struct
       | [] , _ -> (* adding w2 *) List.rev_append res (List.append o1 w2)
       | _ , [] -> (* adding w1 *) List.rev_append res o1
       | ((k1,v1) as a1)::r1 , ((k2,v2) as a2)::r2 ->
-          let c = K.compare k1 k2 in
-          if c < 0 then (* adding a1 *) aux acc r1 w2
-          else if c = 0 then let w = f k1 v1 v2 in
-            if w==v1 then (* adding a1 *) aux acc r1 r2
-            else (* adding w *) aux (((k1,w)::(rev_append_until a1 o1 res)), r1) r1 r2
-          else (* c > 0 *) (* adding a2 *) aux ((a2::(rev_append_until a1 o1 res)),w1) w1 r2
+        let c = K.compare k1 k2 in
+        if c < 0 then (* adding a1 *) aux acc r1 w2
+        else if c = 0 then let w = f k1 v1 v2 in
+          if w==v1 then (* adding a1 *) aux acc r1 r2
+          else (* adding w *) aux (((k1,w)::(rev_append_until a1 o1 res)), r1) r1 r2
+        else (* c > 0 *) (* adding a2 *) aux ((a2::(rev_append_until a1 o1 res)),w1) w1 r2
     in aux ([],w1) w1 w2
 
   let rec subset f w1 w2 =
@@ -225,10 +225,10 @@ struct
     | [] , _ -> true
     | _::_ , [] -> false
     | (k1,v1)::r1 , (k2,v2)::r2 ->
-        let c = K.compare k1 k2 in
-        if c < 0 then false else
-        if c > 0 then subset f w1 r2 else
-          f k1 v1 v2 && subset f r1 r2
+      let c = K.compare k1 k2 in
+      if c < 0 then false else
+      if c > 0 then subset f w1 r2 else
+        f k1 v1 v2 && subset f r1 r2
 
   let rec iterk
       (f : K.t -> 'a -> 'b -> unit)
@@ -238,10 +238,10 @@ struct
     match w1 , w2 with
     | [] , _  | _  , [] -> ()
     | (k1,v1)::r1 , (k2,v2)::r2 ->
-        let c = K.compare k1 k2 in
-        if c < 0 then iterk f r1 w2 else
-        if c > 0 then iterk f w1 r2 else
-          (f k1 v1 v2 ; iterk f r1 r2)
+      let c = K.compare k1 k2 in
+      if c < 0 then iterk f r1 w2 else
+      if c > 0 then iterk f w1 r2 else
+        (f k1 v1 v2 ; iterk f r1 r2)
 
   let rec iter2
       (f : K.t -> 'a option -> 'b option -> unit)
@@ -253,10 +253,10 @@ struct
     | _  , [] -> List.iter (fun (k1,v1) -> f k1 (Some v1) None) w1
     | [] , _  -> List.iter (fun (k2,v2) -> f k2 None (Some v2)) w2
     | (k1,v1)::r1 , (k2,v2)::r2 ->
-        let c = K.compare k1 k2 in
-        if c < 0 then (f k1 (Some v1) None ; iter2 f r1 w2) else
-        if c > 0 then (f k2 None (Some v2) ; iter2 f w1 r2) else
-          (f k1 (Some v1) (Some v2) ; iter2 f r1 r2)
+      let c = K.compare k1 k2 in
+      if c < 0 then (f k1 (Some v1) None ; iter2 f r1 w2) else
+      if c > 0 then (f k2 None (Some v2) ; iter2 f w1 r2) else
+        (f k1 (Some v1) (Some v2) ; iter2 f r1 r2)
 
   let cons k v w =
     match v with
@@ -271,9 +271,9 @@ struct
     | _ , [] -> mapf (fun k1 v1 -> f k1 (Some v1) None) w1
     | [] , _ -> mapf (fun k2 v2 -> f k2 None (Some v2)) w2
     | (k1,v1)::r1 , (k2,v2)::r2 ->
-        let c = K.compare k1 k2 in
-        if c < 0 then cons k1 (f k1 (Some v1) None) (merge f r1 w2) else
-        if c > 0 then cons k2 (f k2 None (Some v2)) (merge f w1 r2) else
-          cons k1 (f k1 (Some v1) (Some v2)) (merge f r1 r2)
+      let c = K.compare k1 k2 in
+      if c < 0 then cons k1 (f k1 (Some v1) None) (merge f r1 w2) else
+      if c > 0 then cons k2 (f k2 None (Some v2)) (merge f w1 r2) else
+        cons k1 (f k1 (Some v1) (Some v2)) (merge f r1 r2)
 
 end

@@ -19,7 +19,7 @@ module OUT = Self.String
     (struct
       let option_name = "-server-tsc-out"
       let arg_name = "path"
-      let default = "src/frama-c"
+      let default = "src"
       let help = Printf.sprintf "Output directory (default is '%s')" default
     end)
 
@@ -514,7 +514,7 @@ let makePackage pkg path fmt =
     makeIgnore fmt "import * as State from 'frama-c/states';@\n" ;
     Format.pp_print_newline fmt () ;
     Pkg.IdMap.iter
-      (fun { name = iname ; plugin ; package = package } name ->
+      (fun { name = iname ; plugin ; package } name ->
          if plugin <> pkg.p_plugin || package <> pkg.p_package
          then
            let path = pkg_path ~plugin ~package in

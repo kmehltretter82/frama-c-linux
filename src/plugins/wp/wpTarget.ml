@@ -35,11 +35,11 @@ module TargetKfs =
 let get_called_stmt stmt =
   match stmt.skind with
   | Instr (Call(_, fct, _, _)) ->
-      begin match Kernel_function.get_called fct with
-        | Some kf -> [kf]
-        | None -> Option.value ~default:[]
-                    (Option.map snd (Dyncall.get stmt))
-      end
+    begin match Kernel_function.get_called fct with
+      | Some kf -> [kf]
+      | None -> Option.value ~default:[]
+                  (Option.map snd (Dyncall.get stmt))
+    end
   | Instr (Local_init (_,ConsInit(vi,_,_),_)) -> [ Globals.Functions.get vi ]
   | _ -> []
 

@@ -104,7 +104,7 @@ module DegenerationPoints =
     (struct
       let name = "Eva_utils.Degeneration"
       let size = 17
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
     end)
 
 let protect_only_once = ref true

@@ -84,10 +84,10 @@ module REGISTRY = State_builder.Hashtbl
 let get = function
   | None -> GLOBAL.get ()
   | Some kf ->
-      try REGISTRY.find kf
-      with Not_found ->
-        let map = compute kf in
-        REGISTRY.add kf map ; map
+    try REGISTRY.find kf
+    with Not_found ->
+      let map = compute kf in
+      REGISTRY.add kf map ; map
 
 (* ---------------------------------------------------------------------- *)
 (* --- Command Line Registry                                          --- *)

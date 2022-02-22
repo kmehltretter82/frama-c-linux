@@ -276,10 +276,11 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     }
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
-    __gen_e_acsl_assert_data.pred_txt = "valid_or_null_retval: retval == \\null || \\valid(retval)";
+    __gen_e_acsl_assert_data.pred_txt = "retval == \\null || \\valid(retval)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_join";
     __gen_e_acsl_assert_data.line = 247;
+    __gen_e_acsl_assert_data.name = "valid_or_null_retval";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
@@ -318,10 +319,11 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     }
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Postcondition";
-    __gen_e_acsl_assert_data_2.pred_txt = "success_or_error:\n  \\result == 0 || \\result == 35 || \\result == 22 || \\result == 3";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0 || \\result == 35 || \\result == 22 || \\result == 3";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_join";
     __gen_e_acsl_assert_data_2.line = 251;
+    __gen_e_acsl_assert_data_2.name = "success_or_error";
     __e_acsl_assert(__gen_e_acsl_or_4,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
@@ -369,10 +371,11 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
                                  "\\valid(thread)",0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
-    __gen_e_acsl_assert_data.pred_txt = "valid_thread: \\valid(thread)";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(thread)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_create";
     __gen_e_acsl_assert_data.line = 223;
+    __gen_e_acsl_assert_data.name = "valid_thread";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -398,10 +401,11 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     }
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Precondition";
-    __gen_e_acsl_assert_data_2.pred_txt = "valid_null_attr: attr == \\null || \\valid_read(attr)";
+    __gen_e_acsl_assert_data_2.pred_txt = "attr == \\null || \\valid_read(attr)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_create";
     __gen_e_acsl_assert_data_2.line = 224;
+    __gen_e_acsl_assert_data_2.name = "valid_null_attr";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
@@ -422,10 +426,11 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     }
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Precondition";
-    __gen_e_acsl_assert_data_4.pred_txt = "valid_null_arg: arg == \\null || \\valid((char *)arg)";
+    __gen_e_acsl_assert_data_4.pred_txt = "arg == \\null || \\valid((char *)arg)";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_4.fct = "pthread_create";
     __gen_e_acsl_assert_data_4.line = 226;
+    __gen_e_acsl_assert_data_4.name = "valid_null_arg";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
@@ -458,10 +463,11 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     }
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Postcondition";
-    __gen_e_acsl_assert_data_5.pred_txt = "success_or_error:\n  \\result == 0 || \\result == 11 || \\result == 22 || \\result == 1";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\result == 0 || \\result == 11 || \\result == 22 || \\result == 1";
     __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_5.fct = "pthread_create";
     __gen_e_acsl_assert_data_5.line = 230;
+    __gen_e_acsl_assert_data_5.name = "success_or_error";
     __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __e_acsl_delete_block((void *)(& arg));

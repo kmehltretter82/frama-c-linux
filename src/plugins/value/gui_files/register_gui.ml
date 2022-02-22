@@ -35,7 +35,7 @@ module UsedVarState =
     (struct
       let size = 17
       let name = "Value.Gui.UsedVarState"
-      let dependencies = [ Analysis.self ]
+      let dependencies = [ Self.state ]
       (* [!Db.Inputs.self_external; !Db.Outputs.self_external] would be better
          dependencies, but this introduces a very problematic recursion between
          Value and Inout *)

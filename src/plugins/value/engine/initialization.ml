@@ -327,7 +327,7 @@ module Make
 
   (* Dependencies for the Frama-C states containing the initial states
      of Eva: all correctness parameters of Eva, plus the AST itself. We
-     cannot use [Db.Value.self] directly, because we do not want to
+     cannot use [Self.state] directly, because we do not want to
      depend on the tuning parameters. Previously, we use a more
      fine-grained list, but this lead to bugs. See mantis #2277. *)
   let correctness_deps =

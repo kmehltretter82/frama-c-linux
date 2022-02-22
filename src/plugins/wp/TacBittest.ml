@@ -39,11 +39,11 @@ let rec lookup_bittest e =
   match F.repr e with
   | Not e -> lookup_bittest e
   | Fun(f,[n;ek]) when List.memq f Cint.f_bits ->
-      begin
-        match lookup_int ek with
-        | Some k when 0 <= k && k < 128 -> Some (n,k)
-        | _ -> None
-      end
+    begin
+      match lookup_int ek with
+      | Some k when 0 <= k && k < 128 -> Some (n,k)
+      | _ -> None
+    end
   | _ -> None
 
 (* -------------------------------------------------------------------------- *)
@@ -62,21 +62,21 @@ class bittestrange =
       let e = Tactical.selected selection in
       match lookup_bittest e with
       | Some (n,k) ->
-          let bit = Cint.bit_test n k in
-          let bit_set = F.p_bool bit in
-          let bit_clear = F.p_not bit_set in
-          let pos = positive n in
-          let pk = power k in
-          let pk1 = power (succ k) in
-          let g_inf = F.p_hyps [pos] (F.p_leq pk n) in
-          let g_sup = F.p_hyps [pos;F.p_lt n pk1] (F.p_lt n pk) in
-          let name_inf = Printf.sprintf "Bit #%d (inf)" k in
-          let name_sup = Printf.sprintf "Bit #%d (sup)" k in
-          let at = Tactical.at selection in
-          Tactical.Applicable (Tactical.insert ?at [
-              name_inf , F.p_and bit_set g_inf ;
-              name_sup , F.p_and bit_clear g_sup ;
-            ])
+        let bit = Cint.bit_test n k in
+        let bit_set = F.p_bool bit in
+        let bit_clear = F.p_not bit_set in
+        let pos = positive n in
+        let pk = power k in
+        let pk1 = power (succ k) in
+        let g_inf = F.p_hyps [pos] (F.p_leq pk n) in
+        let g_sup = F.p_hyps [pos;F.p_lt n pk1] (F.p_lt n pk) in
+        let name_inf = Printf.sprintf "Bit #%d (inf)" k in
+        let name_sup = Printf.sprintf "Bit #%d (sup)" k in
+        let at = Tactical.at selection in
+        Tactical.Applicable (Tactical.insert ?at [
+            name_inf , F.p_and bit_set g_inf ;
+            name_sup , F.p_and bit_clear g_sup ;
+          ])
       | None -> Tactical.Not_applicable
 
   end
@@ -94,12 +94,12 @@ let rec lookup push step e =
   | Or es -> List.iter (lookup push step) es
   | Imply (hs,p) -> List.iter (lookup push step) (p::hs)
   | _ ->
-      begin
-        match lookup_bittest e with
-        | None -> ()
-        | Some _ ->
-            push @@ strategy ~priority:0.3 (Tactical.Inside(step,e))
-      end
+    begin
+      match lookup_bittest e with
+      | None -> ()
+      | Some _ ->
+        push @@ strategy ~priority:0.3 (Tactical.Inside(step,e))
+    end
 
 class autobittestrange : Strategy.heuristic =
   object

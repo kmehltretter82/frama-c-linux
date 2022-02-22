@@ -34,6 +34,7 @@
 #define eacsl_runtime_sound_verdict export_alias(sound_verdict)
 #define eacsl_runtime_assert        export_alias(assert)
 #define eacsl_print_value           export_alias(print_value)
+#define eacsl_print_value_content   export_alias(print_value_content)
 
 /*! E-ACSL instrumentation automatically sets this global to 0 if its verdict
     becomes unsound.
@@ -60,6 +61,16 @@ void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data)
 /*@ requires \valid_read(value) && \initialized(value);
   @ assigns \nothing; */
 void eacsl_print_value(eacsl_assert_data_value_t *value)
+    __attribute__((FC_BUILTIN));
+
+/*! \brief Utility function that prints the content of the given data value in
+ *  the given stream.
+ *  \param stream Stream where to print the value content.
+ *  \param value Value to print to the stream.
+ */
+/*@ requires \valid_read(value) && \initialized(value);
+  @ assigns \nothing; */
+void eacsl_print_value_content(FILE *stream, eacsl_assert_data_value_t *value)
     __attribute__((FC_BUILTIN));
 
 #endif // E_ACSL_ASSERT_H

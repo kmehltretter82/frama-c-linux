@@ -1,2 +1,2 @@
-../../../share/compliance/posix_identifiers.json checked.
-../../../share/compliance/c11_functions.json checked.
+posix_identifiers.json checked.
+c11_functions.json checked.

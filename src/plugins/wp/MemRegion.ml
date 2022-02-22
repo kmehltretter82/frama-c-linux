@@ -138,24 +138,24 @@ let phi_consistent index =
   match F.repr index with
   | L.Fun(f,[]) when f == f_inull -> F.e_false
   | L.Fun(f,[x]) when f == f_index_var ->
-      F.e_neq x F.e_zero
+    F.e_neq x F.e_zero
   | L.Fun(f,[l]) when f == f_index_ref ->
-      F.e_prop @@ p_consistent l
+    F.e_prop @@ p_consistent l
   | L.Fun(f,[l;k;n]) when f == f_index_mem ->
-      F.e_prop @@ F.p_conj @@ p_range k n [p_consistent l]
+    F.e_prop @@ F.p_conj @@ p_range k n [p_consistent l]
   | L.Fun(f,es) ->
-      F.e_prop @@ (IndexBuiltin.find f).consistent es
+    F.e_prop @@ (IndexBuiltin.find f).consistent es
   | _ -> raise Not_found
 
 let phi_consistent_range index sizeof =
   match F.repr index with
   | L.Fun(f,[l;k;n]) when f == f_index_mem ->
-      F.e_prop @@ F.p_conj @@ F.[
-          p_leq e_zero sizeof ;
-          p_leq e_zero k ;
-          p_leq (e_add k sizeof) n ;
-          p_consistent l ;
-        ]
+    F.e_prop @@ F.p_conj @@ F.[
+        p_leq e_zero sizeof ;
+        p_leq e_zero k ;
+        p_leq (e_add k sizeof) n ;
+        p_consistent l ;
+      ]
   | _ -> raise Not_found
 
 let () = Context.register
@@ -228,11 +228,11 @@ struct
   let pretty fmt = function
     | [] -> Format.fprintf fmt "{}"
     | p::ps ->
-        begin
-          Format.fprintf fmt "@[<hov 2>{%d" p ;
-          List.iter (fun p -> Format.fprintf fmt ",@,%d" p) ps ;
-          Format.fprintf fmt "}@]" ;
-        end
+      begin
+        Format.fprintf fmt "@[<hov 2>{%d" p ;
+        List.iter (fun p -> Format.fprintf fmt ",@,%d" p) ps ;
+        Format.fprintf fmt "}@]" ;
+      end
 
   let compare = Stdlib.compare
 
@@ -242,8 +242,8 @@ struct
       match F.repr a with
       | L.Add es -> List.fold_left walk s es
       | L.Kint z ->
-          (try s + Integer.to_int_exn z
-           with Z.Overflow -> s)
+        (try s + Integer.to_int_exn z
+         with Z.Overflow -> s)
       | _ -> s
     in walk 0 k
 
@@ -329,9 +329,9 @@ struct
   let rec add_range_dims ps ks ns =
     match ks , ns with
     | k::ks , n::ns ->
-        add_range_dims F.(p_range k (e_int n) ps) ks ns
+      add_range_dims F.(p_range k (e_int n) ps) ks ns
     | k::ks , [] ->
-        add_range_dims F.(p_equal e_zero k :: ps) ks []
+      add_range_dims F.(p_equal e_zero k :: ps) ks []
     | [] , _ -> ps
 
   (* Consistent index.
@@ -345,11 +345,11 @@ struct
     match F.repr a with
     | L.Add es -> List.fold_left get_linear poly es
     | L.Kint z ->
-        (try (Integer.to_int_exn z,F.e_one)::poly
-         with Z.Overflow -> (1,a)::poly)
+      (try (Integer.to_int_exn z,F.e_one)::poly
+       with Z.Overflow -> (1,a)::poly)
     | L.Times(c,e) ->
-        (try (Integer.to_int_exn c,e)::poly
-         with Z.Overflow -> (1,a)::poly)
+      (try (Integer.to_int_exn c,e)::poly
+       with Z.Overflow -> (1,a)::poly)
     | _ -> (1,a)::poly
 
   (* Some of linear form *)
@@ -362,16 +362,16 @@ struct
   let rec euclid q r ci = function
     | [] -> q,r
     | (c,k)::poly ->
-        let q0 = c / ci in
-        let r0 = c mod ci in
-        euclid (F.e_add q (F.e_fact q0 k)) ((r0,k)::r) ci poly
+      let q0 = c / ci in
+      let r0 = c mod ci in
+      euclid (F.e_add q (F.e_fact q0 k)) ((r0,k)::r) ci poly
 
   (* Linear offset decomposed on each coefficient *)
   let rec add_linear_index cs ks ks' p =
     match cs , ks with
     | c :: cs , k :: ks ->
-        let k' , r = euclid k [] c p in
-        add_linear_index cs ks (k'::ks') r
+      let k' , r = euclid k [] c p in
+      add_linear_index cs ks (k'::ks') r
     | _ -> List.rev_append ks' ks , p
 
   (* Linear offset and remainder delta *)
@@ -382,12 +382,12 @@ struct
   (* Builtin simplifier *)
   let builtin_index cs f es p = match es with
     | l::ks ->
-        let ks' , r = offset cs ks p in
-        if Qed.Hcons.equal_list F.equal ks ks' then
-          raise Not_found
-        else
-          let l' = F.e_fun f (l :: ks) in
-          l_shift_index l' r
+      let ks' , r = offset cs ks p in
+      if Qed.Hcons.equal_list F.equal ks ks' then
+        raise Not_found
+      else
+        let l' = F.e_fun f (l :: ks) in
+        l_shift_index l' r
     | _ -> raise Not_found
 
 end
@@ -471,8 +471,8 @@ let pp_value = Value.pretty pp_region
 let pp_args fmt = function
   | [] -> ()
   | k::ks ->
-      F.pp_term fmt k ;
-      List.iter (fun k -> Format.fprintf fmt "@,,%a" F.pp_term k) ks
+    F.pp_term fmt k ;
+    List.iter (fun k -> Format.fprintf fmt "@,,%a" F.pp_term k) ks
 
 let pp_field fmt k =
   if F.is_atomic k then
@@ -506,40 +506,40 @@ let vars = function
   | GarbledMix -> F.Vars.empty
   | Index l | Lref(_,l,_) | Lmem(_,l,_,_) | Lraw(_,l,_,_) -> F.vars l
   | Lfld(_,l,k,_) ->
-      F.Vars.union (F.vars l) (F.vars k)
+    F.Vars.union (F.vars l) (F.vars k)
   | Larr(_,l,k,ks,_,_) ->
-      Qed.Hcons.fold_list F.Vars.union F.vars F.Vars.empty (l::k::ks)
+    Qed.Hcons.fold_list F.Vars.union F.vars F.Vars.empty (l::k::ks)
 
 let occurs x = function
   | GarbledMix -> false
   | Index l | Lref(_,l,_) | Lmem(_,l,_,_) | Lraw(_,l,_,_) -> F.occurs x l
   | Lfld(_,l,k,_) ->
-      F.occurs x l || F.occurs x k
+    F.occurs x l || F.occurs x k
   | Larr(_,l,k,ks,_,_) ->
-      List.exists (F.occurs x) (l::k::ks)
+    List.exists (F.occurs x) (l::k::ks)
 
 let pretty fmt = function
   | GarbledMix -> Format.pp_print_string fmt "garbled-mix"
   | Index l ->
-      Format.fprintf fmt "@[<hov 2>Index(%a)@]" pp_index l
+    Format.fprintf fmt "@[<hov 2>Index(%a)@]" pp_index l
   | Lref(r,l,r') ->
-      Format.fprintf fmt "@[<hov 2>Ref@,{%a->%a}@,(%a)@]"
-        pp_region r pp_region r' pp_index l
+    Format.fprintf fmt "@[<hov 2>Ref@,{%a->%a}@,(%a)@]"
+      pp_region r pp_region r' pp_index l
   | Lmem(r,l,_,v) ->
-      Format.fprintf fmt "@[<hov 2>Mem@,{%a:@,%a}@,(%a)@]"
-        pp_region r pp_value v pp_index l
+    Format.fprintf fmt "@[<hov 2>Mem@,{%a:@,%a}@,(%a)@]"
+      pp_region r pp_value v pp_index l
   | Lraw(r,l,_,None) ->
-      Format.fprintf fmt "@[<hov 2>Raw@,{%a}@,(%a)"
-        pp_region r pp_index l
+    Format.fprintf fmt "@[<hov 2>Raw@,{%a}@,(%a)"
+      pp_region r pp_index l
   | Lraw(r,l,_,Some r') ->
-      Format.fprintf fmt "@[<hov 2>Raw@,{%a->%a}@,(%a)"
-        pp_region r pp_region r' pp_index l
+    Format.fprintf fmt "@[<hov 2>Raw@,{%a->%a}@,(%a)"
+      pp_region r pp_region r' pp_index l
   | Lfld(r,l,k,_) ->
-      Format.fprintf fmt "@[<hov 2>Field@,{%a}@,(%a%a)@]"
-        pp_region r pp_index l pp_field k
+    Format.fprintf fmt "@[<hov 2>Field@,{%a}@,(%a%a)@]"
+      pp_region r pp_index l pp_field k
   | Larr(r,l,k,ks,_,_) ->
-      Format.fprintf fmt "@[<hov 2>Index@,{%a}@,@[<hov 2>(%a[%a]%a)@]@]"
-        pp_region r pp_index l pp_args ks pp_delta k
+    Format.fprintf fmt "@[<hov 2>Index@,{%a}@,@[<hov 2>(%a[%a]%a)@]@]"
+      pp_region r pp_index l pp_args ks pp_delta k
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Constructors                                                   --- *)
@@ -567,9 +567,9 @@ and index_field map r l ofs len overlay =
 
 and index_dim map r l ofs len = function
   | Raw s | Dim(s,[]) ->
-      index map r (l_index_mem l F.e_zero (F.e_int s)) ofs len
+    index map r (l_index_mem l F.e_zero (F.e_int s)) ofs len
   | Dim(s,ds) ->
-      index_array map r l (ARRAY.zeroes ds) ofs len s ds
+    index_array map r l (ARRAY.zeroes ds) ofs len s ds
 
 and index_array map r l ks ofs len s ds =
   let cs = ARRAY.coefs s ds in
@@ -649,8 +649,8 @@ struct
     | Mu_alloc -> MemMemory.t_malloc
     | Mu_raw _ -> t_bits
     | Mu_mem(_,root,v) ->
-        let value = tau_of_value v in
-        if Root.indexed root then L.Array(t_addr,value) else value
+      let value = tau_of_value v in
+      if Root.indexed root then L.Array(t_addr,value) else value
 
   let basename_of_chunk = function
     | Mu_raw _ -> "B"
@@ -747,9 +747,9 @@ struct
 
   let load_pointer sigma ty = function
     | Lmem(r,l,rt,(Pointer r' as v)) ->
-        loc_of_index r' ty (load_mem sigma r rt v l)
+      loc_of_index r' ty (load_mem sigma r rt v l)
     | Lref(_,l,r') ->
-        loc_of_index r' ty (l_index_ref l)
+      loc_of_index r' ty (l_index_ref l)
     | l -> error "Can not load pointer value from %a" pretty l
 
   let havoc obj loc ~length (chunk:chunk) ~fresh ~current =
@@ -757,38 +757,38 @@ struct
     | Mu_alloc -> fresh
     | Mu_raw _ -> error "Can not havoc raw memories"
     | Mu_mem(_,root,_) ->
-        if Layout.Root.indexed root then
-          let addr = to_addr loc in
-          let offset = F.e_fact (Ctypes.bits_sizeof_object obj) length in
-          F.e_fun MemMemory.f_havoc [fresh;current;addr;offset]
-        else
-          fresh
+      if Layout.Root.indexed root then
+        let addr = to_addr loc in
+        let offset = F.e_fact (Ctypes.bits_sizeof_object obj) length in
+        F.e_fun MemMemory.f_havoc [fresh;current;addr;offset]
+      else
+        fresh
 
   let eqmem obj loc chunk m1 m2 =
     match chunk with
     | Mu_alloc -> error "Can not compare allocation tables"
     | Mu_raw _ -> error "Can not compare raw memories"
     | Mu_mem(_,root,_) ->
-        if Layout.Root.indexed root then
-          let addr = to_addr loc in
-          let offset = F.e_int (Ctypes.bits_sizeof_object obj) in
-          F.p_call MemMemory.p_eqmem [m1;m2;addr;offset]
-        else F.p_equal m1 m2
+      if Layout.Root.indexed root then
+        let addr = to_addr loc in
+        let offset = F.e_int (Ctypes.bits_sizeof_object obj) in
+        F.p_call MemMemory.p_eqmem [m1;m2;addr;offset]
+      else F.p_equal m1 m2
 
   let eqmem_forall obj loc chunk m1 m2 =
     match chunk with
     | Mu_alloc -> error "Can not compare allocation tables"
     | Mu_raw _ -> error "Can not compare raw memories"
     | Mu_mem(_,root,_) ->
-        if Layout.Root.indexed root then
-          let xp = Lang.freshvar ~basename:"p" t_addr in
-          let p = F.e_var xp in
-          let a = to_addr loc in
-          let n = F.e_int (Ctypes.bits_sizeof_object obj) in
-          let separated = p_separated p F.e_one a n in
-          let equal = F.p_equal (F.e_get m1 p) (F.e_get m2 p) in
-          [xp],separated,equal
-        else [],F.p_true,F.p_equal m1 m2
+      if Layout.Root.indexed root then
+        let xp = Lang.freshvar ~basename:"p" t_addr in
+        let p = F.e_var xp in
+        let a = to_addr loc in
+        let n = F.e_int (Ctypes.bits_sizeof_object obj) in
+        let separated = p_separated p F.e_one a n in
+        let equal = F.p_equal (F.e_get m1 p) (F.e_get m2 p) in
+        [xp],separated,equal
+      else [],F.p_true,F.p_equal m1 m2
 
   let last _ = error "Can not compute last valid index"
 

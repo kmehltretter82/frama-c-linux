@@ -1,5 +1,5 @@
 [kernel] Parsing func_ptr.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] func_ptr.c:28: Warning: 
+[kernel:typing:implicit-function-declaration] func_ptr.c:29: Warning: 
   Calling undeclared function exit. Old style K&R code?
 [metrics] Defined functions (4)
   =====================
@@ -73,8 +73,8 @@
     <func_ptr.c>: exit; foo;
 [metrics] References to non-analyzed functions
   ------------------------------------
-  Function main calls exit (at func_ptr.c:28)
-  Function main references foo (at func_ptr.c:29)
+  Function main calls exit (at func_ptr.c:29)
+  Function main references foo (at func_ptr.c:30)
 [metrics] Statements analyzed by Eva
   --------------------------
   13 stmts in analyzed functions, 6 stmts analyzed (46.2%)

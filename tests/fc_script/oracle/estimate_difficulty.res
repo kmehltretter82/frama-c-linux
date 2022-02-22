@@ -7,5 +7,4 @@ Estimating difficulty for 7 function calls...
 Function-related warnings: 2
 Estimating difficulty for 3 '#include <header>' directives...
 - WARNING: included header <complex.h> is explicitly unsupported by Frama-C
-- warning: included header <langinfo.h> not currently included in Frama-C's libc
-Header-related warnings: 2
+Header-related warnings: 1

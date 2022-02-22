@@ -597,10 +597,11 @@ int main(void)
                                  0,__gen_e_acsl_forall_13);
     __gen_e_acsl_assert_data_15.blocking = 1;
     __gen_e_acsl_assert_data_15.kind = "Assertion";
-    __gen_e_acsl_assert_data_15.pred_txt = "forall_multiple_binders_1:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k)";
+    __gen_e_acsl_assert_data_15.pred_txt = "\\forall integer i, integer j, integer k;\n  0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k)";
     __gen_e_acsl_assert_data_15.file = "quantif.i";
     __gen_e_acsl_assert_data_15.fct = "main";
     __gen_e_acsl_assert_data_15.line = 59;
+    __gen_e_acsl_assert_data_15.name = "forall_multiple_binders_1";
     __e_acsl_assert(__gen_e_acsl_forall_13,& __gen_e_acsl_assert_data_15);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
   }
@@ -651,10 +652,11 @@ int main(void)
                                  0,__gen_e_acsl_forall_14);
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
-    __gen_e_acsl_assert_data_16.pred_txt = "forall_multiple_binders_2:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 ==> p2(i, j, k)";
+    __gen_e_acsl_assert_data_16.pred_txt = "\\forall integer i, integer j, integer k;\n  0 <= i <= j < k <= 10 ==> p2(i, j, k)";
     __gen_e_acsl_assert_data_16.file = "quantif.i";
     __gen_e_acsl_assert_data_16.fct = "main";
     __gen_e_acsl_assert_data_16.line = 62;
+    __gen_e_acsl_assert_data_16.name = "forall_multiple_binders_2";
     __e_acsl_assert(__gen_e_acsl_forall_14,& __gen_e_acsl_assert_data_16);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
   }
@@ -705,10 +707,11 @@ int main(void)
                                  0,__gen_e_acsl_forall_15);
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "Assertion";
-    __gen_e_acsl_assert_data_17.pred_txt = "forall_multiple_binders_3:\n  \\forall integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k)";
+    __gen_e_acsl_assert_data_17.pred_txt = "\\forall integer i, integer j, integer k;\n  0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k)";
     __gen_e_acsl_assert_data_17.file = "quantif.i";
     __gen_e_acsl_assert_data_17.fct = "main";
     __gen_e_acsl_assert_data_17.line = 65;
+    __gen_e_acsl_assert_data_17.name = "forall_multiple_binders_3";
     __e_acsl_assert(__gen_e_acsl_forall_15,& __gen_e_acsl_assert_data_17);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
   }
@@ -759,10 +762,11 @@ int main(void)
                                  0,__gen_e_acsl_forall_16);
     __gen_e_acsl_assert_data_18.blocking = 1;
     __gen_e_acsl_assert_data_18.kind = "Assertion";
-    __gen_e_acsl_assert_data_18.pred_txt = "forall_multiple_binders_4:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k)";
+    __gen_e_acsl_assert_data_18.pred_txt = "\\forall integer i, integer j, integer k;\n  0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k)";
     __gen_e_acsl_assert_data_18.file = "quantif.i";
     __gen_e_acsl_assert_data_18.fct = "main";
     __gen_e_acsl_assert_data_18.line = 68;
+    __gen_e_acsl_assert_data_18.name = "forall_multiple_binders_4";
     __e_acsl_assert(__gen_e_acsl_forall_16,& __gen_e_acsl_assert_data_18);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
   }
@@ -813,10 +817,11 @@ int main(void)
                                  0,__gen_e_acsl_forall_17);
     __gen_e_acsl_assert_data_19.blocking = 1;
     __gen_e_acsl_assert_data_19.kind = "Assertion";
-    __gen_e_acsl_assert_data_19.pred_txt = "forall_unordered_binders:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k)";
+    __gen_e_acsl_assert_data_19.pred_txt = "\\forall integer i, integer j, integer k;\n  0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k)";
     __gen_e_acsl_assert_data_19.file = "quantif.i";
     __gen_e_acsl_assert_data_19.fct = "main";
     __gen_e_acsl_assert_data_19.line = 71;
+    __gen_e_acsl_assert_data_19.name = "forall_unordered_binders";
     __e_acsl_assert(__gen_e_acsl_forall_17,& __gen_e_acsl_assert_data_19);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
   }
@@ -867,10 +872,11 @@ int main(void)
                                  0,__gen_e_acsl_exists_3);
     __gen_e_acsl_assert_data_20.blocking = 1;
     __gen_e_acsl_assert_data_20.kind = "Assertion";
-    __gen_e_acsl_assert_data_20.pred_txt = "exists_multiple_binders_1:\n  \\exists integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k)";
+    __gen_e_acsl_assert_data_20.pred_txt = "\\exists integer i, integer j, integer k;\n  0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k)";
     __gen_e_acsl_assert_data_20.file = "quantif.i";
     __gen_e_acsl_assert_data_20.fct = "main";
     __gen_e_acsl_assert_data_20.line = 74;
+    __gen_e_acsl_assert_data_20.name = "exists_multiple_binders_1";
     __e_acsl_assert(__gen_e_acsl_exists_3,& __gen_e_acsl_assert_data_20);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
   }
@@ -921,10 +927,11 @@ int main(void)
                                  0,__gen_e_acsl_exists_4);
     __gen_e_acsl_assert_data_21.blocking = 1;
     __gen_e_acsl_assert_data_21.kind = "Assertion";
-    __gen_e_acsl_assert_data_21.pred_txt = "exists_multiple_binders_2:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 && p2(i, j, k)";
+    __gen_e_acsl_assert_data_21.pred_txt = "\\exists integer i, integer j, integer k; 0 <= i <= j < k <= 10 && p2(i, j, k)";
     __gen_e_acsl_assert_data_21.file = "quantif.i";
     __gen_e_acsl_assert_data_21.fct = "main";
     __gen_e_acsl_assert_data_21.line = 77;
+    __gen_e_acsl_assert_data_21.name = "exists_multiple_binders_2";
     __e_acsl_assert(__gen_e_acsl_exists_4,& __gen_e_acsl_assert_data_21);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
   }
@@ -975,10 +982,11 @@ int main(void)
                                  0,__gen_e_acsl_exists_5);
     __gen_e_acsl_assert_data_22.blocking = 1;
     __gen_e_acsl_assert_data_22.kind = "Assertion";
-    __gen_e_acsl_assert_data_22.pred_txt = "exists_multiple_binders_3:\n  \\exists integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k)";
+    __gen_e_acsl_assert_data_22.pred_txt = "\\exists integer i, integer j, integer k;\n  0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k)";
     __gen_e_acsl_assert_data_22.file = "quantif.i";
     __gen_e_acsl_assert_data_22.fct = "main";
     __gen_e_acsl_assert_data_22.line = 80;
+    __gen_e_acsl_assert_data_22.name = "exists_multiple_binders_3";
     __e_acsl_assert(__gen_e_acsl_exists_5,& __gen_e_acsl_assert_data_22);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
   }
@@ -1029,10 +1037,11 @@ int main(void)
                                  0,__gen_e_acsl_exists_6);
     __gen_e_acsl_assert_data_23.blocking = 1;
     __gen_e_acsl_assert_data_23.kind = "Assertion";
-    __gen_e_acsl_assert_data_23.pred_txt = "exists_unordered_binders:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k)";
+    __gen_e_acsl_assert_data_23.pred_txt = "\\exists integer i, integer j, integer k;\n  0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k)";
     __gen_e_acsl_assert_data_23.file = "quantif.i";
     __gen_e_acsl_assert_data_23.fct = "main";
     __gen_e_acsl_assert_data_23.line = 83;
+    __gen_e_acsl_assert_data_23.name = "exists_unordered_binders";
     __e_acsl_assert(__gen_e_acsl_exists_6,& __gen_e_acsl_assert_data_23);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
   }

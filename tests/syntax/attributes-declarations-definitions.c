@@ -1,3 +1,8 @@
+/* run.config
+   STDOPT:
+   EXIT: 1
+   STDOPT: #"-cpp-extra-args=-DUNSUPPORTED"
+*/
 //@ requires p1 >= 1;
 int __attribute__((tret1)) f(int __attribute__((arg1)) p1) __attribute__((f1));
 
@@ -51,3 +56,8 @@ int __attribute__((o)) one_letter_attribute;
 int __attribute__((_n)) one_letter_attribute_with_underscore;
 
 int __attribute__((e_)) one_letter_attribute_with_underscore_after;
+
+#ifdef UNSUPPORTED
+// explicitly unsupported attributes must cause errors
+typedef char V __attribute__((vector_size (64))); // vector_size is unsupported
+#endif

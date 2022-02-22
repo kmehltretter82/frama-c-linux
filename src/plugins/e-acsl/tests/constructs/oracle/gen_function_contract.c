@@ -264,10 +264,11 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"Y",0,Y);
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Precondition";
-      __gen_e_acsl_assert_data_2.pred_txt = "neg: Y < 1";
+      __gen_e_acsl_assert_data_2.pred_txt = "Y < 1";
       __gen_e_acsl_assert_data_2.file = "function_contract.i";
       __gen_e_acsl_assert_data_2.fct = "o";
       __gen_e_acsl_assert_data_2.line = 98;
+      __gen_e_acsl_assert_data_2.name = "neg";
       __e_acsl_assert(Y < 1,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
@@ -279,10 +280,11 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"Y",0,Y);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Precondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "pos: Y > -1";
+      __gen_e_acsl_assert_data_3.pred_txt = "Y > -1";
       __gen_e_acsl_assert_data_3.file = "function_contract.i";
       __gen_e_acsl_assert_data_3.fct = "o";
       __gen_e_acsl_assert_data_3.line = 103;
+      __gen_e_acsl_assert_data_3.name = "pos";
       __e_acsl_assert(Y > -1,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
@@ -294,10 +296,11 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"Y",0,Y);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Precondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "odd: Y % 2 - 1 == 0";
+      __gen_e_acsl_assert_data_4.pred_txt = "Y % 2 - 1 == 0";
       __gen_e_acsl_assert_data_4.file = "function_contract.i";
       __gen_e_acsl_assert_data_4.fct = "o";
       __gen_e_acsl_assert_data_4.line = 108;
+      __gen_e_acsl_assert_data_4.name = "odd";
       __e_acsl_assert(Y % 2 - 1 == 0,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
@@ -309,10 +312,11 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"Y",0,Y);
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "Precondition";
-      __gen_e_acsl_assert_data_5.pred_txt = "even: Y % 2 + 1 == 1";
+      __gen_e_acsl_assert_data_5.pred_txt = "Y % 2 + 1 == 1";
       __gen_e_acsl_assert_data_5.file = "function_contract.i";
       __gen_e_acsl_assert_data_5.fct = "o";
       __gen_e_acsl_assert_data_5.line = 113;
+      __gen_e_acsl_assert_data_5.name = "even";
       __e_acsl_assert(Y % 2 + 1 == 1,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
@@ -433,10 +437,11 @@ void __gen_e_acsl_o(void)
                                    0,__gen_e_acsl_at_2);
       __gen_e_acsl_assert_data_13.blocking = 1;
       __gen_e_acsl_assert_data_13.kind = "Postcondition";
-      __gen_e_acsl_assert_data_13.pred_txt = "neg: X == \\old(Y)";
+      __gen_e_acsl_assert_data_13.pred_txt = "X == \\old(Y)";
       __gen_e_acsl_assert_data_13.file = "function_contract.i";
       __gen_e_acsl_assert_data_13.fct = "o";
       __gen_e_acsl_assert_data_13.line = 99;
+      __gen_e_acsl_assert_data_13.name = "neg";
       __e_acsl_assert(X == __gen_e_acsl_at_2,& __gen_e_acsl_assert_data_13);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     }
@@ -450,10 +455,11 @@ void __gen_e_acsl_o(void)
                                    0,__gen_e_acsl_at_3);
       __gen_e_acsl_assert_data_14.blocking = 1;
       __gen_e_acsl_assert_data_14.kind = "Postcondition";
-      __gen_e_acsl_assert_data_14.pred_txt = "pos: X == \\old(Y)";
+      __gen_e_acsl_assert_data_14.pred_txt = "X == \\old(Y)";
       __gen_e_acsl_assert_data_14.file = "function_contract.i";
       __gen_e_acsl_assert_data_14.fct = "o";
       __gen_e_acsl_assert_data_14.line = 104;
+      __gen_e_acsl_assert_data_14.name = "pos";
       __e_acsl_assert(X == __gen_e_acsl_at_3,& __gen_e_acsl_assert_data_14);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
     }
@@ -467,10 +473,11 @@ void __gen_e_acsl_o(void)
                                    0,__gen_e_acsl_at_4);
       __gen_e_acsl_assert_data_15.blocking = 1;
       __gen_e_acsl_assert_data_15.kind = "Postcondition";
-      __gen_e_acsl_assert_data_15.pred_txt = "odd: X == \\old(Y)";
+      __gen_e_acsl_assert_data_15.pred_txt = "X == \\old(Y)";
       __gen_e_acsl_assert_data_15.file = "function_contract.i";
       __gen_e_acsl_assert_data_15.fct = "o";
       __gen_e_acsl_assert_data_15.line = 109;
+      __gen_e_acsl_assert_data_15.name = "odd";
       __e_acsl_assert(X == __gen_e_acsl_at_4,& __gen_e_acsl_assert_data_15);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
     }
@@ -484,10 +491,11 @@ void __gen_e_acsl_o(void)
                                    0,__gen_e_acsl_at_5);
       __gen_e_acsl_assert_data_16.blocking = 1;
       __gen_e_acsl_assert_data_16.kind = "Postcondition";
-      __gen_e_acsl_assert_data_16.pred_txt = "even: X == \\old(Y)";
+      __gen_e_acsl_assert_data_16.pred_txt = "X == \\old(Y)";
       __gen_e_acsl_assert_data_16.file = "function_contract.i";
       __gen_e_acsl_assert_data_16.fct = "o";
       __gen_e_acsl_assert_data_16.line = 114;
+      __gen_e_acsl_assert_data_16.name = "even";
       __e_acsl_assert(X == __gen_e_acsl_at_5,& __gen_e_acsl_assert_data_16);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
     }
@@ -549,10 +557,11 @@ void __gen_e_acsl_n(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"X",0,X);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Postcondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "b1: X == 8";
+      __gen_e_acsl_assert_data_3.pred_txt = "X == 8";
       __gen_e_acsl_assert_data_3.file = "function_contract.i";
       __gen_e_acsl_assert_data_3.fct = "n";
       __gen_e_acsl_assert_data_3.line = 83;
+      __gen_e_acsl_assert_data_3.name = "b1";
       __e_acsl_assert(X == 8,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
@@ -564,10 +573,11 @@ void __gen_e_acsl_n(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"X",0,X);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "b2: X == 98";
+      __gen_e_acsl_assert_data_4.pred_txt = "X == 98";
       __gen_e_acsl_assert_data_4.file = "function_contract.i";
       __gen_e_acsl_assert_data_4.fct = "n";
       __gen_e_acsl_assert_data_4.line = 86;
+      __gen_e_acsl_assert_data_4.name = "b2";
       __e_acsl_assert(X == 98,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
@@ -611,10 +621,11 @@ void __gen_e_acsl_m(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"X",0,X);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Postcondition";
-      __gen_e_acsl_assert_data.pred_txt = "b1: X == 95";
+      __gen_e_acsl_assert_data.pred_txt = "X == 95";
       __gen_e_acsl_assert_data.file = "function_contract.i";
       __gen_e_acsl_assert_data.fct = "m";
       __gen_e_acsl_assert_data.line = 68;
+      __gen_e_acsl_assert_data.name = "b1";
       __e_acsl_assert(X == 95,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
@@ -632,19 +643,21 @@ void __gen_e_acsl_m(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"Y",0,Y);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Postcondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "b2: X == \\old(X) + Y";
+      __gen_e_acsl_assert_data_3.pred_txt = "X == \\old(X) + Y";
       __gen_e_acsl_assert_data_3.file = "function_contract.i";
       __gen_e_acsl_assert_data_3.fct = "m";
       __gen_e_acsl_assert_data_3.line = 73;
+      __gen_e_acsl_assert_data_3.name = "b2";
       __e_acsl_assert((long)X == __gen_e_acsl_at + Y,
                       & __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Postcondition";
-      __gen_e_acsl_assert_data_2.pred_txt = "b2: X == 7";
+      __gen_e_acsl_assert_data_2.pred_txt = "X == 7";
       __gen_e_acsl_assert_data_2.file = "function_contract.i";
       __gen_e_acsl_assert_data_2.fct = "m";
       __gen_e_acsl_assert_data_2.line = 72;
+      __gen_e_acsl_assert_data_2.name = "b2";
       __e_acsl_assert(X == 7,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
@@ -703,10 +716,11 @@ void __gen_e_acsl_k(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"X",0,X);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Precondition";
-      __gen_e_acsl_assert_data.pred_txt = "b1: X == 0";
+      __gen_e_acsl_assert_data.pred_txt = "X == 0";
       __gen_e_acsl_assert_data.file = "function_contract.i";
       __gen_e_acsl_assert_data.fct = "k";
       __gen_e_acsl_assert_data.line = 48;
+      __gen_e_acsl_assert_data.name = "b1";
       __e_acsl_assert(X == 0,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
@@ -722,18 +736,20 @@ void __gen_e_acsl_k(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"Y",0,Y);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Precondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "b2: X + Y == 5";
+      __gen_e_acsl_assert_data_3.pred_txt = "X + Y == 5";
       __gen_e_acsl_assert_data_3.file = "function_contract.i";
       __gen_e_acsl_assert_data_3.fct = "k";
       __gen_e_acsl_assert_data_3.line = 53;
+      __gen_e_acsl_assert_data_3.name = "b2";
       __e_acsl_assert(X + (long)Y == 5L,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Precondition";
-      __gen_e_acsl_assert_data_2.pred_txt = "b2: X == 3";
+      __gen_e_acsl_assert_data_2.pred_txt = "X == 3";
       __gen_e_acsl_assert_data_2.file = "function_contract.i";
       __gen_e_acsl_assert_data_2.fct = "k";
       __gen_e_acsl_assert_data_2.line = 52;
+      __gen_e_acsl_assert_data_2.name = "b2";
       __e_acsl_assert(X == 3,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
@@ -768,10 +784,11 @@ void __gen_e_acsl_j(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"X",0,X);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Precondition";
-      __gen_e_acsl_assert_data.pred_txt = "b1: X == 5";
+      __gen_e_acsl_assert_data.pred_txt = "X == 5";
       __gen_e_acsl_assert_data.file = "function_contract.i";
       __gen_e_acsl_assert_data.fct = "j";
       __gen_e_acsl_assert_data.line = 35;
+      __gen_e_acsl_assert_data.name = "b1";
       __e_acsl_assert(X == 5,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
@@ -787,18 +804,20 @@ void __gen_e_acsl_j(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"Y",0,Y);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Precondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "b2: Y == 2";
+      __gen_e_acsl_assert_data_3.pred_txt = "Y == 2";
       __gen_e_acsl_assert_data_3.file = "function_contract.i";
       __gen_e_acsl_assert_data_3.fct = "j";
       __gen_e_acsl_assert_data_3.line = 39;
+      __gen_e_acsl_assert_data_3.name = "b2";
       __e_acsl_assert(Y == 2,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Precondition";
-      __gen_e_acsl_assert_data_2.pred_txt = "b2: X == 3 + Y";
+      __gen_e_acsl_assert_data_2.pred_txt = "X == 3 + Y";
       __gen_e_acsl_assert_data_2.file = "function_contract.i";
       __gen_e_acsl_assert_data_2.fct = "j";
       __gen_e_acsl_assert_data_2.line = 38;
+      __gen_e_acsl_assert_data_2.name = "b2";
       __e_acsl_assert((long)X == 3L + Y,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
@@ -814,10 +833,11 @@ void __gen_e_acsl_j(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"X",0,X);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "b1: X == 3";
+      __gen_e_acsl_assert_data_4.pred_txt = "X == 3";
       __gen_e_acsl_assert_data_4.file = "function_contract.i";
       __gen_e_acsl_assert_data_4.fct = "j";
       __gen_e_acsl_assert_data_4.line = 36;
+      __gen_e_acsl_assert_data_4.name = "b1";
       __e_acsl_assert(X == 3,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
@@ -830,10 +850,11 @@ void __gen_e_acsl_j(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"Y",0,Y);
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "Postcondition";
-      __gen_e_acsl_assert_data_5.pred_txt = "b2: X == Y + 1";
+      __gen_e_acsl_assert_data_5.pred_txt = "X == Y + 1";
       __gen_e_acsl_assert_data_5.file = "function_contract.i";
       __gen_e_acsl_assert_data_5.fct = "j";
       __gen_e_acsl_assert_data_5.line = 40;
+      __gen_e_acsl_assert_data_5.name = "b2";
       __e_acsl_assert((long)X == Y + 1L,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }

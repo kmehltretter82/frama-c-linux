@@ -154,20 +154,20 @@ let refusage_param ~byref ~context x =
   | RefUsage.NoAccess -> MemoryContext.NotUsed
   | RefUsage.ByAddr -> MemoryContext.ByAddr
   | RefUsage.ByValue ->
-      if context && is_formal_ptr x then MemoryContext.InContext (validity x)
-      else if is_ptr x && not (is_fun_ptr x) then MemoryContext.ByShift
-      else MemoryContext.ByValue
+    if context && is_formal_ptr x then MemoryContext.InContext (validity x)
+    else if is_ptr x && not (is_fun_ptr x) then MemoryContext.ByShift
+    else MemoryContext.ByValue
   | RefUsage.ByRef ->
-      if byref
-      then
-        if RefUsage.is_nullable x
-        then MemoryContext.InContext Nullable
-        else MemoryContext.ByRef
-      else MemoryContext.ByValue
+    if byref
+    then
+      if RefUsage.is_nullable x
+      then MemoryContext.InContext Nullable
+      else MemoryContext.ByRef
+    else MemoryContext.ByValue
   | RefUsage.ByArray ->
-      if context && is_formal_ptr x
-      then MemoryContext.InArray (validity x)
-      else MemoryContext.ByShift
+    if context && is_formal_ptr x
+    then MemoryContext.InArray (validity x)
+    else MemoryContext.ByShift
 
 let refusage_iter ?kf ~init f = RefUsage.iter ?kf ~init (fun x _usage -> f x)
 
@@ -251,13 +251,13 @@ let configure_mheap = function
   | Region -> MemRegion.configure ()
   | Eva -> MemVal.configure ()
   | Typed p ->
-      let rollback_memtyped = MemTyped.configure () in
-      let orig_memtyped_pointer = Context.push MemTyped.pointer p in
-      let rollback () =
-        rollback_memtyped () ;
-        Context.pop MemTyped.pointer orig_memtyped_pointer
-      in
-      rollback
+    let rollback_memtyped = MemTyped.configure () in
+    let orig_memtyped_pointer = Context.push MemTyped.pointer p in
+    let rollback () =
+      rollback_memtyped () ;
+      Context.pop MemTyped.pointer orig_memtyped_pointer
+    in
+    rollback
 
 let configure_driver setup driver () =
   let rollback_mheap = configure_mheap setup.mheap in

@@ -50,10 +50,11 @@ void f(int *x, int *y)
                                                     (void *)x,(void *)(& x));
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(x)";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(x)";
       __gen_e_acsl_assert_data_2.file = "e-acsl-valid.c";
       __gen_e_acsl_assert_data_2.fct = "f";
       __gen_e_acsl_assert_data_2.line = 27;
+      __gen_e_acsl_assert_data_2.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
       __gen_e_acsl_assert_data.blocking = 1;
@@ -201,10 +202,11 @@ void __gen_e_acsl_f(int *x, int *y)
                                                   (void *)x,(void *)(& x));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(x)";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(x)";
     __gen_e_acsl_assert_data_2.file = "e-acsl-valid.c";
     __gen_e_acsl_assert_data_2.fct = "f";
     __gen_e_acsl_assert_data_2.line = 17;
+    __gen_e_acsl_assert_data_2.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
@@ -218,10 +220,11 @@ void __gen_e_acsl_f(int *x, int *y)
                                                     (void *)x,(void *)(& x));
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "RTE";
-    __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(x)";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(x)";
     __gen_e_acsl_assert_data_3.file = "e-acsl-valid.c";
     __gen_e_acsl_assert_data_3.fct = "f";
     __gen_e_acsl_assert_data_3.line = 21;
+    __gen_e_acsl_assert_data_3.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,

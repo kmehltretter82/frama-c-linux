@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: eva,scope,from
+PLUGIN: eva,inout,scope,from
    OPT: -eva @EVA_CONFIG@ -deps
 */
 int e;

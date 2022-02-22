@@ -96,11 +96,11 @@ let get_compound_cmp a b =
   | None -> match get_record_term b with
     | Some fs -> Record(a,b,fs)
     | None ->
-        match get_array_update a , get_array_update b with
-        | None , None -> raise Not_found
-        | Some upd , None -> array1 upd b
-        | None , Some upd -> array1 upd a
-        | Some p , Some q -> array2 p q
+      match get_array_update a , get_array_update b with
+      | None , None -> raise Not_found
+      | Some upd , None -> array1 upd b
+      | None , Some upd -> array1 upd a
+      | Some p , Some q -> array2 p q
 
 let get_compound_equality e =
   match F.repr e with
@@ -128,15 +128,15 @@ let get2 a b k = F.p_equal (F.e_get a k) (F.e_get b k)
 let clause ~pool = function
   | Record(a,b,fs) -> List.map (field a b) fs
   | Array1((a,i,u),b,t) ->
-      let ks,k = index ~pool t in
-      [ "Updated" , get1 b i u ;
-        "Others" , F.p_forall ks (neq i k (get2 a b k)) ]
+    let ks,k = index ~pool t in
+    [ "Updated" , get1 b i u ;
+      "Others" , F.p_forall ks (neq i k (get2 a b k)) ]
   | Array2((a,i,u),(b,j,v),t) ->
-      let ks,k = index ~pool t in
-      [ "Updated (both)" , eq i j (F.p_equal u v) ;
-        "Updated (left)" , neq i j (get1 a j v) ;
-        "Updated (right)" , neq i j (get1 b i u) ;
-        "Others" , F.p_forall ks (neq i k (neq j k (get2 a b k))) ]
+    let ks,k = index ~pool t in
+    [ "Updated (both)" , eq i j (F.p_equal u v) ;
+      "Updated (left)" , neq i j (get1 a j v) ;
+      "Updated (right)" , neq i j (get1 b i u) ;
+      "Others" , F.p_forall ks (neq i k (neq j k (get2 a b k))) ]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Compound Tactic                                                    --- *)

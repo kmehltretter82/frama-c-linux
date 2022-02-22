@@ -57,11 +57,11 @@ let focus_of_selection selection scope =
   | S_prop (IPAxiomatic {iax_name=name}) , _ -> `Index(Wpo.Axiomatic (Some name))
   | S_prop ip , `Select -> `Property ip
   | S_prop ip , `Module ->
-      begin
-        match Property.get_kf ip with
-        | None -> `All
-        | Some kf -> `Index(Wpo.Function(kf,None))
-      end
+    begin
+      match Property.get_kf ip with
+      | None -> `All
+      | Some kf -> `Index(Wpo.Function(kf,None))
+    end
 
 exception FIRST of Wpo.t
 
@@ -153,8 +153,8 @@ class behavior
         let k = match currentgoal with
           | None -> (-1)
           | Some w ->
-              try list#index w
-              with Not_found -> (-1)
+            try list#index w
+            with Not_found -> (-1)
         in
         index#set_enabled (n>0) ;
         if n=0 then card#set `List ;
@@ -191,24 +191,24 @@ class behavior
 
     method private navigator src = function
       | None ->
-          begin
-            currentgoal <- None ;
-            next#set_enabled false ;
-            prev#set_enabled false ;
-            source#set None ;
-            self#details ;
-          end
+        begin
+          currentgoal <- None ;
+          next#set_enabled false ;
+          prev#set_enabled false ;
+          source#set None ;
+          self#details ;
+        end
       | (Some w) as sw ->
-          try
-            currentgoal <- sw ;
-            let n = list#size in
-            let k = list#index w in
-            prev#set_enabled (k > 0) ;
-            next#set_enabled (succ k < n) ;
-            source#set (if src then sw else None) ;
-            self#details ;
-          with Not_found ->
-            self#navigator false None
+        try
+          currentgoal <- sw ;
+          let n = list#size in
+          let k = list#index w in
+          prev#set_enabled (k > 0) ;
+          next#set_enabled (succ k < n) ;
+          source#set (if src then sw else None) ;
+          self#details ;
+        with Not_found ->
+          self#navigator false None
 
     method private next () = self#move succ
     method private prev () = self#move pred
@@ -217,12 +217,12 @@ class behavior
         match currentgoal with
         | None -> ()
         | Some w ->
-            begin
-              self#navigator true None ;
-              let k = list#index w in
-              let w = list#get (dir k) in
-              self#navigator true (Some w) ;
-            end
+          begin
+            self#navigator true None ;
+            let k = list#index w in
+            let w = list#get (dir k) in
+            self#navigator true (Some w) ;
+          end
       with Not_found ->
         self#navigator true None
 
@@ -249,21 +249,21 @@ class behavior
         then
           match prover with
           | VCS.Tactical ->
-              begin
-                match mode , ProverScript.get w with
-                | (None | Some VCS.Batch) , `Script ->
-                    schedule (ProverScript.prove ~success w)
-                | _ ->
-                    card#set `Goal ;
-                    clear#set_enabled false ;
-                    self#navigator true (Some w) ;
-              end
+            begin
+              match mode , ProverScript.get w with
+              | (None | Some VCS.Batch) , `Script ->
+                schedule (ProverScript.prove ~success w)
+              | _ ->
+                card#set `Goal ;
+                clear#set_enabled false ;
+                self#navigator true (Some w) ;
+            end
           | _ ->
-              let mode = match mode , prover with
-                | Some m , _ -> m
-                | _ -> if VCS.is_auto prover then VCS.Batch else VCS.Fix in
-              schedule (Prover.prove w ~mode ~result prover) ;
-              refresh w
+            let mode = match mode , prover with
+              | Some m , _ -> m
+              | _ -> if VCS.is_auto prover then VCS.Batch else VCS.Fix in
+            schedule (Prover.prove w ~mode ~result prover) ;
+            refresh w
       end
 
     method private clear () =
@@ -338,25 +338,25 @@ class behavior
         | None | Some Tactical -> popup_tip#run ()
         | Some Qed -> popup_qed#run ()
         | Some (Why3 _ as p) ->
-            if VCS.is_auto p
-            then popup_why3_auto#run ()
-            else popup_why3_inter#run ()
+          if VCS.is_auto p
+          then popup_why3_auto#run ()
+          else popup_why3_inter#run ()
       end
 
     method private action w p =
       match p with
       | None ->
-          begin
-            card#set `Goal ;
-            clear#set_enabled false ;
-            self#navigator true (Some w) ;
-          end
+        begin
+          card#set `Goal ;
+          clear#set_enabled false ;
+          self#navigator true (Some w) ;
+        end
       | Some p ->
-          begin
-            self#navigator true (Some w) ;
-            self#prove w p ;
-            list#update w ;
-          end
+        begin
+          self#navigator true (Some w) ;
+          self#prove w p ;
+          list#update w ;
+        end
 
     (* -------------------------------------------------------------------------- *)
     (* --- Popup on Goals                                                     --- *)
@@ -403,21 +403,21 @@ let model_varinfo :
   | PLval(Some kf, _ , (Var x,NoOffset))
   | PTermLval(Some kf, _, _, (TVar {lv_origin=Some x},TNoOffset))
     when button=1 && RefUsage.is_computed () ->
-      begin
-        let init = Globals.is_entry_point ~when_lib_entry:false kf in
-        let acc = RefUsage.get ~kf ~init x in
-        let model = match acc with
-          | RefUsage.NoAccess -> "any"
-          | RefUsage.ByValue -> "'var'"
-          | RefUsage.ByRef -> "'ref'"
-          | RefUsage.ByArray when x.vformal && Cil.isPointerType x.vtype
-            -> "'caveat'"
-          | _ -> "'typed'"
-        in
-        main#pretty_information
-          "Is is accessed as %t and fits in %s wp-model@."
-          (RefUsage.print x acc) model ;
-      end
+    begin
+      let init = Globals.is_entry_point ~when_lib_entry:false kf in
+      let acc = RefUsage.get ~kf ~init x in
+      let model = match acc with
+        | RefUsage.NoAccess -> "any"
+        | RefUsage.ByValue -> "'var'"
+        | RefUsage.ByRef -> "'ref'"
+        | RefUsage.ByArray when x.vformal && Cil.isPointerType x.vtype
+          -> "'caveat'"
+        | _ -> "'typed'"
+      in
+      main#pretty_information
+        "Is is accessed as %t and fits in %s wp-model@."
+        (RefUsage.print x acc) model ;
+    end
   | _ -> ()
 
 (* -------------------------------------------------------------------------- *)

@@ -141,9 +141,9 @@ struct
     | [] -> goto (env @: Clabels.here) (env @: Clabels.next)
     | [ elt ] -> f env elt
     | stmt :: stmts ->
-        let n = Cfg.node () in
-        let paths = f (bind Clabels.next n env) stmt in
-        paths @^ (sequence f (bind Clabels.here n env) stmts)
+      let n = Cfg.node () in
+      let paths = f (bind Clabels.next n env) stmt in
+      paths @^ (sequence f (bind Clabels.here n env) stmts)
 
   let choice ?(pre=Clabels.here) ?(post=Clabels.next) f env =
     let pre_node = env @: pre in
@@ -153,11 +153,11 @@ struct
     let rec aux env ns = function
       | [] -> goto (env @: pre) (env @: post)
       | [ elt ] ->
-          let n, paths = apply f env elt in
-          paths @^ either pre_node (n :: ns)
+        let n, paths = apply f env elt in
+        paths @^ either pre_node (n :: ns)
       | elt :: elts ->
-          let n, paths = apply f env elt in
-          paths @^ (aux env (n :: ns) elts)
+        let n, paths = apply f env elt in
+        paths @^ (aux env (n :: ns) elts)
     in
     aux env []
 
@@ -170,11 +170,11 @@ struct
     let rec aux env ns = function
       | [] -> goto (env @: pre) (env @: post)
       | [ elt ] ->
-          let n, (c,paths) = apply f env elt in
-          paths @^ implies pre_node ((c,n) :: ns)
+        let n, (c,paths) = apply f env elt in
+        paths @^ implies pre_node ((c,n) :: ns)
       | elt :: elts ->
-          let n, (c,paths) = apply f env elt in
-          paths @^ (aux env ((c,n) :: ns) elts)
+        let n, (c,paths) = apply f env elt in
+        paths @^ (aux env ((c,n) :: ns) elts)
     in
     aux env []
 
@@ -229,11 +229,11 @@ struct
     match e_opt with
     | None -> nop
     | Some exp ->
-        let rtyp = env.return in
-        let here = Sigma.create () in
-        let value = C.return here rtyp exp in
-        let p = Lang.F.p_equal (Lang.F.e_var env.result) value in
-        assume (Cfg.P.create (current env here) p)
+      let rtyp = env.return in
+      let here = Sigma.create () in
+      let value = C.return here rtyp exp in
+      let p = Lang.F.p_equal (Lang.F.e_var env.result) value in
+      assume (Cfg.P.create (current env here) p)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiler: Assertion                                                --- *)
@@ -347,18 +347,18 @@ struct
       let result env = match lvr with
         | None -> goto (env @: Clabels.here) (env @: Clabels.next)
         | Some lv ->
-            let pre = Sigma.create () in
-            let tr = Cil.typeOfLval lv in
-            let obj = Ctypes.object_of tr in
-            let loc = C.lval pre lv in
-            let post = Sigma.havoc pre (M.domain obj loc) in
-            let vr = M.load post obj loc in
-            let p =
-              C.equal_typ tr vr
-                (C.cast tr env.return (Val (Lang.F.e_var env.result)))
-            in
-            let e = Cfg.E.create { pre; post } p in
-            effect (env @: Clabels.here) e (env @: Clabels.next)
+          let pre = Sigma.create () in
+          let tr = Cil.typeOfLval lv in
+          let obj = Ctypes.object_of tr in
+          let loc = C.lval pre lv in
+          let post = Sigma.havoc pre (M.domain obj loc) in
+          let vr = M.load post obj loc in
+          let p =
+            C.equal_typ tr vr
+              (C.cast tr env.return (Val (Lang.F.e_var env.result)))
+          in
+          let e = Cfg.E.create { pre; post } p in
+          effect (env @: Clabels.here) e (env @: Clabels.next)
       in
 
       let old_status = env.status in
@@ -409,18 +409,18 @@ struct
     | Call (lv, e, es, _) -> call env lv e es
     | Asm _ -> not_yet "[StmtSemantics] Inline Asm."
     | Local_init (v, ConsInit(f, args, kind), loc) ->
-        Cil.treat_constructor_as_func
-          (fun lv e es _ -> call env lv e es)
-          v f args kind loc
+      Cil.treat_constructor_as_func
+        (fun lv e es _ -> call env lv e es)
+        v f args kind loc
     | Local_init (vi, AssignInit init, _) ->
-        let here = Sigma.create () in
-        let next = Sigma.create () in
-        (*TODO: make something of warnings *)
-        let init = C.init ~sigma:next vi (Some init) in
-        let hyp_value = Lang.F.p_all (fun (_, h) -> fst h) init in
-        let hyp_init =  Lang.F.p_all (fun (_, h) -> snd h) init in
-        let hyp = Lang.F.p_and hyp_init hyp_value in
-        effect (env @: Clabels.here) (Cfg.E.create {pre=here; post=next} hyp) (env @: Clabels.next)
+      let here = Sigma.create () in
+      let next = Sigma.create () in
+      (*TODO: make something of warnings *)
+      let init = C.init ~sigma:next vi (Some init) in
+      let hyp_value = Lang.F.p_all (fun (_, h) -> fst h) init in
+      let hyp_init =  Lang.F.p_all (fun (_, h) -> snd h) init in
+      let hyp = Lang.F.p_and hyp_init hyp_value in
+      effect (env @: Clabels.here) (Cfg.E.create {pre=here; post=next} hyp) (env @: Clabels.next)
     | Skip _ | Code_annot _ -> goto (env @: Clabels.here) (env @: Clabels.next)
 
   (* -------------------------------------------------------------------------- *)
@@ -483,11 +483,11 @@ struct
     match authorized_region with
     | None -> goto (env @: Clabels.here) (env @: Clabels.next)
     | Some region ->
-        let domain = A.domain region in
-        let next = M.Sigma.havoc here domain in
-        let seq = { pre = here; post = next } in
-        let preds = A.apply_assigns seq region in
-        effect (env @: Clabels.here) (Cfg.E.create seq (Lang.F.p_conj preds)) (env @: Clabels.next)
+      let domain = A.domain region in
+      let next = M.Sigma.havoc here domain in
+      let seq = { pre = here; post = next } in
+      let preds = A.apply_assigns seq region in
+      effect (env @: Clabels.here) (Cfg.E.create seq (Lang.F.p_conj preds)) (env @: Clabels.next)
 
   and froms : env -> from list -> paths = fun env froms ->
     assigns env (Writes froms)
@@ -524,35 +524,35 @@ struct
       let open Interpreted_automata in
       match tr with
       | Skip | Enter { blocals = [] } | Leave { blocals = [] } ->
-          goto (env @: Clabels.here) (env @: Clabels.next)
+        goto (env @: Clabels.here) (env @: Clabels.next)
       | Enter {blocals} -> scope env Sigs.Enter blocals
       | Leave {blocals} -> scope env Sigs.Leave blocals
       | Return (r,_) -> return env r
       | Prop ({kind = Assert|Invariant} as a, _) ->
-          let env = Logic_label.Map.fold
-              (fun logic_label vertex acc ->
-                 let c_label = Clabels.of_logic logic_label in
-                 let node = get_node nodes vertex in
-                 bind c_label node acc
-              ) a.labels env in
-          assert_ env a.predicate (WpPropId.mk_property a.property)
+        let env = Logic_label.Map.fold
+            (fun logic_label vertex acc ->
+               let c_label = Clabels.of_logic logic_label in
+               let node = get_node nodes vertex in
+               bind c_label node acc
+            ) a.labels env in
+        assert_ env a.predicate (WpPropId.mk_property a.property)
       | Prop ({kind = Assume} as a, _)->
-          let env = Logic_label.Map.fold
-              (fun logic_label vertex acc ->
-                 let c_label = Clabels.of_logic logic_label in
-                 let node = get_node nodes vertex in
-                 bind c_label node acc
-              ) a.labels env in
-          assume (pred env `Negative a.predicate.ip_content.tp_statement) @^
-          goto (env @: Clabels.here) (env @: Clabels.next)
+        let env = Logic_label.Map.fold
+            (fun logic_label vertex acc ->
+               let c_label = Clabels.of_logic logic_label in
+               let node = get_node nodes vertex in
+               bind c_label node acc
+            ) a.labels env in
+        assume (pred env `Negative a.predicate.ip_content.tp_statement) @^
+        goto (env @: Clabels.here) (env @: Clabels.next)
       | Prop _ ->
-          not_yet "[StmtSemantics] Annots other than 'assert'"
+        not_yet "[StmtSemantics] Annots other than 'assert'"
       | Guard (exp,b,_) ->
-          let here = Sigma.create () in
-          let cond = C.cond here exp in
-          let condition = Cfg.C.create here cond in
-          (if b = Then then guard else guard')
-            (env @: Clabels.here) condition (env @: Clabels.next)
+        let here = Sigma.create () in
+        let cond = C.cond here exp in
+        let condition = Cfg.C.create here cond in
+        (if b = Then then guard else guard')
+          (env @: Clabels.here) condition (env @: Clabels.next)
       | Instr (i,_) -> instr env i
 
   let rec get_invariants g n (l:Automata.t Wto.partition) =
@@ -563,8 +563,8 @@ struct
       [(_,{edge_transition =
              (Prop({kind=Assert|Invariant|Assume|Check},_) | Skip) as t},b)]
       when Automata.equal a b ->
-        let invs,l = get_invariants g b l in
-        (t,a)::invs,l
+      let invs,l = get_invariants g b l in
+      (t,a)::invs,l
     | _ -> [],(Wto.Node n)::l
 
   let as_assumes l =
@@ -615,40 +615,40 @@ struct
     let rec do_list ~fresh_nodes paths nodes n1 = function
       | [] -> (n1,paths)
       | (t,b)::l ->
-          let n2, nodes =
-            if fresh_nodes then
-              let n2 = Cfg.node () in
-              let nodes = add_local nodes b n2 in
-              n2, nodes
-            else (get_node nodes b), nodes
-          in
-          let paths = paths @^ transition (env @* [Clabels.here,n1;Clabels.next,n2]) nodes t in
-          do_list ~fresh_nodes paths nodes n2 l
+        let n2, nodes =
+          if fresh_nodes then
+            let n2 = Cfg.node () in
+            let nodes = add_local nodes b n2 in
+            n2, nodes
+          else (get_node nodes b), nodes
+        in
+        let paths = paths @^ transition (env @* [Clabels.here,n1;Clabels.next,n2]) nodes t in
+        do_list ~fresh_nodes paths nodes n2 l
     in
     let rec component nodes paths = function
       | Wto.Node ((n, _) as v) -> bind n (do_node nodes v) paths
       | Wto.Component ((n, _) as v, l) ->
-          let do_component (v, l) =
-            assert (not (Automata.Map.mem v nodes.local));
-            let invariants,l = get_invariants g v l in
-            let n = get_node {nodes with local = Automata.Map.empty} v in
-            (* initialization *)
-            let n,paths = do_list ~fresh_nodes:true paths nodes n invariants in
-            (* preservation *)
-            let n_loop = Cfg.node () in
-            let _,paths = do_list ~fresh_nodes:true paths nodes n_loop invariants in
-            (* arbitrary number of loop *)
-            let n_havoc = Cfg.node () in
-            let havoc = Cfg.havoc n ~effects:{pre=n_havoc;post=n_loop} n_havoc in
-            let paths = (havoc |> paths_of_cfg) @^ paths in
-            (* body *)
-            let invariants_as_assumes = as_assumes invariants in
-            let _,paths =
-              do_list ~fresh_nodes:false paths (add_local nodes v n_havoc)
-                n_havoc invariants_as_assumes in
-            partition (add_local nodes v n_loop) paths l
-          in
-          bind n do_component (v, l)
+        let do_component (v, l) =
+          assert (not (Automata.Map.mem v nodes.local));
+          let invariants,l = get_invariants g v l in
+          let n = get_node {nodes with local = Automata.Map.empty} v in
+          (* initialization *)
+          let n,paths = do_list ~fresh_nodes:true paths nodes n invariants in
+          (* preservation *)
+          let n_loop = Cfg.node () in
+          let _,paths = do_list ~fresh_nodes:true paths nodes n_loop invariants in
+          (* arbitrary number of loop *)
+          let n_havoc = Cfg.node () in
+          let havoc = Cfg.havoc n ~effects:{pre=n_havoc;post=n_loop} n_havoc in
+          let paths = (havoc |> paths_of_cfg) @^ paths in
+          (* body *)
+          let invariants_as_assumes = as_assumes invariants in
+          let _,paths =
+            do_list ~fresh_nodes:false paths (add_local nodes v n_havoc)
+              n_havoc invariants_as_assumes in
+          partition (add_local nodes v n_loop) paths l
+        in
+        bind n do_component (v, l)
 
     and partition nodes paths l =
       List.fold_left (component nodes) paths l

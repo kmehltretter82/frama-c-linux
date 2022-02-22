@@ -4,7 +4,7 @@
    OPT: -eva @EVA_OPTIONS@
 */
 
-/* bin/viewer.opt -eva @PTEST_DIR@/@PTEST_NAME@.c */
+/* bin/viewer.opt -eva %{dep:@PTEST_DIR@/@PTEST_NAME@.c} */
 
 int T [10];
 struct Tstr { int a; int b; } S;

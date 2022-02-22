@@ -55,9 +55,9 @@ let apply_all ~propagate_to_callers =
 
 let get_select_kf (fvar, _select) = Globals.Functions.get fvar
 
-let get_lval_zone ?(access=Locations.Read) stmt lval =
+let get_lval_zone ?(for_writing=false) stmt lval =
   let open Eva.Results in
-  before stmt |> eval_address lval |> as_zone ~access
+  before stmt |> eval_address ~for_writing lval |> as_zone
 
 (** Utilities for [kinstr]. *)
 module Kinstr: sig
@@ -80,7 +80,7 @@ struct
       (* returns [read_zone] joined to [Zone.t read] by [lv], [Zone.t written] by [lv] *)
       (* The modified locations are [looking_for], those address are
          function of [deps]. *)
-      let zloc = get_lval_zone ~access:Locations.Write stmt lv in
+      let zloc = get_lval_zone ~for_writing:true stmt lv in
       let deps = Eva.Results.(before stmt |> address_deps lv) in
       Locations.Zone.join read_zone deps, zloc
     in
@@ -349,8 +349,7 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
           (fun lval_str acc ->
              let lval_term = !Db.Properties.Interp.term_lval kf lval_str in
              let lval = !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term in
-             let access = if for_writing then Locations.Write else Locations.Read in
-             let zone = get_lval_zone ~access eval lval in
+             let zone = get_lval_zone ~for_writing eval lval in
              Locations.Zone.join zone acc)
           lval_str Locations.Zone.bottom
       in SlicingParameters.debug ~level:3

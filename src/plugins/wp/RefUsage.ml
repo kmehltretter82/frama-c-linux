@@ -183,7 +183,7 @@ let m_vcup =
   let m_vcup m = vcup (e_value m) in
   function
   | E old as m -> (* better sharing than vcup (e_value m) b *)
-      share_vcup m ~old
+    share_vcup m ~old
   | _ as m -> m_vcup m
 
 let m_fcup f =
@@ -215,10 +215,10 @@ let field = function
 let load = function
   | Loc_var x -> Val_var x (* E.access x ByValue E.bot *)
   | Loc_shift(x,e) ->
-      if Cil.isArithmeticOrPointerType x.vtype then
-        E (E.access x ByAddr e)
-      else
-        E (E.access x ByValue e)
+    if Cil.isArithmeticOrPointerType x.vtype then
+      E (E.access x ByAddr e)
+    else
+      E (E.access x ByValue e)
   | Val_var x -> E (E.access x ByRef E.bot)
   | Val_comp(x,e) -> E (E.access x ByRef e)
   | Val_shift(x,e) -> E (E.access x ByArray e)
@@ -251,11 +251,11 @@ let cast_obj tgt src =
   match tgt , src with
   | (C_int _ | C_float _) , (C_int _ | C_float _) -> Convert
   | C_pointer tr , C_pointer te ->
-      let obj_r = Ctypes.object_of tr in
-      let obj_e = Ctypes.object_of te in
-      if Ctypes.compare obj_r obj_e = 0
-      then Identity
-      else Cast
+    let obj_r = Ctypes.object_of tr in
+    let obj_e = Ctypes.object_of te in
+    if Ctypes.compare obj_r obj_e = 0
+    then Identity
+    else Cast
   | _ -> if Ctypes.equal tgt src then Identity else Cast
 
 let cast_ctyp tgt src =
@@ -427,10 +427,10 @@ and term (env:ctx) (t:term) : model = match t.term_node with
   | TLval tlv -> term_lval env tlv
   | TAddrOf tlv | TStartOf tlv -> addr_lval env tlv
   | TUpdate(s,ofs,t) ->
-      let v = term env s in
-      let k = term_indices env E.bot ofs in
-      let e = vterm env t in
-      m_vcup (m_vcup v k) e
+    let v = term env s in
+    let k = term_indices env E.bot ofs in
+    let e = vterm env t in
+    m_vcup (m_vcup v k) e
 
   (* Operators *)
   | Tat(t,_) -> term env t
@@ -445,30 +445,30 @@ and term (env:ctx) (t:term) : model = match t.term_node with
   | Tcomprehension(t,_xs,None) -> mterm env t
   | Tcomprehension(t,_xs,Some p) -> m_vcup (term env t) (pred env p)
   | Tlet({l_var_info; l_body = LBterm def},t) ->
-      let m_def = term env def in
-      add_tlet env.local l_var_info m_def;
-      let m = term env t in
-      rem_tlet env.local l_var_info;
-      m
+    let m_def = term env def in
+    add_tlet env.local l_var_info m_def;
+    let m = term env t in
+    rem_tlet env.local l_var_info;
+    m
   | Tlet(_,_t) ->
-      Wp_parameters.not_yet_implemented "unknown \\let construct"
+    Wp_parameters.not_yet_implemented "unknown \\let construct"
 
   (* No escape *)
   | Tblock_length(_, t) ->
-      E (unescape ((term env) t))
+    E (unescape ((term env) t))
 
   (* Call *)
   | Tapp({l_var_info=({lv_origin=None; lv_kind=LVLocal} as lvar)},[],[]) ->
-      (* var bound by a \\let *)
-      get_tlet env.local lvar
+    (* var bound by a \\let *)
+    get_tlet env.local lvar
   | Tapp(phi,_,ts) -> v_model (v_lphi env phi ts)
 
 (* --- Lvalues --- *)
 and term_lval env (h,ofs) = match h with
   | TResult _ | TVar{lv_name="\\exit_status"} -> nothing
   | TVar( {lv_origin=None ; lv_kind=LVLocal} as lvar) ->
-      (* var bound by a \\let *)
-      load (term_offset env (get_tlet env.local lvar) ofs)
+    (* var bound by a \\let *)
+    load (term_offset env (get_tlet env.local lvar) ofs)
   | TVar( {lv_origin=None} ) -> (* logic variable *)   nothing
   | TVar( {lv_origin=Some x} ) -> load (term_offset env (Loc_var x) ofs)
   | TMem t -> load (term_offset env (load (term env t)) ofs)
@@ -487,12 +487,12 @@ and term_offset env (l:model) = function
 and addr_lval env (h,ofs) = match h with
   | TResult _ -> Wp_parameters.abort ~current:true "Address of \\result"
   | TVar{lv_name="\\exit_status"} ->
-      Wp_parameters.abort ~current:true "Address of \\exit_status"
+    Wp_parameters.abort ~current:true "Address of \\exit_status"
   | TMem t -> term_offset env (term env t) ofs
   | TVar( {lv_origin=Some x} ) -> term_offset env (Loc_var x) ofs
   | TVar( {lv_origin=None} as x ) ->
-      Wp_parameters.abort ~current:true
-        "Address of logic variable (%a)" Logic_var.pretty x
+    Wp_parameters.abort ~current:true
+      "Address of logic variable (%a)" Logic_var.pretty x
 
 (* --- Predicates --- *)
 and pred (env:ctx) p : value = match p.pred_content with
@@ -511,22 +511,22 @@ and pred (env:ctx) p : value = match p.pred_content with
   (* Binders *)
   | Pforall(_,p) | Pexists(_,p) -> (pred env) p
   | Plet({l_var_info; l_body = LBterm def},p) ->
-      let m_def = term env def in
-      add_tlet env.local l_var_info m_def;
-      let e = pred env p in
-      rem_tlet env.local l_var_info; e
+    let m_def = term env def in
+    add_tlet env.local l_var_info m_def;
+    let e = pred env p in
+    rem_tlet env.local l_var_info; e
   | Plet({l_var_info; l_body = LBpred def},p) ->
-      let e_def = pred env def in
-      add_plet env.local l_var_info e_def;
-      let e = pred env p in
-      rem_plet env.local l_var_info; e
+    let e_def = pred env def in
+    add_plet env.local l_var_info e_def;
+    let e = pred env p in
+    rem_plet env.local l_var_info; e
   | Plet(_,_t) ->
-      Wp_parameters.not_yet_implemented "unknown \\let construct"
+    Wp_parameters.not_yet_implemented "unknown \\let construct"
 
   (* Call *)
   | Papp({l_var_info=({lv_origin=None; lv_kind=LVLocal} as lvar)},[],[]) ->
-      (* var bound by a \\let *)
-      get_plet env.local lvar
+    (* var bound by a \\let *)
+    get_plet env.local lvar
   | Papp(phi,_,ts) -> v_lphi env phi ts
 
   (* No escape *)
@@ -534,11 +534,11 @@ and pred (env:ctx) p : value = match p.pred_content with
   | Pallocable(_, t) | Pfreeable(_, t)
   | Pvalid(_,t) | Pvalid_read (_,t)
   | Pobject_pointer (_,t) | Pvalid_function t ->
-      unescape ((term env) t)
+    unescape ((term env) t)
   | Pseparated ts ->
-      E.fcup (fun t -> unescape ((term env) t)) ts
+    E.fcup (fun t -> unescape ((term env) t)) ts
   | Pfresh(_, _, t1, t2) ->
-      E.fcup (fun t -> unescape ((term env) t)) [t1;t2]
+    E.fcup (fun t -> unescape ((term env) t)) [t1;t2]
 
 (* --- Call to Logical functions/Predicates --- *)
 and v_lphi (env:ctx) (lphi:logic_info) ts : value =
@@ -551,15 +551,15 @@ and v_lphi (env:ctx) (lphi:logic_info) ts : value =
   | LVQuant -> not_yet_implemented "LVQuant"
   | LVLocal -> not_yet_implemented "LVLocal"
   | LVGlobal ->
-      let v_body = (* get the accesses the globals *)
-        if not (LFset.mem lphi env.global.lphi) then begin
-          env.global.lphi <- LFset.add lphi env.global.lphi;
-          v_body env lphi.l_body
-        end
-        else E.bot
-      and v_param =
-        E.fcup (vterm env) ts (* usage of the parameter of the application *)
-      in E.cup v_param v_body
+    let v_body = (* get the accesses the globals *)
+      if not (LFset.mem lphi env.global.lphi) then begin
+        env.global.lphi <- LFset.add lphi env.global.lphi;
+        v_body env lphi.l_body
+      end
+      else E.bot
+    and v_param =
+      E.fcup (vterm env) ts (* usage of the parameter of the application *)
+    in E.cup v_param v_body
 and v_body (env:ctx) = (* locals of the logical function are removed *)
   let vglob v = snd (E.partition_formals_vs_others v) in
   function
@@ -581,8 +581,8 @@ let cinit vi init =
   let rec aux (m: model) a = function
     | SingleInit (exp) ->  einit m a exp
     | CompoundInit(_,loi) ->
-        List.fold_left (fun a (ofs,init) -> aux (offset m ofs) a init)
-          a loi
+      List.fold_left (fun a (ofs,init) -> aux (offset m ofs) a init)
+        a loi
   in aux (cval vi) E.bot init
 
 let cfun_code env kf = (* Visits term/pred of code annotations and C exp *)
@@ -619,24 +619,24 @@ let cfun_code env kf = (* Visits term/pred of code annotations and C exp *)
       -> ()
 
     | Throw _ | TryCatch _ | TryExcept _ ->
-        Wp_parameters.warning "RefUsage: throw/try-catch not implemented"
+      Wp_parameters.warning "RefUsage: throw/try-catch not implemented"
 
     | Instr(Set(lval,exp,_)) -> do_lval lval ; do_exp exp
     | Instr(Call(lval_opt,fun_exp,args_list,_)) ->
-        begin
-          do_lval_opt lval_opt ;
-          match Kernel_function.get_called fun_exp with
-          | None -> List.iter do_exp (fun_exp::args_list)
-          | Some called_kf -> do_args called_kf args_list
-        end
+      begin
+        do_lval_opt lval_opt ;
+        match Kernel_function.get_called fun_exp with
+        | None -> List.iter do_exp (fun_exp::args_list)
+        | Some called_kf -> do_args called_kf args_list
+      end
     | Instr(Local_init (v,AssignInit i,_)) -> update_code_env (cinit v i)
     | Instr(Local_init (v,ConsInit (f,args,kind),_)) ->
-        let kf = Globals.Functions.get f in
-        (match kind with
-         | Constructor -> do_args kf (Cil.mkAddrOfVi v :: args)
-         | Plain_func ->
-             update_code_env (e_value (cval v));
-             do_args kf args)
+      let kf = Globals.Functions.get f in
+      (match kind with
+       | Constructor -> do_args kf (Cil.mkAddrOfVi v :: args)
+       | Plain_func ->
+         update_code_env (e_value (cval v));
+         do_args kf args)
     | Return(Some exp,_)
     | If (exp,_,_,_)
     | Switch (exp,_,_,_) -> do_exp exp
@@ -713,9 +713,9 @@ let call_kf (env:global_ctx) (formals:access list) (models:model list) (reached:
   let unmodified = ref reached in
   let rec call xs ms = match xs, ms with
     | x::xs , m::ms ->
-        let actual = param x m in
-        if update_call_env env actual then unmodified := false;
-        call xs ms
+      let actual = param x m in
+      if update_call_env env actual then unmodified := false;
+      call xs ms
     | _ -> ()
   in call formals models;
   !unmodified
@@ -844,7 +844,7 @@ struct
       match ctxt.Logic_typing.type_term ctxt ctxt.pre_state e with
       | { term_node = TLval (TVar { lv_origin = Some vi }, TNoOffset) } as term
         when Cil.isPointerType vi.vtype && vi.vformal ->
-          make_nullable vi ; term
+        make_nullable vi ; term
       | t -> ctxt.error loc "Not a formal pointer: %a" Cil_printer.pp_term t
 
     let typer ctxt loc l =
@@ -880,8 +880,8 @@ let iter ?kf ?(init=false) f =
   let kf_access = match kf with
     | None -> E.bot
     | Some kf ->
-        (try KFmap.find kf usage
-         with Not_found -> E.bot)
+      (try KFmap.find kf usage
+       with Not_found -> E.bot)
   in
   let access = if init then E.cup kf_access u_init else kf_access in
   E.iter f access
@@ -891,8 +891,8 @@ let get ?kf ?(init=false) vi =
   let kf_access = match kf with
     | None -> NoAccess
     | Some kf ->
-        (try E.get vi (KFmap.find kf usage)
-         with Not_found -> NoAccess)
+      (try E.get vi (KFmap.find kf usage)
+       with Not_found -> NoAccess)
   in
   if init then Access.cup kf_access (E.get vi u_init) else kf_access
 

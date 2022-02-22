@@ -60,7 +60,7 @@ static void str_append (char **to, size_t *to_len, const char *buf,
 
 error_t argz_replace (char **argz, size_t *argz_len, const char *str,
                       const char *with, unsigned *replace_count) {
-  error_t err = 0;
+  error_t er = 0;
 
   if (str && *str) {
     char *arg = 0;
@@ -71,7 +71,7 @@ error_t argz_replace (char **argz, size_t *argz_len, const char *str,
     int delayed_copy = 1;
     size_t str_len = strlen (str), with_len = strlen (with);
 
-    while (!err && (arg = argz_next (src, src_len, arg))) {
+    while (!er && (arg = argz_next (src, src_len, arg))) {
       char *match = strstr (arg, str);
       if (match) {
         char *from = match + str_len;
@@ -95,22 +95,22 @@ error_t argz_replace (char **argz, size_t *argz_len, const char *str,
         if (to) {
           if (delayed_copy) {
             if (arg > src)
-              err = argz_append (&dst, &dst_len, src, (arg - src));
+              er = argz_append (&dst, &dst_len, src, (arg - src));
             delayed_copy = 0;
           }
-          if (! err)
-            err = argz_add (&dst, &dst_len, to);
+          if (! er)
+            er = argz_add (&dst, &dst_len, to);
           free (to);
         } else
-          err = ENOMEM;
+          er = ENOMEM;
 
         if (replace_count)
           (*replace_count)++;
       } else if (! delayed_copy)
-        err = argz_add (&dst, &dst_len, arg);
+        er = argz_add (&dst, &dst_len, arg);
     }
 
-    if (! err) {
+    if (! er) {
       if (! delayed_copy) {
         free (src);
         *argz = dst;
@@ -120,7 +120,7 @@ error_t argz_replace (char **argz, size_t *argz_len, const char *str,
       free (dst);
   }
 
-  return err;
+  return er;
 }
 
 char * argz_next (const char *argz, size_t argz_len, const char *entry) {

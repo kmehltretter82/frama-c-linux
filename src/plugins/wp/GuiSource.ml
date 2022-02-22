@@ -45,27 +45,27 @@ let selection_of_localizable = function
   | PStmt( kf , stmt ) | PStmtStart( kf , stmt )
   | PLval( Some kf , Kstmt stmt , _ )
   | PTermLval( Some kf , Kstmt stmt , _, _ ) ->
-      begin
-        match stmt with
-        | { skind=Instr(Call(_,e,_,_)) } ->
-            begin
-              match Kernel_function.get_called e with
-              | None -> S_none
-              | Some called ->
-                  S_call {
-                    s_called = called ;
-                    s_caller = kf ;
-                    s_stmt = stmt ;
-                  }
-            end
-        | { skind=Instr(Local_init(_,ConsInit (vi, _, _),_)) } ->
+    begin
+      match stmt with
+      | { skind=Instr(Call(_,e,_,_)) } ->
+        begin
+          match Kernel_function.get_called e with
+          | None -> S_none
+          | Some called ->
             S_call {
-              s_called = Globals.Functions.get vi ;
+              s_called = called ;
               s_caller = kf ;
               s_stmt = stmt ;
             }
-        | _ -> S_none
-      end
+        end
+      | { skind=Instr(Local_init(_,ConsInit (vi, _, _),_)) } ->
+        S_call {
+          s_called = Globals.Functions.get vi ;
+          s_caller = kf ;
+          s_stmt = stmt ;
+        }
+      | _ -> S_none
+    end
   | PVDecl (Some kf,_,{vglob=true}) -> S_fun kf
   | PIP ip -> S_prop ip
   | PVDecl _ | PLval _ | PExp _ | PTermLval _ | PGlobal _ -> S_none
@@ -74,7 +74,7 @@ let kind_of_property = function
   | Property.IPLemma _ -> "lemma"
   | Property.IPCodeAnnot _ -> "annotation"
   | Property.(IPPredicate {ip_kind=PKRequires _;ip_kinstr = Kglobal}) ->
-      "precondition for callers"
+    "precondition for callers"
   | _ -> "property"
 
 (* -------------------------------------------------------------------------- *)
@@ -108,22 +108,22 @@ class popup () =
     method private rte_popup menu main loc =
       match loc with
       | PVDecl (Some kf,_,{vglob=true}) ->
-          if not (is_rte_generated kf) then
-            self#rte_option menu main "Insert wp-rte guards"
-              self#rte_generate kf ;
+        if not (is_rte_generated kf) then
+          self#rte_option menu main "Insert wp-rte guards"
+            self#rte_generate kf ;
       | _ -> ()
 
     method private wp_popup (menu : GMenu.menu GMenu.factory) = function
       | S_none -> ()
       | s ->
-          let target = match s with
-            | S_none -> "none"
-            | S_prop ip -> kind_of_property ip
-            | S_call _ -> "call preconditions"
-            | S_fun _ -> "function annotations"
-          in
-          let title = Printf.sprintf "Prove %s by WP" target in
-          ignore (menu#add_item title ~callback:(fun () -> prove s))
+        let target = match s with
+          | S_none -> "none"
+          | S_prop ip -> kind_of_property ip
+          | S_call _ -> "call preconditions"
+          | S_fun _ -> "function annotations"
+        in
+        let title = Printf.sprintf "Prove %s by WP" target in
+        ignore (menu#add_item title ~callback:(fun () -> prove s))
 
     method register
         (menu : GMenu.menu GMenu.factory)
@@ -131,16 +131,16 @@ class popup () =
         ~(button:int) (loc:Pretty_source.localizable) =
       begin match button with
         | 1 ->
-            begin
-              match selection_of_localizable loc with
-              | S_none -> ()
-              | s -> click s
-            end
+          begin
+            match selection_of_localizable loc with
+            | S_none -> ()
+            | s -> click s
+          end
         | 3 ->
-            begin
-              self#wp_popup menu (selection_of_localizable loc) ;
-              self#rte_popup menu main loc ;
-            end
+          begin
+            self#wp_popup menu (selection_of_localizable loc) ;
+            self#rte_popup menu main loc ;
+          end
         | _ -> ()
       end
 
@@ -207,20 +207,20 @@ class highlighter (main:Design.main_window_extension_points) =
           match s with
           | None -> Wutil.later main#rehighlight ;
           | Some { Wpo.po_pid = pid ; Wpo.po_formula = f } ->
-              begin
-                match f with
-                | GoalLemma l ->
-                    deps <- lemmas l.VC_Lemma.depends
-                | GoalAnnot a ->
-                    effect <- a.VC_Annot.effect ;
-                    path <- instructions a.VC_Annot.path ;
-                    deps <- a.VC_Annot.deps ;
-              end ;
-              if not (WpPropId.is_check pid || WpPropId.is_tactic pid)
-              then
-                ( let ip = WpPropId.property_of_id pid in
-                  goal <- Some ip ) ;
-              Wutil.later self#scroll ;
+            begin
+              match f with
+              | GoalLemma l ->
+                deps <- lemmas l.VC_Lemma.depends
+              | GoalAnnot a ->
+                effect <- a.VC_Annot.effect ;
+                path <- instructions a.VC_Annot.path ;
+                deps <- a.VC_Annot.deps ;
+            end ;
+            if not (WpPropId.is_check pid || WpPropId.is_tactic pid)
+            then
+              ( let ip = WpPropId.property_of_id pid in
+                goal <- Some ip ) ;
+            Wutil.later self#scroll ;
         end
 
     method update = main#rehighlight ()
@@ -232,23 +232,23 @@ class highlighter (main:Design.main_window_extension_points) =
       let buffer = buffer#buffer in
       begin match loc with
         | PStmt( _ , stmt ) | PStmtStart( _ , stmt ) ->
-            begin
-              match effect with
-              | Some(s,_) when Stmt.equal stmt s ->
-                  apply_effect buffer start stop
-              | _ ->
-                  if PATH.mem stmt path then
-                    apply_path buffer start stop
-            end
+          begin
+            match effect with
+            | Some(s,_) when Stmt.equal stmt s ->
+              apply_effect buffer start stop
+            | _ ->
+              if PATH.mem stmt path then
+                apply_path buffer start stop
+          end
         | PIP ip ->
-            begin
-              match goal with
-              | Some g when Property.equal g ip ->
-                  apply_goal buffer start stop
-              | _ ->
-                  if DEPS.mem ip deps then
-                    apply_depend buffer start stop
-            end
+          begin
+            match goal with
+            | Some g when Property.equal g ip ->
+              apply_goal buffer start stop
+            | _ ->
+              if DEPS.mem ip deps then
+                apply_depend buffer start stop
+          end
         | PGlobal _
         | PVDecl _ | PTermLval _ | PLval _ | PExp _ -> ()
       end

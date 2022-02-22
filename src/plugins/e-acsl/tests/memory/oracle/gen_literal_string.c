@@ -36,10 +36,11 @@ void f(void)
                                                   (void *)(& T));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(T + G)";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(T + G)";
     __gen_e_acsl_assert_data_2.file = "literal_string.i";
     __gen_e_acsl_assert_data_2.fct = "f";
     __gen_e_acsl_assert_data_2.line = 11;
+    __gen_e_acsl_assert_data_2.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -143,10 +144,11 @@ int main(void)
                                                   (void *)(& S));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(S + G2)";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(S + G2)";
     __gen_e_acsl_assert_data_2.file = "literal_string.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 25;
+    __gen_e_acsl_assert_data_2.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gen_e_acsl_assert_data.blocking = 1;

@@ -179,3 +179,4 @@
    Application: 2 MB [0x0000-0000-0000, 0x0000-0000-0000]
    Primary    : 2 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
    Secondary  : 2 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+ *** WARNING: Leakedxxxbytes of heap memory in 2 blocks

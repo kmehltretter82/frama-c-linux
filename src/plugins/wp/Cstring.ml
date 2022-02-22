@@ -99,8 +99,8 @@ module LIT = WpContext.Generator(STR)
           begin match s with
             | C_str str -> export_literal prefix lfun str
             | W_str _ ->
-                Wp_parameters.warning ~current:false ~once:true
-                  "Content of wide string literals not exported."
+              Wp_parameters.warning ~current:false ~once:true
+                "Content of wide string literals not exported."
           end ;
         id , F.e_fun lfun []
 

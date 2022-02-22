@@ -190,11 +190,11 @@ let select_goal ~pland ~plor g =
 let rec split_goals ~pland ~plor others ranges = function
   | [] -> List.rev others , List.rev ranges
   | g::gs ->
-      begin
-        match select_goal ~pland ~plor g with
-        | None -> split_goals ~pland ~plor (F.p_bool g::others) ranges gs
-        | Some g' -> split_goals ~pland ~plor others (g'::ranges) gs
-      end
+    begin
+      match select_goal ~pland ~plor g with
+      | None -> split_goals ~pland ~plor (F.p_bool g::others) ranges gs
+      | Some g' -> split_goals ~pland ~plor others (g'::ranges) gs
+    end
 
 let range_goal g' (hs,_) = ["bit-range" , (hs,g')]
 let range_goals gs' (hs,_) = List.map (fun g' -> "bit-range" , (hs,g')) gs'
@@ -226,42 +226,42 @@ class bitrange =
 
     method select feedback = function
       | Clause(Goal p) ->
-          begin
-            let goals =
-              let e = F.e_prop p in
-              match F.repr e with
-              | Qed.Logic.And es -> es
-              | Qed.Logic.Leq _ | Qed.Logic.Lt _ -> [e]
-              | _ -> raise Not_found
-            in
-            let pland = self#get_field (fst positive_land) in
-            let plor = self#get_field (fst positive_lor) in
-            let others,ranges = split_goals ~pland ~plor [] [] goals in
-            if ranges = [] then Tactical.Not_applicable else
-              begin
-                if others = [] then
-                  feedback#set_title "Split & Bit Range(s)"
-                else
-                  feedback#set_title "Bit Range(s)" ;
-                Tactical.Applicable
-                  (fun seq -> other_goals others seq @
-                              range_goals ranges seq)
-              end
-          end
+        begin
+          let goals =
+            let e = F.e_prop p in
+            match F.repr e with
+            | Qed.Logic.And es -> es
+            | Qed.Logic.Leq _ | Qed.Logic.Lt _ -> [e]
+            | _ -> raise Not_found
+          in
+          let pland = self#get_field (fst positive_land) in
+          let plor = self#get_field (fst positive_lor) in
+          let others,ranges = split_goals ~pland ~plor [] [] goals in
+          if ranges = [] then Tactical.Not_applicable else
+            begin
+              if others = [] then
+                feedback#set_title "Split & Bit Range(s)"
+              else
+                feedback#set_title "Bit Range(s)" ;
+              Tactical.Applicable
+                (fun seq -> other_goals others seq @
+                            range_goals ranges seq)
+            end
+        end
       | Inside(Goal p,e) ->
-          begin
-            let g = F.e_prop p in
-            match F.repr g with
-            | Qed.Logic.And es when List.memq e es ->
-                begin
-                  let pland = self#get_field (fst positive_land) in
-                  let plor = self#get_field (fst positive_lor) in
-                  match select_goal ~pland ~plor g with
-                  | Some g' -> Tactical.Applicable(range_goal g')
-                  | None -> Tactical.Not_applicable
-                end
-            | _ -> Tactical.Not_applicable
-          end
+        begin
+          let g = F.e_prop p in
+          match F.repr g with
+          | Qed.Logic.And es when List.memq e es ->
+            begin
+              let pland = self#get_field (fst positive_land) in
+              let plor = self#get_field (fst positive_lor) in
+              match select_goal ~pland ~plor g with
+              | Some g' -> Tactical.Applicable(range_goal g')
+              | None -> Tactical.Not_applicable
+            end
+          | _ -> Tactical.Not_applicable
+        end
       | _ -> Tactical.Not_applicable
   end
 
@@ -290,7 +290,7 @@ class autobitrange =
       let open Qed.Logic in
       match F.e_expr goal with
       | Lt(x,y) | Leq(x,y) when is_bitwised x || is_bitwised y ->
-          push (strategy Tactical.(Clause (Goal goal)))
+        push (strategy Tactical.(Clause (Goal goal)))
       | _ -> ()
   end
 

@@ -217,7 +217,7 @@ struct
   type ('a,'c) evaluation =
     | LValue: (EvalTypes.lval, 'c) Response.t -> (value,'c) evaluation
     | Value: (EvalTypes.exp, 'c) Response.t -> (value,'c) evaluation
-    | Address: (EvalTypes.loc, 'c) Response.t * Cil_types.lval ->
+    | Address: (EvalTypes.loc, 'c) Response.t * Locations.access ->
         (address,'c) evaluation
 
   let get_by_callstack (req : request) :
@@ -308,9 +308,10 @@ struct
     let eval state = A.Eval.evaluate state exp in
     Value (Response.map eval (get req))
 
-  let eval_address lval req =
-    let eval state = A.Eval.lvaluate ~for_writing:false state lval in
-    Address (Response.map eval (get req), lval)
+  let eval_address ~for_writing lval req =
+    let eval state = A.Eval.lvaluate ~for_writing state lval in
+    let access = if for_writing then Locations.Write else Read in
+    Address (Response.map eval (get req), access)
 
   let eval_callee exp req =
     let join = (@)
@@ -347,11 +348,11 @@ struct
 
   let extract_loc :
     type c. (address, c) evaluation ->
-    (A.Loc.location or_bottom, c) Response.t * Cil_types.lval =
+    (A.Loc.location or_bottom, c) Response.t * Locations.access =
     function
-    | Address (r, lval) ->
+    | Address (r, access) ->
       let extract (x, _alarms) = x >>-: (fun (_valuation,loc,_typ) -> loc) in
-      Response.map extract r, lval
+      Response.map extract r, access
 
   let as_location res =
     match A.Loc.get Main_locations.PLoc.key with
@@ -369,22 +370,17 @@ struct
       in
       extract_loc res |> fst |> Response.map_join' extract join |> convert
 
-  let as_zone ~access res =
-    let response_loc, lv = extract_loc res in
-    let is_const_lv = Eva_utils.is_const_write_invalid (Cil.typeOfLval lv) in
-    (* No write effect if [lv] is const *)
-    if access=Locations.Write && is_const_lv
-    then Result.ok Locations.Zone.bottom
-    else
-      match A.Loc.get Main_locations.PLoc.key with
-      | None ->
-        Result.error DisabledDomain
-      | Some get ->
-        let join = Locations.Zone.join
-        and extract loc =
-          loc  >>>-: get >>>-: Precise_locs.enumerate_valid_bits access
-        in
-        response_loc |> Response.map_join' extract join |> convert
+  let as_zone res =
+    match A.Loc.get Main_locations.PLoc.key with
+    | None ->
+      Result.error DisabledDomain
+    | Some get ->
+      let response_loc, access = extract_loc res in
+      let join = Locations.Zone.join
+      and extract loc =
+        loc >>>-: get >>>-: Precise_locs.enumerate_valid_bits access
+      in
+      response_loc |> Response.map_join' extract join |> convert
 
   let is_initialized : type c. (value,c) evaluation -> bool =
     function
@@ -520,9 +516,9 @@ let eval_var vi req = eval_lval (Cil.var vi) req
 
 let eval_exp exp req = Value ((snd @@ build_eval_lval_and_exp ()) exp req)
 
-let eval_address lval req =
+let eval_address ?(for_writing=false) lval req =
   let module M = Make () in
-  let v = M.eval_address lval req in
+  let v = M.eval_address ~for_writing lval req in
   Address
     (module struct
       include M
@@ -601,12 +597,12 @@ let as_location (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
   E.as_location E.v
 
-let as_zone_result ?(access=Locations.Read) (Address lvaluation) =
+let as_zone_result (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
-  E.as_zone ~access E.v
+  E.as_zone E.v
 
-let as_zone ?access address =
-  match as_zone_result ?access address with
+let as_zone address =
+  match as_zone_result address with
   | Ok zone -> zone
   | Error Bottom -> Locations.Zone.bottom
   | Error (Top | DisabledDomain) -> Locations.Zone.top

@@ -137,10 +137,11 @@ void g(void)
       else __gen_e_acsl_and = 0;
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(p)";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(p)";
       __gen_e_acsl_assert_data_2.file = "valid.c";
       __gen_e_acsl_assert_data_2.fct = "g";
       __gen_e_acsl_assert_data_2.line = 24;
+      __gen_e_acsl_assert_data_2.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
@@ -707,10 +708,11 @@ int main(void)
       else __gen_e_acsl_and_21 = 0;
       __gen_e_acsl_assert_data_7.blocking = 1;
       __gen_e_acsl_assert_data_7.kind = "RTE";
-      __gen_e_acsl_assert_data_7.pred_txt = "mem_access: \\valid_read(c)";
+      __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(c)";
       __gen_e_acsl_assert_data_7.file = "valid.c";
       __gen_e_acsl_assert_data_7.fct = "main";
       __gen_e_acsl_assert_data_7.line = 40;
+      __gen_e_acsl_assert_data_7.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and_21,& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
@@ -764,10 +766,11 @@ int main(void)
     else __gen_e_acsl_and_23 = 0;
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "RTE";
-    __gen_e_acsl_assert_data_9.pred_txt = "mem_access: \\valid_read(d)";
+    __gen_e_acsl_assert_data_9.pred_txt = "\\valid_read(d)";
     __gen_e_acsl_assert_data_9.file = "valid.c";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 41;
+    __gen_e_acsl_assert_data_9.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_and_23,& __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
@@ -822,10 +825,11 @@ int main(void)
         else __gen_e_acsl_and_24 = 0;
         __gen_e_acsl_assert_data_11.blocking = 1;
         __gen_e_acsl_assert_data_11.kind = "RTE";
-        __gen_e_acsl_assert_data_11.pred_txt = "mem_access: \\valid_read(d)";
+        __gen_e_acsl_assert_data_11.pred_txt = "\\valid_read(d)";
         __gen_e_acsl_assert_data_11.file = "valid.c";
         __gen_e_acsl_assert_data_11.fct = "main";
         __gen_e_acsl_assert_data_11.line = 41;
+        __gen_e_acsl_assert_data_11.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_and_24,& __gen_e_acsl_assert_data_11);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
@@ -838,10 +842,11 @@ int main(void)
       else __gen_e_acsl_and_25 = 0;
       __gen_e_acsl_assert_data_10.blocking = 1;
       __gen_e_acsl_assert_data_10.kind = "RTE";
-      __gen_e_acsl_assert_data_10.pred_txt = "mem_access: \\valid_read(*d)";
+      __gen_e_acsl_assert_data_10.pred_txt = "\\valid_read(*d)";
       __gen_e_acsl_assert_data_10.file = "valid.c";
       __gen_e_acsl_assert_data_10.fct = "main";
       __gen_e_acsl_assert_data_10.line = 41;
+      __gen_e_acsl_assert_data_10.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and_25,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
@@ -867,10 +872,11 @@ int main(void)
       else __gen_e_acsl_and_26 = 0;
       __gen_e_acsl_assert_data_12.blocking = 1;
       __gen_e_acsl_assert_data_12.kind = "RTE";
-      __gen_e_acsl_assert_data_12.pred_txt = "mem_access: \\valid_read(d)";
+      __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read(d)";
       __gen_e_acsl_assert_data_12.file = "valid.c";
       __gen_e_acsl_assert_data_12.fct = "main";
       __gen_e_acsl_assert_data_12.line = 41;
+      __gen_e_acsl_assert_data_12.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and_26,& __gen_e_acsl_assert_data_12);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,

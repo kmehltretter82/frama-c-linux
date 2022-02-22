@@ -1,5 +1,5 @@
 /* run.config
- PLUGIN: @PTEST_PLUGIN@ scope
+   PLUGIN: @PTEST_PLUGIN@ inout,scope
    STDOPT: +"-metrics-eva-cover -then -main foo"
 */
 void foo () {

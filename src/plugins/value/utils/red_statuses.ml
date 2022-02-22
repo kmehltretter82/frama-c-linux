@@ -64,7 +64,7 @@ module RedStatusesTable =
     (struct
       let name = "Value.Red_statuses.RedStatusesTable"
       let size = 16
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
     end)
 
 let add_red_ap kinstr ap =
