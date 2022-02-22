@@ -22,6 +22,11 @@
 
 open Lattice_bounds
 
+let are_available kf =
+  match Analysis.status kf with
+  | Analyzed (Complete | Partial) -> true
+  | SpecUsed | Builtin _ | Unreachable | Analyzed NoResults -> false
+
 module Callstack = Value_types.Callstack
 
 type callstack = Callstack.t
