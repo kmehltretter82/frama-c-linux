@@ -20,7 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable no-console */
 
 /**
@@ -50,6 +49,7 @@ import {
   shell,
   dialog,
   nativeTheme,
+  Rectangle,
 } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
 import SYS, * as System from 'dome/system';
@@ -65,7 +65,7 @@ import * as Menubar from './menubar';
 // --- System Helpers
 // --------------------------------------------------------------------------
 
-function fstat(p: string) {
+function fstat(p: string): fs.Stats | undefined {
   try {
     return fs.statSync(p);
   } catch (_error) {
@@ -97,7 +97,7 @@ nativeTheme.on('updated', () => {
   broadcast('dome.theme.updated');
 });
 
-function setNativeTheme(theme: string | undefined) {
+function setNativeTheme(theme: string | undefined): void {
   switch (theme) {
     case 'dark':
     case 'light':
@@ -113,7 +113,13 @@ function setNativeTheme(theme: string | undefined) {
 // --- Settings
 // --------------------------------------------------------------------------
 
-function loadSettings(file: string) {
+type json =
+  | undefined | null | boolean | number | string
+  | { [key: string]: json };
+type Store = { [key: string]: json };
+type Frame = { x: number, y: number, width: number, height: number };
+
+function loadSettings(file: string): Store {
   try {
     if (!fstat(file))
       return {};
@@ -125,7 +131,7 @@ function loadSettings(file: string) {
   }
 }
 
-function saveSettings(file: string, data = {}) {
+function saveSettings(file: string, data: Store = {}): void {
   try {
     const text = JSON.stringify(data, undefined, DEVEL ? 2 : 0);
     fs.writeFileSync(file, text, { encoding: 'utf8' });
@@ -144,7 +150,7 @@ const APP_DIR = app.getPath('userData');
 const PATH_WINDOW_SETTINGS = path.join(APP_DIR, 'WindowSettings.json');
 const PATH_GLOBAL_SETTINGS = path.join(APP_DIR, 'GlobalSettings.json');
 
-function saveGlobalSettings() {
+function saveGlobalSettings(): void {
   try {
     if (!fstat(APP_DIR)) fs.mkdirSync(APP_DIR);
     saveSettings(PATH_GLOBAL_SETTINGS, GlobalSettings);
@@ -153,7 +159,7 @@ function saveGlobalSettings() {
   }
 }
 
-function obtainGlobalSettings() {
+function obtainGlobalSettings(): Store {
   if (_.isEmpty(GlobalSettings)) {
     GlobalSettings = loadSettings(PATH_GLOBAL_SETTINGS);
   }
@@ -164,12 +170,10 @@ function obtainGlobalSettings() {
 // --- Window Settings & Frames
 // --------------------------------------------------------------------------
 
-type Store = { [key: string]: unknown };
-
 interface Handle {
   primary: boolean; // Primary window
   window: BrowserWindow; // Also prevents Gc
-  frame: Electron.Rectangle; // Window frame
+  frame: Electron.Rectangle | undefined; // Window frame
   devtools: boolean; // Developper tools visible
   reloaded: boolean; // Reloaded window
   config: string; // Path to config file
@@ -179,9 +183,29 @@ interface Handle {
 
 const WindowHandles = new Map<number, Handle>(); // Indexed by *webContents* id
 
-function saveWindowConfig(handle: Handle) {
-  const configData = {
-    frame: handle.frame,
+function jInt(v: json): number {
+  return _.toSafeInteger(v);
+}
+
+function jFrame(obj: json | Rectangle): Frame | undefined {
+  if (obj && typeof (obj) === 'object')
+    return {
+      x: jInt(obj.x),
+      y: jInt(obj.y),
+      width: jInt(obj.width),
+      height: jInt(obj.height),
+    };
+  return undefined;
+}
+
+function jStore(obj: json): Store {
+  return obj !== null && typeof (obj) === 'object' ? obj : {};
+}
+
+function saveWindowConfig(handle: Handle): void {
+  const frame = jFrame(handle.frame);
+  const configData: Store = {
+    frame,
     settings: handle.settings,
     storage: handle.storage,
     devtools: handle.devtools,
@@ -189,7 +213,7 @@ function saveWindowConfig(handle: Handle) {
   saveSettings(handle.config, configData);
 }
 
-function windowSyncSettings(event: IpcMainEvent) {
+function windowSyncSettings(event: IpcMainEvent): void {
   const handle = WindowHandles.get(event.sender.id);
   event.returnValue = {
     globals: obtainGlobalSettings(),
@@ -209,9 +233,9 @@ function applyThemeSettings(settings: Store) {
 // --- Patching Settings
 // --------------------------------------------------------------------------
 
-type Patch = { key: string; value: unknown };
+type Patch = { key: string; value: json };
 
-function applyPatches(data: Store, args: Patch[]) {
+function applyPatches(data: Store, args: Patch[]): void {
   args.forEach(({ key, value }) => {
     if (value === null) {
       delete data[key];
@@ -221,7 +245,7 @@ function applyPatches(data: Store, args: Patch[]) {
   });
 }
 
-function applyWindowSettings(event: IpcMainEvent, args: Patch[]) {
+function applyWindowSettings(event: IpcMainEvent, args: Patch[]): void {
   const handle = WindowHandles.get(event.sender.id);
   if (handle) {
     applyPatches(handle.settings, args);
@@ -229,7 +253,7 @@ function applyWindowSettings(event: IpcMainEvent, args: Patch[]) {
   }
 }
 
-function applyStorageSettings(event: IpcMainEvent, args: Patch[]) {
+function applyStorageSettings(event: IpcMainEvent, args: Patch[]): void {
   const handle = WindowHandles.get(event.sender.id);
   if (handle) {
     applyPatches(handle.storage, args);
@@ -237,7 +261,7 @@ function applyStorageSettings(event: IpcMainEvent, args: Patch[]) {
   }
 }
 
-function applyGlobalSettings(event: IpcMainEvent, args: Patch[]) {
+function applyGlobalSettings(event: IpcMainEvent, args: Patch[]): void {
   const settings: Store = obtainGlobalSettings();
   applyPatches(settings, args);
   applyThemeSettings(settings);
@@ -258,7 +282,7 @@ ipcMain.on('dome.ipc.settings.storage', applyStorageSettings);
 // --- Renderer-Process Communication
 // --------------------------------------------------------------------------
 
-function broadcast(event: string, ...args: unknown[]) {
+function broadcast(event: string, ...args: unknown[]): void {
   BrowserWindow.getAllWindows().forEach((w) => {
     w.webContents.send(event, ...args);
   });
@@ -274,16 +298,16 @@ const MODIFIED = '(*) ';
 /**
    Sets application window name
  */
-export function setName(title: string) {
+export function setName(title: string): void {
   appName = title;
 }
 
-function setTitle(event: IpcMainEvent, title: string) {
+function setTitle(event: IpcMainEvent, title: string): void {
   const handle = WindowHandles.get(event.sender.id);
   if (handle) handle.window.setTitle(title || appName);
 }
 
-function setModified(event: IpcMainEvent, modified: boolean) {
+function setModified(event: IpcMainEvent, modified: boolean): void {
   const handle = WindowHandles.get(event.sender.id);
   if (handle) {
     const w = handle.window;
@@ -303,7 +327,7 @@ function setModified(event: IpcMainEvent, modified: boolean) {
 ipcMain.on('dome.ipc.window.title', setTitle);
 ipcMain.on('dome.ipc.window.modified', setModified);
 
-function getURL() {
+function getURL(): string {
   if (DEVEL)
     return `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
   if (LOCAL)
@@ -328,7 +352,7 @@ function navigateURL(sender: Electron.WebContents) {
 // --- Lookup for config file
 // --------------------------------------------------------------------------
 
-function lookupConfig(pwd = '.') {
+function lookupConfig(pwd = '.'): string {
   const wdir = path.resolve(pwd);
   let cwd = wdir;
   const cfg = `.${appName.toLowerCase()}`;
@@ -353,7 +377,7 @@ function createBrowserWindow(
   config: BrowserWindowConstructorOptions,
   argv?: string[],
   wdir?: string,
-) {
+): BrowserWindow {
 
   const isAppWindow = (argv !== undefined && wdir !== undefined);
 
@@ -375,13 +399,16 @@ function createBrowserWindow(
   const configFile = isAppWindow ? lookupConfig(wdir) : PATH_WINDOW_SETTINGS;
   const configData = loadSettings(configFile);
 
-  const { frame, devtools, settings = {}, storage = {} } = configData;
+  const frame = jFrame(configData.frame);
+  const settings = jStore(configData.settings);
+  const storage = jStore(configData.storage);
+  const devtools = !!configData.devtools;
+
   if (frame) {
-    const getInt = <A>(v: A) => v && _.toSafeInteger(v);
-    options.x = getInt(frame.x);
-    options.y = getInt(frame.y);
-    options.width = getInt(frame.width);
-    options.height = getInt(frame.height);
+    options.x = frame.x;
+    options.y = frame.y;
+    options.width = frame.width;
+    options.height = frame.height;
   }
 
   const theWindow = new BrowserWindow(options);
@@ -468,11 +495,11 @@ function createBrowserWindow(
 // --- Application Window(s) & Command Line
 // --------------------------------------------------------------------------
 
-function stripElectronArgv(argv: string[]) {
+function stripElectronArgv(argv: string[]): string[] {
   return argv.slice(DEVEL ? 3 : (LOCAL ? 2 : 1)).filter((p) => !!p);
 }
 
-function createPrimaryWindow() {
+function createPrimaryWindow(): void {
   // Initialize Menubar
   Menubar.install();
 
@@ -511,7 +538,7 @@ function createSecondaryWindow(
   }
 }
 
-function createDesktopWindow() {
+function createDesktopWindow(): void {
   const wdir = app.getPath('home');
   const title = `${appName} #${++appCount}`;
   createBrowserWindow(false, { title }, [], wdir);
@@ -521,7 +548,7 @@ function createDesktopWindow() {
 // --- Activate Windows (macOS)
 // --------------------------------------------------------------------------
 
-function activateWindows() {
+function activateWindows(): void {
   let isFocused = false;
   let toFocus: BrowserWindow | undefined;
   BrowserWindow.getAllWindows().forEach((w) => {
@@ -544,7 +571,7 @@ function activateWindows() {
 
 let PreferenceWindow: BrowserWindow | undefined;
 
-function showSettingsWindow() {
+function showSettingsWindow(): void {
   if (!PreferenceWindow)
     PreferenceWindow = createBrowserWindow(
       false, {
@@ -560,7 +587,7 @@ function showSettingsWindow() {
   PreferenceWindow.on('closed', () => { PreferenceWindow = undefined; });
 }
 
-function restoreDefaultSettings() {
+function restoreDefaultSettings(): void {
   GlobalSettings = {};
   nativeTheme.themeSource = 'system';
   if (DEVEL) saveGlobalSettings();
@@ -592,7 +619,7 @@ ipcMain.on('dome.app.paths', (event) => {
 // --------------------------------------------------------------------------
 
 /** Starts the main process. */
-export function start() {
+export function start(): void {
 
   // Workaround to recover the original commandline of a second instance
   // after chromium messes with the argument order.
@@ -633,21 +660,21 @@ export function start() {
 /**
    Define a custom main window menu.
 */
-export function addMenu(label: string) {
+export function addMenu(label: string): void {
   Menubar.addMenu(label);
 }
 
 /**
    Define a custom menu item.
 */
-export function addMenuItem(spec: Menubar.CustomMenuItemSpec) {
+export function addMenuItem(spec: Menubar.CustomMenuItemSpec): void {
   Menubar.addMenuItem(spec);
 }
 
 /**
    Update a menu item.
 */
-export function setMenuItem(spec: Menubar.CustomMenuItem) {
+export function setMenuItem(spec: Menubar.CustomMenuItem): void {
   Menubar.setMenuItem(spec);
 }
 
