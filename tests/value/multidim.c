@@ -169,6 +169,20 @@ void main8(void) {
   Frama_C_domain_show_each(t);
 }
 
+void main9(void) {
+  int t1[10], t2[10];
+  //@ eva_domain_scope multidim,t1;
+
+  for (int i = 0 ; i < 10 ; i++) {
+    //@ eva_domain_scope multidim,i;
+    t1[i] = 0;
+    t2[i] = 0;
+  }
+
+  Frama_C_domain_show_each(t1, t2);
+}
+
+
 void main(s x) {
   main1(x);
   main2();
@@ -178,4 +192,5 @@ void main(s x) {
   main6();
   main7();
   main8();
+  main9();
 }
