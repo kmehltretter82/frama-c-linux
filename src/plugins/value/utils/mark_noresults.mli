@@ -22,6 +22,3 @@
 
 (** Are the states of the function analysis saved? *)
 val should_memorize_function: Cil_types.fundec -> bool
-
-(** Signal that some analysis results are not stored. *)
-val no_memoization_enabled: unit -> bool

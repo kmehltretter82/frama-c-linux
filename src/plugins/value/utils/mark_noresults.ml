@@ -29,13 +29,6 @@ let () = Db.Value.no_results :=
     (fun fd -> not (should_memorize_function fd)
                || not (Parameters.Domains.mem "cvalue"))
 
-(* Signal that some results are not stored. The gui, or some calls to
-   Db.Value, may fail ungracefully *)
-let no_memoization_enabled () =
-  not (Parameters.ResultsAll.get ()) ||
-  not (Parameters.NoResultsFunctions.is_empty ())
-
-
 
 (*
 Local Variables:
