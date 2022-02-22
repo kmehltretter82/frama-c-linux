@@ -161,13 +161,13 @@ libc_defined_functions, libc_specified_functions = get_framac_libc_function_stat
     framac, framac_share
 )
 
-with open(framac_share / "compliance" / "c11_functions.json") as f:
+with open(framac_share / "compliance" / "c11_functions.json", encoding="utf-8") as f:
     c11_functions = json.load(f)["data"]
 
-with open(framac_share / "compliance" / "c11_headers.json") as f:
+with open(framac_share / "compliance" / "c11_headers.json", encoding="utf-8") as f:
     c11_headers = json.load(f)["data"]
 
-with open(framac_share / "compliance" / "posix_identifiers.json") as f:
+with open(framac_share / "compliance" / "posix_identifiers.json", encoding="utf-8") as f:
     all_data = json.load(f)
     posix_identifiers = all_data["data"]
     posix_headers = all_data["headers"]
