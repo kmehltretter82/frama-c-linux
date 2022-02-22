@@ -36,3 +36,14 @@ type analysis_target =
     Also registers the call in tables for the functions below. *)
 val define_analysis_target:
    ?recursion_depth:int -> kinstr -> kernel_function -> analysis_target
+
+
+(** Returns true if the function has been analyzed. *)
+val is_called: kernel_function -> bool
+
+(** Returns the list of inferred callers of the given function. *)
+val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
+
+(** Returns the list of inferred callers, and for each of them, the list
+    of callsites (the call statements) inside. *)
+val callsites: kernel_function -> (kernel_function * stmt list) list

@@ -670,10 +670,6 @@ let is_bottom : type a. a evaluation -> bool =
     let module L = (val lvaluation : Lvaluation) in
     L.is_bottom L.v
 
-let is_called kf =
-  let module M = Make () in
-  M.is_reachable (at_start_of kf)
-
 let is_reachable stmt =
   let module M = Make () in
   M.is_reachable (before stmt)
@@ -686,29 +682,9 @@ let condition_truth_value = Db.Value.condition_truth_value
 
 (* Callers / callsites *)
 
-let callers kf =
-  let f = function
-    | [] | [_] -> None
-    | _ :: (caller,_) :: _-> Some caller
-  in
-  at_start_of kf |> callstacks |>
-  List.filter_map f |> List.sort_uniq Kernel_function.compare
-
-let uniq_sites = List.sort_uniq Cil_datatype.Stmt.compare
-
-let callsites kf =
-  let module Map = Kernel_function.Map in
-  let f acc = function
-    | [] | (_,Cil_types.Kglobal) :: _ -> acc
-    | [(_,Kstmt _)] -> assert false (* End of callstacks should have no callsite *)
-    | (_kf,Kstmt stmt) :: (caller,_) :: _ -> (* kf = _kf *)
-      Map.update caller
-        (fun old -> Some (stmt :: Option.value ~default:[] old)) acc
-  in
-  at_start_of kf |> callstacks |>
-  List.fold_left f Map.empty |> Map.to_seq |> List.of_seq |>
-  List.map (fun (kf,sites) -> kf, uniq_sites sites)
-
+let is_called = Function_calls.is_called
+let callers = Function_calls.callers
+let callsites = Function_calls.callsites
 
 (* Result conversion *)
 

@@ -56,6 +56,20 @@ let register_call kinstr kf =
     let add _kf = Kernel_function.Map.singleton caller callsite in
     ignore (Callers.memo ~change add kf)
 
+let is_called = Callers.mem
+
+let callers kf =
+  try
+    let calls = Kernel_function.Map.bindings (Callers.find kf) in
+    List.map fst calls
+  with Not_found -> []
+
+let callsites kf =
+  try
+    let calls = Kernel_function.Map.bindings (Callers.find kf) in
+    List.map (fun (kf, set) -> kf, StmtSet.elements set) calls
+  with Not_found -> []
+
 
 type analysis_target =
   [ `Builtin of string * Builtins.builtin * cacheable * funspec
