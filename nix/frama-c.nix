@@ -81,7 +81,6 @@ stdenv.mkDerivation rec {
   postInstall = ''
     mkdir -p $build_dir
     tar -cf $build_dir/dir.tar .
-    pwd > $build_dir/old_pwd
   '';
 
   meta = {
