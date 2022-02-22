@@ -3220,10 +3220,9 @@ let parseIntAux (str:string) =
     else if hasSuffix "U" then
       1, [IUInt; IULong; IULongLong]
     else
-      0, if octalhexbin || true (* !!! This is against the ISO but it
-                                 * is what GCC and MSVC do !!! *)
+      0, if octalhexbin
       then [IInt; IUInt; ILong; IULong; ILongLong; IULongLong]
-      else [IInt; ILong; IUInt; ILongLong]
+      else [IInt; ILong; ILongLong]
   in
   (* Convert to integer. To prevent overflow we do the arithmetic
    * on Big_int and we take care of overflow. We work only with
