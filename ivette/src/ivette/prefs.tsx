@@ -34,23 +34,13 @@ import * as Dome from 'dome';
 import * as Themes from 'dome/themes';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Settings from 'dome/data/settings';
-import { IconButton } from 'dome/controls/buttons';
 import 'codemirror/mode/clike/clike';
-
-// --------------------------------------------------------------------------
-// --- AST View Preferences
-// --------------------------------------------------------------------------
-
-export const AstFontSize = new Settings.GNumber('ASTview.fontSize', 12);
-export const AstWrapText = new Settings.GFalse('ASTview.wrapText');
-export const SourceFontSize = new Settings.GNumber('SourceCode.fontSize', 12);
-export const SourceWrapText = new Settings.GFalse('SourceCode.wrapText');
 
 /* -------------------------------------------------------------------------- */
 /* --- Theme Switcher Button                                              --- */
 /* -------------------------------------------------------------------------- */
 
-export function ThemeSwitch(): JSX.Element {
+export function ThemeSwitchTool(): JSX.Element {
   const [theme, setTheme] = Themes.useColorTheme();
   const other = theme === 'dark' ? 'light' : 'dark';
   const position = theme === 'dark' ? 'left' : 'right';
@@ -66,70 +56,40 @@ export function ThemeSwitch(): JSX.Element {
   );
 }
 
-// --------------------------------------------------------------------------
-// --- Editor Icon Buttons
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* --- Font Size Buttons Group                                            --- */
+/* -------------------------------------------------------------------------- */
 
-export interface EditorProps {
-  fontSize: Settings.GlobalSettings<number>;
-  wrapText: Settings.GlobalSettings<boolean>;
-  disabled?: boolean;
-}
-
-export interface EditorControls {
-  buttons: React.ReactNode;
-  fontSize: number;
-  wrapText: boolean;
-}
-
-export function useEditorButtons(props: EditorProps): EditorControls {
-  const { disabled = false } = props;
-  const [fontSize, setFontSize] = Settings.useGlobalSettings(props.fontSize);
-  const [wrapText, setWrapText] = Settings.useGlobalSettings(props.wrapText);
+export function FontTools(): JSX.Element {
+  const [fontSize, setFontSize] = Settings.useGlobalSettings(EditorFontSize);
   const zoomIn = (): void => setFontSize(fontSize + 2);
   const zoomOut = (): void => setFontSize(fontSize - 2);
-  const flipWrapText = (): void => setWrapText(!wrapText);
-  return {
-    fontSize,
-    wrapText,
-    buttons: [
-      <IconButton
-        key="zoom.out"
+  return (
+    <Toolbar.ButtonGroup>
+      <Toolbar.Button
         icon="ZOOM.OUT"
         onClick={zoomOut}
         enabled={fontSize > 4}
-        disabled={disabled}
         title="Decrease font size"
-      />,
-      <IconButton
-        key="zoom.in"
+      />
+      <Toolbar.Button
         icon="ZOOM.IN"
         onClick={zoomIn}
         enabled={fontSize < 48}
-        disabled={disabled}
         title="Increase font size"
-      />,
-      <IconButton
-        key="wrap"
-        icon="WRAPTEXT"
-        selected={wrapText}
-        disabled={disabled}
-        onClick={flipWrapText}
-        title="Wrap text"
-      />,
-    ],
-  };
+      />
+    </Toolbar.ButtonGroup>
+  );
 }
 
 // --------------------------------------------------------------------------
-// --- Editor configuration
+// --- AST View Preferences
 // --------------------------------------------------------------------------
+
+export const EditorFontSize =
+  new Settings.GNumber('Editor.fontSize', 12);
 
 export const EditorCommand =
   new Settings.GString('Editor.Command', 'emacs +%n:%c %s');
-
-export interface EditorCommandProps {
-  command: Settings.GlobalSettings<string>;
-}
 
 // --------------------------------------------------------------------------

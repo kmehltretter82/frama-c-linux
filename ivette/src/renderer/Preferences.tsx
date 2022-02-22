@@ -69,51 +69,34 @@ function ThemeFields(): JSX.Element {
 // --- Editor Fields
 // --------------------------------------------------------------------------
 
-interface EditorFieldProps extends IvettePrefs.EditorProps {
-  target: string;
-}
-
-function EditorFields(props: EditorFieldProps) {
+function EditorFields() {
   const fontsize = Forms.useValid(
-    Settings.useGlobalSettings(props.fontSize),
+    Settings.useGlobalSettings(IvettePrefs.EditorFontSize)
   );
-  const wraptext = Forms.useValid(
-    Settings.useGlobalSettings(props.wrapText),
-  );
-  const { target } = props;
+  const cmd = Forms.useDefined(Forms.useValid(
+    Settings.useGlobalSettings(IvettePrefs.EditorCommand)
+  ));
+  const titleCmd =
+    'Command to open an external editor on Ctrl-click in the source code view.'
+    + '\nUse %s for the file name, %n for the line number'
+    + ' and %c for the selected character.';
   return (
     <>
       <Forms.SliderField
         state={fontsize}
         label="Font Size"
-        title={`Set the font size of ${target}`}
+        title={`Set the font size of editors`}
         min={8}
         max={32}
         step={2}
       />
-      <Forms.CheckboxField
-        state={wraptext}
-        label="Wrap Text"
-        title={`Set long line wrapping mode of ${target}`}
+      <Forms.TextCodeField
+        state={cmd}
+        label="Command"
+        title={titleCmd}
       />
     </>
   );
-}
-
-
-
-// --------------------------------------------------------------------------
-// --- Editor Command Forms
-// --------------------------------------------------------------------------
-function EditorCommandFields(props: IvettePrefs.EditorCommandProps) {
-  const cmd = Forms.useDefined(Forms.useValid(
-    Settings.useGlobalSettings(props.command),
-  ));
-  const title =
-    'Command to open an external editor on Ctrl-click in the source code view.'
-    + '\nUse %s for the file name, %n for the line number'
-    + ' and %c for the selected character.';
-  return (<Forms.TextCodeField state={cmd} label="Command" title={title} />);
 }
 
 // --------------------------------------------------------------------------
@@ -126,22 +109,8 @@ export default function Preferences() {
       <Forms.Section label="Theme" unfold>
         <ThemeFields />
       </Forms.Section>
-      <Forms.Section label="AST View" unfold>
-        <EditorFields
-          target="Internal AST"
-          fontSize={IvettePrefs.AstFontSize}
-          wrapText={IvettePrefs.AstWrapText}
-        />
-      </Forms.Section>
-      <Forms.Section label="Source View" unfold>
-        <EditorFields
-          target="Source Code"
-          fontSize={IvettePrefs.SourceFontSize}
-          wrapText={IvettePrefs.SourceWrapText}
-        />
-      </Forms.Section>
-      <Forms.Section label="Editor Command" unfold>
-        <EditorCommandFields command={IvettePrefs.EditorCommand} />
+      <Forms.Section label="Editors" unfold>
+        <EditorFields />
       </Forms.Section>
     </Forms.Page>
   );

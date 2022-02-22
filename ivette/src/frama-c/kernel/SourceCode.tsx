@@ -79,13 +79,8 @@ export default function SourceCode(): JSX.Element {
   const line = sloc ? sloc.line : 0;
   const filename = Path.parse(file).base;
 
-  // Title bar buttons, along with the parameters for our text.
-  const { buttons: editorButtons, fontSize, wrapText } =
-    Preferences.useEditorButtons({
-      fontSize: Preferences.SourceFontSize,
-      wrapText: Preferences.AstWrapText,
-      disabled: !theFunction,
-    });
+  // Global Font Size
+  const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
 
   // Updating the buffer content.
   const text = React.useMemo(async () => {
@@ -194,15 +189,13 @@ export default function SourceCode(): JSX.Element {
           onClick={launchEditor}
           title={externalEditorTitle}
         />
-        <Code title={file} style={{ padding: '5px' }}>{filename}</Code>
+        <Code title={file}>{filename}</Code>
         <Hfill />
-        {editorButtons}
       </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
         fontSize={fontSize}
-        lineWrapping={wrapText}
         selection={theMarker}
         lineNumbers={!!theFunction}
         styleActiveLine={!!theFunction}

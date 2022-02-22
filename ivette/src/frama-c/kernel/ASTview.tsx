@@ -35,8 +35,8 @@ import * as Utils from 'frama-c/utils';
 import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
+import * as Settings from 'dome/data/settings';
 
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Properties from 'frama-c/kernel/api/properties';
@@ -164,12 +164,7 @@ export default function ASTview() {
   const multipleSelections = selection?.multiple.allSelections;
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
-  const { buttons: editorButtons, fontSize, wrapText } =
-    Preferences.useEditorButtons({
-      fontSize: Preferences.AstFontSize,
-      wrapText: Preferences.AstWrapText,
-      disabled: !theFunction,
-    });
+  const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
 
   const markersInfo = States.useSyncArray(Ast.markerInfo);
   const deadCode = States.useRequest(getDeadCode, theFunction);
@@ -303,14 +298,10 @@ export default function ASTview() {
   // Component
   return (
     <>
-      <TitleBar>
-        {editorButtons}
-      </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
         fontSize={fontSize}
-        lineWrapping={wrapText}
         selection={theMarker}
         onSelection={onSelection}
         onContextMenu={onContextMenu}
