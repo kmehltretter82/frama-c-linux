@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Kernel    [2022-02-22] Fix list of potential types for decimal
+              integer literal constants
 *   Kernel    [2022-02-17] Reject programs using unsupported
               vector_size attribute (fixes ##2573)
 *   Kernel    [2022-02-08] Reject array whose size is too big with a proper
