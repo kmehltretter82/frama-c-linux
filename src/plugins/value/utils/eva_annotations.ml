@@ -414,6 +414,11 @@ module DomainScope = Register (struct
           begin match context.Logic_typing.find_var v with
             | {lv_origin=Some vi} -> vi
             | _ -> raise Parse_error
+            | exception Not_found ->
+              Kernel.warning ~wkey:Kernel.wkey_annot_error
+                ~once:true ~current:true
+                "cannot find variable %s at this point" v;
+              raise Parse_error
           end
         | _ -> raise Parse_error
       in
