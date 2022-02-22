@@ -1,4 +1,5 @@
 /* run.config
+   PLUGIN: @PTEST_PLUGIN@ inout
    STDOPT: +"-metrics-eva-cover"
 **/
 

@@ -1,5 +1,5 @@
 /*run.config
-PLUGIN: eva, scope
+PLUGIN: eva,inout,scope
  OPT: -print -eva @EVA_CONFIG@
  */
 #define IP_FIELD 4

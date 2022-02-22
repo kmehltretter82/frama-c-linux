@@ -1,5 +1,5 @@
 [kernel] Parsing func_ptr.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] func_ptr.c:28: Warning: 
+[kernel:typing:implicit-function-declaration] func_ptr.c:29: Warning: 
   Calling undeclared function exit. Old style K&R code?
 [metrics] Defined functions (4)
   =====================

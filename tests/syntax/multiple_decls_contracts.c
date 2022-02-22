@@ -1,7 +1,7 @@
 /* run.config
-OPT: @PTEST_SHARE_DIR@/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -cpp-extra-args="-I@PTEST_SHARE_DIR@/libc" -print
-OPT: @PTEST_FILE@ @PTEST_SHARE_DIR@/libc/string.h @PTEST_FILE@ -cpp-extra-args="-I@PTEST_SHARE_DIR@/libc" -print
-OPT: @PTEST_FILE@ @PTEST_FILE@ @PTEST_SHARE_DIR@/libc/string.h -cpp-extra-args="-I@PTEST_SHARE_DIR@/libc" -print
+OPT: @FRAMAC_SHARE@/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -cpp-extra-args="-I@FRAMAC_SHARE@/libc" -print
+OPT: @PTEST_FILE@ @FRAMAC_SHARE@/libc/string.h @PTEST_FILE@ -cpp-extra-args="-I@FRAMAC_SHARE@/libc" -print
+OPT: @PTEST_FILE@ @PTEST_FILE@ @FRAMAC_SHARE@/libc/string.h -cpp-extra-args="-I@FRAMAC_SHARE@/libc" -print
 */
 
 #include "string.h"

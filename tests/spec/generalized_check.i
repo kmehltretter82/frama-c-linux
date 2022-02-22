@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: eva,scope
+PLUGIN: eva,inout,scope
     OPT: -eva -eva-use-spec f
 PLUGIN:
     OPT: -print
