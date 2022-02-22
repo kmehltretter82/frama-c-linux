@@ -61,7 +61,7 @@ const NativeThemeUpdated = new Dome.Event('dome.theme.updated');
 ipcRenderer.on('dome.theme.updated', () => NativeThemeUpdated.emit());
 
 async function getNativeTheme(): Promise<ColorTheme> {
-  const th = await ipcRenderer.invoke('dome.ipc.theme.getDefault');
+  const th = await ipcRenderer.invoke('dome.ipc.theme');
   return jColorTheme(th);
 }
 
@@ -72,20 +72,12 @@ async function getNativeTheme(): Promise<ColorTheme> {
 export function useColorTheme(): [ColorTheme, (upd: ColorSettings) => void] {
   Dome.useUpdate(NativeThemeUpdated);
   const { result: current } = Dome.usePromise(getNativeTheme());
-  const [pref, setPref] = Settings.useGlobalSettings(ColorThemeSettings);
-  const setTheme = (upd: ColorSettings): void => {
-    setPref(upd);
-    ipcRenderer.invoke('dome.ipc.theme.setSource', upd);
-  };
+  const [pref, setTheme] = Settings.useGlobalSettings(ColorThemeSettings);
   return [current ?? jColorTheme(pref), setTheme];
 }
 
 export function useColorThemeSettings(): State<ColorSettings> {
-  const [pref, setPref] = Settings.useGlobalSettings(ColorThemeSettings);
-  const setTheme = (upd: ColorSettings): void => {
-    setPref(upd);
-    ipcRenderer.invoke('dome.ipc.theme.setSource', upd);
-  };
+  const [pref, setTheme] = Settings.useGlobalSettings(ColorThemeSettings);
   return [jColorSettings(pref), setTheme];
 }
 

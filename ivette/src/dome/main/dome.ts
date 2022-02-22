@@ -86,6 +86,30 @@ export const { DEVEL } = System;
 export const { platform } = System;
 
 // --------------------------------------------------------------------------
+// --- Native Theme
+// --------------------------------------------------------------------------
+
+ipcMain.handle('dome.ipc.theme', () => {
+  return nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
+});
+
+nativeTheme.on('updated', () => {
+  broadcast('dome.theme.updated');
+});
+
+function setNativeTheme(theme: string | undefined) {
+  switch (theme) {
+    case 'dark':
+    case 'light':
+    case 'system':
+      nativeTheme.themeSource = theme;
+      return;
+    default:
+      console.warn('[dome] unknown theme', theme);
+  }
+}
+
+// --------------------------------------------------------------------------
 // --- Settings
 // --------------------------------------------------------------------------
 
@@ -208,7 +232,10 @@ function applyStorageSettings(event: IpcMainEvent, args: Patch[]) {
 }
 
 function applyGlobalSettings(event: IpcMainEvent, args: Patch[]) {
-  applyPatches(obtainGlobalSettings(), args);
+  const settings: Store = obtainGlobalSettings();
+  applyPatches(settings, args);
+  const theme = settings['dome-color-theme'];
+  if (typeof (theme) === 'string') setNativeTheme(theme);
   BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
     const contents = w.webContents;
     if (contents.id !== event.sender.id) {
@@ -513,6 +540,7 @@ function showSettingsWindow() {
 
 function restoreDefaultSettings() {
   GlobalSettings = {};
+  nativeTheme.themeSource = 'system';
   if (DEVEL) saveGlobalSettings();
 
   WindowHandles.forEach((handle) => {
@@ -618,30 +646,5 @@ ipcMain.handle(
   'dome.dialog.showSaveDialog',
   (_evt, props) => dialog.showSaveDialog(props),
 );
-
-// --------------------------------------------------------------------------
-// --- Native Theme
-// --------------------------------------------------------------------------
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-ipcMain.handle('dome.ipc.theme.setSource', (_evt, theme) => {
-  switch (theme) {
-    case 'dark':
-    case 'light':
-    case 'system':
-      nativeTheme.themeSource = theme;
-      return;
-    default:
-      console.warn('[dome] unknown theme', theme);
-  }
-});
-
-ipcMain.handle('dome.ipc.theme.getDefault', () => {
-  return nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
-});
-
-nativeTheme.on('updated', () => {
-  broadcast('dome.theme.updated');
-});
 
 // --------------------------------------------------------------------------
