@@ -1,0 +1,41 @@
+{ lib
+, stdenv
+, frama-c
+, perl
+, time
+, which
+}:
+
+stdenv.mkDerivation rec {
+  pname = "main-tests";
+  version = frama-c.version;
+  slang = frama-c.slang;
+
+  build_dir = frama-c.build_dir;
+  src = build_dir + "/dir.tar";
+  sourceRoot = ".";
+
+  buildInputs = frama-c.buildInputs ++ [
+    frama-c
+    perl
+    time
+    which
+  ];
+
+  # Keep main configuration
+  configurePhase = ''
+    true
+  '';
+
+  buildPhase = ''
+    make ptests/ptests.exe
+    make ptests/wtests.exe
+    dune exec --root ptests -- frama-c-ptests tests
+    dune build -j1 --display short @tests/ptests
+  '';
+
+  # No installation required
+  installPhase = ''
+    touch $out
+  '';
+}

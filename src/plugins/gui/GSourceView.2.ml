@@ -24,13 +24,13 @@
 include GSourceView2
 
 let make_marker_attributes
-  ~(source:source_view)
-  ~(category:string)
-  ~(priority: int)
-  ?(background: Gdk.color option)
-  ?(pixbuf:GdkPixbuf.pixbuf option)
-  ?(icon_name:string option)
-  () =
+    ~(source:source_view)
+    ~(category:string)
+    ~(priority: int)
+    ?(background: Gdk.color option)
+    ?(pixbuf:GdkPixbuf.pixbuf option)
+    ?(icon_name:string option)
+    () =
   ignore icon_name; (* not in lablgtk2. *)
   source#set_mark_category_priority ~category priority;
   source#set_mark_category_pixbuf ~category pixbuf;

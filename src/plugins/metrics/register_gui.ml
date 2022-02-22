@@ -149,7 +149,7 @@ module CyclomaticMetricsGUI = struct
         match localizable with
         | PVDecl (Some kf, _,_) ->
           let callback1 () =
-           Metrics__Metrics_parameters.debug "cyclo_selector - callback";
+            Metrics__Metrics_parameters.debug "cyclo_selector - callback";
             self#display_localizable localizable  ()
           in
           let callback2 () =

@@ -35,13 +35,13 @@ let print_config () =
           Fc_config.version_and_codename
           (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.datadirs))
           (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.plugin_dir))
-        (fun fmt ->
-          if Fc_config.preprocessor = "" then
-            Format.fprintf fmt "@\nWarning: no default pre-processor"
-          else if not Fc_config.preprocessor_keep_comments then
-            Format.fprintf fmt
-              "@\nWarning: default pre-processor is not able to keep comments \
-               (hence ACSL annotations) in its output")
+          (fun fmt ->
+             if Fc_config.preprocessor = "" then
+               Format.fprintf fmt "@\nWarning: no default pre-processor"
+             else if not Fc_config.preprocessor_keep_comments then
+               Format.fprintf fmt
+                 "@\nWarning: default pre-processor is not able to keep comments \
+                  (hence ACSL annotations) in its output")
         ;
       );
     raise Cmdline.Exit

@@ -29,48 +29,48 @@ type itv = Int.t * Int.t
 
 module type S = sig
 
-include Lattice_type.Full_Lattice
+  include Lattice_type.Full_Lattice
 
-val is_top: t -> bool
+  val is_top: t -> bool
 
-val inject_bounds: Int.t -> Int.t -> t
-val inject_itv: itv -> t
-val inject: itv list -> t
-val from_ival_size: Ival.t -> Int_Base.t -> t
-(** Conversion from an ival, which represents the beginning of
-    each interval. The size if taken from the [Int_Base.t] argument.
-    If the result contains more than [-plevel] arguments, it is
-    automatically over-approximated. *)
+  val inject_bounds: Int.t -> Int.t -> t
+  val inject_itv: itv -> t
+  val inject: itv list -> t
+  val from_ival_size: Ival.t -> Int_Base.t -> t
+  (** Conversion from an ival, which represents the beginning of
+      each interval. The size if taken from the [Int_Base.t] argument.
+      If the result contains more than [-plevel] arguments, it is
+      automatically over-approximated. *)
 
-val from_ival_size_under: Ival.t -> Int_Base.t -> t
-(** Same as [from_ival_size], except that the result is an under-approximation
-    if the ival points to too many locations *)
+  val from_ival_size_under: Ival.t -> Int_Base.t -> t
+  (** Same as [from_ival_size], except that the result is an under-approximation
+      if the ival points to too many locations *)
 
-val project_set: t -> itv list
-(** May raise [Error_Top].
-    As intervals are not represented as lists, this function has an overhead.
-    Use iterators whenever possible instead. *)
+  val project_set: t -> itv list
+  (** May raise [Error_Top].
+      As intervals are not represented as lists, this function has an overhead.
+      Use iterators whenever possible instead. *)
 
-val project_singleton: t -> itv option
+  val project_singleton: t -> itv option
 
-(** Iterators *)
-val fold: (itv -> 'a -> 'a) -> t -> 'a -> 'a
-(** May raise [Error_Top] *)
-val iter: (itv -> unit) -> t -> unit
-(** May raise [Error_Top] *)
+  (** Iterators *)
+  val fold: (itv -> 'a -> 'a) -> t -> 'a -> 'a
+  (** May raise [Error_Top] *)
+  val iter: (itv -> unit) -> t -> unit
+  (** May raise [Error_Top] *)
 
-val pretty_typ: Cil_types.typ option -> t Pretty_utils.formatter
-(** Pretty-printer that supposes the intervals are subranges of
-    a C type, and use the type to print nice offsets *)
+  val pretty_typ: Cil_types.typ option -> t Pretty_utils.formatter
+  (** Pretty-printer that supposes the intervals are subranges of
+      a C type, and use the type to print nice offsets *)
 
-val range_covers_whole_type: Cil_types.typ -> t -> bool
-(** Does the interval cover the entire range of bits that are valid
-    for the given type. *)
+  val range_covers_whole_type: Cil_types.typ -> t -> bool
+  (** Does the interval cover the entire range of bits that are valid
+      for the given type. *)
 
 
-(**/**)
+  (**/**)
 
-val pretty_debug: t Pretty_utils.formatter
+  val pretty_debug: t Pretty_utils.formatter
 
 end
 

@@ -196,7 +196,7 @@ Makefile.plugin.generated
 /src/kernel_internals/parsing/cparser.ml
 /src/kernel_internals/parsing/cparser.mli
 /src/libraries/stdlib/transitioning.ml
-/src/plugins/callgraph/cg_viewer.ml
+# /src/plugins/callgraph/cg_viewer.ml
 /src/plugins/gui/debug_manager.ml
 /src/plugins/gui/dgraph_helper.ml
 /src/plugins/gui/GSourceView.ml
@@ -214,6 +214,10 @@ hello-*.tar.gz
 _build
 *.install
 /config.sed
+
+# Nix
+
+/result*
 
 #######################
 # should remain empty #

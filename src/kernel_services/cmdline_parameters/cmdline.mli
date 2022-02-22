@@ -228,8 +228,8 @@ val nb_given_options: unit -> int
     @since Beryllium-20090601-beta1 *)
 
 val use_cmdline_files: (Filepath.Normalized.t list -> unit) -> unit
-  (** What to do with the list of files put on the command lines.
-      @since Beryllium-20090601-beta1 *)
+(** What to do with the list of files put on the command lines.
+    @since Beryllium-20090601-beta1 *)
 
 val help: unit -> exit
 (** Display the help of Frama-C
