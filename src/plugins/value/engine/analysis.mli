@@ -138,6 +138,12 @@ type status =
 
 (** Returns the analysis status of a given function. *)
 val status: Cil_types.kernel_function -> status
+
+(** Does the analysis ignores the body of a given function, and uses instead
+    its specification or a builtin to interpret it?
+    Please use {!Eva.Results.are_available} instead to known whether results
+    are available for a given function. *)
+val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t

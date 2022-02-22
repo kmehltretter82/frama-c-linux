@@ -208,3 +208,6 @@ type results = Function_calls.results = Complete | Partial | NoResults
 type status = Function_calls.analysis_status =
     Unreachable | SpecUsed | Builtin of string | Analyzed of results
 let status = Function_calls.analysis_status
+
+let use_spec_instead_of_definition =
+  Function_calls.use_spec_instead_of_definition ?recursion_depth:None
