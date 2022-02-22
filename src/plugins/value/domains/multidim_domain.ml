@@ -305,6 +305,11 @@ struct
   include Base.Hptset (* The set of bases referencing the variable *)
 end
 
+module TrackedBases =
+struct
+  include Base.Hptset
+end
+
 module DomainLattice =
 struct
   (* The domain is essentially a map from bases to individual memory abstractions *)
@@ -317,9 +322,31 @@ struct
     let top = Memory.top, References.empty
   end
 
-  include Hptmap.Make
-      (Base.Base) (V)
-      (Hptmap.Comp_unused) (Initial_Values) (Deps)
+  module BaseMap =
+  struct
+    include
+      Hptmap.Make
+        (Base.Base) (V)
+        (Hptmap.Comp_unused) (Initial_Values) (Deps)
+
+    let find_or_top (state : t) (b : Base.t) =
+      try find b state with Not_found -> V.top
+
+    let remove_var (state : t) (v : Cil_types.varinfo) =
+      remove (Base.of_varinfo v) state
+
+    let remove_vars (state : t) (l : Cil_types.varinfo list) =
+      List.fold_left remove_var state l
+
+    let remove_loc (state : t) (loc : Precise_locs.precise_location) =
+      let loc = Precise_locs.imprecise_location loc in
+      Locations.(Location_Bits.fold_bases remove loc.loc state)
+  end
+
+  include Datatype.Pair_with_collections
+      (BaseMap)
+      (Datatype.Option (TrackedBases))
+      (struct let module_name = "DomainLattice" end)
 
   type state = t
   type value = Value.t
@@ -338,25 +365,19 @@ struct
 
   (* Bases handling *)
 
-  let covers_base (b : base) =
+  let covers_base (tracked : TrackedBases.t option) (b : base) : bool =
     match b with
     | Base.Var (vi, _) | Allocated (vi, _, _) ->
-      not (Cil.typeHasQualifier "volatile" vi.vtype)
+      not (Cil.typeHasQualifier "volatile" vi.vtype) &&
+      Option.fold ~none:true ~some:(TrackedBases.mem b) tracked
     | Null -> true
     | CLogic_Var _ | String _ -> false
 
-  let find_or_top (state : state) (b : base) =
-    try find b state with Not_found -> V.top
+  let join_tracked tracked1 tracked2 =
+    match tracked1, tracked2 with
+    | None, tracked | tracked, None -> tracked
+    | Some s1, Some s2 -> Some (TrackedBases.union s1 s2)
 
-  let remove_var (state : state) (v : Cil_types.varinfo) =
-    remove (Base.of_varinfo v) state
-
-  let remove_vars (state : state) (l : Cil_types.varinfo list) =
-    List.fold_left remove_var state l
-
-  let remove (state : state) (loc : location) =
-    let loc = Precise_locs.imprecise_location loc in
-    Locations.(Location_Bits.fold_bases remove loc.loc state)
 
   (* Accesses *)
 
@@ -364,9 +385,9 @@ struct
     type a .
     (memory -> offset -> a) -> (a -> a -> a) ->
     state -> mdlocation -> a or_bottom =
-    fun map reduce state loc ->
+    fun map reduce (state,_tracked) loc ->
     let f base off acc =
-      let v = map (fst (find_or_top state base)) off in
+      let v = map (fst (BaseMap.find_or_top state base)) off in
       Bottom.join reduce (`Value v) acc
     in
     Location.fold f loc `Bottom
@@ -421,11 +442,11 @@ struct
     let oracle = mk_oracle state in
     read (Memory.extract ~oracle) (Memory.smash ~oracle) state src
 
-  let add_references state vi refs' =
+  let add_references (base_map,tracked) vi refs' =
     let base = Base.of_varinfo vi in
-    let memory, refs = find_or_top state base in
+    let memory, refs = BaseMap.find_or_top base_map base in
     let refs'' = References.union refs (References.of_list refs') in
-    add base (memory, refs'') state
+    BaseMap.add base (memory, refs'') base_map, tracked
 
   let add_references_l state l refs =
     List.fold_left (fun state vi -> add_references state vi refs) state l
@@ -433,11 +454,11 @@ struct
   let write' (update : memory -> offset -> memory or_bottom)
       (state : state) (loc : mdlocation) : state or_bottom =
     let f base off state' =
-      if covers_base base then
-        state' >>- fun state ->
-        let memory, refs = find_or_top state base in
+      state' >>- fun (base_map,tracked) ->
+      if covers_base tracked base then
+        let memory, refs = BaseMap.find_or_top base_map base in
         update memory off >>-: fun memory' ->
-        add base (memory', refs) state
+        BaseMap.add base (memory', refs) base_map, tracked
       else
         state'
     in
@@ -475,26 +496,29 @@ struct
 
   (* Lattice *)
 
-  let top = empty
+  let top = BaseMap.empty, None
 
   let is_included =
+    let open BaseMap in
     let cache = cache_name "is_included" in
     let decide_fst _b _v1 = true (* v2 is top *) in
     let decide_snd _b _v2 = false (* v1 is top, v2 is not *) in
     let decide_both _ (m1,_r1) (m2,_r2) = Memory.is_included m1 m2 in
     let decide_fast s t = if s == t then PTrue else PUnknown in
-    binary_predicate cache UniversalPredicate
-      ~decide_fast ~decide_fst ~decide_snd ~decide_both
+    let is_included = binary_predicate cache UniversalPredicate
+        ~decide_fast ~decide_fst ~decide_snd ~decide_both
+    in
+    fun (m1,_) (m2,_) -> is_included m1 m2
 
   let narrow =
+    let open BaseMap in
     let cache = cache_name "narrow" in
-    let decide _ v1 v2 =
-      Memory.narrow v1 v2
-    in
+    let decide _ v1 v2 = Memory.narrow v1 v2 in
     let narrow = join ~cache ~symmetric:false ~idempotent:true ~decide in
-    fun a b -> `Value (narrow a b)
+    fun (m1,t1) (m2,t2) -> `Value (narrow m1 m2, join_tracked t1 t2)
 
-  let join s1 s2 =
+  let join (m1,t1 as s1) (m2,t2 as s2) =
+    let open BaseMap in
     let oracle = function
       | Abstract_memory.Left -> mk_oracle s1
       | Right -> mk_oracle s2
@@ -505,9 +529,12 @@ struct
       and r = References.union r1 r2 in
       if Memory.(is_top m) then None else Some (m,r)
     in
-    inter ~cache ~symmetric:false ~idempotent:true ~decide s1 s2
+    inter ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
+    join_tracked t1 t2
 
-  let widen kf stmt s1 s2 =
+
+  let widen kf stmt (m1,t1 as s1) (m2,t2 as s2) =
+    let open BaseMap in
     let oracle = function
       | Abstract_memory.Left -> mk_oracle s1
       | Right -> mk_oracle s2
@@ -518,7 +545,8 @@ struct
       and r = References.union r1 r2 in
       if Memory.(is_top m) then None else Some (m,r)
     in
-    inter ~cache ~symmetric:false ~idempotent:true ~decide s1 s2
+    inter ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
+    join_tracked t1 t2
 end
 
 module Domain =
@@ -589,7 +617,7 @@ struct
   let update valuation state =
     assume_valuation valuation state
 
-  let update_array_segmentation_bounds vi expr state =
+  let update_array_segmentation_bounds vi expr (base_map,tracked as state) =
     (* TODO: more general transfer function *)
     let incr = Option.bind expr (fun expr ->
         match expr.Cil_types.enode with
@@ -608,23 +636,26 @@ struct
        assignement of the bound to allow removing of eventual empty slice
        before the bound leaves the segmentation. *)
     let oracle = mk_oracle state in
-    let references = snd (find_or_top state (Base.of_varinfo vi)) in
-    let update_ref base state =
+    let references = snd (BaseMap.find_or_top base_map (Base.of_varinfo vi)) in
+    let update_ref base base_map =
       let update (memory, refs) =
         Memory.incr_bound ~oracle vi incr memory, refs
       in
-      replace (Option.map update) base state
+      BaseMap.replace (Option.map update) base base_map
     in
-    let state = References.fold update_ref references state in
+    let base_map = References.fold update_ref references base_map in
     (* If increment is None, every reference to vi should have been removed by
        Memory.incr_bound *)
-    if Option.is_none incr then
-      replace
-        (Option.map (fun (memory, _refs) -> memory, References.empty))
-        (Base.of_varinfo vi)
-        state
-    else
-      state
+    let base_map =
+      if Option.is_none incr then
+        BaseMap.replace
+          (Option.map (fun (memory, _refs) -> memory, References.empty))
+          (Base.of_varinfo vi)
+          base_map
+      else
+        base_map
+    in
+    base_map, tracked
 
   let update_array_segmentation lval expr state =
     match lval with
@@ -708,11 +739,12 @@ struct
         (fun state vi -> update_array_segmentation_bounds vi None state)
         state vars
     in
-    remove_vars state vars
+    let (base_map,tracked) = state in
+    BaseMap.remove_vars base_map vars, tracked
 
-  let logic_assign assign location state =
+  let logic_assign assign location (base_map,tracked as state) =
     match assign with
-    | None -> remove state location
+    | None -> BaseMap.remove_loc base_map location, tracked
     | Some ((Frees _ | Allocates _), _) -> state
     | Some (Assigns (_dest, sources), _pre_state) ->
       match sources with
@@ -720,7 +752,7 @@ struct
         let dst = Location.of_precise_loc location in
         erase state dst Abstract_memory.Bit.numerical
       | _ ->
-        remove state location
+        BaseMap.remove_loc base_map location, tracked
 
   let reduce_by_papp env li _labels args positive state =
     try
@@ -750,7 +782,8 @@ struct
     reduce predicate truth state
 
   let interpret_acsl_extension extension _env state =
-    if extension.ext_name = "array_partition" then
+    match extension.ext_name with
+    | "array_partition" ->
       let annotation = Eva_annotations.read_array_segmentation extension in
       let vi,offset,bounds = annotation in
       (* Update the segmentation *)
@@ -768,7 +801,16 @@ struct
       in
       let references = List.fold_left add [] bounds in
       add_references_l state references (Location.bases loc)
-    else
+    | "eva_domain_scope" ->
+      let domain,vars = Eva_annotations.read_domain_scope extension in
+      if domain = "multidim" then
+        let (base_map,tracked) = state in
+        let set = Option.value ~default:TrackedBases.empty tracked
+        and bases = List.map Base.of_varinfo vars in
+        base_map, Some (List.fold_right TrackedBases.add bases set)
+      else
+        state
+    | _ ->
       state
 
   let empty () = top
@@ -788,18 +830,22 @@ struct
 
   let relate _kf _bases _state = Base.SetLattice.empty
 
-  let filter _kf _kind bases state =
-    DomainLattice.filter (fun elt -> Base.Hptset.mem elt bases) state
+  let filter _kf _kind bases (base_map,tracked) =
+    BaseMap.filter (fun elt -> Base.Hptset.mem elt bases) base_map,
+    tracked (* TODO: intersection with bases *)
 
-  let reuse _kf bases ~current_input ~previous_output =
+  let reuse _kf bases =
+    let open BaseMap in
     let cache = Hptmap_sig.NoCache in
     let decide_both _key _v1 v2 = Some v2 in
     let decide_left key v1 =
       if Base.Hptset.mem key bases then None else Some v1
     in
-    merge ~cache ~symmetric:false ~idempotent:true
-      ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
-      current_input previous_output
+    let reuse = merge ~cache ~symmetric:false ~idempotent:true
+        ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
+    in
+    fun ~current_input:(m1,t1)  ~previous_output:(m2,t2) ->
+      reuse m1 m2, join_tracked t1 t2
 end
 
 include Domain

@@ -396,6 +396,54 @@ module ArraySegmentation = Register (struct
 
 
 type array_segmentation = ArraySegmentation.t
-let get_array_segmentation = ArraySegmentation.get
 let add_array_segmentation = ArraySegmentation.add
 let read_array_segmentation ext = ArraySegmentation.import ext.ext_kind
+
+
+module DomainScope = Register (struct
+    type t = string * Cil_types.varinfo list
+    let name = "eva_domain_scope"
+    let is_loop_annot = false
+
+    let parse ~typing_context:context =
+      let parse_domain = function
+        | {lexpr_node = PLvar v} -> v
+        | _ -> raise Parse_error
+      and parse_var = function
+        | {lexpr_node = PLvar v} ->
+          begin match context.Logic_typing.find_var v with
+            | {lv_origin=Some vi} -> vi
+            | _ -> raise Parse_error
+          end
+        | _ -> raise Parse_error
+      in
+      function
+      | domain :: vars ->
+        parse_domain domain, List.map parse_var vars
+      | _ -> raise Parse_error
+
+    let import = function
+      | Ext_terms ({term_node=TConst (LStr domain)} :: vars) ->
+        let import_var = function
+          | {term_node=TLval (TVar {lv_origin=Some vi}, TNoOffset)} -> vi
+          | _ -> assert false
+        in
+        domain, List.map import_var vars
+      | _ -> assert false
+
+    let export (domain, vars) =
+      let export_var vi =
+        Logic_const.tvar (Cil.cvar_to_lvar vi)
+      in
+      Ext_terms (Logic_const.tstring domain :: List.map export_var vars)
+
+    let print fmt (domain, vars) =
+      Format.fprintf fmt "%s, %a"
+        domain
+        (Pretty_utils.pp_list ~sep:",@ " Cil_printer.pp_varinfo) vars
+  end)
+
+
+type domain_scope = DomainScope.t
+let add_domain_scope = DomainScope.add
+let read_domain_scope ext = DomainScope.import ext.ext_kind
