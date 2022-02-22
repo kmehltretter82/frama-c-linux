@@ -48,9 +48,9 @@ int main(void)
   z = (int)(-0x80000000 - (unsigned int)1);
   /*@ assert
       rte: signed_downcast:
-        (unsigned int)((unsigned int)(-2147483648) - 1) ≤ 2147483647;
+        (unsigned int)((unsigned int)(-2147483648U) - 1) ≤ 2147483647;
   */
-  z = (int)(-2147483648 - (unsigned int)1);
+  z = (int)(-2147483648U - (unsigned int)1);
   /*@ assert rte: signed_overflow: -2147483647 ≤ 2147483647; */
   /*@ assert rte: signed_overflow: -2147483648 ≤ (int)(-2147483647) - 1; */
   /*@ assert rte: signed_overflow: (int)(-2147483647) - 1 ≤ 2147483647; */
