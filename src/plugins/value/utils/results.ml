@@ -107,10 +107,10 @@ struct
 
   (* Constructors *)
 
-  let consolidated =
+  let consolidated ~top =
     function
     | `Bottom -> Bottom
-    | `Top -> Top
+    | `Top -> Consolidated top
     | `Value state -> Consolidated state
 
   let singleton cs =
@@ -239,7 +239,7 @@ struct
         | Start kf -> A.get_initial_state kf
         | Initial -> A.get_global_state ()
       in
-      consolidated state
+      consolidated ~top:A.Dom.top state
 
   let convert : 'a or_top_bottom -> 'a result = function
     | `Top -> Result.error Top
