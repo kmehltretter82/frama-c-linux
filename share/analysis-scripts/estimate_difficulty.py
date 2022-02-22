@@ -31,7 +31,6 @@ import os
 from pathlib import Path
 import re
 import subprocess
-import sys
 import tempfile
 
 import build_callgraph
@@ -72,30 +71,34 @@ def extract_keys(l):
 
 
 def get_framac_libc_function_statuses(framac, framac_share):
-    (_handler, metrics_tmpfile) = tempfile.mkstemp(prefix="fc_script_est_diff", suffix=".json")
-    if debug:
-        print("metrics_tmpfile: %s", metrics_tmpfile)
-    fc_runtime = framac_share / "libc" / "__fc_runtime.c"
-    fc_libc_headers = framac_share / "libc" / "__fc_libc.h"
-    subprocess.run(
-        [
-            framac,
-            "-no-autoload-plugins",
-            fc_runtime,
-            fc_libc_headers,
-            "-load-module",
-            "metrics",
-            "-metrics",
-            "-metrics-libc",
-            "-metrics-output",
-            metrics_tmpfile,
-        ],
-        stdout=subprocess.DEVNULL,
-        check=True,
-    )
-    with open(metrics_tmpfile) as f:
-        metrics_json = json.load(f)
-    os.remove(metrics_tmpfile)
+    if framac:
+        (_handler, metrics_tmpfile) = tempfile.mkstemp(prefix="fc_script_est_diff", suffix=".json")
+        if debug:
+            print("metrics_tmpfile: %s", metrics_tmpfile)
+        fc_runtime = framac_share / "libc" / "__fc_runtime.c"
+        fc_libc_headers = framac_share / "libc" / "__fc_libc.h"
+        subprocess.run(
+            [
+                framac,
+                "-no-autoload-plugins",
+                fc_runtime,
+                fc_libc_headers,
+                "-load-module",
+                "metrics",
+                "-metrics",
+                "-metrics-libc",
+                "-metrics-output",
+                metrics_tmpfile,
+            ],
+            stdout=subprocess.DEVNULL,
+            check=True,
+        )
+        with open(metrics_tmpfile) as f:
+            metrics_json = json.load(f)
+        os.remove(metrics_tmpfile)
+    else:
+        with open(framac_share / "libc_metrics.json") as f:
+            metrics_json = json.load(f)
     defined = extract_keys(metrics_json["defined-functions"])
     spec_only = extract_keys(metrics_json["specified-only-functions"])
     return (defined, spec_only)
@@ -136,17 +139,22 @@ def get_includes(files):
 debug = os.getenv("DEBUG")
 verbose = False
 
-print("Building callgraph...")
-cg = build_callgraph.compute(files)
-
 framac_bin = os.getenv("FRAMAC_BIN")
 if not framac_bin:
-    sys.exit("error: FRAMAC_BIN not in environment")
-framac = Path(framac_bin) / "frama-c"
+    print(
+        "Running script in no-Frama-C mode (set FRAMAC_BIN to the directory containing frama-c if you want to use it)."
+    )
+    framac = None
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    framac_share = Path(script_dir) / "share"
+else:
+    framac = Path(framac_bin) / "frama-c"
+    framac_share = Path(
+        subprocess.check_output([framac, "-no-autoload-plugins", "-print-share-path"]).decode()
+    )
 
-framac_share = Path(
-    subprocess.check_output([framac, "-no-autoload-plugins", "-print-share-path"]).decode()
-)
+print("Building callgraph...")
+cg = build_callgraph.compute(files)
 
 print("Computing data about libc/POSIX functions...")
 libc_defined_functions, libc_specified_functions = get_framac_libc_function_statuses(
