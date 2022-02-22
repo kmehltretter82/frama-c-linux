@@ -33,10 +33,6 @@ import json
 import re
 from pathlib import Path
 
-MIN_PYTHON = (3, 6) # for glob(recursive) and automatic Path conversions
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 if len(sys.argv) < 2:
    # no argument, assume default name
    arg = Path("compile_commands.json")

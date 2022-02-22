@@ -315,7 +315,7 @@ let backward_comp_right op ~left ~right =
 let backward_binop ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
   match op with
   | Ne | Eq | Le | Lt | Ge | Gt ->
-    let op = Value_util.conv_comp op in
+    let op = Eva_utils.conv_comp op in
     if equal zero result then
       (* The comparison is false, as it always evaluate to false. Reduce by the
          fact that the inverse comparison is true.  *)

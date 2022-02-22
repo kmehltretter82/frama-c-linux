@@ -74,24 +74,24 @@ let load wpo =
   match get wpo with
   | NoScript -> `Null
   | Script f | Deprecated f ->
-      if Sys.file_exists f then Json.load_file f else `Null
+    if Sys.file_exists f then Json.load_file f else `Null
 
 let remove wpo =
   match get wpo with
   | NoScript -> ()
   | Script f ->
-      begin
-        Extlib.safe_remove f ;
-        Hashtbl.replace files f NoScript ;
-      end
+    begin
+      Extlib.safe_remove f ;
+      Hashtbl.replace files f NoScript ;
+    end
   | Deprecated f0 ->
-      begin
-        Wp_parameters.feedback
-          "Removed deprecated script for '%s'" wpo.po_sid ;
-        Extlib.safe_remove f0 ;
-        let f = filename ~force:false wpo in
-        Hashtbl.replace files f NoScript ;
-      end
+    begin
+      Wp_parameters.feedback
+        "Removed deprecated script for '%s'" wpo.po_sid ;
+      Extlib.safe_remove f0 ;
+      let f = filename ~force:false wpo in
+      Hashtbl.replace files f NoScript ;
+    end
 
 let save wpo js =
   let empty =
@@ -101,19 +101,19 @@ let save wpo js =
   if empty then remove wpo else
     match get wpo with
     | Script f ->
-        Json.save_file f js
+      Json.save_file f js
     | NoScript ->
-        begin
-          let f = filename ~force:true wpo in
-          Json.save_file f js ;
-          Hashtbl.replace files f (Script f) ;
-        end
+      begin
+        let f = filename ~force:true wpo in
+        Json.save_file f js ;
+        Hashtbl.replace files f (Script f) ;
+      end
     | Deprecated f0 ->
-        begin
-          Wp_parameters.feedback
-            "Upgraded script for '%s'" wpo.po_sid ;
-          Extlib.safe_remove f0 ;
-          let f = filename ~force:true wpo in
-          Json.save_file f js ;
-          Hashtbl.replace files f (Script f) ;
-        end
+      begin
+        Wp_parameters.feedback
+          "Upgraded script for '%s'" wpo.po_sid ;
+        Extlib.safe_remove f0 ;
+        let f = filename ~force:true wpo in
+        Json.save_file f js ;
+        Hashtbl.replace files f (Script f) ;
+      end

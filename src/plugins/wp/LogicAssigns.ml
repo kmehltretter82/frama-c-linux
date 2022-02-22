@@ -52,18 +52,18 @@ struct
     | [] -> Bag.concat (M.Sigma.assigned ~pre:s.pre ~post:s.post D.empty) hs
 
     | [obj,sloc] ->
-        let eq_sloc = M.assigned s obj sloc in
-        let hs_sloc = Bag.list (List.map Cvalues.equation eq_sloc) in
-        let hs_sdom = M.Sigma.assigned ~pre:s.pre ~post:s.post (dsloc obj sloc) in
-        Bag.concat (Bag.concat hs_sloc hs_sdom) hs
+      let eq_sloc = M.assigned s obj sloc in
+      let hs_sloc = Bag.list (List.map Cvalues.equation eq_sloc) in
+      let hs_sdom = M.Sigma.assigned ~pre:s.pre ~post:s.post (dsloc obj sloc) in
+      Bag.concat (Bag.concat hs_sloc hs_sdom) hs
 
     | (obj,sloc)::tail ->
-        let sigma = M.Sigma.havoc s.post (dsloc obj sloc) in
-        let s_local = { pre = sigma ; post = s.post } in
-        let s_other = { pre = s.pre ; post = sigma } in
-        let eq_sloc = M.assigned s_local obj sloc in
-        let hs_sloc = Bag.list (List.map Cvalues.equation eq_sloc) in
-        assigned_seq (Bag.concat hs_sloc hs) s_other tail
+      let sigma = M.Sigma.havoc s.post (dsloc obj sloc) in
+      let s_local = { pre = sigma ; post = s.post } in
+      let s_other = { pre = s.pre ; post = sigma } in
+      let eq_sloc = M.assigned s_local obj sloc in
+      let hs_sloc = Bag.list (List.map Cvalues.equation eq_sloc) in
+      assigned_seq (Bag.concat hs_sloc hs) s_other tail
 
   let apply_assigns (s:sigma sequence) (r: M.loc Sigs.region) =
     Bag.elements (assigned_seq Bag.empty s r)

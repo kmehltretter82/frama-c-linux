@@ -156,8 +156,7 @@ let rec is_positive_or_null e = match F.repr e with
   | _ -> (* try some improvement first then ask to qed *)
     let improved_is_positive_or_null e = match F.repr e with
       | Logic.Add es -> List.for_all is_positive_or_null es
-      | Logic.Mul es ->
-        (match mul_xor_sign es with | Some b -> b | _ -> false)
+      | Logic.Mul es -> (match mul_xor_sign es with | Some b -> b | _ -> false)
       | Logic.Mod(e1,e2) when is_positive e2 || is_negative e2 ->
         (* e2<>0 ==> ( 0<=(e1 % e2) <=> 0<=e1 ) *)
         is_positive_or_null e1
@@ -1197,7 +1196,7 @@ let is_cint_simplifier =
           reduce Abstract_interp.Comp.Ge var_domain b
         | Lt(a,b) when Lang.F.equal a var && is_int b ->
           reduce Abstract_interp.Comp.Lt var_domain b
-        | Lt(b,a) when Lang.F.equal a var  && is_int b->
+        | Lt(b,a) when Lang.F.equal a var  && is_int b ->
           reduce Abstract_interp.Comp.Gt var_domain b
         | And l -> List.iter (reduce_on_neg var var_domain) l
         | Not p -> reduce_on_pos var var_domain p

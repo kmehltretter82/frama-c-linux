@@ -101,9 +101,9 @@ let parse_mode ~origin ~fallback = function
   | "cleanup" -> Cleanup
   | "" -> raise Not_found
   | m ->
-      Wp_parameters.warning ~current:false
-        "Unknown %s mode %S (use %s instead)" origin m fallback ;
-      raise Not_found
+    Wp_parameters.warning ~current:false
+      "Unknown %s mode %S (use %s instead)" origin m fallback ;
+    raise Not_found
 
 let mode_name = function
   | NoCache -> "none"
@@ -164,54 +164,54 @@ let promote ~timeout ~steplimit (res : VCS.result) =
   | VCS.NoResult | VCS.Computing _ -> VCS.no_result
   | VCS.Failed -> res
   | VCS.Invalid | VCS.Valid | VCS.Unknown ->
-      if not (steps_fits res.prover_steps steplimit) then
-        { res with verdict = Stepout }
-      else
-      if not (time_fits res.prover_time timeout) then
-        { res with verdict = Timeout }
-      else res
+    if not (steps_fits res.prover_steps steplimit) then
+      { res with verdict = Stepout }
+    else
+    if not (time_fits res.prover_time timeout) then
+      { res with verdict = Timeout }
+    else res
   | VCS.Timeout | VCS.Stepout ->
-      if steps_seized res.prover_steps steplimit then
-        { res with verdict = Stepout }
-      else
-      if time_seized res.prover_time timeout then
-        { res with verdict = Timeout }
-      else (* can be run a longer time or widely *)
-        VCS.no_result
+    if steps_seized res.prover_steps steplimit then
+      { res with verdict = Stepout }
+    else
+    if time_seized res.prover_time timeout then
+      { res with verdict = Timeout }
+    else (* can be run a longer time or widely *)
+      VCS.no_result
 
 let get_cache_result ~mode hash =
   match mode with
   | NoCache | Rebuild -> VCS.no_result
   | Update | Cleanup | Replay | Offline ->
-      try
-        let dir = get_usable_dir ~make:true () in
-        let hash = Lazy.force hash in
-        let file = Printf.sprintf "%s/%s.json" dir hash in
-        if not (Sys.file_exists file) then VCS.no_result
-        else
-          try
-            mark_cache ~mode hash ;
-            Json.load_file file |> ProofScript.result_of_json
-          with err ->
-            Wp_parameters.warning ~current:false ~once:true
-              "invalid cache entry (%s)" (Printexc.to_string err) ;
-            VCS.no_result
-      with Not_found -> VCS.no_result
+    try
+      let dir = get_usable_dir ~make:true () in
+      let hash = Lazy.force hash in
+      let file = Printf.sprintf "%s/%s.json" dir hash in
+      if not (Sys.file_exists file) then VCS.no_result
+      else
+        try
+          mark_cache ~mode hash ;
+          Json.load_file file |> ProofScript.result_of_json
+        with err ->
+          Wp_parameters.warning ~current:false ~once:true
+            "invalid cache entry (%s)" (Printexc.to_string err) ;
+          VCS.no_result
+    with Not_found -> VCS.no_result
 
 let set_cache_result ~mode hash prover result =
   match mode with
   | NoCache | Replay | Offline -> ()
   | Rebuild | Update | Cleanup ->
-      let hash = Lazy.force hash in
-      try
-        let dir = get_usable_dir ~make:true () in
-        let file = Printf.sprintf "%s/%s.json" dir hash in
-        mark_cache ~mode hash ;
-        ProofScript.json_of_result (VCS.Why3 prover) result
-        |> Json.save_file file
-      with err ->
-        Wp_parameters.warning ~current:false ~once:true
-          "can not update cache (%s)" (Printexc.to_string err)
+    let hash = Lazy.force hash in
+    try
+      let dir = get_usable_dir ~make:true () in
+      let file = Printf.sprintf "%s/%s.json" dir hash in
+      mark_cache ~mode hash ;
+      ProofScript.json_of_result (VCS.Why3 prover) result
+      |> Json.save_file file
+    with err ->
+      Wp_parameters.warning ~current:false ~once:true
+        "can not update cache (%s)" (Printexc.to_string err)
 
 let clear_result ~digest prover goal =
   try
@@ -244,11 +244,11 @@ let cleanup_cache () =
           ) (Sys.readdir dir) ;
     with
     | Unix.Unix_error _ as exn ->
-        Wp_parameters.warning ~current:false
-          "Can not cleanup cache (%s)" (Printexc.to_string exn)
+      Wp_parameters.warning ~current:false
+        "Can not cleanup cache (%s)" (Printexc.to_string exn)
     | Not_found ->
-        Wp_parameters.warning ~current:false
-          "Cannot cleanup cache"
+      Wp_parameters.warning ~current:false
+        "Cannot cleanup cache"
 
 type 'a digest =
   Why3Provers.t -> 'a -> string
@@ -262,29 +262,29 @@ let get_result ~digest ~runner ~timeout ~steplimit prover goal =
   match mode with
   | NoCache -> runner ~timeout ~steplimit prover goal
   | Offline ->
-      let hash = lazy (digest prover goal) in
-      let result = get_cache_result ~mode hash |> VCS.cached in
-      if VCS.is_verdict result then incr hits else incr miss ;
-      Task.return result
+    let hash = lazy (digest prover goal) in
+    let result = get_cache_result ~mode hash |> VCS.cached in
+    if VCS.is_verdict result then incr hits else incr miss ;
+    Task.return result
   | Update | Replay | Rebuild | Cleanup ->
-      let hash = lazy (digest prover goal) in
-      let result =
-        get_cache_result ~mode hash
-        |> promote ~timeout ~steplimit |> VCS.cached in
-      if VCS.is_verdict result
-      then
-        begin
-          incr hits ;
-          Task.return result
+    let hash = lazy (digest prover goal) in
+    let result =
+      get_cache_result ~mode hash
+      |> promote ~timeout ~steplimit |> VCS.cached in
+    if VCS.is_verdict result
+    then
+      begin
+        incr hits ;
+        Task.return result
+      end
+    else
+      Task.finally
+        (runner ~timeout ~steplimit prover goal)
+        begin function
+          | Task.Result result when VCS.is_verdict result ->
+            incr miss ;
+            set_cache_result ~mode hash prover result
+          | _ -> ()
         end
-      else
-        Task.finally
-          (runner ~timeout ~steplimit prover goal)
-          begin function
-            | Task.Result result when VCS.is_verdict result ->
-                incr miss ;
-                set_cache_result ~mode hash prover result
-            | _ -> ()
-          end
 
 (* -------------------------------------------------------------------------- *)

@@ -86,7 +86,7 @@ module Externals =
 let get_external =
   Externals.memo
     (fun kf ->
-       !Db.Value.compute ();
+       Eva.Analysis.compute ();
        if Kernel_function.is_definition kf then
          try
            externalize

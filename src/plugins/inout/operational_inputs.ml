@@ -208,7 +208,7 @@ module Internals =
   Kernel_function.Make_Table(Inout_type)
     (struct
       let name = "Inout.Operational_inputs.Internals"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
       let size = 17
     end)
 
@@ -374,26 +374,18 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
          | AAssert (_, p)
          | AInvariant (_, true, p) ->
            begin
-             let env =
-               Eva.Eval_terms.env_annot
-                 ~pre:X.kf_pre_state
-                 ~here:(X.stmt_state stmt)
-                 ()
+             let pre = X.kf_pre_state
+             and here = X.stmt_state stmt in
+             let deps =
+               Eva.Eval_terms.annot_predicate_deps ~pre ~here p.tp_statement
              in
-             match Eva.Eval_terms.predicate_deps env p.tp_statement with
+             match deps with
              | None ->
                (* To be sound, we should perform a join with the top zone here.
                   We do nothing instead because the latter behavior would
                   directly disable memexec. *)
                ()
-             | Some logic_deps ->
-               let p_zone =
-                 Cil_datatype.Logic_label.Map.fold
-                   (fun _ -> Zone.join)
-                   logic_deps
-                   Zone.bottom
-               in
-               store_non_terminating_logic_inputs p_zone
+             | Some p_zone -> store_non_terminating_logic_inputs p_zone
            end
          | _ -> ())
       stmt
@@ -807,9 +799,9 @@ end
 let get_internal =
   Internals.memo
     (fun kf ->
-       !Db.Value.compute ();
+       Eva.Analysis.compute ();
        try Internals.find kf (* The results may have been computed by the call
-                                to Value.compute *)
+                                to Eva.Analysis.compute *)
        with
        | Not_found ->
          if!Db.Value.use_spec_instead_of_definition kf then

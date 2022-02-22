@@ -77,23 +77,23 @@ let is_selected_ca (m: mode) ~goal (ca: code_annotation) =
     -> is_selected_for m ~goal forb
   | AVariant _ -> is_default_bhv m
   | AExtended _ | AStmtSpec _ | APragma _ ->
-      assert false (* n/a *)
+    assert false (* n/a *)
 
 let is_active_mode ~mode ~goal (p: Property.t) =
   let open Property in
   match p with
   | IPCodeAnnot { ica_ca } -> is_selected_ca mode ~goal ica_ca
   | IPPredicate { ip_kind } ->
-      begin match ip_kind with
-        | PKRequires _ | PKAssumes _ -> true
-        | PKEnsures(bhv,_) -> is_selected_bhv mode bhv
-        | PKTerminates -> is_default_bhv mode
-      end
+    begin match ip_kind with
+      | PKRequires _ | PKAssumes _ -> true
+      | PKEnsures(bhv,_) -> is_selected_bhv mode bhv
+      | PKTerminates -> is_default_bhv mode
+    end
   | IPAllocation { ial_bhv = bhv } | IPAssigns { ias_bhv = bhv } ->
-      begin match bhv with
-        | Id_loop ca -> is_selected_ca mode ~goal ca
-        | Id_contract(_,bhv) -> is_selected_bhv mode bhv
-      end
+    begin match bhv with
+      | Id_loop ca -> is_selected_ca mode ~goal ca
+      | Id_contract(_,bhv) -> is_selected_bhv mode bhv
+    end
   | IPDecrease { id_ca = None } -> is_default_bhv mode
   | IPDecrease { id_ca = Some ca } -> is_selected_ca mode ~goal ca
   | IPComplete _ | IPDisjoint _ -> is_default_bhv mode
@@ -110,9 +110,9 @@ let is_selected_props (props : props) ?pi pid =
   | `All | `Names [] -> WpPropId.select_default pid
   | `Names ps -> WpPropId.select_by_name ps pid
   | `PropId p ->
-      Property.equal p @@ match pi with
-      | Some q -> q
-      | None -> WpPropId.property_of_id pid
+    Property.equal p @@ match pi with
+    | Some q -> q
+    | None -> WpPropId.property_of_id pid
 
 let rec factorize ~wdefault = function
   | (_,w)::wcs when w==wdefault -> factorize ~wdefault wcs
@@ -154,8 +154,8 @@ struct
     | [] -> W.empty
     | [x] -> f x
     | x::xs ->
-        let cup = W.merge env.we in
-        List.fold_left (fun p y -> cup (f y) p) (f x) xs
+      let cup = W.merge env.we in
+      List.fold_left (fun p y -> cup (f y) p) (f x) xs
 
   let is_selected ~goal { mode ; props } (pid,_) =
     let pi = WpPropId.property_of_id pid in
@@ -169,18 +169,18 @@ struct
     match a with
     | NoAssignsInfo -> assert false
     | AssignsAny ad ->
-        WpLog.warning ~current:true ~once:true
-          "Missing assigns clause (assigns 'everything' instead)" ;
-        W.use_assigns env.we None ad w
+      WpLog.warning ~current:true ~once:true
+        "Missing assigns clause (assigns 'everything' instead)" ;
+      W.use_assigns env.we None ad w
     | AssignsLocations(ap,ad) -> W.use_assigns env.we (Some ap) ad w
 
   let prove_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo | AssignsAny _ -> w
     | AssignsLocations ai ->
-        if is_selected ~goal:true env ai
-        then W.add_assigns env.we ai w
-        else w
+      if is_selected ~goal:true env ai
+      then W.add_assigns env.we ai w
+      else w
 
   let use_property ?for_pid env (p : WpPropId.pred_info) w =
     if is_selected ~goal:false env p then W.add_hyp ?for_pid env.we p w else w
@@ -196,9 +196,9 @@ struct
   let on_selected_terminates env f =
     match env.terminates with
     | Some t when is_default_bhv env.mode && is_selected ~goal:true env t ->
-        f env t
+      f env t
     | _ ->
-        Extlib.id
+      Extlib.id
 
   (* --- Decomposition of WP Rules --- *)
 
@@ -207,12 +207,12 @@ struct
     | None -> raise (NonNaturalLoop (Cil.CurrentLoc.get()));
     | Some pi -> pi
     | exception Not_found ->
-        (* cut circularities *)
-        Vhash.add env.wp a None ;
-        let pi = match a.vertex_start_of with
-          | None -> successors env a
-          | Some s -> stmt env a s
-        in Vhash.replace env.wp a (Some pi) ; pi
+      (* cut circularities *)
+      Vhash.add env.wp a None ;
+      let pi = match a.vertex_start_of with
+        | None -> successors env a
+        | Some s -> stmt env a s
+      in Vhash.replace env.wp a (Some pi) ; pi
 
   (* Compute a stmt node *)
   and stmt env a (s: stmt) : W.t_prop =
@@ -240,21 +240,21 @@ struct
   and control env a s : W.t_prop =
     match a.vertex_control with
     | If { cond ; vthen ; velse } ->
-        let wthen = wp env vthen in
-        let welse = wp env velse in
-        W.test env.we s cond wthen welse
+      let wthen = wp env vthen in
+      let welse = wp env velse in
+      W.test env.we s cond wthen welse
     | Switch { value ; cases ; default } ->
-        let wcases = List.map (fun (e,v) -> e,wp env v) cases in
-        let wdefault = wp env default in
-        W.switch env.we s value (factorize ~wdefault wcases) wdefault
+      let wcases = List.map (fun (e,v) -> e,wp env v) cases in
+      let wdefault = wp env default in
+      W.switch env.we s value (factorize ~wdefault wcases) wdefault
     | Loop _ ->
-        let m = env.mode in
-        let smoking =
-          is_default_bhv m &&
-          WpLog.SmokeTests.get () &&
-          WpLog.SmokeDeadloop.get () in
-        let terminates = Option.map snd env.terminates in
-        loop env a s (CfgAnnot.get_loop_contract ~smoking ?terminates m.kf s)
+      let m = env.mode in
+      let smoking =
+        is_default_bhv m &&
+        WpLog.SmokeTests.get () &&
+        WpLog.SmokeDeadloop.get () in
+      let terminates = Option.map snd env.terminates in
+      loop env a s (CfgAnnot.get_loop_contract ~smoking ?terminates m.kf s)
     | Edges -> successors env a
 
   (* Compute loops *)
@@ -319,37 +319,37 @@ struct
     | Set(lv,e,_) -> W.assign env.we s lv e w
     | Local_init(x,AssignInit i,_) -> W.init env.we x (Some i) w
     | Local_init(x,ConsInit (vf, args, kind), loc) ->
-        Cil.treat_constructor_as_func
-          begin fun r fct args _loc ->
-            match Kf.get_called fct with
-            | Some kf -> call env s r kf args w
-            | None ->
-                WpLog.warning ~once:true "No function for constructor '%s'"
-                  vf.vname ;
-                let any = WpPropId.mk_stmt_assigns_any_desc s in
-                W.use_assigns env.we None any (W.merge env.we w env.wk)
-          end x vf args kind loc
-    | Call(res,fct,args,_loc) ->
-        begin
+      Cil.treat_constructor_as_func
+        begin fun r fct args _loc ->
           match Kf.get_called fct with
-          | Some kf -> call env s res kf args w
+          | Some kf -> call env s r kf args w
           | None ->
-              match Dyncall.get ~bhv:env.mode.bhv.b_name s with
-              | None ->
-                  WpLog.warning ~once:true "Missing 'calls' for %s"
-                    (if Cil.is_default_behavior env.mode.bhv
-                     then "default behavior"
-                     else env.mode.bhv.b_name) ;
-                  let any = WpPropId.mk_stmt_assigns_any_desc s in
-                  W.use_assigns env.we None any (W.merge env.we w env.wk)
-              | Some(prop,kfs) ->
-                  let id = WpPropId.mk_property prop in
-                  W.call_dynamic env.we s id fct @@
-                  List.map (fun kf -> kf, call env s res kf args w) kfs
-        end
+            WpLog.warning ~once:true "No function for constructor '%s'"
+              vf.vname ;
+            let any = WpPropId.mk_stmt_assigns_any_desc s in
+            W.use_assigns env.we None any (W.merge env.we w env.wk)
+        end x vf args kind loc
+    | Call(res,fct,args,_loc) ->
+      begin
+        match Kf.get_called fct with
+        | Some kf -> call env s res kf args w
+        | None ->
+          match Dyncall.get ~bhv:env.mode.bhv.b_name s with
+          | None ->
+            WpLog.warning ~once:true "Missing 'calls' for %s"
+              (if Cil.is_default_behavior env.mode.bhv
+               then "default behavior"
+               else env.mode.bhv.b_name) ;
+            let any = WpPropId.mk_stmt_assigns_any_desc s in
+            W.use_assigns env.we None any (W.merge env.we w env.wk)
+          | Some(prop,kfs) ->
+            let id = WpPropId.mk_property prop in
+            W.call_dynamic env.we s id fct @@
+            List.map (fun kf -> kf, call env s res kf args w) kfs
+      end
     | Asm _ ->
-        let assigns = CfgAnnot.get_stmt_assigns env.mode.kf s in
-        List.fold_right (use_assigns env) assigns w
+      let assigns = CfgAnnot.get_stmt_assigns env.mode.kf s in
+      List.fold_right (use_assigns env) assigns w
 
   and call env s r kf es wr : W.t_prop =
     let smoking =
@@ -384,15 +384,15 @@ struct
     let in_cluster = CfgInfos.in_cluster ~caller:env.mode.kf kf in
     let w_term = match env.terminates with
       | Some t when selected t ->
-          W.call_terminates env.we s kf es t ?callee_t w_pre
+        W.call_terminates env.we s kf es t ?callee_t w_pre
       | _ -> w_pre
     in
     let w_decr = match env.decreases with
       | Some d when selected d && in_cluster ->
-          W.call_decreases env.we s kf es d
-            ?caller_t:(Option.map snd env.terminates)
-            ?callee_d:c.contract_decreases
-            w_term
+        W.call_decreases env.we s kf es d
+          ?caller_t:(Option.map snd env.terminates)
+          ?callee_d:c.contract_decreases
+          w_term
       | _ -> w_term
     in
     w_decr
@@ -410,28 +410,28 @@ struct
     match env.body with
     | None -> w
     | Some _ ->
-        let deps = CfgInfos.terminates_deps env.mode.infos in
-        let return = Kernel_function.find_return env.mode.kf in
-        let prove goal env t w =
-          prove_subproperty env t ~deps goal return FromReturn w
+      let deps = CfgInfos.terminates_deps env.mode.infos in
+      let return = Kernel_function.find_return env.mode.kf in
+      let prove goal env t w =
+        prove_subproperty env t ~deps goal return FromReturn w
+      in
+      if CfgInfos.is_recursive env.mode.kf then
+        (* there is a dependency on terminates or decreases is missing *)
+        let goal =
+          if None <> env.decreases then Logic_const.ptrue
+          else begin
+            WpLog.warning ~once:true
+              "No 'decreases' clause on recursive function '%a', \
+               cannot prove termination"
+              Kernel_function.pretty env.mode.kf ;
+            Logic_const.pfalse
+          end
         in
-        if CfgInfos.is_recursive env.mode.kf then
-          (* there is a dependency on terminates or decreases is missing *)
-          let goal =
-            if None <> env.decreases then Logic_const.ptrue
-            else begin
-              WpLog.warning ~once:true
-                "No 'decreases' clause on recursive function '%a', \
-                 cannot prove termination"
-                Kernel_function.pretty env.mode.kf ;
-              Logic_const.pfalse
-            end
-          in
-          on_selected_terminates env (prove goal) w
-        else
-        if not @@ Property.Set.is_empty deps then
-          on_selected_terminates env (prove Logic_const.ptrue) w
-        else w
+        on_selected_terminates env (prove goal) w
+      else
+      if not @@ Property.Set.is_empty deps then
+        on_selected_terminates env (prove Logic_const.ptrue) w
+      else w
 
   let do_global_init env w =
     I.process_global_init env.we env.mode.kf @@
@@ -472,10 +472,10 @@ struct
     match env.body with
     | None -> w
     | Some cfg ->
-        let wpost = do_post env ~formals b w in
-        Vhash.add env.wp cfg.return_point (Some wpost) ;
-        env.wk <- if exits then do_exit env ~formals b w else w ;
-        wp env cfg.entry_point
+      let wpost = do_post env ~formals b w in
+      Vhash.add env.wp cfg.return_point (Some wpost) ;
+      env.wk <- if exits then do_exit env ~formals b w else w ;
+      wp env cfg.entry_point
 
   (* Putting everything together *)
   let compute ~mode ~props =

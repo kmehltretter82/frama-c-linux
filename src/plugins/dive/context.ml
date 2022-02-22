@@ -51,7 +51,7 @@ type t = {
 (* --- initialization --- *)
 
 let create () =
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   {
     graph = Graph.create ();
     vertex_table = Index.create 13;

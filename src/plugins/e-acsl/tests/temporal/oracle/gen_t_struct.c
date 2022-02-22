@@ -426,10 +426,11 @@ int main(void)
                                                     (void *)0);
       __gen_e_acsl_assert_data_7.blocking = 1;
       __gen_e_acsl_assert_data_7.kind = "RTE";
-      __gen_e_acsl_assert_data_7.pred_txt = "mem_access: \\valid_read(&lp->t.p)";
+      __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(&lp->t.p)";
       __gen_e_acsl_assert_data_7.file = "t_struct.c";
       __gen_e_acsl_assert_data_7.fct = "main";
       __gen_e_acsl_assert_data_7.line = 44;
+      __gen_e_acsl_assert_data_7.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,

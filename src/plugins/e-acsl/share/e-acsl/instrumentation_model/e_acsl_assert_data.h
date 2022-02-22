@@ -190,6 +190,8 @@ typedef struct eacsl_assert_data_t {
   int blocking;
   /*! C string representing a kind of annotation (e.g., "Assertion") */
   const char *kind;
+  /*! name identifying the predicate */
+  const char *name;
   /*! stringified predicate */
   const char *pred_txt;
   /*! un-instrumented file of predicate placement */

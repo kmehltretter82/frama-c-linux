@@ -34,7 +34,7 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
-import { functions, markerInfo, getMarkerAt } from 'frama-c/api/kernel/ast';
+import { functions, markerInfo, getMarkerAt } from 'frama-c/kernel/api/ast';
 import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
 import { IconButton } from 'dome/controls/buttons';

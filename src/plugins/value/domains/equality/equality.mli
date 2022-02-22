@@ -88,6 +88,8 @@ module Equality : sig
   val choose: t -> elt
   (** Return the representative of the equality. *)
 
+  val elements: t -> elt list
+  (** Returns the list of all elements of the given set. *)
 end
 
 type equality = Equality.t

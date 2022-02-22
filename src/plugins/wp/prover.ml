@@ -34,11 +34,11 @@ let dispatch ?(config=VCS.default) mode prover wpo =
     match prover with
     | Qed | Tactical -> Task.return VCS.no_result
     | Why3 prover ->
-        let smoke = Wpo.is_smoke_test wpo in
-        ProverWhy3.prove
-          ~timeout:(VCS.get_timeout ~smoke config)
-          ~steplimit:(VCS.get_stepout config)
-          ~mode ~prover wpo
+      let smoke = Wpo.is_smoke_test wpo in
+      ProverWhy3.prove
+        ~timeout:(VCS.get_timeout ~smoke config)
+        ~steplimit:(VCS.get_stepout config)
+        ~mode ~prover wpo
   end
 
 let started ?start wpo =
@@ -98,15 +98,15 @@ let spawn wpo ~delayed
     let monitor = match success with
       | None -> None
       | Some on_success ->
-          Some
-            begin function
-              | None -> on_success wpo None
-              | Some prover ->
-                  let r = Wpo.get_result wpo VCS.Qed in
-                  let prover =
-                    if VCS.( r.verdict == Valid ) then VCS.Qed else prover in
-                  on_success wpo (Some prover)
-            end in
+        Some
+          begin function
+            | None -> on_success wpo None
+            | Some prover ->
+              let r = Wpo.get_result wpo VCS.Qed in
+              let prover =
+                if VCS.( r.verdict == Valid ) then VCS.Qed else prover in
+              on_success wpo (Some prover)
+          end in
     let process (mode,prover) =
       prove wpo ?config ~mode ?start ?progress ?result prover in
     let all = Wp_parameters.RunAllProvers.get() in
@@ -124,7 +124,7 @@ let spawn wpo ~delayed
         match success with
         | None -> ()
         | Some on_success ->
-            on_success wpo (if ok then Some VCS.Qed else None) ;
+          on_success wpo (if ok then Some VCS.Qed else None) ;
       end ;
       Task.return ()
     in

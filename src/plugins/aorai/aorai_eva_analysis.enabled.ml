@@ -25,7 +25,7 @@
 
 let show_aorai_variable state fmt var_name =
   let vi = Data_for_aorai.(get_varinfo var_name) in
-  let cvalue = !Db.Value.eval_expr state (Cil.evar vi) in
+  let cvalue = Cvalue.Model.find state (Locations.loc_of_varinfo vi) in
   try
     let i = Ival.project_int (Cvalue.V.project_ival cvalue) in
     let state_name = Data_for_aorai.getStateName (Integer.to_int_exn i) in
@@ -80,7 +80,7 @@ let add_slevel_annotations () =
 let add_partitioning varname =
   match Data_for_aorai.get_varinfo_option varname with
   | None -> ()
-  | Some vi -> Eva.Value_parameters.use_global_value_partitioning vi
+  | Some vi -> Eva.Parameters.use_global_value_partitioning vi
 
 let add_state_variables_partitioning () =
   add_partitioning Data_for_aorai.curState;

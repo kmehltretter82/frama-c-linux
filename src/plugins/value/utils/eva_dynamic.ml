@@ -43,7 +43,7 @@ module Scope = struct
 
   let rm_asserts () =
     let fallback () =
-      Value_parameters.warning
+      Self.warning
         "The scope plugin is missing: cannot remove redundant alarms."
     in
     let typ = Datatype.(func unit unit) in

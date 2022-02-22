@@ -1108,7 +1108,7 @@ module G = struct
 
 end
 
-let dkey = Value_parameters.register_category "d-gauges"
+let dkey = Self.register_category "d-gauges"
 
 module D : Abstract_domain.Leaf
   with type state = G.t

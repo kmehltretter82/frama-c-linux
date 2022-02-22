@@ -7,7 +7,7 @@ let run () =
     (fun kf ->
       if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then begin
 	Globals.set_entry_point (Kernel_function.get_name kf) true;
-	!Db.Value.compute();
+	Eva.Analysis.compute();
 	let hyps = 
 	  Alarms.fold
 	    (fun _ kf' s ~rank:_ _ a l -> 

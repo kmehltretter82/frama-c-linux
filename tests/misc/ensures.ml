@@ -2,7 +2,7 @@ open Cil_types
 
 let run () =
   Dynamic.Parameter.Bool.set "-eva-context-valid-pointers" true;
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   Globals.Functions.iter
     (fun kf ->
        let kf_name = Kernel_function.get_name kf in

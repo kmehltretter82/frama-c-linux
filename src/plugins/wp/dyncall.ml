@@ -45,10 +45,10 @@ let typecheck typing_context loc ps =
          let loc = p.lexpr_loc in
          match p.lexpr_node with
          | PLvar f ->
-             let fv = find_call typing_context loc f in
-             Logic_const.term ~loc (TLval(TVar fv,TNoOffset)) fv.lv_type
+           let fv = find_call typing_context loc f in
+           Logic_const.term ~loc (TLval(TVar fv,TNoOffset)) fv.lv_type
          | _ ->
-             typing_context.error loc "Function name expected for calls"
+           typing_context.error loc "Function name expected for calls"
       ) ps
   in
   Ext_terms fs
@@ -68,7 +68,7 @@ let get_calls ecmd bhvs : (string * Kernel_function.t list) list =
        List.iter
          (function
            | {ext_name; ext_kind = Ext_terms ts} when ext_name = ecmd ->
-               fs := !fs @ List.map get_call ts
+             fs := !fs @ List.map get_call ts
            | _ -> ())
          bhv.Cil_types.b_extended ;
        let fs = !fs in
@@ -140,47 +140,47 @@ class dyncall =
       | Cil_types.AExtended
           (bhvs, _,
            ({ext_name = "calls"; ext_kind = Ext_terms calls} as extended)) ->
-          if calls <> [] && (scope <> [] || not (Stack.is_empty block_calls))
-          then begin
-            let bhvs =
-              match bhvs with
-              | [] -> [ Cil.default_behavior_name ]
-              | bhvs -> bhvs
-            in
-            let debug_calls bhv stmt kfs =
-              if Wp_parameters.has_dkey dkey_calls then
-                let source = snd (Stmt.loc stmt) in
-                if Cil.default_behavior_name = bhv then
-                  Wp_parameters.result ~source
-                    "@[<hov 2>Calls%a@]" pp_calls kfs
-                else
-                  Wp_parameters.result ~source
-                    "@[<hov 2>Calls (for %s)%a@]" bhv pp_calls kfs
-            in
-            let pool = ref [] in (* collect emitted properties *)
-            let add_calls_info kf stmt =
-              count <- succ count ;
-              List.iter
-                (fun bhv ->
-                   let kfs = List.map get_call calls in
-                   debug_calls bhv stmt kfs ;
-                   let prop = property ~kf ~bhv ~stmt kfs in
-                   pool := prop :: !pool ;
-                   CallPoints.add (bhv,stmt) (prop,kfs))
-                bhvs
-            in
-            let kf = self#kf in
+        if calls <> [] && (scope <> [] || not (Stack.is_empty block_calls))
+        then begin
+          let bhvs =
+            match bhvs with
+            | [] -> [ Cil.default_behavior_name ]
+            | bhvs -> bhvs
+          in
+          let debug_calls bhv stmt kfs =
+            if Wp_parameters.has_dkey dkey_calls then
+              let source = snd (Stmt.loc stmt) in
+              if Cil.default_behavior_name = bhv then
+                Wp_parameters.result ~source
+                  "@[<hov 2>Calls%a@]" pp_calls kfs
+              else
+                Wp_parameters.result ~source
+                  "@[<hov 2>Calls (for %s)%a@]" bhv pp_calls kfs
+          in
+          let pool = ref [] in (* collect emitted properties *)
+          let add_calls_info kf stmt =
+            count <- succ count ;
             List.iter
-              (add_calls_info kf)
-              (if scope <> [] then scope else Stack.top block_calls) ;
-            if !pool <> [] then
-              begin
-                let eloc = Property.ELStmt(kf,self#stmt) in
-                let annot = Property.ip_of_extended eloc extended in
-                Property_status.logical_consequence emitter annot !pool ;
-              end
-          end;
-          SkipChildren
+              (fun bhv ->
+                 let kfs = List.map get_call calls in
+                 debug_calls bhv stmt kfs ;
+                 let prop = property ~kf ~bhv ~stmt kfs in
+                 pool := prop :: !pool ;
+                 CallPoints.add (bhv,stmt) (prop,kfs))
+              bhvs
+          in
+          let kf = self#kf in
+          List.iter
+            (add_calls_info kf)
+            (if scope <> [] then scope else Stack.top block_calls) ;
+          if !pool <> [] then
+            begin
+              let eloc = Property.ELStmt(kf,self#stmt) in
+              let annot = Property.ip_of_extended eloc extended in
+              Property_status.logical_consequence emitter annot !pool ;
+            end
+        end;
+        SkipChildren
       | _ -> SkipChildren
 
     method! vspec spec =
@@ -201,18 +201,18 @@ class dyncall =
       match s.skind with
       | Instr (Call( _ , fct , _ , _ ))
         when Kernel_function.get_called fct = None ->
-          if not (Stack.is_empty block_calls) then
-            Stack.push (self#stmt :: Stack.pop block_calls) block_calls;
-          scope <- self#stmt :: scope ;
-          Cil.DoChildrenPost (fun s -> scope <- []; s)
+        if not (Stack.is_empty block_calls) then
+          Stack.push (self#stmt :: Stack.pop block_calls) block_calls;
+        scope <- self#stmt :: scope ;
+        Cil.DoChildrenPost (fun s -> scope <- []; s)
       | Block _ ->
-          Stack.push [] block_calls;
-          Cil.DoChildrenPost
-            (fun s ->
-               let calls = Stack.pop block_calls in
-               if not (Stack.is_empty block_calls) then
-                 Stack.push (calls @ Stack.pop block_calls) block_calls;
-               s)
+        Stack.push [] block_calls;
+        Cil.DoChildrenPost
+          (fun s ->
+             let calls = Stack.pop block_calls in
+             if not (Stack.is_empty block_calls) then
+               Stack.push (calls @ Stack.pop block_calls) block_calls;
+             s)
       | _ -> Cil.DoChildren
 
   end
@@ -247,9 +247,9 @@ let get ?bhv stmt =
   match bhv with
   | None -> get Cil.default_behavior_name
   | Some bhv ->
-      (match get bhv with
-       | None -> get Cil.default_behavior_name
-       | result -> result)
+    (match get bhv with
+     | None -> get Cil.default_behavior_name
+     | result -> result)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)

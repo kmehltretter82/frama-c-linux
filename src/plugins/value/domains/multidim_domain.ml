@@ -23,7 +23,7 @@
 open Cil_types
 open Eval
 
-let dkey = Value_parameters.register_category "d-multidim"
+let dkey = Self.register_category "d-multidim"
 
 let map_to_singleton map =
   let aux base offset = function
@@ -451,7 +451,7 @@ struct
   let start_call _stmt call recursion valuation state =
     if recursion <> None
     then
-      Value_parameters.abort ~current:true
+      Self.abort ~current:true
         "The multidim domain does not support recursive calls yet";
     let oracle = make_oracle valuation in
     let bind state arg =

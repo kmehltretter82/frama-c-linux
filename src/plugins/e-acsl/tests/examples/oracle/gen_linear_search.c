@@ -42,10 +42,11 @@ int search(int elt)
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "RTE";
-        __gen_e_acsl_assert_data_2.pred_txt = "index_bound: __gen_e_acsl_i < 10";
+        __gen_e_acsl_assert_data_2.pred_txt = "__gen_e_acsl_i < 10";
         __gen_e_acsl_assert_data_2.file = "linear_search.i";
         __gen_e_acsl_assert_data_2.fct = "search";
         __gen_e_acsl_assert_data_2.line = 18;
+        __gen_e_acsl_assert_data_2.name = "index_bound";
         __e_acsl_assert(__gen_e_acsl_i < 10,& __gen_e_acsl_assert_data_2);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
@@ -54,10 +55,11 @@ int search(int elt)
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __gen_e_acsl_assert_data_3.blocking = 1;
         __gen_e_acsl_assert_data_3.kind = "RTE";
-        __gen_e_acsl_assert_data_3.pred_txt = "index_bound: 0 <= __gen_e_acsl_i";
+        __gen_e_acsl_assert_data_3.pred_txt = "0 <= __gen_e_acsl_i";
         __gen_e_acsl_assert_data_3.file = "linear_search.i";
         __gen_e_acsl_assert_data_3.fct = "search";
         __gen_e_acsl_assert_data_3.line = 18;
+        __gen_e_acsl_assert_data_3.name = "index_bound";
         __e_acsl_assert(0 <= __gen_e_acsl_i,& __gen_e_acsl_assert_data_3);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
         if (A[__gen_e_acsl_i] < elt) ;
@@ -144,10 +146,11 @@ int search(int elt)
                                        "__gen_e_acsl_i_2",0,__gen_e_acsl_i_2);
           __gen_e_acsl_assert_data_7.blocking = 1;
           __gen_e_acsl_assert_data_7.kind = "RTE";
-          __gen_e_acsl_assert_data_7.pred_txt = "index_bound: __gen_e_acsl_i_2 < 10";
+          __gen_e_acsl_assert_data_7.pred_txt = "__gen_e_acsl_i_2 < 10";
           __gen_e_acsl_assert_data_7.file = "linear_search.i";
           __gen_e_acsl_assert_data_7.fct = "search";
           __gen_e_acsl_assert_data_7.line = 18;
+          __gen_e_acsl_assert_data_7.name = "index_bound";
           __e_acsl_assert(__gen_e_acsl_i_2 < 10,& __gen_e_acsl_assert_data_7);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
           __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
@@ -156,10 +159,11 @@ int search(int elt)
                                        "__gen_e_acsl_i_2",0,__gen_e_acsl_i_2);
           __gen_e_acsl_assert_data_8.blocking = 1;
           __gen_e_acsl_assert_data_8.kind = "RTE";
-          __gen_e_acsl_assert_data_8.pred_txt = "index_bound: 0 <= __gen_e_acsl_i_2";
+          __gen_e_acsl_assert_data_8.pred_txt = "0 <= __gen_e_acsl_i_2";
           __gen_e_acsl_assert_data_8.file = "linear_search.i";
           __gen_e_acsl_assert_data_8.fct = "search";
           __gen_e_acsl_assert_data_8.line = 18;
+          __gen_e_acsl_assert_data_8.name = "index_bound";
           __e_acsl_assert(0 <= __gen_e_acsl_i_2,& __gen_e_acsl_assert_data_8);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
           if (A[__gen_e_acsl_i_2] < elt) ;
@@ -269,10 +273,11 @@ int __gen_e_acsl_search(int elt)
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "RTE";
-        __gen_e_acsl_assert_data_2.pred_txt = "index_bound: (int)(__gen_e_acsl_i + 1) < 10";
+        __gen_e_acsl_assert_data_2.pred_txt = "(int)(__gen_e_acsl_i + 1) < 10";
         __gen_e_acsl_assert_data_2.file = "linear_search.i";
         __gen_e_acsl_assert_data_2.fct = "search";
         __gen_e_acsl_assert_data_2.line = 7;
+        __gen_e_acsl_assert_data_2.name = "index_bound";
         __e_acsl_assert((int)(__gen_e_acsl_i + 1L) < 10,
                         & __gen_e_acsl_assert_data_2);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -282,10 +287,11 @@ int __gen_e_acsl_search(int elt)
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __gen_e_acsl_assert_data_3.blocking = 1;
         __gen_e_acsl_assert_data_3.kind = "RTE";
-        __gen_e_acsl_assert_data_3.pred_txt = "index_bound: 0 <= (int)(__gen_e_acsl_i + 1)";
+        __gen_e_acsl_assert_data_3.pred_txt = "0 <= (int)(__gen_e_acsl_i + 1)";
         __gen_e_acsl_assert_data_3.file = "linear_search.i";
         __gen_e_acsl_assert_data_3.fct = "search";
         __gen_e_acsl_assert_data_3.line = 7;
+        __gen_e_acsl_assert_data_3.name = "index_bound";
         __e_acsl_assert(0 <= (int)(__gen_e_acsl_i + 1L),
                         & __gen_e_acsl_assert_data_3);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -295,10 +301,11 @@ int __gen_e_acsl_search(int elt)
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __gen_e_acsl_assert_data_4.blocking = 1;
         __gen_e_acsl_assert_data_4.kind = "RTE";
-        __gen_e_acsl_assert_data_4.pred_txt = "index_bound: __gen_e_acsl_i < 10";
+        __gen_e_acsl_assert_data_4.pred_txt = "__gen_e_acsl_i < 10";
         __gen_e_acsl_assert_data_4.file = "linear_search.i";
         __gen_e_acsl_assert_data_4.fct = "search";
         __gen_e_acsl_assert_data_4.line = 7;
+        __gen_e_acsl_assert_data_4.name = "index_bound";
         __e_acsl_assert(__gen_e_acsl_i < 10,& __gen_e_acsl_assert_data_4);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
@@ -307,10 +314,11 @@ int __gen_e_acsl_search(int elt)
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __gen_e_acsl_assert_data_5.blocking = 1;
         __gen_e_acsl_assert_data_5.kind = "RTE";
-        __gen_e_acsl_assert_data_5.pred_txt = "index_bound: 0 <= __gen_e_acsl_i";
+        __gen_e_acsl_assert_data_5.pred_txt = "0 <= __gen_e_acsl_i";
         __gen_e_acsl_assert_data_5.file = "linear_search.i";
         __gen_e_acsl_assert_data_5.fct = "search";
         __gen_e_acsl_assert_data_5.line = 7;
+        __gen_e_acsl_assert_data_5.name = "index_bound";
         __e_acsl_assert(0 <= __gen_e_acsl_i,& __gen_e_acsl_assert_data_5);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
         if (A[__gen_e_acsl_i] <= A[__gen_e_acsl_i + 1]) ;
@@ -344,10 +352,11 @@ int __gen_e_acsl_search(int elt)
                                      "__gen_e_acsl_j",0,__gen_e_acsl_j);
         __gen_e_acsl_assert_data_6.blocking = 1;
         __gen_e_acsl_assert_data_6.kind = "RTE";
-        __gen_e_acsl_assert_data_6.pred_txt = "index_bound: __gen_e_acsl_j < 10";
+        __gen_e_acsl_assert_data_6.pred_txt = "__gen_e_acsl_j < 10";
         __gen_e_acsl_assert_data_6.file = "linear_search.i";
         __gen_e_acsl_assert_data_6.fct = "search";
         __gen_e_acsl_assert_data_6.line = 9;
+        __gen_e_acsl_assert_data_6.name = "index_bound";
         __e_acsl_assert(__gen_e_acsl_j < 10,& __gen_e_acsl_assert_data_6);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
@@ -356,10 +365,11 @@ int __gen_e_acsl_search(int elt)
                                      "__gen_e_acsl_j",0,__gen_e_acsl_j);
         __gen_e_acsl_assert_data_7.blocking = 1;
         __gen_e_acsl_assert_data_7.kind = "RTE";
-        __gen_e_acsl_assert_data_7.pred_txt = "index_bound: 0 <= __gen_e_acsl_j";
+        __gen_e_acsl_assert_data_7.pred_txt = "0 <= __gen_e_acsl_j";
         __gen_e_acsl_assert_data_7.file = "linear_search.i";
         __gen_e_acsl_assert_data_7.fct = "search";
         __gen_e_acsl_assert_data_7.line = 9;
+        __gen_e_acsl_assert_data_7.name = "index_bound";
         __e_acsl_assert(0 <= __gen_e_acsl_j,& __gen_e_acsl_assert_data_7);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
         if (! (A[__gen_e_acsl_j] == elt)) ;
@@ -384,10 +394,11 @@ int __gen_e_acsl_search(int elt)
                                      "__gen_e_acsl_j_2",0,__gen_e_acsl_j_2);
         __gen_e_acsl_assert_data_8.blocking = 1;
         __gen_e_acsl_assert_data_8.kind = "RTE";
-        __gen_e_acsl_assert_data_8.pred_txt = "index_bound: __gen_e_acsl_j_2 < 10";
+        __gen_e_acsl_assert_data_8.pred_txt = "__gen_e_acsl_j_2 < 10";
         __gen_e_acsl_assert_data_8.file = "linear_search.i";
         __gen_e_acsl_assert_data_8.fct = "search";
         __gen_e_acsl_assert_data_8.line = 12;
+        __gen_e_acsl_assert_data_8.name = "index_bound";
         __e_acsl_assert(__gen_e_acsl_j_2 < 10,& __gen_e_acsl_assert_data_8);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
@@ -396,10 +407,11 @@ int __gen_e_acsl_search(int elt)
                                      "__gen_e_acsl_j_2",0,__gen_e_acsl_j_2);
         __gen_e_acsl_assert_data_9.blocking = 1;
         __gen_e_acsl_assert_data_9.kind = "RTE";
-        __gen_e_acsl_assert_data_9.pred_txt = "index_bound: 0 <= __gen_e_acsl_j_2";
+        __gen_e_acsl_assert_data_9.pred_txt = "0 <= __gen_e_acsl_j_2";
         __gen_e_acsl_assert_data_9.file = "linear_search.i";
         __gen_e_acsl_assert_data_9.fct = "search";
         __gen_e_acsl_assert_data_9.line = 12;
+        __gen_e_acsl_assert_data_9.name = "index_bound";
         __e_acsl_assert(0 <= __gen_e_acsl_j_2,& __gen_e_acsl_assert_data_9);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
         if (A[__gen_e_acsl_j_2] != elt) ;
@@ -426,10 +438,11 @@ int __gen_e_acsl_search(int elt)
                                    0,__retres);
       __gen_e_acsl_assert_data_10.blocking = 1;
       __gen_e_acsl_assert_data_10.kind = "Postcondition";
-      __gen_e_acsl_assert_data_10.pred_txt = "exists: \\result == 1";
+      __gen_e_acsl_assert_data_10.pred_txt = "\\result == 1";
       __gen_e_acsl_assert_data_10.file = "linear_search.i";
       __gen_e_acsl_assert_data_10.fct = "search";
       __gen_e_acsl_assert_data_10.line = 10;
+      __gen_e_acsl_assert_data_10.name = "exists";
       __e_acsl_assert(__retres == 1,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
@@ -442,10 +455,11 @@ int __gen_e_acsl_search(int elt)
                                    0,__retres);
       __gen_e_acsl_assert_data_11.blocking = 1;
       __gen_e_acsl_assert_data_11.kind = "Postcondition";
-      __gen_e_acsl_assert_data_11.pred_txt = "not_exists: \\result == 0";
+      __gen_e_acsl_assert_data_11.pred_txt = "\\result == 0";
       __gen_e_acsl_assert_data_11.file = "linear_search.i";
       __gen_e_acsl_assert_data_11.fct = "search";
       __gen_e_acsl_assert_data_11.line = 13;
+      __gen_e_acsl_assert_data_11.name = "not_exists";
       __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_11);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
     }

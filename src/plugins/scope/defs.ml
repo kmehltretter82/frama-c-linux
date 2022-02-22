@@ -62,10 +62,8 @@ let rec add_callee_nodes z acc nodes =
       (fun node acc2 ->
          match !Db.Pdg.node_key node with
          | PdgIndex.Key.SigCallKey (cid, PdgIndex.Signature.Out out_key) ->
-           let callees =
-             Db.Value.call_to_kernel_function (PdgIndex.Key.call_from_id cid)
-           in
-           Kernel_function.Hptset.fold (fun kf (new_nodes, acc) ->
+           let callees = Eva.Results.callee (PdgIndex.Key.call_from_id cid) in
+           List.fold_left (fun (new_nodes, acc) kf ->
                let callee_pdg = !Db.Pdg.get kf in
                let outputs = match out_key with
                  | PdgIndex.Signature.OutLoc out ->
@@ -78,8 +76,8 @@ let rec add_callee_nodes z acc nodes =
                in
                let outputs = List.map fst outputs in
                add_list_to_set outputs new_nodes, add_list_to_set outputs acc)
-             callees
              acc2
+             callees
          | _ -> acc2)
       nodes
       (NSet.empty, acc)
@@ -134,7 +132,7 @@ let rec add_caller_nodes z kf acc (undef, nodes) =
     let acc_undef, caller_nodes =
       List.fold_left (add_one_call_nodes pdg) (None, NSet.empty) stmts
     in add_caller_nodes z kf (NSet.union caller_nodes acc) (acc_undef, caller_nodes)
-  in List.fold_left add_one_caller_nodes acc (!Db.Value.callers kf)
+  in List.fold_left add_one_caller_nodes acc (Eva.Results.callsites kf)
 
 let compute_aux kf stmt zone =
   debug1 "[Defs.compute] for %a at sid:%d in '%a'@."
@@ -168,9 +166,9 @@ let compute kf stmt lval =
     let defs = NSet.fold add_node nodes Stmt.Hptset.empty in
     (defs, undef)
   in
-  !Db.Value.compute ();
-  let zone = !Db.Value.lval_to_zone (Kstmt stmt) lval in
-  Option.map extract (compute_aux kf stmt zone)
+  Eva.Analysis.compute ();
+  let zone = Eva.Results.(before stmt |> eval_address lval |> as_zone) in
+  compute_aux kf stmt zone |> Option.map extract
 
 (* Variation of the function above. For each PDG node that has been found,
    we find whether it directly modifies [zone] through an affectation
@@ -219,8 +217,10 @@ let compute_with_def_type_zone kf stmt zone =
   Option.map extract (compute_aux kf stmt zone)
 
 let compute_with_def_type kf stmt lval =
-  !Db.Value.compute ();
-  let zone = !Db.Value.lval_to_zone (Kstmt stmt) lval in
+  Eva.Analysis.compute ();
+  let zone =
+    Eva.Results.(before stmt |> eval_address lval |> as_zone)
+  in
   compute_with_def_type_zone kf stmt zone
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)

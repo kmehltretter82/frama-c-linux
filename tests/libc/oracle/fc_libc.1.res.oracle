@@ -2047,7 +2047,7 @@ static void str_append(char **to, size_t *to_len, char const *buf,
 error_t argz_replace(char **argz, size_t *argz_len, char const *str,
                      char const *with, unsigned int *replace_count)
 {
-  error_t err = 0;
+  error_t er = 0;
   if (str) 
     if (*str) {
       char *arg = (char *)0;
@@ -2059,7 +2059,7 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
       size_t str_len = strlen(str);
       size_t with_len = strlen(with);
       while (1) {
-        if (! err) {
+        if (! er) {
           arg = argz_next((char const *)src,src_len,(char const *)arg);
           if (! arg) break;
         }
@@ -2094,23 +2094,23 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
             }
             if (to) {
               if (delayed_copy) {
-                if (arg > src) err = argz_append(& dst,& dst_len,
-                                                 (char const *)src,
-                                                 (unsigned int)(arg - src));
+                if (arg > src) er = argz_append(& dst,& dst_len,
+                                                (char const *)src,
+                                                (unsigned int)(arg - src));
                 delayed_copy = 0;
               }
-              if (! err) err = argz_add(& dst,& dst_len,(char const *)to);
+              if (! er) er = argz_add(& dst,& dst_len,(char const *)to);
               free((void *)to);
             }
-            else err = 12;
+            else er = 12;
             if (replace_count) (*replace_count) ++;
           }
           else 
-            if (! delayed_copy) err = argz_add(& dst,& dst_len,
-                                               (char const *)arg);
+            if (! delayed_copy) er = argz_add(& dst,& dst_len,
+                                              (char const *)arg);
         }
       }
-      if (! err) {
+      if (! er) {
         if (! delayed_copy) {
           free((void *)src);
           *argz = dst;
@@ -2120,7 +2120,7 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
       else 
         if (dst_len > (size_t)0) free((void *)dst);
     }
-  return err;
+  return er;
 }
 
 char *argz_next(char const *argz, size_t argz_len, char const *entry)
@@ -8506,6 +8506,62 @@ extern DIR *opendir(char const *path);
     assigns __fc_errno \from dirp, *dirp, __fc_p_opendir;
  */
 extern struct dirent *readdir(DIR *dirp);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from eval;
+ */
+void err(int eval, char const *fmt, void * const *__va_params);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from eval;
+ */
+void errx(int eval, char const *fmt, void * const *__va_params);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    assigns \nothing;
+ */
+void warn(char const *fmt, void * const *__va_params);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    assigns \nothing;
+ */
+void warnx(char const *fmt, void * const *__va_params);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from eval;
+ */
+void verr(int eval, char const *fmt, va_list args);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from eval;
+ */
+void verrx(int eval, char const *fmt, va_list args);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    assigns \nothing;
+ */
+void vwarn(char const *fmt, va_list args);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    assigns \nothing;
+ */
+void vwarnx(char const *fmt, va_list args);
 
 /*@ requires valid_res: \valid(res);
     ensures initialization: res: \initialized(\old(res));

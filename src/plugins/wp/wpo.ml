@@ -53,13 +53,13 @@ let pp_function fmt kf bhv =
   flow := true ;
   match bhv with
   | None ->
-      Format.fprintf fmt
-        "%s@\n  Function %s@\n%s@\n@\n"
-        bar (Kernel_function.get_name kf) bar
+    Format.fprintf fmt
+      "%s@\n  Function %s@\n%s@\n@\n"
+      bar (Kernel_function.get_name kf) bar
   | Some bhv ->
-      Format.fprintf fmt
-        "%s@\n  Function %s with behavior %s@\n%s@\n@\n"
-        bar (Kernel_function.get_name kf) bhv bar
+    Format.fprintf fmt
+      "%s@\n  Function %s with behavior %s@\n%s@\n@\n"
+      bar (Kernel_function.get_name kf) bhv bar
 
 let pp_warnings fmt ws =
   List.iter (fun w -> Format.fprintf fmt "%a@\n" Warning.pretty w) ws
@@ -270,8 +270,8 @@ struct
     match vc.sequent with
     | Some s -> s
     | None ->
-        let s = Conditions.lemma vc.lemma.l_lemma in
-        vc.sequent <- Some s ; s
+      let s = Conditions.lemma vc.lemma.l_lemma in
+      vc.sequent <- Some s ; s
 
   let pretty fmt vc results =
     begin
@@ -329,14 +329,14 @@ struct
   let pp_effect fmt = function
     | None -> ()
     | Some(s,e) ->
-        let loc = fst (Stmt.loc s) in
-        let line = loc.Filepath.pos_lnum in
-        let desc = match e with
-          | WpPropId.FromCode -> "Effect"
-          | WpPropId.FromCall -> "Call Effect"
-          | WpPropId.FromReturn -> "Call Result"
-        in
-        Format.fprintf fmt "%s at line %d@\n" desc line
+      let loc = fst (Stmt.loc s) in
+      let line = loc.Filepath.pos_lnum in
+      let desc = match e with
+        | WpPropId.FromCode -> "Effect"
+        | WpPropId.FromCall -> "Call Effect"
+        | WpPropId.FromReturn -> "Call Result"
+      in
+      Format.fprintf fmt "%s at line %d@\n" desc line
 
   let pretty fmt pid vc results =
     begin
@@ -392,9 +392,9 @@ let get_context w = w.po_model , get_scope w
 
 let get_depend = function
   | { po_formula = GoalAnnot { VC_Annot.deps = ips } } ->
-      Property.Set.elements ips
+    Property.Set.elements ips
   | { po_formula = GoalLemma { VC_Lemma.depends = ips } } ->
-      List.map LogicUsage.ip_lemma ips
+    List.map LogicUsage.ip_lemma ips
 
 let get_file_logout w prover =
   DISK.file_logout ~pid:w.po_pid ~model:(get_model w) ~prover
@@ -417,13 +417,13 @@ struct
     | Axiomatic _ , Function _ -> (-1)
     | Function _ , Axiomatic _ -> 1
     | Function(f,a) , Function(g,b) ->
-        let c =
-          if Kernel_function.equal f g then 0 else
-            String.compare
-              (Kernel_function.get_name f)
-              (Kernel_function.get_name g)
-        in
-        if c=0 then cmpopt a b else c
+      let c =
+        if Kernel_function.equal f g then 0 else
+          String.compare
+            (Kernel_function.get_name f)
+            (Kernel_function.get_name g)
+      in
+      if c=0 then cmpopt a b else c
 end
 
 module S =
@@ -653,7 +653,7 @@ let add g =
     begin
       match g.po_idx with
       | Function(kf,_) ->
-          system.wpo_kf <- index_wpo Fmap.add Fmap.find kf g system.wpo_kf
+        system.wpo_kf <- index_wpo Fmap.add Fmap.find kf g system.wpo_kf
       | _ -> ()
     end ;
     incr added ;
@@ -682,7 +682,7 @@ let remove g =
     begin
       match g.po_idx with
       | Function(kf,_) ->
-          system.wpo_kf <- unindex_wpo Fmap.add Fmap.find kf g system.wpo_kf
+        system.wpo_kf <- unindex_wpo Fmap.add Fmap.find kf g system.wpo_kf
       | Axiomatic _ -> ()
     end ;
     system.results <- WPOmap.remove g system.results ;
@@ -790,10 +790,10 @@ let is_trivial g =
 let reduce g =
   match g.po_formula with
   | GoalLemma vc ->
-      WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
+    WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
   | GoalAnnot vc ->
-      let pid = g.po_pid in
-      WpContext.on_context (get_context g) (VC_Annot.resolve ~pid) vc
+    let pid = g.po_pid in
+    WpContext.on_context (get_context g) (VC_Annot.resolve ~pid) vc
 
 let resolve g =
   let valid = reduce g in
@@ -806,12 +806,12 @@ let compute g =
   let ctxt = get_context g in
   match g.po_formula with
   | GoalAnnot { VC_Annot.axioms ; VC_Annot.goal = goal } ->
-      let pid = g.po_pid in
-      axioms , WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal
+    let pid = g.po_pid in
+    axioms , WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal
   | GoalLemma ({ VC_Lemma.depends = depends ; VC_Lemma.lemma = lemma } as w) ->
-      let open Definitions in
-      Some( lemma.l_cluster , depends ) ,
-      WpContext.on_context ctxt VC_Lemma.sequent w
+    let open Definitions in
+    Some( lemma.l_cluster , depends ) ,
+    WpContext.on_context ctxt VC_Lemma.sequent w
 
 let is_proved g =
   is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
@@ -845,9 +845,9 @@ let pp_goal_model fmt w =
   begin
     match w.po_formula with
     | GoalAnnot vcq ->
-        VC_Annot.pretty fmt w.po_pid vcq (get_results w)
+      VC_Annot.pretty fmt w.po_pid vcq (get_results w)
     | GoalLemma vca ->
-        VC_Lemma.pretty fmt vca (get_results w)
+      VC_Lemma.pretty fmt vca (get_results w)
   end
 
 let pp_goal fmt w = WpContext.on_context (get_context w) (pp_goal_model fmt) w
@@ -895,27 +895,27 @@ let iter ?ip ?index ?on_axiomatics ?on_behavior ?on_goal () =
   in
   match index,ip with
   | None,None ->
-      Gmap.iter (fun idx ws -> on_part idx ; on_goals ws) system.wpo_idx
+    Gmap.iter (fun idx ws -> on_part idx ; on_goals ws) system.wpo_idx
   | _,Some ip ->
-      begin
-        match on_goal with
-        | None -> ()
-        | Some phi ->
-            let poset =
-              try Pmap.find ip system.wpo_ip
-              with Not_found -> WPOset.empty in
-            WPOset.iter phi poset
-      end
+    begin
+      match on_goal with
+      | None -> ()
+      | Some phi ->
+        let poset =
+          try Pmap.find ip system.wpo_ip
+          with Not_found -> WPOset.empty in
+        WPOset.iter phi poset
+    end
   | Some (Function(kf,None)),None ->
-      begin
-        try on_goals (Fmap.find kf system.wpo_kf)
-        with Not_found -> ()
-      end
+    begin
+      try on_goals (Fmap.find kf system.wpo_kf)
+      with Not_found -> ()
+    end
   | Some idx,None ->
-      begin
-        try on_goals (Gmap.find idx system.wpo_idx)
-        with Not_found -> ()
-      end
+    begin
+      try on_goals (Gmap.find idx system.wpo_idx)
+      with Not_found -> ()
+    end
 
 let iter_on_goals =
   Dynamic.register ~plugin:"Wp" "Wpo.iter_on_goals"
@@ -972,9 +972,9 @@ let get_files w =
   let results = get_results w in
   let descr_files = match w.po_formula with
     | GoalAnnot vcq ->
-        [ "Goal" , VC_Annot.cache_descr ~pid:w.po_pid vcq results ]
+      [ "Goal" , VC_Annot.cache_descr ~pid:w.po_pid vcq results ]
     | GoalLemma vca ->
-        [ "Lemma" , VC_Lemma.cache_descr vca results ]
+      [ "Lemma" , VC_Lemma.cache_descr vca results ]
   in
   let result_files =
     List.fold_right

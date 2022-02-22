@@ -783,6 +783,7 @@ plugin_require(inout,callgraph)
 #########
 
 check_plugin(metrics,src/plugins/metrics,[support for metrics analysis],yes)
+plugin_require(metrics,server)
 plugin_require(metrics,eva)
 plugin_use(metrics,gui)
 

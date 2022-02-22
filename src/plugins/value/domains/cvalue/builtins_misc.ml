@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Value_util
+open Eva_utils
 
 
 let frama_C_assert state actuals =

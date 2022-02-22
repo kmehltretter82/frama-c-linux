@@ -60,47 +60,47 @@ class norm_at (mapping : label_mapping) =
     method! vterm t =
       match t.term_node with
       | Tat (t, l) ->
-          let old_label = self#change_label l in
-          let new_t = {t with term_node = Ttypeof t} in
-          Cil.ChangeDoChildrenPost (new_t, self#restore_term old_label)
+        let old_label = self#change_label l in
+        let new_t = {t with term_node = Ttypeof t} in
+        Cil.ChangeDoChildrenPost (new_t, self#restore_term old_label)
       | TAddrOf (h, _) | TLval (h, _) | TStartOf (h, _)  ->
-          let old_label = current_label in
-          let at_label = match h with
-            | TResult _ | TVar{lv_name="\\exit_status"} -> Some Clabels.post
-            | _ -> old_label
-          in
-          current_label <- None;
-          let post t =
-            current_label <- old_label;
-            match at_label with
-            | Some label -> {t with term_node = Tat (t, Clabels.to_logic label)}
-            | None -> t
-          in Cil.ChangeDoChildrenPost (t, post)
+        let old_label = current_label in
+        let at_label = match h with
+          | TResult _ | TVar{lv_name="\\exit_status"} -> Some Clabels.post
+          | _ -> old_label
+        in
+        current_label <- None;
+        let post t =
+          current_label <- old_label;
+          match at_label with
+          | Some label -> {t with term_node = Tat (t, Clabels.to_logic label)}
+          | None -> t
+        in Cil.ChangeDoChildrenPost (t, post)
       | Tapp _ ->
-          let post = function
-            | {term_node=Tapp(predicate,labels,args)} as t ->
-                let normalize l = mapping l |> Clabels.to_logic in
-                let new_labels = List.map normalize labels in
-                { t with term_node=Tapp(predicate,new_labels,args) }
-            | _ -> assert false
-          in
-          Cil.ChangeDoChildrenPost (t,post)
+        let post = function
+          | {term_node=Tapp(predicate,labels,args)} as t ->
+            let normalize l = mapping l |> Clabels.to_logic in
+            let new_labels = List.map normalize labels in
+            { t with term_node=Tapp(predicate,new_labels,args) }
+          | _ -> assert false
+        in
+        Cil.ChangeDoChildrenPost (t,post)
       | _ -> Cil.DoChildren
 
     method! vpredicate p = match p.pred_content with
       | Pat (p, l) ->
-          let old_label = self#change_label l in
-          let new_p = {p with pred_content = Pnot p} in
-          Cil.ChangeDoChildrenPost (new_p, self#restore_pred old_label)
+        let old_label = self#change_label l in
+        let new_p = {p with pred_content = Pnot p} in
+        Cil.ChangeDoChildrenPost (new_p, self#restore_pred old_label)
       | Papp _ ->
-          let post = function
-            | {pred_content=Papp(predicate,labels,args)} as p ->
-                let normalize l = mapping l |> Clabels.to_logic in
-                let new_labels = List.map normalize labels in
-                { p with pred_content=Papp(predicate,new_labels,args) }
-            | _ -> assert false
-          in
-          Cil.ChangeDoChildrenPost (p,post)
+        let post = function
+          | {pred_content=Papp(predicate,labels,args)} as p ->
+            let normalize l = mapping l |> Clabels.to_logic in
+            let new_labels = List.map normalize labels in
+            { p with pred_content=Papp(predicate,new_labels,args) }
+          | _ -> assert false
+        in
+        Cil.ChangeDoChildrenPost (p,post)
       | _ -> Cil.DoChildren
   end
 
@@ -223,24 +223,24 @@ let preproc_assigns labels asgns =
 let has_postassigns = function
   | WritesAny -> false
   | Writes froms ->
-      let exception HAS_POST in
-      let visitor = new norm_at (fun l ->
-          if Clabels.is_post l then raise HAS_POST
-          else Clabels.of_logic l
-        ) in
-      try
-        List.iter
-          (fun fr -> ignore @@ Visitor.visitFramacFrom visitor fr)
-          froms ;
-        false
-      with HAS_POST ->
-        true
+    let exception HAS_POST in
+    let visitor = new norm_at (fun l ->
+        if Clabels.is_post l then raise HAS_POST
+        else Clabels.of_logic l
+      ) in
+    try
+      List.iter
+        (fun fr -> ignore @@ Visitor.visitFramacFrom visitor fr)
+        froms ;
+      false
+    with HAS_POST ->
+      true
 
 let catch_label_error ex txt1 txt2 = match ex with
   | LabelError lab ->
-      Wp_parameters.warning
-        "Unexpected label %a in %s : ignored %s"
-        Wp_error.pp_logic_label lab txt1 txt2
+    Wp_parameters.warning
+      "Unexpected label %a in %s : ignored %s"
+      Wp_error.pp_logic_label lab txt1 txt2
   | _ -> raise ex
 
 (* -------------------------------------------------------------------------- *)

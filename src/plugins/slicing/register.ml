@@ -27,7 +27,7 @@ let main () =
     (* have to do the value analysis before the selections
      * because some functions use its results,
      * and the value analysis is not launched automatically. *)
-    !Db.Value.compute ();
+    Eva.Analysis.compute ();
 
     let project_name = SlicingParameters.ProjectName.get () in
     Api.Project.reset_slicing ();

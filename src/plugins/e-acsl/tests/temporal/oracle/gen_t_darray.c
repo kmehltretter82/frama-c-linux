@@ -29,10 +29,11 @@ void area_triangle(double (*vertices)[4])
                                  0,__gen_e_acsl_valid_read);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "rte: mem_access: \\valid_read((double *)*(vertices + 0))";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid_read((double *)*(vertices + 0))";
     __gen_e_acsl_assert_data.file = "t_darray.c";
     __gen_e_acsl_assert_data.fct = "area_triangle";
     __gen_e_acsl_assert_data.line = 6;
+    __gen_e_acsl_assert_data.name = "rte/mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -55,10 +56,11 @@ void area_triangle(double (*vertices)[4])
                                  0,__gen_e_acsl_valid_read_2);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "rte: mem_access: \\valid_read((double *)*(vertices + 1))";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read((double *)*(vertices + 1))";
     __gen_e_acsl_assert_data_2.file = "t_darray.c";
     __gen_e_acsl_assert_data_2.fct = "area_triangle";
     __gen_e_acsl_assert_data_2.line = 7;
+    __gen_e_acsl_assert_data_2.name = "rte/mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }

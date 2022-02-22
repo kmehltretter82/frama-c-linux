@@ -103,10 +103,11 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                                       (void *)(& buf));
         __gen_e_acsl_assert_data.blocking = 1;
         __gen_e_acsl_assert_data.kind = "RTE";
-        __gen_e_acsl_assert_data.pred_txt = "mem_access: \\valid_read((char *)buf + __gen_e_acsl_i)";
+        __gen_e_acsl_assert_data.pred_txt = "\\valid_read((char *)buf + __gen_e_acsl_i)";
         __gen_e_acsl_assert_data.file = "bts1390.c";
         __gen_e_acsl_assert_data.fct = "memchr";
         __gen_e_acsl_assert_data.line = 8;
+        __gen_e_acsl_assert_data.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
         if (! ((int)*((char *)buf + __gen_e_acsl_i) == c)) ;
@@ -141,10 +142,11 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                                         (void *)(& buf));
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "RTE";
-        __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read((char *)buf + __gen_e_acsl_k)";
+        __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read((char *)buf + __gen_e_acsl_k)";
         __gen_e_acsl_assert_data_2.file = "bts1390.c";
         __gen_e_acsl_assert_data_2.fct = "memchr";
         __gen_e_acsl_assert_data_2.line = 11;
+        __gen_e_acsl_assert_data_2.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read_2,
                         & __gen_e_acsl_assert_data_2);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -199,10 +201,11 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                                           (void *)(& __gen_e_acsl_at));
           __gen_e_acsl_assert_data_4.blocking = 1;
           __gen_e_acsl_assert_data_4.kind = "RTE";
-          __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read((char *)__gen_e_acsl_at + __gen_e_acsl_j)";
+          __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read((char *)__gen_e_acsl_at + __gen_e_acsl_j)";
           __gen_e_acsl_assert_data_4.file = "bts1390.c";
           __gen_e_acsl_assert_data_4.fct = "memchr";
           __gen_e_acsl_assert_data_4.line = 9;
+          __gen_e_acsl_assert_data_4.name = "mem_access";
           __e_acsl_assert(__gen_e_acsl_valid_read_3,
                           & __gen_e_acsl_assert_data_4);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -221,10 +224,11 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                    0,__gen_e_acsl_forall_2);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Postcondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "exists:\n  \\forall int j;\n    0 <= j < (int)\\offset((char *)\\result) ==>\n    (int)*((char *)\\old(buf) + j) != \\old(c)";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\forall int j;\n  0 <= j < (int)\\offset((char *)\\result) ==>\n  (int)*((char *)\\old(buf) + j) != \\old(c)";
       __gen_e_acsl_assert_data_3.file = "bts1390.c";
       __gen_e_acsl_assert_data_3.fct = "memchr";
       __gen_e_acsl_assert_data_3.line = 9;
+      __gen_e_acsl_assert_data_3.name = "exists";
       __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
@@ -237,10 +241,11 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                    __retres);
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "Postcondition";
-      __gen_e_acsl_assert_data_5.pred_txt = "not_exists: \\result == (void *)0";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\result == (void *)0";
       __gen_e_acsl_assert_data_5.file = "bts1390.c";
       __gen_e_acsl_assert_data_5.fct = "memchr";
       __gen_e_acsl_assert_data_5.line = 12;
+      __gen_e_acsl_assert_data_5.name = "not_exists";
       __e_acsl_assert(__retres == (void *)0,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }

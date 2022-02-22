@@ -63,7 +63,7 @@ let main _ =
     Cil.visitCilFile infos new_cil_file (* the cil file after slicing *);;
   *)
   Dynamic.Parameter.Bool.set "-eva-show-progress" true;
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   let all = Cil_datatype.Fundec.Set.empty in
   let proj3 = Constant_Propagation.Api.get all ~cast_intro:true in
   Project.set_current proj3;

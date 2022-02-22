@@ -64,7 +64,7 @@ module RedStatusesTable =
     (struct
       let name = "Value.Red_statuses.RedStatusesTable"
       let size = 16
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
     end)
 
 let add_red_ap kinstr ap =
@@ -76,7 +76,7 @@ let add_red_ap kinstr ap =
     try AlarmOrProp.Map.find ap current_map
     with Not_found -> Callstacks.empty
   in
-  let new_callstacks = Callstacks.add (Value_util.call_stack ()) callstacks in
+  let new_callstacks = Callstacks.add (Eva_utils.call_stack ()) callstacks in
   let new_map = AlarmOrProp.Map.add ap new_callstacks current_map in
   RedStatusesTable.replace kinstr new_map
 
@@ -194,7 +194,7 @@ let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
     dir file lnum kf alarm kind contexts status text
 
 let output file =
-  Value_parameters.feedback "Listing red statuses in file %a"
+  Self.feedback "Listing red statuses in file %a"
     Filepath.Normalized.pretty file;
   let channel = open_out (file:>string) in
   let fmt = Format.formatter_of_out_channel channel in
@@ -209,4 +209,4 @@ let output file =
   Format.fprintf fmt "@]%!"
 
 let report () =
-  Value_parameters.ReportRedStatuses.(if not (is_empty ()) then output (get ()))
+  Parameters.ReportRedStatuses.(if not (is_empty ()) then output (get ()))

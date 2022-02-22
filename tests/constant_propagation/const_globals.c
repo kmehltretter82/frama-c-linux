@@ -1,7 +1,7 @@
 /* run.config
+   PLUGIN:
    OPT: -constfold -print -machdep x86_32
 */
-
 #include <stddef.h>
 
 typedef const size_t const_size_t;

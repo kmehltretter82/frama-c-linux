@@ -59,7 +59,36 @@ let valid_sid = false
 open Cil_types
 open Cil_datatype
 
-let stripUnderscore s =
+(* Maps the start and end positions of a function declaration or definition
+   (including its possible contract) to its name. *)
+module FuncLocs = struct
+  include
+    State_builder.List_ref
+      (Datatype.Triple
+         (Cil_datatype.Position)(Cil_datatype.Position)(Datatype.String)
+      )
+      (struct
+        let name = "FuncLocs"
+        let dependencies = [ Kernel.Files.self ]
+      end)
+
+  let add_loc ?spec loc1 loc2 funcname =
+    let startpos =
+      match spec with
+      | None -> fst loc1
+      | Some (_, spec_loc) -> fst spec_loc
+    in
+    let endpos = snd loc2 in
+    add (startpos, endpos, funcname)
+end
+
+let func_locs () = FuncLocs.get ()
+
+(* Attributes which are entirely unsupported by Frama-C and must cause a
+   parsing error, since their behavior requires non-standard parsing *)
+let unsupported_attributes = ["vector_size"]
+
+let stripUnderscore ?(checkUnsupported=true) s =
   if String.length s = 1 then begin
     if s = "_" then
       Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
@@ -68,6 +97,8 @@ let stripUnderscore s =
     let res = Extlib.strip_underscore s in
     if res = "" then
       Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+    if checkUnsupported && List.mem res unsupported_attributes then
+      Kernel.error ~current:true "unsupported attribute: %s" s;
     res
   end
 
@@ -4099,7 +4130,6 @@ let continueUsed () =
   match !continues with
   | [] -> Kernel.fatal ~current:true "not in a loop"
   | (While lr | NotWhile lr) :: _ -> !lr <> ""
-
 
 (****** TYPE SPECIFIERS *******)
 
@@ -8613,12 +8643,14 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * C
     List.exists (fun (_,el) -> List.exists is_fc_stdlib el) a
   in
   (* Make a first version of the varinfo *)
+  let vi_loc = convLoc cloc in
   let vi = makeVarInfoCabs ~ghost ~isformal:false ~referenced:islibc
-      ~isglobal:true ~isgenerated (convLoc cloc) (t,s,b,attr_list) (n,ndt,a)
+      ~isglobal:true ~isgenerated vi_loc (t,s,b,attr_list) (n,ndt,a)
   in
   (* Add the variable to the environment before doing the initializer
    * because it might refer to the variable itself *)
   if isFunctionType vi.vtype then begin
+    FuncLocs.add_loc ?spec:logic_spec (CurrentLoc.get ()) vi_loc n;
     if inite != Cabs.NO_INIT  then
       Kernel.error ~once:true ~current:true
         "Function declaration with initializer (%s)\n" vi.vname;
@@ -9240,6 +9272,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "Definition of %s at %a\n" n Cil_printer.pp_location idloc;
       CurrentLoc.set idloc;
+      FuncLocs.add_loc ?spec loc1 endloc n;
       IH.clear callTempVars;
 
       (* Make the fundec right away, and we'll populate it later. We

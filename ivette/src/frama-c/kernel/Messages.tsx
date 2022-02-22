@@ -39,8 +39,8 @@ import * as Compare from 'dome/data/compare';
 
 import { State, GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
-import * as Ast from 'frama-c/api/kernel/ast';
-import * as Kernel from 'frama-c/api/kernel/services';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as Kernel from 'frama-c/kernel/api/services';
 
 type Message = Kernel.messageData;
 type logkind = Kernel.logkind;

@@ -118,6 +118,7 @@ val runtime_check:
 val runtime_check_with_msg:
   adata:t ->
   loc:location ->
+  ?name:string ->
   string ->
   pred_kind:predicate_kind ->
   Smart_stmt.annotation_kind ->
@@ -125,12 +126,13 @@ val runtime_check_with_msg:
   Env.t ->
   exp ->
   stmt * Env.t
-(** [runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e] generates
-    a runtime check for [e] (or [!e] if [reverse] is [true]) by building a call
-    to [__e_acsl_assert].
+(** [runtime_check_with_msg ~adata ~loc ?name msg ~pred_kind kind kf env e]
+    generates a runtime check for [e] (or [!e] if [reverse] is [true]) by
+    building a call to [__e_acsl_assert].
     [adata] is the assertion context holding the data contributing to the
     assertion.
     [loc] is the location printed in the message if the runtime check fails.
+    [name] is the name of the predicate printed if the runtime check fails.
     [msg] is the message printed if the runtime check fails.
     [pred_kind] indicates if the assert should be blocking or not.
     [kind] is the annotation kind of [p].

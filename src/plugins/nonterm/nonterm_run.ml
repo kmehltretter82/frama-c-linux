@@ -181,7 +181,7 @@ class unreachable_stmt_visitor kf to_ignore = object
 
   method! vstmt stmt =
     if Stmt.Hptset.mem stmt syntactically_reachable &&
-       Db.Value.is_reachable_stmt stmt = false &&
+       not (Eva.Results.is_reachable stmt) &&
        not (Stmt.Hptset.mem stmt !semantically_considered)
     then begin
       (* add node and its reachable successors to the considered statements *)
@@ -197,11 +197,10 @@ end
    1. SyntacticallyUnreachable is disabled (otherwise it already checks them);
    2. No warnings were emitted for the function (otherwise it may be redundant). *)
 let check_unreachable_returns kf =
-  let st = Db.Value.get_initial_state kf in
-  if Db.Value.is_reachable st then begin
+  if Eva.Results.is_called kf then begin
     try
       let ret_stmt = Kernel_function.find_return kf in
-      if not (Db.Value.is_reachable_stmt ret_stmt) then
+      if not (Eva.Results.is_reachable ret_stmt) then
         warn_unreachable_statement ret_stmt
     with
     | Kernel_function.No_Statement -> (* should never happen *)
@@ -221,25 +220,24 @@ let check_unreachable_statements kf ~to_ignore ~dead_code ~warned_kfs =
                 considered as always terminating"
       Kernel_function.pretty kf
   else
-    let st = Db.Value.get_initial_state kf in
-    if Db.Value.is_reachable st then begin
-      try
-        let vis = new unreachable_stmt_visitor kf to_ignore in
+  if Eva.Results.is_called kf then begin
+    try
+      let vis = new unreachable_stmt_visitor kf to_ignore in
+      ignore (Visitor.visitFramacKf (vis :> Visitor.frama_c_visitor) kf);
+      if dead_code then begin
+        (* compute syntactically unreachable statements *)
+        let vis = new dead_cc_collector kf in
         ignore (Visitor.visitFramacKf (vis :> Visitor.frama_c_visitor) kf);
-        if dead_code then begin
-          (* compute syntactically unreachable statements *)
-          let vis = new dead_cc_collector kf in
-          ignore (Visitor.visitFramacKf (vis :> Visitor.frama_c_visitor) kf);
-          let cc_heads = List.map List.hd vis#get in
-          Stmt.Hptset.iter (fun h -> warn_dead_code h) (Stmt.Hptset.of_list cc_heads)
-        end
-        else if not (Kernel_function.Set.mem kf warned_kfs) then
-          check_unreachable_returns kf
-      with
-      | Kernel_function.No_Statement -> (* should never happen *)
-        Self.error "function %a has no return statement, skipping"
-          Kernel_function.pretty kf;
-    end
+        let cc_heads = List.map List.hd vis#get in
+        Stmt.Hptset.iter (fun h -> warn_dead_code h) (Stmt.Hptset.of_list cc_heads)
+      end
+      else if not (Kernel_function.Set.mem kf warned_kfs) then
+        check_unreachable_returns kf
+    with
+    | Kernel_function.No_Statement -> (* should never happen *)
+      Self.error "function %a has no return statement, skipping"
+        Kernel_function.pretty kf;
+  end
 
 (* To avoid redundant warnings, calls to possibly non-terminating functions
    are ignored if:
@@ -281,14 +279,6 @@ class stmt_collector = object
   method get_instr_stmts = List.rev !instr_stmts
 end
 
-let get_callstack_state ~after stmt cs =
-  match Db.Value.get_stmt_state_callstack ~after stmt with
-  | None -> None (* unreachable stmt *)
-  | Some table ->
-    try
-      Some (Value_types.Callstack.Hashtbl.find table cs)
-    with Not_found -> None
-
 (* collects the list of non-terminating instructions *)
 let collect_nonterminating_statements fd nonterm_stacks =
   let vis = new stmt_collector in
@@ -309,40 +299,23 @@ let collect_nonterminating_statements fd nonterm_stacks =
       | _ ->
         let source = fst (Stmt.loc stmt) in
         Self.debug ~source "processing stmt:@ %a" Printer.pp_stmt stmt;
-        match Db.Value.get_stmt_state_callstack ~after:false stmt with
-        | None -> () (* unreachable stmt *)
-        | Some before_table ->
-          Value_types.Callstack.Hashtbl.iter
-            (fun cs before_state ->
-               try
-                 match Db.Value.get_stmt_state_callstack ~after:true stmt with
-                 | None -> (* no after table => non-terminating statement *)
-                   add_stack stmt cs
-                 | Some after_table ->
-                   let after_state =
-                     Value_types.Callstack.Hashtbl.find after_table cs
-                   in
-                   if Cvalue.Model.is_reachable before_state then
-                     if not (Cvalue.Model.is_reachable after_state) then add_stack stmt cs
-                     else if match stmt.skind with Loop _ -> true | _ -> false then begin
-                       (* special treatment for loops: even if their after state
-                          is reachable, we must check that at least one outgoing
-                          edge is reachable *)
-                       let out_edges = Stmts_graph.get_all_stmt_out_edges stmt in
-                       let all_out_edges_unreachable =
-                         List.for_all (fun (_, out_stmt) ->
-                             match get_callstack_state ~after:false out_stmt cs with
-                             | None -> true
-                             | Some state -> not (Cvalue.Model.is_reachable state)
-                           ) out_edges
-                       in
-                       if all_out_edges_unreachable then add_stack stmt cs
-                     end
-               with
-               | Not_found ->
-                 (* in this callstack, the statement is non-terminating *)
-                 add_stack stmt cs
-            ) before_table
+        let process_callstack cs =
+          if Eva.Results.(after stmt |> in_callstack cs |> is_empty) then
+            add_stack stmt cs
+          else if match stmt.skind with Loop _ -> true | _ -> false then begin
+            (* special treatment for loops: even if their after state
+                is reachable, we must check that at least one outgoing
+                edge is reachable *)
+            let out_edges = Stmts_graph.get_all_stmt_out_edges stmt in
+            let all_out_edges_unreachable =
+              List.for_all (fun (_, out_stmt) ->
+                  Eva.Results.(before out_stmt |> in_callstack cs |> is_empty)
+                ) out_edges
+            in
+            if all_out_edges_unreachable then add_stack stmt cs
+          end
+        in
+        List.iter process_callstack Eva.Results.(before stmt |> callstacks)
     ) vis#get_instr_stmts;
   !new_nonterm_stmts
 
@@ -364,7 +337,7 @@ let cmp_callstacks cs1 cs2 =
 let run () =
   if not (Ast.is_computed ()) then
     Self.abort "nonterm requires a computed AST";
-  if not (Db.Value.is_computed ()) then
+  if not (Eva.Analysis.is_computed ()) then
     Self.abort "nonterm requires a computed value analysis";
   Self.debug "Starting analysis...";
   let file = Ast.get () in
@@ -398,7 +371,7 @@ let run () =
   Self.feedback ~level:2 "Analysis done."
 ;;
 
-let run_once, _ = State_builder.apply_once "Nonterm.run" [Db.Value.self] run
+let run_once, _ = State_builder.apply_once "Nonterm.run" [Eva.Analysis.self] run
 
 let main () =
   if Enabled.get () then run_once ()

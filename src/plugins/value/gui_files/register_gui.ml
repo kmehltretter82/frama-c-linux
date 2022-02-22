@@ -35,7 +35,7 @@ module UsedVarState =
     (struct
       let size = 17
       let name = "Value.Gui.UsedVarState"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
       (* [!Db.Inputs.self_external; !Db.Outputs.self_external] would be better
          dependencies, but this introduces a very problematic recursion between
          Value and Inout *)
@@ -67,7 +67,7 @@ let sync_filetree (filetree:Filetree.t) =
           try
             let vi = Kernel_function.get_vi kf in
             let strikethrough =
-              Db.Value.is_computed () && not (!Db.Value.is_called kf)
+              Analysis.is_computed () && not (Results.is_called kf)
             in
             filetree#set_global_attribute ~strikethrough vi
           with Not_found -> ());
@@ -75,7 +75,7 @@ let sync_filetree (filetree:Filetree.t) =
        (fun vi _ ->
           if vi.vsource = true then
             filetree#set_global_attribute
-              ~strikethrough:(Db.Value.is_computed () && not (used_var vi))
+              ~strikethrough:(Analysis.is_computed () && not (used_var vi))
               vi
        );
      if not (filetree#flat_mode) then
@@ -84,7 +84,7 @@ let sync_filetree (filetree:Filetree.t) =
             (* the display name removes the path *)
             let globals_state = filetree#get_file_globals file in
             filetree#set_file_attribute
-              ~strikethrough:(Db.Value.is_computed () &&
+              ~strikethrough:(Analysis.is_computed () &&
                               List.for_all snd globals_state)
               file
          )
@@ -96,11 +96,11 @@ let sync_filetree (filetree:Filetree.t) =
     ()
 
 let hide_unused_function_or_var g =
-  !hide_unused () && Db.Value.is_computed () &&
+  !hide_unused () && Analysis.is_computed () &&
   (match g with
    | GFun ({svar = vi}, _) | GFunDecl (_, vi, _) ->
      let kf = Globals.Functions.get vi in
-     not (!Db.Value.is_called kf)
+     not (Results.is_called kf)
    | GVarDecl (vi, _) | GVar (vi, _, _)  ->
      not (used_var vi)
    | _ -> false
@@ -114,21 +114,21 @@ let value_panel pack (main_ui:main_ui) =
   in
   let box_1_1 = GPack.hbox ~packing:(w#attach ~left:1 ~top:1) () in
   let precision_refresh =
-    let tooltip = Value_parameters.Precision.parameter.Typed_parameter.help in
+    let tooltip = Parameters.Precision.parameter.Typed_parameter.help in
     Gtk_helper.on_int ~lower:(-1) ~upper:11 ~tooltip
       box_1_1 "precision (meta-option)"
-      Value_parameters.Precision.get
-      Value_parameters.Precision.set
+      Parameters.Precision.get
+      Parameters.Precision.set
   in
   let box_1_2 = GPack.hbox ~packing:(w#attach ~left:1 ~top:2) () in
   let slevel_refresh =
     let tooltip =
-      Value_parameters.SemanticUnrollingLevel.parameter.Typed_parameter.help
+      Parameters.SemanticUnrollingLevel.parameter.Typed_parameter.help
     in
     Gtk_helper.on_int ~lower:0 ~upper:1000000 ~tooltip
       box_1_2 "slevel"
-      Value_parameters.SemanticUnrollingLevel.get
-      Value_parameters.SemanticUnrollingLevel.set
+      Parameters.SemanticUnrollingLevel.get
+      Parameters.SemanticUnrollingLevel.set
   in
   let box_1_3 = GPack.hbox ~packing:(w#attach ~left:1 ~top:3) () in
   let validator s =
@@ -144,7 +144,7 @@ let value_panel pack (main_ui:main_ui) =
   ignore (run_button#connect#pressed
             (fun () ->
                main_ui#protect ~cancelable:true
-                 (fun () -> refresh (); !Db.Value.compute (); main_ui#reset ());
+                 (fun () -> refresh (); Analysis.compute (); main_ui#reset ());
             ));
   pack box;
   "Eva", box#coerce, Some refresh
@@ -156,13 +156,13 @@ let active_highlighter buffer localizable ~start ~stop =
   let buffer = buffer#buffer in
   (* highlight dead code areas, non-terminating calls, and degeneration
      points if Value has run.*)
-  if Db.Value.is_computed () then
+  if Analysis.is_computed () then
     match localizable with
     | PStmt (kf, stmt) -> begin
         let degenerate =
           try
             Some (
-              if Value_util.DegenerationPoints.find stmt
+              if Eva_utils.DegenerationPoints.find stmt
               then (make_tag buffer ~name:"degeneration" [`BACKGROUND "orange"])
               else (make_tag buffer ~name:"unpropagated" [`BACKGROUND "yellow"])
             )
@@ -222,7 +222,7 @@ let menu_go_to_fun_definition (main_ui:main_ui) (popup_factory:menu) funs =
   List.iter aux funs
 
 let gui_compute_values (main_ui:main_ui) =
-  if not (Db.Value.is_computed ())
+  if not (Analysis.is_computed ())
   then main_ui#launcher ()
 
 let cleaned_outputs kf s =
@@ -233,8 +233,8 @@ let cleaned_outputs kf s =
 
 let pretty_stmt_info (main_ui:main_ui) kf stmt =
   (* Is it an accessible statement ? *)
-  if Db.Value.is_reachable_stmt stmt then begin
-    if Value_results.is_non_terminating_instr stmt then
+  if Results.is_reachable stmt then begin
+    if Eva_results.is_non_terminating_instr stmt then
       match stmt.skind with
       | Instr (Call (_, _, _, _)
               | Local_init (_, ConsInit _, _)) ->
@@ -412,7 +412,7 @@ module Select (Eval: Eval) = struct
         (if unfocus <> [] then (kf, unfocus) :: acc_unfocus else acc_unfocus)
       in
       let focused, unfocused =
-        List.fold_left aux_focus ([], []) (!Db.Value.callers kf)
+        List.fold_left aux_focus ([], []) (Results.callsites kf)
       in
       List.iter (aux menu) focused;
       if unfocused <> [] then
@@ -520,8 +520,13 @@ module Select (Eval: Eval) = struct
          | Mem _, NoOffset when Cil.isFunctionType ty -> begin
              (* Function pointers *)
              (* get the list of functions in the values *)
-             let e = Value_util.lval_to_exp lv in
-             match Eval.Analysis.get_kinstr_state ~after:false ki with
+             let e = Eva_utils.lval_to_exp lv in
+             let state =
+               match ki with
+               | Kglobal -> Eval.Analysis.get_global_state ()
+               | Kstmt stmt -> Eval.Analysis.get_stmt_state ~after:false stmt
+             in
+             match state  with
              | `Bottom -> ()
              | `Value state ->
                let funs, _ = Eval.Analysis.eval_function_exp state e in
@@ -555,7 +560,7 @@ let responses_ref = ref (module No_Response: Responses)
 
 let to_do_on_select (menu:menu) (main_ui:main_ui) ~button selected =
   let module Responses = (val !responses_ref) in
-  if Db.Value.is_computed () then
+  if Analysis.is_computed () then
     if button = 1 then
       Responses.left_click_values_computed main_ui selected
     else if button = 3 then

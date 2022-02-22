@@ -60,9 +60,9 @@ let pretty fmt =
   List.iter
     begin function
       | Bind(x,y) ->
-          Format.fprintf fmt "@ @[%a:=%a@]"
-            F.pp_var x F.pp_var y
+        Format.fprintf fmt "@ @[%a:=%a@]"
+          F.pp_var x F.pp_var y
       | Join(x,y) ->
-          Format.fprintf fmt "@ @[%a==%a@]"
-            F.pp_var x F.pp_var y
+        Format.fprintf fmt "@ @[%a==%a@]"
+          F.pp_var x F.pp_var y
     end

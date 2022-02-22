@@ -5,10 +5,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] fc_libc.c:173: assertion got status valid.
-[eva] fc_libc.c:174: assertion got status valid.
-[eva] fc_libc.c:175: assertion got status valid.
-[eva] fc_libc.c:176: assertion got status valid.
+[eva] fc_libc.c:203: assertion got status valid.
+[eva] fc_libc.c:204: assertion got status valid.
+[eva] fc_libc.c:205: assertion got status valid.
+[eva] fc_libc.c:206: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -32,6 +32,7 @@
 #include "ctype.c"
 #include "ctype.h"
 #include "dirent.h"
+#include "err.h"
 #include "errno.c"
 #include "errno.h"
 #include "fcntl.h"

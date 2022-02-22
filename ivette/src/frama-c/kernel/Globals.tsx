@@ -32,8 +32,8 @@ import { Section, Item } from 'dome/frame/sidebars';
 import * as Ivette from 'ivette';
 
 import * as States from 'frama-c/states';
-import { functions, functionsData } from 'frama-c/api/kernel/ast';
-import { computationState } from 'frama-c/api/plugins/eva/general';
+import { functions, functionsData } from 'frama-c/kernel/api/ast';
+import { computationState } from 'frama-c/plugins/eva/api/general';
 
 // --------------------------------------------------------------------------
 // --- Global Search Hints

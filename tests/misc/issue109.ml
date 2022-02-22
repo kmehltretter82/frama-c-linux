@@ -6,10 +6,10 @@ let ptest_file =
   with Not_found -> fun dir file -> dir ^ file
 
 let main () =
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   Dynamic.Parameter.String.set "" "";
   Dynamic.Parameter.String.set "" (ptest_file "tests/misc/" "issue109.i");
   File.init_from_cmdline ();
-  !Db.Value.compute ()
+  Eva.Analysis.compute ()
 
 let main = Db.Main.extend main

@@ -39,10 +39,11 @@ int main(int argc, char **argv)
     else __gen_e_acsl_and = 0;
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615";
+    __gen_e_acsl_assert_data.pred_txt = "0 < sizeof(int) * LEN <= 18446744073709551615";
     __gen_e_acsl_assert_data.file = "vla.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 9;
+    __gen_e_acsl_assert_data.name = "alloca_bounds";
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }

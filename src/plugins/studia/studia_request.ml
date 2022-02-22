@@ -81,7 +81,8 @@ let compute kind zone =
   let empty = { direct = []; indirect = []; } in
   List.fold_left add empty stmts
 
-let lval_location kinstr lval = !Db.Value.lval_to_zone kinstr lval
+let lval_location kinstr lval =
+  Eva.Results.(before_kinstr kinstr |> eval_address lval |> as_zone)
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getReadsLval"

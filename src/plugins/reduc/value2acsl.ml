@@ -165,15 +165,13 @@ let value_to_predicate_opt ?(loc=Location.unknown) t v =
     with
     | Not_based_on_null -> (* base_offsets_to_predicate ~loc t m *) None
 
-let exp_to_predicate ?(loc=Location.unknown) state e =
-  let value = !Db.Value.eval_expr ~with_alarms:CilE.warn_none_mode state e in
+let exp_to_predicate ?(loc=Location.unknown) stmt e =
+  let value = Eva.Results.(before stmt |> eval_exp e |> as_ival) in
   let te = Logic_utils.expr_to_term ~coerce:false e in
-  value_to_predicate_opt ~loc te value
+  Option.bind (Result.to_option value) (ival_to_predicate_opt ~loc te)
 
-let lval_to_predicate ?(loc=Location.unknown) state lv =
-  let value = snd(!Db.Value.eval_lval
-                    ~with_alarms:CilE.warn_none_mode None state lv)
-  in
+let lval_to_predicate ?(loc=Location.unknown) stmt lv =
+  let value = Eva.Results.(before stmt |> eval_lval lv |> as_ival) in
   let e = Cil.new_exp ~loc (Lval lv) in
   let te = Logic_utils.expr_to_term ~coerce:false e in
-  value_to_predicate_opt ~loc te value
+  Option.bind (Result.to_option value) (ival_to_predicate_opt ~loc te)

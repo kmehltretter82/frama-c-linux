@@ -106,7 +106,7 @@ module Make_Minimal
 
   include Domain
 
-  let log_category = Value_parameters.register_category ("d-" ^ name)
+  let log_category = Self.register_category ("d-" ^ name)
 
   type value = Value.t
   type location = Location.location
@@ -132,7 +132,7 @@ module Make_Minimal
     | None -> `Value (Domain.start_call stmt (simplify_call call) state)
     | Some _ ->
       (* TODO *)
-      Value_parameters.abort
+      Self.abort
         "The domain %s does not support recursive call." Domain.name
 
   let finalize_call stmt call recursion ~pre ~post =
@@ -217,7 +217,7 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
          (Domain) (struct let module_name = Domain.name end)
        : Datatype.S_with_collections with type t := t)
 
-    let log_category = Value_parameters.register_category ("d-" ^ name)
+    let log_category = Self.register_category ("d-" ^ name)
 
     type value = Cvalue.V.t
     type location = Precise_locs.precise_location
@@ -258,7 +258,7 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       | None -> `Value (Domain.start_call stmt call (record valuation) state)
       | Some _ ->
         (* TODO *)
-        Value_parameters.abort
+        Self.abort
           "The domain %s does not support recursive call." Domain.name
 
     let finalize_call stmt call recursion =

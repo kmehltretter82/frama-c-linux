@@ -32,7 +32,7 @@ import { classes } from 'dome/misc/utils';
 import { Hpack, Vpack } from 'dome/layout/boxes';
 import { Code, Cell } from 'dome/controls/labels';
 import * as States from 'frama-c/states';
-import * as Ast from 'frama-c/api/kernel/ast';
+import * as Ast from 'frama-c/kernel/api/ast';
 import { ModelProp } from 'frama-c/plugins/eva/model';
 
 // Locals

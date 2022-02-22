@@ -48,10 +48,9 @@ class virtual do_it_ = object(self)
     (* For local initializations, counts the written variable as an output of the
        function, even if it is const; thus, [for_writing] is false in this case. *)
   method private do_assign ~for_writing lv =
-    let state = Db.Value.get_state self#current_kinstr in
-    let _deps, bits_loc, _exact =
-      !Db.Value.lval_to_zone_with_deps_state state
-        ~deps:None ~for_writing lv
+    let ki = self#current_kinstr in
+    let bits_loc =
+      Eva.Results.(before_kinstr ki |> eval_address ~for_writing lv |> as_zone)
     in
     self#join bits_loc
 

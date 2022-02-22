@@ -90,7 +90,7 @@ struct
       (Stmt.Map.Make(Datatype.String.Set))
       (struct
         let name = Info.name
-        let dependencies = [ Db.Value.self ]
+        let dependencies = [ Eva.Analysis.self ]
         let default () = Stmt.Map.empty
       end)
 
@@ -184,7 +184,7 @@ module StudiaState =
     (Stmt)
     (struct
       let name = "Studia.Highlighter.StudiaState"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
     end)
 
 let reset () =
@@ -226,7 +226,7 @@ let highlighter (buffer:Design.reactive_buffer) localizable ~start ~stop =
   with Not_found -> ()
 
 let check_value (main_ui:Design.main_window_extension_points) =
-  Db.Value.is_computed () ||
+  Eva.Analysis.is_computed () ||
   let answer = GToolbox.question_box
       ~title:("Eva Needed")
       ~buttons:[ "Run"; "Cancel" ]
@@ -234,7 +234,7 @@ let check_value (main_ui:Design.main_window_extension_points) =
        ^"Do you want to run Eva now ?")
   in
   answer = 1 &&
-  match main_ui#full_protect ~cancelable:true !Db.Value.compute with
+  match main_ui#full_protect ~cancelable:true Eva.Analysis.compute with
   | Some _ -> true
   | None -> false
 

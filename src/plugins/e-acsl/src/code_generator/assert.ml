@@ -205,7 +205,7 @@ let kind_to_string loc k =
      | Smart_stmt.Variant -> "Variant"
      | Smart_stmt.RTE -> "RTE")
 
-let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env predicate_e =
+let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env predicate_e =
   let env = Env.push env in
   let data_registered, data_ptr, data_vi, env =
     match adata with
@@ -234,13 +234,26 @@ let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env predicate_e =
   let fct = Cil.mkString ~loc (Functions.RTL.get_original_name kf) in
   let line = Cil.integer ~loc start_pos.Filepath.pos_lnum in
   let stmts =
-    [ Smart_stmt.rtl_call ~loc "assert" [ predicate_e; data_ptr ];
-      Smart_stmt.assigns_field ~loc data_vi "line" line;
+    [ Smart_stmt.assigns_field ~loc data_vi "line" line;
       Smart_stmt.assigns_field ~loc data_vi "fct" fct;
       Smart_stmt.assigns_field ~loc data_vi "file" file;
       Smart_stmt.assigns_field ~loc data_vi "pred_txt" pred_txt;
       Smart_stmt.assigns_field ~loc data_vi "kind" kind;
       Smart_stmt.assigns_field ~loc data_vi "blocking" blocking ]
+  in
+  let stmts =
+    if Datatype.String.equal name "" then
+      stmts
+    else
+      Smart_stmt.assigns_field
+        ~loc
+        data_vi
+        "name"
+        (Cil.mkString ~loc name)
+      :: stmts
+  in
+  let stmts =
+    Smart_stmt.rtl_call ~loc "assert" [ predicate_e; data_ptr ] :: stmts
   in
   let stmts=
     if data_registered then
@@ -259,5 +272,7 @@ let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env predicate_e =
 
 let runtime_check ~adata ~pred_kind kind kf env e p =
   let loc = p.pred_loc in
+  let name = String.concat "/" p.pred_name in
+  let p = { p with pred_name = [] } in
   let msg = Format.asprintf "%a@?" Printer.pp_predicate p in
-  runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e
+  runtime_check_with_msg ~adata ~loc ~name msg ~pred_kind kind kf env e

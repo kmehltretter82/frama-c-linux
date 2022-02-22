@@ -34,7 +34,7 @@ import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
-import { markerInfo } from 'frama-c/api/kernel/ast';
+import { markerInfo } from 'frama-c/kernel/api/ast';
 
 // --------------------------------------------------------------------------
 // --- Locations Panel

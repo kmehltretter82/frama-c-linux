@@ -73,26 +73,26 @@ let rec is_predicate cond p =
   | Pif(_,p,q) -> is_predicate cond p && is_predicate cond q
   | Pat(p,_) -> is_predicate cond p
   | Pand(p,q) ->
-      if cond
-      then is_predicate true p && is_predicate true q
-      else is_predicate false p || is_predicate false q
+    if cond
+    then is_predicate true p && is_predicate true q
+    else is_predicate false p || is_predicate false q
   | Por(p,q) ->
-      if cond
-      then is_predicate true p && is_predicate true q
-      else is_predicate false p && is_predicate false q
+    if cond
+    then is_predicate true p && is_predicate true q
+    else is_predicate false p && is_predicate false q
   | Pimplies(p,q) ->
-      if cond
-      then is_predicate false p || is_predicate true q
-      else is_predicate true p && is_predicate false q
+    if cond
+    then is_predicate false p || is_predicate true q
+    else is_predicate true p && is_predicate false q
   | _ -> false
 
 let is_dead_annot ca =
   match ca.annot_content with
   | APragma (Loop_pragma (Unroll_specs [ spec ; _ ])) ->
-      is_unrolled_completely spec
+    is_unrolled_completely spec
   | AAssert([],p)
   | AInvariant([],_,p) ->
-      Logic_utils.use_predicate p.tp_kind && is_predicate false p.tp_statement
+    Logic_utils.use_predicate p.tp_kind && is_predicate false p.tp_statement
   | _ -> false
 
 let is_dead_code stmt =
@@ -125,9 +125,9 @@ let flow i f =
     match i with
     | Asm _ | Set _ -> F_effect
     | Local_init _ ->
-        if Wp_parameters.SmokeDeadlocalinit.get ()
-        then F_effect
-        else F_goto
+      if Wp_parameters.SmokeDeadlocalinit.get ()
+      then F_effect
+      else F_goto
     | Call _ -> F_call
     | Skip _ | Code_annot _ -> F_goto
 
@@ -154,26 +154,26 @@ and skind env a b = function
   | Break _ -> goto a env.break
   | Continue _ -> goto a env.continue
   | If(_,bthen,belse,_) ->
-      let ft = goto a (block env bthen b) in
-      let fe = goto a (block env belse b) in
-      merge ft fe
+    let ft = goto a (block env bthen b) in
+    let fe = goto a (block env belse b) in
+    merge ft fe
   | Switch(_,body,cases,_) ->
-      ignore (block { env with break = b } body b) ;
-      List.fold_left
-        (fun f s -> merge f (goto a (of_stmt env.cfg s)))
-        F_dead cases
+    ignore (block { env with break = b } body b) ;
+    List.fold_left
+      (fun f s -> merge f (goto a (of_stmt env.cfg s)))
+      F_dead cases
   | Loop(_,body,_,_,_) ->
-      let continue = node () in
-      let lenv = { env with continue ; break = b }  in
-      let flow = goto a (block lenv body continue) in
-      if flow = F_dead then F_dead else F_entry
+    let continue = node () in
+    let lenv = { env with continue ; break = b }  in
+    let flow = goto a (block lenv body continue) in
+    if flow = F_dead then F_dead else F_entry
   | Block body ->
-      goto a (block env body b)
+    goto a (block env body b)
   | UnspecifiedSequence s ->
-      let body = Cil.block_from_unspecified_sequence s in
-      goto a (block env body b)
+    let body = Cil.block_from_unspecified_sequence s in
+    goto a (block env body b)
   | Throw _ | TryCatch _ | TryFinally _ | TryExcept _ ->
-      Wp_parameters.not_yet_implemented "try-catch blocks"
+    Wp_parameters.not_yet_implemented "try-catch blocks"
 
 and block env blk b = sequence env blk.bstmts b
 and sequence env seq b = match seq with
@@ -188,26 +188,26 @@ let rec unreachable node =
   match node.unreachable with
   | Some r -> r
   | None ->
-      node.unreachable <- Some true ; (* cut loops *)
-      let r =
-        match node.flow with
-        | F_dead -> true
-        | F_entry -> false
-        | F_goto | F_effect | F_return | F_branch | F_call ->
-            List.for_all unreachable node.prev
-      in node.unreachable <- Some r ; r
+    node.unreachable <- Some true ; (* cut loops *)
+    let r =
+      match node.flow with
+      | F_dead -> true
+      | F_entry -> false
+      | F_goto | F_effect | F_return | F_branch | F_call ->
+        List.for_all unreachable node.prev
+    in node.unreachable <- Some r ; r
 
 let rec protected node =
   match node.protected with
   | Some r -> r
   | None ->
-      node.protected <- Some false ; (* cut loops *)
-      let r =
-        match node.flow with
-        | F_dead | F_entry -> true
-        | F_goto | F_effect | F_return | F_branch | F_call ->
-            node.prev <> [] && List.for_all protected_by node.prev
-      in node.protected <- Some r ; r
+    node.protected <- Some false ; (* cut loops *)
+    let r =
+      match node.flow with
+      | F_dead | F_entry -> true
+      | F_goto | F_effect | F_return | F_branch | F_call ->
+        node.prev <> [] && List.for_all protected_by node.prev
+    in node.protected <- Some r ; r
 
 and protected_by prev =
   match prev.flow with
@@ -274,14 +274,14 @@ let dump ~dir kf reached =
          let module Pr = Printer in
          match s.skind with
          | Instr _ | Return _ | Break _ | Continue _ | Goto _ ->
-             Pu.to_string Pr.pp_stmt s
+           Pu.to_string Pr.pp_stmt s
          | If(e,_,_,_) -> Pu.sfprintf "@[<hov 2>if (%a)@]" Pr.pp_exp e
          | Switch(e,_,_,_) -> Pu.sfprintf "@[<hov 2>switch (%a)@]" Pr.pp_exp e
          | Loop _ -> Printf.sprintf "Loop s%d" s.sid
          | Block  _ -> Printf.sprintf "Block s%d" s.sid
          | UnspecifiedSequence  _ -> Printf.sprintf "Seq. s%d" s.sid
          | Throw _ | TryExcept _ | TryCatch _ | TryFinally _ ->
-             Printf.sprintf "Exn. s%d" s.sid
+           Printf.sprintf "Exn. s%d" s.sid
        in G.node dot (N.get n)
          [`Box;`Label (Printf.sprintf "s%d n%d: %s" s.sid n.id label)])
     reached ;
@@ -349,35 +349,35 @@ let set_invalid emitter tgt =
   match tgt with
   (* For invalid assumes, introduce "ensures false" in behavior on need *)
   | Property.IPPredicate { ip_kind = PKAssumes(bhv) ; ip_kf ; ip_pred } ->
-      if not (Invalid_behaviors.mem ip_kf bhv) then begin
-        Invalid_behaviors.add ip_kf bhv ;
-        let pred_name = [ "Wp" ; "SmokeTest" ] in
-        let pred_loc = ip_pred.ip_content.tp_statement.pred_loc in
-        let p = { Logic_const.pfalse with pred_loc ; pred_name } in
-        let p = Logic_const.(new_predicate p) in
-        let pid = Property.ip_of_ensures ip_kf Kglobal bhv (Normal, p) in
-        Annotations.add_ensures emitter ip_kf ~behavior:bhv.b_name [Normal, p];
-        emit emitter ~hyps:[] pid False_if_reachable
-      end
+    if not (Invalid_behaviors.mem ip_kf bhv) then begin
+      Invalid_behaviors.add ip_kf bhv ;
+      let pred_name = [ "Wp" ; "SmokeTest" ] in
+      let pred_loc = ip_pred.ip_content.tp_statement.pred_loc in
+      let p = { Logic_const.pfalse with pred_loc ; pred_name } in
+      let p = Logic_const.(new_predicate p) in
+      let pid = Property.ip_of_ensures ip_kf Kglobal bhv (Normal, p) in
+      Annotations.add_ensures emitter ip_kf ~behavior:bhv.b_name [Normal, p];
+      emit emitter ~hyps:[] pid False_if_reachable
+    end
   | p ->
-      emit emitter ~hyps:[] p False_if_reachable
+    emit emitter ~hyps:[] p False_if_reachable
 
 let set_doomed emitter pid =
   List.iter (set_invalid emitter) (WpPropId.doomed_if_valid pid) ;
   match WpPropId.unreachable_if_valid pid with
   | Property.OLStmt(kf,stmt) ->
-      let ca =
-        match Annotations.code_annot ~emitter ~filter:is_dead_annot stmt with
-        | ca::_ -> ca
-        | [] ->
-            let pred_loc = Stmt.loc stmt in
-            let pred_name = [ "Wp" ; "SmokeTest" ] in
-            let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
-            let pf = Logic_const.toplevel_predicate pf in
-            let ca = Logic_const.new_code_annotation (AAssert ([],pf)) in
-            Annotations.add_code_annot emitter ~kf stmt ca ; ca
-      in
-      List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
+    let ca =
+      match Annotations.code_annot ~emitter ~filter:is_dead_annot stmt with
+      | ca::_ -> ca
+      | [] ->
+        let pred_loc = Stmt.loc stmt in
+        let pred_name = [ "Wp" ; "SmokeTest" ] in
+        let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
+        let pf = Logic_const.toplevel_predicate pf in
+        let ca = Logic_const.new_code_annotation (AAssert ([],pf)) in
+        Annotations.add_code_annot emitter ~kf stmt ca ; ca
+    in
+    List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
   | Property.OLGlob _ | Property.OLContract _ -> ()
 
 (* -------------------------------------------------------------------------- *)
@@ -410,22 +410,22 @@ let set_unreachable pid =
     let emit = function
       | IPPredicate {ip_kind = PKAssumes _} -> ()
       | p ->
-          debug "unreachable annotation %a@." Property.pretty p;
-          Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
+        debug "unreachable annotation %a@." Property.pretty p;
+        Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
     in
     let pids = match WpPropId.property_of_id pid with
       | IPPredicate {ip_kind = PKAssumes _} -> []
       | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
-          let active = Datatype.String.Set.elements ib_active in
-          (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
-          (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
+        let active = Datatype.String.Set.elements ib_active in
+        (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
+        (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
       | IPExtended _ -> []
       (* Extended clauses might concern anything. Don't validate them
          unless we know exactly what is going on. *)
       | p ->
-          incr unreachable_proved ;
-          Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
-            WpPropId.pp_propid pid ; [p]
+        incr unreachable_proved ;
+        Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
+          WpPropId.pp_propid pid ; [p]
     in
     List.iter emit pids
 

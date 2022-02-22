@@ -98,10 +98,10 @@ let write_abstract_value state (lval, loc, typ) assigned_value =
   in
   match loc.Locations.loc with
   | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
-    Value_parameters.result
+    Self.result
       "State before degeneration:@\n======%a@\n======="
       Cvalue.Model.pretty state;
-    Value_parameters.fatal ~current:true
+    Self.fatal ~current:true
       "writing at a completely unknown address@[%a@].@\nAborting."
       Origin.pretty_as_reason orig
   | _ ->
@@ -205,7 +205,7 @@ let actualize_formals state arguments =
 
 let start_call _stmt call _recursion _valuation state =
   let with_formals = actualize_formals state call.arguments in
-  let stack_with_call = Value_util.call_stack () in
+  let stack_with_call = Eva_utils.call_stack () in
   Db.Value.Call_Value_Callbacks.apply (with_formals, stack_with_call);
   `Value with_formals
 
@@ -214,7 +214,7 @@ let finalize_call stmt call _recursion ~pre:_ ~post:state =
      To minimize computations, only do it for function definitions. *)
   let state' =
     if Kernel_function.is_definition call.kf then
-      let stack = (call.kf, Kstmt stmt) :: (Value_util.call_stack ()) in
+      let stack = (call.kf, Kstmt stmt) :: (Eva_utils.call_stack ()) in
       Builtins_malloc.free_automatic_bases stack state
     else state
   in

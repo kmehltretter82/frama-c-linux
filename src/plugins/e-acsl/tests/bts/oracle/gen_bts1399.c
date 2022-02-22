@@ -45,10 +45,11 @@ int main(void)
                                                   (void *)0);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(&state->bitsInQueue)";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(&state->bitsInQueue)";
     __gen_e_acsl_assert_data_2.file = "bts1399.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 19;
+    __gen_e_acsl_assert_data_2.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,

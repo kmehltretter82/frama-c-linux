@@ -18,9 +18,11 @@
 Open Source Release <next-release>
 ##################################
 
+*   Kernel    [2022-02-17] Reject programs using unsupported
+              vector_size attribute (fixes ##2573)
 *   Kernel    [2022-02-08] Reject array whose size is too big with a proper
               error message instead of a crash (fixes ##2590)
-o!  Kernel    [2022-02-19] Removed obsolete AST nodes IndexPI and Info
+o!  Kernel    [2022-01-19] Removed obsolete AST nodes IndexPI and Info
 o!  Kernel    [2021-12-03] Remove unused AST node Dcustom_annot and field
               fpadding_in_bits. Do not cache size of types in the AST but in
               a dedicated table.

@@ -65,19 +65,19 @@ let jconfigure (console : #Tactical.feedback) jtactic goal =
   match ProofScript.configure jtactic sequent with
   | None -> None
   | Some(tactical,selection) ->
-      console#set_title "%s" tactical#title ;
-      let verdict =
-        try Lang.local ~pool:console#pool (tactical#select console) selection
-        with Not_found | Exit -> Not_applicable
-      in
-      begin
-        match verdict with
-        | Applicable process when not console#has_error ->
-            let title = tactical#title in
-            let script = ProofScript.jtactic ~title tactical selection in
-            Some (script , process)
-        | _ -> None
-      end
+    console#set_title "%s" tactical#title ;
+    let verdict =
+      try Lang.local ~pool:console#pool (tactical#select console) selection
+      with Not_found | Exit -> Not_applicable
+    in
+    begin
+      match verdict with
+      | Applicable process when not console#has_error ->
+        let title = tactical#title in
+        let script = ProofScript.jtactic ~title tactical selection in
+        Some (script , process)
+      | _ -> None
+    end
 
 let jfork tree ?node jtactic =
   let console = new ProofScript.console
@@ -90,13 +90,13 @@ let jfork tree ?node jtactic =
     match WpContext.on_context ctxt (jconfigure console jtactic) goal with
     | None -> None
     | Some (script,process) ->
-        Some (ProofEngine.fork tree ~anchor script process)
+      Some (ProofEngine.fork tree ~anchor script process)
   with
   | Exit | Not_found | Invalid_argument _ ->
-      console#set_error "Can not configure tactic" ; None
+    console#set_error "Can not configure tactic" ; None
   | e ->
-      console#set_error "Exception <%s>" (Printexc.to_string e) ;
-      raise e
+    console#set_error "Exception <%s>" (Printexc.to_string e) ;
+    raise e
 
 (* -------------------------------------------------------------------------- *)
 (* --- Running Alternatives                                               --- *)
@@ -201,20 +201,20 @@ struct
       match env.backtracking with
       | None -> None
       | Some point ->
-          let n = backtracking env in
-          let anchor = point.bk_node in
-          if n < point.bk_pending then
-            begin
-              point.bk_best <- fst (ProofEngine.get_strategies anchor) ;
-              point.bk_pending <- n ;
-            end ;
-          match ProverSearch.backtrack env.tree ~anchor ~loop:false () with
-          | Some fork ->
-              env.backtracking <- None ; Some (point.bk_depth,fork)
-          | None -> (* end of backtrack *)
-              env.backtracking <- None ;
-              match ProverSearch.index env.tree ~anchor ~index:point.bk_best
-              with None -> None | Some fork -> Some (point.bk_depth,fork)
+        let n = backtracking env in
+        let anchor = point.bk_node in
+        if n < point.bk_pending then
+          begin
+            point.bk_best <- fst (ProofEngine.get_strategies anchor) ;
+            point.bk_pending <- n ;
+          end ;
+        match ProverSearch.backtrack env.tree ~anchor ~loop:false () with
+        | Some fork ->
+          env.backtracking <- None ; Some (point.bk_depth,fork)
+        | None -> (* end of backtrack *)
+          env.backtracking <- None ;
+          match ProverSearch.index env.tree ~anchor ~index:point.bk_best
+          with None -> None | Some fork -> Some (point.bk_depth,fork)
 
   let provers env = env.provers
 
@@ -241,33 +241,33 @@ let rec zip order nodes scripts =
   match nodes , scripts with
   | _ , [] | [] , _ -> (*TODO: saveback forgiven scripts *) ()
   | node :: o_nodes , script :: o_scripts ->
-      let cmp = order node script in
-      if cmp < 0 then zip order o_nodes scripts else
-      if cmp > 0 then zip order nodes o_scripts else
-        (ProofEngine.bind (snd node) (snd script) ;
-         zip order o_nodes o_scripts)
+    let cmp = order node script in
+    if cmp < 0 then zip order o_nodes scripts else
+    if cmp > 0 then zip order nodes o_scripts else
+      (ProofEngine.bind (snd node) (snd script) ;
+       zip order o_nodes o_scripts)
 
 let reconcile nodes scripts =
   match nodes , scripts with
   | [] , [] -> ()
   | [_,n] , [_,s] -> ProofEngine.bind n s
   | _ ->
-      if List.for_all (fun (k,_) -> k = "") scripts
-      then zip fst_order nodes scripts
-      else zip key_order
-          (List.stable_sort key_order nodes)
-          (List.stable_sort key_order scripts)
+    if List.for_all (fun (k,_) -> k = "") scripts
+    then zip fst_order nodes scripts
+    else zip key_order
+        (List.stable_sort key_order nodes)
+        (List.stable_sort key_order scripts)
 
 let rec forall phi = function
   | x::xs ->
-      phi x >>= fun ok ->
-      if ok then forall phi xs else Task.return false
+    phi x >>= fun ok ->
+    if ok then forall phi xs else Task.return false
   | [] -> Task.return true
 
 let rec exists phi = function
   | x::xs ->
-      phi x >>= fun ok ->
-      if ok then Task.return true else exists phi xs
+    phi x >>= fun ok ->
+    if ok then Task.return true else exists phi xs
   | [] -> Task.return false
 
 let prove_node env node prv =
@@ -291,10 +291,10 @@ let rec auto env ?(depth=0) node : bool Task.task =
       if ok then Task.return true else
         match Env.backtrack env with
         | Some (depth,fork) ->
-            Env.progress env "Backtracking" ;
-            autofork env ~depth fork
+          Env.progress env "Backtracking" ;
+          autofork env ~depth fork
         | None ->
-            Task.return false
+          Task.return false
     end
 
 and autosearch env ~depth node : bool Task.task =
@@ -322,12 +322,12 @@ let apply env node jtactic subscripts =
   match jfork (Env.tree env) ?node jtactic with
   | None -> failwith "Selector not found"
   | Some fork ->
-      let _,children = ProofEngine.commit fork in
-      reconcile children subscripts ; (*TODO: saveback forgiven script ? *)
-      let ok = List.for_all
-          (fun (_,node) -> ProofEngine.proved node)
-          children in
-      if ok then [] else children
+    let _,children = ProofEngine.commit fork in
+    reconcile children subscripts ; (*TODO: saveback forgiven script ? *)
+    let ok = List.for_all
+        (fun (_,node) -> ProofEngine.proved node)
+        children in
+    if ok then [] else children
 
 (* -------------------------------------------------------------------------- *)
 (* --- Script Crawling                                                    --- *)
@@ -336,56 +336,56 @@ let apply env node jtactic subscripts =
 let rec crawl env on_child node = function
 
   | [] ->
-      let node = ProofEngine.anchor (Env.tree env) ?node () in
-      auto env node >>= fun ok ->
-      if ok then Env.validate env else Env.stuck env ;
-      Task.return ()
+    let node = ProofEngine.anchor (Env.tree env) ?node () in
+    auto env node >>= fun ok ->
+    if ok then Env.validate env else Env.stuck env ;
+    Task.return ()
 
   | Error(msg,json) :: alternative ->
-      Wp_parameters.warning "@[<hov 2>Script Error: on goal %a@\n%S: %a@]@."
-        WpPropId.pretty (Env.goal env node).po_pid
-        msg Json.pp json ;
-      crawl env on_child node alternative
+    Wp_parameters.warning "@[<hov 2>Script Error: on goal %a@\n%S: %a@]@."
+      WpPropId.pretty (Env.goal env node).po_pid
+      msg Json.pp json ;
+    crawl env on_child node alternative
 
   | Prover( prv , res ) :: alternative ->
-      begin
-        let task =
-          if Env.play env prv res then
-            let wpo = Env.goal env node in
-            let config = VCS.configure res in
-            Env.prove env wpo ~config prv
-          else Task.return false in
-        let continue ok =
-          if ok
-          then (Env.validate env ; Task.return ())
-          else crawl env on_child node alternative
-        in
-        task >>= continue
-      end
+    begin
+      let task =
+        if Env.play env prv res then
+          let wpo = Env.goal env node in
+          let config = VCS.configure res in
+          Env.prove env wpo ~config prv
+        else Task.return false in
+      let continue ok =
+        if ok
+        then (Env.validate env ; Task.return ())
+        else crawl env on_child node alternative
+      in
+      task >>= continue
+    end
 
   | Tactic( _ , jtactic , subscripts ) :: alternative ->
-      begin
-        try
-          let residual = apply env node jtactic subscripts in
-          if residual = [] then
-            Env.validate env
-          else
-            List.iter (fun (_,n) -> on_child n) residual ;
-          Task.return ()
-        with exn when Wp_parameters.protect exn ->
-          Wp_parameters.warning
-            "Script Error: on goal %a@\n\
-             can not apply '%s'@\n\
-             exception %S@\n\
-             @[<hov 2>Params: %a@]@\n\
-             @[<hov 2>Select: %a@]@."
-            WpPropId.pretty (Env.goal env node).po_pid
-            jtactic.tactic
-            (Printexc.to_string exn)
-            Json.pp jtactic.params
-            Json.pp jtactic.select ;
-          crawl env on_child node alternative
-      end
+    begin
+      try
+        let residual = apply env node jtactic subscripts in
+        if residual = [] then
+          Env.validate env
+        else
+          List.iter (fun (_,n) -> on_child n) residual ;
+        Task.return ()
+      with exn when Wp_parameters.protect exn ->
+        Wp_parameters.warning
+          "Script Error: on goal %a@\n\
+           can not apply '%s'@\n\
+           exception %S@\n\
+           @[<hov 2>Params: %a@]@\n\
+           @[<hov 2>Select: %a@]@."
+          WpPropId.pretty (Env.goal env node).po_pid
+          jtactic.tactic
+          (Printexc.to_string exn)
+          Json.pp jtactic.params
+          Json.pp jtactic.select ;
+        crawl env on_child node alternative
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Main Process                                                       --- *)

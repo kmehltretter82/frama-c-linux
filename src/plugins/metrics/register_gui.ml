@@ -146,7 +146,7 @@ module CyclomaticMetricsGUI = struct
       end
 
     method cyclo_selector (popup_factory:GMenu.menu GMenu.factory) main_ui ~button localizable =
-      if button = 3 && Db.Value.is_computed () then
+      if button = 3 && Eva.Analysis.is_computed () then
         match localizable with
         | PVDecl (Some kf, _,_) ->
           let callback1 () =
@@ -214,7 +214,7 @@ module ValueCoverageGUI = struct
     begin
       match !result with
       | None ->
-        !Db.Value.compute ();
+        Eva.Analysis.compute ();
         result := Some (Metrics_coverage.compute ~libc)
       | Some _ -> ()
     end;

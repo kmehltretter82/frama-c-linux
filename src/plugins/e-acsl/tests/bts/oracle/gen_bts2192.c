@@ -42,10 +42,11 @@ int __gen_e_acsl_atoi(char const *nptr)
                                  __gen_e_acsl_valid_read);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
-    __gen_e_acsl_assert_data.pred_txt = "valid_nptr: \\valid_read(nptr)";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid_read(nptr)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "atoi";
     __gen_e_acsl_assert_data.line = 78;
+    __gen_e_acsl_assert_data.name = "valid_nptr";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }

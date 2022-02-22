@@ -398,7 +398,7 @@ module Component = struct
            todolist
            callsites)
       todolist
-      (!Db.Value.callers kf)
+      (Eva.Results.callsites kf)
 
   let related_nodes_of_nodes kind result nodes =
     let initial_nodes =
@@ -460,7 +460,7 @@ module Component = struct
                   in
                   List.fold_left do_call todolist callsites
                 in
-                List.fold_left do_caller todolist (!Db.Value.callers kf)
+                List.fold_left do_caller todolist (Eva.Results.callsites kf)
               | _ ->
                 todolist
             in
@@ -502,11 +502,7 @@ module Component = struct
                   todolist
                 else
                   let stmt = Key.call_from_id id in
-                  let called_kfs =
-                    Kernel_function.Hptset.elements
-                      (try Db.Value.call_to_kernel_function stmt
-                       with Db.Value.Not_a_call -> assert false)
-                  in
+                  let called_kfs = Eva.Results.callee stmt in
                   let todolist =
                     List.fold_left
                       (fun todolist called_kf ->
@@ -629,7 +625,7 @@ module Component = struct
       ~level:3 "computing initial nodes for %d" stmt.sid;
     let pdg = !Db.Pdg.get kf in
     let nodes =
-      if Db.Value.is_reachable_stmt stmt then
+      if Eva.Results.is_reachable stmt then
         try !Db.Pdg.find_simple_stmt_nodes pdg stmt
         with Not_found -> assert false
       else begin
@@ -783,7 +779,7 @@ end = struct
       (struct
          let name = "Components"
          let size = 7
-         let dependencies = [ Ast.self; Db.Value.self ]
+         let dependencies = [ Ast.self; Eva.Analysis.self ]
        end)
 
   let () =
