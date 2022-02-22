@@ -865,7 +865,7 @@ endif
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	utils/eva_audit utils/eva_perf utils/eva_annotations \
 	utils/eva_dynamic utils/eva_utils utils/red_statuses \
-	utils/active_behaviors utils/mark_noresults \
+	utils/active_behaviors \
 	utils/widen_hints_ext utils/widen \
 	partitioning/split_return \
 	partitioning/per_stmt_slevel \
