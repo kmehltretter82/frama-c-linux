@@ -747,9 +747,9 @@ let compute_on_cilast ~libc =
          Format.fprintf fmt "@." (* ensure the file ends with a newline *)
       );
       close_out oc;
-    with Sys_error _ ->
-      Metrics_parameters.failure "Cannot open file %a.@."
-        Filepath.Normalized.pretty out_fname
+    with Sys_error s ->
+      Metrics_parameters.abort "Cannot open file %a (%s)."
+        Filepath.Normalized.pretty out_fname s
   end
   else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
 
