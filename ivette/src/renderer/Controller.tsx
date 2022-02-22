@@ -40,8 +40,6 @@ import { Text } from 'dome/text/editors';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 
-import 'codemirror/theme/ambiance.css';
-
 // --------------------------------------------------------------------------
 // --- Configure Server
 // --------------------------------------------------------------------------
