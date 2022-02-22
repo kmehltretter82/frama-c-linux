@@ -152,12 +152,10 @@ export function Section(props: SectionProps): JSX.Element | null {
   const { enabled = true, disabled = false, children } = props;
   if (disabled || !enabled || React.Children.count(children) === 0)
     return null;
-  const { unfold } = props;
+  const { unfold, label } = props;
   const foldable = unfold === undefined;
   const visible = unfold ?? state;
   const maxHeight = visible ? 'max-content' : 0;
-  const label =
-    (visible || !!props.summary) ? props.label : `${props.label}…`;
 
   return (
     <div className="dome-xSideBarSection">
