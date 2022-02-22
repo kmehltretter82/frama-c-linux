@@ -899,7 +899,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/cvalue/builtins_watchpoint \
 	domains/cvalue/builtins_float domains/cvalue/builtins_split \
 	domains/inout_domain \
-	legacy/eval_terms legacy/eval_annots \
+	legacy/eval_terms \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
@@ -908,7 +908,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
-	engine/recursion engine/function_calls \
+	engine/recursion engine/function_calls legacy/eval_annots \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
 	engine/transfer_logic engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \

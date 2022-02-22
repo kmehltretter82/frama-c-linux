@@ -85,7 +85,7 @@ let do_copy_at = function
    on functions whose body is analyzed. *)
 let is_determinate kf =
   let name = Kernel_function.get_name kf in
-  (warn_indeterminate kf || !Db.Value.use_spec_instead_of_definition kf)
+  (warn_indeterminate kf || Function_calls.use_spec_instead_of_definition kf)
   && not (Ast_info.is_frama_c_builtin name)
 
 let subdivide_stmt = Eva_utils.get_subdivision

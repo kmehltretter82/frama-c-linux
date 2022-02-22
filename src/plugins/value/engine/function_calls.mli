@@ -40,6 +40,11 @@ type analysis_target =
 val define_analysis_target:
   ?recursion_depth:int -> kinstr -> kernel_function -> analysis_target
 
+(** Returns true if the Eva analysis use the specification of the given
+    function instead of its body to interpret its calls. *)
+val use_spec_instead_of_definition:
+  ?recursion_depth:int -> kernel_function -> bool
+
 
 (** Returns true if the function has been analyzed. *)
 val is_called: kernel_function -> bool

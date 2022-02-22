@@ -124,14 +124,6 @@ let find_deps_term_no_transitivity_state state t =
     r.Eval_terms.ldeps
   with Eval_terms.LogicEvalError _ -> raise Db.From.Not_lval
 
-(* If the function is a builtin, or if the user has requested it, use
-   \assigns and \from clauses, that give an approximation of the result *)
-let use_spec_instead_of_definition kf =
-  not (Kernel_function.is_definition kf) ||
-  Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
-  Builtins.is_builtin_overridden kf ||
-  Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
-
 let eval_predicate ~pre ~here p =
   let open Eval_terms in
   let env = env_annot ~pre ~here () in
@@ -153,7 +145,8 @@ let valid_behaviors kf state =
 
 let () =
   (* Pretty-printing *)
-  Db.Value.use_spec_instead_of_definition := use_spec_instead_of_definition;
+  Db.Value.use_spec_instead_of_definition :=
+    Function_calls.use_spec_instead_of_definition;
   Db.Value.assigns_outputs_to_zone := assigns_outputs_to_zone;
   Db.Value.assigns_outputs_to_locations := assigns_outputs_to_locations;
   Db.Value.assigns_inputs_to_zone := assigns_inputs_to_zone;

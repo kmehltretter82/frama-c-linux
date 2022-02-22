@@ -109,7 +109,7 @@ let mark_unreachable () =
   Visitor.visitFramacFileFunctions unreach (Ast.get ())
 
 let c_labels kf cs =
-  if !Db.Value.use_spec_instead_of_definition kf then
+  if Function_calls.use_spec_instead_of_definition kf then
     Cil_datatype.Logic_label.Map.empty
   else
     let fdec = Kernel_function.get_definition kf in

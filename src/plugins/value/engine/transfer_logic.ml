@@ -54,7 +54,7 @@ let pp_p_kind fmt = function
 let post_kind kf =
   if Builtins.is_builtin_overridden kf
   then PostBuiltin
-  else if !Db.Value.use_spec_instead_of_definition kf then
+  else if Function_calls.use_spec_instead_of_definition kf then
     if Kernel_function.is_definition kf
     then PostUseSpec
     else PostLeaf

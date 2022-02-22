@@ -343,7 +343,7 @@ module Make (X: Analysis.S) = struct
     let pre = pre_kf kf callstack in
     let post = X.Dom.get_cvalue_or_top post in
     let result =
-      if !Db.Value.use_spec_instead_of_definition kf then
+      if Function_calls.use_spec_instead_of_definition kf then
         None
       else
         let ret_stmt = Kernel_function.find_return kf in
@@ -395,7 +395,8 @@ module Make (X: Analysis.S) = struct
      normal termination, and only when the function is called.
      After states are not available. *)
   let callstacks_at_post kf =
-    if not (!Db.Value.use_spec_instead_of_definition kf) && results_kf_computed kf
+    if not (Function_calls.use_spec_instead_of_definition kf)
+    && results_kf_computed kf
     then
       let ret = Kernel_function.find_return kf in
       let states_before = X.get_stmt_state_by_callstack ~after:true ret in

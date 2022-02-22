@@ -123,6 +123,14 @@ let analysis_status kf =
   with Not_found -> Unreachable
 
 
+(* Must be consistent with the choice made by [analysis_target] below. *)
+let use_spec_instead_of_definition ?(recursion_depth = -1) kf =
+  Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
+  Builtins.is_builtin_overridden kf ||
+  recursion_depth >= Parameters.RecursiveUnroll.get () ||
+  not (Kernel_function.is_definition kf) ||
+  Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
+
 let analysis_target ~recursion_depth callsite kf =
   match Builtins.find_builtin_override kf with
   | Some (name, builtin, cache, spec) ->
