@@ -31,10 +31,11 @@ import * as States from 'frama-c/states';
 import * as DATA from 'frama-c/kernel/api/data';
 import * as AST from 'frama-c/kernel/api/ast';
 import { Text } from 'frama-c/utils';
-import { Section } from 'dome/frame/sidebars';
 import { Icon } from 'dome/controls/icons';
 import { Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import * as Boxes from 'dome/layout/boxes';
+import { TitleBar } from 'ivette';
 
 // --------------------------------------------------------------------------
 // --- Marker Kinds
@@ -329,15 +330,18 @@ export default function ASTinfo(): JSX.Element {
     );
   };
   return (
-    <Section
-      label="Informations"
-      title="Contextual informations on current selection"
-      defaultUnfold
-      settings="frama-c.sidebar.astinfo"
-      onContextMenu={() => openFilter(informations, filter, setFilter)}
-    >
-      {markers.getSelected().map(renderMark)}
-    </Section>
+    <>
+      <TitleBar>
+        <IconButton
+          icon="CLIPBOARD"
+          onClick={() => openFilter(informations, filter, setFilter)}
+          title="Information Filters"
+        />
+      </TitleBar>
+      <Boxes.Vfill>
+        {markers.getSelected().map(renderMark)}
+      </Boxes.Vfill>
+    </>
   );
 }
 

@@ -53,9 +53,14 @@ Ivette.registerGroup({
   label: 'Frama-C Kernel',
 }, () => {
   Ivette.registerSidebar({ id: 'frama-c.globals', children: <Globals /> });
-  Ivette.registerSidebar({ id: 'frama-c.astinfo', children: <ASTinfo /> });
   Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
   Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
+  Ivette.registerComponent({
+    id: 'frama-c.astinfo',
+    label: 'Informations',
+    title: 'Contextual informations on current selection',
+    children: <ASTinfo />
+  });
   Ivette.registerComponent({
     id: 'frama-c.astview',
     label: 'AST',
