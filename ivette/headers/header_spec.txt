@@ -139,7 +139,7 @@ src/dome/template/typescript.el: .ignore
 src/dome/template/update.sh: .ignore
 src/dome/template/webpack.main.js: CEA_LGPL
 src/dome/template/webpack.renderer.js: CEA_LGPL
-src/frama-c/api_generator.ml: .ignore
+src/frama-c/api_generator.ml: CEA_LGPL
 src/frama-c/client.ts: CEA_LGPL
 src/frama-c/client_socket.ts: CEA_LGPL
 src/frama-c/client_zmq.ts: CEA_LGPL

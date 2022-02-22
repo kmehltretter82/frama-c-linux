@@ -217,19 +217,19 @@ let channel (s: socket) =
       let rcv = Unix.getsockopt_int sock SO_RCVBUF in
       Senv.debug "Client connected" ;
       let ch = Some {
-        sock ;
-        snd = Bytes.create snd ;
-        rcv = Bytes.create rcv ;
-        bsnd = Buffer.create snd ;
-        brcv = Buffer.create rcv ;
-      } in
+          sock ;
+          snd = Bytes.create snd ;
+          rcv = Bytes.create rcv ;
+          bsnd = Buffer.create snd ;
+          brcv = Buffer.create rcv ;
+        } in
       s.channel <- ch ; ch
     with Unix.Unix_error(EAGAIN,_,_) -> None
 
 let fetch (s:socket) () =
   try match channel s with
-  | None -> None
-  | Some ch -> commands ch
+    | None -> None
+    | Some ch -> commands ch
   with
   | Unix.Unix_error(EPIPE,_,_) ->
     Senv.debug "Client disconnected" ;
