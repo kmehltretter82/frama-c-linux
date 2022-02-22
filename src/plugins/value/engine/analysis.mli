@@ -106,6 +106,38 @@ val is_computed : unit -> bool
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
 
+
+(** Kind of results for the analysis of a function body. *)
+type results =
+  | Complete
+  (** The results are complete: they cover all possible call contexts of the
+      given function. *)
+  | Partial
+  (** The results are partial, as the functions has not been analyzed in all
+      possible call contexts. This happens for recursive functions that are
+      not completely unrolled, or if the analysis has stopped unexpectedly. *)
+  | NoResults
+  (** No results were saved for the function, due to option -eva-no-results.
+      Any request at a statement of this function will lead to a Top result. *)
+
+(* Analysis status of a function. *)
+type status =
+  | Unreachable
+  (** The function has not been reached by the analysis. Any request in thi
+      function will lead to a Bottom result. *)
+  | SpecUsed
+  (** The function specification has been used to interpret its calls:
+      its body has not been analyzed. Any request at a statement of this
+      function will lead to a Top result. *)
+  | Builtin of string
+  (** The builtin of the given name has been used to interpret the function:
+      its body has not been analyzed. Any request at a statement of this
+      function will lead to a Top result. *)
+  | Analyzed of results
+  (** The function body has been analyzed. *)
+
+(** Returns the analysis status of a given function. *)
+val status: Cil_types.kernel_function -> status
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t

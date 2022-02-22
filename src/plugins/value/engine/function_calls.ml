@@ -118,6 +118,10 @@ let register_status kf kind =
   in
   ignore (StatusTable.memo ~change (fun _ -> status) kf)
 
+let analysis_status kf =
+  try StatusTable.find kf
+  with Not_found -> Unreachable
+
 
 let analysis_target ~recursion_depth callsite kf =
   match Builtins.find_builtin_override kf with

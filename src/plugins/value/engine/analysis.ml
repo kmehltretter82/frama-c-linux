@@ -203,3 +203,8 @@ let () =
   Project.register_after_global_load_hook reset_analyzer
 
 let self = Self.state
+
+type results = Function_calls.results = Complete | Partial | NoResults
+type status = Function_calls.analysis_status =
+    Unreachable | SpecUsed | Builtin of string | Analyzed of results
+let status = Function_calls.analysis_status
