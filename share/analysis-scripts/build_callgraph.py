@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
@@ -32,14 +31,6 @@ import function_finder
 import source_filter
 
 under_test = os.getenv("PTESTS_TESTING")
-
-arg = ""
-if len(sys.argv) < 2:
-    print(f"usage: {sys.argv[0]} file...")
-    print("        builds a heuristic callgraph for the specified files.")
-    sys.exit(1)
-else:
-    files = sys.argv[1:]
 
 debug = os.getenv("DEBUG")
 
