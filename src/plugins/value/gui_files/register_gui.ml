@@ -528,7 +528,7 @@ module Select (Eval: Eval) = struct
                | Kstmt stmt -> Eval.Analysis.get_stmt_state ~after:false stmt
              in
              match state  with
-             | `Bottom -> ()
+             | `Bottom | `Top -> ()
              | `Value state ->
                let funs, _ = Eval.Analysis.eval_function_exp state e in
                match funs with

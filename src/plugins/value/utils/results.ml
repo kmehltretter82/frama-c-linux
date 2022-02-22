@@ -110,11 +110,13 @@ struct
   let consolidated =
     function
     | `Bottom -> Bottom
+    | `Top -> Top
     | `Value state -> Consolidated state
 
   let singleton cs =
     function
     | `Bottom -> Bottom
+    | `Top -> Top
     | `Value state -> ByCallstack [cs,state]
 
   let by_callstack : request ->
