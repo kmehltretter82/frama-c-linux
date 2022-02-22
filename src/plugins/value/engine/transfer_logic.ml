@@ -141,68 +141,6 @@ let create_conjunction l=
   in
   Logic_const.(List.fold_right (fun p1 p2 -> pand ?loc (p1, p2)) (List.map pred_of_id_pred l) ptrue)
 
-(* -------------------------- Active behaviors ------------------------------ *)
-
-module ActiveBehaviors = struct
-
-  type t = {
-    funspec: funspec;
-    is_active: funbehavior -> Alarmset.status
-  }
-
-  module HashBehaviors = Hashtbl.Make(
-    struct
-      type t = funbehavior
-      let equal b1 b2 = b1.b_name = b2.b_name
-      let hash b = Hashtbl.hash b.b_name
-    end)
-
-  let is_active eval_predicate b =
-    let assumes = create_conjunction b.b_assumes in
-    eval_predicate assumes
-
-  let create eval_predicate funspec =
-    let h = HashBehaviors.create 3 in
-    let is_active = fun b ->
-      try HashBehaviors.find h b
-      with Not_found ->
-        let active = is_active eval_predicate b in
-        HashBehaviors.add h b active;
-        active
-    in
-    { is_active; funspec }
-
-  let is_active ab behavior = ab.is_active behavior
-
-  let active_behaviors ab =
-    List.filter
-      (fun b -> is_active ab b != Alarmset.False)
-      ab.funspec.spec_behavior
-
-  let is_active_from_name ab name =
-    try
-      let list = ab.funspec.spec_behavior in
-      let behavior = List.find (fun b' -> b'.b_name = name) list in
-      is_active ab behavior
-    (* This case happens for behaviors of statement contract, that are not
-       handled by this module. *)
-    with Not_found -> Alarmset.Unknown
-end
-
-let () =
-  Db.Value.valid_behaviors :=
-    (fun kf state ->
-       let funspec = Annotations.funspec kf in
-       let eval_predicate pred =
-         match Eval_terms.(eval_predicate (env_pre_f ~pre:state ()) pred) with
-         | Eval_terms.True -> Alarmset.True
-         | Eval_terms.False -> Alarmset.False
-         | Eval_terms.Unknown -> Alarmset.Unknown
-       in
-       let ab = ActiveBehaviors.create eval_predicate funspec in
-       ActiveBehaviors.active_behaviors ab
-    )
-
 let ip_from_precondition kf call_ki b pre =
   let ip_precondition = Property.ip_of_requires kf Kglobal b pre in
   match call_ki with
@@ -269,22 +207,22 @@ module type S = sig
   type state
   type states
 
-  val create: state -> kernel_function -> ActiveBehaviors.t
-  val create_from_spec: state -> spec -> ActiveBehaviors.t
+  val create: state -> kernel_function -> Active_behaviors.t
+  val create_from_spec: state -> spec -> Active_behaviors.t
 
   val check_fct_preconditions_for_behaviors:
     kinstr -> kernel_function -> behavior list -> Alarmset.status ->
     states -> states
 
   val check_fct_preconditions:
-    kinstr -> kernel_function -> ActiveBehaviors.t -> state -> states or_bottom
+    kinstr -> kernel_function -> Active_behaviors.t -> state -> states or_bottom
 
   val check_fct_postconditions_for_behaviors:
     kernel_function -> behavior list -> Alarmset.status ->
     pre_state:state -> post_states:states -> result:varinfo option -> states
 
   val check_fct_postconditions:
-    kernel_function -> ActiveBehaviors.t -> termination_kind ->
+    kernel_function -> Active_behaviors.t -> termination_kind ->
     pre_state:state -> post_states:states -> result:varinfo option ->
     states or_bottom
 
@@ -292,7 +230,7 @@ module type S = sig
 
   val interp_annot:
     limit:int -> record:bool ->
-    kernel_function -> ActiveBehaviors.t -> stmt -> code_annotation ->
+    kernel_function -> Active_behaviors.t -> stmt -> code_annotation ->
     initial_state:state -> states -> states
 end
 
@@ -344,7 +282,7 @@ module Make
 
   let create_from_spec pre funspec =
     let eval_predicate = Domain.evaluate_predicate (pre_env ~pre) pre in
-    ActiveBehaviors.create eval_predicate funspec
+    Active_behaviors.create eval_predicate funspec
 
   let create init_state kf =
     let funspec = Annotations.funspec kf in
@@ -537,7 +475,7 @@ module Make
       to help reduce the final state. *)
   let check_fct_postconditions kf ab kind ~pre_state ~post_states ~result =
     let behaviors = Annotations.behaviors kf in
-    let is_active = ActiveBehaviors.is_active ab in
+    let is_active = Active_behaviors.is_active ab in
     let states =
       check_fct_postconditions_of_behaviors
         kf behaviors is_active kind ~per_behavior:false
@@ -583,7 +521,7 @@ module Make
   let check_fct_preconditions call_ki kf ab init_state =
     let init_states = States.singleton init_state in
     let behaviors = Annotations.behaviors kf in
-    let is_active = ActiveBehaviors.is_active ab in
+    let is_active = Active_behaviors.is_active ab in
     let states =
       check_fct_preconditions_of_behaviors call_ki kf ~per_behavior:false
         behaviors is_active init_states
@@ -625,7 +563,7 @@ module Make
         | [] -> `True
         | behavs ->
           let aux acc b =
-            match ActiveBehaviors.is_active_from_name ab b with
+            match Active_behaviors.is_active_from_name ab b with
             | Alarmset.True -> `True
             | Alarmset.Unknown -> if acc = `True then `True else `Unknown
             | Alarmset.False -> acc

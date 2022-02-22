@@ -22,8 +22,6 @@
 
 open Cil_types
 
-module AB = Transfer_logic.ActiveBehaviors
-
 (* Eval: under-approximation of the term.  Note that ACSL states
    that assigns clauses are evaluated in the pre-state.
    We skip [\result]: it is meaningless when evaluating the 'assigns' part,
@@ -114,7 +112,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
   let link zones = List.fold_left Zone.link Zone.bottom zones in
   let outputs = Function_Froms.outputs found_froms in
   let check_for_behavior b =
-    let activity = AB.is_active ab b in
+    let activity = Active_behaviors.is_active ab b in
     match activity with
     | False -> ()
     | True | Unknown ->
@@ -187,7 +185,7 @@ let verify_assigns_from kf ~pre froms =
     | Eval_terms.False -> Alarmset.False
     | Eval_terms.Unknown -> Alarmset.Unknown
   in
-  let ab = AB.create eval_predicate funspec in
+  let ab = Active_behaviors.create eval_predicate funspec in
   check_fct_assigns kf ab ~pre_state:pre froms;;
 
 Db.Value.verify_assigns_froms := verify_assigns_from;;

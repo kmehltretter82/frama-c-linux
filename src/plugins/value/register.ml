@@ -140,6 +140,17 @@ let eval_predicate ~pre ~here p =
   | False -> Property_status.False_if_reachable
   | Unknown -> Property_status.Dont_know
 
+let valid_behaviors kf state =
+  let funspec = Annotations.funspec kf in
+  let eval_predicate pred =
+    match Eval_terms.(eval_predicate (env_pre_f ~pre:state ()) pred) with
+    | Eval_terms.True -> Alarmset.True
+    | Eval_terms.False -> Alarmset.False
+    | Eval_terms.Unknown -> Alarmset.Unknown
+  in
+  let ab = Active_behaviors.create eval_predicate funspec in
+  Active_behaviors.active_behaviors ab
+
 let () =
   (* Pretty-printing *)
   Db.Value.use_spec_instead_of_definition := use_spec_instead_of_definition;
@@ -150,6 +161,7 @@ let () =
   Db.Value.access_location := access_value_of_location;
   Db.Value.access_expr := access_value_of_expr;
   Db.Value.Logic.eval_predicate := eval_predicate;
+  Db.Value.valid_behaviors := valid_behaviors;
   Db.From.find_deps_term_no_transitivity_state :=
     find_deps_term_no_transitivity_state;
 
