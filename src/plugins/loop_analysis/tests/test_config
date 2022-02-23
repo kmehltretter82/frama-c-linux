@@ -1,2 +1,2 @@
-PLUGIN: loopanalysis
+PLUGIN: loop-analysis
 OPT: -loop

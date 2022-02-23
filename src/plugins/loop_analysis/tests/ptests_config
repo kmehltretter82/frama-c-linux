@@ -1,2 +1,2 @@
 # todo: to fixe package name
-IGNORE= DEFAULT_SUITES= loop_analysis
+DEFAULT_SUITES= loop_analysis
