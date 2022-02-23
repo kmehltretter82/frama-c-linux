@@ -167,11 +167,11 @@ force-reconfigure:
 
 
 ##############################################################################
-TEST_DIRS=tests $(wildcard src/plugins/*/tests)
+PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
 
 .PHONY: tests.info
 tests.info:
-	echo "TEST_DIRS=$(TEST_DIRS)"
+	echo "PTEST_DIRS=$(PTEST_DIRS)"
 
 # Note: the public name of ptest.exe is frama-c-ptests
 ptests/ptests.exe: ptests/ptests.ml
@@ -197,17 +197,17 @@ wtests-help:
 # Removes all dune files generated for testing
 .PHONY: purge-tests
 purge-tests:
-	find $(TEST_DIRS) -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty rm
+	find $(PTEST_DIRS) -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty rm
 
 # Force the full cleaning of the testing environment
 .PHONY: clean-tests
 clean-tests: purge-tests
-	rm -rf $(addprefix _build/default/,$(TEST_DIRS))
+	rm -rf $(addprefix _build/default/,$(PTEST_DIRS))
 
 # Generates all dune files used for testing
 .PHONY: run-ptests
 run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
-	$(PTESTS) $(TEST_DIRS)
+	$(PTESTS) $(PTEST_DIRS)
 
 # run tests of for all configurations (requires all dune files)
 .PHONY: run-tests
