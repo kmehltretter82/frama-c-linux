@@ -241,7 +241,12 @@ end
 
 (* For performance, this table provides O(1) lookups between type names
    and the underlying Cil types. Some types may be unavailable in some
-   machdeps, so the table returns an option type. *)
+   machdeps, so the table returns an option type.
+   Note that the type strings must follow a strict format (also used
+   in gcc_builtins.json), with a single space between type names and
+   asterisks (for pointers); otherwise we would have to do some expensive
+   matching.
+*)
 let build_type_table () : (string, typ option) Hashtbl.t =
   let int8_t = Some Cil.scharType in
   let int16_t = try Some (Cil.int16_t ()) with Not_found -> None in
@@ -317,6 +322,9 @@ let build_type_table () : (string, typ option) Hashtbl.t =
     ] in
   Hashtbl.of_seq (List.to_seq types)
 
+(* Note that [s] (the type string) follows a stricter format than the ones
+   allowed by the C standard w.r.t. type names; a single space must be
+   present between type names and asterisks. *)
 let parse_type ?(template="") type_table s =
   try
     if String.get s 0 == 'T' then
