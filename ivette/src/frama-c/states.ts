@@ -188,7 +188,7 @@ export function useRequest<In, Out>(
     }
   });
 
-  const signals = options.onSignals ?? rq.signals;
+  const signals = rq.signals.concat(options.onSignals ?? []);
   React.useEffect(() => {
     signals.forEach((s) => Server.onSignal(s, trigger));
     return () => {
@@ -767,10 +767,17 @@ const emptySelection = {
   },
 };
 
+export type Hovered = Location | undefined;
 export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
+export const GlobalHovered = new GlobalState<Hovered>(undefined);
 export const GlobalSelection = new GlobalState<Selection>(emptySelection);
 
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
+
+export function setHovered(h: Hovered) { GlobalHovered.setValue(h); }
+export function useHovered(): [Hovered, (h: Hovered) => void] {
+  return useGlobalState(GlobalHovered);
+}
 
 export function setSelection(location: Location, meta = false) {
   const s = GlobalSelection.getValue();

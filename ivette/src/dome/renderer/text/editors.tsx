@@ -72,6 +72,9 @@ export interface TextProps extends CodeMirror.EditorConfiguration {
   /** The currently selected marker identifier. */
   selection?: string;
 
+  /** Callback on hovered marker, if some. */
+  onHover?: (id?: string) => void;
+
   /** Callback on identified marker selection. */
   onSelection?: MarkerCallback;
 
@@ -311,6 +314,8 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
       if (newMarker && newMarker.hover)
         this._markElementsWith(newMarker.classNameId, CSS_HOVERED);
       this.marker = newMarker;
+      const callback = this.props.onHover;
+      if (callback) callback(newMarker?.id);
     }
   }
 
