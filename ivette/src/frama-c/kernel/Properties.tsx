@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Properties
 // --------------------------------------------------------------------------
@@ -105,7 +103,7 @@ const DEFAULTS: { [key: string]: boolean } = {
   'eva.ctrl_tainted_only': false,
 };
 
-function filter(path: string) {
+function filter(path: string): boolean {
   const defaultValue = DEFAULTS[path] ?? true;
   return Settings.getWindowSettings(
     `ivette.properties.filter.${path}`,
@@ -114,7 +112,7 @@ function filter(path: string) {
   );
 }
 
-function useFilter(path: string) {
+function useFilter(path: string): [boolean, () => void] {
   const defaultValue = DEFAULTS[path] ?? true;
   return Dome.useFlipSettings(
     `ivette.properties.filter.${path}`,
@@ -124,7 +122,7 @@ function useFilter(path: string) {
 
 function filterStatus(
   status: Properties.propStatus,
-) {
+): boolean {
   switch (status) {
     case 'valid':
       return filter('status.valid');
@@ -153,7 +151,7 @@ function filterStatus(
 
 function filterKind(
   kind: Properties.propKind,
-) {
+): boolean {
   switch (kind) {
     case 'assert': return filter('kind.assert');
     case 'loop_invariant': return filter('kind.invariant');
@@ -173,7 +171,7 @@ function filterKind(
   }
 }
 
-function filterAlarm(alarm: string | undefined) {
+function filterAlarm(alarm: string | undefined): boolean {
   if (alarm) {
     if (!filter('alarms.alarms')) return false;
     switch (alarm) {
@@ -202,7 +200,7 @@ function filterAlarm(alarm: string | undefined) {
   return filter('alarms.others');
 }
 
-function filterEva(p: Property) {
+function filterEva(p: Property): boolean {
   let b = true;
   if (p.priority === false && filter('eva.priority_only'))
     b = false;
@@ -224,7 +222,7 @@ function filterEva(p: Property) {
   return b;
 }
 
-function filterProperty(p: Property) {
+function filterProperty(p: Property): boolean {
   return filterStatus(p.status)
     && filterKind(p.kind)
     && filterAlarm(p.alarm)
@@ -236,32 +234,33 @@ function filterProperty(p: Property) {
 // --------------------------------------------------------------------------
 
 const renderCode: Renderer<string> =
-  (text: string) => (<Code className="code-column" title={text}>{text}</Code>);
+  (text: string): JSX.Element =>
+    (<Code className="code-column" title={text}>{text}</Code>);
 
 const renderTag: Renderer<States.Tag> =
-  (d: States.Tag) => <Label label={d.label ?? d.name} title={d.descr} />;
+  (d: States.Tag): JSX.Element =>
+    (<Label label={d.label ?? d.name} title={d.descr} />);
 
 const renderNames: Renderer<string[]> =
-  (names: string[]) => {
+  (names: string[]): JSX.Element | null => {
     const label = names?.join(': ');
     return (label ? <Label label={label} /> : null);
   };
 
 const renderDir: Renderer<Ast.source> =
-  (loc: Ast.source) => (
-    <Code className="code-column" label={loc.dir} title={loc.file} />
-  );
+  (loc: Ast.source): JSX.Element =>
+    (<Code className="code-column" label={loc.dir} title={loc.file} />);
 
 const renderFile: Renderer<Ast.source> =
-  (loc: Ast.source) => (
-    <Code className="code-column" label={loc.base} title={loc.file} />
-  );
+  (loc: Ast.source): JSX.Element =>
+    (<Code className="code-column" label={loc.base} title={loc.file} />);
 
 const renderPriority: Renderer<boolean> =
-  (prio: boolean) => (prio ? <Icon id="ATTENTION" /> : null);
+  (prio: boolean): JSX.Element | null =>
+    (prio ? <Icon id="ATTENTION" /> : null);
 
 const renderTaint: Renderer<States.Tag> =
-  (taint: States.Tag) => {
+  (taint: States.Tag): JSX.Element | null => {
     let id = null;
     let color = 'black';
     switch (taint.name) {
@@ -275,11 +274,11 @@ const renderTaint: Renderer<States.Tag> =
     return (id ? <Icon id={id} fill={color} title={taint.descr} /> : null);
   };
 
-function ColumnCode<Row>(props: ColumnProps<Row, string>) {
+function ColumnCode<Row>(props: ColumnProps<Row, string>): JSX.Element {
   return <Column render={renderCode} {...props} />;
 }
 
-function ColumnTag<Row>(props: ColumnProps<Row, States.Tag>) {
+function ColumnTag<Row>(props: ColumnProps<Row, States.Tag>): JSX.Element {
   return <Column render={renderTag} {...props} />;
 }
 
@@ -349,12 +348,12 @@ class PropertyModel
     this.setFilter(this.filterItem.bind(this));
   }
 
-  setFilterFunction(kf?: string) {
+  setFilterFunction(kf?: string): void {
     this.filterFun = kf;
     if (filter('currentFunction')) this.reload();
   }
 
-  filterItem(prop: Property) {
+  filterItem(prop: Property): boolean {
     const kf = prop.fct;
     const cf = this.filterFun;
     const filteringFun = cf && filter('currentFunction');
@@ -376,7 +375,7 @@ interface SectionProps {
   children: React.ReactNode;
 }
 
-function Section(props: SectionProps) {
+function Section(props: SectionProps): JSX.Element {
   const settings = `properties-section-${props.label}`;
   return (
     <Folder
@@ -396,9 +395,9 @@ interface CheckFieldProps {
   path: string;
 }
 
-function CheckField(props: CheckFieldProps) {
+function CheckField(props: CheckFieldProps): JSX.Element {
   const [value, setValue] = useFilter(props.path);
-  const onChange = () => { setValue(); Reload.emit(); };
+  const onChange = (): void => { setValue(); Reload.emit(); };
   return (
     <Checkbox
       style={{
@@ -415,7 +414,7 @@ function CheckField(props: CheckFieldProps) {
 
 /* eslint-disable max-len */
 
-function PropertyFilter() {
+function PropertyFilter(): JSX.Element {
   return (
     <Scroll>
       <CheckField label="Current function" path="currentFunction" />
@@ -497,35 +496,29 @@ function PropertyFilter() {
 // --- Property Columns
 // -------------------------------------------------------------------------
 
-const PropertyColumns = () => {
-
+function PropertyColumns(): JSX.Element {
   const statusDict = States.useTags(Properties.propStatusTags);
   const kindDict = States.useTags(Properties.propKindTags);
   const alarmDict = States.useTags(Properties.alarmsTags);
   const taintDict = States.useTags(Eva.taintStatusTags);
-
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict.get(st) ?? { name: st }),
     [statusDict],
   );
-
   const getKind = React.useCallback(
     ({ kind: kd }: Property) => (kindDict.get(kd) ?? { name: kd }),
     [kindDict],
   );
-
   const getAlarm = React.useCallback(
     ({ alarm }: Property) => (
       alarm === undefined ? alarm : (alarmDict.get(alarm) ?? { name: alarm })
     ),
     [alarmDict],
   );
-
   const getTaint = React.useCallback(
     ({ taint }: Property) => (taintDict.get(taint) ?? { name: taint }),
     [taintDict],
   );
-
   return (
     <>
       <Column
@@ -587,10 +580,9 @@ const PropertyColumns = () => {
       />
     </>
   );
+}
 
-};
-
-function FilterRatio({ model }: { model: PropertyModel }) {
+function FilterRatio({ model }: { model: PropertyModel }): JSX.Element {
   Models.useModel(model);
   const [filtered, total] = [model.getRowCount(), model.getTotalRowCount()];
   return (
@@ -608,7 +600,7 @@ function FilterRatio({ model }: { model: PropertyModel }) {
 // --- Properties Table
 // -------------------------------------------------------------------------
 
-export default function RenderProperties() {
+export default function RenderProperties(): JSX.Element {
 
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
