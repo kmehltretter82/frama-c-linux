@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 /* --------------------------------------------------------------------------*/
 /* --- Ivette Extensions                                                  ---*/
 /* --------------------------------------------------------------------------*/
@@ -41,7 +39,7 @@ export interface ElementProps {
   children?: React.ReactNode;
 }
 
-function byPanel(p: ElementProps, q: ElementProps) {
+function byPanel(p: ElementProps, q: ElementProps): number {
   const rp = p.rank ?? 0;
   const rq = q.rank ?? 0;
   if (rp < rq) return -1;
@@ -65,7 +63,7 @@ export class ElementRack {
     UPDATED.emit();
   }
 
-  render() {
+  render(): JSX.Element {
     const panels: ElementProps[] = [];
     this.items.forEach((p) => { if (p.children) { panels.push(p); } });
     const contents = panels.sort(byPanel).map((p) => p.children);
@@ -74,7 +72,7 @@ export class ElementRack {
 
 }
 
-export function useRack(E: ElementRack) {
+export function useRack(E: ElementRack): JSX.Element {
   Dome.useUpdate(UPDATED);
   return E.render();
 }
@@ -83,8 +81,8 @@ export const SIDEBAR = new ElementRack();
 export const TOOLBAR = new ElementRack();
 export const STATUSBAR = new ElementRack();
 
-export function Sidebar() { return useRack(SIDEBAR); }
-export function Toolbar() { return useRack(TOOLBAR); }
-export function Statusbar() { return useRack(STATUSBAR); }
+export function Sidebar(): JSX.Element { return useRack(SIDEBAR); }
+export function Toolbar(): JSX.Element { return useRack(TOOLBAR); }
+export function Statusbar(): JSX.Element { return useRack(STATUSBAR); }
 
 /* --------------------------------------------------------------------------*/

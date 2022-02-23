@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Main React Component rendered by './index.js'
 // --------------------------------------------------------------------------
@@ -114,7 +112,7 @@ function ConsoleScrollbackFields(props: IvettePrefs.ConsoleScrollbackProps) {
 // --- Export Components
 // --------------------------------------------------------------------------
 
-export default function Preferences() {
+export default function Preferences(): JSX.Element {
   return (
     <Forms.Page>
       <Forms.Section label="Theme" unfold>
