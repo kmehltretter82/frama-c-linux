@@ -34,7 +34,6 @@ import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
 import * as PivotState from 'frama-c/plugins/pivot/api/general';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
-// import 'react-pivottable/pivottable.css';
 import 'frama-c/kernel/PivotTable-style.css';
 
 // --------------------------------------------------------------------------

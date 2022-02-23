@@ -54,7 +54,7 @@ export function ThemeSwitch(): JSX.Element {
   const [theme, setTheme] = Themes.useColorTheme();
   const other = theme === 'dark' ? 'light' : 'dark';
   const position = theme === 'dark' ? 'left' : 'right';
-  const title = `Switch to ${other} theme (right-click for full choice)`;
+  const title = `Switch to ${other} theme`;
   const onChange = (): void => setTheme(other);
   return (
     <Toolbar.Switch

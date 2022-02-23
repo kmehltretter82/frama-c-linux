@@ -1297,7 +1297,7 @@ export function MenuField<A>(props: MenuFieldProps<A>): JSX.Element {
   const entries: ENTRY<A>[] = React.useMemo(() =>
     props.options.map((e, k) => {
       const field = `item#${k}`;
-      const option = <option value={field} label={e.label} />;
+      const option = <option value={field} key={field} label={e.label} />;
       return { field, option, value: e.value };
     }), [props.options]);
   const input = React.useCallback(

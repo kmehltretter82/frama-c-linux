@@ -80,7 +80,7 @@ export default function SourceCode(): JSX.Element {
   const filename = Path.parse(file).base;
 
   // Title bar buttons, along with the parameters for our text.
-  const { buttons: themeButtons, fontSize, wrapText } =
+  const { buttons: editorButtons, fontSize, wrapText } =
     Preferences.useEditorButtons({
       fontSize: Preferences.SourceFontSize,
       wrapText: Preferences.AstWrapText,
@@ -196,7 +196,7 @@ export default function SourceCode(): JSX.Element {
         />
         <Code title={file} style={{ padding: '5px' }}>{filename}</Code>
         <Hfill />
-        {themeButtons}
+        {editorButtons}
       </TitleBar>
       <Text
         buffer={buffer}
