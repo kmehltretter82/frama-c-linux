@@ -56,16 +56,16 @@ Ivette.registerGroup({
   Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
   Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
+    id: 'frama-c.astinfo',
+    label: 'Informations',
+    title: 'Contextual informations on current selection',
+    children: <ASTinfo />
+  });
+  Ivette.registerComponent({
     id: 'frama-c.astview',
     label: 'AST',
     title: 'Normalized C/ACSL Source Code',
     children: <ASTview />,
-  });
-  Ivette.registerComponent({
-    id: 'frama-c.astinfo',
-    label: 'Informations',
-    title: 'Informations on currently selected item',
-    children: <ASTinfo />,
   });
   Ivette.registerComponent({
     id: 'frama-c.sourcecode',
