@@ -5,9 +5,9 @@
 
 DEFAULT_SUITES= callgraph cil constant_propagation float idct impact
 # todo:
-IGNORE= DEFAULT_SUITES= builtins compliance dynamic syntax
+IGNORE= DEFAULT_SUITES= builtins compliance dynamic
 
-DEFAULT_SUITES= occurrence pretty_printing rte_manual
+DEFAULT_SUITES= occurrence pretty_printing rte_manual syntax
 # todo:
 IGNORE= DEFAULT_SUITES= journal libc metrics pdg rte
 

@@ -206,7 +206,7 @@ clean-tests: purge-tests
 
 # Generates all dune files used for testing
 .PHONY: run-ptests
-run-ptests: config.sed purge-tests
+run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
 	$(PTESTS) $(TEST_DIRS)
 
 # run tests of for all configurations (requires all dune files)
