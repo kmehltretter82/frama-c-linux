@@ -87,6 +87,10 @@ module Jtext : S with type t = json
 
 module Jmarkdown : S with type t = Markdown.text
 
+(** All-in-one formatter. Return the JSON encoding of formatted text. *)
+val jpretty : ?indent:int -> ?margin:int ->
+  (Format.formatter -> 'a -> unit) -> 'a -> Jtext.t
+
 (* -------------------------------------------------------------------------- *)
 (** {2 Constructors} *)
 (* -------------------------------------------------------------------------- *)

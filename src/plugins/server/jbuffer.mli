@@ -55,6 +55,9 @@ val pop_tag : buffer -> Format.stag -> unit
     tags. *)
 val contents : buffer -> json
 
+(** When [is_empty js] holds, the JSON is sure to be empty. *)
+val is_empty : json -> bool
+
 (** Prints back a JSON encoding into the provided formatter.
     @raise Yojson.Basic.Util.Type_error in case of ill formatted buffer. *)
 val fprintf : Format.formatter -> json -> unit
