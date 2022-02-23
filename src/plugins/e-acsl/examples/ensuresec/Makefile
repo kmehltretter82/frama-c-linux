@@ -1,37 +1,26 @@
-OUT:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))build
-DEPS:=Makefile ensuresec_ee.c json_assert.c
-EACSL_CC:=e-acsl-gcc.sh -c --concurrency --external-assert json_assert.c ensuresec_ee.c
-MKDIR:=mkdir -p
+JSON_OUTPUT_DIR=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))json-output
+PUSH_ALERTS_DIR=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))push-alerts
 
-EE_ID:=EnsuresecEE
-EE_TOOL_ID:=EnsuresecEE_EACSL
+compile:
+	make -C $(JSON_OUTPUT_DIR) compile
 
-$(OUT)/ensuresec_ee.e-acsl: $(DEPS)
-	$(MKDIR) $(OUT)
-	$(EACSL_CC) -o $(OUT)/ensuresec_ee.frama.c -O $(OUT)/ensuresec_ee
+run:
+	make -C $(JSON_OUTPUT_DIR) run
 
-$(OUT)/ensuresec_ee_pall.e-acsl: $(DEPS)
-	$(MKDIR) $(OUT)
-	$(EACSL_CC) -e -DE_ACSL_DEBUG_ASSERT -o $(OUT)/ensuresec_ee_pall.frama.c -O $(OUT)/ensuresec_ee_pall
+launch_receiver:
+	FLASK_APP=$(PUSH_ALERTS_DIR)/receiver.py FLASK_ENV=development flask run
 
-$(OUT)/ensuresec_ee_debug.e-acsl: $(DEPS)
-	$(MKDIR) $(OUT)
-	$(EACSL_CC) -e -DE_ACSL_DEBUG_ASSERT --rt-debug -o $(OUT)/ensuresec_ee_debug.frama.c -O $(OUT)/ensuresec_ee_debug
+run_wrapped: compile
+	$(PUSH_ALERTS_DIR)/wrapper.py \
+		--alert-url http://localhost:5000/alert \
+		--id EnsuresecEE \
+		--tool-id EnsuresecEE_EACSL \
+		$(JSON_OUTPUT_DIR)/build/ensuresec_ee.e-acsl
 
-compile: $(OUT)/ensuresec_ee.e-acsl
-compile_print_all: $(OUT)/ensuresec_ee_pall.e-acsl
-compile_debug: $(OUT)/ensuresec_ee_debug.e-acsl
-
-run: $(OUT)/ensuresec_ee.e-acsl
-	ENSURESEC_EE_ID="$(EE_ID)" ENSURESEC_EE_TOOL_ID="$(EE_TOOL_ID)" ENSURESEC_OUTPUT_FILE="$(OUT)/ensuresec_ee.json" $(OUT)/ensuresec_ee.e-acsl
-
-run_print_all: $(OUT)/ensuresec_ee_pall.e-acsl
-	ENSURESEC_EE_ID="$(EE_ID)" ENSURESEC_EE_TOOL_ID="$(EE_TOOL_ID)" ENSURESEC_OUTPUT_FILE="$(OUT)/ensuresec_ee_pall.json" $(OUT)/ensuresec_ee_pall.e-acsl
-
-run_debug: $(OUT)/ensuresec_ee_debug.e-acsl
-	ENSURESEC_EE_ID="$(EE_ID)" ENSURESEC_EE_TOOL_ID="$(EE_TOOL_ID)" ENSURESEC_OUTPUT_FILE="$(OUT)/ensuresec_ee_debug.json" $(OUT)/ensuresec_ee_debug.e-acsl
-
-all: run run_print_all run_debug
-
-clean:
-	rm -rf $(OUT)
+run_wrapped_print_all:
+	make -C $(JSON_OUTPUT_DIR) compile_print_all
+	$(PUSH_ALERTS_DIR)/wrapper.py \
+		--alert-url http://localhost:5000/alert \
+		--id EnsuresecEE \
+		--tool-id EnsuresecEE_EACSL \
+		$(JSON_OUTPUT_DIR)/build/ensuresec_ee_pall.e-acsl
