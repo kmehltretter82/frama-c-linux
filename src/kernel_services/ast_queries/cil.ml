@@ -5262,6 +5262,14 @@ class constFoldVisitorClass (machdep: bool) : cilVisitor = object
     (* Do it bottom up *)
     ChangeDoChildrenPost (e, constFold machdep)
 
+  (* Optimization: only visits function and variable definitions. *)
+  method! vglob = function
+    | GFun _ | GVar _ -> DoChildren
+    | _ -> SkipChildren
+
+  method! vtype _ = SkipChildren
+  method! vspec _ = SkipChildren
+  method! vcode_annot _ = SkipChildren
 end
 let constFoldVisitor (machdep: bool) = new constFoldVisitorClass machdep
 
@@ -5355,6 +5363,13 @@ let visitCilFileSameGlobals (vis : cilVisitor) (f : file) : unit =
   else
     ignore
       (doVisitCil vis (Visitor_behavior.cfile vis#behavior) (post_file vis) childrenFileSameGlobals f)
+
+let visitCilFileFunctions vis file =
+  let process_one_global = function
+    | GFun (fundec, _) -> ignore (visitCilFunction vis fundec)
+    | _ -> ()
+  in
+  iterGlobals file process_one_global
 
 let childrenFileCopy vis f =
   let fGlob g = visitCilGlobal vis g in

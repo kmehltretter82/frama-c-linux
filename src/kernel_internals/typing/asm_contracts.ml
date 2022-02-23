@@ -221,11 +221,17 @@ class visit_assembly =
           ~dkey:Kernel.dkey_asm_contracts "Ignoring basic assembly instruction";
         Cil.SkipChildren
       | _ -> Cil.SkipChildren
+
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
 
 let transform file =
   if Kernel.AsmContractsGenerate.get() then
-    Visitor.visitFramacFileSameGlobals (new visit_assembly) file
+    Visitor.visitFramacFileFunctions (new visit_assembly) file
 
 let () =
   File.add_code_transformation_after_cleanup

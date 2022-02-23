@@ -709,6 +709,13 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
       ChangeDoChildrenPost (s, fgh)
 
     | _ -> DoChildren
+
+  method! vinst _ = SkipChildren
+  method! vexpr _ = SkipChildren
+  method! vlval _ = SkipChildren
+  method! vtype _ = SkipChildren
+  method! vspec _ = SkipChildren
+  method! vcode_annot _ = SkipChildren
 end
 
 (* Performs unrolling transformation without using -ulevel option.
@@ -723,7 +730,7 @@ let apply_transformation ?(force=true) nb file =
     in
     let visitor = new do_it global_find_init (force, nb) in
     Kernel.debug ~dkey "Using -ulevel %d option and UNROLL loop pragmas@." nb;
-    visitFramacFileSameGlobals (visitor:>Visitor.frama_c_visitor) file;
+    visitFramacFileFunctions (visitor:>Visitor.frama_c_visitor) file;
     if !ast_has_changed then Ast.mark_as_changed ()
     else begin
       Kernel.debug ~dkey

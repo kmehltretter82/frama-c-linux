@@ -96,11 +96,16 @@ let mark_unreachable () =
       end;
       Cil.DoChildren
 
-    method! vinst _ = Cil.SkipChildren
+    method! vinst _ = SkipChildren
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
   in
   Annotations.iter_all_code_annot do_code_annot;
-  Visitor.visitFramacFile unreach (Ast.get ())
+  Visitor.visitFramacFileFunctions unreach (Ast.get ())
 
 let c_labels kf cs =
   if !Db.Value.use_spec_instead_of_definition kf then

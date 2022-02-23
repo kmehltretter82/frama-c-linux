@@ -142,19 +142,23 @@ let compute () =
          method! vstmt s =
            Datatype.Int.Hashtbl.add h s.sid (self#kf, s, opened_blocks);
            Cil.DoChildren
-         method! vglob g =
-           begin match g with
-             | GFun (fd, _) ->
-               (try
-                  let kf = Globals.Functions.get fd.svar in
-                  current_kf <- Some kf;
-                with Not_found ->
-                  Kernel.fatal "No kernel function for function %a"
-                    Cil_datatype.Varinfo.pretty fd.svar)
-             | _ ->
-               ()
-           end;
-           Cil.DoChildren
+         method! vglob = function
+           | GFun (fd, _) ->
+             (try
+                let kf = Globals.Functions.get fd.svar in
+                current_kf <- Some kf;
+                Cil.DoChildren
+              with Not_found ->
+                Kernel.fatal "No kernel function for function %a"
+                  Cil_datatype.Varinfo.pretty fd.svar)
+           | GVar _ -> Cil.SkipChildren
+           | _ -> Cil.SkipChildren
+         method! vinst _ = SkipChildren
+         method! vexpr _ = SkipChildren
+         method! vlval _ = SkipChildren
+         method! vtype _ = SkipChildren
+         method! vspec _ = SkipChildren
+         method! vcode_annot _ = SkipChildren
        end
        in
        Cil.visitCilFile (visitor :> Cil.cilVisitor) p;

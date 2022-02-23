@@ -100,7 +100,10 @@ let add_metavariable map (name,typename) =
   in
   if Datatype.String.Map.mem name map then
     Aorai_option.abort "The metavariable %s is declared twice" name;
-  let vi = Cil.makeGlobalVar (Data_for_aorai.get_fresh ("aorai_" ^ name)) ty in
+  let vi =
+    Cil.makeGlobalVar
+      ~ghost:true (Data_for_aorai.get_fresh ("aorai_" ^ name)) ty
+  in
   Datatype.String.Map.add name vi map
 
 let check_state st =
