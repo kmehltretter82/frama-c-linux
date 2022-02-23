@@ -185,16 +185,10 @@
 .dome-xSplitter-vpos-R { position: absolute; height: 1px; width: 100% }
 .dome-xSplitter-vpos-B { position: absolute; bottom: 0px; width: 100% }
 
-.dome-window-active .dome-xSplitter-hline,
-.dome-window-active .dome-xSplitter-vline
+.dome-xSplitter-hline,
+.dome-xSplitter-vline
 {
-    background: #afafaf ;
-}
-
-.dome-window-inactive .dome-xSplitter-hline,
-.dome-window-inactive .dome-xSplitter-vline
-{
-    background: #d6d6d6 ;
+    background: var(--splitter) ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -223,7 +217,7 @@
     z-index: 2 ;
     position: absolute ;
     border-radius: 12px ;
-    background: #64b4f0 ;
+    background: var(--grid-layout-target) ;
     opacity: 0.5 ;
 }
 
@@ -231,7 +225,7 @@
     z-index: -1 ;
     position: absolute ;
     overflow: hidden ;
-    background: lightblue ;
+    background: var(--grid-layout-holder) ;
     opacity: 0.5 ;
 }
 
@@ -313,7 +307,7 @@
 }
 
 .dome-xForm-section .dome-disabled {
-    color: #aaa ;
+    color: var(--background-disabled) ;
 }
 
 .dome-xForm-hsep
@@ -327,7 +321,7 @@
 {
     position: absolute ;
     top: 2px ;
-    fill: #888 ;
+    fill: var(--info-text-discrete) ;
     left: -14px ;
 }
 
@@ -350,7 +344,7 @@
 
 .dome-xForm-label.dome-disabled, .dome-xForm-field.dome-disabled
 {
-    color: #aaa ;
+    color: var(--background-disabled) ;
     opacity: 0.9 ;
 }
 
@@ -363,7 +357,7 @@
 {
     position: absolute ;
     top: -1px ;
-    fill: darkorange ;
+    fill: var(--error) ;
     margin-left: 6px ;
 }
 
@@ -374,7 +368,7 @@
     position: absolute ;
     top: 3px ;
     width: max-content ;
-    color: darkorange ;
+    color: var(--warning) ;
     margin-left: 4px ;
     font-size: smaller ;
 }
@@ -401,7 +395,7 @@
 
 .dome-xForm-textarea-field
 {
-    border-color: #d6d6d6 ;
+    border-color: var(--border-discrete) ;
     font-size: 10pt ;
     padding-top:    2px ;
     padding-bottom: 2px ;
@@ -435,7 +429,7 @@
 
 .dome-xForm-units
 {
-    color: #888 ;
+    color: var(--info-text-discrete) ;
     font-size: smaller ;
     margin-left: 4px ;
 }

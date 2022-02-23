@@ -46,9 +46,8 @@ export default function ASTinfo(): JSX.Element {
 
   React.useEffect(() => {
     buffer.clear();
-    if (data) {
-      Utils.printTextWithTags(buffer, data, { css: 'color: blue' });
-    }
+    const style = { css: 'color: var(--text-highlighted)' };
+    if (data) Utils.printTextWithTags(buffer, data, style);
   }, [buffer, data]);
 
   // Callbacks
@@ -65,7 +64,6 @@ export default function ASTinfo(): JSX.Element {
         <Text
           buffer={buffer}
           mode="text"
-          theme="default"
           onSelection={onTextSelection}
           readOnly
         />

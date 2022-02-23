@@ -164,10 +164,8 @@ export default function ASTview() {
   const multipleSelections = selection?.multiple.allSelections;
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
-  const { buttons: themeButtons, theme, fontSize, wrapText } =
-    Preferences.useThemeButtons({
-      target: 'Internal AST',
-      theme: Preferences.AstTheme,
+  const { buttons: editorButtons, fontSize, wrapText } =
+    Preferences.useEditorButtons({
       fontSize: Preferences.AstFontSize,
       wrapText: Preferences.AstWrapText,
       disabled: !theFunction,
@@ -306,12 +304,11 @@ export default function ASTview() {
   return (
     <>
       <TitleBar>
-        {themeButtons}
+        {editorButtons}
       </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
-        theme={theme}
         fontSize={fontSize}
         lineWrapping={wrapText}
         selection={theMarker}

@@ -49,6 +49,8 @@ import { ipcRenderer } from 'electron';
 import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
+import './dark.css';
+import './light.css';
 import './style.css';
 import { State } from './data/states';
 

@@ -1249,6 +1249,7 @@ export function SelectField(props: SelectFieldProps) {
   return (
     <Field
       {...props}
+      offset={5}
       error={error}
       htmlFor={id}
     >
@@ -1264,5 +1265,68 @@ export function SelectField(props: SelectFieldProps) {
     </Field>
   );
 }
+
+/** @category Form Fields */
+export interface MenuFieldOption<A> {
+  value: A;
+  label: string;
+}
+
+/** @category Form Fields */
+export interface MenuFieldProps<A> extends FieldProps<A> {
+  /** Field label. */
+  label: string;
+  /** Field tooltip text. */
+  title?: string;
+  /** Field state. */
+  state: FieldState<A>;
+  placeholder?: string;
+  defaultValue: A;
+  options: MenuFieldOption<A>[];
+}
+
+type ENTRY<A> = { option: JSX.Element, field: string, value: A };
+
+/**
+   Creates a `<SelectField/>` form field with a predefine set
+   of (typed) options.
+
+   @category Form Fields
+ */
+export function MenuField<A>(props: MenuFieldProps<A>): JSX.Element {
+  const entries: ENTRY<A>[] = React.useMemo(() =>
+    props.options.map((e, k) => {
+      const field = `item#${k}`;
+      const option = <option value={field} key={field} label={e.label} />;
+      return { field, option, value: e.value };
+    }), [props.options]);
+  const input = React.useCallback(
+    (v) => entries.find((e) => e.value === v)?.field
+    , [entries]
+  );
+  const output = React.useCallback(
+    (f) => entries.find((e) => e.field === f)?.value ?? props.defaultValue
+    , [entries, props.defaultValue]
+  );
+  const defaultField = React.useMemo(
+    () => input(props.defaultValue),
+    [input, props.defaultValue]
+  );
+  const state = useFilter<A, string | undefined>(
+    props.state,
+    input, output,
+    defaultField,
+  );
+  return (
+    <SelectField
+      state={state}
+      label={props.label}
+      title={props.title}
+      placeholder={props.placeholder} >
+      {entries.map((e) => e.option)}
+    </SelectField>
+  );
+}
+
 
 // --------------------------------------------------------------------------

@@ -37,11 +37,8 @@ import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
-
-import 'codemirror/theme/ambiance.css';
 
 // --------------------------------------------------------------------------
 // --- Configure Server
@@ -76,7 +73,7 @@ function buildServerConfig(argv: string[], cwd?: string) {
   let command;
   let sockaddr;
   let cwdir = cwd;
-  for (let k = 0; k < argv.length; k++) {
+  for (let k = 0; k < (argv ? argv.length : 0); k++) {
     const v = argv[k];
     switch (v) {
       case '--cwd':
@@ -330,7 +327,6 @@ const RenderConsole = () => {
         buffer={edited ? editor : Server.buffer}
         mode="text"
         readOnly={!edited}
-        theme="ambiance"
       />
     </>
   );
