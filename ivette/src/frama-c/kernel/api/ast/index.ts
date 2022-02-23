@@ -478,7 +478,7 @@ const getInformations_internal: Server.GetRequest<
               title: Json.jFail(Json.jString,'String expected'),
               descr: jTextSafe,
             })),
-  signals: [[ { name: 'kernel.ast.getInformationsUpdate' } ]],
+  signals: [ { name: 'kernel.ast.getInformationsUpdate' } ],
 };
 /** Get available informations about markers. When no marker is given, returns all kinds of informations (with empty `descr` field). */
 export const getInformations: Server.GetRequest<
