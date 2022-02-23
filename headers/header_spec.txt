@@ -123,7 +123,9 @@ share/analysis-scripts/creduce.sh: CEA_LGPL
 share/analysis-scripts/detect_recursion.py: CEA_LGPL
 share/analysis-scripts/epilogue.mk: CEA_LGPL
 share/analysis-scripts/estimate_difficulty.py: CEA_LGPL
+share/analysis-scripts/external_tool.py: CEA_LGPL
 share/analysis-scripts/fc_stubs.c: .ignore
+share/analysis-scripts/fclog.py: CEA_LGPL
 share/analysis-scripts/frama_c_results.py: CEA_LGPL
 share/analysis-scripts/cmd-dep.sh: .ignore
 share/analysis-scripts/concat-csv.sh: .ignore

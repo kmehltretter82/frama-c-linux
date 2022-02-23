@@ -192,7 +192,13 @@ def make_target_name(target):
 # sources are pretty-printed relatively to the .frama-c directory, where the
 # GNUmakefile will reside
 def rel_prefix(path):
-    return path if os.path.isabs(path) else os.path.relpath(path, start=dot_framac_dir)
+    """Return a relative path to the .frama-c directory if path is relative, or if the relativized
+    path will contain at most a single '..'. Otherwise, return an absolute path."""
+    rel = os.path.relpath(path, start=dot_framac_dir)
+    if rel.startswith("../.."):
+        return os.path.abspath(path)
+    else:
+        return rel
 
 
 def pretty_sources(sources):
@@ -255,7 +261,7 @@ def list_partition(f, l):
     l1 = []
     l2 = []
     for e in l:
-        if f(l):
+        if f(e):
             l1.append(e)
         else:
             l2.append(e)
