@@ -344,43 +344,6 @@ let is_machdep_active compiler =
   | Some Not_MSVC, _, false -> true
   | _, _, _ -> false
 
-(* Complex types are unsupported so the following built-ins can't be added :
-   - cabs, cabsf, cabsh
-   - cacos, cacosf, cacosl, cacosh, cacoshf, cacoshl
-   - carg, cargf, cargl
-   - casin, casinf, casinl, casinh, casinhf, casinhl
-   - catan, catanf, catanl, catanh, catanhf, catanhl
-   - ccos, ccosf, ccosl, ccosh, ccoshf, ccoshl
-   - cexp, cexpf, cexpl
-   - cimag, cimagf, cimagl
-   - clog, clogf, clogl
-   - conj, conjf, conjl
-   - cpow, cpowf, cpowl
-   - cproj, cprojf, cprojl
-   - creal, crealf, creall
-   - csin, csinf, csinl, csinh, csinhf, csinhl
-   - csqrt, csqrtf, csqrtl
-   - ctan, ctanf, ctanl, ctanh, ctanhf, ctanhl
-*)
-
-(* [wint_t] isn't specified in [theMachine] so the following built-ins that
-   use this type can't be added :
-   - iswalnum
-   - iswalpha
-   - iswblank
-   - iswcntrl
-   - iswdigit
-   - iswgraph
-   - iswlower
-   - iswprint
-   - iswpunct
-   - iswspace
-   - iswupper
-   - iswxdigit
-   - towlower
-   - towupper
-*)
-
 let add_builtin_if_active b =
   if is_machdep_active b.compiler then begin
     Kernel.feedback ~dkey:Kernel.dkey_builtins
