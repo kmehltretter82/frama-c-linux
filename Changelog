@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ##################################
 
+o   Kernel    [2022-02-23] New visitor functions visitFramacFileFunctions
+              and visitCilFileFunctions to visit only function definitions,
+              for better performance.
 -*  Kernel    [2022-02-22] Fix list of potential types for decimal
               integer literal constants
 *   Kernel    [2022-02-17] Reject programs using unsupported
