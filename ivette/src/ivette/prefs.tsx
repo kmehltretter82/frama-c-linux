@@ -50,28 +50,18 @@ export const SourceWrapText = new Settings.GFalse('SourceCode.wrapText');
 /* --- Theme Switcher Button                                              --- */
 /* -------------------------------------------------------------------------- */
 
-const themeEntries: Dome.PopupMenuItem[] = [
-  { id: 'light', label: 'Switch to Light Theme' },
-  { id: 'dark', label: 'Switch to Dark Theme' },
-  { id: 'system', label: 'Switch to System Default' },
-];
-
 export function ThemeSwitch(): JSX.Element {
   const [theme, setTheme] = Themes.useColorTheme();
   const other = theme === 'dark' ? 'light' : 'dark';
+  const position = theme === 'dark' ? 'left' : 'right';
   const title = `Switch to ${other} theme (right-click for full choice)`;
   const onChange = (): void => setTheme(other);
-  const onPopup = (): void => Dome.popupMenu(
-    themeEntries,
-    (th) => setTheme(Themes.jColorSettings(th))
-  );
   return (
     <Toolbar.Switch
       disabled={!Dome.DEVEL}
       title={title}
-      checked={theme === 'dark'}
+      position={position}
       onChange={onChange}
-      onContextMenu={onPopup}
     />
   );
 }

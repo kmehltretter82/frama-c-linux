@@ -160,31 +160,25 @@ export interface SwitchProps {
   enabled?: boolean;
   /** Defaults to `false`. */
   disabled?: boolean;
-  /** Switch value.
-      When checked, the slide is switched to « right » position.
-      Defaults to false. */
-  checked?: boolean;
+  /** Switch position. Defaults to 'left'. */
+  position?: 'left' | 'right';
   /** Click callback. */
-  onChange?: (newValue: boolean) => void;
-  /** Right Click callback. */
-  onContextMenu?: () => void;
+  onChange?: (newPosition: 'left' | 'right') => void;
 }
 
-/** Toolbar Switch. */
+/** Toolbar Left/Right Switch. */
 export function Switch(props: SwitchProps) {
-  const { checked = false, onChange } = props;
-  const { title = '', className = '', style } = props;
+  const { position, onChange } = props;
+  const checked = position === 'right';
+  const { title, className, style } = props;
   const { enabled = true, disabled = false } = props;
-  const callback = onChange && (() => onChange(!checked));
+  const callback = onChange && (() => onChange(checked ? 'left' : 'right'));
   if (disabled || !enabled) return null;
   return (
-    <label
-      className={'dome-xSwitch ' + className}
-      style={style}
-      onContextMenu={props.onContextMenu}>
+    <label className={classes('dome-xSwitch', className)} style={style}>
       <input type={'checkbox'} checked={checked} onChange={callback} />
       <span className={'dome-xSwitch-slider'} title={title} />
-    </label>
+    </label >
   );
 }
 
