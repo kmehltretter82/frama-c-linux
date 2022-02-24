@@ -41,8 +41,11 @@ autom4te.cache
 
 #tests
 
-/tests/**/result/
-/tests/**/result_*/
+/tests/**/result*/
+/tests/**/oracle*/dune
+
+/src/plugin/*/tests/**/result*/
+/src/plugin/*/tests/**/oracle*/dune
 
 /tests/crowbar/*constfold
 /tests/crowbar/integer_bb_pretty
@@ -217,6 +220,7 @@ _build
 
 # Nix
 
+# When a nix-build is executed it generates
 /result*
 
 #######################
