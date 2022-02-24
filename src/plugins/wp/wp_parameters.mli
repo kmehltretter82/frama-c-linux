@@ -71,6 +71,7 @@ module Region_annot: Parameter_sig.Bool
 module Region_inline: Parameter_sig.Bool
 module Region_fixpoint: Parameter_sig.Bool
 module Region_cluster: Parameter_sig.Bool
+module Region_output_dot : Parameter_sig.Filepath
 
 (** {2 Computation Strategies} *)
 
