@@ -26,6 +26,10 @@ stdenv.mkDerivation rec {
     which
   ];
 
+  postPatch = ''
+    patchShebangs .
+  '' ;
+
   # Keep main configuration
   # Only for WP qualif -> replace with true after split
   configurePhase = ''
