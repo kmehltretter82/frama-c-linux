@@ -358,6 +358,7 @@ module Region_annot =
     end)
 
 let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.is_invisible ()
 module Region_output_dot =
   Filepath
     (struct
