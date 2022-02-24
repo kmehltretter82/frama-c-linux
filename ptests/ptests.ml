@@ -1039,11 +1039,11 @@ end = struct
                      But only if the comment is still opened by the end of
                      the line and we are indeed reading a config
                  *)
-               (if List.exists is_config configs &&
-                   not (Str.string_match end_comment names 0) then
-                  ignore (scan_directives ~drop:true dir ~file:f scan_buffer default);
-                scan_config ())
-             end)
+                 (if List.exists is_config configs &&
+                     not (Str.string_match end_comment names 0) then
+                    ignore (scan_directives ~drop:true dir ~file:f scan_buffer default);
+                  scan_config ())
+               end)
       in
       let config =
         try
