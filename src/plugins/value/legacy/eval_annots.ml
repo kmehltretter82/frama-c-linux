@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,10 +46,10 @@ let code_annotation_loc ca stmt =
 let mark_unreachable () =
   let mark ppt =
     if not (Property_status.automatically_computed ppt) then begin
-      Value_parameters.debug "Marking property %a as dead"
+      Self.debug "Marking property %a as dead"
         Description.pp_property ppt;
       let emit =
-        Property_status.emit ~distinct:false Value_util.emitter ~hyps:[]
+        Property_status.emit ~distinct:false Eva_utils.emitter ~hyps:[]
       in
       let reach_p = Property.ip_reachable_ppt ppt in
       emit ppt Property_status.True;
@@ -73,7 +73,7 @@ let mark_unreachable () =
         let mark_status kf =
           (* Do not mark preconditions as dead if they are not analyzed in
              non-dead code. Otherwise, the consolidation does strange things. *)
-          if not (Value_util.skip_specifications kf) ||
+          if not (Eva_utils.skip_specifications kf) ||
              Builtins.is_builtin_overridden kf
           then begin
             (* Setup all precondition statuses for [kf]: maybe it has
@@ -96,11 +96,16 @@ let mark_unreachable () =
       end;
       Cil.DoChildren
 
-    method! vinst _ = Cil.SkipChildren
+    method! vinst _ = SkipChildren
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
   in
   Annotations.iter_all_code_annot do_code_annot;
-  Visitor.visitFramacFile unreach (Ast.get ())
+  Visitor.visitFramacFileFunctions unreach (Ast.get ())
 
 let c_labels kf cs =
   if !Db.Value.use_spec_instead_of_definition kf then
@@ -187,10 +192,10 @@ let mark_green_and_red () =
             | `True -> Property_status.True, "valid"
             | `False -> Property_status.False_if_reachable, "invalid"
           in
-          Property_status.emit ~distinct Value_util.emitter ~hyps:[] ip status;
+          Property_status.emit ~distinct Eva_utils.emitter ~hyps:[] ip status;
           let source = fst loc in
           let text_ca = code_annotation_text ca in
-          Value_parameters.result ~once:true ~source "%s%a got final status %s."
+          Self.result ~once:true ~source "%s%a got final status %s."
             text_ca Description.pp_named p text_status;
         in
         begin
@@ -230,7 +235,7 @@ let mark_invalid_initializers () =
             let status = Property_status.False_and_reachable in
             let distinct = false (* see comment in mark_green_and_red above *) in
             Red_statuses.add_red_property Kglobal ip;
-            Property_status.emit ~distinct Value_util.emitter ~hyps:[] ip status;
+            Property_status.emit ~distinct Eva_utils.emitter ~hyps:[] ip status;
         end
       | _ -> ()
   in

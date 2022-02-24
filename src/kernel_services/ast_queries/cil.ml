@@ -3214,10 +3214,9 @@ let parseIntAux (str:string) =
     else if hasSuffix "U" then
       1, [IUInt; IULong; IULongLong]
     else
-      0, if octalhexbin || true (* !!! This is against the ISO but it
-                                 * is what GCC and MSVC do !!! *)
+      0, if octalhexbin
       then [IInt; IUInt; ILong; IULong; ILongLong; IULongLong]
-      else [IInt; ILong; IUInt; ILongLong]
+      else [IInt; ILong; ILongLong]
   in
   (* Convert to integer. To prevent overflow we do the arithmetic
    * on Big_int and we take care of overflow. We work only with
@@ -5256,6 +5255,14 @@ class constFoldVisitorClass (machdep: bool) : cilVisitor = object
     (* Do it bottom up *)
     ChangeDoChildrenPost (e, constFold machdep)
 
+  (* Optimization: only visits function and variable definitions. *)
+  method! vglob = function
+    | GFun _ | GVar _ -> DoChildren
+    | _ -> SkipChildren
+
+  method! vtype _ = SkipChildren
+  method! vspec _ = SkipChildren
+  method! vcode_annot _ = SkipChildren
 end
 let constFoldVisitor (machdep: bool) = new constFoldVisitorClass machdep
 
@@ -5349,6 +5356,13 @@ let visitCilFileSameGlobals (vis : cilVisitor) (f : file) : unit =
   else
     ignore
       (doVisitCil vis (Visitor_behavior.cfile vis#behavior) (post_file vis) childrenFileSameGlobals f)
+
+let visitCilFileFunctions vis file =
+  let process_one_global = function
+    | GFun (fundec, _) -> ignore (visitCilFunction vis fundec)
+    | _ -> ()
+  in
+  iterGlobals file process_one_global
 
 let childrenFileCopy vis f =
   let fGlob g = visitCilGlobal vis g in

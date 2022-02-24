@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -96,7 +96,7 @@ class eva_coverage_vis ~from_entry_point = object(self)
     | Block _ | UnspecifiedSequence _ -> Cil.DoChildren
     | _ ->
       self#incr_total_stmts;
-      if Db.Value.is_reachable_stmt s then self#incr_covered_stmts;
+      if Eva.Results.is_reachable s then self#incr_covered_stmts;
       Cil.DoChildren
 
   method! vinst i =
@@ -114,7 +114,7 @@ class eva_coverage_vis ~from_entry_point = object(self)
       Cil.SkipChildren
     | Call(_,{ enode = Lval (Mem _,NoOffset)},_,_) ->
       let s = Option.get self#current_stmt in
-      let kfs = Db.Value.call_to_kernel_function s in
+      let kfs = Eva.Results.callee s in
       let handle_one kf =
         let vi = Kernel_function.get_vi kf in
         if not (Cil_datatype.Varinfo.Hashtbl.mem calls vi)
@@ -129,7 +129,7 @@ class eva_coverage_vis ~from_entry_point = object(self)
           end
         end
       in
-      Kernel_function.Hptset.iter handle_one kfs;
+      List.iter handle_one kfs;
       Cil.SkipChildren
     | _ -> Cil.SkipChildren (* No need to go further. *)
 
@@ -187,7 +187,7 @@ open Markdown
 
 let coverage_md_gen () =
   let main = Kernel.MainFunction.get () in
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   let vis = new eva_coverage_vis ~from_entry_point:false in
   let stats = vis#compute () in
   let summary_whole =
@@ -231,7 +231,7 @@ let coverage_md_gen () =
   [ Block [Text summary_whole]; Block [Text summary ]]
 
 let domains_md_gen () =
-  let eva_domains = Eva.Value_parameters.enabled_domains () in
+  let eva_domains = Eva.Parameters.enabled_domains () in
   let domains = List.filter (fun (name, _) -> name <> "cvalue") eva_domains in
   let aux (name, descr) = (plain "domain" @ bold name), plain descr in
   List.map aux domains

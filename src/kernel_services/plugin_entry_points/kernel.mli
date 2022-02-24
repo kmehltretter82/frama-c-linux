@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -66,6 +66,9 @@ val dkey_file_transform: category
 val dkey_file_print_one: category
 
 val dkey_file_annot: category
+
+val dkey_file_source: category
+(** Messages related to operations on files during preprocessing/parsing. *)
 
 val dkey_filter: category
 
@@ -200,6 +203,9 @@ val wkey_asm: warn_category
 val wkey_unnamed_typedef: warn_category
 (** Warning related to "unnamed typedef that does not introduce a struct
     or enumeration type". *)
+
+val wkey_file_not_found: warn_category
+(** Warnings related to missing files during preprocessing/parsing. *)
 
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
@@ -342,6 +348,9 @@ module FloatHex: Parameter_sig.Bool
 
 module BigIntsHex: Parameter_sig.Int
 (** Behavior of option "-hexadecimal-big-integers" *)
+
+module EagerLoadSources: Parameter_sig.Bool
+(** Behavior of option "-eager-load-sources" *)
 
 (* ************************************************************************* *)
 (** {2 Save/Load} *)

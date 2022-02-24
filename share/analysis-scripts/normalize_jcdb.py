@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2021                                               #
+#  Copyright (C) 2007-2022                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -31,10 +31,6 @@ import os
 import json
 import re
 from pathlib import Path
-
-MIN_PYTHON = (3, 6) # for automatic Path conversions
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
 if len(sys.argv) < 2:
    # no argument, assume default name

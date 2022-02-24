@@ -87,7 +87,7 @@
 [eva] computing for function free <- main.
   Called from stdlib_c.c:39.
 [eva] using specification for function free
-[eva] stdlib_c.c:39: Warning: ignoring unsupported \allocates clause
+[eva] stdlib_c.c:39: Warning: ignoring unsupported allocates clause
 [eva] stdlib_c.c:39: function free: precondition 'freeable' got status valid.
 [eva] Done for function free
 [eva] computing for function posix_memalign <- main.
@@ -99,7 +99,7 @@
 [eva] Done for function posix_memalign
 [eva] computing for function free <- main.
   Called from stdlib_c.c:41.
-[eva] stdlib_c.c:41: Warning: ignoring unsupported \allocates clause
+[eva] stdlib_c.c:41: Warning: ignoring unsupported allocates clause
 [eva] stdlib_c.c:41: function free: precondition 'freeable' got status valid.
 [eva] Done for function free
 [eva] stdlib_c.c:44: Call to builtin Frama_C_malloc
@@ -138,7 +138,7 @@
   assertion 'maybe_uninitialized' got status unknown.
 [eva] computing for function free <- main.
   Called from stdlib_c.c:53.
-[eva] stdlib_c.c:53: Warning: ignoring unsupported \allocates clause
+[eva] stdlib_c.c:53: Warning: ignoring unsupported allocates clause
 [eva] stdlib_c.c:53: function free: precondition 'freeable' got status valid.
 [eva] Done for function free
 [eva] computing for function free <- main.
@@ -253,7 +253,7 @@
 [eva] Done for function canonicalize_file_name
 [eva] computing for function free <- main.
   Called from stdlib_c.c:57.
-[eva] stdlib_c.c:57: Warning: ignoring unsupported \allocates clause
+[eva] stdlib_c.c:57: Warning: ignoring unsupported allocates clause
 [eva] stdlib_c.c:57: function free: precondition 'freeable' got status valid.
 [eva] Done for function free
 [eva] computing for function free <- main.

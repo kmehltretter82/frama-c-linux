@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2021                                               #
+#  Copyright (C) 2007-2022                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -33,10 +33,6 @@ import subprocess
 import sys
 from functools import partial
 import tempfile
-
-MIN_PYTHON = (3, 6) # for automatic Path conversions
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
 # Check if GNU make is available and has the minimal required version
 # (4.0). Otherwise, this script will fail.

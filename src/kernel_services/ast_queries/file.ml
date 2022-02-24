@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,13 +35,14 @@ let pretty_cpp_opt_kind fmt =
 
 type file =
   | NeedCPP of
-      Filepath.Normalized.t (* filename of the [.c] to preprocess *)
+      Filepath.Normalized.t (* Filename of the [.c] to preprocess. *)
       * string (* Preprocessing command, as given by -cpp-command, or
-                  the default value, but without extra arguments *)
-      * string list (* Extra arguments to be given to the preprocessing
-                       command, as given by -cpp-extra-args-per-file or
-                       a JSON Compilation Database. *)
-      * cpp_opt_kind
+                  the default value, but without extra arguments. *)
+      * string list (* Extra arguments (already included in the command)
+                       which must also be given to the logic preprocessor
+                       (since Frama-C may preprocess twice each source). *)
+      * cpp_opt_kind (* Whether the preprocessor is known to be compatible with
+                        GCC-style options (mostly, -D and -I). *)
   | NoCPP of Filepath.Normalized.t (** filename of a preprocessed [.c] *)
   | External of Filepath.Normalized.t * string
   (* file * name of plug-in that handles it *)
@@ -460,10 +461,9 @@ let adjust_pwd fp cpp_command =
       | None -> cwd
       | Some d -> (d:>string)
     in
-    if cwd <> dir then
-      "cd " ^ dir ^ " && " ^ cpp_command
-    else cpp_command
-  else cpp_command
+    if cwd <> dir then Some dir, "cd " ^ dir ^ " && " ^ cpp_command
+    else None, cpp_command
+  else None, cpp_command
 
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
@@ -543,7 +543,9 @@ let build_cpp_cmd = function
         include_args define_args
     in
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
-    let cpp_command_with_chdir = adjust_pwd f cpp_command in
+    let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
+    if workdir <> None then
+      Parse_env.set_workdir ppf (Option.get workdir);
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
@@ -989,7 +991,7 @@ let cleanup file =
         DoChildren
       | GFunDecl(s,_,_) ->
         Logic_utils.clear_funspec s;
-        DoChildren
+        SkipChildren
       | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _
       | GEnumTagDecl _ | GVar _ | GVarDecl _ | GAsm _ | GPragma _ | GText _
       | GAnnot _  ->
@@ -1001,6 +1003,13 @@ let cleanup file =
              Cfg.clearFileCFG ~clear_id:false f;
              Cfg.computeFileCFG f; f end
             else f)
+
+    method! vinst _ = SkipChildren
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
   in visitFramacFileSameGlobals visitor file
 

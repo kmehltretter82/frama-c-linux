@@ -2047,7 +2047,7 @@ static void str_append(char **to, size_t *to_len, char const *buf,
 error_t argz_replace(char **argz, size_t *argz_len, char const *str,
                      char const *with, unsigned int *replace_count)
 {
-  error_t err = 0;
+  error_t er = 0;
   if (str) 
     if (*str) {
       char *arg = (char *)0;
@@ -2059,7 +2059,7 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
       size_t str_len = strlen(str);
       size_t with_len = strlen(with);
       while (1) {
-        if (! err) {
+        if (! er) {
           arg = argz_next((char const *)src,src_len,(char const *)arg);
           if (! arg) break;
         }
@@ -2094,23 +2094,23 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
             }
             if (to) {
               if (delayed_copy) {
-                if (arg > src) err = argz_append(& dst,& dst_len,
-                                                 (char const *)src,
-                                                 (unsigned int)(arg - src));
+                if (arg > src) er = argz_append(& dst,& dst_len,
+                                                (char const *)src,
+                                                (unsigned int)(arg - src));
                 delayed_copy = 0;
               }
-              if (! err) err = argz_add(& dst,& dst_len,(char const *)to);
+              if (! er) er = argz_add(& dst,& dst_len,(char const *)to);
               free((void *)to);
             }
-            else err = 12;
+            else er = 12;
             if (replace_count) (*replace_count) ++;
           }
           else 
-            if (! delayed_copy) err = argz_add(& dst,& dst_len,
-                                               (char const *)arg);
+            if (! delayed_copy) er = argz_add(& dst,& dst_len,
+                                              (char const *)arg);
         }
       }
-      if (! err) {
+      if (! er) {
         if (! delayed_copy) {
           free((void *)src);
           *argz = dst;
@@ -2120,7 +2120,7 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
       else 
         if (dst_len > (size_t)0) free((void *)dst);
     }
-  return err;
+  return er;
 }
 
 char *argz_next(char const *argz, size_t argz_len, char const *entry)
@@ -6728,6 +6728,8 @@ extern int pclose(FILE *stream);
 
 ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 
+FILE *fmemopen(void * restrict buf, size_t size, char const * restrict mode);
+
 int asprintf(char **strp, char const *fmt, void * const *__va_params);
 
 FILE __fc_initial_stdout =
@@ -6739,6 +6741,43 @@ FILE *__fc_stderr = & __fc_initial_stderr;
 FILE __fc_initial_stdin =
   {.__fc_FILE_id = (unsigned int)0, .__fc_FILE_data = 0U};
 FILE *__fc_stdin = & __fc_initial_stdin;
+/*@ requires valid_mode: valid_read_string(mode); */
+static _Bool is_valid_mode(char const *mode)
+{
+  _Bool __retres;
+  if (! ((int)*(mode + 0) != 'r')) 
+    if (! ((int)*(mode + 0) != 'w')) 
+      if (! ((int)*(mode + 0) != 'a')) {
+        __retres = (_Bool)0;
+        goto return_label;
+      }
+  if (! *(mode + 1)) {
+    __retres = (_Bool)1;
+    goto return_label;
+  }
+  if (! ((int)*(mode + 1) != 'b')) 
+    if (! ((int)*(mode + 1) != '+')) {
+      __retres = (_Bool)0;
+      goto return_label;
+    }
+  if (! *(mode + 2)) {
+    __retres = (_Bool)1;
+    goto return_label;
+  }
+  if ((int)*(mode + 2) == (int)*(mode + 1)) {
+    __retres = (_Bool)0;
+    goto return_label;
+  }
+  else 
+    if (! ((int)*(mode + 2) != 'b')) 
+      if (! ((int)*(mode + 2) != '+')) {
+        __retres = (_Bool)0;
+        goto return_label;
+      }
+  __retres = (_Bool)(! *(mode + 3));
+  return_label: return __retres;
+}
+
 ssize_t getline(char **lineptr, size_t *n, FILE *stream)
 {
   ssize_t __retres;
@@ -6863,6 +6902,72 @@ int asprintf(char **strp, char const *fmt, void * const *__va_params)
   Frama_C_make_unknown(*strp,len - 1U);
   *(*strp + (len - 1U)) = (char)0;
   __retres = (int)len;
+  return_label: return __retres;
+}
+
+/*@ requires
+      valid_or_null_buff:
+        buf ≡ \null ∨ \valid((char *)buf + (0 .. size - 1));
+    requires valid_mode: valid_read_string(mode);
+    ensures
+      result_error_or_valid:
+        \result ≡ \null ∨ \result ∈ &__fc_fopen[0 .. 16 - 1];
+    ensures
+      errno_set:
+        __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ∈ {22, 24, 12};
+    assigns __fc_errno, \result;
+    assigns __fc_errno
+      \from (indirect: buf), (indirect: size),
+            (indirect: *(mode + (0 .. strlen{Old}(mode))));
+    assigns \result
+      \from __fc_p_fopen, (indirect: buf), (indirect: size),
+            (indirect: *(mode + (0 .. strlen{Old}(mode))));
+    allocates \old(buf);
+ */
+FILE *fmemopen(void * restrict buf, size_t size, char const * restrict mode)
+{
+  FILE *__retres;
+  _Bool tmp;
+  int tmp_1;
+  int tmp_2;
+  tmp = is_valid_mode(mode);
+  if (! tmp) {
+    __fc_errno = 22;
+    __retres = (FILE *)0;
+    goto return_label;
+  }
+  if (! buf) {
+    if (size == (size_t)0) {
+      int tmp_0;
+      tmp_0 = Frama_C_interval(0,1);
+      if (tmp_0) {
+        __fc_errno = 22;
+        __retres = (FILE *)0;
+        goto return_label;
+      }
+    }
+    if ((int)*(mode + 1) != '+') 
+      if (*(mode + 1)) 
+        if ((int)*(mode + 2) != '+') {
+          __fc_errno = 22;
+          __retres = (FILE *)0;
+          goto return_label;
+        }
+    buf = malloc(size);
+    if (! buf) {
+      __fc_errno = 12;
+      __retres = (FILE *)0;
+      goto return_label;
+    }
+  }
+  tmp_1 = Frama_C_interval(0,1);
+  if (tmp_1) {
+    __fc_errno = 24;
+    __retres = (FILE *)0;
+    goto return_label;
+  }
+  tmp_2 = Frama_C_interval(0,16 - 1);
+  __retres = & __fc_fopen[tmp_2];
   return_label: return __retres;
 }
 
@@ -8401,6 +8506,62 @@ extern DIR *opendir(char const *path);
     assigns __fc_errno \from dirp, *dirp, __fc_p_opendir;
  */
 extern struct dirent *readdir(DIR *dirp);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from eval;
+ */
+void err(int eval, char const *fmt, void * const *__va_params);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from eval;
+ */
+void errx(int eval, char const *fmt, void * const *__va_params);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    assigns \nothing;
+ */
+void warn(char const *fmt, void * const *__va_params);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    assigns \nothing;
+ */
+void warnx(char const *fmt, void * const *__va_params);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from eval;
+ */
+void verr(int eval, char const *fmt, va_list args);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from eval;
+ */
+void verrx(int eval, char const *fmt, va_list args);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    assigns \nothing;
+ */
+void vwarn(char const *fmt, va_list args);
+
+/*@ requires
+      fmt_valid_read_or_null: valid_read_string(fmt) ∨ fmt ≡ \null;
+    assigns \nothing;
+ */
+void vwarnx(char const *fmt, va_list args);
 
 /*@ requires valid_res: \valid(res);
     ensures initialization: res: \initialized(\old(res));

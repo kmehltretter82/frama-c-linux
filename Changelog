@@ -6,10 +6,11 @@
 # Mark "+": change for Frama-C-commits audience (not in html version).        #
 # Mark "*": bug fixed.                                                        #
 # Mark "!": change that can break compatibility with existing development.    #
-# '#nnn'   : BTS entry #nnn                                                   #
-# '#!nnn'  : BTS private entry #nnn                                           #
+# '##nnn'  : Public Gitlab (pub/frama-c) issue
 # '#@nnn'  : Gitlab frama-c/frama-c issue                                     #
 # For compatibility with old change log formats:                              #
+# '#nnn'   : BTS entry #nnn (OBSOLETE)                                        #
+# '#!nnn'  : BTS private entry #nnn  (OBSOLETE)                               #
 # '#?nnn'  : OLD-BTS entry #nnn                                               #
 ###############################################################################
 
@@ -17,7 +18,21 @@
 Open Source Release <next-release>
 ##################################
 
+o   Kernel    [2022-02-23] New visitor functions visitFramacFileFunctions
+              and visitCilFileFunctions to visit only function definitions,
+              for better performance.
+o! [kernel]   [2022-02-23] Remove State_selection.Static (deprecated since
+              10 years, use directly State_selection instead)
+-*  Kernel    [2022-02-22] Fix list of potential types for decimal
+              integer literal constants
+*   Kernel    [2022-02-17] Reject programs using unsupported
+              vector_size attribute (fixes ##2573)
+*   Kernel    [2022-02-08] Reject array whose size is too big with a proper
+              error message instead of a crash (fixes ##2590)
+o!  Kernel    [2022-01-19] Removed obsolete AST nodes IndexPI and Info
 o!  Kernel    [2022-02-19] Removed obsolete AST nodes IndexPI and Info
+*   Kernel    [2022-02-08] Reject array whose size is too big with a proper
+              error message instead of a crash (fixes ##2590)
 o!  Kernel    [2021-12-03] Remove unused AST node Dcustom_annot and field
               fpadding_in_bits. Do not cache size of types in the AST but in
               a dedicated table.

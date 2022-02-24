@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,7 +49,7 @@ let may_map ~none f = match P.get_option () with
   | Some _ -> f ()
 
 let reset_slicing () =
-  !Db.Value.compute () ;
+  Eva.Analysis.compute () ;
   let initialized = match P.get_option () with | None -> false | Some _ -> true in
   if not initialized then
     SlicingParameters.feedback ~level:1 "initializing slicing ..."

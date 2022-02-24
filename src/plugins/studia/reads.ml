@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,15 +44,13 @@ class find_read zlval = object
         let deps = match lvopt with
           | None -> deps
           | Some lv ->
-            let dlv, _ =
-              !Db.Value.lval_to_loc_with_deps (Kstmt stmt) ~deps:Zone.bottom lv
-            in
+            let dlv = Eva.Results.(before stmt |> address_deps lv) in
             Zone.join dlv deps
         in
         let direct = Zone.intersects deps zlval in
         (* now determine if the functions called at [stmt] read directly or
              indirectly [zlval] *)
-        let aux_kf kf effects =
+        let aux_kf effects kf =
           let inputs = !Db.Inputs.get_internal kf in
           (* TODO: change to this once we can get "full" inputs through Inout.
              Currently, non operational inputs disappear, and this function
@@ -68,9 +66,9 @@ class find_read zlval = object
           else
             effects (* this function pointer does not read [zlval] *)
         in
-        let kfs = Db.Value.call_to_kernel_function stmt in
+        let kfs = Eva.Results.callee stmt in
         let effects =
-          Kernel_function.Hptset.fold aux_kf kfs {direct; indirect = false}
+          List.fold_left aux_kf {direct; indirect = false} kfs
         in
         res <- (stmt, effects) :: res
       end

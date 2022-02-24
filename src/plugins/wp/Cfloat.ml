@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -229,9 +229,9 @@ let float_lit ulp (q : Q.t) =
   let rec lookup ulp v = function
     | [] -> Pretty_utils.to_string Floating_point.pretty v
     | pp::pps ->
-        let r = force_float @@ pp v in
-        if reparse ulp r = v then r else
-          lookup ulp v pps
+      let r = force_float @@ pp v in
+      if reparse ulp r = v then r else
+        lookup ulp v pps
   in lookup ulp v printers
 
 (* -------------------------------------------------------------------------- *)
@@ -266,11 +266,11 @@ let rec exact e =
 let round ulp e =
   match F.repr e with
   | Qed.Logic.Fun( f , [ b ] ) ->
-      begin
-        match find f with
-        | REAL , ulp2 when ulp2 = ulp -> b
-        | _ -> qmake ulp (exact e )
-      end
+    begin
+      match find f with
+      | REAL , ulp2 when ulp2 = ulp -> b
+      | _ -> qmake ulp (exact e )
+    end
   | _ -> qmake ulp (exact e)
 
 let compute_float op ulp xs =
@@ -280,10 +280,10 @@ let compute_float op ulp xs =
   | SUB , [ x ; y ] -> qmake ulp (Q.sub (exact x) (exact y))
   | MUL , [ x ; y ] -> qmake ulp (Q.mul (exact x) (exact y))
   | DIV , [ x ; y ] ->
-      let res = match Q.div (exact x) (exact y) with
-        | x when Q.classify x = Q.NZERO -> x
-        | _ -> raise Not_found (* let Why3 take care of the division*)
-      in qmake ulp res
+    let res = match Q.div (exact x) (exact y) with
+      | x when Q.classify x = Q.NZERO -> x
+      | _ -> raise Not_found (* let Why3 take care of the division*)
+    in qmake ulp res
   | ROUND , [ x ] -> round ulp x
   | REAL , [ x ] -> F.e_real (exact x)
   | LE , [ x ; y ] -> F.e_bool (Q.leq (exact x) (exact y))
@@ -332,12 +332,12 @@ module Compute = WpContext.StaticGenerator
         let name = op_name op in
         let phi = match op with
           | LT | EQ | LE | NE ->
-              let prop = Pretty_utils.sfprintf "%s_%a" name pp_suffix ft in
-              let bool = Pretty_utils.sfprintf "%s_%ab" name pp_suffix ft in
-              extern_p ~library ~bool ~prop ()
+            let prop = Pretty_utils.sfprintf "%s_%a" name pp_suffix ft in
+            let bool = Pretty_utils.sfprintf "%s_%ab" name pp_suffix ft in
+            extern_p ~library ~bool ~prop ()
           | _ ->
-              let result = return_type ft op in
-              extern_f ~library ~result "%s_%a" name pp_suffix ft
+            let result = return_type ft op in
+            extern_f ~library ~result "%s_%a" name pp_suffix ft
         in
         Lang.F.set_builtin phi impl ;
         REGISTRY.define phi (op, ft) ;

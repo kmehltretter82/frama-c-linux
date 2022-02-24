@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2021                                               #
+#  Copyright (C) 2007-2022                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -33,6 +33,7 @@ PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_NAME:= LoopAnalysis
 PLUGIN_CMO:= options region_analysis region_analysis_stmt loop_analysis register
 PLUGIN_CMI:= region_analysis_sig
+PLUGIN_DEPENDENCIES:= Eva
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure test.c test.oracle README.org
 PLUGIN_TESTS_DIRS:=loop_analysis
 

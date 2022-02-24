@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -73,11 +73,11 @@ struct
         | Gprop _ , _ -> (-1)
         | _ , Gprop _ -> 1
         | Gsource(p1,s1,e1) , Gsource(p2,s2,e2) ->
-            let c = P.compare p1 p2 in
+          let c = P.compare p1 p2 in
+          if c <> 0 then c else
+            let c = Stmt.compare s1 s2 in
             if c <> 0 then c else
-              let c = Stmt.compare s1 s2 in
-              if c <> 0 then c else
-                hsrc e1 - hsrc e2
+              hsrc e1 - hsrc e2
         | Gsource _ , _ -> (-1)
         | _ , Gsource _ -> 1
         | Gposteffect p1 , Gposteffect p2 -> P.compare p1 p2
@@ -171,9 +171,9 @@ struct
            match tags with
            | [] -> ()
            | t::ts ->
-               Format.fprintf fmt " (%a" Splitter.pretty t ;
-               List.iter (fun t -> Format.fprintf fmt ",%a" Splitter.pretty t) ts ;
-               Format.fprintf fmt ")@\n" ;
+             Format.fprintf fmt " (%a" Splitter.pretty t ;
+             List.iter (fun t -> Format.fprintf fmt ",%a" Splitter.pretty t) ts ;
+             Format.fprintf fmt ")@\n" ;
          end ;
          Format.fprintf fmt "@[<hov 5> (%d) %a@]@\n" !k pp_vc vc)
       vcs
@@ -320,18 +320,18 @@ struct
     | [] -> empty_vc
     | [vc] -> vc
     | vcs ->
-        let hyps = Conditions.merge (List.map (fun vc -> vc.hyps) vcs) in
-        let goal = p_all (fun vc -> vc.goal) vcs in
-        let vars = List.fold_left (fun d vc -> V.union d vc.vars) V.empty vcs in
-        let deps = List.fold_left (fun d vc -> D.union d vc.deps) D.empty vcs in
-        let warn = List.fold_left (fun d vc -> W.union d vc.warn) W.empty vcs in
-        let path = List.fold_left (fun d vc -> S.union d vc.path) S.empty vcs in
-        { hyps = hyps ;
-          goal = goal ;
-          vars = vars ;
-          deps = deps ;
-          warn = warn ;
-          path = path }
+      let hyps = Conditions.merge (List.map (fun vc -> vc.hyps) vcs) in
+      let goal = p_all (fun vc -> vc.goal) vcs in
+      let vars = List.fold_left (fun d vc -> V.union d vc.vars) V.empty vcs in
+      let deps = List.fold_left (fun d vc -> D.union d vc.deps) D.empty vcs in
+      let warn = List.fold_left (fun d vc -> W.union d vc.warn) W.empty vcs in
+      let path = List.fold_left (fun d vc -> S.union d vc.path) S.empty vcs in
+      { hyps = hyps ;
+        goal = goal ;
+        vars = vars ;
+        deps = deps ;
+        warn = warn ;
+        path = path }
 
   (* -------------------------------------------------------------------------- *)
   (* --- Merging and Branching with Splitters                               --- *)
@@ -348,11 +348,11 @@ struct
          match w1 , w2 with
          | None , None -> None
          | Some vcs1 , None ->
-             Some (Splitter.map left vcs1)
+           Some (Splitter.map left vcs1)
          | None , Some vcs2 ->
-             Some (Splitter.map right vcs2)
+           Some (Splitter.map right vcs2)
          | Some vcs1 , Some vcs2 ->
-             Some (Splitter.merge ~left ~both ~right vcs1 vcs2)
+           Some (Splitter.merge ~left ~both ~right vcs1 vcs2)
       ) vcs1 vcs2
 
   let merge_all_vcs : vc Splitter.t Gmap.t list -> vc Splitter.t Gmap.t =
@@ -422,10 +422,10 @@ struct
       (fun wp ->
          match wp.sigma with
          | None ->
-             let s = Sigma.create () in
-             phi (L.move_at wenv.main s) { wp with sigma = Some s }
+           let s = Sigma.create () in
+           phi (L.move_at wenv.main s) { wp with sigma = Some s }
          | Some s ->
-             phi (L.move_at wenv.main s) wp) wp
+           phi (L.move_at wenv.main s) wp) wp
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compilation of Goals                                               --- *)
@@ -461,17 +461,17 @@ struct
     in match authorized_region with
     | None -> None
     | Some region ->
-        let post = match ainfo.a_kind with
-          | LoopAssigns -> true
-          | StmtAssigns -> NormAtLabels.has_postassigns ainfo.a_assigns
-        in Some {
-          e_pid = pid ;
-          e_post = post ;
-          e_label = from ;
-          e_valid = sigma ;
-          e_region = region ;
-          e_warn = Warning.Set.empty ;
-        }
+      let post = match ainfo.a_kind with
+        | LoopAssigns -> true
+        | StmtAssigns -> NormAtLabels.has_postassigns ainfo.a_assigns
+      in Some {
+        e_pid = pid ;
+        e_post = post ;
+        e_label = from ;
+        e_valid = sigma ;
+        e_region = region ;
+        e_warn = Warning.Set.empty ;
+      }
 
   let cc_posteffect e vcs =
     if not e.e_post then vcs else
@@ -532,13 +532,13 @@ struct
         in match outcome with
         | Warning.Result (_,None) -> wp
         | Warning.Result (warn,Some e) ->
-            let e = { e with e_warn = warn } in
-            let effects = Eset.add e wp.effects in
-            let vcs = cc_posteffect e wp.vcs in
-            { wp with effects = effects ; vcs = vcs }
+          let e = { e with e_warn = warn } in
+          let effects = Eset.add e wp.effects in
+          let vcs = cc_posteffect e wp.vcs in
+          { wp with effects = effects ; vcs = vcs }
         | Warning.Failed warn ->
-            let vcs = add_vc (Gprop gpid) ~warn p_false wp.vcs in
-            { wp with vcs = vcs }
+          let vcs = add_vc (Gprop gpid) ~warn p_false wp.vcs in
+          { wp with vcs = vcs }
       end
 
   let add_warnings wrns vcs =
@@ -636,28 +636,28 @@ struct
         match ainfo.a_assigns with
 
         | WritesAny ->
-            let sigma = Sigma.havoc_any ~call:false (L.current env) in
-            let vcs = do_assigns_everything ?stmt wp.effects wp.vcs in
-            { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
+          let sigma = Sigma.havoc_any ~call:false (L.current env) in
+          let vcs = do_assigns_everything ?stmt wp.effects wp.vcs in
+          { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
 
         | Writes froms ->
-            let kind = ainfo.WpPropId.a_kind in
-            let outcome =
-              Warning.catch ~severe:true ~effect:"Assigns everything"
-                (cc_assigned env kind) froms
-            in
-            match outcome with
-            | Warning.Result(warn,(sequence,assigned)) ->
-                let vcs =
-                  do_assigns ~source:FromCode
-                    ?hpid ?stmt ~warn sequence
-                    ~assigned
-                    wp.effects wp.vcs in
-                { sigma = Some sequence.pre ; vcs=vcs ; effects = wp.effects }
-            | Warning.Failed warn ->
-                let sigma = Sigma.havoc_any ~call:false (L.current env) in
-                let vcs = do_assigns_everything ?stmt ~warn wp.effects wp.vcs in
-                { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
+          let kind = ainfo.WpPropId.a_kind in
+          let outcome =
+            Warning.catch ~severe:true ~effect:"Assigns everything"
+              (cc_assigned env kind) froms
+          in
+          match outcome with
+          | Warning.Result(warn,(sequence,assigned)) ->
+            let vcs =
+              do_assigns ~source:FromCode
+                ?hpid ?stmt ~warn sequence
+                ~assigned
+                wp.effects wp.vcs in
+            { sigma = Some sequence.pre ; vcs=vcs ; effects = wp.effects }
+          | Warning.Failed warn ->
+            let sigma = Sigma.havoc_any ~call:false (L.current env) in
+            let vcs = do_assigns_everything ?stmt ~warn wp.effects wp.vcs in
+            { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
       end
 
   (* -------------------------------------------------------------------------- *)
@@ -674,7 +674,7 @@ struct
       let descr : string option = match stmt with
         | None | Some { labels=[] } -> None
         | Some { labels = lbl::_ } ->
-            Some (Pretty_utils.to_string Printer.pp_label lbl) in
+          Some (Pretty_utils.to_string Printer.pp_label lbl) in
       let state = Mstate.state state sigma in
       gmap (state_vc ?descr ?stmt sigma state) vcs
     with Not_found -> vcs
@@ -722,18 +722,18 @@ struct
     else
       let value = match expr.enode with
         | Lval lv when not @@ intercept_volatile "read" lv ->
-            M.copied seq obj loc (C.lval seq.pre lv)
+          M.copied seq obj loc (C.lval seq.pre lv)
         | _ ->
-            (* Note: a volatile lval will be compiled to an unknown value *)
-            M.stored seq obj loc (C.val_of_exp seq.pre expr)
+          (* Note: a volatile lval will be compiled to an unknown value *)
+          M.stored seq obj loc (C.val_of_exp seq.pre expr)
       in
       let init = match expr.enode with
         | Lval lv when intercept_volatile "read" lv ->
-            M.stored_init seq obj loc (Cvalues.initialized_obj obj)
+          M.stored_init seq obj loc (Cvalues.initialized_obj obj)
         | Lval lv when Cil.(isStructOrUnionType @@ typeOfLval lv) ->
-            M.copied_init seq obj loc (C.lval seq.pre lv)
+          M.copied_init seq obj loc (C.lval seq.pre lv)
         | _ ->
-            M.stored_init seq obj loc (Cvalues.initialized_obj obj)
+          M.stored_init seq obj loc (Cvalues.initialized_obj obj)
       in
       Some (value @ init)
 
@@ -744,40 +744,40 @@ struct
             (cc_lval env) lv in
         match outcome with
         | Warning.Failed warn ->
-            (* L-Value is unknown *)
-            let sigma = Sigma.havoc_any ~call:false (L.current env) in
-            let vcs = do_assigns_everything ~stmt ~warn wp.effects wp.vcs in
-            { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
+          (* L-Value is unknown *)
+          let sigma = Sigma.havoc_any ~call:false (L.current env) in
+          let vcs = do_assigns_everything ~stmt ~warn wp.effects wp.vcs in
+          { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
         | Warning.Result(l_warn,(obj,dom,seq,loc)) ->
-            (* L-Value has been translated *)
-            let assigned = [obj,Sloc loc] in
-            let outcome = Warning.catch
-                ~severe:false ~effect:"Havoc l-value (unknown r-value)"
-                (cc_stored lv seq loc obj) expr in
-            match outcome with
-            | Warning.Failed r_warn
-            | Warning.Result(r_warn,None) ->
-                (* R-Value is unknown or L-Value is volatile *)
-                let warn = Warning.Set.union l_warn r_warn in
-                let vcs = do_assigns ~source:FromCode
-                    ~stmt ~warn seq ~assigned wp.effects wp.vcs in
-                { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
-            | Warning.Result(r_warn,Some stored) ->
-                (* R-Value and effects has been translated *)
-                let warn = Warning.Set.union l_warn r_warn in
-                let ft = M.Heap.Set.fold_sorted
-                    (fun chunk ft -> M.Sigma.get seq.post chunk :: ft) dom []
-                in
-                let update vc =
-                  if List.exists (occurs_vc vc) ft
-                  then
-                    let eqs = List.map Cvalues.equation stored in
-                    assume_vc ~stmt ~warn eqs vc
-                  else vc in
-                let vcs = gmap update wp.vcs in
-                let vcs =
-                  check_assigns (Some stmt) FromCode assigned wp.effects vcs in
-                { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
+          (* L-Value has been translated *)
+          let assigned = [obj,Sloc loc] in
+          let outcome = Warning.catch
+              ~severe:false ~effect:"Havoc l-value (unknown r-value)"
+              (cc_stored lv seq loc obj) expr in
+          match outcome with
+          | Warning.Failed r_warn
+          | Warning.Result(r_warn,None) ->
+            (* R-Value is unknown or L-Value is volatile *)
+            let warn = Warning.Set.union l_warn r_warn in
+            let vcs = do_assigns ~source:FromCode
+                ~stmt ~warn seq ~assigned wp.effects wp.vcs in
+            { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
+          | Warning.Result(r_warn,Some stored) ->
+            (* R-Value and effects has been translated *)
+            let warn = Warning.Set.union l_warn r_warn in
+            let ft = M.Heap.Set.fold_sorted
+                (fun chunk ft -> M.Sigma.get seq.post chunk :: ft) dom []
+            in
+            let update vc =
+              if List.exists (occurs_vc vc) ft
+              then
+                let eqs = List.map Cvalues.equation stored in
+                assume_vc ~stmt ~warn eqs vc
+              else vc in
+            let vcs = gmap update wp.vcs in
+            let vcs =
+              check_assigns (Some stmt) FromCode assigned wp.effects vcs in
+            { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
       end
 
   (* -------------------------------------------------------------------------- *)
@@ -788,27 +788,27 @@ struct
     match result with
     | None -> wp
     | Some exp ->
-        in_wenv wenv wp
-          begin fun env wp ->
-            let compile () =
-              let sigma = L.current env in
-              let vr = L.result () in
-              let tr = L.return () in
-              p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
-            let outcome = Warning.catch
-                ~severe:false ~effect:"Result value discarded (unknown)"
-                compile () in
-            let warn, condition =
-              match outcome with
-              | Warning.Failed warn ->
-                  warn , p_true
-              | Warning.Result(warn,condition) ->
-                  warn , condition in
-            let vcs = gmap (
-                assume_vc ~descr:"Return" ~stmt ~warn [condition]
-              ) wp.vcs in
-            { wp with vcs = vcs }
-          end
+      in_wenv wenv wp
+        begin fun env wp ->
+          let compile () =
+            let sigma = L.current env in
+            let vr = L.result () in
+            let tr = L.return () in
+            p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
+          let outcome = Warning.catch
+              ~severe:false ~effect:"Result value discarded (unknown)"
+              compile () in
+          let warn, condition =
+            match outcome with
+            | Warning.Failed warn ->
+              warn , p_true
+            | Warning.Result(warn,condition) ->
+              warn , condition in
+          let vcs = gmap (
+              assume_vc ~descr:"Return" ~stmt ~warn [condition]
+            ) wp.vcs in
+          { wp with vcs = vcs }
+        end
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : conditional                                              --- *)
@@ -878,11 +878,11 @@ struct
   let rec cc_case_values ks vs sigma = function
     | [] -> ks , vs
     | e::es ->
-        match Ctypes.get_int64 e with
-        | Some k ->
-            cc_case_values (k::ks) (F.e_int64 k::vs) sigma es
-        | None ->
-            cc_case_values ks (C.val_of_exp sigma e::vs) sigma es
+      match Ctypes.get_int64 e with
+      | Some k ->
+        cc_case_values (k::ks) (F.e_int64 k::vs) sigma es
+      | None ->
+        cc_case_values ks (C.val_of_exp sigma e::vs) sigma es
 
   let cc_group_case stmt warn descr tag pa cond vcs : vc Splitter.t Gmap.t =
     Gmap.map
@@ -923,8 +923,8 @@ struct
            with
            | Warning.Result(warn,value) -> warn,value
            | Warning.Failed(warn) ->
-               let tau = Lang.tau_of_ctype (Cil.typeOf exp) in
-               warn,e_var (Lang.freshvar tau)
+             let tau = Lang.tau_of_ctype (Cil.typeOf exp) in
+             warn,e_var (Lang.freshvar tau)
          in
          let vcs_cases = List.map (cc_case stmt warn sigma value) cases in
          let neq = List.map (fun (vs,_) -> p_all (p_neq value) vs) vcs_cases in
@@ -1026,29 +1026,29 @@ struct
              (List.map (C.exp sigma)) es in
          match outcome with
          | Warning.Failed warn ->
-             let vcs = List.fold_left
-                 (fun vcs (gid,_) -> add_vc (Gprop gid) ~warn p_false vcs)
-                 wp.vcs pre
-             in { wp with vcs = vcs }
+           let vcs = List.fold_left
+               (fun vcs (gid,_) -> add_vc (Gprop gid) ~warn p_false vcs)
+               wp.vcs pre
+           in { wp with vcs = vcs }
          | Warning.Result(warn,vs) ->
-             let init = L.mem_at env Clabels.init in
-             let call = L.call kf vs in
-             let call_e = L.mk_env ~here:sigma () in
-             let call_f = L.call_pre init call sigma in
-             let vcs = List.fold_left
-                 (fun vcs (gid,p) ->
-                    let outcome = Warning.catch
-                        ~severe:true ~effect:"Can not prove call precondition"
-                        (L.in_frame call_f (L.pred `Positive call_e)) p in
-                    match outcome with
-                    | Warning.Result(warn2,goal) ->
-                        let warn = W.union warn warn2 in
-                        add_vc (Gprop gid) ~warn goal vcs
-                    | Warning.Failed warn2 ->
-                        let warn = W.union warn warn2 in
-                        add_vc (Gprop gid) ~warn p_false vcs
-                 ) wp.vcs pre
-             in { wp with vcs = vcs })
+           let init = L.mem_at env Clabels.init in
+           let call = L.call kf vs in
+           let call_e = L.mk_env ~here:sigma () in
+           let call_f = L.call_pre init call sigma in
+           let vcs = List.fold_left
+               (fun vcs (gid,p) ->
+                  let outcome = Warning.catch
+                      ~severe:true ~effect:"Can not prove call precondition"
+                      (L.in_frame call_f (L.pred `Positive call_e)) p in
+                  match outcome with
+                  | Warning.Result(warn2,goal) ->
+                    let warn = W.union warn warn2 in
+                    add_vc (Gprop gid) ~warn goal vcs
+                  | Warning.Failed warn2 ->
+                    let warn = W.union warn warn2 in
+                    add_vc (Gprop gid) ~warn p_false vcs
+               ) wp.vcs pre
+           in { wp with vcs = vcs })
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : call terminates                                          --- *)
@@ -1076,34 +1076,34 @@ struct
              (List.map (C.exp sigma)) args in
          match outcome with
          | Warning.Failed warn2 ->
-             let warn = W.union warn warn2 in
-             let vcs = prove_terminates ~warn p_false wp.vcs in
-             { wp with vcs = vcs }
+           let warn = W.union warn warn2 in
+           let vcs = prove_terminates ~warn p_false wp.vcs in
+           { wp with vcs = vcs }
          | Warning.Result(warn2, args) ->
-             let warn = W.union warn warn2 in
-             let compile_callee = function
-               | None ->
-                   Warning.error "No terminates clause for %a"
-                     Kernel_function.pretty kf
-               | Some callee_t ->
-                   let init = L.mem_at env Clabels.init in
-                   let call = L.call kf args in
-                   let call_e = L.mk_env ~here:sigma () in
-                   let call_f = L.call_pre init call sigma in
-                   L.in_frame call_f (L.pred `Positive call_e) callee_t
-             in
-             let outcome =
-               Warning.catch
-                 ~severe:true ~effect:"Considering non terminating callee"
-                 compile_callee callee_t
-             in
-             let warn2, callee_t = match outcome with
-               | Warning.Failed warn -> warn, p_false
-               | Warning.Result(warn,callee_t) -> warn, callee_t
-             in
-             let warn = W.union warn warn2 in
-             let vcs = prove_terminates ~warn callee_t wp.vcs in
-             { wp with vcs = vcs })
+           let warn = W.union warn warn2 in
+           let compile_callee = function
+             | None ->
+               Warning.error "No terminates clause for %a"
+                 Kernel_function.pretty kf
+             | Some callee_t ->
+               let init = L.mem_at env Clabels.init in
+               let call = L.call kf args in
+               let call_e = L.mk_env ~here:sigma () in
+               let call_f = L.call_pre init call sigma in
+               L.in_frame call_f (L.pred `Positive call_e) callee_t
+           in
+           let outcome =
+             Warning.catch
+               ~severe:true ~effect:"Considering non terminating callee"
+               compile_callee callee_t
+           in
+           let warn2, callee_t = match outcome with
+             | Warning.Failed warn -> warn, p_false
+             | Warning.Result(warn,callee_t) -> warn, callee_t
+           in
+           let warn = W.union warn warn2 in
+           let vcs = prove_terminates ~warn callee_t wp.vcs in
+           { wp with vcs = vcs })
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : call decreases                                           --- *)
@@ -1137,53 +1137,53 @@ struct
              (List.map (C.exp sigma)) args in
          match outcome with
          | Warning.Failed warn2 ->
-             let warn = W.union warn warn2 in
-             let vcs = prove_decreases ~warn p_false wp.vcs in
-             { wp with vcs = vcs }
+           let warn = W.union warn warn2 in
+           let vcs = prove_decreases ~warn p_false wp.vcs in
+           { wp with vcs = vcs }
          | Warning.Result(warn2, args) ->
-             let warn = W.union warn warn2 in
-             let init = L.mem_at env Clabels.init in
-             let call = L.call kf args in
-             let call_e = L.mk_env ~here:sigma () in
-             let call_f = L.call_pre init call sigma in
-             let compile_decreases (caller_d, callee_d) =
-               match caller_d, callee_d with
-               | _, None ->
-                   Warning.error "No decreases clause for %a"
-                     Kernel_function.pretty kf
-               | (_, r), Some (_, r')
-                 when not @@ Option.equal Logic_utils.is_same_logic_info r r' ->
-                   let none : Pretty_utils.sformat = "<None>" in
-                   Warning.error
-                     "On call to %a, relation (%a) does not match caller (%a)"
-                     Kernel_function.pretty kf
-                     (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r
-                     (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r'
-               | (caller_d, rel), Some (callee_d,_ ) ->
-                   let rel caller callee = match rel with
-                     | None ->
-                         p_and (p_leq e_zero callee) (p_lt callee caller)
-                     | Some rel ->
-                         (L.in_frame call_f (L.call_pred call_e))
-                           rel [] [caller ; callee]
-                   in
-                   let caller_d = L.term env caller_d in
-                   let callee_d =
-                     (L.in_frame call_f (L.term call_e)) callee_d in
-                   rel caller_d callee_d
-             in
-             let outcome =
-               Warning.catch
-                 ~severe:true ~effect:"Considering non decreasing call"
-                 compile_decreases (caller_d, callee_d)
-             in
-             let warn2, pred = match outcome with
-               | Warning.Failed warn -> warn, p_false
-               | Warning.Result (warn, p) -> warn, p
-             in
-             let warn = W.union warn warn2 in
-             let vcs = prove_decreases ~warn pred wp.vcs in
-             { wp with vcs = vcs })
+           let warn = W.union warn warn2 in
+           let init = L.mem_at env Clabels.init in
+           let call = L.call kf args in
+           let call_e = L.mk_env ~here:sigma () in
+           let call_f = L.call_pre init call sigma in
+           let compile_decreases (caller_d, callee_d) =
+             match caller_d, callee_d with
+             | _, None ->
+               Warning.error "No decreases clause for %a"
+                 Kernel_function.pretty kf
+             | (_, r), Some (_, r')
+               when not @@ Option.equal Logic_utils.is_same_logic_info r r' ->
+               let none : Pretty_utils.sformat = "<None>" in
+               Warning.error
+                 "On call to %a, relation (%a) does not match caller (%a)"
+                 Kernel_function.pretty kf
+                 (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r
+                 (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r'
+             | (caller_d, rel), Some (callee_d,_ ) ->
+               let rel caller callee = match rel with
+                 | None ->
+                   p_and (p_leq e_zero callee) (p_lt callee caller)
+                 | Some rel ->
+                   (L.in_frame call_f (L.call_pred call_e))
+                     rel [] [caller ; callee]
+               in
+               let caller_d = L.term env caller_d in
+               let callee_d =
+                 (L.in_frame call_f (L.term call_e)) callee_d in
+               rel caller_d callee_d
+           in
+           let outcome =
+             Warning.catch
+               ~severe:true ~effect:"Considering non decreasing call"
+               compile_decreases (caller_d, callee_d)
+           in
+           let warn2, pred = match outcome with
+             | Warning.Failed warn -> warn, p_false
+             | Warning.Result (warn, p) -> warn, p
+           in
+           let warn = W.union warn warn2 in
+           let vcs = prove_decreases ~warn pred wp.vcs in
+           { wp with vcs = vcs })
 
 
   (* -------------------------------------------------------------------------- *)
@@ -1205,22 +1205,22 @@ struct
 
   let cc_result_domain = function
     | Some lv ->
-        let dummy = Sigma.create () in
-        let tr = Cil.typeOfLval lv in
-        let lr = C.lval dummy lv in
-        Some (M.domain (Ctypes.object_of tr) lr)
+      let dummy = Sigma.create () in
+      let tr = Cil.typeOfLval lv in
+      let lr = C.lval dummy lv in
+      Some (M.domain (Ctypes.object_of tr) lr)
     | None -> Some (M.Heap.Set.empty)
 
   let cc_call_domain env0 kf es = function
     | WritesAny -> None
     | Writes froms ->
-        let dummy = Sigma.create () in
-        let vs = List.map (C.exp dummy) es in
-        let env = L.move_at env0 dummy in
-        let init = L.mem_at env0 Clabels.init in
-        let frame = L.call_pre init (L.call kf vs) dummy in
-        let cc_froms = L.assigned_of_froms env in
-        Some (A.domain (L.in_frame frame cc_froms froms))
+      let dummy = Sigma.create () in
+      let vs = List.map (C.exp dummy) es in
+      let env = L.move_at env0 dummy in
+      let init = L.mem_at env0 Clabels.init in
+      let frame = L.call_pre init (L.call kf vs) dummy in
+      let cc_froms = L.assigned_of_froms env in
+      Some (A.domain (L.in_frame frame cc_froms froms))
 
   let cc_havoc d s = match d with
     | None -> { pre = Sigma.havoc_any ~call:true s ; post = s }
@@ -1242,10 +1242,10 @@ struct
     let result = match lvr with
       | None -> None
       | Some lv ->
-          let tr = Cil.typeOfLval lv in
-          let obj = Ctypes.object_of tr in
-          let loc = C.lval sigma_pre lv in
-          Some (tr,obj,loc)
+        let tr = Cil.typeOfLval lv in
+        let obj = Ctypes.object_of tr in
+        let loc = C.lval sigma_pre lv in
+        Some (tr,obj,loc)
     in
     {
       sigma_pre = sigma_pre ;
@@ -1266,31 +1266,31 @@ struct
   let cc_call_effects stmt cenv env0 assigns wpost wexit =
     match assigns with
     | WritesAny ->
-        {
-          vcs_post = do_assigns_everything ~stmt wpost.effects wpost.vcs ;
-          vcs_exit = do_assigns_everything ~stmt wexit.effects wexit.vcs ;
-        }
+      {
+        vcs_post = do_assigns_everything ~stmt wpost.effects wpost.vcs ;
+        vcs_exit = do_assigns_everything ~stmt wexit.effects wexit.vcs ;
+      }
     | Writes froms ->
-        let env = L.move_at env0 cenv.sigma_pre in
-        let cc_region = L.assigned_of_froms env in
-        let vcs_post =
-          let assigned = L.in_frame cenv.frame_post cc_region froms in
-          do_assigns ~descr:"Call Effects" ~source:FromCall
-            ~stmt cenv.seq_post ~assigned wpost.effects wpost.vcs in
-        let vcs_exit =
-          let assigned = L.in_frame cenv.frame_exit cc_region froms in
-          do_assigns ~descr:"Exit Effects" ~source:FromCall
-            ~stmt cenv.seq_exit ~assigned wexit.effects wexit.vcs in
-        let vcs_result =
-          match cenv.loc_result with
-          | None -> vcs_post (* no result *)
-          | Some(_,obj,loc) ->
-              let assigned = [obj,Sloc loc] in
-              do_assigns ~descr:"Return Effects"
-                ~source:FromReturn ~stmt cenv.seq_result
-                ~assigned wpost.effects vcs_post
-        in
-        { vcs_post = vcs_result ; vcs_exit = vcs_exit }
+      let env = L.move_at env0 cenv.sigma_pre in
+      let cc_region = L.assigned_of_froms env in
+      let vcs_post =
+        let assigned = L.in_frame cenv.frame_post cc_region froms in
+        do_assigns ~descr:"Call Effects" ~source:FromCall
+          ~stmt cenv.seq_post ~assigned wpost.effects wpost.vcs in
+      let vcs_exit =
+        let assigned = L.in_frame cenv.frame_exit cc_region froms in
+        do_assigns ~descr:"Exit Effects" ~source:FromCall
+          ~stmt cenv.seq_exit ~assigned wexit.effects wexit.vcs in
+      let vcs_result =
+        match cenv.loc_result with
+        | None -> vcs_post (* no result *)
+        | Some(_,obj,loc) ->
+          let assigned = [obj,Sloc loc] in
+          do_assigns ~descr:"Return Effects"
+            ~source:FromReturn ~stmt cenv.seq_result
+            ~assigned wpost.effects vcs_post
+      in
+      { vcs_post = vcs_result ; vcs_exit = vcs_exit }
 
   (* --- Compiling Contracts --- *)
 
@@ -1303,17 +1303,17 @@ struct
   let cc_result call = match call.loc_result with
     | None -> []
     | Some(tr,obj,loc) ->
-        let handler () = [ p_true ] in
-        let compile () =
-          (* [LC,VP] : the C left unspecified where to compute the lv *)
-          (* [LC,BY] : lv computed before, like in Value Analysis *)
-          let vr = M.load call.seq_result.post obj loc in
-          let re = L.in_frame call.frame_post L.result () in
-          let te = L.in_frame call.frame_post L.return () in
-          let value = C.result call.sigma_pre tr re in
-          [ C.equal_typ tr vr (C.cast tr te (Val value)) ]
-        in
-        Warning.handle ~handler ~severe:false ~effect:"Hide \\result" compile ()
+      let handler () = [ p_true ] in
+      let compile () =
+        (* [LC,VP] : the C left unspecified where to compute the lv *)
+        (* [LC,BY] : lv computed before, like in Value Analysis *)
+        let vr = M.load call.seq_result.post obj loc in
+        let re = L.in_frame call.frame_post L.result () in
+        let te = L.in_frame call.frame_post L.return () in
+        let value = C.result call.sigma_pre tr re in
+        [ C.equal_typ tr vr (C.cast tr te (Val value)) ]
+      in
+      Warning.handle ~handler ~severe:false ~effect:"Hide \\result" compile ()
 
   let cc_status f_caller f_callee =
     p_equal
@@ -1371,12 +1371,12 @@ struct
          match outcome with
          | Warning.Result(warn , wp) -> { wp with vcs = add_warnings warn wp.vcs }
          | Warning.Failed warn ->
-             let v_post = do_assigns_everything ~stmt ~warn p_post.effects p_post.vcs in
-             let v_exit = do_assigns_everything ~stmt ~warn p_exit.effects p_exit.vcs in
-             let effects = Eset.union p_post.effects p_exit.effects in
-             let vcs = gmerge v_post v_exit in
-             let sigma = Sigma.create () in
-             { sigma = Some sigma ; vcs = vcs ; effects = effects }
+           let v_post = do_assigns_everything ~stmt ~warn p_post.effects p_post.vcs in
+           let v_exit = do_assigns_everything ~stmt ~warn p_exit.effects p_exit.vcs in
+           let effects = Eset.union p_post.effects p_exit.effects in
+           let vcs = gmerge v_post v_exit in
+           let sigma = Sigma.create () in
+           { sigma = Some sigma ; vcs = vcs ; effects = effects }
       ) ()
 
   (* -------------------------------------------------------------------------- *)
@@ -1394,17 +1394,17 @@ struct
       begin fun env wp ->
         match sc with
         | Mcfg.SC_Global ->
-            let hs = M.frame (L.current env) in
-            let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
-            { wp with vcs }
+          let hs = M.frame (L.current env) in
+          let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
+          { wp with vcs }
         | Mcfg.SC_Frame_in ->
-            wp_scope env wp ~descr:"Frame In" Enter xs
+          wp_scope env wp ~descr:"Frame In" Enter xs
         | Mcfg.SC_Frame_out ->
-            wp_scope env wp ~descr:"Frame Out" Leave xs
+          wp_scope env wp ~descr:"Frame Out" Leave xs
         | Mcfg.SC_Block_in ->
-            wp_scope env wp ~descr:"Block In" Enter xs
+          wp_scope env wp ~descr:"Block In" Enter xs
         | Mcfg.SC_Block_out ->
-            wp_scope env wp ~descr:"Block Out" Leave xs
+          wp_scope env wp ~descr:"Block Out" Leave xs
       end
 
   (* -------------------------------------------------------------------------- *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -173,12 +173,9 @@ let is_call_stmt stmt =
   | Instr (Call _ | Local_init(_, ConsInit _,_)) -> true | _ -> false
 
 let get_called_kf call_stmt = match call_stmt.skind with
-  | Instr (Call (_, funcexp,_,_)) ->
-    let _funcexp_dpds, called_functions =
-      !Db.Value.expr_to_kernel_function ~deps:None (Kstmt call_stmt) funcexp
-    in
-    (match Kernel_function.Hptset.contains_single_elt called_functions with
-     | Some kf -> kf
+  | Instr (Call _) ->
+    (match Eva.Results.callee call_stmt with
+     | [kf] -> kf
      | _ -> raise SlicingTypes.PtrCallExpr)
   | Instr (Local_init(_, ConsInit (f, _, _), _)) -> Globals.Functions.get f
   | _ -> invalid_arg "Not a call statement !"

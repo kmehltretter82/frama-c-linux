@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -155,14 +155,14 @@ class mkcomposer
     method private updated =
       match tac#get_field field with
       | Empty ->
-          Pretty_utils.ksfprintf head#set_text "%s: -" wtitle
+        Pretty_utils.ksfprintf head#set_text "%s: -" wtitle
       | value ->
-          let text =
-            Pretty_utils.sfprintf "@[<hov 2>%s: %a@]" wtitle pp value in
-          let msg =
-            if String.length text <= 20 then text else
-              String.sub text 0 17 ^ "..." in
-          head#set_text msg
+        let text =
+          Pretty_utils.sfprintf "@[<hov 2>%s: %a@]" wtitle pp value in
+        let msg =
+          if String.length text <= 20 then text else
+            String.sub text 0 17 ^ "..." in
+        head#set_text msg
 
     (* --- Composer API ---- *)
     method composer = (self :> composer)
@@ -173,8 +173,8 @@ class mkcomposer
       | Empty -> false
       | Compose(Range(a,b)) -> ranged && (a <= b)
       | _ as s ->
-          try wvalid (Tactical.selected s)
-          with _ -> false
+        try wvalid (Tactical.selected s)
+        with _ -> false
     method get_value = tac#get_field field
     method set_value v =
       tac#set_field field v ;
@@ -226,16 +226,16 @@ class ['a] mksearch
     method private updated =
       match tac#get_field field with
       | None ->
-          Pretty_utils.ksfprintf head#set_text "%s: -" wtitle
+        Pretty_utils.ksfprintf head#set_text "%s: -" wtitle
       | Some item ->
-          begin
-            let text = item.title in
-            let msg =
-              if String.length text <= 20 then text else
-                String.sub text 0 17 ^ "..." in
-            head#set_text msg ;
-            head#set_tooltip item.descr ;
-          end
+        begin
+          let text = item.title in
+          let msg =
+            if String.length text <= 20 then text else
+              String.sub text 0 17 ^ "..." in
+          head#set_text msg ;
+          head#set_tooltip item.descr ;
+        end
 
     (* --- Browser API --- *)
     method browser = (self :> browser)
@@ -243,8 +243,8 @@ class ['a] mksearch
     method choose item =
       let value = match item with
         | Some id ->
-            (try Some(Hashtbl.find items id)
-             with Not_found -> None)
+          (try Some(Hashtbl.find items id)
+           with Not_found -> None)
         | None -> None in
       tac#set_field field value ;
       self#updated ;
@@ -444,7 +444,7 @@ class tactic
       match edited with
       | None -> ()
       | Some { process ; composer ; browser ; target ; tree } ->
-          self#select ~process ~composer ~browser ~tree target
+        self#select ~process ~composer ~browser ~tree target
 
     method clear =
       begin
@@ -469,18 +469,18 @@ class tactic
         let status = self#status target in
         match status , error with
         | Not_applicable , _ ->
-            self#set_visible false ;
-            self#set_status `FIND ;
-            self#set_action () ;
+          self#set_visible false ;
+          self#set_status `FIND ;
+          self#set_action () ;
         | Not_configured , _ | Applicable _ , true ->
-            self#set_visible true ;
-            self#set_status `DIALOG_WARNING ;
-            self#set_action () ;
+          self#set_visible true ;
+          self#set_status `DIALOG_WARNING ;
+          self#set_action () ;
         | Applicable proc , false ->
-            self#set_visible true ;
-            self#set_status `APPLY ;
-            let callback () = process tac target proc in
-            self#set_action ~callback () ;
+          self#set_visible true ;
+          self#set_status `APPLY ;
+          let callback () = process tac target proc in
+          self#set_action ~callback () ;
       end
 
   end
@@ -539,28 +539,28 @@ class strategies () =
     method private update () =
       match demon with
       | None ->
-          self#set_visible false
+        self#set_visible false
       | Some _ ->
-          self#set_visible true ;
-          if List.exists (fun h -> h.widget#get) hforms then
-            begin
-              self#set_status `APPLY ;
-              self#set_action ~callback:self#callback () ;
-            end
-          else
-            begin
-              self#set_status `INDEX ;
-              self#set_action ()
-            end
+        self#set_visible true ;
+        if List.exists (fun h -> h.widget#get) hforms then
+          begin
+            self#set_status `APPLY ;
+            self#set_action ~callback:self#callback () ;
+          end
+        else
+          begin
+            self#set_status `INDEX ;
+            self#set_action ()
+          end
 
     method private callback () =
       match demon with
       | Some f ->
-          let hs =
-            List.fold_right
-              (fun h hs -> if h.widget#get then h.search :: hs else hs)
-              hforms [] in
-          f ~depth:depth#get ~width:width#get hs
+        let hs =
+          List.fold_right
+            (fun h hs -> if h.widget#get then h.search :: hs else hs)
+            hforms [] in
+        f ~depth:depth#get ~width:width#get hs
       | None -> ()
 
     method connect f = demon <- f ; self#update ()

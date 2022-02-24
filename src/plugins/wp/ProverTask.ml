@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -110,11 +110,11 @@ let validate_buffer buffer validers =
 let dump_buffer buffer = function
   | None -> ()
   | Some log ->
-      let n = Buffer.length buffer in
-      if n > 0 then
-        Command.write_file log (fun out -> Buffer.output_buffer out buffer)
-      else if Wp_parameters.has_out () then
-        Extlib.safe_remove log
+    let n = Buffer.length buffer in
+    if n > 0 then
+      Command.write_file log (fun out -> Buffer.output_buffer out buffer)
+    else if Wp_parameters.has_out () then
+      Extlib.safe_remove log
 
 let echo_buffer buffer =
   let n = Buffer.length buffer in
@@ -134,9 +134,9 @@ let location file line = {
 
 let timeout ~smoke = function
   | None ->
-      if smoke
-      then Wp_parameters.SmokeTimeout.get ()
-      else Wp_parameters.Timeout.get ()
+    if smoke
+    then Wp_parameters.SmokeTimeout.get ()
+    else Wp_parameters.Timeout.get ()
   | Some t -> t
 
 let stepout = function
@@ -175,17 +175,17 @@ let is_opt a = String.length a > 0 && a.[0] = '-'
 let rec pp_args fmt = function
   | [] -> ()
   | a::b::c::w when is_opt a && not (is_opt b) && not (is_opt c) ->
-      Format.fprintf fmt "@ @[<hov 2>%s@ %S@ %S@]" a b c ;
-      pp_args fmt w
+    Format.fprintf fmt "@ @[<hov 2>%s@ %S@ %S@]" a b c ;
+    pp_args fmt w
   | a::b::w when is_opt a && not (is_opt b) ->
-      Format.fprintf fmt "@ @[<hov 2>%s@ %S@]" a b ;
-      pp_args fmt w
+    Format.fprintf fmt "@ @[<hov 2>%s@ %S@]" a b ;
+    pp_args fmt w
   | a::w when is_opt a ->
-      Format.fprintf fmt "@ %s" a ;
-      pp_args fmt w
+    Format.fprintf fmt "@ %s" a ;
+    pp_args fmt w
   | a::w->
-      Format.fprintf fmt "@ %S" a ;
-      pp_args fmt w
+    Format.fprintf fmt "@ %S" a ;
+    pp_args fmt w
 
 class command name =
   object
@@ -257,23 +257,23 @@ class command name =
           begin match st with
             | Task.Result 0 | Task.Canceled | Task.Timeout _ -> ()
             | Task.Result 127 ->
-                begin
-                  Wp_parameters.error "Command '%s' not found (exit status 127)@." cmd ;
-                  echo_buffer stdout ;
-                  echo_buffer stderr ;
-                end
+              begin
+                Wp_parameters.error "Command '%s' not found (exit status 127)@." cmd ;
+                echo_buffer stdout ;
+                echo_buffer stderr ;
+              end
             | Task.Result s ->
-                begin
-                  Wp_parameters.error "Command '%s' exits with status [%d]@." cmd s ;
-                  echo_buffer stdout ;
-                  echo_buffer stderr ;
-                end
+              begin
+                Wp_parameters.error "Command '%s' exits with status [%d]@." cmd s ;
+                echo_buffer stdout ;
+                echo_buffer stderr ;
+              end
             | Task.Failed exn ->
-                begin
-                  Wp_parameters.error "Command '%s' fails: %s@." cmd (Task.error exn) ;
-                  echo_buffer stdout ;
-                  echo_buffer stderr ;
-                end
+              begin
+                Wp_parameters.error "Command '%s' fails: %s@." cmd (Task.error exn) ;
+                echo_buffer stdout ;
+                echo_buffer stderr ;
+              end
           end ;
         let t = !time in
         List.iter (fun phi -> phi t) timers ;
@@ -294,15 +294,15 @@ let getprocs = function Some n -> n | None -> Wp_parameters.Procs.get ()
 let server ?procs () =
   match !server with
   | Some s ->
-      let np = getprocs procs in
-      Task.set_procs s np ;
-      Why3Provers.set_procs np ;
-      s
+    let np = getprocs procs in
+    Task.set_procs s np ;
+    Why3Provers.set_procs np ;
+    s
   | None ->
-      let np = getprocs procs in
-      let s = Task.server ~procs:np () in
-      Why3Provers.set_procs np ;
-      server := Some s ; s
+    let np = getprocs procs in
+    let s = Task.server ~procs:np () in
+    Why3Provers.set_procs np ;
+    server := Some s ; s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Task Composition                                                   --- *)

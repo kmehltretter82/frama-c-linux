@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2021                                               #
+#  Copyright (C) 2007-2022                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -25,14 +25,14 @@
 # This script finds files containing likely declarations and definitions
 # for a given function name, via heuristic syntactic matching.
 
-import sys
 import os
 import re
-import function_finder
+import sys
 
-MIN_PYTHON = (3, 5)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
+import function_finder
+import source_filter
+
+under_test = os.getenv("PTESTS_TESTING")
 
 arg = ""
 if len(sys.argv) < 2:
@@ -78,13 +78,13 @@ class Callgraph:
         return f"Callgraph({self.succs}, {self.edges})"
 
 def compute(files):
-    #print(f"Computing callgraph for {len(files)} file(s)...")
     cg = Callgraph()
     for f in files:
-        #print(f"Processing {os.path.relpath(f)}...")
-        newlines = function_finder.compute_newline_offsets(f)
-        defs = function_finder.find_definitions_and_declarations(True, False, f, newlines)
-        calls = function_finder.find_calls(f, newlines)
+        file_content = source_filter.open_and_filter(f, not under_test)
+        file_lines = file_content.splitlines(keepends=True)
+        newlines = function_finder.compute_newline_offsets(file_lines)
+        defs = function_finder.find_definitions_and_declarations(True, False, f, file_content, file_lines, newlines)
+        calls = function_finder.find_calls(file_content, newlines)
         for call in calls:
             caller = function_finder.find_caller(defs, call)
             if caller:
@@ -93,7 +93,6 @@ def compute(files):
                 if debug:
                     print(f"build_callgraph: {f}:{line}: {caller} -> {called}")
                 cg.add_edge(caller, called, loc)
-    #print(f"Callgraph computed ({len(cg.succs)} node(s), {len(cg.edges)} edge(s))")
     return cg
 
 def print_edge(cg, caller, called, padding="", end="\n"):

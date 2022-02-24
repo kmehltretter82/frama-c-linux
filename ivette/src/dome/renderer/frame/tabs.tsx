@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -43,7 +43,7 @@ export interface TabsBarProps {
 }
 
 /** Container for Tabs. */
-export function TabsBar(props: TabsBarProps) {
+export function TabsBar(props: TabsBarProps): JSX.Element {
   return (
     <div className="dome-xTabsBar dome-color-frame">
       {props.children}
@@ -73,7 +73,7 @@ export interface TabProps<A> {
 }
 
 /** Tab Selector. */
-export function Tab<A>(props: TabProps<A>) {
+export function Tab<A>(props: TabProps<A>): JSX.Element {
   const { value, selection, onSelection, onClose } = props;
   const selected = value === selection;
   // --- Tab Rendering

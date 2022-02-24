@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Server Controller
 // --------------------------------------------------------------------------
@@ -35,11 +37,8 @@ import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
-
-import 'codemirror/theme/ambiance.css';
 
 // --------------------------------------------------------------------------
 // --- Configure Server
@@ -74,7 +73,7 @@ function buildServerConfig(argv: string[], cwd?: string) {
   let command;
   let sockaddr;
   let cwdir = cwd;
-  for (let k = 0; k < argv.length; k++) {
+  for (let k = 0; k < (argv ? argv.length : 0); k++) {
     const v = argv[k];
     switch (v) {
       case '--cwd':
@@ -146,9 +145,9 @@ Dome.onCommand((argv: string[], cwd: string) => {
 export const Control = () => {
   const status = Server.useStatus();
 
-  let play = { enabled: false, onClick: () => { } };
-  let stop = { enabled: false, onClick: () => { } };
-  let reload = { enabled: false, onClick: () => { } };
+  let play = { enabled: false, onClick: () => { /* do nothing */ } };
+  let stop = { enabled: false, onClick: () => { /* do nothing */ } };
+  let reload = { enabled: false, onClick: () => { /* do nothing */ } };
 
   switch (status) {
     case Server.Status.OFF:
@@ -328,7 +327,6 @@ const RenderConsole = () => {
         buffer={edited ? editor : Server.buffer}
         mode="text"
         readOnly={!edited}
-        theme="ambiance"
       />
     </>
   );

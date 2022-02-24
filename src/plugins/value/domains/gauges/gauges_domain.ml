@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1108,7 +1108,7 @@ module G = struct
 
 end
 
-let dkey = Value_parameters.register_category "d-gauges"
+let dkey = Self.register_category "d-gauges"
 
 module D : Abstract_domain.Leaf
   with type state = G.t

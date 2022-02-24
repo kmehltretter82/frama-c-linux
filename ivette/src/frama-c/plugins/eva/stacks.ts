@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -25,8 +25,8 @@
 // --------------------------------------------------------------------------
 
 import * as Server from 'frama-c/server';
-import * as Ast from 'frama-c/api/kernel/ast';
-import * as Values from 'frama-c/api/plugins/eva/values';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as Values from 'frama-c/plugins/eva/api/values';
 
 import { ModelCallbacks } from './cells';
 
@@ -64,7 +64,7 @@ export class StacksCache {
     this.model = state;
   }
 
-  clear() {
+  clear(): void {
     this.stacks.clear();
     this.calls.clear();
   }
@@ -77,7 +77,7 @@ export class StacksCache {
     return this.summary.get(fct) ?? true;
   }
 
-  setSummary(fct: string, s: boolean) {
+  setSummary(fct: string, s: boolean): void {
     this.summary.set(fct, s);
     this.model.forceLayout();
   }
@@ -117,7 +117,7 @@ export class StacksCache {
   // --- Fetchers
   // --------------------------------------------------------------------------
 
-  private requestStacks(key: string, markers: Ast.marker[]) {
+  private requestStacks(key: string, markers: Ast.marker[]): void {
     Server
       .send(Values.getCallstacks, markers)
       .then((stacks: callstacks) => {
@@ -127,7 +127,7 @@ export class StacksCache {
       });
   }
 
-  private requestCalls(cs: Values.callstack) {
+  private requestCalls(cs: Values.callstack): void {
     Server
       .send(Values.getCallstackInfo, cs)
       .then((calls) => {

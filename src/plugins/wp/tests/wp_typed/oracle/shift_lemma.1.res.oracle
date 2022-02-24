@@ -31,7 +31,7 @@ Assume {
   (* Heap *)
   Type: region(p.base) <= 0.
   (* Goal *)
-  When: (0 <= i) /\ (i <= 9) /\ is_sint32(i).
+  When: (0 <= i) /\ (i <= 9).
   (* Pre-condition *)
   Have: P_inv(Mint_0, p).
   (* Assertion *)

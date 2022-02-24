@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"@PTEST_DIR@/merge_bts0948_1.i" +"@PTEST_DIR@/merge_bts0948_2.i"
+   STDOPT: +"%{dep:@PTEST_DIR@/merge_bts0948_1.i}" +"%{dep:@PTEST_DIR@/merge_bts0948_2.i}"
 */
 
 /*@ requires \valid((char*)dest);

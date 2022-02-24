@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,5 +27,5 @@ open Cil_types
    @return None if no such predicate can be created. *)
 val value_to_predicate_opt: ?loc:location -> term -> Cvalue.V.t -> predicate option
 
-val lval_to_predicate: ?loc:location -> Cvalue.Model.t -> lval -> predicate option
-val exp_to_predicate: ?loc:location -> Cvalue.Model.t -> exp -> predicate option
+val lval_to_predicate: ?loc:location -> stmt -> lval -> predicate option
+val exp_to_predicate: ?loc:location -> stmt -> exp -> predicate option

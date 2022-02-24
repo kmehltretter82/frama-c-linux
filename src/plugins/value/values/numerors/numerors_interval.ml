@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -51,15 +51,15 @@ let pretty fmt itv =
 let prec = function NaN p -> p | I (x, _, _) -> F.prec x
 
 let get_max_exponent = function
-  | NaN _ -> Value_parameters.fatal "Numerors: can't return the exponent of a NaN"
+  | NaN _ -> Self.fatal "Numerors: can't return the exponent of a NaN"
   | I (x, y, _) -> Stdlib.max (F.exponent x) (F.exponent y)
 
 let get_exponents = function
-  | NaN _ -> Value_parameters.fatal "Numerors: can't return the exponent of a NaN"
+  | NaN _ -> Self.fatal "Numerors: can't return the exponent of a NaN"
   | I (x, y, _) -> F.exponent x, F.exponent y
 
 let get_bounds = function
-  | NaN _ -> Value_parameters.fatal "Numerors: can't return the bounds of a NaN"
+  | NaN _ -> Self.fatal "Numerors: can't return the bounds of a NaN"
   | I (x, y, _) -> x, y
 
 
@@ -84,7 +84,7 @@ let make ?(nan = false) x y =
   let bad_order   = F.gt x y in
   let bad_precs   = not @@ Precisions.eq (F.prec x) (F.prec y) in
   if there_a_nan || bad_order || bad_precs then
-    Value_parameters.fatal
+    Self.fatal
       "Numerors: impossible to create an interval with bounds %a and %a"
       F.pretty x F.pretty y
   else if F.is_pos_zero x && F.is_neg_zero y then

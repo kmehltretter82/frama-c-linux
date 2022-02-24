@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,8 +30,8 @@ type call_init_state =
 
 let call_init_state kf =
   let str =
-    try Value_parameters.EqualityCallFunction.find kf
-    with Not_found -> Value_parameters.EqualityCall.get ()
+    try Parameters.EqualityCallFunction.find kf
+    with Not_found -> Parameters.EqualityCall.get ()
   in
   match str with
   | "all" -> ISCaller
@@ -39,7 +39,7 @@ let call_init_state kf =
   | "none" -> ISEmpty
   | _ -> assert false
 
-let dkey = Value_parameters.register_category "d-equality"
+let dkey = Self.register_category "d-equality"
 
 open Hcexprs
 
@@ -123,9 +123,6 @@ module Internal = struct
 
   let log_category = dkey
 
-  type equalities = Equality.Set.t
-  let project (t, _, _) = t
-
   let pretty fmt (eqs, _, _) = Equality.Set.pretty fmt eqs
 
   let pretty_debug fmt (eqs, deps, modified) =
@@ -169,6 +166,10 @@ module Internal = struct
 end
 
 module Store = Domain_builder.Complete (Internal)
+
+type t = Internal.t
+let key = Store.key
+let project (t, _, _) = t
 
 
 (* ------------------------- Abstract Domain -------------------------------- *)
@@ -316,7 +317,7 @@ module Make
         | Var vi, NoOffset -> Locations.zone_of_varinfo vi
         | _ ->
           let expr = Cil.dummy_exp (Lval lv) in
-          Value_util.zone_of_expr (find_loc valuation) expr
+          Eva_utils.zone_of_expr (find_loc valuation) expr
       in
       Deps.add lval zone deps
 
@@ -397,9 +398,9 @@ module Make
     let right_expr = Cil.constFold true right_expr in
     try
       let indirect_left_zone =
-        Value_util.indirect_zone_of_lval (find_loc valuation) left_value.lval
+        Eva_utils.indirect_zone_of_lval (find_loc valuation) left_value.lval
       and right_zone =
-        Value_util.zone_of_expr (find_loc valuation) right_expr
+        Eva_utils.zone_of_expr (find_loc valuation) right_expr
       in
       (* After an assignment lv = e, the equality [lv == eq] holds iff the value
          of [e] and the location of [lv] are not modified by the assignment,

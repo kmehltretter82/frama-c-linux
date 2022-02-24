@@ -4,7 +4,7 @@
   (modules Options Journalize Cg Services Uses Register Callgraph_api Callgraph Subgraph)
 ;  (private_modules Options Journalize Cg Uses Register)
   (flags -open Frama_c_kernel)
-  (libraries frama-c.kernel)
+  (libraries frama-c.kernel frama-c-eva.core)
 )
 
 (plugin (optional) (name callgraph) (libraries frama-c-callgraph.core) (site (frama-c plugins)))

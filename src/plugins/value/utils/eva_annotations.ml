@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -341,10 +341,10 @@ module Allocation = struct
 
   let get stmt =
     match get stmt with
-    | [] -> Option.get (of_string (Value_parameters.AllocBuiltin.get ()))
+    | [] -> Option.get (of_string (Parameters.AllocBuiltin.get ()))
     | [x] -> x
     | x :: _ ->
-      Value_parameters.warning ~current:true ~once:true
+      Self.warning ~current:true ~once:true
         "Several eva_allocate annotations at the same statement; selecting %s\
          and ignoring the others." (to_string x);
       x

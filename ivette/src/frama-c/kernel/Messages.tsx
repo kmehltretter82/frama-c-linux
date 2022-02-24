@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -19,6 +19,8 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import * as React from 'react';
 import * as Dome from 'dome';
@@ -37,8 +39,8 @@ import * as Compare from 'dome/data/compare';
 
 import { State, GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
-import * as Ast from 'frama-c/api/kernel/ast';
-import * as Kernel from 'frama-c/api/kernel/services';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as Kernel from 'frama-c/kernel/api/services';
 
 type Message = Kernel.messageData;
 type logkind = Kernel.logkind;
@@ -280,7 +282,7 @@ function MessageFilter(props: { filter: State<Filter> }) {
   );
 }
 
-function FilterRatio({ model }: { model: Arrays.ArrayModel<any, any> }) {
+function FilterRatio<K, R>({ model }: { model: Arrays.ArrayModel<K, R> }) {
   const [filtered, total] = [model.getRowCount(), model.getTotalRowCount()];
   const title = `${filtered} displayed messages / ${total} total messages`;
   return (

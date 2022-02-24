@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+[@@@ api_start]
 (** Eva analysis builtins for the cvalue domain, more efficient than their
     equivalent in C. *)
 
@@ -78,6 +79,7 @@ val register_builtin:
 
 (** Has a builtin been registered with the given name? *)
 val is_builtin: string -> bool
+[@@@ api_end]
 
 (** Prepares the builtins to be used for an analysis. Must be called at the
     beginning of each Eva analysis. Warns about builtins of incompatible types,

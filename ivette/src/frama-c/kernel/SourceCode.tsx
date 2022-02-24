@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -34,7 +34,7 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
-import { functions, markerInfo, getMarkerAt } from 'frama-c/api/kernel/ast';
+import { functions, markerInfo, getMarkerAt } from 'frama-c/kernel/api/ast';
 import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
 import { IconButton } from 'dome/controls/buttons';
@@ -60,7 +60,7 @@ const D = new Dome.Debug('Source Code');
 
 // The SourceCode component, producing the GUI part showing the source code
 // corresponding to the selected function.
-export default function SourceCode() {
+export default function SourceCode(): JSX.Element {
 
   // Hooks
   const [buffer] = React.useState(() => new RichTextBuffer());
@@ -80,10 +80,8 @@ export default function SourceCode() {
   const filename = Path.parse(file).base;
 
   // Title bar buttons, along with the parameters for our text.
-  const { buttons: themeButtons, theme, fontSize, wrapText } =
-    Preferences.useThemeButtons({
-      target: 'Source Code',
-      theme: Preferences.SourceTheme,
+  const { buttons: editorButtons, fontSize, wrapText } =
+    Preferences.useEditorButtons({
       fontSize: Preferences.SourceFontSize,
       wrapText: Preferences.AstWrapText,
       disabled: !theFunction,
@@ -91,7 +89,7 @@ export default function SourceCode() {
 
   // Updating the buffer content.
   const text = React.useMemo(async () => {
-    const onError = () => {
+    const onError = (): string => {
       if (file)
         D.error(`Fail to load source code file ${file}`);
       return '';
@@ -150,7 +148,7 @@ export default function SourceCode() {
   }, [buffer, selectCallback]);
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
-  async function launchEditor(_?: editor, pos?: position) {
+  async function launchEditor(_?: editor, pos?: position): Promise<void> {
     if (file !== '') {
       const selectedLine = pos ? (pos.line + 1).toString() : '1';
       const selectedChar = pos ? (pos.ch + 1).toString() : '1';
@@ -169,7 +167,7 @@ export default function SourceCode() {
     }
   }
 
-  async function contextMenu(editor?: editor, pos?: position) {
+  async function contextMenu(editor?: editor, pos?: position): Promise<void> {
     if (file !== '') {
       const items = [
         {
@@ -198,12 +196,11 @@ export default function SourceCode() {
         />
         <Code title={file} style={{ padding: '5px' }}>{filename}</Code>
         <Hfill />
-        {themeButtons}
+        {editorButtons}
       </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
-        theme={theme}
         fontSize={fontSize}
         lineWrapping={wrapText}
         selection={theMarker}

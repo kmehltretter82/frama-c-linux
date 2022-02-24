@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -112,43 +112,43 @@ class instance =
     method private wrap env vars fields =
       match vars , fields with
       | x::xs , fd::fields ->
-          let title = Pretty_utils.to_string F.pp_var x in
-          let value = self#get_field fd in
-          let tau = F.tau_of_var x in
-          env.feedback#update_field ~enabled:true
-            ~title ~tooltip:env.descr
-            ~range:(match tau with L.Int -> true | _ -> false)
-            ~filter:(TacInstance.filter tau) fd ;
-          let bindings,lemma = self#wrap env xs fields in
-          (x,value)::bindings , lemma
+        let title = Pretty_utils.to_string F.pp_var x in
+        let value = self#get_field fd in
+        let tau = F.tau_of_var x in
+        env.feedback#update_field ~enabled:true
+          ~title ~tooltip:env.descr
+          ~range:(match tau with L.Int -> true | _ -> false)
+          ~filter:(TacInstance.filter tau) fd ;
+        let bindings,lemma = self#wrap env xs fields in
+        (x,value)::bindings , lemma
       | _ ->
-          self#hide env.feedback fields ;
-          [] , F.p_forall vars env.lemma
+        self#hide env.feedback fields ;
+        [] , F.p_forall vars env.lemma
 
     method select feedback = function
       | Empty -> Not_applicable
       | selection ->
-          begin match self#get_field search with
+        begin match self#get_field search with
+          | None ->
+            self#hide feedback TacInstance.fields ;
+            Not_configured
+          | Some Tactical.{ title ; value = dlem } ->
+            let fields = TacInstance.fields in
+            let vars,lemma = fresh feedback#pool dlem in
+            let descr = Pretty_utils.to_string F.pp_pred lemma in
+            let bindings,lemma =
+              self#wrap { feedback ; descr ; lemma } vars fields in
+            match TacInstance.cardinal 1000 bindings with
+            | Some n ->
+              if n > 1 then
+                feedback#set_descr "Generates %d instances" n ;
+              let at = Tactical.at selection in
+              Applicable
+                (TacInstance.instance_have ~title ?at bindings lemma)
             | None ->
-                self#hide feedback TacInstance.fields ;
-                Not_configured
-            | Some Tactical.{ title ; value = dlem } ->
-                let fields = TacInstance.fields in
-                let vars,lemma = fresh feedback#pool dlem in
-                let descr = Pretty_utils.to_string F.pp_pred lemma in
-                let bindings,lemma =
-                  self#wrap { feedback ; descr ; lemma } vars fields in
-                match TacInstance.cardinal 1000 bindings with
-                | Some n ->
-                    if n > 1 then
-                      feedback#set_descr "Generates %d instances" n ;
-                    let at = Tactical.at selection in
-                    Applicable
-                      (TacInstance.instance_have ~title ?at bindings lemma)
-                | None ->
-                    feedback#set_error "More than 1,000 instances" ;
-                    Not_configured
-          end
+              feedback#set_error "More than 1,000 instances" ;
+              Not_configured
+        end
   end
 
 let tactical = Tactical.export (new instance)

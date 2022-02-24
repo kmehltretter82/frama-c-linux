@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Info Components
 // --------------------------------------------------------------------------
@@ -30,7 +32,7 @@ import { classes } from 'dome/misc/utils';
 import { Hpack, Vpack } from 'dome/layout/boxes';
 import { Code, Cell } from 'dome/controls/labels';
 import * as States from 'frama-c/states';
-import * as Ast from 'frama-c/api/kernel/ast';
+import * as Ast from 'frama-c/kernel/api/ast';
 import { ModelProp } from 'frama-c/plugins/eva/model';
 
 // Locals
@@ -73,7 +75,7 @@ export function AlarmsInfos(props: ModelProp) {
   if (probe) {
     const callstack = model.getCallstack();
     const domain = model.values.getValues(probe, callstack);
-    const alarms = domain?.v_before.alarms ?? [];
+    const alarms = domain?.vBefore.alarms ?? [];
     if (alarms.length > 0) {
       const renderAlarm = ([status, alarm]: EvaAlarm) => {
         const className = `eva-alarm-info eva-alarm-${status}`;

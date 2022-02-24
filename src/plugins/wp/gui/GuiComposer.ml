@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,8 +30,8 @@ let peek n s =
       match s with
       | [] -> raise Not_found
       | e::s ->
-          let es,s = prefix (pred n) s in
-          e :: es , s
+        let es,s = prefix (pred n) s in
+        e :: es , s
   in try Some(prefix n s) with Not_found -> None
 
 class composer (focused : GuiSequent.focused) =
@@ -53,31 +53,31 @@ class composer (focused : GuiSequent.focused) =
         let open Tactical in
         match v with
         | Compose(Code _) | Inside _ | Clause _ ->
-            Format.fprintf fmt "@ @{<fg:grey>(%a)@}" self#pp_typeof v
+          Format.fprintf fmt "@ @{<fg:grey>(%a)@}" self#pp_typeof v
         | _ -> ()
       end
 
     method private pp_select cc args ~quit fmt =
       match args with
       | e::_ when cc#is_valid e ->
-          let callback () = cc#set_value e ; quit () in
-          Format.fprintf fmt "%t @{<it>and quit composer@}@\n"
-            (focused#button ~title:"Select A" ~callback)
+        let callback () = cc#set_value e ; quit () in
+        Format.fprintf fmt "%t @{<it>and quit composer@}@\n"
+          (focused#button ~title:"Select A" ~callback)
       | _ -> ()
 
     method private pp_range cc args ~quit fmt =
       match args with
       | a::b::_ when cc#ranged ->
-          begin
-            match Tactical.get_int a, Tactical.get_int b with
-            | Some a,Some b when a <= b ->
-                let callback () =
-                  cc#set_value (Tactical.range a b) ;
-                  quit () in
-                Format.fprintf fmt "%t @{<it>for range selection@}@\n"
-                  (focused#button ~title:"Select A..B" ~callback)
-            | _ -> ()
-          end
+        begin
+          match Tactical.get_int a, Tactical.get_int b with
+          | Some a,Some b when a <= b ->
+            let callback () =
+              cc#set_value (Tactical.range a b) ;
+              quit () in
+            Format.fprintf fmt "%t @{<it>for range selection@}@\n"
+              (focused#button ~title:"Select A..B" ~callback)
+          | _ -> ()
+        end
       | _ -> ()
 
 
@@ -91,34 +91,34 @@ class composer (focused : GuiSequent.focused) =
 
     method private op1 title job args fmt = match args with
       | a::w ->
-          let callback () =
-            stack <- job a w ; ignore focused#unselect ; update () in
-          focused#button ~title ~callback fmt
+        let callback () =
+          stack <- job a w ; ignore focused#unselect ; update () in
+        focused#button ~title ~callback fmt
       | _ -> ()
 
     method private op2 title job args fmt = match args with
       | a::b::w ->
-          let callback () =
-            stack <- job a b w ; ignore focused#unselect ; update () in
-          focused#button ~title ~callback fmt
+        let callback () =
+          stack <- job a b w ; ignore focused#unselect ; update () in
+        focused#button ~title ~callback fmt
       | _ -> ()
 
     method private op3 title job args fmt = match args with
       | a::b::c::w ->
-          let callback () =
-            stack <- job a b c w ; ignore focused#unselect ; update () in
-          focused#button ~title ~callback fmt
+        let callback () =
+          stack <- job a b c w ; ignore focused#unselect ; update () in
+        focused#button ~title ~callback fmt
       | _ -> ()
 
     method private destruct args fmt = match args with
       | a::w ->
-          let ps = Tactical.destruct a in
-          if ps <> [] then
-            let callback () =
-              stack <- ps @ w ; update () in
-            Format.fprintf fmt
-              "%t @{<it>Decompose into (selectable) sub-terms@}@\n"
-              (focused#button ~title:"Destruct A" ~callback)
+        let ps = Tactical.destruct a in
+        if ps <> [] then
+          let callback () =
+            stack <- ps @ w ; update () in
+          Format.fprintf fmt
+            "%t @{<it>Decompose into (selectable) sub-terms@}@\n"
+            (focused#button ~title:"Destruct A" ~callback)
       | _ -> ()
 
     val mutable stacked = true
@@ -129,29 +129,29 @@ class composer (focused : GuiSequent.focused) =
       match peek cc#arity args with
       | None -> ()
       | Some (es,tail) ->
-          let vs = List.map Tactical.selected es in
-          if cc#filter vs then
-            begin
-              let callback () =
-                let s = Tactical.compose cc#id es in
-                stack <-  if es = [] then tail @ [s] else s :: tail ;
-                ignore focused#unselect ;
-                update () in
-              let button = focused#button ~title:cc#title ~callback in
-              let descr = cc#descr in
-              if descr = "" then
-                ( if not stacked && cc#group <> group then
-                    Format.pp_print_newline fmt () ;
-                  button fmt ;
-                  stacked <- false )
-              else
-                begin
-                  if not stacked then Format.pp_print_newline fmt () ;
-                  Format.fprintf fmt "%t @{<it>%s@}@\n" button descr ;
-                  stacked <- true
-                end ;
-              group <- cc#group
-            end
+        let vs = List.map Tactical.selected es in
+        if cc#filter vs then
+          begin
+            let callback () =
+              let s = Tactical.compose cc#id es in
+              stack <-  if es = [] then tail @ [s] else s :: tail ;
+              ignore focused#unselect ;
+              update () in
+            let button = focused#button ~title:cc#title ~callback in
+            let descr = cc#descr in
+            if descr = "" then
+              ( if not stacked && cc#group <> group then
+                  Format.pp_print_newline fmt () ;
+                button fmt ;
+                stacked <- false )
+            else
+              begin
+                if not stacked then Format.pp_print_newline fmt () ;
+                Format.fprintf fmt "%t @{<it>%s@}@\n" button descr ;
+                stacked <- true
+              end ;
+            group <- cc#group
+          end
 
     method private hrule fmt =
       if not stacked then Format.pp_print_newline fmt () ;
@@ -194,7 +194,7 @@ class composer (focused : GuiSequent.focused) =
               stack <-
                 begin match current with
                   | Tactical.Compose(Tactical.Range(a,b)) ->
-                      [ Tactical.int a ; Tactical.int b ]
+                    [ Tactical.int a ; Tactical.int b ]
                   | _ -> [current] end ;
               update () in
             Format.fprintf fmt "Current: @[<hov 2>%a@]@."

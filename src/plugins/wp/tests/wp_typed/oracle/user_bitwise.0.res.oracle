@@ -16,7 +16,7 @@ Let x_1 = lsr(x, 31).
 Assume {
   Type: is_uint32(x) /\ is_uint32(x_1).
   (* Goal *)
-  When: (0 <= i) /\ (i <= 30) /\ is_sint32(i).
+  When: (0 <= i) /\ (i <= 30).
 }
 Prove: (land(lor(x_1, to_uint32(lsl(x, 1))), lsl(1, 1 + i)) != 0) <->
     (land(x, lsl(1, i)) != 0).
@@ -32,7 +32,7 @@ Let x_2 = lsr(x, 32 - n).
 Assume {
   Type: is_uint32(x) /\ is_sint32(n) /\ is_uint32(x_2).
   (* Goal *)
-  When: (0 <= i) /\ (i < n) /\ is_sint32(i).
+  When: (0 <= i) /\ (i < n).
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
@@ -65,7 +65,7 @@ Let x_2 = lsr(x, 64 - n).
 Assume {
   Type: is_sint32(n) /\ is_uint64(x) /\ is_uint64(x_2).
   (* Goal *)
-  When: (0 <= i) /\ (i < n) /\ is_sint32(i).
+  When: (0 <= i) /\ (i < n).
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
@@ -93,8 +93,7 @@ Prove: (land(lor(to_uint64(lsl(x, n)), x_2), lsl(1, x_1)) != 0) <->
 ------------------------------------------------------------
 
 Goal Post-condition 'b0' in 'rr1':
-Assume { Type: is_uint32(x) /\ is_uint32(lsr(x, 1)). }
-Prove: (bit_test(x, 0) \/ bit_test(x, 32)) <-> bit_test(x, 0).
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -103,7 +102,7 @@ Let x_1 = lsr(x, 1).
 Assume {
   Type: is_uint32(x) /\ is_uint32(x_1).
   (* Goal *)
-  When: (0 <= i) /\ (i <= 30) /\ is_sint32(i).
+  When: (0 <= i) /\ (i <= 30).
 }
 Prove: (land(lor(x_1, to_uint32(lsl(x, 31))), lsl(1, i)) != 0) <->
     (land(x, lsl(1, 1 + i)) != 0).
@@ -119,7 +118,7 @@ Let x_2 = -n.
 Assume {
   Type: is_uint32(x) /\ is_sint32(n) /\ is_uint32(x_1).
   (* Goal *)
-  When: (0 <= i) /\ (i < n) /\ is_sint32(i).
+  When: (0 <= i) /\ (i < n).
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
@@ -152,7 +151,7 @@ Let x_2 = -n.
 Assume {
   Type: is_sint32(n) /\ is_uint64(x) /\ is_uint64(x_1).
   (* Goal *)
-  When: (0 <= i) /\ (i < n) /\ is_sint32(i).
+  When: (0 <= i) /\ (i < n).
   (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }

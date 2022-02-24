@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -63,13 +63,13 @@ val get_decreases_goal : kernel_function -> variant_info option
 (* --- Property Accessors : Assertions                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-type code_assertions = {
-  code_admitted: pred_info list ;
-  code_verified: pred_info list ;
+type code_assertion = {
+  code_admitted: pred_info option ;
+  code_verified: pred_info option ;
 }
 
 val get_code_assertions :
-  ?smoking:bool -> kernel_function -> stmt -> code_assertions
+  ?smoking:bool -> kernel_function -> stmt -> code_assertion list
 
 val get_unreachable : kernel_function -> stmt -> prop_id
 val get_stmt_assigns : kernel_function -> stmt -> assigns_full_info list

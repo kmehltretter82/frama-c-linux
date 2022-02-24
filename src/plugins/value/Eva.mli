@@ -20,18 +20,39 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Analysis for values and pointers *)
+(** Eva public API.
+
+   The main modules are:
+   - Analysis: run the analysis.
+   - Results: access analysis results, especially the values of expressions
+      and memory locations of lvalues at each program point.
+
+   The following modules allow configuring the Eva analysis:
+   - Parameters: change the configuration of the analysis.
+   - Eva_annotations: add local annotations to guide the analysis.
+   - Builtins: register ocaml builtins to be used by the cvalue domain
+       instead of analysing the body of some C functions.
+
+   Other modules are for internal use only. *)
+
+module Analysis = Analysis
+module Results = Results
+
+module Parameters = Parameters
+module Eva_annotations = Eva_annotations
+module Builtins = Builtins
 
 
 (** For internal use *)
 
 module Private: sig
   module Abstractions = Abstractions
-  module Analysis = Analysis
   module Alarmset = Alarmset
   module Main_values = Main_values
-  module Value_parameters =Value_parameters
   module Eval = Eval
+  module Eva_utils = Eva_utils
+  module Eva_results = Eva_results
+  module Self = Self
   module Eval_terms = Eval_terms
   module Red_statuses = Red_statuses
   module Abstract_value = Abstract_value
@@ -41,134 +62,8 @@ module Private: sig
   module Structure = Structure
   module Eval_typ = Eval_typ
   module Eval_op = Eval_op
-  module Value_util = Value_util
-  module Value_results = Value_results
   module Domain_builder = Domain_builder
   module Main_locations = Main_locations
   module Eval_annots = Eval_annots
   module Eva_dynamic = Eva_dynamic
-end
-
-
-module Value_results: sig
-  type results
-
-  val get_results: unit -> results
-  val set_results: results -> unit
-  val merge: results -> results -> results
-  val change_callstacks:
-    (Value_types.callstack -> Value_types.callstack) -> results -> results
-end
-
-module Value_parameters: sig
-  (** Returns the list (name, descr) of currently enabled abstract domains. *)
-  val enabled_domains: unit -> (string * string) list
-
-  (** [use_builtin kf name] instructs the analysis to use the builtin [name]
-      to interpret calls to function [kf].
-      Raises [Not_found] if there is no builtin of name [name]. *)
-  val use_builtin: Cil_types.kernel_function -> string -> unit
-
-  (** [use_global_value_partitioning vi] instructs the analysis to use
-      value partitioning on the global variable [vi]. *)
-  val use_global_value_partitioning: Cil_types.varinfo -> unit
-end
-
-module Eval_terms: sig
-  (** Evaluation environment, built by [env_annot]. *)
-  type eval_env
-
-  (** Dependencies needed to evaluate a term or a predicate. *)
-  type logic_deps = Locations.Zone.t Cil_datatype.Logic_label.Map.t
-
-  type labels_states = Db.Value.state Cil_datatype.Logic_label.Map.t
-
-  val env_annot :
-    ?c_labels:labels_states -> pre:Db.Value.state -> here:Db.Value.state ->
-    unit -> eval_env
-
-  (** [predicate_deps env p] computes the logic dependencies needed to evaluate
-      [p] in the given evaluation environment [env].
-      @return None on either an evaluation error or on unsupported construct. *)
-  val predicate_deps: eval_env -> Cil_types.predicate -> logic_deps option
-end
-
-
-module Unit_tests: sig
-  (** Runs the unit tests of Eva. *)
-  val run: unit -> unit
-end
-
-(** Register special annotations to locally guide the partitioning of states
-    performed by an Eva analysis. *)
-module Eva_annotations: sig
-
-  (** Annotations tweaking the behavior of the -eva-slevel paramter. *)
-  type slevel_annotation =
-    | SlevelMerge        (** Join all states separated by slevel. *)
-    | SlevelDefault      (** Use the limit defined by -eva-slevel. *)
-    | SlevelLocal of int (** Use the given limit instead of -eva-slevel. *)
-    | SlevelFull         (** Remove the limit of number of separated states. *)
-
-  (** Loop unroll annotations. *)
-  type unroll_annotation =
-    | UnrollAmount of Cil_types.term (** Unroll the n first iterations. *)
-    | UnrollFull (** Unroll amount defined by -eva-default-loop-unroll. *)
-
-  type split_kind = Static | Dynamic
-  type split_term =
-    | Expression of Cil_types.exp
-    | Predicate of Cil_types.predicate
-
-  (** Split/merge annotations for value partitioning.  *)
-  type flow_annotation =
-    | FlowSplit of split_term * split_kind
-    (** Split states according to a term. *)
-    | FlowMerge of split_term
-    (** Merge states separated by a previous split. *)
-
-  val get_slevel_annot : Cil_types.stmt -> slevel_annotation option
-  val get_unroll_annot : Cil_types.stmt -> unroll_annotation list
-  val get_flow_annot : Cil_types.stmt -> flow_annotation list
-  val get_subdivision_annot : Cil_types.stmt -> int list
-
-  val add_slevel_annot : emitter:Emitter.t ->
-    Cil_types.stmt -> slevel_annotation -> unit
-  val add_unroll_annot : emitter:Emitter.t ->
-    Cil_types.stmt -> unroll_annotation -> unit
-  val add_flow_annot : emitter:Emitter.t ->
-    Cil_types.stmt -> flow_annotation -> unit
-  val add_subdivision_annot : emitter:Emitter.t ->
-    Cil_types.stmt -> int -> unit
-end
-
-(** Analysis builtins for the cvalue domain, more efficient than the analysis
-    of the C functions. See {builtins.mli} for more details. *)
-module Builtins: sig
-  open Cil_types
-
-  exception Invalid_nb_of_args of int
-  exception Outside_builtin_possibilities
-
-  type builtin_type = unit -> typ * typ list
-  type cacheable = Cacheable | NoCache | NoCacheCallers
-
-  type full_result = {
-    c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
-    c_clobbered: Base.SetLattice.t;
-    c_from: (Function_Froms.froms * Locations.Zone.t) option;
-  }
-
-  type call_result =
-    | States of Cvalue.Model.t list
-    | Result of Cvalue.V.t list
-    | Full of full_result
-
-  type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
-
-  val register_builtin:
-    string -> ?replace:string -> ?typ:builtin_type -> cacheable ->
-    builtin -> unit
-
-  val is_builtin: string -> bool
 end

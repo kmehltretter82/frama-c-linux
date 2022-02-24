@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,7 +27,7 @@ let main () =
     (* have to do the value analysis before the selections
      * because some functions use its results,
      * and the value analysis is not launched automatically. *)
-    !Db.Value.compute ();
+    Eva.Analysis.compute ();
 
     let project_name = SlicingParameters.ProjectName.get () in
     Api.Project.reset_slicing ();

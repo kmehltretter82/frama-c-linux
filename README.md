@@ -115,6 +115,10 @@ via the GUI:
 - Links to user and developer manuals, Frama-C archives,
   and plug-in manuals are available at <br> https://frama-c.com/html/get-frama-c.html
 
+- The [Frama-C documentation page](https://frama-c.com/html/documentation.html)
+  contains links to all manuals and plugins description, as well as tutorials,
+  courses and more.
+
 - [StackOverflow](https://stackoverflow.com/questions/tagged/frama-c) has several
   questions with the `frama-c` tag, which is monitored by several members of the
   Frama-C community.
@@ -122,15 +126,13 @@ via the GUI:
 - The [Frama-c-discuss mailing list](https://groupes.renater.fr/sympa/info/frama-c-discuss)
   is used for announcements and general discussions.
 
+- The [Frama-C blog](https://frama-c.com/blog) has several posts about
+  new developments of Frama-C, as well as general discussions about the C
+  language, undefined behavior, floating-point computations, etc.
+
 - The [Frama-C public repository](https://git.frama-c.com/pub/frama-c)
   contains a daily snapshot of the development version of Frama-C, as well as
   the [issues tracking system](https://git.frama-c.com/pub/frama-c/issues),
   for reporting bugs.
-
-- The [Frama-C documentation page](https://frama-c.com/html/documentation.html)
-  contains links to all manuals and plugins description, as well as tutorials, courses
-	and more.
-
-- The [Frama-C blog](https://frama-c.com/blog) has several posts about
-  new developments of Frama-C, as well as general discussions about the C
-  language, undefined behavior, floating-point computations, etc.
+  These [contribution guidelines](CONTRIBUTING.md) detail how to submit
+  issues or create merge requests.

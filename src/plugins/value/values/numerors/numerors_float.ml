@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -122,7 +122,7 @@ let neg_inf prec = of_mpfr prec @@ Mpfrf.of_float neg_infinity  Mpfr.Near
  *---------------------------------------------------------------------------*)
 let compare (px, nx) (py, ny) =
   if not (Precisions.eq px py) then
-    Value_parameters.fatal
+    Eva.Private.Self.fatal
       "Numerors: impossible to compare two numbers with different precisions"
   else Mpfrf.cmp nx ny
 let eq a b = compare a b =  0

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -127,7 +127,7 @@ let compute_for_kf kf =
   Kernel_function.Set.mem kf (Pdg_parameters.BuildFct.get ())
 
 let compute () =
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   let do_kf_pdg kf =
     if compute_for_kf kf then
       let pdg = !Db.Pdg.get kf in

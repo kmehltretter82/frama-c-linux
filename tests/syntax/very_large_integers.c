@@ -16,14 +16,24 @@
    STDOPT: #"-cpp-extra-args=-DCABS_DOWHILE"
    STDOPT: #"-cpp-extra-args=-DARRAY_INIT1"
    STDOPT: #"-cpp-extra-args=-DARRAY_INIT2"
+   STDOPT: #"-cpp-extra-args=-DARRAY_INIT3"
+   STDOPT: #"-cpp-extra-args=-DARRAY_INIT4"
    EXIT: 0
    STDOPT: #"-cpp-extra-args=-DUNROLL_PRAGMA"
 */
 
+
+
+
+
+
+
+// Lines intentionally left blank to minimize future oracle changes
+
 volatile int nondet;
 #ifdef BITFIELD
 struct st {
-  int bf:(999999999999999999+9999999999999999999);
+  int bf:(999999999999999999U+9999999999999999999U);
 };
 #endif
 
@@ -103,6 +113,14 @@ struct st {
 struct st s = {
   {{[7205759403792793 ... 7205759403792793] = 0}}
 };
+#endif
+
+#ifdef ARRAY_INIT3
+int ai3[] = {0xdead, [72057594037927936] = 0xbeef};
+#endif
+#ifdef ARRAY_INIT4
+// Previously caused Out of memory
+int ai4[] = {1, [7205759403792793] = 11};
 #endif
 
 int main() {

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -92,8 +92,8 @@ struct
     | R_index _ , _ -> (-1)
     | _ , R_index _ -> 1
     | R_range(a1,b1) , R_range(a2,b2) ->
-        let cmp = compare_bound a1 a2 in
-        if cmp <> 0 then cmp else compare_bound b1 b2
+      let cmp = compare_bound a1 a2 in
+      if cmp <> 0 then cmp else compare_bound b1 b2
 
   let rec compare a b =
     match a.lnode , b.lnode with
@@ -104,8 +104,8 @@ struct
     | L_region _ , _ -> (-1)
     | _ , L_region _ -> 1
     | L_star(ta,a) , L_star(tb,b) ->
-        let cmp = Typ.compare ta tb in
-        if cmp <> 0 then cmp else compare a b
+      let cmp = Typ.compare ta tb in
+      if cmp <> 0 then cmp else compare a b
     | L_star _ , _ -> (-1)
     | _ , L_star _ -> 1
     | L_addr a , L_addr b -> compare a b
@@ -118,14 +118,14 @@ struct
     | L_index _ , _ -> (-1)
     | _ , L_index _ -> 1
     | L_field(a,fs) , L_field(b,gs) ->
-        let cmp = compare a b in
-        if cmp <> 0 then cmp
-        else Qed.Hcons.compare_list Fieldinfo.compare fs gs
+      let cmp = compare a b in
+      if cmp <> 0 then cmp
+      else Qed.Hcons.compare_list Fieldinfo.compare fs gs
     | L_field _ , _ -> (-1)
     | _ , L_field _ -> 1
     | L_cast(ta,a) , L_cast(tb,b) ->
-        let cmp = Typ.compare ta tb in
-        if cmp <> 0 then cmp else compare a b
+      let cmp = Typ.compare ta tb in
+      if cmp <> 0 then cmp else compare a b
 
   and compare_index a ta i b tb j =
     let cmp = compare a b in
@@ -140,11 +140,11 @@ struct
   let pp_range pp fmt = function
     | R_index a -> pp fmt a
     | R_range(a,b) ->
-        begin
-          pp_bound pp fmt a ;
-          Format.fprintf fmt "@,.." ;
-          pp_bound pp fmt b ;
-        end
+      begin
+        pp_bound pp fmt a ;
+        Format.fprintf fmt "@,.." ;
+        pp_bound pp fmt b ;
+      end
 
   let first = function [] -> assert false | f::_ -> f
   let rec last = function [] -> assert false | [f] -> f | _::fs -> last fs
@@ -158,14 +158,14 @@ struct
     | L_region a -> Format.pp_print_string fmt a
     | L_field( p , [f] ) -> pfield pp p f fmt
     | L_field( p , fs ) ->
-        Format.fprintf fmt "@[<hov 2>(%t@,..%t)@]"
-          (pfield pp p (first fs)) (pfield pp p (last fs))
+      Format.fprintf fmt "@[<hov 2>(%t@,..%t)@]"
+        (pfield pp p (first fs)) (pfield pp p (last fs))
     | L_index(a,_,i) ->
-        Format.fprintf fmt "@[<hov 2>%a@,[%a]@]"
-          (pp_lval pp) a (pp_range pp) i
+      Format.fprintf fmt "@[<hov 2>%a@,[%a]@]"
+        (pp_lval pp) a (pp_range pp) i
     | L_shift(a,_,i) ->
-        Format.fprintf fmt "@[<hov 2>%a@,+(%a)@]"
-          (pp_lpath pp) a (pp_range pp) i
+      Format.fprintf fmt "@[<hov 2>%a@,+(%a)@]"
+        (pp_lpath pp) a (pp_range pp) i
     | L_star(_,a) -> Format.fprintf fmt "*%a" (pp_lval pp) a
     | L_addr a -> Format.fprintf fmt "&%a" (pp_lval pp) a
     | L_cast(t,a) -> Format.fprintf fmt "(%a)@,%a" Typ.pretty t (pp_lval pp) a
@@ -303,109 +303,109 @@ let sugar ~loc node = { lexpr_loc = loc ; lexpr_node = node }
 let rec field_range ~inside fa fb = function
   | [] -> []
   | f::fs ->
-      let bound = Fieldinfo.equal f fa || Fieldinfo.equal f fb in
-      if inside then f :: (if bound then [] else field_range ~inside fa fb fs)
-      else if bound then f :: (field_range ~inside:true fa fb fs)
-      else field_range ~inside fa fb fs
+    let bound = Fieldinfo.equal f fa || Fieldinfo.equal f fb in
+    if inside then f :: (if bound then [] else field_range ~inside fa fb fs)
+    else if bound then f :: (field_range ~inside:true fa fb fs)
+    else field_range ~inside fa fb fs
 
 let rec typeof_fields = function
   | [] -> TVoid []
   | [f] -> f.ftype
   | f::fs ->
-      let t = typeof_fields fs in
-      if Typ.equal f.ftype t then t else TVoid []
+    let t = typeof_fields fs in
+    if Typ.equal f.ftype t then t else TVoid []
 
 let rec parse_lpath env e =
   let loc = e.lexpr_loc in
   match e.lexpr_node with
   | PLvar x ->
-      if List.mem x env.declared
-      then { loc ; lnode = L_region x ; ltype = TVoid [] }
-      else
-        let v = parse_varinfo env ~loc x in
-        { loc ; lnode = L_var v ; ltype = v.vtype }
+    if List.mem x env.declared
+    then { loc ; lnode = L_region x ; ltype = TVoid [] }
+    else
+      let v = parse_varinfo env ~loc x in
+      { loc ; lnode = L_var v ; ltype = v.vtype }
   | PLunop( Ustar , p ) ->
-      let lv = parse_lpath env p in
-      if Cil.isPointerType lv.ltype then
-        let te = Cil.typeOf_pointed lv.ltype in
-        { loc ; lnode = L_star(te,lv) ; ltype = te }
-      else
-        error env ~loc "Pointer-type expected for operator '&'"
+    let lv = parse_lpath env p in
+    if Cil.isPointerType lv.ltype then
+      let te = Cil.typeOf_pointed lv.ltype in
+      { loc ; lnode = L_star(te,lv) ; ltype = te }
+    else
+      error env ~loc "Pointer-type expected for operator '&'"
   | PLunop( Uamp , p ) ->
-      let lv = parse_lpath env p in
-      let ltype = TPtr( lv.ltype , [] ) in
-      { loc ; lnode = L_addr lv ; ltype }
+    let lv = parse_lpath env p in
+    let ltype = TPtr( lv.ltype , [] ) in
+    { loc ; lnode = L_addr lv ; ltype }
   | PLbinop( p , Badd , r ) ->
-      let { ltype } as lv = parse_lpath env p in
-      let rg = parse_lrange env r in
-      if Cil.isPointerType ltype then
-        let te = Cil.typeOf_pointed ltype in
-        { loc ; lnode = L_shift(lv,te,rg) ; ltype = ltype }
-      else
-      if Cil.isArrayType ltype then
-        let te = Cil.typeOf_array_elem ltype in
-        { loc ; lnode = L_shift(lv,te,rg) ; ltype = TPtr(te,[]) }
-      else
-        error env ~loc "Pointer-type expected for operator '+'"
+    let { ltype } as lv = parse_lpath env p in
+    let rg = parse_lrange env r in
+    if Cil.isPointerType ltype then
+      let te = Cil.typeOf_pointed ltype in
+      { loc ; lnode = L_shift(lv,te,rg) ; ltype = ltype }
+    else
+    if Cil.isArrayType ltype then
+      let te = Cil.typeOf_array_elem ltype in
+      { loc ; lnode = L_shift(lv,te,rg) ; ltype = TPtr(te,[]) }
+    else
+      error env ~loc "Pointer-type expected for operator '+'"
   | PLdot( p , f ) ->
-      let lv = parse_lpath env p in
-      let comp = getCompoundType env ~loc:lv.loc lv.ltype in
-      let fd = parse_fieldinfo env ~loc comp f in
-      { loc ; lnode = L_field(lv,[fd]) ; ltype = fd.ftype }
+    let lv = parse_lpath env p in
+    let comp = getCompoundType env ~loc:lv.loc lv.ltype in
+    let fd = parse_fieldinfo env ~loc comp f in
+    { loc ; lnode = L_field(lv,[fd]) ; ltype = fd.ftype }
   | PLarrow( p , f ) ->
-      let sp = sugar ~loc (PLunop(Ustar,p)) in
-      let pf = sugar ~loc (PLdot(sp,f)) in
-      parse_lpath env pf
+    let sp = sugar ~loc (PLunop(Ustar,p)) in
+    let pf = sugar ~loc (PLdot(sp,f)) in
+    parse_lpath env pf
   | PLarrget( p , k ) ->
-      let { ltype } as lv = parse_lpath env p in
-      let rg = parse_lrange env k in
-      if Cil.isPointerType ltype then
-        let pointed = Cil.typeOf_pointed ltype in
-        let ls = { loc ; lnode = L_shift(lv,pointed,rg) ; ltype } in
-        { loc ; lnode = L_star(pointed,ls) ; ltype = pointed }
-      else
-      if Cil.isArrayType ltype then
-        let elt = Cil.typeOf_array_elem ltype in
-        { loc ; lnode = L_index(lv,elt,rg) ; ltype = elt }
-      else
-        error env ~loc:lv.loc "Pointer or array type expected"
+    let { ltype } as lv = parse_lpath env p in
+    let rg = parse_lrange env k in
+    if Cil.isPointerType ltype then
+      let pointed = Cil.typeOf_pointed ltype in
+      let ls = { loc ; lnode = L_shift(lv,pointed,rg) ; ltype } in
+      { loc ; lnode = L_star(pointed,ls) ; ltype = pointed }
+    else
+    if Cil.isArrayType ltype then
+      let elt = Cil.typeOf_array_elem ltype in
+      { loc ; lnode = L_index(lv,elt,rg) ; ltype = elt }
+    else
+      error env ~loc:lv.loc "Pointer or array type expected"
   | PLcast( t , a ) ->
-      let lv = parse_lpath env a in
-      let ty = parse_ltype env ~loc t in
-      { loc ; lnode = L_cast(ty,lv) ; ltype = ty }
+    let lv = parse_lpath env a in
+    let ty = parse_ltype env ~loc t in
+    { loc ; lnode = L_cast(ty,lv) ; ltype = ty }
   | PLrange( Some a , Some b ) ->
-      let pa,fa = parse_fpath env a in
-      let pb,fb = parse_fpath env b in
-      let p =
-        if Lpath.equal pa pb then pa
-        else error env ~loc "Range of fields from different l-values" in
-      let comp =
-        if Compinfo.equal fa.fcomp fb.fcomp then fa.fcomp
-        else error env ~loc "Range of fields from incompatible types" in
-      let fields =
-        field_range ~inside:false fa fb
-          (Option.value ~default:[] comp.cfields)
-      in
-      let ltype = typeof_fields fields in
-      { loc ; lnode = L_field(p,fields) ; ltype }
+    let pa,fa = parse_fpath env a in
+    let pb,fb = parse_fpath env b in
+    let p =
+      if Lpath.equal pa pb then pa
+      else error env ~loc "Range of fields from different l-values" in
+    let comp =
+      if Compinfo.equal fa.fcomp fb.fcomp then fa.fcomp
+      else error env ~loc "Range of fields from incompatible types" in
+    let fields =
+      field_range ~inside:false fa fb
+        (Option.value ~default:[] comp.cfields)
+    in
+    let ltype = typeof_fields fields in
+    { loc ; lnode = L_field(p,fields) ; ltype }
   | PLrange( Some a , None ) ->
-      let p,fd = parse_fpath env a in
-      let fields =
-        field_range ~inside:false fd fd
-          (Option.value ~default:[] fd.fcomp.cfields)
-      in
-      let ltype = typeof_fields fields in
-      { loc ; lnode = L_field(p,fields) ; ltype }
+    let p,fd = parse_fpath env a in
+    let fields =
+      field_range ~inside:false fd fd
+        (Option.value ~default:[] fd.fcomp.cfields)
+    in
+    let ltype = typeof_fields fields in
+    { loc ; lnode = L_field(p,fields) ; ltype }
   | PLrange( None , Some a ) ->
-      let p,fd = parse_fpath env a in
-      let fields =
-        field_range ~inside:true fd fd
-          (Option.value ~default:[] fd.fcomp.cfields)
-      in
-      let ltype = typeof_fields fields in
-      { loc ; lnode = L_field(p,fields) ; ltype }
+    let p,fd = parse_fpath env a in
+    let fields =
+      field_range ~inside:true fd fd
+        (Option.value ~default:[] fd.fcomp.cfields)
+    in
+    let ltype = typeof_fields fields in
+    { loc ; lnode = L_field(p,fields) ; ltype }
   | _ ->
-      error env ~loc "Unexpected expression for region spec"
+    error env ~loc "Unexpected expression for region spec"
 
 and parse_fpath env p =
   let lv = parse_lpath env p in
@@ -423,12 +423,12 @@ let registry = Hashtbl.create 0
 let parse_pattern env ~loc names params =
   match names with
   | [name] ->
-      let pattern =
-        try List.assoc name patterns
-        with Not_found -> error env ~loc "Unknown pattern '%s'" name in
-      if params <> [] then
-        error env ~loc "Unexpected parameters for pattern '%s'" name ;
-      pattern
+    let pattern =
+      try List.assoc name patterns
+      with Not_found -> error env ~loc "Unknown pattern '%s'" name in
+    if params <> [] then
+      error env ~loc "Unexpected parameters for pattern '%s'" name ;
+    pattern
   | [] -> error env ~loc "Missing pattern name"
   | _ -> error env ~loc "Duplicate pattern names"
 
@@ -436,18 +436,18 @@ let rec parse_region env p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
   | PLnamed( name , p ) ->
-      flush env ;
-      env.name <- Some name ;
-      parse_region env p
+    flush env ;
+    env.name <- Some name ;
+    parse_region env p
   | PLapp("\\pattern",names,params) ->
-      let pattern = parse_pattern env ~loc names params in
-      if env.pattern <> FREE && env.pattern <> pattern then
-        error env ~loc "Duplicate pattern definition in region"
-      else
-        env.pattern <- pattern
+    let pattern = parse_pattern env ~loc names params in
+    if env.pattern <> FREE && env.pattern <> pattern then
+      error env ~loc "Duplicate pattern definition in region"
+    else
+      env.pattern <- pattern
   | _ ->
-      let path = parse_lpath env p in
-      env.paths <- path :: env.paths
+    let path = parse_lpath env p in
+    env.paths <- path :: env.paths
 
 let typecheck typing_context _loc ps =
   let env = {
@@ -478,8 +478,8 @@ let of_behavior bhv =
 
 let pp_extension printer fmt = function
   | Ext_id k ->
-      let spec = try Hashtbl.find registry k with Not_found -> [] in
-      ignore (List.fold_left (pp_region_spec printer#term fmt) false spec)
+    let spec = try Hashtbl.find registry k with Not_found -> [] in
+    ignore (List.fold_left (pp_region_spec printer#term fmt) false spec)
   | _ -> ()
 
 let specified =

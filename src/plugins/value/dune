@@ -19,8 +19,8 @@
   (optional)
   (public_name frama-c-eva.core)
   (modules eva unit_tests
-   split_strategy value_parameters
-        value_perf value_util
+   split_strategy self parameters
+        eva_perf eva_utils
         mark_noresults
         widen_hints_ext widen
         alarmset warn eval_typ backward_formals
@@ -31,9 +31,9 @@
         library_functions
         builtins_string
         builtins_misc
-        value_results
+        eva_results
         builtins_memory
-        builtins_print_c
+        builtins_print_c results
         builtins_watchpoint
         function_args split_return
         per_stmt_slevel
@@ -109,7 +109,7 @@
   (optional)
   (modules gui_callstacks_filters gui_callstacks_manager gui_eval gui_types register_gui gui_red)
 ;  (public_interfaces ())
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva.Private)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva -open Eva.Private)
   (libraries eva frama-c.kernel frama-c.gui)
 )
 

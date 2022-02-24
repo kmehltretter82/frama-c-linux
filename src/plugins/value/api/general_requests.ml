@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -45,6 +45,7 @@ module ComputationState = struct
     | Analysis.NotComputed -> `String "not_computed"
     | Computing -> `String "computing"
     | Computed -> `String "computed"
+    | Aborted -> `String "aborted"
 end
 
 let _computation_signal =
@@ -57,7 +58,7 @@ let _computation_signal =
     ()
 
 let is_computed kf =
-  Db.Value.is_computed () &&
+  Analysis.is_computed () &&
   match kf with
   | { fundec = Definition (fundec, _) } ->
     Mark_noresults.should_memorize_function fundec
@@ -66,7 +67,7 @@ let is_computed kf =
 module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 
 let callers kf =
-  let list = !Db.Value.callers kf in
+  let list = Eva_results.callers kf in
   List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
 
 let () = Request.register ~package

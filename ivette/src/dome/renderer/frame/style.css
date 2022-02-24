@@ -38,24 +38,14 @@
     border-right-style: solid ;
 }
 
-.dome-window-inactive .dome-xTab.dome-inactive {
-    color: #606060 ;
-    border-color: inherit ;
-}
-
 .dome-xTab.dome-inactive:hover {
-    background: #bababa ;
+    background: var(--background-disabled-hover) ;
 }
 
 .dome-xTab.dome-inactive {
-    color: #606060 ;
-    border-color: #9c9c9c ;
-    background: #b4b4b4 ;
-}
-
-.dome-window-inactive .dome-xTab.dome-inactive {
-    color: #b0b0b0 ;
-    background: #e6e6e6 ;
+    color: var(--text-discrete) ;
+    border-color: var(--border) ;
+    background: var(--background-disabled) ;
 }
 
 /* Closing Tab button */
@@ -82,16 +72,11 @@
     left: initial ;
 }
 
-.dome-active .dome-xTab-closing:hover {
-    background: #c0c0c0 ;
+.dome-xTab-closing:hover {
+    background: var(--background-button-hover);
 }
 
-.dome-inactive .dome-xTab-closing:hover {
-    background: #a0a0a0 ;
-}
-
-.dome-xTab:hover .dome-xTab-closing , .dome-xTab:hover .dome-xTab-closing
-{
+.dome-xTab:hover .dome-xTab-closing {
     opacity: 1 ;
 }
 
@@ -107,10 +92,10 @@
     padding: 0px ;
 }
 
-.dome-window-active .dome-xSideBar.dome-color-frame,
-.dome-window-active .dome-xSideBarSection-title.dome-color-frame
+.dome-xSideBar.dome-color-frame,
+.dome-xSideBarSection-title.dome-color-frame
 {
-    background: #e3e8ec ;
+    background: var(--background-sidebar) ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -148,7 +133,7 @@
 .dome-xSideBarSection-hideshow {
     flex: 0 0 ;
     margin: 1px ;
-    color: #aaa ;
+    color: var(--info-text) ;
     width: 32px ;
     font-weight: normal ;
     display: inline ;
@@ -177,12 +162,8 @@
     scroll-margin-top: 30px;
 }
 
-.dome-window-active .dome-xSideBarItem.dome-active {
-    background: #ccc ;
-}
-
-.dome-window-inactive .dome-xSideBarItem.dome-active {
-    background: #ddd ;
+.dome-xSideBarItem.dome-active {
+    background: var(--background-profound) ;
 }
 
 .dome-xSideBarItem > .dome-xLabel {
@@ -193,8 +174,8 @@
 }
 
 .dome-xSideBarItem.dome-disabled > .dome-xLabel {
-    color: #b0b0b0 ;
-    fill:  #b0b0b0 ;
+    color: var(--disabled-text) ;
+    fill:  var(--disabled-text) ;
 }
 
 .dome-xSideBarItem > .dome-xLabel:last-child {
@@ -216,7 +197,7 @@
     display: flex ;
     flex-direction: row ;
     flex-wrap: wrap ;
-    align-items: baseline ;
+    align-items: center ;
     border-width: 1px ;
     border-bottom-style: solid ;
 }
@@ -258,12 +239,8 @@
     height: 18px ;
 }
 
-.dome-window-active .dome-xToolBar-vrule {
-    background: #aaa ;
-}
-
-.dome-window-inactive .dome-xToolBar-vrule {
-    background: #ddd ;
+.dome-xToolBar-vrule {
+    background: var(--splitter) ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -292,118 +269,115 @@
     margin-left: 4px ;
 }
 
-/* Background */
+/* Default button behaviors */
 
-.dome-window-active .dome-xToolBar-control {
-    background-image: linear-gradient(to bottom, #e8e8e8 0, #f1f1f1 100%);
+.dome-xToolBar-control {
+    background-image: var(--default-button-img);
+    color: var(--text);
 }
 
-.dome-window-active .dome-xToolBar-control:hover:not(:disabled) {
-    background-color: #ffffff ;
+.dome-xToolBar-control:hover:not(:disabled) {
+    background-color: var(--default-button-hover);
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-positive:not(:disabled) {
-    background-image: linear-gradient(to bottom, #34ff52 0%, #48fd64 100%);
+.dome-xToolBar-control:active:not(:disabled) {
+    background-color: var(--default-button-active);
+    background-image: none;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-positive:hover:not(:disabled) {
-    background-color: #00ff00 ;
+/* Positive button behaviors */
+
+.dome-xToolBar-control.dome-xToolBar-positive:not(:disabled) {
+    background-image: var(--positive-button-img);
+}
+
+.dome-xToolBar-control.dome-xToolBar-positive:hover:not(:disabled) {
+    background-color: var(--positive-button-hover);
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-negative:not(:disabled) {
-    color: #ccc ;
-    fill: #ccc ;
-    background-image: linear-gradient(to bottom, #ec453e 0%, #ff4c47 100%);
+.dome-xToolBar-control.dome-xToolBar-positive:active:not(:disabled) {
+    background-color: var(--positive-button-active);
+    background-image: none;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-negative:hover:not(:disabled) {
-    background-color: red ;
+/* Negative button behaviors */
+
+.dome-xToolBar-control.dome-xToolBar-negative:not(:disabled) {
+    background-image: var(--negative-button-img);
+}
+
+.dome-xToolBar-control.dome-xToolBar-negative:hover:not(:disabled) {
+    background-color: var(--negative-button-hover);
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-warning:not(:disabled) {
-    background-image: linear-gradient(to bottom, #fece72 0%, #fcaa0e 100%);
+.dome-xToolBar-control.dome-xToolBar-negative:active:not(:disabled) {
+    background-color: var(--negative-button-active);
+    background-image: none;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-warning:hover:not(:disabled) {
-    background-color: orange ;
+/* Warning button behaviors */
+
+.dome-xToolBar-control.dome-xToolBar-warning:not(:disabled) {
+    background-image: var(--warning-button-img);
+}
+
+.dome-xToolBar-control.dome-xToolBar-warning:hover:not(:disabled) {
+    background-color: var(--warning-button-hover);
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-cancel:not(:disabled) {
-    background-color: #c2c0c2 ;
+.dome-xToolBar-control.dome-xToolBar-warning:active:not(:disabled) {
+    background-color: var(--warning-button-active);
+    background-image: none;
+}
+
+/* Cancel button behaviors */
+
+.dome-xToolBar-control.dome-xToolBar-cancel:not(:disabled) {
+    background-color: var(--cancel-button-img);
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-xToolBar-cancel:hover:not(:disabled) {
-    background-image: linear-gradient(to bottom, #e8e8e8 0, #f1f1f1 100%);
+.dome-xToolBar-control.dome-xToolBar-cancel:hover:not(:disabled) {
+    background-image: var(--cancel-button-hover);
 }
 
-.dome-window-inactive .dome-xToolBar-control {
-    box-shadow: none ;
-    background-image: none ;
-}
-
-/* Activated */
-
-.dome-window-active .dome-xToolBar-control:active:not(:disabled) {
-    fill: #ddd ;
-    color: #ddd ;
-    background-color: gray ;
-    background-image: none ;
+.dome-xToolBar-control.dome-xToolBar-cancel:active:not(:disabled) {
+    background-color: var(--cancel-button-active);
+    background-image: none;
 }
 
 /* Disabled */
 
-.dome-window-active .dome-xToolBar-control:disabled {
-    fill: #ccc ;
-    color: #ccc ;
-    box-shadow: none ;
-    border-color: #bbb ;
-}
-
-.dome-window-inactive .dome-xToolBar-control:disabled {
-    fill: #ccc ;
-    color: #ccc ;
+.dome-xToolBar-control:disabled {
+    fill: var(--disabled-text) ;
+    color: var(--disabled-text) ;
 }
 
 /* Selected */
 
-.dome-window-active .dome-xToolBar-control.dome-selected {
-    fill:  #fff;
-    color: #fff;
+.dome-xToolBar-control.dome-selected {
+    fill:  var(--info-text);
+    color: var(--info-text);
     border: 1px solid transparent ;
-    background-color: #7f7f7f ;
+    background-color: var(--selected-button-img) ;
     background-image: none ;
 }
 
-.dome-window-active .dome-xToolBar-control.dome-selected:hover {
-    background-color: #888 ;
+.dome-xToolBar-control.dome-selected:hover {
+    background-color: var(--selected-button-hover) ;
     background-image: none ;
-}
-
-.dome-window-inactive .dome-xToolBar-control.dome-selected:not(:disabled) {
-    fill:  #eee;
-    color: #eee;
-    background-color: #ccc ;
 }
 
 /* Selected & Disabled */
 
-.dome-window-active .dome-xToolBar-control.dome-selected:disabled {
-    fill: #ccc ;
-    color: #ccc ;
-    border: 1px solid #bbb ;
-    background-color: #ddd ;
-}
-
-.dome-window-inactive .dome-xToolBar-control.dome-selected:disabled {
-    fill: #ccc ;
-    color: #ccc ;
-    border-color: #ddd ;
-    background-color: #ddd ;
+.dome-xToolBar-control.dome-selected:disabled {
+    fill: var(--info-text) ;
+    color: var(--info-text) ;
+    border: 1px solid var(--border-discrete) ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -419,28 +393,17 @@
 
 .dome-xToolBar-group .dome-xToolBar-control {
     margin: 0 ;
-}
-
-.dome-xToolBar-group .dome-xToolBar-control:not(:first-child) {
-    border-left: 0 ;
+    border-radius: 0;
 }
 
 .dome-xToolBar-group > .dome-xToolBar-control:first-child {
-    border-top-right-radius: 0 ;
-    border-bottom-right-radius: 0 ;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 
 .dome-xToolBar-group > .dome-xToolBar-control:last-child {
-    border-top-left-radius: 0 ;
-    border-bottom-left-radius: 0 ;
-}
-
-.dome-xToolBar-group > .dome-xToolBar-control:first-child:last-child {
-    border-radius: 4px ;
-}
-
-.dome-xToolBar-group > .dome-xToolBar-control:not(:first-child):not(:last-child) {
-    border-radius: 0 ;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -449,19 +412,13 @@
 
 .dome-xToolBar-control.dome-xToolBar-searchfield {
     background-image: none ;
-    background-color: #eee ;
-    margin-top: 1px ;
-    padding-top: 1px ;
+    background-color: var(--background-alterning-odd);
     padding-left: 20px ;
     border-radius: 12px ;
-    border-color: #aaa ;
+    border-color: var(--border);
+    color: var(--text);
     width: 32px ;
     transition: width 0.4s ease-in-out ;
-}
-
-.dome-window-inactive .dome-xToolBar-control.dome-xToolBar-searchfield {
-    background-color: #f6f6f6 ;
-    border-color: #ddd ;
 }
 
 .dome-xToolBar-searchfield:focus,
@@ -477,12 +434,8 @@
     z-Index: +1;
     height: 0px;
     width: 0px;
-    top: 2px ;
+    top: -7px ;
     left: 12px ;
-}
-
-.dome-window-inactive .dome-xToolBar-searchicon svg {
-    fill: #ccc ;
 }
 
 .dome-xToolBar-searchmenu {
@@ -494,11 +447,12 @@
     left: -7px ;
     top: 4px ;
     padding: 0px ;
-    border: 1pt solid #aaa ;
-    background: #fff ;
+    border: 1pt solid var(--border) ;
+    background: var(--background-alterning-odd) ;
 }
 
 .dome-xToolBar-searchitem {
+    color: var(--text);
     display: block ;
     width: 100% ;
     margin-left: 0px ;
@@ -510,11 +464,55 @@
 .dome-xToolBar-searchitem:hover,
 .dome-xToolBar-searchindex
 {
-    background: lightblue !important;
+    background: var(--selected-element) !important;
 }
 
 .dome-xToolBar-searchitem:nth-child(even) {
-    background: #eef7f7;
+    background: var(--background-alterning-even);
 }
 
 /* -------------------------------------------------------------------------- */
+
+.dome-xSwitch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 21px;
+}
+
+.dome-xSwitch input {
+  visibility: hidden;
+}
+
+.dome-xSwitch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--background-softer);
+  box-shadow: 0 0 1px var(--border);
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 21px;
+}
+
+.dome-xSwitch-slider:before {
+  position: absolute;
+  content: "";
+  height: 15px;
+  width: 15px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-discrete);
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .dome-xSwitch-slider:before {
+  -webkit-transform: translateX(13px);
+  -ms-transform: translateX(13px);
+  transform: translateX(13px);
+}

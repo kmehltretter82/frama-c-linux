@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -189,35 +189,35 @@ class pane (gprovers : GuiConfig.provers) =
     method private compose cc =
       match state with
       | Proof proof ->
-          composer#clear ;
-          let tgt = printer#unselect in
-          state <- Composer(proof,cc,tgt) ;
-          self#update
+        composer#clear ;
+        let tgt = printer#unselect in
+        state <- Composer(proof,cc,tgt) ;
+        self#update
       | _ -> ()
 
     method private browse cc =
       match state with
       | Proof proof ->
-          browser#clear ;
-          let tgt = printer#unselect in
-          state <- Browser(proof,cc,tgt) ;
-          self#update
+        browser#clear ;
+        let tgt = printer#unselect in
+        state <- Browser(proof,cc,tgt) ;
+        self#update
       | _ -> ()
 
     method private interrupt cancel =
       match state with
       | Empty -> ()
       | Proof proof | Composer(proof,_,_) | Browser(proof,_,_) ->
-          cancel proof ;
-          printer#reset ;
-          self#update
+        cancel proof ;
+        printer#reset ;
+        self#update
       | Forking (proof,_,pool) ->
-          cancel proof ;
-          Task.iter Task.cancel pool ;
-          state <- Proof proof ;
-          ProofEngine.forward proof ;
-          printer#reset ;
-          self#update
+        cancel proof ;
+        Task.iter Task.cancel pool ;
+        state <- Proof proof ;
+        ProofEngine.forward proof ;
+        printer#reset ;
+        self#update
 
     method private forward =
       match state with
@@ -233,41 +233,41 @@ class pane (gprovers : GuiConfig.provers) =
       match state with
       | Empty | Forking _ | Composer _ | Browser _ -> ()
       | Proof p ->
-          match ProofEngine.current p with
-          | `Leaf (k,_) -> ProofEngine.goto p (`Leaf(f k)) ; self#update
-          | `Main | `Internal _ -> ()
+        match ProofEngine.current p with
+        | `Leaf (k,_) -> ProofEngine.goto p (`Leaf(f k)) ; self#update
+        | `Main | `Internal _ -> ()
 
     method private iformat f = printer#set_iformat f ; self#update
     method private rformat f = printer#set_rformat f ; self#update
 
     method private autofocus = function
       | `Autofocus ->
-          printer#set_focus_mode true ;
-          printer#set_state_mode true ;
-          self#update
+        printer#set_focus_mode true ;
+        printer#set_state_mode true ;
+        self#update
       | `ViewRaw ->
-          printer#set_focus_mode false ;
-          printer#set_state_mode false ;
-          self#update
+        printer#set_focus_mode false ;
+        printer#set_state_mode false ;
+        self#update
       | `ViewModel ->
-          printer#set_focus_mode true ;
-          printer#set_state_mode false ;
-          self#update
+        printer#set_focus_mode true ;
+        printer#set_state_mode false ;
+        self#update
       | `ViewAll ->
-          printer#set_focus_mode false ;
-          printer#set_state_mode true ;
-          self#update
+        printer#set_focus_mode false ;
+        printer#set_state_mode true ;
+        self#update
       | `Refresh ->
-          helpmode <- false ;
-          printer#reset ;
-          let mode =
-            match printer#get_focus_mode , printer#get_state_mode with
-            | true , true -> `Autofocus
-            | false , false -> `ViewRaw
-            | true , false -> `ViewModel
-            | false , true -> `ViewAll
-          in
-          autofocus#set mode ; self#update
+        helpmode <- false ;
+        printer#reset ;
+        let mode =
+          match printer#get_focus_mode , printer#get_state_mode with
+          | true , true -> `Autofocus
+          | false , false -> `ViewRaw
+          | true , false -> `ViewModel
+          | false , true -> `ViewAll
+        in
+        autofocus#set mode ; self#update
 
     method private provers =
       (List.map (fun dp -> VCS.Why3 dp)
@@ -276,30 +276,30 @@ class pane (gprovers : GuiConfig.provers) =
     method private play_script =
       match state with
       | Proof p ->
-          ProofEngine.reset p ;
-          ProverScript.spawn
-            ~provers:self#provers
-            ~result:
-              (fun wpo prv res ->
-                 text#printf "[%a] %a : %a@."
-                   VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result res)
-            ~success:
-              (fun _ _ ->
-                 ProofEngine.forward p ;
-                 self#update)
-            (ProofEngine.main p) ;
-          let server = ProverTask.server () in
-          Task.launch server
+        ProofEngine.reset p ;
+        ProverScript.spawn
+          ~provers:self#provers
+          ~result:
+            (fun wpo prv res ->
+               text#printf "[%a] %a : %a@."
+                 VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result res)
+          ~success:
+            (fun _ _ ->
+               ProofEngine.forward p ;
+               self#update)
+          (ProofEngine.main p) ;
+        let server = ProverTask.server () in
+        Task.launch server
       | Empty | Forking _ | Composer _ | Browser _ -> ()
 
     method private save_script =
       match state with
       | Proof p ->
-          let main = ProofEngine.main p in
-          let json = ProofScript.encode (ProofEngine.script p) in
-          ProofSession.save main json ;
-          ProofEngine.set_saved p true ;
-          self#update
+        let main = ProofEngine.main p in
+        let json = ProofScript.encode (ProofEngine.script p) in
+        ProofSession.save main json ;
+        ProofEngine.set_saved p true ;
+        self#update
           (*
           text#clear ;
           text#printf "@{<bf>Session:@} '%a'@." ProofSession.pretty main ;
@@ -347,23 +347,23 @@ class pane (gprovers : GuiConfig.provers) =
 
     method select = function
       | None ->
-          state <- Empty ; self#update
+        state <- Empty ; self#update
       | Some w ->
-          let pw = ProofEngine.proof ~main:w in
-          let changed = match state with
-            | Empty -> true
-            | Proof p -> p != pw
-            | Forking _ | Composer _ | Browser _ -> false
-          in
-          if changed then
-            begin
-              printer#reset ;
-              self#update_provers None ;
-              self#update_tactics None ;
-              state <- Proof pw ;
-              ProofEngine.forward pw ;
-              self#update ;
-            end
+        let pw = ProofEngine.proof ~main:w in
+        let changed = match state with
+          | Empty -> true
+          | Proof p -> p != pw
+          | Forking _ | Composer _ | Browser _ -> false
+        in
+        if changed then
+          begin
+            printer#reset ;
+            self#update_provers None ;
+            self#update_tactics None ;
+            state <- Proof pw ;
+            ProofEngine.forward pw ;
+            self#update ;
+          end
 
     (* ---------------------------------------------------------------------- *)
     (* --- Repaint                                                        --- *)
@@ -373,216 +373,216 @@ class pane (gprovers : GuiConfig.provers) =
 
     method private update_provers = function
       | None ->
-          List.iter (fun prover -> prover#clear) provers
+        List.iter (fun prover -> prover#clear) provers
       | Some wpo ->
-          List.iter (fun prover -> prover#update wpo) provers
+        List.iter (fun prover -> prover#update wpo) provers
 
     method private update_tactics = function
       | None ->
-          printer#set_target Tactical.Empty ;
-          strategies#connect None ;
-          List.iter (fun tactic -> tactic#clear) tactics
+        printer#set_target Tactical.Empty ;
+        strategies#connect None ;
+        List.iter (fun tactic -> tactic#clear) tactics
       | Some(tree,sequent,sel) ->
-          on_proof_context tree
-            begin fun () ->
-              strategies#connect (Some (self#strategies sequent)) ;
-              let select (tactic : GuiTactic.tactic) =
-                let process = self#apply in
-                let composer = self#compose in
-                let browser = self#browse in
-                tactic#select ~process ~composer ~browser ~tree sel
-              in
-              List.iter select tactics ;
-              let tgt =
-                if List.exists (fun tactics -> tactics#targeted) tactics
-                then sel else Tactical.Empty in
-              printer#set_target tgt
-            end ()
+        on_proof_context tree
+          begin fun () ->
+            strategies#connect (Some (self#strategies sequent)) ;
+            let select (tactic : GuiTactic.tactic) =
+              let process = self#apply in
+              let composer = self#compose in
+              let browser = self#browse in
+              tactic#select ~process ~composer ~browser ~tree sel
+            in
+            List.iter select tactics ;
+            let tgt =
+              if List.exists (fun tactics -> tactics#targeted) tactics
+              then sel else Tactical.Empty in
+            printer#set_target tgt
+          end ()
 
     method private update_scriptbar =
       match state with
       | Empty | Forking _ ->
-          begin
-            save_script#set_enabled false ;
-            play_script#set_enabled false ;
-          end
+        begin
+          save_script#set_enabled false ;
+          play_script#set_enabled false ;
+        end
       | Proof proof | Composer(proof,_,_) | Browser(proof,_,_) ->
-          begin
-            let main = ProofEngine.main proof in
-            let play = ProofSession.exists main in
-            let save = not (ProofEngine.saved proof) in
-            play_script#set_enabled play ;
-            save_script#set_enabled save ;
-          end
+        begin
+          let main = ProofEngine.main proof in
+          let play = ProofSession.exists main in
+          let save = not (ProofEngine.saved proof) in
+          play_script#set_enabled play ;
+          save_script#set_enabled save ;
+        end
 
     method private update_pending kind proof n =
       match ProofEngine.current proof with
       | `Main | `Internal _ ->
-          next#set_enabled false ;
-          prev#set_enabled false ;
-          if n = 1 then
-            Pretty_utils.ksfprintf status#set_text "One %s Goal" kind
-          else
-            Pretty_utils.ksfprintf status#set_text "%d %s Goals" n kind
+        next#set_enabled false ;
+        prev#set_enabled false ;
+        if n = 1 then
+          Pretty_utils.ksfprintf status#set_text "One %s Goal" kind
+        else
+          Pretty_utils.ksfprintf status#set_text "%d %s Goals" n kind
       | `Leaf(k,_) ->
-          prev#set_enabled (0 < k) ;
-          next#set_enabled (k+1 < n) ;
-          if k = 0 && n = 1 then
-            Pretty_utils.ksfprintf status#set_text
-              "Last %s Goal" kind
-          else
-            Pretty_utils.ksfprintf status#set_text
-              "%s Goal #%d /%d" kind (succ k) n
+        prev#set_enabled (0 < k) ;
+        next#set_enabled (k+1 < n) ;
+        if k = 0 && n = 1 then
+          Pretty_utils.ksfprintf status#set_text
+            "Last %s Goal" kind
+        else
+          Pretty_utils.ksfprintf status#set_text
+            "%s Goal #%d /%d" kind (succ k) n
 
     method private update_statusbar =
       match state with
       | Empty ->
-          begin
-            icon#set_icon GuiProver.no_status ;
+        begin
+          icon#set_icon GuiProver.no_status ;
+          next#set_enabled false ;
+          prev#set_enabled false ;
+          cancel#set_enabled false ;
+          delete#set_enabled false ;
+          forward#set_enabled false ;
+          status#set_text "No Status" ;
+          help#set_enabled false ;
+        end
+      | Proof proof | Forking(proof,_,_)
+      | Composer(proof,_,_) | Browser(proof,_,_) ->
+        begin
+          let nofork = match state with Forking _ -> false | _ -> true in
+          delete#set_enabled nofork ;
+          help#set_enabled
+            (match state with Proof _ -> not helpmode | _ -> false) ;
+          match ProofEngine.status proof with
+          | `Unproved ->
+            icon#set_icon GuiProver.ko_status ;
             next#set_enabled false ;
             prev#set_enabled false ;
             cancel#set_enabled false ;
-            delete#set_enabled false ;
             forward#set_enabled false ;
-            status#set_text "No Status" ;
-            help#set_enabled false ;
-          end
-      | Proof proof | Forking(proof,_,_)
-      | Composer(proof,_,_) | Browser(proof,_,_) ->
-          begin
-            let nofork = match state with Forking _ -> false | _ -> true in
-            delete#set_enabled nofork ;
-            help#set_enabled
-              (match state with Proof _ -> not helpmode | _ -> false) ;
-            match ProofEngine.status proof with
-            | `Unproved ->
-                icon#set_icon GuiProver.ko_status ;
-                next#set_enabled false ;
-                prev#set_enabled false ;
-                cancel#set_enabled false ;
-                forward#set_enabled false ;
-                status#set_text "Non Proved Property" ;
-            | `Invalid | `StillResist 0 ->
-                icon#set_icon GuiProver.wg_status ;
-                next#set_enabled false ;
-                prev#set_enabled false ;
-                cancel#set_enabled false ;
-                forward#set_enabled false ;
-                status#set_text "Invalid Smoke-test" ;
-            | `Passed ->
-                icon#set_icon GuiProver.smoke_status ;
-                next#set_enabled false ;
-                prev#set_enabled false ;
-                cancel#set_enabled false ;
-                forward#set_enabled false ;
-                status#set_text "Passed Smoke Test" ;
-            | `Proved ->
-                icon#set_icon GuiProver.ok_status ;
-                next#set_enabled false ;
-                prev#set_enabled false ;
-                cancel#set_enabled false ;
-                forward#set_enabled false ;
-                status#set_text "Proved Goal" ;
-            | `Pending 0 ->
-                icon#set_icon GuiProver.ok_status ;
-                next#set_enabled false ;
-                prev#set_enabled false ;
-                forward#set_enabled false ;
-                cancel#set_enabled nofork ;
-                status#set_text "Proof Terminated" ;
-            | `Pending n ->
-                icon#set_icon GuiProver.ko_status ;
-                forward#set_enabled nofork ;
-                cancel#set_enabled nofork ;
-                self#update_pending "Pending" proof n ;
-            | `StillResist n ->
-                icon#set_icon GuiProver.smoke_status ;
-                forward#set_enabled nofork ;
-                cancel#set_enabled nofork ;
-                self#update_pending "Smoking" proof n ;
-          end
+            status#set_text "Non Proved Property" ;
+          | `Invalid | `StillResist 0 ->
+            icon#set_icon GuiProver.wg_status ;
+            next#set_enabled false ;
+            prev#set_enabled false ;
+            cancel#set_enabled false ;
+            forward#set_enabled false ;
+            status#set_text "Invalid Smoke-test" ;
+          | `Passed ->
+            icon#set_icon GuiProver.smoke_status ;
+            next#set_enabled false ;
+            prev#set_enabled false ;
+            cancel#set_enabled false ;
+            forward#set_enabled false ;
+            status#set_text "Passed Smoke Test" ;
+          | `Proved ->
+            icon#set_icon GuiProver.ok_status ;
+            next#set_enabled false ;
+            prev#set_enabled false ;
+            cancel#set_enabled false ;
+            forward#set_enabled false ;
+            status#set_text "Proved Goal" ;
+          | `Pending 0 ->
+            icon#set_icon GuiProver.ok_status ;
+            next#set_enabled false ;
+            prev#set_enabled false ;
+            forward#set_enabled false ;
+            cancel#set_enabled nofork ;
+            status#set_text "Proof Terminated" ;
+          | `Pending n ->
+            icon#set_icon GuiProver.ko_status ;
+            forward#set_enabled nofork ;
+            cancel#set_enabled nofork ;
+            self#update_pending "Pending" proof n ;
+          | `StillResist n ->
+            icon#set_icon GuiProver.smoke_status ;
+            forward#set_enabled nofork ;
+            cancel#set_enabled nofork ;
+            self#update_pending "Smoking" proof n ;
+        end
 
     method private update_tacticbar =
       match state with
       | Empty | Forking _ ->
-          self#update_provers None ;
-          self#update_tactics None ;
+        self#update_provers None ;
+        self#update_tactics None ;
       | Proof proof ->
-          let wpo = ProofEngine.head proof in
-          begin
-            self#update_provers (Some wpo) ;
-            let sequent = printer#sequent in
-            let select = printer#selection in
-            self#update_tactics (Some(proof,sequent,select)) ;
-          end
+        let wpo = ProofEngine.head proof in
+        begin
+          self#update_provers (Some wpo) ;
+          let sequent = printer#sequent in
+          let select = printer#selection in
+          self#update_tactics (Some(proof,sequent,select)) ;
+        end
       | Composer _ | Browser _ -> ()
 
     method private update_proofview =
       match state with
       | Empty -> text#clear
       | Proof _ when helpmode ->
-          begin
-            text#clear ;
-            let callback () = self#quit_help in
-            text#printf "@\n@{<bf>Available Tactics:@} %t@\n@\n"
-              (printer#button ~title:"Close" ~callback) ;
-            text#hrule ;
-            let pp_item pp fmt tac =
-              Format.fprintf fmt "[ @{<bf>%a@} ] @{<it>%s@}@\n"
-                pp tac#title tac#descr in
-            Pretty_utils.pp_items
-              ~title:(fun tac -> tac#title)
-              ~iter:Tactical.iter
-              ~pp_item text#fmt ;
-            text#hrule ;
-          end
+        begin
+          text#clear ;
+          let callback () = self#quit_help in
+          text#printf "@\n@{<bf>Available Tactics:@} %t@\n@\n"
+            (printer#button ~title:"Close" ~callback) ;
+          text#hrule ;
+          let pp_item pp fmt tac =
+            Format.fprintf fmt "[ @{<bf>%a@} ] @{<it>%s@}@\n"
+              pp tac#title tac#descr in
+          Pretty_utils.pp_items
+            ~title:(fun tac -> tac#title)
+            ~iter:Tactical.iter
+            ~pp_item text#fmt ;
+          text#hrule ;
+        end
       | Proof proof ->
-          on_proof_context proof
-            begin fun () ->
-              text#clear ;
-              let main = ProofEngine.main proof in
-              if ProofSession.exists main then
-                text#printf
-                  (if ProofEngine.saved proof
-                   then "%a (@{<green>saved@})@."
-                   else "%a (@{<orange>modified@})@.")
-                  ProofSession.pp_script_for main
-              else
-                text#printf "%a (@{<blue>not created@})@."
-                  ProofSession.pp_script_for main ;
-              text#hrule ;
-              scripter#tree proof ;
-              text#hrule ;
-              text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
-              text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
-              text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
-              text#hrule ;
-              scripter#status proof ;
-            end ()
+        on_proof_context proof
+          begin fun () ->
+            text#clear ;
+            let main = ProofEngine.main proof in
+            if ProofSession.exists main then
+              text#printf
+                (if ProofEngine.saved proof
+                 then "%a (@{<green>saved@})@."
+                 else "%a (@{<orange>modified@})@.")
+                ProofSession.pp_script_for main
+            else
+              text#printf "%a (@{<blue>not created@})@."
+                ProofSession.pp_script_for main ;
+            text#hrule ;
+            scripter#tree proof ;
+            text#hrule ;
+            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
+            text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
+            text#hrule ;
+            scripter#status proof ;
+          end ()
       | Composer(proof,cc,tgt) ->
-          on_proof_context proof
-            begin fun () ->
-              text#clear ;
-              let quit () =
-                state <- Proof proof ;
-                printer#restore tgt ;
-                self#update in
-              text#printf "%t@." (composer#print cc ~quit) ;
-              text#hrule ;
-              text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
-            end ()
+        on_proof_context proof
+          begin fun () ->
+            text#clear ;
+            let quit () =
+              state <- Proof proof ;
+              printer#restore tgt ;
+              self#update in
+            text#printf "%t@." (composer#print cc ~quit) ;
+            text#hrule ;
+            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+          end ()
       | Browser(proof,cc,tgt) ->
-          on_proof_context proof
-            begin fun () ->
-              text#clear ;
-              let quit () =
-                state <- Proof proof ;
-                printer#restore tgt ;
-                self#update in
-              text#printf "%t@." (browser#print cc ~quit) ;
-              text#hrule ;
-              text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
-            end ()
+        on_proof_context proof
+          begin fun () ->
+            text#clear ;
+            let quit () =
+              state <- Proof proof ;
+              printer#restore tgt ;
+              self#update in
+            text#printf "%t@." (browser#print cc ~quit) ;
+            text#hrule ;
+            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+          end ()
       | Forking _ -> ()
 
     method update =
@@ -601,18 +601,18 @@ class pane (gprovers : GuiConfig.provers) =
       match state with
       | Empty | Proof _ | Composer _ | Browser _ -> ()
       | Forking(proof,fork,pool) ->
-          let n = Task.size pool in
-          if n = 0 then
-            begin
-              ignore (ProofEngine.commit fork) ;
-              ProofEngine.validate proof ;
-              ProofEngine.forward proof ;
-              state <- Proof proof ;
-              printer#reset ;
-              self#update ;
-            end
-          else
-            Wutil.later self#commit
+        let n = Task.size pool in
+        if n = 0 then
+          begin
+            ignore (ProofEngine.commit fork) ;
+            ProofEngine.validate proof ;
+            ProofEngine.forward proof ;
+            state <- Proof proof ;
+            printer#reset ;
+            self#update ;
+          end
+        else
+          Wutil.later self#commit
 
     method private schedule pool provers goal =
       Prover.spawn goal
@@ -646,16 +646,16 @@ class pane (gprovers : GuiConfig.provers) =
       match state with
       | Empty | Forking _ | Composer _ | Browser _ -> ()
       | Proof proof ->
-          Wutil.later
-            begin fun () ->
-              let title = tactic#title in
-              try
-                let tactic = ProofScript.jtactic ~title tactic selection in
-                let anchor = ProofEngine.anchor proof () in
-                self#fork proof (ProofEngine.fork proof ~anchor tactic process)
-              with Exit | Not_found | Invalid_argument _ ->
-                text#printf "Application of tactic '%s' failed." title
-            end
+        Wutil.later
+          begin fun () ->
+            let title = tactic#title in
+            try
+              let tactic = ProofScript.jtactic ~title tactic selection in
+              let anchor = ProofEngine.anchor proof () in
+              self#fork proof (ProofEngine.fork proof ~anchor tactic process)
+            with Exit | Not_found | Invalid_argument _ ->
+              text#printf "Application of tactic '%s' failed." title
+          end
 
     method private search proof = function
       | None -> text#printf "No tactic found.@\n"
@@ -665,43 +665,43 @@ class pane (gprovers : GuiConfig.provers) =
       match state with
       | Empty | Forking _ | Composer _ | Browser _ -> ()
       | Proof proof ->
-          Wutil.later
-            begin fun () ->
-              if depth <= 1 then
-                let fork = ProverSearch.search proof ~sequent auto in
-                self#search proof fork
-              else
-                begin
-                  let provers = List.map (fun e -> e#prover) provers in
-                  ProverScript.search
-                    ~depth ~width ~auto
-                    ~provers
-                    ~result:
-                      (fun wpo prv res ->
-                         text#printf "[%a] %a : %a@."
-                           VCS.pp_prover prv
-                           Wpo.pp_title wpo
-                           VCS.pp_result res)
-                    ~success:
-                      (fun _ _ ->
-                         ProofEngine.forward proof ;
-                         self#update ;
-                         text#printf "Strategies Applied." )
-                    proof (ProofEngine.anchor proof ()) ;
-                  let server = ProverTask.server () in
-                  Task.launch server
-                end
-            end
+        Wutil.later
+          begin fun () ->
+            if depth <= 1 then
+              let fork = ProverSearch.search proof ~sequent auto in
+              self#search proof fork
+            else
+              begin
+                let provers = List.map (fun e -> e#prover) provers in
+                ProverScript.search
+                  ~depth ~width ~auto
+                  ~provers
+                  ~result:
+                    (fun wpo prv res ->
+                       text#printf "[%a] %a : %a@."
+                         VCS.pp_prover prv
+                         Wpo.pp_title wpo
+                         VCS.pp_result res)
+                  ~success:
+                    (fun _ _ ->
+                       ProofEngine.forward proof ;
+                       self#update ;
+                       text#printf "Strategies Applied." )
+                  proof (ProofEngine.anchor proof ()) ;
+                let server = ProverTask.server () in
+                Task.launch server
+              end
+          end
 
     method private backtrack node =
       match state with
       | Empty | Forking _ | Composer _ | Browser _ -> ()
       | Proof proof ->
-          begin
-            ProofEngine.goto proof (`Node node) ;
-            let fork =
-              ProverSearch.backtrack proof ~anchor:node ~loop:true () in
-            self#search proof fork
-          end
+        begin
+          ProofEngine.goto proof (`Node node) ;
+          let fork =
+            ProverSearch.backtrack proof ~anchor:node ~loop:true () in
+          self#search proof fork
+        end
 
   end

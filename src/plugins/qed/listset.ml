@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -62,8 +62,8 @@ struct
     let rec aux ((res,rest) as acc) = function
       | [] -> List.rev_append res rest
       | i :: resti ->
-          if f i then aux acc resti
-          else aux ((rev_append_until i rest res),resti) resti
+        if f i then aux acc resti
+        else aux ((rev_append_until i rest res),resti) resti
     in aux ([],l) l
 
   (* good sharing *)
@@ -71,8 +71,8 @@ struct
     let rec aux ((res,rest) as acc) ((res',rest') as acc') = function
       | [] -> (List.rev_append res rest), (List.rev_append res' rest')
       | i :: resti ->
-          if f i then aux acc ((rev_append_until i rest' res'),resti) resti
-          else aux ((rev_append_until i rest res),resti) acc' resti
+        if f i then aux acc ((rev_append_until i rest' res'),resti) resti
+        else aux ((rev_append_until i rest res),resti) acc' resti
     in aux ([],l) ([],l) l
 
   (* good sharing *)
@@ -80,10 +80,10 @@ struct
     let rec aux = function
       | [] -> l @ [k]
       | (k'::next) as w ->
-          let c = E.compare k k' in
-          if c < 0 then append_until k' l (k::w)
-          else if c = 0 then l
-          else (* c > 0 *) aux next
+        let c = E.compare k k' in
+        if c < 0 then append_until k' l (k::w)
+        else if c = 0 then l
+        else (* c > 0 *) aux next
     in aux l
 
   (* good sharing *)
@@ -91,18 +91,18 @@ struct
     let rec aux = function
       | [] -> l
       | (k'::next) as w ->
-          let c = E.compare k k' in
-          if c > 0 then append_until k' l w
-          else if c = 0 then append_until k' l next
-          else (* c > 0 *) aux next
+        let c = E.compare k k' in
+        if c > 0 then append_until k' l w
+        else if c = 0 then append_until k' l next
+        else (* c > 0 *) aux next
     in aux l
 
   let rec mem x = function
     | [] -> false
     | e::es ->
-        let c = E.compare x e in
-        if c < 0 then false else
-        if c > 0 then mem x es else true
+      let c = E.compare x e in
+      if c < 0 then false else
+      if c > 0 then mem x es else true
 
   let iter = List.iter
   let fold = List.fold_right
@@ -114,10 +114,10 @@ struct
       | [] , _ -> (* adding w2 *) List.rev_append res (List.append o1 w2)
       | _ , [] -> (* adding w1 *) List.rev_append res o1
       | a1::r1 , a2::r2 ->
-          let c = E.compare a1 a2 in
-          if c < 0 then (* adding a1 *) aux acc r1 w2
-          else if c = 0 then (* adding a1 *) aux acc r1 r2
-          else (* c > 0 *) (* adding a2 *) aux ((a2::(rev_append_until a1 o1 res)),w1) w1 r2
+        let c = E.compare a1 a2 in
+        if c < 0 then (* adding a1 *) aux acc r1 w2
+        else if c = 0 then (* adding a1 *) aux acc r1 r2
+        else (* c > 0 *) (* adding a2 *) aux ((a2::(rev_append_until a1 o1 res)),w1) w1 r2
     in aux ([],w1) w1 w2
 
   (* good sharing with w1 *)
@@ -127,11 +127,11 @@ struct
       | [] , _ ->    (* no addition *) List.rev_append res o1
       | a1::_, [] -> (* no addition *) List.rev_append res (List.rev (rev_append_until a1 o1 []))
       | a1::r1 , a2::r2 ->
-          let c = E.compare a1 a2 in
-          if c < 0 then (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 w2
-          else if c > 0 then (* skip a2 *) aux acc w1 r2
-          else if not (f a1) then (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 r2
-          else (* adding a1 *) aux acc r1 r2
+        let c = E.compare a1 a2 in
+        if c < 0 then (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 w2
+        else if c > 0 then (* skip a2 *) aux acc w1 r2
+        else if not (f a1) then (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 r2
+        else (* adding a1 *) aux acc r1 r2
     in aux ([],w1) w1 w2
 
   let inter = interf (fun _ -> true)
@@ -143,10 +143,10 @@ struct
       | [] , _ -> (* no addition *) List.rev_append res o1
       | _ , [] -> (* adding w1 *) List.rev_append res o1
       | a1::r1 , a2::r2 ->
-          let c = E.compare a1 a2 in
-          if c < 0 then (* adding a1 *) aux acc r1 w2
-          else if c > 0 then (* skip *) aux acc w1 r2
-          else (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 r2
+        let c = E.compare a1 a2 in
+        if c < 0 then (* adding a1 *) aux acc r1 w2
+        else if c > 0 then (* skip *) aux acc w1 r2
+        else (* remove a1 *) aux ((rev_append_until a1 o1 res),r1) r1 r2
     in aux ([],w1) w1 w2
 
   let rec subsetf f xs ys =
@@ -154,10 +154,10 @@ struct
     | [] , _ -> true
     | _::_ , [] -> false
     | (x::xtail) , (y::ytail) ->
-        let c = E.compare x y in
-        if c < 0 then false else
-        if c > 0 then subsetf f xs ytail else
-          (f x && subsetf f xtail ytail)
+      let c = E.compare x y in
+      if c < 0 then false else
+      if c > 0 then subsetf f xs ytail else
+        (f x && subsetf f xtail ytail)
 
   let subset = subsetf (fun _ -> true)
 
@@ -165,21 +165,21 @@ struct
     match xs , ys with
     | [] , _ | _ , [] -> false
     | (x::xtail) , (y::ytail) ->
-        let c = E.compare x y in
-        if c < 0 then intersectf f xtail ys else
-        if c > 0 then intersectf f xs ytail else
-          f x
+      let c = E.compare x y in
+      if c < 0 then intersectf f xtail ys else
+      if c > 0 then intersectf f xs ytail else
+        f x
   let intersect = intersectf (fun _ -> true)
 
   let rec fact rxs cxs rys xs ys =
     match xs , ys with
     | [] , _ | _ , [] ->
-        List.rev_append rxs xs , List.rev cxs , List.rev_append rys ys
+      List.rev_append rxs xs , List.rev cxs , List.rev_append rys ys
     | x::xtail , y::ytail ->
-        let c = E.compare x y in
-        if c < 0 then fact (x::rxs) cxs rys xtail ys else
-        if c > 0 then fact rxs cxs (y::rys) xs ytail else
-          fact rxs (x::cxs) rys xtail ytail
+      let c = E.compare x y in
+      if c < 0 then fact (x::rxs) cxs rys xtail ys else
+      if c > 0 then fact rxs cxs (y::rys) xs ytail else
+        fact rxs (x::cxs) rys xtail ytail
 
   let factorize xs ys = fact [] [] [] xs ys
 

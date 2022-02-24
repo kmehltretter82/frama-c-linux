@@ -24,16 +24,6 @@ open Cil_types
 
 (** Generate C implementations of E-ACSL predicates. *)
 
-val to_exp:
-  adata:Assert.t ->
-  ?name:string ->
-  kernel_function ->
-  ?rte:bool ->
-  Env.t ->
-  predicate ->
-  exp * Assert.t * Env.t
-(** Convert an ACSL predicate into a corresponding C expression. *)
-
 val generalized_untyped_to_exp:
   adata:Assert.t ->
   ?name:string ->

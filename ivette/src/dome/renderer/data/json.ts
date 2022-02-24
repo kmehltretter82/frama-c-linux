@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/no-explicit-any, no-console */
+
 // --------------------------------------------------------------------------
 // --- JSON Utilities
 // --------------------------------------------------------------------------
@@ -31,8 +33,6 @@
 */
 
 import { DEVEL } from 'dome/system';
-
-/* eslint-disable @typescript-eslint/naming-convention, no-shadow */
 
 export type json =
   undefined | null | boolean | number | string |
@@ -62,14 +62,14 @@ export function parse(text: string, noError = false): json {
 /**
    Export JSON (or any data) as a compact string.
 */
-export function stringify(js: any) {
+export function stringify(js: any): string {
   return JSON.stringify(js, undefined, 0);
 }
 
 /**
    Export JSON (or any data) as a string with indentation.
  */
-export function pretty(js: any) {
+export function pretty(js: any): string {
   return JSON.stringify(js, undefined, 2);
 }
 
@@ -104,8 +104,9 @@ export function identity<A>(v: A): A { return v; }
 // --- Primitives
 // --------------------------------------------------------------------------
 
-/** Always returns `undefined` on any input. */
-export const jNull: Safe<undefined> = () => undefined;
+/** 'null' or 'undefined'. */
+export const jNull: Loose<null> = (js: json) =>
+  js === null ? null : undefined;
 
 /** Identity. */
 export const jAny: Safe<json> = (js: json) => js;
@@ -453,6 +454,7 @@ export function eObject<A>(fp: EProps<A>): Encoder<A> {
 }
 
 // Intentionnaly internal and only declared
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const tag: unique symbol;
 
 /** Phantom type. */

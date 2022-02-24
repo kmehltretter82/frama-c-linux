@@ -72,7 +72,7 @@ let main () =
   );
   Project.on p (fun () ->
       Dynamic.Parameter.Bool.set "-eva-show-progress" true;
-      !Db.Value.compute ()
+      Eva.Analysis.compute ()
     ) ();
   File.pretty_ast ~prj:p ()
 

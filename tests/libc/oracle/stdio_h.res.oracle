@@ -125,8 +125,8 @@
   function fsetpos: precondition 'initialization,pos' got status valid.
 [eva] Done for function fsetpos
 [eva] computing for function fclose <- main.
-  Called from stdio_h.c:49.
-[eva] stdio_h.c:49: 
+  Called from stdio_h.c:48.
+[eva] stdio_h.c:48: 
   function fclose: precondition 'valid_stream' got status valid.
 [eva] Done for function fclose
 [eva] computing for function asprintf <- main.
@@ -135,7 +135,7 @@
 [eva:libc:unsupported-spec] stdio_h.c:52: Warning: 
   The specification of function 'asprintf' is currently not supported by Eva.
   Consider adding 'FRAMAC_SHARE/libc/stdio.c' to the analyzed source files.
-[eva] stdio_h.c:52: Warning: ignoring unsupported \allocates clause
+[eva] stdio_h.c:52: Warning: ignoring unsupported allocates clause
 [eva] stdio_h.c:52: 
   function asprintf: precondition 'valid_strp' got status valid.
 [eva] stdio_h.c:52: 
@@ -151,6 +151,18 @@
 [eva] stdio_h.c:54: 
   function printf_va_2: no state left, precondition valid_read_string(format) got status valid.
 [eva] Done for function printf_va_2
+[eva] computing for function fmemopen <- main.
+  Called from stdio_h.c:58.
+[eva] using specification for function fmemopen
+[eva:libc:unsupported-spec] stdio_h.c:58: Warning: 
+  The specification of function 'fmemopen' is currently not supported by Eva.
+  Consider adding 'FRAMAC_SHARE/libc/stdio.c' to the analyzed source files.
+[eva] stdio_h.c:58: Warning: ignoring unsupported allocates clause
+[eva] stdio_h.c:58: 
+  function fmemopen: precondition 'valid_or_null_buff' got status valid.
+[eva] stdio_h.c:58: 
+  function fmemopen: precondition 'valid_mode' got status valid.
+[eva] Done for function fmemopen
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -169,6 +181,5 @@
   fgets_res ∈ {{ NULL ; &fgets_buf0[0] }}
   pos ∈ [--..--] or UNINITIALIZED
   res_fclose ∈ {-1; 0}
-  s ∈ [--..--] or UNINITIALIZED
-  __retres ∈ {1; 2; 3}
+  __retres ∈ {0; 1; 2; 3}
   S___fc_stdout[0..1] ∈ [--..--]

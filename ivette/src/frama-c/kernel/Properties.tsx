@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -19,6 +19,8 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 // --------------------------------------------------------------------------
 // --- Properties
@@ -42,10 +44,10 @@ import { Scroll, Folder } from 'dome/layout/boxes';
 
 import { RSplit } from 'dome/layout/splitters';
 
-import * as Ast from 'frama-c/api/kernel/ast';
-import { statusData } from 'frama-c/api/kernel/properties';
-import * as Properties from 'frama-c/api/kernel/properties';
-import * as Eva from 'frama-c/api/plugins/eva/general';
+import * as Ast from 'frama-c/kernel/api/ast';
+import { statusData } from 'frama-c/kernel/api/properties';
+import * as Properties from 'frama-c/kernel/api/properties';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 
 type Property = statusData & Eva.propertiesData;
 
@@ -224,9 +226,9 @@ function filterEva(p: Property) {
 
 function filterProperty(p: Property) {
   return filterStatus(p.status)
-      && filterKind(p.kind)
-      && filterAlarm(p.alarm)
-      && filterEva(p);
+    && filterKind(p.kind)
+    && filterAlarm(p.alarm)
+    && filterEva(p);
 }
 
 // --------------------------------------------------------------------------
@@ -258,7 +260,7 @@ const renderFile: Renderer<Ast.source> =
 const renderPriority: Renderer<boolean> =
   (prio: boolean) => (prio ? <Icon id="ATTENTION" /> : null);
 
-const renderTaint: Renderer<any> =
+const renderTaint: Renderer<States.Tag> =
   (taint: States.Tag) => {
     let id = null;
     let color = 'black';
@@ -335,7 +337,8 @@ const byColumn: Arrays.ByColumns<Property> = {
   file: Compare.byFields<Property>({ source: byFile }),
 };
 
-class PropertyModel extends Arrays.CompactModel<Json.key<'#status'>, Property> {
+class PropertyModel
+  extends Arrays.CompactModel<Json.key<'#property'>, Property> {
 
   private filterFun?: string;
 

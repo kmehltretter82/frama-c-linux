@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -65,7 +65,7 @@ let () =
 
 let warning warn s =
   if warn then
-    Value_parameters.result ~current:true ~once:true s
+    Self.result ~current:true ~once:true s
   else
     Pretty_utils.nullprintf s
 
@@ -182,13 +182,13 @@ let aux_split f state = function
         in
         f ~warn:true lv state max_card
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
-        Value_parameters.warning ~current:true ~once:true
+        Self.warning ~current:true ~once:true
           "Cannot use non-constant split level %a" V.pretty card;
         [state]
     in
     Builtins.States states
   | _ ->
-    Value_parameters.warning ~current:true ~once:true
+    Self.warning ~current:true ~once:true
       "Cannot interpret split directive. Ignoring";
     Builtins.States [state]
 

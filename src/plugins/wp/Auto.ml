@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -124,9 +124,9 @@ struct
   let update merge x v ofs map =
     match Repr.term v with
     | Int v ->
-        let v0 = Integer.add v ofs in
-        let v1 = try merge v0 (Tmap.find x map) with Not_found -> v0 in
-        Tmap.add x v1 map
+      let v0 = Integer.add v ofs in
+      let v1 = try merge v0 (Tmap.find x map) with Not_found -> v0 in
+      Tmap.add x v1 map
     | _ -> map
 
   type rg = {
@@ -144,11 +144,11 @@ struct
     match Repr.term p with
     | And ps -> List.iter (add_bound rg) ps
     | Lt(a,b) when Lang.F.is_int a && Lang.F.is_int b ->
-        set_vmax rg a b Integer.minus_one ;
-        set_vmin rg b a Integer.one ;
+      set_vmax rg a b Integer.minus_one ;
+      set_vmin rg b a Integer.one ;
     | Leq(a,b) when Lang.F.is_int a && Lang.F.is_int b ->
-        set_vmax rg a b Integer.zero ;
-        set_vmin rg b a Integer.zero ;
+      set_vmax rg a b Integer.zero ;
+      set_vmin rg b a Integer.zero ;
     | _ -> ()
 
   let compute hs =
@@ -222,7 +222,7 @@ class autosplit =
             | Bind (Exists,_,phi) -> is_split (F.repr (F.QED.lc_repr phi))
             | And _ | Or _ | If _ | Imply _ -> true
             | _ -> false
-            in is_split (F.repr (F.QED.lc_repr phi))
+          in is_split (F.repr (F.QED.lc_repr phi))
         | Neq(x,y) | Eq(x,y) -> (F.is_prop x) && (F.is_prop y)
         | _ -> false
       in
@@ -238,12 +238,12 @@ class autosplit =
            let open Conditions in
            match s.condition with
            | Branch(_,sa,sb) ->
-               let priority =
-                 if F.Vars.intersect target (Conditions.vars_hyp sa) ||
-                    F.Vars.intersect target (Conditions.vars_hyp sb)
-                 then 1.0 else 0.5 in
-               let selection = Tactical.(Clause(Step s)) in
-               push (split ~priority selection)
+             let priority =
+               if F.Vars.intersect target (Conditions.vars_hyp sa) ||
+                  F.Vars.intersect target (Conditions.vars_hyp sb)
+               then 1.0 else 0.5 in
+             let selection = Tactical.(Clause(Step s)) in
+             push (split ~priority selection)
            | _ -> ()
         ) (fst seq)
 

@@ -3,7 +3,7 @@
  (public_name frama-c-security_slicing.core)
   (modules security_slicing_parameters components)
   (flags -open Frama_c_kernel)
-  (libraries frama-c.kernel)
+  (libraries frama-c.kernel frama-c-eva.core)
 )
 
 (plugin (optional) (name security_slicing) (libraries frama-c-security_slicing.core) (site (frama-c plugins)))

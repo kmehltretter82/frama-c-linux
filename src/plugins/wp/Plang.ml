@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -131,19 +131,19 @@ class engine =
       | Q.MINF -> Format.pp_print_string fmt "(-1/.0)"
       | Q.UNDEF -> Format.pp_print_string fmt "(.0/.0)"
       | Q.NZERO ->
-          match rformat with
-          | `Ratio ->
-              let { Q.num = num ; Q.den = den } = q in
-              if Z.equal den Z.one then
-                Format.fprintf fmt "%s.0" (Z.to_string num)
-              else
-                Format.fprintf fmt "(%s.0/%s)"
-                  (Z.to_string num)
-                  (Z.to_string den)
-          | `Float ->
-              Format.fprintf fmt "%sf" (Cfloat.float_lit Ctypes.Float32 q)
-          | `Double ->
-              Format.fprintf fmt "%sd" (Cfloat.float_lit Ctypes.Float64 q)
+        match rformat with
+        | `Ratio ->
+          let { Q.num = num ; Q.den = den } = q in
+          if Z.equal den Z.one then
+            Format.fprintf fmt "%s.0" (Z.to_string num)
+          else
+            Format.fprintf fmt "(%s.0/%s)"
+              (Z.to_string num)
+              (Z.to_string den)
+        | `Float ->
+          Format.fprintf fmt "%sf" (Cfloat.float_lit Ctypes.Float32 q)
+        | `Double ->
+          Format.fprintf fmt "%sd" (Cfloat.float_lit Ctypes.Float64 q)
 
     (* --- Atomicity --- *)
 
@@ -216,15 +216,15 @@ class engine =
           (fun i (f,v) ->
              ( match i , base with
                | (Isingle | Ifirst) , Some r ->
-                   fprintf fmt "@ %a with" self#pp_flow r
+                 fprintf fmt "@ %a with" self#pp_flow r
                | _ -> () ) ;
              ( match i with
                | Ifirst | Imiddle ->
-                   fprintf fmt "@ @[<hov 2>%s = %a ;@]"
-                     (self#field f) self#pp_flow v
+                 fprintf fmt "@ @[<hov 2>%s = %a ;@]"
+                   (self#field f) self#pp_flow v
                | Isingle | Ilast ->
-                   fprintf fmt "@ @[<hov 2>%s = %a@]"
-                     (self#field f) self#pp_flow v )
+                 fprintf fmt "@ @[<hov 2>%s = %a@]"
+                   (self#field f) self#pp_flow v )
           ) fvs ;
         fprintf fmt "@ }@]" ;
       end
@@ -252,16 +252,16 @@ class engine =
     method pp_forall tau fmt = function
       | [] -> ()
       | x::xs ->
-          fprintf fmt "@[<hov 2>forall %a" self#pp_var x ;
-          List.iter (fun x -> fprintf fmt ",@,%a" self#pp_var x) xs ;
-          fprintf fmt "@ : %a.@]" self#pp_tau tau ;
+        fprintf fmt "@[<hov 2>forall %a" self#pp_var x ;
+        List.iter (fun x -> fprintf fmt ",@,%a" self#pp_var x) xs ;
+        fprintf fmt "@ : %a.@]" self#pp_tau tau ;
 
     method pp_exists tau fmt = function
       | [] -> ()
       | x::xs ->
-          fprintf fmt "@[<hov 2>exists %a" self#pp_var x ;
-          List.iter (fun x -> fprintf fmt ",@,%a" self#pp_var x) xs ;
-          fprintf fmt "@ : %a.@]" self#pp_tau tau ;
+        fprintf fmt "@[<hov 2>exists %a" self#pp_var x ;
+        List.iter (fun x -> fprintf fmt ",@,%a" self#pp_var x) xs ;
+        fprintf fmt "@ : %a.@]" self#pp_tau tau ;
 
     method pp_let fmt _ x e =
       fprintf fmt "@[<hov 4>let %s = %a in@]@ " x self#pp_flow e

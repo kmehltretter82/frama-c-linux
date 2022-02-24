@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -266,14 +266,10 @@ module Value = struct
 
   let globals_use_supplied_state () = not (VGlobals.get_option () = None)
 
-  (* Do NOT add dependencies to Kernel parameters here, but at the top of
-     Value/Value_parameters *)
-  let dependencies =
-    [ Ast.self;
-      Alarms.self;
-      Annotations.code_annot_state;
-      FunArgs.self;
-      VGlobals.self ]
+  let dependencies = [ FunArgs.self; VGlobals.self ]
+  let proxy = State_builder.Proxy.(create "eva_db" Forward dependencies)
+  let self = State_builder.Proxy.get proxy
+  let only_self = [ self ]
 
   let size = 256
 
@@ -285,14 +281,14 @@ module Value = struct
       (struct
         let name = "Db.Value.Table_By_Callstack"
         let size = size
-        let dependencies = dependencies
+        let dependencies = [ self ]
       end)
   module Table =
     Cil_state_builder.Stmt_hashtbl(Cvalue.Model)
       (struct
         let name = "Db.Value.Table"
         let size = size
-        let dependencies = [ Table_By_Callstack.self ]
+        let dependencies = [ self ]
       end)
   (* Clear Value's various caches each time [Db.Value.is_computed] is updated,
      including when it is set, reset, or during project change. Some operations
@@ -308,25 +304,20 @@ module Value = struct
          Function_Froms.Memory.clear_caches ();
       )
 
-
   module AfterTable_By_Callstack =
     Cil_state_builder.Stmt_hashtbl(States_by_callstack)
       (struct
         let name = "Db.Value.AfterTable_By_Callstack"
         let size = size
-        let dependencies = [ Table_By_Callstack.self ]
+        let dependencies = [ self ]
       end)
   module AfterTable =
     Cil_state_builder.Stmt_hashtbl(Cvalue.Model)
       (struct
         let name = "Db.Value.AfterTable"
         let size = size
-        let dependencies = [ AfterTable_By_Callstack.self ]
+        let dependencies = [ self ]
       end)
-
-
-  let self = Table_By_Callstack.self
-  let only_self = [ self ]
 
   let mark_as_computed =
     Journal.register "Db.Value.mark_as_computed"

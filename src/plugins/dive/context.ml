@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -51,7 +51,7 @@ type t = {
 (* --- initialization --- *)
 
 let create () =
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   {
     graph = Graph.create ();
     vertex_table = Index.create 13;

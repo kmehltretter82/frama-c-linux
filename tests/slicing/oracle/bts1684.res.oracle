@@ -59,4 +59,3 @@ int main(void)
 
 
 [kernel] Parsing ocode_0_bts1684.i (no preprocessing)
-[kernel] writing journal in file `frama_c_journal.ml'.

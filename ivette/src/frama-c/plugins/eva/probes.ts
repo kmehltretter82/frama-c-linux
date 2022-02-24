@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -26,8 +26,8 @@
 
 // Frama-C
 import * as Server from 'frama-c/server';
-import * as Values from 'frama-c/api/plugins/eva/values';
-import * as Ast from 'frama-c/api/kernel/ast';
+import * as Values from 'frama-c/plugins/eva/api/values';
+import * as Ast from 'frama-c/kernel/api/ast';
 
 // Model
 import { ModelCallbacks } from './cells';
@@ -42,7 +42,7 @@ const LabelSize = 12;
 let La = Ka;
 let Lk = 0;
 
-function newLabel() {
+function newLabel(): string {
   const a = La;
   const k = Lk;
   const lbl = String.fromCharCode(a);
@@ -87,7 +87,7 @@ export class Probe {
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
   }
 
-  requestProbeInfo() {
+  requestProbeInfo(): void {
     this.loading = true;
     this.label = '…';
     Server
@@ -121,17 +121,17 @@ export class Probe {
   // --- Internal State
   // --------------------------------------------------------------------------
 
-  setPersistent() { this.updateTransient(false); }
-  setTransient() { this.updateTransient(true); }
+  setPersistent(): void { this.updateTransient(false); }
+  setTransient(): void { this.updateTransient(true); }
 
-  private updateTransient(tr: boolean) {
+  private updateTransient(tr: boolean): void {
     if (this.transient !== tr) {
       this.transient = tr;
       this.model.forceLayout();
     }
   }
 
-  setZoomed(zoomed: boolean) {
+  setZoomed(zoomed: boolean): void {
     if (zoomed !== this.zoomed) {
       this.zoomed = zoomed;
       this.model.forceLayout();

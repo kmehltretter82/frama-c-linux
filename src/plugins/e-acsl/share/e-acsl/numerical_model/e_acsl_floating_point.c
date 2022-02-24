@@ -59,10 +59,10 @@ void eacsl_floating_point_exception(const char *exp) {
       resp = "Floating-point underflow";
   }
   if (resp) {
-    rtl_printf(
+    rtl_eprintf(
         "Execution of the statement `%s` leads to a floating point exception\n",
         exp);
-    rtl_printf("Exception:  %s\n", resp);
+    rtl_eprintf("Exception:  %s\n", resp);
   }
   feclearexcept(FE_ALL_EXCEPT);
 }

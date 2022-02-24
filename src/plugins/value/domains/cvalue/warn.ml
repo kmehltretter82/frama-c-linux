@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,14 +27,14 @@ let warn_locals_escape is_block fundec k locals =
   let pretty_base = Base.pretty in
   let pretty_block fmt = Pretty_utils.pp_cond is_block fmt "a block of " in
   let sv = fundec.svar in
-  Value_parameters.warning
-    ~wkey:Value_parameters.wkey_locals_escaping
+  Self.warning
+    ~wkey:Self.wkey_locals_escaping
     ~current:true ~once:true
     "locals %a escaping the scope of %t%a through %a"
     Base.Hptset.pretty locals pretty_block Printer.pp_varinfo sv pretty_base k
 
 let warn_imprecise_lval_read lv loc contents =
-  if Value_parameters.verbose_atleast 1 then
+  if Self.verbose_atleast 1 then
     let pretty_gm fmt s =
       let s = Base.SetLattice.(inject (O.remove Base.null s)) in
       Base.SetLattice.pretty fmt s
@@ -62,7 +62,7 @@ let warn_imprecise_lval_read lv loc contents =
     in
     if something_to_warn
     then
-      Value_parameters.result ~current:true ~once:true
+      Self.result ~current:true ~once:true
         "@[<v>@[Reading left-value %a.@]@ %t%t%t@]"
         Printer.pp_lval lv
         (fun fmt ->
@@ -91,7 +91,7 @@ let warn_imprecise_lval_read lv loc contents =
                pretty_param_b param
                Origin.pretty orig
            | Location_Bytes.Map _ -> ())
-        Value_util.pp_callstack
+        Eva_utils.pp_callstack
 
 (* Auxiliary function for [do_assign] below. When computing the
    result of [lv = exp], warn if the evaluation of [exp] results in
@@ -100,7 +100,7 @@ let warn_imprecise_lval_read lv loc contents =
 let warn_right_exp_imprecision lv loc_lv exp_val =
   match exp_val with
   | Location_Bytes.Top(_topparam,origin) ->
-    Value_parameters.result ~once:true ~current:true
+    Self.result ~once:true ~current:true
       "@[<v>@[Assigning imprecise value to %a%t.@]%a%t@]"
       Printer.pp_lval lv
       (fun fmt -> match lv with
@@ -114,7 +114,7 @@ let warn_right_exp_imprecision lv loc_lv exp_val =
              "@ @[The imprecision@ originates@ from@ %a@]"
              Origin.pretty org)
       origin
-      Value_util.pp_callstack
+      Eva_utils.pp_callstack
   | Location_Bytes.Map _ -> ()
 
 

@@ -175,7 +175,7 @@ let main () =
       ~select_annot:false
       ~select_slice_pragma:false
    in
-   Project.on p !Db.Value.compute ()
+   Project.on p Eva.Analysis.compute ()
 \end{ocamlcode}
   \end{itemize}
 

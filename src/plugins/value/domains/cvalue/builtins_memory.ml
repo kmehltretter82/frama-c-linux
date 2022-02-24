@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,7 +28,7 @@ open Locations
 let register_builtin name ?replace builtin =
   Builtins.register_builtin name ?replace Cacheable builtin
 
-let dkey = Value_parameters.register_category "imprecision"
+let dkey = Self.register_category "imprecision"
 
 let frama_C_is_base_aligned _state = function
   | [_, x; _, y] ->
@@ -58,7 +58,7 @@ let frama_c_offset _state = function
         let offsets = Location_Bytes.fold_i (fun _b -> Ival.join) x acc in
         Cvalue.V.inject_ival offsets
       with Abstract_interp.Error_Top ->
-        Value_parameters.error ~current:true
+        Self.error ~current:true
           "Builtin Frama_C_offset is applied to a value not \
            guaranteed to be an address";
         Cvalue.V.top_int
@@ -75,7 +75,7 @@ exception Indeterminate of V_Or_Uninitialized.t
 (*  Called by the [memcpy] builtin. Warns when the offsetmap contains
     an indeterminate value, when the imprecision category is enabled *)
 let memcpy_check_indeterminate_offsetmap offsm =
-  if Value_parameters.is_debug_key_enabled dkey then
+  if Self.is_debug_key_enabled dkey then
     try
       let aux_offset _ (v, _, _) =
         match v with
@@ -84,15 +84,15 @@ let memcpy_check_indeterminate_offsetmap offsm =
       in
       V_Offsetmap.iter aux_offset offsm
     with Indeterminate v ->
-      Value_parameters.debug ~current:true ~dkey ~once:true
+      Self.debug ~current:true ~dkey ~once:true
         "@[In memcpy@ builtin:@ precise@ copy of@ indeterminate@ values %a@]%t"
-        V_Or_Uninitialized.pretty v Value_util.pp_callstack
+        V_Or_Uninitialized.pretty v Eva_utils.pp_callstack
 
 (* Create a dependency [\from arg_n] where n is the nth argument of the
    currently called function. *)
 let deps_nth_arg n =
   let open Function_Froms in
-  let (kf,_) = List.hd (Value_util.call_stack()) in
+  let (kf,_) = List.hd (Eva_utils.call_stack()) in
   try
     let vi = List.nth (Kernel_function.get_formals kf) n in
     Deps.add_data_dep Deps.bottom (Locations.zone_of_varinfo vi)
@@ -101,7 +101,7 @@ let deps_nth_arg n =
 
 let frama_c_memcpy state actuals =
   let compute (_exp_dst,dst_bytes) (_exp_src,src_bytes) (_exp_size,size) =
-    let plevel = Value_parameters.ArrayPrecisionLevel.get() in
+    let plevel = Parameters.ArrayPrecisionLevel.get() in
     let size =
       try Cvalue.V.project_ival size
       with Cvalue.V.Not_based_on_null -> Ival.top (* TODO: use size_t *)
@@ -229,7 +229,7 @@ let frama_c_memcpy state actuals =
         raise (Memcpy_result (state,c_from,sure_zone))
       with
       | Abstract_interp.Not_less_than ->
-        Value_parameters.debug ~dkey ~once:true
+        Self.debug ~dkey ~once:true
           ~current:true "In memcpy builtin: too many sizes to enumerate, \
                          possible loss of precision";
         (* Too many slices in the size. We read the entire range
@@ -240,9 +240,9 @@ let frama_c_memcpy state actuals =
         in
         begin match v with
           | V_Or_Uninitialized.C_init_noesc _ -> ()
-          | _ -> Value_parameters.result ~dkey ~current:true ~once:true
+          | _ -> Self.result ~dkey ~current:true ~once:true
                    "@[In memcpy@ builtin:@ imprecise@ copy of@ indeterminate@ values@]%t"
-                   Value_util.pp_callstack
+                   Eva_utils.pp_callstack
         end;
         let updated_state =
           Cvalue.Model.add_indeterminate_binding
@@ -600,10 +600,10 @@ let frama_c_memset state actuals =
       in
       try frama_c_memset_precise state dst v (exp_size, size)
       with ImpreciseMemset reason ->
-        Value_parameters.debug ~dkey ~current:true
+        Self.debug ~dkey ~current:true
           "Call to builtin precise_memset(%a) failed; %a%t"
-          Value_util.pretty_actuals actuals pretty_imprecise_memset_reason reason
-          Value_util.pp_callstack;
+          Eva_utils.pretty_actuals actuals pretty_imprecise_memset_reason reason
+          Eva_utils.pp_callstack;
         frama_c_memset_imprecise state dst v size
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 3)
@@ -627,9 +627,9 @@ let frama_c_interval_split _state actuals =
       with
       | Cvalue.V.Not_based_on_null
       | Ival.Not_Singleton_Int ->
-        Value_parameters.abort
+        Self.abort
           "Invalid call to Frama_C_interval_split%a"
-          Value_util.pretty_actuals actuals
+          Eva_utils.pretty_actuals actuals
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 2)
 

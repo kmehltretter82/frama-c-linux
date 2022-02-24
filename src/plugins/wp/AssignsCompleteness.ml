@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -128,30 +128,30 @@ let check_assigns kf assigns =
     in
     let vfrom acc = function
       | t, FromAny when Logic_typing.is_pointer_type t.it_content.term_type ->
-          incomplete acc
-            begin fun _kf ->
-              Wp_parameters.warning ~wkey:wkey_pedantic
-                ~once:true ~source:(fst t.it_content.term_loc)
-                "No \\from specification for assigned pointer '%a'.@ \
-                 Callers assumptions might be imprecise."
-                Cil_printer.pp_identified_term t
-            end
+        incomplete acc
+          begin fun _kf ->
+            Wp_parameters.warning ~wkey:wkey_pedantic
+              ~once:true ~source:(fst t.it_content.term_loc)
+              "No \\from specification for assigned pointer '%a'.@ \
+               Callers assumptions might be imprecise."
+              Cil_printer.pp_identified_term t
+          end
       | _ -> acc
     in List.fold_left vfrom acc froms
   in
   match assigns with
   | Error l ->
-      false,
-      begin fun kf ->
-        Wp_parameters.warning ~wkey:wkey_pedantic
-          ~once:true ~source:(fst (Kernel_function.get_location kf))
-          "No 'assigns' specification for function '%a'.@\n%a\
-           Callers assumptions might be imprecise."
-          Kernel_function.pretty kf
-          pretty_behaviors_errors l
-      end
+    false,
+    begin fun kf ->
+      Wp_parameters.warning ~wkey:wkey_pedantic
+        ~once:true ~source:(fst (Kernel_function.get_location kf))
+        "No 'assigns' specification for function '%a'.@\n%a\
+         Callers assumptions might be imprecise."
+        Kernel_function.pretty kf
+        pretty_behaviors_errors l
+    end
   | Ok l ->
-      List.fold_left vassigns complete l
+    List.fold_left vassigns complete l
 
 let memo_compute kf =
   Completeness.memo (fun kf -> check_assigns kf (collect_assigns kf)) kf

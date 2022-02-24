@@ -5,7 +5,7 @@
     metrics_cabs metrics_cilast metrics_coverage
     register)
   (flags -open Frama_c_kernel)
-  (libraries frama-c.kernel frama-c-eva.core)
+  (libraries frama-c.kernel frama-c-eva.core frama-c-server.core)
 )
 
 (plugin (optional) (name metrics) (libraries frama-c-metrics.core) (site (frama-c plugins)))

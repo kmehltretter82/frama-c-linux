@@ -2,7 +2,7 @@
   (name Constant_Propagation)
   (public_name frama-c-constant_propagation.core)
   (flags -open Frama_c_kernel)
-  (libraries frama-c.kernel)
+  (libraries frama-c.kernel frama-c-eva.core)
 )
 
 (plugin (optional) (name constant_propagation) (libraries frama-c-constant_propagation.core) (site (frama-c plugins)))

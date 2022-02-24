@@ -14,6 +14,7 @@
   Prove: (is_uint16 us_0) -> ((us_0 mod 256)=(land 255 us_0))
   
   ------------------------------------------------------------
+[wp] [Script] Goal typed_check_lemma_and_modulo_us_255 : Valid
 [wp:script:allgoals] 
   typed_check_lemma_and_modulo_u subgoal:
   
@@ -32,28 +33,11 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  typed_check_lemma_and_modulo_us_255 subgoal:
-  
-  Goal Wp.Tactical.typed_check_lemma_and_modulo_us_255-0 (generated):
-  Assume { Have: is_uint16(us_0). }
-  Prove: 0 <= us_0.
-  
-  ------------------------------------------------------------
-[wp] [Script] Goal typed_check_lemma_and_modulo_us_255 : Valid
-[wp:script:allgoals] 
-  typed_check_lemma_and_modulo_us_255 subgoal:
-  
-  Goal Wp.Tactical.typed_check_lemma_and_modulo_us_255-1 (generated):
-  Prove: true.
-  Prover Qed returns Valid
-  
-  ------------------------------------------------------------
-[wp:script:allgoals] 
   typed_check_lemma_and_modulo_u subgoal:
   
   Goal Wp.Tactical.typed_check_lemma_and_modulo_u-2 (generated):
-  Assume { Have: 0 <= shift_0. Have: shift_0 <= 31. Have: is_uint32(us_0). }
-  Prove: 0 <= us_0.
+  Prove: true.
+  Prover Qed returns Valid
   
   ------------------------------------------------------------
 [wp:script:allgoals] 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -467,8 +467,8 @@ module type S = sig
   include Reuse with type t := t
 
   (** Category for the messages about the domain.
-      Must be created through {!Value_parameters.register_category}. *)
-  val log_category : Value_parameters.category
+      Must be created through {!Self.register_category}. *)
+  val log_category : Self.category
 
   (** This function is called after the analysis. The argument is the state
       computed at the return statement of the main function. The function can

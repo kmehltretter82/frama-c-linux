@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -208,6 +208,10 @@ module ReturnUsage = struct
 
     method result () =
       summarize_by_lv usage
+
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
 
   (* For functions returning pointers, add a split on NULL/non-NULL *)
@@ -223,7 +227,7 @@ module ReturnUsage = struct
 
   let compute file =
     let vis = new visitorVarUsage in
-    Visitor.visitFramacFileSameGlobals (vis:> Visitor.frama_c_visitor) file;
+    Visitor.visitFramacFileFunctions (vis:> Visitor.frama_c_visitor) file;
     let split_compared = vis#result () in
     let split_null_pointers = add_null_pointers_split split_compared in
     split_null_pointers
@@ -258,8 +262,8 @@ let find_auto_strategy kf =
 module KfStrategy = Kernel_function.Make_Table(Split_strategy)
     (struct
       let size = 17
-      let dependencies = [Value_parameters.SplitReturnFunction.self;
-                          Value_parameters.SplitGlobalStrategy.self;
+      let dependencies = [Parameters.SplitReturnFunction.self;
+                          Parameters.SplitGlobalStrategy.self;
                           AutoStrategy.self]
       let name = "Value.Split_return.Kfstrategy"
     end)
@@ -269,11 +273,11 @@ let kf_strategy =
   KfStrategy.memo
     (fun kf ->
        try (* User strategies take precedence *)
-         match Value_parameters.SplitReturnFunction.find kf with
+         match Parameters.SplitReturnFunction.find kf with
          | Split_strategy.SplitAuto -> find_auto_strategy kf
          | s -> s
        with Not_found ->
-       match Value_parameters.SplitGlobalStrategy.get () with
+       match Parameters.SplitGlobalStrategy.get () with
        | Split_strategy.SplitAuto -> find_auto_strategy kf
        | s -> s
     )
@@ -297,16 +301,16 @@ let pretty_strategies fmt =
     | Some SplitAuto -> pp_one "auto" (pp_kf kf) (kf_strategy kf)
     | Some s -> pp_one "user" (pp_kf kf) s
   in
-  Value_parameters.SplitReturnFunction.iter pp_user;
-  if not (Value_parameters.SplitReturnFunction.is_empty ()) &&
-     match Value_parameters.SplitGlobalStrategy.get () with
+  Parameters.SplitReturnFunction.iter pp_user;
+  if not (Parameters.SplitReturnFunction.is_empty ()) &&
+     match Parameters.SplitGlobalStrategy.get () with
      | Split_strategy.NoSplit | Split_strategy.SplitAuto -> false
      | _ -> true
   then Format.fprintf fmt "@[other functions:@]@ ";
-  begin match Value_parameters.SplitGlobalStrategy.get () with
+  begin match Parameters.SplitGlobalStrategy.get () with
     | SplitAuto ->
       let pp_auto kf s =
-        if not (Value_parameters.SplitReturnFunction.mem kf) then
+        if not (Parameters.SplitReturnFunction.mem kf) then
           let s = SplitEqList (Datatype.Integer.Set.elements s) in
           pp_one "auto" (pp_kf kf) s
       in
@@ -317,10 +321,10 @@ let pretty_strategies fmt =
   Format.fprintf fmt "@]"
 
 let pretty_strategies () =
-  if not (Value_parameters.SplitReturnFunction.is_empty ()) ||
-     (Value_parameters.SplitGlobalStrategy.get () != Split_strategy.NoSplit)
+  if not (Parameters.SplitReturnFunction.is_empty ()) ||
+     (Parameters.SplitGlobalStrategy.get () != Split_strategy.NoSplit)
   then
-    Value_parameters.result "Splitting return states on:@.%t" pretty_strategies
+    Self.result "Splitting return states on:@.%t" pretty_strategies
 
 
 (*

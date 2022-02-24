@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- AST Source Code
 // --------------------------------------------------------------------------
@@ -36,10 +38,10 @@ import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
 
-import * as Ast from 'frama-c/api/kernel/ast';
-import * as Properties from 'frama-c/api/kernel/properties';
-import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
-import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as Properties from 'frama-c/kernel/api/properties';
+import { getCallers, getDeadCode } from 'frama-c/plugins/eva/api/general';
+import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -162,10 +164,8 @@ export default function ASTview() {
   const multipleSelections = selection?.multiple.allSelections;
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
-  const { buttons: themeButtons, theme, fontSize, wrapText } =
-    Preferences.useThemeButtons({
-      target: 'Internal AST',
-      theme: Preferences.AstTheme,
+  const { buttons: editorButtons, fontSize, wrapText } =
+    Preferences.useEditorButtons({
       fontSize: Preferences.AstFontSize,
       wrapText: Preferences.AstWrapText,
       disabled: !theFunction,
@@ -304,12 +304,11 @@ export default function ASTview() {
   return (
     <>
       <TitleBar>
-        {themeButtons}
+        {editorButtons}
       </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
-        theme={theme}
         fontSize={fontSize}
         lineWrapping={wrapText}
         selection={theMarker}

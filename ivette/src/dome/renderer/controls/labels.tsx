@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -29,7 +29,7 @@
    @module dome/controls/labels
 */
 
-import React from 'react';
+import React, { LegacyRef } from 'react';
 import { classes } from 'dome/misc/utils';
 import { Icon } from './icons';
 import './style.css';
@@ -62,29 +62,34 @@ export interface LabelProps {
   onContextMenu?: (evt: React.MouseEvent) => void;
 }
 
-const makeLabel = (className: string) => (props: LabelProps, ref: any) => {
-  const { display = true } = props;
-  const allClasses = classes(
-    className,
-    !display && 'dome-control-erased',
-    props.className,
-  );
-  return (
-    <label
-      ref={ref}
-      className={allClasses}
-      title={props.title}
-      style={props.style}
-      onClick={props.onClick}
-      onDoubleClick={props.onDoubleClick}
-      onContextMenu={props.onContextMenu}
-    >
-      {props.icon && <Icon title={props.title} id={props.icon} />}
-      {props.label}
-      {props.children}
-    </label>
-  );
-};
+const makeLabel = (className: string) =>
+  function Label
+    (
+      props: LabelProps,
+      ref: LegacyRef<HTMLLabelElement> | undefined
+    ): JSX.Element {
+    const { display = true } = props;
+    const allClasses = classes(
+      className,
+      !display && 'dome-control-erased',
+      props.className,
+    );
+    return (
+      <label
+        ref={ref}
+        className={allClasses}
+        title={props.title}
+        style={props.style}
+        onClick={props.onClick}
+        onDoubleClick={props.onDoubleClick}
+        onContextMenu={props.onContextMenu}
+      >
+        {props.icon && <Icon title={props.title} id={props.icon} />}
+        {props.label}
+        {props.children}
+      </label>
+    );
+  };
 
 // --------------------------------------------------------------------------
 // --- CSS Classes

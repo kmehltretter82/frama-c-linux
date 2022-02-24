@@ -16,7 +16,7 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: (i_1 <= b) /\ (a <= i_1) /\ is_sint32(i_1).
+  When: (i_1 <= b) /\ (a <= i_1).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Pre-condition *)
@@ -87,7 +87,7 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: (a <= i_1) /\ (i_1 <= i) /\ is_sint32(i_1).
+  When: (a <= i_1) /\ (i_1 <= i).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Pre-condition *)

@@ -125,8 +125,24 @@ void lemma(unsigned a, unsigned b, unsigned k) {
 
 }
 
+//@ axiomatic Def { predicate P(integer x); }
+
+
 //@ ensures \result == (x & 0xFF) ;
 unsigned char cast_uchar(int x) {
   unsigned char c = x;
+  //@ check bit_test:       ok: (c & (1 << 1)) == 0  ==> (c & 5) == (c & 7);
+  //@ check bit_test1:      ok: (c & (1 << 1)) == 0  ==> (P(c & 5) <==> P(c & 7));
+  //@ check bit_unset:      ok: (c & 0x77) == 0x66 ==> (x & 1) == 0 ;
+  //@ check bit_set_unset:  ok: (c & 0x77) == 0x66 && (x & 5) == (x & 7) ==> (x & 4) == (x & 6) ;
+  //@ check bit_set_unset2: ok: (c & 0x77) == 0x66 && (x & 5) == (x & 7) ==> (P(x & 4) <==> P(x & 6)) ;
+  //@ check bit_defined:    ok: (c & 0x77) == 0x66 && (x & ~0x77) == (~0x77 & 0xFFF0) ==> (P(c)<==>P(0xE6));
+  //@ check bit_defined2:   ok: (c & 0x77) == 0x66 && (x & ~0x77) == (~0x77 & 0xFFF0) ==> (P(x)<==>P(0xFFE6));
+  //@ check bit_to_signed_positive:  ok: (x & 0xFF) == 0x60 ==> (P((signed char) x) <==> P(0x60));
+  //@ check bit_to_signed_positive2: ok: (x & 0xF0) == 0x60 ==> (((signed char) x) & (1 << 10)) == 0;
+  //@ check bit_to_signed_negative:  ok: (x & 0xFF) == 0x86 ==>  (P((signed char) x) <==> P(0x86|~255));
+  //@ check bit_to_signed_negative2: ok: (x & 0xF0) == 0x80 ==> (((signed char) x) & (1 << 10)) != 0;
+  //@ check bit_to_signed:           ok: (x & 0x0F) == 0x06 ==> (((signed char) x) & (1 << 3)) == 0;
+  //@ check bit_to_signed2:          ok: (x & 0x0F) == 0x06 ==> (((signed char) x) & (1 << 2)) != 0;
   return c;
 }

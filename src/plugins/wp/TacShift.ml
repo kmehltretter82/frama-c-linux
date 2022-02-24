@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -45,7 +45,7 @@ let select_op f =
 let select_int n =
   match F.repr n with
   | Qed.Logic.Kint n ->
-      (try Integer.to_int_exn n with Z.Overflow -> raise Not_found)
+    (try Integer.to_int_exn n with Z.Overflow -> raise Not_found)
   | _ -> raise Not_found
 
 class shift =
@@ -61,13 +61,13 @@ class shift =
       let open Qed.Logic in
       match F.repr e with
       | Fun( f , [a;n] ) ->
-          begin
-            let rewrite_shift = select_op f in
-            let n = select_int n in
-            if n > 64 then feedback#set_error "Too large shift (64 max.)" ;
-            if n < 0 then feedback#set_error "Negative shift (0 min.)" ;
-            Tactical.Applicable (rewrite_shift e a n)
-          end
+        begin
+          let rewrite_shift = select_op f in
+          let n = select_int n in
+          if n > 64 then feedback#set_error "Too large shift (64 max.)" ;
+          if n < 0 then feedback#set_error "Negative shift (0 min.)" ;
+          Tactical.Applicable (rewrite_shift e a n)
+        end
       | _ -> Tactical.Not_applicable
 
   end
@@ -84,9 +84,9 @@ let is_shift e =
     let open Qed.Logic in
     match F.repr e with
     | Fun( f , [_;n] ) ->
-        let _ignore = select_op f in
-        let _ = select_int n in
-        true
+      let _ignore = select_op f in
+      let _ = select_int n in
+      true
     | _ -> false
   with Not_found -> false
 

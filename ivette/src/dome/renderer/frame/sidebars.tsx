@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -50,7 +50,7 @@ export interface SideBarProps {
 /**
    Container for sidebar items.
  */
-export function SideBar(props: SideBarProps) {
+export function SideBar(props: SideBarProps): JSX.Element {
   const className = classes(
     'dome-xSideBar',
     'dome-color-frame',
@@ -91,7 +91,12 @@ const makeBadge = (elt: Badges): React.ReactNode => {
 // --- SideBar Section Hide/Show Button
 // --------------------------------------------------------------------------
 
-const HideShow = (props: { onClick: () => void; visible: boolean }) => (
+interface HideShowProps {
+  onClick: () => void;
+  visible: boolean;
+}
+
+const HideShow = (props: HideShowProps): JSX.Element => (
   <label
     className="dome-xSideBarSection-hideshow dome-text-label"
     onClick={props.onClick}
@@ -137,7 +142,7 @@ export interface SectionProps {
 
    Sections with no items are not displayed.
 */
-export function Section(props: SectionProps) {
+export function Section(props: SectionProps): JSX.Element | null {
 
   const [state, flipState] = useFlipSettings(
     props.settings,
@@ -202,7 +207,7 @@ export interface ItemProps {
 }
 
 /** Sidebar Items. */
-export function Item(props: ItemProps) {
+export function Item(props: ItemProps): JSX.Element {
   const { selected = false, disabled = false, enabled = true } = props;
   const isDisabled = disabled || !enabled;
   const ref = React.useRef<HTMLDivElement>(null);

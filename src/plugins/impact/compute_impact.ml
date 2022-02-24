@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -332,8 +332,8 @@ let downward_one_call_node wl (pnode, _ as node) caller_kf pdg =
 
   | Key.SigCallKey(id, key) ->
     let stmt = Key.call_from_id id in
-    let called_kfs = Db.Value.call_to_kernel_function stmt in
-    KFS.iter
+    let called_kfs = Eva.Results.callee stmt in
+    List.iter
       (fun called_kf ->
          let called_pdg = !Db.Pdg.get called_kf in
          let nodes_callee, pdg_ok =
@@ -452,7 +452,7 @@ let all_upward_callers wl kfs =
                let pdg_caller = !Db.Pdg.get caller in
                List.iter (aux_call (caller, pdg_caller) (kf, pdg_kf)) callsites;
                KFS.add caller todo
-            ) todo (!Db.Value.callers kf);
+            ) todo (Eva.Results.callsites kf);
         )
         else todo
       in
@@ -536,7 +536,7 @@ let initial_worklist ?(skip=Locations.Zone.bottom) ?(reason=false) nodes kf =
 let initial_nodes ~skip kf stmt =
   Options.debug ~level:3 "computing initial nodes for %d" stmt.sid;
   let pdg = !Db.Pdg.get kf in
-  if Db.Value.is_reachable_stmt stmt then
+  if Eva.Results.is_reachable stmt then
     try
       let all = !Db.Pdg.find_simple_stmt_nodes pdg stmt in
       let filter n = match PdgTypes.Node.elem_key n with

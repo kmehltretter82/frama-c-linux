@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -68,6 +68,8 @@ let dkey_file_annot = register_category "file:annotation"
 let dkey_file_print_one = register_category "file:print-one"
 
 let dkey_file_transform = register_category "file:transformation"
+
+let dkey_file_source = register_category "file:source"
 
 let dkey_filter = register_category "filter"
 
@@ -204,6 +206,9 @@ let wkey_parser_unsupported = register_warn_category "parser:unsupported"
 let wkey_asm = register_warn_category "asm:clobber"
 
 let wkey_unnamed_typedef = register_warn_category "parser:unnamed-typedef"
+
+let wkey_file_not_found = register_warn_category "file:not-found"
+let () = set_warn_status wkey_file_not_found Log.Wfeedback
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
@@ -800,6 +805,15 @@ module BigIntsHex =
     let help = "display integers larger than <max> using hexadecimal \
                 notation"
     let default = -1
+  end)
+
+let () = Parameter_customize.set_group inout_source
+module EagerLoadSources =
+  False(struct
+    let module_name = "EagerLoadSources"
+    let option_name = "-eager-load-sources"
+    let help = "when loading a source, try to load all referenced sources \
+                in memory"
   end)
 
 (* ************************************************************************* *)

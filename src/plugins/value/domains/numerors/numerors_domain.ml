@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -86,10 +86,10 @@ module Domain = struct
   include Simple_memory.Make_Domain (Name) (Numerors_Value)
 
   let post_analysis f =
-    if not (Value_parameters.NumerorsLogFile.is_empty ()) then
+    if not (Eva.Parameters.NumerorsLogFile.is_empty ()) then
       match f with
       | `Value _ ->
-        let log = open_out (Value_parameters.NumerorsLogFile.get ():>string) in
+        let log = open_out (Eva.Parameters.NumerorsLogFile.get ():>string) in
         let fmt = Format.formatter_of_out_channel log in
         List.iter (fun f -> f fmt ()) !Numerors_Value.dprint_callstack ;
         close_out log

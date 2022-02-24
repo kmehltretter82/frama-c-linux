@@ -1,11 +1,5 @@
 /* run.config
-<<<<<<< HEAD
-STDOPT: +"%{dep:vdefined_bts1241_1.i}"
-||||||| 754e522ceb
-STDOPT: +"tests/syntax/vdefined_bts1241_1.i"
-=======
-STDOPT: +"@PTEST_DIR@/vdefined_bts1241_1.i"
->>>>>>> origin/master
+STDOPT: +"%{dep:@PTEST_DIR@/vdefined_bts1241_1.i}"
  */
 
 int f();

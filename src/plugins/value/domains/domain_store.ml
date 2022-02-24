@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -58,9 +58,9 @@ module Make (Domain: InputDomain) = struct
   (* This module stores the resulting states of an Eva analysis. They depends on
      the set of parameters with which the analysis has been run, and must be
      cleared each time one of this parameter is changed. Thus, the tables of
-     this module have as dependencies Db.Value.self, the internal state of Eva
+     this module have as dependencies Self.state, the internal state of Eva
      (all parameters of Eva are added as codependencies of this state).  *)
-  let dependencies = [ Db.Value.self ]
+  let dependencies = [ Self.state ]
   let size = 16
 
   module type Ref = sig

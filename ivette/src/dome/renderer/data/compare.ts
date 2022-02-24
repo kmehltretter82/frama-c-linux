@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -19,6 +19,8 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // --------------------------------------------------------------------------
 // --- Comparison Utilities
@@ -67,7 +69,7 @@ export function isBigNum(x: any): x is BigNum {
 }
 
 /** @internal */
-function primitive(x: any, y: any) {
+function primitive(x: any, y: any): number {
   if (x < y) return -1;
   if (x > y) return 1;
   return 0;
@@ -96,7 +98,7 @@ export const bignum: Order<BigNum> = primitive;
 /**
    Primitive comparison for number (NaN included).
  */
-export function number(x: number, y: number) {
+export function number(x: number, y: number): number {
   const nx = Number.isNaN(x);
   const ny = Number.isNaN(y);
   if (nx && ny) return 0;
@@ -111,7 +113,7 @@ export function number(x: number, y: number) {
    Alphabetic comparison for strings.
    Handles case differently than `byString` comparison.
 */
-export function alpha(x: string, y: string) {
+export function alpha(x: string, y: string): number {
   const cmp = primitive(x.toLowerCase(), y.toLowerCase());
   return cmp !== 0 ? cmp : primitive(x, y);
 }

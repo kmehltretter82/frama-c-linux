@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1000,7 +1000,7 @@ let degenerated top kf =
   if top then PdgTypes.Pdg.top kf else PdgTypes.Pdg.bottom kf
 
 let compute_pdg kf =
-  if not (Db.Value.is_computed ()) then !Db.Value.compute ();
+  if not (Eva.Analysis.is_computed ()) then Eva.Analysis.compute ();
   Pdg_parameters.feedback "computing for function %a" Kernel_function.pretty kf;
   try
     if is_variadic kf then

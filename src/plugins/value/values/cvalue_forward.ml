@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -189,9 +189,9 @@ let assume_comparable comparison v1 v2 =
     | Abstract_value.Relation ->
       let truth, reason = are_comparable_reason comparison v1 v2 in
       if reason <> `Ok then
-        Value_parameters.result
+        Self.result
           ~current:true ~once:true
-          ~dkey:Value_parameters.dkey_pointer_comparison
+          ~dkey:Self.dkey_pointer_comparison
           "invalid pointer comparison: %a" pp_incomparable_reason reason;
       truth
     | Abstract_value.Subtraction ->
@@ -357,7 +357,7 @@ let forward_minus_pp ~typ ev1 ev2 =
       else Ival.scale_div ~pos:true size minus_offs
     with Abstract_interp.Error_Top -> Ival.top
   in
-  if not (Value_parameters.WarnPointerSubstraction.get ()) then
+  if not (Parameters.WarnPointerSubstraction.get ()) then
     (* Generate garbled mix if the two pointers disagree on their base *)
     let minus_val = V.add_untyped Int_Base.minus_one ev1 ev2 in
     try
@@ -402,7 +402,7 @@ let forward_binop_int ~typ ev1 op ev2 =
       ~contains_zero: (V.contains_zero ev1 || V.contains_zero ev2)
       ~contains_non_zero:(V.contains_non_zero ev1 && V.contains_non_zero ev2)
   | Eq | Ne | Ge | Le | Gt | Lt ->
-    let op = Value_util.conv_comp op in
+    let op = Eva_utils.conv_comp op in
     let signed = Bit_utils.is_signed_int_enum_pointer (Cil.unrollType typ) in
     V.inject_comp_result (V.forward_comp_int ~signed op ev1 ev2)
 
@@ -420,7 +420,7 @@ let forward_binop_float fkind ev1 op ev2 =
     | Mult ->    binary_float_floats "*." Fval.mul
     | Div ->     binary_float_floats "/." Fval.div
     | Eq | Ne | Lt | Gt | Le | Ge ->
-      let op = Value_util.conv_comp op in
+      let op = Eva_utils.conv_comp op in
       V.inject_comp_result (Fval.forward_comp op f1 f2)
     | _ -> assert false
 
@@ -527,7 +527,7 @@ let eval_float_constant f fkind fstring =
   if Fc_float.is_nan f
   then V.inject_float Fval.nan
   else
-    let all_rounding = Value_parameters.AllRoundingModesConstants.get in
+    let all_rounding = Parameters.AllRoundingModesConstants.get in
     let fl, fu = match fstring with
       | Some "INFINITY" -> f, f (* Special case for the INFINITY macro. *)
       | Some string when fkind = Cil_types.FLongDouble || all_rounding () ->
@@ -539,7 +539,7 @@ let eval_float_constant f fkind fstring =
         if Fc_float.is_infinite f_lower && Fc_float.is_infinite f_upper
         then
           begin
-            Value_util.warning_once_current
+            Eva_utils.warning_once_current
               "cannot parse floating-point constant, returning imprecise result";
             neg_infinity, infinity
           end

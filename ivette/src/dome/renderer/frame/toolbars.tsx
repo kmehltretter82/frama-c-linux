@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -19,6 +19,8 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 // --------------------------------------------------------------------------
 // --- ToolBars
@@ -147,6 +149,39 @@ export function Button<A = undefined>(props: ButtonProps<A>) {
   );
 }
 
+export interface SwitchProps {
+  /** Switch tooltip. */
+  title?: string;
+  /** Additional class. */
+  className?: string;
+  /** Additional style. */
+  style?: React.CSSProperties;
+  /** Defaults to `true`. */
+  enabled?: boolean;
+  /** Defaults to `false`. */
+  disabled?: boolean;
+  /** Switch position. Defaults to 'left'. */
+  position?: 'left' | 'right';
+  /** Click callback. */
+  onChange?: (newPosition: 'left' | 'right') => void;
+}
+
+/** Toolbar Left/Right Switch. */
+export function Switch(props: SwitchProps) {
+  const { position, onChange } = props;
+  const checked = position === 'right';
+  const { title, className, style } = props;
+  const { enabled = true, disabled = false } = props;
+  const callback = onChange && (() => onChange(checked ? 'left' : 'right'));
+  if (disabled || !enabled) return null;
+  return (
+    <label className={classes('dome-xSwitch', className)} style={style}>
+      <input type={'checkbox'} checked={checked} onChange={callback} />
+      <span className={'dome-xSwitch-slider'} title={title} />
+    </label >
+  );
+}
+
 // --------------------------------------------------------------------------
 // --- Selection Props
 // --------------------------------------------------------------------------
@@ -232,7 +267,7 @@ export function Select(props: SelectionProps<string>) {
 
 const DEBOUNCED_SEARCH = 200;
 
-const scrollToRef = (r: undefined | HTMLLabelElement) => {
+const scrollToRef = (r: null | HTMLLabelElement) => {
   if (r) r.scrollIntoView({ block: 'nearest' });
 };
 

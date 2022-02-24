@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -121,14 +121,14 @@ let update_spec spec =
       spec.spec_complete_behaviors <- map_filter spec.spec_complete_behaviors;
       spec.spec_disjoint_behaviors <- map_filter spec.spec_disjoint_behaviors
 
-let visitor = object
-  inherit Cil.nopCilVisitor
-  method! vspec spec = update_spec spec; Cil.SkipChildren
-end
+let visit_global = function
+  | GFun (fundec, _) -> update_spec fundec.sspec
+  | GFunDecl (spec, _, _) -> update_spec spec
+  | _ -> ()
 
 let run ast =
   if Kernel.SpecialFloat.get () <> "none" then
-    Cil.visitCilFileSameGlobals visitor ast
+    Cil.iterGlobals ast visit_global
 
 let transform =
   File.register_code_transformation_category "contract_special_float"

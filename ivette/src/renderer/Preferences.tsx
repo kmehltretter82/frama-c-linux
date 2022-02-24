@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -19,6 +19,8 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 // --------------------------------------------------------------------------
 // --- Main React Component rendered by './index.js'
@@ -37,35 +39,50 @@ import React from 'react';
 
 import * as Settings from 'dome/data/settings';
 import * as Forms from 'dome/layout/forms';
-import * as P from 'ivette/prefs';
+import * as Themes from 'dome/themes';
+import * as IvettePrefs from 'ivette/prefs';
 
 // --------------------------------------------------------------------------
-// --- Font Forms
+// --- Theme Fields
 // --------------------------------------------------------------------------
 
-function ThemeFields(props: P.ThemeProps) {
-  const theme = Forms.useDefined(Forms.useValid(
-    Settings.useGlobalSettings(props.theme),
-  ));
+const themeOptions: Forms.MenuFieldOption<Themes.ColorSettings>[] = [
+  { value: 'light', label: 'Light Theme' },
+  { value: 'dark', label: 'Dark Theme' },
+  { value: 'system', label: 'System Defaults' },
+];
+
+function ThemeFields(): JSX.Element {
+  const state = Forms.useValid(Themes.useColorThemeSettings());
+  return (
+    <Forms.MenuField<Themes.ColorSettings>
+      label="Color Theme"
+      title="Select global color theme for the application"
+      state={state}
+      defaultValue='system'
+      options={themeOptions}
+    />
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Editor Fields
+// --------------------------------------------------------------------------
+
+interface EditorFieldProps extends IvettePrefs.EditorProps {
+  target: string;
+}
+
+function EditorFields(props: EditorFieldProps) {
   const fontsize = Forms.useValid(
     Settings.useGlobalSettings(props.fontSize),
   );
   const wraptext = Forms.useValid(
     Settings.useGlobalSettings(props.wrapText),
   );
-  const options = P.THEMES.map(({ id, label }) => (
-    <option key={id} value={id} label={label} />
-  ));
   const { target } = props;
   return (
     <>
-      <Forms.SelectField
-        state={theme}
-        label="Theme"
-        title={`Set the color theme of ${target}`}
-      >
-        {options}
-      </Forms.SelectField>
       <Forms.SliderField
         state={fontsize}
         label="Font Size"
@@ -83,10 +100,12 @@ function ThemeFields(props: P.ThemeProps) {
   );
 }
 
+
+
 // --------------------------------------------------------------------------
 // --- Editor Command Forms
 // --------------------------------------------------------------------------
-function EditorCommandFields(props: P.EditorCommandProps) {
+function EditorCommandFields(props: IvettePrefs.EditorCommandProps) {
   const cmd = Forms.useDefined(Forms.useValid(
     Settings.useGlobalSettings(props.command),
   ));
@@ -101,28 +120,31 @@ function EditorCommandFields(props: P.EditorCommandProps) {
 // --- Export Components
 // --------------------------------------------------------------------------
 
-export default (() => (
-  <Forms.Page>
-    <Forms.Section label="AST View" unfold>
-      <ThemeFields
-        target="Internal AST"
-        theme={P.AstTheme}
-        fontSize={P.AstFontSize}
-        wrapText={P.AstWrapText}
-      />
-    </Forms.Section>
-    <Forms.Section label="Source View" unfold>
-      <ThemeFields
-        target="Source Code"
-        theme={P.SourceTheme}
-        fontSize={P.SourceFontSize}
-        wrapText={P.SourceWrapText}
-      />
-    </Forms.Section>
-    <Forms.Section label="Editor Command" unfold>
-      <EditorCommandFields command={P.EditorCommand} />
-    </Forms.Section>
-  </Forms.Page>
-));
+export default function Preferences() {
+  return (
+    <Forms.Page>
+      <Forms.Section label="Theme" unfold>
+        <ThemeFields />
+      </Forms.Section>
+      <Forms.Section label="AST View" unfold>
+        <EditorFields
+          target="Internal AST"
+          fontSize={IvettePrefs.AstFontSize}
+          wrapText={IvettePrefs.AstWrapText}
+        />
+      </Forms.Section>
+      <Forms.Section label="Source View" unfold>
+        <EditorFields
+          target="Source Code"
+          fontSize={IvettePrefs.SourceFontSize}
+          wrapText={IvettePrefs.SourceWrapText}
+        />
+      </Forms.Section>
+      <Forms.Section label="Editor Command" unfold>
+        <EditorCommandFields command={IvettePrefs.EditorCommand} />
+      </Forms.Section>
+    </Forms.Page>
+  );
+}
 
 // --------------------------------------------------------------------------

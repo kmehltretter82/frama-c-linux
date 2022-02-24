@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,10 +44,10 @@ let pp_value fmt = function
   | Pure -> Format.pp_print_string fmt "scalar"
   | Read_at(_,r) -> Format.fprintf fmt "read %a" R.pretty r
   | Addr_of a ->
-      if a.shift then
-        Format.fprintf fmt "addr %a+" R.pretty a.addrof
-      else
-        Format.fprintf fmt "addr %a" R.pretty a.addrof
+    if a.shift then
+      Format.fprintf fmt "addr %a+" R.pretty a.addrof
+    else
+      Format.fprintf fmt "addr %a" R.pretty a.addrof
 [@@@ warning "+32"]
 
 (* -------------------------------------------------------------------------- *)
@@ -67,8 +67,8 @@ let read acs = function
   | Pure -> ()
   | Addr_of _ -> ()
   | Read_at(tr,r) ->
-      acs_deref r (Value,tr) ;
-      acs_read r acs
+    acs_deref r (Value,tr) ;
+    acs_read r acs
 
 let points_to = function { shift ; addrof = pointed ; typeOfPointed = typ } ->
   acs_deref pointed ((if shift then Array else Deref),typ)
@@ -76,19 +76,19 @@ let points_to = function { shift ; addrof = pointed ; typeOfPointed = typ } ->
 let addrof map = function
   | Pure -> failwith "Wp.Region: physical address"
   | Read_at(tr,r) ->
-      acs_deref r (Value,tr) ;
-      {
-        addrof = add_pointed map r ;
-        typeOfPointed = Cil.typeOf_pointed tr ;
-        shift = false ;
-      }
+    acs_deref r (Value,tr) ;
+    {
+      addrof = add_pointed map r ;
+      typeOfPointed = Cil.typeOf_pointed tr ;
+      shift = false ;
+    }
   | Addr_of addr -> addr
 
 let cast ty value =
   if Cil.isPointerType ty then
     match value with
     | Addr_of addr ->
-        Addr_of { addr with typeOfPointed = Cil.typeOf_pointed ty }
+      Addr_of { addr with typeOfPointed = Cil.typeOf_pointed ty }
     | Read_at (_,r) -> Read_at(ty,r)
     | Pure -> Pure
   else
@@ -122,16 +122,16 @@ let merge_addrof (map:map) v1 v2 =
 let rec cc_exp (map:map) exp =
   match exp.enode with
   | BinOp( (PlusPI | MinusPI) , a , b , _ ) ->
-      cc_read map b ;
-      let { addrof = pointed } as addr = cc_addr map a in
-      acs_shift pointed (Eval exp) ;
-      Addr_of { addr with shift = true }
+    cc_read map b ;
+    let { addrof = pointed } as addr = cc_addr map a in
+    acs_shift pointed (Eval exp) ;
+    Addr_of { addr with shift = true }
   | AddrOf lv | StartOf lv ->
-      Addr_of {
-        addrof = cc_lval map lv ;
-        typeOfPointed = Cil.typeOfLval lv ;
-        shift = false ;
-      }
+    Addr_of {
+      addrof = cc_lval map lv ;
+      typeOfPointed = Cil.typeOfLval lv ;
+      shift = false ;
+    }
   | Lval lv -> Read_at (Cil.typeOfLval lv , cc_lval map lv)
   | CastE(ty,e) -> cast ty (cc_exp map e)
   | Const (CStr _ | CWStr _) -> Addr_of (cc_string map exp)
@@ -139,18 +139,18 @@ let rec cc_exp (map:map) exp =
   | SizeOf _ | SizeOfE _ | SizeOfStr _
   | AlignOf _ | AlignOfE _ -> Pure
   | UnOp(_,e,ty) ->
-      assert (not (Cil.isPointerType ty)) ;
-      cc_read map e ; Pure
+    assert (not (Cil.isPointerType ty)) ;
+    cc_read map e ; Pure
   | BinOp(_,a,b,ty) ->
-      assert (not (Cil.isPointerType ty)) ;
-      cc_read map a ; cc_read map b ; Pure
+    assert (not (Cil.isPointerType ty)) ;
+    cc_read map a ; cc_read map b ; Pure
 
 and cc_host map = function
   | Var x -> of_cvar map x , x.vtype
   | Mem e ->
-      let a = cc_addr map e in
-      points_to a ; (* deref, not read !*)
-      a.addrof , a.typeOfPointed
+    let a = cc_addr map e in
+    points_to a ; (* deref, not read !*)
+    a.addrof , a.typeOfPointed
 
 and cc_lval map (host , offset) =
   let r,ty = cc_host map host in cc_offset map r ty offset
@@ -158,13 +158,13 @@ and cc_lval map (host , offset) =
 and cc_offset map r ty = function
   | Cil_types.NoOffset -> r
   | Cil_types.Field(fd,ofs) ->
-      let df = Offset.field fd in
-      cc_offset map (add_offset map r df) fd.ftype ofs
+    let df = Offset.field fd in
+    cc_offset map (add_offset map r df) fd.ftype ofs
   | Cil_types.Index(e,ofs) ->
-      cc_read map e ;
-      let de = Offset.index ty in
-      let te = Offset.typeof de in
-      cc_offset map (add_offset map r de) te ofs
+    cc_read map e ;
+    let de = Offset.index ty in
+    let te = Offset.typeof de in
+    cc_offset map (add_offset map r de) te ofs
 
 and cc_addr map a = addrof map (cc_exp map a)
 
@@ -180,14 +180,14 @@ let cc_writes map stmt tgt typ e =
   acs_write tgt (Assigned stmt) ;
   match Cil.unrollType typ with
   | TPtr _ ->
-      let a = cc_addr map e in
-      points_to a ; (* deref, not read! *)
-      do_alias map a.addrof (add_pointed map tgt)
+    let a = cc_addr map e in
+    points_to a ; (* deref, not read! *)
+    do_alias map a.addrof (add_pointed map tgt)
   | TComp _ ->
-      let src = cc_comp map e in
-      acs_copy ~src ~tgt
+    let src = cc_comp map e in
+    acs_copy ~src ~tgt
   | _ ->
-      cc_read map e
+    cc_read map e
 
 let cc_assign map stmt lv e =
   cc_writes map stmt (cc_lval map lv) (Cil.typeOfLval lv) e
@@ -202,10 +202,10 @@ let cc_return map stmt e =
 let rec cc_init map stmt lv = function
   | SingleInit e -> cc_assign map stmt lv e
   | CompoundInit(_,content) ->
-      List.iter
-        (fun (ofs,vi) ->
-           cc_init map stmt (Cil.addOffsetLval ofs lv) vi
-        ) content
+    List.iter
+      (fun (ofs,vi) ->
+         cc_init map stmt (Cil.addOffsetLval ofs lv) vi
+      ) content
 
 let cc_local_init map stmt x = function
   | AssignInit vi -> cc_init map stmt (Var x,NoOffset) vi
@@ -237,33 +237,33 @@ let rec cc_term map t = read (Tval t) (cc_term_value map t)
 and cc_term_value (map:map) (term:term) =
   match term.term_node with
   | TLval lv ->
-      begin match cc_term_lval map lv with
-        | None -> Pure
-        | Some(ty,reg) -> Read_at(ty,reg)
-      end
+    begin match cc_term_lval map lv with
+      | None -> Pure
+      | Some(ty,reg) -> Read_at(ty,reg)
+    end
   | TAddrOf lv | TStartOf lv ->
-      begin match cc_term_lval map lv with
-        | None -> failwith "Wp.Region: pure term-value"
-        | Some(ty,reg) -> Addr_of {
-            addrof = reg ;
-            typeOfPointed = ty ;
-            shift = false ;
-          }
-      end
+    begin match cc_term_lval map lv with
+      | None -> failwith "Wp.Region: pure term-value"
+      | Some(ty,reg) -> Addr_of {
+          addrof = reg ;
+          typeOfPointed = ty ;
+          shift = false ;
+        }
+    end
   | TBinOp( (PlusPI | MinusPI) , a , b ) ->
-      begin
-        cc_term map b ;
-        let { addrof = pointed } as addr = cc_term_addr map a in
-        acs_shift pointed (Tval term) ;
-        Addr_of { addr with shift = true }
-      end
+    begin
+      cc_term map b ;
+      let { addrof = pointed } as addr = cc_term_addr map a in
+      acs_shift pointed (Tval term) ;
+      Addr_of { addr with shift = true }
+    end
 
   | Tnull ->
-      Addr_of {
-        addrof = Region.of_null map ;
-        typeOfPointed = Cil.charType ;
-        shift = false ;
-      }
+    Addr_of {
+      addrof = Region.of_null map ;
+      typeOfPointed = Cil.charType ;
+      shift = false ;
+    }
 
   | TUnOp(_,a) -> cc_term map a ; Pure
   | TBinOp(_,a,b) -> cc_term map a ; cc_term map b ; Pure
@@ -281,61 +281,61 @@ and cc_term_value (map:map) (term:term) =
 
   | TDataCons(_,ts) -> List.iter (cc_term map) ts ; Pure
   | TUpdate(w,ofs,v) ->
-      cc_term map w ;
-      cc_term map v ;
-      cc_term_offset_read map ofs ;
-      Pure
+    cc_term map w ;
+    cc_term map v ;
+    cc_term_offset_read map ofs ;
+    Pure
 
   | Tbase_addr(_at,t) -> cast Cil.voidPtrType @@ cc_term_value map t
   | Tblock_length(_at,t) | Toffset(_at,t) -> cc_term map t ; Pure
 
   | Tif(c,a,b) ->
-      cc_term map c ;
-      merge_addrof map (cc_term_value map a) (cc_term_value map b)
+    cc_term map c ;
+    merge_addrof map (cc_term_value map a) (cc_term_value map b)
 
   | Tempty_set -> Pure
   | Tunion ts | Tinter ts ->
-      List.fold_left
-        (fun v t -> merge_addrof map v (cc_term_value map t)) Pure ts
+    List.fold_left
+      (fun v t -> merge_addrof map v (cc_term_value map t)) Pure ts
 
   | Tcomprehension(t,_,None) -> cc_term_value map t
   | Tcomprehension(t,_,Some p) -> cc_pred map p ; cc_term_value map t
   | Trange(a,b) -> cc_term_option map a ; cc_term_option map b ; Pure
 
   | Tlet _ | Tlambda _ | Tapp _ ->
-      failwith "Wp.Region: unsupported logic functions and bindings"
+    failwith "Wp.Region: unsupported logic functions and bindings"
 
 and cc_term_lval map (lhost,loffset) =
   match lhost with
   | TResult typ -> Some(typ,of_return map)
   | TVar lvar ->
-      begin
-        match lvar.lv_origin with
-        | Some x ->
-            let ty,rv = cc_term_offset map (of_cvar map x) x.vtype loffset in
-            Some(ty,rv)
-        | None ->
-            cc_term_offset_read map loffset ;
-            None
-      end
+    begin
+      match lvar.lv_origin with
+      | Some x ->
+        let ty,rv = cc_term_offset map (of_cvar map x) x.vtype loffset in
+        Some(ty,rv)
+      | None ->
+        cc_term_offset_read map loffset ;
+        None
+    end
   | TMem p ->
-      begin
-        let a = cc_term_addr map p in
-        points_to a ;
-        let ty,ra = cc_term_offset map a.addrof a.typeOfPointed loffset in
-        Some(ty,ra)
-      end
+    begin
+      let a = cc_term_addr map p in
+      points_to a ;
+      let ty,ra = cc_term_offset map a.addrof a.typeOfPointed loffset in
+      Some(ty,ra)
+    end
 
 and cc_term_offset map r ty = function
   | TNoOffset -> ty,r
   | TField(fd,ofs) ->
-      let df = Offset.field fd in
-      cc_term_offset map (add_offset map r df) fd.ftype ofs
+    let df = Offset.field fd in
+    cc_term_offset map (add_offset map r df) fd.ftype ofs
   | TIndex(t,ofs) ->
-      cc_term map t ;
-      let de = Offset.index ty in
-      let te = Offset.typeof de in
-      cc_term_offset map (add_offset map r de) te ofs
+    cc_term map t ;
+    let de = Offset.index ty in
+    let te = Offset.typeof de in
+    cc_term_offset map (add_offset map r de) te ofs
   | TModel _ -> failwith "Wp.Region: model field"
 
 and cc_term_offset_read map = function
@@ -357,13 +357,13 @@ and cc_pred (map:map) (p:predicate) =
   | Pfalse | Ptrue -> ()
 
   | Prel(_,a,b) ->
-      cc_term map a ; cc_term map b
+    cc_term map a ; cc_term map b
 
   | Pnot a -> cc_pred map a
   | Pif(t,a,b) ->
-      cc_term map t ; cc_pred map a ; cc_pred map b
+    cc_term map t ; cc_pred map a ; cc_pred map b
   | Pand(a,b) | Por(a,b) | Pxor(a,b) | Pimplies(a,b) | Piff(a,b) ->
-      cc_pred map a ; cc_pred map b
+    cc_pred map a ; cc_pred map b
 
   | Pforall(_,p) | Pexists(_,p) -> cc_pred map p
 
@@ -376,7 +376,7 @@ and cc_pred (map:map) (p:predicate) =
   | Pat(p,_at) -> cc_pred map p
 
   | Plet _ | Papp _ ->
-      failwith "Wp.Region: unsupported logic predicates and bindings"
+    failwith "Wp.Region: unsupported logic predicates and bindings"
 
 (* -------------------------------------------------------------------------- *)
 (* --- ACSL Spec & Defs                                                   --- *)

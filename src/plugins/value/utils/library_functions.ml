@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,7 +33,7 @@ module Retres =
 let () = Ast.add_monotonic_state Retres.self
 
 let () =
-  State_dependency_graph.add_dependencies ~from:Retres.self [ Db.Value.self ]
+  State_dependency_graph.add_dependencies ~from:Retres.self [ Self.state ]
 
 let get_retres_vi = Retres.memo
     (fun kf ->
@@ -47,7 +47,7 @@ let get_retres_vi = Retres.memo
            let name = Format.asprintf "\\result<%a>" Kernel_function.pretty kf in
            Some (Cil.makeVarinfo false false name typ)
          with Cil.SizeOfError _ ->
-           Value_parameters.abort ~current:true
+           Self.abort ~current:true
              "function %a returns a value of unknown size. Aborting"
              Kernel_function.pretty kf
     )
@@ -62,9 +62,9 @@ let returned_value kf =
   | TFloat (FDouble, _)
   | TFloat (FLongDouble, _) -> Cvalue.V.top_float
   | TBuiltin_va_list _ ->
-    Value_parameters.error ~current:true ~once:true
+    Self.error ~current:true ~once:true
       "functions returning variadic arguments must be stubbed%t"
-      Value_util.pp_callstack;
+      Eva_utils.pp_callstack;
     Cvalue.V.top_int
   | TVoid _ -> Cvalue.V.top (* this value will never be used *)
   | TFun _ | TNamed _ | TArray _ -> assert false
@@ -74,6 +74,7 @@ let unsupported_specifications =
   [
     "asprintf", "stdio.c";
     "canonicalize_path_name", "stdlib.c";
+    "fmemopen", "stdio.c";
     "getaddrinfo", "netdb.c";
     "getenv", "stdlib.c";
     "getline", "stdio.c";
@@ -100,8 +101,8 @@ let warn_unsupported_spec name =
   try
     let header = Hashtbl.find unsupported_specs_tbl name in
     let path = Filepath.Normalized.(concat (concat Fc_config.datadir "libc") header) in
-    Value_parameters.warning ~once:true ~current:true
-      ~wkey:Value_parameters.wkey_libc_unsupported_spec
+    Self.warning ~once:true ~current:true
+      ~wkey:Self.wkey_libc_unsupported_spec
       "@[The specification of function '%s' is currently not supported by Eva.@ \
        Consider adding %a@ to the analyzed source files.@]"
       name  Filepath.Normalized.pretty path

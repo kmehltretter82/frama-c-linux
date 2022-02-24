@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,12 +31,14 @@ type call_init_state =
   | ISEmpty (** completely empty state, without impact on Memexec. *)
 
 
+type t
+val key: t Abstract_domain.key
+val project: t -> Equality.Set.t
+
 module Make (Value : Abstract.Value.External) : sig
   include Abstract_domain.Leaf with type value = Value.t
                                 and type location = Precise_locs.precise_location
+                                and type state = t
 
   val pretty_debug : Format.formatter -> t -> unit
-
-  type equalities
-  val project : t -> equalities
 end

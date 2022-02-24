@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -109,7 +109,7 @@ export interface IconProps extends SVGprops {
    Icon Component.
    Consult the [Icon Gallery](../guides/icons.md.html) for default icons.
  */
-export function Icon(props: IconProps) {
+export function Icon(props: IconProps): JSX.Element {
   const {
     id, title, onClick, fill,
     size, className = '', offset, style,
@@ -150,7 +150,7 @@ export interface BadgeProps {
    a label, or the corresponding named icon.
    Consult the [Icon Gallery](gallery-icons.html) for default icons.
  */
-export function Badge(props: BadgeProps) {
+export function Badge(props: BadgeProps): JSX.Element {
   const { value, title, onClick } = props;
   let content;
   if (typeof value === 'string' && Icons[value]) {
@@ -190,7 +190,7 @@ export interface CustomIcon {
 /**
    Register a new custom icon.
  */
-export function register(icon: CustomIcon) {
+export function register(icon: CustomIcon): void {
   const { id, ...jsicon } = icon;
   Icons[id] = jsicon;
 }
@@ -199,7 +199,7 @@ export function register(icon: CustomIcon) {
    Iterate over icons gallery.
    See [[register]] to add custom icons to the gallery.
  */
-export function forEach(fn: (ico: CustomIcon) => void) {
+export function forEach(fn: (ico: CustomIcon) => void): void {
   const ids = Object.keys(Icons);
   ids.forEach((id) => {
     const jsicon = Icons[id];

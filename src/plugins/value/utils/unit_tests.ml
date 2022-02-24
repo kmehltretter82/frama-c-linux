@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,7 +28,7 @@ let print = false
 
 let report bug format =
   if print || bug
-  then Value_parameters.result ("%s" ^^ format) (if bug then "BUG " else "")
+  then Self.result ("%s" ^^ format) (if bug then "BUG " else "")
   else Format.ifprintf Format.std_formatter format
 
 
@@ -128,7 +128,7 @@ end
 
 (** Runs all tests. *)
 let run () =
-  Value_parameters.result "Runs unit tests: %s."
+  Self.result "Runs unit tests: %s."
     (if print
      then "all operations will be printed"
      else  "only faulty operations will be printed");

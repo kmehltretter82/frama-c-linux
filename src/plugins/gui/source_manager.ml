@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -47,21 +47,6 @@ let make ?tab_pos ?packing () =
     page_index = Hashtbl.create 7;
     pages = 0 ;
   }
-
-let input_channel b ic =
-  let buf = Bytes.create 1024 and len = ref 0 in
-  while len := input ic buf 0 1024; !len > 0 do
-    Buffer.add_subbytes b buf 0 !len
-  done
-
-(* returns [true] in case of success, [false] otherwise *)
-let with_file name ~f =
-  try
-    let ic = open_in_gen [Open_rdonly] 0o644 name in
-    try f ic; close_in ic; true with _exn ->
-      close_in ic; (*; !flash_info ("Error: "^Printexc.to_string exn)*)
-      false
-  with _exn -> false
 
 let clear w =
   begin
@@ -112,15 +97,14 @@ let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb 
         in
         let window = (original_source_view :> GText.view) in
         let page_num = w.notebook#page_num sw#coerce in
-        let b = Buffer.create 1024 in
+        let scan_references = Kernel.EagerLoadSources.get () in
         let s =
-          if with_file (filename :> string) ~f:(input_channel b) then
-            Wutil.to_utf8 (Buffer.contents b)
-          else
+          match Parse_env.open_source ~scan_references (filename :> string) with
+          | Error _msg ->
             let f = Filepath.Normalized.to_pretty_string filename in
             "Error: cannot open file '" ^ f ^ "'"
+          | Ok s -> s
         in
-        Buffer.reset b;
         let (buffer:GText.buffer) = window#buffer in
         buffer#set_text s;
         let select_line ~line =

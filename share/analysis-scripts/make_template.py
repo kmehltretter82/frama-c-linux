@@ -36,10 +36,6 @@ from subprocess import Popen, PIPE
 from pathlib import Path
 import function_finder
 
-MIN_PYTHON = (3, 6) # for glob(recursive) and automatic Path conversions
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-
 if len(sys.argv) > 2:
     print(f"usage: {sys.argv[0]} [dir]")
     print("       creates a Frama-C makefile in [dir] (default: .frama-c)")

@@ -13,24 +13,7 @@ Prove: (50 <= A) /\ (A <= 100).
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file combined.c, line 29):
-Assume {
-  Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(v) /\ is_sint32(1 + i).
-  (* Heap *)
-  Type: region(t.base) <= 0.
-  (* Assertion *)
-  Have: (50 <= A) /\ (A <= 100).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= 50).
-  (* Invariant *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
-            [shift_sint32(t, i_1)]))).
-  (* Then *)
-  Have: i <= 49.
-  (* Call 'f' *)
-  Have: P_P(v).
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -98,7 +98,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
           (* the annotation is empty or contains only variables *)
           self#add_var_hints ~stmt var_hints
         | (_lv, _lt) ->
-          Value_parameters.warning ~once:true
+          Self.warning ~once:true
             "could not interpret loop pragma relative to widening variables"
       end
     | Widen_hints l -> begin
@@ -124,7 +124,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
                 self#add_float_thresholds ~base float_thresholds;
               ) vars
         | _ ->
-          Value_parameters.warning ~once:true
+          Self.warning ~once:true
             "could not interpret loop pragma relative to widening hint"
       end
     | _ -> ()
@@ -314,7 +314,7 @@ let base_of_static_hvars hvars =
   | Widen_hints_ext.HintVar vi -> Some (Base.of_varinfo vi)
   | Widen_hints_ext.HintMem (e, offset) ->
     (* syntactic constraints prevent this from happening *)
-    Value_parameters.fatal "unsupported lhost: %a" Printer.pp_lval (Mem e, offset)
+    Self.fatal "unsupported lhost: %a" Printer.pp_lval (Mem e, offset)
 
 type threshold = Int_th of Integer.t | Real_th of logic_real
 
@@ -332,7 +332,7 @@ let threshold_of_threshold_term ht =
     match constFoldTermToLogicReal ht.term_node with
     | Some f -> Real_th f
     | None ->
-      Value_parameters.abort ~source:(fst ht.term_loc)
+      Self.abort ~source:(fst ht.term_loc)
         "could not parse widening hint: %a@ \
          If it contains variables, they must be global const integers."
         Printer.pp_term ht
@@ -344,14 +344,14 @@ let thresholds_of_threshold_terms hts =
       match threshold_of_threshold_term ht with
       | Int_th i ->
         if !has_float then
-          Value_parameters.abort ~source:(fst ht.term_loc)
+          Self.abort ~source:(fst ht.term_loc)
             "widening hint mixing integers and floats: %a"
             Printer.pp_term ht;
         has_int := true;
         Ival.Widen_Hints.add i int_acc, float_acc
       | Real_th f ->
         if !has_int then
-          Value_parameters.abort ~source:(fst ht.term_loc)
+          Self.abort ~source:(fst ht.term_loc)
             "widening hint mixing integers and floats: %a"
             Printer.pp_term ht;
         has_float := true;
@@ -374,7 +374,7 @@ class hints_visitor init_widen_hints global = object(self)
          let int_thresholds, float_thresholds =
            thresholds_of_threshold_terms wh_terms
          in
-         Value_parameters.feedback ~source:(fst loc) ~dkey
+         Self.feedback ~source:(fst loc) ~dkey
            "adding%s hint from annotation: %a, %t (for all statements)"
            (if global then " global" else "")
            (Pretty_utils.pp_opt ~none:(format_of_string "for all variables")
@@ -405,7 +405,7 @@ end
 
 (* Precompute global widen hints, used for all functions *)
 let compute_global_static_hints () =
-  Value_parameters.debug ~dkey "computing global widen hints";
+  Self.debug ~dkey "computing global widen hints";
   let global_widen_hints = ref (Global_Static_Hints.get ()) in
   Globals.Functions.iter_on_fundecs (fun fd ->
       let visitor = new hints_visitor global_widen_hints true in
@@ -493,7 +493,7 @@ module Parsed_Dynamic_Hints =
     (struct
       let name = "Widen.Parsed_Dynamic_Hints"
       let size = 7
-      let dependencies = [ Ast.self; Db.Value.self ]
+      let dependencies = [ Ast.self; Self.state ]
     end)
 
 let dynamic_bases_of_lval states e offset =
@@ -508,7 +508,7 @@ let dynamic_bases_of_lval states e offset =
 (* Find syntactically the dynamic hints on [stmt]. *)
 let extract_dynamic_hints stmt =
   let source = fst (Stmt.loc stmt) in
-  Value_parameters.debug ~source ~dkey
+  Self.debug ~source ~dkey
     "computing dynamic hints for statement %d" stmt.sid;
   let wh = Widen_hints_ext.get_stmt_widen_hint_terms stmt in
   let aux l (hlv, threshold_terms) =
@@ -530,7 +530,7 @@ module Dynamic_Hints =
   State_builder.Ref
     (Widen_type)
     (struct
-      let dependencies = [ Ast.self; Db.Value.self ]
+      let dependencies = [ Ast.self; Self.state ]
       let name = "Widen.Dynamic_Hints"
       let default = Widen_type.default
     end)
@@ -577,7 +577,7 @@ let dynamic_widen_hints_hook (stmt, _callstack, states) =
             else
               let new_hints =
                 Base.Hptset.fold (fun base acc ->
-                    Value_parameters.debug ~source ~dkey
+                    Self.debug ~source ~dkey
                       "adding new base due to dynamic widen hint: %a, %a%a"
                       Base.pretty base
                       Ival.Widen_Hints.pretty dhint.int_thresholds

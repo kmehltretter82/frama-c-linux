@@ -1173,12 +1173,14 @@ inconsistent requirements, or on the loop with inconsistent invariants, and
   calls (default is: \texttt{yes}).
 \item[\tt -wp-(no)-smoke-dead-code] includes smoke tests for dead code (default
   is: \texttt{yes}).
+\item[\tt -wp-(no)-smoke-dead-local-init] includes smoke tests for dead local
+  variables initialization (default is: \texttt{no}).
 \item[\tt -wp-(no)-smoke-dead-loop] includes smoke tests for inconsistent loop
   invariants (default is: \texttt{yes}).
 \end{description}
 
 When reporting prover results for smoke-tests, the \textsf{WP} displays
-``Failed'' when some prover succeed in discharing the \verb+\false+ proof-obligation
+``Failed'' when some prover succeeds in discharging the \verb+\false+ proof-obligation
 and ``Passed'' when all the provers result are unknown or interrupted.
 In the final prover statistics, the interrupted smoke tests are \emph{not} reported, since
 they are considered valid tests.

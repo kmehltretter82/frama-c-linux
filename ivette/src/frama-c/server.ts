@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -19,6 +19,8 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 // --------------------------------------------------------------------------
 // --- Connection to Frama-C Server
@@ -336,7 +338,7 @@ export function clear() {
 /** Server configuration. */
 export interface Configuration {
   /** Process environment variables (default: `undefined`). */
-  env?: any;
+  env?: { [VAR: string]: string };
   /** Working directory (default: current). */
   cwd?: string;
   /** Server command (default: `frama-c`). */
@@ -694,12 +696,15 @@ export function send<In, Out>(
   const response: Response<Out> = new Promise<Out>((resolve, reject) => {
     const unwrap = (js: Json.json) => {
       const data = request.output(js);
-      resolve(data as unknown as Out);
+      if (data !== undefined)
+        resolve(data);
+      else
+        reject('Wrong response type');
     };
     pending.set(rid, { resolve: unwrap, reject });
   });
   response.kill = () => pending.get(rid)?.reject();
-  client.send(request.kind, rid, request.name, param);
+  client.send(request.kind, rid, request.name, param as unknown as Json.json);
   if (!pollingTimer) {
     const polling = (config && config.polling) || pollingTimeout;
     pollingTimer = setInterval(() => {
@@ -715,7 +720,7 @@ export function send<In, Out>(
 
 function _resolved(id: string) {
   pending.delete(id);
-  if (pending.size == 0) {
+  if (pending.size === 0) {
     rqCount = 0;
     if (pollingTimer) {
       clearInterval(pollingTimer);

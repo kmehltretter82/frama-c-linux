@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -210,7 +210,7 @@ let is_def_or_last_decl g =
   | _ -> false
 
 let clear_last_decl () =
-  let selection = State_selection.Static.with_dependencies LastDecl.self in
+  let selection = State_selection.with_dependencies LastDecl.self in
   Project.clear ~selection ()
 
 let add_hook_on_update f =

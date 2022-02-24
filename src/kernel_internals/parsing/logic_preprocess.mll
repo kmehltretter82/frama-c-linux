@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -531,18 +531,25 @@ parse
   let file suffix cpp filename =
     reset ();
     let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
-    let inchan = open_in_bin filename in
-    let lex = Lexing.from_channel inchan in
-    let ppname =
-      Extlib.temp_file_cleanup_at_exit ~debug
-        (Filename.basename filename) ".pp"
-    in
-    let ppfile = open_out ppname in
-    main lex;
-    preprocess_annots suffix cpp ppfile;
-    close_in inchan;
-    close_out ppfile;
-    Datatype.Filepath.of_string ppname
+    let scan_references = Kernel.EagerLoadSources.get () in
+    match Parse_env.open_source ~scan_references filename with
+    | Error msg -> Kernel.abort "logic_preprocess: %s" msg
+    | Ok source ->
+      let lex = Lexing.from_string source in
+      let ppname =
+        Extlib.temp_file_cleanup_at_exit ~debug
+          (Filename.basename filename) ".pp"
+      in
+      let fp_of_string = Filepath.Normalized.of_string in
+      let workdir_opt = Parse_env.get_workdir (fp_of_string filename) in
+      Option.iter
+        (fun workdir -> Parse_env.set_workdir (fp_of_string ppname) workdir)
+        workdir_opt;
+      let ppfile = open_out ppname in
+      main lex;
+      preprocess_annots suffix cpp ppfile;
+      close_out ppfile;
+      Datatype.Filepath.of_string ppname
 }
 
 (*

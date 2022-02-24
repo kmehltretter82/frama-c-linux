@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,7 +24,7 @@ open Cil_types
 open Eval
 open Locations
 
-let dkey = Value_parameters.register_category "d-symblocs"
+let dkey = Self.register_category "d-symblocs"
 
 module K = Hcexprs
 module V = Cvalue.V (* TODO: functorize (with locations too ?) *)
@@ -275,7 +275,7 @@ module Memory = struct
       let z =
         try K2Z.find k state.zones
         with Not_found ->
-          Value_parameters.abort "Missing zone for %a@.%a"
+          Self.abort "Missing zone for %a@.%a"
             K.HCE.pretty k pretty state
       in
       add_deps k v z acc
@@ -379,7 +379,7 @@ module Memory = struct
     else
       let k = K.HCE.of_lval lv in
       let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
-      let z_lv_indirect = Value_util.indirect_zone_of_lval get_z lv in
+      let z_lv_indirect = Eva_utils.indirect_zone_of_lval get_z lv in
       if Locations.Zone.intersects z_lv z_lv_indirect then
         (* The location of [lv] intersects with the zones needed to compute
            itself, the equality would not hold. *)
@@ -395,7 +395,7 @@ module Memory = struct
       state
     else
       let k = K.HCE.of_exp e in
-      let z = Value_util.zone_of_expr get_z e in
+      let z = Eva_utils.zone_of_expr get_z e in
       add_key k v z state
 
   let find k state =
@@ -489,7 +489,7 @@ module D : Abstract_domain.Leaf
       | `Value loc -> loc.Eval.loc
     in
     if Precise_locs.(equal_loc loc_top r) then
-      Value_parameters.fatal "Unknown location for %a" Printer.pp_lval lv
+      Self.fatal "Unknown location for %a" Printer.pp_lval lv
     else r
 
   let get_val valuation = fun lv ->

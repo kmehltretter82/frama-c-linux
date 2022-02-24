@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -43,7 +43,7 @@ module Scope = struct
 
   let rm_asserts () =
     let fallback () =
-      Value_parameters.warning
+      Self.warning
         "The scope plugin is missing: cannot remove redundant alarms."
     in
     let typ = Datatype.(func unit unit) in

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -61,18 +61,18 @@ let f_nf_hyp  s e ~depth = f_replace_hyp s ["DNF"] (nf_disj_args (WpTac.e_dnf ~d
 
 let match_selection = function
   | Clause(Goal p) ->
-      let e = Lang.F.e_prop p in
-      if WpTac.is_cnf e then None
-      else Some (true, e, f_nf_goal e)
+    let e = Lang.F.e_prop p in
+    if WpTac.is_cnf e then None
+    else Some (true, e, f_nf_goal e)
   | Clause(Step s) ->
-      begin
-        match s.condition with
-        | (Type p | Have p | When p | Core p | Init p) ->
-            let e = Lang.F.e_prop p in
-            if WpTac.is_dnf e then None
-            else Some (false, e, f_nf_hyp s e)
-        | _ -> None
-      end
+    begin
+      match s.condition with
+      | (Type p | Have p | When p | Core p | Init p) ->
+        let e = Lang.F.e_prop p in
+        if WpTac.is_dnf e then None
+        else Some (false, e, f_nf_hyp s e)
+      | _ -> None
+    end
   | Inside(_,_) | Compose _ | Empty | Multi _ -> None
 
 class normal_form =
@@ -85,10 +85,10 @@ class normal_form =
     method select feedback (s : Tactical.selection) =
       match match_selection s with
       | Some (pol,_,continuation) ->
-          feedback#set_title
-            (if pol then "Intuition (CNF)" else "Intuition (DNF)") ;
-          let depth = (-1) in
-          Applicable (continuation ~depth)
+        feedback#set_title
+          (if pol then "Intuition (CNF)" else "Intuition (DNF)") ;
+        let depth = (-1) in
+        Applicable (continuation ~depth)
       | _ -> Not_applicable
 
   end

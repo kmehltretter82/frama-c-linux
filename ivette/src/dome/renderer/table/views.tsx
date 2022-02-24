@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -19,6 +19,9 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // --------------------------------------------------------------------------
 // --- Tables
@@ -45,6 +48,7 @@ import {
   TableHeaderRowProps,
   TableHeaderProps,
   TableCellDataGetter,
+  TableCellProps,
   TableCellRenderer,
   RowMouseEventHandlerParams,
 } from 'react-virtualized';
@@ -54,6 +58,7 @@ import { Trigger, Client, Sorting, SortingInfo, Model } from './models';
 
 import './style.css';
 
+const D = new Dome.Debug('Dome.table');
 const SVG = SVGraw as (props: { id: string; size?: number }) => JSX.Element;
 
 // --------------------------------------------------------------------------
@@ -246,8 +251,8 @@ function makeDataGetter(
     try {
       if (rowData !== undefined) return getter(rowData, dataKey);
     } catch (err) {
-      console.error(
-        '[Dome.table] Custom getter error',
+      D.error(
+        'custom getter error',
         'rowData:', rowData,
         'dataKey:', dataKey,
         err,
@@ -261,7 +266,7 @@ function makeDataRenderer(
   render: ((data: any) => ReactNode) = defaultRenderer,
   onContextMenu?: (row: any, index: number, dataKey: string) => void,
 ): TableCellRenderer {
-  return ((props) => {
+  return function TableCell(props: TableCellProps) {
     const { cellData } = props;
     try {
       const contents = cellData ? render(cellData) : null;
@@ -274,15 +279,15 @@ function makeDataRenderer(
       }
       return contents;
     } catch (err) {
-      console.error(
-        '[Dome.table] Custom renderer error',
+      D.error(
+        'custom renderer error',
         'dataKey:', props.dataKey,
         'cellData:', cellData,
         err,
       );
       return null;
     }
-  });
+  };
 }
 
 // --------------------------------------------------------------------------

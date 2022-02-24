@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,7 +35,7 @@ module Result =
     (struct
       let name = "Sparecode"
       let size = 7
-      let dependencies = [ Ast.self; Db.Value.self ] (* delayed, see below *)
+      let dependencies = [ Ast.self; Eva.Analysis.self ] (* delayed, see below *)
     end)
 
 let () =

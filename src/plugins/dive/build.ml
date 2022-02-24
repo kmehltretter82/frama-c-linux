@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,7 +26,6 @@ open Dive_types
 module Graph = Dive_graph
 
 let dkey = Self.register_category "build"
-
 
 (* --- Utility function --- *)
 
@@ -76,29 +75,24 @@ end
 
 module Eval =
 struct
-  let to_kf_list kinstr expr =
-    let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None expr in
-    Kernel_function.Hptset.fold (fun kf acc -> kf :: acc) set []
+  open Eva.Results
+
+  let to_kf_list kinstr callee =
+    before_kinstr kinstr |> eval_callee callee |>
+    Result.value ~default:[]
 
   let to_cvalue kinstr lval =
-    let state = Db.Value.get_state kinstr in
-    let _,cvalue = !Db.Value.eval_lval None state lval in
-    cvalue
+    before_kinstr kinstr |> eval_lval lval |> as_cvalue
 
   let to_location kinstr lval =
-    let state = Db.Value.get_state kinstr in
-    !Db.Value.lval_to_loc_state state lval
+    before_kinstr kinstr |> eval_address lval |> as_location |>
+    Result.value ~default:Locations.loc_bottom
 
   let to_zone kinstr lval =
-    !Db.Value.lval_to_zone kinstr lval
+    before_kinstr kinstr |> eval_address lval |> as_zone
 
   let to_callstacks stmt =
-    let states = Db.Value.get_stmt_state_callstack ~after:false stmt in
-    match states with
-    | None -> assert false
-    | Some table ->
-      let module Table = Value_types.Callstack.Hashtbl in
-      Table.fold (fun cs _ acc -> cs :: acc) table []
+    before stmt |> callstacks
 
   let studia_is_direct (_,{Studia.Writes.direct}) = direct
 

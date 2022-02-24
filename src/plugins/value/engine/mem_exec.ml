@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -82,7 +82,7 @@ module Make
       (ArgsToStoredCalls)
       (struct
         let size = 17
-        let dependencies = [Db.Value.self]
+        let dependencies = [Self.state]
         let name = "Mem_exec.PreviousCalls(" ^ string_of_int !counter ^ ")"
       end)
 

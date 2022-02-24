@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -19,6 +19,9 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-console */
 
 /**
    ## Dome Application (Main Process)
@@ -46,6 +49,7 @@ import {
   IpcMainEvent,
   shell,
   dialog,
+  nativeTheme,
 } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
 import SYS, * as System from 'dome/system';
@@ -80,6 +84,30 @@ export const { DEVEL } = System;
 
 /** System platform */
 export const { platform } = System;
+
+// --------------------------------------------------------------------------
+// --- Native Theme
+// --------------------------------------------------------------------------
+
+ipcMain.handle('dome.ipc.theme', () => {
+  return nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
+});
+
+nativeTheme.on('updated', () => {
+  broadcast('dome.theme.updated');
+});
+
+function setNativeTheme(theme: string | undefined) {
+  switch (theme) {
+    case 'dark':
+    case 'light':
+    case 'system':
+      nativeTheme.themeSource = theme;
+      return;
+    default:
+      console.warn('[dome] unknown theme', theme);
+  }
+}
 
 // --------------------------------------------------------------------------
 // --- Settings
@@ -136,7 +164,7 @@ function obtainGlobalSettings() {
 // --- Window Settings & Frames
 // --------------------------------------------------------------------------
 
-type Store = { [key: string]: any };
+type Store = { [key: string]: unknown };
 
 interface Handle {
   window: BrowserWindow; // Also prevents Gc
@@ -175,7 +203,7 @@ ipcMain.on('dome.ipc.settings.sync', windowSyncSettings);
 // --- Patching Settings
 // --------------------------------------------------------------------------
 
-type Patch = { key: string; value: any };
+type Patch = { key: string; value: unknown };
 
 function applyPatches(data: Store, args: Patch[]) {
   args.forEach(({ key, value }) => {
@@ -204,7 +232,10 @@ function applyStorageSettings(event: IpcMainEvent, args: Patch[]) {
 }
 
 function applyGlobalSettings(event: IpcMainEvent, args: Patch[]) {
-  applyPatches(obtainGlobalSettings(), args);
+  const settings: Store = obtainGlobalSettings();
+  applyPatches(settings, args);
+  const theme = settings['dome-color-theme'];
+  if (typeof (theme) === 'string') setNativeTheme(theme);
   BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
     const contents = w.webContents;
     if (contents.id !== event.sender.id) {
@@ -222,7 +253,7 @@ ipcMain.on('dome.ipc.settings.storage', applyStorageSettings);
 // --- Renderer-Process Communication
 // --------------------------------------------------------------------------
 
-function broadcast(event: string, ...args: any[]) {
+function broadcast(event: string, ...args: unknown[]) {
   BrowserWindow.getAllWindows().forEach((w) => {
     w.webContents.send(event, ...args);
   });
@@ -340,7 +371,7 @@ function createBrowserWindow(
 
   const { frame, devtools, settings = {}, storage = {} } = configData;
   if (frame) {
-    const getInt = (v: any) => v && _.toSafeInteger(v);
+    const getInt = <A>(v: A) => v && _.toSafeInteger(v);
     options.x = getInt(frame.x);
     options.y = getInt(frame.y);
     options.width = getInt(frame.width);
@@ -509,6 +540,7 @@ function showSettingsWindow() {
 
 function restoreDefaultSettings() {
   GlobalSettings = {};
+  nativeTheme.themeSource = 'system';
   if (DEVEL) saveGlobalSettings();
 
   WindowHandles.forEach((handle) => {

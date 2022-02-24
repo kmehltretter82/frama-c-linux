@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -108,14 +108,14 @@ let track_alarms b = function
 let display_evaluation_error ~loc = function
   | CAlarm -> ()
   | pa ->
-    Value_parameters.result ~source:(fst loc) ~once:true
+    Self.result ~source:(fst loc) ~once:true
       "cannot evaluate ACSL term, %a" pretty_logic_evaluation_error pa
 
 (* Warning mode use when performing _reductions_ in the logic ( ** not **
    evaluation). "Logic alarms" are ignored, and the reduction proceeds as if
    they had not occurred. *)
 let alarm_reduce_mode () =
-  if Value_parameters.ReduceOnLogicAlarms.get () then Ignore else Fail
+  if Parameters.ReduceOnLogicAlarms.get () then Ignore else Fail
 
 let find_indeterminate ~alarm_mode state loc =
   let is_invalid = not Locations.(is_valid Read loc) in
@@ -853,7 +853,7 @@ let eval_logic_memchr_off builtin env s c n =
    - otherwise, allocation always succeeds. *)
 let eval_is_allocable size =
   let size_ok = Builtins_malloc.alloc_size_ok size in
-  match size_ok, Value_parameters.AllocReturnsNull.get () with
+  match size_ok, Parameters.AllocReturnsNull.get () with
   | Alarmset.False, _ -> False
   | Alarmset.Unknown, _ | _, true -> Unknown
   | Alarmset.True, false -> True
@@ -985,7 +985,7 @@ let forward_binop_by_type typ =
 let forward_binop typ v1 op v2 =
   match op with
   | Eq | Ne | Le | Lt | Ge | Gt ->
-    let comp = Value_util.conv_comp op in
+    let comp = Eva_utils.conv_comp op in
     if Cil.isPointerType typ || Cvalue_forward.are_comparable comp v1 v2
     then forward_binop_by_type typ v1 op v2
     else Cvalue.V.zero_or_one
@@ -1118,7 +1118,7 @@ let rec eval_term ~alarm_mode env t =
         | Cvalue.V.Not_based_on_null -> None, None
         | LogicEvalError e ->
           if e <> CAlarm then
-            Value_parameters.result ~source:(fst t.term_loc) ~once:true
+            Self.result ~source:(fst t.term_loc) ~once:true
               "@[<hov 0>Cannot evaluate@ range bound %a@ (%a). Approximating@]"
               Printer.pp_term term pretty_logic_evaluation_error e;
           None, None
@@ -1330,7 +1330,7 @@ let rec eval_term ~alarm_mode env t =
 
 and eval_binop ~alarm_mode env op t1 t2 =
   if not (isLogicNonCompositeType t1.term_type) then
-    if Value_parameters.debug_atleast 1 then
+    if Self.debug_atleast 1 then
       unsupported (Format.asprintf
                      "operation (%a) %a (%a) on non-supported type %a"
                      Printer.pp_term t1
@@ -1378,7 +1378,7 @@ and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a
     let vtrue = eval ~alarm_mode env ttrue in
     let vfalse = eval ~alarm_mode env tfalse in
     if not (same_etype vtrue.etype vfalse.etype) then
-      Value_parameters.failure ~current:true
+      Self.failure ~current:true
         "Incoherent types in conditional: %a vs. %a. \
          Please report"
         Printer.pp_typ vtrue.etype Printer.pp_typ vfalse.etype;
@@ -1983,7 +1983,7 @@ and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
     let exact_location = eval_term_as_exact_locs ~alarm_mode env tl in
     let rtl = eval_term ~alarm_mode env tr in
     let cond_v = rtl.eover in
-    let comp = Value_util.conv_relation rel in
+    let comp = Eva_utils.conv_relation rel in
     match exact_location with
     | Logic_var logic_var ->
       let cvalue = LogicVarEnv.find logic_var env.logic_vars in
@@ -2395,7 +2395,7 @@ and eval_predicate env pred =
       in
       let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in
       (* Check if we are trying to write in a const l-value *)
-      if kind = Write && Value_util.is_const_write_invalid typ_pointed
+      if kind = Write && Eva_utils.is_const_write_invalid typ_pointed
       then False
       else
         let eover, eunder, indeterminate, empty =
@@ -2629,9 +2629,9 @@ and eval_predicate env pred =
     | "\\warning", _ -> begin
         match args with
         | [{ term_node = TConst(LStr(str))}] ->
-          Value_parameters.warning "reached \\warning(\"%s\")" str; Unknown
+          Self.warning "reached \\warning(\"%s\")" str; Unknown
         | _ ->
-          Value_parameters.abort
+          Self.abort
             "Wrong argument: \\warning expects a constant string"
       end
     | "\\subset", [argl;argr] ->
@@ -2745,6 +2745,16 @@ and predicate_deps env pred =
   try Some (do_eval env pred)
   with LogicEvalError _ -> None
 
+let annot_predicate_deps ~pre ~here predicate =
+  let env = env_annot ~pre ~here () in
+  let logic_deps = predicate_deps env predicate in
+  let join logic_deps =
+    Cil_datatype.Logic_label.Map.fold
+      (fun _ -> Locations.Zone.join)
+      logic_deps
+      Locations.Zone.bottom
+  in
+  Option.map join logic_deps
 
 (* -------------------------------------------------------------------------- *)
 (* --- Export                                                             --- *)

@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -46,11 +46,11 @@ const emptyMessage: MessageProps = { text: '', kind: 'none' };
 
 const GlobalMessage = new GlobalState(emptyMessage);
 
-export function setMessage(message: MessageProps) {
+export function setMessage(message: MessageProps): void {
   GlobalMessage.setValue(message);
 }
 
-export default function Message() {
+export default function Message(): JSX.Element {
   const [message] = useGlobalState(GlobalMessage);
   return (
     <>

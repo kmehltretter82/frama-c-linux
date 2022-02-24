@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,41 +28,41 @@ let user_setup () : Factory.setup =
   begin
     match Wp_parameters.Model.get () with
     | ["Runtime"] ->
-        Wp_parameters.abort
-          "Model 'Runtime' is no more available.@\nIt will be reintroduced \
-           in a future release."
+      Wp_parameters.abort
+        "Model 'Runtime' is no more available.@\nIt will be reintroduced \
+         in a future release."
     | ["Logic"] ->
-        Wp_parameters.warning ~once:true
-          "Deprecated 'Logic' model.@\nUse 'Typed' with option '-wp-ref' \
-           instead." ;
-        {
-          mheap = Factory.Typed MemTyped.Fits ;
-          mvar = Factory.Ref ;
-          cint = Cint.Natural ;
-          cfloat = Cfloat.Real ;
-        }
+      Wp_parameters.warning ~once:true
+        "Deprecated 'Logic' model.@\nUse 'Typed' with option '-wp-ref' \
+         instead." ;
+      {
+        mheap = Factory.Typed MemTyped.Fits ;
+        mvar = Factory.Ref ;
+        cint = Cint.Natural ;
+        cfloat = Cfloat.Real ;
+      }
     | ["Store"] ->
-        Wp_parameters.warning ~once:true
-          "Deprecated 'Store' model.@\nUse 'Typed' instead." ;
-        {
-          mheap = Factory.Typed MemTyped.Fits ;
-          mvar = Factory.Var ;
-          cint = Cint.Natural ;
-          cfloat = Cfloat.Real ;
-        }
+      Wp_parameters.warning ~once:true
+        "Deprecated 'Store' model.@\nUse 'Typed' instead." ;
+      {
+        mheap = Factory.Typed MemTyped.Fits ;
+        mvar = Factory.Var ;
+        cint = Cint.Natural ;
+        cfloat = Cfloat.Real ;
+      }
     | spec ->
-        let setup = Factory.parse spec in
-        let mref = match setup.mvar with
-          | Caveat -> "caveat" | Ref -> "ref" | Raw | Var -> "" in
-        if mref <> ""
-        && RefUsage.has_nullable ()
-        && not (Wp_parameters.RTE.is_set ())
-        then
-          Wp_parameters.warning ~current:false ~once:true
-            "In %s model with nullable arguments, \
-             -wp-(no)-rte shall be explicitly positioned."
-            mref ;
-        setup
+      let setup = Factory.parse spec in
+      let mref = match setup.mvar with
+        | Caveat -> "caveat" | Ref -> "ref" | Raw | Var -> "" in
+      if mref <> ""
+      && RefUsage.has_nullable ()
+      && not (Wp_parameters.RTE.is_set ())
+      then
+        Wp_parameters.warning ~current:false ~once:true
+          "In %s model with nullable arguments, \
+           -wp-(no)-rte shall be explicitly positioned."
+          mref ;
+      setup
   end
 
 (* -------------------------------------------------------------------------- *)

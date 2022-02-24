@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -95,7 +95,7 @@ class SocketClient extends Client {
   }
 
   /** Send Request */
-  send(kind: string, id: string, request: string, data: any): void {
+  send(kind: string, id: string, request: string, data: json): void {
     this.queue.push({ cmd: kind, id, request, data });
     this._flush();
   }
@@ -134,7 +134,7 @@ class SocketClient extends Client {
   // --- Low-Level Management
   // --------------------------------------------------------------------------
 
-  _flush() {
+  _flush(): void {
     if (this.running) {
       this.queue.forEach((cmd) => {
         this._send(Buffer.from(JSON.stringify(cmd), 'utf8'));
@@ -143,7 +143,7 @@ class SocketClient extends Client {
     }
   }
 
-  _send(data: Buffer) {
+  _send(data: Buffer): void {
     const s = this.socket;
     if (s) {
       const len = data.length;
@@ -164,7 +164,7 @@ class SocketClient extends Client {
     if (len < 1) return;
     const hd = msg.readInt8(0);
     // 'S': 83, 'L': 76, 'W': 87
-    const phex = hd == 83 ? 4 : hd == 76 ? 8 : 16;
+    const phex = hd === 83 ? 4 : hd === 76 ? 8 : 16;
     if (len < phex) return;
     const size = Number.parseInt(msg.slice(1, phex).toString('ascii'), 16);
     const offset = phex + size;
@@ -173,7 +173,7 @@ class SocketClient extends Client {
     return msg.slice(phex, offset).toString('utf8');
   }
 
-  _receive(chunk: Buffer) {
+  _receive(chunk: Buffer): void {
     this.buffer = Buffer.concat([this.buffer, chunk]);
     while (true) {
       const n0 = this.buffer.length;
@@ -181,6 +181,7 @@ class SocketClient extends Client {
       const n1 = this.buffer.length;
       if (data === undefined || n0 <= n1) break;
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const cmd: any = JSON.parse(data);
         if (cmd !== null && typeof (cmd) === 'object') {
           switch (cmd.res) {

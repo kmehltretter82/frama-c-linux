@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,10 +32,10 @@ let access_update_pattern e =
   let open Qed.Logic in
   match F.repr e with
   | Aget(u,j) ->
-      begin match F.repr u with
-        | Aset(a,i,e) -> Some(a,i,e,j)
-        | _ -> None
-      end
+    begin match F.repr u with
+      | Aset(a,i,e) -> Some(a,i,e,j)
+      | _ -> None
+    end
   | _ -> None
 
 class array =
@@ -50,13 +50,13 @@ class array =
       match access_update_pattern e with
       | None -> Not_applicable
       | Some(a,i,v,j) ->
-          ignore feedback ;
-          let at = Tactical.at s in
-          let cases = [
-            "Same Indices" , F.p_equal i j , e , v ;
-            "Diff Indices" , F.p_neq i j , e , F.e_get a j ;
-          ] in
-          Applicable (Tactical.rewrite ?at cases)
+        ignore feedback ;
+        let at = Tactical.at s in
+        let cases = [
+          "Same Indices" , F.p_equal i j , e , v ;
+          "Diff Indices" , F.p_neq i j , e , F.e_get a j ;
+        ] in
+        Applicable (Tactical.rewrite ?at cases)
 
   end
 

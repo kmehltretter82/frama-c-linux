@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,7 +24,7 @@ open Cil_types
 open Gui_types
 
 let results_kf_computed kf =
-  Db.Value.is_computed () &&
+  Eva.Analysis.is_computed () &&
   match kf with
   | { fundec = Definition (fundec, _) } ->
     Mark_noresults.should_memorize_function fundec

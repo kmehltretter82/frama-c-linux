@@ -3,7 +3,7 @@
   (public_name frama-c-studia.core)
   (modules options writes reads)
   (flags -open Frama_c_kernel)
-  (libraries frama-c.kernel)
+  (libraries frama-c.kernel frama-c-eva.core)
 )
 
 (plugin (optional) (name studia) (libraries frama-c-studia.core) (site (frama-c plugins)))

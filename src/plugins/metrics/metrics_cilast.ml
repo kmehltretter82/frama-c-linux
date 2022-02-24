@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -747,9 +747,9 @@ let compute_on_cilast ~libc =
          Format.fprintf fmt "@." (* ensure the file ends with a newline *)
       );
       close_out oc;
-    with Sys_error _ ->
-      Metrics_parameters.failure "Cannot open file %a.@."
-        Filepath.Normalized.pretty out_fname
+    with Sys_error s ->
+      Metrics_parameters.abort "Cannot open file %a (%s)."
+        Filepath.Normalized.pretty out_fname s
   end
   else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
 

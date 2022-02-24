@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -67,8 +67,8 @@ let configure ~update ~generate kf cint rte =
     match cint with
     | Cint.Machine -> () (* RTE has been set *)
     | Cint.Natural ->
-        Wp_parameters.warning ~once:true ~current:false
-          "-wp-rte and model nat require kernel to warn against %s" rte.name
+      Wp_parameters.warning ~once:true ~current:false
+        "-wp-rte and model nat require kernel to warn against %s" rte.name
 
 let generator =
   [

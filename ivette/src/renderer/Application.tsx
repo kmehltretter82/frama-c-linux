@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -35,22 +35,22 @@ import * as Sidebar from 'dome/frame/sidebars';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
+import * as IvettePrefs from 'ivette/prefs';
 import './loader';
 
 // --------------------------------------------------------------------------
 // --- Main View
 // --------------------------------------------------------------------------
 
-export default (() => {
+export default function Application(): JSX.Element {
   const [sidebar, flipSidebar] =
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
   const [viewbar, flipViewbar] =
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
   const hints = Extensions.useSearchHints();
-  const onSelectedHints = () => {
+  const onSelectedHints = (): void => {
     if (hints.length === 1) Extensions.onSearchHint(hints[0]);
   };
-
   return (
     <Vfill>
       <Toolbar.ToolBar>
@@ -70,6 +70,7 @@ export default (() => {
           onHint={Extensions.onSearchHint}
           onSelect={onSelectedHints}
         />
+        <IvettePrefs.ThemeSwitch />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"
@@ -95,6 +96,6 @@ export default (() => {
       </Toolbar.ToolBar>
     </Vfill>
   );
-});
+}
 
 // --------------------------------------------------------------------------

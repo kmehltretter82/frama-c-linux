@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -81,7 +81,7 @@ module BoolInfo = struct
     key_visible "label_visible" fm lab_key
 
   let annotation_visible _ stmt annot =
-    Db.Value.is_reachable_stmt stmt && Alarms.find annot = None
+    Eva.Results.is_reachable stmt && Alarms.find annot = None
   (* Keep annotations on reachable, but not alarms: they can be resynthesized,
      and the alarms table is not synchronized in the new project anyway *)
   (* TODO: does not seem really coherent with the fact that almost everything
@@ -126,13 +126,11 @@ module BoolInfo = struct
   let called_info (project, _fm) call_stmt =
     match call_stmt.skind with
     | Instr (Call (_, _, _, _) | Local_init(_, ConsInit _, _)) ->
-      let called_functions = Db.Value.call_to_kernel_function call_stmt in
+      let called_functions = Eva.Results.callee call_stmt in
       let call_info =
-        match
-          Kernel_function.Hptset.contains_single_elt called_functions
-        with
-        | None -> None
-        | Some kf ->
+        match called_functions with
+        | [] | _ :: _  :: _ -> None
+        | [kf] ->
           match Spare_marks.get_marks project kf with
           | None ->
             if Spare_marks.kf_visible project kf

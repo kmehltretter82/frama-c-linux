@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -201,10 +201,10 @@ and footprint_comp { cfields } =
   match cfields with
   | None -> all_value_chunks ()
   | Some fields ->
-      List.fold_left
-        (fun ft f ->
-           Heap.Set.union ft (footprint (object_of f.ftype))
-        ) Heap.Set.empty fields
+    List.fold_left
+      (fun ft f ->
+         Heap.Set.union ft (footprint (object_of f.ftype))
+      ) Heap.Set.empty fields
 
 and all_value_chunks () =
   let ints =
@@ -251,32 +251,32 @@ let rec length_of_object = function
   | C_int _ | C_float _ | C_pointer _ -> e_one
   | C_comp c -> length_of_comp c
   | C_array { arr_flat = Some { arr_size = n } ; arr_element = elt } ->
-      e_mul (e_int n) (length_of_typ elt)
+    e_mul (e_int n) (length_of_typ elt)
   | C_array _ as a ->
-      if Wp_parameters.ExternArrays.get () then
-        e_int max_int
-      else
-        Warning.error ~source:"Typed Model"
-          "Undefined array-size (%a)" Ctypes.pretty a
+    if Wp_parameters.ExternArrays.get () then
+      e_int max_int
+    else
+      Warning.error ~source:"Typed Model"
+        "Undefined array-size (%a)" Ctypes.pretty a
 
 and length_of_typ t = length_of_object (object_of t)
 and length_of_field f = length_of_typ f.ftype
 and length_of_comp c =
   match c.cfields with
   | None ->
-      Lang.F.e_fun (OPAQUE_COMP_LENGTH.get c) []
+    Lang.F.e_fun (OPAQUE_COMP_LENGTH.get c) []
   | Some fields ->
-      (* union field are considered as struct field *)
-      e_sum (List.map length_of_field fields)
+    (* union field are considered as struct field *)
+    e_sum (List.map length_of_field fields)
 
 let position_of_field f =
   let rec fnext k f = function
     | [] -> assert false
     | g::gs ->
-        if Fieldinfo.equal f g then k
-        else fnext (e_add k (length_of_field g)) f gs
-        (* Just as we fail if the field does not exists, we fail
-           if we try to get a field position in an opaque struct. *)
+      if Fieldinfo.equal f g then k
+      else fnext (e_add k (length_of_field g)) f gs
+      (* Just as we fail if the field does not exists, we fail
+         if we try to get a field position in an opaque struct. *)
   in fnext e_zero f (Option.get f.fcomp.cfields)
 
 (* -------------------------------------------------------------------------- *)
@@ -382,10 +382,10 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
         | C_pointer _ -> Format.fprintf fmt "PTR"
         | C_comp c -> Format.pp_print_string fmt (Lang.comp_id c)
         | C_array a ->
-            let te = object_of a.arr_element in
-            match a.arr_flat with
-            | None -> Format.fprintf fmt "A_%a" c_object_id te
-            | Some f -> Format.fprintf fmt "A%d_%a" f.arr_size c_object_id te
+          let te = object_of a.arr_element in
+          match a.arr_flat with
+          | None -> Format.fprintf fmt "A_%a" c_object_id te
+          | Some f -> Format.fprintf fmt "A%d_%a" f.arr_size c_object_id te
 
       let c_object_id c = Format.asprintf "%a@?" c_object_id c
 
@@ -564,38 +564,38 @@ module BASE = WpContext.Generator(Varinfo)
         match size with
         | None -> ()
         | Some size ->
-            let a = Lang.freshvar ~basename:"alloc" t_malloc in
-            let m = e_var a in
-            let m_linked = p_call p_linked [m] in
-            let base_size = p_equal (F.e_get m base) size in
-            Definitions.define_lemma {
-              l_kind = Admit ;
-              l_name = name ; l_types = 0 ;
-              l_triggers = [] ; l_forall = [] ;
-              l_lemma = p_forall [a] (p_imply m_linked base_size) ;
-              l_cluster = cluster_globals () ;
-            }
+          let a = Lang.freshvar ~basename:"alloc" t_malloc in
+          let m = e_var a in
+          let m_linked = p_call p_linked [m] in
+          let base_size = p_equal (F.e_get m base) size in
+          Definitions.define_lemma {
+            l_kind = Admit ;
+            l_name = name ; l_types = 0 ;
+            l_triggers = [] ; l_forall = [] ;
+            l_lemma = p_forall [a] (p_imply m_linked base_size) ;
+            l_cluster = cluster_globals () ;
+          }
 
       let initialization prefix x base =
         match sizeof x with
         | Some size when Cvalues.always_initialized x ->
-            let a = Lang.freshvar ~basename:"init" t_init in
-            let m = e_var a in
-            let init_access =
-              if size = e_one then
-                p_bool (F.e_get m (a_addr base e_zero))
-              else
-                F.p_call p_is_init_r [ m ; a_addr base e_zero ; size ]
-            in
-            let m_init = p_call p_cinits [m] in
-            let init_prop = p_forall [a] (p_imply m_init init_access) in
-            Definitions.define_lemma {
-              l_kind = Admit ;
-              l_name = prefix ^ "_init" ; l_types = 0 ;
-              l_triggers = [] ; l_forall = [] ;
-              l_lemma = init_prop ;
-              l_cluster = cluster_globals () ;
-            }
+          let a = Lang.freshvar ~basename:"init" t_init in
+          let m = e_var a in
+          let init_access =
+            if size = e_one then
+              p_bool (F.e_get m (a_addr base e_zero))
+            else
+              F.p_call p_is_init_r [ m ; a_addr base e_zero ; size ]
+          in
+          let m_init = p_call p_cinits [m] in
+          let init_prop = p_forall [a] (p_imply m_init init_access) in
+          Definitions.define_lemma {
+            l_kind = Admit ;
+            l_name = prefix ^ "_init" ; l_types = 0 ;
+            l_triggers = [] ; l_forall = [] ;
+            l_lemma = init_prop ;
+            l_cluster = cluster_globals () ;
+          }
         | _ -> ()
 
       let generate x =
@@ -647,9 +647,9 @@ let block_length sigma obj l =
   let n_cells = e_div (allocated sigma l) (length_of_object obj) in
   match obj with
   | C_comp ({ cfields = None } as c) ->
-      e_mul (Cvalues.bytes_length_of_opaque_comp c) n_cells
+    e_mul (Cvalues.bytes_length_of_opaque_comp c) n_cells
   | _ ->
-      e_fact (Ctypes.sizeof_object obj) n_cells
+    e_fact (Ctypes.sizeof_object obj) n_cells
 
 (* -------------------------------------------------------------------------- *)
 (* --- Cast                                                               --- *)
@@ -699,11 +699,11 @@ struct
     | C_float f -> A (F f)
     | C_pointer t -> A (P t)
     | C_comp ( { cfields = Some [f] } as c ) ->
-        begin (* union having only one field is equivalent to a struct *)
-          match Ctypes.object_of f.ftype with
-          | C_array _ -> (if c.cstruct then S c else U c)
-          | cobj -> get_slot cobj
-        end
+      begin (* union having only one field is equivalent to a struct *)
+        match Ctypes.object_of f.ftype with
+        | C_array _ -> (if c.cstruct then S c else U c)
+        | cobj -> get_slot cobj
+      end
     | C_comp c -> if c.cstruct then S c else U c
     | C_array _ -> assert false
 
@@ -735,34 +735,34 @@ struct
   let pp_layout fmt = function
     | [b] -> pp_block fmt b
     | bs ->
-        begin
-          Format.fprintf fmt "@[<hov 2>{" ;
-          List.iter (fun b -> Format.fprintf fmt "@ %a" pp_block b) bs ;
-          Format.fprintf fmt " }@]" ;
-        end
+      begin
+        Format.fprintf fmt "@[<hov 2>{" ;
+        List.iter (fun b -> Format.fprintf fmt "@ %a" pp_block b) bs ;
+        Format.fprintf fmt " }@]" ;
+      end
 
   (* requires n > 1 *)
   let rec add_many cobj n w = (* returns [layout obj]*n @ [w] *)
     assert (n > 1L) ;
     match cobj, w with
     | C_array { arr_flat = Some a }, _ when a.arr_cell_nbr = 1L ->
-        add_many (Ctypes.object_of a.arr_cell) n w
+      add_many (Ctypes.object_of a.arr_cell) n w
     | C_array _, Arr(o, m)::w when 0 = compare_ptr_conflated o cobj ->
-        Arr(o, Int64.add m n)::w
+      Arr(o, Int64.add m n)::w
     | C_array _, _ -> Arr(cobj, n)::w
     | _  -> add_slot (get_slot cobj) n w
 
   let rec rlayout w = function (* returns [layout obj] @ [w] *)
     | C_array { arr_flat = Some a } ->
-        let cobj = Ctypes.object_of a.arr_cell in
-        if a.arr_cell_nbr = 1L
-        then rlayout w cobj
-        else add_many cobj a.arr_cell_nbr w
+      let cobj = Ctypes.object_of a.arr_cell in
+      if a.arr_cell_nbr = 1L
+      then rlayout w cobj
+      else add_many cobj a.arr_cell_nbr w
     | C_array { arr_element = e } ->
-        if Wp_parameters.ExternArrays.get () then
-          add_many (Ctypes.object_of e) Int64.max_int w
-        else
-          add_block Garbled w
+      if Wp_parameters.ExternArrays.get () then
+        add_many (Ctypes.object_of e) Int64.max_int w
+      else
+        add_block Garbled w
     | cobj -> add_slot (get_slot cobj) 1L w
 
   let layout (obj : c_object) : layout = rlayout [] obj
@@ -770,10 +770,10 @@ struct
   let clayout (c: Cil_types.compinfo) : layout =
     match c.cfields with
     | None ->
-        [Garbled]
+      [Garbled]
     | Some fields ->
-        let flayout w f = rlayout w (Ctypes.object_of f.ftype) in
-        List.fold_left flayout [] (List.rev fields)
+      let flayout w f = rlayout w (Ctypes.object_of f.ftype) in
+      List.fold_left flayout [] (List.rev fields)
 
   type comparison = Srem of layout | Drem of layout | Equal | Mismatch
 
@@ -796,7 +796,7 @@ struct
     | S c1, _    -> compare ~dst:(clayout c1) ~src:[Str(src,1L)]
     |    _, S c2 -> compare ~dst:[Str(dst,1L)] ~src:(clayout c2)
     | U c1, U c2 ->  (* for union, the layouts must be equal *)
-        if equal (clayout c1) (clayout c2) then Equal else Mismatch
+      if equal (clayout c1) (clayout c2) then Equal else Mismatch
     | U _, A _ -> Mismatch
     | A _, U _ -> Mismatch
   and compare ~dst ~src =
@@ -805,58 +805,58 @@ struct
     | [] , obj -> Srem obj (* src = dst @ obj *)
     | obj , [] -> Drem obj (* dst = src @ obj *)
     | p::w1 , q::w2 ->
-        match p , q with
-        | Garbled , _ | _ , Garbled -> Mismatch
-        | Str(a,n) , Str(b,m) ->
-            begin
-              match compare_slot a b with
-              | Mismatch -> Mismatch
-              | Drem a'->
-                  let w1 = a' @ decr_slot a n w1 in
-                  let w2 =      decr_slot b m w2 in
-                  compare w1 w2
-              | Srem b' ->
-                  let w1 =      decr_slot a n w1 in
-                  let w2 = b' @ decr_slot b m w2 in
-                  compare w1 w2
-              | Equal ->
-                  if n < m then
-                    let w2 = Str(a,Int64.sub m n)::w2 in
-                    compare w1 w2
-                  else if n > m then
-                    let w1 = Str(a,Int64.sub n m)::w1 in
-                    compare w1 w2
-                  else
-                    (* n = m *)
-                    compare w1 w2
-            end
-        | Arr(u,n) , Arr(v,m) ->
-            begin
-              match compare ~dst:(layout u) ~src:(layout v) with
-              | Mismatch -> Mismatch
-              | Drem u' ->
-                  let w1 = u' @ add_array u (Int64.pred n) w1 in
-                  let w2 =      add_array v (Int64.pred m) w2 in
-                  compare w1 w2
-              | Srem v' ->
-                  let w1 =      add_array u (Int64.pred n) w1 in
-                  let w2 = v' @ add_array v (Int64.pred m) w2 in
-                  compare w1 w2
-              | Equal ->
-                  if n < m then
-                    let w2 = add_array v (Int64.sub m n) w2 in
-                    compare w1 w2
-                  else if n > m then
-                    let w1 = add_array u (Int64.sub n m) w1 in
-                    compare w1 w2
-                  else
-                    (* n = m *)
-                    compare w1 w2
-            end
-        | Arr(u,n) , Str _ ->
-            compare ~dst:((layout u) @ add_array u (Int64.pred n) w1) ~src
-        | Str _ , Arr(v,n) ->
-            compare ~dst ~src:((layout v) @ add_array v (Int64.pred n) w2)
+      match p , q with
+      | Garbled , _ | _ , Garbled -> Mismatch
+      | Str(a,n) , Str(b,m) ->
+        begin
+          match compare_slot a b with
+          | Mismatch -> Mismatch
+          | Drem a'->
+            let w1 = a' @ decr_slot a n w1 in
+            let w2 =      decr_slot b m w2 in
+            compare w1 w2
+          | Srem b' ->
+            let w1 =      decr_slot a n w1 in
+            let w2 = b' @ decr_slot b m w2 in
+            compare w1 w2
+          | Equal ->
+            if n < m then
+              let w2 = Str(a,Int64.sub m n)::w2 in
+              compare w1 w2
+            else if n > m then
+              let w1 = Str(a,Int64.sub n m)::w1 in
+              compare w1 w2
+            else
+              (* n = m *)
+              compare w1 w2
+        end
+      | Arr(u,n) , Arr(v,m) ->
+        begin
+          match compare ~dst:(layout u) ~src:(layout v) with
+          | Mismatch -> Mismatch
+          | Drem u' ->
+            let w1 = u' @ add_array u (Int64.pred n) w1 in
+            let w2 =      add_array v (Int64.pred m) w2 in
+            compare w1 w2
+          | Srem v' ->
+            let w1 =      add_array u (Int64.pred n) w1 in
+            let w2 = v' @ add_array v (Int64.pred m) w2 in
+            compare w1 w2
+          | Equal ->
+            if n < m then
+              let w2 = add_array v (Int64.sub m n) w2 in
+              compare w1 w2
+            else if n > m then
+              let w1 = add_array u (Int64.sub n m) w1 in
+              compare w1 w2
+            else
+              (* n = m *)
+              compare w1 w2
+        end
+      | Arr(u,n) , Str _ ->
+        compare ~dst:((layout u) @ add_array u (Int64.pred n) w1) ~src
+      | Str _ , Arr(v,n) ->
+        compare ~dst ~src:((layout v) @ add_array v (Int64.pred n) w2)
 
   let rec repeated ~dst ~src =
     match dst , src with
@@ -867,33 +867,33 @@ struct
         match p , q with
         | Garbled , _ | _ , Garbled -> false
         | Str(a,n) , Str(b,m) -> (* dst =?= repeated(src,n/m) *)
-            begin
-              match compare_slot ~dst:a ~src:b with
-              | Mismatch -> false
-              | Drem a' ->
-                  let w1 = a' @ decr_slot a n [] in
-                  let w2 =      decr_slot b m [] in
-                  let cmp = compare ~dst:w1 ~src:w2 in
-                  repeated_result ~src cmp
-              | Srem _ ->
-                  false
-              | Equal -> (* dst =?= repeated(src,n/m) *)
-                  n >= m && (Int64.rem n m = 0L)
-            end
+          begin
+            match compare_slot ~dst:a ~src:b with
+            | Mismatch -> false
+            | Drem a' ->
+              let w1 = a' @ decr_slot a n [] in
+              let w2 =      decr_slot b m [] in
+              let cmp = compare ~dst:w1 ~src:w2 in
+              repeated_result ~src cmp
+            | Srem _ ->
+              false
+            | Equal -> (* dst =?= repeated(src,n/m) *)
+              n >= m && (Int64.rem n m = 0L)
+          end
         | Arr(u,n) , Arr(v,m) ->
-            begin
-              match compare ~dst:(layout u) ~src:(layout v) with
-              | Mismatch -> false
-              | Drem u' ->
-                  let w1 = u' @ add_array u (Int64.pred  n) [] in
-                  let w2 = add_array v (Int64.pred m) [] in
-                  let cmp = compare ~dst:w1 ~src:w2 in
-                  repeated_result ~src cmp
-              | Srem _ ->
-                  false
-              | Equal -> (* dst =?= repeated(src,n/m) *)
-                  n >= m && (Int64.rem n m = 0L)
-            end
+          begin
+            match compare ~dst:(layout u) ~src:(layout v) with
+            | Mismatch -> false
+            | Drem u' ->
+              let w1 = u' @ add_array u (Int64.pred  n) [] in
+              let w2 = add_array v (Int64.pred m) [] in
+              let cmp = compare ~dst:w1 ~src:w2 in
+              repeated_result ~src cmp
+            | Srem _ ->
+              false
+            | Equal -> (* dst =?= repeated(src,n/m) *)
+              n >= m && (Int64.rem n m = 0L)
+          end
         | _ , _ -> repeated_compare ~dst ~src
       end
     | _ , _ -> repeated_compare ~dst ~src
@@ -910,11 +910,11 @@ struct
     | C_comp c , C_comp d when Compinfo.equal c d -> true
     | C_pointer _ , C_pointer _ -> true
     | _ ->
-        let src = layout src in
-        match compare ~dst:(layout dst) ~src with
-        | Equal | Srem _ -> true
-        | Mismatch -> false
-        | Drem dst -> repeated dst src
+      let src = layout src in
+      match compare ~dst:(layout dst) ~src with
+      | Equal | Srem _ -> true
+      | Mismatch -> false
+      | Drem dst -> repeated dst src
 
   let rec pretty fmt = function
     | C_pointer ty -> Format.fprintf fmt "%a*" pretty (Ctypes.object_of ty)
@@ -943,13 +943,13 @@ let cast s l =
       match Context.get pointer with
       | NoCast -> Warning.error ~source:"Typed Model" "%a" pp_mismatch s
       | Fits ->
-          if Layout.fits ~dst:s.post ~src:s.pre then l else
-            Warning.error ~source:"Typed Model" "%a" pp_mismatch s
+        if Layout.fits ~dst:s.post ~src:s.pre then l else
+          Warning.error ~source:"Typed Model" "%a" pp_mismatch s
       | Unsafe ->
-          if not (Layout.fits ~dst:s.post ~src:s.pre) then
-            Warning.emit ~severe:false ~source:"Typed Model"
-              ~effect:"Keep pointer value"
-              "%a" pp_mismatch s ; l
+        if not (Layout.fits ~dst:s.post ~src:s.pre) then
+          Warning.emit ~severe:false ~source:"Typed Model"
+            ~effect:"Keep pointer value"
+            "%a" pp_mismatch s ; l
     end
 
 let loc_of_int _ v = F.e_fun f_addr_of_int [v]
@@ -962,11 +962,11 @@ let int_of_loc _ l = F.e_fun f_int_of_addr [l]
 let frames obj addr = function
   | T_alloc -> []
   | m ->
-      let offset = length_of_object obj in
-      let sizeof = F.e_one in
-      let tau = Chunk.val_of_chunk m in
-      let basename = Chunk.basename_of_chunk m in
-      MemMemory.frames ~addr ~offset ~sizeof ~basename tau
+    let offset = length_of_object obj in
+    let sizeof = F.e_one in
+    let tau = Chunk.val_of_chunk m in
+    let basename = Chunk.basename_of_chunk m in
+    MemMemory.frames ~addr ~offset ~sizeof ~basename tau
 
 (* -------------------------------------------------------------------------- *)
 (* --- Chunk element type                                                 --- *)
@@ -1004,9 +1004,9 @@ module ChunkContent = WpContext.Generator(Chunk)
 
 let is_chunk sigma = function
   | M_int _ as m ->
-      F.p_call (ChunkContent.get m) [ Sigma.value sigma m ]
+    F.p_call (ChunkContent.get m) [ Sigma.value sigma m ]
   | _ ->
-      p_true
+    p_true
 
 let is_well_formed sigma =
   let open Sigma in
@@ -1133,15 +1133,15 @@ let s_invalid sigma p n =
 
 let segment phi = function
   | Rloc(obj,l) ->
-      phi l (length_of_object obj)
+    phi l (length_of_object obj)
   | Rrange(l,obj,Some a,Some b) ->
-      let l = shift l obj a in
-      let n = e_mul (length_of_object obj) (e_range a b) in
-      phi l n
+    let l = shift l obj a in
+    let n = e_mul (length_of_object obj) (e_range a b) in
+    phi l n
   | Rrange(l,_,a,b) ->
-      Wp_parameters.abort ~current:true
-        "Invalid infinite range @[<hov 2>%a+@,(%a@,..%a)@]"
-        F.pp_term l Vset.pp_bound a Vset.pp_bound b
+    Wp_parameters.abort ~current:true
+      "Invalid infinite range @[<hov 2>%a+@,(%a@,..%a)@]"
+      F.pp_term l Vset.pp_bound a Vset.pp_bound b
 
 let valid sigma acs = segment (s_valid sigma acs)
 let invalid sigma = segment (s_invalid sigma)
@@ -1221,9 +1221,9 @@ let lookup s e =
   try match F.repr e with
     | L.Fun( f , es ) -> Sigs.Maddr (lookup_f f es)
     | L.Aget( m , k ) when Tmap.find m s = T_init ->
-        Sigs.Mlval (lookup_lv k, KInit)
+      Sigs.Mlval (lookup_lv k, KInit)
     | L.Aget( m , k ) when Tmap.find m s <> T_alloc ->
-        Sigs.Mlval (lookup_lv k, KValue)
+      Sigs.Mlval (lookup_lv k, KValue)
     | _ -> Sigs.Mterm
   with Not_found -> Sigs.Mterm
 
@@ -1246,11 +1246,11 @@ let rec diff v1 v2 =
   if v1 == v2 then Bag.empty else
     match F.repr v2 with
     | L.Aset( m , k , v ) ->
-        let lv = lookup_lv k in
-        let upd = Mstore( lv , v ) in
-        Bag.append (diff v1 m) upd
+      let lv = lookup_lv k in
+      let upd = Mstore( lv , v ) in
+      Bag.append (diff v1 m) upd
     | _ ->
-        Bag.empty
+      Bag.empty
 
 let updates seq domain =
   let pool = ref Bag.empty in

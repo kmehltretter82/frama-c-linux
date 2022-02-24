@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,7 +29,7 @@ module Tbl =
     (struct
       let name = "Functionwise dependencies"
       let size = 17
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
     end)
 let () = From_parameters.ForceDeps.set_output_dependencies [Tbl.self]
 
@@ -92,7 +92,7 @@ let () =
 
 
 let force_compute_all () =
-  !Db.Value.compute ();
+  Eva.Analysis.compute ();
   Callgraph.Uses.iter_in_rev_order
     (fun kf ->
        if Kernel_function.is_definition kf && !Db.Value.is_called kf

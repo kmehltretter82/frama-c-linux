@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -49,7 +49,7 @@ import './style.css';
 
 const globalModelState = new GlobalState(new Model());
 
-function ValuesComponent() {
+function ValuesComponent(): JSX.Element {
   const [model] = useGlobalState(globalModelState);
   model.mount();
   Dome.useUpdate(model.changed, model.laidout);

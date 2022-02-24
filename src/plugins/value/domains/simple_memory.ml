@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -196,7 +196,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   type location = Precise_locs.precise_location
   type origin
 
-  let log_category = Value_parameters.register_category ("d-" ^ Info.name)
+  let log_category = Self.register_category ("d-" ^ Info.name)
 
   let widen _kf _stmt = widen
 

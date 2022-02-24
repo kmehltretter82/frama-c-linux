@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Value_parameters
+open Parameters
 open Eva_annotations
 open Cil_types
 
@@ -69,10 +69,10 @@ struct
     | loop_kind :: _ ->
       let wkey =
         if loop_kind = "for"
-        then Value_parameters.wkey_missing_loop_unroll_for
-        else Value_parameters.wkey_missing_loop_unroll
+        then Self.wkey_missing_loop_unroll_for
+        else Self.wkey_missing_loop_unroll
       in
-      Value_parameters.warning
+      Self.warning
         ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
         "%s loop without unroll annotation" loop_kind
 
@@ -142,8 +142,8 @@ struct
 
   let call_return_policy =
     Partition.{
-      callee_splits = Value_parameters.InterproceduralSplits.get ();
-      callee_history = Value_parameters.InterproceduralHistory.get ();
+      callee_splits = Parameters.InterproceduralSplits.get ();
+      callee_history = Parameters.InterproceduralHistory.get ();
       caller_history = true;
       history_size = history_size;
     }

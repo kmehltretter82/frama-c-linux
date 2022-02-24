@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -77,9 +77,9 @@ let select kf bnames =
   match Annotations.behaviors kf with
   | [] -> if bnames = [] then [empty_default_behavior] else []
   | bhvs -> if bnames = [] then bhvs else
-        List.filter
-          (fun b -> List.mem b.b_name bnames)
-          bhvs
+      List.filter
+        (fun b -> List.mem b.b_name bnames)
+        bhvs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Elementary Tasks                                                   --- *)
@@ -97,9 +97,9 @@ let add_fun_task model pool ~kf ?infos ?bhvs ?target () =
   let bhvs = match bhvs with
     | Some bhvs -> bhvs
     | None ->
-        let bhvs = Annotations.behaviors kf in
-        if List.exists (Cil.is_default_behavior) bhvs then bhvs
-        else empty_default_behavior :: bhvs in
+      let bhvs = Annotations.behaviors kf in
+      if List.exists (Cil.is_default_behavior) bhvs then bhvs
+      else empty_default_behavior :: bhvs in
   let add_mode kf m =
     let ms = try KFmap.find kf pool.modes with Not_found -> [] in
     pool.modes <- KFmap.add kf (m :: ms) pool.modes in
@@ -120,50 +120,50 @@ let rec strategy_ip model pool target =
   let open Property in
   match target with
   | IPLemma { il_name } ->
-      add_lemma_task pool (LogicUsage.logic_lemma il_name)
+    add_lemma_task pool (LogicUsage.logic_lemma il_name)
   | IPAxiomatic { iax_props } ->
-      List.iter (strategy_ip model pool) iax_props
+    List.iter (strategy_ip model pool) iax_props
   | IPBehavior { ib_kf = kf ; ib_bhv = bhv } ->
-      add_fun_task model pool ~kf ~bhvs:[bhv] ()
+    add_fun_task model pool ~kf ~bhvs:[bhv] ()
   | IPPredicate { ip_kf = kf ; ip_kind ; ip_kinstr = ki } ->
-      begin match ip_kind with
-        | PKAssumes _ -> ()
-        | PKRequires bhv ->
-            begin
-              match ki with
-              | Kglobal -> (*TODO*) notyet target
-              | Kstmt _ -> add_fun_task model pool ~kf ~bhvs:[bhv] ~target ()
-            end
-        | PKEnsures(bhv,_) ->
-            add_fun_task model pool ~kf ~bhvs:[bhv] ~target ()
-        | PKTerminates ->
-            add_fun_task model pool ~kf ~bhvs:(default kf) ~target ()
-      end
+    begin match ip_kind with
+      | PKAssumes _ -> ()
+      | PKRequires bhv ->
+        begin
+          match ki with
+          | Kglobal -> (*TODO*) notyet target
+          | Kstmt _ -> add_fun_task model pool ~kf ~bhvs:[bhv] ~target ()
+        end
+      | PKEnsures(bhv,_) ->
+        add_fun_task model pool ~kf ~bhvs:[bhv] ~target ()
+      | PKTerminates ->
+        add_fun_task model pool ~kf ~bhvs:(default kf) ~target ()
+    end
   | IPDecrease { id_kf = kf } ->
-      add_fun_task model pool ~kf ~bhvs:(default kf) ~target ()
+    add_fun_task model pool ~kf ~bhvs:(default kf) ~target ()
   | IPAssigns { ias_kf=kf ; ias_bhv=Id_loop ca }
   | IPAllocation { ial_kf=kf ; ial_bhv=Id_loop ca } ->
-      let bhvs = match ca.annot_content with
-        | AAssigns(bhvs,_) | AAllocation(bhvs,_) -> bhvs
-        | _ -> [] in
-      add_fun_task model pool ~kf ~bhvs:(select kf bhvs) ~target ()
+    let bhvs = match ca.annot_content with
+      | AAssigns(bhvs,_) | AAllocation(bhvs,_) -> bhvs
+      | _ -> [] in
+    add_fun_task model pool ~kf ~bhvs:(select kf bhvs) ~target ()
   | IPAssigns { ias_kf=kf ; ias_bhv=Id_contract(_,bhv) }
   | IPAllocation { ial_kf=kf ; ial_bhv=Id_contract(_,bhv) }
     -> add_fun_task model pool ~kf ~bhvs:[bhv] ~target ()
   | IPCodeAnnot { ica_kf = kf ; ica_ca = ca } ->
-      begin match ca.annot_content with
-        | AExtended _ | APragma _ -> ()
-        | AStmtSpec(fors,_) ->
-            (*TODO*) notyet target ;
-            add_fun_task model pool ~kf ~bhvs:(select kf fors) ()
-        | AVariant _ ->
-            add_fun_task model pool ~kf ~target ()
-        | AAssert(fors, _)
-        | AInvariant(fors, _, _)
-        | AAssigns(fors, _)
-        | AAllocation(fors, _) ->
-            add_fun_task model pool ~kf ~bhvs:(select kf fors) ~target ()
-      end
+    begin match ca.annot_content with
+      | AExtended _ | APragma _ -> ()
+      | AStmtSpec(fors,_) ->
+        (*TODO*) notyet target ;
+        add_fun_task model pool ~kf ~bhvs:(select kf fors) ()
+      | AVariant _ ->
+        add_fun_task model pool ~kf ~target ()
+      | AAssert(fors, _)
+      | AInvariant(fors, _, _)
+      | AAssigns(fors, _)
+      | AAllocation(fors, _) ->
+        add_fun_task model pool ~kf ~bhvs:(select kf fors) ~target ()
+    end
   | IPComplete _ -> (*TODO*) notyet target
   | IPDisjoint _ -> (*TODO*) notyet target
   | IPFrom _ | IPReachable _ | IPTypeInvariant _ | IPGlobalInvariant _

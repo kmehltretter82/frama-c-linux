@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,8 +26,8 @@
 module ShouldOutput =
   State_builder.True_ref
     (struct
-      let dependencies = [Db.Value.self] (* To be completed if some computations
-                                            use some other results than value *)
+      let dependencies = [Eva.Analysis.self] (* To be completed if some computations
+                                                use some other results than Eva *)
       let name = "Inout.Register.ShouldOuput"
     end)
 let () = Inout_parameters.Output.add_set_hook
@@ -49,7 +49,7 @@ let main () =
      Inout_parameters.Output.get () && ShouldOutput.get ()
   then begin
     ShouldOutput.set false;
-    !Db.Value.compute ();
+    Eva.Analysis.compute ();
     Callgraph.Uses.iter_in_rev_order
       (fun kf ->
          if Kernel_function.is_definition kf && !Db.Value.is_called kf

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,7 +36,7 @@ val alloc_size_ok: Cvalue.V.t -> Alarmset.status
 
 val free_automatic_bases: Value_types.Callstack.t -> Cvalue.Model.t -> Cvalue.Model.t
 (** Performs the equivalent of [free] for each location that was allocated via
-    [alloca()] in the current function (as per [Value_util.call_stack ()]).
+    [alloca()] in the current function (as per [Eva_utils.call_stack ()]).
     This function must be called during finalization of a function call. *)
 
 val freeable: Cvalue.V.t -> Abstract_interp.truth

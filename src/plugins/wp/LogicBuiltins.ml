@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -80,15 +80,15 @@ let pp_kind fmt = function
 let pp_kinds fmt = function
   | [] -> ()
   | t::ts ->
-      Format.fprintf fmt "(%a" pp_kind t ;
-      List.iter (fun t -> Format.fprintf fmt ",%a" pp_kind t) ts ;
-      Format.fprintf fmt ")"
+    Format.fprintf fmt "(%a" pp_kind t ;
+    List.iter (fun t -> Format.fprintf fmt ",%a" pp_kind t) ts ;
+    Format.fprintf fmt ")"
 
 let pp_libs fmt = function
   | [] -> ()
   | t::ts ->
-      Format.fprintf fmt ": %s" t ;
-      List.iter (fun t -> Format.fprintf fmt ",%s" t) ts
+    Format.fprintf fmt ": %s" t ;
+    List.iter (fun t -> Format.fprintf fmt ",%s" t) ts
 
 let pp_link fmt = function
   | ACSLDEF -> Format.pp_print_string fmt "(ACSL)"
@@ -293,8 +293,8 @@ let find_lib file =
     let rec lookup file = function
       | [] -> Wp_parameters.abort "File '%s' not found" file
       | dir::dirs ->
-          let path = Printf.sprintf "%s/%s" dir file in
-          if Sys.file_exists path then path else lookup file dirs
+        let path = Printf.sprintf "%s/%s" dir file in
+        if Sys.file_exists path then path else lookup file dirs
     in
     lookup file (cdriver_ro ()).includes
 

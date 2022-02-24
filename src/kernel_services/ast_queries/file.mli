@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,7 +32,7 @@ type cpp_opt_kind = Gnu | Not_gnu | Unknown
 type file =
   | NeedCPP of Filepath.Normalized.t * string * string list * cpp_opt_kind
   (** File which needs preprocessing.
-      NeedCPP(filepath, cmd, extra, cpp_opt_kind):
+      NeedCPP(filepath, cmd, extra, workdir, cpp_opt_kind):
       - filepath: source file to be preprocessed;
       - cmd: preprocessing command, before replacement of '%'-arguments;
       - extra: list of extra arguments (e.g. from a JCDB);

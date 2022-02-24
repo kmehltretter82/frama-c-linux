@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -20,6 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // --------------------------------------------------------------------------
 // --- Text Documents
 // --------------------------------------------------------------------------
@@ -31,6 +34,9 @@
 
 import Emitter from 'events';
 import CodeMirror from 'codemirror/lib/codemirror';
+import { Debug } from 'dome';
+
+const D = new Debug('Dome.text');
 
 export type Range = { from: CodeMirror.Position; to: CodeMirror.Position };
 
@@ -553,7 +559,7 @@ export class RichTextBuffer extends Emitter {
    */
   forEach(fn: (editor: CodeMirror.Editor) => void) {
     this.editors.forEach((cm) => {
-      try { fn(cm); } catch (e) { console.error('[Dome.text]', e); }
+      try { fn(cm); } catch (e) { D.error(e); }
     });
   }
 

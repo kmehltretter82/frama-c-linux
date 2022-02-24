@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -121,7 +121,7 @@ class visitor = object(self)
     Error.cannot_check_ghost_call ~source ~current:true ~once:true kf
 
   method! vglob_aux = function
-    | GFunDecl(_, vi, _) ->
+    | GFunDecl(_, vi, _) when vi.vghost ->
       self#prefer_loc (Log.get_current_source ()) ;
       let post g = self#reset_loc() ; g in
 
@@ -136,7 +136,11 @@ class visitor = object(self)
         if is_empty_funspec spec then self#bad_ghost_function kf
       end ;
       Cil.DoChildrenPost post
-    | _ -> Cil.DoChildren
+    (* Optimization: only visits ghost globals or globals that may contain
+       ghost code. *)
+    | GVarDecl (vi, _) when vi.vghost -> Cil.DoChildren
+    | GVar _ | GFun _ -> Cil.DoChildren
+    | _ -> Cil.SkipChildren
 
   method! vvdec v =
     let current, source =

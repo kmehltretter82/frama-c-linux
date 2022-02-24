@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -206,6 +206,10 @@ module Position =  struct
   let pp_with_col fmt pos =
     Format.fprintf fmt "%a char %d" pretty pos
       (pos.Filepath.pos_cnum - pos.Filepath.pos_bol)
+  let pretty_debug fmt pos =
+    Format.fprintf fmt "%a:%d:%d"
+      Datatype.Filepath.pretty pos.Filepath.pos_path
+      pos.Filepath.pos_lnum pos.Filepath.pos_cnum
 end
 
 module Location = struct
@@ -242,11 +246,8 @@ module Location = struct
       Format.fprintf fmt "generated"
 
   let pretty_debug fmt loc =
-    Format.fprintf fmt "(%a:%d:%d,%a:%d:%d)"
-      Datatype.Filepath.pretty (fst loc).Filepath.pos_path
-      (fst loc).Filepath.pos_lnum (fst loc).Filepath.pos_cnum
-      Datatype.Filepath.pretty (snd loc).Filepath.pos_path
-      (snd loc).Filepath.pos_lnum (snd loc).Filepath.pos_cnum
+    Format.fprintf fmt "(%a,%a)"
+      Position.pretty_debug (fst loc) Position.pretty_debug (snd loc)
 
   let of_lexing_loc (pos1, pos2) =
     Position.of_lexing_pos pos1, Position.of_lexing_pos pos2

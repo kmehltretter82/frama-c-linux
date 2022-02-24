@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -582,7 +582,7 @@ module JEvaluation = struct
   let alarms = Record.field record ~name:"alarms"
       ~descr:(Markdown.plain "Alarms raised by the evaluation")
       (module Jlist (Jpair (Jtruth) (Jstring)))
-  let pointed_vars = Record.field record ~name:"pointed_vars"
+  let pointed_vars = Record.field record ~name:"pointedVars"
       ~descr:(Markdown.plain "List of variables pointed by the value")
       (module Jlist (Jpair (Jstring) (Jmarker)))
 
@@ -609,16 +609,16 @@ let () =
   and get_cs = Request.param_opt getValues ~name:"callstack"
       ~descr:(Md.plain "Callstack to collect (defaults to none)")
       (module Jcallstack)
-  and set_before = Request.result_opt getValues ~name:"v_before"
+  and set_before = Request.result_opt getValues ~name:"vBefore"
       ~descr:(Md.plain "Domain values before execution")
       (module JEvaluation)
-  and set_after = Request.result_opt getValues ~name:"v_after"
+  and set_after = Request.result_opt getValues ~name:"vAfter"
       ~descr:(Md.plain "Domain values after execution")
       (module JEvaluation)
-  and set_then = Request.result_opt getValues ~name:"v_then"
+  and set_then = Request.result_opt getValues ~name:"vThen"
       ~descr:(Md.plain "Domain values for true condition")
       (module JEvaluation)
-  and set_else = Request.result_opt getValues ~name:"v_else"
+  and set_else = Request.result_opt getValues ~name:"vElse"
       ~descr:(Md.plain "Domain values for false condition")
       (module JEvaluation)
   in

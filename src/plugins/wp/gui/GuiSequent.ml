@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -110,11 +110,11 @@ class autofocus =
            | `Hidden -> Env.define env "..." t
            | `Visible -> Env.unfold env t
            | `Shared ->
-               let base = F.basename t in
-               let sanitizer = Plang.sanitizer in
-               Env.define env (Env.fresh env ~sanitizer base) t
+             let base = F.basename t in
+             let sanitizer = Plang.sanitizer in
+             Env.define env (Env.fresh env ~sanitizer base) t
            | `Name x ->
-               Env.define env x t)
+             Env.define env x t)
         vterm ; env
 
     (* --- Term Occurrence --- *)
@@ -153,27 +153,27 @@ class autofocus =
           | When _ -> true
           | State s -> self#occurs_state s
           | Init p | Have p | Type p | Core p ->
-              self#occurs_term (F.e_prop p)
+            self#occurs_term (F.e_prop p)
           | Branch(p,sa,sb) ->
-              self#occurs_term (F.e_prop p)
-              || self#occurs_seq sa
-              || self#occurs_seq sb
+            self#occurs_term (F.e_prop p)
+            || self#occurs_seq sa
+            || self#occurs_seq sb
           | Either cs ->
-              List.exists self#occurs_seq cs
+            List.exists self#occurs_seq cs
         in occurs_step <- Imap.add step.id occurs occurs_step ; occurs
 
     (* --- Term Visibility --- *)
 
     method set_term t = function
       | `Auto ->
-          if Tmap.mem t vterm then
-            (vterm <- Tmap.remove t vterm ; self#clear_cache)
+        if Tmap.mem t vterm then
+          (vterm <- Tmap.remove t vterm ; self#clear_cache)
       | v ->
-          let same =
-            try v = Tmap.find t vterm
-            with Not_found -> false in
-          if not same then
-            (vterm <- Tmap.add t v vterm ; self#clear_cache)
+        let same =
+          try v = Tmap.find t vterm
+          with Not_found -> false in
+        if not same then
+          (vterm <- Tmap.add t v vterm ; self#clear_cache)
 
     method get_term t = try Tmap.find t vterm with Not_found -> `Auto
 
@@ -220,14 +220,14 @@ class autofocus =
 
     method set_step s = function
       | `Auto ->
-          if Imap.mem s.id vstep then
-            (vstep <- Imap.remove s.id vstep ; self#clear_steps)
+        if Imap.mem s.id vstep then
+          (vstep <- Imap.remove s.id vstep ; self#clear_steps)
       | v ->
-          let same =
-            try v = Imap.find s.id vstep
-            with Not_found -> false in
-          if not same then
-            (vstep <- Imap.add s.id v vstep ; self#clear_steps)
+        let same =
+          try v = Imap.find s.id vstep
+          with Not_found -> false in
+        if not same then
+          (vstep <- Imap.add s.id v vstep ; self#clear_steps)
 
     method get_step s =
       try Imap.find s.id vstep
@@ -243,27 +243,27 @@ class autofocus =
       match sequent with
       | None -> Tactical.Empty
       | Some (hs,goal) ->
-          if F.is_subterm a (F.e_prop goal)
-          then Tactical.(Inside(Goal goal,a))
-          else
-            let pool = ref Tactical.Empty in
-            let rec lookup_sequence a hs =
-              Conditions.iter
-                (fun step ->
-                   match step.condition with
-                   | (Have p | When p | Branch(p,_,_))
-                     when F.is_subterm a (F.e_prop p) ->
-                       pool := Tactical.(Inside(Step step,a)) ;
-                       raise Exit
-                   | Branch(_,sa,sb) ->
-                       lookup_sequence a sa ;
-                       lookup_sequence a sb ;
-                   | Either cs ->
-                       List.iter (lookup_sequence a) cs
-                   | State _ | Type _ | Init _ | Have _ | When _ | Core _ -> ()
-                ) hs in
-            (try lookup_sequence a hs with Exit -> ()) ;
-            !pool
+        if F.is_subterm a (F.e_prop goal)
+        then Tactical.(Inside(Goal goal,a))
+        else
+          let pool = ref Tactical.Empty in
+          let rec lookup_sequence a hs =
+            Conditions.iter
+              (fun step ->
+                 match step.condition with
+                 | (Have p | When p | Branch(p,_,_))
+                   when F.is_subterm a (F.e_prop p) ->
+                   pool := Tactical.(Inside(Step step,a)) ;
+                   raise Exit
+                 | Branch(_,sa,sb) ->
+                   lookup_sequence a sa ;
+                   lookup_sequence a sb ;
+                 | Either cs ->
+                   List.iter (lookup_sequence a) cs
+                 | State _ | Type _ | Init _ | Have _ | When _ | Core _ -> ()
+              ) hs in
+          (try lookup_sequence a hs with Exit -> ()) ;
+          !pool
 
     (* ---- Global ----- *)
 
@@ -380,10 +380,10 @@ class pcond
                match step.condition with
                | State _ -> ()
                | Have p | Init p | Core p | When p | Type p ->
-                   domain <- Vars.union (F.varsp p) domain
+                 domain <- Vars.union (F.varsp p) domain
                | Branch(p,a,b) ->
-                   domain <- Vars.union (F.varsp p) domain ;
-                   self#domain a ; self#domain b
+                 domain <- Vars.union (F.varsp p) domain ;
+                 self#domain a ; self#domain b
                | Either cs -> List.iter self#domain cs
              end
         ) seq
@@ -398,9 +398,9 @@ class pcond
           match tgt with
           | Step { condition = State _ } -> super#pp_step fmt step
           | Step s when s == step ->
-              target#mark (Step step) super#pp_step fmt step
+            target#mark (Step step) super#pp_step fmt step
           | _ ->
-              part#mark (Step step) super#pp_step fmt step
+            part#mark (Step step) super#pp_step fmt step
         end
       else
         ( if not ellipsed then Format.fprintf fmt "@ [...]" ; ellipsed <- true )
@@ -408,9 +408,9 @@ class pcond
     method! pp_goal fmt goal =
       match tgt with
       | Goal ->
-          target#mark Goal super#pp_goal fmt goal
+        target#mark Goal super#pp_goal fmt goal
       | _ ->
-          part#mark Goal super#pp_goal fmt goal
+        part#mark Goal super#pp_goal fmt goal
 
     method! pp_block ~clause fmt seq =
       try
@@ -551,34 +551,34 @@ class focused (wtext : Wtext.text) =
     method private popup_term e =
       match autofocus#get_term e with
       | `Auto ->
-          begin
-            if autofocus#is_focused e then
-              self#item ~label:"Un-focus Term"
-                ~callback:(fun () -> autofocus#unfocus e) ;
-            self#item ~label:"Hide Term"
-              ~callback:(fun () -> autofocus#set_term e `Hidden) ;
-            self#item ~label:"Don't Share"
-              ~callback:(fun () -> autofocus#set_term e `Visible) ;
-          end
+        begin
+          if autofocus#is_focused e then
+            self#item ~label:"Un-focus Term"
+              ~callback:(fun () -> autofocus#unfocus e) ;
+          self#item ~label:"Hide Term"
+            ~callback:(fun () -> autofocus#set_term e `Hidden) ;
+          self#item ~label:"Don't Share"
+            ~callback:(fun () -> autofocus#set_term e `Visible) ;
+        end
       | `Hidden ->
-          self#item ~label:"Show Term"
-            ~callback:(fun () -> autofocus#set_term e `Auto)
+        self#item ~label:"Show Term"
+          ~callback:(fun () -> autofocus#set_term e `Auto)
       | `Visible | `Name _ | `Shared ->
-          self#item ~label:"Autofocus"
-            ~callback:(fun () -> autofocus#set_term e `Auto)
+        self#item ~label:"Autofocus"
+          ~callback:(fun () -> autofocus#set_term e `Auto)
 
     method private popup_part = function
       | Goal | Term ->
-          self#item
-            ~label:"Reset Autofocus"
-            ~callback:(fun () -> autofocus#reset)
+        self#item
+          ~label:"Reset Autofocus"
+          ~callback:(fun () -> autofocus#reset)
       | Step step ->
-          if autofocus#is_visible_step step then
-            self#item ~label:"Hide Clause"
-              ~callback:(fun () -> autofocus#set_step step `Hidden)
-          else
-            self#item ~label:"Show Clause"
-              ~callback:(fun () -> autofocus#set_step step `Visible)
+        if autofocus#is_visible_step step then
+          self#item ~label:"Hide Clause"
+            ~callback:(fun () -> autofocus#set_step step `Hidden)
+        else
+          self#item ~label:"Show Clause"
+            ~callback:(fun () -> autofocus#set_step step `Visible)
 
     method popup =
       begin
@@ -624,29 +624,29 @@ class focused (wtext : Wtext.text) =
     method set_target tgt =
       match tgt with
       | Tactical.Empty | Tactical.Compose _ | Tactical.Multi _ ->
-          begin
-            pcond#set_target Term ;
-            plang#clear_target ;
-            autofocus#clear_target ;
-          end
+        begin
+          pcond#set_target Term ;
+          plang#clear_target ;
+          autofocus#clear_target ;
+        end
       | Tactical.Inside (_,t) ->
-          begin
-            pcond#set_target Term ;
-            plang#set_target t ;
-            autofocus#set_target t ;
-          end
+        begin
+          pcond#set_target Term ;
+          plang#set_target t ;
+          autofocus#set_target t ;
+        end
       | Tactical.Clause (Tactical.Goal _) ->
-          begin
-            pcond#set_target Goal ;
-            plang#clear_target ;
-            autofocus#clear_target ;
-          end
+        begin
+          pcond#set_target Goal ;
+          plang#clear_target ;
+          autofocus#clear_target ;
+        end
       | Tactical.Clause (Tactical.Step s) ->
-          begin
-            pcond#set_target (Step s) ;
-            plang#clear_target ;
-            autofocus#clear_target ;
-          end
+        begin
+          pcond#set_target (Step s) ;
+          plang#clear_target ;
+          autofocus#clear_target ;
+        end
 
     method private on_term ~extend (p,q,e) =
       if F.lc_closed e then (* defensive *)
@@ -694,7 +694,7 @@ class focused (wtext : Wtext.text) =
     method pp_selection fmt = function
       | Tactical.Empty -> Format.fprintf fmt " - "
       | Tactical.Compose(Tactical.Range(a,b)) ->
-          Format.fprintf fmt "%d..%d" a b
+        Format.fprintf fmt "%d..%d" a b
       | sel -> self#pp_term fmt (Tactical.selected sel)
 
     method sequent = sequent
@@ -718,13 +718,13 @@ class focused (wtext : Wtext.text) =
       let open Wpo in
       match w.po_formula with
       | GoalLemma _ ->
-          Format.fprintf fmt "@\n@{<wp:clause>Lemma@} %a:@\n" Wpo.pp_title w ;
-          let _,sequent = Wpo.compute w in
-          self#pp_sequent sequent fmt
+        Format.fprintf fmt "@\n@{<wp:clause>Lemma@} %a:@\n" Wpo.pp_title w ;
+        let _,sequent = Wpo.compute w in
+        self#pp_sequent sequent fmt
       | GoalAnnot _ ->
-          Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
-          let _,sequent = Wpo.compute w in
-          self#pp_sequent sequent fmt
+        Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
+        let _,sequent = Wpo.compute w in
+        self#pp_sequent sequent fmt
 
     method button ~title ~callback fmt =
       let pp_title fmt title = Format.fprintf fmt " %s " title in

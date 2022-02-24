@@ -1,16 +1,12 @@
 /* run.config
-<<<<<<< HEAD
-   PLUGIN: @EVA_PLUGINS@
-||||||| 754e522ceb
-=======
-PLUGIN: eva,scope
->>>>>>> origin/master
+PLUGIN: eva,inout,scope
    STDOPT: +"-copy" +"-eva"
  */
 /*@ predicate p(int x); */
 /*@ predicate q(int x) = x == 42; */
 /*@ logic int f (int y); */
 /*@ logic integer g (int x) = x + 42; */
+
 
 /*@ frees x; */
 void f(int *x);

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,7 +23,7 @@
 open Cil_types
 open Eval
 
-let dkey = Value_parameters.register_category "callbacks"
+let dkey = Self.register_category "callbacks"
 
 let floats_ok () =
   let u = min_float /. 2. in
@@ -41,22 +41,22 @@ let options_ok () =
      advanced parsing. Just make a query, as this will force the kernel to
      parse them. *)
   let check f = try ignore (f ()) with Not_found -> () in
-  check Value_parameters.SplitReturnFunction.get;
-  check Value_parameters.BuiltinsOverrides.get;
-  check Value_parameters.SlevelFunction.get;
-  check Value_parameters.EqualityCallFunction.get;
+  check Parameters.SplitReturnFunction.get;
+  check Parameters.BuiltinsOverrides.get;
+  check Parameters.SlevelFunction.get;
+  check Parameters.EqualityCallFunction.get;
   let check_assigns kf =
     if need_assigns kf then
-      Value_parameters.error "@[no assigns@ specified@ for function '%a',@ for \
-                              which@ a builtin@ or the specification@ will be used.@ \
-                              Potential unsoundness.@]" Kernel_function.pretty kf
+      Self.error "@[no assigns@ specified@ for function '%a',@ for \
+                  which@ a builtin@ or the specification@ will be used.@ \
+                  Potential unsoundness.@]" Kernel_function.pretty kf
   in
-  Value_parameters.BuiltinsOverrides.iter (fun (kf, _) -> check_assigns kf);
-  Value_parameters.UsePrototype.iter (fun kf -> check_assigns kf)
+  Parameters.BuiltinsOverrides.iter (fun (kf, _) -> check_assigns kf);
+  Parameters.UsePrototype.iter (fun kf -> check_assigns kf)
 
 let plugins_ok () =
   if not (Plugin.is_present "inout") then
-    Value_parameters.warning
+    Self.warning
       "The inout plugin is missing: some features are disabled, \
        and the analysis may have degraded precision and performance."
 
@@ -66,15 +66,15 @@ let generate_specs () =
   let aux kf =
     if need_assigns kf then begin
       let spec = Annotations.funspec ~populate:false kf in
-      Value_parameters.warning "Generating potentially incorrect assigns \
-                                for function '%a' for which option %s is set"
-        Kernel_function.pretty kf Value_parameters.UsePrototype.option_name;
+      Self.warning "Generating potentially incorrect assigns \
+                    for function '%a' for which option %s is set"
+        Kernel_function.pretty kf Parameters.UsePrototype.option_name;
       (* The function populate_spec may emit a warning. Position a loc. *)
       Cil.CurrentLoc.set (Kernel_function.get_location kf);
       ignore (!Annotations.populate_spec_ref kf spec)
     end
   in
-  Value_parameters.UsePrototype.iter aux
+  Parameters.UsePrototype.iter aux
 
 let pre_analysis () =
   floats_ok ();
@@ -84,17 +84,17 @@ let pre_analysis () =
   generate_specs ();
   Widen.precompute_widen_hints ();
   Builtins.prepare_builtins ();
-  Value_perf.reset ();
+  Eva_perf.reset ();
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
-  Value_util.DegenerationPoints.clear ();
+  Eva_utils.DegenerationPoints.clear ();
   Cvalue.V.clear_garbled_mix ();
-  Value_util.clear_call_stack ()
+  Eva_utils.clear_call_stack ()
 
 let post_analysis_cleanup ~aborted =
-  Value_util.clear_call_stack ();
+  Eva_utils.clear_call_stack ();
   (* Precompute consolidated states if required *)
-  if Value_parameters.JoinResults.get () then
+  if Parameters.JoinResults.get () then
     Db.Value.Table_By_Callstack.iter
       (fun s _ -> ignore (Db.Value.get_stmt_state s));
   if not aborted then
@@ -105,7 +105,7 @@ let post_analysis () =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
-  Value_util.dump_garbled_mix ();
+  Eva_utils.dump_garbled_mix ();
   (* Mark unreachable and RTE statuses. Only do this there, not when the
      analysis was aborted (hence, not in post_cleanup), because the
      propagation is incomplete. Also do not mark unreachable statutes if
@@ -118,14 +118,14 @@ let post_analysis () =
   Eva_dynamic.RteGen.mark_generated_rte ();
   post_analysis_cleanup ~aborted:false;
   (* Remove redundant alarms *)
-  if Value_parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ()
+  if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ()
 
 (* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva
    analysis. Returns a function that restores previous signal behaviors after
    the analysis. *)
 let register_signal_handler () =
   let warn () =
-    Value_parameters.warning ~once:true "Stopping analysis at user request@."
+    Self.warning ~once:true "Stopping analysis at user request@."
   in
   let stop _ = warn (); Iterator.signal_abort () in
   let interrupt _ = warn (); raise Sys.Break in
@@ -173,24 +173,24 @@ module Make (Abstract: Abstractions.Eva) = struct
      the callstack and additional information are printed. *)
   let compute_using_spec_or_body call_kinstr call recursion state =
     let kf = call.kf in
-    Value_results.mark_kf_as_called kf;
+    Eva_results.mark_kf_as_called kf;
     let global = match call_kinstr with Kglobal -> true | _ -> false in
-    let pp = not global && Value_parameters.ValShowProgress.get () in
-    let call_stack = Value_util.call_stack () in
+    let pp = not global && Parameters.ValShowProgress.get () in
+    let call_stack = Eva_utils.call_stack () in
     if pp then
-      Value_parameters.feedback
+      Self.feedback
         "@[computing for function %a.@\nCalled from %a.@]"
         Value_types.Callstack.pretty_short call_stack
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc call_kinstr);
     let use_spec =
       match recursion with
-      | Some { depth } when depth >= Value_parameters.RecursiveUnroll.get () ->
+      | Some { depth } when depth >= Parameters.RecursiveUnroll.get () ->
         `Spec (Recursion.get_spec call_kinstr kf)
       | _ ->
         match kf.fundec with
         | Declaration (_,_,_,_) -> `Spec (Annotations.funspec kf)
         | Definition (def, _) ->
-          if Kernel_function.Set.mem kf (Value_parameters.UsePrototype.get ())
+          if Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
           then `Spec (Annotations.funspec kf)
           else `Def def
     in
@@ -199,9 +199,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       | `Spec spec ->
         Db.Value.Call_Type_Value_Callbacks.apply
           (`Spec spec, cvalue_state, call_stack);
-        if Value_parameters.InterpreterMode.get ()
-        then Value_parameters.abort "Library function call. Stopping.";
-        Value_parameters.feedback ~once:true
+        if Parameters.InterpreterMode.get ()
+        then Self.abort "Library function call. Stopping.";
+        Self.feedback ~once:true
           "@[using specification for function %a@]" Kernel_function.pretty kf;
         let vi = Kernel_function.get_vi kf in
         if Cil.is_in_libc vi.vattr then
@@ -215,7 +215,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         result
     in
     if pp then
-      Value_parameters.feedback
+      Self.feedback
         "Done for function %a" Kernel_function.pretty kf;
     Transfer.{ states = resulting_states; cacheable; builtin=false }
 
@@ -228,7 +228,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     let default () =
       compute_using_spec_or_body (Kstmt stmt) call recursion init_state
     in
-    if Value_parameters.MemExecAll.get () then
+    if Parameters.MemExecAll.get () then
       let args =
         List.map (fun {avalue} -> Eval.value_assigned avalue) call.arguments
       in
@@ -244,26 +244,26 @@ module Make (Abstract: Abstractions.Eva) = struct
         in
         call_result
       | Some (states, i) ->
-        let stack = Value_util.call_stack () in
+        let stack = Eva_utils.call_stack () in
         let cvalue = Abstract.Dom.get_cvalue_or_top init_state in
         Db.Value.Call_Type_Value_Callbacks.apply (`Memexec, cvalue, stack);
         (* Evaluate the preconditions of kf, to update the statuses
            at this call. *)
         let spec = Annotations.funspec call.kf in
-        if not (Value_util.skip_specifications call.kf) &&
+        if not (Eva_utils.skip_specifications call.kf) &&
            Eval_annots.has_requires spec
         then begin
           let ab = Logic.create init_state call.kf in
           ignore (Logic.check_fct_preconditions
                     (Kstmt stmt) call.kf ab init_state);
         end;
-        if Value_parameters.ValShowProgress.get () then begin
-          Value_parameters.feedback ~current:true
+        if Parameters.ValShowProgress.get () then begin
+          Self.feedback ~current:true
             "Reusing old results for call to %a" Kernel_function.pretty call.kf;
-          Value_parameters.debug ~dkey
+          Self.debug ~dkey
             "calling Record_Value_New callbacks on saved previous result";
         end;
-        let stack_with_call = Value_util.call_stack () in
+        let stack_with_call = Eva_utils.call_stack () in
         Db.Value.Record_Value_Callbacks_New.apply
           (stack_with_call, Value_types.Reuse i);
         (* call can be cached since it was cached once *)
@@ -292,12 +292,12 @@ module Make (Abstract: Abstractions.Eva) = struct
     match Builtins.find_builtin_override call.kf with
     | None -> compute_and_cache_call stmt call recursion state
     | Some (name, builtin, cacheable, spec) ->
-      Value_results.mark_kf_as_called call.kf;
+      Eva_results.mark_kf_as_called call.kf;
       let kinstr = Kstmt stmt in
       let kf_name = Kernel_function.get_name call.kf in
-      if Value_parameters.ValShowProgress.get ()
+      if Parameters.ValShowProgress.get ()
       then
-        Value_parameters.feedback ~current:true "Call to builtin %s%s"
+        Self.feedback ~current:true "Call to builtin %s%s"
           name (if kf_name = name then "" else " for function " ^ kf_name);
       (* Do not track garbled mixes created when interpreting the specification,
          as the result of the cvalue builtin will overwrite them. *)
@@ -310,7 +310,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
       match final_state with
       | `Bottom ->
-        let cs = Value_util.call_stack () in
+        let cs = Eva_utils.call_stack () in
         Db.Value.Call_Type_Value_Callbacks.apply (`Spec spec, cvalue_state, cs);
         let cacheable = Eval.Cacheable in
         Transfer.{states; cacheable; builtin=true}
@@ -337,14 +337,14 @@ module Make (Abstract: Abstractions.Eva) = struct
   let () = Transfer.compute_call_ref := compute_call
 
   let store_initial_state kf init_state =
-    Abstract.Dom.Store.register_initial_state (Value_util.call_stack ()) init_state;
+    Abstract.Dom.Store.register_initial_state (Eva_utils.call_stack ()) init_state;
     let cvalue_state = Abstract.Dom.get_cvalue_or_top init_state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, [kf, Kglobal])
 
   let compute kf init_state =
     let restore_signals = register_signal_handler () in
     let compute () =
-      Value_util.push_call_stack kf Kglobal;
+      Eva_utils.push_call_stack kf Kglobal;
       store_initial_state kf init_state;
       let call =
         { kf; callstack = []; arguments = []; rest = []; return = None; }
@@ -354,8 +354,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       in
       let final_states = List.map snd (final_result.Transfer.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
-      Value_util.pop_call_stack ();
-      Value_parameters.feedback "done for function %a" Kernel_function.pretty kf;
+      Eva_utils.pop_call_stack ();
+      Self.feedback "done for function %a" Kernel_function.pretty kf;
+      Self.(set_computation_state Computed);
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
@@ -363,33 +364,35 @@ module Make (Abstract: Abstractions.Eva) = struct
       restore_signals ()
     in
     let cleanup () =
+      Self.(set_computation_state Aborted);
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis_cleanup ~aborted:true
     in
-    Value_util.protect compute ~cleanup
+    Eva_utils.protect compute ~cleanup
 
   let compute_from_entry_point kf ~lib_entry =
     pre_analysis ();
-    Value_parameters.feedback "Analyzing a%scomplete application starting at %a"
+    Self.feedback "Analyzing a%scomplete application starting at %a"
       (if lib_entry then "n in" else " ")
       Kernel_function.pretty kf;
     let initial_state =
-      Value_util.protect
+      Eva_utils.protect
         (fun () -> Init.initial_state_with_formals ~lib_entry kf)
         ~cleanup:(fun () -> post_analysis_cleanup ~aborted:true)
     in
     match initial_state with
     | `Bottom ->
+      Self.(set_computation_state Aborted);
       Abstract.Dom.Store.mark_as_computed ();
-      Value_parameters.result "Eva not started because globals \
-                               initialization is not computable.";
+      Self.result "Eva not started because globals \
+                   initialization is not computable.";
       Eval_annots.mark_invalid_initializers ()
     | `Value init_state ->
       compute kf init_state
 
   let compute_from_init_state kf init_state =
     pre_analysis ();
-    let b = Value_parameters.ResultsAll.get () in
+    let b = Parameters.ResultsAll.get () in
     Abstract.Dom.Store.register_global_state b (`Value init_state);
     compute kf init_state
 end

@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -34,7 +34,7 @@ import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
-import { markerInfo } from 'frama-c/api/kernel/ast';
+import { markerInfo } from 'frama-c/kernel/api/ast';
 
 // --------------------------------------------------------------------------
 // --- Locations Panel
@@ -42,7 +42,7 @@ import { markerInfo } from 'frama-c/api/kernel/ast';
 
 type LocationId = States.Location & { id: number };
 
-export default function LocationsTable() {
+export default function LocationsTable(): JSX.Element {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
@@ -79,7 +79,7 @@ export default function LocationsTable() {
     [updateSelection],
   );
 
-  const reload = () => {
+  const reload = (): void => {
     const location = multipleSelections.allSelections[multipleSelections.index];
     updateSelection({ location });
   };

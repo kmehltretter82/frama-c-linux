@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -162,7 +162,7 @@ module Transfer = struct
      in [e] into locations. Nothing is written, the memory locations
      present in [e] are read. *)
   let effects_assume to_z e =
-    let inputs = Value_util.zone_of_expr to_z e in
+    let inputs = Eva_utils.zone_of_expr to_z e in
     {
       over_outputs = Zone.bottom;
       over_inputs = inputs;
@@ -173,8 +173,8 @@ module Transfer = struct
   (* Effects of an assigment [lv = e]. [to_z] converts the lvalues present
      in [lv] and [e] into locations. *)
   let effects_assign to_z lv e =
-    let inputs_e = Value_util.zone_of_expr to_z e in
-    let inputs_lv = Value_util.indirect_zone_of_lval to_z lv.Eval.lval in
+    let inputs_e = Eva_utils.zone_of_expr to_z e in
+    let inputs_lv = Eva_utils.indirect_zone_of_lval to_z lv.Eval.lval in
     let inputs = Zone.join inputs_e inputs_lv in
     let outputs =
       Precise_locs.enumerate_valid_bits Locations.Write lv.Eval.lloc
@@ -222,7 +222,7 @@ module D
 
   include Domain_builder.Complete (LatticeInout)
 
-  let log_category = Value_parameters.register_category "d-inout"
+  let log_category = Self.register_category "d-inout"
 
   let enter_scope _kind _vars state = state
   let leave_scope _kf vars state = Transfer.remove_variables vars state

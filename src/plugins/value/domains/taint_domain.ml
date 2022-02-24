@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,13 +41,13 @@ type taint = {
   dependent_call: bool;
 }
 
-let dkey = Value_parameters.register_category "d-taint"
+let dkey = Self.register_category "d-taint"
 
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
-let dkey_debug = Value_parameters.register_category "d-taint-debug"
+let dkey_debug = Self.register_category "d-taint-debug"
 
-let wkey = Value_parameters.register_warn_category "taint"
+let wkey = Self.register_warn_category "taint"
 
 module LatticeTaint = struct
 
@@ -93,7 +93,7 @@ module LatticeTaint = struct
       let equal = Datatype.from_compare
 
       let pretty fmt t =
-        if Value_parameters.is_debug_key_enabled dkey_debug
+        if Self.is_debug_key_enabled dkey_debug
         then pp_state fmt t
         else pp_locs_only fmt t
 
@@ -199,13 +199,13 @@ module TransferTaint = struct
         let loc = Precise_locs.imprecise_location ploc in
         Locations.enumerate_valid_bits Write loc
       in
-      let lv_indirect_zone = Value_util.indirect_zone_of_lval to_loc lval in
+      let lv_indirect_zone = Eva_utils.indirect_zone_of_lval to_loc lval in
       lv_zone, lv_indirect_zone, singleton
 
   (* Propagates data- and control-taints for an assignement [lval = exp]. *)
   let assign_aux lval exp to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_zones lval to_loc in
-    let exp_zone = Value_util.zone_of_expr to_loc exp in
+    let exp_zone = Eva_utils.zone_of_expr to_loc exp in
     (* [lv] becomes data-tainted if a memory location on which the value of
        [exp] depends on is data-tainted. *)
     let data_tainted = Zone.intersects state.locs_data exp_zone in
@@ -246,7 +246,7 @@ module TransferTaint = struct
     let state = filter_active_tainted_assumes stmt state in
     (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
     let to_loc = loc_of_lval valuation in
-    let exp_zone = Value_util.zone_of_expr to_loc exp in
+    let exp_zone = Eva_utils.zone_of_expr to_loc exp in
     let state =
       if not state.dependent_call && LatticeTaint.intersects state exp_zone
       then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
@@ -279,7 +279,7 @@ module TransferTaint = struct
 
   let show_expr valuation state fmt exp =
     let to_loc = loc_of_lval valuation in
-    let exp_zone = Value_util.zone_of_expr to_loc exp in
+    let exp_zone = Eva_utils.zone_of_expr to_loc exp in
     Format.fprintf fmt "%B" (LatticeTaint.intersects state exp_zone)
 
 end
@@ -507,14 +507,14 @@ module TaintLogic = struct
     let taint_term taint term =
       match eval_tlval_zone cvalue_env term with
       | None ->
-        Value_parameters.warning ~wkey ~current:true ~once:true
+        Self.warning ~wkey ~current:true ~once:true
           "Cannot evaluate term %a in taint annotation; ignoring."
           Printer.pp_term term;
         taint
       | Some (under, over) ->
         if not (Zone.equal under over)
         then
-          Value_parameters.warning ~wkey ~current:true ~once:true
+          Self.warning ~wkey ~current:true ~once:true
             "Cannot precisely evaluate term %a in taint annotation; \
              over-approximating."
             Printer.pp_term term;
@@ -568,7 +568,7 @@ let interpret_taint_logic
             in
             Abstract.Dom.set key taint state
           | _ ->
-            Value_parameters.warning ~wkey ~current:true ~once:true
+            Self.warning ~wkey ~current:true ~once:true
               "Invalid taint annotation %a; ignoring."
               Printer.pp_extended extension;
             state

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -222,7 +222,7 @@ struct
            match src,tgt with
            | Some src , Some tgt -> identify sigma ~src ~tgt
            | Some _, None ->
-               invalid_arg (Format.asprintf "P.relocate: tgt is smaller than src at %a" Node.pp n)
+             invalid_arg (Format.asprintf "P.relocate: tgt is smaller than src at %a" Node.pp n)
            | _ -> ())
         src tgt ;
       let tgt = Node.Map.inter (fun _ _ tgt -> tgt) src tgt in
@@ -320,8 +320,8 @@ struct
   let iter_succs : type a b. (Node.t -> unit) -> (a,b) edge -> unit = fun f -> function
     | Goto n2 | Effect(_,n2) | Havoc(_,n2) -> f n2
     | Branch(_,n2a,n2b) ->
-        let f' = function None -> () | Some x -> f x in
-        f' n2a; f' n2b
+      let f' = function None -> () | Some x -> f x in
+      f' n2a; f' n2b
     | Either l -> List.iter f l
     | Implies l -> List.iter (fun (_,a) -> f a) l
     | Binding (_,n2) -> f n2
@@ -360,9 +360,9 @@ struct
 
   let pretty_data fmt = function
     | Meta(s_opt,str_opt) ->
-        Format.fprintf fmt "Meta(%a,%a)"
-          (Pretty_utils.pp_opt ~none:"None" Cil_datatype.Stmt.pretty_sid) s_opt
-          (Pretty_utils.pp_opt ~none:"None" Format.pp_print_string) str_opt
+      Format.fprintf fmt "Meta(%a,%a)"
+        (Pretty_utils.pp_opt ~none:"None" Cil_datatype.Stmt.pretty_sid) s_opt
+        (Pretty_utils.pp_opt ~none:"None" Format.pp_print_string) str_opt
 
   let pretty_env : type a. Format.formatter -> (_,a) env -> unit =
     fun fmt env ->
@@ -383,12 +383,12 @@ struct
     begin match edge with
       | Goto n1 -> pp_edge n1
       | Branch (_, n1, n2)->
-          Option.iter pp_edge n1;
-          Option.iter pp_edge n2
+        Option.iter pp_edge n1;
+        Option.iter pp_edge n2
       | Either ns -> List.iter pp_edge ns
       | Implies ns -> List.iter (fun (_,a) -> pp_edge a) ns
       | Effect (e, n') ->
-          pp_edge ~label:(Format.asprintf "%a" E.pretty e) n'
+        pp_edge ~label:(Format.asprintf "%a" E.pretty e) n'
       | Havoc (_, n') -> pp_edge ~label:"havoc" n'
       | Binding (_,n') -> pp_edge ~label:"binding" n'
     end
@@ -459,16 +459,16 @@ struct
     let add_edges : type a b. Node.t -> (a,b) edge -> unit = fun n1 -> function
       | Goto n2 -> add_edge n1 [] n2
       | Branch((_,c),n2,n2') ->
-          let aux s = function
-            | None -> ()
-            | Some n -> add_edge n1 [`Label (escape "%s%a" s Lang.F.pp_pred c)] n
-          in
-          aux "" n2; aux "!" n2'
+        let aux s = function
+          | None -> ()
+          | Some n -> add_edge n1 [`Label (escape "%s%a" s Lang.F.pp_pred c)] n
+        in
+        aux "" n2; aux "!" n2'
       | Either l -> List.iter (add_edge n1 []) l
       | Implies l ->
-          List.iter (fun (c,n) -> add_edge n1 [`Label (escape "%a" Lang.F.pp_pred (C.get c))] n) l
+        List.iter (fun (c,n) -> add_edge n1 [`Label (escape "%a" Lang.F.pp_pred (C.get c))] n) l
       | Effect ((_,e),n2) ->
-          add_edge n1 [`Label (escape "%a" Lang.F.pp_pred e)] n2
+        add_edge n1 [`Label (escape "%a" Lang.F.pp_pred e)] n2
       | Havoc (_,n2) -> add_edge n1 [`Label (escape "havoc")] n2
       | Binding (_,n2) -> add_edge n1 [`Label (escape "binding")] n2
     in
@@ -602,31 +602,31 @@ struct
       match Node.Map.find node env.succs with
       | exception Not_found -> None
       | Goto (node2) ->
-          effects env post node2
+        effects env post node2
       | Branch (_, node2, node3) ->
-          union_opt_or S.union
-            (option_bind ~f:(effects env post) node2)
-            (option_bind ~f:(effects env post) node3)
+        union_opt_or S.union
+          (option_bind ~f:(effects env post) node2)
+          (option_bind ~f:(effects env post) node3)
       | Either (l) ->
-          (List.fold_left
-             (fun acc node2 -> union_opt_or S.union
-                 acc (effects env post node2))
-             None l)
+        (List.fold_left
+           (fun acc node2 -> union_opt_or S.union
+               acc (effects env post node2))
+           None l)
       | Implies (l) ->
-          (List.fold_left
-             (fun acc (_,node2) -> union_opt_or S.union
-                 acc (effects env post node2))
-             None l)
+        (List.fold_left
+           (fun acc (_,node2) -> union_opt_or S.union
+               acc (effects env post node2))
+           None l)
       | Effect (effect , node2) ->
-          add_only_if_alive S.union
-            (E.writes effect)
-            (effects env post node2)
+        add_only_if_alive S.union
+          (E.writes effect)
+          (effects env post node2)
       | Havoc (m, node2) ->
-          union_opt_and S.union
-            (effects env m.post m.pre)
-            (effects env post node2)
+        union_opt_and S.union
+          (effects env m.post m.pre)
+          (effects env post node2)
       | Binding (_,node2) ->
-          effects env post node2
+        effects env post node2
 
   (** restrict a cfg to the nodes accessible from the pre post given,
       and compute havoc effect *)
@@ -638,44 +638,44 @@ struct
         let r = match Node.Map.find node cfg.succs with
           | exception Not_found -> None
           | (Goto (node2) | Effect (_ , node2)) as edge ->
-              union_opt_and env_union
-                (Some (new_env edge))
-                (walk acc node2)
+            union_opt_and env_union
+              (Some (new_env edge))
+              (walk acc node2)
           | Branch (pred, node2, node3) ->
-              (** it is important to visit all the childrens *)
-              let f acc node =
-                match option_bind ~f:(walk acc) node with
-                | None -> None, acc
-                | Some acc -> node, acc in
-              let node2, acc = f acc node2 in
-              let node3, acc = f acc node3 in
-              if node2 = None && node3 = None then None
-              else Some (env_union acc (new_env (Branch(pred, node2, node3))))
+            (** it is important to visit all the childrens *)
+            let f acc node =
+              match option_bind ~f:(walk acc) node with
+              | None -> None, acc
+              | Some acc -> node, acc in
+            let node2, acc = f acc node2 in
+            let node3, acc = f acc node3 in
+            if node2 = None && node3 = None then None
+            else Some (env_union acc (new_env (Branch(pred, node2, node3))))
           | Either (l) ->
-              let acc,l = List.fold_left
-                  (fun ((acc,l) as old) node2 ->
-                     match walk acc node2 with
-                     | None -> old
-                     | Some acc -> (acc,node2::l))
-                  (acc,[]) l in
-              if l = [] then None
-              else Some (env_union acc (new_env (Either (List.rev l))))
+            let acc,l = List.fold_left
+                (fun ((acc,l) as old) node2 ->
+                   match walk acc node2 with
+                   | None -> old
+                   | Some acc -> (acc,node2::l))
+                (acc,[]) l in
+            if l = [] then None
+            else Some (env_union acc (new_env (Either (List.rev l))))
           | Implies (l) ->
-              let acc,l = List.fold_left
-                  (fun ((acc,l) as old) ((_,node2) as e) ->
-                     match walk acc node2 with
-                     | None -> old
-                     | Some acc -> (acc,e::l))
-                  (acc,[]) l in
-              if l = [] then None
-              else Some (env_union acc (new_env (Implies (List.rev l))))
+            let acc,l = List.fold_left
+                (fun ((acc,l) as old) ((_,node2) as e) ->
+                   match walk acc node2 with
+                   | None -> old
+                   | Some acc -> (acc,e::l))
+                (acc,[]) l in
+            if l = [] then None
+            else Some (env_union acc (new_env (Implies (List.rev l))))
           | Havoc (m, node2) ->
-              match effects cfg m.post m.pre with
-              | None -> None
-              | Some eff ->
-                  union_opt_and env_union
-                    (Some (new_env (Havoc(eff,node2))))
-                    (walk acc node2)
+            match effects cfg m.post m.pre with
+            | None -> None
+            | Some eff ->
+              union_opt_and env_union
+                (Some (new_env (Havoc(eff,node2))))
+                (walk acc node2)
         in
         if Node.Set.mem node posts && r = None
         then Some acc
@@ -684,13 +684,13 @@ struct
     match walk (new_env ()) pre with
     | None -> (new_env ())
     | Some acc ->
-        { succs = acc.succs;
-          datas = Node.Map.inter (fun _ _ v -> v) acc.succs cfg.datas;
-          assumes = Bag.filter (fun (seq,_) ->
-              Node.Map.subset (fun _ _ _ -> true)
-                seq acc.succs) cfg.assumes;
-          tmpnodes = cfg.tmpnodes;
-        }
+      { succs = acc.succs;
+        datas = Node.Map.inter (fun _ _ v -> v) acc.succs cfg.datas;
+        assumes = Bag.filter (fun (seq,_) ->
+            Node.Map.subset (fun _ _ _ -> true)
+              seq acc.succs) cfg.assumes;
+        tmpnodes = cfg.tmpnodes;
+      }
 
   (** succ is decreasing for this order *)
   let topological (type a) (type b) (cfg:(a,b) env) =
@@ -749,7 +749,7 @@ struct
           iter_succs incr_how_many_preds e;
           match (e:(_,without_bindings) edge) with
           | Goto n' when not (Node.Set.mem n used_nodes) ->
-              Node.Map.add n n' acc
+            Node.Map.add n n' acc
           | Goto _
           | Branch (_,_,_)
           | Either _
@@ -779,22 +779,22 @@ struct
                             Node.Set.mem b env.tmpnodes &&
                             true
           ->
-            begin
-              let find_opt k m =
-                match Node.Map.find k m with
-                | exception Not_found -> None
-                | v -> Some v
-              in
-              match find_opt a env.succs, find_opt b env.succs with
-              | Some Branch(c,Some n1, None), Some Branch(c',None, Some n2)
-              | Some Branch(c,None, Some n2), Some Branch(c',Some n1,None) when C.equal c c' ->
-                  let n1 = find n1 in
-                  let n2 = find n2 in
-                  let br = Branch(c,Some n1, Some n2) in
-                  Node.Hashtbl.add to_remove a br;
-                  Node.Hashtbl.add to_remove b br
-              | _ -> ()
-            end
+          begin
+            let find_opt k m =
+              match Node.Map.find k m with
+              | exception Not_found -> None
+              | v -> Some v
+            in
+            match find_opt a env.succs, find_opt b env.succs with
+            | Some Branch(c,Some n1, None), Some Branch(c',None, Some n2)
+            | Some Branch(c,None, Some n2), Some Branch(c',Some n1,None) when C.equal c c' ->
+              let n1 = find n1 in
+              let n2 = find n2 in
+              let br = Branch(c,Some n1, Some n2) in
+              Node.Hashtbl.add to_remove a br;
+              Node.Hashtbl.add to_remove b br
+            | _ -> ()
+          end
         | Goto _
         | Branch (_,_,_)
         | Effect (_,_)
@@ -808,37 +808,37 @@ struct
         | _ when Node.Hashtbl.mem to_remove n -> None
         | Goto _ when not (Node.Set.mem n used_nodes) -> None
         | Goto n' ->
-            let n'' = find n' in
-            if Node.equal n' n'' then Some e
-            else Some (Goto n'')
+          let n'' = find n' in
+          if Node.equal n' n'' then Some e
+          else Some (Goto n'')
         | Branch (c,n1,n2) ->
-            let n1' = Option.map find n1 in
-            let n2' = Option.map find n2 in
-            if Option.equal Node.equal n1 n1' && Option.equal Node.equal n2 n2'
-            then Some e
-            else Some (Branch(c,n1',n2'))
+          let n1' = Option.map find n1 in
+          let n2' = Option.map find n2 in
+          if Option.equal Node.equal n1 n1' && Option.equal Node.equal n2 n2'
+          then Some e
+          else Some (Branch(c,n1',n2'))
         | Either l ->
-            let l' = List.map find l in
-            let l' = List.sort_uniq Node.compare l' in
-            begin match l' with
-              | [] -> assert false (* absurd: Either after restricted has at least one successor *)
-              | [a] -> Some (Goto a)
-              | [a;_] when Node.Hashtbl.mem to_remove a ->
-                  let br = Node.Hashtbl.find to_remove a in
-                  Some br
-              | l' -> Some (Either l')
-            end
+          let l' = List.map find l in
+          let l' = List.sort_uniq Node.compare l' in
+          begin match l' with
+            | [] -> assert false (* absurd: Either after restricted has at least one successor *)
+            | [a] -> Some (Goto a)
+            | [a;_] when Node.Hashtbl.mem to_remove a ->
+              let br = Node.Hashtbl.find to_remove a in
+              Some br
+            | l' -> Some (Either l')
+          end
         | Implies l ->
-            let l' = List.map (fun (g,n) -> (g,find n)) l in
-            Some (Implies l')
+          let l' = List.map (fun (g,n) -> (g,find n)) l in
+          Some (Implies l')
         | Effect (ef,n') ->
-            let n'' = find n' in
-            if Node.equal n' n'' then Some e
-            else Some (Effect(ef,n''))
+          let n'' = find n' in
+          if Node.equal n' n'' then Some e
+          else Some (Effect(ef,n''))
         | Havoc (h,n') ->
-            let n'' = find n' in
-            if Node.equal n' n'' then Some e
-            else Some (Havoc(h,n''))
+          let n'' = find n' in
+          if Node.equal n' n'' then Some e
+          else Some (Havoc(h,n''))
       )
         env.succs
     in
@@ -876,69 +876,69 @@ struct
         let ret =
           match Node.Map.find node env.succs with
           | exception Not_found ->
-              (** posts node *)
-              let s1 = S.create () in
-              allocate dom s1;
-              s1
+            (** posts node *)
+            let s1 = S.create () in
+            allocate dom s1;
+            s1
           | Goto (node2) ->
-              let s1 = S.copy (aux node2) in
-              allocate dom s1;
-              add_edge node (Goto node2);
-              s1
+            let s1 = S.copy (aux node2) in
+            allocate dom s1;
+            add_edge node (Goto node2);
+            s1
           | Branch (pred, node2, node3) ->
-              let dom = (S.union (C.reads pred) dom) in
-              begin match node2, node3 with
-                | (None, Some next) | (Some next, None) ->
-                    let s1 = S.copy (aux next) in
-                    allocate dom s1;
-                    let pred = C.relocate s1 pred in
-                    add_edge node (Branch(pred,node2,node3));
-                    s1
-                | Some node2, Some node3 ->
-                    let s2 = aux node2 in
-                    let s3 = aux node3 in
-                    let s1,p2,p3 = S.merge s2 s3 in
-                    allocate dom s1;
-                    let node2' = add_binding_edge node2 p2 in
-                    let node3' = add_binding_edge node3 p3 in
-                    let pred = C.relocate s1 pred in
-                    add_edge node (Branch(pred,Some node2',Some node3'));
-                    s1
-                | _ -> assert false
-              end
+            let dom = (S.union (C.reads pred) dom) in
+            begin match node2, node3 with
+              | (None, Some next) | (Some next, None) ->
+                let s1 = S.copy (aux next) in
+                allocate dom s1;
+                let pred = C.relocate s1 pred in
+                add_edge node (Branch(pred,node2,node3));
+                s1
+              | Some node2, Some node3 ->
+                let s2 = aux node2 in
+                let s3 = aux node3 in
+                let s1,p2,p3 = S.merge s2 s3 in
+                allocate dom s1;
+                let node2' = add_binding_edge node2 p2 in
+                let node3' = add_binding_edge node3 p3 in
+                let pred = C.relocate s1 pred in
+                add_edge node (Branch(pred,Some node2',Some node3'));
+                s1
+              | _ -> assert false
+            end
           | Either (l) ->
-              let s1, pl = S.merge_list (List.map aux l) in
-              allocate dom s1;
-              let l = List.map2 add_binding_edge l pl in
-              add_edge node (Either l);
-              s1
+            let s1, pl = S.merge_list (List.map aux l) in
+            allocate dom s1;
+            let l = List.map2 add_binding_edge l pl in
+            add_edge node (Either l);
+            s1
           | Implies (l) ->
-              let dom =
-                List.fold_left (fun acc (c,_) -> S.union (C.reads c) acc) dom l
-              in
-              let s1, pl = S.merge_list (List.map (fun (_,n) -> aux n) l) in
-              allocate dom s1;
-              let l = List.map2 (fun (c,a) b ->
-                  let a = add_binding_edge a b in
-                  let c = C.relocate s1 c in
-                  (c,a)) l pl
-              in
-              add_edge node (Implies l);
-              s1
+            let dom =
+              List.fold_left (fun acc (c,_) -> S.union (C.reads c) acc) dom l
+            in
+            let s1, pl = S.merge_list (List.map (fun (_,n) -> aux n) l) in
+            allocate dom s1;
+            let l = List.map2 (fun (c,a) b ->
+                let a = add_binding_edge a b in
+                let c = C.relocate s1 c in
+                (c,a)) l pl
+            in
+            add_edge node (Implies l);
+            s1
           | Effect (effect , node2) ->
-              let s2 = aux node2 in
-              let s1 = S.remove_chunks s2 (E.writes effect) in
-              allocate dom s1;
-              allocate (E.reads effect) s1;
-              let effect = E.relocate {pre=s1;post=s2} effect in
-              add_edge node (Effect(effect,node2));
-              s1
+            let s2 = aux node2 in
+            let s1 = S.remove_chunks s2 (E.writes effect) in
+            allocate dom s1;
+            allocate (E.reads effect) s1;
+            let effect = E.relocate {pre=s1;post=s2} effect in
+            add_edge node (Effect(effect,node2));
+            s1
           | Havoc (eff, node2) ->
-              let s2 = aux node2 in
-              let s1 = S.havoc s2 eff in
-              allocate dom s1;
-              add_edge node (Havoc(eff,node2));
-              s1
+            let s2 = aux node2 in
+            let s1 = S.havoc s2 eff in
+            allocate dom s1;
+            add_edge node (Havoc(eff,node2));
+            s1
         in
         visited := Node.Map.add node ret !visited;
         ret
@@ -960,8 +960,8 @@ struct
         match s with
         | Goto n1 | Havoc (_, n1) | Effect (_,n1) | Binding (_,n1) -> add n1 n
         | Branch (_,Some n1,Some n2) ->
-            add n1 n;
-            add n2 n
+          add n1 n;
+          add n2 n
         | Branch(_,Some n1,None) -> add n1 n
         | Branch(_,None,Some n1) -> add n1 n
         | Branch(_,None,None) -> ()
@@ -1017,8 +1017,8 @@ struct
           match s with
           | Goto n' | Havoc (_, n') -> add acc n' F.p_true
           | Branch (c,Some n1,Some n2) ->
-              let c = P.get c in
-              add (add acc n1 c) n2 (F.p_not c)
+            let c = P.get c in
+            add (add acc n1 c) n2 (F.p_not c)
           | Branch(c,Some n1,None) -> add acc n1 (P.get c)
           | Branch(c,None,Some n1) -> add acc n1 (F.p_not (P.get c))
           | Branch(_,None,None) -> acc
@@ -1026,8 +1026,8 @@ struct
           | Implies l -> List.fold_left (fun acc (c,e) -> add acc e (P.get c)) acc l
           | Effect (e,n') -> add acc n' (E.get e)
           | Binding (b,n') ->
-              let b = F.p_conj (Passive.conditions b (fun _ -> true)) in
-              add acc n' b
+            let b = F.p_conj (Passive.conditions b (fun _ -> true)) in
+            add acc n' b
         ) env.succs Node.Map.empty
       in
       Node.Map.fold (fun n' preds f ->
@@ -1045,8 +1045,8 @@ struct
             Bag.fold_left (fun (os,od) b ->
                 match b with
                 | Meta(os',od') ->
-                    (if os = None then os' else os),
-                    (if od = None then od' else od)
+                  (if os = None then os' else os),
+                  (if od = None then od' else od)
               ) (None,None) bag in
           add_cond ?stmt ?descr f f'
         ) predecessors f
@@ -1058,49 +1058,49 @@ struct
           let node_is_accessible = access n in
           let f' = match s with
             | Goto n' | Havoc (_, n') ->
-                (* The havoc is already taken into account during {!domains} *)
-                Conditions.Branch(node_is_accessible,
-                                  have_access n',
-                                  Conditions.empty)
+              (* The havoc is already taken into account during {!domains} *)
+              Conditions.Branch(node_is_accessible,
+                                have_access n',
+                                Conditions.empty)
             | Branch (c,Some n1,Some n2) ->
-                Conditions.Branch(node_is_accessible,
-                                  !. (Conditions.Branch((C.get c),
-                                                        have_access n1,
-                                                        have_access n2)),
-                                  Conditions.empty)
+              Conditions.Branch(node_is_accessible,
+                                !. (Conditions.Branch((C.get c),
+                                                      have_access n1,
+                                                      have_access n2)),
+                                Conditions.empty)
             | Branch(c,Some n1,None) ->
-                Conditions.Branch(node_is_accessible,
-                                  Conditions.append
-                                    (!. (Conditions.Have (C.get c)))
-                                    (have_access n1),
-                                  Conditions.empty)
+              Conditions.Branch(node_is_accessible,
+                                Conditions.append
+                                  (!. (Conditions.Have (C.get c)))
+                                  (have_access n1),
+                                Conditions.empty)
             | Branch(c,_,Some n1) ->
-                Conditions.Branch(node_is_accessible,
-                                  Conditions.append
-                                    (!. (Conditions.Have (F.p_not (C.get c))))
-                                    (have_access n1),
-                                  Conditions.empty)
+              Conditions.Branch(node_is_accessible,
+                                Conditions.append
+                                  (!. (Conditions.Have (F.p_not (C.get c))))
+                                  (have_access n1),
+                                Conditions.empty)
             | Branch(_,None,None) -> assert false
             | Either l ->
-                let l = List.map have_access l in
-                Conditions.Branch(node_is_accessible, either l, Conditions.empty)
+              let l = List.map have_access l in
+              Conditions.Branch(node_is_accessible, either l, Conditions.empty)
             | Implies l ->
-                let l = List.map
-                    (fun (c,n) -> !. (Conditions.Branch (C.get c, have_access n, Conditions.empty)))
-                    l in
-                Conditions.Branch(node_is_accessible, Conditions.concat l, Conditions.empty)
+              let l = List.map
+                  (fun (c,n) -> !. (Conditions.Branch (C.get c, have_access n, Conditions.empty)))
+                  l in
+              Conditions.Branch(node_is_accessible, Conditions.concat l, Conditions.empty)
             | Effect (e,n) ->
-                Conditions.Branch(node_is_accessible,
-                                  Conditions.append
-                                    (!. (Conditions.Have (E.get e)))
-                                    (have_access n) ,
-                                  Conditions.empty)
+              Conditions.Branch(node_is_accessible,
+                                Conditions.append
+                                  (!. (Conditions.Have (E.get e)))
+                                  (have_access n) ,
+                                Conditions.empty)
             | Binding (b,n') ->
-                (** For basic: all the variables are important *)
-                let b = !. (Conditions.Have(F.p_conj (Passive.conditions b (fun _ -> true)))) in
-                Conditions.Branch(node_is_accessible,
-                                  Conditions.append b (have_access n'),
-                                  Conditions.empty) in
+              (** For basic: all the variables are important *)
+              let b = !. (Conditions.Have(F.p_conj (Passive.conditions b (fun _ -> true)))) in
+              Conditions.Branch(node_is_accessible,
+                                Conditions.append b (have_access n'),
+                                Conditions.empty) in
           let stmt,descr =
             let bag = match Node.Map.find n env.datas with
               | exception Not_found -> Bag.empty
@@ -1109,8 +1109,8 @@ struct
             Bag.fold_left (fun (os,od) b ->
                 match b with
                 | Meta(os',od') ->
-                    (if os = None then os' else os),
-                    (if od = None then od' else od)
+                  (if os = None then os' else os),
+                  (if od = None then od' else od)
               ) (None,None) bag in
           add_cond ?stmt ?descr f f'
         ) env.succs f
@@ -1307,17 +1307,17 @@ struct
       match cond with
       | Conditions.Have c when F.is_ptrue c = Qed.Logic.Yes -> f
       | _ ->
-          Conditions.append (Conditions.sequence [Conditions.step ?descr ?stmt cond]) f
+        Conditions.append (Conditions.sequence [Conditions.step ?descr ?stmt cond]) f
 
     let access env n = Node.Hashtbl.find env.full_conds n
 
     let get_latest_node env  = function
       | [] -> env.root
       | a::l ->
-          let n = List.fold_left (fun a e ->
-              if env.topo_order a < env.topo_order e then e else a
-            ) a l in
-          Node.Hashtbl.find env.subtrees n
+        let n = List.fold_left (fun a e ->
+            if env.topo_order a < env.topo_order e then e else a
+          ) a l in
+        Node.Hashtbl.find env.subtrees n
 
     (** Add each assume to the sub-tree corresponding to the latest
         node it uses. The assumes are true if all their nodes are
@@ -1343,7 +1343,7 @@ struct
       | Qed.Logic.Yes -> Conditions.concat [f;f']
       | Qed.Logic.No -> f
       | Qed.Logic.Maybe ->
-          add_cond f (Conditions.Branch(t.c,f',Conditions.empty))
+        add_cond f (Conditions.Branch(t.c,f',Conditions.empty))
 
     let to_sequence_tree _ posts env =
       let env,ordered = create_env_to_sequence_tree env in
@@ -1396,12 +1396,12 @@ struct
              match Node.Map.find n user_reads with
              | exception Not_found -> acc
              | domain ->
-                 let domain' =
-                   try
-                     S.union (Node.Map.find n' acc) domain
-                   with Not_found -> domain
-                 in
-                 Node.Map.add n' domain' acc)
+               let domain' =
+                 try
+                   S.union (Node.Map.find n' acc) domain
+                 with Not_found -> domain
+               in
+               Node.Map.add n' domain' acc)
           subst user_reads
       in
       (** For each node what must be read for assumes *)
@@ -1420,19 +1420,19 @@ struct
       let f, preds =
         match mode with
         | `Tree ->
-            (** Add a unique post node *)
-            let final_node = node () in
-            let env =
-              Node.Set.fold (fun p cfg ->
-                  let s = {pre=S.create();post=S.create()} in
-                  let e =  s,Lang.F.p_true in
-                  let goto = effect p e final_node in
-                  concat goto cfg
-                ) posts env
-            in
-            To_tree.to_sequence_tree pre posts env
+          (** Add a unique post node *)
+          let final_node = node () in
+          let env =
+            Node.Set.fold (fun p cfg ->
+                let s = {pre=S.create();post=S.create()} in
+                let e =  s,Lang.F.p_true in
+                let goto = effect p e final_node in
+                concat goto cfg
+              ) posts env
+          in
+          To_tree.to_sequence_tree pre posts env
         | (`Bool_Backward | `Bool_Forward) as mode ->
-            to_sequence_bool ~mode pre posts env in
+          to_sequence_bool ~mode pre posts env in
       let predssigmas =
         Node.Map.merge
           (fun _ p s -> Some (Option.value ~default:F.p_false p, Option.value ~default:(S.create ()) s))

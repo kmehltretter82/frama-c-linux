@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -31,7 +31,7 @@
 
 import * as Dome from 'dome';
 import * as DomeBuffers from 'dome/text/buffers';
-import * as KernelData from 'frama-c/api/kernel/data';
+import * as KernelData from 'frama-c/kernel/api/data';
 
 const D = new Dome.Debug('Utils');
 
@@ -49,7 +49,7 @@ export function printTextWithTags(
   buffer: DomeBuffers.RichTextBuffer,
   contents: KernelData.text,
   options?: DomeBuffers.MarkerProps,
-) {
+): void {
   if (Array.isArray(contents)) {
     let marker = false;
     const tag = contents.shift();

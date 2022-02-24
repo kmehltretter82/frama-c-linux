@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -33,6 +33,7 @@ import Status from 'frama-c/kernel/Status';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
 import SourceCode from 'frama-c/kernel/SourceCode';
+import PivotTable from 'frama-c/kernel/PivotTable';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
 import Messages from 'frama-c/kernel/Messages';
@@ -90,6 +91,12 @@ Ivette.registerGroup({
     title: 'Messages emitted by Frama-C',
     children: <Messages />,
   });
+  Ivette.registerComponent({
+    id: 'frama-c.pivottable',
+    label: 'Pivot Table',
+    title: 'Pivot Table',
+    children: <PivotTable />,
+  });
 });
 
 /* --------------------------------------------------------------------------*/
@@ -112,6 +119,15 @@ Ivette.registerView({
   layout: [
     ['frama-c.astview', 'frama-c.sourcecode'],
     'frama-c.astinfo',
+  ],
+});
+
+Ivette.registerView({
+  id: 'pivot-table',
+  rank: 2,
+  label: 'Pivot Table',
+  layout: [
+    ['frama-c.pivottable'],
   ],
 });
 

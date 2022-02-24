@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,13 +24,13 @@ open Cil_types
 open Eval
 open Apron
 
-let dkey = Value_parameters.register_category "d-apron"
+let dkey = Self.register_category "d-apron"
 
 let debug = false
 
 let abort exclog =
   let open Manager in
-  Value_parameters.fatal
+  Self.fatal
     "Apron manager error : %a in function %a.@.%s"
     print_exc exclog.exn print_funid exclog.funid exclog.msg
 
@@ -151,7 +151,7 @@ let reduce eval expr range =
          Since the denominator is not 1, the translation will fail later in
          [scalar_to_mpzf]. Thus we should catch this case here. *)
       if Interval.is_top interval then begin
-        if debug then Value_parameters.result ~current:true ~once:true
+        if debug then Self.result ~current:true ~once:true
             "imprecise expr %a" Apron.Texpr1.print_expr expr;
         top ()
       end
@@ -291,7 +291,7 @@ let rec constraint_expr eval oracle env expr positive =
     let typ = translate_typ (Cil.unrollType typ) in
     let e = Texpr1.Binop (Texpr1.Sub, e1'', e2'', typ, round) in
     let expr = Texpr1.of_expr env e in
-    let binop = Value_util.conv_comp binop in
+    let binop = Eva.Private.Eva_utils.conv_comp binop in
     let binop = if positive then binop else Abstract_interp.Comp.inv  binop in
     translate_relation expr typ binop
   | _ -> raise (Out_of_Scope "constraint_expr not handled")
@@ -495,7 +495,7 @@ module Make (Man : Input) = struct
     compute state expr (Cil.typeOf expr)
 
   let extract_lval ~oracle:_ _context state lval typ _loc =
-    let expr = Value_util.lval_to_exp lval in
+    let expr = Eva_utils.lval_to_exp lval in
     compute state expr typ
 
   let maybe_bottom state =
@@ -633,7 +633,7 @@ module Make (Man : Input) = struct
   let start_call _stmt call recursion valuation state =
     if recursion <> None
     then
-      Value_parameters.abort ~current:true
+      Self.abort ~current:true
         "The binding to APRON domains does not support recursive calls.";
     update valuation state >>- fun state ->
     let eval = make_eval state in

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -105,7 +105,7 @@ let select_stmt_zone kf ?(select=empty_db_select kf) stmt ~before loc mark =
     Locations.Zone.pretty loc
     (if before then "before" else "after") stmt.sid
     SlicingMarks.pretty_mark mark;
-  if not (Db.Value.is_reachable_stmt stmt) then
+  if not (Eva.Results.is_reachable stmt) then
     begin
       SlicingParameters.feedback
         "@[Nothing to select for @[%a@]@ %s unreachable stmt of %a@]"
@@ -194,7 +194,7 @@ let stmt_nodes_to_select pdg stmt =
 
 let select_stmt_computation kf ?(select=empty_db_select kf) stmt mark =
   SlicingParameters.debug ~level:1 "[Register.select_stmt_computation] on stmt %d" stmt.sid;
-  if not (Db.Value.is_reachable_stmt stmt) then
+  if not (Eva.Results.is_reachable stmt) then
     begin
       SlicingParameters.feedback
         "@[Nothing to select for an unreachable stmt of %a@]"

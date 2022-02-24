@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,7 +27,7 @@ open Eval
     what goes through it. *)
 module Simple : Simpler_domains.Simple_Cvalue = struct
 
-  let feedback = Value_parameters.feedback ~current:true
+  let feedback = Self.feedback ~current:true
 
   (* --- Datatype --- *)
 

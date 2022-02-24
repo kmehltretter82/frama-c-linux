@@ -157,10 +157,6 @@ val unsafe_set:
 (** {2 Typing/types-related utils} *)
 (*****************************************************************************)
 
-val ty_of_interv: ?ctx:number_ty -> ?use_gmp_opt:bool -> Interval.t -> number_ty
-(* Compute the smallest type (bigger than [int]) which can contain the whole
-   interval. It is the \theta operator of the JFLA's paper. *)
-
 val typ_of_lty: logic_type -> typ
 (** @return the C type that correponds to the given logic type. *)
 

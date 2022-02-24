@@ -48,32 +48,7 @@ Prove: (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < n) ->
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'I' (file prenex.i, line 19):
-Assume {
-  Type: is_sint32(i) /\ is_sint32(j) /\ is_sint32(m) /\ is_sint32(n) /\
-      is_sint32(1 + i).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
-  (* Invariant 'I' *)
-  Have: 0 <= n.
-  (* Invariant 'I' *)
-  Have: (0 <= i) /\ (i <= n).
-  (* Invariant 'PI' *)
-  Have: forall i_2,i_1 : Z. ((0 <= i_2) -> ((i_2 < i) -> ((0 <= i_1) ->
-      ((i_1 < m) ->
-      (Mint_0[shift_sint32(p, i_2)] < Mint_0[shift_sint32(q, i_1)]))))).
-  (* Then *)
-  Have: i < n.
-  (* Invariant 'J' *)
-  Have: 0 <= m.
-  (* Invariant 'J' *)
-  Have: (0 <= j) /\ (j <= m).
-  (* Invariant 'PJ' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < j) ->
-      (Mint_0[shift_sint32(p, i)] < Mint_0[shift_sint32(q, i_1)]))).
-  (* Else *)
-  Have: m <= j.
-}
-Prove: (-1) <= i.
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -122,36 +97,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'J' (file prenex.i, line 28):
-Let x = Mint_0[shift_sint32(p, i)].
-Let x_1 = Mint_0[shift_sint32(q, j)].
-Assume {
-  Type: is_sint32(i) /\ is_sint32(j) /\ is_sint32(m) /\ is_sint32(n) /\
-      is_sint32(1 + j) /\ is_sint32(x) /\ is_sint32(x_1).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
-  (* Invariant 'I' *)
-  Have: 0 <= n.
-  (* Invariant 'I' *)
-  Have: (0 <= i) /\ (i <= n).
-  (* Invariant 'PI' *)
-  Have: forall i_2,i_1 : Z. ((0 <= i_2) -> ((i_2 < i) -> ((0 <= i_1) ->
-      ((i_1 < m) ->
-      (Mint_0[shift_sint32(p, i_2)] < Mint_0[shift_sint32(q, i_1)]))))).
-  (* Then *)
-  Have: i < n.
-  (* Invariant 'J' *)
-  Have: 0 <= m.
-  (* Invariant 'J' *)
-  Have: (0 <= j) /\ (j <= m).
-  (* Invariant 'PJ' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < j) ->
-      (x < Mint_0[shift_sint32(q, i_1)]))).
-  (* Then *)
-  Have: j < m.
-  (* Else *)
-  Have: x < x_1.
-}
-Prove: (-1) <= j.
+Prove: true.
 
 ------------------------------------------------------------
 

@@ -2144,6 +2144,40 @@
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
+--- Properties of Function 'fmemopen'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition 'result_error_or_valid'
+            ensures
+            result_error_or_valid:
+              \result ≡ \null ∨ \result ∈ &__fc_fopen[0 .. 16 - 1]
+            Unverifiable but considered Valid.
+[ Extern  ] Post-condition 'errno_set'
+            ensures
+            errno_set:
+              __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ∈ {22, 24, 12}
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 590)
+            assigns __fc_errno, \result;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 590)
+            assigns __fc_errno
+              \from (indirect: buf), (indirect: size),
+                    (indirect: *(mode + (0 .. strlen{Old}(mode))));
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 592)
+            assigns \result
+              \from __fc_p_fopen, (indirect: buf), (indirect: size),
+                    (indirect: *(mode + (0 .. strlen{Old}(mode))));
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            default behavior
+            by Frama-C kernel.
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 599) 
+            allocates \old(buf);
+            Unverifiable but considered Valid.
+
+--------------------------------------------------------------------------------
 --- Properties of Function 'asprintf'
 --------------------------------------------------------------------------------
 
@@ -2151,25 +2185,25 @@
             ensures
             result_error_or_written_byes: \result ≡ -1 ∨ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 593)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 611)
             assigns __fc_heap_status, \result, *strp;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 593)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 611)
             assigns __fc_heap_status
               \from (indirect: *(fmt + (0 ..))), __fc_heap_status;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 594)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 612)
             assigns \result
               \from (indirect: *(fmt + (0 ..))), (indirect: __fc_heap_status);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 595)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 613)
             assigns *strp
               \from *(fmt + (0 ..)), (indirect: __fc_heap_status);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 598) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 616) 
             allocates *\old(strp);
             Unverifiable but considered Valid.
 
@@ -4220,9 +4254,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   193 Completely validated
+   194 Completely validated
     16 Locally validated
-   563 Considered valid
+   569 Considered valid
     56 To be validated
-   828 Total
+   835 Total
 --------------------------------------------------------------------------------

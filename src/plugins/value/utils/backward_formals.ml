@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -79,7 +79,7 @@ module WrittenFormals =
     (struct
       let size = 17
       let dependencies = [Ast.self]
-      let name = "Value_util.WrittenFormals"
+      let name = "Eva_utils.WrittenFormals"
     end)
 
 let written_formals = WrittenFormals.memo written_formals

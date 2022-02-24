@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -62,7 +62,7 @@ class ZmqClient extends Client {
   }
 
   /** Send Request */
-  send(kind: string, id: string, request: string, data: any): void {
+  send(kind: string, id: string, request: string, data: string): void {
     if (this.zmqSocket) {
       this.queue.push(kind, id, request, data);
       this._flush();
@@ -95,7 +95,7 @@ class ZmqClient extends Client {
 
   /** Polling */
   poll(): void {
-    if (this.zmqSocket && this.queue.length == 0) {
+    if (this.zmqSocket && this.queue.length === 0) {
       this.queue.push('POLL');
     }
     this._flush();
@@ -114,7 +114,7 @@ class ZmqClient extends Client {
   // --- Low-Level Management
   // --------------------------------------------------------------------------
 
-  _flush() {
+  _flush(): void {
     const socket = this.zmqSocket;
     if (socket) {
       const cmds = this.queue;
@@ -133,7 +133,7 @@ class ZmqClient extends Client {
     }
   }
 
-  _receive(resp: string[]) {
+  _receive(resp: string[]): void {
     try {
       this._decode(resp);
     } catch (err) {
@@ -145,8 +145,8 @@ class ZmqClient extends Client {
   }
 
   /* eslint-disable @typescript-eslint/indent */
-  _decode(resp: string[]) {
-    const shift = () => resp.shift() ?? '';
+  _decode(resp: string[]): void {
+    const shift = (): string => resp.shift() ?? '';
     while (resp.length) {
       const cmd = shift();
       switch (cmd) {

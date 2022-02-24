@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -58,6 +58,11 @@ module Position: sig
   val pp_with_col : Format.formatter -> t -> unit
   val of_lexing_pos : Lexing.position -> t
   val to_lexing_pos : t -> Lexing.position
+
+  (** Pretty-print file, line and character offset.
+      @since Frama-C+dev
+  *)
+  val pretty_debug: t Pretty_utils.formatter
 end
 
 (** Cil locations. *)

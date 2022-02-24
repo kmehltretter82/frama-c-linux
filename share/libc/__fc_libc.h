@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2021                                               */
+/*  Copyright (C) 2007-2022                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -27,21 +27,25 @@
 #define _POSIX_C_SOURCE 200112L
 #define _GNU_SOURCE 1
 
+#include "aio.h"
 #include "alloca.h"
 #include "argz.h"
 #include "arpa/inet.h"
 #include "assert.h"
 #include "byteswap.h"
 //#include "complex.h"
+#include "cpio.h"
 #include "ctype.h"
 #include "dirent.h"
 #include "dlfcn.h"
 #include "endian.h"
+#include "err.h"
 #include "errno.h"
 #include "fcntl.h"
 #include "features.h"
 #include "fenv.h"
 #include "float.h"
+#include "fmtmsg.h"
 #include "fnmatch.h"
 #include "ftw.h"
 #include "getopt.h"
@@ -58,6 +62,9 @@
 #include "malloc.h"
 #include "math.h"
 #include "memory.h"
+#include "monetary.h"
+#include "mqueue.h"
+#include "ndbm.h"
 #include "netdb.h"
 #include "net/if.h"
 #include "netinet/in.h"
@@ -70,9 +77,12 @@
 #include "regex.h"
 #include "resolv.h"
 #include "sched.h"
+#include "search.h"
 #include "semaphore.h"
 #include "setjmp.h"
 #include "signal.h"
+#include "spawn.h"
+#include "stdalign.h"
 #include "stdarg.h"
 #include "stdatomic.h"
 #include "stdbool.h"
@@ -89,10 +99,12 @@
 #include "sys/ipc.h"
 #include "syslog.h"
 #include "sys/mman.h"
+#include "sys/msg.h"
 #include "sys/param.h"
 #include "sys/random.h"
 #include "sys/resource.h"
 #include "sys/select.h"
+#include "sys/sem.h"
 #include "sys/sendfile.h"
 #include "sys/shm.h"
 #include "sys/signal.h"
@@ -108,12 +120,17 @@
 #include "sys/utsname.h"
 #include "sys/vfs.h"
 #include "sys/wait.h"
+#include "tar.h"
 #include "termios.h"
 //#include "tgmath.h"
 #include "time.h"
+#include "trace.h"
+#include "ulimit.h"
 #include "unistd.h"
 #include "utime.h"
 #include "utmp.h"
 #include "utmpx.h"
+#include "wait.h"
 #include "wchar.h"
 #include "wctype.h"
+#include "wordexp.h"

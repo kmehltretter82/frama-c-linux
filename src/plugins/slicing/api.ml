@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -413,10 +413,9 @@ module Slice = struct
 
   let get_called_funcs ff stmt =
     match stmt.skind with
-    | Instr (Call (_,expr_f,_,_)) ->
+    | Instr (Call _) ->
       if snd (Fct_slice.get_called_slice ff stmt) then
-        Kernel_function.Hptset.elements
-          (snd (!Db.Value.expr_to_kernel_function (Kstmt stmt) ~deps:None expr_f))
+        Eva.Results.callee stmt
       else
         []
     | Instr (Local_init (_, ConsInit (f, _, _), _)) -> [ Globals.Functions.get f ]

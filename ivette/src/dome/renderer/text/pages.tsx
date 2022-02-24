@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -68,7 +68,7 @@ export interface TextProps {
    The page has insets and shadows and fills the entire available area.
    Large content is crolled inside in both directions.
  */
-export const Page = (props: TextProps) => (
+export const Page = (props: TextProps): JSX.Element => (
   <div className="dome-xPages-page">
     <div
       className={classes('dome-xPages-sheet dome-pages', props.className)}
@@ -88,7 +88,7 @@ export const Page = (props: TextProps) => (
 
    The area has small padding and no margin, and does not scroll its content.
  */
-export const Note = (props: TextProps) => (
+export const Note = (props: TextProps): JSX.Element => (
   <div
     className={classes('dome-xPages-note', 'dome-pages', props.className)}
     style={props.style}

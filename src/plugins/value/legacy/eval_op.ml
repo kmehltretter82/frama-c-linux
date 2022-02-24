@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,7 +49,7 @@ let v_uninit_of_offsetmap ~typ offsm =
     V_Offsetmap.find ~validity ~conflate_bottom:false ~offsets ~size offsm
 
 let backward_comp_int_left positive comp l r =
-  if (Value_parameters.UndefinedPointerComparisonPropagateAll.get())
+  if (Parameters.UndefinedPointerComparisonPropagateAll.get())
   && not (Cvalue_forward.are_comparable comp l r)
   then l
   else
@@ -167,7 +167,7 @@ let apply_on_all_locs f loc state =
   | Int_Base.Top -> state
   | Int_Base.Value _ as size ->
     let loc = Locations.valid_part Locations.Read loc in
-    let plevel = Value_parameters.ArrayPrecisionLevel.get () in
+    let plevel = Parameters.ArrayPrecisionLevel.get () in
     let ilevel = Int_set.get_small_cardinal () in
     let limit = max plevel ilevel in
     let apply_f base ival state =

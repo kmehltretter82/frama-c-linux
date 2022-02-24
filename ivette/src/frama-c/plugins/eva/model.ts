@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -20,6 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 // --------------------------------------------------------------------------
 // --- Eva Values
 // --------------------------------------------------------------------------
@@ -31,7 +33,7 @@ import * as Dome from 'dome';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import * as Values from 'frama-c/api/plugins/eva/values';
+import * as Values from 'frama-c/plugins/eva/api/values';
 
 // Model
 import { Probe } from './probes';

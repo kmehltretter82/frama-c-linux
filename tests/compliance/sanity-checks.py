@@ -36,7 +36,7 @@ with open(posix_ids_path) as data:
         unknown_exts = exts - extension_names
         if unknown_exts:
             sys.exit(f"error: unknown extension(s) {unknown_exts} for id {i}")
-print(f"{posix_ids_path} checked.")
+print(f"{posix_ids_path.name} checked.")
 
 c11_headers_path = Path(compliance_dir) / "c11_headers.json"
 c11_headers = []
@@ -71,4 +71,4 @@ for (i, v) in c11_funs.items():
         posix_header = posix_dict[i]["header"]
         if header != posix_header:
             sys.exit(f"error: C11 function {i} mapped to header {header}, but in POSIX it is mapped to header {posix_header}")
-print(f"{c11_funs_path} checked.")
+print(f"{c11_funs_path.name} checked.")

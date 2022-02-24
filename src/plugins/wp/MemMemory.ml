@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -195,27 +195,27 @@ let register ?(base=nop) ?(offset=nop) ?equal ?(linear=false) lfun =
 
 let r_separated = function
   | [p;a;q;b] ->
-      if a == F.e_one && b == F.e_one then F.e_neq p q
-      else
-        begin
-          let a_negative = F.e_leq a F.e_zero in
-          let b_negative = F.e_leq b F.e_zero in
-          if a_negative == e_true || b_negative == e_true then e_true else
-            let bp = a_base p in
-            let bq = a_base q in
-            let open Qed.Logic in
-            match F.is_true (F.e_eq bp bq) with
-            | No -> e_true (* Have S *)
-            | Yes when (a_negative == e_false && b_negative == e_false) ->
-                (* Reduced to S *)
-                let p_ofs = a_offset p in
-                let q_ofs = a_offset q in
-                let p_ofs' = F.e_add p_ofs a in
-                let q_ofs' = F.e_add q_ofs b in
-                F.e_or [ F.e_leq q_ofs' p_ofs ;
-                         F.e_leq p_ofs' q_ofs ]
-            | _ -> raise Not_found
-        end
+    if a == F.e_one && b == F.e_one then F.e_neq p q
+    else
+      begin
+        let a_negative = F.e_leq a F.e_zero in
+        let b_negative = F.e_leq b F.e_zero in
+        if a_negative == e_true || b_negative == e_true then e_true else
+          let bp = a_base p in
+          let bq = a_base q in
+          let open Qed.Logic in
+          match F.is_true (F.e_eq bp bq) with
+          | No -> e_true (* Have S *)
+          | Yes when (a_negative == e_false && b_negative == e_false) ->
+            (* Reduced to S *)
+            let p_ofs = a_offset p in
+            let q_ofs = a_offset q in
+            let p_ofs' = F.e_add p_ofs a in
+            let q_ofs' = F.e_add q_ofs b in
+            F.e_or [ F.e_leq q_ofs' p_ofs ;
+                     F.e_leq p_ofs' q_ofs ]
+          | _ -> raise Not_found
+      end
   | _ -> raise Not_found
 
 let is_separated args = F.is_true (r_separated args)
@@ -250,33 +250,33 @@ let is_separated args = F.is_true (r_separated args)
 
 let r_included = function
   | [p;a;q;b] ->
-      if F.e_eq p q == F.e_true
-      then F.e_imply [F.e_lt F.e_zero a] (F.e_leq a b) (* INC_P *)
-      else
-      if (F.e_eq a b == F.e_true) && (F.e_lt F.e_zero a == F.e_true)
-      then F.e_eq p q (* INC_A *)
-      else
-        begin
-          let a_empty = F.e_leq a F.e_zero in
-          let b_negative = F.e_lt b F.e_zero in
-          if a_empty == F.e_true then F.e_true (* INC_1 *) else
-          if b_negative == F.e_true then a_empty (* INC_2 *) else
-            let bp = a_base p in
-            let bq = a_base q in
-            let open Qed.Logic in
-            match F.is_true (F.e_eq bp bq) with
-            | No -> a_empty (* INC_3 *)
-            | Yes when (a_empty == e_false && b_negative == e_false) ->
-                (* INC_4 *)
-                let p_ofs = a_offset p in
-                let q_ofs = a_offset q in
-                if a == b then F.e_eq p_ofs q_ofs
-                else
-                  let p_ofs' = e_add p_ofs a in
-                  let q_ofs' = e_add q_ofs b in
-                  e_and [ F.e_leq q_ofs p_ofs ; F.e_leq p_ofs' q_ofs' ]
-            | _ -> raise Not_found
-        end
+    if F.e_eq p q == F.e_true
+    then F.e_imply [F.e_lt F.e_zero a] (F.e_leq a b) (* INC_P *)
+    else
+    if (F.e_eq a b == F.e_true) && (F.e_lt F.e_zero a == F.e_true)
+    then F.e_eq p q (* INC_A *)
+    else
+      begin
+        let a_empty = F.e_leq a F.e_zero in
+        let b_negative = F.e_lt b F.e_zero in
+        if a_empty == F.e_true then F.e_true (* INC_1 *) else
+        if b_negative == F.e_true then a_empty (* INC_2 *) else
+          let bp = a_base p in
+          let bq = a_base q in
+          let open Qed.Logic in
+          match F.is_true (F.e_eq bp bq) with
+          | No -> a_empty (* INC_3 *)
+          | Yes when (a_empty == e_false && b_negative == e_false) ->
+            (* INC_4 *)
+            let p_ofs = a_offset p in
+            let q_ofs = a_offset q in
+            if a == b then F.e_eq p_ofs q_ofs
+            else
+              let p_ofs' = e_add p_ofs a in
+              let q_ofs' = e_add q_ofs b in
+              e_and [ F.e_leq q_ofs p_ofs ; F.e_leq p_ofs' q_ofs' ]
+          | _ -> raise Not_found
+      end
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
@@ -304,11 +304,11 @@ let r_havoc = function
 *)
 let r_get_havoc = function
   | [undef;m;p;a] ->
-      (fun _ k ->
-         match is_separated [p;a;k;e_one] with
-         | L.Yes -> F.e_get m k
-         | L.No  -> F.e_get undef k
-         | _ -> raise Not_found)
+    (fun _ k ->
+       match is_separated [p;a;k;e_one] with
+       | L.Yes -> F.e_get m k
+       | L.No  -> F.e_get undef k
+       | _ -> raise Not_found)
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
@@ -340,7 +340,7 @@ let null_base p = e_eq (F.e_fun f_base [p]) F.e_zero
 *)
 let r_valid_unref = function
   | [_; p; n] when F.decide (null_base p) ->
-      e_leq n e_zero
+    e_leq n e_zero
   | _ -> raise Not_found
 
 (* - lemma valid_obj_null: forall m n. valid_obj m null n *)
@@ -411,47 +411,47 @@ type range =
 
 let range ~shift ~addrof ~sizeof = function
   | Sigs.Rloc(obj,loc) ->
-      LOC( addrof loc , sizeof obj )
+    LOC( addrof loc , sizeof obj )
   | Sigs.Rrange(loc,obj,Some a,Some b) ->
-      let s = sizeof obj in
-      let p = addrof (shift loc obj a) in
-      let n = e_mul s (e_range a b) in
-      LOC( p , n )
+    let s = sizeof obj in
+    let p = addrof (shift loc obj a) in
+    let n = e_mul s (e_range a b) in
+    LOC( p , n )
   | Sigs.Rrange(loc,_obj,None,None) ->
-      RANGE( a_base (addrof loc) , Vset.range None None )
+    RANGE( a_base (addrof loc) , Vset.range None None )
   | Sigs.Rrange(loc,obj,Some a,None) ->
-      let s = sizeof obj in
-      RANGE( a_base (addrof loc) , Vset.range (Some (e_mul s a)) None )
+    let s = sizeof obj in
+    RANGE( a_base (addrof loc) , Vset.range (Some (e_mul s a)) None )
   | Sigs.Rrange(loc,obj,None,Some b) ->
-      let s = sizeof obj in
-      RANGE( a_base (addrof loc) , Vset.range None (Some (e_mul s b)) )
+    let s = sizeof obj in
+    RANGE( a_base (addrof loc) , Vset.range None (Some (e_mul s b)) )
 
 let range_set = function
   | LOC(l,n) ->
-      let a = a_offset l in
-      let b = e_add a n in
-      a_base l , Vset.range (Some a) (Some b)
+    let a = a_offset l in
+    let b = e_add a n in
+    a_base l , Vset.range (Some a) (Some b)
   | RANGE(base,set) -> base , set
 
 let r_included r1 r2 =
   match r1 , r2 with
   | LOC(l1,n1) , LOC(l2,n2) ->
-      F.p_call p_included [l1;n1;l2;n2]
+    F.p_call p_included [l1;n1;l2;n2]
   | _ ->
-      let base1,set1 = range_set r1 in
-      let base2,set2 = range_set r2 in
-      F.p_if (F.p_equal base1 base2)
-        (Vset.subset set1 set2)
-        (Vset.is_empty set1)
+    let base1,set1 = range_set r1 in
+    let base2,set2 = range_set r2 in
+    F.p_if (F.p_equal base1 base2)
+      (Vset.subset set1 set2)
+      (Vset.is_empty set1)
 
 let r_disjoint r1 r2 =
   match r1 , r2 with
   | LOC(l1,n1) , LOC(l2,n2) ->
-      F.p_call p_separated [l1;n1;l2;n2]
+    F.p_call p_separated [l1;n1;l2;n2]
   | _ ->
-      let base1,set1 = range_set r1 in
-      let base2,set2 = range_set r2 in
-      F.p_imply (F.p_equal base1 base2) (Vset.disjoint set1 set2)
+    let base1,set1 = range_set r1 in
+    let base2,set2 = range_set r2 in
+    F.p_imply (F.p_equal base1 base2) (Vset.disjoint set1 set2)
 
 let included ~shift ~addrof ~sizeof s1 s2  =
   let range = range ~shift ~addrof ~sizeof in

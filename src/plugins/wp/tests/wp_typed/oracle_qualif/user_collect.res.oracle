@@ -21,29 +21,29 @@
 [wp] [Qed] Goal typed_caller_ensures_K : Valid
 [wp] [Alt-Ergo] Goal typed_caller_ensures_P1 : Valid
 [wp] [Alt-Ergo] Goal typed_caller_ensures_P2 : Valid
-[wp] [Alt-Ergo] Goal typed_caller_call_job_requires : Valid
-[wp] [Alt-Ergo] Goal typed_caller_call_job_2_requires : Valid
+[wp] [Qed] Goal typed_caller_call_job_requires : Valid
+[wp] [Qed] Goal typed_caller_call_job_2_requires : Valid
 [wp] [Qed] Goal typed_caller2_ensures_K : Valid
 [wp] [Alt-Ergo] Goal typed_caller2_ensures_Q1 : Valid
 [wp] [Alt-Ergo] Goal typed_caller2_ensures_Q2 : Valid
 [wp] [Alt-Ergo] Goal typed_caller2_ensures_R : Valid
-[wp] [Alt-Ergo] Goal typed_caller2_call_job2_requires : Valid
-[wp] [Alt-Ergo] Goal typed_caller2_call_job2_2_requires : Valid
+[wp] [Qed] Goal typed_caller2_call_job2_requires : Valid
+[wp] [Qed] Goal typed_caller2_call_job2_2_requires : Valid
 [wp] [Qed] Goal typed_caller3_ensures_K : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_ensures_Q1 : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_ensures_Q2 : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_ensures_R : Valid
-[wp] [Alt-Ergo] Goal typed_caller3_call_job3_requires : Valid
-[wp] [Alt-Ergo] Goal typed_caller3_call_job3_2_requires : Valid
+[wp] [Qed] Goal typed_caller3_call_job3_requires : Valid
+[wp] [Qed] Goal typed_caller3_call_job3_2_requires : Valid
 [wp] Proved goals:   32 / 32
-  Qed:            17 
-  Alt-Ergo:       15
+  Qed:            23 
+  Alt-Ergo:        9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job                       5        -        5       100%
   job2                      5        -        5       100%
   job3                      4        1        5       100%
-  caller                    1        4        5       100%
-  caller2                   1        5        6       100%
-  caller3                   1        5        6       100%
+  caller                    3        2        5       100%
+  caller2                   3        3        6       100%
+  caller3                   3        3        6       100%
 ------------------------------------------------------------

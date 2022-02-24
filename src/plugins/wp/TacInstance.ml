@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -59,11 +59,11 @@ type env = {
 let rec complexity = function
   | [] -> Integer.one
   | (_,v) :: bindings ->
-      match v with
-      | Tactical.Compose(Tactical.Range(a,b)) when a < b ->
-          let n = Integer.of_int (b+1-a) in
-          Integer.mul n (complexity bindings)
-      | _ -> complexity bindings
+    match v with
+    | Tactical.Compose(Tactical.Range(a,b)) when a < b ->
+      let n = Integer.of_int (b+1-a) in
+      Integer.mul n (complexity bindings)
+    | _ -> complexity bindings
 
 let cardinal limit bindings =
   let n = complexity bindings in
@@ -74,13 +74,13 @@ let rec bind_exists bindings property =
   match bindings with
   | [] -> property
   | (x,v) :: bindings ->
-      let closed =
-        if Tactical.is_empty v then
-          Lang.F.p_bind L.Exists x property
-        else
-          let value = Tactical.selected v in
-          Lang.F.p_subst_var x value property
-      in bind_exists bindings closed
+    let closed =
+      if Tactical.is_empty v then
+        Lang.F.p_bind L.Exists x property
+      else
+        let value = Tactical.selected v in
+        Lang.F.p_subst_var x value property
+    in bind_exists bindings closed
 
 let rec range x a b w =
   if a <= b then
@@ -92,23 +92,23 @@ let rec range x a b w =
 let rec bind_ranges pool = function
   | [] -> pool
   | (x,a,b) :: ranges ->
-      bind_ranges (List.concat (List.map (range x a b) pool)) ranges
+    bind_ranges (List.concat (List.map (range x a b) pool)) ranges
 
 let rec bind_forall ranges bindings property =
   match bindings with
   | (x,v) :: bindings ->
-      begin
-        match v with
-        | Tactical.Compose(Tactical.Range(a,b)) when a < b ->
-            bind_forall ((x,a,b)::ranges) bindings property
-        | Tactical.Empty ->
-            bind_forall ranges bindings (Lang.F.p_bind L.Forall x property)
-        | _ ->
-            let value = Tactical.selected v in
-            bind_forall ranges bindings (Lang.F.p_subst_var x value property)
-      end
+    begin
+      match v with
+      | Tactical.Compose(Tactical.Range(a,b)) when a < b ->
+        bind_forall ((x,a,b)::ranges) bindings property
+      | Tactical.Empty ->
+        bind_forall ranges bindings (Lang.F.p_bind L.Forall x property)
+      | _ ->
+        let value = Tactical.selected v in
+        bind_forall ranges bindings (Lang.F.p_subst_var x value property)
+    end
   | [] ->
-      bind_ranges [ "Instance" , property ] ranges
+    bind_ranges [ "Instance" , property ] ranges
 
 let instance_goal ?(title="Witness") bindings property sequent =
   [ title, (fst sequent , bind_exists bindings property) ]
@@ -125,10 +125,10 @@ let instance_have ?(title="Instance") ?at bindings property sequent =
 let bind ~side bindings property : Tactical.process =
   match side with
   | None ->
-      instance_goal ~title:"Witness" bindings property
+    instance_goal ~title:"Witness" bindings property
   | Some s ->
-      let open Conditions in
-      instance_have ?title:s.descr ~at:s.id bindings property
+    let open Conditions in
+    instance_have ?title:s.descr ~at:s.id bindings property
 
 let filter tau e =
   try F.Tau.equal tau (F.typeof e)
@@ -150,22 +150,22 @@ class instance =
       match F.repr lemma , fields with
       | L.Imply(hs,p) , _ when env.binder = L.Forall &&
                                has_binder env.binder p ->
-          let bindings,property = self#wrap env p fields in
-          bindings, F.e_imply hs property
+        let bindings,property = self#wrap env p fields in
+        bindings, F.e_imply hs property
       | L.Bind(q,tau,phi) , fd :: fields when q = env.binder ->
-          env.index <- succ env.index ;
-          let x = F.fresh env.feedback#pool tau in
-          let v = self#get_field fd in
-          let range = match tau with L.Int -> true | _ -> false in
-          let tooltip = fieldname ~range env.index x in
-          env.feedback#update_field
-            ~tooltip ~range ~enabled:true ~filter:(filter tau) fd ;
-          let lemma = F.QED.e_unbind x phi in
-          let bindings,property = self#wrap env lemma fields in
-          (x,v) :: bindings , property
+        env.index <- succ env.index ;
+        let x = F.fresh env.feedback#pool tau in
+        let v = self#get_field fd in
+        let range = match tau with L.Int -> true | _ -> false in
+        let tooltip = fieldname ~range env.index x in
+        env.feedback#update_field
+          ~tooltip ~range ~enabled:true ~filter:(filter tau) fd ;
+        let lemma = F.QED.e_unbind x phi in
+        let bindings,property = self#wrap env lemma fields in
+        (x,v) :: bindings , property
       | _ ->
-          List.iter (env.feedback#update_field ~enabled:false) fields ;
-          [] , lemma
+        List.iter (env.feedback#update_field ~enabled:false) fields ;
+        [] , lemma
 
     method private configure ~side feedback p =
       let binder = match side with None -> L.Exists | Some _ -> L.Forall in
@@ -177,12 +177,12 @@ class instance =
         then
           match cardinal 1000 bindings with
           | Some n ->
-              if n > 1 then
-                feedback#set_descr "Generates %d instances" n ;
-              Applicable (bind ~side bindings (F.p_bool phi))
+            if n > 1 then
+              feedback#set_descr "Generates %d instances" n ;
+            Applicable (bind ~side bindings (F.p_bool phi))
           | None ->
-              feedback#set_error "More than 1,000 instances" ;
-              Not_configured
+            feedback#set_error "More than 1,000 instances" ;
+            Not_configured
         else Not_configured
       else
         Not_applicable
@@ -190,22 +190,22 @@ class instance =
     method select feedback sel =
       match sel with
       | Inside(Step s,t) when F.is_prop t ->
-          let hs = Conditions.have s in
-          let p = F.p_bool t in
-          begin match F.p_expr hs with
-            | L.And ps when List.memq p ps ->
-                self#configure ~side:(Some s) feedback p
-            | _ -> Not_applicable
-          end
+        let hs = Conditions.have s in
+        let p = F.p_bool t in
+        begin match F.p_expr hs with
+          | L.And ps when List.memq p ps ->
+            self#configure ~side:(Some s) feedback p
+          | _ -> Not_applicable
+        end
       | Clause(Step s) ->
-          let open Conditions in
-          begin match s.condition with
-            | Have p | When p | Init p | Core p ->
-                self#configure ~side:(Some s) feedback p
-            | _ -> Not_applicable
-          end
+        let open Conditions in
+        begin match s.condition with
+          | Have p | When p | Init p | Core p ->
+            self#configure ~side:(Some s) feedback p
+          | _ -> Not_applicable
+        end
       | Clause(Goal p) ->
-          self#configure ~side:None feedback p
+        self#configure ~side:None feedback p
       | _ -> Not_applicable
 
   end
@@ -215,9 +215,9 @@ let tactical = Tactical.export (new instance)
 let rec wrap fs vs =
   match fs , vs with
   | f :: fs , v :: vs ->
-      Strategy.arg f v :: (wrap fs vs)
+    Strategy.arg f v :: (wrap fs vs)
   | fs , _ ->
-      List.map (fun f -> Strategy.arg f Empty) fs
+    List.map (fun f -> Strategy.arg f Empty) fs
 
 let strategy ?(priority=1.0) selection values =
   Strategy.{

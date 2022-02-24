@@ -277,10 +277,11 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"y",0,y);
     __gen_e_acsl_assert_data_20.blocking = 1;
     __gen_e_acsl_assert_data_20.kind = "RTE";
-    __gen_e_acsl_assert_data_20.pred_txt = "division_by_zero: y != 0";
+    __gen_e_acsl_assert_data_20.pred_txt = "y != 0";
     __gen_e_acsl_assert_data_20.file = "arith.i";
     __gen_e_acsl_assert_data_20.fct = "main";
     __gen_e_acsl_assert_data_20.line = 31;
+    __gen_e_acsl_assert_data_20.name = "division_by_zero";
     __e_acsl_assert(y != 0,& __gen_e_acsl_assert_data_20);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
     __gen_e_acsl_assert_data_19.blocking = 1;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -69,16 +69,16 @@ let emit_status ppt status =
   if status = Property_status.False_if_reachable then begin
     Red_statuses.add_red_property (Property.get_kinstr ppt) ppt;
   end;
-  Property_status.emit ~distinct:true Value_util.emitter ~hyps:[] ppt status
+  Property_status.emit ~distinct:true Eva_utils.emitter ~hyps:[] ppt status
 
 (* Display the message as result/warning depending on [status] *)
 let msg_status status ?current ?once ?source fmt =
   if status = Alarmset.True then
-    if Value_parameters.ValShowProgress.get ()
-    then Value_parameters.result ?current ?once ?source fmt
-    else Value_parameters.result ?current ?once ?source ~level:2 fmt
+    if Parameters.ValShowProgress.get ()
+    then Self.result ?current ?once ?source fmt
+    else Self.result ?current ?once ?source ~level:2 fmt
   else
-    Value_util.alarm_report ?current ?once ?source fmt
+    Eva_utils.alarm_report ?current ?once ?source fmt
 
 let behavior_inactive fmt =
   Format.fprintf fmt " (Behavior may be inactive, no reduction performed.)"
@@ -123,7 +123,7 @@ let emit_message_and_status kind kf behavior ~active ~empty property named_pred 
       pp_predicate named_pred
       Alarmset.Status.pretty status
       (if active then (fun _ -> ()) else behavior_inactive)
-      Value_util.pp_callstack;
+      Eva_utils.pp_callstack;
     emit_status property (conv_status status);
   | Postcondition postk ->
     (* Do not emit a status for leaf functions or builtins. Otherwise, we would
@@ -236,9 +236,9 @@ let process_inactive_behavior kf call_ki behavior =
       end
     ) behavior.b_requires;
   if !emitted then
-    Value_parameters.result ~once:true ~current:true ~level:2
+    Self.result ~once:true ~current:true ~level:2
       "%a: assumes got status invalid; behavior not evaluated.%t"
-      (pp_header kf) behavior Value_util.pp_callstack
+      (pp_header kf) behavior Eva_utils.pp_callstack
 
 let process_inactive_behaviors call_ki kf behaviors =
   List.iter (process_inactive_behavior kf call_ki) behaviors
@@ -258,9 +258,9 @@ let process_inactive_postconds kf inactive_bhvs =
            end
          ) b.b_post_cond;
        if !emitted then
-         Value_parameters.result ~once:true ~current:true ~level:2
+         Self.result ~once:true ~current:true ~level:2
            "%a: requires got status invalid; postconditions not evaluated.%t"
-           (pp_header kf) b Value_util.pp_callstack;
+           (pp_header kf) b Eva_utils.pp_callstack;
     ) inactive_bhvs
 
 (* -------------------------------- Functor --------------------------------- *)
@@ -421,14 +421,14 @@ module Make
         | Postcondition (PostLeaf | PostUseSpec) -> true
         | _ -> false)
        && pr.pred_content <> Pfalse then
-      Value_parameters.warning ~once:true ~source
+      Self.warning ~once:true ~source
         "@[%a:@ this postcondition@ evaluates to@ false@ in this@ context.\
          @ If it is valid,@ either@ a precondition@ was not@ verified@ \
          for this@ call%t,@ or some assigns/from@ clauses@ are \
          incomplete@ (or incorrect).@]%t"
         pp_header behavior
         (if active then (fun _ -> ()) else pp_behavior_inactive)
-        Value_util.pp_callstack
+        Eva_utils.pp_callstack
 
   (* [per_behavior] indicates if we are processing each behavior separately.
      If this is the case, then [Unknown] and [True] behaviors are treated
@@ -453,7 +453,7 @@ module Make
      - [build_env] is used to build the environment evaluation, in particular
        the pre- and post-states. *)
   let eval_and_reduce kf behavior active kind ips states build_prop build_env =
-    let limit = Value_util.get_slevel kf in
+    let limit = Eva_utils.get_slevel kf in
     let emit = emit_message_and_status kind kf behavior ~active in
     let aux_pred states pred =
       let pr = Logic_const.pred_of_id_pred pred in

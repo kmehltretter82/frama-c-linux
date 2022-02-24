@@ -1,13 +1,6 @@
 /* run.config
-<<<<<<< HEAD
-   PLUGIN: @EVA_PLUGINS@
-   STDOPT: +"-copy -eva @EVA_OPTIONS@"
-||||||| 754e522ceb
+PLUGIN: eva,inout,scope
    STDOPT: +"-copy -eva @EVA_CONFIG@"
-=======
-PLUGIN: eva,scope
-   STDOPT: +"-copy -eva @EVA_CONFIG@"
->>>>>>> origin/master
  */
 struct S {
   int a;

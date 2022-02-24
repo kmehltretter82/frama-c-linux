@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -86,7 +86,7 @@ module Externals =
 let get_external =
   Externals.memo
     (fun kf ->
-       !Db.Value.compute ();
+       Eva.Analysis.compute ();
        if Kernel_function.is_definition kf then
          try
            externalize

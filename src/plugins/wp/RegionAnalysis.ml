@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -84,10 +84,10 @@ module REGISTRY = State_builder.Hashtbl
 let get = function
   | None -> GLOBAL.get ()
   | Some kf ->
-      try REGISTRY.find kf
-      with Not_found ->
-        let map = compute kf in
-        REGISTRY.add kf map ; map
+    try REGISTRY.find kf
+    with Not_found ->
+      let map = compute kf in
+      REGISTRY.add kf map ; map
 
 (* ---------------------------------------------------------------------- *)
 (* --- Command Line Registry                                          --- *)

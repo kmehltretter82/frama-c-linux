@@ -1194,7 +1194,7 @@
 [eva:final-states] Values at end of function argz_replace:
   __fc_errno ∈ [--..--]
   __fc_heap_status ∈ [--..--]
-  err ∈ {0; 12}
+  er ∈ {0; 12}
   argz ∈
       {{ &__realloc_argz_append_l271_1[0] ;
          &__realloc_argz_append_l271_7[0] }}

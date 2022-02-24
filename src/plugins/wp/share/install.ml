@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -121,16 +121,16 @@ let do_install file =
       Format.printf "[install] File %S not found@." src
   with
   | Failure msg | Sys_error msg ->
-      Format.printf "[install] %s@." msg ;
-      exit 1
+    Format.printf "[install] %s@." msg ;
+    exit 1
   | Unix.Unix_error (e,_,_) ->
-      let msg = Unix.error_message e in
-      Format.printf "[install] Error: %s@." msg ;
-      exit 2
+    let msg = Unix.error_message e in
+    Format.printf "[install] Error: %s@." msg ;
+    exit 2
   | e ->
-      let msg = Printexc.to_string e in
-      Format.printf "[install] Error: %s@." msg ;
-      exit 2
+    let msg = Printexc.to_string e in
+    Format.printf "[install] Error: %s@." msg ;
+    exit 2
 
 let () =
   Arg.parse [

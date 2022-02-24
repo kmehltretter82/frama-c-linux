@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -31,13 +31,13 @@ import * as Utils from 'frama-c/utils';
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { getInfo } from 'frama-c/api/kernel/ast';
+import { getInfo } from 'frama-c/kernel/api/ast';
 
 // --------------------------------------------------------------------------
 // --- Information Panel
 // --------------------------------------------------------------------------
 
-export default function ASTinfo() {
+export default function ASTinfo(): JSX.Element {
 
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [selection, updateSelection] = States.useSelection();
@@ -46,13 +46,12 @@ export default function ASTinfo() {
 
   React.useEffect(() => {
     buffer.clear();
-    if (data) {
-      Utils.printTextWithTags(buffer, data, { css: 'color: blue' });
-    }
+    const style = { css: 'color: var(--text-highlighted)' };
+    if (data) Utils.printTextWithTags(buffer, data, style);
   }, [buffer, data]);
 
   // Callbacks
-  function onTextSelection(id: string) {
+  function onTextSelection(id: string): void {
     // For now, the only markers are functions.
     const location = { fct: id };
     updateSelection({ location });
@@ -65,7 +64,6 @@ export default function ASTinfo() {
         <Text
           buffer={buffer}
           mode="text"
-          theme="default"
           onSelection={onTextSelection}
           readOnly
         />

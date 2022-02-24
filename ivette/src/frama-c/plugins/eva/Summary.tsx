@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -25,7 +25,7 @@ import React from 'react';
 import { LED } from 'dome/controls/displays';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
-import * as Eva from 'frama-c/api/plugins/eva/general';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 
 import CoverageMeter, { percent } from './CoverageMeter';
 

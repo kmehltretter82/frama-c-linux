@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -64,11 +64,11 @@ struct
   let subterms f e =
     match T.repr e with
     | Rdef fts ->
-        begin
-          match T.record_with fts with
-          | None -> T.lc_iter f e
-          | Some(a,fts) -> f a ; List.iter (fun (_,e) -> f e) fts
-        end
+      begin
+        match T.record_with fts with
+        | None -> T.lc_iter f e
+        | Some(a,fts) -> f a ; List.iter (fun (_,e) -> f e) fts
+      end
     | _ -> T.lc_iter f e
 
   (* -------------------------------------------------------------------------- *)
@@ -169,10 +169,10 @@ struct
   and group_collect q k kts = function
     | [] -> [q,kts]
     | (q0,t) :: qts ->
-        if q = q0 && q0 <> Lambda then
-          group_collect q (succ k) (group_add t k kts) qts
-        else
-          (q,kts) :: group_collect q0 (succ k) (group_var t k) qts
+      if q = q0 && q0 <> Lambda then
+        group_collect q (succ k) (group_add t k kts) qts
+      else
+        (q,kts) :: group_collect q0 (succ k) (group_var t k) qts
 
   (* -------------------------------------------------------------------------- *)
   (* --- Output Form                                                        --- *)
@@ -230,9 +230,9 @@ struct
     | Not e -> Unop("not ",e)
     | Imply(hs,p) ->Vbox("->",hs@[p])
     | Eq(a,b) ->
-        if T.sort e = Sprop
-        then Vbox("<->",[a;b])
-        else Hbox("=",[a;b])
+      if T.sort e = Sprop
+      then Vbox("<->",[a;b])
+      else Hbox("=",[a;b])
     | Lt(a,b) -> Hbox("<",[a;b])
     | Neq(a,b) -> Hbox("!=",[a;b])
     | Leq(a,b) -> Hbox("<=",[a;b])
@@ -301,11 +301,11 @@ struct
     List.iter
       (function
         | With r ->
-            fprintf fmt "@ %a with" (pp_atom env) r
+          fprintf fmt "@ %a with" (pp_atom env) r
         | Field (f,v) ->
-            fprintf fmt "@ @[<hov 2>%a =@ %a ;@]" Field.pretty f (pp_free env) v
+          fprintf fmt "@ @[<hov 2>%a =@ %a ;@]" Field.pretty f (pp_free env) v
         | Last (f,v) ->
-            fprintf fmt "@ @[<hov 2>%a =@ %a@]" Field.pretty f (pp_free env) v
+          fprintf fmt "@ @[<hov 2>%a =@ %a@]" Field.pretty f (pp_free env) v
       ) fs ;
     fprintf fmt "@]@ }@]"
 
@@ -323,9 +323,9 @@ struct
   and pp_call (env:env) (fmt:formatter) f = function
     | [] -> Fun.pretty fmt f
     | es ->
-        fprintf fmt "@[<hov 2>(%a" Fun.pretty f ;
-        List.iter (fun e -> fprintf fmt "@ %a" (pp_atom env) e) es ;
-        fprintf fmt ")@]"
+      fprintf fmt "@[<hov 2>(%a" Fun.pretty f ;
+      List.iter (fun e -> fprintf fmt "@ %a" (pp_atom env) e) es ;
+      fprintf fmt ")@]"
 
   (* -------------------------------------------------------------------------- *)
   (* --- Sum printer                                                        --- *)
@@ -342,9 +342,9 @@ struct
     in match ps , ns with
     | [] , [] -> pp_print_string fmt "0"
     | [] , _ ->
-        if free
-        then fprintf fmt "(%a)" (pp_factor env "-") ns
-        else pp_factor env "-" fmt ns
+      if free
+      then fprintf fmt "(%a)" (pp_factor env "-") ns
+      else pp_factor env "-" fmt ns
     | p::ps , ns -> fprintf fmt "%a%a%a"
                       (pp_atom env) p
                       (pp_factor env "+") ps
@@ -368,8 +368,8 @@ struct
   and pp_vbox (env:env) (sep:string) (fmt:formatter) = function
     | [] -> ()
     | e::es ->
-        pp_atom env fmt e ;
-        List.iter (fun e -> fprintf fmt "@ %s %a" sep (pp_atom env) e) es
+      pp_atom env fmt e ;
+      List.iter (fun e -> fprintf fmt "@ %s %a" sep (pp_atom env) e) es
 
   (* -------------------------------------------------------------------------- *)
   (* --- Specific Operators                                                 --- *)

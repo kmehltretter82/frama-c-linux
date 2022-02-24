@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,7 +25,7 @@ open Cil_types
 let main (main_ui:Design.main_window_extension_points) =
   let filetree_selector ~was_activated ~activating node =
     (* [JS 2009/30/03] GUI may become too slow if froms are displayed *)
-    if false && Db.Value.is_computed () then begin
+    if false && Eva.Analysis.is_computed () then begin
       if not was_activated && activating then begin
         match node with
         | Filetree.Global (Cil_types.GFun ({svar=v},_)) ->

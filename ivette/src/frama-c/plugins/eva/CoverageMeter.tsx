@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -23,17 +23,22 @@
 import React from 'react';
 import { Meter } from 'dome/controls/displays';
 
-export interface CoverageProps {
+export interface Coverage {
   reachable: number;
   dead: number;
 }
 
-export function percent(coverage: CoverageProps): string {
+export interface CoverageProps {
+  coverage: Coverage;
+}
+
+
+export function percent(coverage: Coverage): string {
   const q = coverage.reachable / (coverage.reachable + coverage.dead);
   return `${(q * 100).toFixed(1)}%`;
 }
 
-export default function(props: { coverage: CoverageProps }) {
+export default function CoverageMeter(props: CoverageProps): JSX.Element {
   const { reachable, dead } = props.coverage;
   const total = reachable + dead;
 

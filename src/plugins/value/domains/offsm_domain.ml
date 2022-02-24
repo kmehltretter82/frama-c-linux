@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,7 +30,7 @@ let store_redundant = false
     unsoundnesses in the domain through testing, because many more expressions
     end up being handled. *)
 
-let dkey = Value_parameters.register_category "d-bitwise"
+let dkey = Self.register_category "d-bitwise"
 
 module Default_offsetmap = struct
   open Cvalue

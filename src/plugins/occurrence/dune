@@ -3,7 +3,7 @@
  (public_name frama-c-occurrence.core)
   (modules options register)
   (flags -open Frama_c_kernel)
-  (libraries frama-c.kernel)
+  (libraries frama-c.kernel frama-c-eva.core)
 )
 
 (plugin (optional) (name occurrence) (libraries frama-c-occurrence.core) (site (frama-c plugins)))

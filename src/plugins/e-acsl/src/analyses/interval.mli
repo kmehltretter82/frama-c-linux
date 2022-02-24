@@ -58,7 +58,7 @@ type ival =
   | Real
   | Nan
 
-include Datatype.S_with_collections with type t = ival
+type t = ival
 
 val is_included: t -> t -> bool
 val join: t -> t -> t
@@ -68,9 +68,6 @@ val widen: t -> t
 (** @return the smallest interval containing a disjoint union of intervals *)
 
 val is_singleton_int: t -> bool
-
-val top_ival: t
-val ival: Integer.t -> Integer.t -> t
 
 (** assume [Ival _] as argument *)
 val extract_ival: t -> Ival.t
@@ -102,7 +99,6 @@ module Env: sig
   val clear: unit -> unit
   val add: Cil_types.logic_var -> t -> unit
   val remove: Cil_types.logic_var -> unit
-  val replace: Cil_types.logic_var -> t -> unit
 end
 
 (* ************************************************************************** *)

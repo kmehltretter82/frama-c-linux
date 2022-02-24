@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2021                                               #
+#  Copyright (C) 2007-2022                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -26,24 +26,22 @@
 # of analyzing a new code base with Frama-C.
 
 import argparse
-import build_callgraph
-import function_finder
 import json
 import os
-from pathlib import Path
+from   pathlib import Path
 import re
 import subprocess
 import sys
 import tempfile
 
+import build_callgraph
+import function_finder
+import source_filter
+
 #TODO : avoid relativizing paths when introducing too many ".." ;
 #TODO : accept directory as argument (--full-tree), and then do glob **/*.{c,i} inside
 #TODO : try to check the presence of compiler builtins
 #TODO : try to check for pragmas
-
-MIN_PYTHON = (3, 5)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
 parser = argparse.ArgumentParser(description="""
 Estimates the difficulty of analyzing a given code base""")
@@ -56,6 +54,8 @@ header_dirs = args["header_dirs"]
 if not header_dirs:
     header_dirs = []
 files = args["files"]
+
+under_test = os.getenv("PTESTS_TESTING")
 
 # gather information from several sources
 
@@ -79,16 +79,16 @@ def get_framac_libc_function_statuses(framac, framac_share):
     return (defined, spec_only)
 
 re_include = re.compile(r'\s*#\s*include\s*("|<)([^">]+)("|>)')
-def grep_includes_in_file(file):
-    with open(file, "r", encoding="utf-8", errors='ignore') as f:
-        i = 0
-        for line in f.readlines():
-            i += 1
-            m = re_include.match(line)
-            if m:
-                kind = m.group(1)
-                header = m.group(2)
-                yield((i,kind,header))
+def grep_includes_in_file(filename):
+    file_content = source_filter.open_and_filter(filename, not under_test)
+    i = 0
+    for line in file_content.splitlines():
+        i += 1
+        m = re_include.match(line)
+        if m:
+            kind = m.group(1)
+            header = m.group(2)
+            yield((i,kind,header))
 
 def get_includes(files):
     quote_includes = {}
@@ -165,9 +165,10 @@ for callee in sorted(callees):
             warnings += 1
         if verbose or debug or status == "warning":
             print(f"- {status}: {callee} ({standard}) {reason}")
-    #print(f"callee: {callee}")
+    is_problematic = callee in posix_identifiers and "notes" in posix_identifiers[callee] and "fc-support" in posix_identifiers[callee]["notes"] and posix_identifiers[callee]["notes"]["fc-support"] == "problematic"
     if callee in posix_identifiers:
         used_headers.add(posix_identifiers[callee]["header"])
+    status_emitted = False # to avoid re-emitting a message for functions in both C11 and POSIX
     if callee in c11_functions:
         standard = "C11"
         # check that the callee is not a macro or type (e.g. va_arg);
@@ -175,30 +176,40 @@ for callee in sorted(callees):
         # so we must test membership before checking the POSIX type
         if callee in posix_identifiers and posix_identifiers[callee]["id_type"] != "function":
             continue
-        #print(f"C11 function: {callee}")
-        if callee in libc_specified_functions:
+        if (not is_problematic) and callee in libc_specified_functions:
             callee_status("good", standard, "is specified in Frama-C's libc")
-        elif callee in libc_defined_functions:
+            status_emitted = True
+        elif (not is_problematic) and callee in libc_defined_functions:
             callee_status("ok", standard, "is defined in Frama-C's libc")
+            status_emitted = True
         else:
-            # Some functions without specification are actually variadic
-            # (and possibly handled by the Variadic plug-in)
-            if callee in posix_identifiers and "notes" in posix_identifiers[callee] and "variadic-plugin" in posix_identifiers[callee]["notes"]:
-                callee_status("ok", standard, "is handled by the Variadic plug-in")
-            else:
+            if callee not in posix_identifiers:
                 callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
-    elif callee in posix_identifiers:
+                status_emitted = True
+    if not status_emitted and callee in posix_identifiers:
         standard = "POSIX"
         # check that the callee is not a macro or type (e.g. va_arg)
         if posix_identifiers[callee]["id_type"] != "function":
             continue
-        #print(f"Non-C11, POSIX function: {callee}")
-        if callee in libc_specified_functions:
+        if (not is_problematic) and callee in libc_specified_functions:
             callee_status("good", standard, "specified in Frama-C's libc")
-        elif callee in libc_defined_functions:
+            status_emitted = True
+        elif (not is_problematic) and callee in libc_defined_functions:
             callee_status("ok", standard, "defined in Frama-C's libc")
+            status_emitted = True
         else:
-            callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
+            # Some functions without specification are actually variadic
+            # (and possibly handled by the Variadic plug-in)
+            if "notes" in posix_identifiers[callee]:
+                if "variadic-plugin" in posix_identifiers[callee]["notes"]:
+                    callee_status("ok", standard, "is handled by the Variadic plug-in")
+                    status_emitted = True
+                elif is_problematic:
+                    callee_status("warning", standard, "is known to be problematic for code analysis")
+                    status_emitted = True
+            if not status_emitted:
+                callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
+
 print(f"Function-related warnings: {warnings}")
 
 if (verbose or debug) and used_headers:
@@ -217,13 +228,13 @@ def is_local_header(header_dirs, header):
 
 print(f"Estimating difficulty for {len(chevron_includes)} '#include <header>' directives...")
 non_posix_headers = []
+header_warnings = 0
 for header in sorted(chevron_includes, key=str.casefold):
     if header in posix_headers:
         fc_support = posix_headers[header]["fc-support"]
         if fc_support == "unsupported":
+            header_warnings += 1
             print(f"- WARNING: included header <{header}> is explicitly unsupported by Frama-C")
-        elif fc_support == "none":
-            print(f"- warning: included header <{header}> not currently included in Frama-C's libc")
         else:
             if verbose or debug:
                 c11_or_posix = "C11" if header in c11_headers else "POSIX"
@@ -234,8 +245,9 @@ for header in sorted(chevron_includes, key=str.casefold):
                 print(f"- ok: included header <{header}> seems to be available locally")
         else:
             non_posix_headers.append(header)
+            header_warnings += 1
             print(f"- warning: included non-POSIX header <{header}>")
-print(f"Header-related warnings: {len(non_posix_headers)}")
+print(f"Header-related warnings: {header_warnings}")
 
 
 # dynamic allocation
@@ -248,7 +260,9 @@ if dyncallees:
 
 # unsupported C11-specific features
 
-c11_unsupported = ["_Alignas", "_Alignof", "_Generic", "_Static_assert"]
+c11_unsupported = ["_Alignas", "_Alignof", "_Complex", "_Generic", "_Imaginary",
+                   "alignas", "alignof" # stdalign.h may use these symbols instead of the C11 keywords
+                   ];
 
 for keyword in c11_unsupported:
     out = subprocess.Popen(["grep", "-n", '\\b' + keyword + '\\b'] + files + ["/dev/null"],

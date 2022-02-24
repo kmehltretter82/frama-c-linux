@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -33,6 +33,9 @@
 import React from 'react';
 import Emitter from 'events';
 import isEqual from 'react-fast-compare';
+import { Debug } from 'dome';
+
+const D = new Debug('State');
 
 // --------------------------------------------------------------------------
 // --- State utilities
@@ -72,7 +75,7 @@ export function debug<A>(msg: string, st: State<A>): State<A> {
   const [value, setValue] = st;
   return [value, (v) => {
     setValue(v);
-    console.log(msg, v); // eslint-disable-line no-console
+    D.log(msg, v);
   }];
 }
 
@@ -102,10 +105,10 @@ export class GlobalState<A> {
   }
 
   /** Current state value. */
-  getValue() { return this.value; }
+  getValue(): A { return this.value; }
 
   /** Notify callbacks on change, using _deep_ structural comparison. */
-  setValue(value: A) {
+  setValue(value: A): void {
     if (!isEqual(value, this.value)) {
       this.value = value;
       this.emitter.emit(UPDATE, value);
@@ -113,12 +116,12 @@ export class GlobalState<A> {
   }
 
   /** Callback Emitter. */
-  on(callback: (value: A) => void) {
+  on(callback: (value: A) => void): void {
     this.emitter.on(UPDATE, callback);
   }
 
   /** Callback Emitter. */
-  off(callback: (value: A) => void) {
+  off(callback: (value: A) => void): void {
     this.emitter.off(UPDATE, callback);
   }
 

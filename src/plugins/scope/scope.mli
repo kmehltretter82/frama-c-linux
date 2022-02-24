@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -80,12 +80,6 @@ module Datascope : sig
 
   (** for internal use *)
   module R: Plugin.General_services
-
-  val get_lval_zones:
-    for_writing:bool ->
-    Cil_types.stmt ->
-    Cil_types.lval ->
-    Locations.Zone.t * bool * Locations.Zone.t
 end
 
 (** {3 Zones} *)

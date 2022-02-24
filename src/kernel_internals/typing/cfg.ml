@@ -307,6 +307,13 @@ let forallStmts todo (fd : fundec) =
   let vis = object
     inherit nopCilVisitor
     method! vstmt stmt = ignore (todo stmt); DoChildren
+    method! vinst _ = SkipChildren
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
+    method! vattr _ = SkipChildren
   end
   in
   ignore (visitCilFunction vis fd)
@@ -744,6 +751,7 @@ class registerLabelsVisitor : cilVisitor = object
   method! vexpr _ = SkipChildren
   method! vtype _ = SkipChildren
   method! vinst _ = SkipChildren
+  method! vspec _ = SkipChildren
   method! vcode_annot _ = SkipChildren (* via Loop stmt *)
   method! vlval _ = SkipChildren (* via UnspecifiedSequence stmt *)
   method! vattr _ = SkipChildren (* via block stmt *)

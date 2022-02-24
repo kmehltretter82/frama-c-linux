@@ -45,27 +45,12 @@ Prove: L_fact(n) = F1_0.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file user_rec.i, line 15):
-Assume {
-  Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i) /\
-      is_sint32(L_fact(i - 1)).
-  (* Else *)
-  Have: 2 <= n.
-  (* Invariant *)
-  Have: 0 < n.
-  (* Invariant *)
-  Have: L_fact(1) = 1.
-  (* Invariant *)
-  Have: (2 <= i) /\ (i <= (1 + n)).
-  (* Then *)
-  Have: i <= n.
-}
-Prove: 0 < i.
+Prove: true.
 
 ------------------------------------------------------------
 
 Goal Establishment of Invariant (file user_rec.i, line 15):
-Assume { Type: is_sint32(n). (* Else *) Have: 2 <= n. }
-Prove: 0 < n.
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -181,8 +166,7 @@ Prove: if (n <= 1) then (i = 1) else (0 < i).
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'RANGE' (file user_rec.i, line 28):
-Assume { Type: is_sint32(n). }
-Prove: (0 < n) \/ (n <= 1).
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -270,8 +254,7 @@ Prove: if (n <= 1) then (x_1 = n_1) else (n_1 <= x_1).
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'RANGE' (file user_rec.i, line 41):
-Assume { Type: is_sint32(n). }
-Prove: (0 < n) \/ (n <= 1).
+Prove: true.
 
 ------------------------------------------------------------
 

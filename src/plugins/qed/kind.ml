@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -54,8 +54,8 @@ let image = function Sarray s -> s | _ -> Sdata
 let rec merge_list f s = function
   | [] -> s
   | x::xs ->
-      if s = Sprop then Sprop
-      else merge_list f (merge s (f x)) xs
+    if s = Sprop then Sprop
+    else merge_list f (merge s (f x)) xs
 
 let pretty fmt = function
   | Sprop -> Format.pp_print_string fmt "Prop"
@@ -78,8 +78,8 @@ let rec degree_of_tau = function
   | Data(_,ts) -> degree_of_list ts
   | Array(a,b) -> max (degree_of_tau a) (degree_of_tau b)
   | Record fts ->
-      List.fold_left
-        (fun r (_,t) -> max r (degree_of_tau t)) 0 fts
+    List.fold_left
+      (fun r (_,t) -> max r (degree_of_tau t)) 0 fts
 
 and degree_of_list = function
   | [] -> 0
@@ -105,10 +105,10 @@ let pp_data pdata ptau fmt a = function
   | [] -> pdata fmt a
   | [t] -> Format.fprintf fmt "%a %a" ptau t pdata a
   | t::ts ->
-      Format.fprintf fmt "@[(@[<hov 2>%a" ptau t ;
-      List.iter
-        (fun t -> Format.fprintf fmt ",@,%a" ptau t) ts ;
-      Format.fprintf fmt ")@]@ %a@]" pdata a
+    Format.fprintf fmt "@[(@[<hov 2>%a" ptau t ;
+    List.iter
+      (fun t -> Format.fprintf fmt ",@,%a" ptau t) ts ;
+    Format.fprintf fmt ")@]@ %a@]" pdata a
 
 let pp_record pfield ptau fmt ?(opened=false) fts =
   Format.fprintf fmt "@[<hv 0>{@[<hv 2>" ;
@@ -125,10 +125,10 @@ let rec pp_tau pvar pfield pdata fmt = function
   | Prop -> Format.pp_print_string fmt "prop"
   | Tvar x -> pvar fmt x
   | Array(Int,te) ->
-      Format.fprintf fmt "%a[]" (pp_tau pvar pfield pdata) te
+    Format.fprintf fmt "%a[]" (pp_tau pvar pfield pdata) te
   | Array(tk,te) ->
-      Format.fprintf fmt "%a[%a]"
-        (pp_tau pvar pfield pdata) te (pp_tau pvar pfield pdata) tk
+    Format.fprintf fmt "%a[%a]"
+      (pp_tau pvar pfield pdata) te (pp_tau pvar pfield pdata) tk
   | Data(a,ts) -> pp_data pdata (pp_tau pvar pfield pdata) fmt a ts
   | Record fts -> pp_record pfield (pp_tau pvar pfield pdata) fmt fts
 
@@ -139,11 +139,11 @@ let rec hash_tau hfield hadt = function
   | Prop -> 3
   | Tvar k -> 4+k
   | Array(tk,te) ->
-      7 * Hcons.hash_pair (hash_tau hfield hadt tk) (hash_tau hfield hadt te)
+    7 * Hcons.hash_pair (hash_tau hfield hadt tk) (hash_tau hfield hadt te)
   | Data(a,te) ->
-      11 * Hcons.hash_list (hash_tau hfield hadt) (hadt a) te
+    11 * Hcons.hash_list (hash_tau hfield hadt) (hadt a) te
   | Record fts ->
-      Hcons.hash_list (hash_field hfield hadt) 13 fts
+    Hcons.hash_list (hash_field hfield hadt) 13 fts
 
 and hash_field hfield hadt (f,t) =
   Hcons.hash_pair (hfield f) (hash_tau hfield hadt t)
@@ -152,15 +152,15 @@ let rec eq_tau cfield cadt t1 t2 =
   match t1 , t2 with
   | (Bool|Int|Real|Prop|Tvar _) , (Bool|Int|Real|Prop|Tvar _) -> t1 = t2
   | Array(ta,tb) , Array(ta',tb') ->
-      eq_tau cfield cadt ta ta' && eq_tau cfield cadt tb tb'
+    eq_tau cfield cadt ta ta' && eq_tau cfield cadt tb tb'
   | Array _ , _  | _ , Array _ -> false
   | Data(a,ts) , Data(b,ts') ->
-      cadt a b && Hcons.equal_list (eq_tau cfield cadt) ts ts'
+    cadt a b && Hcons.equal_list (eq_tau cfield cadt) ts ts'
   | Data _ , _ | _ , Data _ -> false
   | Record fts , Record gts ->
-      Hcons.equal_list
-        (fun (f,t) (g,t') -> cfield f g && eq_tau cfield cadt t t')
-        fts gts
+    Hcons.equal_list
+      (fun (f,t) (g,t') -> cfield f g && eq_tau cfield cadt t t')
+      fts gts
   | Record _ , _ | _ , Record _ -> false
 
 let rec compare_tau cfield cadt t1 t2 =
@@ -181,21 +181,21 @@ let rec compare_tau cfield cadt t1 t2 =
   | Tvar _ , _ -> (-1)
   | _ , Tvar _ -> 1
   | Array(ta,tb) , Array(ta',tb') ->
-      let c = compare_tau cfield cadt ta ta' in
-      if c = 0 then compare_tau cfield cadt tb tb' else c
+    let c = compare_tau cfield cadt ta ta' in
+    if c = 0 then compare_tau cfield cadt tb tb' else c
   | Array _ , _ -> (-1)
   | _ , Array _ -> 1
   | Data(a,ts) , Data(b,ts') ->
-      let c = cadt a b in
-      if c = 0 then Hcons.compare_list (compare_tau cfield cadt) ts ts' else c
+    let c = cadt a b in
+    if c = 0 then Hcons.compare_list (compare_tau cfield cadt) ts ts' else c
   | Data _ , _ -> (-1)
   | _ , Data _ -> 1
   | Record fts , Record gts ->
-      Hcons.compare_list
-        (fun (f,t) (g,t') ->
-           let c = cfield f g in
-           if c = 0 then compare_tau cfield cadt t t' else c
-        ) fts gts
+    Hcons.compare_list
+      (fun (f,t) (g,t') ->
+         let c = cfield f g in
+         if c = 0 then compare_tau cfield cadt t t' else c
+      ) fts gts
 
 module MakeTau(F : Field)(A : Data) =
 struct

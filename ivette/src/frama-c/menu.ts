@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -27,8 +27,8 @@
 import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
 import * as Server from 'frama-c/server';
-import * as Services from 'frama-c/api/kernel/services';
-import * as Ast from 'frama-c/api/kernel/ast';
+import * as Services from 'frama-c/kernel/api/services';
+import * as Ast from 'frama-c/kernel/api/ast';
 import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
 
@@ -44,7 +44,7 @@ const allFilter = {
 async function parseFiles(files: string[]): Promise<void> {
   Status.setMessage({ text: 'Parsing source files…', kind: 'progress' });
   await Server.send(Ast.setFiles, files);
-  await Server.send(Ast.compute, { });
+  await Server.send(Ast.compute, {});
   Status.setMessage({ text: 'Source files parsed.', kind: 'success' });
   return;
 }
@@ -133,7 +133,7 @@ async function saveSession(): Promise<void> {
   return;
 }
 
-export function init() {
+export function init(): void {
   Dome.addMenuItem({
     menu: 'File',
     label: 'Set source files…',

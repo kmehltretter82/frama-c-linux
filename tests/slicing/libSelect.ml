@@ -64,7 +64,7 @@ let load_source_file ?entry_point filename  =
   in
   ignore (Db.get_cil_file ());
   let kf = Db.find_function_def_by_name entry_point in
-    ignore (!Db.Value.compute_entry_point kf ~library);
+    ignore (Eva.Analysis.compute_entry_point kf ~library);
   Db.iter_on_functions
     (fun kf -> if Db.is_definition kf && Db.Value.is_called kf
      then !Db.From.compute kf)

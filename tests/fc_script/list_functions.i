@@ -15,5 +15,5 @@
  DEPS: @PTEST_DEPS@ @PTEST_DIR@/build-callgraph.i
  DEPS: @PTEST_DEPS@ @PTEST_DIR@/recursions.i
 
-   EXECNOW: LOG heuristic_list_functions.res LOG heuristic_list_functions.err %{bin:frama-c-script} heuristic-list-functions true true @PTEST_DEPS@ > @PTEST_RESULT@/heuristic_list_functions.res 2> @PTEST_RESULT@/heuristic_list_functions.err
+   EXECNOW: LOG heuristic_list_functions.res LOG heuristic_list_functions.err PTESTS_TESTING=1 %{bin:frama-c-script} heuristic-list-functions true true @PTEST_DEPS@ > @PTEST_RESULT@/heuristic_list_functions.res 2> @PTEST_RESULT@/heuristic_list_functions.err
  */

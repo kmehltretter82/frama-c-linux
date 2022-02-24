@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,20 +36,20 @@ let filter = function
 
 let timeout_for = function
   | VCS.Why3 _ ->
-      let value = Wp_parameters.Timeout.get () in
-      let spin = new Widget.spinner
-        ~tooltip:"Prover Timeout (0 for none)"
-        ~min:0 ~step:5 ~value () in
-      Some spin
+    let value = Wp_parameters.Timeout.get () in
+    let spin = new Widget.spinner
+      ~tooltip:"Prover Timeout (0 for none)"
+      ~min:0 ~step:5 ~value () in
+    Some spin
   | _ -> None
 
 let stepout_for = function
   | VCS.Why3 _ ->
-      let value = Wp_parameters.Steps.get () in
-      let spin = new Widget.spinner
-        ~tooltip:"Prover Step Limit (0 for none)"
-        ~min:0 ~step:100 ~value () in
-      Some spin
+    let value = Wp_parameters.Steps.get () in
+    let spin = new Widget.spinner
+      ~tooltip:"Prover Step Limit (0 for none)"
+      ~min:0 ~step:100 ~value () in
+    Some spin
   | _ -> None
 
 class prover ~(console:Wtext.text) ~prover =
@@ -119,29 +119,29 @@ class prover ~(console:Wtext.text) ~prover =
         result#set_text (Pretty_utils.to_string VCS.pp_result res) ;
         match res.VCS.verdict with
         | VCS.NoResult ->
-            let callback () = self#run wpo in
-            self#set_status no_status ;
-            self#set_action ~icon:`MEDIA_PLAY ~tooltip:"Run Prover" ~callback () ;
+          let callback () = self#run wpo in
+          self#set_status no_status ;
+          self#set_action ~icon:`MEDIA_PLAY ~tooltip:"Run Prover" ~callback () ;
         | VCS.Computing callback ->
-            self#set_status `EXECUTE ;
-            self#set_action ~tooltip:"Interrrupt Prover" ~icon:`STOP ~callback () ;
-            Pretty_utils.ksfprintf self#set_label "%a (...)" VCS.pp_prover prover ;
+          self#set_status `EXECUTE ;
+          self#set_action ~tooltip:"Interrrupt Prover" ~icon:`STOP ~callback () ;
+          Pretty_utils.ksfprintf self#set_label "%a (...)" VCS.pp_prover prover ;
         | VCS.Valid ->
-            let callback () = self#run wpo in
-            self#set_status ok_status ;
-            self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;
-            Pretty_utils.ksfprintf self#set_label "%a (%a)" VCS.pp_prover prover
-              Rformat.pp_time res.VCS.prover_time ;
+          let callback () = self#run wpo in
+          self#set_status ok_status ;
+          self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;
+          Pretty_utils.ksfprintf self#set_label "%a (%a)" VCS.pp_prover prover
+            Rformat.pp_time res.VCS.prover_time ;
         | VCS.Invalid | VCS.Unknown | VCS.Timeout | VCS.Stepout ->
-            let callback () = self#run wpo in
-            self#set_status ko_status ;
-            self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;
-            Pretty_utils.ksfprintf self#set_label "%a (?)" VCS.pp_prover prover ;
+          let callback () = self#run wpo in
+          self#set_status ko_status ;
+          self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;
+          Pretty_utils.ksfprintf self#set_label "%a (?)" VCS.pp_prover prover ;
         | VCS.Failed ->
-            let callback () = self#log wpo res in
-            self#set_status `DIALOG_WARNING ;
-            self#set_action ~tooltip:"Dump Logs" ~icon:`FILE ~callback () ;
-            Pretty_utils.ksfprintf self#set_label "%a (failed)" VCS.pp_prover prover ;
+          let callback () = self#log wpo res in
+          self#set_status `DIALOG_WARNING ;
+          self#set_action ~tooltip:"Dump Logs" ~icon:`FILE ~callback () ;
+          Pretty_utils.ksfprintf self#set_label "%a (failed)" VCS.pp_prover prover ;
       end
 
   end

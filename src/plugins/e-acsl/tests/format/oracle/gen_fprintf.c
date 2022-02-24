@@ -123,10 +123,11 @@ pid_t __gen_e_acsl_fork(void)
     }
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
-    __gen_e_acsl_assert_data.pred_txt = "result_ok_child_or_error: \\result == 0 || \\result > 0 || \\result == -1";
+    __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result > 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "fork";
     __gen_e_acsl_assert_data.line = 846;
+    __gen_e_acsl_assert_data.name = "result_ok_child_or_error";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     return __retres;
@@ -182,10 +183,11 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
                                    "\\valid(stat_loc)",0,__gen_e_acsl_valid);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Precondition";
-      __gen_e_acsl_assert_data.pred_txt = "stat_loc_non_null: valid_stat_loc: \\valid(stat_loc)";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(stat_loc)";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/sys/wait.h";
       __gen_e_acsl_assert_data.fct = "waitpid";
       __gen_e_acsl_assert_data.line = 95;
+      __gen_e_acsl_assert_data.name = "stat_loc_non_null/valid_stat_loc";
       __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
@@ -209,10 +211,11 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     }
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Postcondition";
-    __gen_e_acsl_assert_data_2.pred_txt = "result_ok_or_error: \\result == -1 || \\result >= 0";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\result == -1 || \\result >= 0";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/sys/wait.h";
     __gen_e_acsl_assert_data_2.fct = "waitpid";
     __gen_e_acsl_assert_data_2.line = 87;
+    __gen_e_acsl_assert_data_2.name = "result_ok_or_error";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
@@ -242,10 +245,11 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     }
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Postcondition";
-    __gen_e_acsl_assert_data_3.pred_txt = "initialization: stat_loc_init_on_success:\n  \\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/sys/wait.h";
     __gen_e_acsl_assert_data_3.fct = "waitpid";
     __gen_e_acsl_assert_data_3.line = 89;
+    __gen_e_acsl_assert_data_3.name = "initialization/stat_loc_init_on_success";
     __e_acsl_assert(__gen_e_acsl_implies,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
@@ -266,10 +270,11 @@ void __gen_e_acsl_exit(int status)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
-    __gen_e_acsl_assert_data.pred_txt = "never_terminates: \\false";
+    __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
     __gen_e_acsl_assert_data.line = 473;
+    __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
   }
@@ -297,10 +302,11 @@ int __gen_e_acsl_fclose(FILE *stream)
                                  "\\valid(stream)",0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
-    __gen_e_acsl_assert_data.pred_txt = "valid_stream: \\valid(stream)";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(stream)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data.fct = "fclose";
     __gen_e_acsl_assert_data.line = 120;
+    __gen_e_acsl_assert_data.name = "valid_stream";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -319,10 +325,11 @@ int __gen_e_acsl_fclose(FILE *stream)
     }
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Postcondition";
-    __gen_e_acsl_assert_data_2.pred_txt = "result_zero_or_EOF: \\result == 0 || \\result == -1";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0 || \\result == -1";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_2.fct = "fclose";
     __gen_e_acsl_assert_data_2.line = 122;
+    __gen_e_acsl_assert_data_2.name = "result_zero_or_EOF";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_delete_block((void *)(& stream));

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -50,10 +50,10 @@ struct
         let r = match F.repr e with
           | Rdef fvs -> List.for_all (fun (_,e) -> is_ground env e) fvs
           | Fun(f,es) ->
-              begin match Fun.category f with
-                | Constructor -> List.for_all (is_ground env) es
-                | _ -> false
-              end
+            begin match Fun.category f with
+              | Constructor -> List.for_all (is_ground env) es
+              | _ -> false
+            end
           | _ -> false in
         env.ground <- Tmap.add e r env.ground ; r
     end
@@ -79,13 +79,13 @@ struct
       begin
         match F.repr a , F.repr b with
         | Fun(f,_) , Fun(g,_) when Wp_parameters.Reduce.get () ->
-            let cmp = frank f - frank g in
-            if cmp < 0 then add_sigma env a b else
-            if cmp > 0 then add_sigma env b a
+          let cmp = frank f - frank g in
+          if cmp < 0 then add_sigma env a b else
+          if cmp > 0 then add_sigma env b a
         | Fun(f,_) , _ when frank f = 0 ->
-            add_sigma env a b
+          add_sigma env a b
         | _ , Fun(f,_) when frank f = 0 ->
-            add_sigma env b a
+          add_sigma env b a
         | _ -> ()
       end
 
@@ -94,25 +94,25 @@ struct
     | True | False -> ()
     | And ps -> List.iter (walk env) ps
     | Eq(a,b) ->
-        add_clause env h ;
-        if is_ground env b then
-          add_sigma env a b
-        else
-        if is_ground env a then
-          add_sigma env b a
-        else
-          reduce env a b
+      add_clause env h ;
+      if is_ground env b then
+        add_sigma env a b
+      else
+      if is_ground env a then
+        add_sigma env b a
+      else
+        reduce env a b
     | Fun(f,[x]) ->
-        begin
-          add_clause env h ;
-          try
-            let iota = Cint.is_cint f in
-            let conv = Cint.convert iota x in
-            add_sigma env conv x ;
-          with Not_found -> ()
-        end
+      begin
+        add_clause env h ;
+        try
+          let iota = Cint.is_cint f in
+          let conv = Cint.convert iota x in
+          add_sigma env conv x ;
+        with Not_found -> ()
+      end
     | _ ->
-        add_clause env h
+      add_clause env h
 
   let e_apply env = F.e_subst (Subst.copy env.sigma)
   let p_apply env = F.p_subst (Subst.copy env.sigma)
@@ -211,11 +211,11 @@ struct
     match sigma.cache with
     | Some s -> s
     | None ->
-        let s = Lang.sigma () in
-        F.Subst.add_fun s (lookup sigma.def) ;
-        F.Subst.add_fun s (fun e -> Tmap.find e sigma.cst) ;
-        F.Subst.add_filter s (filter sigma.dall) ;
-        sigma.cache <- Some s ; s
+      let s = Lang.sigma () in
+      F.Subst.add_fun s (lookup sigma.def) ;
+      F.Subst.add_fun s (fun e -> Tmap.find e sigma.cst) ;
+      F.Subst.add_filter s (filter sigma.dall) ;
+      sigma.cache <- Some s ; s
 
   let e_apply sigma e = F.e_subst (subst sigma) e
   let p_apply sigma p = F.p_subst (subst sigma) p
@@ -309,23 +309,23 @@ struct
   let extract_forall_equality fb =
     begin match F.repr (F.QED.lc_repr fb) with
       | Imply ([la;lb],c) ->
-          begin match F.repr c with
-            | Eq _ ->
-                let order = 0 in (** todo get the order from term *)
-                begin match F.repr la, F.repr lb with
-                  | Leq(a,b), Leq(c,d) ->
-                      begin
-                        match F.repr a, F.repr b, F.repr c, F.repr d with
-                        | Bvar(o1,Int), Kint cstb, Kint csta, Bvar(o2,Int) when
-                            o1 = order && o2 = order -> Some(csta,cstb)
-                        | Kint csta, Bvar(o1,Int), Bvar(o2,Int), Kint cstb when
-                            o1 = order && o2 = order -> Some(csta,cstb)
-                        | _ -> None
-                      end
+        begin match F.repr c with
+          | Eq _ ->
+            let order = 0 in (** todo get the order from term *)
+            begin match F.repr la, F.repr lb with
+              | Leq(a,b), Leq(c,d) ->
+                begin
+                  match F.repr a, F.repr b, F.repr c, F.repr d with
+                  | Bvar(o1,Int), Kint cstb, Kint csta, Bvar(o2,Int) when
+                      o1 = order && o2 = order -> Some(csta,cstb)
+                  | Kint csta, Bvar(o1,Int), Bvar(o2,Int), Kint cstb when
+                      o1 = order && o2 = order -> Some(csta,cstb)
                   | _ -> None
                 end
-            | _ -> None
-          end
+              | _ -> None
+            end
+          | _ -> None
+        end
       | _ -> None
     end
 
@@ -334,47 +334,47 @@ struct
   let rec add_pred sigma p = match F.repr p with
     | And ps -> List.fold_left add_pred sigma ps
     | Eq(a,b) ->
-        begin
-          match F.repr a , F.repr b with
-          | Fvar x , _ when not (F.occurs x b) -> add x b sigma
-          | _ , Fvar x when not (F.occurs x a) -> add x a sigma
-          | _ ->
-              match F.is_closed a , F.is_closed b with
-              | true , false -> add_cst b a sigma
-              | false , true -> add_cst a b sigma
-              | true , true ->
-                  if F.compare a b < 0
-                  then add_cst b a sigma
-                  else add_cst a b sigma
-              | false , false -> add_lit p sigma
-        end
+      begin
+        match F.repr a , F.repr b with
+        | Fvar x , _ when not (F.occurs x b) -> add x b sigma
+        | _ , Fvar x when not (F.occurs x a) -> add x a sigma
+        | _ ->
+          match F.is_closed a , F.is_closed b with
+          | true , false -> add_cst b a sigma
+          | false , true -> add_cst a b sigma
+          | true , true ->
+            if F.compare a b < 0
+            then add_cst b a sigma
+            else add_cst a b sigma
+          | false , false -> add_lit p sigma
+      end
     | Leq(a,b) ->
-        if mem_lit (e_leq b a) sigma
-        then add_pred sigma (e_eq a b)
-        else add_lit p sigma
+      if mem_lit (e_leq b a) sigma
+      then add_pred sigma (e_eq a b)
+      else add_lit p sigma
     | Lt(a,b) ->
-        let sigma = if is_kint b then add_pred sigma (e_leq a (e_add b e_one)) else sigma in
-        let sigma = if is_kint a then add_pred sigma (e_leq (e_sub a e_one) b) else sigma in
-        add_lit p (add_lit (e_leq a b) (add_lit (e_neq a b) sigma))
+      let sigma = if is_kint b then add_pred sigma (e_leq a (e_add b e_one)) else sigma in
+      let sigma = if is_kint a then add_pred sigma (e_leq (e_sub a e_one) b) else sigma in
+      add_lit p (add_lit (e_leq a b) (add_lit (e_neq a b) sigma))
     | Neq _ | Fun _ | Not _ -> add_lit p sigma
     | Bind (Forall,Int,fb) ->
-        let bound = Integer.of_int (Wp_parameters.BoundForallUnfolding.get ()) in
-        begin match extract_forall_equality fb with
-          | Some (csta,cstb) when
-              Integer.le csta cstb &&
-              Integer.le (Integer.sub cstb csta) bound ->
-              let rec aux sigma i =
-                if Integer.lt cstb i then sigma
-                else begin
-                  let eq = F.QED.e_apply p [e_zint i] in
-                  (** qed should be able to simplify it directly *)
-                  let sigma = add_pred sigma eq in
-                  aux sigma (Integer.succ i)
-                end
-              in
-              aux sigma csta
-          | _ -> sigma
-        end
+      let bound = Integer.of_int (Wp_parameters.BoundForallUnfolding.get ()) in
+      begin match extract_forall_equality fb with
+        | Some (csta,cstb) when
+            Integer.le csta cstb &&
+            Integer.le (Integer.sub cstb csta) bound ->
+          let rec aux sigma i =
+            if Integer.lt cstb i then sigma
+            else begin
+              let eq = F.QED.e_apply p [e_zint i] in
+              (** qed should be able to simplify it directly *)
+              let sigma = add_pred sigma eq in
+              aux sigma (Integer.succ i)
+            end
+          in
+          aux sigma csta
+        | _ -> sigma
+      end
     | _ -> sigma
 
   let assume sigma p = add_pred sigma (F.e_prop p)
@@ -421,9 +421,9 @@ struct
   let rec diff s y = function
     | [] -> s
     | e::es ->
-        match F.repr e with
-        | Fvar x when x==y -> diff s y es
-        | _ -> diff (e_opp e :: s) y es
+      match F.repr e with
+      | Fvar x when x==y -> diff s y es
+      | _ -> diff (e_opp e :: s) y es
 
   let add_linear w x pos neg =
     add_def w x (e_sum (diff pos x neg))
@@ -432,20 +432,20 @@ struct
   let rec atoms = function
     | [] -> []
     | e::es ->
-        match F.repr e with
-        | Fvar x -> x :: atoms es
-        | _ -> atoms es
+      match F.repr e with
+      | Fvar x -> x :: atoms es
+      | _ -> atoms es
 
   let rec defs w p =
     match F.repr p with
     | And ps -> List.iter (defs w) ps
     | Eq(a,b) -> defs_eq w a b
     | Not p ->
-        begin
-          match F.repr p with
-          | Fvar x -> add_def w x e_false
-          | _ -> ()
-        end
+      begin
+        match F.repr p with
+        | Fvar x -> add_def w x e_false
+        | _ -> ()
+      end
     | Fvar x -> add_def w x e_true
     | _ -> ()
 
@@ -500,10 +500,10 @@ let rec extract defs sref cycle x =
            if not (occurs cycle e) then
              match F.repr e with
              | Fvar y ->
-                 begin
-                   try let d = Sigma.find y !sref in rs := d :: !rs
-                   with Not_found -> ys := y :: !ys
-                 end
+               begin
+                 try let d = Sigma.find y !sref in rs := d :: !rs
+                 with Not_found -> ys := y :: !ys
+               end
              | _ -> es := e :: !es
         ) ds ;
       (* Now choose the represent of x and the dependencies *)

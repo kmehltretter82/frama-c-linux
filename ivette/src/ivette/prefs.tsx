@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -30,68 +30,66 @@
  */
 
 import React from 'react';
-
-import { popupMenu } from 'dome';
+import * as Dome from 'dome';
+import * as Themes from 'dome/themes';
+import * as Toolbar from 'dome/frame/toolbars';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
-
 import 'codemirror/mode/clike/clike';
-import 'codemirror/theme/ambiance.css';
-import 'codemirror/theme/solarized.css';
-
-export const THEMES = [
-  { id: 'default', label: 'Default' },
-  { id: 'ambiance', label: 'Ambiance' },
-  { id: 'solarized light', label: 'Solarized Light' },
-  { id: 'solarized dark', label: 'Solarized Dark' },
-];
 
 // --------------------------------------------------------------------------
 // --- AST View Preferences
 // --------------------------------------------------------------------------
 
-export const AstTheme = new Settings.GString('ASTview.theme', 'default');
 export const AstFontSize = new Settings.GNumber('ASTview.fontSize', 12);
 export const AstWrapText = new Settings.GFalse('ASTview.wrapText');
-
-export const SourceTheme = new Settings.GString('SourceCode.theme', 'default');
 export const SourceFontSize = new Settings.GNumber('SourceCode.fontSize', 12);
 export const SourceWrapText = new Settings.GFalse('SourceCode.wrapText');
 
-export interface ThemeProps {
-  target: string;
-  theme: Settings.GlobalSettings<string>;
+/* -------------------------------------------------------------------------- */
+/* --- Theme Switcher Button                                              --- */
+/* -------------------------------------------------------------------------- */
+
+export function ThemeSwitch(): JSX.Element {
+  const [theme, setTheme] = Themes.useColorTheme();
+  const other = theme === 'dark' ? 'light' : 'dark';
+  const position = theme === 'dark' ? 'left' : 'right';
+  const title = `Switch to ${other} theme`;
+  const onChange = (): void => setTheme(other);
+  return (
+    <Toolbar.Switch
+      disabled={!Dome.DEVEL}
+      title={title}
+      position={position}
+      onChange={onChange}
+    />
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Editor Icon Buttons
+// --------------------------------------------------------------------------
+
+export interface EditorProps {
   fontSize: Settings.GlobalSettings<number>;
   wrapText: Settings.GlobalSettings<boolean>;
   disabled?: boolean;
 }
 
-// --------------------------------------------------------------------------
-// --- Icon Buttons
-// --------------------------------------------------------------------------
-
-export interface ThemeControls {
+export interface EditorControls {
   buttons: React.ReactNode;
-  theme: string;
   fontSize: number;
   wrapText: boolean;
 }
 
-export function useThemeButtons(props: ThemeProps): ThemeControls {
-  const [theme, setTheme] = Settings.useGlobalSettings(props.theme);
+export function useEditorButtons(props: EditorProps): EditorControls {
+  const { disabled = false } = props;
   const [fontSize, setFontSize] = Settings.useGlobalSettings(props.fontSize);
   const [wrapText, setWrapText] = Settings.useGlobalSettings(props.wrapText);
-  const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
-  const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
-  const flipWrapText = () => setWrapText(!wrapText);
-  const selectTheme = (id?: string) => id && setTheme(id);
-  const themeItem = (th: { id: string; label: string }) => (
-    { checked: th.id === theme, ...th }
-  );
-  const themePopup = () => popupMenu(THEMES.map(themeItem), selectTheme);
-  const { disabled = false } = props;
+  const zoomIn = (): void => setFontSize(fontSize + 2);
+  const zoomOut = (): void => setFontSize(fontSize - 2);
+  const flipWrapText = (): void => setWrapText(!wrapText);
   return {
-    theme,
     fontSize,
     wrapText,
     buttons: [
@@ -99,6 +97,7 @@ export function useThemeButtons(props: ThemeProps): ThemeControls {
         key="zoom.out"
         icon="ZOOM.OUT"
         onClick={zoomOut}
+        enabled={fontSize > 4}
         disabled={disabled}
         title="Decrease font size"
       />,
@@ -106,19 +105,15 @@ export function useThemeButtons(props: ThemeProps): ThemeControls {
         key="zoom.in"
         icon="ZOOM.IN"
         onClick={zoomIn}
+        enabled={fontSize < 48}
         disabled={disabled}
         title="Increase font size"
-      />,
-      <IconButton
-        key="theme"
-        icon="PAINTBRUSH"
-        onClick={themePopup}
-        title="Choose theme"
       />,
       <IconButton
         key="wrap"
         icon="WRAPTEXT"
         selected={wrapText}
+        disabled={disabled}
         onClick={flipWrapText}
         title="Wrap text"
       />,

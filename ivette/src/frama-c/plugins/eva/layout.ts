@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -24,7 +24,7 @@
 /* --- Layout                                                             ---*/
 /* --------------------------------------------------------------------------*/
 
-import { callstack } from 'frama-c/api/plugins/eva/values';
+import { callstack } from 'frama-c/plugins/eva/api/values';
 import { Probe } from './probes';
 import { StacksCache } from './stacks';
 import { Size, EMPTY, leq, addH, ValueCache } from './cells';
@@ -125,7 +125,7 @@ export class LayoutEngine {
     return 0;
   }
 
-  private push(p: Probe) {
+  private push(p: Probe): void {
     // --- sectionning
     const { fct } = p;
     if (fct !== this.byFct) {

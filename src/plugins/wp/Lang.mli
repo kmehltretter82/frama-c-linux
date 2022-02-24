@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -576,16 +576,18 @@ class type simplifier =
     method infer : F.pred list
     (** Add new hypotheses implied by the original hypothesis. *)
 
-    method simplify_exp : F.term -> F.term
-    (** Currently simplify an expression. *)
-    method simplify_hyp : F.pred -> F.pred
-    (** Currently simplify an hypothesis before assuming it. In any
-        case must return a weaker formula. *)
-    method simplify_branch : F.pred -> F.pred
-    (** Currently simplify a branch condition. In any case must return an
-        equivalent formula. *)
-    method simplify_goal : F.pred -> F.pred
-    (** Simplify the goal. In any case must return a stronger formula. *)
+    method equivalent_exp : F.term -> F.term
+    (** Currently simplify an expression.
+        It must returns a equivalent formula from the assumed hypotheses. *)
+    method weaker_hyp : F.pred -> F.pred
+    (** Currently simplify an hypothesis before assuming it.
+        It must return a weaker formula from the assumed hypotheses. *)
+    method equivalent_branch : F.pred -> F.pred
+    (** Currently simplify a branch condition.
+        It must return an equivalent formula from the assumed hypotheses. *)
+    method stronger_goal : F.pred -> F.pred
+    (** Simplify the goal.
+        It must return a stronger formula from the assumed hypotheses. *)
   end
 
 (* -------------------------------------------------------------------------- *)
