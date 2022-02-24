@@ -270,7 +270,9 @@ let rec argspec =
     ("-remove-empty-oracles", Arg.Set remove_empty_oracles,
      " remove empty oracles") ;
 
-    ("-wrapper" , Arg.String (fun s -> wrapper_cmd := s),
+    ("-wrapper" , Arg.String (function
+         | "''" -> wrapper_cmd := ""
+         | s -> wrapper_cmd := s),
      " <command> Uses a wrapper to executes tests (defaults to "^ !wrapper_cmd ^")");
 
     ("-adds-default-options" , Arg.String (fun s -> macro_default_options := !macro_default_options ^ " " ^ s),

@@ -167,11 +167,13 @@ force-reconfigure:
 
 
 ##############################################################################
+PURGED_PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
 PTEST_OPTS?=
-PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
+PTEST_DIRS?=$(PURGED_PTEST_DIRS)
 
 .PHONY: tests.info
 tests.info:
+	echo "PURGED_PTEST_DIRS=$(PURGED_PTEST_DIRS)"
 	echo "PTEST_DIRS=$(PTEST_DIRS)"
 	echo "PTEST_OPTS=$(PTEST_OPTS)"
 
@@ -199,12 +201,12 @@ wtests-help:
 # Removes all dune files generated for testing
 .PHONY: purge-tests
 purge-tests:
-	find $(PTEST_DIRS) -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty rm
+	find $(PURGED_PTEST_DIRS) -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty rm
 
 # Force the full cleaning of the testing environment
 .PHONY: clean-tests
 clean-tests: purge-tests
-	rm -rf $(addprefix _build/default/,$(PTEST_DIRS))
+	rm -rf $(addprefix _build/default/,$(PURGED_PTEST_DIRS))
 
 # Generates all dune files used for testing
 .PHONY: run-ptests
