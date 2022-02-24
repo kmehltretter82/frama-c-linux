@@ -1,1 +1,3 @@
+DEFAULT_SUITES=
+# todo:
 IGNORE= DEFAULT_SUITES= md sarif

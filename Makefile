@@ -167,11 +167,13 @@ force-reconfigure:
 
 
 ##############################################################################
+PTEST_OPTS?=
 PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
 
 .PHONY: tests.info
 tests.info:
 	echo "PTEST_DIRS=$(PTEST_DIRS)"
+	echo "PTEST_OPTS=$(PTEST_OPTS)"
 
 # Note: the public name of ptest.exe is frama-c-ptests
 ptests/ptests.exe: ptests/ptests.ml
@@ -207,7 +209,7 @@ clean-tests: purge-tests
 # Generates all dune files used for testing
 .PHONY: run-ptests
 run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
-	$(PTESTS) $(PTEST_DIRS)
+	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
 # run tests of for all configurations (requires all dune files)
 .PHONY: run-tests

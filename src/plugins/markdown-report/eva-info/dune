@@ -18,4 +18,4 @@
   (preprocess (pps ppx_deriving_yojson))
 )
 
-(plugin (optional) (name markdown-report-eva-info) (libraries frama-c-markdown-report.eva-info.core) (site (frama-c plugins)))
+(plugin (optional) (name markdown-report.eva-info) (libraries frama-c-markdown-report.eva-info.core) (site (frama-c plugins)))
