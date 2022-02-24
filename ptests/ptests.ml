@@ -1153,7 +1153,13 @@ let basic_command_string command =
 
 let pp_list fmt l = List.iter (Format.fprintf fmt " %S") l
 module Fmt = struct
-  let plugin_as_package fmt s = Format.fprintf fmt "frama-c-%s" s
+  let plugin_as_package fmt s =
+    let base =
+      if String.contains s '.' then
+        String.sub s 0 (String.index s '.')
+      else s
+    in
+    Format.fprintf fmt "frama-c-%s" base
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
