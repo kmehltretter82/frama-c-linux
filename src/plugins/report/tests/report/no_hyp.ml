@@ -4,9 +4,9 @@ let emitter =
 let set_status s =
   Annotations.iter_all_code_annot
     (fun stmt _ ca ->
-      let kf = Kernel_function.find_englobing_kf stmt in
-      let ps = Property.ip_of_code_annot kf stmt ca in
-      List.iter (fun p -> Property_status.emit emitter p ~hyps:[] s) ps)
+       let kf = Kernel_function.find_englobing_kf stmt in
+       let ps = Property.ip_of_code_annot kf stmt ca in
+       List.iter (fun p -> Property_status.emit emitter p ~hyps:[] s) ps)
 
 let print_status =
   Dynamic.get
@@ -16,7 +16,7 @@ let print_status =
 
 let clear () =
   Project.clear
-    ~selection:(State_selection.Static.with_dependencies Property_status.self)
+    ~selection:(State_selection.with_dependencies Property_status.self)
     ()
 
 let main () =
