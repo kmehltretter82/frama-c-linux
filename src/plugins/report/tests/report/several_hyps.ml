@@ -1,13 +1,13 @@
 open Cil_types
 
-let emitter = 
+let emitter =
   Emitter.create "Test" [ Emitter.Property_status ] ~correctness:[] ~tuning:[]
 
-let emitter2 = 
+let emitter2 =
   Emitter.create "Test2" [ Emitter.Property_status ] ~correctness:[] ~tuning:[]
 
 let set_status ?(emitter=emitter) p hyps s =
-  Kernel.feedback "SETTING STATUS OF %a TO %a" 
+  Kernel.feedback "SETTING STATUS OF %a TO %a"
     Property.pretty p
     Property_status.Emitted_status.pretty s;
   Property_status.emit emitter p ~hyps s
@@ -15,13 +15,13 @@ let set_status ?(emitter=emitter) p hyps s =
 let print_status =
   Dynamic.get
     ~plugin:"Report"
-    "print" 
+    "print"
     (Datatype.func Datatype.unit Datatype.unit)
 
 let clear () =
   Kernel.feedback "CLEARING";
   Project.clear
-    ~selection:(State_selection.Static.with_dependencies Property_status.self)
+    ~selection:(State_selection.with_dependencies Property_status.self)
     ()
 
 let main () =
@@ -30,13 +30,13 @@ let main () =
   let main, j, i, h, g =
     let l =
       Annotations.fold_all_code_annot
-	(fun stmt _ ca acc ->
-	  let kf = Kernel_function.find_englobing_kf stmt in
-	  let ps = Property.ip_of_code_annot kf stmt ca in
-	  match ps with
-	  | [ p ] -> p :: acc
-	  | _ -> assert false)
-	[]
+        (fun stmt _ ca acc ->
+           let kf = Kernel_function.find_englobing_kf stmt in
+           let ps = Property.ip_of_code_annot kf stmt ca in
+           match ps with
+           | [ p ] -> p :: acc
+           | _ -> assert false)
+        []
     in
     match l with
     | [ p1; p2; p3; p4; p5 ] -> p1, p2, p3, p4, p5
@@ -57,7 +57,7 @@ let main () =
     clear ();
     f ()
   in
-  let test msg ?(hyps=hyps) set_status_hyps = 
+  let test msg ?(hyps=hyps) set_status_hyps =
     Kernel.feedback msg;
     reset set_status_hyps;
     (* unknown *)
@@ -72,33 +72,33 @@ let main () =
     print_status ()
   in
   let nothing () = () in
-  let valid ?(g=g) ?(i=i) () = 
-    let _i = i in set_status g [] Property_status.True 
+  let valid ?(g=g) ?(i=i) () =
+    let _i = i in set_status g [] Property_status.True
   in
-  let valid_under_hyp ?(g=g) ?(i=i) () = 
+  let valid_under_hyp ?(g=g) ?(i=i) () =
     set_status g [ i ] Property_status.True in
-  let unknown ?(g=g) ?(i=i) () = 
-    let _i = i in set_status g [] Property_status.Dont_know 
+  let unknown ?(g=g) ?(i=i) () =
+    let _i = i in set_status g [] Property_status.Dont_know
   in
-  let invalid ?(g=g) ?(i=i) () = 
-    let _i = i in set_status g [] Property_status.False_and_reachable 
+  let invalid ?(g=g) ?(i=i) () =
+    let _i = i in set_status g [] Property_status.False_and_reachable
   in
-  let invalid_under_hyp ?(g=g) ?i:_ () = 
-    set_status g [ ] Property_status.False_and_reachable 
+  let invalid_under_hyp ?(g=g) ?i:_ () =
+    set_status g [ ] Property_status.False_and_reachable
   in
   let invalid_but_dead ?(g=g) ?(i=i) () =
     set_status i [] Property_status.False_and_reachable;
-    set_status g [ ] Property_status.False_and_reachable 
+    set_status g [ ] Property_status.False_and_reachable
   in
-  let valid_but_dead ?(g=g) ?(i=i) () = 
+  let valid_but_dead ?(g=g) ?(i=i) () =
     set_status i [] Property_status.False_and_reachable;
-    set_status g [ ] Property_status.True 
+    set_status g [ ] Property_status.True
   in
-  let unknown_but_dead ?(g=g) ?(i=i) () = 
+  let unknown_but_dead ?(g=g) ?(i=i) () =
     set_status i [] Property_status.False_and_reachable;
-    set_status g [ i ] Property_status.Dont_know 
+    set_status g [ i ] Property_status.Dont_know
   in
-  let inconsistent ?(g=g) ?(i=i) () = 
+  let inconsistent ?(g=g) ?(i=i) () =
     let _i = i in
     set_status g [ ] Property_status.True;
     set_status ~emitter:emitter2 g [] Property_status.False_and_reachable
@@ -129,9 +129,9 @@ let main () =
   test "CONSIDERED_VALID + INCONSISTENT" ~hyps inconsistent;
   (***************************************************************************)
   let set status_g status_h () =
-(*      (status_h: ?g:Property.t -> ?i:Property.t -> unit -> unit) () =*)
+    (*      (status_h: ?g:Property.t -> ?i:Property.t -> unit -> unit) () =*)
     status_g ();
-(*    status_h ~g:h ~i:j ()*)
+    (*    status_h ~g:h ~i:j ()*)
     status_h ?g:(Some h) ?i:(Some j) ()
   in
   test "VALID + VALID" (set valid valid);
@@ -144,16 +144,16 @@ let main () =
   test "VALID + UNKNOWN_BUT_DEAD" (set valid unknown_but_dead);
   test "VALID + INCONSISTENT" (set valid inconsistent);
   (***************************************************************************)
-  test "VALID_UNDER_HYP + VALID_UNDER_HYP" 
+  test "VALID_UNDER_HYP + VALID_UNDER_HYP"
     (set valid_under_hyp valid_under_hyp);
   test "VALID_UNDER_HYP + UNKNOWN" (set valid_under_hyp unknown);
   test "VALID_UNDER_HYP + INVALID"  (set valid_under_hyp invalid);
-  test "VALID_UNDER_HYP + INVALID_UNDER_HYP" 
+  test "VALID_UNDER_HYP + INVALID_UNDER_HYP"
     (set valid_under_hyp invalid_under_hyp);
-  test "VALID_UNDER_HYP + INVALID_BUT_DEAD" 
+  test "VALID_UNDER_HYP + INVALID_BUT_DEAD"
     (set valid_under_hyp invalid_but_dead);
   test "VALID_UNDER_HYP + VALID_BUT_DEAD" (set valid_under_hyp valid_but_dead);
-  test "VALID_UNDER_HYP + UNKNOWN_BUT_DEAD" 
+  test "VALID_UNDER_HYP + UNKNOWN_BUT_DEAD"
     (set valid_under_hyp unknown_but_dead);
   test "VALID_UNDER_HYP + INCONSISTENT" (set valid_under_hyp inconsistent);
   (***************************************************************************)
@@ -172,24 +172,24 @@ let main () =
   test "INVALID + UNKNOWN_BUT_DEAD" (set invalid unknown_but_dead);
   test "INVALID + INCONSISTENT" (set invalid inconsistent);
   (***************************************************************************)
-  test "INVALID_UNDER_HYP + INVALID_UNDER_HYP" 
+  test "INVALID_UNDER_HYP + INVALID_UNDER_HYP"
     (set invalid_under_hyp invalid_under_hyp);
-  test "INVALID_UNDER_HYP + INVALID_BUT_DEAD" 
+  test "INVALID_UNDER_HYP + INVALID_BUT_DEAD"
     (set invalid_under_hyp invalid_but_dead);
-  test "INVALID_UNDER_HYP + VALID_BUT_DEAD" 
+  test "INVALID_UNDER_HYP + VALID_BUT_DEAD"
     (set invalid_under_hyp valid_but_dead);
   test "INVALID_UNDER_HYP + UNKNOWN_BUT_DEAD"
     (set invalid_under_hyp unknown_but_dead);
-  test "INVALID_UNDER_HYP + INCONSISTENT" 
+  test "INVALID_UNDER_HYP + INCONSISTENT"
     (set invalid_under_hyp inconsistent);
   (***************************************************************************)
-  test "INVALID_BUT_DEAD + INVALID_BUT_DEAD" 
+  test "INVALID_BUT_DEAD + INVALID_BUT_DEAD"
     (set invalid_but_dead invalid_but_dead);
-  test "INVALID_BUT_DEAD + VALID_BUT_DEAD" 
+  test "INVALID_BUT_DEAD + VALID_BUT_DEAD"
     (set invalid_but_dead valid_but_dead);
   test "INVALID_BUT_DEAD + UNKNOWN_BUT_DEAD"
     (set invalid_but_dead unknown_but_dead);
-  test "INVALID_BUT_DEAD + INCONSISTENT" 
+  test "INVALID_BUT_DEAD + INCONSISTENT"
     (set invalid_but_dead inconsistent);
   (***************************************************************************)
   test "VALID_BUT_DEAD + VALID_BUT_DEAD" (set valid_but_dead valid_but_dead);
@@ -204,4 +204,3 @@ let main () =
   test "INCONSISTENT + INCONSISTENT" (set inconsistent inconsistent)
 
 let () = Db.Main.extend main
-

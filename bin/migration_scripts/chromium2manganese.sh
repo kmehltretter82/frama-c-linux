@@ -89,6 +89,7 @@ process_file ()
    -e 's/(Integer\.pretty ~hexa:true)/Integer.pretty_hex/g' \
    -e 's/Integer\.pretty ~hexa:false/Integer.pretty/g' \
    -e 's/Integer\.pretty ~hexa:true/Integer.pretty_hex/g' \
+   -e 's/State_selection\.Static/State_selection/g'
    # this line left empty on purpose
 }
 

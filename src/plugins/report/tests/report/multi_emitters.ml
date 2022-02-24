@@ -1,28 +1,28 @@
-let emitter1 = 
+let emitter1 =
   Emitter.create "Test1" [ Emitter.Property_status ] ~correctness:[] ~tuning:[]
 
-let emitter2 = 
+let emitter2 =
   Emitter.create "Test2" [ Emitter.Property_status ] ~correctness:[] ~tuning:[]
 
 let set_status e s =
-  Kernel.feedback "%a SET STATUS TO %a" 
+  Kernel.feedback "%a SET STATUS TO %a"
     Emitter.pretty e Property_status.Emitted_status.pretty s;
   Annotations.iter_all_code_annot
     (fun stmt _ ca ->
-      let kf = Kernel_function.find_englobing_kf stmt in
-      let ps = Property.ip_of_code_annot kf stmt ca in
-      List.iter (fun p -> Property_status.emit e p ~hyps:[] s) ps)
+       let kf = Kernel_function.find_englobing_kf stmt in
+       let ps = Property.ip_of_code_annot kf stmt ca in
+       List.iter (fun p -> Property_status.emit e p ~hyps:[] s) ps)
 
 let print_status =
   Dynamic.get
     ~plugin:"Report"
-    "print" 
+    "print"
     (Datatype.func Datatype.unit Datatype.unit)
 
 let clear () =
   Kernel.feedback "CLEARING";
   Project.clear
-    ~selection:(State_selection.Static.with_dependencies Property_status.self)
+    ~selection:(State_selection.with_dependencies Property_status.self)
     ()
 
 let main () =
@@ -31,7 +31,7 @@ let main () =
   set_status emitter1 Property_status.Dont_know;
   set_status emitter2 Property_status.Dont_know;
   (* unknown /\ unknown *)
-  print_status (); 
+  print_status ();
   (* unknown /\ true *)
   set_status emitter1 Property_status.True;
   print_status ();

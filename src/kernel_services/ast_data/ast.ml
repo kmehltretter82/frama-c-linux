@@ -208,7 +208,7 @@ let is_def_or_last_decl g =
   | _ -> false
 
 let clear_last_decl () =
-  let selection = State_selection.Static.with_dependencies LastDecl.self in
+  let selection = State_selection.with_dependencies LastDecl.self in
   Project.clear ~selection ()
 
 let add_hook_on_update f =
