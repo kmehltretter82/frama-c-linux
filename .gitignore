@@ -44,8 +44,8 @@ autom4te.cache
 /tests/**/result*/
 /tests/**/oracle*/dune
 
-/src/plugin/*/tests/**/result*/
-/src/plugin/*/tests/**/oracle*/dune
+/src/plugins/*/tests/**/result*/
+/src/plugins/*/tests/**/oracle*/dune
 
 /tests/crowbar/*constfold
 /tests/crowbar/integer_bb_pretty
