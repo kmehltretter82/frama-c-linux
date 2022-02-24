@@ -97,11 +97,16 @@ let main () =
   if Wp.Region.get () then
     begin
       Ast.compute () ;
-      let dir = Wp.get_output_dir "region" in
+      let dump =
+        if Wp_parameters.Region_output_dot.is_set () then
+          RegionDump.dump_in_file ~file:(Wp_parameters.Region_output_dot.get())
+        else
+          RegionDump.dump_in_dir ~dir:(Wp.get_output_dir "region")
+      in
       Wp.iter_kf (fun kf ->
           let map = get (Some kf) in
           if not (Region.is_empty map) then
-            RegionDump.dump ~dir kf map
+            dump (Kernel_function.get_name kf) map
         ) ;
     end
 

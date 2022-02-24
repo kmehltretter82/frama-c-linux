@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 module Wp = Wp_parameters
-module Kf = Kernel_function
 module G = Dotgraph
 module R = G.Node(Region.Map)
 
@@ -279,13 +278,10 @@ let dotgraph dot map =
     G.run dot ;
   end
 
-let dump ~dir kf map =
+let dump_in_file ~file name map =
   if Wp.has_dkey dot_key || Wp.has_dkey pdf_key then
     begin
-      let name = Kf.get_name kf in
-      let file =
-        Format.asprintf "%a/%s.dot" Datatype.Filepath.pretty dir name
-      in
+      let file = Pretty_utils.to_string Datatype.Filepath.pretty file in
       let dot = Dotgraph.open_dot ~attr:[`LR] ~name ~file () in
       dotgraph dot map ;
       Dotgraph.close dot ;
@@ -295,3 +291,7 @@ let dump ~dir kf map =
         else file in
       Wp.result "Region Graph: %s" outcome
     end
+
+let dump_in_dir ~dir name map =
+  let file = Datatype.Filepath.concat dir (name ^ ".dot") in
+  dump_in_file ~file name map
