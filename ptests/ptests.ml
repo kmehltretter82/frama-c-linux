@@ -1682,14 +1682,18 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        if !verbosity >= 2 then Format.printf "%% Generates %S file for test suite %s%s and dune-alias=@@%s ...@."
            result_dune_file suite (if env.config = "" then "" else (", config=" ^ env.config)) env.dune_alias;
        let dir_config =
-         let config = SubDir.make_file directory Test_config.filename in
+         let config = SubDir.make_file directory (config_name ~env Test_config.filename) in
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
+           if !verbosity >= 2 then Format.printf "%% Scan suite directives of file %s@." config ;
            Test_config.scan_directives ~drop:false directory ~file:config
              scan_buffer default_config
          end
-         else default_config
+         else begin
+           if !verbosity >= 2 then Format.printf "%% There is no suite directive file %s@." config ;
+           default_config
+         end
        in
        let result_cout = (open_out result_dune_file) in
        let result_fmt = Format.formatter_of_out_channel result_cout  in
