@@ -38,16 +38,16 @@ module Defs : sig
   val get_defs_with_type :
     Kernel_function.t -> stmt -> lval ->
     ((bool * bool) Stmt.Map.t * Locations.Zone.t option) option
-    (** @return a map from the statements that define [lval] before [stmt] in
-            [kf]. The first boolean indicates the possibility of a direct
-            modification at this statement, ie. [lval = ...] or [lval = f()].
-            The second boolean indicates a possible indirect modification through
-            a call.
-            Also returns the zone that is possibly not defined.
-            Can return [None] when the information is not available (Pdg missing).
-    *)
+  (** @return a map from the statements that define [lval] before [stmt] in
+          [kf]. The first boolean indicates the possibility of a direct
+          modification at this statement, ie. [lval = ...] or [lval = f()].
+          The second boolean indicates a possible indirect modification through
+          a call.
+          Also returns the zone that is possibly not defined.
+          Can return [None] when the information is not available (Pdg missing).
+  *)
 
-    val compute_with_def_type_zone:
+  val compute_with_def_type_zone:
     Cil_types.kernel_function -> Cil_types.stmt -> Locations.Zone.t ->
     ((bool * bool) Cil_datatype.Stmt.Map.t * Locations.Zone.t option) option
     (** internal use *)

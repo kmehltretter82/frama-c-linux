@@ -705,7 +705,7 @@ module PrintLibc =
       let help = "when pretty-printing C code, keep prototypes coming \
                   from Frama-C standard library"
       let default = Fc_config.is_gui (* always print by default on the GUI *)
-     end)
+    end)
 
 let () = Parameter_customize.set_group inout_source
 module PrintReturn =

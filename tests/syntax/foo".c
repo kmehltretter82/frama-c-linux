@@ -1,6 +1,3 @@
-/* run.config*
-DONTRUN:
-*/
 #include "assert.h"
 
 int test = 1;

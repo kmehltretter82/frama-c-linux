@@ -48,7 +48,6 @@ module HalsteadMetricsGUI = struct
 end
 
 module CyclomaticMetricsGUI = struct
-  open Metrics_base
   open Pretty_source
   open Visitor
 
@@ -150,7 +149,7 @@ module CyclomaticMetricsGUI = struct
         match localizable with
         | PVDecl (Some kf, _,_) ->
           let callback1 () =
-           Metrics__Metrics_parameters.debug "cyclo_selector - callback";
+            Metrics__Metrics_parameters.debug "cyclo_selector - callback";
             self#display_localizable localizable  ()
           in
           let callback2 () =
@@ -195,7 +194,6 @@ end
 (** GUI hooks value coverage  *)
 module ValueCoverageGUI = struct
   open Cil_datatype
-  open Metrics_coverage
   open Gtk_helper
 
   let name = "Eva coverage"

@@ -4,6 +4,7 @@
 */
 // This test must be rejected: return type of foo is not 
 // compatible between decl and def.
+
 //@ assigns \nothing;
 int foo(int* p);
 

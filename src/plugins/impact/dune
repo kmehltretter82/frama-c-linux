@@ -1,7 +1,7 @@
 ( library
   (name impact)
   (public_name frama-c-impact.core)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -6-9-50)
   (libraries frama-c.kernel frama-c-slicing.core frama-c-callgraph.core frama-c-inout.core)
 )
 

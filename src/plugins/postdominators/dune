@@ -1,7 +1,7 @@
 ( library
   (name postdominators)
   (public_name frama-c-postdominators.core)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-eva.core)
 )
 

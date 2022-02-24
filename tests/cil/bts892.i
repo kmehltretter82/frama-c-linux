@@ -6,8 +6,10 @@
 
 int tab[16];
 
-void* main(void){
+void* main(void)
+{
   int i;
+
   static const int* t[] = {
     &tab[1],
     &tab[3],

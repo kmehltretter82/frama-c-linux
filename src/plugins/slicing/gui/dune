@@ -2,6 +2,6 @@
   (name slicing_gui)
   (public_name frama-c-slicing.gui)
   (optional)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Slicing)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Slicing :standard -w -6-9)
   (libraries frama-c.kernel frama-c.gui frama-c-slicing.core)
 )

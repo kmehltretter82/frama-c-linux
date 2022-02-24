@@ -11,6 +11,7 @@
 volatile int nondet;
 
 struct empty {};
+
 struct empty global_empty;
 
 typedef struct {

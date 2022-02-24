@@ -1,2 +1,1 @@
-PLUGIN: instantiate
-OPT: -instantiate -check -print
+OPT: @PTEST_FILE@ -instantiate -print

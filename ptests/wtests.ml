@@ -40,7 +40,7 @@ end
 (* ------------------------------- *)
 
 let pp_json fmt json =
-  Format.fprintf fmt "%% dune build @@%s" json
+  Format.fprintf fmt "%% dune build @@%S" json
 
 let fail ~json s info =
   Format.printf "%a: Error - %s@.%% Aborting: %s@." pp_json json s info ;
@@ -151,7 +151,7 @@ let compare_files ~json ~error~result oracle =
   let not_generated = not (Sys.file_exists result) in
   if not_generated then
     Format.printf "%a: missing target %S@." pp_json json result;
-  let cmd = Format.sprintf "%s %s %s" (if !verbosity > 0  then diff_cmd else cmp_cmd) oracle result in
+  let cmd = Format.sprintf "%s %S %S" (if !verbosity > 0  then diff_cmd else cmp_cmd) oracle result in
   if !verbosity > 0  then Format.printf "%% Run compare command: %s@." cmd;
   let ret_code = launch cmd in
   let is_ko = ret_code <> 0 in

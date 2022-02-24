@@ -3,7 +3,7 @@
   (public_name frama-c-callgraph.core)
   (modules Options Journalize Cg Services Uses Register Callgraph_api Callgraph Subgraph)
 ;  (private_modules Options Journalize Cg Uses Register)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -9-50)
   (libraries frama-c.kernel frama-c-eva.core)
 )
 
@@ -15,7 +15,7 @@
   (optional)
   (modules Cg_viewer)
 ;  (private_modules Cg_viewer)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Callgraph)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Callgraph :standard)
   (libraries callgraph frama-c.kernel frama-c.gui ocamlgraph.dgraph)
 )
 

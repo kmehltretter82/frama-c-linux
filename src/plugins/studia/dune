@@ -2,7 +2,7 @@
   (name studia)
   (public_name frama-c-studia.core)
   (modules options writes reads)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard)
   (libraries frama-c.kernel frama-c-eva.core)
 )
 
@@ -14,7 +14,7 @@
   (public_name frama-c-studia.gui)
   (optional)
   (modules studia_gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Studia)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Studia :standard -w -6-9)
   (libraries studia frama-c.kernel frama-c.gui frama-c-eva.gui)
 )
 

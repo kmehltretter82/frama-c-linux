@@ -1,7 +1,7 @@
 ( library
   (name aorai)
   (public_name frama-c-aorai.core)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -6-9-50)
  (libraries frama-c.kernel
   (select aorai_eva_analysis.ml from
    (frama-c-eva.core -> aorai_eva_analysis.enabled.ml)

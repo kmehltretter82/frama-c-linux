@@ -327,11 +327,11 @@ let pp_pos fmt pos =
 let add_symbolic_dir_list name = function
   | [d] -> add_symbolic_dir name d
   | ds ->
-      List.iteri
-        (fun i d ->
-           let path = Printf.sprintf "%s#%d" name (succ i) in
-           add_symbolic_dir path d)
-        ds
+    List.iteri
+      (fun i d ->
+         let path = Printf.sprintf "%s#%d" name (succ i) in
+         add_symbolic_dir path d)
+      ds
 
 (*
 Local Variables:

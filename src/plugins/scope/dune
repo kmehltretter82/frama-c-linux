@@ -2,7 +2,7 @@
   (name scope)
   (public_name frama-c-scope.core)
   (modules scope datascope zones defs)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-eva.core)
 )
 
@@ -11,7 +11,7 @@
   (public_name frama-c-scope.gui)
   (optional)
   (modules dpds_gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Scope)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Scope :standard  -w -9)
   (libraries frama-c.kernel frama-c.gui frama-c-scope.core)
 )
 

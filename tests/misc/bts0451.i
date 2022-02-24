@@ -6,6 +6,7 @@
 
 /* small test cases to verify that break is accepted in while and switch */
 int f () {
+
   while (1) {
     if (0) {
       while (1) break;

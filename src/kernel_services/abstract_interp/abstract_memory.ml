@@ -201,28 +201,28 @@ struct
             pretty_indexes indexes
             pretty sub
       in fun fmt (x:t) ->
-      match x with
-      | Raw b ->
-        begin match b with
-          | Uninitialized -> Format.fprintf fmt "UNINITIALIZED"
-          | Zero -> Format.fprintf fmt "0"
-          | Any (Set set) when Base.SetLattice.O.is_empty set ->
-            Format.fprintf fmt "[--..--]"
-          | Any _ -> Format.fprintf fmt "T"
-        end
-      | Scalar {scalar_value} -> Value.pretty fmt scalar_value
-      | Struct s ->
-        Format.fprintf fmt "{@;<1 2>";
-        FieldMap.iter (fun i v -> pretty_field fmt i (Obj.magic v:FieldMap.t memory)) s.struct_value;
-        Format.fprintf fmt "@ }";
-      | Union u ->
-        Format.fprintf fmt "{@;<1 2>%t@ }"
-          (fun fmt -> pretty_field fmt u.union_field (Obj.magic u.union_value : FieldMap.t memory))
-      | Array a ->
-        let indexes, sub = leading_indexes [a.array_range] a.array_value in
-        Format.fprintf fmt "%a = %a"
-          pretty_indexes indexes
-          pretty (Obj.magic sub : FieldMap.t memory)
+        match x with
+        | Raw b ->
+          begin match b with
+            | Uninitialized -> Format.fprintf fmt "UNINITIALIZED"
+            | Zero -> Format.fprintf fmt "0"
+            | Any (Set set) when Base.SetLattice.O.is_empty set ->
+              Format.fprintf fmt "[--..--]"
+            | Any _ -> Format.fprintf fmt "T"
+          end
+        | Scalar {scalar_value} -> Value.pretty fmt scalar_value
+        | Struct s ->
+          Format.fprintf fmt "{@;<1 2>";
+          FieldMap.iter (fun i v -> pretty_field fmt i (Obj.magic v:FieldMap.t memory)) s.struct_value;
+          Format.fprintf fmt "@ }";
+        | Union u ->
+          Format.fprintf fmt "{@;<1 2>%t@ }"
+            (fun fmt -> pretty_field fmt u.union_field (Obj.magic u.union_value : FieldMap.t memory))
+        | Array a ->
+          let indexes, sub = leading_indexes [a.array_range] a.array_value in
+          Format.fprintf fmt "%a = %a"
+            pretty_indexes indexes
+            pretty (Obj.magic sub : FieldMap.t memory)
 
     let rec hash = function
       | Raw b -> Bit.hash b

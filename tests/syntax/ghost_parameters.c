@@ -16,8 +16,11 @@
    STDOPT: +" -cpp-extra-args=-DVOID_EMPTY_GHOST_PARAMETER_LIST"
    STDOPT: +" -cpp-extra-args=-DVOID_GHOST_PARAMETER"
 */
+
 #ifdef ARGS_NOT_VOID
+
 void function(int a, int b) /*@ ghost (int c, int d) */{
+
 }
 
 void caller(void){

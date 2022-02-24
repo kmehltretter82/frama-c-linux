@@ -1,4 +1,5 @@
 /* run.config
+   PLUGIN: @PTEST_PLUGIN@ markdown-report.eva-info
    OPT: -mdr-remarks %{dep:@PTEST_DIR@/@PTEST_NAME@.remarks.md}
  */
 

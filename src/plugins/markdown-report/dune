@@ -12,7 +12,7 @@
   (name markdown_report)
   (public_name frama-c-markdown-report.core)
   (optional)
-  (flags -open Frama_c_kernel)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel)
   (preprocess (pps ppx_deriving_yojson))
 )

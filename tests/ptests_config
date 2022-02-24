@@ -3,29 +3,38 @@
 # todo: adds dynamic_plugin? No, will be removed from master branch.
 # todo: adds verisec?
 
-DEFAULT_SUITES= builtins callgraph cil constant_propagation compliance dynamic float idct impact
-DEFAULT_SUITES= journal libc metrics occurrence pdg pretty_printing rte rte_manual
-DEFAULT_SUITES= saveload scope slicing sparecode spec syntax test value value/traces
+DEFAULT_SUITES= builtins callgraph cil compliance constant_propagation
+# todo:
+IGNORE= DEFAULT_SUITES= dynamic
 
-# todo: fixes fc_script
-IGNORE= DEFAULT_SUITES= fc_script jcdb misc 
+DEFAULT_SUITES= float idct impact metrics occurrence pdg pretty_printing
+# todo:
+IGNORE= DEFAULT_SUITES= journal libc
 
-# todo: adds make_run_script?
-IGNORE= DEFAULT_SUITES= make_run_script
+DEFAULT_SUITES= rte rte_manual saveload scope slicing sparecode spec syntax
+
+DEFAULT_SUITES=
+# todo:
+IGNORE= DEFAULT_SUITES= fc_script jcdb misc make_run_script
+
+DEFAULT_SUITES= value/traces
+# todo:
+IGNORE= DEFAULT_SUITES= test value
 
 # todo: adds value/numerors (requires opam package mlgmpidl and system libraries for MPFR)
 IGNORE= DEFAULT_SUITES= value/numerors
 
-IGNORE= apron_SUITES = value builtins float idct
-bitwise_SUITES = value builtins float idct
-equalities_SUITES = value builtins float idct
-gauges_SUITES = value builtins float idct
-IGNORE= octagon_SUITES = value builtins float idct
-symblocs_SUITES = value builtins float idct
-
-IGNORE= apron_SUITES = value/numerors
-IGNORE= bitwise_SUITES = value/numerors
-IGNORE= equalities_SUITES = value/numerors
-IGNORE= gauges_SUITES = value/numerors
-IGNORE= octagon_SUITES = value/numerors
-IGNORE= symblocs_SUITES = value/numerors
+### tests of EVA domains
+apron_SUITES =
+bitwise_SUITES = builtins float idct
+equality_SUITES = builtins float idct
+gauges_SUITES = builtins float idct
+octagon_SUITES = builtins float idct
+symblocs_SUITES = builtins float idct
+# todo:
+IGNORE= apron_SUITES = builtins float idct value value/numerors
+IGNORE= bitwise_SUITES = value value/numerors
+IGNORE= equality_SUITES = value value/numerors
+IGNORE= gauges_SUITES = value value/numerors
+IGNORE= octagon_SUITES = value value/numerors
+IGNORE= symblocs_SUITES = value value/numerors

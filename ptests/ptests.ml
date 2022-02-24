@@ -164,12 +164,12 @@ let example_msg =
      FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
      DONTRUN:            @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
-                                                    # Note: the textual targets are compared to oracles.@]@  \
+     # Note: the textual targets are compared to oracles.@]@  \
      DEPS: <file>...     @[<v 0># Adds a dependency to next sub-test and execnow commands.@ \
-                                # Notes: a dependency to the included file can be added with this directive.@ \
-                                # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
+     # Notes: a dependency to the included file can be added with this directive.@ \
+     # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
      LOG: <file>...      @[<v 0># Defines textual targets built by the next sub-test command..@ \
-                                # Note: the textual targets are compared to oracles.@]@  \
+     # Note: the textual targets are compared to oracles.@]@  \
      CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
      STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
@@ -219,7 +219,7 @@ let example_msg =
      @@FRAMAC_SHARE@@   # Shortcut defined as follow: %s@  \
      @@PTEST_SHARE_DIR@@   # Path to the share directory of the related plugin.@  \
      @@DEV_NULL@@       # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
-      @]@ \
+     @]@ \
      @[<v 1>\
      Default directive values:@  \
      FILEREG: %s@  \
@@ -376,7 +376,7 @@ end = struct
       end
       else begin
         Format.eprintf
-          "Cannot find configuration file %s. Aborting (CWD=%s).@." ptests_config (Sys.getcwd()) ;
+          "Cannot find configuration file %s. (CWD=%s).@." ptests_config (Sys.getcwd()) ;
       end;
       !default_suites
 end
@@ -434,6 +434,12 @@ module Macros = struct
 
   type t = string StringMap.t
 
+  let add_defaults ~defaults macros =
+    StringMap.merge (fun _k default cur ->
+        match cur with
+        | Some _ -> cur
+        | _ -> default) defaults macros
+
   let empty = StringMap.empty
 
   let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
@@ -443,26 +449,26 @@ module Macros = struct
     StringMap.iter (fun key data -> Format.fprintf fmt "- %s -> %s@." key data) macros;
     Format.fprintf fmt "End macros@."
 
-type does_expand = {
-  has_ptest_file : bool;
-  has_ptest_opt : bool;
-  has_frama_c_exe : bool;
-}
+  type does_expand = {
+    has_ptest_file : bool;
+    has_ptest_opt : bool;
+    has_frama_c_exe : bool;
+  }
 
 
-  let does_expand =
+  let does_expand ~file =
     let macro_regex = Str.regexp "@\\([-A-Za-z_0-9]+\\)@" in
     fun macros s ->
       let has_ptest_file = ref false in
       let has_ptest_opt = ref false in
       let has_ptest_options = ref false in
       let has_frama_c_exe = ref false in
-      if !verbosity >= 4 then Format.printf "%% Expand: %s@." s;
+      if !verbosity >= 4 then Format.printf "%% %s: Expand: %s@." file s;
       if !verbosity >= 5 then Format.printf "%a" pp_macros macros;
       let nb_loops = ref 0 in
       let rec aux s =
         if !nb_loops > 100 then
-          fail "Possible infinite recursivity in macro expands"
+          fail (file ^ ": possible infinite recursivity in macro expands: "^ s)
         else incr nb_loops ;
         let expand_macro = function
           | Str.Text s -> s
@@ -475,11 +481,11 @@ type does_expand = {
                  | "PTEST_OPTIONS" -> has_ptest_options := true
                  | "frama-c-exe" -> has_frama_c_exe := true
                  | _ -> ());
-                if !verbosity >= 5 then Format.printf "%%     - macro is %s\n%!" macro;
+                if !verbosity >= 5 then Format.printf "%% %s:     - macro is %s\n%!" file macro;
                 try
                   let replacement = StringMap.find macro macros in
                   if !verbosity >= 4 then
-                    Format.printf "%%     - replacement for %s is %s\n%!" macro replacement;
+                    Format.printf "%% %s:     - replacement for %s is %s\n%!" file macro replacement;
                   aux replacement
                 with Not_found -> s
               end
@@ -490,17 +496,17 @@ type does_expand = {
       let r =
         try aux s
         with e ->
-          Format.eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
+          Format.eprintf "%s: uncaught exception %s\n%!" file (Printexc.to_string e);
           raise e
       in
-      if !verbosity >= 4 then Format.printf "%% Expansion result: %s@." r;
+      if !verbosity >= 4 then Format.printf "%% %s: Expansion result: %s@." file r;
       { has_ptest_file= !has_ptest_file;
         has_ptest_opt= !has_ptest_opt;
         has_frama_c_exe= !has_frama_c_exe;
       }, r
 
-  let expand (macros:t) s =
-    snd (does_expand macros s)
+  let expand ~file (macros:t) s =
+    snd (does_expand ~file macros s)
 
   let get ?(default="") name macros =
     try StringMap.find name macros with Not_found -> default
@@ -508,31 +514,31 @@ type does_expand = {
   let add_list l map =
     List.fold_left (fun acc (k,v) -> StringMap.add k v acc) map l
 
-  let add_expand name def macros =
-    StringMap.add name (expand macros def) macros
+  let add_expand ~file name def macros =
+    StringMap.add name (expand ~file macros def) macros
 
-  let append_expand name def macros =
-    StringMap.add name (get name macros ^ expand macros def) macros
+  let append_expand ~file name def macros =
+    StringMap.add name (get name macros ^ expand ~file macros def) macros
 
   let default_macros = add_list
-    [ "frama-c-exe", !macro_frama_c_exe;
-      "frama-c-cmd", !macro_frama_c_cmd;
-      "frama-c",     !macro_frama_c;
-      "DEV_NULL",    dev_null;
+      [ "frama-c-exe", !macro_frama_c_exe;
+        "frama-c-cmd", !macro_frama_c_cmd;
+        "frama-c",     !macro_frama_c;
+        "DEV_NULL",    dev_null;
 
-      "FRAMAC_SHARE",!macro_frama_c_share;
+        "FRAMAC_SHARE",!macro_frama_c_share;
 
-      "PTEST_DEFAULT_OPTIONS", !macro_default_options;
-      "PTEST_OPTIONS",         !macro_options;
-      "PTEST_PRE_OPTIONS",     !macro_pre_options;
-      "PTEST_POST_OPTIONS",    !macro_post_options;
+        "PTEST_DEFAULT_OPTIONS", !macro_default_options;
+        "PTEST_OPTIONS",         !macro_options;
+        "PTEST_PRE_OPTIONS",     !macro_pre_options;
+        "PTEST_POST_OPTIONS",    !macro_post_options;
 
-      "PTEST_DEPS",   "";
-      "PTEST_LIBS",   "";
-      "PTEST_MODULE", "";
-      "PTEST_SCRIPT", "";
-      "PTEST_PLUGIN", "";
-    ] empty
+        "PTEST_DEPS",   "";
+        "PTEST_LIBS",   "";
+        "PTEST_MODULE", "";
+        "PTEST_SCRIPT", "";
+        "PTEST_PLUGIN", "";
+      ] empty
 
 end
 
@@ -613,15 +619,16 @@ end = struct
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
     let ptest_vars =
-        [ "PTEST_SESSION", env.absolute_tests_dir ^ "/_build/default:.";
-          "PTEST_CONFIG", ptest_config;
-          "PTEST_DIR", ".";
-          "PTEST_RESULT", ".";
-          "PTEST_SUITE_DIR", "..";
-          "PTEST_FILE", ptest_file;
-          "PTEST_NAME", ptest_name;
-        ] in
-    let subst = Macros.expand (Macros.add_list ptest_vars Macros.empty) in
+      [ "PTEST_SESSION", env.absolute_tests_dir ^ "/_build/default:.";
+        "PTEST_CONFIG", ptest_config;
+        "PTEST_DIR", ".";
+        "PTEST_SHARE_DIR", "../../../share";
+        "PTEST_RESULT", ".";
+        "PTEST_SUITE_DIR", "..";
+        "PTEST_FILE", ptest_file;
+        "PTEST_NAME", ptest_name;
+      ] in
+    let subst = Macros.expand ~file (Macros.add_list ptest_vars Macros.empty) in
     ptest_name,
     { config with
       dc_execnow = List.rev config.dc_execnow;
@@ -745,7 +752,7 @@ end = struct
     }
 
   let config_exec ~once ~drop:_ ~file ~dir s current =
-    let s = Macros.expand current.dc_macros s in
+    let s = Macros.expand ~file current.dc_macros s in
     { current with
       dc_execnow =
         scan_execnow ~file ~once dir current.dc_timeout (deps_of_config current) s :: current.dc_execnow }
@@ -773,27 +780,27 @@ end = struct
       let _,_,res = (add "" acc) in
       res
 
-  let config_deps ~drop:_ ~file:_ ~dir:_ s current =
-    let s = Macros.expand current.dc_macros s in
+  let config_deps ~drop:_ ~file ~dir:_ s current =
+    let s = Macros.expand ~file current.dc_macros s in
     { current with
       dc_deps = (split_list s);
       dc_macros = Macros.add_list ["PTEST_DEPS", s] current.dc_macros }
 
-  let config_libs ~drop:_ ~file:_ ~dir:_ s current =
-    let s = Macros.expand current.dc_macros s in
+  let config_libs ~drop:_ ~file ~dir:_ s current =
+    let s = Macros.expand ~file current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     { current with
       dc_libs = l;
       dc_macros = Macros.add_list ["PTEST_LIBS", s] current.dc_macros }
 
-  let config_plugin ~drop:_ ~file:_ ~dir:_ s current =
-    let s = Macros.expand current.dc_macros s in
+  let config_plugin ~drop:_ ~file ~dir:_ s current =
+    let s = Macros.expand ~file current.dc_macros s in
     let deps = split_list s in
     { current with dc_plugin = deps ;
                    dc_macros = Macros.add_list ["PTEST_PLUGIN", s] current.dc_macros }
 
-  let config_module macro_name ~drop:_ ~file:_ ~dir:_ s current =
-    let s = Macros.expand current.dc_macros s in
+  let config_module macro_name ~drop:_ ~file ~dir:_ s current =
+    let s = Macros.expand ~file current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     let deps = List.map (fun s -> s ^ ".cmxs") l in
     { current with
@@ -810,7 +817,7 @@ end = struct
       in
       if !verbosity >= 4 then
         Format.printf "%%   - New macro %s with definition %s@." name def;
-      { current with dc_macros = Macros.add_expand name def current.dc_macros }
+      { current with dc_macros = Macros.add_expand ~file name def current.dc_macros }
     end else begin
       Format.eprintf "%a: cannot understand MACRO definition: %s@." (SubDir.pp_file ~dir) file s;
       current
@@ -837,8 +844,8 @@ end = struct
 
   let config_options =
     [ "CMD",
-      (fun ~drop:_ ~file:_ ~dir:_ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~drop:_ ~file ~dir:_ s current ->
+         let s = Macros.expand ~file current.dc_macros s in
          { current with dc_default_toplevel = s});
 
       "OPT",
@@ -846,7 +853,7 @@ end = struct
          if not (drop || current.dc_framac) then
            Format.eprintf "%s: a NOFRAMAC directive has been defined before a sub-test defined by an 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
-         let s = Macros.expand current.dc_macros s in
+         let s = Macros.expand ~file current.dc_macros s in
          let t =
            { toplevel = current.dc_default_toplevel;
              opts = s;
@@ -866,7 +873,7 @@ end = struct
          if not (drop || current.dc_framac) then
            Format.eprintf "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
-         let s = Macros.expand current.dc_macros s in
+         let s = Macros.expand ~file current.dc_macros s in
          let new_top =
            List.map
              (fun command ->
@@ -879,20 +886,20 @@ end = struct
                   deps = deps_of_config ~deps:command.deps current
                 })
              (if !default_parsing_env.current_default_cmds = [] then
-               default_commands current
-             else !default_parsing_env.current_default_cmds)
+                default_commands current
+              else !default_parsing_env.current_default_cmds)
          in
          { current with dc_commands = new_top @ current.dc_commands;
                         dc_default_log = !default_parsing_env.current_default_log @
                                          current.dc_default_log });
       "FILEREG",
-      (fun ~drop:_ ~file:_ ~dir:_ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~drop:_ ~file ~dir:_ s current ->
+         let s = Macros.expand ~file current.dc_macros s in
          { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~drop:_ ~file:_ ~dir:_ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~drop:_ ~file ~dir:_ s current ->
+         let s = Macros.expand ~file current.dc_macros s in
          let s = trim_right s in
          match current.dc_filter with
          | None when s="" -> { current with dc_filter = None }
@@ -900,8 +907,8 @@ end = struct
          | Some filter    -> { current with dc_filter = Some (s ^ " | " ^ filter) });
 
       "EXIT",
-      (fun ~drop:_ ~file:_ ~dir:_ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~drop:_ ~file ~dir:_ s current ->
+         let s = Macros.expand ~file current.dc_macros s in
          { current with dc_exit_code = Some s });
 
       "GCC",
@@ -927,13 +934,13 @@ end = struct
       "PLUGIN", config_plugin;
 
       "LOG",
-      (fun ~drop:_ ~file:_ ~dir:_ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~drop:_ ~file ~dir:_ s current ->
+         let s = Macros.expand ~file current.dc_macros s in
          { current with dc_default_log = s :: current.dc_default_log });
 
       "TIMEOUT",
-      (fun ~drop:_ ~file:_ ~dir:_ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~drop:_ ~file ~dir:_ s current ->
+         let s = Macros.expand ~file current.dc_macros s in
          { current with dc_timeout = s });
 
       "NOFRAMAC",
@@ -1116,26 +1123,26 @@ let basic_command_string command =
   in
   let macros = (* set expanded macros that can be used into CMD directives *)
     Macros.add_list [
-      "PTEST_OPT", Macros.expand command.macros command.options;
+      "PTEST_OPT", Macros.expand ~file:command.file command.macros command.options;
       "PTEST_LOAD_OPTIONS", plugins_options;
     ] command.macros in
   let toplevel =
-    let in_toplevel,toplevel = Macros.does_expand macros command.toplevel in
+    let in_toplevel,toplevel = Macros.does_expand ~file:command.file macros command.toplevel in
     if command.execnow || in_toplevel.has_ptest_opt then toplevel
     else begin
       let has_ptest_file,options =
-        let in_option,options = Macros.does_expand macros command.options in
+        let in_option,options = Macros.does_expand ~file:command.file macros command.options in
         (in_option.has_ptest_file || in_toplevel.has_ptest_file),
         (if in_toplevel.has_frama_c_exe then
-           [ Macros.expand macros "@PTEST_PRE_OPTIONS@" ;
+           [ Macros.expand ~file:command.file macros "@PTEST_PRE_OPTIONS@" ;
              options ;
-             Macros.expand macros "@PTEST_POST_OPTIONS@" ;
+             Macros.expand ~file:command.file macros "@PTEST_POST_OPTIONS@" ;
            ]
          else [ options ])
       in
       let options = List.filter (fun s -> s <> "") options in
       let options = if has_ptest_file then options
-        else (Filename.basename command.file)::options
+        else (Filename.sanitize (Filename.basename command.file))::options
       in
       String.concat " " (toplevel::options)
     end
@@ -1146,7 +1153,13 @@ let basic_command_string command =
 
 let pp_list fmt l = List.iter (Format.fprintf fmt " %S") l
 module Fmt = struct
-  let plugin_as_package fmt s = Format.fprintf fmt "frama-c-%s" s
+  let plugin_as_package fmt s =
+    let base =
+      if String.contains s '.' then
+        String.sub s 0 (String.index s '.')
+      else s
+    in
+    Format.fprintf fmt "frama-c-%s" base
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
@@ -1164,11 +1177,11 @@ let show_cmd =
   subst
 
 let redirection ?reslog ?errlog cmd =
-    match reslog, errlog with
-    | None, None         -> cmd
-    | None, Some err     -> Format.sprintf "%s 2> %s" cmd err
-    | Some res, None     -> Format.sprintf "%s > %s" cmd res
-    | Some res, Some err -> Format.sprintf "%s > %s 2> %s" cmd res err
+  match reslog, errlog with
+  | None, None         -> cmd
+  | None, Some err     -> Format.sprintf "%s 2> %S" cmd err
+  | Some res, None     -> Format.sprintf "%s > %S" cmd res
+  | Some res, Some err -> Format.sprintf "%s > %S 2> %S" cmd res err
 
 let ptests_alias ~env = config_name ~env (env.dune_alias ^ "_config")
 
@@ -1196,8 +1209,8 @@ type wtest = {
 let std = false
 let pp_wtest ?(compacted=false) fmt wtest =
   let writer = (if compacted
-        then (fun json -> Format.fprintf fmt "%s" (Yojson.Safe.to_string ~std json))
-        else (fun json -> Format.fprintf fmt "%a" (Yojson.Safe.pretty_print ~std) json))
+                then (fun json -> Format.fprintf fmt "%s" (Yojson.Safe.to_string ~std json))
+                else (fun json -> Format.fprintf fmt "%a" (Yojson.Safe.pretty_print ~std) json))
   in writer (wtest_to_yojson wtest)
 
 let default_wtest = match wtest_of_yojson (Yojson.Safe.from_string "{}") with
@@ -1280,9 +1293,9 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     }
   in
   let wtest = if wtest.log = [] then wtest else
-    { wtest with
-      oracle_dir = SubDir.get (SubDir.oracle_subdir ~env SubDir.upper_dir)
-    }
+      { wtest with
+        oracle_dir = SubDir.get (SubDir.oracle_subdir ~env SubDir.upper_dir)
+      }
   in
   let wrapper_basename =  mk_alias command "exec.wtests" in
   if !wrapper_cmd <> "" then begin
@@ -1290,8 +1303,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       "(rule ; %s\n  \
        (alias %S)\n  \
        (targets %S %S %a)\n  \
-       (deps %S %S %a %a)\n  \
-       (action (run %s %%{dep:%s} %S %a))\n\
+       (deps %S %S %S %a %a)\n  \
+       (action (run %s %S %S %a))\n\
        )@."
       (* rule: *)
       wtest.info
@@ -1302,6 +1315,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       cmdreslog
       pp_list command.log_files
       (* deps: *)
+      wrapper_basename
       wtest.oracle_out
       wtest.oracle_err
       pp_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
@@ -1428,7 +1442,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (action (diff %S %S))\n\
      )@."
     (* alias: *)
-     diff_alias
+    diff_alias
     (* action: *)
     wtest.oracle_err
     errlog;
@@ -1445,8 +1459,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   List.iter (oracle_target oracle_fmt oracle_subdir) command.log_files ;
   ()
 
-let deps_command macros deps =
-  let subst = Macros.expand macros in
+let deps_command ~file macros deps =
+  let subst = Macros.expand ~file macros in
   let load_plugin = List.map subst deps.load_plugin in
   let load_module = List.map subst deps.load_module in
   let load_libs = List.map (fun s -> (subst s)^".cmxs") deps.load_libs in
@@ -1455,7 +1469,7 @@ let deps_command macros deps =
     deps_cmd = load_libs @ load_module @ deps_cmd;
   }
 
-let update_modules file modules deps =
+let update_modules ~file modules deps =
   if deps.load_module <> [] then begin
     let plugin_libs = StringSet.union
         (StringSet.of_list (List.map (Format.sprintf "frama-c-%s.core") deps.load_plugin))
@@ -1470,7 +1484,7 @@ let update_modules file modules deps =
           ) !modules) (StringSet.elements (StringSet.of_list deps.load_module));
   end
 
- (** process a test file *)
+(** process a test file *)
 let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
   let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
@@ -1482,14 +1496,15 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
         let nth = !i in
         incr i ;
         let macros = ptest_vars ~nth macros in
-        let log_files = List.map (Macros.expand macros) logs in
-        let deps = deps_command macros deps in
-        update_modules file modules deps;
+        let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
+        let log_files = List.map (Macros.expand ~file macros) logs in
+        let deps = deps_command ~file macros deps in
+        update_modules ~file modules deps;
         command_string ~env ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files;
             filter = (* from a global directive applyed to all OPT tests  *)
-              (match config.dc_filter with None -> None | Some s -> Some (Macros.expand macros s));
+              (match config.dc_filter with None -> None | Some s -> Some (Macros.expand ~file macros s));
             exit_code = begin
               match exit_code with
               | None -> 0
@@ -1505,137 +1520,138 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
     let make_execnow_cmd =
       let e = ref 0 in
       fun execnow->
-       let nth = !e in
-       incr e ;
-       let macros = ptest_vars ~nth Macros.empty in
-       let cmd =
-         let deps = deps_command macros execnow.ex_deps in
-         update_modules file modules deps;
-         { test_name; file; nb_files = nb_files_execnow; directory; nth;
-           log_files = [];
-           options = "";
-           toplevel = execnow.ex_cmd;
-           exit_code = 0;
-           timeout=execnow.ex_timeout;
-           macros;
-           filter = None; (* no FILTER applied to EXECNOW LOG *)
-           execnow = true;
-           deps = deps;
-         }
-       in
-       let cmd_string = basic_command_string cmd in
-       let wtest = {
-         default_wtest with
-         dir = SubDir.get (SubDir.result_subdir ~env cmd.directory) ;
-         info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
-             nth (SubDir.get directory) file;
-         cmd = cmd_string;
-         log = List.map (Macros.expand cmd.macros) execnow.ex_log;
-         bin = List.map (Macros.expand cmd.macros) execnow.ex_bin;
-       }
-       in
-       let wrapper_basename =  mk_alias cmd "execnow.wtests" in
-       if !wrapper_cmd <> "" then begin
-         Format.fprintf result_fmt
-           "(rule ; %s\n  \
-            (alias %s)\n  \
-            (deps %a %a %a)\n  \
-            (targets %a %a)\n  \
-            (action (run %s %%{dep:%s} %S))\n\
-            )@."
-           (* rule: *)
-           wtest.info
-           (* alias: *)
-           wrapper_basename
-           (* deps: *)
-           pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
-           pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
-           pp_command_deps cmd
-           (* targets: *)
-           pp_list wtest.log
-           pp_list wtest.bin
-           (* action: *)
-           !wrapper_cmd
-           wrapper_basename
-           wtest.cmd;
-         let wtest =
-           { wtest with
-             cmd = show_cmd wtest.cmd ;
-           }
-         in
-         (* Prints the JSON file for the wrapper *)
-         print_json_wrapper wtest
-           ~file:(SubDir.make_file (SubDir.result_subdir ~env cmd.directory) wrapper_basename);
-       end
-       else begin
-         Format.fprintf result_fmt
-           "(rule ; %s\n  \
-            (alias %s)\n  \
-            (deps %a (package frama-c)%a)\n  \
-            (targets %a %a)\n  \
-            (action (system %S))\n\
-            )@."
-           (* rule: *)
-           wtest.info
-           (* alias: *)
-           wrapper_basename
-           (* deps: *)
-           pp_list config.dc_deps
-           pp_command_deps cmd
-           (* targets: *)
-           pp_list wtest.log
-           pp_list wtest.bin
-           (* action: *)
-           wtest.cmd
-       end;
-       let oracle_subdir = SubDir.oracle_subdir ~env cmd.directory in
-       List.iter (oracle_target oracle_fmt oracle_subdir) wtest.log ;
-       List.iter (oracle_target oracle_fmt oracle_subdir) wtest.bin ;
-       Format.fprintf result_fmt
-         "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
-          (alias %s)\n  \
-          (deps  %a (universe))\n  \
-          (action (system %S))\n\
-          )@."
-         (* rule: *)
-         nth file
-         (* alias: *)
-         (mk_alias cmd "execnow.show")
-         (* deps: *)
-         pp_command_deps cmd (* to get an updated build even in case of using the result *)
-         (* action: *)
-         ("echo '" ^ show_cmd wtest.cmd ^"'");
-       ;
-       List.iteri (fun n log ->
-           Format.fprintf result_fmt
-             "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
-              (alias %s)\n  \
-              (action (diff %S %S))\n\
-              )@."
-             (* rule: *)
-             n nth file
-             (* alias: *)
-             (ptests_alias ~env)
-             (* action: *)
-             (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
-             log
-         ) wtest.log
+        let nth = !e in
+        incr e ;
+        let macros = ptest_vars ~nth Macros.empty in
+        let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
+        let cmd =
+          let deps = deps_command ~file macros execnow.ex_deps in
+          update_modules ~file modules deps;
+          { test_name; file; nb_files = nb_files_execnow; directory; nth;
+            log_files = [];
+            options = "";
+            toplevel = execnow.ex_cmd;
+            exit_code = 0;
+            timeout=execnow.ex_timeout;
+            macros;
+            filter = None; (* no FILTER applied to EXECNOW LOG *)
+            execnow = true;
+            deps = deps;
+          }
+        in
+        let cmd_string = basic_command_string cmd in
+        let wtest = {
+          default_wtest with
+          dir = SubDir.get (SubDir.result_subdir ~env cmd.directory) ;
+          info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
+              nth (SubDir.get directory) file;
+          cmd = cmd_string;
+          log = List.map (Macros.expand ~file cmd.macros) execnow.ex_log;
+          bin = List.map (Macros.expand ~file cmd.macros) execnow.ex_bin;
+        }
+        in
+        let wrapper_basename =  mk_alias cmd "execnow.wtests" in
+        if !wrapper_cmd <> "" then begin
+          Format.fprintf result_fmt
+            "(rule ; %s\n  \
+             (alias %s)\n  \
+             (deps %a %a %a)\n  \
+             (targets %a %a)\n  \
+             (action (run %s %%{dep:%s} %S))\n\
+             )@."
+            (* rule: *)
+            wtest.info
+            (* alias: *)
+            wrapper_basename
+            (* deps: *)
+            pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
+            pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
+            pp_command_deps cmd
+            (* targets: *)
+            pp_list wtest.log
+            pp_list wtest.bin
+            (* action: *)
+            !wrapper_cmd
+            wrapper_basename
+            wtest.cmd;
+          let wtest =
+            { wtest with
+              cmd = show_cmd wtest.cmd ;
+            }
+          in
+          (* Prints the JSON file for the wrapper *)
+          print_json_wrapper wtest
+            ~file:(SubDir.make_file (SubDir.result_subdir ~env cmd.directory) wrapper_basename);
+        end
+        else begin
+          Format.fprintf result_fmt
+            "(rule ; %s\n  \
+             (alias %s)\n  \
+             (deps %a (package frama-c)%a)\n  \
+             (targets %a %a)\n  \
+             (action (system %S))\n\
+             )@."
+            (* rule: *)
+            wtest.info
+            (* alias: *)
+            wrapper_basename
+            (* deps: *)
+            pp_list config.dc_deps
+            pp_command_deps cmd
+            (* targets: *)
+            pp_list wtest.log
+            pp_list wtest.bin
+            (* action: *)
+            wtest.cmd
+        end;
+        let oracle_subdir = SubDir.oracle_subdir ~env cmd.directory in
+        List.iter (oracle_target oracle_fmt oracle_subdir) wtest.log ;
+        List.iter (oracle_target oracle_fmt oracle_subdir) wtest.bin ;
+        Format.fprintf result_fmt
+          "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
+           (alias %s)\n  \
+           (deps  %a (universe))\n  \
+           (action (system %S))\n\
+           )@."
+          (* rule: *)
+          nth file
+          (* alias: *)
+          (mk_alias cmd "execnow.show")
+          (* deps: *)
+          pp_command_deps cmd (* to get an updated build even in case of using the result *)
+          (* action: *)
+          ("echo '" ^ show_cmd wtest.cmd ^"'");
+        ;
+        List.iteri (fun n log ->
+            Format.fprintf result_fmt
+              "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
+               (alias %s)\n  \
+               (action (diff %S %S))\n\
+               )@."
+              (* rule: *)
+              n nth file
+              (* alias: *)
+              (ptests_alias ~env)
+              (* action: *)
+              (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
+              log
+          ) wtest.log
     in
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
       let pp_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
-          "; TEST FILE %S\n\
-           (alias (deps %a%a) (name %S)) ; to performs all sub-tests related to a file\n\
-           (alias (deps %a%a) (name %S)) ; to reproduce and visualize the all sub-test outputs related to a file@."
-          file
-          (* alias #1 *)
-          pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec.wtests" test_name i) config.dc_commands)
-          pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
-          (Format.sprintf "%s.wtests" test_name)
-          (* alias #2 *)
-          pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
-          pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
-          file;
+        "; TEST FILE %S\n\
+         (alias (deps %a%a) (name %S)) ; to performs all sub-tests related to a file\n\
+         (alias (deps %a%a) (name %S)) ; to reproduce and visualize the all sub-test outputs related to a file@."
+        file
+        (* alias #1 *)
+        pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec.wtests" test_name i) config.dc_commands)
+        pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
+        (Format.sprintf "%s.wtests" test_name)
+        (* alias #2 *)
+        pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
+        pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
+        file;
     end ;
     List.iter make_cmd config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow;
@@ -1667,9 +1683,9 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
          let config = SubDir.make_file directory Test_config.filename in
          if Sys.file_exists config
          then begin
-            let scan_buffer = Scanf.Scanning.from_file config in
-            Test_config.scan_directives ~drop:false directory ~file:config
-              scan_buffer default_config
+           let scan_buffer = Scanf.Scanning.from_file config in
+           Test_config.scan_directives ~drop:false directory ~file:config
+             scan_buffer default_config
          end
          else default_config
        in

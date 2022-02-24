@@ -46,7 +46,7 @@ val is_gui: bool
 (** Is the Frama-C GUI running?
       @since Beryllium-20090601-beta1
       @since frama-c-trunk not anymore a reference
- *)
+*)
 
 val lablgtk: string
 (** Name of the lablgtk version against which Frama-C has been compiled.
@@ -62,12 +62,12 @@ val datadirs: Filepath.Normalized.t list
     @since 19.0-Potassium *)
 
 val datadir: Filepath.Normalized.t
-  (** Last directory of datadirs (the directory of frama-c installation)
-      @since 19.0-Potassium *)
+(** Last directory of datadirs (the directory of frama-c installation)
+    @since 19.0-Potassium *)
 
 val framac_libc: Filepath.Normalized.t
-  (** Directory where Frama-C libc headers are.
-      @since 19.0-Potassium *)
+(** Directory where Frama-C libc headers are.
+    @since 19.0-Potassium *)
 
 val plugin_dir: Filepath.Normalized.t list
 (** Directory where the Frama-C dynamic plug-ins are.

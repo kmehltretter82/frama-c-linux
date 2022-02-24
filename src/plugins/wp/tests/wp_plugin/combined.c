@@ -3,8 +3,8 @@
 */
 
 /* run.config_qualif
-   MODULE: @PTEST_NAME@
-   OPT: -wp-par 1
+   EXECNOW: @PTEST_DIR@/@PTEST_NAME@.cmxs
+   OPT: -wp-par 1 -load-module @PTEST_DIR@/@PTEST_NAME@
 */
 
 /* ZD : this should not be here such as it cannot be tested by all frama-c

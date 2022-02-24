@@ -1,6 +1,6 @@
 (* To use this in interactive mode :
 
-#use "select.ml";;
+#use "tests/slicing/select.ml";;
 *)
 
 exception Break

@@ -167,11 +167,11 @@ force-reconfigure:
 
 
 ##############################################################################
-TEST_DIRS=tests $(wildcard src/plugins/*/tests)
+PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
 
 .PHONY: tests.info
 tests.info:
-	echo "TEST_DIRS=$(TEST_DIRS)"
+	echo "PTEST_DIRS=$(PTEST_DIRS)"
 
 # Note: the public name of ptest.exe is frama-c-ptests
 ptests/ptests.exe: ptests/ptests.ml
@@ -197,17 +197,17 @@ wtests-help:
 # Removes all dune files generated for testing
 .PHONY: purge-tests
 purge-tests:
-	find $(TEST_DIRS) -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty rm
+	find $(PTEST_DIRS) -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty rm
 
 # Force the full cleaning of the testing environment
 .PHONY: clean-tests
 clean-tests: purge-tests
-	rm -rf $(addprefix _build/default/,$(TEST_DIRS))
+	rm -rf $(addprefix _build/default/,$(PTEST_DIRS))
 
 # Generates all dune files used for testing
 .PHONY: run-ptests
-run-ptests: config.sed purge-tests
-	$(PTESTS) $(TEST_DIRS)
+run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
+	$(PTESTS) $(PTEST_DIRS)
 
 # run tests of for all configurations (requires all dune files)
 .PHONY: run-tests
@@ -243,6 +243,172 @@ ifeq ($(FRAMAC_INSTALLDIR),"")
 else
 	dune uninstall --prefix ${FRAMAC_INSTALLDIR}
 endif
+
+################################
+# Code prettyfication and lint #
+################################
+
+# We're interested by any .ml[i]? file in src, except for scripts in test
+# directories, and generated files (in particular lexers and parsers)
+# Note: the find command below is *very* ugly, but it should be POSIX-compliant.
+
+ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -path '*/tests' -prune '!' -name '*')
+ALL_ML_FILES+=ptests/ptests.ml
+
+ifeq ($(origin MANUAL_ML_FILES),undefined)
+MANUAL_ML_FILES:=$(ALL_ML_FILES)
+endif
+
+MANUAL_ML_FILES:=\
+  $(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(MANUAL_ML_FILES))
+
+# Allow control of files to be linted/fixed by external sources
+# (e.g. pre-commit hook that will concentrate on files which have changed)
+
+sinclude .Makefile.lint
+
+HAS_GIT_FILE:=$(wildcard .git/HEAD)
+
+ifeq ("$(HAS_GIT_FILE)","")
+LINT_OTHER_SOURCES:=
+else
+LINT_OTHER_SOURCES:=\
+  $(filter-out \
+    $(shell git ls-tree --name-only HEAD src/plugins/*), \
+    $(wildcard src/plugins/*))
+endif
+
+$(foreach dir,$(LINT_OTHER_SOURCES),$(eval sinclude $(dir)/.Makefile.lint))
+
+ML_LINT_MISSING:=$(filter-out $(MANUAL_ML_FILES), $(ML_LINT_KO))
+
+# By default, also checks files with unknown status:
+# this requires new files to pass lint checker from the beginning
+
+ML_LINT_CHECK?=$(filter-out $(ML_LINT_KO), $(MANUAL_ML_FILES))
+
+# this NEWLINE variable containing a literal newline character is used to avoid
+# the error "argument list too long", in some instances of "foreach".
+# For details, see https://stackoverflow.com/questions/7039811
+define NEWLINE
+
+
+endef
+
+# pre-requisite intentionally left blank: this target should only be used
+# if the file is not present to generate it once and forall,
+# and be edited manually afterwards
+# double colon here tells make not to attempt updating the .Makefile.lint
+# if it does not exist, but just to ignore it.
+.Makefile.lint::
+	echo "ML_LINT_KO:=" >> $@
+	$(foreach file,$(sort $(MANUAL_ML_FILES)), \
+            if ! $(MAKE) ML_LINT_CHECK=$(file) lint; \
+            then echo "ML_LINT_KO+=$(file)" >> $@; fi;$(NEWLINE) )
+
+$(foreach dir,$(LINT_OTHER_SOURCES),\
+  $(eval $(dir)/.Makefile.lint:: ; \
+     $(foreach file, $(sort $(filter $(dir)/%, $(MANUAL_ML_FILES))), \
+            if ! $$(MAKE) ML_LINT_CHECK=$(file) lint; \
+            then echo "ML_LINT_KO+=$(file)" >> $$@; fi; )))
+
+.PHONY: stats-lint
+stats-lint:
+	echo \
+         "scale = 2; bad = $(words $(ML_LINT_MISSING)); \
+          all = $(words $(sort $(MANUAL_ML_FILES))); \
+	  fail = $(words $(ML_LINT_KO)); \
+          \"lint coverage: \"; \
+          ((all - fail) * 100) / all; " | bc
+	echo "number of files supposed to pass lint: $(words $(ML_LINT_CHECK))"
+	echo "number of files supposed to fail lint: $(words $(ML_LINT_KO))"
+ifneq ($(strip $(ML_LINT_MISSING)),)
+	echo "number of files missing from src/ : $(words $(ML_LINT_MISSING))"
+	$(foreach file, $(ML_LINT_MISSING), echo $(file);)
+	exit 1
+endif
+
+INDENT_TARGET= $(patsubst %,%.indent,$(ML_LINT_CHECK))
+
+LINT_TARGET= $(patsubst %,%.lint,$(ML_LINT_CHECK))
+
+FIX_SYNTAX_TARGET=$(patsubst %,%.fix-syntax,$(ML_LINT_CHECK))
+
+.PHONY: $(INDENT_TARGET) $(LINT_TARGET) $(FIX_SYNTAX_TARGET) \
+        indent lint fix-syntax
+
+indent: $(INDENT_TARGET)
+
+lint:: $(LINT_TARGET)
+
+check-ocp-indent-version:
+	if command -v ocp-indent >/dev/null; then \
+		if [ -z "$(shell ocp-indent --version)" ]; then echo "warning: ocp-indent returned an empty string, assuming it is the correct version"; \
+		else \
+			$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
+			$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
+			if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 7 ]; then \
+				echo "error: ocp-indent 1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+			exit 1; \
+			fi; \
+		fi; \
+	else \
+		exit 1; \
+	fi;
+
+fix-syntax: $(FIX_SYNTAX_TARGET)
+
+$(INDENT_TARGET): %.indent: % check-ocp-indent-version
+	ocp-indent -i $<
+
+$(LINT_TARGET): %.lint: % check-ocp-indent-version
+	# See SO 1825552 on mixing grep and \t (and cry)
+	# For OK_NL, we have three cases:
+	# - for empty files, the computation boils down to 0 - 0 == 0
+	# - for non-empty files with a proper \n at the end, to 1 - 1 == 0
+	# - for empty files without \n, to 1 - 0 == 1 that will be catched
+	OK_TAB=$$(grep -c -e "$$(printf '^ *\t')" $<) ; \
+        OK_SPACE=$$(grep -c -e '[[:blank:]]$$' $<) ; \
+        OK_NL=$$(($$(tail -c -1 $< | wc -c) - $$(tail -n -1 $< | wc -l))) ; \
+        OK_EMPTY=$$(tail -n -1 $< | grep -c -e '^[[:blank:]]*$$') ; \
+        ERROR=$$(($$OK_TAB + $$OK_SPACE + $$OK_NL + $$OK_EMPTY)) ; \
+        if test $$ERROR -gt 0; then \
+          echo "File $< does not pass syntactic checks:"; \
+          echo "$$OK_TAB lines indented with tabulation instead of spaces"; \
+          echo "$$OK_SPACE lines with spaces at end of line"; \
+          test $$OK_NL -eq 0 || echo "No newline at end of file"; \
+          test $$OK_EMPTY -eq 0 || echo "Empty line(s) at end of file"; \
+          echo "Please run make ML_LINT_CHECK=$< fix-syntax"; \
+          exit 1 ; \
+        fi
+	ocp-indent $< > $<.tmp;
+	if cmp -s $< $<.tmp; \
+        then rm -f $<.tmp; \
+        else \
+          echo "File $< is not indented correctly."; \
+          echo "Please run make ML_LINT_CHECK=$< indent";\
+          rm $<.tmp; \
+          exit 1; \
+        fi
+
+$(FIX_SYNTAX_TARGET): %.fix-syntax: %
+	$(ISED) -e 's/^ *\t\+/ /' $<
+	$(ISED) -e 's/\(.*[^[:blank:]]\)[[:blank:]]\+$$/\1/' $<
+	$(ISED) -e 's/^[ \t]\+$$//' $<
+	if test \( $$(tail -n -1 $< | wc -l) -eq 0 \) -a \( $$(wc -c $< | cut -d " " -f 1) -gt 0 \) ; then \
+          echo "" >> $<; \
+        else \
+          while tail -n -1 $< | grep -l -e '^[ \t]*$$'; do \
+            head -n -1 $< > $<.tmp; \
+            mv $<.tmp $<; \
+          done; \
+        fi
+
+# Avoid a UTF-8 locale at all cost: in such setting, sed does not work
+# reliably if you happen to have latin-1 encoding somewhere,
+# which is still unfortunately the case in some dark corners of the platform
+%.fix-syntax: LC_ALL = C
+
 
 ###############################################################################
 # Local Variables:

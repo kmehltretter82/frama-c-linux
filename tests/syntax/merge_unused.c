@@ -1,17 +1,7 @@
-<<<<<<< HEAD
-/* run.config*
-EXIT: 1
-  DEPS: merge_unused.h
-  OPT: -cpp-extra-args="-I@PTEST_DIR@" %{dep:@PTEST_NAME@_2.c} -print
-||||||| 754e522ceb
-/* run.config
-OPT: -cpp-extra-args="-I@PTEST_DIR@" @PTEST_DIR@/@PTEST_NAME@_2.c -print
-=======
 /* run.config*
  EXIT: 1
  DEPS: merge_unused.h
   OPT: -cpp-extra-args="-I@PTEST_DIR@" %{dep:@PTEST_DIR@/@PTEST_NAME@_2.c} -print
->>>>>>> origin/master
 */
 #pragma pack(1)
 

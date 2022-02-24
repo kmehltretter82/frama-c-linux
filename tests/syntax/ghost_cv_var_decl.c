@@ -6,8 +6,8 @@
    OPT:
 */
 
-/* When there is no comment, the code should be allowed */
 
+/* When there is no comment, the code should be allowed */
 void f_ints(){
   int ng ;
 

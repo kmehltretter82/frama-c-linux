@@ -22,8 +22,6 @@
 
 (** E-ACSL. *)
 
-open Cil_types
-
 module Options = Options
 module Error = Error
 

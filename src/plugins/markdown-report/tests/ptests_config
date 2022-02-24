@@ -1,1 +1,1 @@
-DEFAULT_SUITES= md sarif
+IGNORE= DEFAULT_SUITES= md sarif

@@ -6,6 +6,7 @@
 */
 
 // All of this should be refused
+
 #ifdef IN_TYPE
 
 struct S {

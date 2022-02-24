@@ -1,4 +1,0 @@
-[kernel] Parsing Longinit_sequencer.i (no preprocessing)
-[kernel] User Error: source file 'long_init.c' does not exist
-[kernel] Frama-C aborted: invalid user input.
-[test-long-init] Keeping temp file result/Longinit_sequencer.sav
