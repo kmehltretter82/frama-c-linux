@@ -40,6 +40,7 @@
 // Enable live-editing in React:
 import 'react-hot-loader/patch' ;
 import React from 'react' ;
+import { ipcRenderer } from 'electron';
 import {
   setApplicationWindow,
   setPreferencesWindow,
@@ -58,6 +59,9 @@ import Preferences from './Preferences' ;
 // Define the application main components for each window:
 setApplicationWindow(Application);
 setPreferencesWindow(Preferences);
+ipcRenderer.send('dome.ipc.settings.window', []);
+ipcRenderer.send('dome.ipc.settings.global', []);
+ipcRenderer.send('dome.ipc.settings.storage', []);
 
 // Mark the main application reloadable and enable live updates:
 module.hot && isApplicationWindow() &&
