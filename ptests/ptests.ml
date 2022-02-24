@@ -1028,17 +1028,22 @@ end = struct
                name = "run.config_" ^ env.config
              in
              let configs = split_config (String.trim names) in
-             if List.exists is_current_config configs then
+             match List.find_opt is_current_config configs with
+             | Some name ->
                (* Found options for current config! *)
+               if !verbosity >= 2 then Format.printf "%% Parsing %s of file=%s@."
+                   name f ;
                scan_directives ~drop:false dir ~file:f scan_buffer default
-             else (* config name does not match: eat config and continue.
+             | None -> begin
+                 (* config name does not match: eat config and continue.
                      But only if the comment is still opened by the end of
                      the line and we are indeed reading a config
-                  *)
+                 *)
                (if List.exists is_config configs &&
                    not (Str.string_match end_comment names 0) then
                   ignore (scan_directives ~drop:true dir ~file:f scan_buffer default);
-                scan_config ()))
+                scan_config ())
+             end)
       in
       let config =
         try
@@ -1047,6 +1052,7 @@ end = struct
           options
         with End_of_file | Scanf.Scan_failure _ ->
           Scanf.Scanning.close_in scan_buffer;
+          if !verbosity >= 2 then Format.printf "%% No run.config directives in file=%s@." f ;
           default
       in
       if config.dc_commands = [] && config.dc_framac
@@ -1686,12 +1692,12 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
-           if !verbosity >= 2 then Format.printf "%% Scan suite directives of file %s@." config ;
+           if !verbosity >= 2 then Format.printf "%% Parsing suite config file=%s@." config ;
            Test_config.scan_directives ~drop:false directory ~file:config
              scan_buffer default_config
          end
          else begin
-           if !verbosity >= 2 then Format.printf "%% There is no suite directive file %s@." config ;
+           if !verbosity >= 2 then Format.printf "%% There is no suite config file=%s@." config ;
            default_config
          end
        in
