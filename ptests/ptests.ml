@@ -420,6 +420,7 @@ let example_msg =
      @@PTEST_NAME@@         # Basename of the test file.@ \
      @@PTEST_NUMBER@@       # Test command number.@ \
      @@PTEST_CONFIG@@       # Test configuration suffix.@ \
+     @@PTEST_SESSION@@      # Set to the value of the environment variable FRAMAC_SESSION.@ \
      @@PTEST_SUITE_DIR@@    # Path to the directory contained the source of the test file (depends from -dune-mode option).@ \
      @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@ \
      @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@ \
@@ -958,7 +959,7 @@ end = struct
   let default_options =
     match !dune_mode with
     | 0 -> !macro_default_options
-    | _ -> !macro_default_options ^ " -add-symbolic-path $FRAMAC_SESSION:."
+    | _ -> !macro_default_options ^ " -add-symbolic-path @PTEST_SESSION@:."
 
   let default_macros () =
     let l = [
@@ -967,6 +968,7 @@ end = struct
       "frama-c",      !macro_frama_c;
       "DEV_NULL",     dev_null;
       "FRAMAC_SHARE",           get_default_env "FRAMAC_SHARE" "";
+      "PTEST_SESSION",          get_default_env "FRAMAC_SESSION" "";
       "PTEST_DEFAULT_OPTIONS",  default_options;
       "PTEST_OPTIONS",          !macro_options;
       "PTEST_PRE_OPTIONS",      !macro_pre_options;
