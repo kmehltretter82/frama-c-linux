@@ -357,6 +357,18 @@ module Region_annot =
       let help = "Register '@region' ACSL Annotations (auto with -wp-region)"
     end)
 
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.is_invisible ()
+module Region_output_dot =
+  Filepath
+    (struct
+      let option_name = "-wp-region-output-dot"
+      let arg_name = "output.dot"
+      let file_kind = "DOT"
+      let existence = Fc_Filepath.Indifferent
+      let help = "Outputs the region graph in DOT format to the specified file."
+    end)
+
 (* ------------------------------------------------------------------------ *)
 (* ---  WP Strategy                                                     --- *)
 (* ------------------------------------------------------------------------ *)
