@@ -281,7 +281,7 @@ let dotgraph dot map =
 let dump_in_file ~file name map =
   if Wp.has_dkey dot_key || Wp.has_dkey pdf_key then
     begin
-      let file = Format.asprintf "%a" Datatype.Filepath.pretty file in
+      let file = Pretty_utils.to_string Datatype.Filepath.pretty file in
       let dot = Dotgraph.open_dot ~attr:[`LR] ~name ~file () in
       dotgraph dot map ;
       Dotgraph.close dot ;
