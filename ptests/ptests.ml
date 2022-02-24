@@ -622,6 +622,7 @@ end = struct
       [ "PTEST_SESSION", env.absolute_tests_dir ^ "/_build/default:.";
         "PTEST_CONFIG", ptest_config;
         "PTEST_DIR", ".";
+        "PTEST_SHARE_DIR", "../../../share";
         "PTEST_RESULT", ".";
         "PTEST_SUITE_DIR", "..";
         "PTEST_FILE", ptest_file;
