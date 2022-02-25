@@ -6,7 +6,7 @@ DEFAULT_SUITES= builtins callgraph cil compliance constant_propagation
 # todo:
 IGNORE= DEFAULT_SUITES= dynamic
 
-DEFAULT_SUITES= float idct impact metrics occurrence pdg pretty_printing
+DEFAULT_SUITES= float idct impact jcdb metrics occurrence pdg pretty_printing
 # todo:
 IGNORE= DEFAULT_SUITES= libc
 
@@ -14,7 +14,7 @@ DEFAULT_SUITES= rte rte_manual saveload scope slicing sparecode spec syntax
 
 DEFAULT_SUITES=
 # todo:
-IGNORE= DEFAULT_SUITES= fc_script jcdb misc make_run_script
+IGNORE= DEFAULT_SUITES= fc_script misc make_run_script
 
 DEFAULT_SUITES= value/traces
 # todo:
