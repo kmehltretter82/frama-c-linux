@@ -35,7 +35,7 @@ import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
 import { Hbox } from 'dome/layout/boxes';
-import { IconButton } from 'dome/controls/buttons';
+import { IconButton, Button } from 'dome/controls/buttons';
 
 import './style.css';
 
@@ -132,7 +132,21 @@ export function Section(props: SectionProps): JSX.Element | null {
   const icon = state ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
 
   const { enabled = true, disabled = false, children } = props;
-  if (disabled || !enabled || React.Children.count(children) === 0) return null;
+  if (disabled || !enabled) return null;
+
+  const noChildContent =
+    <div className='dome-xSideBarSection-content'>
+      <label className='dome-xSideBarSection-info'>
+        {'There is no function to display. Maybe you can change ' +
+         'the filtering options.'}
+      </label>
+      <Button
+        icon='TUNINGS'
+        label='Functions filtering options'
+        onClick={props.onContextMenu}
+        visible={!(props.onContextMenu === undefined)}
+      />
+    </div>;
 
   const visible = unfold ?? state;
   const maxHeight = visible ? 'max-content' : 0;
@@ -149,12 +163,13 @@ export function Section(props: SectionProps): JSX.Element | null {
         />
         <IconButton
           icon='TUNINGS'
+          title={'Functions filtering options'}
           onClick={props.onContextMenu}
           visible={!(props.onContextMenu === undefined)}
         />
       </Hbox>
       <div className='dome-xSideBarSection-content' style={{ maxHeight }}>
-        {children}
+        {React.Children.count(children) === 0 ? noChildContent : children}
       </div>
     </div>
   );

@@ -155,6 +155,23 @@
     transition: max-height 250ms ease-in-out ;
 }
 
+.dome-xSideBarSection-content > .dome-xBoxButton {
+  margin-left: 20px;
+  margin-right: 10px;
+  margin-top: 7px;
+  color: var(--info-text);
+  fill: var(--info-text);
+  display: flex;
+}
+
+.dome-xSideBarSection-info {
+  color: var(--info-text-discrete);
+  font-style: italic;
+  padding-left: 20px;
+  padding-right: 10px;
+  display: block;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- SideBar Items                                                      --- */
 /* -------------------------------------------------------------------------- */
