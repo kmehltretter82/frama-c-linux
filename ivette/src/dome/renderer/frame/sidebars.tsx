@@ -134,7 +134,7 @@ export function Section(props: SectionProps): JSX.Element | null {
   const icon = state ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
 
   const { enabled = true, disabled = false, children } = props;
-  if (disabled || !enabled) return null;
+  if (disabled || !enabled || React.Children.count(children) === 0) return null;
 
   const visible = unfold ?? state;
   const maxHeight = visible ? 'max-content' : 0;

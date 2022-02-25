@@ -184,7 +184,7 @@ export default function Globals(): JSX.Element {
 
   const filterButtonProps = {
     icon: 'TUNINGS',
-    title: 'Functions filtering options',
+    title: `Functions filtering options (${nFilter} / ${nTotal})`,
     onClick: onContextMenu,
     visible: !(onContextMenu === undefined),
     className: 'dome-xSideBarSection-filterButton'
