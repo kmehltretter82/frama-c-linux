@@ -186,7 +186,6 @@ export default function Globals(): JSX.Element {
     icon: 'TUNINGS',
     title: `Functions filtering options (${nFilter} / ${nTotal})`,
     onClick: onContextMenu,
-    className: 'dome-xSideBarSection-filterButton'
   };
 
   const filteredFunctions =
@@ -209,14 +208,9 @@ export default function Globals(): JSX.Element {
   const allFiltered =
     <div className='dome-xSideBarSection-content'>
       <label className='dome-xSideBarSection-info'>
-        {'All functions are filtered. Maybe you can change ' +
-         'the filtering options.'}
+        {'All functions are filtered. Try adjusting function filters.'}
       </label>
-      <Button
-        {...filterButtonProps}
-        className=''
-        label='Functions filtering options'
-      />
+      <Button {...filterButtonProps} label='Functions filters' />
     </div>;
 
   return (
