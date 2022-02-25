@@ -186,7 +186,6 @@ export default function Globals(): JSX.Element {
     icon: 'TUNINGS',
     title: `Functions filtering options (${nFilter} / ${nTotal})`,
     onClick: onContextMenu,
-    visible: !(onContextMenu === undefined),
     className: 'dome-xSideBarSection-filterButton'
   };
 
@@ -214,10 +213,9 @@ export default function Globals(): JSX.Element {
          'the filtering options.'}
       </label>
       <Button
-        icon='TUNINGS'
+        {...filterButtonProps}
+        className=''
         label='Functions filtering options'
-        onClick={onContextMenu}
-        visible={!(onContextMenu === undefined)}
       />
     </div>;
 
