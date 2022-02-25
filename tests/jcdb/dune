@@ -1,0 +1,11 @@
+(subdir
+ result/subdir1
+ (copy_files ../../subdir1/*))
+
+(subdir
+ result/subdir2
+ (copy_files ../../subdir2/*))
+
+(subdir
+ result/logic-pp-include
+ (copy_files ../../logic-pp-include/*))
