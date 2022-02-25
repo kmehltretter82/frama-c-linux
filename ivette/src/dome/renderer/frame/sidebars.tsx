@@ -34,6 +34,8 @@ import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
+import { Hbox } from 'dome/layout/boxes';
+import { IconButton } from 'dome/controls/buttons';
 
 import './style.css';
 
@@ -88,24 +90,6 @@ const makeBadge = (elt: Badges): React.ReactNode => {
 };
 
 // --------------------------------------------------------------------------
-// --- SideBar Section Hide/Show Button
-// --------------------------------------------------------------------------
-
-interface HideShowProps {
-  onClick: () => void;
-  visible: boolean;
-}
-
-const HideShow = (props: HideShowProps): JSX.Element => (
-  <label
-    className="dome-xSideBarSection-hideshow dome-text-label"
-    onClick={props.onClick}
-  >
-    {props.visible ? 'Hide' : 'Show'}
-  </label>
-);
-
-// --------------------------------------------------------------------------
 // --- SideBar Section
 // --------------------------------------------------------------------------
 
@@ -143,32 +127,33 @@ export interface SectionProps {
    Sections with no items are not displayed.
 */
 export function Section(props: SectionProps): JSX.Element | null {
-
-  const [state, flipState] = useFlipSettings(
-    props.settings,
-    props.defaultUnfold,
-  );
+  const { settings, defaultUnfold, unfold } = props;
+  const [state, flipState] = useFlipSettings(settings, defaultUnfold);
+  const icon = state ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
 
   const { enabled = true, disabled = false, children } = props;
-  if (disabled || !enabled || React.Children.count(children) === 0)
-    return null;
-  const { unfold } = props;
-  const foldable = unfold === undefined;
+  if (disabled || !enabled || React.Children.count(children) === 0) return null;
+
   const visible = unfold ?? state;
   const maxHeight = visible ? 'max-content' : 0;
 
   return (
-    <div className="dome-xSideBarSection">
-      <div
-        className="dome-xSideBarSection-title dome-color-frame"
-        title={props.title}
-        onContextMenu={props.onContextMenu}
-      >
-        <Label label={props.label} />
-        {!visible && makeBadge(props.summary)}
-        {foldable && <HideShow visible={visible} onClick={flipState} />}
-      </div>
-      <div className="dome-xSideBarSection-content" style={{ maxHeight }}>
+    <div className='dome-xSideBarSection'>
+      <Hbox>
+        <Label
+          className='dome-xSideBarSection-title dome-color-frame'
+          title={props.title}
+          label={props.label}
+          icon={icon}
+          onClick={flipState}
+        />
+        <IconButton
+          icon='TUNINGS'
+          onClick={props.onContextMenu}
+          visible={!(props.onContextMenu === undefined)}
+        />
+      </Hbox>
+      <div className='dome-xSideBarSection-content' style={{ maxHeight }}>
         {children}
       </div>
     </div>

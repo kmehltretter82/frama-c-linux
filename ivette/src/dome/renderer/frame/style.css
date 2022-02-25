@@ -105,18 +105,24 @@
 .dome-xSideBarSection {
     display: block ;
     padding: 0px ;
+    padding-top: 3px;
 }
 
 .dome-xSideBarSection-title {
+    flex: 1 1 auto;
     position: sticky ;
     top: 0px ;
-    padding-top: 3px ;
+    padding-top: 0px;
     padding-bottom: 0px ;
     padding-left: 3px ;
     padding-right: 2px ;
     display: flex ;
     flex-flow: row nowrap ;
     align-items: center ;
+}
+
+.dome-xSideBarSection-title > .dome-xIcon {
+  padding: 0px;
 }
 
 .dome-xSideBarSection-title > .dome-xLabel {
