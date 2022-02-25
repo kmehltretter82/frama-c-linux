@@ -139,12 +139,12 @@ export function Section(props: SectionProps): JSX.Element | null {
   const visible = unfold ?? state;
   const maxHeight = visible ? 'max-content' : 0;
   const { rightButtonProps: iconProps } = props;
-  const className = 'dome-xSideBarSection-filterButton ' + iconProps?.className;
+  const className = `dome-xSideBarSection-filterButton ${iconProps?.className}`;
   const rightButton =
     iconProps ? <IconButton {...iconProps} className={className}/> : undefined;
 
   return (
-    <div className={'dome-xSideBarSection ' + props.className}>
+    <div className={`dome-xSideBarSection ${props.className}`}>
       <Hbox>
         <Label
           className='dome-xSideBarSection-title dome-color-frame'
