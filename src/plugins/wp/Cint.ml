@@ -194,22 +194,9 @@ let match_positive_or_null e =
   if not (is_positive_or_null e) then raise Not_found;
   e
 
-let highest_bit_number =
-  let hsb p = if p land 2 = 0 then 0 else 1
-  in let hsb p = let n = p lsr 2 in if n = 0 then hsb p else 2 + hsb n
-  in let hsb p = let n = p lsr 4 in if n = 0 then hsb p else 4 + hsb n
-  in let hsb = Array.init 256 hsb
-  in let hsb p = let n = p lsr 8 in if n = 0 then hsb.(p) else 8 + hsb.(n)
-  in let hsb p =
-       let n = Integer.shift_right p Integer.sixteen in
-       Integer.of_int (if Integer.is_zero n
-                       then hsb (Integer.to_int_exn p)
-                       else 16 + hsb (Integer.to_int_exn n))
-  in let rec hsb_aux p =
-       let n = Integer.shift_right p Integer.thirtytwo in
-       if Integer.is_zero n then hsb p
-       else Integer.add Integer.thirtytwo (hsb_aux n)
-  in hsb_aux
+let match_log2 x =
+  (* undefined for 0 and negative values *)
+  Integer.of_int (try Z.log2 x with _ -> raise Not_found)
 
 let match_power2, match_power2_minus1 =
   let is_power2 k = (* exists n such that k == 2**n? *)
@@ -217,14 +204,14 @@ let match_power2, match_power2_minus1 =
     (Integer.equal k (Integer.logand k (Integer.neg k)))
   in let rec match_power2 e = match F.repr e with
       | Logic.Kint z
-        when is_power2 z -> e_zint (highest_bit_number z)
+        when is_power2 z -> e_zint (match_log2 z)
       | Logic.Fun( f , [n;k] )
         when Fun.equal f f_lsl && is_positive_or_null k ->
         e_add k (match_power2 n)
       | _ -> raise Not_found
   in let match_power2_minus1 e = match F.repr e with
       | Logic.Kint z when is_power2 (Integer.succ z) ->
-        e_zint (highest_bit_number (Integer.succ z))
+        e_zint (match_log2 (Integer.succ z))
       | _ -> match_power2 (e_add e_one e)
   in match_power2, match_power2_minus1
 
