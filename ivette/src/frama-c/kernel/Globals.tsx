@@ -186,6 +186,7 @@ export default function Globals(): JSX.Element {
       title={title}
       onContextMenu={onContextMenu}
       defaultUnfold
+      disabled={nTotal === 0}
     >
       {filtered.map((fct) => (
         <FctItem

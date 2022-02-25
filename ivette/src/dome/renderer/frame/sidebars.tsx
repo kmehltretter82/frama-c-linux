@@ -34,7 +34,7 @@ import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
-import { Hbox } from 'dome/layout/boxes';
+import { Hbox, Hfill } from 'dome/layout/boxes';
 import { IconButton, Button } from 'dome/controls/buttons';
 
 import './style.css';
@@ -161,6 +161,8 @@ export function Section(props: SectionProps): JSX.Element | null {
           icon={icon}
           onClick={flipState}
         />
+        {!visible && makeBadge(props.summary)}
+        <Hfill />
         <IconButton
           icon='TUNINGS'
           title={'Functions filtering options'}

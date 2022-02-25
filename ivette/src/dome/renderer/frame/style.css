@@ -109,7 +109,6 @@
 }
 
 .dome-xSideBarSection-title {
-    flex: 1 1 auto;
     position: sticky ;
     top: 0px ;
     padding-top: 0px;
