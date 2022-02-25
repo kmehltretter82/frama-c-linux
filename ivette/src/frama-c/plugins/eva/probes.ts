@@ -33,31 +33,10 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import { ModelCallbacks } from './cells';
 
 /* --------------------------------------------------------------------------*/
-/* --- Probe Labelling                                                    ---*/
-/* --------------------------------------------------------------------------*/
-
-const Ka = 'A'.charCodeAt(0);
-const Kz = 'Z'.charCodeAt(0);
-const LabelSize = 12;
-let La = Ka;
-let Lk = 0;
-
-function newLabel(): string {
-  const a = La;
-  const k = Lk;
-  const lbl = String.fromCharCode(a);
-  if (a < Kz) {
-    La++;
-  } else {
-    La = Ka;
-    Lk++;
-  }
-  return k > 0 ? `${lbl}${k}` : lbl;
-}
-
-/* --------------------------------------------------------------------------*/
 /* --- Probe State                                                        ---*/
 /* --------------------------------------------------------------------------*/
+
+const LabelSize = 12;
 
 export class Probe {
 
@@ -69,7 +48,6 @@ export class Probe {
   prev?: Probe;
   transient = true;
   loading = true;
-  label?: string;
   code?: string;
   stmt?: Ast.marker;
   rank?: number;
@@ -89,27 +67,20 @@ export class Probe {
 
   requestProbeInfo(): void {
     this.loading = true;
-    this.label = '…';
     Server
       .send(Values.getProbeInfo, this.marker)
       .then(({ code, stmt, rank, effects, condition }) => {
         this.code = code;
         this.stmt = stmt;
         this.rank = rank;
-        this.label = undefined;
         this.effects = effects;
         this.condition = condition;
         this.loading = false;
-        if (code && code.length > LabelSize)
-          this.label = newLabel();
-        else
-          this.label = code;
       })
       .catch(() => {
         this.code = '(error)';
         this.stmt = undefined;
         this.rank = undefined;
-        this.label = undefined;
         this.effects = false;
         this.condition = false;
         this.loading = false;
