@@ -210,7 +210,7 @@ export default function Globals(): JSX.Element {
   const allFiltered =
     <div className='dome-xSideBarSection-content'>
       <label className='dome-xSideBarSection-info'>
-        {'There is no function to display. Maybe you can change ' +
+        {'All functions are filtered. Maybe you can change ' +
          'the filtering options.'}
       </label>
       <Button
@@ -228,6 +228,7 @@ export default function Globals(): JSX.Element {
       defaultUnfold
       rightButtonProps={filterButtonProps}
       summary={[nFilter]}
+      className='globals-function-section'
     >
       {nFilter > 0 ? filteredFunctions : nTotal > 0 ? allFiltered : noFunction}
     </Section>

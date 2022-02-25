@@ -114,6 +114,8 @@ export interface SectionProps {
   rightButtonProps?: IconButtonProps;
   /** Section contents. */
   children?: React.ReactNode;
+  /** Additionnal CSS class. */
+  className?: string;
 }
 
 /**
@@ -140,7 +142,7 @@ export function Section(props: SectionProps): JSX.Element | null {
   const rightButton = iconProps ? <IconButton {...iconProps}/> : undefined;
 
   return (
-    <div className='dome-xSideBarSection'>
+    <div className={'dome-xSideBarSection ' + props.className}>
       <Hbox>
         <Label
           className='dome-xSideBarSection-title dome-color-frame'
