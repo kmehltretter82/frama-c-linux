@@ -194,7 +194,7 @@ export default function SourceCode(): JSX.Element {
           onClick={launchEditor}
           title={externalEditorTitle}
         />
-        <Code title={file} style={{ padding: '5px' }}>{filename}</Code>
+        <Code title={file}>{filename}</Code>
         <Hfill />
         {editorButtons}
       </TitleBar>
