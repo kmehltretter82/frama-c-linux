@@ -120,10 +120,6 @@
     align-items: center ;
 }
 
-.dome-xSideBarSection-title > .dome-xIcon {
-  padding: 0px;
-}
-
 .dome-xSideBarSection-title > .dome-xLabel {
     flex: 1 1 ;
     overflow: hidden ;
@@ -133,6 +129,11 @@
 
 .dome-xSideBarSection-title > .dome-xBadge {
     flex: 0 0 ;
+}
+
+.dome-xSideBarSection-filterButton {
+  margin: 0px;
+  padding: 0px;
 }
 
 .dome-xSideBarSection-hideshow {

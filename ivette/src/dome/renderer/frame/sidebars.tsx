@@ -35,7 +35,7 @@ import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
 import { Hbox, Hfill } from 'dome/layout/boxes';
-import { IconButton, Button } from 'dome/controls/buttons';
+import { IconButton, IconButtonProps } from 'dome/controls/buttons';
 
 import './style.css';
 
@@ -72,12 +72,12 @@ export function SideBar(props: SideBarProps): JSX.Element {
 export type BadgeElt = undefined | null | string | number | React.ReactNode;
 export type Badges = BadgeElt | BadgeElt[];
 
-const makeBadgeElt = (elt: BadgeElt): React.ReactNode => {
+const makeBadgeElt = (elt: BadgeElt, index: number): React.ReactNode => {
   if (elt === undefined || elt === null) return null;
   switch (typeof (elt)) {
     case 'number':
     case 'string':
-      return <Badge value={elt} />;
+      return <Badge value={elt} key={`item#${index}`} />;
     default:
       return elt;
   }
@@ -86,7 +86,7 @@ const makeBadgeElt = (elt: BadgeElt): React.ReactNode => {
 const makeBadge = (elt: Badges): React.ReactNode => {
   if (Array.isArray(elt))
     return elt.map(makeBadgeElt);
-  return makeBadgeElt(elt);
+  return makeBadgeElt(elt, 0);
 };
 
 // --------------------------------------------------------------------------
@@ -110,8 +110,8 @@ export interface SectionProps {
   disabled?: boolean;
   /** Badge summary (only visible when folded). */
   summary?: Badges;
-  /** Right-click callback. */
-  onContextMenu?: () => void;
+  /** Additional controls, (only visible when unfolded). */
+  rightButtonProps?: IconButtonProps;
   /** Section contents. */
   children?: React.ReactNode;
 }
@@ -134,22 +134,10 @@ export function Section(props: SectionProps): JSX.Element | null {
   const { enabled = true, disabled = false, children } = props;
   if (disabled || !enabled) return null;
 
-  const noChildContent =
-    <div className='dome-xSideBarSection-content'>
-      <label className='dome-xSideBarSection-info'>
-        {'There is no function to display. Maybe you can change ' +
-         'the filtering options.'}
-      </label>
-      <Button
-        icon='TUNINGS'
-        label='Functions filtering options'
-        onClick={props.onContextMenu}
-        visible={!(props.onContextMenu === undefined)}
-      />
-    </div>;
-
   const visible = unfold ?? state;
   const maxHeight = visible ? 'max-content' : 0;
+  const { rightButtonProps: iconProps } = props;
+  const rightButton = iconProps ? <IconButton {...iconProps}/> : undefined;
 
   return (
     <div className='dome-xSideBarSection'>
@@ -161,17 +149,11 @@ export function Section(props: SectionProps): JSX.Element | null {
           icon={icon}
           onClick={flipState}
         />
-        {!visible && makeBadge(props.summary)}
         <Hfill />
-        <IconButton
-          icon='TUNINGS'
-          title={'Functions filtering options'}
-          onClick={props.onContextMenu}
-          visible={!(props.onContextMenu === undefined)}
-        />
+        {visible ? rightButton : makeBadge(props.summary)}
       </Hbox>
       <div className='dome-xSideBarSection-content' style={{ maxHeight }}>
-        {React.Children.count(children) === 0 ? noChildContent : children}
+        {children}
       </div>
     </div>
   );
