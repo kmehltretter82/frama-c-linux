@@ -71,7 +71,7 @@ stdenv.mkDerivation rec {
 
   buildPhase = ''
     make config.sed
-    dune build --display short @install
+    dune build -j2 --display short @install
   '';
 
   installFlags = [

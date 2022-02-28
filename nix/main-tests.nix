@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
     make ptests/ptests.exe
     make ptests/wtests.exe
     dune exec --root ptests -- frama-c-ptests tests
-    dune build --display short @tests/ptests
+    dune build -j1 --display short @tests/ptests
   '';
 
   # No installation required
