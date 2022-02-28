@@ -1,5 +1,4 @@
 stages:
-  - git-update
   - build
   - tests
   - distrib_and_compatibility
@@ -15,26 +14,15 @@ stages:
 #     OCAML: "4_08"
 
 ################################################################################
-### GIT UPDATE
+### BUILD
 
 check-no-old-frama-c:
-  stage: git-update
+  stage: build
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a HEAD)
     - git merge-base --is-ancestor a35d2118fe6999dddce9e1847eff626fae9cc37c HEAD
   tags:
     - nix
-
-#avoid a nix error https://github.com/NixOS/nix/issues/2087
-git-update:
-  stage: git-update
-  script:
-    - nix-instantiate --eval nix/pkgs.nix -A ocamlPackages.frama-c.src.outPath
-  tags:
-    - nix
-
-################################################################################
-### BUILD
 
 frama-c:
   stage: build
