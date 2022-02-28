@@ -1173,9 +1173,15 @@ module Fmt = struct
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
   let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s
 end
+let pp_list_deps fmt l =
+  List.iter (fun s ->
+      if String.contains s '*' then
+        Format.fprintf fmt " (glob_files %S)" s
+      else
+        Format.fprintf fmt " %S" s) l
 let pp_command_deps fmt command =
   Format.fprintf fmt "%a %S (package frama-c)%a"
-    pp_list command.deps.deps_cmd
+    pp_list_deps command.deps.deps_cmd
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.deps.load_plugin
 
