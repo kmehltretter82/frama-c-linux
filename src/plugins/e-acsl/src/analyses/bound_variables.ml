@@ -699,7 +699,6 @@ end
   let preprocessor = object
     inherit E_acsl_visitor.visitor
 
-    method !glob_annot _ = Cil.DoChildren
     method !vannotation annot =
       match annot with
       | Dfun_or_pred _ -> Cil.DoChildren

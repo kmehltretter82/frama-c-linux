@@ -111,7 +111,7 @@ class visitor
       fun _ _ -> self#default ()
 
     method glob_annot: global_annotation -> global list Cil.visitAction =
-      fun _ -> self#default ()
+      fun _ -> Cil.DoChildren (* do visit ACSL annotations by default *)
 
     method fun_def ({svar = vi}) =
       let kf = try Globals.Functions.get vi with Not_found -> assert false in

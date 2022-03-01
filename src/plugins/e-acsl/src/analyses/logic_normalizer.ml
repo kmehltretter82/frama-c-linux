@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Analyses_types
 
 module Id_predicate =
   Datatype.Make_with_collections
@@ -126,9 +125,6 @@ let preprocess_term ~loc t =
 let preprocessor = object
   inherit E_acsl_visitor.visitor
 
-  (* Only logic functions and logic predicates are handled.
-     E-acsl simply ignores all the other global annotations *)
-  method !glob_annot _ = Cil.DoChildren
   method !vannotation annot =
     match annot with
     | Dfun_or_pred _ -> Cil.DoChildren

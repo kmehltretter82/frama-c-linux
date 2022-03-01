@@ -978,8 +978,11 @@ let get_cast_of_predicate ~lenv p =
 
 let clear = Memo.clear
 
-let typer_visitor lenv = object
+let typing_visitor lenv = object
   inherit E_acsl_visitor.visitor
+
+  (* global logic functions and predicates are evaluated are callsites *)
+  method !glob_annot _ = Cil.SkipChildren
 
   method !vpredicate p =
     (* Do not raise a warning for e-acsl errors at preprocessing time,
@@ -993,13 +996,13 @@ end
 
 let type_program ast =
   Visitor.visitFramacFileSameGlobals
-    (typer_visitor [] :> Visitor.frama_c_inplace)
+    (typing_visitor [] :> Visitor.frama_c_inplace)
     ast
 
 let type_code_annot lenv annot =
   ignore
     (Visitor.visitFramacCodeAnnotation
-       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       (typing_visitor lenv :> Visitor.frama_c_inplace)
        annot)
 
 let preprocess_predicate lenv p =
@@ -1007,7 +1010,7 @@ let preprocess_predicate lenv p =
   Bound_variables.preprocess_predicate p;
   ignore
     (Visitor.visitFramacPredicate
-       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       (typing_visitor lenv :> Visitor.frama_c_inplace)
        p)
 
 let preprocess_rte ~lenv rte =
