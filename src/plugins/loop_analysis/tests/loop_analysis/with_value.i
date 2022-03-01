@@ -1,5 +1,5 @@
 /*run.config
-PLUGIN: from,inout,loopanalysis,eva,scope
+PLUGIN: @PTEST_PLUGIN@ from,inout,eva,scope
 OPT: -eva -eva-show-progress -then -loop
 */
 void f1(int n) {
