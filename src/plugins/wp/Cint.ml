@@ -519,7 +519,7 @@ let smp_bitk_positive = function
       with Not_found ->
       match F.repr a with
       | Logic.Kint za ->
-        let zk = match_integer k (* simplifies constants *)
+        let zk = match_positive_or_null_integer k (* simplifies constants *)
         in if Integer.is_zero (Integer.logand za
                                  (Integer.shift_left Integer.one zk))
         then e_false else e_true
@@ -1291,12 +1291,9 @@ module Masks = struct
              set:Integer.t      (* Mask of the bits set to 1 *)
            }
 
+  exception Bottom
   let is_bottom v =
     not (Integer.is_zero (Integer.logand v.unset v.set))
-
-  let mk ~set ~unset = { unset ; set }
-
-  let top = mk ~set:Integer.zero ~unset:Integer.zero
 
   let is_top v =
     Integer.is_zero v.unset && Integer.is_zero v.set
@@ -1308,6 +1305,34 @@ module Masks = struct
   let is_one_unset mask v =
     if is_bottom v then false
     else not (Integer.is_zero (Integer.logand mask v.unset))
+
+  let is_all_set mask v =
+    if is_bottom v then false
+    else Integer.equal mask (Integer.logand mask v.set)
+
+  let is_all_unset mask v =
+    if is_bottom v then false
+    else Integer.equal mask (Integer.logand mask v.unset)
+
+  let is_equal_no_bottom {unset=u1; set=s1} {unset=u2; set=s2} =
+    Integer.equal u1 u2 && Integer.equal s1 s2
+
+  [@@@ warning "-32"]
+  let is_equal v1 v2 =
+    is_equal_no_bottom v1 v2 || (is_bottom v1 && is_bottom v2)
+
+  let mk ~set ~unset = { unset ; set }
+
+  let mk_exn ~set ~unset =
+    let v = mk ~set ~unset in
+    if is_bottom v then raise Bottom else v
+
+  let of_integer z = mk ~set:z ~unset:(Integer.lognot z)
+
+  (* N.B. there is not a unique bottom value *)
+  let a_bottom = mk ~set:Integer.minus_one ~unset:Integer.minus_one
+
+  let top = mk ~set:Integer.zero ~unset:Integer.zero
 
   [@@@ warning "-32"]
   let pretty_mask fmt m =
@@ -1321,74 +1346,176 @@ module Masks = struct
     else Format.fprintf fmt "set:%a unset:%a"
         pretty_mask v.set pretty_mask v.unset
 
-  let is_equal {unset=u1; set=s1} {unset=u2; set=s2} =
-    Integer.equal u1 u2 &&  Integer.equal s1 s2
+  let rewrite eval ctx e =
+    try
+      let v = eval ctx e in  (* may raise Bottom *)
+      if Integer.equal v.set (Integer.lognot v.unset)
+      then e_zint v.set (* all bits are specified *)
+      else e
+    with Bottom -> e
 
-  let narrow ?(unset=Integer.zero) ?(set=Integer.zero)v  =
-    mk ~unset:(Integer.logor unset v.unset)
-      ~set:(Integer.logor set v.set)
+  (** Eval functions
+      should raise Bottom and never return a bottom *)
 
-  let eval_not eval ctx e =
-    let v = eval ctx e in
-    if is_bottom v then v
-    else mk ~set:v.unset ~unset:v.set
+  let eval_not eval_exn ctx e =
+    let v = eval_exn ctx e in (* may raise Bottom *)
+    mk ~set:v.unset ~unset:v.set (* cannot build a bottom *)
 
   let neutral_land = mk ~set:(Integer.minus_one) ~unset:Integer.zero
-  let eval_land eval ctx es =
+  let eval_land eval_exn ctx es =
     List.fold_left (fun {set;unset} x ->
-        let v = eval ctx x in
-        if is_bottom v then v
-        else mk ~set:(Integer.logand v.set set)
-            ~unset:(Integer.logor v.unset unset))
+        let v = eval_exn ctx x in (* may raise Bottom *)
+        mk ~set:(Integer.logand v.set set) (* cannot build a bottom *)
+          ~unset:(Integer.logor v.unset unset))
       neutral_land es
 
   let neutral_lor = mk ~set:Integer.zero ~unset:(Integer.minus_one)
-  let eval_lor eval ctx es =
+  let eval_lor eval_exn ctx es =
     List.fold_left (fun {set;unset} x ->
-        let v = eval ctx x in
-        if is_bottom v then v
-        else mk ~set:(Integer.logor v.set set)
-            ~unset:(Integer.logand v.unset unset))
+        let v = eval_exn ctx x in (* may raise Bottom *)
+        mk ~set:(Integer.logor v.set set) (* cannot build a bottom *)
+          ~unset:(Integer.logand v.unset unset))
       neutral_lor es
 
-  let eval_to_cint eval ctx iota e =
-    let v = eval ctx e in
-    if is_bottom v then v
-    else
-      let min,max = Ctypes.bounds iota in
-      if not (Ctypes.signed iota) then
-        (* The highest bits are unset *)
-        mk ~set:(Integer.logand v.set max)
-          ~unset:(Integer.logor v.unset (Integer.lognot max))
-      else (* Unsigned int type.
-              So , [min = Integer.lognot max] *)
-        let sign_bit_mask = Integer.succ max in
-        if is_one_unset sign_bit_mask v then
-          (* The sign bit is set to 0.
-             So, the highest bits are unset *)
-          mk ~set:(Integer.logand v.set max)
-            ~unset:(Integer.logor v.unset min)
-        else if is_one_set sign_bit_mask v then
-          (* The sign bit is set to 1.
-             So, the highest bits are set *)
-          mk ~set:(Integer.logor v.set min)
-            ~unset:(Integer.logand v.unset max)
-        else
-          (* The sign is unknown.
-             So, the highest bits are unknown. *)
-          mk ~set:(Integer.logand v.set max)
-            ~unset:(Integer.logand v.unset max)
+  let neutral_lxor = neutral_lor
+  let eval_lxor eval_exn ctx es =
+    let land4 a b c d =
+      Integer.logand (Integer.logand a b) (Integer.logand c d)
+    in
+    List.fold_left (fun {set;unset} x ->
+        let v = eval_exn ctx x in (* may raise Bottom *)
+        let lnot_set = Integer.lognot set
+        and lnot_unset = Integer.lognot unset
+        and v_lnot_set = Integer.lognot v.set
+        and v_lnot_unset = Integer.lognot v.unset
+        in
+        mk ~set:(Integer.logor (* cannot build a bottom *)
+                   (land4 lnot_set unset v.set v_lnot_unset)
+                   (land4 lnot_unset set v.unset v_lnot_set))
+          ~unset:(Integer.logor
+                    (land4 lnot_set unset v.unset v_lnot_set)
+                    (land4 lnot_unset set v.set v_lnot_unset)))
+      neutral_lxor es
 
-  let of_integer set = mk ~set ~unset:(Integer.lognot set)
-  let rewrite eval ctx e =
-    let v = eval ctx e in
-    if Integer.equal v.set (Integer.lognot v.unset)
-    then e_zint v.set (* all bits are specified *)
-    else e
+  let eval_lsr eval_exn ctx x n =
+    try
+      let n = match_positive_or_null_integer n in
+      let v = eval_exn ctx x in (* may raise Bottom *)
+      mk ~set:(Integer.shift_right v.set n) (* cannot build a bottom *)
+        ~unset:(Integer.shift_right v.unset n)
+    with Not_found -> top
+
+  let eval_lsl eval_exn ctx x n =
+    try
+      let n = match_positive_or_null_integer n in
+      let v = eval_exn ctx x in (* may raise Bottom *)
+      mk ~set:(Integer.shift_left v.set n) (* cannot build a bottom *)
+        ~unset:(Integer.shift_left v.unset n)
+    with Not_found -> top
+
+  let eval_to_cint eval_exn ctx iota e =
+    let v = eval_exn ctx e in (* may raise Bottom *)
+    let min,max = Ctypes.bounds iota in
+    if not (Ctypes.signed iota) then
+      (* The highest bits are unset *)
+      mk ~set:(Integer.logand v.set max) (* cannot build a bottom *)
+        ~unset:(Integer.logor v.unset (Integer.lognot max))
+    else (* Unsigned int type.
+              So , [min = Integer.lognot max] *)
+      let sign_bit_mask = Integer.succ max in
+      if is_one_unset sign_bit_mask v then
+        (* The sign bit is set to 0.
+             So, the highest bits are unset *)
+        mk ~set:(Integer.logand v.set max) (* cannot build a bottom *)
+          ~unset:(Integer.logor v.unset min)
+      else if is_one_set sign_bit_mask v then
+        (* The sign bit is set to 1.
+             So, the highest bits are set *)
+        mk ~set:(Integer.logor v.set min) (* cannot build a bottom *)
+          ~unset:(Integer.logand v.unset max)
+      else
+        (* The sign is unknown.
+           So, the highest bits are unknown. *)
+        mk ~set:(Integer.logand v.set max) (* cannot build a bottom *)
+          ~unset:(Integer.logand v.unset max)
+
+  (** Narrow *)
+
+  (* may raise Bottom *)
+  let narrow_exn ?(unset=Integer.zero) ?(set=Integer.zero) v =
+    mk_exn ~unset:(Integer.logor unset v.unset)
+      ~set:(Integer.logor set v.set)
+
+  (** Reduce
+      may raise Bottom *)
+
+  let reduce_land reduce_exn ctx v es =
+    try
+      let k,es = match_list_head match_integer es in
+      (* N.B. requires v<>bottom *)
+      let unset = Integer.logand
+          (Integer.logor v.set v.unset)
+          (Integer.logxor v.set k)
+      in
+      reduce_exn ctx (F.e_fun f_land es) { v with unset }
+    with Not_found ->
+      if Integer.is_zero v.set then ctx else
+        List.fold_left (fun ctx t ->
+            (* bit(&ei... ,kv) ==> bit(ei,kv) *)
+            reduce_exn ctx t { top with set = v.set })
+          ctx es
+
+  let reduce_lor reduce_exn ctx v es =
+    try
+      let k,es = match_list_head match_integer es in
+      (* N.B. requires v<>bottom *)
+      let set = Integer.logand (Integer.logor v.set v.unset)
+          (Integer.logxor v.set k)
+      in
+      reduce_exn ctx (F.e_fun f_land es) { v with set }
+    with Not_found ->
+      if Integer.is_zero v.unset then ctx else
+        List.fold_left (fun ctx t ->
+            (* !bit(|ei... ,kv) ==>!bit(ei,kv) *)
+            reduce_exn ctx t { top with unset = v.unset })
+          ctx es
+
+  let reduce_lnot reduce_exn ctx v e =
+    reduce_exn ctx e (mk ~set:v.unset ~unset:v.set)
+
+  let reduce_to_cint reduce_exn ctx v iota e =
+    (* The lowest bits can be reduced *)
+    let mask = if not (Ctypes.signed iota) then
+        snd (Ctypes.bounds iota)
+      else
+        let min,max = (Ctypes.bounds iota) in
+        Integer.sub max min
+    in
+    reduce_exn ctx e (mk ~set:(Integer.logand mask v.set)
+                        ~unset:(Integer.logand mask v.unset))
+
+  let reduce_lsr reduce_exn ctx v e n =
+    try (* yes, that uses the opposite shift *)
+      let n = match_positive_or_null_integer n in
+      reduce_exn ctx e (mk ~set:(Integer.shift_left v.set   n)
+                          ~unset:(Integer.shift_left v.unset n))
+    with Not_found -> ctx
+
+  let reduce_lsl narrow_exn t reduce_exn ctx v e n =
+    try (* yes, that uses the opposite shift *)
+      let n = match_positive_or_null_integer n in
+      (* the lowest bits of the left shift have to be set *)
+      let ctx = narrow_exn ctx t { top with unset = two_power_k_minus1 n } in
+      reduce_exn ctx e (mk ~set:(Integer.shift_right v.set n)
+                          ~unset:(Integer.shift_right v.unset n))
+    with Not_found -> ctx
+
 end
 
 module MasksDomain = struct
 
+  (* - the domain values never contains a bottom
+     - the key is never a Kint term *)
   type t = Masks.t Tmap.t
 
   [@@@ warning "-32"]
@@ -1411,7 +1538,49 @@ module MasksDomain = struct
     Wp_parameters.debug ~dkey "- Get %a@." pretty (t,r);
     r
 
-  let narrow ctx t (v:Masks.t) =
+  (* N.B. Catches the Masks.Bottom raised during evaluations *)
+  let eval ~level (ctx:t) t =
+    let eval get_exn ctx e = (* may raise Masks.Bottom *)
+      match F.repr e with
+      | Kint set -> Masks.mk ~set ~unset:(Integer.lognot set)
+      | Fun(f,es) when f == f_land -> Masks.eval_land get_exn ctx es
+      | Fun(f,es) when f == f_lor  -> Masks.eval_lor  get_exn ctx es
+      | Fun(f,es) when f == f_lxor -> Masks.eval_lxor get_exn ctx es
+      | Fun(f,[e;n]) when f == f_lsr -> Masks.eval_lsr get_exn ctx e n
+      | Fun(f,[e;n]) when f == f_lsl -> Masks.eval_lsl get_exn ctx e n
+      | Fun(f,[e]) when f == f_lnot -> Masks.eval_not get_exn ctx e
+      | Fun(f,[e]) ->
+        (try
+           let iota = to_cint f in (* may raise Not_found *)
+           Masks.eval_to_cint get_exn ctx iota e
+         with Not_found -> Masks.top)
+      | _ -> Masks.top
+    in
+    let eval_narrow_exn eval_subterm_exn ctx t =
+      let ({Masks.set;unset} as v) =
+        eval eval_subterm_exn ctx t  (* may raises Masks.Bottom *)
+      in try
+        let v = get ctx t in
+        Masks.narrow_exn ~unset ~set v (* may raises Masks.Bottom *)
+      with Not_found -> v
+    in
+    let rec eval_rec_exn ctx t = eval_narrow_exn eval_rec_exn ctx t in
+    let r = try
+        match level with
+        | 0 -> eval get ctx t (* from what is in the table for the sub-terms *)
+        | 1 -> (* 0 + narrowing from from what is in the table for the term *)
+          eval_narrow_exn get ctx t
+        | _ -> (* 1 + recursive *)
+          eval_rec_exn ctx t
+      with Masks.Bottom -> Masks.a_bottom
+    in
+    Wp_parameters.debug ~dkey "* Eval ~level:%d %a@." level pretty (t,r);
+    r
+
+  (* [narrow_exn ctx t v] is the only one low level way to extend the [ctx]
+     domain map and the key [t] is always an {i int} term.
+     May raise Lang.Contradiction. *)
+  let narrow_exn ctx t (v:Masks.t) =
     if Masks.is_top v then ctx
     else if Masks.is_bottom v then
       (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
@@ -1424,45 +1593,20 @@ module MasksDomain = struct
               Wp_parameters.debug ~dkey "* Assume %a@." pretty (t,v);
               Some v
             | (Some old) as old' ->
-              let v = Masks.narrow ~unset:v.unset ~set:v.set old in
-              if Masks.is_bottom v then
-                (Wp_parameters.debug ~dkey "* Assume FALSE: %a@."
-                   pretty (t,v);
-                 raise Lang.Contradiction)
-              else if Masks.is_equal v old then old'
+              let v = try
+                  Masks.narrow_exn ~unset:v.unset ~set:v.set old
+                with Masks.Bottom ->
+                  Wp_parameters.debug ~dkey "* Assume FALSE: %a@."
+                    pretty (t,Masks.a_bottom);
+                  raise Lang.Contradiction
+              in
+              (* there is no bottom values in the map domains *)
+              if Masks.is_equal_no_bottom v old then old' (* no narrowing *)
               else
                 (Wp_parameters.debug ~dkey "* Assume %a@." pretty (t,v);
                  Some v)) t v ctx
 
-  let eval ~level (ctx:t) t =
-    let eval get ctx e =
-      match F.repr e with
-      | Kint set -> Masks.mk ~set ~unset:(Integer.lognot set)
-      | Fun(f,es) when f == f_land -> Masks.eval_land get ctx es
-      | Fun(f,es) when f == f_lor -> Masks.eval_lor get ctx es
-      | Fun(f,[e]) when f == f_lnot -> Masks.eval_not get ctx e
-      | Fun(f,[e]) ->
-        (try
-           let iota = to_cint f in (* may raise Not_found *)
-           Masks.eval_to_cint get ctx iota e
-         with Not_found -> Masks.top)
-      | _ -> Masks.top
-    in
-    let eval_narrow eval_subterm ctx t =
-      let ({Masks.set;unset} as v) = eval eval_subterm ctx t in
-      (try Masks.narrow ~unset ~set (get ctx t) with Not_found -> v)
-    in
-    let rec eval_rec ctx t = eval_narrow eval_rec ctx t in
-    let r = match level with
-      | 0 -> eval get ctx t (* from what is in the table for the sub-terms *)
-      | 1 -> (* 0 + narrowing from from what is in the table for the term *)
-        eval_narrow get ctx t
-      | _ -> (* 1 + recursive *)
-        eval_rec ctx t
-    in
-    Wp_parameters.debug ~dkey "* Eval ~level:%d %a@." level pretty (t,r);
-    r
-
+  (* may raise Lang.Contradiction *)
   let rec reduce ctx t (v:Masks.t) =
     Wp_parameters.debug ~dkey "- Reduce %a@." pretty (t,v);
     let ctx =
@@ -1471,60 +1615,31 @@ module MasksDomain = struct
         (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
          raise Lang.Contradiction)
       else match F.repr t with
-        | Fun(f,es) when f == f_land -> begin
-            try
-              let k,es = match_list_head match_integer es in
-              (* N.B. requires v<>bottom *)
-              let unset = Integer.logand
-                  (Integer.logor v.Masks.set v.Masks.unset)
-                  (Integer.logxor v.Masks.set k)
-              in
-              reduce ctx (F.e_fun f_land es) { v with unset }
-            with Not_found ->
-              if Integer.is_zero v.set then ctx else
-                List.fold_left (fun ctx t ->
-                    (* bit(&ei... ,kv) ==> bit(ei,kv) *)
-                    reduce ctx t { Masks.top with Masks.set = v.Masks.set })
-                  ctx es
-          end
-        | Fun(f,es) when f == f_lor -> begin
-            try
-              let k,es = match_list_head match_integer es in
-              (* N.B. requires v<>bottom *)
-              let set = Integer.logand (Integer.logor v.set v.unset)
-                  (Integer.logxor v.set k)
-              in
-              reduce ctx (F.e_fun f_land es) { v with set }
-            with Not_found ->
-              if Integer.is_zero v.unset then ctx else
-                List.fold_left (fun ctx t ->
-                    (* !bit(|ei... ,kv) ==>!bit(ei,kv) *)
-                    reduce ctx t { Masks.top with Masks.set = v.Masks.unset })
-                  ctx es
-          end
-        | Fun(f,[e]) when f == f_lnot ->
-          reduce ctx e (Masks.mk ~set:v.Masks.unset ~unset:v.Masks.set)
-        | Fun(f,[x]) -> begin
+        | Fun(f,es) when f == f_land -> Masks.reduce_land reduce ctx v es
+        | Fun(f,es) when f == f_lor -> Masks.reduce_lor reduce ctx v es
+        | Fun(f,[e]) when f == f_lnot -> Masks.reduce_lnot reduce ctx v e
+        | Fun(f,[e;n]) when f == f_lsr -> Masks.reduce_lsr reduce ctx v e n
+        | Fun(f,[e;n]) when f == f_lsl -> Masks.reduce_lsl narrow_exn t reduce ctx v e n
+        | Fun(f,[e]) -> begin
             try
               let iota = to_cint f in (* may raise Not_found *)
-              (* The lowest bits can be reduced *)
-              let mask = if not (Ctypes.signed iota) then
-                  snd (Ctypes.bounds iota)
-                else
-                  let min,max = (Ctypes.bounds iota) in
-                  Integer.sub max min
-              in
-              reduce ctx x { set   = Integer.logand mask v.set ;
-                             unset = Integer.logand mask v.unset }
+              Masks.reduce_to_cint reduce ctx v iota e
             with Not_found -> ctx
           end
         | _ -> ctx
     in
-    let {Masks.set;unset} =
-      (* level 1 est unnecessary since the narrowing is done just after,
-         level 2 may give better results *)
-      eval ~level:0 ctx t
-    in narrow ctx t (Masks.narrow ~unset ~set v)
+    let v =
+      let {Masks.set;unset} =
+        (* level 1 est unnecessary since the narrowing is done just after,
+           level 2 may give better results *)
+        eval ~level:0 ctx t
+      in
+      try Masks.narrow_exn ~unset ~set v (* may raise Masks.Bottom *)
+      with Masks.Bottom ->
+        Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,Masks.a_bottom);
+        raise Lang.Contradiction
+    in
+    narrow_exn ctx t v
 
   (* @raises [Lang.Contradiction] when [h] introduces a contradiction *)
   let assume ctx h = (* [rtx = assume ctx h] such that [h |- ctx ==> rtx] *)
@@ -1539,13 +1654,13 @@ module MasksDomain = struct
           reduce ctx x { Masks.top with unset =Integer.lognot mask }
         else ctx
       | Fun(f,[x;k]) when f == f_bit_positive ->
-        let k = match_integer k in (* may raise Not_found *)
+        let k = match_positive_or_null_integer k in (* may raise Not_found *)
         if Integer.le Integer.zero k then
           reduce ctx x { Masks.top with set = two_power_k k }
         else ctx
       | Not x -> begin match F.repr x with
           | Fun(f,[x;k]) when f == f_bit_positive ->
-            let k = match_integer k in
+            let k = match_positive_or_null_integer k in
             if Integer.le Integer.zero k then
               reduce ctx x { Masks.top with unset = two_power_k k }
             else ctx
@@ -1568,22 +1683,21 @@ let mask_simplifier =
     | Kint _ -> e
     | Fun(f,[x;k]) when highest &&
                         f == f_bit_positive -> (* rewrites [bit_test(x,k)] *)
-      (try let k = match_integer k in (* may raise Not_found *)
+      (try let k = match_positive_or_null_integer k in (* may raise Not_found *)
          let v = MasksDomain.eval ~level:1 ctx x in
-         if Masks.is_bottom v then
-           (* Does not rewrite [e] because the polarity is unknown *)
-           e
+         let mask = two_power_k k in (* may raise Not_found *)
+         if Masks.is_one_set mask v then
+           (* [ctx] gives that the bit [k] of [x] is set *)
+           e_true
+         else if Masks.is_one_unset mask v then
+           (* [ctx] gives that the bit [k] of [x] is unset *)
+           e_false
          else
-           let mask = two_power_k k in (* may raise Not_found *)
-           if Masks.is_one_set mask v then
-             (* [ctx] gives that the bit [k] of [x] is set *)
-             e_true
-           else if Masks.is_one_unset mask v then
-             (* [ctx] gives that the bit [k] of [x] is unset *)
-             e_false
-           else e
+           (* note: does not rewrite [e] when is_bottom v
+              because the polarity is unknown *)
+           e
        with _ -> e)
-    | Eq (a, b) when highest ->
+    | Eq (a, b) when highest && is_int a && is_int b ->
       (try
          let b = match_integer b in (* may raise Not_found *)
          match F.repr a with
@@ -1605,21 +1719,21 @@ let mask_simplifier =
                  Masks.eval_land (fun _ctx i -> i) ctx
                    (List.map (MasksDomain.eval  ~level:1 ctx) es)
              in
-             if Masks.is_bottom v then
-               (* Does not rewrite [e] because the polarity is unknown *)
-               e
-             else if Masks.is_one_unset set v then
+             if Masks.is_one_unset set v then
                (* Some bits of [t] that has to be set is unset *)
                e_false
              else if Masks.is_one_set unset v then
                (* Some bits of [t] that has to be unset is set *)
                e_false
-             else if (Integer.equal (Integer.logand set v.Masks.set) set) &&
-                     (Integer.equal (Integer.logand unset v.unset) unset)
+             else if Masks.is_all_set set v
+                  && Masks.is_all_unset unset v
              then (* The bits of [t] that have to be set are set &&
                      those that have to be unset are unset *)
                e_true
-             else e
+             else
+               (* note: does not rewrite [e] when is_bottom v
+                  because the polarity is unknown *)
+               e
          | _ -> e
        with _ -> e)
     | _ when is_int e -> Masks.rewrite (MasksDomain.eval ~level:1) ctx e
