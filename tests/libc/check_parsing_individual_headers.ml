@@ -7,16 +7,17 @@ let header_re = Str.regexp ".*\\.h$"
 let is_header f = Str.string_match header_re f 0
 
 (* Files which are *not* supposed to be parsed *)
-let blacklist () =
-  let libc = (Filename.concat (Sys.getenv "FRAMAC_SHARE") "libc") in
+let blacklist libc_dir =
   List.map (fun f ->
-      Datatype.Filepath.of_string (Filename.concat libc f))
+      Datatype.Filepath.concat libc_dir f)
     ["tgmath.h"; "complex.h"; "__fc_machdep_linux_shared.h"]
 
 (* only goes down one level, which is enough for the libc *)
-let collect_headers libc_dir =
+let collect_headers () =
+  let libc_dir = Kernel.Share.get_dir ~mode:`Must_exist "libc" in
+  let libc_dir_files = Array.to_list (Sys.readdir (libc_dir :> string)) in
   let contents =
-    List.map (Filename.concat libc_dir) (Array.to_list (Sys.readdir libc_dir))
+    List.map (Filename.concat (libc_dir :> string)) libc_dir_files
   in
   let subdirs = List.filter Sys.is_directory contents in
   let base_headers = List.filter is_header contents in
@@ -29,7 +30,7 @@ let collect_headers libc_dir =
     ) base_headers subdirs
   in
   let all_headers = List.sort Extlib.compare_ignore_case all_headers in
-  let to_skip = blacklist () in
+  let to_skip = blacklist libc_dir in
   List.iter (fun header ->
       let header_path = Datatype.Filepath.of_string header in
       if List.mem header_path to_skip then
@@ -42,4 +43,4 @@ let collect_headers libc_dir =
     ) all_headers
 
 let () =
-  Db.Main.apply (collect_headers (Filename.concat (Sys.getenv "FRAMAC_SHARE") "libc"))
+  Db.Main.extend collect_headers
