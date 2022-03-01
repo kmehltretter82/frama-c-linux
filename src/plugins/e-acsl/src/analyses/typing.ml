@@ -812,107 +812,105 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
   (t1, lv, t2)
 
 and type_predicate ~lenv p =
-  match Logic_normalizer.get_pred p with
-  | PoT_term t -> type_term ~use_gmp_opt:true ~lenv t
-  | PoT_pred p ->
-    Cil.CurrentLoc.set p.pred_loc;
-    (* this pattern matching also follows the formal rules of the JFLA's paper *)
-    let op =
-      match p.pred_content with
-      | Pfalse | Ptrue -> c_int
-      | Papp(li, _, args) ->
-        begin
-          match li.l_body with
-          | LBpred p ->
-            let typed_args =
-              type_args
-                ~use_gmp_opt:true
-                ~lenv
-                li.l_profile
-                args
-                li.l_var_info.lv_name
-            in
-            ignore (type_predicate ~lenv:typed_args p);
-            List.iter Interval.Env.remove li.l_profile
-          | LBnone -> ()
-          | LBreads _ -> ()
-          | LBinductive _ -> ()
-          | LBterm _ ->
-            Options.fatal "unexpected logic definition"
-              Printer.pp_predicate p
-        end;
-        c_int
-      | Pdangling _ -> Error.not_yet "\\dangling"
-      | Prel(_, t1, t2) ->
-        let i1 = Interval.infer t1 in
-        let i2 = Interval.infer t2 in
-        let i = Interval.join i1 i2 in
-        let ctx = mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i) in
-        ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t1);
-        ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t2);
-        (match ctx with
-         | Nan -> c_int
-         | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx)
-      | Pand(p1, p2)
-      | Por(p1, p2)
-      | Pxor(p1, p2)
-      | Pimplies(p1, p2)
-      | Piff(p1, p2) ->
-        ignore (type_predicate ~lenv p1);
-        ignore (type_predicate ~lenv p2);
-        c_int
-      | Pnot p ->
-        ignore (type_predicate ~lenv p);
-        c_int
-      | Pif(t, p1, p2) ->
-        let ctx = mk_ctx ~use_gmp_opt:false c_int in
-        ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t);
-        ignore (type_predicate ~lenv p1);
-        ignore (type_predicate ~lenv p2);
-        c_int
-      | Plet(li, p) ->
-        let li_t = Misc.term_of_li li in
-        type_letin li li_t;
-        ignore (type_term ~use_gmp_opt:true ~lenv li_t);
-        (type_predicate ~lenv p).ty
-      | Pforall _
-      | Pexists _ ->
-        begin
-          let guards, goal =
-            Error.retrieve_preprocessing
-              "preprocessing of quantified predicate"
-              Bound_variables.get_preprocessed_quantifier
-              p
-              Printer.pp_predicate
+  let p = Logic_normalizer.get_pred p in
+  Cil.CurrentLoc.set p.pred_loc;
+  (* this pattern matching also follows the formal rules of the JFLA's paper *)
+  let op =
+    match p.pred_content with
+    | Pfalse | Ptrue -> c_int
+    | Papp(li, _, args) ->
+      begin
+        match li.l_body with
+        | LBpred p ->
+          let typed_args =
+            type_args
+              ~use_gmp_opt:true
+              ~lenv
+              li.l_profile
+              args
+              li.l_var_info.lv_name
           in
-          let guards =
-            List.map
-              (fun (t1, x, t2) ->
-                 type_bound_variables ~loc:p.pred_loc ~lenv (t1, x, t2))
-              guards
-          in Bound_variables.replace p guards goal;
-          (type_predicate ~lenv goal).ty
-        end
-      | Pseparated tlist ->
-        List.iter
-          (fun t ->
-             ignore
-               (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t))
-          tlist;
-        c_int
-      | Pinitialized(_, t)
-      | Pfreeable(_, t)
-      | Pallocable(_, t)
-      | Pvalid(_, t)
-      | Pvalid_read(_, t)
-      | Pobject_pointer(_,t)
-      | Pvalid_function t ->
-        ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t);
-        c_int
-      | Pat(p, _) -> (type_predicate ~lenv p).ty
-      | Pfresh _ -> Error.not_yet "\\fresh"
-    in
-    coerce ~arith_operand:false ~ctx:c_int ~op c_int
+          ignore (type_predicate ~lenv:typed_args p);
+          List.iter Interval.Env.remove li.l_profile
+        | LBnone -> ()
+        | LBreads _ -> ()
+        | LBinductive _ -> ()
+        | LBterm _ ->
+          Options.fatal "unexpected logic definition"
+            Printer.pp_predicate p
+      end;
+      c_int
+    | Pdangling _ -> Error.not_yet "\\dangling"
+    | Prel(_, t1, t2) ->
+      let i1 = Interval.infer t1 in
+      let i2 = Interval.infer t2 in
+      let i = Interval.join i1 i2 in
+      let ctx = mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i) in
+      ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx ~lenv t2);
+      (match ctx with
+       | Nan -> c_int
+       | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx)
+    | Pand(p1, p2)
+    | Por(p1, p2)
+    | Pxor(p1, p2)
+    | Pimplies(p1, p2)
+    | Piff(p1, p2) ->
+      ignore (type_predicate ~lenv p1);
+      ignore (type_predicate ~lenv p2);
+      c_int
+    | Pnot p ->
+      ignore (type_predicate ~lenv p);
+      c_int
+    | Pif(t, p1, p2) ->
+      let ctx = mk_ctx ~use_gmp_opt:false c_int in
+      ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t);
+      ignore (type_predicate ~lenv p1);
+      ignore (type_predicate ~lenv p2);
+      c_int
+    | Plet(li, p) ->
+      let li_t = Misc.term_of_li li in
+      type_letin li li_t;
+      ignore (type_term ~use_gmp_opt:true ~lenv li_t);
+      (type_predicate ~lenv p).ty
+    | Pforall _
+    | Pexists _ ->
+      begin
+        let guards, goal =
+          Error.retrieve_preprocessing
+            "preprocessing of quantified predicate"
+            Bound_variables.get_preprocessed_quantifier
+            p
+            Printer.pp_predicate
+        in
+        let guards =
+          List.map
+            (fun (t1, x, t2) ->
+               type_bound_variables ~loc:p.pred_loc ~lenv (t1, x, t2))
+            guards
+        in Bound_variables.replace p guards goal;
+        (type_predicate ~lenv goal).ty
+      end
+    | Pseparated tlist ->
+      List.iter
+        (fun t ->
+           ignore
+             (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t))
+        tlist;
+      c_int
+    | Pinitialized(_, t)
+    | Pfreeable(_, t)
+    | Pallocable(_, t)
+    | Pvalid(_, t)
+    | Pvalid_read(_, t)
+    | Pobject_pointer(_,t)
+    | Pvalid_function t ->
+      ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~lenv t);
+      c_int
+    | Pat(p, _) -> (type_predicate ~lenv p).ty
+    | Pfresh _ -> Error.not_yet "\\fresh"
+  in
+  coerce ~arith_operand:false ~ctx:c_int ~op c_int
 
 let type_term ~use_gmp_opt ?ctx ~lenv t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
@@ -980,28 +978,31 @@ let get_cast_of_predicate ~lenv p =
 
 let clear = Memo.clear
 
-let typer_visitor lenv = object
+let typing_visitor lenv = object
   inherit E_acsl_visitor.visitor
+
+  (* global logic functions and predicates are evaluated are callsites *)
+  method !glob_annot _ = Cil.SkipChildren
 
   method !vpredicate p =
     (* Do not raise a warning for e-acsl errors at preprocessing time,
        those errrors are stored in the table and warnings are raised at
-       translation time*)
-    let _ = try type_named_predicate ~lenv p
-      with Error.Not_yet _ | Error.Typing_error _  -> ()
-    in
+       translation time *)
+    ignore
+      (try type_named_predicate ~lenv p
+       with Error.Not_yet _ | Error.Typing_error _  -> ());
     Cil.SkipChildren
 end
 
 let type_program ast =
   Visitor.visitFramacFileSameGlobals
-    (typer_visitor [] :> Visitor.frama_c_inplace)
+    (typing_visitor [] :> Visitor.frama_c_inplace)
     ast
 
 let type_code_annot lenv annot =
   ignore
     (Visitor.visitFramacCodeAnnotation
-       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       (typing_visitor lenv :> Visitor.frama_c_inplace)
        annot)
 
 let preprocess_predicate lenv p =
@@ -1009,7 +1010,7 @@ let preprocess_predicate lenv p =
   Bound_variables.preprocess_predicate p;
   ignore
     (Visitor.visitFramacPredicate
-       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       (typing_visitor lenv :> Visitor.frama_c_inplace)
        p)
 
 let preprocess_rte ~lenv rte =

@@ -310,36 +310,34 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
 and to_exp ~adata ?name kf ?rte env p =
-  match Logic_normalizer.get_pred p with
-  | PoT_term t -> Translate_terms.to_exp ~adata kf env t
-  | PoT_pred p ->
-    let rte = match rte with None -> Env.generate_rte env | Some b -> b in
-    Extlib.flatten
-      (Env.with_params_and_result
-         ~rte:false
-         ~f:(fun env ->
-             let e, adata, env =
-               predicate_content_to_exp ~adata ?name kf env p
-             in
-             let env = if rte then !translate_rte_exp_ref kf env e else env in
-             let cast =
-               Typing.get_cast_of_predicate
-                 ~lenv:(Env.Local_vars.get env)
-                 p
-             in
-             Extlib.nest
-               adata
-               (Typed_number.add_cast
-                  ~loc:p.pred_loc
-                  ?name
-                  env
-                  kf
-                  cast
-                  Typed_number.C_number
-                  None
-                  e)
-           )
-         env)
+  let p = Logic_normalizer.get_pred p in
+  let rte = match rte with None -> Env.generate_rte env | Some b -> b in
+  Extlib.flatten
+    (Env.with_params_and_result
+       ~rte:false
+       ~f:(fun env ->
+           let e, adata, env =
+             predicate_content_to_exp ~adata ?name kf env p
+           in
+           let env = if rte then !translate_rte_exp_ref kf env e else env in
+           let cast =
+             Typing.get_cast_of_predicate
+               ~lenv:(Env.Local_vars.get env)
+               p
+           in
+           Extlib.nest
+             adata
+             (Typed_number.add_cast
+                ~loc:p.pred_loc
+                ?name
+                env
+                kf
+                cast
+                Typed_number.C_number
+                None
+                e)
+         )
+       env)
 
 let generalized_untyped_to_exp ~adata ?name kf ?rte env p =
   (* If [rte] is true, it means we're translating the root predicate of an
