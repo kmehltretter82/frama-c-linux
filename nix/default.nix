@@ -253,7 +253,7 @@ pkgs.lib.makeExtensible
           HOME=$(pwd)/home
           why3 config detect
           make src/plugins/aorai/tests/ptests_config
-          make PTESTS_OPTS="-config prove -error-code" Aorai_TESTS
+          make PTESTS_OPTS="-error-code" aorai-test-prove
         '';
 
         installPhase = ''
