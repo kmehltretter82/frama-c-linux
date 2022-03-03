@@ -3,6 +3,7 @@
 */
 
 /* run.config_qualif
+
    OPT: -ulevel=1 -wp-prop=@ensures -wp-prover script
 */
 

@@ -4,6 +4,7 @@
 
 /* run.config_qualif
    SCRIPT: TacNOP
+
    OPT: -wp -wp-par 1 -wp-prover script
 */
 

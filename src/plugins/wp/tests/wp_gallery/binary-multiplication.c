@@ -3,6 +3,7 @@
 */
 
 /* run.config_qualif
+
    OPT: -wp-rte -wp-prover=alt-ergo,script -wp-prop=-lack
 */
 
