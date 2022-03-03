@@ -29,7 +29,7 @@ val pp_script_for : Format.formatter -> Wpo.t -> unit
 
 val get : Wpo.t -> script
 val exists : Wpo.t -> bool
-val save : Wpo.t -> Json.t -> unit
+val save : stdout:bool -> Wpo.t -> Json.t -> unit
 val load : Wpo.t -> Json.t
 val remove : Wpo.t -> unit
 

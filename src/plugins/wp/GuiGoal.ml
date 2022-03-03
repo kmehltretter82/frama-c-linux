@@ -297,7 +297,7 @@ class pane (gprovers : GuiConfig.provers) =
       | Proof p ->
         let main = ProofEngine.main p in
         let json = ProofScript.encode (ProofEngine.script p) in
-        ProofSession.save main json ;
+        ProofSession.save ~stdout:false main json ;
         ProofEngine.set_saved p true ;
         self#update
           (*

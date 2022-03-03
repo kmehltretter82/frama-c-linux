@@ -93,11 +93,15 @@ let remove wpo =
       Hashtbl.replace files f NoScript ;
     end
 
-let save wpo js =
+let save ~stdout wpo js =
   let empty =
     match js with
     | `Null | `List [] | `Assoc [] -> true
     | _ -> false in
+  if stdout then
+    Wp_parameters.result "Proof script for %s:@.%a"
+      wpo.po_gid (Json.save_formatter ~pretty:true) js
+  else
   if empty then remove wpo else
     match get wpo with
     | Script f ->
