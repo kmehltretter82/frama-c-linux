@@ -104,6 +104,7 @@ let extend () =
           State_selection.empty
           [ InternalWpShare.self; ProveAuxSpec.self;
             Wp.Wp_parameters.CacheEnv.self;
+            Wp.Wp_parameters.Verbose.self;
           ]
       in
       Project.copy ~selection my_project;
@@ -121,7 +122,8 @@ let extend () =
         Wp.Wp_parameters.Let.off();
         Wp.Wp_parameters.Split.on();
         Wp.Wp_parameters.SplitMax.set 32;
-        Wp.Wp_parameters.Verbose.set 0;
+        if not (Wp.Wp_parameters.Verbose.is_set()) then
+          Wp.Wp_parameters.Verbose.set 0;
         Globals.Functions.iter check_auto_func;
       end else begin
         File.pretty_ast ();
