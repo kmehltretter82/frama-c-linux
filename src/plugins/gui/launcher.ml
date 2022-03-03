@@ -263,9 +263,9 @@ let show ?height ?width ~(host:basic_main) () =
       ()
   in
   ignore (dialog#misc#connect#size_allocate
-            (fun ({Gtk.width=w;Gtk.height=h}) ->
-               Configuration.set "launcher_width" (Configuration.ConfInt w);
-               Configuration.set "launcher_height" (Configuration.ConfInt h)));
+            ~callback:(fun ({Gtk.width=w;Gtk.height=h}) ->
+                Configuration.set "launcher_width" (Configuration.ConfInt w);
+                Configuration.set "launcher_height" (Configuration.ConfInt h)));
   ignore
     (GMisc.label
        ~text:"Customize parameters, then click on `Execute'"
@@ -280,12 +280,12 @@ let show ?height ?width ~(host:basic_main) () =
   let cancel =
     GButton.button ~label:"Close" ~stock:`CANCEL ~packing:buttons#pack ()
   in
-  ignore (cancel#connect#released dialog#destroy);
+  ignore (cancel#connect#released ~callback:dialog#destroy);
   let button_run =
     GButton.button
       ~label:"Configure analysis" ~stock:`EXECUTE ~packing:buttons#pack ()
   in
-  ignore (button_run#connect#released (run host dialog));
+  ignore (button_run#connect#released ~callback:(run host dialog));
   let plugins = ref [] in
   Plugin.iter_on_plugins
     (fun p ->

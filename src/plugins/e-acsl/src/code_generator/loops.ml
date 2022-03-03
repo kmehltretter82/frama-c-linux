@@ -386,7 +386,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           (* Even though p is considered a RTE, it was generated while
              typing the loop, and was already typed at this moment. Thus
              there is no need to type it again *)
-          !predicate_to_exp_ref adata kf (Env.push env) p
+          !predicate_to_exp_ref ~adata kf (Env.push env) p
         in
         let stmt, env =
           Assert.runtime_check

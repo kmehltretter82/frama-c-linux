@@ -47,15 +47,15 @@ let security_highlighter buffer loc ~start ~stop =
   | PStmt (_,s) ->
     let f = ForwardHighlighterState.get () in
     if List.exists (fun k -> k.sid=s.sid) f then begin
-      let tag = make_tag buffer"forward" [`BACKGROUND "orange" ] in
+      let tag = make_tag buffer ~name:"forward" [`BACKGROUND "orange" ] in
       apply_tag buffer tag start stop end;
     let i = IndirectBackwardHighlighterState.get () in
     if List.exists (fun k -> k.sid=s.sid) i then begin
-      let tag = make_tag buffer"indirect_backward" [`BACKGROUND  "cyan" ] in
+      let tag = make_tag buffer ~name:"indirect_backward" [`BACKGROUND  "cyan" ] in
       apply_tag buffer tag start stop end;
     let d = DirectHighlighterState.get () in
     if List.exists (fun k -> k.sid=s.sid) d then begin
-      let tag = make_tag buffer"direct" [`BACKGROUND  "green" ] in
+      let tag = make_tag buffer ~name:"direct" [`BACKGROUND  "green" ] in
       apply_tag buffer tag start stop end
   | PStmtStart _
   | PExp _ | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ -> ()

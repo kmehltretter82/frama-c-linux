@@ -40,7 +40,7 @@ let main () =
           let kf_entry, _library = Globals.entry_point () in
           SlicingParameters.warning "Adding an extra request on the entry point of function: %a." Kernel_function.pretty kf_entry;
           let set = Api.Select.empty_selects in
-          let set = Api.Select.select_func_calls_into set true kf_entry in
+          let set = Api.Select.select_func_calls_into set ~spare:true kf_entry in
           Api.Request.add_persistent_selection set
       end;
 

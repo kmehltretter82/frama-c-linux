@@ -118,7 +118,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
                   None
                   e1
                   res2
-                  (Cil.zero loc, env3))
+                  (Cil.zero ~loc, env3))
            )
          env)
   | Por(p1, p2) ->
@@ -142,7 +142,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
                   kf
                   None
                   e1
-                  (Cil.one loc, env')
+                  (Cil.one ~loc, env')
                   res2)
            )
          env)
@@ -249,7 +249,7 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
            let p = { p with pred_name = name :: p.pred_name } in
            let tp = Logic_const.toplevel_predicate ~kind:Assert p in
            let annot = Logic_const.new_code_annotation (AAssert ([],tp)) in
-           Typing.preprocess_rte (Env.Local_vars.get env) annot;
+           Typing.preprocess_rte ~lenv:(Env.Local_vars.get env) annot;
            !translate_rte_annots_ref
              Printer.pp_code_annotation
              annot

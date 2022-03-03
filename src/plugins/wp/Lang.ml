@@ -293,7 +293,7 @@ let mem_builtin_type ~name =
   try ignore (find_builtin name) ; true
   with Not_found -> false
 
-let is_builtin lt = mem_builtin_type lt.lt_name
+let is_builtin lt = mem_builtin_type ~name:lt.lt_name
 
 let is_builtin_type ~name = function
   | Data(Mtype m,_) ->

@@ -346,7 +346,7 @@ let cnf_dnf ~pol ~depth e =
           (cf@cxf),cnf
       with | Absorbant -> [],[[]]
   in
-  let tool = tools pol in
+  let tool = tools ~pol in
   let cNf = cnf_dnf ~depth ~pol e in
   try
     match cNf with

@@ -81,7 +81,7 @@ let init_panel (main_ui: Design.main_window_extension_points) =
   let launch_button = GButton.button ~label:"Launch"
       ~packing:(up#pack) ()
   in
-  ignore(launch_button#connect#clicked (fun () ->
+  ignore(launch_button#connect#clicked ~callback:(fun () ->
       let actions = (get_panel ()).actions in
       let sopt = GEdit.text_combo_get_active choices in
       match sopt with

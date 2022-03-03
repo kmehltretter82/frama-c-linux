@@ -759,7 +759,9 @@ let add_annotation kf st a =
   | AStmtSpec
       ([],
        ({ spec_behavior = [ { b_name = "Frama_C_implicit_init" } as bhv]})) ->
-    let props = Property.ip_post_cond_of_behavior kf (Kstmt st) [] bhv in
+    let props =
+      Property.ip_post_cond_of_behavior kf (Kstmt st) ~active:[] bhv
+    in
     List.iter (fun p -> Implicit_annotations.add p []) props
   | _ -> ()
 
@@ -1220,7 +1222,7 @@ let fill_built_ins () =
     Cil_builtins.init_builtins ();
   end else begin
     Kernel.debug "Machine is not computed, initialize everything";
-    Cil.initCIL (Logic_builtin.init()) (get_machdep ());
+    Cil.initCIL ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
   end;
   (* Fill logic tables with builtins *)
   Logic_env.Builtins.apply ();
@@ -1633,7 +1635,7 @@ let reorder_ast () = reorder_custom_ast (Ast.get())
 
 (* Fill logic tables with builtins *)
 let init_cil () =
-  Cil.initCIL (Logic_builtin.init()) (get_machdep ());
+  Cil.initCIL ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
   Logic_env.Builtins.apply ();
   Logic_env.prepare_tables ()
 

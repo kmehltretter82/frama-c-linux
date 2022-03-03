@@ -382,7 +382,7 @@ let anchor tree ?node () =
     | None ->
       match tree.root with
       | Some n -> n
-      | None -> mk_root tree
+      | None -> mk_root ~tree
 
 let commit fork =
   List.iter (fun (_,wp) -> ignore (Wpo.resolve wp)) fork.Fork.goals ;

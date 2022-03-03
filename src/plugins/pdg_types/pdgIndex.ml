@@ -161,11 +161,11 @@ module Signature = struct
 
   let add_info sgn key info ~replace =
     match key with
-    | In InCtrl -> add_in_ctrl sgn info replace
-    | In (InNum n) -> add_input sgn n info replace
-    | In (InImpl loc) -> add_impl_input sgn loc info replace
-    | Out OutRet -> add_out_ret sgn info replace
-    | Out (OutLoc k) -> add_output sgn k info replace
+    | In InCtrl -> add_in_ctrl sgn info ~replace
+    | In (InNum n) -> add_input sgn n info ~replace
+    | In (InImpl loc) -> add_impl_input sgn loc info ~replace
+    | Out OutRet -> add_out_ret sgn info ~replace
+    | Out (OutLoc k) -> add_output sgn k info ~replace
 
   let find_input sgn n =
     try
@@ -528,7 +528,7 @@ module FctIndex = struct
     | _ -> assert false
 
   let add_info_sig_call calls call k e replace =
-    let new_sgn old = Signature.add_info old k e replace in
+    let new_sgn old = Signature.add_info old k e ~replace in
     let rec add l = match l with
       | [] -> [(call, (None, new_sgn Signature.empty))]
       | ((call1, (e1, sgn1)) as c1) :: tl ->
@@ -579,7 +579,7 @@ module FctIndex = struct
     let hfct = if replace then H.replace else H.add in
     match key with
     | Key.SigKey k ->
-      idx.sgn <- Signature.add_info idx.sgn k e replace
+      idx.sgn <- Signature.add_info idx.sgn k e ~replace
     | Key.CallStmt _ -> raise CallStatement (* see add_info_call *)
     | Key.SigCallKey (call, k) ->
       idx.calls <- add_info_sig_call idx.calls call k e replace

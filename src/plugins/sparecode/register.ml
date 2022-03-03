@@ -113,7 +113,7 @@ let main () =
   if Sparecode_params.Analysis.get () then begin
     let select_annot = Sparecode_params.Annot.get () in
     let select_slice_pragma = true in
-    let new_proj = get select_annot select_slice_pragma in
+    let new_proj = get ~select_annot ~select_slice_pragma in
     File.pretty_ast ~prj:new_proj ()
   end
   else if Sparecode_params.GlobDecl.get () then begin

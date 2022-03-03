@@ -625,7 +625,7 @@ let transfer_switch_from_guard transfer_guard stmt state =
           | Const (CInt64 (z,_,_))
             when Integer.equal z Integer.zero ->
             Cil.new_exp ~loc:cond.eloc (UnOp(LNot,cond,Cil.intType))
-          | _ -> Cil.new_exp exp_case.eloc
+          | _ -> Cil.new_exp ~loc:exp_case.eloc
                    (BinOp (Eq, cond, exp_case, Cil.intType))
         in
         let (true_state, false_state) =

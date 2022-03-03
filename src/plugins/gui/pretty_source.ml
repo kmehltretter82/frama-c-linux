@@ -385,7 +385,7 @@ let display_source globals
              ~callback:(fun _ -> call_cc next_10)
              ()) ca *)
        end;
-       source#place_cursor source#start_iter;
+       source#place_cursor ~where:source#start_iter;
        let last_shown_area =
          Gtk_helper.make_tag source ~name:"last_shown_area"
            [`BACKGROUND "light green"]

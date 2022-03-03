@@ -294,7 +294,9 @@ module ValueCoverageGUI = struct
             Varinfo.Set.diff metrics.syntactic metrics.semantic
           in
           let hilit color =
-            let tag = make_tag buffer#buffer "metrics" [`BACKGROUND color] in
+            let tag =
+              make_tag buffer#buffer ~name:"metrics" [`BACKGROUND color]
+            in
             apply_tag buffer#buffer tag start stop
           in
           let syn_hilit () = hilit "yellow"

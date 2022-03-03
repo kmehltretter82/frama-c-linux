@@ -128,7 +128,7 @@ end = struct
     let rec process_stmts prev_list stmts = match stmts with
       | [] -> prev_list
       | s :: tail ->
-        let s_last_stmts = process_stmt graph prev_list s in
+        let s_last_stmts = process_stmt graph ~prev_list ~stmt:s in
         process_stmts s_last_stmts tail
     in process_stmts [] blk.bstmts
 

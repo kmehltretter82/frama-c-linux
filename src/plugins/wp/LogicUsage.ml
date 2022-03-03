@@ -370,7 +370,7 @@ class visitor =
       | Daxiomatic _ ->
         begin
           let pf = database.proofcontext in
-          let ax = axiomatic_of_global pf global in
+          let ax = axiomatic_of_global ~context:pf global in
           register_axiomatic database ax ;
           axiomatic <- Some ax ;
           DoChildrenPost
@@ -404,7 +404,7 @@ class visitor =
       (* --- LEMMAS --- *)
 
       | Dlemma _ ->
-        let lem = lemma_of_global database.proofcontext global in
+        let lem = lemma_of_global ~context:database.proofcontext global in
         register_lemma database self#section lem ;
         if Logic_utils.use_predicate lem.lem_predicate.tp_kind then
           database.proofcontext <- lem :: database.proofcontext ;

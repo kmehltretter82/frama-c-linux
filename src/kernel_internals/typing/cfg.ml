@@ -347,7 +347,8 @@ let computeFileCFG (f : file) =
 let labelAlphaTable : unit Alpha.alphaTable = Hashtbl.create 11
 
 let freshLabel (base:string) =
-  fst (Alpha.newAlphaName labelAlphaTable None base ())
+  fst (Alpha.newAlphaName ~alphaTable:labelAlphaTable ~undolist:None
+         ~lookupname:base ~data:())
 
 
 let xform_switch_block ?(keepSwitch=false) b =
@@ -743,7 +744,8 @@ class registerLabelsVisitor : cilVisitor = object
     List.iter
       (function
         | Label (name,_,_) ->
-          Alpha.registerAlphaName labelAlphaTable name ()
+          Alpha.registerAlphaName ~alphaTable:labelAlphaTable
+            ~lookupname:name ~data:()
         | _ -> ())
       labels;
     DoChildren
