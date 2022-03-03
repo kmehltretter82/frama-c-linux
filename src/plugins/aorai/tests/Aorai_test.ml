@@ -29,6 +29,16 @@ module InternalWpShare =
     let file_kind = "wp share directory"
   end)
 
+module WpCache =
+  P.Filepath(
+  struct
+    let option_name = "-aorai-test-wp-cache"
+    let help = "use custom session dir for storing cache"
+    let arg_name = "dir"
+    let existence = Filepath.Must_exist
+    let file_kind = "wp session directory"
+  end)
+
 module ProveAuxSpec =
   P.False(
   struct
@@ -97,7 +107,12 @@ let extend () =
       File.pretty_ast ~prj:aorai_prj ~fmt ();
       close_out chan;
       let selection =
-        State_selection.of_list [ InternalWpShare.self; ProveAuxSpec.self ]
+        List.fold_left
+          (fun selection state ->
+             State_selection.union
+               (State_selection.with_codependencies state) selection)
+          State_selection.empty
+          [ InternalWpShare.self; ProveAuxSpec.self; WpCache.self ]
       in
       Project.copy ~selection my_project;
       Project.set_current my_project;
@@ -115,6 +130,9 @@ let extend () =
         Wp.Wp_parameters.Split.on();
         Wp.Wp_parameters.SplitMax.set 32;
         Wp.Wp_parameters.Verbose.set 0;
+        if WpCache.is_set () then
+          Wp.Wp_parameters.Session.set (WpCache.get());
+        Wp.Wp_parameters.Cache.set "update";
         Globals.Functions.iter check_auto_func;
       end else begin
         File.pretty_ast ();
