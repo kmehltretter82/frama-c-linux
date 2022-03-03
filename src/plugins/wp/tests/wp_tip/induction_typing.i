@@ -1,6 +1,6 @@
 /* run.config
 
-   OPT: -wp-par 1 -wp-prop X -wp-no-print -wp-prover qed,tip -wp-msg-key script -wp-session @PTEST_SUITE_DIR@/@PTEST_NAME@.@PTEST_NUMBER@.session
+   OPT: -wp-par 1 -wp-prop X -wp-no-print -wp-prover qed,tip -wp-msg-key script -wp-session @PTEST_DIR@/@PTEST_NAME@.@PTEST_NUMBER@.session
 */
 /* run.config_qualif
    DONTRUN:
