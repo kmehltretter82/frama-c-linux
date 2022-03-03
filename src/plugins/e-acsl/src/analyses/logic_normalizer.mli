@@ -30,7 +30,6 @@
 *)
 
 open Cil_types
-open Analyses_types
 
 val preprocess : file -> unit
 (** Preprocess all the predicates of the ast and store the results *)
