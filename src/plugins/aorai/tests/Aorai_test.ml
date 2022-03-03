@@ -102,7 +102,9 @@ let extend () =
              State_selection.union
                (State_selection.with_codependencies state) selection)
           State_selection.empty
-          [ InternalWpShare.self; ProveAuxSpec.self ]
+          [ InternalWpShare.self; ProveAuxSpec.self;
+            Wp.Wp_parameters.CacheEnv.self;
+          ]
       in
       Project.copy ~selection my_project;
       Project.set_current my_project;
