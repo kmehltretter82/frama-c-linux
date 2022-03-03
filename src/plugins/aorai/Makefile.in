@@ -117,6 +117,16 @@ CONFIG_STATUS_DIR=.
 AORAI_WP_SHARE=
 endif
 
+TEST_DEPENDENCIES:= \
+  $(Aorai_DIR)/tests/Aorai_test.cmxs \
+  $(Aorai_DIR)/tests/Aorai_test.cmo \
+  $(Aorai_DIR)/tests/ya/name_projects.cmxs \
+  $(Aorai_DIR)/tests/ya/name_projects.cmo
+
+Aorai_DEFAULT_TESTS: $(TEST_DEPENDENCIES)
+
+# 'prove' ptests config: ensure ACSL and C instrumentation coincide
+
 $(Aorai_DIR)/tests/ptests_config: $(Aorai_DIR)/tests/test_config_prove
 
 $(Aorai_DIR)/tests/test_config_prove: \
@@ -126,7 +136,14 @@ $(Aorai_DIR)/tests/test_config_prove: \
 	$(SED) -e 's!@AORAI_WP_SHARE@!$(AORAI_WP_SHARE)!' $< > $@
 	$(CHMOD_RO) $@
 
-Aorai_DEFAULT_TESTS: $(Aorai_DIR)/tests/Aorai_test.cmxs $(Aorai_DIR)/tests/Aorai_test.cmo $(Aorai_DIR)/tests/ya/name_projects.cmxs $(Aorai_DIR)/tests/ya/name_projects.cmo
+AORAI_WP_CACHE?=$(abspath $(Aorai_DIR)/../wp-cache)
+
+.PHONY: aorai-test-prove
+aorai-test-prove: $(TEST_DEPENDENCIES) $(Aorai_DIR)/tests/test_config_prove
+	FRAMAC_WP_CACHE=update \
+	FRAMAC_WP_CACHEDIR=$(AORAI_WP_CACHE) \
+	PTESTS_OPTS="-config prove" \
+	$(MAKE) Aorai_TESTS
 
 # Regenerating the Makefile on need
 
