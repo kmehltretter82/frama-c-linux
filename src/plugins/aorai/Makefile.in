@@ -126,6 +126,16 @@ TEST_DEPENDENCIES:= \
 Aorai_DEFAULT_TESTS: $(TEST_DEPENDENCIES)
 
 # 'prove' ptests config: ensure ACSL and C instrumentation coincide
+# Launch this configuration for all tests with
+# make aorai-test-prove
+# To launch only one test, you can use PTESTS_OPTS, as in
+# PTESTS_OPTS="tests/ya/stack.i -add-options '-wp-verbose 1'" make aorai-test-prove
+#
+# This requires to have a copy of the wp-cache repository
+# (see ../wp/tests/README.md for more information). If it is not
+# in its default place of ../wp-cache, use AORAI_WP_CACHE variable to give the
+# proper absolute path.
+# Don't forget to add the new cache files to the repo if needed.
 
 $(Aorai_DIR)/tests/ptests_config: $(Aorai_DIR)/tests/test_config_prove
 
@@ -142,7 +152,7 @@ AORAI_WP_CACHE?=$(abspath $(Aorai_DIR)/../wp-cache)
 aorai-test-prove: $(TEST_DEPENDENCIES) $(Aorai_DIR)/tests/test_config_prove
 	FRAMAC_WP_CACHE=update \
 	FRAMAC_WP_CACHEDIR=$(AORAI_WP_CACHE) \
-	PTESTS_OPTS="-config prove" \
+	PTESTS_OPTS+=" -config prove" \
 	$(MAKE) Aorai_TESTS
 
 # Regenerating the Makefile on need
