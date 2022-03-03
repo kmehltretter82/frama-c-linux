@@ -27,7 +27,7 @@
 // React & Dome
 import React from 'react';
 import { Hpack, Filler } from 'dome/layout/boxes';
-import { Label, Code } from 'dome/controls/labels';
+import { Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { ButtonGroup, Button } from 'dome/frame/toolbars';
 
@@ -48,7 +48,6 @@ function ProbeEditor(props: ModelProp): JSX.Element | null {
   const { model } = props;
   const probe = model.getFocused();
   if (!probe || !probe.code) return null;
-  const { label } = probe;
   const { code } = probe;
   const { stmt, marker } = probe;
   const { cols, rows } = sizeof(code);
@@ -57,7 +56,6 @@ function ProbeEditor(props: ModelProp): JSX.Element | null {
   const { zoomable } = probe;
   return (
     <>
-      <Label className="eva-probeinfo-label">{label}</Label>
       <div className="eva-probeinfo-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
@@ -67,6 +65,7 @@ function ProbeEditor(props: ModelProp): JSX.Element | null {
         className="eva-probeinfo-button"
         display={zoomable}
         selected={zoomed}
+        title="Resize cells to fit values"
         onClick={() => { if (probe) probe.setZoomed(!zoomed); }}
       />
       <IconButton

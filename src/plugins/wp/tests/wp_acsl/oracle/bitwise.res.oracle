@@ -247,42 +247,67 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_defined,ok' (file bitwise.i, line 139):
+Goal Check 'bit_defined,ok' (file bitwise.i, line 140):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_defined2,ok' (file bitwise.i, line 140):
+Goal Check 'bit_defined2,ok' (file bitwise.i, line 141):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed_positive,ok' (file bitwise.i, line 141):
+Goal Check 'bit_to_signed_positive,ok' (file bitwise.i, line 143):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed_positive2,ok' (file bitwise.i, line 142):
+Goal Check 'bit_to_signed_positive2,ok' (file bitwise.i, line 144):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed_negative,ok' (file bitwise.i, line 143):
+Goal Check 'bit_to_signed_negative,ok' (file bitwise.i, line 145):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed_negative2,ok' (file bitwise.i, line 144):
+Goal Check 'bit_to_signed_negative2,ok' (file bitwise.i, line 146):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed,ok' (file bitwise.i, line 145):
+Goal Check 'bit_to_signed,ok' (file bitwise.i, line 147):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed2,ok' (file bitwise.i, line 146):
+Goal Check 'bit_to_signed2,ok' (file bitwise.i, line 148):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsl_lowest,ok' (file bitwise.i, line 150):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsl_higher_set,ok' (file bitwise.i, line 151):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsl_higher_unset,ok' (file bitwise.i, line 152):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsr_set,ok' (file bitwise.i, line 154):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsr_unset,ok' (file bitwise.i, line 155):
 Prove: true.
 
 ------------------------------------------------------------

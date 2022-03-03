@@ -70,7 +70,8 @@ export default function Application(): JSX.Element {
           onHint={Extensions.onSearchHint}
           onSelect={onSelectedHints}
         />
-        <IvettePrefs.ThemeSwitch />
+        <IvettePrefs.ThemeSwitchTool />
+        <IvettePrefs.FontTools />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"

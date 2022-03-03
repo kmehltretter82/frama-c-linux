@@ -21,7 +21,7 @@ Open Source Release <next-release>
 o   Kernel    [2022-02-23] New visitor functions visitFramacFileFunctions
               and visitCilFileFunctions to visit only function definitions,
               for better performance.
-o! [kernel]   [2022-02-23] Remove State_selection.Static (deprecated since
+o!  Kernel    [2022-02-23] Remove State_selection.Static (deprecated since
               10 years, use directly State_selection instead)
 -*  Kernel    [2022-02-22] Fix list of potential types for decimal
               integer literal constants

@@ -7,7 +7,7 @@
     display: flex ;
     overflow: hidden ;
     flex-flow: row nowrap ;
-    align-items: stretch ;
+    align-items: baseline ;
 }
 
 .dome-xBoxes-vbox

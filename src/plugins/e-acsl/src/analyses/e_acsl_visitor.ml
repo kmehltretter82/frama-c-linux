@@ -31,6 +31,7 @@ let case_globals
     ?(var_fun_decl = fun _ -> default ())
     ?(var_init = fun _ -> default ())
     ?(var_def = fun _ _ -> default ())
+    ?(glob_annot = fun _ -> default ())
     ~fun_def
   = function
     (* library functions and built-ins *)
@@ -65,6 +66,10 @@ let case_globals
     | GFun(fundec, _) ->
       fun_def fundec
 
+    (* global annotation *)
+    | GAnnot (ga, _) ->
+      glob_annot ga
+
     (* other globals: nothing to do *)
     | GType _
     | GCompTag _
@@ -74,7 +79,6 @@ let case_globals
     | GAsm _
     | GPragma _
     | GText _
-    | GAnnot _ (* do never read annotation from sources *)
       ->
       default ()
 
@@ -106,6 +110,9 @@ class visitor
     method var_def : varinfo -> init -> global list Cil.visitAction =
       fun _ _ -> self#default ()
 
+    method glob_annot: global_annotation -> global list Cil.visitAction =
+      fun _ -> Cil.DoChildren (* do visit ACSL annotations by default *)
+
     method fun_def ({svar = vi}) =
       let kf = try Globals.Functions.get vi with Not_found -> assert false in
       if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
@@ -120,5 +127,6 @@ class visitor
         ~var_fun_decl:self#var_fun_decl
         ~var_init:self#var_init
         ~var_def:self#var_def
+        ~glob_annot:self#glob_annot
         ~fun_def:self#fun_def
   end
