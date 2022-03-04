@@ -93,9 +93,11 @@ module Pred_or_term =
 module Ext_logic_label: sig
   include Datatype.S_with_collections with type t = logic_label * stmt option
 
-  val from: kinstr -> logic_label -> logic_label * stmt option
+  val get: kinstr -> logic_label -> logic_label * stmt option
   (** @return an extended logic label from a [kinstr] and a [logic_label]. *)
+
 end = struct
+
   include Datatype.Pair_with_collections
       (Logic_label)
       (Datatype.Option_with_collections
@@ -105,8 +107,8 @@ end = struct
          end))
       (struct let module_name = "E_ACSL.Labels.Ext_logic_label" end)
 
-  (* Override [pretty] to print a more compact representation of [Ext_logic_label]
-     for debugging purposes. *)
+  (* Override [pretty] to print a more compact representation of
+     [Ext_logic_label] for debugging purposes. *)
   let pretty fmt (label, from_stmt_opt) =
     match from_stmt_opt with
     | Some from_stmt ->
@@ -118,7 +120,7 @@ end = struct
       Format.fprintf fmt "%a"
         Logic_label.pretty label
 
-  let from kinstr label =
+  let get kinstr label =
     let from_stmt_opt =
       match kinstr, label with
       | Kglobal, _
@@ -135,6 +137,7 @@ end = struct
       | Kstmt s, BuiltinLabel (Old | Post) -> Some s
     in
     label, from_stmt_opt
+
 end
 
 (** Basic printer for a [kinstr]. Contrary to [Cil_datatype.Kinstr.pretty], the
@@ -219,29 +222,29 @@ module At_data = struct
             else cmp
           in
           if cmp = 0 then
-            let extlabel1 = Ext_logic_label.from kinstr1 label1 in
-            let extlabel2 = Ext_logic_label.from kinstr2 label2 in
-            Ext_logic_label.compare extlabel1 extlabel2
+            let elabel1 = Ext_logic_label.get kinstr1 label1 in
+            let elabel2 = Ext_logic_label.get kinstr2 label2 in
+            Ext_logic_label.compare elabel1 elabel2
           else cmp
 
         let equal = Datatype.from_compare
 
         let hash { kf; kinstr; lscope; pot; label } =
-          let extlabel = Ext_logic_label.from kinstr label in
+          let elabel = Ext_logic_label.get kinstr label in
           Hashtbl.hash
             (Kf.hash kf,
              basic_kinstr_hash kinstr,
              Lscope.D.hash lscope,
              Pred_or_term.hash pot,
-             Ext_logic_label.hash extlabel)
+             Ext_logic_label.hash elabel)
 
         let pretty fmt { kf; kinstr; lscope; pot; label } =
-          let extlabel = Ext_logic_label.from kinstr label in
+          let elabel = Ext_logic_label.get kinstr label in
           Format.fprintf fmt "@[(%a, %a, %a, %a, %a)@]"
             Kf.pretty kf
             basic_pp_kinstr kinstr
             Lscope.D.pretty lscope
             Pred_or_term.pretty pot
-            Ext_logic_label.pretty extlabel
+            Ext_logic_label.pretty elabel
       end)
 end

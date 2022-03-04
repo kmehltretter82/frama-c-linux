@@ -232,20 +232,23 @@ class visitor cat
       | None -> None
 
     (* see documentation in e_acsl_visitor.mli *)
-    method visit: 'a 'b. ?vcode_annot:bool -> ?vspec:bool -> (Visitor.frama_c_visitor -> 'a -> 'b) -> 'a -> 'b =
-      fun ?vcode_annot ?vspec visit_func item ->
-      let old_run_from_visitor = self#set_run_from_visitor true in
-      let old_vcode_annot = self#set_do_visit_code_annot vcode_annot in
-      let old_vfunspec = self#set_do_visit_funspec vspec in
-      let finally () =
-        ignore @@ self#set_do_visit_code_annot old_vcode_annot;
-        ignore @@ self#set_do_visit_funspec old_vfunspec;
-        ignore @@ self#set_run_from_visitor old_run_from_visitor
-      in
-      Extlib.try_finally
-        ~finally
-        (fun item -> visit_func (self :> Visitor.frama_c_inplace) item)
-        item
+    method visit
+      : 'a 'b. ?vcode_annot:bool -> ?vspec:bool
+        -> (Visitor.frama_c_visitor -> 'a -> 'b)
+        -> 'a -> 'b
+      = fun ?vcode_annot ?vspec visit_func item ->
+        let old_run_from_visitor = self#set_run_from_visitor true in
+        let old_vcode_annot = self#set_do_visit_code_annot vcode_annot in
+        let old_vfunspec = self#set_do_visit_funspec vspec in
+        let finally () =
+          ignore @@ self#set_do_visit_code_annot old_vcode_annot;
+          ignore @@ self#set_do_visit_funspec old_vfunspec;
+          ignore @@ self#set_run_from_visitor old_run_from_visitor
+        in
+        Extlib.try_finally
+          ~finally
+          (fun item -> visit_func (self :> Visitor.frama_c_inplace) item)
+          item
 
     (** see documentation in e_acsl_visitor.mli *)
     method visit_file file =
@@ -310,7 +313,7 @@ class visitor cat
 
     (** [do_with ?not_yet ?akind ~f arg] changes the visit error to [not_yet]
         and changes the annotation kind to [akind] if provided, then execute
-        [f arg]. Finally, it restore the visit error and annotation kind to
+        [f arg]. Finally, it restores the visit error and annotation kind to
         their old values and returns the result of [f arg]. *)
     method private do_with: 'a 'b.
       ?not_yet:string ->
@@ -356,10 +359,10 @@ class visitor cat
                         self#visit_id_predicate requires))
              bhv.b_requires;
            (* The links between the [identified_property]s and the [assigns] or
-              [allocates] clauses are not clear. For now store a [not_yet] error
-              for every term of the clauses. Update the code to add the relevant
-              [must_translate] calls once the [assigns] or [allocates] clauses
-              translation are supported. *)
+              [allocates] clauses are not clear. For now, store a [not_yet]
+              error for every term of the clauses. Update the code to add the
+              relevant [must_translate] calls once the [assigns] or [allocates]
+              clauses translation are supported. *)
            self#do_with
              ~akind:Postcondition
              ~not_yet:"assigns clause in behavior"
@@ -433,7 +436,7 @@ class visitor cat
       let kf = Option.get self#current_kf in
 
       if Kernel_function.is_first_stmt kf stmt then begin
-        (* Analyse the specification on the function on the first statement *)
+        (* Analyze the funspec before visiting the first statement *)
         if Annotations.has_funspec kf then begin
           let old_kinstr_stmts = self#set_global_kinstr () in
           self#process_spec (Annotations.funspec kf);
@@ -441,7 +444,7 @@ class visitor cat
         end
       end;
 
-      (* Analyse the specification on the current statement *)
+      (* Analyze the code annotation of the current statement *)
       Annotations.iter_code_annot
         (fun _ annot ->
            (* Reset the visit error before starting to analyze an annotation. *)

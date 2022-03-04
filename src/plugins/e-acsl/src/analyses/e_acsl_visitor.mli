@@ -57,20 +57,19 @@ val case_globals :
     [new visitor cat] creates a visitor with [cat] as the category to use for
     the [Error] module in the visitor.
 
-    For the root of the AST, no the globals level, only visit the cases that are
-    relevant to E-ACSL. Each case is handled by a method of the visitor. The
+    For the root of the AST, not the global level, only visit the cases that
+    are relevant to E-ACSL. Each case is handled by a method of the visitor. The
     cases are similar, and similarly named as the ones of the function
     [case_globals].
 
-    For the rest of the AST, the kind of annotation visited is recorded and
-    accessible through the method [get_akind]. While visiting annotations
+    For the rest of the AST, the kind of the visited annotation is recorded and
+    accessed through the method [get_akind]. While visiting annotations
     currently not supported by E-ACSL, the [get_visit_error] returns a [not_yet]
-    exception detailing the error. The actual visitor inheriting from
-    [E_acsl_visitor.visitor] can then continue its processing or not as it sees
-    fit.
+    exception. Any visitor that inherits from [E_acsl_visitor.visitor] can
+    decide wether continue its processing or not as it sees fit.
 
     As a result of the custom visit of the AST, the methods [vcode_annot] and
-    [vspec] skip their children since they are already visited by [vstmt_aux].
+    [vspec] skip their children, since they are already visited by [vstmt_aux].
     Be sure to use the method [visit] (and associated methods) if you need to
     visit the children of those nodes.
 
@@ -137,3 +136,9 @@ class visitor :
 val must_translate_ppt_ref: (Property.t -> bool) ref
 
 val must_translate_ppt_opt_ref: (Property.t option -> bool) ref
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)
