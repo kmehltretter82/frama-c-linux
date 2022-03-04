@@ -43,7 +43,6 @@ FC_SUFFIX=$(cat ../VERSION)-$(cat ../VERSION_CODENAME)
 FC_SUFFIX="$(echo ${FC_SUFFIX} | sed -e "s/~/-/")"
 ACSL_SUFFIX=$(grep acslversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 FC_VERSION=$(cat ../VERSION)
-ACSL_IMPLEM_VERSION=$(grep fcversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 EACSL_SUFFIX=$(grep 'newcommand{\\eacsllangversion' ../src/plugins/e-acsl/doc/refman/main.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 # sanity check
 if [ "$EACSL_SUFFIX" = "" ]; then
@@ -67,7 +66,7 @@ build () {
     MANUAL=${2%.*}-$3.${2##*.}
     cp -f $1 manuals/$MANUAL
     echo "##### $MANUAL copied"
-    
+
 }
 
 EACSL_DOC=../src/plugins/e-acsl/doc
@@ -96,9 +95,17 @@ acsl/acsl.pdf,acsl.pdf,$ACSL_SUFFIX \
 $EACSL_DOC/refman/e-acsl.pdf,e-acsl.pdf,$EACSL_SUFFIX
 
 # Sanity check: version differences between Frama-C, ACSL and E-ACSL
+FAIL = 0
 if [ "$ACSL_SUFFIX" != "$EACSL_SUFFIX" ]; then
     echo "WARNING: different versions for ACSL and E-ACSL manuals: $ACSL_SUFFIX versus $EACSL_SUFFIX"
+    FAIL=1
 fi
+
+# The file fc_version.tex is created by the compilation of the implementation manual
+ACSL_IMPLEM_VERSION=$(grep fcversion acsl/fc_version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
+
 if [ "$ACSL_IMPLEM_VERSION" != "$FC_VERSION" ]; then
     echo "WARNING: ACSL implementation refers to a different Frama-C version: $ACSL_IMPLEM_VERSION versus $FC_VERSION"
+    FAIL=1
 fi
+exit $FAIL
