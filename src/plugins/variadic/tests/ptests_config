@@ -1,4 +1,1 @@
-DEFAULT_SUITES= declared defined
-
-#todo:
-IGNORE= DEFAULT_SUITES= known erroneous
+DEFAULT_SUITES= declared defined known erroneous
