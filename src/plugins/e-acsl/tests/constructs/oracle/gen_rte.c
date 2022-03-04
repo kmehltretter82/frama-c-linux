@@ -56,11 +56,13 @@ int main(void)
 void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
                        int h, int i, int j, int k, int l)
 {
+  __e_acsl_contract_t *__gen_e_acsl_contract;
   int __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
-  __e_acsl_contract_t *__gen_e_acsl_contract;
   {
     int __gen_e_acsl_assumes_value;
+    __gen_e_acsl_at = b;
+    __gen_e_acsl_at_2 = e;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)1);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
@@ -324,8 +326,6 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
   }
-  __gen_e_acsl_at_2 = e;
-  __gen_e_acsl_at = b;
   test(a,b,c,d,e,f,g,h,i,j,k,l);
   {
     int __gen_e_acsl_assumes_value_2;

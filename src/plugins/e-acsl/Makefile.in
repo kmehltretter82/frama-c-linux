@@ -61,15 +61,15 @@ ANALYSES_CMI:= \
 ANALYSES_CMI:=$(addprefix src/analyses/, $(ANALYSES_CMI))
 
 SRC_ANALYSES:= \
-	analyses_datatype \
-	label \
-	rte \
 	lscope \
+	analyses_datatype \
+	rte \
 	e_acsl_visitor \
 	logic_normalizer \
 	bound_variables \
 	interval \
 	typing \
+	labels \
 	literal_strings \
 	memory_tracking \
 	exit_points \
@@ -94,10 +94,10 @@ SRC_CODE_GENERATOR:= \
 	logic_functions \
 	loops \
 	quantif \
-	at_with_lscope \
 	memory_translate \
 	logic_array \
 	translate_utils \
+	translate_ats \
 	translate_terms \
 	translate_predicates \
 	translate_rtes \

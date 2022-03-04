@@ -210,14 +210,6 @@ let mark_readonly vi =
   let loc = vi.vdecl in
   rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
 
-type annotation_kind =
-  | Assertion
-  | Precondition
-  | Postcondition
-  | Invariant
-  | Variant
-  | RTE
-
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

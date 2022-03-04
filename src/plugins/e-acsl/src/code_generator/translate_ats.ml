@@ -20,62 +20,72 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Generate C implementations of E-ACSL [\at()] terms and predicates. *)
+
 open Cil_types
+open Cil_datatype
 open Analyses_types
+open Analyses_datatype
+module Error = Translation_error
 
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-let predicate_to_exp_ref
-  : (adata:Assert.t ->
-     kernel_function ->
-     Env.t ->
-     predicate ->
-     exp * Assert.t * Env.t) ref
-  =
-  ref (fun ~adata:_ _kf _env _p ->
-      Extlib.mk_labeled_fun "predicate_to_exp_ref")
-
 let term_to_exp_ref
   : (adata:Assert.t ->
+     ?inplace:bool ->
      kernel_function ->
      Env.t ->
      term ->
      exp * Assert.t * Env.t) ref
   =
-  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
+  ref (fun ~adata:_ ?inplace:_ _kf _env _t ->
+      Extlib.mk_labeled_fun "term_to_exp_ref")
+
+let predicate_to_exp_ref
+  : (adata:Assert.t ->
+     ?inplace:bool ->
+     ?name:string ->
+     kernel_function ->
+     ?rte:bool ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ ?inplace:_ ?name:_ _kf ?rte:_ _env _p ->
+      Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
 (*****************************************************************************)
 (**************************** Handling memory ********************************)
 (*****************************************************************************)
 
-(* Remove all the bindings for [kf]. [Cil_datatype.Kf.Hashtbl] does not
-   provide the [remove_all] function. Thus we need to keep calling [remove]
-   until all entries are removed. *)
+(** Remove all the bindings for [kf]. [Kf.Hashtbl] does not provide the
+    [remove_all] function. Thus we need to keep calling [remove] until all
+    entries are removed. *)
 let rec remove_all tbl kf =
-  if Cil_datatype.Kf.Hashtbl.mem tbl kf then begin
-    Cil_datatype.Kf.Hashtbl.remove tbl kf;
+  if Kf.Hashtbl.mem tbl kf then begin
+    Kf.Hashtbl.remove tbl kf;
     remove_all tbl kf
   end
 
 module Malloc = struct
-  let tbl = Cil_datatype.Kf.Hashtbl.create 7
-  let add kf stmt = Cil_datatype.Kf.Hashtbl.add tbl kf stmt
-  let find_all kf = Cil_datatype.Kf.Hashtbl.find_all tbl kf
+  let tbl = Kf.Hashtbl.create 7
+  let add kf stmt = Kf.Hashtbl.add tbl kf stmt
+  let find_all kf = Kf.Hashtbl.find_all tbl kf
   let remove_all kf = remove_all tbl kf
 end
 
 module Free = struct
-  let tbl = Cil_datatype.Kf.Hashtbl.create 7
-  let add kf stmt = Cil_datatype.Kf.Hashtbl.add tbl kf stmt
-  let find_all kf = Cil_datatype.Kf.Hashtbl.find_all tbl kf
+  let tbl = Kf.Hashtbl.create 7
+  let add kf stmt = Kf.Hashtbl.add tbl kf stmt
+  let find_all kf = Kf.Hashtbl.find_all tbl kf
   let remove_all kf = remove_all tbl kf
 end
 
-(**************************************************************************)
-(*************************** Translation **********************************)
-(**************************************************************************)
+(* ************************************************************************** *)
+(* Helper functions for "with lscope" translation *)
+(* ************************************************************************** *)
 
 (* Builds the terms [t_size] and [t_shifted] from each
    [Lvs_quantif(tmin, lv, tmax)] from [lscope]
@@ -171,7 +181,7 @@ let size_from_sizes_and_shifts ~loc = function
       sizes_and_shifts
 
 (* Build the left-value corresponding to [*(at + index)]. *)
-let lval_at_index ~loc kf env (e_at, vi_at, t_index) =
+let lval_at_index ~loc kf env (e_at, t_index) =
   Typing.type_term
     ~use_gmp_opt:false
     ~ctx:Typing.c_int
@@ -181,7 +191,7 @@ let lval_at_index ~loc kf env (e_at, vi_at, t_index) =
   let e_index, _, env = term_to_exp ~adata:Assert.no_data kf env t_index in
   let e_index = Cil.constFold false e_index in
   let e_addr =
-    Cil.new_exp ~loc (BinOp(PlusPI, e_at, e_index, vi_at.vtype))
+    Cil.new_exp ~loc (BinOp(PlusPI, e_at, e_index, Cil.typeOf e_at))
   in
   let lval_at_index = Mem e_addr, NoOffset in
   lval_at_index, env
@@ -219,23 +229,80 @@ let index_from_sizes_and_shifts ~loc sizes_and_shifts =
   in
   sum
 
-let put_block_at_label env kf block label =
-  let stmt = Label.get_stmt kf label in
-  let env_ref = ref env in
-  let o = object
-    inherit Visitor.frama_c_inplace
-    method !vstmt_aux stmt =
-      assert (!env_ref == env);
-      env_ref := Env.extend_stmt_in_place env stmt ~label block;
-      Cil.ChangeTo stmt
-  end
-  in
-  ignore (Visitor.visitFramacStmt o stmt);
-  !env_ref
-
-let to_exp ~loc kf env pot label =
-  let term_to_exp = !term_to_exp_ref in
+(* [indexed_exp ~loc kf env e_at]
+   [e_at] represents an array generated by [pretranslate_to_exp_with_lscope]
+   and filled during the traversal of the [lscope].
+   The function returns an expression indexing the array [e_at] using the
+   variables created when traversing the [lscope] to retrieve the [\at] value
+   during the traversal. *)
+let indexed_exp ~loc kf env e_at =
   let lscope_vars = Lscope.get_all (Env.Logic_scope.get env) in
+  let lscope_vars = List.rev lscope_vars in
+  let sizes_and_shifts =
+    sizes_and_shifts_from_quantifs ~loc kf lscope_vars []
+  in
+  let t_index = index_from_sizes_and_shifts ~loc sizes_and_shifts in
+  let lval_at_index, env = lval_at_index ~loc kf env (e_at, t_index) in
+  let e = Smart_exp.lval ~loc lval_at_index in
+  e, env
+
+(* ************************************************************************** *)
+(* Translation *)
+(* ************************************************************************** *)
+
+(* Table storing the [varinfo] with the translation of a given [at_data]. *)
+let translations: varinfo Error.result At_data.Hashtbl.t =
+  At_data.Hashtbl.create 17
+
+(* [pretranslate_to_exp ~loc kf env pot] immediately translates the given
+   [pred_or_term] in the current environment and returns the translated
+   expression. *)
+let pretranslate_to_exp ~loc kf env pot =
+  Options.debug ~level:4 "pre-translating %a in local environment '%a'"
+    Pred_or_term.pretty pot
+    Typing.Function_params_ty.pretty (Env.Local_vars.get env);
+  let e, env, t_opt =
+    let adata = Assert.no_data in
+    match pot with
+    | PoT_term t ->
+      let e, _, env = !term_to_exp_ref ~adata ~inplace:true kf env t in
+      e, env, Some t
+    | PoT_pred p ->
+      let e, _, env = !predicate_to_exp_ref ~adata ~inplace:true kf env p in
+      e, env, None
+  in
+  let ty = Cil.typeOf e in
+  let var_vi, _, env =
+    Env.new_var
+      ~loc
+      ~scope:Function
+      ~name:"at"
+      env
+      kf
+      t_opt
+      ty
+      (fun var_vi var_e ->
+         let init_set =
+           if Gmp_types.Q.is_t ty then Rational.init_set else Gmp.init_set
+         in
+         [ init_set ~loc (Cil.var var_vi) var_e e ])
+  in
+  var_vi, env
+
+(* [pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot] immediately
+   translates the given [pred_or_term] in the current environment for each value
+   of the given [lscope]. The result is stored in a dynamically allocated array
+   and the expression returned is a pointer to this array.
+   The function [indexed_exp] can later be used to retrieve the translation for
+   a specific value of the [lscope]. *)
+let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
+  Options.debug ~level:4
+    "pre-translating %a in local environment '%a' with lscope '%a'"
+    Pred_or_term.pretty pot
+    Typing.Function_params_ty.pretty (Env.Local_vars.get env)
+    Lscope.D.pretty lscope;
+  let term_to_exp = !term_to_exp_ref in
+  let lscope_vars = Lscope.get_all lscope in
   let lscope_vars = List.rev lscope_vars in
   let sizes_and_shifts =
     sizes_and_shifts_from_quantifs ~loc kf lscope_vars []
@@ -309,13 +376,15 @@ let to_exp ~loc kf env pot label =
   let t_index = index_from_sizes_and_shifts ~loc sizes_and_shifts in
   (* Innermost block *)
   let mk_innermost_block env =
-    let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
-    let named_predicate_to_exp = !predicate_to_exp_ref ~adata:Assert.no_data in
+    let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data ~inplace:true in
+    let predicate_to_exp =
+      !predicate_to_exp_ref ~adata:Assert.no_data ~inplace:true
+    in
     match pot with
     | PoT_pred p ->
       let env = Env.push env in
-      let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
-      let e, _, env = named_predicate_to_exp kf env p in
+      let lval, env = lval_at_index ~loc kf env (e_at, t_index) in
+      let e, _, env = predicate_to_exp kf env p in
       let e = Cil.constFold false e in
       let storing_stmt =
         Smart_stmt.assigns ~loc ~result:lval e
@@ -330,7 +399,7 @@ let to_exp ~loc kf env pot label =
       begin match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
           let env = Env.push env in
-          let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
+          let lval, env = lval_at_index ~loc kf env (e_at, t_index) in
           let e, _, env = term_to_exp kf env t in
           let e = Cil.constFold false e in
           let storing_stmt =
@@ -349,7 +418,7 @@ let to_exp ~loc kf env pot label =
       end
   in
   (* Storing loops *)
-  let lscope_vars = Lscope.get_all (Env.Logic_scope.get env) in
+  let lscope_vars = Lscope.get_all lscope in
   let lscope_vars = List.rev lscope_vars in
   let env = Env.push env in
   let storing_loops_stmts, env =
@@ -362,15 +431,125 @@ let to_exp ~loc kf env pot label =
       ~global_clear:false
       Env.After
   in
-  (* Put at label *)
-  let env = put_block_at_label env kf storing_loops_block label in
+  (* Put block in the current env *)
+  let env = Env.add_stmt env (Smart_stmt.block_stmt storing_loops_block) in
   (* Returning *)
-  let lval_at_index, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
-  let e = Smart_exp.lval ~loc lval_at_index in
-  e, env
+  vi_at, env
 
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)
+(* Set holding the C labels defined in the function currently being visited. *)
+let clabels_ref: Logic_label.Set.t ref = ref Logic_label.Set.empty
+
+(* [is_label_defined label] returns [true] if [label] is either a C label that
+   has been defined, a built-in label or a formal label, and returns [false] if
+   [label] is a C label that has not been defined. *)
+let is_label_defined label =
+  match label with
+  | StmtLabel _ when Logic_label.Set.mem label !clabels_ref ->
+    true
+  | StmtLabel _ ->
+    false
+  | BuiltinLabel _ | FormalLabel _ ->
+    true
+
+let for_stmt env kf stmt =
+  Options.debug ~level:4 "pre-translating ats for stmt %d at %a"
+    stmt.sid
+    Printer.pp_location (Stmt.loc stmt);
+
+  (* At the start of a function, reset the set of defined C labels. *)
+  if Kernel_function.is_first_stmt kf stmt then
+    clabels_ref := Logic_label.Set.empty;
+
+  (* If the current statement has labels, add the C label to the set. *)
+  begin match stmt.labels with
+    | [] -> ()
+    | _ :: _ ->
+      clabels_ref := Logic_label.Set.add (StmtLabel (ref stmt)) !clabels_ref
+  end;
+
+  (* Retrieve the set of [\at()] to translate for the given statement. *)
+  let at_for_stmt =
+    Error.retrieve_preprocessing
+      "labels pre-analysis"
+      Labels.at_for_stmt
+      stmt
+      Printer.pp_stmt
+  in
+
+  (* Translate the [\at()]. *)
+  let stmt_translations = Pred_or_term.Hashtbl.create 7 in
+  At_data.Set.fold
+    (fun ({ lscope; pot; error } as at_data) env ->
+       let vi_or_err, env =
+         let vi_or_err = Pred_or_term.Hashtbl.find_opt stmt_translations pot in
+         match error, vi_or_err with
+         | Some exn, (Some _ | None) ->
+           (* If there was an error during the pre-analysis, then store it
+              instead of the translation. *)
+           Result.Error exn, env
+         | None, Some vi_or_err ->
+           (* If the same [pred_or_term] has already been translated on this
+              statement, return its translation. *)
+           vi_or_err, env
+         | None, None ->
+           (* Otherwise translate it. *)
+           try
+             let loc = Stmt.loc stmt in
+             let vi, env =
+               if Lscope.is_used lscope pot then
+                 pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot
+               else
+                 pretranslate_to_exp ~loc kf env pot
+             in
+             Result.Ok vi, env
+           with Error.(Typing_error _ | Not_yet _) as exn ->
+             Result.Error exn, env
+       in
+       Pred_or_term.Hashtbl.replace stmt_translations pot vi_or_err;
+       At_data.Hashtbl.replace translations at_data vi_or_err;
+       env)
+    at_for_stmt
+    env
+
+let to_exp ~loc ~adata kf env pot label =
+  let kinstr = Env.get_kinstr env in
+  let lscope = Env.Logic_scope.get env in
+  let at = At_data.create kf kinstr lscope pot label in
+  if is_label_defined label then
+    try
+      let vi_or_err = At_data.Hashtbl.find translations at in
+      match vi_or_err with
+      | Result.Ok vi ->
+        let e, env =
+          if Lscope.is_used lscope pot then
+            indexed_exp ~loc kf env (Smart_exp.lval ~loc (Cil.var vi))
+          else
+            Smart_exp.lval ~loc (Cil.var vi), env
+        in
+        let adata, env=
+          Assert.register_pred_or_term ~loc env pot e adata
+        in
+        e, adata, env
+      | Result.Error exn ->
+        Env.Context.save env;
+        raise exn
+    with Not_found -> begin
+        match pot with
+        | PoT_term t -> !term_to_exp_ref ~adata ~inplace:true kf env t
+        | PoT_pred p -> !predicate_to_exp_ref ~adata ~inplace:true kf env p
+      end
+  else
+    let potstr =
+      match pot with PoT_term _ -> "Term" | PoT_pred _ -> "Predicate"
+    in
+    Options.abort ~source:(fst loc)
+      "%s '%a' was used before being translated.@ \
+       This usually happens when using a label defined after the place@ \
+       where the %s should be translated"
+      potstr
+      Pred_or_term.pretty pot
+      potstr
+
+let reset () =
+  At_data.Hashtbl.clear translations;
+  clabels_ref := Logic_label.Set.empty

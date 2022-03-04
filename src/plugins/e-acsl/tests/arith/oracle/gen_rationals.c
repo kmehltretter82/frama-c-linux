@@ -359,13 +359,13 @@ double __gen_e_acsl_avg(double a, double b)
   double __gen_e_acsl_at_2;
   __e_acsl_mpq_t __gen_e_acsl_at;
   double __retres;
-  __gen_e_acsl_at_2 = b;
   {
     __e_acsl_mpq_t __gen_e_acsl_a;
     __gmpq_init(__gen_e_acsl_a);
     __gmpq_set_d(__gen_e_acsl_a,a);
     __gmpq_init(__gen_e_acsl_at);
     __gmpq_set(__gen_e_acsl_at,(__e_acsl_mpq_struct const *)(__gen_e_acsl_a));
+    __gen_e_acsl_at_2 = b;
     __gmpq_clear(__gen_e_acsl_a);
   }
   __retres = avg(a,b);

@@ -95,13 +95,10 @@ int main(void)
  */
 void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 {
-  float *__gen_e_acsl_at_6;
-  float *__gen_e_acsl_at_5;
-  float *__gen_e_acsl_at_4;
+  __e_acsl_contract_t *__gen_e_acsl_contract;
   float *__gen_e_acsl_at_3;
   float *__gen_e_acsl_at_2;
   float *__gen_e_acsl_at;
-  __e_acsl_contract_t *__gen_e_acsl_contract;
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
@@ -109,6 +106,9 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __e_acsl_store_block((void *)(& Mtmin_out),(size_t)8);
     __e_acsl_store_block((void *)(& Mwmin),(size_t)8);
     __e_acsl_store_block((void *)(& Mtmin_in),(size_t)8);
+    __gen_e_acsl_at = Mtmin_in;
+    __gen_e_acsl_at_2 = Mwmin;
+    __gen_e_acsl_at_3 = Mtmin_out;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)1);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"Mtmin_in",
@@ -167,12 +167,6 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,1);
   }
-  __gen_e_acsl_at_6 = Mwmin;
-  __gen_e_acsl_at_5 = Mtmin_in;
-  __gen_e_acsl_at_4 = Mwmin;
-  __gen_e_acsl_at_3 = Mtmin_in;
-  __gen_e_acsl_at_2 = Mtmin_in;
-  __gen_e_acsl_at = Mtmin_out;
   bar(Mtmin_in,Mwmin,Mtmin_out);
   {
     int __gen_e_acsl_assumes_value;
@@ -186,23 +180,22 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
       __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmin_out)",*__gen_e_acsl_at);
+                                     "*\\old(Mtmin_out)",*__gen_e_acsl_at_3);
       __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmin_in)",*__gen_e_acsl_at_2);
+                                     "*\\old(Mtmin_in)",*__gen_e_acsl_at);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
-                                   "__gen_e_acsl_at_2",
-                                   (void *)__gen_e_acsl_at_2);
+                                   "__gen_e_acsl_at",(void *)__gen_e_acsl_at);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                      "sizeof(float)",0,sizeof(float));
-      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at_2,
+      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at,
                                                     sizeof(float),
-                                                    (void *)__gen_e_acsl_at_2,
-                                                    (void *)(& __gen_e_acsl_at_2));
+                                                    (void *)__gen_e_acsl_at,
+                                                    (void *)(& __gen_e_acsl_at));
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(__gen_e_acsl_at_2)";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(__gen_e_acsl_at)";
       __gen_e_acsl_assert_data_5.file = "bts1307.i";
       __gen_e_acsl_assert_data_5.fct = "bar";
       __gen_e_acsl_assert_data_5.line = 26;
@@ -212,42 +205,43 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
         {.values = (void *)0};
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
-                                   "__gen_e_acsl_at",(void *)__gen_e_acsl_at);
+                                   "__gen_e_acsl_at_3",
+                                   (void *)__gen_e_acsl_at_3);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
                                      "sizeof(float)",0,sizeof(float));
-      __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
+      __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at_3,
                                                       sizeof(float),
-                                                      (void *)__gen_e_acsl_at,
-                                                      (void *)(& __gen_e_acsl_at));
+                                                      (void *)__gen_e_acsl_at_3,
+                                                      (void *)(& __gen_e_acsl_at_3));
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(__gen_e_acsl_at)";
+      __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(__gen_e_acsl_at_3)";
       __gen_e_acsl_assert_data_6.file = "bts1307.i";
       __gen_e_acsl_assert_data_6.fct = "bar";
       __gen_e_acsl_assert_data_6.line = 26;
       __gen_e_acsl_assert_data_6.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-      if (*__gen_e_acsl_at == *__gen_e_acsl_at_2) {
+      if (*__gen_e_acsl_at_3 == *__gen_e_acsl_at) {
         __e_acsl_mpq_t __gen_e_acsl_;
         __e_acsl_mpq_t __gen_e_acsl__2;
         __e_acsl_mpq_t __gen_e_acsl_mul;
         __e_acsl_mpq_t __gen_e_acsl__3;
         int __gen_e_acsl_lt;
         __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                       "*\\old(Mtmin_in)",*__gen_e_acsl_at_3);
+                                       "*\\old(Mtmin_in)",*__gen_e_acsl_at);
         __gmpq_init(__gen_e_acsl_);
         __gmpq_set_str(__gen_e_acsl_,"085/100",10);
         __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                       "*\\old(Mwmin)",*__gen_e_acsl_at_4);
+                                       "*\\old(Mwmin)",*__gen_e_acsl_at_2);
         __gmpq_init(__gen_e_acsl__2);
-        __gmpq_set_d(__gen_e_acsl__2,(double)*__gen_e_acsl_at_4);
+        __gmpq_set_d(__gen_e_acsl__2,(double)*__gen_e_acsl_at_2);
         __gmpq_init(__gen_e_acsl_mul);
         __gmpq_mul(__gen_e_acsl_mul,
                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_),
                    (__e_acsl_mpq_struct const *)(__gen_e_acsl__2));
         __gmpq_init(__gen_e_acsl__3);
-        __gmpq_set_d(__gen_e_acsl__3,(double)*__gen_e_acsl_at_3);
+        __gmpq_set_d(__gen_e_acsl__3,(double)*__gen_e_acsl_at);
         __gen_e_acsl_lt = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl__3),
                                      (__e_acsl_mpq_struct const *)(__gen_e_acsl_mul));
         __gen_e_acsl_and = __gen_e_acsl_lt < 0;
@@ -260,21 +254,21 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       if (__gen_e_acsl_and) {
         int __gen_e_acsl_valid_read_3;
         __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                       "*\\old(Mtmin_in)",*__gen_e_acsl_at_5);
+                                       "*\\old(Mtmin_in)",*__gen_e_acsl_at);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
           {.values = (void *)0};
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
-                                     "__gen_e_acsl_at_5",
-                                     (void *)__gen_e_acsl_at_5);
+                                     "__gen_e_acsl_at",
+                                     (void *)__gen_e_acsl_at);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                        "sizeof(float)",0,sizeof(float));
-        __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)__gen_e_acsl_at_5,
+        __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
                                                         sizeof(float),
-                                                        (void *)__gen_e_acsl_at_5,
-                                                        (void *)(& __gen_e_acsl_at_5));
+                                                        (void *)__gen_e_acsl_at,
+                                                        (void *)(& __gen_e_acsl_at));
         __gen_e_acsl_assert_data_7.blocking = 1;
         __gen_e_acsl_assert_data_7.kind = "RTE";
-        __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(__gen_e_acsl_at_5)";
+        __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(__gen_e_acsl_at)";
         __gen_e_acsl_assert_data_7.file = "bts1307.i";
         __gen_e_acsl_assert_data_7.fct = "bar";
         __gen_e_acsl_assert_data_7.line = 26;
@@ -282,7 +276,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         __e_acsl_assert(__gen_e_acsl_valid_read_3,
                         & __gen_e_acsl_assert_data_7);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-        __gen_e_acsl_if = (double)*__gen_e_acsl_at_5 != 0.;
+        __gen_e_acsl_if = (double)*__gen_e_acsl_at != 0.;
       }
       else {
         __e_acsl_mpq_t __gen_e_acsl__4;
@@ -293,9 +287,9 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         __gmpq_init(__gen_e_acsl__4);
         __gmpq_set_str(__gen_e_acsl__4,"085/100",10);
         __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                       "*\\old(Mwmin)",*__gen_e_acsl_at_6);
+                                       "*\\old(Mwmin)",*__gen_e_acsl_at_2);
         __gmpq_init(__gen_e_acsl__5);
-        __gmpq_set_d(__gen_e_acsl__5,(double)*__gen_e_acsl_at_6);
+        __gmpq_set_d(__gen_e_acsl__5,(double)*__gen_e_acsl_at_2);
         __gmpq_init(__gen_e_acsl_mul_2);
         __gmpq_mul(__gen_e_acsl_mul_2,
                    (__e_acsl_mpq_struct const *)(__gen_e_acsl__4),
@@ -340,10 +334,10 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
  */
 void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
+  __e_acsl_contract_t *__gen_e_acsl_contract;
   float *__gen_e_acsl_at_3;
   float *__gen_e_acsl_at_2;
   float *__gen_e_acsl_at;
-  __e_acsl_contract_t *__gen_e_acsl_contract;
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
@@ -351,6 +345,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __e_acsl_store_block((void *)(& Mtmax_out),(size_t)8);
     __e_acsl_store_block((void *)(& Mwmax),(size_t)8);
     __e_acsl_store_block((void *)(& Mtmax_in),(size_t)8);
+    __gen_e_acsl_at = Mtmax_in;
+    __gen_e_acsl_at_2 = Mwmax;
+    __gen_e_acsl_at_3 = Mtmax_out;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)1);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"Mtmax_in",
@@ -409,9 +406,6 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,1);
   }
-  __gen_e_acsl_at_3 = Mwmax;
-  __gen_e_acsl_at_2 = Mtmax_in;
-  __gen_e_acsl_at = Mtmax_out;
   foo(Mtmax_in,Mwmax,Mtmax_out);
   {
     int __gen_e_acsl_assumes_value;
@@ -434,9 +428,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
       __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmax_out)",*__gen_e_acsl_at);
+                                     "*\\old(Mtmax_out)",*__gen_e_acsl_at_3);
       __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmax_in)",*__gen_e_acsl_at_2);
+                                     "*\\old(Mtmax_in)",*__gen_e_acsl_at);
       __gmpq_init(__gen_e_acsl_);
       __gmpq_set_str(__gen_e_acsl_,"5",10);
       __gmpq_init(__gen_e_acsl__2);
@@ -448,9 +442,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl__2),
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl__3));
       __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mwmax)",*__gen_e_acsl_at_3);
+                                     "*\\old(Mwmax)",*__gen_e_acsl_at_2);
       __gmpq_init(__gen_e_acsl__4);
-      __gmpq_set_d(__gen_e_acsl__4,(double)*__gen_e_acsl_at_3);
+      __gmpq_set_d(__gen_e_acsl__4,(double)*__gen_e_acsl_at_2);
       __gmpq_init(__gen_e_acsl_mul);
       __gmpq_mul(__gen_e_acsl_mul,
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_div),
@@ -466,13 +460,13 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_),
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_mul_2));
       __gmpq_init(__gen_e_acsl__6);
-      __gmpq_set_d(__gen_e_acsl__6,(double)*__gen_e_acsl_at_2);
+      __gmpq_set_d(__gen_e_acsl__6,(double)*__gen_e_acsl_at);
       __gmpq_init(__gen_e_acsl_add);
       __gmpq_add(__gen_e_acsl_add,
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl__6),
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_sub));
       __gmpq_init(__gen_e_acsl__7);
-      __gmpq_set_d(__gen_e_acsl__7,(double)*__gen_e_acsl_at);
+      __gmpq_set_d(__gen_e_acsl__7,(double)*__gen_e_acsl_at_3);
       __gen_e_acsl_ne = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl__7),
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_add));
       __gen_e_acsl_assert_data_4.blocking = 1;

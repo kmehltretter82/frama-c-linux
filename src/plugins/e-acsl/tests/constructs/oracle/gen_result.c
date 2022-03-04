@@ -112,10 +112,8 @@ int __gen_e_acsl_g(int x)
 /*@ ensures \result == (int)(\old(x) - \old(x)); */
 int __gen_e_acsl_f(int x)
 {
-  int __gen_e_acsl_at_2;
   long __gen_e_acsl_at;
   int __retres;
-  __gen_e_acsl_at_2 = x;
   __gen_e_acsl_at = (long)x;
   __retres = f(x);
   {
@@ -124,15 +122,15 @@ int __gen_e_acsl_f(int x)
                                  __retres);
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"\\old(x)",0,
                                   __gen_e_acsl_at);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\old(x)",0,
-                                 __gen_e_acsl_at_2);
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"\\old(x)",0,
+                                  __gen_e_acsl_at);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "\\result == (int)(\\old(x) - \\old(x))";
     __gen_e_acsl_assert_data.file = "result.i";
     __gen_e_acsl_assert_data.fct = "f";
     __gen_e_acsl_assert_data.line = 5;
-    __e_acsl_assert(__retres == (int)(__gen_e_acsl_at - __gen_e_acsl_at_2),
+    __e_acsl_assert(__retres == (int)(__gen_e_acsl_at - __gen_e_acsl_at),
                     & __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     return __retres;

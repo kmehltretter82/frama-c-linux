@@ -22,6 +22,8 @@
 
 open Cil_types
 
+let dkey = Options.Dkey.logic_normalizer
+
 module Id_predicate =
   Datatype.Make_with_collections
     (struct
@@ -123,7 +125,7 @@ let preprocess_term ~loc t =
   | _ -> None
 
 let preprocessor = object
-  inherit E_acsl_visitor.visitor
+  inherit E_acsl_visitor.visitor dkey
 
   method !vannotation annot =
     match annot with
@@ -142,19 +144,13 @@ let preprocessor = object
 end
 
 let preprocess ast =
-  Visitor.visitFramacFileSameGlobals
-    (preprocessor :> Visitor.frama_c_inplace)
-    ast
+  preprocessor#visit_file ast
 
 let preprocess_annot annot =
-  ignore
-    (Visitor.visitFramacCodeAnnotation
-       (preprocessor :> Visitor.frama_c_inplace)
-       annot)
+  ignore @@ preprocessor#visit_code_annot annot
 
 let preprocess_predicate p =
-  ignore
-    (Visitor.visitFramacPredicate (preprocessor :> Visitor.frama_c_inplace) p)
+  ignore @@ preprocessor#visit_predicate p
 
 let get_pred = Memo.get_pred
 let get_term = Memo.get_term
