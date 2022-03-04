@@ -176,16 +176,16 @@ PTEST_OPTS?=
 PTEST_DIRS?=$(PURGED_PTEST_DIRS)
 
 # Defines the related dune targets
-PTEST_DUNE_TARGETS=$(addsuffix /ptests,$(addprefix @, tests src/plugins))
+PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @, tests src/plugins))
 # TODO: uncomments when a dune file is at least generated for all PTEST_DIRS
-#PTEST_DUNE_TARGETS=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
+#PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
 
 .PHONY: tests.info
 tests.info:
 	echo "PURGED_PTEST_DIRS=$(PURGED_PTEST_DIRS)"
 	echo "PTEST_DIRS=$(PTEST_DIRS)"
 	echo "PTEST_OPTS=$(PTEST_OPTS)"
-	echo "PTEST_DUNE_TARGETS=$(PTEST_DUNE_TARGETS)"
+	echo "PTEST_ALIASES=$(PTEST_ALIASES)"
 
 # Note: the public name of ptest.exe is frama-c-ptests
 ptests/ptests.exe: ptests/ptests.ml
@@ -229,19 +229,19 @@ run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
 .PHONY: run-tests
 run-tests: FRAMAC_WP_CACHE=replay
 run-tests: run-ptests
-	dune build $(PTEST_DUNE_TARGETS)
+	dune build $(PTEST_ALIASESS)
 
 # Replay tests of for all configurations (requires  all dune files)
 .PHONY: test.replay
 tests.replay: FRAMAC_WP_CACHE=replay
 tests.replay:
-	dune build $(PTEST_DUNE_TARGETS)
+	dune build $(PTEST_ALIASESS)
 
 # Update cache entries of for all configurations (requires all dune files)
 .PHONY: tests.update-wp-cache
 tests.update-wp-cache: FRAMAC_WP_CACHE=update
 tests.update-wp-cache:
-	dune build $(PTEST_DUNE_TARGETS)
+	dune build $(PTEST_ALIASES)
 
 .PHONY: tests
 ifneq ($(FRAMAC_WP_CACHEDIR),)
