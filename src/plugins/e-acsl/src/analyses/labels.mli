@@ -20,12 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Labeled term and predicates pre-analysis.
+(** Pre-analysis for Labeled terms and predicates.
 
     This pre-analysis records, for each labeled term or predicate, the place
     where the translation must happen.
 
-    The list of labeled term or predicates to be translated for a given
+    The list of labeled terms or predicates to be translated for a given
     statement is provided by [Labels.at_for_stmt]. *)
 
 open Cil_types

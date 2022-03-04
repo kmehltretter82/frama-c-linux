@@ -255,7 +255,7 @@ let translations: varinfo Error.result At_data.Hashtbl.t =
   At_data.Hashtbl.create 17
 
 (* [pretranslate_to_exp ~loc kf env pot] immediately translates the given
-   [pred_or_term] in the current environment and return the translated
+   [pred_or_term] in the current environment and returns the translated
    expression. *)
 let pretranslate_to_exp ~loc kf env pot =
   Options.debug ~level:4 "pre-translating %a in local environment '%a'"
@@ -440,7 +440,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
 let clabels_ref: Logic_label.Set.t ref = ref Logic_label.Set.empty
 
 (* [is_label_defined label] returns [true] if [label] is either a C label that
-   has been defined, a built-in label or a formal label, and return false if
+   has been defined, a built-in label or a formal label, and returns [false] if
    [label] is a C label that has not been defined. *)
 let is_label_defined label =
   match label with
@@ -533,7 +533,7 @@ let to_exp ~loc ~adata kf env pot label =
       | Result.Error exn ->
         Env.Context.save env;
         raise exn
-    with Not_found ->begin
+    with Not_found -> begin
         match pot with
         | PoT_term t -> !term_to_exp_ref ~adata ~inplace:true kf env t
         | PoT_pred p -> !predicate_to_exp_ref ~adata ~inplace:true kf env p

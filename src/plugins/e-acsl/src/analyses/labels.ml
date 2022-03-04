@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Labeled term and predicates pre-analysis *)
+(** Pre-analysis for Labeled terms and predicates. *)
 
 open Cil_types
 open Cil_datatype
