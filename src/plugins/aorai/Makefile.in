@@ -135,7 +135,8 @@ Aorai_DEFAULT_TESTS: $(TEST_DEPENDENCIES)
 # (see ../wp/tests/README.md for more information). If it is not
 # in its default place of ../wp-cache, use AORAI_WP_CACHE variable to give the
 # proper absolute path.
-# Don't forget to add the new cache files to the repo if needed.
+# Don't forget to add the new cache files to the repo if needed,
+# in particular if CI complains about its aorai-prove target.
 
 $(Aorai_DIR)/tests/ptests_config: $(Aorai_DIR)/tests/test_config_prove
 
@@ -146,12 +147,13 @@ $(Aorai_DIR)/tests/test_config_prove: \
 	$(SED) -e 's!@AORAI_WP_SHARE@!$(AORAI_WP_SHARE)!' $< > $@
 	$(CHMOD_RO) $@
 
-AORAI_WP_CACHE?=$(abspath $(Aorai_DIR)/../wp-cache)
+AORAI_WP_CACHEDIR?=$(abspath $(Aorai_DIR)/../wp-cache)
+AORAI_WP_CACHE?=update
 
 .PHONY: aorai-test-prove
 aorai-test-prove: $(TEST_DEPENDENCIES) $(Aorai_DIR)/tests/test_config_prove
-	FRAMAC_WP_CACHE=update \
-	FRAMAC_WP_CACHEDIR=$(AORAI_WP_CACHE) \
+	FRAMAC_WP_CACHE=$(AORAI_WP_CACHE) \
+	FRAMAC_WP_CACHEDIR=$(AORAI_WP_CACHEDIR) \
 	PTESTS_OPTS+=" -config prove" \
 	$(MAKE) Aorai_TESTS
 

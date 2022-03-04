@@ -253,6 +253,8 @@ pkgs.lib.makeExtensible
           HOME=$(pwd)/home
           why3 config detect
           make src/plugins/aorai/tests/ptests_config
+          export AORAI_WP_CACHE=replay
+          export AORAI_WP_CACHEDIR=${plugins.wp-cache.src}
           make PTESTS_OPTS="-error-code" aorai-test-prove
         '';
 
