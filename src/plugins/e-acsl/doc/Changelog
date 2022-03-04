@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2022-03-04] Improve translation of `\at()` terms and
+                predicates (frama-c/e-acsl#108).
 -* E-ACSL       [2022-03-01] Fix normalization of global annotations that
                 may lead to crashes (frama-c/e-acsl#195).
 -  E-ACSL       [2022-01-28] Add Linux's pthread concurrency support.
