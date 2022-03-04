@@ -154,7 +154,7 @@ AORAI_WP_CACHE?=update
 aorai-test-prove: $(TEST_DEPENDENCIES) $(Aorai_DIR)/tests/test_config_prove
 	FRAMAC_WP_CACHE=$(AORAI_WP_CACHE) \
 	FRAMAC_WP_CACHEDIR=$(AORAI_WP_CACHEDIR) \
-	PTESTS_OPTS+=" -config prove" \
+	PTESTS_OPTS="$$PTESTS_OPTS -config prove" \
 	$(MAKE) Aorai_TESTS
 
 # Regenerating the Makefile on need
