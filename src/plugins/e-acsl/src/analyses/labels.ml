@@ -517,6 +517,8 @@ class vis_at_labels () = object (self)
 
   inherit E_acsl_visitor.visitor dkey
 
+  method! glob_annot _ = Cil.SkipChildren
+
   (** Launch the analysis on the given predicate. *)
   method! vpredicate p =
     let kf = Option.get self#current_kf in
@@ -549,6 +551,7 @@ let reset () =
   Stmt.Hashtbl.clear at_data_for_stmts
 
 let _debug () =
+  Options.feedback ~level:2 "Labels preprocessing";
   Options.feedback ~level:2 "|Locations:";
   Stmt.Hashtbl.iter
     (fun stmt ats_ref ->

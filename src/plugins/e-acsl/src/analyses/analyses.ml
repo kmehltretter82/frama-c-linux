@@ -32,7 +32,7 @@ let preprocess () =
   analyses_feedback "typing annotations";
   Typing.type_program ast;
   analyses_feedback
-    "computing translation locations of labeled predicates and terms";
+    "computing future locations of labeled predicates and terms";
   Labels.preprocess ast
 
 let reset () =
