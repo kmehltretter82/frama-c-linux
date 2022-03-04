@@ -167,15 +167,25 @@ force-reconfigure:
 
 
 ##############################################################################
+# TESTING
+################################
+
+# Defines where to find the ptest_config file
 PURGED_PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
 PTEST_OPTS?=
 PTEST_DIRS?=$(PURGED_PTEST_DIRS)
+
+# Defines the related dune targets
+PTEST_DUNE_TARGETS=$(addsuffix /ptests,$(addprefix @, tests src/plugins))
+# TODO: uncomments when a dune file is at least generated for all PTEST_DIRS
+#PTEST_DUNE_TARGETS=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
 
 .PHONY: tests.info
 tests.info:
 	echo "PURGED_PTEST_DIRS=$(PURGED_PTEST_DIRS)"
 	echo "PTEST_DIRS=$(PTEST_DIRS)"
 	echo "PTEST_OPTS=$(PTEST_OPTS)"
+	echo "PTEST_DUNE_TARGETS=$(PTEST_DUNE_TARGETS)"
 
 # Note: the public name of ptest.exe is frama-c-ptests
 ptests/ptests.exe: ptests/ptests.ml
@@ -189,10 +199,12 @@ ptests/wtests.exe: ptests/wtests.ml
 PTESTS=dune exec --root ptests -- frama-c-ptests
 #PTESTS=dune exec --root ptests -- frama-c-ptests -v
 
-WTESTS=dune exec --root ptests -- frama-c-wtests
 .PHONY: ptests-help
 ptests-help:
 	$(PTESTS) --help
+
+# Note: wrapper that can be used during dune testing (c.f. frama-c-ptests)
+WTESTS=dune exec --root ptests -- frama-c-wtests
 
 .PHONY: wtests-help
 wtests-help:
@@ -213,11 +225,23 @@ clean-tests: purge-tests
 run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
 	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
-# run tests of for all configurations (requires all dune files)
+# run tests of for all configurations (and build all dune files)
 .PHONY: run-tests
 run-tests: FRAMAC_WP_CACHE=replay
 run-tests: run-ptests
-	dune build @tests/ptests @src/plugins/ptests
+	dune build $(PTEST_DUNE_TARGETS)
+
+# run tests of for all configurations (and build all dune files)
+.PHONY: test.replay
+tests.replay: FRAMAC_WP_CACHE=replay
+tests.replay:
+	dune build $(PTEST_DUNE_TARGETS)
+
+# run tests of for all configurations (requires all dune files)
+.PHONY: tests.update-wp-cache
+tests.update-wp-cache: FRAMAC_WP_CACHE=update
+tests.update-wp-cache:
+	dune build $(PTEST_DUNE_TARGETS)
 
 .PHONY: tests
 ifneq ($(FRAMAC_WP_CACHEDIR),)
@@ -228,6 +252,8 @@ tests: run-tests
 endif
 
 ##############################################################################
+# INSTALL/UNINSTALL
+################################
 .PHONY: install uninstall
 
 FRAMAC_INSTALLDIR?=""
