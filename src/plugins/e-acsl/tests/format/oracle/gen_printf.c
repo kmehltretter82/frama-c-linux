@@ -912,6 +912,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_2.fct = "strchr";
       __gen_e_acsl_assert_data_2.line = 177;
+      __gen_e_acsl_assert_data_2.name = "found/result_char";
       __e_acsl_assert((int)*__retres == (int)((char)__gen_e_acsl_at_2),
                       & __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);

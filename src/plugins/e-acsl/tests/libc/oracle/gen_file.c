@@ -277,6 +277,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_5.fct = "fread";
     __gen_e_acsl_assert_data_5.line = 356;
+    __gen_e_acsl_assert_data_5.name = "size_read";
     __e_acsl_assert(__retres <= __gen_e_acsl_at_3,
                     & __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);

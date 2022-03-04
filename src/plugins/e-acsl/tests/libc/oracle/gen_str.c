@@ -329,6 +329,7 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
     __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_8.fct = "strcat";
     __gen_e_acsl_assert_data_8.line = 434;
+    __gen_e_acsl_assert_data_8.name = "result_ptr";
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     __e_acsl_delete_block((void *)(& dest));

@@ -159,6 +159,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       __gen_e_acsl_assert_data_3.file = "valid_in_contract.c";
       __gen_e_acsl_assert_data_3.fct = "f";
       __gen_e_acsl_assert_data_3.line = 18;
+      __gen_e_acsl_assert_data_3.name = "B2";
       __e_acsl_assert(__retres == __gen_e_acsl_at,
                       & __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);

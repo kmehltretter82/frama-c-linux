@@ -195,7 +195,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                                     (void *)(& __gen_e_acsl_at));
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at)";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(__gen_e_acsl_at)";
       __gen_e_acsl_assert_data_5.file = "bts1307.i";
       __gen_e_acsl_assert_data_5.fct = "bar";
       __gen_e_acsl_assert_data_5.line = 26;
@@ -215,7 +215,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                                       (void *)(& __gen_e_acsl_at_3));
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_3)";
+      __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(__gen_e_acsl_at_3)";
       __gen_e_acsl_assert_data_6.file = "bts1307.i";
       __gen_e_acsl_assert_data_6.fct = "bar";
       __gen_e_acsl_assert_data_6.line = 26;
@@ -268,7 +268,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                                         (void *)(& __gen_e_acsl_at));
         __gen_e_acsl_assert_data_7.blocking = 1;
         __gen_e_acsl_assert_data_7.kind = "RTE";
-        __gen_e_acsl_assert_data_7.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at)";
+        __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(__gen_e_acsl_at)";
         __gen_e_acsl_assert_data_7.file = "bts1307.i";
         __gen_e_acsl_assert_data_7.fct = "bar";
         __gen_e_acsl_assert_data_7.line = 26;

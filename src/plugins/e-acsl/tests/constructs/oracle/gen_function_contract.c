@@ -433,6 +433,7 @@ void __gen_e_acsl_o(void)
       __gen_e_acsl_assert_data_13.file = "function_contract.i";
       __gen_e_acsl_assert_data_13.fct = "o";
       __gen_e_acsl_assert_data_13.line = 99;
+      __gen_e_acsl_assert_data_13.name = "neg";
       __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_13);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     }
@@ -450,6 +451,7 @@ void __gen_e_acsl_o(void)
       __gen_e_acsl_assert_data_14.file = "function_contract.i";
       __gen_e_acsl_assert_data_14.fct = "o";
       __gen_e_acsl_assert_data_14.line = 104;
+      __gen_e_acsl_assert_data_14.name = "pos";
       __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_14);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
     }
@@ -467,6 +469,7 @@ void __gen_e_acsl_o(void)
       __gen_e_acsl_assert_data_15.file = "function_contract.i";
       __gen_e_acsl_assert_data_15.fct = "o";
       __gen_e_acsl_assert_data_15.line = 109;
+      __gen_e_acsl_assert_data_15.name = "odd";
       __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_15);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
     }
@@ -484,6 +487,7 @@ void __gen_e_acsl_o(void)
       __gen_e_acsl_assert_data_16.file = "function_contract.i";
       __gen_e_acsl_assert_data_16.fct = "o";
       __gen_e_acsl_assert_data_16.line = 114;
+      __gen_e_acsl_assert_data_16.name = "even";
       __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_16);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
     }

@@ -116,10 +116,11 @@ int __gen_e_acsl_f(int *p)
                                                   (void *)p,(void *)(& p));
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "RTE";
-    __gen_e_acsl_assert_data.pred_txt = "mem_access: \\valid_read(p)";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid_read(p)";
     __gen_e_acsl_assert_data.file = "e-acsl-functions.c";
     __gen_e_acsl_assert_data.fct = "f";
     __gen_e_acsl_assert_data.line = 11;
+    __gen_e_acsl_assert_data.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __gen_e_acsl_at = *p;
@@ -152,10 +153,11 @@ int __gen_e_acsl_f(int *p)
                                                     (void *)p,(void *)(& p));
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "RTE";
-    __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read(p)";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(p)";
     __gen_e_acsl_assert_data_4.file = "e-acsl-functions.c";
     __gen_e_acsl_assert_data_4.fct = "f";
     __gen_e_acsl_assert_data_4.line = 10;
+    __gen_e_acsl_assert_data_4.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __gen_e_acsl_assert_data_3.blocking = 1;
