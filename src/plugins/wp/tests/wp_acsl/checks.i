@@ -1,7 +1,7 @@
 /* run.config
-PLUGIN: wp,rtegen,scope,eva,report,inout
+PLUGIN: @PTEST_PLUGIN@,rtegen,scope,eva,report,inout
    OPT: -then -eva -then -report
-PLUGIN: wp,rtegen
+PLUGIN: @PTEST_PLUGIN@,rtegen
    OPT: -wp-prop=@check
    OPT: -wp-prop=-@check
 */

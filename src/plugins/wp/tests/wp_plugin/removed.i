@@ -1,5 +1,5 @@
 /* run.config_qualif
-PLUGIN: wp,rtegen,eva,scope,inout
+PLUGIN: @PTEST_PLUGIN@,rtegen,eva,scope,inout
    OPT: -no-wp -eva -eva-msg-key=-summary -then -wp -then -no-eva -warn-unsigned-overflow -wp
  */
 /* run.config
