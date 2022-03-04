@@ -219,7 +219,7 @@ run-tests: FRAMAC_WP_CACHE=replay
 run-tests: run-ptests
 	dune build @tests/ptests @src/plugins/ptests
 
-.PHONY: run-tests
+.PHONY: tests
 ifneq ($(FRAMAC_WP_CACHEDIR),)
 tests: run-tests
 else
