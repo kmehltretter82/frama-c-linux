@@ -43,6 +43,7 @@ type localizable = Printer_tag.localizable =
 
 module Locs: sig
   type state
+
   (** To call when the source buffer is about to be discarded *)
   val create: unit -> state
   val clear: state -> unit

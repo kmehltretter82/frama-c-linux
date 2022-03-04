@@ -905,26 +905,25 @@ class type cilVisitor = object
   method vstmt: stmt -> stmt visitAction
   (** Control-flow statement. *)
 
-  method vblock: block -> block visitAction     (** Block. Replaced in
-                                                    place. *)
-  method vfunc: fundec -> fundec visitAction    (** Function definition.
-                                                    Replaced in place. *)
-  method vglob: global -> global list visitAction (** Global (vars, types,
-                                                      etc.)  *)
+  method vblock: block -> block visitAction
+  (** Block. Replaced in place. *)
+
+  method vfunc: fundec -> fundec visitAction
+  (** Function definition. Replaced in place. *)
+
+  method vglob: global -> global list visitAction
+  (** Global (vars, types, etc.)  *)
+
   method vinit: varinfo -> offset -> init -> init visitAction
-  (** Initializers for globals,
-   * pass the global where this
-   * occurs, and the offset *)
+  (** Initializers for globals, pass the global where this occurs, and the
+      offset *)
 
   method vlocal_init: varinfo -> local_init -> local_init visitAction
 
-  method vtype: typ -> typ visitAction          (** Use of some type. Note
-                                                 * that for structure/union
-                                                 * and enumeration types the
-                                                 * definition of the
-                                                 * composite type is not
-                                                 * visited. Use [vglob] to
-                                                 * visit it.  *)
+  method vtype: typ -> typ visitAction
+  (** Use of some type. Note that for structure/union and enumeration types the
+      definition of the composite type is not visited. Use [vglob] to visit it.
+  *)
 
   method vcompinfo: compinfo -> compinfo visitAction
 
@@ -936,6 +935,7 @@ class type cilVisitor = object
 
   method vattr: attribute -> attribute list visitAction
   (** Attribute. Each attribute can be replaced by a list *)
+
   method vattrparam: attrparam -> attrparam visitAction
   (** Attribute parameters. *)
 
@@ -6466,7 +6466,7 @@ let pushGlobal (g: global)
           GType (_, l) | GCompTag (_, l) -> Some (getVarsInGlobal g, l)
         | GEnumTag (_, l) | GPragma (Attr("pack", _), l)
         | GCompTagDecl (_, l) | GEnumTagDecl (_, l) -> Some ([], l)
-        (** Move the warning pragmas early
+        (* Move the warning pragmas early
             | GPragma(Attr(s, _), l) when hasPrefix "warning" s -> Some ([], l)
         *)
         | _ -> None (* Does not go with the types *)

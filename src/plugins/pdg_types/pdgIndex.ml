@@ -446,13 +446,13 @@ end
 module FctIndex = struct
 
   type ('node_info, 'call_info) t = {
-    (** inputs and outputs of the function *)
     mutable sgn : 'node_info Signature.t ;
-    (** calls signatures *)
+    (** inputs and outputs of the function *)
     mutable calls :
       (Cil_types.stmt * ('call_info option * 'node_info Signature.t)) list ;
-    (** everything else *)
+    (** calls signatures *)
     other : 'node_info H.t
+    (** everything else *)
   }
 
   open Structural_descr

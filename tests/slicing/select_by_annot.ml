@@ -33,8 +33,8 @@ let main _ =
   Slicing.Api.Project.pretty Format.std_formatter;
   extract_and_print ();
 
-  (** create another slice for "main" to check if it also contains the previous
-      * selection. *)
+  (* create another slice for "main" to check if it also contains the previous
+   * selection. *)
 
   let ff = Slicing.Api.Slice.create kf_main in
   let select = LibSelect.select_data "b" kf_main in

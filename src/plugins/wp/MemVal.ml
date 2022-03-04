@@ -747,7 +747,7 @@ struct
 
   let initialized _sigma _l = F.p_true (* todo *)
   let is_well_formed _ = F.p_true (* todo *)
-  let base_offset _loc = assert false (** TODO *)
+  let base_offset _loc = assert false (* TODO *)
   type domain = Sigma.domain
   let no_binder = { bind = fun _ f v -> f v }
   let configure_ia _ = no_binder (* todo *)

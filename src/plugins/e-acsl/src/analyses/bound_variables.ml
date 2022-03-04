@@ -89,6 +89,7 @@ module Quantifier: sig
   val get:
     predicate ->
     ((term * logic_var * term) list * predicate) Error.result
+
   (** getter and setter for the additional guard that intersects with the type
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
@@ -199,18 +200,18 @@ module Constraints: sig
   val raise_error_invalid_pred: ?warn_rel:bool -> predicate -> t -> 'a
 end = struct
   type t = {
-    (** Quantification predicate being analyzed. *)
     quantif: predicate;
-    (** Variables of the quantification that still need guards. *)
+    (** Quantification predicate being analyzed. *)
     bounded_vars: Logic_var.Set.t;
+    (** Variables of the quantification that still need guards. *)
+    rev_order: Logic_var.t list;
     (** Bounded variables list in reverse order in which they must be
         generated. *)
-    rev_order: Logic_var.t list;
-    (** Table associating a bounded variable with its guard. *)
     guards: (term * relation * (relation * term) option) Logic_var.Map.t;
+    (** Table associating a bounded variable with its guard. *)
+    linked_upper_bounds: (logic_var * relation) Logic_var.Map.t;
     (** Table associating a bounded variable with a relation with another
         bounded variable. *)
-    linked_upper_bounds: (logic_var * relation) Logic_var.Map.t;
   }
 
   let empty quantif bounded_vars =

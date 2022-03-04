@@ -42,9 +42,15 @@ val is_tactic : alternative -> bool
 val a_prover : VCS.prover -> VCS.result -> alternative
 val a_tactic : jtactic -> (string * jscript) list -> alternative
 
-val pending : alternative -> int (** pending goals *)
-val pending_any : jscript -> int (** minimum of pending goals *)
-val has_proof : jscript -> bool (** Has a tactical alternative *)
+val pending : alternative -> int
+(** pending goals *)
+
+val pending_any : jscript -> int
+(** minimum of pending goals *)
+
+val has_proof : jscript -> bool
+(** Has a tactical alternative *)
+
 val decode : Json.t -> jscript
 val encode : jscript -> Json.t
 

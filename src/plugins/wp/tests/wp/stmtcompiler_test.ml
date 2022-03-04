@@ -86,7 +86,7 @@ let run () =
     prove_sequent kf goal.Compiler.goal_prop sequent
   in
 
-  (** Test on real Cil functions *)
+  (* Test on real Cil functions *)
   let _run_test model kf =
     let context = model , WpContext.Kf kf in
     WpContext.on_context context

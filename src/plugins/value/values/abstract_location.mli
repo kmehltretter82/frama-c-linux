@@ -31,8 +31,11 @@ type 'v truth = 'v Abstract_value.truth
 module type S = sig
   type value
 
-  type location  (** abstract locations *)
-  type offset    (** abstract offsets *)
+  (** abstract locations *)
+  type location
+
+  (** abstract offsets *)
+  type offset
 
   val top: location
 

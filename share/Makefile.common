@@ -82,13 +82,10 @@ ifeq ($(DEVELOPMENT),yes)
 #   module.
 # - 48 (implicit elimination of optional arguments): makes use of functions
 #   with optional arguments heavier in higher-order context
-# - 50 (warning about ambiguously placed OCamldoc comments): while it would be
-#   useful to ensure OCamldoc understands comments correctly, some clean-up
-#   is needed before enabling this warning.
 # - 67 (unused module parameter in functor signature): naming all parameters
 #   in functor signatures is a common practice that seems harmless. Warning 60
 #   ensures that named functor parameters are indeed used in the implementation.
-WARNINGS ?= -w +a-4-9-40-41-42-44-45-48-50-67
+WARNINGS ?= -w +a-4-9-40-41-42-44-45-48-67
 
 # - 3 (deprecated feature) cannot always be avoided for OCaml stdlib when
 #   supporting several OCaml versions

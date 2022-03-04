@@ -60,6 +60,7 @@ module Binding: sig
   (** [add ty v var] binds the value [v] to the variable name [var].  Thus,
       [pp ty v] prints [var] and not use the standard pretty printer.  Very
       useful to pretty print values with no associated pretty printer. *)
+
   exception Name_already_exists of string
   val add_once: 'a Type.t -> 'a -> string -> unit
   (** Same as function [add] above but raise the exception [Already_exists]

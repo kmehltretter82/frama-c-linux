@@ -33,7 +33,9 @@ module Location_Bytes : sig
 
   module M : sig
     type key = Base.t
-    type t (** Mapping from bases to bytes-expressed offsets *)
+
+    (** Mapping from bases to bytes-expressed offsets *)
+    type t
     val iter : (Base.t -> Ival.t -> unit) -> t -> unit
     val find :  key -> t -> Ival.t
     val fold : (Base.t -> Ival.t -> 'a -> 'a) -> t -> 'a -> 'a
@@ -59,8 +61,10 @@ module Location_Bytes : sig
 
   val singleton_zero : t
   (** the set containing only the value for to the C expression [0] *)
+
   val singleton_one : t
   (** the set containing only the value [1] *)
+
   val zero_or_one : t
 
   val is_zero : t -> bool
@@ -114,6 +118,7 @@ module Location_Bytes : sig
   val inject_top_origin : Origin.t -> Base.Hptset.t -> t
   (** [inject_top_origin origin p] creates a top with origin [origin]
       and additional information [param] *)
+
   val top_with_origin: Origin.t -> t
   (** Completely imprecise value. Use only as last resort. *)
 
@@ -123,9 +128,11 @@ module Location_Bytes : sig
   val fold_bases : (Base.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** Fold on all the bases of the location, including [Top bases].
       @raise Error_Top in the case [Top Top]. *)
+
   val fold_i : (Base.t -> Ival.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** Fold with offsets.
       @raise Error_Top in the cases [Top Top], [Top bases]. *)
+
   val fold_topset_ok: (Base.t -> Ival.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** Fold with offsets, including in the case [Top bases]. In this case,
       [Ival.top] is supplied to the iterator.
@@ -158,6 +165,7 @@ module Location_Bytes : sig
   val cardinal_less_than : t -> int -> int
   (** [cardinal_less_than v card] returns the cardinal of [v] if it is less
       than [card], or raises [Not_less_than]. *)
+
   val cardinal: t -> Integer.t option (** None if the cardinal is unbounded *)
 
   val find_lonely_key : t -> Base.t * Ival.t

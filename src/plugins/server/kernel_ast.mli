@@ -47,8 +47,11 @@ sig
   val jglobal : jtype
   val jproperty : jtype
 
-  val create : t -> string (** Memoized unique identifier. *)
-  val lookup : string -> t (** Get back the localizable, if any. *)
+  val create : t -> string
+  (** Memoized unique identifier. *)
+
+  val lookup : string -> t
+  (** Get back the localizable, if any. *)
 end
 
 module KfMarker : Data.S with type t = kernel_function * Printer_tag.localizable

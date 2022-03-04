@@ -346,6 +346,7 @@ let prepare_tables () =
   Logic_builtin_used.iter Logic_info.add
 
 (** C typedefs *)
+
 (**
    -  true => identifier is a type name
    -  false => identifier is a plain identifier

@@ -114,7 +114,7 @@ let t_app' ~cnv ~f ~l ~p tl ty =
 
 (** fold map list of at least one element *)
 let fold_map map fold = function
-  | [] -> assert false (** absurd: forbidden by qed  *)
+  | [] -> assert false (* absurd: forbidden by qed  *)
   | a::tl ->
     List.fold_left (fun acc a -> fold acc (map a)) (map a) tl
 
@@ -317,7 +317,7 @@ let rec full_triggers = function
 
 let rec of_trigger ~cnv t =
   match t with
-  | Qed.Engine.TgAny -> assert false (** absurd: filter by full_triggers *)
+  | Qed.Engine.TgAny -> assert false (* absurd: filter by full_triggers *)
   | Qed.Engine.TgVar v -> begin
       try Lang.F.Tmap.find (Lang.F.e_var v) cnv.subst
       with Not_found -> why3_failure "Unbound variable %a" Lang.F.pp_var v
@@ -486,7 +486,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         let mtau = Lang.F.typeof m in
         let ksort = match mtau with
           | Array(ksort,_) -> ksort
-          | _ -> assert false (** absurd: by qed typing *)in
+          | _ -> assert false (* absurd: by qed typing *)in
         t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_term ~cnv mtau m;of_term ~cnv ksort k]
       end
     | Aset(m,k,v), Array(ksort,vsort), _ ->
@@ -603,7 +603,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     | (False, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
     | (True, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
     | (Acst (_, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
-      -> assert false (** absurd: by typing *)
+      -> assert false (* absurd: by typing *)
     | (Bind (Lambda, _, _), _, _)
     | Apply _ , _, _
     | Rdef _, Record _, _ ->
@@ -672,7 +672,7 @@ and int_or_real ~cnv ~fint ~lint ~pint ~freal ~lreal ~preal a b =
   | _ -> assert false
 
 let convert cnv expected t =
-  (** rewrite terms which normal form inside qed are different from the one of the provers *)
+  (* rewrite terms which normal form inside qed are different from the one of the provers *)
   let t, convert_for_export = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
   cnv.convert_for_export <- convert_for_export;
   Lang.For_export.in_state (share cnv expected) t

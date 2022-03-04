@@ -130,8 +130,11 @@ val get_label : t -> string
 val get_model : t -> WpContext.model
 val get_scope : t -> WpContext.scope
 val get_context : t -> WpContext.context
-val get_file_logout : t -> prover -> string (** only filename, might not exists *)
-val get_file_logerr : t -> prover -> string (** only filename, might not exists *)
+val get_file_logout : t -> prover -> string
+(** only filename, might not exists *)
+
+val get_file_logerr : t -> prover -> string
+(** only filename, might not exists *)
 
 val get_files : t -> (string * string) list
 
@@ -144,8 +147,12 @@ val on_remove : (t -> unit) -> unit
 val add : t -> unit
 val age : t -> int (* generation *)
 
-val reduce : t -> bool (** tries simplification *)
-val resolve : t -> bool (** tries simplification and set result if valid *)
+val reduce : t -> bool
+(** tries simplification *)
+
+val resolve : t -> bool
+(** tries simplification and set result if valid *)
+
 val set_result : t -> prover -> result -> unit
 val clear_results : t -> unit
 
@@ -156,10 +163,18 @@ val get_result : t -> prover -> result
 val get_results : t -> (prover * result) list
 val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t
 val get_target : t -> Property.t
-val is_trivial : t -> bool (** do not tries simplification, do not check prover results *)
-val is_proved : t -> bool (** do not tries simplification, check prover results *)
-val is_unknown : t -> bool (** at least one prover returns « Unknown » *)
-val is_passed : t -> bool (** proved, or unknown for smoke tests *)
+val is_trivial : t -> bool
+(** do not tries simplification, do not check prover results *)
+
+val is_proved : t -> bool
+(** do not tries simplification, check prover results *)
+
+val is_unknown : t -> bool
+(** at least one prover returns « Unknown » *)
+
+val is_passed : t -> bool
+(** proved, or unknown for smoke tests *)
+
 val warnings : t -> Warning.t list
 
 (** [true] if the result is valid. Dynamically exported.
@@ -220,13 +235,16 @@ class type generator =
   object
     method model : WpContext.model
     (** Generate VCs for the given Property. *)
+
     method compute_ip : Property.t -> t Bag.t
     (** Generate VCs for call preconditions at the given statement. *)
+
     method compute_call : stmt -> t Bag.t
     (** Generate VCs for all functions
         matching provided behaviors and property names.
         For `~bhv` and `~prop` optional arguments,
         default and empty list means {i all} properties. *)
+
     method compute_main :
       ?fct:Wp_parameters.functions ->
       ?bhv:string list ->

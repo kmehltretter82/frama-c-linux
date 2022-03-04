@@ -27,13 +27,12 @@
 type t = private
   | Invalid (** No location is valid *)
   | Set of Integer.t list (** Limited number of locations *)
-  | Interval of (** min *) Integer.t *
-                           (** max *) Integer.t *
-                           (** modu *)Integer.t
-  | Overlap of (** min *) Integer.t *
-                          (** max *) Integer.t *
-                          Origin.t  (** The location covers the entire range [min..max],
-                                        but consecutive offsets overlap *)
+  | Interval of Integer.t * Integer.t * Integer.t
+  (** [Interval(min, max, modulo)]*)
+  | Overlap of Integer.t * Integer.t * Origin.t
+  (**[Overlap(min, max, origin)]
+     - [origin]: the location covers the entire range [min..max],
+                 but consecutive offsets overlap *)
 
 val pretty: t Pretty_utils.formatter
 

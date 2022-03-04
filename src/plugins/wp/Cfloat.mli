@@ -40,8 +40,11 @@ val fq64 : lfun
 type model = Real | Float
 val configure : model -> WpContext.rollback
 
-val ftau : c_float -> tau (** model independant *)
-val tau_of_float : c_float -> tau (** with respect to model *)
+val ftau : c_float -> tau
+(** model independant *)
+
+val tau_of_float : c_float -> tau
+(** with respect to model *)
 
 type op =
   | LT

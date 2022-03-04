@@ -827,6 +827,7 @@ sig
     ?wkey: warn_category -> ?emitwith:(event -> unit) -> ?once:bool -> ('a,'b) pretty_aborter
 
   val register : kind -> (event -> unit) -> unit (** Very local listener. *)
+
   val register_tag_handlers : (string -> string) * (string -> string) -> unit
 
   val register_category: string -> category

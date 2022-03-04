@@ -641,7 +641,7 @@ class cil_printer () = object (self)
                             we want to print it as hexa *)
     | CInt64(i, ik, _) ->
       (*fprintf fmt "/* %Lx */" i;*)
-      (** We must make sure to capture the type of the constant. For some
+      (* We must make sure to capture the type of the constant. For some
           constants this is done with a suffix, for others with a cast
           prefix.*)
       let suffix = match ik with

@@ -713,7 +713,7 @@ let cmdline_run () =
           end ;
         let bhv = Wp_parameters.Behaviors.get () in
         let prop = Wp_parameters.Properties.get () in
-        (** TODO entry point *)
+        (* TODO entry point *)
         if Wp_parameters.has_dkey dkey_builtins then
           begin
             WpContext.on_context (model,WpContext.Global)

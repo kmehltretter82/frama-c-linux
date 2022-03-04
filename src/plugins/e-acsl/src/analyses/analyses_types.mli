@@ -39,25 +39,25 @@ type pred_or_term =
 (** Type uniquely representing a [predicate] or [term] with an associated
     [label], and the necessary information for its translation. *)
 type at_data = {
-  (** [kernel_function] englobing the [pred_or_term]. *)
   kf: kernel_function;
+  (** [kernel_function] englobing the [pred_or_term]. *)
 
-  (** [kinstr] where the [pred_or_term] is used. *)
   kinstr: kinstr;
+  (** [kinstr] where the [pred_or_term] is used. *)
 
-  (** Current state of the [lscope] for the [pred_or_term]. *)
   lscope: lscope;
+  (** Current state of the [lscope] for the [pred_or_term]. *)
 
-  (** [pred_or_term] to translate. *)
   pot: pred_or_term;
+  (** [pred_or_term] to translate. *)
 
-  (** Label of the [pred_or_term]. *)
   label: logic_label;
+  (** Label of the [pred_or_term]. *)
 
+  error: exn option
   (** Error raised during the pre-analysis.
       This field does not contribute to the equality and comparison between two
       [at_data]. *)
-  error: exn option
 }
 
 type annotation_kind =

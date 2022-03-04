@@ -22,14 +22,22 @@
 
 open VCS
 
+(** - [valid]: Play provers with valid result (default: true)
+    - [failed]: Play provers with invalid result (default: true)
+    - [provers]: Additional list of provers to {i try} when stuck
+    - [depth]: Strategy search depth (default: 0)
+    - [width]: Strategy search width (default: 0)
+    - [backtrack]: Strategy backtracking (default: 0)
+    - [auto]: Strategies to try (default: none)
+*)
 type 'a process =
-  ?valid:bool -> (** Play provers with valid result (default: true) *)
-  ?failed:bool -> (** Play provers with invalid result (default: true) *)
-  ?provers:prover list -> (** Additional list of provers to {i try} when stuck *)
-  ?depth:int -> (** Strategy search depth (default: 0) *)
-  ?width:int -> (** Strategy search width (default: 0) *)
-  ?backtrack:int -> (** Strategy backtracking (default: 0) *)
-  ?auto:Strategy.heuristic list -> (** Strategies to try (default: none) *)
+  ?valid:bool ->
+  ?failed:bool ->
+  ?provers:prover list ->
+  ?depth:int ->
+  ?width:int ->
+  ?backtrack:int ->
+  ?auto:Strategy.heuristic list ->
   ?start:(Wpo.t -> unit) ->
   ?progress:(Wpo.t -> string -> unit) ->
   ?result:(Wpo.t -> prover -> result -> unit) ->

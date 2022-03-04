@@ -96,9 +96,11 @@ end
 
 (** The list of registered extension *)
 let (handlers:(main_window_extension_points -> unit) list ref) = ref []
+
 (** Insert an extension *)
 let register_extension f =
   handlers := f::!handlers
+
 (** Apply all extensions *)
 let process_extensions window =
   List.iter (fun f -> f window) (List.rev !handlers)

@@ -41,7 +41,8 @@ type offset =
   | Field of fieldinfo
   | Index of typ * int
 
-type lvalue = (** Generalized l-values *)
+(** Generalized l-values *)
+type lvalue =
   | Eval of exp
   | Tval of term
   | Assigned of stmt

@@ -44,9 +44,13 @@ type json =
   | `String of string ]
 
 type t = json
+
 val equal : t -> t -> bool (** Stdlib *)
+
 val compare : t -> t -> int (** Stdlib *)
+
 val pp : Format.formatter -> t -> unit
+
 val pp_dump : Format.formatter -> t -> unit (** without formatting *)
 
 exception Error of Filepath.Normalized.t * int * string
@@ -64,10 +68,17 @@ val of_fields : (string * t) list -> t
 
 (** {2 Parsers} Parsing raise [Error] in case of error. *)
 
-val load_lexbuf : Lexing.lexbuf -> t (** Consumes the entire buffer. *)
-val load_channel : ?file:string -> in_channel -> t (** Parses the stream until EOF. *)
-val load_string : string -> t (** Parses the Json in the string. *)
-val load_file : string -> t (** May also raise system exception. *)
+val load_lexbuf : Lexing.lexbuf -> t
+(** Consumes the entire buffer. *)
+
+val load_channel : ?file:string -> in_channel -> t
+(** Parses the stream until EOF. *)
+
+val load_string : string -> t
+(** Parses the Json in the string. *)
+
+val load_file : string -> t
+(** May also raise system exception. *)
 
 (** {2 Printers} Printers use formatting unless [~pretty:false]. *)
 

@@ -233,7 +233,7 @@ let add_ctrl_dpds pdg =
 
 
 let process_declarations pdg ~formals ~locals =
-  (** 2 new nodes for each formal parameters :
+  (* 2 new nodes for each formal parameters :
       one for its declaration, and one for its values.
       This is because it might be the case that we only need the declaration
       whatever the value is.
@@ -695,8 +695,8 @@ let call_outputs  pdg state_before_call state_with_inputs stmt
 *)
 let process_call pdg state stmt lvaloption funcexp argl _loc =
   let state_before_call = state in
-  (** add a simple node for each call in order to have something in the PDG
-      for this statement even if there are no input/output *)
+  (* add a simple node for each call in order to have something in the PDG
+     for this statement even if there are no input/output *)
   ignore (add_elem pdg (Key.call_ctrl_key stmt));
   let arg_nodes = process_args pdg state_before_call stmt argl in
   let state_with_args = state in

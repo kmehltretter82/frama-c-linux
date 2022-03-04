@@ -311,7 +311,7 @@ struct
       | Imply ([la;lb],c) ->
         begin match F.repr c with
           | Eq _ ->
-            let order = 0 in (** todo get the order from term *)
+            let order = 0 in (* todo get the order from term *)
             begin match F.repr la, F.repr lb with
               | Leq(a,b), Leq(c,d) ->
                 begin
@@ -367,7 +367,7 @@ struct
             if Integer.lt cstb i then sigma
             else begin
               let eq = F.QED.e_apply p [e_zint i] in
-              (** qed should be able to simplify it directly *)
+              (* qed should be able to simplify it directly *)
               let sigma = add_pred sigma eq in
               aux sigma (Integer.succ i)
             end

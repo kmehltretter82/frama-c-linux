@@ -46,12 +46,16 @@ val lemma_id : string -> string
 
 type datakind = KValue | KInit
 
-type adt = private (** A type is never registered in a Definition.t *)
+(** A type is never registered in a Definition.t *)
+type adt = private
   | Mtype of mdt (** External type *)
   | Mrecord of mdt * fields (** External record-type *)
   | Atype of logic_type_info (** Logic Type *)
   | Comp of compinfo * datakind (** C-code struct or union *)
-and mdt = string extern (** name to print to the provers *)
+
+(** name to print to the provers *)
+and mdt = string extern
+
 and 'a extern = {
   ext_id     : int;
   ext_link   : 'a ;
@@ -175,11 +179,20 @@ val t_farray : tau -> tau -> tau
 val t_datatype : adt -> tau list -> tau
 val t_matrix : tau -> int -> tau
 
-val pointer : tau Context.value (** type of pointers *)
-val floats : (c_float -> tau) Context.value (** type of floats *)
-val poly : string list Context.value (** polymorphism *)
-val builtin_types: (string -> t_builtin) Context.value (* builtin types *)
-val parameters : (lfun -> sort list) -> unit (** definitions *)
+val pointer : tau Context.value
+(** type of pointers *)
+
+val floats : (c_float -> tau) Context.value
+(** type of floats *)
+
+val poly : string list Context.value
+(** polymorphism *)
+
+val builtin_types: (string -> t_builtin) Context.value
+(* builtin types *)
+
+val parameters : (lfun -> sort list) -> unit
+(** definitions *)
 
 val name_of_lfun : lfun -> string
 val name_of_field : field -> string
@@ -240,8 +253,12 @@ sig
   type term = QED.term
   type record = (field * term) list
 
-  val hash : term -> int (** Constant time *)
-  val equal : term -> term -> bool (** Same as [==] *)
+  val hash : term -> int
+  (** Constant time *)
+
+  val equal : term -> term -> bool
+  (** Same as [==] *)
+
   val compare : term -> term -> int
 
   module Tset : Qed.Idxset.S with type elt = term
@@ -265,7 +282,9 @@ sig
   val e_bigint : Integer.t -> term
   val e_float : float -> term
   val e_setfield : term -> field -> term -> term
-  val e_range : term -> term -> term (** e_range a b = b+1-a *)
+  val e_range : term -> term -> term
+  (** [e_range a b] = [b+1-a] *)
+
   val is_zero : term -> bool
 
   val e_true : term
@@ -378,8 +397,11 @@ sig
   val p_subst : sigma -> pred -> pred
   val p_subst_var : var -> term -> pred -> pred
 
-  val e_vars : term -> var list (** Sorted *)
-  val p_vars : pred -> var list (** Sorted *)
+  val e_vars : term -> var list
+  (** Sorted *)
+
+  val p_vars : pred -> var list
+  (** Sorted *)
 
   val p_close : pred -> pred (** Quantify over (sorted) free variables *)
 
@@ -405,6 +427,7 @@ sig
   (** Returns a list of terms to be shared among all {i shared} or {i
       marked} subterms.  The order of terms is consistent with
       definition order: head terms might be used in tail ones. *)
+
   val defs : marks -> term list
   val define : (env -> string -> term -> unit) -> env -> marks -> env
   val pp_eterm : env -> Format.formatter -> term -> unit
@@ -422,33 +445,73 @@ sig
 
   (** {3 Utilities} *)
 
-  val decide   : term -> bool (** Return [true] if and only the term is [e_true]. Constant time. *)
-  val basename : term -> string
-  val is_true  : term -> maybe (** Constant time. *)
-  val is_false : term -> maybe (** Constant time. *)
-  val is_prop  : term -> bool (** Boolean or Property *)
-  val is_int   : term -> bool (** Integer sort *)
-  val is_real  : term -> bool (** Real sort *)
-  val is_arith : term -> bool (** Integer or Real sort *)
+  val decide   : term -> bool
+  (** Return [true] if and only the term is [e_true]. Constant time. *)
 
-  val is_closed : term -> bool (** No bound variables *)
-  val is_simple : term -> bool (** Constants, variables, functions of arity 0 *)
-  val is_atomic : term -> bool (** Constants and variables *)
-  val is_primitive : term -> bool (** Constants only *)
+  val basename : term -> string
+
+  val is_true  : term -> maybe
+  (** Constant time. *)
+
+  val is_false : term -> maybe
+  (** Constant time. *)
+
+  val is_prop  : term -> bool
+  (** Boolean or Property *)
+
+  val is_int   : term -> bool
+  (** Integer sort *)
+
+  val is_real  : term -> bool
+  (** Real sort *)
+
+  val is_arith : term -> bool
+  (** Integer or Real sort *)
+
+  val is_closed : term -> bool
+  (** No bound variables *)
+
+  val is_simple : term -> bool
+  (** Constants, variables, functions of arity 0 *)
+
+  val is_atomic : term -> bool
+  (** Constants and variables *)
+
+  val is_primitive : term -> bool
+  (** Constants only *)
+
   val is_neutral : Fun.t -> term -> bool
   val is_absorbant : Fun.t -> term -> bool
   val record_with : record -> (term * record) option
 
-  val are_equal : term -> term -> maybe (** Computes equality *)
-  val eval_eq   : term -> term -> bool  (** Same as [are_equal] is [Yes] *)
-  val eval_neq  : term -> term -> bool  (** Same as [are_equal] is [No]  *)
-  val eval_lt   : term -> term -> bool  (** Same as [e_lt] is [e_true] *)
-  val eval_leq  : term -> term -> bool  (** Same as [e_leq] is [e_true]  *)
+  val are_equal : term -> term -> maybe
+  (** Computes equality *)
 
-  val repr : term -> QED.repr (** Constant time *)
-  val sort : term -> Logic.sort (** Constant time *)
-  val vars : term -> Vars.t (** Constant time *)
-  val varsp : pred -> Vars.t (** Constant time *)
+  val eval_eq   : term -> term -> bool
+  (** Same as [are_equal] is [Yes] *)
+
+  val eval_neq  : term -> term -> bool
+  (** Same as [are_equal] is [No]  *)
+
+  val eval_lt   : term -> term -> bool
+  (** Same as [e_lt] is [e_true] *)
+
+  val eval_leq  : term -> term -> bool
+  (** Same as [e_leq] is [e_true]  *)
+
+
+  val repr : term -> QED.repr
+  (** Constant time *)
+
+  val sort : term -> Logic.sort
+  (** Constant time *)
+
+  val vars : term -> Vars.t
+  (** Constant time *)
+
+  val varsp : pred -> Vars.t
+  (** Constant time *)
+
   val occurs : var -> term -> bool
   val occursp : var -> pred -> bool
   val intersect : term -> term -> bool
@@ -497,27 +560,63 @@ end
 module N: sig
   (** simpler notation for writing {!F.term} and {F.pred} *)
 
-  val ( + ): F.binop (** {! F.p_add } *)
-  val ( - ): F.binop (** {! F.p_sub } *)
-  val ( ~- ): F.unop (** [fun x -> p_sub 0 x] *)
-  val ( * ): F.binop (** {! F.p_mul} *)
-  val ( / ): F.binop (** {! F.p_div} *)
-  val ( mod ): F.binop (** {! F.p_mod} *)
+  val ( + ): F.binop
+  (** {! F.p_add } *)
 
-  val ( = ): F.cmp (** {! F.p_equal} *)
-  val ( < ): F.cmp (** {! F.p_lt} *)
-  val ( > ): F.cmp (** {! F.p_lt} with inversed argument *)
-  val ( <= ): F.cmp (** {! F.p_leq } *)
-  val ( >= ): F.cmp (** {! F.p_leq } with inversed argument *)
-  val ( <> ): F.cmp (** {! F.p_neq } *)
+  val ( - ): F.binop
+  (** {! F.p_sub } *)
 
-  val ( ==> ): F.operator (** {! F.p_imply } *)
-  val ( && ): F.operator (** {! F.p_and } *)
-  val ( || ): F.operator (** {! F.p_or } *)
-  val not: F.pred -> F.pred (** {! F.p_not } *)
+  val ( ~- ): F.unop
+  (** [fun x -> p_sub 0 x] *)
 
-  val ( $ ): ?result:tau -> lfun -> F.term list -> F.term (** {! F.e_fun } *)
-  val ( $$ ): lfun -> F.term list -> F.pred (** {! F.p_call } *)
+  val ( * ): F.binop
+  (** {! F.p_mul} *)
+
+  val ( / ): F.binop
+  (** {! F.p_div} *)
+
+  val ( mod ): F.binop
+  (** {! F.p_mod} *)
+
+
+  val ( = ): F.cmp
+  (** {! F.p_equal} *)
+
+  val ( < ): F.cmp
+  (** {! F.p_lt} *)
+
+  val ( > ): F.cmp
+  (** {! F.p_lt} with inversed argument *)
+
+  val ( <= ): F.cmp
+  (** {! F.p_leq } *)
+
+  val ( >= ): F.cmp
+  (** {! F.p_leq } with inversed argument *)
+
+  val ( <> ): F.cmp
+  (** {! F.p_neq } *)
+
+
+  val ( ==> ): F.operator
+  (** {! F.p_imply } *)
+
+  val ( && ): F.operator
+  (** {! F.p_and } *)
+
+  val ( || ): F.operator
+  (** {! F.p_or } *)
+
+  val not: F.pred -> F.pred
+  (** {! F.p_not } *)
+
+
+  val ( $ ): ?result:tau -> lfun -> F.term list -> F.term
+  (** {! F.e_fun } *)
+
+  val ( $$ ): lfun -> F.term list -> F.pred
+  (** {! F.p_call } *)
+
 end
 
 
@@ -545,12 +644,22 @@ val filter_hypotheses : var list -> pred list
 
 (** {2 Substitutions} *)
 
-val sigma : unit -> F.sigma (** uses current pool *)
-val alpha : unit -> F.sigma (** freshen all variables *)
-val subst : F.var list -> F.term list -> F.sigma (** replace variables *)
+val sigma : unit -> F.sigma
+(** uses current pool *)
 
-val e_subst : (term -> term) -> term -> term (** uses current pool *)
-val p_subst : (term -> term) -> pred -> pred (** uses current pool *)
+val alpha : unit -> F.sigma
+(** freshen all variables *)
+
+val subst : F.var list -> F.term list -> F.sigma
+(** replace variables *)
+
+
+val e_subst : (term -> term) -> term -> term
+(** uses current pool *)
+
+val p_subst : (term -> term) -> pred -> pred
+(** uses current pool *)
+
 
 (** {2 Simplifiers} *)
 
@@ -569,22 +678,28 @@ class type simplifier =
     method copy : simplifier
     method assume : F.pred -> unit
     (** Assumes the hypothesis *)
+
     method target : F.pred -> unit
     (** Give the predicate that will be simplified later *)
+
     method fixpoint : unit
     (** Called after assuming hypothesis and knowing the goal *)
+
     method infer : F.pred list
     (** Add new hypotheses implied by the original hypothesis. *)
 
     method equivalent_exp : F.term -> F.term
     (** Currently simplify an expression.
         It must returns a equivalent formula from the assumed hypotheses. *)
+
     method weaker_hyp : F.pred -> F.pred
     (** Currently simplify an hypothesis before assuming it.
         It must return a weaker formula from the assumed hypotheses. *)
+
     method equivalent_branch : F.pred -> F.pred
     (** Currently simplify a branch condition.
         It must return an equivalent formula from the assumed hypotheses. *)
+
     method stronger_goal : F.pred -> F.pred
     (** Simplify the goal.
         It must return a stronger formula from the assumed hypotheses. *)

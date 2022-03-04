@@ -227,7 +227,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
     in
     (if Integer.is_zero start
      && Integer.equal size req_size then
-       (** pretty print a full offset *)
+       (* pretty print a full offset *)
        (if not env.use_align ||
            (Integer.equal start align && Integer.equal env.rh_size size)
         then update_types typ
@@ -285,7 +285,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
             []
             (Option.value ~default:[] compinfo.cfields)
         in
-        (** find non covered intervals in structs *)
+        (* find non covered intervals in structs *)
         let non_covered,succ_last =
           if compinfo.cstruct then
             List.fold_left
@@ -352,7 +352,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
     else
       let start_case,rem_start_size = Integer.e_div_rem start size in
       let stop_case,rem_stop_size =  Integer.e_div_rem stop size in
-      if Integer.equal start_case stop_case then (** part of one element *)
+      if Integer.equal start_case stop_case then (* part of one element *)
         let new_align =
           Integer.e_rem
             (Integer.sub align (Integer.mul start_case size))

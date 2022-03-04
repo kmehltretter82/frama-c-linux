@@ -105,6 +105,7 @@ val is_computed : unit -> bool
 
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
+
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t

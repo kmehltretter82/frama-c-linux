@@ -140,6 +140,7 @@ module Configuration: sig
     object
       method set : 'a -> unit
       (** Set's widget value to given one. *)
+
       method connect : ('a -> unit) -> unit
       (** Register a callback invoked by the widget each time the value is edited. *)
     end

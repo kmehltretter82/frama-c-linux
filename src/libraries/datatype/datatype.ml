@@ -776,8 +776,8 @@ module Pair_arg = struct
   let mk_mem_project mem1 mem2 f (x1, x2) = mem1 f x1 && mem2 f x2
 end
 
-(** warning is unsound in that case:
-    http://caml.inria.fr/mantis/view.php?id=7314#c16232
+(* warning is unsound in that case:
+   http://caml.inria.fr/mantis/view.php?id=7314#c16232
 *)
 [@@@ warning "-60"]
 
@@ -1996,7 +1996,7 @@ module Triple_arg = struct
     mem1 f x1 && mem2 f x2 && mem3 f x3
 end
 
-(** warning is unsound in that case:
+(* warning is unsound in that case:
     http://caml.inria.fr/mantis/view.php?id=7314#c16232
 *)
 [@@@ warning "-60"]
@@ -2106,7 +2106,7 @@ module Quadruple_arg = struct
     mem1 f x1 && mem2 f x2 && mem3 f x3 && mem4 f x4
 end
 
-(** warning is unsound in that case:
+(* warning is unsound in that case:
     http://caml.inria.fr/mantis/view.php?id=7314#c16232
 *)
 [@@@ warning "-60"]

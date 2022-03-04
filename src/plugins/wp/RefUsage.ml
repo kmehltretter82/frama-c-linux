@@ -276,22 +276,22 @@ module LFset = Qed.Mergeset.Make(Logic_info)
 
 type global_ctx = {
 
-  (** Variable accesses from C code and code annotations *)
   mutable code : value ;
+  (** Variable accesses from C code and code annotations *)
 
-  (** Accesses of formal variables from function specs *)
   mutable spec_formals : value ;
+  (** Accesses of formal variables from function specs *)
 
-  (** Accesses of global variables from function specs *)
   mutable spec_globals : value ;
+  (** Accesses of global variables from function specs *)
 
+  mutable cphi : (model list list) KFmap.t ;
   (** A map to a list (since a same kf can be called more than ones)
       to a list of models for each arg_exp of the call to the kf. *)
-  mutable cphi : (model list list) KFmap.t ;
 
+  mutable lphi : LFset.t ;
   (** Logical function/predicate used directly and indirectly by
       specs/annots of a C function *)
-  mutable lphi : LFset.t ;
 }
 let mk_global_ctx () =
   { code = E.bot ; spec_formals = E.bot ; spec_globals = E.bot ;

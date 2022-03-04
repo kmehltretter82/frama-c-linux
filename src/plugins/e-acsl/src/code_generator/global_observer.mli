@@ -27,6 +27,7 @@ open Cil_types
 val function_init_name: string
 (** Name of the function in which [mk_init_function] (see below) generates the
     code. *)
+
 val function_clean_name: string
 (** Name of the function in which [mk_clean_function] (see below) generates the
     code. *)

@@ -624,7 +624,7 @@ module G = struct
     | (_, []), (_, _ :: _) | (_, _ :: _) , (_, []) ->
       raise MessyJoin (* should always be in the same number of loops *)
 
-    | (ct1, []), (ct2, []) -> (** out of any loop *)
+    | (ct1, []), (ct2, []) -> (* out of any loop *)
       ct1, ct2, [], false
 
     | (ct1, (stmt1, nb1) :: q1), (ct2, (stmt2, nb2) :: q2) ->
@@ -632,35 +632,35 @@ module G = struct
       let ct1, ct2, q, joined_iter = join_iterations (ct1, q1) (ct2, q2) in
       match nb1, nb2 with
       | MultipleIterations i1, MultipleIterations i2 ->
-        (** Coefficients have already been found. Just merge the number of
-            iterations. *)
+        (* Coefficients have already been found. Just merge the number of
+           iterations. *)
         let i = MultipleIterations (MultipleIterations.join i1 i2) in
         ct1, ct2, (stmt1, i) :: q, joined_iter
 
       | PreciseIteration n1, PreciseIteration n2 ->
-        (** Two exact number of iterations. If equal, do nothing. If not,
-            infer coefficients, or go to top. *)
+        (* Two exact number of iterations. If equal, do nothing. If not,
+           infer coefficients, or go to top. *)
         let nb = Bounds.inject_range n1 n2 in
         let (ct1, ct2), nb, joined_iter = match n1 - n2 with
-          | 0 -> (** Same number of iterations *)
+          | 0 -> (* Same number of iterations *)
             (ct1, ct2), PreciseIteration n1, false
-          | 1 -> (** One more iteration in s1 *)
+          | 1 -> (* One more iteration in s1 *)
             let coeffs, ct1, ct2 = join_consecutive_lambda n2 ct2 ct1 in
             (ct1, ct2), MultipleIterations { nb; coeffs }, true
-          | -1 -> (** One more iteration in s2 *)
+          | -1 -> (* One more iteration in s2 *)
             let coeffs, ct1, ct2 = join_consecutive_lambda n1 ct1 ct2 in
             (ct1, ct2), MultipleIterations { nb; coeffs }, true
-          | _ -> (** difference > 1. This case does not happen with the
-                     current iteration engine, and requires a division function
-                     in module Bounds. Go to top *)
+          | _ -> (* difference > 1. This case does not happen with the
+                    current iteration engine, and requires a division function
+                    in module Bounds. Go to top *)
             (MV.empty, MV.empty),
             MultipleIterations { nb; coeffs = MC.empty }, true
         in
         ct1, ct2, (stmt1, nb) :: q, joined_iter
 
       | PreciseIteration i1, MultipleIterations m2 ->
-        (** Normalizes the initial values [ct1] according to the coefficients
-            computed in [m2] *)
+        (* Normalizes the initial values [ct1] according to the coefficients
+           computed in [m2] *)
         let ct1 = remove_coeffs m2.coeffs i1 ct1 in
         let nb = Bounds.enlarge (Integer.of_int i1) m2.nb in
         let ii = MultipleIterations { m2 with nb } in

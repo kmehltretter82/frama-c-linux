@@ -39,8 +39,11 @@ type cache_type =
     These functions can be applied to any maps from a given type [key],
     regardless of the type of values bound. *)
 module type Shape = sig
-  type key    (** Type of the keys. *)
-  type 'v map (** Type of the maps from type [key] to type ['v]. *)
+  (** Type of the keys. *)
+  type key
+
+  (** Type of the maps from type [key] to type ['v]. *)
+  type 'v map
 
   (** Bijective function. The ids are positive. *)
   val id: 'v map -> int
@@ -204,8 +207,11 @@ end
 
 (** Signature for hptmaps from hash-consed trees to values. *)
 module type S = sig
-  type key (** type of the keys *)
-  type v   (** type of the values *)
+  (** type of the keys *)
+  type key
+
+  (** type of the values *)
+  type v
   type prefix
 
   include Shape with type key := key

@@ -67,27 +67,27 @@ struct
     | Unused
 
   let merge_list l =
-    (** Get a map of the chunks (the data is not important) *)
+    (* Get a map of the chunks (the data is not important) *)
     let union = List.fold_left (fun acc e -> H.Map.union (fun _ v1 _ -> v1) acc e.map) H.Map.empty l in
-    (** The goal is to build a matrix chunk -> elt of the list -> Used/Unused
+    (* The goal is to build a matrix chunk -> elt of the list -> Used/Unused
     *)
-    (** Set the data of the map to []. *)
+    (* Set the data of the map to []. *)
     let union = H.Map.map (fun _ -> []) union in
-    (** For each elements of the list tell if each chunk is used *)
+    (* For each elements of the list tell if each chunk is used *)
     let merge _ m e =
       match m, e with
       | Some m, Some e -> Some (Used e::m)
       | Some m, None -> Some (Unused::m)
       | None, _ -> assert false in
     let union = List.fold_left (fun acc e -> H.Map.merge merge acc e.map) union
-        (** important so that the list in the map are in the correct order *)
+        (* important so that the list in the map are in the correct order *)
         (List.rev l) in
-    (** Build the passive for each element of the list, and the final domain *)
+    (* Build the passive for each element of the list, and the final domain *)
     let p = ref (List.map (fun _ -> Passive.empty) l) in
     let map c l =
       match List.filter (fun x -> not (Unused = x)) l with
       | [] -> assert false
-      (** If all the sigmas use the same variable *)
+      (* If all the sigmas use the same variable *)
       | (Used a)::l when List.for_all (function | Unused -> true | Used x -> Var.equal x a) l ->
         a
       | _ ->
@@ -177,7 +177,7 @@ struct
            match u,v with
            | Some x , Some y -> not (Var.equal x y)
            | None , Some _ -> true
-           | Some _ , None -> false (** no need to create a new so it is the same *)
+           | Some _ , None -> false (* no need to create a new so it is the same *)
            | None, None -> assert false
          in
          if written then effect := Chunk.Set.add chunk !effect

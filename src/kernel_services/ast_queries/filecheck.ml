@@ -469,8 +469,8 @@ module Base_checker = struct
                  (Stmt.Set.elements !calls)
            in Cil.ChangeDoChildrenPost(s,f)
          | If (_,bt,be,_) -> begin
-             (** Check that we have 2 successors, in the right order (then before
-                 else) *)
+             (* Check that we have 2 successors, in the right order (then before
+                else) *)
              match s.succs with
              | [st; se] -> begin
                  (match bt.bstmts with

@@ -36,9 +36,9 @@ type coverage_metrics = {
   initializers: (Cil_types.varinfo * Cil_types.init) list;  (** initializers *)
 }
 
-val percent_coverage : libc:bool -> coverage_metrics -> float ;;
+val percent_coverage : libc:bool -> coverage_metrics -> float
 
-val compute : libc:bool -> coverage_metrics ;;
+val compute : libc:bool -> coverage_metrics
 (** Computes both syntactic and semantic coverage information. *)
 
 (** Computes the semantic coverage by function. *)

@@ -2711,7 +2711,7 @@ let find_initial_value init loff =
 let eval_term_lval global_find_init (lhost, loff) =
   match lhost with
   | TVar lvi -> begin
-      (** See if we can evaluate the l-value using the initializer of lvi*)
+      (* See if we can evaluate the l-value using the initializer of lvi*)
       let off_type = Cil.typeTermOffset lvi.lv_type loff in
       if Logic_const.plain_or_set Cil.isLogicIntegralType off_type then
         match lvi.lv_origin with

@@ -72,6 +72,7 @@ class type virtual ['a] cumulative_class = object
 
   (** Result of the analysis *)
   method result: 'a
+
   (** Adding partial results to the current ones *)
   method join: 'a -> unit
 

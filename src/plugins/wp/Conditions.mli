@@ -85,19 +85,31 @@ val update_cond :
   step ->
   condition -> step
 
-val is_true : sequence -> bool (** Contains only true or empty steps *)
-val is_empty : sequence -> bool (** No step at all *)
-val vars_hyp : sequence -> Vars.t (** Pre-computed and available in constant time. *)
-val vars_seq : sequent -> Vars.t (** At the cost of the union of hypotheses and goal. *)
+val is_true : sequence -> bool
+(** Contains only true or empty steps *)
 
-val empty : sequence (** empty sequence, equivalent to true assumption *)
-val trivial : sequent (** empty implies true *)
+val is_empty : sequence -> bool
+(** No step at all *)
+
+val vars_hyp : sequence -> Vars.t
+(** Pre-computed and available in constant time. *)
+
+val vars_seq : sequent -> Vars.t
+(** At the cost of the union of hypotheses and goal. *)
+
+val empty : sequence
+(** empty sequence, equivalent to true assumption *)
+
+val trivial : sequent
+(** empty implies true *)
+
 val sequence : step list -> sequence
 
 val seq_branch : ?stmt:stmt -> F.pred -> sequence -> sequence -> sequence
 (** Creates an If-Then-Else branch located at the provided stmt, if any. *)
 
 val append : sequence -> sequence -> sequence (** Conjunction *)
+
 val concat : sequence list -> sequence (** List conjunction *)
 
 (** Iterate only over the head steps of the sequence.
@@ -174,15 +186,22 @@ val introduction_eq : sequent -> sequent
 val lemma : pred -> sequent
 (** Performs existential, universal and hypotheses introductions *)
 
-val head : step -> pred (** Predicate for Have and such, Condition for Branch, True for Either *)
-val have : step -> pred (** Predicate for Have and such, True for any other *)
+val head : step -> pred
+(** Predicate for Have and such, Condition for Branch, True for Either *)
+
+val have : step -> pred
+(** Predicate for Have and such, True for any other *)
 
 val pred_cond : condition -> pred
 
-val condition : sequence -> pred (** With free variables kept. *)
-val close : sequent -> pred (** With free variables {i quantified}. *)
+val condition : sequence -> pred
+(** With free variables kept. *)
 
-val at_closure : (sequent -> sequent ) -> unit (** register a transformation applied just before close *)
+val close : sequent -> pred
+(** With free variables {i quantified}. *)
+
+val at_closure : (sequent -> sequent ) -> unit
+(** register a transformation applied just before close *)
 
 (** {2 Bundles}
 
@@ -204,6 +223,7 @@ type 'a attributed =
     'a )
 
 val nil : bundle (** Same as empty *)
+
 val occurs : F.var -> bundle -> bool
 val intersect : F.pred -> bundle -> bool
 (** Variables of predicate and the bundle intersects *)

@@ -53,15 +53,15 @@ let reparse (host_window: Design.main_window_extension_points) =
          Source_manager.clear host_window#original_source_viewer)
   in
   begin match old_helt, succeeded with
-    | None, _ -> (** no history available before reparsing *)
+    | None, _ -> (* no history available before reparsing *)
       host_window#reset ()
-    | _, None -> (** the user stopped or an error occurred  *)
+    | _, None -> (* the user stopped or an error occurred  *)
       host_window#reset ()
     | Some old_helt, Some () ->
       let new_helt = History.translate_history_elt old_helt in
       Option.iter History.push new_helt;
       host_window#reset ();
-      (** The buffer is not ready yet, modification of its vadjustement
+      (*  The buffer is not ready yet, modification of its vadjustement
           is unreliable *)
       let set () =
         let adj = host_window#source_viewer_scroll#vadjustment in

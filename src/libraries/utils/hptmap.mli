@@ -55,8 +55,12 @@ module Make
            boolean on the subtrees and the value information present on each leaf.
            See {!Comp_unused} for a default implementation. *)
 
-       val e: bool  (** Value for the empty tree *)
-       val f : Key.t -> V.t -> bool  (** Value for a leaf *)
+       val e: bool
+       (** Value for the empty tree *)
+
+       val f : Key.t -> V.t -> bool
+       (** Value for a leaf *)
+
        val compose : bool -> bool -> bool
        (** Composition of the values of two subtrees *)
      end)

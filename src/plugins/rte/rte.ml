@@ -109,11 +109,11 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
   let typ = Cil.typeOfLval lv in
   match lv with
   | Var vi, NoOffset ->
-    (** Note: here [lv] has structure/union type or fundamental type.
-        We exclude structures and unions. And for fundamental types:
-        - globals (initialized and then only written with initialized values)
-        - formals (checked at function call)
-        - temporary variables (initialized during AST normalization)
+    (* Note: here [lv] has structure/union type or fundamental type.
+       We exclude structures and unions. And for fundamental types:
+       - globals (initialized and then only written with initialized values)
+       - formals (checked at function call)
+       - temporary variables (initialized during AST normalization)
     *)
     if not (vi.vglob || vi.vformal || vi.vtemp)
     && not (Cil.isStructOrUnionType typ)
