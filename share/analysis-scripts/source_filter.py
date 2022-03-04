@@ -73,8 +73,8 @@ def get_command(command, env_var_name):
             if not p.exists():
                 if emit_warns:
                     print(
-                        f"info: optional external command '{command}' not found in PATH; \
-consider installing it or setting environment variable {env_var_name}"
+                        f"info: optional external command '{command}' not found in PATH; "
+                        f"consider installing it or setting environment variable {env_var_name}"
                     )
                 p = None
     cached_commands[command] = p

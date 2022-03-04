@@ -41,12 +41,16 @@ get_make_major_version_args = (
     r" --version | grep 'GNU Make\s\+\([0-9]\+\)\..*$' | sed -E 's|GNU Make +([0-9]+)\..*|\1|'"
 )
 
-cmd = f'command -v {make_cmd} >{os.devnull} && \
-test "$({make_cmd} {get_make_major_version_args})" -ge 4 2>{os.devnull}'
+cmd = (
+    f"command -v {make_cmd} >{os.devnull} && "
+    f'test "$({make_cmd} {get_make_major_version_args})" -ge 4 2>{os.devnull}'
+)
 if os.system(cmd) != 0:
     make_cmd = "make"
-    cmd = f'command -v {make_cmd} >{os.devnull} && \
-test "$({make_cmd} {get_make_major_version_args})" -ge 4 2>{os.devnull}'
+    cmd = (
+        f"command -v {make_cmd} >{os.devnull} && "
+        f'test "$({make_cmd} {get_make_major_version_args})" -ge 4 2>{os.devnull}'
+    )
     if os.system(cmd) != 0:
         sys.exit("error: could not find GNU make >= 4.0 (tried 'gmake' and 'make')")
 

@@ -354,8 +354,7 @@ for target, sources in sources_map.items():
         )
     elif len(main_definitions[target]) > 1:
         logging.warning(
-            "function '%s' seems to be defined multiple times in the sources of \
-target '%s':",
+            "function '%s' seems to be defined multiple times in the sources of target '%s':",
             main,
             prettify(target),
         )

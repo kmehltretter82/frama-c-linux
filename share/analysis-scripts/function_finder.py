@@ -206,14 +206,14 @@ def find_definitions_and_declarations(
                     else:
                         # no opening brace; assume a false positive and skip definition
                         print(
-                            f"{os.path.relpath(filename)}:{start}:closing brace not found, \
-skipping potential definition of '{funcname}'"
+                            f"{os.path.relpath(filename)}:{start}:closing brace not found, "
+                            f"skipping potential definition of '{funcname}'"
                         )
                         continue
         if debug:
             print(
-                f"function_finder: {'def' if is_def else 'decl'} of \
-{funcname} between {start} and {end}"
+                f"function_finder: {'def' if is_def else 'decl'} of "
+                f"{funcname} between {start} and {end}"
             )
         res.append((funcname, is_def, start, end, terminator_offset))
     return res

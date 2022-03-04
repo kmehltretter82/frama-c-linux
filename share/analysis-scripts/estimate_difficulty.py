@@ -330,8 +330,8 @@ for keyword in c11_unsupported:
     if lines:
         n = len(lines)
         print(
-            f"- warning: found {n} line{'s' if n > 1 else ''} with occurrences of \
-unsupported C11 construct '{keyword}'"
+            f"- warning: found {n} line{'s' if n > 1 else ''} with occurrences of "
+            f"unsupported C11 construct '{keyword}'"
         )
 
 # assembly code
