@@ -1,2 +1,3 @@
-CMD: @frama-c@ -no-autoload-plugins -load-module eva,scope,reduc,wp -eva -eva-no-print -eva-verbose 0 @PTEST_FILE@ -then -reduc -reduc-gen-annot all -then -no-reduc -then -wp -wp-par 1 -wp-share @PTEST_SHARE_DIR@ -wp-msg-key shell -wp-report tests/qualif.report -wp-session @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay @PTEST_FILE@
+PLUGIN: @PTEST_PLUGIN@,eva,scope,inout,reduc
+CMD: @frama-c@ -no-autoload-plugins -eva -eva-no-print -eva-verbose 0 @PTEST_FILE@ -then -reduc -reduc-gen-annot all -then -no-reduc -then -wp -wp-par 1 -wp-share @PTEST_SHARE_DIR@ -wp-msg-key shell -wp-warn-key pedantic-assigns=inactive -wp-report %{dep:@PTEST_SUITE_DIR@/../qualif.report} -wp-session @PTEST_DIR@/@PTEST_NAME@.@PTEST_NUMBER@.session@PTEST_CONFIG@ -wp-cache-env -wp-cache replay @PTEST_FILE@
 OPT:
