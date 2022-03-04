@@ -332,7 +332,7 @@ end = struct
         (function
           | "DEFAULT" -> Some ("", (split_blank value))
           | config -> Some (config, (split_blank value)))
-     in
+    in
     fun ~dir ->
       let default_suites = ref StringMap.empty in
       let dune_alias = ref {alias = !default_dune_alias } in
