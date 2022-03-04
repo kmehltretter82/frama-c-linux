@@ -72,6 +72,13 @@ let str_string_match1 regexp line pos =
     with Not_found -> None
   else None
 
+let str_string_match2 regexp line pos =
+  if Str.string_match regexp line pos then
+    try
+      Some ((Str.matched_group 1 line),(Str.matched_group 2 line))
+    with Not_found -> None
+  else None
+
 (* removes first blanks *)
 let trim_right s =
   let n = ref (String.length s - 1) in
@@ -319,6 +326,13 @@ end = struct
     let regexp = Str.regexp " *\\([^#=][^=]*\\)=\\(.*\\)" in
     let regexp_config = Str.regexp "\\([a-zA-Z_]+\\)_SUITES" in
     let regexp_comment = Str.regexp " *#" in
+    let get_key_value s = str_string_match2 regexp s 0 in
+    let get_config_suites (key,value) =
+      Option.bind (str_string_match1 regexp_config key 0)
+        (function
+          | "DEFAULT" -> Some ("", (split_blank value))
+          | config -> Some (config, (split_blank value)))
+     in
     fun ~dir ->
       let default_suites = ref StringMap.empty in
       let dune_alias = ref {alias = !default_dune_alias } in
@@ -337,25 +351,24 @@ end = struct
         StringMap.update config (function | None -> Some (StringMap.singleton s !dune_alias)
                                           | Some suites -> add_to suites) map
       in
-      let parse_config_line =
-        fun (key, value) ->
-          if Str.string_match regexp_config key 0 then
-            let config = match Str.matched_group 1 key with
-              | "DEFAULT" -> ""
-              | s -> s
-            in
-            let l = split_blank value in
-            default_suites := List.fold_left (add_suite config) !default_suites l
-          else match key with
-            | "DUNE_ALIAS" -> (match split_blank value with
-                | [ alias ] -> dune_alias := { alias }
-                | _  ->
-                  Format.eprintf "ERROR: %s: %s=%s@." ptests_config key value;
-                  exit 2)
-            | "IGNORE" -> incr nb_ignores;
-              ignored_suites := (ptests_config ^ ":" ^ value)::!ignored_suites;
-              if !verbosity >=2 then Format.eprintf "%s: %s=%s@." ptests_config key value
-            | _ ->  Format.eprintf "%s: setenv (DEPRECATED): %s=%s@." ptests_config key value;
+      let parse_config_line (key,value) =
+        match get_config_suites (key,value) with
+        | Some (config, suites) ->
+          default_suites := List.fold_left (add_suite config) !default_suites suites
+        | None -> match key with
+          | "DUNE_ALIAS" -> (match split_blank value with
+              | [ alias ] -> dune_alias := { alias }
+              | _  ->
+                Format.eprintf "ERROR: %s: %s=%s@." ptests_config key value;
+                exit 2)
+          | "IGNORE" ->
+            (match Option.bind (get_key_value value) get_config_suites with
+             | Some (_config,suites) -> nb_ignores := !nb_ignores + List.length suites
+             | None -> incr nb_ignores
+            );
+            ignored_suites := (ptests_config ^ ":" ^ value)::!ignored_suites;
+            if !verbosity >=2 then Format.eprintf "%s: %s=%s@." ptests_config key value
+          | _ ->  Format.eprintf "%s: (DEPRECATED): %s=%s@." ptests_config key value;
       in
       if Sys.file_exists ptests_config then begin
         let ch = open_in ptests_config in
@@ -363,15 +376,14 @@ end = struct
           (*Parse the plugin configuration file for tests. Format is 'Key=value' *)
           while true do
             let line = input_line ch in
-            if Str.string_match regexp line 0 then
-              let key = Str.matched_group 1 line in
-              let value = Str.matched_group 2 line in
-              parse_config_line (key, value)
-            else if not ((Str.string_match regexp_comment line 0) || (split_blank line = [])) then begin
-              close_in ch;
-              Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line ptests_config (Sys.getcwd());
-              exit 1
-            end
+            match get_key_value line with
+            | Some (key, value) -> parse_config_line (key,value)
+            | None ->
+              if not ((Str.string_match regexp_comment line 0) || (split_blank line = [])) then begin
+                close_in ch;
+                Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line ptests_config (Sys.getcwd());
+                exit 1
+              end
           done
         with
         | End_of_file -> close_in ch ;
