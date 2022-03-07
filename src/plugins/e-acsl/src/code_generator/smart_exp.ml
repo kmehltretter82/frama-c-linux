@@ -69,7 +69,7 @@ let lnot ~loc e =
     Cil.zero ~loc
 
 let null ~loc =
-  Cil.mkCast (TPtr (TVoid [], [])) (Cil.zero ~loc)
+  Cil.mkCast ~newt:(TPtr (TVoid [], [])) (Cil.zero ~loc)
 
 (*
 Local Variables:

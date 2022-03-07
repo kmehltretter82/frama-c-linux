@@ -249,20 +249,21 @@ class menu_manager ?packing (_:Gtk_helper.host) =
         let item = match stock_opt, callback with
           | None, Unit_callback callback ->
             let mi = GMenu.menu_item ~packing:!!menubar_packing ~label () in
-            ignore (mi#connect#activate callback);
+            ignore (mi#connect#activate ~callback);
             MStandard mi
           | Some stock, Unit_callback callback ->
             let image = (GMisc.image ~stock ~xalign:0. () :> GObj.widget) in
             let text = label in
             let packing = !!menubar_packing in
             let mi = Gtk_helper.image_menu_item ~image ~text ~packing in
-            ignore (mi#connect#activate callback);
+            ignore (mi#connect#activate ~callback);
             MStandard mi
           | _, Bool_callback (callback, active) ->
             let mi = GMenu.check_menu_item
                 ~packing:!!menubar_packing ~label ~active:(active ()) ()
             in
-            ignore (mi#connect#activate (fun () -> callback mi#active));
+            ignore (mi#connect#activate
+                      ~callback:(fun () -> callback mi#active));
             set_active_states <-
               (fun () -> mi#set_active (active ())) :: set_active_states;
             MCheck mi

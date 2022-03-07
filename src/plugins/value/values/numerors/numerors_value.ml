@@ -163,10 +163,10 @@ let constant _ = function
     let prec = Precisions.of_fkind fkind in
     let exact =
       match opt with
-      | Some s -> I.of_strings Precisions.Real (s, s)
-      | None   -> I.of_floats  Precisions.Real (r, r)
+      | Some s -> I.of_strings ~prec:Precisions.Real (s, s)
+      | None   -> I.of_floats  ~prec:Precisions.Real (r, r)
     in
-    let approx = I.of_floats_without_rounding prec (r, r) in
+    let approx = I.of_floats_without_rounding ~prec (r, r) in
     let abs_err = I.sub approx exact in
     let rel_err =
       if I.is_zero exact then I.of_floats ~prec:P.Real (0.0, 0.0)

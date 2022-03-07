@@ -205,7 +205,7 @@ let shift (m:model) (k:value) =
   | Val_var x -> Val_shift(x,k)
   | Val_comp(x,e) -> share ~old:e (fun k -> Val_comp(x,k)) (E.cup e k)
   | Val_shift(x,e) -> share ~old:e (fun k -> Val_shift(x,k)) (E.cup e k)
-  | E old -> share_vcup m old k
+  | E old -> share_vcup m ~old k
 
 let field = function
   | Val_var x -> Val_comp(x,E.bot)

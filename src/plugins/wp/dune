@@ -12,7 +12,7 @@
  (name wp)
   (optional)
   (public_name frama-c-wp.core)
-  (flags (-open Frama_c_kernel :standard -w -6-9-50))
+  (flags (-open Frama_c_kernel :standard -w -9-50))
   (libraries frama-c.kernel frama-c-rtegen.core why3 qed zarith ocamlgraph)
 )
 

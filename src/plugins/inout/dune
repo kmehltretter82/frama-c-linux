@@ -1,7 +1,7 @@
 ( library
   (name inout)
   (public_name frama-c-inout.core)
-  (flags -open Frama_c_kernel :standard -w -6-9-50)
+  (flags -open Frama_c_kernel :standard -w -9-50)
   (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-from.core)
 )
 

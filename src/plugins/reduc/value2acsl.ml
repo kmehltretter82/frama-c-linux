@@ -116,16 +116,16 @@ let valid_to_predicate_opt ~loc t valid =
     Some p
   | Base.Unknown (_, _, _) -> None
   | Base.Variable { Base.min_alloc = bmn } when Integer.(equal bmn minus_one) ->
-    not_yet "Invalid Base.Variable above max_alloc";
+    not_yet ~what:"Invalid Base.Variable above max_alloc";
     None
   | Base.Variable { Base.min_alloc = bmn; Base.max_alloc = bmx } ->
-    not_yet "Invalid Base.Variable above max_alloc";
+    not_yet ~what:"Invalid Base.Variable above max_alloc";
     let tbmn = Cil.lconstant ~loc bmn in
     let tbmx = Cil.lconstant ~loc bmx in
     let p = Logic_const.pvalid_range ~loc (here_lbl, t, tbmn, tbmx) in
     Some p
   | Base.Invalid ->
-    not_yet "Invalid Base";
+    not_yet ~what:"Invalid Base";
     None
 
 let base_to_predicate ~loc t (b: Base.t) =

@@ -328,7 +328,7 @@ module PrintReturn : Parameter_sig.Bool
 (** Behavior of option "-ocode".
     @plugin development guide *)
 module CodeOutput : sig
-  include Parameter_sig.String
+  include Parameter_sig.Filepath
   val output: (Format.formatter -> unit) -> unit
 end
 

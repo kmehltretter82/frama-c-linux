@@ -142,10 +142,10 @@ let value_panel pack (main_ui:main_ui) =
   in
   let refresh () = precision_refresh (); slevel_refresh (); main_refresh() in
   ignore (run_button#connect#pressed
-            (fun () ->
-               main_ui#protect ~cancelable:true
-                 (fun () -> refresh (); Analysis.compute (); main_ui#reset ());
-            ));
+            ~callback:(fun () ->
+                main_ui#protect ~cancelable:true
+                  (fun () -> refresh (); Analysis.compute (); main_ui#reset ());
+              ));
   pack box;
   "Eva", box#coerce, Some refresh
 
@@ -185,7 +185,8 @@ let active_highlighter buffer localizable ~start ~stop =
             end
             else
               let dead_code_area =
-                make_tag buffer "deadcode" [`BACKGROUND "tomato";`STYLE `ITALIC]
+                make_tag buffer ~name:"deadcode"
+                  [`BACKGROUND "tomato";`STYLE `ITALIC]
               in
               apply_tag buffer dead_code_area start stop
           end

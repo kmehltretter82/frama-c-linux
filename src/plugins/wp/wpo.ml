@@ -958,8 +958,8 @@ let _ignore =
        WpoType.ty ProverType.ty
        (Datatype.pair Datatype.string Datatype.string))
     (fun w p ->
-       (DISK.file_logout w.po_pid (get_model w) p,
-        DISK.file_logerr w.po_pid (get_model w) p))
+       (DISK.file_logout ~pid:w.po_pid ~model:(get_model w) ~prover:p,
+        DISK.file_logerr ~pid:w.po_pid ~model:(get_model w) ~prover:p))
 
 let pp_logfile fmt w prover =
   let model = get_model w in

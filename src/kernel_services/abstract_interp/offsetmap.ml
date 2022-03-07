@@ -1138,7 +1138,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
   let f_aux_merge_generic merge_v abs_min abs_max rem1 modu1 v1 rem2 modu2 v2 =
     if Rel.equal rem1 rem2 && modu1 =~ modu2
     then
-      rem1, modu1, V.anisotropic_cast modu1 (merge_v modu1 v1 v2)
+      rem1, modu1, V.anisotropic_cast ~size:modu1 (merge_v modu1 v1 v2)
       (*  Format.printf "f_aux_merge: [%a, %a]@.(%a %a %a)@.(%a %a %a)@."
           pretty_int abs_min pretty_int abs_max pretty_int rem1 pretty_int
           modu1 V.pretty v1 pretty_int rem2 pretty_int modu2 V.pretty v2 ; *)
@@ -1196,7 +1196,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
       [narrow {0} {1,2}] on the first bit is {0}, but the intersection
       of the two sets is bottom. *)
   let f_aux_merge_join merge_v abs_min abs_max rem1 modu1 v1 rem2 modu2 v2 =
-    let joined size v1 v2 = V.anisotropic_cast size (merge_v size v1 v2) in
+    let joined size v1 v2 = V.anisotropic_cast ~size (merge_v size v1 v2) in
     if V.is_isotropic v2 then
       rem1, modu1, joined modu1 v1 v2
     else if V.is_isotropic v1 then
@@ -1585,13 +1585,13 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
     | Node (max, offl, subl, offr, subr, rem, m, v, _) ->
       let new_offl = offl +~ curr_off in
       if offset <~ curr_off then
-        keep_below offset new_offl subl
+        keep_below ~offset new_offl subl
       else if offset =~ curr_off then
         new_offl, subl
       else
         let sup = curr_off +~ max in
         if offset >~ sup then
-          let new_offr, new_subr = keep_below offset (curr_off +~ offr) subr in
+          let new_offr, new_subr = keep_below ~offset (curr_off +~ offr) subr in
           curr_off,
           nNode max offl subl (new_offr -~ curr_off) new_subr rem m v
         else
@@ -1614,7 +1614,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         (* This node should be forgotten,
            let's look at the right subtree
         *)
-        keep_above offset new_offr subr
+        keep_above ~offset new_offr subr
       else if offset =~ abs_max then
         (* we are at the limit,
            the right subtree is the answer
@@ -1624,7 +1624,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
       if offset <~ curr_off then
         (* we want to keep this node and part of its left subtree *)
         let new_offl, new_subl =
-          keep_above offset (curr_off +~ offl) subl
+          keep_above ~offset (curr_off +~ offl) subl
         in
         curr_off,
         nNode max (new_offl -~ curr_off) new_subl offr subr rem m v
@@ -1638,8 +1638,8 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
 
   let update_itv_with_rem ~exact ~offset ~abs_max ~size ~rem v curr_off tree =
     if Int.(equal size zero) then curr_off, tree else
-      let off1, t1 = keep_above abs_max curr_off tree in
-      let off2, t2 = keep_below offset curr_off tree in
+      let off1, t1 = keep_above ~offset:abs_max curr_off tree in
+      let off2, t2 = keep_below ~offset curr_off tree in
       if exact then
         let off_add, t_add =
           add_node ~min:offset ~max:abs_max rem size v off1 t1
@@ -2301,11 +2301,11 @@ module Int_Intervals_Map = struct
   let shrink_itv co m ~prev_min ~new_min ~prev_max ~new_max : itvs =
     let co, m as i =
       if new_max <~ prev_max then
-        keep_below (succ new_max) co m
+        keep_below ~offset:(succ new_max) co m
       else co, m
     in
     if new_min >~ prev_min then
-      keep_above (pred new_min) co m
+      keep_above ~offset:(pred new_min) co m
     else i
 
   (* Resize size [m] to size [new_min..new_max], by enlarging or shrinking
@@ -2316,13 +2316,13 @@ module Int_Intervals_Map = struct
       else if new_max >~ prev_max then
         add_itv ~min:(succ prev_max) ~max:new_max false co m
       else (* new_max <~ prev_max *)
-        keep_below (succ new_max) co m
+        keep_below ~offset:(succ new_max) co m
     in
     if new_min =~ prev_min then i
     else if new_min <~ prev_min then
       add_itv ~min:new_min ~max:(pred prev_min) false co m
     else (* new_min >~ prev_min *)
-      keep_above (pred new_min) co m
+      keep_above ~offset:(pred new_min) co m
 
 
   (* normalizes a non-empty offsetmap [m], by removing an eventual rightmost

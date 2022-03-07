@@ -270,10 +270,10 @@ let add_item (main_ui:Design.main_window_extension_points) ~uses_value menu name
     ignore (item#connect#activate ~callback);
     (* Needed for the menu in the Information panel. *)
     ignore (item#event#connect#button_press
-              (fun evt ->
-                 if GdkEvent.Button.button evt = 1
-                 then (callback (); true)
-                 else false))
+              ~callback:(fun evt ->
+                  if GdkEvent.Button.button evt = 1
+                  then (callback (); true)
+                  else false))
 
 let selector (popup_factory:GMenu.menu GMenu.factory)
     (main_ui:Design.main_window_extension_points)

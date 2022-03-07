@@ -144,7 +144,8 @@ let eval_assigns kf state assigns =
         | From l ->
           let aux acc { it_content = from } =
             let _, loc, deps =
-              !Db.Properties.Interp.loc_to_loc_under_over None state from in
+              !Db.Properties.Interp.loc_to_loc_under_over ~result:None state from
+            in
             let acc = Zone.join (clean_deps deps) acc in
             let z = enumerate_valid_bits Read loc in
             Zone.join z acc

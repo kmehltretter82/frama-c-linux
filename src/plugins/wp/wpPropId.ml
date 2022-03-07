@@ -149,9 +149,9 @@ let mk_fct_from_id kf kf_has_exit bhv tkind from =
   mk_prop kind (Option.get id)
 
 let mk_disj_bhv_id (kf,ki,active,disj)  =
-  mk_prop PKProp (Property.ip_of_disjoint kf ki active disj)
+  mk_prop PKProp (Property.ip_of_disjoint kf ki ~active disj)
 let mk_compl_bhv_id (kf,ki,active,comp) =
-  mk_prop PKProp (Property.ip_of_complete kf ki active comp)
+  mk_prop PKProp (Property.ip_of_complete kf ki ~active comp)
 let mk_decrease_id kf s x  =
   mk_prop PKDecreases (Property.ip_of_decreases kf s x)
 

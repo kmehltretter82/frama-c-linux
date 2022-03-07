@@ -123,7 +123,7 @@ let () =
   Ast.add_linked_state funspec_state;
   Funspecs.add_hook_on_remove
     (fun _ kf spec ->
-       let ppts = Property.ip_of_spec kf Kglobal [] spec in
+       let ppts = Property.ip_of_spec kf Kglobal ~active:[] spec in
        List.iter Property_status.remove ppts)
 
 module Code_annots =
@@ -431,7 +431,8 @@ let pre_register_funspec ?tbl ?(emitter=Emitter.end_user) ?(force=false) kf =
           (fun e spec -> Format.printf "Register for function %a, Emitter %a, spec %a@." Kf.pretty kf Emitter.Usable_emitter.pretty e Cil_printer.pp_funspec spec)
           tbl;
     *)
-    List.iter Property_status.register (Property.ip_of_spec kf Kglobal [] spec)
+    List.iter Property_status.register
+      (Property.ip_of_spec kf Kglobal ~active:[] spec)
   end
 
 let register_funspec ?emitter ?force kf =
@@ -890,7 +891,7 @@ let add_behaviors ?(register_children=true) e kf ?stmt ?active bhvs =
          let b' = Cil.mk_behavior ~name:bhv.b_name () in
          merge_behavior b' bhv;
          merge_behavior b' (List.find (is_same_behavior bhv) bhvs);
-         let ip = Property.ip_of_behavior kf ki active bhv in
+         let ip = Property.ip_of_behavior kf ki ~active bhv in
          Property_status.remove ip;
          (* mergeable clauses, i.e. assigns, from, and allocates may have changed.
             Thus, if register_children is true, we need to update
@@ -899,20 +900,20 @@ let add_behaviors ?(register_children=true) e kf ?stmt ?active bhvs =
              add the additional ip, nothing will be removed.
          *)
          if register_children then begin
-           let ip = Property.ip_from_of_behavior kf ki active bhv in
+           let ip = Property.ip_from_of_behavior kf ki ~active bhv in
            List.iter Property_status.remove ip;
-           let ip = Property.ip_assigns_of_behavior kf ki active bhv in
+           let ip = Property.ip_assigns_of_behavior kf ki ~active bhv in
            Option.iter Property_status.remove ip;
-           let ip = Property.ip_allocation_of_behavior kf ki active bhv in
+           let ip = Property.ip_allocation_of_behavior kf ki ~active bhv in
            Option.iter Property_status.remove ip;
-           let ip = Property.ip_from_of_behavior kf ki active b' in
+           let ip = Property.ip_from_of_behavior kf ki ~active b' in
            List.iter Property_status.register ip;
-           let ip = Property.ip_assigns_of_behavior kf ki active b' in
+           let ip = Property.ip_assigns_of_behavior kf ki ~active b' in
            Option.iter Property_status.register ip;
-           let ip = Property.ip_allocation_of_behavior kf ki active b' in
+           let ip = Property.ip_allocation_of_behavior kf ki ~active b' in
            Option.iter Property_status.register ip;
          end;
-         let ip = Property.ip_of_behavior kf ki active b' in
+         let ip = Property.ip_of_behavior kf ki ~active b' in
          Property_status.register ip;
        end)
     full_spec.spec_behavior;
@@ -929,7 +930,7 @@ let add_behaviors ?(register_children=true) e kf ?stmt ?active bhvs =
                 when List.exists (is_same_behavior bhv) full_spec.spec_behavior
                 -> ()
               | _ -> Property_status.register ip)
-           (Property.ip_all_of_behavior kf ki active bhv))
+           (Property.ip_all_of_behavior kf ki ~active bhv))
       bhvs
   end
 
@@ -976,7 +977,7 @@ let add_complete e kf ?stmt ?active l =
     emit_spec.spec_complete_behaviors <- l :: emit_spec.spec_complete_behaviors;
     let active = match active with None -> [] | Some l -> l in
     Property_status.register
-      (Property.ip_of_complete kf (kinstr stmt) active l)
+      (Property.ip_of_complete kf (kinstr stmt) ~active l)
   end
 
 let add_disjoint e kf ?stmt ?active l =
@@ -991,7 +992,7 @@ let add_disjoint e kf ?stmt ?active l =
     List.iter (check_bhv_name full_spec) l;
     emit_spec.spec_disjoint_behaviors <- l :: emit_spec.spec_disjoint_behaviors;
     let active = match active with None -> [] | Some l -> l in
-    Property_status.register (Property.ip_of_disjoint kf (kinstr stmt) active l)
+    Property_status.register (Property.ip_of_disjoint kf (kinstr stmt) ~active l)
   end
 
 let add_spec ?register_children e kf ?stmt ?active spec =
@@ -1024,10 +1025,10 @@ let extend_behavior
   let b = List.find has_same_name full_spec.spec_behavior in
   let b' = List.find has_same_name emit_spec.spec_behavior in
   let active = match active with None -> [] | Some l -> l in
-  let ip = Property.ip_of_behavior kf (kinstr stmt) active b in
+  let ip = Property.ip_of_behavior kf (kinstr stmt) ~active b in
   Property_status.remove ip;
   set_bhv b b';
-  let ip = Property.ip_of_behavior kf (kinstr stmt) active b in
+  let ip = Property.ip_of_behavior kf (kinstr stmt) ~active b in
   Property_status.register ip
 
 let add_requires e kf ?stmt ?active ?behavior l =
@@ -1108,14 +1109,14 @@ let add_assigns ~keep_empty e kf ?stmt ?active ?behavior a =
        (* All assigns of a same behavior share the property.
           Thus must remove the previous property before adding the new one *)
        List.iter Property_status.remove
-         (Property.ip_from_of_behavior kf ki active full_bhv);
+         (Property.ip_from_of_behavior kf ki ~active full_bhv);
        Option.iter Property_status.remove
-         (Property.ip_assigns_of_behavior kf ki active full_bhv);
-       full_bhv.b_assigns <- merge_assigns keep_empty full_bhv.b_assigns a;
+         (Property.ip_assigns_of_behavior kf ki ~active full_bhv);
+       full_bhv.b_assigns <- merge_assigns ~keep_empty full_bhv.b_assigns a;
        Option.iter Property_status.register
-         (Property.ip_assigns_of_behavior kf ki active full_bhv);
+         (Property.ip_assigns_of_behavior kf ki ~active full_bhv);
        List.iter Property_status.register
-         (Property.ip_from_of_behavior kf ki active full_bhv);
+         (Property.ip_from_of_behavior kf ki ~active full_bhv);
     )
   in
   let old_spec = get_full_spec kf ?stmt ?behavior:active () in
@@ -1136,11 +1137,11 @@ let add_allocates ~keep_empty e kf ?stmt ?active ?behavior a =
       merge_allocation ~keep_empty e_bhv.b_allocation a;
     let active = match active with None -> [] | Some l -> l in
     Option.iter Property_status.remove
-      (Property.ip_allocation_of_behavior kf ki active full_bhv);
+      (Property.ip_allocation_of_behavior kf ki ~active full_bhv);
     full_bhv.b_allocation <-
       merge_allocation ~keep_empty full_bhv.b_allocation a;
     Option.iter Property_status.register
-      (Property.ip_allocation_of_behavior kf ki active full_bhv);
+      (Property.ip_allocation_of_behavior kf ki ~active full_bhv);
   in
   let old_spec = get_full_spec kf ?stmt ?behavior:active () in
   let bhv = get_spec_behavior old_spec behavior in
@@ -1515,7 +1516,7 @@ let remove_behavior ?(force=false) e kf bhv =
     (* Kernel.feedback "Removing behavior %s@." bhv.b_name; *)
     (* Kernel.feedback "New spec is %a@." Cil_printer.pp_funspec spec; *)
     List.iter Property_status.remove
-      (Property.ip_all_of_behavior kf Kglobal [] bhv)
+      (Property.ip_all_of_behavior kf Kglobal ~active:[] bhv)
   in
   remove_in_funspec e kf set_spec
 
@@ -1544,14 +1545,14 @@ let remove_complete e kf l =
     spec.spec_complete_behaviors <- filterq l spec.spec_complete_behaviors
   in
   remove_in_funspec e kf set_spec;
-  Property_status.remove (Property.ip_of_complete kf Kglobal [] l)
+  Property_status.remove (Property.ip_of_complete kf Kglobal ~active:[] l)
 
 let remove_disjoint e kf l =
   let set_spec spec _tbl =
     spec.spec_disjoint_behaviors <- filterq l spec.spec_disjoint_behaviors
   in
   remove_in_funspec e kf set_spec;
-  Property_status.remove (Property.ip_of_disjoint kf Kglobal [] l)
+  Property_status.remove (Property.ip_of_disjoint kf Kglobal ~active:[] l)
 
 let remove_requires e kf p =
   let set_spec spec _tbl =

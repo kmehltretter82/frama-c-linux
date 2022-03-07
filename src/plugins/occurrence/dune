@@ -2,7 +2,7 @@
   (name occurrence)
  (public_name frama-c-occurrence.core)
   (modules options register)
-  (flags -open Frama_c_kernel :standard -w -6-9)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-eva.core)
 )
 
@@ -13,7 +13,7 @@
   (public_name frama-c-occurrence.gui)
   (optional)
   (modules register_gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Occurrence :standard  -w -6-9)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Occurrence :standard  -w -9)
   (libraries occurrence frama-c.kernel frama-c.gui)
 )
 

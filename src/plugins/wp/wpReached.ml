@@ -417,7 +417,7 @@ let set_unreachable pid =
       | IPPredicate {ip_kind = PKAssumes _} -> []
       | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
         let active = Datatype.String.Set.elements ib_active in
-        (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
+        (ip_post_cond_of_behavior ib_kf ib_kinstr ~active ib_bhv) @
         (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
       | IPExtended _ -> []
       (* Extended clauses might concern anything. Don't validate them

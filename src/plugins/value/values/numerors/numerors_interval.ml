@@ -298,9 +298,9 @@ let monotonic ~prec (op : operator) a b =
     let treat_nan x y =
       nan := true ;
       if F.is_inf x && not (F.eq b1 e1) then
-        add @@ op ~prec (F.apply_sign x (F.of_int ~prec 1)) y ;
+        add @@ op ~prec (F.apply_sign ~src:x ~dst:(F.of_int ~prec 1)) y ;
       if F.is_inf y && not (F.eq b2 e2) then
-        add @@ op ~prec x (F.apply_sign y (F.of_int ~prec 1)) ;
+        add @@ op ~prec x (F.apply_sign ~src:y ~dst:(F.of_int ~prec 1)) ;
     in
     let op rnd x y =
       let r = op ~rnd ~prec x y in
@@ -437,20 +437,20 @@ let backward_gt ?(prec = Precisions.Real) y x =
 let finite_values ~prec = function
   | NaN _ -> None
   | I (x, y, _) ->
-    let min = F.max (F.maximal_neg_float prec) x in
-    let max = F.min (F.maximal_pos_float prec) y in
+    let min = F.max (F.maximal_neg_float ~prec) x in
+    let max = F.min (F.maximal_pos_float ~prec) y in
     if max < min then None else Some (min, max)
 
 let backward_op (op : operator) fnan ?(prec = Precisions.Real) value result () =
   if contains_infinity result || (contains_nan value && contains_nan result)
-  then `Value (top prec)
+  then `Value (top ~prec)
   else
     let reduced_for_nan =
       if contains_nan result
       then `Value (fnan value)
       else `Bottom
     and reduced_for_finite =
-      match finite_values prec result, finite_values prec value with
+      match finite_values ~prec result, finite_values ~prec value with
       | None, _ | _, None -> `Bottom
       | Some (xres, yres), Some (xval, yval) ->
         if Precisions.eq prec Precisions.Real then

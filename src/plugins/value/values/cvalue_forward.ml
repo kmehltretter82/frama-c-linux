@@ -359,7 +359,7 @@ let forward_minus_pp ~typ ev1 ev2 =
   in
   if not (Parameters.WarnPointerSubstraction.get ()) then
     (* Generate garbled mix if the two pointers disagree on their base *)
-    let minus_val = V.add_untyped Int_Base.minus_one ev1 ev2 in
+    let minus_val = V.add_untyped ~factor:Int_Base.minus_one ev1 ev2 in
     try
       V.inject_ival (conv (Cvalue.V.project_ival minus_val))
     with Cvalue.V.Not_based_on_null ->
@@ -376,12 +376,12 @@ let forward_minus_pp ~typ ev1 ev2 =
    The function must behave as if it was acting on unbounded integers *)
 let forward_binop_int ~typ ev1 op ev2 =
   match op with
-  | PlusPI  -> V.add_untyped (Bit_utils.osizeof_pointed typ) ev1 ev2
+  | PlusPI  -> V.add_untyped ~factor:(Bit_utils.osizeof_pointed typ) ev1 ev2
   | MinusPI ->
     let int_base = Int_Base.neg (Bit_utils.osizeof_pointed typ) in
-    V.add_untyped int_base ev1 ev2
-  | PlusA   -> V.add_untyped (Int_Base.one) ev1 ev2
-  | MinusA  -> V.add_untyped Int_Base.minus_one ev1 ev2
+    V.add_untyped ~factor:int_base ev1 ev2
+  | PlusA   -> V.add_untyped ~factor:(Int_Base.one) ev1 ev2
+  | MinusA  -> V.add_untyped ~factor:Int_Base.minus_one ev1 ev2
   | MinusPP -> forward_minus_pp ~typ ev1 ev2
   | Mod     -> V.c_rem ev1 ev2
   | Div     -> V.div ev1 ev2

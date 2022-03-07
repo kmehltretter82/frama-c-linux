@@ -71,12 +71,13 @@ let backward_relation typ ~positive op =
 (* res == v1 +/- v2 *)
 let backward_add_int typ ~res_value ~v1 ~v2 pos =
   (* v1 == res -/+ v2 *)
-  let v1' = V.add_untyped Int_Base.(if pos then minus_one else one) res_value v2
+  let v1' =
+    V.add_untyped ~factor:Int_Base.(if pos then minus_one else one) res_value v2
   (* +/- v2 == res - v1 *)
   and v2' =
     if pos
-    then V.add_untyped Int_Base.minus_one res_value v1
-    else V.add_untyped Int_Base.minus_one v1 res_value
+    then V.add_untyped ~factor:Int_Base.minus_one res_value v1
+    else V.add_untyped ~factor:Int_Base.minus_one v1 res_value
   in
   (* TODO: no need for reinterpret if no overflow. *)
   Some (Cvalue_forward.reinterpret typ v1',
@@ -270,8 +271,8 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
 
   | MinusPP, TInt _ ->
     let factor = Bit_utils.osizeof_pointed typ_e1 in
-    let v1 = V.add_untyped factor v2 res_value
-    and v2 = V.add_untyped (Int_Base.neg factor) v1 res_value in
+    let v1 = V.add_untyped ~factor v2 res_value
+    and v2 = V.add_untyped ~factor:(Int_Base.neg factor) v1 res_value in
     Some (v1, v2)
 
   (* comparison operators *)
@@ -300,7 +301,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
     (* the following equality only holds when v1 does not change sign, which
        is why we split its range: v1 == (v1 / v2) * v2 + res *)
     let v1' v1 res =
-      V.add_untyped Int_Base.one res (V.mul (V.div v1 v2) v2)
+      V.add_untyped ~factor:Int_Base.one res (V.mul (V.div v1 v2) v2)
     in
     let ge = Abstract_interp.Comp.Ge and le = Abstract_interp.Comp.Le in
     let v1_pos =  V.backward_comp_int_left ge v1 V.singleton_zero in
@@ -318,7 +319,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
       else
         (* v2 = (v1 - res) / (v1 / v2) *)
         V.div
-          (V.add_untyped Int_Base.minus_one v1 res_value)
+          (V.add_untyped ~factor:Int_Base.minus_one v1 res_value)
           (V.div  v1 v2)
     in
     Some (v1', v2')

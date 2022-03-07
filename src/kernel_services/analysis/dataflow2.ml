@@ -416,7 +416,7 @@ module Forwards(T : ForwardsTransfer) = struct
                 when Integer.equal z Integer.zero ->
                 new_exp ~loc:exp_sw.eloc (UnOp(LNot,exp_sw,intType))
               | _ ->
-                Cil.new_exp exp_case.eloc
+                Cil.new_exp ~loc:exp_case.eloc
                   (BinOp (Eq, exp_sw, exp_case, Cil.intType))
             in
             let branch_case, branch_not_case = T.doGuard s exp before in

@@ -809,26 +809,26 @@ struct
       | Garbled , _ | _ , Garbled -> Mismatch
       | Str(a,n) , Str(b,m) ->
         begin
-          match compare_slot a b with
+          match compare_slot ~dst:a ~src:b with
           | Mismatch -> Mismatch
           | Drem a'->
             let w1 = a' @ decr_slot a n w1 in
             let w2 =      decr_slot b m w2 in
-            compare w1 w2
+            compare ~dst:w1 ~src:w2
           | Srem b' ->
             let w1 =      decr_slot a n w1 in
             let w2 = b' @ decr_slot b m w2 in
-            compare w1 w2
+            compare ~dst:w1 ~src:w2
           | Equal ->
             if n < m then
               let w2 = Str(a,Int64.sub m n)::w2 in
-              compare w1 w2
+              compare ~dst:w1 ~src:w2
             else if n > m then
               let w1 = Str(a,Int64.sub n m)::w1 in
-              compare w1 w2
+              compare ~dst:w1 ~src:w2
             else
               (* n = m *)
-              compare w1 w2
+              compare ~dst:w1 ~src:w2
         end
       | Arr(u,n) , Arr(v,m) ->
         begin
@@ -837,21 +837,21 @@ struct
           | Drem u' ->
             let w1 = u' @ add_array u (Int64.pred n) w1 in
             let w2 =      add_array v (Int64.pred m) w2 in
-            compare w1 w2
+            compare ~dst:w1 ~src:w2
           | Srem v' ->
             let w1 =      add_array u (Int64.pred n) w1 in
             let w2 = v' @ add_array v (Int64.pred m) w2 in
-            compare w1 w2
+            compare ~dst:w1 ~src:w2
           | Equal ->
             if n < m then
               let w2 = add_array v (Int64.sub m n) w2 in
-              compare w1 w2
+              compare ~dst:w1 ~src:w2
             else if n > m then
               let w1 = add_array u (Int64.sub n m) w1 in
-              compare w1 w2
+              compare ~dst:w1 ~src:w2
             else
               (* n = m *)
-              compare w1 w2
+              compare ~dst:w1 ~src:w2
         end
       | Arr(u,n) , Str _ ->
         compare ~dst:((layout u) @ add_array u (Int64.pred n) w1) ~src
@@ -914,7 +914,7 @@ struct
       match compare ~dst:(layout dst) ~src with
       | Equal | Srem _ -> true
       | Mismatch -> false
-      | Drem dst -> repeated dst src
+      | Drem dst -> repeated ~dst ~src
 
   let rec pretty fmt = function
     | C_pointer ty -> Format.fprintf fmt "%a*" pretty (Ctypes.object_of ty)

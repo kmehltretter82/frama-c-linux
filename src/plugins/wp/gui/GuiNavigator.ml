@@ -509,7 +509,7 @@ let make (main : main_window_extension_points) =
     panel#pack ~expand:false focusbar#coerce ;
     panel#pack ~expand:true ~fill:true book#coerce ;
     let tab_label = (GMisc.label ~text:"WP Goals" ())#coerce in
-    ignore (panel#misc#connect#after#realize behavior#reload) ;
+    ignore (panel#misc#connect#after#realize ~callback:behavior#reload) ;
     ignore (main#lower_notebook#append_page ~tab_label panel#coerce) ;
     main#register_source_highlighter source#highlight ;
     main#register_source_selector popup#register ;

@@ -81,7 +81,7 @@ let menu entries ?width ?tooltip ~packing get set demon =
     try combo_box#set_active (lookup 0 (get ()) entries)
     with Not_found -> ()
   in
-  ignore (combo_box#connect#changed callback) ;
+  ignore (combo_box#connect#changed ~callback) ;
   Gtk_helper.do_tooltip ?tooltip combo_box ;
   register demon update
 

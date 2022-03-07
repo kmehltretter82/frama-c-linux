@@ -304,9 +304,9 @@ struct
     let expanded =Gtk_helper.Configuration.find_bool ~default:true key_config in
     let expander = GBin.expander ~expanded ~packing:box#pack () in
     ignore (expander#connect#activate
-              (fun () -> (* Save expansion of panels*)
-                 Gtk_helper.Configuration.set key_config
-                   (Gtk_helper.Configuration.ConfBool (not expander#expanded))));
+              ~callback:(fun () -> (* Save expansion of panels*)
+                  Gtk_helper.Configuration.set key_config
+                    (Gtk_helper.Configuration.ConfBool (not expander#expanded))));
     let hb = GPack.vbox ~packing:expander#add () in
     let markup = Printf.sprintf "<span font_weight=\"bold\">%s</span>" text in
     let label = GMisc.label ~markup () in
@@ -515,8 +515,8 @@ let make_panel (main_ui:main_window_extension_points) =
   reset_menu_button#misc#set_tooltip_text "Reconfigure filters according to presets";
   reset_menu_button#add icon#coerce;
   ignore (reset_menu_button#connect#clicked
-            (fun () -> checks_menu#popup ~button:0
-                ~time:(GtkMain.Main.get_current_event_time ())));
+            ~callback:(fun () -> checks_menu#popup ~button:0
+                          ~time:(GtkMain.Main.get_current_event_time ())));
   let sc_buttons =
     GBin.scrolled_window ~vpolicy:`AUTOMATIC ~hpolicy:`NEVER ()
   in
@@ -559,7 +559,7 @@ let make_panel (main_ui:main_window_extension_points) =
              let format_graph ppf =
                Consolidation_graph.dump (Consolidation_graph.get ip) ppf in
              Dgraph_helper.graph_window_through_dot
-               main_ui#main_window "Dependencies" format_graph
+               ~parent:main_ui#main_window ~title:"Dependencies" format_graph
            | None -> ()));
   view#selection#set_select_function
     (fun path currently_selected ->

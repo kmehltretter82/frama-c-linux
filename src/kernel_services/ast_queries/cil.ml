@@ -237,7 +237,7 @@ let pp_attributes_ref = Extlib.mk_fun "Cil.pp_attributes_ref"
 
 let default_behavior_name = "default!"
 let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
-let is_default_behavior b = is_default_mk_behavior b.b_name b.b_assumes
+let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
 
 let find_default_behavior spec =
   try
@@ -5586,7 +5586,7 @@ let mkAddrOf ~loc ((_b, _off) as lval) : exp =
   (* array *)
   | _ -> new_exp ~loc (AddrOf lval)
 
-let mkAddrOfVi vi = mkAddrOf vi.vdecl (var vi)
+let mkAddrOfVi vi = mkAddrOf ~loc:vi.vdecl (var vi)
 
 let mkAddrOrStartOf ~loc (lv: lval) : exp =
   match unrollTypeSkel (typeOfLval lv) with
@@ -5867,8 +5867,8 @@ let mkBinOp ~loc op e1 e2 =
   let machdep = false in
   let make_expr common_type res_type =
     constFoldBinOp ~loc machdep op
-      (mkCastT t1 common_type e1)
-      (mkCastT t2 common_type e2)
+      (mkCastT ~oldt:t1 ~newt:common_type e1)
+      (mkCastT ~oldt:t2 ~newt:common_type e2)
       res_type
   in
   let doArithmetic () =
@@ -5924,14 +5924,14 @@ let mkBinOp ~loc op e1 e2 =
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       constFoldBinOp ~loc machdep op
-        (mkCastT t1 t1' e1) (mkCastT t2 t2' e2) t1'
+        (mkCastT ~oldt:t1 ~newt:t1' e1) (mkCastT ~oldt:t2 ~newt:t2' e2) t1'
   | (PlusA|MinusA)
     when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
   | (PlusPI|MinusPI) when isPointerType t1 && isIntegralType t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
   | MinusPP when isPointerType t1 && isPointerType t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
-    constFoldBinOp ~loc machdep op e1 (mkCastT t2 t1 e2) intType
+    constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2) intType
   | (Eq|Ne|Lt|Le|Ge|Gt)
     when isArithmeticType t1 && isArithmeticType t2 ->
     doArithmeticComp ()
@@ -6099,7 +6099,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
 
   | TPtr _ as t ->
     SingleInit(
-      if theMachine.insertImplicitCasts then mkCast t (zero ~loc)
+      if theMachine.insertImplicitCasts then mkCast ~newt:t (zero ~loc)
       else zero ~loc)
   | x -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref x
 
@@ -6283,7 +6283,8 @@ let uniqueVarNames (f: file) : unit =
              (* Here if this is the first time we define a name *)
              Hashtbl.add globalNames vi.vname vi.vid;
              (* And register it *)
-             Alpha.registerAlphaName gAlphaTable vi.vname (CurrentLoc.get ())
+             Alpha.registerAlphaName ~alphaTable:gAlphaTable
+               ~lookupname:vi.vname ~data:(CurrentLoc.get ())
            end)
       | _ -> ());
 
@@ -6327,7 +6328,7 @@ let uniqueVarNames (f: file) : unit =
           (* Fix the type again *)
           setFormals fdec fdec.sformals;
           (* Undo the changes to the global table *)
-          Alpha.undoAlphaChanges gAlphaTable !undolist;
+          Alpha.undoAlphaChanges ~alphaTable:gAlphaTable ~undolist:!undolist;
           ()
         end
       | _ -> ());

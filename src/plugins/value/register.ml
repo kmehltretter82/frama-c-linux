@@ -67,7 +67,7 @@ let assigns_inputs_to_zone state assigns =
   | Writes l  -> List.fold_left treat_asgn Zone.bottom l
 
 let assigns_outputs_aux ~eval ~bot ~top ~join state ~result assigns =
-  let env = Eval_terms.env_post_f state state result () in
+  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
   let treat_asgn acc ({it_content = out},_) =
     if Logic_utils.is_result out && result = None
     then acc
