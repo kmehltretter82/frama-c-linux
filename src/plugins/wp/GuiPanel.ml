@@ -278,7 +278,7 @@ let wp_panel
   let cancel = GButton.button ~packing:(pbox#pack ~expand:false) ~stock:`STOP () in
   cancel#misc#set_sensitive false ;
   let server = ProverTask.server () in
-  ignore (cancel#connect#released (fun () -> Task.cancel_all server)) ;
+  ignore (cancel#connect#released ~callback:(fun () -> Task.cancel_all server));
   let inactive = (0,0) in
   let state = ref inactive in
   Task.on_server_activity server

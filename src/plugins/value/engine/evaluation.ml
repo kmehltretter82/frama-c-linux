@@ -1405,7 +1405,8 @@ module Make
       let context = fast_eval_context state in
       fst (eval_offset context ~reduce_valid_index:true typ_pointed remaining)
       >>- fun (rem, _, _) ->
-      Loc.backward_index typ_pointed v rem loc_offset >>- fun (v', rem') ->
+      Loc.backward_index typ_pointed ~index:v ~remaining:rem loc_offset >>-
+      fun (v', rem') ->
       let reduced_v = if Value.is_included v v' then None else Some v' in
       backward_eval fuel state exp reduced_v >>- fun _ ->
       backward_offset fuel state typ_pointed remaining rem'

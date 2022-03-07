@@ -26,7 +26,7 @@ open Logic_const
 
 let emitter =
   Emitter.create "Inferred annotations"
-    [Emitter.Funspec; Emitter.Property_status] [] []
+    [Emitter.Funspec; Emitter.Property_status] ~correctness:[] ~tuning:[]
 
 let assigns_from_prototype kf =
   let vi = Kernel_function.get_vi kf in
@@ -164,7 +164,9 @@ let is_frama_c_builtin name =
 (* Put an 'Unknown' status on all 'assigns' and 'from' clauses that we
    generate. *)
 let emit_unknown_status_on_assigns kf bhv assigns =
-  let emit ip = Property_status.emit emitter [] ip Property_status.Dont_know in
+  let emit ip =
+    Property_status.emit emitter ~hyps:[] ip Property_status.Dont_know
+  in
   let pptopt =
     Property.ip_of_assigns
       kf Kglobal (Property.Id_contract (Datatype.String.Set.empty,bhv)) assigns

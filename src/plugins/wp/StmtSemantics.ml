@@ -475,7 +475,7 @@ struct
     parallel behavior env spec.spec_behavior
 
   and assigns : env -> assigns -> paths = fun env a ->
-    let frame, _,  _ = mk_frame "assigns" env in
+    let frame, _,  _ = mk_frame ~descr:"assigns" env in
     let lenv = L.mk_env () in (* TODO: lenv for ghost code. *)
     let here = Sigma.create () in
     let authorized_region = L.in_frame frame

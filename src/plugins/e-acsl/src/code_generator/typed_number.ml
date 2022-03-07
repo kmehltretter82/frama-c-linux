@@ -67,7 +67,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
                only non integral value that can be seen as an integer, while the
                type system infers that it is C-representable (see
                tests/runtime/null.i) *)
-            Cil.mkCast Cil.longType e (* \null *)
+            Cil.mkCast ~newt:Cil.longType e (* \null *)
           else
             e
         in

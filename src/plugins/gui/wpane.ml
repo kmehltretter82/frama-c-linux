@@ -190,7 +190,7 @@ class ['a] notebook ?tabs ~default () =
     method on_focus page f = select#connect (fun p -> f (page = p))
     initializer
       begin
-        ignore (view#connect#switch_page self#switched) ;
+        ignore (view#connect#switch_page ~callback:self#switched) ;
         Wutil.on tabs (fun p -> view#set_show_tabs true ; view#set_tab_pos p) ;
       end
     method coerce = view#coerce
@@ -284,7 +284,7 @@ class ['a] dialog ~title ~window ?(resize=false) () =
         hclip#set_left_padding 24 ;
         hclip#set_right_padding 24 ;
         ignore (shell#event#connect#delete
-                  (fun _ -> self#select `CANCEL ; true)) ;
+                  ~callback:(fun _ -> self#select `CANCEL ; true)) ;
         (* returning [true] prevent the dialog from being destroyed *)
       end
 

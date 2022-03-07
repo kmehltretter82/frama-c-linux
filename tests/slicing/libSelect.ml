@@ -83,7 +83,7 @@ let get_zones str_data (kinst, kf) =
 let select_data_before_stmt str_data kinst kf =
   let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
   let zone = get_zones str_data (kinst, kf) in
-    Slicing.Api.Select.select_stmt_zone_internal kf kinst true zone mark
+    Slicing.Api.Select.select_stmt_zone_internal kf kinst ~before:true zone mark
 
 
 (** build the selection for returned value of the function *)
@@ -94,7 +94,7 @@ let select_retres kf =
       let zone = Locations.(enumerate_valid_bits Read loc) in
       let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
       let before = false in
-        Slicing.Api.Select.select_stmt_zone_internal kf ki before zone mark
+        Slicing.Api.Select.select_stmt_zone_internal kf ki ~before zone mark
     with Db.Value.Void_Function -> raise No_return
 ;;
 
@@ -104,7 +104,7 @@ let select_data data kf =
     let ki = Kernel_function.find_return kf in
     let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
     let zone = get_zones data (ki, kf) in
-      Slicing.Api.Select.select_stmt_zone_internal kf ki true zone mark
+      Slicing.Api.Select.select_stmt_zone_internal kf ki ~before:true zone mark
   (* with Logic_interp.Error (_, str) -> raise (Unknown_data data) *)
   with _ -> raise (Unknown_data data)
 ;;

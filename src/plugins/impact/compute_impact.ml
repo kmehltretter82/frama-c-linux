@@ -246,7 +246,7 @@ let add_to_do_aux ~init wl kf pdg (pn, zone as n) =
 
 (** Build the initial value of the [todo] field, from a list of initial nodes *)
 let initial_to_do_list wl kf pdg nodes =
-  List.iter (fun n -> add_to_do_aux true wl kf pdg n) nodes
+  List.iter (fun n -> add_to_do_aux ~init:true wl kf pdg n) nodes
 
 (** Mark a new node as impacted, and simultaneously mark that it is equivalent
     to nodes that are all initial nodes *)
@@ -434,7 +434,8 @@ let all_upward_callers wl kfs =
       "Found call %a -> %a"
       Kernel_function.pretty caller Kernel_function.pretty callee;
     let nodes =
-      lazy (Pdg_aux.all_call_out_nodes pdg_callee pdg_caller callsite)
+      lazy (Pdg_aux.all_call_out_nodes ~callee:pdg_callee ~caller:pdg_caller
+              callsite)
     in
     wl.upward_calls <-
       KfKfCall.Map.add (caller, callee, callsite) nodes wl.upward_calls

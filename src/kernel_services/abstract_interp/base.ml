@@ -298,7 +298,9 @@ let offset_for_validity ~bitfield access base =
     let max = last_valid_offset base max access in
     if bitfield
     then Ival.inject_range (Some min) (Some max)
-    else Ival.inject_interval (Some min) (Some max) Int.zero Int.eight
+    else
+      Ival.inject_interval ~min:(Some min) ~max:(Some max) ~rem:Int.zero
+        ~modu:Int.eight
   | Variable variable_v ->
     let maxv = last_valid_offset base variable_v.max_alloc access in
     Ival.inject_range (Some Int.zero) (Some maxv)

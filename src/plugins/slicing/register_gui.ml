@@ -542,8 +542,8 @@ let slicing_panel (main_ui:Design.main_window_extension_points) =
         ~packing:(table#attach ~left:0 ~top:1) () in
     main_ui#help_message b "%s" msg_help_libraries ;
     ignore (b#connect#toggled
-              (fun () ->
-                 gui_set_slicing_undef_functions main_ui b#active));
+              ~callback:(fun () ->
+                  gui_set_slicing_undef_functions main_ui b#active));
     b
   in
   let level_refresh = Gtk_helper.on_int ~lower:0 ~upper:3

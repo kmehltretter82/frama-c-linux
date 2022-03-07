@@ -338,7 +338,7 @@ module Make (Input: Input) = struct
                 column#set_visible true
               end;
             in
-            ignore (show#connect#activate callback_show_hide);
+            ignore (show#connect#activate ~callback:callback_show_hide);
             (!!menu)#add (show :> GMenu.menu_item);
         with Not_found -> ()
       in
@@ -368,7 +368,7 @@ module Make (Input: Input) = struct
         end
       in
       match get_column_header_button col with
-      | None -> ignore (col#connect#clicked pop_menu) (* TODO: warn *)
+      | None -> ignore (col#connect#clicked ~callback:pop_menu) (* TODO: warn *)
       | Some button ->
         (* Connect the callback to a right-click *)
         let callback evt =
@@ -547,12 +547,12 @@ module Make (Input: Input) = struct
             ) model.columns_type;
           callback_remove_filters ();
         in
-        ignore (remove#connect#activate callback_remove);
+        ignore (remove#connect#activate ~callback:callback_remove);
         if has_filters then begin
           let txt_unfilter = "Remove filters on this column" in
           let unfilter = GMenu.menu_item ~label:txt_unfilter () in
           (!!menu)#add unfilter;
-          ignore (unfilter#connect#activate callback_remove_filters);
+          ignore (unfilter#connect#activate ~callback:callback_remove_filters);
         end;
       in
       let aux_expr_column (col: GTree.view_column) coltype txt tip =
@@ -606,7 +606,8 @@ module Make (Input: Input) = struct
       if Option.is_some model.focused_rev_callstacks then begin
         let unfocus = GMenu.menu_item ~label:"Unfocus callstack(s)" () in
         (!!menu)#add unfocus;
-        ignore (unfocus#connect#activate (callback_focus_unfocus None icon))
+        ignore (unfocus#connect#activate
+                  ~callback:(callback_focus_unfocus None icon))
       end;
     in
     (* Add 'Focus on all displayed callstacks' to menu *)
@@ -623,7 +624,7 @@ module Make (Input: Input) = struct
                                                 displayed callstacks" () in
         (!!menu)#add focus_all;
         ignore (focus_all#connect#activate
-                  (callback_focus_unfocus (Some callstacks) icon));
+                  ~callback:(callback_focus_unfocus (Some callstacks) icon));
     in
     let tip_callstack = "Callstacks at which the selection was analyzed" in
     let icon_callstack =
@@ -692,9 +693,9 @@ module Make (Input: Input) = struct
       menu#add (GMenu.separator_item ());
       menu#add equal;
       menu#add different;
-      ignore (copy#connect#activate callback_copy);
-      ignore (equal#connect#activate (callback_only_except true));
-      ignore (different#connect#activate (callback_only_except false));
+      ignore (copy#connect#activate ~callback:callback_copy);
+      ignore (equal#connect#activate ~callback:(callback_only_except true));
+      ignore (different#connect#activate ~callback:(callback_only_except false));
       (* add menu items for variables present in the selected expression *)
       let callback_display_var vi () =
         Option.iter (fun loc ->
@@ -720,7 +721,8 @@ module Make (Input: Input) = struct
               Printer.pp_varinfo vi in
           let varmenuitem = GMenu.menu_item ~label () in
           menu#add varmenuitem;
-          ignore (varmenuitem#connect#activate (callback_display_var vi));
+          ignore (varmenuitem#connect#activate
+                    ~callback:(callback_display_var vi));
         ) vars_to_display;
       if nb_omitted > 0 then begin
         let label =
@@ -790,7 +792,7 @@ module Make (Input: Input) = struct
                  let focus = GMenu.menu_item ~label:"Focus on this callstack"() in
                  (!!menu)#add focus;
                  ignore (focus#connect#activate
-                           (callback_focus_unfocus (Some [cs]) icon));
+                           ~callback:(callback_focus_unfocus (Some [cs]) icon));
                | GC_Filtered | GC_Consolidated -> ()
              end;
              add_focus_all_callstacks menu icon;

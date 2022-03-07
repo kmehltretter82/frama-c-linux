@@ -121,8 +121,8 @@ let affect_binop ~loc var_as_varinfo var_as_exp binop exp_type exp1 exp2 =
   else if Gmp_types.Q.is_t exp_type then
     Error.not_yet "rational in affect_binop"
   else
-    Smart_stmt.assigns loc
-      (Cil.var var_as_varinfo)
+    Smart_stmt.assigns ~loc
+      ~result:(Cil.var var_as_varinfo)
       (Cil.mkBinOp ~loc binop exp1 exp2 )
 
 let rec thost_to_host kf env th = match th with
@@ -203,7 +203,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let lbd_stmt,env =
       Env.pop_and_get env
         (Gmp.affect ~loc (Cil.var lbd_as_varinfo) lbd_as_exp e_lbd)
-        false Env.Middle
+        ~global_clear:false Env.Middle
     in
     (* statement construction *)
     (* cond = k > e_max; or cond =  __gmpz_cmp(k,e_max) *)
@@ -653,7 +653,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
                Extlib.nest
                  adata
                  (Translate_utils.conditional_to_exp
-                    ~name:"or" ~loc kf (Some t) e1 (Cil.one loc, env') res2)
+                    ~name:"or" ~loc kf (Some t) e1 (Cil.one ~loc, env') res2)
              )
            env)
     in
@@ -674,7 +674,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
                Extlib.nest
                  adata
                  (Translate_utils.conditional_to_exp
-                    ~name:"and" ~loc kf (Some t) e1 res2 (Cil.zero loc, env3))
+                    ~name:"and" ~loc kf (Some t) e1 res2 (Cil.zero ~loc, env3))
              )
            env)
     in

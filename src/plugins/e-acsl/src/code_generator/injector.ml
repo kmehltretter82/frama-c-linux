@@ -175,7 +175,7 @@ let inject_in_instr env kf stmt = function
     let caller, args =
       match caller.enode with
       | Lval (Var fvi, _) ->
-        let fvi, args = rename_caller loc fvi args in
+        let fvi, args = rename_caller ~loc fvi args in
         Cil.evar fvi, args
       | _ -> caller, args
     in
@@ -813,10 +813,10 @@ let inject_mtracking_handler main =
           (* some non-standard arguments. *)
           nulls
       in
-      let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
+      let ptr_size = Cil.sizeOf ~loc Cil.voidPtrType in
       let args = args @ [ ptr_size ] in
-      let init = Smart_stmt.rtl_call loc "memory_init" args in
-      let clean = Smart_stmt.rtl_call loc "memory_clean" [] in
+      let init = Smart_stmt.rtl_call ~loc "memory_init" args in
+      let clean = Smart_stmt.rtl_call ~loc "memory_clean" [] in
       surround_function_with fundec init (Some clean)
     in
     Option.iter handle_main main

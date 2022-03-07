@@ -202,7 +202,7 @@ end = struct
         end;
         let _ff, call = call_id in
         let new_call_info = to_call in
-        PdgIndex.FctIndex.add_info_call ff_marks call new_call_info true
+        PdgIndex.FctIndex.add_info_call ff_marks call new_call_info ~replace:true
       end
 
 end

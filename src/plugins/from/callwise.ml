@@ -171,7 +171,7 @@ let record_for_individual_froms (call_stack, value_res) =
           | { value_initial_state } :: _ -> value_initial_state
         in
         if From_parameters.VerifyAssigns.get () then
-          !Db.Value.verify_assigns_froms cur_kf pre_state froms;
+          !Db.Value.verify_assigns_froms cur_kf ~pre:pre_state froms;
         (match value_res with
          | Value_types.NormalStore (_, memexec_counter) ->
            MemExec.replace memexec_counter froms

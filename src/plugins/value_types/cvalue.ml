@@ -192,7 +192,7 @@ module V = struct
           let o, ok = conv_offset o in
           if o = NoOffset then
             let o' = match Cil.unrollType typ_base with
-              | TArray _ -> Index (Cil.(zero Cil_builtins.builtinLoc), NoOffset)
+              | TArray _ -> Index (Cil.(zero ~loc:Cil_builtins.builtinLoc), NoOffset)
               | TComp (ci, _) -> Field (List.hd (Option.get ci.cfields), NoOffset)
               | _ -> raise Bit_utils.NoMatchingOffset
             in o', ok
@@ -683,7 +683,7 @@ module V = struct
     | Map m ->
       let card =
         M.fold (fun _ v card ->
-            Int.add card (Ival.cardinal_estimate v size)
+            Int.add card (Ival.cardinal_estimate v ~size)
           ) m Int.zero
       in
       Int.min card (Int.two_power size)
