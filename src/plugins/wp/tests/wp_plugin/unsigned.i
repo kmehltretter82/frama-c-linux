@@ -4,7 +4,7 @@
 
 /* run.config_qualif
 
-   OPT: -wp-prover script
+   OPT: -wp-prover script @USING_WP_SESSION@
 */
 
 /*@

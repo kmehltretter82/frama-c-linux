@@ -4,7 +4,7 @@
 
 /* run.config_qualif
 
-   OPT: -ulevel=1 -wp-prop=@ensures -wp-prover script
+   OPT: -ulevel=1 -wp-prop=@ensures -wp-prover script @USING_WP_SESSION@
 */
 
 enum {Max = 16};
