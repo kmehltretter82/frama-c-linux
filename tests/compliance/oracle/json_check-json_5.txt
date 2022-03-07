@@ -1,2 +1,1 @@
-posix_identifiers.json checked.
-c11_functions.json checked.
+    "description": "Compiler builtins supported by Frama-C (for GCC builtins, see gcc_builtins.json)",

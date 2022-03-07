@@ -41,6 +41,8 @@ val dkey_asm_contracts: category
 
 val dkey_ast: category
 
+val dkey_builtins: category
+
 val dkey_check: category
 
 val dkey_constfold: category

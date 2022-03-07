@@ -1223,8 +1223,12 @@ class cil_printer () = object (self)
     | Some vi ->
       let formals = Cil.getFormalsDecl vi in
       match List.rev formals with
-      | [] -> assert false (* Typing error, this function is variadic and should
-                              have at least one argument *)
+      | [] ->
+        (* Typing error, this function should
+           have at least one named argument *)
+        Kernel.abort ~current:true
+          "%s should have at least one named argument"
+          vi.vname
       | f :: _ -> Cil.new_exp ~loc:f.vdecl (Lval (Cil.var f))
 
   (**** STATEMENTS ****)
