@@ -135,11 +135,11 @@ module D = Datatype.Make(struct
                in
                let c =
                  if c <> 0 then c
-                 else compare lr1 lr2
+                 else Stdlib.compare lr1 lr2
                in
                let c =
                  if c <> 0 then c
-                 else compare rr1 rr2
+                 else Stdlib.compare rr1 rr2
                in
                c
              | Lvs_formal (lv1, li1), Lvs_formal (lv2, li2) ->
@@ -153,6 +153,8 @@ module D = Datatype.Make(struct
         )
         lscope_vars1
         lscope_vars2
+
+    let equal = Datatype.from_compare
 
     let hash lscope =
       let lscope_vars = get_all lscope in

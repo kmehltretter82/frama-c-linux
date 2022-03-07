@@ -92,8 +92,8 @@ src/analyses/exit_points.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/exit_points.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/interval.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/interval.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/label.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/label.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/labels.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/labels.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/logic_normalizer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -110,8 +110,6 @@ src/code_generator/assert.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/assert.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/assigns.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/assigns.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/at_with_lscope.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/at_with_lscope.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/contract.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/contract.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/contract_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -149,6 +147,8 @@ src/code_generator/temporal.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/temporal.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_annots.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_annots.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translate_ats.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translate_ats.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_predicates.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_predicates.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate_rtes.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

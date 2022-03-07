@@ -5884,7 +5884,11 @@ let mkBinOp ~loc op e1 e2 =
     if isIntegralType tres then
       make_expr tres tres
     else
-      Kernel.fatal ~current:true "mkBinOp: %a" !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,intType)))
+      Kernel.fatal
+        ~current:true
+        "@[mkBinOp: unsupported non integral result type for integral \
+         arithmetic@ %a@]"
+        !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,intType)))
   in
   let compare_pointer op ?cast1 ?cast2 e1 e2 =
     let do_cast e = function
@@ -5945,8 +5949,13 @@ let mkBinOp ~loc op e1 e2 =
     compare_pointer ~cast1:theMachine.upointType ~cast2:theMachine.upointType
       op e1 e2
   | _ ->
-    Kernel.fatal ~current:true "mkBinOp: %a"
+    Kernel.fatal
+      ~current:true
+      "@[mkBinOp: unsupported operator for such operands@ \
+       %a@ (type of e1: %a,@ type of e2: %a)@]"
       !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,intType)))
+      !pp_typ_ref t1
+      !pp_typ_ref t2
 
 let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
   let e1, e2 =

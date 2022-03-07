@@ -735,13 +735,13 @@ void test_specifier_application(char const *allowed, char const *fmt,
  */
 char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
 {
-  char *__gen_e_acsl_at;
   unsigned long __gen_e_acsl_strcpy_src_size;
+  char *__gen_e_acsl_at;
   char *__retres;
   __e_acsl_store_block((void *)(& src),(size_t)8);
   __e_acsl_store_block((void *)(& dest),(size_t)8);
-  __gen_e_acsl_strcpy_src_size = __e_acsl_builtin_strlen(src);
   __gen_e_acsl_at = dest;
+  __gen_e_acsl_strcpy_src_size = __e_acsl_builtin_strlen(src);
   __retres = strcpy(dest,src);
   {
     __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_strcpy_src_size;
@@ -830,19 +830,16 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
  */
 char *__gen_e_acsl_strchr(char const *s, int c)
 {
-  char const *__gen_e_acsl_at_4;
-  char const *__gen_e_acsl_at_2;
-  int __gen_e_acsl_at;
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  int __gen_e_acsl_at_2;
+  char const *__gen_e_acsl_at;
   char *__retres;
   __e_acsl_store_block((void *)(& __retres),(size_t)8);
   __e_acsl_store_block((void *)(& s),(size_t)8);
+  __gen_e_acsl_at = s;
+  __gen_e_acsl_at_2 = c;
   __gen_e_acsl_contract = __e_acsl_contract_init((size_t)3);
   __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)2,1);
-  __gen_e_acsl_at_4 = s;
-  __gen_e_acsl_at_3 = s;
-  __gen_e_acsl_at_2 = s;
-  __gen_e_acsl_at = c;
   __retres = strchr(s,c);
   {
     int __gen_e_acsl_assumes_value;
@@ -858,7 +855,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_2,"*\\result",
                                     0,*__retres);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\old(c)",0,
-                                   __gen_e_acsl_at);
+                                   __gen_e_acsl_at_2);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&__retres",
@@ -895,7 +892,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
                                    "\\base_addr(\\result)",
                                    __gen_e_acsl_base_addr);
-      __gen_e_acsl_base_addr_2 = __e_acsl_base_addr((void *)__gen_e_acsl_at_2);
+      __gen_e_acsl_base_addr_2 = __e_acsl_base_addr((void *)__gen_e_acsl_at);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
                                    "\\base_addr(\\old(s))",
                                    __gen_e_acsl_base_addr_2);
@@ -916,7 +913,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __gen_e_acsl_assert_data_2.fct = "strchr";
       __gen_e_acsl_assert_data_2.line = 177;
       __gen_e_acsl_assert_data_2.name = "found/result_char";
-      __e_acsl_assert((int)*__retres == (int)((char)__gen_e_acsl_at),
+      __e_acsl_assert((int)*__retres == (int)((char)__gen_e_acsl_at_2),
                       & __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
@@ -953,7 +950,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
                                      "\\base_addr(\\result)",
                                      __gen_e_acsl_base_addr_3);
-        __gen_e_acsl_base_addr_4 = __e_acsl_base_addr((void *)__gen_e_acsl_at_4);
+        __gen_e_acsl_base_addr_4 = __e_acsl_base_addr((void *)__gen_e_acsl_at);
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
                                      "\\base_addr(\\old(s))",
                                      __gen_e_acsl_base_addr_4);
@@ -1050,13 +1047,13 @@ pid_t __gen_e_acsl_fork(void)
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
 {
-  int *__gen_e_acsl_at_2;
-  int *__gen_e_acsl_at;
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  int *__gen_e_acsl_at;
   pid_t __retres;
   {
     int __gen_e_acsl_assumes_value;
     __e_acsl_store_block((void *)(& stat_loc),(size_t)8);
+    __gen_e_acsl_at = stat_loc;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
                                            stat_loc == (int *)0);
@@ -1088,8 +1085,6 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
   }
-  __gen_e_acsl_at_2 = stat_loc;
-  __gen_e_acsl_at = stat_loc;
   __retres = waitpid(pid,stat_loc,options);
   {
     int __gen_e_acsl_or;
@@ -1128,11 +1123,10 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     else {
       int __gen_e_acsl_initialized;
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
-                                   "\\old(stat_loc)",
-                                   (void *)__gen_e_acsl_at_2);
+                                   "\\old(stat_loc)",(void *)__gen_e_acsl_at);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at_2,
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
                                                       sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                    "\\initialized(\\old(stat_loc))",0,

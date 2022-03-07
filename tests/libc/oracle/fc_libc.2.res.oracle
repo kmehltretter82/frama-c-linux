@@ -1,3 +1,4 @@
+[kernel] Parsing fc_libc.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_alloc_axiomatic.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_blkcnt_t.h (with preprocessing)
@@ -154,4 +155,3 @@ skipping FRAMAC_SHARE/libc/tgmath.h
 [kernel] Parsing FRAMAC_SHARE/libc/wchar.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/wctype.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/wordexp.h (with preprocessing)
-[kernel] Parsing fc_libc.c (with preprocessing)

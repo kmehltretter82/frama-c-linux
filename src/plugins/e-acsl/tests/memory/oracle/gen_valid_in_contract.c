@@ -66,15 +66,15 @@ int main(void)
  */
 struct list *__gen_e_acsl_f(struct list *l)
 {
-  struct list *__gen_e_acsl_at_2;
-  struct list *__gen_e_acsl_at;
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  struct list *__gen_e_acsl_at;
   struct list *__retres;
   __e_acsl_store_block((void *)(& __retres),(size_t)8);
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_or;
     __e_acsl_store_block((void *)(& l),(size_t)8);
+    __gen_e_acsl_at = l;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
                                            l == (struct list *)0);
@@ -121,8 +121,6 @@ struct list *__gen_e_acsl_f(struct list *l)
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
                                            __gen_e_acsl_or);
   }
-  __gen_e_acsl_at_2 = l;
-  __gen_e_acsl_at = l;
   __retres = f(l);
   {
     int __gen_e_acsl_assumes_value;
@@ -154,7 +152,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"\\result",
                                    (void *)__retres);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"\\old(l)",
-                                   (void *)__gen_e_acsl_at_2);
+                                   (void *)__gen_e_acsl_at);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Postcondition";
       __gen_e_acsl_assert_data_3.pred_txt = "\\result == \\old(l)";
@@ -162,7 +160,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       __gen_e_acsl_assert_data_3.fct = "f";
       __gen_e_acsl_assert_data_3.line = 18;
       __gen_e_acsl_assert_data_3.name = "B2";
-      __e_acsl_assert(__retres == __gen_e_acsl_at_2,
+      __e_acsl_assert(__retres == __gen_e_acsl_at,
                       & __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }

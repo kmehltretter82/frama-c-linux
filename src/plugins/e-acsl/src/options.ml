@@ -182,10 +182,12 @@ let must_visit () = Run.get ()
 
 module Dkey = struct
   let prepare = register_category "preparation"
+  let logic_normalizer = register_category "analysis:logic_normalizer"
   let bound_variables = register_category "analysis:bound_variables"
   let interval = register_category "analysis:interval_inference"
   let mtracking = register_category "analysis:memory_tracking"
   let typing = register_category "analysis:typing"
+  let labels = register_category "analysis:labels"
   let translation = register_category "translation"
 end
 

@@ -4,14 +4,12 @@
 
 errors=0
 
-if [ "$#" -ge 1 ] && [ -d "$1" ]; then
-    cd "$1"
-else
-    cd share/libc
-fi
+test_dir=$(pwd)
+share_libc="$1"
+cd "$share_libc"
 
 for A in *.h */*.h; do
-    if ! grep -q $A ../../tests/libc/fc_libc.c
+    if ! grep -q $A "$test_dir/fc_libc.c"
     then
         echo "missing include in tests/libc/fc_libc.c: $A"
         errors=$((errors+1))
@@ -24,7 +22,7 @@ for A in *.h */*.h; do
 done
 
 for A in *.c */*.c; do
-    if ! grep -q $A __fc_runtime.c ../../tests/libc/fc_libc.c
+    if ! grep -q $A __fc_runtime.c "$test_dir/fc_libc.c"
     then
         echo "missing include in share/libc/__fc_runtime.c or tests/libc/fc_libc.c: $A"
         errors=$((errors+1))

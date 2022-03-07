@@ -374,7 +374,7 @@ let check_other_requires kf env contract =
                    Assert.runtime_check
                      ~adata
                      ~pred_kind
-                     Smart_stmt.Precondition
+                     Precondition
                      kf
                      env
                      requires_e
@@ -697,7 +697,7 @@ let check_post_conds kf env contract =
                        Assert.runtime_check
                          ~adata
                          ~pred_kind
-                         Smart_stmt.Postcondition
+                         Postcondition
                          kf
                          env
                          post_cond_e
@@ -754,7 +754,7 @@ let check_post_conds kf env contract =
     contract.spec.spec_behavior
 
 let translate_preconditions kf env contract =
-  let env = Env.set_annotation_kind env Smart_stmt.Precondition in
+  let env = Env.set_annotation_kind env Precondition in
   let env = Env.push_contract env contract in
   let env = init kf env contract in
   (* Start with translating the requires predicate of the default behavior. *)
@@ -775,7 +775,7 @@ let translate_preconditions kf env contract =
   Env.handle_error do_it env
 
 let translate_postconditions kf env =
-  let env = Env.set_annotation_kind env Smart_stmt.Postcondition in
+  let env = Env.set_annotation_kind env Postcondition in
   let contract, env = Env.pop_and_get_contract env in
   let do_it env =
     let env = check_post_conds kf env contract in

@@ -44,10 +44,12 @@ val must_visit: unit -> bool
 
 module Dkey: sig
   val prepare: category
+  val logic_normalizer: category
   val bound_variables: category
   val interval: category
   val mtracking: category
   val typing: category
+  val labels: category
   val translation: category
 end
 

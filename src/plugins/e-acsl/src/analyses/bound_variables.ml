@@ -35,7 +35,8 @@
 open Cil_types
 open Cil_datatype
 
-module Error = Error.Make(struct let phase = Options.Dkey.bound_variables end)
+let dkey = Options.Dkey.bound_variables
+module Error = Error.Make(struct let phase = dkey end)
 
 (** [error_msg quantif msg pp x] creates an error message from the string [msg]
     containing the value [x] pretty-printed by [pp] and the predicate [quantif]
@@ -697,7 +698,7 @@ end
     | _ -> ()
 
   let preprocessor = object
-    inherit E_acsl_visitor.visitor
+    inherit E_acsl_visitor.visitor dkey
 
     method !vannotation annot =
       match annot with
@@ -713,21 +714,13 @@ end
   end
 
   let compute ast =
-    Visitor.visitFramacFileSameGlobals
-      (preprocessor :> Visitor.frama_c_inplace)
-      ast
+    preprocessor#visit_file ast
 
   let compute_annot annot =
-    ignore
-      (Visitor.visitFramacCodeAnnotation
-         (preprocessor :> Visitor.frama_c_inplace)
-         annot)
+    ignore @@ preprocessor#visit_code_annot annot
 
   let compute_predicate p =
-    ignore
-      (Visitor.visitFramacPredicate
-         (preprocessor :> Visitor.frama_c_inplace)
-         p)
+    ignore @@ preprocessor#visit_predicate p
 end
 
 let preprocess = Preprocessor.compute

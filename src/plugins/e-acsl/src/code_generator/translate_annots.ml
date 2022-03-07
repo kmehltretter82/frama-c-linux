@@ -70,7 +70,7 @@ let pre_code_annotation kf stmt env annot =
     | AAssert(l, p) ->
       if Translate_utils.must_translate
           (Property.ip_of_code_annot_single kf stmt annot) then
-        let env = Env.set_annotation_kind env Smart_stmt.Assertion in
+        let env = Env.set_annotation_kind env Assertion in
         if l <> [] then
           Env.not_yet env "@[assertion applied only on some behaviors@]";
         Env.with_params
@@ -93,7 +93,7 @@ let pre_code_annotation kf stmt env annot =
     | AInvariant(l, loop_invariant, p) ->
       if Translate_utils.must_translate
           (Property.ip_of_code_annot_single kf stmt annot) then
-        let env = Env.set_annotation_kind env Smart_stmt.Invariant in
+        let env = Env.set_annotation_kind env Invariant in
         if l <> [] then
           Env.not_yet env "@[invariant applied only on some behaviors@]";
         let env =
