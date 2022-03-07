@@ -3,7 +3,8 @@
  */
 
 /* run.config_qualif
-   OPT: -wp-prover script,alt-ergo
+
+   OPT: -wp-prover script,alt-ergo @USING_WP_SESSION@
  */
 
 typedef unsigned short ushort;

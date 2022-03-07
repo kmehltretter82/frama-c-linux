@@ -3,7 +3,8 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-prover script,none
+
+   OPT: -wp-prover script,none @USING_WP_SESSION@
  */
 
 /*@

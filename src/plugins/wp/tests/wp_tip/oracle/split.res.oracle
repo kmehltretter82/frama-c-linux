@@ -4,7 +4,7 @@
 [wp] Warning: Missing RTE guards
 [wp] 23 goals scheduled
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 36) in 'test_step_branch':
+  Goal Post-condition (file split.i, line 37) in 'test_step_branch':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     If a < b
@@ -15,31 +15,31 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 46) in 'test_step_or':
+  Goal Post-condition (file split.i, line 47) in 'test_step_or':
   Assume { (* Pre-condition *) Have: P_P \/ P_Q \/ P_R. }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 50) in 'test_step_and':
+  Goal Post-condition (file split.i, line 51) in 'test_step_and':
   Assume { (* Pre-condition *) Have: P_P /\ P_Q /\ P_R. }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 54) in 'test_step_peq':
+  Goal Post-condition (file split.i, line 55) in 'test_step_peq':
   Assume { (* Pre-condition *) Have: L_LQ = L_LP. }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 58) in 'test_step_pneq':
+  Goal Post-condition (file split.i, line 59) in 'test_step_pneq':
   Assume { (* Pre-condition *) Have: L_LQ != L_LP. }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 62) in 'test_step_neq':
+  Goal Post-condition (file split.i, line 63) in 'test_step_neq':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -49,7 +49,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 66) in 'test_step_leq':
+  Goal Post-condition (file split.i, line 67) in 'test_step_leq':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -59,14 +59,14 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 70) in 'test_step_lt':
+  Goal Post-condition (file split.i, line 71) in 'test_step_lt':
   Assume { Type: is_sint32(a) /\ is_sint32(b). (* Pre-condition *) Have: a < b.
   }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 74) in 'test_step_if':
+  Goal Post-condition (file split.i, line 75) in 'test_step_if':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -76,7 +76,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 78) in 'test_step_fa_if':
+  Goal Post-condition (file split.i, line 79) in 'test_step_fa_if':
   Assume {
     (* Heap *)
     Type: is_sint32(a) /\ is_sint32(b).
@@ -87,7 +87,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 82) in 'test_step_fa_or':
+  Goal Post-condition (file split.i, line 83) in 'test_step_fa_or':
   Assume {
     (* Pre-condition *)
     Have: forall i : Z. P_P \/ P_Q \/ P_R \/ P_Pi(i) \/ P_Qi(i).
@@ -96,7 +96,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 86) in 'test_step_fa_and':
+  Goal Post-condition (file split.i, line 87) in 'test_step_fa_and':
   Assume {
     (* Pre-condition *)
     Have: forall i : Z. P_P /\ P_Q /\ P_R /\ P_Pi(i) /\ P_Qi(i).
@@ -105,7 +105,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 90) in 'test_inside_leq':
+  Goal Post-condition (file split.i, line 91) in 'test_inside_leq':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -115,7 +115,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 94) in 'test_inside_lt':
+  Goal Post-condition (file split.i, line 95) in 'test_inside_lt':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -125,7 +125,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 98) in 'test_inside_neq':
+  Goal Post-condition (file split.i, line 99) in 'test_inside_neq':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -135,43 +135,43 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 102) in 'test_goal_and':
+  Goal Post-condition (file split.i, line 103) in 'test_goal_and':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: P_P /\ P_Q /\ P_R.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 106) in 'test_goal_eq':
+  Goal Post-condition (file split.i, line 107) in 'test_goal_eq':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: L_LQ = L_LP.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 110) in 'test_goal_neq':
+  Goal Post-condition (file split.i, line 111) in 'test_goal_neq':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: L_LQ != L_LP.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 114) in 'test_goal_if':
+  Goal Post-condition (file split.i, line 115) in 'test_goal_if':
   Assume { Type: is_sint32(a) /\ is_sint32(b). (* Pre-condition *) Have: P_S. }
   Prove: if (a < b) then P_P else P_Q.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 118) in 'test_goal_ex_and':
+  Goal Post-condition (file split.i, line 119) in 'test_goal_ex_and':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: exists i : Z. P_P /\ P_Q /\ P_Pi(i) /\ P_Qi(i).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 122) in 'test_goal_ex_or':
+  Goal Post-condition (file split.i, line 123) in 'test_goal_ex_or':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: exists i : Z. P_P \/ P_Q \/ P_Pi(i) \/ P_Qi(i).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 126) in 'test_goal_ex_if':
+  Goal Post-condition (file split.i, line 127) in 'test_goal_ex_if':
   Assume {
     (* Heap *)
     Type: is_sint32(a) /\ is_sint32(b).
@@ -182,7 +182,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 130) in 'test_goal_ex_imply':
+  Goal Post-condition (file split.i, line 131) in 'test_goal_ex_imply':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: exists i : Z. (P_Q -> (P_Pi(i) -> P_Qi(i))).
   
@@ -704,4 +704,3 @@
   ------------------------------------------------------------
 [wp] [Script] Goal typed_test_goal_ex_imply_ensures : Unsuccess
 [wp] Proved goals:    0 / 23
-[wp] No updated script.

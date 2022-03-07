@@ -53,4 +53,4 @@ val search :
   unit
 
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
-val save : Wpo.t -> unit
+val save : stdout:bool -> Wpo.t -> unit

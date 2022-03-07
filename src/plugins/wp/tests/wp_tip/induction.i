@@ -3,9 +3,12 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-prover script,alt-ergo -wp-timeout 1
-   OPT: -wp-prover script,alt-ergo -wp-timeout 1
-   OPT: -wp-prover script,alt-ergo -wp-timeout 1
+
+   OPT: -wp-prover script,alt-ergo -wp-timeout 1 @USING_WP_SESSION@
+
+   OPT: -wp-prover script,alt-ergo -wp-timeout 1 @USING_WP_SESSION@
+
+   OPT: -wp-prover script,alt-ergo -wp-timeout 1 @USING_WP_SESSION@
 */
 
 // Script 0: induction on f(x) => success
