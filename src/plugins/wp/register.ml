@@ -478,6 +478,7 @@ let do_list_scheduled_result () =
 type script = {
   mutable tactical : bool ;
   mutable update : bool ;
+  mutable on_stdout : bool ;
   mutable depth : int ;
   mutable width : int ;
   mutable backtrack : int ;
@@ -555,7 +556,7 @@ let dump_strategies =
                )))
 
 let default_script_mode () = {
-  tactical = false ; update=false ; provers = [] ;
+  tactical = false ; update=false ; on_stdout = false ; provers = [] ;
   depth=0 ; width = 0 ; auto=[] ; backtrack = 0 ;
 }
 
@@ -609,16 +610,17 @@ let do_update_session ~script goals =
                   | ProofScript.Tactic(n,_,_) -> n=0
                   | ProofScript.Error _ -> false in
                 let strategy = List.filter keep scripts in
+                let stdout = script.on_stdout in
                 if strategy <> [] then
                   begin
                     incr updated ;
-                    ProofSession.save goal (ProofScript.encode strategy)
+                    ProofSession.save ~stdout goal (ProofScript.encode strategy)
                   end
                 else
                 if not (ProofSession.exists goal) then
                   begin
                     incr invalid ;
-                    ProofSession.save goal (ProofScript.encode scripts)
+                    ProofSession.save ~stdout goal (ProofScript.encode scripts)
                   end
               end
         end goals ;
@@ -649,6 +651,9 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   begin match tip with None -> () | Some tip ->
     script.tactical <- tip ;
     script.update <- tip ;
+  end ;
+  begin
+    script.on_stdout <- Wp_parameters.ScriptOnStdout.get ();
   end ;
   let spawned = script.tactical || script.provers <> [] in
   begin

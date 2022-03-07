@@ -29,6 +29,7 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
+import { Button } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
 
 import * as States from 'frama-c/states';
@@ -180,21 +181,48 @@ export default function Globals(): JSX.Element {
   const nTotal = fcts.length;
   const nFilter = filtered.length;
   const title = `Functions ${nFilter} / ${nTotal}`;
+
+  const filterButtonProps = {
+    icon: 'TUNINGS',
+    title: `Functions filtering options (${nFilter} / ${nTotal})`,
+    onClick: onContextMenu,
+  };
+
+  const filteredFunctions =
+    filtered.map((fct) => (
+      <FctItem
+        key={fct.name}
+        fct={fct}
+        current={current}
+        onSelection={onSelection}
+      />
+    ));
+
+  const noFunction =
+    <div className='dome-xSideBarSection-content'>
+      <label className='dome-xSideBarSection-info'>
+        {'There is no function to display.'}
+      </label>
+    </div>;
+
+  const allFiltered =
+    <div className='dome-xSideBarSection-content'>
+      <label className='dome-xSideBarSection-info'>
+        {'All functions are filtered. Try adjusting function filters.'}
+      </label>
+      <Button {...filterButtonProps} label='Functions filters' />
+    </div>;
+
   return (
     <Section
       label="Functions"
       title={title}
-      onContextMenu={onContextMenu}
       defaultUnfold
+      rightButtonProps={filterButtonProps}
+      summary={[nFilter]}
+      className='globals-function-section'
     >
-      {filtered.map((fct) => (
-        <FctItem
-          key={fct.name}
-          fct={fct}
-          current={current}
-          onSelection={onSelection}
-        />
-      ))}
+      {nFilter > 0 ? filteredFunctions : nTotal > 0 ? allFiltered : noFunction}
     </Section>
   );
 

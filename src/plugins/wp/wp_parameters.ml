@@ -753,6 +753,14 @@ module Generate = False
 let () = on_reset Generate.clear
 
 let () = Parameter_customize.set_group wp_prover
+module ScriptOnStdout = False
+    (struct
+      let option_name = "-wp-script-on-stdout"
+      let help = "When enabled (default: no), display scripts on stdout \
+                  instead of writing them on disk."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module Detect = Action
     (struct
       let option_name = "-wp-detect"

@@ -4,7 +4,7 @@
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
 [wp:script:allgoals] 
-  Goal Post-condition (file clear.i, line 21) in 'clear':
+  Goal Post-condition (file clear.i, line 22) in 'clear':
   Assume {
     Type: is_sint32(a) /\ is_sint32(a_1) /\ is_sint32(a_2) /\ is_sint32(b) /\
         is_sint32(b_1) /\ is_sint32(b_2).
@@ -22,7 +22,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Check (file clear.i, line 32):
+  Goal Check (file clear.i, line 33):
   Assume { (* Admit *) Have: P_P /\ P_Q /\ P_R. }
   Prove: P_S(42).
   
@@ -145,4 +145,3 @@
   ------------------------------------------------------------
 [wp] [Script] Goal typed_clear_ensures : Unsuccess
 [wp] Proved goals:    0 / 2
-[wp] No updated script.

@@ -507,10 +507,10 @@ let has_proof wpo =
       (Hashtbl.add proofs wid ok ; ok)
     else false
 
-let save wpo =
+let save ~stdout wpo =
   let script = ProofEngine.script (ProofEngine.proof ~main:wpo) in
   Hashtbl.remove proofs wpo.Wpo.po_gid ;
-  ProofSession.save wpo (ProofScript.encode script)
+  ProofSession.save ~stdout wpo (ProofScript.encode script)
 
 let get wpo =
   match ProofEngine.get wpo with
