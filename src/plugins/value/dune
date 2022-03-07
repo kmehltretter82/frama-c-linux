@@ -18,59 +18,108 @@
   (name eva)
   (optional)
   (public_name frama-c-eva.core)
-  (modules eva unit_tests
-   split_strategy self parameters
-        eva_perf eva_utils
-        mark_noresults
-        widen_hints_ext widen
-        alarmset warn eval_typ backward_formals
-        eval_op
-        locals_scoping
-        builtins
-        builtins_malloc
-        library_functions
-        builtins_string
-        builtins_misc
-        eva_results
-        builtins_memory
-        builtins_print_c results
-        builtins_watchpoint
-        function_args split_return
-        per_stmt_slevel
-        eval structure
-        powerset transfer_logic
-        value_product location_lift
-        cvalue_forward cvalue_backward
-        eval_terms eval_annots
-        main_values main_locations offsm_value
-        domain_store domain_builder
-        domain_product domain_lift unit_domain
-        gauges_domain
-        hcexprs
-        equality equality_domain
-        offsm_domain
-        symbolic_locs
-        cvalue_transfer cvalue_init
-        cvalue_specification
-        cvalue_domain builtins_float
-        evaluation subdivided_evaluation
-        recursion
-        abstract abstract_value abstract_location abstract_domain
-        red_statuses
-        cvalue_offsetmap
-        simpler_domains
-        simple_memory
-        sign_value
-        inout_domain
-        sign_domain
-        printer_domain
-        abstractions partitioning_index  trace_partitioning partition partitioning_parameters
-           transfer_stmt mem_exec iterator
-           transfer_specification initialization analysis register compute_functions
-           eva_annotations octagons traces_domain auto_loop_unroll domain_mode
-           multidim_domain eva_audit summary eva_dynamic
-           general_requests values_request taint_domain
+  (modules
+  abstract
+  abstract_domain
+  abstract_location
+  abstract_value
+  abstractions
+  alarmset
+  analysis
+  auto_loop_unroll
+  backward_formals
+  builtins
+  builtins_float
+  builtins_malloc
+  builtins_memory
+  builtins_misc
+  builtins_print_c
+  builtins_split
+  builtins_string
+  builtins_watchpoint
+  compute_functions
+  cvalue_backward
+  cvalue_domain
+  cvalue_forward
+  cvalue_init
+  cvalue_offsetmap
+  cvalue_specification
+  cvalue_transfer
+  domain_builder
+  domain_lift
+  domain_mode
+  domain_product
+  domain_store
+  equality
+  equality_domain
+  eva
+  eva_annotations
+  eva_audit
+  eva_dynamic
+  eva_perf
+  eva_results
+  eva_utils
+  eval
+  eval_annots
+  eval_op
+  eval_terms
+  eval_typ
+  evaluation
+  function_args
+  gauges_domain
+  general_requests
+  hcexprs
+  initialization
+  inout_domain
+  iterator
+  library_functions
+  locals_scoping
+  location_lift
+  main_locations
+  main_values
+  mark_noresults
+  mem_exec
+  multidim_domain
+  octagons
+  offsm_domain
+  offsm_value
+  parameters
+  partition
+  partitioning_index
+  partitioning_parameters
+  per_stmt_slevel
+  powerset
+  printer_domain
+  recursion
+  red_statuses
+  register
+  results
+  self
+  sign_domain
+  sign_value
+  simple_memory
+  simpler_domains
+  split_return
+  split_strategy
+  structure
+  subdivided_evaluation
+  summary
+  symbolic_locs
+  taint_domain
+  trace_partitioning
+  traces_domain
+  transfer_logic
+  transfer_specification
+  transfer_stmt
+  unit_domain
+  unit_tests
+  value_product
+  values_request
+  warn
+  widen
+  widen_hints_ext
 )
+
 ;  (public_interfaces (Eva))
   (flags -open Frama_c_kernel :standard -w -6-9-50)
  (libraries frama-c.kernel frama-c-server.core
