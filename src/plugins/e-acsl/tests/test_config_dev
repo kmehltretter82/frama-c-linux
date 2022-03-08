@@ -1,5 +1,4 @@
 NOFRAMAC: only the EXEC command below is useful in this config
-MACRO: SEDCMD @SEDCMD@
 MACRO: EACSL_ERR @PTEST_NAME@.e-acsl.err.log
 
 COMMENT: Default options for `e-acsl-gcc.sh`
