@@ -35,8 +35,12 @@ let dispatch ?(config=VCS.default) mode prover wpo =
     | Qed | Tactical -> Task.return VCS.no_result
     | Why3 prover ->
       let smoke = Wpo.is_smoke_test wpo in
+      let kf = match Wpo.get_scope wpo with
+        | Global -> None
+        | Kf kf -> Some kf
+      in
       ProverWhy3.prove
-        ~timeout:(VCS.get_timeout ~smoke config)
+        ~timeout:(VCS.get_timeout ?kf ~smoke config)
         ~steplimit:(VCS.get_stepout config)
         ~mode ~prover wpo
   end

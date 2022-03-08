@@ -54,8 +54,6 @@ val p_until_space : string (** No space group pattern "\\([^ \t\n]*\\)" *)
 
 val location : string -> int -> Lexing.position
 
-val timeout : smoke:bool -> int option -> int
-val stepout : int option -> int
 type logs = [ `OUT | `ERR | `BOTH ]
 
 class virtual command : string ->
