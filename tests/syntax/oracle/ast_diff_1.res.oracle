@@ -11,9 +11,12 @@
 [AST diff test] Variable x:  => x
 [AST diff test] Variable y:  => y
 [AST diff test] Variable has_static_local:  => has_static_local
+[AST diff test] Variable decl:  => decl
+[AST diff test] Variable used_in_decl:  => used_in_decl
 [AST diff test] Variable has_static_local_x:  => has_static_local_y
 [AST diff test] Function f:  => f
 [AST diff test] Function g: N/A
 [AST diff test] Function h: -> h (body changed)
 [AST diff test] Function use_logic_builtin:  => use_logic_builtin
 [AST diff test] Function has_static_local:  => has_static_local
+[AST diff test] Function decl:  => decl

@@ -43,3 +43,10 @@ int has_static_local(void) {
   y++;
   return y;
 }
+
+int used_in_decl;
+
+int decl() {
+  used_in_decl++;
+  return used_in_decl;
+}

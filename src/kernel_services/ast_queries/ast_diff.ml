@@ -406,20 +406,6 @@ let get_original_kf vi =
   in
   Project.on ~selection (Orig_project.get()) Globals.Functions.get vi
 
-let is_matching_varinfo vi vi' env =
-  try
-    if vi.vglob then begin
-      match Varinfo.find vi with
-      | `Not_present -> false
-      | `Same vi'' -> Cil_datatype.Varinfo.equal vi' vi''
-    end else begin
-      let vi'' = Cil_datatype.Varinfo.Map.find vi env.local_vars in
-      Cil_datatype.Varinfo.equal vi' vi''
-    end
-  with Not_found ->
-    Kernel.fatal "Unbound variable %a in AST diff"
-      Cil_datatype.Varinfo.pretty vi
-
 let is_matching_fieldinfo fi fi' =
   match Fieldinfo.find fi with
   | `Not_present -> false
@@ -435,18 +421,6 @@ let is_matching_model_info mf mf' =
   | exception Not_found ->
     Kernel.fatal "Unbound model field %a in AST diff"
       Cil_datatype.Model_info.pretty  mf
-
-let is_matching_logic_var lv lv' env =
-  match lv.lv_origin, lv'.lv_origin with
-  | Some vi, Some vi' -> is_matching_varinfo vi vi' env
-  | None, None ->
-    (match Cil_datatype.Logic_var.Map.find_opt lv env.logic_local_vars with
-     | Some lv'' -> Cil_datatype.Logic_var.equal lv' lv''
-     | None ->
-       (match Logic_var.find lv with
-        | `Not_present -> false
-        | `Same lv'' -> Cil_datatype.Logic_var.equal lv' lv''))
-  | _ -> false
 
 let is_matching_logic_type_var a a' env =
   match Datatype.String.Map.find_opt a env.logic_type_vars with
@@ -657,6 +631,18 @@ and is_same_term_lhost lh lh' env =
   | TResult _, TResult _ -> true
   | TMem p, TMem p' -> is_same_term p p' env
   | (TVar _ | TResult _ | TMem _), _ -> false
+
+and is_matching_logic_var lv lv' env =
+  match lv.lv_origin, lv'.lv_origin with
+  | Some vi, Some vi' -> is_matching_varinfo vi vi' env
+  | None, None ->
+    (match Cil_datatype.Logic_var.Map.find_opt lv env.logic_local_vars with
+     | Some lv'' -> Cil_datatype.Logic_var.equal lv' lv''
+     | None ->
+       (match Logic_var.find lv with
+        | `Not_present -> false
+        | `Same lv'' -> Cil_datatype.Logic_var.equal lv' lv''))
+  | _ -> false
 
 and is_same_term_offset lo lo' env =
   match lo, lo' with
@@ -986,6 +972,20 @@ and is_same_lhost h h' env =
   | Mem p, Mem p' -> is_same_exp p p' env
   | (Var _ | Mem _), _ -> false
 
+and is_matching_varinfo vi vi' env =
+  if vi.vglob then begin
+    match gvar_correspondance vi with
+    | `Not_present -> false
+    | `Same vi'' -> Cil_datatype.Varinfo.equal vi' vi''
+  end else begin
+    try
+      let vi'' = Cil_datatype.Varinfo.Map.find vi env.local_vars in
+      Cil_datatype.Varinfo.equal vi' vi''
+    with Not_found ->
+      Kernel.fatal "Unbound variable %a in AST diff"
+        Cil_datatype.Varinfo.pretty vi
+  end
+
 and is_same_offset o o' env =
   match (o,o') with
   | NoOffset, NoOffset -> true
@@ -1293,6 +1293,21 @@ and enuminfo_correspondance ?loc ei env =
 
 and enumitem_correspondance ?loc:_loc ei _env = Enumitem.find ei
 
+and gvar_correspondance ?loc vi =
+  let add vi =
+    match find_candidate_varinfo ?loc vi Cil_types.VGlobal with
+    | None -> `Not_present
+    | Some vi' ->
+      let selection = State_selection.singleton Globals.Vars.self in
+      let init =
+        Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
+      in
+      let init' = Globals.Vars.find vi' in
+      let res = is_same_initinfo init init' empty_env in
+      if res then `Same vi' else `Not_present
+  in
+  Varinfo.memo add vi
+
 and gfun_correspondance ?loc vi env =
   (* NB: we also take care of the correspondance between the underlying varinfo,
      in case we have to refer to it directly, e.g. as an AddrOf argument.
@@ -1439,21 +1454,6 @@ and logic_type_correspondance ?loc ti env =
   match Cil_datatype.Logic_type_info.Map.find_opt ti env.logic_type_info with
   | Some ti' -> `Same ti'
   | None -> Logic_type_info.memo add ti
-
-let gvar_correspondance ?loc vi =
-  let add vi =
-    match find_candidate_varinfo ?loc vi Cil_types.VGlobal with
-    | None -> `Not_present
-    | Some vi' ->
-      let selection = State_selection.singleton Globals.Vars.self in
-      let init =
-        Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
-      in
-      let init' = Globals.Vars.find vi' in
-      let res = is_same_initinfo init init' empty_env in
-      if res then `Same vi' else `Not_present
-  in
-  Varinfo.memo add vi
 
 let model_info_correspondance ?loc mi =
   let add mi =
