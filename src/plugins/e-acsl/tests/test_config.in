@@ -12,11 +12,6 @@ PLUGIN: E_ACSL eva,scope,variadic rtegen
 LIBS: @PTEST_SUITE_DIR@/../E_ACSL_test
 LOG: gen_@PTEST_NAME@.c
 
-COMMENT: This regex works around the tendency of Frama-C to transform
-COMMENT: absolute path into relative ones whenever the file is not too far
-COMMENT: away from cwd.
-FILTER:@SEDCMD@ -e "s|[a-zA-Z/\\]\+frama_c_project_e-acsl_[a-z0-9]*|PROJECT_FILE|" -e "s|$FRAMAC_SHARE|FRAMAC_SHARE|g" -e "s|../../share|FRAMAC_SHARE|g" -e "s|@PTEST_SHARE_DIR@/e-acsl|FRAMAC_SHARE/e-acsl|g" -e "s|share/e-acsl|FRAMAC_SHARE/e-acsl|g"
-
 COMMENT: The dependency to the plugin share directory has not to be explicited
 DEPS:
 
