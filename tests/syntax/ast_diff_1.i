@@ -38,3 +38,9 @@ int h() {
     ensures \true != \false;
 */
 int use_logic_builtin(double x, float y);
+
+int has_static_local(void) {
+  static int x = 0;
+  x++;
+  return x;
+}

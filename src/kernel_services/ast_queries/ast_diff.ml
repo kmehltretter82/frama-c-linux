@@ -303,6 +303,12 @@ let add_locals f f' env =
   in
   List.fold_left2 add_one env f f'
 
+(* local static variables are in fact global. As soon as we have determined
+   that they have a correspondance, we add them to the global bindings *)
+let add_statics l l' =
+  let add_one v v' = Varinfo.add v (`Same v') in
+  List.iter2 add_one l l'
+
 let add_logic_prms p p' env =
   let add_one env lv lv' =
     { env with
@@ -1125,9 +1131,11 @@ and is_same_block b b' env =
   let local_decls = List.filter (fun x -> not x.vdefined) b.blocals in
   let local_decls' = List.filter (fun x -> not x.vdefined) b'.blocals in
   if is_same_list is_same_varinfo local_decls local_decls' env &&
+     is_same_list is_same_varinfo b.bstatics b'.bstatics env &&
      Cil_datatype.Attributes.equal b.battrs b'.battrs
   then begin
     let env = add_locals local_decls local_decls' env in
+    add_statics b.bstatics b'.bstatics;
     let rec is_same_stmts l l' env =
       match l, l' with
       | [], [] -> `Same_body,env
