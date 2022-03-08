@@ -41,10 +41,12 @@ module type S = sig
   val get_global_state: unit -> t or_bottom
   val get_initial_state: kernel_function -> t or_bottom
   val get_initial_state_by_callstack:
+    ?selection:callstack list ->
     kernel_function -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
   val get_stmt_state: after:bool -> stmt -> t or_bottom
   val get_stmt_state_by_callstack:
+    ?selection:callstack list ->
     after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
   val mark_as_computed: unit -> unit
@@ -223,12 +225,27 @@ module Make (Domain: InputDomain) = struct
         state
       with Not_found -> `Bottom
 
-  let get_initial_state_by_callstack kf =
+  let select ?selection tbl =
+    match selection with
+    | None -> tbl
+    | Some list ->
+      let new_tbl = Value_types.Callstack.Hashtbl.create (List.length list) in
+      let add cs =
+        let state_opt = Value_types.Callstack.Hashtbl.find_opt tbl cs in
+        Option.iter (Value_types.Callstack.Hashtbl.replace new_tbl cs) state_opt
+      in
+      List.iter add list;
+      new_tbl
+
+  let get_state_by_callstack ?selection find key =
     if not (Storage.get ())
     then `Top
     else
-      try `Value (Called_Functions_By_Callstack.find kf)
+      try `Value (select ?selection (find key))
       with Not_found -> `Bottom
+
+  let get_initial_state_by_callstack ?selection kf =
+    get_state_by_callstack ?selection Called_Functions_By_Callstack.find kf
 
   let get_stmt_state ~after s =
     if not (Storage.get ())
@@ -253,14 +270,13 @@ module Make (Domain: InputDomain) = struct
         ignore (state >>-: add s);
         state
 
-  let get_stmt_state_by_callstack ~after stmt =
-    if not (Storage.get ())
-    then `Top
-    else
-      try `Value (if after
-                  then AfterTable_By_Callstack.find stmt
-                  else Table_By_Callstack.find stmt)
-      with Not_found -> `Bottom
+  let get_stmt_state_by_callstack ?selection ~after stmt =
+    let find =
+      if after
+      then AfterTable_By_Callstack.find
+      else Table_By_Callstack.find
+    in
+    get_state_by_callstack ?selection find stmt
 
   let register_state_before_stmt callstack stmt state =
     if Storage.get ()

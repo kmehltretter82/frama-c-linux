@@ -478,24 +478,36 @@ module State = struct
       Callstack.Hashtbl.iter process tbl;
       h
 
+    let select ?selection tbl =
+      match selection with
+      | None -> tbl
+      | Some list ->
+        let new_tbl = Value_types.Callstack.Hashtbl.create (List.length list) in
+        let add cs =
+          let s = Value_types.Callstack.Hashtbl.find_opt tbl cs in
+          Option.iter (Value_types.Callstack.Hashtbl.replace new_tbl cs) s
+        in
+        List.iter add list;
+        new_tbl
+
     let get_global_state () = return (Db.Value.globals_state ())
     let get_initial_state kf = return (Db.Value.get_initial_state kf)
-    let get_initial_state_by_callstack kf =
+    let get_initial_state_by_callstack ?selection kf =
       if Storage.get ()
       then
         match Db.Value.get_initial_state_callstack kf with
-        | Some tbl -> `Value (lift_tbl tbl)
+        | Some tbl -> `Value (lift_tbl (select ?selection tbl))
         | None -> `Bottom
       else `Top
 
     let get_stmt_state ~after stmt =
       return (Db.Value.get_stmt_state ~after stmt)
 
-    let get_stmt_state_by_callstack ~after stmt =
+    let get_stmt_state_by_callstack ?selection ~after stmt =
       if Storage.get ()
       then
         match Db.Value.get_stmt_state_callstack ~after stmt with
-        | Some tbl -> `Value (lift_tbl tbl)
+        | Some tbl -> `Value (lift_tbl (select ?selection tbl))
         | None -> `Bottom
       else `Top
 
