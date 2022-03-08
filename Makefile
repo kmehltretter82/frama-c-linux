@@ -210,10 +210,10 @@ WTESTS=dune exec --root ptests -- frama-c-wtests
 wtests-help:
 	$(WTESTS) --help
 
-# Removes all dune files generated for testing
+# Removes all dune files generated for testing: xargs -n 10 avoids a too long line
 .PHONY: purge-tests
 purge-tests:
-	find $(PURGED_PTEST_DIRS) -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty rm
+	find $(PURGED_PTEST_DIRS) -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty -n 10 rm
 
 # Force the full cleaning of the testing environment
 .PHONY: clean-tests
