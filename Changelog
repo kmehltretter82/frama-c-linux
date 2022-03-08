@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ##################################
 
+o   Kernel    [2022-03-07] Known compiler builtins are no longer hardcoded in
+              OCaml, but defined via JSON files (in share/compliance).
 o   Kernel    [2022-02-23] New visitor functions visitFramacFileFunctions
               and visitCilFileFunctions to visit only function definitions,
               for better performance.

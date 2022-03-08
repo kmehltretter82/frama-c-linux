@@ -132,17 +132,6 @@ let location file line = {
   Lexing.pos_cnum = 0 ;
 }
 
-let timeout ~smoke = function
-  | None ->
-    if smoke
-    then Wp_parameters.SmokeTimeout.get ()
-    else Wp_parameters.Timeout.get ()
-  | Some t -> t
-
-let stepout = function
-  | None -> Wp_parameters.Steps.get ()
-  | Some t -> t
-
 let pp_file ~message ~file =
   if Sys.file_exists file then
     Log.print_on_output

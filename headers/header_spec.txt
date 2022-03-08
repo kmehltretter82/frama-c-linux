@@ -148,6 +148,8 @@ share/analysis-scripts/summary.py: CEA_LGPL
 share/analysis-scripts/template.mk: .ignore
 share/compliance/c11_functions.json: .ignore
 share/compliance/c11_headers.json: .ignore
+share/compliance/compiler_builtins.json: .ignore
+share/compliance/gcc_builtins.json: .ignore
 share/compliance/glibc_functions.json: .ignore
 share/compliance/nonstandard_identifiers.json: .ignore
 share/compliance/posix_identifiers.json: .ignore

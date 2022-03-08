@@ -98,484 +98,154 @@ let add_builtin ?(prefix="__builtin_") s t l b =
 
 let () = Cil.registerAttribute "FC_BUILTIN" (AttrName true)
 
-let intType = Cil.intType
-let voidPtrType = Cil.voidPtrType
-let charConstPtrType = Cil.charConstPtrType
-let voidConstPtrType = Cil.voidConstPtrType
-let charPtrType = Cil.charPtrType
-let voidType = Cil.voidType
-let floatType = Cil.floatType
-let doubleType = Cil.doubleType
-let longDoubleType = Cil.longDoubleType
-let longType = Cil.longType
-let longLongType = Cil.longLongType
-let uintType = Cil.uintType
-let ulongType = Cil.ulongType
-let ulongLongType = Cil.ulongLongType
-let intPtrType = Cil.intPtrType
-
-(* Initialize the builtin functions after the machine has been initialized. *)
-let initGccBuiltins () : unit =
-  (* Complex types are unsupported so the following built-ins can't be added :
-     - cabs, cabsf, cabsh
-     - cacos, cacosf, cacosl, cacosh, cacoshf, cacoshl
-     - carg, cargf, cargl
-     - casin, casinf, casinl, casinh, casinhf, casinhl
-     - catan, catanf, catanl, catanh, catanhf, catanhl
-     - ccos, ccosf, ccosl, ccosh, ccoshf, ccoshl
-     - cexp, cexpf, cexpl
-     - cimag, cimagf, cimagl
-     - clog, clogf, clogl
-     - conj, conjf, conjl
-     - cpow, cpowf, cpowl
-     - cproj, cprojf, cprojl
-     - creal, crealf, creall
-     - csin, csinf, csinl, csinh, csinhf, csinhl
-     - csqrt, csqrtf, csqrtl
-     - ctan, ctanf, ctanl, ctanh, ctanhf, ctanhl
-  *)
-
-  (* [wint_t] isn't specified in [theMachine] so the following built-ins that
-     use this type can't be added :
-     - iswalnum
-     - iswalpha
-     - iswblank
-     - iswcntrl
-     - iswdigit
-     - iswgraph
-     - iswlower
-     - iswprint
-     - iswpunct
-     - iswspace
-     - iswupper
-     - iswxdigit
-     - towlower
-     - towupper
-  *)
-
-  let sizeType = Cil.theMachine.upointType in
-  let add = add_builtin in
-
-  add "__fprintf_chk"
-    intType
-    (* first argument is really FILE*, not void*, but we don't want to build in
-       the definition for FILE *)
-    [ voidPtrType; intType; charConstPtrType ]
-    true;
-  add "__memcpy_chk"
-    voidPtrType
-    [ voidPtrType; voidConstPtrType; sizeType; sizeType ]
-    false;
-  add "__memmove_chk"
-    voidPtrType [ voidPtrType; voidConstPtrType; sizeType; sizeType ] false;
-  add "__mempcpy_chk"
-    voidPtrType [ voidPtrType; voidConstPtrType; sizeType; sizeType ] false;
-  add "__memset_chk"
-    voidPtrType [ voidPtrType; intType; sizeType; sizeType ] false;
-  add "__printf_chk" intType [ intType; charConstPtrType ] true;
-  add "__snprintf_chk"
-    intType [ charPtrType; sizeType; intType; sizeType; charConstPtrType ]
-    true;
-  add "__sprintf_chk"
-    intType [ charPtrType; intType; sizeType; charConstPtrType ] true;
-  add "__stpcpy_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "__strcat_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "__strcpy_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "__strncat_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType; sizeType ] false;
-  add "__strncpy_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType; sizeType ] false;
-  add "__vfprintf_chk"
-    intType
-    (* first argument is really FILE*, not void*, but we don't want to build in
-       the definition for FILE *)
-    [ voidPtrType; intType; charConstPtrType; TBuiltin_va_list [] ]
-    false;
-  add "__vprintf_chk"
-    intType [ intType; charConstPtrType; TBuiltin_va_list [] ] false;
-  add "__vsnprintf_chk"
-    intType
-    [ charPtrType; sizeType; intType; sizeType; charConstPtrType;
-      TBuiltin_va_list [] ]
-    false;
-  add "__vsprintf_chk"
-    intType
-    [ charPtrType; intType; sizeType; charConstPtrType; TBuiltin_va_list [] ]
-    false;
-
-  add "_Exit" voidType [ intType ] false;
-  add "exit" voidType [ intType ] false;
-
-  add "alloca" voidPtrType [ sizeType ] false;
-
-  add "malloc" voidPtrType [ sizeType ] false;
-  add "calloc" voidPtrType [ sizeType; sizeType ] false;
-  add "realloc" voidPtrType [ voidPtrType; sizeType ] false;
-  add "free" voidType [ voidPtrType ] false;
-
-  add "abs" intType [ intType ] false;
-  add "labs" longType [ longType ] false;
-  add "llabs" longLongType [ longLongType] false;
-  (* Can't add imaxabs because it takes intmax_t as parameter *)
-
-  add "acos" doubleType [ doubleType ] false;
-  add "acosf" floatType [ floatType ] false;
-  add "acosl" longDoubleType [ longDoubleType ] false;
-  add "acosh" doubleType [ doubleType ] false;
-  add "acoshf" floatType [ floatType ] false;
-  add "acoshl" longDoubleType [ longDoubleType ] false;
-
-  add "asin" doubleType [ doubleType ] false;
-  add "asinf" floatType [ floatType ] false;
-  add "asinl" longDoubleType [ longDoubleType ] false;
-  add "asinh" doubleType [ doubleType ] false;
-  add "asinhf" floatType [ floatType ] false;
-  add "asinhl" longDoubleType [ longDoubleType ] false;
-
-  add "atan" doubleType [ doubleType ] false;
-  add "atanf" floatType [ floatType ] false;
-  add "atanl" longDoubleType [ longDoubleType ] false;
-  add "atanh" doubleType [ doubleType ] false;
-  add "atanhf" floatType [ floatType ] false;
-  add "atanhl" longDoubleType [ longDoubleType ] false;
-
-  add "atan2" doubleType [ doubleType; doubleType ] false;
-  add "atan2f" floatType [ floatType; floatType ] false;
-  add "atan2l" longDoubleType [ longDoubleType;
-                                longDoubleType ] false;
-
-  let uint16t = Cil.uint16_t () in
-  add "bswap16" uint16t [uint16t] false;
-
-  let uint32t = Cil.uint32_t () in
-  add "bswap32" uint32t [uint32t] false;
-
-  let uint64t = Cil.uint64_t () in
-  add "bswap64" uint64t [uint64t] false;
-
-  add "cbrt" doubleType [ doubleType ] false;
-  add "cbrtf" floatType [ floatType ] false;
-  add "cbrtl" longDoubleType [ longDoubleType ] false;
-
-  add "ceil" doubleType [ doubleType ] false;
-  add "ceilf" floatType [ floatType ] false;
-  add "ceill" longDoubleType [ longDoubleType ] false;
-
-  add "cos" doubleType [ doubleType ] false;
-  add "cosf" floatType [ floatType ] false;
-  add "cosl" longDoubleType [ longDoubleType ] false;
-
-  add "cosh" doubleType [ doubleType ] false;
-  add "coshf" floatType [ floatType ] false;
-  add "coshl" longDoubleType [ longDoubleType ] false;
-
-  add "constant_p" intType [ intType ] false;
-
-  add "copysign" doubleType [ doubleType; doubleType ] false;
-  add "copysignf" floatType [ floatType; floatType ] false;
-  add "copysignl" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "erfc" doubleType [ doubleType ] false;
-  add "erfcf" floatType [ floatType ] false;
-  add "erfcl" longDoubleType [ longDoubleType ] false;
-
-  add "erf" doubleType [ doubleType ] false;
-  add "erff" floatType [ floatType ] false;
-  add "erfl" longDoubleType [ longDoubleType ] false;
-
-  add "exp" doubleType [ doubleType ] false;
-  add "expf" floatType [ floatType ] false;
-  add "expl" longDoubleType [ longDoubleType ] false;
-
-  add "exp2" doubleType [ doubleType ] false;
-  add "exp2f" floatType [ floatType ] false;
-  add "exp2l" longDoubleType [ longDoubleType ] false;
-
-  add "expm1" doubleType [ doubleType ] false;
-  add "expm1f" floatType [ floatType ] false;
-  add "expm1l" longDoubleType [ longDoubleType ] false;
-
-  add "expect" longType [ longType; longType ] false;
-
-  add "fabs" doubleType [ doubleType ] false;
-  add "fabsf" floatType [ floatType ] false;
-  add "fabsl" longDoubleType [ longDoubleType ] false;
-
-  add "fdim" doubleType [ doubleType; doubleType ] false;
-  add "fdimf" floatType [ floatType; floatType ] false;
-  add "fdiml" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "ffs" intType [ uintType ] false;
-  add "ffsl" intType [ ulongType ] false;
-  add "ffsll" intType [ ulongLongType ] false;
-  add "frame_address" voidPtrType [ uintType ] false;
-
-  add "floor" doubleType [ doubleType ] false;
-  add "floorf" floatType [ floatType ] false;
-  add "floorl" longDoubleType [ longDoubleType ] false;
-
-  add "fma" doubleType [ doubleType; doubleType; doubleType ] false;
-  add "fmaf" floatType [ floatType; floatType; floatType ] false;
-  add "fmal"
-    longDoubleType [ longDoubleType; longDoubleType; longDoubleType ] false;
-
-  add "fmax" doubleType [ doubleType; doubleType ] false;
-  add "fmaxf" floatType [ floatType; floatType ] false;
-  add "fmaxl" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "fmin" doubleType [ doubleType; doubleType ] false;
-  add "fminf" floatType [ floatType; floatType ] false;
-  add "fminl" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "huge_val" doubleType [] false;
-  add "huge_valf" floatType [] false;
-  add "huge_vall" longDoubleType [] false;
-
-  add "hypot" doubleType [ doubleType; doubleType ] false;
-  add "hypotf" floatType [ floatType; floatType ] false;
-  add "hypotl" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "ia32_lfence" voidType [] false;
-  add "ia32_mfence" voidType [] false;
-  add "ia32_sfence" voidType [] false;
-
-  add "ilogb" doubleType [ doubleType ] false;
-  add "ilogbf" floatType [ floatType ] false;
-  add "ilogbl" longDoubleType [ longDoubleType ] false;
-
-  add "inf" doubleType [] false;
-  add "inff" floatType [] false;
-  add "infl" longDoubleType [] false;
-
-  add "isblank" intType [ intType ] false;
-  add "isalnum" intType [ intType ] false;
-  add "isalpha" intType [ intType ] false;
-  add "iscntrl" intType [ intType ] false;
-  add "isdigit" intType [ intType ] false;
-  add "isgraph" intType [ intType ] false;
-  add "islower" intType [ intType ] false;
-  add "isprint" intType [ intType ] false;
-  add "ispunct" intType [ intType ] false;
-  add "isspace" intType [ intType ] false;
-  add "isupper" intType [ intType ] false;
-  add "isxdigit" intType [ intType ] false;
-
-  add "fmod" doubleType [ doubleType ] false;
-  add "fmodf" floatType [ floatType ] false;
-  add "fmodl" longDoubleType [ longDoubleType ] false;
-
-  add "frexp" doubleType [ doubleType; intPtrType ] false;
-  add "frexpf" floatType [ floatType; intPtrType  ] false;
-  add "frexpl" longDoubleType [ longDoubleType; intPtrType  ] false;
-
-  add "ldexp" doubleType [ doubleType; intType ] false;
-  add "ldexpf" floatType [ floatType; intType  ] false;
-  add "ldexpl" longDoubleType [ longDoubleType; intType  ] false;
-
-  add "lgamma" doubleType [ doubleType ] false;
-  add "lgammaf" floatType [ floatType ] false;
-  add "lgammal" longDoubleType [ longDoubleType ] false;
-
-  add "llrint" longLongType [ doubleType ] false;
-  add "llrintf" longLongType [ floatType ] false;
-  add "llrintl" longLongType [ longDoubleType ] false;
-
-  add "llround" longLongType [ doubleType ] false;
-  add "llroundf" longLongType [ floatType ] false;
-  add "llroundl" longLongType [ longDoubleType ] false;
-
-  add "log" doubleType [ doubleType ] false;
-  add "logf" floatType [ floatType ] false;
-  add "logl" longDoubleType [ longDoubleType ] false;
-
-  add "log10" doubleType [ doubleType ] false;
-  add "log10f" floatType [ floatType ] false;
-  add "log10l" longDoubleType [ longDoubleType ] false;
-
-  add "log1p" doubleType [ doubleType ] false;
-  add "log1pf" floatType [ floatType ] false;
-  add "log1pl" longDoubleType [ longDoubleType ] false;
-
-  add "log2" doubleType [ doubleType ] false;
-  add "log2f" floatType [ floatType ] false;
-  add "log2l" longDoubleType [ longDoubleType ] false;
-
-  add "logb" doubleType [ doubleType ] false;
-  add "logbf" floatType [ floatType ] false;
-  add "logbl" longDoubleType [ longDoubleType ] false;
-
-  add "lrint" longType [ doubleType ] false;
-  add "lrintf" longType [ floatType ] false;
-  add "lrintl" longType [ longDoubleType ] false;
-
-  add "lround" longType [ doubleType ] false;
-  add "lroundf" longType [ floatType ] false;
-  add "lroundl" longType [ longDoubleType ] false;
-
-  add "memchr" voidPtrType [ voidConstPtrType; intType; sizeType ] false;
-  add "memcmp" intType [ voidConstPtrType; voidConstPtrType; sizeType ] false;
-  add "memcpy" voidPtrType [ voidPtrType; voidConstPtrType; sizeType ] false;
-  add "mempcpy" voidPtrType [ voidPtrType; voidConstPtrType; sizeType ] false;
-  add "memset" voidPtrType [ voidPtrType; intType; sizeType ] false;
-
-  add "modf" doubleType [ doubleType; TPtr(doubleType,[]) ] false;
-  add "modff" floatType [ floatType; TPtr(floatType,[]) ] false;
-  add "modfl"
-    longDoubleType [ longDoubleType; TPtr(longDoubleType, []) ] false;
-
-  add "nan" doubleType [ charConstPtrType ] false;
-  add "nanf" floatType [ charConstPtrType ] false;
-  add "nanl" longDoubleType [ charConstPtrType ] false;
-  add "nans" doubleType [ charConstPtrType ] false;
-  add "nansf" floatType [ charConstPtrType ] false;
-  add "nansl" longDoubleType [ charConstPtrType ] false;
-
-  add "nearbyint" doubleType [ doubleType ] false;
-  add "nearbyintf" floatType [ floatType ] false;
-  add "nearbyintl" longDoubleType [ longDoubleType ] false;
-
-  add "nextafter" doubleType [ doubleType; doubleType ] false;
-  add "nextafterf" floatType [ floatType; floatType ] false;
-  add "nextafterl" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "nexttoward" doubleType [ doubleType; longDoubleType ] false;
-  add "nexttowardf" floatType [ floatType; longDoubleType ] false;
-  add "nexttowardl" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "object_size" sizeType [ voidPtrType; intType ] false;
-
-  add "parity" intType [ uintType ] false;
-  add "parityl" intType [ ulongType ] false;
-  add "parityll" intType [ ulongLongType ] false;
-
-  add "pow" doubleType [ doubleType; doubleType ] false;
-  add "powf" floatType [ floatType; floatType ] false;
-  add "powl" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "powi" doubleType [ doubleType; intType ] false;
-  add "powif" floatType [ floatType; intType ] false;
-  add "powil" longDoubleType [ longDoubleType; intType ] false;
-
-  add "prefetch" voidType [ voidConstPtrType ] true;
-
-  add "printf" intType [ charConstPtrType ] true;
-  add "vprintf" intType [ charConstPtrType; TBuiltin_va_list [] ] false;
-  (* For [fprintf] and [vfprintf] the first argument is really FILE*, not void*,
-     but we don't want to build in the definition for FILE. *)
-  add "fprintf" intType [ voidPtrType; charConstPtrType ] true;
-  add "vfprintf"
-    intType [ voidPtrType; charConstPtrType; TBuiltin_va_list [] ] false;
-  add "sprintf" intType [ charPtrType; charConstPtrType ] true;
-  add "vsprintf"
-    intType [ charPtrType; charConstPtrType; TBuiltin_va_list [] ] false;
-  add "snprintf" intType [ charPtrType; sizeType; charConstPtrType ] true;
-  add "vsnprintf"
-    intType
-    [ charPtrType; sizeType; charConstPtrType; TBuiltin_va_list [] ]
-    false;
-
-  add "putchar" intType [ intType ] false;
-
-  add "puts" intType [ charConstPtrType ] false;
-  (* The second argument of [fputs] is really FILE*, not void*, but we
-     don't want to build in the definition for FILE. *)
-  add "fputs" intType [ charConstPtrType; voidPtrType ] false;
-
-  add "remainder" doubleType [ doubleType; doubleType ] false;
-  add "remainderf" floatType [ floatType; floatType ] false;
-  add "remainderl" longDoubleType [ longDoubleType; longDoubleType ] false;
-
-  add "remquo" doubleType [ doubleType; doubleType; intPtrType ] false;
-  add "remquof" floatType [ floatType; floatType; intPtrType ] false;
-  add "remquol"
-    longDoubleType [ longDoubleType; longDoubleType; intPtrType ] false;
-
-  add "return" voidType [ voidConstPtrType ] false;
-  add "return_address" voidPtrType [ uintType ] false;
-
-  add "rint" doubleType [ doubleType ] false;
-  add "rintf" floatType [ floatType ] false;
-  add "rintl" longDoubleType [ longDoubleType ] false;
-
-  add "round" doubleType [ doubleType ] false;
-  add "roundf" floatType [ floatType ] false;
-  add "roundl" longDoubleType [ longDoubleType ] false;
-
-  add "scalbln" doubleType [ doubleType; longType ] false;
-  add "scalblnf" floatType [ floatType; longType ] false;
-  add "scalblnl" longDoubleType [ longDoubleType; longType ] false;
-
-  add "scalbn" doubleType [ doubleType; intType ] false;
-  add "scalbnf" floatType [ floatType; intType ] false;
-  add "scalbnl" longDoubleType [ longDoubleType; intType ] false;
-
-  add "scanf" intType [ charConstPtrType ] true;
-  add "vscanf" intType [ charConstPtrType; TBuiltin_va_list [] ] false;
-  (* For [fscanf] and [vfscanf] the first argument is really FILE*, not void*,
-     but we don't want to build in the definition for FILE. *)
-  add "fscanf" intType [ voidPtrType; charConstPtrType ] true;
-  add "vfscanf"
-    intType [ voidPtrType; charConstPtrType; TBuiltin_va_list [] ] false;
-  add "sscanf" intType [ charConstPtrType; charConstPtrType ] true;
-  add "vsscanf"
-    intType [ charConstPtrType; charConstPtrType; TBuiltin_va_list [] ] false;
-
-  add "sin" doubleType [ doubleType ] false;
-  add "sinf" floatType [ floatType ] false;
-  add "sinl" longDoubleType [ longDoubleType ] false;
-
-  add "sinh" doubleType [ doubleType ] false;
-  add "sinhf" floatType [ floatType ] false;
-  add "sinhl" longDoubleType [ longDoubleType ] false;
-
-  add "sqrt" doubleType [ doubleType ] false;
-  add "sqrtf" floatType [ floatType ] false;
-  add "sqrtl" longDoubleType [ longDoubleType ] false;
-
-  add "stpcpy" charPtrType [ charPtrType; charConstPtrType ] false;
-  add "strcat" charPtrType [ charPtrType; charConstPtrType ] false;
-  add "strchr" charPtrType [ charPtrType; intType ] false;
-  add "strcmp" intType [ charConstPtrType; charConstPtrType ] false;
-  add "strcpy" charPtrType [ charPtrType; charConstPtrType ] false;
-  add "strcspn" sizeType [ charConstPtrType; charConstPtrType ] false;
-  add "strlen" sizeType [ charConstPtrType ] false;
-  add "strncat" charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "strncmp" intType [ charConstPtrType; charConstPtrType; sizeType ] false;
-  add "strncpy" charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "strspn" sizeType [ charConstPtrType; charConstPtrType ] false;
-  add "strpbrk" charPtrType [ charConstPtrType; charConstPtrType ] false;
-  add "strrchr" charPtrType [ charConstPtrType; intType ] false;
-  add "strstr" charPtrType [ charConstPtrType; charConstPtrType ] false;
-  (* When we parse builtin_types_compatible_p, we change its interface *)
-  add "types_compatible_p"
-    intType
-    [ Cil.theMachine.typeOfSizeOf;(* Sizeof the type *)
-      Cil.theMachine.typeOfSizeOf (* Sizeof the type *) ]
-    false;
-  add "tan" doubleType [ doubleType ] false;
-  add "tanf" floatType [ floatType ] false;
-  add "tanl" longDoubleType [ longDoubleType ] false;
-
-  add "tanh" doubleType [ doubleType ] false;
-  add "tanhf" floatType [ floatType ] false;
-  add "tanhl" longDoubleType [ longDoubleType ] false;
-
-  add "tgamma" doubleType [ doubleType ] false;
-  add "tgammaf" floatType [ floatType ] false;
-  add "tgammal" longDoubleType [ longDoubleType ] false;
-
-  add "tolower" intType [ intType ] false;
-  add "toupper" intType [ intType ] false;
-
-  add "trunc" doubleType [ doubleType ] false;
-  add "truncf" floatType [ floatType ] false;
-  add "truncl" longDoubleType [ longDoubleType ] false;
-
-  add "unreachable" voidType [ ] false;
-
+let custom_builtins = Queue.create ()
+
+let add_custom_builtin f = Queue.add f custom_builtins
+
+let register_custom_builtin (name, rt, prms, isva) =
+  Builtin_functions.add name (rt,prms,isva)
+
+(* Table Builtin_templates is similar to Builtin_functions,
+   but with a few differences:
+   1. it lists all _known_ builtins, even those not registered (available)
+      under the current machdep.
+   2. It lists the 'generic' builtin names, not their 'typed' versions,
+      e.g. '__sync_add_and_fetch' instead of '__sync_add_and_fetch_int32_t'.
+   3. It can refer to "generic" type 'type', as in GCC's docs, since its types
+      are only strings, not actual CIL types.
+   This table mirrors the contents of the 'data' field of file
+   'compiler_builtins.json'.
+*)
+
+type compiler = GCC | MSVC | Not_MSVC
+
+type builtin_template = {
+  name: string;
+  compiler: compiler option;
+  rettype: string;
+  args: string list;
+  types: string list option;
+  variadic: bool;
+}
+
+let to_compiler s =
+  if s = "gcc" then GCC
+  else if s = "msvc" then MSVC
+  else if s = "!msvc" then Not_MSVC
+  else
+    Kernel.fatal "invalid compiler '%s' in compiler_builtins JSON" s
+
+let string_of_compiler = function
+  | GCC -> "GCC-based"
+  | MSVC -> "MSVC-based"
+  | Not_MSVC -> "not MSVC-based"
+
+module Builtin_template = struct
+  let dummy =
+    { name = "";
+      compiler = None;
+      rettype = "";
+      args = [];
+      types = None;
+      variadic = false;
+    }
+  include Datatype.Make_with_collections
+      (struct
+        type t = builtin_template
+        let name = "Builtin_template"
+        let reprs = [ dummy ]
+        let compare b1 b2 = String.compare b1.name b2.name
+        let hash b = Datatype.String.hash b.name
+        let equal b1 b2 = b1.name = b2.name
+        let copy = Datatype.identity
+        let internal_pretty_code = Datatype.undefined
+        let pretty fmt b =
+          Format.fprintf fmt "%s %s(%a%s)"
+            b.rettype b.name
+            (Pretty_utils.pp_list ~sep:", " Format.pp_print_string) b.args
+            (if b.variadic then ", ..." else "")
+        let rehash = Datatype.identity
+        let structural_descr = Structural_descr.t_abstract
+        let mem_project = Datatype.never_any_project
+        let varname b = "_cb_" ^ b.name
+      end)
+end
+module Builtin_templates =
+  State_builder.Hashtbl
+    (Datatype.String.Hashtbl)
+    (Builtin_template)
+    (struct
+      let name = "Builtin_templates"
+      let dependencies = []
+      let size = 200
+    end)
+
+module Gcc_builtin_templates_loaded =
+  State_builder.Ref
+    (Datatype.Bool)
+    (struct
+      let name = "Cil_builtins.Gcc_builtin_templates_loaded"
+      let dependencies = [ Builtin_templates.self ]
+      let default () = false
+    end)
+
+(* An actual instance of a builtin_template, with actual types. *)
+type builtin = {
+  name: string;
+  compiler: compiler option;
+  rettype: typ option;
+  args: typ option list;
+  variadic: bool;
+}
+
+module Json =
+struct
+  open Yojson.Basic
+  open Util
+
+  let parse fp =
+    Kernel.feedback ~dkey:Kernel.dkey_builtins "Parsing builtins file: %a"
+      Datatype.Filepath.pretty fp;
+    let json = Json.from_file fp in
+    member "data" json
+
+  let init_builtin_templates ?default_compiler fp =
+    let json = parse fp in
+    List.iter (fun (name, entry) ->
+        let compiler =
+          if default_compiler <> None then default_compiler
+          else
+            entry |> member "compiler" |> to_string_option |>
+            Option.map to_compiler
+        in
+        let rettype = entry |> member "rettype" |> to_string in
+        let args = entry |> member "args" |> to_list |> List.map to_string in
+        let variadic =
+          entry |> member "variadic" |> to_bool_option |> Option.is_some
+        in
+        let types =
+          match entry |> member "types" with
+          | `Null -> None
+          | `List l -> Some (List.map to_string l)
+          | _ ->
+            Kernel.fatal "invalid 'types': expected list (in %a)"
+              Datatype.Filepath.pretty fp
+        in
+        let cb = { name; compiler; rettype; args; types; variadic} in
+        Builtin_templates.replace name cb
+      ) (json |> to_assoc)
+
+end
+
+(* For performance, this table provides O(1) lookups between type names
+   and the underlying Cil types. Some types may be unavailable in some
+   machdeps, so the table returns an option type.
+   Note that the type strings must follow a strict format (also used
+   in gcc_builtins.json), with a single space between type names and
+   asterisks (for pointers); otherwise we would have to do some expensive
+   matching.
+*)
+let build_type_table () : (string, typ option) Hashtbl.t =
   let int8_t = Some Cil.scharType in
   let int16_t = try Some (Cil.int16_t ()) with Not_found -> None in
   let int32_t = try Some (Cil.int32_t ()) with Not_found -> None in
@@ -584,126 +254,169 @@ let initGccBuiltins () : unit =
   let uint16_t = try Some (Cil.uint16_t ()) with Not_found -> None in
   let uint32_t = try Some (Cil.uint32_t ()) with Not_found -> None in
   let uint64_t = try Some (Cil.uint64_t ()) with Not_found -> None in
+  let ptr_of = Option.map (fun t -> TPtr(t,[])) in
+  let volatile_ptr_of = Option.map (fun t -> TPtr(typeAddVolatile t,[])) in
+  let types =
+    [
+      ("__builtin_va_list",
+       Some (if Cil.theMachine.theMachine.has__builtin_va_list
+             then TBuiltin_va_list []
+             else Cil.voidPtrType));
+      ("char *", Some Cil.charPtrType);
+      ("char const *", Some Cil.charConstPtrType);
+      ("double", Some Cil.doubleType);
+      ("double *", Some (TPtr(Cil.doubleType,[])));
+      ("float", Some Cil.floatType);
+      ("float *", Some (TPtr(Cil.floatType,[])));
+      ("int", Some Cil.intType);
+      ("int *", Some Cil.intPtrType);
+      ("int volatile *", Some (TPtr(typeAddVolatile Cil.intType,[])));
+      ("long", Some Cil.longType);
+      ("long double", Some Cil.longDoubleType);
+      ("long double *", Some (TPtr(Cil.longDoubleType,[])));
+      ("long long", Some Cil.longLongType);
+      ("long long volatile *", Some (TPtr(typeAddVolatile Cil.longLongType,[])));
+      ("short", Some Cil.shortType);
+      ("short volatile *", Some (TPtr(typeAddVolatile Cil.shortType,[])));
+      ("signed char", Some Cil.scharType);
+      ("signed char volatile *", Some (TPtr(typeAddVolatile Cil.scharType,[])));
+      ("unsigned char", Some Cil.ucharType);
+      ("unsigned char volatile *", Some (TPtr(typeAddVolatile Cil.ucharType,[])));
+      ("unsigned int", Some Cil.uintType);
+      ("unsigned int volatile *", Some (TPtr(typeAddVolatile Cil.uintType,[])));
+      ("unsigned long", Some Cil.ulongType);
+      ("unsigned long long", Some Cil.ulongLongType);
+      ("unsigned long long volatile *", Some (TPtr(typeAddVolatile Cil.ulongLongType,[])));
+      ("unsigned short", Some Cil.ushortType);
+      ("unsigned short volatile *", Some (TPtr(typeAddVolatile Cil.ushortType,[])));
+      ("void", Some Cil.voidType);
+      ("void *", Some Cil.voidPtrType);
+      ("void const *", Some Cil.voidConstPtrType);
+      ("size_t", Some Cil.theMachine.typeOfSizeOf);
+      ("int8_t", int8_t);
+      ("int16_t", int16_t);
+      ("int32_t", int32_t);
+      ("int64_t", int64_t);
+      ("uint8_t", uint8_t);
+      ("uint16_t", uint16_t);
+      ("uint32_t", uint32_t);
+      ("uint64_t", uint64_t);
+      ("int8_t *", ptr_of int8_t);
+      ("int16_t *", ptr_of int16_t);
+      ("int32_t *", ptr_of int32_t);
+      ("int64_t *", ptr_of int64_t);
+      ("uint8_t *", ptr_of uint8_t);
+      ("uint16_t *", ptr_of uint16_t);
+      ("uint32_t *", ptr_of uint32_t);
+      ("uint64_t *", ptr_of uint64_t);
+      ("int8_t volatile *", volatile_ptr_of int8_t);
+      ("int16_t volatile *", volatile_ptr_of int16_t);
+      ("int32_t volatile *", volatile_ptr_of int32_t);
+      ("int64_t volatile *", volatile_ptr_of int64_t);
+      ("uint8_t volatile *", volatile_ptr_of uint8_t);
+      ("uint16_t volatile *", volatile_ptr_of uint16_t);
+      ("uint32_t volatile *", volatile_ptr_of uint32_t);
+      ("uint64_t volatile *", volatile_ptr_of uint64_t);
+    ] in
+  Hashtbl.of_seq (List.to_seq types)
 
-  (* Binary monomorphic versions of atomic builtins *)
-  let atomic_instances =
-    [int8_t, "_int8_t";
-     int16_t,"_int16_t";
-     int32_t,"_int32_t";
-     int64_t,"_int64_t";
-     uint8_t, "_uint8_t";
-     uint16_t,"_uint16_t";
-     uint32_t,"_uint32_t";
-     uint64_t,"_uint64_t"]
-  in
-  let add_sync (typ,name) f =
-    match typ with
-    | Some typ ->
-      add ~prefix:"__sync_" (f^name) typ [ TPtr(typeAddVolatile typ,[]); typ] true
-    | None -> ()
-  in
-  let add_sync f =
-    List.iter (fun typ -> add_sync typ f) atomic_instances
-  in
-  add_sync "fetch_and_add";
-  add_sync "fetch_and_sub";
-  add_sync "fetch_and_or";
-  add_sync "fetch_and_and";
-  add_sync "fetch_and_xor";
-  add_sync "fetch_and_nand";
-  add_sync "add_and_fetch";
-  add_sync "sub_and_fetch";
-  add_sync "or_and_fetch";
-  add_sync "and_and_fetch";
-  add_sync "xor_and_fetch";
-  add_sync "nand_and_fetch";
-  add_sync "lock_test_and_set";
-  List.iter (fun (typ,n) ->
-      match typ with
-      | Some typ ->
-        add ~prefix:"" ("__sync_bool_compare_and_swap"^n)
-          intType
-          [ TPtr(typeAddVolatile typ,[]); typ ; typ]
-          true
-      | None -> ())
-    atomic_instances;
-  List.iter (fun (typ,n) ->
-      match typ with
-      | Some typ ->
-        add ~prefix:"" ("__sync_val_compare_and_swap"^n)
-          typ
-          [ TPtr(typeAddVolatile typ,[]); typ ; typ]
-          true
-      | None -> ())
-    atomic_instances;
-  List.iter (fun (typ,n) ->
-      match typ with
-      | Some typ ->
-        add ~prefix:"" ("__sync_lock_release"^n)
-          voidType
-          [ TPtr(typeAddVolatile typ,[]) ]
-          true;
-      | None -> ())
-    atomic_instances;
-  (* __sync_synchronize has been declared non-variadic and a spec was added
-     to __fc_gcc_builtins.h; to avoid issues with pretty-printing, we removed
-     it from this list. *)
-;;
+(* Note that [s] (the type string) follows a stricter format than the ones
+   allowed by the C standard w.r.t. type names; a single space must be
+   present between type names and asterisks. *)
+let parse_type ?(template="") type_table s =
+  try
+    if String.get s 0 == 'T' then
+      (* replace 'T' (always at the beginning) with the template *)
+      let typ = template ^ (String.sub s 1 (String.length s - 1)) in
+      Hashtbl.find type_table typ
+    else
+      Hashtbl.find type_table s
+  with Not_found ->
+    Kernel.fatal "invalid type '%s' in compiler_builtins JSON" s
 
-(* Builtins related to va_list. Added to all non-msvc machdeps, because
-   Cabs2cil supposes they exist. *)
-let initVABuiltins () =
-  let hasbva = Cil.theMachine.theMachine.has__builtin_va_list in
-  let add = add_builtin in
-  add "next_arg"
-    (* When we parse builtin_next_arg we drop the second argument *)
-    (if hasbva then TBuiltin_va_list [] else voidPtrType) [] false;
-  if hasbva then begin
-    add "va_end" voidType [ TBuiltin_va_list [] ] false;
-    add "varargs_start" voidType [ TBuiltin_va_list [] ] false;
-    (* When we parse builtin_{va,stdarg}_start, we drop the second argument *)
-    add "va_start" voidType [ TBuiltin_va_list [] ] false;
-    add "stdarg_start" voidType [ TBuiltin_va_list [] ] false;
-    (* When we parse builtin_va_arg we change its interface *)
-    add "va_arg"
-      voidType
-      [ TBuiltin_va_list [];
-        Cil.theMachine.typeOfSizeOf;(* Sizeof the type *)
-        voidPtrType (* Ptr to res *) ]
-      false;
-    add "va_copy" voidType [ TBuiltin_va_list []; TBuiltin_va_list [] ] false;
+let is_machdep_active compiler =
+  match compiler, Cil.gccMode (), Cil.msvcMode () with
+  | None, _, _ (* always active *)
+  | Some GCC, true, _
+  | Some MSVC, _, true
+  | Some Not_MSVC, _, false -> true
+  | _, _, _ -> false
+
+let add_builtin_if_active b =
+  if is_machdep_active b.compiler then begin
+    Kernel.feedback ~dkey:Kernel.dkey_builtins
+      "adding builtin: %a %s(%a%s)"
+      Cil_datatype.Typ.pretty (Option.get b.rettype) b.name
+      (Pretty_utils.pp_list ~sep:", " Cil_datatype.Typ.pretty)
+      (List.map Option.get b.args)
+      (if b.variadic then ", ..." else "")
+    ;
+    add_builtin ~prefix:"" b.name (Option.get b.rettype)
+      ((List.map Option.get) b.args) b.variadic
   end
 
-let initMsvcBuiltins () : unit =
-  (** Take a number of wide string literals *)
-  Builtin_functions.add "__annotation" (voidType, [ ], true)
+(* Instantiates builtins according to the types in the template.
+   In some machdeps, there may be missing types (e.g. int16_t);
+   such elements are not instantiated in the resulting list.
+   If the template has no 'types' member, at most a single
+   builtin will be instantiated. *)
+let instantiate_available_templates type_table name (entry : builtin_template) =
+  let compiler = entry.compiler in
+  let variadic = entry.variadic in
+  let make_builtin_as_list ?template name =
+    let to_type_opt = parse_type ?template type_table in
+    let rettype = to_type_opt entry.rettype in
+    let args = List.map to_type_opt entry.args in
+    if rettype = None || List.exists (fun arg -> arg = None) args
+    then (* unavailable type: skip builtin *) []
+    else
+      let name =
+        Option.fold ~none:name ~some:(fun t -> name ^ "_" ^ t) template
+      in
+      [{ name; compiler; rettype; args; variadic }]
+  in
+  match entry.types with
+  | Some types ->
+    List.fold_left (fun acc template ->
+        (make_builtin_as_list ~template name) @ acc
+      ) [] types
+  | None ->
+    make_builtin_as_list name
 
-let init_common_builtins () =
-  add_builtin
-    "offsetof"
-    Cil.theMachine.typeOfSizeOf
-    [ Cil.theMachine.typeOfSizeOf ]
-    false
+let init_gcc_builtin_templates () =
+  let fp =
+    Datatype.Filepath.concat ~existence:Filepath.Must_exist
+      Fc_config.datadir "compliance/gcc_builtins.json"
+  in
+  Json.init_builtin_templates ~default_compiler:GCC fp;
+  Gcc_builtin_templates_loaded.set true
 
-let custom_builtins = Queue.create ()
+let init_other_builtin_templates () =
+  let fp =
+    Datatype.Filepath.concat ~existence:Filepath.Must_exist
+      Fc_config.datadir "compliance/compiler_builtins.json"
+  in
+  Json.init_builtin_templates fp
 
-let add_custom_builtin f = Queue.add f custom_builtins
-
-let register_custom_builtin (name, rt, prms, isva) =
-  Builtin_functions.add name (rt,prms,isva)
+let init_builtins_from_json () =
+  (* For performance reasons, we avoid loading GCC builtins unless we are
+     using a GCC machdep *)
+  if Cil.gccMode () then init_gcc_builtin_templates ();
+  init_other_builtin_templates ();
+  let type_table = build_type_table () in
+  Builtin_templates.iter (fun name entry ->
+      (* In the JSON file, each entry is possibly a template for
+         several type-specialized functions *)
+      let builtins = instantiate_available_templates type_table name entry in
+      List.iter add_builtin_if_active builtins
+    )
 
 let init_builtins () =
   if not (Cil.selfMachine_is_computed ()) then
     Kernel.fatal ~current:true "You must call initCIL before init_builtins" ;
   if Builtin_functions.length () <> 0 then
     Kernel.fatal ~current:true "Cil builtins already initialized." ;
-  init_common_builtins ();
-  if Cil.msvcMode () then
-    initMsvcBuiltins ()
-  else begin
-    initVABuiltins ();
-    if Cil.gccMode () then initGccBuiltins ();
-  end;
+  init_builtins_from_json ();
   Queue.iter (fun f -> register_custom_builtin (f())) custom_builtins
 
 (** This is used as the location of the prototypes of builtin functions. *)
