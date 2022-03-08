@@ -1,9 +1,7 @@
-/tests/*/dune
 /aorai_eva_analysis.ml
 /Makefile
 /*parser*.output
 /ptests_local_config.ml
 /tests/*/result
-/tests/test_config_prove
 /tests/*/result_prove
 /top
