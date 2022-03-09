@@ -39,7 +39,7 @@ stdenv.mkDerivation rec {
   buildInputs = with ocamlPackages; [
     apron
     camlzip
-    dune_2
+    dune_3
     dune-site
     findlib
     graphviz
