@@ -563,10 +563,10 @@ end
 
 module StringSet = Set.Make(String)
 type deps =  {
-  load_plugin: string list;
-  load_libs: string list;
-  load_module: string list;
-  deps_cmd: string list;
+  load_plugin: string list option;
+  load_libs: string list option;
+  load_module: string list option;
+  deps_cmd: string list option;
 }
 
 type execnow =
@@ -597,10 +597,10 @@ type config =
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
                                   *)
-    dc_libs : string list; (** libraries to compile *)
-    dc_deps : string list; (** deps *)
-    dc_plugin : string list; (** only plugins to load *)
-    dc_module : string list; (** module to load *)
+    dc_libs : string list option; (** libraries to compile *)
+    dc_deps : string list option ; (** deps *)
+    dc_plugin : string list option; (** only plugins to load *)
+    dc_module : string list option; (** module to load *)
     dc_macros: Macros.t; (** existing macros. *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
@@ -651,10 +651,10 @@ end = struct
     ptest_name,
     { config with
       dc_execnow = List.rev config.dc_execnow;
-      dc_deps = List.map subst config.dc_deps;
-      dc_plugin = List.map subst config.dc_plugin;
-      dc_module = List.map subst config.dc_module;
-      dc_libs = List.map subst config.dc_libs;
+      dc_deps = Option.map (List.map subst) config.dc_deps ;
+      dc_plugin = Option.map (List.map subst) config.dc_plugin;
+      dc_module = Option.map (List.map subst) config.dc_module;
+      dc_libs = Option.map (List.map subst) config.dc_libs;
     },
     fun ~nth macros ->
       Macros.add_list (("PTEST_NUMBER", string_of_int nth)::ptest_vars) macros
@@ -668,10 +668,10 @@ end = struct
         exit_code=None;
         macros=config.dc_macros;
         logs=[];
-        deps={ load_plugin=[];
-               load_libs=[];
-               load_module=[];
-               deps_cmd=[];
+        deps={ load_plugin=None;
+               load_libs=None;
+               load_module=None;
+               deps_cmd=None;
              };
         timeout=""
       } ]
@@ -681,10 +681,10 @@ end = struct
       dc_test_regexp = test_file_regexp;
       dc_macros = Macros.default_macros;
       dc_execnow = [];
-      dc_libs = [];
-      dc_deps = [];
-      dc_plugin = [];
-      dc_module = [];
+      dc_libs = None;
+      dc_deps = None;
+      dc_plugin = None;
+      dc_module = None;
       dc_filter = None ;
       dc_exit_code = None;
       dc_default_toplevel = !default_toplevel;
@@ -763,11 +763,15 @@ end = struct
       (* preserve options ordering *)
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
-  let deps_of_config ?(deps={load_module=[];load_libs=[];load_plugin=[];deps_cmd=[]}) config =
-    { load_module = deps.load_module @ config.dc_module;
-      load_plugin = deps.load_plugin @ config.dc_plugin;
-      load_libs= deps.load_libs @ config.dc_libs;
-      deps_cmd = deps.deps_cmd @ config.dc_deps
+  let deps_of_config ?(deps={load_module=None;load_libs=None;load_plugin=None;deps_cmd=None}) config =
+    let select ~prev ~config = match config with
+      | None -> prev
+      | _ -> config
+    in
+    { load_module = select ~prev:deps.load_module ~config:config.dc_module;
+      load_plugin = select ~prev:deps.load_plugin ~config:config.dc_plugin;
+      load_libs= select ~prev:deps.load_libs ~config:config.dc_libs;
+      deps_cmd = select ~prev:deps.deps_cmd ~config:config.dc_deps
     }
 
   let config_exec ~once ~drop:_ ~file ~dir s current =
@@ -801,29 +805,30 @@ end = struct
 
   let config_deps ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
+    let l = split_list s in
     { current with
-      dc_deps = (split_list s);
+      dc_deps = Some l;
       dc_macros = Macros.add_list ["PTEST_DEPS", s] current.dc_macros }
 
   let config_libs ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     { current with
-      dc_libs = l;
+      dc_libs = Some l;
       dc_macros = Macros.add_list ["PTEST_LIBS", s] current.dc_macros }
 
   let config_plugin ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
-    let deps = split_list s in
-    { current with dc_plugin = deps ;
+    Format.printf "XXXX PTEST_PLUGIN= %s@." s;
+    let l = split_list s in
+    { current with dc_plugin = Some l ;
                    dc_macros = Macros.add_list ["PTEST_PLUGIN", s] current.dc_macros }
 
   let config_module macro_name ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
-    let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
-    let deps = List.map (fun s -> s ^ ".cmxs") l in
+    let l = List.map (fun s -> (Filename.remove_extension s) ^ ".cmxs") (split_list s) in
     { current with
-      dc_module = deps;
+      dc_module = Some l;
       dc_macros = Macros.add_list [macro_name, s] current.dc_macros }
 
   let config_macro ~drop:_ ~file ~dir s current =
@@ -1135,15 +1140,22 @@ let gen_prefix gen_file cmd =
 let oracle_prefix ~env = gen_prefix (make_oracle_file ~env)
 let log_prefix ~env = gen_prefix (make_result_file ~env)
 
+let list_of_deps = function
+    | None -> []
+    | Some l -> l
 
 let basic_command_string command =
   let plugins_options =
-    let opt_plugin = if command.deps.load_plugin = [] then ""
-      else Printf.sprintf "-load-plugin=%s" (String.concat "," command.deps.load_plugin) in
-    let opt_libs = if command.deps.load_libs = [] then ""
-      else Printf.sprintf "-load-module=%s" (String.concat "," command.deps.load_libs) in
-    let opt_modules = if command.deps.load_module = [] then ""
-      else Printf.sprintf "-load-module=%s" (String.concat "," command.deps.load_module) in
+    let load_option opt deps = match list_of_deps deps with
+      | [] -> ""
+      | l -> Printf.sprintf "%s=%s" opt (String.concat "," l)
+    in
+    let opt_plugin = load_option "-load-plugin" command.deps.load_plugin in
+    let opt_libs = load_option "-load-module" command.deps.load_libs in
+    let opt_modules =  load_option "-load-module" command.deps.load_module in
+    Format.printf "XXXX PLUGIN= %s@. " opt_plugin;
+    Format.printf "XXXX LIBS= %s@. " opt_libs;
+    Format.printf "XXXX MODULE= %s@. " opt_modules;
     String.concat " " [opt_plugin; opt_libs; opt_modules]
   in
   let macros = (* set expanded macros that can be used into CMD directives *)
@@ -1151,6 +1163,7 @@ let basic_command_string command =
       "PTEST_OPT", Macros.expand ~file:command.file command.macros command.options;
       "PTEST_LOAD_OPTIONS", plugins_options;
     ] command.macros in
+  Format.printf "XXXX PTEST_LOAD_OPTIONS= %s@. " plugins_options;
   let toplevel =
     let in_toplevel,toplevel = Macros.does_expand ~file:command.file macros command.toplevel in
     if command.execnow || in_toplevel.has_ptest_opt then toplevel
@@ -1200,9 +1213,9 @@ let pp_list_deps fmt l =
 
 let pp_command_deps fmt command =
   Format.fprintf fmt "%a %S (package frama-c)%a"
-    pp_list_deps command.deps.deps_cmd
+    pp_list_deps (list_of_deps command.deps.deps_cmd)
     command.file
-    Fmt.(list (package_as_deps (quote plugin_as_package))) command.deps.load_plugin
+    Fmt.(list (package_as_deps (quote plugin_as_package))) (list_of_deps command.deps.load_plugin)
 
 let show_cmd =
   let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
@@ -1484,7 +1497,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      )@."
     diff_alias
     (ptests_alias ~env)
-    Fmt.(list (var_libavailable plugin_as_package )) command.deps.load_plugin
+    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
   ;
   let oracle_subdir = SubDir.oracle_subdir ~env command.directory in
   oracle_target oracle_fmt oracle_subdir (Filename.basename (oracle_prefix ^ ".err.oracle"));
@@ -1494,27 +1507,28 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
 
 let deps_command ~file macros deps =
   let subst = Macros.expand ~file macros in
-  let load_plugin = List.map subst deps.load_plugin in
-  let load_module = List.map subst deps.load_module in
-  let load_libs = List.map (fun s -> (subst s)^".cmxs") deps.load_libs in
-  let deps_cmd = List.map subst deps.deps_cmd in
+  let load_plugin = Option.map (List.map subst) deps.load_plugin in
+  let load_module = Option.map (List.map subst) deps.load_module in
+  let load_libs = Option.map (List.map (fun s -> (subst s)^".cmxs")) deps.load_libs in
+  let deps_cmd = Option.map (List.map subst) deps.deps_cmd in
   { load_plugin; load_module; load_libs;
-    deps_cmd = load_libs @ load_module @ deps_cmd;
+    deps_cmd = Some ((list_of_deps load_libs) @ (list_of_deps load_module) @ (list_of_deps deps_cmd));
   }
 
 let update_modules ~file modules deps =
-  if deps.load_module <> [] then begin
+  let load_module = list_of_deps deps.load_module in
+  if load_module <> [] then begin
     let plugin_libs = StringSet.union
-        (StringSet.of_list (List.map (Format.sprintf "frama-c-%s.core") deps.load_plugin))
+        (StringSet.of_list (List.map (Format.sprintf "frama-c-%s.core") (list_of_deps deps.load_plugin)))
         (StringSet.of_list (List.map (fun s -> Filename.remove_extension (Filename.basename s))
-                              deps.load_libs))
+                              (list_of_deps deps.load_libs)))
     in
     List.iter (fun cmxs ->
         let cmxs = Filename.remove_extension cmxs in
         modules := StringMap.update cmxs (function
             | None -> Some (plugin_libs,[file])
             | Some (set,files) -> Some ((StringSet.inter set plugin_libs),file::files)
-          ) !modules) (StringSet.elements (StringSet.of_list deps.load_module));
+          ) !modules) (StringSet.elements (StringSet.of_list load_module));
   end
 
 (** process a test file *)
@@ -1629,7 +1643,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             (* alias: *)
             wrapper_basename
             (* deps: *)
-            pp_list config.dc_deps
+            pp_list (list_of_deps config.dc_deps)
             pp_command_deps cmd
             (* targets: *)
             pp_list wtest.log
