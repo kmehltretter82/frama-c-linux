@@ -53,3 +53,5 @@ int decl() {
   used_in_decl++;
   return used_in_decl;
 }
+
+/*@ type nat = Zero | Succ(nat); */

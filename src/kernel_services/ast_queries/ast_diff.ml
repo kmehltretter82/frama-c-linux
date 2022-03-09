@@ -1424,17 +1424,20 @@ and is_matching_logic_type_info t t' env =
   | `Not_present -> false
   | `Same t'' -> Cil_datatype.Logic_type_info.equal t' t''
   | exception Not_found ->
-    if Logic_env.is_builtin_logic_type t.lt_name then
-      begin
-        let res = logic_type_correspondance t env in
-        Logic_type_info.add t res;
-        (match res with
-         | `Same t'' -> Cil_datatype.Logic_type_info.equal t' t''
-         | `Not_present -> false)
-      end
-    else
-      Kernel.fatal "Unbound logic type %a in AST diff"
-        Cil_datatype.Logic_type_info.pretty t
+    (match Cil_datatype.Logic_type_info.Map.find_opt t env.logic_type_info with
+     | Some t'' -> Cil_datatype.Logic_type_info.equal t' t''
+     | None ->
+       if Logic_env.is_builtin_logic_type t.lt_name then
+         begin
+           let res = logic_type_correspondance t env in
+           Logic_type_info.add t res;
+           (match res with
+            | `Same t'' -> Cil_datatype.Logic_type_info.equal t' t''
+            | `Not_present -> false)
+         end
+       else
+         Kernel.fatal "Unbound logic type %a in AST diff"
+           Cil_datatype.Logic_type_info.pretty t)
 
 and logic_type_correspondance ?loc ti env =
   let add ti =
