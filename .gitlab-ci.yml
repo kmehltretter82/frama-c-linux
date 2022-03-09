@@ -62,6 +62,13 @@ plugins-tests:
   tags:
     - nix
 
+volatile:
+  stage: tests
+  script:
+    - ./ci.sh Volatile
+  tags:
+    - nix
+
 ################################################################################
 ### DISTRIB
 
