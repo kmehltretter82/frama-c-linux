@@ -1,0 +1,3 @@
+(subdir
+ result/custom_machdep
+ (copy_files ../../custom_machdep/*))
