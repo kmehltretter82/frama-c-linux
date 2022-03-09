@@ -1,5 +1,5 @@
 { lib
-, fetchzip
+, fetchFromGitHub
 , buildDunePackage
 , cmdliner
 }:
@@ -8,8 +8,10 @@ buildDunePackage rec {
   version = "1.7.0";
   pname = "ocp-indent";
 
-  src = fetchzip {
-    url = "https://github.com/OCamlPro/ocp-indent/archive/${version}.tar.gz";
+  src = fetchFromGitHub {
+    owner = "OCamlPro";
+    repo = pname;
+    rev = version;
     sha256 = "006x3fsd61vxnxj4chlakyk3b2s10pb0bdl46g0ghf3j8h33x7hc";
   };
 
