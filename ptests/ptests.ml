@@ -1140,8 +1140,8 @@ let oracle_prefix ~env = gen_prefix (make_oracle_file ~env)
 let log_prefix ~env = gen_prefix (make_result_file ~env)
 
 let list_of_deps = function
-    | None -> []
-    | Some l -> l
+  | None -> []
+  | Some l -> l
 
 let basic_command_string command =
   let plugins_options =
