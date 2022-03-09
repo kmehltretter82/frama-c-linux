@@ -229,13 +229,13 @@ run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
 .PHONY: run-tests
 run-tests: FRAMAC_WP_CACHE=replay
 run-tests: run-ptests
-	dune build $(PTEST_ALIASESS)
+	dune build $(PTEST_ALIASES)
 
 # Replay tests of for all configurations (requires  all dune files)
 .PHONY: test.replay
 tests.replay: FRAMAC_WP_CACHE=replay
 tests.replay:
-	dune build $(PTEST_ALIASESS)
+	dune build $(PTEST_ALIASES)
 
 # Update cache entries of for all configurations (requires all dune files)
 .PHONY: tests.update-wp-cache
