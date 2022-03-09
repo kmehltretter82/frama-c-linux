@@ -63,6 +63,11 @@ module Filename = struct
       fun a b -> temp_file a b
 
   let sanitize f = String.escaped f
+
+  let sanitize_with_space =
+    let regexp = Str.regexp "[\\] " in
+    let subst = Str.global_replace regexp " " in
+    subst
 end
 
 let str_string_match1 regexp line pos =
@@ -141,7 +146,7 @@ let config_name ~env name =
 let macro_post_options = ref "" (* value set to @PTEST_POST_OPTIONS@ macro *)
 let macro_pre_options  = ref "" (* value set to @PTEST_PRE_OPTIONS@  macro *)
 let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
-let macro_default_options = ref "-journal-disable -check -no-autoload-plugins -add-symbolic-path @PTEST_SESSION@"
+let macro_default_options = ref "-journal-disable -check -no-autoload-plugins -add-symbolic-path=\"@PTEST_SESSION@\""
 
 let macro_frama_c_exe = ref "frama-c"
 let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
@@ -1187,10 +1192,12 @@ module Fmt = struct
 end
 let pp_list_deps fmt l =
   List.iter (fun s ->
+      let s = Filename.sanitize_with_space s in
       if String.contains s '*' then
         Format.fprintf fmt " (glob_files %S)" s
       else
         Format.fprintf fmt " %S" s) l
+
 let pp_command_deps fmt command =
   Format.fprintf fmt "%a %S (package frama-c)%a"
     pp_list_deps command.deps.deps_cmd

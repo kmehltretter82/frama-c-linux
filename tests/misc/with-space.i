@@ -1,4 +1,4 @@
 /* run.config
- SCRIPT: @PTEST_DIR@/with\ space/module
+ LIBS: ../with\ space/module
    OPT:
  */
