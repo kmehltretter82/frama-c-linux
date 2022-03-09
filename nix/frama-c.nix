@@ -6,6 +6,7 @@
 , makeWrapper
 , nix-gitignore
 , wrapGAppsHook
+, writeText
 # Generic
 , autoconf
 , findlib
@@ -78,9 +79,20 @@ stdenv.mkDerivation rec {
     "FRAMAC_INSTALLDIR=$(out)"
   ];
 
+  # Simpler for our test target
   postInstall = ''
     mkdir -p $build_dir
     tar -cf $build_dir/dir.tar .
+  '';
+
+  # Required so that tests of external plugins can be excuted
+  postFixup = ''
+    cp -r $out/share/doc $out/doc
+  '';
+
+  # Required so that Frama-C libs are found after install
+  setupHook = writeText "setupHook.sh" ''
+    export OCAMLPATH="''${OCAMLPATH-}''${OCAMLPATH:+:}''$1/lib"
   '';
 
   meta = {
