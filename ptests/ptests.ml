@@ -1197,7 +1197,7 @@ let pp_list_deps fmt l =
         Format.fprintf fmt " (glob_files %S)" s
       else
         Format.fprintf fmt " %S" s) l
-    
+
 let pp_command_deps fmt command =
   Format.fprintf fmt "%a %S (package frama-c)%a"
     pp_list_deps command.deps.deps_cmd
