@@ -68,8 +68,6 @@ stdenv.mkDerivation rec {
 
   installTargets = [ "install" "install-lib" ];
 
-  passthru.withProvers = callPackage ./with-provers.nix {};
-
   meta = with lib; {
     description = "A platform for deductive program verification";
     homepage = "http://why3.lri.fr/";
