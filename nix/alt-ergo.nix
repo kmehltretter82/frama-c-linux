@@ -1,5 +1,5 @@
 { callPackage
-, fetchzip
+, fetchFromGitHub
 , lib
 , stdenv
 , ocaml
@@ -19,12 +19,12 @@ stdenv.mkDerivation rec {
   pname = "alt-ergo";
   version = "2.2.0-free";
 
-  src =
-    fetchzip {
-      url = "https://alt-ergo.ocamlpro.com/http/alt-ergo-free-2.2.0/alt-ergo-free-2.2.0.tar.gz";
-      sha256 = "11ffm87vsrii8nyhxhbc9gzjmqkspqv7hpjq7ll9xflll7gpnpkj";
-      stripRoot=false;
-    };
+  src = fetchFromGitHub {
+    owner = "OCamlPro";
+    repo = pname;
+    rev = version;
+    sha256 = "11ffm87vsrii8nyhxhbc9gzjmqkspqv7hpjq7ll9xflll7gpnpkj";
+  };
 
   nativeBuildInputs = [
     autoreconfHook
@@ -46,8 +46,6 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   configureFlags = [ "--enable-verbose-make" ];
-
-  installTargets = [ "install" ];
 
   meta = {
     description = "High-performance theorem prover and SMT solver";
