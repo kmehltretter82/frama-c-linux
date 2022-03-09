@@ -60,7 +60,7 @@ extern void i(void);
 /*@ ensures succ(Zero) == Succ(Zero); */
 extern void i(void);
 
-void local_var_use(void) {
+void local_var_use(int w, int q[][w]) {
   int z;
   int t [sizeof(z)];
 }

@@ -2,6 +2,8 @@
 [kernel] Parsing ast_diff_2.i (no preprocessing)
 [AST diff test] Showing correspondances between orig_default and default
 [AST diff test] Variable local_var_use:  => local_var_use
+[AST diff test] Variable v:  => w
+[AST diff test] Variable a:  => q
 [AST diff test] Variable x:  => z
 [AST diff test] Variable y:  => t
 [AST diff test] Variable has_static_local_x:  => has_static_local_y

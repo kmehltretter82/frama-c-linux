@@ -1329,9 +1329,11 @@ and gfun_correspondance ?loc vi env =
     | Some kf' ->
       let formals = Kf.get_formals kf in
       let formals' = Kf.get_formals kf' in
-      if is_same_list is_same_varinfo formals formals' env &&
-         is_same_type (Kf.get_return_type kf) (Kf.get_return_type kf') env
-      then begin
+      let res, env =
+        (is_same_type (Kf.get_return_type kf) (Kf.get_return_type kf') env, env)
+        &&& is_same_list_env varinfo_env formals formals'
+      in
+      if res then begin
         (* from a variable point of view, e.g. if we take its address,
            they are similar *)
         Varinfo.add vi (`Same (Kf.get_vi kf'));
@@ -1339,7 +1341,6 @@ and gfun_correspondance ?loc vi env =
            part of the kf is unchanged (otherwise, we can't reuse information
            about the formals anyways). Hence, we only add them into the local
            env for now. *)
-        let env = add_locals formals formals' env in
         let env =
           { env with kernel_function = Kf.Map.add kf kf' env.kernel_function }
         in
