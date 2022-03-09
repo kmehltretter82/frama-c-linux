@@ -186,8 +186,8 @@ src/project_initializer/prepare_ast.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/prepare_ast.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 tests/E_ACSL_test.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 tests/wrapper.sh: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-tests/test_config.in: .ignore
-tests/test_config_dev.in: .ignore
+tests/test_config: .ignore
+tests/test_config_dev: .ignore
 tests/builtin/test_config: .ignore
 tests/builtin/test_config_dev: .ignore
 tests/concurrency/test_config: .ignore
