@@ -54,4 +54,11 @@ int decl() {
   return used_in_decl;
 }
 
+extern void i(void);
+
 /*@ type nat = Zero | Succ(nat); */
+
+/*@ logic nat succ(nat n) = Succ(n); */
+
+/*@ ensures succ(Zero) == Succ(Zero); */
+extern void i(void);
