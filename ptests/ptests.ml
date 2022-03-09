@@ -819,7 +819,6 @@ end = struct
 
   let config_plugin ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
-    Format.printf "XXXX PTEST_PLUGIN= %s@." s;
     let l = split_list s in
     { current with dc_plugin = Some l ;
                    dc_macros = Macros.add_list ["PTEST_PLUGIN", s] current.dc_macros }
@@ -1153,9 +1152,6 @@ let basic_command_string command =
     let opt_plugin = load_option "-load-plugin" command.deps.load_plugin in
     let opt_libs = load_option "-load-module" command.deps.load_libs in
     let opt_modules =  load_option "-load-module" command.deps.load_module in
-    Format.printf "XXXX PLUGIN= %s@. " opt_plugin;
-    Format.printf "XXXX LIBS= %s@. " opt_libs;
-    Format.printf "XXXX MODULE= %s@. " opt_modules;
     String.concat " " [opt_plugin; opt_libs; opt_modules]
   in
   let macros = (* set expanded macros that can be used into CMD directives *)
@@ -1163,7 +1159,6 @@ let basic_command_string command =
       "PTEST_OPT", Macros.expand ~file:command.file command.macros command.options;
       "PTEST_LOAD_OPTIONS", plugins_options;
     ] command.macros in
-  Format.printf "XXXX PTEST_LOAD_OPTIONS= %s@. " plugins_options;
   let toplevel =
     let in_toplevel,toplevel = Macros.does_expand ~file:command.file macros command.toplevel in
     if command.execnow || in_toplevel.has_ptest_opt then toplevel
