@@ -396,9 +396,14 @@ let is_same_pair f1 f2 (x1,x2) (y1,y2) env = f1 x1 y1 env && f2 x2 y2 env
 let rec is_same_list f l l' env =
   match l, l' with
   | [], [] -> true
-  | h::t, h'::t' ->
-    f h h' env && is_same_list f t t' env
+  | h::t, h'::t' -> f h h' env && is_same_list f t t' env
   | _ -> false
+
+let rec is_same_list_env f l l' env =
+  match l, l' with
+  | [], [] -> true, env
+  | h::t, h'::t' -> f h h' env &&& is_same_list_env f t t'
+  | _ -> false, env
 
 let get_original_kf vi =
   let selection = State_selection.of_list
@@ -1130,20 +1135,21 @@ and is_same_stmt s s' env =
 and is_same_block b b' env =
   let local_decls = List.filter (fun x -> not x.vdefined) b.blocals in
   let local_decls' = List.filter (fun x -> not x.vdefined) b'.blocals in
-  if is_same_list is_same_varinfo local_decls local_decls' env &&
-     is_same_list is_same_varinfo b.bstatics b'.bstatics env &&
+  if is_same_list is_same_varinfo b.bstatics b'.bstatics env &&
      Cil_datatype.Attributes.equal b.battrs b'.battrs
   then begin
-    let env = add_locals local_decls local_decls' env in
-    add_statics b.bstatics b'.bstatics;
-    let rec is_same_stmts l l' env =
-      match l, l' with
-      | [], [] -> `Same_body,env
-      | [], _ | _, [] -> `Body_changed, env
-      | s :: tl, s' :: tl' ->
-        is_same_stmt s s' env &&> (is_same_stmts tl tl')
-    in
-    is_same_stmts b.bstmts b'.bstmts env
+    let res, env = is_same_list_env varinfo_env local_decls local_decls' env in
+    if res then begin
+      add_statics b.bstatics b'.bstatics;
+      let rec is_same_stmts l l' env =
+        match l, l' with
+        | [], [] -> `Same_body,env
+        | [], _ | _, [] -> `Body_changed, env
+        | s :: tl, s' :: tl' ->
+          is_same_stmt s s' env &&> (is_same_stmts tl tl')
+      in
+      is_same_stmts b.bstmts b'.bstmts env
+    end else `Body_changed, env
   end else `Body_changed, env
 
 and is_same_binder b b' env =
@@ -1191,6 +1197,10 @@ and is_same_fundec f f' env: body_correspondance =
 and is_same_varinfo vi vi' env =
   is_same_type vi.vtype vi'.vtype env &&
   Cil_datatype.Attributes.equal vi.vattr vi'.vattr
+
+and varinfo_env vi vi' env =
+  if is_same_varinfo vi vi' env then true, add_locals [vi] [vi'] env
+  else false, env
 
 and is_same_logic_var lv lv' env =
   is_same_logic_type lv.lv_type lv'.lv_type env &&

@@ -62,3 +62,8 @@ extern void i(void);
 
 /*@ ensures succ(Zero) == Succ(Zero); */
 extern void i(void);
+
+void local_var_use(void) {
+  int x;
+  int y [sizeof(x)];
+}
