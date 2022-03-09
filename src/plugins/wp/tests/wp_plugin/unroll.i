@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-
+   DEPS: @WP_SESSION@/script/*
    OPT: -ulevel=1 -wp-prop=@ensures -wp-prover script @USING_WP_SESSION@
 */
 

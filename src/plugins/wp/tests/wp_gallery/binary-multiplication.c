@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-
+   DEPS: @WP_SESSION@/script/*
    OPT: -wp-rte -wp-prover=alt-ergo,script -wp-prop=-lack @USING_WP_SESSION@
 */
 
