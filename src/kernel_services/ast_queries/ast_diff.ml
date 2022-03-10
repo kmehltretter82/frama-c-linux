@@ -646,8 +646,21 @@ and is_matching_logic_var lv lv' env =
      | None ->
        (match Logic_var.find lv with
         | `Not_present -> false
-        | `Same lv'' -> Cil_datatype.Logic_var.equal lv' lv''))
+        | `Same lv'' -> Cil_datatype.Logic_var.equal lv' lv''
+        | exception Not_found ->
+          if lv.lv_name = "\\exit_status" && lv'.lv_name = "\\exit_status"
+          then begin Logic_var.add lv (`Same lv'); true end
+          else begin
+            match logic_var_correspondance lv env with
+            | None -> false
+            | Some lv'' -> Cil_datatype.Logic_var.equal lv' lv''
+          end))
   | _ -> false
+
+and logic_var_correspondance lv env =
+  match find_candidate_logic_var lv env with
+  | None -> None
+  | Some lv' -> Logic_var.add lv (`Same lv'); Some lv'
 
 and is_same_term_offset lo lo' env =
   match lo, lo' with
@@ -1211,6 +1224,16 @@ and logic_vars_env l l' env =
     true, add_logic_prms l l' env
   else
     false, env
+
+and find_candidate_logic_var ?loc:_loc lv env =
+  let candidates = Logic_env.find_all_logic_functions lv.lv_name in
+  match List.find_opt (fun li -> li.l_profile = []) candidates with
+  | None -> Format.printf "No such var@."; None
+  | Some li ->
+    Format.printf "Found something@.";
+    if is_same_logic_var lv li.l_var_info env then
+      Some li.l_var_info
+    else None
 
 (* because of overloading, we have to check for a corresponding profile,
    leading to potentially recursive calls to is_same_* functions. *)

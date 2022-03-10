@@ -46,6 +46,7 @@ int has_static_local(void) {
 
 int used_in_decl;
 
+/*@ exits \exit_status == 1; */
 int decl() {
   used_in_decl++;
   return used_in_decl;
