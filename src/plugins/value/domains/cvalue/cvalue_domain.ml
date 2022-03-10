@@ -456,7 +456,7 @@ module State = struct
           let default () = false
         end)
 
-    let register_global_state _ _ = Storage.set true
+    let register_global_state b _ = Storage.set b
     let register_initial_state callstack (state, _clob) =
       Db.Value.merge_initial_state callstack state
     let register_state_before_stmt callstack stmt (state, _clob) =
