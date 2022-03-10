@@ -55,6 +55,7 @@
 #include "netinet/in.h"
 #include "poll.h"
 #include "pthread.h"
+#include "pwd.c"
 #include "pwd.h"
 #include "setjmp.h"
 #include "signal.c"

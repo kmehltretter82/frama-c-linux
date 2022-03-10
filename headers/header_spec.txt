@@ -286,6 +286,7 @@ share/libc/netinet/tcp.h: CEA_LGPL
 share/libc/nl_types.h: CEA_LGPL
 share/libc/poll.h: CEA_LGPL
 share/libc/pthread.h: CEA_LGPL
+share/libc/pwd.c: CEA_LGPL
 share/libc/pwd.h: CEA_LGPL
 share/libc/regex.h: CEA_LGPL
 share/libc/resolv.h: CEA_LGPL

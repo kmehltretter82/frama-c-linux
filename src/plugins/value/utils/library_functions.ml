@@ -78,6 +78,8 @@ let unsupported_specifications =
     "getaddrinfo", "netdb.c";
     "getenv", "stdlib.c";
     "getline", "stdio.c";
+    "getpwnam_r", "pwd.c";
+    "getpwuid_r", "pwd.c";
     "glob", "glob.c";
     "globfree", "glob.c";
     "posix_memalign", "stdlib.c";
