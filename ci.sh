@@ -19,10 +19,17 @@ then plugins=("${all_plugins[@]}")
 else plugins=("$1")
 fi
 
-# prints "$2" if it is a branch name in remote $1, or master otherwise
+DEFAULT=${DEFAULT:-master}
+
+# prints
+# - "$2" if it is a branch name in remote $1,
+# - else "$DEFAULT" if it is set and $DEFAULT is a branch name in remote $1,
+# - else master
 get_matching_branch () {
-  if git ls-remote --quiet --exit-code "$1" "$2" >/dev/null 2>/dev/null;
+  if   git ls-remote --quiet --exit-code "$1" "$2" >/dev/null 2>/dev/null;
   then echo "$2"
+  elif git ls-remote --quiet --exit-code "$1" "$DEFAULT" >/dev/null 2>/dev/null;
+  then echo "$DEFAULT"
   else echo master
   fi
 }

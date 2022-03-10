@@ -5,11 +5,11 @@ stages:
   - make_public
 
 ################################################################################
-### VARIABLES (todo)
+### VARIABLES
 
-# variables:
+variables:
+     DEFAULT: "feature/bobot/jbuilder"
 #     CURRENT: $CI_COMMIT_REF_NAME
-#     DEFAULT: "master"
 #     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
 #     OCAML: "4_08"
 
