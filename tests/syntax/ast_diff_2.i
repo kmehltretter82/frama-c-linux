@@ -54,6 +54,8 @@ int decl() {
 
 extern void i(void);
 
+void (*ptr_func)(void) = &i;
+
 /*@ type nat = Zero | Succ(nat); */
 
 /*@ logic nat succ(nat n) = Succ(n); */

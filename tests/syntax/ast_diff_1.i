@@ -55,7 +55,11 @@ int decl() {
   return used_in_decl;
 }
 
+void (*ptr_func)(void);
+
 extern void i(void);
+
+void (*ptr_func)(void) = &i;
 
 /*@ type nat = Zero | Succ(nat); */
 

@@ -992,7 +992,7 @@ and is_same_lhost h h' env =
 
 and is_matching_varinfo vi vi' env =
   if vi.vglob then begin
-    match gvar_correspondance vi with
+    match gvar_correspondance vi env with
     | `Not_present -> false
     | `Same vi'' -> Cil_datatype.Varinfo.equal vi' vi''
   end else begin
@@ -1326,10 +1326,19 @@ and enuminfo_correspondance ?loc ei env =
 
 and enumitem_correspondance ?loc:_loc ei _env = Enumitem.find ei
 
-and gvar_correspondance ?loc vi =
+and gvar_correspondance ?loc vi env =
   let add vi =
     match find_candidate_varinfo ?loc vi Cil_types.VGlobal with
-    | None -> `Not_present
+    | None ->
+      begin
+        match gfun_correspondance ?loc vi env with
+        | `Same kf' -> `Same (Kf.get_vi kf')
+        | `Partial(kf',_) ->
+          (* a partial match at kf level is still the
+             identity for the underlying varinfo *)
+          `Same (Kf.get_vi kf')
+        | `Not_present -> `Not_present
+      end
     | Some vi' ->
       let selection = State_selection.singleton Globals.Vars.self in
       let init =
@@ -1519,7 +1528,7 @@ let global_correspondance g =
   | GEnumTag(ei,loc) | GEnumTagDecl(ei,loc) ->
     ignore (enuminfo_correspondance ~loc ei empty_env)
   | GVar(vi,_,loc) | GVarDecl(vi,loc) ->
-    ignore (gvar_correspondance ~loc vi)
+    ignore (gvar_correspondance ~loc vi empty_env)
   | GFunDecl(_,vi,loc) -> ignore (gfun_correspondance ~loc vi empty_env)
   | GFun(f,loc) -> ignore (gfun_correspondance ~loc f.svar empty_env)
   | GAnnot (g,_) -> gannot_correspondance g

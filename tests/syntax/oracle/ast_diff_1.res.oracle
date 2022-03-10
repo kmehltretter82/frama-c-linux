@@ -1,6 +1,7 @@
 [kernel] Parsing ast_diff_1.i (no preprocessing)
 [kernel] Parsing ast_diff_2.i (no preprocessing)
 [AST diff test] Showing correspondances between orig_default and default
+[AST diff test] Variable i:  => i
 [AST diff test] Variable local_var_use:  => local_var_use
 [AST diff test] Variable v:  => w
 [AST diff test] Variable a:  => q
@@ -19,7 +20,8 @@
 [AST diff test] Variable has_static_local:  => has_static_local
 [AST diff test] Variable decl:  => decl
 [AST diff test] Variable used_in_decl:  => used_in_decl
-[AST diff test] Variable i:  => i
+[AST diff test] Variable ptr_func:  => ptr_func
+[AST diff test] Function i:  => i
 [AST diff test] Function local_var_use:  => local_var_use
 [AST diff test] Function f:  => f
 [AST diff test] Function g: N/A
@@ -27,4 +29,3 @@
 [AST diff test] Function use_logic_builtin:  => use_logic_builtin
 [AST diff test] Function has_static_local:  => has_static_local
 [AST diff test] Function decl:  => decl
-[AST diff test] Function i:  => i
