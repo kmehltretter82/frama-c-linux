@@ -342,11 +342,11 @@ let inliner functions_to_inline = object (self)
          let kf = Globals.Functions.get f.svar in
          already_visited <- Cil_datatype.Kf.Set.add kf functions_to_inline; f)
 
-  method! vexpr _ = SkipChildren
-  method! vlval _ = SkipChildren
-  method! vtype _ = SkipChildren
-  method! vspec _ = SkipChildren
-  method! vcode_annot _ = SkipChildren
+  method! vexpr _ = Cil.SkipChildren
+  method! vlval _ = Cil.SkipChildren
+  method! vtype _ = Cil.SkipChildren
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren
 end
 
 let remove_local_statics = object

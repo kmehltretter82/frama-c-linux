@@ -144,12 +144,12 @@ let check_sequences file =
        | _ -> ());
       Cil.DoChildren
 
-    method! vinst _ = SkipChildren
-    method! vexpr _ = SkipChildren
-    method! vlval _ = SkipChildren
-    method! vtype _ = SkipChildren
-    method! vspec _ = SkipChildren
-    method! vcode_annot _ = SkipChildren
+    method! vinst _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
   in
   Cil.visitCilFileFunctions check_unspec file

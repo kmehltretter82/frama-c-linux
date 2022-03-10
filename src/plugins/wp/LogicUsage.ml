@@ -421,7 +421,7 @@ class visitor =
       | Dextended _
         -> SkipChildren
 
-    method! vfunc _ = SkipChildren
+    method! vfunc _ = Cil.SkipChildren
 
   end
 

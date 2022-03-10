@@ -1368,8 +1368,8 @@ class canDropStmtClass pRes = object
     else
     if !pRes then DoChildren else SkipChildren
 
-  method! vinst _ = SkipChildren
-  method! vexpr _ = SkipChildren
+  method! vinst _ = Cil.SkipChildren
+  method! vexpr _ = Cil.SkipChildren
 
 end
 let canDropStatement (s: stmt) : bool =
