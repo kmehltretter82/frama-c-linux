@@ -7,10 +7,13 @@
 [AST diff test] Variable a:  => q
 [AST diff test] Variable x:  => z
 [AST diff test] Variable y:  => t
+[AST diff test] Variable s:  => s
+[AST diff test] Variable use_s:  => use_s
 [AST diff test] Variable has_static_local_x:  => has_static_local_y
 [AST diff test] Variable X:  => X
 [AST diff test] Variable Y: N/A
 [AST diff test] Variable f:  => f
+[AST diff test] Variable __retres:  => __retres
 [AST diff test] Variable x:  => x
 [AST diff test] Variable g:  => g
 [AST diff test] Variable h:  => h
@@ -23,6 +26,7 @@
 [AST diff test] Variable ptr_func:  => ptr_func
 [AST diff test] Function i:  => i
 [AST diff test] Function local_var_use:  => local_var_use
+[AST diff test] Function use_s:  => use_s
 [AST diff test] Function f:  => f
 [AST diff test] Function g: N/A
 [AST diff test] Function h: -> h (body changed)

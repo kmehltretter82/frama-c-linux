@@ -352,12 +352,12 @@ let find_candidate_type ?loc:_loc ti =
 let find_candidate_compinfo ?loc:_loc ci =
   let su = if ci.cstruct then Logic_typing.Struct else Logic_typing.Union in
   if Globals.Types.mem_type su ci.cname then begin
-    match Globals.Types.global su ci.cname with
-    | GCompTag (ci,_) | GCompTagDecl(ci,_) -> Some ci
-    | g ->
+    match Globals.Types.find_type su ci.cname with
+    | TComp(ci', _) -> Some ci'
+    | t ->
       Kernel.fatal
-        "Expected aggregate definition instead of %a"
-        Cil_datatype.Global.pretty g
+        "Expected compinfo instead of %a"
+        Printer.pp_typ t
   end else None
 
 let find_candidate_enuminfo ?loc:_loc ei =

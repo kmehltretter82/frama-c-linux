@@ -67,3 +67,7 @@ void local_var_use(int w, int q[][w]) {
   int z;
   int t [sizeof(z)];
 }
+
+extern struct s s;
+
+struct s* use_s() { return &s; }
