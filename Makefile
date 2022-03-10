@@ -226,7 +226,7 @@ run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
 	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
 .PHONY: run-ptests.replay
-run-ptests.replay: ptests/ptests.exe
+run-ptests.replay: config.sed ptests/ptests.exe
 	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
 # Run tests of for all configurations (and build all dune files)
@@ -238,13 +238,13 @@ run-tests: run-ptests
 # Replay tests of for all configurations (requires  all dune files)
 .PHONY: test.replay
 tests.replay: FRAMAC_WP_CACHE=replay
-tests.replay:
+tests.replay: config.sed
 	dune build $(PTEST_ALIASES)
 
 # Update cache entries of for all configurations (requires all dune files)
 .PHONY: tests.update-wp-cache
 tests.update-wp-cache: FRAMAC_WP_CACHE=update
-tests.update-wp-cache:
+tests.update-wp-cache: config.sed
 	dune build $(PTEST_ALIASES)
 
 .PHONY: tests
