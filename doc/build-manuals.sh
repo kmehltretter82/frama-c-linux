@@ -63,8 +63,12 @@ build () {
         echo "######### $1 failed"
         exit 1
     fi
-    # extract extension, add suffix, re-append extension
-    MANUAL=${2%.*}-$3.${2##*.}
+    if [ "$NO_SUFFIX" == "yes" ] ; then
+        MANUAL=$2
+    else
+        # extract extension, add suffix, re-append extension
+        MANUAL=${2%.*}-$3.${2##*.}
+    fi
     cp -f $1 manuals/$MANUAL
     echo "##### $MANUAL copied"
 
@@ -112,7 +116,7 @@ else
 fi
 
 # Sanity check: version differences between Frama-C, ACSL and E-ACSL
-FAIL = 0
+FAIL=0
 if [ "$ACSL_SUFFIX" != "$EACSL_SUFFIX" ]; then
     echo "WARNING: different versions for ACSL and E-ACSL manuals: $ACSL_SUFFIX versus $EACSL_SUFFIX"
     FAIL=1
