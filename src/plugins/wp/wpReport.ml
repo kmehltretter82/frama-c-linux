@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -371,7 +371,7 @@ let add_goal (gs:fcstat) wpo =
     let ds : dstats = get_section gs section in
     let status,prop = Wpo.get_proof wpo in
     let ps : pstats = get_property ds prop in
-    add_results status [gs.global ; ds.dstats ; ps] wpo ;
+    add_results ~status [gs.global ; ds.dstats ; ps] wpo ;
     let ok = (status = `Passed) in
     add_cover gs.gcoverage ok prop ;
     add_cover ds.dcoverage ok prop ;
@@ -553,10 +553,10 @@ let number ~config fmt k =
   else Format.pp_print_int fmt k
 
 let properties ~config fmt (s:coverage) = function
-  | "" -> percent config fmt (Property.Set.cardinal s.proved) (Property.Set.cardinal s.covered)
-  | "total" -> number config fmt (Property.Set.cardinal s.covered)
-  | "valid" -> number config fmt (Property.Set.cardinal s.proved)
-  | "failed" -> number config fmt (Property.Set.cardinal s.covered - Property.Set.cardinal s.proved)
+  | "" -> percent ~config fmt (Property.Set.cardinal s.proved) (Property.Set.cardinal s.covered)
+  | "total" -> number ~config fmt (Property.Set.cardinal s.covered)
+  | "valid" -> number ~config fmt (Property.Set.cardinal s.proved)
+  | "failed" -> number ~config fmt (Property.Set.cardinal s.covered - Property.Set.cardinal s.proved)
   | _ -> raise Exit
 
 
@@ -576,10 +576,10 @@ let is_stat_name = function
 
 
 let stat ~config fmt s = function
-  | "success" -> percent config fmt s.valid s.total
-  | "total" -> number config fmt s.total
-  | "valid" | "" -> number config fmt s.valid
-  | "failed" -> number config fmt (s.unsuccess + s.inconclusive)
+  | "success" -> percent ~config fmt s.valid s.total
+  | "total" -> number ~config fmt s.total
+  | "valid" | "" -> number ~config fmt s.valid
+  | "failed" -> number ~config fmt (s.unsuccess + s.inconclusive)
   | "status" ->
     let msg =
       if s.inconclusive > 0 then config.status_inconclusive else
@@ -587,8 +587,8 @@ let stat ~config fmt s = function
       if s.valid >= s.total then config.status_passed else
         config.status_untried
     in Format.pp_print_string fmt msg
-  | "inconclusive" -> number config fmt s.inconclusive
-  | "unsuccess" -> number config fmt s.unsuccess
+  | "inconclusive" -> number ~config fmt s.inconclusive
+  | "unsuccess" -> number ~config fmt s.unsuccess
   | "time" ->
     if s.time > 0.0 then
       Rformat.pp_time_range ladder fmt s.time
@@ -623,7 +623,7 @@ let pcstats ~config fmt (s,c) cmd arg =
 
 let env_toplevel ~config gstat fmt cmd arg =
   try
-    pcstats config fmt (gstat.global, gstat.gcoverage) cmd arg
+    pcstats ~config fmt (gstat.global, gstat.gcoverage) cmd arg
   with Exit ->
     if arg=""
     then Wp_parameters.error ~once:true "Unknown toplevel-format '%%%s'" cmd
@@ -660,7 +660,7 @@ let env_section ~config ~name sstat fmt cmd arg =
         | Fun kf -> config.function_prefix, ( Kernel_function.get_name kf)
       in Format.fprintf fmt "%s%s" prefix name
     | _ ->
-      pcstats config fmt (ds.dstats, ds.dcoverage) cmd arg
+      pcstats ~config fmt (ds.dstats, ds.dcoverage) cmd arg
   with Exit ->
     if arg=""
     then Wp_parameters.error ~once:true "Unknown section-format '%%%s'" cmd
@@ -692,7 +692,7 @@ let env_property ~config ~name pstat fmt cmd arg =
     | "property" ->
       Description.pp_local fmt p
     | _ ->
-      pstats config fmt stat cmd arg
+      pstats ~config fmt stat cmd arg
   with Exit ->
     if arg=""
     then Wp_parameters.error ~once:true "Unknown property-format '%%%s'" cmd

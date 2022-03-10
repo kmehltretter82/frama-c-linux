@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -251,7 +251,7 @@ let inliner functions_to_inline = object (self)
               r.vdefined <- false;
               Cil.update_var_type
                 r (Cil.typeRemoveAttributes ["const"] r.vtype);
-              false, None, (Cil.mkAddrOf loc (Cil.var r)) :: args
+              false, None, (Cil.mkAddrOf ~loc (Cil.var r)) :: args
             | Some _, _ ->
               Kernel.fatal "Attempt to initialize an inexistent varinfo"
           in
@@ -342,6 +342,11 @@ let inliner functions_to_inline = object (self)
          let kf = Globals.Functions.get f.svar in
          already_visited <- Cil_datatype.Kf.Set.add kf functions_to_inline; f)
 
+  method! vexpr _ = SkipChildren
+  method! vlval _ = SkipChildren
+  method! vtype _ = SkipChildren
+  method! vspec _ = SkipChildren
+  method! vcode_annot _ = SkipChildren
 end
 
 let remove_local_statics = object
@@ -379,7 +384,7 @@ end
 let inline_calls ast =
   if not (InlineCalls.is_empty ()) then begin
     let functions = InlineCalls.get() in
-    Visitor.visitFramacFileSameGlobals (inliner functions) ast;
+    Visitor.visitFramacFileFunctions (inliner functions) ast;
     Cil_datatype.Kf.Set.iter
       (fun kf -> ignore (Visitor.visitFramacKf remove_local_statics kf))
       functions;

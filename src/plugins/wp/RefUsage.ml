@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -205,7 +205,7 @@ let shift (m:model) (k:value) =
   | Val_var x -> Val_shift(x,k)
   | Val_comp(x,e) -> share ~old:e (fun k -> Val_comp(x,k)) (E.cup e k)
   | Val_shift(x,e) -> share ~old:e (fun k -> Val_shift(x,k)) (E.cup e k)
-  | E old -> share_vcup m old k
+  | E old -> share_vcup m ~old k
 
 let field = function
   | Val_var x -> Val_comp(x,E.bot)

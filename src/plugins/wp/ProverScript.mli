@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -53,4 +53,4 @@ val search :
   unit
 
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
-val save : Wpo.t -> unit
+val save : stdout:bool -> Wpo.t -> unit

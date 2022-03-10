@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -145,7 +145,7 @@ let impact_highlighter buffer loc ~start ~stop =
   if Enabled.get () then
     let buffer = buffer#buffer in
     let tag name color =
-      let t = make_tag buffer name [`BACKGROUND color ] in
+      let t = make_tag buffer ~name [`BACKGROUND color ] in
       apply_tag buffer t start stop
     in
     let hilight kf s =

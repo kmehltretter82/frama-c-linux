@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -293,7 +293,7 @@ let mem_builtin_type ~name =
   try ignore (find_builtin name) ; true
   with Not_found -> false
 
-let is_builtin lt = mem_builtin_type lt.lt_name
+let is_builtin lt = mem_builtin_type ~name:lt.lt_name
 
 let is_builtin_type ~name = function
   | Data(Mtype m,_) ->

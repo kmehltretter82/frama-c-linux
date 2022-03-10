@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -34,7 +34,7 @@ import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
 import * as PivotState from 'frama-c/plugins/pivot/api/general';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
-import 'react-pivottable/pivottable.css';
+import 'frama-c/kernel/PivotTable-style.css';
 
 // --------------------------------------------------------------------------
 // --- Pivot Table for Properties

@@ -43,7 +43,7 @@ G:;
   /*@ assert
       \exists integer u; 9 <= u < 21 &&
       \forall integer v; -5 < v <= (u < 15 ? u + 6 : 3) ==>
-        \at(n + u + v > 0, K); */
+        \at(n + u + v, K) > 0; */
   ;
 
   // Function calls:

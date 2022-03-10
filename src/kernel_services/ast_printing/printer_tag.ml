@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -700,7 +700,7 @@ struct
            (Property.ip_of_behavior
               (Option.get self#current_kf)
               self#current_kinstr
-              active_behaviors b))
+              ~active:active_behaviors b))
         super#behavior b
 
     method! decreases fmt t =
@@ -723,7 +723,7 @@ struct
            (Property.ip_of_complete
               (Option.get self#current_kf)
               self#current_kinstr
-              active_behaviors
+              ~active:active_behaviors
               t))
         super#complete_behaviors t
 
@@ -733,7 +733,7 @@ struct
            (Property.ip_of_disjoint
               (Option.get self#current_kf)
               self#current_kinstr
-              active_behaviors
+              ~active:active_behaviors
               t))
         super#disjoint_behaviors t
 

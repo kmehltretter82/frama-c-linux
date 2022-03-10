@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -79,15 +79,8 @@ export default function SourceCode(): JSX.Element {
   const line = sloc ? sloc.line : 0;
   const filename = Path.parse(file).base;
 
-  // Title bar buttons, along with the parameters for our text.
-  const { buttons: themeButtons, theme, fontSize, wrapText } =
-    Preferences.useThemeButtons({
-      target: 'Source Code',
-      theme: Preferences.SourceTheme,
-      fontSize: Preferences.SourceFontSize,
-      wrapText: Preferences.AstWrapText,
-      disabled: !theFunction,
-    });
+  // Global Font Size
+  const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
 
   // Updating the buffer content.
   const text = React.useMemo(async () => {
@@ -196,16 +189,13 @@ export default function SourceCode(): JSX.Element {
           onClick={launchEditor}
           title={externalEditorTitle}
         />
-        <Code title={file} style={{ padding: '5px' }}>{filename}</Code>
+        <Code title={file}>{filename}</Code>
         <Hfill />
-        {themeButtons}
       </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
-        theme={theme}
         fontSize={fontSize}
-        lineWrapping={wrapText}
         selection={theMarker}
         lineNumbers={!!theFunction}
         styleActiveLine={!!theFunction}

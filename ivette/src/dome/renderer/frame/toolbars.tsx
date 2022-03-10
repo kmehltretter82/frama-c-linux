@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -146,6 +146,39 @@ export function Button<A = undefined>(props: ButtonProps<A>) {
       {props.icon && <SVG id={props.icon} />}
       {props.label && <label>{props.label}</label>}
     </button>
+  );
+}
+
+export interface SwitchProps {
+  /** Switch tooltip. */
+  title?: string;
+  /** Additional class. */
+  className?: string;
+  /** Additional style. */
+  style?: React.CSSProperties;
+  /** Defaults to `true`. */
+  enabled?: boolean;
+  /** Defaults to `false`. */
+  disabled?: boolean;
+  /** Switch position. Defaults to 'left'. */
+  position?: 'left' | 'right';
+  /** Click callback. */
+  onChange?: (newPosition: 'left' | 'right') => void;
+}
+
+/** Toolbar Left/Right Switch. */
+export function Switch(props: SwitchProps) {
+  const { position, onChange } = props;
+  const checked = position === 'right';
+  const { title, className, style } = props;
+  const { enabled = true, disabled = false } = props;
+  const callback = onChange && (() => onChange(checked ? 'left' : 'right'));
+  if (disabled || !enabled) return null;
+  return (
+    <label className={classes('dome-xSwitch', className)} style={style}>
+      <input type={'checkbox'} checked={checked} onChange={callback} />
+      <span className={'dome-xSwitch-slider'} title={title} />
+    </label >
   );
 }
 

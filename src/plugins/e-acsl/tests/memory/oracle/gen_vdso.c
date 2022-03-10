@@ -52,14 +52,15 @@ time_t __gen_e_acsl_time(time_t *timer);
  */
 time_t __gen_e_acsl_time(time_t *timer)
 {
-  time_t *__gen_e_acsl_at;
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  time_t *__gen_e_acsl_at;
   time_t __retres;
   __e_acsl_store_block((void *)(& __retres),(size_t)8);
   {
     int __gen_e_acsl_assumes_value;
     int __gen_e_acsl_active_bhvrs;
     __e_acsl_store_block((void *)(& timer),(size_t)8);
+    __gen_e_acsl_at = timer;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
                                            timer == (time_t *)0);
@@ -122,7 +123,6 @@ time_t __gen_e_acsl_time(time_t *timer)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
   }
-  __gen_e_acsl_at = timer;
   __retres = time(timer);
   {
     int __gen_e_acsl_assumes_value_2;

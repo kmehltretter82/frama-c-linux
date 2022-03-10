@@ -24,6 +24,8 @@
 Plugin WP <next-release>
 ########################
 
+- WP          [2022-02-28] New option -wp-fct-timeout, used to customize the
+                           provers timeout per function
 - WP          [2022-02-02] New option -wp-smoke-dead-local-init, smoke tests on
                            local variables initialization
 - WP          [2022-01-25] Removed deprecated "native:coq" prover

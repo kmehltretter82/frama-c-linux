@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -93,7 +93,7 @@ class propagate project fnames ~cast_intro = object(self)
       else
         oldt, newt
     in
-    let exp = Cil.mkCastT oldt newt e in
+    let exp = Cil.mkCastT ~oldt ~newt e in
     if cast_intro then
       exp
     else match exp.enode with
@@ -274,7 +274,9 @@ class propagate project fnames ~cast_intro = object(self)
                    they will disappear when the l-value is dereferenced. *)
                 match self#propagated exp_mem ~ignore_const_cast:true with
                 | Some exp_mem' ->
-                  let lv = Cil.new_exp expr.eloc (Lval (Cil.mkMem exp_mem' off)) in
+                  let lv =
+                    Cil.new_exp ~loc:expr.eloc (Lval (Cil.mkMem ~addr:exp_mem' ~off))
+                  in
                   Cil.ChangeDoChildrenPost (lv, fun x -> x)
                 | None -> Cil.DoChildren
               end
@@ -317,9 +319,9 @@ class propagate project fnames ~cast_intro = object(self)
     Cil.DoChildrenPost add_decls
 
   method! vlval lv =
-    let simplify (host,offs as lv) = match host with
-      | Mem e -> Cil.mkMem e offs (* canonize in case the propagation
-                                     simplified [lv] *)
+    let simplify (host,off as lv) = match host with
+      | Mem e -> Cil.mkMem ~addr:e ~off (* canonize in case the propagation
+                                           simplified [lv] *)
       | Var _ -> lv
     in
     Cil.ChangeDoChildrenPost(lv, simplify)
@@ -356,7 +358,7 @@ let journalized_get =
          let fresh_project =
            FC_file.create_project_from_visitor
              (PropagationParameters.Project_name.get ())
-             (fun prj -> new propagate prj fnames cast_intro)
+             (fun prj -> new propagate prj fnames ~cast_intro)
          in
          let ctx = Parameter_state.get_selection_context () in
          let ctx = State_selection.diff ctx selection_command_line_option in
@@ -382,7 +384,7 @@ let compute () =
   PropagationParameters.feedback "beginning constant propagation";
   let fnames = PropagationParameters.SemanticConstFold.get () in
   let cast_intro = PropagationParameters.CastIntro.get () in
-  let propagated = get fnames cast_intro in
+  let propagated = get fnames ~cast_intro in
   if PropagationParameters.SemanticConstFolding.get () then
     FC_file.pretty_ast ~prj:propagated ();
   let project_name = Project.get_unique_name propagated in

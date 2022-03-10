@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -34,6 +34,8 @@ import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
+import { Hbox, Hfill } from 'dome/layout/boxes';
+import { IconButton, IconButtonProps } from 'dome/controls/buttons';
 
 import './style.css';
 
@@ -70,12 +72,12 @@ export function SideBar(props: SideBarProps): JSX.Element {
 export type BadgeElt = undefined | null | string | number | React.ReactNode;
 export type Badges = BadgeElt | BadgeElt[];
 
-const makeBadgeElt = (elt: BadgeElt): React.ReactNode => {
+const makeBadgeElt = (elt: BadgeElt, index: number): React.ReactNode => {
   if (elt === undefined || elt === null) return null;
   switch (typeof (elt)) {
     case 'number':
     case 'string':
-      return <Badge value={elt} />;
+      return <Badge value={elt} key={`item#${index}`} />;
     default:
       return elt;
   }
@@ -84,26 +86,8 @@ const makeBadgeElt = (elt: BadgeElt): React.ReactNode => {
 const makeBadge = (elt: Badges): React.ReactNode => {
   if (Array.isArray(elt))
     return elt.map(makeBadgeElt);
-  return makeBadgeElt(elt);
+  return makeBadgeElt(elt, 0);
 };
-
-// --------------------------------------------------------------------------
-// --- SideBar Section Hide/Show Button
-// --------------------------------------------------------------------------
-
-interface HideShowProps {
-  onClick: () => void;
-  visible: boolean;
-}
-
-const HideShow = (props: HideShowProps): JSX.Element => (
-  <label
-    className="dome-xSideBarSection-hideshow dome-text-label"
-    onClick={props.onClick}
-  >
-    {props.visible ? 'Hide' : 'Show'}
-  </label>
-);
 
 // --------------------------------------------------------------------------
 // --- SideBar Section
@@ -126,10 +110,12 @@ export interface SectionProps {
   disabled?: boolean;
   /** Badge summary (only visible when folded). */
   summary?: Badges;
-  /** Right-click callback. */
-  onContextMenu?: () => void;
+  /** Additional controls, (only visible when unfolded). */
+  rightButtonProps?: IconButtonProps;
   /** Section contents. */
   children?: React.ReactNode;
+  /** Additionnal CSS class. */
+  className?: string;
 }
 
 /**
@@ -143,32 +129,34 @@ export interface SectionProps {
    Sections with no items are not displayed.
 */
 export function Section(props: SectionProps): JSX.Element | null {
-
-  const [state, flipState] = useFlipSettings(
-    props.settings,
-    props.defaultUnfold,
-  );
+  const { settings, defaultUnfold, unfold } = props;
+  const [state, flipState] = useFlipSettings(settings, defaultUnfold);
+  const icon = state ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
 
   const { enabled = true, disabled = false, children } = props;
-  if (disabled || !enabled || React.Children.count(children) === 0)
-    return null;
-  const { unfold, label } = props;
-  const foldable = unfold === undefined;
+  if (disabled || !enabled || React.Children.count(children) === 0) return null;
+
   const visible = unfold ?? state;
   const maxHeight = visible ? 'max-content' : 0;
+  const { rightButtonProps: iconProps } = props;
+  const className = `dome-xSideBarSection-filterButton ${iconProps?.className}`;
+  const rightButton =
+    iconProps ? <IconButton {...iconProps} className={className}/> : undefined;
 
   return (
-    <div className="dome-xSideBarSection">
-      <div
-        className="dome-xSideBarSection-title dome-color-frame"
-        title={props.title}
-        onContextMenu={props.onContextMenu}
-      >
-        <Label label={label} />
-        {!visible && makeBadge(props.summary)}
-        {foldable && <HideShow visible={visible} onClick={flipState} />}
-      </div>
-      <div className="dome-xSideBarSection-content" style={{ maxHeight }}>
+    <div className={`dome-xSideBarSection ${props.className}`}>
+      <Hbox>
+        <Label
+          className='dome-xSideBarSection-title dome-color-frame'
+          title={props.title}
+          label={props.label}
+          icon={icon}
+          onClick={flipState}
+        />
+        <Hfill />
+        {visible ? rightButton : makeBadge(props.summary)}
+      </Hbox>
+      <div className='dome-xSideBarSection-content' style={{ maxHeight }}>
         {children}
       </div>
     </div>

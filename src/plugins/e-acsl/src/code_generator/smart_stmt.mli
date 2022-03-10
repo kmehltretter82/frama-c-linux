@@ -109,14 +109,6 @@ val mark_readonly: varinfo -> stmt
 (** Same as [store_stmt] for [__e_acsl_markreadonly] that observes the
     read-onlyness of the given varinfo. *)
 
-type annotation_kind =
-  | Assertion
-  | Precondition
-  | Postcondition
-  | Invariant
-  | Variant
-  | RTE
-
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

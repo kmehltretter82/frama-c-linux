@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -229,7 +229,7 @@ module MarkPair = struct
   *)
   let combine ma mb =
     let combine_m ma mb =
-      let is_new, mr = Mark.combine ma mb in
+      let is_new, mr = Mark.combine ~old:ma mb in
       let m_to_prop = if is_new then mr else Mark.bottom in
       mr, m_to_prop
     in

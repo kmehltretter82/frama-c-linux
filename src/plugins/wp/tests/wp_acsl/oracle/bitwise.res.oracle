@@ -65,8 +65,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition for 'bit5' 'band7,zbit' in 'band':
-Assume { Type: is_sint32(a). (* Goal *) When: land(4095, a) = 85. }
-Prove: land(65535, a) != 21845.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -218,7 +217,97 @@ Prove: b != a.
   Function cast_uchar
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise.i, line 128) in 'cast_uchar':
+Goal Post-condition (file bitwise.i, line 131) in 'cast_uchar':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_test,ok' (file bitwise.i, line 134):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_test1,ok' (file bitwise.i, line 135):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_unset,ok' (file bitwise.i, line 136):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_set_unset,ok' (file bitwise.i, line 137):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_set_unset2,ok' (file bitwise.i, line 138):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_defined,ok' (file bitwise.i, line 140):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_defined2,ok' (file bitwise.i, line 141):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed_positive,ok' (file bitwise.i, line 143):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed_positive2,ok' (file bitwise.i, line 144):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed_negative,ok' (file bitwise.i, line 145):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed_negative2,ok' (file bitwise.i, line 146):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed,ok' (file bitwise.i, line 147):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_to_signed2,ok' (file bitwise.i, line 148):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsl_lowest,ok' (file bitwise.i, line 150):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsl_higher_set,ok' (file bitwise.i, line 151):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsl_higher_unset,ok' (file bitwise.i, line 152):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsr_set,ok' (file bitwise.i, line 154):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'bit_lsr_unset,ok' (file bitwise.i, line 155):
 Prove: true.
 
 ------------------------------------------------------------

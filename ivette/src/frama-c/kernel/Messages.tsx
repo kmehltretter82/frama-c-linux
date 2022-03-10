@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -424,17 +424,24 @@ export default function RenderMessages() {
   const [filter] = filterState;
   const [selection, updateSelection] = States.useSelection();
   const selectedFct = selection?.current?.fct;
-  const [message, setMessage] = React.useState('');
+  const [selectedMsg, selectMsg] = React.useState<Message|undefined>(undefined);
+  const [text, setText] = React.useState('');
+
+  React.useEffect(() => {
+    if (selectedFct !== selectedMsg?.fct)
+      selectMsg(undefined);
+  }, [selectedFct, selectedMsg?.fct]);
 
   React.useEffect(() => {
     model.setFilter((msg: Message) => filterMessage(filter, selectedFct, msg));
   }, [model, filter, selectedFct]);
 
   const onMessageSelection = React.useCallback(
-    ({ fct, marker, message: msg }: Message) => {
-      setMessage(msg);
-      if (fct && marker) {
-        const location = { fct, marker };
+    (msg: Message) => {
+      selectMsg(msg);
+      setText(msg.message);
+      if (msg.fct && msg.marker) {
+        const location = { fct:msg.fct, marker:msg.marker };
         updateSelection({ location });
       }
     }, [updateSelection],
@@ -448,11 +455,11 @@ export default function RenderMessages() {
       <IconButton
         icon="CROSS"
         title="Close"
-        onClick={() => setMessage('')}
+        onClick={() => setText('')}
         style={{ margin: '0 auto' }}
       />
       <Scroll>
-        <Page className="message-page"> {message} </Page>
+        <Page className="message-page"> {text} </Page>
       </Scroll>
     </Vbox>
   );
@@ -476,11 +483,12 @@ export default function RenderMessages() {
         <BSplit
           settings="ivette.messages.messageSplit"
           defaultPosition={90}
-          unfold={message !== ''}
+          unfold={text !== ''}
         >
           <Table<string, Message>
             model={model}
             sorting={model}
+            selection={selectedMsg?.key}
             onSelection={onMessageSelection}
             settings="ivette.messages.table"
           >

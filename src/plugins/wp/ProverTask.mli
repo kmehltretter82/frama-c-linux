@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -54,8 +54,6 @@ val p_until_space : string (** No space group pattern "\\([^ \t\n]*\\)" *)
 
 val location : string -> int -> Lexing.position
 
-val timeout : smoke:bool -> int option -> int
-val stepout : int option -> int
 type logs = [ `OUT | `ERR | `BOTH ]
 
 class virtual command : string ->

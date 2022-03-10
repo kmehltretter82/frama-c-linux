@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -35,6 +35,7 @@ import * as Sidebar from 'dome/frame/sidebars';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
+import * as IvettePrefs from 'ivette/prefs';
 import './loader';
 
 // --------------------------------------------------------------------------
@@ -50,7 +51,6 @@ export default function Application(): JSX.Element {
   const onSelectedHints = (): void => {
     if (hints.length === 1) Extensions.onSearchHint(hints[0]);
   };
-
   return (
     <Vfill>
       <Toolbar.ToolBar>
@@ -70,6 +70,8 @@ export default function Application(): JSX.Element {
           onHint={Extensions.onSearchHint}
           onSelect={onSelectedHints}
         />
+        <IvettePrefs.ThemeSwitchTool />
+        <IvettePrefs.FontTools />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"

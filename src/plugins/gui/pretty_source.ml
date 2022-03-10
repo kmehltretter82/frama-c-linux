@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -385,7 +385,7 @@ let display_source globals
              ~callback:(fun _ -> call_cc next_10)
              ()) ca *)
        end;
-       source#place_cursor source#start_iter;
+       source#place_cursor ~where:source#start_iter;
        let last_shown_area =
          Gtk_helper.make_tag source ~name:"last_shown_area"
            [`BACKGROUND "light green"]

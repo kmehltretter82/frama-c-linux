@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -145,9 +145,12 @@ let is_positive t =
 (* integration with qed should be improved! *)
 let rec is_positive_or_null e = match F.repr e with
   | Logic.Fun( f , [e] ) when Fun.equal f f_lnot -> is_negative e
-  | Logic.Fun( f , es ) when Fun.equal f f_land  -> List.exists is_positive_or_null es
-  | Logic.Fun( f , es ) when Fun.equal f f_lor   -> List.for_all is_positive_or_null es
-  | Logic.Fun( f , es ) when Fun.equal f f_lxor  -> (match mul_xor_sign es with | Some b -> b | _ -> false)
+  | Logic.Fun( f , es ) when Fun.equal f f_land  ->
+    List.exists is_positive_or_null es
+  | Logic.Fun( f , es ) when Fun.equal f f_lor   ->
+    List.for_all is_positive_or_null es
+  | Logic.Fun( f , es ) when Fun.equal f f_lxor  ->
+    (match mul_xor_sign es with | Some b -> b | _ -> false)
   | Logic.Fun( f , es ) when Fun.equal f f_lsr || Fun.equal f f_lsl
     -> List.for_all is_positive_or_null es
   | _ -> (* try some improvement first then ask to qed *)
@@ -166,13 +169,15 @@ and is_negative e = match F.repr e with
   | Logic.Fun( f , [e] ) when Fun.equal f f_lnot -> is_positive_or_null e
   | Logic.Fun( f , es ) when Fun.equal f f_lor   -> List.exists is_negative es
   | Logic.Fun( f , es ) when Fun.equal f f_land  -> List.for_all is_negative es
-  | Logic.Fun( f , es ) when Fun.equal f f_lxor  -> (match mul_xor_sign es with | Some b -> (not b) | _ -> false)
+  | Logic.Fun( f , es ) when Fun.equal f f_lxor  ->
+    (match mul_xor_sign es with | Some b -> (not b) | _ -> false)
   | Logic.Fun( f , [k;n] ) when Fun.equal f f_lsr || Fun.equal f f_lsl
     -> is_positive_or_null n && is_negative k
   | _ -> (* try some improvement first then ask to qed *)
     let improved_is_negative e = match F.repr e with
       | Logic.Add es -> List.for_all is_negative es
-      | Logic.Mul es -> (match mul_xor_sign es with | Some b -> (not b) | _ -> false)
+      | Logic.Mul es ->
+        (match mul_xor_sign es with | Some b -> (not b) | _ -> false)
       | _ -> false
     in if improved_is_negative e then true
     else match F.is_true (F.e_lt e e_zero) with
@@ -189,36 +194,24 @@ let match_positive_or_null e =
   if not (is_positive_or_null e) then raise Not_found;
   e
 
+let match_log2 x =
+  (* undefined for 0 and negative values *)
+  Integer.of_int (try Z.log2 x with _ -> raise Not_found)
+
 let match_power2, match_power2_minus1 =
-  let highest_bit_number =
-    let hsb p = if p land 2 = 0 then 0 else 1
-    in let hsb p = let n = p lsr 2 in if n = 0 then hsb p else 2 + hsb n
-    in let hsb p = let n = p lsr 4 in if n = 0 then hsb p else 4 + hsb n
-    in let hsb = Array.init 256 hsb
-    in let hsb p = let n = p lsr 8 in if n = 0 then hsb.(p) else 8 + hsb.(n)
-    in let hsb p =
-         let n = Integer.shift_right p Integer.sixteen in
-         Integer.of_int (if Integer.is_zero n
-                         then hsb (Integer.to_int_exn p)
-                         else 16 + hsb (Integer.to_int_exn n))
-    in let rec hsb_aux p =
-         let n = Integer.shift_right p Integer.thirtytwo in
-         if Integer.is_zero n then hsb p
-         else Integer.add Integer.thirtytwo (hsb_aux n)
-    in hsb_aux
-  in let is_power2 k = (* exists n such that k == 2**n? *)
-       (Integer.gt k Integer.zero) &&
-       (Integer.equal k (Integer.logand k (Integer.neg k)))
+  let is_power2 k = (* exists n such that k == 2**n? *)
+    (Integer.gt k Integer.zero) &&
+    (Integer.equal k (Integer.logand k (Integer.neg k)))
   in let rec match_power2 e = match F.repr e with
       | Logic.Kint z
-        when is_power2 z -> e_zint (highest_bit_number z)
+        when is_power2 z -> e_zint (match_log2 z)
       | Logic.Fun( f , [n;k] )
         when Fun.equal f f_lsl && is_positive_or_null k ->
         e_add k (match_power2 n)
       | _ -> raise Not_found
   in let match_power2_minus1 e = match F.repr e with
       | Logic.Kint z when is_power2 (Integer.succ z) ->
-        e_zint (highest_bit_number (Integer.succ z))
+        e_zint (match_log2 (Integer.succ z))
       | _ -> match_power2 (e_add e_one e)
   in match_power2, match_power2_minus1
 
@@ -273,7 +266,8 @@ let match_integer_extraction = match_list_head match_integer
 
 let match_power2_extraction = match_list_extraction match_power2
 let match_power2_minus1_extraction = match_list_extraction match_power2_minus1
-let match_binop_one_extraction binop = match_list_extraction (match_binop_one_arg1 binop)
+let match_binop_one_extraction binop =
+  match_list_extraction (match_binop_one_arg1 binop)
 
 
 (* -------------------------------------------------------------------------- *)
@@ -511,7 +505,7 @@ let bitk_positive k e = F.e_fun ~result:Logic.Bool f_bit_positive [e;k]
 let smp_mk_bit_stdlib = function
   | [ a ; k ] when is_positive_or_null k ->
     (* No need to expand the logic definition of the ACSL stdlib symbol when
-       [k] is positive (the definition must comply with that simplification). *)
+       [k] is positive (the definition must comply with the simplification) *)
     bitk_positive k a
   | [ a ; k ] ->
     (* TODO: expand the current logic definition of the ACSL stdlib symbol *)
@@ -525,13 +519,15 @@ let smp_bitk_positive = function
       with Not_found ->
       match F.repr a with
       | Logic.Kint za ->
-        let zk = match_integer k (* simplifies constants *)
+        let zk = match_positive_or_null_integer k (* simplifies constants *)
         in if Integer.is_zero (Integer.logand za
                                  (Integer.shift_left Integer.one zk))
         then e_false else e_true
-      | Logic.Fun( f , [e;n] ) when Fun.equal f f_lsr && is_positive_or_null n ->
+      | Logic.Fun( f , [e;n] ) when Fun.equal f f_lsr
+                                 && is_positive_or_null n ->
         bitk_positive (e_add k n) e
-      | Logic.Fun( f , [e;n] ) when Fun.equal f f_lsl && is_positive_or_null n ->
+      | Logic.Fun( f , [e;n] ) when Fun.equal f f_lsl
+                                 && is_positive_or_null n ->
         begin match is_leq n k with
           | Logic.Yes -> bitk_positive (e_sub k n) e
           | Logic.No  -> e_false
@@ -596,7 +592,8 @@ let smp_land es =
     with Not_found -> r
   with Not_found -> introduction_bit_test_positive_from_land es
 
-let smp_shift zf = (* f(e1,0)~>e1, c2>0==>f(c1,c2)~>zf(c1,c2), c2>0==>f(0,c2)~>0 *)
+let smp_shift zf =
+  (* f(e1,0)~>e1, c2>0==>f(c1,c2)~>zf(c1,c2), c2>0==>f(0,c2)~>0 *)
   function
   | [e1;e2] -> begin match (F.repr e1), (F.repr e2) with
       | _, Logic.Kint c2 when Z.equal c2 Z.zero -> e1
@@ -624,7 +621,8 @@ let smp_lnot = function
 (* -------------------------------------------------------------------------- *)
 
 let smp_leq_improved f a b =
-  ignore (match_fun f b) ; (* It must be an improved of [is_positive_or_null f(args)] *)
+  ignore (match_fun f b) ;
+  (* It must be an improved of [is_positive_or_null f(args)] *)
   (* a <= 0 && 0 <= f(args) *)
   if F.decide (F.e_leq a F.e_zero) && is_positive_or_null b
   then e_true
@@ -660,7 +658,8 @@ let smp_eq_with_land a b =
     (* k>=0 & b1>=0 ==> (b1 & ((1 << k) -1) == b1 % (1 << k)  <==> true) *)
     let b1,b2 = match_mod b in
     let k = match_power2 b2 in
-    (* note: a positive or null k is required by match_power2, match_power2_minus1 *)
+    (* note: a positive or null k is required
+       by match_power2, match_power2_minus1 *)
     let k',_,es = match_power2_minus1_extraction es in
     if not ((is_positive_or_null b1) &&
             (F.decide (F.e_eq k k')) &&
@@ -668,7 +667,8 @@ let smp_eq_with_land a b =
     then raise Not_found ;
     F.e_true
   with Not_found ->
-    (* k in {8,16,32,64} ==> (b1 & ((1 << k) -1) == to_cint_unsigned_bits(k, b1)  <==> true *)
+    (* k in {8,16,32,64} ==>
+          ( (b1 & ((1 << k) -1) == to_cint_unsigned_bits(k, b1)  <==> true ) *)
     let iota,b1 = match_to_cint b in
     if Ctypes.signed iota then raise Not_found ;
     let n = Ctypes.i_bits iota in
@@ -772,26 +772,26 @@ let smp_cmp_with_lsl cmp a0 b0 =
     let a,p = match_fun f_lsl a0 |> match_positive_or_null_arg2 in
     let b,q = match_fun f_lsl b0 |> match_positive_or_null_arg2 in
     if p == q then
-      (* p>=0 && q>=0 && p==q ==> ( ((a<<p)cmp(b<<q)) <==> (a cmp b) ) *)
+      (* p>=0 && q>=0 && p==q ==> ( ((a<<p)cmp(b<<q))<==>(a cmp b) ) *)
       cmp a b
     else if a == b && (cmp==e_eq || is_positive_or_null a) then
-      (* p>=0 && q>=0 && a==b         ==> ( ((a<<p)== (b<<q)) <==> (p ==  q) ) *)
-      (* p>=0 && q>=0 && a==b && a>=0 ==> ( ((a<<p)cmp(b<<q)) <==> (p cmp q) ) *)
+      (* p>=0 && q>=0 && a==b         ==> ( ((a<<p)== (b<<q))<==>(p ==  q) ) *)
+      (* p>=0 && q>=0 && a==b && a>=0 ==> ( ((a<<p)cmp(b<<q))<==>(p cmp q) ) *)
       cmp p q
     else if a == b && is_negative a then
-      (* p>=0 && q>=0 && a==b && a<0 ==> ( ((a<<p)cmp(b<<q)) <==> (q cmp p) ) *)
+      (* p>=0 && q>=0 && a==b && a<0  ==> ( ((a<<p)cmp(b<<q))<==>(q cmp p) ) *)
       cmp q p
     else
       let p = match_integer p in
       let q = match_integer q in
       if Z.lt p q then
-        (* p>=0 && q>=0 && p>q ==> ( ((a<<p)cmp(b<<q)) <==> (a cmp(b<<(q-p))) ) *)
+        (* p>=0 && q>=0 && p>q ==>( ((a<<p)cmp(b<<q))<==>(a cmp(b<<(q-p))) ) *)
         cmp a (e_fun f_lsl [b;e_zint (Z.sub q p)])
       else if Z.lt q p then
-        (* p>=0 && q>=0 && p<q ==> ( ((a<<p)cmp(b<<q)) <==> ((a<<(p-q)) cmp b) ) *)
+        (* p>=0 && q>=0 && p<q ==>( ((a<<p)cmp(b<<q))<==>((a<<(p-q)) cmp b) ) *)
         cmp (e_fun f_lsl [a;e_zint (Z.sub p q)]) b
       else
-        (* p>=0 && q>=0 && p==q ==> ( ((a<<p)cmp(b<<q)) <==> (a cmp b) ) *)
+        (* p>=0 && q>=0 && p==q ==>( ((a<<p)cmp(b<<q))<==>(a cmp b) ) *)
         cmp a b
 
 let smp_eq_with_lsl a b =
@@ -824,7 +824,7 @@ let smp_eq_with_lsr a0 b0 =
        That rule is similar to
        (a/P) == (b/(N*P)) <==> (a/P)*P == ((b/N)/P)*P
        with P==2**p, N=2**n, q=p+n.
-       So, (a/P)*P==a&~((2**p)-1), b/N==b>>n,  ((b/N)/P)*P==(b>>n)&~((2**p)-1)  *)
+       So, (a/P)*P==a&~((2**p)-1), b/N==b>>n, ((b/N)/P)*P==(b>>n)&~((2**p)-1) *)
     let a,p = match_fun f_lsr a0 |> match_positive_or_null_integer_arg2 in
     let b,q = match_fun f_lsr b0 |> match_positive_or_null_integer_arg2 in
     let n = Integer.min p q in
@@ -884,8 +884,8 @@ let () =
       begin
         let mk_builtin n f ?eq ?leq smp = n, { f ; eq; leq; smp } in
 
-        (* From [smp_mk_bit_stdlib], the built-in [f_bit_stdlib] is such that there is
-           no creation of [e_fun f_bit_stdlib args] *)
+        (* From [smp_mk_bit_stdlib], the built-in [f_bit_stdlib] is such that
+           there is no creation of [e_fun f_bit_stdlib args] *)
         let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
         let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
         let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot smp_lnot ~leq:(smp_leq_improved f_lnot) in
@@ -910,7 +910,8 @@ let () =
              | None -> ()
              | Some leq -> F.set_builtin_leq f leq)
           end
-          [bi_lbit_stdlib ; bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr];
+          [bi_lbit_stdlib ; bi_lbit; bi_lnot;
+           bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr];
 
         Lang.For_export.set_builtin_eq f_land export_eq_with_land
       end
@@ -943,22 +944,28 @@ let blsl i x y = overflow i (l_lsl x y) (* mult. by 2^y *)
 let blsr _i = l_lsr (* div. by 2^y, never overflow *)
 
 (** Simplifiers *)
+let dkey = Wp_parameters.register_category "is-cint-simplifier"
+
 let c_int_bounds_ival f  =
   let (umin,umax) = Ctypes.bounds f in
   Ival.inject_range (Some umin) (Some umax)
 
 let max_reduce_quantifiers = 1000
 
-module Dom = struct
+module IntDomain = struct
   type t = Ival.t Tmap.t
   let is_top_ival = Ival.equal Ival.top
 
   let top = Tmap.empty
 
   [@@@ warning "-32"]
-  let pretty fmt dom =
+  let pretty fmt (k,v) =
+    Format.fprintf fmt "%a: %a" Lang.F.pp_term k Ival.pretty v
+
+  [@@@ warning "-32"]
+  let pretty_tbl fmt dom =
     Tmap.iter (fun k v ->
-        Format.fprintf fmt "%a: %a,@ " Lang.F.pp_term k Ival.pretty v)
+        Format.fprintf fmt "%a,@, " pretty (k,v))
       dom
 
   let find t dom = Tmap.find t dom
@@ -966,21 +973,27 @@ module Dom = struct
   let get t dom = try find t dom with Not_found -> Ival.top
 
   let narrow t v dom =
-    if Ival.is_bottom v then raise Lang.Contradiction
+    if Ival.is_bottom v then
+      (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+       raise Lang.Contradiction)
     else if is_top_ival v then dom
-    else Tmap.change (fun _ v old ->
-        match old with | None -> Some v
-                       | (Some old) as old' ->
-                         let v = Ival.narrow v old in
-                         if Ival.is_bottom v then raise Lang.Contradiction;
-                         if Ival.equal v old then old'
-                         else Some v) t v dom
+    else Tmap.change (fun _ v -> function
+        | None -> Some v
+        | (Some old) as old' ->
+          let v = Ival.narrow v old in
+          if Ival.is_bottom v then
+            (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+             raise Lang.Contradiction)
+          else if Ival.equal v old then old'
+          else Some v) t v dom
 
   let add_with_bot t v dom =
     if is_top_ival v then dom else Tmap.add t v dom
 
   let add t v dom =
-    if Ival.is_bottom v then raise Lang.Contradiction;
+    if Ival.is_bottom v then
+      (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+       raise Lang.Contradiction);
     add_with_bot t v dom
 
   let remove t dom = Tmap.remove t dom
@@ -988,7 +1001,7 @@ module Dom = struct
   let assume_cmp =
     let module Local = struct
       type t = Integer of Ival.t | Term of Ival.t option
-    end in fun cmp t1 t2 dom ->
+    end in fun cmp_str cmp t1 t2 dom -> (* Requires an int type for [t1,t2] *)
       let encode t = match Lang.F.repr t with
         | Kint z -> Local.Integer (Ival.inject_singleton z)
         | _ -> Local.Term (try Some (Tmap.find t dom) with Not_found -> None)
@@ -1000,7 +1013,10 @@ module Dom = struct
       match encode t1, encode t2 with
       | Local.Integer cst1, Local.Integer cst2 -> (* assume cmp cst1 cst2 *)
         if Abstract_interp.Comp.False = Ival.forward_comp_int cmp cst1 cst2
-        then raise Lang.Contradiction;
+        then
+          (Wp_parameters.debug ~dkey "* Assume FALSE: %a %s %a@."
+             pretty (t1,cst1) cmp_str pretty (t2,cst2);
+           raise Lang.Contradiction);
         dom
       | Local.Term None, Local.Term None ->
         dom (* nothing can be collected *)
@@ -1019,9 +1035,12 @@ module Dom = struct
           (add t2 (Ival.backward_comp_int_left cmp_sym v2 v1) dom)
 
   let assume_literal t dom = match Lang.F.repr t with
-    | Eq(a,b) -> assume_cmp Abstract_interp.Comp.Eq a b dom
-    | Leq(a,b) -> assume_cmp Abstract_interp.Comp.Le a b dom
-    | Lt(a,b) -> assume_cmp Abstract_interp.Comp.Lt a b dom
+    | Eq(a,b)  when is_int a && is_int b ->
+      assume_cmp "==" Abstract_interp.Comp.Eq a b dom
+    | Leq(a,b) when is_int a && is_int b ->
+      assume_cmp "<=" Abstract_interp.Comp.Le a b dom
+    | Lt(a,b)  when is_int a && is_int b ->
+      assume_cmp "<" Abstract_interp.Comp.Lt a b dom
     | Fun(g,[a]) -> begin try
           let ubound =
             c_int_bounds_ival (is_cint g) (* may raise Not_found *) in
@@ -1033,7 +1052,10 @@ module Dom = struct
               let ubound =
                 c_int_bounds_ival (is_cint g) (* may raise Not_found *) in
               let v = Tmap.find a dom (* may raise Not_found *) in
-              if Ival.is_included v ubound then raise Lang.Contradiction;
+              if Ival.is_included v ubound then
+                (Wp_parameters.debug ~dkey "* Assume FALSE: %a -> %a@."
+                   Lang.F.pp_term t pretty (a,v);
+                 raise Lang.Contradiction);
               dom
             with Not_found -> dom
           end
@@ -1047,7 +1069,7 @@ let is_cint_simplifier =
     (** Returns [new_t] such that [c_bind quant (alpha,t)]
                            equals [c_bind quant v (alpha,new_t)]
         under the knowledge that  [(not t) ==> (var in dom)].
-        Note: [~add_bonus] has not effect on the correctness of the transformation.
+        Note: [~add_bonus] has not effect on the correctness.
           It is a parameter that can be used in order to get better results.
         Bonus: Add additionnal hypothesis when we could deduce better constraint
         on the variable *)
@@ -1103,7 +1125,7 @@ let is_cint_simplifier =
             if !bonus_max then tools.Tool.add_hyp [e_leq tv (e_zint max)] t
             else t
           | Some min, Some max ->
-            if Integer.equal min max then (* Reduced to only one value: [min] *)
+            if Integer.equal min max then (* Reduced to only one value: min *)
               QED.e_subst_var v (e_zint min) t
             else if Integer.lt min max then
               let h = if !bonus_min then [e_leq (e_zint min) tv] else []
@@ -1127,7 +1149,7 @@ let is_cint_simplifier =
   end
   in object (self)
 
-    val mutable domain : Dom.t = Dom.top
+    val mutable domain : IntDomain.t = IntDomain.top
 
     method name = "Remove redundant is_cint"
     method copy = {< domain = domain >}
@@ -1137,7 +1159,7 @@ let is_cint_simplifier =
 
     method assume p =
       Lang.iter_consequence_literals
-        (fun p -> domain <- Dom.assume_literal p domain) (Lang.F.e_prop p)
+        (fun p -> domain <- IntDomain.assume_literal p domain) (Lang.F.e_prop p)
 
     method private simplify ~is_goal p =
       let pool = Lang.get_pool () in
@@ -1153,15 +1175,15 @@ let is_cint_simplifier =
         var_domain := Ival.backward_comp_int_left op !var_domain dom
       in
       let rec reduce_on_neg var var_domain t =
-        match Lang.F.repr t with
+        match Lang.F.repr t with (* NB. [var] has an int type *)
         | _ when not (is_prop t) -> ()
-        | Leq(a,b) when Lang.F.equal a var ->
+        | Leq(a,b) when Lang.F.equal a var && is_int b ->
           reduce Abstract_interp.Comp.Le var_domain b
-        | Leq(b,a) when Lang.F.equal a var ->
+        | Leq(b,a) when Lang.F.equal a var && is_int b ->
           reduce Abstract_interp.Comp.Ge var_domain b
-        | Lt(a,b) when Lang.F.equal a var ->
+        | Lt(a,b) when Lang.F.equal a var && is_int b ->
           reduce Abstract_interp.Comp.Lt var_domain b
-        | Lt(b,a) when Lang.F.equal a var ->
+        | Lt(b,a) when Lang.F.equal a var  && is_int b ->
           reduce Abstract_interp.Comp.Gt var_domain b
         | And l -> List.iter (reduce_on_neg var var_domain) l
         | Not p -> reduce_on_pos var var_domain p
@@ -1196,7 +1218,7 @@ let is_cint_simplifier =
                   if quant = Forall
                   then reduce_on_pos tvar var_domain t
                   else reduce_on_neg tvar var_domain t;
-                  domain <- Dom.add_with_bot tvar !var_domain domain;
+                  domain <- IntDomain.add_with_bot tvar !var_domain domain;
                   qv, Some (tvar, var_domain)
                 | _ -> qv, None) ctx
           in
@@ -1204,15 +1226,15 @@ let is_cint_simplifier =
           let f_close t = function
             | (quant,var), None -> e_bind quant var t
             | (quant,var), Some (tvar,var_domain) ->
-              domain <- Dom.remove tvar domain;
-              (** Bonus: Add additionnal hypothesis in forall when we could deduce
-                  better constraint on the variable *)
+              domain <- IntDomain.remove tvar domain;
+              (** Bonus: Add additionnal hypothesis in forall when we could
+                  deduce a better constraint on the variable *)
               let add_bonus = match term_pol with
                 | Polarity.Both -> false
                 | _ -> (term_pol=Polarity.Pos) = (quant=Forall)
               in
-              let t = reduce_bound ~add_bonus quant var tvar !var_domain t in
-              e_bind quant var t
+              e_bind quant var
+                (reduce_bound ~add_bonus quant var tvar !var_domain t)
           in
           List.fold_left f_close t ctx_with_dom
         | Fun(g,[a]) ->
@@ -1225,56 +1247,540 @@ let is_cint_simplifier =
               else t
             with Not_found -> t
           end
-        | Imply (l1,l2) -> e_imply (List.map walk_flip_pol l1) (walk_same_pol l2)
+        | Imply (l1,l2) -> e_imply (List.map walk_flip_pol l1)
+                             (walk_same_pol l2)
         | Not p -> e_not (walk_flip_pol p)
         | And _ | Or _ -> Lang.F.QED.f_map walk_same_pol t
         | _ ->
-          Lang.F.QED.f_map ~pool ~forall:false ~exists:false walk_both_pol t in
-      Lang.F.p_bool (walk ~term_pol:(Polarity.from_bool is_goal) (Lang.F.e_prop p))
+          Lang.F.QED.f_map ~pool ~forall:false ~exists:false
+            walk_both_pol t
+      in
+      let walk_pred ~term_pol p =
+        Lang.F.p_bool (walk ~term_pol (Lang.F.e_prop p))
+      in
+      walk_pred ~term_pol:(Polarity.from_bool is_goal) p
 
     method equivalent_exp (e : term) = e
 
-    method weaker_hyp p = self#simplify ~is_goal:false p
+    method weaker_hyp p =
+      Wp_parameters.debug ~dkey "Rewrite Hyp: %a@." Lang.F.pp_pred p;
+      let r = self#simplify ~is_goal:false p in
+      if not (r == p) then
+        Wp_parameters.debug ~dkey "Hyp rewritten into: %a@." Lang.F.pp_pred r;
+      r
 
-    method stronger_goal p = self#simplify ~is_goal:true p
+    method stronger_goal p =
+      Wp_parameters.debug ~dkey "Rewrite Goal: %a@." Lang.F.pp_pred p;
+      let r = self#simplify ~is_goal:true p in
+      if not (r == p) then
+        Wp_parameters.debug ~dkey "Goal rewritten into: %a@." Lang.F.pp_pred r;
+      r
 
     method equivalent_branch p = p
 
     method infer = []
   end
 
+(** Mask Simplifier **)
+
+let dkey = Wp_parameters.register_category "mask-simplifier"
+
+module Masks = struct
+  (* There is a contradiction when [m.unset & m.set != 0] *)
+  type t = { unset: Integer.t ; (* Mask of the bits set to 1 *)
+             set:Integer.t      (* Mask of the bits set to 1 *)
+           }
+
+  exception Bottom
+  let is_bottom v =
+    not (Integer.is_zero (Integer.logand v.unset v.set))
+
+  let is_top v =
+    Integer.is_zero v.unset && Integer.is_zero v.set
+
+  let is_one_set mask v =
+    if is_bottom v then false
+    else not (Integer.is_zero (Integer.logand mask v.set))
+
+  let is_one_unset mask v =
+    if is_bottom v then false
+    else not (Integer.is_zero (Integer.logand mask v.unset))
+
+  let is_all_set mask v =
+    if is_bottom v then false
+    else Integer.equal mask (Integer.logand mask v.set)
+
+  let is_all_unset mask v =
+    if is_bottom v then false
+    else Integer.equal mask (Integer.logand mask v.unset)
+
+  let is_equal_no_bottom {unset=u1; set=s1} {unset=u2; set=s2} =
+    Integer.equal u1 u2 && Integer.equal s1 s2
+
+  [@@@ warning "-32"]
+  let is_equal v1 v2 =
+    is_equal_no_bottom v1 v2 || (is_bottom v1 && is_bottom v2)
+
+  let mk ~set ~unset = { unset ; set }
+
+  let mk_exn ~set ~unset =
+    let v = mk ~set ~unset in
+    if is_bottom v then raise Bottom else v
+
+  let of_integer z = mk ~set:z ~unset:(Integer.lognot z)
+
+  (* N.B. there is not a unique bottom value *)
+  let a_bottom = mk ~set:Integer.minus_one ~unset:Integer.minus_one
+
+  let top = mk ~set:Integer.zero ~unset:Integer.zero
+
+  [@@@ warning "-32"]
+  let pretty_mask fmt m =
+    if Integer.le Integer.zero m then Integer.pretty_hex fmt m
+    else Format.fprintf fmt "~%a" Integer.pretty_hex (Integer.lognot m)
+
+  [@@@ warning "-32"]
+  let pretty fmt v =
+    if is_bottom v then Format.fprintf fmt "BOTTOM"
+    else if is_top v then Format.fprintf fmt "TOP"
+    else Format.fprintf fmt "set:%a unset:%a"
+        pretty_mask v.set pretty_mask v.unset
+
+  let rewrite eval ctx e =
+    try
+      let v = eval ctx e in  (* may raise Bottom *)
+      if Integer.equal v.set (Integer.lognot v.unset)
+      then e_zint v.set (* all bits are specified *)
+      else e
+    with Bottom -> e
+
+  (** Eval functions
+      should raise Bottom and never return a bottom *)
+
+  let eval_not eval_exn ctx e =
+    let v = eval_exn ctx e in (* may raise Bottom *)
+    mk ~set:v.unset ~unset:v.set (* cannot build a bottom *)
+
+  let neutral_land = mk ~set:(Integer.minus_one) ~unset:Integer.zero
+  let eval_land eval_exn ctx es =
+    List.fold_left (fun {set;unset} x ->
+        let v = eval_exn ctx x in (* may raise Bottom *)
+        mk ~set:(Integer.logand v.set set) (* cannot build a bottom *)
+          ~unset:(Integer.logor v.unset unset))
+      neutral_land es
+
+  let neutral_lor = mk ~set:Integer.zero ~unset:(Integer.minus_one)
+  let eval_lor eval_exn ctx es =
+    List.fold_left (fun {set;unset} x ->
+        let v = eval_exn ctx x in (* may raise Bottom *)
+        mk ~set:(Integer.logor v.set set) (* cannot build a bottom *)
+          ~unset:(Integer.logand v.unset unset))
+      neutral_lor es
+
+  let neutral_lxor = neutral_lor
+  let eval_lxor eval_exn ctx es =
+    let land4 a b c d =
+      Integer.logand (Integer.logand a b) (Integer.logand c d)
+    in
+    List.fold_left (fun {set;unset} x ->
+        let v = eval_exn ctx x in (* may raise Bottom *)
+        let lnot_set = Integer.lognot set
+        and lnot_unset = Integer.lognot unset
+        and v_lnot_set = Integer.lognot v.set
+        and v_lnot_unset = Integer.lognot v.unset
+        in
+        mk ~set:(Integer.logor (* cannot build a bottom *)
+                   (land4 lnot_set unset v.set v_lnot_unset)
+                   (land4 lnot_unset set v.unset v_lnot_set))
+          ~unset:(Integer.logor
+                    (land4 lnot_set unset v.unset v_lnot_set)
+                    (land4 lnot_unset set v.set v_lnot_unset)))
+      neutral_lxor es
+
+  let eval_lsr eval_exn ctx x n =
+    try
+      let n = match_positive_or_null_integer n in
+      let v = eval_exn ctx x in (* may raise Bottom *)
+      mk ~set:(Integer.shift_right v.set n) (* cannot build a bottom *)
+        ~unset:(Integer.shift_right v.unset n)
+    with Not_found -> top
+
+  let eval_lsl eval_exn ctx x n =
+    try
+      let n = match_positive_or_null_integer n in
+      let v = eval_exn ctx x in (* may raise Bottom *)
+      mk ~set:(Integer.shift_left v.set n) (* cannot build a bottom *)
+        ~unset:(Integer.shift_left v.unset n)
+    with Not_found -> top
+
+  let eval_to_cint eval_exn ctx iota e =
+    let v = eval_exn ctx e in (* may raise Bottom *)
+    let min,max = Ctypes.bounds iota in
+    if not (Ctypes.signed iota) then
+      (* The highest bits are unset *)
+      mk ~set:(Integer.logand v.set max) (* cannot build a bottom *)
+        ~unset:(Integer.logor v.unset (Integer.lognot max))
+    else (* Unsigned int type.
+              So , [min = Integer.lognot max] *)
+      let sign_bit_mask = Integer.succ max in
+      if is_one_unset sign_bit_mask v then
+        (* The sign bit is set to 0.
+             So, the highest bits are unset *)
+        mk ~set:(Integer.logand v.set max) (* cannot build a bottom *)
+          ~unset:(Integer.logor v.unset min)
+      else if is_one_set sign_bit_mask v then
+        (* The sign bit is set to 1.
+             So, the highest bits are set *)
+        mk ~set:(Integer.logor v.set min) (* cannot build a bottom *)
+          ~unset:(Integer.logand v.unset max)
+      else
+        (* The sign is unknown.
+           So, the highest bits are unknown. *)
+        mk ~set:(Integer.logand v.set max) (* cannot build a bottom *)
+          ~unset:(Integer.logand v.unset max)
+
+  (** Narrow *)
+
+  (* may raise Bottom *)
+  let narrow_exn ?(unset=Integer.zero) ?(set=Integer.zero) v =
+    mk_exn ~unset:(Integer.logor unset v.unset)
+      ~set:(Integer.logor set v.set)
+
+  (** Reduce
+      may raise Bottom *)
+
+  let reduce_land reduce_exn ctx v es =
+    try
+      let k,es = match_list_head match_integer es in
+      (* N.B. requires v<>bottom *)
+      let unset = Integer.logand
+          (Integer.logor v.set v.unset)
+          (Integer.logxor v.set k)
+      in
+      reduce_exn ctx (F.e_fun f_land es) { v with unset }
+    with Not_found ->
+      if Integer.is_zero v.set then ctx else
+        List.fold_left (fun ctx t ->
+            (* bit(&ei... ,kv) ==> bit(ei,kv) *)
+            reduce_exn ctx t { top with set = v.set })
+          ctx es
+
+  let reduce_lor reduce_exn ctx v es =
+    try
+      let k,es = match_list_head match_integer es in
+      (* N.B. requires v<>bottom *)
+      let set = Integer.logand (Integer.logor v.set v.unset)
+          (Integer.logxor v.set k)
+      in
+      reduce_exn ctx (F.e_fun f_land es) { v with set }
+    with Not_found ->
+      if Integer.is_zero v.unset then ctx else
+        List.fold_left (fun ctx t ->
+            (* !bit(|ei... ,kv) ==>!bit(ei,kv) *)
+            reduce_exn ctx t { top with unset = v.unset })
+          ctx es
+
+  let reduce_lnot reduce_exn ctx v e =
+    reduce_exn ctx e (mk ~set:v.unset ~unset:v.set)
+
+  let reduce_to_cint reduce_exn ctx v iota e =
+    (* The lowest bits can be reduced *)
+    let mask = if not (Ctypes.signed iota) then
+        snd (Ctypes.bounds iota)
+      else
+        let min,max = (Ctypes.bounds iota) in
+        Integer.sub max min
+    in
+    reduce_exn ctx e (mk ~set:(Integer.logand mask v.set)
+                        ~unset:(Integer.logand mask v.unset))
+
+  let reduce_lsr reduce_exn ctx v e n =
+    try (* yes, that uses the opposite shift *)
+      let n = match_positive_or_null_integer n in
+      reduce_exn ctx e (mk ~set:(Integer.shift_left v.set   n)
+                          ~unset:(Integer.shift_left v.unset n))
+    with Not_found -> ctx
+
+  let reduce_lsl narrow_exn t reduce_exn ctx v e n =
+    try (* yes, that uses the opposite shift *)
+      let n = match_positive_or_null_integer n in
+      (* the lowest bits of the left shift have to be set *)
+      let ctx = narrow_exn ctx t { top with unset = two_power_k_minus1 n } in
+      reduce_exn ctx e (mk ~set:(Integer.shift_right v.set n)
+                          ~unset:(Integer.shift_right v.unset n))
+    with Not_found -> ctx
+
+end
+
+module MasksDomain = struct
+
+  (* - the domain values never contains a bottom
+     - the key is never a Kint term *)
+  type t = Masks.t Tmap.t
+
+  [@@@ warning "-32"]
+  let pretty fmt (key,v) =
+    Format.fprintf fmt "%a:%a"
+      Lang.F.pp_term key Masks.pretty v
+
+  [@@@ warning "-32"]
+  let pretty_table fmt dom =
+    Tmap.iter (fun k v -> Format.fprintf fmt "%a@," pretty (k,v)) dom
+
+  let find t dom = Tmap.find t dom
+
+  let get dom t =
+    let r =
+      match F.repr t with
+      | Kint k -> Masks.of_integer k
+      | _ -> try find t dom with Not_found -> Masks.top
+    in
+    Wp_parameters.debug ~dkey "- Get %a@." pretty (t,r);
+    r
+
+  (* N.B. Catches the Masks.Bottom raised during evaluations *)
+  let eval ~level (ctx:t) t =
+    let eval get_exn ctx e = (* may raise Masks.Bottom *)
+      match F.repr e with
+      | Kint set -> Masks.mk ~set ~unset:(Integer.lognot set)
+      | Fun(f,es) when f == f_land -> Masks.eval_land get_exn ctx es
+      | Fun(f,es) when f == f_lor  -> Masks.eval_lor  get_exn ctx es
+      | Fun(f,es) when f == f_lxor -> Masks.eval_lxor get_exn ctx es
+      | Fun(f,[e;n]) when f == f_lsr -> Masks.eval_lsr get_exn ctx e n
+      | Fun(f,[e;n]) when f == f_lsl -> Masks.eval_lsl get_exn ctx e n
+      | Fun(f,[e]) when f == f_lnot -> Masks.eval_not get_exn ctx e
+      | Fun(f,[e]) ->
+        (try
+           let iota = to_cint f in (* may raise Not_found *)
+           Masks.eval_to_cint get_exn ctx iota e
+         with Not_found -> Masks.top)
+      | _ -> Masks.top
+    in
+    let eval_narrow_exn eval_subterm_exn ctx t =
+      let ({Masks.set;unset} as v) =
+        eval eval_subterm_exn ctx t  (* may raises Masks.Bottom *)
+      in try
+        let v = get ctx t in
+        Masks.narrow_exn ~unset ~set v (* may raises Masks.Bottom *)
+      with Not_found -> v
+    in
+    let rec eval_rec_exn ctx t = eval_narrow_exn eval_rec_exn ctx t in
+    let r = try
+        match level with
+        | 0 -> eval get ctx t (* from what is in the table for the sub-terms *)
+        | 1 -> (* 0 + narrowing from from what is in the table for the term *)
+          eval_narrow_exn get ctx t
+        | _ -> (* 1 + recursive *)
+          eval_rec_exn ctx t
+      with Masks.Bottom -> Masks.a_bottom
+    in
+    Wp_parameters.debug ~dkey "* Eval ~level:%d %a@." level pretty (t,r);
+    r
+
+  (* [narrow_exn ctx t v] is the only one low level way to extend the [ctx]
+     domain map and the key [t] is always an {i int} term.
+     May raise Lang.Contradiction. *)
+  let narrow_exn ctx t (v:Masks.t) =
+    if Masks.is_top v then ctx
+    else if Masks.is_bottom v then
+      (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+       raise Lang.Contradiction)
+    else match F.repr t with
+      | Kint _ -> ctx
+      | _ ->
+        Tmap.change (fun _ v -> function
+            | None ->
+              Wp_parameters.debug ~dkey "* Assume %a@." pretty (t,v);
+              Some v
+            | (Some old) as old' ->
+              let v = try
+                  Masks.narrow_exn ~unset:v.unset ~set:v.set old
+                with Masks.Bottom ->
+                  Wp_parameters.debug ~dkey "* Assume FALSE: %a@."
+                    pretty (t,Masks.a_bottom);
+                  raise Lang.Contradiction
+              in
+              (* there is no bottom values in the map domains *)
+              if Masks.is_equal_no_bottom v old then old' (* no narrowing *)
+              else
+                (Wp_parameters.debug ~dkey "* Assume %a@." pretty (t,v);
+                 Some v)) t v ctx
+
+  (* may raise Lang.Contradiction *)
+  let rec reduce ctx t (v:Masks.t) =
+    Wp_parameters.debug ~dkey "- Reduce %a@." pretty (t,v);
+    let ctx =
+      if Masks.is_top v then ctx (* no possible reduction *)
+      else if Masks.is_bottom v then
+        (Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,v);
+         raise Lang.Contradiction)
+      else match F.repr t with
+        | Fun(f,es) when f == f_land -> Masks.reduce_land reduce ctx v es
+        | Fun(f,es) when f == f_lor -> Masks.reduce_lor reduce ctx v es
+        | Fun(f,[e]) when f == f_lnot -> Masks.reduce_lnot reduce ctx v e
+        | Fun(f,[e;n]) when f == f_lsr -> Masks.reduce_lsr reduce ctx v e n
+        | Fun(f,[e;n]) when f == f_lsl -> Masks.reduce_lsl narrow_exn t reduce ctx v e n
+        | Fun(f,[e]) -> begin
+            try
+              let iota = to_cint f in (* may raise Not_found *)
+              Masks.reduce_to_cint reduce ctx v iota e
+            with Not_found -> ctx
+          end
+        | _ -> ctx
+    in
+    let v =
+      let {Masks.set;unset} =
+        (* level 1 est unnecessary since the narrowing is done just after,
+           level 2 may give better results *)
+        eval ~level:0 ctx t
+      in
+      try Masks.narrow_exn ~unset ~set v (* may raise Masks.Bottom *)
+      with Masks.Bottom ->
+        Wp_parameters.debug ~dkey "* Assume FALSE: %a@." pretty (t,Masks.a_bottom);
+        raise Lang.Contradiction
+    in
+    narrow_exn ctx t v
+
+  (* @raises [Lang.Contradiction] when [h] introduces a contradiction *)
+  let assume ctx h = (* [rtx = assume ctx h] such that [h |- ctx ==> rtx] *)
+    Wp_parameters.debug ~dkey "Intro %a@." Lang.F.pp_term h;
+    try
+      match F.repr h with
+      | Fun(f,[x]) ->
+        let iota = is_cint f in (* may raise Not_found *)
+        if not (Ctypes.signed iota) then
+          (* The uppest bits are unset *)
+          let mask = snd (Ctypes.bounds iota) in
+          reduce ctx x { Masks.top with unset =Integer.lognot mask }
+        else ctx
+      | Fun(f,[x;k]) when f == f_bit_positive ->
+        let k = match_positive_or_null_integer k in (* may raise Not_found *)
+        if Integer.le Integer.zero k then
+          reduce ctx x { Masks.top with set = two_power_k k }
+        else ctx
+      | Not x -> begin match F.repr x with
+          | Fun(f,[x;k]) when f == f_bit_positive ->
+            let k = match_positive_or_null_integer k in
+            if Integer.le Integer.zero k then
+              reduce ctx x { Masks.top with unset = two_power_k k }
+            else ctx
+          | _ -> ctx
+        end
+      | Eq(a,b) when is_int a && is_int b ->
+        (* b may give a better constraint because it could be a constant *)
+        let ctx = reduce ctx a (eval ~level:2 ctx b) in
+        reduce ctx b (get ctx a)
+      | _ -> ctx
+    with Not_found -> ctx
+
+end
 
 let mask_simplifier =
-  let update x m ctx =
-    Tmap.insert (fun _ m old -> if Integer.lt m old then (*better*) m else old)
-      x m ctx
-  and rewrite ctx e =
-    let reduce m x = match F.repr x with
-      | Kint v -> F.e_zint (Integer.logand m v)
-      | _ -> x
-    and collect ctx d x = try
-        let m = Tmap.find x ctx in
-        match d with
-        | None -> Some m
-        | Some m0 -> if Integer.lt m m0 then Some m else d
-      with Not_found -> d
-    in
+
+  (* [r = rewrite_cst ctx e] such that [ctx |- e = r] *)
+  let rewrite_cst ~highest ctx e =
     match F.repr e with
-    | Fun(f,es) when f == f_land ->
-      begin
-        match List.fold_left (collect ctx) None es with
-        | None -> raise Not_found
-        | Some m -> F.e_fun f_land (List.map (reduce m) es)
-      end
-    | _ -> raise Not_found
+    | Kint _ -> e
+    | Fun(f,[x;k]) when highest &&
+                        f == f_bit_positive -> (* rewrites [bit_test(x,k)] *)
+      (try let k = match_positive_or_null_integer k in (* may raise Not_found *)
+         let v = MasksDomain.eval ~level:1 ctx x in
+         let mask = two_power_k k in (* may raise Not_found *)
+         if Masks.is_one_set mask v then
+           (* [ctx] gives that the bit [k] of [x] is set *)
+           e_true
+         else if Masks.is_one_unset mask v then
+           (* [ctx] gives that the bit [k] of [x] is unset *)
+           e_false
+         else
+           (* note: does not rewrite [e] when is_bottom v
+              because the polarity is unknown *)
+           e
+       with _ -> e)
+    | Eq (a, b) when highest && is_int a && is_int b ->
+      (try
+         let b = match_integer b in (* may raise Not_found *)
+         match F.repr a with
+         | Fun(f,es) when f == f_land ->
+           (* [k & t == b] specifies some bits of [t] *)
+           let k,es =
+             match_list_head match_integer es (* may raise Not_found *)
+           in
+           if not (Integer.is_zero (Integer.logand b (Integer.lognot k)))
+           then (* [b] and [k] are such that the equality is false *)
+             e_false
+           else
+             let set = b (* the bits of [t] that have to be set *)
+             and unset = (* the bits of [t] that have to be unset *)
+               Integer.logand k (Integer.lognot b)
+             and v = (* the current bits of [t] *)
+               try MasksDomain.find (F.e_fun f_land es) ctx
+               with Not_found ->
+                 Masks.eval_land (fun _ctx i -> i) ctx
+                   (List.map (MasksDomain.eval  ~level:1 ctx) es)
+             in
+             if Masks.is_one_unset set v then
+               (* Some bits of [t] that has to be set is unset *)
+               e_false
+             else if Masks.is_one_set unset v then
+               (* Some bits of [t] that has to be unset is set *)
+               e_false
+             else if Masks.is_all_set set v
+                  && Masks.is_all_unset unset v
+             then (* The bits of [t] that have to be set are set &&
+                     those that have to be unset are unset *)
+               e_true
+             else
+               (* note: does not rewrite [e] when is_bottom v
+                  because the polarity is unknown *)
+               e
+         | _ -> e
+       with _ -> e)
+    | _ when is_int e -> Masks.rewrite (MasksDomain.eval ~level:1) ctx e
+    | _ -> e
+  in
+
+  let nary_op e f rewrite es = (* requires [e==f es] *)
+    (* reuse the previous term when there is no rewriting *)
+    let modified = ref false in
+    let xs = List.map (fun e ->
+        let x = rewrite e in
+        if not (x==e) then modified := true;
+        x) es
+    in if !modified then f xs else e
+  in
+
+  (* [r = rewrite ctx e] such that [ctx |- e = r] *)
+  let rewrite ~highest ctx e =
+    let x =
+      match F.repr e with
+      | Fun(f,es) when f == f_land ->
+        let reduce unset x = match F.repr x with
+          | Kint v -> F.e_zint (Integer.logand (Integer.lognot unset) v)
+          | _ -> x
+        and collect ctx unset_mask x = try
+            let m = MasksDomain.eval ~level:1 ctx x in
+            Integer.logor unset_mask m.Masks.unset
+          with Not_found -> unset_mask
+        in
+        let unset_mask = List.fold_left (collect ctx) Integer.zero es in
+        if Integer.is_zero unset_mask then e
+        else if Integer.equal unset_mask Integer.minus_one then e_zero
+        else nary_op e (F.e_fun f_land) (reduce unset_mask) es
+      | _ -> e
+    in
+    let x = rewrite_cst ~highest ctx x in
+    if x == e then raise Not_found (* to try substitutions in the subterms *)
+    else x
+
   in
   object
 
     (** Must be 2^n-1 *)
-    val mutable magnitude : Integer.t Tmap.t = Tmap.empty
+    val mutable masks : MasksDomain.t = Tmap.empty
 
-    method name = "Rewrite unsigned masks"
-    method copy = {< magnitude = magnitude >}
+    method name = "Rewrite bitwise masks"
+    method copy = {< masks = masks >}
 
     method target _ = ()
     method infer = []
@@ -1282,31 +1788,46 @@ let mask_simplifier =
 
     method assume p =
       Lang.iter_consequence_literals
-        (fun p -> match F.repr p with
-           | Fun(f,[x]) -> begin
-               try
-                 let iota = is_cint f in
-                 if not (Ctypes.signed iota) then
-                   magnitude <- update x (snd (Ctypes.bounds iota)) magnitude
-               with Not_found -> ()
-             end
-           | _ -> ()) (F.e_prop p)
+        (fun p -> masks <- MasksDomain.assume masks p) (F.e_prop p)
 
     method equivalent_exp e =
-      if Tmap.is_empty magnitude then e else
-        Lang.e_subst (rewrite magnitude) e
+      if Tmap.is_empty masks then e else
+        (Wp_parameters.debug ~dkey "Rewrite Exp: %a@." Lang.F.pp_term e;
+         let r = Lang.e_subst (rewrite ~highest:true masks) e in
+         if not (r==e) then
+           Wp_parameters.debug ~dkey "Exp rewritten into: %a@."
+             Lang.F.pp_term r;
+         r)
 
     method weaker_hyp p =
-      if Tmap.is_empty magnitude then p else
-        Lang.p_subst (rewrite magnitude) p
+      if Tmap.is_empty masks then p else
+        (Wp_parameters.debug ~dkey "Rewrite Hyp: %a@." Lang.F.pp_pred p;
+         (* Does not rewrite [hyp] as much as possible. Any way, contradiction
+            may be found later when [hyp] will be assumed *)
+         let r = Lang.p_subst (rewrite ~highest:false masks) p in
+         if not (r==p) then
+           Wp_parameters.debug ~dkey "Hyp rewritten into: %a@."
+             Lang.F.pp_pred r;
+         r)
 
     method equivalent_branch p =
-      if Tmap.is_empty magnitude then p else
-        Lang.p_subst (rewrite magnitude) p
+      if Tmap.is_empty masks then p else
+        (Wp_parameters.debug ~dkey "Rewrite Branch: %a@." Lang.F.pp_pred p;
+         let r = Lang.p_subst (rewrite ~highest:true masks) p in
+         if not (r==p) then
+           Wp_parameters.debug ~dkey "Branch rewritten into: %a@."
+             Lang.F.pp_pred r;
+         r)
 
     method stronger_goal p =
-      if Tmap.is_empty magnitude then p else
-        Lang.p_subst (rewrite magnitude) p
+      if Tmap.is_empty masks then p else
+        (Wp_parameters.debug ~dkey "Rewrite Goal: %a@." Lang.F.pp_pred p;
+         let r = Lang.p_subst (rewrite ~highest:true masks) p in
+         if not (r==p) then
+           Wp_parameters.debug ~dkey "Goal rewritten into: %a@."
+             Lang.F.pp_pred r;
+         r
+        )
 
   end
 

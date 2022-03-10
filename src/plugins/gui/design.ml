@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -697,7 +697,7 @@ struct
     let iter = source#get_iter_at_char offset in
     let mark = iter#set_line_offset 0 in
     let category = category validity in
-    source#remove_source_marks mark mark () ;
+    source#remove_source_marks ~start:mark ~stop:mark () ;
     ignore (source#create_source_mark ~category mark) ;
     Hashtbl.replace tooltip_marks iter#line (long_category validity);
     match call_site with
@@ -882,7 +882,7 @@ class main_window () : main_window_extension_points =
   (* status bar (at bottom) *)
   (* toplevel_vbox->bottom_hbox-> *statusbar *)
   let statusbar = GMisc.statusbar ~packing:bottom_hbox#add () in
-  let status_context = statusbar#new_context "messages" in
+  let status_context = statusbar#new_context ~name:"messages" in
 
   (* progress bar (at bottom) *)
   (* toplevel_vbox->bottom_hbox-> [statusbar;*progress_bar] *)
@@ -992,7 +992,9 @@ class main_window () : main_window_extension_points =
                let (xbuf, ybuf) = source_viewer#window_to_buffer_coords
                    ~tag:`WIDGET ~x:(int_of_float x) ~y:(int_of_float y)
                in
-               let iterpos = source_viewer#get_iter_at_location xbuf ybuf in
+               let iterpos =
+                 source_viewer#get_iter_at_location ~x:xbuf ~y:ybuf
+               in
                let line = iterpos#line in
                if Hashtbl.mem Feedback.tooltip_marks line then begin
                  let text = Hashtbl.find Feedback.tooltip_marks line in
@@ -1093,17 +1095,18 @@ class main_window () : main_window_extension_points =
            in
            expander#set_label_widget (label_hb#coerce);
            ignore (expander#connect#activate
-                     (fun () -> (* Save expansion of panels*)
-                        Configuration.set key_config
-                          (Configuration.ConfBool (not expander#expanded))));
+                     ~callback:(fun () -> (* Save expansion of panels*)
+                         Configuration.set key_config
+                           (Configuration.ConfBool (not expander#expanded))));
            let frame = GBin.frame ~packing:expander#add () in
            frame#add widget;
 
            (* Drag stuff *)
            expander#drag#source_set ~modi:[`BUTTON1] ~actions:[`MOVE] targets;
            ignore (expander#drag#connect#beginning
-                     (fun _ -> dragged_frame:=Some (frame,text)));
-           ignore (expander#drag#connect#ending (fun _ -> dragged_frame:=None));
+                     ~callback:(fun _ -> dragged_frame:=Some (frame,text)));
+           ignore (expander#drag#connect#ending
+                     ~callback:(fun _ -> dragged_frame:=None));
 
            (* Refreshers *)
            Option.iter
@@ -1120,31 +1123,31 @@ class main_window () : main_window_extension_points =
       let dropper (widget:GObj.widget) =
         widget#drag#dest_set ~flags:[`ALL] ~actions:[`MOVE] targets;
         ignore (widget#drag#connect#drop
-                  (fun drag_context ~x:_ ~y:_ ~time:_ ->
-                     match !dragged_frame with
-                     | None (* Not dropping a panel *) -> true
-                     | Some (frame,title) ->
-                       (*Format.printf "Hello %d %d %ld@." x y time;*)
-                       let w = drag_context#source_widget in
-                       let new_w =
-                         GWindow.window ~position:`MOUSE ~title ~show:true () in
-                       let b = GPack.vbox ~packing:new_w#add () in
-                       frame#misc#reparent b#coerce;
-                       ignore (new_w#connect#destroy
-                                 (fun () ->
-                                    frame#misc#reparent w;
-                                    w#misc#show ()));
-                       w#misc#hide ();
-                       true));
+                  ~callback:(fun drag_context ~x:_ ~y:_ ~time:_ ->
+                      match !dragged_frame with
+                      | None (* Not dropping a panel *) -> true
+                      | Some (frame,title) ->
+                        (*Format.printf "Hello %d %d %ld@." x y time;*)
+                        let w = drag_context#source_widget in
+                        let new_w =
+                          GWindow.window ~position:`MOUSE ~title ~show:true () in
+                        let b = GPack.vbox ~packing:new_w#add () in
+                        frame#misc#reparent b#coerce;
+                        ignore (new_w#connect#destroy
+                                  ~callback:(fun () ->
+                                      frame#misc#reparent w;
+                                      w#misc#show ()));
+                        w#misc#hide ();
+                        true));
         ignore (widget#drag#connect#motion
-                  (fun drag_context ~x:_ ~y:_ ~time ->
-                     (*Format.printf "Motion %d %d %ld@." x y time;*)
-                     drag_context#status ~time (Some `MOVE);
-                     true));
+                  ~callback:(fun drag_context ~x:_ ~y:_ ~time ->
+                      (*Format.printf "Motion %d %d %ld@." x y time;*)
+                      drag_context#status ~time (Some `MOVE);
+                      true));
         ignore (widget#drag#connect#leave
-                  (fun drag_context ~time ->
-                     (*Format.printf "Motion %d %d %ld@." x y time;*)
-                     drag_context#status ~time (Some `MOVE)));
+                  ~callback:(fun drag_context ~time ->
+                      (*Format.printf "Motion %d %d %ld@." x y time;*)
+                      drag_context#status ~time (Some `MOVE)));
       in
       dropper main_window#coerce;
       dropper source_viewer#coerce;
@@ -1206,7 +1209,7 @@ class main_window () : main_window_extension_points =
           iter#line iter#line_offset
         ;
         ignore (self#source_viewer#backward_display_line_start iter);
-        self#source_viewer#buffer#place_cursor iter;
+        self#source_viewer#buffer#place_cursor ~where:iter;
         ignore (self#source_viewer#scroll_to_mark
                   ~use_align:true ~yalign:0.5 ~xalign:0. `INSERT);
         let adj = source_viewer_scroll#hadjustment in
@@ -1338,11 +1341,11 @@ class main_window () : main_window_extension_points =
       Format.kfprintf
         (function _ ->
            ignore (w#event#connect#leave_notify
-                     (fun _ -> self#pop_info ();true));
+                     ~callback:(fun _ -> self#pop_info ();true));
            ignore (w#event#connect#enter_notify
-                     (fun _ ->
-                        Format.pp_print_flush bfmt ();
-                        self#push_info_buffer ~buffer "" ;false)))
+                     ~callback:(fun _ ->
+                         Format.pp_print_flush bfmt ();
+                         self#push_info_buffer ~buffer "" ;false)))
         bfmt
         fmt
 
@@ -1421,7 +1424,7 @@ class main_window () : main_window_extension_points =
         in
         match found_iters with
         | Some (i1,i2) ->
-          buffer#place_cursor i1;
+          buffer#place_cursor ~where:i1;
           buffer#select_range i1 i2;
           ignore (scroll_to_iter i1
                     ~use_align:false
@@ -1541,7 +1544,9 @@ class main_window () : main_window_extension_points =
                   let (xbuf, ybuf) = source_viewer#window_to_buffer_coords
                       ~tag:`WIDGET ~x:(int_of_float x) ~y:(int_of_float y)
                   in
-                  let iterpos = source_viewer#get_iter_at_location xbuf ybuf in
+                  let iterpos =
+                    source_viewer#get_iter_at_location ~x:xbuf ~y:ybuf
+                  in
                   let line = iterpos#line in
                   try
                     let stmt = Hashtbl.find Feedback.call_sites line in
@@ -1659,26 +1664,26 @@ class main_window () : main_window_extension_points =
       (* Set the relative position for all paned whenever the main window is
          resized *)
       ignore (main_window#misc#connect#size_allocate
-                (fun ({Gtk.width=w;Gtk.height=h} as rect) ->
-                   Configuration.set "window_width" (Configuration.ConfInt w);
-                   Configuration.set "window_height" (Configuration.ConfInt h);
+                ~callback:(fun ({Gtk.width=w;Gtk.height=h} as rect) ->
+                    Configuration.set "window_width" (Configuration.ConfInt w);
+                    Configuration.set "window_height" (Configuration.ConfInt h);
 
-                   if main_window_metrics.Gtk.width <> w
-                   || main_window_metrics.Gtk.height <> h then
-                     begin
-                       place_paned hb_sources
-                         (Configuration.find_float ~default:0.5 "hb_sources");
-                       place_paned vb_message_sources
-                         (Configuration.find_float ~default:0.71
-                            "vb_message_sources");
-                       place_paned filetree_panel_vpaned
-                         (Configuration.find_float ~default:0.5
-                            "filetree_panel_vpaned");
-                       place_paned toplevel_hpaned
-                         (Configuration.find_float ~default:0.18
-                            "toplevel_hpaned");
-                     end;
-                   main_window_metrics <- rect));
+                    if main_window_metrics.Gtk.width <> w
+                    || main_window_metrics.Gtk.height <> h then
+                      begin
+                        place_paned hb_sources
+                          (Configuration.find_float ~default:0.5 "hb_sources");
+                        place_paned vb_message_sources
+                          (Configuration.find_float ~default:0.71
+                             "vb_message_sources");
+                        place_paned filetree_panel_vpaned
+                          (Configuration.find_float ~default:0.5
+                             "filetree_panel_vpaned");
+                        place_paned toplevel_hpaned
+                          (Configuration.find_float ~default:0.18
+                             "toplevel_hpaned");
+                      end;
+                    main_window_metrics <- rect));
 
       file_tree <- Some (Filetree.make file_tree_view);
       self#file_tree#add_select_function (filetree_selector self#toplevel);

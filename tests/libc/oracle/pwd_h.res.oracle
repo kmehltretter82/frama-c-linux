@@ -25,10 +25,11 @@
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  __fc_pwd.pw_name ∈ {{ NULL + [--..--] ; &__fc_getpwuid_pw_name[0] }}
-          .pw_passwd ∈ {{ NULL + [--..--] ; &__fc_getpwuid_pw_passwd[0] }}
-          {.pw_uid; .pw_gid; .pw_gecos} ∈ [--..--]
-          .pw_dir ∈ {{ NULL + [--..--] ; &__fc_getpwuid_pw_dir[0] }}
-          .pw_shell ∈ {{ NULL + [--..--] ; &__fc_getpwuid_pw_shell[0] }}
+  __fc_pwd.pw_name ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_name[0] }}
+          .pw_passwd ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_passwd[0] }}
+          {.pw_uid; .pw_gid} ∈ [--..--]
+          .pw_gecos ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_gecos[0] }}
+          .pw_dir ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_dir[0] }}
+          .pw_shell ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_shell[0] }}
   pw ∈ {{ NULL ; &__fc_pwd }}
   __retres ∈ {0}

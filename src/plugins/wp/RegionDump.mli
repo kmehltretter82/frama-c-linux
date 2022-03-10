@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,4 +23,6 @@
 (* Dump region graphs to dir according to -wp options.
    By default, does nothing. *)
 
-val dump : dir:Datatype.Filepath.t -> Kernel_function.t -> Region.map -> unit
+val dump_in_dir : dir:Datatype.Filepath.t -> string -> Region.map -> unit
+
+val dump_in_file : file:Datatype.Filepath.t -> string -> Region.map -> unit

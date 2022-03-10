@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -831,7 +831,7 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
 let eval_logic_memchr_off builtin env s c n =
   let minus_one = Cvalue.V.inject_int Integer.minus_one in
   let positive = Cvalue.V.inject_ival Ival.positive_integers in
-  let pred_n = Cvalue.V.add_untyped Int_Base.one n.eover minus_one in
+  let pred_n = Cvalue.V.add_untyped ~factor:Int_Base.one n.eover minus_one in
   let n_pos = Cvalue.V.narrow positive pred_n in
   let eover =
     if Cvalue.V.is_bottom n_pos then minus_one else

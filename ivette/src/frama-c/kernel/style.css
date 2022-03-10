@@ -25,7 +25,7 @@
 /* -------------------------------------------------------------------------- */
 
 .highlighted-marker {
-    background-color: #FFFF66;
+    background-color: var(--highlighted-marker);
 }
 
 .hovered-marker {
@@ -33,17 +33,17 @@
 }
 
 .dead-code {
-    background-color: #BBB;
-    border-bottom: solid 0.1em #BBB;
+    background-color: var(--dead-code);
+    border-bottom: solid 0.1em var(--dead-code);
 }
 
 .non-terminating {
-    border-bottom: solid 0.2em #BBB;
+    border-bottom: solid 0.2em var(--non-terminating);
 }
 
 .bullet {
     width: 1.5em;
-    background: #DDD;
+    background: var(--code-bullet);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -62,6 +62,10 @@
     font-size: smaller;
     font-weight: lighter;
     color: #aaa;
+}
+
+.globals-function-section {
+  padding-right: 3px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -149,15 +153,6 @@
     display: none; /* Hide label, only use placeholder */
 }
 
-.message-search input::placeholder {
-    font-style: italic;
-}
-
-.message-search input {
-    vertical-align: middle;
-    margin: 2px 4px 2px 0px;
-}
-
 .message-search .dome-xForm-field {
     margin: 0px 4px;
     display: inline-block;
@@ -184,6 +179,7 @@
 .message-page {
     user-select: text;
     white-space: pre-line;
+    background-color: var(--background-report);
 }
 
 /* -------------------------------------------------------------------------- */

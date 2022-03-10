@@ -957,6 +957,7 @@ int __gen_e_acsl_pthread_mutex_init(pthread_mutex_t * restrict mutex,
     int __gen_e_acsl_or;
     __e_acsl_store_block((void *)(& attrs),(size_t)8);
     __e_acsl_store_block((void *)(& mutex),(size_t)8);
+    __gen_e_acsl_at = mutex;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"mutex",
                                  (void *)mutex);
@@ -1008,7 +1009,6 @@ int __gen_e_acsl_pthread_mutex_init(pthread_mutex_t * restrict mutex,
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
-  __gen_e_acsl_at = mutex;
   __retres = pthread_mutex_init(mutex,attrs);
   {
     int __gen_e_acsl_and;
@@ -1424,6 +1424,7 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
     int __gen_e_acsl_or;
     __e_acsl_store_block((void *)(& attr),(size_t)8);
     __e_acsl_store_block((void *)(& cond),(size_t)8);
+    __gen_e_acsl_at = cond;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"cond",
                                  (void *)cond);
@@ -1474,7 +1475,6 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
-  __gen_e_acsl_at = cond;
   __retres = pthread_cond_init(cond,attr);
   {
     int __gen_e_acsl_initialized;

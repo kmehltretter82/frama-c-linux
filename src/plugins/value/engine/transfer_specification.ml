@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -238,7 +238,8 @@ module Make
   let set_ploc = Location.set Main_locations.PLoc.key
   let set_location loc = set_ploc (Main_locations.PLoc.make loc)
 
-  let make_env state = Eval_terms.env_assigns (Domain.get_cvalue_or_top state)
+  let make_env state =
+    Eval_terms.env_assigns ~pre:(Domain.get_cvalue_or_top state)
 
   (* Evaluates the location affected by an assigns, allocates, frees or \from
      clause. Returns None if the clause cannot be interpreted. *)

@@ -183,11 +183,11 @@
   
   long double __builtin_fdiml(long double __x0, long double __x1);
   
-  int __builtin_ffs(unsigned int __x0);
+  int __builtin_ffs(int __x0);
   
-  int __builtin_ffsl(unsigned long __x0);
+  int __builtin_ffsl(long __x0);
   
-  int __builtin_ffsll(unsigned long long __x0);
+  int __builtin_ffsll(long long __x0);
   
   double __builtin_floor(double __x0);
   

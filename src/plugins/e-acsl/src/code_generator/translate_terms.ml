@@ -121,8 +121,8 @@ let affect_binop ~loc var_as_varinfo var_as_exp binop exp_type exp1 exp2 =
   else if Gmp_types.Q.is_t exp_type then
     Error.not_yet "rational in affect_binop"
   else
-    Smart_stmt.assigns loc
-      (Cil.var var_as_varinfo)
+    Smart_stmt.assigns ~loc
+      ~result:(Cil.var var_as_varinfo)
       (Cil.mkBinOp ~loc binop exp1 exp2 )
 
 let rec thost_to_host kf env th = match th with
@@ -203,7 +203,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let lbd_stmt,env =
       Env.pop_and_get env
         (Gmp.affect ~loc (Cil.var lbd_as_varinfo) lbd_as_exp e_lbd)
-        false Env.Middle
+        ~global_clear:false Env.Middle
     in
     (* statement construction *)
     (* cond = k > e_max; or cond =  __gmpz_cmp(k,e_max) *)
@@ -261,7 +261,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   | _ ->
     assert false
 
-and context_insensitive_term_to_exp ~adata kf env t =
+and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
   let loc = t.term_loc in
   let lenv = Env.Local_vars.get env in
   match t.term_node with
@@ -525,7 +525,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
           Assert.runtime_check
             ~adata:adata2
             ~pred_kind:Assert
-            Smart_stmt.RTE
+            RTE
             kf
             env
             coerce_guard
@@ -605,7 +605,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
               Assert.runtime_check
                 ~adata:adata1
                 ~pred_kind:Assert
-                Smart_stmt.RTE
+                RTE
                 kf
                 env
                 e1_guard
@@ -653,7 +653,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
                Extlib.nest
                  adata
                  (Translate_utils.conditional_to_exp
-                    ~name:"or" ~loc kf (Some t) e1 (Cil.one loc, env') res2)
+                    ~name:"or" ~loc kf (Some t) e1 (Cil.one ~loc, env') res2)
              )
            env)
     in
@@ -674,7 +674,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
                Extlib.nest
                  adata
                  (Translate_utils.conditional_to_exp
-                    ~name:"and" ~loc kf (Some t) e1 res2 (Cil.zero loc, env3))
+                    ~name:"and" ~loc kf (Some t) e1 res2 (Cil.zero ~loc, env3))
              )
            env)
     in
@@ -799,23 +799,14 @@ and context_insensitive_term_to_exp ~adata kf env t =
            env)
     in
     e, adata, env, Typed_number.C_number, ""
-  | Tat(t, BuiltinLabel Here) ->
-    let e, adata, env = to_exp ~adata kf env t in
-    e, adata, env, Typed_number.C_number, ""
   | Tat(t', label) ->
-    let lscope = Env.Logic_scope.get env in
-    let pot = PoT_term t' in
-    if Lscope.is_used lscope pot then
-      let e, env = At_with_lscope.to_exp ~loc kf env pot label in
-      let adata, env = Assert.register_term ~loc env t e adata in
-      e, adata, env, Typed_number.C_number, ""
-    else
-      let e, _, env = to_exp ~adata:Assert.no_data kf (Env.push env) t' in
-      let e, env, sty =
-        Translate_utils.at_to_exp_no_lscope kf env (Some t) label e
-      in
-      let adata, env = Assert.register_term ~loc env t e adata in
-      e, adata, env, sty, ""
+    let e, adata, env =
+      if inplace then
+        to_exp ~adata kf env t'
+      else
+        Translate_ats.to_exp ~loc ~adata kf env (PoT_term t) label
+    in
+    e, adata, env, Typed_number.C_number, ""
   | Tbase_addr(BuiltinLabel Here, t') ->
     let name = "base_addr" in
     let e, _, env =
@@ -876,7 +867,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
    constructs. *)
-and to_exp ~adata kf env t =
+and to_exp ~adata ?inplace kf env t =
   let generate_rte = Env.generate_rte env in
   Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)in local \
                                    environment '%a'"
@@ -888,7 +879,7 @@ and to_exp ~adata kf env t =
        ~rte:false
        ~f:(fun env ->
            let e, adata, env, sty, name =
-             context_insensitive_term_to_exp ~adata kf env t
+             context_insensitive_term_to_exp ?inplace ~adata kf env t
            in
            let env =
              if generate_rte then !translate_rte_exp_ref kf env e else env
@@ -909,12 +900,14 @@ and to_exp ~adata kf env t =
          )
        env)
 
+let term_to_exp_without_inplace ~adata kf env t = to_exp ~adata kf env t
+
 let () =
-  Translate_utils.term_to_exp_ref := to_exp;
-  Loops.term_to_exp_ref := to_exp;
-  At_with_lscope.term_to_exp_ref := to_exp;
-  Memory_translate.term_to_exp_ref := to_exp;
-  Logic_functions.term_to_exp_ref := to_exp
+  Translate_utils.term_to_exp_ref := term_to_exp_without_inplace;
+  Translate_ats.term_to_exp_ref := to_exp;
+  Loops.term_to_exp_ref := term_to_exp_without_inplace;
+  Memory_translate.term_to_exp_ref := term_to_exp_without_inplace;
+  Logic_functions.term_to_exp_ref := term_to_exp_without_inplace
 
 exception No_simple_translation of term
 

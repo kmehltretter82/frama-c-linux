@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,6 +40,8 @@ val dkey_alpha_undo: category
 val dkey_asm_contracts: category
 
 val dkey_ast: category
+
+val dkey_builtins: category
 
 val dkey_check: category
 
@@ -328,7 +330,7 @@ module PrintReturn : Parameter_sig.Bool
 (** Behavior of option "-ocode".
     @plugin development guide *)
 module CodeOutput : sig
-  include Parameter_sig.String
+  include Parameter_sig.Filepath
   val output: (Format.formatter -> unit) -> unit
 end
 

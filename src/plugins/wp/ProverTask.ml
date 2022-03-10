@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -131,17 +131,6 @@ let location file line = {
   Lexing.pos_bol = 0 ;
   Lexing.pos_cnum = 0 ;
 }
-
-let timeout ~smoke = function
-  | None ->
-    if smoke
-    then Wp_parameters.SmokeTimeout.get ()
-    else Wp_parameters.Timeout.get ()
-  | Some t -> t
-
-let stepout = function
-  | None -> Wp_parameters.Steps.get ()
-  | Some t -> t
 
 let pp_file ~message ~file =
   if Sys.file_exists file then

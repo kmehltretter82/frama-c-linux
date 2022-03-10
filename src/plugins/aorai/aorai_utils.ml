@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -397,27 +397,27 @@ let rec term_to_exp t res =
   let loc = t.term_loc in
   match t.term_node with
   | TConst (Integer (value,repr)) -> Cil.kinteger64 ~loc ?repr value
-  | TConst (LStr str) -> new_exp loc (Const (CStr str))
-  | TConst (LWStr l) -> new_exp loc (Const (CWStr l))
-  | TConst (LChr c) -> new_exp loc (Const (CChr c))
+  | TConst (LStr str) -> new_exp ~loc (Const (CStr str))
+  | TConst (LWStr l) -> new_exp ~loc (Const (CWStr l))
+  | TConst (LChr c) -> new_exp ~loc (Const (CChr c))
   | TConst (LReal l_real) ->
     (* r_nearest is by definition in double precision. *)
-    new_exp loc (Const (CReal (l_real.r_nearest, FDouble, None)))
-  | TConst (LEnum e) -> new_exp loc (Const (CEnum e))
-  | TLval tlval -> new_exp loc (Lval (tlval_to_lval tlval res))
-  | TSizeOf ty -> new_exp loc (SizeOf ty)
-  | TSizeOfE t -> new_exp loc (SizeOfE(term_to_exp t res))
-  | TSizeOfStr s -> new_exp loc (SizeOfStr s)
-  | TAlignOf ty -> new_exp loc (AlignOf ty)
-  | TAlignOfE t -> new_exp loc (AlignOfE (term_to_exp t res))
+    new_exp ~loc (Const (CReal (l_real.r_nearest, FDouble, None)))
+  | TConst (LEnum e) -> new_exp ~loc (Const (CEnum e))
+  | TLval tlval -> new_exp ~loc (Lval (tlval_to_lval tlval res))
+  | TSizeOf ty -> new_exp ~loc (SizeOf ty)
+  | TSizeOfE t -> new_exp ~loc (SizeOfE(term_to_exp t res))
+  | TSizeOfStr s -> new_exp ~loc (SizeOfStr s)
+  | TAlignOf ty -> new_exp ~loc (AlignOf ty)
+  | TAlignOfE t -> new_exp ~loc (AlignOfE (term_to_exp t res))
   | TUnOp (unop, t) ->
-    new_exp loc (UnOp (unop, term_to_exp t res, Cil.intType))
+    new_exp ~loc (UnOp (unop, term_to_exp t res, Cil.intType))
   | TBinOp (binop, t1, t2)->
-    new_exp loc
+    new_exp ~loc
       (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil.intType))
-  | TCastE (ty, t) -> new_exp loc (CastE (ty, term_to_exp t res))
-  | TAddrOf tlval -> new_exp loc (AddrOf (tlval_to_lval tlval res))
-  | TStartOf tlval -> new_exp loc (StartOf (tlval_to_lval tlval res))
+  | TCastE (ty, t) -> new_exp ~loc (CastE (ty, term_to_exp t res))
+  | TAddrOf tlval -> new_exp ~loc (AddrOf (tlval_to_lval tlval res))
+  | TStartOf tlval -> new_exp ~loc (StartOf (tlval_to_lval tlval res))
   | TLogic_coerce (_,t) -> term_to_exp t res
   | _ ->
     Aorai_option.fatal
@@ -441,7 +441,7 @@ and tlval_to_lval (tlhost, toffset) res =
       end
     in
     (Var v_info, t_to_loffset toffset)
-  |TMem t -> mkMem (term_to_exp t res) (t_to_loffset toffset)
+  |TMem t -> mkMem ~addr:(term_to_exp t res) ~off:(t_to_loffset toffset)
   |TResult _ ->
     (match res with
      | Some res -> Var res, t_to_loffset toffset
@@ -576,7 +576,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
          let stmts2, vars2, defs2, e2 = expnode_convert c2 in
          stmts1 @ stmts2, vars1 @ vars2,
          Cil_datatype.Varinfo.Set.union defs1 defs2,
-         Cil.mkBinOp loc LOr e1 e2
+         Cil.mkBinOp ~loc LOr e1 e2
        | Some i when Integer.is_zero i -> expnode_convert c2
        | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty,e1)
     | TAnd (c1, c2) ->
@@ -586,7 +586,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
          let stmts2, vars2, defs2, e2 = expnode_convert c2 in
          stmts1 @ stmts2, vars1 @vars2,
          Cil_datatype.Varinfo.Set.union defs1 defs2,
-         Cil.mkBinOp loc LAnd e1 e2
+         Cil.mkBinOp ~loc LAnd e1 e2
        | Some i when Integer.is_zero i ->
          [], [], Cil_datatype.Varinfo.Set.empty, e1
        | Some _ -> expnode_convert c2)
@@ -594,32 +594,32 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
       let stmts1, vars1, defs1, e1 = expnode_convert c1 in
       (match Cil.isInteger e1 with
        | None ->
-         stmts1, vars1, defs1, Cil.new_exp loc (UnOp(LNot, e1,Cil.intType))
+         stmts1, vars1, defs1, Cil.new_exp ~loc (UnOp(LNot, e1,Cil.intType))
        | Some i when Integer.is_zero i ->
-         [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
-       | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc)
+         [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
+       | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc)
     | TCall (f,None) ->
       if check_current_event f Promelaast.Call then
-        [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
       else
-        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc
     | TCall (f, Some bhv) ->
       if check_current_event f Promelaast.Call then begin
         let res, stmt, new_kf = mk_behavior_call generated_kf f bhv in
         [ stmt ], [res], new_kf, Cil.evar res
       end else
-        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc
     | TReturn f ->
       if check_current_event f Promelaast.Return then
-        [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
       else
-        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
-    | TTrue -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
-    | TFalse -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc
+    | TTrue -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
+    | TFalse -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc
     | TRel(rel,t1,t2) ->
       [], [], Cil_datatype.Varinfo.Set.empty,
       Cil.mkBinOp
-        loc (rel_convert rel) (term_to_exp t1 res) (term_to_exp t2 res)
+        ~loc (rel_convert rel) (term_to_exp t1 res) (term_to_exp t2 res)
   in
   expnode_convert cond
 
@@ -679,7 +679,6 @@ let add_global glob = globals_queue := glob :: !globals_queue
 (* Utilities for global variables *)
 let add_gvar ?init vi =
   let initinfo = {Cil_types.init} in
-  vi.vghost <- true;
   vi.vstorage <- NoStorage;
   add_global (GVar(vi,initinfo,vi.vdecl));
   Globals.Vars.add vi initinfo;
@@ -700,7 +699,7 @@ let mk_gvar ?init ~ty name =
       Globals.Vars.remove vi;
       vi
     with Not_found ->
-      Cil.makeGlobalVar name ty
+      Cil.makeGlobalVar ~ghost:true name ty
   in
   add_gvar ?init vi
 
@@ -775,7 +774,7 @@ let int2enumstate nums =
   let enum = find_enum nums in
   Logic_const.term (TConst (LEnum enum)) (Ctype (TEnum (enum.eihost,[])))
 
-let int2enumstate_exp loc nums = new_exp loc (Const (CEnum (find_enum nums)))
+let int2enumstate_exp loc nums = new_exp ~loc (Const (CEnum (find_enum nums)))
 
 (** Given an lval term 'host' and an integer value 'off', it returns a lval term host[off]. *)
 let mk_offseted_array_states_as_enum host off =
@@ -822,7 +821,7 @@ let is_state_pred state =
        Logic_const.tvar (Data_for_aorai.get_state_logic_var state))
 
 let is_state_non_det_stmt (_,copy) loc =
-  mkStmtOneInstr ~ghost:true (Set (Cil.var copy, Cil.one loc, loc))
+  mkStmtOneInstr ~ghost:true (Set (Cil.var copy, Cil.one ~loc, loc))
 
 let is_state_det_stmt state loc =
   let var = Data_for_aorai.get_varinfo curState in
@@ -834,12 +833,12 @@ let is_state_exp state loc =
   if Aorai_option.Deterministic.get ()
   then
     Cil.mkBinOp
-      loc Eq
+      ~loc Eq
       (int2enumstate_exp loc state.nums)
       (Cil.evar ~loc (Data_for_aorai.get_varinfo curState))
   else
     Cil.mkBinOp
-      loc Eq (Cil.evar (Data_for_aorai.get_state_var state)) (Cil.one loc)
+      ~loc Eq (Cil.evar (Data_for_aorai.get_state_var state)) (Cil.one ~loc)
 
 let is_out_of_state_pred state =
   if Aorai_option.Deterministic.get () then
@@ -865,12 +864,12 @@ let is_out_of_state_exp state loc =
   if Aorai_option.Deterministic.get ()
   then
     Cil.mkBinOp
-      loc Ne
+      ~loc Ne
       (int2enumstate_exp loc state.nums)
       (evar ~loc (Data_for_aorai.get_varinfo curState))
   else
     Cil.mkBinOp
-      loc Eq
+      ~loc Eq
       (Cil.evar (Data_for_aorai.get_state_var state))
       (mk_int_exp 0)
 
@@ -1945,17 +1944,17 @@ let act_convert loc act res =
     function
     | Counter_init t_lval ->
       Cil.mkStmtOneInstr
-        ~ghost:true (Set (tlval_to_lval t_lval res, Cil.one loc, loc))
+        ~ghost:true (Set (tlval_to_lval t_lval res, Cil.one ~loc, loc))
     | Counter_incr t_lval ->
       let my_lval = tlval_to_lval t_lval res in
       Cil.mkStmtOneInstr ~ghost:true
         (Set
            (my_lval,
             (Cil.mkBinOp
-               loc
+               ~loc
                PlusA
-               (Cil.new_exp loc (Lval my_lval))
-               (Cil.one loc)),
+               (Cil.new_exp ~loc (Lval my_lval))
+               (Cil.one ~loc)),
             loc))
     | Copy_value (t_lval, t) ->
       Cil.mkStmtOneInstr ~ghost:true
@@ -1972,11 +1971,11 @@ let mk_transitions_stmt generated_kf loc f st res trans =
       let (tr_stmts, tr_vars, tr_funcs, exp) =
         crosscond_to_exp generated_kf f st loc trans.cross res
       in
-      let cond = Cil.mkBinOp loc LAnd (is_state_exp trans.start loc) exp in
+      let cond = Cil.mkBinOp ~loc LAnd (is_state_exp trans.start loc) exp in
       (tr_stmts @ aux_stmts,
        tr_vars @ aux_vars,
        Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
-       Cil.mkBinOp loc LOr exp_from_trans cond,
+       Cil.mkBinOp ~loc LOr exp_from_trans cond,
        (Cil.copy_exp cond, act_convert loc trans.actions res)
        :: stmt_from_action))
     trans
@@ -2151,12 +2150,12 @@ let auto_func_block generated_kf loc f st status res =
       (* First statement : what is the current status : called or return ? *)
       equalsStmt
         (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOpStatus))
-        (Cil.new_exp loc (Const (Data_for_aorai.op_status_to_cenum st))) loc;
+        (Cil.new_exp ~loc (Const (Data_for_aorai.op_status_to_cenum st))) loc;
       (* Second statement : what is the current operation,
          i.e. which function ?  *)
       equalsStmt
         (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOp))
-        (Cil.new_exp loc
+        (Cil.new_exp ~loc
            (Const (Data_for_aorai.func_to_cenum (Kernel_function.get_name f))))
         loc
     ]

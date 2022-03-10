@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -143,6 +143,13 @@ let check_sequences file =
              (my_stmt_print#without_annot my_stmt_print#stmt) s
        | _ -> ());
       Cil.DoChildren
+
+    method! vinst _ = SkipChildren
+    method! vexpr _ = SkipChildren
+    method! vlval _ = SkipChildren
+    method! vtype _ = SkipChildren
+    method! vspec _ = SkipChildren
+    method! vcode_annot _ = SkipChildren
   end
   in
-  Cil.visitCilFileSameGlobals check_unspec file
+  Cil.visitCilFileFunctions check_unspec file

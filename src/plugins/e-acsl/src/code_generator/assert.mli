@@ -24,6 +24,7 @@
     general functions to create assertion statements. *)
 
 open Cil_types
+open Analyses_types
 
 type t
 (** Type to hold the data contributing to an assertion. *)
@@ -96,10 +97,23 @@ val register_pred:
     parameter [force] has the same signification than for the function
     [register]. *)
 
+val register_pred_or_term:
+  loc:location ->
+  Env.t ->
+  ?force:bool ->
+  pred_or_term ->
+  exp ->
+  t ->
+  t * Env.t
+(** [register_pred_or_term ~loc kf env ?force pot e adata] registers the data
+    [e] corresponding to the predicate or term [pot] to the assertion context
+    [adata]. The parameter [force] has the same signification than for the
+    function [register]. *)
+
 val runtime_check:
   adata:t ->
   pred_kind:predicate_kind ->
-  Smart_stmt.annotation_kind ->
+  annotation_kind ->
   kernel_function ->
   Env.t ->
   exp ->
@@ -121,7 +135,7 @@ val runtime_check_with_msg:
   ?name:string ->
   string ->
   pred_kind:predicate_kind ->
-  Smart_stmt.annotation_kind ->
+  annotation_kind ->
   kernel_function ->
   Env.t ->
   exp ->

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -387,7 +387,7 @@ let register_tuning_parameter name p =
 let () =
   Cmdline.run_after_extended_stage
     (fun () ->
-       State_selection.Static.iter
+       State_selection.iter
          (fun s ->
             let tbl = Datatype.String.Hashtbl.create 7 in
             let p = Typed_parameter.get (State.get_name s) in

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -253,6 +253,10 @@ let set_results results =
     Property_status.emit Eva_utils.emitter ~hyps:[] ip st
   in
   Property.Hashtbl.iter aux_statuses results.statuses;
+  let b = Parameters.ResultsAll.get () in
+  Cvalue_domain.State.Store.register_global_state b
+    (`Value Cvalue_domain.State.top);
+  Self.set_computation_state Computed;
   Db.Value.mark_as_computed ();
 ;;
 

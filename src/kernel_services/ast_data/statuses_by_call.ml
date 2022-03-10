@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -170,7 +170,7 @@ let transpose_pred_at_callsite ~formals ~concretes id_pred =
   let pred = Logic_const.pred_of_id_pred id_pred in
   try
     let arguments = associate [] ~formals ~concretes in
-    let visitor :> Cil.cilVisitor = replacement_visitor arguments in
+    let visitor :> Cil.cilVisitor = replacement_visitor ~arguments in
     let new_pred = Cil.visitCilPredicateNode visitor pred.pred_content in
     let p_unnamed = Logic_const.unamed ~loc:pred.pred_loc new_pred in
     let p_named = { p_unnamed with pred_name = pred.pred_name } in

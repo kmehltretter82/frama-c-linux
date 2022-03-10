@@ -738,11 +738,11 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
   void *__retres;
   __e_acsl_store_block((void *)(& s),(size_t)8);
   __e_acsl_temporal_pull_parameter((void *)(& s),0U,8UL);
+  __gen_e_acsl_at = s;
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& s),0U);
   __e_acsl_temporal_memset(s,c,n);
-  __gen_e_acsl_at = s;
   __retres = memset(s,c,n);
   __e_acsl_initialize(s,n);
   {
@@ -812,6 +812,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     __e_acsl_store_block((void *)(& dest),(size_t)8);
     __e_acsl_temporal_pull_parameter((void *)(& dest),0U,8UL);
     __e_acsl_temporal_pull_parameter((void *)(& src),1U,8UL);
+    __gen_e_acsl_at = dest;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
@@ -955,7 +956,6 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     __gmpz_clear(__gen_e_acsl_sub_2);
     __gmpz_clear(__gen_e_acsl_add);
   }
-  __gen_e_acsl_at = dest;
   __retres = memcpy(dest,src,n);
   __e_acsl_initialize(dest,n);
   {

@@ -175,7 +175,7 @@ let inject_in_instr env kf stmt = function
     let caller, args =
       match caller.enode with
       | Lval (Var fvi, _) ->
-        let fvi, args = rename_caller loc fvi args in
+        let fvi, args = rename_caller ~loc fvi args in
         Cil.evar fvi, args
       | _ -> caller, args
     in
@@ -443,7 +443,7 @@ and inject_in_stmt env kf stmt =
   in
   let env = Env.set_kinstr env (Kstmt stmt) in
   (* initial environment *)
-  let env =
+  let env, translate_pre_funspec =
     if Kernel_function.is_first_stmt kf stmt then
       let env =
         if Kernel_function.is_main kf then
@@ -454,11 +454,18 @@ and inject_in_stmt env kf stmt =
           in
           Temporal.handle_function_parameters kf env
       in
-      (* translate the precondition of the function *)
-      if Functions.check kf then
-        let funspec = Annotations.funspec kf in
-        Translate_annots.pre_funspec kf env funspec
-      else env
+      (* check if the precondition of the function needs to be translated *)
+      env, Functions.check kf
+    else
+      env, false
+  in
+  (* translate all \at() predicates and terms that reference the current stmt *)
+  let env = Translate_ats.for_stmt env kf stmt in
+  (* translate the precondition of the function *)
+  let env =
+    if translate_pre_funspec then
+      let funspec = Annotations.funspec kf in
+      Translate_annots.pre_funspec kf env funspec
     else
       env
   in
@@ -497,7 +504,7 @@ and inject_in_block (env: Env.t) kf blk =
   (* now inject code that de-allocates the necessary observation variables and
      blocks of the runtime memory that have been previously allocated *)
   (* calls to [free] for de-allocating variables observing \at(_,_) *)
-  let free_stmts = At_with_lscope.Free.find_all kf in
+  let free_stmts = Translate_ats.Free.find_all kf in
   match blk.blocals, free_stmts with
   | [], [] ->
     env
@@ -511,7 +518,7 @@ and inject_in_block (env: Env.t) kf blk =
           (* now that [free] stmts for [kf] have been inserted,
              there is no more need to keep the corresponding entries in the
              table managing them. *)
-          At_with_lscope.Free.remove_all kf;
+          Translate_ats.Free.remove_all kf;
           (* The free statements are passed in the same order than the malloc
              ones. In order to free the variable in the reverse order, the list
              is reversed before appending the return statement. Moreover,
@@ -573,12 +580,12 @@ let add_generated_variables_in_function env fundec =
 (* Memory management for \at on purely logic variables: put [malloc] stmts at
    proper locations *)
 let add_malloc_and_free_stmts kf fundec =
-  let malloc_stmts = At_with_lscope.Malloc.find_all kf in
+  let malloc_stmts = Translate_ats.Malloc.find_all kf in
   let fstmts = malloc_stmts @ fundec.sbody.bstmts in
   fundec.sbody.bstmts <- fstmts;
   (* now that [malloc] stmts for [kf] have been inserted, there is no more need
      to keep the corresponding entries in the table managing them. *)
-  At_with_lscope.Malloc.remove_all kf
+  Translate_ats.Malloc.remove_all kf
 
 let inject_in_fundec main fundec =
   let vi = fundec.svar in
@@ -806,10 +813,10 @@ let inject_mtracking_handler main =
           (* some non-standard arguments. *)
           nulls
       in
-      let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
+      let ptr_size = Cil.sizeOf ~loc Cil.voidPtrType in
       let args = args @ [ ptr_size ] in
-      let init = Smart_stmt.rtl_call loc "memory_init" args in
-      let clean = Smart_stmt.rtl_call loc "memory_clean" [] in
+      let init = Smart_stmt.rtl_call ~loc "memory_init" args in
+      let clean = Smart_stmt.rtl_call ~loc "memory_clean" [] in
       surround_function_with fundec init (Some clean)
     in
     Option.iter handle_main main
@@ -830,6 +837,7 @@ let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
+  Translate_ats.reset ();
   Logic_functions.reset ();
   Global_observer.reset ();
   Analyses.reset ();

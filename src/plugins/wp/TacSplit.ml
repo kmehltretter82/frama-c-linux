@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -253,7 +253,7 @@ class split =
                 let cases = [ "Split" , F.p_bool p ] in
                 Applicable (Tactical.split cases)
               | And es ->
-                let nb_parts,parts = PartitionsQQ.get vars es in
+                let nb_parts,parts = PartitionsQQ.get ~vars es in
                 if nb_parts=1 then Not_applicable
                 else begin
                   feedback#set_title "Split (exists and)" ;
@@ -347,7 +347,7 @@ class split =
                     let cases = [ "Split (distrib forall and)" , When p ] in
                     Applicable (Tactical.replace ~at:step.id cases)
                   | Or es ->
-                    let nb_parts,parts = PartitionsQQ.get vars es in
+                    let nb_parts,parts = PartitionsQQ.get ~vars es in
                     if nb_parts=1 then Not_applicable
                     else begin
                       feedback#set_title "Split (forall or)" ;

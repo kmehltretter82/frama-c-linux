@@ -35,7 +35,8 @@
 open Cil_types
 open Cil_datatype
 
-module Error = Error.Make(struct let phase = Options.Dkey.bound_variables end)
+let dkey = Options.Dkey.bound_variables
+module Error = Error.Make(struct let phase = dkey end)
 
 (** [error_msg quantif msg pp x] creates an error message from the string [msg]
     containing the value [x] pretty-printed by [pp] and the predicate [quantif]
@@ -696,46 +697,30 @@ end
         (Result.Error (Error.make_not_yet "unguarded \\exists quantification"))
     | _ -> ()
 
-  let do_user_predicates () =
-    let gannot a =
-      match a with
-      | Dfun_or_pred ({l_body = LBpred p},loc) ->
-        (match Logic_normalizer.get_pred p with
-         | PoT_pred p -> process_quantif ~loc p
-         | PoT_term _ -> ())
-      | _ -> ()
-    in
-    Annotations.iter_global (fun _ a -> gannot a)
-
   let preprocessor = object
-    inherit E_acsl_visitor.visitor
+    inherit E_acsl_visitor.visitor dkey
+
+    method !vannotation annot =
+      match annot with
+      | Dfun_or_pred _ -> Cil.DoChildren
+      | _ -> Cil.SkipChildren
 
     method !vpredicate p =
       let loc = p.pred_loc in
-      match Logic_normalizer.get_pred p with
-      | PoT_pred p -> process_quantif ~loc p;
-        Cil.DoChildren
-      | PoT_term _ -> Cil.DoChildren
+      let p = Logic_normalizer.get_pred p in
+      process_quantif ~loc p;
+      Cil.DoChildren
 
   end
 
   let compute ast =
-    Visitor.visitFramacFileSameGlobals
-      (preprocessor :> Visitor.frama_c_inplace)
-      ast;
-    do_user_predicates ()
+    preprocessor#visit_file ast
 
   let compute_annot annot =
-    ignore
-      (Visitor.visitFramacCodeAnnotation
-         (preprocessor :> Visitor.frama_c_inplace)
-         annot)
+    ignore @@ preprocessor#visit_code_annot annot
 
   let compute_predicate p =
-    ignore
-      (Visitor.visitFramacPredicate
-         (preprocessor :> Visitor.frama_c_inplace)
-         p)
+    ignore @@ preprocessor#visit_predicate p
 end
 
 let preprocess = Preprocessor.compute

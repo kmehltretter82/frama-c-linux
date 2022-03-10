@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -198,7 +198,7 @@ class button ?align ?icon ?label ?(border=true) ?tooltip () =
     method! set_enabled e = s#set_enabled e ; b#set_enabled e
     method default = button#grab_default
     initializer
-      ignore (button#connect#clicked self#fire)
+      ignore (button#connect#clicked ~callback:self#fire)
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -216,7 +216,8 @@ class checkbox ~label ?tooltip () =
     initializer
       begin
         set_tooltip button tooltip ;
-        ignore (button#connect#clicked (fun () -> s#set button#active)) ;
+        ignore (button#connect#clicked
+                  ~callback:(fun () -> s#set button#active)) ;
       end
   end
 
@@ -236,7 +237,7 @@ class toggle ?align ?icon ?label ?(border=true) ?tooltip () =
           toggle_icon_warning := false ) ;
       b#set_icon icn
     initializer
-      ignore (button#connect#clicked (fun () -> s#set button#active))
+      ignore (button#connect#clicked ~callback:(fun () -> s#set button#active))
   end
 
 class switch ?tooltip () =
@@ -253,7 +254,7 @@ class switch ?tooltip () =
       begin
         set_tooltip evt tooltip ;
         ignore (evt#event#connect#button_release
-                  (fun _evt -> self#set (not s#get) ; false)) ;
+                  ~callback:(fun _evt -> self#set (not s#get) ; false)) ;
       end
   end
 
@@ -274,7 +275,8 @@ class radio_group ~label ?tooltip () =
     initializer
       begin
         set_tooltip button tooltip ;
-        ignore (button#connect#clicked (fun () -> s#set button#active)) ;
+        ignore (button#connect#clicked
+                  ~callback:(fun () -> s#set button#active)) ;
       end
   end
 
@@ -286,7 +288,8 @@ class toggle_group ?label ?icon ?tooltip () =
     inherit! button_skel ?icon ?tooltip (button :> GButton.button_skel) as b
     method! set_enabled e = s#set_enabled e ; b#set_enabled e
     method! set a = s#set a ; button#set_relief (if a then `NORMAL else `NONE)
-    initializer ignore (button#connect#clicked (fun () -> s#set (not s#get)))
+    initializer ignore (button#connect#clicked
+                          ~callback:(fun () -> s#set (not s#get)))
   end
 
 class ['a] group (default : 'a) =
@@ -403,7 +406,7 @@ class ['a] menu ~default ?(options=[]) ?render ?items () =
       end
 
     initializer
-      ignore (cmb#connect#notify_active self#clicked)
+      ignore (cmb#connect#notify_active ~callback:self#clicked)
 
   end
 

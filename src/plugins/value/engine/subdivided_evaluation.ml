@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -241,7 +241,7 @@ let has_smaller_max_bound = compare_bound Ival.has_smaller_max_bound
 let subdivide size cvalue =
   try
     let ival = Cvalue.V.project_ival cvalue in
-    let ival1, ival2 = Ival.subdivide size ival in
+    let ival1, ival2 = Ival.subdivide ~size ival in
     Cvalue.V.inject_ival ival1, Cvalue.V.inject_ival ival2
   with Cvalue.V.Not_based_on_null -> assert false
 

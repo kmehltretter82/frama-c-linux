@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -154,7 +154,7 @@ module PATH = Stmt.Set
 module DEPS = Property.Set
 
 let apply_tag name attr buffer start stop =
-  let tg = Gtk_helper.make_tag buffer name attr in
+  let tg = Gtk_helper.make_tag buffer ~name attr in
   Gtk_helper.apply_tag buffer tg start stop
 
 let apply_goal = apply_tag "wp.goal" [`BACKGROUND "lightblue"]

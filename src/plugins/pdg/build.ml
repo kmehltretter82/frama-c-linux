@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -308,13 +308,13 @@ let create_lval_node pdg state key  ~l_loc ~exact ~l_dpds ~l_decl =
   let new_node = add_elem pdg key in
   add_dpds pdg new_node Dpd.Addr state l_dpds;
   add_decl_dpds pdg new_node Dpd.Addr l_decl;
-  let new_state = Pdg_state.add_loc_node state exact l_loc new_node in
+  let new_state = Pdg_state.add_loc_node state ~exact l_loc new_node in
   (new_node, new_state)
 
 let add_from pdg state_before state lval (default, deps) =
   let new_node = add_elem pdg (Key.out_from_key lval) in
   let exact = (not default) in
-  let state = Pdg_state.add_loc_node state exact lval new_node in
+  let state = Pdg_state.add_loc_node state ~exact lval new_node in
   add_dpds pdg new_node Dpd.Data state_before deps;
   state
 
@@ -327,7 +327,7 @@ let process_call_output pdg state_before_call state stmt out default from_out fc
   let key = Key.call_output_key stmt out in
   let new_node = create_call_output_node pdg state_before_call stmt
       key from_out fct_dpds in
-  let state = Pdg_state.add_loc_node state exact out new_node
+  let state = Pdg_state.add_loc_node state ~exact out new_node
   in state
 
 (** mix between process_call_output and process_asgn *)
@@ -340,7 +340,7 @@ let process_call_return pdg state_before_call state_with_inputs stmt
   add_dpds pdg new_node Dpd.Addr state_before_call l_dpds;
   add_decl_dpds pdg new_node Dpd.Addr l_decl;
   let new_state =
-    Pdg_state.add_loc_node state_before_call exact l_loc new_node in
+    Pdg_state.add_loc_node state_before_call ~exact l_loc new_node in
   new_state
 
 (** for skip statement : we want to add a node in the PDG in order to be able
@@ -473,7 +473,7 @@ let add_retres pdg state ret_stmt retres_loc_dpds retres_decls =
   let retres = Locations.(enumerate_valid_bits Read retres_loc) in
   add_dpds pdg return_node  Dpd.Data state retres_loc_dpds;
   add_decl_dpds pdg return_node Dpd.Data retres_decls;
-  let new_state = Pdg_state.add_loc_node state true retres return_node in
+  let new_state = Pdg_state.add_loc_node state ~exact:true retres return_node in
   create_fun_output_node pdg (Some new_state) retres;
   new_state
 
@@ -843,7 +843,7 @@ module Computer
 
   let join_and_is_included smaller larger =
     pdg_debug "smaller (new): %a larger (old) %a" pretty smaller pretty larger;
-    let is_new, new_state = Pdg_state.test_and_merge larger smaller in
+    let is_new, new_state = Pdg_state.test_and_merge ~old:larger smaller in
     pdg_debug "new_state: %a is_new: %b" pretty new_state is_new;
     (new_state, not is_new)
   ;;
@@ -947,7 +947,7 @@ let compute_pdg_for_f kf =
   let init_state =
     process_entry_point pdg f_stmts;
     let formals = Kernel_function.get_formals kf in
-    process_declarations pdg formals f_locals
+    process_declarations pdg ~formals ~locals:f_locals
   in
   let froms = match f_stmts with
     | [] ->

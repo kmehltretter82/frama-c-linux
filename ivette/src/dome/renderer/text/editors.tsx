@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -34,11 +34,13 @@
 import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
+import * as Themes from 'dome/themes';
 import { Vfill } from 'dome/layout/boxes';
 import CodeMirror, { EditorConfiguration } from 'codemirror/lib/codemirror';
 import { RichTextBuffer, CSSMarker, Decorator } from './buffers';
 
 import './style.css';
+import './dark-code.css';
 import 'codemirror/lib/codemirror.css';
 
 const CSS_HOVERED = 'dome-xText-hover';
@@ -492,8 +494,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
 // --- Text View
 // --------------------------------------------------------------------------
 
-/**
-   #### Text Editor.
+/** #### Text Editor.
 
    A component rendering the content of a text buffer, that shall be instances
    of the `Buffer` base class.
@@ -511,11 +512,17 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
 
    #### Themes
 
-   The CodeMirror `theme` option allow you to style your document,
-   especially when using modes.
-   Themes are only accessible if you load the associated CSS style sheet.
-   For instance, to use the `'ambiance'` theme provided with CodeMirror, you
-   shall import `'codemirror/theme/ambiance.css'` somewhere in your application.
+   The CodeMirror `theme` option allow you to style your document, especially
+   when using modes.
+
+   By default, CodeMirror uses the `'default'` theme in _light_ theme and the
+   `'dark-code'` theme in _dark_ theme. The `'dark-code'` is provided by Dome,
+   Cf. `./dark-mode.css` in the source distribution.
+
+   To use other custom themes, you shall load the associated CSS style
+   sheet. For instance, to use the `'ambiance'` theme provided with CodeMirror,
+   you shall import `'codemirror/theme/ambiance.css'` somewhere in your
+   application.
 
    #### Modes & Adds-On
 
@@ -529,16 +536,17 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
    You can register your own extensions directly into the global `CodeMirror`
    class instance.  However, the correct instance must be retrieved by using
    `import CodeMirror from 'codemirror/lib/codemirror.js'` ; using `from
-   'codemirror'` returns a different instance of `CodeMirror` class and will
-   not work.
- */
+   'codemirror'` returns a different instance of `CodeMirror` class and will not
+   work.  */
 export function Text(props: TextProps) {
-  let { className, style, fontSize, ...cmprops } = props;
+  const [appTheme] = Themes.useColorTheme();
+  let { className, style, fontSize, theme: usrTheme, ...cmprops } = props;
   if (fontSize !== undefined && fontSize < 4) fontSize = 4;
   if (fontSize !== undefined && fontSize > 48) fontSize = 48;
+  const theme = usrTheme ?? (appTheme === 'dark' ? 'dark-code' : 'default');
   return (
     <Vfill className={className} style={{ ...style, fontSize }}>
-      <CodeMirrorWrapper fontSize={fontSize} {...cmprops} />
+      <CodeMirrorWrapper fontSize={fontSize} theme={theme} {...cmprops} />
     </Vfill>
   );
 }

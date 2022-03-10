@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -122,7 +122,7 @@ let select_stmt_zone kf ?(select=empty_db_select kf) stmt ~before loc mark =
       try
         let pdg = !Db.Pdg.get kf in
         let nodes, undef =
-          !Db.Pdg.find_location_nodes_at_stmt pdg stmt before loc in
+          !Db.Pdg.find_location_nodes_at_stmt pdg stmt ~before loc in
         let sel = mk_select pdg sel nodes undef mark in
         (fvar, sel)
       with

@@ -168,7 +168,7 @@ let initialize ~loc (host, offset as lv) = match host, offset with
     let typ = Cil.typeOfLval lv in
     rtl_call ~loc
       "initialize"
-      [ Cil.mkAddrOf ~loc lv; Cil.new_exp loc (SizeOf typ) ]
+      [ Cil.mkAddrOf ~loc lv; Cil.new_exp ~loc (SizeOf typ) ]
 
 let named_store_stmt name ?str_size vi =
   let ty = Cil.unrollType vi.vtype in
@@ -209,14 +209,6 @@ let delete_stmt ?(is_addr=false) vi =
 let mark_readonly vi =
   let loc = vi.vdecl in
   rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
-
-type annotation_kind =
-  | Assertion
-  | Precondition
-  | Postcondition
-  | Invariant
-  | Variant
-  | RTE
 
 (*
 Local Variables:

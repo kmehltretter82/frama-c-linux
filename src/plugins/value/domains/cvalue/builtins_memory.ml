@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -175,7 +175,10 @@ let frama_c_memcpy state actuals =
          to be copied, we use a more precise method (see do_size below).
          However, in all cases, those locations are used to compute the
          read and written bits. *)
-      let range = Ival.inject_interval (Some Int.zero) diff Int.zero char_bits in
+      let range =
+        Ival.inject_interval ~min:(Some Int.zero) ~max:diff
+          ~rem:Int.zero ~modu:char_bits
+      in
       let size_char = Int_Base.inject char_bits in
       let loc_src = make_loc (Location_Bits.shift range src) size_char in
       let loc_dst = make_loc (Location_Bits.shift range dst) size_char in
@@ -550,7 +553,7 @@ let frama_c_memset_precise state dst v (exp_size, size) =
         let offset_dst_bits = Int.mul offset_dst size_char in
         let vi_dst = Base.to_varinfo base_dst in
         let mo = Bit_utils.MatchSize size_bits in
-        snd (Bit_utils.(find_offset vi_dst.vtype offset_dst_bits mo))
+        snd (Bit_utils.(find_offset vi_dst.vtype ~offset:offset_dst_bits mo))
     in
     let offsm = memset_typ_offsm typ v in
     let dst_loc = Locations.loc_bytes_to_loc_bits dst in

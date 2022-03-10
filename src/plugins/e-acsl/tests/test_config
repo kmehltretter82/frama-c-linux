@@ -1,0 +1,18 @@
+MACRO: DEST @PTEST_RESULT@/gen_@PTEST_NAME@
+MACRO: MACHDEP -machdep gcc_x86_64
+MACRO: GLOBAL @MACHDEP@ -remove-unused-specified-functions -verbose 0 -no-unicode
+
+MACRO: EACSL -e-acsl -e-acsl-share @PTEST_SHARE_DIR@/e-acsl -e-acsl-verbose 1
+MACRO: EVA -eva -eva-no-alloc-returns-null -eva-no-results -eva-no-print -eva-warn-key libc:unsupported-spec=inactive -eva-warn-key loop-unroll:auto=inactive
+
+MACRO: EVENTUALLY -print -ocode @DEST@.c
+
+PLUGIN: E_ACSL eva,scope,variadic rtegen
+
+LIBS: @PTEST_SUITE_DIR@/../E_ACSL_test
+LOG: gen_@PTEST_NAME@.c
+
+COMMENT: The dependency to the plugin share directory has not to be explicited
+DEPS:
+
+OPT: @GLOBAL@ @EACSL@ -then-last @EVA@ @EVENTUALLY@

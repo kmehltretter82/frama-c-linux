@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -162,7 +162,7 @@ let register_domain ~name ~descr =
   create_domain_option name;
   domains_ref := (name, descr) :: !domains_ref;
   Cmdline.replace_option_help
-    Domains.option_name "eva" domains (domains_help ())
+    Domains.option_name ~plugin:"eva" ~group:domains (domains_help ())
 
 (* Checks that a domain has been registered. *)
 let check_domain option_name domain =
@@ -276,7 +276,7 @@ module Numerors_Real_Size =
         "Set <n> as the significand size of the MPFR representation \
          of reals used by the numerors domain (defaults to 128)"
     end)
-let () = Numerors_Real_Size.set_range 1 max_int
+let () = Numerors_Real_Size.set_range ~min:1 ~max:max_int
 let () = add_precision_dep Numerors_Real_Size.parameter
 
 let () = Parameter_customize.set_group domains
@@ -490,7 +490,7 @@ module AutomaticContextMaxDepth =
       let help = "Use <n> as the depth of the default context for Eva. \
                   (defaults to 2)"
     end)
-let () = AutomaticContextMaxDepth.set_range 0 max_int
+let () = AutomaticContextMaxDepth.set_range ~min:0 ~max:max_int
 let () = add_correctness_dep AutomaticContextMaxDepth.parameter
 
 let () = Parameter_customize.set_group initial_context
@@ -618,7 +618,7 @@ module SemanticUnrollingLevel =
          The larger n, the more precise and expensive the analysis \
          (defaults to 0)"
     end)
-let () = SemanticUnrollingLevel.set_range 0 max_int
+let () = SemanticUnrollingLevel.set_range ~min:0 ~max:max_int
 let () = add_precision_dep SemanticUnrollingLevel.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -670,7 +670,7 @@ module MinLoopUnroll =
          Can be overwritten on a case-by-case basis by loop unroll annotations."
     end)
 let () = add_precision_dep MinLoopUnroll.parameter
-let () = MinLoopUnroll.set_range 0 max_int
+let () = MinLoopUnroll.set_range ~min:0 ~max:max_int
 
 let () = Parameter_customize.set_group precision_tuning
 module AutoLoopUnroll =
@@ -684,7 +684,7 @@ module AutoLoopUnroll =
                   are completely unrolled."
     end)
 let () = add_precision_dep AutoLoopUnroll.parameter
-let () = AutoLoopUnroll.set_range 0 max_int
+let () = AutoLoopUnroll.set_range ~min:0 ~max:max_int
 
 let () = Parameter_customize.set_group precision_tuning
 module DefaultLoopUnroll =
@@ -698,7 +698,7 @@ module DefaultLoopUnroll =
          not explicitly provide a limit."
     end)
 let () = add_precision_dep DefaultLoopUnroll.parameter
-let () = DefaultLoopUnroll.set_range 0 max_int
+let () = DefaultLoopUnroll.set_range ~min:0 ~max:max_int
 
 let () = Parameter_customize.set_group precision_tuning
 module HistoryPartitioning =
@@ -712,7 +712,7 @@ module HistoryPartitioning =
          traces are also distinct. (A value of 0 deactivates this feature)"
     end)
 let () = add_precision_dep HistoryPartitioning.parameter
-let () = HistoryPartitioning.set_range 0 max_int
+let () = HistoryPartitioning.set_range ~min:0 ~max:max_int
 
 let () = Parameter_customize.set_group precision_tuning
 module ValuePartitioning =
@@ -739,7 +739,7 @@ module SplitLimit =
                   enumerating more than N cases"
     end)
 let () = add_precision_dep SplitLimit.parameter
-let () = SplitLimit.set_range 0 max_int
+let () = SplitLimit.set_range ~min:0 ~max:max_int
 
 let () = Parameter_customize.set_group precision_tuning
 module InterproceduralSplits =
@@ -826,7 +826,7 @@ module ILevel =
     end)
 let () = add_precision_dep ILevel.parameter
 let () = ILevel.add_update_hook (fun _ i -> Int_set.set_small_cardinal i)
-let () = ILevel.set_range 2 max_int
+let () = ILevel.set_range ~min:2 ~max:max_int
 
 let builtins = ref Datatype.String.Set.empty
 let register_builtin name = builtins := Datatype.String.Set.add name !builtins
@@ -903,7 +903,7 @@ module LinearLevel =
          appears multiple times, by splitting its value at most n times. \
          Defaults to 0."
     end)
-let () = LinearLevel.set_range 0 max_int
+let () = LinearLevel.set_range ~min:0 ~max:max_int
 let () = add_precision_dep LinearLevel.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -985,7 +985,7 @@ module ArrayPrecisionLevel =
                   Array accesses are precise as long as the interval for the \
                   index contains less than n values. (defaults to 200)"
     end)
-let () = ArrayPrecisionLevel.set_range 0 max_int
+let () = ArrayPrecisionLevel.set_range ~min:0 ~max:max_int
 let () = add_precision_dep ArrayPrecisionLevel.parameter
 let () = ArrayPrecisionLevel.add_update_hook
     (fun _ v -> Offsetmap.set_plevel v)
@@ -1092,7 +1092,7 @@ module StopAtNthAlarm =
     let arg_name = "n"
     let help = "Abort the analysis when the nth alarm is emitted."
   end)
-let () = StopAtNthAlarm.set_range 0 max_int
+let () = StopAtNthAlarm.set_range ~min:0 ~max:max_int
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ugliness required for correctness                                  --- *)
@@ -1143,7 +1143,7 @@ module OracleDepth =
       let default = 2
       let arg_name = ""
     end)
-let () = OracleDepth.set_range 0 max_int
+let () = OracleDepth.set_range ~min:0 ~max:max_int
 let () = add_precision_dep OracleDepth.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -1156,7 +1156,7 @@ module ReductionDepth =
       let default = 4
       let arg_name = ""
     end)
-let () = ReductionDepth.set_range 0 max_int
+let () = ReductionDepth.set_range ~min:0 ~max:max_int
 let () = add_precision_dep ReductionDepth.parameter
 
 
@@ -1220,7 +1220,7 @@ module MallocLevel =
       let help = "Set to [m] the number of precise dynamic allocations \
                   besides the initial one, for each callstack (defaults to 0)"
     end)
-let () = MallocLevel.set_range 0 max_int
+let () = MallocLevel.set_range ~min:0 ~max:max_int
 let () = add_precision_dep MallocLevel.parameter
 
 (* -------------------------------------------------------------------------- *)
@@ -1310,7 +1310,7 @@ module Precision =
                   from 0 (fastest but rather imprecise analysis) \
                   to 11 (accurate but potentially slow analysis)."
     end)
-let () = Precision.set_range (-1) 11
+let () = Precision.set_range ~min:(-1) ~max:11
 let () = add_precision_dep Precision.parameter
 
 (* Sets a parameter [P] to [t], unless it has already been set by any other

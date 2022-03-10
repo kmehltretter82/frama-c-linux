@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -382,7 +382,7 @@ let anchor tree ?node () =
     | None ->
       match tree.root with
       | Some n -> n
-      | None -> mk_root tree
+      | None -> mk_root ~tree
 
 let commit fork =
   List.iter (fun (_,wp) -> ignore (Wpo.resolve wp)) fork.Fork.goals ;

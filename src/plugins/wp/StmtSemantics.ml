@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -475,7 +475,7 @@ struct
     parallel behavior env spec.spec_behavior
 
   and assigns : env -> assigns -> paths = fun env a ->
-    let frame, _,  _ = mk_frame "assigns" env in
+    let frame, _,  _ = mk_frame ~descr:"assigns" env in
     let lenv = L.mk_env () in (* TODO: lenv for ghost code. *)
     let here = Sigma.create () in
     let authorized_region = L.in_frame frame

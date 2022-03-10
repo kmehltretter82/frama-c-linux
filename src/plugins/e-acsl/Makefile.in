@@ -61,15 +61,15 @@ ANALYSES_CMI:= \
 ANALYSES_CMI:=$(addprefix src/analyses/, $(ANALYSES_CMI))
 
 SRC_ANALYSES:= \
-	analyses_datatype \
-	label \
-	rte \
 	lscope \
+	analyses_datatype \
+	rte \
 	e_acsl_visitor \
 	logic_normalizer \
 	bound_variables \
 	interval \
 	typing \
+	labels \
 	literal_strings \
 	memory_tracking \
 	exit_points \
@@ -94,10 +94,10 @@ SRC_CODE_GENERATOR:= \
 	logic_functions \
 	loops \
 	quantif \
-	at_with_lscope \
 	memory_translate \
 	logic_array \
 	translate_utils \
+	translate_ats \
 	translate_terms \
 	translate_predicates \
 	translate_rtes \
@@ -233,26 +233,12 @@ E_ACSL_TESTS E_ACSL_DEFAULT_TESTS: $(TEST_DEPENDENCIES)
 tests:: $(TEST_DEPENDENCIES)
 endif
 
-$(EACSL_PLUGIN_DIR)/tests/test_config: \
-		$(EACSL_PLUGIN_DIR)/tests/test_config.in \
-		$(EACSL_PLUGIN_DIR)/Makefile
-	$(PRINT_MAKING) $@
-	$(SED) -e "s|@SEDCMD@|`command -v sed`|g" $< > $@
-
-$(EACSL_PLUGIN_DIR)/tests/test_config_dev: \
-		$(EACSL_PLUGIN_DIR)/tests/test_config_dev.in \
-		$(EACSL_PLUGIN_DIR)/Makefile
-	$(PRINT_MAKING) $@
-	$(SED) -e "s|@SEDCMD@|`command -v sed`|g" $< > $@
-
 clean::
 	for d in $(E_ACSL_EXTRA_DIRS); do \
 	  $(RM) $$d/*~; \
 	done
 	$(PRINT_RM) cleaning generated test files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
-	$(RM) $(E_ACSL_DIR)/tests/test_config \
-		$(E_ACSL_DIR)/tests/test_config_dev
 	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
 
 endif
@@ -353,8 +339,8 @@ EACSL_DOC_FILES = \
 	$(EACSL_MANPAGES)
 
 EACSL_TEST_FILES = \
-	tests/test_config_dev.in \
-	tests/test_config.in \
+	tests/test_config_dev \
+	tests/test_config \
 	tests/wrapper.sh \
 	tests/gmp-only/test_config \
 	tests/gmp-only/test_config_dev \

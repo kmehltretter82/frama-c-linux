@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -45,7 +45,7 @@ let call_function lval vi args =
   let typs = Cil.argsToList typs in
   let gen_arg exp (_, typ, _) =
     if Cil_datatype.Typ.equal vi.vtype typ then exp
-    else Cil.mkCast typ exp
+    else Cil.mkCast ~newt:typ exp
   in
   let args = List.map2 gen_arg args typs in
   Call(lval, (Cil.evar vi), args, loc)

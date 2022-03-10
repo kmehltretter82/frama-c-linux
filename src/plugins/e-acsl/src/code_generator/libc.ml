@@ -229,7 +229,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
           Assert.runtime_check
             ~adata
             ~pred_kind:Assert
-            Smart_stmt.RTE
+            RTE
             kf
             env
             lower_guard
@@ -256,7 +256,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
           Assert.runtime_check
             ~adata
             ~pred_kind:Assert
-            Smart_stmt.RTE
+            RTE
             kf
             env
             upper_guard

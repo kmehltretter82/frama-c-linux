@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -961,13 +961,13 @@ struct
       | None ->
         (* We could do better here, as one of the bound may be finite. However,
            this case should occur rarely or not at all. *)
-        inject_interval None None r modu
+        inject_interval ~min:None ~max:None ~rem:r ~modu
       | Some size ->
         try compute_small_set ~size v1 v2 r modu
         with Do_not_fit_small_sets ->
           let min = compute_bound ~size v1 v2 true
           and max = compute_bound ~size v1 v2 false in
-          inject_interval (Some min) (Some max) r modu
+          inject_interval ~min:(Some min) ~max:(Some max) ~rem:r ~modu
 end
 
 let bitwise_or = let module M = BitwiseOperator (Or) in M.bitwise_forward

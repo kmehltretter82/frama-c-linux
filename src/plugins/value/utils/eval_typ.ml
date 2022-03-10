@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -125,7 +125,7 @@ let compatible_functions typ_pointer ?args kfs =
   let check_pointer (list, alarm) kf =
     let typ = Kernel_function.get_type kf in
     if Cil.isFunctionType typ then
-      match is_compatible_function typ_pointer typ with
+      match is_compatible_function ~typ_pointed:typ_pointer ~typ_fun:typ with
       | Compatible -> kf :: list, alarm
       | Incompatible_but_accepted -> kf :: list, true
       | Incompatible -> list, true

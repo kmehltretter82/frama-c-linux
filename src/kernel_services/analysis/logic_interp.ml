@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -312,7 +312,7 @@ and loc_to_exp ~result {term_node = lnode ; term_type = ltype; term_loc = loc} =
       Logic_utils.is_same_type
         (Logic_typing.type_of_set_elem set) t.term_type ->
     loc_to_exp ~result t
-  | Tnull -> [ Cil.mkCast (TPtr(TVoid [], [])) (Cil.zero ~loc) ]
+  | Tnull -> [ Cil.mkCast ~newt:(TPtr(TVoid [], [])) (Cil.zero ~loc) ]
 
   (* additional constructs *)
   | Tapp _ | Tlambda _ | Trange _   | Tlet _
@@ -787,7 +787,7 @@ struct
              dependencies of [*p]. *)
           if is_same_label current_label lbl then (
             let typ = Logic_typing.type_of_pointed t.term_type in
-            let tlv = Cil.mkTermMem t TNoOffset in
+            let tlv = Cil.mkTermMem ~addr:t ~off:TNoOffset in
             let tlv' = Logic_const.term (TLval tlv) typ in
             self#do_term_lval tlv';
             DoChildren
@@ -818,7 +818,7 @@ struct
               (function Base.CLogic_Var _ -> false | _ -> true)
               z
           in
-          add_result current_before current_stmt z
+          add_result ~before:current_before current_stmt z
         with Db.From.Not_lval ->
           raise (NYI "[logic_interp] dependencies of a term lval")
 

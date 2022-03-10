@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -164,11 +164,14 @@ let current () = {
 
 let default = { valid = false ; timeout = None ; stepout = None }
 
-let get_timeout ~smoke = function
+let get_timeout ?kf ~smoke = function
   | { timeout = None } ->
     if smoke
     then Wp_parameters.SmokeTimeout.get ()
-    else Wp_parameters.Timeout.get ()
+    else begin match Option.map Wp_parameters.FctTimeout.find kf with
+      | exception Not_found | None -> Wp_parameters.Timeout.get ()
+      | Some timeout -> timeout
+    end
   | { timeout = Some t } -> t
 
 let get_stepout = function

@@ -61,6 +61,8 @@ let rec has_empty_quantif_with_false_negative = function
         has_empty_quantif_with_false_negative guards
     end
 
+let () =
+  Labels.has_empty_quantif_ref := has_empty_quantif_with_false_negative
 
 module Label_ids =
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)

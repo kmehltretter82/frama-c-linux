@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -346,7 +346,7 @@ let cnf_dnf ~pol ~depth e =
           (cf@cxf),cnf
       with | Absorbant -> [],[[]]
   in
-  let tool = tools pol in
+  let tool = tools ~pol in
   let cNf = cnf_dnf ~depth ~pol e in
   try
     match cNf with

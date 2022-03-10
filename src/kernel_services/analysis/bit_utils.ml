@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -538,7 +538,7 @@ let rec find_offset typ ~offset om =
         let rem = Integer.e_rem offset size_elt in
         if offset_match_cell om size_elt then
           (* [size] covers at most one cell; we continue in the relevant one *)
-          let off, typ = find_offset typ_elt rem om in
+          let off, typ = find_offset typ_elt ~offset:rem om in
           Index (exp_start, off), typ
         else begin
           match om with
@@ -571,7 +571,7 @@ let rec find_offset typ ~offset om =
               find_field q
             else
               let off, typ =
-                find_offset fi.ftype (Integer.sub offset off_fi) om
+                find_offset fi.ftype ~offset:(Integer.sub offset off_fi) om
               in
               Field (fi, off), typ
           with NoMatchingOffset when not ci.cstruct ->

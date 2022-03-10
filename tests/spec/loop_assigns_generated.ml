@@ -1,7 +1,7 @@
 open Cil_types
 
-let e1 = Emitter.(create "emitter1" [ Code_annot ] [] [])
-let e2 = Emitter.(create "emitter2" [ Code_annot ] [] [])
+let e1 = Emitter.(create "emitter1" [ Code_annot ] ~correctness:[] ~tuning:[])
+let e2 = Emitter.(create "emitter2" [ Code_annot ] ~correctness:[] ~tuning:[])
 
 let mk_assigns e v =
   let lv = Cil.cvar_to_lvar v in
