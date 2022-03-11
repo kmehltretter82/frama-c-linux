@@ -69,6 +69,13 @@ plugins-tests:
   tags:
     - nix
 
+security:
+  stage: tests
+  script:
+    - ./ci.sh security
+  tags:
+    - nix
+
 volatile:
   stage: tests
   script:
