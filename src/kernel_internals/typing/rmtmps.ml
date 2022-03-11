@@ -663,8 +663,8 @@ class markReferencedVisitor = object (self)
     end;
     SkipChildren
 
-  method! vspec _ = SkipChildren
-  method! vcode_annot _ = SkipChildren
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren
 end
 
 let markReferenced ast =
@@ -748,8 +748,8 @@ class markUsedLabels is_removable (labelMap: (string, unit) Hashtbl.t) =
       DoChildren
 
     (* No need to go into expressions or types *)
-    method! vexpr _ = SkipChildren
-    method! vtype _ = SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
   end
 
 class removeUnusedLabels is_removable (labelMap: (string, unit) Hashtbl.t) = object
@@ -768,9 +768,9 @@ class removeUnusedLabels is_removable (labelMap: (string, unit) Hashtbl.t) = obj
     DoChildren
 
   (* No need to go into expressions or instructions *)
-  method! vexpr _ = SkipChildren
-  method! vinst _ = SkipChildren
-  method! vtype _ = SkipChildren
+  method! vexpr _ = Cil.SkipChildren
+  method! vinst _ = Cil.SkipChildren
+  method! vtype _ = Cil.SkipChildren
 end
 
 (***********************************************************************

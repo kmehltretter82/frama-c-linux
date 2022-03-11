@@ -307,13 +307,13 @@ let forallStmts todo (fd : fundec) =
   let vis = object
     inherit nopCilVisitor
     method! vstmt stmt = ignore (todo stmt); DoChildren
-    method! vinst _ = SkipChildren
-    method! vexpr _ = SkipChildren
-    method! vlval _ = SkipChildren
-    method! vtype _ = SkipChildren
-    method! vspec _ = SkipChildren
-    method! vcode_annot _ = SkipChildren
-    method! vattr _ = SkipChildren
+    method! vinst _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
+    method! vattr _ = Cil.SkipChildren
   end
   in
   ignore (visitCilFunction vis fd)
@@ -750,13 +750,13 @@ class registerLabelsVisitor : cilVisitor = object
       labels;
     DoChildren
   end
-  method! vexpr _ = SkipChildren
-  method! vtype _ = SkipChildren
-  method! vinst _ = SkipChildren
-  method! vspec _ = SkipChildren
-  method! vcode_annot _ = SkipChildren (* via Loop stmt *)
-  method! vlval _ = SkipChildren (* via UnspecifiedSequence stmt *)
-  method! vattr _ = SkipChildren (* via block stmt *)
+  method! vexpr _ = Cil.SkipChildren
+  method! vtype _ = Cil.SkipChildren
+  method! vinst _ = Cil.SkipChildren
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren (* via Loop stmt *)
+  method! vlval _ = Cil.SkipChildren (* via UnspecifiedSequence stmt *)
+  method! vattr _ = Cil.SkipChildren (* via block stmt *)
 end
 
 (* prepare a function for computeCFGInfo by removing break, continue,

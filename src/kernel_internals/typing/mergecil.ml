@@ -3232,7 +3232,7 @@ let find_decls g =
       method! vlogic_var_decl lv =
         res := Cil_datatype.Logic_var.Set.add lv !res;
         SkipChildren
-      method! vspec _ = SkipChildren
+      method! vspec _ = Cil.SkipChildren
       method! vfunc f =
         ignore (self#vvdec f.svar);
         Option.iter (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;
