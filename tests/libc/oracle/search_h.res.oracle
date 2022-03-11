@@ -70,6 +70,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   str[0..2048] ∈ [--..--] or UNINITIALIZED
   length ∈ {0}
   elementptr ∈ UNINITIALIZED

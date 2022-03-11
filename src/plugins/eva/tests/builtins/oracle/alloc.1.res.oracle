@@ -41,6 +41,7 @@
       {{ garbled mix of &{__malloc_main_abs_l50}
        (origin: Misaligned write {alloc.c:54}) }}
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   q ∈ {{ &__malloc_main_abs_l50 }}
   r ∈ {{ NULL + [256..509] ; &__malloc_main_abs_l50 }}
   a ∈ {{ NULL + [1..510] ; &__malloc_main_abs_l50 + {1} }}
@@ -54,17 +55,20 @@
   These dependencies hold at termination for the executions that terminate:
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function main_abs:
   NULL{[256..259]; [264..512]} FROM __fc_heap_status (and SELF)
       [260..263] FROM __fc_heap_status
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   q FROM __fc_heap_status
   r FROM __fc_heap_status
   a FROM __fc_heap_status
   __malloc_main_abs_l50 FROM __fc_heap_status
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main_abs:
-    NULL[256..512]; __fc_heap_status; q; r; a; __malloc_main_abs_l50
+    NULL[256..512]; __fc_heap_status; __fc_errno; q; r; a;
+    __malloc_main_abs_l50
 [inout] Inputs for function main_abs:
     __fc_heap_status; q; r; __malloc_main_abs_l50

@@ -63,14 +63,17 @@
   \result FROM ANYTHING(origin:Unknown)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function bar:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   __malloc_bar_l18 FROM __fc_heap_status; x (and SELF)
   __malloc_bar_l18_0 FROM __fc_heap_status; x (and SELF)
   \result FROM __fc_heap_status
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   __malloc_bar_l18 FROM __fc_heap_status (and SELF)
   __malloc_bar_l18_0 FROM __fc_heap_status (and SELF)
   \result FROM \nothing

@@ -398,20 +398,22 @@ extern long int jrand48 (unsigned short xsubi[3]);
 /*@
   allocates \result;
   assigns __fc_heap_status \from indirect:nmemb, indirect:size, __fc_heap_status;
-  assigns \result \from indirect:nmemb, indirect:size,
-                        indirect:__fc_heap_status;
+  assigns \result, __fc_errno \from indirect:nmemb, indirect:size,
+                                    indirect:__fc_heap_status;
 
   behavior allocation:
     assumes can_allocate: is_allocable(nmemb * size);
     ensures allocation: \fresh(\result, nmemb * size);
     ensures initialization: \initialized(((char *)\result)+(0..nmemb*size-1));
     ensures zero_initialization: \subset(((char *)\result)[0..nmemb*size-1], {0});
+    ensures errno_same: __fc_errno == \old(__fc_errno);
 
   behavior no_allocation:
     assumes cannot_allocate: !is_allocable(nmemb * size);
     allocates \nothing;
     assigns \result \from \nothing;
     ensures null_result: \result == \null;
+    ensures errno_set: __fc_errno == ENOMEM;
 
   complete behaviors;
   disjoint behaviors; */
@@ -419,17 +421,19 @@ extern void *calloc(size_t nmemb, size_t size);
 
 /*@ allocates \result;
   @ assigns __fc_heap_status \from size, __fc_heap_status;
-  @ assigns \result \from indirect:size, indirect:__fc_heap_status;
+  @ assigns \result, __fc_errno \from indirect:size, indirect:__fc_heap_status;
   @ behavior allocation:
   @   assumes can_allocate: is_allocable(size);
   @   assigns __fc_heap_status \from size, __fc_heap_status;
   @   assigns \result \from indirect:size, indirect:__fc_heap_status;
   @   ensures allocation: \fresh(\result,size);
+  @   ensures errno_same: __fc_errno == \old(__fc_errno);
   @ behavior no_allocation:
   @   assumes cannot_allocate: !is_allocable(size);
   @   allocates \nothing;
   @   assigns \result \from \nothing;
   @   ensures null_result: \result==\null;
+  @   ensures errno_set: __fc_errno == ENOMEM;
   @ complete behaviors;
   @ disjoint behaviors;
   @*/
@@ -457,12 +461,14 @@ extern void free(void *p);
    frees     ptr;
    assigns   __fc_heap_status \from __fc_heap_status;
    assigns   \result \from size, ptr, __fc_heap_status;
+   assigns   __fc_errno \from indirect:size, indirect:__fc_heap_status;
 
    behavior allocation:
      assumes   can_allocate: is_allocable(size);
      allocates \result;
      assigns   \result \from size, __fc_heap_status;
      ensures   allocation: \fresh(\result,size);
+     ensures   errno_same: __fc_errno == \old(__fc_errno);
 
    behavior deallocation:
      assumes   nonnull_ptr: ptr != \null;
@@ -470,6 +476,7 @@ extern void free(void *p);
      frees     ptr;
      ensures   freed: \allocable(ptr);
      ensures   freeable: \result == \null || \freeable(\result);
+     ensures   errno_same: __fc_errno == \old(__fc_errno);
 
    behavior fail:
      assumes cannot_allocate: !is_allocable(size);
@@ -477,6 +484,7 @@ extern void free(void *p);
      frees     \nothing;
      assigns   \result \from size, __fc_heap_status;
      ensures   null_result: \result == \null;
+     ensures   errno_set: __fc_errno == ENOMEM;
 
    complete behaviors;
    disjoint behaviors allocation, fail;
@@ -493,11 +501,14 @@ extern void *realloc(void *ptr, size_t size);
                                     __fc_heap_status;
    assigns   \result \from ptr, indirect:nmemb, indirect:size,
                            indirect:__fc_heap_status;
+   assigns   __fc_errno \from indirect:size, indirect: nmemb,
+                              indirect:__fc_heap_status;
 
    behavior allocation:
      assumes   can_allocate: is_allocable(nmemb * size);
      allocates \result;
      ensures   allocation: \fresh(\result, nmemb * size);
+     ensures   errno_same: __fc_errno == \old(__fc_errno);
 
    behavior deallocation:
      assumes   nonnull_ptr: ptr != \null;
@@ -505,6 +516,7 @@ extern void *realloc(void *ptr, size_t size);
      frees     ptr;
      ensures   freed: \allocable(ptr);
      ensures   freeable: \result == \null || \freeable(\result);
+     ensures   errno_same: __fc_errno == \old(__fc_errno);
 
    behavior fail:
      assumes cannot_allocate: !is_allocable(nmemb * size);
@@ -513,6 +525,7 @@ extern void *realloc(void *ptr, size_t size);
      assigns   \result \from indirect:nmemb, indirect:size,
                              indirect:__fc_heap_status;
      ensures   null_result: \result == \null;
+     ensures   errno_set: __fc_errno == ENOMEM;
 
    complete behaviors;
    disjoint behaviors allocation, fail;
@@ -797,14 +810,21 @@ extern size_t wcstombs(char * restrict s,
 //       such as 'is_allocable_aligned(alignment, size)'.
 /*@
   requires valid_memptr: \valid(memptr);
-  requires alignment_is_a_suitable_power_of_two:
-    alignment >= sizeof(void*) &&
-    ((size_t)alignment & ((size_t)alignment - 1)) == 0;
   allocates *memptr;
   assigns __fc_heap_status \from indirect:alignment, size, __fc_heap_status;
   assigns \result \from indirect:alignment, indirect:size,
                         indirect:__fc_heap_status;
+
+  behavior invalid_alignment:
+    assumes alignment_not_a_suitable_power_of_two:
+      !(alignment >= sizeof(void*) &&
+        ((size_t)alignment & ((size_t)alignment - 1)) == 0);
+    assigns \result \from indirect:alignment;
+    ensures result_einval: \result == EINVAL;
   behavior allocation:
+    assumes alignment_is_a_suitable_power_of_two:
+      alignment >= sizeof(void*) &&
+      ((size_t)alignment & ((size_t)alignment - 1)) == 0;
     assumes can_allocate: is_allocable(size);
     assigns __fc_heap_status \from indirect:alignment, size, __fc_heap_status;
     assigns \result \from indirect:alignment, indirect:size,
@@ -812,6 +832,9 @@ extern size_t wcstombs(char * restrict s,
     ensures allocation: \fresh(*memptr,size);
     ensures result_zero: \result == 0;
   behavior no_allocation:
+    assumes alignment_is_a_suitable_power_of_two:
+      alignment >= sizeof(void*) &&
+      ((size_t)alignment & ((size_t)alignment - 1)) == 0;
     assumes cannot_allocate: !is_allocable(size);
     allocates \nothing;
     assigns \result \from indirect:alignment;

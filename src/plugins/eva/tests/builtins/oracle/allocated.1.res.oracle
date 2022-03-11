@@ -717,6 +717,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   i ∈ {10}
   j ∈ {10}
   p ∈ ESCAPINGADDR
@@ -831,9 +832,11 @@
   __fc_heap_status FROM __fc_heap_status (and SELF)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status; nondet (and SELF)
+  __fc_errno FROM __fc_heap_status; nondet
   __malloc_main_l25 FROM __fc_heap_status
   __malloc_main_l36[0..1] FROM __fc_heap_status; nondet
   __malloc_main_l50[0..1] FROM __fc_heap_status; nondet (and SELF)
@@ -894,8 +897,8 @@
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    __fc_heap_status; i; j; p; tmp; tmp_3; k; tmp_0; size; pb; a; __lengthof_a;
-    __retres; __malloc_main_l25; __malloc_main_l36[0..1];
+    __fc_heap_status; __fc_errno; i; j; p; tmp; tmp_3; k; tmp_0; size; 
+    pb; a; __lengthof_a; __retres; __malloc_main_l25; __malloc_main_l36[0..1];
     __malloc_main_l50[0..2]; __malloc_main_l50_0[0..1]; __malloc_main_l63;
     __malloc_main_l63_0; __malloc_main_l63_1; __malloc_main_l63_2;
     __malloc_main_l73; __malloc_main_l73_0; __malloc_main_l73_1;

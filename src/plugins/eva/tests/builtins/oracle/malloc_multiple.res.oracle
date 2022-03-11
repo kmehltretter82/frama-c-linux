@@ -126,6 +126,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function allocate_T:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   T[0] ∈ {{ &__malloc_allocate_T_l11 ; &__malloc_allocate_T_l11_0 }}
    [1] ∈ {{ &__malloc_allocate_T_l14 ; &__malloc_allocate_T_l14_5 }}
    [2] ∈ {{ &__malloc_allocate_T_l14_0 ; &__malloc_allocate_T_l14_6 }}
@@ -152,6 +153,7 @@
   __malloc_w_allocate_T_l14_10 ∈ {2} or UNINITIALIZED
 [eva:final-states] Values at end of function allocate_and_free_last:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   F[0] ∈ {{ &__malloc_allocate_and_free_last_l29 }}
    [1] ∈ {{ &__malloc_allocate_and_free_last_l29_0 }}
    [2] ∈ {{ &__malloc_allocate_and_free_last_l29_1 }}
@@ -167,6 +169,7 @@
                                          {5; 6; 7; 8; 9} or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   T[0] ∈ {{ &__malloc_allocate_T_l11_0 }}
    [1] ∈ {{ &__malloc_allocate_T_l14_5 }}
    [2] ∈ {{ &__malloc_allocate_T_l14_6 }}

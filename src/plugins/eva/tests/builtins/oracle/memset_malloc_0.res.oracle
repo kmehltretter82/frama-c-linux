@@ -16,6 +16,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ {{ &__malloc_main_l17[0] }}
   __retres ∈ {0}
 [from] Computing for function main
@@ -28,15 +29,17 @@
   These dependencies hold at termination for the executions that terminate:
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function memset:
   \result FROM s
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   p FROM __fc_heap_status
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    __fc_heap_status; p; __retres
+    __fc_heap_status; __fc_errno; p; __retres
 [inout] Inputs for function main:
     __fc_heap_status; p

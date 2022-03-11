@@ -54,6 +54,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -106,8 +107,10 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function my_calloc:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p1 ∈ ESCAPINGADDR
   q1 ∈
     {{ &__malloc_my_calloc_l10_0[0] ; &__malloc_my_calloc_l10_1[0] ;

@@ -20,6 +20,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -48,6 +49,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -88,6 +90,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -119,6 +122,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -164,6 +168,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -199,6 +204,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -232,6 +238,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -264,6 +271,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main1_l9[0] }} or ESCAPINGADDR
   r ∈ {{ &__malloc_main1_l12[0] }} or ESCAPINGADDR
@@ -275,6 +283,7 @@
   __malloc_main1_l12[0..5] ∈ {6}
 [eva:final-states] Values at end of function main2:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main2_l30[0] }} or ESCAPINGADDR
   r ∈ {{ &__malloc_main2_l33[0] }} or ESCAPINGADDR
@@ -288,6 +297,7 @@
   __malloc_main2_l33[0..5] ∈ {8}
 [eva:final-states] Values at end of function main3:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main3_l52 }} or ESCAPINGADDR
   q ∈ ESCAPINGADDR
@@ -296,6 +306,7 @@
   __malloc_main3_l52 ∈ ESCAPINGADDR
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   __malloc_main1_l9[0..4] ∈ {5}
   __malloc_main1_l12[0..5] ∈ {6}
@@ -327,27 +338,33 @@
   __fc_heap_status FROM __fc_heap_status (and SELF)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function realloc:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; ptr; size
 [from] Function main1:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   __malloc_main1_l9[0..4] FROM __fc_heap_status (and SELF)
   __malloc_main1_l12[0..5] FROM __fc_heap_status (and SELF)
 [from] Function main2:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   __malloc_main2_l30[0..4] FROM __fc_heap_status (and SELF)
   __malloc_main2_l33[0..5] FROM __fc_heap_status (and SELF)
 [from] Function main3:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   __malloc_main3_l52 FROM __fc_heap_status
   __malloc_main3_l53 FROM __fc_heap_status
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status; v (and SELF)
+  __fc_errno FROM __fc_heap_status; v (and SELF)
   Frama_C_entropy_source FROM Frama_C_entropy_source; v (and SELF)
   __malloc_main1_l9[0..4] FROM __fc_heap_status; v (and SELF)
   __malloc_main1_l12[0..5] FROM __fc_heap_status; v (and SELF)
@@ -357,25 +374,26 @@
   __malloc_main3_l53 FROM __fc_heap_status; v (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main1:
-    __fc_heap_status; Frama_C_entropy_source; q; i; r; i_0; p; x; s;
-    __malloc_main1_l9[0..4]; __malloc_main1_l12[0..5]
+    __fc_heap_status; __fc_errno; Frama_C_entropy_source; q; i; r; i_0; 
+    p; x; s; __malloc_main1_l9[0..4]; __malloc_main1_l12[0..5]
 [inout] Inputs for function main1:
     __fc_heap_status; Frama_C_entropy_source
 [inout] Out (internal) for function main2:
-    __fc_heap_status; Frama_C_entropy_source; q; i; r; i_0; p; x; s;
-    __malloc_main2_l30[0..4]; __malloc_main2_l33[0..5]
+    __fc_heap_status; __fc_errno; Frama_C_entropy_source; q; i; r; i_0; 
+    p; x; s; __malloc_main2_l30[0..4]; __malloc_main2_l33[0..5]
 [inout] Inputs for function main2:
     __fc_heap_status; Frama_C_entropy_source
 [inout] Out (internal) for function main3:
-    __fc_heap_status; Frama_C_entropy_source; p; q; r; s; x; y; c;
-    __malloc_main3_l52; __malloc_main3_l53
+    __fc_heap_status; __fc_errno; Frama_C_entropy_source; p; q; r; s; x; 
+    y; c; __malloc_main3_l52; __malloc_main3_l53
 [inout] Inputs for function main3:
     __fc_heap_status; Frama_C_entropy_source; __realloc_main3_l65[0];
     __realloc_main3_l65_0[0]; __realloc_main3_l65_1[0]
 [inout] Out (internal) for function main:
-    __fc_heap_status; Frama_C_entropy_source; __malloc_main1_l9[0..4];
-    __malloc_main1_l12[0..5]; __malloc_main2_l30[0..4];
-    __malloc_main2_l33[0..5]; __malloc_main3_l52; __malloc_main3_l53
+    __fc_heap_status; __fc_errno; Frama_C_entropy_source;
+    __malloc_main1_l9[0..4]; __malloc_main1_l12[0..5];
+    __malloc_main2_l30[0..4]; __malloc_main2_l33[0..5]; __malloc_main3_l52;
+    __malloc_main3_l53
 [inout] Inputs for function main:
     __fc_heap_status; Frama_C_entropy_source; __realloc_main3_l65[0];
     __realloc_main3_l65_0[0]; __realloc_main3_l65_1[0]

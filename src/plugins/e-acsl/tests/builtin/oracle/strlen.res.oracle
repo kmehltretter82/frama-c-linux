@@ -35,21 +35,21 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:85: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:539: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:552: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:539: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:552: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:542: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:555: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:525: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:525: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:528: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:541: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.

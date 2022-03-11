@@ -486,7 +486,6 @@
 [eva] FRAMAC_SHARE/libc/argz.c:126: Call to builtin free
 [eva] FRAMAC_SHARE/libc/argz.c:126: Call to builtin free
 [eva] FRAMAC_SHARE/libc/argz.c:126: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:126: Call to builtin free
 [eva] Recording results for argz_replace
 [eva] Done for function argz_replace
 [eva] computing for function exit <- main.
@@ -1065,6 +1064,7 @@
   len ∈ {0}
   count ∈ {3; 6}
 [eva:final-states] Values at end of function argz_create:
+  __fc_errno ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   argc ∈ {3}
   tlen ∈ {13}
@@ -1087,6 +1087,7 @@
                            [11] ∈ {122}
                            [12] ∈ {0}
 [eva:final-states] Values at end of function argz_create_sep:
+  __fc_errno ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   nlen ∈ {7; 8}
   argz ∈ {{ NULL ; &__malloc_argz_create_sep_l208[0] }}

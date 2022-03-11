@@ -7,11 +7,11 @@
 < [eva] gauges.c:218: Frama_C_show_each:
 < [eva:alarm] gauges.c:220: Warning: 
 <   signed overflow. assert -2147483648 ≤ n - 1;
-714c707
+720c713
 <   numNonZero ∈ [-2147483648..8]
 ---
 >   numNonZero ∈ {-1}
-725c718
+731c724
 <   n ∈ [-2147483648..99]
 ---
 >   n ∈ {-1}
