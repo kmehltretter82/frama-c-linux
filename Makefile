@@ -343,7 +343,7 @@ DISTRIB_TESTS=$(shell find \
                   -o -path 'tests/crowbar/*' -type d \! -name input -prune -false \
                   -o -type f \! -name "*\.log" \! -name "*\.o" \
                     \! -name '*~' \! -name "*\.cm*"  \! -name "*.sav" \
-                    -perm /u+w | sed -e 's/ /@/g')
+                    -perm -u+w | sed -e 's/ /@/g')
 
 # files that are needed to compile API documentation of external plugins
 DOC_GEN_FILES:=$(addprefix doc/code/,\
