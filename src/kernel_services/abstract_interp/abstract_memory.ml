@@ -882,11 +882,11 @@ struct
   type t = Bound.t * age
 
   let pretty fmt (b,_) = Bound.pretty fmt b
-  let hash (b,a) = Hashtbl.hash (Bound.hash b, Integer.hash a)
-  let compare (b1,a1) (b2,a2) =
-    Bound.compare b1 b2 <?> (Integer.compare, a1, a2)
-  let equal (b1,a1) (b2,a2) =
-    Bound.equal b1 b2 && Integer.equal a1 a2
+  let hash (b,_a) = Bound.hash b
+  let compare (b1,_a1) (b2,_a2) =
+    Bound.compare b1 b2
+  let equal (b1,_a1) (b2,_a2) =
+    Bound.equal b1 b2
   let _of_integer i a = Bound.of_integer i, a
   let _of_exp e a = Bound.of_exp e, a
   let _succ (b,a) = (Bound.succ b, a)
