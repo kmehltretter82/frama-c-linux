@@ -1,4 +1,4 @@
-PLUGIN: aorai eva,from,scope report wp,rtegen
+PLUGIN: aorai eva,from,scope,inout report wp,rtegen
 
 COMMENT: Path to the library from the test file
 LIBS: @PTEST_SUITE_DIR@/../Aorai_test
