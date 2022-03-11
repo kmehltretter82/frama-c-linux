@@ -20,20 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-module Analysis = Analysis
-module Results = Results
-
-module Parameters = Parameters
-module Eva_annotations = Eva_annotations
-module Builtins = Builtins
-
-module Eval_terms = Eval_terms
-module Unit_tests = Unit_tests
 module Private = struct
   module Abstractions = Eva__Abstractions
   module Analysis = Eva__Analysis
   module Alarmset = Eva__Alarmset
+  module Parameters = Parameters
   module Main_values = Eva__Main_values
   module Eval = Eva__Eval
   module Eval_terms = Eva__Eval_terms
@@ -53,3 +44,13 @@ module Private = struct
   module Eval_annots = Eva__Eval_annots
   module Eva_dynamic = Eva_dynamic
 end
+
+module Analysis = Analysis
+module Results = Results
+module Parameters = Parameters
+module Eva_annotations = Eva_annotations
+module Eval = Eval
+module Builtins = Builtins
+module Eval_terms = Eval_terms
+module Eva_results = Eva_results
+module Unit_tests = Unit_tests
