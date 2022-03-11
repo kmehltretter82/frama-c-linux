@@ -7,15 +7,13 @@
 CONTRIBUTING.md: .ignore
 INSTALL.md: .ignore
 Makefile: CEA_LGPL
-Makefile.distrib: .ignore
 README.md: .ignore
 configure.js: .ignore
+distrib.sh: .ignore
 doc/pandoc/href.lua: .ignore
 doc/pandoc/index.json: .ignore
 doc/pandoc/template.html: .ignore
 electron-webpack.json: .ignore
-headers/header_spec.txt: .ignore
-headers/register.sh: .ignore
 package.json: .ignore
 src/dome/.gitignore: .ignore
 src/dome/CONTRIBUTING.md: .ignore
