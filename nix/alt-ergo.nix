@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "OCamlPro";
     repo = pname;
-    rev = version;
+    rev = "refs/tags/"+version;
     sha256 = "11ffm87vsrii8nyhxhbc9gzjmqkspqv7hpjq7ll9xflll7gpnpkj";
   };
 
