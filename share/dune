@@ -162,6 +162,7 @@
 (libc/nl_types.h as libc/nl_types.h)
 (libc/poll.h as libc/poll.h)
 (libc/pthread.h as libc/pthread.h)
+(libc/pwd.c as libc/pwd.c)
 (libc/pwd.h as libc/pwd.h)
 (libc/regex.h as libc/regex.h)
 (libc/resolv.h as libc/resolv.h)
