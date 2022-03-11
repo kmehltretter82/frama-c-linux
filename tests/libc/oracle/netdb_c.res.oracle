@@ -13,6 +13,7 @@
   \return(calloc) == 0 (auto)
   \return(malloc) == 0 (auto)
   \return(realloc) == 0 (auto)
+  \return(reallocarray) == 0 (auto)
   \return(getenv) == 0 (auto)
   \return(bsearch) == 0 (auto)
   \return(getcwd) == 0 (auto)

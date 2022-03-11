@@ -1481,6 +1481,44 @@ extern void free(void *p);
  */
 extern void *realloc(void *ptr, size_t size);
 
+/*@ requires freeable: ptr ≡ \null ∨ \freeable(ptr);
+    assigns __fc_heap_status, \result;
+    assigns __fc_heap_status
+      \from (indirect: nmemb), (indirect: size), __fc_heap_status;
+    assigns \result
+      \from ptr, (indirect: nmemb), (indirect: size),
+            (indirect: __fc_heap_status);
+    frees ptr;
+    allocates \result;
+    
+    behavior allocation:
+      assumes can_allocate: is_allocable(nmemb * size);
+      ensures
+        allocation: \fresh{Old, Here}(\result,\old(nmemb) * \old(size));
+      allocates \result;
+    
+    behavior deallocation:
+      assumes nonnull_ptr: ptr ≢ \null;
+      assumes can_allocate: is_allocable(nmemb * size);
+      ensures freed: \allocable(\old(ptr));
+      ensures freeable: \result ≡ \null ∨ \freeable(\result);
+      frees ptr;
+    
+    behavior fail:
+      assumes cannot_allocate: ¬is_allocable(nmemb * size);
+      ensures null_result: \result ≡ \null;
+      assigns \result;
+      assigns \result
+        \from (indirect: nmemb), (indirect: size),
+              (indirect: __fc_heap_status);
+      allocates \nothing;
+    
+    complete behaviors fail, deallocation, allocation;
+    disjoint behaviors allocation, fail;
+    disjoint behaviors deallocation, fail;
+ */
+extern void *reallocarray(void *ptr, size_t nmemb, size_t size);
+
 /*@ exits status: \exit_status ≢ 0;
     ensures never_terminates: \false;
     
