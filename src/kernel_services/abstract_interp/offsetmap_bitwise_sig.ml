@@ -30,8 +30,11 @@
     instead. *)
 
 module type S = sig
-  type v (** Type of the values stored in the offsetmap *)
-  include Datatype.S (** Datatype for the offsetmap *)
+  (** Type of the values stored in the offsetmap *)
+  type v
+
+  (** Datatype for the offsetmap *)
+  include Datatype.S
 
   type intervals
 

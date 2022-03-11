@@ -33,6 +33,7 @@ module Register: sig
   (** Return the occurrences of the given varinfo.
       An occurrence [ki, lv] is a left-value [lv] which uses the location of
       [vi] at the position [ki]. *)
+
   val print_all: (unit -> unit)
   (** Print all the occurrence of each variable declarations. *)
 end = Register

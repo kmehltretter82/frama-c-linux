@@ -475,7 +475,7 @@ module STRING = WpContext.Generator(LITERAL)
         }
 
       let sconst prefix base cst =
-        (** describe the content of literal strings *)
+        (* describe the content of literal strings *)
         let name = prefix ^ "_literal" in
         let i = Lang.freshvar ~basename:"i" L.Int in
         let c = Cstring.char_at cst (e_var i) in

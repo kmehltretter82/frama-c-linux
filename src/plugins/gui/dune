@@ -33,7 +33,7 @@
         property_navigator GSourceView gtk_compat
         dgraph_helper
 )
-  (flags -open Frama_c_kernel -linkall :standard -w -9-50)
+  (flags -open Frama_c_kernel -linkall :standard -w -9)
   (libraries frama-c.init.gui frama-c.kernel
    (select gtk_compat.ml from
       (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> gtk_compat.2.ml)

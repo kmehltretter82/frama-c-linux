@@ -50,10 +50,13 @@ val copy : string -> string -> unit
 
 val read_file : string -> (in_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
+
 val read_lines : string -> (string -> unit) -> unit
 (** Iter over all text lines in the file *)
+
 val write_file : string -> (out_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
+
 val print_file : string -> (Format.formatter -> 'a) -> 'a
 (** Properly flush and close the channel and re-raise exceptions *)
 

@@ -65,12 +65,12 @@ class all_exn =
         all_exn <- Cil_datatype.Typ.Set.add (purify t) all_exn;
         SkipChildren
       | _ -> DoChildren
-    method! vinst _ = SkipChildren
-    method! vexpr _ = SkipChildren
-    method! vlval _ = SkipChildren
-    method! vtype _ = SkipChildren
-    method! vspec _ = SkipChildren
-    method! vcode_annot _ = SkipChildren
+    method! vinst _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
 
 let compute_all_exn () =
@@ -265,11 +265,11 @@ class exn_visit =
       in
       DoChildrenPost after_visit
 
-    method! vexpr _ = SkipChildren
-    method! vlval _ = SkipChildren
-    method! vtype _ = SkipChildren
-    method! vspec _ = SkipChildren
-    method! vcode_annot _ = SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
 
 let compute_kf kf =

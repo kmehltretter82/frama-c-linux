@@ -135,6 +135,7 @@ val por: ?loc:location -> predicate * predicate -> predicate
 
 (** ^^ *)
 val pxor: ?loc:location -> predicate * predicate -> predicate
+
 (** ! *)
 val pnot: ?loc:location -> predicate -> predicate
 

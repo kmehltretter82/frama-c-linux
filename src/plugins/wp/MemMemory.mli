@@ -31,15 +31,26 @@ open Lang.F
 
 val t_addr : tau
 val t_malloc : tau (** allocation tables *)
+
 val t_init : tau (** initialization tables *)
+
 val t_mem : tau -> tau (** t_addr indexed array *)
 
 val a_null : term (** Null address. Same as [a_addr 0 0] *)
+
 val a_global : term -> term (** Zero-offset base. Same as [a_addr base 0] *)
+
 val a_addr : term -> term -> term (** Constructor for [{ base ; offset }] *)
-val a_shift : term -> term -> term (** Shift: [a_shift a k] adds [k] to [a.offset] *)
-val a_base : term -> term (** Returns the base *)
-val a_offset : term -> term (** Returns the offset *)
+
+val a_shift : term -> term -> term
+(** Shift: [a_shift a k] adds [k] to [a.offset] *)
+
+val a_base : term -> term
+(** Returns the base *)
+
+val a_offset : term -> term
+(** Returns the offset *)
+
 val a_base_offset : term -> term -> term
 (** Returns the offset in {i bytes} from the {i logic} offset
     (which is a memory cell index, actually) *)
@@ -52,7 +63,9 @@ val f_offset : lfun
 val f_havoc : lfun
 val f_set_init : lfun
 val f_region : lfun
+
 val f_addr_of_int : lfun (** Physical address *)
+
 val f_int_of_addr : lfun (** Physical address *)
 
 val p_addr_lt : lfun

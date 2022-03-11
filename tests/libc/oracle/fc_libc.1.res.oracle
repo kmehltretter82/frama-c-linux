@@ -235,6 +235,15 @@ struct __fc_gethostbyname {
    char *host_aliases[2] ;
    char hostbuf[128] ;
 };
+struct passwd {
+   char *pw_name ;
+   char *pw_passwd ;
+   uid_t pw_uid ;
+   gid_t pw_gid ;
+   char *pw_gecos ;
+   char *pw_dir ;
+   char *pw_shell ;
+};
 typedef unsigned int ino_t;
 typedef long time_t;
 typedef unsigned int blkcnt_t;
@@ -340,15 +349,6 @@ struct pollfd {
    short revents ;
 };
 typedef unsigned long nfds_t;
-struct passwd {
-   char *pw_name ;
-   char *pw_passwd ;
-   uid_t pw_uid ;
-   gid_t pw_gid ;
-   char *pw_gecos ;
-   char *pw_dir ;
-   char *pw_shell ;
-};
 typedef int jmp_buf[5];
 struct __fc_sigjmp_buf {
    jmp_buf buf ;
@@ -417,14 +417,8 @@ int Frama_C_interval(int min, int max);
  */
 extern int Frama_C_interval_split(int min, int max);
 
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern unsigned char Frama_C_unsigned_char_interval(unsigned char min,
-                                                    unsigned char max);
+unsigned char Frama_C_unsigned_char_interval(unsigned char min,
+                                             unsigned char max);
 
 char Frama_C_char_interval(char min, char max);
 
@@ -445,14 +439,7 @@ extern unsigned short Frama_C_unsigned_short_interval(unsigned short min,
  */
 extern short Frama_C_short_interval(short min, short max);
 
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern unsigned int Frama_C_unsigned_int_interval(unsigned int min,
-                                                  unsigned int max);
+unsigned int Frama_C_unsigned_int_interval(unsigned int min, unsigned int max);
 
 /*@ requires order: min ≤ max;
     ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
@@ -462,22 +449,10 @@ extern unsigned int Frama_C_unsigned_int_interval(unsigned int min,
  */
 extern int Frama_C_int_interval(int min, int max);
 
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern unsigned long Frama_C_unsigned_long_interval(unsigned long min,
-                                                    unsigned long max);
+unsigned long Frama_C_unsigned_long_interval(unsigned long min,
+                                             unsigned long max);
 
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern long Frama_C_long_interval(long min, long max);
+long Frama_C_long_interval(long min, long max);
 
 /*@ requires order: min ≤ max;
     ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
@@ -537,6 +512,9 @@ extern long long Frama_C_abstract_max(long long i);
     assigns \result \from i; */
 extern long long Frama_C_abstract_min(long long i);
 
+unsigned int volatile __fc_unsigned_int_entropy;
+long volatile __fc_long_entropy;
+unsigned long volatile __fc_unsigned_long_entropy;
 /*@ assigns Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
  */
@@ -618,14 +596,9 @@ int Frama_C_interval(int min, int max)
 char Frama_C_char_interval(char min, char max)
 {
   char __retres;
-  int r;
-  char aux;
-  Frama_C_update_entropy();
-  aux = (char)Frama_C_entropy_source;
-  if ((int)aux >= (int)min) 
-    if ((int)aux <= (int)max) r = (int)aux; else r = (int)min;
-  else r = (int)min;
-  __retres = (char)r;
+  int tmp;
+  tmp = Frama_C_interval((int)min,(int)max);
+  __retres = (char)tmp;
   return __retres;
 }
 
@@ -661,6 +634,77 @@ double Frama_C_double_interval(double min, double max)
   Frama_C_update_entropy();
   if (Frama_C_entropy_source) tmp = min; else tmp = max;
   return tmp;
+}
+
+/*@ requires order: min ≤ max;
+    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
+    assigns \result, Frama_C_entropy_source;
+    assigns \result \from min, max, Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+ */
+unsigned char Frama_C_unsigned_char_interval(unsigned char min,
+                                             unsigned char max)
+{
+  unsigned char __retres;
+  int tmp;
+  tmp = Frama_C_interval((int)min,(int)max);
+  __retres = (unsigned char)tmp;
+  return __retres;
+}
+
+/*@ requires order: min ≤ max;
+    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
+    assigns \result, Frama_C_entropy_source;
+    assigns \result \from min, max, Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+ */
+unsigned int Frama_C_unsigned_int_interval(unsigned int min, unsigned int max)
+{
+  unsigned int r;
+  unsigned int aux;
+  Frama_C_update_entropy();
+  aux = __fc_unsigned_int_entropy;
+  if (aux >= min) 
+    if (aux <= max) r = aux; else r = min;
+  else r = min;
+  return r;
+}
+
+/*@ requires order: min ≤ max;
+    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
+    assigns \result, Frama_C_entropy_source;
+    assigns \result \from min, max, Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+ */
+long Frama_C_long_interval(long min, long max)
+{
+  long r;
+  long aux;
+  Frama_C_update_entropy();
+  aux = __fc_long_entropy;
+  if (aux >= min) 
+    if (aux <= max) r = aux; else r = min;
+  else r = min;
+  return r;
+}
+
+/*@ requires order: min ≤ max;
+    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
+    assigns \result, Frama_C_entropy_source;
+    assigns \result \from min, max, Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+ */
+unsigned long Frama_C_unsigned_long_interval(unsigned long min,
+                                             unsigned long max)
+{
+  unsigned long r;
+  unsigned long aux;
+  Frama_C_update_entropy();
+  aux = __fc_unsigned_long_entropy;
+  if (aux >= min) 
+    if (aux <= max) r = aux; else r = min;
+  else r = min;
+  return r;
 }
 
 extern  __attribute__((__noreturn__)) void __builtin_abort(void);
@@ -5218,6 +5262,204 @@ struct in6_addr const in6addr_loopback =
                (unsigned char)0,
                (unsigned char)0,
                (unsigned char)1}};
+char __fc_getpw_pw_name[64];
+char __fc_getpw_pw_passwd[64];
+char __fc_getpw_pw_gecos[64];
+char __fc_getpw_pw_dir[64];
+char __fc_getpw_pw_shell[64];
+struct passwd __fc_pwd =
+  {.pw_name = __fc_getpw_pw_name,
+   .pw_passwd = __fc_getpw_pw_passwd,
+   .pw_uid = 0U,
+   .pw_gid = 0U,
+   .pw_gecos = __fc_getpw_pw_gecos,
+   .pw_dir = __fc_getpw_pw_dir,
+   .pw_shell = __fc_getpw_pw_shell};
+struct passwd *__fc_p_pwd = & __fc_pwd;
+/*@ requires valid_name: valid_read_string(name);
+    ensures
+      result_null_or_internal_struct:
+        \result ≡ \null ∨ \result ≡ __fc_p_pwd;
+    assigns \result, __fc_pwd;
+    assigns \result \from __fc_p_pwd, (indirect: *(name + (0 ..)));
+    assigns __fc_pwd \from (indirect: *(name + (0 ..)));
+ */
+extern struct passwd *getpwnam(char const *name);
+
+/*@ ensures
+      result_null_or_internal_struct:
+        \result ≡ \null ∨ \result ≡ __fc_p_pwd;
+    assigns \result, __fc_pwd;
+    assigns \result \from __fc_p_pwd, (indirect: uid);
+    assigns __fc_pwd \from (indirect: uid);
+ */
+extern struct passwd *getpwuid(uid_t uid);
+
+int getpwnam_r(char const *name, struct passwd *pwd, char *buf,
+               size_t buflen, struct passwd **result);
+
+int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf, size_t buflen,
+               struct passwd **result);
+
+static int __fc_getpw_init;
+static int __fc_getpw_r(struct passwd *pwd, char *buf, size_t buflen,
+                        struct passwd **result)
+{
+  int __retres;
+  int tmp_2;
+  if (! __fc_getpw_init) {
+    __fc_getpw_init = 1;
+    Frama_C_make_unknown(__fc_getpw_pw_name,(unsigned int)63);
+    __fc_getpw_pw_name[63] = (char)0;
+    Frama_C_make_unknown(__fc_getpw_pw_passwd,(unsigned int)63);
+    __fc_getpw_pw_passwd[63] = (char)0;
+    Frama_C_make_unknown(__fc_getpw_pw_gecos,(unsigned int)63);
+    __fc_getpw_pw_gecos[63] = (char)0;
+    Frama_C_make_unknown(__fc_getpw_pw_dir,(unsigned int)63);
+    __fc_getpw_pw_dir[63] = (char)0;
+    Frama_C_make_unknown(__fc_getpw_pw_shell,(unsigned int)63);
+    __fc_getpw_pw_shell[63] = (char)0;
+  }
+  tmp_2 = Frama_C_interval(0,1);
+  if (tmp_2) {
+    int tmp;
+    int tmp_0;
+    int tmp_1;
+    *result = (struct passwd *)0;
+    tmp = Frama_C_interval(0,1);
+    if (tmp) {
+      __retres = 5;
+      goto return_label;
+    }
+    tmp_0 = Frama_C_interval(0,1);
+    if (tmp_0) {
+      __retres = 24;
+      goto return_label;
+    }
+    tmp_1 = Frama_C_interval(0,1);
+    if (tmp_1) {
+      __retres = 23;
+      goto return_label;
+    }
+    __retres = 0;
+    goto return_label;
+  }
+  else {
+    size_t len;
+    size_t remaining = buflen;
+    len = strlen((char const *)__fc_pwd.pw_name);
+    if (remaining <= len) {
+      *result = (struct passwd *)0;
+      __retres = 34;
+      goto return_label;
+    }
+    strcpy(buf,(char const *)__fc_pwd.pw_name);
+    *(buf + len) = (char)0;
+    pwd->pw_name = buf;
+    buf += len + (size_t)1;
+    remaining -= len;
+    len = strlen((char const *)__fc_pwd.pw_passwd);
+    if (remaining <= len) {
+      *result = (struct passwd *)0;
+      __retres = 34;
+      goto return_label;
+    }
+    strcpy(buf,(char const *)__fc_pwd.pw_passwd);
+    *(buf + len) = (char)0;
+    pwd->pw_passwd = buf;
+    buf += len + (size_t)1;
+    remaining -= len;
+    len = strlen((char const *)__fc_pwd.pw_gecos);
+    if (remaining <= len) {
+      *result = (struct passwd *)0;
+      __retres = 34;
+      goto return_label;
+    }
+    strcpy(buf,(char const *)__fc_pwd.pw_gecos);
+    *(buf + len) = (char)0;
+    pwd->pw_gecos = buf;
+    buf += len + (size_t)1;
+    remaining -= len;
+    len = strlen((char const *)__fc_pwd.pw_dir);
+    if (remaining <= len) {
+      *result = (struct passwd *)0;
+      __retres = 34;
+      goto return_label;
+    }
+    strcpy(buf,(char const *)__fc_pwd.pw_dir);
+    *(buf + len) = (char)0;
+    pwd->pw_dir = buf;
+    buf += len + (size_t)1;
+    remaining -= len;
+    len = strlen((char const *)__fc_pwd.pw_shell);
+    if (remaining <= len) {
+      *result = (struct passwd *)0;
+      __retres = 34;
+      goto return_label;
+    }
+    strcpy(buf,(char const *)__fc_pwd.pw_shell);
+    *(buf + len) = (char)0;
+    pwd->pw_shell = buf;
+    buf += len + (size_t)1;
+    remaining -= len;
+    pwd->pw_uid = Frama_C_unsigned_int_interval((unsigned int)0,4294967295U);
+    pwd->pw_gid = Frama_C_unsigned_int_interval((unsigned int)0,4294967295U);
+    *result = pwd;
+    __retres = 0;
+    goto return_label;
+  }
+  return_label: return __retres;
+}
+
+/*@ requires valid_name: valid_read_string(name);
+    requires valid_buf: \valid(buf + (0 .. buflen - 1));
+    requires valid_pwd: \valid(pwd);
+    requires valid_result: \valid(result);
+    ensures
+      result_null_or_assigned:
+        *\old(result) ≡ \null ∨ *\old(result) ≡ \old(pwd);
+    ensures
+      result_ok_or_error: \result ≡ 0 ∨ \result ∈ {5, 24, 23, 34};
+    assigns \result, __fc_pwd, *pwd, *result, *(buf + (0 .. buflen - 1));
+    assigns \result
+      \from (indirect: __fc_p_pwd), (indirect: *(name + (0 ..)));
+    assigns __fc_pwd \from (indirect: *(name + (0 ..)));
+    assigns *pwd \from __fc_p_pwd;
+    assigns *result \from __fc_p_pwd;
+    assigns *(buf + (0 .. buflen - 1)) \from (indirect: *__fc_p_pwd);
+ */
+int getpwnam_r(char const *name, struct passwd *pwd, char *buf,
+               size_t buflen, struct passwd **result)
+{
+  int tmp;
+  /*@ assert valid_read_string(name); */ ;
+  tmp = __fc_getpw_r(pwd,buf,buflen,result);
+  return tmp;
+}
+
+/*@ requires valid_buf: \valid(buf + (0 .. buflen - 1));
+    requires valid_pwd: \valid(pwd);
+    requires valid_result: \valid(result);
+    ensures
+      result_null_or_assigned:
+        *\old(result) ≡ \null ∨ *\old(result) ≡ \old(pwd);
+    ensures
+      result_ok_or_error: \result ≡ 0 ∨ \result ∈ {5, 24, 23, 34};
+    assigns \result, __fc_pwd, *pwd, *result, *(buf + (0 .. buflen - 1));
+    assigns \result \from (indirect: __fc_p_pwd);
+    assigns __fc_pwd \from (indirect: uid);
+    assigns *pwd \from __fc_p_pwd;
+    assigns *result \from __fc_p_pwd;
+    assigns *(buf + (0 .. buflen - 1)) \from (indirect: *__fc_p_pwd);
+ */
+int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf, size_t buflen,
+               struct passwd **result)
+{
+  int tmp;
+  tmp = __fc_getpw_r(pwd,buf,buflen,result);
+  return tmp;
+}
+
 /*@ ghost unsigned int volatile __fc_time; */
 /*@ assigns \result;
     assigns \result \from __fc_time; */
@@ -9309,42 +9551,6 @@ int pthread_setname_np(pthread_t thread, char const *name);
     assigns *(name + (0 .. len - 1)) \from thread;
  */
 int pthread_getname_np(pthread_t thread, char *name, size_t len);
-
-extern char __fc_getpwuid_pw_name[64];
-
-extern char __fc_getpwuid_pw_passwd[64];
-
-extern char __fc_getpwuid_pw_dir[64];
-
-extern char __fc_getpwuid_pw_shell[64];
-
-struct passwd __fc_pwd =
-  {.pw_name = __fc_getpwuid_pw_name,
-   .pw_passwd = __fc_getpwuid_pw_passwd,
-   .pw_uid = 0U,
-   .pw_gid = 0U,
-   .pw_gecos = (char *)0,
-   .pw_dir = __fc_getpwuid_pw_dir,
-   .pw_shell = __fc_getpwuid_pw_shell};
-struct passwd *__fc_p_pwd = & __fc_pwd;
-/*@ requires valid_name: valid_read_string(name);
-    ensures
-      result_null_or_internal_struct:
-        \result ≡ \null ∨ \result ≡ __fc_p_pwd;
-    assigns \result, __fc_pwd;
-    assigns \result \from __fc_p_pwd, (indirect: *(name + (0 ..)));
-    assigns __fc_pwd \from (indirect: *(name + (0 ..)));
- */
-extern struct passwd *getpwnam(char const *name);
-
-/*@ ensures
-      result_null_or_internal_struct:
-        \result ≡ \null ∨ \result ≡ __fc_p_pwd;
-    assigns \result, __fc_pwd;
-    assigns \result \from __fc_p_pwd, (indirect: uid);
-    assigns __fc_pwd \from (indirect: uid);
- */
-extern struct passwd *getpwuid(uid_t uid);
 
 /*@ assigns *(env + (0 .. 4)); */
 extern int setjmp(int env[5]);

@@ -121,7 +121,7 @@
 )
 
 ;  (public_interfaces (Eva))
-  (flags -open Frama_c_kernel :standard -w -9-50)
+  (flags -open Frama_c_kernel :standard -w -9)
  (libraries frama-c.kernel frama-c-server.core
             ; frama-c-callgraph.core frama-c-rtegen.core frama-c-loop-analysis.core
             ; frama-c-scope.core
@@ -158,7 +158,7 @@
   (optional)
   (modules gui_callstacks_filters gui_callstacks_manager gui_eval gui_types register_gui gui_red)
 ;  (public_interfaces ())
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva -open Eva.Private :standard -w -9-50)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva -open Eva.Private :standard -w -9)
   (libraries eva frama-c.kernel frama-c.gui)
 )
 

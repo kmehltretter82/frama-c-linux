@@ -31,10 +31,12 @@ module type Results = sig
   val get_global_state: unit -> state or_bottom
   val get_stmt_state : after:bool -> stmt -> state or_bottom
   val get_stmt_state_by_callstack:
+    ?selection:callstack list ->
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
   val get_initial_state:
     kernel_function -> state or_bottom
   val get_initial_state_by_callstack:
+    ?selection:callstack list ->
     kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
   val eval_expr : state -> exp -> value evaluated
@@ -103,6 +105,7 @@ val is_computed : unit -> bool
 
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
+
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t

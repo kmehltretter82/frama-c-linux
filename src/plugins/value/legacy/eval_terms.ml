@@ -1206,7 +1206,7 @@ let rec eval_term ~alarm_mode env t =
          then V.cast_int_to_float Fval.Real r.eover
          else V.cast_float_to_float Fval.Real r.eover
        in
-       { etype = Cil.longDoubleType; (** hack until logic type *)
+       { etype = Cil.longDoubleType; (* hack until logic type *)
          ldeps = r.ldeps;
          eover; eunder = under_from_over eover;
          empty = r.empty }

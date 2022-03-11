@@ -1,7 +1,7 @@
 ( library
   (name variadic)
   (public_name frama-c-variadic.core)
-  (flags -open Frama_c_kernel :standard -w -9-50)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel)
 )
 

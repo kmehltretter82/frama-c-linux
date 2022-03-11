@@ -143,8 +143,12 @@ module Scope :
 sig
   type t
   val create : plugin -> t
-  val reserve : t -> string -> unit (** Must _not_ be call after [use] *)
-  val declare : t -> ident -> unit (** Must _not_ be call after [use] *)
+  val reserve : t -> string -> unit
+  (** Must _not_ be call after [use] *)
+
+  val declare : t -> ident -> unit
+  (** Must _not_ be call after [use] *)
+
   val use : t -> ident -> unit
   val resolve : t -> string IdMap.t
 end

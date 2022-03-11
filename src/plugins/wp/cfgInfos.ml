@@ -193,6 +193,7 @@ module Callees = WpContext.StaticGenerator(Kernel_function)
       type key = Kernel_function.t
       type data = Fset.t * Cil_types.stmt list
       (** functions + unspecified function pointer calls *)
+
       let name = "Wp.CfgInfos.SCallees"
       let compile = function
         | { Cil_types.fundec = Definition(fd, _ ) } as kf ->

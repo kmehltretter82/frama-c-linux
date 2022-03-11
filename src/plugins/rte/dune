@@ -2,7 +2,7 @@
   (name RteGen)
   (public_name frama-c-rtegen.core)
   (private_modules options generator rte visit register RteGen)
-  (flags -open Frama_c_kernel :standard -w -9-50)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel)
 )
 

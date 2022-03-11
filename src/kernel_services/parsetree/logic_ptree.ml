@@ -77,15 +77,16 @@ type lexpr = {
 }
 
 (* PL is for Parsed Logic *)
-(** kind of expression. *)
+(** construct inside a functional update. *)
 and path_elt =
-  (** construct inside a functional update. *)
   | PLpathField of string
   | PLpathIndex of lexpr
 
 and update_term =
   | PLupdateTerm of lexpr
   | PLupdateCont of ((path_elt list) * update_term) list
+
+(** Kind of expression *)
 and lexpr_node =
   (* both terms and predicates *)
   | PLvar of string (** a variable *)

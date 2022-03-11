@@ -2,7 +2,7 @@
   (name Sparecode)
   (public_name frama-c-sparecode.core)
   (private_modules sparecode_params globs spare_marks transform register)
-  (flags :standard -w -50 -open Frama_c_kernel)
+  (flags :standard -open Frama_c_kernel)
   (libraries frama-c.kernel frama-c-users.core frama-c-eva.core frama-c-pdg.core frama-c-inout.core)
 )
 

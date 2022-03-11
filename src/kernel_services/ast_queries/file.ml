@@ -1006,12 +1006,12 @@ let cleanup file =
              Cfg.computeFileCFG f; f end
             else f)
 
-    method! vinst _ = SkipChildren
-    method! vexpr _ = SkipChildren
-    method! vlval _ = SkipChildren
-    method! vtype _ = SkipChildren
-    method! vspec _ = SkipChildren
-    method! vcode_annot _ = SkipChildren
+    method! vinst _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
   in visitFramacFileSameGlobals visitor file
 
@@ -1429,7 +1429,7 @@ class reorder_ast: Visitor.frama_c_visitor =
       assert (List.length deps = List.length needed_annots);
       match g with
       | GAnnot _ -> List.rev deps
-      (** g is already in the dependencies graph. *)
+      (* g is already in the dependencies graph. *)
       | _ -> List.rev (g::deps)
 
     (* TODO: add methods for uses of undeclared identifiers.

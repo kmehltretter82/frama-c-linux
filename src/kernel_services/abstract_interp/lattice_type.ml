@@ -26,8 +26,11 @@
 module type Join_Semi_Lattice = sig
   include Datatype.S (** datatype of element of the lattice *)
 
-  val join: t -> t -> t (** over-approximation of union *)
-  val is_included: t -> t -> bool (**is first argument included in the second?*)
+  val join: t -> t -> t
+  (** over-approximation of union *)
+
+  val is_included: t -> t -> bool
+  (**is first argument included in the second?*)
 end
 
 module type Bounded_Join_Semi_Lattice = sig
@@ -52,8 +55,11 @@ end
 
 module type With_Under_Approximation = sig
   type t
-  val link: t -> t -> t (** under-approximation of union *)
-  val meet: t -> t -> t (** under-approximation of intersection *)
+  val link: t -> t -> t
+  (** under-approximation of union *)
+
+  val meet: t -> t -> t
+  (** under-approximation of intersection *)
 end
 
 (** {2 Over- and under-approximations}

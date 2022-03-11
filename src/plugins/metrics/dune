@@ -4,7 +4,7 @@
   (modules metrics metrics_parameters css_html metrics_base metrics_acsl
     metrics_cabs metrics_cilast metrics_coverage
     register)
-  (flags -open Frama_c_kernel :standard -w -9-50)
+  (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-eva.core frama-c-server.core)
 )
 

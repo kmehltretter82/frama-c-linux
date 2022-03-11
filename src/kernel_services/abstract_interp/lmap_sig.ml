@@ -27,11 +27,17 @@ open Locations
 
 module type S = sig
 
-  type v (** type of the values associated to a location *)
-  type offsetmap (** type of the maps associated to a base *)
-  type widen_hint_base (** widening hints for each base *)
+  (** type of the values associated to a location *)
+  type v
 
-  type map (** Maps from {!Base.t} to {!offsetmap} *)
+  (** type of the maps associated to a base *)
+  type offsetmap
+
+  (** widening hints for each base *)
+  type widen_hint_base
+
+  (** Maps from {!Base.t} to {!offsetmap} *)
+  type map
   type lmap = private Bottom | Top | Map of map
 
 
@@ -42,6 +48,7 @@ module type S = sig
   val pretty_filter: Format.formatter -> t -> Zone.t -> unit
   (** [pretty_filter m z] pretties only the part of [m] that correspond to
       the bases present in [z] *)
+
   val pretty_diff: Format.formatter -> t -> t -> unit
 
   (** {2 General shape} *)
@@ -57,6 +64,7 @@ module type S = sig
   val bottom : t
   (** Every location is associated to the value [bottom] of type [v] in this
       state. This state can be reached only in dead code. *)
+
   val is_reachable : t -> bool
 
 

@@ -237,6 +237,7 @@ class type extensible_printer_type = object
   method binop: Format.formatter -> binop -> unit
 
   method init:  Format.formatter -> init -> unit
+
   (** Print initializers. This can be slow. *)
   method file: Format.formatter -> file -> unit
 
@@ -314,6 +315,7 @@ class type extensible_printer_type = object
   method pp_keyword: Format.formatter -> string -> unit
   (** All C99 keywords except types "char", "int", "long", "signed",
       "short", "unsigned", "void" and "_XXX" (like "_Bool") **)
+
   method pp_acsl_keyword: Format.formatter -> string -> unit
   (** All ACSL keywords except logic types *)
 
@@ -361,11 +363,12 @@ type line_directive_style =
   | Line_preprocessor_output (** Use # nnn directives (in gcc mode) *)
 
 type state =
-  { (** How to print line directives *)
-    mutable line_directive_style: line_directive_style option;
+  { mutable line_directive_style: line_directive_style option;
+    (** How to print line directives *)
+    mutable print_cil_input: bool;
     (** Whether we print something that will only be used as input to Cil's
         parser. In that case we are a bit more liberal in what we print. *)
-    mutable print_cil_input: bool;
+    mutable print_cil_as_is: bool;
     (** Whether to print the CIL as they are, without trying to be smart and
         print nicer code. Normally this is false, in which case the pretty
         printer will turn the while(1) loops of CIL into nicer loops, will not
@@ -373,13 +376,13 @@ type state =
         you turn this on you will get code that does not compile: if you use
         varargs the __builtin_va_arg function will be printed in its internal
         form. *)
-    mutable print_cil_as_is: bool;
+    mutable line_length: int;
     (** The length used when wrapping output lines. Setting this variable to
         a large integer will prevent wrapping and make #line directives more
         accurate. *)
-    mutable line_length: int;
+    mutable warn_truncate: bool
     (** Emit warnings when truncating integer constants (default true) *)
-    mutable warn_truncate: bool }
+  }
 
 (* ********************************************************************* *)
 (** {2 Functions for pretty printing} *)
@@ -450,10 +453,12 @@ module type S_pp = sig
   val pp_extended: Format.formatter -> acsl_extension -> unit
   val pp_short_extended: Format.formatter -> acsl_extension -> unit
   (** @since 21.0-Scandium *)
+
   val pp_predicate_node: Format.formatter -> predicate_node -> unit
   val pp_predicate: Format.formatter -> predicate -> unit
   val pp_toplevel_predicate: Format.formatter -> toplevel_predicate -> unit
   (** @since 22.0-Titanium *)
+
   val pp_identified_predicate: Format.formatter -> identified_predicate -> unit
   val pp_code_annotation: Format.formatter -> code_annotation -> unit
   val pp_funspec: Format.formatter -> funspec -> unit

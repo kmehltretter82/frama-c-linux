@@ -29,9 +29,12 @@ open Abstract_interp
 
 module type S = sig
 
-  type v (** Type of the values stored in the offsetmap *)
+  (** Type of the values stored in the offsetmap *)
+  type v
   type widen_hint
-  include Datatype.S (** Datatype for the offsetmaps *)
+
+  (** Datatype for the offsetmaps *)
+  include Datatype.S
 
 
   (** {2 Pretty-printing} *)

@@ -54,8 +54,10 @@ module type S = sig
   val project_singleton: t -> itv option
 
   (** Iterators *)
+
   val fold: (itv -> 'a -> 'a) -> t -> 'a -> 'a
   (** May raise [Error_Top] *)
+
   val iter: (itv -> unit) -> t -> unit
   (** May raise [Error_Top] *)
 

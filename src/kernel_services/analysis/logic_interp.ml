@@ -992,7 +992,7 @@ struct
     | AStmtSpec _ -> (* TODO *)
       raise (NYI "[logic_interp] statement contract")
     | AExtended _ -> raise (NYI "[logic_interp] extension")
-  (** Used by annotations entry points. *)
+  (* Used by annotations entry points. *)
   let get_from_stmt_annots code_annot_filter ((ki, _kf) as stmt) =
     Option.iter
       (fun caf ->

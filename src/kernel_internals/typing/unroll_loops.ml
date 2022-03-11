@@ -151,12 +151,12 @@ let update_gotos sid_tbl block =
           DoChildren
         | _ -> DoChildren
       (* speed up: skip non interesting subtrees *)
-      method! vvdec _ = SkipChildren (* via visitCilFunction *)
-      method! vspec _ = SkipChildren (* via visitCilFunction *)
-      method! vcode_annot _ = SkipChildren (* via Code_annot stmt *)
-      method! vexpr _ = SkipChildren (* via stmt such as Return, IF, ... *)
-      method! vlval _ = SkipChildren (* via stmt such as Set, Call, Asm, ... *)
-      method! vattr _ = SkipChildren (* via Asm stmt *)
+      method! vvdec _ = Cil.SkipChildren (* via visitCilFunction *)
+      method! vspec _ = Cil.SkipChildren (* via visitCilFunction *)
+      method! vcode_annot _ = Cil.SkipChildren (* via Code_annot stmt *)
+      method! vexpr _ = Cil.SkipChildren (* via stmt such as Return, IF, ... *)
+      method! vlval _ = Cil.SkipChildren (* via stmt such as Set, Call, Asm, ... *)
+      method! vattr _ = Cil.SkipChildren (* via Asm stmt *)
     end
   in visitCilBlock (goto_updater:>cilVisitor) block
 
@@ -710,12 +710,12 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
 
     | _ -> DoChildren
 
-  method! vinst _ = SkipChildren
-  method! vexpr _ = SkipChildren
-  method! vlval _ = SkipChildren
-  method! vtype _ = SkipChildren
-  method! vspec _ = SkipChildren
-  method! vcode_annot _ = SkipChildren
+  method! vinst _ = Cil.SkipChildren
+  method! vexpr _ = Cil.SkipChildren
+  method! vlval _ = Cil.SkipChildren
+  method! vtype _ = Cil.SkipChildren
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren
 end
 
 (* Performs unrolling transformation without using -ulevel option.

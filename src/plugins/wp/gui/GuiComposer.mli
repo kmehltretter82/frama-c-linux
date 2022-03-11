@@ -28,7 +28,9 @@ class composer : GuiSequent.focused ->
   object
 
     method clear : unit
-    method connect : (unit -> unit) -> unit (** request-for-update event *)
+    method connect : (unit -> unit) -> unit
+    (** request-for-update event *)
+
     method print :
       GuiTactic.composer -> quit:(unit -> unit) -> Format.formatter -> unit
 
@@ -38,7 +40,9 @@ class browser : GuiSequent.focused ->
   object
 
     method clear : unit
-    method connect : (unit -> unit) -> unit (** request-for-update event *)
+    method connect : (unit -> unit) -> unit
+    (** request-for-update event *)
+
     method print :
       GuiTactic.browser -> quit:(unit -> unit) -> Format.formatter -> unit
 

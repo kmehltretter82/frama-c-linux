@@ -135,14 +135,14 @@ module Process: sig
 end = struct
   module Env = struct
     type t = {
-      (** Enclosing function of the predicate or term being analysed. *)
       kf: kernel_function;
-      (** Kinstr of the predicate or term being analysed. *)
+      (** Enclosing function of the predicate or term being analysed. *)
       kinstr: kinstr;
-      (** Kind of annotation for the predicate or term being analysed. *)
+      (** Kinstr of the predicate or term being analysed. *)
       akind: annotation_kind;
-      (** Logic scope for the predicate or term being analysed. *)
+      (** Kind of annotation for the predicate or term being analysed. *)
       lscope: Lscope.t;
+      (** Logic scope for the predicate or term being analysed. *)
     }
 
     let create kf kinstr akind =

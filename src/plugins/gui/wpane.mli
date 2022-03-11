@@ -91,9 +91,14 @@ class ['a] notebook : ?tabs:Gtk.Tags.position -> default:'a -> unit ->
 
 class type entry =
   object
-    method widget : GObj.widget  (** Returns the widget *)
-    method update : unit -> unit (** On array request *)
-    method delete : unit -> unit (** When removed *)
+    method widget : GObj.widget
+    (** Returns the widget *)
+
+    method update : unit -> unit
+    (** On array request *)
+
+    method delete : unit -> unit
+    (** When removed *)
   end
 
 class ['a] warray :
@@ -102,8 +107,10 @@ class ['a] warray :
   unit ->
   object
     inherit widget
-    (** Install the new-entry creator. *)
+
     method set_entry : ('a -> entry) -> unit
+    (** Install the new-entry creator. *)
+
     method set : 'a list -> unit
     method get : 'a list
     method mem : 'a -> bool
@@ -146,8 +153,15 @@ class ['a] dialog :
     method button :
       action:'a action ->
       ?label:string -> ?icon:icon -> ?tooltip:string ->
-      unit -> unit (** Closes the dialog. *)
-    method select : 'a -> unit (** Closes the dialog. *)
-    method run : unit -> unit (** Opens the dialog (asynchronously). *)
-    inherit ['a] signal (** Emitted when the dialog is closed. *)
+      unit -> unit
+    (** Closes the dialog. *)
+
+    method select : 'a -> unit
+    (** Closes the dialog. *)
+
+    method run : unit -> unit
+    (** Opens the dialog (asynchronously). *)
+
+    inherit ['a] signal
+    (** Emitted when the dialog is closed. *)
   end

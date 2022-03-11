@@ -464,8 +464,8 @@ module PreprocessAnnot: Parameter_sig.Bool
 (** Behavior of option "-pp-annot" *)
 
 module ContinueOnAnnotError: Parameter_sig.Bool
-(** Behavior of option "-continue-annot-error" *)
 [@@ deprecated "Use Kernel.wkey_annot_error instead"]
+(** Behavior of option "-continue-annot-error" *)
 
 module SimplifyCfg: Parameter_sig.Bool
 (** Behavior of option "-simplify-cfg" *)
@@ -515,12 +515,12 @@ val normalization_parameters: unit -> Typed_parameter.t list
 *)
 
 module WarnDecimalFloat: Parameter_sig.String
-(** Behavior of option "-warn-decimal-float" *)
 [@@ deprecated "Uses kernel.wkey_decimal_float instead."]
+(** Behavior of option "-warn-decimal-float" *)
 
 module ImplicitFunctionDeclaration: Parameter_sig.String
-(** Behavior of option "-implicit-function-declaration" *)
 [@@ deprecated "Uses kernel.wkey_implicit_function_declaration instead."]
+(** Behavior of option "-implicit-function-declaration" *)
 
 module C11: Parameter_sig.Bool
 (** Behavior of option "-c11" *)

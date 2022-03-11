@@ -23,6 +23,7 @@
 (* Note: widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
 
 [@@@ api_start]
+
 (** Register special annotations to locally guide the Eva analysis:
 
     - slevel annotations: "slevel default", "slevel merge" and "slevel i"

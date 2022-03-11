@@ -350,18 +350,22 @@ module Make
       Left.Store.get_initial_state kf >>- fun left ->
       Right.Store.get_initial_state kf >>-: fun right ->
       left, right
-    let get_initial_state_by_callstack kf =
-      let left_tbl = Left.Store.get_initial_state_by_callstack kf
-      and right_tbl = Right.Store.get_initial_state_by_callstack kf in
+    let get_initial_state_by_callstack ?selection kf =
+      let left_tbl, right_tbl =
+        Left.Store.get_initial_state_by_callstack ?selection kf,
+        Right.Store.get_initial_state_by_callstack ?selection kf
+      in
       merge_callstack_tbl left_tbl right_tbl
 
     let get_stmt_state ~after stmt =
       Left.Store.get_stmt_state ~after stmt >>- fun left ->
       Right.Store.get_stmt_state ~after stmt >>-: fun right ->
       left, right
-    let get_stmt_state_by_callstack ~after stmt =
-      let left_tbl = Left.Store.get_stmt_state_by_callstack ~after stmt
-      and right_tbl = Right.Store.get_stmt_state_by_callstack ~after stmt in
+    let get_stmt_state_by_callstack ?selection ~after stmt =
+      let left_tbl, right_tbl =
+        Left.Store.get_stmt_state_by_callstack ?selection ~after stmt,
+        Right.Store.get_stmt_state_by_callstack ?selection ~after stmt
+      in
       merge_callstack_tbl left_tbl right_tbl
 
     let mark_as_computed () =

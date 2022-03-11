@@ -216,6 +216,7 @@ val of_string : string -> t
 
 (** @modify Frama-C+dev remove optional `hexa` argument *)
 val pretty : t formatter
+
 (** @since Frama-C+dev *)
 val pretty_hex : t formatter
 

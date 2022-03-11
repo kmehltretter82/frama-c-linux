@@ -209,9 +209,9 @@ module ReturnUsage = struct
     method result () =
       summarize_by_lv usage
 
-    method! vtype _ = SkipChildren
-    method! vspec _ = SkipChildren
-    method! vcode_annot _ = SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
 
   (* For functions returning pointers, add a split on NULL/non-NULL *)

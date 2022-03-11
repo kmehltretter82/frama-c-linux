@@ -24,8 +24,11 @@
 (** Interactive Proof Engine *)
 (* -------------------------------------------------------------------------- *)
 
-type tree (** A proof tree *)
-type node (** A proof node *)
+(** A proof tree *)
+type tree
+
+(** A proof node *)
+type node
 
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
@@ -63,7 +66,9 @@ val node_context : node -> WpContext.t
 
 val title : node -> string
 val proved : node -> bool
-val pending : node -> int (** 0 means proved *)
+val pending : node -> int
+(** 0 means proved *)
+
 val parent : node -> node option
 val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option

@@ -52,8 +52,11 @@ val bool_neq : binop
 val bool_leq : binop
 val bool_and : binop
 val bool_or  : binop
-val is_true  : pred -> term (** [p ? 1 : 0] *)
-val is_false : pred -> term (** [p ? 0 : 1] *)
+val is_true  : pred -> term
+(** [p ? 1 : 0] *)
+
+val is_false : pred -> term
+(** [p ? 0 : 1] *)
 
 (** {2 Null Values} *)
 
@@ -91,8 +94,11 @@ val equal_array : matrixinfo -> term -> term -> pred
 
 (** {2 C and ACSL Constants} *)
 
-val ainf : term option (** Array lower-bound, ie `Some(0)` *)
-val asup : int -> term option (** Array upper-bound, ie `Some(n-1)` *)
+val ainf : term option
+(** Array lower-bound, ie `Some(0)` *)
+
+val asup : int -> term option
+(** Array upper-bound, ie `Some(n-1)` *)
 
 val constant : constant -> term
 val logic_constant : logic_constant -> term

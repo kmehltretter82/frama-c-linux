@@ -2809,7 +2809,7 @@ let oneFilePass2 (f: file) =
           (* Reflect them in the type *)
           setFormals fdec fdec.sformals
         end;
-        (** See if we can remove this inline function *)
+        (* See if we can remove this inline function *)
         if fdec'.svar.vinline && mergeInlines then begin
           let mergeInlinesWithAlphaConvert =
             mergeInlinesWithAlphaConvert ()
@@ -3232,7 +3232,7 @@ let find_decls g =
       method! vlogic_var_decl lv =
         res := Cil_datatype.Logic_var.Set.add lv !res;
         SkipChildren
-      method! vspec _ = SkipChildren
+      method! vspec _ = Cil.SkipChildren
       method! vfunc f =
         ignore (self#vvdec f.svar);
         Option.iter (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;
