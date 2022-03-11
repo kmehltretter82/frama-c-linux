@@ -70,4 +70,6 @@ void local_var_use(int w, int q[][w]) {
 
 extern struct s s;
 
-struct s* use_s() { return &s; }
+enum e;
+
+struct s* use_s() { enum e* x; return &s; }

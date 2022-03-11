@@ -362,12 +362,12 @@ let find_candidate_compinfo ?loc:_loc ci =
 
 let find_candidate_enuminfo ?loc:_loc ei =
   if Globals.Types.mem_type Logic_typing.Enum ei.ename then begin
-    match Globals.Types.global Logic_typing.Enum ei.ename with
-    | GEnumTag(ei,_) | GEnumTagDecl(ei,_) -> Some ei
-    | g ->
+    match Globals.Types.find_type Logic_typing.Enum ei.ename with
+    | TEnum(ei,_) -> Some ei
+    | t ->
       Kernel.fatal
-        "Expected enumeration definition instead of %a"
-        Cil_datatype.Global.pretty g
+        "Expected enuminfo instead of %a"
+        Printer.pp_typ t
   end else None
 
 let find_candidate_varinfo ?loc:_loc vi where =
