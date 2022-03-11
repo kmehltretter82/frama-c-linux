@@ -1,4 +1,5 @@
 import React from 'react';
+import * as Ivette from 'ivette';
 import * as Dome from 'dome/dome';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
@@ -7,11 +8,6 @@ import * as Values from 'frama-c/plugins/eva/api/values';
 import { callstack, evaluation } from 'frama-c/plugins/eva/api/values';
 
 import { Icon } from 'dome/controls/icons';
-// import { Stmt } from 'frama-c/plugins/eva/valueinfos';
-// import { Diff } from 'frama-c/plugins/eva/diffed';
-// import { FontSizer, SizedArea } from 'frama-c/plugins/eva/sized';
-
-import * as Ivette from 'ivette';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Hpack, Vpack, Vfill } from 'dome/layout/boxes';
@@ -19,15 +15,132 @@ import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 
 
 
-type Status = 'True' | 'False' | 'Unknown'
+type Maybe<A> = A | undefined;
 type Alarm = [ Status, string ]
+type Status = 'True' | 'False' | 'Unknown'
+type StateToDisplay = 'Before' | 'After' | 'Both' | 'None'
+
+function getAlarmStatus(alarms: Alarm[]): string {
+  if (alarms.length === 0) return 'none';
+  if (alarms.find(([st, _]) => st === 'False')) return 'False';
+  else return 'Unknown';
+}
+
+class CacheManager<K, V> {
+
+  private readonly request: (key: K) => Promise<V>;
+  private readonly cache: Map<K, V>;
+
+  constructor(request: (key: K) => Promise<V>) {
+    console.log('Coucou');
+    this.request = request;
+    this.cache = new Map<K, V>()
+    this.request = this.request.bind(this);
+    this.get = this.get.bind(this);
+    this.clear = this.clear.bind(this);
+  }
+
+  get(key: K): Maybe<V> {
+    const add = (value: V): void => { this.cache.set(key, value); };
+    if (!this.cache.has(key)) this.request(key).then(add);
+    return this.cache.get(key);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+}
+
+
+
+interface FunctionInfos {
+  markers: Set<Ast.marker>;
+  byCallstacks: boolean;
+  folded: boolean;
+}
+
+class FunctionsManager {
+
+  private readonly cache = new Map<string, FunctionInfos>();
+
+  newFunction(fct: string): void {
+    const markers = new Set<Ast.marker>();
+    const folded = false;
+    const byCallstacks = false;
+    this.cache.set(fct, { markers, byCallstacks, folded });
+  }
+
+  getInfos(fct: string): Maybe<FunctionInfos> {
+    return this.cache.get(fct);
+  }
+
+  setByCallstacks(fct: string, byCallstacks: boolean): void {
+    const infos = this.getInfos(fct); if (!infos) return;
+    const { markers, folded } = infos;
+    this.cache.set(fct, { markers, byCallstacks, folded });
+  }
+
+  setFolded(fct: string, folded: boolean): void {
+    const infos = this.getInfos(fct); if (!infos) return;
+    const { markers, byCallstacks } = infos;
+    this.cache.set(fct, { markers, byCallstacks, folded });
+  }
+
+  addLocation(loc: Location): void {
+    const { target, fct } = loc;
+    const infos = this.getInfos(fct);
+    if (!infos) {
+      this.newFunction(fct);
+      this.addLocation(loc);
+    }
+    else {
+      infos.markers.add(target);
+    }
+  }
+
+  removeLocation(loc: Location): void {
+    const { target, fct } = loc;
+    this.getInfos(fct)?.markers.delete(target);
+  }
+
+  delete(fct: string): void {
+    this.cache.delete(fct);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  map<A>(func: (infos: FunctionInfos, fct: string) => A): A[] {
+    const acc: A[] = [];
+    this.cache.forEach((infos, fct) => acc.push(func(infos, fct)));
+    return acc;
+  }
+
+}
+
+
+
+interface Callsite {
+  callee: string;
+  caller?: string;
+  stmt?: Ast.marker;
+}
+
+function requestCallsites(callstack?: callstack): Promise<Callsite[]> {
+  if (!callstack) return Promise.resolve([]);
+  return Server.send(Values.getCallstackInfo, callstack);
+}
+
+
 
 export interface Location {
   target: Ast.marker;
   fct: string;
 }
 
-interface Info {
+interface Infos {
   code?: string;
   stmt?: Ast.marker;
   rank?: number;
@@ -43,39 +156,18 @@ interface Values {
   vElse?: evaluation;
 }
 
-function defaultValues(e: any): Values {
-  const empty: evaluation = { value: '', alarms: [], pointedVars: [] };
-  return { errors: `Error: ${e}`, vBefore: empty };
+interface Probe extends Location, Infos, Values {}
+
+interface ProbeProps {
+  loc: Location;
+  callstack?: callstack;
 }
 
-export interface Probe extends Location, Info {
-  values: (c?: callstack) => Promise<Values>
-}
-
-
-
-function getInfo(loc: Location): Info {
-  const { target } = loc;
-  const [ cache ] = React.useState<Map<Ast.marker, Info>>(new Map());
-  if (cache.has(target)) return cache.get(target) as Info;
-  const error: Info = { code: '(error)' };
-  const request = Server.send(Values.getProbeInfo, target);
-  const { result = error } = Dome.usePromise(request.catch(() => error));
-  cache.set(target, result);
-  return result;
-}
-
-export function useProbe(loc: Location): Probe {
-  const [ cache ] = React.useState<Map<Location, Probe>>(new Map());
-  if (cache.has(loc)) return cache.get(loc) as Probe;
-  const info = getInfo(loc);
-  const values = async (c?: Values.callstack): Promise<Values> => {
-    const req = Server.send(Values.getValues, {...loc, callstack:c });
-    return req.catch(defaultValues);
-  };
-  const result = { ...loc, ...info, values };
-  cache.set(loc, result);
-  return result;
+async function requestProbe(props: ProbeProps): Promise<Probe> {
+  const { loc, callstack } = props;
+  const infos = await Server.send(Values.getProbeInfo, loc.target);
+  const values = await Server.send(Values.getValues, { ...loc, callstack });
+  return { ...loc, ...infos, ...values };
 }
 
 
@@ -98,18 +190,8 @@ function Stmt(props: StmtProps): JSX.Element {
   return <span className={className} title={title}>{text}</span>;
 }
 
-
-
-interface AlarmsInfosProps {
-  probe?: Probe;
-  callstack?: callstack;
-}
-
-function AlarmsInfos(props: AlarmsInfosProps): JSX.Element {
-  const { probe, callstack: c } = props;
-  if (!probe) return <></>;
-  const { result: domain } = Dome.usePromise(probe.values(c));
-  const alarms = domain?.vBefore?.alarms ?? [];
+function AlarmsInfos(props: { probe?: Probe }): JSX.Element {
+  const alarms = props.probe?.vBefore?.alarms ?? [];
   if (alarms.length > 0) {
     const renderAlarm = ([status, alarm]: Alarm) => {
       const className = `eva-alarm-info eva-alarm-${status}`;
@@ -124,27 +206,13 @@ function AlarmsInfos(props: AlarmsInfosProps): JSX.Element {
   return <></>;
 }
 
-
-
 interface StackInfosProps {
-  callstack?: callstack;
-}
-
-export interface Callsite {
-  callee: string;
-  caller?: string;
-  stmt?: Ast.marker;
-}
-
-function getCallsites(callstack?: callstack): Promise<Callsite[]> {
-  if (!callstack) return Promise.resolve([]);
-  return Server.send(Values.getCallstackInfo, callstack);
+  callsites: Callsite[];
+  setSelection: (a: States.SelectionActions) => void;
 }
 
 function StackInfos(props: StackInfosProps): JSX.Element {
-  const [, setSelection] = States.useSelection();
-  const { callstack } = props;
-  const { result: callsites = [] } = Dome.usePromise(getCallsites(callstack));
+  const { callsites, setSelection } = props;
   if (callsites.length <= 1) return <></>;
   const makeCallsite = ({ caller, stmt }: Callsite) => {
     if (!caller || !stmt) return null;
@@ -172,15 +240,12 @@ function StackInfos(props: StackInfosProps): JSX.Element {
       </Cell>
     );
   };
-
   return (
     <Hpack className="eva-info">
       {callsites.map(makeCallsite)}
     </Hpack>
   );
 }
-
-
 
 interface ProbeInfosProps {
   probe?: Probe;
@@ -191,6 +256,7 @@ interface ProbeInfosProps {
 
 export function ProbeInfos(props: ProbeInfosProps): JSX.Element {
   const { probe, removeLoc, display, setDisplay } = props;
+  console.log(props);
   if (!probe || !probe.code) return <></>;
   const { code, stmt, target } = probe;
   return (
@@ -234,75 +300,30 @@ export function ProbeInfos(props: ProbeInfosProps): JSX.Element {
       </ButtonGroup>
     </Hpack>
   );
-  /*
-        <Button
-          visible={condition}
-          label="C"
-          selected={vcond === 'Cond'}
-          title="Show values in all conditions"
-          onClick={() => model.setVcond('Cond')}
-        />
-        <Button
-          visible={condition || vcond === 'Then'}
-          selected={vcond === 'Then'}
-          enabled={condition}
-          label="T"
-          value="Then"
-          title="Show reduced values when condition holds (Then)"
-          onClick={() => model.setVcond('Then')}
-        />
-        <Button
-          visible={condition || vcond === 'Else'}
-          selected={vcond === 'Else'}
-          enabled={condition}
-          label="E"
-          value="Else"
-          title="Show reduced values when condition does not hold (Else)"
-          onClick={() => model.setVcond('Else')}
-        />
-        <Button
-          visible={condition || effects}
-          selected={vstmt === 'After'}
-          label="A"
-          value="After"
-          title="Show values after/before statement effects"
-          onClick={() => {
-            model.setVstmt(vstmt === 'After' ? 'Before' : 'After');
-          }}
-        />
-      </ButtonGroup>
-    </Hpack>
-  );
-  */
 }
 
 
 
-export type StateToDisplay = 'Before' | 'After' | 'Both' | 'None'
-
-export interface ProbeRenderProps {
+interface ProbeRenderProps {
   probe: Probe;
-  focused: boolean
+  focused: boolean;
   display: StateToDisplay;
   selectProbe: () => void;
   removeProbe: () => void;
   addLoc: (loc: Location) => void;
+  setSelection: (a: States.SelectionActions) => void;
 }
 
-
-
-export function ProbeHeader(props: ProbeRenderProps): JSX.Element {
-  const { probe, focused, display } = props;
+function ProbeHeader(props: ProbeRenderProps): JSX.Element {
+  const { probe, focused, display, setSelection } = props;
   const { code = '(error)', stmt, target } = probe;
   const color = 'eva-probes eva-' + focused ? 'focused' : 'cell';
   const { selectProbe, removeProbe } = props;
-  const [, setSelection] = States.useSelection();
 
   // Computing the number of columns. By design, either vAfter or vThen and
   // vElse are empty. Also by design (hypothesis), it is not function of the
   // considered callstacks, so we check on the consolidated.
-  const { result = defaultValues('Unknown')} = Dome.usePromise(probe.values());
-  const { vBefore, vAfter, vThen, vElse } = result;
+  const { vBefore, vAfter, vThen, vElse } = probe;
   let colSpan = 0;
   if (display !== 'After' && vBefore) colSpan += 1;
   if (display !== 'Before' && vAfter) colSpan += 1;
@@ -330,20 +351,9 @@ export function ProbeHeader(props: ProbeRenderProps): JSX.Element {
   );
 }
 
-
-
-type CallstackElement = (c?: callstack) => JSX.Element
-
-function getAlarmStatus(alarms: Alarm[]): string {
-  if (alarms.length === 0) return 'none';
-  if (alarms.find(([st, _]) => st === 'False')) return 'False';
-  else return 'Unknown';
-}
-
-export function ProbeValues(props: ProbeRenderProps): CallstackElement {
+function ProbeValues(props: ProbeRenderProps): JSX.Element {
   const { probe, display } = props;
-  const { selectProbe, addLoc } = props;
-  const [, setSelection] = States.useSelection();
+  const { selectProbe, addLoc, setSelection } = props;
 
   // Building common parts
   const loc: States.SelectionActions = { location: probe };
@@ -364,38 +374,32 @@ export function ProbeValues(props: ProbeRenderProps): CallstackElement {
     if (items.length > 0) Dome.popupMenu(items);
   };
 
-  function result(c?: callstack): JSX.Element {
-  const { result = defaultValues('Unknown')} = Dome.usePromise(probe.values(c));
-  const { vBefore, vAfter, vThen, vElse } = result;
-    function td(e: Values.evaluation, state: string): JSX.Element {
-      const status = getAlarmStatus(e.alarms);
-      const alarmClass = `eva-cell-alarms eva-alarm-${status}`;
-      const title = 'At least one alarm is raised in one callstack';
-      return (
-        <td
-          className='eva-values eva-cell'
-          onClick={onClick}
-          onContextMenu={onContextMenu(e)}
-        >
-          <Icon className={alarmClass} size={10} title={title} id="WARNING" />
-          <span className={`eva-state-${state}`}>{e.value}</span>
-        </td>
-      );
-    }
-    if (display === 'Before' && vBefore) return td(vBefore, 'Before');
-    if (display === 'After' && vAfter) return td(vAfter, 'After');
-    if (display === 'After' && vThen && vElse)
-      return <>{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
-    if (display === 'Both' && vBefore && vAfter)
-      return <>{td(vBefore, 'Before')}{td(vAfter, 'After')}</>;
-    if (display === 'Both' && vBefore && vThen && vElse)
-      return <>{td(vBefore, 'Before')}{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
-    return <></>;
+  const { vBefore, vAfter, vThen, vElse } = probe;
+  function td(e: Values.evaluation, state: string): JSX.Element {
+    const status = getAlarmStatus(e.alarms);
+    const alarmClass = `eva-cell-alarms eva-alarm-${status}`;
+    const title = 'At least one alarm is raised in one callstack';
+    return (
+      <td
+        className='eva-values eva-cell'
+        onClick={onClick}
+        onContextMenu={onContextMenu(e)}
+      >
+        <Icon className={alarmClass} size={10} title={title} id="WARNING" />
+        <span className={`eva-state-${state}`}>{e.value}</span>
+      </td>
+    );
   }
-
-  return result;
+  if (display === 'Before' && vBefore) return td(vBefore, 'Before');
+  if (display === 'After' && vAfter) return td(vAfter, 'After');
+  if (display === 'After' && vThen && vElse)
+    return <>{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
+  if (display === 'Both' && vBefore && vAfter)
+    return <>{td(vBefore, 'Before')}{td(vAfter, 'After')}</>;
+  if (display === 'Both' && vBefore && vThen && vElse)
+    return <>{td(vBefore, 'Before')}{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
+  return <></>;
 }
-
 
 
 interface FunctionProps {
@@ -403,20 +407,22 @@ interface FunctionProps {
   markers: Set<Ast.marker>;
   display: StateToDisplay;
   close: () => void;
+  getProbe: (props: ProbeProps) => Maybe<Probe>;
   selectLoc: (loc: Location) => void;
   isSelected: (loc: Location) => boolean;
   removeLoc: (loc: Location) => void;
   addLoc: (loc: Location) => void;
-}
-
-interface FunctionTitleProps extends FunctionProps {
-  byCallstacks: boolean;
   folded: boolean;
   setFolded: (folded: boolean) => void;
+  byCallstacks: boolean;
+  getCallstacks: (markers: Set<Ast.marker>) => Maybe<callstack[]>;
   setByCallstacks: (byCallstack: boolean) => void;
+  selectCallstack: (callstack: callstack) => void;
+  isSelectedCallstack: (callstack: callstack) => boolean;
+  setSelection: (a: States.SelectionActions) => void;
 }
 
-function FunctionTitle(props: FunctionTitleProps): JSX.Element {
+function FunctionTitle(props: FunctionProps): JSX.Element {
   const { fct, folded, byCallstacks } = props;
   const { setFolded, setByCallstacks, close } = props;
   return (
@@ -448,33 +454,30 @@ function FunctionTitle(props: FunctionTitleProps): JSX.Element {
 
 function FunctionSection(props: FunctionProps): JSX.Element {
   const { fct, markers, display } = props;
-  const [ byCallstacks, setByCallstacks ] = React.useState(false);
-  const [ folded, setFolded ] = React.useState(false);
+  const { byCallstacks, setByCallstacks } = props;
+  const { folded, setFolded, setSelection } = props;
+  const { isSelected, addLoc, getCallstacks: getCS } = props;
+  const callstacks = byCallstacks ? getCS(markers) ?? [undefined] : [undefined];
 
-  const reqCallstacks = Server.send(Values.getCallstacks, [...markers]);
-  const { result } = Dome.usePromise(reqCallstacks.catch(() => [undefined]));
-  const callstacks = byCallstacks ? result ?? [undefined] : [undefined];
-
-  const probes: Set<Probe> = new Set();
-  markers.forEach((target) => probes.add(useProbe({ target, fct })));
-
-  let renderProps: ProbeRenderProps[] = [];
-  const { isSelected, addLoc } = props;
-  probes.forEach((probe) => {
-    const focused = isSelected(probe);
-    const selectProbe = (): void => props.selectLoc(probe);
-    const removeProbe = (): void => props.removeLoc(probe);
-    const fcts = { selectProbe, removeProbe, addLoc };
-    renderProps.push({ probe, focused, display, ...fcts });
+  const renderProps: ProbeRenderProps[][] = callstacks.map((callstack) => {
+    let acc: ProbeRenderProps[] = [];
+    markers.forEach((target) => {
+      const probe = props.getProbe({ loc: { target, fct }, callstack });
+      if (!probe) return;
+      const focused = isSelected(probe);
+      const selectProbe = (): void => props.selectLoc(probe);
+      const removeProbe = (): void => props.removeLoc(probe);
+      const fcts = { selectProbe, removeProbe, addLoc };
+      acc.push({ probe, focused, display, ...fcts, setSelection });
+    });
+    return acc;
   });
 
-  const headers = renderProps.map(ProbeHeader);
-  const values = callstacks.map((callstack) => {
-    return renderProps.map((props) => ProbeValues(props)(callstack))
-  });
+  const headers = renderProps[0].map(ProbeHeader);
+  const values = renderProps.map((t) => t.map(ProbeValues));
 
   return (
-    <>
+    <div key={fct}>
       <FunctionTitle
         {...props}
         byCallstacks={byCallstacks}
@@ -486,55 +489,84 @@ function FunctionSection(props: FunctionProps): JSX.Element {
         <tr>{headers}</tr>
         {values.map((callstackValues) => <tr>{callstackValues}</tr>)}
       </table>
-    </>
+    </div>
   );
 }
 
 
 
-type Maybe<A> = A | undefined;
+
+function requestCallstacks(markers: Set<Ast.marker>): Promise<callstack[]> {
+  let markersList: Ast.marker[] = [];
+  markers.forEach((marker) => markersList.push(marker));
+  return Server.send(Values.getCallstacks, markersList);
+}
 
 export function EvaTable(): JSX.Element {
+  const [selection, setSelection ] = States.useSelection();
+  const [ fcts ] = React.useState(new FunctionsManager());
+  const [ probes ] = React.useState(() => new CacheManager(requestProbe));
+  const [ callsites ] = React.useState(new CacheManager(requestCallsites));
+  const [ callstacks ] = React.useState(new CacheManager(requestCallstacks));
   const [ display, setDisplay ] = React.useState<StateToDisplay>('Before');
-  const [ fcts ] = React.useState<Map<string, Set<Ast.marker>>>(new Map());
-
-  const addLoc = (loc: Location): void => {
-    const { fct, target: m } = loc;
-    const ms = fcts.get(fct);
-    fcts.set(fct, ms ? ms.add(m) : (new Set<Ast.marker>()).add(m));
-  };
-
-  const removeLoc = (loc: Location): void => {
-    const { fct, target: m } = loc;
-    const ms = fcts.get(fct);
-    if (ms) ms.delete(m);
-  };
-
-  // TODO: Faire descendre setCS pour pouvoir sélectionner les callstacks
+  const [ loc, selectLoc ] = React.useState<Maybe<Location>>(undefined);
   const [ cs, setCS ] = React.useState<Maybe<callstack>>(undefined);
+  const isSelected = (l: Location) => l === loc;
+  const isSelectedCallstack = (c: callstack) => c === cs;
+  const selectedProbe = loc ? probes.get({ loc, callstack: cs }) : undefined;
 
-  const [ selected, select ] = React.useState<Maybe<Location>>(undefined);
-  const selectedProbe = selected ? useProbe(selected) : undefined;
-  const isSelected = (loc: Location): boolean => loc === selected;
-  const closeFct = (fct: string): () => void => () => { fcts.delete(fct); };
+  React.useEffect(() => {
+    const { current: loc } = selection;
+    if (!loc) { selectLoc(undefined); return; }
+    const { fct, marker } = loc;
+    if (!fct || !marker) { selectLoc(undefined); return; }
+    fcts.addLocation({ target: marker, fct });
+    console.log('Location:');
+    console.log(loc);
+    selectLoc({ target: marker, fct });
+  }, [selection]);
 
-  let functionsProps: FunctionProps[] = [];
-  fcts.forEach((markers, fct) => {
-    const selectLoc = select;
-    const close = closeFct(fct);
-    const calls = { selectLoc, isSelected, removeLoc, addLoc };
-    functionsProps.push({ fct, markers, display, close, ...calls });
+  const functionsProps: FunctionProps[] = fcts.map((infos, fct) => {
+    const { markers, byCallstacks, folded } = infos;
+    const setFolded = (folded: boolean) => fcts.setFolded(fct, folded);
+    const setByCallstacks = (byCS: boolean) => fcts.setByCallstacks(fct, byCS);
+    return {
+      fct,
+      markers,
+      display,
+      close: () => fcts.delete(fct),
+      getProbe: probes.get,
+      selectLoc,
+      isSelected,
+      removeLoc: fcts.removeLocation,
+      addLoc: fcts.addLocation,
+      folded,
+      setFolded,
+      byCallstacks,
+      getCallstacks: callstacks.get,
+      setByCallstacks,
+      selectCallstack: setCS,
+      isSelectedCallstack,
+      setSelection
+    };
   });
-
 
   return (
     <>
       <Ivette.TitleBar />
       <Vfill>
-        <ProbeInfos probe={selectedProbe} removeLoc={removeLoc} />
-        <Vfill>{functionsProps.map(FunctionSection)}</Vfill>
-        <AlarmsInfos probe={selectedProbe} callstack={cs} />
-        <StackInfos callstack={cs}/>
+        <ProbeInfos
+          probe={selectedProbe}
+          removeLoc={fcts.removeLocation}
+          display={display}
+          setDisplay={setDisplay}
+        />
+        {functionsProps.map(FunctionSection)}
+        <AlarmsInfos probe={selectedProbe} />
+        <StackInfos
+          callsites={callsites.get(cs) ?? []}
+          setSelection={setSelection}
+        />
       </Vfill>
     </>
   );

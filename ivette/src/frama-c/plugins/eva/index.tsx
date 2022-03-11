@@ -43,6 +43,8 @@ import { } from './Summary';
 import { } from './Coverage';
 import './style.css';
 
+import { EvaTable } from 'frama-c/plugins/eva/state';
+
 // --------------------------------------------------------------------------
 // --- Values Component
 // --------------------------------------------------------------------------
@@ -120,6 +122,15 @@ Ivette.registerView({
     ['frama-c.astview', 'frama-c.plugins.values'],
     'frama-c.properties',
   ],
+});
+
+Ivette.registerComponent({
+  id: 'frama-c.plugins.values.test',
+  group: 'frama-c.plugins',
+  rank: 1,
+  label: 'Test Eva Values',
+  title: 'Values inferred by the Eva analysis',
+  children: <EvaTable />,
 });
 
 // --------------------------------------------------------------------------
