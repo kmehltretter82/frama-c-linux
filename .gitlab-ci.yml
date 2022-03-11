@@ -48,6 +48,13 @@ lint:
 ################################################################################
 ### TESTS
 
+cfp:
+  stage: tests
+  script:
+    - ./ci.sh context-from-precondition
+  tags:
+    - nix
+
 main-tests:
   stage: tests
   script:
