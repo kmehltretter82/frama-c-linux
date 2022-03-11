@@ -113,7 +113,9 @@ type adt =
   | Mrecord of mdt * fields (* Model record-type *)
   | Atype of logic_type_info (* Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
-and mdt = string extern (** name to print to the provers *)
+
+(** name to print to the provers *)
+and mdt = string extern
 and 'a extern = {
   ext_id      : int;
   ext_link : 'a ;
@@ -446,7 +448,7 @@ let symbolf
     ?library
     ?context
     ?link
-    ?(balance=Nary) (** specify a default for link *)
+    ?(balance=Nary) (* specify a default for link *)
     ?(category=Logic.Function)
     ?(params=[])
     ?(sort=Logic.Sdata)

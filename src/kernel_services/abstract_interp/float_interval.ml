@@ -321,7 +321,7 @@ module Make (F: Float_sig.S) = struct
     | FRange.Itv (b1, e1, _), FRange.Itv (b2, e2, nan) ->
       let b = if Cmp.equal b2 b1 then b2 else F.widen_down wh prec b2 in
       let e = if Cmp.equal e2 e1 then e2 else F.widen_up wh prec e2 in
-      (** widen_up and down produce double only if the input is a double *)
+      (* widen_up and down produce double only if the input is a double *)
       FRange.inject ~nan b e
     | FRange.NaN, f2 -> f2
     | FRange.Itv _, FRange.NaN -> assert false

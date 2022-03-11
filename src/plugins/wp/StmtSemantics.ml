@@ -288,7 +288,7 @@ struct
         let here = LabelMap.find Clabels.here lsigmas in
         let lenv = L.mk_env ~here () in
         let pred = L.in_frame frame (L.pred polarity lenv) p in
-        (** Remove the sigmas not used for the compilation, but here must stay *)
+        (* Remove the sigmas not used for the compilation, but here must stay *)
         let nsigmas = Cfg.Node.Map.filter (fun _ s ->
             s == here || not (Sigma.Chunk.Set.is_empty (Sigma.domain s))
           ) nsigmas
@@ -456,7 +456,7 @@ struct
       assume,
       sequence
         (fun env ip ->
-           (** TODO: Kglobal is it always Kglobal ? *)
+           (* TODO: Kglobal is it always Kglobal ? *)
            let prop_id = WpPropId.mk_pre_id env.kf Kglobal b ip in
            pre_cond env ip prop_id)
         (env @* [Clabels.next, nrequires]) b.b_requires
@@ -666,9 +666,9 @@ struct
   let init ~is_pre_main env =
     let ninit = (env @: Clabels.init) in
     let sinit = Sigma.create () in
-    (** todo Globals.is_entry_point kf, need to test that seq.pre is the
+    (* todo Globals.is_entry_point kf, need to test that seq.pre is the
         start of the function *)
-    (** todo warning *)
+    (* todo warning *)
     let cfg_init = Globals.Vars.fold_in_file_order
         (fun var initinfo cfg ->
            if var.vstorage = Extern then cfg else

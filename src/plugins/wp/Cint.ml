@@ -1066,13 +1066,13 @@ end
 
 let is_cint_simplifier =
   let reduce_bound ~add_bonus quant v tv dom t : term =
-    (** Returns [new_t] such that [c_bind quant (alpha,t)]
-                           equals [c_bind quant v (alpha,new_t)]
-        under the knowledge that  [(not t) ==> (var in dom)].
-        Note: [~add_bonus] has not effect on the correctness.
-          It is a parameter that can be used in order to get better results.
-        Bonus: Add additionnal hypothesis when we could deduce better constraint
-        on the variable *)
+    (* Returns [new_t] such that [c_bind quant (alpha,t)]
+                          equals [c_bind quant v (alpha,new_t)]
+       under the knowledge that  [(not t) ==> (var in dom)].
+       Note: [~add_bonus] has not effect on the correctness.
+         It is a parameter that can be used in order to get better results.
+       Bonus: Add additionnal hypothesis when we could deduce better constraint
+       on the variable *)
     let module Tool = struct
       exception Stop
       exception Empty
@@ -1227,8 +1227,8 @@ let is_cint_simplifier =
             | (quant,var), None -> e_bind quant var t
             | (quant,var), Some (tvar,var_domain) ->
               domain <- IntDomain.remove tvar domain;
-              (** Bonus: Add additionnal hypothesis in forall when we could
-                  deduce a better constraint on the variable *)
+              (* Bonus: Add additionnal hypothesis in forall when we could
+                 deduce a better constraint on the variable *)
               let add_bonus = match term_pol with
                 | Polarity.Both -> false
                 | _ -> (term_pol=Polarity.Pos) = (quant=Forall)
@@ -1238,7 +1238,7 @@ let is_cint_simplifier =
           in
           List.fold_left f_close t ctx_with_dom
         | Fun(g,[a]) ->
-          (** Here we simplifies the cints which are redoundant *)
+          (* Here we simplifies the cints which are redoundant *)
           begin try
               let ubound = c_int_bounds_ival (is_cint g) in
               let dom = (Tmap.find a domain) in

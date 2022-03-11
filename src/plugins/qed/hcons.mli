@@ -33,8 +33,12 @@ val hash_list : ('a -> int) -> int -> 'a list -> int
 val hash_array : ('a -> int) -> int -> 'a array -> int
 val hash_opt : ('a -> int) -> int -> 'a option -> int
 
-val eq_list : 'a list -> 'a list -> bool (** Uses [==]. *)
-val eq_array : 'a array -> 'a array -> bool (** Uses [==]. *)
+val eq_list : 'a list -> 'a list -> bool
+(** Uses [==]. *)
+
+val eq_array : 'a array -> 'a array -> bool
+(** Uses [==]. *)
+
 val equal_list : ('a -> 'a -> bool) -> 'a list -> 'a list -> bool
 val equal_array : ('a -> 'a -> bool) -> 'a array -> 'a array -> bool
 val compare_list : ('a -> 'a -> int) -> 'a list -> 'a list -> int

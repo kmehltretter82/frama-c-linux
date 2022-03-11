@@ -51,7 +51,8 @@
     implementation. *)
 
 module type S = sig
-  type key (** The type of the map keys. *)
+  (** The type of the map keys. *)
+  type key
   type value
 
   type rangemap

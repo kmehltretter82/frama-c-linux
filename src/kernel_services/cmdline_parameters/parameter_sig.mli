@@ -34,6 +34,7 @@
 module type Input = sig
   val option_name: string
   (** The name of the option *)
+
   val help: string
   (** A description for this option (e.g. used by -help).
       If [help = ""], then it has the special meaning "undocumented" *)
@@ -352,7 +353,8 @@ end
 (** Signature for a category over a collection.
     @since Sodium-20150201 *)
 module type Collection_category = sig
-  type elt (** Element in the category *)
+  (** Element in the category *)
+  type elt
   type t = elt Parameter_category.t
 
   val none: t
@@ -475,8 +477,11 @@ module type Filepath_list =
     @since Sodium-20150201 *)
 module type Map = sig
 
-  type key (** Type of keys of the map. *)
-  type value (** Type of the values associated to the keys. *)
+  (** Type of keys of the map. *)
+  type key
+
+  (** Type of the values associated to the keys. *)
+  type value
 
   include Collection with type elt = key * value option
   (** A map is a collection in which elements are pairs [(key, value)], but some

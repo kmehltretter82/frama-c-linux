@@ -191,11 +191,11 @@ let is_def_or_last_decl g =
   let is_eq v =
     compute_last_def_decl ();
     try
-      (** using [(==)] is the only way to fulfill the spec (do not use
-          [Cil_datatype.Global.equal] here): if a variable is declared several
-          times in the program, each declaration are equal wrt
-          [Cil_datatype.Global.equal] but only one is [(==)] (and exactly one if
-          [g] comes from the AST). *)
+      (* using [(==)] is the only way to fulfill the spec (do not use
+         [Cil_datatype.Global.equal] here): if a variable is declared several
+         times in the program, each declaration are equal wrt
+         [Cil_datatype.Global.equal] but only one is [(==)] (and exactly one if
+         [g] comes from the AST). *)
       LastDecl.find v == g
     with Not_found ->
       (* [Not_found] mainly means that the information is irrelevant at this

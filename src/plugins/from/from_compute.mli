@@ -67,6 +67,7 @@ val find_deps_lval_no_transitivity :
 module Make (To_Use: To_Use) : sig
   (** Compute the dependencies of the given function, and return them *)
   val compute_and_return : Kernel_function.t -> Function_Froms.t
+
   (** Compute the dependencies of the given function *)
   val compute : Kernel_function.t -> unit
 end

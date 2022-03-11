@@ -157,7 +157,7 @@ let rec key_visible fm key =
       BoolMark.visible m
   with Not_found -> false
 and
-  (** the call is visible if its control node is visible *)
+  (* the call is visible if its control node is visible *)
   call_visible fm call =
   let key = PdgIndex.Key.call_ctrl_key call in
   key_visible fm key

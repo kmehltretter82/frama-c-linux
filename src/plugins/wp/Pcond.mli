@@ -51,15 +51,32 @@ class engine : #Plang.engine ->
   object
 
     (** {2 Printer Components} *)
-    method name : env -> term -> string (** Generate a name for marked term *)
-    method mark : marks -> step -> unit (** Marks terms to share in step *)
-    method pp_clause : string printer (** Default: ["@{<wp:clause>...}"] *)
-    method pp_stmt : string printer (** Default: ["@{<wp:stmt>...}"] *)
-    method pp_comment : string printer (** Default: ["@{<wp:comment>(* ... *)}"] *)
-    method pp_property : Property.t printer (** Default: ["@{<wp:property>(* ... *)}"] *)
-    method pp_warning : Warning.t printer (** Default: ["@{<wp:warning>Warning}..."] *)
-    method pp_name : string printer (** Default: [Format.pp_print_string] *)
-    method pp_core : term printer (** Default: [plang#pp_sort] *)
+    method name : env -> term -> string
+    (** Generate a name for marked term *)
+
+    method mark : marks -> step -> unit
+    (** Marks terms to share in step *)
+
+    method pp_clause : string printer
+    (** Default: ["@{<wp:clause>...}"] *)
+
+    method pp_stmt : string printer
+    (** Default: ["@{<wp:stmt>...}"] *)
+
+    method pp_comment : string printer
+    (** Default: ["@{<wp:comment>(* ... *)}"] *)
+
+    method pp_property : Property.t printer
+    (** Default: ["@{<wp:property>(* ... *)}"] *)
+
+    method pp_warning : Warning.t printer
+    (** Default: ["@{<wp:warning>Warning}..."] *)
+
+    method pp_name : string printer
+    (** Default: [Format.pp_print_string] *)
+
+    method pp_core : term printer
+    (** Default: [plang#pp_sort] *)
 
     method pp_definition : Format.formatter -> string -> term -> unit
     method pp_intro : step:step -> clause:string -> ?dot:string -> pred printer
@@ -96,7 +113,9 @@ class state :
     inherit Pcfg.engine
     method clear : unit
     method set_sequence : Conditions.sequence -> unit
-    method set_domain : Vars.t -> unit (** Default is sequence's domain *)
+    method set_domain : Vars.t -> unit
+    (** Default is sequence's domain *)
+
     method domain : Vars.t
     method label_at : id:int -> Pcfg.label
     method updates : Pcfg.label Sigs.sequence -> Sigs.update Bag.t
@@ -110,12 +129,16 @@ class seqengine : #state ->
     inherit engine
     method set_sequence : Conditions.sequence -> unit
     (** Initialize state with this sequence *)
+
     method set_goal : pred -> unit
     (** Adds goal to state domain *)
+
     method set_sequent : sequent -> unit
     (** Set sequence and goal *)
+
     method get_state : bool
     (** If [true], states are rendered when printing sequences. *)
+
     method set_state : bool -> unit
     (** If set to [false], states rendering is deactivated. *)
   end

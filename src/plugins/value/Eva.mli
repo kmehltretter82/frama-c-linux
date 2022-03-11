@@ -30,9 +30,11 @@ module Analysis: sig
 
   val self : State.t
   (** Internal state of Eva analysis from projects viewpoint. *)
+
 end
 
 module Results: sig
+
   (** Eva's result API is a work-in-progress interface to allow accessing the
       analysis results once its completed. It is experimental and is very likely
       to change in the future. It aims at replacing [Db.Value] but does not
@@ -300,6 +302,7 @@ module Results: sig
 end
 
 module Parameters: sig
+
   (** Configuration of the analysis. *)
 
   (** Returns the list (name, descr) of currently enabled abstract domains. *)
@@ -316,6 +319,7 @@ module Parameters: sig
 end
 
 module Eva_annotations: sig
+
   (** Register special annotations to locally guide the Eva analysis:
 
       - slevel annotations: "slevel default", "slevel merge" and "slevel i"
@@ -368,6 +372,7 @@ module Eva_annotations: sig
 end
 
 module Eval: sig
+
   (** Can the results of a function call be cached with memexec? *)
   type cacheable =
     | Cacheable      (** Functions whose result can be safely cached. *)
@@ -379,6 +384,7 @@ module Eval: sig
 end
 
 module Builtins: sig
+
   (** Eva analysis builtins for the cvalue domain, more efficient than their
       equivalent in C. *)
 
@@ -440,6 +446,7 @@ module Builtins: sig
 end
 
 module Eval_terms: sig
+
   (** [annot_predicate_deps ~pre ~here p] computes the logic dependencies needed
       to evaluate the predicate [p] in a code annotation in cvalue state [here],
       in a function whose pre-state is [pre].
@@ -460,9 +467,11 @@ module Eva_results: sig
   (** Change the callstacks for the results for which this is meaningful.
       For technical reasons, the top of the callstack must currently
       be preserved. *)
+
 end
 
 module Unit_tests: sig
+
   (** Currently tested by this module:
       - semantics of sign values. *)
 

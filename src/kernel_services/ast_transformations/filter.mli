@@ -92,6 +92,7 @@ module type RemoveInfo = sig
       should be erased entirely (i.e. assigns everything. If it were to
       just return false to all elements, this would result in assigns \nothing
   *)
+
   val fun_deps_visible : fct -> identified_term -> bool
   (** true if the corresponding functional dependency is visible. *)
 

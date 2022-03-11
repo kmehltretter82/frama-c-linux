@@ -374,7 +374,7 @@ struct
       let call_string =
         Uniquify_Stmt.unique_basename (caller_kf,callee_kf,stmt)
       in
-      (** remove name of callee kernel function given by get_ip *)
+      (* remove name of callee kernel function given by get_ip *)
       let ip_string = get_ip pre in
       let ip_string =
         Option.value ~default:ip_string

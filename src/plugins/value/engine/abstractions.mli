@@ -161,9 +161,12 @@ module Config : sig
   val multidim: flag
   val printer: flag
 
-  val default: t (** The default configuration of Eva. *)
-  val legacy: t (** The configuration corresponding to the old "Value" analysis,
-                    with only the cvalue domain enabled. *)
+  val default: t
+  (** The default configuration of Eva. *)
+
+  val legacy: t
+  (** The configuration corresponding to the old "Value" analysis,
+      with only the cvalue domain enabled. *)
 end
 
 (** Creates the configuration according to the analysis parameters. *)

@@ -118,6 +118,7 @@ val filter_map_opt: ('a -> 'b option) -> 'a list -> 'b list
 
 val fold_map: ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 (** Combines [fold_left] and [map] *)
+
 val fold_map_opt: ('a -> 'b -> 'a * 'c option) -> 'a -> 'b list -> 'a * 'c list
 (** Combines [filter] [fold_left] and [map] *)
 

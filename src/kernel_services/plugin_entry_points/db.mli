@@ -1237,6 +1237,7 @@ module type INOUTKF = sig
   val pretty : Format.formatter -> t -> unit
 
 end
+
 (** Signature common to inputs and outputs computations. The results
     are also available on a per-statement basis. *)
 module type INOUT = sig

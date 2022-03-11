@@ -77,7 +77,9 @@ module Fmap :
 sig
   type t
   val create : unit -> t
-  val get : t -> 'a field -> 'a (** raises Not_found if absent *)
+  val get : t -> 'a field -> 'a
+  (** raises Not_found if absent *)
+
   val set : t -> 'a field -> 'a -> unit
 end
 
@@ -249,7 +251,9 @@ class type composer =
 type t = tactical
 
 val register : #tactical -> unit
-val export : #tactical -> tactical (** Register and returns the tactical *)
+val export : #tactical -> tactical
+(** Register and returns the tactical *)
+
 val lookup : id:string -> tactical
 val iter : (tactical -> unit) -> unit
 

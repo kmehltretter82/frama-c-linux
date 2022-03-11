@@ -85,7 +85,7 @@ let meta_inline_in =
 let t_unfold defs fs tl ty =
   match Mls.find_opt fs defs with
   | None ->
-    assert false (** absurd: it is in mpr so it is in sls so added in defs *)
+    assert false (* absurd: it is in mpr so it is in sls so added in defs *)
   | Some (vl,e) ->
     let add (mt,mv) x y = Ty.ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
     let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl tl in
@@ -102,7 +102,7 @@ let rec t_replace_all defs s t =
   | _ -> t
 
 let fold mpr sls d (defs, task) =
-  (** replace *)
+  (* replace *)
   let d = match d.d_node with
     | Dprop (k,pr,f) ->
       let s = Mpr.find_def Sls.empty pr mpr in
@@ -110,7 +110,7 @@ let fold mpr sls d (defs, task) =
       else create_prop_decl k pr (t_replace_all defs s f)
     | _ -> d
   in
-  (** add to defs if needed *)
+  (* add to defs if needed *)
   match d.d_node with
   | Dlogic [ls,ld] when Sls.mem ls sls ->
     let vl,e = open_ls_defn ld in

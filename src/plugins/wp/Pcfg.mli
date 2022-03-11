@@ -56,10 +56,16 @@ class virtual engine :
 
     method pp_ofs : Format.formatter -> s_offset -> unit
     method pp_offset : Format.formatter -> s_offset list -> unit
+
     method pp_host : Format.formatter -> s_host -> unit (** current state *)
+
     method pp_lval : Format.formatter -> s_lval -> unit (** current state *)
+
     method pp_init : Format.formatter -> s_lval -> unit (** current state *)
+
     method pp_addr : Format.formatter -> s_lval -> unit
+
     method pp_label : Format.formatter -> label -> unit (** label name *)
+
     method pp_chunk : Format.formatter -> string -> unit (** chunk name *)
   end

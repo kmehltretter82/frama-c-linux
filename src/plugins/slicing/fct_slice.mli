@@ -32,6 +32,7 @@ val is_src_fun_called :
  * (even indirectly via transitivity) from a [Slice.t]. *)
 val is_src_fun_visible :
   Cil_types.kernel_function -> bool
+
 (**
  * @raise SlicingTypes.ExternalFunction if the function has no source code,
  *        because there cannot be any slice for it.

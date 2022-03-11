@@ -52,8 +52,12 @@ sig
 
   val result : env -> Lang.F.var
 
-  val (@^) : paths -> paths -> paths (** Same as [Cfg.concat] *)
-  val (@*) : env -> ( c_label * node ) list -> env (** fold bind *)
+  val (@^) : paths -> paths -> paths
+  (** Same as [Cfg.concat] *)
+
+  val (@*) : env -> ( c_label * node ) list -> env
+  (** fold bind *)
+
   val (@:) : env -> c_label -> node
   (** LabelMap.find with refined excpetion.
       @raise LabelNotFound instead of [Not_found] *)

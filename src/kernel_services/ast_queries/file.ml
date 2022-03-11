@@ -1429,7 +1429,7 @@ class reorder_ast: Visitor.frama_c_visitor =
       assert (List.length deps = List.length needed_annots);
       match g with
       | GAnnot _ -> List.rev deps
-      (** g is already in the dependencies graph. *)
+      (* g is already in the dependencies graph. *)
       | _ -> List.rev (g::deps)
 
     (* TODO: add methods for uses of undeclared identifiers.

@@ -41,7 +41,7 @@ end
 module type S_ordered = sig
   include S
   type key
-  type id (** identifier of the hook *)
+  type id (* identifier of the hook *)
   val register_key: key -> id
   val extend: id -> (param->result)->unit
   val extend_once: id -> (param->result) -> unit

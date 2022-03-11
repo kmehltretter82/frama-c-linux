@@ -2523,7 +2523,7 @@ let cabsAddAttributes al0 (al: attributes) : attributes =
                "Duplicate attribute %a along with %a"
                Cil_printer.pp_attribute a Cil_printer.pp_attribute a' ;
              (* let acc' = dropAttribute an acc in *)
-             (** Keep both attributes *)
+             (* Keep both attributes *)
              addAttribute a acc
            end)
       al
@@ -3068,7 +3068,7 @@ let rec castTo ?context ?(fromsource=false)
     | TComp (comp1, _), TComp (comp2, _) when comp1.ckey = comp2.ckey ->
       result
 
-    (** If we try to pass a transparent union value to a function
+    (* If we try to pass a transparent union value to a function
      * expecting a transparent union argument, the argument type would
      * have been changed to the type of the first argument, and we'll
      * see a cast from a union to the type of the first argument. Turn
@@ -3124,7 +3124,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         vi.vname oldvi.vid Cil_printer.pp_location oldloc;
       (* It was already defined. We must reuse the varinfo. But clean up the
        * storage.  *)
-      let newstorage = (** See 6.2.2 *)
+      let newstorage = (* See 6.2.2 *)
         match oldvi.vstorage, vi.vstorage with
         | Extern, NoStorage when isadef -> NoStorage
         (* the case above is not strictly C standard, but will not accept
@@ -3949,9 +3949,9 @@ let collapseCallCast (s1,s2) = match s1.skind, s2.skind with
 
 let afterConversion ~ghost (c: chunk) : chunk =
   (* Now scan the statements and find Instr blocks *)
-  (** We want to collapse sequences of the form "tmp = f(); v = tmp". This
-      * will help significantly with the handling of calls to malloc, where it
-      * is important to have the cast at the same place as the call *)
+  (* We want to collapse sequences of the form "tmp = f(); v = tmp". This
+   * will help significantly with the handling of calls to malloc, where it
+   * is important to have the cast at the same place as the call *)
   let block = c2block ~ghost ~collapse_block:false c in
   let sl =
     if Kernel.DoCollapseCallCast.get () then
@@ -4989,7 +4989,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       match a.expr_node with
       | Cabs.VARIABLE n -> begin
           let n' = if strip then stripUnderscore n else n in
-          (** See if this is an enumeration *)
+          (* See if this is an enumeration *)
           try
             if not foldenum then raise Not_found;
             let env = if ghost then ghost_env else env in
@@ -7887,7 +7887,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
  * new statements.
 *)
 and doCondExp local_env asconst
-    (** Try to evaluate the conditional expression
+    (* Try to evaluate the conditional expression
      * to TRUE or FALSE, because it occurs in a constant *)
     ?ctxt (* ctxt is used internally to determine if we should apply
              the conditional side effects hook (see above)

@@ -938,9 +938,9 @@ struct
     try Logic_var.Map.find x env.vars
     with Not_found ->
     try
-      (** It is here because currently the application of a function
-          of arity 0 are represented in the AST as a variable not
-          as an application of the function with no arguments *)
+      (* It is here because currently the application of a function
+         of arity 0 are represented in the AST as a variable not
+         as an application of the function with no arguments *)
       let cst = Logic_env.find_logic_cons x in
       let result = Lang.tau_of_ltype x.lv_type in
       let v =

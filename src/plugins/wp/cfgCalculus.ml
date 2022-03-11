@@ -372,7 +372,7 @@ struct
       else w_call
     in
     let callee_t =
-      (** TODO when kernel terminates complete: remove this code. *)
+      (* TODO when kernel terminates complete: remove this code. *)
       let generated, callee_t = c.contract_terminates in
       if generated && env.terminates <> None then
         Wp_parameters.warning ~once:true

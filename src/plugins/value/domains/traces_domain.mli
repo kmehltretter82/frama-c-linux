@@ -36,7 +36,7 @@ type transition =
   | LeaveScope of kernel_function * varinfo list
   (** For call of functions without definition *)
   | CallDeclared of kernel_function * exp list * lval option
-  | Loop of stmt * node (** start *) * edge list GraphShape.t
+  | Loop of stmt * node * edge list GraphShape.t (** node is starting node *)
   | Msg of string
 
 and edge = {
@@ -57,7 +57,8 @@ end
 (** stack of open loops *)
 type loops =
   | Base of Node.t * Graph.t (* current last *)
-  | OpenLoop of Cil_types.stmt * Node.t (* start node *) * Graph.t (* last iteration *) * Node.t (** current *) * Graph.t * loops
+  | OpenLoop of Cil_types.stmt * Node.t * Graph.t * Node.t * Graph.t * loops
+  (** [OpenLoop(stmt, starting_node, last_iteration, current_node, g, loop)] *)
   | UnrollLoop of Cil_types.stmt * loops
 
 module Loops : sig

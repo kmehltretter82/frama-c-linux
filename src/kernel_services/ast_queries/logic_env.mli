@@ -94,6 +94,7 @@ val add_model_field: model_info -> unit
 module Builtins: sig
   val apply: unit -> unit
   (** adds all requested objects in the environment. *)
+
   val extend: (unit -> unit) -> unit
   (** request an addition in the environment. Use one of the functions below
       in the body of the argument.

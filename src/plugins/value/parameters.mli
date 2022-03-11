@@ -155,6 +155,7 @@ val register_builtin: string -> unit
 val register_domain: name:string -> descr:string -> unit
 
 [@@@ api_start]
+
 (** Configuration of the analysis. *)
 
 (** Returns the list (name, descr) of currently enabled abstract domains. *)

@@ -166,10 +166,12 @@ val get_output_dir : string -> Datatype.Filepath.t
 val make_output_dir : string -> unit
 
 (** {2 Debugging Categories} *)
+
 val has_print_generated: unit -> bool
 val print_generated: ?header:string -> string -> unit
 (** print the given file if the debugging category
     "print-generated" is set *)
+
 val cat_print_generated: category
 
 val protect : exn -> bool
