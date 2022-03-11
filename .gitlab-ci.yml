@@ -95,18 +95,18 @@ manuals: # TODO: restore doc companions
   when: manual
   artifacts:
     paths:
-      - acsl-implementation.pdf
-      - acsl.pdf
-      - aorai-manual.pdf
-      - e-acsl-implementation.pdf
-      - e-acsl-manual.pdf
-      - e-acsl.pdf
-      - eva-manual.pdf
-      - metrics-manual.pdf
-      - plugin-development-guide.pdf
-      - rte-manual.pdf
-      - user-manual.pdf
-      - wp-manual.pd
+      - result/acsl-implementation.pdf
+      - result/acsl.pdf
+      - result/aorai-manual.pdf
+      - result/e-acsl-implementation.pdf
+      - result/e-acsl-manual.pdf
+      - result/e-acsl.pdf
+      - result/eva-manual.pdf
+      - result/metrics-manual.pdf
+      - result/plugin-development-guide.pdf
+      - result/rte-manual.pdf
+      - result/user-manual.pdf
+      - result/wp-manual.pdf
 
 ################################################################################
 ### PUBLIC
