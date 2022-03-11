@@ -2484,7 +2484,7 @@ DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
 
 DISTRIB_TESTS += $(wildcard $(PLUGIN_DIST_TESTS_LIST))
 
-include ivette/Makefile.distrib
+sinclude ivette/Makefile.distrib
 sinclude ivette/Makefile.plugins
 
 SPECIFIED_OPEN_SOURCE:=$(OPEN_SOURCE)
