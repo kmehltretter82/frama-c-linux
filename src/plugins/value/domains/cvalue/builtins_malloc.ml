@@ -860,10 +860,7 @@ let reallocarray_builtin state args =
     Eva_utils.warning_once_current
       "reallocarray out of bounds: assert(nmemb * size <= SIZE_MAX)";
   if size_ok = Alarmset.False (* size always overflows *)
-  then
-    let c_values = [Some Cvalue.V.singleton_zero, state] in
-    let c_clobbered = Base.SetLattice.bottom in
-    Builtins.Full { c_values; c_clobbered; c_from = None; }
+  then Builtins.Result [Cvalue.V.singleton_zero]
   else
     let valid_size =
       Cvalue.V.narrow (Cvalue.V.inject_ival (zero_to_max_bytes ())) size
