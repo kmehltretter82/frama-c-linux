@@ -2100,7 +2100,6 @@ uninstall::
 HEADER_SPEC := $(DEFAULT_HEADER_SPEC)
 # The list can be extended by external plugins using PLUGIN_HEADER_SPEC variable
 HEADER_SPEC += $(PLUGIN_HEADER_SPEC_LIST)
-HEADER_SPEC += ivette/./headers/header_spec.txt
 # Default list of header specification files can be overloaded.
 HEADER_SPEC_FILE?=$(HEADER_SPEC)
 

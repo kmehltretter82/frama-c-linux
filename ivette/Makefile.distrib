@@ -1,3 +1,4 @@
+HEADER_SPEC += ivette/./headers/header_spec.txt
 DISTRIB_FILES += ivette/.babelrc
 DISTRIB_FILES += ivette/.dome-pkg-app.lock
 DISTRIB_FILES += ivette/.dome-pkg-dev.lock

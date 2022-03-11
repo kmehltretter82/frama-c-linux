@@ -17,6 +17,7 @@ Distribute() {
         src=ivette/$repo
     fi
     echo "Distributing $src"
+    echo "HEADER_SPEC += $src/./headers/header_spec.txt" >> $Distrib
     for f in $(git -C $repo ls-files .)
     do
         case $f in
