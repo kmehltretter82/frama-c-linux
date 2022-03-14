@@ -1,5 +1,5 @@
 { callPackage
-, fetchFromGitHub
+, fetchzip
 , lib
 , stdenv
 , ocaml
@@ -19,11 +19,10 @@ stdenv.mkDerivation rec {
   pname = "alt-ergo";
   version = "2.2.0-free";
 
-  src = fetchFromGitHub {
-    owner = "OCamlPro";
-    repo = pname;
-    rev = "refs/tags/"+version;
+  src = fetchzip {
+    url = https://alt-ergo.ocamlpro.com/http/alt-ergo-free-2.2.0/alt-ergo-free-2.2.0.tar.gz;
     sha256 = "11ffm87vsrii8nyhxhbc9gzjmqkspqv7hpjq7ll9xflll7gpnpkj";
+    stripRoot=false;
   };
 
   nativeBuildInputs = [
