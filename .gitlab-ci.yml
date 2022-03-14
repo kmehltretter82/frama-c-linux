@@ -55,6 +55,13 @@ cfp:
   tags:
     - nix
 
+metacsl:
+  stage: tests
+  script:
+    - ./ci.sh meta
+  tags:
+    - nix
+
 main-tests:
   stage: tests
   script:
