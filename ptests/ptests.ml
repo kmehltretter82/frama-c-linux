@@ -1358,7 +1358,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   in
   let wtest = if wtest.log = [] then wtest else
       { wtest with
-        oracle_dir = SubDir.get (SubDir.oracle_subdir ~env SubDir.upper_dir)
+        oracle_dir = config_name ~env default_wtest.oracle_dir ;
       }
   in
   let wrapper_basename =  mk_alias command "exec.wtests" in
@@ -1619,12 +1619,17 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           bin = List.map (Macros.expand ~file cmd.macros) execnow.ex_bin;
         }
         in
+        let wtest = if wtest.log = [] then wtest else
+            { wtest with
+              oracle_dir = config_name ~env default_wtest.oracle_dir ;
+            }
+        in
         let wrapper_basename =  mk_alias cmd "execnow.wtests" in
         if !wrapper_cmd <> "" then begin
           Format.fprintf result_fmt
             "(rule ; %s\n  \
              (alias %s)\n  \
-             (deps %a %a %a)\n  \
+             (deps %a %a)\n  \
              (targets %a %a)\n  \
              (action (run %s %%{dep:%s} %S))\n\
              )@."
@@ -1634,7 +1639,6 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             wrapper_basename
             (* deps: *)
             pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
-            pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
             pp_command_deps cmd
             (* targets: *)
             pp_list wtest.log
