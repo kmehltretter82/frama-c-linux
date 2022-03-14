@@ -54,16 +54,14 @@ export function printTextWithTags(
 ): void {
   if (Array.isArray(text)) {
     let marker = false;
-    const tag = text.shift();
-    if (tag) {
-      if (Array.isArray(tag)) {
-        text.unshift(tag);
-      } else {
-        buffer.openTextMarker({ id: tag, ...options ?? {} });
-        marker = true;
-      }
+    const tag = text[0];
+    if (typeof (tag) === 'string') {
+      buffer.openTextMarker({ id: tag, ...options ?? {} });
+      marker = true;
     }
-    text.forEach((txt) => printTextWithTags(buffer, txt, options));
+    for (let k = marker ? 1 : 0; k < text.length; k++) {
+      printTextWithTags(buffer, text[k], options);
+    }
     if (marker) {
       marker = false;
       buffer.closeTextMarker();
