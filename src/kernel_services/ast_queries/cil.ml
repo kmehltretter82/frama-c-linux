@@ -4984,11 +4984,17 @@ let mk_behavior ?(name=default_behavior_name) ?(assumes=[]) ?(requires=[])
     b_extended = extended;
   }
 
+let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
+
 let spare_attributes_for_c_cast =
-  "declspec"::"arraylen"::"fc_stdlib"::qualifier_attributes
+  fc_internal_attributes @ qualifier_attributes
 
 let type_remove_attributes_for_c_cast =
   typeRemoveAttributes spare_attributes_for_c_cast
+
+let type_remove_attributes_for_c_cast_deep t =
+  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  type_remove_attributes_for_c_cast t
 
 let spare_attributes_for_logic_cast =
   spare_attributes_for_c_cast
@@ -5000,8 +5006,8 @@ let () = Cil_datatype.drop_non_logic_attributes :=
     dropAttributes spare_attributes_for_logic_cast
 
 let need_cast ?(force=false) oldt newt =
-  let oldt = type_remove_attributes_for_c_cast (unrollType oldt) in
-  let newt = type_remove_attributes_for_c_cast (unrollType newt) in
+  let oldt = type_remove_attributes_for_c_cast_deep (unrollType oldt) in
+  let newt = type_remove_attributes_for_c_cast_deep (unrollType newt) in
   not (Cil_datatype.Typ.equal oldt newt) &&
   (force ||
    match oldt, newt with
