@@ -898,16 +898,18 @@ struct
   let cmp ~oracle (b1,_a1) (b2,_a2) = Bound.cmp ~oracle b1 b2
   let eq ?oracle (b1,_a1) (b2,_a2) = Bound.eq ?oracle b1 b2
   let lower_bound ~oracle (b1,a1) (b2,a2) =
-    Bound.lower_bound ~oracle b1 b2, Integer.max a1 a2
+    Bound.lower_bound ~oracle b1 b2, Integer.min a1 a2
   let upper_bound ~oracle (b1,a1) (b2,a2) =
-    Bound.upper_bound ~oracle b1 b2, Integer.max a1 a2
+    Bound.upper_bound ~oracle b1 b2, Integer.min a1 a2
   let lower_const ~oracle (b,_a) =
     Bound.lower_const ~oracle b
   let upper_const ~oracle (b,_a) =
     Bound.upper_const ~oracle b
 
-  let born b = b, Integer.zero
+  let birth b = b, Integer.zero
+  let aging (b,a) = b, Integer.succ a
   let age (_,a) = a
+  let unify_age ~other:(_,a') (b,a) = (b, Integer.min a' a)
   let operators oracle : (module Operators with type t = t) =
     operators (cmp ~oracle)
 end
@@ -944,14 +946,12 @@ struct
   module B = AgingBound
 
   type bound = Bound.t
-  type age = Integer.t
   type submemory = M.t
 
   type t = {
     start: B.t;
     segments: (M.t * B.t) list; (* should not be empty *)
     padding: bit; (* padding at the left and right of the segmentation *)
-    age: age; (* number of writes to the array during the analysis *)
   }
 
   let _pretty_debug fmt (l,s) : unit =
@@ -1126,12 +1126,12 @@ struct
         if equals Left l u1 then (* actually empty both sides*)
           aux l t1 s2 acc
         else
-          aux u1 t1 s2 ((v1,u1) :: acc)
+          aux u1 t1 s2 ((v1,B.unify_age ~other:l u1) :: acc)
       | None, Some (v2,u2,t2) -> (* right slice emerges *)
         if equals Right l u2 then (* actually empty both sides *)
           aux l s1 t2 acc
         else
-          aux u2 s1 t2 ((v2,u2) :: acc)
+          aux u2 s1 t2 ((v2,B.unify_age ~other:l u2) :: acc)
       | Some _, Some _ (* both emerges, can't choose *)
       | None, None -> (* none emerges *)
         match s1, s2 with (* Are we done yet ? *)
@@ -1144,11 +1144,11 @@ struct
               (* u1 and u2 can be indeferently used right side
                  -> use u1 as next bound
                  Note: Asymetric choice, u2 may also be a good choice *)
-              aux u1 t1 t2 ((f v1 v2, u1) :: acc)
+              aux u1 t1 t2 ((f v1 v2, B.unify_age ~other:u2 u1) :: acc)
             | Equal, _ ->
               (* u1 and u2 can be indeferently used left side
                  -> use u2 as next bound *)
-              aux u2 t1 t2 ((f v1 v2, u2) :: acc)
+              aux u2 t1 t2 ((f v1 v2, B.unify_age ~other:u1 u2) :: acc)
             | (Greater | GreaterOrEqual),
               (Greater | GreaterOrEqual | Uncomparable) ->
               (* u1 > u2 on the left side, we are sure u2 doesn't appear left
@@ -1173,20 +1173,18 @@ struct
       start = l ;
       segments = check_segments segments ;
       padding = Bit.join p1 p2 ;
-      age = Integer.max m1.age m2.age ;
     }
 
   let single padding lindex (* included *) uindex (* included *) value =
     {
       padding ;
-      start = B.born lindex ;
-      segments = check_segments [(value,B.born (Bound.succ uindex))] ;
-      age = Integer.zero
+      start = B.birth lindex ;
+      segments = check_segments [(value,B.birth (Bound.succ uindex))] ;
     }
 
   let read ~oracle map reduce m lindex uindex =
     let open (val (B.operators oracle)) in
-    let lindex = B.born lindex and uindex = B.born uindex in
+    let lindex = B.birth lindex and uindex = B.birth uindex in
     let fold acc x =
       Bottom.join reduce acc (`Value (map x))
     in
@@ -1201,6 +1199,14 @@ struct
     | `Bottom -> assert false (* TODO: ensure that with typing *)
     | `Value v -> v
 
+  let aging m = (* Extremities do not age *)
+    let rec aux acc = function
+      | [] -> acc
+      | [x] -> x :: acc
+      | (v,b) :: t -> aux ((v,B.aging b) :: acc) t
+    in
+    { m with segments = List.rev (aux [] m.segments) }
+
   let oldest_inner_bound m =
     match m.segments with (* ignore m.start bound *)
     | [] -> None
@@ -1208,7 +1214,7 @@ struct
       let rec aux acc = function
         | [] -> None
         | [_] -> Some acc (* ignore last bound *)
-        | (_,b) :: t -> aux (min acc (B.age b)) t
+        | (_,b) :: t -> aux (max acc (B.age b)) t
       in
       aux (B.age b) t
 
@@ -1220,7 +1226,7 @@ struct
       let rec aux acc l = function
         | ([] | [_]) as t -> List.rev (t @ acc)
         | ((v,u) :: t) as s ->
-          if B.age u =  oldest_age then
+          if B.age u = oldest_age then
             aux acc l (merge_first ~oracle l s)
           else
             aux ((v,u) :: acc) u t
@@ -1236,15 +1242,15 @@ struct
     in
     aux m
 
+
   (* TODO: partitioning strategies
      1. reinforcement without loss
      2. weak update without singularization
      3. update reduces the number of segments to 3 *)
   let write ~oracle f m lindex (* included *) uindex (* excluded *) = (* lindex < uindex *)
     let open (val (B.operators oracle)) in
-    let age = Integer.succ m.age in
     let same_bounds = lindex == uindex in
-    let lindex = lindex, age and uindex = uindex, age in
+    let lindex = B.birth lindex and uindex = B.birth uindex in
     (* (start,head) : segmentation kept identical below the write indexes,
                       head is a list in reverse order
        (l,v,u) : the segment (l,u) beeing overwriten with previous value v
@@ -1299,10 +1305,10 @@ struct
         m with
         segments = check_segments (List.rev_append head' tail');
         start = start';
-        age;
       }
     in
     aux_before m.start m.segments >>-:
+    aging >>-:
     limit_size ~oracle
 
   let incr_bound ~oracle vi x m =
@@ -1331,7 +1337,7 @@ struct
           and v = M.smash ~oracle (M.of_raw m.padding) v in
           l, (v,u) :: t
     in
-    {  m with start ; segments = check_segments (List.rev (aux [] segments)) }
+    { m with start ; segments = check_segments (List.rev (aux [] segments)) }
 
   let map f m =
     { m with segments = check_segments (List.map (fun (v,u) -> f v, u) m.segments) }
