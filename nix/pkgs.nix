@@ -4,6 +4,7 @@ let
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     camlzip = oself.callPackage ./camlzip.nix {};
+    headache = oself.callPackage ./headache.nix {};
     ocp-indent = oself.callPackage ./ocp-indent.nix {};
     psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
     why3 = oself.callPackage ./why3.nix {};
@@ -13,6 +14,8 @@ let
     # Tests
     main-tests = oself.callPackage ./main-tests.nix {};
     plugins-tests = oself.callPackage ./plugins-tests.nix {};
+    # Release
+    manuals = oself.callPackage ./manuals.nix {};
   };
   overlay = self: super: {
     niv = (import sources.niv {}).niv;

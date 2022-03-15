@@ -93,6 +93,28 @@ volatile:
 ################################################################################
 ### DISTRIB
 
+manuals: # TODO: restore doc companions
+  stage: distrib_and_compatibility
+  script:
+    - nix-build nix/pkgs.nix -A ocamlPackages.manuals
+  tags:
+    - nix
+  when: manual
+  artifacts:
+    paths:
+      - result/acsl-implementation.pdf
+      - result/acsl.pdf
+      - result/aorai-manual.pdf
+      - result/e-acsl-implementation.pdf
+      - result/e-acsl-manual.pdf
+      - result/e-acsl.pdf
+      - result/eva-manual.pdf
+      - result/metrics-manual.pdf
+      - result/plugin-development-guide.pdf
+      - result/rte-manual.pdf
+      - result/user-manual.pdf
+      - result/wp-manual.pdf
+
 ################################################################################
 ### PUBLIC
 

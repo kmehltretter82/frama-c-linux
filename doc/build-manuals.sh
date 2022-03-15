@@ -1,9 +1,10 @@
 #! /usr/bin/env bash
 
-# GNU parallel needs to be installed
+# Look for GNU parallel
+PARALLEL=1
 if ! command -v parallel >/dev/null 2>/dev/null; then
-    echo "parallel is required"
-    exit 127
+    echo "parallel not found, building in sequential"
+    PARALLEL=0
 fi
 
 # latexmk needs to be installed
@@ -43,7 +44,6 @@ FC_SUFFIX=$(cat ../VERSION)-$(cat ../VERSION_CODENAME)
 FC_SUFFIX="$(echo ${FC_SUFFIX} | sed -e "s/~/-/")"
 ACSL_SUFFIX=$(grep acslversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 FC_VERSION=$(cat ../VERSION)
-ACSL_IMPLEM_VERSION=$(grep fcversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 EACSL_SUFFIX=$(grep 'newcommand{\\eacsllangversion' ../src/plugins/e-acsl/doc/refman/main.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 # sanity check
 if [ "$EACSL_SUFFIX" = "" ]; then
@@ -63,42 +63,70 @@ build () {
         echo "######### $1 failed"
         exit 1
     fi
-    # extract extension, add suffix, re-append extension
-    MANUAL=${2%.*}-$3.${2##*.}
+    if [ "$NO_SUFFIX" == "yes" ] ; then
+        MANUAL=$2
+    else
+        # extract extension, add suffix, re-append extension
+        MANUAL=${2%.*}-$3.${2##*.}
+    fi
     cp -f $1 manuals/$MANUAL
     echo "##### $MANUAL copied"
-    
+
 }
 
 EACSL_DOC=../src/plugins/e-acsl/doc
 
 export -f build
 
-# Note: The makefiles of ACSL/E-ACSL are not parallelizable when producing both
-# acsl.pdf and acsl-implementation.pdf (race conditions in intermediary files,
-# leading to non-deterministic errors).
-# Therefore, we perform a second call to parellel for these files.
-SHELL=(type -p bash) parallel --halt soon,fail=1 --csv build {1} {2} {3} ::: \
-userman/userman.pdf,user-manual.pdf,$FC_SUFFIX \
-developer/developer.pdf,plugin-development-guide.pdf,$FC_SUFFIX \
-rte/main.pdf,rte-manual.pdf,$FC_SUFFIX \
-aorai/main.pdf,aorai-manual.pdf,$FC_SUFFIX \
-aorai/aorai-example.tgz,aorai-example.tgz,$FC_SUFFIX \
-value/main.pdf,eva-manual.pdf,$FC_SUFFIX \
-metrics/metrics.pdf,metrics-manual.pdf,$FC_SUFFIX \
-../src/plugins/wp/doc/manual/wp.pdf,wp-manual.pdf,$FC_SUFFIX \
-acsl/acsl-implementation.pdf,acsl-implementation.pdf,$FC_SUFFIX \
-$EACSL_DOC/refman/e-acsl-implementation.pdf,e-acsl-implementation.pdf,$FC_SUFFIX \
-$EACSL_DOC/userman/main.pdf,e-acsl-manual.pdf,$FC_SUFFIX \
+if [[ $PARALLEL -eq 1 ]]; then
+    # Note: The makefiles of ACSL/E-ACSL are not parallelizable when producing both
+    # acsl.pdf and acsl-implementation.pdf (race conditions in intermediary files,
+    # leading to non-deterministic errors).
+    # Therefore, we perform a second call to parellel for these files.
+    SHELL=(type -p bash) parallel --halt soon,fail=1 --csv build {1} {2} {3} ::: \
+    userman/userman.pdf,user-manual.pdf,$FC_SUFFIX \
+    developer/developer.pdf,plugin-development-guide.pdf,$FC_SUFFIX \
+    rte/main.pdf,rte-manual.pdf,$FC_SUFFIX \
+    aorai/main.pdf,aorai-manual.pdf,$FC_SUFFIX \
+    aorai/aorai-example.tgz,aorai-example.tgz,$FC_SUFFIX \
+    value/main.pdf,eva-manual.pdf,$FC_SUFFIX \
+    metrics/metrics.pdf,metrics-manual.pdf,$FC_SUFFIX \
+    ../src/plugins/wp/doc/manual/wp.pdf,wp-manual.pdf,$FC_SUFFIX \
+    acsl/acsl-implementation.pdf,acsl-implementation.pdf,$FC_SUFFIX \
+    $EACSL_DOC/refman/e-acsl-implementation.pdf,e-acsl-implementation.pdf,$FC_SUFFIX \
+    $EACSL_DOC/userman/main.pdf,e-acsl-manual.pdf,$FC_SUFFIX \
 
-SHELL=(type -p bash) parallel --halt soon,fail=1 --csv build {1} {2} {3} ::: \
-acsl/acsl.pdf,acsl.pdf,$ACSL_SUFFIX \
-$EACSL_DOC/refman/e-acsl.pdf,e-acsl.pdf,$EACSL_SUFFIX
+    SHELL=(type -p bash) parallel --halt soon,fail=1 --csv build {1} {2} {3} ::: \
+    acsl/acsl.pdf,acsl.pdf,$ACSL_SUFFIX \
+    $EACSL_DOC/refman/e-acsl.pdf,e-acsl.pdf,$EACSL_SUFFIX
+else
+    build userman/userman.pdf user-manual.pdf $FC_SUFFIX
+    build developer/developer.pdf plugin-development-guide.pdf $FC_SUFFIX
+    build rte/main.pdf rte-manual.pdf $FC_SUFFIX
+    build aorai/main.pdf aorai-manual.pdf $FC_SUFFIX
+    build aorai/aorai-example.tgz aorai-example.tgz $FC_SUFFIX
+    build value/main.pdf eva-manual.pdf $FC_SUFFIX
+    build metrics/metrics.pdf metrics-manual.pdf $FC_SUFFIX
+    build ../src/plugins/wp/doc/manual/wp.pdf wp-manual.pdf $FC_SUFFIX
+    build acsl/acsl.pdf acsl.pdf $ACSL_SUFFIX
+    build acsl/acsl-implementation.pdf acsl-implementation.pdf $FC_SUFFIX
+    build $EACSL_DOC/refman/e-acsl-implementation.pdf e-acsl-implementation.pdf $FC_SUFFIX
+    build $EACSL_DOC/userman/main.pdf e-acsl-manual.pdf $FC_SUFFIX
+    build $EACSL_DOC/refman/e-acsl.pdf e-acsl.pdf $EACSL_SUFFIX
+fi
 
 # Sanity check: version differences between Frama-C, ACSL and E-ACSL
+FAIL=0
 if [ "$ACSL_SUFFIX" != "$EACSL_SUFFIX" ]; then
     echo "WARNING: different versions for ACSL and E-ACSL manuals: $ACSL_SUFFIX versus $EACSL_SUFFIX"
+    FAIL=1
 fi
+
+# The file fc_version.tex is created by the compilation of the implementation manual
+ACSL_IMPLEM_VERSION=$(grep fcversion acsl/fc_version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
+
 if [ "$ACSL_IMPLEM_VERSION" != "$FC_VERSION" ]; then
     echo "WARNING: ACSL implementation refers to a different Frama-C version: $ACSL_IMPLEM_VERSION versus $FC_VERSION"
+    FAIL=1
 fi
+exit $FAIL
