@@ -5,26 +5,35 @@ import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Values from 'frama-c/plugins/eva/api/values';
-import { callstack, evaluation } from 'frama-c/plugins/eva/api/values';
+import { evaluation } from 'frama-c/plugins/eva/api/values';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { Filler, Hpack, Vpack, Vfill } from 'dome/layout/boxes';
+import { Filler, Hpack, Vpack, Vfill, Scroll } from 'dome/layout/boxes';
 import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 
 
 
-type Maybe<A> = A | undefined;
-type Alarm = [ Status, string ]
-type Status = 'True' | 'False' | 'Unknown'
+type Request<A, B> = (a: A) => Promise<B>;
 type StateToDisplay = 'Before' | 'After' | 'Both' | 'None'
 
+type callstack = 'Consolidated' | Values.callstack
+const isConsolidated = (c: callstack) => c === 'Consolidated';
 
-type MarkerTracked = [ 'Tracked', boolean ]
-type MarkerPinned  = [ 'Pinned' , boolean ]
-type MarkerStatus  = MarkerTracked | MarkerPinned | 'JustFocused'
+function useCallstacksCache(): Request<Ast.marker[], callstack[]> {
+  const get = React.useCallback((markers) => {
+    return Server.send(Values.getCallstacks, markers);
+  }, []);
+  const toString = React.useCallback((markers: Ast.marker[]) => {
+    return markers.map((m) => `${m}`).join('|');
+  }, []);
+  return Dome.useCache(get, toString);
+}
+
+type Status = 'True' | 'False' | 'Unknown'
+type Alarm = [ Status, string ]
 
 function getAlarmStatus(alarms: Alarm[]): string {
   if (alarms.length === 0) return 'none';
@@ -32,50 +41,16 @@ function getAlarmStatus(alarms: Alarm[]): string {
   else return 'Unknown';
 }
 
+type MarkerTracked = [ 'Tracked', boolean ]
+type MarkerPinned  = [ 'Pinned' , boolean ]
+type MarkerStatus  = MarkerTracked | MarkerPinned | 'JustFocused'
 
-
-interface CacheManagerProps<K, V> {
-  request: (key: K) => Promise<V>;
-  toString: (key: K) => string;
-  name: string;
+function MarkerStatusClass(status: MarkerStatus): string {
+  if (status === 'JustFocused') return 'eva-header-just-focused';
+  const [ kind, focused ] = status;
+  return 'eva-header-' + kind.toLowerCase() + (focused ? '-focused' : '');
 }
 
-class CacheManager<K, V> {
-
-  readonly request: (key: K) => Promise<V>;
-  private readonly toString: (key: K) => string;
-  private readonly cache = new Map<string, V>();
-  readonly updated: Dome.Event<void>;
-
-  constructor(props: CacheManagerProps<K, V>) {
-    const { request, toString, name } = props;
-    this.request = request;
-    this.request = this.request.bind(this);
-    this.toString = toString;
-    this.toString = this.toString.bind(this);
-    this.get = this.get.bind(this);
-    this.clear = this.clear.bind(this);
-    this.updated = new Dome.Event(`cache-manager-${name}`);
-  }
-
-  get(key: K): Maybe<V> {
-    const id = this.toString(key);
-    const add = (value: V): void => {
-      if (!this.cache.has(id)) {
-        this.cache.set(id, value);
-        this.updated.emit();
-      }
-    };
-    if (!this.cache.has(id))
-      this.request(key).then(add);
-    return this.cache.get(id);
-  }
-
-  clear(): void {
-    this.cache.clear();
-  }
-
-}
 
 
 
@@ -85,22 +60,46 @@ interface Callsite {
   stmt?: Ast.marker;
 }
 
-function CallsitesManager(): CacheManager<Maybe<callstack>, Callsite[]> {
-  function request(callstack?: callstack): Promise<Callsite[]> {
-    if (!callstack) return Promise.resolve([]);
-    return Server.send(Values.getCallstackInfo, callstack);
-  }
-  const toString = (callstack?: callstack): string => `callstack:${callstack}`;
-  const props = { request, toString, name: 'callsites' };
-  const [ manager ] = React.useState(new CacheManager(props));
-  return manager;
+function useCallsitesCache(): Request<callstack, Callsite[]> {
+  const get = React.useCallback((c) => {
+    if (!isConsolidated(c)) return Server.send(Values.getCallstackInfo, c);
+    else return Promise.resolve([]);
+  }, []);
+  return Dome.useCache(get);
+}
+
+interface CallsiteCellProps {
+  byCallstacks: boolean;
+  state: StateToDisplay;
+  index?: number;
+  selectedClass?: string;
+}
+
+function CallsiteCell(props: CallsiteCellProps): JSX.Element {
+  const { byCallstacks, state, index:n, selectedClass = '' } = props;
+  const activeClass = byCallstacks ? 'eva-table-callsite-active' : '';
+  const callClass = classes('eva-table-callsite', activeClass, selectedClass);
+  const callVisibility = state === 'None' ? 'hidden' : 'visible';
+  return (
+    <td className={callClass} style={{ visibility: callVisibility }}>
+      {byCallstacks ? (n !== undefined ? (n === 0 ? '∑' : n) : '#') : ''}
+    </td>
+  );
 }
 
 
 
-export interface Location {
+interface Location {
   target: Ast.marker;
   fct: string;
+}
+
+interface Evaluation {
+  errors?: string;
+  vBefore?: evaluation;
+  vAfter?: evaluation;
+  vThen?: evaluation;
+  vElse?: evaluation;
 }
 
 interface Probe extends Location {
@@ -109,35 +108,20 @@ interface Probe extends Location {
   rank?: number;
   effects?: boolean;
   condition?: boolean;
-  errors?: string;
-  vBefore?: evaluation;
-  vAfter?: evaluation;
-  vThen?: evaluation;
-  vElse?: evaluation;
+  evaluate: Request<callstack, Evaluation>
 }
 
-interface ProbeProps {
-  loc: Location;
-  callstack?: callstack;
-}
-
-function ProbesManager(): CacheManager<ProbeProps, Probe>{
-  async function request(props: ProbeProps): Promise<Probe> {
-    const { loc, callstack } = props;
+function useProbeCache(): Request<Location, Probe> {
+  const toString = React.useCallback((l) => `${l.fct}:${l.target}`, []);
+  const get = React.useCallback(async (loc: Location): Promise<Probe> => {
     const infos = await Server.send(Values.getProbeInfo, loc.target);
-    const values = await Server.send(Values.getValues, { ...loc, callstack });
-    return { ...loc, ...infos, ...values };
-  };
-  const LocationToString = (loc: Location) => {
-    const { target, fct } = loc;
-    return `target:${target}|fct:${fct}`;
-  };
-  const toString = (props: ProbeProps): string => {
-    return `${LocationToString(props.loc)}|callstack:${props.callstack}`;
-  };
-  const props = { request, toString, name: 'probes' };
-  const [ manager ] = React.useState(new CacheManager(props));
-  return manager;
+    const evaluate: Request<callstack, Evaluation> = (c) => {
+      const callstack = isConsolidated(c) ? undefined : c as Values.callstack;
+      return Server.send(Values.getValues, { ...loc, callstack });
+    };
+    return { ...loc, ...infos, evaluate };
+  }, []);
+  return Dome.useCache(get, toString);
 }
 
 
@@ -160,24 +144,34 @@ function Stmt(props: StmtProps): JSX.Element {
   return <span className={className} title={title}>{text}</span>;
 }
 
-function AlarmsInfos(props: { probe?: Probe }): JSX.Element {
-  const alarms = props.probe?.vBefore?.alarms ?? [];
-  if (alarms.length <= 0) return <></>;
-  const renderAlarm = ([status, alarm]: Alarm) => {
-    const className = `eva-alarm-info eva-alarm-${status}`;
-    return <Code className={className} icon="WARNING">{alarm}</Code>;
+
+
+function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
+  return async (c: callstack): Promise<JSX.Element> => {
+    const evaluation = await probe?.evaluate(c);
+    const alarms = evaluation?.vBefore?.alarms ?? [];
+    if (alarms.length <= 0) return <></>;
+    const renderAlarm = ([status, alarm]: Alarm) => {
+      const className = `eva-alarm-info eva-alarm-${status}`;
+      return <Code className={className} icon="WARNING">{alarm}</Code>;
+    };
+    const children = React.Children.toArray(alarms.map(renderAlarm));
+    return <Vpack className="eva-info">{children}</Vpack>;
   };
-  const children = React.Children.toArray(alarms.map(renderAlarm));
-  return <Vpack className="eva-info">{children}</Vpack>;
 }
+
+
 
 interface StackInfosProps {
   callsites: Callsite[];
+  isSelected: boolean;
   setSelection: (a: States.SelectionActions) => void;
 }
 
-function StackInfos(props: StackInfosProps): JSX.Element {
-  const { callsites, setSelection } = props;
+async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
+  const { callsites, setSelection, isSelected } = props;
+  const selectedClass = isSelected ? 'eva-table-selected-row' : '';
+  const className = classes('eva-callsite', selectedClass);
   if (callsites.length <= 1) return <></>;
   const makeCallsite = ({ caller, stmt }: Callsite) => {
     if (!caller || !stmt) return null;
@@ -196,7 +190,7 @@ function StackInfos(props: StackInfosProps): JSX.Element {
       <Cell
         key={key}
         icon='TRIANGLE.LEFT'
-        className='eva-callsite'
+        className={className}
         onClick={onClick}
         onDoubleClick={onDoubleClick}
       >
@@ -208,20 +202,23 @@ function StackInfos(props: StackInfosProps): JSX.Element {
   return <Hpack className="eva-info">{callsites.map(makeCallsite)}</Hpack>;
 }
 
+
+
 interface ProbeInfosProps {
   probe?: Probe;
-  status: Maybe<MarkerStatus>;
-  removeLoc: (loc: Location) => void;
+  status?: MarkerStatus;
+  removeProbe: (probe: Probe) => void;
   setLocPin: (loc: Location, pin: boolean) => void;
-  display: StateToDisplay;
-  setDisplay: (display: StateToDisplay) => void;
+  state: StateToDisplay;
+  setState: (state: StateToDisplay) => void;
 }
 
-export function ProbeInfos(props: ProbeInfosProps): JSX.Element {
-  const { probe, status, setLocPin, removeLoc, display, setDisplay } = props;
+function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
+  const { probe, status, setLocPin, removeProbe, state, setState } = props;
   const code = probe?.code;
   const stmt = probe?.stmt;
   const target = probe?.target;
+  const visible = code !== undefined;
   let pinned = false;
   if (status && status !== 'JustFocused') {
     const [ kind ] = status;
@@ -232,7 +229,7 @@ export function ProbeInfos(props: ProbeInfosProps): JSX.Element {
     <Hpack className="eva-probeinfo">
       <div
         className="eva-probeinfo-code"
-        style={{ visibility: probe !== undefined ? 'visible' : 'hidden' }}
+        style={{ visibility: visible ? 'visible' : 'hidden' }}
       >
         <div className='eva-sized-area dome-text-cell'>{code}</div>
       </div>
@@ -242,40 +239,42 @@ export function ProbeInfos(props: ProbeInfosProps): JSX.Element {
         className="eva-probeinfo-button"
         title='Pin the probe'
         selected={pinned}
-        visible={probe !== undefined}
+        visible={visible}
         onClick={() => { if (probe) setLocPin(probe, !pinned); }}
       />
       <IconButton
         icon="CIRC.CLOSE"
         className="eva-probeinfo-button"
         title="Discard the probe"
-        onClick={() => { if (probe) removeLoc(probe); }}
-        visible={probe !== undefined}
+        onClick={() => { if (probe) removeProbe(probe); }}
+        visible={visible}
       />
       <Filler />
       <ButtonGroup className='eva-probeinfo-state'>
         <Button
           label='B'
           value='Before'
-          selected={display === 'Before' || display === 'Both'}
+          selected={state === 'Before' || state === 'Both'}
           title='Show values before statement effects'
+          visible={visible}
           onClick={() => {
-            if (display === 'Before') setDisplay('None')
-            else if (display === 'After') setDisplay('Both')
-            else if (display === 'None') setDisplay('Before')
-            else if (display === 'Both') setDisplay('After')
+            if (state === 'Before') setState('None')
+            else if (state === 'After') setState('Both')
+            else if (state === 'None') setState('Before')
+            else if (state === 'Both') setState('After')
           }}
         />
         <Button
           label='A'
           value='After'
-          selected={display === 'After' || display === 'Both'}
+          selected={state === 'After' || state === 'Both'}
           title='Show values after statement effects'
+          visible={visible}
           onClick={() => {
-            if (display === 'Before') setDisplay('Both')
-            else if (display === 'After') setDisplay('None')
-            else if (display === 'None') setDisplay('After')
-            else if (display === 'Both') setDisplay('Before')
+            if (state === 'Before') setState('Both')
+            else if (state === 'After') setState('None')
+            else if (state === 'None') setState('After')
+            else if (state === 'Both') setState('Before')
           }}
         />
       </ButtonGroup>
@@ -285,25 +284,17 @@ export function ProbeInfos(props: ProbeInfosProps): JSX.Element {
 
 
 
-function MarkerStatusClass(status: MarkerStatus): string {
-  if (status === 'JustFocused') return 'eva-header-just-focused';
-  const [ kind, focused ] = status;
-  return 'eva-header-' + kind.toLowerCase() + (focused ? '-focused' : '');
-}
-
-interface ProbeRenderProps {
+interface ProbeHeaderProps {
   probe: Probe;
   status: MarkerStatus;
-  display: StateToDisplay;
+  state: StateToDisplay;
   selectProbe: () => void;
   removeProbe: () => void;
-  selectCallstack: () => void;
-  addLoc: (loc: Location) => void;
   setSelection: (a: States.SelectionActions) => void;
 }
 
-function ProbeHeader(props: ProbeRenderProps): JSX.Element {
-  const { probe, status, display, setSelection } = props;
+async function ProbeHeader(props: ProbeHeaderProps): Promise<JSX.Element> {
+  const { probe, status, state, setSelection } = props;
   const { code = '(error)', stmt, target, fct } = probe;
   const color = MarkerStatusClass(status);
   const { selectProbe, removeProbe } = props;
@@ -311,11 +302,12 @@ function ProbeHeader(props: ProbeRenderProps): JSX.Element {
   // Computing the number of columns. By design, either vAfter or vThen and
   // vElse are empty. Also by design (hypothesis), it is not function of the
   // considered callstacks, so we check on the consolidated.
-  const { vBefore, vAfter, vThen, vElse } = probe;
+  const evaluation = await probe.evaluate('Consolidated');
+  const { vBefore, vAfter, vThen, vElse } = evaluation;
   let span = 0;
-  if ((display === 'Before' || display === 'Both') && vBefore) span += 1;
-  if ((display === 'After' || display === 'Both') && vAfter) span += 1;
-  if ((display === 'After' || display == 'Both') && vThen && vElse) span += 2;
+  if ((state === 'Before' || state === 'Both') && vBefore) span += 1;
+  if ((state === 'After' || state === 'Both') && vAfter) span += 1;
+  if ((state === 'After' || state == 'Both') && vThen && vElse) span += 2;
   if (span === 0) return <></>;
 
   const loc: States.SelectionActions = { location: { fct, marker: target} };
@@ -340,9 +332,21 @@ function ProbeHeader(props: ProbeRenderProps): JSX.Element {
   );
 }
 
-function ProbeValues(props: ProbeRenderProps): JSX.Element {
-  const { probe, display } = props;
+
+
+interface ProbeValuesProps {
+  probe: Probe;
+  status: MarkerStatus;
+  state: StateToDisplay;
+  selectCallstack: () => void;
+  addLoc: (loc: Location) => void;
+  selectedClass?: string;
+}
+
+function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
+  const { probe, state, selectedClass = '' } = props;
   const { selectCallstack, addLoc } = props;
+  const className = classes('eva-table-values', selectedClass);
 
   // Building common parts
   const onClick = selectCallstack;
@@ -362,144 +366,133 @@ function ProbeValues(props: ProbeRenderProps): JSX.Element {
     if (items.length > 0) Dome.popupMenu(items);
   };
 
-  const { vBefore, vAfter, vThen, vElse } = probe;
-  function td(e: Values.evaluation, state: string): JSX.Element {
-    const status = getAlarmStatus(e.alarms);
-    const alarmClass = `eva-alarms eva-alarm-${status}`;
-    const title = 'At least one alarm is raised in one callstack';
-    return (
-      <td
-        onClick={onClick}
-        className='eva-table-values'
-        onContextMenu={onContextMenu(e)}
-      >
-        <div style={{ position: 'relative' }}>
-          <span className={`eva-state-${state}`}>{e.value}</span>
-          <Icon className={alarmClass} size={10} title={title} id="WARNING" />
-        </div>
-      </td>
-    );
-  }
-  if (display === 'Before' && vBefore) return td(vBefore, 'Before');
-  if (display === 'After' && vAfter) return td(vAfter, 'After');
-  if (display === 'After' && vThen && vElse)
-    return <>{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
-  if (display === 'Both' && vBefore && vAfter)
-    return <>{td(vBefore, 'Before')}{td(vAfter, 'After')}</>;
-  if (display === 'Both' && vBefore && vThen && vElse)
-    return <>{td(vBefore, 'Before')}{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
-  return <></>;
+  return async (callstack: callstack): Promise<JSX.Element> => {
+    const evaluation = await probe.evaluate(callstack);
+    const { vBefore, vAfter, vThen, vElse } = evaluation;
+    function td(e: Values.evaluation, state: string): JSX.Element {
+      const status = getAlarmStatus(e.alarms);
+      const alarmClass = `eva-alarms eva-alarm-${status}`;
+      const title = 'At least one alarm is raised in one callstack';
+      return (
+        <td
+          onClick={onClick}
+          className={className}
+          onContextMenu={onContextMenu(e)}
+        >
+          <div style={{ position: 'relative' }}>
+            <span className={`eva-state-${state}`}>{e.value}</span>
+            <Icon className={alarmClass} size={10} title={title} id="WARNING" />
+          </div>
+        </td>
+      );
+    }
+    if (state === 'Before' && vBefore) return td(vBefore, 'Before');
+    if (state === 'After' && vAfter) return td(vAfter, 'After');
+    if (state === 'After' && vThen && vElse)
+      return <>{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
+    if (state === 'Both' && vBefore && vAfter)
+      return <>{td(vBefore, 'Before')}{td(vAfter, 'After')}</>;
+    if (state === 'Both' && vBefore && vThen && vElse)
+      return <>{td(vBefore, 'Before')}{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
+    return <></>;
+  };
 }
 
 
-
-interface CallsiteCellProps {
-  byCallstacks: boolean;
-  display: StateToDisplay;
-  index?: number;
-}
-
-function CallsiteCell(props: CallsiteCellProps): JSX.Element {
-  const { byCallstacks, display, index:n } = props;
-  const activeClass = byCallstacks ? 'eva-table-callsite-active' : '';
-  const callClass = classes('eva-table-callsite', activeClass);
-  const callVisibility = display === 'None' ? 'hidden' : 'visible';
-  return (
-    <td className={callClass} style={{ visibility: callVisibility }}>
-      {byCallstacks ? (n !== undefined ? (n === 0 ? '∑' : n) : '#') : ''}
-    </td>
-  );
-}
 
 interface FunctionProps {
   fct: string;
   markers: Map<Ast.marker, MarkerStatus>;
-  display: StateToDisplay;
+  state: StateToDisplay;
   close: () => void;
-  getProbe: (props: ProbeProps) => Maybe<Probe>;
-  selectLoc: (loc: Location) => void;
-  removeLoc: (loc: Location) => void;
+  getProbe: Request<Location, Probe>;
+  selectProbe: (probe: Probe) => void;
+  removeProbe: (probe: Probe) => void;
   addLoc: (loc: Location) => void;
   folded: boolean;
   setFolded: (folded: boolean) => void;
   byCallstacks: boolean;
-  getCallstacks: (markers: Ast.marker[]) => Maybe<callstack[]>;
+  getCallstacks: Request<Ast.marker[], callstack[]>;
   setByCallstacks: (byCallstack: boolean) => void;
-  selectCallstack: (callstack?: callstack) => void;
-  isSelectedCallstack: (callstack: callstack) => boolean;
+  selectCallstack: (callstack: callstack) => void;
+  isSelectedCallstack: (c: callstack) => boolean;
   setSelection: (a: States.SelectionActions) => void;
 }
 
-function FunctionTitle(props: FunctionProps): JSX.Element {
-  const { fct, folded, byCallstacks } = props;
-  const { setFolded, setByCallstacks, close } = props;
-  return (
-    <Hpack className="eva-function">
-      <IconButton
-        className="eva-fct-fold"
-        icon={folded ? 'ANGLE.RIGHT' : 'ANGLE.DOWN'}
-        onClick={() => setFolded(!folded)}
-      />
-      <Cell className="eva-fct-name">{fct}</Cell>
-      <Filler />
-      <IconButton
-        icon="ITEMS.LIST"
-        className="eva-probeinfo-button"
-        selected={byCallstacks}
-        title="Details by callstack"
-        onClick={() => setByCallstacks(!byCallstacks)}
-      />
-      <Inset />
-      <IconButton
-        icon="CROSS"
-        className="eva-probeinfo-button"
-        title="Close"
-        onClick={close}
-      />
-    </Hpack>
-  );
-}
-
-function FunctionSection(props: FunctionProps): JSX.Element {
-  const { fct, markers, display, folded } = props;
+async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
+  const { fct, state, folded, isSelectedCallstack } = props;
   const { byCallstacks, setSelection } = props;
-  const { selectLoc, removeLoc } = props;
   const { addLoc, getCallstacks: getCS } = props;
-  let callstacks: (callstack | undefined)[] = [undefined];
-  let markersArray: Ast.marker[] = [];
-  markers.forEach((_, marker) => markersArray.push(marker));
-  if (byCallstacks) callstacks = callstacks.concat(getCS(markersArray) ?? []);
-
-  const renderProps: ProbeRenderProps[][] = callstacks.map((callstack) => {
-    let acc: ProbeRenderProps[] = [];
-    markers.forEach((status, target) => {
-      const probe = props.getProbe({ loc: { target, fct }, callstack });
-      if (!probe) return;
-      const selectProbe = (): void => selectLoc(probe);
-      const removeProbe = (): void => removeLoc(probe);
-      const selectCallstack = (): void => props.selectCallstack(callstack);
-      const fcts = { selectProbe, removeProbe, addLoc, selectCallstack };
-      acc.push({ probe, status, display, ...fcts, setSelection });
-    });
-    return acc;
-  });
-
-  const headers = renderProps[0].map(ProbeHeader);
-  const values = renderProps.map((t) => t.map(ProbeValues));
+  const { setFolded, setByCallstacks, close } = props;
+  const callsiteProps = { byCallstacks, state };
   const displayTable = folded ? 'none' : 'table';
-  const callsiteProps = { byCallstacks, display };
-  const valuesRows = values.map((callstackValues, index) => {
-    const callsite = <CallsiteCell {...callsiteProps} index={index} />;
-    return <tr>{callsite}{callstackValues}</tr>;
+
+  /* Compute relevant callstacks */
+  let markers: Ast.marker[] = [];
+  props.markers.forEach((_, m) => markers.push(m));
+  const computedCallstacks = byCallstacks ? (await getCS(markers) ?? []) : [];
+  const callstacks = [ 'Consolidated' as callstack ].concat(computedCallstacks);
+
+  let probes: [ Promise<Probe>, MarkerStatus ][] = [];
+  props.markers.forEach(async (status, target) => {
+    const probe = props.getProbe({ target, fct });
+    probes.push([ probe, status ]);
   });
+
+  const headers = await Promise.all(probes.map(async ([ promise, status ]) => {
+    const probe = await promise;
+    const selectProbe = (): void => props.selectProbe(probe);
+    const removeProbe = (): void => props.removeProbe(probe);
+    const fcts = { selectProbe, removeProbe, setSelection };
+    return ProbeHeader({ probe, status, state, ...fcts });
+  }));
+
+  const values = await Promise.all(callstacks.map(async (callstack, index) => {
+    const isSelected = isSelectedCallstack(callstack);
+    const selector = isSelected && callstack !== 'Consolidated';
+    const selectedClass = selector ? 'eva-table-selected-row' : '';
+    const call = CallsiteCell({ ...callsiteProps, selectedClass, index });
+    const vs = await Promise.all(probes.map(async ([ promise, status ]) => {
+      const probe = await promise;
+      const selectCallstack = (): void => props.selectCallstack(callstack);
+      const fcts = { addLoc, selectCallstack, selectedClass };
+      return ProbeValues({ probe, status, state, ...fcts })(callstack);
+    }));
+    return <tr>{call}{React.Children.toArray(vs)}</tr>;
+  }));
 
   return (
-    <div>
-      <FunctionTitle {...props} />
+    <div key={fct}>
+      <Hpack className="eva-function">
+        <IconButton
+          className="eva-fct-fold"
+          icon={folded ? 'ANGLE.RIGHT' : 'ANGLE.DOWN'}
+          onClick={() => setFolded(!folded)}
+        />
+        <Cell className="eva-fct-name">{fct}</Cell>
+        <Filler />
+        <IconButton
+          icon="ITEMS.LIST"
+          className="eva-probeinfo-button"
+          selected={byCallstacks}
+          title="Details by callstack"
+          onClick={() => setByCallstacks(!byCallstacks)}
+        />
+        <Inset />
+        <IconButton
+          icon="CROSS"
+          className="eva-probeinfo-button"
+          title="Close"
+          onClick={close}
+        />
+      </Hpack>
       <table className='eva-table' style={{ display: displayTable }}>
         <tbody>
-          <tr><CallsiteCell {...callsiteProps} />{headers}</tr>
-          {React.Children.toArray(valuesRows)}
+          <tr>
+            <CallsiteCell {...callsiteProps} />
+            {React.Children.toArray(headers)}
+          </tr>
+          {React.Children.toArray(values)}
         </tbody>
       </table>
     </div>
@@ -560,6 +553,8 @@ class FunctionInfos {
 
 }
 
+
+
 class FunctionsManager {
 
   private readonly cache = new Map<string, FunctionInfos>();
@@ -616,7 +611,7 @@ class FunctionsManager {
     this.getInfos(fct).track(target);
   }
 
-  status(loc: Maybe<Location>): Maybe<MarkerStatus> {
+  status(loc?: Location): MarkerStatus | undefined {
     if (!loc) return undefined;
     const infos = this.cache.get(loc.fct);
     if (infos?.pinned.has(loc.target))
@@ -659,121 +654,109 @@ class FunctionsManager {
 
 
 
-function CallstacksManager(): CacheManager<Ast.marker[], callstack[]> {
-  function request(markers: Ast.marker[]): Promise<callstack[]> {
-    return Server.send(Values.getCallstacks, markers);
-  };
-  const toString = (markers: Ast.marker[]): string => {
-    let str = '';
-    markers.forEach((marker) => { str += `|${marker}`; });
-    return str;
-  };
-  const props = { request, toString, name: 'callstacks' };
-  const [ manager ] = React.useState(new CacheManager(props));
-  return manager;
-}
-
-
-
-function useForceUpdate(): () => void {
-  const [ counter, setCounter ] = React.useState(0);
-  return () => { console.log(`update ${counter}`); setCounter(counter + 1); };
-}
-
-
-
 export function EvaTable(): JSX.Element {
   const [ selection, setSelection ] = States.useSelection();
-  const [ display, setDisplay ] = React.useState<StateToDisplay>('Before');
+  const [ state, setState ] = React.useState<StateToDisplay>('Before');
+  const [ cs, setCS ] = React.useState<callstack>('Consolidated');
+  const [ fcts ] = React.useState(new FunctionsManager());
 
-  const forceUpdate = useForceUpdate();
-  const probes = ProbesManager();
-  const callsites = CallsitesManager();
-  const callstacks = CallstacksManager();
-  // Dome.useEvent(probes.updated, forceUpdate);
-  // Dome.useEvent(callsites.updated, forceUpdate);
-  // Dome.useEvent(callstacks.updated, forceUpdate);
+  const [ update, setUpdate ] = React.useState(0);
+  const forceUpdate = (): void => setUpdate(update + 1);
 
-  const [ fcts ] = React.useState(new FunctionsManager);
+  const getProbe = useProbeCache();
+  const getCallsites = useCallsitesCache();
+  const getCallstacks = useCallstacksCache();
 
-  const [ cs, setCS ] = React.useState<Maybe<callstack>>(undefined);
-  const isSelectedCallstack = (c: callstack) => c === cs;
-
-  const [ focus, selectFocus ] = React.useState<Maybe<Location>>(undefined);
+  const [ focus, setFocus ] = React.useState<Probe | undefined>(undefined);
   React.useEffect(() => {
     const target = selection?.current?.marker;
     const fct = selection?.current?.fct;
-    if (fct) fcts.newFunction(fct);
-    const newFocus = (!target || !fct) ? undefined : { target, fct };
-    fcts.clean(newFocus);
-    selectFocus(newFocus);
-  }, [ selection ]);
-
-  const [ probe, setProbe ] = React.useState<Maybe<Probe>>(undefined);
-  React.useEffect(() => {
-    if (focus) probes.request({ loc: focus, callstack: cs }).then(setProbe);
-    else setProbe(undefined);
-  }, [ focus ]);
-
-  const removeLoc = (loc: Location): void => {
-    fcts.removeLocation(loc);
-    if (loc.target === focus?.target)
-      selectFocus(undefined);
-  };
+    const loc = (target && fct) ? { target, fct } : undefined;
+    const doUpdate = (probe: Probe): void => {
+      if (fct && probe.code) fcts.newFunction(fct);
+      setFocus(probe);
+    };
+    fcts.clean(loc);
+    if (loc) getProbe(loc).then(doUpdate);
+    else setFocus(undefined);
+  }, [ selection, getProbe, setFocus ]);
 
   const setLocPin = (loc: Location, pin: boolean): void => {
-    if (pin) fcts.pin(loc); else fcts.unpin(loc);
+    if (pin) fcts.pin(loc);
+    else fcts.unpin(loc);
     forceUpdate();
-  }
+  };
 
-  const functionsProps: FunctionProps[] = fcts.map((infos, fct) => {
-    const { byCallstacks, folded } = infos;
-    const setFolded = (folded: boolean): void => {
-      fcts.setFolded(fct, folded);
-      forceUpdate();
-    }
-    const setByCS = (byCS: boolean): void => fcts.setByCallstacks(fct, byCS);
-    const locStatus = (_loc: Location): MarkerStatus => 'JustFocused';
-    return {
-      fct,
-      markers: infos.markers(focus),
-      display,
-      close: () => { fcts.delete(fct); forceUpdate(); },
-      getProbe: probes.get,
-      selectLoc: selectFocus,
-      locStatus,
-      removeLoc,
-      addLoc: fcts.pin,
-      folded,
-      setFolded,
-      byCallstacks,
-      getCallstacks: callstacks.get,
-      setByCallstacks: setByCS,
-      selectCallstack: setCS,
-      isSelectedCallstack,
-      setSelection,
-    };
-  });
+  const removeProbe = React.useCallback((probe: Probe): void => {
+    fcts.removeLocation(probe);
+    if (probe.target === focus?.target)
+      setFocus(undefined);
+    fcts.clean(undefined);
+    forceUpdate();
+  }, [ fcts, focus, setFocus ]);
+
+  const { result: functions } = Dome.usePromise(() => {
+    const props = fcts.map((infos, fct) => {
+      const { byCallstacks, folded } = infos;
+      const isSelectedCallstack = (c: callstack): boolean => c === cs;
+      const setFolded = (folded: boolean): void => {
+        fcts.setFolded(fct, folded);
+        forceUpdate();
+      };
+      const setByCS = (byCS: boolean): void => {
+        fcts.setByCallstacks(fct, byCS);
+        forceUpdate();
+      };
+      return {
+        fct,
+        markers: infos.markers(focus),
+        state,
+        close: () => { fcts.delete(fct); forceUpdate(); },
+        getProbe,
+        selectProbe: setFocus,
+        removeProbe,
+        addLoc: (loc: Location) => { fcts.pin(loc); forceUpdate(); },
+        folded,
+        setFolded,
+        byCallstacks,
+        getCallstacks,
+        setByCallstacks: setByCS,
+        selectCallstack: (c: callstack) => { setCS(c); forceUpdate(); },
+        isSelectedCallstack,
+        setSelection,
+      };
+    });
+    return Promise.all(props.map(FunctionSection));
+  }, [ fcts, setFocus, removeProbe, update ]);
+
+  const { result: alarmsInfos } = Dome.usePromise(() => {
+    return AlarmsInfos(focus)(cs);
+  }, [ focus, cs ]);
+
+  const { result: stackInfos } = Dome.usePromise(async () => {
+    const callsites = await getCallsites(cs);
+    const tgt = selection.current?.marker;
+    const p = (c: Callsite): boolean => c.stmt !== undefined && c.stmt === tgt;
+    const isSelected = callsites.find(p) !== undefined;
+    return StackInfos({ callsites, isSelected, setSelection });
+  }, [ cs, setSelection ]);
 
   return (
     <>
       <Ivette.TitleBar />
-      <Vfill>
-        <ProbeInfos
-          probe={probe}
-          status={fcts.status(focus)}
-          setLocPin={setLocPin}
-          removeLoc={removeLoc}
-          display={display}
-          setDisplay={setDisplay}
-        />
-        {functionsProps.map(FunctionSection)}
-      </Vfill>
-      <AlarmsInfos probe={probe} />
-      <StackInfos
-        callsites={callsites.get(cs) ?? []}
-        setSelection={setSelection}
+      <SelectedProbeInfos
+        probe={focus}
+        status={fcts.status(focus)}
+        setLocPin={setLocPin}
+        removeProbe={removeProbe}
+        state={state}
+        setState={(s) => { setState(s); forceUpdate(); }}
       />
+      <Vfill style={{ overflow: 'auto' }}>
+        {React.Children.toArray(functions)}
+      </Vfill>
+      {alarmsInfos}
+      {stackInfos}
     </>
   );
 }

@@ -313,9 +313,7 @@
   padding: 2px 3px 2px 3px;
   border-left: thin solid var(--border);
   border-bottom: thin solid var(--border);
-  width: 144px;
   min-width: 144px;
-  max-width: 144px;
   font-family: Andale Mono, monospace;
   font-size: 9pt;
   text-align: center;
@@ -362,6 +360,10 @@
 .eva-table-callsite-active {
   border-left: thin solid var(--border);
   border-bottom: thin solid var(--border);
+}
+
+.eva-table-selected-row {
+  background-color: var(--code-select);
 }
 
 tr:first-of-type > .eva-table-callsite-active {
