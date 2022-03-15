@@ -1240,18 +1240,11 @@ and find_candidate_logic_var ?loc:_loc lv env =
 and find_candidate_logic_info ?loc:_loc li env =
   let candidates = Logic_env.find_all_logic_functions li.l_var_info.lv_name in
   let find_one li' =
-    is_same_list is_same_logic_var li.l_profile li'.l_profile env
+    let res, env = logic_type_vars_env li.l_tparams li'.l_tparams env in
+    res && is_same_list is_same_logic_var li.l_profile li'.l_profile env
+    && is_same_opt is_same_logic_type li.l_type li'.l_type env
   in
-  let rec extract l =
-    match l with
-    | [] -> None
-    | li' :: tl -> if find_one li' then Some li' else extract tl
-  in
-  match extract candidates with
-  | None -> None
-  | Some li' ->
-    let res = is_same_opt is_same_logic_type li.l_type li'.l_type env in
-    if res then Some li' else None
+  List.find_opt find_one candidates
 
 and find_candidate_model_info ?loc:_loc mi env =
   let candidates = Logic_env.find_all_model_fields mi.mi_name in
@@ -1422,19 +1415,16 @@ and logic_info_correspondance ?loc li env =
     match find_candidate_logic_info ?loc li env with
     | None -> `Not_present
     | Some li' ->
-      if is_same_list is_same_logic_var li.l_profile li'.l_profile env then
-        begin
-          let env = add_logic_prms li.l_profile li'.l_profile env in
-          let env =
-            { env with
-              logic_info=Cil_datatype.Logic_info.Map.add li li' env.logic_info }
-          in
-          let res = is_same_logic_info li li' env in
-          if res then begin
-            logic_prms_correspondance li.l_profile li'.l_profile;
-            `Same li'
-          end else `Not_present
-        end else `Not_present
+      let env = add_logic_prms li.l_profile li'.l_profile env in
+      let env =
+        { env with
+          logic_info=Cil_datatype.Logic_info.Map.add li li' env.logic_info }
+      in
+      let res = is_same_logic_info li li' env in
+      if res then begin
+        logic_prms_correspondance li.l_profile li'.l_profile;
+        `Same li'
+      end else `Not_present
   in
   match Cil_datatype.Logic_info.Map.find_opt li env.logic_info with
   | Some li' -> `Same li'
