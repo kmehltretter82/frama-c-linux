@@ -149,8 +149,8 @@ struct
                     [ (Trigger.of_term value1 :: triggers );
                       (Trigger.of_term value2 :: triggers ) ]
                 in
-                let l_name = Pretty_utils.sfprintf "%s_%s_%a%d"
-                    prefix name Chunk.pretty chunk i in
+                let l_name = Pretty_utils.sfprintf "%s_%s_%s%d"
+                    prefix name (Chunk.basename_of_chunk chunk) i in
                 let l_lemma = F.p_hyps conditions (p_equal value1 value2) in
                 Definitions.define_lemma {
                   l_kind = Admit ;
