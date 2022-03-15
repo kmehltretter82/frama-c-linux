@@ -59,6 +59,7 @@ let () =
   Translate_predicates.translate_rte_annots_ref := rte_annots
 
 let exp ?filter kf env e =
+  Assert.push_pending_register_data();
   let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
   let l = Rte.exp kf stmt e in
   let l =
@@ -67,7 +68,8 @@ let exp ?filter kf env e =
     | None -> l
   in
   List.iter (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env)) l;
-  rte_annots Printer.pp_exp e kf env l
+  let env = rte_annots Printer.pp_exp e kf env l
+  in Assert.do_pending_register_data env
 
 let () =
   Translate_terms.translate_rte_exp_ref := exp;

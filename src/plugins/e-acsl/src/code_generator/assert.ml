@@ -42,6 +42,11 @@ type data = {
     want to register some data in the context of [None] if we do not want to. *)
 type t = data option
 
+let pending_register_data : stmt Queue.t Stack.t = Stack.create()
+
+let push_pending_register_data () =
+  Stack.push (Queue.create()) pending_register_data
+
 let no_data = None
 
 (** C type for the [assert_data_t] structure. *)
@@ -131,7 +136,7 @@ let ikind_to_string = function
   | ILongLong -> "longlong"
   | IULongLong -> "ulonglong"
 
-let do_register_data ~loc env { data_ptr } name e =
+let add_pending_register_data ~loc { data_ptr } name e =
   let ty = Cil.typeOf e in
   let fct, args =
     if Gmp_types.Z.is_t ty then
@@ -161,7 +166,23 @@ let do_register_data ~loc env { data_ptr } name e =
   let name = Cil.mkString ~loc name in
   let args = data_ptr :: name :: args in
   let stmt = Smart_stmt.rtl_call ~loc fct args in
-  Env.add_stmt env stmt
+  let queue =
+    if Stack.is_empty pending_register_data
+    then Queue.create ()
+    else Stack.pop pending_register_data in
+  Queue.add stmt queue;
+  Stack.push queue pending_register_data
+
+let do_pending_register_data env =
+  if Stack.is_empty pending_register_data then env
+  else
+    let queue = Stack.pop pending_register_data in
+    let rec do_queue env=
+      if Queue.is_empty queue then env
+      else
+        let stmt = Queue.pop queue in
+        do_queue (Env.add_stmt env stmt)
+    in do_queue env
 
 let register ~loc env ?(force=false) name e adata =
   if Options.Assert_print_data.get () then
@@ -177,7 +198,8 @@ let register ~loc env ?(force=false) name e adata =
       Some adata, env
     | Some adata, _ ->
       let adata = { adata with data_registered = true } in
-      Some adata, do_register_data ~loc env adata name e
+      add_pending_register_data ~loc adata name e;
+      Some adata, env
     | None, _ -> None, env
   else
     adata, env

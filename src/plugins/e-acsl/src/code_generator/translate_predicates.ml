@@ -311,6 +311,7 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
     - [env]: the current environment.
     - [p]: the predicate to translate. *)
 and to_exp ~adata ?inplace ?name kf ?rte env p =
+  Assert.push_pending_register_data();
   let p = Logic_normalizer.get_pred p in
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
   Extlib.flatten
@@ -326,6 +327,7 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
                ~lenv:(Env.Local_vars.get env)
                p
            in
+           let env = Assert.do_pending_register_data env in
            Extlib.nest
              adata
              (Typed_number.add_cast

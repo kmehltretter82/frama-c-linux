@@ -57,6 +57,11 @@ val clean: loc:location -> Env.t -> t -> Env.t
     not given to [runtime_check] or [runtime_check_with_msg], otherwise the
     memory allocated in the C structure will not be freed. *)
 
+val push_pending_register_data: unit -> unit
+
+val do_pending_register_data:
+  Env.t -> Env.t
+
 val register:
   loc:location ->
   Env.t ->
