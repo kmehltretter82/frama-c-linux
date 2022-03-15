@@ -11,7 +11,7 @@ import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { Filler, Hpack, Vpack, Vfill, Scroll } from 'dome/layout/boxes';
+import { Filler, Hpack, Vpack, Vfill } from 'dome/layout/boxes';
 import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 
 
@@ -20,7 +20,7 @@ type Request<A, B> = (a: A) => Promise<B>;
 type StateToDisplay = 'Before' | 'After' | 'Both' | 'None'
 
 type callstack = 'Consolidated' | Values.callstack
-const isConsolidated = (c: callstack) => c === 'Consolidated';
+const isConsolidated = (c: callstack): boolean => c === 'Consolidated';
 
 function useCallstacksCache(): Request<Ast.marker[], callstack[]> {
   const get = React.useCallback((markers) => {
@@ -151,7 +151,7 @@ function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
     const evaluation = await probe?.evaluate(c);
     const alarms = evaluation?.vBefore?.alarms ?? [];
     if (alarms.length <= 0) return <></>;
-    const renderAlarm = ([status, alarm]: Alarm) => {
+    const renderAlarm = ([status, alarm]: Alarm): JSX.Element => {
       const className = `eva-alarm-info eva-alarm-${status}`;
       return <Code className={className} icon="WARNING">{alarm}</Code>;
     };
@@ -173,16 +173,16 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
   const selectedClass = isSelected ? 'eva-table-selected-row' : '';
   const className = classes('eva-callsite', selectedClass);
   if (callsites.length <= 1) return <></>;
-  const makeCallsite = ({ caller, stmt }: Callsite) => {
-    if (!caller || !stmt) return null;
+  const makeCallsite = ({ caller, stmt }: Callsite): JSX.Element => {
+    if (!caller || !stmt) return <></>;
     const key = `${caller}@${stmt}`;
     const location = { fct: caller, marker: stmt };
-    const select = (meta: boolean) => {
+    const select = (meta: boolean): void => {
       setSelection({ location });
       if (meta) States.MetaSelection.emit(location);
     };
-    const onClick = (evt: React.MouseEvent) => { select(evt.altKey); };
-    const onDoubleClick = (evt: React.MouseEvent) => {
+    const onClick = (evt: React.MouseEvent): void => { select(evt.altKey); };
+    const onDoubleClick = (evt: React.MouseEvent): void => {
       evt.preventDefault();
       select(true);
     };
@@ -258,10 +258,10 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
           title='Show values before statement effects'
           visible={visible}
           onClick={() => {
-            if (state === 'Before') setState('None')
-            else if (state === 'After') setState('Both')
-            else if (state === 'None') setState('Before')
-            else if (state === 'Both') setState('After')
+            if (state === 'Before') setState('None');
+            else if (state === 'After') setState('Both');
+            else if (state === 'None') setState('Before');
+            else if (state === 'Both') setState('After');
           }}
         />
         <Button
@@ -271,10 +271,10 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
           title='Show values after statement effects'
           visible={visible}
           onClick={() => {
-            if (state === 'Before') setState('Both')
-            else if (state === 'After') setState('None')
-            else if (state === 'None') setState('After')
-            else if (state === 'Both') setState('Before')
+            if (state === 'Before') setState('Both');
+            else if (state === 'After') setState('None');
+            else if (state === 'None') setState('After');
+            else if (state === 'Both') setState('Before');
           }}
         />
       </ButtonGroup>
@@ -307,7 +307,7 @@ async function ProbeHeader(props: ProbeHeaderProps): Promise<JSX.Element> {
   let span = 0;
   if ((state === 'Before' || state === 'Both') && vBefore) span += 1;
   if ((state === 'After' || state === 'Both') && vAfter) span += 1;
-  if ((state === 'After' || state == 'Both') && vThen && vElse) span += 2;
+  if ((state === 'After' || state === 'Both') && vThen && vElse) span += 2;
   if (span === 0) return <></>;
 
   const loc: States.SelectionActions = { location: { fct, marker: target} };
@@ -353,14 +353,14 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   const onContextMenu = (evaluation: Values.evaluation) => (): void => {
     const { value, pointedVars } = evaluation;
     const items: Dome.PopupMenuItem[] = [];
-    const copy = () => navigator.clipboard.writeText(value);
+    const copy = (): void => { navigator.clipboard.writeText(value); };
     if (value !== '') items.push({ label: 'Copy to clipboard', onClick: copy });
     if (items.length > 0 && pointedVars.length > 0) items.push('separator');
     pointedVars.forEach((lval) => {
       const [text, lvalMarker] = lval;
       const label = `Display values for ${text}`;
       const location = { fct: probe.fct, target: lvalMarker };
-      const onItemClick = () => addLoc(location);
+      const onItemClick = (): void => addLoc(location);
       items.push({ label, onClick: onItemClick });
     });
     if (items.length > 0) Dome.popupMenu(items);
@@ -428,12 +428,12 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const displayTable = folded ? 'none' : 'table';
 
   /* Compute relevant callstacks */
-  let markers: Ast.marker[] = [];
+  const markers: Ast.marker[] = [];
   props.markers.forEach((_, m) => markers.push(m));
   const computedCallstacks = byCallstacks ? (await getCS(markers) ?? []) : [];
   const callstacks = [ 'Consolidated' as callstack ].concat(computedCallstacks);
 
-  let probes: [ Promise<Probe>, MarkerStatus ][] = [];
+  const probes: [ Promise<Probe>, MarkerStatus ][] = [];
   props.markers.forEach(async (status, target) => {
     const probe = props.getProbe({ target, fct });
     probes.push([ probe, status ]);
@@ -458,7 +458,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
       const fcts = { addLoc, selectCallstack, selectedClass };
       return ProbeValues({ probe, status, state, ...fcts })(callstack);
     }));
-    return <tr>{call}{React.Children.toArray(vs)}</tr>;
+    return <tr key={index}>{call}{React.Children.toArray(vs)}</tr>;
   }));
 
   return (
@@ -506,8 +506,8 @@ class FunctionInfos {
   readonly fct: string;
   readonly pinned = new Set<Ast.marker>();
   readonly tracked = new Set<Ast.marker>();
-  byCallstacks: boolean = false;
-  folded: boolean = false;
+  byCallstacks = false;
+  folded = false;
 
   constructor(fct: string) {
     this.fct = fct;
@@ -531,7 +531,7 @@ class FunctionInfos {
 
   delete(marker: Ast.marker): void {
     this.pinned.delete(marker);
-    this.tracked.delete(marker)
+    this.tracked.delete(marker);
   }
 
   isEmpty(): boolean {
@@ -660,8 +660,8 @@ export function EvaTable(): JSX.Element {
   const [ cs, setCS ] = React.useState<callstack>('Consolidated');
   const [ fcts ] = React.useState(new FunctionsManager());
 
-  const [ update, setUpdate ] = React.useState(0);
-  const forceUpdate = (): void => setUpdate(update + 1);
+  const [ cpt, setCpt ] = React.useState(0);
+  const forceUpdate = React.useCallback(() => setCpt(cpt + 1), [cpt, setCpt]);
 
   const getProbe = useProbeCache();
   const getCallsites = useCallsitesCache();
@@ -679,7 +679,7 @@ export function EvaTable(): JSX.Element {
     fcts.clean(loc);
     if (loc) getProbe(loc).then(doUpdate);
     else setFocus(undefined);
-  }, [ selection, getProbe, setFocus ]);
+  }, [ fcts, selection, getProbe, setFocus ]);
 
   const setLocPin = (loc: Location, pin: boolean): void => {
     if (pin) fcts.pin(loc);
@@ -693,10 +693,10 @@ export function EvaTable(): JSX.Element {
       setFocus(undefined);
     fcts.clean(undefined);
     forceUpdate();
-  }, [ fcts, focus, setFocus ]);
+  }, [ fcts, focus, setFocus, forceUpdate ]);
 
   const { result: functions } = Dome.usePromise(() => {
-    const props = fcts.map((infos, fct) => {
+    const ps = fcts.map((infos, fct) => {
       const { byCallstacks, folded } = infos;
       const isSelectedCallstack = (c: callstack): boolean => c === cs;
       const setFolded = (folded: boolean): void => {
@@ -726,8 +726,8 @@ export function EvaTable(): JSX.Element {
         setSelection,
       };
     });
-    return Promise.all(props.map(FunctionSection));
-  }, [ fcts, setFocus, removeProbe, update ]);
+    return Promise.all(ps.map(FunctionSection));
+  }, [ fcts, setFocus, removeProbe, cpt ]);
 
   const { result: alarmsInfos } = Dome.usePromise(() => {
     return AlarmsInfos(focus)(cs);

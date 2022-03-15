@@ -593,7 +593,9 @@ type Dependencies = React.DependencyList | undefined
    - loading: the promise status, true if the promise is still running.
 */
 export function usePromise<T> (job: () => Promise<T>, deps: Dependencies) {
-  const memoized = React.useMemo<Promise<T>>(job, deps);
+  const depsArray: any[] = [];
+  deps?.forEach(depsArray.push);
+  const memoized = React.useMemo<Promise<T>>(job, [job, ...depsArray]);
   return usePromiseNoMemo(memoized);
 }
 
@@ -608,7 +610,7 @@ type Serialize<A> = (a: A) => string;
 */
 export function useCache<K, V>(r: (k: K) => V, s?: Serialize<K>): (k: K) => V {
   const [ cache ] = React.useState(new Map<string, V>());
-  const serialize = s ?? React.useCallback((k: K) => `${k}`, []);
+  const serialize = React.useCallback((k: K) => s ? s(k) : `${k}`, [s]);
   const get = React.useCallback((k: K): V => {
     const id = serialize(k);
     if (cache.has(id))
@@ -616,7 +618,7 @@ export function useCache<K, V>(r: (k: K) => V, s?: Serialize<K>): (k: K) => V {
     const v = r(k);
     cache.set(id, v);
     return v;
-  }, [ cache, r, s ]);
+  }, [ cache, r,  serialize ]);
   return get;
 }
 
