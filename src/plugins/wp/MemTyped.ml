@@ -555,8 +555,8 @@ module BASE = WpContext.Generator(Varinfo)
         Warning.handle
           ~handler:(fun _ -> None)
           ~effect:(Printf.sprintf "No allocation size for variable '%s'" x.vname)
-          (fun obj -> Some (length_of_object obj))
-          (Ctypes.object_of x.vtype)
+          (fun t -> Some (length_of_object @@ Ctypes.object_of t))
+          x.vtype
 
       let linked prefix x base =
         let name = prefix ^ "_linked" in
