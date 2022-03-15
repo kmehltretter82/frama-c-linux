@@ -83,7 +83,7 @@ export default function SourceCode(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
 
   // Updating the buffer content.
-  const text = React.useMemo(async () => {
+  const { result } = Dome.usePromise(async () => {
     const onError = (): string => {
       if (file)
         D.error(`Fail to load source code file ${file}`);
@@ -91,7 +91,6 @@ export default function SourceCode(): JSX.Element {
     };
     return System.readFile(file).catch(onError);
   }, [file]);
-  const { result } = Dome.usePromise(text);
   React.useEffect(() => buffer.setValue(result), [buffer, result]);
 
   /* Last location selected by a click in the source code. */

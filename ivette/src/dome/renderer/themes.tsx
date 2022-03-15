@@ -71,7 +71,7 @@ async function getNativeTheme(): Promise<ColorTheme> {
 
 export function useColorTheme(): [ColorTheme, (upd: ColorSettings) => void] {
   Dome.useUpdate(NativeThemeUpdated);
-  const { result: current } = Dome.usePromise(getNativeTheme());
+  const { result: current } = Dome.usePromiseNoMemo(getNativeTheme());
   const [pref, setTheme] = Settings.useGlobalSettings(ColorThemeSettings);
   return [current ?? jColorTheme(pref), setTheme];
 }

@@ -561,13 +561,12 @@ export function useUpdate(...events: Event<any>[]) {
 
 /**
    Hook to re-render when a Promise returns.
-   The promise will be typically created by using `React.useMemo()`.
    The hook returns three informations:
    - result: the promise result if it succeeds, undefined otherwise;
    - error: the promise error if it fails, undefined otherwise;
    - loading: the promise status, true if the promise is still running.
 */
-export function usePromise<T>(job: Promise<T>) {
+export function usePromiseNoMemo<T> (job: Promise<T>) {
   const [result, setResult] = React.useState<T | undefined>();
   const [error, setError] = React.useState<Error | undefined>();
   const [loading, setLoading] = React.useState(true);
@@ -580,6 +579,45 @@ export function usePromise<T>(job: Promise<T>) {
     return () => { cancel = true; };
   }, [job]);
   return { result, error, loading };
+}
+
+/* Internal type alias */
+type Dependencies = React.DependencyList | undefined
+
+/**
+   Hook to re-render when a Promise returns.
+   The promise construction is memoized.
+   The hook returns three informations:
+   - result: the promise result if it succeeds, undefined otherwise;
+   - error: the promise error if it fails, undefined otherwise;
+   - loading: the promise status, true if the promise is still running.
+*/
+export function usePromise<T> (job: () => Promise<T>, deps: Dependencies) {
+  const memoized = React.useMemo<Promise<T>>(job, deps);
+  return usePromiseNoMemo(memoized);
+}
+
+/* Internal type alias */
+type Serialize<A> = (a: A) => string;
+
+/**
+   Hook to add a cache system to a function, allowing to reuse previous results.
+   As the equality used in JS maps does not allow to effectively implement a
+   cache for complex type, a serialization function can be procured.
+   The hook returns the cached version of the function.
+*/
+export function useCache<K, V>(r: (k: K) => V, s?: Serialize<K>): (k: K) => V {
+  const [ cache ] = React.useState(new Map<string, V>());
+  const serialize = s ?? React.useCallback((k: K) => `${k}`, []);
+  const get = React.useCallback((k: K): V => {
+    const id = serialize(k);
+    if (cache.has(id))
+      return cache.get(id) as V;
+    const v = r(k);
+    cache.set(id, v);
+    return v;
+  }, [ cache, r, s ]);
+  return get;
 }
 
 // --------------------------------------------------------------------------
