@@ -568,7 +568,7 @@ and is_same_term_node t t' env =
   | TSizeOfStr s, TSizeOfStr s' -> String.length s = String.length s'
   | TUnOp(op,t), TUnOp(op',t') -> Unop.equal op op' && is_same_term t t' env
   | TBinOp(op,t1,t2), TBinOp(op',t1',t2') ->
-    Binop.equal op op' && is_same_term t1 t2 env && is_same_term t1' t2' env
+    Binop.equal op op' && is_same_term t1 t1' env && is_same_term t2 t2' env
   | TCastE(typ,term), TCastE(typ',term') ->
     is_same_type typ typ' env && is_same_term term term' env
   | TAddrOf lv, TAddrOf lv'
