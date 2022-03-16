@@ -1,12 +1,4 @@
 /* -------------------------------------------------------------------------- */
-/* --- General CSS                                                        --- */
-/* -------------------------------------------------------------------------- */
-
-.eva-focused {
-  background: var(--code-select);
-}
-
-/* -------------------------------------------------------------------------- */
 /* --- Probe Panel                                                        --- */
 /* -------------------------------------------------------------------------- */
 
@@ -91,13 +83,14 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-cell-alarms {
-  fill: orange;
-  position: absolute;
-  z-index: +1;
+  position: relative;
+  float: right;
+  z-index: 1;
   margin: 0px;
   padding: 0px;
   right: 3px;
   margin-left: 4px;
+  padding-left: 4px;
 }
 
 .eva-alarm-info {
@@ -106,7 +99,7 @@
   margin: 1px;
 }
 
-.eva-alarm-none { display: none; }
+.eva-alarm-none { fill: transparent; }
 .eva-alarm-True { fill: var(--eva-alarms-true); }
 .eva-alarm-False { fill: var(--eva-alarms-false); }
 .eva-alarm-Unknown { fill: var(--eva-alarms-unknown); }
@@ -205,13 +198,13 @@
 .eva-table-callsite-box {
   width: 18px;
   min-width: 18px;
-  max-width: 18px;
   background: var(--background);
   border: 0px;
   text-align: center;
   color: var(--info-text);
   border-left: thin solid var(--border);
   border-bottom: thin solid var(--border);
+  padding: 2px;
 }
 
 tr:first-of-type > .eva-table-callsite-box {
@@ -223,6 +216,7 @@ tr:first-of-type > .eva-table-callsite-box {
 /* -------------------------------------------------------------------------- */
 
 .eva-table-values {
+  position: relative;
   border: 0px;
   padding: 2px 3px 2px 3px;
   border-left: thin solid var(--border);
@@ -234,6 +228,20 @@ tr:first-of-type > .eva-table-callsite-box {
   height: 22px;
   min-height: 22px;
   max-height: 22px;
+  white-space: break-spaces;
+}
+
+.eva-values-position {
+  padding-left: 19px;
+  padding-right: 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Selected Element Background                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-focused {
+  background: var(--code-select);
 }
 
 /* -------------------------------------------------------------------------- */

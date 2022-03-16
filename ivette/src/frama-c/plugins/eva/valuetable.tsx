@@ -92,6 +92,7 @@ function useCallsitesCache(): Request<callstack, Callsite[]> {
 
 interface CallsiteCellProps {
   callstack: callstack | 'Header';
+  index?: number;
   getCallsites: Request<callstack, Callsite[]>;
   selectedClass?: string;
 }
@@ -104,7 +105,7 @@ function makeStackTitle(calls: Callsite[]): string {
 }
 
 async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
-  const { callstack: c, getCallsites, selectedClass = '' } = props;
+  const { callstack: c, index, getCallsites, selectedClass = '' } = props;
   const callClass = classes('eva-table-callsite-box', selectedClass);
   const callsites = c !== 'Header' ? await getCallsites(c) : [];
   const infos =
@@ -112,7 +113,7 @@ async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
       c === 'Summary' ? 'Summary' : makeStackTitle(callsites);
   return (
     <td className={callClass} title={infos}>
-      {c === 'Header' ? '#' : c === 'Summary' ? '∑' : c}
+      {c === 'Header' ? '#' : c === 'Summary' ? '∑' : index}
     </td>
   );
 }
@@ -395,7 +396,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   return async (callstack: callstack): Promise<JSX.Element> => {
     const evaluation = await probe.evaluate(callstack);
     const { vBefore, vAfter, vThen, vElse } = evaluation;
-    function td(e: Values.evaluation, state: string): JSX.Element {
+    function td(e: Values.evaluation): JSX.Element {
       const status = getAlarmStatus(e.alarms);
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
       const kind = callstack === 'Summary' ? 'one' : 'this';
@@ -405,21 +406,19 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
           className={className}
           onContextMenu={onContextMenu(e)}
         >
-          <div style={{ position: 'relative' }}>
-            <span className={`eva-state-${state}`}>{e.value}</span>
-            <Icon className={alarmClass} size={10} title={title} id="WARNING" />
-          </div>
+          <span className={'eva-values-position'}>{e.value}</span>
+          <Icon className={alarmClass} size={10} title={title} id="WARNING" />
         </td>
       );
     }
-    if (state === 'Before' && vBefore) return td(vBefore, 'Before');
-    if (state === 'After' && vAfter) return td(vAfter, 'After');
+    if (state === 'Before' && vBefore) return td(vBefore);
+    if (state === 'After' && vAfter) return td(vAfter);
     if (state === 'After' && vThen && vElse)
-      return <>{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
+      return <>{td(vThen)}{td(vElse)}</>;
     if (state === 'Both' && vBefore && vAfter)
-      return <>{td(vBefore, 'Before')}{td(vAfter, 'After')}</>;
+      return <>{td(vBefore)}{td(vAfter)}</>;
     if (state === 'Both' && vBefore && vThen && vElse)
-      return <>{td(vBefore, 'Before')}{td(vThen, 'Then')}{td(vElse, 'Else')}</>;
+      return <>{td(vBefore)}{td(vThen)}{td(vElse)}</>;
     return <></>;
   };
 }
@@ -476,11 +475,12 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     return ProbeHeader({ probe, status, state, ...fcts });
   }));
 
-  const values = await Promise.all(callstacks.map(async (callstack) => {
+  const values = await Promise.all(callstacks.map(async (callstack, index) => {
     const isSelected = isSelectedCallstack(callstack);
     const selector = isSelected && callstack !== 'Summary';
     const selectedClass = selector ? 'eva-focused' : '';
-    const call = await CallsiteCell({ selectedClass, getCallsites, callstack });
+    const callProps = { selectedClass, getCallsites };
+    const call = await CallsiteCell({ index, callstack, ...callProps });
     const onClick = (): void => props.selectCallstack(callstack);
     const vs = await Promise.all(probes.map(async ([ promise, status ]) => {
       const probe = await promise;
