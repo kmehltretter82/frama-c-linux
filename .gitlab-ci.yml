@@ -27,7 +27,7 @@ check-no-old-frama-c:
 frama-c:
   stage: build
   script:
-    - nix-build nix/pkgs.nix -A ocamlPackages.frama-c
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.frama-c
   artifacts:
     when: on_failure
     paths:
@@ -40,7 +40,7 @@ frama-c:
 lint:
   stage: build
   script:
-   - nix-build nix/pkgs.nix -A ocamlPackages.lint
+   - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.lint
   coverage: '/lint coverage: \d+\.\d+/'
   tags:
    - nix
@@ -65,14 +65,14 @@ metacsl:
 main-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocamlPackages.main-tests
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.main-tests
   tags:
     - nix
 
 plugins-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocamlPackages.plugins-tests
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.plugins-tests
   tags:
     - nix
 
@@ -96,7 +96,7 @@ volatile:
 manuals: # TODO: restore doc companions
   stage: distrib_and_compatibility
   script:
-    - nix-build nix/pkgs.nix -A ocamlPackages.manuals
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.manuals
   tags:
     - nix
   when: manual
