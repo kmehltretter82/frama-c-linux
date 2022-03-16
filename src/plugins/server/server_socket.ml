@@ -51,14 +51,15 @@ let _ = Server_doc.protocole
 
 type channel = {
   sock : Unix.file_descr ; (* Socket *)
-  snd  : bytes ; (* SND bytes buffer *)
-  rcv  : bytes ; (* RCV bytes buffer *)
-  brcv : Buffer.t ; (* RCV data buffer *)
-  bsnd : Buffer.t ; (* SND data buffer *)
+  snd  : bytes ; (* SND bytes buffer, re-used for transport *)
+  rcv  : bytes ; (* RCV bytes buffer, re-used for transport *)
+  brcv : Buffer.t ; (* RCV data buffer, accumulated *)
+  bsnd : Buffer.t ; (* SND data buffer, accumulated *)
 }
 
 let feed_bytes { sock ; rcv ; brcv } =
   try
+    (* rcv buffer is only used locally *)
     let s = Bytes.length rcv in
     let n = Unix.read sock rcv 0 s in
     Buffer.add_subbytes brcv rcv 0 n ;
@@ -66,6 +67,7 @@ let feed_bytes { sock ; rcv ; brcv } =
 
 let send_bytes { sock ; snd ; bsnd } =
   try
+    (* snd buffer is only used locally *)
     let n = Buffer.length bsnd in
     if n > 0 then
       let s = Bytes.length snd in
@@ -73,6 +75,7 @@ let send_bytes { sock ; snd ; bsnd } =
       Buffer.blit bsnd 0 snd 0 w ;
       let r = Unix.single_write sock snd 0 w in
       if r > 0 then
+        (* TODO[LC]: inefficient move. Requires a ring-buffer. *)
         let rest = Buffer.sub bsnd r (n-r) in
         Buffer.reset bsnd ;
         Buffer.add_string bsnd rest
@@ -84,6 +87,9 @@ let send_bytes { sock ; snd ; bsnd } =
 
 let read_data ch =
   try
+    (* Try to read all the data.
+       In case there is not enough bytes in the buffer,
+       calls to Buffer.sub would raise Invalid_argument. *)
     let h = match Buffer.nth ch.brcv 0 with
       | 'S' -> 3
       | 'L' -> 7
@@ -95,6 +101,7 @@ let read_data ch =
     let data = Buffer.sub ch.brcv (1+h) len in
     let p = 1 + h + len in
     let n = Buffer.length ch.brcv - p in
+    (* TODO[LC]: inefficient move. Requires a ring-buffer. *)
     let rest = Buffer.sub ch.brcv p n in
     Buffer.reset ch.brcv ;
     Buffer.add_string ch.brcv rest ;
