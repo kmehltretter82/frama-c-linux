@@ -136,7 +136,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   const allInfos: ASTinfos[] =
     States.useRequest(AST.getInformations, marker) ?? [];
   const highlight = classes(
-    props.selected && !props.pinned && 'transient',
+    props.selected && 'selected',
     props.hovered && 'hovered',
   );
   const descr = markerInfo.descr ?? markerInfo.name;
@@ -212,33 +212,59 @@ const reload = new Dome.Event('frama-c.astinfo');
 class InfoMarkers {
 
   private selection: Mark[] = [];
+  private mSelected: AST.marker | undefined;
+  private mHovered: AST.marker | undefined;
   private pinned = new Map<string, boolean>();
-
-  setSelected(location?: States.Location, pinned = false): void {
-    const fct = location?.fct;
-    const marker = location?.marker;
-    const keep =
-      (m: Mark): boolean => m.marker === marker || this.isPinned(m.marker);
-    const self =
-      (m: Mark): boolean => m.marker === marker;
-    this.selection = this.selection.filter(keep);
-    if (fct && marker && !this.selection.some(self)) {
-      this.selection.push({ fct, marker });
-      this.pinned.set(marker, pinned);
-    }
-    reload.emit();
-  }
 
   isPinned(marker: AST.marker | undefined): boolean {
     return (marker !== undefined) && (this.pinned.get(marker) ?? false);
   }
 
-  setPinned(marker: AST.marker, pinned: boolean): void {
-    this.pinned.set(marker, pinned);
+  setPinned(marker: AST.marker | undefined, pinned: boolean): void {
+    if (marker) {
+      const oldpin = this.pinned.get(marker) ?? false;
+      if (oldpin !== pinned) {
+        if (pinned)
+          this.pinned.set(marker, pinned);
+        else
+          this.pinned.delete(marker);
+        reload.emit();
+      }
+    }
+  }
+
+  addMarker(s: Mark[], marker: AST.marker, fct: string): Mark[] {
+    if (s.some((m) => m.marker === marker))
+      return s;
+    else
+      return s.concat({ marker, fct });
+  }
+
+  setLocations(
+    selected: States.Location | undefined,
+    hovered: States.Location | undefined
+  ): void {
+    const sm = selected?.marker;
+    const sf = selected?.fct;
+    const hm = hovered?.marker;
+    const hf = hovered?.fct;
+    const s0 = this.mSelected;
+    const h0 = this.mHovered;
+    let s = this.selection.filter((mark): boolean => {
+      const m = mark.marker;
+      return this.pinned.get(m) || (m !== s0 && m !== h0);
+    });
+    if (sm && sf) s = this.addMarker(s, sm, sf);
+    if (hm && hf) s = this.addMarker(s, hm, hf);
+    this.selection = s;
+    this.mSelected = sm;
+    this.mHovered = hm;
     reload.emit();
   }
 
   removeMarker(marker: AST.marker): void {
+    if (marker === this.mSelected) this.mSelected = undefined;
+    if (marker === this.mHovered) this.mHovered = undefined;
     this.selection = this.selection.filter((m) => m.marker !== marker);
     this.pinned.delete(marker);
     reload.emit();
@@ -292,14 +318,12 @@ export default function ASTinfo(): JSX.Element {
   const informations = States.useRequest(AST.getInformations, null) ?? [];
   const [filter, setFilter] =
     Dome.useStringSettings('frama-c.sidebar.astinfo.filter', '');
-  const location = selection?.current;
-  const selected = location?.marker;
+  const selectedLoc = selection?.current;
+  const selected = selectedLoc?.marker;
   const hovered = hoveredLoc?.marker;
-  React.useEffect(() => markers.setSelected(location), [markers, location]);
-  Dome.useEvent(States.MetaSelection, (loc) => {
-    if (selected) markers.setPinned(selected, true);
-    markers.setSelected(loc, true);
-  });
+  React.useEffect(() => {
+    markers.setLocations(selectedLoc, hoveredLoc);
+  }, [markers, selectedLoc, hoveredLoc]);
   // Rendering
   const renderMark = (mark: Mark): JSX.Element | null => {
     const { marker } = mark;
