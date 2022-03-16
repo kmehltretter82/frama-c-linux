@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- ToolBars
 // --------------------------------------------------------------------------
@@ -52,7 +50,7 @@ export interface ToolBarProps {
    @class
    @summary Container for toolbar items.
  */
-export function ToolBar(props: ToolBarProps) {
+export function ToolBar(props: ToolBarProps): JSX.Element | null {
   const { children } = props;
   const n = React.Children.count(children);
   if (n === 0) return null;
@@ -75,16 +73,22 @@ export function ToolBar(props: ToolBarProps) {
 // --------------------------------------------------------------------------
 
 /** Fixed (tiny) space. */
-export const Inset = (() => <div className="dome-xToolBar-inset" />);
+export const Inset = (): JSX.Element => (
+  <div className="dome-xToolBar-inset" />
+);
 
 /** Fixed space. */
-export const Space = (() => <div className="dome-xToolBar-space" />);
+export const Space = (): JSX.Element => (
+  <div className="dome-xToolBar-space" />
+);
 
 /** Auto-extensible space. */
-export const Filler = (() => <div className="dome-xToolBar-filler" />);
+export const Filler = (): JSX.Element => (
+  <div className="dome-xToolBar-filler" />
+);
 
 /** Fixed space with vertical rule. */
-export const Separator = () => (
+export const Separator = (): JSX.Element => (
   <div className="dome-xToolBar-separator">
     <div className="dome-xToolBar-vrule" />
   </div>
@@ -92,7 +96,7 @@ export const Separator = () => (
 
 const SELECT = 'dome-xToolBar-control dome-selected';
 const BUTTON = 'dome-xToolBar-control dome-color-frame';
-const KIND = (kind: undefined | string) => (
+const KIND = (kind: undefined | string): string => (
   kind ? ` dome-xToolBar-${kind}` : ''
 );
 
@@ -129,7 +133,9 @@ export interface ButtonProps<A> {
 }
 
 /** Toolbar Button. */
-export function Button<A = undefined>(props: ButtonProps<A>) {
+export function Button<A = undefined>(
+  props: ButtonProps<A>
+): JSX.Element | null {
   const { visible = true, hidden = false } = props;
   if (!visible || hidden) return null;
   const { enabled = true, disabled = false } = props;
@@ -170,7 +176,7 @@ export interface SwitchProps {
 }
 
 /** Toolbar Left/Right Switch. */
-export function Switch(props: SwitchProps) {
+export function Switch(props: SwitchProps): JSX.Element | null {
   const { position, onChange } = props;
   const checked = position === 'right';
   const { title, className, style } = props;
@@ -217,7 +223,7 @@ export interface ButtonGroupProps<A> extends SelectionProps<A> {
    Properties of the button group are passed down the buttons of the group
    as appropriate defaults.
  */
-export function ButtonGroup<A>(props: ButtonGroupProps<A>) {
+export function ButtonGroup<A>(props: ButtonGroupProps<A>): JSX.Element {
   const { children, value, onChange, enabled, disabled } = props;
   const baseProps: ButtonProps<A> = {
     enabled,
@@ -247,11 +253,12 @@ export function ButtonGroup<A>(props: ButtonGroupProps<A>) {
    The list of options shall be given with standard
    `<option value={...} label={...}>` elements.
  */
-export function Select(props: SelectionProps<string>) {
+export function Select(props: SelectionProps<string>): JSX.Element {
   const { enabled = true, disabled = false, onChange } = props;
-  const callback = (evt: React.ChangeEvent<HTMLSelectElement>) => {
-    if (onChange) onChange(evt.target.value);
-  };
+  const callback =
+    (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+      if (onChange) onChange(evt.target.value);
+    };
   return (
     <select
       className="dome-xToolBar-control dome-color-frame"
@@ -413,6 +420,10 @@ function Suggestions(props: SuggestionsProps) {
   );
 }
 
+interface Searching {
+  pattern?: string;
+  timer?: NodeJS.Timeout | undefined;
+  onSearch?: ((p: string) => void);
 // --------------------------------------------------------------------------
 // --- ModalActionField input field component
 // --------------------------------------------------------------------------
