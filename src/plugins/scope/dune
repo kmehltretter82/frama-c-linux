@@ -3,7 +3,7 @@
   (public_name frama-c-scope.core)
   (modules scope datascope zones defs)
   (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel frama-c-eva.core)
+  (libraries frama-c.kernel frama-c-eva.core frama-c-inout.core)
 )
 
 (library
