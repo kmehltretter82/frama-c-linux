@@ -29,6 +29,10 @@ let current_computation_state = Self.current_computation_state
 let register_computation_hook = Self.register_computation_hook
 let is_computed = Self.is_computed
 
+let save_results kf =
+  try Function_calls.save_results (Kernel_function.get_definition kf)
+  with Kernel_function.No_Definition -> false
+
 module type Results = sig
   type state
   type value

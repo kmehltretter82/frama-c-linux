@@ -144,6 +144,11 @@ val status: Cil_types.kernel_function -> status
     Please use {!Eva.Results.are_available} instead to known whether results
     are available for a given function. *)
 val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
+
+(** Returns [true] if the user has requested that no results should be recorded
+    for the given function. Please use {!Eva.Results.are_available} instead
+    to known whether results are available for a given function. *)
+val save_results: Cil_types.kernel_function -> bool
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t

@@ -22,6 +22,9 @@
 
 open Cil_types
 
+(** True if the results should be saved for the given function. *)
+val save_results: fundec -> bool
+
 (** What is used for the analysis of a given function:
     - a Cvalue builtin (and other domains use the specification)
     - the function specification
