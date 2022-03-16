@@ -22,62 +22,6 @@
 
 open Cil_datatype
 
-(* {2 Is called} *)
-
-module Is_Called =
-  Kernel_function.Make_Table
-    (Datatype.Bool)
-    (struct
-      let name = "Value.Eva_results.is_called"
-      let dependencies = [ Self.state ]
-      let size = 17
-    end)
-
-let is_called =
-  Is_Called.memo
-    (fun kf ->
-       try Db.Value.is_reachable_stmt (Kernel_function.find_first_stmt kf)
-       with Kernel_function.No_Statement -> false)
-
-let mark_kf_as_called kf =
-  Is_Called.replace kf true
-
-
-(* {2 Callers} *)
-
-module Callers =
-  Kernel_function.Make_Table
-    (Kernel_function.Map.Make(Stmt.Set))
-    (struct
-      let name = "Value.Eva_results.Callers"
-      let dependencies = [ Self.state ]
-      let size = 17
-    end)
-
-let add_kf_caller ~caller:(caller_kf, call_site) kf =
-  let add m = Kernel_function.Map.add caller_kf (Stmt.Set.singleton call_site) m
-  in
-  let change m =
-    try
-      let call_sites = Kernel_function.Map.find caller_kf m in
-      Kernel_function.Map.add caller_kf (Stmt.Set.add call_site call_sites) m
-    with Not_found ->
-      add m
-  in
-  ignore (Callers.memo ~change (fun _kf -> add Kernel_function.Map.empty) kf)
-
-
-let callers kf =
-  try
-    let m = Callers.find kf in
-    Kernel_function.Map.fold
-      (fun key v acc -> (key, Stmt.Set.elements v) :: acc)
-      m
-      []
-  with Not_found ->
-    []
-
-
 (* {2 Termination.} *)
 
 let partition_terminating_instr stmt =
@@ -116,8 +60,7 @@ type results = {
   before_states: stmt_by_callstack Stmt.Hashtbl.t;
   after_states: stmt_by_callstack Stmt.Hashtbl.t;
   kf_initial_states: stmt_by_callstack Kernel_function.Hashtbl.t;
-  kf_is_called: bool Kernel_function.Hashtbl.t;
-  kf_callers: Stmt.Set.t Kernel_function.Map.t Kernel_function.Hashtbl.t;
+  kf_callers: Function_calls.t;
   initial_state: Cvalue.Model.t;
   initial_args: Cvalue.V.t list option;
   alarms: Property_status.emitted_status AlarmsStmt.Hashtbl.t;
@@ -149,16 +92,7 @@ let get_results () =
     Globals.Functions.iter copy;
     h
   in
-  let kf_is_called =
-    let h = Kernel_function.Hashtbl.create 128 in
-    Is_Called.iter (Kernel_function.Hashtbl.add h);
-    h
-  in
-  let kf_callers =
-    let h = Kernel_function.Hashtbl.create 128 in
-    Callers.iter (Kernel_function.Hashtbl.add h);
-    h
-  in
+  let kf_callers = Function_calls.get_results () in
   let initial_state = Db.Value.globals_state () in
   let initial_args = Db.Value.fun_get_args () in
   let aux_statuses f_status ip =
@@ -191,7 +125,7 @@ let get_results () =
     | _ -> add ()
   in
   Property_status.iter aux_ip;
-  { before_states; after_states; kf_initial_states; kf_is_called; kf_callers;
+  { before_states; after_states; kf_initial_states; kf_callers;
     initial_state; initial_args; alarms; statuses; main }
 
 let set_results results =
@@ -222,19 +156,7 @@ let set_results results =
     Value_types.Callstack.Hashtbl.iter aux_callstack h
   in
   Kernel_function.Hashtbl.iter aux_initial_state results.kf_initial_states;
-  (* Kf is_called *)
-  Kernel_function.Hashtbl.iter Is_Called.replace results.kf_is_called;
-  (* Kf callers *)
-  let aux_callers callee m =
-    let aux_caller caller stmts =
-      let aux_stmt callsite =
-        add_kf_caller ~caller:(caller, callsite) callee
-      in
-      Stmt.Set.iter aux_stmt stmts
-    in
-    Kernel_function.Map.iter aux_caller m
-  in
-  Kernel_function.Hashtbl.iter aux_callers results.kf_callers;
+  Function_calls.set_results results.kf_callers;
   (* Alarms *)
   let aux_alarms (alarm, stmt) st =
     let ki = Cil_types.Kstmt stmt in
@@ -315,10 +237,6 @@ let merge r1 r2 =
     | Dont_know, _ | _, Dont_know -> Dont_know
     | True, True -> True
   in
-  let merge_callers _ m1 m2 =
-    let aux _kf s1 s2 = Some (Stmt.Set.union s1 s2) in
-    Kernel_function.Map.union aux m1 m2
-  in
   let merge_s_cs = StmtH.merge merge_cs in
   let main = match r1.main, r2.main with
     | None, _ | _, None -> None
@@ -330,10 +248,7 @@ let merge r1 r2 =
   let kf_initial_states =
     KfH.merge merge_cs r1.kf_initial_states r2.kf_initial_states
   in
-  let kf_is_called =
-    KfH.merge (fun _ -> (||)) r1.kf_is_called r2.kf_is_called
-  in
-  let kf_callers = KfH.merge merge_callers r1.kf_callers r2.kf_callers in
+  let kf_callers = Function_calls.merge_results r1.kf_callers r2.kf_callers in
   let alarms = AlarmsStmtH.merge merge_statuses r1.alarms r2.alarms in
   let statuses = PropertyH.merge merge_statuses r1.statuses r2.statuses in
   let initial_state = Cvalue.Model.join r1.initial_state r2.initial_state in
@@ -345,7 +260,7 @@ let merge r1 r2 =
       try Some (List.map2 Cvalue.V.join args1 args2)
       with Invalid_argument _ -> None (* should not occur *)
   in
-  { main; before_states; after_states; kf_initial_states; kf_is_called;
+  { main; before_states; after_states; kf_initial_states;
     initial_state; initial_args; alarms; statuses; kf_callers }
 
 

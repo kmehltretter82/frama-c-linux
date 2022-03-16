@@ -67,3 +67,11 @@ type analysis_status =
 
 (** Returns the current analysis status of a given function. *)
 val analysis_status: kernel_function -> analysis_status
+
+(** The functions below are used by Eva_results.ml to save, merge and load
+    the results of multiple Eva analyses.  *)
+
+type t
+val get_results: unit -> t
+val set_results: t -> unit
+val merge_results: t -> t -> t

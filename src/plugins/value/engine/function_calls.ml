@@ -45,12 +45,12 @@ let info name : (module State_builder.Info_with_size) =
   end)
 
 module StmtSet = Cil_datatype.Stmt.Set
-module Calls = Kernel_function.Map.Make (StmtSet)
-module Callers = Kernel_function.Make_Table (Calls) (val info "Callers")
+module Callers = Kernel_function.Map.Make (StmtSet)
+module CallersTable = Kernel_function.Make_Table (Callers) (val info "Callers")
 
 let register_call kinstr kf =
   match kinstr, Eva_utils.call_stack () with
-  | Kglobal, _ -> Callers.add kf Kernel_function.Map.empty
+  | Kglobal, _ -> CallersTable.add kf Kernel_function.Map.empty
   | Kstmt _, ([] | [_]) -> assert false
   | Kstmt stmt, (kf', kinstr') :: (caller, _) :: _ ->
     assert (Kernel_function.equal kf kf');
@@ -64,19 +64,19 @@ let register_call kinstr kf =
       Kernel_function.Map.add caller new_stmts calls
     in
     let add _kf = Kernel_function.Map.singleton caller callsite in
-    ignore (Callers.memo ~change add kf)
+    ignore (CallersTable.memo ~change add kf)
 
-let is_called = Callers.mem
+let is_called = CallersTable.mem
 
 let callers kf =
   try
-    let calls = Kernel_function.Map.bindings (Callers.find kf) in
+    let calls = Kernel_function.Map.bindings (CallersTable.find kf) in
     List.map fst calls
   with Not_found -> []
 
 let callsites kf =
   try
-    let calls = Kernel_function.Map.bindings (Callers.find kf) in
+    let calls = Kernel_function.Map.bindings (CallersTable.find kf) in
     List.map (fun (kf, set) -> kf, StmtSet.elements set) calls
   with Not_found -> []
 
@@ -109,6 +109,21 @@ module Status = Datatype.Make (
 
 module StatusTable = Kernel_function.Make_Table (Status) (val info "StatusTable")
 
+(* All statuses bound to a given function should be identical, except for
+   recursive functions that may not be completely unrolled: the body is first
+   analyzed, and then the spec is used. This can also lead to partial and
+   complete analyses of the same function, depending on the success of the
+   unrolling for each call. *)
+let merge_status s1 s2 =
+  match s1, s2 with
+  | Analyzed result, SpecUsed  | SpecUsed, Analyzed result ->
+    Analyzed (if result = Complete then Partial else result)
+  | Analyzed Partial, Analyzed Complete | Analyzed Complete, Analyzed Partial ->
+    Analyzed Partial
+  | _, _ ->
+    assert (s1 = s2);
+    s1
+
 let register_status kf kind =
   let status =
     match kind with
@@ -116,16 +131,7 @@ let register_status kf kind =
     | `Spec _ -> SpecUsed
     | `Def (_, results) -> Analyzed (if results then Complete else NoResults)
   in
-  let change prev_status =
-    match prev_status, status with
-    | Analyzed result, SpecUsed ->
-      Analyzed (if result = Complete then Partial else result)
-    | Analyzed Partial, Analyzed Complete ->
-      Analyzed Partial
-    | _, _ ->
-      assert (prev_status = status);
-      status
-  in
+  let change prev_status = merge_status prev_status status in
   ignore (StatusTable.memo ~change (fun _ -> status) kf)
 
 let analysis_status kf =
@@ -158,7 +164,32 @@ let analysis_target ~recursion_depth callsite kf =
 
 let define_analysis_target ?(recursion_depth = -1) callsite kf  =
   let kind = analysis_target callsite kf ~recursion_depth in
-  Eva_results.mark_kf_as_called kf;
   register_call callsite kf;
   register_status kf kind;
   kind
+
+
+type t = (analysis_status * Callers.t) Kernel_function.Map.t
+
+let get_results () =
+  StatusTable.fold_sorted
+    (fun kf status acc ->
+       let callers = CallersTable.find kf in
+       Kernel_function.Map.add kf (status, callers) acc)
+    Kernel_function.Map.empty
+
+let set_results =
+  let register kf (status, callers) =
+    StatusTable.replace kf status;
+    CallersTable.replace kf callers
+  in
+  Kernel_function.Map.iter register
+
+let merge_results =
+  let union _kf (status1, callers1) (status2, callers2) =
+    let union_stmt _kf s1 s2 = Some (StmtSet.union s1 s2) in
+    let callers = Kernel_function.Map.union union_stmt callers1 callers2 in
+    let status = merge_status status1 status2 in
+    Some (status, callers)
+  in
+  Kernel_function.Map.union union

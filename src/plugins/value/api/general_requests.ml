@@ -62,7 +62,7 @@ let is_computed kf = Analysis.is_computed () && Results.are_available kf
 module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 
 let callers kf =
-  let list = Eva_results.callers kf in
+  let list = Results.callsites kf in
   List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
 
 let () = Request.register ~package

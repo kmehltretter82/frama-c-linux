@@ -903,7 +903,6 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
-	utils/eva_results \
 	domains/powerset \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
@@ -915,6 +914,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	engine/compute_functions engine/analysis register \
 	domains/taint_domain \
 	$(APRON_CMO) $(NUMERORS_CMO) \
+	utils/eva_results \
 	utils/results api/general_requests api/values_request \
 	utils/unit_tests
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
