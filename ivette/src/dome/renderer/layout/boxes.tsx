@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Box Layout
 // --------------------------------------------------------------------------
@@ -78,7 +76,7 @@ const makeBox = (
   boxClasses: string,
   props: DivProps,
   morestyle?: React.CSSProperties,
-) => {
+): JSX.Element => {
   const { children, className, style, ...others } = props;
   const allClasses = classes(className, boxClasses);
   const allStyles = styles(style, morestyle);
@@ -97,37 +95,43 @@ const makeBox = (
    Horizontal box (extends horizontally, no overflow).
 */
 export const Hbox =
-  (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-box', props);
+  (props: DivProps): JSX.Element =>
+    makeBox('dome-xBoxes-hbox dome-xBoxes-box', props);
 
 /**
    Vertical box (extends vertically, no overflow).
-*/
+ */
 export const Vbox =
-  (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-box', props);
+  (props: DivProps): JSX.Element =>
+    makeBox('dome-xBoxes-vbox dome-xBoxes-box', props);
 
 /**
    Compact Horizontal box (fixed dimensions, no overflow).
-*/
+ */
 export const Hpack =
-  (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-pack', props);
+  (props: DivProps): JSX.Element =>
+    makeBox('dome-xBoxes-hbox dome-xBoxes-pack', props);
 
 /**
    Compact Vertical box (fixed dimensions, no overflow).
-*/
+ */
 export const Vpack =
-  (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-pack', props);
+  (props: DivProps): JSX.Element =>
+    makeBox('dome-xBoxes-vbox dome-xBoxes-pack', props);
 
 /**
    Horizontally filled box (fixed height, maximal width, no overflow).
-*/
+ */
 export const Hfill =
-  (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-fill', props);
+  (props: DivProps): JSX.Element =>
+    makeBox('dome-xBoxes-hbox dome-xBoxes-fill', props);
 
 /**
    Vertically filled box (fixed width, maximal height, no overflow).
-*/
+ */
 export const Vfill =
-  (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-fill', props);
+  (props: DivProps): JSX.Element =>
+    makeBox('dome-xBoxes-vbox dome-xBoxes-fill', props);
 
 // --------------------------------------------------------------------------
 // --- Scrolling & Spacing
@@ -135,21 +139,22 @@ export const Vfill =
 
 /**
    Scrolling container.
-*/
+ */
 export const Scroll =
-  (props: DivProps) => makeBox('dome-xBoxes-scroll dome-container', props);
+  (props: DivProps): JSX.Element =>
+    makeBox('dome-xBoxes-scroll dome-container', props);
 
 /**
    Rigid space between items in a box.
-*/
+ */
 export const Space =
-  (props: DivProps) => makeBox('dome-xBoxes-space', props);
+  (props: DivProps): JSX.Element => makeBox('dome-xBoxes-space', props);
 
 /**
    Extensible space between items in a box.
-*/
+ */
 export const Filler =
-  (props: DivProps) => makeBox('dome-xBoxes-filler', props);
+  (props: DivProps): JSX.Element => makeBox('dome-xBoxes-filler', props);
 
 // --------------------------------------------------------------------------
 // --- Grids
@@ -168,8 +173,8 @@ export interface GridProps extends DivProps { columns?: string }
    properties.
 
    Example: `<Grid columns="25% auto auto"> ... </Grid>`
-*/
-export const Grid = (props: GridProps) => {
+ */
+export const Grid = (props: GridProps): JSX.Element => {
   const { columns, ...others } = props;
   return makeBox('dome-xBoxes-grid', others, { gridTemplateColumns: columns });
 };
@@ -197,7 +202,7 @@ export interface FolderProps {
    Foldable (vertical, packed) box.
    The head label is clickable to fold/unfold its contents.
 */
-export const Folder = (props: FolderProps) => {
+export const Folder = (props: FolderProps): JSX.Element => {
   const {
     settings,
     defaultUnfold = false,
