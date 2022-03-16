@@ -14,11 +14,11 @@
 /* -------------------------------------------------------------------------- */
 
 .kernel-text {
-  white-space: pre;
+    white-space: pre;
 }
 
 .kernel-text-marker:hover {
-  background: lightgreen;
+    background: var(--code-hover);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -30,7 +30,7 @@
 }
 
 .hovered-marker {
-    background-color: lightblue;
+    background-color: var(--code-hover);
 }
 
 .dead-code {
@@ -62,7 +62,7 @@
 .globals-attr {
     font-size: smaller;
     font-weight: lighter;
-    color: #aaa;
+    color: var(--info-text);
 }
 
 .globals-function-section {
@@ -80,12 +80,16 @@
     padding-bottom: 2px;
 }
 
-.astinfo-section.hovered {
-    background: #ddd;
+.astinfo-section.selected {
+    background: var(--code-select);
 }
 
-.astinfo-section.transient {
-    background: #f5d69e;
+.astinfo-section.hovered {
+    background: var(--code-hover);
+}
+
+.astinfo-section.selected.hovered {
+    background: var(--code-select-hover);
 }
 
 .astinfo-folderbutton {
@@ -99,13 +103,13 @@
 }
 
 .astinfo-markerkind {
-    background: #b1c6dc;
+    background: var(--selected-element);
     position: relative;
     top: -1px;
     border-radius: 2px;
     font-size: 7pt;
     padding: 2px;
-    color: black;
+    color: var(--text);
     user-select: none;
     margin-right: 3pt;
 }
@@ -133,7 +137,7 @@
     text-align: center;
     margin-top: 1px;
     margin-left: 8px;
-    color: #999;
+    color: var(--info-text);
     font-size: smaller;
 }
 
