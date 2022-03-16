@@ -305,11 +305,24 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   let term_to_exp = !term_to_exp_ref in
   let lscope_vars = Lscope.get_all lscope in
   let lscope_vars = List.rev lscope_vars in
+  let rec add_lscope_to_logic_env env = function
+    | [] -> env
+    | (Lvs_quantif(t1,_,x,_,t2)::lscope) ->
+      let logic_env = Env.Logic_env.get env in
+      let i = Interval.join
+          (Interval.get ~logic_env t1)
+          (Interval.get ~logic_env t2)
+      in
+      add_lscope_to_logic_env
+        (Env.Logic_env.add_let_quantif_binding env x i)
+        lscope
+    | _::_ -> env
+  in
+  let env = add_lscope_to_logic_env env lscope in
   let logic_env = Env.Logic_env.get env in
   let sizes_and_shifts =
     sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope_vars []
   in
-  let logic_env = Env.Logic_env.get env in
   (* Creating the pointer *)
   let ty = match pot with
     | PoT_pred _ ->
