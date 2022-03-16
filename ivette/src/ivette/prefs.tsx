@@ -93,3 +93,14 @@ export const EditorCommand =
   new Settings.GString('Editor.Command', 'emacs +%n:%c %s');
 
 // --------------------------------------------------------------------------
+// --- Console Scrollback configuration
+// --------------------------------------------------------------------------
+
+export const ConsoleScrollback =
+  new Settings.GNumber('Console.Scrollback', 2000);
+
+export interface ConsoleScrollbackProps {
+  scrollback: Settings.GlobalSettings<number>;
+}
+
+// --------------------------------------------------------------------------

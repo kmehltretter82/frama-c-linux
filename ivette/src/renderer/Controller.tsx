@@ -30,6 +30,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
+import * as Preferences from 'ivette/prefs';
 
 import * as Toolbars from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
@@ -209,6 +210,11 @@ const RenderConsole = () => {
     };
     editor.on('change', callback);
     return () => { editor.off('change', callback); };
+  });
+
+  const [maxLines] = Settings.useGlobalSettings(Preferences.ConsoleScrollback);
+  React.useEffect(() => {
+    Server.buffer.setMaxlines(maxLines);
   });
 
   const doReload = () => {
