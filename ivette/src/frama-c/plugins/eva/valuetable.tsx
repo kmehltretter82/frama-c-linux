@@ -105,8 +105,7 @@ function makeStackTitle(calls: Callsite[]): string {
 
 async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
   const { callstack: c, getCallsites, selectedClass = '' } = props;
-  const activeClass = 'eva-table-callsite-active';
-  const callClass = classes('eva-table-callsite', activeClass, selectedClass);
+  const callClass = classes('eva-table-callsite-box', selectedClass);
   const callsites = c !== 'Header' ? await getCallsites(c) : [];
   const infos =
     c === 'Header' ? 'Corresponding callstack' :
@@ -183,7 +182,7 @@ function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
     const alarms = evaluation?.vBefore?.alarms ?? [];
     if (alarms.length <= 0) return <></>;
     const renderAlarm = ([status, alarm]: Alarm): JSX.Element => {
-      const className = `eva-alarm-info eva-alarm-${status}`;
+      const className = classes('eva-alarm-info', `eva-alarm-${status}`);
       return <Code className={className} icon="WARNING">{alarm}</Code>;
     };
     const children = React.Children.toArray(alarms.map(renderAlarm));
@@ -201,7 +200,7 @@ interface StackInfosProps {
 
 async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
   const { callsites, setSelection, isSelected } = props;
-  const selectedClass = isSelected ? 'eva-table-selected-row' : '';
+  const selectedClass = isSelected ? 'eva-focused' : '';
   const className = classes('eva-callsite', selectedClass);
   if (callsites.length <= 1) return <></>;
   const makeCallsite = ({ caller, stmt }: Callsite): JSX.Element => {
@@ -258,7 +257,7 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
         className="eva-probeinfo-code"
         style={{ visibility: visible ? 'visible' : 'hidden' }}
       >
-        <div className='eva-sized-area dome-text-cell'>{code}</div>
+        <div className='eva-probeinfo-code-text dome-text-cell'>{code}</div>
       </div>
       <Code><Stmt stmt={stmt} marker={target} /></Code>
       <IconButton
@@ -398,7 +397,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const { vBefore, vAfter, vThen, vElse } = evaluation;
     function td(e: Values.evaluation, state: string): JSX.Element {
       const status = getAlarmStatus(e.alarms);
-      const alarmClass = `eva-alarms eva-alarm-${status}`;
+      const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
       const kind = callstack === 'Summary' ? 'one' : 'this';
       const title = `At least one alarm is raised in ${kind} callstack`;
       return (
@@ -480,7 +479,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const values = await Promise.all(callstacks.map(async (callstack) => {
     const isSelected = isSelectedCallstack(callstack);
     const selector = isSelected && callstack !== 'Summary';
-    const selectedClass = selector ? 'eva-table-selected-row' : '';
+    const selectedClass = selector ? 'eva-focused' : '';
     const call = await CallsiteCell({ selectedClass, getCallsites, callstack });
     const onClick = (): void => props.selectCallstack(callstack);
     const vs = await Promise.all(probes.map(async ([ promise, status ]) => {
