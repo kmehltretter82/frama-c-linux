@@ -48,7 +48,8 @@ const quoteRe = new RegExp('^[-_./:a-zA-Z0-9]+$');
 const quote = (s: string) => (quoteRe.test(s) ? s : `"${s}"`);
 
 const unquoteRe = new RegExp('^".*"$');
-const unquote = (s: string) => (unquoteRe.test(s) ? s.substring(1, s.length - 1) : s);
+const unquote = (s: string) =>
+  (unquoteRe.test(s) ? s.substring(1, s.length - 1) : s);
 
 function dumpServerConfig(sc: Server.Configuration): string {
   let buffer = '';
