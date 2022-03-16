@@ -51,10 +51,10 @@
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [slicing] initializing slicing ...
-[pdg] computing for function h
-[pdg] done for function h
 [pdg] computing for function g
 [pdg] done for function g
+[pdg] computing for function h
+[pdg] done for function h
 int G;
 /*@ assigns \result;
     assigns \result \from a; */
@@ -120,7 +120,7 @@ Print slice = h_slice_1:
 }
 
 Slicing project worklist [default] =
-[h_slice_1 = change_call for call 16 -> g_slice_1][g_slice_1 = change_call for call 5 -> (src:f)][h_slice_1 = change_call for call 13 -> (src:f)][h_slice_1 = change_call for call 12 -> (src:f)][h_slice_1 = change_call for call 11 -> (src:f)][h_slice_1 = change_call for call 10 -> (src:f)]
+[h_slice_1 = change_call for call 13 -> (src:f)][h_slice_1 = change_call for call 12 -> (src:f)][h_slice_1 = change_call for call 11 -> (src:f)][h_slice_1 = change_call for call 10 -> (src:f)][h_slice_1 = change_call for call 16 -> g_slice_1][g_slice_1 = change_call for call 5 -> (src:f)]
 
 [slicing] exporting project to 'Sliced code'...
 [slicing] applying all slicing requests...

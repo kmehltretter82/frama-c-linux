@@ -144,7 +144,8 @@ let valid_behaviors kf state =
   Active_behaviors.active_behaviors ab
 
 let () =
-  (* Pretty-printing *)
+  Db.Value.is_called := Function_calls.is_called;
+  Db.Value.callers := Function_calls.callsites;
   Db.Value.use_spec_instead_of_definition :=
     Function_calls.use_spec_instead_of_definition;
   Db.Value.assigns_outputs_to_zone := assigns_outputs_to_zone;

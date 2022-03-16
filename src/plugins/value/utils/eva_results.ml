@@ -103,13 +103,6 @@ let is_non_terminating_instr stmt =
   | _, _ -> false
 
 
-(* {2 Registration.} *)
-
-let () =
-  Db.Value.is_called := is_called;
-  Db.Value.callers := callers;
-;;
-
 (* {2 Saving and restoring state} *)
 
 type stmt_by_callstack = Cvalue.Model.t Value_types.Callstack.Hashtbl.t
