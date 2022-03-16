@@ -224,7 +224,7 @@ function windowSyncSettings(event: IpcMainEvent): void {
 
 ipcMain.on('dome.ipc.settings.sync', windowSyncSettings);
 
-function applyThemeSettings(settings: Store) {
+function applyThemeSettings(settings: Store): void {
   const theme = settings['dome-color-theme'];
   if (typeof (theme) === 'string') setNativeTheme(theme);
 }

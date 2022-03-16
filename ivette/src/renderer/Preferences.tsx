@@ -67,7 +67,7 @@ function ThemeFields(): JSX.Element {
 // --- Editor Fields
 // --------------------------------------------------------------------------
 
-function EditorFields() {
+function EditorFields(): JSX.Element {
   const fontsize = Forms.useValid(
     Settings.useGlobalSettings(IvettePrefs.EditorFontSize)
   );
@@ -100,7 +100,10 @@ function EditorFields() {
 // --------------------------------------------------------------------------
 // --- Console Scrollback Forms
 // --------------------------------------------------------------------------
-function ConsoleScrollbackFields(props: IvettePrefs.ConsoleScrollbackProps) {
+
+function ConsoleScrollbackFields(
+  props: IvettePrefs.ConsoleScrollbackProps
+): JSX.Element {
   const scrollback = Forms.useDefined(Forms.useValid(
     Settings.useGlobalSettings(props.scrollback),
   ));
