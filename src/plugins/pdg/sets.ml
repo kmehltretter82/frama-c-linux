@@ -157,7 +157,7 @@ let find_location_nodes_at_end pdg loc =
 let find_location_nodes_at_begin pdg loc =
   let kf =  PdgTypes.Pdg.get_kf pdg in
   let stmts =
-    if !Db.Value.use_spec_instead_of_definition kf then []
+    if Eva.Analysis.use_spec_instead_of_definition kf then []
     else let f = Kernel_function.get_definition kf in f.sbody.bstmts
   in
   let state = match stmts with

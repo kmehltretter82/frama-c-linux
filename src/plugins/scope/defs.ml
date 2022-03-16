@@ -199,7 +199,7 @@ let compute_with_def_type_zone kf stmt zone =
              | Instr (Call (_, { enode = Lval (Var vi, NoOffset)}, _, _)
                      | Local_init (_, ConsInit(vi,_,_),_))
                when let kf = Globals.Functions.get vi in
-                 !Db.Value.use_spec_instead_of_definition kf
+                 Eva.Analysis.use_spec_instead_of_definition kf
                ->
                (* defined through a call, but function has no body *)
                change s (true, false)

@@ -71,7 +71,7 @@ let get_kf_fi kf =
     let fi_def, is_def =
       match kf.fundec with
       | Declaration _ -> None, false
-      | Definition _ when !Db.Value.use_spec_instead_of_definition kf ->
+      | Definition _ when Eva.Analysis.use_spec_instead_of_definition kf ->
         None, false
       | Definition (def, _) -> Some def, true
     in
