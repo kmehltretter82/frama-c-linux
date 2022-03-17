@@ -28,6 +28,7 @@
 # Dune #
 ########
 | "dune-project"  -> frame open:";;" line:";" close:";;"
+| ".*dune-project" -> skip match:"(lang.*"
 | "dune"          -> frame open:";;" line:";" close:";;"
 
 ############
