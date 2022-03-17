@@ -401,10 +401,12 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
       const kind = callstack === 'Summary' ? 'one' : 'this';
       const title = `At least one alarm is raised in ${kind} callstack`;
+      const align = e.value.includes('\n') ? 'left' : 'center';
       return (
         <td
           className={className}
           onContextMenu={onContextMenu(e)}
+          style={{ textAlign: align }}
         >
           <span className={'eva-values-position'}>{e.value}</span>
           <Icon className={alarmClass} size={10} title={title} id="WARNING" />
