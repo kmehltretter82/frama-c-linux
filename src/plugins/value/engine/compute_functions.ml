@@ -202,9 +202,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         Self.debug ~dkey
           "calling Record_Value_New callbacks on saved previous result";
       end;
-      let stack_with_call = Eva_utils.call_stack () in
-      Db.Value.Record_Value_Callbacks_New.apply
-        (stack_with_call, Value_types.Reuse i);
+      Db.Value.Record_Value_Callbacks_New.apply (stack, Value_types.Reuse i);
       (* call can be cached since it was cached once *)
       Transfer.{states; cacheable = Cacheable; builtin=false}
 
@@ -243,7 +241,6 @@ module Make (Abstract: Abstractions.Eva) = struct
         Value_types.Callstack.pretty_short call_stack
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
     let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
-    let call_stack = Eva_utils.call_stack () in
     let compute, kind =
       match target with
       | `Def (fundec, save_results) ->
