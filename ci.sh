@@ -89,7 +89,7 @@ do_plugin () {
   fi
 
   # run the build
-  nix-build --no-out-link "./nix/pkgs.nix" $OPTS -A ocamlPackages."$plugin"
+  nix-build --no-out-link "./nix/pkgs.nix" $OPTS -A ocaml-ng.ocamlPackages_4_12."$plugin"
 
   cd "$curdir"
 

@@ -11,11 +11,25 @@
 , autoconf
 , findlib
 # Frama-C build
+, apron
+, camlzip
+, dune_3
+, dune-site-3
 , graphviz
+, lablgtk3
+, lablgtk3-sourceview3
 , ltl2ba
-, ocamlPackages
+, menhirLib
+, mlgmpidl
+, ocaml
+, ocamlgraph
+, ppx_deriving
+, ppx_deriving_yojson
+, yojson
 , which
 , why3
+, zarith
+, zmq
 # Frama-C extra (other targets do not reconfigure)
 , dos2unix
 , doxygen
@@ -37,11 +51,11 @@ stdenv.mkDerivation rec {
     wrapGAppsHook
   ];
 
-  buildInputs = with ocamlPackages; [
+  buildInputs = [
     apron
     camlzip
     dune_3
-    dune-site
+    dune-site-3
     findlib
     graphviz
     lablgtk3
