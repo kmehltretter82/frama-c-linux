@@ -33,7 +33,11 @@ let self = Self.state
 type results = Function_calls.results = Complete | Partial | NoResults
 type status = Function_calls.analysis_status =
     Unreachable | SpecUsed | Builtin of string | Analyzed of results
-let status = Function_calls.analysis_status
+let status kf =
+  match Function_calls.analysis_status kf with
+  | Analyzed Complete as status ->
+    if is_computed () then status else Analyzed Partial
+  | status -> status
 
 let use_spec_instead_of_definition =
   Function_calls.use_spec_instead_of_definition ?recursion_depth:None
