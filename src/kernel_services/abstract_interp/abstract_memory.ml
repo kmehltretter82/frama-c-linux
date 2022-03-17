@@ -885,8 +885,9 @@ struct
   let hash (b,_a) = Bound.hash b
   let compare (b1,_a1) (b2,_a2) =
     Bound.compare b1 b2
-  let equal (b1,_a1) (b2,_a2) =
+  let equal_regardless_age (b1,_a1) (b2,_a2) =
     Bound.equal b1 b2
+  let equal = equal_regardless_age
   let _of_integer i a = Bound.of_integer i, a
   let _of_exp e a = Bound.of_exp e, a
   let _succ (b,a) = (Bound.succ b, a)
@@ -953,6 +954,8 @@ struct
     segments: (M.t * B.t) list; (* should not be empty *)
     padding: bit; (* padding at the left and right of the segmentation *)
   }
+
+  type segments = (M.t * B.t) list
 
   let _pretty_debug fmt (l,s) : unit =
     Format.fprintf fmt " {%a} " B.pretty l;
@@ -1311,6 +1314,24 @@ struct
     aging >>-:
     limit_size ~oracle
 
+  let remove_empty_segments m =
+    let unify_head_age (b' : B.t) : segments -> segments = function
+      | [] -> [] (* Start of segmentation, age is 0, do nothing *)
+      | (v,b) :: t -> (v, B.unify_age ~other:b' b) :: t
+    in
+    let rec aux l acc = function
+      | [] -> List.rev acc
+      | (v,u) :: t ->
+        (* Oracle cannot be used in case of incr here as it represents the
+           value of the bounds before the instruction, while we iterate
+           here over a segmentation interpreted after the instruction. *)
+        if B.equal_regardless_age l u then (* empty segment, remove v *)
+          aux l (unify_head_age u acc) t
+        else
+          aux u ((v,u) :: acc) t
+    in
+    { m with segments = check_segments (aux m.start [] m.segments) }
+
   let incr_bound ~oracle vi x m =
     let incr = B.incr_or_constantify ~oracle vi x in
     let rec aux acc = function
@@ -1337,7 +1358,8 @@ struct
           and v = M.smash ~oracle (M.of_raw m.padding) v in
           l, (v,u) :: t
     in
-    { m with start ; segments = check_segments (List.rev (aux [] segments)) }
+    { m with start ; segments = check_segments (List.rev (aux [] segments)) } |>
+    remove_empty_segments
 
   let map f m =
     { m with segments = check_segments (List.map (fun (v,u) -> f v, u) m.segments) }

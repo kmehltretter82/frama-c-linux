@@ -92,7 +92,7 @@
 [eva] multidim.c:59: 
   Frama_C_domain_show_each:
   t : # cvalue: {0; 1}
-      # multidim: { [0 .. 9] = {1}, [10 .. 9] = {0} }
+      # multidim: [0 .. 9] = {1}
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
@@ -154,12 +154,7 @@
   Frama_C_domain_show_each:
   t : # cvalue: [0..9] ∈ {0; 1}
                 [10..19] ∈ {0; 2}
-      # multidim: {
-                    [0 .. 17] = {1; 2},
-                    [18] = {1; 2},
-                    [19] = {2},
-                    [20 .. 19] = {0}
-                  }
+      # multidim: { [0 .. 17] = {1; 2}, [18] = {1; 2}, [19] = {2} }
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
@@ -195,12 +190,9 @@
   Frama_C_domain_show_each:
   t : # cvalue: [0].typ ∈ {1; 2} or UNINITIALIZED
                 {[0].val; [1..999]} ∈ [--..--] or UNINITIALIZED
-      # multidim: {
-                    [0 .. 999] = {
-                      { .typ = {1}, .val.i = {42} } or 
-                      { .typ = {2}, .val.f = {42.} }
-                    },
-                    [1000 .. 999] = UNINITIALIZED
+      # multidim: [0 .. 999] = {
+                    { .typ = {1}, .val.i = {42} } or 
+                    { .typ = {2}, .val.f = {42.} }
                   }
 [eva] computing for function Frama_C_interval <- main7 <- main.
   Called from multidim.c:147.
@@ -219,7 +211,7 @@
 [eva] multidim.c:169: 
   Frama_C_domain_show_each:
   t : # cvalue: {0; 1}
-      # multidim: { [0 .. 9] = {1}, [10 .. 9] = {0} }
+      # multidim: [0 .. 9] = {1}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
