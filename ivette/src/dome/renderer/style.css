@@ -32,11 +32,11 @@ body {
 /* -------------------------------------------------------------------------- */
 
 .dome-phantom {
-    display: none;
+    display: none !important;
 }
 
 .dome-hidden {
-    visibility: hidden;
+    visibility: hidden !important;
 }
 
 .dome-color-frame {
