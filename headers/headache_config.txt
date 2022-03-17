@@ -24,6 +24,12 @@
 | ".*config\.h\.in" -> frame open:"/*"  line:"*" close:"*/"
 | ".*configure\..*" -> frame open:"#"  line:"#" close:"#"
 
+########
+# Dune #
+########
+| "dune-project"  -> frame open:";;" line:";" close:";;"
+| "dune"          -> frame open:";;" line:";" close:";;"
+
 ############
 # Makefile #
 ############
@@ -33,7 +39,8 @@
 #################
 # Shell scripts #
 #################
-#note: the skip directive requires a filename starting by ".*" ??? 
+#note: the skip directive requires a filename starting by ".*"
+#      (the skip directive looks at the full path-name)
 | "autocomplete_frama-c" -> frame open: "#" line: "#" close: "#"
 | "_frama-c" -> frame open: "#" line: "#" close: "#"
 | ".*_frama-c" -> skip match:"#compdef.*"
