@@ -38,6 +38,7 @@ type env_t = {
 ; dir: string
 ; dune_alias: string
 ; absolute_tests_dir: string
+; absolute_cwd: string
 }
 
 module Filename = struct
@@ -146,7 +147,7 @@ let config_name ~env name =
 let macro_post_options = ref "" (* value set to @PTEST_POST_OPTIONS@ macro *)
 let macro_pre_options  = ref "" (* value set to @PTEST_PRE_OPTIONS@  macro *)
 let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
-let macro_default_options = ref "-journal-disable -check -no-autoload-plugins -add-symbolic-path=\"@PTEST_SESSION@\""
+let macro_default_options = ref "-journal-disable -check -no-autoload-plugins -add-symbolic-path=\"@PTEST_SESSION@:.\""
 
 let macro_frama_c_exe = ref "frama-c"
 let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
@@ -637,8 +638,10 @@ end = struct
     let ptest_config = config_name ~env "" in
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
+    let ptest_session = Filename.dirname env.dir in
+    let ptest_session = env.absolute_cwd ^ "/_build/default" ^ (if ptest_session = "." then "" else "/" ^ ptest_session) in
     let ptest_vars =
-      [ "PTEST_SESSION", env.absolute_tests_dir ^ "/_build/default:.";
+      [ "PTEST_SESSION", ptest_session ;
         "PTEST_CONFIG", ptest_config;
         "PTEST_DIR", ".";
         "PTEST_SHARE_DIR", "../../../share";
@@ -1811,11 +1814,11 @@ let () =
     | [] -> [ "tests" ]
     | l -> l
   in
-  let pwd = Unix.getcwd () in
+  let absolute_cwd = Unix.getcwd () in
   List.iter (fun dir ->
       Format.printf "Test directory: %s@." dir;
       let absolute_tests_dir = Filename.dirname
-          (if Filename.is_relative dir then Filename.concat pwd dir else dir)
+          (if Filename.is_relative dir then Filename.concat absolute_cwd dir else dir)
       in
       let suites = Ptests_config.parse ~dir in
       if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
@@ -1824,7 +1827,7 @@ let () =
       StringMap.iter (fun config_mode suites ->
           if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
               (match config_mode with "" -> "DEFAULT" | s -> s) (StringMap.cardinal suites);
-          let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_tests_dir} in
+          let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_tests_dir ; absolute_cwd} in
           let directory = SubDir.create ~with_subdir:false ~env dir in
           let config = Test_config.current_config ~env directory in
           let config = update_dir_ref directory config in
