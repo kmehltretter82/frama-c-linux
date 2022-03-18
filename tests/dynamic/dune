@@ -1,0 +1,7 @@
+(subdir
+ result
+ (copy_files ../file_path))
+
+(subdir
+ result/directory_path
+ (copy_files ../../directory_path/*))
