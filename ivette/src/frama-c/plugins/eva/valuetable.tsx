@@ -43,13 +43,9 @@ type StateToDisplay = 'Before' | 'After' | 'Both' | 'None'
 type callstack = 'Summary' | Values.callstack
 
 function useCallstacksCache(): Request<Ast.marker[], callstack[]> {
-  const get = React.useCallback((markers) => {
-    return Server.send(Values.getCallstacks, markers);
-  }, []);
-  const toString = React.useCallback((markers: Ast.marker[]) => {
-    return markers.map((m) => `${m}`).join('|');
-  }, []);
-  return Dome.useCache(get, toString);
+  const g = React.useCallback((m) => Server.send(Values.getCallstacks, m), []);
+  const toString = React.useCallback((ms) => ms.join('|'), []);
+  return Dome.useCache(g, toString);
 }
 
 type Alarm = [ 'True' | 'False' | 'Unknown', string ]
@@ -144,16 +140,26 @@ interface Probe extends Location {
   evaluate: Request<callstack, Evaluation>
 }
 
+const LocToString = (loc: Location): string => `${loc.fct}:${loc.target}`;
+type LocStack = [ Location, callstack ]
+
+function useEvaluationCache(): Request<LocStack, Evaluation> {
+  const toString = ([ l, c ] : LocStack): string => `${LocToString(l)}:${c}`;
+  const get: Request<LocStack, Evaluation> = React.useCallback(([ l, c ]) => {
+    const callstack = c === 'Summary' ? undefined : c as Values.callstack;
+    return Server.send(Values.getValues, { ...l, callstack });
+  }, []);
+  return Dome.useCache(get, toString);
+}
+
 function useProbeCache(): Request<Location, Probe> {
   const toString = React.useCallback((l) => `${l.fct}:${l.target}`, []);
+  const cache = useEvaluationCache();
   const get = React.useCallback(async (loc: Location): Promise<Probe> => {
     const infos = await Server.send(Values.getProbeInfo, loc.target);
-    const evaluate: Request<callstack, Evaluation> = (c) => {
-      const callstack = c === 'Summary' ? undefined : c as Values.callstack;
-      return Server.send(Values.getValues, { ...loc, callstack });
-    };
+    const evaluate: Request<callstack, Evaluation> = (c) => cache([ loc, c ]);
     return { ...loc, ...infos, evaluate };
-  }, []);
+  }, [ cache ]);
   return Dome.useCache(get, toString);
 }
 
