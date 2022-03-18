@@ -599,6 +599,17 @@ let as_zone address =
 
 (* Evaluation properties *)
 
+let is_singleton: type a. a evaluation -> bool = function
+  | Value _ as evaluation ->
+    let cvalue = as_cvalue evaluation in
+    Cvalue.V.cardinal_zero_or_one cvalue && not (Cvalue.V.is_bottom cvalue)
+  | Address _ as lvaluation ->
+    let loc = as_location lvaluation in
+    let is_singleton loc =
+      Locations.cardinal_zero_or_one loc && not (Locations.is_bottom_loc loc)
+    in
+    Result.fold ~ok:is_singleton ~error:(fun _ -> false) loc
+
 let is_initialized (Value evaluation) =
   let module E = (val evaluation : Evaluation) in
   E.is_initialized E.v
