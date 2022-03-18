@@ -1,0 +1,61 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of Frama-C.                                         *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2022                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+let import_varinfo vi =
+  match Ast_diff.Varinfo.find vi with
+  | `Same vi -> vi
+  | `Not_present -> raise Not_found
+
+let import_logic_var lvi =
+  match Ast_diff.Logic_var.find lvi with
+  | `Same lvi -> lvi
+  | `Not_present -> raise Not_found
+
+let import_base = function
+  | Base.Var (vi, _validity) -> Base.of_varinfo (import_varinfo vi)
+  | CLogic_Var (lvi, _, _) -> Base.of_c_logic_var (import_logic_var lvi)
+  | Allocated (vi, _, _) -> Base.of_varinfo (import_varinfo vi)
+  | Null -> Base.null
+  | String _ as x -> x
+
+let import_bases bases =
+  Base.Hptset.(fold (fun b acc -> add (import_base b) acc) bases empty)
+
+let import_cvalue =
+  let open Cvalue.V in
+  function
+  | Top (Top, _) as top -> top
+  | Top (Set bases, origin) ->
+    let bases = import_bases bases in
+    inject_top_origin origin bases
+  | Map map ->
+    M.fold (fun b ival acc -> add (import_base b) ival acc) map bottom
+
+let import_cvalue_or_initialized =
+  Cvalue.V_Or_Uninitialized.map import_cvalue
+
+let import_offsetmap offsm =
+  Cvalue.V_Offsetmap.fold
+    (fun itv (v, size, offset) acc ->
+       let v = import_cvalue_or_initialized v in
+       Cvalue.V_Offsetmap.add ~exact:true itv (v, size, offset) acc)
+    offsm Cvalue.V_Offsetmap.empty
