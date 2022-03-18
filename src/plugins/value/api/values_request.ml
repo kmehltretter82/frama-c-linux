@@ -354,7 +354,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let dstate ~after stmt = function
     | None -> (A.get_stmt_state ~after stmt :> dstate)
     | Some cs ->
-      match A.get_stmt_state_by_callstack ~after stmt with
+      match A.get_stmt_state_by_callstack ~selection:[cs] ~after stmt with
       | (`Top | `Bottom) as res -> res
       | `Value cmap ->
         try `Value (CSmap.find cmap cs)
