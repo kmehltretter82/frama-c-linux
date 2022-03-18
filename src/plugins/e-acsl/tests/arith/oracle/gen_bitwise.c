@@ -1145,7 +1145,7 @@ void g_unsigned(unsigned int a, unsigned int b)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int a = 4;
   int b = 8;
   f_signed(a,b);

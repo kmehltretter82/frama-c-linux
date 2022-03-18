@@ -32,7 +32,7 @@ void __e_acsl_globals_init(void)
                          sizeof("Struct_G[0]"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
-    __e_acsl_store_block((void *)(_G),(size_t)32);
+    __e_acsl_store_block((void *)(_G),32UL);
     __e_acsl_full_init((void *)(& _G));
   }
   return;
@@ -47,7 +47,7 @@ void __e_acsl_globals_clean(void)
 int main(int argc, char **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,& argv,(size_t)8);
+  __e_acsl_memory_init(& argc,& argv,8UL);
   __e_acsl_globals_init();
   {
     int __gen_e_acsl_initialized;

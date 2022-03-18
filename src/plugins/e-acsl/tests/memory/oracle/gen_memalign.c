@@ -57,16 +57,15 @@ int main(int argc, char const **argv)
 {
   int __retres;
   char *a;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
-  __e_acsl_store_block((void *)(& a),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
+  __e_acsl_store_block((void *)(& a),8UL);
   char **memptr = malloc(sizeof(void *));
-  __e_acsl_store_block((void *)(& memptr),(size_t)8);
+  __e_acsl_store_block((void *)(& memptr),8UL);
   __e_acsl_full_init((void *)(& memptr));
   int res2 =
-    __gen_e_acsl_posix_memalign((void **)memptr,(unsigned long)256,
-                                (unsigned long)15);
+    __gen_e_acsl_posix_memalign((void **)memptr,(size_t)256,(size_t)15);
   char *p = *memptr;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
     int __gen_e_acsl_initialized;
@@ -180,7 +179,7 @@ int main(int argc, char const **argv)
   }
   /*@ assert !\valid(p); */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (char *)aligned_alloc((unsigned long)256,(unsigned long)12);
+  a = (char *)aligned_alloc((size_t)256,(size_t)12);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
@@ -196,7 +195,7 @@ int main(int argc, char const **argv)
   }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (char *)aligned_alloc((unsigned long)255,(unsigned long)512);
+  a = (char *)aligned_alloc((size_t)255,(size_t)512);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
@@ -212,7 +211,7 @@ int main(int argc, char const **argv)
   }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (char *)aligned_alloc((unsigned long)0,(unsigned long)512);
+  a = (char *)aligned_alloc((size_t)0,(size_t)512);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
@@ -228,7 +227,7 @@ int main(int argc, char const **argv)
   }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (char *)aligned_alloc((unsigned long)256,(unsigned long)512);
+  a = (char *)aligned_alloc((size_t)256,(size_t)512);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
@@ -405,8 +404,8 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_and;
-    __e_acsl_store_block((void *)(& memptr),(size_t)8);
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __e_acsl_store_block((void *)(& memptr),8UL);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"memptr",
                                  (void *)memptr);
@@ -473,7 +472,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
@@ -490,7 +489,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_or;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =

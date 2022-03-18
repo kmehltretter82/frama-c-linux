@@ -16,9 +16,9 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& PA),(size_t)8);
+    __e_acsl_store_block((void *)(& PA),8UL);
     __e_acsl_full_init((void *)(& PA));
-    __e_acsl_store_block((void *)(A),(size_t)16);
+    __e_acsl_store_block((void *)(A),16UL);
     __e_acsl_full_init((void *)(& A));
   }
   return;
@@ -34,7 +34,7 @@ void __e_acsl_globals_clean(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   PA = (int *)(& A);
   {
@@ -119,7 +119,7 @@ int main(void)
   }
   /*@ assert \offset(PA + 1) == 8; */ ;
   int a[4] = {1, 2, 3, 4};
-  __e_acsl_store_block((void *)(a),(size_t)16);
+  __e_acsl_store_block((void *)(a),16UL);
   __e_acsl_full_init((void *)(& a));
   {
     unsigned long __gen_e_acsl_offset_5;
@@ -183,10 +183,10 @@ int main(void)
   }
   /*@ assert \offset(&a[3]) == 12; */ ;
   long l = (long)4;
-  __e_acsl_store_block((void *)(& l),(size_t)8);
+  __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   char *pl = (char *)(& l);
-  __e_acsl_store_block((void *)(& pl),(size_t)8);
+  __e_acsl_store_block((void *)(& pl),8UL);
   __e_acsl_full_init((void *)(& pl));
   {
     unsigned long __gen_e_acsl_offset_8;
@@ -271,7 +271,7 @@ int main(void)
   }
   /*@ assert \offset(pl + 7) == 7; */ ;
   int *pi = (int *)(& l);
-  __e_acsl_store_block((void *)(& pi),(size_t)8);
+  __e_acsl_store_block((void *)(& pi),8UL);
   __e_acsl_full_init((void *)(& pi));
   {
     unsigned long __gen_e_acsl_offset_12;
@@ -315,8 +315,8 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
   }
   /*@ assert \offset(pi) == 4; */ ;
-  char *p = malloc((unsigned long)12);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  char *p = malloc((size_t)12);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
     unsigned long __gen_e_acsl_offset_14;
@@ -420,7 +420,7 @@ int main(void)
   }
   /*@ assert \offset(p - 5) == 0; */ ;
   long *q = malloc((unsigned long)30 * sizeof(long));
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   {
     unsigned long __gen_e_acsl_offset_19;

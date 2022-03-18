@@ -20,7 +20,7 @@ void f(void)
 void g(int *C, int *D)
 {
   {
-    __e_acsl_store_block((void *)(& C),(size_t)8);
+    __e_acsl_store_block((void *)(& C),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
@@ -40,9 +40,9 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& B),(size_t)8);
+    __e_acsl_store_block((void *)(& B),8UL);
     __e_acsl_full_init((void *)(& B));
-    __e_acsl_store_block((void *)(& A),(size_t)8);
+    __e_acsl_store_block((void *)(& A),8UL);
     __e_acsl_full_init((void *)(& A));
   }
   return;
@@ -60,10 +60,10 @@ int main(void)
   int __retres;
   int *x;
   int *y;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& y),(size_t)8);
-  __e_acsl_store_block((void *)(& x),(size_t)8);
+  __e_acsl_store_block((void *)(& y),8UL);
+  __e_acsl_store_block((void *)(& x),8UL);
   B = (int *)malloc(sizeof(int));
   __e_acsl_full_init((void *)(& y));
   y = (int *)malloc(sizeof(int));

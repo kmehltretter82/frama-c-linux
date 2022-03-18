@@ -35,8 +35,8 @@ void f(int *x, int *y)
   {
     {
       int __gen_e_acsl_valid_read;
-      __e_acsl_store_block((void *)(& y),(size_t)8);
-      __e_acsl_store_block((void *)(& x),(size_t)8);
+      __e_acsl_store_block((void *)(& y),8UL);
+      __e_acsl_store_block((void *)(& x),8UL);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*x",0,*x);
@@ -133,12 +133,12 @@ void f(int *x, int *y)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int x = 0;
-  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_store_block((void *)(& x),4UL);
   __e_acsl_full_init((void *)(& x));
   int *y = malloc(sizeof(int));
-  __e_acsl_store_block((void *)(& y),(size_t)8);
+  __e_acsl_store_block((void *)(& y),8UL);
   __e_acsl_full_init((void *)(& y));
   __gen_e_acsl_f(& x,y);
   __retres = 0;
@@ -174,9 +174,9 @@ void __gen_e_acsl_f(int *x, int *y)
     int __gen_e_acsl_valid_read;
     int __gen_e_acsl_valid_read_2;
     int __gen_e_acsl_active_bhvrs;
-    __e_acsl_store_block((void *)(& y),(size_t)8);
-    __e_acsl_store_block((void *)(& x),(size_t)8);
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __e_acsl_store_block((void *)(& y),8UL);
+    __e_acsl_store_block((void *)(& x),8UL);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"y",(void *)y);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
@@ -209,8 +209,7 @@ void __gen_e_acsl_f(int *x, int *y)
     __gen_e_acsl_assert_data_2.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                           *x == 1);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,*x == 1);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"x",(void *)x);
@@ -227,8 +226,7 @@ void __gen_e_acsl_f(int *x, int *y)
     __gen_e_acsl_assert_data_3.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
-                                           *x == 0);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,*x == 0);
     __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_all_behaviors
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =

@@ -17,10 +17,10 @@ typedef struct __anonstruct_int32_pair_t_1 int32_pair_t;
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     int32_pair_t static_pair;
-    __e_acsl_store_block((void *)(& static_pair),(size_t)8);
+    __e_acsl_store_block((void *)(& static_pair),8UL);
     {
       int __gen_e_acsl_initialized;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
@@ -178,7 +178,7 @@ int main(void)
   }
   {
     int32_pair_t *heap_pair = malloc(sizeof(int32_pair_t));
-    __e_acsl_store_block((void *)(& heap_pair),(size_t)8);
+    __e_acsl_store_block((void *)(& heap_pair),8UL);
     __e_acsl_full_init((void *)(& heap_pair));
     {
       int __gen_e_acsl_initialized_7;

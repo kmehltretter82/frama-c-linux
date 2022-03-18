@@ -12,17 +12,17 @@ short a;
 char b(void)
 {
   char __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)1);
+  __e_acsl_store_block((void *)(& __retres),1UL);
   switch ((int)a) {
     int c = 0;
-    __e_acsl_store_block((void *)(& c),(size_t)4);
+    __e_acsl_store_block((void *)(& c),4UL);
     __e_acsl_full_init((void *)(& c));
     case 0:
-    __e_acsl_store_block_duplicate((void *)(& c),(size_t)4);
+    __e_acsl_store_block_duplicate((void *)(& c),4UL);
     __e_acsl_delete_block((void *)(& c));
     goto d;
     int tmp = c;
-    __e_acsl_store_block((void *)(& tmp),(size_t)4);
+    __e_acsl_store_block((void *)(& tmp),4UL);
     __e_acsl_full_init((void *)(& tmp));
     __e_acsl_delete_block((void *)(& tmp));
     __e_acsl_delete_block((void *)(& c));
@@ -38,9 +38,9 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& b),(size_t)1);
+    __e_acsl_store_block((void *)(& b),1UL);
     __e_acsl_full_init((void *)(& b));
-    __e_acsl_store_block((void *)(& a),(size_t)2);
+    __e_acsl_store_block((void *)(& a),2UL);
     __e_acsl_full_init((void *)(& a));
   }
   return;
@@ -56,9 +56,9 @@ void __e_acsl_globals_clean(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   b();
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;

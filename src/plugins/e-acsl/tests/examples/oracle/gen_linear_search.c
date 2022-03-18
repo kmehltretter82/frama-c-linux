@@ -196,7 +196,7 @@ int main(void)
 {
   int __retres;
   int found;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     int i = 0;
     while (i < 10) {
@@ -260,7 +260,7 @@ int __gen_e_acsl_search(int elt)
     int __gen_e_acsl_j;
     int __gen_e_acsl_forall_2;
     int __gen_e_acsl_j_2;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_i = 0;
@@ -381,7 +381,7 @@ int __gen_e_acsl_search(int elt)
       __gen_e_acsl_j ++;
     }
     e_acsl_end_loop4: ;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            __gen_e_acsl_exists);
     __gen_e_acsl_forall_2 = 1;
     __gen_e_acsl_j_2 = 0;
@@ -423,14 +423,14 @@ int __gen_e_acsl_search(int elt)
       __gen_e_acsl_j_2 ++;
     }
     e_acsl_end_loop5: ;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            __gen_e_acsl_forall_2);
   }
   __retres = search(elt);
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
         {.values = (void *)0};
@@ -447,7 +447,7 @@ int __gen_e_acsl_search(int elt)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
         {.values = (void *)0};

@@ -16,7 +16,7 @@ void __gen_e_acsl_f(struct X *item);
 
 void f(struct X *item)
 {
-  __e_acsl_store_block((void *)(& item),(size_t)8);
+  __e_acsl_store_block((void *)(& item),8UL);
   __e_acsl_delete_block((void *)(& item));
   return;
 }
@@ -24,9 +24,9 @@ void f(struct X *item)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   struct X x = {.i = 1};
-  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_store_block((void *)(& x),4UL);
   __e_acsl_full_init((void *)(& x));
   __gen_e_acsl_f(& x);
   __retres = 0;
@@ -42,7 +42,7 @@ void __gen_e_acsl_f(struct X *item)
   struct X *__gen_e_acsl_at;
   {
     int __gen_e_acsl_valid_read;
-    __e_acsl_store_block((void *)(& item),(size_t)8);
+    __e_acsl_store_block((void *)(& item),8UL);
     __gen_e_acsl_at = item;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"item",

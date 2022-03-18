@@ -35,8 +35,8 @@ char *memset_char(char *ptr, char value, size_t len)
 
 void chars(char dest[10])
 {
-  char *res = memset_char(dest,(char)0xFF,(unsigned long)10);
-  memset_char(res,(char)0xFF,(unsigned long)10);
+  char *res = memset_char(dest,(char)0xFF,(size_t)10);
+  memset_char(res,(char)0xFF,(size_t)10);
   return;
 }
 
@@ -59,9 +59,8 @@ unsigned char *memset_uchar(unsigned char *ptr, unsigned char value,
 
 void uchars(unsigned char dest[10])
 {
-  unsigned char *res =
-    memset_uchar(dest,(unsigned char)0xFF,(unsigned long)10);
-  memset_uchar(res,(unsigned char)0xFF,(unsigned long)10);
+  unsigned char *res = memset_uchar(dest,(unsigned char)0xFF,(size_t)10);
+  memset_uchar(res,(unsigned char)0xFF,(size_t)10);
   return;
 }
 
@@ -88,8 +87,8 @@ char (*memset_arr10_char(char (*ptr)[10], char value, size_t len))[10]
 
 void nested_chars(char dest[10][10])
 {
-  char (*res)[10] = memset_arr10_char(dest,(char)0xFF,(unsigned long)100);
-  memset_arr10_char(res,(char)0xFF,(unsigned long)100);
+  char (*res)[10] = memset_arr10_char(dest,(char)0xFF,(size_t)100);
+  memset_arr10_char(res,(char)0xFF,(size_t)100);
   return;
 }
 
@@ -399,15 +398,15 @@ void nested(int (*dest)[10], int n)
 
 void with_void(void *dest)
 {
-  void *res = memset(dest,0xFF,(unsigned long)10);
-  memset(res,0xFF,(unsigned long)10);
+  void *res = memset(dest,0xFF,(size_t)10);
+  memset(res,0xFF,(size_t)10);
   return;
 }
 
 void with_null_or_int(void)
 {
-  memset((void *)0,0xFF,(unsigned long)10);
-  memset((void *)((int *)42),0xFF,(unsigned long)10);
+  memset((void *)0,0xFF,(size_t)10);
+  memset((void *)((int *)42),0xFF,(size_t)10);
   return;
 }
 
@@ -447,8 +446,8 @@ char *memset_char(char *ptr, char value, size_t len)
 
 void chars(char dest[10])
 {
-  char *res = memset_char(dest,(char)0xFF,(unsigned long)10);
-  memset_char(res,(char)0xFF,(unsigned long)10);
+  char *res = memset_char(dest,(char)0xFF,(size_t)10);
+  memset_char(res,(char)0xFF,(size_t)10);
   return;
 }
 
@@ -473,9 +472,8 @@ unsigned char *memset_uchar(unsigned char *ptr, unsigned char value,
 
 void uchars(unsigned char dest[10])
 {
-  unsigned char *res =
-    memset_uchar(dest,(unsigned char)0xFF,(unsigned long)10);
-  memset_uchar(res,(unsigned char)0xFF,(unsigned long)10);
+  unsigned char *res = memset_uchar(dest,(unsigned char)0xFF,(size_t)10);
+  memset_uchar(res,(unsigned char)0xFF,(size_t)10);
   return;
 }
 
@@ -503,8 +501,8 @@ char (*memset_arr10_char(char (*ptr)[10], char value, size_t len))[10]
 
 void nested_chars(char dest[10][10])
 {
-  char (*res)[10] = memset_arr10_char(dest,(char)0xFF,(unsigned long)100);
-  memset_arr10_char(res,(char)0xFF,(unsigned long)100);
+  char (*res)[10] = memset_arr10_char(dest,(char)0xFF,(size_t)100);
+  memset_arr10_char(res,(char)0xFF,(size_t)100);
   return;
 }
 
@@ -817,15 +815,15 @@ void nested(int (*dest)[10], int n)
 
 void with_void(void *dest)
 {
-  void *res = memset(dest,0xFF,(unsigned long)10);
-  memset(res,0xFF,(unsigned long)10);
+  void *res = memset(dest,0xFF,(size_t)10);
+  memset(res,0xFF,(size_t)10);
   return;
 }
 
 void with_null_or_int(void)
 {
-  memset((void *)0,0xFF,(unsigned long)10);
-  memset((void *)((int *)42),0xFF,(unsigned long)10);
+  memset((void *)0,0xFF,(size_t)10);
+  memset((void *)((int *)42),0xFF,(size_t)10);
   return;
 }
 

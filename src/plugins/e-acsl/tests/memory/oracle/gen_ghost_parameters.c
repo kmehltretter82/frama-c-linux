@@ -16,7 +16,7 @@ void function(int a, int b, int c, int d)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int w = 0;
   int x = 1;
   int y = 2;

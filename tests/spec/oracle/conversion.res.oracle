@@ -34,7 +34,7 @@ int g(void)
 T const X;
 T const Tab[4];
 T_PTR_T4 const Tab_Ptr =
-  {(int *)(& X), (int *)(& X), (int *)(& X), (int *)(& X)};
+  {(T_PTR)(& X), (T_PTR)(& X), (T_PTR)(& X), (T_PTR)(& X)};
 /*@
 axiomatic useless_logic_cast {
   logic ℤ v2= 1 + 1;

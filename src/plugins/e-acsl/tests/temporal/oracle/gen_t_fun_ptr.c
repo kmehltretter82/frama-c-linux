@@ -11,11 +11,11 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 int *pfun(char c, int *p, int *p2, int *p3, int *p4, int i)
 {
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_temporal_pull_parameter((void *)(& p),1U,8UL);
   int *q = p;
   __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& p));
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   __e_acsl_temporal_save_return((void *)(& q));
   __e_acsl_delete_block((void *)(& p));
@@ -26,15 +26,15 @@ int *pfun(char c, int *p, int *p2, int *p3, int *p4, int i)
 int main(int argc, char const **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   int a = 1;
-  __e_acsl_store_block((void *)(& a),(size_t)4);
+  __e_acsl_store_block((void *)(& a),4UL);
   __e_acsl_full_init((void *)(& a));
   int *p = & a;
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& a));
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
-  uintptr_t addr = (unsigned long)(& addr);
+  uintptr_t addr = (uintptr_t)(& addr);
   __e_acsl_full_init((void *)(& p));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();

@@ -31,7 +31,7 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   unsigned long long x = my_pow((unsigned int)2,(unsigned int)63);
   {
     __e_acsl_mpz_t __gen_e_acsl_;
@@ -47,8 +47,7 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl_,2L);
     __e_acsl_assert_register_ulonglong(& __gen_e_acsl_assert_data,"x",0,x);
     __gmpz_init(__gen_e_acsl_x);
-    __gmpz_import(__gen_e_acsl_x,(size_t)1,1,(size_t)8,0,(size_t)0,
-                  (void const *)(& x));
+    __gmpz_import(__gen_e_acsl_x,1UL,1,8UL,0,0UL,(void const *)(& x));
     __gmpz_init(__gen_e_acsl_mul);
     __gmpz_mul(__gen_e_acsl_mul,(__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_x));

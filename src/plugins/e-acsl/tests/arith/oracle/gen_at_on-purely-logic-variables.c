@@ -17,7 +17,7 @@ void __gen_e_acsl_f(int *t);
 
 void f(int *t)
 {
-  __e_acsl_store_block((void *)(& t),(size_t)8);
+  __e_acsl_store_block((void *)(& t),8UL);
   __e_acsl_delete_block((void *)(& t));
   return;
 }
@@ -26,7 +26,7 @@ void g(void)
 {
   int *__gen_e_acsl_at;
   int m;
-  __gen_e_acsl_at = (int *)malloc((size_t)12);
+  __gen_e_acsl_at = (int *)malloc(12UL);
   m = 8;
   Q:
   {
@@ -110,15 +110,15 @@ int main(void)
   int *__gen_e_acsl_at;
   int __retres;
   int n;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __gen_e_acsl_at_8 = (long *)malloc((size_t)64);
-  __gen_e_acsl_at_7 = (int *)malloc((size_t)12000);
-  __gen_e_acsl_at_6 = (long *)malloc((size_t)3072);
-  __gen_e_acsl_at_5 = (int *)malloc((size_t)528);
-  __gen_e_acsl_at_3 = (int *)malloc((size_t)12);
-  __gen_e_acsl_at_2 = (long *)malloc((size_t)8);
-  __gen_e_acsl_at = (int *)malloc((size_t)4);
-  __e_acsl_store_block((void *)(& n),(size_t)4);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __gen_e_acsl_at_8 = (long *)malloc(64UL);
+  __gen_e_acsl_at_7 = (int *)malloc(12000UL);
+  __gen_e_acsl_at_6 = (long *)malloc(3072UL);
+  __gen_e_acsl_at_5 = (int *)malloc(528UL);
+  __gen_e_acsl_at_3 = (int *)malloc(12UL);
+  __gen_e_acsl_at_2 = (long *)malloc(8UL);
+  __gen_e_acsl_at = (int *)malloc(4UL);
+  __e_acsl_store_block((void *)(& n),4UL);
   __e_acsl_full_init((void *)(& n));
   n = 7;
   L:
@@ -620,7 +620,7 @@ int main(void)
    */
   ;
   int t[5] = {9, 12, 12, 12, -4};
-  __e_acsl_store_block((void *)(t),(size_t)20);
+  __e_acsl_store_block((void *)(t),20UL);
   __e_acsl_full_init((void *)(& t));
   __gen_e_acsl_f(t);
   g();
@@ -773,11 +773,11 @@ void __gen_e_acsl_f(int *t)
   int *__gen_e_acsl_at_3;
   int *__gen_e_acsl_at_2;
   int *__gen_e_acsl_at;
-  __gen_e_acsl_at_4 = (int *)malloc((size_t)8);
-  __gen_e_acsl_at_3 = (int *)malloc((size_t)8);
-  __gen_e_acsl_at_2 = (int *)malloc((size_t)4);
-  __gen_e_acsl_at = (int *)malloc((size_t)4);
-  __e_acsl_store_block((void *)(& t),(size_t)8);
+  __gen_e_acsl_at_4 = (int *)malloc(8UL);
+  __gen_e_acsl_at_3 = (int *)malloc(8UL);
+  __gen_e_acsl_at_2 = (int *)malloc(4UL);
+  __gen_e_acsl_at = (int *)malloc(4UL);
+  __e_acsl_store_block((void *)(& t),8UL);
   {
     int __gen_e_acsl_m;
     __gen_e_acsl_m = 4;

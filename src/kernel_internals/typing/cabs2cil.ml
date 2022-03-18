@@ -2906,17 +2906,15 @@ let rec castTo ?context ?(fromsource=false)
   Kernel.debug ~dkey:Kernel.dkey_typing_cast "@[%t: castTo:%s %a->%a@\n@]"
     Cil.pp_thisloc (if fromsource then "(source)" else "")
     Cil_printer.pp_typ ot Cil_printer.pp_typ nt;
-  let ot' = unrollType ot in
-  let nt' = unrollType nt in
-  if not fromsource && not (need_cast ot' nt') then begin
+  if not fromsource && not (need_cast ot nt) then begin
     (* Do not put the cast if it is not necessary, unless it is from the
      * source. *)
     Kernel.debug ~dkey:Kernel.dkey_typing_cast "no cast to perform";
     (ot, e)
   end else begin
-    let nt' = if fromsource then nt' else !typeForInsertedCast e ot' nt' in
-    let result = (nt', if theMachine.insertImplicitCasts || fromsource then
-                    Cil.mkCastT ~force:true ~oldt:ot ~newt:nt' e else e)
+    let nt = if fromsource then nt else !typeForInsertedCast e ot nt in
+    let result = (nt, if theMachine.insertImplicitCasts || fromsource then
+                    Cil.mkCastT ~force:true ~oldt:ot ~newt:nt e else e)
     in
     let error s =
       if fromsource then abort_context s else Kernel.fatal ~current:true s
@@ -2925,10 +2923,10 @@ let rec castTo ?context ?(fromsource=false)
         ignore (check_strict_attributes true ot nt  && check_strict_attributes false nt ot);*)
     Kernel.debug ~dkey:Kernel.dkey_typing_cast
       "@[castTo: ot=%a nt=%a\n  result is %a@\n@]"
-      Cil_printer.pp_typ ot Cil_printer.pp_typ nt'
+      Cil_printer.pp_typ ot Cil_printer.pp_typ nt
       Cil_printer.pp_exp (snd result);
     (* Now see if we can have a cast here *)
-    match ot', nt' with
+    match Cil.unrollType ot, Cil.unrollType nt with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in castTo"
     | t, TInt(IBool,_) when is_scalar_type t ->
@@ -2936,7 +2934,7 @@ let rec castTo ?context ?(fromsource=false)
       else
         nt,
         Cil.mkCastT
-          ~oldt:ot ~newt:nt'
+          ~oldt:ot ~newt:nt
           (constFold true
              (new_exp  ~loc:e.eloc
                 (BinOp(Ne,e,Cil.integer ~loc:e.eloc 0,intType))))
@@ -2971,7 +2969,7 @@ let rec castTo ?context ?(fromsource=false)
         | Lval lv ->  Cil.mkAddrOf ~loc:e.eloc lv
         | _ -> e (* function decay into pointer anyway *)
       in
-      castTo ?context ~fromsource (TPtr (ot', [])) nt' clean_e
+      castTo ?context ~fromsource (TPtr (ot, [])) nt clean_e
 
     (* accept converting a ptr to function to/from a ptr to void, even though
        not really accepted by the standard. gcc supports it. though
@@ -3025,10 +3023,10 @@ let rec castTo ?context ?(fromsource=false)
     | TArray _, TPtr _ -> result
 
     | TArray(t1,_,_), TArray(t2,None,_)
-      when Cil_datatype.Typ.equal t1 t2 -> (nt', e)
+      when Cil_datatype.Typ.equal t1 t2 -> (nt, e)
 
     | TPtr _, TArray(_,_,_) ->
-      error "Cast over a non-scalar type %a" Cil_printer.pp_typ nt';
+      error "Cast over a non-scalar type %a" Cil_printer.pp_typ nt;
 
     | TEnum _, TInt _ -> result
     | TFloat _, (TInt _|TEnum _) -> result
@@ -3039,7 +3037,7 @@ let rec castTo ?context ?(fromsource=false)
        | Const (CEnum { eihost = ei'})
          when ei.ename = ei'.ename && not fromsource &&
               Cil.bytesSizeOfInt ik = Cil.bytesSizeOfInt ei'.ekind
-         -> (nt',e)
+         -> (nt,e)
        | _ -> result)
     | TEnum _, TEnum _ -> result
 
@@ -3077,7 +3075,7 @@ let rec castTo ?context ?(fromsource=false)
         match isTransparentUnion ot with
         | None ->
           Kernel.fatal ~current:true "castTo %a -> %a"
-            Cil_printer.pp_typ ot Cil_printer.pp_typ nt'
+            Cil_printer.pp_typ ot Cil_printer.pp_typ nt
         | Some fstfield -> begin
             (* We do it now only if the expression is an lval *)
             let e' =
@@ -3091,11 +3089,11 @@ let rec castTo ?context ?(fromsource=false)
                   Cil_printer.pp_exp e
             in
             (* Continue casting *)
-            castTo ?context ~fromsource:fromsource fstfield.ftype nt' e'
+            castTo ?context ~fromsource:fromsource fstfield.ftype nt e'
           end
       end
     | _ ->
-      error "cannot cast from %a to %a@\n" Cil_printer.pp_typ ot Cil_printer.pp_typ nt'
+      error "cannot cast from %a to %a@\n" Cil_printer.pp_typ ot Cil_printer.pp_typ nt
   end
 
 (* Create and cache varinfo's for globals. Starts with a varinfo but if the

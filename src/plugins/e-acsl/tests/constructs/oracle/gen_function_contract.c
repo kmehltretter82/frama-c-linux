@@ -181,7 +181,7 @@ void o(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __gen_e_acsl_f();
   __gen_e_acsl_g();
   __gen_e_acsl_h();
@@ -234,7 +234,7 @@ void __gen_e_acsl_o(void)
     int __gen_e_acsl_assumes_value;
     int __gen_e_acsl_active_bhvrs;
     __gen_e_acsl_at = Y;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)4);
+    __gen_e_acsl_contract = __e_acsl_contract_init(4UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"X",0,X);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -245,16 +245,14 @@ void __gen_e_acsl_o(void)
     __gen_e_acsl_assert_data.line = 93;
     __e_acsl_assert(X > -1000,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                           Y < 0);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
-                                           Y >= 0);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)2,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,Y < 0);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,Y >= 0);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,2UL,
                                            Y % 2 == 1);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)3,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,3UL,
                                            Y % 2 == 0);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
@@ -270,7 +268,7 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
@@ -286,7 +284,7 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)2);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,2UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
@@ -302,7 +300,7 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)3);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,3UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
@@ -318,7 +316,7 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_behaviors
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)2,1,0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,2UL,1,0);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
@@ -350,7 +348,7 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     }
     __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_behaviors
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)2,2,3);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,2UL,2,3);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
@@ -420,7 +418,7 @@ void __gen_e_acsl_o(void)
     __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_12);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value_2) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
         {.values = (void *)0};
@@ -438,7 +436,7 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     }
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value_2) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
         {.values = (void *)0};
@@ -456,7 +454,7 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
     }
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)2);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,2UL);
     if (__gen_e_acsl_assumes_value_2) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
         {.values = (void *)0};
@@ -474,7 +472,7 @@ void __gen_e_acsl_o(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
     }
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)3);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,3UL);
     if (__gen_e_acsl_assumes_value_2) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
         {.values = (void *)0};
@@ -511,7 +509,7 @@ void __gen_e_acsl_n(void)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
   {
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"X",0,X);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -533,16 +531,14 @@ void __gen_e_acsl_n(void)
     __gen_e_acsl_assert_data_2.line = 80;
     __e_acsl_assert(X < 10,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                           X == 7);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
-                                           X == 5);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,X == 7);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,X == 5);
   }
   n();
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
@@ -558,7 +554,7 @@ void __gen_e_acsl_n(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
@@ -595,18 +591,17 @@ void __gen_e_acsl_m(void)
   {
     int __gen_e_acsl_and;
     __gen_e_acsl_at = (long)X;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                           X == 7);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,X == 7);
     if (X == 5) __gen_e_acsl_and = Y == 2; else __gen_e_acsl_and = 0;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            __gen_e_acsl_and);
   }
   m();
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
@@ -622,7 +617,7 @@ void __gen_e_acsl_m(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
@@ -694,14 +689,13 @@ void __gen_e_acsl_k(void)
   {
     int __gen_e_acsl_and;
     int __gen_e_acsl_assumes_value;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                           X == 1);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,X == 1);
     if (X == 3) __gen_e_acsl_and = Y == 2; else __gen_e_acsl_and = 0;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            __gen_e_acsl_and);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
@@ -717,7 +711,7 @@ void __gen_e_acsl_k(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
@@ -765,11 +759,11 @@ void __gen_e_acsl_j(void)
   __e_acsl_contract_t *__gen_e_acsl_contract;
   {
     int __gen_e_acsl_assumes_value;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,1);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,1);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,1);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,1);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
@@ -785,7 +779,7 @@ void __gen_e_acsl_j(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
@@ -818,7 +812,7 @@ void __gen_e_acsl_j(void)
   {
     int __gen_e_acsl_assumes_value_2;
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value_2) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
@@ -834,7 +828,7 @@ void __gen_e_acsl_j(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value_2) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};

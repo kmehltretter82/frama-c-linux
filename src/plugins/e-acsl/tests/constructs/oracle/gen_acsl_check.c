@@ -22,7 +22,7 @@ void g(int a, int *b)
 {
   {
     int __gen_e_acsl_valid_read;
-    __e_acsl_store_block((void *)(& b),(size_t)8);
+    __e_acsl_store_block((void *)(& b),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*(b + 1)",0,
@@ -122,11 +122,11 @@ void __e_acsl_globals_init(void)
 
 int main(void)
 {
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   int a = 0;
   int b[3] = {1, 2, 3};
-  __e_acsl_store_block((void *)(b),(size_t)12);
+  __e_acsl_store_block((void *)(b),12UL);
   __e_acsl_full_init((void *)(& b));
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};

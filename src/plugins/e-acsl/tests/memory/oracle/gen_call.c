@@ -14,8 +14,8 @@ int *__gen_e_acsl_f(int *x, int *y);
 
 int *f(int *x, int *y)
 {
-  __e_acsl_store_block((void *)(& y),(size_t)8);
-  __e_acsl_store_block((void *)(& x),(size_t)8);
+  __e_acsl_store_block((void *)(& y),8UL);
+  __e_acsl_store_block((void *)(& x),8UL);
   __e_acsl_initialize((void *)y,sizeof(int));
   *y = 1;
   __e_acsl_delete_block((void *)(& y));
@@ -27,13 +27,13 @@ int main(void)
 {
   int __retres;
   int *p;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& p),8UL);
   int x = 0;
-  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_store_block((void *)(& x),4UL);
   __e_acsl_full_init((void *)(& x));
   int *q = malloc(sizeof(int));
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   int *r = malloc(sizeof(int));
   __e_acsl_full_init((void *)(& p));
@@ -52,9 +52,9 @@ int main(void)
 int *__gen_e_acsl_f(int *x, int *y)
 {
   int *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
-  __e_acsl_store_block((void *)(& y),(size_t)8);
-  __e_acsl_store_block((void *)(& x),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& y),8UL);
+  __e_acsl_store_block((void *)(& x),8UL);
   __retres = f(x,y);
   {
     int __gen_e_acsl_valid;

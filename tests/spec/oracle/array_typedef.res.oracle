@@ -74,7 +74,7 @@ void send_addr(int const addr[4]);
 
 void send_msg(msg const *msg)
 {
-  send_addr(msg->src);
+  send_addr((int const *)(msg->src));
   return;
 }
 

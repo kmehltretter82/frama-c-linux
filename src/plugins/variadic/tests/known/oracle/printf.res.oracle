@@ -625,12 +625,12 @@ int main(void)
   unsigned int ui = (unsigned int)42;
   unsigned long ul = (unsigned long)42;
   unsigned long long ull = (unsigned long long)42;
-  uintmax_t uj = (unsigned long long)42;
+  uintmax_t uj = (uintmax_t)42;
   double f = (double)42.0f;
   long double L = 42.0l;
   uint64_t u64 = 42ul;
-  int8_t i8 = (signed char)42;
-  uint_least64_t uleast64 = (unsigned long)42u;
+  int8_t i8 = (int8_t)42;
+  uint_least64_t uleast64 = (uint_least64_t)42u;
   int_fast32_t ifast32 = 42;
   printf("Hello world !\n"); /* printf_va_1 */
   printf("%s%n",string,& i); /* printf_va_2 */

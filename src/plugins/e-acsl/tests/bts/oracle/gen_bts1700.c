@@ -16,9 +16,9 @@ int main(void)
   int __retres;
   struct toto s;
   struct toto *p;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
-  __e_acsl_store_block((void *)(& s),(size_t)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& p),8UL);
+  __e_acsl_store_block((void *)(& s),0UL);
   {
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};

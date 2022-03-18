@@ -155,12 +155,12 @@ char *__gen_e_acsl_strdup(char const *s)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
   char *__retres;
-  __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+  __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
   __retres = strdup(s);
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
@@ -246,15 +246,15 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
   pid_t __retres;
   {
     int __gen_e_acsl_assumes_value;
-    __e_acsl_store_block((void *)(& stat_loc),(size_t)8);
+    __e_acsl_store_block((void *)(& stat_loc),8UL);
     __gen_e_acsl_at = stat_loc;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            stat_loc == (int *)0);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            stat_loc != (int *)0);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_valid;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
@@ -558,7 +558,7 @@ int main(int argc, char const **argv)
 {
   int __retres;
   int res;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   __e_acsl_globals_init();
   char const *cl = __gen_e_acsl_literal_string_6;
   char const *cr = __gen_e_acsl_literal_string_6;
@@ -578,7 +578,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status;
-      __e_acsl_store_block((void *)(& process_status),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status),4UL);
       __gen_e_acsl_waitpid(pid,& process_status,0);
       signal_eval(process_status,0,__gen_e_acsl_literal_string_8);
       __e_acsl_delete_block((void *)(& process_status));
@@ -596,7 +596,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_0;
-      __e_acsl_store_block((void *)(& process_status_0),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_0),4UL);
       __gen_e_acsl_waitpid(pid_0,& process_status_0,0);
       signal_eval(process_status_0,0,__gen_e_acsl_literal_string_9);
       __e_acsl_delete_block((void *)(& process_status_0));
@@ -614,7 +614,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_1;
-      __e_acsl_store_block((void *)(& process_status_1),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_1),4UL);
       __gen_e_acsl_waitpid(pid_1,& process_status_1,0);
       signal_eval(process_status_1,0,__gen_e_acsl_literal_string_10);
       __e_acsl_delete_block((void *)(& process_status_1));
@@ -633,7 +633,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_2;
-      __e_acsl_store_block((void *)(& process_status_2),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_2),4UL);
       __gen_e_acsl_waitpid(pid_2,& process_status_2,0);
       signal_eval(process_status_2,1,__gen_e_acsl_literal_string_11);
       __e_acsl_delete_block((void *)(& process_status_2));
@@ -653,7 +653,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_3;
-      __e_acsl_store_block((void *)(& process_status_3),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_3),4UL);
       __gen_e_acsl_waitpid(pid_3,& process_status_3,0);
       signal_eval(process_status_3,1,__gen_e_acsl_literal_string_12);
       __e_acsl_delete_block((void *)(& process_status_3));
@@ -672,7 +672,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_4;
-      __e_acsl_store_block((void *)(& process_status_4),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_4),4UL);
       __gen_e_acsl_waitpid(pid_4,& process_status_4,0);
       signal_eval(process_status_4,1,__gen_e_acsl_literal_string_13);
       __e_acsl_delete_block((void *)(& process_status_4));
@@ -692,7 +692,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_5;
-      __e_acsl_store_block((void *)(& process_status_5),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_5),4UL);
       __gen_e_acsl_waitpid(pid_5,& process_status_5,0);
       signal_eval(process_status_5,1,__gen_e_acsl_literal_string_14);
       __e_acsl_delete_block((void *)(& process_status_5));
@@ -710,7 +710,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_6;
-      __e_acsl_store_block((void *)(& process_status_6),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_6),4UL);
       __gen_e_acsl_waitpid(pid_6,& process_status_6,0);
       signal_eval(process_status_6,1,__gen_e_acsl_literal_string_15);
       __e_acsl_delete_block((void *)(& process_status_6));
@@ -728,7 +728,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_7;
-      __e_acsl_store_block((void *)(& process_status_7),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_7),4UL);
       __gen_e_acsl_waitpid(pid_7,& process_status_7,0);
       signal_eval(process_status_7,1,__gen_e_acsl_literal_string_16);
       __e_acsl_delete_block((void *)(& process_status_7));
@@ -748,7 +748,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_8;
-      __e_acsl_store_block((void *)(& process_status_8),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_8),4UL);
       __gen_e_acsl_waitpid(pid_8,& process_status_8,0);
       signal_eval(process_status_8,1,__gen_e_acsl_literal_string_17);
       __e_acsl_delete_block((void *)(& process_status_8));
@@ -766,7 +766,7 @@ int main(int argc, char const **argv)
     }
     else {
       int process_status_9;
-      __e_acsl_store_block((void *)(& process_status_9),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_9),4UL);
       __gen_e_acsl_waitpid(pid_9,& process_status_9,0);
       signal_eval(process_status_9,1,__gen_e_acsl_literal_string_18);
       __e_acsl_delete_block((void *)(& process_status_9));
@@ -781,14 +781,14 @@ int main(int argc, char const **argv)
     if (! pid_10) {
       int tmp_35;
       int tmp_36;
-      tmp_35 = __e_acsl_builtin_strncmp(cl,cr,(unsigned long)3);
-      tmp_36 = __e_acsl_builtin_strncmp(cl,cr,(unsigned long)3);
+      tmp_35 = __e_acsl_builtin_strncmp(cl,cr,(size_t)3);
+      tmp_36 = __e_acsl_builtin_strncmp(cl,cr,(size_t)3);
       fail_ncomp(tmp_36 != 0,(char *)__gen_e_acsl_literal_string_7,tmp_35,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_10;
-      __e_acsl_store_block((void *)(& process_status_10),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_10),4UL);
       __gen_e_acsl_waitpid(pid_10,& process_status_10,0);
       signal_eval(process_status_10,0,__gen_e_acsl_literal_string_19);
       __e_acsl_delete_block((void *)(& process_status_10));
@@ -800,15 +800,15 @@ int main(int argc, char const **argv)
       int tmp_38;
       int tmp_39;
       tmp_38 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(unsigned long)3);
+                                        (char const *)(nar),(size_t)3);
       tmp_39 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(unsigned long)3);
+                                        (char const *)(nar),(size_t)3);
       fail_ncomp(tmp_39 != 0,(char *)__gen_e_acsl_literal_string_7,tmp_38,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_11;
-      __e_acsl_store_block((void *)(& process_status_11),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_11),4UL);
       __gen_e_acsl_waitpid(pid_11,& process_status_11,0);
       signal_eval(process_status_11,0,__gen_e_acsl_literal_string_20);
       __e_acsl_delete_block((void *)(& process_status_11));
@@ -820,15 +820,15 @@ int main(int argc, char const **argv)
       int tmp_41;
       int tmp_42;
       tmp_41 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (unsigned long)3);
+                                        (size_t)3);
       tmp_42 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (unsigned long)3);
+                                        (size_t)3);
       fail_ncomp(tmp_42 != 0,(char *)__gen_e_acsl_literal_string_7,tmp_41,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_12;
-      __e_acsl_store_block((void *)(& process_status_12),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_12),4UL);
       __gen_e_acsl_waitpid(pid_12,& process_status_12,0);
       signal_eval(process_status_12,0,__gen_e_acsl_literal_string_21);
       __e_acsl_delete_block((void *)(& process_status_12));
@@ -840,15 +840,15 @@ int main(int argc, char const **argv)
       int tmp_44;
       int tmp_45;
       tmp_44 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(unsigned long)6);
+                                        (char const *)(nar),(size_t)6);
       tmp_45 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(unsigned long)6);
+                                        (char const *)(nar),(size_t)6);
       fail_ncomp(tmp_45 != 0,(char *)__gen_e_acsl_literal_string_7,tmp_44,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_13;
-      __e_acsl_store_block((void *)(& process_status_13),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_13),4UL);
       __gen_e_acsl_waitpid(pid_13,& process_status_13,0);
       signal_eval(process_status_13,0,__gen_e_acsl_literal_string_22);
       __e_acsl_delete_block((void *)(& process_status_13));
@@ -860,15 +860,15 @@ int main(int argc, char const **argv)
       int tmp_47;
       int tmp_48;
       tmp_47 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (unsigned long)6);
+                                        (size_t)6);
       tmp_48 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (unsigned long)6);
+                                        (size_t)6);
       fail_ncomp(tmp_48 != 0,(char *)__gen_e_acsl_literal_string_7,tmp_47,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_14;
-      __e_acsl_store_block((void *)(& process_status_14),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_14),4UL);
       __gen_e_acsl_waitpid(pid_14,& process_status_14,0);
       signal_eval(process_status_14,0,__gen_e_acsl_literal_string_23);
       __e_acsl_delete_block((void *)(& process_status_14));
@@ -881,15 +881,15 @@ int main(int argc, char const **argv)
       int tmp_50;
       int tmp_51;
       tmp_50 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(unsigned long)4);
+                                        (char const *)(nar),(size_t)4);
       tmp_51 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(unsigned long)4);
+                                        (char const *)(nar),(size_t)4);
       fail_ncomp(tmp_51 == 0,(char *)__gen_e_acsl_literal_string_24,tmp_50,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_15;
-      __e_acsl_store_block((void *)(& process_status_15),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_15),4UL);
       __gen_e_acsl_waitpid(pid_15,& process_status_15,0);
       signal_eval(process_status_15,0,__gen_e_acsl_literal_string_25);
       __e_acsl_delete_block((void *)(& process_status_15));
@@ -903,15 +903,15 @@ int main(int argc, char const **argv)
       int tmp_53;
       int tmp_54;
       tmp_53 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(unsigned long)4);
+                                        (char const *)(nar),(size_t)4);
       tmp_54 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(unsigned long)4);
+                                        (char const *)(nar),(size_t)4);
       fail_ncomp(tmp_54 == 0,(char *)__gen_e_acsl_literal_string_24,tmp_53,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_16;
-      __e_acsl_store_block((void *)(& process_status_16),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_16),4UL);
       __gen_e_acsl_waitpid(pid_16,& process_status_16,0);
       signal_eval(process_status_16,0,__gen_e_acsl_literal_string_26);
       __e_acsl_delete_block((void *)(& process_status_16));
@@ -924,15 +924,15 @@ int main(int argc, char const **argv)
       int tmp_56;
       int tmp_57;
       tmp_56 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (unsigned long)4);
+                                        (size_t)4);
       tmp_57 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (unsigned long)4);
+                                        (size_t)4);
       fail_ncomp(tmp_57 == 0,(char *)__gen_e_acsl_literal_string_24,tmp_56,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_17;
-      __e_acsl_store_block((void *)(& process_status_17),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_17),4UL);
       __gen_e_acsl_waitpid(pid_17,& process_status_17,0);
       signal_eval(process_status_17,0,__gen_e_acsl_literal_string_27);
       __e_acsl_delete_block((void *)(& process_status_17));
@@ -946,15 +946,15 @@ int main(int argc, char const **argv)
       int tmp_59;
       int tmp_60;
       tmp_59 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (unsigned long)4);
+                                        (size_t)4);
       tmp_60 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (unsigned long)4);
+                                        (size_t)4);
       fail_ncomp(tmp_60 == 0,(char *)__gen_e_acsl_literal_string_24,tmp_59,0);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_18;
-      __e_acsl_store_block((void *)(& process_status_18),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_18),4UL);
       __gen_e_acsl_waitpid(pid_18,& process_status_18,0);
       signal_eval(process_status_18,0,__gen_e_acsl_literal_string_28);
       __e_acsl_delete_block((void *)(& process_status_18));
@@ -964,12 +964,12 @@ int main(int argc, char const **argv)
     pid_t pid_19 = __gen_e_acsl_fork();
     if (! pid_19) {
       res = __e_acsl_builtin_strncmp((char const *)(nal),(char const *)(nar),
-                                     (unsigned long)5);
+                                     (size_t)5);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_19;
-      __e_acsl_store_block((void *)(& process_status_19),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_19),4UL);
       __gen_e_acsl_waitpid(pid_19,& process_status_19,0);
       signal_eval(process_status_19,1,__gen_e_acsl_literal_string_29);
       __e_acsl_delete_block((void *)(& process_status_19));
@@ -981,12 +981,12 @@ int main(int argc, char const **argv)
     pid_t pid_20 = __gen_e_acsl_fork();
     if (! pid_20) {
       res = __e_acsl_builtin_strncmp((char const *)(al),(char const *)(ar),
-                                     (unsigned long)5);
+                                     (size_t)5);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_20;
-      __e_acsl_store_block((void *)(& process_status_20),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_20),4UL);
       __gen_e_acsl_waitpid(pid_20,& process_status_20,0);
       signal_eval(process_status_20,1,__gen_e_acsl_literal_string_30);
       __e_acsl_delete_block((void *)(& process_status_20));
@@ -996,12 +996,12 @@ int main(int argc, char const **argv)
     pid_t pid_21 = __gen_e_acsl_fork();
     if (! pid_21) {
       res = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                     (unsigned long)5);
+                                     (size_t)5);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_21;
-      __e_acsl_store_block((void *)(& process_status_21),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_21),4UL);
       __gen_e_acsl_waitpid(pid_21,& process_status_21,0);
       signal_eval(process_status_21,1,__gen_e_acsl_literal_string_31);
       __e_acsl_delete_block((void *)(& process_status_21));
@@ -1013,12 +1013,12 @@ int main(int argc, char const **argv)
     pid_t pid_22 = __gen_e_acsl_fork();
     if (! pid_22) {
       res = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                     (unsigned long)5);
+                                     (size_t)5);
       __gen_e_acsl_exit(0);
     }
     else {
       int process_status_22;
-      __e_acsl_store_block((void *)(& process_status_22),(size_t)4);
+      __e_acsl_store_block((void *)(& process_status_22),4UL);
       __gen_e_acsl_waitpid(pid_22,& process_status_22,0);
       signal_eval(process_status_22,1,__gen_e_acsl_literal_string_32);
       __e_acsl_delete_block((void *)(& process_status_22));

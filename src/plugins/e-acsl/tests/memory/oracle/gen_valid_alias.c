@@ -14,9 +14,9 @@ int main(void)
   int __retres;
   int *a;
   int *b;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& b),(size_t)8);
-  __e_acsl_store_block((void *)(& a),(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& b),8UL);
+  __e_acsl_store_block((void *)(& a),8UL);
   int n = 0;
   {
     int __gen_e_acsl_initialized;

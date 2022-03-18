@@ -20,7 +20,7 @@ int main(void)
 {
   int __retres;
   union __anonunion_s_2 s;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int n = -2;
   {
     long __gen_e_acsl_u;
@@ -179,7 +179,7 @@ int main(void)
   }
   /*@ assert \let u = 'b'; c < u; */ ;
   float f = 1.0f;
-  __e_acsl_store_block((void *)(& f),(size_t)4);
+  __e_acsl_store_block((void *)(& f),4UL);
   __e_acsl_full_init((void *)(& f));
   {
     float __gen_e_acsl_u_10;
@@ -236,7 +236,7 @@ int main(void)
   }
   /*@ assert (\let u = &t[1]; 1) == 1; */ ;
   struct __anonstruct_r_1 r = {.x = 1, .y = 2};
-  __e_acsl_store_block((void *)(& r),(size_t)8);
+  __e_acsl_store_block((void *)(& r),8UL);
   __e_acsl_full_init((void *)(& r));
   {
     struct __anonstruct_r_1 __gen_e_acsl_u_13;

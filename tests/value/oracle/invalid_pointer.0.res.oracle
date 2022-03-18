@@ -112,8 +112,7 @@
 [eva:alarm] invalid_pointer.c:142: Warning: 
   invalid pointer creation.
   assert
-  \object_pointer((int *)((unsigned int)((unsigned int)(&x) +
-                                         (unsigned int)undet)));
+  \object_pointer((int *)((uintptr_t)((uintptr_t)(&x) + (uintptr_t)undet)));
 [eva] invalid_pointer.c:143: assertion got status valid.
 [eva] invalid_pointer.c:144: assertion got status valid.
 [eva] invalid_pointer.c:145: 

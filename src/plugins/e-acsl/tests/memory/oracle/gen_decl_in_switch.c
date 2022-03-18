@@ -10,12 +10,12 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 void decl_in_switch(int value)
 {
-  __e_acsl_store_block((void *)(& value),(size_t)4);
+  __e_acsl_store_block((void *)(& value),4UL);
   switch (value) {
     int *p;
-    __e_acsl_store_block((void *)(& p),(size_t)8);
+    __e_acsl_store_block((void *)(& p),8UL);
     default:
-    __e_acsl_store_block_duplicate((void *)(& p),(size_t)8);
+    __e_acsl_store_block_duplicate((void *)(& p),8UL);
     __e_acsl_full_init((void *)(& p));
     p = & value;
     __e_acsl_delete_block((void *)(& p));
@@ -29,7 +29,7 @@ void decl_in_switch(int value)
 void compound_decl_and_init(int value)
 {
   int a = 0;
-  __e_acsl_store_block((void *)(& a),(size_t)4);
+  __e_acsl_store_block((void *)(& a),4UL);
   __e_acsl_full_init((void *)(& a));
   {
     int __gen_e_acsl_valid;
@@ -78,7 +78,7 @@ void compound_decl_and_init(int value)
     /*@ assert \valid(&b); */ ;
     case 0: ;
     int c = 3;
-    __e_acsl_store_block((void *)(& c),(size_t)4);
+    __e_acsl_store_block((void *)(& c),4UL);
     __e_acsl_full_init((void *)(& c));
     {
       int __gen_e_acsl_valid_3;
@@ -104,10 +104,10 @@ void compound_decl_and_init(int value)
     /*@ assert \valid(&c); */ ;
     __e_acsl_delete_block((void *)(& c));
     break;
-    case 1: __e_acsl_store_block_duplicate((void *)(& c),(size_t)4);
+    case 1: __e_acsl_store_block_duplicate((void *)(& c),4UL);
             ;
     int d = 4;
-    __e_acsl_store_block((void *)(& d),(size_t)4);
+    __e_acsl_store_block((void *)(& d),4UL);
     __e_acsl_full_init((void *)(& d));
     {
       int __gen_e_acsl_valid_4;
@@ -144,7 +144,7 @@ void compound_decl_and_init(int value)
 void separate_decl_and_init(int value)
 {
   int a;
-  __e_acsl_store_block((void *)(& a),(size_t)4);
+  __e_acsl_store_block((void *)(& a),4UL);
   __e_acsl_full_init((void *)(& a));
   a = 1;
   {
@@ -172,8 +172,8 @@ void separate_decl_and_init(int value)
     int b;
     int c;
     int d;
-    __e_acsl_store_block((void *)(& d),(size_t)4);
-    __e_acsl_store_block((void *)(& c),(size_t)4);
+    __e_acsl_store_block((void *)(& d),4UL);
+    __e_acsl_store_block((void *)(& c),4UL);
     b = 2;
     {
       int __gen_e_acsl_valid_2;
@@ -198,8 +198,8 @@ void separate_decl_and_init(int value)
     }
     /*@ assert \valid(&b); */ ;
     case 0:
-    __e_acsl_store_block_duplicate((void *)(& c),(size_t)4);
-    __e_acsl_store_block_duplicate((void *)(& d),(size_t)4);
+    __e_acsl_store_block_duplicate((void *)(& c),4UL);
+    __e_acsl_store_block_duplicate((void *)(& d),4UL);
     ;
     __e_acsl_full_init((void *)(& c));
     c = 3;
@@ -229,8 +229,8 @@ void separate_decl_and_init(int value)
     __e_acsl_delete_block((void *)(& d));
     break;
     case 1:
-    __e_acsl_store_block_duplicate((void *)(& c),(size_t)4);
-    __e_acsl_store_block_duplicate((void *)(& d),(size_t)4);
+    __e_acsl_store_block_duplicate((void *)(& c),4UL);
+    __e_acsl_store_block_duplicate((void *)(& d),4UL);
     ;
     __e_acsl_full_init((void *)(& d));
     d = 4;
@@ -272,7 +272,7 @@ void label_in_switch(int value)
   switch (value) {
     K: ;
     int d = 0;
-    __e_acsl_store_block((void *)(& d),(size_t)4);
+    __e_acsl_store_block((void *)(& d),4UL);
     __e_acsl_full_init((void *)(& d));
     {
       int __gen_e_acsl_valid;
@@ -296,10 +296,10 @@ void label_in_switch(int value)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     /*@ assert \valid(&d); */ ;
-    L: case 0: __e_acsl_store_block_duplicate((void *)(& d),(size_t)4);
+    L: case 0: __e_acsl_store_block_duplicate((void *)(& d),4UL);
                ;
     int e = 1;
-    __e_acsl_store_block((void *)(& e),(size_t)4);
+    __e_acsl_store_block((void *)(& e),4UL);
     __e_acsl_full_init((void *)(& e));
     {
       int __gen_e_acsl_valid_2;
@@ -327,11 +327,11 @@ void label_in_switch(int value)
     __e_acsl_delete_block((void *)(& e));
     break;
     case 1:
-    __e_acsl_store_block_duplicate((void *)(& d),(size_t)4);
-    __e_acsl_store_block_duplicate((void *)(& e),(size_t)4);
+    __e_acsl_store_block_duplicate((void *)(& d),4UL);
+    __e_acsl_store_block_duplicate((void *)(& e),4UL);
     ;
     int ff = 2;
-    __e_acsl_store_block((void *)(& ff),(size_t)4);
+    __e_acsl_store_block((void *)(& ff),4UL);
     __e_acsl_full_init((void *)(& ff));
     {
       int __gen_e_acsl_valid_3;
@@ -373,7 +373,7 @@ void label_in_switch(int value)
 int main(int argc, char **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,& argv,(size_t)8);
+  __e_acsl_memory_init(& argc,& argv,8UL);
   decl_in_switch(argc);
   compound_decl_and_init(argc);
   separate_decl_and_init(argc);

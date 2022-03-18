@@ -164,16 +164,15 @@ void nested(int (*src)[10], int (*dest)[10], int n)
 
 void with_void(void *src, void *dest, int n)
 {
-  void *res = memcpy(dest,(void const *)src,(unsigned long)n);
-  memcpy(src,(void const *)res,(unsigned long)n);
+  void *res = memcpy(dest,(void const *)src,(size_t)n);
+  memcpy(src,(void const *)res,(size_t)n);
   return;
 }
 
 void with_incomplete(struct incomplete *src, struct incomplete *dest, int n)
 {
-  struct incomplete *res =
-    memcpy((void *)dest,(void const *)src,(unsigned long)n);
-  memcpy((void *)src,(void const *)res,(unsigned long)n);
+  struct incomplete *res = memcpy((void *)dest,(void const *)src,(size_t)n);
+  memcpy((void *)src,(void const *)res,(size_t)n);
   return;
 }
 
@@ -356,16 +355,15 @@ void nested(int (*src)[10], int (*dest)[10], int n)
 
 void with_void(void *src, void *dest, int n)
 {
-  void *res = memcpy(dest,(void const *)src,(unsigned long)n);
-  memcpy(src,(void const *)res,(unsigned long)n);
+  void *res = memcpy(dest,(void const *)src,(size_t)n);
+  memcpy(src,(void const *)res,(size_t)n);
   return;
 }
 
 void with_incomplete(struct incomplete *src, struct incomplete *dest, int n)
 {
-  struct incomplete *res =
-    memcpy((void *)dest,(void const *)src,(unsigned long)n);
-  memcpy((void *)src,(void const *)res,(unsigned long)n);
+  struct incomplete *res = memcpy((void *)dest,(void const *)src,(size_t)n);
+  memcpy((void *)src,(void const *)res,(size_t)n);
   return;
 }
 

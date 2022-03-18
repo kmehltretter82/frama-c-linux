@@ -192,7 +192,7 @@ size_t fact2(size_t n)
       result *= n - i;
       {
         int __gen_e_acsl_and_2;
-        i += (size_t)1;
+        i ++;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
           {.values = (void *)0};
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,"i",0,i);
@@ -279,7 +279,7 @@ int odd(int n)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int f10 = f(10);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -355,7 +355,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
   /*@ assert fact7 == 5040; */ ;
-  size_t fact18 = __gen_e_acsl_fact2((unsigned long)18);
+  size_t fact18 = __gen_e_acsl_fact2((size_t)18);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};

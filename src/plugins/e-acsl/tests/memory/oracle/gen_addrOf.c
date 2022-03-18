@@ -13,9 +13,9 @@ void f(void)
   int m;
   int *u;
   int *p;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
-  __e_acsl_store_block((void *)(& u),(size_t)8);
-  __e_acsl_store_block((void *)(& m),(size_t)4);
+  __e_acsl_store_block((void *)(& p),8UL);
+  __e_acsl_store_block((void *)(& u),8UL);
+  __e_acsl_store_block((void *)(& m),4UL);
   __e_acsl_full_init((void *)(& u));
   u = & m;
   __e_acsl_full_init((void *)(& p));
@@ -51,7 +51,7 @@ void f(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int x = 0;
   f();
   {

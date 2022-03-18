@@ -17,7 +17,7 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& B),(size_t)4);
+    __e_acsl_store_block((void *)(& B),4UL);
     __e_acsl_full_init((void *)(& B));
   }
   return;
@@ -32,15 +32,15 @@ void __e_acsl_globals_clean(void)
 int main(int argc, char **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,& argv,(size_t)8);
+  __e_acsl_memory_init(& argc,& argv,8UL);
   __e_acsl_globals_init();
   int *p = (int *)0;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   int *q = (int *)0;
   int a = 1;
   int b = 2;
-  __e_acsl_store_block((void *)(& b),(size_t)4);
+  __e_acsl_store_block((void *)(& b),4UL);
   __e_acsl_full_init((void *)(& b));
   int c = 3;
   __e_acsl_full_init((void *)(& p));
@@ -162,14 +162,14 @@ int main(int argc, char **argv)
   }
   /*@ assert !\valid(p + 1); */ ;
   char *pmin = malloc(sizeof(int));
-  __e_acsl_store_block((void *)(& pmin),(size_t)8);
+  __e_acsl_store_block((void *)(& pmin),8UL);
   __e_acsl_full_init((void *)(& pmin));
   char *pmax = malloc(sizeof(int));
-  __e_acsl_store_block((void *)(& pmax),(size_t)8);
+  __e_acsl_store_block((void *)(& pmax),8UL);
   __e_acsl_full_init((void *)(& pmax));
-  if ((unsigned long)pmin > (unsigned long)pmax) {
+  if ((uintptr_t)pmin > (uintptr_t)pmax) {
     char *t = pmin;
-    __e_acsl_store_block((void *)(& t),(size_t)8);
+    __e_acsl_store_block((void *)(& t),8UL);
     __e_acsl_full_init((void *)(& t));
     __e_acsl_full_init((void *)(& pmin));
     pmin = pmax;
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
   *pmin = (char)'P';
   __e_acsl_initialize((void *)pmax,sizeof(char));
   *pmax = (char)'L';
-  int diff = (int)((unsigned long)pmax - (unsigned long)pmin);
+  int diff = (int)((uintptr_t)pmax - (uintptr_t)pmin);
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_3;
