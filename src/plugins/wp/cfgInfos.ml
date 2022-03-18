@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -60,7 +60,7 @@ let smoking infos s = wpreached s infos.reachability
 let unreachable infos v =
   match infos.body, infos.checkpath with
   | Some cfg , Some checkpath ->
-      not @@ CheckPath.check_path checkpath cfg.entry_point v
+    not @@ CheckPath.check_path checkpath cfg.entry_point v
   | _ -> true
 
 let terminates_deps infos = infos.terminates_deps
@@ -83,11 +83,11 @@ let selected_assigns ~prop = function
   | Cil_types.WritesAny -> false
   | Writes _ when prop = [] -> true
   | Writes l ->
-      let collect_names l (t, _) =
-        WpPropId.ident_names t.Cil_types.it_content.term_name @ l
-      in
-      let names = List.fold_left collect_names ["@assigns"] l in
-      WpPropId.are_selected_names prop names
+    let collect_names l (t, _) =
+      WpPropId.ident_names t.Cil_types.it_content.term_name @ l
+    in
+    let names = List.fold_left collect_names ["@assigns"] l in
+    WpPropId.are_selected_names prop names
 
 let selected_allocates ~prop = function
   | Cil_types.FreeAllocAny -> false
@@ -117,19 +117,19 @@ let selected_clause ~prop name getter kf =
 let selected_terminates ~prop kf =
   match Annotations.terminates kf with
   | None ->
-      Wp_parameters.TerminatesDefinitions.get ()
+    Wp_parameters.TerminatesDefinitions.get ()
   | Some ip ->
-      let tk_name = "@terminates" in
-      let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
-      WpPropId.are_selected_names prop (tk_name :: tp_names)
+    let tk_name = "@terminates" in
+    let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
+    WpPropId.are_selected_names prop (tk_name :: tp_names)
 
 let selected_decreases ~prop kf =
   match Annotations.decreases kf with
   | None -> false
   | Some (it, _) ->
-      let tk_name = "@decreases" in
-      let tp_names = WpPropId.ident_names it.term_name in
-      WpPropId.are_selected_names prop (tk_name :: tp_names)
+    let tk_name = "@decreases" in
+    let tp_names = WpPropId.ident_names it.term_name in
+    WpPropId.are_selected_names prop (tk_name :: tp_names)
 
 let selected_disjoint_complete kf ~bhv ~prop =
   selected_default ~bhv &&
@@ -156,32 +156,32 @@ let collect_calls ~bhv ?(on_missing_calls=fun _ -> ()) kf stmt =
   let open Cil_types in
   match stmt.skind with
   | Instr(Call(_,fct,_,_)) ->
-      begin
-        match Kernel_function.get_called fct with
-        | Some kf -> Fset.singleton kf
-        | None ->
-            let bhvs =
-              if bhv = []
-              then List.map (fun b -> b.b_name) (Annotations.behaviors kf)
-              else bhv in
-            let calls =
-              List.fold_left
-                (fun fs bhv -> match Dyncall.get ~bhv stmt with
-                   | None -> fs
-                   | Some(_,kfs) -> List.fold_right Fset.add kfs fs
-                ) Fset.empty bhvs
-            in
-            if Fset.is_empty calls then
-              on_missing_calls stmt ;
-            calls
-      end
+    begin
+      match Kernel_function.get_called fct with
+      | Some kf -> Fset.singleton kf
+      | None ->
+        let bhvs =
+          if bhv = []
+          then List.map (fun b -> b.b_name) (Annotations.behaviors kf)
+          else bhv in
+        let calls =
+          List.fold_left
+            (fun fs bhv -> match Dyncall.get ~bhv stmt with
+               | None -> fs
+               | Some(_,kfs) -> List.fold_right Fset.add kfs fs
+            ) Fset.empty bhvs
+        in
+        if Fset.is_empty calls then
+          on_missing_calls stmt ;
+        calls
+    end
   | Instr(Local_init(x,ConsInit(vf, args, kind), loc)) ->
-      Cil.treat_constructor_as_func
-        (fun _r fct _args _loc ->
-           match Kernel_function.get_called fct with
-           | Some kf -> Fset.singleton kf
-           | None -> Fset.empty)
-        x vf args kind loc
+    Cil.treat_constructor_as_func
+      (fun _r fct _args _loc ->
+         match Kernel_function.get_called fct with
+         | Some kf -> Fset.singleton kf
+         | None -> Fset.empty)
+      x vf args kind loc
   | _ -> Fset.empty
 
 (* -------------------------------------------------------------------------- *)
@@ -193,16 +193,17 @@ module Callees = WpContext.StaticGenerator(Kernel_function)
       type key = Kernel_function.t
       type data = Fset.t * Cil_types.stmt list
       (** functions + unspecified function pointer calls *)
+
       let name = "Wp.CfgInfos.SCallees"
       let compile = function
         | { Cil_types.fundec = Definition(fd, _ ) } as kf ->
-            let stmts = ref [] in
-            let on_missing_calls s = stmts := s :: !stmts in
-            let fold e s =
-              Fset.union e (collect_calls ~on_missing_calls ~bhv:[] kf s)
-            in
-            let kfs = List.fold_left fold Fset.empty fd.sallstmts in
-            kfs, !stmts
+          let stmts = ref [] in
+          let on_missing_calls s = stmts := s :: !stmts in
+          let fold e s =
+            Fset.union e (collect_calls ~on_missing_calls ~bhv:[] kf s)
+          in
+          let kfs = List.fold_left fold Fset.empty fd.sallstmts in
+          kfs, !stmts
         | _ -> Fset.empty, []
     end)
 
@@ -254,10 +255,10 @@ struct
       env.stack <- stack;
       begin match cluster with
         | [ x ] when base = max_int ->
-            HT.add env.clusters x None
+          HT.add env.clusters x None
         | cluster ->
-            let set = Some (Fset.of_list cluster) in
-            List.iter (fun kf -> HT.add env.clusters kf set) cluster
+          let set = Some (Fset.of_list cluster) in
+          List.iter (fun kf -> HT.add env.clusters kf set) cluster
       end ;
       max_int
     end
@@ -315,12 +316,12 @@ let collect_loops_no_variant kf stmt =
   in
   match stmt.skind with
   | Loop _ ->
-      begin match Annotations.fold_code_annot fold_no_variant stmt None with
-        | None -> Sset.singleton stmt, Pset.empty
-        | Some (ca, v) -> Sset.empty, props_of_v ca (fst v)
-      end
+    begin match Annotations.fold_code_annot fold_no_variant stmt None with
+      | None -> Sset.singleton stmt, Pset.empty
+      | Some (ca, v) -> Sset.empty, props_of_v ca (fst v)
+    end
   | _ ->
-      Sset.empty, Pset.empty
+    Sset.empty, Pset.empty
 
 (* -------------------------------------------------------------------------- *)
 (* --- Trivially terminates                                               --- *)
@@ -368,8 +369,8 @@ struct
     match xs with
     | [] -> ()
     | x::xs ->
-        Format.fprintf fmt "~%s:%s" kind x ;
-        List.iter (Format.fprintf fmt ",%s") xs
+      Format.fprintf fmt "~%s:%s" kind x ;
+      List.iter (Format.fprintf fmt ",%s") xs
 
   let pretty fmt k =
     begin
@@ -399,18 +400,18 @@ let dead_posts ~bhv ~prop tk (bhvs : CfgAnnot.behavior list) =
 let loop_contract_pids kf stmt =
   match stmt.Cil_types.skind with
   | Loop _ ->
-      let invs = CfgAnnot.get_loop_contract kf stmt in
-      let add_assigns assigns l =
-        match assigns with
-        | WpPropId.NoAssignsInfo | AssignsAny _ -> l
-        | AssignsLocations (pid, _) -> pid :: l
-      in
-      let verif_fold CfgAnnot.{ loop_est ; loop_ind } l =
-        let l = Option.fold ~none:l ~some:(fun i -> i :: l) loop_est in
-        Option.fold ~none:l ~some:(fun i -> i :: l) loop_ind
-      in
-      List.fold_right verif_fold invs.loop_invariants @@
-      List.fold_right add_assigns invs.loop_assigns []
+    let invs = CfgAnnot.get_loop_contract kf stmt in
+    let add_assigns assigns l =
+      match assigns with
+      | WpPropId.NoAssignsInfo | AssignsAny _ -> l
+      | AssignsLocations (pid, _) -> pid :: l
+    in
+    let verif_fold CfgAnnot.{ loop_est ; loop_ind } l =
+      let l = Option.fold ~none:l ~some:(fun i -> i :: l) loop_est in
+      Option.fold ~none:l ~some:(fun i -> i :: l) loop_ind
+    in
+    List.fold_right verif_fold invs.loop_invariants @@
+    List.fold_right add_assigns invs.loop_assigns []
   | _ -> []
 
 let compile Key.{ kf ; smoking ; bhv ; prop } =
@@ -500,36 +501,36 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
     if Kernel_function.is_definition kf then
       match CfgAnnot.get_terminates_goal kf with
       | Some (id, _) when selected_terminates ~prop kf ->
-          let warning_locs =
-            List.map Cil_datatype.Stmt.loc @@ snd @@ Callees.get kf
-          in
-          if warning_locs <> [] then
-            Wp_parameters.warning ~once:true
-              "In '%a', no 'calls' specification for statement(s) on \
-               line(s): %a, @\nAssuming that they can call '%a'"
-              Kernel_function.pretty kf
-              (Pretty_utils.pp_list ~sep:", " Cil_datatype.Location.pretty_line)
-              warning_locs
-              Kernel_function.pretty kf ;
-          if is_recursive kf then
-            (* Notes:
-               - a recursive function never trivially terminates,
-               - in absence of decreases, CfgCalculus will warn *)
-            begin match CfgAnnot.get_decreases_goal kf with
-              | None -> infos
-              | Some (id, _) ->
-                  let deps =
-                    Pset.add (WpPropId.property_of_id id) infos.terminates_deps
-                  in
-                  { infos with terminates_deps = deps }
-            end
-          else if infos.calls = Fset.empty
-               && infos.no_variant_loops = Sset.empty then begin
-            set_trivially_terminates id infos.terminates_deps ;
-            (* Drop dependencies for this terminates, we've used it. *)
-            { infos with terminates_deps = Pset.empty }
+        let warning_locs =
+          List.map Cil_datatype.Stmt.loc @@ snd @@ Callees.get kf
+        in
+        if warning_locs <> [] then
+          Wp_parameters.warning ~once:true
+            "In '%a', no 'calls' specification for statement(s) on \
+             line(s): %a, @\nAssuming that they can call '%a'"
+            Kernel_function.pretty kf
+            (Pretty_utils.pp_list ~sep:", " Cil_datatype.Location.pretty_line)
+            warning_locs
+            Kernel_function.pretty kf ;
+        if is_recursive kf then
+          (* Notes:
+             - a recursive function never trivially terminates,
+             - in absence of decreases, CfgCalculus will warn *)
+          begin match CfgAnnot.get_decreases_goal kf with
+            | None -> infos
+            | Some (id, _) ->
+              let deps =
+                Pset.add (WpPropId.property_of_id id) infos.terminates_deps
+              in
+              { infos with terminates_deps = deps }
           end
-          else infos
+        else if infos.calls = Fset.empty
+             && infos.no_variant_loops = Sset.empty then begin
+          set_trivially_terminates id infos.terminates_deps ;
+          (* Drop dependencies for this terminates, we've used it. *)
+          { infos with terminates_deps = Pset.empty }
+        end
+        else infos
       | _ -> infos
     else infos
   in

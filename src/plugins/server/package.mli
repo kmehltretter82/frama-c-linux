@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -143,8 +143,12 @@ module Scope :
 sig
   type t
   val create : plugin -> t
-  val reserve : t -> string -> unit (** Must _not_ be call after [use] *)
-  val declare : t -> ident -> unit (** Must _not_ be call after [use] *)
+  val reserve : t -> string -> unit
+  (** Must _not_ be call after [use] *)
+
+  val declare : t -> ident -> unit
+  (** Must _not_ be call after [use] *)
+
   val use : t -> ident -> unit
   val resolve : t -> string IdMap.t
 end

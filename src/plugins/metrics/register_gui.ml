@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -294,7 +294,9 @@ module ValueCoverageGUI = struct
             Varinfo.Set.diff metrics.syntactic metrics.semantic
           in
           let hilit color =
-            let tag = make_tag buffer#buffer "metrics" [`BACKGROUND color] in
+            let tag =
+              make_tag buffer#buffer ~name:"metrics" [`BACKGROUND color]
+            in
             apply_tag buffer#buffer tag start stop
           in
           let syn_hilit () = hilit "yellow"

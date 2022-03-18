@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -45,6 +45,8 @@ let dkey_alpha_undo = register_category "alpha:undo"
 let dkey_asm_contracts = register_category "asm:contracts"
 
 let dkey_ast = register_category "ast"
+
+let dkey_builtins = register_category "builtins"
 
 let dkey_check = register_category "check"
 
@@ -719,10 +721,12 @@ module PrintReturn =
 module CodeOutput = struct
 
   let () = Parameter_customize.set_group inout_source
-  include P.Empty_string
+  include P.Filepath
       (struct
         let option_name = "-ocode"
         let arg_name = "filename"
+        let existence = Filepath.Indifferent
+        let file_kind = "source"
         let help =
           "when printing code, redirects the output to file <filename>"
       end)
@@ -731,22 +735,23 @@ module CodeOutput = struct
 
   let output job =
     let file = get () in
-    if file = ""
+    if Filepath.Normalized.(is_special_stdout file || is_empty file)
     then Log.print_delayed job
     else
       try
         let fmt =
           try fst (Hashtbl.find streams file)
           with Not_found ->
-            let out = open_out file in
+            let out = open_out (file:>string) in
             let fmt = Format.formatter_of_out_channel out in
             Hashtbl.add streams file (fmt,out) ; fmt
         in
         job fmt
       with Sys_error s ->
         warning
-          "Fail to open file \"%s\" for code output@\nSystem error: %s.@\n\
-           Code is output on stdout instead." file s ;
+          "Fail to open file \"%a\" for code output@\nSystem error: %s.@\n\
+           Code is output on stdout instead."
+          Filepath.Normalized.pretty file s ;
         Log.print_delayed job
 
   let close_all () =
@@ -757,8 +762,8 @@ module CodeOutput = struct
            close_out cout ;
          with Sys_error s ->
            failure
-             "Fail to close output file \"%s\"@\nSystem error: %s."
-             file s)
+             "Fail to close output file \"%a\"@\nSystem error: %s."
+             Filepath.Normalized.pretty file s)
       streams
 
   let () = Extlib.safe_at_exit close_all

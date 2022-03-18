@@ -4,7 +4,7 @@
   MACRO: ROOT_EACSL_GCC_OPTS_EXT --rt-debug --rt-verbose --concurrency
 
   COMMENT: Filter the addresses of the output so that the test is deterministic.
-  MACRO: ROOT_EACSL_EXEC_FILTER @SEDCMD@ -e s_0x[0-9a-f-]*_0x0000-0000-0000_g | @SEDCMD@ -e s_Offset:\s[0-9-]*_Offset:xxxxx_g | @SEDCMD@ -e s/[0-9]*\skB/xxxkB/g | @SEDCMD@ -e s/Leaked.*bytes/Leakedxxxbytes/g
+  MACRO: ROOT_EACSL_EXEC_FILTER sed -e s_0x[0-9a-f-]*_0x0000-0000-0000_g | sed -e s_Offset:\s[0-9-]*_Offset:xxxxx_g | sed -e s/[0-9]*\skB/xxxkB/g | sed -e s/Leaked.*bytes/Leakedxxxbytes/g
 */
 
 // Include existing test

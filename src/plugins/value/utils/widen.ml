@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -493,7 +493,7 @@ module Parsed_Dynamic_Hints =
     (struct
       let name = "Widen.Parsed_Dynamic_Hints"
       let size = 7
-      let dependencies = [ Ast.self; Db.Value.self ]
+      let dependencies = [ Ast.self; Self.state ]
     end)
 
 let dynamic_bases_of_lval states e offset =
@@ -530,7 +530,7 @@ module Dynamic_Hints =
   State_builder.Ref
     (Widen_type)
     (struct
-      let dependencies = [ Ast.self; Db.Value.self ]
+      let dependencies = [ Ast.self; Self.state ]
       let name = "Widen.Dynamic_Hints"
       let default = Widen_type.default
     end)

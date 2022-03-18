@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -50,8 +50,9 @@ let builtins_table = Hashtbl.create 17
 
 module Info = struct
   let name = "Eva.Builtins.BuiltinsOverride"
-  let dependencies = [ Db.Value.self ]
+  let dependencies = [ Self.state ]
 end
+
 (** Set of functions overridden by a builtin. *)
 module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
 

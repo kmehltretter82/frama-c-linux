@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -131,24 +131,27 @@ module Worklist(MaybeReverse:MAYBE_REVERSE):WORKLIST = struct
 
   type t =
     {
+      bv: Bitvector.t;
       (** Priority queue implemented as a bit vector. Index 0 has the
           highest priority.*)
-      bv: Bitvector.t;
 
-      (** Conversions between stmt and ordered_stmt. *)
       order: Ordered_stmt.stmt_to_ordered;
+      (** Conversions between stmt and ordered_stmt. *)
+
       unorder: Ordered_stmt.ordered_to_stmt;
+      (** Conversions between stmt and ordered_stmt. *)
+
       connex: connex_component array;
 
-      (** Next stmt to be retrieved.  *)
       mutable next: ordered_stmt;
+      (** Next stmt to be retrieved.  *)
 
-      (** The connex component for the last call to next(). *)
       mutable current_scc: connex_component;
+      (** The connex component for the last call to next(). *)
 
+      mutable must_restart_cc: ordered_stmt option;
       (** The first statement changed in the current scc, or None
           if the scc has not changed. *)
-      mutable must_restart_cc: ordered_stmt option;
     }
 
   (* Forward and backward dataflow use the same data structure, but
@@ -296,7 +299,7 @@ module Forwards(T : ForwardsTransfer) = struct
   (** We call this function when we have encountered a statement, with some
    * state. *)
   let reachedStatement worklist pred (s: stmt) (d: T.t) : unit =
-    (** see if we know about it already *)
+    (* see if we know about it already *)
     let d = T.doEdge pred s d in
     let newdata: T.t option =
       try
@@ -341,7 +344,7 @@ module Forwards(T : ForwardsTransfer) = struct
           "FF(%s): processing block without data" T.name
     in
 
-    (** See what the custom says *)
+    (* See what the custom says *)
     match T.doStmt s init with
     | SDone  -> ()
     | (SDefault | SUse _) as act -> begin
@@ -416,7 +419,7 @@ module Forwards(T : ForwardsTransfer) = struct
                 when Integer.equal z Integer.zero ->
                 new_exp ~loc:exp_sw.eloc (UnOp(LNot,exp_sw,intType))
               | _ ->
-                Cil.new_exp exp_case.eloc
+                Cil.new_exp ~loc:exp_case.eloc
                   (BinOp (Eq, exp_sw, exp_case, Cil.intType))
             in
             let branch_case, branch_not_case = T.doGuard s exp before in

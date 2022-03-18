@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -52,8 +52,12 @@ sig
 
   val result : env -> Lang.F.var
 
-  val (@^) : paths -> paths -> paths (** Same as [Cfg.concat] *)
-  val (@*) : env -> ( c_label * node ) list -> env (** fold bind *)
+  val (@^) : paths -> paths -> paths
+  (** Same as [Cfg.concat] *)
+
+  val (@*) : env -> ( c_label * node ) list -> env
+  (** fold bind *)
+
   val (@:) : env -> c_label -> node
   (** LabelMap.find with refined excpetion.
       @raise LabelNotFound instead of [Not_found] *)

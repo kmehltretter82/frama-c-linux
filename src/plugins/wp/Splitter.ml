@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,9 +41,9 @@ let pretty fmt = function
   | CASE(_,[]) -> Format.fprintf fmt "Case(s)"
   | CASE(_,[k]) -> Format.fprintf fmt "Case %s" (Int64.to_string k)
   | CASE(_,k::ks) ->
-      Format.fprintf fmt "@[Cases %s" (Int64.to_string k) ;
-      List.iter (fun k -> Format.fprintf fmt ",@,%s" (Int64.to_string k)) ks ;
-      Format.fprintf fmt "@]"
+    Format.fprintf fmt "@[Cases %s" (Int64.to_string k) ;
+    List.iter (fun k -> Format.fprintf fmt ",@,%s" (Int64.to_string k)) ks ;
+    Format.fprintf fmt "@]"
   | CALL(_,kf) -> Format.fprintf fmt "Call %a" Kernel_function.pretty kf
   | DEFAULT _ -> Format.fprintf fmt "Default"
   | ASSERT(_,k,n) -> Format.fprintf fmt "Disjunction (%d/%d)" k n
@@ -62,21 +62,21 @@ let compare p q =
     | ELSE _ , _ -> (-1)
     | _ , ELSE _ -> 1
     | CASE(s1,k1) , CASE(s2,k2) ->
-        let c = Stmt.compare s1 s2 in
-        if c = 0 then Stdlib.compare k1 k2 else c
+      let c = Stmt.compare s1 s2 in
+      if c = 0 then Stdlib.compare k1 k2 else c
     | CASE _ , _ -> (-1)
     | _ , CASE _ -> 1
     | DEFAULT s , DEFAULT t -> Stmt.compare s t
     | DEFAULT _ , _ -> (-1)
     | _ , DEFAULT _ -> 1
     | CALL(s1,f1) , CALL(s2,f2) ->
-        let c = Stmt.compare s1 s2 in
-        if c = 0 then Kernel_function.compare f1 f2 else c
+      let c = Stmt.compare s1 s2 in
+      if c = 0 then Kernel_function.compare f1 f2 else c
     | CALL _ , _ -> (-1)
     | _ , CALL _ -> 1
     | ASSERT(ip1,k1,_) , ASSERT(ip2,k2,_) ->
-        let c = Stdlib.compare ip1.ip_id ip2.ip_id in
-        if c = 0 then k1 - k2 else c
+      let c = Stdlib.compare ip1.ip_id ip2.ip_id in
+      if c = 0 then k1 - k2 else c
 
 (* -------------------------------------------------------------------------- *)
 (* --- Assertion Disjunction                                              --- *)
@@ -90,17 +90,17 @@ and unwrap p =
   match p.pred_content with
   | Por(a,b) -> disjunction a @ disjunction b
   | Plet(f,a) ->
-      List.map
-        (fun q -> { p with pred_content = Plet(f,q) })
-        (unwrap a)
+    List.map
+      (fun q -> { p with pred_content = Plet(f,q) })
+      (unwrap a)
   | Pexists(qs,p) ->
-      List.map
-        (fun q -> { p with pred_content = Pexists(qs,q) })
-        (unwrap p)
+    List.map
+      (fun q -> { p with pred_content = Pexists(qs,q) })
+      (unwrap p)
   | Pat(p,l) ->
-      List.map
-        (fun q -> { p with pred_content = Pat(q,l) })
-        (unwrap p)
+    List.map
+      (fun q -> { p with pred_content = Pat(q,l) })
+      (unwrap p)
   | _ -> raise Exit
 
 let predicate ip = ip.ip_content.tp_statement
@@ -143,17 +143,17 @@ type 'a t = 'a M.t
 let rec compact merge = function
   | ([] | [_]) as m -> m
   | ( (k1,v1) as e )::(( (k2,v2)::r ) as m) ->
-      if Tags.compare k1 k2 = 0 then
-        collect merge k1 [v2;v1] r
-      else
-        e :: compact merge m
+    if Tags.compare k1 k2 = 0 then
+      collect merge k1 [v2;v1] r
+    else
+      e :: compact merge m
 and collect merge k vs = function
   | [] -> [k,merge vs]
   | ((k',v')::r) as m ->
-      if Tags.compare k k' = 0 then
-        collect merge k (v'::vs) r
-      else
-        (k,merge vs) :: compact merge m
+    if Tags.compare k k' = 0 then
+      collect merge k (v'::vs) r
+    else
+      (k,merge vs) :: compact merge m
 
 let bytags (k,_) (k',_) = Tags.compare k k'
 
@@ -180,34 +180,34 @@ let rec merge ~left ~both ~right m1 m2 =
   | _,[] -> List.map (fun (k,v) -> k , left v) m1
   | [],_ -> List.map (fun (k,v) -> k , right v) m2
   | (k1,v1)::w1 , (k2,v2)::w2 ->
-      let cmp = Tags.compare k1 k2 in
-      if cmp < 0 then
-        (k1 , left v1) :: merge ~left ~both ~right w1 m2
-      else if cmp > 0 then
-        (k2 , right v2) :: merge ~left ~both ~right m1 w2
-      else
-        (k1 , both v1 v2) :: merge ~left ~both ~right w1 w2
+    let cmp = Tags.compare k1 k2 in
+    if cmp < 0 then
+      (k1 , left v1) :: merge ~left ~both ~right w1 m2
+    else if cmp > 0 then
+      (k2 , right v2) :: merge ~left ~both ~right m1 w2
+    else
+      (k1 , both v1 v2) :: merge ~left ~both ~right w1 w2
 
 let merge_all merge = function
   | [] -> []
   | [m] -> m
   | [m1;m2] -> M.union (fun _ u v -> merge [u;v]) m1 m2
   | ms ->
-      let t = ref I.empty in
-      List.iter
-        (List.iter
-           (fun (k,v) ->
-              try
-                let r = (I.find k !t) in r := v :: !r
-              with Not_found ->
-                t := I.add k (ref [v]) !t))
-        ms ;
-      I.fold
-        (fun k r m -> match !r with
-           | [] -> m
-           | [v] -> (k,v)::m
-           | vs -> (k,merge vs)::m)
-        !t []
+    let t = ref I.empty in
+    List.iter
+      (List.iter
+         (fun (k,v) ->
+            try
+              let r = (I.find k !t) in r := v :: !r
+            with Not_found ->
+              t := I.add k (ref [v]) !t))
+      ms ;
+    I.fold
+      (fun k r m -> match !r with
+         | [] -> m
+         | [v] -> (k,v)::m
+         | vs -> (k,merge vs)::m)
+      !t []
 
 let map = M.map
 let iter = M.iter

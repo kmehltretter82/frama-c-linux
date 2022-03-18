@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -124,8 +124,12 @@ val at_error_exit: (exn -> unit) -> unit
 (** Group of command line options.
     @since Beryllium-20090901 *)
 module Group : sig
-  type t (** @since Beryllium-20090901 *)
-  val default: t (** @since Beryllium-20090901 *)
+  (** @since Beryllium-20090901 *)
+  type t
+
+  val default: t
+  (** @since Beryllium-20090901 *)
+
   val name: t -> string
   (** @since Beryllium-20090901 *)
 

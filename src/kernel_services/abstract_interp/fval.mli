@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,7 +36,9 @@ module F : sig
   type t
   val packed_descr : Structural_descr.pack
 
-  val of_float : float -> t (** fails on NaNs, but allows infinities. *)
+  val of_float : float -> t
+  (** fails on NaNs, but allows infinities. *)
+
   val to_float : t -> float
 
   val compare : t -> t -> int
@@ -82,6 +84,7 @@ val minus_zero : t
 val zeros: t (** Both positive and negative zero *)
 
 val pi: t (** Real representation of \pi. *)
+
 val e: t  (** Real representation of \e. *)
 
 val contains_plus_zero : t -> bool

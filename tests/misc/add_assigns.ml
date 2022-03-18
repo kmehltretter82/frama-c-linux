@@ -26,7 +26,9 @@ let main () =
         (fun b -> b.b_name = Cil.default_behavior_name)
         (Annotations.behaviors kf)
     in
-    let ip = Option.get (Property.ip_assigns_of_behavior kf Kglobal [] bhv) in
+    let ip =
+      Option.get (Property.ip_assigns_of_behavior kf Kglobal ~active:[] bhv)
+    in
     Property_status.(emit emitter ~hyps:[] ip True)
   end
 

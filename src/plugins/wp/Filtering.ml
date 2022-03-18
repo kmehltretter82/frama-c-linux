@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,13 +38,13 @@ let rec filter ~polarity f p =
   | Or ps when not polarity -> F.p_any (filter ~polarity f) ps
   | Not p -> F.p_not (filter_inv ~polarity f p)
   | Imply(hs,p) ->
-      F.p_hyps
-        (List.map (filter_inv ~polarity f) hs)
-        (filter ~polarity f p)
+    F.p_hyps
+      (List.map (filter_inv ~polarity f) hs)
+      (filter ~polarity f p)
   | _ ->
-      (* polarity=true: FALSE -> p
-         polarity=false: p -> TRUE *)
-      if f p then p else if polarity then F.p_false else F.p_true
+    (* polarity=true: FALSE -> p
+       polarity=false: p -> TRUE *)
+    if f p then p else if polarity then F.p_false else F.p_true
 
 and filter_inv ~polarity f p = filter ~polarity:(not polarity) f p
 
@@ -70,19 +70,19 @@ struct
     | Bot -> Format.pp_print_string fmt "Bot"
     | Array u -> Format.fprintf fmt "[%a]" pretty u
     | Index m ->
-        begin
-          Format.fprintf fmt "@[<hov 2>[" ;
-          Imap.iteri (fun k u -> Format.fprintf fmt "@ %d:%a" k pretty u) m ;
-          Format.fprintf fmt " ]@]" ;
-        end
+      begin
+        Format.fprintf fmt "@[<hov 2>[" ;
+        Imap.iteri (fun k u -> Format.fprintf fmt "@ %d:%a" k pretty u) m ;
+        Format.fprintf fmt " ]@]" ;
+      end
     | Field m ->
-        begin
-          Format.fprintf fmt "@[<hov 2>{" ;
-          Fmap.iter
-            (fun fd u -> Format.fprintf fmt "@ %a:%a" Field.pretty fd pretty u)
-            m ;
-          Format.fprintf fmt " }@]" ;
-        end
+      begin
+        Format.fprintf fmt "@[<hov 2>{" ;
+        Fmap.iter
+          (fun fd u -> Format.fprintf fmt "@ %a:%a" Field.pretty fd pretty u)
+          m ;
+        Format.fprintf fmt " }@]" ;
+      end
 
   let rec join u v =
     match u,v with
@@ -90,11 +90,11 @@ struct
     | Bot , w | w , Bot -> w
     | Array u , Array v -> Array(join u v)
     | Index m , Array u | Array u , Index m ->
-        Array(Imap.fold (fun u w -> join u w) m u)
+      Array(Imap.fold (fun u w -> join u w) m u)
     | Index a , Index b ->
-        Index(Imap.union (fun _ u v -> join u v) a b)
+      Index(Imap.union (fun _ u v -> join u v) a b)
     | Field a , Field b ->
-        Field(Fmap.union (fun _ u v -> join u v) a b)
+      Field(Fmap.union (fun _ u v -> join u v) a b)
     | (Index _ | Array _) , Field _
     | Field _ , (Index _ | Array _)
       -> Top
@@ -110,11 +110,11 @@ struct
     | Bot , _ | _ , Bot -> Bot
     | Array u , Array v -> meet_array (meet u v)
     | Index m , Array v | Array v , Index m ->
-        meet_index (Imap.mapf (fun _ u -> meet_filter (meet u v)) m)
+      meet_index (Imap.mapf (fun _ u -> meet_filter (meet u v)) m)
     | Index a , Index b ->
-        meet_index (Imap.interf (fun _ u v -> meet_filter (meet u v)) a b)
+      meet_index (Imap.interf (fun _ u v -> meet_filter (meet u v)) a b)
     | Field a , Field b ->
-        meet_field (Fmap.interf (fun _ u v -> meet_filter (meet u v)) a b)
+      meet_field (Fmap.interf (fun _ u v -> meet_filter (meet u v)) a b)
     | (Index _ | Array _) , Field _
     | Field _ , (Index _ | Array _)
       -> Bot
@@ -196,7 +196,7 @@ struct
   let pretty fmt = function
     | E -> Format.pp_print_string fmt "empty"
     | X(x,ds) ->
-        Format.fprintf fmt "%a(%a)@." F.pp_var x Usage.pretty (delta ds)
+      Format.fprintf fmt "%a(%a)@." F.pp_var x Usage.pretty (delta ds)
     | D dom -> Domain.pretty fmt dom
   [@@@ warning "+32"]
 
@@ -208,17 +208,17 @@ struct
 
   let getindex ~mu v k = match v with
     | X(x,ds) ->
-        begin match F.repr k with
-          | Kint z ->
-              let d =
-                try Dindex(Integer.to_int_exn z) with Z.Overflow -> Darray in
-              X( x , ds @ [ d ] )
-          | _ ->
-              let ds = ds @ [ Darray ] in
-              let dk = mu k in
-              if Domain.is_empty dk then X(x,ds)
-              else D (Domain.join (path x ds) dk)
-        end
+      begin match F.repr k with
+        | Kint z ->
+          let d =
+            try Dindex(Integer.to_int_exn z) with Z.Overflow -> Darray in
+          X( x , ds @ [ d ] )
+        | _ ->
+          let ds = ds @ [ Darray ] in
+          let dk = mu k in
+          if Domain.is_empty dk then X(x,ds)
+          else D (Domain.join (path x ds) dk)
+      end
     | D d -> D (Domain.join d (mu k))
     | E -> D (mu k)
 
@@ -235,13 +235,13 @@ struct
       match F.repr e with
       | L.True | L.False | L.Kint _ | L.Kreal _ -> E
       | _ ->
-          let result = match F.repr e with
-            | L.Rget( r , f ) -> getfield (compute env r) f
-            | L.Aget( r , k ) -> getindex ~mu:(domain env) (compute env r) k
-            | L.Fvar x -> X(x,[])
-            | L.Fun(f,_) -> D (subterms env (symbol f) e)
-            | _ -> D (subterms env Domain.empty e)
-          in env.mvalue <- Tmap.add e result env.mvalue ; result
+        let result = match F.repr e with
+          | L.Rget( r , f ) -> getfield (compute env r) f
+          | L.Aget( r , k ) -> getindex ~mu:(domain env) (compute env r) k
+          | L.Fvar x -> X(x,[])
+          | L.Fun(f,_) -> D (subterms env (symbol f) e)
+          | _ -> D (subterms env Domain.empty e)
+        in env.mvalue <- Tmap.add e result env.mvalue ; result
 
   and subterms env d0 e =
     let pool = ref d0 in
@@ -255,8 +255,8 @@ struct
     | E -> Domain.empty
     | D dom -> dom
     | X(x,ds) ->
-        let dom = path x ds in
-        env.mdomain <- Tmap.add e dom env.mdomain ; dom
+      let dom = path x ds in
+      env.mdomain <- Tmap.add e dom env.mdomain ; dom
 
 end
 
@@ -276,13 +276,13 @@ struct
     match F.p_expr p with
     | And ps | Or ps -> List.iter (collect_hyp env) ps
     | Imply(hs,p) ->
-        List.iter (collect_hyp env) hs ;
-        collect_hyp env p
+      List.iter (collect_hyp env) hs ;
+      collect_hyp env p
     | _ ->
-        let dp = Value.domain env.usage (F.e_prop p) in
-        if not (Domain.separated dp env.target)
-        then
-          ( env.target <- Domain.join dp env.target )
+      let dp = Value.domain env.usage (F.e_prop p) in
+      if not (Domain.separated dp env.target)
+      then
+        ( env.target <- Domain.join dp env.target )
 
   let rec collect_seq env s = Conditions.iter (collect_step env) s
   and collect_step env s =
@@ -292,11 +292,11 @@ struct
     | Core p | Have p | When p | Init p -> collect_hyp env p
     | Either cs -> List.iter (collect_seq env) cs
     | Branch(p,a,b) ->
-        begin
-          collect_hyp env p ;
-          collect_seq env a ;
-          collect_seq env b ;
-        end
+      begin
+        collect_hyp env p ;
+        collect_seq env a ;
+        collect_seq env b ;
+      end
 
   let rec fixpoint env sequence =
     let d0 = env.target in

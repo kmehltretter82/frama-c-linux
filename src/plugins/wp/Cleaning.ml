@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -66,29 +66,29 @@ let rec add_pred m p =
   | And ps -> List.fold_left add_pred m ps
   | If(e,a,b) -> add_pred (add_pred (set_top m e) a) b
   | Eq(a,b) ->
-      begin
-        match F.p_expr a , F.p_expr b with
-        | Fvar x , Fvar y -> add_var x y (add_var y x m)
-        | _ -> set_top m p
-      end
+    begin
+      match F.p_expr a , F.p_expr b with
+      | Fvar x , Fvar y -> add_var x y (add_var y x m)
+      | _ -> set_top m p
+    end
   | Fvar x -> add_true m x
   | Not p ->
-      begin
-        match F.p_expr p with
-        | Fvar x -> add_false m x
-        | _ -> set_top m p
-      end
+    begin
+      match F.p_expr p with
+      | Fvar x -> add_false m x
+      | _ -> set_top m p
+    end
   | _ -> set_top m p
 
 let rec add_type m p =
   match F.p_expr p with
   | And ps -> List.fold_left add_type m ps
   | Fun(f,[e]) ->
-      begin
-        match F.e_expr e with
-        | Fvar x -> add_fun x f m
-        | _ -> set_top m p
-      end
+    begin
+      match F.e_expr e with
+      | Fvar x -> add_fun x f m
+      | _ -> set_top m p
+    end
   | _ -> set_top m p
 
 (* -------------------------------------------------------------------------- *)
@@ -123,12 +123,12 @@ let is_false x m =
 let is_var x m =
   try match Vmap.find x m.eq_var with
     | EQ y ->
-        begin
-          match get x m.eq_fun , get y m.eq_fun with
-          | None , _ -> true  (* we eliminate x, which has no guard... *)
-          | Some (EQ f) , Some (EQ g) -> Fun.equal f g
-          | _ -> false
-        end
+      begin
+        match get x m.eq_fun , get y m.eq_fun with
+        | None , _ -> true  (* we eliminate x, which has no guard... *)
+        | Some (EQ f) , Some (EQ g) -> Fun.equal f g
+        | _ -> false
+      end
     | _ -> false
   with Not_found -> false
 
@@ -141,27 +141,27 @@ let rec filter_pred m p =
   | And ps -> F.p_all (filter_pred m) ps
   | If(e,a,b) -> p_if e (filter_pred m a) (filter_pred m b)
   | Eq(a,b) ->
-      begin
-        match F.p_expr a , F.p_expr b with
-        | Fvar x , Fvar y when is_var x m || is_var y m -> p_true
-        | _ -> p
-      end
+    begin
+      match F.p_expr a , F.p_expr b with
+      | Fvar x , Fvar y when is_var x m || is_var y m -> p_true
+      | _ -> p
+    end
   | Fvar x when is_true x m.eq_var -> p_true
   | Not q ->
-      begin
-        match F.p_expr q with
-        | Fvar x when is_false x m.eq_var -> p_true
-        | _ -> p
-      end
+    begin
+      match F.p_expr q with
+      | Fvar x when is_false x m.eq_var -> p_true
+      | _ -> p
+    end
   | _ -> p
 
 let rec filter_type m p =
   match F.p_expr p with
   | And ps -> F.p_all (filter_type m) ps
   | Fun(_,[e]) ->
-      begin
-        match F.p_expr e with
-        | Fvar x when is_var x m -> p_true
-        | _ -> p
-      end
+    begin
+      match F.p_expr e with
+      | Fvar x when is_var x m -> p_true
+      | _ -> p
+    end
   | _ -> p

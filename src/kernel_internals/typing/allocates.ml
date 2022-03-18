@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -58,10 +58,14 @@ class vis_add_loop_allocates =
       Cil.DoChildren
 
     method! vinst _ = Cil.SkipChildren
-
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
 
 let add_allocates_nothing () =
   Globals.Functions.iter add_allocates_nothing_funspec;
   let vis = new vis_add_loop_allocates in
-  Visitor.visitFramacFileSameGlobals vis (Ast.get ())
+  Visitor.visitFramacFileFunctions vis (Ast.get ())

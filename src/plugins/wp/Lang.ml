@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -113,7 +113,9 @@ type adt =
   | Mrecord of mdt * fields (* Model record-type *)
   | Atype of logic_type_info (* Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
-and mdt = string extern (** name to print to the provers *)
+
+(** name to print to the provers *)
+and mdt = string extern
 and 'a extern = {
   ext_id      : int;
   ext_link : 'a ;
@@ -218,8 +220,8 @@ let rec tau_of_ltype t =
   | Ctype typ -> tau_of_ctype typ
   | Lvar x -> Logic.Tvar (varpoly 1 x (Context.get poly))
   | Larrow _ ->
-      Warning.error "array type non-supported(%a)"
-        Printer.pp_logic_type t
+    Warning.error "array type non-supported(%a)"
+      Printer.pp_logic_type t
   | Ltype _ as b when Logic_const.is_boolean_type b -> Logic.Bool
   | Ltype(lt,lts) -> atype lt (List.map tau_of_ltype lts)
 
@@ -293,16 +295,16 @@ let mem_builtin_type ~name =
   try ignore (find_builtin name) ; true
   with Not_found -> false
 
-let is_builtin lt = mem_builtin_type lt.lt_name
+let is_builtin lt = mem_builtin_type ~name:lt.lt_name
 
 let is_builtin_type ~name = function
   | Data(Mtype m,_) ->
-      begin
-        try match find_builtin name with
-          | E_mdt m0 -> m == m0
-          | _ -> false
-        with Not_found -> false
-      end
+    begin
+      try match find_builtin name with
+        | E_mdt m0 -> m == m0
+        | _ -> false
+      with Not_found -> false
+    end
   | _ -> false
 
 let datatype ~library name =
@@ -318,10 +320,10 @@ let record ~link ~library fts =
 let field t f =
   match t with
   | Mrecord(_,r) ->
-      begin
-        try List.find (function Mfield(_,_,g,_) -> f = g | _ -> false) r.fields
-        with Not_found -> Wp_parameters.fatal "No field <%s> in record" f
-      end
+    begin
+      try List.find (function Mfield(_,_,g,_) -> f = g | _ -> false) r.fields
+      with Not_found -> Wp_parameters.fatal "No field <%s> in record" f
+    end
   | _ -> Wp_parameters.fatal "No field <%s> in type '%a'" f ADT.pretty t
 
 let comp c = Comp (c, KValue)
@@ -330,7 +332,7 @@ let comp_init c = Comp (c, KInit)
 let fields_of_adt = function
   | Mrecord(_,r) -> r.fields
   | Comp (c, k) ->
-      List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] c.cfields)
+    List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] c.cfields)
   | _ -> []
 
 let fields_of_tau = function
@@ -341,7 +343,7 @@ let fields_of_tau = function
 let fields_of_field = function
   | Mfield(_,r,_,_) -> r.fields
   | Cfield(f, k) ->
-      List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] f.fcomp.cfields)
+    List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] f.fcomp.cfields)
 
 let tau_of_field = function
   | Mfield(_,_,_,t) -> t
@@ -376,7 +378,7 @@ struct
       | Cfield _ , Mfield _ -> 1
       | Cfield(f, KValue) , Cfield(g, KValue)
       | Cfield(f, KInit) , Cfield(g, KInit) ->
-          Fieldinfo.compare f g
+        Fieldinfo.compare f g
       | Cfield(_, KInit), Cfield(_, KValue) -> (-1)
       | Cfield(_, KValue), Cfield(_, KInit) -> 1
 
@@ -420,8 +422,8 @@ let tau_of_lfun phi ts =
   match phi with
   | ACSL f -> tau_of_return f
   | CTOR c ->
-      if c.ctor_type.lt_params = [] then Logic.Data(Atype c.ctor_type,[])
-      else raise Not_found
+    if c.ctor_type.lt_params = [] then Logic.Data(Atype c.ctor_type,[])
+    else raise Not_found
   | Model m -> match m.m_result with
     | Sint -> Int
     | Sreal -> Real
@@ -446,7 +448,7 @@ let symbolf
     ?library
     ?context
     ?link
-    ?(balance=Nary) (** specify a default for link *)
+    ?(balance=Nary) (* specify a default for link *)
     ?(category=Logic.Function)
     ?(params=[])
     ?(sort=Logic.Sdata)
@@ -461,19 +463,19 @@ let symbolf
        let name = Buffer.contents buffer in
        let source = match library with
          | None ->
-             assert (link = None);
-             generated ?context name
+           assert (link = None);
+           generated ?context name
          | Some th ->
-             let conv n = function
-               | Nary  -> Engine.F_call n
-               | Left  -> Engine.F_left n
-               | Right -> Engine.F_right n
-             in
-             let link = match link with
-               | None -> conv name balance
-               | Some info -> info
-             in
-             Extern (new_extern ~library:th ~link ~debug:name) in
+           let conv n = function
+             | Nary  -> Engine.F_call n
+             | Left  -> Engine.F_left n
+             | Right -> Engine.F_right n
+           in
+           let link = match link with
+             | None -> conv name balance
+             | Some info -> info
+           in
+           Extern (new_extern ~library:th ~link ~debug:name) in
        let typeof =
          match typecheck with Some phi -> phi | None ->
          match result with Some t -> fun _ -> t | None -> not_found in
@@ -575,10 +577,10 @@ struct
   let compare_source s1 s2 =
     match s1 , s2 with
     | Generated(m1,f1), Generated(m2,f2) ->
-        let cmp = String.compare f1 f2 in
-        if cmp<>0 then cmp else compare_context m1 m2
+      let cmp = String.compare f1 f2 in
+      if cmp<>0 then cmp else compare_context m1 m2
     | Extern f , Extern g ->
-        ext_compare f g
+      ext_compare f g
     | Generated _ , Extern _ -> (-1)
     | Extern _ , Generated _ -> 1
 
@@ -842,8 +844,8 @@ struct
       match Context.get_opt context_pp with
       | Some env -> Pretty.pp_term_env env  fmt e
       | None ->
-          let env = Pretty.known Pretty.empty (QED.vars e) in
-          Pretty.pp_term env fmt e
+        let env = Pretty.known Pretty.empty (QED.vars e) in
+        Pretty.pp_term env fmt e
   let pp_pred = pp_term
   let pp_var fmt x = pp_term fmt (e_var x)
   let pp_vars fmt xs =
@@ -1030,10 +1032,10 @@ module For_export = struct
   let get_state () =
     match !state with
     | None ->
-        let st = QZERO.create () in
-        QZERO.in_state st !init ();
-        state := Some st;
-        st
+      let st = QZERO.create () in
+      QZERO.in_state st !init ();
+      state := Some st;
+      st
     | Some st -> st
 
   let rebuild ?cache t = QZERO.rebuild_in_state (get_state ()) ?cache t

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -233,8 +233,8 @@ let rec ipath lv = function
   | S::w -> ipath (Mval lv,[]) w
   | I::_ -> raise Not_found
   | F f::w ->
-      let (host,path) = lv in
-      ipath (host, path @ [Mfield f]) w
+    let (host,path) = lv in
+    ipath (host, path @ [Mfield f]) w
 let ilval (x,p) = ipath (Mvar x,[]) p
 
 let heap domain state =
@@ -254,10 +254,10 @@ let updates seq domain =
          match v1,v2 with
          | _,None -> ()
          | None,Some v ->
-             pool := Bag.add (Mstore(ilval c,v)) !pool
+           pool := Bag.add (Mstore(ilval c,v)) !pool
          | Some v1,Some v2 ->
-             if v2 != v1 then
-               pool := Bag.add (Mstore (ilval c,v2)) !pool
+           if v2 != v1 then
+             pool := Bag.add (Mstore (ilval c,v2)) !pool
        with Not_found -> ()
     ) pre post ;
   !pool

@@ -581,13 +581,20 @@ let global_type_and_name = function
   | GText _ -> "<text>"
   | GAnnot _ -> "<annot>"
 
-class markReferencedVisitor = object
+class markReferencedVisitor = object (self)
   inherit nopCilVisitor
 
   val dkey = Kernel.dkey_referenced
 
   val inside_exp : exp Stack.t = Stack.create ()
   val inside_typ : typ Stack.t = Stack.create ()
+
+  method private reference varinfo loc =
+    if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then begin
+      Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
+      Kernel.debug ~source:(fst loc) ~dkey "referenced: fun %s" varinfo.vname;
+      varinfo.vreferenced <- true;
+    end
 
   method! vglob = function
     | GType (typeinfo, loc) ->
@@ -604,19 +611,14 @@ class markReferencedVisitor = object
       Kernel.debug ~source:(fst loc) ~dkey "referenced: enum %s" enuminfo.ename;
       enuminfo.ereferenced <- true;
       DoChildren
-    | GVar (varinfo, _, loc)
-    | GVarDecl (varinfo, loc)
-    | GFunDecl (_,varinfo, loc)
-    | GFun ({svar = varinfo}, loc) ->
-      if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then begin
-        Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
-        Kernel.debug ~source:(fst loc) ~dkey "referenced: fun %s" varinfo.vname;
-        varinfo.vreferenced <- true;
-      end;
+    | GVar (varinfo, _, loc) | GFun ({svar = varinfo}, loc) ->
+      self#reference varinfo loc;
       DoChildren
-    | GAnnot _ -> DoChildren
-    | _ ->
+    | GVarDecl (varinfo, loc)
+    | GFunDecl (_,varinfo, loc) ->
+      self#reference varinfo loc;
       SkipChildren
+    | _ -> SkipChildren
 
   method! vtype = function
     | TNamed (ti, _) ->
@@ -661,6 +663,8 @@ class markReferencedVisitor = object
     end;
     SkipChildren
 
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren
 end
 
 let markReferenced ast =
@@ -744,8 +748,8 @@ class markUsedLabels is_removable (labelMap: (string, unit) Hashtbl.t) =
       DoChildren
 
     (* No need to go into expressions or types *)
-    method! vexpr _ = SkipChildren
-    method! vtype _ = SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
   end
 
 class removeUnusedLabels is_removable (labelMap: (string, unit) Hashtbl.t) = object
@@ -764,9 +768,9 @@ class removeUnusedLabels is_removable (labelMap: (string, unit) Hashtbl.t) = obj
     DoChildren
 
   (* No need to go into expressions or instructions *)
-  method! vexpr _ = SkipChildren
-  method! vinst _ = SkipChildren
-  method! vtype _ = SkipChildren
+  method! vexpr _ = Cil.SkipChildren
+  method! vinst _ = Cil.SkipChildren
+  method! vtype _ = Cil.SkipChildren
 end
 
 (***********************************************************************

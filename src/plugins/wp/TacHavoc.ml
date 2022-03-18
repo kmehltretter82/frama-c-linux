@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,12 +33,12 @@ module L = Qed.Logic
 let lookup_havoc e =
   match F.repr e with
   | L.Aget( m , p ) ->
-      begin
-        match F.repr m with
-        | L.Fun( f , [m_undef;m_sep;a;n] ) when f == MemMemory.f_havoc ->
-            Some( m_undef , m_sep , a , n , p )
-        | _ -> None
-      end
+    begin
+      match F.repr m with
+      | L.Fun( f , [m_undef;m_sep;a;n] ) when f == MemMemory.f_havoc ->
+        Some( m_undef , m_sep , a , n , p )
+      | _ -> None
+    end
   | _ -> None
 
 class havoc =
@@ -54,14 +54,14 @@ class havoc =
       match lookup_havoc e with
       | None -> Not_applicable
       | Some(mr,m0,a,n,p) ->
-          let separated =
-            F.p_call MemMemory.p_separated
-              [ p ; F.e_int 1 ; a ; n ] in
-          let process = Tactical.rewrite ?at [
-              "Unassigned" , separated , e , F.e_get m0 p ;
-              "Assigned" , F.p_not separated , e , F.e_get mr p  ;
-            ] in
-          Applicable process
+        let separated =
+          F.p_call MemMemory.p_separated
+            [ p ; F.e_int 1 ; a ; n ] in
+        let process = Tactical.rewrite ?at [
+            "Unassigned" , separated , e , F.e_get m0 p ;
+            "Assigned" , F.p_not separated , e , F.e_get mr p  ;
+          ] in
+        Applicable process
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -71,22 +71,22 @@ class havoc =
 let separated ?at property =
   match F.e_expr property with
   | L.Fun( f , [p;n;q;m] ) when f == MemMemory.p_separated ->
-      let base_p = MemMemory.a_base p in
-      let ofs_p = MemMemory.a_offset p in
-      let base_q = MemMemory.a_base q in
-      let ofs_q = MemMemory.a_offset q in
-      let eq_base = F.p_equal base_p base_q in
-      let on_left = F.p_leq (F.e_add ofs_p n) ofs_q in
-      let on_right = F.p_leq (F.e_add ofs_q m) ofs_p in
-      let overlap = F.p_not (F.p_and on_left on_right) in
-      let pattern = F.e_prop property in
-      let cases =
-        [ "WrongBase" , F.p_neq base_p base_q , pattern , F.e_true ;
-          "OnLeft" , F.p_and eq_base on_left , pattern , F.e_true ;
-          "OnRight" , F.p_and eq_base on_right , pattern , F.e_true ;
-          "OverLap" , F.p_and eq_base overlap , pattern , F.e_false ]
-      in
-      Applicable (Tactical.rewrite ?at cases)
+    let base_p = MemMemory.a_base p in
+    let ofs_p = MemMemory.a_offset p in
+    let base_q = MemMemory.a_base q in
+    let ofs_q = MemMemory.a_offset q in
+    let eq_base = F.p_equal base_p base_q in
+    let on_left = F.p_leq (F.e_add ofs_p n) ofs_q in
+    let on_right = F.p_leq (F.e_add ofs_q m) ofs_p in
+    let overlap = F.p_not (F.p_and on_left on_right) in
+    let pattern = F.e_prop property in
+    let cases =
+      [ "WrongBase" , F.p_neq base_p base_q , pattern , F.e_true ;
+        "OnLeft" , F.p_and eq_base on_left , pattern , F.e_true ;
+        "OnRight" , F.p_and eq_base on_right , pattern , F.e_true ;
+        "OverLap" , F.p_and eq_base overlap , pattern , F.e_false ]
+    in
+    Applicable (Tactical.rewrite ?at cases)
   | _ -> Not_applicable
 
 class separated =
@@ -101,7 +101,7 @@ class separated =
       | Clause (Goal p) -> separated p
       | Clause (Step s) -> separated ~at:s.id (Conditions.head s)
       | Inside (_,p) when F.is_prop p ->
-          separated ?at:(Tactical.at sel) (F.p_bool p)
+        separated ?at:(Tactical.at sel) (F.p_bool p)
       | _ -> Not_applicable
   end
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,8 +46,13 @@ type env = {
   length : term option ; (** number of cells (None is infinite) *)
 }
 
-val cc_tau : tau -> t -> tau (** Type of matrix *)
-val cc_env : t -> env (** Dimension environment *)
-val cc_dims : int option list -> term list (** Value of size variables *)
+val cc_tau : tau -> t -> tau
+(** Type of matrix *)
+
+val cc_env : t -> env
+(** Dimension environment *)
+
+val cc_dims : int option list -> term list
+(** Value of size variables *)
 
 (* -------------------------------------------------------------------------- *)

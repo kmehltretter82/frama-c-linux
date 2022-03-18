@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,16 +37,16 @@ let pattern e =
   | Times(k,e) when F.is_int e -> IMUL_K(k,e)
   | Div(a,b) when not (F.is_int e) -> QDIV(a,b)
   | Div(a,b) when F.is_int e ->
-      begin match F.repr b with
-        | Kint k ->
-            if Integer.(equal k zero) then raise Not_found ;
-            IDIV_K(a,k)
-        | _ -> Ival(e,None)
-      end
+    begin match F.repr b with
+      | Kint k ->
+        if Integer.(equal k zero) then raise Not_found ;
+        IDIV_K(a,k)
+      | _ -> Ival(e,None)
+    end
   | _ ->
-      if F.is_int e then Ival(e,None) else
-      if F.is_real e then Rval e else
-        raise Not_found
+    if F.is_int e then Ival(e,None) else
+    if F.is_real e then Rval e else
+      raise Not_found
 (*
 let pp_pattern fmt = function
   | Ival(_,Some z) -> Format.fprintf fmt "(%s : constant)" (Integer.to_string z)
@@ -102,46 +102,46 @@ let compare_div cmp a b g =
 let rec compare cmp a b =
   match a, b with
   | IMUL_K( k,a ) , Ival(_,Some n) ->
-      if Integer.(lt zero k) then compare cmp (pattern a) (pdiv n k) else
-      if Integer.(lt k zero) then compare cmp (pdiv n k) (pattern a) else
-      if icmp cmp Integer.zero n then F.p_true else F.p_false
+    if Integer.(lt zero k) then compare cmp (pattern a) (pdiv n k) else
+    if Integer.(lt k zero) then compare cmp (pdiv n k) (pattern a) else
+    if icmp cmp Integer.zero n then F.p_true else F.p_false
   | Ival(_,Some n) , IMUL_K( k,a ) ->
-      if Integer.(lt zero k) then compare cmp (pdiv n k) (pattern a) else
-      if Integer.(lt k zero) then compare cmp (pattern a) (pdiv n k) else
-      if icmp cmp Integer.zero n then F.p_true else F.p_false
+    if Integer.(lt zero k) then compare cmp (pdiv n k) (pattern a) else
+    if Integer.(lt k zero) then compare cmp (pattern a) (pdiv n k) else
+    if icmp cmp Integer.zero n then F.p_true else F.p_false
   | IDIV_K( a,k ) , Ival(b,_) ->
-      if Integer.(lt zero k) then
-        let c = F.e_times k (F.e_add b F.e_one) in
-        fcmp cmp a c
-      else
-      if Integer.(lt k zero) then
-        let c = F.e_times k (F.e_sub b F.e_one) in
-        fcmp cmp c a
-      else
-        raise Not_found
+    if Integer.(lt zero k) then
+      let c = F.e_times k (F.e_add b F.e_one) in
+      fcmp cmp a c
+    else
+    if Integer.(lt k zero) then
+      let c = F.e_times k (F.e_sub b F.e_one) in
+      fcmp cmp c a
+    else
+      raise Not_found
   | Ival(a,_) , IDIV_K( b,k ) ->
-      if Integer.(lt zero k) then
-        let c = F.e_times k (F.e_sub a F.e_one) in
-        fcmp cmp c b
-      else
-      if Integer.(lt k zero) then
-        let c = F.e_times k (F.e_add a F.e_one) in
-        fcmp cmp b c
-      else
-        raise Not_found
+    if Integer.(lt zero k) then
+      let c = F.e_times k (F.e_sub a F.e_one) in
+      fcmp cmp c b
+    else
+    if Integer.(lt k zero) then
+      let c = F.e_times k (F.e_add a F.e_one) in
+      fcmp cmp b c
+    else
+      raise Not_found
   | IDIV_K( a,p ) , IDIV_K( b,q ) when
       not Integer.(equal p zero) &&
       not Integer.(equal q zero) ->
-      let g = Integer.pgcd (Integer.abs p) (Integer.abs q) in
-      let ka = Integer.e_div p g in
-      let kb = Integer.e_div q g in
-      compare_div cmp (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
+    let g = Integer.pgcd (Integer.abs p) (Integer.abs q) in
+    let ka = Integer.e_div p g in
+    let kb = Integer.e_div q g in
+    compare_div cmp (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
 
   | QDIV(a,u) , QDIV(b,v) -> compare_ratio cmp a u b v
   | QDIV(a,u) , (Ival(b,_) | Rval b) -> compare_ratio cmp a u b F.e_one
   | (Ival(a,_) | Rval a) , QDIV(b,v) -> compare_ratio cmp a F.e_one b v
   | _ ->
-      raise Not_found
+    raise Not_found
 
 let eq_ratio eq a u b v =
   F.p_conj [ nzero u ; nzero v ; eq (F.e_mul a v) (F.e_mul b u) ]
@@ -150,23 +150,23 @@ let rec equal eq a b =
   match a , b with
   | IMUL_K( k,a ) , Ival(_,Some n)
   | Ival(_,Some n) , IMUL_K( k,a ) ->
-      let r = Integer.c_rem k n in
-      if Integer.equal r Integer.zero then
-        equal eq (pattern a) (pdiv n k)
-      else
-        eq F.e_one F.e_zero
+    let r = Integer.c_rem k n in
+    if Integer.equal r Integer.zero then
+      equal eq (pattern a) (pdiv n k)
+    else
+      eq F.e_one F.e_zero
   | IMUL_K( k,a ) , IMUL_K( k',b ) ->
-      let r = Integer.pgcd k k' in
-      eq (F.e_times (Integer.c_div k r) a)
-        (F.e_times (Integer.c_div k' r) b)
+    let r = Integer.pgcd k k' in
+    eq (F.e_times (Integer.c_div k r) a)
+      (F.e_times (Integer.c_div k' r) b)
 
   | IDIV_K( a,p ) , IDIV_K( b,q ) when
       not Integer.(equal p zero) &&
       not Integer.(equal q zero) ->
-      let g = Integer.pgcd (Integer.abs p) (Integer.abs q) in
-      let ka = Integer.e_div p g in
-      let kb = Integer.e_div q g in
-      compare_div EQ (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
+    let g = Integer.pgcd (Integer.abs p) (Integer.abs q) in
+    let ka = Integer.e_div p g in
+    let kb = Integer.e_div q g in
+    compare_div EQ (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
 
   | QDIV(a,u) , QDIV(b,v) -> eq_ratio eq a u b v
   | QDIV(a,u) , (Ival(b,_) | Rval b) -> eq_ratio eq a u b F.e_one
@@ -191,10 +191,10 @@ class congruence =
 
     method select _feedback = function
       | Tactical.Clause(Tactical.Goal p) ->
-          let q = select p in
-          if q != p
-          then Tactical.Applicable(fun seq -> ["congruence" , (fst seq , q)])
-          else Tactical.Not_applicable
+        let q = select p in
+        if q != p
+        then Tactical.Applicable(fun seq -> ["congruence" , (fst seq , q)])
+        else Tactical.Not_applicable
       | _ -> Tactical.Not_applicable
 
   end

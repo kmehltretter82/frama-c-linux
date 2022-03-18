@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -260,7 +260,7 @@ module D =
             Printer.pp_exp e1
             (match e2 with None -> ">=" | Some _ -> "<")
             Printer.pp_exp
-            (match e2 with None -> Cil.zero e1.eloc | Some e -> e)
+            (match e2 with None -> Cil.zero ~loc:e1.eloc | Some e -> e)
         | Invalid_pointer e ->
           Format.fprintf fmt "Invalid_pointer(@[%a@])" Exp.pretty e
         | Invalid_shift(e, n) ->
@@ -270,7 +270,7 @@ module D =
         | Pointer_comparison(e1, e2) ->
           Format.fprintf fmt "Pointer_comparison(@[%a@],@ @[%a@])"
             Printer.pp_exp
-            (match e1 with None -> Cil.zero e2.eloc | Some e -> e)
+            (match e1 with None -> Cil.zero ~loc:e2.eloc | Some e -> e)
             Printer.pp_exp e2
         | Differing_blocks (e1, e2) ->
           Format.fprintf fmt "Differing_blocks(@[%a@],@ @[%a@])"
@@ -557,11 +557,11 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let here = Logic_const.here_label in
       let typ = Ctype Cil.charPtrType in
       let t1 =
-        Logic_const.term ~loc:(best_loc loc e1.eloc) (Tbase_addr(here, t1)) typ
+        Logic_const.term ~loc:(best_loc ~loc e1.eloc) (Tbase_addr(here, t1)) typ
       in
       let t2 = Logic_utils.expr_to_term e2 in
       let t2 =
-        Logic_const.term ~loc:(best_loc loc e2.eloc) (Tbase_addr(here, t2)) typ
+        Logic_const.term ~loc:(best_loc ~loc e2.eloc) (Tbase_addr(here, t2)) typ
       in
       Logic_const.prel ~loc (Req, t1, t2)
 
@@ -648,7 +648,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
         | TPtr (TFun (ret, None, var, attrs), _), Some args ->
           let ltyps = List.map (fun arg -> "", Cil.typeOf arg, []) args in
           let typ = TFun (ret, Some ltyps, var, attrs) in
-          Cil.mkCast (TPtr (typ, [])) e
+          Cil.mkCast ~newt:(TPtr (typ, [])) e
         | t', _ ->
           Kernel.fatal
             "Trying to emit a Function_pointer alarm over expression %a \

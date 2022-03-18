@@ -26,11 +26,20 @@ open Cil_types
 
 val to_exp:
   adata:Assert.t ->
+  ?inplace:bool ->
   kernel_function ->
   Env.t ->
   term ->
   exp * Assert.t * Env.t
-(** Convert an ACSL term into a corresponding C expression. *)
+(** [to_exp ~adata ?inplace kf env t] converts an ACSL term into a
+    corresponding C expression.
+    - [adata]: assertion context.
+    - [inplace]: if the root term has a label, indicates if it should be
+      immediately translated or if [Translate_ats] should be used to retrieve
+      the translation.
+    - [kf]: The enclosing function.
+    - [env]: The current environment.
+    - [t]: The term to translate. *)
 
 exception No_simple_translation of term
 (** Exceptin raised if [untyped_to_exp] would generate new statements in

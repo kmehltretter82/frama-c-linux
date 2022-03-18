@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -134,7 +134,8 @@ let two = F.of_int 2
 let change_prec prec t =
   let approx = I.change_prec prec t.approx in
   if I.is_nan t.approx then
-    { t with approx ; abs_err = I.top P.Real ; rel_err = I.top P.Real }
+    { t with approx ; abs_err = I.top ~prec:P.Real ;
+             rel_err = I.top ~prec:P.Real }
   else
     let epsilon = F.machine_epsilon prec in
     let abs_err =
@@ -210,11 +211,11 @@ end = struct
           let ufp = F.pow_int two (I.get_max_exponent itv) in
           let t = F.mul ufp epsilon in
           I.of_numerors_floats (F.neg t, t)
-        | None -> I.zero P.Real
+        | None -> I.zero ~prec:P.Real
       in
       let delta_part = match delta_opt with
         | Some delta -> I.of_numerors_floats (F.neg delta, delta)
-        | None -> I.zero P.Real
+        | None -> I.zero ~prec:P.Real
       in
       let res = I.join epsilon_part delta_part in
       if not (I.eq old_itv itv) then I.add_nan res else res
@@ -238,14 +239,14 @@ end = struct
           in
           let t = F.mul max_ufp epsilon in
           I.of_numerors_floats (F.neg t, t)
-        | None -> I.zero P.Real
+        | None -> I.zero ~prec:P.Real
       in
       let delta_part = match delta_opt with
         | Some delta ->
           let one = I.of_ints ~prec:P.Real (-1, 1) in
           let r = I.div (I.of_numerors_floats (F.neg delta, delta)) itv in
           non_bottom_narrow r one
-        | None -> I.zero P.Real
+        | None -> I.zero ~prec:P.Real
       in
       let res = I.join epsilon_part delta_part in
       if not (I.eq old_itv itv) then I.add_nan res else res
@@ -576,7 +577,7 @@ module Rel_Err : Arithmetic with
     let sqrt v ~exact ~abs_err =
       let p = I.prec v.approx in
       let naive = I.div abs_err exact in
-      let g = I.add (Elementary.rel p (I.sqrt v.approx)) one in
+      let g = I.add (Elementary.rel ~prec:p (I.sqrt v.approx)) one in
       let err = I.sub (I.mul (I.sqrt (I.add v.rel_err one)) g) one in
       narrow_errors naive err
 

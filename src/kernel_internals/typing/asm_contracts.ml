@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -221,11 +221,17 @@ class visit_assembly =
           ~dkey:Kernel.dkey_asm_contracts "Ignoring basic assembly instruction";
         Cil.SkipChildren
       | _ -> Cil.SkipChildren
+
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
 
 let transform file =
   if Kernel.AsmContractsGenerate.get() then
-    Visitor.visitFramacFileSameGlobals (new visit_assembly) file
+    Visitor.visitFramacFileFunctions (new visit_assembly) file
 
 let () =
   File.add_code_transformation_after_cleanup

@@ -307,6 +307,13 @@ let forallStmts todo (fd : fundec) =
   let vis = object
     inherit nopCilVisitor
     method! vstmt stmt = ignore (todo stmt); DoChildren
+    method! vinst _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
+    method! vattr _ = Cil.SkipChildren
   end
   in
   ignore (visitCilFunction vis fd)
@@ -340,7 +347,8 @@ let computeFileCFG (f : file) =
 let labelAlphaTable : unit Alpha.alphaTable = Hashtbl.create 11
 
 let freshLabel (base:string) =
-  fst (Alpha.newAlphaName labelAlphaTable None base ())
+  fst (Alpha.newAlphaName ~alphaTable:labelAlphaTable ~undolist:None
+         ~lookupname:base ~data:())
 
 
 let xform_switch_block ?(keepSwitch=false) b =
@@ -736,17 +744,19 @@ class registerLabelsVisitor : cilVisitor = object
     List.iter
       (function
         | Label (name,_,_) ->
-          Alpha.registerAlphaName labelAlphaTable name ()
+          Alpha.registerAlphaName ~alphaTable:labelAlphaTable
+            ~lookupname:name ~data:()
         | _ -> ())
       labels;
     DoChildren
   end
-  method! vexpr _ = SkipChildren
-  method! vtype _ = SkipChildren
-  method! vinst _ = SkipChildren
-  method! vcode_annot _ = SkipChildren (* via Loop stmt *)
-  method! vlval _ = SkipChildren (* via UnspecifiedSequence stmt *)
-  method! vattr _ = SkipChildren (* via block stmt *)
+  method! vexpr _ = Cil.SkipChildren
+  method! vtype _ = Cil.SkipChildren
+  method! vinst _ = Cil.SkipChildren
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren (* via Loop stmt *)
+  method! vlval _ = Cil.SkipChildren (* via UnspecifiedSequence stmt *)
+  method! vattr _ = Cil.SkipChildren (* via block stmt *)
 end
 
 (* prepare a function for computeCFGInfo by removing break, continue,

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -145,6 +145,7 @@ sig
   val add_hook_on_remove: (E.t -> H.key -> D.t -> unit) -> unit
   (** Register a hook to be applied whenever a binding is removed from the table.
       @since Fluorine-20130401 *)
+
   val apply_hooks_on_remove: E.t -> H.key -> D.t -> unit
   (** This function must be called on each binding which is removed from the
       table without directly calling the function {!remove}.

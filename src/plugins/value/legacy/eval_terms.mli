@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -122,6 +122,7 @@ val reduce_by_predicate :
 
 
 [@@@ api_start]
+
 (** [annot_predicate_deps ~pre ~here p] computes the logic dependencies needed
     to evaluate the predicate [p] in a code annotation in cvalue state [here],
     in a function whose pre-state is [pre].

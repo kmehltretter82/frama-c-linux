@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -101,11 +101,10 @@ function TableCell(props: TableCellProps) {
     // ---- Probe Contents
     case 'probes':
       {
-        const { stmt, code, label } = probe;
-        const textClass = label ? 'dome-text-label' : 'dome-text-cell';
+        const { stmt, code } = probe;
         contents = (
           <>
-            <span className={textClass}>{label ?? code}</span>
+            <span className='dome-text-cell'>{code}</span>
             <Stmt stmt={stmt} marker={marker} short />
           </>
         );

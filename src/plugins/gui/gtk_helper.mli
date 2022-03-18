@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -140,6 +140,7 @@ module Configuration: sig
     object
       method set : 'a -> unit
       (** Set's widget value to given one. *)
+
       method connect : ('a -> unit) -> unit
       (** Register a callback invoked by the widget each time the value is edited. *)
     end

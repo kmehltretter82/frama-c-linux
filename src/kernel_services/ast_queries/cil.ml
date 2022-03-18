@@ -171,8 +171,8 @@ let acceptEmptyCompinfo () =
 
 let allowed_machdep machdep =
   Format.asprintf
-    "only allowed for %s machdeps;@ see option -machdep or@ \
-     run '-machdep help' for the list of available machdeps"
+    "only allowed for %s machdeps; see option -machdep or \
+     run 'frama-c -machdep help' for the list of available machdeps"
     machdep
 
 let theMachineProject = ref (createMachine ())
@@ -242,7 +242,7 @@ let pp_attributes_ref = Extlib.mk_fun "Cil.pp_attributes_ref"
 
 let default_behavior_name = "default!"
 let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
-let is_default_behavior b = is_default_mk_behavior b.b_name b.b_assumes
+let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
 
 let find_default_behavior spec =
   try
@@ -905,26 +905,25 @@ class type cilVisitor = object
   method vstmt: stmt -> stmt visitAction
   (** Control-flow statement. *)
 
-  method vblock: block -> block visitAction     (** Block. Replaced in
-                                                    place. *)
-  method vfunc: fundec -> fundec visitAction    (** Function definition.
-                                                    Replaced in place. *)
-  method vglob: global -> global list visitAction (** Global (vars, types,
-                                                      etc.)  *)
+  method vblock: block -> block visitAction
+  (** Block. Replaced in place. *)
+
+  method vfunc: fundec -> fundec visitAction
+  (** Function definition. Replaced in place. *)
+
+  method vglob: global -> global list visitAction
+  (** Global (vars, types, etc.)  *)
+
   method vinit: varinfo -> offset -> init -> init visitAction
-  (** Initializers for globals,
-   * pass the global where this
-   * occurs, and the offset *)
+  (** Initializers for globals, pass the global where this occurs, and the
+      offset *)
 
   method vlocal_init: varinfo -> local_init -> local_init visitAction
 
-  method vtype: typ -> typ visitAction          (** Use of some type. Note
-                                                 * that for structure/union
-                                                 * and enumeration types the
-                                                 * definition of the
-                                                 * composite type is not
-                                                 * visited. Use [vglob] to
-                                                 * visit it.  *)
+  method vtype: typ -> typ visitAction
+  (** Use of some type. Note that for structure/union and enumeration types the
+      definition of the composite type is not visited. Use [vglob] to visit it.
+  *)
 
   method vcompinfo: compinfo -> compinfo visitAction
 
@@ -936,6 +935,7 @@ class type cilVisitor = object
 
   method vattr: attribute -> attribute list visitAction
   (** Attribute. Each attribute can be replaced by a list *)
+
   method vattrparam: attrparam -> attrparam visitAction
   (** Attribute parameters. *)
 
@@ -3220,10 +3220,9 @@ let parseIntAux (str:string) =
     else if hasSuffix "U" then
       1, [IUInt; IULong; IULongLong]
     else
-      0, if octalhexbin || true (* !!! This is against the ISO but it
-                                 * is what GCC and MSVC do !!! *)
+      0, if octalhexbin
       then [IInt; IUInt; ILong; IULong; ILongLong; IULongLong]
-      else [IInt; ILong; IUInt; ILongLong]
+      else [IInt; ILong; ILongLong]
   in
   (* Convert to integer. To prevent overflow we do the arithmetic
    * on Big_int and we take care of overflow. We work only with
@@ -5263,6 +5262,14 @@ class constFoldVisitorClass (machdep: bool) : cilVisitor = object
     (* Do it bottom up *)
     ChangeDoChildrenPost (e, constFold machdep)
 
+  (* Optimization: only visits function and variable definitions. *)
+  method! vglob = function
+    | GFun _ | GVar _ -> DoChildren
+    | _ -> SkipChildren
+
+  method! vtype _ = SkipChildren
+  method! vspec _ = SkipChildren
+  method! vcode_annot _ = SkipChildren
 end
 let constFoldVisitor (machdep: bool) = new constFoldVisitorClass machdep
 
@@ -5356,6 +5363,13 @@ let visitCilFileSameGlobals (vis : cilVisitor) (f : file) : unit =
   else
     ignore
       (doVisitCil vis (Visitor_behavior.cfile vis#behavior) (post_file vis) childrenFileSameGlobals f)
+
+let visitCilFileFunctions vis file =
+  let process_one_global = function
+    | GFun (fundec, _) -> ignore (visitCilFunction vis fundec)
+    | _ -> ()
+  in
+  iterGlobals file process_one_global
 
 let childrenFileCopy vis f =
   let fGlob g = visitCilGlobal vis g in
@@ -5579,7 +5593,7 @@ let mkAddrOf ~loc ((_b, _off) as lval) : exp =
   (* array *)
   | _ -> new_exp ~loc (AddrOf lval)
 
-let mkAddrOfVi vi = mkAddrOf vi.vdecl (var vi)
+let mkAddrOfVi vi = mkAddrOf ~loc:vi.vdecl (var vi)
 
 let mkAddrOrStartOf ~loc (lv: lval) : exp =
   match unrollTypeSkel (typeOfLval lv) with
@@ -5860,8 +5874,8 @@ let mkBinOp ~loc op e1 e2 =
   let machdep = false in
   let make_expr common_type res_type =
     constFoldBinOp ~loc machdep op
-      (mkCastT t1 common_type e1)
-      (mkCastT t2 common_type e2)
+      (mkCastT ~oldt:t1 ~newt:common_type e1)
+      (mkCastT ~oldt:t2 ~newt:common_type e2)
       res_type
   in
   let doArithmetic () =
@@ -5877,7 +5891,11 @@ let mkBinOp ~loc op e1 e2 =
     if isIntegralType tres then
       make_expr tres tres
     else
-      Kernel.fatal ~current:true "mkBinOp: %a" !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,intType)))
+      Kernel.fatal
+        ~current:true
+        "@[mkBinOp: unsupported non integral result type for integral \
+         arithmetic@ %a@]"
+        !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,intType)))
   in
   let compare_pointer op ?cast1 ?cast2 e1 e2 =
     let do_cast e = function
@@ -5913,14 +5931,14 @@ let mkBinOp ~loc op e1 e2 =
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       constFoldBinOp ~loc machdep op
-        (mkCastT t1 t1' e1) (mkCastT t2 t2' e2) t1'
+        (mkCastT ~oldt:t1 ~newt:t1' e1) (mkCastT ~oldt:t2 ~newt:t2' e2) t1'
   | (PlusA|MinusA)
     when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
   | (PlusPI|MinusPI) when isPointerType t1 && isIntegralType t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
   | MinusPP when isPointerType t1 && isPointerType t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
-    constFoldBinOp ~loc machdep op e1 (mkCastT t2 t1 e2) intType
+    constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2) intType
   | (Eq|Ne|Lt|Le|Ge|Gt)
     when isArithmeticType t1 && isArithmeticType t2 ->
     doArithmeticComp ()
@@ -5938,8 +5956,13 @@ let mkBinOp ~loc op e1 e2 =
     compare_pointer ~cast1:theMachine.upointType ~cast2:theMachine.upointType
       op e1 e2
   | _ ->
-    Kernel.fatal ~current:true "mkBinOp: %a"
+    Kernel.fatal
+      ~current:true
+      "@[mkBinOp: unsupported operator for such operands@ \
+       %a@ (type of e1: %a,@ type of e2: %a)@]"
       !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,intType)))
+      !pp_typ_ref t1
+      !pp_typ_ref t2
 
 let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
   let e1, e2 =
@@ -6083,7 +6106,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
 
   | TPtr _ as t ->
     SingleInit(
-      if theMachine.insertImplicitCasts then mkCast t (zero ~loc)
+      if theMachine.insertImplicitCasts then mkCast ~newt:t (zero ~loc)
       else zero ~loc)
   | x -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref x
 
@@ -6267,7 +6290,8 @@ let uniqueVarNames (f: file) : unit =
              (* Here if this is the first time we define a name *)
              Hashtbl.add globalNames vi.vname vi.vid;
              (* And register it *)
-             Alpha.registerAlphaName gAlphaTable vi.vname (CurrentLoc.get ())
+             Alpha.registerAlphaName ~alphaTable:gAlphaTable
+               ~lookupname:vi.vname ~data:(CurrentLoc.get ())
            end)
       | _ -> ());
 
@@ -6311,7 +6335,7 @@ let uniqueVarNames (f: file) : unit =
           (* Fix the type again *)
           setFormals fdec fdec.sformals;
           (* Undo the changes to the global table *)
-          Alpha.undoAlphaChanges gAlphaTable !undolist;
+          Alpha.undoAlphaChanges ~alphaTable:gAlphaTable ~undolist:!undolist;
           ()
         end
       | _ -> ());
@@ -6442,7 +6466,7 @@ let pushGlobal (g: global)
           GType (_, l) | GCompTag (_, l) -> Some (getVarsInGlobal g, l)
         | GEnumTag (_, l) | GPragma (Attr("pack", _), l)
         | GCompTagDecl (_, l) | GEnumTagDecl (_, l) -> Some ([], l)
-        (** Move the warning pragmas early
+        (* Move the warning pragmas early
             | GPragma(Attr(s, _), l) when hasPrefix "warning" s -> Some ([], l)
         *)
         | _ -> None (* Does not go with the types *)

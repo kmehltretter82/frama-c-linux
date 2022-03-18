@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -49,6 +49,8 @@ import { ipcRenderer } from 'electron';
 import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
+import './dark.css';
+import './light.css';
 import './style.css';
 import { State } from './data/states';
 

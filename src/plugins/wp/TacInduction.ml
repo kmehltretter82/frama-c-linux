@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,11 +32,11 @@ let filter_pred n hs p  =
 let filter_step n hs s =
   match s.Conditions.condition with
   | (Have _ | Type _ | Core _ | Init _ | When _)  ->
-      Conditions.map_step (filter_pred n hs) s
+    Conditions.map_step (filter_pred n hs) s
   | (State _ | Branch _ | Either _) as c ->
-      if F.Vars.mem n s.vars then
-        (hs := Conditions.pred_cond c :: !hs ; Conditions.step (Have F.p_true))
-      else s
+    if F.Vars.mem n s.vars then
+      (hs := Conditions.pred_cond c :: !hs ; Conditions.step (Have F.p_true))
+    else s
 
 let filter_seq n hs seq =
   Conditions.sequence @@ List.map (filter_step n hs) @@ Conditions.list seq
@@ -97,17 +97,17 @@ class induction =
       match self#get_field vbase with
       | Tactical.Compose(Code(t, _, _))
       | Inside(_, t) when Lang.F.typeof t = Lang.t_int ->
-          Some t
+        Some t
       | Compose(Cint i) ->
-          Some (Lang.F.e_bigint i)
+        Some (Lang.F.e_bigint i)
       | _ ->
-          None
+        None
 
     method select feedback (s : Tactical.selection) =
       begin match self#get_field vbase with
         | Empty ->
-            self#set_field vbase (Tactical.int 0) ;
-            feedback#update_field vbase
+          self#set_field vbase (Tactical.int 0) ;
+          feedback#update_field vbase
         | _ -> ()
       end ;
       let value = Tactical.selected s in

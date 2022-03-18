@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,9 +36,9 @@ type coverage_metrics = {
   initializers: (Cil_types.varinfo * Cil_types.init) list;  (** initializers *)
 }
 
-val percent_coverage : libc:bool -> coverage_metrics -> float ;;
+val percent_coverage : libc:bool -> coverage_metrics -> float
 
-val compute : libc:bool -> coverage_metrics ;;
+val compute : libc:bool -> coverage_metrics
 (** Computes both syntactic and semantic coverage information. *)
 
 (** Computes the semantic coverage by function. *)

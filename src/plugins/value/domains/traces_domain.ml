@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -60,7 +60,7 @@ type transition =
   | LeaveScope of kernel_function * varinfo list
   (** For call of functions without definition *)
   | CallDeclared of kernel_function * exp list * lval option
-  | Loop of stmt * node (** start *) * edge list GraphShape.t
+  | Loop of stmt * node * edge list GraphShape.t (** node is starting node *)
   | Msg of string
 
 and edge = {
@@ -333,7 +333,7 @@ let join_path ~all_edges_ever_created g c1 c2 =
 (* A loop .*)
 type loops =
   | Base of Node.t * Graph.t (* current last *)
-  | OpenLoop of Cil_types.stmt * Node.t (* start node *) * Graph.t (* last iteration *) * Node.t (** current *) * Graph.t * loops
+  | OpenLoop of Cil_types.stmt * Node.t (* start node *) * Graph.t (* last iteration *) * Node.t (* current *) * Graph.t * loops
   | UnrollLoop of Cil_types.stmt * loops
 
 module Loops = struct
@@ -598,11 +598,11 @@ module Traces = struct
   let add_trans_aux state t =
     let add_edge (current, graph) =
       let e =
-        (** try to reuse an edge from the pool *)
+        (* try to reuse an edge from the pool *)
         let succs = Graph.succs current !(state.all_edges_ever_created) in
         try List.find (Edge.has_transition t) succs
         with Not_found ->
-          (** create a new edge *)
+          (* create a new edge *)
           { edge_trans = t; edge_dst = Node.next () }
       in
       let n = e.edge_dst in
@@ -614,7 +614,7 @@ module Traces = struct
 
   let add_trans c t =
     if c == top then c
-    else if c.call_declared_function then c (** forget intermediary state *)
+    else if c.call_declared_function then c (* forget intermediary state *)
     else
       let c = if c == empty then new_empty () else c in
       add_trans_aux c t
@@ -732,7 +732,7 @@ module Traces = struct
     then c2
     else begin
       match c2.current with
-      | Base _ -> assert false (** must be in a loop *)
+      | Base _ -> assert false (* must be in a loop *)
       | OpenLoop(stmt,_,_,_,_,_) ->
         assert (Stmt.equal stmt' stmt);
         c2
@@ -921,7 +921,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
         stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
       | EnterScope (_, vs) ->
-        (** all our variables are assigned, not defined *)
+        (* all our variables are assigned, not defined *)
         let var_map = List.fold_left fresh_varinfo var_map vs in
         let vs = List.map (subst_in_varinfo var_map) vs in
         List.iter (fun v -> v.vformal <- false) vs;
@@ -995,7 +995,7 @@ let project_of_cfg vreturn s =
           | _ -> Cil.JustCopy
         method! vfunc fundec =
           if Varinfo.equal (Visitor_behavior.Get_orig.varinfo self#behavior fundec.Cil_types.svar) main then begin
-            (** copy of the fundec structure has already been done *)
+            (* copy of the fundec structure has already been done *)
             fundec.slocals <- [];
             let var_map = Varinfo.Map.empty in
             let return_stmt, return_equal, blocals = match vreturn with
@@ -1120,7 +1120,7 @@ module D = struct
                      arg.Eval.concrete))) state call.Eval.arguments in
       `Value state
     else
-      (** enter the scope of the dumb result variable *)
+      (* enter the scope of the dumb result variable *)
       let var = call.Eval.return in
       let state = match var with
         | Some var -> Traces.add_trans state (EnterScope (kf, [var]))
@@ -1234,7 +1234,6 @@ module D = struct
   let output_dot filename state =
     let out = open_out filename in
     Self.feedback ~dkey:log_category "@[Output dot produced to %s.@]" filename;
-    (** *)
     GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
     close_out out
 

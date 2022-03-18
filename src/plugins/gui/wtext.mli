@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,6 +30,7 @@ class type ['a] marker =
     (** The style of added entries. Defaults to empty.
 
         {b Warning} must be set before any entry is added. *)
+
     method set_hover : GText.tag_property list -> unit
     (** The style of hovered entries. Defaults to background green.
 
@@ -59,7 +60,9 @@ class text : ?autoscroll:bool -> ?width:int -> ?indent:int -> unit ->
     method clear : unit
     method fmt : Format.formatter (** The formatter used by [printf] method. *)
 
-    method hrule : unit (** Print an horizontal rule. Consecutive rules are collapsed. *)
+    method hrule : unit
+    (** Print an horizontal rule. Consecutive rules are collapsed. *)
+
     method printf : 'a. ?scroll:bool -> ('a,Format.formatter,unit) format -> 'a
     (** Append material to the text buffer, optionally scrolling it to the
         beginning of the message (defaults to autoscrolling setting).

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,29 +37,26 @@ type bound_kind = Lower_bound | Upper_bound
 type alarm =
   | Division_by_zero of exp
   | Memory_access of lval * access_kind
-  | Index_out_of_bound of
-      exp (** index *)
-      * exp option (** None = lower bound is zero; Some up = upper bound *)
+  | Index_out_of_bound of exp * exp option
+  (** [Index_out_of_bound(index, opt)]
+      - [opt = None] -> lower bound is zero; Some up = upper bound *)
   | Invalid_pointer of exp
   | Invalid_shift of exp * int option (** strict upper bound, if any *)
-  | Pointer_comparison of
-      exp option (** [None] when implicit comparison to NULL pointer *)
-      * exp
-  | Differing_blocks of exp * exp (** The two expressions (which evaluate to
-                                      pointers) must point to the same allocated block *)
-  | Overflow of
-      overflow_kind
-      * exp
-      * Integer.t (** the bound *)
-      * bound_kind
-  | Float_to_int of
-      exp
-      * Integer.t (** the bound for the integer type. The actual alarm
-                      is [exp < bound+1] or [bound-1 < exp]. *)
-      * bound_kind
-  | Not_separated of lval * lval  (** the two lvalues must be separated *)
-  | Overlap of lval * lval (** overlapping read/write: the two lvalues must be
-                               separated or equal *)
+  | Pointer_comparison of exp option * exp
+  (** First parameter is [None] when implicit comparison to NULL pointer *)
+  | Differing_blocks of exp * exp
+  (** The two expressions (which evaluate to
+      pointers) must point to the same allocated block *)
+  | Overflow of overflow_kind * exp * Integer.t * bound_kind
+  (** Integer parameters is the bound *)
+  | Float_to_int of exp * Integer.t * bound_kind
+  (** Integer parameter is the bound for the integer type. The actual alarm
+      is [exp < bound+1] or [bound-1 < exp]. *)
+  | Not_separated of lval * lval
+  (** the two lvalues must be separated *)
+  | Overlap of lval * lval
+  (** overlapping read/write: the two lvalues must be
+      separated or equal *)
   | Uninitialized of lval
   | Dangling of lval
   | Is_nan_or_infinite of exp * fkind

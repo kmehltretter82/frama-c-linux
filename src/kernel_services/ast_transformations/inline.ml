@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -251,7 +251,7 @@ let inliner functions_to_inline = object (self)
               r.vdefined <- false;
               Cil.update_var_type
                 r (Cil.typeRemoveAttributes ["const"] r.vtype);
-              false, None, (Cil.mkAddrOf loc (Cil.var r)) :: args
+              false, None, (Cil.mkAddrOf ~loc (Cil.var r)) :: args
             | Some _, _ ->
               Kernel.fatal "Attempt to initialize an inexistent varinfo"
           in
@@ -342,6 +342,11 @@ let inliner functions_to_inline = object (self)
          let kf = Globals.Functions.get f.svar in
          already_visited <- Cil_datatype.Kf.Set.add kf functions_to_inline; f)
 
+  method! vexpr _ = Cil.SkipChildren
+  method! vlval _ = Cil.SkipChildren
+  method! vtype _ = Cil.SkipChildren
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren
 end
 
 let remove_local_statics = object
@@ -379,7 +384,7 @@ end
 let inline_calls ast =
   if not (InlineCalls.is_empty ()) then begin
     let functions = InlineCalls.get() in
-    Visitor.visitFramacFileSameGlobals (inliner functions) ast;
+    Visitor.visitFramacFileFunctions (inliner functions) ast;
     Cil_datatype.Kf.Set.iter
       (fun kf -> ignore (Visitor.visitFramacKf remove_local_statics kf))
       functions;
@@ -423,23 +428,23 @@ open Cil_datatype
 exception CannotInline
 
 type inline_env = {
+  inline: logic_info -> bool;
   (** Returns true for predicate and logic functions to be inlined. Other
       predicates and functions are left unchanged. *)
-  inline: logic_info -> bool;
 
+  map_param: (term * logic_label) Logic_var.Map.t;
   (** logic argument of the predicate -> term that replaces it, plus the label
       at which it must be evaluated. *)
-  map_param: (term * logic_label) Logic_var.Map.t;
 
-  (** logic label of the predicate -> label at call site *)
   map_label: logic_label Logic_label.Map.t;
+  (** logic label of the predicate -> label at call site *)
 
+  already_seen: Logic_info.Set.t;
   (** predicates and functions already inlined once, to prevent loops on
       recursive definitions *)
-  already_seen: Logic_info.Set.t;
 
-  (** current default label, Here at the beginning *)
   curr_label: logic_label;
+  (** current default label, Here at the beginning *)
 }
 
 (* Specification of the following inliner: the resulting term/predicate

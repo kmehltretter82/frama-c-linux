@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -113,10 +113,13 @@ sig
   val remove : key -> unit
   val define : key -> data -> unit
   (** no redefinition ; circularity protected *)
+
   val update : key -> data -> unit
   (** set current value, with no protection *)
+
   val memoize : (key -> data) -> key -> data
   (** with circularity protection *)
+
   val compile : (key -> data) -> key -> unit
   (** with circularity protection *)
 

@@ -49,7 +49,7 @@ let parse_to_cabs (path : Datatype.Filepath.t) =
   try
     Kernel.feedback ~level:2 "Parsing %a" Datatype.Filepath.pretty path;
     Errorloc.clear_errors () ;
-    let lexbuf = Clexer.init (path :> string) in
+    let lexbuf = Clexer.init ~filename:(path :> string) in
     let cabs = Cparser.file Clexer.initial lexbuf in
     (* Cprint.print_defs cabs;*)
     Clexer.finish ();

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -238,20 +238,20 @@ let char c = Integer.to_int64_exn (Cil.charConstToInt c)
 let constant e =
   match (Cil.constFold true e).enode with
   | Const(CInt64(k,_,_)) ->
-      begin
-        try Integer.to_int64_exn k
-        with Z.Overflow ->
-          Warning.error "Array size too large (%a)" Integer.pretty_hex k
-      end
+    begin
+      try Integer.to_int64_exn k
+      with Z.Overflow ->
+        Warning.error "Array size too large (%a)" Integer.pretty_hex k
+    end
   | _ -> Warning.error "Non-constant expression (%a)" Printer.pp_exp e
 
 let array_size = function
   | None -> None
   | Some e ->
-      match constant e with
-      | 0L when Cil.gccMode () || Cil.msvcMode () -> None
-      | 0L -> Warning.error "0 sized array %s" (Cil.allowed_machdep "GCC/MSVC")
-      | n  -> Some n
+    match constant e with
+    | 0L when Cil.gccMode () || Cil.msvcMode () -> None
+    | 0L -> Warning.error "0 sized array %s" (Cil.allowed_machdep "GCC/MSVC")
+    | n  -> Some n
 
 let get_int e =
   match (Cil.constFold true e).enode with
@@ -267,7 +267,7 @@ let dimension t =
   let rec flat k d = function
     | TNamed (r,_) -> flat k d r.ttype
     | TArray(ty,Some e,_) ->
-        flat (succ k) (Int64.mul d (constant e)) ty
+      flat (succ k) (Int64.mul d (constant e)) ty
     | te -> k , d , te
   in flat 1 Int64.one t
 
@@ -288,31 +288,31 @@ let rec object_of typ =
   | TEnum ({ekind=i},_) -> C_int (c_int i)
   | TComp (comp,_) -> C_comp comp
   | TArray (typ_elt,e_opt,_) ->
-      begin
-        match array_size e_opt with
-        | None ->
-            C_array {
-              arr_element = typ_elt;
-              arr_flat = None;
+    begin
+      match array_size e_opt with
+      | None ->
+        C_array {
+          arr_element = typ_elt;
+          arr_flat = None;
+        }
+      | Some e ->
+        let dim,ncells,ty_cell = dimension typ in
+        C_array {
+          arr_element = typ_elt ;
+          arr_flat = Some {
+              arr_size = Int64.to_int e ;
+              arr_dim = dim ;
+              arr_cell = ty_cell ;
+              arr_cell_nbr = ncells ;
             }
-        | Some e ->
-            let dim,ncells,ty_cell = dimension typ in
-            C_array {
-              arr_element = typ_elt ;
-              arr_flat = Some {
-                  arr_size = Int64.to_int e ;
-                  arr_dim = dim ;
-                  arr_cell = ty_cell ;
-                  arr_cell_nbr = ncells ;
-                }
-            }
-      end
+        }
+    end
   | TBuiltin_va_list _ ->
-      WpLog.warning ~current:true ~once:true "variadyc type (considered as void*)" ;
-      C_pointer (TVoid [])
+    WpLog.warning ~current:true ~once:true "variadyc type (considered as void*)" ;
+    C_pointer (TVoid [])
   | TVoid _ ->
-      WpLog.warning ~current:true "void object" ;
-      C_int (c_int IInt)
+    WpLog.warning ~current:true "void object" ;
+    C_int (c_int IInt)
   | TNamed (r,_)  -> object_of r.ttype
 
 (* ------------------------------------------------------------------------ *)
@@ -390,8 +390,8 @@ let () =
 
 let object_of_pointed = function
     C_int _ | C_float _ | C_comp _ as o ->
-      Wp_parameters.fatal
-        "object_of_pointed called on non-pointer %a@." pp_object o
+    Wp_parameters.fatal
+      "object_of_pointed called on non-pointer %a@." pp_object o
   | C_array info -> object_of info.arr_element
   | C_pointer typ -> object_of typ
 
@@ -447,7 +447,7 @@ let is_array obj ~elt = match obj with
 let array_size = function
   | { arr_flat = Some { arr_size=s } } -> Some s
   | { arr_flat = None } ->
-      if Wp_parameters.ExternArrays.get () then Some max_int else None
+    if Wp_parameters.ExternArrays.get () then Some max_int else None
 
 let get_array_size = function
   | C_array a -> array_size a
@@ -477,15 +477,15 @@ let bits_sizeof_comp cinfo = Cil.bitsSizeOf (typ_comp cinfo)
 let bits_sizeof_array ainfo =
   match ainfo.arr_flat with
   | Some a ->
-      let csize = Cil.kinteger64
-          ~loc:Cil_builtins.builtinLoc (Z.of_int64 a.arr_cell_nbr) in
-      let ctype = TArray(a.arr_cell,Some csize,[]) in
-      Cil.bitsSizeOf ctype
+    let csize = Cil.kinteger64
+        ~loc:Cil_builtins.builtinLoc (Z.of_int64 a.arr_cell_nbr) in
+    let ctype = TArray(a.arr_cell,Some csize,[]) in
+    Cil.bitsSizeOf ctype
   | None ->
-      if WpLog.ExternArrays.get () then
-        max_int
-      else
-        WpLog.fatal ~current:true "Sizeof unknown-size array"
+    if WpLog.ExternArrays.get () then
+      max_int
+    else
+      WpLog.fatal ~current:true "Sizeof unknown-size array"
 
 
 let sizeof_object = function
@@ -542,10 +542,10 @@ let rec basename = function
   | C_pointer _ -> "pointer"
   | C_comp c -> c.cname
   | C_array a ->
-      let te = basename (object_of a.arr_element) in
-      match a.arr_flat with
-      | None -> te ^ "_array"
-      | Some f -> te ^ "_" ^ string_of_int f.arr_size
+    let te = basename (object_of a.arr_element) in
+    match a.arr_flat with
+    | None -> te ^ "_array"
+    | Some f -> te ^ "_" ^ string_of_int f.arr_size
 
 let is_atomic = function
   | TVoid _ | TInt _ | TFloat _ | TNamed _ -> true
@@ -556,15 +556,15 @@ let rec pretty fmt = function
   | C_float f -> pp_float fmt f
   | C_comp c -> Format.pp_print_string fmt c.cname
   | C_pointer ty ->
-      if is_atomic ty then
-        Format.fprintf fmt "%a*" Printer.pp_typ ty
-      else
-        Format.fprintf fmt "(%a)*" Printer.pp_typ ty
+    if is_atomic ty then
+      Format.fprintf fmt "%a*" Printer.pp_typ ty
+    else
+      Format.fprintf fmt "(%a)*" Printer.pp_typ ty
   | C_array a ->
-      let te = object_of a.arr_element in
-      match a.arr_flat with
-      | None -> Format.fprintf fmt "%a[]" pretty te
-      | Some f -> Format.fprintf fmt "%a[%d]" pretty te f.arr_size
+    let te = object_of a.arr_element in
+    match a.arr_flat with
+    | None -> Format.fprintf fmt "%a[]" pretty te
+    | Some f -> Format.fprintf fmt "%a[%d]" pretty te f.arr_size
 
 module C_object = Datatype.Make(struct
     type t = c_object

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -67,11 +67,13 @@ class type ['a] signal =
 
 class type ['a] selector =
   object
-    inherit ['a] signal (** listen to all sets. *)
+    inherit ['a] signal
+    (** listen to all sets. *)
+
     method set : 'a -> unit
     method get : 'a
     method send : ('a -> unit) -> unit -> unit
-    (* [send f] calls [f] with the current value {i via} the signal lock. *)
+    (** [send f] calls [f] with the current value {i via} the signal lock. *)
   end
 
 (** {2 Labels} *)
@@ -189,11 +191,14 @@ class popup : unit ->
   object
     method clear : unit
     (** Remove all items *)
+
     method add_item : label:string -> callback:(unit -> unit) -> unit
     (** Adds an item. *)
+
     method add_separator : unit
     (** Inserts a separator.
         Consecutive and trailing separators are eliminated. *)
+
     method run : unit -> unit
     (** Run the menu. *)
   end

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -98,7 +98,7 @@ struct
     Kernel_function.Make_Table(X.T)
       (struct
         let name = "Inout.Cumulative_analysis.Memo(" ^ X.analysis_name ^ ")"
-        let dependencies = [ Db.Value.self ]
+        let dependencies = [ Eva.Analysis.self ]
         let size = 97
       end)
 

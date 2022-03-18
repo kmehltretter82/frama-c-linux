@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,8 +40,11 @@ val fq64 : lfun
 type model = Real | Float
 val configure : model -> WpContext.rollback
 
-val ftau : c_float -> tau (** model independant *)
-val tau_of_float : c_float -> tau (** with respect to model *)
+val ftau : c_float -> tau
+(** model independant *)
+
+val tau_of_float : c_float -> tau
+(** with respect to model *)
 
 type op =
   | LT

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -60,9 +60,9 @@ let pretty fmt =
   List.iter
     begin function
       | Bind(x,y) ->
-          Format.fprintf fmt "@ @[%a:=%a@]"
-            F.pp_var x F.pp_var y
+        Format.fprintf fmt "@ @[%a:=%a@]"
+          F.pp_var x F.pp_var y
       | Join(x,y) ->
-          Format.fprintf fmt "@ @[%a==%a@]"
-            F.pp_var x F.pp_var y
+        Format.fprintf fmt "@ @[%a==%a@]"
+          F.pp_var x F.pp_var y
     end

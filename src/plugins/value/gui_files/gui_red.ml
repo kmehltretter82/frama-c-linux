@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -151,7 +151,7 @@ let build_list () =
     w#reload ;
   in
   let r = {widget=w; append; clear} in
-  (** End of generic code *)
+  (* End of generic code *)
   let props = [`YALIGN 0.0] in
   let _ = w#add_column_text ~title:"Function" props
       (function (_, {function_name}) -> [`TEXT function_name])
@@ -194,7 +194,7 @@ let make_panel (main_ui:main_window_extension_points) =
   (* Fill the table when it is created. We are probably missing a call to
      'reset' once the saved state is loaded through -load... *)
   let (_:GtkSignal.id) =
-    w.widget#coerce#misc#connect#after#realize (fun () -> fill w)
+    w.widget#coerce#misc#connect#after#realize ~callback:(fun () -> fill w)
   in
   (* Insert the page in the notebook, then return *)
   let n =

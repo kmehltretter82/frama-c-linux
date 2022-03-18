@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -70,6 +70,7 @@ module Location: sig
   include S_with_collections_pretty with type t = location
   val unknown: t
   val pretty_long : t Pretty_utils.formatter
+
   (** Pretty the location under the form [file <f>, line <l>], without
       the full-path to the file. The default pretty-printer [pretty] echoes
       [<dir/f>:<l>] *)
@@ -355,6 +356,7 @@ module Toplevel_predicate: S_with_pretty with type t = toplevel_predicate
 module Identified_predicate:
   S_with_collections_pretty with type t = identified_predicate
 (** @since Neon-20140301 *)
+
 module PredicateStructEq: S_with_collections_pretty with type t = predicate
 (** @since 24.0-Chromium *)
 

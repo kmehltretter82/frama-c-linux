@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -2349,6 +2349,15 @@ class complete_types =
              not (isLogicType Cil.isCompleteType t.term_type) ->
         ChangeDoChildrenPost({ t with term_type = v.lv_type }, fun x -> x)
       | _ -> DoChildrenPost self#insert_cast_term
+
+    method! vinst = function
+      | Code_annot _ -> Cil.DoChildren
+      | _ -> Cil.SkipChildren
+
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vinit _ _ _ = Cil.SkipChildren
   end
 
 let complete_types f = Cil.visitCilFile (new complete_types) f
@@ -2702,7 +2711,7 @@ let find_initial_value init loff =
 let eval_term_lval global_find_init (lhost, loff) =
   match lhost with
   | TVar lvi -> begin
-      (** See if we can evaluate the l-value using the initializer of lvi*)
+      (* See if we can evaluate the l-value using the initializer of lvi*)
       let off_type = Cil.typeTermOffset lvi.lv_type loff in
       if Logic_const.plain_or_set Cil.isLogicIntegralType off_type then
         match lvi.lv_origin with

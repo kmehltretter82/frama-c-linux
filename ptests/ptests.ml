@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -420,6 +420,7 @@ let example_msg =
      @@PTEST_NAME@@         # Basename of the test file.@ \
      @@PTEST_NUMBER@@       # Test command number.@ \
      @@PTEST_CONFIG@@       # Test configuration suffix.@ \
+     @@PTEST_SESSION@@      # Set to the value of the environment variable FRAMAC_SESSION.@ \
      @@PTEST_SUITE_DIR@@    # Path to the directory contained the source of the test file (depends from -dune-mode option).@ \
      @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@ \
      @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@ \
@@ -440,7 +441,8 @@ let example_msg =
      @@PTEST_OPTIONS@@          # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
      @@frama-c@@                # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@            # Shortcut defined as follow: %s@  \
-     @@frama-c-exe@@            # set to the value of the 'TOPLEVEL_PATH' variable from './tests/ptests_config' file.@  \
+     @@frama-c-exe@@            # set to the value of the 'TOPLEVEL_PATH' variable defined in the './tests/ptests_config' file.@  \
+     @@FRAMAC_SHARE@@           # set to the value of the 'FRAMAC_SHARE' variable defined in the './tests/ptests_config' file.@  \
      @@DEV_NULL@@               # set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
      @]@ \
      @[<v 1>\
@@ -957,7 +959,7 @@ end = struct
   let default_options =
     match !dune_mode with
     | 0 -> !macro_default_options
-    | _ -> !macro_default_options ^ " -add-symbolic-path $FRAMAC_SESSION:."
+    | _ -> !macro_default_options ^ " -add-symbolic-path @PTEST_SESSION@:."
 
   let default_macros () =
     let l = [
@@ -965,6 +967,8 @@ end = struct
       "frama-c-cmd",  !macro_frama_c_cmd;
       "frama-c",      !macro_frama_c;
       "DEV_NULL",     dev_null;
+      "FRAMAC_SHARE",           get_default_env "FRAMAC_SHARE" "";
+      "PTEST_SESSION",          get_default_env "FRAMAC_SESSION" "";
       "PTEST_DEFAULT_OPTIONS",  default_options;
       "PTEST_OPTIONS",          !macro_options;
       "PTEST_PRE_OPTIONS",      !macro_pre_options;

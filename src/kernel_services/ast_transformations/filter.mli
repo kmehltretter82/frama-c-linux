@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -92,6 +92,7 @@ module type RemoveInfo = sig
       should be erased entirely (i.e. assigns everything. If it were to
       just return false to all elements, this would result in assigns \nothing
   *)
+
   val fun_deps_visible : fct -> identified_term -> bool
   (** true if the corresponding functional dependency is visible. *)
 

@@ -992,7 +992,8 @@ let alphaTable : location Alpha.alphaTable = H.create 307
  * foo" or "union bar" *)
 
 let fresh_global lookupname =
-  fst (Alpha.newAlphaName alphaTable None lookupname (CurrentLoc.get ()))
+  fst (Alpha.newAlphaName ~alphaTable ~undolist:None ~lookupname
+         ~data:(CurrentLoc.get ()))
 
 (* To keep different name scopes different, we add prefixes to names
  * specifying the kind of name: the kind can be one of "" for variables or
@@ -1335,7 +1336,7 @@ let findCompType ghost kind name attr =
      * struct already or because we want to create a version with different
      * attributes  *)
     if kind = "enum" then
-      let enum, isnew = createEnumInfo name name in
+      let enum, isnew = createEnumInfo name ~norig:name in
       if isnew then
         cabsPushGlobal (GEnumTagDecl (enum, CurrentLoc.get ()));
       TEnum (enum, attr)
@@ -1367,8 +1368,8 @@ class canDropStmtClass pRes = object
     else
     if !pRes then DoChildren else SkipChildren
 
-  method! vinst _ = SkipChildren
-  method! vexpr _ = SkipChildren
+  method! vinst _ = Cil.SkipChildren
+  method! vexpr _ = Cil.SkipChildren
 
 end
 let canDropStatement (s: stmt) : bool =
@@ -1420,11 +1421,11 @@ let rec is_boolean_result e =
 (* Like Cil.mkCastT, but it calls typeForInsertedCast *)
 let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   if need_cast oldt newt then
-    Cil.mkCastT oldt (!typeForInsertedCast e oldt newt) e
+    Cil.mkCastT ~oldt ~newt:(!typeForInsertedCast e oldt newt) e
   else e
 
 let makeCast ~(e: exp) ~(newt: typ) =
-  makeCastT e (typeOf e) newt
+  makeCastT ~e ~oldt:(typeOf e) ~newt
 
 let is_scalar_type t =
   match unrollType t with
@@ -2439,7 +2440,8 @@ class registerLabelsVisitor = object
     let currentLoc = convLoc (Cabshelper.get_statementloc s) in
     (match s.stmt_node with
      | Cabs.LABEL (lbl,_,_) ->
-       Alpha.registerAlphaName alphaTable (kindPlusName "label" lbl) currentLoc
+       Alpha.registerAlphaName ~alphaTable
+         ~lookupname:(kindPlusName "label" lbl) ~data:currentLoc
      | _ -> ());
     DoChildren
 end
@@ -2521,7 +2523,7 @@ let cabsAddAttributes al0 (al: attributes) : attributes =
                "Duplicate attribute %a along with %a"
                Cil_printer.pp_attribute a Cil_printer.pp_attribute a' ;
              (* let acc' = dropAttribute an acc in *)
-             (** Keep both attributes *)
+             (* Keep both attributes *)
              addAttribute a acc
            end)
       al
@@ -2934,7 +2936,7 @@ let rec castTo ?context ?(fromsource=false)
       else
         nt,
         Cil.mkCastT
-          ot nt'
+          ~oldt:ot ~newt:nt'
           (constFold true
              (new_exp  ~loc:e.eloc
                 (BinOp(Ne,e,Cil.integer ~loc:e.eloc 0,intType))))
@@ -3066,7 +3068,7 @@ let rec castTo ?context ?(fromsource=false)
     | TComp (comp1, _), TComp (comp2, _) when comp1.ckey = comp2.ckey ->
       result
 
-    (** If we try to pass a transparent union value to a function
+    (* If we try to pass a transparent union value to a function
      * expecting a transparent union argument, the argument type would
      * have been changed to the type of the first argument, and we'll
      * see a cast from a union to the type of the first argument. Turn
@@ -3122,7 +3124,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         vi.vname oldvi.vid Cil_printer.pp_location oldloc;
       (* It was already defined. We must reuse the varinfo. But clean up the
        * storage.  *)
-      let newstorage = (** See 6.2.2 *)
+      let newstorage = (* See 6.2.2 *)
         match oldvi.vstorage, vi.vstorage with
         | Extern, NoStorage when isadef -> NoStorage
         (* the case above is not strictly C standard, but will not accept
@@ -3947,9 +3949,9 @@ let collapseCallCast (s1,s2) = match s1.skind, s2.skind with
 
 let afterConversion ~ghost (c: chunk) : chunk =
   (* Now scan the statements and find Instr blocks *)
-  (** We want to collapse sequences of the form "tmp = f(); v = tmp". This
-      * will help significantly with the handling of calls to malloc, where it
-      * is important to have the cast at the same place as the call *)
+  (* We want to collapse sequences of the form "tmp = f(); v = tmp". This
+   * will help significantly with the handling of calls to malloc, where it
+   * is important to have the cast at the same place as the call *)
   let block = c2block ~ghost ~collapse_block:false c in
   let sl =
     if Kernel.DoCollapseCallCast.get () then
@@ -4987,7 +4989,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       match a.expr_node with
       | Cabs.VARIABLE n -> begin
           let n' = if strip then stripUnderscore n else n in
-          (** See if this is an enumeration *)
+          (* See if this is an enumeration *)
           try
             if not foldenum then raise Not_found;
             let env = if ghost then ghost_env else env in
@@ -5115,9 +5117,9 @@ and doType (ghost:bool) isFuncArg
     | Cabs.JUSTBASE -> bt, acc
     | Cabs.PARENTYPE (a1, d, a2) ->
       let a1' = doAttributes ghost a1 in
-      let a1n, a1f, a1t = partitionAttributes AttrType a1' in
+      let a1n, a1f, a1t = partitionAttributes ~default:AttrType a1' in
       let a2' = doAttributes ghost a2 in
-      let a2n, a2f, a2t = partitionAttributes nameortype a2' in
+      let a2n, a2f, a2t = partitionAttributes ~default:nameortype a2' in
       (*Format.printf "doType: @[a1n=%a@\na1f=%a@\na1t=%a@\na2n=%a@\na2f=%a@\na2t=%a@]@\n" d_attrlist a1n d_attrlist a1f d_attrlist a1t d_attrlist a2n d_attrlist a2f d_attrlist a2t;*)
       let bt' = cabsTypeAddAttributes a1t bt in
       (*        log "bt' = %a@." d_type bt';*)
@@ -5164,7 +5166,7 @@ and doType (ghost:bool) isFuncArg
 
     | Cabs.PTR (al, d) ->
       let al' = doAttributes ghost al in
-      let an, af, at = partitionAttributes AttrType al' in
+      let an, af, at = partitionAttributes ~default:AttrType al' in
       (* Now recurse *)
       let restyp, nattr = doDeclType (TPtr(bt, at)) acc d in
       (* See if we can do anything with function type attributes *)
@@ -5466,7 +5468,7 @@ and makeCompType ghost (isstruct: bool)
   let n', _  = newAlphaName ghost true kind n in
   (* Create the self cell for use in fields and forward references. Or maybe
    * one exists already from a forward reference  *)
-  let comp, _ = createCompInfo isstruct n' norig in
+  let comp, _ = createCompInfo isstruct n' ~norig in
   let rec fold f acc = function
     | [] -> acc
     | [x] -> f ~last:true acc x
@@ -5955,8 +5957,8 @@ and doExp local_env
             addOffsetLval (Index(e2'', NoOffset)) array
           | _ -> (* Turn into *(e1 + e2) *)
             mkMem
-              (new_exp ~loc:e1''.eloc (BinOp(PlusPI, e1'', e2'', t1)))
-              NoOffset
+              ~addr:(new_exp ~loc:e1''.eloc (BinOp(PlusPI, e1'', e2'', t1)))
+              ~off:NoOffset
         in
         (* Do some optimization of StartOf *)
         let reads =
@@ -5981,7 +5983,7 @@ and doExp local_env
             "Expecting a pointer type in *. Got %a."
             Cil_printer.pp_typ t
       in
-      let res = mkMem e' NoOffset in
+      let res = mkMem ~addr:e' ~off:NoOffset in
       let reads =
         if Lval.Set.mem res local_env.authorized_reads
         then r
@@ -6044,7 +6046,7 @@ and doExp local_env
             "expecting a struct with field %s. Found %a. t1 is %a"
             str Cil_printer.pp_typ x Cil_printer.pp_typ t'
       in
-      let lv' = mkMem e' field_offset in
+      let lv' = mkMem ~addr:e' ~off:field_offset in
       let field_type = typeOfLval lv' in
       let reads =
         if Lval.Set.mem lv' local_env.authorized_reads
@@ -6266,7 +6268,9 @@ and doExp local_env
       in
       if isIntegralType t then
         let tres = integralPromotion t in
-        let e'' = new_exp ~loc (UnOp(Neg, makeCastT e' t tres, tres)) in
+        let e'' =
+          new_exp ~loc (UnOp(Neg, makeCastT ~e:e' ~oldt:t ~newt:tres, tres))
+        in
         finishExp r se e'' tres
       else
       if isArithmeticType t then
@@ -6280,7 +6284,9 @@ and doExp local_env
       in
       if isIntegralType t then
         let tres = integralPromotion t in
-        let e'' = new_exp ~loc (UnOp(BNot, makeCastT e' t tres, tres)) in
+        let e'' =
+          new_exp ~loc (UnOp(BNot, makeCastT ~e:e' ~oldt:t ~newt:tres, tres))
+        in
         finishExp r se e'' tres
       else
         Kernel.fatal ~current:true "Unary ~ on a non-integral type"
@@ -6759,7 +6765,7 @@ and doExp local_env
                 | AddrOf lv -> new_exp ~loc:f'.eloc (Lval(lv))
                 | _ ->
                   new_exp ~loc:f'.eloc
-                    (Lval (mkMem f' NoOffset))
+                    (Lval (mkMem ~addr:f' ~off:NoOffset))
               in
               (rt,at,isvar, f'',[])
             | x ->
@@ -7674,7 +7680,7 @@ and doExp local_env
             end
         in
         finishExp [] (unspecified_chunk empty)
-          (makeCast (integer ~loc addrval) voidPtrType) voidPtrType
+          (makeCast ~e:(integer ~loc addrval) ~newt:voidPtrType) voidPtrType
       end
 
     | Cabs.EXPR_PATTERN _ -> abort_context "EXPR_PATTERN in cabs2cil input"
@@ -7765,14 +7771,18 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
     (* Keep the operator since it is arithmetic *)
     tres,
     optConstFoldBinOp loc false bop
-      (makeCastT e1 t1 tres) (makeCastT e2 t2 tres) tres
+      (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
+      (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
+      tres
   in
   let doArithmeticComp () =
     let tres = arithmeticConversion t1 t2 in
     (* Keep the operator since it is arithmetic *)
     intType,
     optConstFoldBinOp loc false bop
-      (makeCastT e1 t1 tres) (makeCastT e2 t2 tres) intType
+      (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
+      (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
+      intType
   in
   let doIntegralArithmetic () =
     let tres = unrollType (arithmeticConversion t1 t2) in
@@ -7780,7 +7790,9 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
     | TInt _ ->
       tres,
       optConstFoldBinOp loc false bop
-        (makeCastT e1 t1 tres) (makeCastT e2 t2 tres) tres
+        (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
+        (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
+        tres
     | _ ->
       Kernel.fatal ~current:true "%a operator on non-integer type %a"
         Cil_printer.pp_binop bop Cil_printer.pp_typ tres
@@ -7796,7 +7808,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
        arguments with incompatible types to a common type *)
     let e1', e2' =
       if not (areCompatibleTypes t1p t2p) then
-        makeCastT e1 t1 Cil.voidPtrType, makeCastT e2 t2 Cil.voidPtrType
+        makeCastT ~e:e1 ~oldt:t1 ~newt:Cil.voidPtrType,
+        makeCastT ~e:e2 ~oldt:t2 ~newt:Cil.voidPtrType
       else e1, e2
     in
     intType,
@@ -7808,7 +7821,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
     | _ ->
       optConstFoldBinOp loc false PlusPI e1
-        (makeCastT e2 t2 (integralPromotion t2)) t1
+        (makeCastT ~e:e2 ~oldt:t2 ~newt:(integralPromotion t2)) t1
   in
   match bop with
   | (Mult|Div) -> doArithmetic ()
@@ -7823,7 +7836,9 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       let t2' = integralPromotion t2 in
       t1',
       optConstFoldBinOp loc false bop
-        (makeCastT e1 t1 t1') (makeCastT e2 t2 t2') t1'
+        (makeCastT ~e:e1 ~oldt:t1 ~newt:t1')
+        (makeCastT ~e:e2 ~oldt:t2 ~newt:t2')
+        t1'
   | (PlusA|MinusA)
     when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
   | (Eq|Ne|Lt|Le|Ge|Gt)
@@ -7836,7 +7851,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
   | MinusA when isPointerType t1 && isIntegralType t2 ->
     t1,
     optConstFoldBinOp loc false MinusPI e1
-      (makeCastT e2 t2 (integralPromotion t2)) t1
+      (makeCastT ~e:e2 ~oldt:t2 ~newt:(integralPromotion t2)) t1
   | MinusA when isPointerType t1 && isPointerType t2 ->
     if areCompatibleTypes (* C99 6.5.6:3 *)
         (Cil.type_remove_qualifier_attributes_deep t1)
@@ -7849,9 +7864,9 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
   (* Two special cases for comparisons with the NULL pointer. We are a bit
      more permissive. *)
   | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t1 && isZero e2 ->
-    pointerComparison e1 t1 (makeCast e2 t1) t1
+    pointerComparison e1 t1 (makeCast ~e:e2 ~newt:t1) t1
   | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t2 && isZero e1 ->
-    pointerComparison (makeCast e1 t2) t2 e2 t2
+    pointerComparison (makeCast ~e:e1 ~newt:t2) t2 e2 t2
 
   | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t1 && isPointerType t2 ->
     pointerComparison e1 t1 e2 t2
@@ -7872,7 +7887,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
  * new statements.
 *)
 and doCondExp local_env asconst
-    (** Try to evaluate the conditional expression
+    (* Try to evaluate the conditional expression
      * to TRUE or FALSE, because it occurs in a constant *)
     ?ctxt (* ctxt is used internally to determine if we should apply
              the conditional side effects hook (see above)
@@ -8119,7 +8134,8 @@ and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "Collecting the initializer for %s@\n" vi.vname;
   let (init, typ'', reads) =
-    collectInitializer Cil_datatype.Lval.Set.empty preinit typ' typ'
+    collectInitializer Cil_datatype.Lval.Set.empty preinit typ'
+      ~parenttype:typ'
   in
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "Finished the initializer for %s@\n  init=%a@\n  typ=%a@\n  acc=%a@\n"
@@ -8493,7 +8509,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
             asconst oneinit (AExp(Some so.soTyp))
         in
         let r = Cil_datatype.Lval.Set.of_list r in
-        let init_expr = makeCastT oneinit' t' so.soTyp in
+        let init_expr = makeCastT ~e:oneinit' ~oldt:t' ~newt:so.soTyp in
         let preinit' = setOneInit preinit so.soOff (SinglePre (init_expr, r)) in
         (* Move on *)
         advanceSubobj so;
@@ -9052,7 +9068,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
         in
         let setlen =  se0 +++
                       (mkStmtOneInstr ~ghost ~valid_sid
-                         (Set(var savelen, makeCast len savelen.vtype,
+                         (Set(var savelen, makeCast ~e:len ~newt:savelen.vtype,
                               CurrentLoc.get ())),
                        [],[],[])
         in
@@ -9082,7 +9098,8 @@ and createLocal ghost ((_, sto, _, _) as specs)
                  (Local_init
                     (vi,AssignInit
                        (SingleInit
-                          (makeCast (new_exp ~loc (Lval(var tmp))) vi.vtype)),
+                          (makeCast ~e:(new_exp ~loc (Lval(var tmp)))
+                             ~newt:vi.vtype)),
                      CurrentLoc.get ())),
                [],[var vi],[var tmp])
         end
@@ -9514,7 +9531,8 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
              defaultChunk ~ghost
                loc
                (i2c (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
-                       (Set ((Mem (makeCast (integer ~loc 0) intPtrType),
+                       (Set ((Mem (makeCast ~e:(integer ~loc 0)
+                                     ~newt:intPtrType),
                               NoOffset),
                              integer ~loc 0, loc)),[],[],[]))
            in
@@ -9602,7 +9620,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
           match unrollType !currentReturnType with
           | TVoid _ -> [], None
           | (TInt _ | TEnum _ | TFloat _ | TPtr _) as rt ->
-            let res = Some (makeCastT (zero ~loc) intType rt) in
+            let res = Some (makeCastT ~e:(zero ~loc) ~oldt:intType ~newt:rt) in
             if !currentFunctionFDEC.svar.vname = "main" then
               [],res
             else begin
@@ -9616,8 +9634,12 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
             (* 0 is not an admissible value for the return type.
                On the other hand, *( T* )0 is. We're not supposed
                to get there anyway. *)
-            let null_ptr = makeCastT (zero ~loc) intType (TPtr(rt,[])) in
-            let res = Some (new_exp ~loc (Lval (mkMem null_ptr NoOffset))) in
+            let null_ptr =
+              makeCastT ~e:(zero ~loc) ~oldt:intType ~newt:(TPtr(rt,[]))
+            in
+            let res =
+              Some (new_exp ~loc (Lval (mkMem ~addr:null_ptr ~off:NoOffset)))
+            in
             Kernel.warning ~current:true ~wkey:Kernel.wkey_cert_msc_37
               "Body of function %s falls-through. \
                Adding a return statement"
@@ -9735,7 +9757,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                  which are invalid)
                - redefinition via a typedef of a struct/union/enum IS allowed;
                - other types are allowed. *)
-            if declared_in_current_scope ghost n then
+            if declared_in_current_scope ~ghost n then
               begin
                 match newTyp' with (* do NOT unroll type here,
                                       redefinitions of typedefs are ok *)
@@ -9762,7 +9784,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                   if not (Kernel.C11.get ()) then error_c11_redefinition ()
               end
           end
-        else if declared_in_current_scope ghost n then
+        else if declared_in_current_scope ~ghost n then
           Kernel.error ~current:true
             "redefinition of type '%s' in the same scope with incompatible type.@ \
              Previous declaration was at %a" n Cil_datatype.Location.pretty oldloc;
@@ -10201,7 +10223,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       | Some (switchv, switch) -> (* We have already generated this one  *)
         (se
          @@ (i2c(mkStmtOneInstr ~ghost ~valid_sid
-                   (Set (var switchv, makeCast e' intType, loc')),
+                   (Set (var switchv, makeCast ~e:e' ~newt:intType, loc')),
                  [],[],[]), ghost))
         @@ (s2c(mkStmt ~ghost ~valid_sid (Goto (ref switch, loc'))), ghost)
 
@@ -10232,7 +10254,8 @@ and doStatement local_env (s : Cabs.statement) : chunk =
           (se @@
            (i2c
               (mkStmtOneInstr ~ghost ~valid_sid
-                 (Set (var switchv, makeCast e' intType, loc')),[],[],[]),
+                 (Set (var switchv, makeCast ~e:e' ~newt:intType, loc')),
+               [],[],[]),
             ghost))
           @@ (s2c switch, ghost)
         end

@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2021                                               */
+/*  Copyright (C) 2007-2022                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -451,6 +451,41 @@ extern void free(void *p);
   */
 extern void *realloc(void *ptr, size_t size);
 
+// reallocarray is non-POSIX (glibc)
+/*@
+   requires freeable: ptr == \null || \freeable(ptr);
+   allocates \result;
+   frees     ptr;
+   assigns   __fc_heap_status \from indirect:nmemb, indirect:size,
+                                    __fc_heap_status;
+   assigns   \result \from ptr, indirect:nmemb, indirect:size,
+                           indirect:__fc_heap_status;
+
+   behavior allocation:
+     assumes   can_allocate: is_allocable(nmemb * size);
+     allocates \result;
+     ensures   allocation: \fresh(\result, nmemb * size);
+
+   behavior deallocation:
+     assumes   nonnull_ptr: ptr != \null;
+     assumes   can_allocate: is_allocable(nmemb * size);
+     frees     ptr;
+     ensures   freed: \allocable(ptr);
+     ensures   freeable: \result == \null || \freeable(\result);
+
+   behavior fail:
+     assumes cannot_allocate: !is_allocable(nmemb * size);
+     allocates \nothing;
+     frees     \nothing;
+     assigns   \result \from indirect:nmemb, indirect:size,
+                             indirect:__fc_heap_status;
+     ensures   null_result: \result == \null;
+
+   complete behaviors;
+   disjoint behaviors allocation, fail;
+   disjoint behaviors deallocation, fail;
+  */
+extern void *reallocarray(void *ptr, size_t nmemb, size_t size);
 
 /* ISO C: 7.20.4 */
 

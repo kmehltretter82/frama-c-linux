@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,7 +33,7 @@ class provers =
 
     initializer
       begin
-        (** select automatically the provers set on the command line *)
+        (* select automatically the provers set on the command line *)
         let cmdline =
           match Wp_parameters.Provers.get () with
           | [] -> [ "alt-ergo" ]

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -975,7 +975,7 @@ let make (tree_view:GTree.view) =
       let () = match get_column_header_button column with
         | None ->
           (* Should not happen, but who knowns? *)
-          ignore (column#connect#clicked pop_menu)
+          ignore (column#connect#clicked ~callback:pop_menu)
         | Some button ->
           (* Connect the menu to a right click. *)
           let callback evt =
@@ -988,26 +988,26 @@ let make (tree_view:GTree.view) =
 
       (* Changes the sort order when left-clicking on the column header. *)
       let callback () = self#change_sort column MYTREE.Ascending; self#reset () in
-      ignore (column#connect#clicked callback);
+      ignore (column#connect#clicked ~callback:callback);
       (* Sets the sort_kind to the initial sort. *)
       sort_kind <- `ASCENDING, column#get_oid;
 
       ignore (MenusHide.mi_set_callback
-                mhide_functions key_hide_functions self#reset_internal);
+                mhide_functions ~key:key_hide_functions self#reset_internal);
       ignore (MenusHide.mi_set_callback
-                mhide_variables key_hide_variables self#reset_internal);
+                mhide_variables ~key:key_hide_variables self#reset_internal);
       ignore (MenusHide.mi_set_callback
-                mhide_stdlib key_hide_stdlib self#reset_internal);
+                mhide_stdlib ~key:key_hide_stdlib self#reset_internal);
       ignore (MenusHide.mi_set_callback
-                mhide_defined key_hide_defined self#reset_internal);
+                mhide_defined ~key:key_hide_defined self#reset_internal);
       ignore (MenusHide.mi_set_callback
-                mhide_undefined key_hide_undefined self#reset_internal);
+                mhide_undefined ~key:key_hide_undefined self#reset_internal);
       ignore (MenusHide.mi_set_callback
-                mhide_builtins key_hide_builtins self#reset_internal);
+                mhide_builtins ~key:key_hide_builtins self#reset_internal);
       ignore (MenusHide.mi_set_callback
-                mhide_annotations key_hide_annotations self#reset_internal);
+                mhide_annotations ~key:key_hide_annotations self#reset_internal);
       ignore (MenusHide.mi_set_callback
-                mflat_mode key_flat_mode self#reset_internal);
+                mflat_mode ~key:key_flat_mode self#reset_internal);
       menu#add (GMenu.separator_item () :> GMenu.menu_item);
 
       tree_view#set_model (Some (init_model:>GTree.model));

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -68,17 +68,17 @@ class printer (text : Wtext.text) =
       text#printf "@{<bf>Tactical@}@} %s:" header ;
       match ProofEngine.children node with
       | [] ->
-          text#printf "@{<green>proved@} (Qed).@\n"
+        text#printf "@{<green>proved@} (Qed).@\n"
       | [_,child] ->
-          text#printf "%a (%a).@\n" pp_status child self#pp_node child
+        text#printf "%a (%a).@\n" pp_status child self#pp_node child
       | children ->
-          begin
-            text#printf " (%a)@\n@{<bf>Sub Goals:@}" pp_status node ;
-            List.iter
-              (fun (part,child) -> text#printf "@\n - %s : %a" part pp_status child)
-              children ;
-            text#printf "@." ;
-          end
+        begin
+          text#printf " (%a)@\n@{<bf>Sub Goals:@}" pp_status node ;
+          List.iter
+            (fun (part,child) -> text#printf "@\n - %s : %a" part pp_status child)
+            children ;
+          text#printf "@." ;
+        end
 
     method private alternative g a =
       let open ProofScript in match a with
@@ -86,9 +86,9 @@ class printer (text : Wtext.text) =
       | Tactic(n,{ header },_) -> text#printf "@{<bf>Script@} %s: pending %d.@\n" header n
       | Error(msg,_) -> text#printf "@{<bf>Script@} Error (%S).@\n" msg
       | Prover(p,r) ->
-          if not (Wpo.has_verdict g p) then
-            text#printf "@{<bf>Script@} %a: %a.@\n"
-              VCS.pp_prover p VCS.pp_result r
+        if not (Wpo.has_verdict g p) then
+          text#printf "@{<bf>Script@} %a: %a.@\n"
+            VCS.pp_prover p VCS.pp_result r
 
     method private strategy index i h =
       text#printf "@{<bf>Strategy@} %s"
@@ -104,10 +104,10 @@ class printer (text : Wtext.text) =
         match ProofEngine.tactical node with
         | None -> List.iter (self#alternative g) (ProofEngine.bound node)
         | Some { ProofScript.header } ->
-            self#tactic header node ;
-            let index,hs = ProofEngine.get_strategies node in
-            if Array.length hs > 0 then
-              ( text#hrule ; Array.iteri (self#strategy index) hs )
+          self#tactic header node ;
+          let index,hs = ProofEngine.get_strategies node in
+          if Array.length hs > 0 then
+            ( text#hrule ; Array.iteri (self#strategy index) hs )
       end
 
     method status tree =
@@ -148,54 +148,54 @@ class printer (text : Wtext.text) =
         self#pp_step ~prefix ~here fmt node ;
         match ProofEngine.tactical node with
         | None ->
-            Format.fprintf fmt " (%a)" pp_status node
+          Format.fprintf fmt " (%a)" pp_status node
         | Some tactic ->
-            Format.fprintf fmt " (%s" tactic.ProofScript.header ;
-            match ProofEngine.children node with
+          Format.fprintf fmt " (%s" tactic.ProofScript.header ;
+          match ProofEngine.children node with
 
-            | [] ->
-                Format.fprintf fmt ": @{<green>qed@})"
+          | [] ->
+            Format.fprintf fmt ": @{<green>qed@})"
 
-            | _::_ when not (List.mem node path) ->
-                Format.fprintf fmt ": %a)%a" pp_status node self#backtrack node
+          | _::_ when not (List.mem node path) ->
+            Format.fprintf fmt ": %a)%a" pp_status node self#backtrack node
 
-            | [_,child] ->
-                Format.fprintf fmt ")%a" self#backtrack node ;
-                self#proofstep ~prefix:direct ~direct ~path ~here fmt child
+          | [_,child] ->
+            Format.fprintf fmt ")%a" self#backtrack node ;
+            self#proofstep ~prefix:direct ~direct ~path ~here fmt child
 
-            | children ->
-                Format.fprintf fmt ": %a)%a" pp_status node self#backtrack node ;
-                let prefix = direct ^ " + " in
-                let direct = direct ^ "   " in
-                List.iter
-                  (fun (_,node) ->
-                     self#proofstep ~prefix ~direct ~path ~here fmt node)
-                  children
+          | children ->
+            Format.fprintf fmt ": %a)%a" pp_status node self#backtrack node ;
+            let prefix = direct ^ " + " in
+            let direct = direct ^ "   " in
+            List.iter
+              (fun (_,node) ->
+                 self#proofstep ~prefix ~direct ~path ~here fmt node)
+              children
       end
 
     method tree tree =
       match ProofEngine.current tree with
       | `Main ->
-          begin
-            let wpo = ProofEngine.main tree in
-            match ProofEngine.get wpo with
-            | `Proof ->
-                text#printf "@{<it>Existing Script (navigate to explore)@}@."
-            | `Script ->
-                text#printf "[%a]@." ProofSession.pp_script_for wpo ;
-                text#printf "@{<it>Existing Script (replay to explore)@}@."
-            | `Saved ->
-                text#printf "[%a]@." ProofSession.pp_script_for wpo ;
-                text#printf "@{<it>Saved Script (replay to load)@}@."
-            | `None ->
-                text#printf "@{<it>No Script@}@."
-          end
+        begin
+          let wpo = ProofEngine.main tree in
+          match ProofEngine.get wpo with
+          | `Proof ->
+            text#printf "@{<it>Existing Script (navigate to explore)@}@."
+          | `Script ->
+            text#printf "[%a]@." ProofSession.pp_script_for wpo ;
+            text#printf "@{<it>Existing Script (replay to explore)@}@."
+          | `Saved ->
+            text#printf "[%a]@." ProofSession.pp_script_for wpo ;
+            text#printf "@{<it>Saved Script (replay to load)@}@."
+          | `None ->
+            text#printf "@{<it>No Script@}@."
+        end
       | `Internal here | `Leaf(_,here) ->
-          begin
-            let root,path = rootchain here [here] in
-            let qed = if Wpo.is_proved (ProofEngine.main tree) then "Qed" else "End"
-            in text#printf "@[<hv 0>@{<bf>Proof@}:%a@\n@{<bf>%s@}.@]@."
-              (self#proofstep ~prefix:"  " ~direct:"  " ~path ~here) root qed ;
-          end
+        begin
+          let root,path = rootchain here [here] in
+          let qed = if Wpo.is_proved (ProofEngine.main tree) then "Qed" else "End"
+          in text#printf "@[<hv 0>@{<bf>Proof@}:%a@\n@{<bf>%s@}.@]@."
+            (self#proofstep ~prefix:"  " ~direct:"  " ~path ~here) root qed ;
+        end
 
   end

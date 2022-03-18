@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -45,10 +45,10 @@ class type composer =
 let rec insert_group cc = function
   | [] -> [cc#group , [cc]]
   | (( gid , ccs ) as group ):: others ->
-      if cc#group = gid then
-        ( gid , ccs @ [cc] ) :: others
-      else
-        group :: insert_group cc others
+    if cc#group = gid then
+      ( gid , ccs @ [cc] ) :: others
+    else
+      group :: insert_group cc others
 
 let add_composer (c : #composer) =
   let id = c#id in
@@ -115,23 +115,23 @@ let get_int = function
   | Empty -> None
   | Compose(Cint a) -> get_int_z a
   | s ->
-      match Lang.F.repr (selected s) with
-      | Qed.Logic.Kint z -> get_int_z z
-      | _ -> None
+    match Lang.F.repr (selected s) with
+    | Qed.Logic.Kint z -> get_int_z z
+    | _ -> None
 
 let subclause clause p =
   match clause with
   | Step s ->
-      let hs = Conditions.have s in
-      hs == p ||
-      ( match Lang.F.p_expr hs with
-        | Qed.Logic.And ps -> List.memq p ps
-        | _ -> false )
+    let hs = Conditions.have s in
+    hs == p ||
+    ( match Lang.F.p_expr hs with
+      | Qed.Logic.And ps -> List.memq p ps
+      | _ -> false )
   | Goal hs ->
-      hs == p ||
-      ( match Lang.F.p_expr hs with
-        | Qed.Logic.Or ps -> List.memq p ps
-        | _ -> false )
+    hs == p ||
+    ( match Lang.F.p_expr hs with
+      | Qed.Logic.Or ps -> List.memq p ps
+      | _ -> false )
 
 let pp_clause fmt = function
   | Goal _ -> Format.pp_print_string fmt "Goal"
@@ -140,20 +140,20 @@ let pp_clause fmt = function
 let rec pp_selection fmt = function
   | Empty -> Format.pp_print_string fmt "Empty"
   | Inside(c,t) ->
-      Format.fprintf fmt "Term %d in %a" (Lang.F.QED.id t) pp_clause c
+    Format.fprintf fmt "Term %d in %a" (Lang.F.QED.id t) pp_clause c
   | Clause c -> pp_clause fmt c
   | Compose(Cint k) ->
-      Format.fprintf fmt "Constant '%a'" Integer.pretty k
+    Format.fprintf fmt "Constant '%a'" Integer.pretty k
   | Compose(Range(a,b)) ->
-      Format.fprintf fmt "Range '%d..%d'" a b
+    Format.fprintf fmt "Range '%d..%d'" a b
   | Compose(Code(_,id,es)) ->
-      Format.fprintf fmt "@[<hov 2>Compose '%s'" id ;
-      List.iter (fun e -> Format.fprintf fmt "(%a)" pp_selection e) es ;
-      Format.fprintf fmt "@]"
+    Format.fprintf fmt "@[<hov 2>Compose '%s'" id ;
+    List.iter (fun e -> Format.fprintf fmt "(%a)" pp_selection e) es ;
+    Format.fprintf fmt "@]"
   | Multi es ->
-      Format.fprintf fmt "@[<hov 2>Multi-selection" ;
-      List.iter (fun e -> Format.fprintf fmt "(%a)" pp_selection e) es ;
-      Format.fprintf fmt "@]"
+    Format.fprintf fmt "@[<hov 2>Multi-selection" ;
+    List.iter (fun e -> Format.fprintf fmt "(%a)" pp_selection e) es ;
+    Format.fprintf fmt "@]"
 
 let int a = Compose(Cint (Integer.of_int a))
 let cint a = Compose(Cint a)
@@ -174,12 +174,12 @@ let findhead (s:selection) e =
   | Empty -> None
   | Compose(Range _ | Cint _) -> None
   | Inside(clause,_) | Clause clause ->
-      let p = Lang.F.e_prop (head clause) in
-      if Lang.F.is_subterm e p
-      then Some(Inside(clause,e))
-      else None
+    let p = Lang.F.e_prop (head clause) in
+    if Lang.F.is_subterm e p
+    then Some(Inside(clause,e))
+    else None
   | Compose(Code(v,_,_)) as s ->
-      if v == e then Some s else None
+    if v == e then Some s else None
   | Multi _ -> None
 
 let rec lookup (s:selection) e q =
@@ -190,7 +190,7 @@ let rec lookup (s:selection) e q =
 and lookup_inner (s:selection) e q =
   begin match s with
     | Compose(Code(_,_,ps)) ->
-        List.iter (fun p -> Queue.add p q) ps
+      List.iter (fun p -> Queue.add p q) ps
     | _ -> ()
   end ;
   if Queue.is_empty q then None else lookup (Queue.pop q) e q
@@ -199,17 +199,17 @@ and subterm (s:selection) e =
   match Lang.F.repr e with
   | Qed.Logic.Kint z -> Some (cint z)
   | _ ->
-      match findhead s e with
-      | Some _ as result -> result
-      | None -> lookup_inner s e (Queue.create ())
+    match findhead s e with
+    | Some _ as result -> result
+    | None -> lookup_inner s e (Queue.create ())
 
 let rec subterms s = function
   | [] -> []
   | e::es ->
-      let ps = subterms s es in
-      match subterm s e with
-      | None -> ps
-      | Some p -> p::ps
+    let ps = subterms s es in
+    match subterm s e with
+    | None -> ps
+    | Some p -> p::ps
 
 let destruct_value s =
   let v = selected s in
@@ -223,17 +223,17 @@ let destruct_value s =
   | Rdef fvs -> subterms s (List.map snd fvs)
   | Times(k,v) -> cint k :: subterms s [v]
   | Div(a,b) | Mod(a,b) | Eq(a,b) | Neq(a,b) | Lt(a,b) | Leq(a,b) | Aget(a,b) ->
-      subterms s [a;b]
+    subterms s [a;b]
 
 let destruct = function
   | Empty | Compose(Cint _) -> []
   | Compose(Range(a,b)) -> [int a;int b]
   | s ->
-      let ps = destruct_value s in
-      if ps <> [] then ps else
-        match s with
-        | Compose(Code(_,_,ps)) -> ps
-        | _ -> []
+    let ps = destruct_value s in
+    if ps <> [] then ps else
+      match s with
+      | Compose(Code(_,_,ps)) -> ps
+      | _ -> []
 
 (* -------------------------------------------------------------------------- *)
 (* --- Fields                                                             --- *)
@@ -287,7 +287,7 @@ let checkbox ~id ~title ~descr ?(default=false) () =
 let spinner ~id ~title ~descr ?default ?vmin ?vmax ?(vstep=1) () =
   let () = match vmin , vmax with
     | Some a , Some b ->
-        if a >= b then raise (Invalid_argument "Tactical.spinner")
+      if a >= b then raise (Invalid_argument "Tactical.spinner")
     | _ -> () in
   let default = match default, vmin, vmax with
     | Some v , _ , _ -> v
@@ -301,9 +301,9 @@ let selector ~id ~title ~descr ?default ~options ?(equal=(=)) () =
   let default = match default,options with
     | _ , [] -> raise (Invalid_argument "Tactical.selector(empty)")
     | Some value , vs ->
-        if List.for_all (fun v -> equal v.value value) vs
-        then raise (Invalid_argument "Tactical.selector(default)") ;
-        value
+      if List.for_all (fun v -> equal v.value value) vs
+      then raise (Invalid_argument "Tactical.selector(default)") ;
+      value
     | None , {value}::_ -> value in
   let fd = field ~id ~title ~descr ~default in
   fd , Selector(fd,options,equal)
@@ -478,11 +478,11 @@ let () = add_composer
       method arity = 2
       method filter = function
         | [a;b] ->
-            (try
-               let ta = F.typeof a in
-               let tb = F.typeof b in
-               F.Tau.equal ta tb
-             with Not_found -> false)
+          (try
+             let ta = F.typeof a in
+             let tb = F.typeof b in
+             F.Tau.equal ta tb
+           with Not_found -> false)
         | _ -> false
       method compute = function [a;b] -> F.e_eq a b | _ -> F.e_true
     end)
@@ -653,15 +653,15 @@ let () = add_composer
       method arity = 2
       method filter = function
         | [a;b] ->
-            begin
-              try
-                let ta = F.typeof a in
-                let tb = F.typeof b in
-                match ta with
-                | Qed.Logic.Array(tm,_) -> F.Tau.equal tm tb
-                | _ -> false
-              with Not_found -> false
-            end
+          begin
+            try
+              let ta = F.typeof a in
+              let tb = F.typeof b in
+              match ta with
+              | Qed.Logic.Array(tm,_) -> F.Tau.equal tm tb
+              | _ -> false
+            with Not_found -> false
+          end
         | _ -> false
       method compute = function [a;b] -> F.e_get a b | _ -> F.e_int 0
     end)
@@ -675,18 +675,18 @@ let () = add_composer
       method arity = 3
       method filter = function
         | [a;b;c] ->
-            begin
-              try
-                let ta = F.typeof a in
-                let tb = F.typeof b in
-                let tc = F.typeof c in
-                match ta with
-                | Qed.Logic.Array(tm,tv) ->
-                    F.Tau.equal tm tb &&
-                    F.Tau.equal tv tc
-                | _ -> false
-              with Not_found -> false
-            end
+          begin
+            try
+              let ta = F.typeof a in
+              let tb = F.typeof b in
+              let tc = F.typeof c in
+              match ta with
+              | Qed.Logic.Array(tm,tv) ->
+                F.Tau.equal tm tb &&
+                F.Tau.equal tv tc
+              | _ -> false
+            with Not_found -> false
+          end
         | _ -> false
       method compute = function [a;b] -> F.e_get a b | _ -> F.e_int 0
     end)

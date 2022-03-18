@@ -1,6 +1,6 @@
 [kernel] Parsing very_large_integers.c (with preprocessing)
 [kernel] very_large_integers.c:35: User Error: 
-  integer constant too large in expression (unsigned long long)999999999999999999 + 9999999999999999999
+  integer constant too large in expression 999999999999999999U + 9999999999999999999U
 [kernel] very_large_integers.c:36: User Error: 
   bitfield width is not a valid integer constant
 [kernel] User Error: stopping on file "very_large_integers.c" that has errors. Add

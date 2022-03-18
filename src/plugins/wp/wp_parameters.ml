@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -164,8 +164,8 @@ let iter_fct phi = function
   | Fct_none -> ()
   | Fct_all -> Globals.Functions.iter phi
   | Fct_skip fs ->
-      Globals.Functions.iter
-        (fun kf -> if not (Fct.mem kf fs) then phi kf)
+    Globals.Functions.iter
+      (fun kf -> if not (Fct.mem kf fs) then phi kf)
   | Fct_list fs -> Fct.iter phi fs
 
 let get_kfs () =
@@ -355,6 +355,18 @@ module Region_annot =
     (struct
       let option_name = "-region-annot"
       let help = "Register '@region' ACSL Annotations (auto with -wp-region)"
+    end)
+
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.is_invisible ()
+module Region_output_dot =
+  Filepath
+    (struct
+      let option_name = "-wp-region-output-dot"
+      let arg_name = "output.dot"
+      let file_kind = "DOT"
+      let existence = Fc_Filepath.Indifferent
+      let help = "Outputs the region graph in DOT format to the specified file."
     end)
 
 (* ------------------------------------------------------------------------ *)
@@ -741,6 +753,14 @@ module Generate = False
 let () = on_reset Generate.clear
 
 let () = Parameter_customize.set_group wp_prover
+module ScriptOnStdout = False
+    (struct
+      let option_name = "-wp-script-on-stdout"
+      let help = "When enabled (default: no), display scripts on stdout \
+                  instead of writing them on disk."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module Detect = Action
     (struct
       let option_name = "-wp-detect"
@@ -776,6 +796,29 @@ module Timeout =
       Printf.sprintf
         "Set the timeout (in seconds) for provers (default: %d)." default
   end)
+
+let () = Parameter_customize.set_group wp_prover
+module FctTimeout =
+  Kernel_function_map
+    (struct
+      include Datatype.Int
+      type key = Cil_types.kernel_function
+      let of_string ~key:_ ~prev:_ s =
+        Option.map
+          (fun s ->
+             try int_of_string s
+             with Failure _ ->
+               raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
+          s
+      let to_string ~key:_ = Option.map string_of_int
+    end)
+    (struct
+      let option_name = "-wp-fct-timeout"
+      let arg_name = "f1:t1,...,fn:tn"
+      let help = "Customize the WP timeout (in secondes) for each specified \
+                  function (t1 seconds for f1, t2 for f2, etc)."
+      let default = Kernel_function.Map.empty
+    end)
 
 let () = Parameter_customize.set_group wp_prover
 module SmokeTimeout =
@@ -1028,14 +1071,14 @@ let unique_tmp = ref None
 let make_tmp_dir () =
   match !unique_tmp with
   | None ->
-      let tmp =
-        try Extlib.temp_dir_cleanup_at_exit "wp"
-        with Extlib.Temp_file_error s ->
-          abort "Cannot create temporary file: %s" s
-      in
-      unique_tmp := Some tmp ;
-      debug ~dkey "Created temporary directory '%s'" tmp ;
-      tmp
+    let tmp =
+      try Extlib.temp_dir_cleanup_at_exit "wp"
+      with Extlib.Temp_file_error s ->
+        abort "Cannot create temporary file: %s" s
+    in
+    unique_tmp := Some tmp ;
+    debug ~dkey "Created temporary directory '%s'" tmp ;
+    tmp
   | Some tmp -> tmp
 
 let make_gui_dir () =
@@ -1058,14 +1101,14 @@ let base_output () =
   | None -> let output =
               match OutputDir.get () with
               | "" ->
-                  if !Fc_config.is_gui
-                  then make_gui_dir ()
-                  else make_tmp_dir ()
+                if !Fc_config.is_gui
+                then make_gui_dir ()
+                else make_tmp_dir ()
               | dir ->
-                  make_output_dir dir ; dir in
-      base_output := Some output;
-      Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
-      Datatype.Filepath.of_string output
+                make_output_dir dir ; dir in
+    base_output := Some output;
+    Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
+    Datatype.Filepath.of_string output
   | Some output -> Datatype.Filepath.of_string output
 
 let get_output () =

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -53,15 +53,15 @@ let reparse (host_window: Design.main_window_extension_points) =
          Source_manager.clear host_window#original_source_viewer)
   in
   begin match old_helt, succeeded with
-    | None, _ -> (** no history available before reparsing *)
+    | None, _ -> (* no history available before reparsing *)
       host_window#reset ()
-    | _, None -> (** the user stopped or an error occurred  *)
+    | _, None -> (* the user stopped or an error occurred  *)
       host_window#reset ()
     | Some old_helt, Some () ->
       let new_helt = History.translate_history_elt old_helt in
       Option.iter History.push new_helt;
       host_window#reset ();
-      (** The buffer is not ready yet, modification of its vadjustement
+      (*  The buffer is not ready yet, modification of its vadjustement
           is unreliable *)
       let set () =
         let adj = host_window#source_viewer_scroll#vadjustment in
@@ -225,8 +225,8 @@ let preferences (host_window: Design.main_window_extension_points) =
     Gui_parameters.debug "canceled, preferences not saved";
     dialog#destroy ()
   in
-  ignore (wb_ok#connect#clicked f_ok);
-  ignore (wb_cancel#connect#clicked f_cancel);
+  ignore (wb_ok#connect#clicked ~callback:f_ok);
+  ignore (wb_cancel#connect#clicked ~callback:f_cancel);
   (* the enter key is linked to the ok action *)
   (* the escape key is linked to the cancel action *)
   dialog#misc#grab_focus ();
@@ -247,9 +247,9 @@ let insert (host_window: Design.main_window_extension_points) =
           ~icon:`REFRESH ~label:"Reparse"
           ~tooltip:"Reparse source files, and replay analyses"
           (Menu_manager.Unit_callback (fun () -> reparse host_window));
-        Menu_manager.toolmenubar `REVERT_TO_SAVED "Load session"
+        Menu_manager.toolmenubar ~icon:`REVERT_TO_SAVED ~label:"Load session"
           (Menu_manager.Unit_callback (fun () -> load_file host_window));
-        Menu_manager.toolmenubar `SAVE "Save session"
+        Menu_manager.toolmenubar ~icon:`SAVE ~label:"Save session"
           (Menu_manager.Unit_callback (fun () -> save_file host_window));
         Menu_manager.menubar ~icon:`SAVE_AS "Save session as"
           (Menu_manager.Unit_callback (fun () -> save_file_as host_window));

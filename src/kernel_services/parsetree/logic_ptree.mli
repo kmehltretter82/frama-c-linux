@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -77,15 +77,16 @@ type lexpr = {
 }
 
 (* PL is for Parsed Logic *)
-(** kind of expression. *)
+(** construct inside a functional update. *)
 and path_elt =
-  (** construct inside a functional update. *)
   | PLpathField of string
   | PLpathIndex of lexpr
 
 and update_term =
   | PLupdateTerm of lexpr
   | PLupdateCont of ((path_elt list) * update_term) list
+
+(** Kind of expression *)
 and lexpr_node =
   (* both terms and predicates *)
   | PLvar of string (** a variable *)

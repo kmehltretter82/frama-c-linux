@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -94,6 +94,7 @@ val add_model_field: model_info -> unit
 module Builtins: sig
   val apply: unit -> unit
   (** adds all requested objects in the environment. *)
+
   val extend: (unit -> unit) -> unit
   (** request an addition in the environment. Use one of the functions below
       in the body of the argument.

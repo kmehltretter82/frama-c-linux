@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -624,10 +624,11 @@ module Restrict
         Hashtbl.iter (fun key s -> Hashtbl.add table key (inject s)) t;
         `Value table
 
-    let get_initial_state_by_callstack kf =
-      inject_table (Domain.Store.get_initial_state_by_callstack kf)
-    let get_stmt_state_by_callstack ~after stmt =
-      inject_table (Domain.Store.get_stmt_state_by_callstack ~after stmt)
+    let get_initial_state_by_callstack ?selection kf =
+      inject_table (Domain.Store.get_initial_state_by_callstack ?selection kf)
+    let get_stmt_state_by_callstack ?selection ~after stmt =
+      inject_table
+        (Domain.Store.get_stmt_state_by_callstack ?selection ~after stmt)
 
     let mark_as_computed = Domain.Store.mark_as_computed
     let is_computed = Domain.Store.is_computed

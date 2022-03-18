@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,8 +49,10 @@ type base = private
   | CLogic_Var of Cil_types.logic_var * Cil_types.typ * validity
   (** Base for a logic variable that has a C type. *)
   | Null (** Base for an address like [(int* )0x123] *)
-  | String of int (** unique id of the constant string (one per code location)*)
-              * cstring (** contents of the constant string *)
+  | String of int * cstring
+  (** [String(id, s)]
+      - [id]: unique id of the constant string (one per code location)
+      - [s]: contents of the constant string *)
   | Allocated of Cil_types.varinfo * deallocation  * validity
   (** Base for a variable dynamically allocated via malloc/calloc/realloc/alloca *)
 

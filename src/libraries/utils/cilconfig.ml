@@ -128,7 +128,7 @@ let useConfigurationList (key: string) (f: configData list -> unit) =
 
 
 let saveConfiguration (fname : Datatype.Filepath.t) =
-  (** Convert configuration data to a string, for saving externally *)
+  (* Convert configuration data to a string, for saving externally *)
   let configToString (c: configData) : string =
     let buff = Buffer.create 80 in
     let rec loop (c: configData) : unit =
@@ -185,7 +185,7 @@ let loadConfiguration (fname : Datatype.Filepath.t) : unit =
   H.clear configurationData;
 
   let stringToConfig (s: string) : configData =
-    let idx = ref 0 in (** the current index *)
+    let idx = ref 0 in (* the current index *)
     let l = String.length s in
 
     let rec getOne () : configData =

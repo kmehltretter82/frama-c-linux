@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -495,7 +495,7 @@ let on_combo
     let k = select 0 !result values in
     if k >= 0 then combo_box#set_active k
   in
-  ignore (combo_box#connect#changed callback) ;
+  ignore (combo_box#connect#changed ~callback) ;
   ignore (mk_label ~use_markup ~xalign:0. container label) ;
   (fun () -> update ())
 
@@ -676,8 +676,8 @@ let input_widget ~parent ~widget ~event ~get_text ~bind_ok ~expand
     retour := None;
     window#destroy ()
   in
-  ignore (wb_ok#connect#clicked f_ok);
-  ignore (wb_cancel#connect#clicked f_cancel);
+  ignore (wb_ok#connect#clicked ~callback:f_ok);
+  ignore (wb_cancel#connect#clicked ~callback:f_cancel);
   (* the enter key is linked to the ok action *)
   (* the escape key is linked to the cancel action *)
   ignore (event#connect#key_press ~callback:
@@ -698,7 +698,7 @@ let input_widget ~parent ~widget ~event ~get_text ~bind_ok ~expand
 let input_string ~parent ~title ?ok ?cancel ?(text="") message =
   let we_chaine = GEdit.entry ~text () in
   if text <> "" then
-    we_chaine#select_region 0 (we_chaine#text_length);
+    we_chaine#select_region ~start:0 ~stop:(we_chaine#text_length);
   input_widget ~parent ~widget:we_chaine#coerce ~event:we_chaine#event
     ~get_text:(fun () -> we_chaine#text) ~bind_ok:true
     ~expand: false
@@ -740,7 +740,7 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
           ~modal:true
           ()
       in
-      ignore (w#connect#response (fun _ -> w#destroy ()));
+      ignore (w#connect#response ~callback:(fun _ -> w#destroy ()));
       ignore (w#run ());
       if reset then f_reset ()
 
@@ -834,9 +834,9 @@ let make_text_page ?pos (notebook:GPack.notebook) title =
   let flash_ref = ref flash in
   let w = GText.view ~packing:sw#add () in
   let _ = w#set_editable false in
-  let _ = w#misc#connect#map (fun () -> !flash_ref false) in
-  let _ = w#event#connect#focus_in (fun _ -> !flash_ref false; false) in
-  let _ = w#buffer#connect#changed (fun () -> !flash_ref true)
+  let _ = w#misc#connect#map ~callback:(fun () -> !flash_ref false) in
+  let _ = w#event#connect#focus_in ~callback:(fun _ -> !flash_ref false; false) in
+  let _ = w#buffer#connect#changed ~callback:(fun () -> !flash_ref true)
   in
   let reparent_page (notebook:GPack.notebook) =
     let flash, sw = make_tab_label notebook in

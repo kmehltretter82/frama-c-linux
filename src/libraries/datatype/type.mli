@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -235,6 +235,7 @@ module Function : sig
       - [~label:(p,None)] for a mandatory labeled parameter [p];
       - [~label:(p,Some f)] for an optional labeled parameter [p],
          with default value [f ()]. *)
+
   val is_instance_of: 'a t -> bool
   val get_instance: ('a -> 'b) t -> 'a t * 'b t * string option
   val get_optional_argument: ('a -> 'b) t ->  (unit -> 'a) option

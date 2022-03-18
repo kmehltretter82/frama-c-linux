@@ -252,12 +252,11 @@ and raw_statement =
       front-ends.
   *)
 
-  (** MS SEH *)
-  | TRY_EXCEPT of block * expression * block * cabsloc
-  | TRY_FINALLY of block * block * cabsloc
-  (* annotations *)
-  | CODE_ANNOT of (Logic_ptree.code_annot * cabsloc)
-  | CODE_SPEC of (Logic_ptree.spec * cabsloc)
+  | TRY_EXCEPT of block * expression * block * cabsloc (** MS SEH *)
+  | TRY_FINALLY of block * block * cabsloc (** MS SEH *)
+
+  | CODE_ANNOT of (Logic_ptree.code_annot * cabsloc) (* annotations *)
+  | CODE_SPEC of (Logic_ptree.spec * cabsloc) (* annotations *)
 
 and statement = { mutable stmt_ghost: bool; stmt_node:raw_statement }
 

@@ -17,15 +17,15 @@
 }
 
 .dome-xText-hover {
-    background: lightgreen ;
+    background: var(--code-hover) ;
 }
 
 .dome-xText-select {
-    background: #ffda95 !important ;
+    background: var(--code-select) !important ;
 }
 
 .dome-xText-select.dome-xText-hover {
-    background: orange !important ;
+    background: var(--code-select-hover) !important ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -33,7 +33,6 @@
 /* -------------------------------------------------------------------------- */
 
 .dome-xPages-note {
-    background: white ;
     padding: 2px ;
 }
 
@@ -48,9 +47,7 @@
     height: calc(100% - 16px) ;
     margin: 8px ;
     padding: 8px ;
-    background: white ;
     border-radius: 2px ;
-    box-shadow: 2px 2px 6px 3px lightgray ;
     overflow: auto ;
 }
 

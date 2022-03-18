@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -119,9 +119,7 @@ type typing_context = {
   pre_state:Lenv.t;
   post_state:termination_kind list -> Lenv.t;
   assigns_env: Lenv.t;
-  (**/**)
   silent: bool;
-  (**/**)
   logic_type:
     typing_context -> location -> Lenv.t ->
     Logic_ptree.logic_type -> Cil_types.logic_type ;
@@ -142,6 +140,7 @@ type typing_context = {
     Lenv.t -> Logic_ptree.assigns -> assigns;
   error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
 
+  on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
   (** [on_error f rollback x] will attempt to evaluate [f x]. If this triggers
       an error while in [-continue-annot-error] mode, [rollback (loc,cause)]
       will be executed (where [loc] is the location of the error and [cause]
@@ -150,7 +149,6 @@ type typing_context = {
       @since Chlorine-20180501
       @modify Frama-C+dev rollback takes as argument the error
   *)
-  on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
 }
 
 module Make
@@ -159,11 +157,13 @@ module Make
        val is_loop: unit -> bool
        (** whether the annotation we want to type is contained in a loop.
            Only useful when creating objects of type [code_annotation]. *)
+
        val anonCompFieldName : string
        val conditionalConversion : typ -> typ -> typ
        val find_macro : string -> Logic_ptree.lexpr
        val find_var : ?label:string -> string -> logic_var
        (** see corresponding field in {!Logic_typing.typing_context}. *)
+
        val find_enum_tag : string -> exp * typ
        val find_type : type_namespace -> string -> typ
        val find_comp_field: compinfo -> string -> offset

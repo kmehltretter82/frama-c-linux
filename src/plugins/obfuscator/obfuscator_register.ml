@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,14 +23,14 @@
 let disable_other_analyzers () =
   if Options.Run.get () then
     let selection =
-      State_selection.Static.diff
+      State_selection.diff
         (Parameter_state.get_selection ())
-        (State_selection.Static.union
+        (State_selection.union
            (State_selection.of_list
               (Kernel.CodeOutput.self :: Options.states))
            (* The command-line options that govern the creation of the AST
               must be preserved *)
-           (State_selection.Static.with_codependencies Ast.self))
+           (State_selection.with_codependencies Ast.self))
     in
     Project.clear ~selection ()
 

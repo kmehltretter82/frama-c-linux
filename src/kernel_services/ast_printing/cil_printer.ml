@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -641,7 +641,7 @@ class cil_printer () = object (self)
                             we want to print it as hexa *)
     | CInt64(i, ik, _) ->
       (*fprintf fmt "/* %Lx */" i;*)
-      (** We must make sure to capture the type of the constant. For some
+      (* We must make sure to capture the type of the constant. For some
           constants this is done with a suffix, for others with a cast
           prefix.*)
       let suffix = match ik with
@@ -1223,8 +1223,12 @@ class cil_printer () = object (self)
     | Some vi ->
       let formals = Cil.getFormalsDecl vi in
       match List.rev formals with
-      | [] -> assert false (* Typing error, this function is variadic and should
-                              have at least one argument *)
+      | [] ->
+        (* Typing error, this function should
+           have at least one named argument *)
+        Kernel.abort ~current:true
+          "%s should have at least one named argument"
+          vi.vname
       | f :: _ -> Cil.new_exp ~loc:f.vdecl (Lval (Cil.var f))
 
   (**** STATEMENTS ****)

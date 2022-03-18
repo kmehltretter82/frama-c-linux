@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -42,9 +42,15 @@ val is_tactic : alternative -> bool
 val a_prover : VCS.prover -> VCS.result -> alternative
 val a_tactic : jtactic -> (string * jscript) list -> alternative
 
-val pending : alternative -> int (** pending goals *)
-val pending_any : jscript -> int (** minimum of pending goals *)
-val has_proof : jscript -> bool (** Has a tactical alternative *)
+val pending : alternative -> int
+(** pending goals *)
+
+val pending_any : jscript -> int
+(** minimum of pending goals *)
+
+val has_proof : jscript -> bool
+(** Has a tactical alternative *)
+
 val decode : Json.t -> jscript
 val encode : jscript -> Json.t
 

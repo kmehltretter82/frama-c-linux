@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -48,10 +48,12 @@ module type S = sig
   val get_global_state: unit -> t or_bottom
   val get_initial_state: kernel_function -> t or_bottom
   val get_initial_state_by_callstack:
+    ?selection:callstack list ->
     kernel_function -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
   val get_stmt_state: after:bool -> stmt -> t or_bottom
   val get_stmt_state_by_callstack:
+    ?selection:callstack list ->
     after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
   val mark_as_computed: unit -> unit

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -78,16 +78,19 @@ val ident_names : string list -> string list
 
 val prop_id_keys : prop_id -> string list * string list (* required , hints *)
 
-val get_propid : prop_id -> string (** Unique identifier of [prop_id] *)
-val pp_propid : Format.formatter -> prop_id -> unit (** Print unique id of [prop_id] *)
+(** Unique identifier of [prop_id] *)
+val get_propid : prop_id -> string
+
+(** Print unique id of [prop_id] *)
+val pp_propid : Format.formatter -> prop_id -> unit
 
 val user_pred_names: toplevel_predicate -> string list
 val user_bhv_names: Property.identified_property -> string list
 val user_prop_names: Property.identified_property -> string list
-val are_selected_names: string list -> string list -> bool
+
 (** [are_selected_names asked names] checks if [names] of a property are
     selected according to [asked] names. *)
-
+val are_selected_names: string list -> string list -> bool
 
 val pretty : Format.formatter -> prop_id -> unit
 val pretty_context : Description.kf -> Format.formatter -> prop_id -> unit

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -256,7 +256,7 @@ include
   PostDomDb
     (struct
       let is_accessible = Eva.Results.is_reachable
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
       let name = "value"
       let eval_cond stmt _e =
         Db.Value.condition_truth_value stmt

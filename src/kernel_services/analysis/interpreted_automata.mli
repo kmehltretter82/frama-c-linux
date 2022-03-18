@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -121,6 +121,7 @@ type wto = vertex Wto.partition
 
 (** Datatype for vertices *)
 module Vertex : Datatype.S_with_collections with type t = vertex
+
 (** Datatype for edges *)
 module Edge : Datatype.S_with_collections with type t = vertex edge
 
@@ -140,6 +141,7 @@ type automaton = {
 
 (** Datatype for automata *)
 module Automaton : Datatype.S with type t = automaton
+
 (** Datatype for WTOs *)
 module WTO : sig
   include module type of (Wto.Make(Vertex))
@@ -148,8 +150,10 @@ end
 
 (** Get the automaton for the given kernel_function without annotations *)
 val get_automaton : Cil_types.kernel_function -> automaton
+
 (** Get the wto for the automaton of the given kernel_function *)
 val get_wto : Cil_types.kernel_function -> wto
+
 (** Extract an exit strategy from a component, i.e. a sub-wto where all
     vertices lead outside the wto without passing through the head. *)
 val exit_strategy : graph -> vertex Wto.component -> wto
@@ -175,17 +179,21 @@ module WTOIndex : Datatype.S with type t = wto_index
 (** @return the wto_index for a statement *)
 val get_wto_index :
   Cil_types.kernel_function -> vertex -> wto_index
+
 (** @return the components left and the components entered when going from
     one index to another *)
 val wto_index_diff :
   wto_index -> wto_index -> vertex list * vertex list
+
 (** @return the components left and the components entered when going from
     one vertex to another *)
 val get_wto_index_diff :
   Cil_types.kernel_function -> vertex -> vertex -> vertex list * vertex list
+
 (** @return wether [v] is a component head or not *)
 val is_wto_head :
   Cil_types.kernel_function -> vertex -> bool
+
 (** @return wether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
     is a wto head of any component where v2 is included. This assumes that
     (v1,v2) is actually an edge present in the control flow graph. *)
@@ -200,12 +208,15 @@ module Compute: sig
       expressions which will be different at each call: you may need to
       memoize the results of this function. *)
   val get_automaton : annotations:bool -> Cil_types.kernel_function -> automaton
+
   (** Build the wto for the given automaton (No memoization, use get_wto
       instead) *)
   val build_wto : automaton -> wto
+
   (** Extract an exit strategy from a component, i.e. a sub-wto where all
       vertices lead outside the wto without passing through the head. *)
   val exit_strategy : graph -> vertex Wto.component -> wto
+
   (** Output the automaton in dot format *)
   val output_to_dot : out_channel -> ?labeling:vertex labeling  -> ?wto:wto ->
     automaton -> unit
@@ -215,20 +226,25 @@ module Compute: sig
 
   (** Compute the index table from a wto *)
   val build_wto_index_table: wto -> wto_index_table
+
   (** @return the wto_index for a statement *)
   val get_wto_index :
     wto_index_table -> vertex -> wto_index
+
   (** @return the components left and the components entered when going from
       one index to another *)
   val wto_index_diff :
     wto_index -> wto_index -> vertex list * vertex list
+
   (** @return the components left and the components entered when going from
       one vertex to another *)
   val get_wto_index_diff :
     wto_index_table -> vertex -> vertex -> vertex list * vertex list
+
   (** @return wether [v] is a component head or not *)
   val is_wto_head :
     wto_index_table -> vertex -> bool
+
   (** @return wether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
       is a wto head of any component where v2 is included. This assumes that
       (v1,v2) is actually an edge present in the control flow graph. *)

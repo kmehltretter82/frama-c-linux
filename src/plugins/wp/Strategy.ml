@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -56,15 +56,15 @@ let lookup_step env queue s =
   match s.condition with
   | State _ -> Empty
   | When p | Have p | Init p | Core p | Type p ->
-      let p = Lang.F.e_prop p in
-      if p == env.target then Clause(Step s) else
-      if lookup_term env p then Inside(Step s,env.target) else Empty
+    let p = Lang.F.e_prop p in
+    if p == env.target then Clause(Step s) else
+    if lookup_term env p then Inside(Step s,env.target) else Empty
   | Branch(c,sa,sb) ->
-      let p = Lang.F.e_prop c in
-      if lookup_term env p then Inside(Step s,env.target) else
-        ( Queue.add sa queue ; Queue.add sb queue ; Empty )
+    let p = Lang.F.e_prop c in
+    if lookup_term env p then Inside(Step s,env.target) else
+      ( Queue.add sa queue ; Queue.add sb queue ; Empty )
   | Either cs ->
-      List.iter (fun s -> Queue.add s queue) cs ; Empty
+    List.iter (fun s -> Queue.add s queue) cs ; Empty
 
 exception Found of selection
 

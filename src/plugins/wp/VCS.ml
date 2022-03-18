@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -47,20 +47,20 @@ let parse_prover = function
                            Why3.Whyconf.prover_version = "";
                            Why3.Whyconf.prover_altern = "generate only" })
   | s ->
-      let prv = String.split_on_char ':' s in
-      let prv = match prv with "why3"::prv -> prv | _ -> prv in
-      let name = String.concat "," prv in
-      match Why3Provers.find_fallback name with
-      | Exact p -> Some (Why3 p)
-      | Fallback p ->
-          Wp_parameters.warning ~current:false ~once:true
-            "Prover '%s' not found, fallback to '%s'"
-            (String.concat ":" prv) (Why3Provers.print_wp p) ;
-          Some (Why3 p)
-      | NotFound ->
-          Wp_parameters.error ~once:true
-            "Prover '%s' not found in why3.conf" name ;
-          None
+    let prv = String.split_on_char ':' s in
+    let prv = match prv with "why3"::prv -> prv | _ -> prv in
+    let name = String.concat "," prv in
+    match Why3Provers.find_fallback name with
+    | Exact p -> Some (Why3 p)
+    | Fallback p ->
+      Wp_parameters.warning ~current:false ~once:true
+        "Prover '%s' not found, fallback to '%s'"
+        (String.concat ":" prv) (Why3Provers.print_wp p) ;
+      Some (Why3 p)
+    | NotFound ->
+      Wp_parameters.error ~once:true
+        "Prover '%s' not found in why3.conf" name ;
+      None
 
 let parse_mode m =
   match String.lowercase_ascii m with
@@ -70,9 +70,9 @@ let parse_mode m =
   | "update" -> Update
   | "fixup" -> FixUpdate
   | _ ->
-      Wp_parameters.error ~once:true
-        "Unrecognized mode %S (use 'batch' instead)" m ;
-      Batch
+    Wp_parameters.error ~once:true
+      "Unrecognized mode %S (use 'batch' instead)" m ;
+    Batch
 
 let name_of_prover = function
   | Why3 s -> Why3Provers.print_wp s
@@ -81,9 +81,9 @@ let name_of_prover = function
 
 let title_of_prover = function
   | Why3 s ->
-      if Wp_parameters.has_dkey dkey_shell
-      then Why3Provers.name s
-      else Why3Provers.title s
+    if Wp_parameters.has_dkey dkey_shell
+    then Why3Provers.name s
+    else Why3Provers.title s
   | Qed -> "Qed"
   | Tactical -> "Script"
 
@@ -117,15 +117,15 @@ let is_auto = function
   | Qed -> true
   | Tactical -> false
   | Why3 p ->
-      match p.prover_name with
-      | "Alt-Ergo" | "CVC4" | "Z3" -> true
-      | "Coq" -> false
-      | _ ->
-          let config = Why3Provers.config () in
-          try
-            let prover_config = Why3.Whyconf.get_prover_config config p in
-            not prover_config.interactive
-          with Not_found -> true
+    match p.prover_name with
+    | "Alt-Ergo" | "CVC4" | "Z3" -> true
+    | "Coq" -> false
+    | _ ->
+      let config = Why3Provers.config () in
+      try
+        let prover_config = Why3.Whyconf.get_prover_config config p in
+        not prover_config.interactive
+      with Not_found -> true
 
 let cmp_prover p q =
   match p,q with
@@ -164,11 +164,14 @@ let current () = {
 
 let default = { valid = false ; timeout = None ; stepout = None }
 
-let get_timeout ~smoke = function
+let get_timeout ?kf ~smoke = function
   | { timeout = None } ->
-      if smoke
-      then Wp_parameters.SmokeTimeout.get ()
-      else Wp_parameters.Timeout.get ()
+    if smoke
+    then Wp_parameters.SmokeTimeout.get ()
+    else begin match Option.map Wp_parameters.FctTimeout.find kf with
+      | exception Not_found | None -> Wp_parameters.Timeout.get ()
+      | Some timeout -> timeout
+    end
   | { timeout = Some t } -> t
 
 let get_stepout = function

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,7 +29,7 @@ module Tbl =
     (struct
       let name = "Callwise dependencies"
       let size = 17
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
     end)
 let () = From_parameters.ForceCallDeps.set_output_dependencies [Tbl.self]
 
@@ -171,7 +171,7 @@ let record_for_individual_froms (call_stack, value_res) =
           | { value_initial_state } :: _ -> value_initial_state
         in
         if From_parameters.VerifyAssigns.get () then
-          !Db.Value.verify_assigns_froms cur_kf pre_state froms;
+          !Db.Value.verify_assigns_froms cur_kf ~pre:pre_state froms;
         (match value_res with
          | Value_types.NormalStore (_, memexec_counter) ->
            MemExec.replace memexec_counter froms
@@ -197,11 +197,11 @@ let () = From_parameters.ForceCallDeps.add_update_hook
 
 
 let force_compute_all_calldeps ()=
-  if Db.Value.is_computed () then
+  if Eva.Analysis.is_computed () then
     Project.clear
-      ~selection:(State_selection.with_dependencies Db.Value.self)
+      ~selection:(State_selection.with_dependencies Eva.Analysis.self)
       ();
-  !Db.Value.compute ()
+  Eva.Analysis.compute ()
 
 (* Registration for call-wise from *)
 let () =

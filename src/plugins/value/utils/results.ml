@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -122,30 +122,17 @@ struct
   let by_callstack : request ->
     [< `Bottom | `Top | `Value of 'a Value_types.Callstack.Hashtbl.t ] ->
     ('a, restricted_to_callstack) t =
-    fun req table ->
-    match table with
-    | `Top -> Top
-    | `Bottom -> Bottom
-    | `Value table ->
-      (* Filter *)
-      let add cs state acc =
-        if List.for_all (fun filter -> filter cs) req.filter
-        then (cs, state) :: acc
-        else acc
-      in
-      (* Selection *)
-      let l =
-        match req.selector with
-        | None -> Callstack.Hashtbl.fold add table []
-        | Some selector ->
-          let add acc cs =
-            match Callstack.Hashtbl.find_opt table cs with
-            | Some state -> add cs state acc
-            | None -> acc
-          in
-          List.fold_left add [] selector
-      in
-      ByCallstack l
+    fun req -> function
+      | `Top -> Top
+      | `Bottom -> Bottom
+      | `Value table ->
+        let add cs state acc =
+          if List.for_all (fun filter -> filter cs) req.filter
+          then (cs, state) :: acc
+          else acc
+        in
+        let list = Callstack.Hashtbl.fold add table [] in
+        ByCallstack list
 
   (* Accessors *)
 
@@ -223,15 +210,18 @@ struct
   let get_by_callstack (req : request) :
     (_, restricted_to_callstack) Response.t =
     let open Response in
+    let selection = req.selector in
     match req.control_point with
     | Before stmt ->
-      A.get_stmt_state_by_callstack ~after:false stmt |> by_callstack req
+      A.get_stmt_state_by_callstack ?selection ~after:false stmt
+      |> by_callstack req
     | After stmt ->
-      A.get_stmt_state_by_callstack ~after:true stmt |> by_callstack req
+      A.get_stmt_state_by_callstack ?selection ~after:true stmt
+      |> by_callstack req
     | Initial ->
       A.get_global_state () |> singleton []
     | Start kf ->
-      A.get_initial_state_by_callstack kf |> by_callstack req
+      A.get_initial_state_by_callstack ?selection kf |> by_callstack req
 
   let get (req : request) : (_, unrestricted_response) Response.t =
     if req.filter <> [] || Option.is_some req.selector then

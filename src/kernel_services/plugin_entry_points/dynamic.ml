@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -175,7 +175,7 @@ let load_packages pkgs =
           *)
           let gui = if !Fc_config.is_gui then ["gui"] else [] in
           let predicates =
-            (** The order is important for the archive cases *)
+            (* The order is important for the archive cases *)
             if Dynlink.is_native then
               [
                 "plugin", ["native"]@gui;

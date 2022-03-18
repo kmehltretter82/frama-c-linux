@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,20 +29,27 @@ open Lang
 open Lang.F
 
 val of_real : c_int -> unop
-val convert : c_int -> unop (** Independent from model *)
+val convert : c_int -> unop
+(** Independent from model *)
 
 val to_integer : unop
 val of_integer : c_int -> unop
 
-val to_cint : lfun -> c_int (** Raises [Not_found] if not. *)
-val is_cint : lfun -> c_int (** Raises [Not_found] if not. *)
+val to_cint : lfun -> c_int
+(** Raises [Not_found] if not. *)
+
+val is_cint : lfun -> c_int
+(** Raises [Not_found] if not. *)
 
 type model = Natural | Machine
 val configure : model -> WpContext.rollback
 val current : unit -> model
 
-val range : c_int -> term -> pred (** Dependent on model *)
-val downcast : c_int -> unop (** Dependent on model *)
+val range : c_int -> term -> pred
+(** Dependent on model *)
+
+val downcast : c_int -> unop
+(** Dependent on model *)
 
 val iopp : c_int -> unop
 val iadd : c_int -> binop
@@ -72,8 +79,11 @@ val f_lor  : lfun
 val f_lsl  : lfun
 val f_lsr  : lfun
 
-val f_bitwised : lfun list (** All except f_bit_positive *)
-val f_bits : lfun list (** All bit-test functions *)
+val f_bitwised : lfun list
+(** All except f_bit_positive *)
+
+val f_bits : lfun list
+(** All bit-test functions *)
 
 val bit_test : term -> int -> term
 

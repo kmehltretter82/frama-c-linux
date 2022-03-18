@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -71,6 +71,7 @@ module Region_annot: Parameter_sig.Bool
 module Region_inline: Parameter_sig.Bool
 module Region_fixpoint: Parameter_sig.Bool
 module Region_cluster: Parameter_sig.Bool
+module Region_output_dot : Parameter_sig.Filepath
 
 (** {2 Computation Strategies} *)
 
@@ -110,6 +111,7 @@ module TerminatesVariantHyp : Parameter_sig.Bool
 
 module Detect: Parameter_sig.Bool
 module Generate:Parameter_sig.Bool
+module ScriptOnStdout: Parameter_sig.Bool
 module Provers: Parameter_sig.String_list
 module Interactive: Parameter_sig.String
 module RunAllProvers: Parameter_sig.Bool
@@ -119,6 +121,10 @@ module CacheDir: Parameter_sig.String
 module CachePrint: Parameter_sig.Bool
 module Drivers: Parameter_sig.String_list
 module Timeout: Parameter_sig.Int
+module FctTimeout:
+  Parameter_sig.Map
+  with type key = Cil_types.kernel_function
+   and type value = int
 module SmokeTimeout: Parameter_sig.Int
 module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
@@ -160,10 +166,12 @@ val get_output_dir : string -> Datatype.Filepath.t
 val make_output_dir : string -> unit
 
 (** {2 Debugging Categories} *)
+
 val has_print_generated: unit -> bool
 val print_generated: ?header:string -> string -> unit
 (** print the given file if the debugging category
     "print-generated" is set *)
+
 val cat_print_generated: category
 
 val protect : exn -> bool

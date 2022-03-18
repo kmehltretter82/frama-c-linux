@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -61,9 +61,15 @@ sig
       method virtual field : Field.t -> string
       method virtual link : Fun.t -> link
 
-      method env : Env.t (** A safe copy of the environment *)
-      method set_env : Env.t -> unit (** Set the environment *)
-      method marks : Env.t * T.marks (** The current environment with empty marks *)
+      method env : Env.t
+      (** A safe copy of the environment *)
+
+      method set_env : Env.t -> unit
+      (** Set the environment *)
+
+      method marks : Env.t * T.marks
+      (** The current environment with empty marks *)
+
       method lookup : term -> scope
       method set_env : Env.t -> unit
       method scope : Env.t -> (unit -> unit) -> unit

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,6 +33,7 @@ val create : ?truncate:bool -> int -> buffer
 val clear : buffer -> unit
 
 val add_sep : buffer -> unit (** Adds ['_'] character *)
+
 val add_char : buffer -> char -> unit
 val add_string : buffer -> string -> unit
 val add_list : buffer -> string list -> unit (** Separated with ['_'] *)

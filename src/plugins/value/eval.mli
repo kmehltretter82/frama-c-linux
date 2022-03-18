@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -148,9 +148,15 @@ type 'a record_loc = {
     map. *)
 module type Valuation = sig
   type t
-  type value  (** Abstract value. *)
-  type origin (** Origin of values. *)
-  type loc    (** Abstract memory location. *)
+
+  (** Abstract value. *)
+  type value
+
+  (** Origin of values. *)
+  type origin
+
+  (** Abstract memory location. *)
+  type loc
 
   val empty : t
   val find : t -> exp -> (value, origin) record_val or_top
@@ -271,6 +277,7 @@ type recursion = {
 }
 
 [@@@ api_start]
+
 (** Can the results of a function call be cached with memexec? *)
 type cacheable =
   | Cacheable      (** Functions whose result can be safely cached. *)

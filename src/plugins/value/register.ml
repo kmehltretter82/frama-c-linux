@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,16 +23,13 @@
 open Cil_types
 open Locations
 
-let [@alert "-deprecated"] _self =
-  Db.register_compute "Value.compute" [ Db.Value.self ] Db.Value.compute
-    Analysis.compute
-
-let () = Parameters.ForceValues.set_output_dependencies [Db.Value.self]
+let () = Db.Value.compute := Analysis.compute
+let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 
 let main () =
   (* Value computations *)
-  if Parameters.ForceValues.get () then !Db.Value.compute ();
-  if Db.Value.is_computed () then Red_statuses.report ()
+  if Parameters.ForceValues.get () then Analysis.compute ();
+  if Analysis.is_computed () then Red_statuses.report ()
 
 let () = Db.Main.extend main
 
@@ -70,7 +67,7 @@ let assigns_inputs_to_zone state assigns =
   | Writes l  -> List.fold_left treat_asgn Zone.bottom l
 
 let assigns_outputs_aux ~eval ~bot ~top ~join state ~result assigns =
-  let env = Eval_terms.env_post_f state state result () in
+  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
   let treat_asgn acc ({it_content = out},_) =
     if Logic_utils.is_result out && result = None
     then acc

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,7 +29,7 @@ module Is_Called =
     (Datatype.Bool)
     (struct
       let name = "Value.Eva_results.is_called"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
       let size = 17
     end)
 
@@ -50,7 +50,7 @@ module Callers =
     (Kernel_function.Map.Make(Stmt.Set))
     (struct
       let name = "Value.Eva_results.Callers"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
       let size = 17
     end)
 
@@ -202,9 +202,9 @@ let get_results () =
     initial_state; initial_args; alarms; statuses; main }
 
 let set_results results =
-  let selection = State_selection.with_dependencies Db.Value.self in
+  let selection = State_selection.with_dependencies Self.state in
   Project.clear ~selection ();
-  (* Those two functions may clear Db.Value.self. Start by them *)
+  (* Those two functions may clear Self.state. Start by them *)
   (* Initial state *)
   Db.Value.globals_set_initial_state results.initial_state;
   (* Initial args *)
@@ -253,6 +253,10 @@ let set_results results =
     Property_status.emit Eva_utils.emitter ~hyps:[] ip st
   in
   Property.Hashtbl.iter aux_statuses results.statuses;
+  let b = Parameters.ResultsAll.get () in
+  Cvalue_domain.State.Store.register_global_state b
+    (`Value Cvalue_domain.State.top);
+  Self.set_computation_state Computed;
   Db.Value.mark_as_computed ();
 ;;
 

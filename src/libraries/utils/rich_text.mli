@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -80,7 +80,9 @@ val message : buffer -> message
 (** Buffer contents, with its formatting tags. *)
 
 val add_char : buffer -> char -> unit (** Buffer-like *)
+
 val add_string : buffer -> string -> unit (** Buffer-like *)
+
 val add_substring : buffer -> string -> int -> int -> unit (** Buffer-like *)
 
 val formatter : buffer -> Format.formatter

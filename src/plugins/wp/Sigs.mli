@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -145,7 +145,9 @@ module type Chunk =
 sig
 
   type t
-  val self : string (** Chunk names, for pretty-printing. *)
+  val self : string
+  (** Chunk names, for pretty-printing. *)
+
   val hash : t -> int
   val equal : t -> t -> bool
   val compare : t -> t -> int
@@ -175,7 +177,9 @@ end
 module type Sigma =
 sig
 
-  type chunk (** The type of memory chunks. *)
+  type chunk
+  (** The type of memory chunks. *)
+
   module Chunk : Qed.Collection.S with type t = chunk
 
   (** Memory footprint. *)
@@ -194,11 +198,17 @@ sig
   val pretty : Format.formatter -> t -> unit
   (** For debugging purpose *)
 
-  val create : unit -> t (** Initially empty environment. *)
+  val create : unit -> t
+  (** Initially empty environment. *)
 
-  val mem : t -> chunk -> bool (** Whether a chunk has been assigned. *)
-  val get : t -> chunk -> var (** Lazily get the variable for a chunk. *)
-  val value : t -> chunk -> term (** Same as [Lang.F.e_var] of [get]. *)
+  val mem : t -> chunk -> bool
+  (** Whether a chunk has been assigned. *)
+
+  val get : t -> chunk -> var
+  (** Lazily get the variable for a chunk. *)
+
+  val value : t -> chunk -> term
+  (** Same as [Lang.F.e_var] of [get]. *)
 
   val copy : t -> t (** Duplicate the environment. Fresh chunks in the copy
                         are {i not} duplicated into the source environment. *)
@@ -265,8 +275,11 @@ sig
   (** Footprint of a memory environment.
       That is, the set of accessed chunks so far in the environment. *)
 
-  val union : domain -> domain -> domain (** Same as [Chunk.Set.union] *)
-  val empty : domain (** Same as [Chunk.Set.empty] *)
+  val union : domain -> domain -> domain
+  (** Same as [Chunk.Set.union] *)
+
+  val empty : domain
+  (** Same as [Chunk.Set.empty] *)
 
   val writes : t sequence -> domain
   (** [writes s] indicates which chunks are new in [s.post] compared

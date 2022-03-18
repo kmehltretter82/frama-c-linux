@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -43,6 +43,7 @@ type localizable = Printer_tag.localizable =
 
 module Locs: sig
   type state
+
   (** To call when the source buffer is about to be discarded *)
   val create: unit -> state
   val clear: state -> unit

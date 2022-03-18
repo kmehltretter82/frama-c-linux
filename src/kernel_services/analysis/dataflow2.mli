@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -64,8 +64,11 @@ module StartData(X:sig type t val size: int end) :
 (** Interface to provide for a backward dataflow analysis. *)
 module type ForwardsTransfer = sig
 
-  val name: string (** For debugging purposes, the name of the analysis *)
-  val debug: bool (** Whether to turn on debugging *)
+  val name: string
+  (** For debugging purposes, the name of the analysis *)
+
+  val debug: bool
+  (** Whether to turn on debugging *)
 
   type t
   (** The type of the data we compute for each block start. May be
@@ -152,8 +155,11 @@ end
 (** Interface to provide for a backward dataflow analysis. *)
 module type BackwardsTransfer = sig
 
-  val name: string (** For debugging purposes, the name of the analysis *)
-  val debug: bool (** Whether to turn on debugging *)
+  val name: string
+  (** For debugging purposes, the name of the analysis *)
+
+  val debug: bool
+  (** Whether to turn on debugging *)
 
   type t
   (** The type of the data we compute for each block start. In many

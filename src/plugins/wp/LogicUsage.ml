@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -161,13 +161,13 @@ let compute_logicname l =
     match LSet.elements over with
     | [] | [_] -> d.names <- LMap.add l base d.names ; base
     | symbols ->
-        let rec register k = function
-          | l::ls ->
-              let name = Printf.sprintf "%s_%d_" base k in
-              d.names <- LMap.add l name d.names ;
-              register (succ k) ls
-          | [] -> ()
-        in register 1 symbols ; LMap.find l d.names
+      let rec register k = function
+        | l::ls ->
+          let name = Printf.sprintf "%s_%d_" base k in
+          d.names <- LMap.add l name d.names ;
+          register (succ k) ls
+        | [] -> ()
+      in register 1 symbols ; LMap.find l d.names
 
 let is_overloaded l =
   let d = Database.get () in
@@ -179,12 +179,12 @@ let pp_profile fmt l =
   match l.l_profile with
   | [] -> ()
   | x::xs ->
-      Format.fprintf fmt "@[<hov 1>(%a" Printer.pp_logic_type x.lv_type ;
-      List.iter
-        (fun y -> Format.fprintf fmt ",@,%a"
-            Printer.pp_logic_type y.lv_type)
-        xs ;
-      Format.fprintf fmt ")@]"
+    Format.fprintf fmt "@[<hov 1>(%a" Printer.pp_logic_type x.lv_type ;
+    List.iter
+      (fun y -> Format.fprintf fmt ",@,%a"
+          Printer.pp_logic_type y.lv_type)
+      xs ;
+    Format.fprintf fmt ")@]"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities                                                          --- *)
@@ -200,15 +200,15 @@ let ip_lemma l =
 
 let lemma_of_global ~context = function
   | Dlemma(name,labels,types,pred,attrs,loc) ->
-      {
-        lem_name = name ;
-        lem_position = fst loc ;
-        lem_types = types ;
-        lem_labels = labels ;
-        lem_predicate = pred ;
-        lem_depends = context ;
-        lem_attrs = attrs ;
-      }
+    {
+      lem_name = name ;
+      lem_position = fst loc ;
+      lem_types = types ;
+      lem_labels = labels ;
+      lem_predicate = pred ;
+      lem_depends = context ;
+      lem_attrs = attrs ;
+    }
   | _ -> assert false
 
 let populate a ~context = function
@@ -224,18 +224,18 @@ let ip_of_axiomatic g =
 
 let axiomatic_of_global ~context = function
   | Daxiomatic(name,globals,_,loc) as g ->
-      let a = {
-        ax_name = name ;
-        ax_position = fst loc ;
-        ax_property = ip_of_axiomatic g ;
-        ax_reads = Varinfo.Set.empty ;
-        ax_types = [] ; ax_lemmas = [] ; ax_logics = [] ;
-      } in
-      List.iter (populate a ~context) globals ;
-      a.ax_types <- List.rev a.ax_types ;
-      a.ax_logics <- List.rev a.ax_logics ;
-      a.ax_lemmas <- List.rev a.ax_lemmas ;
-      a
+    let a = {
+      ax_name = name ;
+      ax_position = fst loc ;
+      ax_property = ip_of_axiomatic g ;
+      ax_reads = Varinfo.Set.empty ;
+      ax_types = [] ; ax_lemmas = [] ; ax_logics = [] ;
+    } in
+    List.iter (populate a ~context) globals ;
+    a.ax_types <- List.rev a.ax_types ;
+    a.ax_logics <- List.rev a.ax_logics ;
+    a.ax_lemmas <- List.rev a.ax_lemmas ;
+    a
   | _ -> assert false
 
 let register_logic d section l =
@@ -318,14 +318,14 @@ class visitor =
     method private do_call l labels =
       match inductive with
       | Some case ->
-          if Logic_info.equal l case.ind_logic then
-            case.ind_call <- List.fold_left2 add_call case.ind_call l.l_labels labels
+        if Logic_info.equal l case.ind_logic then
+          case.ind_call <- List.fold_left2 add_call case.ind_call l.l_labels labels
       | None ->
-          match caller with
-          | None -> ()
-          | Some f ->
-              if Logic_info.equal f l then
-                database.recursives <- LSet.add f database.recursives
+        match caller with
+        | None -> ()
+        | Some f ->
+          if Logic_info.equal f l then
+            database.recursives <- LSet.add f database.recursives
 
     method private do_case l (case,_labels,_types,pnamed) =
       begin
@@ -368,51 +368,51 @@ class visitor =
       (* --- AXIOMATICS --- *)
 
       | Daxiomatic _ ->
-          begin
-            let pf = database.proofcontext in
-            let ax = axiomatic_of_global pf global in
-            register_axiomatic database ax ;
-            axiomatic <- Some ax ;
-            DoChildrenPost
-              (fun g ->
-                 if not (is_global_axiomatic ax) then
-                   database.proofcontext <- pf ;
-                 axiomatic <- None ;
-                 toplevel <- succ toplevel ;
-                 g)
-          end
+        begin
+          let pf = database.proofcontext in
+          let ax = axiomatic_of_global ~context:pf global in
+          register_axiomatic database ax ;
+          axiomatic <- Some ax ;
+          DoChildrenPost
+            (fun g ->
+               if not (is_global_axiomatic ax) then
+                 database.proofcontext <- pf ;
+               axiomatic <- None ;
+               toplevel <- succ toplevel ;
+               g)
+        end
 
       (* --- LOGIC INFO --- *)
 
       | Dtype_annot(l,_)
       | Dinvariant(l,_)
       | Dfun_or_pred(l,_) ->
-          begin
-            register_logic database self#section l ;
-            match l.l_body with
-            | LBnone when axiomatic = None -> SkipChildren
+        begin
+          register_logic database self#section l ;
+          match l.l_body with
+          | LBnone when axiomatic = None -> SkipChildren
 
-            | LBnone | LBreads _ | LBterm _ | LBpred _ ->
-                caller <- Some l ;
-                DoChildrenPost (fun g -> caller <- None ; g)
+          | LBnone | LBreads _ | LBterm _ | LBpred _ ->
+            caller <- Some l ;
+            DoChildrenPost (fun g -> caller <- None ; g)
 
-            | LBinductive cases ->
-                register_cases l (List.map (self#do_case l) cases) ;
-                SkipChildren
-          end
+          | LBinductive cases ->
+            register_cases l (List.map (self#do_case l) cases) ;
+            SkipChildren
+        end
 
       (* --- LEMMAS --- *)
 
       | Dlemma _ ->
-          let lem = lemma_of_global database.proofcontext global in
-          register_lemma database self#section lem ;
-          if Logic_utils.use_predicate lem.lem_predicate.tp_kind then
-            database.proofcontext <- lem :: database.proofcontext ;
-          SkipChildren
+        let lem = lemma_of_global ~context:database.proofcontext global in
+        register_lemma database self#section lem ;
+        if Logic_utils.use_predicate lem.lem_predicate.tp_kind then
+          database.proofcontext <- lem :: database.proofcontext ;
+        SkipChildren
 
       | Dtype(t,_) ->
-          register_type database self#section t ;
-          SkipChildren
+        register_type database self#section t ;
+        SkipChildren
 
       (* --- OTHERS --- *)
 
@@ -421,7 +421,7 @@ class visitor =
       | Dextended _
         -> SkipChildren
 
-    method! vfunc _ = SkipChildren
+    method! vfunc _ = Cil.SkipChildren
 
   end
 

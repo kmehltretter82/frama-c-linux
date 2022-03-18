@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -30,6 +30,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
+import * as Preferences from 'ivette/prefs';
 
 import * as Toolbars from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
@@ -37,11 +38,8 @@ import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
-
-import 'codemirror/theme/ambiance.css';
 
 // --------------------------------------------------------------------------
 // --- Configure Server
@@ -76,7 +74,7 @@ function buildServerConfig(argv: string[], cwd?: string) {
   let command;
   let sockaddr;
   let cwdir = cwd;
-  for (let k = 0; k < argv.length; k++) {
+  for (let k = 0; k < (argv ? argv.length : 0); k++) {
     const v = argv[k];
     switch (v) {
       case '--cwd':
@@ -214,6 +212,11 @@ const RenderConsole = () => {
     return () => { editor.off('change', callback); };
   });
 
+  const [maxLines] = Settings.useGlobalSettings(Preferences.ConsoleScrollback);
+  React.useEffect(() => {
+    Server.buffer.setMaxlines(maxLines);
+  });
+
   const doReload = () => {
     const cfg = Server.getConfig();
     const hst = insertConfig(history, cfg);
@@ -330,7 +333,6 @@ const RenderConsole = () => {
         buffer={edited ? editor : Server.buffer}
         mode="text"
         readOnly={!edited}
-        theme="ambiance"
       />
     </>
   );

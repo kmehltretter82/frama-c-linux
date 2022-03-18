@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,6 +31,7 @@ module Register: sig
    *   or its slicing pragmas when [select_slice_pragmas] is true.
    *  @return a new project where the sparecode has been removed.
   *)
+
   val rm_unused_globals : ?new_proj_name:string -> ?project:Project.t -> unit -> Project.t
   (** Remove  unused global types and variables from the given project
     * (the current one if no project given).
@@ -38,4 +39,5 @@ module Register: sig
     * The result is in the returned new project.
     * @modify Carbon-20110201 optional argument [new_proj_name] added
     * *)
+
 end

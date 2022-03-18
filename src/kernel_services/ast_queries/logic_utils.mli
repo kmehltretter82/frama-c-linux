@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -389,6 +389,7 @@ val is_same_code_annotation : code_annotation -> code_annotation -> bool
 val is_same_global_annotation : global_annotation -> global_annotation -> bool
 val is_same_axiomatic :
   global_annotation list -> global_annotation list -> bool
+
 (** @since Oxygen-20120901 *)
 val is_same_model_info: model_info -> model_info -> bool
 

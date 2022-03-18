@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -86,7 +86,7 @@ module LIT = WpContext.Generator(STR)
       let compile s =
         let id = lookup (STR.hash s) in
         let lfun = Lang.generated_f ~result:(Array(Int,Int)) "Lit_%04X" id in
-        (** Since its a generated it is the unique name given ["Lit_%04X" id] *)
+        (* Since its a generated it is the unique name given ["Lit_%04X" id] *)
         let prefix = Lang.Fun.debug lfun in
         define_symbol {
           d_lfun = lfun ;
@@ -99,8 +99,8 @@ module LIT = WpContext.Generator(STR)
           begin match s with
             | C_str str -> export_literal prefix lfun str
             | W_str _ ->
-                Wp_parameters.warning ~current:false ~once:true
-                  "Content of wide string literals not exported."
+              Wp_parameters.warning ~current:false ~once:true
+                "Content of wide string literals not exported."
           end ;
         id , F.e_fun lfun []
 

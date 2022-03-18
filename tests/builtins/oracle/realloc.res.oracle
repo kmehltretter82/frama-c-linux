@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from realloc.c:160.
+  Called from realloc.c:177.
 [eva] realloc.c:12: Call to builtin malloc
 [eva] realloc.c:12: allocating variable __malloc_main1_l12
 [eva] realloc.c:15: 
@@ -67,7 +67,7 @@
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from realloc.c:161.
+  Called from realloc.c:178.
 [eva] computing for function Frama_C_interval <- main2 <- main.
   Called from realloc.c:22.
 [eva] using specification for function Frama_C_interval
@@ -114,7 +114,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from realloc.c:162.
+  Called from realloc.c:179.
 [eva] realloc.c:32: Call to builtin malloc
 [eva] realloc.c:32: allocating variable __malloc_main3_l32
 [eva] realloc.c:35: Call to builtin malloc
@@ -204,7 +204,7 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from realloc.c:163.
+  Called from realloc.c:180.
 [eva] computing for function Frama_C_interval <- main4 <- main.
   Called from realloc.c:53.
 [eva] realloc.c:53: 
@@ -329,7 +329,7 @@
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from realloc.c:164.
+  Called from realloc.c:181.
 [eva] realloc.c:76: Call to builtin malloc
 [eva] realloc.c:76: allocating variable __malloc_main5_l76
 [eva] computing for function Frama_C_interval <- main5 <- main.
@@ -405,7 +405,7 @@
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
-  Called from realloc.c:165.
+  Called from realloc.c:182.
 [eva] computing for function Frama_C_interval <- main6 <- main.
   Called from realloc.c:92.
 [eva] realloc.c:92: 
@@ -423,7 +423,7 @@
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
-  Called from realloc.c:166.
+  Called from realloc.c:183.
 [eva] realloc.c:110: Call to builtin malloc
 [eva] realloc.c:110: allocating variable __malloc_main7_l110
 [eva] realloc.c:115: Call to builtin realloc
@@ -488,7 +488,7 @@
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
-  Called from realloc.c:167.
+  Called from realloc.c:184.
 [eva] realloc.c:123: Call to builtin malloc
 [eva] realloc.c:123: allocating variable __malloc_main8_l123
 [eva] realloc.c:126: Call to builtin realloc
@@ -525,7 +525,7 @@
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
-  Called from realloc.c:168.
+  Called from realloc.c:185.
 [eva] realloc.c:132: Call to builtin malloc
 [eva] realloc.c:132: allocating variable __malloc_main9_l132
 [eva] realloc.c:135: Call to builtin realloc
@@ -562,7 +562,7 @@
 [eva] Recording results for main9
 [eva] Done for function main9
 [eva] computing for function main10 <- main.
-  Called from realloc.c:169.
+  Called from realloc.c:186.
 [eva] realloc.c:147: Call to builtin malloc
 [eva] realloc.c:147: allocating variable __malloc_main10_l147
 [eva] realloc.c:152: Call to builtin realloc
@@ -627,6 +627,73 @@
   ==END OF DUMP==
 [eva] Recording results for main10
 [eva] Done for function main10
+[eva] computing for function main11 <- main.
+  Called from realloc.c:187.
+[eva] realloc.c:160: Call to builtin malloc
+[eva] realloc.c:160: allocating variable __malloc_main11_l160
+[eva] realloc.c:165: Call to builtin reallocarray
+[eva] realloc.c:165: 
+  function reallocarray: precondition 'freeable' got status valid.
+[eva:malloc] bases_to_realloc: {__malloc_main11_l160}
+[eva] realloc.c:165: allocating variable __realloc_main11_l165
+[eva:malloc] realloc.c:165: strong free on bases: {__malloc_main11_l160}
+[eva] realloc.c:167: Call to builtin reallocarray
+[eva] realloc.c:167: 
+  function reallocarray: precondition 'freeable' got status valid.
+[eva] realloc.c:167: Warning: 
+  reallocarray out of bounds: assert(nmemb * size <= SIZE_MAX)
+[eva] realloc.c:168: assertion got status valid.
+[eva] computing for function Frama_C_interval <- main11 <- main.
+  Called from realloc.c:169.
+[eva] realloc.c:169: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] realloc.c:171: Call to builtin reallocarray
+[eva] realloc.c:171: 
+  function reallocarray: precondition 'freeable' got status valid.
+[eva] realloc.c:171: Warning: 
+  reallocarray out of bounds: assert(nmemb * size <= SIZE_MAX)
+[eva:malloc] bases_to_realloc: {}
+[eva] realloc.c:171: allocating variable __realloc_main11_l171
+[eva:malloc] realloc.c:171: strong free on bases: {}
+[eva] realloc.c:172: Frama_C_show_each_p: {0}
+[eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
+[eva] realloc.c:165: Call to builtin reallocarray
+[eva:malloc] bases_to_realloc: {__realloc_main11_l171}
+[eva:malloc:weak] realloc.c:165: 
+  marking variable `__realloc_main11_l165' as weak
+[eva:malloc] realloc.c:165: strong free on bases: {__realloc_main11_l171}
+[eva] realloc.c:165: Call to builtin reallocarray
+[eva:malloc] bases_to_realloc: {}
+[eva:malloc] realloc.c:165: strong free on bases: {}
+[eva:alarm] realloc.c:166: Warning: 
+  accessing uninitialized left-value. assert \initialized(p);
+[eva] realloc.c:167: Call to builtin reallocarray
+[eva] realloc.c:167: Call to builtin reallocarray
+[eva] computing for function Frama_C_interval <- main11 <- main.
+  Called from realloc.c:169.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main11 <- main.
+  Called from realloc.c:169.
+[eva] Done for function Frama_C_interval
+[eva] realloc.c:171: Call to builtin reallocarray
+[eva:malloc] bases_to_realloc: {}
+[eva:malloc] realloc.c:171: strong free on bases: {}
+[eva] realloc.c:171: Call to builtin reallocarray
+[eva:malloc] bases_to_realloc: {}
+[eva:malloc] realloc.c:171: strong free on bases: {}
+[eva] realloc.c:172: Frama_C_show_each_p: {0}
+[eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
+[eva] realloc.c:172: Frama_C_show_each_p: {0}
+[eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
+[eva] realloc.c:165: Call to builtin reallocarray
+[eva:malloc] bases_to_realloc: {__realloc_main11_l171}
+[eva:malloc] realloc.c:165: strong free on bases: {__realloc_main11_l171}
+[eva] realloc.c:165: Call to builtin reallocarray
+[eva:malloc] bases_to_realloc: {}
+[eva:malloc] realloc.c:165: strong free on bases: {}
+[eva] Recording results for main11
+[eva] Done for function main11
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -689,11 +756,22 @@
   __fc_heap_status ∈ [--..--]
   p ∈ ESCAPINGADDR
   q ∈ ESCAPINGADDR
+[eva:final-states] Values at end of function main11:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ {{ NULL ; &__malloc_main11_l160 ; (int *)&__realloc_main11_l171 }}
+  q ∈ {0} or UNINITIALIZED or ESCAPINGADDR
+  __malloc_main11_l160 ∈ {4}
+  __realloc_w_main11_l165[0] ∈ {4} or UNINITIALIZED
+                         [1] ∈ UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   __malloc_main10_l147 ∈ {4}
   __realloc_w_main10_l152[0] ∈ {4}
+                         [1] ∈ UNINITIALIZED
+  __malloc_main11_l160 ∈ {4}
+  __realloc_w_main11_l165[0] ∈ {4} or UNINITIALIZED
                          [1] ∈ UNINITIALIZED
 [from] Computing for function main1
 [from] Computing for function malloc <-main1
@@ -723,6 +801,10 @@
 [from] Done for function main8
 [from] Computing for function main9
 [from] Done for function main9
+[from] Computing for function main11
+[from] Computing for function reallocarray <-main11
+[from] Done for function reallocarray
+[from] Done for function main11
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -780,10 +862,21 @@
 [from] Function main9:
   __fc_heap_status FROM __fc_heap_status (and SELF)
   __malloc_main9_l132[0..1] FROM __fc_heap_status
+[from] Function reallocarray:
+  __fc_heap_status FROM __fc_heap_status; nmemb; size (and SELF)
+  \result FROM __fc_heap_status; ptr; nmemb; size
+[from] Function main11:
+  __fc_heap_status FROM __fc_heap_status; Frama_C_entropy_source;
+                        v (and SELF)
+  Frama_C_entropy_source FROM Frama_C_entropy_source; v (and SELF)
+  __malloc_main11_l160 FROM __fc_heap_status
+  __realloc_w_main11_l165[0]
+                         FROM __fc_heap_status; Frama_C_entropy_source; 
+                              v; __realloc_w_main11_l165[0] (and SELF)
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status; Frama_C_entropy_source;
                         v (and SELF)
-  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  Frama_C_entropy_source FROM Frama_C_entropy_source; v (and SELF)
   __malloc_main1_l12 FROM __fc_heap_status
   __malloc_main2_l23[0..3]
                     FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
@@ -803,6 +896,10 @@
   __realloc_w_main10_l152[0]
                          FROM __fc_heap_status; Frama_C_entropy_source; 
                               v; __realloc_w_main10_l152[0] (and SELF)
+  __malloc_main11_l160 FROM __fc_heap_status; Frama_C_entropy_source; v
+  __realloc_w_main11_l165[0]
+                         FROM __fc_heap_status; Frama_C_entropy_source; 
+                              v; __realloc_w_main11_l165[0] (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main1:
     __fc_heap_status; p; pp; q; __malloc_main1_l12
@@ -847,12 +944,19 @@
     __fc_heap_status; p; q; __malloc_main9_l132[0..1]
 [inout] Inputs for function main9:
     __fc_heap_status
+[inout] Out (internal) for function main11:
+    __fc_heap_status; Frama_C_entropy_source; p; q; nmemb;
+    __malloc_main11_l160; __realloc_w_main11_l165[0]
+[inout] Inputs for function main11:
+    __fc_heap_status; Frama_C_entropy_source; v; __realloc_w_main11_l165[0]
 [inout] Out (internal) for function main:
     __fc_heap_status; Frama_C_entropy_source; __malloc_main1_l12;
     __malloc_main2_l23[0..3]; __malloc_main3_l32[0..4];
     __malloc_main3_l35[0..5]; __malloc_main4_l55[0..9];
     __malloc_main4_l56[0..9]; __malloc_main5_l76; __malloc_main7_l110;
     __malloc_main8_l123[0..1]; __malloc_main9_l132[0..1]; __malloc_main10_l147;
-    __realloc_w_main10_l152[0]
+    __realloc_w_main10_l152[0]; __malloc_main11_l160;
+    __realloc_w_main11_l165[0]
 [inout] Inputs for function main:
-    __fc_heap_status; Frama_C_entropy_source; v; __realloc_w_main10_l152[0]
+    __fc_heap_status; Frama_C_entropy_source; v; __realloc_w_main10_l152[0];
+    __realloc_w_main11_l165[0]

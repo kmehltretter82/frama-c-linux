@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,10 +27,17 @@ open Eval
 
 module type S = sig
 
-  type state  (** State of abstract domain. *)
-  type value  (** Numeric values to which the expressions are evaluated. *)
-  type origin (** Origin of values. *)
-  type loc    (** Location of an lvalue. *)
+  (** State of abstract domain. *)
+  type state
+
+  (** Numeric values to which the expressions are evaluated. *)
+  type value
+
+  (** Origin of values. *)
+  type origin
+
+  (** Location of an lvalue. *)
+  type loc
 
   (** Results of an evaluation: the results of all intermediate calculation (the
       value of each expression and the location of each lvalue) are cached here.

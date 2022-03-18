@@ -1,7 +1,7 @@
 /* run.config*
    STDOPT: +"-eva-slevel 10 -eva-alloc-builtin by_stack -eva-warn-copy-indeterminate @all"
 */
-
+#include <stdint.h>
 #include <stdlib.h>
 #include "__fc_builtin.h"
 
@@ -156,6 +156,23 @@ void main10() {
   }
 }
 
+void main11() {
+  int *p = malloc(sizeof(int));
+  int *q;
+  *p = 4;
+  while (v) {
+    q = p;
+    p = reallocarray(p, 2, sizeof(int));
+    *p = *p; // always succeeds (provided realloc does not return NULL)
+    p = reallocarray(p, SIZE_MAX, sizeof(int)); // always fails
+    //@ assert p == \null;
+    int nmemb = Frama_C_interval(3,10);
+    // succeeds sometimes, fails sometimes
+    p = reallocarray(p, nmemb, SIZE_MAX/6); // always fails
+    Frama_C_show_each_p(p);
+  }
+}
+
 void main() {
   main1();
   main2();
@@ -167,5 +184,5 @@ void main() {
   main8();
   main9();
   main10();
+  main11();
 }
-

@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2021                                               */
+/*  Copyright (C) 2007-2022                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -22,6 +22,7 @@
 
 #include "__fc_builtin.h"
 __PUSH_FC_STDLIB
+#include "limits.h"
 
 /* Those builtins implementations could probably be removed entirely for
    Value, as the spec is informative enough. There remains a slight difference
@@ -29,6 +30,11 @@ __PUSH_FC_STDLIB
    is not sufficient to to exclude -0. when requiring >= +0. */
 
 int volatile Frama_C_entropy_source;
+
+// Additional entropy sources for some interval functions
+unsigned int volatile __fc_unsigned_int_entropy;
+long volatile __fc_long_entropy;
+unsigned long volatile __fc_unsigned_long_entropy;
 
 //@ assigns Frama_C_entropy_source \from Frama_C_entropy_source;
 void Frama_C_update_entropy(void) {
@@ -56,10 +62,10 @@ void *Frama_C_nondet_ptr(void *a, void *b)
 
 int Frama_C_interval(int min, int max)
 {
-  int r,aux;
+  int r, aux;
   Frama_C_update_entropy();
   aux = Frama_C_entropy_source;
-  if ((aux>=min) && (aux <=max))
+  if (aux >= min && aux <= max)
     r = aux;
   else
     r = min;
@@ -68,15 +74,7 @@ int Frama_C_interval(int min, int max)
 
 char Frama_C_char_interval(char min, char max)
 {
-  int r;
-  char aux;
-  Frama_C_update_entropy();
-  aux = Frama_C_entropy_source;
-  if ((aux>=min) && (aux <=max))
-    r = aux;
-  else
-    r = min;
-  return r;
+  return (char)Frama_C_interval(min, max);
 }
 
 float Frama_C_float_interval(float min, float max)
@@ -89,6 +87,47 @@ double Frama_C_double_interval(double min, double max)
 {
   Frama_C_update_entropy();
   return Frama_C_entropy_source ? min : max;
+}
+
+unsigned char Frama_C_unsigned_char_interval(unsigned char min, unsigned char max)
+{
+  return (unsigned char)Frama_C_interval(min, max);
+}
+
+unsigned int Frama_C_unsigned_int_interval(unsigned int min, unsigned int max)
+{
+  unsigned int r, aux;
+  Frama_C_update_entropy();
+  aux = __fc_unsigned_int_entropy;
+  if (aux >= min && aux <= max)
+    r = aux;
+  else
+    r = min;
+  return r;
+}
+
+long Frama_C_long_interval(long min, long max)
+{
+  long r, aux;
+  Frama_C_update_entropy();
+  aux = __fc_long_entropy;
+  if (aux >= min && aux <= max)
+    r = aux;
+  else
+    r = min;
+  return r;
+}
+
+unsigned long Frama_C_unsigned_long_interval(unsigned long min, unsigned long max)
+{
+  unsigned long r, aux;
+  Frama_C_update_entropy();
+  aux = __fc_unsigned_long_entropy;
+  if (aux >= min && aux <= max)
+    r = aux;
+  else
+    r = min;
+  return r;
 }
 
 extern void __builtin_abort(void) __attribute__((noreturn)); // GCC builtin

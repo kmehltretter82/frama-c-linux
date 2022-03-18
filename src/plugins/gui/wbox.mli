@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -43,9 +43,15 @@ val g : ?expand:expand -> ?padding:int -> #GObj.widget -> box
 
 (** Helper to [box] for packing a [widget]. Same defaults than [box]. *)
 val w : ?expand:expand -> ?padding:int -> #widget -> box
-val h : ?padding:int -> #widget -> box (** [w ~expand:H] *)
-val v : ?padding:int -> #widget -> box (** [w ~expand:V] *)
-val hv : ?padding:int -> #widget -> box (** [w ~expand:HV] *)
+
+(** [w ~expand:H] *)
+val h : ?padding:int -> #widget -> box
+
+(** [w ~expand:V] *)
+val v : ?padding:int -> #widget -> box
+
+(** [w ~expand:HV] *)
+val hv : ?padding:int -> #widget -> box
 
 val label : ?fill:bool -> ?style:style -> ?align:align -> ?padding:int -> string -> box
 (** Helper to pack a [Widget.label] widget using [box].
@@ -60,8 +66,11 @@ val label : ?fill:bool -> ?style:style -> ?align:align -> ?padding:int -> string
     Notice that nested boxes can {i generally} be packed using default
     [W] mode, even if they contains horizontal or vertical widgets. *)
 
-val hbox : box list -> widget (** Pack a list of boxes horizontally. *)
-val vbox : box list -> widget (** Pack a list of boxes vertically. *)
+(** Pack a list of boxes horizontally. *)
+val hbox : box list -> widget
+
+(** Pack a list of boxes vertically. *)
+val vbox : box list -> widget
 
 (** Pack a list of widgets horizontally, with all widgets stuck to the same width *)
 val hgroup : widget list -> widget

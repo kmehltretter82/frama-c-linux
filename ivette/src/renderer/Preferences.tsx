@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -39,64 +39,75 @@ import React from 'react';
 
 import * as Settings from 'dome/data/settings';
 import * as Forms from 'dome/layout/forms';
-import * as P from 'ivette/prefs';
+import * as Themes from 'dome/themes';
+import * as IvettePrefs from 'ivette/prefs';
 
 // --------------------------------------------------------------------------
-// --- Font Forms
+// --- Theme Fields
 // --------------------------------------------------------------------------
 
-function ThemeFields(props: P.ThemeProps) {
-  const theme = Forms.useDefined(Forms.useValid(
-    Settings.useGlobalSettings(props.theme),
-  ));
+const themeOptions: Forms.MenuFieldOption<Themes.ColorSettings>[] = [
+  { value: 'light', label: 'Light Theme' },
+  { value: 'dark', label: 'Dark Theme' },
+  { value: 'system', label: 'System Defaults' },
+];
+
+function ThemeFields(): JSX.Element {
+  const state = Forms.useValid(Themes.useColorThemeSettings());
+  return (
+    <Forms.MenuField<Themes.ColorSettings>
+      label="Color Theme"
+      title="Select global color theme for the application"
+      state={state}
+      defaultValue='system'
+      options={themeOptions}
+    />
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Editor Fields
+// --------------------------------------------------------------------------
+
+function EditorFields() {
   const fontsize = Forms.useValid(
-    Settings.useGlobalSettings(props.fontSize),
+    Settings.useGlobalSettings(IvettePrefs.EditorFontSize)
   );
-  const wraptext = Forms.useValid(
-    Settings.useGlobalSettings(props.wrapText),
-  );
-  const options = P.THEMES.map(({ id, label }) => (
-    <option key={id} value={id} label={label} />
+  const cmd = Forms.useDefined(Forms.useValid(
+    Settings.useGlobalSettings(IvettePrefs.EditorCommand)
   ));
-  const { target } = props;
+  const titleCmd =
+    'Command to open an external editor on Ctrl-click in the source code view.'
+    + '\nUse %s for the file name, %n for the line number'
+    + ' and %c for the selected character.';
   return (
     <>
-      <Forms.SelectField
-        state={theme}
-        label="Theme"
-        title={`Set the color theme of ${target}`}
-      >
-        {options}
-      </Forms.SelectField>
       <Forms.SliderField
         state={fontsize}
         label="Font Size"
-        title={`Set the font size of ${target}`}
+        title={`Set the font size of editors`}
         min={8}
         max={32}
         step={2}
       />
-      <Forms.CheckboxField
-        state={wraptext}
-        label="Wrap Text"
-        title={`Set long line wrapping mode of ${target}`}
+      <Forms.TextCodeField
+        state={cmd}
+        label="Command"
+        title={titleCmd}
       />
     </>
   );
 }
 
 // --------------------------------------------------------------------------
-// --- Editor Command Forms
+// --- Console Scrollback Forms
 // --------------------------------------------------------------------------
-function EditorCommandFields(props: P.EditorCommandProps) {
-  const cmd = Forms.useDefined(Forms.useValid(
-    Settings.useGlobalSettings(props.command),
+function ConsoleScrollbackFields(props: IvettePrefs.ConsoleScrollbackProps) {
+  const scrollback = Forms.useDefined(Forms.useValid(
+    Settings.useGlobalSettings(props.scrollback),
   ));
-  const title =
-    'Command to open an external editor on Ctrl-click in the source code view.'
-    + '\nUse %s for the file name, %n for the line number'
-    + ' and %c for the selected character.';
-  return (<Forms.TextCodeField state={cmd} label="Command" title={title} />);
+  const title = 'Maximum number of lines in the console window';
+  return (<Forms.NumberField state={scrollback} label="Lines" title={title} />);
 }
 
 // --------------------------------------------------------------------------
@@ -106,24 +117,14 @@ function EditorCommandFields(props: P.EditorCommandProps) {
 export default function Preferences() {
   return (
     <Forms.Page>
-      <Forms.Section label="AST View" unfold>
-        <ThemeFields
-          target="Internal AST"
-          theme={P.AstTheme}
-          fontSize={P.AstFontSize}
-          wrapText={P.AstWrapText}
-        />
+      <Forms.Section label="Theme" unfold>
+        <ThemeFields />
       </Forms.Section>
-      <Forms.Section label="Source View" unfold>
-        <ThemeFields
-          target="Source Code"
-          theme={P.SourceTheme}
-          fontSize={P.SourceFontSize}
-          wrapText={P.SourceWrapText}
-        />
+      <Forms.Section label="Editors" unfold>
+        <EditorFields />
       </Forms.Section>
-      <Forms.Section label="Editor Command" unfold>
-        <EditorCommandFields command={P.EditorCommand} />
+      <Forms.Section label="Console Scrollback" unfold>
+        <ConsoleScrollbackFields scrollback={IvettePrefs.ConsoleScrollback} />
       </Forms.Section>
     </Forms.Page>
   );

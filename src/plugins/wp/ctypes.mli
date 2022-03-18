@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -82,12 +82,21 @@ val f_memo : (c_float -> 'a) -> c_float -> 'a
 (** memoized, not-projectified *)
 
 val is_char : c_int -> bool
-val c_char : unit -> c_int     (** Returns the type of [char] *)
-val c_bool : unit -> c_int     (** Returns the type of [int] *)
-val c_ptr  : unit -> c_int     (** Returns the type of pointers *)
+val c_char : unit -> c_int
+(** Returns the type of [char] *)
 
-val c_int    : ikind -> c_int   (** Conforms to {Cil.theMachine} *)
-val c_float  : fkind -> c_float (** Conforms to {Cil.theMachine} *)
+val c_bool : unit -> c_int
+(** Returns the type of [int] *)
+
+val c_ptr  : unit -> c_int
+(** Returns the type of pointers *)
+
+val c_int    : ikind -> c_int
+(** Conforms to {Cil.theMachine} *)
+
+val c_float  : fkind -> c_float
+(** Conforms to {Cil.theMachine} *)
+
 val object_of : typ -> c_object
 
 val is_pointer : c_object -> bool
@@ -98,15 +107,29 @@ val constant : exp -> int64
 val get_int : exp -> int option
 val get_int64 : exp -> int64 option
 
-val signed : c_int -> bool  (** [true] if signed *)
-val bounds: c_int -> Integer.t * Integer.t (** domain, bounds included *)
+val signed : c_int -> bool
+(** [true] if signed *)
 
-val i_bits : c_int -> int (** size in bits *)
-val i_bytes : c_int -> int (** size in bytes *)
-val f_bits : c_float -> int (** size in bits *)
-val f_bytes : c_float -> int (** size in bytes *)
-val p_bits : unit -> int (** pointer size in bits *)
-val p_bytes : unit -> int (** pointer size in bits *)
+val bounds: c_int -> Integer.t * Integer.t
+(** domain, bounds included *)
+
+val i_bits : c_int -> int
+(** size in bits *)
+
+val i_bytes : c_int -> int
+(** size in bytes *)
+
+val f_bits : c_float -> int
+(** size in bits *)
+
+val f_bytes : c_float -> int
+(** size in bytes *)
+
+val p_bits : unit -> int
+(** pointer size in bits *)
+
+val p_bytes : unit -> int
+(** pointer size in bits *)
 
 val sub_c_int: c_int -> c_int -> bool
 
@@ -131,6 +154,7 @@ val array_size : arrayinfo -> int option
 val array_dimensions : arrayinfo -> c_object * int option list
 (** Returns the list of dimensions the array consists of.
     None-dimension means undefined one. *)
+
 val dimension_of_object : c_object -> (int * int64) option
 (** Returns None for 1-dimension objects, and Some(d,N) for d-matrix with N cells *)
 

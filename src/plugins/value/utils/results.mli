@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 [@@@ api_start]
+
 (** Eva's result API is a work-in-progress interface to allow accessing the
     analysis results once its completed. It is experimental and is very likely
     to change in the future. It aims at replacing [Db.Value] but does not

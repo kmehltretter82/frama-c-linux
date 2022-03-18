@@ -60,7 +60,7 @@
     <referenced-by-acsl.c>: f;
 [metrics] References to non-analyzed functions
   ------------------------------------
-  f referenced by an ACSL specification (at referenced-by-acsl.c:7)
+  f referenced by an ACSL specification (at referenced-by-acsl.c:8)
 [metrics] Statements analyzed by Eva
   --------------------------
   2 stmts in analyzed functions, 2 stmts analyzed (100.0%)

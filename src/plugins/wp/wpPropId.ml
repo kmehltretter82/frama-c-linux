@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -89,16 +89,16 @@ let num_of_bhv_from bhv (out, _) =
   match bhv.b_assigns with
     WritesAny -> Wp_parameters.fatal "no \\from in this behavior ???"
   | Writes l ->
-      let add n (o, f) = match f with FromAny -> n
-                                    | From _ ->
-                                        if Logic_utils.is_same_identified_term out o then
-                                          raise (Found n)
-                                        else n+1
-      in
-      try
-        let _ = List.fold_left add 1 l in
-        Wp_parameters.fatal "didn't found this \\from"
-      with Found n -> n
+    let add n (o, f) = match f with FromAny -> n
+                                  | From _ ->
+                                    if Logic_utils.is_same_identified_term out o then
+                                      raise (Found n)
+                                    else n+1
+    in
+    try
+      let _ = List.fold_left add 1 l in
+      Wp_parameters.fatal "didn't found this \\from"
+    with Found n -> n
 
 (*----------------------------------------------------------------------------*)
 (* Constructors *)
@@ -138,7 +138,7 @@ let mk_bhv_from_id kf ki a bhv from =
 
 let get_kind_for_tk tkind has_exit = match tkind with
   | Normal ->
-      if has_exit then PKAFctOut else PKProp
+    if has_exit then PKAFctOut else PKProp
   | Exits -> PKAFctExit
   | _ -> assert false
 
@@ -149,9 +149,9 @@ let mk_fct_from_id kf kf_has_exit bhv tkind from =
   mk_prop kind (Option.get id)
 
 let mk_disj_bhv_id (kf,ki,active,disj)  =
-  mk_prop PKProp (Property.ip_of_disjoint kf ki active disj)
+  mk_prop PKProp (Property.ip_of_disjoint kf ki ~active disj)
 let mk_compl_bhv_id (kf,ki,active,comp) =
-  mk_prop PKProp (Property.ip_of_complete kf ki active comp)
+  mk_prop PKProp (Property.ip_of_complete kf ki ~active comp)
 let mk_decrease_id kf s x  =
   mk_prop PKDecreases (Property.ip_of_decreases kf s x)
 
@@ -226,13 +226,13 @@ let kind_order = function
 
 let compare_kind k1 k2 = match k1, k2 with
     PKPre (kf1, ki1, p1), PKPre (kf2, ki2, p2) ->
-      let cmp = Kernel_function.compare kf1 kf2 in
+    let cmp = Kernel_function.compare kf1 kf2 in
+    if cmp <> 0 then cmp
+    else
+      let cmp = Stmt.compare ki1 ki2 in
       if cmp <> 0 then cmp
       else
-        let cmp = Stmt.compare ki1 ki2 in
-        if cmp <> 0 then cmp
-        else
-          Property.compare p1 p2
+        Property.compare p1 p2
   | _,_ -> Stdlib.compare (kind_order k1) (kind_order k2)
 
 let compare_prop_id pid1 pid2 =
@@ -370,21 +370,21 @@ struct
     | PKAFctOut , p -> get_ip p ^ "_normal"
     | PKAFctExit , p -> get_ip p ^ "_exit"
     | PKPre(callee_kf,stmt,pre) , _ ->
-        let caller_kf = Kernel_function.find_englobing_kf stmt in
-        let call_string =
-          Uniquify_Stmt.unique_basename (caller_kf,callee_kf,stmt)
-        in
-        (** remove name of callee kernel function given by get_ip *)
-        let ip_string = get_ip pre in
-        let ip_string =
-          Option.value ~default:ip_string
-            (Extlib.string_del_prefix
-               ((Kernel_function.get_name callee_kf)^"_")
-               ip_string)
-        in
-        call_string^"_"^ip_string
+      let caller_kf = Kernel_function.find_englobing_kf stmt in
+      let call_string =
+        Uniquify_Stmt.unique_basename (caller_kf,callee_kf,stmt)
+      in
+      (* remove name of callee kernel function given by get_ip *)
+      let ip_string = get_ip pre in
+      let ip_string =
+        Option.value ~default:ip_string
+          (Extlib.string_del_prefix
+             ((Kernel_function.get_name callee_kf)^"_")
+             ip_string)
+      in
+      call_string^"_"^ip_string
     | _ , p ->
-        get_ip p
+      get_ip p
 
 
   let get_prop_id_basename p =
@@ -392,10 +392,10 @@ struct
     match p.p_part with
     | None -> basename
     | Some(k,n) ->
-        if n < 10 then Printf.sprintf "%s_part%d" basename (succ k) else
-        if n < 100 then Printf.sprintf "%s_part%02d" basename (succ k) else
-        if n < 1000 then Printf.sprintf "%s_part%03d" basename (succ k) else
-          Printf.sprintf "%s_part%06d" basename (succ k)
+      if n < 10 then Printf.sprintf "%s_part%d" basename (succ k) else
+      if n < 100 then Printf.sprintf "%s_part%02d" basename (succ k) else
+      if n < 1000 then Printf.sprintf "%s_part%03d" basename (succ k) else
+        Printf.sprintf "%s_part%06d" basename (succ k)
 
   module Uniquify2 = NameUniquify(PropIdRaw)(struct
       let name = "Wp.WpPropId.Names2."
@@ -443,31 +443,31 @@ let code_annot_names ca = match ca.annot_content with
 let user_prop_names p =
   let open Property in match p with
   | IPPredicate {ip_kind; ip_pred} ->
-      Format.asprintf  "@@%a" Property.pretty_predicate_kind ip_kind ::
-      user_pred_names ip_pred.ip_content
+    Format.asprintf  "@@%a" Property.pretty_predicate_kind ip_kind ::
+    user_pred_names ip_pred.ip_content
   | IPExtended {ie_ext={ext_name}} -> [ Printf.sprintf "@%s" ext_name ]
   | IPCodeAnnot {ica_ca} -> code_annot_names ica_ca
   | IPComplete {ic_bhvs} ->
-      let kind_name = "@complete_behaviors" in
-      let name = Format.asprintf "complete_behaviors%a" pp_names ic_bhvs
-      in kind_name::[name]
+    let kind_name = "@complete_behaviors" in
+    let name = Format.asprintf "complete_behaviors%a" pp_names ic_bhvs
+    in kind_name::[name]
   | IPDisjoint {ic_bhvs} ->
-      let kind_name = "@disjoint_behaviors" in
-      let name = Format.asprintf "disjoint_behaviors%a" pp_names ic_bhvs
-      in kind_name::[name]
+    let kind_name = "@disjoint_behaviors" in
+    let name = Format.asprintf "disjoint_behaviors%a" pp_names ic_bhvs
+    in kind_name::[name]
   | IPAssigns {ias_froms} ->
-      List.fold_left
-        (fun acc (t,_) -> (ident_names t.it_content.term_name) @ acc)
-        ["@assigns"] ias_froms
+    List.fold_left
+      (fun acc (t,_) -> (ident_names t.it_content.term_name) @ acc)
+      ["@assigns"] ias_froms
   | IPDecrease {id_ca=Some ca} -> "@decreases"::code_annot_names ca
   | IPDecrease _ -> [ "@decreases" ]
   | IPLemma {il_name = a; il_pred = l} ->
-      let names = "@lemma"::a::user_pred_names l in
-      begin
-        match LogicUsage.section_of_lemma a with
-        | LogicUsage.Toplevel _ -> names
-        | LogicUsage.Axiomatic ax -> ax.LogicUsage.ax_name::names
-      end
+    let names = "@lemma"::a::user_pred_names l in
+    begin
+      match LogicUsage.section_of_lemma a with
+      | LogicUsage.Toplevel _ -> names
+      | LogicUsage.Axiomatic ax -> ax.LogicUsage.ax_name::names
+    end
   (* TODO *)
   | IPFrom _
   | IPAllocation _
@@ -483,15 +483,15 @@ let user_bhv_names p =
   let open Property in
   let fors = match p with
     | Property.IPCodeAnnot { ica_ca } ->
-        let fors = match ica_ca.annot_content with
-          | Cil_types.AAssert (fors, _)
-          | Cil_types.AStmtSpec (fors, _)
-          | Cil_types.AInvariant (fors, _, _)
-          | Cil_types.AAssigns (fors, _)
-          | Cil_types.AAllocation (fors, _)
-          | Cil_types.AExtended (fors, _, _) -> fors
-          | _ -> []
-        in fors
+      let fors = match ica_ca.annot_content with
+        | Cil_types.AAssert (fors, _)
+        | Cil_types.AStmtSpec (fors, _)
+        | Cil_types.AInvariant (fors, _, _)
+        | Cil_types.AAssigns (fors, _)
+        | Cil_types.AAllocation (fors, _)
+        | Cil_types.AExtended (fors, _, _) -> fors
+        | _ -> []
+      in fors
     | _ -> []
   in Option.fold ~none:fors ~some:(fun b -> b.b_name :: fors) (get_behavior p)
 
@@ -518,13 +518,13 @@ let label_of_kind = function
   | PKTerminates -> "Terminates"
   | PKDecreases -> "Decreases"
   | PKPre(kf,_,_) ->
-      Printf.sprintf "Precondition for '%s'" (Kernel_function.get_name kf)
+    Printf.sprintf "Precondition for '%s'" (Kernel_function.get_name kf)
 
 let label_of_prop_id p =
   match p.p_part with
   | None -> label_of_kind p.p_kind
   | Some(k,n) ->
-      Printf.sprintf "%s (%d/%d)" (label_of_kind p.p_kind) (succ k) n
+    Printf.sprintf "%s (%d/%d)" (label_of_kind p.p_kind) (succ k) n
 
 module Pretty =
 struct
@@ -600,9 +600,9 @@ let propid_hints hs p =
   | PKCheck , _ -> ()
   | PKSmoke , _ -> add_required hs "smoke-test"
   | PKProp , IPAssigns {ias_kinstr=Kstmt _} ->
-      add_required hs "stmt-assigns"
+    add_required hs "stmt-assigns"
   | PKProp , IPAssigns {ias_kinstr=Kglobal} ->
-      add_required hs "fct-assigns"
+    add_required hs "fct-assigns"
   | PKPropLoop , Property.IPAssigns _ -> add_required hs "loop-assigns"
   | PKPropLoop , _ -> add_required hs "invariant"
   | PKProp , _ -> add_required hs "property"
@@ -617,8 +617,8 @@ let propid_hints hs p =
   | PKTerminates , _ -> add_required hs "terminates"
   | PKDecreases , _ -> add_required hs "decreases"
   | PKPre(kf,st,_) , _ ->
-      add_required hs ("precond-" ^ Kernel_function.get_name kf) ;
-      stmt_hints hs st
+    add_required hs ("precond-" ^ Kernel_function.get_name kf) ;
+    stmt_hints hs st
 
 let rec term_hints hs t =
   match t.term_node with
@@ -640,23 +640,23 @@ let assigns_hints hs froms =
 
 let annot_hints hs = function
   | AAssert(bs,ipred) | AInvariant(bs,_,ipred) ->
-      List.iter (add_hint hs) (ident_names ipred.tp_statement.pred_name) ;
-      List.iter (add_hint hs) bs
+    List.iter (add_hint hs) (ident_names ipred.tp_statement.pred_name) ;
+    List.iter (add_hint hs) bs
   | AAssigns(bs,Writes froms) ->
-      List.iter (add_hint hs) bs ;
-      assigns_hints hs froms
+    List.iter (add_hint hs) bs ;
+    assigns_hints hs froms
   | AAllocation _ | AAssigns(_,WritesAny) | AStmtSpec _
   | AVariant _ | APragma _ | AExtended _ -> ()
 
 let property_hints hs =
   let open Property in function
     | IPLemma  {il_name; il_pred} ->
-        List.iter (add_required hs) (il_name::il_pred.tp_statement.pred_name)
+      List.iter (add_required hs) (il_name::il_pred.tp_statement.pred_name)
     | IPBehavior _ -> ()
     | IPComplete {ic_bhvs} | IPDisjoint {ic_bhvs} ->
-        Datatype.String.Set.iter (add_required hs) ic_bhvs
+      Datatype.String.Set.iter (add_required hs) ic_bhvs
     | IPPredicate {ip_pred} ->
-        List.iter (add_hint hs) ip_pred.ip_content.tp_statement.pred_name
+      List.iter (add_hint hs) ip_pred.ip_content.tp_statement.pred_name
     | IPExtended {ie_ext={ext_name}} -> List.iter (add_hint hs) [ext_name]
     | IPCodeAnnot {ica_ca} -> annot_hints hs ica_ca.annot_content
     | IPAssigns {ias_froms} -> assigns_hints hs ias_froms
@@ -737,11 +737,11 @@ let is_requires =
 let is_loop_preservation p =
   match p.p_kind with
   | PKPreserved ->
-      begin
-        match Property.get_kinstr p.p_prop with
-        | Kglobal -> Wp_parameters.fatal "Loop Preservation ? (%a)" Property.pretty p.p_prop
-        | Kstmt st -> Some st
-      end
+    begin
+      match Property.get_kinstr p.p_prop with
+      | Kglobal -> Wp_parameters.fatal "Loop Preservation ? (%a)" Property.pretty p.p_prop
+      | Kstmt st -> Some st
+    end
   | _ -> None
 
 let user_prop_pid pid =
@@ -787,10 +787,10 @@ let select_for_behaviors bhvs pid =
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with
   | PKPre (_, p_stmt, p_prop) ->
-      Stmt.equal s_call p_stmt &&
-      (match asked_pre with
-       | None -> true
-       | Some asked_pre -> Property.equal p_prop asked_pre)
+    Stmt.equal s_call p_stmt &&
+    (match asked_pre with
+     | None -> true
+     | Some asked_pre -> Property.equal p_prop asked_pre)
   | _ -> false
 
 (*----------------------------------------------------------------------------*)
@@ -938,23 +938,23 @@ let mk_loop_any_assigns_info s =
 let pp_assign_info k fmt a = match a with
   | NoAssignsInfo -> ()
   | AssignsAny a ->
-      let pkind =
-        match a.a_kind with
-        | StmtAssigns -> ""
-        | LoopAssigns -> "loop"
-      in
-      Format.fprintf fmt "%s(@@%a): %s assigns everything@."
-        k Clabels.pretty a.a_label pkind
+    let pkind =
+      match a.a_kind with
+      | StmtAssigns -> ""
+      | LoopAssigns -> "loop"
+    in
+    Format.fprintf fmt "%s(@@%a): %s assigns everything@."
+      k Clabels.pretty a.a_label pkind
   | AssignsLocations (_,a) ->
-      Format.fprintf fmt "%s(@@%a): %a@." k
-        Clabels.pretty a.a_label
-        pp_assigns_desc a
+    Format.fprintf fmt "%s(@@%a): %a@." k
+      Clabels.pretty a.a_label
+      pp_assigns_desc a
 
 let merge_assign_info a1 a2 = match a1,a2 with
   | NoAssignsInfo, a | a, NoAssignsInfo -> a
   | (AssignsLocations _ | AssignsAny _),
     (AssignsLocations _ | AssignsAny _) ->
-      Wp_parameters.fatal "Several assigns ?"
+    Wp_parameters.fatal "Several assigns ?"
 
 
 (* -------------------------------------------------------------------------- *)
@@ -1028,25 +1028,25 @@ let get_loop_stmt kf stmt =
       | If (_, b1, b2,_) -> is_in_blk b1 || is_in_blk b2
       | Switch (_, b, _, _) | Block b -> is_in_blk b
       | UnspecifiedSequence seq ->
-          let b = Cil.block_from_unspecified_sequence seq in
-          is_in_blk b
+        let b = Cil.block_from_unspecified_sequence seq in
+        is_in_blk b
       | Loop (_, b, _, _, _) -> is_in_blk b
       | _ -> false
   and find_loop_in_blk blk = find_loop_in_stmts blk.bstmts
   and find_loop_in_stmts l = match l with
     | [] -> None
     | s::tl ->
-        (match find_loop_in_stmt s with Some l -> Some l
-                                      | None -> find_loop_in_stmts tl)
+      (match find_loop_in_stmt s with Some l -> Some l
+                                    | None -> find_loop_in_stmts tl)
   and find_loop_in_stmt s = match s.skind with
     | (Loop _) -> if is_in_stmt s then Some s else None
     | If (_, b1, b2,_) ->
-        (match find_loop_in_blk b1 with Some l -> Some l
-                                      | None -> find_loop_in_blk b2)
+      (match find_loop_in_blk b1 with Some l -> Some l
+                                    | None -> find_loop_in_blk b2)
     | Switch (_, b, _, _) | Block b -> find_loop_in_blk b
     | UnspecifiedSequence seq ->
-        let b = Cil.block_from_unspecified_sequence seq in
-        find_loop_in_blk b
+      let b = Cil.block_from_unspecified_sequence seq in
+      find_loop_in_blk b
     | _ -> None
   in let f = Kernel_function.get_definition kf in
   find_loop_in_blk f.sbody
@@ -1062,26 +1062,26 @@ let get_induction p =
   in match p.p_kind with
   | PKCheck | PKSmoke | PKAFctOut | PKAFctExit | PKPre _
   | PKTactic | PKTerminates | PKDecreases ->
-      None
+    None
   | PKProp ->
-      let loop_stmt_opt = match get_stmt (property_of_id p) with
-        | None -> None
-        | Some (kf, s) -> get_loop_stmt kf s
-      in loop_stmt_opt
+    let loop_stmt_opt = match get_stmt (property_of_id p) with
+      | None -> None
+      | Some (kf, s) -> get_loop_stmt kf s
+    in loop_stmt_opt
   | PKPropLoop ->
-      let open Property in
-      let loop_stmt_opt = match property_of_id p with
-        | IPCodeAnnot {ica_kf; ica_stmt;
-                       ica_ca = {annot_content = AInvariant(_, loop, _)}} ->
-            if loop then (*loop invariant *) Some ica_stmt
-            else (* invariant inside loop *) get_loop_stmt ica_kf ica_stmt
-        | IPAssigns {ias_kinstr=Kstmt stmt; ias_bhv = Id_loop _} ->
-            (* loop assigns *) Some stmt
-        | _ -> None (* assert false ??? *)
-      in loop_stmt_opt
+    let open Property in
+    let loop_stmt_opt = match property_of_id p with
+      | IPCodeAnnot {ica_kf; ica_stmt;
+                     ica_ca = {annot_content = AInvariant(_, loop, _)}} ->
+        if loop then (*loop invariant *) Some ica_stmt
+        else (* invariant inside loop *) get_loop_stmt ica_kf ica_stmt
+      | IPAssigns {ias_kinstr=Kstmt stmt; ias_bhv = Id_loop _} ->
+        (* loop assigns *) Some stmt
+      | _ -> None (* assert false ??? *)
+    in loop_stmt_opt
   | PKEstablished|PKVarDecr|PKVarPos|PKVarRel|PKPreserved ->
-      (match get_stmt (property_of_id p) with
-       | None -> None | Some (_, s) -> Some s)
+    (match get_stmt (property_of_id p) with
+     | None -> None | Some (_, s) -> Some s)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Filter according to status                                         --- *)
@@ -1096,7 +1096,7 @@ let filter_status pid =
     | C.Considered_valid | C.Inconsistent _ -> false
     | C.Valid _ | C.Valid_under_hyp _
     | C.Invalid_but_dead _ | C.Valid_but_dead _ | C.Unknown_but_dead _ ->
-        Wp_parameters.StatusTrue.get ()
+      Wp_parameters.StatusTrue.get ()
     | C.Unknown _ -> Wp_parameters.StatusMaybe.get ()
     | C.Invalid _ | C.Invalid_under_hyp _ -> Wp_parameters.StatusFalse.get ()
   end
@@ -1141,17 +1141,17 @@ let add_proof pf ip hs =
     match parts_of_id ip with
     | None -> pf.proved.(k) <- Complete
     | Some(p,n) ->
-        match pf.proved.(k) with
-        | Complete -> ()
-        | Noproof ->
-            let bv = Bitvector.create n in
-            Bitvector.set_range bv 0 (p-1) ;
-            Bitvector.set_range bv (p+1) (n-1) ;
-            pf.proved.(k) <- Parts bv
-        | Parts bv ->
-            Bitvector.clear bv p ;
-            if Bitvector.is_empty bv
-            then pf.proved.(k) <- Complete
+      match pf.proved.(k) with
+      | Complete -> ()
+      | Noproof ->
+        let bv = Bitvector.create n in
+        Bitvector.set_range bv 0 (p-1) ;
+        Bitvector.set_range bv (p+1) (n-1) ;
+        pf.proved.(k) <- Parts bv
+      | Parts bv ->
+        Bitvector.clear bv p ;
+        if Bitvector.is_empty bv
+        then pf.proved.(k) <- Complete
   end
 
 let add_invalid_proof pf = pf.invalid <- true

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -422,7 +422,7 @@ let build_automaton ~annotations kf =
         (* Guards for edges of the switch *)
         let build_guard exp2 kind =
           let enode = BinOp (Eq,exp1,exp2,Cil.intType) in
-          Guard (Cil.new_exp exp2.eloc enode, kind, stmt)
+          Guard (Cil.new_exp ~loc:exp2.eloc enode, kind, stmt)
         in
         (* First build the automaton for the block *)
         let block_control = {

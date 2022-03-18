@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,12 +31,24 @@ class type virtual ['a] custom =
 
 class type ['a] columns =
   object
-    method view : GTree.view (** the tree *)
-    method scroll : GBin.scrolled_window (** scrolled tree (build on demand) *)
-    method coerce : GObj.widget (** widget of the scroll *)
-    method pack : (GObj.widget -> unit) -> unit (** packs the scroll *)
-    method reload : unit (** Structure has changed *)
-    method update_all : unit (** (only) Content of rows has changed *)
+    method view : GTree.view
+    (** the tree *)
+
+    method scroll : GBin.scrolled_window
+    (** scrolled tree (build on demand) *)
+
+    method coerce : GObj.widget
+    (** widget of the scroll *)
+
+    method pack : (GObj.widget -> unit) -> unit
+    (** packs the scroll *)
+
+    method reload : unit
+    (** Structure has changed *)
+
+    method update_all : unit
+    (** (only) Content of rows has changed *)
+
     method update_row : 'a -> unit
     method insert_row : 'a -> unit
     method set_focus : 'a -> GTree.view_column -> unit

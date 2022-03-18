@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -70,6 +70,7 @@ val minus_one: t
 val zero_or_one: t
 
 val min: t -> Integer.t (** Returns the smallest integer of a set. *)
+
 val max: t -> Integer.t (** Returns the highest integer of a set. *)
 
 (** Returns the number of integers in a set. *)

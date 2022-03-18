@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -97,10 +97,15 @@ let mark_unreachable () =
       Cil.DoChildren
 
     method! vinst _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
   in
   Annotations.iter_all_code_annot do_code_annot;
-  Visitor.visitFramacFile unreach (Ast.get ())
+  Visitor.visitFramacFileFunctions unreach (Ast.get ())
 
 let c_labels kf cs =
   if !Db.Value.use_spec_instead_of_definition kf then

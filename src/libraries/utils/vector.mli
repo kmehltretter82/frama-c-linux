@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,15 +31,28 @@ val create : unit -> 'a t
 val length : 'a t -> int
 val size : 'a t -> int (** Same as [length] *)
 
-val get : 'a t -> int -> 'a (** Raise [Not_found] if out-of-bounds. *)
-val set : 'a t -> int -> 'a -> unit (** Raise [Not_found] if out-of-bounds. *)
-val add : 'a t -> 'a -> unit (** Element will be added at index [size]. After addition, it is at index [size-1]. *)
-val addi : 'a t -> 'a -> int (** Return index of added (last) element. *)
-val clear : 'a t -> unit (** Do not modify actual capacity. *)
+val get : 'a t -> int -> 'a
+(** Raise [Not_found] if out-of-bounds. *)
+
+val set : 'a t -> int -> 'a -> unit
+(** Raise [Not_found] if out-of-bounds. *)
+
+val add : 'a t -> 'a -> unit
+(** Element will be added at index [size]. After addition, it is at index [size-1]. *)
+
+val addi : 'a t -> 'a -> int
+(** Return index of added (last) element. *)
+
+val clear : 'a t -> unit
+(** Do not modify actual capacity. *)
+
 val iter : ('a -> unit) -> 'a t -> unit
 val iteri : (int -> 'a -> unit) -> 'a t -> unit
-val map : ('a -> 'b) -> 'a t -> 'b t (** Result is shrunk. *)
-val mapi : (int -> 'a -> 'b) -> 'a t -> 'b t (** Result is shrunk. *)
+val map : ('a -> 'b) -> 'a t -> 'b t
+(** Result is shrunk. *)
+
+val mapi : (int -> 'a -> 'b) -> 'a t -> 'b t
+(** Result is shrunk. *)
 
 val find : 'a t -> ?default:'a -> ?exn:exn -> int -> 'a
 (** Default exception is [Not_found].
@@ -52,8 +65,11 @@ val update : 'a t -> ?default:'a -> int -> 'a -> unit
     @raise Invalid_argument if the index is negative or when it exceeds the
     the vector size but the default value is not provided. *)
 
-val to_array : 'a t -> 'a array (** Makes a copy. *)
-val of_array : 'a array -> 'a t (** Makes a copy. *)
+val to_array : 'a t -> 'a array
+(** Makes a copy. *)
+
+val of_array : 'a array -> 'a t
+(** Makes a copy. *)
 
 (** Low-level interface. Internal capacity. *)
 val capacity : 'a t -> int

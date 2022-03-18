@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -137,6 +137,7 @@ sig
     val reads : t -> S.domain
     val writes : t -> S.domain
     (** as defined by S.writes *)
+
     val relocate : S.t sequence -> t -> t
   end
 

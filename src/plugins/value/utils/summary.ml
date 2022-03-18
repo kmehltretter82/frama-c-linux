@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -207,7 +207,7 @@ module FunctionStats = struct
       (FunctionStats_Type)
       (struct
         let name = "Eva.Summary.FunctionStats"
-        let dependencies = [ Db.Value.self ]
+        let dependencies = [ Self.state ]
         let size = 17
       end)
 

@@ -659,6 +659,7 @@ val existsType: (typ -> existsAction) -> typ -> bool
  * a function type *)
 val splitFunctionType:
   typ -> typ * (string * typ * attributes) list option * bool * attributes
+
 (** Same as {!Cil.splitFunctionType} but takes a varinfo. Prints a nicer
  * error message if the varinfo is not for a function *)
 val splitFunctionTypeVI:
@@ -1387,12 +1388,12 @@ val typeHasQualifier: string -> typ -> bool
     @since Sodium-20150201 *)
 
 val typeHasAttributeDeep: string -> typ -> bool
+[@@ deprecated "Use Cil.typeHasAttributeMemoryBlock instead"]
 (** Does the type or one of its subtypes have the given attribute. Does
     not recurse through pointer types, nor inside function prototypes.
     @since Oxygen-20120901
     @deprecated Chlorine-20180501 see {!Cil.typeHasAttributeMemoryBlock}
 *)
-[@@ deprecated "Use Cil.typeHasAttributeMemoryBlock instead"]
 
 val typeHasAttributeMemoryBlock: string -> typ -> bool
 (** [typeHasAttributeMemoryBlock attr t] is
@@ -1737,6 +1738,7 @@ class type cilVisitor = object
   (** link to the current function being visited.
 
       {b NB:} for copy visitors, the fundec is the original one. *)
+
   method set_current_func: fundec -> unit
   method reset_current_func: unit -> unit
 
@@ -1829,6 +1831,7 @@ class genericCilVisitor: Visitor_behavior.t -> cilVisitor
 class nopCilVisitor: cilVisitor
 
 (** {3 Generic visit functions} *)
+
 (** [doVisit vis deepCopyVisitor copy action children node]
     visits a [node]
     (or its copy according to the result of [copy]) and if needed
@@ -1879,6 +1882,12 @@ val visitCilFile: cilVisitor -> file -> unit
     whenever appropriate because it is more efficient for long files.
     @plugin development guide *)
 val visitCilFileSameGlobals: cilVisitor -> file -> unit
+
+(** Same as {!visitCilFilesSameGlobals}, but only visits function definitions
+    (i.e. behaves as if all globals but [GFun] return [SkipChildren]).
+    @since Frama-C+dev
+*)
+val visitCilFileFunctions: cilVisitor -> file -> unit
 
 (** Visit a global *)
 val visitCilGlobal: cilVisitor -> global -> global list

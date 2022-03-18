@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2021                                               #
+#  Copyright (C) 2007-2022                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -291,6 +291,8 @@ DISTRIB_FILES:=\
       share/_frama-c                                                    \
       share/compliance/c11_functions.json                               \
       share/compliance/c11_headers.json                                 \
+      share/compliance/compiler_builtins.json                           \
+      share/compliance/gcc_builtins.json                                \
       share/compliance/glibc_functions.json                             \
       share/compliance/nonstandard_identifiers.json                     \
       share/compliance/posix_identifiers.json                           \
@@ -812,8 +814,9 @@ PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=callgraph
 PLUGIN_TESTS_LIB:=tests/callgraph/function_pointer.ml
-$(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
+PLUGIN_DEPENDENCIES:=Eva
 
+$(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 ##################
 # Evolved Value Analysis #
@@ -888,7 +891,6 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/sign_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
-	utils/eva_results \
 	utils/summary \
 	domains/cvalue/builtins domains/cvalue/builtins_malloc \
 	domains/cvalue/builtins_string domains/cvalue/builtins_misc \
@@ -901,6 +903,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
+	utils/eva_results \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
@@ -1058,6 +1061,8 @@ PLUGIN_CMO:= postdominators_parameters print compute
 PLUGIN_NO_TEST:=yes
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
+PLUGIN_DEPENDENCIES:=Eva
+
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 #########
@@ -2004,6 +2009,8 @@ install:: install-lib-$(OCAMLBEST)
 	$(MKDIR) $(FRAMAC_DATADIR)/compliance
 	$(CP) share/compliance/c11_functions.json \
 	  share/compliance/c11_headers.json \
+	  share/compliance/compiler_builtins.json \
+	  share/compliance/gcc_builtins.json \
 	  share/compliance/glibc_functions.json \
 	  share/compliance/nonstandard_identifiers.json \
 	  share/compliance/posix_identifiers.json \

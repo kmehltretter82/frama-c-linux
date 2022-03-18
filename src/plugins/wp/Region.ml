@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -237,8 +237,8 @@ let add_pointed map reg =
   match reg.pointsTo with
   | Some k -> region map k
   | None ->
-      let r = fresh map in
-      reg.pointsTo <- Some r.id ; r
+    let r = fresh map in
+    reg.pointsTo <- Some r.id ; r
 
 let get_addrof map reg =
   let addr = fresh map in
@@ -531,9 +531,9 @@ struct
 
   and add_range map marks ~source = function
     | { ofs ; reg = target ; dim = Dim(_,[]) } ->
-        forward map marks ~source ~from:(Ffield(source,ofs)) ~target
+      forward map marks ~source ~from:(Ffield(source,ofs)) ~target
     | { reg = target } ->
-        forward map marks ~source ~from:(Findex source) ~target
+      forward map marks ~source ~from:(Findex source) ~target
 
 end
 
@@ -600,16 +600,16 @@ let rec chunk map region =
       match cluster map region with
       | Empty | Garbled -> Mraw (roots,get_pointed map region)
       | Chunk v ->
-          if is_read region || is_written region then
-            Mmem(roots,v)
-          else
-            begin match v with
-              | Pointer r -> Mref r
-              | _ -> Mraw (roots,get_pointed map region)
-            end
+        if is_read region || is_written region then
+          Mmem(roots,v)
+        else
+          begin match v with
+            | Pointer r -> Mref r
+            | _ -> Mraw (roots,get_pointed map region)
+          end
       | Layout { layout } ->
-          let chunks = Chunk.union_map (fun { reg } -> chunks map reg) layout
-          in Mcomp(chunks,layout)
+        let chunks = Chunk.union_map (fun { reg } -> chunks map reg) layout
+        in Mcomp(chunks,layout)
 
     in map.chunk <- Rmap.add region.id chunk map.chunk ; chunk
 

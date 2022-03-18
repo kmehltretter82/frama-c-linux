@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -61,6 +61,7 @@ module Vars: sig
 
   val iter_in_file_rev_order: (varinfo -> initinfo -> unit) -> unit
   (** @since Neon-20140301 *)
+
   val fold_in_file_rev_order: (varinfo -> initinfo -> 'a -> 'a) -> 'a -> 'a
   (** @since Neon-20140301 *)
 

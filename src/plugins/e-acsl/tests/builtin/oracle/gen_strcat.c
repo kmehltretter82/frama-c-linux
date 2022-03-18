@@ -700,13 +700,13 @@ pid_t __gen_e_acsl_fork(void)
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
 {
-  int *__gen_e_acsl_at_2;
-  int *__gen_e_acsl_at;
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  int *__gen_e_acsl_at;
   pid_t __retres;
   {
     int __gen_e_acsl_assumes_value;
     __e_acsl_store_block((void *)(& stat_loc),(size_t)8);
+    __gen_e_acsl_at = stat_loc;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
                                            stat_loc == (int *)0);
@@ -738,8 +738,6 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
   }
-  __gen_e_acsl_at_2 = stat_loc;
-  __gen_e_acsl_at = stat_loc;
   __retres = waitpid(pid,stat_loc,options);
   {
     int __gen_e_acsl_or;
@@ -778,11 +776,10 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     else {
       int __gen_e_acsl_initialized;
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
-                                   "\\old(stat_loc)",
-                                   (void *)__gen_e_acsl_at_2);
+                                   "\\old(stat_loc)",(void *)__gen_e_acsl_at);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at_2,
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
                                                       sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                    "\\initialized(\\old(stat_loc))",0,
@@ -819,7 +816,7 @@ void __gen_e_acsl_exit(int status)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 473;
+    __gen_e_acsl_assert_data.line = 508;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;

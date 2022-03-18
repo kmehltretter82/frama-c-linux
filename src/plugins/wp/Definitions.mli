@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,6 +35,7 @@ val compinfo : compinfo -> cluster
 val matrix : unit -> cluster
 
 val cluster_id : cluster -> string (** Unique *)
+
 val cluster_title : cluster -> string
 val cluster_position : cluster -> Filepath.position option
 val cluster_age : cluster -> int
@@ -78,12 +79,16 @@ sig
   val vars : trigger -> Vars.t
 end
 
-val find_symbol : lfun -> dfun (** @raise Not_found if symbol is not compiled (yet) *)
+val find_symbol : lfun -> dfun
+(** @raise Not_found if symbol is not compiled (yet) *)
+
 val define_symbol : dfun -> unit
 val update_symbol : dfun -> unit
 
 val find_name : string -> dlemma
-val find_lemma : logic_lemma -> dlemma (** @raise Not_found if lemma is not compiled (yet) *)
+val find_lemma : logic_lemma -> dlemma
+(** @raise Not_found if lemma is not compiled (yet) *)
+
 val compile_lemma  : (logic_lemma -> dlemma) -> logic_lemma -> unit
 val define_lemma  : dlemma -> unit
 val define_type   : cluster -> logic_type_info -> unit
@@ -117,10 +122,18 @@ class virtual visitor : cluster ->
     method vcluster : cluster -> unit
     method vlibrary : string -> unit
     method vgoal : axioms option -> F.pred -> unit
-    method vtypes : unit (** Visit all typedefs *)
-    method vsymbols : unit (** Visit all definitions *)
-    method vlemmas : unit (** Visit all lemmas *)
-    method vself : unit (** Visit all records, types, defs and lemmas *)
+
+    method vtypes : unit
+    (** Visit all typedefs *)
+
+    method vsymbols : unit
+    (** Visit all definitions *)
+
+    method vlemmas : unit
+    (** Visit all lemmas *)
+
+    method vself : unit
+    (** Visit all records, types, defs and lemmas *)
 
     (** {2 Visited definitions} *)
 

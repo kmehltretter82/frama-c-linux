@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -382,7 +382,7 @@ end = struct
       in
       DoChildrenPost do_post
 
-    (*method vvdec _ = SkipChildren (* everything is done elsewhere *)*)
+    (*method vvdec _ = Cil.SkipChildren (* everything is done elsewhere *)*)
 
     method private add_formals_bindings v formals =
       Varinfo.Hashtbl.add formals_table v formals

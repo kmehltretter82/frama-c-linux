@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -601,8 +601,11 @@ module Pdg = struct
     type t = parent_t
     module V = Node
     module E = struct
-      type t = G.E.t * bool (** boolean to say that the edge is dynamic *)
+      (** boolean to say that the edge is dynamic *)
+      type t = G.E.t * bool
+
       let src (e, _d) = G.E.dst e (* We reverse the direction of edges *)
+
       let dst (e, _d) = G.E.src e (* to get graphs with a correct orientation*)
     end
 

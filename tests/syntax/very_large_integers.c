@@ -33,7 +33,7 @@
 volatile int nondet;
 #ifdef BITFIELD
 struct st {
-  int bf:(999999999999999999+9999999999999999999);
+  int bf:(999999999999999999U+9999999999999999999U);
 };
 #endif
 

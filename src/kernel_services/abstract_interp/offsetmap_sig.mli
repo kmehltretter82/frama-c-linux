@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,7 +27,8 @@
 
 open Abstract_interp
 
-type v (** Type of the values stored in the offsetmap *)
+(** Type of the values stored in the offsetmap *)
+type v
 type widen_hint
 include Datatype.S (** Datatype for the offsetmaps *)
 

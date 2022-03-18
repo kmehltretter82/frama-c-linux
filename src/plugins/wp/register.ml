@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -88,11 +88,11 @@ let do_wp_report model =
           match String.split_on_char ':' jreport with
           | [] | [""] -> ()
           | [joutput] ->
-              WpReport.export_json stats ~joutput () ;
+            WpReport.export_json stats ~joutput () ;
           | [jinput;joutput] ->
-              WpReport.export_json stats ~jinput ~joutput () ;
+            WpReport.export_json stats ~jinput ~joutput () ;
           | _ ->
-              Wp_parameters.error "Invalid format for option -wp-report-json"
+            Wp_parameters.error "Invalid format for option -wp-report-json"
         end ;
         List.iter (WpReport.export stats) reports ;
       end ;
@@ -245,21 +245,21 @@ let do_report_cache_usage mode =
           match mode with
           | Cache.NoCache -> ()
           | Cache.Replay ->
-              pp_cache fmt hits "found" ;
-              pp_cache fmt miss "missed" ;
-              Format.pp_print_newline fmt () ;
+            pp_cache fmt hits "found" ;
+            pp_cache fmt miss "missed" ;
+            Format.pp_print_newline fmt () ;
           | Cache.Offline ->
-              pp_cache fmt hits "found" ;
-              pp_cache fmt miss "failed" ;
-              Format.pp_print_newline fmt () ;
+            pp_cache fmt hits "found" ;
+            pp_cache fmt miss "failed" ;
+            Format.pp_print_newline fmt () ;
           | Cache.Update | Cache.Cleanup ->
-              pp_cache fmt hits "found" ;
-              pp_cache fmt miss "updated" ;
-              Format.pp_print_newline fmt () ;
+            pp_cache fmt hits "found" ;
+            pp_cache fmt miss "updated" ;
+            Format.pp_print_newline fmt () ;
           | Cache.Rebuild ->
-              pp_cache fmt hits "replaced" ;
-              pp_cache fmt miss "updated" ;
-              Format.pp_print_newline fmt () ;
+            pp_cache fmt hits "replaced" ;
+            pp_cache fmt miss "updated" ;
+            Format.pp_print_newline fmt () ;
         end
 
 (* -------------------------------------------------------------------------- *)
@@ -274,17 +274,17 @@ let do_wpo_stat goal prover res =
   let verdict = VCS.verdict ~smoke res in
   match verdict with
   | NoResult | Computing _ | Unknown ->
-      s.unknown <- succ s.unknown
+    s.unknown <- succ s.unknown
   | Stepout | Timeout ->
-      s.interrupted <- succ s.interrupted
+    s.interrupted <- succ s.interrupted
   | Failed | Invalid ->
-      s.failed <- succ s.failed
+    s.failed <- succ s.failed
   | Valid ->
-      s.proved <- succ s.proved ;
-      add_step s res.prover_steps ;
-      add_time s res.prover_time ;
-      if prover <> Qed then
-        add_time (get_pstat Qed) res.solver_time
+    s.proved <- succ s.proved ;
+    add_step s res.prover_steps ;
+    add_time s res.prover_time ;
+    if prover <> Qed then
+      add_time (get_pstat Qed) res.solver_time
 
 let do_wpo_result goal prover res =
   if VCS.is_verdict res then
@@ -302,20 +302,20 @@ let do_wpo_failed goal =
   let updating = Cache.is_updating () in
   match results goal with
   | [p,r] ->
-      Wp_parameters.result "[%a] Goal %s : %t%a"
-        VCS.pp_prover p (Wpo.get_gid goal)
-        (VCS.pp_result_qualif ~updating p r) pp_warnings goal
+    Wp_parameters.result "[%a] Goal %s : %t%a"
+      VCS.pp_prover p (Wpo.get_gid goal)
+      (VCS.pp_result_qualif ~updating p r) pp_warnings goal
   | pres ->
-      Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
-        begin fun fmt ->
-          pp_warnings fmt goal ;
-          List.iter
-            (fun (p,r) ->
-               Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
-                 (VCS.title_of_prover p)
-                 (VCS.pp_result_qualif ~updating p r)
-            ) pres ;
-        end
+    Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
+      begin fun fmt ->
+        pp_warnings fmt goal ;
+        List.iter
+          (fun (p,r) ->
+             Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
+               (VCS.title_of_prover p)
+               (VCS.pp_result_qualif ~updating p r)
+          ) pres ;
+      end
 
 let do_wpo_smoke status goal =
   Wp_parameters.result "[%s] Smoke-test %s%t"
@@ -340,35 +340,35 @@ let do_wpo_success goal s =
     match s with
     | None -> ()
     | Some prover ->
-        Wp_parameters.feedback ~ontty:`Silent
-          "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
+      Wp_parameters.feedback ~ontty:`Silent
+        "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
   else
   if Wpo.is_smoke_test goal then
     begin match s with
       | None ->
-          Wp_parameters.feedback ~ontty:`Silent
-            "[Passed] Smoke-test %s" (Wpo.get_gid goal)
+        Wp_parameters.feedback ~ontty:`Silent
+          "[Passed] Smoke-test %s" (Wpo.get_gid goal)
       | Some _ ->
-          let status,target = Wpo.get_proof goal in
-          do_wpo_smoke status goal ;
-          if status = `Failed then
-            let source = fst (Property.location target) in
-            Wp_parameters.warning ~source "Failed smoke-test"
+        let status,target = Wpo.get_proof goal in
+        do_wpo_smoke status goal ;
+        if status = `Failed then
+          let source = fst (Property.location target) in
+          Wp_parameters.warning ~source "Failed smoke-test"
     end
   else
     begin match s with
       | None -> do_wpo_failed goal
       | Some (VCS.Tactical as script) ->
-          Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : Valid"
-            VCS.pp_prover script (Wpo.get_gid goal)
+        Wp_parameters.feedback ~ontty:`Silent
+          "[%a] Goal %s : Valid"
+          VCS.pp_prover script (Wpo.get_gid goal)
       | Some prover ->
-          let result = Wpo.get_result goal prover in
-          let updating = Cache.is_updating () in
-          Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : %t"
-            VCS.pp_prover prover (Wpo.get_gid goal)
-            (VCS.pp_result_qualif ~updating prover result)
+        let result = Wpo.get_result goal prover in
+        let updating = Cache.is_updating () in
+        Wp_parameters.feedback ~ontty:`Silent
+          "[%a] Goal %s : %t"
+          VCS.pp_prover prover (Wpo.get_gid goal)
+          (VCS.pp_result_qualif ~updating prover result)
     end
 
 let do_report_time fmt s =
@@ -478,6 +478,7 @@ let do_list_scheduled_result () =
 type script = {
   mutable tactical : bool ;
   mutable update : bool ;
+  mutable on_stdout : bool ;
   mutable depth : int ;
   mutable width : int ;
   mutable backtrack : int ;
@@ -534,13 +535,13 @@ let compute_provers ~mode ~script =
         match VCS.parse_prover pname with
         | None -> prvs
         | Some VCS.Tactical ->
-            script.tactical <- true ;
-            if pname = "tip" || env_script_update () then
-              script.update <- true ;
-            prvs
+          script.tactical <- true ;
+          if pname = "tip" || env_script_update () then
+            script.update <- true ;
+          prvs
         | Some prover ->
-            let pmode = if VCS.is_auto prover then VCS.Batch else mode in
-            (pmode , prover) :: prvs
+          let pmode = if VCS.is_auto prover then VCS.Batch else mode in
+          (pmode , prover) :: prvs
       end (get_prover_names ()) []
 
 let dump_strategies =
@@ -555,7 +556,7 @@ let dump_strategies =
                )))
 
 let default_script_mode () = {
-  tactical = false ; update=false ; provers = [] ;
+  tactical = false ; update=false ; on_stdout = false ; provers = [] ;
   depth=0 ; width = 0 ; auto=[] ; backtrack = 0 ;
 }
 
@@ -609,16 +610,17 @@ let do_update_session ~script goals =
                   | ProofScript.Tactic(n,_,_) -> n=0
                   | ProofScript.Error _ -> false in
                 let strategy = List.filter keep scripts in
+                let stdout = script.on_stdout in
                 if strategy <> [] then
                   begin
                     incr updated ;
-                    ProofSession.save goal (ProofScript.encode strategy)
+                    ProofSession.save ~stdout goal (ProofScript.encode strategy)
                   end
                 else
                 if not (ProofSession.exists goal) then
                   begin
                     incr invalid ;
-                    ProofSession.save goal (ProofScript.encode scripts)
+                    ProofSession.save ~stdout goal (ProofScript.encode scripts)
                   end
               end
         end goals ;
@@ -649,6 +651,9 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   begin match tip with None -> () | Some tip ->
     script.tactical <- tip ;
     script.update <- tip ;
+  end ;
+  begin
+    script.on_stdout <- Wp_parameters.ScriptOnStdout.get ();
   end ;
   let spawned = script.tactical || script.provers <> [] in
   begin
@@ -708,7 +713,7 @@ let cmdline_run () =
           end ;
         let bhv = Wp_parameters.Behaviors.get () in
         let prop = Wp_parameters.Properties.get () in
-        (** TODO entry point *)
+        (* TODO entry point *)
         if Wp_parameters.has_dkey dkey_builtins then
           begin
             WpContext.on_context (model,WpContext.Global)
@@ -804,7 +809,7 @@ let do_prover_detect () =
 let rec try_sequence jobs () = match jobs with
   | [] -> ()
   | head :: tail ->
-      Extlib.try_finally ~finally:(try_sequence tail) head ()
+    Extlib.try_finally ~finally:(try_sequence tail) head ()
 
 let sequence jobs () =
   if Wp_parameters.has_dkey dkey_raised

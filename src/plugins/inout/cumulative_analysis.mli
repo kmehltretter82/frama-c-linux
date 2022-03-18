@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -72,6 +72,7 @@ class type virtual ['a] cumulative_class = object
 
   (** Result of the analysis *)
   method result: 'a
+
   (** Adding partial results to the current ones *)
   method join: 'a -> unit
 

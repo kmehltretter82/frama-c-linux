@@ -21,7 +21,8 @@
 (**************************************************************************)
 
 open Cil_types
-open Analyses_types
+
+let dkey = Options.Dkey.logic_normalizer
 
 module Id_predicate =
   Datatype.Make_with_collections
@@ -40,8 +41,8 @@ module Id_predicate =
 
 (* Memoization module which retrieves the preprocessed form of predicates *)
 module Memo: sig
-  val memo_pred: (predicate -> pred_or_term option) -> predicate -> unit
-  val get_pred: predicate -> pred_or_term
+  val memo_pred: (predicate -> predicate option) -> predicate -> unit
+  val get_pred: predicate -> predicate
   val memo_term : (term -> term option) -> term -> unit
   val get_term : term -> term
   val clear: unit -> unit
@@ -52,7 +53,7 @@ end = struct
 
   let get_pred p =
     try Id_predicate.Hashtbl.find tbl_pred p
-    with Not_found -> PoT_pred p
+    with Not_found -> p
 
   let memo_pred process p =
     try ignore (Id_predicate.Hashtbl.find tbl_pred p) with
@@ -97,7 +98,7 @@ let preprocess_pred ~loc p =
           | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
           | _ -> assert false
         in
-        Some (PoT_pred (Logic_const.pand ~loc (init, p_copy)))
+        Some (Logic_const.pand ~loc (init, p_copy))
       | _ -> None
     end
   | _ -> None
@@ -124,10 +125,8 @@ let preprocess_term ~loc t =
   | _ -> None
 
 let preprocessor = object
-  inherit E_acsl_visitor.visitor
+  inherit E_acsl_visitor.visitor dkey
 
-  (* Only logic functions and logic predicates are handled.
-     E-acsl simply ignores all the other global annotations *)
   method !vannotation annot =
     match annot with
     | Dfun_or_pred _ -> Cil.DoChildren
@@ -145,19 +144,13 @@ let preprocessor = object
 end
 
 let preprocess ast =
-  Visitor.visitFramacFileSameGlobals
-    (preprocessor :> Visitor.frama_c_inplace)
-    ast
+  preprocessor#visit_file ast
 
 let preprocess_annot annot =
-  ignore
-    (Visitor.visitFramacCodeAnnotation
-       (preprocessor :> Visitor.frama_c_inplace)
-       annot)
+  ignore @@ preprocessor#visit_code_annot annot
 
 let preprocess_predicate p =
-  ignore
-    (Visitor.visitFramacPredicate (preprocessor :> Visitor.frama_c_inplace) p)
+  ignore @@ preprocessor#visit_predicate p
 
 let get_pred = Memo.get_pred
 let get_term = Memo.get_term

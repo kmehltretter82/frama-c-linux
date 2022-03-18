@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -759,7 +759,9 @@ let add_annotation kf st a =
   | AStmtSpec
       ([],
        ({ spec_behavior = [ { b_name = "Frama_C_implicit_init" } as bhv]})) ->
-    let props = Property.ip_post_cond_of_behavior kf (Kstmt st) [] bhv in
+    let props =
+      Property.ip_post_cond_of_behavior kf (Kstmt st) ~active:[] bhv
+    in
     List.iter (fun p -> Implicit_annotations.add p []) props
   | _ -> ()
 
@@ -991,7 +993,7 @@ let cleanup file =
         DoChildren
       | GFunDecl(s,_,_) ->
         Logic_utils.clear_funspec s;
-        DoChildren
+        SkipChildren
       | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _
       | GEnumTagDecl _ | GVar _ | GVarDecl _ | GAsm _ | GPragma _ | GText _
       | GAnnot _  ->
@@ -1003,6 +1005,13 @@ let cleanup file =
              Cfg.clearFileCFG ~clear_id:false f;
              Cfg.computeFileCFG f; f end
             else f)
+
+    method! vinst _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
   in visitFramacFileSameGlobals visitor file
 
@@ -1213,7 +1222,7 @@ let fill_built_ins () =
     Cil_builtins.init_builtins ();
   end else begin
     Kernel.debug "Machine is not computed, initialize everything";
-    Cil.initCIL (Logic_builtin.init()) (get_machdep ());
+    Cil.initCIL ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
   end;
   (* Fill logic tables with builtins *)
   Logic_env.Builtins.apply ();
@@ -1420,7 +1429,7 @@ class reorder_ast: Visitor.frama_c_visitor =
       assert (List.length deps = List.length needed_annots);
       match g with
       | GAnnot _ -> List.rev deps
-      (** g is already in the dependencies graph. *)
+      (* g is already in the dependencies graph. *)
       | _ -> List.rev (g::deps)
 
     (* TODO: add methods for uses of undeclared identifiers.
@@ -1626,7 +1635,7 @@ let reorder_ast () = reorder_custom_ast (Ast.get())
 
 (* Fill logic tables with builtins *)
 let init_cil () =
-  Cil.initCIL (Logic_builtin.init()) (get_machdep ());
+  Cil.initCIL ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
   Logic_env.Builtins.apply ();
   Logic_env.prepare_tables ()
 

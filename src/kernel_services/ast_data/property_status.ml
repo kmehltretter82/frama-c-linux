@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -371,7 +371,9 @@ let property_kind = function
   | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
     (* logical consequence of its postconditions *)
     let active = Datatype.String.Set.elements ib_active in
-    let post = Property.ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv in
+    let post =
+      Property.ip_post_cond_of_behavior ib_kf ib_kinstr ~active ib_bhv
+    in
     Consequence post
   | IPReachable {ir_kf; ir_kinstr; ir_program_point} ->
     begin

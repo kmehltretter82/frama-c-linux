@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,9 +34,9 @@ let configure (console : #Tactical.feedback) strategy =
   in
   match Lang.local ~pool:console#pool verdict () with
   | Applicable process when not console#has_error ->
-      let title = tactical#title in
-      let script = ProofScript.jtactic ~title tactical selection in
-      Some (script , process)
+    let title = tactical#title in
+    let script = ProofScript.jtactic ~title tactical selection in
+    Some (script , process)
   | _ -> None
 
 let fork tree anchor strategy =
@@ -48,13 +48,13 @@ let fork tree anchor strategy =
     match WpContext.on_context context (configure console) strategy with
     | None -> None
     | Some (script,process) ->
-        Some (ProofEngine.fork tree ~anchor script process)
+      Some (ProofEngine.fork tree ~anchor script process)
   with
   | Exit | Not_found | Invalid_argument _ ->
-      console#set_error "Can not configure strategy" ; None
+    console#set_error "Can not configure strategy" ; None
   | e ->
-      console#set_error "Exception <%s>" (Printexc.to_string e) ;
-      raise e
+    console#set_error "Exception <%s>" (Printexc.to_string e) ;
+    raise e
 
 let rec lookup tree anchor k hs =
   let n = Array.length hs in
@@ -62,15 +62,15 @@ let rec lookup tree anchor k hs =
     match fork tree anchor hs.(k) with
     | Some fork -> Some fork,k,hs
     | None ->
-        if k = 0 then
-          lookup tree anchor 0 (Array.sub hs 1 (n-1))
+      if k = 0 then
+        lookup tree anchor 0 (Array.sub hs 1 (n-1))
+      else
+        let slice = Array.sub hs 0 (n-1) in
+        if k < n-1 then
+          ( Array.blit hs (succ k) slice k (n-k-1) ;
+            lookup tree anchor k slice )
         else
-          let slice = Array.sub hs 0 (n-1) in
-          if k < n-1 then
-            ( Array.blit hs (succ k) slice k (n-k-1) ;
-              lookup tree anchor k slice )
-          else
-            lookup tree anchor 0 hs
+          lookup tree anchor 0 hs
 
 let index tree ~anchor ~index =
   if index < 0 then None else

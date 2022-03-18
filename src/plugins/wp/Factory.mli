@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -42,6 +42,7 @@ val compiler : mheap -> mvar -> (module Sigs.Compiler)
 val configure_driver : setup -> driver -> unit -> WpContext.rollback
 val instance : setup -> driver -> WpContext.model
 val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
+
 val parse :
   ?default:setup ->
   ?warning:(string -> unit) ->

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 module Wp = Wp_parameters
-module Kf = Kernel_function
 module G = Dotgraph
 module R = G.Node(Region.Map)
 
@@ -103,8 +102,8 @@ let dotcluster cluster : Dotgraph.record =
   | Garbled -> `Label "Garbled"
   | Chunk v -> dotvalue v
   | Layout { sizeof ; layout } ->
-      let label = Printf.sprintf "sizeof:%d" sizeof in
-      `Hbox (`Label label :: List.map dotrange layout)
+    let label = Printf.sprintf "sizeof:%d" sizeof in
+    `Hbox (`Label label :: List.map dotrange layout)
 
 let dotchunk mem : Dotgraph.record =
   let open Layout in
@@ -113,12 +112,12 @@ let dotchunk mem : Dotgraph.record =
   | Mraw(_,Some r) -> dotpointed ~label:"Raw" r
   | Mref r -> dotpointed ~label:"Ref" r
   | Mmem(rt,v) ->
-      let prefix = if Layout.Root.indexed rt then "Mem " else "Var " in
-      dotvalue ~prefix v
+    let prefix = if Layout.Root.indexed rt then "Mem " else "Var " in
+    dotvalue ~prefix v
   | Mcomp(_,ovl) ->
-      let range rg = dotrange
-          ~prefix:(if Overlay.once rg.reg ovl then "D" else "C") rg in
-      `Hbox (List.map range ovl)
+    let range rg = dotrange
+        ~prefix:(if Overlay.once rg.reg ovl then "D" else "C") rg in
+    `Hbox (List.map range ovl)
 
 let dotregion dot map region node =
   begin
@@ -215,14 +214,14 @@ let dotregion dot map region node =
           (function
             | Fvar _ -> ()
             | Farray r ->
-                G.edge dot (R.get r) node (`Label "[]"::attr_froms)
+              G.edge dot (R.get r) node (`Label "[]"::attr_froms)
             | Fderef r ->
-                G.edge dot (R.get r) node (`Label "*"::attr_froms)
+              G.edge dot (R.get r) node (`Label "*"::attr_froms)
             | Findex r ->
-                G.edge dot (R.get r) node (`Label "+(..)"::attr_froms)
+              G.edge dot (R.get r) node (`Label "+(..)"::attr_froms)
             | Ffield(r,ofs) ->
-                let label = Printf.sprintf "+%d" ofs in
-                G.edge dot (R.get r) node (`Label label::attr_froms)
+              let label = Printf.sprintf "+%d" ofs in
+              G.edge dot (R.get r) node (`Label label::attr_froms)
           ) (Region.get_froms map region)
       end ;
     Region.iter_copies map
@@ -279,13 +278,10 @@ let dotgraph dot map =
     G.run dot ;
   end
 
-let dump ~dir kf map =
+let dump_in_file ~file name map =
   if Wp.has_dkey dot_key || Wp.has_dkey pdf_key then
     begin
-      let name = Kf.get_name kf in
-      let file =
-        Format.asprintf "%a/%s.dot" Datatype.Filepath.pretty dir name
-      in
+      let file = Pretty_utils.to_string Datatype.Filepath.pretty file in
       let dot = Dotgraph.open_dot ~attr:[`LR] ~name ~file () in
       dotgraph dot map ;
       Dotgraph.close dot ;
@@ -295,3 +291,7 @@ let dump ~dir kf map =
         else file in
       Wp.result "Region Graph: %s" outcome
     end
+
+let dump_in_dir ~dir name map =
+  let file = Datatype.Filepath.concat dir (name ^ ".dot") in
+  dump_in_file ~file name map

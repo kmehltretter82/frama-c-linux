@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,8 +21,11 @@
 (**************************************************************************)
 
 module Pango : sig
-  val set_small_font : #GObj.widget -> unit (** makes the font smaller. *)
-  val set_bold_font : #GObj.widget -> unit (** makes the font bold. *)
+  val set_small_font : #GObj.widget -> unit
+  (** makes the font smaller. *)
+
+  val set_bold_font : #GObj.widget -> unit
+  (** makes the font bold. *)
 end
 
 val get_toolbar_index: GButton.toolbar -> GButton.tool_item -> int

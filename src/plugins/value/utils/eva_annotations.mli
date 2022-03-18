@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,6 +23,7 @@
 (* Note: widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
 
 [@@@ api_start]
+
 (** Register special annotations to locally guide the Eva analysis:
 
     - slevel annotations: "slevel default", "slevel merge" and "slevel i"

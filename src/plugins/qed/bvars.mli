@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,12 +32,17 @@ type t (** An over-approximation of set of integers *)
 val empty : t
 val singleton : int -> t
 
-val order : t -> int (** Max stack of binders *)
-val bind : t -> t (** Decrease all elements in [s] after removing [0] *)
+val order : t -> int
+(** Max stack of binders *)
+
+val bind : t -> t
+(** Decrease all elements in [s] after removing [0] *)
 
 val union : t -> t -> t
 
-val closed : t -> bool (** All variables are bound *)
+val closed : t -> bool
+(** All variables are bound *)
+
 val closed_at : int -> t -> bool
 (** [closed_at n a] Does not contains variables [k<n] *)
 

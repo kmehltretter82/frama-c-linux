@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -63,7 +63,7 @@ module State =
     (D)
     (struct
       let name = "Callgraph.Cg"
-      let dependencies = [ Db.Value.self; Globals.Functions.self ]
+      let dependencies = [ Eva.Analysis.self; Globals.Functions.self ]
     end)
 
 let self = State.self
@@ -228,10 +228,10 @@ let compute () =
   (* optimize with [Value] when either it is already computed or someone
      requires it anyway *)
   if Dynamic.Parameter.Bool.get "-eva" () then begin
-    !Db.Value.compute ();
+    Eva.Analysis.compute ();
     semantic_compute g
   end else
-    (if Db.Value.is_computed () then semantic_compute else syntactic_compute) g;
+    (if Eva.Analysis.is_computed () then semantic_compute else syntactic_compute) g;
   g
 
 let get () = State.memo compute

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -67,37 +67,37 @@ struct
     | Unused
 
   let merge_list l =
-    (** Get a map of the chunks (the data is not important) *)
+    (* Get a map of the chunks (the data is not important) *)
     let union = List.fold_left (fun acc e -> H.Map.union (fun _ v1 _ -> v1) acc e.map) H.Map.empty l in
-    (** The goal is to build a matrix chunk -> elt of the list -> Used/Unused
+    (* The goal is to build a matrix chunk -> elt of the list -> Used/Unused
     *)
-    (** Set the data of the map to []. *)
+    (* Set the data of the map to []. *)
     let union = H.Map.map (fun _ -> []) union in
-    (** For each elements of the list tell if each chunk is used *)
+    (* For each elements of the list tell if each chunk is used *)
     let merge _ m e =
       match m, e with
       | Some m, Some e -> Some (Used e::m)
       | Some m, None -> Some (Unused::m)
       | None, _ -> assert false in
     let union = List.fold_left (fun acc e -> H.Map.merge merge acc e.map) union
-        (** important so that the list in the map are in the correct order *)
+        (* important so that the list in the map are in the correct order *)
         (List.rev l) in
-    (** Build the passive for each element of the list, and the final domain *)
+    (* Build the passive for each element of the list, and the final domain *)
     let p = ref (List.map (fun _ -> Passive.empty) l) in
     let map c l =
       match List.filter (fun x -> not (Unused = x)) l with
       | [] -> assert false
-      (** If all the sigmas use the same variable *)
+      (* If all the sigmas use the same variable *)
       | (Used a)::l when List.for_all (function | Unused -> true | Used x -> Var.equal x a) l ->
-          a
+        a
       | _ ->
-          let z = newchunk c in
-          let map2 p = function
-            | Unused -> p
-            | Used a -> Passive.bind ~fresh:z ~bound:a p
-          in
-          p := List.map2 map2 !p l;
-          z
+        let z = newchunk c in
+        let map2 p = function
+          | Unused -> p
+          | Used a -> Passive.bind ~fresh:z ~bound:a p
+        in
+        p := List.map2 map2 !p l;
+        z
     in
     let union = H.Map.mapi map union in
     build union , !p
@@ -133,7 +133,7 @@ struct
          if not (H.Set.mem chunk written) then
            match x,y with
            | Some x , Some y when x != y ->
-               p := Bag.add (p_equal (e_var x) (e_var y)) !p
+             p := Bag.add (p_equal (e_var x) (e_var y)) !p
            | Some x , None -> post.map <- H.Map.add chunk x post.map
            | None , Some y -> pre.map <- H.Map.add chunk y pre.map
            | _ -> ())
@@ -177,7 +177,7 @@ struct
            match u,v with
            | Some x , Some y -> not (Var.equal x y)
            | None , Some _ -> true
-           | Some _ , None -> false (** no need to create a new so it is the same *)
+           | Some _ , None -> false (* no need to create a new so it is the same *)
            | None, None -> assert false
          in
          if written then effect := Chunk.Set.add chunk !effect

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -63,16 +63,16 @@ let render_prover_result p =
     match Wpo.get_result w p , p with
     | { verdict=NoResult } , Qed -> icn_na
     | { verdict=NoResult } , Tactical ->
-        begin
-          match ProverScript.get w with
-          | `None -> icn_na
-          | `Script -> icn_stock "gtk-media-play"
-          | `Proof -> icn_stock "gtk-edit"
-          | `Saved -> icn_stock "gtk-file"
-        end
+      begin
+        match ProverScript.get w with
+        | `None -> icn_na
+        | `Script -> icn_stock "gtk-media-play"
+        | `Proof -> icn_stock "gtk-edit"
+        | `Saved -> icn_stock "gtk-file"
+      end
     | result , _ ->
-        let smoke = Wpo.is_smoke_test w in
-        icon_of_verdict (VCS.verdict ~smoke result)
+      let smoke = Wpo.is_smoke_test w in
+      icon_of_verdict (VCS.verdict ~smoke result)
 
 class pane (gprovers:GuiConfig.provers) =
   let model = new model in
@@ -124,8 +124,8 @@ class pane (gprovers:GuiConfig.provers) =
           (fun (vcs,column) ->
              match vcs with
              | VCS.Why3 p ->
-                 column#set_visible (Why3.Whyconf.Sprover.mem p dps) ;
-                 (* ignore (list#view#remove_column column) *)
+               column#set_visible (Why3.Whyconf.Sprover.mem p dps) ;
+               (* ignore (list#view#remove_column column) *)
              | _ -> ()
           ) provers ;
         (* Installing Missing Columns *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,8 +31,11 @@ type 'v truth = 'v Abstract_value.truth
 module type S = sig
   type value
 
-  type location  (** abstract locations *)
-  type offset    (** abstract offsets *)
+  (** abstract locations *)
+  type location
+
+  (** abstract offsets *)
+  type offset
 
   val top: location
 

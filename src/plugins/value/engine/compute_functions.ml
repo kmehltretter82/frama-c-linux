@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -356,6 +356,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Eva_utils.pop_call_stack ();
       Self.feedback "done for function %a" Kernel_function.pretty kf;
+      Self.(set_computation_state Computed);
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
@@ -363,6 +364,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       restore_signals ()
     in
     let cleanup () =
+      Self.(set_computation_state Aborted);
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis_cleanup ~aborted:true
     in
@@ -380,6 +382,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     match initial_state with
     | `Bottom ->
+      Self.(set_computation_state Aborted);
       Abstract.Dom.Store.mark_as_computed ();
       Self.result "Eva not started because globals \
                    initialization is not computable.";

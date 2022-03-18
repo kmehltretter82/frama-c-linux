@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -112,8 +112,11 @@ val async : (coin -> 'a status async) -> 'a task
 
 
 val (>>>) : 'a task -> ('a status -> 'b task) -> 'b task (** [bind] infix. *)
+
 val (>>=) : 'a task -> ('a -> 'b task) -> 'b task  (** [sequence] infix. *)
+
 val (>>?) : 'a task -> ('a status -> unit) -> 'a task (** [finally] infix. *)
+
 val (>>!) : 'a task -> ('a status -> unit) -> unit task (** [callback] infix. *)
 
 (* ************************************************************************* *)
@@ -193,10 +196,15 @@ val run : thread -> unit
 (* ************************************************************************* *)
 
 type pool
+
 val pool : unit -> pool
+
 val add : pool -> thread -> unit (** Auto-flush *)
+
 val iter : (thread -> unit) -> pool -> unit (** Auto-flush *)
+
 val flush : pool -> unit (** Clean all terminated tasks *)
+
 val size : pool -> int (** Auto-flush. Number of living tasks *)
 
 (* ************************************************************************* *)
@@ -240,7 +248,9 @@ val on_server_wait     : server -> (unit -> unit) -> unit
 (** On-wait server callback (all tasks are scheduled) *)
 
 val scheduled  : server -> int (** Number of scheduled process *)
+
 val terminated : server -> int (** Number of terminated process *)
+
 val waiting : server -> int option
 (** All task scheduled and server is waiting for termination *)
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,20 +37,27 @@ module Make(E : Elt) : sig
   (** Number of elements in the collection. Constant time. *)
 
   val mem : E.t -> t -> bool (** Log complexity. *)
+
   val get : int -> t -> E.t (** raises Not_found. Log complexity. *)
+
   val index : E.t -> t -> int (** raise Not_found. Log complexity. *)
+
   val is_empty : t -> bool
 
   val empty : t
   val add : E.t -> t -> t (** Log complexity. *)
+
   val remove : E.t -> t -> t (** Log complexity. *)
+
   val filter : (E.t -> bool) -> t -> t (** Linear. *)
+
   val update : E.t option -> E.t option -> t -> int * int * t
   (** [update x y t] replaces [x] by [y]
       and returns the range [a..b] of modified indices.
       Log complexity. *)
 
   val iter : (E.t -> unit) -> t -> unit (** Linear. *)
+
   val iteri : (int -> E.t -> unit) -> t -> unit (** Linear. *)
 
 end

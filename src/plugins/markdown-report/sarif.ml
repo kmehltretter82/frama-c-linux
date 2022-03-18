@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,8 +22,8 @@
 
 (** OCaml representation for the sarif 2.1 schema. *)
 
-(** ppx_deriving_yojson generates parser and printer that are recursive
-    by default: we must thus silence spurious let rec warning (39). *)
+(* ppx_deriving_yojson generates parser and printer that are recursive
+   by default: we must thus silence spurious let rec warning (39). *)
 [@@@ warning "-39"]
 
 type 'a dict = (string * 'a) list

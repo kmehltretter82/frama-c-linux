@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -118,6 +118,7 @@ val filter_map_opt: ('a -> 'b option) -> 'a list -> 'b list
 
 val fold_map: ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 (** Combines [fold_left] and [map] *)
+
 val fold_map_opt: ('a -> 'b -> 'a * 'c option) -> 'a -> 'b list -> 'a * 'c list
 (** Combines [filter] [fold_left] and [map] *)
 

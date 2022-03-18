@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -81,9 +81,9 @@ let pool tree =
   match tree.pool with
   | Some pool -> pool
   | None ->
-      let _,sequent = Wpo.compute tree.main in
-      let pool = Lang.new_pool ~vars:(Conditions.vars_seq sequent) () in
-      tree.pool <- Some pool ; pool
+    let _,sequent = Wpo.compute tree.main in
+    let pool = Lang.new_pool ~vars:(Conditions.vars_seq sequent) () in
+    tree.pool <- Some pool ; pool
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constructors                                                       --- *)
@@ -138,8 +138,8 @@ let iteri f tree =
   match tree.root with
   | None -> ()
   | Some r ->
-      let k = ref 0 in
-      walk (fun node -> f !k node ; incr k) r
+    let k = ref 0 in
+    walk (fun node -> f !k node ; incr k) r
 
 (* -------------------------------------------------------------------------- *)
 (* --- Consolidating                                                      --- *)
@@ -168,13 +168,13 @@ let validate ?(incomplete=false) tree =
   match tree.root with
   | None -> ()
   | Some root ->
-      if not (Wpo.is_proved tree.main) then
-        if incomplete then
-          let result = consolidate root in
-          Wpo.set_result tree.main VCS.Tactical result
-        else
-        if not (has_pending root) then
-          Wpo.set_result tree.main VCS.Tactical VCS.valid
+    if not (Wpo.is_proved tree.main) then
+      if incomplete then
+        let result = consolidate root in
+        Wpo.set_result tree.main VCS.Tactical result
+      else
+      if not (has_pending root) then
+        Wpo.set_result tree.main VCS.Tactical VCS.valid
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)
@@ -217,16 +217,16 @@ type status = [
 let status t : status =
   match t.root with
   | None ->
-      if Wpo.is_proved t.main
-      then if Wpo.is_smoke_test t.main then `Invalid else `Proved
-      else if Wpo.is_smoke_test t.main then `Passed else `Unproved
+    if Wpo.is_proved t.main
+    then if Wpo.is_smoke_test t.main then `Invalid else `Proved
+    else if Wpo.is_smoke_test t.main then `Passed else `Unproved
   | Some root ->
-      match root.script with
-      | Opened | Script _ ->
-          if Wpo.is_smoke_test t.main then `Passed else `Unproved
-      | Tactic _ ->
-          let n = pending root in
-          if Wpo.is_smoke_test t.main then `StillResist n else `Pending n
+    match root.script with
+    | Opened | Script _ ->
+      if Wpo.is_smoke_test t.main then `Passed else `Unproved
+    | Tactic _ ->
+      let n = pending root in
+      if Wpo.is_smoke_test t.main then `StillResist n else `Pending n
 
 (* -------------------------------------------------------------------------- *)
 (* --- Navigation                                                         --- *)
@@ -237,19 +237,19 @@ type current = [ `Main | `Internal of node | `Leaf of int * node ]
 let current t : current =
   match t.head with
   | Some h ->
-      let p = ref (`Internal h) in
-      iteri (fun i n -> if n == h then p := `Leaf(i,n)) t ; !p
+    let p = ref (`Internal h) in
+    iteri (fun i n -> if n == h then p := `Leaf(i,n)) t ; !p
   | None -> `Main
 
 type position = [ `Main | `Node of node | `Leaf of int ]
 let goto t = function
   | `Main ->
-      t.head <- t.root
+    t.head <- t.root
   | `Node n ->
-      if n.tree == t.main then t.head <- Some n
+    if n.tree == t.main then t.head <- Some n
   | `Leaf k ->
-      t.head <- t.root ;
-      iteri (fun i n -> if i = k then t.head <- Some n) t
+    t.head <- t.root ;
+    iteri (fun i n -> if i = k then t.head <- Some n) t
 
 let fetch t node =
   try
@@ -261,26 +261,26 @@ let rec forward t =
   match t.head with
   | None -> t.head <- t.root
   | Some hd ->
-      if not (fetch t hd) then
-        begin
-          t.head <- hd.parent ;
-          forward t ;
-        end
+    if not (fetch t hd) then
+      begin
+        t.head <- hd.parent ;
+        forward t ;
+      end
 
 let cancel t =
   match t.head with
   | None -> ()
   | Some node ->
-      begin
-        Wpo.clear_results node.goal ;
-        match node.script with
-        | Opened ->
-            t.head <- node.parent ;
-            if t.head = None then t.root <- None ;
-        | Tactic _ | Script _ ->
-            (*TODO: save the current script *)
-            node.script <- Opened ;
-      end
+    begin
+      Wpo.clear_results node.goal ;
+      match node.script with
+      | Opened ->
+        t.head <- node.parent ;
+        if t.head = None then t.root <- None ;
+      | Tactic _ | Script _ ->
+        (*TODO: save the current script *)
+        node.script <- Opened ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sub-Goal                                                           --- *)
@@ -377,12 +377,12 @@ let anchor tree ?node () =
   match node with
   | Some n -> n
   | None ->
-      match tree.head with
+    match tree.head with
+    | Some n -> n
+    | None ->
+      match tree.root with
       | Some n -> n
-      | None ->
-          match tree.root with
-          | Some n -> n
-          | None -> mk_root tree
+      | None -> mk_root ~tree
 
 let commit fork =
   List.iter (fun (_,wp) -> ignore (Wpo.resolve wp)) fork.Fork.goals ;
@@ -406,7 +406,7 @@ let rec script_node (node : node) =
     match node.script with
     | Script s -> List.filter ProofScript.is_tactic s
     | Tactic( tactic , children ) ->
-        [ ProofScript.a_tactic tactic (List.map subscript_node children) ]
+      [ ProofScript.a_tactic tactic (List.map subscript_node children) ]
     | Opened -> []
   in
   provers @ scripts
@@ -421,11 +421,11 @@ let script tree =
 let bind node script =
   match node.script with
   | Tactic _ ->
-      (*TODO: saveback the thrown script *)
-      ()
+    (*TODO: saveback the thrown script *)
+    ()
   | Opened | Script _ ->
-      (*TODO: saveback the previous script *)
-      node.script <- Script script
+    (*TODO: saveback the previous script *)
+    node.script <- Script script
 
 let bound node =
   match node.script with

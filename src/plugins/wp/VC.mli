@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,8 +38,12 @@ val get_description : t -> string
 val get_property : t -> Property.t
 val get_result : t -> prover -> result
 val get_results : t -> (prover * result) list
-val get_logout : t -> prover -> string (** only file name, might not exists *)
-val get_logerr : t -> prover -> string (** only file name, might not exists *)
+val get_logout : t -> prover -> string
+(** only file name, might not exists *)
+
+val get_logerr : t -> prover -> string
+(** only file name, might not exists *)
+
 val get_sequent : t -> Conditions.sequent
 val get_formula: t -> Lang.F.pred
 val is_trivial : t -> bool

@@ -35,3 +35,35 @@ type lscope = lscope_var list
 type pred_or_term =
   | PoT_pred of predicate
   | PoT_term of term
+
+(** Type uniquely representing a [predicate] or [term] with an associated
+    [label], and the necessary information for its translation. *)
+type at_data = {
+  kf: kernel_function;
+  (** [kernel_function] englobing the [pred_or_term]. *)
+
+  kinstr: kinstr;
+  (** [kinstr] where the [pred_or_term] is used. *)
+
+  lscope: lscope;
+  (** Current state of the [lscope] for the [pred_or_term]. *)
+
+  pot: pred_or_term;
+  (** [pred_or_term] to translate. *)
+
+  label: logic_label;
+  (** Label of the [pred_or_term]. *)
+
+  error: exn option
+  (** Error raised during the pre-analysis.
+      This field does not contribute to the equality and comparison between two
+      [at_data]. *)
+}
+
+type annotation_kind =
+  | Assertion
+  | Precondition
+  | Postcondition
+  | Invariant
+  | Variant
+  | RTE

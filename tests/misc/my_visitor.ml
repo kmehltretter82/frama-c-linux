@@ -76,7 +76,7 @@ let main () =
     print ();
     Kernel.SafeArrays.set false;
     Project.clear
-      ~selection:(State_selection.Static.with_dependencies S.self) ();
+      ~selection:(State_selection.with_dependencies S.self) ();
     (* The AST with 1/2 asserts *)
     print ()
   end

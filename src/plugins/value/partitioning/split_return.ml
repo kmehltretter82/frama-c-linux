@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -208,6 +208,10 @@ module ReturnUsage = struct
 
     method result () =
       summarize_by_lv usage
+
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
 
   (* For functions returning pointers, add a split on NULL/non-NULL *)
@@ -223,7 +227,7 @@ module ReturnUsage = struct
 
   let compute file =
     let vis = new visitorVarUsage in
-    Visitor.visitFramacFileSameGlobals (vis:> Visitor.frama_c_visitor) file;
+    Visitor.visitFramacFileFunctions (vis:> Visitor.frama_c_visitor) file;
     let split_compared = vis#result () in
     let split_null_pointers = add_null_pointers_split split_compared in
     split_null_pointers

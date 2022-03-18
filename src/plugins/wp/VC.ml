@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,8 +46,8 @@ let get_formula po =
   match po.po_formula with
   | GoalLemma l -> l.VC_Lemma.lemma.Definitions.l_lemma
   | GoalAnnot { VC_Annot.goal = g } ->
-      WpContext.on_context
-        (get_context po) (Wpo.GOAL.compute_proof ~pid:po.po_pid) g
+    WpContext.on_context
+      (get_context po) (Wpo.GOAL.compute_proof ~pid:po.po_pid) g
 
 let clear = Wpo.clear
 let proof = Wpo.goals_of_property
@@ -55,13 +55,13 @@ let iter_ip on_goal ip = Wpo.iter ~ip ~on_goal ()
 let iter_kf on_goal ?bhv kf =
   match bhv with
   | None ->
-      (* iter on all behaviors, see Wpo.iter *)
-      Wpo.iter ~index:(Wpo.Function(kf,None)) ~on_goal ()
+    (* iter on all behaviors, see Wpo.iter *)
+    Wpo.iter ~index:(Wpo.Function(kf,None)) ~on_goal ()
   | Some bs ->
-      List.iter
-        (fun b ->
-           Wpo.iter ~index:(Wpo.Function(kf,Some b)) ~on_goal ()
-        ) bs
+    List.iter
+      (fun b ->
+         Wpo.iter ~index:(Wpo.Function(kf,Some b)) ~on_goal ()
+      ) bs
 
 let remove = iter_ip Wpo.remove
 let () = Property_status.register_property_remove_hook remove

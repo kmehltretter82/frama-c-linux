@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,8 +44,8 @@ let occurs_vset x = function
   | Singleton t -> occurs x t
   | Range(a,b) -> occurs_opt x a || occurs_opt x b
   | Descr(xs,t,p) ->
-      if List.exists (Var.equal x) xs then false
-      else (occurs x t || occursp x p)
+    if List.exists (Var.equal x) xs then false
+    else (occurs x t || occursp x p)
 
 let occurs x = List.exists (occurs_vset x)
 
@@ -56,9 +56,9 @@ let vars_vset = function
   | Singleton t -> F.vars t
   | Range(a,b) -> Vars.union (vars_opt a) (vars_opt b)
   | Descr(xs,t,p) ->
-      List.fold_left
-        (fun xs x -> Vars.remove x xs)
-        (Vars.union (F.vars t) (F.varsp p)) xs
+    List.fold_left
+      (fun xs x -> Vars.remove x xs)
+      (Vars.union (F.vars t) (F.varsp p)) xs
 
 let vars vset = List.fold_left
     (fun xs s -> Vars.union xs (vars_vset s))
@@ -83,9 +83,9 @@ let pretty fmt = function
   | [] -> Format.pp_print_string fmt "{}"
   | [v] -> pp_vset fmt v
   | v::vs ->
-      Format.fprintf fmt "@[<hov 2>(%a" pp_vset v ;
-      List.iter (fun v -> Format.fprintf fmt "@ + %a" pp_vset v) vs ;
-      Format.fprintf fmt ")@]"
+    Format.fprintf fmt "@[<hov 2>(%a" pp_vset v ;
+    List.iter (fun v -> Format.fprintf fmt "@ + %a" pp_vset v) vs ;
+    Format.fprintf fmt ")@]"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Set Operations                                                     --- *)
@@ -147,16 +147,16 @@ let union xs ys = (xs @ ys)
 
 let descr = function
   | Set(t,s) ->
-      let x = Lang.freshvar t in
-      let e = e_var x in
-      [x] , e , p_call p_member [e;s]
+    let x = Lang.freshvar t in
+    let e = e_var x in
+    [x] , e , p_call p_member [e;s]
   | Singleton e -> ( [] , e , p_true )
   | Range(a,b) ->
-      let x = Lang.freshvar ~basename:"k" Logic.Int in
-      let e = e_var x in
-      [x] , e , in_range e a b
+    let x = Lang.freshvar ~basename:"k" Logic.Int in
+    let e = e_var x in
+    [x] , e , in_range e a b
   | Descr(xs,t,p) ->
-      xs, t, p
+    xs, t, p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Concretize                                                         --- *)
@@ -170,14 +170,14 @@ let concretize_vset = function
   | Range(Some a,None) -> e_fun f_range_sup [a]
   | Range(Some a,Some b) -> e_fun f_range [a;b]
   | Descr _ ->
-      Warning.error "Concretization for comprehension sets not implemented yet"
+    Warning.error "Concretization for comprehension sets not implemented yet"
 
 let concretize = function
   | [] -> e_fun f_empty []
   | x::xs ->
-      List.fold_left
-        (fun w x -> e_fun f_union [w;concretize_vset x])
-        (concretize_vset x) xs
+    List.fold_left
+      (fun w x -> e_fun f_union [w;concretize_vset x])
+      (concretize_vset x) xs
 
 let inter xs ys = e_fun f_inter [xs;ys]
 
@@ -202,35 +202,35 @@ let is_empty xs =
 
 let subrange a b = function
   | [Range(c,d)] ->
-      p_imply
-        (match a,b with
-         | Some a , Some b -> p_leq a b
-         | _ -> p_true)
-        (p_and
-           (match c,a with
-            | None,_ -> p_true
-            | Some _,None -> p_false
-            | Some c,Some a -> p_leq c a)
-           (match b,d with
-            | _,None -> p_true
-            | None,Some _ -> p_false
-            | Some b,Some d -> p_leq b d))
+    p_imply
+      (match a,b with
+       | Some a , Some b -> p_leq a b
+       | _ -> p_true)
+      (p_and
+         (match c,a with
+          | None,_ -> p_true
+          | Some _,None -> p_false
+          | Some c,Some a -> p_leq c a)
+         (match b,d with
+          | _,None -> p_true
+          | None,Some _ -> p_false
+          | Some b,Some d -> p_leq b d))
   | ys ->
-      let x = Lang.freshvar ~basename:"k" Logic.Int in
-      let k = e_var x in
-      p_forall [x] (p_imply (in_range k a b) (member k ys))
+    let x = Lang.freshvar ~basename:"k" Logic.Int in
+    let k = e_var x in
+    p_forall [x] (p_imply (in_range k a b) (member k ys))
 
 let subset xs ys =
   p_all (function
       | Set(t,s) ->
-          let x = Lang.freshvar t in
-          let e = e_var x in
-          p_forall [x] (p_imply (p_call p_member [e;s]) (member e ys))
+        let x = Lang.freshvar t in
+        let e = e_var x in
+        p_forall [x] (p_imply (p_call p_member [e;s]) (member e ys))
       | Singleton e -> member e ys
       | Descr(xs,t,p) ->
-          p_forall xs (p_imply p (member t ys))
+        p_forall xs (p_imply p (member t ys))
       | Range(a,b) ->
-          subrange a b ys
+        subrange a b ys
     ) xs
 
 (* -------------------------------------------------------------------------- *)
@@ -258,46 +258,46 @@ let disjoint_vset x y =
   match x , y with
 
   | Singleton x , Singleton y ->
-      p_neq x y
+    p_neq x y
 
   | Singleton e , Range(a,b)
   | Range(a,b) , Singleton e ->
-      p_not (in_range e a b)
+    p_not (in_range e a b)
 
   | Range(a,b) , Range(c,d) ->
-      p_disj [
-        empty_range a b ;
-        empty_range c d ;
-        disjoint_bounds b c ;
-        disjoint_bounds d a ;
-      ]
+    p_disj [
+      empty_range a b ;
+      empty_range c d ;
+      disjoint_bounds b c ;
+      disjoint_bounds d a ;
+    ]
 
   | Singleton x , Descr(xs,t,p)
   | Descr(xs,t,p) , Singleton x ->
-      p_forall xs (p_imply p (p_neq x t))
+    p_forall xs (p_imply p (p_neq x t))
 
   | Range(a,b) , Descr(xs,t,p)
   | Descr(xs,t,p) , Range(a,b) ->
-      p_forall xs (p_imply p (p_not (in_range t a b)))
+    p_forall xs (p_imply p (p_not (in_range t a b)))
 
   | Descr(xs,ta,pa) , Descr(ys,tb,pb) ->
-      p_forall xs
-        (p_forall ys
-           (p_hyps [pa;pb] (p_neq ta tb)))
+    p_forall xs
+      (p_forall ys
+         (p_hyps [pa;pb] (p_neq ta tb)))
 
   | Singleton e , Set(_,s)
   | Set(_,s) , Singleton e ->
-      p_not (p_call p_member [e;s])
+    p_not (p_call p_member [e;s])
 
   | Set _ , Set _ ->
-      let xs,a,p = descr x in
-      let ys,b,q = descr y in
-      p_forall (xs @ ys) (p_hyps [p;q] (p_neq a b))
+    let xs,a,p = descr x in
+    let ys,b,q = descr y in
+    p_forall (xs @ ys) (p_hyps [p;q] (p_neq a b))
 
   | Set(_,s) , w | w , Set(_,s) ->
-      let xs,t,p = descr w in
-      let t_in_s = p_call p_member [t;s] in
-      p_forall xs (p_not (p_and p t_in_s))
+    let xs,t,p = descr w in
+    let t_in_s = p_call p_member [t;s] in
+    p_forall xs (p_not (p_and p t_in_s))
 
 let disjoint xs ys =
   let ws =
@@ -369,9 +369,9 @@ let lift_add xs ys =
        match x , y with
        | Singleton a , Singleton b -> Singleton(e_add a b)
        | Singleton u , Range(a,b) | Range(a,b) , Singleton u ->
-           Range(map_opt (e_add u) a, map_opt (e_add u) b)
+         Range(map_opt (e_add u) a, map_opt (e_add u) b)
        | Range(a,b) , Range(c,d) ->
-           Range(bound_add a c,bound_add b d)
+         Range(bound_add a c,bound_add b d)
        | _ -> lift_vset e_add x y
     ) xs ys
 
@@ -381,11 +381,11 @@ let lift_sub xs ys =
        match x , y with
        | Singleton a , Singleton b -> Singleton(e_sub a b)
        | Singleton u , Range(a,b) ->
-           Range(bound_sub (Some u) b , bound_sub (Some u) a)
+         Range(bound_sub (Some u) b , bound_sub (Some u) a)
        | Range(a,b) , Singleton u ->
-           Range(bound_sub a (Some u) , bound_sub b (Some u))
+         Range(bound_sub a (Some u) , bound_sub b (Some u))
        | Range(a,b) , Range(c,d) ->
-           Range(bound_sub a d , bound_sub b c)
+         Range(bound_sub a d , bound_sub b c)
        | _ -> lift_vset e_sub x y
     ) xs ys
 

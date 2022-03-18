@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -159,9 +159,11 @@ include Datatype.S with type t = froms
 val join: froms -> froms -> froms
 
 val top: froms
+
 (** Display dependencies of a function, using the function's type to improve
     readability *)
 val pretty_with_type: Cil_types.typ -> froms Pretty_utils.formatter
+
 (** Display dependencies of a function, using the function's type to improve
     readability, separating direct and indirect dependencies *)
 val pretty_with_type_indirect: Cil_types.typ -> froms Pretty_utils.formatter

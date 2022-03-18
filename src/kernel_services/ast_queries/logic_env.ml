@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -346,6 +346,7 @@ let prepare_tables () =
   Logic_builtin_used.iter Logic_info.add
 
 (** C typedefs *)
+
 (**
    -  true => identifier is a type name
    -  false => identifier is a plain identifier

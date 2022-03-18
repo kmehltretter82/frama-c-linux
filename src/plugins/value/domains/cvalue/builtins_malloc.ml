@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -817,12 +817,7 @@ let choose_bases_reallocation () =
   | By_stack -> realloc_alloc_copy Weak
   | Imprecise -> realloc_imprecise_weakest
 
-let realloc_builtin state args =
-  let ptr, size =
-    match args with
-    | [ (_, ptr); (_, size) ] -> ptr, size
-    | _ -> raise (Builtins.Invalid_nb_of_args 2)
-  in
+let realloc_builtin_aux state ptr size =
   let bases, card_ok, null = resolve_bases_to_free ptr in
   if card_ok > 0 then
     let realloc = choose_bases_reallocation () in
@@ -839,11 +834,56 @@ let realloc_builtin state args =
     let c_clobbered = Base.SetLattice.bottom in
     Builtins.Full { c_values = []; c_clobbered; c_from = None; }
 
+let realloc_builtin state args =
+  let ptr, size =
+    match args with
+    | [ (_, ptr); (_, size) ] -> ptr, size
+    | _ -> raise (Builtins.Invalid_nb_of_args 2)
+  in
+  realloc_builtin_aux state ptr size
+
 let () =
   let name = "Frama_C_realloc" in
   let replace = "realloc" in
   let typ () = Cil.(voidPtrType, [voidPtrType; theMachine.typeOfSizeOf]) in
   Builtins.register_builtin ~replace name NoCacheCallers realloc_builtin ~typ
+
+let reallocarray_builtin state args =
+  let ptr, nmemb, sizev =
+    match args with
+    | [ (_, ptr); (_, nmemb); (_, sizev) ] -> ptr, nmemb, sizev
+    | _ -> raise (Builtins.Invalid_nb_of_args 3)
+  in
+  let size = Cvalue.V.mul nmemb sizev in
+  let size_ok = alloc_size_ok size in
+  if size_ok <> Alarmset.True then
+    Eva_utils.warning_once_current
+      "reallocarray out of bounds: assert(nmemb * size <= SIZE_MAX)";
+  if size_ok = Alarmset.False (* size always overflows *)
+  then Builtins.Result [Cvalue.V.singleton_zero]
+  else
+    let valid_size =
+      Cvalue.V.narrow (Cvalue.V.inject_ival (zero_to_max_bytes ())) size
+    in
+    let res = realloc_builtin_aux state ptr valid_size in
+    if size_ok = Alarmset.Unknown then
+      (* include failure case among possible results *)
+      match res with
+      | Builtins.Full cr ->
+        let c_values = (Some Cvalue.V.singleton_zero, state) :: cr.c_values in
+        Builtins.Full { cr with c_values }
+      | _ -> assert false (* realloc_builtin_aux always returns Full *)
+    else res
+
+let () =
+  let name = "Frama_C_reallocarray" in
+  let replace = "reallocarray" in
+  let typ () =
+    Cil.(voidPtrType,
+         [voidPtrType; theMachine.typeOfSizeOf; theMachine.typeOfSizeOf])
+  in
+  Builtins.register_builtin
+    ~replace name NoCacheCallers reallocarray_builtin ~typ
 
 (* ----------------------------- Leak detection ----------------------------- *)
 

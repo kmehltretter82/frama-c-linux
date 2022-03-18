@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,7 +35,7 @@ module UsedVarState =
     (struct
       let size = 17
       let name = "Value.Gui.UsedVarState"
-      let dependencies = [ Analysis.self ]
+      let dependencies = [ Self.state ]
       (* [!Db.Inputs.self_external; !Db.Outputs.self_external] would be better
          dependencies, but this introduces a very problematic recursion between
          Value and Inout *)
@@ -142,10 +142,10 @@ let value_panel pack (main_ui:main_ui) =
   in
   let refresh () = precision_refresh (); slevel_refresh (); main_refresh() in
   ignore (run_button#connect#pressed
-            (fun () ->
-               main_ui#protect ~cancelable:true
-                 (fun () -> refresh (); Analysis.compute (); main_ui#reset ());
-            ));
+            ~callback:(fun () ->
+                main_ui#protect ~cancelable:true
+                  (fun () -> refresh (); Analysis.compute (); main_ui#reset ());
+              ));
   pack box;
   "Eva", box#coerce, Some refresh
 
@@ -185,7 +185,8 @@ let active_highlighter buffer localizable ~start ~stop =
             end
             else
               let dead_code_area =
-                make_tag buffer "deadcode" [`BACKGROUND "tomato";`STYLE `ITALIC]
+                make_tag buffer ~name:"deadcode"
+                  [`BACKGROUND "tomato";`STYLE `ITALIC]
               in
               apply_tag buffer dead_code_area start stop
           end

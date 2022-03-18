@@ -7,9 +7,9 @@
    EXECNOW: BIN @PTEST_NAME@.1.sav LOG @PTEST_NAME@_sav.1.res LOG @PTEST_NAME@_sav.1.err @frama-c@ -save @PTEST_NAME@.1.sav @PTEST_FILE@ -eva @EVA_OPTIONS@ -out -input -deps > @PTEST_NAME@_sav.1.res 2> @PTEST_NAME@_sav.1.err
    STDOPT: +"-load %{dep:@PTEST_NAME@.sav} -eva @EVA_OPTIONS@ -out -input -deps"
  MODULE: @PTEST_NAME@
-   STDOPT: +"-load %{dep:@PTEST_NAME@.1}.sav -eva @EVA_OPTIONS@ -out -input -deps -print"
+   STDOPT: +"-load %{dep:@PTEST_NAME@.1.sav} -eva @EVA_OPTIONS@ -out -input -deps -print"
  MODULE:
-   STDOPT: +"-load %{dep:@PTEST_NAME@.1}.sav -eva @EVA_OPTIONS@ -out -input -deps"
+   STDOPT: +"-load %{dep:@PTEST_NAME@.1.sav} -eva @EVA_OPTIONS@ -out -input -deps"
  MODULE: status
    EXECNOW: LOG status_sav.res LOG status_sav.err BIN status.sav @frama-c@ -save status.sav @PTEST_FILE@ > status_sav.res 2> status_sav.err
    STDOPT: +"-load %{dep:status.sav}"

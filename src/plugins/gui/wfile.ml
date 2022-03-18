@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,7 +41,7 @@ class dialog
 
     initializer
       begin
-        ignore (dialog#event#connect#delete (fun _ -> true)) ;
+        ignore (dialog#event#connect#delete ~callback:(fun _ -> true)) ;
         dialog#add_button "Cancel" `DELETE_EVENT ;
         dialog#add_button select `SELECT ;
         ignore (GMisc.label ~packing:(dialog#action_area#pack ~expand:true) ()) ;
@@ -102,7 +102,7 @@ class button ?kind ?title ?select ?tooltip ?parent () =
       begin
         button#add box#coerce ;
         button#set_focus_on_click false ;
-        ignore (button#connect#clicked self#select) ;
+        ignore (button#connect#clicked ~callback:self#select) ;
         dialog#connect current#set ;
         Wutil.set_tooltip button tooltip ;
         current#connect

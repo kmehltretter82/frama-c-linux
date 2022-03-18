@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,8 +27,7 @@
     @since Boron-20100401 *)
 type where =
   | Toolbar of GtkStock.id * string * string (** Label then tooltip *)
-  | Menubar of
-      GtkStock.id option (** Stock used for the icon *) * string (** Label *)
+  | Menubar of GtkStock.id option * string (** Stock used for icon * Label *)
   | ToolMenubar of GtkStock.id * string * string (** Label then tooltip *)
 
 (** Callback for the buttons that can be in the menus. Standard buttons/menus

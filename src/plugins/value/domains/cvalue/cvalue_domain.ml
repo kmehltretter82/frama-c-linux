@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -451,12 +451,12 @@ module State = struct
     module Storage =
       State_builder.Ref (Datatype.Bool)
         (struct
-          let dependencies = [Db.Value.self]
+          let dependencies = [Self.state]
           let name = name ^ ".Storage"
           let default () = false
         end)
 
-    let register_global_state _ _ = Storage.set true
+    let register_global_state b _ = Storage.set b
     let register_initial_state callstack (state, _clob) =
       Db.Value.merge_initial_state callstack state
     let register_state_before_stmt callstack stmt (state, _clob) =
@@ -478,24 +478,36 @@ module State = struct
       Callstack.Hashtbl.iter process tbl;
       h
 
+    let select ?selection tbl =
+      match selection with
+      | None -> tbl
+      | Some list ->
+        let new_tbl = Value_types.Callstack.Hashtbl.create (List.length list) in
+        let add cs =
+          let s = Value_types.Callstack.Hashtbl.find_opt tbl cs in
+          Option.iter (Value_types.Callstack.Hashtbl.replace new_tbl cs) s
+        in
+        List.iter add list;
+        new_tbl
+
     let get_global_state () = return (Db.Value.globals_state ())
     let get_initial_state kf = return (Db.Value.get_initial_state kf)
-    let get_initial_state_by_callstack kf =
+    let get_initial_state_by_callstack ?selection kf =
       if Storage.get ()
       then
         match Db.Value.get_initial_state_callstack kf with
-        | Some tbl -> `Value (lift_tbl tbl)
+        | Some tbl -> `Value (lift_tbl (select ?selection tbl))
         | None -> `Bottom
       else `Top
 
     let get_stmt_state ~after stmt =
       return (Db.Value.get_stmt_state ~after stmt)
 
-    let get_stmt_state_by_callstack ~after stmt =
+    let get_stmt_state_by_callstack ?selection ~after stmt =
       if Storage.get ()
       then
         match Db.Value.get_stmt_state_callstack ~after stmt with
-        | Some tbl -> `Value (lift_tbl tbl)
+        | Some tbl -> `Value (lift_tbl (select ?selection tbl))
         | None -> `Bottom
       else `Top
 

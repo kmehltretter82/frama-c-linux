@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: eva,scope
+PLUGIN: eva,inout,scope
   STDOPT: +"-eva @EVA_CONFIG@"
   STDOPT: +"-eva @EVA_CONFIG@ -main main2 -eva-slevel 3"
 */

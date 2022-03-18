@@ -1,15 +1,15 @@
 /* run.config*
-OPT: -cpp-extra-args="-DEEDN" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
-OPT: -cpp-extra-args="-DEENN" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
-OPT: -cpp-extra-args="-DENND" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
-OPT: -cpp-extra-args="-DENNN" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
-OPT: -cpp-extra-args="-DNNNN" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
+OPT: -cpp-extra-args="-DEEDN" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
+OPT: -cpp-extra-args="-DEENN" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
+OPT: -cpp-extra-args="-DENND" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
+OPT: -cpp-extra-args="-DENNN" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
+OPT: -cpp-extra-args="-DNNNN" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
 EXIT: 1
-OPT: -cpp-extra-args="-DEEDD" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
-OPT: -cpp-extra-args="-DENDD" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
-OPT: -cpp-extra-args="-DENDN" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
-OPT: -cpp-extra-args="-DNNDD" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
-OPT: -cpp-extra-args="-DNNDN" @PTEST_DIR@/@PTEST_NAME@_aux.c -print
+OPT: -cpp-extra-args="-DEEDD" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
+OPT: -cpp-extra-args="-DENDD" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
+OPT: -cpp-extra-args="-DENDN" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
+OPT: -cpp-extra-args="-DNNDD" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
+OPT: -cpp-extra-args="-DNNDN" %{dep:@PTEST_DIR@/@PTEST_NAME@_aux.c} -print
 */
 
 // OK (one global defined to 1)

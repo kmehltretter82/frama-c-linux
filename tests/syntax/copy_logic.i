@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: eva,scope
+PLUGIN: eva,inout,scope
    STDOPT: +"-copy" +"-eva"
  */
 /*@ predicate p(int x); */

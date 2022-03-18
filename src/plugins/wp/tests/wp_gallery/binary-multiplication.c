@@ -3,7 +3,8 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-rte -wp-prover=alt-ergo,script -wp-prop=-lack
+
+   OPT: -wp-rte -wp-prover=alt-ergo,script -wp-prop=-lack @USING_WP_SESSION@
 */
 
 // The use '-wp-prover=z3,why3:alt-ergo' or using Alt-Ergo 2.3.0 gives better results.

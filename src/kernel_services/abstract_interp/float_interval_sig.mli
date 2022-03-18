@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,9 +28,14 @@ open Bottom.Type
 type prec = Float_sig.prec
 
 module type S = sig
-  type float (** Type of the interval bounds. *)
-  type widen_hints (** Type of the widen hints. *)
-  type t     (** Type of intervals. *)
+  (** Type of the interval bounds. *)
+  type float
+
+  (** Type of the widen hints. *)
+  type widen_hints
+
+  (** Type of intervals. *)
+  type t
 
   val packed_descr : Structural_descr.pack
 

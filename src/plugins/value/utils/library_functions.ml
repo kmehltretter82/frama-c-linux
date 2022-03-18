@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,7 +33,7 @@ module Retres =
 let () = Ast.add_monotonic_state Retres.self
 
 let () =
-  State_dependency_graph.add_dependencies ~from:Retres.self [ Db.Value.self ]
+  State_dependency_graph.add_dependencies ~from:Retres.self [ Self.state ]
 
 let get_retres_vi = Retres.memo
     (fun kf ->
@@ -78,6 +78,8 @@ let unsupported_specifications =
     "getaddrinfo", "netdb.c";
     "getenv", "stdlib.c";
     "getline", "stdio.c";
+    "getpwnam_r", "pwd.c";
+    "getpwuid_r", "pwd.c";
     "glob", "glob.c";
     "globfree", "glob.c";
     "posix_memalign", "stdlib.c";

@@ -22,9 +22,7 @@
 
 (** Utility functions for generating C implementations. *)
 
-module E_acsl_label = Label
 open Cil_types
-open Cil_datatype
 module Error = Translation_error
 
 (**************************************************************************)
@@ -75,6 +73,10 @@ let must_translate_opt = function
   | None -> false
   | Some ppt -> must_translate ppt
 
+let () =
+  E_acsl_visitor.must_translate_ppt_ref := must_translate;
+  E_acsl_visitor.must_translate_ppt_opt_ref := must_translate_opt
+
 let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   let lenv = Env.Local_vars.get env in
   let pp = match pp with Some size_pp -> size_pp | None -> t in
@@ -100,7 +102,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
         Assert.runtime_check
           ~adata:adata_lower_guard
           ~pred_kind:Assert
-          Smart_stmt.RTE
+          RTE
           kf
           env
           lower_guard
@@ -130,7 +132,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
     Assert.runtime_check
       ~adata:adata_upper_guard
       ~pred_kind:Assert
-      Smart_stmt.RTE
+      RTE
       kf
       env
       upper_guard
@@ -297,51 +299,6 @@ let env_of_li ~adata ~loc kf env li =
     Env.not_yet env "type variable"
   | Larrow _ ->
     Env.not_yet env "lambda-abstraction"
-
-let at_to_exp_no_lscope kf env t_opt label e =
-  let stmt = E_acsl_label.get_stmt kf label in
-  (* generate a new variable denoting [\at(t',label)].
-     That is this variable which is the resulting expression.
-     ACSL typing rule ensures that the type of this variable is the same as
-     the one of [e]. *)
-  let loc = Stmt.loc stmt in
-  let res_v, res, new_env =
-    Env.new_var
-      ~loc
-      ~name:"at"
-      ~scope:Varname.Function
-      env
-      kf
-      t_opt
-      (Cil.typeOf e)
-      (fun _ _ -> [])
-  in
-  let env_ref = ref new_env in
-  (* visitor modifying in place the labeled statement in order to store [e]
-     in the resulting variable at this location (which is the only correct
-     one). *)
-  let o = object
-    inherit Visitor.frama_c_inplace
-    method !vstmt_aux stmt =
-      (* either a standard C affectation or a call to an initializer according
-         to the type of [e] *)
-      let ty = Cil.typeOf e in
-      let init_set =
-        if Gmp_types.Q.is_t ty then Rational.init_set else Gmp.init_set
-      in
-      let new_stmt = init_set ~loc (Cil.var res_v) res e in
-      assert (!env_ref == new_env);
-      (* generate the new block of code for the labeled statement and the
-         corresponding environment *)
-      let block, new_env =
-        Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
-      in
-      env_ref := Env.extend_stmt_in_place new_env stmt ~label block;
-      Cil.ChangeTo stmt
-  end
-  in
-  ignore (Visitor.visitFramacStmt o stmt);
-  res, !env_ref, Typed_number.C_number
 
 (*
 Local Variables:

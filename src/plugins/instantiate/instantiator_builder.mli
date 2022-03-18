@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -100,15 +100,19 @@ end
 module type Instantiator = sig
   (** Plugin option that allows to check whether the instantiator is enabled. *)
   module Enabled: Parameter_sig.Bool
+
   (** Same as [Generator_sig.override_key] *)
   type override_key
 
   (** Same as [Generator_sig.override_key] *)
   val function_name: string
+
   (** Same as [Generator_sig.override_key] *)
   val well_typed_call: lval option -> varinfo -> exp list -> bool
+
   (** Same as [Generator_sig.override_key] *)
   val key_from_call: lval option -> varinfo -> exp list -> override_key
+
   (** Same as [Generator_sig.override_key] *)
   val retype_args: override_key -> exp list -> exp list
 

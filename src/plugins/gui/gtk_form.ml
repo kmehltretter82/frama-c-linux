@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -81,7 +81,7 @@ let menu entries ?width ?tooltip ~packing get set demon =
     try combo_box#set_active (lookup 0 (get ()) entries)
     with Not_found -> ()
   in
-  ignore (combo_box#connect#changed callback) ;
+  ignore (combo_box#connect#changed ~callback) ;
   Gtk_helper.do_tooltip ?tooltip combo_box ;
   register demon update
 

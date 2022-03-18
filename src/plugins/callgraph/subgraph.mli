@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,11 +28,13 @@ module Make
        val create: ?size:int -> unit -> t
        val add_edge_e: t -> E.t -> unit
      end)
-    (D: Datatype.S with type t = G.t  (** Graph datatype *))
+    (D: Datatype.S with type t = G.t(* Graph datatype *))
     (Info: sig
        (** additional information *)
        val self: State.t
-       val name: string (** name of the state *)
+       val name: string
+       (** name of the state *)
+
        val get: unit -> G.t
        val vertex: Kernel_function.t -> G.V.t
      end) :

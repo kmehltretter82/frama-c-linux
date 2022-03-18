@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -60,35 +60,35 @@ class cut =
       let mode =
         match sel with
         | Clause(Goal p) when p != F.p_false ->
-            feedback#update_field ~enabled:false fmode ; CASES
+          feedback#update_field ~enabled:false fmode ; CASES
         | _ ->
-            feedback#update_field ~enabled:true fmode ;
-            self#get_field fmode in
+          feedback#update_field ~enabled:true fmode ;
+          self#get_field fmode in
       let cut = self#get_field fclause in
       if Tactical.is_empty cut then
         Not_configured
       else
         match mode with
         | MODUS ->
-            feedback#set_descr "Prove then Insert the Clause" ;
-            let clause = F.p_bool (Tactical.selected cut) in
-            let step = Conditions.step ~descr:"Cut" (Have clause) in
-            let at = Tactical.at sel in
-            Applicable
-              begin fun sequent ->
-                let assume = Conditions.insert ?at step sequent in
-                [ "Clause" , (fst sequent,clause) ;
-                  "Assume" , (fst assume,snd sequent) ]
-              end
+          feedback#set_descr "Prove then Insert the Clause" ;
+          let clause = F.p_bool (Tactical.selected cut) in
+          let step = Conditions.step ~descr:"Cut" (Have clause) in
+          let at = Tactical.at sel in
+          Applicable
+            begin fun sequent ->
+              let assume = Conditions.insert ?at step sequent in
+              [ "Clause" , (fst sequent,clause) ;
+                "Assume" , (fst assume,snd sequent) ]
+            end
         | CASES ->
-            feedback#set_descr "Proof by Case in the Clause" ;
-            let positive = F.p_bool (Tactical.selected cut) in
-            let negative = F.p_not positive in
-            Applicable
-              begin fun (hs,goal) ->
-                [ "Positive" , (hs,F.p_imply positive goal) ;
-                  "Negative" , (hs,F.p_imply negative goal) ]
-              end
+          feedback#set_descr "Proof by Case in the Clause" ;
+          let positive = F.p_bool (Tactical.selected cut) in
+          let negative = F.p_not positive in
+          Applicable
+            begin fun (hs,goal) ->
+              [ "Positive" , (hs,F.p_imply positive goal) ;
+                "Negative" , (hs,F.p_imply negative goal) ]
+            end
   end
 
 let tactical = Tactical.export (new cut)

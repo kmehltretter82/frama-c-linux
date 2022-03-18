@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1568,7 +1568,7 @@ let ip_from_of_code_annot kf st ca = match ca.annot_content with
 let ip_post_cond_of_behavior kf st ~active b =
   ip_ensures_of_behavior kf st b
   @ (Option.to_list (ip_assigns_of_behavior kf st ~active b))
-  @ ip_from_of_behavior kf st active b
+  @ ip_from_of_behavior kf st ~active b
   @ (Option.to_list (ip_allocation_of_behavior kf st ~active b))
 
 let ip_of_behavior ib_kf ib_kinstr ~active ib_bhv =
@@ -1629,8 +1629,8 @@ let ip_post_cond_of_spec kf st ~active s =
 
 let ip_of_spec kf st ~active s =
   List.concat (List.map (ip_all_of_behavior kf st ~active) s.spec_behavior)
-  @ ip_complete_of_spec kf st active s
-  @ ip_disjoint_of_spec kf st active s
+  @ ip_complete_of_spec kf st ~active s
+  @ ip_disjoint_of_spec kf st ~active s
   @ (Option.to_list (ip_terminates_of_spec kf st s))
   @ (Option.to_list (ip_decreases_of_spec kf st s))
 
@@ -1645,7 +1645,7 @@ let ip_of_code_annot kf stmt ca =
   let ki = Kstmt stmt in
   match ca.annot_content with
   | AAssert _ | AInvariant _ -> [ IPCodeAnnot {ica_kf=kf; ica_stmt=stmt; ica_ca=ca} ]
-  | AStmtSpec (active,s) -> ip_of_spec kf ki active s
+  | AStmtSpec (active,s) -> ip_of_spec kf ki ~active s
   | AVariant t ->
     [ IPDecrease {id_kf=kf;id_kinstr=ki;id_ca=Some ca; id_variant=t}]
   | AAllocation _ ->

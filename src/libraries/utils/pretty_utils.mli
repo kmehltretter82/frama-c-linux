@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -207,8 +207,12 @@ val pp_items :
     {!pp_margin} and {!add_margin} below.
 *)
 
-type marger (** Margin accumulator (low-level API to [pp_items]). *)
-val marger : unit -> marger (** Create an empty marger *)
+(** Margin accumulator (low-level API to [pp_items]). *)
+type marger
+
+val marger : unit -> marger
+(** Create an empty marger *)
+
 val add_margin : marger -> ?margin:int -> ?min:int -> ?max:int -> string -> unit
 (** Updates the marger with new text dimension.
     The marger width is updated with the width of the provided text.

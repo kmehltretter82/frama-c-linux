@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -142,10 +142,10 @@ let _phi_read ~obj ~read ~write mem off = match F.repr mem with
   | Logic.Fun (f, [_; o; v]) when f == write && off == o -> v
   (*read_tau (write_tau m o v) o == v*)
   | Logic.Fun (f, [m; o; _]) when f == write ->
-      let offset = a_iabs (F.e_sub off o) in
-      if F.eval_leq (F.e_int (Ctypes.sizeof_object obj)) offset then
-        F.e_fun read [m; off]
-      else raise Not_found
+    let offset = a_iabs (F.e_sub off o) in
+    if F.eval_leq (F.e_int (Ctypes.sizeof_object obj)) offset then
+      F.e_fun read [m; off]
+    else raise Not_found
   (*read_tau (write_tau m o v) o' == read m o' when |o - o'| <= sizeof(tau)*)
   | _ -> raise Not_found
 
@@ -248,17 +248,17 @@ struct
       | Base.Null -> "MNull"
       | Base.String (eid, _) -> Format.sprintf "MStr_%d" eid
       | Base.Allocated (vi, _dealloc, _) ->
-          Format.sprintf "MAlloc_%s" (LogicUsage.basename vi)
+        Format.sprintf "MAlloc_%s" (LogicUsage.basename vi)
     let basename_of_chunk = function
       | M_base b -> basename_of_base b
     let is_framed = function
       | M_base b ->
-          try
-            (match WpContext.get_scope () with
-             | WpContext.Global -> assert false
-             | WpContext.Kf kf -> Base.is_formal_or_local b (Kernel_function.get_definition kf))
-          with Invalid_argument _ | Kernel_function.No_Definition ->
-            assert false (* by context. *)
+        try
+          (match WpContext.get_scope () with
+           | WpContext.Global -> assert false
+           | WpContext.Kf kf -> Base.is_formal_or_local b (Kernel_function.get_definition kf))
+        with Invalid_argument _ | Kernel_function.No_Definition ->
+          assert false (* by context. *)
   end
 
   let cluster () = Definitions.cluster ~id:"MemVal"  ()
@@ -438,10 +438,10 @@ struct
       | [] -> assert false
       | [x] -> f x
       | x :: xs ->
-          F.e_if
-            (F.e_eq (a_base l.loc_t) (F.e_int (Base.id x)))
-            (f x)
-            (aux xs)
+        F.e_if
+          (F.e_eq (a_base l.loc_t) (F.e_int (Base.id x)))
+          (f x)
+          (aux xs)
     in
     aux (V.domain l.loc_v)
 
@@ -450,10 +450,10 @@ struct
       | [] -> assert false
       | [x] -> f x
       | x :: xs ->
-          F.p_if
-            (F.p_equal (a_base l.loc_t) (F.e_int (Base.id x)))
-            (f x)
-            (aux xs)
+        F.p_if
+          (F.p_equal (a_base l.loc_t) (F.e_int (Base.id x)))
+          (f x)
+          (aux xs)
     in
     aux (V.domain l.loc_v)
 
@@ -574,13 +574,13 @@ struct
     let rec store acc = function
       | [] -> assert false
       | [c] ->
-          let cond = F.e_and ((List.map (F.e_neq (a_base l.loc_t))) acc) in
-          [ Assert (mk_write cond c) ]
+        let cond = F.e_and ((List.map (F.e_neq (a_base l.loc_t))) acc) in
+        [ Assert (mk_write cond c) ]
       | c :: cs ->
-          let bid = (F.e_int (Base.id c)) in
-          let cond = F.e_eq (a_base l.loc_t) bid in
-          [ Assert (mk_write cond c) ]
-          @ store (bid :: acc) cs
+        let bid = (F.e_int (Base.id c)) in
+        let cond = F.e_eq (a_base l.loc_t) bid in
+        [ Assert (mk_write cond c) ]
+        @ store (bid :: acc) cs
     in
     store [ ] (V.domain l.loc_v)
 
@@ -607,7 +607,7 @@ struct
     match F.is_equal (a_base l1.loc_t) (a_base l2.loc_t) with
     | Logic.Yes -> F.e_sub (a_offset l1.loc_t) (a_offset l2.loc_t)
     | Logic.Maybe | Logic.No ->
-        Warning.error "Can only compare pointers with same base."
+      Warning.error "Can only compare pointers with same base."
 
   let base_eq l1 l2 = F.p_equal (a_base l1.loc_t) (a_base l2.loc_t)
   let offset_cmp cmpop l1 l2 = cmpop (a_offset l1.loc_t) (a_offset l2.loc_t)
@@ -628,14 +628,14 @@ struct
 
   let range_of_rloc = function
     | Rloc (obj, l) ->
-        LOC (l, F.e_int (Ctypes.sizeof_object obj))
+      LOC (l, F.e_int (Ctypes.sizeof_object obj))
     | Rrange (l, obj, Some a, Some b) ->
-        let la = shift l obj a in
-        let n = e_fact (Ctypes.sizeof_object obj) (F.e_range a b) in
-        LOC (la, n)
+      let la = shift l obj a in
+      let n = e_fact (Ctypes.sizeof_object obj) (F.e_range a b) in
+      LOC (la, n)
     | Rrange (l, obj, a_opt, b_opt) ->
-        let f = F.e_fact (Ctypes.sizeof_object obj) in
-        RANGE (l, Vset.range (Option.map f a_opt) (Option.map f b_opt))
+      let f = F.e_fact (Ctypes.sizeof_object obj) in
+      RANGE (l, Vset.range (Option.map f a_opt) (Option.map f b_opt))
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Validity                                                          --- *)
@@ -647,14 +647,14 @@ struct
     | Base.Invalid -> Vset.singleton F.e_zero
     | Base.Known (min_valid, max_valid)
     | Base.Unknown (min_valid, Some max_valid, _) ->
-        (* valid between min_valid .. max_valid inclusive *)
-        let mn = F.e_bigint Integer.(e_div min_valid eight) in
-        let mx = F.e_bigint Integer.(e_div max_valid eight) in
-        Vset.range (Some mn) (Some mx)
+      (* valid between min_valid .. max_valid inclusive *)
+      let mn = F.e_bigint Integer.(e_div min_valid eight) in
+      let mx = F.e_bigint Integer.(e_div max_valid eight) in
+      Vset.range (Some mn) (Some mx)
     | Base.Variable { Base.min_alloc = min_valid } ->
-        (* valid between 0 .. min_valid inclusive *)
-        let mn_valid = F.e_bigint Integer.(e_div min_valid eight) in
-        Vset.range (Some F.e_zero) (Some mn_valid)
+      (* valid between 0 .. min_valid inclusive *)
+      let mn_valid = F.e_bigint Integer.(e_div min_valid eight) in
+      Vset.range (Some F.e_zero) (Some mn_valid)
     | Base.Unknown (_, None, _) -> Vset.empty
 
   let valid_range : sigma -> acs -> range -> pred = fun _ acs r ->
@@ -662,9 +662,9 @@ struct
                                    | OBJ -> true (* TODO:  *) in
     let l, base_offset = match r with
       | LOC (l, n) ->
-          let a = a_offset l.loc_t in
-          let b = F.e_add a (F.e_sub n F.e_one) in
-          l, Vset.range (Some a) (Some b)
+        let a = a_offset l.loc_t in
+        let b = F.e_add a (F.e_sub n F.e_one) in
+        l, Vset.range (Some a) (Some b)
       | RANGE (l, r) -> l, Vset.lift_add (Vset.singleton l.loc_t) r
     in
     let valid_base set base =
@@ -704,7 +704,7 @@ struct
     match scope with
     | Enter -> []
     | Leave ->
-        alloc_pred seq xs ()
+      alloc_pred seq xs ()
 
   let scope seq sc xs =
     let preds = scope seq sc xs in
@@ -724,9 +724,9 @@ struct
   (* -------------------------------------------------------------------------- *)
   let range_to_base_offset = function
     | LOC (l, n) ->
-        let a = a_offset l.loc_t in
-        let b = F.e_add a n in
-        l, Vset.range (Some a) (Some b)
+      let a = a_offset l.loc_t in
+      let b = F.e_add a n in
+      l, Vset.range (Some a) (Some b)
     | RANGE (l, r) -> l, Vset.lift_add (Vset.singleton l.loc_t) r
 
   let included : segment -> segment -> pred = fun s1 s2 ->
@@ -747,7 +747,7 @@ struct
 
   let initialized _sigma _l = F.p_true (* todo *)
   let is_well_formed _ = F.p_true (* todo *)
-  let base_offset _loc = assert false (** TODO *)
+  let base_offset _loc = assert false (* TODO *)
   type domain = Sigma.domain
   let no_binder = { bind = fun _ f v -> f v }
   let configure_ia _ = no_binder (* todo *)
@@ -836,15 +836,15 @@ struct
     (* assert (not (Ival.is_float ival)); (* by integer offsets *) *)
     match Ival.project_small_set ival with
     | Some is ->
-        F.p_any
-          (fun i -> F.p_equal x (F.e_bigint i))
-          is
+      F.p_any
+        (fun i -> F.p_equal x (F.e_bigint i))
+        is
     | None -> begin
         match Ival.min_and_max ival with
         | Some mn, Some mx ->
-            F.p_and
-              (F.p_leq (F.e_bigint mn) x)
-              (F.p_leq x (F.e_bigint mx))
+          F.p_and
+            (F.p_leq (F.e_bigint mn) x)
+            (F.p_leq x (F.e_bigint mx))
         | Some mn, None -> F.p_leq (F.e_bigint mn) x
         | None, Some mx -> F.p_leq x (F.e_bigint mx)
         | None, None -> F.p_true

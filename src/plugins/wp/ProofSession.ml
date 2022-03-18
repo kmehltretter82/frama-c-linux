@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -74,46 +74,50 @@ let load wpo =
   match get wpo with
   | NoScript -> `Null
   | Script f | Deprecated f ->
-      if Sys.file_exists f then Json.load_file f else `Null
+    if Sys.file_exists f then Json.load_file f else `Null
 
 let remove wpo =
   match get wpo with
   | NoScript -> ()
   | Script f ->
-      begin
-        Extlib.safe_remove f ;
-        Hashtbl.replace files f NoScript ;
-      end
+    begin
+      Extlib.safe_remove f ;
+      Hashtbl.replace files f NoScript ;
+    end
   | Deprecated f0 ->
-      begin
-        Wp_parameters.feedback
-          "Removed deprecated script for '%s'" wpo.po_sid ;
-        Extlib.safe_remove f0 ;
-        let f = filename ~force:false wpo in
-        Hashtbl.replace files f NoScript ;
-      end
+    begin
+      Wp_parameters.feedback
+        "Removed deprecated script for '%s'" wpo.po_sid ;
+      Extlib.safe_remove f0 ;
+      let f = filename ~force:false wpo in
+      Hashtbl.replace files f NoScript ;
+    end
 
-let save wpo js =
+let save ~stdout wpo js =
   let empty =
     match js with
     | `Null | `List [] | `Assoc [] -> true
     | _ -> false in
+  if stdout then
+    Wp_parameters.result "Proof script for %s:@.%a"
+      wpo.po_gid (Json.save_formatter ~pretty:true) js
+  else
   if empty then remove wpo else
     match get wpo with
     | Script f ->
-        Json.save_file f js
+      Json.save_file f js
     | NoScript ->
-        begin
-          let f = filename ~force:true wpo in
-          Json.save_file f js ;
-          Hashtbl.replace files f (Script f) ;
-        end
+      begin
+        let f = filename ~force:true wpo in
+        Json.save_file f js ;
+        Hashtbl.replace files f (Script f) ;
+      end
     | Deprecated f0 ->
-        begin
-          Wp_parameters.feedback
-            "Upgraded script for '%s'" wpo.po_sid ;
-          Extlib.safe_remove f0 ;
-          let f = filename ~force:true wpo in
-          Json.save_file f js ;
-          Hashtbl.replace files f (Script f) ;
-        end
+      begin
+        Wp_parameters.feedback
+          "Upgraded script for '%s'" wpo.po_sid ;
+        Extlib.safe_remove f0 ;
+        let f = filename ~force:true wpo in
+        Json.save_file f js ;
+        Hashtbl.replace files f (Script f) ;
+      end

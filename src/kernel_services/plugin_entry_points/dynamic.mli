@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -105,6 +105,7 @@ module Parameter : sig
     include Common with type t = bool
     val on: string -> unit -> unit
     (** Set the parameter to [true]. *)
+
     val off : string -> unit -> unit
     (** Set the parameter to [false]. *)
   end
@@ -136,8 +137,10 @@ module Parameter : sig
     val add: string -> string  -> unit
     val append_before: string -> string list -> unit
     (** @since Neon-20140301 *)
+
     val append_after: string -> string list -> unit
     (** @since Neon-20140301 *)
+
     val remove: string -> string -> unit
     val is_empty: string -> unit -> bool
     val iter: string -> (string -> unit) -> unit

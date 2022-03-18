@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,13 +38,13 @@ let rec alloc_hyp pool f seq =
          if not (Vars.subset step.vars (Plang.alloc_domain pool)) then
            match step.condition with
            | State _ ->
-               Plang.alloc_xs pool f step.vars
+             Plang.alloc_xs pool f step.vars
            | Have p | When p | Type p | Init p | Core p ->
-               Plang.alloc_p pool f p
+             Plang.alloc_p pool f p
            | Branch(p,sa,sb) ->
-               Plang.alloc_p pool f p ;
-               alloc_hyp pool f sa ;
-               alloc_hyp pool f sb ;
+             Plang.alloc_p pool f p ;
+             alloc_hyp pool f sa ;
+             alloc_hyp pool f sb ;
            | Either cases -> List.iter (alloc_hyp pool f) cases
       ) seq
 
@@ -92,20 +92,20 @@ class state =
       begin fun ?lbl pp fmt w ->
         match context , lbl with
         | NoWhere , None ->
-            context <- InAddr ;
-            Format.fprintf fmt "« %a »" pp w ;
-            context <- NoWhere ;
+          context <- InAddr ;
+          Format.fprintf fmt "« %a »" pp w ;
+          context <- NoWhere ;
         | NoWhere , Some l ->
-            context <- AtLabel l ;
-            Format.fprintf fmt "« %a »%a" pp w self#pp_at l ;
-            context <- NoWhere ;
+          context <- AtLabel l ;
+          Format.fprintf fmt "« %a »%a" pp w self#pp_at l ;
+          context <- NoWhere ;
         | InAddr , None -> pp fmt w
         | AtLabel _ , None -> pp fmt w
         | AtLabel l0 , Some l when l == l0 -> pp fmt w
         | (InAddr | AtLabel _) as here , Some l ->
-            context <- AtLabel l ;
-            Format.fprintf fmt "( %a )%a" pp w self#pp_at l ;
-            context <- here ;
+          context <- AtLabel l ;
+          Format.fprintf fmt "( %a )%a" pp w self#pp_at l ;
+          context <- here ;
       end
 
     method private atflow : 'a. ?lbl:Pcfg.label ->
@@ -113,16 +113,16 @@ class state =
       begin fun ?lbl pp fmt w ->
         match context , lbl with
         | NoWhere , None ->
-            context <- InAddr ;
-            pp fmt w ;
-            context <- NoWhere ;
+          context <- InAddr ;
+          pp fmt w ;
+          context <- NoWhere ;
         | InAddr , None -> pp fmt w
         | AtLabel _ , None -> pp fmt w
         | AtLabel l0 , Some l when l == l0 -> pp fmt w
         | (InAddr | AtLabel _ | NoWhere) as here , Some l ->
-            context <- AtLabel l ;
-            Format.fprintf fmt "%a%a" pp w self#pp_at l ;
-            context <- here ;
+          context <- AtLabel l ;
+          Format.fprintf fmt "%a%a" pp w self#pp_at l ;
+          context <- here ;
       end
 
     method pp_at fmt lbl = Format.fprintf fmt "@@%a" self#pp_label lbl
@@ -137,19 +137,19 @@ class state =
           match Pcfg.find env e with
           | Pcfg.Term -> super#pp_repr fmt e
           | Pcfg.Addr lv ->
-              if self#is_atomic_lv lv
-              then self#atflow self#pp_addr fmt lv
-              else self#at self#pp_addr fmt lv
+            if self#is_atomic_lv lv
+            then self#atflow self#pp_addr fmt lv
+            else self#at self#pp_addr fmt lv
           | Pcfg.Lval(lv,lbl) ->
-              if self#is_atomic_lv lv
-              then self#atflow ~lbl self#pp_lval fmt lv
-              else self#at ~lbl self#pp_lval fmt lv
+            if self#is_atomic_lv lv
+            then self#atflow ~lbl self#pp_lval fmt lv
+            else self#at ~lbl self#pp_lval fmt lv
           | Pcfg.Init(lv,lbl) ->
-              if self#is_atomic_lv lv
-              then self#atflow ~lbl self#pp_init fmt lv
-              else self#at ~lbl self#pp_init fmt lv
+            if self#is_atomic_lv lv
+            then self#atflow ~lbl self#pp_init fmt lv
+            else self#at ~lbl self#pp_init fmt lv
           | Pcfg.Chunk(m,lbl) ->
-              self#atflow ~lbl self#pp_chunk fmt m
+            self#atflow ~lbl self#pp_chunk fmt m
         end
 
     method pp_value fmt e = force <- true ; super#pp_sort fmt e
@@ -232,37 +232,37 @@ class engine (lang : #Plang.engine) =
       | Have p -> self#pp_intro ~step ~clause:"Have:" fmt p
       | When p -> self#pp_intro ~step ~clause:"When:" fmt p
       | Branch(p,sa,sb) ->
-          begin
-            self#pp_intro ~step ~clause:"If" ~dot:"" fmt p ;
-            if not (Conditions.is_true sa)
-            then self#sequence ~clause:"Then" fmt sa ;
-            if not (Conditions.is_true sb)
-            then self#sequence ~clause:"Else" fmt sb ;
-          end
+        begin
+          self#pp_intro ~step ~clause:"If" ~dot:"" fmt p ;
+          if not (Conditions.is_true sa)
+          then self#sequence ~clause:"Then" fmt sa ;
+          if not (Conditions.is_true sb)
+          then self#sequence ~clause:"Else" fmt sb ;
+        end
       | Either cases ->
-          begin
-            pp_open_block self#pp_clause fmt "Either" "{" ;
-            List.iter
-              (fun seq ->
-                 Format.fprintf fmt "@ @[<hv 2>%a" self#pp_clause "Case:" ;
-                 self#block fmt seq ;
-                 Format.fprintf fmt "@]" ;
-              ) cases ;
-            pp_close_block fmt "}" ;
-          end
+        begin
+          pp_open_block self#pp_clause fmt "Either" "{" ;
+          List.iter
+            (fun seq ->
+               Format.fprintf fmt "@ @[<hv 2>%a" self#pp_clause "Case:" ;
+               self#block fmt seq ;
+               Format.fprintf fmt "@]" ;
+            ) cases ;
+          pp_close_block fmt "}" ;
+        end
 
     method pp_step fmt step =
       match step.condition with
       | State _ ->
-          self#pp_condition ~step fmt step.condition
+        self#pp_condition ~step fmt step.condition
       | _ ->
-          begin
-            ( match step.descr with None -> () | Some s ->
-                  spaced self#pp_comment fmt s ) ;
-            Warning.Set.iter (spaced self#pp_warning fmt) step.warn ;
-            List.iter (spaced self#pp_property fmt) step.deps ;
-            spaced (self#pp_condition ~step) fmt step.condition ;
-          end
+        begin
+          ( match step.descr with None -> () | Some s ->
+                spaced self#pp_comment fmt s ) ;
+          Warning.Set.iter (spaced self#pp_warning fmt) step.warn ;
+          List.iter (spaced self#pp_property fmt) step.deps ;
+          spaced (self#pp_condition ~step) fmt step.condition ;
+        end
 
     method private sequence ~clause fmt seq =
       Format.pp_print_space fmt () ; self#pp_block ~clause fmt seq
@@ -339,52 +339,52 @@ class seqengine (lang : #state) =
 
     method private label step = function
       | State _ ->
-          (try Some (lang#label_at ~id:step.id)
-           with Not_found -> None)
+        (try Some (lang#label_at ~id:step.id)
+         with Not_found -> None)
       | _ -> None
 
     method private updates fmt = function
       | None -> ()
       | Some( lbl , upd ) ->
-          if not (Bag.is_empty upd) then
-            Bag.iter ((spaced (lang#pp_update lbl)) fmt) upd
+        if not (Bag.is_empty upd) then
+          Bag.iter ((spaced (lang#pp_update lbl)) fmt) upd
 
     method! pp_condition ~step fmt cond =
       match self#label step cond with
       | None -> super#pp_condition ~step fmt cond
       | Some lbl ->
-          let before = match Pcfg.prev lbl with
-            | [ pre ] when (Pcfg.branching pre) ->
-                let seq = Sigs.{ pre ; post = lbl } in
-                let upd = lang#updates seq in
-                Some(pre,upd)
-            | _ -> None in
-          let after = match Pcfg.next lbl with
-            | [ post ] ->
-                let seq = Sigs.{ pre = lbl ; post } in
-                let upd = lang#updates seq in
-                Some(lbl,upd)
-            | _ -> None in
-          if Pcfg.visible lbl || not (is_nop before) || not (is_nop after)
-             || Wp_parameters.debug_atleast 1
-          then
-            lang#with_mode Qed.Engine.Mterm
-              (fun _mode ->
-                 begin
-                   Format.fprintf fmt "@ @[<hv 0>@[<hv 2>%a {" self#pp_stmt "Stmt" ;
-                   self#updates fmt before ;
-                   if Pcfg.visible lbl then
-                     Format.fprintf fmt "@ %a:" lang#pp_label lbl ;
-                   if Wp_parameters.debug_atleast 1 then
-                     begin
-                       if not (Pcfg.visible lbl) then
-                         Format.fprintf fmt "@ label %a:" lang#pp_label lbl ;
-                       List.iter
-                         (fun lbl -> Format.fprintf fmt "@ from %a;" lang#pp_label lbl)
-                         (Pcfg.prev lbl) ;
-                       List.iter
-                         (fun lbl -> Format.fprintf fmt "@ goto %a;" lang#pp_label lbl)
-                         (Pcfg.next lbl) ;
+        let before = match Pcfg.prev lbl with
+          | [ pre ] when (Pcfg.branching pre) ->
+            let seq = Sigs.{ pre ; post = lbl } in
+            let upd = lang#updates seq in
+            Some(pre,upd)
+          | _ -> None in
+        let after = match Pcfg.next lbl with
+          | [ post ] ->
+            let seq = Sigs.{ pre = lbl ; post } in
+            let upd = lang#updates seq in
+            Some(lbl,upd)
+          | _ -> None in
+        if Pcfg.visible lbl || not (is_nop before) || not (is_nop after)
+           || Wp_parameters.debug_atleast 1
+        then
+          lang#with_mode Qed.Engine.Mterm
+            (fun _mode ->
+               begin
+                 Format.fprintf fmt "@ @[<hv 0>@[<hv 2>%a {" self#pp_stmt "Stmt" ;
+                 self#updates fmt before ;
+                 if Pcfg.visible lbl then
+                   Format.fprintf fmt "@ %a:" lang#pp_label lbl ;
+                 if Wp_parameters.debug_atleast 1 then
+                   begin
+                     if not (Pcfg.visible lbl) then
+                       Format.fprintf fmt "@ label %a:" lang#pp_label lbl ;
+                     List.iter
+                       (fun lbl -> Format.fprintf fmt "@ from %a;" lang#pp_label lbl)
+                       (Pcfg.prev lbl) ;
+                     List.iter
+                       (fun lbl -> Format.fprintf fmt "@ goto %a;" lang#pp_label lbl)
+                       (Pcfg.next lbl) ;
                        (*
                        Pcfg.iter
                          (fun _m v ->
@@ -393,10 +393,10 @@ class seqengine (lang : #state) =
                                 lang#pp_term v lang#pp_value v
                          ) lbl ;
                        *)
-                     end ;
-                   self#updates fmt after ;
-                   Format.fprintf fmt " @]@ }@]" ;
-                 end)
+                   end ;
+                 self#updates fmt after ;
+                 Format.fprintf fmt " @]@ }@]" ;
+               end)
 
     val mutable active = true
     method set_state s = active <- s

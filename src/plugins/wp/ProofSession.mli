@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,7 +29,7 @@ val pp_script_for : Format.formatter -> Wpo.t -> unit
 
 val get : Wpo.t -> script
 val exists : Wpo.t -> bool
-val save : Wpo.t -> Json.t -> unit
+val save : stdout:bool -> Wpo.t -> Json.t -> unit
 val load : Wpo.t -> Json.t
 val remove : Wpo.t -> unit
 

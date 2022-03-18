@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,7 +34,8 @@ end
 module Make(T : Type) :
 sig
 
-  type var = (** Hashconsed *)
+  (** Hashconsed *)
+  type var =
     private {
     vid : int ;
     vbase : string ;
@@ -44,8 +45,12 @@ sig
 
   val dummy : var (** null vid *)
 
-  val hash : var -> int (** [vid] *)
-  val equal : var -> var -> bool (** [==] *)
+  val hash : var -> int
+  (** [vid] *)
+
+  val equal : var -> var -> bool
+  (** [==] *)
+
   val compare : var -> var -> int
   val pretty : Format.formatter -> var -> unit
 

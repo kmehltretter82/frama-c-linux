@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -151,12 +151,12 @@ let update_gotos sid_tbl block =
           DoChildren
         | _ -> DoChildren
       (* speed up: skip non interesting subtrees *)
-      method! vvdec _ = SkipChildren (* via visitCilFunction *)
-      method! vspec _ = SkipChildren (* via visitCilFunction *)
-      method! vcode_annot _ = SkipChildren (* via Code_annot stmt *)
-      method! vexpr _ = SkipChildren (* via stmt such as Return, IF, ... *)
-      method! vlval _ = SkipChildren (* via stmt such as Set, Call, Asm, ... *)
-      method! vattr _ = SkipChildren (* via Asm stmt *)
+      method! vvdec _ = Cil.SkipChildren (* via visitCilFunction *)
+      method! vspec _ = Cil.SkipChildren (* via visitCilFunction *)
+      method! vcode_annot _ = Cil.SkipChildren (* via Code_annot stmt *)
+      method! vexpr _ = Cil.SkipChildren (* via stmt such as Return, IF, ... *)
+      method! vlval _ = Cil.SkipChildren (* via stmt such as Set, Call, Asm, ... *)
+      method! vattr _ = Cil.SkipChildren (* via Asm stmt *)
     end
   in visitCilBlock (goto_updater:>cilVisitor) block
 
@@ -709,6 +709,13 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
       ChangeDoChildrenPost (s, fgh)
 
     | _ -> DoChildren
+
+  method! vinst _ = Cil.SkipChildren
+  method! vexpr _ = Cil.SkipChildren
+  method! vlval _ = Cil.SkipChildren
+  method! vtype _ = Cil.SkipChildren
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren
 end
 
 (* Performs unrolling transformation without using -ulevel option.
@@ -723,7 +730,7 @@ let apply_transformation ?(force=true) nb file =
     in
     let visitor = new do_it global_find_init (force, nb) in
     Kernel.debug ~dkey "Using -ulevel %d option and UNROLL loop pragmas@." nb;
-    visitFramacFileSameGlobals (visitor:>Visitor.frama_c_visitor) file;
+    visitFramacFileFunctions (visitor:>Visitor.frama_c_visitor) file;
     if !ast_has_changed then Ast.mark_as_changed ()
     else begin
       Kernel.debug ~dkey

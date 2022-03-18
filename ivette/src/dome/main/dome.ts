@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2021                                                */
+/*   Copyright (C) 2007-2022                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -49,6 +49,7 @@ import {
   IpcMainEvent,
   shell,
   dialog,
+  nativeTheme,
 } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
 import SYS, * as System from 'dome/system';
@@ -83,6 +84,30 @@ export const { DEVEL } = System;
 
 /** System platform */
 export const { platform } = System;
+
+// --------------------------------------------------------------------------
+// --- Native Theme
+// --------------------------------------------------------------------------
+
+ipcMain.handle('dome.ipc.theme', () => {
+  return nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
+});
+
+nativeTheme.on('updated', () => {
+  broadcast('dome.theme.updated');
+});
+
+function setNativeTheme(theme: string | undefined) {
+  switch (theme) {
+    case 'dark':
+    case 'light':
+    case 'system':
+      nativeTheme.themeSource = theme;
+      return;
+    default:
+      console.warn('[dome] unknown theme', theme);
+  }
+}
 
 // --------------------------------------------------------------------------
 // --- Settings
@@ -174,6 +199,11 @@ function windowSyncSettings(event: IpcMainEvent) {
 
 ipcMain.on('dome.ipc.settings.sync', windowSyncSettings);
 
+function applyThemeSettings(settings: Store) {
+  const theme = settings['dome-color-theme'];
+  if (typeof (theme) === 'string') setNativeTheme(theme);
+}
+
 // --------------------------------------------------------------------------
 // --- Patching Settings
 // --------------------------------------------------------------------------
@@ -207,7 +237,9 @@ function applyStorageSettings(event: IpcMainEvent, args: Patch[]) {
 }
 
 function applyGlobalSettings(event: IpcMainEvent, args: Patch[]) {
-  applyPatches(obtainGlobalSettings(), args);
+  const settings: Store = obtainGlobalSettings();
+  applyPatches(settings, args);
+  applyThemeSettings(settings);
   BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
     const contents = w.webContents;
     if (contents.id !== event.sender.id) {
@@ -449,6 +481,12 @@ function createPrimaryWindow() {
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
   const argv = stripElectronArgv(process.argv);
+
+  // Initialize Theme
+  const globals = obtainGlobalSettings();
+  applyThemeSettings(globals);
+
+  // Create Window
   createBrowserWindow({ title: appName }, argv, wdir);
 }
 
@@ -512,6 +550,7 @@ function showSettingsWindow() {
 
 function restoreDefaultSettings() {
   GlobalSettings = {};
+  nativeTheme.themeSource = 'system';
   if (DEVEL) saveGlobalSettings();
 
   WindowHandles.forEach((handle) => {

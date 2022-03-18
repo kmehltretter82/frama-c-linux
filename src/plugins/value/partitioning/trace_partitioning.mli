@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,12 +26,20 @@ module Make
     (Abstract : Abstractions.Eva)
     (Kf : sig val kf: Cil_types.kernel_function end) :
 sig
-  type state = Abstract.Dom.t     (** The states being partitioned *)
-  type store       (** The storage of all states ever met at a control point *)
-  type tank        (** The set of states that remains to propagate from a
-                       control point. *)
-  type flow        (** A set of states which are currently propagated *)
-  type widening    (** Widening information *)
+  (** The states being partitioned *)
+  type state = Abstract.Dom.t
+
+  (** The storage of all states ever met at a control point *)
+  type store
+
+  (** The set of states that remains to propagate from a control point. *)
+  type tank
+
+  (** A set of states which are currently propagated *)
+  type flow
+
+  (** Widening information *)
+  type widening
 
   (* --- Constructors --- *)
 

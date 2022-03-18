@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2021                                               #
+#  Copyright (C) 2007-2022                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -235,9 +235,6 @@ for header in sorted(chevron_includes, key=str.casefold):
         if fc_support == "unsupported":
             header_warnings += 1
             print(f"- WARNING: included header <{header}> is explicitly unsupported by Frama-C")
-        elif fc_support == "none":
-            header_warnings += 1
-            print(f"- warning: included header <{header}> not currently included in Frama-C's libc")
         else:
             if verbose or debug:
                 c11_or_posix = "C11" if header in c11_headers else "POSIX"

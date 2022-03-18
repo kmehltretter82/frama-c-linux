@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -164,7 +164,6 @@ module Select = struct
   let dyn_t = SlicingTypes.Sl_select.ty
   type set = SlicingCmds.set
   module S = Cil_datatype.Varinfo.Map.Make(SlicingTypes.Fct_user_crit)
-  type selections = S.t
   let dyn_set = S.ty
   (** {2 Journalized selectors } *)
 

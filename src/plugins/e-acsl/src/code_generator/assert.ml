@@ -24,17 +24,18 @@
     general functions to create assertion statements. *)
 
 open Cil_types
+open Analyses_types
+open Analyses_datatype
 
 (** Type holding information about the C variable representing the assertion
     data. *)
-[@@@ warning "-69"]
 type data = {
-  (** Indicates if some data have been registered in the context or not. *)
   data_registered: bool;
-  (** [varinfo] representing the C variable for the assertion data. *)
+  (** Indicates if some data have been registered in the context or not. *)
   data_vi: varinfo;
-  (** [exp] representing a pointer to the C variable for the assertion data. *)
+  (** [varinfo] representing the C variable for the assertion data. *)
   data_ptr: exp;
+  (** [exp] representing a pointer to the C variable for the assertion data. *)
 }
 
 (** External type representing the assertion context. Either [Some data] if we
@@ -186,7 +187,7 @@ let register_term ~loc env ?force t e adata =
   register ~loc env name ?force e adata
 
 let register_pred ~loc env ?force p e adata =
-  if Env.annotation_kind env == Smart_stmt.RTE then
+  if Env.annotation_kind env == RTE then
     (* When translating RTE, we do not want to print the result of the predicate
        because they should be the only predicate in an assertion clause. *)
     adata, env
@@ -194,16 +195,15 @@ let register_pred ~loc env ?force p e adata =
     let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
     register ~loc env name ?force e adata
 
+let register_pred_or_term ~loc env ?force pot e adata =
+  match pot with
+  | PoT_term t -> register_term ~loc env ?force t e adata
+  | PoT_pred p -> register_pred ~loc env ?force p e adata
+
 let kind_to_string loc k =
   Cil.mkString
     ~loc
-    (match k with
-     | Smart_stmt.Assertion -> "Assertion"
-     | Smart_stmt.Precondition -> "Precondition"
-     | Smart_stmt.Postcondition -> "Postcondition"
-     | Smart_stmt.Invariant -> "Invariant"
-     | Smart_stmt.Variant -> "Variant"
-     | Smart_stmt.RTE -> "RTE")
+    (Format.asprintf "%a" Annotation_kind.pretty k)
 
 let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env predicate_e =
   let env = Env.push env in

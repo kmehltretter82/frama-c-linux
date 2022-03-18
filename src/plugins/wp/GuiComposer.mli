@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,7 +28,9 @@ class composer : GuiSequent.focused ->
   object
 
     method clear : unit
-    method connect : (unit -> unit) -> unit (** request-for-update event *)
+    method connect : (unit -> unit) -> unit
+    (** request-for-update event *)
+
     method print :
       GuiTactic.composer -> quit:(unit -> unit) -> Format.formatter -> unit
 
@@ -38,7 +40,9 @@ class browser : GuiSequent.focused ->
   object
 
     method clear : unit
-    method connect : (unit -> unit) -> unit (** request-for-update event *)
+    method connect : (unit -> unit) -> unit
+    (** request-for-update event *)
+
     method print :
       GuiTactic.browser -> quit:(unit -> unit) -> Format.formatter -> unit
 

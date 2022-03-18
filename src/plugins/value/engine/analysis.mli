@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,10 +31,12 @@ module type Results = sig
   val get_global_state: unit -> state or_bottom
   val get_stmt_state : after:bool -> stmt -> state or_bottom
   val get_stmt_state_by_callstack:
+    ?selection:callstack list ->
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
   val get_initial_state:
     kernel_function -> state or_bottom
   val get_initial_state_by_callstack:
+    ?selection:callstack list ->
     kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
   val eval_expr : state -> exp -> value evaluated
@@ -72,7 +74,7 @@ val register_hook: ((module S) -> unit) -> unit
     is changed. This happens when a new analysis is run with different
     abstractions than before, or when the current project is changed. *)
 
-type computation_state = NotComputed | Computing | Computed
+type computation_state = NotComputed | Computing | Computed | Aborted
 (** Computation state of the analysis. *)
 
 val current_computation_state : unit -> computation_state
@@ -103,6 +105,7 @@ val is_computed : unit -> bool
 
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
+
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t

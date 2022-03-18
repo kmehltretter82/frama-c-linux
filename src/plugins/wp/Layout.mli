@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,7 +41,8 @@ type offset =
   | Field of fieldinfo
   | Index of typ * int
 
-type lvalue = (** Generalized l-values *)
+(** Generalized l-values *)
+type lvalue =
   | Eval of exp
   | Tval of term
   | Assigned of stmt

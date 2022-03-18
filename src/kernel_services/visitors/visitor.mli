@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -114,6 +114,13 @@ val visitFramacFile: frama_c_visitor -> file -> unit
     efficient for long files.
     @plugin development guide *)
 val visitFramacFileSameGlobals: frama_c_visitor -> file -> unit
+
+(** Visit all function definitions of a file. Use this function instead of
+    {!Visitor.visitFramacFile} or {!Visitor.visitFramacFileSameGlobals} if your
+    visitor only needs function bodies to avoid visiting other globals,
+    including libc functions and their specifications.
+    @since Frama-c+dev *)
+val visitFramacFileFunctions: frama_c_visitor -> file -> unit
 
 (** Visit a global.
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,8 +41,12 @@ end
 
 module type With_Under_Approximation = sig
   type t
-  val link: t -> t -> t (** under-approximation of union *)
-  val meet: t -> t -> t or_bottom (** under-approximation of intersection *)
+
+  val link: t -> t -> t
+  (** under-approximation of union *)
+
+  val meet: t -> t -> t or_bottom
+  (** under-approximation of intersection *)
 end
 
 module type With_Diff = sig

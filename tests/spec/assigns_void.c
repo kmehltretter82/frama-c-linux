@@ -1,6 +1,6 @@
 /* run.config
  OPT: -print -kernel-warn-key=annot-error=active
-PLUGIN: eva,scope
+PLUGIN: eva,inout,scope
  OPT: -eva @EVA_CONFIG@ -main g -print -no-annot
  */
 //@ assigns *x;

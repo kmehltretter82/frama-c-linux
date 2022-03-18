@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -78,56 +78,48 @@ type fct_info = {
   (** calls in slices that call source fct *)
 }
 
-and
-  (** to represent where a function is called. *)
-  called_by = (fct_slice * Cil_types.stmt) list
+(** to represent where a function is called. *)
+and called_by = (fct_slice * Cil_types.stmt) list
 
-and
-  (** Function slice :
+(** Function slice :
       created as soon as there is a criterion to compute it,
       even if the slice itself hasn't been computed yet.
-  *)
-  fct_slice  = {
+*)
+and fct_slice  = {
   ff_fct : fct_info ;
   ff_id : int ;
   mutable ff_marks : ff_marks;
   mutable ff_called_by : called_by
 }
 
-and
-  (** [fct_id] is used to identify either a source function or a sliced one.*)
-  fct_id =
+(** [fct_id] is used to identify either a source function or a sliced one.*)
+and fct_id =
   | FctSrc of fct_info  (** source function *)
   | FctSliced of fct_slice (** sliced function *)
 
-and
-  called_fct =
+and called_fct =
   | CallSrc of fct_info option
   (** call the source function (might be unknown if the call uses pointer) *)
   | CallSlice of fct_slice
 
-and
-  (** information about a call in a slice which gives the function to call *)
-  call_info = called_fct option
+(** information about a call in a slice which gives the function to call *)
+and call_info = called_fct option
 
-and
-  (** main part of a slice = mapping between the function elements
-    * and information about them in the slice. *)
-  marks_index = (pdg_mark, call_info) PdgIndex.FctIndex.t
+(** main part of a slice = mapping between the function elements
+    and information about them in the slice. *)
+and marks_index = (pdg_mark, call_info) PdgIndex.FctIndex.t
 
-and
-  ff_marks = PdgTypes.Pdg.t * marks_index
+and ff_marks = PdgTypes.Pdg.t * marks_index
 
-and
-  project = { functions : fct_info Varinfo.Hashtbl.t;
-              mutable actions : criterion list;
-            }
+and project = {
+  functions : fct_info Varinfo.Hashtbl.t;
+  mutable actions : criterion list;
+}
 
-and
-  (** Slicing criterion at the application level.
+(** Slicing criterion at the application level.
       When applied, they are translated into [fct_criterion]
-  *)
-  appli_criterion =
+*)
+and appli_criterion =
   | CaGlobalData of Locations.Zone.t
   (** select all that is necessary to compute the given location. *)
   | CaCall of fct_info
@@ -136,38 +128,30 @@ and
    * to all the function callers. *)
   | CaOther
 
-and
-  (** Base criterion for the functions. These are the only one that can
-      really generate function slices. All the other criteria are
-      translated in more basic ones.
-      Note that to build such a base criterion, the PDG has to be already
-      computed.
-  *)
-  fct_base_criterion = pdg_mark PdgMarks.select
+(** Base criterion for the functions. These are the only one that can
+    really generate function slices. All the other criteria are
+    translated in more basic ones.
+    Note that to build such a base criterion, the PDG has to be already
+    computed.
+*)
+and fct_base_criterion = pdg_mark PdgMarks.select
 
-and
-  (** Used to identify a location (zone) at a given program point.
+(** Used to identify a location (zone) at a given program point.
       * The boolean tell if the point is before (true) or after the statement *)
-  loc_point = Cil_types.stmt * Locations.Zone.t * bool
+and loc_point = Cil_types.stmt * Locations.Zone.t * bool
 
-(** List of pdg nodes to be selected (see {!fct_user_crit})*)
-(*type nodes = pdg_node list*)
+(** [node_or_dpds] tells how we want to select nodes,
+    or some of their dependencies (see {!fct_user_crit}). *)
+and node_or_dpds = CwNode | CwAddrDpds | CwDataDpds | CwCtrlDpds
 
-and
-  (** [node_or_dpds] tells how we want to select nodes,
-      * or some of their dependencies (see {!fct_user_crit}). *)
-  node_or_dpds = CwNode | CwAddrDpds | CwDataDpds | CwCtrlDpds
-
-and
-  (** Tells which marks we want to put in the slice of a function *)
-  fct_user_crit =
-  (* | CuNodes of (pdg_node list * (node_or_dpds * pdg_mark) list) list *)
+(** Tells which marks we want to put in the slice of a function *)
+and fct_user_crit =
   | CuSelect of pdg_mark PdgMarks.select
   | CuTop of pdg_mark (** the function has probably no PDG,
-                            but we nonetheless give a mark to propagate *)
-and
-  (** kinds of actions that can be apply to a function *)
-  fct_crit =
+                          but we nonetheless give a mark to propagate *)
+
+(** kinds of actions that can be apply to a function *)
+and fct_crit =
   | CcUserMark of fct_user_crit
   (** add marks to a slice *)
   | CcChooseCall of Cil_types.stmt
@@ -189,9 +173,9 @@ and
   | CcPropagate of (pdg_mark PdgMarks.select)
   (** simply propagate the given marks *)
   | CcExamineCalls of pdg_mark PdgMarks.info_called_outputs
-and
-  (** Slicing criterion for a function.  *)
-  fct_criterion =  {
+
+(** Slicing criterion for a function.  *)
+and fct_criterion =  {
   cf_fct : fct_id ;
   (** Identification of the {b RESULT} of this filter.
    * When it a a slice, it might be an existing slice that will be modified,
@@ -202,10 +186,10 @@ and
   *)
   cf_info : fct_crit
 }
-and
-  (** A slicing criterion is either an application level criterion,
-    * or a function level one.  *)
-  criterion =
+
+(** A slicing criterion is either an application level criterion,
+    or a function level one.  *)
+and criterion =
     CrAppli of appli_criterion | CrFct of fct_criterion
 
 (** {2 Internals values} *)

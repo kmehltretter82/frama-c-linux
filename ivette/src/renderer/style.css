@@ -10,7 +10,7 @@
 }
 
 .component-info {
-    color: #555 ;
+    color: var(--text) ;
     min-width: 50px;
     padding-top: 4px;
     font-size: smaller;
@@ -26,7 +26,7 @@
 }
 
 .labview-stock:hover {
-    background: #ccc ;
+    background: var(--background-profound);
 }
 
 .labview-stock:hover * {
@@ -36,19 +36,19 @@
 .labview-stock.dome-dragging
 {
     border-radius: 4px ;
-    background: #ccc ;
+    background: var(--background-profound);
     border: thin solid black ;
 }
 
 .labview-content
 {
-    background: #e6e6e6 ;
+    background: var(--background);
 }
 
 .labview-titlebar
 {
-    background: #ccc ;
-    height: 24px ;
+    background: var(--background-profound);
+    height: 24px
 }
 
 .labview-handle
@@ -59,11 +59,11 @@
 
 .labview-close:hover
 {
-    fill: red ;
+    fill: var(--negative-button-color) ;
 }
 
-.dome-window-active .labview-icon {
-    fill: #7d7d7d ;
+.labview-icon {
+    fill: var(--info-text);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -208,7 +208,9 @@ module type Make_input = sig
       value specified in module type {!S}. *)
 
   val structural_descr: Structural_descr.t
-  val reprs: t list (** Must be non-empty.*)
+  val reprs: t list
+  (** Must be non-empty.*)
+
   val equal: t -> t -> bool
   val compare: t -> t -> int
   val hash: t -> int

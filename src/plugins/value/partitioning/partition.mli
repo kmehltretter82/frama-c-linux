@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -50,7 +50,9 @@ type call_return_policy = {
 
 module Key : sig
   include Datatype.S_with_collections with type t = key
-  val empty : t (** Initial key: no partitioning. *)
+  val empty : t
+  (** Initial key: no partitioning. *)
+
   val exceed_rationing: t -> bool
   val combine : policy:call_return_policy -> caller:t -> callee:t -> t
   (** Recombinaison of keys after a call *)

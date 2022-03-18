@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Aorai plug-in of Frama-C.                        */
 /*                                                                        */
-/*  Copyright (C) 2007-2021                                               */
+/*  Copyright (C) 2007-2022                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*    INRIA (Institut National de Recherche en Informatique et en         */
@@ -100,7 +100,10 @@ let add_metavariable map (name,typename) =
   in
   if Datatype.String.Map.mem name map then
     Aorai_option.abort "The metavariable %s is declared twice" name;
-  let vi = Cil.makeGlobalVar (Data_for_aorai.get_fresh ("aorai_" ^ name)) ty in
+  let vi =
+    Cil.makeGlobalVar
+      ~ghost:true (Data_for_aorai.get_fresh ("aorai_" ^ name)) ty
+  in
   Datatype.String.Map.add name vi map
 
 let check_state st =

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,21 +41,29 @@ class type pattern =
     method get_after : ?offset:int -> int -> string
     (** [get_after ~offset:p k] returns the end of the message
                 starting [p] characters after the end of group [k]. *)
+
     method get_string : int -> string
     method get_int : int -> int
     method get_float : int -> float
   end
 
-val p_group : string -> string (** Put pattern in group [\(p\)] *)
-val p_int : string (** Int group pattern [\([0-9]+\)] *)
-val p_float : string (** Float group pattern [\([0-9.]+\)] *)
-val p_string : string (** String group pattern ["\(...\)"] *)
-val p_until_space : string (** No space group pattern "\\([^ \t\n]*\\)" *)
+val p_group : string -> string
+(** Put pattern in group [\(p\)] *)
+
+val p_int : string
+(** Int group pattern [\([0-9]+\)] *)
+
+val p_float : string
+(** Float group pattern [\([0-9.]+\)] *)
+
+val p_string : string
+(** String group pattern ["\(...\)"] *)
+
+val p_until_space : string
+(** No space group pattern "\\([^ \t\n]*\\)" *)
 
 val location : string -> int -> Lexing.position
 
-val timeout : smoke:bool -> int option -> int
-val stepout : int option -> int
 type logs = [ `OUT | `ERR | `BOTH ]
 
 class virtual command : string ->
@@ -87,7 +95,6 @@ val spawn :
   ?pool:Task.pool ->
   all:bool -> smoke:bool ->
   ('a * bool Task.task) list -> unit
-
 (** Spawn all the tasks over the server and retain the first 'validated' one.
     The callback [monitor] is called with [Some] at first success, and [None]
     if none succeed. An option [pool] task can be passed to register

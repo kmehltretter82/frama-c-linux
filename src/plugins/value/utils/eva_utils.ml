@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -104,7 +104,7 @@ module DegenerationPoints =
     (struct
       let name = "Eva_utils.Degeneration"
       let size = 17
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Self.state ]
     end)
 
 let protect_only_once = ref true

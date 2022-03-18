@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -99,7 +99,7 @@ module State_var =
     end)
 
 let get_state_var =
-  let add_var state = Cil.makeVarinfo true false state.name Cil.intType in
+  let add_var state = Cil.makeGlobalVar ~ghost:true state.name Cil.intType in
   State_var.memo add_var
 
 let get_state_logic_var state = Cil.cvar_to_lvar (get_state_var state)
@@ -339,7 +339,9 @@ let pebble_set_at li lab =
 let memo_multi_state st =
   match st.multi_state with
   | None ->
-    let aux = Cil.makeGlobalVar (get_fresh "aorai_aux") Cil.intType in
+    let aux =
+      Cil.makeGlobalVar ~ghost:true (get_fresh "aorai_aux") Cil.intType
+    in
     let laux = Cil.cvar_to_lvar aux in
     let set = Cil_const.make_logic_info (get_fresh (st.name ^ "_pebble")) in
     let typ = Logic_const.make_set_type (Ctype Cil.intType) in
@@ -572,7 +574,7 @@ let memo_aux_variable tr counter used_prms vi =
       | Some _ -> TArray(vi.vtype,None,[])
     in
     let my_var =
-      Cil.makeGlobalVar (get_fresh ("aorai_" ^ vi.vname)) my_type
+      Cil.makeGlobalVar ~ghost:true (get_fresh ("aorai_" ^ vi.vname)) my_type
     in
     add_aux_variable my_var;
     let my_lvar = Cil.cvar_to_lvar my_var in
@@ -1156,7 +1158,9 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
           else Cil.intType
         in (* We won't always need a counter *)
         lazy (
-          let vi = Cil.makeGlobalVar (get_fresh "aorai_counter") ty in
+          let
+            vi = Cil.makeGlobalVar ~ghost:true (get_fresh "aorai_counter") ty
+          in
           add_aux_variable vi;
           vi
         )
@@ -1358,6 +1362,7 @@ let type_trans auto metaenv env tr =
         let start = tr.start in
         let count = (* TODO: make it an integer. *)
           Cil.makeGlobalVar
+            ~ghost:true
             (get_fresh ("aorai_cnt_" ^ start.name)) Cil.intType
         in
         add_aux_variable count;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,6 +36,7 @@ val is_non_terminating_instr: stmt -> bool
     statements that are instructions. *)
 
 (** {2 Results} *)
+
 [@@@ api_start]
 type results
 
@@ -47,6 +48,7 @@ val change_callstacks:
 (** Change the callstacks for the results for which this is meaningful.
     For technical reasons, the top of the callstack must currently
     be preserved. *)
+
 [@@@ api_end]
 
 (*

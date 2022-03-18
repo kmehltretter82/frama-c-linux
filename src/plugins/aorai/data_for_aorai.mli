@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -85,6 +85,7 @@ val cst_one: expression
 val cst_zero: expression
 
 (** {2 Utilities for parsed_conditions } *)
+
 (** [true] iff the expression is 1 *)
 val is_cst_one: expression -> bool
 

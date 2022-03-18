@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -149,8 +149,8 @@ struct
                     [ (Trigger.of_term value1 :: triggers );
                       (Trigger.of_term value2 :: triggers ) ]
                 in
-                let l_name = Pretty_utils.sfprintf "%s_%s_%a%d"
-                    prefix name Chunk.pretty chunk i in
+                let l_name = Pretty_utils.sfprintf "%s_%s_%s%d"
+                    prefix name (Chunk.basename_of_chunk chunk) i in
                 let l_lemma = F.p_hyps conditions (p_equal value1 value2) in
                 Definitions.define_lemma {
                   l_kind = Admit ;
@@ -275,13 +275,13 @@ struct
             match c.cfields with
             | None -> Definitions.Logic result
             | Some fields ->
-                let def = List.map
-                    (fun f ->
-                       Cfield (f, Info.kind) ,
-                       Info.load sigma (object_of f.ftype) (M.field loc f)
-                    ) fields
-                in
-                Definitions.Function( result , Def , e_record def )
+              let def = List.map
+                  (fun f ->
+                     Cfield (f, Info.kind) ,
+                     Info.load sigma (object_of f.ftype) (M.field loc f)
+                  ) fields
+              in
+              Definitions.Function( result , Def , e_record def )
           in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
@@ -443,11 +443,11 @@ struct
           let def = match c.cfields with
             | None -> Logic Lang.t_prop
             | Some fields ->
-                let def = p_all
-                    (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
-                    fields
-                in
-                Predicate(Def, def)
+              let def = p_all
+                  (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
+                  fields
+              in
+              Predicate(Def, def)
           in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
@@ -544,15 +544,15 @@ struct
   let initialized sigma = function
     | Rloc(obj, loc) -> initialized_loc sigma obj loc
     | Rrange(loc, obj, Some low, Some up) ->
-        let x = Lang.freshvar ~basename:"i" Lang.t_int in
-        let v = e_var x in
-        let hyps = [ p_leq low v ; p_leq v up] in
-        let loc = M.shift loc obj v in
-        p_forall [x] (p_hyps hyps (initialized_loc sigma obj loc))
+      let x = Lang.freshvar ~basename:"i" Lang.t_int in
+      let v = e_var x in
+      let hyps = [ p_leq low v ; p_leq v up] in
+      let loc = M.shift loc obj v in
+      p_forall [x] (p_hyps hyps (initialized_loc sigma obj loc))
     | Rrange(_l, _, low, up) ->
-        Wp_parameters.abort ~current:true
-          "Invalid infinite range @[<hov 2>+@,(%a@,..%a)@]"
-          Vset.pp_bound low Vset.pp_bound up
+      Wp_parameters.abort ~current:true
+        "Invalid infinite range @[<hov 2>+@,(%a@,..%a)@]"
+        Vset.pp_bound low Vset.pp_bound up
 
   module INIT_LOADER =
     LOADER_GEN
@@ -621,16 +621,16 @@ struct
   let stored seq obj loc value =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-        [ updated_atom seq obj loc value ]
+      [ updated_atom seq obj loc value ]
     | C_comp _ | C_array _ ->
-        Set(load_value seq.post obj loc, value) :: havoc seq obj loc
+      Set(load_value seq.post obj loc, value) :: havoc seq obj loc
 
   let stored_init seq obj loc value =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-        [ updated_init_atom seq loc value ]
+      [ updated_init_atom seq loc value ]
     | C_comp _ | C_array _ ->
-        Set(load_init seq.post obj loc, value) :: havoc_init seq obj loc
+      Set(load_init seq.post obj loc, value) :: havoc_init seq obj loc
 
   let copied s obj p q = stored s obj p (load_value s.pre obj q)
 
@@ -643,12 +643,12 @@ struct
   let assigned_loc seq obj loc =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-        let value = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
-        let init = Lang.freshvar ~basename:"i" (Lang.init_of_object obj) in
-        [ updated_init_atom seq loc (e_var init) ;
-          updated_atom seq obj loc (e_var value) ]
+      let value = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
+      let init = Lang.freshvar ~basename:"i" (Lang.init_of_object obj) in
+      [ updated_init_atom seq loc (e_var init) ;
+        updated_atom seq obj loc (e_var value) ]
     | C_comp _ | C_array _ ->
-        havoc seq obj loc @ havoc_init seq obj loc
+      havoc seq obj loc @ havoc_init seq obj loc
 
   let assigned_range s obj l a b =
     havoc_length s obj (M.shift l obj a) (e_range a b) @
@@ -659,23 +659,23 @@ struct
     match sloc with
     | Sloc loc -> assigned_loc seq obj loc
     | Sdescr(xs,loc,condition) ->
-        let ps = ref [] in
-        Domain.iter
-          (fun c ->
-             let m1 = Sigma.value seq.pre c in
-             let m2 = Sigma.value seq.post c in
-             let p,separated,equal = M.eqmem_forall obj loc c m1 m2 in
-             let sep_from_all = F.p_forall xs (F.p_imply condition separated) in
-             let phi = F.p_forall p (F.p_imply sep_from_all equal) in
-             ps := Assert phi :: !ps
-          ) (domain obj loc) ;
-        !ps
+      let ps = ref [] in
+      Domain.iter
+        (fun c ->
+           let m1 = Sigma.value seq.pre c in
+           let m2 = Sigma.value seq.post c in
+           let p,separated,equal = M.eqmem_forall obj loc c m1 m2 in
+           let sep_from_all = F.p_forall xs (F.p_imply condition separated) in
+           let phi = F.p_forall p (F.p_imply sep_from_all equal) in
+           ps := Assert phi :: !ps
+        ) (domain obj loc) ;
+      !ps
     | Sarray(loc,obj,n) ->
-        assigned_range seq obj loc e_zero (e_int (n-1))
+      assigned_range seq obj loc e_zero (e_int (n-1))
     | Srange(loc,obj,u,v) ->
-        let a = match u with Some a -> a | None -> e_zero in
-        let b = match v with Some b -> b | None -> M.last seq.pre obj loc in
-        assigned_range seq obj loc a b
+      let a = match u with Some a -> a | None -> e_zero in
+      let b = match v with Some b -> b | None -> M.last seq.pre obj loc in
+      assigned_range seq obj loc a b
 
   (* -------------------------------------------------------------------------- *)
 

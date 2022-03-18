@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -45,6 +45,7 @@ module ComputationState = struct
     | Analysis.NotComputed -> `String "not_computed"
     | Computing -> `String "computing"
     | Computed -> `String "computed"
+    | Aborted -> `String "aborted"
 end
 
 let _computation_signal =

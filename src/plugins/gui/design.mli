@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -113,6 +113,7 @@ class type main_window_extension_points = object
       You should not directly use the buffer contained in the annot_window
       to add text. Use the method [pretty_information].
   *)
+
   method pretty_information : 'a. ?scroll:bool -> ('a, Format.formatter, unit) format -> 'a
   (** Pretty print a message in the [annot_window],
       optionally scrolling it to the beginning of the message. *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -67,9 +67,12 @@ type config = {
 }
 
 val current : unit -> config (** Current parameters *)
+
 val default : config (** all None *)
 
-val get_timeout : smoke:bool -> config -> int (** 0 means no-timeout *)
+val get_timeout : ?kf:Kernel_function.t -> smoke:bool -> config -> int
+(** 0 means no-timeout *)
+
 val get_stepout : config -> int (** 0 means no-stepout *)
 
 (** {2 Results} *)
@@ -124,6 +127,7 @@ val pp_result_qualif : ?updating:bool -> prover -> result ->
   Format.formatter -> unit
 
 val compare : result -> result -> int (* best is minimal *)
+
 val merge : result -> result -> result
 val choose : result -> result -> result
 val best : result list -> result

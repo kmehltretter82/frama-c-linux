@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -43,8 +43,12 @@ val load_file:
     a reverse mapping from the original source to the Cil source, and not
     always exact. *)
 
-val select_file: t -> Datatype.Filepath.t -> unit (** Selection by page filename *)
-val select_name: t -> string -> unit (** Selection by page title *)
+val select_file: t -> Datatype.Filepath.t -> unit
+(** Selection by page filename *)
+
+val select_name: t -> string -> unit
+(** Selection by page title *)
+
 val get_current_source_view : t -> GSourceView.source_view
 (** Returns the source viewer for the currently displayed tab *)
 

@@ -618,7 +618,8 @@ module EnumMerging =
            (e2.ename <-
               fst
                 (Alpha.newAlphaName
-                   aeAlpha None e2.ename Cil_datatype.Location.unknown);
+                   ~alphaTable:aeAlpha ~undolist:None ~lookupname:e2.ename
+                   ~data:Cil_datatype.Location.unknown);
             Kernel.debug ~dkey:Kernel.dkey_linker
               "new anonymous name %s" e2.ename;
             false))))
@@ -1190,113 +1191,112 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
     let oldfidx = oldcinode.nfidx in
     let ci = cinode.ndata in
     let fidx = cinode.nfidx in
-
-    match oldci.cfields, ci.cfields with
-    | _, None -> () (* new struct is not defined, just keep using the old one *)
-    | None, Some fields ->
-      (* old struct is not defined, but new one is. Use its fields. *)
-      oldci.cfields <- Some fields
-    | Some oldfields, Some fields ->
-      let old_len = List.length oldfields in
-      let len = List.length fields in
-      if old_len <> len then begin
-        let curLoc = CurrentLoc.get () in (* d_global blows this away.. *)
-        CurrentLoc.set curLoc;
-        let aggregate_name = if cstruct then "struct" else "union" in
-        let msg = Printf.sprintf
-            "different number of fields in %s %s and %s %s: %d != %d."
-            aggregate_name oldci.cname aggregate_name ci.cname
-            old_len len
-        in
-        raise (Failure msg)
-      end;
-      (* We check that they are defined in the same way. While doing this there
-       * might be recursion and we have to watch for going into an infinite
-       * loop. So we add the assumption that they are equal *)
-      let newrep, undo = union oldcinode cinode in
-      (* We check the fields but watch for Failure. We only do the check when
-       * the lengths are the same. Due to the code above this the other
-       * possibility is that one of the length is 0, in which case we reuse the
-       * old compinfo. *)
-      begin
-        try
-          (* must_check_offsets indicates that composite type attributes are
-             different, which may impact field offsets *)
-          let mustCheckOffsets =
-            if equal_attributes_for_merge ci.cattr oldci.cattr then false
-            else if equalModuloPackedAlign ci.cattr oldci.cattr then true
-            else raise
-                (Failure
-                   (let attrs = drop_attributes_for_merge ci.cattr in
-                    let oldattrs = drop_attributes_for_merge oldci.cattr in
-                    (* we do not use Cil_datatype.Attributes.pretty because it
-                       may not print some relevant attributes *)
-                    let pp_attrs =
-                      Pretty_utils.pp_list ~sep:", " Printer.pp_attribute
-                    in
-                    Format.asprintf
-                      "different/incompatible composite type attributes: \
-                       [%a] vs [%a]"
-                      pp_attrs attrs pp_attrs oldattrs))
-          in
-          List.iter2
-            (fun oldf f ->
-               checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f oldf;
-               (* Make sure the types are compatible *)
-               (* Note: 6.2.7 §1 states that the names of the fields
-                  should be the same.
-                  We do not force this for now, but could do it. *)
-               let newtype =
-                 combineTypes CombineOther oldfidx oldf.ftype fidx f.ftype
-               in
-               (* Change the type in the representative *)
-               oldf.ftype <- newtype)
-            oldfields fields
-        with Failure reason ->
-          (* Our assumption was wrong. Forget the isomorphism *)
-          undo ();
-          let fields_old =
-            Format.asprintf "%a"
-              Cil_printer.pp_global
-              (GCompTag(oldci, Cil_datatype.Location.unknown))
-          in
-          let fields =
-            Format.asprintf "%a"
-              Cil_printer.pp_global
-              (GCompTag(ci, Cil_datatype.Location.unknown))
-          in
-          let fullname_old = compFullName oldci in
-          let fullname = compFullName ci in
-          let msg =
-            match fullname_old = fullname,
-                  fields_old = fields (* Could also use a special comparison *)
-            with
-              true, true ->
-              Format.asprintf
-                "Definitions of %s are not isomorphic. Reason follows:@\n@?%s"
-                fullname_old reason
-            | false, true ->
-              Format.asprintf
-                "%s and %s are not isomorphic. Reason follows:@\n@?%s"
-                fullname_old fullname reason
-            | true, false ->
-              Format.asprintf
-                "Definitions of %s are not isomorphic. \
-                 Reason follows:@\n@?%s@\n@?%s@?%s"
-                fullname_old reason
-                fields_old fields
-            | false, false ->
-              Format.asprintf
-                "%s and %s are not isomorphic. \
-                 Reason follows:@\n@?%s@\n@?%s@?%s"
-                fullname_old fullname reason
-                fields_old fields
-          in
-          raise (Failure msg)
-      end;
-      (* We get here when we succeeded checking that they are equal, or one of
-       * them was empty *)
-      newrep.ndata.cattr <- addAttributes oldci.cattr ci.cattr
+    (* We check that they are defined in the same way. While doing this there
+     * might be recursion and we have to watch for going into an infinite
+     * loop. So we add the assumption that they are equal *)
+    let newrep, undo = union oldcinode cinode in
+    (match oldci.cfields, ci.cfields with
+     | _, None -> () (* new struct is not defined, just keep using the old one *)
+     | None, Some fields ->
+       (* old struct is not defined, but new one is. Use its fields. *)
+       oldci.cfields <- Some fields
+     | Some oldfields, Some fields ->
+       let old_len = List.length oldfields in
+       let len = List.length fields in
+       if old_len <> len then begin
+         let curLoc = CurrentLoc.get () in (* d_global blows this away.. *)
+         CurrentLoc.set curLoc;
+         let aggregate_name = if cstruct then "struct" else "union" in
+         let msg = Printf.sprintf
+             "different number of fields in %s %s and %s %s: %d != %d."
+             aggregate_name oldci.cname aggregate_name ci.cname
+             old_len len
+         in
+         raise (Failure msg)
+       end;
+       (* We check the fields but watch for Failure. We only do the check when
+        * the lengths are the same. Due to the code above this the other
+        * possibility is that one of the length is 0, in which case we reuse the
+        * old compinfo. *)
+       begin
+         try
+           (* must_check_offsets indicates that composite type attributes are
+              different, which may impact field offsets *)
+           let mustCheckOffsets =
+             if equal_attributes_for_merge ci.cattr oldci.cattr then false
+             else if equalModuloPackedAlign ci.cattr oldci.cattr then true
+             else raise
+                 (Failure
+                    (let attrs = drop_attributes_for_merge ci.cattr in
+                     let oldattrs = drop_attributes_for_merge oldci.cattr in
+                     (* we do not use Cil_datatype.Attributes.pretty because it
+                        may not print some relevant attributes *)
+                     let pp_attrs =
+                       Pretty_utils.pp_list ~sep:", " Printer.pp_attribute
+                     in
+                     Format.asprintf
+                       "different/incompatible composite type attributes: \
+                        [%a] vs [%a]"
+                       pp_attrs attrs pp_attrs oldattrs))
+           in
+           List.iter2
+             (fun oldf f ->
+                checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f oldf;
+                (* Make sure the types are compatible *)
+                (* Note: 6.2.7 §1 states that the names of the fields
+                   should be the same.
+                   We do not force this for now, but could do it. *)
+                let newtype =
+                  combineTypes CombineOther oldfidx oldf.ftype fidx f.ftype
+                in
+                (* Change the type in the representative *)
+                oldf.ftype <- newtype)
+             oldfields fields
+         with Failure reason ->
+           (* Our assumption was wrong. Forget the isomorphism *)
+           undo ();
+           let fields_old =
+             Format.asprintf "%a"
+               Cil_printer.pp_global
+               (GCompTag(oldci, Cil_datatype.Location.unknown))
+           in
+           let fields =
+             Format.asprintf "%a"
+               Cil_printer.pp_global
+               (GCompTag(ci, Cil_datatype.Location.unknown))
+           in
+           let fullname_old = compFullName oldci in
+           let fullname = compFullName ci in
+           let msg =
+             match fullname_old = fullname,
+                   fields_old = fields (* Could also use a special comparison *)
+             with
+               true, true ->
+               Format.asprintf
+                 "Definitions of %s are not isomorphic. Reason follows:@\n@?%s"
+                 fullname_old reason
+             | false, true ->
+               Format.asprintf
+                 "%s and %s are not isomorphic. Reason follows:@\n@?%s"
+                 fullname_old fullname reason
+             | true, false ->
+               Format.asprintf
+                 "Definitions of %s are not isomorphic. \
+                  Reason follows:@\n@?%s@\n@?%s@?%s"
+                 fullname_old reason
+                 fields_old fields
+             | false, false ->
+               Format.asprintf
+                 "%s and %s are not isomorphic. \
+                  Reason follows:@\n@?%s@\n@?%s@?%s"
+                 fullname_old fullname reason
+                 fields_old fields
+           in
+           raise (Failure msg)
+       end);
+    (* We get here when we succeeded checking that they are equal, or one of
+     * them was empty *)
+    newrep.ndata.cattr <- addAttributes oldci.cattr ci.cattr
   end
 
 (* Match two enuminfos and throw a Failure if they do not match *)
@@ -1391,9 +1391,12 @@ let update_compinfo ci =
     | Some (loc,_) -> loc
     | None -> Cil_datatype.Location.unknown
   in
-  Alpha.registerAlphaName sAlpha ci.cname loc;
+  Alpha.registerAlphaName ~alphaTable:sAlpha ~lookupname:ci.cname ~data:loc;
   let orig_name = if ci.corig_name = "" then ci.cname else ci.corig_name in
-  let n, _ = Alpha.newAlphaName sAlpha None orig_name loc in
+  let n, _ =
+    Alpha.newAlphaName ~alphaTable:sAlpha ~undolist:None
+      ~lookupname:orig_name ~data:loc
+  in
   let oldnode = PlainMerging.find true node in
   if oldnode == node then begin
     let node =
@@ -1429,8 +1432,11 @@ let rec update_type_repr t =
       | Some (loc,_) -> loc
       | None -> Cil_datatype.Location.unknown
     in
-    Alpha.registerAlphaName vtAlpha ti.tname loc;
-    let n,_ = Alpha.newAlphaName vtAlpha None ti.torig_name loc in
+    Alpha.registerAlphaName ~alphaTable:vtAlpha ~lookupname:ti.tname ~data:loc;
+    let n,_ =
+      Alpha.newAlphaName ~alphaTable:vtAlpha ~undolist:None
+        ~lookupname:ti.torig_name ~data:loc
+    in
     let oldnode = PlainMerging.find true node in
     if oldnode == node then begin
       let node =
@@ -1670,7 +1676,8 @@ let oneFilePass1 (f:file) : unit =
    * with the same name have been encountered before and we merge those types
    * *)
   let matchVarinfo (vi: varinfo) (loc, _ as l) =
-    ignore (Alpha.registerAlphaName vtAlpha vi.vname (CurrentLoc.get ()));
+    ignore (Alpha.registerAlphaName ~alphaTable:vtAlpha
+              ~lookupname:vi.vname ~data:(CurrentLoc.get ()));
     (* Make a node for it and put it in vEq *)
     let vinode =
       PlainMerging.mkSelfNode vEq vSyn !currentFidx vi.vname vi (Some l)
@@ -1841,7 +1848,8 @@ let oneFilePass1 (f:file) : unit =
         let orig_name =
           if ei.eorig_name = "" then ei.ename else ei.eorig_name
         in
-        ignore (Alpha.newAlphaName aeAlpha None orig_name l);
+        ignore (Alpha.newAlphaName ~alphaTable:aeAlpha ~undolist:None
+                  ~lookupname:orig_name ~data:l);
         ei.ereferenced <- false;
         ignore
           (EnumMerging.getNode eEq eSyn !currentFidx ei ei
@@ -2636,7 +2644,8 @@ let oneFilePass2 (f: file) =
         (* Maybe it is static. Rename it then *)
         if vi.vstorage = Static then begin
           let newName, _ =
-            Alpha.newAlphaName vtAlpha None vi.vname (CurrentLoc.get ())
+            Alpha.newAlphaName ~alphaTable:vtAlpha ~undolist:None
+              ~lookupname:vi.vname ~data:(CurrentLoc.get ())
           in
           let formals_decl =
             try Some (Cil.getFormalsDecl vi)
@@ -2799,7 +2808,7 @@ let oneFilePass2 (f: file) =
           (* Reflect them in the type *)
           setFormals fdec fdec.sformals
         end;
-        (** See if we can remove this inline function *)
+        (* See if we can remove this inline function *)
         if fdec'.svar.vinline && mergeInlines then begin
           let mergeInlinesWithAlphaConvert =
             mergeInlinesWithAlphaConvert ()
@@ -2985,7 +2994,8 @@ let oneFilePass2 (f: file) =
               if ci.corig_name = "" then ci.cname else ci.corig_name
             in
             let newname, _ =
-              Alpha.newAlphaName sAlpha None orig_name (CurrentLoc.get ())
+              Alpha.newAlphaName ~alphaTable:sAlpha ~undolist:None
+                ~lookupname:orig_name ~data:(CurrentLoc.get ())
             in
             ci.cname <- newname;
             ci.creferenced <- true;
@@ -3014,7 +3024,8 @@ let oneFilePass2 (f: file) =
               if ei.eorig_name = "" then ei.ename else ei.eorig_name
             in
             let newname, _ =
-              Alpha.newAlphaName eAlpha None orig_name (CurrentLoc.get ())
+              Alpha.newAlphaName ~alphaTable:eAlpha ~undolist:None
+                ~lookupname:orig_name ~data:(CurrentLoc.get ())
             in
             ei.ename <- newname;
             ei.ereferenced <- true;
@@ -3023,7 +3034,8 @@ let oneFilePass2 (f: file) =
             List.iter
               (fun item ->
                  let newname,_ =
-                   Alpha.newAlphaName vtAlpha None item.eiorig_name item.eiloc
+                   Alpha.newAlphaName ~alphaTable:vtAlpha ~undolist:None
+                     ~lookupname:item.eiorig_name ~data:item.eiloc
                  in
                  item.einame <- newname)
               ei.eitems;
@@ -3067,7 +3079,8 @@ let oneFilePass2 (f: file) =
           with
             None -> (* We must rename it and keep it *)
             let newname, _ =
-              Alpha.newAlphaName vtAlpha None ti.torig_name (CurrentLoc.get ())
+              Alpha.newAlphaName ~alphaTable:vtAlpha ~undolist:None
+                ~lookupname:ti.torig_name ~data:(CurrentLoc.get ())
             in
             ti.tname <- newname;
             ti.treferenced <- true;
@@ -3218,7 +3231,7 @@ let find_decls g =
       method! vlogic_var_decl lv =
         res := Cil_datatype.Logic_var.Set.add lv !res;
         SkipChildren
-      method! vspec _ = SkipChildren
+      method! vspec _ = Cil.SkipChildren
       method! vfunc f =
         ignore (self#vvdec f.svar);
         Option.iter (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;

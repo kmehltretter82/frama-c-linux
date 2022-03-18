@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -308,7 +308,7 @@ let compute_first_common mn1 mn2 r modu =
       | Some m1, Some m2 -> Int.max m1 m2
       | None, None -> assert false (* already tested above *)
     in
-    Some (Int.round_up_to_r m r modu)
+    Some (Int.round_up_to_r ~min:m ~r ~modu)
 
 let compute_last_common mx1 mx2 r modu =
   if mx1 = None && mx2 = None
@@ -320,7 +320,7 @@ let compute_last_common mx1 mx2 r modu =
       | Some m1, Some m2 -> Int.min m1 m2
       | None, None -> assert false (* already tested above *)
     in
-    Some (Int.round_down_to_r m r modu)
+    Some (Int.round_down_to_r ~max:m ~r ~modu)
 
 let meet t1 t2 =
   try

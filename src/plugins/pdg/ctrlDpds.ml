@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,9 +25,8 @@ let dkey = Pdg_parameters.register_category "ctrl-dpds"
 open Cil_types
 open Cil_datatype
 
-(*============================================================================*)
-(** Lexical successors *)
-(*============================================================================*)
+(** {2 Lexical successors} *)
+
 (** Compute a graph which provide the lexical successor of each statement s,
     ie. the statement which is the next one if 's' is replaced by Nop.
     Notice that if 's' is an If, Loop, ...
@@ -128,7 +127,7 @@ end = struct
     let rec process_stmts prev_list stmts = match stmts with
       | [] -> prev_list
       | s :: tail ->
-        let s_last_stmts = process_stmt graph prev_list s in
+        let s_last_stmts = process_stmt graph ~prev_list ~stmt:s in
         process_stmts s_last_stmts tail
     in process_stmts [] blk.bstmts
 
@@ -151,9 +150,8 @@ end = struct
       raise Not_found
 end
 
-(*============================================================================*)
-(** Postdominators (with infinite path extension) *)
-(*============================================================================*)
+(** {2 Postdominators (with infinite path extension)} *)
+
 (** This backward dataflow implements a variant of postdominators that verify
     the property P enunciated in bts 963: a statement postdominates itself
     if and only it is within the main path of a syntactically infinite loop.

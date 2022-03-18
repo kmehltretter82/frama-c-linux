@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,13 +24,23 @@
 
 include Plugin.General_services
 
-module Doc : Parameter_sig.Filepath (** Generate documentation *)
-module Polling : Parameter_sig.Int (** Idle waiting time (in ms) *)
-module AutoLog : Parameter_sig.Bool (** Monitor logs *)
+(** Generate documentation *)
+module Doc : Parameter_sig.Filepath
 
-val wpage : warn_category (** Inconsistent page warning *)
-val wkind : warn_category (** Inconsistent category warning *)
-val wname : warn_category (** Invalid name warning *)
+(** Idle waiting time (in ms) *)
+module Polling : Parameter_sig.Int
+
+(** Monitor logs *)
+module AutoLog : Parameter_sig.Bool
+
+val wpage : warn_category
+(** Inconsistent page warning *)
+
+val wkind : warn_category
+(** Inconsistent category warning *)
+
+val wname : warn_category
+(** Invalid name warning *)
 
 val has_relative_filepath: unit -> bool
 

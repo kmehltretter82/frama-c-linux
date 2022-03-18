@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -207,9 +207,11 @@ module FctIndex : sig
   (** store the information for the key.
       @raise AddError if there is already something stored. *)
   val add :  ('ni, 'ci) t -> Key.t-> 'ni -> unit
+
   (** store the information for the key. Replace the previously stored
       information if any. *)
   val add_or_replace :  ('ni, 'ci) t -> Key.t-> 'ni -> unit
+
   val add_info_call :
     ('ni, 'ci) t -> Cil_types.stmt -> 'ci -> replace:bool -> unit
   val add_info_call_key :  ('ni, 'ci) t -> Key.t -> 'ci -> replace:bool -> unit

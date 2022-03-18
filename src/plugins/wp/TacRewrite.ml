@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,11 +41,11 @@ let hypothesis s =
 let clause = function
   | Clause(Step s) -> hypothesis s
   | Inside(Step s,e) ->
-      begin
-        match Repr.pred (hypothesis s) with
-        | And es when List.memq e es -> Lang.F.p_bool e
-        | _ -> raise Not_found
-      end
+    begin
+      match Repr.pred (hypothesis s) with
+      | And es when List.memq e es -> Lang.F.p_bool e
+      | _ -> raise Not_found
+    end
   | _ -> raise Not_found
 
 class rewrite dir =
@@ -60,8 +60,8 @@ class rewrite dir =
         let p = clause select in
         match Repr.pred p with
         | Eq(a,b) ->
-            let replaced,value = if dir then a,b else b,a in
-            rewrite ~select ~replaced ~value
+          let replaced,value = if dir then a,b else b,a in
+          rewrite ~select ~replaced ~value
         | _ -> Not_applicable
       with Not_found -> Not_applicable
   end
@@ -95,11 +95,11 @@ let rec lookup step push goal e =
   match Repr.term e with
   | And ps -> List.iter (lookup step push goal) ps
   | Eq(a,b) ->
-      begin
-        let select = Inside(Step step,e) in
-        submit push select a goal tacl ;
-        submit push select b goal tacr ;
-      end
+    begin
+      let select = Inside(Step step,e) in
+      submit push select a goal tacl ;
+      submit push select b goal tacr ;
+    end
   | _ -> ()
 
 class auto_rewrite =
@@ -113,7 +113,7 @@ class auto_rewrite =
            let open Conditions in
            match s.condition with
            | Have p | When p | Core p | Init p ->
-               lookup s push (Lang.F.e_prop goal) (Lang.F.e_prop p)
+             lookup s push (Lang.F.e_prop goal) (Lang.F.e_prop p)
            | _ -> ())
         hyps
   end

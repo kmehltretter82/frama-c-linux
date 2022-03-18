@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2021                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -70,6 +70,7 @@ module Make
          include Graph.Sig.COMPARABLE
          val id: t -> int
          (** assume [id >= 0] and unique for each vertices of the graph *)
+
          val name: t -> string
          val attributes: t -> Graph.Graphviz.DotAttributes.vertex list
          val entry_point: unit -> t option
