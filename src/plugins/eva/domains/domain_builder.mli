@@ -66,6 +66,8 @@ module type LeafDomain = sig
 
   module Store: Domain_store.S with type t := t
 
+  val import: t -> t
+
   val key: t Abstract_domain.key
 end
 

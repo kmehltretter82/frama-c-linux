@@ -498,6 +498,15 @@ module type S = sig
   (** Storage of the states computed by the analysis.
       Automatically built by {!Domain_builder.Complete}. *)
   module Store: Domain_store.S with type t := t
+
+  (** Imports a state from another Frama-C project, by using {!Ast_diff}
+      correspondance tables to convert all references to the previous AST
+      to the new one. See also {!Eva_diff} for other utilitary functions.
+      @raise [Not_found] if the state cannot be imported, in particular if it
+      refers an AST element that has no counterpart part in the new AST.
+      Defined by {!Domain_builder.Complete} as always failing, preventing
+      incremental analyses by reloading the results of a previous analysis. *)
+  val import: t -> t
 end
 
 type 't key = 't Structure.Key_Domain.key

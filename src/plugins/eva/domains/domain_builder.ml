@@ -58,6 +58,8 @@ module type LeafDomain = sig
 
   module Store: Domain_store.S with type t := t
 
+  val import: t -> t
+
   val key: t Abstract_domain.key
 end
 
@@ -83,6 +85,12 @@ module Complete (Domain: InputDomain) = struct
   let post_analysis _state = ()
 
   module Store = Domain_store.Make (Domain)
+
+  let import _state =
+    Self.abort
+      "The domain %s does not support reloading previous states \
+       from a saved session"
+      Domain.name
 
   let key: Domain.t Structure.Key_Domain.key =
     Structure.Key_Domain.create_key Domain.name
@@ -650,4 +658,6 @@ module Restrict
     let mark_as_computed = Domain.Store.mark_as_computed
     let is_computed = Domain.Store.is_computed
   end
+
+  let import _state = assert false (* TODO *)
 end

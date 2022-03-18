@@ -374,6 +374,9 @@ module Make
     let is_computed () = Left.Store.is_computed () && Right.Store.is_computed ()
   end
 
+  let import (left, right) =
+    Left.import left, Right.import right
+
   let post_analysis = function
     | `Bottom -> Left.post_analysis `Bottom; Right.post_analysis `Bottom
     | `Value (left, right) ->

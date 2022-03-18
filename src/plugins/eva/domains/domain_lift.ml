@@ -158,8 +158,9 @@ module Make
 
   module Store = Domain.Store
 
-  let post_analysis = Domain.post_analysis
+  let import = Domain.import
 
+  let post_analysis = Domain.post_analysis
 end
 
 

@@ -394,6 +394,8 @@ module State = struct
     | `Bottom -> Cvalue.Model.bottom
     | `Value v -> v
 
+  let import _state = None
+
   let display ?fmt kf =
     let open Cil_types in
     (* Do not pretty Cil-generated variables or out-of-scope local variables *)
