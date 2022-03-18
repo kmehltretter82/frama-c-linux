@@ -849,3 +849,46 @@ struct
 end
 
 include Domain
+
+let multidim_top = top
+let better_join _oracle_left _oracle_right a b = join a b
+
+let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
+  match Abstract.Dom.get key with
+  | None -> (module Abstract)
+  | Some get_multidim ->
+    let module Eval =
+      Evaluation.Make (Abstract.Val) (Abstract.Loc) (Abstract.Dom)
+    in
+    let module Dom = struct
+      include Abstract.Dom
+
+      let join a b =
+        let r = join (set key multidim_top a) (set key multidim_top b) in
+        let left_oracle = Eval.evaluate a in
+        let right_oracle = Eval.evaluate b in
+        let taint =
+          better_join left_oracle right_oracle (get_multidim a) (get_multidim b)
+        in
+        set key taint r
+    end
+    in
+    (module struct
+      module Val = Abstract.Val
+      module Loc = Abstract.Loc
+      module Dom = Dom
+    end)
+
+(* Registers the domain. *)
+let flag =
+  let name = "multidim"
+  and descr = "Improve the precision over arrays of structures \
+               or multidimensional arrays."
+  and experimental = true
+  and abstraction =
+    Abstractions.{ values = Single (module Main_values.CVal);
+                   domain = Domain (module Domain); }
+  in
+  Abstractions.register ~name ~descr ~experimental abstraction
+
+let () = Abstractions.register_hook multidim_hook

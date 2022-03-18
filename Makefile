@@ -881,7 +881,6 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \
 	domains/offsm_domain \
-	domains/multidim_domain \
 	domains/symbolic_locs \
 	domains/sign_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
@@ -906,6 +905,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	engine/transfer_logic engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
+	domains/multidim_domain \
 	domains/taint_domain \
 	$(APRON_CMO) $(NUMERORS_CMO) \
 	utils/eva_results \
