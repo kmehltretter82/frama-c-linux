@@ -38,6 +38,7 @@ type env_t = {
 ; dir: string
 ; dune_alias: string
 ; absolute_tests_dir: string
+; absolute_cwd: string
 }
 
 module Filename = struct
@@ -146,7 +147,7 @@ let config_name ~env name =
 let macro_post_options = ref "" (* value set to @PTEST_POST_OPTIONS@ macro *)
 let macro_pre_options  = ref "" (* value set to @PTEST_PRE_OPTIONS@  macro *)
 let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
-let macro_default_options = ref "-journal-disable -check -no-autoload-plugins -add-symbolic-path=\"@PTEST_SESSION@\""
+let macro_default_options = ref "-journal-disable -check -no-autoload-plugins -add-symbolic-path=\"@PTEST_SESSION@:.\""
 
 let macro_frama_c_exe = ref "frama-c"
 let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
@@ -180,7 +181,8 @@ let example_msg =
      DEPS: <file>...     @[<v 0># Adds a dependency to next sub-test and execnow commands.@ \
      # Notes: a dependency to the included file can be added with this directive.@ \
      # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
-     LOG: <file>...      @[<v 0># Defines textual targets built by the next sub-test command..@ \
+     BIN: <file>...      @[<v 0># Defines binary targets built by the next sub-test command.@ \
+     LOG: <file>...      @[<v 0># Defines textual targets built by the next sub-test command.@ \
      # Note: the textual targets are compared to oracles.@]@  \
      CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
@@ -586,6 +588,7 @@ type cmd = {
   macros: Macros.t;
   exit_code: string option;
   logs: string list;
+  bins: string list;
   deps: deps;
   timeout: string
 }
@@ -613,6 +616,7 @@ type config =
     dc_dont_run   : bool;
     dc_framac     : bool;
     dc_default_log: string list;
+    dc_default_bin: string list;
     dc_timeout: string
   }
 
@@ -637,8 +641,10 @@ end = struct
     let ptest_config = config_name ~env "" in
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
+    let ptest_session = Filename.dirname env.dir in
+    let ptest_session = env.absolute_cwd ^ "/_build/default" ^ (if ptest_session = "." then "" else "/" ^ ptest_session) in
     let ptest_vars =
-      [ "PTEST_SESSION", env.absolute_tests_dir ^ "/_build/default:.";
+      [ "PTEST_SESSION", ptest_session ;
         "PTEST_CONFIG", ptest_config;
         "PTEST_DIR", ".";
         "PTEST_SHARE_DIR", "../../../share";
@@ -668,6 +674,7 @@ end = struct
         exit_code=None;
         macros=config.dc_macros;
         logs=[];
+        bins=[];
         deps={ load_plugin=None;
                load_libs=None;
                load_module=None;
@@ -692,6 +699,7 @@ end = struct
       dc_dont_run = false;
       dc_framac = true;
       dc_default_log = [];
+      dc_default_bin = [];
       dc_timeout = "";
     }
 
@@ -849,12 +857,14 @@ end = struct
   type parsing_env = {
     current_default_toplevel: string;
     current_default_log: string list;
+    current_default_bin: string list;
     current_default_cmds: cmd list;
   }
 
   let default_parsing_env = ref {
       current_default_toplevel = "" ;
       current_default_log = [] ;
+      current_default_bin = [] ;
       current_default_cmds = []
     }
 
@@ -862,6 +872,7 @@ end = struct
     default_parsing_env := {
       current_default_toplevel = config.dc_default_toplevel;
       current_default_log = config.dc_default_log;
+      current_default_bin = config.dc_default_bin;
       current_default_cmds = List.rev config.dc_commands;
     }
 
@@ -883,12 +894,14 @@ end = struct
              macros = current.dc_macros ;
              exit_code = current.dc_exit_code ;
              logs = current.dc_default_log;
+             bins = current.dc_default_bin;
              timeout = current.dc_timeout;
              deps = deps_of_config current
            }
          in
          { current with
            dc_default_log = !default_parsing_env.current_default_log;
+           dc_default_bin = !default_parsing_env.current_default_bin;
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
@@ -905,6 +918,7 @@ end = struct
                   macros= current.dc_macros;
                   exit_code = current.dc_exit_code;
                   logs= command.logs @ current.dc_default_log;
+                  bins= command.bins @ current.dc_default_bin;
                   timeout= current.dc_timeout;
                   deps = deps_of_config ~deps:command.deps current
                 })
@@ -914,7 +928,9 @@ end = struct
          in
          { current with dc_commands = new_top @ current.dc_commands;
                         dc_default_log = !default_parsing_env.current_default_log @
-                                         current.dc_default_log });
+                                         current.dc_default_log;
+                        dc_default_bin = !default_parsing_env.current_default_bin @
+                                         current.dc_default_bin });
       "FILEREG",
       (fun ~drop:_ ~file ~dir:_ s current ->
          let s = Macros.expand ~file current.dc_macros s in
@@ -960,6 +976,11 @@ end = struct
       (fun ~drop:_ ~file ~dir:_ s current ->
          let s = Macros.expand ~file current.dc_macros s in
          { current with dc_default_log = s :: current.dc_default_log });
+
+      "BIN",
+      (fun ~drop:_ ~file ~dir:_ s current ->
+         let s = Macros.expand ~file current.dc_macros s in
+         { current with dc_default_bin = s :: current.dc_default_bin });
 
       "TIMEOUT",
       (fun ~drop:_ ~file ~dir:_ s current ->
@@ -1088,6 +1109,7 @@ end
 type toplevel_command =
   { macros: Macros.t;
     log_files: string list;
+    bin_files: string list;
     test_name : string ;
     file : string ;
     nb_files : int ;
@@ -1329,6 +1351,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       err = errlog;
       ret_code = command.exit_code;
       log = command.log_files;
+      bin = command.bin_files;
       oracle_out = Filename.concat ".." (oracle_prefix ^ ".res.oracle");
       oracle_err = Filename.concat ".." (oracle_prefix ^ ".err.oracle");
     }
@@ -1343,7 +1366,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     Format.fprintf result_fmt
       "(rule ; %s\n  \
        (alias %S)\n  \
-       (targets %S %S %a)\n  \
+       (targets %S %S %a %a)\n  \
        (deps %S %S %S %a %a)\n  \
        (action (run %s %S %S %a))\n\
        )@."
@@ -1355,6 +1378,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       cmderrlog
       cmdreslog
       pp_list command.log_files
+      pp_list command.bin_files
       (* deps: *)
       wrapper_basename
       wtest.oracle_out
@@ -1382,7 +1406,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     Format.fprintf result_fmt
       "(rule ; %s\n  \
        (alias %S)\n  \
-       (targets %S %S %a)\n  \
+       (targets %S %S %a %a)\n  \
        (deps   %a)\n  \
        (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
        )@."
@@ -1394,6 +1418,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       cmderrlog
       cmdreslog
       pp_list command.log_files
+      pp_list command.bin_files
       (* deps: *)
       pp_command_deps command
       (* action: *)
@@ -1534,17 +1559,18 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
     let nb_files = List.length config.dc_commands in
     let make_cmd =
       let i = ref 0 in
-      fun { toplevel; opts=options; macros; exit_code; logs; timeout; deps } ->
+      fun { toplevel; opts=options; macros; exit_code; logs; bins; timeout; deps } ->
         let nth = !i in
         incr i ;
         let macros = ptest_vars ~nth macros in
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
         let log_files = List.map (Macros.expand ~file macros) logs in
+        let bin_files = List.map (Macros.expand ~file macros) bins in
         let deps = deps_command ~file macros deps in
         update_modules ~file modules deps;
         command_string ~env ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
-            macros; log_files;
+            macros; log_files; bin_files;
             filter = (* from a global directive applyed to all OPT tests  *)
               (match config.dc_filter with None -> None | Some s -> Some (Macros.expand ~file macros s));
             exit_code = begin
@@ -1571,6 +1597,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           update_modules ~file modules deps;
           { test_name; file; nb_files = nb_files_execnow; directory; nth;
             log_files = [];
+            bin_files = [];
             options = "";
             toplevel = execnow.ex_cmd;
             exit_code = 0;
@@ -1811,11 +1838,11 @@ let () =
     | [] -> [ "tests" ]
     | l -> l
   in
-  let pwd = Unix.getcwd () in
+  let absolute_cwd = Unix.getcwd () in
   List.iter (fun dir ->
       Format.printf "Test directory: %s@." dir;
       let absolute_tests_dir = Filename.dirname
-          (if Filename.is_relative dir then Filename.concat pwd dir else dir)
+          (if Filename.is_relative dir then Filename.concat absolute_cwd dir else dir)
       in
       let suites = Ptests_config.parse ~dir in
       if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
@@ -1824,7 +1851,7 @@ let () =
       StringMap.iter (fun config_mode suites ->
           if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
               (match config_mode with "" -> "DEFAULT" | s -> s) (StringMap.cardinal suites);
-          let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_tests_dir} in
+          let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_tests_dir ; absolute_cwd} in
           let directory = SubDir.create ~with_subdir:false ~env dir in
           let config = Test_config.current_config ~env directory in
           let config = update_dir_ref directory config in
