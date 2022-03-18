@@ -150,7 +150,7 @@
   (optional)
 )
 
-
+;(plugin (optional) (name eva-apron) (libraries frama-c-eva.apron) (site (frama-c plugins)))
 
 ( library
   (name eva_gui)
