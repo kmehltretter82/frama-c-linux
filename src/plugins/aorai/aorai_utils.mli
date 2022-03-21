@@ -142,6 +142,11 @@ val auto_func_block:
   Data_for_aorai.state -> Cil_types.varinfo option ->
   Cil_datatype.Varinfo.Set.t * Cil_types.block * Cil_types.varinfo list
 
+(** returns a behavior consisting in a single post-condition saying that at least
+    one accepting state must be active (to be used for the main entry point)
+*)
+val mk_acceptance_bhv: unit -> Cil_types.behavior
+
 val get_preds_pre_wrt_params :  kernel_function -> predicate
 
 val get_preds_post_bc_wrt_params : kernel_function -> predicate

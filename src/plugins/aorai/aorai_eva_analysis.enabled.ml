@@ -39,21 +39,40 @@ let show_val fmt (expr, v) =
     Printer.pp_exp expr
     (Cvalue.V.pretty_typ (Some (Cil.typeOf expr))) v
 
+let show_non_det_state fmt state =
+  let (states,_) = Data_for_aorai.getGraph () in
+  let first_print = ref true in
+  let print_state s sure =
+    if not !first_print then Format.fprintf fmt ",@ ";
+    first_print := false;
+    Format.fprintf fmt "%s%s"
+      (if sure then "" else "(?)")
+      s.Promelaast.name
+  in
+  let print_one s =
+    (* TODO: sync Data_for_aorai.get_state_var with current project*)
+    let vi = Data_for_aorai.get_varinfo s.Promelaast.name in
+    let e = Cil.evar vi in
+    let cvalue = !Db.Value.eval_expr state e in
+    if Cvalue.V.contains_non_zero cvalue then
+      print_state s (not (Cvalue.V.contains_zero cvalue))
+  in
+  List.iter print_one states
+
 let show_aorai_state = "Frama_C_show_aorai_state"
 
 let builtin_show_aorai_state state args =
   if not (Aorai_option.Deterministic.get()) then begin
-    Aorai_option.warning
-      ~current:true "%s can only display info for deterministic automata"
-      show_aorai_state
+    Aorai_option.result ~current:true
+      "@[<hv 2>Possible states:@ %a@]" show_non_det_state state;
   end else begin
     let history = Data_for_aorai.(curState :: (whole_history ())) in
     Aorai_option.result ~current:true "@[<hv>%a@]"
       (Pretty_utils.pp_list ~sep:" <- " (show_aorai_variable state)) history;
-    if args <> [] then begin
-      Aorai_option.result ~current:true "@[<hv>%a@]"
-        (Pretty_utils.pp_list ~sep:"," show_val) args
-    end;
+  end;
+  if args <> [] then begin
+    Aorai_option.result ~current:true "@[<hv>%a@]"
+      (Pretty_utils.pp_list ~sep:"," show_val) args
   end;
   (* Return value : returns nothing, changes nothing *)
   Eva.Builtins.States [state]
@@ -77,13 +96,27 @@ let add_slevel_annotation vi kind =
 let add_slevel_annotations () =
   Aorai_visitors.Aux_funcs.iter add_slevel_annotation
 
+let add_nondet_partitioning () =
+  let (states,_) = Data_for_aorai.getGraph() in
+  let add_one_state state =
+    let vi = Data_for_aorai.get_state_var state in
+    Eva.Parameters.use_global_value_partitioning vi
+  in
+  List.iter add_one_state states
+
 let add_partitioning varname =
   match Data_for_aorai.get_varinfo_option varname with
-  | None -> ()
+  | None -> add_nondet_partitioning ()
   | Some vi -> Eva.Parameters.use_global_value_partitioning vi
+
+let add_aux_partitioning () =
+  List.iter
+    Eva.Parameters.use_global_value_partitioning
+    (Data_for_aorai.aux_variables())
 
 let add_state_variables_partitioning () =
   add_partitioning Data_for_aorai.curState;
+  add_aux_partitioning ();
   List.iter add_partitioning (Data_for_aorai.whole_history ())
 
 let setup () =

@@ -133,7 +133,7 @@ let killingTimer: NodeJS.Timeout | undefined;
 // --------------------------------------------------------------------------
 
 /** The server console buffer. */
-export const buffer = new RichTextBuffer({ maxlines: 200 });
+export const buffer = new RichTextBuffer();
 
 // --------------------------------------------------------------------------
 // --- Server Status

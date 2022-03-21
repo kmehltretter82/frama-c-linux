@@ -206,6 +206,7 @@ Makefile.plugin.generated
 /src/plugins/gui/GSourceView.mli
 /src/plugins/gui/gtk_compat.ml
 /src/plugins/markdown-report/META
+/src/plugins/value/Eva.mli
 
 # generated tar.gz files
 

@@ -147,7 +147,7 @@ struct
     | T_alloc -> 12
     | T_init -> 13
   let hash = rank
-  let name = function
+  let basename = function
     | M_int i when Ctypes.is_char i -> "Mchar"
     | M_int _ -> "Mint"
     | M_f32 -> "Mf32"
@@ -157,10 +157,9 @@ struct
     | T_init -> "Init"
   let compare a b = rank a - rank b
   let equal = (=)
-  let pretty fmt c = Format.pp_print_string fmt (name c)
-  let detailed_pretty fmt = function
+  let pretty fmt = function
     | M_int i -> Format.fprintf fmt "M%a" Ctypes.pp_int i
-    | m -> Format.pp_print_string fmt (name m)
+    | m -> Format.pp_print_string fmt (basename m)
   let val_of_chunk = function
     | M_int _ -> L.Int
     | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
@@ -175,7 +174,7 @@ struct
     | M_f64 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float64)
     | T_alloc -> t_malloc
     | T_init -> t_init
-  let basename_of_chunk = name
+  let basename_of_chunk = basename
   let is_framed _ = false
 end
 
@@ -555,8 +554,8 @@ module BASE = WpContext.Generator(Varinfo)
         Warning.handle
           ~handler:(fun _ -> None)
           ~effect:(Printf.sprintf "No allocation size for variable '%s'" x.vname)
-          (fun obj -> Some (length_of_object obj))
-          (Ctypes.object_of x.vtype)
+          (fun t -> Some (length_of_object @@ Ctypes.object_of t))
+          x.vtype
 
       let linked prefix x base =
         let name = prefix ^ "_linked" in
@@ -1213,7 +1212,7 @@ and lookup_lv e = try lookup_a e with Not_found -> Sigs.(Mmem e,[])
 let mchunk c =
   match c with
   | T_init -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KInit)
-  | _ -> Sigs.Mchunk (Pretty_utils.to_string Chunk.detailed_pretty c, KValue)
+  | _ -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
 
 let lookup s e =
   try mchunk (Tmap.find e s)
