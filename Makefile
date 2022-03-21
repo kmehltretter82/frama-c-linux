@@ -280,6 +280,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/parse-coverage.sh                          \
       share/analysis-scripts/print_callgraph.py                         \
       share/analysis-scripts/prologue.mk                                \
+      share/analysis-scripts/pyproject.toml                             \
       share/analysis-scripts/README.md                                  \
       share/analysis-scripts/results_display.py                         \
       share/analysis-scripts/script_for_creduce_fatal.sh                \
@@ -1998,6 +1999,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/normalize_jcdb.py \
 	  share/analysis-scripts/parse-coverage.sh \
 	  share/analysis-scripts/prologue.mk \
+	  share/analysis-scripts/pyproject.toml \
 	  share/analysis-scripts/README.md \
 	  share/analysis-scripts/results_display.py \
 	  share/analysis-scripts/script_for_creduce_fatal.sh \
