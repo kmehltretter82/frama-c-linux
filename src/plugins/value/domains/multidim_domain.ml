@@ -379,9 +379,20 @@ struct
     | Some s1, Some s2 -> Some (TrackedBases.union s1 s2)
 
 
+  (* Oracle conversion for Abstract_memory *)
+
+  let convert_oracle (oracle : Cil_types.exp -> value)
+    : Abstract_memory.oracle =
+    fun exp ->
+    try
+      Value.project_ival (oracle exp)
+    with Value.Not_based_on_null ->
+      Ival.top (* TODO: should it just not happen ? *)
+
+
   (* Accesses *)
 
-  let rec read :
+  let read :
     type a .
     (memory -> offset -> a) -> (a -> a -> a) ->
     state -> mdlocation -> a or_bottom =
@@ -392,17 +403,19 @@ struct
     in
     Location.fold f loc `Bottom
 
-  and get (state : state) (src : mdlocation) : value_or_uninitialized or_bottom =
-    let oracle = mk_oracle state in
+  let get ~oracle
+      (state : state) (src : mdlocation) : value_or_uninitialized or_bottom =
+    let oracle = convert_oracle oracle in
     read (Memory.get ~oracle) Value_or_Uninitialized.join state src
 
-  and mk_oracle' (state : state) : Cil_types.exp -> value =
+  let mk_oracle (state : state) : Cil_types.exp -> value =
     (* Until Eva gives access to good oracles, we use this poor stupid oracle
        instead *)
     let rec oracle exp =
       match exp.enode with
       | Lval lval ->
-        let value = get state (Location.of_lval oracle lval) in
+        let loc = Location.of_lval oracle lval in
+        let value = get ~oracle state loc in
         Value_or_Uninitialized.get_v (Bottom.non_bottom value) (* TODO: handle exception *)
       | Const (CInt64 (i,_,_)) -> Value.inject_int i
       | Const (CReal (f,_,_)) -> Value.inject_float (Fval.singleton (Fval.F.of_float f))
@@ -423,23 +436,15 @@ struct
     in
     fun exp -> oracle (Cil.constFold true exp)
 
-  and convert_oracle (oracle : Cil_types.exp -> value)
-    : Abstract_memory.oracle =
-    fun exp ->
-    try
-      Value.project_ival (oracle exp)
-    with Value.Not_based_on_null ->
-      Ival.top (* TODO: should it just not happen ? *)
+  let mk_bioracle s1 s2 =
+    let oracle_left = mk_oracle s1
+    and oracle_right = mk_oracle s2 in
+    function
+    | Abstract_memory.Left -> convert_oracle oracle_left
+    | Right -> convert_oracle oracle_right
 
-  and convert_oracle_or_default state = function (* TODO: use everywhere *)
-    | Some oracle -> convert_oracle oracle
-    | None -> mk_oracle state
-
-  and mk_oracle (state : state) : Abstract_memory.oracle =
-    convert_oracle (mk_oracle' state)
-
-  let extract (state : state) (src : mdlocation) : Memory.t or_bottom =
-    let oracle = mk_oracle state in
+  let extract ~oracle (state : state) (src : mdlocation) : Memory.t or_bottom =
+    let oracle = convert_oracle oracle in
     read (Memory.extract ~oracle) (Memory.smash ~oracle) state src
 
   let add_references (base_map,tracked) vi refs' =
@@ -469,29 +474,32 @@ struct
     (* Result can never be bottom if update never returns bottom *)
     Bottom.non_bottom (write' (fun m o -> `Value (update m o)) state loc)
 
-  let set (state : state) (dst : mdlocation) (v : value_or_uninitialized) : state =
+  let set ~oracle
+      (state : state) (dst : mdlocation) (v : value_or_uninitialized) : state =
     let weak = not (Location.is_singleton dst)
-    and oracle = mk_oracle state in
+    and oracle = convert_oracle oracle in
     write (Memory.set ~oracle ~weak v) state dst
 
-  let overwrite (state : state) (dst : mdlocation) (src : mdlocation) : state =
-    let weak = not (Location.is_singleton dst)
-    and oracle = mk_oracle state in
-    match extract state src with
+  let overwrite ~oracle
+      (state : state) (dst : mdlocation) (src : mdlocation) : state =
+    let weak = not (Location.is_singleton dst) in
+    match extract ~oracle state src with
     | `Bottom -> state (* no source *)
     | `Value value ->
+      let oracle = convert_oracle oracle in
       write (fun m off -> Memory.overwrite ~oracle ~weak m off value) state dst
 
-  let erase (state : state) (dst : mdlocation) (b : Abstract_memory.bit): state =
+  let erase ~oracle
+      (state : state) (dst : mdlocation) (b : Abstract_memory.bit): state =
     let weak = not (Location.is_singleton dst)
-    and oracle = mk_oracle state in
+    and oracle = convert_oracle oracle in
     write (fun m off -> Memory.erase ~oracle ~weak m off b) state dst
 
   let reinforce
-      ?oracle
+      ~oracle
       (f : value_or_uninitialized -> value_or_uninitialized or_bottom)
       (state : state) (dst : mdlocation) : state or_bottom =
-    let oracle = convert_oracle_or_default state oracle in
+    let oracle = convert_oracle oracle in
     write' (fun m off -> Memory.reinforce ~oracle f m off) state dst
 
   (* Lattice *)
@@ -517,12 +525,8 @@ struct
     let narrow = join ~cache ~symmetric:false ~idempotent:true ~decide in
     fun (m1,t1) (m2,t2) -> `Value (narrow m1 m2, join_tracked t1 t2)
 
-  let join (m1,t1 as s1) (m2,t2 as s2) =
+  let join' ~oracle (m1,t1) (m2,t2) =
     let open BaseMap in
-    let oracle = function
-      | Abstract_memory.Left -> mk_oracle s1
-      | Right -> mk_oracle s2
-    in
     let cache = Hptmap_sig.NoCache
     and decide _ (m1,r1) (m2,r2) =
       let m = Memory.join ~oracle m1 m2
@@ -532,12 +536,13 @@ struct
     inter ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
     join_tracked t1 t2
 
+  let join s1 s2 =
+    let oracle = mk_bioracle s1 s2 in
+    join' ~oracle s1 s2
 
   let widen kf stmt (m1,t1 as s1) (m2,t2 as s2) =
     let open BaseMap in
-    let oracle = function
-      | Abstract_memory.Left -> mk_oracle s1
-      | Right -> mk_oracle s2
+    let oracle = mk_bioracle s1 s2
     and _,get_hints = Widen.getWidenHints kf stmt in
     let cache = Hptmap_sig.NoCache
     and decide base (m1,r1) (m2,r2) =
@@ -568,7 +573,7 @@ struct
     in
     try
       let loc = Location.of_lval oracle lv in
-      let v = get state loc in
+      let v = get ~oracle state loc in
       (v >>-: fun v -> (Value_or_Uninitialized.get_v v, None)),
       match v with
       | `Bottom -> Alarmset.all
@@ -639,6 +644,7 @@ struct
     let references = snd (BaseMap.find_or_top base_map (Base.of_varinfo vi)) in
     let update_ref base base_map =
       let update (memory, refs) =
+        let oracle = convert_oracle oracle in
         Memory.incr_bound ~oracle vi incr memory, refs
       in
       BaseMap.replace (Option.map update) base base_map
@@ -672,13 +678,13 @@ struct
       let dst = Location.of_lval oracle lval in
       match assigned_value with
       | Assign value ->
-        set state dst (Value_or_Uninitialized.of_value value)
+        set ~oracle state dst (Value_or_Uninitialized.of_value value)
       | Copy (right, _value) ->
         try
           let src = Location.of_lval oracle right.lval in
-          overwrite state dst src
+          overwrite ~oracle state dst src
         with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
-          erase state dst Abstract_memory.Bit.top
+          erase ~oracle state dst Abstract_memory.Bit.top
     with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
       (* Failed to evaluate the left location *)
       top
@@ -717,7 +723,7 @@ struct
       begin try
           let oracle = make_oracle valuation in
           let loc = Location.of_lval oracle lval in
-          match extract state loc with
+          match extract ~oracle state loc with
           | `Bottom -> Format.fprintf fmt "⊥"
           | `Value value -> Memory.pretty fmt value
         with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
@@ -727,9 +733,10 @@ struct
     | _ -> ()
 
   let enter_scope _kind vars state =
+    let oracle = mk_oracle state in
     let enter_one state v =
       let dst = Location.of_var v in
-      erase state dst Abstract_memory.Bit.uninitialized
+      erase ~oracle state dst Abstract_memory.Bit.uninitialized
     in
     List.fold_left enter_one state vars
 
@@ -750,7 +757,8 @@ struct
       match sources with
       | [] ->
         let dst = Location.of_precise_loc location in
-        erase state dst Abstract_memory.Bit.numerical
+        let oracle = mk_oracle state in
+        erase ~oracle state dst Abstract_memory.Bit.numerical
       | _ ->
         BaseMap.remove_loc base_map location, tracked
 
@@ -761,8 +769,9 @@ struct
         let loc,typ = Location.of_term env arg in
         begin match Cil.unrollType (Logic_utils.logicCType typ) with
           | TFloat (fkind,_) ->
-            let update = Value.backward_is_finite positive fkind in
-            reinforce (Value_or_Uninitialized.map' update) state loc
+            let update = Value.backward_is_finite positive fkind
+            and oracle = mk_oracle state in
+            reinforce ~oracle (Value_or_Uninitialized.map' update) state loc
           | _ | exception (Failure _) -> `Value state
         end
       | _ -> `Value state
@@ -788,9 +797,10 @@ struct
       let vi,offset,bounds = annotation in
       (* Update the segmentation *)
       let lval = Cil_types.Var vi, offset in
-      let loc = Location.of_lval (mk_oracle' state) lval in
       let oracle = mk_oracle state in
+      let loc = Location.of_lval oracle lval in
       let update m offset =
+        let oracle = convert_oracle oracle in
         Memory.segmentation_hint ~oracle m offset bounds
       in
       let state = write update state loc in
@@ -821,12 +831,14 @@ struct
       | Abstract_domain.Top  -> Abstract_memory.Bit.numerical
       | Abstract_domain.Zero -> Abstract_memory.Bit.zero
     in
-    erase state dst d
+    let oracle = mk_oracle state in (* Since dst has no offset, oracle is actyally useless *)
+    erase ~oracle state dst d
 
   let initialize_variable_using_type _kind vi state =
     let lval = Cil.var vi in
     let dst = Location.of_lval no_oracle lval in
-    erase state dst Abstract_memory.Bit.top
+    let oracle = mk_oracle state in (* Since dst has no offset, oracle is actyally useless *)
+    erase ~oracle state dst Abstract_memory.Bit.top
 
   let relate _kf _bases _state = Base.SetLattice.empty
 
@@ -850,13 +862,11 @@ end
 
 include Domain
 
-let multidim_top = top
-let better_join _oracle_left _oracle_right a b = join a b
-
 let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
-  match Abstract.Dom.get key with
-  | None -> (module Abstract)
-  | Some get_multidim ->
+  match Abstract.Val.get Main_values.CVal.key, Abstract.Dom.get key with
+  | None, _
+  | _, None -> (module Abstract)
+  | Some get_cval,  Some get_multidim ->
     let module Eval =
       Evaluation.Make (Abstract.Val) (Abstract.Loc) (Abstract.Dom)
     in
@@ -864,13 +874,19 @@ let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
       include Abstract.Dom
 
       let join a b =
-        let r = join (set key multidim_top a) (set key multidim_top b) in
-        let left_oracle = Eval.evaluate a in
-        let right_oracle = Eval.evaluate b in
-        let taint =
-          better_join left_oracle right_oracle (get_multidim a) (get_multidim b)
+        let r = join (set key Domain.top a) (set key Domain.top b) in
+        let oracle state exp = (* TODO: cache results *)
+          let v, _alarms = Eval.evaluate state exp in
+          match v with
+          | `Bottom -> Cvalue.V.top
+          | `Value (_valuation,v) -> get_cval v
         in
-        set key taint r
+        let oracle = function
+          | Abstract_memory.Left ->  Domain.convert_oracle (oracle a)
+          | Abstract_memory.Right -> Domain.convert_oracle (oracle b)
+        in
+        let multidim = Domain.join' ~oracle (get_multidim a) (get_multidim b) in
+        set key multidim r
     end
     in
     (module struct

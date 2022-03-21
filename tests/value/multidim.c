@@ -174,7 +174,7 @@ void main9(void) {
   //@ eva_domain_scope multidim,t1;
 
   for (int i = 0 ; i < 10 ; i++) {
-    //@ eva_domain_scope multidim,i;
+
     t1[i] = 0;
     t2[i] = 0;
   }
