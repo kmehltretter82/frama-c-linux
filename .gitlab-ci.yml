@@ -55,6 +55,13 @@ acsl-importer:
   tags:
     - nix
 
+caveat-importer:
+  stage: tests
+  script:
+    - ./ci.sh Caveat-importer
+  tags:
+    - nix
+
 cfp:
   stage: tests
   script:
