@@ -1310,6 +1310,15 @@ module Base_checker = struct
         | Local_init (v, ConsInit(f,args,k),loc) ->
           self#check_initialized_var v;
           Cil.treat_constructor_as_func treat_call v f args k loc
+        | Set(lv, rv, _) ->
+          let t1 = Cil.typeOfLval lv in
+          let t2 = Cil.typeOf rv in
+          if not (is_admissible_conversion rv t2 t1) then
+            check_abort
+              "Incompatible types in assignment %a:\
+               location has type %a, value has type %a"
+              Printer.pp_instr i Printer.pp_typ t1 Printer.pp_typ t2;
+          Cil.DoChildren
         | Asm(_,_,Some { asm_gotos },_) ->
           List.iter self#check_label asm_gotos; Cil.DoChildren
         | _ -> Cil.DoChildren
