@@ -674,6 +674,7 @@ let () = Informations.register
       | PExp (_, _, e) -> pp_typ fmt (Cil.typeOf e)
       | PLval (_, _, lval) -> pp_typ fmt (Cil.typeOfLval lval)
       | PTermLval(_,_,_,lv) -> pp_logic_type fmt (Cil.typeOfTermLval lv)
+      | PVDecl (_,_,vi) -> pp_typ fmt vi.vtype
       | _ -> raise Not_found
     end
 
