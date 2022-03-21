@@ -315,6 +315,29 @@ struct
 
   (* Conversion *)
 
+  let as_cvalue_or_uninitialized res =
+    match A.Val.get Main_values.CVal.key with
+    | None -> `Top
+    | Some get ->
+      let make_expr (x, _alarms) =
+        x >>>-: fun (_valuation, v) ->
+        Cvalue.V_Or_Uninitialized.make ~initialized:true ~escaping:false (get v)
+      in
+      let make_lval (x, _alarms) =
+        x >>>-: fun (_valuation, v) ->
+        let Eval.{ v; initialized; escaping } = v in
+        let v =
+          match v with
+          | `Bottom -> Cvalue.V.bottom
+          | `Value v -> get v
+        in
+        Cvalue.V_Or_Uninitialized.make ~initialized ~escaping v
+      in
+      let join = Cvalue.V_Or_Uninitialized.join in
+      match res with
+      | LValue r -> Response.map_join' make_lval join r
+      | Value r -> Response.map_join' make_expr join r
+
   let extract_value :
     type c. (value, c) evaluation -> (A.Val.t or_bottom, c) Response.t =
     function
@@ -538,6 +561,13 @@ let callee stmt =
   before stmt |> eval_callee callee_exp |> Result.value ~default:[]
 
 (* Value conversion *)
+
+let as_cvalue_or_uninitialized (Value evaluation) =
+  let module E = (val evaluation : Evaluation) in
+  match E.as_cvalue_or_uninitialized E.v with
+  | `Value v -> v
+  | `Bottom -> Cvalue.V_Or_Uninitialized.bottom
+  | `Top -> Cvalue.V_Or_Uninitialized.top
 
 let as_cvalue_result (Value evaluation) =
   let module E = (val evaluation : Evaluation) in
