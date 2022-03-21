@@ -136,7 +136,7 @@ int f4(int c)
   int __retres;
   if (c) {
     struct my_exn2 exn;
-    exn.c = 0;
+    exn.c = (char)0;
     __fc_exn.exn_uncaught = 1;
     __fc_exn.exn_kind = __fc_exn_kind___fc_Smy_exn2;
     __fc_exn.exn_obj.__fc_Smy_exn2 = exn;
@@ -198,7 +198,7 @@ int h(int c)
     if (0) {
       struct my_exn2 exn2;
       __fc_Smy_exn2_2: exn2 = __fc_exn.exn_obj.__fc_Smy_exn2;
-      exn.e = exn2.c;
+      exn.e = (int)exn2.c;
       goto __fc_Smy_exn;
     }
     if (0) {
