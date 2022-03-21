@@ -28,21 +28,18 @@ int main(void)
     int __gen_e_acsl_valid_read;
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
-                                 "&state->dataQueue[state->bitsInQueue / 8]",
-                                 (void *)(& state->dataQueue[state->bitsInQueue / 8U]));
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& state->bitsInQueue),
+                                                  sizeof(unsigned int),
+                                                  (void *)(& state->bitsInQueue),
+                                                  (void *)0);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
                                  "&state->bitsInQueue",
                                  (void *)(& state->bitsInQueue));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(unsigned int)",0,
                                    sizeof(unsigned int));
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& state->bitsInQueue),
-                                                  sizeof(unsigned int),
-                                                  (void *)(& state->bitsInQueue),
-                                                  (void *)0);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(&state->bitsInQueue)";
@@ -52,15 +49,18 @@ int main(void)
     __gen_e_acsl_assert_data_2.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
+                                                    state->bitsInQueue / 8U]),
+                                                    sizeof(unsigned char __attribute__((
+                                                    __aligned__(32)))));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
+                                 "&state->dataQueue[state->bitsInQueue / 8]",
+                                 (void *)(& state->dataQueue[state->bitsInQueue / 8U]));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(unsigned char __attribute__((__aligned__(32))))",
                                    0,
                                    sizeof(unsigned char __attribute__((
                                    __aligned__(32)))));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
-                                                    state->bitsInQueue / 8U]),
-                                                    sizeof(unsigned char __attribute__((
-                                                    __aligned__(32)))));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\initialized(&state->dataQueue[state->bitsInQueue / 8])",
                                  0,__gen_e_acsl_initialized);

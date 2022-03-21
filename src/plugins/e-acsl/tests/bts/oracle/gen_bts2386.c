@@ -21,18 +21,18 @@ void f(void const *s, int c, unsigned long n)
     __e_acsl_mpz_t __gen_e_acsl_sub;
     int __gen_e_acsl_eq;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"s",(void *)s);
     __gmpz_init_set_ui(__gen_e_acsl_,p - (unsigned char const *)s);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"n",0,n);
     __gmpz_init_set_ui(__gen_e_acsl_n,n);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"n",0,n);
     __gmpz_init(__gen_e_acsl_sub);
     __gmpz_sub(__gen_e_acsl_sub,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_n),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_n));
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"s",(void *)s);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"n",0,n);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"n",0,n);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "p - (unsigned char const *)s == n - n";

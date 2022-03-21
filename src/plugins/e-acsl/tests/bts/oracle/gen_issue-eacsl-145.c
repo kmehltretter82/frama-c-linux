@@ -34,12 +34,12 @@ int main(void)
   {
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)(& G),sizeof(int),
+                                        (void *)(& G),(void *)0);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&G",
                                  (void *)(& G));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
                                    0,sizeof(int));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)(& G),sizeof(int),
-                                        (void *)(& G),(void *)0);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(&G)",0,
                                  __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;

@@ -22,13 +22,13 @@ int main(void)
   {
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)(& s),sizeof(struct toto),
+                                        (void *)(& s),(void *)0);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&s",
                                  (void *)(& s));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(struct toto)",0,
                                    sizeof(struct toto));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)(& s),sizeof(struct toto),
-                                        (void *)(& s),(void *)0);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(&s)",0,
                                  __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -48,25 +48,25 @@ int main(void)
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
+                                                    sizeof(struct toto *));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&p",
                                  (void *)(& p));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(struct toto *)",0,
                                    sizeof(struct toto *));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
-                                                    sizeof(struct toto *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\initialized(&p)",0,
                                  __gen_e_acsl_initialized);
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid_2;
+      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(struct toto),
+                                            (void *)p,(void *)(& p));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"p",
                                    (void *)p);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(struct toto)",0,
                                      sizeof(struct toto));
-      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(struct toto),
-                                            (void *)p,(void *)(& p));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\valid(p)",
                                    0,__gen_e_acsl_valid_2);
       __gen_e_acsl_and = __gen_e_acsl_valid_2;

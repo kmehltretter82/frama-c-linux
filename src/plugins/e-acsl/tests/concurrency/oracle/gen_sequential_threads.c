@@ -79,21 +79,16 @@ void *read_value(void *arg)
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*(values[idx])",
-                                 0,*(values[idx]));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"idx",0,idx);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& values[idx]),
+                                                    sizeof(int *));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&values[idx]",
                                  (void *)(& values[idx]));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(int *)",0,sizeof(int *));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& values[idx]),
-                                                    sizeof(int *));
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid_read;
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
-                                   "values[idx]",(void *)values[idx]);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"idx",0,idx);
@@ -118,12 +113,14 @@ void *read_value(void *arg)
       __gen_e_acsl_assert_data_4.name = "index_bound";
       __e_acsl_assert(0 <= idx,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "sizeof(int)",0,sizeof(int));
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)values[idx],
                                                     sizeof(int),
                                                     (void *)values[idx],
                                                     (void *)(& values[idx]));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
+                                   "values[idx]",(void *)values[idx]);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                     "sizeof(int)",0,sizeof(int));
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
@@ -160,6 +157,9 @@ void *read_value(void *arg)
     __gen_e_acsl_assert_data_6.name = "index_bound";
     __e_acsl_assert(0 <= idx,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*(values[idx])",
+                                 0,*(values[idx]));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"idx",0,idx);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "*(values[idx]) == idx";
@@ -215,12 +215,12 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     if (retval == (void **)0) __gen_e_acsl_or = 1;
     else {
       int __gen_e_acsl_valid;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)retval,sizeof(void *),
+                                          (void *)retval,(void *)(& retval));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"retval",
                                    (void *)retval);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(void *)",0,sizeof(void *));
-      __gen_e_acsl_valid = __e_acsl_valid((void *)retval,sizeof(void *),
-                                          (void *)retval,(void *)(& retval));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                    "\\valid(retval)",0,__gen_e_acsl_valid);
       __gen_e_acsl_or = __gen_e_acsl_valid;
@@ -312,12 +312,12 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __e_acsl_store_block((void *)(& attr),8UL);
     __e_acsl_store_block((void *)(& thread),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)thread,sizeof(pthread_t),
+                                        (void *)thread,(void *)(& thread));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"thread",
                                  (void *)thread);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(pthread_t)",0,sizeof(pthread_t));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)thread,sizeof(pthread_t),
-                                        (void *)thread,(void *)(& thread));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\valid(thread)",0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -336,15 +336,15 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     if (attr == (pthread_attr_t const *)0) __gen_e_acsl_or = 1;
     else {
       int __gen_e_acsl_valid_read;
+      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)attr,
+                                                    sizeof(pthread_attr_t const),
+                                                    (void *)attr,
+                                                    (void *)(& attr));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"attr",
                                    (void *)attr);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(pthread_attr_t const)",0,
                                      sizeof(pthread_attr_t const));
-      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)attr,
-                                                    sizeof(pthread_attr_t const),
-                                                    (void *)attr,
-                                                    (void *)(& attr));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                    "\\valid_read(attr)",0,
                                    __gen_e_acsl_valid_read);
@@ -365,11 +365,11 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     if (arg == (void *)0) __gen_e_acsl_or_2 = 1;
     else {
       int __gen_e_acsl_valid_2;
+      __gen_e_acsl_valid_2 = __e_acsl_valid(arg,sizeof(char),arg,
+                                            (void *)(& arg));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"arg",arg);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(char)",0,sizeof(char));
-      __gen_e_acsl_valid_2 = __e_acsl_valid(arg,sizeof(char),arg,
-                                            (void *)(& arg));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "\\valid((char *)arg)",0,
                                    __gen_e_acsl_valid_2);

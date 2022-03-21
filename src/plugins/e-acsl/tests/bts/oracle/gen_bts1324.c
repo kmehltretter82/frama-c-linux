@@ -83,15 +83,15 @@ int __gen_e_acsl_sorted(int *t, int n)
         int __gen_e_acsl_valid_read_2;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
           {.values = (void *)0};
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + __gen_e_acsl_i),
+                                                      sizeof(int),(void *)t,
+                                                      (void *)(& t));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"t",
                                      (void *)t);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                        "sizeof(int)",0,sizeof(int));
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + __gen_e_acsl_i),
-                                                      sizeof(int),(void *)t,
-                                                      (void *)(& t));
         __gen_e_acsl_assert_data.blocking = 1;
         __gen_e_acsl_assert_data.kind = "RTE";
         __gen_e_acsl_assert_data.pred_txt = "\\valid_read(t + __gen_e_acsl_i)";
@@ -103,17 +103,17 @@ int __gen_e_acsl_sorted(int *t, int n)
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
           {.values = (void *)0};
+        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (
+                                                                 __gen_e_acsl_i - 1L)),
+                                                        sizeof(int),
+                                                        (void *)t,
+                                                        (void *)(& t));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"t",
                                      (void *)t);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                        "sizeof(int)",0,sizeof(int));
-        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (
-                                                                 __gen_e_acsl_i - 1L)),
-                                                        sizeof(int),
-                                                        (void *)t,
-                                                        (void *)(& t));
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "RTE";
         __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(t + (long)(__gen_e_acsl_i - 1))";

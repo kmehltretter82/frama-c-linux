@@ -44,13 +44,13 @@ void __gen_e_acsl_loop(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)global_i_ptr,sizeof(int),
+                                        (void *)global_i_ptr,
+                                        (void *)(& global_i_ptr));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"global_i_ptr",
                                  (void *)global_i_ptr);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)global_i_ptr,sizeof(int),
-                                        (void *)global_i_ptr,
-                                        (void *)(& global_i_ptr));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\valid(global_i_ptr)",0,
                                  __gen_e_acsl_valid);

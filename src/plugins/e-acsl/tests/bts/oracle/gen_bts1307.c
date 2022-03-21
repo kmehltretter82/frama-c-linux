@@ -111,13 +111,13 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __gen_e_acsl_at_3 = Mtmin_out;
     __gen_e_acsl_contract = __e_acsl_contract_init(1UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmin_in,sizeof(float),
+                                        (void *)Mtmin_in,
+                                        (void *)(& Mtmin_in));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"Mtmin_in",
                                  (void *)Mtmin_in);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(float)",0,sizeof(float));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmin_in,sizeof(float),
-                                        (void *)Mtmin_in,
-                                        (void *)(& Mtmin_in));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\valid(Mtmin_in)",0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -130,12 +130,12 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmin,sizeof(float),
+                                          (void *)Mwmin,(void *)(& Mwmin));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"Mwmin",
                                  (void *)Mwmin);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(float)",0,sizeof(float));
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmin,sizeof(float),
-                                          (void *)Mwmin,(void *)(& Mwmin));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\valid(Mwmin)",0,__gen_e_acsl_valid_2);
     __gen_e_acsl_assert_data_2.blocking = 1;
@@ -148,13 +148,13 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmin_out,sizeof(float),
+                                          (void *)Mtmin_out,
+                                          (void *)(& Mtmin_out));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"Mtmin_out",
                                  (void *)Mtmin_out);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(float)",0,sizeof(float));
-    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmin_out,sizeof(float),
-                                          (void *)Mtmin_out,
-                                          (void *)(& Mtmin_out));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\\valid(Mtmin_out)",0,__gen_e_acsl_valid_3);
     __gen_e_acsl_assert_data_3.blocking = 1;
@@ -179,20 +179,16 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       int __gen_e_acsl_if;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmin_out)",*__gen_e_acsl_at_3);
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmin_in)",*__gen_e_acsl_at);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
-                                   "__gen_e_acsl_at",(void *)__gen_e_acsl_at);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
-                                     "sizeof(float)",0,sizeof(float));
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at,
                                                     sizeof(float),
                                                     (void *)__gen_e_acsl_at,
                                                     (void *)(& __gen_e_acsl_at));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
+                                   "__gen_e_acsl_at",(void *)__gen_e_acsl_at);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                     "sizeof(float)",0,sizeof(float));
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(__gen_e_acsl_at)";
@@ -204,15 +200,15 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
         {.values = (void *)0};
+      __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at_3,
+                                                      sizeof(float),
+                                                      (void *)__gen_e_acsl_at_3,
+                                                      (void *)(& __gen_e_acsl_at_3));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
                                    "__gen_e_acsl_at_3",
                                    (void *)__gen_e_acsl_at_3);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
                                      "sizeof(float)",0,sizeof(float));
-      __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at_3,
-                                                      sizeof(float),
-                                                      (void *)__gen_e_acsl_at_3,
-                                                      (void *)(& __gen_e_acsl_at_3));
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "RTE";
       __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(__gen_e_acsl_at_3)";
@@ -228,12 +224,8 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         __e_acsl_mpq_t __gen_e_acsl_mul;
         __e_acsl_mpq_t __gen_e_acsl__3;
         int __gen_e_acsl_lt;
-        __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                       "*\\old(Mtmin_in)",*__gen_e_acsl_at);
         __gmpq_init(__gen_e_acsl_);
         __gmpq_set_str(__gen_e_acsl_,"085/100",10);
-        __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                       "*\\old(Mwmin)",*__gen_e_acsl_at_2);
         __gmpq_init(__gen_e_acsl__2);
         __gmpq_set_d(__gen_e_acsl__2,(double)*__gen_e_acsl_at_2);
         __gmpq_init(__gen_e_acsl_mul);
@@ -253,19 +245,17 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       else __gen_e_acsl_and = 0;
       if (__gen_e_acsl_and) {
         int __gen_e_acsl_valid_read_3;
-        __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                       "*\\old(Mtmin_in)",*__gen_e_acsl_at);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
           {.values = (void *)0};
+        __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
+                                                        sizeof(float),
+                                                        (void *)__gen_e_acsl_at,
+                                                        (void *)(& __gen_e_acsl_at));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
                                      "__gen_e_acsl_at",
                                      (void *)__gen_e_acsl_at);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                        "sizeof(float)",0,sizeof(float));
-        __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
-                                                        sizeof(float),
-                                                        (void *)__gen_e_acsl_at,
-                                                        (void *)(& __gen_e_acsl_at));
         __gen_e_acsl_assert_data_7.blocking = 1;
         __gen_e_acsl_assert_data_7.kind = "RTE";
         __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(__gen_e_acsl_at)";
@@ -276,6 +266,8 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         __e_acsl_assert(__gen_e_acsl_valid_read_3,
                         & __gen_e_acsl_assert_data_7);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+        __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                       "*\\old(Mtmin_in)",*__gen_e_acsl_at);
         __gen_e_acsl_if = (double)*__gen_e_acsl_at != 0.;
       }
       else {
@@ -286,8 +278,6 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         int __gen_e_acsl_ne;
         __gmpq_init(__gen_e_acsl__4);
         __gmpq_set_str(__gen_e_acsl__4,"085/100",10);
-        __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                       "*\\old(Mwmin)",*__gen_e_acsl_at_2);
         __gmpq_init(__gen_e_acsl__5);
         __gmpq_set_d(__gen_e_acsl__5,(double)*__gen_e_acsl_at_2);
         __gmpq_init(__gen_e_acsl_mul_2);
@@ -298,12 +288,22 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         __gmpq_set_d(__gen_e_acsl__6,0.);
         __gen_e_acsl_ne = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_mul_2),
                                      (__e_acsl_mpq_struct const *)(__gen_e_acsl__6));
+        __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                       "*\\old(Mwmin)",*__gen_e_acsl_at_2);
         __gen_e_acsl_if = __gen_e_acsl_ne != 0;
         __gmpq_clear(__gen_e_acsl__4);
         __gmpq_clear(__gen_e_acsl__5);
         __gmpq_clear(__gen_e_acsl_mul_2);
         __gmpq_clear(__gen_e_acsl__6);
       }
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mtmin_out)",*__gen_e_acsl_at_3);
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mtmin_in)",*__gen_e_acsl_at);
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mtmin_in)",*__gen_e_acsl_at);
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mwmin)",*__gen_e_acsl_at_2);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
       __gen_e_acsl_assert_data_4.pred_txt = "*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85 * *\\old(Mwmin) != 0.";
@@ -350,13 +350,13 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __gen_e_acsl_at_3 = Mtmax_out;
     __gen_e_acsl_contract = __e_acsl_contract_init(1UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmax_in,sizeof(float),
+                                        (void *)Mtmax_in,
+                                        (void *)(& Mtmax_in));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"Mtmax_in",
                                  (void *)Mtmax_in);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(float)",0,sizeof(float));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmax_in,sizeof(float),
-                                        (void *)Mtmax_in,
-                                        (void *)(& Mtmax_in));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\valid(Mtmax_in)",0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -369,12 +369,12 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmax,sizeof(float),
+                                          (void *)Mwmax,(void *)(& Mwmax));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"Mwmax",
                                  (void *)Mwmax);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(float)",0,sizeof(float));
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmax,sizeof(float),
-                                          (void *)Mwmax,(void *)(& Mwmax));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\valid(Mwmax)",0,__gen_e_acsl_valid_2);
     __gen_e_acsl_assert_data_2.blocking = 1;
@@ -387,13 +387,13 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmax_out,sizeof(float),
+                                          (void *)Mtmax_out,
+                                          (void *)(& Mtmax_out));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"Mtmax_out",
                                  (void *)Mtmax_out);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(float)",0,sizeof(float));
-    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmax_out,sizeof(float),
-                                          (void *)Mtmax_out,
-                                          (void *)(& Mtmax_out));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\\valid(Mtmax_out)",0,__gen_e_acsl_valid_3);
     __gen_e_acsl_assert_data_3.blocking = 1;
@@ -427,10 +427,6 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       int __gen_e_acsl_ne;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmax_out)",*__gen_e_acsl_at_3);
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmax_in)",*__gen_e_acsl_at);
       __gmpq_init(__gen_e_acsl_);
       __gmpq_set_str(__gen_e_acsl_,"5",10);
       __gmpq_init(__gen_e_acsl__2);
@@ -441,8 +437,6 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       __gmpq_div(__gen_e_acsl_div,
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl__2),
                  (__e_acsl_mpq_struct const *)(__gen_e_acsl__3));
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mwmax)",*__gen_e_acsl_at_2);
       __gmpq_init(__gen_e_acsl__4);
       __gmpq_set_d(__gen_e_acsl__4,(double)*__gen_e_acsl_at_2);
       __gmpq_init(__gen_e_acsl_mul);
@@ -469,6 +463,12 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       __gmpq_set_d(__gen_e_acsl__7,(double)*__gen_e_acsl_at_3);
       __gen_e_acsl_ne = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl__7),
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_add));
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mtmax_out)",*__gen_e_acsl_at_3);
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mtmax_in)",*__gen_e_acsl_at);
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mwmax)",*__gen_e_acsl_at_2);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
       __gen_e_acsl_assert_data_4.pred_txt = "*\\old(Mtmax_out) != *\\old(Mtmax_in) + (5 - ((5 / 80) * *\\old(Mwmax)) * 0.4)";

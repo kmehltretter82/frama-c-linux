@@ -31,12 +31,12 @@ int main(void)
   {
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& i),
+                                                    sizeof(int));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&i",
                                  (void *)(& i));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
                                    0,sizeof(int));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& i),
-                                                    sizeof(int));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\initialized(&i)",0,
                                  __gen_e_acsl_initialized);

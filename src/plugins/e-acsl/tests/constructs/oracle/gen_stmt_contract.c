@@ -339,14 +339,8 @@ int main(void)
       ((__e_acsl_contract_t const *)__gen_e_acsl_contract_3);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
-                                   "number of active behaviors",0,
-                                   __gen_e_acsl_active_bhvrs);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,
-                                   "number of active behaviors",0,
-                                   __gen_e_acsl_active_bhvrs);
       if (__gen_e_acsl_active_bhvrs != 1) {
         __gen_e_acsl_assert_data_19.blocking = 1;
         __gen_e_acsl_assert_data_19.kind = "Precondition";
