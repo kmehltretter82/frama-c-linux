@@ -73,12 +73,14 @@ sig
      Identifier [id] shall be unique.
      Label [label] shall be very short.
      Description shall succintly describe the kind of informations.
+     If the optional [enable] function is provided, the information printer is
+     only used when [enable ()] returns true.
      The printer is allowed to raise [Not_found] exception,
      which is interpreted as there is no information of this kind for
      the localizable.
   *)
   val register :
-    id:string -> label:string -> title:string ->
+    id:string -> label:string -> title:string -> ?enable:(unit -> bool) ->
     (Format.formatter -> Printer_tag.localizable -> unit) -> unit
 
   (** Updated informations signal *)

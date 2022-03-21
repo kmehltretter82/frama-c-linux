@@ -554,6 +554,7 @@ struct
     rank: int;
     label: string;
     title: string;
+    enable: unit -> bool;
     pretty: Format.formatter -> Printer_tag.localizable -> unit
   }
 
@@ -599,12 +600,13 @@ struct
     let infos = ref [] in
     Hashtbl.iter
       (fun _ info ->
-         match tgt with
-         | None -> infos := (info, `Null) :: !infos
-         | Some marker ->
-           let text = jtext info.pretty marker in
-           if not (Jbuffer.is_empty text) then
-             infos := (info, text) :: !infos
+         if info.enable () then
+           match tgt with
+           | None -> infos := (info, `Null) :: !infos
+           | Some marker ->
+             let text = jtext info.pretty marker in
+             if not (Jbuffer.is_empty text) then
+               infos := (info, text) :: !infos
       ) registry ;
     List.sort by_rank !infos
 
@@ -614,9 +616,9 @@ struct
 
   let update () = Request.emit signal
 
-  let register ~id ~label ~title pretty =
+  let register ~id ~label ~title ?(enable = fun _ -> true) pretty =
     let rank = incr rankId ; !rankId in
-    let info = { id ; rank ; label ; title ; pretty } in
+    let info = { id ; rank ; label ; title ; enable ; pretty } in
     if Hashtbl.mem registry id then
       ( let msg = Format.sprintf
             "Server.Kernel_ast.register_info: duplicate %S" id in
