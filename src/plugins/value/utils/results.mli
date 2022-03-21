@@ -225,6 +225,10 @@ val as_cvalue : value evaluation -> Cvalue.V.t
 (** Converts the value into a Cvalue abstraction. *)
 val as_cvalue_result : value evaluation -> Cvalue.V.t result
 
+(** Converts the value into a Cvalue abstraction with 'undefined' and 'escaping
+    addresses' flags. *)
+val as_cvalue_or_uninitialized : value evaluation -> Cvalue.V_Or_Uninitialized.t
+
 
 (** Converts into a C location abstraction. *)
 val as_location : address evaluation -> Locations.location result
