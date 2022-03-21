@@ -362,9 +362,9 @@ export default function ASTinfo(): JSX.Element {
           title="Information Filters"
         />
       </TitleBar>
-      <Boxes.Vfill>
+      <Boxes.Scroll>
         {markers.getSelected().map(renderMark)}
-      </Boxes.Vfill>
+      </Boxes.Scroll>
     </>
   );
 }
