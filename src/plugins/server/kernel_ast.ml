@@ -641,6 +641,15 @@ let () = Request.register ~package
 (* -------------------------------------------------------------------------- *)
 
 let () = Informations.register
+    ~id:"kernel.ast.location"
+    ~label:"Location"
+    ~title:"Source file location"
+    begin fun fmt loc ->
+      let location = Printer_tag.loc_of_localizable loc in
+      Filepath.pp_pos fmt (fst location)
+    end
+
+let () = Informations.register
     ~id:"kernel.ast.varinfo"
     ~label:"Var"
     ~title:"Variable Informations"
