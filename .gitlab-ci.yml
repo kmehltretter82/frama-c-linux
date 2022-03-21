@@ -48,6 +48,13 @@ lint:
 ################################################################################
 ### TESTS
 
+acsl-importer:
+  stage: tests
+  script:
+    - ./ci.sh ACSL-importer
+  tags:
+    - nix
+
 cfp:
   stage: tests
   script:
