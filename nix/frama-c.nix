@@ -84,6 +84,8 @@ stdenv.mkDerivation rec {
     autoconf
   '';
 
+  # Do not use default parallel building, but allow 2 cores for Frama-C build
+  enableParallelBuilding = false;
   buildPhase = ''
     make config.sed
     dune build -j2 --display short @install
@@ -104,9 +106,33 @@ stdenv.mkDerivation rec {
     cp -r $out/share/doc $out/doc
   '';
 
-  # Required so that Frama-C libs are found after install
+  # Allow loading of external Frama-C plugins
   setupHook = writeText "setupHook.sh" ''
-    export OCAMLPATH="''${OCAMLPATH-}''${OCAMLPATH:+:}''$1/lib"
+    has_dirs() {
+      for f do
+        [ -d "$f" ] && return
+      done
+      false
+    }
+
+    addFramaCPath () {
+      if test -d "''$1/lib/frama-c/plugins"; then
+        export FRAMAC_PLUGIN="''${FRAMAC_PLUGIN-}''${FRAMAC_PLUGIN:+:}''$1/lib/frama-c/plugins"
+        export OCAMLPATH="''${OCAMLPATH-}''${OCAMLPATH:+:}''$1/lib/frama-c/plugins"
+      fi
+
+      if has_dirs ''$1/lib/frama-c-*; then
+        export OCAMLPATH="''${OCAMLPATH-}''${OCAMLPATH:+:}''$1/lib"
+        export DUNE_DIR_LOCATIONS="''${DUNE_DIR_LOCATIONS-}''${DUNE_DIR_LOCATIONS:+:}frama-c:lib:''$1/lib/frama-c"
+      fi
+
+      if test -d "''$1/share/frama-c/"; then
+        export FRAMAC_EXTRA_SHARE="''${FRAMAC_EXTRA_SHARE-}''${FRAMAC_EXTRA_SHARE:+:}''$1/share/frama-c"
+      fi
+
+    }
+
+    addEnvHooks "$targetOffset" addFramaCPath
   '';
 
   meta = {
