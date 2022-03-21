@@ -33,9 +33,17 @@ let condition original p = (* keep original kind of simple condition *)
   | _ -> assert false
 
 let tactical_step step =
-  Tactical.replace_single ~at:step.id ("Removed", Conditions.Have Lang.F.p_true)
+  Tactical.replace_single ~at:step.id
+    (* Note: the provided name is used in the GUi for the subgoal title *)
+    ("Removed Step", Conditions.Have Lang.F.p_true)
 
 module TermLset = Qed.Listset.Make(Lang.F.QED.Term)
+
+let pp_filtered fmt t =
+  match Lang.F.repr t with
+  | Qed.Logic.Fun(f,_) -> Format.fprintf fmt "%a(...)" Lang.Fun.pretty f
+  | _ -> Lang.F.pp_term fmt t
+
 
 let tactical_inside step remove =
   let remove = List.sort_uniq Lang.F.compare remove in
@@ -47,9 +55,13 @@ let tactical_inside step remove =
   begin match step.condition with
     | Type p | Have p | When p | Core p | Init p ->
       let ps = Lang.F.e_props @@ collect p in
-      let ps = TermLset.diff ps remove in
-      let cond = condition step @@ Lang.F.p_bool @@ Lang.F.e_and ps in
-      Tactical.replace_single ~at:step.id ("Filtered", cond)
+      let kept = TermLset.diff ps remove in
+      let feedback =
+        Format.asprintf "Filtered: %a"
+          (Pretty_utils.pp_list ~sep:", " pp_filtered) remove
+      in
+      let cond = condition step @@ Lang.F.p_bool @@ Lang.F.e_and kept in
+      Tactical.replace_single ~at:step.id (feedback, cond)
 
     | _ -> raise Not_found
   end
@@ -71,7 +83,8 @@ let collect_remove m = function
 
 let fold_selection s seq =
   let m = List.fold_left collect_remove Smap.empty s in
-  "Filtered", Smap.fold (fun s l seq -> snd @@ tactical_inside s l seq) m seq
+  "Filtered mutiple selection",
+  Smap.fold (fun s l seq -> snd @@ tactical_inside s l seq) m seq
 
 let process (f: sequent -> string * sequent) s = [ f s ]
 

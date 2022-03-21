@@ -118,9 +118,22 @@ let tactical_inside step unfolds sequent =
   then raise Not_found
   else match step.condition with
     | Type p | Have p | When p | Core p | Init p ->
-      let subst t = Lang.F.Tmap.find t unfolds in
+      let unfolded = ref [] in
+      let subst t =
+        let result = Lang.F.Tmap.find t unfolds in
+        begin match F.repr t with
+          | Qed.Logic.Fun(f,_) -> unfolded := f :: !unfolded
+          | _ -> ()
+        end ;
+        result
+      in
       let p = condition step @@ Lang.p_subst subst p in
-      snd @@ Tactical.replace_single ~at:step.id ("Unfolded", p) sequent
+      let unfolded = List.sort_uniq Lang.Fun.compare !unfolded in
+      let feedback =
+        Format.asprintf "Unfolded: %a"
+          (Pretty_utils.pp_list ~sep:", " Lang.Fun.pretty) unfolded
+      in
+      snd @@ Tactical.replace_single ~at:step.id (feedback, p) sequent
     | _ -> raise Not_found
 
 let tactical_goal unfolds (seq, g) =
