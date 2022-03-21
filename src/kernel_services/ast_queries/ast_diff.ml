@@ -1322,7 +1322,7 @@ and enumitem_correspondance ?loc:_loc ei _env = Enumitem.find ei
 and gvar_correspondance ?loc vi env =
   let add vi =
     match find_candidate_varinfo ?loc vi Cil_types.VGlobal with
-    | None ->
+    | None when Cil.isFunctionType vi.vtype ->
       begin
         match gfun_correspondance ?loc vi env with
         | `Same kf' -> `Same (Kf.get_vi kf')
@@ -1332,6 +1332,7 @@ and gvar_correspondance ?loc vi env =
           `Same (Kf.get_vi kf')
         | `Not_present -> `Not_present
       end
+    | None -> `Not_present
     | Some vi' ->
       let selection = State_selection.singleton Globals.Vars.self in
       let init =
