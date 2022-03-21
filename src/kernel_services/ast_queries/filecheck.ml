@@ -24,10 +24,18 @@ open Cil_types
 open Cil_datatype
 
 
+let same_integral_types t1 t2 =
+  match Cil.unrollType t1, Cil.unrollType t2 with
+  | TInt(ik1,[]), TInt(ik2,[]) ->
+    Cil.bitsSizeOfInt ik1 = Cil.bitsSizeOfInt ik2 &&
+    Cil.isSigned ik1 = Cil.isSigned ik2
+  | _ -> false
+
 let is_admissible_conversion e ot nt =
   let ot' = Cil.typeDeepDropAllAttributes ot in
   let nt' = Cil.typeDeepDropAllAttributes nt in
   not (Cil.need_cast ot' nt') ||
+  same_integral_types ot' nt' ||
   (match e.enode, Cil.unrollType nt with
    | Const(CEnum { eihost = ei }), TEnum(ei',_) -> ei.ename = ei'.ename
    | _ -> false)
