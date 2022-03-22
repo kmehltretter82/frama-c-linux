@@ -138,12 +138,6 @@ $(info 'acsl' not in doc; try: git clone https://github.com/acsl-language/acsl.g
 else
 
 ACSL_SUFFIX=$(shell grep acslversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
-ACSL_IMPLEM_VERSION=$(shell grep fcversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
-
-# Sanity check: version differences between Frama-C and ACSL
-ifneq ($(ACSL_IMPLEM_VERSION),$(VERSION))
-    $(info WARNING: ACSL implementation refers to a different Frama-C version: $(ACSL_IMPLEM_VERSION) versus $(VERSION))
-endif
 
 clean::
 	$(MAKE) -C acsl clean
