@@ -91,6 +91,7 @@ autom4te.cache
 /doc/*/*.fls
 /doc/*/*.fdb_latexmk
 /doc/*/*.synctex.gz
+/doc/*/frama-c-affiliation.tex
 
 /doc/acsl/
 
