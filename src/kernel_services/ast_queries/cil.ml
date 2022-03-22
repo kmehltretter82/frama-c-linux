@@ -6911,7 +6911,7 @@ module Switch_cases =
 let () = dependency_on_ast Switch_cases.self
 let separate_switch_succs = Switch_cases.memo separate_switch_succs
 
-class dropAttributes ?select () = object
+class dropAttributes ?select () = object(self)
   inherit genericCilVisitor (Visitor_behavior.copy (Project.current ()))
   method! vattr a =
     match select with
@@ -6924,8 +6924,9 @@ class dropAttributes ?select () = object
     | TNamed (internal_ty, attrs) ->
       let tty = typeAddAttributes attrs internal_ty.ttype in
       (* keep the original type whenever possible *)
-      ChangeDoChildrenPost
-        (tty, fun x -> if x == internal_ty.ttype then ty else x)
+      ChangeToPost
+        (visitCilType (self:>cilVisitor) tty,
+         fun x -> if x == internal_ty.ttype then ty else x)
     | TVoid _ | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _
     | TComp _ | TEnum _ | TBuiltin_va_list _ -> DoChildren
 end
