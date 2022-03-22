@@ -191,9 +191,10 @@ endif
 
 # Note: The makefiles of ACSL/E-ACSL are not parallelizable when producing both
 # acsl.pdf and acsl-implementation.pdf (race conditions in intermediary files,
-# leading to non-deterministic errors).
-# Therefore, we perform a second call to parellel for these files.
-acsl/acsl.pdf: acsl/acsl-implementation.pdf
-$(EACSL_DOC)/refman/e-acsl.pdf: $(EACSL_DOC)/refman/e-acsl-implementation.pdf
+# leading to non-deterministic errors): we have to wait for one to complete
+# before making the other
+
+acsl/acsl-implementation.pdf: | acsl/acsl.pdf
+$(EACSL_DOC)/refman/e-acsl-implementation.pdf: | $(EACSL_DOC)/refman/e-acsl.pdf
 
 endif
