@@ -27,6 +27,7 @@ import ThenImage from './img/then.svg';
 import ElseImage from './img/else.svg';
 
 type controlPointKind = 'before' | 'after' | 'then' | 'else';
+interface Props { kind : controlPointKind }
 
 function imageSource(kind: controlPointKind): string {
   switch (kind) {
@@ -46,15 +47,15 @@ function imageTitle(kind: controlPointKind): string {
   }
 }
 
-export default function ({ kind }: { kind: controlPointKind}) {
+export default function ControlPoint(p: Props): JSX.Element {
   return (
     <img
       style={{ verticalAlign: 'middle' }}
-      src={imageSource(kind)}
+      src={imageSource(p.kind)}
       height="18px"
       width="18px"
-      title={imageTitle(kind)}
-      alt={imageTitle(kind)}
+      title={imageTitle(p.kind)}
+      alt={imageTitle(p.kind)}
     />
   );
 }

@@ -33,7 +33,7 @@ import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { Filler, Hpack, Vpack, Vfill } from 'dome/layout/boxes';
+import { Filler, Hpack, Vpack } from 'dome/layout/boxes';
 import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 
 
@@ -350,7 +350,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   locEvt.on((l) => { if (l === probe) ref.current?.scrollIntoView(); });
 
   const loc: States.SelectionActions = { location: { fct, marker: target} };
-  const onClick = (): void => { setSelection(loc); selectProbe(); }
+  const onClick = (): void => { setSelection(loc); selectProbe(); };
   const onDoubleClick = (): void => pinProbe(!isPinnedMarker(status));
   const onContextMenu = (): void => {
     const items: Dome.PopupMenuItem[] = [];
@@ -769,7 +769,7 @@ function EvaTable(): JSX.Element {
   const [ cs, setCS ] = React.useState<callstack>('Summary');
   const [ fcts ] = React.useState(new FunctionsManager());
   const [ tac, setTic ] = React.useState(false);
-  const locEvt = new Dome.Event<Location>('eva-select-location');
+  const [ locEvt ] = React.useState(new Dome.Event<Location>('eva-location'));
 
   const getProbe = useProbeCache();
   const getCallsites = useCallsitesCache();
@@ -785,7 +785,7 @@ function EvaTable(): JSX.Element {
     fcts.clean(loc);
     if (loc) getProbe(loc).then(update);
     else setFocus(undefined);
-  }, [ fcts, selection, getProbe, setFocus ]);
+  }, [ fcts, selection, getProbe, setFocus, locEvt ]);
 
   const setLocPin = React.useCallback((loc: Location, pin: boolean): void => {
     if (pin) fcts.pin(loc);
@@ -838,7 +838,7 @@ function EvaTable(): JSX.Element {
     return Promise.all(ps.map(FunctionSection));
   },
   [ cs, fcts, focus, tac, getCallsites, setLocPin,
-    getCallstacks, getProbe, remove, select, state
+    getCallstacks, getProbe, remove, select, state, locEvt
   ]);
   const { result: functions } = Dome.usePromise(functionsPromise);
 
