@@ -167,6 +167,10 @@
   border-right: thin solid var(--border);
 }
 
+.eva-table-container {
+  overflow: auto;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Table Headers CSS                                                  --- */
 /* -------------------------------------------------------------------------- */
@@ -269,5 +273,7 @@ tr:first-of-type > .eva-table-callsite-box {
 /* -------------------------------------------------------------------------- */
 
 .eva-functions-section {
-  overflow-y: auto;
+  display: grid;
+  overflow: auto;
+  align-content: start;
 }

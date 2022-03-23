@@ -423,7 +423,6 @@ interface ProbeValuesProps {
   addLoc: (loc: Location) => void;
   isSelected: boolean;
   summaryOnly: boolean;
-  // selectedClass?: string;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
@@ -484,8 +483,6 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     return <></>;
   };
 }
-
-
 
 
 
@@ -568,7 +565,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   }));
 
   return (
-    <div key={fct}>
+    <>
       <Hpack className="eva-function">
         <IconButton
           className="eva-fct-fold"
@@ -592,7 +589,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
           onClick={close}
         />
       </Hpack>
-      <div style={{ overflowX: 'auto' }}>
+      <div className='eva-table-container'>
         <table className='eva-table' style={{ display: displayTable }}>
           <tbody>
             <tr>
@@ -611,7 +608,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -868,9 +865,9 @@ function EvaTable(): JSX.Element {
         state={state}
         setState={setState}
       />
-      <Vfill className='eva-functions-section'>
+      <div className='eva-functions-section'>
         {React.Children.toArray(functions)}
-      </Vfill>
+      </div>
       {alarmsInfos}
       {stackInfos}
     </>
