@@ -32,10 +32,16 @@ let add_my_exn my_exn f =
   let c = Cil.evar (List.hd f.sformals) in
   let exn_type = TComp(my_exn,[]) in
   let loc = Cil_datatype.Location.unknown in
+  let my_field = List.hd (Option.get my_exn.cfields) in
+  let kind =
+    match my_field.ftype with
+    | TInt(ik,_) -> ik
+    | _ -> Kernel.fatal "Unexpected struct for the test"
+  in
   let init =
     CompoundInit(
         exn_type,
-        [Field(List.hd (Option.get my_exn.cfields), NoOffset), SingleInit (Cil.zero ~loc)])
+        [Field(my_field, NoOffset), SingleInit (Cil.kinteger ~loc kind 0)])
   in
   add_throw_test f exn_type c init
 
@@ -61,8 +67,9 @@ let add_int_ptr_exn glob f =
 let add_catch my_exn my_exn2 f =
   let exn_type = TComp(my_exn, []) in
   let exn_type2 = TComp(my_exn2, []) in
-  let exn_field = Field (List.hd (Option.get my_exn.cfields), NoOffset) in
-  let exn2_field = Field (List.hd (Option.get my_exn2.cfields), NoOffset) in
+  let exn_field = List.hd (Option.get my_exn.cfields) in
+  let exn_field_offset = Field(exn_field,NoOffset) in
+  let exn2_field = List.hd (Option.get my_exn2.cfields) in
   let loc = Cil_datatype.Location.unknown in
   let real_locals = f.sbody.blocals in
   let v1 = Cil.makeLocalVar f "exn" exn_type in
@@ -76,10 +83,9 @@ let add_catch my_exn my_exn2 f =
   in
   let convert_exn_block =
     Cil.mkBlock
-      [ Cil.mkStmtOneInstr
-          (Set ((Var v1, exn_field),
-                Cil.new_exp ~loc (Lval (Var v4, exn2_field)),
-                loc))]
+      [ Cil_builder.Pure.(
+            cil_stmt ~loc
+              (field (var v1) exn_field := field (var v4) exn2_field)) ]
   in
   let catch_stmt =
     Cil.mkStmt
@@ -89,7 +95,7 @@ let add_catch my_exn my_exn2 f =
              Cil.mkBlock
                [ Cil.mkStmt
                    (Return
-                      (Some (Cil.new_exp ~loc (Lval (Var v1, exn_field))),
+                      (Some (Cil.new_exp ~loc (Lval (Var v1,exn_field_offset))),
                        loc))];
              Catch_exn (v2,[]),
              Cil.mkBlock

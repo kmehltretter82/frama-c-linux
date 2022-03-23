@@ -1212,6 +1212,7 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
              aggregate_name oldci.cname aggregate_name ci.cname
              old_len len
          in
+         undo ();
          raise (Failure msg)
        end;
        (* We check the fields but watch for Failure. We only do the check when

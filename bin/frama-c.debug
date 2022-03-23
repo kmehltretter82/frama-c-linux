@@ -65,8 +65,6 @@ install_printer Cil_types_debug.pp_global
 install_printer Cil_types_debug.pp_typ
 install_printer Cil_types_debug.pp_ikind
 install_printer Cil_types_debug.pp_fkind
-install_printer Cil_types_debug.pp_bitsSizeofTyp
-install_printer Cil_types_debug.pp_bitsSizeofTypCache
 install_printer Cil_types_debug.pp_attribute
 install_printer Cil_types_debug.pp_attributes
 install_printer Cil_types_debug.pp_attrparam
@@ -79,7 +77,6 @@ install_printer Cil_types_debug.pp_varinfo
 install_printer Cil_types_debug.pp_storage
 install_printer Cil_types_debug.pp_exp
 install_printer Cil_types_debug.pp_exp_node
-install_printer Cil_types_debug.pp_exp_info
 install_printer Cil_types_debug.pp_constant
 install_printer Cil_types_debug.pp_unop
 install_printer Cil_types_debug.pp_binop
@@ -136,7 +133,6 @@ install_printer Cil_types_debug.pp_funspec
 install_printer Cil_types_debug.pp_code_annotation
 install_printer Cil_types_debug.pp_funbehavior
 install_printer Cil_types_debug.pp_global_annotation
-install_printer Cil_types_debug.pp_custom_tree
 install_printer Cil_types_debug.pp_kinstr
 install_printer Cil_types_debug.pp_cil_function
 install_printer Cil_types_debug.pp_kernel_function
