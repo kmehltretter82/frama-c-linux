@@ -98,26 +98,19 @@ function Marker(props: MarkerProps): JSX.Element {
 
 function makeContents(text: KernelData.text): React.ReactNode {
   if (Array.isArray(text)) {
-    const tag = text.shift();
-    let marker: string | undefined;
-    if (tag) {
-      if (Array.isArray(tag)) {
-        text.unshift(tag);
-      } else if (typeof tag === 'string') {
-        marker = tag;
-      }
-      // otherwize, ignore tag
+    const tag = text[0];
+    const marker = tag && typeof (tag) === 'string';
+    const array = marker ? text.slice(1) : text;
+    const contents = React.Children.toArray(array.map(makeContents));
+    if (marker) {
+      return <Marker marker={tag}>{contents}</Marker>;
     }
-    const contents = React.Children.map(text, makeContents);
-    if (marker)
-      return <Marker marker={marker}>{contents}</Marker>;
     return <>{contents}</>;
   } if (typeof text === 'string') {
     return text;
   }
   D.error('Unexpected text', text);
   return null;
-
 }
 
 export interface TextProps {
