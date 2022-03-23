@@ -321,10 +321,11 @@ interface ProbeHeaderProps {
   selectProbe: () => void;
   removeProbe: () => void;
   setSelection: (a: States.SelectionActions) => void;
+  locEvt: Dome.Event<Location>;
 }
 
 function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
-  const { probe, summary, status, state, setSelection } = props;
+  const { probe, summary, status, state, setSelection, locEvt } = props;
   const { code = '(error)', stmt, target, fct } = probe;
   const color = MarkerStatusClass(status);
   const { selectProbe, removeProbe, pinProbe } = props;
@@ -340,8 +341,13 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   if ((state === 'After' || state === 'Both') && vThen && vElse) span += 4;
   if (span === 0) return <></>;
 
+  // When the location is selected, we scroll the header into view, making it
+  // appears wherever it was.
+  const ref = React.createRef<HTMLTableCellElement>();
+  locEvt.on((l) => { if (l === probe) ref.current?.scrollIntoView(); });
+
   const loc: States.SelectionActions = { location: { fct, marker: target} };
-  const onClick = (): void => { setSelection(loc); selectProbe(); };
+  const onClick = (): void => { setSelection(loc); selectProbe(); }
   const onDoubleClick = (): void => pinProbe(!isPinnedMarker(status));
   const onContextMenu = (): void => {
     const items: Dome.PopupMenuItem[] = [];
@@ -352,6 +358,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   
   return (
     <th
+      ref={ref}
       className={color}
       colSpan={span}
       onClick={onClick}
@@ -498,10 +505,11 @@ interface FunctionProps {
   selectCallstack: (callstack: callstack) => void;
   isSelectedCallstack: (c: callstack) => boolean;
   setSelection: (a: States.SelectionActions) => void;
+  locEvt: Dome.Event<Location>;
 }
 
 async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
-  const { fct, state, folded, isSelectedCallstack } = props;
+  const { fct, state, folded, isSelectedCallstack, locEvt } = props;
   const { byCallstacks, setSelection, getCallsites } = props;
   const { addLoc, getCallstacks: getCS } = props;
   const { setFolded, setByCallstacks, close } = props;
@@ -526,7 +534,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     const selectProbe = (): void => props.selectProbe(d.probe);
     const removeProbe = (): void => props.removeProbe(d.probe);
     const fcts = { selectProbe, pinProbe, removeProbe, setSelection };
-    return ProbeHeader({ ...d, state, ...fcts });
+    return ProbeHeader({ ...d, state, ...fcts, locEvt });
   }));
 
   const title = 'Column description';
@@ -644,24 +652,13 @@ class FunctionInfos {
   }
 
   markers(focusedLoc?: Location): Map<Ast.marker, MarkerStatus> {
-    const focused = focusedLoc?.target;
-    const fct = focusedLoc?.fct;
-    const { pinned, tracked } = this;
-    const markers = new Map<Ast.marker, MarkerStatus>();
-    if (focused && fct && fct === this.fct) {
-      if (pinned.has(focused))
-        markers.set(focused, [ 'Pinned', true ]);
-      else if (tracked.has(focused))
-        markers.set(focused, [ 'Tracked', true ]);
-      else
-        markers.set(focused, 'JustFocused');
-    }
-    const add = (marker: Ast.marker, kind: 'Pinned' | 'Tracked'): void => {
-      if (marker !== focused) markers.set(marker, [ kind, false ]);
-    };
-    pinned.forEach((p) => add(p, 'Pinned'));
-    tracked.forEach((t) => add(t, 'Tracked'));
-    return markers;
+    const { target: tgt, fct } = focusedLoc ?? {};
+    const inFct = fct !== undefined && fct === this.fct;
+    const ms = new Map<Ast.marker, MarkerStatus>();
+    this.pinned.forEach((p) => ms.set(p, [ 'Pinned', inFct && tgt === p ]));
+    this.tracked.forEach((p) => ms.set(p, [ 'Tracked', inFct && tgt === p ]));
+    if (inFct && tgt && !this.has(tgt)) ms.set(tgt, 'JustFocused');
+    return new Map(Array.from(ms.entries()).reverse());
   }
 
 }
@@ -772,6 +769,7 @@ function EvaTable(): JSX.Element {
   const [ cs, setCS ] = React.useState<callstack>('Summary');
   const [ fcts ] = React.useState(new FunctionsManager());
   const [ tac, setTic ] = React.useState(false);
+  const locEvt = new Dome.Event<Location>('eva-select-location');
 
   const getProbe = useProbeCache();
   const getCallsites = useCallsitesCache();
@@ -783,9 +781,9 @@ function EvaTable(): JSX.Element {
     const fct = selection?.current?.fct;
     const loc = (target && fct) ? { target, fct } : undefined;
     const f = (p: Probe): void => { if (fct && p.code) fcts.newFunction(fct); };
-    const doUpdate = (p: Probe): void => { f(p) ; setFocus(p); };
+    const update = (p: Probe): void => { f(p) ; setFocus(p); locEvt.emit(p); };
     fcts.clean(loc);
-    if (loc) getProbe(loc).then(doUpdate);
+    if (loc) getProbe(loc).then(update);
     else setFocus(undefined);
   }, [ fcts, selection, getProbe, setFocus ]);
 
@@ -834,6 +832,7 @@ function EvaTable(): JSX.Element {
         selectCallstack: (c: callstack) => { setCS(c); setTic(!tac); },
         isSelectedCallstack,
         setSelection: select,
+        locEvt,
       };
     });
     return Promise.all(ps.map(FunctionSection));
