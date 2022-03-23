@@ -106,9 +106,7 @@
 
 .eva-stmt {
   color: var(--info-text);
-  text-select: none;
   font-weight: normal;
-  margin-left: 0.2em;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -161,10 +159,6 @@
   background-color: var(--background-alterning-even);
 }
 
-.eva-table tr:nth-child(3) {
-  font-style: italic;
-}
-
 .eva-table-alarm {
   border-bottom: thin solid var(--border);
 }
@@ -193,6 +187,15 @@
 
 .eva-header-pinned-focused {
   background: var(--eva-probes-pinned-focused);
+}
+
+.eva-header-after-both {
+  display: flex;
+  justify-content: center;
+}
+
+.eva-italic {
+  font-style: italic;
 }
 
 /* -------------------------------------------------------------------------- */

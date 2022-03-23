@@ -381,9 +381,9 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   }
 
   const both = (): JSX.Element =>
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
+    <div className='eva-header-after-both'>
       {'After '}
-      <div style={{ color: 'var(--info-text)' }}>{'(Then|Else)'}</div>
+      <div className='eva-stmt'>{'(Then|Else)'}</div>
     </div>;
 
   const elements: JSX.Element[] = [];
@@ -411,12 +411,13 @@ interface ProbeValuesProps {
   status: MarkerStatus;
   state: StateToDisplay;
   addLoc: (loc: Location) => void;
-  selectedClass?: string;
+  isSelected: boolean;
+  summaryOnly: boolean;
+  // selectedClass?: string;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, summary, state, selectedClass = '', addLoc } = props;
-  const className = classes('eva-table-values', selectedClass);
+  const { probe, summary, state, addLoc, isSelected, summaryOnly } = props;
   const summaryStatus = getAlarmStatus(summary.vBefore?.alarms);
 
   // Building common parts
@@ -439,6 +440,9 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   return async (callstack: callstack): Promise<JSX.Element> => {
     const evaluation = await probe.evaluate(callstack);
     const { vBefore, vAfter, vThen, vElse } = evaluation;
+    const selected = isSelected && callstack !== 'Summary' ? 'eva-focused' : '';
+    const font = summaryOnly && callstack === 'Summary' ? 'eva-italic' : '';
+    const className = classes('eva-table-values', selected, font);
     function td(e: Values.evaluation): JSX.Element {
       const status = getAlarmStatus(e.alarms);
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
@@ -447,15 +451,13 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       const align = e.value.includes('\n') ? 'left' : 'center';
       const alignClass = `eva-table-values-${align}`;
       const width = summaryStatus !== 'none' ? 'eva-table-values-alarms' : '';
+      const c = classes(className, alignClass, width);
       return (
         <>
-          <td
-            className={classes(className, alignClass, width)}
-            onContextMenu={onContextMenu(e)}
-          >
+          <td className={c} onContextMenu={onContextMenu(e)}>
             <span >{e.value}</span>
           </td>
-          <td className={classes('eva-table-alarm', selectedClass)}>
+          <td className={classes('eva-table-alarm', selected)}>
             <Icon className={alarmClass} size={10} title={title} id="WARNING" />
           </td>
         </>
@@ -509,8 +511,9 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   /* Compute relevant callstacks */
   const markers = Array.from(props.markers.keys());
   const callstacks = byCallstacks ? (await getCS(markers) ?? []) : [];
+  const summaryOnly = callstacks.length === 1;
 
-  interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus };
+  interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus }
   const entries = Array.from(props.markers.entries());
   const probes = await Promise.all(entries.map(async ([ target, status ]) => {
     const probe = await props.getProbe({ target, fct });
@@ -532,15 +535,14 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const onClick = (c: callstack): () => void => () => props.selectCallstack(c); 
   function build(d: Data, c: callstack): Promise<JSX.Element> {
     const isSelected = isSelectedCallstack(c);
-    const selector = isSelected && c !== 'Summary';
-    const selectedClass = selector ? 'eva-focused' : '';
-    const valuesProps = { ...d, state, addLoc, selectedClass };
+    const valuesProps = { ...d, state, addLoc, isSelected, summaryOnly };
     return ProbeValues(valuesProps)(c);
   }
 
   const summary = await Promise.all(probes.map((d) => build(d, 'Summary')));
   const summCall = await CallsiteCell({ callstack: 'Summary', getCallsites });
   const values = await Promise.all(callstacks.map(async (callstack, n) => {
+    if (summaryOnly) return <></>;
     const isSelected = isSelectedCallstack(callstack);
     const selector = isSelected && callstack !== 'Summary';
     const selectedClass = selector ? 'eva-focused' : '';
