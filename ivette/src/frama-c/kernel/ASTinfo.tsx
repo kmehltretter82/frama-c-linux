@@ -324,6 +324,13 @@ export default function ASTinfo(): JSX.Element {
   React.useEffect(() => {
     markers.setLocations(selectedLoc, hoveredLoc);
   }, [markers, selectedLoc, hoveredLoc]);
+  const pinMarker = (location: States.Location) : void => {
+    markers.setPinned(location?.marker, true);
+  };
+  React.useEffect(() => {
+    States.MetaSelection.on(pinMarker);
+    return () => States.MetaSelection.off(pinMarker);
+  });
   // Rendering
   const renderMark = (mark: Mark): JSX.Element | null => {
     const { marker } = mark;
