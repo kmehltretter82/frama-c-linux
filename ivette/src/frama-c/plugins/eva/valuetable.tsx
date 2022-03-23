@@ -52,7 +52,8 @@ function useCallstacksCache(): Request<Ast.marker[], callstack[]> {
 }
 
 type Alarm = [ 'True' | 'False' | 'Unknown', string ]
-function getAlarmStatus(alarms: Alarm[]): string {
+function getAlarmStatus(alarms: Alarm[] | undefined): string {
+  if (!alarms) return 'none';
   if (alarms.length === 0) return 'none';
   if (alarms.find(([st, _]) => st === 'False')) return 'False';
   else return 'Unknown';
@@ -279,7 +280,7 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
       <Filler />
       <ButtonGroup className='eva-probeinfo-state'>
         <Button
-          label='B'
+          label='Before'
           value='Before'
           selected={state === 'Before' || state === 'Both'}
           title='Show values before statement effects'
@@ -292,7 +293,7 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
           }}
         />
         <Button
-          label='A'
+          label='After'
           value='After'
           selected={state === 'After' || state === 'Both'}
           title='Show values after statement effects'
@@ -313,6 +314,7 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
 
 interface ProbeHeaderProps {
   probe: Probe;
+  summary: Evaluation;
   status: MarkerStatus;
   state: StateToDisplay;
   pinProbe: (pin: boolean) => void;
@@ -321,8 +323,8 @@ interface ProbeHeaderProps {
   setSelection: (a: States.SelectionActions) => void;
 }
 
-async function ProbeHeader(props: ProbeHeaderProps): Promise<JSX.Element> {
-  const { probe, status, state, setSelection } = props;
+function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
+  const { probe, summary, status, state, setSelection } = props;
   const { code = '(error)', stmt, target, fct } = probe;
   const color = MarkerStatusClass(status);
   const { selectProbe, removeProbe, pinProbe } = props;
@@ -330,12 +332,12 @@ async function ProbeHeader(props: ProbeHeaderProps): Promise<JSX.Element> {
   // Computing the number of columns. By design, either vAfter or vThen and
   // vElse are empty. Also by design (hypothesis), it is not function of the
   // considered callstacks, so we check on the consolidated.
-  const evaluation = await probe.evaluate('Summary');
-  const { vBefore, vAfter, vThen, vElse } = evaluation;
+  // const evaluation = await probe.evaluate('Summary');
+  const { vBefore, vAfter, vThen, vElse } = summary;
   let span = 0;
-  if ((state === 'Before' || state === 'Both') && vBefore) span += 1;
-  if ((state === 'After' || state === 'Both') && vAfter) span += 1;
-  if ((state === 'After' || state === 'Both') && vThen && vElse) span += 2;
+  if ((state === 'Before' || state === 'Both') && vBefore) span += 2;
+  if ((state === 'After' || state === 'Both') && vAfter) span += 2;
+  if ((state === 'After' || state === 'Both') && vThen && vElse) span += 4;
   if (span === 0) return <></>;
 
   const loc: States.SelectionActions = { location: { fct, marker: target} };
@@ -364,8 +366,48 @@ async function ProbeHeader(props: ProbeHeaderProps): Promise<JSX.Element> {
 
 
 
+interface ProbeDescrProps {
+  summary: Evaluation;
+  state: StateToDisplay;
+}
+
+function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
+  const { summary, state } = props;
+  const { vBefore, vAfter, vThen, vElse } = summary;
+  const valuesClass = classes('eva-table-values', 'eva-table-values-center');
+  const className = classes(valuesClass, 'eva-table-descrs');
+  function td(kind: JSX.Element, colSpan = 1): JSX.Element {
+    return <td className={className} colSpan={colSpan + 1}>{kind}</td>;
+  }
+
+  const both = (): JSX.Element =>
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      {'After '}
+      <div style={{ color: 'var(--info-text)' }}>{'(Then|Else)'}</div>
+    </div>;
+
+  const elements: JSX.Element[] = [];
+  if (state === 'Before' && vBefore) elements.push(td(<>{'Before'}</>));
+  if (state === 'After' && vAfter) elements.push(td(<>{'After'}</>));
+  if (state === 'After' && vThen && vElse) {
+    elements.push(td(both(), 2));
+  }
+  if (state === 'Both' && vBefore && vAfter) {
+    elements.push(td(<>{'Before'}</>));
+    elements.push(td(<>{'After'}</>));
+  }
+  if (state === 'Both' && vBefore && vThen && vElse) {
+    elements.push(td(<>{'Before'}</>));
+    elements.push(td(both(), 2));
+  }
+  return elements;
+}
+
+
+
 interface ProbeValuesProps {
   probe: Probe;
+  summary: Evaluation;
   status: MarkerStatus;
   state: StateToDisplay;
   addLoc: (loc: Location) => void;
@@ -373,8 +415,9 @@ interface ProbeValuesProps {
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, state, selectedClass = '', addLoc } = props;
+  const { probe, summary, state, selectedClass = '', addLoc } = props;
   const className = classes('eva-table-values', selectedClass);
+  const summaryStatus = getAlarmStatus(summary.vBefore?.alarms);
 
   // Building common parts
   const onContextMenu = (evaluation: Values.evaluation) => (): void => {
@@ -402,15 +445,20 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       const kind = callstack === 'Summary' ? 'one' : 'this';
       const title = `At least one alarm is raised in ${kind} callstack`;
       const align = e.value.includes('\n') ? 'left' : 'center';
+      const alignClass = `eva-table-values-${align}`;
+      const width = summaryStatus !== 'none' ? 'eva-table-values-alarms' : '';
       return (
-        <td
-          className={className}
-          onContextMenu={onContextMenu(e)}
-          style={{ textAlign: align }}
-        >
-          <span className={'eva-values-position'}>{e.value}</span>
-          <Icon className={alarmClass} size={10} title={title} id="WARNING" />
-        </td>
+        <>
+          <td
+            className={classes(className, alignClass, width)}
+            onContextMenu={onContextMenu(e)}
+          >
+            <span >{e.value}</span>
+          </td>
+          <td className={classes('eva-table-alarm', selectedClass)}>
+            <Icon className={alarmClass} size={10} title={title} id="WARNING" />
+          </td>
+        </>
       );
     }
     if (state === 'Before' && vBefore) return td(vBefore);
@@ -424,6 +472,8 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     return <></>;
   };
 }
+
+
 
 
 
@@ -457,41 +507,49 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const headerCall = await CallsiteCell({ getCallsites, callstack: 'Header' });
 
   /* Compute relevant callstacks */
-  const markers: Ast.marker[] = [];
-  props.markers.forEach((_, m) => markers.push(m));
-  const computedCallstacks = byCallstacks ? (await getCS(markers) ?? []) : [];
-  const callstacks = [ 'Summary' as callstack ].concat(computedCallstacks);
+  const markers = Array.from(props.markers.keys());
+  const callstacks = byCallstacks ? (await getCS(markers) ?? []) : [];
 
-  const probes: [ Promise<Probe>, MarkerStatus ][] = [];
-  props.markers.forEach(async (status, target) => {
-    const probe = props.getProbe({ target, fct });
-    probes.push([ probe, status ]);
-  });
-
-  const headers = await Promise.all(probes.map(async ([ promise, status ]) => {
-    const probe = await promise;
-    const pinProbe = (pin: boolean): void => props.pinProbe(probe, pin);
-    const selectProbe = (): void => props.selectProbe(probe);
-    const removeProbe = (): void => props.removeProbe(probe);
-    const fcts = { selectProbe, pinProbe, removeProbe, setSelection };
-    return ProbeHeader({ probe, status, state, ...fcts });
+  interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus };
+  const entries = Array.from(props.markers.entries());
+  const probes = await Promise.all(entries.map(async ([ target, status ]) => {
+    const probe = await props.getProbe({ target, fct });
+    const summary = await probe.evaluate('Summary');
+    return { probe, summary, status } as Data;
   }));
 
-  const values = await Promise.all(callstacks.map(async (callstack, index) => {
+  const headers = await Promise.all(probes.map((d: Data) => {
+    const pinProbe = (pin: boolean): void => props.pinProbe(d.probe, pin);
+    const selectProbe = (): void => props.selectProbe(d.probe);
+    const removeProbe = (): void => props.removeProbe(d.probe);
+    const fcts = { selectProbe, pinProbe, removeProbe, setSelection };
+    return ProbeHeader({ ...d, state, ...fcts });
+  }));
+
+  const title = 'Column description';
+  const descrs = probes.map((d) => ProbeDescr({ ...d, state }));
+
+  const onClick = (c: callstack): () => void => () => props.selectCallstack(c); 
+  function build(d: Data, c: callstack): Promise<JSX.Element> {
+    const isSelected = isSelectedCallstack(c);
+    const selector = isSelected && c !== 'Summary';
+    const selectedClass = selector ? 'eva-focused' : '';
+    const valuesProps = { ...d, state, addLoc, selectedClass };
+    return ProbeValues(valuesProps)(c);
+  }
+
+  const summary = await Promise.all(probes.map((d) => build(d, 'Summary')));
+  const summCall = await CallsiteCell({ callstack: 'Summary', getCallsites });
+  const values = await Promise.all(callstacks.map(async (callstack, n) => {
     const isSelected = isSelectedCallstack(callstack);
     const selector = isSelected && callstack !== 'Summary';
     const selectedClass = selector ? 'eva-focused' : '';
     const callProps = { selectedClass, getCallsites };
-    const call = await CallsiteCell({ index, callstack, ...callProps });
-    const onClick = (): void => props.selectCallstack(callstack);
-    const vs = await Promise.all(probes.map(async ([ promise, status ]) => {
-      const probe = await promise;
-      const fcts = { addLoc, selectedClass };
-      return ProbeValues({ probe, status, state, ...fcts })(callstack);
-    }));
+    const call = await CallsiteCell({ index: n + 1, callstack, ...callProps });
+    const values = await Promise.all(probes.map((d) => build(d, callstack)));
     return (
-      <tr key={callstack} onClick={onClick}>{call}
-        {React.Children.toArray(vs)}
+      <tr key={callstack} onClick={onClick(callstack)}>{call}
+        {React.Children.toArray(values)}
       </tr>
     );
   }));
@@ -527,6 +585,14 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
             <tr>
               {headerCall}
               {React.Children.toArray(headers)}
+            </tr>
+            <tr>
+              <td className='eva-table-callsite-box' title={title}>{'D'}</td>
+              {React.Children.toArray(descrs.flat())}
+            </tr>
+            <tr key={'Summary'} onClick={onClick('Summary')}>
+              {summCall}
+              {React.Children.toArray(summary)}
             </tr>
             {React.Children.toArray(values)}
           </tbody>
@@ -690,9 +756,8 @@ class FunctionsManager {
   }
 
   map<A>(func: (infos: FunctionInfos, fct: string) => A): A[] {
-    const acc: A[] = [];
-    this.cache.forEach((infos, fct) => acc.push(func(infos, fct)));
-    return acc;
+    const entries = Array.from(this.cache.entries());
+    return entries.map(([ fct, infos ]) => func(infos, fct));
   }
 
 }
@@ -799,7 +864,7 @@ function EvaTable(): JSX.Element {
         state={state}
         setState={setState}
       />
-      <Vfill style={{ overflowY: 'auto' }}>
+      <Vfill className='eva-functions-section'>
         {React.Children.toArray(functions)}
       </Vfill>
       {alarmsInfos}
@@ -818,4 +883,3 @@ Ivette.registerComponent({
   title: 'Values inferred by the Eva analysis',
   children: <EvaTable />,
 });
-

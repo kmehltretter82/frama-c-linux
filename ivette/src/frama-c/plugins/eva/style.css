@@ -83,14 +83,10 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-cell-alarms {
-  position: relative;
-  float: right;
   z-index: 1;
   margin: 0px;
   padding: 0px;
-  right: 3px;
-  margin-left: 4px;
-  padding-left: 4px;
+  margin-right: 4px;
 }
 
 .eva-alarm-info {
@@ -99,7 +95,7 @@
   margin: 1px;
 }
 
-.eva-alarm-none { fill: transparent; }
+.eva-alarm-none { display: none; }
 .eva-alarm-True { fill: var(--eva-alarms-true); }
 .eva-alarm-False { fill: var(--eva-alarms-false); }
 .eva-alarm-Unknown { fill: var(--eva-alarms-unknown); }
@@ -165,6 +161,14 @@
   background-color: var(--background-alterning-even);
 }
 
+.eva-table tr:nth-child(3) {
+  font-style: italic;
+}
+
+.eva-table-alarm {
+  border-bottom: thin solid var(--border);
+}
+
 .eva-table tr td:last-child {
   border-right: thin solid var(--border);
 }
@@ -224,14 +228,31 @@ tr:first-of-type > .eva-table-callsite-box {
   min-width: 144px;
   font-family: Andale Mono, monospace;
   font-size: 9pt;
-  text-align: center;
   height: 22px;
   min-height: 22px;
   max-height: 22px;
   white-space: pre;
 }
 
+.eva-table-values-left {
+  text-align: left;
+}
+
+.eva-table-values-center {
+  text-align: center;
+}
+
+.eva-table-descrs {
+  background-color: var(--background-sidebar);
+}
+
+.eva-table-values-alarms {
+  min-width: 130px;
+}
+
 .eva-values-position {
+  display: inline-block;
+  width: 0px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -243,3 +264,7 @@ tr:first-of-type > .eva-table-callsite-box {
 }
 
 /* -------------------------------------------------------------------------- */
+
+.eva-functions-section {
+  overflow-y: auto;
+}
