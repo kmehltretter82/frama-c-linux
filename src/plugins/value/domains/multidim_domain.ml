@@ -320,6 +320,7 @@ struct
     include Datatype.Pair (Memory) (References)
     let pretty_debug = pretty
     let top = Memory.top, References.empty
+    let _istop (m,r) = Memory.is_top m && References.is_empty r
   end
 
   module BaseMap =
@@ -447,7 +448,7 @@ struct
     let oracle = convert_oracle oracle in
     read (Memory.extract ~oracle) (Memory.smash ~oracle) state src
 
-  let add_references (base_map,tracked) vi refs' =
+  let add_references (base_map,tracked : t) vi refs' : t =
     let base = Base.of_varinfo vi in
     let memory, refs = BaseMap.find_or_top base_map base in
     let refs'' = References.union refs (References.of_list refs') in
@@ -458,17 +459,20 @@ struct
 
   let write' (update : memory -> offset -> memory or_bottom)
       (state : state) (loc : mdlocation) : state or_bottom =
+    let deps = Location.references loc in
+    let deps_set = TrackedBases.of_list (List.map Base.of_varinfo deps) in
     let f base off state' =
       state' >>- fun (base_map,tracked) ->
       if covers_base tracked base then
         let memory, refs = BaseMap.find_or_top base_map base in
         update memory off >>-: fun memory' ->
-        BaseMap.add base (memory', refs) base_map, tracked
+        BaseMap.add base (memory', refs) base_map,
+        Option.map (TrackedBases.union deps_set) tracked
       else
         state'
     in
     Location.fold f loc (`Value state) >>-: fun state ->
-    add_references_l state (Location.references loc) (Location.bases loc)
+    add_references_l state deps (Location.bases loc)
 
   let write update state loc =
     (* Result can never be bottom if update never returns bottom *)
@@ -528,12 +532,12 @@ struct
   let join' ~oracle (m1,t1) (m2,t2) =
     let open BaseMap in
     let cache = Hptmap_sig.NoCache
-    and decide _ (m1,r1) (m2,r2) =
-      let m = Memory.join ~oracle m1 m2
-      and r = References.union r1 r2 in
-      if Memory.(is_top m) then None else Some (m,r)
+    and decide _ x1 x2 =
+      let m1,r1 = Option.value ~default:V.top x1
+      and m2,r2 = Option.value ~default:V.top x2 in
+      Memory.join ~oracle m1 m2, References.union r1 r2 (* TODO: Remove tops *)
     in
-    inter ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
+    generic_join ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
     join_tracked t1 t2
 
   let join s1 s2 =
@@ -545,12 +549,12 @@ struct
     let oracle = mk_bioracle s1 s2
     and _,get_hints = Widen.getWidenHints kf stmt in
     let cache = Hptmap_sig.NoCache
-    and decide base (m1,r1) (m2,r2) =
-      let m = Memory.widen ~oracle (get_hints base) m1 m2
-      and r = References.union r1 r2 in
-      if Memory.(is_top m) then None else Some (m,r)
+    and decide base x1 x2 =
+      let m1,r1 = Option.value ~default:V.top x1
+      and m2,r2 = Option.value ~default:V.top x2 in
+      Memory.widen ~oracle (get_hints base) m1 m2, References.union r1 r2
     in
-    inter ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
+    generic_join ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
     join_tracked t1 t2
 end
 
@@ -817,7 +821,9 @@ struct
         let (base_map,tracked) = state in
         let set = Option.value ~default:TrackedBases.empty tracked
         and bases = List.map Base.of_varinfo vars in
-        base_map, Some (List.fold_right TrackedBases.add bases set)
+        let tracked = List.fold_right TrackedBases.add bases set in
+        let base_map = BaseMap.inter_with_shape tracked base_map in (* Only keep tracked bases in the current base map *)
+        base_map, Some tracked
       else
         state
     | _ ->
