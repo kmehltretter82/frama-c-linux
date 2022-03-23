@@ -27,6 +27,7 @@ import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Values from 'frama-c/plugins/eva/api/values';
+import ControlPoint from 'frama-c/plugins/eva/ControlPoint';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
@@ -280,7 +281,6 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
       <Filler />
       <ButtonGroup className='eva-probeinfo-state'>
         <Button
-          label='Before'
           value='Before'
           selected={state === 'Before' || state === 'Both'}
           title='Show values before statement effects'
@@ -291,9 +291,10 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
             else if (state === 'None') setState('Before');
             else if (state === 'Both') setState('After');
           }}
-        />
+        >
+          <ControlPoint kind={'before'}/>
+        </Button>
         <Button
-          label='After'
           value='After'
           selected={state === 'After' || state === 'Both'}
           title='Show values after statement effects'
@@ -304,7 +305,9 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
             else if (state === 'None') setState('After');
             else if (state === 'Both') setState('Before');
           }}
-        />
+        >
+          <ControlPoint kind={'after'}/>
+        </Button>
       </ButtonGroup>
     </Hpack>
   );
@@ -765,7 +768,7 @@ class FunctionsManager {
 
 function EvaTable(): JSX.Element {
   const [ selection, select ] = States.useSelection();
-  const [ state, setState ] = React.useState<StateToDisplay>('Before');
+  const [ state, setState ] = React.useState<StateToDisplay>('After');
   const [ cs, setCS ] = React.useState<callstack>('Summary');
   const [ fcts ] = React.useState(new FunctionsManager());
   const [ tac, setTic ] = React.useState(false);

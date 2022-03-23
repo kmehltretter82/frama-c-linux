@@ -124,6 +124,8 @@ export interface ButtonProps<A> {
   selection?: A;
   /** Selection callback. Receives the button's value. */
   onClick?: (value: A | undefined) => void;
+  /** Button contents */
+  children?: React.ReactNode;
 }
 
 /** Toolbar Button. */
@@ -145,6 +147,7 @@ export function Button<A = undefined>(props: ButtonProps<A>) {
     >
       {props.icon && <SVG id={props.icon} />}
       {props.label && <label>{props.label}</label>}
+      {props.children}
     </button>
   );
 }
