@@ -1223,7 +1223,8 @@ end
 let pp_list_deps fmt l =
   List.iter (fun s ->
       let s = Filename.sanitize_with_space s in
-      if String.contains s '*' then
+      if String.equal s "" then ()
+      else if String.contains s '*' then
         Format.fprintf fmt " (glob_files %S)" s
       else
         Format.fprintf fmt " %S" s) l
