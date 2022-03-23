@@ -416,7 +416,9 @@ module SubDir: sig
 
   val oracle_subdir: env:env_t -> t -> t
   val result_subdir: env:env_t -> t -> t
-  val upper_dir: t
+
+  val get_oracle_dir: env:env_t -> string
+  val oracle_dir: env:env_t -> t
 
   val pp_file: dir:t -> Format.formatter -> string -> unit
 end = struct
@@ -435,7 +437,9 @@ end = struct
 
   let make_file = Filename.concat
   let make_subdir = Filename.concat
-  let upper_dir = ".."
+
+  let oracle_dir ~env = oracle_subdir ~env ".."
+  let get_oracle_dir = oracle_dir
 
   let create ~with_subdir ~env dir =
     if not (Sys.file_exists dir && Sys.is_directory dir)
@@ -1264,11 +1268,17 @@ type wtest = {
   sederr: (string [@default ""]); (* filter command for the stderr result *)
   bin: (string list [@default []]); (* binary targets (without oracles) *)
   log: (string list [@default []]); (* log targets (compared to log oracles *)
-  oracle_dir: (string [@default "../oracle"]); (* directory containing the oracle of the log files *)
+  oracle_dir: (string [@default ""]); (* directory containing the oracle of the log files *)
   oracle_out: (string [@default "" ]); (* oracle of the stdout target *)
   oracle_err: (string [@default "" ]); (* oracle of the stderr target *)
 }
 [@@deriving yojson]
+
+let update_oracle_dir ~env wtest =
+  if wtest.log = [] then wtest else
+    { wtest with
+      oracle_dir = SubDir.get_oracle_dir ~env
+    }
 
 let std = false
 let pp_wtest ?(compacted=false) fmt wtest =
@@ -1342,24 +1352,19 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
                              }
   in
   let oracle_prefix = oracle_prefix ~env command in
-  let wtest =
-    { wtest with
-      dir = SubDir.get (SubDir.result_subdir ~env command.directory) ;
-      info = Format.sprintf "TEST #%d OF TEST FILE %s/%s"
-          command.nth (SubDir.get command.directory) command.file;
-      cmd = redirection ~reslog:cmdreslog ~errlog:cmderrlog command_string ;
-      out = reslog;
-      err = errlog;
-      ret_code = command.exit_code;
-      log = command.log_files;
-      bin = command.bin_files;
-      oracle_out = Filename.concat ".." (oracle_prefix ^ ".res.oracle");
-      oracle_err = Filename.concat ".." (oracle_prefix ^ ".err.oracle");
-    }
-  in
-  let wtest = if wtest.log = [] then wtest else
+  let wtest = update_oracle_dir ~env
       { wtest with
-        oracle_dir = config_name ~env default_wtest.oracle_dir ;
+        dir = SubDir.get (SubDir.result_subdir ~env command.directory) ;
+        info = Format.sprintf "TEST #%d OF TEST FILE %s/%s"
+            command.nth (SubDir.get command.directory) command.file;
+        cmd = redirection ~reslog:cmdreslog ~errlog:cmderrlog command_string ;
+        out = reslog;
+        err = errlog;
+        ret_code = command.exit_code;
+        log = command.log_files;
+        bin = command.bin_files;
+        oracle_out = Filename.concat ".." (oracle_prefix ^ ".res.oracle");
+        oracle_err = Filename.concat ".." (oracle_prefix ^ ".err.oracle");
       }
   in
   let wrapper_basename =  mk_alias command "exec.wtests" in
@@ -1457,7 +1462,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         (* alias: *)
         (ptests_alias ~env)
         (* action: *)
-        (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
+        (SubDir.make_file (SubDir.oracle_dir ~env) log)
         log
     ) command.log_files;
   Format.fprintf result_fmt
@@ -1610,19 +1615,14 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           }
         in
         let cmd_string = basic_command_string cmd in
-        let wtest = {
-          default_wtest with
-          dir = SubDir.get (SubDir.result_subdir ~env cmd.directory) ;
-          info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
-              nth (SubDir.get directory) file;
-          cmd = cmd_string;
-          log = List.map (Macros.expand ~file cmd.macros) execnow.ex_log;
-          bin = List.map (Macros.expand ~file cmd.macros) execnow.ex_bin;
-        }
-        in
-        let wtest = if wtest.log = [] then wtest else
-            { wtest with
-              oracle_dir = config_name ~env default_wtest.oracle_dir ;
+        let wtest = update_oracle_dir ~env
+            { default_wtest with
+              dir = SubDir.get (SubDir.result_subdir ~env cmd.directory) ;
+              info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
+                  nth (SubDir.get directory) file;
+              cmd = cmd_string;
+              log = List.map (Macros.expand ~file cmd.macros) execnow.ex_log;
+              bin = List.map (Macros.expand ~file cmd.macros) execnow.ex_bin;
             }
         in
         let wrapper_basename =  mk_alias cmd "execnow.wtests" in
@@ -1707,7 +1707,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
               (* alias: *)
               (ptests_alias ~env)
               (* action: *)
-              (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
+              (SubDir.make_file (SubDir.oracle_dir ~env) log)
               log
           ) wtest.log
     in
