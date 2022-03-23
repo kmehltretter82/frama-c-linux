@@ -49,37 +49,37 @@ function MarkerKind(props: MarkerKindProps): JSX.Element {
 }
 
 const GMARKER =
-  <MarkerKind label="M" title="Generic Marker" />;
+  <MarkerKind label="?" title="Generic Marker" />;
 
 const MARKERS = new Map<AST.markerKind, JSX.Element>();
 [
   {
     kind: AST.markerKind.declaration,
-    elt: <MarkerKind label="D" title="Declaration" />,
+    elt: <MarkerKind label="Declaration" title="Variable declaration" />,
   },
   {
     kind: AST.markerKind.global,
-    elt: <MarkerKind label="G" title="Global" />,
+    elt: <MarkerKind label="Global" title="Global declaration or definition" />,
   },
   {
     kind: AST.markerKind.lvalue,
-    elt: <MarkerKind label="L" title="L-value" />,
+    elt: <MarkerKind label="Lvalue" title="C lvalue" />,
   },
   {
     kind: AST.markerKind.expression,
-    elt: <MarkerKind label="E" title="Expression" />,
+    elt: <MarkerKind label="Expression" title="C expression" />,
   },
   {
     kind: AST.markerKind.statement,
-    elt: <MarkerKind label="S" title="Statement" />,
+    elt: <MarkerKind label="Statement" title="C statement" />,
   },
   {
     kind: AST.markerKind.property,
-    elt: <MarkerKind label="P" title="Property" />,
+    elt: <MarkerKind label="Property" title="ACSL property" />,
   },
   {
     kind: AST.markerKind.term,
-    elt: <MarkerKind label="T" title="Term" />,
+    elt: <MarkerKind label="Term" title="ACSL term" />,
   },
 ].forEach(({ kind, elt }) => MARKERS.set(kind, elt));
 
