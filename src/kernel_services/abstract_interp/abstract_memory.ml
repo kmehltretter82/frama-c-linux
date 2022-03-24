@@ -29,6 +29,20 @@ exception Not_implemented
 open Abstract_offset
 open Bottom.Type
 
+let zip_bottom x y =
+  match x, y with
+  | `Bottom, _ | _, `Bottom -> `Bottom
+  | `Value x, `Value y -> `Value (x,y)
+
+(* Applicative syntax *)
+let ( let+ ) : 'a or_bottom -> ('a -> 'b) -> 'b or_bottom = (>>-:)
+let ( and+ ): 'a or_bottom -> 'b or_bottom -> ('a * 'b) or_bottom = zip_bottom
+
+(* Monad syntax *)
+let ( let* ) : 'a or_bottom -> ('a -> 'b or_bottom) -> 'b or_bottom = (>>-)
+let ( and* ): 'a or_bottom -> 'b or_bottom -> ('a * 'b) or_bottom = zip_bottom
+
+
 type size = Integer.t
 
 
@@ -46,8 +60,8 @@ let debug b format =
 
 (* Composition operator for compare function *)
 
-let (<?>) c (cmp,x,y) =
-  if c = 0 then cmp x y else c
+let (<?>) c lcmp =
+  if c = 0 then 0 else Lazy.force lcmp
 
 (* Pretty printing for iterators - inspired by Pretty_utils.pp_iter *)
 
@@ -171,7 +185,7 @@ struct
     | Uninitialized, Uninitialized -> 0
     | Zero i1, Zero i2 -> Initialization.compare i1 i2
     | Any (set1,i1), Any (set2,i2) ->
-      Bases.compare set1 set2 <?> (Initialization.compare, i1, i2)
+      Bases.compare set1 set2 <?> lazy (Initialization.compare i1 i2)
     | Uninitialized, _ -> 1
     | _, Uninitialized -> -1
     | Zero _, _ -> 1
@@ -347,7 +361,7 @@ struct
 
   let compare m1 m2 =
     FieldMap.compare m1.fields m2.fields <?>
-    (Bit.compare, m1.padding, m2.padding)
+    lazy (Bit.compare m1.padding m2.padding)
 
   let raw m =
     FieldMap.fold (fun _ x acc -> Bit.join acc (M.raw x)) m.fields m.padding
@@ -687,7 +701,7 @@ struct
     match b1, b2 with
     | Const i1, Const i2 -> Integer.compare i1 i2
     | Exp (e1, i1), Exp (e2, i2) ->
-      Exp.compare e1 e2 <?> (Integer.compare, i1, i2)
+      Exp.compare e1 e2 <?> lazy (Integer.compare i1 i2)
     | Ptroffset _, Ptroffset _ -> raise Not_implemented
     | Const _, _ -> 1
     | _, Const _-> -1
@@ -1008,11 +1022,11 @@ struct
 
   let compare (m1 : t) (m2 : t) : int =
     let compare_segments (v1,u1) (v2,u2) =
-      M.compare v1 v2 <?> (B.compare, u1, u2)
+      M.compare v1 v2 <?> lazy (B.compare u1 u2)
     in
     B.compare m1.start m2.start <?>
-    (Transitioning.List.compare compare_segments, m1.segments, m2.segments) <?>
-    (Bit.compare, m1.padding, m2.padding)
+    lazy (Transitioning.List.compare compare_segments m1.segments m2.segments) <?>
+    lazy (Bit.compare m1.padding m2.padding)
 
   let equal (m1 : t) (m2 : t) : bool =
     let equal_segments (v1,u1) (v2,u2) =
@@ -1054,7 +1068,7 @@ struct
     let l = m.start and u = last m.segments in
     match B.lower_const ~oracle l, B.upper_const ~oracle u with
     | None, _ | _, None -> None
-    | Some l, Some u -> Some (B.raw_bound l, B.raw_bound (B.pred u))
+    | Some l, Some u -> Some (B.raw_bound l, B.raw_bound u)
 
   let is_empty_segment ~oracle l u =
     let open (val (B.operators oracle)) in
@@ -1181,11 +1195,11 @@ struct
     (* Iterate through segmentations *)
     check { start = l ; segments ; padding = Bit.join p1 p2 }
 
-  let single padding lindex (* included *) uindex (* included *) value =
+  let single padding lindex (* included *) uindex (* excluded *) value =
     check {
       padding ;
       start = B.birth lindex ;
-      segments = [(value,B.birth (Bound.succ uindex))] ;
+      segments = [(value,B.birth uindex)] ;
     }
 
   let read ~oracle map reduce m lindex uindex =
@@ -1213,7 +1227,7 @@ struct
     in
     { m with segments = List.rev (aux [] m.segments) }
 
-  let oldest_inner_bound m =
+  let age m = (* Age of the segmentation / age of the oldest bound *)
     match m.segments with (* ignore m.start bound *)
     | [] -> None
     | (_,b) :: t ->
@@ -1224,11 +1238,11 @@ struct
       in
       aux (B.age b) t
 
-  let remove_oldest_bounds ~oracle m =
-    match oldest_inner_bound m with
+  let remove_elderlies ~oracle m =
+    match age m with
     | None -> m (* no inner bounds, should not happen if segments_limit > 2 *)
     | Some oldest_age ->
-      (* Remvoe all bounds of this age *)
+      (* Remove all bounds of this age *)
       let rec aux acc l = function
         | ([] | [_]) as t -> List.rev (t @ acc)
         | ((v,u) :: t) as s ->
@@ -1240,11 +1254,11 @@ struct
       { m with segments = aux [] m.start m.segments }
 
   let limit_size ~oracle m =
-    let limit = Config.slice_limit () in
+    let limit = max 1 (Config.slice_limit ()) in
     let rec aux m =
       if List.length m.segments <= limit
       then m
-      else aux (remove_oldest_bounds ~oracle m)
+      else aux (remove_elderlies ~oracle m)
     in
     aux m
 
@@ -1290,11 +1304,11 @@ struct
           and v = M.smash ~oracle v (M.of_raw m.padding) in
           aux_end start head l v u []
         | (v',u') :: t ->
-          (* TODO: do not smash if the slices are covered by the write *)
+          (* TODO: do not smash for overwrites if the slices are covered by the write *)
           aux_over start head l (M.smash ~oracle v v') u' t
     and aux_end start head l v u tail = (* l <= lindex < uindex <= u*)
       debug dwrite  "aux_end: %a <{%a} %a {%a}> %a@." pretty_segments (start,head) B.pretty l M.pretty v B.pretty u pretty_segments (u,tail);
-      f v >>-: fun new_v ->
+      let+ new_v = f v in
       let previous_is_empty = is_empty_segment ~oracle l lindex
       and next_is_empty = is_empty_segment ~oracle uindex u in
       let tail' =
@@ -1753,11 +1767,11 @@ struct
           if fi.fcomp.cstruct then (* Structures *)
             if Config.disjunctive_invariants () then
               let old = to_disj fi.fcomp m in
-              D.write ~oracle (aux ~weak offset') old fi >>-: fun disj_value ->
+              let+ disj_value = D.write ~oracle (aux ~weak offset') old fi in
               Disjunct { disj_type = fi.fcomp ; disj_value }
             else
               let old = to_struct ~oracle fi.fcomp m in
-              S.write (aux ~weak offset') old fi >>-: fun struct_value ->
+              let+ struct_value = S.write (aux ~weak offset') old fi in
               Struct { struct_type = fi.fcomp; struct_value }
           else (* Unions *)
             let old = match m with
@@ -1766,26 +1780,26 @@ struct
                 let b = raw m in
                 { union_value = Raw b ; union_field = fi ; union_padding = b }
             in
-            aux ~weak offset' old.union_value >>-: fun union_value ->
+            let+ union_value = aux ~weak offset' old.union_value in
             Union { old with union_value }
         | Index (exp, index, elem_type, offset') ->
           let lindex, uindex, weak = match Option.map Bound.of_exp exp with
-            | Some b -> b, b, weak
+            | Some b -> b, Bound.succ b, weak
             | None | exception Bound.UnsupportedBoundExpression ->
               let l, u = Int_val.min_and_max index in
               let l = Option.get l and u = Option.get u in (* TODO: handle exceptions *)
-              Bound.of_integer l, Bound.of_integer u,
+              Bound.of_integer l, Bound.(succ (of_integer u)),
               weak || Integer.equal l u
           in
           match m with
           | Array a when are_typ_compatible a.array_cell_type elem_type ->
-            A.write ~oracle (aux ~weak offset') a.array_value
-              lindex (Bound.succ uindex) >>-: fun array_value ->
+            let+ array_value =
+              A.write ~oracle (aux ~weak offset') a.array_value lindex uindex in
             debug dwrite "wrote from previous@.%a@.->%a" A.pretty a.array_value A.pretty array_value;
             Array { a with array_value }
           | _ ->
             let b = raw m in
-            aux ~weak offset' (Raw b) >>-: fun new_value ->
+            let+ new_value = aux ~weak offset' (Raw b) in
             let array_value = A.single b lindex uindex new_value in
             debug dwrite "wrote from raw@.%a" A.pretty array_value;
             Array { array_cell_type = elem_type ; array_value }
