@@ -89,6 +89,8 @@ stdenv.mkDerivation rec {
   buildPhase = ''
     make config.sed
     dune build -j2 --display short @install
+    make ptests/ptests.exe
+    make ptests/wtests.exe
   '';
 
   installFlags = [

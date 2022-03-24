@@ -40,9 +40,7 @@ stdenv.mkDerivation rec {
 
   buildPhase = ''
     export FRAMAC_WP_CACHEDIR=$wp_cache
-    make ptests/ptests.exe
-    make ptests/wtests.exe
-    dune exec --root ptests -- frama-c-ptests src/plugins/*/tests
+    dune exec -- frama-c-ptests src/plugins/*/tests
     dune build -j1 --display short @src/plugins/ptests
   '';
 

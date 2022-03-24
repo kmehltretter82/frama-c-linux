@@ -32,9 +32,7 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
-    make ptests/ptests.exe
-    make ptests/wtests.exe
-    dune exec --root ptests -- frama-c-ptests tests
+    dune exec -- frama-c-ptests tests
     dune build -j1 --display short @tests/ptests
   '';
 
