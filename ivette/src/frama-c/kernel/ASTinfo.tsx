@@ -269,8 +269,8 @@ function openFilter(
   filter: string,
   onChange: (f: string) => void,
 ): void {
+  const fs = filter.split(':');
   const menuItems = infos.map((info) => {
-    const fs = filter.split(':');
     const checked = !fs.some((m) => m === info.id);
     const onClick = (): void => {
       const newFs =

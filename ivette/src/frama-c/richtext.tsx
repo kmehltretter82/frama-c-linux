@@ -53,17 +53,15 @@ export function printTextWithTags(
   options?: DomeBuffers.MarkerProps,
 ): void {
   if (Array.isArray(text)) {
-    let marker = false;
     const tag = text[0];
-    if (typeof (tag) === 'string') {
+    const marker = typeof (tag) === 'string';
+    if (marker) {
       buffer.openTextMarker({ id: tag, ...options ?? {} });
-      marker = true;
     }
     for (let k = marker ? 1 : 0; k < text.length; k++) {
       printTextWithTags(buffer, text[k], options);
     }
     if (marker) {
-      marker = false;
       buffer.closeTextMarker();
     }
   } else if (typeof text === 'string') {
