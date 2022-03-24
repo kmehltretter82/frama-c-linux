@@ -1,11 +1,11 @@
 /*run.config
-  STDOPT: #"-eva-slevel 12" #"-eva-split-return auto"
-  STDOPT: #"-variadic-no-translation" #"-eva-slevel 12" #"-eva-split-return auto"
+  STDOPT: #"-machdep x86_32 -eva-slevel 12" #"-eva-split-return auto"
+  STDOPT: #"-machdep x86_32 -variadic-no-translation" #"-eva-slevel 12" #"-eva-split-return auto"
 */
 #define _GNU_SOURCE
 #define _XOPEN_SOURCE 600
 #include <unistd.h>
-
+#include <stdint.h>
 volatile int nondet;
 
 int main() {
@@ -106,6 +106,16 @@ int main() {
 
   int unslept = sleep(42);
   //@ assert 0 <= unslept <= 42;
+
+  char buf[SIZE_MAX];
+  ssize_t rread = read(fd, buf, 32);
+  if (rread == 32) {
+    //@ assert \initialized(buf+(0..31));
+  }
+  if (rread == -1)
+  // In x86-32, SSIZE_MAX < SIZE_MAX, so we check for issues
+  rread = read(fd, buf, SSIZE_MAX);
+  rread = read(fd, buf, SIZE_MAX);
 
   return 0;
 }
