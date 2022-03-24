@@ -212,22 +212,20 @@ class InfoMarkers {
   private selection: Mark[] = [];
   private mSelected: AST.marker | undefined;
   private mHovered: AST.marker | undefined;
-  private pinned = new Map<string, boolean>();
+  private pinned = new Set<string>();
 
-  isPinned(marker: AST.marker | undefined): boolean {
-    return (marker !== undefined) && (this.pinned.get(marker) ?? false);
+  isPinned(marker: AST.marker): boolean {
+    return this.pinned.has(marker);
   }
 
-  setPinned(marker: AST.marker | undefined, pinned: boolean): void {
-    if (marker) {
-      const oldpin = this.pinned.get(marker) ?? false;
-      if (oldpin !== pinned) {
-        if (pinned)
-          this.pinned.set(marker, pinned);
-        else
-          this.pinned.delete(marker);
-        reload.emit();
-      }
+  setPinned(marker: AST.marker, pinned: boolean): void {
+    const oldpin = this.isPinned(marker);
+    if (oldpin !== pinned) {
+      if (pinned)
+        this.pinned.add(marker);
+      else
+        this.pinned.delete(marker);
+      reload.emit();
     }
   }
 
@@ -250,7 +248,7 @@ class InfoMarkers {
     const h0 = this.mHovered;
     let s = this.selection.filter((mark): boolean => {
       const m = mark.marker;
-      return this.pinned.get(m) || (m !== s0 && m !== h0);
+      return this.isPinned(m) || (m !== s0 && m !== h0);
     });
     if (sm && sf) s = this.addMarker(s, sm, sf);
     if (hm && hf) s = this.addMarker(s, hm, hf);
@@ -323,7 +321,8 @@ export default function ASTinfo(): JSX.Element {
     markers.setLocations(selectedLoc, hoveredLoc);
   }, [markers, selectedLoc, hoveredLoc]);
   const pinMarker = (location: States.Location) : void => {
-    markers.setPinned(location?.marker, true);
+    if (location?.marker)
+      markers.setPinned(location?.marker, true);
   };
   React.useEffect(() => {
     States.MetaSelection.on(pinMarker);
