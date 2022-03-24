@@ -260,7 +260,7 @@ struct
     States.register_array
       ~package
       ~name:"markerInfo"
-      ~descr:(Md.plain "Marker informations")
+      ~descr:(Md.plain "Marker information")
       ~key:snd ~keyType:Jstring
       ~iter ~add_reload_hook:ast_update_hook
       model
@@ -543,10 +543,10 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Marker Informations                                                --- *)
+(* --- Marker Information                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Informations =
+module Information =
 struct
 
   type info = {
@@ -569,7 +569,7 @@ struct
         "title", Jstring ;
         "descr", Jtext.jtype ;
       ])
-    let of_json _ = failwith "Informations.Info"
+    let of_json _ = failwith "Information.Info"
     let to_json (info,text) = `Assoc [
         "id", `String info.id ;
         "label", `String info.label ;
@@ -596,7 +596,7 @@ struct
   let rank ({rank},_) = rank
   let by_rank a b = Stdlib.compare (rank a) (rank b)
 
-  let get_informations tgt =
+  let get_information tgt =
     let infos = ref [] in
     Hashtbl.iter
       (fun _ info ->
@@ -611,8 +611,8 @@ struct
     List.sort by_rank !infos
 
   let signal = Request.signal ~package
-      ~name:"getInformationsUpdate"
-      ~descr:(Md.plain "Updated AST informations")
+      ~name:"getInformationUpdate"
+      ~descr:(Md.plain "Updated AST information")
 
   let update () = Request.emit signal
 
@@ -628,21 +628,21 @@ struct
 end
 
 let () = Request.register ~package
-    ~kind:`GET ~name:"getInformations"
+    ~kind:`GET ~name:"getInformation"
     ~descr:(Md.plain
-              "Get available informations about markers. \
+              "Get available information about markers. \
                When no marker is given, returns all kinds \
-               of informations (with empty `descr` field).")
+               of information (with empty `descr` field).")
     ~input:(module Joption(Marker))
-    ~output:(module Jlist(Informations.S))
-    ~signals:[Informations.signal]
-    Informations.get_informations
+    ~output:(module Jlist(Information.S))
+    ~signals:[Information.signal]
+    Information.get_information
 
 (* -------------------------------------------------------------------------- *)
-(* --- Default Kernel Informations                                        --- *)
+(* --- Default Kernel Information                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Informations.register
+let () = Information.register
     ~id:"kernel.ast.location"
     ~label:"Location"
     ~title:"Source file location"
@@ -651,10 +651,10 @@ let () = Informations.register
       Filepath.pp_pos fmt (fst location)
     end
 
-let () = Informations.register
+let () = Information.register
     ~id:"kernel.ast.varinfo"
     ~label:"Var"
-    ~title:"Variable Informations"
+    ~title:"Variable Information"
     begin fun fmt loc ->
       match loc with
       | PLval (_ , _, (Var x,NoOffset)) | PVDecl(_,_,x) ->
@@ -675,7 +675,7 @@ let () = Informations.register
       | _ -> raise Not_found
     end
 
-let () = Informations.register
+let () = Information.register
     ~id:"kernel.ast.typeinfo"
     ~label:"Type"
     ~title:"Type of C/ASCL expression"

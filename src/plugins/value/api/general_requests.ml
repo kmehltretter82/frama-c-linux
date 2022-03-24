@@ -139,7 +139,7 @@ let () = Request.register ~package
     ~output:(module DeadCode)
     dead_code
 
-(* ----- Register Eva informations ------------------------------------------ *)
+(* ----- Register Eva information ------------------------------------------- *)
 
 let print_value fmt loc =
   let stmt, eval =
@@ -161,7 +161,7 @@ let print_value fmt loc =
   else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
 
 let () =
-  Server.Kernel_ast.Informations.register
+  Server.Kernel_ast.Information.register
     ~id:"eva.value"
     ~label:"Value"
     ~title:"Possible values inferred by Eva"

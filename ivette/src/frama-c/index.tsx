@@ -57,8 +57,8 @@ Ivette.registerGroup({
   Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
     id: 'frama-c.astinfo',
-    label: 'Informations',
-    title: 'Contextual informations on current selection',
+    label: 'Inspector',
+    title: 'Contextual information on selected AST elements',
     children: <ASTinfo />
   });
   Ivette.registerComponent({

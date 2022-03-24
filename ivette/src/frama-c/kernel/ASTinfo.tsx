@@ -134,7 +134,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   const [more, setMore] = React.useState(false);
   const { marker, markerInfo } = props;
   const allInfos: ASTinfos[] =
-    States.useRequest(AST.getInformations, marker) ?? [];
+    States.useRequest(AST.getInformation, marker) ?? [];
   const highlight = classes(
     props.selected && 'selected',
     props.hovered && 'hovered',
@@ -180,7 +180,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         <IconButton
           style={{ display: hasMore ? undefined : 'none' }}
           className="astinfo-markerbutton"
-          title="Show all available informations"
+          title="Show all available information"
           size={9}
           offset={0}
           icon="CIRC.PLUS"
@@ -311,7 +311,7 @@ export default function ASTinfo(): JSX.Element {
   const markerInfos = States.useSyncArray(AST.markerInfo, false);
   const [selection] = States.useSelection();
   const [hoveredLoc] = States.useHovered();
-  const informations = States.useRequest(AST.getInformations, null) ?? [];
+  const information = States.useRequest(AST.getInformation, null) ?? [];
   const [filter, setFilter] =
     Dome.useStringSettings('frama-c.sidebar.astinfo.filter', '');
   const selectedLoc = selection?.current;
@@ -362,7 +362,7 @@ export default function ASTinfo(): JSX.Element {
       <TitleBar>
         <IconButton
           icon="CLIPBOARD"
-          onClick={() => openFilter(informations, filter, setFilter)}
+          onClick={() => openFilter(information, filter, setFilter)}
           title="Information Filters"
         />
       </TitleBar>

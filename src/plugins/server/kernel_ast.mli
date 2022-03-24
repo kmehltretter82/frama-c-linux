@@ -63,16 +63,16 @@ module KfMarker : Data.S with type t = kernel_function * Printer_tag.localizable
 module Printer : Printer_tag.S_pp
 
 (* -------------------------------------------------------------------------- *)
-(** Ast Informations *)
+(** Ast Information *)
 (* -------------------------------------------------------------------------- *)
 
-module Informations :
+module Information :
 sig
   (**
      Registers a marker information printer.
      Identifier [id] shall be unique.
      Label [label] shall be very short.
-     Description shall succintly describe the kind of informations.
+     Description shall succintly describe the kind of information.
      If the optional [enable] function is provided, the information printer is
      only used when [enable ()] returns true.
      The printer is allowed to raise [Not_found] exception,
@@ -83,10 +83,10 @@ sig
     id:string -> label:string -> title:string -> ?enable:(unit -> bool) ->
     (Format.formatter -> Printer_tag.localizable -> unit) -> unit
 
-  (** Updated informations signal *)
+  (** Updated information signal *)
   val signal : Request.signal
 
-  (** Emits a signal to server clients to reload AST marker informations. *)
+  (** Emits a signal to server clients to reload AST marker information. *)
   val update : unit -> unit
 end
 
