@@ -392,6 +392,8 @@ let setTypeAttrs t a =
 
 let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
 
+let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
+
 let filter_qualifier_attributes al =
   List.filter
     (fun a -> List.mem (attributeName a) qualifier_attributes) al
@@ -4611,7 +4613,8 @@ and constFold (machdep: bool) (e: exp) : exp =
       Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in
       match e.enode, unrollType t with
-      | Const(CInt64(i,_k,_)),(TInt(nk,a)|TEnum({ekind = nk},a)) when a = [] ->
+      | Const(CInt64(i,_k,_)),(TInt(nk,a)|TEnum({ekind = nk},a))
+        when dropAttributes fc_internal_attributes a = [] ->
         begin
           (* If the cast has attributes, leave it alone. *)
           Kernel.debug ~dkey "ConstFold to %a : %a@."
@@ -4985,16 +4988,18 @@ let mk_behavior ?(name=default_behavior_name) ?(assumes=[]) ?(requires=[])
   }
 
 let spare_attributes_for_c_cast =
-  "declspec"::"arraylen"::"fc_stdlib"::qualifier_attributes
+  fc_internal_attributes @ qualifier_attributes
 
-let type_remove_attributes_for_c_cast =
-  typeRemoveAttributes spare_attributes_for_c_cast
+let type_remove_attributes_for_c_cast t =
+  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  typeRemoveAttributes spare_attributes_for_c_cast t
 
 let spare_attributes_for_logic_cast =
   spare_attributes_for_c_cast
 
-let type_remove_attributes_for_logic_type =
-  typeRemoveAttributes spare_attributes_for_logic_cast
+let type_remove_attributes_for_logic_type t =
+  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  typeRemoveAttributes spare_attributes_for_logic_cast t
 
 let () = Cil_datatype.drop_non_logic_attributes :=
     dropAttributes spare_attributes_for_logic_cast
@@ -5836,16 +5841,12 @@ let mkCastT ?(force=false) ~(oldt: typ) ~(newt: typ) e =
       (match e.enode with | Const(CEnum _) -> false | _ -> true)
      in *)
   if need_cast ~force oldt newt then begin
-    let target_type =
-      match newt with
-      | TNamed _ -> newt
-      | _ -> type_remove_attributes_for_c_cast newt
-    in
     let mk_cast exp = (* to new type [newt] *)
-      new_exp ~loc (CastE(target_type,exp))
+      new_exp ~loc (CastE(type_remove_qualifier_attributes newt,exp))
     in
+    let normalized_type = type_remove_attributes_for_c_cast (unrollType newt) in
     (* Watch out for constants and cast of cast to pointer *)
-    match unrollType newt, e.enode with
+    match normalized_type, e.enode with
     (* In the case were we have a representation for the literal,
        explicitly add the cast. *)
     | TInt(newik, []), Const(CInt64(i, _, None)) ->

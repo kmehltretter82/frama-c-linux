@@ -79,8 +79,8 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     unsigned long __gen_e_acsl_size_4;
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
-    __e_acsl_store_block((void *)(& stream),(size_t)8);
-    __e_acsl_store_block((void *)(& ptr),(size_t)8);
+    __e_acsl_store_block((void *)(& stream),8UL);
+    __e_acsl_store_block((void *)(& ptr),8UL);
     __gen_e_acsl_at = ptr;
     __gmpz_init_set_ui(__gen_e_acsl_size,size);
     __gmpz_init_set(__gen_e_acsl_at_2,
@@ -406,7 +406,7 @@ FILE *__gen_e_acsl_fopen(char const * restrict filename,
                          char const * restrict mode)
 {
   FILE *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
   __retres = fopen(filename,mode);
   __e_acsl_delete_block((void *)(& __retres));
   return __retres;
@@ -436,17 +436,16 @@ int main(void)
   int buf[6];
   size_t tmp_0;
   int buf2[6];
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(buf2),(size_t)24);
-  __e_acsl_store_block((void *)(buf),(size_t)24);
+  __e_acsl_store_block((void *)(buf2),24UL);
+  __e_acsl_store_block((void *)(buf),24UL);
   FILE *f =
     __gen_e_acsl_fopen(__gen_e_acsl_literal_string_2,
                        __gen_e_acsl_literal_string);
-  __e_acsl_store_block((void *)(& f),(size_t)8);
+  __e_acsl_store_block((void *)(& f),8UL);
   __e_acsl_full_init((void *)(& f));
-  tmp_0 = __gen_e_acsl_fread((void *)(& buf[1]),sizeof(int),(unsigned long)4,
-                             f);
+  tmp_0 = __gen_e_acsl_fread((void *)(& buf[1]),sizeof(int),(size_t)4,f);
   int res = (int)tmp_0;
   {
     int __gen_e_acsl_initialized;
@@ -624,7 +623,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@ assert !\initialized(&buf[5]); */ ;
-  __gen_e_acsl_fread((void *)(& buf2[1]),sizeof(int),(unsigned long)4,f);
+  __gen_e_acsl_fread((void *)(& buf2[1]),sizeof(int),(size_t)4,f);
   {
     int __gen_e_acsl_initialized_8;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =

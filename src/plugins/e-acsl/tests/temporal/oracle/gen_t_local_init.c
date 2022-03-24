@@ -26,8 +26,8 @@ typedef struct tree_desc2 tree_desc2;
 void build_tree(tree_desc *desc)
 {
   int *extra;
-  __e_acsl_store_block((void *)(& extra),(size_t)8);
-  __e_acsl_store_block((void *)(& desc),(size_t)8);
+  __e_acsl_store_block((void *)(& extra),8UL);
+  __e_acsl_store_block((void *)(& desc),8UL);
   __e_acsl_temporal_pull_parameter((void *)(& desc),0U,8UL);
   __e_acsl_full_init((void *)(& extra));
   __e_acsl_temporal_store_nreferent((void *)(& extra),
@@ -110,9 +110,9 @@ void __e_acsl_globals_init(void)
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_6,sizeof("bar"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_6);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_6);
-    __e_acsl_store_block((void *)(Str),(size_t)32);
+    __e_acsl_store_block((void *)(Str),32UL);
     __e_acsl_full_init((void *)(& Str));
-    __e_acsl_store_block((void *)(Strings),(size_t)32);
+    __e_acsl_store_block((void *)(Strings),32UL);
     __e_acsl_full_init((void *)(& Strings));
     __e_acsl_temporal_store_nblock((void *)(Str),
                                    (void *)__gen_e_acsl_literal_string_5);
@@ -143,7 +143,7 @@ void __e_acsl_globals_clean(void)
 int main(int argc, char const **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   __e_acsl_globals_init();
   char *strings[2][2] =
     {{(char *)__gen_e_acsl_literal_string,
@@ -158,11 +158,11 @@ int main(int argc, char const **argv)
                                  (void *)__gen_e_acsl_literal_string_2);
   __e_acsl_temporal_store_nblock((void *)(& strings[0][0]),
                                  (void *)__gen_e_acsl_literal_string);
-  __e_acsl_store_block((void *)(strings),(size_t)32);
+  __e_acsl_store_block((void *)(strings),32UL);
   __e_acsl_full_init((void *)(& strings));
   char **p = (char **)(strings);
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)(strings));
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
     int __gen_e_acsl_initialized;
@@ -282,7 +282,7 @@ int main(int argc, char const **argv)
                                  (void *)__gen_e_acsl_literal_string_6);
   __e_acsl_temporal_store_nblock((void *)(str),
                                  (void *)__gen_e_acsl_literal_string_5);
-  __e_acsl_store_block((void *)(str),(size_t)32);
+  __e_acsl_store_block((void *)(str),32UL);
   __e_acsl_full_init((void *)(& str));
   __e_acsl_full_init((void *)(& p));
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& str));
@@ -399,7 +399,7 @@ int main(int argc, char const **argv)
   /*@ assert \valid_read(*p); */ ;
   char **P = (char **)(Strings);
   __e_acsl_temporal_store_nblock((void *)(& P),(void *)(Strings));
-  __e_acsl_store_block((void *)(& P),(size_t)8);
+  __e_acsl_store_block((void *)(& P),8UL);
   __e_acsl_full_init((void *)(& P));
   {
     int __gen_e_acsl_initialized_7;
@@ -625,12 +625,12 @@ int main(int argc, char const **argv)
   }
   /*@ assert \valid_read(*P); */ ;
   int extra_lbits[1] = {0};
-  __e_acsl_store_block((void *)(extra_lbits),(size_t)4);
+  __e_acsl_store_block((void *)(extra_lbits),4UL);
   __e_acsl_full_init((void *)(& extra_lbits));
   tree_desc l_desc = {.extra_bits = extra_lbits};
   __e_acsl_temporal_store_nblock((void *)(& l_desc.extra_bits),
                                  (void *)(extra_lbits));
-  __e_acsl_store_block((void *)(& l_desc),(size_t)8);
+  __e_acsl_store_block((void *)(& l_desc),8UL);
   __e_acsl_full_init((void *)(& l_desc));
   tree_desc descs[2] =
     {{.extra_bits = extra_lbits}, {.extra_bits = extra_lbits}};
@@ -638,12 +638,12 @@ int main(int argc, char const **argv)
                                  (void *)(extra_lbits));
   __e_acsl_temporal_store_nblock((void *)(& descs[0].extra_bits),
                                  (void *)(extra_lbits));
-  __e_acsl_store_block((void *)(descs),(size_t)16);
+  __e_acsl_store_block((void *)(descs),16UL);
   __e_acsl_full_init((void *)(& descs));
   tree_desc2 l_desc2 = {.desc = {.extra_bits = extra_lbits}};
   __e_acsl_temporal_store_nblock((void *)(& l_desc2.desc.extra_bits),
                                  (void *)(extra_lbits));
-  __e_acsl_store_block((void *)(& l_desc2),(size_t)8);
+  __e_acsl_store_block((void *)(& l_desc2),8UL);
   __e_acsl_full_init((void *)(& l_desc2));
   tree_desc2 descs2[2] =
     {{.desc = {.extra_bits = extra_lbits}},
@@ -652,7 +652,7 @@ int main(int argc, char const **argv)
                                  (void *)(extra_lbits));
   __e_acsl_temporal_store_nblock((void *)(& descs2[0].desc.extra_bits),
                                  (void *)(extra_lbits));
-  __e_acsl_store_block((void *)(descs2),(size_t)16);
+  __e_acsl_store_block((void *)(descs2),16UL);
   __e_acsl_full_init((void *)(& descs2));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();

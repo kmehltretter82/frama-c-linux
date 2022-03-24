@@ -11,9 +11,9 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 void f(void const *s, int c, unsigned long n)
 {
-  __e_acsl_store_block((void *)(& s),(size_t)8);
+  __e_acsl_store_block((void *)(& s),8UL);
   unsigned char const *p = (unsigned char const *)s;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
     __e_acsl_mpz_t __gen_e_acsl_;
@@ -84,10 +84,10 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   char const *s = __gen_e_acsl_literal_string;
-  __e_acsl_store_block((void *)(& s),(size_t)8);
+  __e_acsl_store_block((void *)(& s),8UL);
   __e_acsl_full_init((void *)(& s));
   f((void const *)s,'0',(unsigned long)11);
   __retres = 0;

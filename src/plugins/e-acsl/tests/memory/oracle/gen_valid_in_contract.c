@@ -26,8 +26,8 @@ struct list *__gen_e_acsl_f(struct list *l);
 struct list *f(struct list *l)
 {
   struct list *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
-  __e_acsl_store_block((void *)(& l),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& l),8UL);
   if (l == (struct list *)0) {
     __e_acsl_full_init((void *)(& __retres));
     __retres = l;
@@ -49,7 +49,7 @@ struct list *f(struct list *l)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __gen_e_acsl_f((struct list *)0);
   __retres = 0;
   __e_acsl_memory_clean();
@@ -69,14 +69,14 @@ struct list *__gen_e_acsl_f(struct list *l)
   __e_acsl_contract_t *__gen_e_acsl_contract;
   struct list *__gen_e_acsl_at;
   struct list *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_or;
-    __e_acsl_store_block((void *)(& l),(size_t)8);
+    __e_acsl_store_block((void *)(& l),8UL);
     __gen_e_acsl_at = l;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            l == (struct list *)0);
     __gen_e_acsl_valid = __e_acsl_valid((void *)l,sizeof(struct list),
                                         (void *)l,(void *)(& l));
@@ -118,14 +118,14 @@ struct list *__gen_e_acsl_f(struct list *l)
       else __gen_e_acsl_and = 0;
       __gen_e_acsl_or = ! __gen_e_acsl_and;
     }
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            __gen_e_acsl_or);
   }
   __retres = f(l);
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
@@ -145,7 +145,7 @@ struct list *__gen_e_acsl_f(struct list *l)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};

@@ -38,12 +38,12 @@ mp_limb_t mpn_mod_1_1p(mp_srcptr ap, mp_size_t n, mp_limb_t b,
     B2modb = *(bmodb + 3);
     B2mb = B2modb - b;
     {
-      UDItype __m0 = (unsigned long)r1;
-      UDItype __m1 = (unsigned long)B2modb;
+      UDItype __m0 = (UDItype)r1;
+      UDItype __m1 = (UDItype)B2modb;
       /*@ assigns p1;
           assigns p1 \from r1, B2modb; */
       __asm__ ("umulh %r1,%2,%0" : "=r" (p1) : "%rJ" (r1), "rI" (B2modb));
-      p0 = (long)(__m0 * __m1);
+      p0 = (mp_limb_t)(__m0 * __m1);
     }
     tmp = USItype(r0);
     tmp_0 = USItype(p1);
@@ -70,12 +70,12 @@ mp_limb_t mpn_mod_1_1p(mp_srcptr ap, mp_size_t n, mp_limb_t b,
         int tmp_5;
         int tmp_6;
         {
-          UDItype __m0_0 = (unsigned long)r1;
-          UDItype __m1_0 = (unsigned long)B2modb;
+          UDItype __m0_0 = (UDItype)r1;
+          UDItype __m1_0 = (UDItype)B2modb;
           /*@ assigns p1;
               assigns p1 \from r1, B2modb; */
           __asm__ ("umulh %r1,%2,%0" : "=r" (p1) : "%rJ" (r1), "rI" (B2modb));
-          p0 = (long)(__m0_0 * __m1_0);
+          p0 = (mp_limb_t)(__m0_0 * __m1_0);
         }
         ADDC_LIMB(cy,r0,r0,r2 & B2modb);
         r0 -= - cy & b;
@@ -96,7 +96,7 @@ mp_limb_t mpn_mod_1_1p(mp_srcptr ap, mp_size_t n, mp_limb_t b,
           : "1" (tmp_3), "g" (tmp_4), "%2" (tmp_5), "g" (tmp_6)
           );
       }
-      j -= (mp_size_t)1;
+      j --;
     }
     r1 -= r2 & b;
   }
@@ -105,12 +105,12 @@ mp_limb_t mpn_mod_1_1p(mp_srcptr ap, mp_size_t n, mp_limb_t b,
     mp_limb_t t;
     mp_limb_t B1modb = *(bmodb + 2);
     {
-      UDItype __m0_1 = (unsigned long)r1;
-      UDItype __m1_1 = (unsigned long)B1modb;
+      UDItype __m0_1 = (UDItype)r1;
+      UDItype __m1_1 = (UDItype)B1modb;
       /*@ assigns r1;
           assigns r1 \from r1, B1modb; */
       __asm__ ("umulh %r1,%2,%0" : "=r" (r1) : "%rJ" (r1), "rI" (B1modb));
-      t = (long)(__m0_1 * __m1_1);
+      t = (mp_limb_t)(__m0_1 * __m1_1);
     }
     r0 += t;
     r1 += (mp_limb_t)(r0 < t);
@@ -118,7 +118,7 @@ mp_limb_t mpn_mod_1_1p(mp_srcptr ap, mp_size_t n, mp_limb_t b,
     r0 <<= cnt;
   }
   else {
-    mp_limb_t mask = - ((long)(r1 >= b));
+    mp_limb_t mask = - ((mp_limb_t)(r1 >= b));
     r1 -= mask & b;
   }
   bi = *(bmodb + 0);

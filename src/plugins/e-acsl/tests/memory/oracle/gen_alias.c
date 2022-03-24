@@ -10,9 +10,9 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 void f(int *dest, int val)
 {
-  __e_acsl_store_block((void *)(& dest),(size_t)8);
+  __e_acsl_store_block((void *)(& dest),8UL);
   int *ptr = dest;
-  __e_acsl_store_block((void *)(& ptr),(size_t)8);
+  __e_acsl_store_block((void *)(& ptr),8UL);
   __e_acsl_full_init((void *)(& ptr));
   __e_acsl_initialize((void *)ptr,sizeof(int));
   *ptr = val;
@@ -25,8 +25,8 @@ int main(void)
 {
   int __retres;
   int i;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& i),(size_t)4);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& i),4UL);
   f(& i,255);
   {
     int __gen_e_acsl_initialized;

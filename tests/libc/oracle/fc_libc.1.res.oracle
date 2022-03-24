@@ -534,10 +534,10 @@ void Frama_C_make_unknown(char *p, size_t l)
 {
   Frama_C_update_entropy();
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     while (i < l) {
       *(p + i) = (char)Frama_C_entropy_source;
-      i += (size_t)1;
+      i ++;
     }
   }
   return;
@@ -995,7 +995,7 @@ axiomatic WcsChr {
     ∀ wchar_t *wcs;
     ∀ ℤ wc;
       wcschr(wcs, wc) ≡ \true ⇔
-      (∃ ℤ i; 0 ≤ i ≤ wcslen(wcs) ∧ *(wcs + i) ≡ (int)wc);
+      (∃ ℤ i; 0 ≤ i ≤ wcslen(wcs) ∧ *(wcs + i) ≡ (wchar_t)wc);
   
   }
  */
@@ -2096,7 +2096,7 @@ void argz_stringify(char *argz, size_t len, int sep)
         argz += part_len;
         len -= part_len;
         tmp_0 = len;
-        len -= (size_t)1;
+        len --;
         ;
         if (tmp_0 <= (size_t)1) break;
         tmp_1 = argz;
@@ -2136,7 +2136,7 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
       char *src = *argz;
       size_t src_len = *argz_len;
       char *dst = (char *)0;
-      size_t dst_len = (unsigned int)0;
+      size_t dst_len = (size_t)0;
       int delayed_copy = 1;
       size_t str_len = strlen(str);
       size_t with_len = strlen(with);
@@ -2150,7 +2150,7 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
           char *match = strstr((char const *)arg,str);
           if (match) {
             char *from = match + str_len;
-            size_t to_len = (unsigned int)(match - arg);
+            size_t to_len = (size_t)(match - arg);
             char *to = strndup((char const *)arg,to_len);
             while (1) {
               if (to) {
@@ -2162,7 +2162,7 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
                 match = strstr((char const *)from,str);
                 if (match) {
                   str_append(& to,& to_len,(char const *)from,
-                             (unsigned int)(match - from));
+                             (size_t)(match - from));
                   from = match + str_len;
                 }
                 else {
@@ -2178,7 +2178,7 @@ error_t argz_replace(char **argz, size_t *argz_len, char const *str,
               if (delayed_copy) {
                 if (arg > src) er = argz_append(& dst,& dst_len,
                                                 (char const *)src,
-                                                (unsigned int)(arg - src));
+                                                (size_t)(arg - src));
                 delayed_copy = 0;
               }
               if (! er) er = argz_add(& dst,& dst_len,(char const *)to);
@@ -2341,8 +2341,8 @@ error_t argz_create_sep(char const *string, int delim, char **argz,
             wp ++;
             *tmp_1 = (char)'\000';
           }
-          else nlen -= (size_t)1;
-        else nlen -= (size_t)1;
+          else nlen --;
+        else nlen --;
       else {
         char *tmp_2;
         tmp_2 = wp;
@@ -2357,13 +2357,13 @@ error_t argz_create_sep(char const *string, int delim, char **argz,
     if (nlen == (size_t)0) {
       free((void *)*argz);
       *argz = (char *)0;
-      *len = (unsigned int)0;
+      *len = (size_t)0;
     }
     *len = nlen;
   }
   else {
     *argz = (char *)0;
-    *len = (unsigned int)0;
+    *len = (size_t)0;
   }
   __retres = 0;
   return_label: return __retres;
@@ -2375,7 +2375,7 @@ error_t argz_create(char * const *argv, char **argz, size_t *len)
   int argc;
   char * const *ap;
   char *p;
-  size_t tlen = (unsigned int)0;
+  size_t tlen = (size_t)0;
   argc = 0;
   while (*(argv + argc) != (char *)0) {
     size_t tmp;
@@ -2405,12 +2405,12 @@ error_t argz_create(char * const *argv, char **argz, size_t *len)
 
 size_t argz_count(char const *argz, size_t len)
 {
-  size_t count = (unsigned int)0;
+  size_t count = (size_t)0;
   while (len > (size_t)0) {
     size_t part_len = strlen(argz);
     argz += part_len + (size_t)1;
     len -= part_len + (size_t)1;
-    count += (size_t)1;
+    count ++;
   }
   return count;
 }
@@ -2474,8 +2474,8 @@ error_t argz_add_sep(char **argz, size_t *argz_len, char const *string,
             wp ++;
             *tmp_1 = (char)'\000';
           }
-          else nlen -= (size_t)1;
-        else nlen -= (size_t)1;
+          else nlen --;
+        else nlen --;
       else {
         char *tmp_2;
         tmp_2 = wp;
@@ -3462,9 +3462,9 @@ int glob(char const *pattern, int flags,
   pglob->gl_pathc = (unsigned int)tmp;
   if (flags & (1 << 3)) tmp_0 = pglob->gl_offs; else tmp_0 = (unsigned int)0;
   size_t reserve_offs = tmp_0;
-  size_t prev_len = (unsigned int)0;
+  size_t prev_len = (size_t)0;
   if (flags & (1 << 5)) 
-    while (*(pglob->gl_pathv + (reserve_offs + prev_len))) prev_len += (size_t)1;
+    while (*(pglob->gl_pathv + (reserve_offs + prev_len))) prev_len ++;
   if (flags & (1 << 5)) tmp_1 = pglob->gl_pathv; else tmp_1 = (char **)0;
   char **path = tmp_1;
   if (pglob->gl_pathc == (unsigned int)0) 
@@ -3476,10 +3476,10 @@ int glob(char const *pattern, int flags,
         goto return_label;
       }
       {
-        size_t i = (unsigned int)0;
+        size_t i = (size_t)0;
         while (i < reserve_offs) {
           *(pglob->gl_pathv + i) = (char *)0;
-          i += (size_t)1;
+          i ++;
         }
       }
       *(pglob->gl_pathv + (reserve_offs + prev_len)) = (char *)pattern;
@@ -3498,17 +3498,17 @@ int glob(char const *pattern, int flags,
     goto return_label;
   }
   {
-    size_t i_0 = (unsigned int)0;
+    size_t i_0 = (size_t)0;
     while (i_0 < reserve_offs) {
       *(pglob->gl_pathv + i_0) = (char *)0;
-      i_0 += (size_t)1;
+      i_0 ++;
     }
   }
   {
-    size_t i_1 = (unsigned int)0;
+    size_t i_1 = (size_t)0;
     while (i_1 < pglob->gl_pathc) {
       *(pglob->gl_pathv + ((reserve_offs + prev_len) + i_1)) = (char *)"glob result";
-      i_1 += (size_t)1;
+      i_1 ++;
     }
   }
   *(pglob->gl_pathv + ((prev_len + reserve_offs) + pglob->gl_pathc)) = (char *)0;
@@ -3581,7 +3581,7 @@ intmax_t imaxabs(intmax_t c)
 }
 
 /*@ requires no_div_by_zero: denom ≢ 0;
-    requires no_overflow: denom ≢ -1 ∨ (long long)(-numer) ≢ numer;
+    requires no_overflow: denom ≢ -1 ∨ (intmax_t)(-numer) ≢ numer;
     ensures correct_div: \result.quot ≡ \old(numer) / \old(denom);
     ensures correct_mod: \result.rem ≡ \old(numer) % \old(denom);
     assigns \result;
@@ -5157,7 +5157,7 @@ int getaddrinfo(char const * restrict nodename,
         goto return_label;
       }
       tmp_3 = Frama_C_interval(0,43);
-      sa->sa_family = (unsigned short)tmp_3;
+      sa->sa_family = (sa_family_t)tmp_3;
       /*@ slevel 15; */
       {
         int i = 0;
@@ -5177,7 +5177,7 @@ int getaddrinfo(char const * restrict nodename,
       ai->ai_protocol = Frama_C_interval(0,IPPROTO_MAX);
       ai->ai_addrlen = sizeof(*sa);
       ai->ai_addr = sa;
-      ai->ai_canonname = (char *)malloc((unsigned int)6);
+      ai->ai_canonname = (char *)malloc((size_t)6);
       if (! ai->ai_canonname) {
         __retres = -10;
         goto return_label;
@@ -5233,8 +5233,8 @@ struct hostent *gethostbyname(char const *name)
             goto return_label;
           }
           memcpy((void *)(__fc_ghbn.host_addr),(void const *)(& addr),
-                 (unsigned int)__fc_ghbn.host.h_length);
-          strncpy(__fc_ghbn.hostbuf,name,(unsigned int)(128 - 1));
+                 (size_t)__fc_ghbn.host.h_length);
+          strncpy(__fc_ghbn.hostbuf,name,(size_t)(128 - 1));
           __fc_ghbn.hostbuf[128 - 1] = (char)'\000';
           __fc_ghbn.host.h_name = __fc_ghbn.hostbuf;
           __fc_ghbn.host.h_aliases = __fc_ghbn.host_aliases;
@@ -5267,8 +5267,8 @@ struct hostent *gethostbyname(char const *name)
     struct in_addr addr_0;
     addr_0.s_addr = inet_addr(name);
     memcpy((void *)(__fc_ghbn.host_addr),(void const *)(& addr_0),
-           (unsigned int)__fc_ghbn.host.h_length);
-    strncpy(__fc_ghbn.hostbuf,name,(unsigned int)(128 - 1));
+           (size_t)__fc_ghbn.host.h_length);
+    strncpy(__fc_ghbn.hostbuf,name,(size_t)(128 - 1));
     __fc_ghbn.hostbuf[128 - 1] = (char)'\000';
     __fc_ghbn.host.h_name = __fc_ghbn.hostbuf;
     __fc_ghbn.host.h_aliases = __fc_ghbn.host_aliases;
@@ -5282,24 +5282,24 @@ struct hostent *gethostbyname(char const *name)
   return_label: return __retres;
 }
 
-struct in6_addr const in6addr_any = {.s6_addr = {(unsigned char)0}};
+struct in6_addr const in6addr_any = {.s6_addr = {(uint8_t)0}};
 struct in6_addr const in6addr_loopback =
-  {.s6_addr = {(unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)0,
-               (unsigned char)1}};
+  {.s6_addr = {(uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)0,
+               (uint8_t)1}};
 char __fc_getpw_pw_name[64];
 char __fc_getpw_pw_passwd[64];
 char __fc_getpw_pw_gecos[64];
@@ -5347,15 +5347,15 @@ static int __fc_getpw_r(struct passwd *pwd, char *buf, size_t buflen,
   int tmp_2;
   if (! __fc_getpw_init) {
     __fc_getpw_init = 1;
-    Frama_C_make_unknown(__fc_getpw_pw_name,(unsigned int)63);
+    Frama_C_make_unknown(__fc_getpw_pw_name,(size_t)63);
     __fc_getpw_pw_name[63] = (char)0;
-    Frama_C_make_unknown(__fc_getpw_pw_passwd,(unsigned int)63);
+    Frama_C_make_unknown(__fc_getpw_pw_passwd,(size_t)63);
     __fc_getpw_pw_passwd[63] = (char)0;
-    Frama_C_make_unknown(__fc_getpw_pw_gecos,(unsigned int)63);
+    Frama_C_make_unknown(__fc_getpw_pw_gecos,(size_t)63);
     __fc_getpw_pw_gecos[63] = (char)0;
-    Frama_C_make_unknown(__fc_getpw_pw_dir,(unsigned int)63);
+    Frama_C_make_unknown(__fc_getpw_pw_dir,(size_t)63);
     __fc_getpw_pw_dir[63] = (char)0;
-    Frama_C_make_unknown(__fc_getpw_pw_shell,(unsigned int)63);
+    Frama_C_make_unknown(__fc_getpw_pw_shell,(size_t)63);
     __fc_getpw_pw_shell[63] = (char)0;
   }
   tmp_2 = Frama_C_interval(0,1);
@@ -5789,7 +5789,7 @@ extern void tzset(void);
 
 /*@ requires
       valid:
-        valid_read_or_empty((void *)s, (unsigned int)(sizeof(wchar_t) * n)) ∨
+        valid_read_or_empty((void *)s, (size_t)(sizeof(wchar_t) * n)) ∨
         \valid_read((unsigned char *)s + (0 .. wmemchr_off(s, c, n)));
     requires
       initialization:
@@ -5797,10 +5797,9 @@ extern void tzset(void);
         \initialized(s + (0 .. wmemchr_off(s, c, n)));
     requires
       danglingness:
-        non_escaping((void *)s, (unsigned int)(sizeof(wchar_t) * n)) ∨
+        non_escaping((void *)s, (size_t)(sizeof(wchar_t) * n)) ∨
         non_escaping((void *)s,
-                    (unsigned int)(sizeof(wchar_t) *
-                                   (wmemchr_off(s, c, n) + 1)));
+                    (size_t)(sizeof(wchar_t) * (wmemchr_off(s, c, n) + 1)));
     ensures
       result_null_or_inside_s:
         \result ≡ \null ∨ \subset(\result, \old(s) + (0 .. \old(n) - 1));
@@ -5812,18 +5811,18 @@ extern wchar_t *wmemchr(wchar_t const *s, wchar_t c, size_t n);
 
 /*@ requires
       valid_s1:
-        valid_read_or_empty((void *)s1, (unsigned int)(sizeof(wchar_t) * n));
+        valid_read_or_empty((void *)s1, (size_t)(sizeof(wchar_t) * n));
     requires
       valid_s2:
-        valid_read_or_empty((void *)s2, (unsigned int)(sizeof(wchar_t) * n));
+        valid_read_or_empty((void *)s2, (size_t)(sizeof(wchar_t) * n));
     requires initialization: s1: \initialized(s1 + (0 .. n - 1));
     requires initialization: s2: \initialized(s2 + (0 .. n - 1));
     requires
       danglingness: s1:
-        non_escaping((void *)s1, (unsigned int)(sizeof(wchar_t) * n));
+        non_escaping((void *)s1, (size_t)(sizeof(wchar_t) * n));
     requires
       danglingness: s2:
-        non_escaping((void *)s2, (unsigned int)(sizeof(wchar_t) * n));
+        non_escaping((void *)s2, (size_t)(sizeof(wchar_t) * n));
     assigns \result;
     assigns \result
       \from (indirect: *(s1 + (0 .. n - 1))),
@@ -6180,22 +6179,22 @@ unsigned long long __fc_atomic_exchange(void *obj,
   unsigned long long r = (unsigned long long)0;
   if (obj_size == sizeof(char)) {
     r = (unsigned long long)*((atomic_uchar volatile *)obj);
-    *((atomic_uchar volatile *)obj) = (unsigned char)desired;
+    *((atomic_uchar volatile *)obj) = (atomic_uchar)desired;
   }
   else 
     if (obj_size == sizeof(short)) {
       r = (unsigned long long)*((atomic_ushort volatile *)obj);
-      *((atomic_ushort volatile *)obj) = (unsigned short)desired;
+      *((atomic_ushort volatile *)obj) = (atomic_ushort)desired;
     }
     else 
       if (obj_size == sizeof(int)) {
         r = (unsigned long long)*((atomic_uint volatile *)obj);
-        *((atomic_uint volatile *)obj) = (unsigned int)desired;
+        *((atomic_uint volatile *)obj) = (atomic_uint)desired;
       }
       else 
         if (obj_size == sizeof(long)) {
           r = (unsigned long long)*((atomic_ulong volatile *)obj);
-          *((atomic_ulong volatile *)obj) = (unsigned long)desired;
+          *((atomic_ulong volatile *)obj) = (atomic_ulong)desired;
         }
         else 
           if (obj_size == sizeof(long long)) {
@@ -6268,22 +6267,22 @@ unsigned long long __fc_atomic_fetch_add(void *obj,
   unsigned long long r = (unsigned long long)0;
   if (obj_size == sizeof(char)) {
     r = (unsigned long long)*((atomic_uchar volatile *)obj);
-    *((atomic_uchar volatile *)obj) = (unsigned char)((unsigned long long)*((atomic_uchar volatile *)obj) + operand);
+    *((atomic_uchar volatile *)obj) = (atomic_uchar)((unsigned long long)*((atomic_uchar volatile *)obj) + operand);
   }
   else 
     if (obj_size == sizeof(short)) {
       r = (unsigned long long)*((atomic_ushort volatile *)obj);
-      *((atomic_ushort volatile *)obj) = (unsigned short)((unsigned long long)*((atomic_ushort volatile *)obj) + operand);
+      *((atomic_ushort volatile *)obj) = (atomic_ushort)((unsigned long long)*((atomic_ushort volatile *)obj) + operand);
     }
     else 
       if (obj_size == sizeof(int)) {
         r = (unsigned long long)*((atomic_uint volatile *)obj);
-        *((atomic_uint volatile *)obj) = (unsigned int)((unsigned long long)*((atomic_uint volatile *)obj) + operand);
+        *((atomic_uint volatile *)obj) = (atomic_uint)((unsigned long long)*((atomic_uint volatile *)obj) + operand);
       }
       else 
         if (obj_size == sizeof(long)) {
           r = (unsigned long long)*((atomic_ulong volatile *)obj);
-          *((atomic_ulong volatile *)obj) = (unsigned long)((unsigned long long)*((atomic_ulong volatile *)obj) + operand);
+          *((atomic_ulong volatile *)obj) = (atomic_ulong)((unsigned long long)*((atomic_ulong volatile *)obj) + operand);
         }
         else 
           if (obj_size == sizeof(long long)) {
@@ -6311,22 +6310,22 @@ unsigned long long __fc_atomic_fetch_sub(void *obj,
   unsigned long long r = (unsigned long long)0;
   if (obj_size == sizeof(char)) {
     r = (unsigned long long)*((atomic_uchar volatile *)obj);
-    *((atomic_uchar volatile *)obj) = (unsigned char)((unsigned long long)*((atomic_uchar volatile *)obj) - operand);
+    *((atomic_uchar volatile *)obj) = (atomic_uchar)((unsigned long long)*((atomic_uchar volatile *)obj) - operand);
   }
   else 
     if (obj_size == sizeof(short)) {
       r = (unsigned long long)*((atomic_ushort volatile *)obj);
-      *((atomic_ushort volatile *)obj) = (unsigned short)((unsigned long long)*((atomic_ushort volatile *)obj) - operand);
+      *((atomic_ushort volatile *)obj) = (atomic_ushort)((unsigned long long)*((atomic_ushort volatile *)obj) - operand);
     }
     else 
       if (obj_size == sizeof(int)) {
         r = (unsigned long long)*((atomic_uint volatile *)obj);
-        *((atomic_uint volatile *)obj) = (unsigned int)((unsigned long long)*((atomic_uint volatile *)obj) - operand);
+        *((atomic_uint volatile *)obj) = (atomic_uint)((unsigned long long)*((atomic_uint volatile *)obj) - operand);
       }
       else 
         if (obj_size == sizeof(long)) {
           r = (unsigned long long)*((atomic_ulong volatile *)obj);
-          *((atomic_ulong volatile *)obj) = (unsigned long)((unsigned long long)*((atomic_ulong volatile *)obj) - operand);
+          *((atomic_ulong volatile *)obj) = (atomic_ulong)((unsigned long long)*((atomic_ulong volatile *)obj) - operand);
         }
         else 
           if (obj_size == sizeof(long long)) {
@@ -6354,22 +6353,22 @@ unsigned long long __fc_atomic_fetch_or(void *obj,
   unsigned long long r = (unsigned long long)0;
   if (obj_size == sizeof(char)) {
     r = (unsigned long long)*((atomic_uchar volatile *)obj);
-    *((atomic_uchar volatile *)obj) = (unsigned char)((unsigned long long)*((atomic_uchar volatile *)obj) | operand);
+    *((atomic_uchar volatile *)obj) = (atomic_uchar)((unsigned long long)*((atomic_uchar volatile *)obj) | operand);
   }
   else 
     if (obj_size == sizeof(short)) {
       r = (unsigned long long)*((atomic_ushort volatile *)obj);
-      *((atomic_ushort volatile *)obj) = (unsigned short)((unsigned long long)*((atomic_ushort volatile *)obj) | operand);
+      *((atomic_ushort volatile *)obj) = (atomic_ushort)((unsigned long long)*((atomic_ushort volatile *)obj) | operand);
     }
     else 
       if (obj_size == sizeof(int)) {
         r = (unsigned long long)*((atomic_uint volatile *)obj);
-        *((atomic_uint volatile *)obj) = (unsigned int)((unsigned long long)*((atomic_uint volatile *)obj) | operand);
+        *((atomic_uint volatile *)obj) = (atomic_uint)((unsigned long long)*((atomic_uint volatile *)obj) | operand);
       }
       else 
         if (obj_size == sizeof(long)) {
           r = (unsigned long long)*((atomic_ulong volatile *)obj);
-          *((atomic_ulong volatile *)obj) = (unsigned long)((unsigned long long)*((atomic_ulong volatile *)obj) | operand);
+          *((atomic_ulong volatile *)obj) = (atomic_ulong)((unsigned long long)*((atomic_ulong volatile *)obj) | operand);
         }
         else 
           if (obj_size == sizeof(long long)) {
@@ -6397,22 +6396,22 @@ unsigned long long __fc_atomic_fetch_xor(void *obj,
   unsigned long long r = (unsigned long long)0;
   if (obj_size == sizeof(char)) {
     r = (unsigned long long)*((atomic_uchar volatile *)obj);
-    *((atomic_uchar volatile *)obj) = (unsigned char)((unsigned long long)*((atomic_uchar volatile *)obj) ^ operand);
+    *((atomic_uchar volatile *)obj) = (atomic_uchar)((unsigned long long)*((atomic_uchar volatile *)obj) ^ operand);
   }
   else 
     if (obj_size == sizeof(short)) {
       r = (unsigned long long)*((atomic_ushort volatile *)obj);
-      *((atomic_ushort volatile *)obj) = (unsigned short)((unsigned long long)*((atomic_ushort volatile *)obj) ^ operand);
+      *((atomic_ushort volatile *)obj) = (atomic_ushort)((unsigned long long)*((atomic_ushort volatile *)obj) ^ operand);
     }
     else 
       if (obj_size == sizeof(int)) {
         r = (unsigned long long)*((atomic_uint volatile *)obj);
-        *((atomic_uint volatile *)obj) = (unsigned int)((unsigned long long)*((atomic_uint volatile *)obj) ^ operand);
+        *((atomic_uint volatile *)obj) = (atomic_uint)((unsigned long long)*((atomic_uint volatile *)obj) ^ operand);
       }
       else 
         if (obj_size == sizeof(long)) {
           r = (unsigned long long)*((atomic_ulong volatile *)obj);
-          *((atomic_ulong volatile *)obj) = (unsigned long)((unsigned long long)*((atomic_ulong volatile *)obj) ^ operand);
+          *((atomic_ulong volatile *)obj) = (atomic_ulong)((unsigned long long)*((atomic_ulong volatile *)obj) ^ operand);
         }
         else 
           if (obj_size == sizeof(long long)) {
@@ -6440,22 +6439,22 @@ unsigned long long __fc_atomic_fetch_and(void *obj,
   unsigned long long r = (unsigned long long)0;
   if (obj_size == sizeof(char)) {
     r = (unsigned long long)*((atomic_uchar volatile *)obj);
-    *((atomic_uchar volatile *)obj) = (unsigned char)((unsigned long long)*((atomic_uchar volatile *)obj) & operand);
+    *((atomic_uchar volatile *)obj) = (atomic_uchar)((unsigned long long)*((atomic_uchar volatile *)obj) & operand);
   }
   else 
     if (obj_size == sizeof(short)) {
       r = (unsigned long long)*((atomic_ushort volatile *)obj);
-      *((atomic_ushort volatile *)obj) = (unsigned short)((unsigned long long)*((atomic_ushort volatile *)obj) & operand);
+      *((atomic_ushort volatile *)obj) = (atomic_ushort)((unsigned long long)*((atomic_ushort volatile *)obj) & operand);
     }
     else 
       if (obj_size == sizeof(int)) {
         r = (unsigned long long)*((atomic_uint volatile *)obj);
-        *((atomic_uint volatile *)obj) = (unsigned int)((unsigned long long)*((atomic_uint volatile *)obj) & operand);
+        *((atomic_uint volatile *)obj) = (atomic_uint)((unsigned long long)*((atomic_uint volatile *)obj) & operand);
       }
       else 
         if (obj_size == sizeof(long)) {
           r = (unsigned long long)*((atomic_ulong volatile *)obj);
-          *((atomic_ulong volatile *)obj) = (unsigned long)((unsigned long long)*((atomic_ulong volatile *)obj) & operand);
+          *((atomic_ulong volatile *)obj) = (atomic_ulong)((unsigned long long)*((atomic_ulong volatile *)obj) & operand);
         }
         else 
           if (obj_size == sizeof(long long)) {
@@ -7090,16 +7089,16 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream)
     if (*n == (size_t)0) {
       _LOR_1:
       {
-        *lineptr = (char *)malloc((unsigned int)2);
+        *lineptr = (char *)malloc((size_t)2);
         if (! lineptr) {
           __fc_errno = 12;
           __retres = -1;
           goto return_label;
         }
-        *n = (unsigned int)2;
+        *n = (size_t)2;
       }
     }
-  size_t cur = (unsigned int)0;
+  size_t cur = (size_t)0;
   while (1) {
     int tmp_3;
     tmp_3 = ferror(stream);
@@ -7122,7 +7121,7 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream)
         if ((int)c != -1) {
           size_t tmp_2;
           tmp_2 = cur;
-          cur += (size_t)1;
+          cur ++;
           *(*lineptr + tmp_2) = c;
         }
         if ((int)c == '\n') goto _LOR_2;
@@ -7131,7 +7130,7 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream)
             _LOR_2:
             {
               *(*lineptr + cur) = (char)'\000';
-              __retres = (int)cur;
+              __retres = (ssize_t)cur;
               goto return_label;
             }
           }
@@ -7173,7 +7172,7 @@ int asprintf(char **strp, char const *fmt, void * const *__va_params)
   int tmp;
   args = __va_params;
   tmp = Frama_C_interval(1,256);
-  size_t len = (unsigned int)tmp;
+  size_t len = (size_t)tmp;
   *strp = (char *)malloc(len);
   if (! *strp) {
     __retres = -1;
@@ -7378,7 +7377,7 @@ static char __fc_initenv_init;
 static void __fc_initenv(void)
 {
   if (! __fc_initenv_init) {
-    Frama_C_make_unknown(__fc_env_strings,(unsigned int)(64 - 1));
+    Frama_C_make_unknown(__fc_env_strings,(size_t)(64 - 1));
     {
       int i = 0;
       while (i < 4096) {
@@ -7492,7 +7491,7 @@ int setenv(char const *name, char const *value, int overwrite)
     int tmp_2;
     int tmp_3;
     tmp_1 = Frama_C_nondet(0,1);
-    if (tmp_1) Frama_C_make_unknown(__fc_env_strings,(unsigned int)(64 - 1));
+    if (tmp_1) Frama_C_make_unknown(__fc_env_strings,(size_t)(64 - 1));
     tmp_2 = Frama_C_interval(0,4096 - 1);
     tmp_3 = Frama_C_interval(0,64 - 1);
     __fc_env[tmp_2] = & __fc_env_strings[tmp_3];
@@ -7622,14 +7621,14 @@ char *realpath(char const * restrict file_name, char * restrict resolved_name)
   }
   int realpath_len = Frama_C_interval(1,256);
   if (! resolved_name) {
-    resolved_name = (char *)malloc((unsigned int)256);
+    resolved_name = (char *)malloc((size_t)256);
     if (! resolved_name) {
       __fc_errno = 12;
       __retres = (char *)0;
       goto return_label;
     }
   }
-  Frama_C_make_unknown(resolved_name,(unsigned int)realpath_len);
+  Frama_C_make_unknown(resolved_name,(size_t)realpath_len);
   *(resolved_name + (realpath_len - 1)) = (char)'\000';
   __retres = resolved_name;
   return_label: return __retres;
@@ -7660,7 +7659,7 @@ char *canonicalize_file_name(char const *path)
 void *memcpy(void * restrict dest, void const * restrict src, size_t n)
 {
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     /*@ loop invariant no_eva: 0 ≤ i ≤ n;
         loop invariant
           no_eva:
@@ -7671,7 +7670,7 @@ void *memcpy(void * restrict dest, void const * restrict src, size_t n)
     */
     while (i < n) {
       *((char *)dest + i) = *((char *)src + i);
-      i += (size_t)1;
+      i ++;
     }
   }
   return dest;
@@ -7696,7 +7695,7 @@ void *mempcpy(void * restrict dest, void const * restrict src, size_t n)
 {
   void *__retres;
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   /*@ loop invariant no_eva: 0 ≤ i ≤ n;
       loop invariant
         no_eva:
@@ -7707,7 +7706,7 @@ void *mempcpy(void * restrict dest, void const * restrict src, size_t n)
   */
   while (i < n) {
     *((char *)dest + i) = *((char *)src + i);
-    i += (size_t)1;
+    i ++;
   }
   __retres = (void *)((char *)dest + i);
   return __retres;
@@ -7740,10 +7739,10 @@ void *mempcpy(void * restrict dest, void const * restrict src, size_t n)
 static int memoverlap(char const *p, char const *q, size_t n)
 {
   int __retres;
-  uintptr_t p1 = (unsigned int)p;
-  uintptr_t p2 = (unsigned int)(p + n);
-  uintptr_t q1 = (unsigned int)q;
-  uintptr_t q2 = (unsigned int)(q + n);
+  uintptr_t p1 = (uintptr_t)p;
+  uintptr_t p2 = (uintptr_t)(p + n);
+  uintptr_t q1 = (uintptr_t)q;
+  uintptr_t q2 = (uintptr_t)(q + n);
   if (p1 <= q1) {
     if (p2 > q1) {
       __retres = -1;
@@ -7794,7 +7793,7 @@ void *memmove(void *dest, void const *src, size_t n)
   char *d = (char *)dest;
   tmp = memoverlap((char const *)dest,(char const *)src,n);
   if (tmp <= 0) {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     /*@ loop invariant no_eva: 0 ≤ i ≤ n;
         loop invariant
           no_eva:
@@ -7811,7 +7810,7 @@ void *memmove(void *dest, void const *src, size_t n)
     */
     while (i < n) {
       *(d + i) = *(s + i);
-      i += (size_t)1;
+      i ++;
     }
   }
   else {
@@ -7833,7 +7832,7 @@ void *memmove(void *dest, void const *src, size_t n)
       */
       while (i_0 > (size_t)0) {
         *(d + i_0) = *(s + i_0);
-        i_0 -= (size_t)1;
+        i_0 --;
       }
     }
     *(d + 0) = *(s + 0);
@@ -7850,8 +7849,8 @@ void *memmove(void *dest, void const *src, size_t n)
 size_t strlen(char const *s)
 {
   size_t i;
-  i = (unsigned int)0;
-  while ((int)*(s + i) != 0) i += (size_t)1;
+  i = (size_t)0;
+  while ((int)*(s + i) != 0) i ++;
   return i;
 }
 
@@ -7866,13 +7865,13 @@ size_t strlen(char const *s)
 size_t strnlen(char const *s, size_t maxlen)
 {
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while (1) {
     if (i < maxlen) {
       if (! ((int)*(s + i) != 0)) break;
     }
     else break;
-    i += (size_t)1;
+    i ++;
   }
   return i;
 }
@@ -7889,10 +7888,10 @@ void *memset(void *s, int c, size_t n)
 {
   unsigned char *p = (unsigned char *)s;
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     while (i < n) {
       *(p + i) = (unsigned char)c;
-      i += (size_t)1;
+      i ++;
     }
   }
   return s;
@@ -7909,13 +7908,13 @@ int strcmp(char const *s1, char const *s2)
 {
   int __retres;
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while ((int)*(s1 + i) == (int)*(s2 + i)) {
     if ((int)*(s1 + i) == 0) {
       __retres = 0;
       goto return_label;
     }
-    i += (size_t)1;
+    i ++;
   }
   __retres = (int)*((unsigned char *)s1 + i) - (int)*((unsigned char *)s2 + i);
   return_label: return __retres;
@@ -7933,7 +7932,7 @@ int strncmp(char const *s1, char const *s2, size_t n)
 {
   int __retres;
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     while (i < n) {
       if ((int)*(s1 + i) != (int)*(s2 + i)) {
         __retres = (int)*((unsigned char *)s1 + i) - (int)*((unsigned char *)s2 + i);
@@ -7943,7 +7942,7 @@ int strncmp(char const *s1, char const *s2, size_t n)
         __retres = 0;
         goto return_label;
       }
-      i += (size_t)1;
+      i ++;
     }
   }
   __retres = 0;
@@ -7973,13 +7972,13 @@ int memcmp(void const *s1, void const *s2, size_t n)
   p1 = (unsigned char const *)s1;
   p2 = (unsigned char const *)s2;
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     while (i < n) {
       if ((int)*(p1 + i) != (int)*(p2 + i)) {
         __retres = (int)*(p1 + i) - (int)*(p2 + i);
         goto return_label;
       }
-      i += (size_t)1;
+      i ++;
     }
   }
   __retres = 0;
@@ -8014,7 +8013,7 @@ int strcasecmp(char const *s1, char const *s2)
 {
   int __retres;
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while (1) {
     if ((int)*(s1 + i) != 0) {
       if (! ((int)*(s2 + i) != 0)) break;
@@ -8027,7 +8026,7 @@ int strcasecmp(char const *s1, char const *s2)
         goto return_label;
       }
     }
-    i += (size_t)1;
+    i ++;
   }
   if ((int)*(s1 + i) == 0) {
     if ((int)*(s2 + i) == 0) {
@@ -8074,10 +8073,10 @@ char *strcat(char *dest, char const *src)
 {
   size_t i;
   size_t n = strlen((char const *)dest);
-  i = (unsigned int)0;
+  i = (size_t)0;
   while ((int)*(src + i) != 0) {
     *(dest + (n + i)) = *(src + i);
-    i += (size_t)1;
+    i ++;
   }
   *(dest + (n + i)) = (char)0;
   return dest;
@@ -8125,11 +8124,11 @@ char *strncat(char *dest, char const *src, size_t n)
 {
   size_t i;
   size_t dest_len = strlen((char const *)dest);
-  i = (unsigned int)0;
+  i = (size_t)0;
   while (i < n) {
     if ((int)*(src + i) == 0) break;
     *(dest + (dest_len + i)) = *(src + i);
-    i += (size_t)1;
+    i ++;
   }
   *(dest + (dest_len + i)) = (char)0;
   return dest;
@@ -8150,10 +8149,10 @@ char *strncat(char *dest, char const *src, size_t n)
 char *strcpy(char *dest, char const *src)
 {
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while ((int)*(src + i) != 0) {
     *(dest + i) = *(src + i);
-    i += (size_t)1;
+    i ++;
   }
   *(dest + i) = (char)0;
   return dest;
@@ -8175,10 +8174,10 @@ char *stpcpy(char *dest, char const *src)
 {
   char *__retres;
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while ((int)*(src + i) != 0) {
     *(dest + i) = *(src + i);
-    i += (size_t)1;
+    i ++;
   }
   *(dest + i) = (char)0;
   __retres = dest + i;
@@ -8207,15 +8206,15 @@ char *stpcpy(char *dest, char const *src)
 char *strncpy(char *dest, char const *src, size_t n)
 {
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while (i < n) {
     *(dest + i) = *(src + i);
     if ((int)*(src + i) == 0) break;
-    i += (size_t)1;
+    i ++;
   }
   while (i < n) {
     *(dest + i) = (char)0;
-    i += (size_t)1;
+    i ++;
   }
   return dest;
 }
@@ -8250,13 +8249,13 @@ char *strchr(char const *s, int c)
   char *__retres;
   size_t i;
   char const ch = (char)c;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while ((int)*(s + i) != (int)ch) {
     if ((int)*(s + i) == 0) {
       __retres = (char *)0;
       goto return_label;
     }
-    i += (size_t)1;
+    i ++;
   }
   __retres = (char *)(s + i);
   return_label: return __retres;
@@ -8294,7 +8293,7 @@ char *strrchr(char const *s, int c)
         __retres = (char *)(s + (i - (size_t)1));
         goto return_label;
       }
-      i -= (size_t)1;
+      i --;
     }
   }
   __retres = (char *)0;
@@ -8312,7 +8311,7 @@ char *strrchr(char const *s, int c)
     requires
       danglingness:
         non_escaping(s, n) ∨
-        non_escaping(s, (unsigned int)(memchr_off((char *)s, c, n) + 1));
+        non_escaping(s, (size_t)(memchr_off((char *)s, c, n) + 1));
     assigns \result;
     assigns \result \from s, c, *((unsigned char *)s + (0 .. n - 1));
     
@@ -8337,13 +8336,13 @@ void *memchr(void const *s, int c, size_t n)
   unsigned char const ch = (unsigned char)c;
   unsigned char const *ss = (unsigned char const *)s;
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     while (i < n) {
       if ((int)*(ss + i) == (int)ch) {
         __retres = (void *)(ss + i);
         goto return_label;
       }
-      i += (size_t)1;
+      i ++;
     }
   }
   __retres = (void *)0;
@@ -8362,7 +8361,7 @@ void *memrchr(void const *s, int c, size_t n)
         __retres = (void *)(ss + (i - (size_t)1));
         goto return_label;
       }
-      i -= (size_t)1;
+      i --;
     }
   }
   __retres = (void *)0;
@@ -8390,21 +8389,21 @@ char *strstr(char const *haystack, char const *needle)
     goto return_label;
   }
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     while ((int)*(haystack + i) != 0) {
       {
         size_t j;
-        j = (unsigned int)0;
+        j = (size_t)0;
         while ((int)*(haystack + (i + j)) != 0) {
           if ((int)*(haystack + (i + j)) != (int)*(needle + j)) break;
-          j += (size_t)1;
+          j ++;
         }
         if ((int)*(needle + j) == 0) {
           __retres = (char *)(haystack + i);
           goto return_label;
         }
       }
-      i += (size_t)1;
+      i ++;
     }
   }
   __retres = (char *)0;
@@ -8422,7 +8421,7 @@ char *strerror(int errnum)
 {
   char *__retres;
   if (! strerror___fc_strerror_init) {
-    Frama_C_make_unknown(__fc_strerror,(unsigned int)63);
+    Frama_C_make_unknown(__fc_strerror,(size_t)63);
     __fc_strerror[63] = (char)0;
     strerror___fc_strerror_init = 1;
   }
@@ -8508,10 +8507,10 @@ char *strndup(char const *s, size_t n)
 {
   char *__retres;
   size_t l;
-  l = (unsigned int)0;
+  l = (size_t)0;
   while (l < n) {
     if ((int)*(s + l) == 0) break;
-    l += (size_t)1;
+    l ++;
   }
   char *p = malloc(l + (size_t)1);
   if (! p) {
@@ -8536,7 +8535,7 @@ char *strsignal(int signum)
 {
   char *__retres;
   if (! strsignal___fc_strsignal_init) {
-    Frama_C_make_unknown(__fc_strsignal,(unsigned int)63);
+    Frama_C_make_unknown(__fc_strsignal,(size_t)63);
     __fc_strsignal[63] = (char)0;
     strsignal___fc_strsignal_init = 1;
   }
@@ -8545,11 +8544,10 @@ char *strsignal(int signum)
 }
 
 /*@ requires
-      valid_dest:
-        valid_or_empty((void *)dest, (unsigned int)(sizeof(wchar_t) * n));
+      valid_dest: valid_or_empty((void *)dest, (size_t)(sizeof(wchar_t) * n));
     requires
       valid_src:
-        valid_read_or_empty((void *)src, (unsigned int)(sizeof(wchar_t) * n));
+        valid_read_or_empty((void *)src, (size_t)(sizeof(wchar_t) * n));
     requires
       separation: dest: src:
         \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
@@ -8562,10 +8560,10 @@ char *strsignal(int signum)
 wchar_t *wmemcpy(wchar_t *dest, wchar_t const *src, size_t n)
 {
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     while (i < n) {
       *(dest + i) = *(src + i);
-      i += (size_t)1;
+      i ++;
     }
   }
   return dest;
@@ -8585,10 +8583,10 @@ wchar_t *wmemcpy(wchar_t *dest, wchar_t const *src, size_t n)
 wchar_t *wmemset(wchar_t *dest, wchar_t val, size_t len)
 {
   {
-    size_t i = (unsigned int)0;
+    size_t i = (size_t)0;
     while (i < len) {
       *(dest + i) = val;
-      i += (size_t)1;
+      i ++;
     }
   }
   return dest;
@@ -8608,10 +8606,10 @@ wchar_t *wmemset(wchar_t *dest, wchar_t val, size_t len)
 wchar_t *wcscpy(wchar_t *dest, wchar_t const *src)
 {
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while (*(src + i) != 0) {
     *(dest + i) = *(src + i);
-    i += (size_t)1;
+    i ++;
   }
   *(dest + i) = 0;
   return dest;
@@ -8625,8 +8623,8 @@ wchar_t *wcscpy(wchar_t *dest, wchar_t const *src)
 size_t wcslen(wchar_t const *str)
 {
   size_t i;
-  i = (unsigned int)0;
-  while (*(str + i) != 0) i += (size_t)1;
+  i = (size_t)0;
+  while (*(str + i) != 0) i ++;
   return i;
 }
 
@@ -8645,15 +8643,15 @@ size_t wcslen(wchar_t const *str)
 wchar_t *wcsncpy(wchar_t *dest, wchar_t const *src, size_t n)
 {
   size_t i;
-  i = (unsigned int)0;
+  i = (size_t)0;
   while (i < n) {
     *(dest + i) = *(src + i);
     if (*(src + i) == 0) break;
-    i += (size_t)1;
+    i ++;
   }
   while (i < n) {
     *(dest + i) = 0;
-    i += (size_t)1;
+    i ++;
   }
   return dest;
 }
@@ -8679,10 +8677,10 @@ wchar_t *wcscat(wchar_t *dest, wchar_t const *src)
 {
   size_t i;
   size_t n = wcslen((wchar_t const *)dest);
-  i = (unsigned int)0;
+  i = (size_t)0;
   while (*(src + i) != 0) {
     *(dest + (n + i)) = *(src + i);
-    i += (size_t)1;
+    i ++;
   }
   *(dest + (n + i)) = 0;
   return dest;
@@ -8709,14 +8707,14 @@ wchar_t *wcsncat(wchar_t *dest, wchar_t const *src, size_t n)
 {
   size_t i;
   size_t dest_len = wcslen((wchar_t const *)dest);
-  i = (unsigned int)0;
+  i = (size_t)0;
   while (1) {
     if (i < n) {
       if (! (*(src + i) != 0)) break;
     }
     else break;
     *(dest + (dest_len + i)) = *(src + i);
-    i += (size_t)1;
+    i ++;
   }
   *(dest + (dest_len + i)) = 0;
   return dest;

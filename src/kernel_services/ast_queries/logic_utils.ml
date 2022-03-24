@@ -225,24 +225,26 @@ let equal_ltype = Cil_datatype.Logic_type.equal
 
 (* Does the same kind of optimization than [Cil.mkCastT] for [Ctype]. *)
 let mk_cast ?loc ?(force=false) newt t =
-  let newt = Cil.type_remove_attributes_for_logic_type newt in
-  if equal_ltype (Ctype newt) t.term_type then t else
+  let newt' = Cil.type_remove_attributes_for_logic_type newt in
+  if equal_ltype (Ctype newt') t.term_type then t else
     let rec unroll_cast e = match e.term_node with
       | TCastE(oldt,e)
-        when (Cil.isPointerType newt && Cil.isPointerType oldt)
-          || equal_ltype (Ctype oldt) (Ctype newt)
+        when (Cil.isPointerType newt' && Cil.isPointerType oldt)
+          || equal_ltype
+               (Ctype (Cil.type_remove_attributes_for_logic_type oldt))
+               (Ctype newt')
         -> unroll_cast e
       | TLogic_coerce(Linteger,e)
-        when Cil.isArithmeticOrPointerType newt
+        when Cil.isArithmeticOrPointerType newt'
         -> unroll_cast e
       | TLogic_coerce(Lreal,e)
-        when Cil.isFloatingType newt
+        when Cil.isFloatingType newt'
         -> unroll_cast e
       | _ -> e
     in
     let tres = if force then t else unroll_cast t in
     let loc = match loc with None -> t.term_loc | Some loc -> loc in
-    Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt)
+    Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt')
 
 
 (* -------------------------------------------------------------------------- *)

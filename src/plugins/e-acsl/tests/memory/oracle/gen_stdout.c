@@ -13,11 +13,11 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& stdout),(size_t)8);
+    __e_acsl_store_block((void *)(& stdout),8UL);
     __e_acsl_full_init((void *)(& stdout));
-    __e_acsl_store_block((void *)(& stdin),(size_t)8);
+    __e_acsl_store_block((void *)(& stdin),8UL);
     __e_acsl_full_init((void *)(& stdin));
-    __e_acsl_store_block((void *)(& stderr),(size_t)8);
+    __e_acsl_store_block((void *)(& stderr),8UL);
     __e_acsl_full_init((void *)(& stderr));
   }
   return;
@@ -34,7 +34,7 @@ void __e_acsl_globals_clean(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   {
     int __gen_e_acsl_valid;

@@ -73,7 +73,7 @@ memory_block *memory_alloc(memory_pool *arena, size_t s)
       }
     mbl = mbl->next;
   }
-  if ((size_t)1000 < s) mb_size = s; else mb_size = (unsigned int)1000;
+  if ((size_t)1000 < s) mb_size = s; else mb_size = (size_t)1000;
   mb_data = (char *)malloc(mb_size);
   mb = (memory_block *)malloc(sizeof(memory_block));
   mb->size = mb_size;

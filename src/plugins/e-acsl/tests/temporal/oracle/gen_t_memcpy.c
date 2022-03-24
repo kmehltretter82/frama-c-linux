@@ -43,15 +43,15 @@ int main(void)
   int *src[2];
   int *dest[2];
   int *tmp_1;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& tmp_1),(size_t)8);
-  __e_acsl_store_block((void *)(dest),(size_t)16);
-  __e_acsl_store_block((void *)(src),(size_t)16);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& tmp_1),8UL);
+  __e_acsl_store_block((void *)(dest),16UL);
+  __e_acsl_store_block((void *)(src),16UL);
   int a = 111;
-  __e_acsl_store_block((void *)(& a),(size_t)4);
+  __e_acsl_store_block((void *)(& a),4UL);
   __e_acsl_full_init((void *)(& a));
   int b = 222;
-  __e_acsl_store_block((void *)(& b),(size_t)4);
+  __e_acsl_store_block((void *)(& b),4UL);
   __e_acsl_full_init((void *)(& b));
   int size = (int)(sizeof(int *) * (unsigned long)2);
   __e_acsl_initialize((void *)(src),sizeof(int *));
@@ -144,8 +144,7 @@ int main(void)
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nblock_parameter((void *)(& dest),0U);
   __e_acsl_temporal_save_nblock_parameter((void *)(& src),1U);
-  __gen_e_acsl_memcpy((void *)(& dest),(void const *)(& src),
-                      (unsigned long)size);
+  __gen_e_acsl_memcpy((void *)(& dest),(void const *)(& src),(size_t)size);
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_3;
@@ -224,7 +223,7 @@ int main(void)
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nblock_parameter((void *)(& dest),0U);
-  __gen_e_acsl_memset((void *)(& dest),0,(unsigned long)size);
+  __gen_e_acsl_memset((void *)(& dest),0,(size_t)size);
   {
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_5;
@@ -302,15 +301,15 @@ int main(void)
   /*@ assert !\valid(dest[1]); */ ;
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  int **p = malloc((unsigned long)size);
+  int **p = malloc((size_t)size);
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  int **q = malloc((unsigned long)size);
+  int **q = malloc((size_t)size);
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)*(& q));
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   __e_acsl_initialize((void *)p,sizeof(int *));
   __e_acsl_temporal_store_nblock((void *)p,(void *)(& a));
@@ -585,7 +584,7 @@ int main(void)
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& q),0U);
   __e_acsl_temporal_save_nreferent_parameter((void *)(& p),1U);
-  __gen_e_acsl_memcpy((void *)q,(void const *)p,(unsigned long)size);
+  __gen_e_acsl_memcpy((void *)q,(void const *)p,(size_t)size);
   {
     int __gen_e_acsl_initialized_13;
     int __gen_e_acsl_and_14;
@@ -736,7 +735,7 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
 {
   void *__gen_e_acsl_at;
   void *__retres;
-  __e_acsl_store_block((void *)(& s),(size_t)8);
+  __e_acsl_store_block((void *)(& s),8UL);
   __e_acsl_temporal_pull_parameter((void *)(& s),0U,8UL);
   __gen_e_acsl_at = s;
   __e_acsl_temporal_reset_parameters();
@@ -808,8 +807,8 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     unsigned long __gen_e_acsl__6;
     unsigned long __gen_e_acsl_if_4;
     int __gen_e_acsl_separated;
-    __e_acsl_store_block((void *)(& src),(size_t)8);
-    __e_acsl_store_block((void *)(& dest),(size_t)8);
+    __e_acsl_store_block((void *)(& src),8UL);
+    __e_acsl_store_block((void *)(& dest),8UL);
     __e_acsl_temporal_pull_parameter((void *)(& dest),0U,8UL);
     __e_acsl_temporal_pull_parameter((void *)(& src),1U,8UL);
     __gen_e_acsl_at = dest;
@@ -927,8 +926,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                                      __gen_e_acsl_size_4);
       __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
     }
-    __gen_e_acsl_separated = __e_acsl_separated((size_t)2,
-                                                (char *)dest + 1 * 0,
+    __gen_e_acsl_separated = __e_acsl_separated(2UL,(char *)dest + 1 * 0,
                                                 __gen_e_acsl_if_3,
                                                 (char *)src + 1 * 0,
                                                 __gen_e_acsl_if_4);

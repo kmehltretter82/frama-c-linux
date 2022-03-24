@@ -160,11 +160,11 @@ void *write_value(void *arg)
   int tmp;
   int tmp_0;
   int tmp_1;
-  __e_acsl_store_block((void *)(& tmp_1),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp_0),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp),(size_t)4);
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
-  __e_acsl_store_block((void *)(& arg),(size_t)8);
+  __e_acsl_store_block((void *)(& tmp_1),4UL);
+  __e_acsl_store_block((void *)(& tmp_0),4UL);
+  __e_acsl_store_block((void *)(& tmp),4UL);
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& arg),8UL);
   __e_acsl_full_init((void *)(& tmp));
   tmp = __gen_e_acsl_pthread_mutex_lock(& write_mutex);
   if (tmp != 0) {
@@ -184,9 +184,9 @@ void *write_value(void *arg)
     __gen_e_acsl_perror(__gen_e_acsl_literal_string_3);
     __gen_e_acsl_exit(1);
   }
-  __gen_e_acsl_usleep((unsigned int)100);
+  __gen_e_acsl_usleep((useconds_t)100);
   int idx = *((int *)arg);
-  __e_acsl_store_block((void *)(& idx),(size_t)4);
+  __e_acsl_store_block((void *)(& idx),4UL);
   __e_acsl_full_init((void *)(& idx));
   __e_acsl_initialize((void *)(& values[idx]),sizeof(int *));
   values[idx] = (int *)malloc(sizeof(int));
@@ -215,11 +215,11 @@ void *read_value(void *arg)
   int tmp;
   int tmp_0;
   int tmp_1;
-  __e_acsl_store_block((void *)(& tmp_1),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp_0),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp),(size_t)4);
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
-  __e_acsl_store_block((void *)(& arg),(size_t)8);
+  __e_acsl_store_block((void *)(& tmp_1),4UL);
+  __e_acsl_store_block((void *)(& tmp_0),4UL);
+  __e_acsl_store_block((void *)(& tmp),4UL);
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& arg),8UL);
   __e_acsl_full_init((void *)(& tmp));
   tmp = __gen_e_acsl_pthread_mutex_lock(& read_mutex);
   if (tmp != 0) {
@@ -239,7 +239,7 @@ void *read_value(void *arg)
     __gen_e_acsl_perror(__gen_e_acsl_literal_string_6);
     __gen_e_acsl_exit(1);
   }
-  __gen_e_acsl_usleep((unsigned int)100);
+  __gen_e_acsl_usleep((useconds_t)100);
   {
     int __gen_e_acsl_idx;
     int __gen_e_acsl_initialized;
@@ -355,7 +355,7 @@ void *read_value(void *arg)
   */
   {
     int idx = *((int *)arg);
-    __e_acsl_store_block((void *)(& idx),(size_t)4);
+    __e_acsl_store_block((void *)(& idx),4UL);
     __e_acsl_full_init((void *)(& idx));
     {
       int __gen_e_acsl_initialized_3;
@@ -478,13 +478,13 @@ void *read_value(void *arg)
 void *__gen_e_acsl_read_value(void *arg)
 {
   void *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
   {
     int __gen_e_acsl_idx;
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
     int __gen_e_acsl_and_2;
-    __e_acsl_store_block((void *)(& arg),(size_t)8);
+    __e_acsl_store_block((void *)(& arg),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*((int *)arg)",
                                  0,*((int *)arg));
@@ -603,8 +603,8 @@ void *__gen_e_acsl_write_value(void *arg)
 {
   void *__gen_e_acsl_at;
   void *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
-  __e_acsl_store_block((void *)(& arg),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& arg),8UL);
   __gen_e_acsl_at = arg;
   __retres = write_value(arg);
   {
@@ -731,8 +731,8 @@ void *__gen_e_acsl_write_value(void *arg)
 int __gen_e_acsl_usleep(useconds_t usec)
 {
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
-  __e_acsl_store_block((void *)(& usec),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
+  __e_acsl_store_block((void *)(& usec),4UL);
   __retres = usleep(usec);
   {
     int __gen_e_acsl_or;
@@ -767,7 +767,7 @@ int __gen_e_acsl_usleep(useconds_t usec)
  */
 void __gen_e_acsl_exit(int status)
 {
-  __e_acsl_store_block((void *)(& status),(size_t)4);
+  __e_acsl_store_block((void *)(& status),4UL);
   exit(status);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -790,7 +790,7 @@ void __gen_e_acsl_exit(int status)
  */
 void __gen_e_acsl_perror(char const *s)
 {
-  __e_acsl_store_block((void *)(& s),(size_t)8);
+  __e_acsl_store_block((void *)(& s),8UL);
   perror(s);
   __e_acsl_delete_block((void *)(& s));
   return;
@@ -805,10 +805,10 @@ void __gen_e_acsl_perror(char const *s)
 int __gen_e_acsl_pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& mutex),(size_t)8);
+    __e_acsl_store_block((void *)(& mutex),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"mutex",
                                  (void *)mutex);
@@ -869,10 +869,10 @@ int __gen_e_acsl_pthread_mutex_unlock(pthread_mutex_t *mutex)
 int __gen_e_acsl_pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& mutex),(size_t)8);
+    __e_acsl_store_block((void *)(& mutex),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"mutex",
                                  (void *)mutex);
@@ -951,12 +951,12 @@ int __gen_e_acsl_pthread_mutex_init(pthread_mutex_t * restrict mutex,
 {
   pthread_mutex_t *__gen_e_acsl_at;
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_or;
-    __e_acsl_store_block((void *)(& attrs),(size_t)8);
-    __e_acsl_store_block((void *)(& mutex),(size_t)8);
+    __e_acsl_store_block((void *)(& attrs),8UL);
+    __e_acsl_store_block((void *)(& mutex),8UL);
     __gen_e_acsl_at = mutex;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"mutex",
@@ -1098,13 +1098,13 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_or;
     int __gen_e_acsl_valid_2;
-    __e_acsl_store_block((void *)(& retval),(size_t)8);
-    __e_acsl_store_block((void *)(& thread),(size_t)4);
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __e_acsl_store_block((void *)(& retval),8UL);
+    __e_acsl_store_block((void *)(& thread),4UL);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"retval",
                                  (void *)retval);
@@ -1130,11 +1130,11 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     __gen_e_acsl_assert_data.name = "valid_or_null_retval";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            retval == (void **)0);
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)retval,sizeof(void *),
                                           (void *)retval,(void *)(& retval));
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            __gen_e_acsl_valid_2);
   }
   __retres = pthread_join(thread,retval);
@@ -1198,15 +1198,15 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
                                 void * restrict arg)
 {
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_or;
     int __gen_e_acsl_or_2;
-    __e_acsl_store_block((void *)(& arg),(size_t)8);
-    __e_acsl_store_block((void *)(& start_routine),(size_t)8);
-    __e_acsl_store_block((void *)(& attr),(size_t)8);
-    __e_acsl_store_block((void *)(& thread),(size_t)8);
+    __e_acsl_store_block((void *)(& arg),8UL);
+    __e_acsl_store_block((void *)(& start_routine),8UL);
+    __e_acsl_store_block((void *)(& attr),8UL);
+    __e_acsl_store_block((void *)(& thread),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"thread",
                                  (void *)thread);
@@ -1336,12 +1336,12 @@ int __gen_e_acsl_pthread_cond_wait(pthread_cond_t * restrict cond,
                                    pthread_mutex_t * restrict mutex)
 {
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
-    __e_acsl_store_block((void *)(& mutex),(size_t)8);
-    __e_acsl_store_block((void *)(& cond),(size_t)8);
+    __e_acsl_store_block((void *)(& mutex),8UL);
+    __e_acsl_store_block((void *)(& cond),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"cond",
                                  (void *)cond);
@@ -1418,12 +1418,12 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
 {
   pthread_cond_t *__gen_e_acsl_at;
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_or;
-    __e_acsl_store_block((void *)(& attr),(size_t)8);
-    __e_acsl_store_block((void *)(& cond),(size_t)8);
+    __e_acsl_store_block((void *)(& attr),8UL);
+    __e_acsl_store_block((void *)(& cond),8UL);
     __gen_e_acsl_at = cond;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"cond",
@@ -1527,10 +1527,10 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
 int __gen_e_acsl_pthread_cond_broadcast(pthread_cond_t *cond)
 {
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   {
     int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& cond),(size_t)8);
+    __e_acsl_store_block((void *)(& cond),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"cond",
                                  (void *)cond);
@@ -1647,127 +1647,121 @@ void __e_acsl_globals_init(void)
                          sizeof("Unable to broadcast to read cond var"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_14);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_14);
-    __e_acsl_store_block((void *)(& __gen_e_acsl_read_value),(size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_read_value),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_read_value));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_write_value),(size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_write_value),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_write_value));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_usleep),(size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_usleep),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_usleep));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_exit),(size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_exit),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_exit));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_perror),(size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_perror),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_perror));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_mutex_unlock),
-                         (size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_mutex_unlock),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_mutex_unlock));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_mutex_lock),
-                         (size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_mutex_lock),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_mutex_lock));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_mutex_init),
-                         (size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_mutex_init),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_mutex_init));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_join),(size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_join),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_join));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_create),(size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_create),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_create));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_cond_wait),
-                         (size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_cond_wait),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_cond_wait));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_cond_init),
-                         (size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_cond_init),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_cond_init));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_cond_broadcast),
-                         (size_t)1);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_cond_broadcast),1UL);
     __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_cond_broadcast));
-    __e_acsl_store_block((void *)(& read_value),(size_t)1);
+    __e_acsl_store_block((void *)(& read_value),1UL);
     __e_acsl_full_init((void *)(& read_value));
-    __e_acsl_store_block((void *)(& write_value),(size_t)1);
+    __e_acsl_store_block((void *)(& write_value),1UL);
     __e_acsl_full_init((void *)(& write_value));
-    __e_acsl_store_block((void *)(& read_mutex),(size_t)4);
+    __e_acsl_store_block((void *)(& read_mutex),4UL);
     __e_acsl_full_init((void *)(& read_mutex));
-    __e_acsl_store_block((void *)(& write_mutex),(size_t)4);
+    __e_acsl_store_block((void *)(& write_mutex),4UL);
     __e_acsl_full_init((void *)(& write_mutex));
-    __e_acsl_store_block((void *)(& read_cond),(size_t)4);
+    __e_acsl_store_block((void *)(& read_cond),4UL);
     __e_acsl_full_init((void *)(& read_cond));
-    __e_acsl_store_block((void *)(& write_cond),(size_t)4);
+    __e_acsl_store_block((void *)(& write_cond),4UL);
     __e_acsl_full_init((void *)(& write_cond));
-    __e_acsl_store_block((void *)(& read_count),(size_t)4);
+    __e_acsl_store_block((void *)(& read_count),4UL);
     __e_acsl_full_init((void *)(& read_count));
-    __e_acsl_store_block((void *)(& write_count),(size_t)4);
+    __e_acsl_store_block((void *)(& write_count),4UL);
     __e_acsl_full_init((void *)(& write_count));
-    __e_acsl_store_block((void *)(values),(size_t)80);
+    __e_acsl_store_block((void *)(values),80UL);
     __e_acsl_full_init((void *)(& values));
-    __e_acsl_store_block((void *)(& usleep),(size_t)1);
+    __e_acsl_store_block((void *)(& usleep),1UL);
     __e_acsl_full_init((void *)(& usleep));
-    __e_acsl_store_block((void *)(& __fc_p_ttyname),(size_t)8);
+    __e_acsl_store_block((void *)(& __fc_p_ttyname),8UL);
     __e_acsl_full_init((void *)(& __fc_p_ttyname));
-    __e_acsl_store_block((void *)(ttyname),(size_t)32);
+    __e_acsl_store_block((void *)(ttyname),32UL);
     __e_acsl_full_init((void *)(& ttyname));
-    __e_acsl_store_block((void *)(& Frama_C_entropy_source),(size_t)4);
+    __e_acsl_store_block((void *)(& Frama_C_entropy_source),4UL);
     __e_acsl_full_init((void *)(& Frama_C_entropy_source));
-    __e_acsl_store_block((void *)(& exit),(size_t)1);
+    __e_acsl_store_block((void *)(& exit),1UL);
     __e_acsl_full_init((void *)(& exit));
-    __e_acsl_store_block((void *)(& free),(size_t)1);
+    __e_acsl_store_block((void *)(& free),1UL);
     __e_acsl_full_init((void *)(& free));
-    __e_acsl_store_block((void *)(& malloc),(size_t)1);
+    __e_acsl_store_block((void *)(& malloc),1UL);
     __e_acsl_full_init((void *)(& malloc));
-    __e_acsl_store_block((void *)(& __fc_p_random48_counter),(size_t)8);
+    __e_acsl_store_block((void *)(& __fc_p_random48_counter),8UL);
     __e_acsl_full_init((void *)(& __fc_p_random48_counter));
-    __e_acsl_store_block((void *)(random48_counter),(size_t)6);
+    __e_acsl_store_block((void *)(random48_counter),6UL);
     __e_acsl_full_init((void *)(& random48_counter));
-    __e_acsl_store_block((void *)(& __fc_random48_init),(size_t)4);
+    __e_acsl_store_block((void *)(& __fc_random48_init),4UL);
     __e_acsl_full_init((void *)(& __fc_random48_init));
-    __e_acsl_store_block((void *)(& __fc_rand_max),(size_t)8);
+    __e_acsl_store_block((void *)(& __fc_rand_max),8UL);
     __e_acsl_full_init((void *)(& __fc_rand_max));
-    __e_acsl_store_block((void *)(& perror),(size_t)1);
+    __e_acsl_store_block((void *)(& perror),1UL);
     __e_acsl_full_init((void *)(& perror));
-    __e_acsl_store_block((void *)(& __fc_p_tmpnam),(size_t)8);
+    __e_acsl_store_block((void *)(& __fc_p_tmpnam),8UL);
     __e_acsl_full_init((void *)(& __fc_p_tmpnam));
-    __e_acsl_store_block((void *)(__fc_tmpnam),(size_t)2048);
+    __e_acsl_store_block((void *)(__fc_tmpnam),2048UL);
     __e_acsl_full_init((void *)(& __fc_tmpnam));
-    __e_acsl_store_block((void *)(& __fc_p_fopen),(size_t)8);
+    __e_acsl_store_block((void *)(& __fc_p_fopen),8UL);
     __e_acsl_full_init((void *)(& __fc_p_fopen));
-    __e_acsl_store_block((void *)(__fc_fopen),(size_t)128);
+    __e_acsl_store_block((void *)(__fc_fopen),128UL);
     __e_acsl_full_init((void *)(& __fc_fopen));
-    __e_acsl_store_block((void *)(& stdout),(size_t)8);
+    __e_acsl_store_block((void *)(& stdout),8UL);
     __e_acsl_full_init((void *)(& stdout));
-    __e_acsl_store_block((void *)(& stdin),(size_t)8);
+    __e_acsl_store_block((void *)(& stdin),8UL);
     __e_acsl_full_init((void *)(& stdin));
-    __e_acsl_store_block((void *)(& __fc_interrupted),(size_t)4);
+    __e_acsl_store_block((void *)(& __fc_interrupted),4UL);
     __e_acsl_full_init((void *)(& __fc_interrupted));
-    __e_acsl_store_block((void *)(& __fc_p_time_tm),(size_t)8);
+    __e_acsl_store_block((void *)(& __fc_p_time_tm),8UL);
     __e_acsl_full_init((void *)(& __fc_p_time_tm));
-    __e_acsl_store_block((void *)(& __fc_time_tm),(size_t)36);
+    __e_acsl_store_block((void *)(& __fc_time_tm),36UL);
     __e_acsl_full_init((void *)(& __fc_time_tm));
-    __e_acsl_store_block((void *)(& __fc_p_ctime),(size_t)8);
+    __e_acsl_store_block((void *)(& __fc_p_ctime),8UL);
     __e_acsl_full_init((void *)(& __fc_p_ctime));
-    __e_acsl_store_block((void *)(__fc_ctime),(size_t)26);
+    __e_acsl_store_block((void *)(__fc_ctime),26UL);
     __e_acsl_full_init((void *)(& __fc_ctime));
-    __e_acsl_store_block((void *)(& __fc_time),(size_t)4);
+    __e_acsl_store_block((void *)(& __fc_time),4UL);
     __e_acsl_full_init((void *)(& __fc_time));
-    __e_acsl_store_block((void *)(& __fc_p_sigaction),(size_t)8);
+    __e_acsl_store_block((void *)(& __fc_p_sigaction),8UL);
     __e_acsl_full_init((void *)(& __fc_p_sigaction));
-    __e_acsl_store_block((void *)(sigaction),(size_t)2080);
+    __e_acsl_store_block((void *)(sigaction),2080UL);
     __e_acsl_full_init((void *)(& sigaction));
-    __e_acsl_store_block((void *)(& pthread_mutex_unlock),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_mutex_unlock),1UL);
     __e_acsl_full_init((void *)(& pthread_mutex_unlock));
-    __e_acsl_store_block((void *)(& pthread_mutex_trylock),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_mutex_trylock),1UL);
     __e_acsl_full_init((void *)(& pthread_mutex_trylock));
-    __e_acsl_store_block((void *)(& pthread_mutex_lock),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_mutex_lock),1UL);
     __e_acsl_full_init((void *)(& pthread_mutex_lock));
-    __e_acsl_store_block((void *)(& pthread_mutex_init),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_mutex_init),1UL);
     __e_acsl_full_init((void *)(& pthread_mutex_init));
-    __e_acsl_store_block((void *)(& pthread_join),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_join),1UL);
     __e_acsl_full_init((void *)(& pthread_join));
-    __e_acsl_store_block((void *)(& pthread_create),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_create),1UL);
     __e_acsl_full_init((void *)(& pthread_create));
-    __e_acsl_store_block((void *)(& pthread_cond_wait),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_cond_wait),1UL);
     __e_acsl_full_init((void *)(& pthread_cond_wait));
-    __e_acsl_store_block((void *)(& pthread_cond_init),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_cond_init),1UL);
     __e_acsl_full_init((void *)(& pthread_cond_init));
-    __e_acsl_store_block((void *)(& pthread_cond_broadcast),(size_t)1);
+    __e_acsl_store_block((void *)(& pthread_cond_broadcast),1UL);
     __e_acsl_full_init((void *)(& pthread_cond_broadcast));
-    __e_acsl_store_block((void *)(& errno),(size_t)4);
+    __e_acsl_store_block((void *)(& errno),4UL);
     __e_acsl_full_init((void *)(& errno));
   }
   return;
@@ -1848,18 +1842,18 @@ int main(void)
   int tmp_2;
   int tmp_5;
   int tmp_6;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& tmp_6),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp_5),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp_2),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp_1),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp_0),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp),(size_t)4);
-  __e_acsl_store_block((void *)(args),(size_t)40);
-  __e_acsl_store_block((void *)(readers),(size_t)40);
-  __e_acsl_store_block((void *)(writers),(size_t)40);
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  __e_acsl_store_block((void *)(& tmp_6),4UL);
+  __e_acsl_store_block((void *)(& tmp_5),4UL);
+  __e_acsl_store_block((void *)(& tmp_2),4UL);
+  __e_acsl_store_block((void *)(& tmp_1),4UL);
+  __e_acsl_store_block((void *)(& tmp_0),4UL);
+  __e_acsl_store_block((void *)(& tmp),4UL);
+  __e_acsl_store_block((void *)(args),40UL);
+  __e_acsl_store_block((void *)(readers),40UL);
+  __e_acsl_store_block((void *)(writers),40UL);
+  __e_acsl_store_block((void *)(& __retres),4UL);
   __e_acsl_full_init((void *)(& tmp));
   tmp = __gen_e_acsl_pthread_mutex_init(& write_mutex,
                                         (pthread_mutexattr_t const *)0);
@@ -1890,7 +1884,7 @@ int main(void)
   }
   {
     int i = 0;
-    __e_acsl_store_block((void *)(& i),(size_t)4);
+    __e_acsl_store_block((void *)(& i),4UL);
     __e_acsl_full_init((void *)(& i));
     while (i < 10) {
       __e_acsl_initialize((void *)(& args[i]),sizeof(int));
@@ -1908,11 +1902,11 @@ int main(void)
   }
   while (1) {
     int res = pthread_mutex_trylock(& write_mutex);
-    __e_acsl_store_block((void *)(& res),(size_t)4);
+    __e_acsl_store_block((void *)(& res),4UL);
     __e_acsl_full_init((void *)(& res));
     if (res == 0) {
       int done = write_count == 10;
-      __e_acsl_store_block((void *)(& done),(size_t)4);
+      __e_acsl_store_block((void *)(& done),4UL);
       __e_acsl_full_init((void *)(& done));
       __gen_e_acsl_pthread_mutex_unlock(& write_mutex);
       if (done) {
@@ -1924,16 +1918,16 @@ int main(void)
     }
     else 
       if (res != 16) __gen_e_acsl_perror(__gen_e_acsl_literal_string_11);
-    __gen_e_acsl_usleep((unsigned int)100);
+    __gen_e_acsl_usleep((useconds_t)100);
     __e_acsl_delete_block((void *)(& res));
   }
   while (1) {
     int res_0 = pthread_mutex_trylock(& read_mutex);
-    __e_acsl_store_block((void *)(& res_0),(size_t)4);
+    __e_acsl_store_block((void *)(& res_0),4UL);
     __e_acsl_full_init((void *)(& res_0));
     if (res_0 == 0) {
       int done_0 = read_count == 10;
-      __e_acsl_store_block((void *)(& done_0),(size_t)4);
+      __e_acsl_store_block((void *)(& done_0),4UL);
       __e_acsl_full_init((void *)(& done_0));
       __gen_e_acsl_pthread_mutex_unlock(& read_mutex);
       if (done_0) {
@@ -1945,7 +1939,7 @@ int main(void)
     }
     else 
       if (res_0 != 16) __gen_e_acsl_perror(__gen_e_acsl_literal_string_12);
-    __gen_e_acsl_usleep((unsigned int)100);
+    __gen_e_acsl_usleep((useconds_t)100);
     __e_acsl_delete_block((void *)(& res_0));
   }
   __e_acsl_full_init((void *)(& tmp_5));
@@ -1956,7 +1950,7 @@ int main(void)
   }
   {
     int i_0 = 0;
-    __e_acsl_store_block((void *)(& i_0),(size_t)4);
+    __e_acsl_store_block((void *)(& i_0),4UL);
     __e_acsl_full_init((void *)(& i_0));
     while (i_0 < 10) {
       __gen_e_acsl_pthread_join(writers[i_0],(void **)0);
@@ -1973,7 +1967,7 @@ int main(void)
   }
   {
     int i_1 = 0;
-    __e_acsl_store_block((void *)(& i_1),(size_t)4);
+    __e_acsl_store_block((void *)(& i_1),4UL);
     __e_acsl_full_init((void *)(& i_1));
     while (i_1 < 10) {
       __gen_e_acsl_pthread_join(readers[i_1],(void **)0);

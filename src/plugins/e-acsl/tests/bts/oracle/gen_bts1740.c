@@ -12,11 +12,11 @@ int main(void)
 {
   int __retres;
   int *p;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& p),8UL);
   {
     int a = 0;
-    __e_acsl_store_block((void *)(& a),(size_t)4);
+    __e_acsl_store_block((void *)(& a),4UL);
     __e_acsl_full_init((void *)(& a));
     __e_acsl_full_init((void *)(& p));
     p = & a;

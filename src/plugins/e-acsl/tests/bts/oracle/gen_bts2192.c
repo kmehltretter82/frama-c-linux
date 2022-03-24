@@ -27,7 +27,7 @@ int __gen_e_acsl_atoi(char const *nptr)
   int __retres;
   {
     int __gen_e_acsl_valid_read;
-    __e_acsl_store_block((void *)(& nptr),(size_t)8);
+    __e_acsl_store_block((void *)(& nptr),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"nptr",
                                  (void *)nptr);
@@ -64,7 +64,7 @@ void __e_acsl_globals_init(void)
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("134"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-    __e_acsl_store_block((void *)(& n),(size_t)8);
+    __e_acsl_store_block((void *)(& n),8UL);
     __e_acsl_full_init((void *)(& n));
   }
   return;
@@ -79,7 +79,7 @@ void __e_acsl_globals_clean(void)
 int main(int argc, char **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,& argv,(size_t)8);
+  __e_acsl_memory_init(& argc,& argv,8UL);
   __e_acsl_globals_init();
   argc = __gen_e_acsl_atoi((char const *)n);
   a = argc;

@@ -16,9 +16,9 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& PA),(size_t)8);
+    __e_acsl_store_block((void *)(& PA),8UL);
     __e_acsl_full_init((void *)(& PA));
-    __e_acsl_store_block((void *)(A),(size_t)16);
+    __e_acsl_store_block((void *)(A),16UL);
     __e_acsl_full_init((void *)(& A));
   }
   return;
@@ -34,7 +34,7 @@ void __e_acsl_globals_clean(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   PA = (int *)(& A);
   {
@@ -134,10 +134,10 @@ int main(void)
   }
   /*@ assert \block_length(PA + 1) == \block_length(&A[1]); */ ;
   int a[4] = {1, 2, 3, 4};
-  __e_acsl_store_block((void *)(a),(size_t)16);
+  __e_acsl_store_block((void *)(a),16UL);
   __e_acsl_full_init((void *)(& a));
   int *pa = (int *)(& a);
-  __e_acsl_store_block((void *)(& pa),(size_t)8);
+  __e_acsl_store_block((void *)(& pa),8UL);
   __e_acsl_full_init((void *)(& pa));
   {
     unsigned long __gen_e_acsl_block_length_6;
@@ -239,10 +239,10 @@ int main(void)
   }
   /*@ assert \block_length(pa + 1) == \block_length(&a[1]); */ ;
   long l = (long)4;
-  __e_acsl_store_block((void *)(& l),(size_t)8);
+  __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   char *pl = (char *)(& l);
-  __e_acsl_store_block((void *)(& pl),(size_t)8);
+  __e_acsl_store_block((void *)(& pl),8UL);
   __e_acsl_full_init((void *)(& pl));
   {
     unsigned long __gen_e_acsl_block_length_11;
@@ -314,7 +314,7 @@ int main(void)
   }
   /*@ assert \block_length(pl + 7) == sizeof(long); */ ;
   int *pi = (int *)(& l);
-  __e_acsl_store_block((void *)(& pi),(size_t)8);
+  __e_acsl_store_block((void *)(& pi),8UL);
   __e_acsl_full_init((void *)(& pi));
   {
     unsigned long __gen_e_acsl_block_length_14;
@@ -374,9 +374,9 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
   }
   /*@ assert \block_length(pi) == \block_length(&l); */ ;
-  size_t size = (unsigned long)12;
+  size_t size = (size_t)12;
   char *p = malloc(size);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
     unsigned long __gen_e_acsl_block_length_18;
@@ -452,7 +452,7 @@ int main(void)
   /*@ assert \block_length(p + 5) == \block_length(p - 5); */ ;
   size = (unsigned long)30 * sizeof(long);
   long *q = malloc(size);
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   {
     unsigned long __gen_e_acsl_block_length_22;

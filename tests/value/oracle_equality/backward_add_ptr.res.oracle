@@ -2,25 +2,25 @@
 < [eva] backward_add_ptr.c:26: Frama_C_show_each_only_a: {0; 1}, {{ &a }}, {0}
 ---
 > [eva] backward_add_ptr.c:26: Frama_C_show_each_only_a: {0}, {{ &a }}, {0}
-85c85,88
+84c84,87
 < [eva] backward_add_ptr.c:110: Reusing old results for call to gm
 ---
 > [eva] computing for function gm <- main3 <- main.
 >   Called from backward_add_ptr.c:110.
 > [eva] Recording results for gm
 > [eva] Done for function gm
-97c100,103
+96c99,102
 < [eva] backward_add_ptr.c:125: Reusing old results for call to gm
 ---
 > [eva] computing for function gm <- main3 <- main.
 >   Called from backward_add_ptr.c:125.
 > [eva] Recording results for gm
 > [eva] Done for function gm
-108c114
+107c113
 <   (origin: Arithmetic {backward_add_ptr.c:68}) }},
 ---
 >   (origin: Arithmetic Bottom) }},
-143,146c149,153
+142,145c148,152
 <   {{ garbled mix of &{b}
 <   (origin: Arithmetic {backward_add_ptr.c:68}) }},
 <   [0..4294967295]
@@ -31,50 +31,50 @@
 >   Called from backward_add_ptr.c:160.
 > [eva] Recording results for gm
 > [eva] Done for function gm
-162c169
+161c168
 <   (origin: Arithmetic {backward_add_ptr.c:68}) }},
 ---
 >   (origin: Arithmetic Bottom) }},
-164c171
+163c170
 <   (origin: Arithmetic {backward_add_ptr.c:68}) }}
 ---
 >   (origin: Arithmetic Bottom) }}
-172c179
+171c178
 <   (origin: Arithmetic {backward_add_ptr.c:68}) }}
 ---
 >   (origin: Arithmetic Bottom) }}
-178c185
+177c184
 <   (origin: Arithmetic {backward_add_ptr.c:68}) }},
 ---
 >   (origin: Arithmetic Bottom) }},
-190a198,199
+189a197,198
 >   {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:33}) }}
 >   {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:33}) }}
-201a211
+200a210
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:106}) }}
-203c213
+202c212
 <   {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:115}) }}
 ---
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:107}) }}
-204a215,217
+203a214,216
 >   {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:115}) }}
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:116}) }}
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:121}) }}
-205a219,220
+204a218,219
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:122}) }}
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:130}) }}
-206a222
+205a221
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:136}) }}
-207a224
+206a223
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:137}) }}
-208a226
+207a225
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:145}) }}
-209a228,231
+208a227,230
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:150}) }}
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:151}) }}
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:156}) }}
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:157}) }}
-210a233,244
+209a232,243
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:165}) }}
 >   {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:165}) }}
 >   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:166}) }}

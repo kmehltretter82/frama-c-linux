@@ -25,7 +25,7 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& t),(size_t)4);
+    __e_acsl_store_block((void *)(& t),4UL);
     __e_acsl_full_init((void *)(& t));
   }
   return;
@@ -40,7 +40,7 @@ void __e_acsl_globals_clean(void)
 int main(int argc, char **argv)
 {
   int tmp;
-  __e_acsl_memory_init(& argc,& argv,(size_t)8);
+  __e_acsl_memory_init(& argc,& argv,8UL);
   __e_acsl_globals_init();
   /*@ assert \valid_read(&t.j); */ ;
   /*@ assert \valid_read(&t.j + (1 .. 3)); */ ;

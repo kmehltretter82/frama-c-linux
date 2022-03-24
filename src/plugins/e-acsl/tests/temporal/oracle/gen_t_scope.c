@@ -11,18 +11,18 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int *p = (int *)0;
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)0);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   int *q = (int *)0;
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)0);
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   {
     int i = 9;
-    __e_acsl_store_block((void *)(& i),(size_t)4);
+    __e_acsl_store_block((void *)(& i),4UL);
     __e_acsl_full_init((void *)(& i));
     __e_acsl_full_init((void *)(& p));
     __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& i));
@@ -107,7 +107,7 @@ int main(void)
   /*@ assert !\valid(q); */ ;
   {
     int j = 8;
-    __e_acsl_store_block((void *)(& j),(size_t)4);
+    __e_acsl_store_block((void *)(& j),4UL);
     __e_acsl_full_init((void *)(& j));
     __e_acsl_full_init((void *)(& p));
     __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& j));
@@ -221,7 +221,7 @@ int main(void)
   q = (int *)0;
   while (len) {
     int a;
-    __e_acsl_store_block((void *)(& a),(size_t)4);
+    __e_acsl_store_block((void *)(& a),4UL);
     {
       int __gen_e_acsl_initialized_5;
       int __gen_e_acsl_and_5;

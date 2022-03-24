@@ -1,26 +1,16 @@
 [kernel] Parsing enum_repr.i (no preprocessing)
-[kernel] enum_repr.i:37: 
-  Inserted implicit cast from int to enum __anonenum_foo_1
-[kernel] enum_repr.i:38: 
-  Inserted implicit cast from int to enum __anonenum_bar_2
-[kernel] enum_repr.i:39: 
-  Inserted implicit cast from int to enum __anonenum_bu1_3
-[kernel] enum_repr.i:41: 
-  Inserted implicit cast from long long to enum __anonenum_bu3_5
-[kernel] enum_repr.i:43: 
-  Inserted implicit cast from unsigned int to enum __anonenum_bs2_7
-[kernel] enum_repr.i:45: 
-  Inserted implicit cast from signed char to enum __anonenum_bc1_9
-[kernel] enum_repr.i:46: 
-  Inserted implicit cast from unsigned char to enum __anonenum_bc2_10
-[kernel] enum_repr.i:47: 
-  Inserted implicit cast from signed char to enum __anonenum_bd1_11
-[kernel] enum_repr.i:48: 
-  Inserted implicit cast from unsigned char to enum __anonenum_bd2_12
+[kernel] enum_repr.i:37: Inserted implicit cast from int to foo
+[kernel] enum_repr.i:38: Inserted implicit cast from int to bar
+[kernel] enum_repr.i:39: Inserted implicit cast from int to bu1
+[kernel] enum_repr.i:41: Inserted implicit cast from long long to bu3
+[kernel] enum_repr.i:43: Inserted implicit cast from unsigned int to bs2
+[kernel] enum_repr.i:45: Inserted implicit cast from signed char to bc1
+[kernel] enum_repr.i:46: Inserted implicit cast from unsigned char to bc2
+[kernel] enum_repr.i:47: Inserted implicit cast from signed char to bd1
+[kernel] enum_repr.i:48: Inserted implicit cast from unsigned char to bd2
 [kernel] enum_repr.i:49: Inserted implicit cast from int to unsigned int
 [kernel] enum_repr.i:49: Inserted implicit cast from bar to int
-[kernel] enum_repr.i:63: 
-  Inserted implicit cast from int to enum __anonenum_foo_1
+[kernel] enum_repr.i:63: Inserted implicit cast from int to foo
 [kernel] Enum __anonenum_foo_1 is represented by unsigned int
 [kernel] Enum __anonenum_bar_2 is represented by unsigned char
 [kernel] Enum __anonenum_bu1_3 is represented by unsigned int
@@ -92,17 +82,17 @@ int main(void)
 {
   int __retres;
   foo x = A;
-  bar y = (enum __anonenum_bar_2)B;
+  bar y = (bar)B;
   bu1 u1 = Bu1;
   bu2 u2 = Bu2;
   bu3 u3 = Bu3;
   bs1 s1 = Bs1;
-  bs2 s2 = (enum __anonenum_bs2_7)Bs2;
+  bs2 s2 = (bs2)Bs2;
   bs3 s3 = Bs3;
-  bc1 c1 = (enum __anonenum_bc1_9)Bc1;
-  bc2 c2 = (enum __anonenum_bc2_10)Bc2;
-  bd1 d1 = (enum __anonenum_bd1_11)Bd1;
-  bd2 d2 = (enum __anonenum_bd2_12)Bd2;
+  bc1 c1 = (bc1)Bc1;
+  bc2 c2 = (bc2)Bc2;
+  bd1 d1 = (bd1)Bd1;
+  bd2 d2 = (bd2)Bd2;
   if (x == (unsigned int)A) 
     if ((int)y == B) {
       __retres = 0;
@@ -132,12 +122,12 @@ int g(void)
   int tmp_3;
   int tmp_4;
   foo x = A;
-  int res = f1((unsigned int)x);
+  int res = f1((bla)x);
   tmp_0 = f2((unsigned int)x);
   res += tmp_0;
   tmp_1 = f3(x);
   res += tmp_1;
-  tmp_2 = h1((unsigned int)x);
+  tmp_2 = h1((bla)x);
   res += tmp_2;
   tmp_3 = h2((unsigned int)x);
   res += tmp_3;

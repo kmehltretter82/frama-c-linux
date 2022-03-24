@@ -14,7 +14,7 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& a),(size_t)1);
+    __e_acsl_store_block((void *)(& a),1UL);
     __e_acsl_full_init((void *)(& a));
   }
   return;
@@ -30,9 +30,9 @@ int main(void)
 {
   int __retres;
   char *b;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& b),(size_t)8);
+  __e_acsl_store_block((void *)(& b),8UL);
   goto _LOR;
   _LOR: __e_acsl_full_init((void *)(& b));
         b = & a;

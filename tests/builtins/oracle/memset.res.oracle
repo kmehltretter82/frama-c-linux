@@ -39,8 +39,7 @@
 [eva:alarm] memset.c:35: Warning: 
   function memset: precondition 'valid_s' got status unknown.
 [eva:imprecision] memset.c:35: 
-  Call to builtin precise_memset(({{ (void *)&t3[10] }},{17},
-                                  {{ (unsigned int)&t1 }})) failed; size is imprecise
+  Call to builtin precise_memset(({{ (void *)&t3[10] }},{17},{{ (size_t)&t1 }})) failed; size is imprecise
 [eva] memset.c:38: Call to builtin memset
 [eva:alarm] memset.c:38: Warning: 
   function memset: precondition 'valid_s' got status invalid.

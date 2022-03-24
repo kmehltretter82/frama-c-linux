@@ -37,7 +37,7 @@ int uninstrument2(int *p)
 int instrument1(int *p)
 {
   int __retres;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_initialize((void *)p,sizeof(int));
   *p = 0;
   __retres = 0;
@@ -51,10 +51,10 @@ int __gen_e_acsl_instrument2(int *p);
 int instrument2(int *p)
 {
   int __retres;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   {
     int *q = p;
-    __e_acsl_store_block((void *)(& q),(size_t)8);
+    __e_acsl_store_block((void *)(& q),8UL);
     __e_acsl_full_init((void *)(& q));
     __e_acsl_initialize((void *)p,sizeof(int));
     *p = 0;
@@ -72,8 +72,8 @@ int vol(int n, void * const *__va_params)
   int __retres;
   va_list vl;
   int tmp;
-  __e_acsl_store_block((void *)(& vl),(size_t)8);
-  __e_acsl_store_block((void *)(& __va_params),(size_t)8);
+  __e_acsl_store_block((void *)(& vl),8UL);
+  __e_acsl_store_block((void *)(& __va_params),8UL);
   __e_acsl_full_init((void *)(& vl));
   vl = __va_params;
   tmp = *((int *)*vl);
@@ -90,10 +90,10 @@ int main(void)
 {
   int x;
   int tmp;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& x),4UL);
   int y = 0;
-  __e_acsl_store_block((void *)(& y),(size_t)4);
+  __e_acsl_store_block((void *)(& y),4UL);
   __e_acsl_full_init((void *)(& y));
   instrument1(& x);
   __gen_e_acsl_uninstrument1(& x);
@@ -146,10 +146,10 @@ int main(void)
   /*@ assert \initialized(&y); */ ;
   {
     int __va_arg0 = 1;
-    __e_acsl_store_block((void *)(& __va_arg0),(size_t)4);
+    __e_acsl_store_block((void *)(& __va_arg0),4UL);
     __e_acsl_full_init((void *)(& __va_arg0));
     void *__va_args[1] = {& __va_arg0};
-    __e_acsl_store_block((void *)(__va_args),(size_t)8);
+    __e_acsl_store_block((void *)(__va_args),8UL);
     __e_acsl_full_init((void *)(& __va_args));
     tmp = vol(6,(void * const *)(__va_args));
     __e_acsl_delete_block((void *)(__va_args));
@@ -167,7 +167,7 @@ int __gen_e_acsl_instrument2(int *p)
   int __retres;
   {
     int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& p),(size_t)8);
+    __e_acsl_store_block((void *)(& p),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",

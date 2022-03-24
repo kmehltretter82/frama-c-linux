@@ -29,13 +29,13 @@ int main(int argc, char const **argv)
 {
   int __retres;
   int tmp;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   tmp = __gen_e_acsl_isupper(argc);
   char c = (char)tmp;
-  __e_acsl_store_block((void *)(& c),(size_t)1);
+  __e_acsl_store_block((void *)(& c),1UL);
   __e_acsl_full_init((void *)(& c));
   char *d = & c;
-  __e_acsl_store_block((void *)(& d),(size_t)8);
+  __e_acsl_store_block((void *)(& d),8UL);
   __e_acsl_full_init((void *)(& d));
   {
     int __gen_e_acsl_initialized;
@@ -104,7 +104,7 @@ int __gen_e_acsl_isupper(int c)
     int __gen_e_acsl_or_2;
     int __gen_e_acsl_or_3;
     int __gen_e_acsl_active_bhvrs;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"c",0,c);
     if (0 <= c) {
@@ -127,7 +127,7 @@ int __gen_e_acsl_isupper(int c)
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     if (65 <= c) __gen_e_acsl_and_2 = c <= 90; else __gen_e_acsl_and_2 = 0;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            __gen_e_acsl_and_2);
     if (c == -1) __gen_e_acsl_or_2 = 1;
     else {
@@ -141,7 +141,7 @@ int __gen_e_acsl_isupper(int c)
       if (90 < c) __gen_e_acsl_and_4 = c <= 127; else __gen_e_acsl_and_4 = 0;
       __gen_e_acsl_or_3 = __gen_e_acsl_and_4;
     }
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            __gen_e_acsl_or_3);
     __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_all_behaviors
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
@@ -169,7 +169,7 @@ int __gen_e_acsl_isupper(int c)
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_or_4;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
@@ -193,7 +193,7 @@ int __gen_e_acsl_isupper(int c)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};

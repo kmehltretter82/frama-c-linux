@@ -12,7 +12,7 @@ int f(void)
 {
   int __retres;
   int a = 10;
-  __e_acsl_store_block((void *)(& a),(size_t)4);
+  __e_acsl_store_block((void *)(& a),4UL);
   __e_acsl_full_init((void *)(& a));
   goto lbl_1;
   lbl_2:
@@ -49,7 +49,7 @@ int f(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   f();
   __retres = 0;
   __e_acsl_memory_clean();
