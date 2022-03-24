@@ -132,3 +132,4 @@ let wkey_invalid_assigns = register_warn_category "invalid-assigns"
 let () = set_warn_status wkey_invalid_assigns Log.Wfeedback
 let wkey_experimental = register_warn_category "experimental"
 let wkey_unknown_size = register_warn_category "unknown-size"
+let wkey_ensures_false = register_warn_category "ensures-false"
