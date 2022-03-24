@@ -41,47 +41,37 @@ import { TitleBar } from 'ivette';
 // --- Marker Kinds
 // --------------------------------------------------------------------------
 
-interface MarkerKindProps { label: string; title: string }
+import Kind = AST.markerKind;
+import Var = AST.markerVar
 
-function MarkerKind(props: MarkerKindProps): JSX.Element {
-  const { label, title } = props;
-  return <span className="astinfo-markerkind" title={title}>{label}</span>;
+function getMarkerKind (props: AST.markerInfoData): [string, string] {
+  switch (props.kind) {
+    case Kind.declaration:
+      switch (props.var) {
+        case Var.function: return ["Declaration", "Function declaration"];
+        case Var.variable: return ["Declaration", "Variable declaration"];
+        case Var.none: return ["Declaration", "Declaration"];
+      }
+      break;
+    case Kind.global: return ["Global", "Global declaration or definition"];
+    case Kind.lvalue:
+      switch (props.var) {
+        case Var.function: return ["Function", "Function"];
+        case Var.variable: return ["Variable", "C variable"];
+        case Var.none: return ["Lvalue", "C lvalue"];
+      }
+      break;
+    case Kind.expression: return ["Expression", "C expression"];
+    case Kind.statement: return ["Statement", "C statement"];
+    case Kind.property: return ["Property", "ACSL property"];
+    case Kind.term: return ["Term", "ACSL term"];
+  }
 }
 
-const GMARKER =
-  <MarkerKind label="?" title="Generic Marker" />;
-
-const MARKERS = new Map<AST.markerKind, JSX.Element>();
-[
-  {
-    kind: AST.markerKind.declaration,
-    elt: <MarkerKind label="Declaration" title="Variable declaration" />,
-  },
-  {
-    kind: AST.markerKind.global,
-    elt: <MarkerKind label="Global" title="Global declaration or definition" />,
-  },
-  {
-    kind: AST.markerKind.lvalue,
-    elt: <MarkerKind label="Lvalue" title="C lvalue" />,
-  },
-  {
-    kind: AST.markerKind.expression,
-    elt: <MarkerKind label="Expression" title="C expression" />,
-  },
-  {
-    kind: AST.markerKind.statement,
-    elt: <MarkerKind label="Statement" title="C statement" />,
-  },
-  {
-    kind: AST.markerKind.property,
-    elt: <MarkerKind label="Property" title="ACSL property" />,
-  },
-  {
-    kind: AST.markerKind.term,
-    elt: <MarkerKind label="Term" title="ACSL term" />,
-  },
-].forEach(({ kind, elt }) => MARKERS.set(kind, elt));
+function markerKind (props: AST.markerInfoData): JSX.Element {
+  const [label, title] = getMarkerKind(props);
+  return <span className="astinfo-markerkind" title={title}>{label}</span>;
+}
 
 // --------------------------------------------------------------------------
 // --- Information Details
@@ -140,7 +130,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     props.hovered && 'hovered',
   );
   const descr = markerInfo.descr ?? markerInfo.name;
-  const kind = MARKERS.get(markerInfo.kind) ?? GMARKER;
+  const kind = markerKind(markerInfo);
   const fs = props.filter.split(':');
   const filtered = allInfos.filter((info) => !fs.some((m) => m === info.id));
   const infos = more ? allInfos : filtered;
