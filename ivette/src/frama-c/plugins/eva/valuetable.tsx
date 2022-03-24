@@ -144,7 +144,9 @@ const LocToString = (loc: Location): string => `${loc.fct}:${loc.target}`;
 type LocStack = [ Location, callstack ]
 
 function useEvaluationCache(): Request<LocStack, Evaluation> {
-  const toString = ([ l, c ] : LocStack): string => `${LocToString(l)}:${c}`;
+  const toString = React.useCallback(([ l, c ] : LocStack): string => {
+    return `${LocToString(l)}:${c}`;
+  }, []);
   const get: Request<LocStack, Evaluation> = React.useCallback(([ l, c ]) => {
     const callstack = c === 'Summary' ? undefined : c as Values.callstack;
     return Server.send(Values.getValues, { ...l, callstack });
