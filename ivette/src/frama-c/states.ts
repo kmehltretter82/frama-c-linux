@@ -411,8 +411,8 @@ class SyncArray<K, A> {
       /* eslint-enable no-await-in-loop */
     } catch (error) {
       D.error(
-        `Fail to retrieve the value of syncArray '${this.handler.name}.`,
-        `${error}`,
+        `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
+        error,
       );
     } finally {
       this.fetching = false;
