@@ -416,7 +416,9 @@ module SubDir: sig
 
   val oracle_subdir: env:env_t -> t -> t
   val result_subdir: env:env_t -> t -> t
-  val upper_dir: t
+
+  val get_oracle_dir: env:env_t -> string
+  val oracle_dir: env:env_t -> t
 
   val pp_file: dir:t -> Format.formatter -> string -> unit
 end = struct
@@ -435,7 +437,9 @@ end = struct
 
   let make_file = Filename.concat
   let make_subdir = Filename.concat
-  let upper_dir = ".."
+
+  let oracle_dir ~env = oracle_subdir ~env ".."
+  let get_oracle_dir = oracle_dir
 
   let create ~with_subdir ~env dir =
     if not (Sys.file_exists dir && Sys.is_directory dir)
@@ -528,6 +532,12 @@ module Macros = struct
 
   let expand ~file (macros:t) s =
     snd (does_expand ~file macros s)
+
+  (* Removes the expansions to an empty string from the list (for DEPS,PLUGIN,MODULE,BIN,LOG *)
+  let expand_list ~file (macros:t) ls =
+    List.filter_map (fun s ->
+        let s = expand ~file macros s in
+        if String.equal s "" then None else Some s) ls
 
   let get ?(default="") name macros =
     try StringMap.find name macros with Not_found -> default
@@ -653,14 +663,16 @@ end = struct
         "PTEST_FILE", ptest_file;
         "PTEST_NAME", ptest_name;
       ] in
-    let subst = Macros.expand ~file (Macros.add_list ptest_vars Macros.empty) in
+    let subst = Macros.expand_list ~file
+        (Macros.add_list ptest_vars Macros.empty)
+    in
     ptest_name,
     { config with
       dc_execnow = List.rev config.dc_execnow;
-      dc_deps = Option.map (List.map subst) config.dc_deps ;
-      dc_plugin = Option.map (List.map subst) config.dc_plugin;
-      dc_module = Option.map (List.map subst) config.dc_module;
-      dc_libs = Option.map (List.map subst) config.dc_libs;
+      dc_deps = Option.map subst config.dc_deps ;
+      dc_plugin = Option.map subst config.dc_plugin;
+      dc_module = Option.map subst config.dc_module;
+      dc_libs = Option.map subst config.dc_libs;
     },
     fun ~nth macros ->
       Macros.add_list (("PTEST_NUMBER", string_of_int nth)::ptest_vars) macros
@@ -739,6 +751,7 @@ end = struct
         }
     in
     if execnow.ex_log = [] && execnow.ex_bin = [] then
+      (* Cannot detect the problem when the LOG/BIN is a macro expanded later into an @EMPTY_STRING@ *)
       Format.eprintf "%s: EXEC%s without LOG nor BIN target (DEPRECATED): %s@."
         file (if once then "NOW" else "") s;
     execnow
@@ -975,12 +988,14 @@ end = struct
       "LOG",
       (fun ~drop:_ ~file ~dir:_ s current ->
          let s = Macros.expand ~file current.dc_macros s in
-         { current with dc_default_log = s :: current.dc_default_log });
+         let l = split_list s in
+         { current with dc_default_log = current.dc_default_log @ l});
 
       "BIN",
       (fun ~drop:_ ~file ~dir:_ s current ->
          let s = Macros.expand ~file current.dc_macros s in
-         { current with dc_default_bin = s :: current.dc_default_bin });
+         let l = split_list s in
+         { current with dc_default_bin = current.dc_default_bin @ l});
 
       "TIMEOUT",
       (fun ~drop:_ ~file ~dir:_ s current ->
@@ -1263,11 +1278,17 @@ type wtest = {
   sederr: (string [@default ""]); (* filter command for the stderr result *)
   bin: (string list [@default []]); (* binary targets (without oracles) *)
   log: (string list [@default []]); (* log targets (compared to log oracles *)
-  oracle_dir: (string [@default "../oracle"]); (* directory containing the oracle of the log files *)
+  oracle_dir: (string [@default ""]); (* directory containing the oracle of the log files *)
   oracle_out: (string [@default "" ]); (* oracle of the stdout target *)
   oracle_err: (string [@default "" ]); (* oracle of the stderr target *)
 }
 [@@deriving yojson]
+
+let update_oracle_dir ~env wtest =
+  if wtest.log = [] then wtest else
+    { wtest with
+      oracle_dir = SubDir.get_oracle_dir ~env
+    }
 
 let std = false
 let pp_wtest ?(compacted=false) fmt wtest =
@@ -1341,24 +1362,19 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
                              }
   in
   let oracle_prefix = oracle_prefix ~env command in
-  let wtest =
-    { wtest with
-      dir = SubDir.get (SubDir.result_subdir ~env command.directory) ;
-      info = Format.sprintf "TEST #%d OF TEST FILE %s/%s"
-          command.nth (SubDir.get command.directory) command.file;
-      cmd = redirection ~reslog:cmdreslog ~errlog:cmderrlog command_string ;
-      out = reslog;
-      err = errlog;
-      ret_code = command.exit_code;
-      log = command.log_files;
-      bin = command.bin_files;
-      oracle_out = Filename.concat ".." (oracle_prefix ^ ".res.oracle");
-      oracle_err = Filename.concat ".." (oracle_prefix ^ ".err.oracle");
-    }
-  in
-  let wtest = if wtest.log = [] then wtest else
+  let wtest = update_oracle_dir ~env
       { wtest with
-        oracle_dir = SubDir.get (SubDir.oracle_subdir ~env SubDir.upper_dir)
+        dir = SubDir.get (SubDir.result_subdir ~env command.directory) ;
+        info = Format.sprintf "TEST #%d OF TEST FILE %s/%s"
+            command.nth (SubDir.get command.directory) command.file;
+        cmd = redirection ~reslog:cmdreslog ~errlog:cmderrlog command_string ;
+        out = reslog;
+        err = errlog;
+        ret_code = command.exit_code;
+        log = command.log_files;
+        bin = command.bin_files;
+        oracle_out = Filename.concat ".." (oracle_prefix ^ ".res.oracle");
+        oracle_err = Filename.concat ".." (oracle_prefix ^ ".err.oracle");
       }
   in
   let wrapper_basename =  mk_alias command "exec.wtests" in
@@ -1456,7 +1472,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         (* alias: *)
         (ptests_alias ~env)
         (* action: *)
-        (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
+        (SubDir.make_file (SubDir.oracle_dir ~env) log)
         log
     ) command.log_files;
   Format.fprintf result_fmt
@@ -1526,11 +1542,11 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   ()
 
 let deps_command ~file macros deps =
-  let subst = Macros.expand ~file macros in
-  let load_plugin = Option.map (List.map subst) deps.load_plugin in
-  let load_module = Option.map (List.map subst) deps.load_module in
-  let load_libs = Option.map (List.map (fun s -> (subst s)^".cmxs")) deps.load_libs in
-  let deps_cmd = Option.map (List.map subst) deps.deps_cmd in
+  let subst = Macros.expand_list ~file macros in
+  let load_plugin = Option.map subst deps.load_plugin in
+  let load_module = Option.map subst deps.load_module in
+  let load_libs = Option.map (fun libs -> List.map (fun s -> s^".cmxs") (subst libs)) deps.load_libs in
+  let deps_cmd = Option.map subst deps.deps_cmd in
   { load_plugin; load_module; load_libs;
     deps_cmd = Some ((list_of_deps load_libs) @ (list_of_deps load_module) @ (list_of_deps deps_cmd));
   }
@@ -1564,8 +1580,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
         incr i ;
         let macros = ptest_vars ~nth macros in
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
-        let log_files = List.map (Macros.expand ~file macros) logs in
-        let bin_files = List.map (Macros.expand ~file macros) bins in
+        let log_files = Macros.expand_list ~file macros logs in
+        let bin_files = Macros.expand_list ~file macros bins in
         let deps = deps_command ~file macros deps in
         update_modules ~file modules deps;
         command_string ~env ~result_fmt ~oracle_fmt
@@ -1609,22 +1625,26 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           }
         in
         let cmd_string = basic_command_string cmd in
-        let wtest = {
-          default_wtest with
-          dir = SubDir.get (SubDir.result_subdir ~env cmd.directory) ;
-          info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
-              nth (SubDir.get directory) file;
-          cmd = cmd_string;
-          log = List.map (Macros.expand ~file cmd.macros) execnow.ex_log;
-          bin = List.map (Macros.expand ~file cmd.macros) execnow.ex_bin;
-        }
+        let wtest = update_oracle_dir ~env
+            { default_wtest with
+              dir = SubDir.get (SubDir.result_subdir ~env cmd.directory) ;
+              info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
+                  nth (SubDir.get directory) file;
+              cmd = cmd_string;
+              log = Macros.expand_list ~file cmd.macros execnow.ex_log;
+              bin = Macros.expand_list ~file cmd.macros execnow.ex_bin;
+            }
         in
+        if wtest.log = [] && wtest.bin = [] then
+          (* Detect the problem even if the LOG/BIN is a macro expanded there into an @EMPTY_STRING@ *)
+          Format.eprintf "%s: EXEC/EXECNOW#%d without LOG nor BIN target (DEPRECATED): %s@."
+            file nth wtest.cmd;
         let wrapper_basename =  mk_alias cmd "execnow.wtests" in
         if !wrapper_cmd <> "" then begin
           Format.fprintf result_fmt
             "(rule ; %s\n  \
              (alias %s)\n  \
-             (deps %a %a %a)\n  \
+             (deps %a %a)\n  \
              (targets %a %a)\n  \
              (action (run %s %%{dep:%s} %S))\n\
              )@."
@@ -1634,7 +1654,6 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             wrapper_basename
             (* deps: *)
             pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
-            pp_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
             pp_command_deps cmd
             (* targets: *)
             pp_list wtest.log
@@ -1702,7 +1721,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
               (* alias: *)
               (ptests_alias ~env)
               (* action: *)
-              (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
+              (SubDir.make_file (SubDir.oracle_dir ~env) log)
               log
           ) wtest.log
     in

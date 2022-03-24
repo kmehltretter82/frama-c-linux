@@ -147,7 +147,7 @@ let filter (cmd,_stdfile) =
   let ret_code = launch cmd in
   if !verbosity > 0 && ret_code <> 0 then Format.printf "%% note: the filter command returned an error code (%d)@." ret_code
 
-let compare_files ~json ~error~result oracle =
+let compare_files ~json ~error ~result oracle =
   let not_generated = not (Sys.file_exists result) in
   if not_generated then
     Format.printf "%a: missing target %S@." pp_json json result;
@@ -163,8 +163,13 @@ let compare_std ~json error = function
   | "" -> fun _ -> error
   | result -> compare_files ~json ~error ~result
 
+(* [oracle_dir] should be set to "." to look at the current directory *)
 let compare_log ~json oracle_dir error result =
-  compare_files ~json ~error ~result (Filename.concat oracle_dir result)
+  if String.equal oracle_dir "" then
+    (Format.printf "%a: missing oracle_dir for %S@." pp_json json result;
+     false)
+  else
+    compare_files ~json ~error ~result (Filename.concat oracle_dir result)
 
 let remove file = if file <> "" then unlink file
 
@@ -187,7 +192,7 @@ type wtest = {
   sederr: (string [@default ""]); (* filter command for the stderr result *)
   bin: (string list [@default []]); (* binary targets (without oracles) *)
   log: (string list [@default []]); (* log targets (compared to log oracles *)
-  oracle_dir: (string [@default "../oracle"]); (* directory containing the oracle of the log files *)
+  oracle_dir: (string [@default ""]); (* directory containing the oracle of the log files *)
   oracle_out: (string [@default "" ]); (* oracle of the stdout target *)
   oracle_err: (string [@default "" ]); (* oracle of the stderr target *)
 }
