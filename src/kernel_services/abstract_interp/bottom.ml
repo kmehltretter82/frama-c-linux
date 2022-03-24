@@ -25,16 +25,23 @@ module Type = struct
 
   type 'a or_bottom = [ `Value of 'a | `Bottom ]
 
-  (* This monad propagates the `Bottom value if needed. *)
   let (>>-) t f = match t with
     | `Bottom  -> `Bottom
     | `Value t -> f t
 
-  (* Use this monad if the following function returns a simple value. *)
   let (>>-:) t f = match t with
     | `Bottom  -> `Bottom
     | `Value t -> `Value (f t)
 
+  let zip x y =
+    match x, y with
+    | `Bottom, _ | _, `Bottom -> `Bottom
+    | `Value x, `Value y -> `Value (x,y)
+
+  let (let+) = (>>-:)
+  let (and+) = zip
+  let (let*) = (>>-)
+  let (and*) = zip
 end
 
 include Type

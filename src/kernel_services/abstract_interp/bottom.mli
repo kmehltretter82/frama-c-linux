@@ -33,6 +33,13 @@ module Type : sig
   (** Use this monad if the following function returns a simple value. *)
   val (>>-:) : 'a or_bottom -> ('a -> 'b) -> 'b or_bottom
 
+  (* Binding operators, applicative syntax *)
+  val (let+) : 'a or_bottom -> ('a -> 'b) -> 'b or_bottom
+  val (and+) : 'a or_bottom -> 'b or_bottom -> ('a * 'b) or_bottom
+
+  (* Binding operators, monad syntax *)
+  val (let*) : 'a or_bottom -> ('a -> 'b or_bottom) -> 'b or_bottom
+  val (and*) : 'a or_bottom -> 'b or_bottom -> ('a * 'b) or_bottom
 end
 
 include module type of Type
