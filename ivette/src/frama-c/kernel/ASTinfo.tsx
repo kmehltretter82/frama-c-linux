@@ -145,6 +145,15 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   const filtered = allInfos.filter((info) => !fs.some((m) => m === info.id));
   const infos = more ? allInfos : filtered;
   const hasMore = filtered.length < allInfos.length;
+  const pinButton =
+    (!props.pinned || props.selected) ?
+    {
+      icon: "PIN", selected: props.pinned, onClick: props.onPin,
+      title: "Pin/unpin marker information"
+    } : {
+      icon: "CIRC.CLOSE", onClick: props.onRemove,
+      title:"Remove marker information"
+    };
   return (
     <div
       className={`astinfo-section ${highlight}`}
@@ -169,15 +178,6 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
           {kind}{descr}
         </Code>
         <IconButton
-          className="astinfo-markerbutton"
-          title="Pin/unpin information in sidebar"
-          size={9}
-          offset={0}
-          icon="PIN"
-          selected={props.pinned}
-          onClick={props.onPin}
-        />
-        <IconButton
           style={{ display: hasMore ? undefined : 'none' }}
           className="astinfo-markerbutton"
           title="Show all available informations"
@@ -189,11 +189,9 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         />
         <IconButton
           className="astinfo-markerbutton"
-          title="Remove informations"
           size={9}
           offset={0}
-          icon="CIRC.CLOSE"
-          onClick={props.onRemove}
+          {...pinButton}
         />
       </div>
       {unfold && infos.map((info) => <InfoItem key={info.id} {...info} />)}
