@@ -988,12 +988,14 @@ end = struct
       "LOG",
       (fun ~drop:_ ~file ~dir:_ s current ->
          let s = Macros.expand ~file current.dc_macros s in
-         { current with dc_default_log = s :: current.dc_default_log });
+         let l = split_list s in
+         { current with dc_default_log = current.dc_default_log @ l});
 
       "BIN",
       (fun ~drop:_ ~file ~dir:_ s current ->
          let s = Macros.expand ~file current.dc_macros s in
-         { current with dc_default_bin = s :: current.dc_default_bin });
+         let l = split_list s in
+         { current with dc_default_bin = current.dc_default_bin @ l});
 
       "TIMEOUT",
       (fun ~drop:_ ~file ~dir:_ s current ->
