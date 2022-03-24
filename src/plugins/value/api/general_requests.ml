@@ -168,6 +168,10 @@ let () =
     ~enable:Analysis.is_computed
     print_value
 
+let () =
+  Analysis.register_computation_hook
+    (fun _ -> Server.Kernel_ast.Information.update ())
+
 (* ----- Red and tainted alarms --------------------------------------------- *)
 
 module Taint = struct
