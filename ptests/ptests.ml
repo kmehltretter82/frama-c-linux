@@ -533,6 +533,12 @@ module Macros = struct
   let expand ~file (macros:t) s =
     snd (does_expand ~file macros s)
 
+  (* Removes the expansions to an empty string from the list (for DEPS,PLUGIN,MODULE,BIN,LOG *)
+  let expand_list ~file (macros:t) ls =
+    List.filter_map (fun s ->
+        let s = expand ~file macros s in
+        if String.equal s "" then None else Some s) ls
+
   let get ?(default="") name macros =
     try StringMap.find name macros with Not_found -> default
 
@@ -657,14 +663,16 @@ end = struct
         "PTEST_FILE", ptest_file;
         "PTEST_NAME", ptest_name;
       ] in
-    let subst = Macros.expand ~file (Macros.add_list ptest_vars Macros.empty) in
+    let subst = Macros.expand_list ~file
+        (Macros.add_list ptest_vars Macros.empty)
+    in
     ptest_name,
     { config with
       dc_execnow = List.rev config.dc_execnow;
-      dc_deps = Option.map (List.map subst) config.dc_deps ;
-      dc_plugin = Option.map (List.map subst) config.dc_plugin;
-      dc_module = Option.map (List.map subst) config.dc_module;
-      dc_libs = Option.map (List.map subst) config.dc_libs;
+      dc_deps = Option.map subst config.dc_deps ;
+      dc_plugin = Option.map subst config.dc_plugin;
+      dc_module = Option.map subst config.dc_module;
+      dc_libs = Option.map subst config.dc_libs;
     },
     fun ~nth macros ->
       Macros.add_list (("PTEST_NUMBER", string_of_int nth)::ptest_vars) macros
@@ -743,6 +751,7 @@ end = struct
         }
     in
     if execnow.ex_log = [] && execnow.ex_bin = [] then
+      (* Cannot detect the problem when the LOG/BIN is a macro expanded later into an @EMPTY_STRING@ *)
       Format.eprintf "%s: EXEC%s without LOG nor BIN target (DEPRECATED): %s@."
         file (if once then "NOW" else "") s;
     execnow
@@ -1227,8 +1236,7 @@ end
 let pp_list_deps fmt l =
   List.iter (fun s ->
       let s = Filename.sanitize_with_space s in
-      if String.equal s "" then ()
-      else if String.contains s '*' then
+      if String.contains s '*' then
         Format.fprintf fmt " (glob_files %S)" s
       else
         Format.fprintf fmt " %S" s) l
@@ -1532,11 +1540,11 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   ()
 
 let deps_command ~file macros deps =
-  let subst = Macros.expand ~file macros in
-  let load_plugin = Option.map (List.map subst) deps.load_plugin in
-  let load_module = Option.map (List.map subst) deps.load_module in
-  let load_libs = Option.map (List.map (fun s -> (subst s)^".cmxs")) deps.load_libs in
-  let deps_cmd = Option.map (List.map subst) deps.deps_cmd in
+  let subst = Macros.expand_list ~file macros in
+  let load_plugin = Option.map subst deps.load_plugin in
+  let load_module = Option.map subst deps.load_module in
+  let load_libs = Option.map (fun libs -> List.map (fun s -> s^".cmxs") (subst libs)) deps.load_libs in
+  let deps_cmd = Option.map subst deps.deps_cmd in
   { load_plugin; load_module; load_libs;
     deps_cmd = Some ((list_of_deps load_libs) @ (list_of_deps load_module) @ (list_of_deps deps_cmd));
   }
@@ -1570,8 +1578,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
         incr i ;
         let macros = ptest_vars ~nth macros in
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
-        let log_files = List.map (Macros.expand ~file macros) logs in
-        let bin_files = List.map (Macros.expand ~file macros) bins in
+        let log_files = Macros.expand_list ~file macros logs in
+        let bin_files = Macros.expand_list ~file macros bins in
         let deps = deps_command ~file macros deps in
         update_modules ~file modules deps;
         command_string ~env ~result_fmt ~oracle_fmt
@@ -1621,10 +1629,14 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
               info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
                   nth (SubDir.get directory) file;
               cmd = cmd_string;
-              log = List.map (Macros.expand ~file cmd.macros) execnow.ex_log;
-              bin = List.map (Macros.expand ~file cmd.macros) execnow.ex_bin;
+              log = Macros.expand_list ~file cmd.macros execnow.ex_log;
+              bin = Macros.expand_list ~file cmd.macros execnow.ex_bin;
             }
         in
+        if wtest.log = [] && wtest.bin = [] then
+          (* Detect the problem even if the LOG/BIN is a macro expanded there into an @EMPTY_STRING@ *)
+          Format.eprintf "%s: EXEC/EXECNOW#%d without LOG nor BIN target (DEPRECATED): %s@."
+            file nth wtest.cmd;
         let wrapper_basename =  mk_alias cmd "execnow.wtests" in
         if !wrapper_cmd <> "" then begin
           Format.fprintf result_fmt
