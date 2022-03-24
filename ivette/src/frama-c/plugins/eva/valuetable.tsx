@@ -924,7 +924,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     if (computationState !== 'computed') return () => { return; };
     const onEnter = (pattern: string): void => {
       const marker = selection?.current?.marker;
-      const data = { at_stmt: marker, term: pattern };
+      const data = { atStmt: marker, term: pattern };
       Server.send(Ast.markerFromTerm, data).then(addProbe).catch(handleError);
     };
     const evalMode = {

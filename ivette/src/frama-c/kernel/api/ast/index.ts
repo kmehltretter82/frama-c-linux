@@ -531,7 +531,7 @@ export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;
 /** <markerFromTerm> input */
 export interface markerFromTermInput {
   /** The statement at which we will build the marker. */
-  at_stmt: marker;
+  atStmt: marker;
   /** The ACSL term. */
   term: string;
 }
@@ -539,7 +539,7 @@ export interface markerFromTermInput {
 /** Loose decoder for `markerFromTermInput` */
 export const jMarkerFromTermInput: Json.Loose<markerFromTermInput> =
   Json.jObject({
-    at_stmt: jMarkerSafe,
+    atStmt: jMarkerSafe,
     term: Json.jFail(Json.jString,'String expected'),
   });
 
@@ -550,8 +550,8 @@ export const jMarkerFromTermInputSafe: Json.Safe<markerFromTermInput> =
 /** Natural order for `markerFromTermInput` */
 export const byMarkerFromTermInput: Compare.Order<markerFromTermInput> =
   Compare.byFields
-    <{ at_stmt: marker, term: string }>({
-    at_stmt: byMarker,
+    <{ atStmt: marker, term: string }>({
+    atStmt: byMarker,
     term: Compare.string,
   });
 
