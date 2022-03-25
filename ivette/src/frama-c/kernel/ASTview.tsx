@@ -162,7 +162,6 @@ export default function ASTview() {
   const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
   const [hoveredLoc] = States.useHovered();
-  const selfhover = React.useRef(false);
   const multipleSelections = selection?.multiple.allSelections;
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
@@ -223,12 +222,12 @@ export default function ASTview() {
         return 'dead-code';
       if (deadCode?.nonTerminating?.some((m) => m === marker))
         return 'non-terminating';
-      if (!selfhover.current && marker === hovered)
+      if (marker === hovered)
         return 'hovered-marker';
       return undefined;
     };
     buffer.setDecorator(decorator);
-  }, [buffer, multipleSelections, selfhover, hovered, deadCode]);
+  }, [buffer, multipleSelections, hovered, deadCode]);
 
   // Hook: marker scrolling
   React.useEffect(() => {
@@ -238,7 +237,6 @@ export default function ASTview() {
   function onHover(markerId?: string) {
     const marker = Ast.jMarker(markerId);
     const fct = selection?.current?.fct;
-    selfhover.current = (marker !== undefined);
     States.setHovered(marker ? { fct, marker } : undefined);
   }
 
