@@ -2160,6 +2160,21 @@ struct
     set mu (e_var x) (c_bvar k t) ;
     walk mu x lc
 
+  (* Alpha-convert free-variables in xs with the top-most bound variables *)
+  let lc_close_xs xs (lc : lc_term) : lc_term =
+    let mu = cache () in
+    let i = ref (Bvars.order lc.bind) in
+    xs |> List.iter (fun x ->
+        set mu (e_var x) (c_bvar !i (tau_of_var x));
+        i := !i -1
+      );
+    let xs = List.fold_left (fun xs x -> Vars.add x xs) Vars.empty xs in
+    let rec walk mu lc =
+      if Vars.intersect xs lc.vars then
+        get mu (lc_alpha (walk mu)) lc
+      else lc in
+    walk mu lc
+
   (* Alpha-convert top-most bound variable with free-variable x *)
   let lc_open x (lc : lc_term) : lc_term =
     let rec walk mu k lc =
@@ -2521,8 +2536,13 @@ struct
 
   let e_close qs a = List.fold_left (fun b (q,x) -> e_bind q x b) a qs
 
-  let rec bind_xs q xs e =
-    match xs with [] -> e | x::xs -> e_bind q x (bind_xs q xs e)
+  let bind_xs q xs e =
+    let xs = match q with
+      | Lambda -> xs
+      | Forall | Exists -> List.filter (fun x -> Vars.mem x e.vars) xs
+    in
+    let e = lc_close_xs xs e in
+    List.fold_right (fun x e -> c_bind q (tau_of_var x) e) xs e
 
   let e_forall = bind_xs Forall
   let e_exists = bind_xs Exists
