@@ -2301,6 +2301,15 @@ struct
   let filter sigma e =
     Subst.filter sigma e || not (Bvars.is_empty e.bind)
 
+  let bind_qxs qxs e =
+    let qxs = List.filter (function
+        | Lambda, _ -> true
+        | Forall, x | Exists, x -> Vars.mem x e.vars
+      ) qxs in
+    let xs = List.map (fun (_q, x) -> x) qxs in
+    let e = lc_close_xs xs e in
+    List.fold_right (fun (q, x) e -> c_bind q (tau_of_var x) e) qxs e
+
   let rec subst sigma alpha e =
     if filter sigma e then
       incache (Subst.cache sigma) sigma alpha e
@@ -2336,21 +2345,7 @@ struct
       let alpha = Intmap.add k (e_var x) alpha in
       let qs = (q,x) :: qs in
       bind sigma alpha qs a
-    | _ ->
-      (* HERE:
-         This final binding of variables could be parallelized
-         if Bvars is precise enough *)
-      List.fold_left
-        (fun e (q,x) ->
-           if Vars.mem x e.vars then
-             let t = tau_of_var x in
-             (* HERE:
-                possible to insert a recursive call to let-intro
-                it will use a new instance of e_subst_var that
-                will work on a different sigma *)
-             c_bind q t (lc_close x e)
-           else e
-        ) (subst sigma alpha e) qs
+    | _ -> bind_qxs qs (subst sigma alpha e)
 
   and apply sigma beta f vs =
     match f.repr, vs with
