@@ -16,14 +16,14 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic libc.c -mdr-out ./with-libc.sarif",
+            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic libc.c -mdr-out ./with-libc.sarif.unfiltered",
           "arguments": [
             "-journal-disable", "-check", "-no-autoload-plugins",
-            "-add-symbolic-path", ":.",
-            "-load-module=eva,from,scope,markdown_report", "-eva",
+            "-add-symbolic-path=PTEST_SESSION:.",
+            "-load-plugin=eva,from,scope,inout,markdown-report", "-eva",
             "-eva-no-results", "-mdr-gen", "sarif",
             "-mdr-sarif-deterministic", "libc.c", "-mdr-out",
-            "./with-libc.sarif"
+            "./with-libc.sarif.unfiltered"
           ],
           "exitCode": 0,
           "executionSuccessful": true
