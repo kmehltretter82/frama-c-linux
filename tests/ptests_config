@@ -12,7 +12,7 @@ DEFAULT_SUITES= rte rte_manual saveload scope slicing sparecode spec syntax
 
 DEFAULT_SUITES= misc
 # todo:
-IGNORE= DEFAULT_SUITES= fc_script make_run_script
+IGNORE= DEFAULT_SUITES= fc_script
 
 DEFAULT_SUITES= value/traces value test
 
