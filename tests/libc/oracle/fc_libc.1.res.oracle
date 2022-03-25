@@ -3222,17 +3222,42 @@ extern int pipe(int pipefd[2]);
 
 /*@ requires valid_fd: 0 ≤ fd < 1024;
     requires buf_has_room: \valid((char *)buf + (0 .. count - 1));
-    ensures
-      result_error_or_read_length:
-        (0 ≤ \result ≤ \old(count)) ∨ \result ≡ -1;
-    ensures
-      initialization: buf:
-        \initialized((char *)\old(buf) + (0 .. \result - 1));
     assigns __fc_fds[fd], \result, *((char *)buf + (0 .. count - 1));
     assigns __fc_fds[fd] \from __fc_fds[fd];
     assigns \result \from (indirect: __fc_fds[fd]), (indirect: count);
     assigns *((char *)buf + (0 .. count - 1))
       \from (indirect: __fc_fds[fd]), (indirect: count);
+    
+    behavior full_read:
+      assumes
+        nondet_small_count:
+          Frama_C_entropy_source ≢ 0 ∧ count ≤ 2147483647;
+      ensures res_full: \result ≡ \old(count);
+      ensures
+        res_init: initialization:
+          \initialized((char *)\old(buf) + (0 .. \old(count) - 1));
+    
+    behavior large_read_implementation_defined:
+      assumes
+        nondet_large_count:
+          Frama_C_entropy_source ≢ 0 ∧ count > 2147483647;
+      ensures
+        res_init: initialization:
+          \initialized((char *)\old(buf) + (0 .. \old(count) - 1));
+    
+    behavior partial_or_error:
+      assumes nondet: Frama_C_entropy_source ≡ 0;
+      ensures result_error_or_read_length: -1 ≤ \result < \old(count);
+      ensures
+        initialization: buf:
+          \initialized((char *)\old(buf) + (0 .. \result - 1));
+    
+    complete behaviors partial_or_error,
+                       large_read_implementation_defined,
+                       full_read;
+    disjoint behaviors partial_or_error,
+                       large_read_implementation_defined,
+                       full_read;
  */
 extern ssize_t read(int fd, void *buf, size_t count);
 
