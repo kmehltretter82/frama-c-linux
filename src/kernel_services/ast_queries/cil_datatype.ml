@@ -436,6 +436,7 @@ let constfoldtoint = Extlib.mk_fun "constfoldtoint"
 let punrollType = Extlib.mk_fun "punrollType"
 let punrollLogicType = Extlib.mk_fun "punrollLogicType"
 let drop_non_logic_attributes = ref (fun a -> a)
+let drop_fc_internal_attributes = ref (fun a -> a)
 let compare_exp_struct_eq = Extlib.mk_fun "compare_exp_struct_eq"
 
 type type_compare_config =
@@ -455,7 +456,8 @@ and compare_attributes config  l1 l2 =
   else
     let l1, l2 = if config.logic_type
       then !drop_non_logic_attributes l1, !drop_non_logic_attributes l2
-      else l1,l2
+      else
+        !drop_fc_internal_attributes l1, !drop_fc_internal_attributes l2
     in compare_list (compare_attribute config) l1 l2
 and compare_attrparam_list config l1 l2 =
   compare_list (compare_attrparam config) l1 l2

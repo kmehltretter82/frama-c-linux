@@ -5004,6 +5004,9 @@ let type_remove_attributes_for_logic_type t =
 let () = Cil_datatype.drop_non_logic_attributes :=
     dropAttributes spare_attributes_for_logic_cast
 
+let () = Cil_datatype.drop_fc_internal_attributes :=
+    dropAttributes fc_internal_attributes
+
 let need_cast ?(force=false) oldt newt =
   let oldt = type_remove_attributes_for_c_cast (unrollType oldt) in
   let newt = type_remove_attributes_for_c_cast (unrollType newt) in
