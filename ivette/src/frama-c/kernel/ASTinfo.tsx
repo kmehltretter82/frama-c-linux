@@ -318,6 +318,10 @@ export default function ASTinfo(): JSX.Element {
     States.MetaSelection.on(pinMarker);
     return () => States.MetaSelection.off(pinMarker);
   }, [pinMarker]);
+  const scrollTarget = React.useRef<HTMLInputElement>(null);
+  React.useEffect(() => {
+    scrollTarget.current?.scrollIntoView({ block: 'nearest' });
+  });
   // Rendering
   const renderMark = (mark: Mark): JSX.Element | null => {
     const { marker } = mark;
@@ -331,7 +335,8 @@ export default function ASTinfo(): JSX.Element {
     const onSelect = () => void States.setSelection(mark);
     const onHover =
       (h: boolean): void => States.setHovered(h ? mark : undefined);
-    return (
+    const ref = isHovered ? scrollTarget : undefined;
+    const markInfo =
       <MarkInfos
         key={marker}
         marker={marker}
@@ -344,8 +349,8 @@ export default function ASTinfo(): JSX.Element {
         onRemove={onRemove}
         onHover={onHover}
         onSelect={onSelect}
-      />
-    );
+      />;
+    return <div ref={ref}>{markInfo}</div>;
   };
   return (
     <>
