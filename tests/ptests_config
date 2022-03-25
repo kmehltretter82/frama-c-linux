@@ -2,12 +2,8 @@
 # todo: adds crowbar? Yes, but these tests do not use ptests
 # todo: adds journal? No, the journal suite directory will be removed later to master
 
-DEFAULT_SUITES= builtins callgraph cil compliance constant_propagation
-# todo:
-IGNORE= DEFAULT_SUITES= dynamic
-
+DEFAULT_SUITES= builtins callgraph cil compliance constant_propagation dynamic
 DEFAULT_SUITES= float idct impact jcdb libc metrics occurrence pdg pretty_printing
-
 DEFAULT_SUITES= rte rte_manual saveload scope slicing sparecode spec syntax
 
 DEFAULT_SUITES= misc
