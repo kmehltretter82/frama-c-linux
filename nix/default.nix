@@ -92,7 +92,7 @@ pkgs.lib.makeExtensible
   lint = mk_deriv {
         name = "frama-c-lint";
         src = self.src;
-        opamPackages = [ "ocp-indent=1.7.0" "headache=1.05"];
+        opamPackages = [ "ocp-indent=1.8.1" "headache=1.05"];
         buildInputs =
           self.mk_buildInputs { nixPackages = [ pkgs.bc pkgs.clang_10 ]; };
         outputs = [ "out" ];

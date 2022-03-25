@@ -464,7 +464,7 @@ module Notification = struct
     threadId: (int [@default 0]);
     time: (string [@default ""]);
     exn: (Sarif_exception.t [@default Sarif_exception.default])
-        [@key "exception"];
+         [@key "exception"];
     properties: (Properties.t [@default Properties.default])
   }[@@deriving yojson]
 end
@@ -1379,7 +1379,7 @@ module Run = struct
     columnKind: (ColumnKind.t [@default ColumnKind.unicodeCodePoints]);
     externalPropertyFileReferences:
       (ExternalPropertyFileReferences.t
-         [@default ExternalPropertyFileReferences.default]);
+       [@default ExternalPropertyFileReferences.default]);
     threadFlowLocations: (ThreadFlowLocation.t list [@default []]);
     taxonomies: (ToolComponent.t list [@default []]);
     addresses: (Address.t list [@default []]);
