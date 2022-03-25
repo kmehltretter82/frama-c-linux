@@ -89,7 +89,7 @@ function useCallsitesCache(): Request<callstack, Callsite[]> {
 }
 
 interface CallsiteCellProps {
-  callstack: callstack | 'Header';
+  callstack: callstack | 'Header' | 'Descr';
   index?: number;
   getCallsites: Request<callstack, Callsite[]>;
   selectedClass?: string;
@@ -103,17 +103,21 @@ function makeStackTitle(calls: Callsite[]): string {
 }
 
 async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
-  const { callstack: c, index, getCallsites, selectedClass = '' } = props;
-  const callClass = classes('eva-table-callsite-box', selectedClass);
-  const callsites = c !== 'Header' ? await getCallsites(c) : [];
-  const infos =
-    c === 'Header' ? 'Corresponding callstack' :
-      c === 'Summary' ? 'Summary' : makeStackTitle(callsites);
-  return (
-    <td className={callClass} title={infos}>
-      {c === 'Header' ? '#' : c === 'Summary' ? '∑' : index}
-    </td>
-  );
+  const { callstack, index, getCallsites, selectedClass = '' } = props;
+  const cl = classes('eva-table-callsite-box', selectedClass);
+  function Res(props: { text: string, title: string }): JSX.Element {
+    return <td className={cl} title={props.title}>{props.text}</td>;
+  }
+  switch (callstack) {
+    case 'Header': return <Res text='#' title='Corresponding callstack'/>;
+    case 'Descr': return <Res text='D' title='Column description'/>;
+    default: 
+      const callsites = await getCallsites(callstack);
+      const isSummary = callstack === 'Summary';
+      const infos = isSummary ? 'Summary' : makeStackTitle(callsites);
+      const text = isSummary ? '∑' : (index ? index.toString() : '0');
+      return <Res text={text} title={infos}/>;
+  }
 }
 
 
@@ -429,12 +433,12 @@ interface ProbeValuesProps {
   status: MarkerStatus;
   state: StateToDisplay;
   addLoc: (loc: Location) => void;
-  isSelected: boolean;
+  isSelectedCallstack: (c: callstack) => boolean;
   summaryOnly: boolean;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, summary, state, addLoc, isSelected, summaryOnly } = props;
+  const { probe, summary, state, addLoc, summaryOnly } = props;
   const summaryStatus = getAlarmStatus(summary.vBefore?.alarms);
 
   // Building common parts
@@ -457,6 +461,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   return async (callstack: callstack): Promise<JSX.Element> => {
     const evaluation = await probe.evaluate(callstack);
     const { vBefore, vAfter, vThen, vElse } = evaluation;
+    const isSelected = props.isSelectedCallstack(callstack);
     const selected = isSelected && callstack !== 'Summary' ? 'eva-focused' : '';
     const font = summaryOnly && callstack === 'Summary' ? 'eva-italic' : '';
     const className = classes('eva-table-values', selected, font);
@@ -514,15 +519,21 @@ interface FunctionProps {
   isSelectedCallstack: (c: callstack) => boolean;
   setSelection: (a: States.SelectionActions) => void;
   locEvt: Dome.Event<Location>;
+  startingCallstack: number;
+  changeStartingCallstack: (n: number) => void;
 }
+
+const PageSize = 49;
+const LineSize = 22;
 
 async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const { fct, state, folded, isSelectedCallstack, locEvt } = props;
   const { byCallstacks, setSelection, getCallsites } = props;
   const { addLoc, getCallstacks: getCS } = props;
   const { setFolded, setByCallstacks, close } = props;
+  const { startingCallstack, changeStartingCallstack } = props;
   const displayTable = folded ? 'none' : 'table';
-  const headerCall = await CallsiteCell({ getCallsites, callstack: 'Header' });
+  const onClick = (c: callstack): () => void => () => props.selectCallstack(c); 
 
   /* Compute relevant callstacks */
   const markers = Array.from(props.markers.keys());
@@ -531,13 +542,14 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
 
   interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus }
   const entries = Array.from(props.markers.entries());
-  const probes = await Promise.all(entries.map(async ([ target, status ]) => {
+  const data = await Promise.all(entries.map(async ([ target, status ]) => {
     const probe = await props.getProbe({ target, fct });
     const summary = await probe.evaluate('Summary');
     return { probe, summary, status } as Data;
   }));
 
-  const headers = await Promise.all(probes.map((d: Data) => {
+  const headerCall = await CallsiteCell({ getCallsites, callstack: 'Header' });
+  const headers = await Promise.all(data.map((d: Data) => {
     const pinProbe = (pin: boolean): void => props.pinProbe(d.probe, pin);
     const selectProbe = (): void => props.selectProbe(d.probe);
     const removeProbe = (): void => props.removeProbe(d.probe);
@@ -545,32 +557,43 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     return ProbeHeader({ ...d, state, ...fcts, locEvt });
   }));
 
-  const title = 'Column description';
-  const descrs = probes.map((d) => ProbeDescr({ ...d, state }));
+  const descrsCall = await CallsiteCell({ getCallsites, callstack: 'Descr' });
+  const descrs = data.map((d) => ProbeDescr({ ...d, state }));
 
-  const onClick = (c: callstack): () => void => () => props.selectCallstack(c); 
-  function build(d: Data, c: callstack): Promise<JSX.Element> {
-    const isSelected = isSelectedCallstack(c);
-    const valuesProps = { ...d, state, addLoc, isSelected, summaryOnly };
-    return ProbeValues(valuesProps)(c);
-  }
-
-  const summary = await Promise.all(probes.map((d) => build(d, 'Summary')));
+  const miscs = { state, addLoc, isSelectedCallstack, summaryOnly };
+  const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
+  const summary = await Promise.all(builders.map((b) => b('Summary')));
   const summCall = await CallsiteCell({ callstack: 'Summary', getCallsites });
+
+  const start = Math.max(1, startingCallstack);
+  const stop = Math.min(start + PageSize, callstacks.length);
   const values = await Promise.all(callstacks.map(async (callstack, n) => {
-    if (summaryOnly) return <></>;
-    const isSelected = isSelectedCallstack(callstack);
-    const selector = isSelected && callstack !== 'Summary';
-    const selectedClass = selector ? 'eva-focused' : '';
+    const index = n + 1;
+    if (start > index || stop < index) return <></>;
+    const selectedClass = isSelectedCallstack(callstack) ? 'eva-focused' : '';
     const callProps = { selectedClass, getCallsites };
-    const call = await CallsiteCell({ index: n + 1, callstack, ...callProps });
-    const values = await Promise.all(probes.map((d) => build(d, callstack)));
+    const call = await CallsiteCell({ index, callstack, ...callProps });
+    const values = await Promise.all(builders.map((b) => b(callstack)));
     return (
       <tr key={callstack} onClick={onClick(callstack)}>{call}
         {React.Children.toArray(values)}
       </tr>
     );
   }));
+
+  const height = byCallstacks ? LineSize * (callstacks.length) : 0;
+  const onScroll: React.UIEventHandler<HTMLDivElement> = (event) => {
+    const element = event.currentTarget;
+    // const s = (element.scrollHeight - element.clientHeight) / callstacks.length;
+    const s = LineSize;
+    const top = Math.floor(event.currentTarget.scrollTop / s);
+    console.log(s);
+    console.log(element.scrollTop);
+    console.log(element.scrollHeight);
+    console.log(element.scrollTop + element.clientHeight);
+    console.log(top + 1);
+    changeStartingCallstack(Math.min(top + 1, callstacks.length));
+  };
 
   return (
     <>
@@ -598,26 +621,81 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
         />
       </Hpack>
       <div className='eva-table-container'>
-        <table className='eva-table' style={{ display: displayTable }}>
-          <tbody>
-            <tr>
-              {headerCall}
-              {React.Children.toArray(headers)}
-            </tr>
-            <tr>
-              <td className='eva-table-callsite-box' title={title}>{'D'}</td>
-              {React.Children.toArray(descrs.flat())}
-            </tr>
-            <tr key={'Summary'} onClick={onClick('Summary')}>
-              {summCall}
-              {React.Children.toArray(summary)}
-            </tr>
-            {React.Children.toArray(values)}
-          </tbody>
-        </table>
+        <div className='eva-table-horizontal-scroller'>
+          <table className='eva-table' style={{ display: displayTable }}>
+            <tbody>
+              <tr>
+                {headerCall}
+                {React.Children.toArray(headers)}
+              </tr>
+              <tr>
+                {descrsCall}
+                {React.Children.toArray(descrs.flat())}
+              </tr>
+              <tr key={'Summary'} onClick={onClick('Summary')}>
+                {summCall}
+                {React.Children.toArray(summary)}
+              </tr>
+              {React.Children.toArray(values)}
+            </tbody>
+          </table>
+        </div>
+        <div onScroll={onScroll} className='eva-table-vertical-scroller'>
+          <div style={{ height: `${height}px` }}/>
+        </div>
       </div>
     </>
   );
+  // return (
+  //   <>
+  //     <Hpack className="eva-function">
+  //       <IconButton
+  //         className="eva-fct-fold"
+  //         icon={folded ? 'ANGLE.RIGHT' : 'ANGLE.DOWN'}
+  //         onClick={() => setFolded(!folded)}
+  //       />
+  //       <Cell className="eva-fct-name">{fct}</Cell>
+  //       <Filler />
+  //       <Pager />
+  //       <IconButton
+  //         icon="ITEMS.LIST"
+  //         className="eva-probeinfo-button"
+  //         selected={byCallstacks}
+  //         title="Details by callstack"
+  //         onClick={() => setByCallstacks(!byCallstacks)}
+  //       />
+  //       <Inset />
+  //       <IconButton
+  //         icon="CROSS"
+  //         className="eva-probeinfo-button"
+  //         title="Close"
+  //         onClick={close}
+  //       />
+  //     </Hpack>
+  //     <div onScroll={onScroll} className='eva-table-container'>
+  //       <div style={{ position: 'relative' }}>
+  //         <div style={{ height: `${height}px` }}/>
+  //         <table className='eva-table' style={{ display: displayTable }}>
+  //           <tbody>
+  //             <tr>
+  //               {headerCall}
+  //               {React.Children.toArray(headers)}
+  //             </tr>
+  //             <tr>
+  //               {descrsCall}
+  //               {React.Children.toArray(descrs.flat())}
+  //             </tr>
+  //             <tr key={'Summary'} onClick={onClick('Summary')}>
+  //               {summCall}
+  //               {React.Children.toArray(summary)}
+  //             </tr>
+  //             {React.Children.toArray(values)}
+  //           </tbody>
+  //         </table>
+  //       </div>
+  //     </div>
+  //   </>
+  // );
 }
 
 
@@ -627,6 +705,7 @@ class FunctionInfos {
   readonly fct: string;
   readonly pinned = new Set<Ast.marker>();
   readonly tracked = new Set<Ast.marker>();
+  startingCallstack = 1;
   byCallstacks = false;
   folded = false;
 
@@ -714,6 +793,12 @@ class FunctionsManager {
     infos.folded = folded;
   }
 
+  changeStartingCallstack(fct: string, n: number): void {
+    const infos = this.cache.get(fct);
+    if (!infos) return;
+    infos.startingCallstack = n;
+  }
+
   pin(loc: Location): void {
     const { target, fct } = loc;
     this.getInfos(fct).pin(target);
@@ -776,7 +861,7 @@ function EvaTable(): JSX.Element {
   const [ state, setState ] = React.useState<StateToDisplay>('After');
   const [ cs, setCS ] = React.useState<callstack>('Summary');
   const [ fcts ] = React.useState(new FunctionsManager());
-  const [ tac, setTic ] = React.useState(false);
+  const [ tac, setTic ] = React.useState(0);
   const [ locEvt ] = React.useState(new Dome.Event<Location>('eva-location'));
 
   const getProbe = useProbeCache();
@@ -798,7 +883,7 @@ function EvaTable(): JSX.Element {
   const setLocPin = React.useCallback((loc: Location, pin: boolean): void => {
     if (pin) fcts.pin(loc);
     else fcts.unpin(loc);
-    setTic(!tac);
+    setTic(tac + 1);
   }, [fcts, setTic, tac]);
 
   const remove = React.useCallback((probe: Probe): void => {
@@ -806,7 +891,7 @@ function EvaTable(): JSX.Element {
     if (probe.target === focus?.target)
       setFocus(undefined);
     fcts.clean(undefined);
-    setTic(!tac);
+    setTic(tac + 1);
   }, [ fcts, focus, setFocus, tac ]);
 
   const functionsPromise = React.useMemo(() => {
@@ -815,32 +900,39 @@ function EvaTable(): JSX.Element {
       const isSelectedCallstack = (c: callstack): boolean => c === cs;
       const setFolded = (folded: boolean): void => {
         fcts.setFolded(fct, folded);
-        setTic(!tac);
+        setTic(tac + 1);
       };
       const setByCS = (byCS: boolean): void => {
         fcts.setByCallstacks(fct, byCS);
-        setTic(!tac);
+        setTic(tac + 1);
       };
+      const changeStartingCallstack = (n: number): void => {
+        console.log(n);
+        fcts.changeStartingCallstack(fct, n);
+        setTic(tac + 1);
+      }
       return {
         fct,
         markers: infos.markers(focus),
         state,
-        close: () => { fcts.delete(fct); setTic(!tac); },
+        close: () => { fcts.delete(fct); setTic(tac + 1); },
         pinProbe: setLocPin,
         getProbe,
         selectProbe: setFocus,
         removeProbe: remove,
-        addLoc: (loc: Location) => { fcts.pin(loc); setTic(!tac); },
+        addLoc: (loc: Location) => { fcts.pin(loc); setTic(tac + 1); },
         folded,
         setFolded,
         getCallsites,
         byCallstacks,
         getCallstacks,
         setByCallstacks: setByCS,
-        selectCallstack: (c: callstack) => { setCS(c); setTic(!tac); },
+        selectCallstack: (c: callstack) => { setCS(c); setTic(tac + 1); },
         isSelectedCallstack,
         setSelection: select,
         locEvt,
+        startingCallstack: infos.startingCallstack,
+        changeStartingCallstack,
       };
     });
     return Promise.all(ps.map(FunctionSection));
