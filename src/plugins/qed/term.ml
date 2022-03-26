@@ -2164,9 +2164,9 @@ struct
   let lc_close_xs xs (lc : lc_term) : lc_term =
     let mu = cache () in
     let i = ref (Bvars.order lc.bind) in
-    xs |> List.iter (fun x ->
+    List.rev xs |> List.iter (fun x ->
         set mu (e_var x) (c_bvar !i (tau_of_var x));
-        i := !i -1
+        i := !i +1
       );
     let xs = List.fold_left (fun xs x -> Vars.add x xs) Vars.empty xs in
     let rec walk mu lc =
@@ -2541,6 +2541,12 @@ struct
       | Lambda -> xs
       | Forall | Exists -> List.filter (fun x -> Vars.mem x e.vars) xs
     in
+    let xs, xs2 = List.partition_map (fun x ->
+        match let_intro_case q x e with
+        | None -> Left x
+        | Some v -> Right (x, v)
+      ) xs in
+    let e = List.fold_right (fun (x, v) e -> e_subst_var x v e) xs2 e in
     let e = lc_close_xs xs e in
     List.fold_right (fun x e -> c_bind q (tau_of_var x) e) xs e
 
