@@ -2540,15 +2540,16 @@ struct
     let xs = match q with
       | Lambda -> xs
       | Forall | Exists -> List.filter (fun x -> Vars.mem x e.vars) xs
-    in
-    let xs, xs2 = List.partition_map (fun x ->
+    in (* let_intro_case have to be called sequentially because of cases like
+          '\forall x y, 42 = x + y -> P' where we detect two let-in variables in parralel
+          but we can only simplify one in practice.*)
+    let e, xs = List.fold_left (fun (e, xs') x ->
         match let_intro_case q x e with
-        | None -> Left x
-        | Some v -> Right (x, v)
-      ) xs in
-    let e = List.fold_right (fun (x, v) e -> e_subst_var x v e) xs2 e in
+        | None -> e, x::xs'
+        | Some v -> e_subst_var x v e, xs'
+      ) (e, []) (List.rev xs) in
     let e = lc_close_xs xs e in
-    List.fold_right (fun x e -> c_bind q (tau_of_var x) e) xs e
+    List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e (List.rev xs)
 
   let e_forall = bind_xs Forall
   let e_exists = bind_xs Exists
