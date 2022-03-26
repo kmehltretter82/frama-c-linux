@@ -2306,7 +2306,7 @@ struct
         | Lambda, _ -> true
         | Forall, x | Exists, x -> Vars.mem x e.vars
       ) qxs in
-    let xs = List.map (fun (_q, x) -> x) qxs in
+    let xs = List.rev_map (fun (_q, x) -> x) qxs in
     let e = lc_close_xs xs e in
     List.fold_right (fun (q, x) e -> c_bind q (tau_of_var x) e) qxs e
 
