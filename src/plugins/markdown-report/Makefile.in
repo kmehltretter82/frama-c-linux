@@ -43,6 +43,14 @@ PLUGIN_DISTRIB_EXTERNAL:=\
  eva_info.ml eva_info.mli
 PLUGIN_DEPFLAGS:= $(PLUGIN_DIR)/eva_info.mli $(PLUGIN_DIR)/eva_info.ml
 PLUGIN_TESTS_DIRS:= md sarif
+PLUGIN_DISTRIB_TESTS := \
+  $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
+    $(dir)/oracle/* \
+    $(filter-out result oracle,$(dir)/*)) \
+  ) \
+  $(filter-out result oracle,tests/*)) \
+  $(foreach dir, tests $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
+    $(dir)/test_config)
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
