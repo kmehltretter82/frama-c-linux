@@ -2161,19 +2161,28 @@ struct
     walk mu x lc
 
   (* Alpha-convert free-variables in xs with the top-most bound variables *)
-  let lc_close_xs xs (lc : lc_term) : lc_term =
+  (* Only activate flag subset if lc.vars is a subset of xs *)
+  let lc_close_xs ?(subset = false) xs (lc : lc_term) : lc_term =
     let mu = cache () in
     let i = ref (Bvars.order lc.bind) in
     List.rev xs |> List.iter (fun x ->
         set mu (e_var x) (c_bvar !i (tau_of_var x));
         i := !i +1
       );
-    let xs = List.fold_left (fun xs x -> Vars.add x xs) Vars.empty xs in
-    let rec walk mu lc =
-      if Vars.intersect xs lc.vars then
-        get mu (lc_alpha (walk mu)) lc
-      else lc in
-    walk mu lc
+    (* if Vars.subset lc.vars xs then*)
+    if subset then
+      let rec walk mu lc =
+        if not (Vars.is_empty lc.vars) then
+          get mu (lc_alpha (walk mu)) lc
+        else lc in
+      walk mu lc
+    else
+      let xs = List.fold_left (fun xs x -> Vars.add x xs) Vars.empty xs in
+      let rec walk mu lc =
+        if Vars.intersect xs lc.vars then
+          get mu (lc_alpha (walk mu)) lc
+        else lc in
+      walk mu lc
 
   (* Alpha-convert top-most bound variable with free-variable x *)
   let lc_open x (lc : lc_term) : lc_term =
@@ -2549,6 +2558,20 @@ struct
   let e_forall = bind_xs Forall
   let e_exists = bind_xs Exists
   let e_lambda = bind_xs Lambda
+
+  let bind_all q e =
+    let e = Vars.fold (fun x e ->
+        match let_intro_case q x e with
+        | None -> e
+        | Some v -> e_subst_var x v e
+      ) e.vars e in
+    let xs = List.sort POOL.compare (Vars.elements e.vars) in
+    let e = lc_close_xs ~subset:true xs e in
+    List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e (List.rev xs)
+
+  let e_close_forall = bind_all Forall
+  let e_close_exists = bind_all Exists
+  let e_close_lambda = bind_all Lambda
 
   (* -------------------------------------------------------------------------- *)
   (* --- Iterators                                                          --- *)
