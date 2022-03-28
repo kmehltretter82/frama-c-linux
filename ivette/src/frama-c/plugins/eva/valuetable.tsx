@@ -104,19 +104,23 @@ function makeStackTitle(calls: Callsite[]): string {
 
 async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
   const { callstack, index, getCallsites, selectedClass = '' } = props;
-  const cl = classes('eva-table-callsite-box', selectedClass);
+  const stickyHd = callstack === 'Header' ? 'eva-table-header-sticky' : '';
+  const stickyDc = callstack === 'Descr' ? 'eva-table-descr-sticky' : '';
+  const sticky = classes(stickyHd, stickyDc);
+  const cl = classes('eva-table-callsite-box', selectedClass, sticky);
   function Res(props: { text: string, title: string }): JSX.Element {
     return <td className={cl} title={props.title}>{props.text}</td>;
   }
   switch (callstack) {
     case 'Header': return <Res text='#' title='Corresponding callstack'/>;
     case 'Descr': return <Res text='D' title='Column description'/>;
-    default: 
+    default: {
       const callsites = await getCallsites(callstack);
       const isSummary = callstack === 'Summary';
       const infos = isSummary ? 'Summary' : makeStackTitle(callsites);
       const text = isSummary ? '∑' : (index ? index.toString() : '0');
       return <Res text={text} title={infos}/>;
+    }
   }
 }
 
@@ -342,7 +346,7 @@ interface ProbeHeaderProps {
 function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   const { probe, summary, status, state, setSelection, locEvt } = props;
   const { code = '(error)', stmt, target, fct } = probe;
-  const color = MarkerStatusClass(status);
+  const color = classes(MarkerStatusClass(status), 'eva-table-header-sticky');
   const { selectProbe, removeProbe, pinProbe } = props;
 
   // Computing the number of columns. By design, either vAfter or vThen and
@@ -397,7 +401,8 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   const { summary, state } = props;
   const { vBefore, vAfter, vThen, vElse } = summary;
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
-  const className = classes(valuesClass, 'eva-table-descrs');
+  const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
+  const className = classes(valuesClass, tableClass);
   function td(kind: JSX.Element, colSpan = 1): JSX.Element {
     return <td className={className} colSpan={colSpan + 1}>{kind}</td>;
   }
@@ -523,8 +528,7 @@ interface FunctionProps {
   changeStartingCallstack: (n: number) => void;
 }
 
-const PageSize = 49;
-const LineSize = 22;
+const PageSize = 99;
 
 async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const { fct, state, folded, isSelectedCallstack, locEvt } = props;
@@ -581,18 +585,17 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     );
   }));
 
-  const height = byCallstacks ? LineSize * (callstacks.length) : 0;
   const onScroll: React.UIEventHandler<HTMLDivElement> = (event) => {
-    const element = event.currentTarget;
-    // const s = (element.scrollHeight - element.clientHeight) / callstacks.length;
-    const s = LineSize;
-    const top = Math.floor(event.currentTarget.scrollTop / s);
-    console.log(s);
-    console.log(element.scrollTop);
-    console.log(element.scrollHeight);
-    console.log(element.scrollTop + element.clientHeight);
-    console.log(top + 1);
-    changeStartingCallstack(Math.min(top + 1, callstacks.length));
+    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
+    if (scrollTop / (scrollHeight - clientHeight) <= 0.1)
+      changeStartingCallstack(Math.max(startingCallstack - 10, 0));
+    const botGap = (scrollHeight - scrollTop - clientHeight) / scrollHeight;
+    const lastCallstack = startingCallstack + PageSize;
+    if (botGap <= 0.1 && lastCallstack !== callstacks.length) {
+      const maxStart = callstacks.length - PageSize;
+      const start = Math.min(startingCallstack + 10, maxStart);
+      changeStartingCallstack(start);
+    }
   };
 
   return (
@@ -620,82 +623,27 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
           onClick={close}
         />
       </Hpack>
-      <div className='eva-table-container'>
-        <div className='eva-table-horizontal-scroller'>
-          <table className='eva-table' style={{ display: displayTable }}>
-            <tbody>
-              <tr>
-                {headerCall}
-                {React.Children.toArray(headers)}
-              </tr>
-              <tr>
-                {descrsCall}
-                {React.Children.toArray(descrs.flat())}
-              </tr>
-              <tr key={'Summary'} onClick={onClick('Summary')}>
-                {summCall}
-                {React.Children.toArray(summary)}
-              </tr>
-              {React.Children.toArray(values)}
-            </tbody>
-          </table>
-        </div>
-        <div onScroll={onScroll} className='eva-table-vertical-scroller'>
-          <div style={{ height: `${height}px` }}/>
-        </div>
+      <div onScroll={onScroll} className='eva-table-container'>
+        <table className='eva-table' style={{ display: displayTable }}>
+          <tbody>
+            <tr>
+              {headerCall}
+              {React.Children.toArray(headers)}
+            </tr>
+            <tr>
+              {descrsCall}
+              {React.Children.toArray(descrs.flat())}
+            </tr>
+            <tr key={'Summary'} onClick={onClick('Summary')}>
+              {summCall}
+              {React.Children.toArray(summary)}
+            </tr>
+            {React.Children.toArray(values)}
+          </tbody>
+        </table>
       </div>
     </>
   );
-  // return (
-  //   <>
-  //     <Hpack className="eva-function">
-  //       <IconButton
-  //         className="eva-fct-fold"
-  //         icon={folded ? 'ANGLE.RIGHT' : 'ANGLE.DOWN'}
-  //         onClick={() => setFolded(!folded)}
-  //       />
-  //       <Cell className="eva-fct-name">{fct}</Cell>
-  //       <Filler />
-  //       <Pager />
-  //       <IconButton
-  //         icon="ITEMS.LIST"
-  //         className="eva-probeinfo-button"
-  //         selected={byCallstacks}
-  //         title="Details by callstack"
-  //         onClick={() => setByCallstacks(!byCallstacks)}
-  //       />
-  //       <Inset />
-  //       <IconButton
-  //         icon="CROSS"
-  //         className="eva-probeinfo-button"
-  //         title="Close"
-  //         onClick={close}
-  //       />
-  //     </Hpack>
-  //     <div onScroll={onScroll} className='eva-table-container'>
-  //       <div style={{ position: 'relative' }}>
-  //         <div style={{ height: `${height}px` }}/>
-  //         <table className='eva-table' style={{ display: displayTable }}>
-  //           <tbody>
-  //             <tr>
-  //               {headerCall}
-  //               {React.Children.toArray(headers)}
-  //             </tr>
-  //             <tr>
-  //               {descrsCall}
-  //               {React.Children.toArray(descrs.flat())}
-  //             </tr>
-  //             <tr key={'Summary'} onClick={onClick('Summary')}>
-  //               {summCall}
-  //               {React.Children.toArray(summary)}
-  //             </tr>
-  //             {React.Children.toArray(values)}
-  //           </tbody>
-  //         </table>
-  //       </div>
-  //     </div>
-  //   </>
-  // );
 }
 
 
@@ -907,10 +855,9 @@ function EvaTable(): JSX.Element {
         setTic(tac + 1);
       };
       const changeStartingCallstack = (n: number): void => {
-        console.log(n);
         fcts.changeStartingCallstack(fct, n);
         setTic(tac + 1);
-      }
+      };
       return {
         fct,
         markers: infos.markers(focus),
