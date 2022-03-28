@@ -38,15 +38,12 @@ import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 
 
 
+/* -------------------------------------------------------------------------- */
+/* --- Miscellaneous definitions                                          --- */
+/* -------------------------------------------------------------------------- */
+
 type Request<A, B> = (a: A) => Promise<B>;
 type StateToDisplay = 'Before' | 'After' | 'Both' | 'None'
-type callstack = 'Summary' | Values.callstack
-
-function useCallstacksCache(): Request<Ast.marker[], callstack[]> {
-  const g = React.useCallback((m) => Server.send(Values.getCallstacks, m), []);
-  const toString = React.useCallback((ms) => ms.join('|'), []);
-  return Dome.useCache(g, toString);
-}
 
 type Alarm = [ 'True' | 'False' | 'Unknown', string ]
 function getAlarmStatus(alarms: Alarm[] | undefined): string {
@@ -72,14 +69,41 @@ function isPinnedMarker(status: MarkerStatus): boolean {
   return kind === 'Pinned';
 }
 
+/* -------------------------------------------------------------------------- */
 
 
+
+/* -------------------------------------------------------------------------- */
+/* --- Callstack related definitions                                      --- */
+/* -------------------------------------------------------------------------- */
+
+/* Callstacks are declared by the server. We add the `Summary` construction to
+ * cleanly represent the summary of all the callstacks. */
+type callstack = 'Summary' | Values.callstack
+
+/* Builds a cached version of the `getCallstacks` request */
+function useCallstacksCache(): Request<Ast.marker[], callstack[]> {
+  const g = React.useCallback((m) => Server.send(Values.getCallstacks, m), []);
+  const toString = React.useCallback((ms) => ms.join('|'), []);
+  return Dome.useCache(g, toString);
+}
+
+/* -------------------------------------------------------------------------- */
+
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Callsite related definitions                                       --- */
+/* -------------------------------------------------------------------------- */
+
+/* Representation of a callsite as described in the server */
 interface Callsite {
   callee: string;
   caller?: string;
   stmt?: Ast.marker;
 }
 
+/* Builds a cached version of the `getCallstackInfo` request */
 function useCallsitesCache(): Request<callstack, Callsite[]> {
   const get = React.useCallback((c) => {
     if (c !== 'Summary') return Server.send(Values.getCallstackInfo, c);
@@ -88,52 +112,22 @@ function useCallsitesCache(): Request<callstack, Callsite[]> {
   return Dome.useCache(get);
 }
 
-interface CallsiteCellProps {
-  callstack: callstack | 'Header' | 'Descr';
-  index?: number;
-  getCallsites: Request<callstack, Callsite[]>;
-  selectedClass?: string;
-}
-
-function makeStackTitle(calls: Callsite[]): string {
-  const cs = calls.slice(1);
-  if (cs.length > 0)
-    return `Callstack: ${cs.map((c) => c.callee).join(' \u2190 ')}`;
-  return 'Callstack Details';
-}
-
-async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
-  const { callstack, index, getCallsites, selectedClass = '' } = props;
-  const baseClasses = classes('eva-table-callsite-box', selectedClass);
-  switch (callstack) {
-    case 'Header': {
-      const cls = classes(baseClasses, 'eva-table-header-sticky');
-      const title = 'Corresponding callstack';
-      return <td className={cls} title={title}>{'#'}</td>;
-    }
-    case 'Descr': {
-      const cls = classes(baseClasses, 'eva-table-descr-sticky');
-      const title = 'Column description';
-      return <td className={cls} title={title}>{'D'}</td>;
-    }
-    default: {
-      const cls = classes(baseClasses, 'eva-table-value-sticky');
-      const callsites = await getCallsites(callstack);
-      const isSummary = callstack === 'Summary';
-      const infos = isSummary ? 'Summary' : makeStackTitle(callsites);
-      const text = isSummary ? '∑' : (index ? index.toString() : '0');
-      return <td className={cls} title={infos}>{text}</td>;
-    }
-  }
-}
+/* -------------------------------------------------------------------------- */
 
 
 
+/* -------------------------------------------------------------------------- */
+/* --- Probe related definitions                                          --- */
+/* -------------------------------------------------------------------------- */
+
+/* A Location is a marker in a function */
 interface Location {
   target: Ast.marker;
   fct: string;
 }
 
+/* An Evaluation keeps track of the values at relevant control point around a
+ * statement, along with the potential errors */
 interface Evaluation {
   errors?: string;
   vBefore?: Values.evaluation;
@@ -142,6 +136,10 @@ interface Evaluation {
   vElse?: Values.evaluation;
 }
 
+/* A Probe is a location along with data representing textually what it is, the
+ * considered statement, if it is an effectfull one or one with conditions.
+ * Moreover, it gives a function that computes an Evaluation for a given
+ * callstack. This computation is asynchronous. */
 interface Probe extends Location {
   code?: string;
   stmt?: Ast.marker;
@@ -151,12 +149,11 @@ interface Probe extends Location {
   evaluate: Request<callstack, Evaluation>
 }
 
-const LocToString = (loc: Location): string => `${loc.fct}:${loc.target}`;
-type LocStack = [ Location, callstack ]
-
-function useEvaluationCache(): Request<LocStack, Evaluation> {
+/* Builds a cached version of the `getValues` request */
+function useEvaluationCache(): Request<[ Location, callstack ], Evaluation> {
+  type LocStack = [ Location, callstack ];
   const toString = React.useCallback(([ l, c ] : LocStack): string => {
-    return `${LocToString(l)}:${c}`;
+    return `${l.fct}:${l.target}:${c}`;
   }, []);
   const get: Request<LocStack, Evaluation> = React.useCallback(([ l, c ]) => {
     const callstack = c === 'Summary' ? undefined : c as Values.callstack;
@@ -165,6 +162,7 @@ function useEvaluationCache(): Request<LocStack, Evaluation> {
   return Dome.useCache(get, toString);
 }
 
+/* Builds a cached function that builds a Probe given a Location */
 function useProbeCache(): Request<Location, Probe> {
   const toString = React.useCallback((l) => `${l.fct}:${l.target}`, []);
   const cache = useEvaluationCache();
@@ -176,7 +174,13 @@ function useProbeCache(): Request<Location, Probe> {
   return Dome.useCache(get, toString);
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Statement Component                                                --- */
+/* -------------------------------------------------------------------------- */
 
 interface StmtProps {
   stmt?: Ast.marker;
@@ -196,7 +200,13 @@ function Stmt(props: StmtProps): JSX.Element {
   return <span className={className} title={title}>{text}</span>;
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Informations on the alarms in a given callstack                    --- */
+/* -------------------------------------------------------------------------- */
 
 function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
   return async (c: callstack): Promise<JSX.Element> => {
@@ -212,7 +222,13 @@ function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
   };
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Informations on the selected callstack                             --- */
+/* -------------------------------------------------------------------------- */
 
 interface StackInfosProps {
   callsites: Callsite[];
@@ -255,7 +271,17 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
   return <Hpack className="eva-info">{children}</Hpack>;
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Selected Probe Component                                           --- */
+/* -------------------------------------------------------------------------- */
+/* --- Display informations on the currently selected probe, along with   --- */
+/* --- buttons to pin, remove and change the displayed columns, i.e. if   --- */
+/* --- we display the values before and/or after the statement.           --- */
+/* -------------------------------------------------------------------------- */
 
 interface ProbeInfosProps {
   probe?: Probe;
@@ -332,7 +358,16 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
   );
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Probe Header Component                                             --- */
+/* -------------------------------------------------------------------------- */
+/* --- Header of a column, describing the evaluated expression and its    --- */
+/* --- status inside the component (pinned, tracked, etc).                --- */
+/* -------------------------------------------------------------------------- */
 
 interface ProbeHeaderProps {
   probe: Probe;
@@ -393,7 +428,16 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   );
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Probe Description Component                                        --- */
+/* -------------------------------------------------------------------------- */
+/* --- Description of a table column, i.e. if it contains values          --- */
+/* --- evaluated before or after the considered statement.                --- */
+/* -------------------------------------------------------------------------- */
 
 interface ProbeDescrProps {
   summary: Evaluation;
@@ -433,7 +477,19 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   return elements;
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Probe Values Component                                             --- */
+/* -------------------------------------------------------------------------- */
+/* --- This component represents the contents of one of the table that    --- */
+/* --- displays values information. As the content depends on the         --- */
+/* --- considered callstack, we decided to return a function that build   --- */
+/* --- the actual component when given a callstack. It avoids useless     --- */
+/* --- computational boilerplate.                                         --- */
+/* -------------------------------------------------------------------------- */
 
 interface ProbeValuesProps {
   probe: Probe;
@@ -505,7 +561,60 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   };
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Row header describing the corresponding callstack                  --- */
+/* -------------------------------------------------------------------------- */
+
+interface CallsiteCellProps {
+  callstack: callstack | 'Header' | 'Descr';
+  index?: number;
+  getCallsites: Request<callstack, Callsite[]>;
+  selectedClass?: string;
+}
+
+function makeStackTitle(calls: Callsite[]): string {
+  const cs = calls.slice(1);
+  if (cs.length > 0)
+    return `Callstack: ${cs.map((c) => c.callee).join(' \u2190 ')}`;
+  return 'Callstack Details';
+}
+
+async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
+  const { callstack, index, getCallsites, selectedClass = '' } = props;
+  const baseClasses = classes('eva-table-callsite-box', selectedClass);
+  switch (callstack) {
+    case 'Header': {
+      const cls = classes(baseClasses, 'eva-table-header-sticky');
+      const title = 'Corresponding callstack';
+      return <td className={cls} title={title}>{'#'}</td>;
+    }
+    case 'Descr': {
+      const cls = classes(baseClasses, 'eva-table-descr-sticky');
+      const title = 'Column description';
+      return <td className={cls} title={title}>{'D'}</td>;
+    }
+    default: {
+      const cls = classes(baseClasses, 'eva-table-value-sticky');
+      const callsites = await getCallsites(callstack);
+      const isSummary = callstack === 'Summary';
+      const infos = isSummary ? 'Summary' : makeStackTitle(callsites);
+      const text = isSummary ? '∑' : (index ? index.toString() : '0');
+      return <td className={cls} title={infos}>{text}</td>;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Function Section Component                                         --- */
+/* -------------------------------------------------------------------------- */
 
 interface FunctionProps {
   fct: string;
@@ -539,14 +648,15 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const { addLoc, getCallstacks: getCS } = props;
   const { setFolded, setByCallstacks, close } = props;
   const { startingCallstack, changeStartingCallstack } = props;
-  const displayTable = folded ? 'none' : 'table';
+  const displayTable = folded || state === 'None' ? 'none' : 'table';
   const onClick = (c: callstack): () => void => () => props.selectCallstack(c); 
 
-  /* Compute relevant callstacks */
+  /* Computes the relevant callstacks */
   const markers = Array.from(props.markers.keys());
   const callstacks = byCallstacks ? (await getCS(markers) ?? []) : [];
   const summaryOnly = callstacks.length === 1;
 
+  /* Computes the relevant data for each marker */
   interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus }
   const entries = Array.from(props.markers.entries());
   const data = await Promise.all(entries.map(async ([ target, status ]) => {
@@ -555,6 +665,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     return { probe, summary, status } as Data;
   }));
 
+  /* Computes the headers for each marker */
   const headerCall = await CallsiteCell({ getCallsites, callstack: 'Header' });
   const headers = await Promise.all(data.map((d: Data) => {
     const pinProbe = (pin: boolean): void => props.pinProbe(d.probe, pin);
@@ -564,14 +675,17 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     return ProbeHeader({ ...d, state, ...fcts, locEvt });
   }));
 
+  /* Computes the columns descriptions */
   const descrsCall = await CallsiteCell({ getCallsites, callstack: 'Descr' });
   const descrs = data.map((d) => ProbeDescr({ ...d, state }));
 
+  /* Computes the summary values */
   const miscs = { state, addLoc, isSelectedCallstack, summaryOnly };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
   const summCall = await CallsiteCell({ callstack: 'Summary', getCallsites });
 
+  /* Computes the values for each callstack */
   const start = Math.max(1, startingCallstack);
   const stop = Math.min(start + PageSize, callstacks.length);
   const values = await Promise.all(callstacks.map(async (callstack, n) => {
@@ -589,6 +703,8 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     );
   }));
 
+  /* We change the starting callstack dynamically when we reach the ends of the
+   * scroll to avoid to build the complete table */
   const onScroll: React.UIEventHandler<HTMLDivElement> = (event) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
     if (scrollTop / (scrollHeight - clientHeight) <= 0.1)
@@ -602,12 +718,14 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     }
   };
 
+  /* Handles ctrl+scroll for horizontal scrolling */
   const onWheel = (event: React.WheelEvent): void => {
     const tgt = event.currentTarget;
     const left = event.deltaY * tgt.scrollWidth / tgt.scrollHeight;
     if (event.ctrlKey) tgt.scrollLeft += left;
   };
 
+  /* Builds the component */
   return (
     <>
       <Hpack className="eva-function">
@@ -660,16 +778,26 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   );
 }
 
+/* -------------------------------------------------------------------------- */
 
 
+
+/* -------------------------------------------------------------------------- */
+/* --- Function Manager                                                   --- */
+/* -------------------------------------------------------------------------- */
+/* --- The Function Manager is responsible of all the data related to     --- */
+/* --- programs functions.                                                --- */
+/* -------------------------------------------------------------------------- */
+
+/* Informations on one function */
 class FunctionInfos {
 
-  readonly fct: string;
-  readonly pinned = new Set<Ast.marker>();
-  readonly tracked = new Set<Ast.marker>();
-  startingCallstack = 1;
-  byCallstacks = false;
-  folded = false;
+  readonly fct: string;                     // Function's name
+  readonly pinned = new Set<Ast.marker>();  // Pinned markers
+  readonly tracked = new Set<Ast.marker>(); // Tracked markers
+  startingCallstack = 1;                    // First displayed callstack
+  byCallstacks = false;                     // True if displayed by callstacks
+  folded = false;                           // True if folded
 
   constructor(fct: string) {
     this.fct = fct;
@@ -712,8 +840,7 @@ class FunctionInfos {
 
 }
 
-
-
+/* State keeping tracks of informations for every relevant functions */
 class FunctionsManager {
 
   private readonly cache = new Map<string, FunctionInfos>();
@@ -816,21 +943,41 @@ class FunctionsManager {
 
 }
 
+/* -------------------------------------------------------------------------- */
 
+
+
+/* -------------------------------------------------------------------------- */
+/* --- Eva Table Complet Component                                        --- */
+/* -------------------------------------------------------------------------- */
 
 function EvaTable(): JSX.Element {
+
+  /* Component state */
   const [ selection, select ] = States.useSelection();
   const [ state, setState ] = React.useState<StateToDisplay>('After');
   const [ cs, setCS ] = React.useState<callstack>('Summary');
   const [ fcts ] = React.useState(new FunctionsManager());
+  const [ focus, setFocus ] = React.useState<Probe | undefined>(undefined);
+
+  /* Used to force the component update. We cannot use the `forceUpdate` hook
+   * proposed by Dome as we need to be able to add dependencies on a changing
+   * value (here tac) explicitly. We need to force the update as modifications
+   * of the Function Manager internal data does NOT trigger the component
+   * update. */
   const [ tac, setTic ] = React.useState(0);
+
+  /* Event use to communicate when a location is selected. Used to scroll
+   * related column into view if needed */
   const [ locEvt ] = React.useState(new Dome.Event<Location>('eva-location'));
 
+  /* Build cached version of needed server's requests */
   const getProbe = useProbeCache();
   const getCallsites = useCallsitesCache();
   const getCallstacks = useCallstacksCache();
 
-  const [ focus, setFocus ] = React.useState<Probe | undefined>(undefined);
+  /* Updated the focused Probe when the selection changes. Also emit on the
+   * `locEvent` event. */
   React.useEffect(() => {
     const target = selection?.current?.marker;
     const fct = selection?.current?.fct;
@@ -842,12 +989,14 @@ function EvaTable(): JSX.Element {
     else setFocus(undefined);
   }, [ fcts, selection, getProbe, setFocus, locEvt ]);
 
+  /* Callback used to pin or unpin a location */
   const setLocPin = React.useCallback((loc: Location, pin: boolean): void => {
     if (pin) fcts.pin(loc);
     else fcts.unpin(loc);
     setTic(tac + 1);
   }, [fcts, setTic, tac]);
 
+  /* Callback used to remove a probe */
   const remove = React.useCallback((probe: Probe): void => {
     fcts.removeLocation(probe);
     if (probe.target === focus?.target)
@@ -856,6 +1005,9 @@ function EvaTable(): JSX.Element {
     setTic(tac + 1);
   }, [ fcts, focus, setFocus, tac ]);
 
+  /* Builds the sections for each function. As the component is built
+   * asynchronously, we have to use the `usePromise` hook, which forces us to
+   * memoize the promises building. */
   const functionsPromise = React.useMemo(() => {
     const ps = fcts.map((infos, fct) => {
       const { byCallstacks, folded } = infos;
@@ -899,13 +1051,16 @@ function EvaTable(): JSX.Element {
     return Promise.all(ps.map(FunctionSection));
   },
   [ cs, fcts, focus, tac, getCallsites, setLocPin,
-    getCallstacks, getProbe, remove, select, state, locEvt
-  ]);
+    getCallstacks, getProbe, remove, select, state, locEvt ]);
   const { result: functions } = Dome.usePromise(functionsPromise);
 
+  /* Builds the alarms component. As for the function sections, it is an
+   * asynchronous process. */
   const alarmsProm = React.useMemo(() => AlarmsInfos(focus)(cs), [ focus, cs ]);
   const { result: alarmsInfos } = Dome.usePromise(alarmsProm);
 
+  /* Builds the stacks component. As for the function sections, it is an
+   * asynchronous process. */
   const stackInfosPromise = React.useMemo(async () => {
     const callsites = await getCallsites(cs);
     const tgt = selection.current?.marker;
@@ -915,6 +1070,7 @@ function EvaTable(): JSX.Element {
   }, [ cs, select, getCallsites, selection ]);
   const { result: stackInfos } = Dome.usePromise(stackInfosPromise);
 
+  /* Builds the component */
   return (
     <>
       <Ivette.TitleBar />
@@ -933,10 +1089,10 @@ function EvaTable(): JSX.Element {
       {stackInfos}
     </>
   );
+
 }
 
-
-
+/* Registers the component in Ivette */
 Ivette.registerComponent({
   id: 'frama-c.plugins.values',
   group: 'frama-c.plugins',
@@ -945,3 +1101,5 @@ Ivette.registerComponent({
   title: 'Values inferred by the Eva analysis',
   children: <EvaTable />,
 });
+
+/* -------------------------------------------------------------------------- */
