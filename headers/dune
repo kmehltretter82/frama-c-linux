@@ -1,0 +1,6 @@
+(executable
+ (public_name frama-c-hdrck)
+ (name hdrck)
+ (modules hdrck)
+ (libraries unix str)
+)

@@ -338,7 +338,7 @@ let check_spec_discrepancies
       ) specs ;
   if !n > 0 then begin
     error ~exit_value:4 "@[<v 2>%a%d / %d files with bad headers@]@."
-      (fun ppf l ->
+      (fun _ppf l ->
          List.iter
            (fun (file, hdr_type) ->
               error_fmt "%s : header differs from spec %s@."
@@ -365,7 +365,7 @@ let check_forbidden_headers (forbidden_headers:StringSet.t) header_specification
       distributed_files;
     if !forbidden <> [] then
       error ~exit_value:4 "@[<v 2>%a%d / %d files with bad headers@]@."
-        (fun ppf l ->
+        (fun _ppf l ->
            List.iter
              (fun (file, hdr_type) ->
                 error_fmt "%s : forbidden header %s@."
