@@ -67,19 +67,23 @@ let feed_bytes { sock ; rcv ; brcv } =
 
 let send_bytes { sock ; snd ; bsnd } =
   try
-    (* snd buffer is only used locally *)
-    let n = Buffer.length bsnd in
-    if n > 0 then
-      let s = Bytes.length snd in
-      let w = min n s in
-      Buffer.blit bsnd 0 snd 0 w ;
-      let r = Unix.single_write sock snd 0 w in
-      if r > 0 then
-        (* TODO[LC]: inefficient move. Requires a ring-buffer. *)
-        let rest = Buffer.sub bsnd r (n-r) in
-        Buffer.reset bsnd ;
-        Buffer.add_string bsnd rest
-  with Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> ()
+    while true do
+      (* snd buffer is only used locally *)
+      let n = Buffer.length bsnd in
+      if n > 0 then
+        let s = Bytes.length snd in
+        let w = min n s in
+        Buffer.blit bsnd 0 snd 0 w ;
+        let r = Unix.single_write sock snd 0 w in
+        if r > 0 then
+          (* TODO[LC]: inefficient move. Requires a ring-buffer. *)
+          let rest = Buffer.sub bsnd r (n-r) in
+          Buffer.reset bsnd ;
+          Buffer.add_string bsnd rest
+        else raise Exit
+      else raise Exit
+    done
+  with Exit | Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Data Chunks Encoding                                               --- *)
