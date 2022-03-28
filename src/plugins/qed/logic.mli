@@ -330,6 +330,9 @@ sig
   val e_forall : var list -> term -> term
   val e_exists : var list -> term -> term
   val e_lambda : var list -> term -> term
+  val e_close_forall : term -> term
+  val e_close_exists : term -> term
+  val e_close_lambda : term -> term
   val e_apply : term -> term list -> term
 
   val e_bind : binder -> var -> term -> term
