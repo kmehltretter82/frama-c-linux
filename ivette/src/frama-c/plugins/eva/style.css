@@ -134,7 +134,7 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-table {
-  border-left: 0px;
+  border: 0px;
   border-spacing: 0px;
 }
 
@@ -145,16 +145,12 @@
 }
 
 .eva-table tr th {
-  border-left: thin solid var(--border);
+  border-right: thin solid var(--border);
   border-top: thin solid var(--border);
   border-bottom: thin solid var(--border);
   height: 22px;
   min-height: 22px;
   max-height: 22px;
-}
-
-.eva-table tr th:last-child {
-  border-right: thin solid var(--border);
 }
 
 .eva-table tr:nth-child(2n) {
@@ -167,10 +163,6 @@
 
 .eva-table-alarm {
   border-bottom: thin solid var(--border);
-}
-
-.eva-table tr td:last-child {
-  border-right: thin solid var(--border);
 }
 
 .eva-table-container {
@@ -230,6 +222,7 @@
   text-align: center;
   color: var(--info-text);
   border-left: thin solid var(--border);
+  border-right: thin solid var(--border);
   border-bottom: thin solid var(--border);
   padding: 2px;
 }
@@ -246,7 +239,7 @@ tr:first-of-type > .eva-table-callsite-box {
   position: relative;
   border: 0px;
   padding: 2px 3px 2px 3px;
-  border-left: thin solid var(--border);
+  border-right: thin solid var(--border);
   border-bottom: thin solid var(--border);
   min-width: 144px;
   font-family: Andale Mono, monospace;
@@ -272,6 +265,22 @@ tr:first-of-type > .eva-table-callsite-box {
 .eva-table-descr-sticky {
   position: sticky;
   top: 22px;
+  z-index: +1;
+}
+
+.eva-table-callsite-box.eva-table-descr-sticky {
+  left: 0px;
+  z-index: +2;
+}
+
+.eva-table-callsite-box.eva-table-header-sticky {
+  left: 0px;
+  z-index: +2;
+}
+
+.eva-table-value-sticky {
+  position: sticky;
+  left: 0px;
   z-index: +1;
 }
 

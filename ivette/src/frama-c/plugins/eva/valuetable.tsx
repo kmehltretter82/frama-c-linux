@@ -104,22 +104,25 @@ function makeStackTitle(calls: Callsite[]): string {
 
 async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
   const { callstack, index, getCallsites, selectedClass = '' } = props;
-  const stickyHd = callstack === 'Header' ? 'eva-table-header-sticky' : '';
-  const stickyDc = callstack === 'Descr' ? 'eva-table-descr-sticky' : '';
-  const sticky = classes(stickyHd, stickyDc);
-  const cl = classes('eva-table-callsite-box', selectedClass, sticky);
-  function Res(props: { text: string, title: string }): JSX.Element {
-    return <td className={cl} title={props.title}>{props.text}</td>;
-  }
+  const baseClasses = classes('eva-table-callsite-box', selectedClass);
   switch (callstack) {
-    case 'Header': return <Res text='#' title='Corresponding callstack'/>;
-    case 'Descr': return <Res text='D' title='Column description'/>;
+    case 'Header': {
+      const cls = classes(baseClasses, 'eva-table-header-sticky');
+      const title = 'Corresponding callstack';
+      return <td className={cls} title={title}>{'#'}</td>;
+    }
+    case 'Descr': {
+      const cls = classes(baseClasses, 'eva-table-descr-sticky');
+      const title = 'Column description';
+      return <td className={cls} title={title}>{'D'}</td>;
+    }
     default: {
+      const cls = classes(baseClasses, 'eva-table-value-sticky');
       const callsites = await getCallsites(callstack);
       const isSummary = callstack === 'Summary';
       const infos = isSummary ? 'Summary' : makeStackTitle(callsites);
       const text = isSummary ? '∑' : (index ? index.toString() : '0');
-      return <Res text={text} title={infos}/>;
+      return <td className={cls} title={infos}>{text}</td>;
     }
   }
 }
@@ -579,7 +582,8 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     const call = await CallsiteCell({ index, callstack, ...callProps });
     const values = await Promise.all(builders.map((b) => b(callstack)));
     return (
-      <tr key={callstack} onClick={onClick(callstack)}>{call}
+      <tr key={callstack} onClick={onClick(callstack)}>
+        {call}
         {React.Children.toArray(values)}
       </tr>
     );
@@ -596,6 +600,12 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
       const start = Math.min(startingCallstack + 10, maxStart);
       changeStartingCallstack(start);
     }
+  };
+
+  const onWheel = (event: React.WheelEvent): void => {
+    const tgt = event.currentTarget;
+    const left = event.deltaY * tgt.scrollWidth / tgt.scrollHeight;
+    if (event.ctrlKey) tgt.scrollLeft += left;
   };
 
   return (
@@ -623,7 +633,11 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
           onClick={close}
         />
       </Hpack>
-      <div onScroll={onScroll} className='eva-table-container'>
+      <div
+        onWheel={onWheel}
+        onScroll={onScroll}
+        className='eva-table-container'
+      >
         <table className='eva-table' style={{ display: displayTable }}>
           <tbody>
             <tr>
