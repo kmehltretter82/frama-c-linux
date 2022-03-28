@@ -198,6 +198,8 @@ function _status(newStatus: Status): void {
   }
 }
 
+const _update: () => void = debounce(() => STATUS.emit(status), 100);
+
 // --------------------------------------------------------------------------
 // --- Server Control (Start)
 // --------------------------------------------------------------------------
@@ -737,6 +739,7 @@ export function send<In, Out>(
     pollingTimer = setInterval(() => {
       client.poll();
     }, polling);
+    _update();
   }
   return response;
 }
@@ -749,6 +752,7 @@ function _resolved(id: string): void {
   pending.delete(id);
   if (pending.size === 0) {
     rqCount = 0;
+    _update();
     if (pollingTimer) {
       clearInterval(pollingTimer);
       pollingTimer = undefined;

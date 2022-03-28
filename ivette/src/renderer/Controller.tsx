@@ -385,7 +385,8 @@ export const Status = () => {
       running = 'BOOT';
       break;
     case Server.Status.ON:
-      led = pending > 0 ? 'positive' : 'active';
+      led = 'active';
+      blink = pending > 0;
       running = 'ON';
       break;
     case Server.Status.HALTING:
