@@ -380,7 +380,18 @@ struct
           in
           match dir with
           | None ->
-            L.abort "no directory %s exist in %s directories" s O.option_name
+            let pp_path fmt (path:Dir_name.t) =
+              Format.pp_print_string fmt (path :> string)
+            in
+            let pp_subdir fmt = function
+              | "." -> ()
+              | s -> Format.fprintf fmt " sub-directory %s in " s
+            in
+            L.abort "there is no%a %s directories: %a"
+              pp_subdir s
+              O.option_name
+              (Format.pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt ", ") pp_path)
+              (base_dirs ())
           | Some d -> d
         end
       | _ ->
@@ -423,7 +434,7 @@ struct
       | `Must_exist ->
         if Sys.file_exists (filepath :> string)
         then filepath
-        else L.abort "no file %s exist in %s directories" s O.option_name
+        else L.abort "there is no file %s in %s directories" (filepath :> string) O.option_name
       | `Normalize_only ->
         filepath
       | `Create_path ->
