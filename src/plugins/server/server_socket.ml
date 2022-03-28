@@ -118,7 +118,6 @@ let write_data ch data =
     in
     Buffer.add_string ch.bsnd hex ;
     Buffer.add_string ch.bsnd data ;
-    send_bytes ch ;
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -190,7 +189,8 @@ let callback ch rs =
        | data -> write_data ch data
        | exception err ->
          Senv.debug "Socket: encoding error %S@." (Printexc.to_string err)
-    ) rs
+    ) rs ;
+  send_bytes ch
 
 let commands ch =
   begin
