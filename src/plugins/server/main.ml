@@ -25,6 +25,7 @@
 (* -------------------------------------------------------------------------- *)
 
 module Senv = Server_parameters
+module Signals = Set.Make(String)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)
@@ -87,8 +88,6 @@ type 'a process = {
   mutable killed : bool ;
 }
 
-module Sigs = Set.Make(String)
-
 (* Server with request identifier (RqId) of type ['a] *)
 type 'a server = {
   pretty : Format.formatter -> 'a -> unit ; (* RqId printer *)
@@ -98,8 +97,8 @@ type 'a server = {
   q_in : 'a process Queue.t ; (* queue of pending jobs *)
   q_out : 'a response Queue.t ; (* queue of pending responses *)
   mutable daemon : Db.daemon option ; (* Db.yield daemon *)
-  mutable s_active : Sigs.t ; (* signals the client is listening to *)
-  mutable s_signal : Sigs.t ; (* emitted signals since last synchro *)
+  mutable s_active : Signals.t ; (* signals the client is listening to *)
+  mutable s_signal : Signals.t ; (* emitted signals since last synchro *)
   mutable shutdown : bool ; (* server has been asked to shut down *)
   mutable running : 'a process option ; (* currently running EXEC request *)
 }
@@ -221,12 +220,12 @@ let process_request (server : 'a server) (request : 'a request) : unit =
     end
   | `SigOn sg ->
     begin
-      server.s_active <- Sigs.add sg server.s_active ;
+      server.s_active <- Signals.add sg server.s_active ;
       notify sg true ;
     end
   | `SigOff sg ->
     begin
-      server.s_active <- Sigs.remove sg server.s_active ;
+      server.s_active <- Signals.remove sg server.s_active ;
       notify sg false ;
     end
   | `Kill id ->
@@ -269,7 +268,7 @@ let communicate server =
     let pool = ref [] in
     Queue.iter (fun r -> pool := r :: !pool) server.q_out ;
     Queue.clear server.q_out ;
-    server.s_signal <- Sigs.empty ;
+    server.s_signal <- Signals.empty ;
     message.callback !pool ;
     Option.iter raise error ;
     true
@@ -283,9 +282,9 @@ let do_yield server () =
   ignore ( communicate server )
 
 let do_signal server s =
-  if Sigs.mem s server.s_active && not (Sigs.mem s server.s_signal) then
+  if Signals.mem s server.s_active && not (Signals.mem s server.s_signal) then
     begin
-      server.s_signal <- Sigs.add s server.s_signal ;
+      server.s_signal <- Signals.add s server.s_signal ;
       Queue.push (`Signal s) server.q_out ;
     end
 
@@ -331,8 +330,8 @@ let create ~pretty ?(equal=(=)) ~fetch () =
     fetch ; polling ; equal ; pretty ;
     q_in = Queue.create () ;
     q_out = Queue.create () ;
-    s_active = Sigs.empty ;
-    s_signal = Sigs.empty ;
+    s_active = Signals.empty ;
+    s_signal = Signals.empty ;
     daemon = None ;
     running = None ;
     shutdown = false ;
