@@ -121,7 +121,7 @@ const pending = new Map<string, PendingRequest>();
 let process: ChildProcess | undefined;
 
 /** Polling timeout when server is busy. */
-const pollingTimeout = 10;
+const pollingTimeout = 50;
 let pollingTimer: NodeJS.Timeout | undefined;
 
 /** Killing timeout and timer for server process hard kill. */
