@@ -88,19 +88,24 @@ type 'a process = {
   mutable killed : bool ;
 }
 
+type 'a running =
+  | Idle (* Server is waiting for requests *)
+  | CmdLine (* Frama-C command line is running *)
+  | ExecRequest of 'a process (* Running EXEC process *)
+
 (* Server with request identifier (RqId) of type ['a] *)
 type 'a server = {
   pretty : Format.formatter -> 'a -> unit ; (* RqId printer *)
   equal : 'a -> 'a -> bool ; (* RqId equality *)
   polling : int ; (* server polling, in milliseconds *)
   fetch : unit -> 'a message option ; (* fetch some client message *)
-  q_in : 'a process Queue.t ; (* queue of pending jobs *)
+  q_in : 'a process Queue.t ; (* queue of pending `EXEC and `GET jobs *)
   q_out : 'a response Queue.t ; (* queue of pending responses *)
   mutable daemon : Db.daemon option ; (* Db.yield daemon *)
   mutable s_active : Signals.t ; (* signals the client is listening to *)
   mutable s_signal : Signals.t ; (* emitted signals since last synchro *)
   mutable shutdown : bool ; (* server has been asked to shut down *)
-  mutable running : 'a process option ; (* currently running EXEC request *)
+  mutable running : 'a running ; (* server running state *)
 }
 
 exception Killed
@@ -133,7 +138,15 @@ let pp_response pp fmt (r : _ response) =
   | `Killed id -> Format.fprintf fmt "Killed %a" pp id
   | `Signal sg -> Format.fprintf fmt "Signal %S" sg
   | `Data(id,data) ->
-    Format.fprintf fmt "@[<hov 2>Replies [%a]@ %a@]" pp id Data.pretty data
+    if Senv.debug_atleast 3 then
+      Format.fprintf fmt "@[<hov 2>Response %a:@ %a@]" pp id Data.pretty data
+    else
+      Format.fprintf fmt "Replied %a" pp id
+
+let pp_running pp fmt = function
+  | Idle -> Format.pp_print_string fmt "Idle"
+  | CmdLine -> Format.pp_print_string fmt "CmdLine"
+  | ExecRequest { id } -> Format.fprintf fmt "ExectRequest [%a]" pp id
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request Handling                                                   --- *)
@@ -202,9 +215,21 @@ let emit s = !emitter s
 (* --- Processing Requests                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let raise_if_killed = function { killed } -> if killed then raise Killed
-let kill_exec e = e.killed <- true
-let kill_request eq id e = if eq id e.id then e.killed <- true
+let raise_if_killed = function
+  | Idle -> ()
+  | CmdLine -> ()
+  | ExecRequest { killed } -> if killed then raise Killed
+
+let kill_running ?id s =
+  match s.running with
+  | Idle -> ()
+  | CmdLine -> if id = None then Db.cancel ()
+  | ExecRequest p ->
+    match id with
+    | None -> p.killed <- true
+    | Some id -> if s.equal id p.id then p.killed <- true
+
+let kill_request eq id p = if eq id p.id then p.killed <- true
 
 let process_request (server : 'a server) (request : 'a request) : unit =
   if Senv.debug_atleast 1 && (Senv.debug_atleast 3 || request <> `Poll) then
@@ -213,7 +238,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
   | `Poll -> ()
   | `Shutdown ->
     begin
-      Option.iter kill_exec server.running ;
+      kill_running server ;
       Queue.clear server.q_in ;
       Queue.clear server.q_out ;
       server.shutdown <- true ;
@@ -230,9 +255,9 @@ let process_request (server : 'a server) (request : 'a request) : unit =
     end
   | `Kill id ->
     begin
+      kill_running ~id server ;
       let set_killed = kill_request server.equal id in
       Queue.iter set_killed server.q_in ;
-      Option.iter set_killed server.running ;
     end
   | `Request(id,request,data) ->
     begin
@@ -278,7 +303,7 @@ let communicate server =
 (* -------------------------------------------------------------------------- *)
 
 let do_yield server () =
-  Option.iter raise_if_killed server.running ;
+  raise_if_killed server.running ;
   ignore ( communicate server )
 
 let do_signal server s =
@@ -301,14 +326,14 @@ let rec fetch_exec q =
 let process server =
   match fetch_exec server.q_in with
   | None -> communicate server
-  | Some proc ->
-    server.running <- Some proc ;
+  | Some exec ->
+    server.running <- ExecRequest exec ;
     try
-      execute server ~yield:(do_yield server) proc ;
-      server.running <- None ;
+      execute server ~yield:(do_yield server) exec ;
+      server.running <- Idle ;
       true
     with exn ->
-      server.running <- None ;
+      server.running <- Idle ;
       raise exn
 
 (* -------------------------------------------------------------------------- *)
@@ -333,7 +358,7 @@ let create ~pretty ?(equal=(=)) ~fetch () =
     s_active = Signals.empty ;
     s_signal = Signals.empty ;
     daemon = None ;
-    running = None ;
+    running = Idle ;
     shutdown = false ;
   }
 
@@ -341,49 +366,69 @@ let create ~pretty ?(equal=(=)) ~fetch () =
 (* --- Start / Stop                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* public API ; shall be scheduled at command line main stage *)
 let start server =
-  emitter := do_signal server ;
-  match server.daemon with
-  | Some _ -> ()
-  | None ->
-    begin
-      Senv.feedback "Server enabled." ;
-      let daemon =
-        Db.on_progress
-          ~debounced:server.polling
-          ?on_delayed:(delayed "command line")
-          (do_yield server)
-      in
-      server.daemon <- Some daemon ;
-      set_active true ;
-    end
+  begin
+    Senv.debug ~level:2 "Server Start (was %a)"
+      (pp_running server.pretty) server.running ;
+    server.running <- CmdLine ;
+    emitter := do_signal server ;
+    match server.daemon with
+    | Some _ -> ()
+    | None ->
+      begin
+        Senv.feedback "Server enabled." ;
+        let daemon =
+          Db.on_progress
+            ~debounced:server.polling
+            ?on_delayed:(delayed "command line")
+            (do_yield server)
+        in
+        server.daemon <- Some daemon ;
+        set_active true ;
+      end
+  end
 
+(* public API ; can be invoked to force server shutdown *)
 let stop server =
-  emitter := nop ;
-  match server.daemon with
-  | None -> ()
-  | Some daemon ->
-    begin
-      Senv.feedback "Server disabled." ;
-      server.daemon <- None ;
-      Db.off_progress daemon ;
-      set_active false ;
-    end
+  begin
+    Senv.debug ~level:2 "Server Stop (was %a)"
+      (pp_running server.pretty) server.running ;
+    kill_running server ;
+    emitter := nop ;
+    match server.daemon with
+    | None -> ()
+    | Some daemon ->
+      begin
+        Senv.feedback "Server disabled." ;
+        server.daemon <- None ;
+        server.running <- Idle ;
+        Db.off_progress daemon ;
+        set_active false ;
+      end
+  end
 
+(* internal only *)
 let foreground server =
-  emitter := do_signal server ;
-  match server.daemon with
-  | None -> ()
-  | Some daemon ->
-    begin
-      server.daemon <- None ;
-      Db.off_progress daemon ;
-    end
+  begin
+    Senv.debug ~level:2 "Server Foreground (was %a)"
+      (pp_running server.pretty) server.running ;
+    server.running <- Idle ;
+    emitter := do_signal server ;
+    match server.daemon with
+    | None -> ()
+    | Some daemon ->
+      begin
+        server.daemon <- None ;
+        Db.off_progress daemon ;
+      end
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Main Loop                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* public API ; shall be invoked at command line normal exit *)
 let run server =
   try
     ( (* TODO: catch-break to be removed once Why3 signal handler is fixed *)
