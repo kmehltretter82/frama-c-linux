@@ -20,13 +20,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Top =
+struct
+  [@@@warning "-32"]
+
+  let zip x y =
+    match x, y with
+    | `Top, _ | _, `Top -> `Top
+    | `Value x, `Value y -> `Value (x,y)
+
+  let (>>-) t f = match t with
+    | `Top  -> `Top
+    | `Value t -> f t
+
+  let (>>-:) t f = match t with
+    | `Top  -> `Top
+    | `Value t -> `Value (f t)
+
+  let (let+) = (>>-:)
+  let (let*) = (>>-)
+end
+
+open Top
+
 module type T =
 sig
   type t
 
   val pretty : Format.formatter -> t -> unit
   val append : t -> t -> t
-  val add_index : (Cil_types.exp -> Int_val.t) -> t -> Cil_types.exp -> t
   val join : t -> t -> t
   val of_cil_offset : (Cil_types.exp -> Int_val.t) -> Cil_types.typ -> Cil_types.offset -> t
   val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t
@@ -66,23 +88,29 @@ struct
 
   let add_index oracle base exp =
     let rec aux = function
-      | NoOffset _ -> assert false
-      | Field (fi, s) -> Field (fi, aux s)
+      | NoOffset _ as o ->
+        let idx = oracle exp in
+        if Int_val.is_zero idx
+        then `Value o
+        else `Top (* Can't add index if not an array *)
+      | Field (fi, s) ->
+        let+ s = aux s in
+        Field (fi, s)
       | Index (e, i, t, (NoOffset _ as s)) ->
-        begin
-          let idx' = Int_val.add i (oracle exp) in
-          let loc = Cil_datatype.Location.unknown in
-          let e = match e with (* If i is singleton, we can use this as the index expression *)
-            | None when Int_val.is_singleton i ->
-              let loc = Cil_datatype.Location.unknown in
-              Some (Cil.kinteger64 ~loc (Int_val.project_int i))
-            | e -> e
-          in
-          let e' = Option.map (Fun.flip (Cil.mkBinOp ~loc Cil_types.PlusA) exp) e in
-          (* TODO: is idx inside bounds ? *)
-          Index (e', idx', t, s)
-        end
-      | Index (e, i, t, s) -> Index (e, i, t, aux s)
+        let idx' = Int_val.add i (oracle exp) in
+        let loc = Cil_datatype.Location.unknown in
+        let e = match e with (* If i is singleton, we can use this as the index expression *)
+          | None when Int_val.is_singleton i ->
+            let loc = Cil_datatype.Location.unknown in
+            Some (Cil.kinteger64 ~loc (Int_val.project_int i))
+          | e -> e
+        in
+        let e' = Option.map (Fun.flip (Cil.mkBinOp ~loc Cil_types.PlusA) exp) e in
+        (* TODO: is idx inside bounds ? *)
+        `Value (Index (e', idx', t, s))
+      | Index (e, i, t, s) ->
+        let+ s = aux s in
+        Index (e, i, t, s)
     in
     aux base
 
@@ -269,9 +297,8 @@ struct
     | `Value o1, `Value o2 -> `Value (TypedOffset.append o1 o2)
 
   let add_index oracle base exp =
-    match base with
-    | `Top -> `Top
-    | `Value base -> `Value (TypedOffset.add_index oracle base exp)
+    let* base = base in
+    TypedOffset.add_index oracle base exp
 
   let join o1 o2 =
     match o1, o2 with
