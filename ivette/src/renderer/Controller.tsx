@@ -45,14 +45,19 @@ import * as Server from 'frama-c/server';
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-const quoteRe = new RegExp('^[-./:a-zA-Z0-9]+$');
-const quote = (s: string) => (quoteRe.test(s) ? s : `"${s}"`);
+const quoteRe = new RegExp('^[-_./:a-zA-Z0-9]+$');
+const quote = (s: string): string =>
+  (quoteRe.test(s) ? s : `"${s}"`);
+
+const unquoteRe = new RegExp('^".*"$');
+const unquote = (s: string): string =>
+  (unquoteRe.test(s) ? s.substring(1, s.length - 1) : s);
 
 function dumpServerConfig(sc: Server.Configuration): string {
   let buffer = '';
   const { cwd, command, sockaddr, params } = sc;
   if (cwd) buffer += `--cwd ${quote(cwd)}\n`;
-  if (command) buffer += `--command ${command}\n`;
+  if (command) buffer += `--command ${quote(command)}\n`;
   if (sockaddr) buffer += `--socket ${sockaddr}\n`;
   if (params) {
     params.forEach((v: string, i: number) => {
@@ -73,17 +78,17 @@ function buildServerConfig(argv: string[], cwd?: string) {
   const params = [];
   let command;
   let sockaddr;
-  let cwdir = cwd;
+  let cwdir = cwd ? unquote(cwd) : undefined;
   for (let k = 0; k < (argv ? argv.length : 0); k++) {
     const v = argv[k];
     switch (v) {
       case '--cwd':
         k += 1;
-        cwdir = argv[k];
+        cwdir = unquote(argv[k]);
         break;
       case '--command':
         k += 1;
-        command = argv[k];
+        command = unquote(argv[k]);
         break;
       case '--socket':
         k += 1;
@@ -220,8 +225,10 @@ const RenderConsole = () => {
   const doReload = () => {
     const cfg = Server.getConfig();
     const hst = insertConfig(history, cfg);
+    const cmd = hst[0];
     scratch.current = hst.slice();
-    editor.setValue(hst[0]);
+    editor.setValue(cmd);
+    setEmpty(cmd === '');
     setHistory(hst);
     setCursor(0);
   };
@@ -251,7 +258,9 @@ const RenderConsole = () => {
         const cmd = editor.getValue();
         const pad = scratch.current;
         pad[cursor] = cmd;
-        editor.setValue(pad[target]);
+        const cmd2 = pad[target];
+        editor.setValue(cmd2);
+        setEmpty(cmd2 === '');
         setCursor(target);
       };
     return undefined;
