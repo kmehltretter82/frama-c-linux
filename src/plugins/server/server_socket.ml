@@ -174,6 +174,8 @@ let encode (resp : string Main.response) : string =
     | `Signal id -> `Assoc [
         "res", `String "SIGNAL" ;
         "id", `String id ]
+    | `CmdLineOn -> `String "CMDLINEON"
+    | `CmdLineOff -> `String "CMDLINEOFF"
   in Yojson.Basic.to_string ~std:false js
 
 let parse ch =

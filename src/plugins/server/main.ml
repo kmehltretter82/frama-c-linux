@@ -70,6 +70,8 @@ type 'a response = [
   | `Killed of 'a
   | `Signal of string
   | `Rejected of 'a
+  | `CmdLineOn
+  | `CmdLineOff
 ]
 
 type 'a message = {
@@ -137,6 +139,8 @@ let pp_response pp fmt (r : _ response) =
   | `Rejected id -> Format.fprintf fmt "Rejected %a" pp id
   | `Killed id -> Format.fprintf fmt "Killed %a" pp id
   | `Signal sg -> Format.fprintf fmt "Signal %S" sg
+  | `CmdLineOn -> Format.pp_print_string fmt "CmdLine On"
+  | `CmdLineOff -> Format.pp_print_string fmt "CmdLine Off"
   | `Data(id,data) ->
     if Senv.debug_atleast 3 then
       Format.fprintf fmt "@[<hov 2>Response %a:@ %a@]" pp id Data.pretty data
@@ -372,6 +376,7 @@ let start server =
     Senv.debug ~level:2 "Server Start (was %a)"
       (pp_running server.pretty) server.running ;
     server.running <- CmdLine ;
+    Queue.push `CmdLineOn server.q_out ;
     emitter := do_signal server ;
     match server.daemon with
     | Some _ -> ()
@@ -408,12 +413,13 @@ let stop server =
       end
   end
 
-(* internal only *)
+(* internal only ; invoked by run when command line is finished *)
 let foreground server =
   begin
     Senv.debug ~level:2 "Server Foreground (was %a)"
       (pp_running server.pretty) server.running ;
     server.running <- Idle ;
+    Queue.push `CmdLineOff server.q_out ;
     emitter := do_signal server ;
     match server.daemon with
     | None -> ()

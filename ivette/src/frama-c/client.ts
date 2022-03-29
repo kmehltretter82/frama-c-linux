@@ -44,7 +44,7 @@ export abstract class Client {
   /** Signal ON */
   abstract sigOn(id: string): void;
 
-  /** Signal ON */
+  /** Signal OFF */
   abstract sigOff(id: string): void;
 
   /** Kill Request */
@@ -141,6 +141,20 @@ export abstract class Client {
   /** @internal */
   emitConnect(err?: Error): void {
     this.events.emit('CONNECT', err);
+  }
+
+  // --------------------------------------------------------------------------
+  // --- CMDLINE Event
+  // --------------------------------------------------------------------------
+
+  /** Signal callback */
+  onCmdLine(callback: (cmd: boolean) => void): void {
+    this.events.on('CMDLINE', callback);
+  }
+
+  /** @internal */
+  emitCmdLine(cmd: boolean): void {
+    this.events.emit('CMDLINE', cmd);
   }
 
 }

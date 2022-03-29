@@ -50,8 +50,10 @@ export enum Status {
   OFF = 'OFF',
   /** Server is starting, but not on yet. */
   STARTING = 'STARTING',
-  /** Server is on. */
+  /** Server is running. */
   ON = 'ON',
+  /** Server is running command line. */
+  CMD = 'CMD',
   /** Server is halting, but not off yet. */
   HALTING = 'HALTING',
   /** Server is restarting. */
@@ -76,7 +78,7 @@ const STATUS = new Dome.Event<Status>('frama-c.server.status');
 /**
  *  Server is actually started and running.
 
- *  This event is emitted when ther server _enters_ the `ON` state.
+ *  This event is emitted when ther server _enters_ the `ON` or `CMD` state.
  *  The server is now ready to handle requests.
  */
 const READY = new Dome.Event('frama-c.server.ready');
@@ -84,7 +86,7 @@ const READY = new Dome.Event('frama-c.server.ready');
 /**
  *  Server Status Notification Event
 
- *  This event is emitted when ther server _leaves_ the `ON` state.
+ *  This event is emitted when ther server _leaves_ the `ON` or `CMD` state.
  *  The server is no more able to handle requests until restart.
  */
 const SHUTDOWN = new Dome.Event('frama-c.server.shutdown');
@@ -154,11 +156,17 @@ export function useStatus(): Status {
   return status;
 }
 
+const running = (st: Status): boolean =>
+  (st === Status.ON || st === Status.CMD);
+
 /**
  *  Whether the server is running and ready to handle requests.
- *  @return {boolean} Whether server stage is [[ON]].
+ *  @return {boolean} Whether server is in running stage,
+ *  defined by status `ON` or `CMD`.
  */
-export function isRunning(): boolean { return status === Status.ON; }
+export function isRunning(): boolean {
+  return running(status);
+}
 
 /**
  *  Number of requests still pending.
@@ -170,7 +178,7 @@ export function getPending(): number {
 
 /**
  *  Register callback on `READY` event.
- *  @param {function} callback Invoked when the server enters [[ON]] stage.
+ *  @param {function} callback Invoked when the server enters running stage.
  */
 export function onReady(callback: () => void): void {
   READY.on(callback);
@@ -178,7 +186,7 @@ export function onReady(callback: () => void): void {
 
 /**
  *  Register callback on `SHUTDOWN` event.
- *  @param {function} callback Invoked when the server leaves [[ON]] stage.
+ *  @param {function} callback Invoked when the server leaves running stage.
  */
 export function onShutdown(callback: () => void): void {
   SHUTDOWN.on(callback);
@@ -193,8 +201,10 @@ function _status(newStatus: Status): void {
     const oldStatus = status;
     status = newStatus;
     STATUS.emit(newStatus);
-    if (oldStatus === Status.ON) SHUTDOWN.emit();
-    if (newStatus === Status.ON) READY.emit();
+    const oldRun = running(oldStatus);
+    const newRun = running(newStatus);
+    if (oldRun && !newRun) SHUTDOWN.emit();
+    if (!oldRun && newRun) READY.emit();
   }
 }
 
@@ -228,6 +238,7 @@ export async function start(): Promise<void> {
       _status(Status.RESTARTING);
       return;
     case Status.ON:
+    case Status.CMD:
     case Status.STARTING:
       return;
     default:
@@ -254,6 +265,7 @@ export function stop(): void {
       _kill();
       return;
     case Status.ON:
+    case Status.CMD:
     case Status.HALTING:
       _status(Status.HALTING);
       _shutdown();
@@ -285,6 +297,7 @@ export function stop(): void {
 export function kill(): void {
   switch (status) {
     case Status.ON:
+    case Status.CMD:
     case Status.HALTING:
     case Status.STARTING:
     case Status.RESTARTING:
@@ -320,6 +333,7 @@ export function restart(): void {
       start();
       return;
     case Status.ON:
+    case Status.CMD:
       _status(Status.RESTARTING);
       _shutdown();
       return;
@@ -480,6 +494,26 @@ async function _launch(): Promise<void> {
 }
 
 // --------------------------------------------------------------------------
+// --- Polling Management
+// --------------------------------------------------------------------------
+
+function _startPolling(): void {
+  if (!pollingTimer) {
+    const polling = (config && config.polling) || pollingTimeout;
+    pollingTimer = setInterval(() => {
+      client.poll();
+    }, polling);
+  }
+}
+
+function _stopPolling(): void {
+  if (pollingTimer) {
+    clearTimeout(pollingTimer);
+    pollingTimer = undefined;
+  }
+}
+
+// --------------------------------------------------------------------------
 // --- Low-level Killing
 // --------------------------------------------------------------------------
 
@@ -487,10 +521,7 @@ function _clear(): void {
   rqCount = 0;
   pending.forEach((p: PendingRequest) => p.reject('clear'));
   pending.clear();
-  if (pollingTimer) {
-    clearTimeout(pollingTimer);
-    pollingTimer = undefined;
-  }
+  _stopPolling();
   if (killingTimer) {
     clearTimeout(killingTimer);
     killingTimer = undefined;
@@ -734,13 +765,8 @@ export function send<In, Out>(
   });
   response.kill = () => pending.get(rid)?.reject('kill');
   client.send(request.kind, rid, request.name, param as unknown as Json.json);
-  if (!pollingTimer) {
-    const polling = (config && config.polling) || pollingTimeout;
-    pollingTimer = setInterval(() => {
-      client.poll();
-    }, polling);
-    _update();
-  }
+  _startPolling();
+  _update();
   return response;
 }
 
@@ -750,21 +776,21 @@ export function send<In, Out>(
 
 function _resolved(id: string): void {
   pending.delete(id);
-  if (pending.size === 0) {
+  if (pending.size === 0 && status === Status.ON) {
     rqCount = 0;
+    _stopPolling();
     _update();
-    if (pollingTimer) {
-      clearInterval(pollingTimer);
-      pollingTimer = undefined;
-    }
   }
 }
 
 client.onConnect((err?: Error) => {
   if (err) {
     _status(Status.FAILURE);
+    _stopPolling();
+    _shutdown();
   } else {
-    _status(Status.ON);
+    _status(Status.CMD);
+    _startPolling();
   }
 });
 
@@ -802,6 +828,14 @@ client.onError((id: string, msg: string) => {
 
 client.onSignal((id: string) => {
   _signal(id).emit();
+});
+
+client.onCmdLine((cmd: boolean) => {
+  _status(cmd ? Status.CMD : Status.ON);
+  if (cmd)
+    _startPolling();
+  else
+    _stopPolling();
 });
 
 // --------------------------------------------------------------------------

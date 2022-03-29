@@ -68,6 +68,8 @@ type 'a response = [
   | `Killed of 'a
   | `Rejected of 'a
   | `Signal of string
+  | `CmdLineOn
+  | `CmdLineOff
 ]
 
 (** A paired request-response message.

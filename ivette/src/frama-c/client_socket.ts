@@ -193,8 +193,14 @@ class SocketClient extends Client {
             default:
               D.warn('Unknown command', cmd);
           }
-        } else
-          D.warn('Misformed data', data);
+        } else {
+          switch (cmd) {
+            case 'CMDLINEON': this.emitCmdLine(true); break;
+            case 'CMDLINEOFF': this.emitCmdLine(false); break;
+            default:
+              D.warn('Misformed data', data);
+          }
+        }
       } catch (err) {
         D.warn('Misformed JSON', data, err);
       }

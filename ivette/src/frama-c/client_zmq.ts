@@ -190,6 +190,12 @@ class ZmqClient extends Client {
             D.error(`ZMQ Protocol Error: ${err}`);
           }
           break;
+        case 'CMDLINEON':
+          this.emitCmdLine(true);
+          break;
+        case 'CMDLINEOFF':
+          this.emitCmdLine(false);
+          break;
         default:
           D.error(`Unknown Response: ${cmd}`);
           return;
