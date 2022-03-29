@@ -54,6 +54,8 @@ An output message chunk consists of a single response encoded as follows:
 | `KILLED(id)` | `{ res = 'KILLED', id }` |
 | `REJECTED(id)` | `{ res = 'REJECTED', id }` |
 | `SIGNAL(id)`   | `{ res = 'SIGNAL', id }` |
+| `CMDLINEON` | `"CMDLINEON"` |
+| `CMDLINEOFF` | `"CMDLINEOFF"` |
 
 The special last case is used when the server is busy or died or some low-level
 error occurs.
