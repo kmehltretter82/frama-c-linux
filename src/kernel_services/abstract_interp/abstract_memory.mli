@@ -87,7 +87,7 @@ type strength = Strong | Weak | Reinforce (* update strength *)
 
 module TypedMemory (Config : Config) (Value : Value) :
 sig
-  type location = Abstract_offset.typed_offset
+  type location = Abstract_offset.t
   type value = Value.t
   type t
 

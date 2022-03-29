@@ -314,10 +314,10 @@ sig
   val join : oracle:bioracle -> t -> t -> t
   val smash : oracle:oracle -> t -> t -> t
   val read : oracle:oracle -> (Cil_types.typ -> t -> 'a) -> ('a -> 'a -> 'a) ->
-    Abstract_offset.typed_offset -> t -> 'a
+    Abstract_offset.t -> t -> 'a
   val write : oracle:oracle ->
     (weak:bool -> Cil_types.typ -> t -> t or_bottom) ->
-    weak:bool -> Abstract_offset.typed_offset -> t -> t or_bottom
+    weak:bool -> Abstract_offset.t -> t -> t or_bottom
   val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
     t -> t
   val add_segmentation_bounds : oracle:oracle -> typ:Cil_types.typ ->
@@ -1873,7 +1873,7 @@ struct
 
   include ProtoMemory
 
-  type location = Abstract_offset.typed_offset
+  type location = Abstract_offset.t
 
   let pretty = pretty_root
 

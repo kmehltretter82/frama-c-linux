@@ -20,28 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type T =
-sig
-  type t
-
-  val pretty : Format.formatter -> t -> unit
-  val append : t -> t -> t (* Does not check that the appened offset fits *)
-  val join : t -> t -> t
-  val of_cil_offset : (Cil_types.exp -> Int_val.t) -> Cil_types.typ -> Cil_types.offset -> t
-  val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t
-  val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t
-  val is_singleton : t -> bool
-  val references : t -> Cil_types.varinfo list (* variables referenced in the offset *)
-end
-
-type typed_offset =
+type t =
   | NoOffset of Cil_types.typ
-  | Index of Cil_types.exp option * Int_val.t * Cil_types.typ * typed_offset
-  | Field of Cil_types.fieldinfo * typed_offset
+  | Index of Cil_types.exp option * Int_val.t * Cil_types.typ * t
+  | Field of Cil_types.fieldinfo * t
 
-module TypedOffset : T with type t = typed_offset
-module TypedOffsetOrTop :
-sig
-  include T with type t = [ `Value of typed_offset | `Top ]
-  val add_index : (Cil_types.exp -> Int_val.t) -> t -> Cil_types.exp -> t
-end
+type 'a or_top = [`Value of 'a | `Top]
+
+val pretty : Format.formatter -> t -> unit
+
+val of_var_address : Cil_types.varinfo -> t
+val of_cil_offset : (Cil_types.exp -> Int_val.t) ->
+  Cil_types.typ -> Cil_types.offset -> t or_top
+val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t or_top
+val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t or_top
+
+val is_singleton : t -> bool
+val references : t -> Cil_types.varinfo list (* variables referenced in the offset *)
+
+val append : t -> t -> t (* Does not check that the appened offset fits *)
+val join : t -> t -> t or_top
+val add_index : (Cil_types.exp -> Int_val.t) -> t -> Cil_types.exp -> t or_top

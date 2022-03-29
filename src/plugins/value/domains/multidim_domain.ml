@@ -25,6 +25,32 @@ open Eval
 
 let dkey = Self.register_category "d-multidim"
 
+module Top =
+struct
+  [@@@warning "-32"]
+
+  let zip x y =
+    match x, y with
+    | `Top, _ | _, `Top -> `Top
+    | `Value x, `Value y -> `Value (x,y)
+
+  let (>>-) t f = match t with
+    | `Top  -> `Top
+    | `Value t -> f t
+
+  let (>>-:) t f = match t with
+    | `Top  -> `Top
+    | `Value t -> `Value (f t)
+
+  let (let+) = (>>-:)
+  let (and+) = zip
+let (let*) = (>>-)
+
+let of_option = function
+  | None -> `Top
+  | Some x -> `Value x
+end
+
 let map_to_singleton map =
   let aux base offset = function
     | None -> Some (base, offset)
@@ -121,12 +147,11 @@ let find_builtin =
 
 module Location =
 struct
-  open Abstract_offset
-
-  module Offset = TypedOffsetOrTop
+  module Offset = Abstract_offset
   module Map = Base.Base.Map
+  open Top
 
-  type offset = Offset.t
+  type offset = Offset.t or_top
   type base = Base.t
   type t = offset Map.t
 
@@ -145,19 +170,22 @@ struct
     match map_to_singleton map with
     | None -> false
     | Some (b,o) ->
-      not (Base.is_weak b) && Offset.is_singleton o
+      match o with
+      | `Top -> false
+      | `Value o -> not (Base.is_weak b) && Offset.is_singleton o
 
-  let references map =
+  let references (map : t) =
     let module Set = Cil_datatype.Varinfo.Set in
-    let add_refs _b o =
-      Set.union (Set.of_list (Offset.references o))
+    let add_refs _b o acc =
+      match o with
+      | `Top -> acc
+      | `Value o -> Set.union (Set.of_list (Offset.references o)) acc
     in
     Map.fold add_refs map Set.empty |> Set.to_seq |> List.of_seq
 
   let of_var (vi : Cil_types.varinfo) : t =
-    Map.singleton (Base.of_varinfo vi) (`Value (NoOffset vi.vtype))
+    Map.singleton (Base.of_varinfo vi) (`Value (Offset.of_var_address vi))
 
-  (* Raises Abstract_domain.{Error_top,Error_bottom} *)
   let of_lval oracle ((host,offset) as lval : Cil_types.lval) : t =
     let oracle' = convert_oracle oracle in
     let base_typ = Cil.typeOfLhost host in
@@ -176,16 +204,18 @@ struct
         | _ -> exp, None
       in
       let add base ival map =
-        let offset' : Offset.t =
+        let offset' : Offset.t or_top =
           match Base.typeof base with
           | None -> `Top
           | Some base_typ ->
             let typ = Cil.typeOf_pointed (Cil.typeOf exp) in
-            let base_offset = Offset.of_ival ~base_typ ~typ ival in
-            let base_offset = match index with
-              | None -> base_offset
-              | Some exp -> Offset.add_index oracle' base_offset exp
+            let* base_offset = Offset.of_ival ~base_typ ~typ ival in
+            let* base_offset = match index with
+              | None -> `Value (base_offset)
+              | Some exp ->
+                Offset.add_index oracle' base_offset exp
             in
+            let+ offset = offset in
             Offset.append base_offset offset
         in
         Map.add base offset' map
@@ -213,7 +243,7 @@ struct
     let add_base base map =
       (* Null base doesn't have a type ; use void instead *)
       let typ = Option.value ~default:Cil.voidType (Base.typeof base) in
-      Map.add base (`Value (NoOffset typ)) map
+      Map.add base (`Value (Offset.NoOffset typ)) map
     in
     Locations.Location_Bits.(fold_bases add_base loc'.loc empty)
 end
