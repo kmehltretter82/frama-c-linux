@@ -23,25 +23,68 @@
 (* Ocaml compiler incorrectly considers that module MemorySafe is unused and
    emits a warning *)
 [@@@warning "-60"]
+[@@@warning "-33"]
 
 exception Not_implemented
 
 open Abstract_offset
-open Bottom.Type
 
-let zip_bottom x y =
-  match x, y with
-  | `Bottom, _ | _, `Bottom -> `Bottom
-  | `Value x, `Value y -> `Value (x,y)
+module Bot =
+struct
+  [@@@warning "-32"]
 
-(* Applicative syntax *)
-let ( let+ ) : 'a or_bottom -> ('a -> 'b) -> 'b or_bottom = (>>-:)
-let ( and+ ): 'a or_bottom -> 'b or_bottom -> ('a * 'b) or_bottom = zip_bottom
+  include Bottom.Type
+  let zip x y =
+    match x, y with
+    | `Bottom, _ | _, `Bottom -> `Bottom
+    | `Value x, `Value y -> `Value (x,y)
 
+  (* Applicative syntax *)
+  let ( let+ ) = (>>-:)
+  let ( and+ ) = zip
 (* Monad syntax *)
-let ( let* ) : 'a or_bottom -> ('a -> 'b or_bottom) -> 'b or_bottom = (>>-)
-let ( and* ): 'a or_bottom -> 'b or_bottom -> ('a * 'b) or_bottom = zip_bottom
+let ( let* ) = (>>-)
+let ( and* ) = zip
+end
 
+module Top =
+struct
+  let zip x y =
+    match x, y with
+    | `Top, _ | _, `Top -> `Top
+    | `Value x, `Value y -> `Value (x,y)
+
+  let (>>-) t f = match t with
+    | `Top  -> `Top
+    | `Value t -> f t
+
+  let (>>-:) t f = match t with
+    | `Top  -> `Top
+    | `Value t -> `Value (f t)
+
+  let (let+) = (>>-:)
+  let (let*) = (>>-)
+end
+
+module TopBot =
+struct
+  let (>>-) t f = match t with
+    | `Top  -> `Top
+    | `Bottom -> `Bottom
+    | `Value t -> f t
+
+  let (>>-:) t f = match t with
+    | `Top  -> `Top
+    | `Bottom -> `Bottom
+    | `Value t -> `Value (f t)
+
+  let (let+) = (>>-:)
+  let (let*) = (>>-)
+end
+
+type 'a or_bottom = [`Bottom | `Value of 'a]
+type 'a or_top = [`Top | `Value of 'a]
+type 'a or_top_bottom = [`Top | `Bottom | `Value of 'a]
 
 type size = Integer.t
 
@@ -786,7 +829,7 @@ struct
     | Exp (e, i) -> Ival.add_singleton_int i (oracle e)
     | Ptroffset _ -> raise Not_implemented
 
-  let to_const ~oracle = function
+  let to_integer ~oracle = function
     | Const i -> Some i
     | Exp (e, i) ->
       begin try
@@ -825,7 +868,7 @@ struct
   let incr_or_constantify ~oracle vi i b =
     match incr vi i b with
     | Some v -> Some v
-    | None -> Option.map (fun c -> Const c) (to_const ~oracle b)
+    | None -> Option.map (fun c -> Const c) (to_integer ~oracle b)
 
   let cmp_int i1 i2 =
     let r = Integer.sub i1 i2 in
@@ -855,51 +898,45 @@ struct
   let eq ?(oracle=no_oracle) b1 b2 =
     cmp ~oracle b1 b2 = Equal
 
-  let lower_bound ~oracle b1 b2 =
-    if b1 == b2 then b1 else
-      match b1, b2 with
-      | Const i1, Const i2 ->
-        Const (Integer.min i1 i2)
-      | Exp (e1, i1), Exp (e2, i2) when Exp.equal e1 e2 ->
-        Exp (e1, Integer.min i1 i2)
-      | _, _ ->
-        let i1 = to_ival ~oracle:(oracle Left) b1
-        and i2 = to_ival ~oracle:(oracle Right) b2 in
-        let l1 = Option.get (Ival.min_int i1) (* TODO: handle Nones *)
-        and l2 = Option.get (Ival.min_int i2) in
-        Const (Integer.min l1 l2)
-
-  let upper_bound ~oracle b1 b2 =
-    if b1 == b2 then b1 else
-      match b1, b2 with
-      | Const i1, Const i2 ->
-        Const (Integer.max i1 i2)
-      | Exp (e1, i1), Exp (e2, i2) when Exp.equal e1 e2 ->
-        Exp (e1, Integer.max i1 i2)
-      | _, _ ->
-        let i1 = to_ival ~oracle:(oracle Left) b1
-        and i2 = to_ival ~oracle:(oracle Right) b2 in
-        let u1 = Option.get (Ival.max_int i1) (* TODO: handle Nones *)
-        and u2 = Option.get (Ival.max_int i2) in
-        Const (Integer.max u1 u2)
-
-  let lower_const ~oracle b =
+  let lower_integer ~oracle b =
     match Ival.min_int (to_ival ~oracle b) with
-    | Some l -> Some (Const l)
+    | Some l -> `Value l
     | None ->
       Kernel.warning ~current:true "cannot retrieve lower bound for %a"
         pretty b;
-      None
+      `Top
 
-  let upper_const ~oracle b =
+  let upper_integer ~oracle b =
     match Ival.max_int (to_ival ~oracle b) with
-    | Some u -> Some (Const u)
-    | None -> (* TODO: handle exception *)
+    | Some u -> `Value u
+    | None ->
       Kernel.warning ~current:true "cannot retrieve upper bound for %a"
         pretty b;
-      None
+      `Top
 
-  let _operators oracle = operators (cmp ~oracle)
+  let lower_bound ~oracle b1 b2 =
+    if b1 == b2 || eq b1 b2 then `Value b1 else
+      let open Top in
+      let+ i1,i2 = Top.zip
+          (lower_integer ~oracle:(oracle Left) b1)
+          (lower_integer ~oracle:(oracle Right) b2) in
+      Const (Integer.min i1 i2)
+
+  let upper_bound ~oracle b1 b2 =
+    if b1 == b2 || eq b1 b2 then `Value b1 else
+      let open Top in
+      let+ i1,i2 = Top.zip
+          (upper_integer ~oracle:(oracle Left) b1)
+          (upper_integer ~oracle:(oracle Right) b2) in
+      Const (Integer.max i1 i2)
+
+  let lower_const ~oracle b =
+    let open Top in
+    lower_integer ~oracle b >>-: of_integer
+
+  let upper_const ~oracle b =
+    let open Top in
+    upper_integer ~oracle b >>-: of_integer
 end
 
 module AgingBound =
@@ -914,7 +951,7 @@ struct
   let equal_regardless_age (b1,_a1) (b2,_a2) =
     Bound.equal b1 b2
   let equal = equal_regardless_age
-  let _of_integer i a = Bound.of_integer i, a
+  let _of_integer i = Bound.of_integer i, Integer.zero
   let _of_exp e a = Bound.of_exp e, a
   let _succ (b,a) = (Bound.succ b, a)
   let pred (b,a) = (Bound.pred b, a)
@@ -925,18 +962,16 @@ struct
   let cmp ~oracle (b1,_a1) (b2,_a2) = Bound.cmp ~oracle b1 b2
   let eq ?oracle (b1,_a1) (b2,_a2) = Bound.eq ?oracle b1 b2
   let lower_bound ~oracle (b1,a1) (b2,a2) =
-    Bound.lower_bound ~oracle b1 b2, Integer.min a1 a2
+    let open Top in
+    Bound.lower_bound ~oracle b1 b2 >>-: fun b -> b, Integer.min a1 a2
   let upper_bound ~oracle (b1,a1) (b2,a2) =
-    Bound.upper_bound ~oracle b1 b2, Integer.min a1 a2
-  let lower_const ~oracle (b,a) =
-    Option.map (fun b -> (b,a)) (Bound.lower_const ~oracle b)
-  let upper_const ~oracle (b,a) =
-    Option.map (fun b -> (b,a)) (Bound.upper_const ~oracle b)
-
+    let open Top in
+    Bound.upper_bound ~oracle b1 b2 >>-: fun b -> b, Integer.min a1 a2
+  let lower_const ~oracle (b,_a) = Bound.lower_const ~oracle b
+  let upper_const ~oracle (b,_a) = Bound.upper_const ~oracle b
   let birth b = b, Integer.zero
   let aging (b,a) = b, Integer.succ a
   let age (_,a) = a
-  let raw_bound (b,_) = b
   let unify_age ~other:(_,a') (b,a) = (b, Integer.min a' a)
   let operators oracle : (module Operators with type t = t) =
     operators (cmp ~oracle)
@@ -952,17 +987,17 @@ sig
   val hash : t -> int
   val equal : t -> t -> bool
   val compare : t -> t -> int
-  val hull : oracle:oracle -> t -> (bound * bound) option
+  val hull : oracle:oracle -> t -> (bound * bound) or_top
   val raw : t -> Bit.t
   val weak_erase : Bit.t -> t -> t
   val is_included : t -> t -> bool
   val unify : oracle:bioracle -> (submemory -> submemory -> submemory) ->
-    t -> t -> t
+    t -> t -> t or_top
   val single : bit -> bound -> bound -> submemory -> t
   val read : oracle:oracle ->
     (submemory -> 'a) -> ('a -> 'a -> 'a) -> t -> bound -> bound -> 'a
   val write : oracle:oracle -> (submemory -> submemory or_bottom) ->
-    t -> bound -> bound -> t or_bottom
+    t -> bound -> bound -> t or_top_bottom
   val incr_bound :
     oracle:oracle -> Bound.Var.t -> Integer.t option -> t ->
     [ `Value of t | `Top ]
@@ -1059,16 +1094,14 @@ struct
       List.for_all2 included_segments m1.segments m2.segments
     with Invalid_argument _ -> false (* Segmentations have different sizes *)
 
-  let hull ~oracle (m : t) : (bound * bound) option =
-    let rec last = function
-      | [] -> assert false
-      | [(_v,u)] -> u
-      | _ :: t -> last t
-    in
-    let l = m.start and u = last m.segments in
-    match B.lower_const ~oracle l, B.upper_const ~oracle u with
-    | None, _ | _, None -> None
-    | Some l, Some u -> Some (B.raw_bound l, B.raw_bound u)
+  let rec last_bound = function
+    | [] -> assert false
+    | [(_v,u)] -> u
+    | _ :: t -> last_bound t
+
+  let hull ~oracle (m : t) : (bound * bound) or_top =
+    let l = m.start and u = last_bound m.segments in
+    Top.zip (B.lower_const ~oracle l) (B.upper_const ~oracle u)
 
   let is_empty_segment ~oracle l u =
     let open (val (B.operators oracle)) in
@@ -1097,7 +1130,8 @@ struct
     | t -> smash_all ~oracle l (smash_head ~oracle l t)
 
   (* Unify two arrays m1 and m2 *)
-  let unify ~oracle f (m1 (*Left*): t) (m2 (*Right*) : t) : t =
+  let unify ~oracle f (m1 (*Left*): t) (m2 (*Right*) : t) : t or_top =
+    let open Top in
     (* Shortcuts *)
     let left = oracle Left and right = oracle Right in
     let equals side b1 b2 = B.cmp ~oracle:(oracle side) b1 b2 = Equal in
@@ -1105,27 +1139,25 @@ struct
     let {start=l1 ; segments=s1 ; padding=p1 } = m1
     and {start=l2 ; segments=s2 ; padding=p2 } = m2 in
     (* Unify the segmentation start *)
-    let l = B.lower_bound ~oracle l1 l2 in
-    debug dunify "%a LUB %a = %a" B.pretty l1 B.pretty l2 B.pretty l;
-    let ll = l in
-    let s1 = if equals Left l l1 then s1 else (M.of_raw p1, l1) :: s1
-    and s2 = if equals Right l l2 then s2 else (M.of_raw p2, l2) :: s2
+    let* start = B.lower_bound ~oracle l1 l2 in
+    let s1 = if equals Left start l1 then s1 else (M.of_raw p1, l1) :: s1
+    and s2 = if equals Right start l2 then s2 else (M.of_raw p2, l2) :: s2
     in
-    debug dunify "Unification start@.%a U@.%a" pretty_segments (l,s1) pretty_segments (l,s2);
+    debug dunify "Unification start@.%a U@.%a" pretty_segments (start,s1) pretty_segments (start,s2);
     (* Unify the segmentation end *)
     let merge_first side = smash_head ~oracle:(oracle side) in
-    let unify_end l s1 s2 =
+    let unify_end l s1 s2 acc =
       let v1, u1 = smash_all ~oracle:left l s1
       and v2, u2 = smash_all ~oracle:right l s2 in
-      let u = B.upper_bound ~oracle u1 u2 in
+      let+ u = B.upper_bound ~oracle u1 u2 in
       let w1 =
         if equals Left u u1 then v1 else smash Left (`Value (M.of_raw p1)) v1
       and w2 =
         if equals Right u u2 then v2 else smash Right (`Value (M.of_raw p2)) v2
       in
       match Bottom.join f w1 w2 with
-      | `Bottom -> [] (* should not happen, but [] is still correct *)
-      | `Value w -> [(w,u)]
+      | `Bottom -> acc (* should not happen, but acc is still correct *)
+      | `Value w -> ((w,u) :: acc)
     in
     (* +----+-------+-----
        | v1 | v1'   |
@@ -1136,7 +1168,7 @@ struct
        +------+-------+---
        l      u2 *)
     let rec aux l s1 s2 acc =
-      debug dunify "Unification progress@.%a U@.%a result:@.%a" pretty_segments (l,s1) pretty_segments (l,s2) pretty_segments (ll, List.rev acc);
+      debug dunify "Unification progress@.%a U@.%a result:@.%a" pretty_segments (l,s1) pretty_segments (l,s2) pretty_segments (start, List.rev acc);
       (* Look for emerging slices *)
       let left_slice_emerges = match s1 with
         | (v1,u1) :: t1 when equals Right l u1 -> Some (v1,u1,t1)
@@ -1159,8 +1191,8 @@ struct
       | Some _, Some _ (* both emerges, can't choose *)
       | None, None -> (* none emerges *)
         match s1, s2 with (* Are we done yet ? *)
-        | [], [] -> acc
-        | _ :: _, [] | [], _ :: _-> unify_end l s1 s2 @ acc
+        | [], [] -> `Value acc
+        | _ :: _, [] | [], _ :: _-> unify_end l s1 s2 acc
         | (v1,u1) :: t1, (v2,u2) :: t2 ->
           try
             match B.cmp ~oracle:left u1 u2, B.cmp ~oracle:right u1 u2 with (* Compare bounds *)
@@ -1188,12 +1220,13 @@ struct
               (Greater | GreaterOrEqual | Uncomparable) ->
               aux l (merge_first Left l s1) (merge_first Right l s2) acc
           with NothingToMerge -> (* There is nothing left to merge *)
-            unify_end l s1 s2 @ acc
+            unify_end l s1 s2 acc
     in
-    let segments = List. rev (aux l s1 s2 []) in
-    debug dunify "Unification result :@.%a" pretty_segments (l,segments);
+    let+ rev_segments = aux start s1 s2 [] in
+    let segments = List.rev rev_segments in
+    debug dunify "Unification result :@.%a" pretty_segments (start,segments);
     (* Iterate through segmentations *)
-    check { start = l ; segments ; padding = Bit.join p1 p2 }
+    check { start ; segments ; padding = Bit.join p1 p2 }
 
   let single padding lindex (* included *) uindex (* excluded *) value =
     check {
@@ -1268,8 +1301,9 @@ struct
      2. weak update without singularization
      3. update reduces the number of segments to 3 *)
   let write ~oracle f m lindex (* included *) uindex (* excluded *) = (* lindex < uindex *)
+    let open TopBot in
     let open (val (B.operators oracle)) in
-    let same_bounds = lindex == uindex in
+    let same_bounds = lindex == uindex in (* happens when adding partitioning hints *)
     let lindex = B.birth lindex and uindex = B.birth uindex in
     (* (start,head) : segmentation kept identical below the write indexes,
                       head is a list in reverse order
@@ -1282,7 +1316,9 @@ struct
       debug dwrite "%a (%a) >= %a (%a) ? %B@." B.pretty lindex Ival.pretty (B._to_ival ~oracle lindex) B.pretty l Ival.pretty (B._to_ival ~oracle l) (lindex >= l);
       if lindex >= l
       then aux_below l [] l s
-      else aux_over lindex [] lindex (M.of_raw m.padding) l s
+      else
+        let* l = B.lower_bound ~oracle:(fun _ -> oracle) lindex l in
+        aux_over l [] l (M.of_raw m.padding) l s
     and aux_below start head l = fun t ->
       debug dwrite "aux_below: %a <{%a}> %a@." pretty_segments (start,head) B.pretty l pretty_segments (l,t);
       match t with (* l <= lindex *)
@@ -1300,8 +1336,8 @@ struct
       else
         match s with
         | [] ->
-          let u = B.upper_bound ~oracle:(fun _ -> oracle) u uindex
-          and v = M.smash ~oracle v (M.of_raw m.padding) in
+          let* u = B.upper_bound ~oracle:(fun _ -> oracle) u uindex in
+          let v = M.smash ~oracle v (M.of_raw m.padding) in
           aux_end start head l v u []
         | (v',u') :: t ->
           (* TODO: do not smash for overwrites if the slices are covered by the write *)
@@ -1322,7 +1358,7 @@ struct
         | head -> head, start
       in
       check {
-        m with
+        padding = m.padding;
         segments = List.rev_append head' tail';
         start = start';
       }
@@ -1358,12 +1394,12 @@ struct
         | Some l' -> incr_end p l' (List.rev s)
         | None -> (* No replacement, try to find a lower bound instead *)
           match B.lower_const ~oracle l with
-          | None -> (* No lower bound, completely remove the segment *)
+          | `Top -> (* No lower bound, completely remove the segment *)
             let p' = Bit.join p (M.raw v) in
             incr_start p' u t
-          | Some l' ->
+          | `Value l' ->
             let v' = M.smash ~oracle (M.of_raw p) v in
-            incr_end p l' (List.rev ((v',u) :: t))
+            incr_end p (B.birth l') (List.rev ((v',u) :: t))
     and incr_end p l = function (* In reverse order *)
       | [] -> `Top (* No more segments, top segmentation *)
       | (v,u) :: t ->
@@ -1371,12 +1407,12 @@ struct
         | Some u' -> incr_inner p l [] ((v,u') :: t)
         | None -> (* No replacement, try to find an upper bound instead *)
           match B.upper_const ~oracle u with
-          | None -> (* No upper bound, completely remove the segment *)
+          | `Top -> (* No upper bound, completely remove the segment *)
             let p' = Bit.join p (M.raw v) in
             incr_end p' l t
-          | Some u' ->
+          | `Value u' ->
             let v' = M.smash ~oracle (M.of_raw p) v in
-            incr_inner p l [] ((v',u') :: t)
+            incr_inner p l [] ((v',B.birth u') :: t)
     and incr_inner p l acc (* In right order *) = function (* In reverse order *)
       | [] -> assert false
       | [s] ->
@@ -1397,8 +1433,16 @@ struct
     check { m with segments=List.map (fun (v,u) -> f v, u) m.segments }
 
   let add_segmentation_bounds ~oracle bounds m =
+    let open TopBot in
     let add_bound m b =
-      Bottom.non_bottom (write ~oracle (fun x -> `Value x) m b b)
+      match write ~oracle (fun x -> `Value x) m b b with
+      | `Value m -> m
+      | `Bottom -> assert false
+      | `Top ->
+        Kernel.warning ~current:true
+          "failed to introduce %a inside the array segmentation"
+          Bound.pretty b;
+        m
     in
     List.fold_left add_bound m bounds
 end
@@ -1648,9 +1692,10 @@ struct
       | m -> D.of_raw ci (raw m)
 
     let unify ~oracle f =
+      let open Top in
       let raw_to_array side prototype b =
-        A.hull ~oracle:(oracle side) prototype |>
-        Option.map (fun (l,u) -> A.single b l u (Raw b))
+        A.hull ~oracle:(oracle side) prototype >>-:
+        fun (l,u) -> A.single b l u (Raw b)
       in
       let rec aux m1 m2 =
         debug dunify "unification between@.%a and@.%a" pretty m1 pretty m2;
@@ -1662,29 +1707,37 @@ struct
           let scalar_value = f ~size s1.scalar_value s2.scalar_value in
           Scalar { s1 with scalar_value }
         | Array a1, Array a2 when are_aray_compatible a1 a2 ->
-          let array_value = A.unify ~oracle aux a1.array_value a2.array_value in
-          Array { a1 with array_value }
+          begin match A.unify ~oracle aux a1.array_value a2.array_value with
+            | `Top -> Raw (Bit.join (raw m1) (raw m2))
+            | `Value array_value -> Array { a1 with array_value }
+          end
         | Array a1, Raw b2 ->
-          begin match raw_to_array Left a1.array_value b2 with
-            | None -> weak_erase b2 (Array a1) (* Should not happen unless oracle is very unprecise *)
-            | Some array_value2 ->
-              let array_value = A.unify ~oracle aux a1.array_value array_value2 in
-              debug demerging "emerging unification between@.%a and@.%a result:@.%a"
-                A.pretty a1.array_value
-                A.pretty array_value2
-                A.pretty array_value;
-              Array { a1 with array_value }
+          let m =
+            let* array_value2 = raw_to_array Left a1.array_value b2 in
+            let+ array_value = A.unify ~oracle aux a1.array_value array_value2 in
+            debug demerging "emerging unification between@.%a and@.%a result:@.%a"
+              A.pretty a1.array_value
+              A.pretty array_value2
+              A.pretty array_value;
+            Array { a1 with array_value }
+          in
+          begin match m with
+            | `Top -> weak_erase b2 (Array a1) (* Should not happen unless oracle is very unprecise *)
+            | `Value m -> m
           end
         | Raw b1, Array a2 ->
-          begin match raw_to_array Right a2.array_value b1 with
-            | None -> weak_erase b1 (Array a2) (* Should not happen unless oracle is very unprecise *)
-            | Some array_value1 ->
-              let array_value = A.unify ~oracle aux array_value1 a2.array_value in
-              debug demerging "emerging unification between@.%a and@.%a result:@.%a"
-                A.pretty array_value1
-                A.pretty a2.array_value
-                A.pretty array_value;
-              Array { a2 with array_value }
+          let m =
+            let* array_value1 = raw_to_array Right a2.array_value b1 in
+            let+ array_value = A.unify ~oracle aux array_value1 a2.array_value in
+            debug demerging "emerging unification between@.%a and@.%a result:@.%a"
+              A.pretty array_value1
+              A.pretty a2.array_value
+              A.pretty array_value;
+            Array { a2 with array_value }
+          in
+          begin match m with
+            | `Top -> weak_erase b1 (Array a2) (* Should not happen unless oracle is very unprecise *)
+            | `Value m -> m
           end
         | Struct s1, Struct s2 when are_structs_compatible s1 s2 ->
           let struct_value = S.unify aux s1.struct_value s2.struct_value in
@@ -1758,6 +1811,7 @@ struct
       aux
 
     let write ~oracle (f : weak:bool -> Cil_types.typ -> t -> t or_bottom) =
+      let open Bot in
       let rec aux ~weak offset m =
         debug dwrite "@[<hv>write at %a from %a" TypedOffset.pretty offset pretty m;
         match offset with
@@ -1794,7 +1848,16 @@ struct
           match m with
           | Array a when are_typ_compatible a.array_cell_type elem_type ->
             let+ array_value =
-              A.write ~oracle (aux ~weak offset') a.array_value lindex uindex in
+              match
+                A.write ~oracle (aux ~weak offset') a.array_value lindex uindex
+              with
+              | `Bottom -> `Bottom
+              | `Top ->
+                let b = raw m in
+                let+ new_value = aux ~weak offset' (Raw b) in
+                A.single b lindex uindex new_value
+              | `Value array_value -> `Value array_value
+            in
             debug dwrite "wrote from previous@.%a@.->%a" A.pretty a.array_value A.pretty array_value;
             Array { a with array_value }
           | _ ->
@@ -1895,6 +1958,7 @@ struct
     r
 
   let reinforce ~oracle f m offset =
+    let open Bottom in
     let f' ~weak typ m =
       if weak
       then `Value m
