@@ -33,7 +33,7 @@ import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { Filler, Hpack, Vpack } from 'dome/layout/boxes';
+import { Filler, Hpack, Vpack, Vfill } from 'dome/layout/boxes';
 import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 
 
@@ -506,8 +506,8 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   const summaryStatus = getAlarmStatus(summary.vBefore?.alarms);
 
   // Building common parts
-  const onContextMenu = (evaluation: Values.evaluation) => (): void => {
-    const { value, pointedVars } = evaluation;
+  const onContextMenu = (evaluation?: Values.evaluation) => (): void => {
+    const { value = '', pointedVars = [] } = evaluation ?? {};
     const items: Dome.PopupMenuItem[] = [];
     const copy = (): void => { navigator.clipboard.writeText(value); };
     if (value !== '') items.push({ label: 'Copy to clipboard', onClick: copy });
@@ -529,19 +529,20 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const selected = isSelected && callstack !== 'Summary' ? 'eva-focused' : '';
     const font = summaryOnly && callstack === 'Summary' ? 'eva-italic' : '';
     const className = classes('eva-table-values', selected, font);
-    function td(e: Values.evaluation): JSX.Element {
-      const status = getAlarmStatus(e.alarms);
+    function td(e?: Values.evaluation): JSX.Element {
+      const { alarms, value } = e ?? {};
+      const status = getAlarmStatus(alarms);
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
       const kind = callstack === 'Summary' ? 'one' : 'this';
       const title = `At least one alarm is raised in ${kind} callstack`;
-      const align = e.value.includes('\n') ? 'left' : 'center';
+      const align = value?.includes('\n') ? 'left' : 'center';
       const alignClass = `eva-table-values-${align}`;
       const width = summaryStatus !== 'none' ? 'eva-table-values-alarms' : '';
       const c = classes(className, alignClass, width);
       return (
         <>
           <td className={c} onContextMenu={onContextMenu(e)}>
-            <span >{e.value}</span>
+            <span >{value}</span>
           </td>
           <td className={classes('eva-table-alarm', selected)}>
             <Icon className={alarmClass} size={10} title={title} id="WARNING" />
@@ -549,15 +550,15 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
         </>
       );
     }
-    if (state === 'Before' && vBefore) return td(vBefore);
-    if (state === 'After' && vAfter) return td(vAfter);
-    if (state === 'After' && vThen && vElse)
+    if (state === 'Before') return td(vBefore);
+    if (state === 'After' && !probe.condition) return td(vAfter);
+    if (state === 'After' && probe.condition)
       return <>{td(vThen)}{td(vElse)}</>;
-    if (state === 'Both' && vBefore && vAfter)
+    if (state === 'Both' && !probe.condition)
       return <>{td(vBefore)}{td(vAfter)}</>;
-    if (state === 'Both' && vBefore && vThen && vElse)
+    if (state === 'Both' && probe.condition)
       return <>{td(vBefore)}{td(vThen)}{td(vElse)}</>;
-    return <></>;
+    return td();
   };
 }
 
@@ -1085,6 +1086,7 @@ function EvaTable(): JSX.Element {
       <div className='eva-functions-section'>
         {React.Children.toArray(functions)}
       </div>
+      <Vfill/>
       {alarmsInfos}
       {stackInfos}
     </>
