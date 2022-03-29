@@ -786,7 +786,7 @@ function _resolved(id: string): void {
 client.onConnect((err?: Error) => {
   if (err) {
     _status(Status.FAILURE);
-    _stopPolling();
+    _clear();
   } else {
     _status(Status.CMD);
     _startPolling();
@@ -833,8 +833,10 @@ client.onCmdLine((cmd: boolean) => {
   _status(cmd ? Status.CMD : Status.ON);
   if (cmd)
     _startPolling();
-  else
-    _stopPolling();
+  else {
+    if (pending.size === 0)
+      _stopPolling();
+  }
 });
 
 // --------------------------------------------------------------------------
