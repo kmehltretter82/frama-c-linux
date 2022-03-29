@@ -802,8 +802,8 @@ let build_marker = Option.map @@ fun input ->
 let descr = "Build a marker from an ACSL term."
 
 let () = Request.register ~package
-  ~kind:`GET ~name:"markerFromTerm" ~descr:(Markdown.plain descr)
-  ~input:(module MarkerTermInput) ~output:(module MarkerTermOutput)
-  build_marker
+    ~kind:`GET ~name:"markerFromTerm" ~descr:(Markdown.plain descr)
+    ~input:(module MarkerTermInput) ~output:(module MarkerTermOutput)
+    build_marker
 
 (**************************************************************************)
