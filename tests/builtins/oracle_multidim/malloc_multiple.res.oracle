@@ -1,0 +1,55 @@
+14a15,19
+> [eva:alarm] malloc_multiple.c:15: Warning: 
+>   out of bounds write. assert \valid(T[counter]);
+> [kernel] malloc_multiple.c:15: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+16a22
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+18a25
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+20a28
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+22a31
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+25,26d33
+< [eva:malloc:weak] malloc_multiple.c:14: 
+<   marking variable `__malloc_allocate_T_l14_4' as weak
+28a36,43
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+> [eva:alarm] malloc_multiple.c:18: Warning: 
+>   out of bounds write. assert \valid(T[0]);
+> [kernel] malloc_multiple.c:18: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+37a53
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+39a56
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+41a59
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+43a62
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+45a65
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+48,49c68,71
+< [eva:malloc:weak] malloc_multiple.c:14: 
+<   marking variable `__malloc_allocate_T_l14_10' as weak
+---
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+> [eva] malloc_multiple.c:14: Call to builtin malloc
+58a81,84
+> [eva:alarm] malloc_multiple.c:30: Warning: 
+>   out of bounds write. assert \valid(F[counter]);
+> [kernel] malloc_multiple.c:30: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+87,88d112
+< [eva:malloc:weak] malloc_multiple.c:29: 
+<   marking variable `__malloc_allocate_and_free_last_l29_4' as weak
+103,104d126
+< [eva:malloc] malloc_multiple.c:34: 
+<   weak free on bases: {__malloc_w_allocate_and_free_last_l29_4}

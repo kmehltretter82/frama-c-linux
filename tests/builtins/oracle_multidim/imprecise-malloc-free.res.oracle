@@ -1,0 +1,5 @@
+50d49
+< [eva:malloc] imprecise-malloc-free.c:25: weak free on bases: {__malloc_main_l14}
+56,57d54
+< [eva:malloc] imprecise-malloc-free.c:26: 
+<   weak free on bases: {__malloc_main_l15, __malloc_main_l16}

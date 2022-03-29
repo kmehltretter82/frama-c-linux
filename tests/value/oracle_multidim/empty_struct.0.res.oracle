@@ -1,0 +1,20 @@
+12c12
+<   p ∈ {{ (void *)&s }}
+---
+>   NON TERMINATING FUNCTION
+13a14
+> [from] Non-terminating function main (no dependencies)
+18c19
+<   NO EFFECTS
+---
+>   NON TERMINATING - NO EFFECTS
+34c35
+<   p ∈ {{ (void *)&s }}
+---
+>   NON TERMINATING FUNCTION
+35a37
+> [from] Non-terminating function main (no dependencies)
+40c42
+<   NO EFFECTS
+---
+>   NON TERMINATING - NO EFFECTS

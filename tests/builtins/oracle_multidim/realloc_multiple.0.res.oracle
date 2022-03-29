@@ -1,0 +1,138 @@
+10a11,14
+> [eva:alarm] realloc_multiple.c:10: Warning: 
+>   out of bounds write. assert \valid(q + i);
+> [kernel] realloc_multiple.c:10: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+12a17,20
+> [eva:alarm] realloc_multiple.c:13: Warning: 
+>   out of bounds write. assert \valid(r + i_0);
+> [kernel] realloc_multiple.c:13: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+48d55
+< [eva:malloc] bases_to_realloc: {__malloc_main1_l12}
+50d56
+< [eva:malloc] bases_to_realloc: {__malloc_main1_l9}
+52,53d57
+< [eva:malloc] realloc_multiple.c:23: 
+<   weak free on bases: {__malloc_main1_l9, __malloc_main1_l12}
+84a89,115
+> [eva] realloc_multiple.c:25: 
+>   Frama_C_dump_each:
+>   # cvalue:
+>   __fc_heap_status ∈ [--..--]
+>   __fc_random_counter ∈ [--..--]
+>   __fc_rand_max ∈ {32767}
+>   __fc_random48_init ∈ {0}
+>   __fc_random48_counter[0..2] ∈ [--..--]
+>   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+>   __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+>           [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+>           [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+>   __fc_mblen_state ∈ [--..--]
+>   __fc_mbtowc_state ∈ [--..--]
+>   __fc_wctomb_state ∈ [--..--]
+>   Frama_C_entropy_source ∈ [--..--]
+>   q ∈ {{ &__malloc_main1_l9[0] }}
+>   r ∈ {{ &__malloc_main1_l12[0] }}
+>   p ∈ {{ &__malloc_main1_l9[0] ; &__malloc_main1_l12[0] }}
+>   x ∈ {0; 1}
+>   s ∈ {0}
+>   v ∈ {1}
+>   S_0___fc_env[0..1] ∈ [--..--]
+>   S_1___fc_env[0..1] ∈ [--..--]
+>   __malloc_main1_l9[0..4] ∈ {5}
+>   __malloc_main1_l12[0..5] ∈ {6}
+>   ==END OF DUMP==
+88,89c119
+< [eva:malloc] realloc_multiple.c:26: 
+<   weak free on bases: {__realloc_main1_l23, __realloc_main1_l23_0}
+---
+> [eva] realloc_multiple.c:26: Call to builtin free
+95a126,129
+> [eva:alarm] realloc_multiple.c:31: Warning: 
+>   out of bounds write. assert \valid(q + i);
+> [kernel] realloc_multiple.c:31: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+97a132,135
+> [eva:alarm] realloc_multiple.c:34: Warning: 
+>   out of bounds write. assert \valid(r + i_0);
+> [kernel] realloc_multiple.c:34: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+132d169
+< [eva:malloc] bases_to_realloc: {__malloc_main2_l33}
+134d170
+< [eva:malloc] bases_to_realloc: {__malloc_main2_l30}
+136d171
+< [eva:malloc] bases_to_realloc: {}
+138,139d172
+< [eva:malloc] realloc_multiple.c:45: 
+<   weak free on bases: {__malloc_main2_l30, __malloc_main2_l33}
+174a208,234
+> [eva] realloc_multiple.c:47: 
+>   Frama_C_dump_each:
+>   # cvalue:
+>   __fc_heap_status ∈ [--..--]
+>   __fc_random_counter ∈ [--..--]
+>   __fc_rand_max ∈ {32767}
+>   __fc_random48_init ∈ {0}
+>   __fc_random48_counter[0..2] ∈ [--..--]
+>   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+>   __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+>           [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+>           [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+>   __fc_mblen_state ∈ [--..--]
+>   __fc_mbtowc_state ∈ [--..--]
+>   __fc_wctomb_state ∈ [--..--]
+>   Frama_C_entropy_source ∈ [--..--]
+>   q ∈ {{ &__malloc_main2_l30[0] }}
+>   r ∈ {{ &__malloc_main2_l33[0] }}
+>   p ∈ {{ NULL ; &__malloc_main2_l30[0] ; &__malloc_main2_l33[0] }}
+>   x ∈ {0; 1; 2}
+>   s ∈ {0}
+>   v ∈ {2}
+>   S_0___fc_env[0..1] ∈ [--..--]
+>   S_1___fc_env[0..1] ∈ [--..--]
+>   __malloc_main2_l30[0..4] ∈ {7}
+>   __malloc_main2_l33[0..5] ∈ {8}
+>   ==END OF DUMP==
+178,180c238
+< [eva:malloc] realloc_multiple.c:48: 
+<   weak free on bases: {__realloc_main2_l45, __realloc_main2_l45_0,
+<                        __realloc_main2_l45_1}
+---
+> [eva] realloc_multiple.c:48: Call to builtin free
+188a247,256
+> [eva] realloc_multiple.c:53: Call to builtin malloc
+> [eva] realloc_multiple.c:53: allocating variable __malloc_main3_l53_0
+> [eva:alarm] realloc_multiple.c:57: Warning: 
+>   out of bounds write. assert \valid(p);
+> [kernel] realloc_multiple.c:57: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+> [eva:alarm] realloc_multiple.c:58: Warning: 
+>   out of bounds write. assert \valid(q);
+> [kernel] realloc_multiple.c:58: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+226d293
+< [eva:malloc] bases_to_realloc: {__malloc_main3_l53}
+228d294
+< [eva:malloc] bases_to_realloc: {__malloc_main3_l52}
+230d295
+< [eva:malloc] bases_to_realloc: {}
+232,233d296
+< [eva:malloc] realloc_multiple.c:65: 
+<   weak free on bases: {__malloc_main3_l52, __malloc_main3_l53}
+235a299,302
+> [eva:alarm] realloc_multiple.c:66: Warning: 
+>   out of bounds read. assert \valid_read(s);
+> [kernel] realloc_multiple.c:66: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+315d381
+< [eva:malloc] realloc_multiple.c:70: strong free on bases: {__malloc_main3_l53}
+329c395
+<    {{ &__realloc_main1_l23[0] ; &__realloc_main1_l23_0[0] }} or ESCAPINGADDR
+---
+>    {{ NULL ; &__realloc_main1_l23[0] ; &__realloc_main1_l23_0[0] }} or ESCAPINGADDR
+341c407
+<    {{ &__realloc_main2_l45[0] ; &__realloc_main2_l45_0[0] ;
+---
+>    {{ NULL ; &__realloc_main2_l45[0] ; &__realloc_main2_l45_0[0] ;

@@ -1,0 +1,1072 @@
+11d10
+< [eva:malloc] bases_to_realloc: {}
+13d11
+< [eva:malloc] realloc2.c:27: strong free on bases: {}
+24d21
+< [eva:malloc] bases_to_realloc: {}
+26d22
+< [eva:malloc] realloc2.c:32: strong free on bases: {}
+39d34
+< [eva:malloc] bases_to_realloc: {__malloc_test_exact_nonnull_expand_l36}
+41,42d35
+< [eva:malloc] realloc2.c:38: 
+<   strong free on bases: {__malloc_test_exact_nonnull_expand_l36}
+46a40,46
+> [eva:alarm] realloc2.c:40: Warning: 
+>   accessing left-value that contains escaping addresses.
+>   assert ¬\dangling(&p1);
+> [eva] computing for function fill <- test_exact_nonnull_expand <- main.
+>   Called from realloc2.c:40.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+59d58
+< [eva:malloc] bases_to_realloc: {__malloc_test_exact_nonnull_shrink_l44}
+61,62d59
+< [eva:malloc] realloc2.c:46: 
+<   strong free on bases: {__malloc_test_exact_nonnull_shrink_l44}
+79d75
+< [eva:malloc] bases_to_realloc: {__malloc_test_exact_nonnull_free_l51}
+81,82d76
+< [eva:malloc] realloc2.c:53: 
+<   strong free on bases: {__malloc_test_exact_nonnull_free_l51}
+91d84
+< [eva:malloc] bases_to_realloc: {__malloc_test_maybe_nonnull_l57}
+93,94d85
+< [eva:malloc] realloc2.c:58: 
+<   weak free on bases: {__malloc_test_maybe_nonnull_l57}
+111d101
+< [eva:malloc] bases_to_realloc: {__malloc_test_same_size_l63}
+113d102
+< [eva:malloc] realloc2.c:65: strong free on bases: {__malloc_test_same_size_l63}
+120d108
+< [eva:malloc] bases_to_realloc: {}
+122d109
+< [eva:malloc] realloc2.c:70: strong free on bases: {}
+134d120
+< [eva:malloc] bases_to_realloc: {}
+137d122
+< [eva:malloc] realloc2.c:76: strong free on bases: {}
+154d138
+< [eva:malloc] bases_to_realloc: {__malloc_test_imprecise_size_free_l81}
+156,157d139
+< [eva:malloc] realloc2.c:84: 
+<   strong free on bases: {__malloc_test_imprecise_size_free_l81}
+170d151
+< [eva:malloc] bases_to_realloc: {__malloc_test_imprecise_both_l89}
+172,173d152
+< [eva:malloc] realloc2.c:91: 
+<   weak free on bases: {__malloc_test_imprecise_both_l89}
+188d166
+< [eva:malloc] bases_to_realloc: {__malloc_test_possibly_invalid_realloc_l96}
+191,192d168
+< [eva:malloc] realloc2.c:99: 
+<   strong free on bases: {__malloc_test_possibly_invalid_realloc_l96}
+231d206
+< [eva:malloc] bases_to_realloc: {__malloc_test_realloc_sequence_l124}
+233,234d207
+< [eva:malloc] realloc2.c:125: 
+<   strong free on bases: {__malloc_test_realloc_sequence_l124}
+238d210
+< [eva:malloc] bases_to_realloc: {__realloc_test_realloc_sequence_l125}
+240,241d211
+< [eva:malloc] realloc2.c:126: 
+<   strong free on bases: {__realloc_test_realloc_sequence_l125}
+259d228
+< [eva:malloc] bases_to_realloc: {__malloc_test_realloc_loop_l131}
+261,262c230,233
+< [eva:malloc] realloc2.c:138: 
+<   strong free on bases: {__malloc_test_realloc_loop_l131}
+---
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+268,274c239,247
+< [eva:malloc] bases_to_realloc: {__realloc_test_realloc_loop_l138}
+< [eva:malloc:weak] realloc2.c:138: 
+<   marking variable `__realloc_test_realloc_loop_l138' as weak
+< [eva:malloc] realloc2.c:138: 
+<   resizing variable `__realloc_w_test_realloc_loop_l138' (0..79) to fit 0..119
+< [eva:malloc] realloc2.c:138: 
+<   weak free on bases: {__realloc_w_test_realloc_loop_l138}
+---
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+278a252,258
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:142.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] realloc2.c:138: Call to builtin realloc
+280,285c260,272
+< [eva:malloc] bases_to_realloc: {__realloc_w_test_realloc_loop_l138}
+< [eva:malloc] realloc2.c:138: 
+<   resizing variable `__realloc_w_test_realloc_loop_l138'
+<   (0..79/119) to fit 0..159
+< [eva:malloc] realloc2.c:138: 
+<   weak free on bases: {__realloc_w_test_realloc_loop_l138}
+---
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] realloc2.c:140: Reusing old results for call to fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+289a277,290
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:142.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:142.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:142.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] realloc2.c:138: Call to builtin realloc
+291,296c292,314
+< [eva:malloc] bases_to_realloc: {__realloc_w_test_realloc_loop_l138}
+< [eva:malloc] realloc2.c:138: 
+<   resizing variable `__realloc_w_test_realloc_loop_l138'
+<   (0..79/159) to fit 0..199
+< [eva:malloc] realloc2.c:138: 
+<   weak free on bases: {__realloc_w_test_realloc_loop_l138}
+---
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] realloc2.c:140: Reusing old results for call to fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:142.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+300a319,333
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:142.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:142.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:142.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] realloc2.c:138: Call to builtin realloc
+302,307c335,343
+< [eva:malloc] bases_to_realloc: {__realloc_w_test_realloc_loop_l138}
+< [eva:malloc] realloc2.c:138: 
+<   resizing variable `__realloc_w_test_realloc_loop_l138'
+<   (0..79/199) to fit 0..239
+< [eva:malloc] realloc2.c:138: 
+<   weak free on bases: {__realloc_w_test_realloc_loop_l138}
+---
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva] realloc2.c:138: Call to builtin realloc
+> [eva:alarm] realloc2.c:140: Warning: 
+>   accessing left-value that contains escaping addresses.
+>   assert ¬\dangling(&p2);
+> [eva] computing for function fill <- test_realloc_loop <- main.
+>   Called from realloc2.c:140.
+> [eva] Recording results for fill
+> [eva] Done for function fill
+325d360
+< [eva:malloc] bases_to_realloc: {__malloc_test_realloc_multiple_bases_l151}
+328,329d362
+< [eva:malloc] realloc2.c:156: 
+<   strong free on bases: {__malloc_test_realloc_multiple_bases_l151}
+333,335d365
+< [eva:malloc] 
+<   bases_to_realloc: {__malloc_test_realloc_multiple_bases_l154,
+<                      __realloc_test_realloc_multiple_bases_l156}
+338,340d367
+< [eva:malloc] realloc2.c:158: 
+<   weak free on bases: {__malloc_test_realloc_multiple_bases_l154,
+<                        __realloc_test_realloc_multiple_bases_l156}
+359d385
+< [eva:malloc] bases_to_realloc: {__malloc_test_realloc_multiple_bases2_l163}
+362,363d387
+< [eva:malloc] realloc2.c:166: 
+<   strong free on bases: {__malloc_test_realloc_multiple_bases2_l163}
+374,376d397
+< [eva:malloc] 
+<   bases_to_realloc: {__realloc_test_realloc_multiple_bases2_l166,
+<                      __malloc_test_realloc_multiple_bases2_l166}
+379,381d399
+< [eva:malloc] realloc2.c:169: 
+<   weak free on bases: {__realloc_test_realloc_multiple_bases2_l166,
+<                        __malloc_test_realloc_multiple_bases2_l166}
+385d402
+< [eva:malloc] bases_to_realloc: {__realloc_test_realloc_multiple_bases2_l169}
+388,389d404
+< [eva:malloc] realloc2.c:171: 
+<   strong free on bases: {__realloc_test_realloc_multiple_bases2_l169}
+404,406d418
+< [eva:malloc] 
+<   bases_to_realloc: {__realloc_test_realloc_multiple_bases2_l171,
+<                      __malloc_test_realloc_multiple_bases2_l174}
+409,411d420
+< [eva:malloc] realloc2.c:177: 
+<   weak free on bases: {__realloc_test_realloc_multiple_bases2_l171,
+<                        __malloc_test_realloc_multiple_bases2_l174}
+426d434
+< [eva:malloc] bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184}
+429,430d436
+< [eva:malloc] realloc2.c:187: 
+<   strong free on bases: {__malloc_test_realloc_multiple_bases_loop_l184}
+437,447d442
+< [eva:malloc] 
+<   bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184,
+<                      __realloc_test_realloc_multiple_bases_loop_l187}
+< [eva:malloc:weak] realloc2.c:187: 
+<   marking variable `__realloc_test_realloc_multiple_bases_loop_l187' as weak
+< [eva:malloc] realloc2.c:187: 
+<   resizing variable `__realloc_w_test_realloc_multiple_bases_loop_l187'
+<   (0..79) to fit 0..79/95
+< [eva:malloc] realloc2.c:187: 
+<   weak free on bases: {__malloc_test_realloc_multiple_bases_loop_l184,
+<                        __realloc_w_test_realloc_multiple_bases_loop_l187}
+453,461d447
+< [eva:malloc] 
+<   bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184,
+<                      __realloc_w_test_realloc_multiple_bases_loop_l187}
+< [eva:malloc] realloc2.c:187: 
+<   resizing variable `__realloc_w_test_realloc_multiple_bases_loop_l187'
+<   (0..79/95) to fit 0..79/111
+< [eva:malloc] realloc2.c:187: 
+<   weak free on bases: {__malloc_test_realloc_multiple_bases_loop_l184,
+<                        __realloc_w_test_realloc_multiple_bases_loop_l187}
+467,475d452
+< [eva:malloc] 
+<   bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184,
+<                      __realloc_w_test_realloc_multiple_bases_loop_l187}
+< [eva:malloc] realloc2.c:187: 
+<   resizing variable `__realloc_w_test_realloc_multiple_bases_loop_l187'
+<   (0..79/111) to fit 0..79/223
+< [eva:malloc] realloc2.c:187: 
+<   weak free on bases: {__malloc_test_realloc_multiple_bases_loop_l184,
+<                        __realloc_w_test_realloc_multiple_bases_loop_l187}
+481,486d457
+< [eva:malloc] 
+<   bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184,
+<                      __realloc_w_test_realloc_multiple_bases_loop_l187}
+< [eva:malloc] realloc2.c:187: 
+<   weak free on bases: {__malloc_test_realloc_multiple_bases_loop_l184,
+<                        __realloc_w_test_realloc_multiple_bases_loop_l187}
+497,541c468,512
+<   __realloc_test_exact_null_l27[0] ∈ {0}
+<                                [1] ∈ {1}
+<                                [2] ∈ {2}
+<                                [3] ∈ {3}
+<                                [4] ∈ {4}
+<                                [5] ∈ {5}
+<                                [6] ∈ {6}
+<                                [7] ∈ {7}
+<                                [8] ∈ {8}
+<                                [9] ∈ {9}
+<   __malloc_test_exact_nonnull_expand_l36[0] ∈ {0}
+<                                         [1] ∈ {1}
+<                                         [2] ∈ {2}
+<                                         [3] ∈ {3}
+<                                         [4] ∈ {4}
+<   __realloc_test_exact_nonnull_expand_l38[0] ∈ {0}
+<                                          [1] ∈ {1}
+<                                          [2] ∈ {2}
+<                                          [3] ∈ {3}
+<                                          [4] ∈ {4}
+<                                          [5] ∈ {5}
+<                                          [6] ∈ {6}
+<                                          [7] ∈ {7}
+<                                          [8] ∈ {8}
+<                                          [9] ∈ {9}
+<   __malloc_test_exact_nonnull_shrink_l44[0] ∈ {0}
+<                                         [1] ∈ {1}
+<                                         [2] ∈ {2}
+<                                         [3] ∈ {3}
+<                                         [4] ∈ {4}
+<   __realloc_test_exact_nonnull_shrink_l46[0] ∈ {0}
+<                                          [1] ∈ {1}
+<   __malloc_test_exact_nonnull_free_l51[0] ∈ {0}
+<                                       [1] ∈ {1}
+<                                       [2] ∈ {2}
+<                                       [3] ∈ {3}
+<                                       [4] ∈ {4}
+<   __realloc_test_maybe_nonnull_l58[0] ∈ {0}
+<                                   [1] ∈ {1}
+<   __malloc_test_same_size_l63[0] ∈ {0}
+<                              [1] ∈ {1}
+<                              [2] ∈ {2}
+<                              [3] ∈ {3}
+<                              [4] ∈ {4}
+<   __realloc_test_imprecise_size_l70[0] ∈ {0}
+---
+>   __realloc_test_exact_null_l27[0] ∈ {0} or UNINITIALIZED
+>                                [1] ∈ {1} or UNINITIALIZED
+>                                [2] ∈ {2} or UNINITIALIZED
+>                                [3] ∈ {3} or UNINITIALIZED
+>                                [4] ∈ {4} or UNINITIALIZED
+>                                [5] ∈ {5} or UNINITIALIZED
+>                                [6] ∈ {6} or UNINITIALIZED
+>                                [7] ∈ {7} or UNINITIALIZED
+>                                [8] ∈ {8} or UNINITIALIZED
+>                                [9] ∈ {9} or UNINITIALIZED
+>   __malloc_test_exact_nonnull_expand_l36[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+>                                         [2] ∈ {2} or UNINITIALIZED
+>                                         [3] ∈ {3} or UNINITIALIZED
+>                                         [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_exact_nonnull_expand_l38[0] ∈ {0} or UNINITIALIZED
+>                                          [1] ∈ {1} or UNINITIALIZED
+>                                          [2] ∈ {2} or UNINITIALIZED
+>                                          [3] ∈ {3} or UNINITIALIZED
+>                                          [4] ∈ {4} or UNINITIALIZED
+>                                          [5] ∈ {5} or UNINITIALIZED
+>                                          [6] ∈ {6} or UNINITIALIZED
+>                                          [7] ∈ {7} or UNINITIALIZED
+>                                          [8] ∈ {8} or UNINITIALIZED
+>                                          [9] ∈ {9} or UNINITIALIZED
+>   __malloc_test_exact_nonnull_shrink_l44[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+>                                         [2] ∈ {2} or UNINITIALIZED
+>                                         [3] ∈ {3} or UNINITIALIZED
+>                                         [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_exact_nonnull_shrink_l46[0] ∈ {0} or UNINITIALIZED
+>                                          [1] ∈ {1} or UNINITIALIZED
+>   __malloc_test_exact_nonnull_free_l51[0] ∈ {0} or UNINITIALIZED
+>                                       [1] ∈ {1} or UNINITIALIZED
+>                                       [2] ∈ {2} or UNINITIALIZED
+>                                       [3] ∈ {3} or UNINITIALIZED
+>                                       [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_maybe_nonnull_l58[0] ∈ {0} or UNINITIALIZED
+>                                   [1] ∈ {1} or UNINITIALIZED
+>   __malloc_test_same_size_l63[0] ∈ {0} or UNINITIALIZED
+>                              [1] ∈ {1} or UNINITIALIZED
+>                              [2] ∈ {2} or UNINITIALIZED
+>                              [3] ∈ {3} or UNINITIALIZED
+>                              [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_imprecise_size_l70[0] ∈ {0} or UNINITIALIZED
+543c514,515
+<   __realloc_test_imprecise_size_but_precise_fill_l76[0] ∈ {0}
+---
+>   __realloc_test_imprecise_size_but_precise_fill_l76[0] ∈
+>                                                     {0} or UNINITIALIZED
+545,551c517,523
+<   __malloc_test_imprecise_size_free_l81[0] ∈ {0}
+<                                        [1] ∈ {1}
+<                                        [2] ∈ {2}
+<                                        [3] ∈ {3}
+<                                        [4] ∈ {4}
+<   __realloc_test_imprecise_size_free_l84[0] ∈ {0}
+<                                         [1] ∈ {1}
+---
+>   __malloc_test_imprecise_size_free_l81[0] ∈ {0} or UNINITIALIZED
+>                                        [1] ∈ {1} or UNINITIALIZED
+>                                        [2] ∈ {2} or UNINITIALIZED
+>                                        [3] ∈ {3} or UNINITIALIZED
+>                                        [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_imprecise_size_free_l84[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+554,566c526,542
+<   __realloc_test_possibly_invalid_realloc_l99[0] ∈ {0}
+<                                              [1] ∈ {1}
+<   __realloc_test_realloc_sequence_l126[0] ∈ {0}
+<                                       [1] ∈ {1}
+<                                       [2] ∈ {2}
+<                                       [3] ∈ {3}
+<                                       [4] ∈ {4}
+<   __malloc_test_realloc_loop_l131[0] ∈ {0}
+<                                  [1] ∈ {1}
+<                                  [2] ∈ {2}
+<                                  [3] ∈ {3}
+<                                  [4] ∈ {4}
+<                                  [5..9] ∈ UNINITIALIZED
+---
+>   __realloc_test_possibly_invalid_realloc_l99[0] ∈ {0} or UNINITIALIZED
+>                                              [1] ∈ {1} or UNINITIALIZED
+>   __realloc_test_realloc_sequence_l126[0] ∈ {0} or UNINITIALIZED
+>                                       [1] ∈ {1} or UNINITIALIZED
+>                                       [2] ∈ {2} or UNINITIALIZED
+>                                       [3] ∈ {3} or UNINITIALIZED
+>                                       [4] ∈ {4} or UNINITIALIZED
+>   __malloc_test_realloc_loop_l131[0] ∈ {0} or UNINITIALIZED
+>                                  [1] ∈ {1} or UNINITIALIZED
+>                                  [2] ∈ {2} or UNINITIALIZED
+>                                  [3] ∈ {3} or UNINITIALIZED
+>                                  [4] ∈ {4} or UNINITIALIZED
+>                                  [5] ∈ {5} or UNINITIALIZED
+>                                  [6] ∈ {6} or UNINITIALIZED
+>                                  [7] ∈ {7} or UNINITIALIZED
+>                                  [8] ∈ {8} or UNINITIALIZED
+>                                  [9] ∈ {9} or UNINITIALIZED
+572,576c548,552
+<                                     [5] ∈ {0}
+<                                     [6] ∈ {1}
+<                                     [7] ∈ {2}
+<                                     [8] ∈ {3}
+<                                     [9] ∈ {4}
+---
+>                                     [5] ∈ {0; 5}
+>                                     [6] ∈ {1; 6}
+>                                     [7] ∈ {2; 7}
+>                                     [8] ∈ {3; 8}
+>                                     [9] ∈ {4; 9}
+597,610c573,586
+<   __realloc_test_realloc_multiple_bases_l158[0] ∈ {0}
+<                                             [1] ∈ {1}
+<                                             [2] ∈ {2}
+<                                             [3] ∈ {3}
+<                                             [4] ∈ {4}
+<   __malloc_test_realloc_multiple_bases2_l163[0] ∈ {0}
+<                                             [1] ∈ {1}
+<                                             [2] ∈ {2}
+<                                             [3] ∈ {3}
+<   __realloc_test_realloc_multiple_bases2_l171[0] ∈ {0}
+<                                              [1] ∈ {1}
+<                                              [2] ∈ {2}
+<                                              [3] ∈ {3}
+<                                              [4] ∈ {4}
+---
+>   __realloc_test_realloc_multiple_bases_l158[0] ∈ {0} or UNINITIALIZED
+>                                             [1] ∈ {1} or UNINITIALIZED
+>                                             [2] ∈ {2} or UNINITIALIZED
+>                                             [3] ∈ {3} or UNINITIALIZED
+>                                             [4] ∈ {4} or UNINITIALIZED
+>   __malloc_test_realloc_multiple_bases2_l163[0] ∈ {0} or UNINITIALIZED
+>                                             [1] ∈ {1} or UNINITIALIZED
+>                                             [2] ∈ {2} or UNINITIALIZED
+>                                             [3] ∈ {3} or UNINITIALIZED
+>   __realloc_test_realloc_multiple_bases2_l171[0] ∈ {0} or UNINITIALIZED
+>                                              [1] ∈ {1; 10} or UNINITIALIZED
+>                                              [2] ∈ {2} or UNINITIALIZED
+>                                              [3] ∈ {3} or UNINITIALIZED
+>                                              [4] ∈ {4} or UNINITIALIZED
+612,614c588,590
+<                                              [1] ∈ {1}
+<                                              [2] ∈ {2}
+<                                              [3] ∈ {3}
+---
+>                                              [1] ∈ {1; 10}
+>                                              [2] ∈ {2; 20}
+>                                              [3] ∈ {3} or UNINITIALIZED
+695,706c671,688
+<   p1 ∈ ESCAPINGADDR
+<   p2 ∈ {{ &__realloc_test_exact_nonnull_expand_l38[0] }}
+<   __realloc_test_exact_nonnull_expand_l38[0] ∈ {0}
+<                                          [1] ∈ {1}
+<                                          [2] ∈ {2}
+<                                          [3] ∈ {3}
+<                                          [4] ∈ {4}
+<                                          [5] ∈ {5}
+<                                          [6] ∈ {6}
+<                                          [7] ∈ {7}
+<                                          [8] ∈ {8}
+<                                          [9] ∈ {9}
+---
+>   p1 ∈
+>     {{ NULL ; (void *)&__malloc_test_exact_nonnull_expand_l36 }} or ESCAPINGADDR
+>   p2 ∈ {{ NULL ; &__realloc_test_exact_nonnull_expand_l38[0] }}
+>   __malloc_test_exact_nonnull_expand_l36[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+>                                         [2] ∈ {2} or UNINITIALIZED
+>                                         [3] ∈ {3} or UNINITIALIZED
+>                                         [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_exact_nonnull_expand_l38[0] ∈ {0} or UNINITIALIZED
+>                                          [1] ∈ {1} or UNINITIALIZED
+>                                          [2] ∈ {2} or UNINITIALIZED
+>                                          [3] ∈ {3} or UNINITIALIZED
+>                                          [4] ∈ {4} or UNINITIALIZED
+>                                          [5] ∈ {5} or UNINITIALIZED
+>                                          [6] ∈ {6} or UNINITIALIZED
+>                                          [7] ∈ {7} or UNINITIALIZED
+>                                          [8] ∈ {8} or UNINITIALIZED
+>                                          [9] ∈ {9} or UNINITIALIZED
+709,710c691,698
+<   p1 ∈ ESCAPINGADDR
+<   p2 ∈ {{ &__realloc_test_exact_nonnull_free_l53[0] }}
+---
+>   p1 ∈
+>     {{ NULL ; (void *)&__malloc_test_exact_nonnull_free_l51 }} or ESCAPINGADDR
+>   p2 ∈ {{ NULL ; &__realloc_test_exact_nonnull_free_l53[0] }}
+>   __malloc_test_exact_nonnull_free_l51[0] ∈ {0} or UNINITIALIZED
+>                                       [1] ∈ {1} or UNINITIALIZED
+>                                       [2] ∈ {2} or UNINITIALIZED
+>                                       [3] ∈ {3} or UNINITIALIZED
+>                                       [4] ∈ {4} or UNINITIALIZED
+713,716c701,710
+<   p1 ∈ ESCAPINGADDR
+<   p2 ∈ {{ &__realloc_test_exact_nonnull_shrink_l46[0] }}
+<   __realloc_test_exact_nonnull_shrink_l46[0] ∈ {0}
+<                                          [1] ∈ {1}
+---
+>   p1 ∈
+>     {{ NULL ; (void *)&__malloc_test_exact_nonnull_shrink_l44 }} or ESCAPINGADDR
+>   p2 ∈ {{ NULL ; &__realloc_test_exact_nonnull_shrink_l46[0] }}
+>   __malloc_test_exact_nonnull_shrink_l44[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+>                                         [2] ∈ {2} or UNINITIALIZED
+>                                         [3] ∈ {3} or UNINITIALIZED
+>                                         [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_exact_nonnull_shrink_l46[0] ∈ {0} or UNINITIALIZED
+>                                          [1] ∈ {1} or UNINITIALIZED
+718,728c712,722
+<   p ∈ {{ &__realloc_test_exact_null_l27[0] }}
+<   __realloc_test_exact_null_l27[0] ∈ {0}
+<                                [1] ∈ {1}
+<                                [2] ∈ {2}
+<                                [3] ∈ {3}
+<                                [4] ∈ {4}
+<                                [5] ∈ {5}
+<                                [6] ∈ {6}
+<                                [7] ∈ {7}
+<                                [8] ∈ {8}
+<                                [9] ∈ {9}
+---
+>   p ∈ {{ NULL ; &__realloc_test_exact_null_l27[0] }}
+>   __realloc_test_exact_null_l27[0] ∈ {0} or UNINITIALIZED
+>                                [1] ∈ {1} or UNINITIALIZED
+>                                [2] ∈ {2} or UNINITIALIZED
+>                                [3] ∈ {3} or UNINITIALIZED
+>                                [4] ∈ {4} or UNINITIALIZED
+>                                [5] ∈ {5} or UNINITIALIZED
+>                                [6] ∈ {6} or UNINITIALIZED
+>                                [7] ∈ {7} or UNINITIALIZED
+>                                [8] ∈ {8} or UNINITIALIZED
+>                                [9] ∈ {9} or UNINITIALIZED
+730c724
+<   p ∈ {{ &__realloc_test_exact_null_free_l32[0] }}
+---
+>   p ∈ {{ NULL ; &__realloc_test_exact_null_free_l32[0] }}
+736c730
+<   p2 ∈ {{ &__realloc_test_imprecise_both_l91[0] }}
+---
+>   p2 ∈ {{ NULL ; &__realloc_test_imprecise_both_l91[0] }}
+741,742c735,736
+<   p ∈ {{ &__realloc_test_imprecise_size_l70[0] }}
+<   __realloc_test_imprecise_size_l70[0] ∈ {0}
+---
+>   p ∈ {{ NULL ; &__realloc_test_imprecise_size_l70[0] }}
+>   __realloc_test_imprecise_size_l70[0] ∈ {0} or UNINITIALIZED
+747,748c741,743
+<   p ∈ {{ &__realloc_test_imprecise_size_but_precise_fill_l76[0] }}
+<   __realloc_test_imprecise_size_but_precise_fill_l76[0] ∈ {0}
+---
+>   p ∈ {{ NULL ; &__realloc_test_imprecise_size_but_precise_fill_l76[0] }}
+>   __realloc_test_imprecise_size_but_precise_fill_l76[0] ∈
+>                                                     {0} or UNINITIALIZED
+752c747,748
+<   p1 ∈ ESCAPINGADDR
+---
+>   p1 ∈
+>     {{ NULL ; (void *)&__malloc_test_imprecise_size_free_l81 }} or ESCAPINGADDR
+754,756c750,757
+<   p2 ∈ {{ &__realloc_test_imprecise_size_free_l84[0] }}
+<   __realloc_test_imprecise_size_free_l84[0] ∈ {0}
+<                                         [1] ∈ {1}
+---
+>   p2 ∈ {{ NULL ; &__realloc_test_imprecise_size_free_l84[0] }}
+>   __malloc_test_imprecise_size_free_l81[0] ∈ {0} or UNINITIALIZED
+>                                        [1] ∈ {1} or UNINITIALIZED
+>                                        [2] ∈ {2} or UNINITIALIZED
+>                                        [3] ∈ {3} or UNINITIALIZED
+>                                        [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_imprecise_size_free_l84[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+758c759,761
+<   NON TERMINATING FUNCTION
+---
+>   __fc_heap_status ∈ [--..--]
+>   p1 ∈ {0}
+>   p2 ∈ UNINITIALIZED
+762c765,768
+<   NON TERMINATING FUNCTION
+---
+>   __fc_heap_status ∈ [--..--]
+>   p1 ∈ {0}
+>   offset ∈ UNINITIALIZED
+>   p2 ∈ UNINITIALIZED
+767,769c773,775
+<   p2 ∈ {{ &__realloc_test_maybe_nonnull_l58[0] }}
+<   __realloc_test_maybe_nonnull_l58[0] ∈ {0}
+<                                   [1] ∈ {1}
+---
+>   p2 ∈ {{ NULL ; &__realloc_test_maybe_nonnull_l58[0] }}
+>   __realloc_test_maybe_nonnull_l58[0] ∈ {0} or UNINITIALIZED
+>                                   [1] ∈ {1} or UNINITIALIZED
+772c778,779
+<   p1 ∈ ESCAPINGADDR
+---
+>   p1 ∈
+>     {{ NULL ; &__malloc_test_possibly_invalid_realloc_l96[0] }} or ESCAPINGADDR
+774,776c781,783
+<   p2 ∈ {{ &__realloc_test_possibly_invalid_realloc_l99[0] }}
+<   __realloc_test_possibly_invalid_realloc_l99[0] ∈ {0}
+<                                              [1] ∈ {1}
+---
+>   p2 ∈ {{ NULL ; &__realloc_test_possibly_invalid_realloc_l99[0] }}
+>   __realloc_test_possibly_invalid_realloc_l99[0] ∈ {0} or UNINITIALIZED
+>                                              [1] ∈ {1} or UNINITIALIZED
+779,780c786,800
+<   p1 ∈ ESCAPINGADDR
+<   p2 ∈ {{ &__realloc_w_test_realloc_loop_l138[0] }}
+---
+>   p1 ∈
+>     {{ NULL ; (void *)&__malloc_test_realloc_loop_l131 }} or ESCAPINGADDR
+>   p2 ∈
+>     {{ &__malloc_test_realloc_loop_l131[0] ;
+>        &__realloc_w_test_realloc_loop_l138[0] }}
+>   __malloc_test_realloc_loop_l131[0] ∈ {0} or UNINITIALIZED
+>                                  [1] ∈ {1} or UNINITIALIZED
+>                                  [2] ∈ {2} or UNINITIALIZED
+>                                  [3] ∈ {3} or UNINITIALIZED
+>                                  [4] ∈ {4} or UNINITIALIZED
+>                                  [5] ∈ {5} or UNINITIALIZED
+>                                  [6] ∈ {6} or UNINITIALIZED
+>                                  [7] ∈ {7} or UNINITIALIZED
+>                                  [8] ∈ {8} or UNINITIALIZED
+>                                  [9] ∈ {9} or UNINITIALIZED
+786,790c806,810
+<                                     [5] ∈ {0}
+<                                     [6] ∈ {1}
+<                                     [7] ∈ {2}
+<                                     [8] ∈ {3}
+<                                     [9] ∈ {4}
+---
+>                                     [5] ∈ {0; 5}
+>                                     [6] ∈ {1; 6}
+>                                     [7] ∈ {2; 7}
+>                                     [8] ∈ {3; 8}
+>                                     [9] ∈ {4; 9}
+814c834
+<     {{ (void *)&__malloc_test_realloc_multiple_bases_l151 }} or ESCAPINGADDR
+---
+>     {{ NULL ; (void *)&__malloc_test_realloc_multiple_bases_l151 }} or ESCAPINGADDR
+816c836
+<     {{ &__malloc_test_realloc_multiple_bases_l154[0] ;
+---
+>     {{ NULL ; &__malloc_test_realloc_multiple_bases_l154[0] ;
+818,823c838,843
+<   p3 ∈ {{ &__realloc_test_realloc_multiple_bases_l158[0] }}
+<   __realloc_test_realloc_multiple_bases_l158[0] ∈ {0}
+<                                             [1] ∈ {1}
+<                                             [2] ∈ {2}
+<                                             [3] ∈ {3}
+<                                             [4] ∈ {4}
+---
+>   p3 ∈ {{ NULL ; &__realloc_test_realloc_multiple_bases_l158[0] }}
+>   __realloc_test_realloc_multiple_bases_l158[0] ∈ {0} or UNINITIALIZED
+>                                             [1] ∈ {1} or UNINITIALIZED
+>                                             [2] ∈ {2} or UNINITIALIZED
+>                                             [3] ∈ {3} or UNINITIALIZED
+>                                             [4] ∈ {4} or UNINITIALIZED
+827c847
+<     {{ (void *)&__malloc_test_realloc_multiple_bases2_l163 }} or ESCAPINGADDR
+---
+>     {{ NULL ; (void *)&__malloc_test_realloc_multiple_bases2_l163 }} or ESCAPINGADDR
+829c849
+<     {{ &__realloc_test_realloc_multiple_bases2_l166[0] ;
+---
+>     {{ NULL ; &__realloc_test_realloc_multiple_bases2_l166[0] ;
+831c851,852
+<   p3 ∈ ESCAPINGADDR
+---
+>   p3 ∈
+>     {{ NULL ; &__realloc_test_realloc_multiple_bases2_l169[0] }} or ESCAPINGADDR
+833,839c854,861
+<     {{ &__realloc_test_realloc_multiple_bases2_l171[0] }} or ESCAPINGADDR
+<   p5 ∈ {{ &__malloc_test_realloc_multiple_bases2_l174[0] }} or ESCAPINGADDR
+<   p6 ∈ {{ &__realloc_test_realloc_multiple_bases2_l177[0] }}
+<   __malloc_test_realloc_multiple_bases2_l163[0] ∈ {0}
+<                                             [1] ∈ {1}
+<                                             [2] ∈ {2}
+<                                             [3] ∈ {3}
+---
+>     {{ NULL ; &__realloc_test_realloc_multiple_bases2_l171[0] }} or ESCAPINGADDR
+>   p5 ∈
+>     {{ NULL ; &__malloc_test_realloc_multiple_bases2_l174[0] }} or ESCAPINGADDR
+>   p6 ∈ {{ NULL ; &__realloc_test_realloc_multiple_bases2_l177[0] }}
+>   __malloc_test_realloc_multiple_bases2_l163[0] ∈ {0} or UNINITIALIZED
+>                                             [1] ∈ {1} or UNINITIALIZED
+>                                             [2] ∈ {2} or UNINITIALIZED
+>                                             [3] ∈ {3} or UNINITIALIZED
+847,854c869,876
+<   __realloc_test_realloc_multiple_bases2_l171[0] ∈ {0}
+<                                              [1] ∈ {1}
+<                                              [2] ∈ {2}
+<                                              [3] ∈ {3}
+<                                              [4] ∈ {4}
+<   __malloc_test_realloc_multiple_bases2_l174[0] ∈ {0}
+<                                             [1] ∈ {10}
+<                                             [2] ∈ {20}
+---
+>   __realloc_test_realloc_multiple_bases2_l171[0] ∈ {0} or UNINITIALIZED
+>                                              [1] ∈ {1; 10} or UNINITIALIZED
+>                                              [2] ∈ {2} or UNINITIALIZED
+>                                              [3] ∈ {3} or UNINITIALIZED
+>                                              [4] ∈ {4} or UNINITIALIZED
+>   __malloc_test_realloc_multiple_bases2_l174[0] ∈ {0} or UNINITIALIZED
+>                                             [1] ∈ {10} or UNINITIALIZED
+>                                             [2] ∈ {20} or UNINITIALIZED
+857,859c879,881
+<                                              [1] ∈ {1}
+<                                              [2] ∈ {2}
+<                                              [3] ∈ {3}
+---
+>                                              [1] ∈ {1; 10}
+>                                              [2] ∈ {2; 20}
+>                                              [3] ∈ {3} or UNINITIALIZED
+864c886
+<    {{ &__malloc_test_realloc_multiple_bases_loop_l184[0] ;
+---
+>    {{ NULL ; &__malloc_test_realloc_multiple_bases_loop_l184[0] ;
+934,941c956,965
+<   p1 ∈ ESCAPINGADDR
+<   p2 ∈ ESCAPINGADDR
+<   p3 ∈ {{ &__realloc_test_realloc_sequence_l126[0] }}
+<   __realloc_test_realloc_sequence_l126[0] ∈ {0}
+<                                       [1] ∈ {1}
+<                                       [2] ∈ {2}
+<                                       [3] ∈ {3}
+<                                       [4] ∈ {4}
+---
+>   p1 ∈
+>     {{ NULL ; (void *)&__malloc_test_realloc_sequence_l124 }} or ESCAPINGADDR
+>   p2 ∈
+>     {{ NULL ; &__realloc_test_realloc_sequence_l125[0] }} or ESCAPINGADDR
+>   p3 ∈ {{ NULL ; &__realloc_test_realloc_sequence_l126[0] }}
+>   __realloc_test_realloc_sequence_l126[0] ∈ {0} or UNINITIALIZED
+>                                       [1] ∈ {1} or UNINITIALIZED
+>                                       [2] ∈ {2} or UNINITIALIZED
+>                                       [3] ∈ {3} or UNINITIALIZED
+>                                       [4] ∈ {4} or UNINITIALIZED
+944,950c968,979
+<   p1 ∈ ESCAPINGADDR
+<   p2 ∈ {{ &__realloc_test_same_size_l65[0] }}
+<   __realloc_test_same_size_l65[0] ∈ {0}
+<                               [1] ∈ {1}
+<                               [2] ∈ {2}
+<                               [3] ∈ {3}
+<                               [4] ∈ {4}
+---
+>   p1 ∈ {{ NULL ; (void *)&__malloc_test_same_size_l63 }} or ESCAPINGADDR
+>   p2 ∈ {{ NULL ; &__realloc_test_same_size_l65[0] }}
+>   __malloc_test_same_size_l63[0] ∈ {0} or UNINITIALIZED
+>                              [1] ∈ {1} or UNINITIALIZED
+>                              [2] ∈ {2} or UNINITIALIZED
+>                              [3] ∈ {3} or UNINITIALIZED
+>                              [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_same_size_l65[0] ∈ {0} or UNINITIALIZED
+>                               [1] ∈ {1} or UNINITIALIZED
+>                               [2] ∈ {2} or UNINITIALIZED
+>                               [3] ∈ {3} or UNINITIALIZED
+>                               [4] ∈ {4} or UNINITIALIZED
+954,983c983,1032
+<   __realloc_test_exact_null_l27[0] ∈ {0}
+<                                [1] ∈ {1}
+<                                [2] ∈ {2}
+<                                [3] ∈ {3}
+<                                [4] ∈ {4}
+<                                [5] ∈ {5}
+<                                [6] ∈ {6}
+<                                [7] ∈ {7}
+<                                [8] ∈ {8}
+<                                [9] ∈ {9}
+<   __realloc_test_exact_nonnull_expand_l38[0] ∈ {0}
+<                                          [1] ∈ {1}
+<                                          [2] ∈ {2}
+<                                          [3] ∈ {3}
+<                                          [4] ∈ {4}
+<                                          [5] ∈ {5}
+<                                          [6] ∈ {6}
+<                                          [7] ∈ {7}
+<                                          [8] ∈ {8}
+<                                          [9] ∈ {9}
+<   __realloc_test_exact_nonnull_shrink_l46[0] ∈ {0}
+<                                          [1] ∈ {1}
+<   __realloc_test_maybe_nonnull_l58[0] ∈ {0}
+<                                   [1] ∈ {1}
+<   __realloc_test_same_size_l65[0] ∈ {0}
+<                               [1] ∈ {1}
+<                               [2] ∈ {2}
+<                               [3] ∈ {3}
+<                               [4] ∈ {4}
+<   __realloc_test_imprecise_size_l70[0] ∈ {0}
+---
+>   __realloc_test_exact_null_l27[0] ∈ {0} or UNINITIALIZED
+>                                [1] ∈ {1} or UNINITIALIZED
+>                                [2] ∈ {2} or UNINITIALIZED
+>                                [3] ∈ {3} or UNINITIALIZED
+>                                [4] ∈ {4} or UNINITIALIZED
+>                                [5] ∈ {5} or UNINITIALIZED
+>                                [6] ∈ {6} or UNINITIALIZED
+>                                [7] ∈ {7} or UNINITIALIZED
+>                                [8] ∈ {8} or UNINITIALIZED
+>                                [9] ∈ {9} or UNINITIALIZED
+>   __malloc_test_exact_nonnull_expand_l36[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+>                                         [2] ∈ {2} or UNINITIALIZED
+>                                         [3] ∈ {3} or UNINITIALIZED
+>                                         [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_exact_nonnull_expand_l38[0] ∈ {0} or UNINITIALIZED
+>                                          [1] ∈ {1} or UNINITIALIZED
+>                                          [2] ∈ {2} or UNINITIALIZED
+>                                          [3] ∈ {3} or UNINITIALIZED
+>                                          [4] ∈ {4} or UNINITIALIZED
+>                                          [5] ∈ {5} or UNINITIALIZED
+>                                          [6] ∈ {6} or UNINITIALIZED
+>                                          [7] ∈ {7} or UNINITIALIZED
+>                                          [8] ∈ {8} or UNINITIALIZED
+>                                          [9] ∈ {9} or UNINITIALIZED
+>   __malloc_test_exact_nonnull_shrink_l44[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+>                                         [2] ∈ {2} or UNINITIALIZED
+>                                         [3] ∈ {3} or UNINITIALIZED
+>                                         [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_exact_nonnull_shrink_l46[0] ∈ {0} or UNINITIALIZED
+>                                          [1] ∈ {1} or UNINITIALIZED
+>   __malloc_test_exact_nonnull_free_l51[0] ∈ {0} or UNINITIALIZED
+>                                       [1] ∈ {1} or UNINITIALIZED
+>                                       [2] ∈ {2} or UNINITIALIZED
+>                                       [3] ∈ {3} or UNINITIALIZED
+>                                       [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_maybe_nonnull_l58[0] ∈ {0} or UNINITIALIZED
+>                                   [1] ∈ {1} or UNINITIALIZED
+>   __malloc_test_same_size_l63[0] ∈ {0} or UNINITIALIZED
+>                              [1] ∈ {1} or UNINITIALIZED
+>                              [2] ∈ {2} or UNINITIALIZED
+>                              [3] ∈ {3} or UNINITIALIZED
+>                              [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_same_size_l65[0] ∈ {0} or UNINITIALIZED
+>                               [1] ∈ {1} or UNINITIALIZED
+>                               [2] ∈ {2} or UNINITIALIZED
+>                               [3] ∈ {3} or UNINITIALIZED
+>                               [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_imprecise_size_l70[0] ∈ {0} or UNINITIALIZED
+985c1034,1035
+<   __realloc_test_imprecise_size_but_precise_fill_l76[0] ∈ {0}
+---
+>   __realloc_test_imprecise_size_but_precise_fill_l76[0] ∈
+>                                                     {0} or UNINITIALIZED
+987,988c1037,1043
+<   __realloc_test_imprecise_size_free_l84[0] ∈ {0}
+<                                         [1] ∈ {1}
+---
+>   __malloc_test_imprecise_size_free_l81[0] ∈ {0} or UNINITIALIZED
+>                                        [1] ∈ {1} or UNINITIALIZED
+>                                        [2] ∈ {2} or UNINITIALIZED
+>                                        [3] ∈ {3} or UNINITIALIZED
+>                                        [4] ∈ {4} or UNINITIALIZED
+>   __realloc_test_imprecise_size_free_l84[0] ∈ {0} or UNINITIALIZED
+>                                         [1] ∈ {1} or UNINITIALIZED
+991,997c1046,1062
+<   __realloc_test_possibly_invalid_realloc_l99[0] ∈ {0}
+<                                              [1] ∈ {1}
+<   __realloc_test_realloc_sequence_l126[0] ∈ {0}
+<                                       [1] ∈ {1}
+<                                       [2] ∈ {2}
+<                                       [3] ∈ {3}
+<                                       [4] ∈ {4}
+---
+>   __realloc_test_possibly_invalid_realloc_l99[0] ∈ {0} or UNINITIALIZED
+>                                              [1] ∈ {1} or UNINITIALIZED
+>   __realloc_test_realloc_sequence_l126[0] ∈ {0} or UNINITIALIZED
+>                                       [1] ∈ {1} or UNINITIALIZED
+>                                       [2] ∈ {2} or UNINITIALIZED
+>                                       [3] ∈ {3} or UNINITIALIZED
+>                                       [4] ∈ {4} or UNINITIALIZED
+>   __malloc_test_realloc_loop_l131[0] ∈ {0} or UNINITIALIZED
+>                                  [1] ∈ {1} or UNINITIALIZED
+>                                  [2] ∈ {2} or UNINITIALIZED
+>                                  [3] ∈ {3} or UNINITIALIZED
+>                                  [4] ∈ {4} or UNINITIALIZED
+>                                  [5] ∈ {5} or UNINITIALIZED
+>                                  [6] ∈ {6} or UNINITIALIZED
+>                                  [7] ∈ {7} or UNINITIALIZED
+>                                  [8] ∈ {8} or UNINITIALIZED
+>                                  [9] ∈ {9} or UNINITIALIZED
+1003,1007c1068,1072
+<                                     [5] ∈ {0}
+<                                     [6] ∈ {1}
+<                                     [7] ∈ {2}
+<                                     [8] ∈ {3}
+<                                     [9] ∈ {4}
+---
+>                                     [5] ∈ {0; 5}
+>                                     [6] ∈ {1; 6}
+>                                     [7] ∈ {2; 7}
+>                                     [8] ∈ {3; 8}
+>                                     [9] ∈ {4; 9}
+1028,1036c1093,1101
+<   __realloc_test_realloc_multiple_bases_l158[0] ∈ {0}
+<                                             [1] ∈ {1}
+<                                             [2] ∈ {2}
+<                                             [3] ∈ {3}
+<                                             [4] ∈ {4}
+<   __malloc_test_realloc_multiple_bases2_l163[0] ∈ {0}
+<                                             [1] ∈ {1}
+<                                             [2] ∈ {2}
+<                                             [3] ∈ {3}
+---
+>   __realloc_test_realloc_multiple_bases_l158[0] ∈ {0} or UNINITIALIZED
+>                                             [1] ∈ {1} or UNINITIALIZED
+>                                             [2] ∈ {2} or UNINITIALIZED
+>                                             [3] ∈ {3} or UNINITIALIZED
+>                                             [4] ∈ {4} or UNINITIALIZED
+>   __malloc_test_realloc_multiple_bases2_l163[0] ∈ {0} or UNINITIALIZED
+>                                             [1] ∈ {1} or UNINITIALIZED
+>                                             [2] ∈ {2} or UNINITIALIZED
+>                                             [3] ∈ {3} or UNINITIALIZED
+1044,1051c1109,1116
+<   __realloc_test_realloc_multiple_bases2_l171[0] ∈ {0}
+<                                              [1] ∈ {1}
+<                                              [2] ∈ {2}
+<                                              [3] ∈ {3}
+<                                              [4] ∈ {4}
+<   __malloc_test_realloc_multiple_bases2_l174[0] ∈ {0}
+<                                             [1] ∈ {10}
+<                                             [2] ∈ {20}
+---
+>   __realloc_test_realloc_multiple_bases2_l171[0] ∈ {0} or UNINITIALIZED
+>                                              [1] ∈ {1; 10} or UNINITIALIZED
+>                                              [2] ∈ {2} or UNINITIALIZED
+>                                              [3] ∈ {3} or UNINITIALIZED
+>                                              [4] ∈ {4} or UNINITIALIZED
+>   __malloc_test_realloc_multiple_bases2_l174[0] ∈ {0} or UNINITIALIZED
+>                                             [1] ∈ {10} or UNINITIALIZED
+>                                             [2] ∈ {20} or UNINITIALIZED
+1054,1056c1119,1121
+<                                              [1] ∈ {1}
+<                                              [2] ∈ {2}
+<                                              [3] ∈ {3}
+---
+>                                              [1] ∈ {1; 10}
+>                                              [2] ∈ {2; 20}
+>                                              [3] ∈ {3} or UNINITIALIZED
+1150d1214
+< [from] Non-terminating function test_invalid_realloc (no dependencies)
+1156d1219
+< [from] Non-terminating function test_invalid_realloc3 (no dependencies)
+1196c1259
+<   __realloc_w_test_realloc_loop_l138[5..29] FROM b; n (and SELF)
+---
+>   __realloc_w_test_realloc_loop_l138[0..29] FROM b; n (and SELF)
+1234c1297
+<   __realloc_w_test_realloc_loop_l138[5..29] FROM __fc_heap_status (and SELF)
+---
+>   __realloc_w_test_realloc_loop_l138[0..29] FROM __fc_heap_status (and SELF)
+1262c1325
+<   __realloc_w_test_realloc_loop_l138[5..29] FROM __fc_heap_status (and SELF)
+---
+>   __realloc_w_test_realloc_loop_l138[0..29] FROM __fc_heap_status (and SELF)
+1290c1353
+<   __realloc_w_test_realloc_loop_l138[5..29] FROM __fc_heap_status (and SELF)
+---
+>   __realloc_w_test_realloc_loop_l138[0..29] FROM __fc_heap_status (and SELF)
+1318c1381
+<   __realloc_w_test_realloc_loop_l138[5..29] FROM __fc_heap_status (and SELF)
+---
+>   __realloc_w_test_realloc_loop_l138[0..29] FROM __fc_heap_status (and SELF)
+1363c1426
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1413c1476
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1463c1526
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1513c1576
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1529c1592
+<   NON TERMINATING - NO EFFECTS
+---
+>   __fc_heap_status FROM __fc_heap_status (and SELF)
+1533c1596
+<   NON TERMINATING - NO EFFECTS
+---
+>   __fc_heap_status FROM __fc_heap_status (and SELF)
+1569c1632
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1619c1682
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1654c1717
+<   __realloc_w_test_realloc_loop_l138[5..29] FROM __fc_heap_status (and SELF)
+---
+>   __realloc_w_test_realloc_loop_l138[0..29] FROM __fc_heap_status (and SELF)
+1697c1760
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1747c1810
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1805c1868
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]
+1840c1903
+<   __realloc_w_test_realloc_loop_l138[5..29] FROM __fc_heap_status (and SELF)
+---
+>   __realloc_w_test_realloc_loop_l138[0..29] FROM __fc_heap_status (and SELF)
+1858c1921
+<   __realloc_test_same_size_l65[0] FROM __fc_heap_status
+---
+>   __realloc_test_same_size_l65[0] FROM __fc_heap_status (and SELF)
+1869c1932
+<   __realloc_w_test_realloc_loop_l138[5..29] FROM __fc_heap_status (and SELF)
+---
+>   __realloc_w_test_realloc_loop_l138[0..29] FROM __fc_heap_status (and SELF)
+1894c1957
+<   __realloc_test_same_size_l65[0] FROM __fc_heap_status; nondet
+---
+>   __realloc_test_same_size_l65[0] FROM __fc_heap_status; nondet (and SELF)
+1913c1976
+<   __realloc_w_test_realloc_loop_l138[5..29]
+---
+>   __realloc_w_test_realloc_loop_l138[0..29]

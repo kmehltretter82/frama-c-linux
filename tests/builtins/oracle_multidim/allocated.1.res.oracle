@@ -1,0 +1,996 @@
+9a10,13
+> [eva:alarm] allocated.c:25: Warning: assertion got status unknown.
+> [eva:alarm] allocated.c:26: Warning: out of bounds write. assert \valid(p);
+> [kernel] allocated.c:26: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+18d21
+< [eva:malloc] allocated.c:31: strong free on bases: {__malloc_main_l25}
+22a26,29
+> [eva:alarm] allocated.c:36: Warning: assertion got status unknown.
+> [eva:alarm] allocated.c:37: Warning: out of bounds write. assert \valid(p + 0);
+> [kernel] allocated.c:37: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+28d34
+< [eva:malloc] allocated.c:43: strong free on bases: {__malloc_main_l36}
+36d41
+< [eva:malloc] allocated.c:45: strong free on bases: {__malloc_main_l36}
+46a52,55
+> [eva:alarm] allocated.c:50: Warning: assertion got status unknown.
+> [eva:alarm] allocated.c:51: Warning: out of bounds write. assert \valid(p + 0);
+> [kernel] allocated.c:51: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+56d64
+< [eva:malloc] allocated.c:58: strong free on bases: {__malloc_main_l50_0}
+59a68,71
+> [eva:alarm] allocated.c:63: Warning: assertion got status unknown.
+> [eva:alarm] allocated.c:64: Warning: out of bounds write. assert \valid(p);
+> [kernel] allocated.c:64: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+64d75
+< [eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
+70d80
+< [eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63_0}
+76d85
+< [eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63_1}
+82d90
+< [eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63_2}
+84a93,95
+> [eva:alarm] allocated.c:74: Warning: out of bounds write. assert \valid(p);
+> [kernel] allocated.c:74: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+89d99
+< [eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
+95d104
+< [eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73_0}
+101d109
+< [eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73_1}
+107d114
+< [eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73_2}
+110a118
+> [eva:alarm] allocated.c:82: Warning: assertion got status unknown.
+113c121
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82}
+---
+> [eva] allocated.c:87: Call to builtin free
+117a126,133
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_2
+> [eva:alarm] allocated.c:85: Warning: out of bounds write. assert \valid(p + j);
+> [kernel] allocated.c:85: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+> [eva] allocated.c:87: Call to builtin free
+> [eva] allocated.c:87: Call to builtin free
+> [eva] allocated.c:87: Call to builtin free
+119d134
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_1}
+121d135
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_0}
+123d136
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_1}
+125,127d137
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_0}
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_2
+136,175d145
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_2}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_3}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_4}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_5}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_6}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_2}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_3}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_4}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_5}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_6}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_2}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_3}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_4}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_5}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_6}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_2}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_3}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_4}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_5}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_6}
+188,223d157
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_13
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_14
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_15
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_16
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_17
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_18
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_19
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_20
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_21
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_22
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_23
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_24
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_25
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_26
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_27
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_28
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_29
+< [eva] allocated.c:82: Call to builtin malloc
+< [eva] allocated.c:82: allocating variable __malloc_main_l82_30
+225,403d158
+< [eva] allocated.c:84: Trace partitioning superposing up to 200 states
+< [eva] allocated.c:84: Trace partitioning superposing up to 300 states
+< [eva] allocated.c:84: Trace partitioning superposing up to 400 states
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_29}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_28}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_27}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_26}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_25}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_24}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_23}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_22}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_21}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_20}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_19}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_18}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_17}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_16}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_15}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_14}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_13}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_12}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_11}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_10}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_9}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_8}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_29}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_28}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_27}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_26}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_25}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_24}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_23}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_22}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_21}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_20}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_19}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_18}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_17}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_16}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_15}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_14}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_13}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_12}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_11}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_10}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_9}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_8}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_29}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_28}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_27}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_26}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_25}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_24}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_23}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_22}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_21}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_20}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_19}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_18}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_17}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_16}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_15}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_14}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_13}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_12}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_11}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_10}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_9}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_8}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_29}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_28}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_27}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_26}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_25}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_24}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_23}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_22}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_21}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_20}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_19}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_18}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_17}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_16}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_15}
+405d159
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_14}
+407d160
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_13}
+409d161
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_12}
+411d162
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_11}
+413d163
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_10}
+415d164
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_9}
+417d165
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_8}
+419d166
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+421d167
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
+423d168
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_29}
+425d169
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_28}
+427d170
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_27}
+429d171
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_26}
+431d172
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_25}
+433d173
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_24}
+435d174
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_23}
+437d175
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_22}
+439d176
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_21}
+441d177
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_20}
+443d178
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_19}
+445d179
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_18}
+447d180
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_17}
+449d181
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_16}
+451d182
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_15}
+453d183
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_14}
+455d184
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_13}
+457d185
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_12}
+459d186
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_11}
+461d187
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_10}
+463d188
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_9}
+465d189
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_8}
+467d190
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+469d191
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
+471d192
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_29}
+473d193
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_28}
+475d194
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_27}
+477d195
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_26}
+479d196
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_25}
+481d197
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_24}
+483d198
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_23}
+485d199
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_22}
+487d200
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_21}
+489d201
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_20}
+491d202
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_19}
+493d203
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_18}
+495,609c205,322
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_17}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_16}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_15}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_14}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_13}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_12}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_11}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_10}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_9}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_8}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_29}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_28}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_27}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_26}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_25}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_24}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_23}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_22}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_21}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_20}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_19}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_18}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_17}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_16}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_15}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_14}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_13}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_12}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_11}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_10}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_9}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_8}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_29}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_28}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_27}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_26}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_25}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_24}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_23}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_22}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_21}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_20}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_19}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_18}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_17}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_16}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_15}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_14}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_13}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_12}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_11}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_10}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_9}
+< [eva] allocated.c:87: Call to builtin free
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_8}
+---
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_13
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_14
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_15
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_16
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_17
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_18
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_19
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_20
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_21
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_22
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_23
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_24
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_25
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_26
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_27
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_28
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_29
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_30
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_31
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_32
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_33
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_34
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_35
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_36
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_37
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_38
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_39
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_40
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_41
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_42
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_43
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_44
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_45
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_46
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_47
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_48
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_49
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_50
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_51
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_52
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_53
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_54
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_55
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_56
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_57
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_58
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_59
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_60
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_61
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_62
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_63
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_64
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_65
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_66
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_67
+> [eva] allocated.c:82: Call to builtin malloc
+> [eva] allocated.c:82: allocating variable __malloc_main_l82_68
+> [eva] allocated.c:84: Trace partitioning superposing up to 200 states
+> [eva] allocated.c:84: Trace partitioning superposing up to 300 states
+> [eva] allocated.c:84: Trace partitioning superposing up to 400 states
+> [eva] allocated.c:84: Trace partitioning superposing up to 600 states
+> [eva] allocated.c:84: Trace partitioning superposing up to 900 states
+> [eva] allocated.c:84: Trace partitioning superposing up to 1100 states
+611d323
+< [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+614a327
+> [eva:alarm] allocated.c:91: Warning: assertion got status unknown.
+617c330
+< [eva:malloc] allocated.c:92: strong free on bases: {__malloc_main_l91}
+---
+> [eva] allocated.c:92: Call to builtin free
+620a334,335
+> [eva] allocated.c:97: Call to builtin malloc
+> [eva] allocated.c:97: allocating variable __malloc_main_l97_0
+621a337,338
+> [eva] allocated.c:97: Frama_C_show_each: {0}
+> [eva] allocated.c:97: Frama_C_show_each: {{ &__malloc_main_l97_0 }}
+622a340,342
+> [kernel] allocated.c:98: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+> [eva] allocated.c:110: Frama_C_show_each: {0}
+626c346
+< [eva:malloc] allocated.c:111: strong free on bases: {__malloc_main_l97}
+---
+> [eva] allocated.c:111: Call to builtin free
+629a350,351
+> [eva] allocated.c:114: Call to builtin malloc
+> [eva] allocated.c:114: allocating variable __malloc_main_l114_0
+630a353,355
+> [eva] allocated.c:114: Frama_C_show_each: {0}
+> [eva] allocated.c:114: Frama_C_show_each: {{ &__malloc_main_l114_0 }}
+> [eva] allocated.c:114: Frama_C_show_each: {0}
+631a357,359
+> [kernel] allocated.c:115: Warning: 
+>   all target addresses were invalid. This path is assumed to be dead.
+> [eva] allocated.c:117: Frama_C_show_each: {0}
+635c363
+< [eva:malloc] allocated.c:118: strong free on bases: {__malloc_main_l114}
+---
+> [eva] allocated.c:118: Call to builtin free
+637a366,367
+> [eva] allocated.c:120: Call to builtin malloc
+> [eva] allocated.c:120: allocating variable __malloc_main_l120_0
+638a369,374
+> [eva] allocated.c:120: Frama_C_show_each: {0}
+> [eva] allocated.c:120: Frama_C_show_each: {{ &__malloc_main_l120_0 }}
+> [eva] allocated.c:120: Frama_C_show_each: {0}
+> [eva] allocated.c:123: Frama_C_show_each: ⊥
+> [eva] allocated.c:123: Frama_C_show_each: ⊥
+> [eva] allocated.c:123: Frama_C_show_each: ⊥
+642c378,380
+< [eva:malloc] allocated.c:125: strong free on bases: {__malloc_main_l120}
+---
+> [eva] allocated.c:125: Call to builtin free
+> [eva] allocated.c:125: Call to builtin free
+> [eva] allocated.c:125: Call to builtin free
+646,648d383
+< [eva] allocated.c:131: Frama_C_show_each: {0}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
+651,653d385
+< [eva] allocated.c:131: Frama_C_show_each: {1}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_0}
+656,658d387
+< [eva] allocated.c:131: Frama_C_show_each: {2}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_1}
+661,693d389
+< [eva] allocated.c:131: Frama_C_show_each: {3}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_2}
+< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
+< [eva] allocated.c:127: allocating variable __malloc_main_l127_3
+< [eva] allocated.c:131: Frama_C_show_each: {4}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_3}
+< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
+< [eva] allocated.c:127: allocating variable __malloc_main_l127_4
+< [eva] allocated.c:131: Frama_C_show_each: {5}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_4}
+< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
+< [eva] allocated.c:127: allocating variable __malloc_main_l127_5
+< [eva] allocated.c:131: Frama_C_show_each: {6}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_5}
+< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
+< [eva] allocated.c:127: allocating variable __malloc_main_l127_6
+< [eva] allocated.c:131: Frama_C_show_each: {7}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_6}
+< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
+< [eva] allocated.c:127: allocating variable __malloc_main_l127_7
+< [eva] allocated.c:131: Frama_C_show_each: {8}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_7}
+< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
+< [eva] allocated.c:127: allocating variable __malloc_main_l127_8
+< [eva] allocated.c:131: Frama_C_show_each: {9}
+< [eva] allocated.c:127: Call to builtin __fc_vla_free
+< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_8}
+701,792c397
+<   __fc_heap_status ∈ [--..--]
+<   i ∈ {10}
+<   j ∈ {10}
+<   p ∈ ESCAPINGADDR
+<   k ∈ {12}
+<   size ∈ [1..100]
+<   pb ∈ ESCAPINGADDR
+<   __retres ∈ {0}
+<   __malloc_main_l82_0 ∈ {7} or UNINITIALIZED
+<   __malloc_main_l82_1 ∈ {7} or UNINITIALIZED
+<   __malloc_main_l82_2[0] ∈ {14} or UNINITIALIZED
+<                      [1] ∈ {17} or UNINITIALIZED
+<   __malloc_main_l82_3[0] ∈ {14} or UNINITIALIZED
+<                      [1] ∈ {17} or UNINITIALIZED
+<   __malloc_main_l82_4[0] ∈ {14} or UNINITIALIZED
+<                      [1] ∈ {17} or UNINITIALIZED
+<   __malloc_main_l82_5[0] ∈ {14} or UNINITIALIZED
+<                      [1] ∈ {17} or UNINITIALIZED
+<   __malloc_main_l82_6[0] ∈ {14} or UNINITIALIZED
+<                      [1] ∈ {17} or UNINITIALIZED
+<   __malloc_main_l82_7[0] ∈ {21} or UNINITIALIZED
+<                      [1] ∈ {24} or UNINITIALIZED
+<                      [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_8[0] ∈ {21} or UNINITIALIZED
+<                      [1] ∈ {24} or UNINITIALIZED
+<                      [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_9[0] ∈ {21} or UNINITIALIZED
+<                      [1] ∈ {24} or UNINITIALIZED
+<                      [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_10[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_11[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_12[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_13[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_14[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_15[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_16[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_17[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_18[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_19[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_20[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_21[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_22[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_23[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_24[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_25[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_26[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_27[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_28[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_29[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+<   __malloc_main_l82_30[0] ∈ {21} or UNINITIALIZED
+<                       [1] ∈ {24} or UNINITIALIZED
+<                       [2] ∈ {27} or UNINITIALIZED
+---
+>   NON TERMINATING FUNCTION
+800,801c405
+< [from] Computing for function __fc_vla_free <-main
+< [from] Done for function __fc_vla_free
+---
+> [from] Non-terminating function main (no dependencies)
+807,808d410
+< [from] Function __fc_vla_free:
+<   NO EFFECTS
+815,872c417
+<   __fc_heap_status FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l25 FROM __fc_heap_status
+<   __malloc_main_l36[0..1] FROM __fc_heap_status; nondet
+<   __malloc_main_l50[0..1] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l50_0[0..1] FROM __fc_heap_status; nondet (and SELF)
+<                      [2] FROM __fc_heap_status; nondet
+<   __malloc_main_l63 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l63_0 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l63_1 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l63_2 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l73 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l73_0 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l73_1 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l73_2 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_0 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_1 FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_2[0..1] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_3[0..1] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_4[0..1] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_5[0..1] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_6[0..1] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_7[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_8[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_9[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_10[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_11[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_12[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_13[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_14[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_15[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_16[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_17[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_18[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_19[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_20[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_21[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_22[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_23[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_24[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_25[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_26[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_27[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_28[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_29[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l82_30[0..2] FROM __fc_heap_status; nondet (and SELF)
+<   __malloc_main_l97[0] FROM __fc_heap_status; nondet
+<   __malloc_main_l114[0..3] FROM __fc_heap_status; nondet
+<   __malloc_main_l127 FROM \nothing (and SELF)
+<   __malloc_main_l127_0[0..1] FROM \nothing (and SELF)
+<   __malloc_main_l127_1[0..2] FROM \nothing (and SELF)
+<   __malloc_main_l127_2[0..3] FROM \nothing (and SELF)
+<   __malloc_main_l127_3[0..4] FROM \nothing (and SELF)
+<   __malloc_main_l127_4[0..5] FROM \nothing (and SELF)
+<   __malloc_main_l127_5[0..6] FROM \nothing (and SELF)
+<   __malloc_main_l127_6[0..7] FROM \nothing (and SELF)
+<   __malloc_main_l127_7[0..8] FROM \nothing (and SELF)
+<   __malloc_main_l127_8[0..9] FROM \nothing (and SELF)
+<   \result FROM \nothing
+---
+>   NON TERMINATING - NO EFFECTS
+876,900c421,460
+<     __retres; __malloc_main_l25; __malloc_main_l36[0..1];
+<     __malloc_main_l50[0..1]; __malloc_main_l50_0[0..2]; __malloc_main_l63;
+<     __malloc_main_l63_0; __malloc_main_l63_1; __malloc_main_l63_2;
+<     __malloc_main_l73; __malloc_main_l73_0; __malloc_main_l73_1;
+<     __malloc_main_l73_2; __malloc_main_l82_0; __malloc_main_l82_1;
+<     __malloc_main_l82_2[0..1]; __malloc_main_l82_3[0..1];
+<     __malloc_main_l82_4[0..1]; __malloc_main_l82_5[0..1];
+<     __malloc_main_l82_6[0..1]; __malloc_main_l82_7[0..2];
+<     __malloc_main_l82_8[0..2]; __malloc_main_l82_9[0..2];
+<     __malloc_main_l82_10[0..2]; __malloc_main_l82_11[0..2];
+<     __malloc_main_l82_12[0..2]; __malloc_main_l82_13[0..2];
+<     __malloc_main_l82_14[0..2]; __malloc_main_l82_15[0..2];
+<     __malloc_main_l82_16[0..2]; __malloc_main_l82_17[0..2];
+<     __malloc_main_l82_18[0..2]; __malloc_main_l82_19[0..2];
+<     __malloc_main_l82_20[0..2]; __malloc_main_l82_21[0..2];
+<     __malloc_main_l82_22[0..2]; __malloc_main_l82_23[0..2];
+<     __malloc_main_l82_24[0..2]; __malloc_main_l82_25[0..2];
+<     __malloc_main_l82_26[0..2]; __malloc_main_l82_27[0..2];
+<     __malloc_main_l82_28[0..2]; __malloc_main_l82_29[0..2];
+<     __malloc_main_l82_30[0..2]; __malloc_main_l97[0]; __malloc_main_l114[0..3];
+<     __malloc_main_l127; __malloc_main_l127_0[0..1]; __malloc_main_l127_1[0..2];
+<     __malloc_main_l127_2[0..3]; __malloc_main_l127_3[0..4];
+<     __malloc_main_l127_4[0..5]; __malloc_main_l127_5[0..6];
+<     __malloc_main_l127_6[0..7]; __malloc_main_l127_7[0..8];
+<     __malloc_main_l127_8[0..9]
+---
+>     __malloc_main_l25; __malloc_main_l36[0..1]; __malloc_main_l50[0..1];
+>     __malloc_main_l50_0[0..2]; __malloc_main_l63; __malloc_main_l63_0;
+>     __malloc_main_l63_1; __malloc_main_l63_2; __malloc_main_l73;
+>     __malloc_main_l73_0; __malloc_main_l73_1; __malloc_main_l73_2;
+>     __malloc_main_l82_0; __malloc_main_l82_1; __malloc_main_l82_2;
+>     __malloc_main_l82_3[0..1]; __malloc_main_l82_4[0..1];
+>     __malloc_main_l82_5[0..1]; __malloc_main_l82_6[0..1];
+>     __malloc_main_l82_7[0..1]; __malloc_main_l82_8[0..1];
+>     __malloc_main_l82_9[0..1]; __malloc_main_l82_10[0..1];
+>     __malloc_main_l82_11[0..1]; __malloc_main_l82_12[0..1];
+>     __malloc_main_l82_13[0..2]; __malloc_main_l82_14[0..2];
+>     __malloc_main_l82_15[0..2]; __malloc_main_l82_16[0..2];
+>     __malloc_main_l82_17[0..2]; __malloc_main_l82_18[0..2];
+>     __malloc_main_l82_19[0..2]; __malloc_main_l82_20[0..2];
+>     __malloc_main_l82_21[0..2]; __malloc_main_l82_22[0..2];
+>     __malloc_main_l82_23[0..2]; __malloc_main_l82_24[0..2];
+>     __malloc_main_l82_25[0..2]; __malloc_main_l82_26[0..2];
+>     __malloc_main_l82_27[0..2]; __malloc_main_l82_28[0..2];
+>     __malloc_main_l82_29[0..2]; __malloc_main_l82_30[0..2];
+>     __malloc_main_l82_31[0..2]; __malloc_main_l82_32[0..2];
+>     __malloc_main_l82_33[0..2]; __malloc_main_l82_34[0..2];
+>     __malloc_main_l82_35[0..2]; __malloc_main_l82_36[0..2];
+>     __malloc_main_l82_37[0..2]; __malloc_main_l82_38[0..2];
+>     __malloc_main_l82_39[0..2]; __malloc_main_l82_40[0..2];
+>     __malloc_main_l82_41[0..2]; __malloc_main_l82_42[0..2];
+>     __malloc_main_l82_43[0..2]; __malloc_main_l82_44[0..2];
+>     __malloc_main_l82_45[0..2]; __malloc_main_l82_46[0..2];
+>     __malloc_main_l82_47[0..2]; __malloc_main_l82_48[0..2];
+>     __malloc_main_l82_49[0..2]; __malloc_main_l82_50[0..2];
+>     __malloc_main_l82_51[0..2]; __malloc_main_l82_52[0..2];
+>     __malloc_main_l82_53[0..2]; __malloc_main_l82_54[0..2];
+>     __malloc_main_l82_55[0..2]; __malloc_main_l82_56[0..2];
+>     __malloc_main_l82_57[0..2]; __malloc_main_l82_58[0..2];
+>     __malloc_main_l82_59[0..2]; __malloc_main_l82_60[0..2];
+>     __malloc_main_l82_61[0..2]; __malloc_main_l82_62[0..2];
+>     __malloc_main_l82_63[0..2]; __malloc_main_l82_64[0..2];
+>     __malloc_main_l82_65[0..2]; __malloc_main_l82_66[0..2];
+>     __malloc_main_l82_67[0..2]; __malloc_main_l82_68[0..2];
+>     __malloc_main_l97[0]; __malloc_main_l97_0[0]; __malloc_main_l114[0..3];
+>     __malloc_main_l114_0[0..3]
+906,911c466,467
+<     __malloc_main_l97[0][bits 0 to 0]; __malloc_main_l114[0][bits 0 to 0];
+<     __malloc_main_l127; __malloc_main_l127_0[0..1]; __malloc_main_l127_1[0..2];
+<     __malloc_main_l127_2[0..3]; __malloc_main_l127_3[0..4];
+<     __malloc_main_l127_4[0..5]; __malloc_main_l127_5[0..6];
+<     __malloc_main_l127_6[0..7]; __malloc_main_l127_7[0..8];
+<     __malloc_main_l127_8[0..9]
+---
+>     __malloc_main_l97[0][bits 0 to 0]; __malloc_main_l97_0[0][bits 0 to 0];
+>     __malloc_main_l114[0][bits 0 to 0]; __malloc_main_l114_0[0][bits 0 to 0]

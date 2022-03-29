@@ -1,0 +1,5 @@
+13,16d12
+< [eva:malloc:weak] str_allocated.c:12: 
+<   marking variable `__malloc_memchr_bug_l12' as weak
+< [eva:malloc] str_allocated.c:12: 
+<   resizing variable `__malloc_w_memchr_bug_l12' (0..-1) to fit 0..-1/7

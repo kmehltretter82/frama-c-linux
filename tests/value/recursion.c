@@ -1,5 +1,5 @@
-/* run.config_apron
-   DONTRUN: The apron binding does not support recursion.
+/* run.config_apron,run.config_multidim
+   DONTRUN: The Apron and multidim domains do not support recursion.
 */
 /* run.config*
    STDOPT: +"-eva-no-show-progress -eva-unroll-recursive-calls 0"

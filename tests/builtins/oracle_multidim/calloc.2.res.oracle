@@ -1,0 +1,16 @@
+31,35c31,35
+<   p1 ∈ {{ &__calloc_main_l14[0] }}
+<   p2 ∈ {{ &__calloc_main_l17[0] }}
+<   p3 ∈ {{ &__calloc_main_l20[0] }}
+<   p4 ∈ {{ &__calloc_main_l23 }}
+<   p5 ∈ {{ &__calloc_main_l30[0] }}
+---
+>   p1 ∈ {{ NULL ; &__calloc_main_l14[0] }}
+>   p2 ∈ {{ NULL ; &__calloc_main_l17[0] }}
+>   p3 ∈ {{ NULL ; &__calloc_main_l20[0] }}
+>   p4 ∈ {{ NULL ; &__calloc_main_l23 }}
+>   p5 ∈ {{ NULL ; &__calloc_main_l30[0] }}
+37c37
+<   __retres ∈ {0}
+---
+>   __retres ∈ {0; 1}

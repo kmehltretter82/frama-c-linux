@@ -1,0 +1,9 @@
+48c48,50
+<   function malloc, behavior allocation: postcondition 'allocation' got status unknown.
+---
+>   function malloc, behavior allocation: postcondition 'allocation' got status unknown. (Behavior may be inactive, no reduction performed.)
+> [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:399: Warning: 
+>   function malloc, behavior no_allocation: postcondition 'null_result' got status invalid. (Behavior may be inactive, no reduction performed.)
+488a491,492
+> [eva] FRAMAC_SHARE/libc/stdlib.h:399: 
+>   function malloc, behavior no_allocation: postcondition 'null_result' got status valid. (Behavior may be inactive, no reduction performed.)

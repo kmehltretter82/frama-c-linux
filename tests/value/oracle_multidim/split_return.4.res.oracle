@@ -1,0 +1,58 @@
+265,266c265
+<   y ∈ {0} or UNINITIALIZED
+<   q ∈ ESCAPINGADDR
+---
+>   NON TERMINATING FUNCTION
+268,272c267
+<   i2 ∈ {0; 5}
+<   i3 ∈ {0; 5}
+<   i4 ∈ {0; 5}
+<   i5 ∈ {0; 5}
+<   v7 ∈ {0; 1}
+---
+>   NON TERMINATING FUNCTION
+309a305
+> [from] Non-terminating function main9 (no dependencies)
+311a308
+> [from] Non-terminating function main (no dependencies)
+359c356
+<   NO EFFECTS
+---
+>   NON TERMINATING - NO EFFECTS
+361,365c358
+<   i2 FROM i2
+<   i3 FROM i3
+<   i4 FROM i4
+<   i5 FROM i5
+<   v7 FROM v
+---
+>   NON TERMINATING - NO EFFECTS
+694,695c687
+<   y ∈ {0} or UNINITIALIZED
+<   q ∈ ESCAPINGADDR
+---
+>   NON TERMINATING FUNCTION
+697,701c689
+<   i2 ∈ {0; 5}
+<   i3 ∈ {0; 5}
+<   i4 ∈ {0; 5}
+<   i5 ∈ {0; 5}
+<   v7 ∈ {0; 1}
+---
+>   NON TERMINATING FUNCTION
+738a727
+> [from] Non-terminating function main9 (no dependencies)
+740a730
+> [from] Non-terminating function main (no dependencies)
+788c778
+<   NO EFFECTS
+---
+>   NON TERMINATING - NO EFFECTS
+790,794c780
+<   i2 FROM i2
+<   i3 FROM i3
+<   i4 FROM i4
+<   i5 FROM i5
+<   v7 FROM v
+---
+>   NON TERMINATING - NO EFFECTS

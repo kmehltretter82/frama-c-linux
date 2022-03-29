@@ -1,0 +1,106 @@
+20,54d19
+< [eva] computing for function g <- main.
+<   Called from local.i:34.
+< [eva] local.i:13: Reusing old results for call to f
+< [eva:locals-escaping] local.i:13: Warning: 
+<   locals {a} escaping the scope of f through X
+< [eva:locals-escaping] local.i:13: Warning: 
+<   locals {b} escaping the scope of f through \result<f>
+< [eva:alarm] local.i:14: Warning: 
+<   accessing left-value that contains escaping addresses.
+<   assert ¬\dangling(&T);
+< [eva] Recording results for g
+< [eva] Done for function g
+< [eva:locals-escaping] local.i:34: Warning: 
+<   locals {d} escaping the scope of g through U
+< [eva:locals-escaping] local.i:34: Warning: 
+<   locals {d} escaping the scope of g through \result<g>
+< [eva] local.i:35: 
+<   Frama_C_dump_each:
+<   # cvalue:
+<   X ∈ ESCAPINGADDR
+<   Y ∈ ESCAPINGADDR
+<   Z ∈ ESCAPINGADDR
+<   T ∈ ESCAPINGADDR
+<   U ∈ ESCAPINGADDR
+<   V ∈ {0}
+<   e ∈ UNINITIALIZED
+<   ==END OF DUMP==
+< [eva] computing for function h <- main.
+<   Called from local.i:36.
+< [eva] Recording results for h
+< [eva] Done for function h
+< [eva] computing for function i <- main.
+<   Called from local.i:37.
+< [eva] Recording results for i
+< [eva] Done for function i
+57d21
+< [eva] local.i:14: assertion 'Eva,dangling_pointer' got final status invalid.
+62,70d25
+< [eva:final-states] Values at end of function g:
+<   X ∈ ESCAPINGADDR
+<   T ∈ ESCAPINGADDR
+<   U ∈ {{ &d }}
+<   d ∈ [--..--]
+< [eva:final-states] Values at end of function h:
+<   __retres ∈ {{ &e + {4} }}
+< [eva:final-states] Values at end of function i:
+<   x ∈ {{ &local }}
+72,77c27
+<   X ∈ ESCAPINGADDR
+<   Y ∈ ESCAPINGADDR
+<   Z ∈ ESCAPINGADDR
+<   T ∈ ESCAPINGADDR
+<   U ∈ ESCAPINGADDR
+<   V ∈ {{ &e + {4} }}
+---
+>   NON TERMINATING FUNCTION
+80,85d29
+< [from] Computing for function g
+< [from] Done for function g
+< [from] Computing for function h
+< [from] Done for function h
+< [from] Computing for function i
+< [from] Done for function i
+86a31
+> [from] Non-terminating function main (no dependencies)
+93,101d37
+< [from] Function g:
+<   X FROM \nothing
+<   T FROM \nothing
+<   U FROM \nothing
+<   \result FROM \nothing
+< [from] Function h:
+<   \result FROM x
+< [from] Function i:
+<   NO EFFECTS
+103,108c39
+<   X FROM \nothing
+<   Y FROM \nothing
+<   Z FROM \nothing
+<   T FROM \nothing
+<   U FROM \nothing
+<   V FROM \nothing
+---
+>   NON TERMINATING - NO EFFECTS
+114,125d44
+< [inout] Out (internal) for function g:
+<     X; T; U; d
+< [inout] Inputs for function g:
+<     T; U
+< [inout] Out (internal) for function h:
+<     __retres
+< [inout] Inputs for function h:
+<     \nothing
+< [inout] Out (internal) for function i:
+<     x
+< [inout] Inputs for function i:
+<     \nothing
+127c46
+<     X; Y; Z; T; U; V
+---
+>     X; Y
+129c48
+<     T; U
+---
+>     \nothing
