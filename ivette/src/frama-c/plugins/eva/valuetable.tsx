@@ -371,7 +371,6 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
 
 interface ProbeHeaderProps {
   probe: Probe;
-  summary: Evaluation;
   status: MarkerStatus;
   state: StateToDisplay;
   pinProbe: (pin: boolean) => void;
@@ -382,20 +381,16 @@ interface ProbeHeaderProps {
 }
 
 function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
-  const { probe, summary, status, state, setSelection, locEvt } = props;
+  const { probe, status, state, setSelection, locEvt } = props;
   const { code = '(error)', stmt, target, fct } = probe;
   const color = classes(MarkerStatusClass(status), 'eva-table-header-sticky');
   const { selectProbe, removeProbe, pinProbe } = props;
 
-  // Computing the number of columns. By design, either vAfter or vThen and
-  // vElse are empty. Also by design (hypothesis), it is not function of the
-  // considered callstacks, so we check on the consolidated.
-  // const evaluation = await probe.evaluate('Summary');
-  const { vBefore, vAfter, vThen, vElse } = summary;
+  // Computing the number of columns..
   let span = 0;
-  if ((state === 'Before' || state === 'Both') && vBefore) span += 2;
-  if ((state === 'After' || state === 'Both') && vAfter) span += 2;
-  if ((state === 'After' || state === 'Both') && vThen && vElse) span += 4;
+  if (state === 'Before' || state === 'Both') span += 2;
+  if ((state === 'After' || state === 'Both') && !probe.condition) span += 2;
+  if ((state === 'After' || state === 'Both') && probe.condition) span += 4;
   if (span === 0) return <></>;
 
   // When the location is selected, we scroll the header into view, making it
@@ -440,13 +435,12 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 interface ProbeDescrProps {
-  summary: Evaluation;
+  probe: Probe;
   state: StateToDisplay;
 }
 
 function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
-  const { summary, state } = props;
-  const { vBefore, vAfter, vThen, vElse } = summary;
+  const { probe, state } = props;
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
   const className = classes(valuesClass, tableClass);
@@ -461,16 +455,16 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
     </div>;
 
   const elements: JSX.Element[] = [];
-  if (state === 'Before' && vBefore) elements.push(td(<>{'Before'}</>));
-  if (state === 'After' && vAfter) elements.push(td(<>{'After'}</>));
-  if (state === 'After' && vThen && vElse) {
+  if (state === 'Before') elements.push(td(<>{'Before'}</>));
+  if (state === 'After' && !probe.condition) elements.push(td(<>{'After'}</>));
+  if (state === 'After' && probe.condition) {
     elements.push(td(both(), 2));
   }
-  if (state === 'Both' && vBefore && vAfter) {
+  if (state === 'Both' && !probe.condition) {
     elements.push(td(<>{'Before'}</>));
     elements.push(td(<>{'After'}</>));
   }
-  if (state === 'Both' && vBefore && vThen && vElse) {
+  if (state === 'Both' && probe.condition) {
     elements.push(td(<>{'Before'}</>));
     elements.push(td(both(), 2));
   }
@@ -530,7 +524,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const font = summaryOnly && callstack === 'Summary' ? 'eva-italic' : '';
     const className = classes('eva-table-values', selected, font);
     function td(e?: Values.evaluation): JSX.Element {
-      const { alarms, value } = e ?? {};
+      const { alarms, value = '∅' } = e ?? {};
       const status = getAlarmStatus(alarms);
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
       const kind = callstack === 'Summary' ? 'one' : 'this';
