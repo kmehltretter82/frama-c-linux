@@ -59,11 +59,15 @@ type channel = {
 
 let feed_bytes { sock ; rcv ; brcv } =
   try
-    (* rcv buffer is only used locally *)
-    let s = Bytes.length rcv in
-    let n = Unix.read sock rcv 0 s in
-    Buffer.add_subbytes brcv rcv 0 n ;
-  with Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> ()
+    while true do
+      (* rcv buffer is only used locally *)
+      let s = Bytes.length rcv in
+      let n = Unix.read sock rcv 0 s in
+      if n > 0 then
+        Buffer.add_subbytes brcv rcv 0 n
+      else raise Exit
+    done
+  with Exit | Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> ()
 
 let send_bytes { sock ; snd ; bsnd } =
   try
@@ -200,7 +204,7 @@ let commands ch =
   begin
     feed_bytes ch ;
     match parse ch with
-    | [] -> None
+    | [] -> send_bytes ch ; None
     | requests -> Some Main.{ requests ; callback = callback ch }
   end
 
