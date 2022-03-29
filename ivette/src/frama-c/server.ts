@@ -787,7 +787,6 @@ client.onConnect((err?: Error) => {
   if (err) {
     _status(Status.FAILURE);
     _stopPolling();
-    _shutdown();
   } else {
     _status(Status.CMD);
     _startPolling();
