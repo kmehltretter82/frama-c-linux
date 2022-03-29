@@ -991,6 +991,16 @@ function EvaTable(): JSX.Element {
     setTic(tac + 1);
   }, [fcts, setTic, tac]);
 
+  /* On meta-selection, pin the selected location. */
+  React.useEffect(() => {
+    const pin = (loc: States.Location): void => {
+      const {marker, fct} = loc;
+      if (marker && fct) setLocPin({ target: marker, fct }, true);
+    };
+    States.MetaSelection.on(pin);
+    return () => States.MetaSelection.off(pin);
+  });
+
   /* Callback used to remove a probe */
   const remove = React.useCallback((probe: Probe): void => {
     fcts.removeLocation(probe);
