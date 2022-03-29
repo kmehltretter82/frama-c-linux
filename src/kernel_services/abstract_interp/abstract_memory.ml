@@ -88,19 +88,6 @@ type 'a or_top_bottom = [`Top | `Bottom | `Value of 'a]
 
 type size = Integer.t
 
-
-let dunify = false
-let dread = false
-let dwrite = false
-let demerging = false
-
-let dp = ref 0
-let debug b format =
-  incr dp;
-  if b then
-    Kernel.debug ~current:true ("#%d " ^^ format) ~level:0 !dp
-  else Kernel.debug format ~level:50
-
 (* Composition operator for compare function *)
 
 let (<?>) c lcmp =
@@ -1141,9 +1128,7 @@ struct
     (* Unify the segmentation start *)
     let* start = B.lower_bound ~oracle l1 l2 in
     let s1 = if equals Left start l1 then s1 else (M.of_raw p1, l1) :: s1
-    and s2 = if equals Right start l2 then s2 else (M.of_raw p2, l2) :: s2
-    in
-    debug dunify "Unification start@.%a U@.%a" pretty_segments (start,s1) pretty_segments (start,s2);
+    and s2 = if equals Right start l2 then s2 else (M.of_raw p2, l2) :: s2 in
     (* Unify the segmentation end *)
     let merge_first side = smash_head ~oracle:(oracle side) in
     let unify_end l s1 s2 acc =
@@ -1168,7 +1153,6 @@ struct
        +------+-------+---
        l      u2 *)
     let rec aux l s1 s2 acc =
-      debug dunify "Unification progress@.%a U@.%a result:@.%a" pretty_segments (l,s1) pretty_segments (l,s2) pretty_segments (start, List.rev acc);
       (* Look for emerging slices *)
       let left_slice_emerges = match s1 with
         | (v1,u1) :: t1 when equals Right l u1 -> Some (v1,u1,t1)
@@ -1224,7 +1208,6 @@ struct
     in
     let+ rev_segments = aux start s1 s2 [] in
     let segments = List.rev rev_segments in
-    debug dunify "Unification result :@.%a" pretty_segments (start,segments);
     (* Iterate through segmentations *)
     check { start ; segments ; padding = Bit.join p1 p2 }
 
@@ -1312,25 +1295,20 @@ struct
        head = (_,l) :: _
     *)
     let rec aux_before l s =
-      debug dwrite "aux before: %a@." pretty_segments (l,s);
-      debug dwrite "%a (%a) >= %a (%a) ? %B@." B.pretty lindex Ival.pretty (B._to_ival ~oracle lindex) B.pretty l Ival.pretty (B._to_ival ~oracle l) (lindex >= l);
       if lindex >= l
       then aux_below l [] l s
       else
         let* l = B.lower_bound ~oracle:(fun _ -> oracle) lindex l in
         aux_over l [] l (M.of_raw m.padding) l s
     and aux_below start head l = fun t ->
-      debug dwrite "aux_below: %a <{%a}> %a@." pretty_segments (start,head) B.pretty l pretty_segments (l,t);
       match t with (* l <= lindex *)
       | [] ->
         aux_end start head l (M.of_raw m.padding) uindex []
       | (v,u) :: t ->
-        debug dwrite "%a (%a) >= %a (%a) ? %B@." B.pretty lindex Ival.pretty (B._to_ival ~oracle lindex) B.pretty u Ival.pretty (B._to_ival ~oracle u) (lindex >= u);
         if lindex >= u
         then aux_below start ((v,u) :: head) u t
         else aux_over start head l v u t
     and aux_over start head l v u s = (* l <= lindex *)
-      debug dwrite "aux_over: %a <{%a} %a {%a}> %a@." pretty_segments (start,head) B.pretty l M.pretty v B.pretty u pretty_segments (u,s);
       if uindex <= u then
         aux_end start head l v u s
       else
@@ -1343,7 +1321,6 @@ struct
           (* TODO: do not smash for overwrites if the slices are covered by the write *)
           aux_over start head l (M.smash ~oracle v v') u' t
     and aux_end start head l v u tail = (* l <= lindex < uindex <= u*)
-      debug dwrite  "aux_end: %a <{%a} %a {%a}> %a@." pretty_segments (start,head) B.pretty l M.pretty v B.pretty u pretty_segments (u,tail);
       let+ new_v = f v in
       let previous_is_empty = is_empty_segment ~oracle l lindex
       and next_is_empty = is_empty_segment ~oracle uindex u in
@@ -1698,7 +1675,6 @@ struct
         fun (l,u) -> A.single b l u (Raw b)
       in
       let rec aux m1 m2 =
-        debug dunify "unification between@.%a and@.%a" pretty m1 pretty m2;
         match m1, m2 with
         | Raw b1, Raw b2 -> Raw (Bit.join b1 b2)
         | Scalar s1, Scalar s2
@@ -1715,10 +1691,6 @@ struct
           let m =
             let* array_value2 = raw_to_array Left a1.array_value b2 in
             let+ array_value = A.unify ~oracle aux a1.array_value array_value2 in
-            debug demerging "emerging unification between@.%a and@.%a result:@.%a"
-              A.pretty a1.array_value
-              A.pretty array_value2
-              A.pretty array_value;
             Array { a1 with array_value }
           in
           begin match m with
@@ -1729,10 +1701,6 @@ struct
           let m =
             let* array_value1 = raw_to_array Right a2.array_value b1 in
             let+ array_value = A.unify ~oracle aux array_value1 a2.array_value in
-            debug demerging "emerging unification between@.%a and@.%a result:@.%a"
-              A.pretty array_value1
-              A.pretty a2.array_value
-              A.pretty array_value;
             Array { a2 with array_value }
           in
           begin match m with
@@ -1774,12 +1742,7 @@ struct
     let smash ~oracle = join ~oracle:(fun _ -> oracle)
 
     let read ~oracle (map : Cil_types.typ -> t -> 'a) (reduce : 'a -> 'a -> 'a) =
-      let map t v =
-        (* debug true "read %a" pretty v; *)
-        map t v
-      in
       let rec aux offset m =
-        debug dread "@[<hv>read at %a in %a@]" TypedOffset.pretty offset pretty m;
         match offset, m with
         | NoOffset t, m ->
           map t m
@@ -1813,7 +1776,6 @@ struct
     let write ~oracle (f : weak:bool -> Cil_types.typ -> t -> t or_bottom) =
       let open Bot in
       let rec aux ~weak offset m =
-        debug dwrite "@[<hv>write at %a from %a" TypedOffset.pretty offset pretty m;
         match offset with
         | NoOffset t ->
           f ~weak t m
@@ -1858,13 +1820,11 @@ struct
                 A.single b lindex uindex new_value
               | `Value array_value -> `Value array_value
             in
-            debug dwrite "wrote from previous@.%a@.->%a" A.pretty a.array_value A.pretty array_value;
             Array { a with array_value }
           | _ ->
             let b = raw m in
             let+ new_value = aux ~weak offset' (Raw b) in
             let array_value = A.single b lindex uindex new_value in
-            debug dwrite "wrote from raw@.%a" A.pretty array_value;
             Array { array_cell_type = elem_type ; array_value }
       in aux
 
@@ -1878,7 +1838,6 @@ struct
           match  A.incr_bound ~oracle vi x a.array_value with
           | `Top -> Raw (A.raw a.array_value)
           | `Value array_value ->
-            (* debug true "bounds updated@.%a@.to%a" A.pretty a.array_value A.pretty array_value; *)
             Array { a with array_value=A.map aux array_value }
       in
       aux m
@@ -1934,9 +1893,7 @@ struct
     read ~oracle to_value V.join loc m
 
   let extract ~oracle (m : t) (loc : location) : t =
-    let r = read ~oracle (fun _typ x -> x) (smash ~oracle) loc m in
-    (* Format.printf "extract %a in %a : %a@." TypedOffset.pretty loc pretty m pretty r; *)
-    r
+    read ~oracle (fun _typ x -> x) (smash ~oracle) loc m
 
   let write' ~oracle ~weak f offset m =
     let f' ~weak typ m =
@@ -1948,14 +1905,7 @@ struct
     let f ~weak typ m =
       of_value typ (if weak then V.join (to_value typ m) new_v else new_v)
     in
-    let r = write' ~oracle ~weak f offset m in
-    (* Format.printf "%a <- %a : %a@." TypedOffset.pretty offset V.pretty new_v pretty r; *)
-    r
-
-  let join ~oracle m1 m2 =
-    let r = join ~oracle m1 m2 in
-    (* Format.printf "%a join %a : %a@." pretty m1 pretty m2 pretty r; *)
-    r
+    write' ~oracle ~weak f offset m
 
   let reinforce ~oracle f m offset =
     let open Bottom in
@@ -1964,9 +1914,7 @@ struct
       then `Value m
       else f (to_value typ m) >>-: of_value typ
     in
-    let r = write ~oracle ~weak:false f' offset m in
-    (* Format.printf "reinforce at %a : %a@." TypedOffset.pretty offset pretty r; *)
-    r
+    write ~oracle ~weak:false f' offset m
 
   let erase ~oracle ~weak m offset b =
     let f ~weak _typ m =

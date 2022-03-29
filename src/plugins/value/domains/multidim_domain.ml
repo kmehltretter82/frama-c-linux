@@ -837,13 +837,13 @@ struct
       | Abstract_domain.Top  -> Abstract_memory.Bit.numerical
       | Abstract_domain.Zero -> Abstract_memory.Bit.zero
     in
-    let oracle = mk_oracle state in (* Since dst has no offset, oracle is actyally useless *)
+    let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)
     erase ~oracle state dst d
 
   let initialize_variable_using_type _kind vi state =
     let lval = Cil.var vi in
     let dst = Location.of_lval no_oracle lval in
-    let oracle = mk_oracle state in (* Since dst has no offset, oracle is actyally useless *)
+    let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)
     erase ~oracle state dst Abstract_memory.Bit.top
 
   let relate _kf _bases _state = Base.SetLattice.empty
