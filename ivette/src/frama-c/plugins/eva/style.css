@@ -202,9 +202,10 @@
   background: var(--eva-probes-pinned-focused);
 }
 
-.eva-header-after-both {
+.eva-header-after-condition {
   display: flex;
   justify-content: center;
+  gap: 0.3em;
 }
 
 .eva-italic {

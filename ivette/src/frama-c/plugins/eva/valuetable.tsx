@@ -434,19 +434,28 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   const { probe, state } = props;
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
-  const className = classes(valuesClass, tableClass);
-  function td(kind: JSX.Element, colSpan = 0): JSX.Element {
-    return <td className={className} colSpan={colSpan + 2}>{kind}</td>;
-  }
-  const both = (): JSX.Element =>
-    <div className='eva-header-after-both'>
-      {'After '}
-      <div className='eva-stmt'>{'(Then|Else)'}</div>
-    </div>;
+  const cls = classes(valuesClass, tableClass);
+  const infos = { className: cls, colSpan: 2 };
+  const title = (s: string): string => `Values ${s} the statement evaluation`;
   const elements: JSX.Element[] = [];
-  if (state.before) elements.push(td(<>{'Before'}</>));
-  if (state.after && !probe.condition) elements.push(td(<>{'After'}</>));
-  if (state.after && probe.condition) elements.push(td(both(), 2));
+  function push(title: string, children: JSX.Element | string): void {
+    elements.push(<td {...infos} title={title}>{children}</td>);
+  }
+  if (state.before) push(title('before'), 'Before');
+  if (state.after && !probe.condition) push(title('after'), 'After');
+  if (state.after && probe.condition) {
+    const pushCondition = (s: string): void => {
+      const t = `Values after the condition, in the ${s.toLowerCase()} branch`;
+      const child =
+        <div className='eva-header-after-condition'>
+          After
+          <div className='eva-stmt'>{`(${s})`}</div>
+        </div>;
+      push(t, child);
+    };
+    pushCondition('Then');
+    pushCondition('Else');
+  }
   return elements;
 }
 
@@ -650,7 +659,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
 
   /* Computes the columns descriptions */
   const descrsCall = await CallsiteCell({ getCallsites, callstack: 'Descr' });
-  const descrs = data.map((d) => ProbeDescr({ ...d, state }));
+  const descrs = data.map((d) => ProbeDescr({ ...d, state })).flat();
 
   /* Computes the summary values */
   const miscs = { state, addLoc, isSelectedCallstack, summaryOnly };
@@ -721,15 +730,15 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
         <table className='eva-table' style={{ display: displayTable }}>
           <tbody>
             <tr>
-              {headerCall}
+              {headers.length > 0 ? headerCall : undefined}
               {React.Children.toArray(headers)}
             </tr>
             <tr>
-              {descrsCall}
-              {React.Children.toArray(descrs.flat())}
+              {descrs.length > 0 ? descrsCall : undefined}
+              {React.Children.toArray(descrs)}
             </tr>
             <tr key={'Summary'} onClick={onClick('Summary')}>
-              {summCall}
+              {summary.length > 0 ? summCall : undefined}
               {React.Children.toArray(summary)}
             </tr>
             {React.Children.toArray(values)}
