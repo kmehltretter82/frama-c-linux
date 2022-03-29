@@ -190,7 +190,7 @@
 }
 
 .eva-header-just-focused {
-  background: var(--eva-probes-transient-focused);
+  background: var(--code-select);
 }
 
 .eva-header-pinned {

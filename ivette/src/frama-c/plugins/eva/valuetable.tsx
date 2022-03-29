@@ -43,7 +43,8 @@ import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 /* -------------------------------------------------------------------------- */
 
 type Request<A, B> = (a: A) => Promise<B>;
-type StateToDisplay = 'Before' | 'After' | 'Both' | 'None'
+type StateToDisplay = { before: boolean; after: boolean }
+const defaultState = { before: false, after: true }
 
 type Alarm = [ 'True' | 'False' | 'Unknown', string ]
 function getAlarmStatus(alarms: Alarm[] | undefined): string {
@@ -327,29 +328,19 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
       <ButtonGroup className='eva-probeinfo-state'>
         <Button
           value='Before'
-          selected={state === 'Before' || state === 'Both'}
+          selected={state.before}
           title='Show values before statement effects'
           visible={visible}
-          onClick={() => {
-            if (state === 'Before') setState('None');
-            else if (state === 'After') setState('Both');
-            else if (state === 'None') setState('Before');
-            else if (state === 'Both') setState('After');
-          }}
+          onClick={() => setState({before: !state.before, after: state.after})}
         >
           <ControlPoint kind={'before'}/>
         </Button>
         <Button
           value='After'
-          selected={state === 'After' || state === 'Both'}
+          selected={state.after}
           title='Show values after statement effects'
           visible={visible}
-          onClick={() => {
-            if (state === 'Before') setState('Both');
-            else if (state === 'After') setState('None');
-            else if (state === 'None') setState('After');
-            else if (state === 'Both') setState('Before');
-          }}
+          onClick={() => setState({before: state.before, after: !state.after})}
         >
           <ControlPoint kind={'after'}/>
         </Button>
@@ -388,9 +379,9 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
 
   // Computing the number of columns..
   let span = 0;
-  if (state === 'Before' || state === 'Both') span += 2;
-  if ((state === 'After' || state === 'Both') && !probe.condition) span += 2;
-  if ((state === 'After' || state === 'Both') && probe.condition) span += 4;
+  if (state.before) span += 2;
+  if (state.after && !probe.condition) span += 2;
+  if (state.after && probe.condition) span += 4;
   if (span === 0) return <></>;
 
   // When the location is selected, we scroll the header into view, making it
@@ -444,30 +435,18 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
   const className = classes(valuesClass, tableClass);
-  function td(kind: JSX.Element, colSpan = 1): JSX.Element {
-    return <td className={className} colSpan={colSpan + 1}>{kind}</td>;
+  function td(kind: JSX.Element, colSpan = 0): JSX.Element {
+    return <td className={className} colSpan={colSpan + 2}>{kind}</td>;
   }
-
   const both = (): JSX.Element =>
     <div className='eva-header-after-both'>
       {'After '}
       <div className='eva-stmt'>{'(Then|Else)'}</div>
     </div>;
-
   const elements: JSX.Element[] = [];
-  if (state === 'Before') elements.push(td(<>{'Before'}</>));
-  if (state === 'After' && !probe.condition) elements.push(td(<>{'After'}</>));
-  if (state === 'After' && probe.condition) {
-    elements.push(td(both(), 2));
-  }
-  if (state === 'Both' && !probe.condition) {
-    elements.push(td(<>{'Before'}</>));
-    elements.push(td(<>{'After'}</>));
-  }
-  if (state === 'Both' && probe.condition) {
-    elements.push(td(<>{'Before'}</>));
-    elements.push(td(both(), 2));
-  }
+  if (state.before) elements.push(td(<>{'Before'}</>));
+  if (state.after && !probe.condition) elements.push(td(<>{'After'}</>));
+  if (state.after && probe.condition) elements.push(td(both(), 2));
   return elements;
 }
 
@@ -524,7 +503,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const font = summaryOnly && callstack === 'Summary' ? 'eva-italic' : '';
     const className = classes('eva-table-values', selected, font);
     function td(e?: Values.evaluation): JSX.Element {
-      const { alarms, value = '∅' } = e ?? {};
+      const { alarms, value = '-' } = e ?? {};
       const status = getAlarmStatus(alarms);
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
       const kind = callstack === 'Summary' ? 'one' : 'this';
@@ -544,15 +523,14 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
         </>
       );
     }
-    if (state === 'Before') return td(vBefore);
-    if (state === 'After' && !probe.condition) return td(vAfter);
-    if (state === 'After' && probe.condition)
-      return <>{td(vThen)}{td(vElse)}</>;
-    if (state === 'Both' && !probe.condition)
-      return <>{td(vBefore)}{td(vAfter)}</>;
-    if (state === 'Both' && probe.condition)
-      return <>{td(vBefore)}{td(vThen)}{td(vElse)}</>;
-    return td();
+    const elements: JSX.Element[] = [];
+    if (state.before) elements.push(td(vBefore));
+    if (state.after && !probe.condition) elements.push(td(vAfter));
+    if (state.after && probe.condition) {
+      elements.push(td(vThen));
+      elements.push(td(vElse));
+    }
+    return <>{React.Children.toArray(elements)}</>;
   };
 }
 
@@ -643,7 +621,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const { addLoc, getCallstacks: getCS } = props;
   const { setFolded, setByCallstacks, close } = props;
   const { startingCallstack, changeStartingCallstack } = props;
-  const displayTable = folded || state === 'None' ? 'none' : 'table';
+  const displayTable = folded || state.before || state.after ? 'table' : 'none';
   const onClick = (c: callstack): () => void => () => props.selectCallstack(c); 
 
   /* Computes the relevant callstacks */
@@ -713,13 +691,6 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     }
   };
 
-  /* Handles ctrl+scroll for horizontal scrolling */
-  const onWheel = (event: React.WheelEvent): void => {
-    const tgt = event.currentTarget;
-    const left = event.deltaY * tgt.scrollWidth / tgt.scrollHeight;
-    if (event.ctrlKey) tgt.scrollLeft += left;
-  };
-
   /* Builds the component */
   return (
     <>
@@ -746,11 +717,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
           onClick={close}
         />
       </Hpack>
-      <div
-        onWheel={onWheel}
-        onScroll={onScroll}
-        className='eva-table-container'
-      >
+      <div onScroll={onScroll} className='eva-table-container'>
         <table className='eva-table' style={{ display: displayTable }}>
           <tbody>
             <tr>
@@ -950,7 +917,7 @@ function EvaTable(): JSX.Element {
 
   /* Component state */
   const [ selection, select ] = States.useSelection();
-  const [ state, setState ] = React.useState<StateToDisplay>('After');
+  const [ state, setState ] = React.useState<StateToDisplay>(defaultState);
   const [ cs, setCS ] = React.useState<callstack>('Summary');
   const [ fcts ] = React.useState(new FunctionsManager());
   const [ focus, setFocus ] = React.useState<Probe | undefined>(undefined);
