@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import _ from 'lodash';
 import * as Ivette from 'ivette';
 import * as Dome from 'dome/dome';
 import * as States from 'frama-c/states';
@@ -44,7 +45,7 @@ import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 
 type Request<A, B> = (a: A) => Promise<B>;
 type StateToDisplay = { before: boolean; after: boolean }
-const defaultState = { before: false, after: true }
+const defaultState = { before: true, after: true };
 
 type Alarm = [ 'True' | 'False' | 'Unknown', string ]
 function getAlarmStatus(alarms: Alarm[] | undefined): string {
@@ -145,6 +146,7 @@ interface Probe extends Location {
   code?: string;
   stmt?: Ast.marker;
   rank?: number;
+  evaluable: boolean;
   effects?: boolean;
   condition?: boolean;
   evaluate: Request<callstack, Evaluation>
@@ -376,12 +378,13 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   const { code = '(error)', stmt, target, fct } = probe;
   const color = classes(MarkerStatusClass(status), 'eva-table-header-sticky');
   const { selectProbe, removeProbe, pinProbe } = props;
+  const { before, after } = state;
 
   // Computing the number of columns..
   let span = 0;
-  if (state.before) span += 2;
-  if (state.after && !probe.condition) span += 2;
-  if (state.after && probe.condition) span += 4;
+  if (before || after && !probe.effects) span += 2;
+  if (after && probe.effects) span += 2;
+  if (after && probe.condition) span += 4;
   if (span === 0) return <></>;
 
   // When the location is selected, we scroll the header into view, making it
@@ -432,6 +435,7 @@ interface ProbeDescrProps {
 
 function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   const { probe, state } = props;
+  const { before, after } = state;
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
   const cls = classes(valuesClass, tableClass);
@@ -441,9 +445,10 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   function push(title: string, children: JSX.Element | string): void {
     elements.push(<td {...infos} title={title}>{children}</td>);
   }
-  if (state.before) push(title('before'), 'Before');
-  if (state.after && !probe.condition) push(title('after'), 'After');
-  if (state.after && probe.condition) {
+  if (before && probe.effects) push(title('before'), 'Before');
+  if (after && probe.effects) push(title('after'), 'After');
+  if ((before || after) && !probe.effects) push('Values at the statement', '-');
+  if (after && probe.condition) {
     const pushCondition = (s: string): void => {
       const t = `Values after the condition, in the ${s.toLowerCase()} branch`;
       const child =
@@ -485,6 +490,7 @@ interface ProbeValuesProps {
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   const { probe, summary, state, addLoc, summaryOnly } = props;
+  const { before, after } = state;
   const summaryStatus = getAlarmStatus(summary.vBefore?.alarms);
 
   // Building common parts
@@ -511,33 +517,37 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const selected = isSelected && callstack !== 'Summary' ? 'eva-focused' : '';
     const font = summaryOnly && callstack === 'Summary' ? 'eva-italic' : '';
     const className = classes('eva-table-values', selected, font);
-    function td(e?: Values.evaluation): JSX.Element {
+    const kind = callstack === 'Summary' ? 'one' : 'this';
+    const title = `At least one alarm is raised in ${kind} callstack`;
+    const width = summaryStatus !== 'none' ? 'eva-table-values-alarms' : '';
+    function td(e?: Values.evaluation, colSpan = 1): JSX.Element {
       const { alarms, value = '-' } = e ?? {};
       const status = getAlarmStatus(alarms);
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
-      const kind = callstack === 'Summary' ? 'one' : 'this';
-      const title = `At least one alarm is raised in ${kind} callstack`;
       const align = value?.includes('\n') ? 'left' : 'center';
       const alignClass = `eva-table-values-${align}`;
-      const width = summaryStatus !== 'none' ? 'eva-table-values-alarms' : '';
       const c = classes(className, alignClass, width);
       return (
         <>
-          <td className={c} onContextMenu={onContextMenu(e)}>
+          <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
             <span >{value}</span>
           </td>
-          <td className={classes('eva-table-alarm', selected)}>
+          <td
+            className={classes('eva-table-alarm', selected)}
+            style={{ width: status === 'none' ? '0px' : '17px' }}
+          >
             <Icon className={alarmClass} size={10} title={title} id="WARNING" />
           </td>
         </>
       );
     }
     const elements: JSX.Element[] = [];
-    if (state.before) elements.push(td(vBefore));
-    if (state.after && !probe.condition) elements.push(td(vAfter));
-    if (state.after && probe.condition) {
-      elements.push(td(vThen));
-      elements.push(td(vElse));
+    if (before && after && probe.effects && _.isEqual(vBefore, vAfter))
+      elements.push(td(vBefore, 3));
+    else {
+      if (before || after && !probe.effects) elements.push(td(vBefore));
+      if (after && probe.effects) elements.push(td(vAfter));
+      if (after && probe.condition) elements.push(td(vThen), td(vElse));
     }
     return <>{React.Children.toArray(elements)}</>;
   };
@@ -953,10 +963,13 @@ function EvaTable(): JSX.Element {
     const target = selection?.current?.marker;
     const fct = selection?.current?.fct;
     const loc = (target && fct) ? { target, fct } : undefined;
-    const f = (p: Probe): void => { if (fct && p.code) fcts.newFunction(fct); };
-    const update = (p: Probe): void => { f(p) ; setFocus(p); locEvt.emit(p); };
     fcts.clean(loc);
-    if (loc) getProbe(loc).then(update);
+    const doUpdate = (p: Probe): void => {
+      if (!p.evaluable) { setFocus(undefined); return; }
+      if (fct && p.code) fcts.newFunction(fct);
+      setFocus(p); locEvt.emit(p);
+    }
+    if (loc) getProbe(loc).then(doUpdate);
     else setFocus(undefined);
   }, [ fcts, selection, getProbe, setFocus, locEvt ]);
 
