@@ -163,6 +163,7 @@
 
 .eva-table-alarm {
   border-bottom: thin solid var(--border);
+  border-right: thin solid var(--border);
 }
 
 .eva-table-container {
@@ -239,7 +240,6 @@ tr:first-of-type > .eva-table-callsite-box {
   position: relative;
   border: 0px;
   padding: 2px 3px 2px 3px;
-  border-right: thin solid var(--border);
   border-bottom: thin solid var(--border);
   min-width: 144px;
   font-family: Andale Mono, monospace;
@@ -260,6 +260,7 @@ tr:first-of-type > .eva-table-callsite-box {
 
 .eva-table-descrs {
   background-color: var(--background-sidebar);
+  border-right: thin solid var(--border);
 }
 
 .eva-table-descr-sticky {
