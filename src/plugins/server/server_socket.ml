@@ -57,37 +57,44 @@ type channel = {
   bsnd : Buffer.t ; (* SND data buffer, accumulated *)
 }
 
-let feed_bytes { sock ; rcv ; brcv } =
-  try
-    while true do
-      (* rcv buffer is only used locally *)
-      let s = Bytes.length rcv in
-      let n = Unix.read sock rcv 0 s in
-      if n > 0 then
-        Buffer.add_subbytes brcv rcv 0 n
-      else raise Exit
-    done
-  with Exit | Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> ()
+let read_bytes { sock ; rcv ; brcv } =
+  begin
+    (* rcv buffer is only used locally *)
+    let s = Bytes.length rcv in
+    let rec scan p =
+      (* try to fill RCV buffer *)
+      if p < s then
+        let n =
+          try Unix.read sock rcv p (s-p)
+          with Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> 0
+        in if n > 0 then scan (p+n) else p
+      else p
+    in
+    let n = scan 0 in
+    if n > 0 then Buffer.add_subbytes brcv rcv 0 n
+  end
 
 let send_bytes { sock ; snd ; bsnd } =
-  try
-    while true do
-      (* snd buffer is only used locally *)
-      let n = Buffer.length bsnd in
-      if n > 0 then
-        let s = Bytes.length snd in
-        let w = min n s in
-        Buffer.blit bsnd 0 snd 0 w ;
-        let r = Unix.single_write sock snd 0 w in
-        if r > 0 then
-          (* TODO[LC]: inefficient move. Requires a ring-buffer. *)
-          let rest = Buffer.sub bsnd r (n-r) in
-          Buffer.reset bsnd ;
-          Buffer.add_string bsnd rest
-        else raise Exit
-      else raise Exit
-    done
-  with Exit | Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> ()
+  begin
+    (* snd buffer is only used locally *)
+    let n = Buffer.length bsnd in
+    if n > 0 then
+      let s = Bytes.length snd in
+      let rec send p =
+        (* try to flush BSND buffer *)
+        let w = min (n-p) s in
+        Buffer.blit bsnd p snd 0 w ;
+        let r =
+          try Unix.single_write sock snd 0 w
+          with Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> 0
+        in if r > 0 then send (p+r) else p
+      in
+      let p = send 0 in
+      if p > 0 then
+        let tail = Buffer.sub bsnd p (n-p) in
+        Buffer.reset bsnd ;
+        Buffer.add_string bsnd tail
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Data Chunks Encoding                                               --- *)
@@ -204,7 +211,7 @@ let callback ch rs =
 
 let commands ch =
   begin
-    feed_bytes ch ;
+    read_bytes ch ;
     match parse ch with
     | [] -> send_bytes ch ; None
     | requests -> Some Main.{ requests ; callback = callback ch }

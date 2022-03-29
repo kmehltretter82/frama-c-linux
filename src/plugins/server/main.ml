@@ -373,7 +373,7 @@ let create ~pretty ?(equal=(=)) ~fetch () =
 (* public API ; shall be scheduled at command line main stage *)
 let start server =
   begin
-    Senv.debug ~level:2 "Server Start (was %a)"
+    Senv.debug ~level:2 "Server started (was %a)"
       (pp_running server.pretty) server.running ;
     server.running <- CmdLine ;
     Queue.push `CmdLineOn server.q_out ;
@@ -397,7 +397,7 @@ let start server =
 (* public API ; can be invoked to force server shutdown *)
 let stop server =
   begin
-    Senv.debug ~level:2 "Server Stop (was %a)"
+    Senv.debug ~level:2 "Server stopped (was %a)"
       (pp_running server.pretty) server.running ;
     kill_running server ;
     emitter := nop ;
@@ -416,7 +416,7 @@ let stop server =
 (* internal only ; invoked by run when command line is finished *)
 let foreground server =
   begin
-    Senv.debug ~level:2 "Server Foreground (was %a)"
+    Senv.debug ~level:2 "Server foreground (was %a)"
       (pp_running server.pretty) server.running ;
     server.running <- Idle ;
     Queue.push `CmdLineOff server.q_out ;
