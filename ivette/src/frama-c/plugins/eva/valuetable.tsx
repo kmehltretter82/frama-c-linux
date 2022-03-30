@@ -383,7 +383,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   // Computing the number of columns..
   let span = 0;
   if ((before || after) && !probe.effects && !probe.condition) span += 2;
-  if (before && (probe.effects || probe.condition)) span += 2
+  if (before && (probe.effects || probe.condition)) span += 2;
   if (after && probe.effects) span += 2;
   if (after && probe.condition) span += 4;
   if (span === 0) return <></>;
@@ -534,7 +534,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       return (
         <>
           <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
-            <span >{value}</span>
+            <span className='eva-table-text'>{value}</span>
           </td>
           <td
             className={classes('eva-table-alarm', selected)}
@@ -646,8 +646,18 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const { startingCallstack, changeStartingCallstack } = props;
   const { before, after } = state;
   const displayTable = folded || !(before || after) ? 'none' : 'table';
-  const onClick = (c: callstack): () => void => () =>
-    props.selectCallstack(isSelectedCallstack(c) ? 'Summary' : c); 
+  type RowHandler = React.MouseEventHandler<HTMLTableRowElement>;
+  const onClick: (c: callstack) => RowHandler = (c) => (event) => {
+    const target = event.currentTarget;
+    const selection = document.getSelection();
+    const length = selection?.toString()?.length ?? 0;
+    const container = selection?.anchorNode;
+    const row = container?.parentElement?.parentElement?.parentElement;
+    if (target !== row || length === 0)
+      props.selectCallstack(isSelectedCallstack(c) ? 'Summary' : c);
+    if (target !== row && target.parentElement === row?.parentElement)
+      selection?.collapse(null);
+  };
 
   /* Computes the relevant callstacks */
   const markers = Array.from(props.markers.keys());
@@ -975,7 +985,7 @@ function EvaTable(): JSX.Element {
       if (!p.evaluable) { setFocus(undefined); return; }
       if (fct && p.code) fcts.newFunction(fct);
       setFocus(p); locEvt.emit(p);
-    }
+    };
     if (loc) getProbe(loc).then(doUpdate);
     else setFocus(undefined);
   }, [ fcts, selection, getProbe, setFocus, locEvt ]);
@@ -1000,9 +1010,13 @@ function EvaTable(): JSX.Element {
   /* Callback used to remove a probe */
   const remove = React.useCallback((probe: Probe): void => {
     fcts.removeLocation(probe);
-    if (probe.target === focus?.target)
+    if (probe.target === focus?.target) {
       setFocus(undefined);
-    fcts.clean(undefined);
+      fcts.clean(undefined);
+    }
+    else {
+      fcts.clean(focus);
+    }
     setTic(tac + 1);
   }, [ fcts, focus, setFocus, tac ]);
 

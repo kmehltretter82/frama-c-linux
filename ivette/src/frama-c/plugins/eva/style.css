@@ -290,6 +290,11 @@ tr:first-of-type > .eva-table-callsite-box {
   width: 0px;
 }
 
+.eva-table-text {
+  cursor: text;
+  user-select: text;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Selected Element Background                                        --- */
 /* -------------------------------------------------------------------------- */
