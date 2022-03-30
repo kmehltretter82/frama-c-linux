@@ -29,7 +29,7 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 
 import CoverageMeter, { percent } from './CoverageMeter';
 
-import './summary.css';
+import './style_summary.css';
 
 function CoverageTable(data: Eva.programStatsType): JSX.Element {
   const { progFunCoverage: functions, progStmtCoverage: statements } = data;
