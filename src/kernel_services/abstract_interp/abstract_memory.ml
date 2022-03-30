@@ -285,11 +285,11 @@ end
 (* ------------------------------------------------------------------------ *)
 
 type side = Left | Right
-type oracle = Cil_types.exp -> Ival.t
+type oracle = Cil_types.exp -> Int_val.t
 type bioracle = side -> oracle
 type strength = Strong | Weak | Reinforce (* update strength *)
 
-let no_oracle = fun _exp -> Ival.top
+let no_oracle = fun _exp -> Int_val.top
 
 module type ProtoMemory =
 sig
@@ -810,17 +810,17 @@ struct
     | Const _ -> assert false (* should not happen ? even with absolute adresses ? *)
     | Ptroffset _ -> assert false (* Not produced by of_exp *)
 
-  (* Stupid oracle built from an Ival oracle *)
-  let to_ival ~oracle = function
-    | Const i -> Ival.inject_singleton i
-    | Exp (e, i) -> Ival.add_singleton_int i (oracle e)
+  (* Convert bound to interval using oracle *)
+  let to_int_val ~oracle = function
+    | Const i -> Int_val.inject_singleton i
+    | Exp (e, i) -> Int_val.add_singleton i (oracle e)
     | Ptroffset _ -> raise Not_implemented
 
   let to_integer ~oracle = function
     | Const i -> Some i
     | Exp (e, i) ->
       begin try
-          Some (Integer.add (Ival.project_int (oracle e)) i)
+          Some (Integer.add (Int_val.project_int (oracle e)) i)
         with Ival.Not_Singleton_Int ->
           None
       end
@@ -872,8 +872,8 @@ struct
       | Exp (e1, i1), Exp (e2, i2) when Exp.equal e1 e2 -> cmp_int i1 i2
       | Ptroffset _, _ | _, Ptroffset _ -> raise Not_implemented
       | _, _ ->
-        let r = Ival.sub_int (to_ival ~oracle b1) (to_ival ~oracle b2) in
-        match Ival.min_and_max r with
+        let r = Int_val.(add (to_int_val ~oracle b1) (neg (to_int_val ~oracle b2))) in
+        match Int_val.min_and_max r with
         | Some min, Some max when Integer.is_zero min && Integer.is_zero max ->
           Equal
         | Some l, _ when Integer.(ge l zero) ->
@@ -886,7 +886,7 @@ struct
     cmp ~oracle b1 b2 = Equal
 
   let lower_integer ~oracle b =
-    match Ival.min_int (to_ival ~oracle b) with
+    match Int_val.min_int (to_int_val ~oracle b) with
     | Some l -> `Value l
     | None ->
       Kernel.warning ~current:true "cannot retrieve lower bound for %a"
@@ -894,7 +894,7 @@ struct
       `Top
 
   let upper_integer ~oracle b =
-    match Ival.max_int (to_ival ~oracle b) with
+    match Int_val.max_int (to_int_val ~oracle b) with
     | Some u -> `Value u
     | None ->
       Kernel.warning ~current:true "cannot retrieve upper bound for %a"
@@ -945,7 +945,6 @@ struct
   let _incr vi i (b,a) = Bound.incr vi i b |> Option.map (fun b -> b,a)
   let incr_or_constantify ~oracle vi i (b,a) =
     Bound.incr_or_constantify ~oracle vi i b |> Option.map (fun b -> b,a)
-  let _to_ival ~oracle (b,_a) = Bound.to_ival ~oracle b
   let cmp ~oracle (b1,_a1) (b2,_a2) = Bound.cmp ~oracle b1 b2
   let eq ?oracle (b1,_a1) (b2,_a2) = Bound.eq ?oracle b1 b2
   let lower_bound ~oracle (b1,a1) (b2,a2) =

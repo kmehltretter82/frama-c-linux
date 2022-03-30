@@ -81,7 +81,7 @@ end
 
 
 type side = Left | Right
-type oracle = Cil_types.exp -> Ival.t
+type oracle = Cil_types.exp -> Int_val.t
 type bioracle = side -> oracle
 type strength = Strong | Weak | Reinforce (* update strength *)
 

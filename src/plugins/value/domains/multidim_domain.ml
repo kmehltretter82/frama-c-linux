@@ -410,17 +410,6 @@ struct
     | Some s1, Some s2 -> Some (TrackedBases.union s1 s2)
 
 
-  (* Oracle conversion for Abstract_memory *)
-
-  let convert_oracle (oracle : Cil_types.exp -> value)
-    : Abstract_memory.oracle =
-    fun exp ->
-    try
-      Value.project_ival (oracle exp)
-    with Value.Not_based_on_null ->
-      Ival.top (* TODO: should it just not happen ? *)
-
-
   (* Accesses *)
 
   let read :
@@ -918,8 +907,8 @@ let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
           | `Value (_valuation,v) -> get_cval v
         in
         let oracle = function
-          | Abstract_memory.Left ->  Domain.convert_oracle (oracle a)
-          | Abstract_memory.Right -> Domain.convert_oracle (oracle b)
+          | Abstract_memory.Left ->  convert_oracle (oracle a)
+          | Abstract_memory.Right -> convert_oracle (oracle b)
         in
         let multidim = Domain.join' ~oracle (get_multidim a) (get_multidim b) in
         set key multidim r
