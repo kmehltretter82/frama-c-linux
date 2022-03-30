@@ -424,9 +424,13 @@ Options:
   -c         compile instrumented code
   -C         assume that the input files have already been instrumented
   -l         pass additional options to the linker
+             (e.g. -l -lm)
   -e         pass additional options to the prepreprocessor
+             (e.g. -e \"-DPI=3.14 -DE_ACSL_DEBUG_ASSERT\")
   -E         pass additional arguments to the Frama-C preprocessor
+             (e.g. -E \"-Iinclude -DMACRO=1\")
   -F         pass additional options to the Frama-C command line
+             (e.g. -F -c11)
   -o <file>  output the generated code to <file> [a.out.frama.c]
   -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
   -M         maximize memory-related instrumentation
