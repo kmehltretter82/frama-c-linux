@@ -382,7 +382,8 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
 
   // Computing the number of columns..
   let span = 0;
-  if (before || after && !probe.effects) span += 2;
+  if ((before || after) && !probe.effects && !probe.condition) span += 2;
+  if (before && (probe.effects || probe.condition)) span += 2
   if (after && probe.effects) span += 2;
   if (after && probe.condition) span += 4;
   if (span === 0) return <></>;
@@ -445,9 +446,12 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   function push(title: string, children: JSX.Element | string): void {
     elements.push(<td {...infos} title={title}>{children}</td>);
   }
-  if (before && probe.effects) push(title('before'), 'Before');
-  if (after && probe.effects) push(title('after'), 'After');
-  if ((before || after) && !probe.effects) push('Values at the statement', '-');
+  if ((before || after) && !probe.effects && !probe.condition)
+    push('Values at the statement', '-');
+  if (before && (probe.effects || probe.condition))
+    push(title('before'), 'Before');
+  if (after && probe.effects)
+    push(title('after'), 'After');
   if (after && probe.condition) {
     const pushCondition = (s: string): void => {
       const t = `Values after the condition, in the ${s.toLowerCase()} branch`;
@@ -545,9 +549,14 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     if (before && after && probe.effects && _.isEqual(vBefore, vAfter))
       elements.push(td(vBefore, 3));
     else {
-      if (before || after && !probe.effects) elements.push(td(vBefore));
-      if (after && probe.effects) elements.push(td(vAfter));
-      if (after && probe.condition) elements.push(td(vThen), td(vElse));
+      if ((before || after) && !probe.effects && !probe.condition)
+        elements.push(td(vBefore));
+      if (before && (probe.effects || probe.condition))
+        elements.push(td(vBefore));
+      if (after && probe.effects)
+        elements.push(td(vAfter));
+      if (after && probe.condition)
+        elements.push(td(vThen), td(vElse));
     }
     return <>{React.Children.toArray(elements)}</>;
   };
@@ -640,7 +649,8 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const { addLoc, getCallstacks: getCS } = props;
   const { setFolded, setByCallstacks, close } = props;
   const { startingCallstack, changeStartingCallstack } = props;
-  const displayTable = folded || state.before || state.after ? 'table' : 'none';
+  const { before, after } = state;
+  const displayTable = folded || !(before || after) ? 'none' : 'table';
   const onClick = (c: callstack): () => void => () => props.selectCallstack(c); 
 
   /* Computes the relevant callstacks */
