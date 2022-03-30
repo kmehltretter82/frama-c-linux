@@ -116,6 +116,7 @@
 .eva-function {
   padding-top: 0px;
   background: var(--background-profound);
+  height: 25px;
 }
 
 .eva-fct-fold {
@@ -167,11 +168,10 @@
 }
 
 .eva-table-container {
-  overflow: hidden;
   position: relative;
   overflow: auto;
   height: 100%;
-  weight: 100%;
+  min-height: 80px;
 }
 
 .eva-functions-section {
