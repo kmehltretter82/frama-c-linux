@@ -743,6 +743,12 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
         />
         <Cell className="eva-fct-name">{fct}</Cell>
         <Filler />
+        <div
+          className='eva-nb-callstacks'
+          style={{ display: byCallstacks ? 'block' : 'none' }}
+        >
+          {`${callstacks.length} callstacks`}
+        </div>
         <IconButton
           icon="ITEMS.LIST"
           className="eva-probeinfo-button"
