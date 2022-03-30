@@ -648,15 +648,9 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const displayTable = folded || !(before || after) ? 'none' : 'table';
   type RowHandler = React.MouseEventHandler<HTMLTableRowElement>;
   const onClick: (c: callstack) => RowHandler = (c) => (event) => {
-    const target = event.currentTarget;
-    const selection = document.getSelection();
-    const length = selection?.toString()?.length ?? 0;
-    const container = selection?.anchorNode;
-    const row = container?.parentElement?.parentElement?.parentElement;
-    if (target !== row || length === 0)
+    const elt = document.elementFromPoint(event.clientX, event.clientY);
+    if (elt?.localName !== 'span')
       props.selectCallstack(isSelectedCallstack(c) ? 'Summary' : c);
-    if (target !== row && target.parentElement === row?.parentElement)
-      selection?.collapse(null);
   };
 
   /* Computes the relevant callstacks */
