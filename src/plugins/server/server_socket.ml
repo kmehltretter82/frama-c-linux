@@ -46,8 +46,8 @@ module SocketSize = Senv.Int
     (struct
       let option_name = "-server-socket-size"
       let arg_name = "n"
-      let default = 8192
-      let help = "Set the maximal size of socket buffers (default: 8192)"
+      let default = 65536
+      let help = "Set the maximal size of socket buffers (default: 65536)"
     end)
 
 let _ = Server_doc.protocole
