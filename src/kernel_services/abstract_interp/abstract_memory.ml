@@ -42,13 +42,15 @@ struct
   (* Applicative syntax *)
   let ( let+ ) = (>>-:)
   let ( and+ ) = zip
-(* Monad syntax *)
-let ( let* ) = (>>-)
-let ( and* ) = zip
+  (* Monad syntax *)
+  let ( let* ) = (>>-)
+  let ( and* ) = zip
 end
 
 module Top =
 struct
+  [@@@warning "-32"]
+
   let zip x y =
     match x, y with
     | `Top, _ | _, `Top -> `Top
@@ -63,7 +65,12 @@ struct
     | `Value t -> `Value (f t)
 
   let (let+) = (>>-:)
+  let (and+) = zip
   let (let*) = (>>-)
+  let (and*) = zip
+  let of_option = function
+    | None -> `Top
+    | Some v -> `Value v
 end
 
 module TopBot =
@@ -889,7 +896,7 @@ struct
     match Int_val.min_int (to_int_val ~oracle b) with
     | Some l -> `Value l
     | None ->
-      Kernel.warning ~current:true "cannot retrieve lower bound for %a"
+      Kernel.warning ~current:true "cannot retrieve a lower bound for %a"
         pretty b;
       `Top
 
@@ -897,7 +904,7 @@ struct
     match Int_val.max_int (to_int_val ~oracle b) with
     | Some u -> `Value u
     | None ->
-      Kernel.warning ~current:true "cannot retrieve upper bound for %a"
+      Kernel.warning ~current:true "cannot retrieve an upper bound for %a"
         pretty b;
       `Top
 
@@ -988,6 +995,7 @@ sig
     oracle:oracle -> Bound.Var.t -> Integer.t option -> t ->
     [ `Value of t | `Top ]
   val map : (submemory -> submemory) -> t -> t
+  val fold : (submemory -> 'a -> 'a) -> (bit -> 'b -> 'a) -> t -> 'b -> 'a
   val add_segmentation_bounds : oracle:oracle -> bound list -> t -> t
 end
 
@@ -1408,6 +1416,9 @@ struct
   let map f m =
     check { m with segments=List.map (fun (v,u) -> f v, u) m.segments }
 
+  let fold fs fp m acc =
+    List.fold_left (fun acc (v,_) -> fs v acc) (fp m.padding acc) m.segments
+
   let add_segmentation_bounds ~oracle bounds m =
     let open TopBot in
     let add_bound m b =
@@ -1756,14 +1767,26 @@ struct
           aux offset' u.union_value
         | Index (exp, index, elem_type, offset'), Array a
           when are_typ_compatible a.array_cell_type elem_type ->
-          let lindex, uindex = match Option.map Bound.of_exp exp with
-            | Some b -> b, b
-            | None | exception Bound.UnsupportedBoundExpression ->
-              let l, u = Int_val.min_and_max index in
-              Bound.of_integer (Option.get l),
-              Bound.of_integer (Option.get u) (* TODO: handle None *)
+          let open Top in
+          let m =
+            let+ lindex, uindex = match Option.map Bound.of_exp exp with
+              | Some b -> `Value (b, b)
+              | None | exception Bound.UnsupportedBoundExpression ->
+                let l, u = Int_val.min_and_max index in
+                let+ l = Top.of_option l
+                and+ u = Top.of_option u in
+                Bound.of_integer l, Bound.of_integer u
+            in
+            A.read ~oracle (aux offset') reduce a.array_value lindex uindex
           in
-          A.read ~oracle (aux offset') reduce a.array_value lindex uindex
+          begin match m with
+            | `Value v -> v
+            | `Top ->
+              A.fold
+                (fun m' acc -> reduce (aux offset' m') acc)
+                (fun p () -> aux offset' (Raw p))
+                a.array_value ()
+          end
         | _, m -> (* structure mismatch *)
           let r = Raw (raw m) in
           match offset with
@@ -1798,33 +1821,35 @@ struct
             let+ union_value = aux ~weak offset' old.union_value in
             Union { old with union_value }
         | Index (exp, index, elem_type, offset') ->
-          let lindex, uindex, weak = match Option.map Bound.of_exp exp with
-            | Some b -> b, Bound.succ b, weak
-            | None | exception Bound.UnsupportedBoundExpression ->
-              let l, u = Int_val.min_and_max index in
-              let l = Option.get l and u = Option.get u in (* TODO: handle exceptions *)
-              Bound.of_integer l, Bound.(succ (of_integer u)),
-              weak || Integer.equal l u
-          in
-          match m with
-          | Array a when are_typ_compatible a.array_cell_type elem_type ->
-            let+ array_value =
-              match
-                A.write ~oracle (aux ~weak offset') a.array_value lindex uindex
-              with
-              | `Bottom -> `Bottom
-              | `Top ->
-                let b = raw m in
-                let+ new_value = aux ~weak offset' (Raw b) in
-                A.single b lindex uindex new_value
-              | `Value array_value -> `Value array_value
+          let m' =
+            let open TopBot in
+            let* lindex, uindex, weak =
+              match Option.map Bound.of_exp exp with
+              | Some b -> `Value (b, Bound.succ b, weak)
+              | None | exception Bound.UnsupportedBoundExpression ->
+                begin match Int_val.min_and_max index with
+                  | None, _ | _, None -> `Top
+                  | Some l, Some u ->
+                    let l' = Bound.of_integer l
+                    and u' = Bound.(succ (of_integer u)) in
+                    `Value (l', u', weak || Integer.equal l u)
+                end
             in
-            Array { a with array_value }
-          | _ ->
-            let b = raw m in
-            let+ new_value = aux ~weak offset' (Raw b) in
-            let array_value = A.single b lindex uindex new_value in
-            Array { array_cell_type = elem_type ; array_value }
+            match m with
+            | Array a when are_typ_compatible a.array_cell_type elem_type ->
+              let+ array_value =
+                A.write ~oracle (aux ~weak offset') a.array_value lindex uindex in
+              Array { a with array_value }
+            | _ ->
+              let b = raw m in
+              let+ new_value = aux ~weak offset' (Raw b) in
+              let array_value = A.single b lindex uindex new_value in
+              Array { array_cell_type = elem_type ; array_value }
+          in
+          match m' with
+          | `Top -> (* No suitable bound for the partition *)
+            let+ v = f ~weak:true Cil.voidType m in v
+          | `Bottom | `Value _ as m -> m
       in aux
 
     let incr_bound ~oracle vi x m = (* TODO: keep subtree when nothing changes *)

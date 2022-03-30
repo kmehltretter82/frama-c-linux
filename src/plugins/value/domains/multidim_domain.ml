@@ -35,21 +35,27 @@ struct
     | `Value x, `Value y -> `Value (x,y)
 
   let (>>-) t f = match t with
-    | `Top  -> `Top
+    | `Top -> `Top
     | `Value t -> f t
 
   let (>>-:) t f = match t with
-    | `Top  -> `Top
+    | `Top -> `Top
     | `Value t -> `Value (f t)
 
   let (let+) = (>>-:)
   let (and+) = zip
-let (let*) = (>>-)
+  let (let*) = (>>-)
+  let (and*) = zip
 
-let of_option = function
-  | None -> `Top
-  | Some x -> `Value x
+  let of_option = function
+    | None -> `Top
+    | Some x -> `Value x
 end
+
+
+let pretty_bottom pp fmt = function
+  | `Bottom -> Format.fprintf fmt "%s" (Unicode.bottom_string ())
+  | `Value value -> pp fmt value
 
 let map_to_singleton map =
   let aux base offset = function
@@ -81,6 +87,12 @@ struct
     try  Some (Ival.project_int (V.project_ival (get_v cvalue)))
     with V.Not_based_on_null | Ival.Not_Singleton_Int -> None
 
+  let get_v_normalized x =
+    let v' = get_v x in
+    if V.is_bottom v'
+    then `Bottom
+    else `Value v'
+
   let make i v =
     let initialized = match i with
       | Abstract_memory.SurelyInitialized -> true
@@ -98,17 +110,17 @@ struct
     | Any (Top, i) -> make i (V.top_with_origin Origin.top)
 
   let to_bit v' =
-    let v = get_v v'
-    and initialization =
-      if is_initialized v'
-      then Abstract_memory.SurelyInitialized
-      else Abstract_memory.MaybeUninitialized
-    in
-    if V.is_bottom v
-    then Abstract_memory.Uninitialized
-    else if V.is_zero v
-    then Abstract_memory.Zero (initialization)
-    else Abstract_memory.Any (V.get_bases v, initialization)
+    match get_v_normalized v' with
+    | `Bottom -> Abstract_memory.Uninitialized
+    | `Value v ->
+      let initialization =
+        if is_initialized v'
+        then Abstract_memory.SurelyInitialized
+        else Abstract_memory.MaybeUninitialized
+      in
+      if V.is_zero v
+      then Abstract_memory.Zero (initialization)
+      else Abstract_memory.Any (V.get_bases v, initialization)
 
   let from_flagged fv =
     V_Or_Uninitialized.make
@@ -122,7 +134,7 @@ end
 
 let no_oracle exp =
   match Cil.isInteger exp with
-  | None -> raise Abstract_interp.Error_Top
+  | None -> Value.top
   | Some i -> Value.inject_int i
 
 let convert_oracle oracle =
@@ -186,7 +198,7 @@ struct
   let of_var (vi : Cil_types.varinfo) : t =
     Map.singleton (Base.of_varinfo vi) (`Value (Offset.of_var_address vi))
 
-  let of_lval oracle ((host,offset) as lval : Cil_types.lval) : t =
+  let of_lval oracle ((host,offset) as lval : Cil_types.lval) : t or_top =
     let oracle' = convert_oracle oracle in
     let base_typ = Cil.typeOfLhost host in
     let offset =
@@ -196,7 +208,7 @@ struct
         Offset.of_cil_offset oracle' base_typ offset in
     match host with
     | Var vi ->
-      Map.singleton (Base.of_varinfo vi) offset
+      `Value (Map.singleton (Base.of_varinfo vi) offset)
     | Mem exp ->
       let exp, index = match exp.enode with
         | BinOp (PlusPI, e1, e2, _typ) ->
@@ -221,13 +233,16 @@ struct
         Map.add base offset' map
       in
       let loc = Locations.loc_bytes_to_loc_bits (oracle exp) in
-      Locations.Location_Bits.fold_i add loc Map.empty
+      try
+        `Value (Locations.Location_Bits.fold_topset_ok add loc Map.empty)
+      with Abstract_interp.Error_Top ->
+        `Top
 
   let of_term_lval env ((lhost, offset) as lval) =
-    let vi = match lhost with
-      | TVar ({lv_origin=Some vi}) -> vi
-      | TResult _ -> Option.get env.Abstract_domain.result
-      | _ -> raise Abstract_interp.Error_Top
+    let+ vi = match lhost with
+      | TVar ({lv_origin=Some vi}) -> `Value (vi)
+      | TResult _ -> Top.of_option env.Abstract_domain.result
+      | _ -> `Top
     in
     let base' = Base.of_varinfo vi in
     let offset' = Offset.of_term_offset vi.vtype offset in
@@ -236,7 +251,7 @@ struct
   let of_term env t =
     match t.term_node with
     | TLval term_lval -> of_term_lval env term_lval
-    | _ -> raise Abstract_interp.Error_Top
+    | _ -> `Top
 
   let of_precise_loc loc =
     let loc' = Precise_locs.imprecise_location loc in
@@ -434,9 +449,13 @@ struct
     let rec oracle exp =
       match exp.enode with
       | Lval lval ->
-        let loc = Location.of_lval oracle lval in
-        let value = get ~oracle state loc in
-        Value_or_Uninitialized.get_v (Bottom.non_bottom value) (* TODO: handle exception *)
+        begin match Location.of_lval oracle lval with
+          | `Top -> Value.top
+          | `Value loc ->
+            match get ~oracle state loc with
+            | `Bottom -> Value.bottom (* should never happen as location should not be empty *)
+            | `Value v -> Value_or_Uninitialized.get_v v
+        end
       | Const (CInt64 (i,_,_)) -> Value.inject_int i
       | Const (CReal (f,_,_)) -> Value.inject_float (Fval.singleton (Fval.F.of_float f))
       | UnOp (op, e, typ) -> Value.forward_unop typ op (oracle e)
@@ -591,41 +610,40 @@ struct
   let extract_lval ~oracle _context state lv _typ _loc =
     let oracle = fun exp ->
       match oracle exp with
-      | `Bottom, _ -> raise Abstract_interp.Error_Bottom
-      | `Value v, _ -> v
+      | `Value v, alarms when Alarmset.is_empty alarms -> v (* only use values safely evaluated *)
+      | _ -> Value.top
     in
-    try
-      let loc = Location.of_lval oracle lv in
-      let v = get ~oracle state loc in
-      (v >>-: fun v -> (Value_or_Uninitialized.get_v v, None)),
-      match v with
-      | `Bottom -> Alarmset.all
+    match Location.of_lval oracle lv with
+    | `Top -> (* can't evaluate location *)
+      `Value (Value.top, None), Alarmset.all
+    | `Value loc ->
+      match get ~oracle state loc with
+      | `Bottom -> `Bottom, Alarmset.all
       | `Value v ->
+        Value_or_Uninitialized.get_v_normalized v >>-: (fun v -> v, None),
         if Value_or_Uninitialized.is_initialized v
         then Alarmset.(set (Alarms.Uninitialized lv) True all)
         else Alarmset.all
-    with
-    | Abstract_interp.Error_Top -> `Value (Value.top, None), Alarmset.all
-    | Abstract_interp.Error_Bottom -> `Bottom, Alarmset.all
 
 
   (* Eva Transfer *)
 
   let make_oracle valuation : Cil_types.exp -> value = fun exp ->
     match valuation.Abstract_domain.find exp with
-    | `Top -> raise Abstract_interp.Error_Top
-    | `Value {value={v=`Bottom}} -> raise Abstract_interp.Error_Bottom
+    | `Top -> Value.top
+    | `Value {value={v=`Bottom}} -> Value.bottom
     | `Value {value={v=`Value value}} -> value
 
   let assume_exp valuation expr record state' =
     state' >>- fun state ->
     let oracle = make_oracle valuation in
-    try
-      match expr.enode with
-      | Lval lv ->
-        let value = Value_or_Uninitialized.from_flagged record.value in
-        if not (Value.is_topint (Value_or_Uninitialized.get_v value)) then
-          let loc = Location.of_lval oracle lv in
+    match expr.enode with
+    | Lval lv ->
+      let value = Value_or_Uninitialized.from_flagged record.value in
+      if not (Value.is_topint (Value_or_Uninitialized.get_v value)) then
+        match Location.of_lval oracle lv with
+        | `Top -> `Value state (* location evaluate to top, ignore *)
+        | `Value loc ->
           let update value' =
             let v = Value_or_Uninitialized.narrow value value' in
             if Value_or_Uninitialized.is_bottom v then `Bottom else `Value v
@@ -633,11 +651,8 @@ struct
           if Location.is_singleton loc
           then reinforce ~oracle update state loc
           else `Value state
-        else `Value state
-      | _ -> `Value state
-    with
-    (* Failed to evaluate the location *)
-      Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> `Value state
+      else `Value state
+    | _ -> `Value state
 
   let assume_valuation valuation state =
     valuation.Abstract_domain.fold (assume_exp valuation) (`Value state)
@@ -646,7 +661,6 @@ struct
     assume_valuation valuation state
 
   let update_array_segmentation_bounds vi expr (base_map,tracked as state) =
-    (* TODO: more general transfer function *)
     let incr = Option.bind expr (fun expr ->
         match expr.Cil_types.enode with
         | BinOp ((PlusA|PlusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
@@ -697,20 +711,19 @@ struct
       update_array_segmentation_bounds vi expr state
 
   let assign_lval lval assigned_value oracle state =
-    try
-      let dst = Location.of_lval oracle lval in
+    match Location.of_lval oracle lval with
+    | `Top -> top
+    | `Value dst ->
       match assigned_value with
       | Assign value ->
         set ~oracle state dst (Value_or_Uninitialized.of_value value)
-      | Copy (right, _value) ->
-        try
-          let src = Location.of_lval oracle right.lval in
+      | Copy (right, value) ->
+        match Location.of_lval oracle right.lval with
+        | `Top ->
+          let b = Value_or_Uninitialized.(to_bit (from_flagged value)) in
+          erase ~oracle state dst b
+        | `Value src ->
           overwrite ~oracle state dst src
-        with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
-          erase ~oracle state dst Abstract_memory.Bit.top
-    with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
-      (* Failed to evaluate the left location *)
-      top
 
   let assign _kinstr left expr assigned_value valuation state =
     let state = update_array_segmentation left.lval (Some expr) state in
@@ -743,15 +756,12 @@ struct
   let show_expr valuation state fmt expr =
     match expr.enode with
     | Lval lval | StartOf lval ->
-      begin try
-          let oracle = make_oracle valuation in
-          let loc = Location.of_lval oracle lval in
-          match extract ~oracle state loc with
-          | `Bottom -> Format.fprintf fmt "⊥"
-          | `Value value -> Memory.pretty fmt value
-        with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
-          (* can't evaluate location : print nothing *)
-          ()
+      let oracle = make_oracle valuation in
+      begin match Location.of_lval oracle lval with
+        | `Top -> Format.fprintf fmt "%s" (Unicode.top_string ())
+        | `Value loc ->
+          let m = extract ~oracle state loc in
+          pretty_bottom Memory.pretty fmt m
       end
     | _ -> ()
 
@@ -786,21 +796,20 @@ struct
         BaseMap.remove_loc base_map location, tracked
 
   let reduce_by_papp env li _labels args positive state =
-    try
-      match li.l_var_info.lv_name, args with
-      | "\\are_finite", [arg] ->
-        let loc,typ = Location.of_term env arg in
-        begin match Cil.unrollType (Logic_utils.logicCType typ) with
-          | TFloat (fkind,_) ->
-            let update = Value.backward_is_finite positive fkind
-            and oracle = mk_oracle state in
-            reinforce ~oracle (Value_or_Uninitialized.map' update) state loc
-          | _ | exception (Failure _) -> `Value state
-        end
-      | _ -> `Value state
-    with
-    | Abstract_interp.Error_Bottom -> `Bottom
-    | Abstract_interp.Error_Top -> `Value state
+    match li.l_var_info.lv_name, args with
+    | "\\are_finite", [arg] ->
+      begin match Location.of_term env arg with
+        | `Top -> `Value state (* can't resolve location, ignore *)
+        | `Value (loc,typ) ->
+          begin match Cil.unrollType (Logic_utils.logicCType typ) with
+            | TFloat (fkind,_) ->
+              let update = Value.backward_is_finite positive fkind
+              and oracle = mk_oracle state in
+              reinforce ~oracle (Value_or_Uninitialized.map' update) state loc
+            | _ | exception (Failure _) -> `Value state
+          end
+      end
+    | _ -> `Value state
 
   let reduce_by_predicate env state predicate truth =
     let rec reduce predicate truth state =
@@ -821,19 +830,22 @@ struct
       (* Update the segmentation *)
       let lval = Cil_types.Var vi, offset in
       let oracle = mk_oracle state in
-      let loc = Location.of_lval oracle lval in
-      let update m offset =
-        let oracle = convert_oracle oracle in
-        Memory.segmentation_hint ~oracle m offset bounds
-      in
-      let state = write update state loc in
-      (* Update the references *)
-      let add acc e =
-        let r = Cil.extract_varinfos_from_exp e in
-        (Cil_datatype.Varinfo.Set.to_seq r |> List.of_seq) @ acc
-      in
-      let references = List.fold_left add [] bounds in
-      add_references_l state references (Location.bases loc)
+      begin match Location.of_lval oracle lval with
+        | `Top -> state
+        | `Value loc ->
+          let update m offset =
+            let oracle = convert_oracle oracle in
+            Memory.segmentation_hint ~oracle m offset bounds
+          in
+          let state = write update state loc in
+          (* Update the references *)
+          let add acc e =
+            let r = Cil.extract_varinfos_from_exp e in
+            (Cil_datatype.Varinfo.Set.to_seq r |> List.of_seq) @ acc
+          in
+          let references = List.fold_left add [] bounds in
+          add_references_l state references (Location.bases loc)
+      end
     | "eva_domain_scope" ->
       let domain,vars = Eva_annotations.read_domain_scope extension in
       if domain = "multidim" then
@@ -851,19 +863,23 @@ struct
   let empty () = top
 
   let initialize_variable lval _loc ~initialized:_ init_value state =
-    let dst = Location.of_lval no_oracle lval in
-    let d = match init_value with
-      | Abstract_domain.Top  -> Abstract_memory.Bit.numerical
-      | Abstract_domain.Zero -> Abstract_memory.Bit.zero
-    in
-    let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)
-    erase ~oracle state dst d
+    match Location.of_lval no_oracle lval with
+    | `Top -> top
+    | `Value dst ->
+      let d = match init_value with
+        | Abstract_domain.Top  -> Abstract_memory.Bit.numerical
+        | Abstract_domain.Zero -> Abstract_memory.Bit.zero
+      in
+      let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)
+      erase ~oracle state dst d
 
   let initialize_variable_using_type _kind vi state =
     let lval = Cil.var vi in
-    let dst = Location.of_lval no_oracle lval in
-    let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)
-    erase ~oracle state dst Abstract_memory.Bit.top
+    match Location.of_lval no_oracle lval with
+    | `Top -> top
+    | `Value dst ->
+      let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)
+      erase ~oracle state dst Abstract_memory.Bit.top
 
   let relate _kf _bases _state = Base.SetLattice.empty
 

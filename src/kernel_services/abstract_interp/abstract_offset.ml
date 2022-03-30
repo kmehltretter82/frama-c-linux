@@ -39,11 +39,11 @@ struct
 
   let (let+) = (>>-:)
   let (and+) = zip
-let (let*) = (>>-)
+  let (let*) = (>>-)
 
-let of_option = function
-  | None -> `Top
-  | Some x -> `Value x
+  let of_option = function
+    | None -> `Top
+    | Some x -> `Value x
 end
 
 type 'a or_top = [`Value of 'a | `Top]
@@ -228,7 +228,7 @@ let rec of_int_val ~base_typ ~typ ival =
 let of_ival ~base_typ ~typ ival =
   match Ival.project_int_val ival with
   | Some ival -> of_int_val ~base_typ ~typ ival
-  | None -> `Top (* should not happen *)
+  | None -> `Top
 
 let index_of_term array_size t = (* Exact constant ranges *)
   match t.Cil_types.term_node with
