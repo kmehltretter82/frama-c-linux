@@ -183,9 +183,7 @@ let execute server ?yield proc =
         ?on_delayed:(delayed proc.request)
         yield run proc
     | _ -> run proc
-  in
-  Senv.debug ~level:2 "%a" (pp_response server.pretty) resp ;
-  Queue.push resp server.q_out
+  in Queue.push resp server.q_out
 
 (* -------------------------------------------------------------------------- *)
 (* --- Signals                                                            --- *)
@@ -236,7 +234,7 @@ let kill_running ?id s =
 let kill_request eq id p = if eq id p.id then p.killed <- true
 
 let process_request (server : 'a server) (request : 'a request) : unit =
-  if Senv.debug_atleast 1 && (Senv.debug_atleast 3 || request <> `Poll) then
+  if Senv.debug_atleast 1 && (Senv.debug_atleast 2 || request <> `Poll) then
     Senv.debug "%a" (pp_request server.pretty) request ;
   match request with
   | `Poll -> ()
@@ -288,9 +286,11 @@ let process_request (server : 'a server) (request : 'a request) : unit =
 (* -------------------------------------------------------------------------- *)
 
 let communicate server =
+  Senv.debug ~level:3 "fetch" ;
   match server.fetch () with
   | None -> false
   | Some message ->
+    Senv.debug ~level:2 "message(s) received" ;
     let error =
       try List.iter (process_request server) message.requests ; None
       with exn -> Some exn in (* re-raised after message reply *)
@@ -298,6 +298,9 @@ let communicate server =
     Queue.iter (fun r -> pool := r :: !pool) server.q_out ;
     Queue.clear server.q_out ;
     server.s_signal <- Signals.empty ;
+    Senv.debug ~level:2 "response(s) callback" ;
+    if Senv.debug_atleast 2 then
+      List.iter (Senv.debug "%a" (pp_response server.pretty)) !pool ;
     message.callback !pool ;
     Option.iter raise error ;
     true
