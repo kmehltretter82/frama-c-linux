@@ -41,6 +41,15 @@ module Socket = Senv.String
          Finally, the server is executed until shutdown."
     end)
 
+let () = Parameter_customize.set_group socket_group
+module SocketSize = Senv.Int
+    (struct
+      let option_name = "-server-socket-size"
+      let arg_name = "n"
+      let default = 8192
+      let help = "Set the maximal size of socket buffers (default: 8192)"
+    end)
+
 let _ = Server_doc.protocole
     ~title:"Unix Socket Protocol"
     ~readme:"server_socket.md"
@@ -237,9 +246,11 @@ let channel (s: socket) =
   | None ->
     try
       let sock,_ = Unix.accept ~cloexec:true s.socket in
-      let snd = Unix.getsockopt_int sock SO_SNDBUF in
-      let rcv = Unix.getsockopt_int sock SO_RCVBUF in
-      Senv.debug "Client connected" ;
+      Unix.set_nonblock sock ;
+      let size = max 256 (SocketSize.get ()) in
+      let rcv = min size @@ Unix.getsockopt_int sock SO_RCVBUF in
+      let snd = min size @@ Unix.getsockopt_int sock SO_SNDBUF in
+      Senv.debug "Client connected (in: %d) (out: %d)" rcv snd ;
       let ch = Some {
           sock ;
           snd = Bytes.create snd ;
@@ -262,12 +273,10 @@ let fetch (s:socket) () =
     Senv.warning "Socket: exn %s" (Printexc.to_string exn) ;
     close s ; None
 
-let bind fd =
+let establish_server fd =
   let socket = { socket = fd ; channel = None } in
   try
-    Unix.set_nonblock fd ;
     Unix.listen fd 1 ;
-    Unix.set_nonblock fd ;
     ignore (Sys.signal Sys.sigpipe Signal_ignore) ;
     let pretty = Format.pp_print_string in
     let server = Main.create ~pretty ~fetch:(fetch socket) () in
@@ -293,17 +302,16 @@ let bind fd =
 let server = ref None
 
 let cmdline () =
-  let addr = Socket.get () in
-  match !server with
-  | Some addr0 ->
-    if Senv.debug_atleast 1 && addr <> addr0 then
+  let option = match Socket.get () with "" -> None | a -> Some a in
+  match !server, option with
+  | _ , None -> ()
+  | Some addr0, Some addr ->
+    if addr0 <> addr then
       Senv.warning "Socket server already running on [%s]." addr0
-    else
-      Senv.feedback "Socket server already running."
-  | None ->
-    if addr <> "" then
+  | None, Some addr ->
+    begin
       try
-        server := Some addr ;
+        server := option ;
         if Sys.file_exists addr then Unix.unlink addr ;
         let fd = Unix.socket PF_UNIX SOCK_STREAM 0 in
         Unix.bind fd (ADDR_UNIX addr) ;
@@ -311,10 +319,11 @@ let cmdline () =
           Senv.feedback "Socket server running on [%s]." addr
         else
           Senv.feedback "Socket server running." ;
-        bind fd
+        establish_server fd ;
       with exn ->
         Senv.fatal "Server socket failed.@\nError: %s@"
           (Printexc.to_string exn)
+    end
 
 let () = Db.Main.extend cmdline
 
