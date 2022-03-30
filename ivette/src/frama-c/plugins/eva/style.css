@@ -270,11 +270,6 @@ tr:first-of-type > .eva-table-callsite-box {
   z-index: +1;
 }
 
-.eva-table-callsite-box.eva-table-descr-sticky {
-  left: 0px;
-  z-index: +2;
-}
-
 .eva-table-callsite-box.eva-table-header-sticky {
   left: 0px;
   z-index: +2;

@@ -519,7 +519,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const { vBefore, vAfter, vThen, vElse } = evaluation;
     const isSelected = props.isSelectedCallstack(callstack);
     const selected = isSelected && callstack !== 'Summary' ? 'eva-focused' : '';
-    const font = summaryOnly && callstack === 'Summary' ? 'eva-italic' : '';
+    const font = summaryOnly ? 'eva-italic' : '';
     const className = classes('eva-table-values', selected, font);
     const kind = callstack === 'Summary' ? 'one' : 'this';
     const title = `At least one alarm is raised in ${kind} callstack`;
@@ -571,7 +571,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
 /* -------------------------------------------------------------------------- */
 
 interface CallsiteCellProps {
-  callstack: callstack | 'Header' | 'Descr';
+  callstack: callstack | 'Header';
   index?: number;
   getCallsites: Request<callstack, Callsite[]>;
   selectedClass?: string;
@@ -591,12 +591,7 @@ async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
     case 'Header': {
       const cls = classes(baseClasses, 'eva-table-header-sticky');
       const title = 'Corresponding callstack';
-      return <td className={cls} title={title}>{'#'}</td>;
-    }
-    case 'Descr': {
-      const cls = classes(baseClasses, 'eva-table-descr-sticky');
-      const title = 'Column description';
-      return <td className={cls} title={title}>{'D'}</td>;
+      return <td className={cls} rowSpan={2} title={title}>{'#'}</td>;
     }
     default: {
       const cls = classes(baseClasses, 'eva-table-value-sticky');
@@ -651,12 +646,14 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const { startingCallstack, changeStartingCallstack } = props;
   const { before, after } = state;
   const displayTable = folded || !(before || after) ? 'none' : 'table';
-  const onClick = (c: callstack): () => void => () => props.selectCallstack(c); 
+  const onClick = (c: callstack): () => void => () =>
+    props.selectCallstack(isSelectedCallstack(c) ? 'Summary' : c); 
 
   /* Computes the relevant callstacks */
   const markers = Array.from(props.markers.keys());
-  const callstacks = byCallstacks ? (await getCS(markers) ?? []) : [];
-  const summaryOnly = callstacks.length === 1;
+  const allCallstacks = await getCS(markers);
+  const summaryOnly = allCallstacks.length === 1;
+  const callstacks = byCallstacks || summaryOnly ? allCallstacks : [];
 
   /* Computes the relevant data for each marker */
   interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus }
@@ -678,7 +675,6 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   }));
 
   /* Computes the columns descriptions */
-  const descrsCall = await CallsiteCell({ getCallsites, callstack: 'Descr' });
   const descrs = data.map((d) => ProbeDescr({ ...d, state })).flat();
 
   /* Computes the summary values */
@@ -721,6 +717,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   };
 
   /* Builds the component */
+  const doCall = data.length > 0;
   return (
     <>
       <Hpack className="eva-function">
@@ -735,6 +732,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
           icon="ITEMS.LIST"
           className="eva-probeinfo-button"
           selected={byCallstacks}
+          disabled={summaryOnly}
           title="Details by callstack"
           onClick={() => setByCallstacks(!byCallstacks)}
         />
@@ -750,16 +748,15 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
         <table className='eva-table' style={{ display: displayTable }}>
           <tbody>
             <tr>
-              {headers.length > 0 ? headerCall : undefined}
+              {doCall ? headerCall : undefined}
               {React.Children.toArray(headers)}
             </tr>
             <tr>
-              {descrs.length > 0 ? descrsCall : undefined}
               {React.Children.toArray(descrs)}
             </tr>
             <tr key={'Summary'} onClick={onClick('Summary')}>
-              {summary.length > 0 ? summCall : undefined}
-              {React.Children.toArray(summary)}
+              {doCall && !summaryOnly ? summCall : undefined}
+              {!summaryOnly ? React.Children.toArray(summary) : undefined}
             </tr>
             {React.Children.toArray(values)}
           </tbody>
