@@ -31,7 +31,7 @@ DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev pkg doc serve dist lint fixlint
+.PHONY: all app dev pkg doc serve dist lint fixlint checkdirs
 
 all: pkg lint app
 
@@ -39,10 +39,21 @@ app: dome-app
 dev: dome-dev
 dist: dome-dist
 
-lint: dome-pkg dome-templ
+lint: dome-pkg dome-templ checkdirs
 	@echo "[Ivette] running typechecker & linter"
 	yarn run typecheck
 	yarn run lint
+
+checkdirs: headers/checkdir
+	@echo "[Ivette] check imported filenames"
+	@headers/checkdirs.sh
+
+headers/checkdir: headers/checkdir.ml
+	@echo "[Ivette] headers/checkdir"
+	@ocamlopt -o $@ $<
+
+clean::
+	@rm -f headers/*.cm* headers/*.o headers/checkdir
 
 tsc: dome-pkg dome-templ
 	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
