@@ -27,7 +27,7 @@ import { Client } from './client';
 
 const D = new Debug('SocketServer');
 
-const RETRIES = 10;
+const RETRIES = 30;
 const TIMEOUT = 200;
 
 // --------------------------------------------------------------------------
