@@ -34,8 +34,8 @@ import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { Filler, Hpack, Vpack, Vfill } from 'dome/layout/boxes';
 import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
+import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
 
 
 
@@ -237,10 +237,11 @@ interface StackInfosProps {
   callsites: Callsite[];
   isSelected: boolean;
   setSelection: (a: States.SelectionActions) => void;
+  close: () => void;
 }
 
 async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
-  const { callsites, setSelection, isSelected } = props;
+  const { callsites, setSelection, isSelected, close } = props;
   const selectedClass = isSelected ? 'eva-focused' : '';
   const className = classes('eva-callsite', selectedClass);
   if (callsites.length <= 1) return <></>;
@@ -271,7 +272,17 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
     );
   };
   const children = React.Children.toArray(callsites.map(makeCallsite));
-  return <Hpack className="eva-info">{children}</Hpack>;
+  return (
+    <div className='eva-info'>
+      <Hpack className='eva-info-wrap'>{children}</Hpack>
+      <Hfill />
+      <IconButton
+        icon='CROSS'
+        className='eva-probeinfo-button'
+        onClick={close}
+      />
+    </div>
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -645,7 +656,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const { setFolded, setByCallstacks, close } = props;
   const { startingCallstack, changeStartingCallstack } = props;
   const { before, after } = state;
-  const displayTable = folded || !(before || after) ? 'none' : 'table';
+  const displayTable = folded || !(before || after) ? 'none' : 'block';
   type RowHandler = React.MouseEventHandler<HTMLTableRowElement>;
   const onClick: (c: callstack) => RowHandler = (c) => (event) => {
     const elt = document.elementFromPoint(event.clientX, event.clientY);
@@ -748,8 +759,12 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
           onClick={close}
         />
       </Hpack>
-      <div onScroll={onScroll} className='eva-table-container'>
-        <table className='eva-table' style={{ display: displayTable }}>
+      <div
+        onScroll={onScroll}
+        className='eva-table-container'
+        style={{ display: displayTable }}
+      >
+        <table className='eva-table'>
           <tbody>
             <tr>
               {doCall ? headerCall : undefined}
@@ -1075,7 +1090,8 @@ function EvaTable(): JSX.Element {
     const tgt = selection.current?.marker;
     const p = (c: Callsite): boolean => c.stmt !== undefined && c.stmt === tgt;
     const isSelected = callsites.find(p) !== undefined;
-    return StackInfos({ callsites, isSelected, setSelection: select });
+    const close = (): void => setCS('Summary');
+    return StackInfos({ callsites, isSelected, setSelection: select, close });
   }, [ cs, select, getCallsites, selection ]);
   const { result: stackInfos } = Dome.usePromise(stackInfosPromise);
 

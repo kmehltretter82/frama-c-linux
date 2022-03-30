@@ -62,11 +62,16 @@
 
 .eva-info {
   width: 100%;
-  flex-wrap: wrap;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
   background: var(--background-profound);
-  padding-top: 3px;
-  padding-left: 12px;
-  padding-bottom: 2px;
+  padding: 2px;
+}
+
+.eva-info-wrap {
+  flex: auto;
+  flex-wrap: wrap;
 }
 
 .eva-callsite {
@@ -145,6 +150,10 @@
   z-index: +1;
 }
 
+.eva-table tr:nth-child(n + 4) {
+  cursor: pointer;
+}
+
 .eva-table tr th {
   border-right: thin solid var(--border);
   border-top: thin solid var(--border);
@@ -171,7 +180,7 @@
   position: relative;
   overflow: auto;
   height: 100%;
-  min-height: 80px;
+  min-height: 66px;
 }
 
 .eva-functions-section {
