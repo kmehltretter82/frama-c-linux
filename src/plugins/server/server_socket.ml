@@ -46,8 +46,8 @@ module SocketSize = Senv.Int
     (struct
       let option_name = "-server-socket-size"
       let arg_name = "n"
-      let default = 65536
-      let help = "Set the maximal size of socket buffers (default: 65536)"
+      let default = 256
+      let help = "Control the size of socket buffers (in ko, default 256)."
     end)
 
 let _ = Server_doc.protocole
@@ -238,6 +238,17 @@ let close (s: socket) =
     s.channel <- None ;
     Unix.close ch.sock
 
+let set_socket_size sock opt s =
+  begin
+    let nbytes = s * 1024 in
+    (try Unix.setsockopt_int sock opt nbytes
+     with Unix.Unix_error(err,_,_) ->
+       let msg = Unix.error_message err in
+       Senv.warning ~once:true
+         "Invalid socket size (%d: %s)" nbytes msg) ;
+    Unix.getsockopt_int sock opt
+  end
+
 let channel (s: socket) =
   match s.channel with
   | Some _ as chan -> chan
@@ -245,10 +256,11 @@ let channel (s: socket) =
     try
       let sock,_ = Unix.accept ~cloexec:true s.socket in
       Unix.set_nonblock sock ;
-      let size = max 256 (SocketSize.get ()) in
-      let rcv = min size @@ Unix.getsockopt_int sock SO_RCVBUF in
-      let snd = min size @@ Unix.getsockopt_int sock SO_SNDBUF in
-      Senv.debug "Client connected (in: %d) (out: %d)" rcv snd ;
+      let size = SocketSize.get () in
+      let rcv = set_socket_size sock SO_RCVBUF size in
+      let snd = set_socket_size sock SO_SNDBUF size in
+      Senv.debug ~level:2 "Socket size in:%d out:%d@." rcv snd ;
+      Senv.debug "Client connected" ;
       let ch = Some {
           sock ;
           snd = Bytes.create snd ;
