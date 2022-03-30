@@ -108,6 +108,7 @@ type 'a server = {
   mutable s_signal : Signals.t ; (* emitted signals since last synchro *)
   mutable shutdown : bool ; (* server has been asked to shut down *)
   mutable running : 'a running ; (* server running state *)
+  mutable cmdline : bool option ; (* cmdline signal management *)
 }
 
 exception Killed
@@ -296,7 +297,13 @@ let communicate server =
       with exn -> Some exn in (* re-raised after message reply *)
     let pool = ref [] in
     Queue.iter (fun r -> pool := r :: !pool) server.q_out ;
+    Option.iter
+      (fun cmd ->
+         pool := (if cmd then `CmdLineOn else `CmdLineOff) :: !pool ;
+      ) server.cmdline ;
+    pool := List.rev !pool ;
     Queue.clear server.q_out ;
+    server.cmdline <- None ;
     server.s_signal <- Signals.empty ;
     Senv.debug ~level:2 "response(s) callback" ;
     if Senv.debug_atleast 2 then
@@ -366,6 +373,7 @@ let create ~pretty ?(equal=(=)) ~fetch () =
     s_signal = Signals.empty ;
     daemon = None ;
     running = Idle ;
+    cmdline = None ;
     shutdown = false ;
   }
 
@@ -379,7 +387,7 @@ let start server =
     Senv.debug ~level:2 "Server started (was %a)"
       (pp_running server.pretty) server.running ;
     server.running <- CmdLine ;
-    Queue.push `CmdLineOn server.q_out ;
+    server.cmdline <- Some true ;
     emitter := do_signal server ;
     match server.daemon with
     | Some _ -> ()
@@ -411,6 +419,7 @@ let stop server =
         Senv.feedback "Server disabled." ;
         server.daemon <- None ;
         server.running <- Idle ;
+        server.cmdline <- None ;
         Db.off_progress daemon ;
         set_active false ;
       end
@@ -422,7 +431,7 @@ let foreground server =
     Senv.debug ~level:2 "Server foreground (was %a)"
       (pp_running server.pretty) server.running ;
     server.running <- Idle ;
-    Queue.push `CmdLineOff server.q_out ;
+    server.cmdline <- Some false ;
     emitter := do_signal server ;
     match server.daemon with
     | None -> ()
