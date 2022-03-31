@@ -1827,14 +1827,11 @@ lint:: $(LINT_TARGET)
 
 check-ocp-indent-version:
 	if command -v ocp-indent >/dev/null; then \
-		if [ -z "$(shell ocp-indent --version)" ]; then echo "warning: ocp-indent returned an empty string, assuming it is the correct version"; \
-		else \
-			$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
-			$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
-			if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 7 ]; then \
-				echo "error: ocp-indent 1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
-			exit 1; \
-			fi; \
+		$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
+		$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
+		if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 8 ]; then \
+			echo "error: ocp-indent 1.8.1 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+		exit 1; \
 		fi; \
 	else \
 		exit 1; \
