@@ -525,6 +525,8 @@ src/kernel_services/abstract_interp/offsetmap_lattice_with_isotropy.mli: CEA_LGP
 src/kernel_services/abstract_interp/offsetmap_sig.mli: CEA_LGPL
 src/kernel_services/abstract_interp/origin.ml: CEA_LGPL
 src/kernel_services/abstract_interp/origin.mli: CEA_LGPL
+src/kernel_services/abstract_interp/top.ml: CEA_LGPL
+src/kernel_services/abstract_interp/top.mli: CEA_LGPL
 src/kernel_services/abstract_interp/tr_offset.ml: CEA_LGPL
 src/kernel_services/abstract_interp/tr_offset.mli: CEA_LGPL
 src/kernel_services/analysis/README.md: .ignore

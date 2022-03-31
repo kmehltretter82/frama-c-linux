@@ -587,6 +587,7 @@ KERNEL_CMO=\
 	src/kernel_services/abstract_interp/lattice_messages.cmo        \
 	src/kernel_services/abstract_interp/abstract_interp.cmo         \
 	src/kernel_services/abstract_interp/bottom.cmo                  \
+	src/kernel_services/abstract_interp/top.cmo                     \
 	src/kernel_services/abstract_interp/int_Base.cmo                \
 	src/kernel_services/analysis/bit_utils.cmo                      \
 	src/kernel_services/abstract_interp/fc_float.cmo                \
