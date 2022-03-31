@@ -628,15 +628,16 @@ struct
 
   (* Eva Transfer *)
 
-  let make_oracle valuation : Cil_types.exp -> value = fun exp ->
+  let valuation_to_oracle state valuation : Cil_types.exp -> value = fun exp ->
+    let multidim_oracle = mk_oracle state in
     match valuation.Abstract_domain.find exp with
-    | `Top -> Value.top
+    | `Top -> multidim_oracle exp
     | `Value {value={v=`Bottom}} -> Value.bottom
     | `Value {value={v=`Value value}} -> value
 
   let assume_exp valuation expr record state' =
     state' >>- fun state ->
-    let oracle = make_oracle valuation in
+    let oracle = valuation_to_oracle state valuation in
     match expr.enode with
     | Lval lv ->
       let value = Value_or_Uninitialized.from_flagged record.value in
@@ -726,9 +727,9 @@ struct
           overwrite ~oracle state dst src
 
   let assign _kinstr left expr assigned_value valuation state =
+    let oracle = valuation_to_oracle state valuation in
     let state = update_array_segmentation left.lval (Some expr) state in
     assume_valuation valuation state >>-: fun state ->
-    let oracle = make_oracle valuation in
     assign_lval left.lval assigned_value oracle state
 
   let assume _stmt _expr _pos valuation state =
@@ -739,7 +740,7 @@ struct
     then
       Self.abort ~current:true
         "The multidim domain does not support recursive calls yet";
-    let oracle = make_oracle valuation in
+    let oracle = valuation_to_oracle state valuation in
     let bind state arg =
       state >>-: assign_lval (Cil.var arg.formal) arg.avalue oracle
     in
@@ -756,7 +757,7 @@ struct
   let show_expr valuation state fmt expr =
     match expr.enode with
     | Lval lval | StartOf lval ->
-      let oracle = make_oracle valuation in
+      let oracle = valuation_to_oracle state valuation in
       begin match Location.of_lval oracle lval with
         | `Top -> Format.fprintf fmt "%s" (Unicode.top_string ())
         | `Value loc ->
