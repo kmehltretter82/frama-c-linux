@@ -44,16 +44,14 @@ lint: dome-pkg dome-templ checkdirs
 	yarn run typecheck
 	yarn run lint
 
-checkdirs: headers/checkdir
+checkdirs:
 	@echo "[Ivette] check imported filenames"
-	@headers/checkdirs.sh
-
-headers/checkdir: headers/checkdir.ml
-	@echo "[Ivette] headers/checkdir"
-	@ocamlopt -o $@ $<
-
-clean::
-	@rm -f headers/*.cm* headers/*.o headers/checkdir
+	@err=0 ; for f in `find src | sed -E 's/(.ts|.tsx|.js|.jsx|.css|.json)$$//' | sort -f | uniq -di` ;\
+	 do \
+		err=1; \
+		echo " - ambiguous $$f.*"; \
+	 done ;\
+	 exit $$err
 
 tsc: dome-pkg dome-templ
 	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
