@@ -508,7 +508,7 @@ function _startPolling(): void {
 
 function _stopPolling(): void {
   if (pollingTimer) {
-    clearTimeout(pollingTimer);
+    clearInterval(pollingTimer);
     pollingTimer = undefined;
   }
 }
