@@ -1,62 +1,4 @@
 /* -------------------------------------------------------------------------- */
-/* --- Probe Panel                                                        --- */
-/* -------------------------------------------------------------------------- */
-
-.eva-probeinfo {
-  min-height: 32px;
-  padding-left: 6px;
-  padding-top: 2px;
-  padding-bottom: 4px;
-  width: 100%;
-  background: var(--background-profound);
-  display: flex;
-}
-
-.eva-probeinfo-label {
-  flex: 0 1 auto;
-  min-width: 22px;
-  text-align: left;
-}
-
-.eva-probeinfo-code {
-  flex: 0 1 auto;
-  height: fit-content;
-  background: var(--background-intense);
-  min-width: 120px;
-  width: auto;
-  border: thin solid var(--border);
-  padding-left: 6px;
-  padding-right: 6px;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.eva-probeinfo-stmt {
-  flex: 0 0 auto;
-  margin-left: 2px;
-  margin-right: 0px;
-  margin-top: 2px;
-}
-
-.eva-probeinfo-button {
-  flex: 0 0 auto;
-  margin: 1px;
-  min-width: 16px;
-}
-
-.eva-probeinfo-state {
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-
-.eva-probeinfo-code-text {
-  padding: 3px;
-  white-space: pre;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* -------------------------------------------------------------------------- */
 /* --- Call Stack Info                                                    --- */
 /* -------------------------------------------------------------------------- */
 
@@ -222,8 +164,15 @@
   gap: 0.3em;
 }
 
-.eva-italic {
-  font-style: italic;
+.eva-header-buttons-container {
+  position: absolute;
+  right: 1px;
+  top: 0px;
+  display: flex;
+}
+
+.eva-header-button {
+  padding: 2px 2px 3px 2px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -310,8 +259,16 @@ tr:first-of-type > .eva-table-callsite-box {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Selected Element Background                                        --- */
+/* --- Miscellaneous                                                      --- */
 /* -------------------------------------------------------------------------- */
+
+.eva-button {
+  margin: 0px;
+}
+
+.eva-italic {
+  font-style: italic;
+}
 
 .eva-focused {
   background: var(--code-select);

@@ -28,13 +28,12 @@ import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Values from 'frama-c/plugins/eva/api/values';
-import ControlPoint from 'frama-c/plugins/eva/ControlPoint';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
+import { Inset } from 'dome/frame/toolbars';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { Inset, Button, ButtonGroup } from 'dome/frame/toolbars';
 import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
 
 
@@ -44,8 +43,6 @@ import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
 /* -------------------------------------------------------------------------- */
 
 type Request<A, B> = (a: A) => Promise<B>;
-type StateToDisplay = { before: boolean; after: boolean }
-const defaultState = { before: true, after: true };
 
 type Alarm = [ 'True' | 'False' | 'Unknown', string ]
 function getAlarmStatus(alarms: Alarm[] | undefined): string {
@@ -278,87 +275,10 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
       <Hfill />
       <IconButton
         icon='CROSS'
-        className='eva-probeinfo-button'
+        className='eva-button'
         onClick={close}
       />
     </div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-
-
-
-/* -------------------------------------------------------------------------- */
-/* --- Selected Probe Component                                           --- */
-/* -------------------------------------------------------------------------- */
-/* --- Display informations on the currently selected probe, along with   --- */
-/* --- buttons to pin, remove and change the displayed columns, i.e. if   --- */
-/* --- we display the values before and/or after the statement.           --- */
-/* -------------------------------------------------------------------------- */
-
-interface ProbeInfosProps {
-  probe?: Probe;
-  status?: MarkerStatus;
-  removeProbe: (probe: Probe) => void;
-  setLocPin: (loc: Location, pin: boolean) => void;
-  state: StateToDisplay;
-  setState: (state: StateToDisplay) => void;
-}
-
-function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
-  const { probe, status, setLocPin, removeProbe, state, setState } = props;
-  const code = probe?.code;
-  const stmt = probe?.stmt;
-  const target = probe?.target;
-  const visible = code !== undefined;
-  const pinned = status ? isPinnedMarker(status) : false;
-  return (
-    <Hpack className="eva-probeinfo">
-      <div
-        className="eva-probeinfo-code"
-        style={{ visibility: visible ? 'visible' : 'hidden' }}
-      >
-        <div className='eva-probeinfo-code-text dome-text-cell'>{code}</div>
-      </div>
-      <Code><Stmt stmt={stmt} marker={target} /></Code>
-      <IconButton
-        icon='PIN'
-        className="eva-probeinfo-button"
-        title='Pin the probe'
-        selected={pinned}
-        visible={visible}
-        onClick={() => { if (probe) setLocPin(probe, !pinned); }}
-      />
-      <IconButton
-        icon="CIRC.CLOSE"
-        className="eva-probeinfo-button"
-        title="Discard the probe"
-        onClick={() => { if (probe) removeProbe(probe); }}
-        visible={visible}
-      />
-      <Filler />
-      <ButtonGroup className='eva-probeinfo-state'>
-        <Button
-          value='Before'
-          selected={state.before}
-          title='Show values before statement effects'
-          visible={visible}
-          onClick={() => setState({before: !state.before, after: state.after})}
-        >
-          <ControlPoint kind={'before'}/>
-        </Button>
-        <Button
-          value='After'
-          selected={state.after}
-          title='Show values after statement effects'
-          visible={visible}
-          onClick={() => setState({before: state.before, after: !state.after})}
-        >
-          <ControlPoint kind={'after'}/>
-        </Button>
-      </ButtonGroup>
-    </Hpack>
   );
 }
 
@@ -376,7 +296,6 @@ function SelectedProbeInfos(props: ProbeInfosProps): JSX.Element {
 interface ProbeHeaderProps {
   probe: Probe;
   status: MarkerStatus;
-  state: StateToDisplay;
   pinProbe: (pin: boolean) => void;
   selectProbe: () => void;
   removeProbe: () => void;
@@ -385,30 +304,27 @@ interface ProbeHeaderProps {
 }
 
 function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
-  const { probe, status, state, setSelection, locEvt } = props;
+  const { probe, status, setSelection, locEvt } = props;
   const { code = '(error)', stmt, target, fct } = probe;
   const color = classes(MarkerStatusClass(status), 'eva-table-header-sticky');
   const { selectProbe, removeProbe, pinProbe } = props;
-  const { before, after } = state;
-
-  // Computing the number of columns..
-  let span = 0;
-  if ((before || after) && !probe.effects && !probe.condition) span += 2;
-  if (before && (probe.effects || probe.condition)) span += 2;
-  if (after && probe.effects) span += 2;
-  if (after && probe.condition) span += 4;
-  if (span === 0) return <></>;
+  const span = 2 + (probe.effects ? 2 : 0) + (probe.condition ? 4 : 0);
+  const buttonClass = classes('eva-button', 'eva-header-button');
 
   // When the location is selected, we scroll the header into view, making it
   // appears wherever it was.
   const ref = React.createRef<HTMLTableCellElement>();
   locEvt.on((l) => { if (l === probe) ref.current?.scrollIntoView(); });
 
+  const isPinned = isPinnedMarker(status);
+  const pinText = isPinned ? 'Unpin' : 'Pin';
   const loc: States.SelectionActions = { location: { fct, marker: target} };
   const onClick = (): void => { setSelection(loc); selectProbe(); };
-  const onDoubleClick = (): void => pinProbe(!isPinnedMarker(status));
+  const onDoubleClick = (): void => pinProbe(!isPinned);
   const onContextMenu = (): void => {
     const items: Dome.PopupMenuItem[] = [];
+    const pinLabel = `${pinText} column for ${code}`;
+    items.push({ label: pinLabel, onClick: onDoubleClick });
     const removeLabel = `Remove column for ${code}`;
     items.push({ label: removeLabel, onClick: removeProbe });
     Dome.popupMenu(items);
@@ -425,6 +341,21 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
     >
       <span className='dome-text-cell'>{code}</span>
       <Stmt stmt={stmt} marker={target} short={true}/>
+      <div className='eva-header-buttons-container'>
+        <IconButton
+          icon='PIN'
+          className={buttonClass}
+          title={`${pinText} the probe`}
+          selected={isPinned}
+          onClick={onDoubleClick}
+        />
+        <IconButton
+          icon="CIRC.CLOSE"
+          className={buttonClass}
+          title="Discard the probe"
+          onClick={() => removeProbe()}
+        />
+      </div>
     </th>
   );
 }
@@ -442,12 +373,10 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
 
 interface ProbeDescrProps {
   probe: Probe;
-  state: StateToDisplay;
 }
 
 function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
-  const { probe, state } = props;
-  const { before, after } = state;
+  const { probe } = props;
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
   const cls = classes(valuesClass, tableClass);
@@ -457,13 +386,13 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   function push(title: string, children: JSX.Element | string): void {
     elements.push(<td {...infos} title={title}>{children}</td>);
   }
-  if ((before || after) && !probe.effects && !probe.condition)
+  if (!probe.effects && !probe.condition)
     push('Values at the statement', '-');
-  if (before && (probe.effects || probe.condition))
+  if (probe.effects || probe.condition)
     push(title('before'), 'Before');
-  if (after && probe.effects)
+  if (probe.effects)
     push(title('after'), 'After');
-  if (after && probe.condition) {
+  if (probe.condition) {
     const pushCondition = (s: string): void => {
       const t = `Values after the condition, in the ${s.toLowerCase()} branch`;
       const child =
@@ -497,15 +426,13 @@ interface ProbeValuesProps {
   probe: Probe;
   summary: Evaluation;
   status: MarkerStatus;
-  state: StateToDisplay;
   addLoc: (loc: Location) => void;
   isSelectedCallstack: (c: callstack) => boolean;
   summaryOnly: boolean;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, summary, state, addLoc, summaryOnly } = props;
-  const { before, after } = state;
+  const { probe, summary, addLoc, summaryOnly } = props;
   const summaryStatus = getAlarmStatus(summary.vBefore?.alarms);
 
   // Building common parts
@@ -557,16 +484,16 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       );
     }
     const elements: JSX.Element[] = [];
-    if (before && after && probe.effects && _.isEqual(vBefore, vAfter))
+    if (probe.effects && _.isEqual(vBefore, vAfter))
       elements.push(td(vBefore, 3));
     else {
-      if ((before || after) && !probe.effects && !probe.condition)
+      if (!probe.effects && !probe.condition)
         elements.push(td(vBefore));
-      if (before && (probe.effects || probe.condition))
+      if (probe.effects || probe.condition)
         elements.push(td(vBefore));
-      if (after && probe.effects)
+      if (probe.effects)
         elements.push(td(vAfter));
-      if (after && probe.condition)
+      if (probe.condition)
         elements.push(td(vThen), td(vElse));
     }
     return <>{React.Children.toArray(elements)}</>;
@@ -626,7 +553,6 @@ async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
 interface FunctionProps {
   fct: string;
   markers: Map<Ast.marker, MarkerStatus>;
-  state: StateToDisplay;
   close: () => void;
   getProbe: Request<Location, Probe>;
   pinProbe: (probe: Probe, pin: boolean) => void;
@@ -650,13 +576,12 @@ interface FunctionProps {
 const PageSize = 99;
 
 async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
-  const { fct, state, folded, isSelectedCallstack, locEvt } = props;
+  const { fct, folded, isSelectedCallstack, locEvt } = props;
   const { byCallstacks, setSelection, getCallsites } = props;
   const { addLoc, getCallstacks: getCS } = props;
   const { setFolded, setByCallstacks, close } = props;
   const { startingCallstack, changeStartingCallstack } = props;
-  const { before, after } = state;
-  const displayTable = folded || !(before || after) ? 'none' : 'block';
+  const displayTable = folded ? 'none' : 'block';
   type RowHandler = React.MouseEventHandler<HTMLTableRowElement>;
   const onClick: (c: callstack) => RowHandler = (c) => (event) => {
     const elt = document.elementFromPoint(event.clientX, event.clientY);
@@ -686,14 +611,14 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     const selectProbe = (): void => props.selectProbe(d.probe);
     const removeProbe = (): void => props.removeProbe(d.probe);
     const fcts = { selectProbe, pinProbe, removeProbe, setSelection };
-    return ProbeHeader({ ...d, state, ...fcts, locEvt });
+    return ProbeHeader({ ...d, ...fcts, locEvt });
   }));
 
   /* Computes the columns descriptions */
-  const descrs = data.map((d) => ProbeDescr({ ...d, state })).flat();
+  const descrs = data.map((d) => ProbeDescr(d)).flat();
 
   /* Computes the summary values */
-  const miscs = { state, addLoc, isSelectedCallstack, summaryOnly };
+  const miscs = { addLoc, isSelectedCallstack, summaryOnly };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
   const summCall = await CallsiteCell({ callstack: 'Summary', getCallsites });
@@ -748,7 +673,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
         </div>
         <IconButton
           icon="ITEMS.LIST"
-          className="eva-probeinfo-button"
+          className="eva-button"
           selected={byCallstacks}
           disabled={summaryOnly}
           title="Details by callstack"
@@ -757,7 +682,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
         <Inset />
         <IconButton
           icon="CROSS"
-          className="eva-probeinfo-button"
+          className="eva-button"
           title="Close"
           onClick={close}
         />
@@ -965,7 +890,6 @@ function EvaTable(): JSX.Element {
 
   /* Component state */
   const [ selection, select ] = States.useSelection();
-  const [ state, setState ] = React.useState<StateToDisplay>(defaultState);
   const [ cs, setCS ] = React.useState<callstack>('Summary');
   const [ fcts ] = React.useState(new FunctionsManager());
   const [ focus, setFocus ] = React.useState<Probe | undefined>(undefined);
@@ -1054,7 +978,6 @@ function EvaTable(): JSX.Element {
       return {
         fct,
         markers: infos.markers(focus),
-        state,
         close: () => { fcts.delete(fct); setTic(tac + 1); },
         pinProbe: setLocPin,
         getProbe,
@@ -1078,7 +1001,7 @@ function EvaTable(): JSX.Element {
     return Promise.all(ps.map(FunctionSection));
   },
   [ cs, fcts, focus, tac, getCallsites, setLocPin,
-    getCallstacks, getProbe, remove, select, state, locEvt ]);
+    getCallstacks, getProbe, remove, select, locEvt ]);
   const { result: functions } = Dome.usePromise(functionsPromise);
 
   /* Builds the alarms component. As for the function sections, it is an
@@ -1102,14 +1025,6 @@ function EvaTable(): JSX.Element {
   return (
     <>
       <Ivette.TitleBar />
-      <SelectedProbeInfos
-        probe={focus}
-        status={fcts.status(focus)}
-        setLocPin={setLocPin}
-        removeProbe={remove}
-        state={state}
-        setState={setState}
-      />
       <div className='eva-functions-section'>
         {React.Children.toArray(functions)}
       </div>
