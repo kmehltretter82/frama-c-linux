@@ -173,13 +173,13 @@ src/frama-c/plugins/dive/tippy.css: .ignore
 src/frama-c/plugins/eva/Coverage.tsx: CEA_LGPL
 src/frama-c/plugins/eva/CoverageMeter.tsx: CEA_LGPL
 src/frama-c/plugins/eva/Summary.tsx: CEA_LGPL
-src/frama-c/plugins/eva/valuetable.tsx: CEA_LGPL
 src/frama-c/plugins/eva/api/general/index.ts: CEA_LGPL
 src/frama-c/plugins/eva/api/values/index.ts: CEA_LGPL
 src/frama-c/plugins/eva/index.tsx: CEA_LGPL
 src/frama-c/plugins/eva/pkg.json: .ignore
 src/frama-c/plugins/eva/style.css: .ignore
-src/frama-c/plugins/eva/summary.css: .ignore
+src/frama-c/plugins/eva/style_summary.css: .ignore
+src/frama-c/plugins/eva/valuetable.tsx: CEA_LGPL
 src/frama-c/plugins/pivot/api/general/index.ts: CEA_LGPL
 src/frama-c/plugins/studia/api/studia/index.ts: CEA_LGPL
 src/frama-c/react-pivottable.d.ts: CEA_LGPL
