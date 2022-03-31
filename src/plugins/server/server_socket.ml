@@ -67,43 +67,41 @@ type channel = {
 }
 
 let read_bytes { sock ; rcv ; brcv } =
-  begin
-    (* rcv buffer is only used locally *)
-    let s = Bytes.length rcv in
-    let rec scan p =
-      (* try to fill RCV buffer *)
-      if p < s then
-        let n =
-          try Unix.read sock rcv p (s-p)
-          with Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> 0
-        in if n > 0 then scan (p+n) else p
-      else p
+  (* rcv buffer is only used locally *)
+  let s = Bytes.length rcv in
+  let rec scan p =
+    (* try to fill RCV buffer *)
+    let n =
+      try Unix.read sock rcv p (s-p)
+      with Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> 0
     in
-    let n = scan 0 in
-    if n > 0 then Buffer.add_subbytes brcv rcv 0 n
-  end
+    let p = p + n in
+    if n > 0 && p < s then scan p else p
+  in
+  let n = scan 0 in
+  if n > 0 then Buffer.add_subbytes brcv rcv 0 n
 
 let send_bytes { sock ; snd ; bsnd } =
-  begin
-    (* snd buffer is only used locally *)
-    let n = Buffer.length bsnd in
-    if n > 0 then
-      let s = Bytes.length snd in
-      let rec send p =
-        (* try to flush BSND buffer *)
-        let w = min (n-p) s in
-        Buffer.blit bsnd p snd 0 w ;
-        let r =
-          try Unix.single_write sock snd 0 w
-          with Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> 0
-        in if r > 0 then send (p+r) else p
+  (* snd buffer is only used locally *)
+  let n = Buffer.length bsnd in
+  if n > 0 then
+    let s = Bytes.length snd in
+    let rec send p =
+      (* try to flush BSND buffer *)
+      let w = min (n-p) s in
+      Buffer.blit bsnd p snd 0 w ;
+      let r =
+        try Unix.single_write sock snd 0 w
+        with Unix.Unix_error((EAGAIN|EWOULDBLOCK),_,_) -> 0
       in
-      let p = send 0 in
-      if p > 0 then
-        let tail = Buffer.sub bsnd p (n-p) in
-        Buffer.reset bsnd ;
-        Buffer.add_string bsnd tail
-  end
+      let p = p + r in
+      if r > 0 && p < n then send p else p
+    in
+    let p = send 0 in
+    if p > 0 then
+      let tail = Buffer.sub bsnd p (n-p) in
+      Buffer.reset bsnd ;
+      Buffer.add_string bsnd tail
 
 (* -------------------------------------------------------------------------- *)
 (* --- Data Chunks Encoding                                               --- *)
