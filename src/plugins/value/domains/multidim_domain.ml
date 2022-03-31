@@ -661,7 +661,7 @@ struct
   let update valuation state =
     assume_valuation valuation state
 
-  let update_array_segmentation_bounds vi expr (base_map,tracked as state) =
+  let update_array_segmentation_bounds ~oracle vi expr (base_map,tracked) =
     let incr = Option.bind expr (fun expr ->
         match expr.Cil_types.enode with
         | BinOp ((PlusA|PlusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
@@ -678,7 +678,6 @@ struct
     (* Very important : oracle must be the oracle before a non-invertible
        assignement of the bound to allow removing of eventual empty slice
        before the bound leaves the segmentation. *)
-    let oracle = mk_oracle state in
     let references = snd (BaseMap.find_or_top base_map (Base.of_varinfo vi)) in
     let update_ref base base_map =
       let update (memory, refs) =
@@ -701,7 +700,7 @@ struct
     in
     base_map, tracked
 
-  let update_array_segmentation lval expr state =
+  let update_array_segmentation ~oracle lval expr state =
     match lval with
     | Mem _, _ -> state (* Do nothing *)
     | Var vi, offset ->
@@ -709,7 +708,7 @@ struct
         | NoOffset -> expr
         | _ -> None
       in
-      update_array_segmentation_bounds vi expr state
+      update_array_segmentation_bounds ~oracle vi expr state
 
   let assign_lval lval assigned_value oracle state =
     match Location.of_lval oracle lval with
@@ -728,7 +727,7 @@ struct
 
   let assign _kinstr left expr assigned_value valuation state =
     let oracle = valuation_to_oracle state valuation in
-    let state = update_array_segmentation left.lval (Some expr) state in
+    let state = update_array_segmentation ~oracle left.lval (Some expr) state in
     assume_valuation valuation state >>-: fun state ->
     assign_lval left.lval assigned_value oracle state
 
@@ -775,9 +774,10 @@ struct
     List.fold_left enter_one state vars
 
   let leave_scope _kf vars state =
+    let oracle = mk_oracle state in
     let state =
       List.fold_left
-        (fun state vi -> update_array_segmentation_bounds vi None state)
+        (fun state vi -> update_array_segmentation_bounds ~oracle vi None state)
         state vars
     in
     let (base_map,tracked) = state in
