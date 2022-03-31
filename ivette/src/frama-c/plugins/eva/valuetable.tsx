@@ -805,6 +805,11 @@ class FunctionsManager {
     return infos;
   }
 
+  isEmpty(fct: string): boolean {
+    const infos = this.cache.get(fct);
+    return infos ? infos.isEmpty() : true;
+  }
+
   setByCallstacks(fct: string, byCallstacks: boolean): void {
     const infos = this.cache.get(fct);
     if (!infos) return;
@@ -910,6 +915,20 @@ function EvaTable(): JSX.Element {
   const getCallsites = useCallsitesCache();
   const getCallstacks = useCallstacksCache();
 
+  /* Computing the function corresponding to the selected callstack */
+  const csFctPromise = React.useMemo(async () => {
+    const selectedCSInfos = await getCallsites(cs);
+    if (selectedCSInfos.length === 0) return undefined;
+    else return selectedCSInfos[0].callee;
+  }, [ cs, getCallsites ]);
+  const { result: csFct } = Dome.usePromise(csFctPromise);
+
+  /* Reset the selected callstack when the corresponding function is removed */
+  React.useEffect(() => {
+    if (csFct && fcts.isEmpty(csFct) && focus?.fct !== csFct)
+      setCS('Summary');
+  });
+
   /* Updated the focused Probe when the selection changes. Also emit on the
    * `locEvent` event. */
   React.useEffect(() => {
@@ -975,10 +994,15 @@ function EvaTable(): JSX.Element {
         fcts.changeStartingCallstack(fct, n);
         setTic(tac + 1);
       };
+      const close = (): void => {
+        fcts.delete(fct);
+        if (csFct === fct) setCS('Summary');
+        setTic(tac + 1);
+      };
       return {
         fct,
         markers: infos.markers(focus),
-        close: () => { fcts.delete(fct); setTic(tac + 1); },
+        close,
         pinProbe: setLocPin,
         getProbe,
         selectProbe: setFocus,
