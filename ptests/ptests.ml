@@ -1244,10 +1244,12 @@ let pp_list_deps fmt l =
         Format.fprintf fmt " %S" s) l
 
 let pp_command_deps fmt command =
-  Format.fprintf fmt "%a %S (package frama-c)%a"
+  Format.fprintf fmt "%a %S (package frama-c) %a %a %a"
     pp_list_deps (list_of_deps command.deps.deps_cmd)
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) (list_of_deps command.deps.load_plugin)
+    pp_list_deps (list_of_deps command.deps.load_module)
+    pp_list_deps (list_of_deps command.deps.load_libs)
 
 let show_cmd =
   let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
