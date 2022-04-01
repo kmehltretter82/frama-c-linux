@@ -42,13 +42,43 @@ static __thread int safe_location_counter = 0;
     safe_location_counter++;                                                   \
   } while (0)
 
+struct segment_boundaries safe_locations_boundaries = {
+    .start = 0,
+    .end = 0,
+};
+
+uintptr_t get_safe_locations_start() {
+  uintptr_t min = get_safe_location(0)->address;
+  for (int i = 1; i < get_safe_locations_count(); i++) {
+    memory_location *location = get_safe_location(i);
+    if (min >= location->address)
+      min = location->address;
+  }
+  return min;
+}
+
+uintptr_t get_safe_locations_end() {
+  memory_location *first_location = get_safe_location(0);
+  uintptr_t max = first_location->address;
+  for (int i = 1; i < get_safe_locations_count(); i++) {
+    memory_location *location = get_safe_location(i);
+    if (max <= location->address)
+      max = location->address;
+  }
+  return max;
+}
+
 void collect_safe_locations() {
   /* Tracking of errno and standard streams */
   add_safe_location((uintptr_t)&errno, sizeof(int), 1, E_ACSL_OS_IS_LINUX);
   add_safe_location((uintptr_t)stdout, sizeof(FILE), 1, E_ACSL_OS_IS_LINUX);
   add_safe_location((uintptr_t)stderr, sizeof(FILE), 1, E_ACSL_OS_IS_LINUX);
   add_safe_location((uintptr_t)stdin, sizeof(FILE), 1, E_ACSL_OS_IS_LINUX);
+  safe_locations_boundaries.start = get_safe_locations_start();
+  safe_locations_boundaries.end = get_safe_locations_end();
 }
+
+/* collect_safe_locations(); */
 
 size_t get_safe_locations_count() {
   return safe_location_counter;
