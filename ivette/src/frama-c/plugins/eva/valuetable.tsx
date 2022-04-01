@@ -683,6 +683,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
 
   /* Builds the component */
   const doCall = data.length > 0;
+  const nbCS = allCallstacks.length;
   return (
     <>
       <Hpack className="eva-function">
@@ -694,7 +695,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
         <Cell className="eva-fct-name">{fct}</Cell>
         <Filler />
         <div className='eva-nb-callstacks'>
-          {`${allCallstacks.length} callstacks`}
+          {`${nbCS} callstack${nbCS > 1 ? 's' : ''}`}
         </div>
         <IconButton
           icon="ITEMS.LIST"
