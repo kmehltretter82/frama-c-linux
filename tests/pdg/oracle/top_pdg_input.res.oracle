@@ -285,8 +285,6 @@ Cannot filter: dumping raw memory (including unchanged variables)
 [pdg] done for function fun_asm
 [pdg] computing for function main_asm
 [pdg] done for function main_asm
-[pdg] computing for function no_results
-[pdg] Top for function no_results
 [pdg] ====== PDG GRAPH COMPUTED ======
 [pdg] PDG for fun_asm
  {n47}: InCtrl
@@ -333,5 +331,3 @@ Cannot filter: dumping raw memory (including unchanged variables)
    -[--d]-> 61
  {n63}: OutRet
    -[--d]-> 62
-[pdg] PDG for no_results
- Top PDG

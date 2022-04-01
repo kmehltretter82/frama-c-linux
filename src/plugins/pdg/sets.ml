@@ -215,7 +215,7 @@ let find_call_stmts kf ~caller =
   match
     List.filter
       (fun (f, _) -> Kernel_function.equal f caller)
-      (!Db.Value.callers kf)
+      (Eva.Results.callsites kf)
   with
   | [] -> []
   | [ _, callsites ] -> assert (callsites <> []); callsites
