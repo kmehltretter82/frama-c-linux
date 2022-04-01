@@ -5,5 +5,3 @@
  (flags -open Frama_c_kernel :standard -w -9)
  (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel)
 )
-
-(plugin (optional) (name analysis_scripts) (libraries frama-c.analysis-script) (site (frama-c plugins)))
