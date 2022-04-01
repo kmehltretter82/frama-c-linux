@@ -160,6 +160,7 @@ export const Control = () => {
       play = { enabled: true, onClick: Server.start };
       break;
     case Server.Status.ON:
+    case Server.Status.CMD:
     case Server.Status.FAILURE:
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
@@ -372,36 +373,50 @@ export const Status = () => {
   const status = Server.useStatus();
   const pending = Server.getPending();
   let led: LEDstatus = 'inactive';
+  let title = undefined;
   let icon = undefined;
   let running = 'OFF';
   let blink = false;
 
   switch (status) {
     case Server.Status.OFF:
+      title = 'Server is off';
       break;
     case Server.Status.STARTING:
       led = 'active';
       blink = true;
       running = 'BOOT';
+      title = 'Server is starting';
       break;
     case Server.Status.ON:
-      led = pending > 0 ? 'positive' : 'active';
+      led = 'active';
+      blink = pending > 0;
       running = 'ON';
+      title = 'Server is running';
+      break;
+    case Server.Status.CMD:
+      led = 'positive';
+      blink = true;
+      running = 'CMD';
+      title = 'Command-line processing';
       break;
     case Server.Status.HALTING:
       led = 'negative';
       blink = true;
       running = 'HALT';
+      title = 'Server is halting';
       break;
     case Server.Status.RESTARTING:
       led = 'warning';
       blink = true;
       running = 'REBOOT';
+      title = 'Server is restarting';
       break;
     case Server.Status.FAILURE:
       led = 'negative';
       blink = true;
       running = 'ERR';
+      title = 'Server halted because of failure';
       icon = 'WARNING';
       break;
   }
@@ -409,7 +424,7 @@ export const Status = () => {
   return (
     <>
       <LED status={led} blink={blink} />
-      <Code icon={icon} label={running} />
+      <Code icon={icon} label={running} title={title} />
       <Toolbars.Separator />
     </>
   );

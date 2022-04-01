@@ -304,6 +304,7 @@ class SyncState<A> {
         `Fail to set value of SyncState '${this.handler.name}'.`,
         `${error}`,
       );
+      this.UPDATE.emit();
     }
   }
 
@@ -311,16 +312,18 @@ class SyncState<A> {
     try {
       this.upToDate = true;
       this.value = undefined;
+      this.UPDATE.emit();
       if (Server.isRunning()) {
         const v = await Server.send(this.handler.getter, null);
         this.value = v;
+        this.UPDATE.emit();
       }
-      this.UPDATE.emit();
     } catch (error) {
       D.error(
         `Fail to update SyncState '${this.handler.name}'.`,
         `${error}`,
       );
+      this.UPDATE.emit();
     }
   }
 }

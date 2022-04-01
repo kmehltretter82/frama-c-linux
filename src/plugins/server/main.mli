@@ -68,6 +68,8 @@ type 'a response = [
   | `Killed of 'a
   | `Rejected of 'a
   | `Signal of string
+  | `CmdLineOn
+  | `CmdLineOff
 ]
 
 (** A paired request-response message.
@@ -89,18 +91,37 @@ val create :
   fetch:(unit -> 'a message option) ->
   unit -> 'a server
 
-(** Run the server forever.
-    The function will {i not} return until the server is actually shut down. *)
-val run : 'a server -> unit
-
 (** Start the server in background.
 
-    The function returns immediately after installing a daemon that accepts GET
-    requests received by the server on calls to [Db.yield()]. *)
+    The function returns immediately after installing a daemon that (only)
+    accepts GET requests received by the server on calls to [Db.yield()].
+
+    Shall be scheduled at command line main stage {i via}
+    [Db.Main.extend] extension point.
+*)
 val start : 'a server -> unit
 
-(** Stop the server if it is running in background. *)
+(** Stop the server if it is running in background.
+
+    Can be invoked to force server shutdown at any time.
+
+    It shall be typically scheduled {i via} [Extlib.safe_at_exit] along with
+    other system cleanup operations to make sure the server is property
+    shutdown before Frama-C main process exits.
+*)
 val stop : 'a server -> unit
+
+(** Run the server forever.
+    The server would now accept any kind of requests and start handling them.
+    While executing an [`EXEC] request, the server would
+    continue to handle (only) [`GET] pending requests on [Db.yield()]
+    at every [server.polling] time interval.
+
+    The function will {i not} return until the server is actually shutdown.
+
+    Shall be scheduled at normal command line termination {i via}
+    [Cmdline.at_normal_exit] extension point. *)
+val run : 'a server -> unit
 
 (** Kill the currently running request by raising an exception. *)
 val kill : unit -> 'a
