@@ -284,6 +284,25 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
 
 /* -------------------------------------------------------------------------- */
 
+interface TableCellProps {
+  children?: JSX.Element | JSX.Element[];
+  right?: JSX.Element;
+}
+
+function TableCell(props: TableCellProps): JSX.Element {
+  const { children, right } = props;
+  return (
+    <div className='eva-cell-container'>
+      <div className='eva-cell-left'/>
+      <div className='eva-cell-content'>
+        {children}
+      </div>
+      <div className='eva-cell-right'>
+        {right}
+      </div>
+    </div>
+  );
+}
 
 
 /* -------------------------------------------------------------------------- */
@@ -329,6 +348,23 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
     items.push({ label: removeLabel, onClick: removeProbe });
     Dome.popupMenu(items);
   };
+
+  const buttons =
+    <div>
+      <IconButton
+        icon='PIN'
+        className={buttonClass}
+        title={`${pinText} the probe`}
+        selected={isPinned}
+        onClick={onDoubleClick}
+      />
+      <IconButton
+        icon="CIRC.CLOSE"
+        className={buttonClass}
+        title="Discard the probe"
+        onClick={() => removeProbe()}
+      />
+    </div>;
   
   return (
     <th
@@ -339,23 +375,12 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
     >
-      <span className='dome-text-cell'>{code}</span>
-      <Stmt stmt={stmt} marker={target} short={true}/>
-      <div className='eva-header-buttons-container'>
-        <IconButton
-          icon='PIN'
-          className={buttonClass}
-          title={`${pinText} the probe`}
-          selected={isPinned}
-          onClick={onDoubleClick}
-        />
-        <IconButton
-          icon="CIRC.CLOSE"
-          className={buttonClass}
-          title="Discard the probe"
-          onClick={() => removeProbe()}
-        />
-      </div>
+      <TableCell right={buttons}>
+        <div className='eva-header-text-overflow'>
+          <span className='dome-text-cell'>{code}</span>
+        </div>
+        <Stmt stmt={stmt} marker={target} short={true}/>
+      </TableCell>
     </th>
   );
 }

@@ -2,6 +2,10 @@
 /* --- Call Stack Info                                                    --- */
 /* -------------------------------------------------------------------------- */
 
+:root {
+  --eva-min-width: 90px;
+}
+
 .eva-info {
   width: 100%;
   display: flex;
@@ -23,6 +27,35 @@
   border-radius: 4px;
   border: thin solid var(--border);
   padding-right: 7px;
+}
+
+.eva-cell-container {
+  display: flex;
+  justify-content: center;
+}
+
+.eva-cell-left {
+  flex: 1;
+}
+
+.eva-cell-content {
+  margin-left: 6px;
+  margin-right: 4px;
+  flex: 0 auto;
+  overflow: hidden;
+  display: flex;
+}
+
+.eva-header-text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eva-cell-right {
+  display: flex;
+  flex: 1;
+  min-width: max-content;
+  justify-content: flex-end;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -103,6 +136,8 @@
   height: 22px;
   min-height: 22px;
   max-height: 22px;
+  min-width: calc(var(--eva-min-width) + 30px);
+  max-width: calc(var(--eva-min-width) + 30px);
 }
 
 .eva-table tr:nth-child(2n) {
@@ -168,11 +203,18 @@
   position: absolute;
   right: 1px;
   top: 0px;
+  padding-left: 2px;
   display: flex;
+  z-index: +1;
+  background: inherit;
 }
 
 .eva-header-button {
   padding: 2px 2px 3px 2px;
+}
+
+.eva-header-text {
+  display: flex;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -205,7 +247,7 @@ tr:first-of-type > .eva-table-callsite-box {
   border: 0px;
   padding: 2px 3px 2px 3px;
   border-bottom: thin solid var(--border);
-  min-width: 144px;
+  min-width: var(--eva-min-width);
   font-family: Andale Mono, monospace;
   font-size: 9pt;
   height: 22px;
@@ -245,7 +287,7 @@ tr:first-of-type > .eva-table-callsite-box {
 }
 
 .eva-table-values-alarms {
-  min-width: 130px;
+  min-width: calc(var(--eva-min-width) - 14px);
 }
 
 .eva-values-position {
