@@ -69,6 +69,11 @@ module Filename = struct
     let regexp = Str.regexp "[\\] " in
     let subst = Str.global_replace regexp " " in
     subst
+
+  let remove_extension_opt suffixes name =
+    let ext = extension name in
+    if (String.equal "" ext) || not (List.mem ext suffixes) then name
+    else remove_extension name
 end
 
 let str_string_match1 regexp line pos =
@@ -833,7 +838,7 @@ end = struct
 
   let config_libs ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
-    let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
+    let l = List.map (fun s -> Filename.remove_extension_opt [ ".cmxs" ; ".cma" ; ".ml" ] s) (split_list s) in
     { current with
       dc_libs = Some l;
       dc_macros = Macros.add_list ["PTEST_LIBS", s] current.dc_macros }
@@ -846,7 +851,7 @@ end = struct
 
   let config_module macro_name ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
-    let l = List.map (fun s -> (Filename.remove_extension s) ^ ".cmxs") (split_list s) in
+    let l = List.map (fun s -> (Filename.remove_extension_opt [".cmxs"; ".cmxo"; ".ml"] s) ^ ".cmxs") (split_list s) in
     { current with
       dc_module = Some l;
       dc_macros = Macros.add_list [macro_name, s] current.dc_macros }
@@ -1558,11 +1563,11 @@ let update_modules ~file modules deps =
   if load_module <> [] then begin
     let plugin_libs = StringSet.union
         (StringSet.of_list (List.map (Format.sprintf "frama-c-%s.core") (list_of_deps deps.load_plugin)))
-        (StringSet.of_list (List.map (fun s -> Filename.remove_extension (Filename.basename s))
+        (StringSet.of_list (List.map (fun s -> Filename.remove_extension_opt [".cmxs"; ".cma"; ".ml"]  (Filename.basename s))
                               (list_of_deps deps.load_libs)))
     in
     List.iter (fun cmxs ->
-        let cmxs = Filename.remove_extension cmxs in
+        let cmxs = Filename.remove_extension_opt [".cmxs"; ".cmo"; ".ml"] cmxs in
         modules := StringMap.update cmxs (function
             | None -> Some (plugin_libs,[file])
             | Some (set,files) -> Some ((StringSet.inter set plugin_libs),file::files)
