@@ -139,6 +139,7 @@ share/analysis-scripts/normalize_jcdb.py: CEA_LGPL
 share/analysis-scripts/parse-coverage.sh: .ignore
 share/analysis-scripts/print_callgraph.py: CEA_LGPL
 share/analysis-scripts/prologue.mk: CEA_LGPL
+share/analysis-scripts/pyproject.toml: .ignore
 share/analysis-scripts/README.md: .ignore
 share/analysis-scripts/results_display.py: CEA_LGPL
 share/analysis-scripts/script_for_creduce_fatal.sh: .ignore

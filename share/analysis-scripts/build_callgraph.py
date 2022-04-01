@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -22,11 +21,10 @@
 #                                                                        #
 ##########################################################################
 
-# This script finds files containing likely declarations and definitions
-# for a given function name, via heuristic syntactic matching.
+"""This script finds files containing likely declarations and definitions
+for a given function name, via heuristic syntactic matching."""
 
 import os
-import re
 import sys
 
 import function_finder
@@ -34,15 +32,8 @@ import source_filter
 
 under_test = os.getenv("PTESTS_TESTING")
 
-arg = ""
-if len(sys.argv) < 2:
-    print(f"usage: {sys.argv[0]} file...")
-    print("        builds a heuristic callgraph for the specified files.")
-    sys.exit(1)
-else:
-    files = sys.argv[1:]
-
 debug = os.getenv("DEBUG")
+
 
 class Callgraph:
     """
@@ -77,13 +68,16 @@ class Callgraph:
     def __repr__(self):
         return f"Callgraph({self.succs}, {self.edges})"
 
+
 def compute(files):
     cg = Callgraph()
     for f in files:
         file_content = source_filter.open_and_filter(f, not under_test)
         file_lines = file_content.splitlines(keepends=True)
         newlines = function_finder.compute_newline_offsets(file_lines)
-        defs = function_finder.find_definitions_and_declarations(True, False, f, file_content, file_lines, newlines)
+        defs = function_finder.find_definitions_and_declarations(
+            True, False, f, file_content, file_lines, newlines
+        )
         calls = function_finder.find_calls(file_content, newlines)
         for call in calls:
             caller = function_finder.find_caller(defs, call)
@@ -95,14 +89,20 @@ def compute(files):
                 cg.add_edge(caller, called, loc)
     return cg
 
+
 def print_edge(cg, caller, called, padding="", end="\n"):
     locs = cg.edges[(caller, called)]
     for (filename, line) in locs:
-        print(f"{padding}{os.path.relpath(filename)}:{line}: {caller} -> {called}", end=end)
+        print(
+            f"{padding}{os.path.relpath(filename)}:{line}: {caller} -> {called}",
+            end=end,
+        )
+
 
 def print_cg(cg):
     for (caller, called) in cg.edges:
         print_edge(cg, caller, called)
+
 
 # note: out _must_ exist (the caller must create it if needed)
 def print_cg_dot(cg, out=sys.stdout):
@@ -110,6 +110,7 @@ def print_cg_dot(cg, out=sys.stdout):
     for (caller, called) in cg.edges:
         print(f"  {caller} -> {called};", file=out)
     print("}", file=out)
+
 
 # succs: dict, input, not modified
 # visited: set, input-output, modified
@@ -143,9 +144,10 @@ def cycle_bfs(cg, visited, just_visited, n):
             return [(n, caller)] + res
     return []
 
+
 def compute_recursive_cycles(cg, acc):
     to_visit = set(cg.nodes())
-    if not to_visit: # empty graph -> no recursion
+    if not to_visit:  # empty graph -> no recursion
         return
     visited = set()
     while to_visit:
@@ -159,9 +161,10 @@ def compute_recursive_cycles(cg, acc):
             acc.append((cycle_start_loc, cycle))
         to_visit -= visited
 
+
 def detect_recursion(cg):
     to_visit = set(cg.nodes())
-    if not to_visit: # empty graph -> no recursion
+    if not to_visit:  # empty graph -> no recursion
         return False
     visited = set()
     has_cycle = False
@@ -172,9 +175,9 @@ def detect_recursion(cg):
         visited = visited.union(just_visited)
         if cycle:
             has_cycle = True
-            print(f"recursive cycle detected: ")
+            print("recursive cycle detected: ")
             for (caller, called) in cycle:
                 print_edge(cg, caller, called, padding="  ")
         to_visit -= visited
     if not has_cycle:
-        print(f"no recursive calls detected")
+        print("no recursive calls detected")

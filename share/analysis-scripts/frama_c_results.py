@@ -24,30 +24,34 @@ import re
 
 stat_file_re = re.compile("^([^=]*)=(.*)$", re.MULTILINE)
 
+
 def load(filename):
     data = {}
     try:
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             content = file.read()
-            for (key,value) in stat_file_re.findall(content):
+            for (key, value) in stat_file_re.findall(content):
                 data[key] = value
     except OSError:
         pass
     return data
 
-re_escape_space = re.compile(r'\\ ')
+
+re_escape_space = re.compile(r"\\ ")
+
 
 def convert(data, key, to_type, default=None):
     try:
         value = data[key].strip()
         if to_type is str:
-            value = re.sub(r'\\ ', ' ', value)
-            value = re.sub(r'\\,', ',', value)
+            value = re.sub(r"\\ ", " ", value)
+            value = re.sub(r"\\,", ",", value)
             return value
         else:
             return to_type(value)
     except (ValueError, TypeError, KeyError):
         return default
+
 
 def parse(data):
     result = {}
@@ -63,11 +67,12 @@ def parse(data):
     result["memory"] = convert(data, "memory", int)
     result["cmd_args"] = convert(data, "cmd_args", str)
     result["benchmark_tag"] = convert(data, "benchmark_tag", str)
-    if result["sem_reach_stmt"] != None and result["syn_reach_stmt"] != None:
+    if result["sem_reach_stmt"] is not None and result["syn_reach_stmt"] is not None:
         result["coverage"] = result["sem_reach_stmt"] / result["syn_reach_stmt"]
     else:
         result["coverage"] = None
     return result
+
 
 def read(filename):
     return parse(load(filename))
