@@ -952,7 +952,7 @@ function EvaTable(): JSX.Element {
   React.useEffect(() => {
     if (csFct && fcts.isEmpty(csFct) && focus?.fct !== csFct)
       setCS('Summary');
-  });
+  }, [ csFct, fcts, focus?.fct ] );
 
   /* Updated the focused Probe when the selection changes. Also emit on the
    * `locEvent` event. */
@@ -1049,7 +1049,7 @@ function EvaTable(): JSX.Element {
     });
     return Promise.all(ps.map(FunctionSection));
   },
-  [ cs, fcts, focus, tac, getCallsites, setLocPin,
+  [ cs, fcts, focus, tac, getCallsites, setLocPin, csFct,
     getCallstacks, getProbe, remove, select, locEvt ]);
   const { result: functions } = Dome.usePromise(functionsPromise);
 
