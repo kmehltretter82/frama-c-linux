@@ -205,7 +205,7 @@ let syntactic_compute g =
 let semantic_compute g =
   Globals.Functions.iter
     (fun kf ->
-       let callers = !Db.Value.callers kf in
+       let callers = Eva.Results.callsites kf in
        let must_add =
          callers <> []  (* the function is called *)
          || is_entry_point kf
