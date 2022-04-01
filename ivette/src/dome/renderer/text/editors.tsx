@@ -484,6 +484,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
         onFocus={this.onFocus}
         onScroll={this.onScroll}
         onMouseMove={this.onMouseMove}
+        onMouseLeave={this.onMouseMove}
       />
     );
   }
