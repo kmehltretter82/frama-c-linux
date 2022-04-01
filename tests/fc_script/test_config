@@ -1,5 +1,5 @@
 /* run.config*
 COMMENT: dependencies of {bin:frama-c-script} execution
  PLUGIN: variadic,instantiate
- LIB: frama-c.analysis-scripts
+ LIBS: @PTEST_SHARE_DIR@/analysis-scripts/analysis_scripts
 */
