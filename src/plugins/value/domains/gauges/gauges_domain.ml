@@ -108,7 +108,7 @@ module G = struct
     let join = lift Integer.min Integer.max
     let add = lift Integer.add Integer.add
 
-    let narrow (min1, max1: t) (min2, max2: t) : t Bottom.or_bottom =
+    let narrow (min1, max1: t) (min2, max2: t) : t or_bottom =
       let minb = match min1, min2 with
         | Some i1, Some i2 -> Some (Integer.max i1 i2)
         | None, i | i, None -> i

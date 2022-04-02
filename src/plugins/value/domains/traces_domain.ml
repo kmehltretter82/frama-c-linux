@@ -30,6 +30,7 @@ module OCamlGraph = Graph
 module Frama_c_File = File
 open Cil_types
 open Cil_datatype
+open Lattice_bounds
 
 module Node : sig
   include Datatype.S_with_collections

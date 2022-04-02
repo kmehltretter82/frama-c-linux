@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Bottom.Type
 open Partition
 
 module Make
@@ -115,7 +114,7 @@ struct
   let expanded (s : store) : (key * state) list =
     Partition.to_list s.store_partition
 
-  let smashed (s : store) : state or_bottom =
+  let smashed (s : store) : state Lattice_bounds.or_bottom =
     match expanded s with
     | [] -> `Bottom
     | (_k, v1) :: l -> `Value (List.fold_left Domain.join v1 (List.map snd l))

@@ -31,13 +31,8 @@ open Cil_types
 (**                      {2 Lattice structure }                               *)
 (* -------------------------------------------------------------------------- *)
 
-include module type of Bottom.Type
-
-(** For some functions, the special value top (denoting no information)
-    is managed separately. *)
-type 'a or_top    = [ `Value of 'a | `Top ]
-
-type 'a or_top_or_bottom = [ `Value of 'a | `Top | `Bottom ]
+include module type of Lattice_bounds
+include module type of Bottom.Operators
 
 
 (* -------------------------------------------------------------------------- *)

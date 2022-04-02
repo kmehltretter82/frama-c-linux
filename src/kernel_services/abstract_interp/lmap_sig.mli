@@ -94,7 +94,7 @@ val find: ?conflate_bottom:bool -> t -> location -> v
     is no Top value in the type {!v}. *)
 
 val copy_offsetmap :
-  Location_Bits.t -> Integer.t -> t -> offsetmap Bottom.or_bottom
+  Location_Bits.t -> Integer.t -> t -> offsetmap Lattice_bounds.or_bottom
 (** [copy_offsetmap alarms loc size m] returns the superposition of the
     ranges of [size] bits starting at [loc] within [m]. [size] must be
     strictly greater than zero. Return [None] if all pointed addresses are
@@ -103,10 +103,10 @@ val copy_offsetmap :
     @raise Error_Top when the location or the state are Top, and there
     is no Top value in the type {!v}. *)
 
-val find_base : Base.t -> t -> offsetmap Bottom.Top.or_top_bottom
+val find_base : Base.t -> t -> offsetmap Lattice_bounds.or_top_bottom
 (** @raise Not_found if the varid is not present in the map. *)
 
-val find_base_or_default : Base.t -> t -> offsetmap Bottom.Top.or_top_bottom
+val find_base_or_default : Base.t -> t -> offsetmap Lattice_bounds.or_top_bottom
 (** Same as [find_base], but return the default values for bases
     that are not currently present in the map. Prefer the use of this function
     to [find_base], unless you explicitly want to see if the base is bound. *)

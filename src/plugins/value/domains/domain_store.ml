@@ -42,12 +42,12 @@ module type S = sig
   val get_initial_state: kernel_function -> t or_bottom
   val get_initial_state_by_callstack:
     ?selection:callstack list ->
-    kernel_function -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
+    kernel_function -> t Value_types.Callstack.Hashtbl.t or_top_bottom
 
   val get_stmt_state: after:bool -> stmt -> t or_bottom
   val get_stmt_state_by_callstack:
     ?selection:callstack list ->
-    after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
+    after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_bottom
 
   val mark_as_computed: unit -> unit
   val is_computed: unit -> bool

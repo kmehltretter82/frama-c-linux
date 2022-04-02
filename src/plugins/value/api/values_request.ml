@@ -337,7 +337,7 @@ end
 module Proxy(A : Analysis.S) : EvaProxy = struct
 
   open Eval
-  type dstate = A.Dom.state or_top_or_bottom
+  type dstate = A.Dom.state or_top_bottom
 
   let get_precise_loc =
     let default = fun _ -> Precise_locs.loc_top in

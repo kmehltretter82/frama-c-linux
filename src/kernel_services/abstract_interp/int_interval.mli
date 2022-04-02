@@ -26,7 +26,7 @@
     A value of [None] for [min] (resp. [max]) represents -infinity
     (resp. +infinity). [modu] is > 0, and [0 <= rem < modu]. *)
 
-open Bottom.Type
+open Lattice_bounds
 
 include Datatype.S_with_collections
 

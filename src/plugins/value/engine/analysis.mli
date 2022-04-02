@@ -32,12 +32,12 @@ module type Results = sig
   val get_stmt_state : after:bool -> stmt -> state or_bottom
   val get_stmt_state_by_callstack:
     ?selection:callstack list ->
-    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
+    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_bottom
   val get_initial_state:
     kernel_function -> state or_bottom
   val get_initial_state_by_callstack:
     ?selection:callstack list ->
-    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
+    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_bottom
 
   val eval_expr : state -> exp -> value evaluated
   val copy_lvalue: state -> lval -> value flagged_value evaluated

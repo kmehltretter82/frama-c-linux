@@ -79,7 +79,7 @@ module type S = sig
     (Analysis.Dom.t, unit, gui_offsetmap_res) evaluation_functions
 
   val exp_ev:
-    (Analysis.Dom.t, exp, Analysis.Val.t Bottom.or_bottom) evaluation_functions
+    (Analysis.Dom.t, exp, Analysis.Val.t Lattice_bounds.or_bottom) evaluation_functions
 
   val lval_ev:
     (Analysis.Dom.t, lval, Analysis.Val.t Eval.flagged_value) evaluation_functions
@@ -97,20 +97,20 @@ module type S = sig
 
   val term_ev:
     gui_loc ->
-    (Eval_terms.eval_env, term, Analysis.Val.t Bottom.or_bottom) evaluation_functions
+    (Eval_terms.eval_env, term, Analysis.Val.t Lattice_bounds.or_bottom) evaluation_functions
 
   val predicate_ev:
     gui_loc ->
     (Eval_terms.eval_env,
      predicate,
-     Eval_terms.predicate_status Bottom.or_bottom
+     Eval_terms.predicate_status Lattice_bounds.or_bottom
     ) evaluation_functions
 
   val predicate_with_red:
     gui_loc ->
     (Eval_terms.eval_env * (kinstr * Value_types.callstack),
      Red_statuses.alarm_or_property * predicate,
-     Eval_terms.predicate_status Bottom.or_bottom
+     Eval_terms.predicate_status Lattice_bounds.or_bottom
     ) evaluation_functions
 
   val make_data_all_callstacks:

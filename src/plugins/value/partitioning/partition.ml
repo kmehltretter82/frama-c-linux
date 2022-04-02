@@ -20,7 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Bottom.Type
+open Lattice_bounds
+open Bottom.Operators
 
 (* --- Split monitors --- *)
 
@@ -482,7 +483,7 @@ struct
       let value = if positive then Integer.one else Integer.zero in
       value, state'
     in
-    Bottom.all [ aux true; aux false ]
+    Bottom.list_values [ aux true; aux false ]
 
   (* --- Applying partitioning actions onto flows --------------------------- *)
 

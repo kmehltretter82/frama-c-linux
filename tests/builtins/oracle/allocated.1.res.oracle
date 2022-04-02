@@ -16,7 +16,7 @@
 [eva] allocated.c:31: Call to builtin free
 [eva] allocated.c:31: function free: precondition 'freeable' got status valid.
 [eva:malloc] allocated.c:31: strong free on bases: {__malloc_main_l25}
-[eva] allocated.c:32: Frama_C_show_each_p_after_free: Bottom
+[eva] allocated.c:32: Frama_C_show_each_p_after_free: ⊥
 [eva] allocated.c:36: Call to builtin malloc
 [eva] allocated.c:36: allocating variable __malloc_main_l36
 [eva] allocated.c:36: assertion got status valid.
@@ -636,7 +636,7 @@
 [eva] allocated.c:120: Call to builtin malloc
 [eva] allocated.c:120: allocating variable __malloc_main_l120
 [eva] allocated.c:120: Frama_C_show_each: {{ &__malloc_main_l120 }}
-[eva] allocated.c:123: Frama_C_show_each: Bottom
+[eva] allocated.c:123: Frama_C_show_each: ⊥
 [eva] allocated.c:125: Call to builtin free
 [eva] allocated.c:125: function free: precondition 'freeable' got status valid.
 [eva:malloc] allocated.c:125: strong free on bases: {__malloc_main_l120}

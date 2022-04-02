@@ -22,7 +22,8 @@
 
 open Cil_types
 open Interpreted_automata
-open Bottom.Type
+open Lattice_bounds
+open Bottom.Operators
 
 let check_signals, signal_abort =
   let signal_emitted = ref false in

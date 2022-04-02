@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Lattice_bounds
 
 (* If true, prints each operation performed for the tests. Otherwise, only
    prints wrong operations. *)
