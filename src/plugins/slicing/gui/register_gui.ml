@@ -467,7 +467,8 @@ let slicing_highlighter(buffer:Design.reactive_buffer) localizable ~start ~stop=
         | Pretty_source.PTermLval _
         | Pretty_source.PGlobal _
         | Pretty_source.PIP _
-        | Pretty_source.PExp _ -> ()
+        | Pretty_source.PExp _
+        | Pretty_source.PType _ -> ()
     in
     (* 2. Highlights the 'Slicing' *)
     SlicingState.may highlight

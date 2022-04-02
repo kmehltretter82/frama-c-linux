@@ -47,8 +47,9 @@ let get_term kf term =
 let key_of_localizable =
   let open Printer_tag in
   function
-  | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _ -> None
-  | PLval (_, Kglobal, _) | PExp (_, Kglobal, _) -> None
+  | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _
+  | PType _ | PLval (_, Kglobal, _) | PExp (_, Kglobal, _)
+    -> None
   | PLval (kf, Kstmt stmt, lval) ->
     let str = Format.asprintf "%a" Cil_datatype.Lval.pretty lval in
     Option.(bind kf (fun kf -> get_term kf str) |> map (fun t -> (stmt, t)))
@@ -144,6 +145,7 @@ module MarkerKind = struct
   let glob = kind "global"
   let term = kind "term"
   let prop = kind "property"
+  let typ = kind "type"
 
   let () =
     Enum.set_lookup
@@ -158,7 +160,8 @@ module MarkerKind = struct
          | PExp _ -> expr
          | PTermLval _ -> term
          | PGlobal _ -> glob
-         | PIP _ -> prop)
+         | PIP _ -> prop
+         | PType _ -> typ)
 
   let data =
     Request.dictionary
@@ -196,7 +199,7 @@ module MarkerVar = struct
            if Cil.isFunctionType vi.vtype then fct else var
          | PGlobal (GFun _ | GFunDecl _) -> fct
          | PLval _ | PStmt _ | PStmtStart _
-         | PExp _ | PTermLval _ | PGlobal _ | PIP _ -> none)
+         | PExp _ | PTermLval _ | PGlobal _ | PIP _ | PType _ -> none)
 
   let data =
     Request.dictionary
@@ -304,6 +307,7 @@ struct
     | PTermLval _ -> Printf.sprintf "#t%d" (incr kid ; !kid)
     | PGlobal _ -> Printf.sprintf "#g%d" (incr kid ; !kid)
     | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
+    | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
 
   let create loc =
     let add_cache key = Cache.add cache key loc in

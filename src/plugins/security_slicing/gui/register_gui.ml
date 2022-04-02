@@ -58,7 +58,8 @@ let security_highlighter buffer loc ~start ~stop =
       let tag = make_tag buffer ~name:"direct" [`BACKGROUND  "green" ] in
       apply_tag buffer tag start stop end
   | PStmtStart _
-  | PExp _ | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ -> ()
+  | PExp _ | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _
+  | PType _ -> ()
 
 let security_selector
     (popup_factory:GMenu.menu GMenu.factory) main_ui ~button localizable =

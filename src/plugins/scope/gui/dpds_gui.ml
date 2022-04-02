@@ -463,7 +463,7 @@ let highlighter (buffer:Design.reactive_buffer) localizable ~start ~stop =
     | PIP (Property.(IPCodeAnnot {ica_ca})) ->
       put_tag (Pscope.tag_annot ica_ca)
     | PStmtStart _ | PExp _
-    | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ -> ()
+    | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ | PType _ -> ()
   with Not_found -> ()
 
 let check_value (main_ui:Design.main_window_extension_points) =

@@ -844,7 +844,7 @@ let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
   | Pretty_source.PStmt _ | Pretty_source.PStmtStart _
   | Pretty_source.PGlobal _| Pretty_source.PVDecl _
   | Pretty_source.PTermLval _| Pretty_source.PLval _
-  | Pretty_source.PExp _ -> ()
+  | Pretty_source.PExp _ | Pretty_source.PType _ -> ()
 
 
 

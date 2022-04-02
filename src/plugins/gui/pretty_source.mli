@@ -43,6 +43,7 @@ type localizable = Printer_tag.localizable =
   | PGlobal of global (** all globals but variable declarations and function
                           definitions. *)
   | PIP of Property.t
+  | PType of typ
 
 module Locs: sig
   type state

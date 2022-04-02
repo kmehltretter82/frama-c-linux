@@ -39,6 +39,7 @@ type localizable = Printer_tag.localizable =
   | PGlobal of global (** all globals but variable declarations and function
                           definitions. *)
   | PIP of Property.t
+  | PType of typ
 
 let kf_of_localizable = Printer_tag.kf_of_localizable
 let ki_of_localizable = Printer_tag.ki_of_localizable
@@ -216,6 +217,7 @@ struct
     | PVDecl _ -> 'd'
     | PGlobal _ -> 'g'
     | PIP _ -> 'i'
+    | PType _ -> 'y'
 
   let create loc =
     incr current ;
@@ -348,7 +350,7 @@ let display_source globals
                 with Not_found -> ())
              | PStmtStart _
              | PTermLval _ | PLval _ | PVDecl _ | PGlobal _
-             | PIP _ | PExp _ ->
+             | PIP _ | PExp _ | PType _ ->
                highlighter v  ~start:pb ~stop:pe
            with Not_found -> () ) ;
            incr index

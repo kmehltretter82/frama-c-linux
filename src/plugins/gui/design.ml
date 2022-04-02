@@ -525,6 +525,7 @@ let to_do_on_select
       (* these properties are not selectable *)
       assert false
     | PGlobal _g -> main_ui#pretty_information "This is a global.@.";
+    | PType _t -> main_ui#pretty_information "This is a type.@.";
 
     | PLval (kf, ki,lv) ->
       let ty = typeOfLval lv in

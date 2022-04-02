@@ -40,6 +40,7 @@ type localizable =
   | PGlobal of global (** all globals but variable declarations and function
                           definitions. *)
   | PIP of Property.t
+  | PType of typ
 
 (** Name (or category). *)
 val label: localizable -> string

@@ -494,7 +494,7 @@ module Select (Eval: Eval) = struct
       | PExp ((_,Kglobal,_) | (None, Kstmt _, _))
       | PTermLval (None, _, _, _)-> ()
       | PVDecl (_kf,_ki,_vi) -> ()
-      | PGlobal _  | PIP _ | PStmtStart _ -> ()
+      | PGlobal _  | PIP _ | PStmtStart _  | PType _ -> ()
     with
     | Eval_terms.LogicEvalError ee ->
       main_ui#pretty_information "Cannot evaluate term: %a@."
@@ -540,7 +540,8 @@ module Select (Eval: Eval) = struct
         )
       end
     | PStmtStart _
-    | PVDecl (None, _, _) | PExp _ | PTermLval _ | PGlobal _ | PIP _ -> ()
+    | PVDecl (None, _, _) | PExp _ | PTermLval _ | PGlobal _ | PIP _
+    | PType _-> ()
 
   let _right_click_value_not_computed (main_ui:main_ui) (menu:menu) localizable =
     match localizable with

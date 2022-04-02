@@ -291,7 +291,7 @@ let translate_history_elt old_helt =
           end
     end
   | Localizable (PLval(None,_,_) | PExp(None,_,_) | PTermLval(None,_,_,_)
-                | PVDecl(None,_,_)) -> (* no names useful? *) None
+                | PVDecl(None,_,_) | PType _) -> (* no names useful? *) None
   | Localizable (PIP _ ) -> (* no names available *) None
 
 (*
