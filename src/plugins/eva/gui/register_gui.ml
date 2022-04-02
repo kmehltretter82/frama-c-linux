@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
-open Pretty_source
+open Printer_tag
 open Gui_types
 
 type main_ui = Design.main_window_extension_points
@@ -494,7 +494,7 @@ module Select (Eval: Eval) = struct
       | PExp ((_,Kglobal,_) | (None, Kstmt _, _))
       | PTermLval (None, _, _, _)-> ()
       | PVDecl (_kf,_ki,_vi) -> ()
-      | PGlobal _  | PIP _ | PStmtStart _  | PType _ -> ()
+      | PGlobal _  | PIP _ | PStmtStart _ | PType _ -> ()
     with
     | Eval_terms.LogicEvalError ee ->
       main_ui#pretty_information "Cannot evaluate term: %a@."

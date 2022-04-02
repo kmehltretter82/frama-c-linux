@@ -25,25 +25,7 @@
 
 open Cil_types
 
-type localizable = Printer_tag.localizable =
-  | PStmt of (kernel_function * stmt)
-  | PStmtStart of (kernel_function * stmt)
-  | PLval of (kernel_function option * kinstr * lval)
-  | PExp of (kernel_function option * kinstr * exp)
-  | PTermLval of (kernel_function option * kinstr * Property.t * term_lval)
-  | PVDecl of (kernel_function option * kinstr * varinfo)
-  (** Declaration and definition of variables and function. Check the type
-      of the varinfo to distinguish between the various possibilities.
-      If the varinfo is a global or a local, the kernel_function is the
-      one in which the variable is declared. The [kinstr] argument is given
-      for local variables with an explicit initializer.
-
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
-  *)
-  | PGlobal of global (** all globals but variable declarations and function
-                          definitions. *)
-  | PIP of Property.t
-  | PType of typ
+type localizable = Printer_tag.localizable
 
 module Locs: sig
   type state

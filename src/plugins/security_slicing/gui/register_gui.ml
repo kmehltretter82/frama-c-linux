@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Pretty_source
+open Printer_tag
 open Gtk_helper
 open Cil_types
 

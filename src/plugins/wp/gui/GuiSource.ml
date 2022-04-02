@@ -26,7 +26,7 @@
 
 open Cil_types
 open Cil_datatype
-open Pretty_source
+open Printer_tag
 open Wpo
 
 type selection =

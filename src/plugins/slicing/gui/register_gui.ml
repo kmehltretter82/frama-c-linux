@@ -168,12 +168,12 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
                 add_mark_info (fun () -> Format.asprintf "%a" Api.Mark.pretty (get_mark slice))
               in List.iter mark_slice slices
           in match localizable with
-          | Pretty_source.PTermLval(Some kf,(Kstmt ki),_,_)
-          | Pretty_source.PLval (Some kf,(Kstmt ki),_)
-          | Pretty_source.PStmt (kf,ki) ->
+          | Printer_tag.PTermLval(Some kf,(Kstmt ki),_,_)
+          | PLval (Some kf,(Kstmt ki),_)
+          | PStmt (kf,ki) ->
             slicing_mark kf
               (fun slice -> Api.Slice.get_mark_from_stmt slice ki)
-          | Pretty_source.PVDecl (Some kf,_,vi) ->
+          | PVDecl (Some kf,_,vi) ->
             slicing_mark kf
               (fun slice -> Api.Slice.get_mark_from_local_var slice vi)
           | _ -> ()
@@ -357,7 +357,7 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
     in
     begin  (* add menu for slicing and scope plug-in *)
       match localizable with
-      | Pretty_source.PLval (Some kf,(Kstmt stmt),lv)->
+      | Printer_tag.PLval (Some kf,(Kstmt stmt),lv)->
         add_slice_menu
           (some_kf_from_lv lv) (some_kf_ki_lv kf stmt (Some lv))
 (*
@@ -365,9 +365,9 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
             (* as for 'statement' localizable. We currently ignore the
                term-lval *)
 *)
-      | Pretty_source.PStmt (kf, stmt) ->
+      | PStmt (kf, stmt) ->
         add_slice_menu None (some_kf_ki_lv kf stmt None)
-      | Pretty_source.PVDecl (kfopt,ki,vi) -> begin
+      | PVDecl (kfopt,ki,vi) -> begin
           add_slice_menu (some_kf_from_vi vi) None;
           match kfopt, ki with
           | Some kf, Kstmt stmt ->
@@ -459,16 +459,16 @@ let slicing_highlighter(buffer:Design.reactive_buffer) localizable ~start ~stop=
               (fun slice -> Api.Slice.get_mark_from_local_var slice vi)
         in
         match localizable with
-        | Pretty_source.PStmt (kf,stmt) -> tag_stmt kf stmt start stop
-        | Pretty_source.PVDecl (Some kf,_,vi) -> tag_vdecl kf vi start stop
-        | Pretty_source.PStmtStart _
-        | Pretty_source.PVDecl (None,_,_)
-        | Pretty_source.PLval _
-        | Pretty_source.PTermLval _
-        | Pretty_source.PGlobal _
-        | Pretty_source.PIP _
-        | Pretty_source.PExp _
-        | Pretty_source.PType _ -> ()
+        | Printer_tag.PStmt (kf,stmt) -> tag_stmt kf stmt start stop
+        | PVDecl (Some kf,_,vi) -> tag_vdecl kf vi start stop
+        | PStmtStart _
+        | PVDecl (None,_,_)
+        | PLval _
+        | PTermLval _
+        | PGlobal _
+        | PIP _
+        | PExp _
+        | PType _ -> ()
     in
     (* 2. Highlights the 'Slicing' *)
     SlicingState.may highlight

@@ -24,7 +24,7 @@
 open Cil_types
 open Cil_datatype
 open Cil
-open Pretty_source
+open Printer_tag
 open Gtk_helper
 
 let dkey = Gui_parameters.register_category "design"
@@ -1803,7 +1803,7 @@ class main_window () : main_window_extension_points =
                  let kfopt = Pretty_source.kf_of_localizable loc in
                  let ki = Pretty_source.ki_of_localizable loc in
                  let var_localizable =
-                   Pretty_source.PLval (kfopt, ki, (Var vi, NoOffset))
+                   Printer_tag.PLval (kfopt, ki, (Var vi, NoOffset))
                  in
                  let button = GdkEvent.Button.button button in
                  if button = 1 then self#pretty_information "@.";

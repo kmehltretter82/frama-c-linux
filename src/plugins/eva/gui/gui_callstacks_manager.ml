@@ -988,10 +988,10 @@ let make_widget (main_ui:main_ui) ~packing make_panel =
       button_edit#connect (fun () ->
           let loc = match loc with
             | GL_Stmt (kf, stmt) ->
-              Pretty_source.PStmt (kf, stmt)
+              Printer_tag.PStmt (kf, stmt)
             | GL_Pre kf | GL_Post kf ->
               let vi = Kernel_function.get_vi kf in
-              Pretty_source.PVDecl (Some kf, Cil_types.Kglobal, vi)
+              Printer_tag.PVDecl (Some kf, Cil_types.Kglobal, vi)
           in
           main_ui#scroll loc;
           model_default#clone model_tab#model;

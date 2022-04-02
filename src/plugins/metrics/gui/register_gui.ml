@@ -48,7 +48,7 @@ module HalsteadMetricsGUI = struct
 end
 
 module CyclomaticMetricsGUI = struct
-  open Pretty_source
+  open Printer_tag
   open Visitor
 
 
@@ -302,7 +302,7 @@ module ValueCoverageGUI = struct
           and unseen_hilit () = hilit "red"
           in
           match loc with
-          | Pretty_source.PVDecl(_, _, vi) ->
+          | Printer_tag.PVDecl(_, _, vi) ->
             if Ast_info.is_function_type vi then begin
               if Varinfo.Set.mem vi pure_syntactic then syn_hilit ()
               else if Varinfo.Set.mem vi metrics.semantic then sem_hilit ()

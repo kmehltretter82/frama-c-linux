@@ -397,7 +397,6 @@ let model_varinfo :
   Design.main_window_extension_points ->
   button:int -> Pretty_source.localizable -> unit =
   fun _menu main ~button item ->
-  let open Pretty_source in
   let open Cil_types in
   match item with
   | PLval(Some kf, _ , (Var x,NoOffset))

@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Pretty_source
+open Printer_tag
 open Cil_types
 open Cil_datatype
 
@@ -52,11 +52,11 @@ let ask_for_lval (main_ui:Design.main_window_extension_points) kf =
 (** [kf_stmt_opt] is used if we want to ask the lval to the user in a popup *)
 let get_lval_opt main_ui kf localizable =
   match localizable with
-  | Pretty_source.PLval (Some _kf, (Kstmt _stmt), lv) ->
+  | PLval (Some _kf, (Kstmt _stmt), lv) ->
     let lv_txt = Pretty_utils.to_string Printer.pp_lval lv in
     let tlv = Logic_utils.lval_to_term_lval lv in
     Some (lv_txt, tlv)
-  | Pretty_source.PTermLval (Some _kf, (Kstmt _stmt), _, tlv) ->
+  | PTermLval (Some _kf, (Kstmt _stmt), _, tlv) ->
     let tlv_txt = Pretty_utils.to_string Printer.pp_term_lval tlv in
     Some (tlv_txt, tlv)
   | _ ->
