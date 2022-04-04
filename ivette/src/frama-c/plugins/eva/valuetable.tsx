@@ -378,7 +378,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
     >
       <TableCell right={buttons}>
         <div className='eva-header-text-overflow'>
-          <span className='dome-text-cell'>{code}</span>
+          <span className='dome-text-cell' title={code}>{code}</span>
         </div>
         <Stmt stmt={stmt} marker={target} short={true}/>
       </TableCell>
@@ -449,14 +449,12 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
 
 interface ProbeValuesProps {
   probe: Probe;
-  status: MarkerStatus;
   addLoc: (loc: Location) => void;
   isSelectedCallstack: (c: callstack) => boolean;
-  summaryOnly: boolean;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, addLoc, summaryOnly } = props;
+  const { probe, addLoc, isSelectedCallstack } = props;
 
   // Building common parts
   const onContextMenu = (evaluation?: Values.evaluation) => (): void => {
@@ -478,9 +476,9 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   return async (callstack: callstack): Promise<JSX.Element> => {
     const evaluation = await probe.evaluate(callstack);
     const { vBefore, vAfter, vThen, vElse } = evaluation;
-    const isSelected = props.isSelectedCallstack(callstack);
+    const isSelected = isSelectedCallstack(callstack);
     const selected = isSelected && callstack !== 'Summary' ? 'eva-focused' : '';
-    const font = summaryOnly ? 'eva-italic' : '';
+    const font = callstack === 'Summary' ? 'eva-italic' : '';
     const className = classes('eva-table-values', selected, font);
     const kind = callstack === 'Summary' ? 'one' : 'this';
     const title = `At least one alarm is raised in ${kind} callstack`;
@@ -612,6 +610,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const allCallstacks = await getCS(markers);
   const summaryOnly = allCallstacks.length === 1;
   const callstacks = byCallstacks || summaryOnly ? allCallstacks : [];
+  const nbCS = allCallstacks.length;
 
   /* Computes the relevant data for each marker */
   interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus }
@@ -621,6 +620,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     const summary = await probe.evaluate('Summary');
     return { probe, summary, status } as Data;
   }));
+  const doCall = data.length > 0;
 
   /* Computes the headers for each marker */
   const headerCall = await CallsiteCell({ getCallsites, callstack: 'Header' });
@@ -636,10 +636,18 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const descrs = data.map((d) => ProbeDescr(d)).flat();
 
   /* Computes the summary values */
-  const miscs = { addLoc, isSelectedCallstack, summaryOnly };
+  const miscs = { addLoc, isSelectedCallstack };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
   const summCall = await CallsiteCell({ callstack: 'Summary', getCallsites });
+  let summaryRow = <></>;
+  if (!summaryOnly) {
+    summaryRow =
+      <tr key={'Summary'} onClick={onClick('Summary')}>
+        {doCall ? summCall : undefined}
+        {React.Children.toArray(summary)}
+      </tr>;
+  }
 
   /* Computes the values for each callstack */
   const start = Math.max(1, startingCallstack);
@@ -675,8 +683,6 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   };
 
   /* Builds the component */
-  const doCall = data.length > 0;
-  const nbCS = allCallstacks.length;
   return (
     <>
       <Hpack className="eva-function">
@@ -720,10 +726,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
             <tr>
               {React.Children.toArray(descrs)}
             </tr>
-            <tr key={'Summary'} onClick={onClick('Summary')}>
-              {doCall && !summaryOnly ? summCall : undefined}
-              {!summaryOnly ? React.Children.toArray(summary) : undefined}
-            </tr>
+            {summaryRow}
             {React.Children.toArray(values)}
           </tbody>
         </table>

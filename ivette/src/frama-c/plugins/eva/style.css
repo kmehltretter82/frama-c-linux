@@ -39,7 +39,7 @@
 }
 
 .eva-cell-content {
-  margin-left: 6px;
+  margin-left: 4px;
   margin-right: 4px;
   flex: 0 auto;
   overflow: hidden;
@@ -142,11 +142,11 @@
 }
 
 .eva-table tr:nth-child(2n) {
-  background-color: var(--background-alterning-odd);
+  background-color: var(--background-alterning-even);
 }
 
 .eva-table tr:nth-child(2n + 1) {
-  background-color: var(--background-alterning-even);
+  background-color: var(--background-alterning-odd);
 }
 
 .eva-table-container {
@@ -291,6 +291,8 @@ tr:first-of-type > .eva-table-callsite-box {
 .eva-table-text {
   cursor: text;
   user-select: text;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
 /* -------------------------------------------------------------------------- */
