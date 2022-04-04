@@ -352,9 +352,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     let compute () =
       Eva_utils.push_call_stack kf Kglobal;
       store_initial_state kf init_state;
-      let call =
-        { kf; callstack = []; arguments = []; rest = []; return = None; }
-      in
+      let callstack = [kf, Kglobal] in
+      let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call Kglobal call None init_state in
       let final_states = List.map snd (final_result.Transfer.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
