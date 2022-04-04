@@ -1,5 +1,6 @@
 /* run.config*
-COMMENT: dependencies of {bin:frama-c-script} execution
+COMMENT: Explicits the dependencies of {bin:frama-c-script} execution:
  PLUGIN: variadic,instantiate
- LIBS: @PTEST_SHARE_DIR@/analysis-scripts/analysis_scripts
+COMMENT: The library frama-c.analysis_scripts is part of the package frama-c
+COMMENT: and this dependency is implicit as the one to the needed python files.
 */
