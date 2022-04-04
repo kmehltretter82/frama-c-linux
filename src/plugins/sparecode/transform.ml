@@ -155,7 +155,7 @@ module BoolInfo = struct
     with Kernel_function.No_Statement -> true
 
   let cond_edge_visible _ s =
-    Db.Value.condition_truth_value s
+    Eva.Results.condition_truth_value s
 end
 
 module Info = Filter.F (BoolInfo)

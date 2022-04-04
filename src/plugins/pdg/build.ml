@@ -765,7 +765,7 @@ let process_condition ctrl_dpds_infos pdg state stmt condition =
   let decls_cond = Cil.extract_varinfos_from_exp condition in
 
   let controlled_stmts = CtrlDpds.get_if_controlled_stmts ctrl_dpds_infos stmt in
-  let go_then, go_else = Db.Value.condition_truth_value stmt in
+  let go_then, go_else = Eva.Results.condition_truth_value stmt in
   let real = go_then && go_else (* real dpd if we can go in both branches *) in
   if not real then
     debug
