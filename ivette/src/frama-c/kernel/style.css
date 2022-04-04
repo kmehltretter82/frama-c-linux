@@ -10,11 +10,27 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Lightweight Text Markers                                           --- */
+/* -------------------------------------------------------------------------- */
+
+.kernel-text {
+    white-space: pre;
+}
+
+.kernel-text-marker:hover {
+    background: var(--code-hover);
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- AST View                                                           --- */
 /* -------------------------------------------------------------------------- */
 
 .highlighted-marker {
     background-color: var(--highlighted-marker);
+}
+
+.hovered-marker {
+    background-color: var(--code-hover);
 }
 
 .dead-code {
@@ -46,7 +62,7 @@
 .globals-attr {
     font-size: smaller;
     font-weight: lighter;
-    color: #aaa;
+    color: var(--info-text);
 }
 
 .globals-function-section {
@@ -54,7 +70,79 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Globals                                                            --- */
+/* --- Informations                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+.astinfo-section {
+    position: relative;
+    overflow: auto;
+    padding-top: 1px;
+    padding-bottom: 2px;
+}
+
+.astinfo-section.selected {
+    background: var(--code-select);
+}
+
+.astinfo-section.hovered {
+    background: var(--code-hover);
+}
+
+.astinfo-section.selected.hovered {
+    background: var(--code-select-hover);
+}
+
+.astinfo-folderbutton {
+    flex: 0 0 auto;
+}
+
+.astinfo-markerbar {
+    display: flex;
+    overflow: hidden;
+    padding-left: 4px;
+}
+
+.astinfo-markerkind {
+    background: var(--selected-element);
+    position: relative;
+    top: -1px;
+    border-radius: 2px;
+    font-size: 7pt;
+    padding: 2px;
+    color: var(--text);
+    user-select: none;
+    margin-right: 3pt;
+}
+
+.astinfo-markercode {
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+    cursor: default;
+}
+
+.astinfo-markerbutton {
+    flex: 0 1 auto;
+    margin: 0px;
+    position: relative;
+}
+
+.astinfo-infos {
+    display: flex ;
+    margin-top: 1px ;
+    margin-bottom: 1px ;
+}
+
+.astinfo-kind {
+    flex: 0 1 50px;
+    text-align: center;
+    margin-top: 1px;
+    margin-left: 8px;
+    color: var(--info-text);
+    font-size: smaller;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Messages                                                           --- */
 /* -------------------------------------------------------------------------- */
 
 .message-search {

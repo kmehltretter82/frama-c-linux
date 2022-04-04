@@ -349,8 +349,9 @@ let makeDeclaration fmt names d =
     Format.fprintf fmt "  name:   '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
     Format.fprintf fmt "  input:  %a,@\n" makeParam input ;
     Format.fprintf fmt "  output: %a,@\n" makeParam output ;
-    Format.fprintf fmt "  signals: [%a],@\n"
-      (Pretty_utils.pp_list ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]"
+    Format.fprintf fmt "  signals: %a,@\n"
+      (Pretty_utils.pp_list
+         ~empty:"[]" ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]"
          (fun fmt s -> Format.fprintf fmt "{ name: '%s' }" s))
          rq.rq_signals;
     Format.fprintf fmt "};@\n" ;

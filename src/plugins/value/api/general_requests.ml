@@ -139,9 +139,40 @@ let () = Request.register ~package
     ~output:(module DeadCode)
     dead_code
 
+(* ----- Register Eva information ------------------------------------------- *)
+
+let print_value fmt loc =
+  let stmt, eval =
+    match loc with
+    | Printer_tag.PLval (_kf, Kstmt stmt, lval)
+      when Cil.isScalarType (Cil.typeOfLval lval) ->
+      stmt, Results.eval_lval lval
+    | Printer_tag.PExp (_kf, Kstmt stmt, expr)
+      when Cil.isScalarType (Cil.typeOf expr) ->
+      stmt, Results.eval_exp expr
+    | _ -> raise Not_found
+  in
+  let eval_cvalue at = Results.(at stmt |> eval |> as_cvalue_or_uninitialized) in
+  let before = eval_cvalue Results.before in
+  let after = eval_cvalue Results.after in
+  let pretty = Cvalue.V_Or_Uninitialized.pretty in
+  if Cvalue.V_Or_Uninitialized.equal before after
+  then pretty fmt before
+  else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+
+let () =
+  Server.Kernel_ast.Information.register
+    ~id:"eva.value"
+    ~label:"Value"
+    ~title:"Possible values inferred by Eva"
+    ~enable:Analysis.is_computed
+    print_value
+
+let () =
+  Analysis.register_computation_hook
+    (fun _ -> Server.Kernel_ast.Information.update ())
 
 (* ----- Red and tainted alarms --------------------------------------------- *)
-
 
 module Taint = struct
   open Server.Data

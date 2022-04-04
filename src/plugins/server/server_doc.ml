@@ -157,6 +157,12 @@ let md_named ~kind pp = function
     let title = String.capitalize_ascii kind in
     Md.table (Package.md_fields ~title pp prms)
 
+let md_signals signals =
+  if signals = [] then []
+  else
+    Md.quote (Md.emph "signals") @
+    Md.block Md.(list (List.map (fun x -> text (code x)) signals))
+
 let descr_of_decl names decl =
   match decl.d_kind with
   | D_safe _ | D_loose _  | D_order _ -> assert false
@@ -181,9 +187,7 @@ let descr_of_decl names decl =
     Md.quote (md_param ~kind:"output" pp rq.rq_output) @
     md_named ~kind:"input" pp rq.rq_input @
     md_named ~kind:"output" pp rq.rq_output @
-    Md.quote (Md.emph "signals") @
-    Md.block Md.(list (List.map (fun x -> text (code x))
-                         rq.rq_signals))
+    md_signals rq.rq_signals
 
 let declaration page names decl =
   match decl.d_kind with
