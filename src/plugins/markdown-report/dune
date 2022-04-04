@@ -2,7 +2,7 @@
  (alias frama-c-configure)
  (deps (universe))
  (action (progn
-          (echo "markdown-report:" %{lib-available:frama-c-markdown-report.core} "\n")
+          (echo "Markdown-report:" %{lib-available:frama-c-markdown-report.core} "\n")
           (echo "  - ppx_deriving_yojson:" %{lib-available:ppx_deriving_yojson} "\n")
   )
   )

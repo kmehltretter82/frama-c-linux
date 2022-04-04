@@ -2,9 +2,9 @@
  (alias frama-c-configure)
  (deps (universe))
  (action (progn
-          (echo "markdown-report.eva-info:" %{lib-available:frama-c-markdown-report.eva-info.core} "\n")
-          (echo "  - markdown-report.core:" %{lib-available:markdown-report.core} "\n")
-          (echo "  - eva.core:" %{lib-available:eva.core} "\n")
+          (echo "Markdown-report.eva-info:" %{lib-available:frama-c-markdown-report.eva-info.core} "\n")
+          (echo "  - markdown-report:" %{lib-available:frama-c-markdown-report.core} "\n")
+          (echo "  - eva:" %{lib-available:frama-c-eva.core} "\n")
   )
   )
 )
