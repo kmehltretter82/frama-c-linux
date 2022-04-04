@@ -1249,12 +1249,13 @@ let pp_list_deps fmt l =
         Format.fprintf fmt " %S" s) l
 
 let pp_command_deps fmt command =
-  Format.fprintf fmt "%a %S (package frama-c) %a %a %a"
-    pp_list_deps (list_of_deps command.deps.deps_cmd)
+  Format.fprintf fmt "%S %a (package frama-c) %a"
+    (* the test file *)
     command.file
+    (* from DEPS: LIBS: and MODULE: directives *)
+    pp_list_deps (list_of_deps command.deps.deps_cmd)
+    (* from PLUGIN directives *)
     Fmt.(list (package_as_deps (quote plugin_as_package))) (list_of_deps command.deps.load_plugin)
-    pp_list_deps (list_of_deps command.deps.load_module)
-    pp_list_deps (list_of_deps command.deps.load_libs)
 
 let show_cmd =
   let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
@@ -1555,6 +1556,7 @@ let deps_command ~file macros deps =
   let load_libs = Option.map (fun libs -> List.map (fun s -> s^".cmxs") (subst libs)) deps.load_libs in
   let deps_cmd = Option.map subst deps.deps_cmd in
   { load_plugin; load_module; load_libs;
+    (* Merge LIBS: MODULE: and DEPS: directives as a dependency to files *)
     deps_cmd = Some ((list_of_deps load_libs) @ (list_of_deps load_module) @ (list_of_deps deps_cmd));
   }
 
@@ -1682,7 +1684,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           Format.fprintf result_fmt
             "(rule ; %s\n  \
              (alias %s)\n  \
-             (deps %a (package frama-c)%a)\n  \
+             (deps (package frama-c)%a)\n  \
              (targets %a %a)\n  \
              (action (system %S))\n\
              )@."
@@ -1691,7 +1693,6 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             (* alias: *)
             wrapper_basename
             (* deps: *)
-            pp_list (list_of_deps config.dc_deps)
             pp_command_deps cmd
             (* targets: *)
             pp_list wtest.log
