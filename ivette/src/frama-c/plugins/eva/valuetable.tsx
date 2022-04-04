@@ -68,6 +68,26 @@ function isPinnedMarker(status: MarkerStatus): boolean {
   return kind === 'Pinned';
 }
 
+interface TableCellProps {
+  children?: JSX.Element | JSX.Element[];
+  right?: JSX.Element;
+}
+
+function TableCell(props: TableCellProps): JSX.Element {
+  const { children, right } = props;
+  return (
+    <div className='eva-cell-container'>
+      <div className='eva-cell-left'/>
+      <div className='eva-cell-content'>
+        {children}
+      </div>
+      <div className='eva-cell-right'>
+        {right}
+      </div>
+    </div>
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 
 
@@ -284,25 +304,6 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
 
 /* -------------------------------------------------------------------------- */
 
-interface TableCellProps {
-  children?: JSX.Element | JSX.Element[];
-  right?: JSX.Element;
-}
-
-function TableCell(props: TableCellProps): JSX.Element {
-  const { children, right } = props;
-  return (
-    <div className='eva-cell-container'>
-      <div className='eva-cell-left'/>
-      <div className='eva-cell-content'>
-        {children}
-      </div>
-      <div className='eva-cell-right'>
-        {right}
-      </div>
-    </div>
-  );
-}
 
 
 /* -------------------------------------------------------------------------- */
@@ -327,7 +328,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   const { code = '(error)', stmt, target, fct } = probe;
   const color = classes(MarkerStatusClass(status), 'eva-table-header-sticky');
   const { selectProbe, removeProbe, pinProbe } = props;
-  const span = 2 + (probe.effects ? 2 : 0) + (probe.condition ? 4 : 0);
+  const span = 1 + (probe.effects ? 1 : 0) + (probe.condition ? 2 : 0);
   const buttonClass = classes('eva-button', 'eva-header-button');
 
   // When the location is selected, we scroll the header into view, making it
@@ -405,11 +406,10 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
   const cls = classes(valuesClass, tableClass);
-  const infos = { className: cls, colSpan: 2 };
   const title = (s: string): string => `Values ${s} the statement evaluation`;
   const elements: JSX.Element[] = [];
   function push(title: string, children: JSX.Element | string): void {
-    elements.push(<td {...infos} title={title}>{children}</td>);
+    elements.push(<td className={cls} title={title}>{children}</td>);
   }
   if (!probe.effects && !probe.condition)
     push('Values at the statement', '-');
@@ -449,7 +449,6 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
 
 interface ProbeValuesProps {
   probe: Probe;
-  summary: Evaluation;
   status: MarkerStatus;
   addLoc: (loc: Location) => void;
   isSelectedCallstack: (c: callstack) => boolean;
@@ -457,8 +456,7 @@ interface ProbeValuesProps {
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, summary, addLoc, summaryOnly } = props;
-  const summaryStatus = getAlarmStatus(summary.vBefore?.alarms);
+  const { probe, addLoc, summaryOnly } = props;
 
   // Building common parts
   const onContextMenu = (evaluation?: Values.evaluation) => (): void => {
@@ -486,31 +484,26 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const className = classes('eva-table-values', selected, font);
     const kind = callstack === 'Summary' ? 'one' : 'this';
     const title = `At least one alarm is raised in ${kind} callstack`;
-    const width = summaryStatus !== 'none' ? 'eva-table-values-alarms' : '';
     function td(e?: Values.evaluation, colSpan = 1): JSX.Element {
       const { alarms, value = '-' } = e ?? {};
       const status = getAlarmStatus(alarms);
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
       const align = value?.includes('\n') ? 'left' : 'center';
       const alignClass = `eva-table-values-${align}`;
-      const c = classes(className, alignClass, width);
+      const c = classes(className, alignClass);
+      const warning =
+        <Icon className={alarmClass} size={10} title={title} id="WARNING" />;
       return (
-        <>
-          <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
+        <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
+          <TableCell right={warning}>
             <span className='eva-table-text'>{value}</span>
-          </td>
-          <td
-            className={classes('eva-table-alarm', selected)}
-            style={{ width: status === 'none' ? '0px' : '17px' }}
-          >
-            <Icon className={alarmClass} size={10} title={title} id="WARNING" />
-          </td>
-        </>
+          </TableCell>
+        </td>
       );
     }
     const elements: JSX.Element[] = [];
     if (probe.effects && _.isEqual(vBefore, vAfter))
-      elements.push(td(vBefore, 3));
+      elements.push(td(vBefore, 2));
     else {
       if (!probe.effects && !probe.condition)
         elements.push(td(vBefore));
