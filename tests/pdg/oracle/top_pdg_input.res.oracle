@@ -256,17 +256,12 @@ Cannot filter: dumping raw memory (including unchanged variables)
 [from] Done for function fun_asm
 [from] Computing for function main_asm
 [from] Done for function main_asm
-[from] Computing for function no_results
-[from] Done for function no_results
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function fun_asm:
   \result FROM i
 [from] Function main_asm:
   \result FROM \nothing
-[from] Function no_results:
-  FROMTOP
-  \result FROM ANYTHING(origin:Unknown)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function fun_asm:
     __retres

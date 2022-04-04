@@ -551,13 +551,13 @@ struct
 
     (* Filter out unreachable values. *)
     let transfer_stmt s d =
-      if Db.Value.is_reachable (To_Use.get_value_state s) &&
+      if Eva.Results.is_reachable s &&
          not (Function_Froms.Memory.is_bottom d.deps_table)
       then transfer_stmt s d
       else []
 
     let doEdge s succ d =
-      if Db.Value.is_reachable (To_Use.get_value_state succ)
+      if Eva.Results.is_reachable succ
       then
         let dt = d.deps_table in
         let opened = Kernel_function.blocks_opened_by_edge s succ in
@@ -647,7 +647,7 @@ struct
           let _poped = Stack.pop call_stack in
           let last_from =
             try
-              if Db.Value.is_reachable (To_Use.get_value_state ret_id)
+              if Eva.Results.is_reachable ret_id
               then
                 externalize
                   ret_id

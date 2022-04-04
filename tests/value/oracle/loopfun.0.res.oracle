@@ -44,8 +44,6 @@
 [eva] ====== VALUES COMPUTED ======
 [from] Computing for function main
 [from] Done for function main
-[from] Computing for function main2
-[from] Done for function main2
 [from] Computing for function test
 [from] Done for function test
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -53,8 +51,6 @@
 [from] Function main:
   FROMTOP
   \result FROM ANYTHING(origin:Unknown)
-[from] Function main2:
-  FROMTOP
 [from] Function test:
   FROMTOP
   \result FROM ANYTHING(origin:Unknown)
