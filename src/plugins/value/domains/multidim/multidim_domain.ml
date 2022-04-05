@@ -280,7 +280,7 @@ struct
     let disjunctive_invariants =
       Parameters.MultidimDisjunctiveInvariants.get
   end
-  module Memory = Abstract_memory.TypedMemory (Config) (Value_or_Uninitialized)
+  module Memory = Typed_memory.Make (Config) (Value_or_Uninitialized)
 
   module Prototype =
   (* Datatype *)

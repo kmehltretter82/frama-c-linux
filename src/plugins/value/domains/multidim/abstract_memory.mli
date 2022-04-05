@@ -20,12 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type size = Integer.t
+open Lattice_extrema
 
+(* Memory initialization *)
 type initialization =
   | SurelyInitialized
   | MaybeUninitialized
 
+(* Abstraction of an unstructured bit in the memory *)
 type bit =
   | Uninitialized (* Uninitialized everywhere *)
   | Zero of initialization (* Zero or uninitialized everywhere *)
@@ -33,7 +35,6 @@ type bit =
   (* Undetermined anywhere, and can contain bits
      of pointers. If the base set is empty,
      the bit can only come from numerical values. *)
-
 
 module Bit :
 sig
@@ -43,107 +44,57 @@ sig
   val zero : t
   val numerical : t
   val top : t
-end
 
-(* Values the memory is mapped to *)
-module type Value =
-sig
-  type t
+  val is_any : t -> bool
+  val initialization : t -> initialization
 
-  val name : string
-
+  val pretty : Format.formatter -> t -> unit
   val hash : t -> int
   val equal : t -> t -> bool
   val compare : t -> t -> int
 
-  val pretty : Format.formatter -> t -> unit
-  val of_bit : typ:Cil_types.typ -> bit -> t
-  val to_bit : t -> bit
-  val to_integer : t -> Integer.t option
   val is_included : t -> t -> bool
   val join : t -> t -> t
 end
 
-module type Config =
-sig
-  (* Dependencies of the hash-consing table. The table will be cleared
-     whenever one of those dependencies is cleared. *)
-  val deps : State.t list
+(* Size type for memory abstraction *)
+type size = Integer.t
 
-  (* Limit on the number of slice after a write for array segmentations.
-     Makes sense above or equal to 1, though below 3 is counter-productive. *)
-  val slice_limit : unit -> int
-
-  (* Whether the memory model try to infer some structure disjunctive
-     invariants. *)
-  val disjunctive_invariants : unit -> bool
-end
-
-
+(* Oracles for memory abstraction *)
 type side = Left | Right
 type oracle = Cil_types.exp -> Int_val.t
 type bioracle = side -> oracle
-type strength = Strong | Weak | Reinforce (* update strength *)
 
-module TypedMemory (Config : Config) (Value : Value) :
+(* Early stage of memory abstraction building *)
+module type ProtoMemory =
 sig
-  type location = Abstract_offset.t
-  type value = Value.t
   type t
+  type value
 
-  (* Datatype *)
+  val pretty : Format.formatter -> t -> unit
+  val pretty_root : Format.formatter -> t -> unit
   val hash : t -> int
   val equal : t -> t -> bool
   val compare : t -> t -> int
 
-  (* Infinite unknown memory *)
-  val top : t
-
-  (* Infinite zero memory *)
-  val zero : t
-
-  (* Is the memory map completely unknown ? *)
-  val is_top : t -> bool
-
-  (* Get a value from a set of locations *)
-  val get : oracle:oracle -> t -> location -> value
-
-  (* Extract a sub map from a set of locations *)
-  val extract : oracle:oracle -> t -> location -> t
-
-  (* Erase / initialize the memory on a set of locations. *)
-  val erase : oracle:oracle -> weak:bool -> t -> location -> bit -> t
-
-  (* Set a value on a set of locations *)
-  val set : oracle:oracle -> weak:bool -> t -> location -> value -> t
-
-  (* Copy a whole map over another *)
-  val overwrite : oracle:oracle -> weak:bool -> t -> location -> t -> t
-
-  (* Reinforce values on a set of locations when the locations match the
-     memory structure ; does nothing on locations that cannot be matched *)
-  val reinforce : oracle:oracle ->
-    (value -> value Bottom.or_bottom) ->  t -> location -> t Bottom.or_bottom
-
-  (* Test inclusion of one memory map into another *)
+  val of_raw : bit -> t
+  val raw : t -> bit
+  val of_value : Cil_types.typ -> value -> t
+  val to_value : Cil_types.typ -> t -> value
+  val to_singleton_int : t -> Integer.t option
+  val weak_erase : bit -> t -> t
   val is_included : t -> t -> bool
-
-  (* Finest partition that is coarcer than both *)
+  val unify : oracle:bioracle ->
+    (size:size -> value -> value -> value) -> t -> t -> t
   val join : oracle:bioracle -> t -> t -> t
-
-  (* Partition widening *)
-  val widen : oracle:bioracle -> (size:size -> value -> value -> value) ->
-    t -> t -> t
-
-  (* Bounds update for array segmentations *)
+  val smash : oracle:oracle -> t -> t -> t
+  val read : oracle:oracle -> (Cil_types.typ -> t -> 'a) -> ('a -> 'a -> 'a) ->
+    Abstract_offset.t -> t -> 'a
+  val update : oracle:oracle ->
+    (weak:bool -> Cil_types.typ -> t -> t or_bottom) ->
+    weak:bool -> Abstract_offset.t -> t -> t or_bottom
   val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
     t -> t
-
-  (* Pretty prints memory *)
-  val pretty : Format.formatter -> t -> unit
-
-  (* Update the array segmentation at the given offset so the given bound
-     expressions appear in the segmentation *)
-  val segmentation_hint : oracle:oracle ->
-    t -> location -> Cil_types.exp list -> t
+  val add_segmentation_bounds : oracle:oracle -> typ:Cil_types.typ ->
+    Cil_types.exp list -> t -> t
 end

@@ -20,24 +20,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t =
-  | NoOffset of Cil_types.typ
-  | Index of Cil_types.exp option * Int_val.t * Cil_types.typ * t
-  | Field of Cil_types.fieldinfo * t
+type 'a sformat = ('a,Format.formatter,unit) format
+type 'a formatter = Format.formatter -> 'a -> unit
 
-type 'a or_top = [`Value of 'a | `Top]
+(* Pretty printing for iterators *)
 
-val pretty : Format.formatter -> t -> unit
+val pp_iter :
+  ?pre:unit sformat ->
+  ?sep:unit sformat ->
+  ?suf:unit sformat ->
+  ?format:('a formatter -> 'a -> unit) sformat ->
+  (('a -> unit) -> 'b -> unit) ->
+  'a formatter -> 'b formatter
 
-val of_var_address : Cil_types.varinfo -> t
-val of_cil_offset : (Cil_types.exp -> Int_val.t) ->
-  Cil_types.typ -> Cil_types.offset -> t or_top
-val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t or_top
-val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t or_top
-
-val is_singleton : t -> bool
-val references : t -> Cil_types.varinfo list (* variables referenced in the offset *)
-
-val append : t -> t -> t (* Does not check that the appened offset fits *)
-val join : t -> t -> t or_top
-val add_index : (Cil_types.exp -> Int_val.t) -> t -> Cil_types.exp -> t or_top
+val pp_iter2 :
+  ?pre:(unit sformat) ->
+  ?sep:(unit sformat) ->
+  ?suf:(unit sformat) ->
+  ?format:('a formatter -> 'a -> 'b formatter -> 'b -> unit) sformat ->
+  (('a -> 'b -> unit) -> 'c -> unit) ->
+  'a formatter -> 'b formatter -> 'c formatter

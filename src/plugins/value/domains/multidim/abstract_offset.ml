@@ -20,34 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Top =
-struct
-  [@@@warning "-32"]
-
-  let zip x y =
-    match x, y with
-    | `Top, _ | _, `Top -> `Top
-    | `Value x, `Value y -> `Value (x,y)
-
-  let (>>-) t f = match t with
-    | `Top  -> `Top
-    | `Value t -> f t
-
-  let (>>-:) t f = match t with
-    | `Top  -> `Top
-    | `Value t -> `Value (f t)
-
-  let (let+) = (>>-:)
-  let (and+) = zip
-  let (let*) = (>>-)
-
-  let of_option = function
-    | None -> `Top
-    | Some x -> `Value x
-end
-
-type 'a or_top = [`Value of 'a | `Top]
-
+open Lattice_extrema
 open Top
 
 type t =
