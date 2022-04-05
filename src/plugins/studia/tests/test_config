@@ -1,2 +1,0 @@
-PLUGIN: eva,inout,deps
-OPT: -eva -journal-disable -out -input -deps
