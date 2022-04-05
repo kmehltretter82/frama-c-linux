@@ -162,7 +162,9 @@ doc: $(NODEBIN)/typedoc icons
 	@rm -fr doc/html
 	@yarn run typedoc $(DOCFILES)
 	@echo "\n[Ivette] main page"
-	@echo "   file://$(PWD)/doc/html/index.html"
+	@echo ""
+	@echo "   file://$(PWD)/ivette/doc/html/index.html"
+	@echo ""
 
 $(NODEBIN)/%:
 	@echo "[Node] install package $*"
