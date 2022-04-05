@@ -93,6 +93,7 @@ src/dome/renderer/controls/gallery.json: .ignore
 src/dome/renderer/controls/icons.tsx: CEA_LGPL
 src/dome/renderer/controls/labels.tsx: CEA_LGPL
 src/dome/renderer/controls/style.css: .ignore
+src/dome/renderer/dark.css: .ignore
 src/dome/renderer/data/compare.ts: CEA_LGPL
 src/dome/renderer/data/json.ts: CEA_LGPL
 src/dome/renderer/data/library.js: CEA_LGPL
@@ -112,15 +113,18 @@ src/dome/renderer/layout/forms.tsx: CEA_LGPL
 src/dome/renderer/layout/grids.js: CEA_LGPL
 src/dome/renderer/layout/splitters.tsx: CEA_LGPL
 src/dome/renderer/layout/style.css: .ignore
+src/dome/renderer/light.css: .ignore
 src/dome/renderer/style.css: .ignore
 src/dome/renderer/table/arrays.ts: CEA_LGPL
 src/dome/renderer/table/models.ts: CEA_LGPL
 src/dome/renderer/table/style.css: .ignore
 src/dome/renderer/table/views.tsx: CEA_LGPL
 src/dome/renderer/text/buffers.ts: CEA_LGPL
+src/dome/renderer/text/dark-code.css: .ignore
 src/dome/renderer/text/editors.tsx: CEA_LGPL
 src/dome/renderer/text/pages.tsx: CEA_LGPL
 src/dome/renderer/text/style.css: .ignore
+src/dome/renderer/themes.tsx: CEA_LGPL
 src/dome/template/Application.js: CEA_LGPL
 src/dome/template/Preferences.js: CEA_LGPL
 src/dome/template/babelrc.json: .ignore
@@ -150,6 +154,7 @@ src/frama-c/kernel/Globals.tsx: CEA_LGPL
 src/frama-c/kernel/History.tsx: CEA_LGPL
 src/frama-c/kernel/Locations.tsx: CEA_LGPL
 src/frama-c/kernel/Messages.tsx: CEA_LGPL
+src/frama-c/kernel/PivotTable-style.css: .ignore
 src/frama-c/kernel/PivotTable.tsx: CEA_LGPL
 src/frama-c/kernel/Properties.tsx: CEA_LGPL
 src/frama-c/kernel/SourceCode.tsx: CEA_LGPL
