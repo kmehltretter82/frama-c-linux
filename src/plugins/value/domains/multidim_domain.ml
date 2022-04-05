@@ -103,11 +103,17 @@ struct
   let of_value v =
     V_Or_Uninitialized.make ~initialized:true ~escaping:false v
 
-  let of_bit = function
+  let of_bit ~typ:_ = function
     | Abstract_memory.Uninitialized -> uninitialized
     | Zero i -> make i (V.inject_int Integer.zero)
-    | Any (Set s,i) -> make i (V.inject_top_origin Origin.top s)
     | Any (Top, i) -> make i (V.top_with_origin Origin.top)
+    | Any (Set s, i) ->
+      let v =
+        if Base.Hptset.is_empty s
+        then V.inject_ival Ival.top
+        else V.inject_top_origin Origin.top s
+      in
+      make i v
 
   let to_bit v' =
     match get_v_normalized v' with
@@ -456,9 +462,12 @@ struct
             | `Bottom -> Value.bottom (* should never happen as location should not be empty *)
             | `Value v -> Value_or_Uninitialized.get_v v
         end
-      | Const (CInt64 (i,_,_)) -> Value.inject_int i
-      | Const (CReal (f,_,_)) -> Value.inject_float (Fval.singleton (Fval.F.of_float f))
-      | UnOp (op, e, typ) -> Value.forward_unop typ op (oracle e)
+      | Const (CInt64 (i,_,_)) ->
+        Value.inject_int i
+      | Const (CReal (f,_,_)) ->
+        Value.inject_float (Fval.singleton (Fval.F.of_float f))
+      | UnOp (op, e, typ) ->
+        Value.forward_unop typ op (oracle e)
       | BinOp (op, e1, e2, TFloat (fkind, _)) ->
         Value.forward_binop_float (Fval.kind fkind) (oracle e1) op (oracle e2)
       | BinOp (op, e1, e2, typ) ->

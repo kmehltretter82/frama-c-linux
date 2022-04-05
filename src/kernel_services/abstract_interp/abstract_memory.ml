@@ -272,7 +272,7 @@ sig
   val compare : t -> t -> int
 
   val pretty : Format.formatter -> t -> unit
-  val of_bit : bit -> t
+  val of_bit : typ:Cil_types.typ -> bit -> t
   val to_bit : t -> bit
   val to_integer : t -> Integer.t option
   val is_included : t -> t -> bool
@@ -322,7 +322,7 @@ sig
   val smash : oracle:oracle -> t -> t -> t
   val read : oracle:oracle -> (Cil_types.typ -> t -> 'a) -> ('a -> 'a -> 'a) ->
     Abstract_offset.t -> t -> 'a
-  val write : oracle:oracle ->
+  val update : oracle:oracle ->
     (weak:bool -> Cil_types.typ -> t -> t or_bottom) ->
     weak:bool -> Abstract_offset.t -> t -> t or_bottom
   val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
@@ -350,7 +350,7 @@ sig
   val is_included : t -> t -> bool
   val unify : (submemory -> submemory -> submemory) -> t -> t -> t
   val read : t -> Cil_types.fieldinfo -> submemory
-  val write : (submemory -> submemory or_bottom) -> t -> Cil_types.fieldinfo ->
+  val update : (submemory -> submemory or_bottom) -> t -> Cil_types.fieldinfo ->
     t or_bottom
   val map : (submemory -> submemory) -> t -> t
 end
@@ -387,7 +387,8 @@ struct
   type submemory = M.t
 
   let pretty fmt m =
-    pp_iter2 ~format:"@[<hv>.%a%a@]" FieldMap.iter Field.pretty M.pretty fmt m.fields
+    pp_iter2 ~format:"@[<hv>.%a%a@]"
+      FieldMap.iter Field.pretty M.pretty fmt m.fields
 
   let hash m =
     Hashtbl.hash (m.padding, FieldMap.hash m.fields)
@@ -441,15 +442,15 @@ struct
     with Not_found -> (* field undefined *)
       M.of_raw m.padding
 
-  let write f m fi =
+  let update f m fi =
     try
-      let write' opt =
+      let update' opt =
         let x = Option.value ~default:(M.of_raw m.padding) opt in
         match f x with
         | `Value v -> Some v
         | `Bottom -> raise Exit
       in
-      `Value { m with fields = FieldMap.replace write' fi m.fields }
+      `Value { m with fields = FieldMap.replace update' fi m.fields }
     with Exit ->
       `Bottom
 
@@ -466,13 +467,13 @@ end
 
    x.f = c₁ ⇒ ϕ₁(x)  ⋁  x.f = c₂ ⇒ ϕ₂(x)  ⋁  ...
 
-   where f is a field, c₁, c₂, ... are constants and ϕ₁, ϕ₂, ... properties about
-   the structure x.
+   where f is a field, c₁, c₂, ... are constants and ϕ₁, ϕ₂, ... properties
+   about the structure x.
 
-   f is called a key. During the analysis, we track fields which are assigned
-   constant values, and the set of such fields is called keys. As the anlysis
-   progresses, the set of key is reduced each time we discover one of the field
-   is actually not a key because it is assigned with non-singleton values. *)
+   During the analysis, we track fields f, called keys which are assigned
+   constant values. As the analysis  progresses, the set of keys is reduced each
+   time we discover one of the field is actually not a key because it is
+   assigned with non-singleton values. *)
 
 module type Disjunction =
 sig
@@ -493,7 +494,7 @@ sig
     t -> t -> t
   val read : (submemory -> 'a) -> ('a -> 'a -> 'a)  ->
     t -> Cil_types.fieldinfo -> 'a
-  val write : oracle:oracle -> (submemory -> submemory or_bottom) ->
+  val update : oracle:oracle -> (submemory -> submemory or_bottom) ->
     t -> Cil_types.fieldinfo -> t or_bottom
   val map : (submemory -> submemory) -> t -> t
 end
@@ -596,14 +597,14 @@ struct
 
   let weak_erase (ci : Cil_types.compinfo) (b : bit) (m : t) : t =
     (* if b is Zero, more could be done as all scalar fields might be a key *)
-    (* weak_erase is probably linear for the join operator, so we weak_erase
-       befoire joining as this is faster. *)
+    (* weak_erase is probably linear in the number of join operators, so we
+       weak_erase befoire joining as the join on erased memory is faster. *)
     let m = Map.map (fun m -> S.weak_erase b m) m in
     let s = smash m in
     of_struct ci s
 
   let is_included (m1 : t) (m2 : t) : bool  =
-    (* Imprecise inclusion: we only consider inclusion of disjunction where
+    (* Imprecise inclusion: we only consider inclusion of disjunctions where
        the set of field keys is the same *)
     let aux k s1 =
       match Map.find_opt k m2 with
@@ -626,8 +627,8 @@ struct
     in
     Option.get (Map.fold aux m None) (* If the map is not empty, result is Some *)
 
-  let write ~oracle f (m : t) (fi : Cil_types.fieldinfo) =
-    let m = Map.filter_map (fun _k s -> Bottom.to_option (S.write f s fi)) m in
+  let update ~oracle f (m : t) (fi : Cil_types.fieldinfo) =
+    let m = Map.filter_map (fun _k s -> Bottom.to_option (S.update f s fi)) m in
     if Map.is_empty m then
       `Bottom
     else
@@ -851,12 +852,14 @@ struct
         let l = linearity vi e in
         if Integer.is_zero l
         then Some b
-        else Option.map (fun i -> Exp (e, Integer.(sub j (mul l i)))) i
+        else i |> Option.map (fun i -> Exp (e, Integer.(sub j (mul l i))))
       | Ptroffset (e, base, j) ->
         let l = linearity vi e in
         if Integer.is_zero l
         then Some b
-        else Option.map (fun i -> Ptroffset (e, base, Integer.(sub j (mul l i)))) i
+        else
+          i |> Option.map (fun i ->
+              Ptroffset (e, base, Integer.(sub j (mul l i))))
     with NonLinear -> None
 
   let incr_or_constantify ~oracle vi i b =
@@ -879,7 +882,8 @@ struct
       | Exp (e1, i1), Exp (e2, i2) when Exp.equal e1 e2 -> cmp_int i1 i2
       | Ptroffset _, _ | _, Ptroffset _ -> raise Not_implemented
       | _, _ ->
-        let r = Int_val.(add (to_int_val ~oracle b1) (neg (to_int_val ~oracle b2))) in
+        let i1 = to_int_val ~oracle b1 and i2 = to_int_val ~oracle b2 in
+        let r = Int_val.(add i1 (neg i2)) in
         match Int_val.min_and_max r with
         | Some min, Some max when Integer.is_zero min && Integer.is_zero max ->
           Equal
@@ -945,11 +949,7 @@ struct
   let equal_regardless_age (b1,_a1) (b2,_a2) =
     Bound.equal b1 b2
   let equal = equal_regardless_age
-  let _of_integer i = Bound.of_integer i, Integer.zero
-  let _of_exp e a = Bound.of_exp e, a
-  let _succ (b,a) = (Bound.succ b, a)
   let pred (b,a) = (Bound.pred b, a)
-  let _incr vi i (b,a) = Bound.incr vi i b |> Option.map (fun b -> b,a)
   let incr_or_constantify ~oracle vi i (b,a) =
     Bound.incr_or_constantify ~oracle vi i b |> Option.map (fun b -> b,a)
   let cmp ~oracle (b1,_a1) (b2,_a2) = Bound.cmp ~oracle b1 b2
@@ -989,7 +989,7 @@ sig
   val single : bit -> bound -> bound -> submemory -> t
   val read : oracle:oracle ->
     (submemory -> 'a) -> ('a -> 'a -> 'a) -> t -> bound -> bound -> 'a
-  val write : oracle:oracle -> (submemory -> submemory or_bottom) ->
+  val update : oracle:oracle -> (submemory -> submemory or_bottom) ->
     t -> bound -> bound -> t or_top_bottom
   val incr_bound :
     oracle:oracle -> Bound.Var.t -> Integer.t option -> t ->
@@ -1290,12 +1290,12 @@ struct
      1. reinforcement without loss
      2. weak update without singularization
      3. update reduces the number of segments to 3 *)
-  let write ~oracle f m lindex (* included *) uindex (* excluded *) = (* lindex < uindex *)
+  let update ~oracle f m lindex (* included *) uindex (* excluded *) = (* lindex < uindex *)
     let open TopBot in
     let open (val (B.operators oracle)) in
     let same_bounds = lindex == uindex in (* happens when adding partitioning hints *)
     let lindex = B.birth lindex and uindex = B.birth uindex in
-    (* (start,head) : segmentation kept identical below the write indexes,
+    (* (start,head) : segmentation kept identical below the update indexes,
                       head is a list in reverse order
        (l,v,u) : the segment (l,u) beeing overwriten with previous value v
 
@@ -1422,7 +1422,7 @@ struct
   let add_segmentation_bounds ~oracle bounds m =
     let open TopBot in
     let add_bound m b =
-      match write ~oracle (fun x -> `Value x) m b b with
+      match update ~oracle (fun x -> `Value x) m b b with
       | `Value m -> m
       | `Bottom -> assert false
       | `Top ->
@@ -1616,7 +1616,7 @@ struct
 
     let to_value typ = function
       | Scalar s when are_typ_compatible s.scalar_type typ -> s.scalar_value
-      | m -> V.of_bit (raw m)
+      | m -> V.of_bit ~typ (raw m)
 
     let rec to_singleton_int = function
       | Scalar s -> V.to_integer s.scalar_value
@@ -1630,7 +1630,8 @@ struct
       | Scalar s when Bit.is_any b ->
         Raw (Bit.join (V.to_bit s.scalar_value) b)
       | Scalar s ->
-        Scalar { s with scalar_value = V.(join (of_bit b) s.scalar_value) }
+        let typ = s.scalar_type in
+        Scalar { s with scalar_value = V.(join (of_bit ~typ b) s.scalar_value) }
       | Array a ->
         Array { a with array_value = A.weak_erase b a.array_value }
       | Struct s ->
@@ -1795,7 +1796,7 @@ struct
       in
       aux
 
-    let write ~oracle (f : weak:bool -> Cil_types.typ -> t -> t or_bottom) =
+    let update ~oracle (f : weak:bool -> Cil_types.typ -> t -> t or_bottom) =
       let open Bot in
       let rec aux ~weak offset m =
         match offset with
@@ -1805,11 +1806,11 @@ struct
           if fi.fcomp.cstruct then (* Structures *)
             if Config.disjunctive_invariants () then
               let old = to_disj fi.fcomp m in
-              let+ disj_value = D.write ~oracle (aux ~weak offset') old fi in
+              let+ disj_value = D.update ~oracle (aux ~weak offset') old fi in
               Disjunct { disj_type = fi.fcomp ; disj_value }
             else
               let old = to_struct ~oracle fi.fcomp m in
-              let+ struct_value = S.write (aux ~weak offset') old fi in
+              let+ struct_value = S.update (aux ~weak offset') old fi in
               Struct { struct_type = fi.fcomp; struct_value }
           else (* Unions *)
             let old = match m with
@@ -1837,8 +1838,8 @@ struct
             in
             match m with
             | Array a when are_typ_compatible a.array_cell_type elem_type ->
-              let+ array_value =
-                A.write ~oracle (aux ~weak offset') a.array_value lindex uindex in
+              let+ array_value = A.update ~oracle (aux ~weak offset')
+                  a.array_value lindex uindex in
               Array { a with array_value }
             | _ ->
               let b = raw m in
@@ -1919,17 +1920,17 @@ struct
   let extract ~oracle (m : t) (loc : location) : t =
     read ~oracle (fun _typ x -> x) (smash ~oracle) loc m
 
-  let write' ~oracle ~weak f offset m =
+  let update' ~oracle ~weak f offset m =
     let f' ~weak typ m =
       `Value (f ~weak typ m)
     in
-    Bottom.non_bottom (write ~oracle ~weak f' offset m)
+    Bottom.non_bottom (update ~oracle ~weak f' offset m)
 
   let set ~oracle ~weak m offset new_v =
     let f ~weak typ m =
       of_value typ (if weak then V.join (to_value typ m) new_v else new_v)
     in
-    write' ~oracle ~weak f offset m
+    update' ~oracle ~weak f offset m
 
   let reinforce ~oracle f m offset =
     let open Bottom in
@@ -1938,7 +1939,7 @@ struct
       then `Value m
       else f (to_value typ m) >>-: of_value typ
     in
-    write ~oracle ~weak:false f' offset m
+    update ~oracle ~weak:false f' offset m
 
   let erase ~oracle ~weak m offset b =
     let f ~weak _typ m =
@@ -1947,7 +1948,7 @@ struct
       else
         of_raw b
     in
-    write' ~oracle ~weak f offset m
+    update' ~oracle ~weak f offset m
 
   let overwrite ~oracle ~weak dst offset src =
     let f ~weak _typ m =
@@ -1956,11 +1957,11 @@ struct
       else
         src
     in
-    write' ~oracle ~weak f offset dst
+    update' ~oracle ~weak f offset dst
 
   let segmentation_hint ~oracle m offset bounds =
     let f ~weak:_ typ m =
       add_segmentation_bounds ~oracle ~typ bounds m
     in
-    write' ~oracle ~weak:false f offset m
+    update' ~oracle ~weak:false f offset m
 end

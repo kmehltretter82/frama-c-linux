@@ -57,7 +57,7 @@ sig
   val compare : t -> t -> int
 
   val pretty : Format.formatter -> t -> unit
-  val of_bit : bit -> t
+  val of_bit : typ:Cil_types.typ -> bit -> t
   val to_bit : t -> bit
   val to_integer : t -> Integer.t option
   val is_included : t -> t -> bool
