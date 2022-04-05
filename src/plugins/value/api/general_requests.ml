@@ -76,6 +76,12 @@ let () = Request.register ~package
     ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (CallSite))
     callers
 
+(* ----- Functions ---------------------------------------------------------- *)
+
+let () =
+  Analysis.register_computation_hook
+    (fun _ -> States.reload Kernel_ast.Functions.array)
+
 
 (* ----- Dead code: unreachable and non-terminating statements -------------- *)
 
