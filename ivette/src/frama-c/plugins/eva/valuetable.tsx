@@ -28,6 +28,7 @@ import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Values from 'frama-c/plugins/eva/api/values';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
@@ -913,13 +914,19 @@ class FunctionsManager {
 /* --- Eva Table Complet Component                                        --- */
 /* -------------------------------------------------------------------------- */
 
+/* Table's state. It is global for when the user changes the view. */
+const CallstackState = new GlobalState<callstack>('Summary');
+const FunctionsManagerState = new GlobalState(new FunctionsManager());
+const FocusState = new GlobalState<Probe | undefined>(undefined);
+
+/* Component */
 function EvaTable(): JSX.Element {
 
   /* Component state */
   const [ selection, select ] = States.useSelection();
-  const [ cs, setCS ] = React.useState<callstack>('Summary');
-  const [ fcts ] = React.useState(new FunctionsManager());
-  const [ focus, setFocus ] = React.useState<Probe | undefined>(undefined);
+  const [ cs, setCS ] = useGlobalState(CallstackState);
+  const [ fcts ] = useGlobalState(FunctionsManagerState);
+  const [ focus, setFocus ] = useGlobalState(FocusState);
 
   /* Used to force the component update. We cannot use the `forceUpdate` hook
    * proposed by Dome as we need to be able to add dependencies on a changing
