@@ -356,14 +356,14 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
       <IconButton
         icon='PIN'
         className={buttonClass}
-        title={`${pinText} the probe`}
+        title={`${pinText} the column`}
         selected={isPinned}
         onClick={onDoubleClick}
       />
       <IconButton
         icon="CIRC.CLOSE"
         className={buttonClass}
-        title="Discard the probe"
+        title="Remove the column"
         onClick={() => removeProbe()}
       />
     </div>;
@@ -545,14 +545,15 @@ async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
   switch (callstack) {
     case 'Header': {
       const cls = classes(baseClasses, 'eva-table-header-sticky');
-      const title = 'Corresponding callstack';
+      const title = 'Callstack at which expressions are evaluated';
       return <td className={cls} rowSpan={2} title={title}>{'#'}</td>;
     }
     default: {
       const cls = classes(baseClasses, 'eva-table-value-sticky');
       const callsites = await getCallsites(callstack);
       const isSummary = callstack === 'Summary';
-      const infos = isSummary ? 'Summary' : makeStackTitle(callsites);
+      const summary = 'Summary: value consolidated accross all callstacks';
+      const infos = isSummary ? summary : makeStackTitle(callsites);
       const text = isSummary ? '∑' : (index ? index.toString() : '0');
       return <td className={cls} title={infos}>{text}</td>;
     }
@@ -702,7 +703,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
           className="eva-button"
           selected={byCallstacks}
           disabled={summaryOnly}
-          title="Details by callstack"
+          title="Show values by callstack"
           onClick={() => setByCallstacks(!byCallstacks)}
         />
         <Inset />
