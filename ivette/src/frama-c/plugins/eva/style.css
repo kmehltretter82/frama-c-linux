@@ -44,7 +44,7 @@
   flex: 0 auto;
   overflow: hidden;
   display: flex;
-  align-items: center;
+  align-items: baseline;
 }
 
 .eva-header-text-overflow {
@@ -95,7 +95,7 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-function {
-  padding-top: 0px;
+  padding: 2px;
   background: var(--background-profound);
   height: 25px;
 }
