@@ -223,6 +223,16 @@ static void grow_bounds_for_size(uintptr_t *min_bound, uintptr_t *max_bound,
   }
 }
 
+// We do not exactly know the bounds of the TLS, we can only guess an
+// approximation. To do that, we take TLS's known addresses and add a buffer
+// around them. Since the TLS in Linux is positionned around the heap, we can
+// check if the approximation overlaps with heap space and adjust it
+// accordingly. The heap spaces allocated for E-ACSL are of course application
+// heap and rtl spaces, but also shadow memory spaces. We also add as a condition
+// that the [safe_locations] should be in the TLS, by construction. It might
+// happen that those addresses are separated by a more than half the size of
+// our initial guess. If this is the case, we have to increase the size of
+// our guess in order to fit both the TLS that we see and its shadow model.
 static void init_tls_size() {
   uintptr_t data = (uintptr_t)&id_tdata, bss = (uintptr_t)&id_tbss;
   uintptr_t min_safe_loc = safe_locations_boundaries.start;
@@ -247,7 +257,6 @@ uintptr_t get_tls_start(int main_thread) {
     min_addr = min_addr < min_safe_loc ? min_addr : min_safe_loc;
     max_addr = max_addr > max_safe_loc ? max_addr : max_safe_loc;
   }
-
   // We do not exactly know the bounds of the TLS, we can only guess an
   // approximation. To do that, we take TLS's known addresses and add a buffer
   // around them. Since the TLS in Linux is positionned around the heap, we can

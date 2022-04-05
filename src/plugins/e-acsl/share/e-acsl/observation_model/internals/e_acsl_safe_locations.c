@@ -58,8 +58,7 @@ uintptr_t get_safe_locations_start() {
 }
 
 uintptr_t get_safe_locations_end() {
-  memory_location *first_location = get_safe_location(0);
-  uintptr_t max = first_location->address;
+  uintptr_t max = get_safe_location(0)->address;
   for (int i = 1; i < get_safe_locations_count(); i++) {
     memory_location *location = get_safe_location(i);
     if (max <= location->address)
