@@ -27,31 +27,26 @@ type 'a or_bottom = [ `Value of 'a | `Bottom ]
 type 'a or_top = [ `Value of 'a | `Top ]
 type 'a or_top_bottom = [ `Value of 'a | `Bottom | `Top ]
 
-module type Operators =
-sig
-  type 'a t
-
-  (** This monad propagates `Bottom and or `Top if needed. *)
-  val (>>-) : 'a t -> ('a -> 'b t) -> 'b t
-
-  (** Use this monad if the following function returns a simple value. *)
-  val (>>-:) : 'a t -> ('a -> 'b) -> 'b t
-
-  (* Binding operators, applicative syntax *)
-  val (let+) : 'a t -> ('a -> 'b) -> 'b t
-  val (and+) : 'a t -> 'b t -> ('a * 'b) t
-
-  (* Binding operators, monad syntax *)
-  val (let*) : 'a t -> ('a -> 'b t) -> 'b t
-  val (and*) : 'a t -> 'b t -> ('a * 'b) t
-end
-
 
 module Bottom : sig
   type 'a t = 'a or_bottom
 
   (** Operators *)
-  module Operators : Operators with type 'a t = 'a or_bottom
+  module Operators : sig
+    (** This monad propagates `Bottom and or `Top if needed. *)
+    val (>>-) : [< 'a t] -> ('a -> ([> 'b t] as 'c)) -> 'c
+
+    (** Use this monad if the following function returns a simple value. *)
+    val (>>-:) : [< 'a t] -> ('a -> 'b) -> [> 'b t]
+
+    (* Binding operators, applicative syntax *)
+    val (let+) : [< 'a t] -> ('a -> 'b) -> [> 'b t]
+    val (and+) : [< 'a t] -> [< 'b t] -> [> ('a * 'b) t]
+
+    (* Binding operators, monad syntax *)
+    val (let*) : [< 'a t] -> ('a -> ([> 'b t] as 'c)) -> 'c
+    val (and*) : [< 'a t] -> [< 'b t] -> [> ('a * 'b) t]
+  end
 
   (** Datatype constructor *)
   module Make_Datatype
@@ -113,7 +108,21 @@ module Top : sig
   type 'a t = 'a or_top
 
   (** Operators *)
-  module Operators : Operators with type 'a t = 'a or_top
+  module Operators : sig
+    (** This monad propagates `Bottom and or `Top if needed. *)
+    val (>>-) : [< 'a t] -> ('a -> ([> 'b t] as 'c)) -> 'c
+
+    (** Use this monad if the following function returns a simple value. *)
+    val (>>-:) : [< 'a t] -> ('a -> 'b) -> [> 'b t]
+
+    (* Binding operators, applicative syntax *)
+    val (let+) : [< 'a t] -> ('a -> 'b) -> [> 'b t]
+    val (and+) : [< 'a t] -> [< 'b t] -> [> ('a * 'b) t]
+
+    (* Binding operators, monad syntax *)
+    val (let*) : [< 'a t] -> ('a -> ([> 'b t] as 'c)) -> 'c
+    val (and*) : [< 'a t] -> [< 'b t] -> [> ('a * 'b) t]
+  end
 
   (** Access *)
   val is_top: 'a t -> bool
@@ -147,6 +156,25 @@ end
 module TopBottom: sig
   type 'a t = 'a or_top_bottom
 
+  (** Operators *)
+  (* In presence of simultaneous `Bottom and `Top in and+ / and*, everything
+     narrows down to `Bottom *)
+  module Operators : sig
+    (** This monad propagates `Bottom and or `Top if needed. *)
+    val (>>-) : [< 'a t] -> ('a -> ([> 'b t] as 'c)) -> 'c
+
+    (** Use this monad if the following function returns a simple value. *)
+    val (>>-:) : [< 'a t] -> ('a -> 'b) -> [> 'b t]
+
+    (* Binding operators, applicative syntax *)
+    val (let+) : [< 'a t] -> ('a -> 'b) -> [> 'b t]
+    val (and+) : [< 'a t] -> [< 'b t] -> [> ('a * 'b) t]
+
+    (* Binding operators, monad syntax *)
+    val (let*) : [< 'a t] -> ('a -> ([> 'b t] as 'c)) -> 'c
+    val (and*) : [< 'a t] -> [< 'b t] -> [> ('a * 'b) t]
+  end
+
   (** Datatype *)
   val hash: ('a -> int) -> 'a t -> int
   val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
@@ -160,9 +188,4 @@ module TopBottom: sig
   (* Lattice operators *)
   val join: ('a -> 'a -> [< 'a t]) -> 'a t -> 'a t -> 'a t
   val narrow: ('a -> 'a -> [< 'a t]) -> 'a t -> 'a t -> 'a t
-
-  (** Operators *)
-  (* In presence of simultaneous `Bottom and `Top in and+ / and*, everything
-     narrows down to `Bottom *)
-  module Operators : Operators with type 'a t = 'a or_top_bottom
 end

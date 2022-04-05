@@ -174,9 +174,8 @@ struct
   let map_join' : type c. ('a -> [< 'b or_top_bottom]) -> ('b -> 'b -> 'b) ->
     ('a, c) t -> 'b or_top_bottom =
     fun map join ->
-    let map' x = (map x :> 'b or_top_bottom)
-    and join' = TopBottom.join (fun x y -> `Value (join x y)) in
-    map_reduce default map' join'
+    let join' = TopBottom.join (fun x y -> `Value (join x y)) in
+    map_reduce default map join'
 end
 
 
@@ -305,7 +304,7 @@ struct
     let join = (@)
     and extract state =
       let r,_alarms = A.Eval.eval_function_exp exp state in
-      (r :> _ or_top_bottom) >>-: List.map fst
+      r >>-: List.map fst
     in
     get req |> Response.map_join' extract join |> convert |>
     Result.map (List.sort_uniq Kernel_function.compare)
@@ -318,11 +317,11 @@ struct
     | None -> `Top
     | Some get ->
       let make_expr (x, _alarms) =
-        (x :> _ or_top_bottom) >>-: fun (_valuation, v) ->
+        x >>-: fun (_valuation, v) ->
         Cvalue.V_Or_Uninitialized.make ~initialized:true ~escaping:false (get v)
       in
       let make_lval (x, _alarms) =
-        (x :> _ or_top_bottom) >>-: fun (_valuation, v) ->
+        let+ _valuation, v = x in
         let Eval.{ v; initialized; escaping } = v in
         let v =
           match v with
@@ -354,7 +353,7 @@ struct
     | Some get ->
       let join = Main_values.CVal.join in
       let extract value =
-        (value :> _ or_top_bottom) >>-: get
+        value >>-: get
       in
       extract_value res |> Response.map_join' extract join |> convert
 
@@ -381,7 +380,7 @@ struct
         assert (Int_Base.equal loc2.size size);
         make_loc loc size
       and extract loc =
-        (loc :> _ or_top_bottom) >>-: get >>-: Precise_locs.imprecise_location
+        loc >>-: get >>-: Precise_locs.imprecise_location
       in
       extract_loc res |> fst |> Response.map_join' extract join |> convert
 
@@ -393,7 +392,7 @@ struct
       let response_loc, access = extract_loc res in
       let join = Locations.Zone.join
       and extract loc =
-        (loc :> _ or_top_bottom) >>-: get >>-:
+        loc >>-: get >>-:
         Precise_locs.enumerate_valid_bits access
       in
       response_loc |> Response.map_join' extract join |> convert
@@ -403,7 +402,7 @@ struct
     | LValue r ->
       let join = (&&)
       and extract (x, _alarms) =
-        (x :> _ or_top_bottom) >>-: (fun (_valuation,fv) -> fv.Eval.initialized)
+        x >>-: (fun (_valuation,fv) -> fv.Eval.initialized)
       in
       begin match Response.map_join' extract join r with
         | `Bottom | `Top -> false

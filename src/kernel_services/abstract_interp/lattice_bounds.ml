@@ -24,17 +24,6 @@ type 'a or_bottom = [ `Value of 'a | `Bottom ]
 type 'a or_top = [ `Value of 'a | `Top ]
 type 'a or_top_bottom = [ `Value of 'a | `Bottom | `Top ]
 
-module type Operators =
-sig
-  type 'a t
-  val (>>-) : 'a t -> ('a -> 'b t) -> 'b t
-  val (>>-:) : 'a t -> ('a -> 'b) -> 'b t
-  val (let+) : 'a t -> ('a -> 'b) -> 'b t
-  val (and+) : 'a t -> 'b t -> ('a * 'b) t
-  val (let*) : 'a t -> ('a -> 'b t) -> 'b t
-  val (and*) : 'a t -> 'b t -> ('a * 'b) t
-end
-
 (** Common functions *)
 
 module Common =
@@ -181,8 +170,6 @@ module Bottom = struct
 
   module Operators =
   struct
-    type 'a t = 'a or_bottom
-
     let (>>-) t f = match t with
       | `Bottom  -> `Bottom
       | `Value t -> f t
@@ -278,8 +265,6 @@ struct
   (** Operators *)
 
   module Operators = struct
-    type 'a t = 'a or_top
-
     let (>>-) t f = match t with
       | `Top -> `Top
       | `Value t -> f t
@@ -325,8 +310,6 @@ struct
   (** Operators *)
 
   module Operators = struct
-    type 'a t = 'a or_top_bottom
-
     let (>>-) t f = match t with
       | `Top -> `Top
       | `Bottom -> `Bottom
