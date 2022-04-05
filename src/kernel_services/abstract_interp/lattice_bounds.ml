@@ -39,6 +39,9 @@ end
 
 module Common =
 struct
+
+  (* Pretty-printing *)
+
   let pretty_top fmt =
     Format.pp_print_string fmt (Unicode.top_string ())
 
@@ -49,6 +52,8 @@ struct
     | `Bottom -> pretty_bottom fmt
     | `Top -> pretty_top fmt
     | `Value v -> pretty_value fmt v
+
+  (* Datatype *)
 
   let hash hash_value = function
     | `Bottom  -> 7
@@ -70,6 +75,33 @@ struct
     | `Top, `Value _ -> -1
     | `Value _, `Top -> 1
     | `Value vx, `Value vy -> compare_value vx vy
+
+  (* Tests *)
+
+  let is_bottom = function
+    | `Bottom -> true
+    | `Value _ | `Top -> false
+
+  let is_top = function
+    | `Top -> true
+    | `Value _ | `Bottom -> false
+
+  let is_included is_included x y =
+    match x, y with
+    | `Bottom, _ | _, `Top -> true
+    | _, `Bottom | `Top, _ -> false
+    | `Value vx, `Value vy -> is_included vx vy
+
+  (* Iterator *)
+  let iter f = function
+    | `Bottom | `Top -> ()
+    | `Value v -> f v
+
+  (* Conversion *)
+  let to_option = function
+    | `Bottom | `Top -> None
+    | `Value x -> Some x
+
 end
 
 module Bottom = struct
@@ -78,10 +110,6 @@ module Bottom = struct
   include Common
 
   (** Access *)
-
-  let is_bottom = function
-    | `Bottom -> true
-    | `Value _ -> false
 
   let non_bottom = function
     | `Value v -> v
@@ -92,11 +120,6 @@ module Bottom = struct
     | `Bottom -> bottom
 
   (* Lattice operators *)
-
-  let is_included is_included x y = match x, y with
-    | `Bottom, _           -> true
-    | _, `Bottom           -> false
-    | `Value vx, `Value vy -> is_included vx vy
 
   let join join x y = match x, y with
     | `Value vx, `Value vy    -> `Value (join vx vy)
@@ -114,10 +137,6 @@ module Bottom = struct
 
   (* Iterators *)
 
-  let iter f = function
-    | `Bottom -> ()
-    | `Value v -> f v
-
   let fold ~bottom f = function
     | `Bottom -> bottom
     | `Value v -> f v
@@ -134,10 +153,6 @@ module Bottom = struct
     | `Value x, `Value y -> `Value (x,y)
 
   (** Conversion *)
-
-  let to_option = function
-    | `Bottom -> None
-    | `Value v -> Some v
 
   let of_option = function
     | None -> `Bottom
@@ -227,10 +242,6 @@ struct
 
   (** Access *)
 
-  let is_top = function
-    | `Value _ -> false
-    | `Top -> true
-
   let non_top = function
     | `Value v -> v
     | `Top  -> assert false
@@ -251,10 +262,6 @@ struct
   let of_option = function
     | None -> `Top
     | Some x -> `Value x
-
-  let to_option = function
-    | `Top -> None
-    | `Value x -> Some x
 
   (** Operators *)
 
