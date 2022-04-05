@@ -131,6 +131,10 @@ module Top : sig
     (Format.formatter -> 'a -> unit) ->
     Format.formatter -> 'a t -> unit
 
+  (** Lattice operators *)
+  val join: ('a -> 'a -> 'a t) -> 'a t -> 'a t -> 'a t
+  val narrow: ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
+
   (** Combination *)
   val zip: 'a t -> 'b t -> ('a * 'b) t (* `Top if any is `Top *)
 

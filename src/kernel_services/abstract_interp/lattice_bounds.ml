@@ -250,6 +250,18 @@ struct
     | `Value v -> v
     | `Top -> top
 
+  (** Lattice *)
+
+  let join join_value x y =
+    match x, y with
+    | `Top, _ | _, `Top -> `Top
+    | `Value vx, `Value vy -> join_value vx vy
+
+  let narrow narrow_value x y =
+    match x, y with
+    | `Top, v | v, `Top -> v
+    | `Value vx, `Value vy -> `Value (narrow_value vx vy)
+
   (** Combination *)
 
   let zip x y =
