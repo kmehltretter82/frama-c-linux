@@ -60,15 +60,15 @@ struct
     | `Bottom, `Bottom -> true
     | `Top, `Top -> true
     | `Value vx, `Value vy -> equal_value vx vy
-    | _ -> false
+    | (`Value _ | `Bottom | `Top), (`Value _ | `Bottom | `Top) -> false
 
   let compare compare_value a b = match a, b with
     | `Bottom, `Bottom -> 0
-    | `Bottom, _ -> -1
-    | _, `Bottom -> 1
+    | `Bottom, (`Top | `Value _) -> -1
+    | (`Top | `Value _), `Bottom -> 1
     | `Top, `Top -> 0
-    | `Top, _ -> -1
-    | _, `Top -> 1
+    | `Top, `Value _ -> -1
+    | `Value _, `Top -> 1
     | `Value vx, `Value vy -> compare_value vx vy
 end
 
@@ -90,14 +90,6 @@ module Bottom = struct
   let value ~bottom = function
     | `Value v -> v
     | `Bottom -> bottom
-
-  (** Datatype *)
-
-  let hash = (Common.hash :> 'f -> 'a t -> int)
-  let equal = (Common.equal :> 'f -> 'a t -> 'a t -> bool)
-  let compare = (Common.compare :> 'f -> 'a t -> 'a t -> int)
-  let pretty = (Common.pretty :> 'f -> Format.formatter -> 'a t -> unit)
-  let pretty_bottom = pretty_bottom
 
   (* Lattice operators *)
 
@@ -231,6 +223,8 @@ module Top =
 struct
   type 'a t = 'a or_top
 
+  include Common
+
   (** Access *)
 
   let is_top = function
@@ -244,14 +238,6 @@ struct
   let value ~top = function
     | `Value v -> v
     | `Top -> top
-
-  (** Datatype *)
-
-  let hash = (Common.hash :> 'f -> 'a t -> int)
-  let equal = (Common.equal :> 'f -> 'a t -> 'a t -> bool)
-  let compare = (Common.compare :> 'f -> 'a t -> 'a t -> int)
-  let pretty = (Common.pretty :> 'f -> Format.formatter -> 'a t -> unit)
-  let pretty_top = Common.pretty_top
 
   (** Combination *)
 
@@ -295,12 +281,7 @@ module TopBottom =
 struct
   type 'a t = 'a or_top_bottom
 
-  (** Datatype *)
-
-  let hash = (Common.hash :> 'f -> 'a t -> int)
-  let equal = (Common.equal :> 'f -> 'a t -> 'a t -> bool)
-  let compare = (Common.compare :> 'f -> 'a t -> 'a t -> int)
-  let pretty = (Common.pretty :> 'f -> Format.formatter -> 'a t -> unit)
+  include Common
 
   (* Lattice operators *)
 
