@@ -835,20 +835,17 @@ class FunctionsManager {
 
   setByCallstacks(fct: string, byCallstacks: boolean): void {
     const infos = this.cache.get(fct);
-    if (!infos) return;
-    infos.byCallstacks = byCallstacks;
+    if (infos) infos.byCallstacks = byCallstacks;
   }
 
   setFolded(fct: string, folded: boolean): void {
     const infos = this.cache.get(fct);
-    if (!infos) return;
-    infos.folded = folded;
+    if (infos) infos.folded = folded;
   }
 
   changeStartingCallstack(fct: string, n: number): void {
     const infos = this.cache.get(fct);
-    if (!infos) return;
-    infos.startingCallstack = n;
+    if (infos) infos.startingCallstack = n;
   }
 
   pin(loc: Location): void {
@@ -866,21 +863,10 @@ class FunctionsManager {
     this.getInfos(fct).track(target);
   }
 
-  status(loc?: Location): MarkerStatus | undefined {
-    if (!loc) return undefined;
-    const infos = this.cache.get(loc.fct);
-    if (infos?.pinned.has(loc.target))
-      return [ 'Pinned', true ];
-    else if (infos?.tracked.has(loc.target))
-      return [ 'Tracked', true ];
-    return 'JustFocused';
-  }
-
   removeLocation(loc: Location): void {
     const { target, fct } = loc;
     const infos = this.cache.get(fct);
-    if (!infos) return;
-    infos.delete(target);
+    if (infos) infos.delete(target);
   }
 
   delete(fct: string): void {

@@ -592,7 +592,7 @@ type Serialize<A> = (a: A) => string;
    The hook returns the cached version of the function.
 */
 export function useCache<K, V>(r: (k: K) => V, s?: Serialize<K>): (k: K) => V {
-  const [ cache ] = React.useState(new Map<string, V>());
+  const { current: cache } = React.useRef(new Map<string, V>());
   const serialize = React.useMemo(() => s ? s : (k: K) => `${k}`, [s]);
   const get = React.useCallback((k: K): V => {
     const id = serialize(k);
