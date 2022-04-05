@@ -177,7 +177,7 @@ function useEvaluationCache(): Request<[ Location, callstack ], Evaluation> {
     return `${l.fct}:${l.target}:${c}`;
   }, []);
   const get: Request<LocStack, Evaluation> = React.useCallback(([ l, c ]) => {
-    const callstack = c === 'Summary' ? undefined : c as Values.callstack;
+    const callstack = c === 'Summary' ? undefined : c;
     return Server.send(Values.getValues, { ...l, callstack });
   }, []);
   return Dome.useCache(get, toString);
