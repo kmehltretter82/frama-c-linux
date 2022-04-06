@@ -252,14 +252,6 @@ tr:first-of-type > .eva-table-callsite-box {
   white-space: pre;
 }
 
-.eva-table-values-left {
-  text-align: left;
-}
-
-.eva-table-values-center {
-  text-align: center;
-}
-
 .eva-table-descrs {
   background-color: var(--background-sidebar);
   border-right: thin solid var(--border);

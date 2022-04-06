@@ -72,13 +72,15 @@ function isPinnedMarker(status: MarkerStatus): boolean {
 interface TableCellProps {
   children?: JSX.Element | JSX.Element[];
   right?: JSX.Element;
+  align?: 'left' | 'center';
 }
 
 function TableCell(props: TableCellProps): JSX.Element {
-  const { children, right } = props;
+  const { children, right, align = 'center' } = props;
+  const leftVisible = align === 'center' ? 'block' : 'none';
   return (
     <div className='eva-cell-container'>
-      <div className='eva-cell-left'/>
+      <div className='eva-cell-left' style={{ display: leftVisible }}/>
       <div className='eva-cell-content'>
         {children}
       </div>
@@ -480,7 +482,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const isSelected = isSelectedCallstack(callstack);
     const selected = isSelected && callstack !== 'Summary' ? 'eva-focused' : '';
     const font = callstack === 'Summary' ? 'eva-italic' : '';
-    const className = classes('eva-table-values', selected, font);
+    const c = classes('eva-table-values', selected, font);
     const kind = callstack === 'Summary' ? 'one' : 'this';
     const title = `At least one alarm is raised in ${kind} callstack`;
     function td(e?: Values.evaluation, colSpan = 1): JSX.Element {
@@ -488,13 +490,11 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       const status = getAlarmStatus(alarms);
       const alarmClass = classes('eva-cell-alarms', `eva-alarm-${status}`);
       const align = value?.includes('\n') ? 'left' : 'center';
-      const alignClass = `eva-table-values-${align}`;
-      const c = classes(className, alignClass);
       const warning =
         <Icon className={alarmClass} size={10} title={title} id="WARNING" />;
       return (
         <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
-          <TableCell right={warning}>
+          <TableCell right={warning} align={align}>
             <span className='eva-table-text'>{value}</span>
           </TableCell>
         </td>
