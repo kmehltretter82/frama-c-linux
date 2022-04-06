@@ -31,7 +31,7 @@ DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev pkg doc serve dist lint fixlint checkdirs
+.PHONY: all app dev pkg doc serve dist lint fixlint checkcase
 
 all: pkg lint app
 
@@ -39,13 +39,15 @@ app: dome-app
 dev: dome-dev
 dist: dome-dist
 
-lint: dome-pkg dome-templ checkdirs
+lint: dome-pkg dome-templ checkcase
 	@echo "[Ivette] running typechecker & linter"
 	yarn run typecheck
 	yarn run lint
 
-checkdirs:
-	@echo "[Ivette] check imported filenames"
+# In case-insensitive filesystems (macOS/Windows), import statements and
+# filenames can have issues due to case differences
+checkcase:
+	@echo "[Ivette] check case issues in imported filenames"
 	@err=0 ; for f in `find src | sed -E 's/(.ts|.tsx|.js|.jsx|.css|.json)$$//' | sort -f | uniq -di` ;\
 	 do \
 		err=1; \
