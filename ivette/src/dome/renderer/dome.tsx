@@ -582,6 +582,29 @@ export function usePromise<T>(job: Promise<T>) {
   return { result, error, loading };
 }
 
+/* Internal type alias */
+type Serialize<A> = (a: A) => string;
+
+/**
+   Hook to add a cache system to a function, allowing to reuse previous results.
+   As the equality used in JS maps does not allow to effectively implement a
+   cache for complex type, a serialization function can be procured.
+   The hook returns the cached version of the function.
+*/
+export function useCache<K, V>(r: (k: K) => V, s?: Serialize<K>): (k: K) => V {
+  const { current: cache } = React.useRef(new Map<string, V>());
+  const serialize = React.useMemo(() => s ? s : (k: K) => `${k}`, [s]);
+  const get = React.useCallback((k: K): V => {
+    const id = serialize(k);
+    if (cache.has(id))
+      return cache.get(id) as V;
+    const v = r(k);
+    cache.set(id, v);
+    return v;
+  }, [ cache, r,  serialize ]);
+  return get;
+}
+
 // --------------------------------------------------------------------------
 // --- Timer Hooks
 // --------------------------------------------------------------------------

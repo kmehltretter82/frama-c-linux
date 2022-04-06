@@ -788,7 +788,10 @@ export function setSelection(location: Location, meta = false) {
 /** Current selection. */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [current, setCurrent] = useGlobalState(GlobalSelection);
-  return [current, (action) => setCurrent(reducer(current, action))];
+  const callback = React.useCallback((action) => {
+    setCurrent(reducer(current, action));
+  }, [ current, setCurrent ]);
+  return [current, callback];
 }
 
 /** Resets the selected locations. */
