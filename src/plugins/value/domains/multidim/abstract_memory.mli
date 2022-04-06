@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lattice_extrema
+open Lattice_bounds
 
 (* Memory initialization *)
 type initialization =

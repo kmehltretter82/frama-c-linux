@@ -24,7 +24,7 @@
    emits a warning *)
 [@@@warning "-60"]
 
-open Lattice_extrema
+open Lattice_bounds
 open Abstract_offset
 open Abstract_memory
 
@@ -309,7 +309,7 @@ struct
       | m -> D.of_raw ci (raw m)
 
     let unify ~oracle f =
-      let open Top in
+      let open Top.Operators in
       let raw_to_array side prototype b =
         A.hull ~oracle:(oracle side) prototype >>-:
         fun (l,u) -> A.single b l u (Raw b)
@@ -397,7 +397,7 @@ struct
           aux offset' u.union_value
         | Index (exp, index, elem_type, offset'), Array a
           when are_typ_compatible a.array_cell_type elem_type ->
-          let open Top in
+          let open Top.Operators in
           let m =
             let+ lindex, uindex = match Option.map Bound.of_exp exp with
               | Some b -> `Value (b, b)
@@ -426,7 +426,7 @@ struct
       aux
 
     let update ~oracle (f : weak:bool -> Cil_types.typ -> t -> t or_bottom) =
-      let open Bot in
+      let open Bottom.Operators in
       let rec aux ~weak offset m =
         match offset with
         | NoOffset t ->
@@ -452,7 +452,7 @@ struct
             Union { old with union_value }
         | Index (exp, index, elem_type, offset') ->
           let m' =
-            let open TopBot in
+            let open TopBottom.Operators in
             let* lindex, uindex, weak =
               match Option.map Bound.of_exp exp with
               | Some b -> `Value (b, Bound.succ b, weak)
@@ -562,7 +562,7 @@ struct
     update' ~oracle ~weak f offset m
 
   let reinforce ~oracle f m offset =
-    let open Bottom in
+    let open Bottom.Operators in
     let f' ~weak typ m =
       if weak
       then `Value m

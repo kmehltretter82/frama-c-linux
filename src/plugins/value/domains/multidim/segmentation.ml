@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lattice_extrema
+open Lattice_bounds
 open Abstract_memory
 open Pretty_memory
 
@@ -92,6 +92,7 @@ let operators :
 
 module Bound =
 struct
+  open Top.Operators
   module Var = Cil_datatype.Varinfo
   module Exp =
   struct
@@ -298,7 +299,6 @@ struct
 
   let lower_bound ~oracle b1 b2 =
     if b1 == b2 || eq b1 b2 then `Value b1 else
-      let open Top in
       let+ i1,i2 = Top.zip
           (lower_integer ~oracle:(oracle Left) b1)
           (lower_integer ~oracle:(oracle Right) b2) in
@@ -306,23 +306,22 @@ struct
 
   let upper_bound ~oracle b1 b2 =
     if b1 == b2 || eq b1 b2 then `Value b1 else
-      let open Top in
       let+ i1,i2 = Top.zip
           (upper_integer ~oracle:(oracle Left) b1)
           (upper_integer ~oracle:(oracle Right) b2) in
       Const (Integer.max i1 i2)
 
   let lower_const ~oracle b =
-    let open Top in
     lower_integer ~oracle b >>-: of_integer
 
   let upper_const ~oracle b =
-    let open Top in
     upper_integer ~oracle b >>-: of_integer
 end
 
 module AgingBound =
 struct
+  open Top.Operators
+
   type age = Integer.t
   type t = Bound.t * age
 
@@ -339,11 +338,11 @@ struct
   let cmp ~oracle (b1,_a1) (b2,_a2) = Bound.cmp ~oracle b1 b2
   let eq ?oracle (b1,_a1) (b2,_a2) = Bound.eq ?oracle b1 b2
   let lower_bound ~oracle (b1,a1) (b2,a2) =
-    let open Top in
-    Bound.lower_bound ~oracle b1 b2 >>-: fun b -> b, Integer.min a1 a2
+    let+ b = Bound.lower_bound ~oracle b1 b2 in
+    b, Integer.min a1 a2
   let upper_bound ~oracle (b1,a1) (b2,a2) =
-    let open Top in
-    Bound.upper_bound ~oracle b1 b2 >>-: fun b -> b, Integer.min a1 a2
+    let+ b = Bound.upper_bound ~oracle b1 b2 in
+    b, Integer.min a1 a2
   let lower_const ~oracle (b,_a) = Bound.lower_const ~oracle b
   let upper_const ~oracle (b,_a) = Bound.upper_const ~oracle b
   let birth b = b, Integer.zero
@@ -518,7 +517,7 @@ struct
 
   (* Unify two arrays m1 and m2 *)
   let unify ~oracle f (m1 (*Left*): t) (m2 (*Right*) : t) : t or_top =
-    let open Top in
+    let open Top.Operators in
     (* Shortcuts *)
     let left = oracle Left and right = oracle Right in
     let equals side b1 b2 = B.cmp ~oracle:(oracle side) b1 b2 = Equal in
@@ -684,7 +683,7 @@ struct
      2. weak update without singularization
      3. update reduces the number of segments to 3 *)
   let update ~oracle f m lindex (* included *) uindex (* excluded *) = (* lindex < uindex *)
-    let open TopBot in
+    let open TopBottom.Operators in
     let open (val (B.operators oracle)) in
     let same_bounds = lindex == uindex in (* happens when adding partitioning hints *)
     let lindex = B.birth lindex and uindex = B.birth uindex in

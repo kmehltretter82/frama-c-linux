@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lattice_extrema
+open Lattice_bounds
 open Abstract_memory
 
 module type Config =

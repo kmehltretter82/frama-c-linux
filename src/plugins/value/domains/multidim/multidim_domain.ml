@@ -22,40 +22,9 @@
 
 open Cil_types
 open Eval
+open Lattice_bounds
 
 let dkey = Self.register_category "d-multidim"
-
-module Top =
-struct
-  [@@@warning "-32"]
-
-  let zip x y =
-    match x, y with
-    | `Top, _ | _, `Top -> `Top
-    | `Value x, `Value y -> `Value (x,y)
-
-  let (>>-) t f = match t with
-    | `Top -> `Top
-    | `Value t -> f t
-
-  let (>>-:) t f = match t with
-    | `Top -> `Top
-    | `Value t -> `Value (f t)
-
-  let (let+) = (>>-:)
-  let (and+) = zip
-  let (let*) = (>>-)
-  let (and*) = zip
-
-  let of_option = function
-    | None -> `Top
-    | Some x -> `Value x
-end
-
-
-let pretty_bottom pp fmt = function
-  | `Bottom -> Format.fprintf fmt "%s" (Unicode.bottom_string ())
-  | `Value value -> pp fmt value
 
 let map_to_singleton map =
   let aux base offset = function
@@ -135,7 +104,8 @@ struct
       (Bottom.value ~bottom:V.bottom fv.v)
 
   let map' f v =
-    f (get_v v) >>-: fun new_v -> map (fun _ -> new_v) v
+    let+ new_v = f (get_v v) in
+    map (fun _ -> new_v) v
 end
 
 let no_oracle exp =
@@ -167,7 +137,7 @@ module Location =
 struct
   module Offset = Abstract_offset
   module Map = Base.Base.Map
-  open Top
+  open Top.Operators
 
   type offset = Offset.t or_top
   type base = Base.t
@@ -363,6 +333,8 @@ end
 
 module DomainLattice =
 struct
+  open Bottom.Operators
+
   (* The domain is essentially a map from bases to individual memory abstractions *)
   module Initial_Values = struct let v = [[]] end
   module Deps = struct let l = [Ast.self] end
@@ -509,16 +481,16 @@ struct
     let deps = Location.references loc in
     let deps_set = TrackedBases.of_list (List.map Base.of_varinfo deps) in
     let f base off state' =
-      state' >>- fun (base_map,tracked) ->
+      let* base_map,tracked = state' in
       if covers_base tracked base then
         let memory, refs = BaseMap.find_or_top base_map base in
-        update memory off >>-: fun memory' ->
+        let+ memory' = update memory off in
         BaseMap.add base (memory', refs) base_map,
         Option.map (TrackedBases.union deps_set) tracked
       else
         state'
     in
-    Location.fold f loc (`Value state) >>-: fun state ->
+    let+ state = Location.fold f loc (`Value state) in
     add_references_l state deps (Location.bases loc)
 
   let write update state loc =
@@ -645,7 +617,7 @@ struct
     | `Value {value={v=`Value value}} -> value
 
   let assume_exp valuation expr record state' =
-    state' >>- fun state ->
+    let* state = state' in
     let oracle = valuation_to_oracle state valuation in
     match expr.enode with
     | Lval lv ->
@@ -737,7 +709,7 @@ struct
   let assign _kinstr left expr assigned_value valuation state =
     let oracle = valuation_to_oracle state valuation in
     let state = update_array_segmentation ~oracle left.lval (Some expr) state in
-    assume_valuation valuation state >>-: fun state ->
+    let+ state = assume_valuation valuation state in
     assign_lval left.lval assigned_value oracle state
 
   let assume _stmt _expr _pos valuation state =
@@ -759,7 +731,7 @@ struct
     | None, _ | _, None   -> `Value post
     | Some f, Some return ->
       let args = List.map (fun arg -> arg.avalue) call.arguments in
-      f args >>-: fun assigned_result ->
+      let+ assigned_result = f args in
       assign_lval (Cil.var return) assigned_result no_oracle post
 
   let show_expr valuation state fmt expr =
@@ -770,7 +742,7 @@ struct
         | `Top -> Format.fprintf fmt "%s" (Unicode.top_string ())
         | `Value loc ->
           let m = extract ~oracle state loc in
-          pretty_bottom Memory.pretty fmt m
+          Bottom.pretty Memory.pretty fmt m
       end
     | _ -> ()
 

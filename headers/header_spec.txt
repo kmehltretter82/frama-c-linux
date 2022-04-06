@@ -1416,7 +1416,6 @@ src/plugins/value/domains/multidim/abstract_offset.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/multidim/abstract_offset.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/multidim/abstract_structure.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/multidim/abstract_structure.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/domains/multidim/lattice_extrema.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/multidim/multidim.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/multidim/multidim.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/multidim/multidim_domain.ml: CEA_LGPL_OR_PROPRIETARY

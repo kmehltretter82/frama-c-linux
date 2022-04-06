@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lattice_extrema
+open Lattice_bounds
 
 type t =
   | NoOffset of Cil_types.typ

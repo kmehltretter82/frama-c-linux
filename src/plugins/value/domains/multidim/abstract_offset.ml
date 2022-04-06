@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lattice_extrema
-open Top
+open Lattice_bounds
+open Top.Operators
 
 type t =
   | NoOffset of Cil_types.typ

@@ -902,7 +902,6 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	engine/transfer_logic engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
-	domains/multidim/lattice_extrema \
 	domains/multidim/multidim \
 	domains/multidim/abstract_offset \
 	domains/multidim/abstract_memory \
