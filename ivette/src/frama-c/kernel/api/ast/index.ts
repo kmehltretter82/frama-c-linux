@@ -104,6 +104,8 @@ export enum markerKind {
   term = 'term',
   /** Property */
   property = 'property',
+  /** Type */
+  type = 'type',
 }
 
 /** Decoder for `markerKind` */

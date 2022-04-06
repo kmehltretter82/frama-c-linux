@@ -66,6 +66,7 @@ function getMarkerKind (props: AST.markerInfoData): [string, string] {
     case Kind.statement: return ["Statement", "C statement"];
     case Kind.property: return ["Property", "ACSL property"];
     case Kind.term: return ["Term", "ACSL term"];
+    case Kind.type: return ["Type", "C type"];
   }
 }
 
