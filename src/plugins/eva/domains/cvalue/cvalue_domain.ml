@@ -394,7 +394,38 @@ module State = struct
     | `Bottom -> Cvalue.Model.bottom
     | `Value v -> v
 
-  let import _state = None
+  (* ------------------------------------------------------------------------ *)
+  (*                      Import state from Frama-C project                   *)
+  (* ------------------------------------------------------------------------ *)
+
+  let import_cvalue_map =
+    let open Cvalue.Model in
+    let cache_name = "Eva.Cvalue_domain.import_cvalue_map" in
+    let empty = empty_map in
+    let f base offsm =
+      add_base
+        (Eva_diff.import_base base)
+        (Eva_diff.import_offsetmap offsm)
+        empty
+    in
+    cached_fold ~f ~cache_name ~temporary:false ~joiner:join ~empty
+
+  let import_lmap = function
+    | Cvalue.Model.Bottom | Top as x -> x
+    | Map map -> import_cvalue_map map
+
+  let import_bases_lattice = function
+    | Base.SetLattice.Top as top -> top
+    | Base.SetLattice.Set bases ->
+      Base.SetLattice.inject (Eva_diff.import_bases bases)
+
+  let import (lmap, clob) =
+    import_lmap lmap,
+    Locals_scoping.{ clob = import_bases_lattice clob.clob }
+
+  (* ------------------------------------------------------------------------ *)
+  (*                         Post-analysis display                            *)
+  (* ------------------------------------------------------------------------ *)
 
   let display ?fmt kf =
     let open Cil_types in
