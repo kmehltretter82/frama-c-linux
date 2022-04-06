@@ -362,6 +362,7 @@ static void init_shadow_layout_global() {
 
 static void init_shadow_layout_tls() {
   memory_partition *ptls = &mem_layout.tls;
+  /* Collect the safe locations of the main thread */
   collect_safe_locations();
   init_tls_size();
   set_application_segment(&ptls->application, get_tls_start(1), get_tls_size(),
