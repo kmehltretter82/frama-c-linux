@@ -814,6 +814,14 @@ struct
       let tag = Tag.create (PStmtStart(f,s)) in
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
 
+    method! typ ?fundecl fmt_opt fmt typ =
+      match fundecl with
+      | Some _ -> super#typ ?fundecl fmt_opt fmt typ
+      | None ->
+        Format.fprintf fmt "@{<%s>%a@}"
+          (Tag.create (PType typ))
+          (super#typ ?fundecl fmt_opt) typ
+
     initializer force_brace <- true
 
   end
