@@ -71,7 +71,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
        size of void *)
     let validity = match Cil.unrollType pointed_typ with
       | TVoid _ -> Base.Unknown (Integer.zero, None, Bit_utils.max_bit_address ())
-      | _ -> Base.validity_from_type hidden_var
+      | _ -> Base.validity_from_type hidden_var.vtype
     in
     match validity with
     | Base.Known (a,b)

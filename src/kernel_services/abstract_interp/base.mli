@@ -113,7 +113,7 @@ val validity : t -> validity
     [size] must not be negative.
     @since Aluminium-20160501 *)
 val validity_from_size : Int.t -> validity
-val validity_from_type : Cil_types.varinfo -> validity
+val validity_from_type : Cil_types.typ -> validity
 
 type range_validity =
   | Invalid_range

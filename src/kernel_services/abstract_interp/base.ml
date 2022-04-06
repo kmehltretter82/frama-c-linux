@@ -402,10 +402,10 @@ let is_block_local v block =
   | Var (v,_) -> Ast_info.is_block_local v block
   | Allocated _ | CLogic_Var _ | Null | String _ -> false
 
-let validity_from_type v =
-  if isFunctionType v.vtype then Invalid
+let validity_from_type typ =
+  if isFunctionType typ then Invalid
   else
-    let max_valid = Bit_utils.sizeof_vid v in
+    let max_valid = Bit_utils.sizeof typ in
     match max_valid with
     | Int_Base.Top ->
       Unknown (Int.zero, None, Bit_utils.max_bit_address ())
@@ -480,7 +480,7 @@ let () = Ast.add_monotonic_state VarinfoNotSource.self
 
 let base_of_varinfo varinfo =
   assert varinfo.vsource;
-  let validity = validity_from_type varinfo in
+  let validity = validity_from_type varinfo.vtype in
   Var (varinfo, validity)
 
 module Validities =
