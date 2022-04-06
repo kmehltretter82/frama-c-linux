@@ -259,7 +259,7 @@ module V = struct
 
   (** Comparisons *)
 
-  open Bottom.Type
+  open Lattice_bounds.Bottom.Operators
 
   let backward_mult_int_left ~right ~result =
     try

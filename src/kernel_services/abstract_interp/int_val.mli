@@ -26,7 +26,7 @@
 
 (** Abstractions do not represent the empty set. Instead, operations creating
     empty sets return `Bottom. *)
-open Bottom.Type
+open Lattice_bounds
 
 include Datatype.S_with_collections
 

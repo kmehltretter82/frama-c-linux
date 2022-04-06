@@ -22,6 +22,7 @@
 
 open Cil_types
 open Eval_terms
+open Lattice_bounds
 
 let has_requires spec =
   let behav_has_requires b = b.b_requires <> [] in

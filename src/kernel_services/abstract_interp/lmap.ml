@@ -22,6 +22,7 @@
 
 open Abstract_interp
 open Locations
+open Lattice_bounds
 
 let msg_emitter = Lattice_messages.register "Lmap";;
 
@@ -41,7 +42,7 @@ module Make_LOffset
       and type widen_hint = V.numerical_widen_hint)
     (Default_offsetmap: sig
        val name: string
-       val default_offsetmap : Base.t -> Offsetmap.t Bottom.or_bottom
+       val default_offsetmap : Base.t -> Offsetmap.t or_bottom
        val default_contents: V.t default_contents
      end)
 =
@@ -631,7 +632,7 @@ struct
   let find_base_or_default b = function
     | Bottom -> `Bottom
     | Top -> `Top
-    | Map m -> (M.find_or_default b m :> _ Bottom.Top.or_top_bottom)
+    | Map m -> (M.find_or_default b m :> _ or_top_bottom)
 
   let remove_base b = function
     | Bottom -> Bottom

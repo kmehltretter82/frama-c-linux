@@ -272,7 +272,7 @@ val create_all_values: signed:bool -> size:int -> t
     representable in [size] bits. *)
 val all_values: size:Integer.t -> t -> bool
 
-val backward_mult_int_left: right:t -> result:t -> t option Bottom.or_bottom
+val backward_mult_int_left: right:t -> result:t -> t option Lattice_bounds.or_bottom
 
 val backward_comp_int_left : Comp.t -> t -> t -> t
 (** [backward_comp_int op l r] reduces [l] into [l'] so that
@@ -319,7 +319,7 @@ val reinterpret_as_int: size:Integer.t -> signed:bool -> t -> t
 (** Bitwise reinterpretation of the given value, of size [size], as an integer
     of the given signedness (and size). *)
 
-val complement_int_under: size:int -> signed:bool -> t -> t Bottom.or_bottom
+val complement_int_under: size:int -> signed:bool -> t -> t Lattice_bounds.or_bottom
 (** Returns an under-approximation of the integers of the given size and
     signedness that are *not* represented by the given ival. *)
 

@@ -28,10 +28,9 @@ open Cil_types
 (**                       {2 Lattice structure }                              *)
 (* -------------------------------------------------------------------------- *)
 
-include Bottom.Type
+include Lattice_bounds
+include Bottom.Operators
 
-type 'a or_top    = [ `Value of 'a | `Top ]
-type 'a or_top_or_bottom = [ `Value of 'a | `Top | `Bottom ]
 
 (* -------------------------------------------------------------------------- *)
 (**                     {2 Types for the evaluations }                        *)

@@ -272,7 +272,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       in
       if is_ret then assert (Alarmset.is_empty alarms);
       Alarmset.emit kinstr alarms;
-      eval >>- fun (assigned, valuation) ->
+      let* assigned, valuation = eval in
       let domain_valuation = Eval.to_domain_valuation valuation in
       let lvalue = { lval; ltyp; lloc } in
       Domain.assign kinstr lvalue expr assigned domain_valuation state
@@ -289,7 +289,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     let eval, alarms = Eval.reduce state expr positive in
     (* TODO: check not comparable. *)
     Alarmset.emit (Kstmt stmt) alarms;
-    eval >>- fun valuation ->
+    let* valuation = eval in
     Domain.assume stmt expr positive (Eval.to_domain_valuation valuation) state
 
 
@@ -394,7 +394,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     let safe_arguments = filter_safe_arguments valuation call in
     let empty = Eval.Valuation.empty in
     let reduce_one_argument acc argument =
-      acc >>- fun acc ->
+      let* acc = acc in
       let pre_value = match argument.avalue with
         | Assign pre_value -> `Value pre_value
         | Copy (_lv, pre_value) -> pre_value.v
@@ -407,8 +407,8 @@ module Make (Abstract: Abstractions.Eva) = struct
          If the call has copied the argument, it may be uninitialized. Thus,
          we also avoid the backward propagation if the formal is uninitialized
          here. This should not happen in the Assign case above. *)
-      fst (Eval.copy_lvalue ~valuation:empty ~subdivnb:0 state lval)
-      >>- fun (_valuation, post_value) ->
+      let* _valuation, post_value =
+        fst (Eval.copy_lvalue ~valuation:empty ~subdivnb:0 state lval) in
       if
         Bottom.is_included Value.is_included pre_value post_value.v
         || post_value.escaping || not post_value.initialized
@@ -423,10 +423,10 @@ module Make (Abstract: Abstractions.Eva) = struct
   let reduce_arguments reductions state =
     let valuation = `Value Eval.Valuation.empty in
     let reduce_one_argument valuation (argument, post_value) =
-      valuation >>- fun valuation ->
+      let* valuation = valuation in
       Eval.assume ~valuation state argument.concrete post_value
     in
-    List.fold_left reduce_one_argument valuation reductions >>- fun valuation ->
+    let* valuation = List.fold_left reduce_one_argument valuation reductions in
     Domain.update (Eval.to_domain_valuation valuation) state
 
   (* -------------------- Treat the results of a call ----------------------- *)
@@ -441,8 +441,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     | Some _, None -> assert false
     | Some lval, Some vi_ret ->
       let exp_ret_caller = Eva_utils.lval_to_exp  (Var vi_ret, NoOffset) in
-      assign_ret state (Kstmt stmt) lval exp_ret_caller
-      >>-: fun state -> Domain.leave_scope kf_callee [vi_ret] state
+      let+ state = assign_ret state (Kstmt stmt) lval exp_ret_caller in
+      Domain.leave_scope kf_callee [vi_ret] state
 
   (* ---------------------- Make a one function call ------------------------ *)
 
@@ -475,16 +475,15 @@ module Make (Abstract: Abstractions.Eva) = struct
       (* Gathers the possible reductions on the value of the concrete arguments
          at the call site, according to the value of the formals at the post
          state of the called function. *)
-      gather_reduced_arguments call valuation state
-      >>- fun reductions ->
+      let* reductions = gather_reduced_arguments call valuation state in
       (* The formals (and the locals) of the called function leave scope. *)
       let post = Domain.leave_scope kf_callee leaving_vars state in
       let recursion = Option.map Recursion.revert recursion in
       (* Computes the state after the call, from the post state at the end of
          the called function, and the pre state at the call site. *)
-      Domain.finalize_call stmt call recursion ~pre ~post >>- fun state ->
+      let* state = Domain.finalize_call stmt call recursion ~pre ~post in
       (* Backward propagates the [reductions] on the concrete arguments. *)
-      reduce_arguments reductions state >>- fun state ->
+      let* state = reduce_arguments reductions state in
       treat_return ~kf_callee lv call.return stmt state
     in
     let states =
@@ -640,8 +639,8 @@ module Make (Abstract: Abstractions.Eva) = struct
       fun fmt subdivnb lval state ->
         try
           let offsm =
-            fst (Eval.lvaluate ~for_writing:false ~subdivnb state lval)
-            >>- fun (_, loc, _) ->
+            let* (_, loc, _) =
+              fst (Eval.lvaluate ~for_writing:false ~subdivnb state lval) in
             Eval_op.offsetmap_of_loc (get_ploc loc) (get_cvalue state)
           in
           let typ = Cil.typeOfLval lval in
@@ -748,7 +747,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     Alarmset.emit ki_call alarms;
     let cacheable = ref Cacheable in
     let eval =
-      functions >>-: fun functions ->
+      let+ functions = functions in
       let current_kf = Eva_utils.current_kf () in
       let process_one_function kf valuation =
         (* The special Frama_C_ functions to print states are handled here. *)
@@ -761,7 +760,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           let eval, alarms = make_call ~subdivnb kf args valuation state in
           Alarmset.emit ki_call alarms;
           let states =
-            eval >>-: fun (call, recursion, valuation) ->
+            let+ call, recursion, valuation = eval in
             (* Register the call. *)
             Eva_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
             (* Do the call. *)

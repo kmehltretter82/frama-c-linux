@@ -462,7 +462,7 @@ let backward_op (op : operator) fnan ?(prec = Precisions.Real) value result () =
           let x = op ~rnd:Rounding.Near  ~prec xres yval in
           let y = op ~rnd:Rounding.Near  ~prec yres xval in
           `Value (make ~nan:false x y)
-    in Bottom.join join reduced_for_nan reduced_for_finite
+    in Lattice_bounds.Bottom.join join reduced_for_nan reduced_for_finite
 [@@inline]
 
 let synthetize left right =

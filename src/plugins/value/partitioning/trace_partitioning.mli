@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Bottom.Type
-
 module Make
     (Abstract : Abstractions.Eva)
     (Kf : sig val kf: Cil_types.kernel_function end) :
@@ -59,7 +57,7 @@ sig
   (* --- Accessors --- *)
 
   val expanded : store -> (Partition.key * state) list
-  val smashed : store -> state or_bottom
+  val smashed : store -> state Lattice_bounds.or_bottom
   val contents : flow -> state list
   val is_empty_store : store -> bool
   val is_empty_flow : flow -> bool
