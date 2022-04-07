@@ -59,19 +59,13 @@ type validity_hidden_base =
   | KnownThenUnknownValidity of Integer.t (* Base is valid on i bits, then
                                              maybe invalid on the remainder of its validity *)
 
-let stdlib_attribute = Attr ("fc_stdlib_generated", [])
-
 let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
-  let hidden_var = Eva_utils.create_new_var hidden_var_name pointed_typ in
-  if libc
-  then hidden_var.vattr <- Cil.addAttribute stdlib_attribute hidden_var.vattr;
-  hidden_var.vdescr <- Some name_desc;
   let validity =
     (* Add a special case for void* pointers: we do not want to compute the
        size of void *)
     let validity = match Cil.unrollType pointed_typ with
       | TVoid _ -> Base.Unknown (Integer.zero, None, Bit_utils.max_bit_address ())
-      | _ -> Base.validity_from_type hidden_var.vtype
+      | _ -> Base.validity_from_type pointed_typ
     in
     match validity with
     | Base.Known (a,b)
@@ -93,8 +87,8 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
     | Base.Variable _ -> (* should never happen (validity_from_type cannot
                             return Weak) *) assert false
   in
-  Base.register_memory_var hidden_var validity
-
+  snd (Special_variables.create_global hidden_var_name pointed_typ
+         ~libc ~descr:name_desc ~validity)
 
 let reject_empty_struct b offset typ =
   match Cil.unrollType typ with
@@ -338,12 +332,11 @@ let initialize_var_using_type varinfo state =
       let hidden_var_name =
         Cabs2cil.fresh_global ("WELL_"^name)
       in
-      let hidden_var =
-        Eva_utils.create_new_var hidden_var_name Cil.charType
+      let validity = Base.Known (Integer.zero, Bit_utils.max_bit_address ()) in
+      let hidden_var, hidden_base =
+        Special_variables.create_global hidden_var_name Cil.charType ~validity
       in
       hidden_var.vdescr <- Some (name_desc^"_WELL");
-      let validity = Base.Known (Integer.zero, Bit_utils.max_bit_address ()) in
-      let hidden_base = Base.register_memory_var hidden_var validity in
       make_well hidden_base state (Lazy.force loc)
     | TNamed (_, _)  -> assert false
   in

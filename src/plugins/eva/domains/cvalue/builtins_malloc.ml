@@ -147,13 +147,12 @@ let base_name prefix cs =
 
 type var = Weak | Strong
 
-let create_new_var stack prefix type_base weak =
+let create_new_variable_name stack prefix weak =
   let prefix = match weak with
     | Weak -> prefix ^ "_w"
     | Strong -> prefix
   in
-  let name = Cabs2cil.fresh_global (base_name prefix stack) in
-  Eva_utils.create_new_var name type_base
+  Cabs2cil.fresh_global (base_name prefix stack)
 
 (* This function adds a "_w" information to a variable. It should be used
    when a variable becomes weak, and supposes that the variable has been
@@ -318,24 +317,21 @@ let pp_validity fmt (v1, v2) =
 let alloc_fresh weak deallocation prefix sizev _state =
   let stack = call_stack_no_wrappers () in
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
-  let type_base = type_from_nb_elems tsize in
-  let var = create_new_var stack prefix type_base weak in
-  Self.result ~current:true ~once:true
-    "@[allocating %svariable %a@]%t"
-    (if weak = Weak then "weak " else "") Printer.pp_varinfo var
-    Eva_utils.pp_callstack;
+  let typ = type_from_nb_elems tsize in
+  let name = create_new_variable_name stack prefix weak in
   let size_char = Bit_utils.sizeofchar () in
   (* Sizes are in bits *)
   let min_alloc = Int.(pred (mul size_char tsize.min_bytes)) in
   let max_alloc = Int.(pred (mul size_char tsize.max_bytes)) in
-  (* NOTE: min_alloc/max_alloc may be -1 if the size is zero *)
-  assert Int.(ge min_alloc Int.minus_one);
-  assert Int.(ge max_alloc min_alloc);
-  (* note that min_alloc may be negative (-1) if the allocated size is 0 *)
   let weak = match weak with Weak -> true | Strong -> false in
-  let variable_v = Base.create_variable_validity ~weak ~min_alloc ~max_alloc in
-  let validity = Base.Variable variable_v in
-  let new_base = Base.register_allocated_var var deallocation validity in
+  let kind = deallocation in
+  let var, new_base =
+    Special_variables.create_allocated name typ ~weak ~min_alloc ~max_alloc ~kind
+  in
+  Self.result ~current:true ~once:true
+    "@[allocating %svariable %a@]%t"
+    (if weak then "weak " else "") Printer.pp_varinfo var
+    Eva_utils.pp_callstack;
   register_malloced_base ~stack new_base;
   new_base, max_alloc
 
@@ -375,20 +371,17 @@ let string_of_region = function
 (* Only called when the 'weakest base' needs to be allocated. *)
 let create_weakest_base region =
   let stack = { (Eva_utils.current_call_stack ()) with stack = [] } in
-  let type_base =
-    TArray (Cil.charType, None, [])
+  let typ = TArray (Cil.charType, None, []) in
+  let name = create_new_variable_name stack "alloc" Weak in
+  let min_alloc = Int.minus_one in
+  let max_alloc = Bit_utils.max_bit_address () in
+  let var, new_base =
+    Special_variables.create_allocated name typ
+      ~weak:true ~min_alloc ~max_alloc ~kind:region
   in
-  let var = create_new_var stack "alloc" type_base Weak in
   Self.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
     "allocating a single weak variable for ALL dynamic allocations %s: %a"
     (string_of_region region) Printer.pp_varinfo var;
-  let min_alloc = Int.minus_one in
-  let max_alloc = Bit_utils.max_bit_address () in
-  let variable_v =
-    Base.create_variable_validity ~weak:true ~min_alloc ~max_alloc
-  in
-  let validity = Base.Variable variable_v in
-  let new_base = Base.register_allocated_var var region validity in
   register_malloced_base ~stack new_base;
   new_base, max_alloc
 

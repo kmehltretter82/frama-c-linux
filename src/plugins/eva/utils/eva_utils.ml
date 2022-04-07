@@ -141,17 +141,6 @@ let protect f ~cleanup =
     cleanup ();
     raise e
 
-let register_new_var v typ =
-  if Cil.isFunctionType typ then
-    Globals.Functions.replace_by_declaration (Cil.empty_funspec()) v v.vdecl
-  else
-    Globals.Vars.add_decl v
-
-let create_new_var name typ =
-  let vi = Cil.makeGlobalVar ~source:false ~temp:false name typ in
-  register_new_var vi typ;
-  vi
-
 let is_const_write_invalid typ = Cil.typeHasQualifier "const" typ
 
 let find_return_var kf =
