@@ -43,3 +43,7 @@ val create_allocated:
   string -> typ -> weak:bool
   -> min_alloc:Integer.t -> max_alloc:Integer.t -> kind:Base.deallocation
   -> varinfo * Base.t
+
+(** Returns the fake varinfo used by Eva to store the result of functions.
+    Returns [None] if the function has a void type. *)
+val get_retres: kernel_function -> varinfo option

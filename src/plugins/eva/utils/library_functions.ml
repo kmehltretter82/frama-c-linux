@@ -22,36 +22,6 @@
 
 open Cil_types
 
-module Retres =
-  Kernel_function.Make_Table
-    (Datatype.Option(Cil_datatype.Varinfo))
-    (struct
-      let name = "Value.Library_functions.Retres"
-      let size = 9
-      let dependencies = [Ast.self]
-    end)
-let () = Ast.add_monotonic_state Retres.self
-
-let () =
-  State_dependency_graph.add_dependencies ~from:Retres.self [ Self.state ]
-
-let get_retres_vi = Retres.memo
-    (fun kf ->
-       let vi = Kernel_function.get_vi kf in
-       let typ = Cil.getReturnType vi.vtype in
-       if Cil.isVoidType typ then
-         None
-       else
-         try
-           ignore (Cil.bitsSizeOf typ);
-           let name = Format.asprintf "\\result<%a>" Kernel_function.pretty kf in
-           Some (Cil.makeVarinfo false false name typ)
-         with Cil.SizeOfError _ ->
-           Self.abort ~current:true
-             "function %a returns a value of unknown size. Aborting"
-             Kernel_function.pretty kf
-    )
-
 let returned_value kf =
   let return_type = Cil.unrollType (Kernel_function.get_return_type kf) in
   match return_type with

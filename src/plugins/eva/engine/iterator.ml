@@ -347,7 +347,7 @@ module Make_Dataflow
       match return_exp with
       | None -> fun state -> [state]
       | Some return_exp ->
-        let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
+        let vi_ret = Option.get (Special_variables.get_retres kf) in
         let return_lval = Var vi_ret, NoOffset in
         let kstmt = Kstmt stmt in
         fun state ->

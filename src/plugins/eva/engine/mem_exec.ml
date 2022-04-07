@@ -198,7 +198,7 @@ module Make
         in
         (* Adds the fake varinfo used for the result of [kf] to the
            output_bases. *)
-        let return_varinfo = Library_functions.get_retres_vi kf in
+        let return_varinfo = Special_variables.get_retres kf in
         let return_base = Option.map Base.of_varinfo return_varinfo in
         let add b = Base.Hptset.add b all_output_bases in
         let all_output_bases =

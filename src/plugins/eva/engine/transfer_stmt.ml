@@ -514,7 +514,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* Create an Eval.call *)
   let create_call stmt kf args =
-    let return = Library_functions.get_retres_vi kf in
+    let return = Special_variables.get_retres kf in
     let callstack = Callstack.push kf stmt (Eva_utils.current_call_stack ()) in
     let arguments, rest =
       let formals = Kernel_function.get_formals kf in

@@ -22,6 +22,8 @@
 
 open Cil_types
 
+(* ----- Creation of varinfos and bases ------------------------------------- *)
+
 let stdlib_attribute = Attr ("fc_stdlib_generated", [])
 
 let register_new_var v typ =
@@ -45,6 +47,40 @@ let create name ?descr ?libc typ validity alloc =
   let vi = create_varinfo name ?descr ?libc typ in
   let base = register_base vi validity alloc in
   vi, base
+
+(* ----- Varinfos for function returning results ---------------------------- *)
+
+module Retres =
+  Kernel_function.Make_Table
+    (Cil_datatype.Varinfo)
+    (struct
+      let name = "Eva.Eva_variables.Retres"
+      let size = 9
+      let dependencies = [ Ast.self; Self.state ]
+    end)
+let () = Ast.add_monotonic_state Retres.self
+
+let check_size typ kf =
+  try ignore (Cil.bitsSizeOf typ)
+  with Cil.SizeOfError _ ->
+    Self.abort ~current:true
+      "function %a returns a value of unknown size. Aborting"
+      Kernel_function.pretty kf
+
+let create_retres_variable typ kf =
+  let () = check_size typ kf in
+  let name = Format.asprintf "\\result<%a>" Kernel_function.pretty kf in
+  let validity = Base.validity_from_type typ in
+  fst (create name typ validity None)
+
+let get_retres kf =
+  let vi = Kernel_function.get_vi kf in
+  let typ = Cil.getReturnType vi.vtype in
+  if Cil.isVoidType typ
+  then None
+  else Some (Retres.memo (create_retres_variable typ) kf)
+
+(* ----- Other created variables -------------------------------------------- *)
 
 module CreatedVars =
   State_builder.Hashtbl
