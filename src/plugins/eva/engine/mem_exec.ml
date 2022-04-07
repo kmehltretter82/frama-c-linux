@@ -27,6 +27,7 @@ let proxy = State_builder.Proxy.(create "Mem_exec.proxy" Forward [])
 let add_cache_dependency state = State_builder.Proxy.extend [state] proxy
 let cache_dependencies = [ Ast.self; State_builder.Proxy.get proxy ]
 
+let dkey = Self.dkey_memexec
 
 module SaveCounter =
   State_builder.SharedCounter(struct let name = "Mem_exec.save_counter" end)
@@ -54,7 +55,7 @@ let bases = function
 let counter = ref 0
 
 module Make
-    (Value : Datatype.S)
+    (Value : Abstract_value.S)
     (Domain : Abstract_domain.S)
 = struct
 
@@ -281,6 +282,105 @@ module Make
       let call_result = outputs in
       Some (call_result, i)
 
+  (* ------------------------------------------------------------------------ *)
+  (*              Reload caches from another Frama-C project                  *)
+  (* ------------------------------------------------------------------------ *)
+
+  let import_call_effect (tbl: CallEffect.t) =
+    let new_tbl = Domain.Hashtbl.(create (length tbl)) in
+    let add entry_state (bases, outputs, i) =
+      let entry_state = Domain.import entry_state in
+      let bases = Eva_diff.import_bases bases in
+      let outputs =
+        List.map (fun (key, state) -> key, Domain.import state) outputs
+      in
+      Domain.Hashtbl.add new_tbl entry_state (bases, outputs, i)
+    in
+    Domain.Hashtbl.iter add tbl;
+    new_tbl
+
+  let import_bases_to_call_effect (tbl: InputBasesToCallEffect.t) =
+    let new_tbl = Base.Hptset.Hashtbl.(create (length tbl)) in
+    let add bases call_effect =
+      let bases = Eva_diff.import_bases bases in
+      let call_effect = import_call_effect call_effect in
+      Base.Hptset.Hashtbl.add new_tbl bases call_effect;
+    in
+    Base.Hptset.Hashtbl.iter add tbl;
+    new_tbl
+
+  let import_calls (map: ArgsToStoredCalls.t) =
+    let add key data acc =
+      let key = List.map (Option.map Value.import) key in
+      let data = import_bases_to_call_effect data in
+      ActualArgs.Map.add key data acc
+    in
+    ActualArgs.Map.fold add map ActualArgs.Map.empty
+
+  let import_cache (old_kf, old_data) =
+    match Ast_diff.Kernel_function.find old_kf with
+    | `Same kf ->
+      begin
+        try
+          Self.debug ~dkey "Importing cache for function %a from function %a@."
+            Kernel_function.pretty kf Kernel_function.pretty old_kf;
+          let data = import_calls old_data in
+          PreviousCalls.replace kf data
+        with Not_found ->
+          Self.debug ~dkey "Cannot import cache for function %a@."
+            Kernel_function.pretty kf
+      end
+    | `Partial _ as diff ->
+      Self.debug ~dkey "Function %a has been modified: %a"
+        Kernel_function.pretty old_kf
+        Ast_diff.Kernel_function.pretty_data diff
+    | `Not_present
+    | exception Not_found -> ()
+
+  let print_cache_size prefix_msg =
+    let kf_nb = PreviousCalls.length () in
+    let call_nb =
+      PreviousCalls.fold (fun _ map acc ->
+          ActualArgs.Map.fold (fun _ tbl acc ->
+              Base.Hptset.Hashtbl.fold (fun _ call_effect acc ->
+                  Domain.Hashtbl.length call_effect + acc)
+                tbl acc)
+            map acc)
+        0
+    in
+    Self.feedback "%s, %i saved calls for %i functions" prefix_msg call_nb kf_nb
+
+  let import_cached_calls_from name project =
+    let gather () =
+      print_cache_size ("In save file " ^ name);
+      PreviousCalls.fold (fun kf data acc -> (kf, data) :: acc) []
+    in
+    let list = Project.on project gather () in
+    List.iter import_cache list
+
+  let load_cache filepath =
+    try
+      Self.feedback "Loading previous session from save file %a"
+        Filepath.Normalized.pretty filepath;
+      let name = Filename.basename (filepath :> string) in
+      let saved = Project.load ~name filepath in
+      Self.feedback
+        "Computing AST differences between saved file and current session";
+      Ast_diff.compare_from_prj saved;
+      Special_variables.import saved;
+      Self.feedback "Copying Eva analysis cache from save file %s" name;
+      import_cached_calls_from name saved;
+      print_cache_size "In current session";
+      Project.remove ~project:saved ();
+    with
+    | Project.IOError s ->
+      Self.abort "Problem while loading file %a: %s"
+        Filepath.Normalized.pretty filepath s
+
+  let prepare () =
+    PreviousCalls.clear ();
+    if not (Parameters.Load.is_empty ()) then
+      load_cache (Parameters.Load.get ())
 end
 
 

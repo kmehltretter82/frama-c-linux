@@ -33,7 +33,7 @@ val new_counter : unit -> int
 val cleanup_results: unit -> unit
 
 module Make
-    (Value : Datatype.S)
+    (Value : Abstract_value.S)
     (Domain : Abstract_domain.S)
   : sig
 
@@ -55,6 +55,10 @@ module Make
     val reuse_previous_call:
       kernel_function -> Domain.t -> Value.t or_bottom list ->
       ((Partition.key * Domain.t) list * int) option
+
+    (** Prepare the analysis cache for a new analysis: if option -eva-load
+        is set, import the cache of a previous analysis from the given file. *)
+    val prepare: unit -> unit
   end
 
 

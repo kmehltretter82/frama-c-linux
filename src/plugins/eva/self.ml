@@ -83,6 +83,7 @@ let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
 let dkey_recursion = register_category "recursion"
+let dkey_memexec = register_category "memexec"
 
 let () =
   let activate dkey = add_debug_keys dkey in

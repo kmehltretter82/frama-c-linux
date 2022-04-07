@@ -51,6 +51,7 @@ val dkey_iterator : category
 val dkey_callbacks : category
 val dkey_widening : category
 val dkey_recursion : category
+val dkey_memexec : category
 
 (** {2 Warning categories.} *)
 

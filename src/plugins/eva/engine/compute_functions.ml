@@ -378,6 +378,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   let compute_from_entry_point kf ~lib_entry =
     pre_analysis ();
+    MemExec.prepare ();
     Self.feedback "Analyzing a%scomplete application starting at %a"
       (if lib_entry then "n in" else " ")
       Kernel_function.pretty kf;
@@ -394,6 +395,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   let compute_from_init_state kf init_state =
     pre_analysis ();
+    MemExec.prepare ();
     let b = Parameters.ResultsAll.get () in
     Abstract.Dom.Store.register_global_state b (`Value init_state);
     compute kf init_state

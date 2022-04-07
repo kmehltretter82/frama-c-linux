@@ -398,6 +398,21 @@ module JoinResults =
       let default = true
     end)
 
+let () = Parameter_customize.set_group performance
+let () = Parameter_customize.is_invisible ()
+module Load =
+  Filepath
+    (struct
+      let option_name = "-eva-load"
+      let arg_name = "filename"
+      let existence = Fc_Filepath.Must_exist
+      let file_kind = "Frama-C save"
+      let help = "load the analysis cache of a previously-saved analysis \
+                  from file <filename> to speed up a new analysis of a \
+                  slightly modified program."
+    end)
+let () = add_correctness_dep Load.parameter
+
 (* ------------------------------------------------------------------------- *)
 (* --- Non-standard alarms                                               --- *)
 (* ------------------------------------------------------------------------- *)
