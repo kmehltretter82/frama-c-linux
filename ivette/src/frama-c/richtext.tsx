@@ -83,7 +83,7 @@ interface MarkerProps {
 
 function Marker(props: MarkerProps): JSX.Element {
   const { marker, onMarker, children } = props;
-  const onClick = (): void => { if (onMarker) onMarker(marker); };
+  const onClick = (): void => {if (onMarker) onMarker(marker);};
   return (
     <span
       className="kernel-text-marker"
@@ -94,23 +94,6 @@ function Marker(props: MarkerProps): JSX.Element {
   );
 }
 
-function makeContents(text: KernelData.text): React.ReactNode {
-  if (Array.isArray(text)) {
-    const tag = text[0];
-    const marker = tag && typeof (tag) === 'string';
-    const array = marker ? text.slice(1) : text;
-    const contents = React.Children.toArray(array.map(makeContents));
-    if (marker) {
-      return <Marker marker={tag}>{contents}</Marker>;
-    }
-    return <>{contents}</>;
-  } if (typeof text === 'string') {
-    return text;
-  }
-  D.error('Unexpected text', text);
-  return null;
-}
-
 export interface TextProps {
   text: KernelData.text;
   onMarker?: (marker: string) => void;
@@ -119,6 +102,22 @@ export interface TextProps {
 
 export function Text(props: TextProps): JSX.Element {
   const className = classes('kernel-text', 'dome-text-code', props.className);
+  function makeContents(text: KernelData.text): React.ReactNode {
+    if (Array.isArray(text)) {
+      const tag = text[0];
+      const marker = tag && typeof (tag) === 'string';
+      const array = marker ? text.slice(1) : text;
+      const contents = React.Children.toArray(array.map(makeContents));
+      if (marker) {
+        return <Marker marker={tag} onMarker={props.onMarker}>{contents}</Marker>;
+      }
+      return <>{contents}</>;
+    } if (typeof text === 'string') {
+      return text;
+    }
+    D.error('Unexpected text', text);
+    return null;
+  }
   return <div className={className}>{makeContents(props.text)}</div>;
 }
 
