@@ -31,7 +31,7 @@ DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev pkg doc serve dist lint fixlint
+.PHONY: all app dev pkg doc serve dist lint fixlint checkcase
 
 all: pkg lint app
 
@@ -39,10 +39,21 @@ app: dome-app
 dev: dome-dev
 dist: dome-dist
 
-lint: dome-pkg dome-templ
+lint: dome-pkg dome-templ checkcase
 	@echo "[Ivette] running typechecker & linter"
 	yarn run typecheck
 	yarn run lint
+
+# In case-insensitive filesystems (macOS/Windows), import statements and
+# filenames can have issues due to case differences
+checkcase:
+	@echo "[Ivette] check case issues in imported filenames"
+	@err=0 ; for f in `find src | sed -E 's/(.ts|.tsx|.js|.jsx|.css|.json)$$//' | sort -f | uniq -di` ;\
+	 do \
+		err=1; \
+		echo " - ambiguous $$f.*"; \
+	 done ;\
+	 exit $$err
 
 tsc: dome-pkg dome-templ
 	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
@@ -153,7 +164,9 @@ doc: $(NODEBIN)/typedoc icons
 	@rm -fr doc/html
 	@yarn run typedoc $(DOCFILES)
 	@echo "\n[Ivette] main page"
-	@echo "   file://$(PWD)/doc/html/index.html"
+	@echo ""
+	@echo "   file://$(PWD)/ivette/doc/html/index.html"
+	@echo ""
 
 $(NODEBIN)/%:
 	@echo "[Node] install package $*"
