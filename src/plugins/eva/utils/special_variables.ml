@@ -120,3 +120,44 @@ let create_allocated name typ ~weak ~min_alloc ~max_alloc ~kind =
   in
   let validity = Base.Variable variable_v in
   register name typ validity (Some kind)
+
+(* ----- Import created variables from another Frama-C project -------------- *)
+
+let import_retres project =
+  let gather () = Retres.fold (fun kf vi acc -> (kf, vi) :: acc) [] in
+  let list = Project.on project gather () in
+  let import (kf, vi) =
+    match Ast_diff.Kernel_function.find kf with
+    | `Same new_kf ->
+      let new_vi = create_retres_variable vi.vtype new_kf in
+      Retres.add new_kf new_vi;
+      Ast_diff.Varinfo.add vi (`Same new_vi)
+    |  `Partial _ | `Not_present | exception Not_found -> ()
+  in
+  List.iter import list
+
+let import_created project =
+  let get_info name vi =
+    let base = Base.of_varinfo vi in
+    let validity = Base.validity base in
+    let deallocation =
+      match base with
+      | Allocated (_, deallocation, _) -> Some deallocation
+      | _ -> None
+    in
+    (name, vi, validity, deallocation)
+  in
+  let gather () =
+    CreatedVars.fold (fun name vi acc -> get_info name vi :: acc) []
+  in
+  let list = Project.on project gather () in
+  let import (name, vi, validity, alloc) =
+    let new_vi, _base = register name vi.vtype validity alloc in
+    Ast_diff.Varinfo.add vi (`Same new_vi)
+  in
+  List.iter import list
+
+let import project =
+  assert (Project.equal project (Ast_diff.Orig_project.get ()));
+  import_retres project;
+  import_created project

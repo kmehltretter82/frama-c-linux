@@ -47,3 +47,6 @@ val create_allocated:
 (** Returns the fake varinfo used by Eva to store the result of functions.
     Returns [None] if the function has a void type. *)
 val get_retres: kernel_function -> varinfo option
+
+(** Imports the variables created by Eva in the given Frama-C project. *)
+val import: Project.t -> unit
