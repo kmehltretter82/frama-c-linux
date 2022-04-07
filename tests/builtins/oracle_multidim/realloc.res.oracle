@@ -838,22 +838,24 @@
 < [eva:malloc:weak] realloc.c:165: 
 <   marking variable `__realloc_main11_l165' as weak
 < [eva:malloc] realloc.c:165: strong free on bases: {__realloc_main11_l171}
-667,668d1290
+667,670d1290
 < [eva:malloc] bases_to_realloc: {}
 < [eva:malloc] realloc.c:165: strong free on bases: {}
-680,681d1301
+< [eva:alarm] realloc.c:166: Warning: 
+<   accessing uninitialized left-value. assert \initialized(p);
+680,681d1299
 < [eva:malloc] bases_to_realloc: {}
 < [eva:malloc] realloc.c:171: strong free on bases: {}
-683,684d1302
+683,684d1300
 < [eva:malloc] bases_to_realloc: {}
 < [eva:malloc] realloc.c:171: strong free on bases: {}
-690,691d1307
+690,691d1305
 < [eva:malloc] bases_to_realloc: {__realloc_main11_l171}
 < [eva:malloc] realloc.c:165: strong free on bases: {__realloc_main11_l171}
-693,694d1308
+693,694d1306
 < [eva:malloc] bases_to_realloc: {}
 < [eva:malloc] realloc.c:165: strong free on bases: {}
-702,704c1316,1319
+702,704c1314,1317
 <   p ∈ ESCAPINGADDR
 <   pp ∈ ESCAPINGADDR
 <   q ∈ ESCAPINGADDR
@@ -862,7 +864,7 @@
 >   pp ∈ {{ &__malloc_main1_l12 }} or ESCAPINGADDR
 >   q ∈ {0} or ESCAPINGADDR
 >   __malloc_main1_l12 ∈ {17}
-716,717c1331,1334
+716,717c1329,1332
 <   r ∈ ESCAPINGADDR
 <   s ∈ ESCAPINGADDR
 ---
@@ -870,11 +872,11 @@
 >   s ∈ {0} or ESCAPINGADDR
 >   __malloc_main2_l23[0..2] ∈ {6}
 >                     [3] ∈ {6} or UNINITIALIZED
-725c1342
+725c1340
 <   s ∈ ESCAPINGADDR
 ---
 >   s ∈ {0} or ESCAPINGADDR
-731,734c1348,1367
+731,734c1346,1365
 <   p ∈ ESCAPINGADDR
 <   q ∈ ESCAPINGADDR
 <   rp ∈ ESCAPINGADDR
@@ -900,22 +902,22 @@
 >                     [5] ∈ {5}
 >                     [6] ∈ {6}
 >                     [7..9] ∈ {7; 8; 9} or UNINITIALIZED
-741c1374
+741c1372
 <   r ∈ ESCAPINGADDR
 ---
 >   r ∈ {0} or ESCAPINGADDR
-746c1379
+746c1377
 <   m ∈ ESCAPINGADDR
 ---
 >   m ∈ {0} or ESCAPINGADDR
-749,750c1382,1384
+749,750c1380,1382
 <   p ∈ ESCAPINGADDR
 <   q ∈ ESCAPINGADDR
 ---
 >   p ∈ {{ &__malloc_main7_l110 }} or ESCAPINGADDR
 >   q ∈ {0} or ESCAPINGADDR
 >   __malloc_main7_l110 ∈ ESCAPINGADDR
-753,754c1387,1390
+753,754c1385,1388
 <   p ∈ ESCAPINGADDR
 <   q ∈ ESCAPINGADDR
 ---
@@ -923,7 +925,7 @@
 >   q ∈ {0} or ESCAPINGADDR
 >   __malloc_main8_l123[0] ∈ {1}
 >                      [1] ∈ {2}
-757,758c1393,1396
+757,758c1391,1394
 <   p ∈ ESCAPINGADDR
 <   q ∈ ESCAPINGADDR
 ---
@@ -931,7 +933,7 @@
 >   q ∈ {0} or ESCAPINGADDR
 >   __malloc_main9_l132[0] ∈ {1}
 >                      [1] ∈ {2}
-769a1408,1431
+769a1406,1429
 >   __malloc_main1_l12 ∈ {17}
 >   __malloc_main2_l23[0..2] ∈ {6}
 >                     [3] ∈ {6} or UNINITIALIZED

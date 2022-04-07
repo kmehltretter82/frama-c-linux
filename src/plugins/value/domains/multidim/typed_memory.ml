@@ -462,7 +462,11 @@ struct
                   | Some l, Some u ->
                     let l' = Bound.of_integer l
                     and u' = Bound.(succ (of_integer u)) in
-                    `Value (l', u', weak || Integer.equal l u)
+                    let weak =
+                      weak ||
+                      Option.is_some exp && not (Integer.equal l u)
+                    in
+                    `Value (l', u', weak)
                 end
             in
             match m with
