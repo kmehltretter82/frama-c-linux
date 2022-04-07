@@ -108,6 +108,7 @@ let constant _ = function
 let resolve_functions _ = `Top, true
 
 let replace_base _substitution t = t
+let import t = t
 
 (** {2 Alarms} *)
 

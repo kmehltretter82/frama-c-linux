@@ -317,6 +317,7 @@ let rewrap_integer _ _ = top
 let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ = `Value None
 let resolve_functions _ = `Top, true
 let replace_base _substitution t = t
+let import t = t
 
 
 (*-----------------------------------------------------------------------------

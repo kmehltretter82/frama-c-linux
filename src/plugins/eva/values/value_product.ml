@@ -132,6 +132,9 @@ module Make
     Left.replace_base substitution left,
     Right.replace_base substitution right
 
+  let import (left, right) =
+    Left.import left, Right.import right
+
   let reduce (orig_left, orig_right) left right = match left, right with
     | None, None            -> None
     | Some left, None       -> Some (left, orig_right)

@@ -133,6 +133,8 @@ module CVal = struct
 
   let replace_base substitution t = snd (Cvalue.V.replace_base substitution t)
 
+  let import = Eva_diff.import_cvalue
+
   let key = Structure.Key_Value.create_key "cvalue"
 end
 
@@ -179,6 +181,7 @@ module Interval = struct
 
   let resolve_functions _ = `Top, true
   let replace_base _substitution t = t
+  let import t = t
 
   let rewrap_integer range value =
     match value with

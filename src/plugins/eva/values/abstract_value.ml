@@ -195,6 +195,15 @@ module type S = sig
       pointed to by [value] according to [substitution]. For arithmetic values,
       this function returns the [value] unchanged.  *)
   val replace_base: Base.substitution -> t -> t
+
+  (** Imports a value from another Frama-C project, by using {!Ast_diff}
+      correspondance tables to convert all references to the previous AST
+      to the new one. See also {!Eva_diff} for other utilitary functions.
+      For values that do not refer to any AST element, [import] should be the
+      identity function.
+      @raise [Not_found] if the value cannot be imported, in particular if it
+      refers an AST element that has no counterpart part in the new AST. *)
+  val import: t -> t
 end
 
 type 'v key = 'v Structure.Key_Value.key
