@@ -280,11 +280,7 @@ export interface Hint {
 
 /** Total order on hints. */
 export function byHint(a: Hint, b: Hint) {
-  const ra = a.rank ?? 0;
-  const rb = b.rank ?? 0;
-  if (ra < rb) return -1;
-  if (ra > rb) return +1;
-  return 0;
+  return (a.rank ?? 0) - (b.rank ?? 0);
 }
 
 /** Type alias for functions that build hints list from a pattern. */
