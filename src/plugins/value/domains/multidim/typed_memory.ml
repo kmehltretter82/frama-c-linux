@@ -527,7 +527,7 @@ struct
   and A : Segmentation.Segmentation with type submemory = ProtoMemory.t =
     Segmentation.Make (Config) (ProtoMemory)
   and D : Abstract_structure.Disjunction with type submemory = ProtoMemory.t and type structure = S.t =
-    Abstract_structure.Disjunction (Config) (ProtoMemory) (S)
+    Abstract_structure.Disjunction (ProtoMemory) (S)
 
   include ProtoMemory
 

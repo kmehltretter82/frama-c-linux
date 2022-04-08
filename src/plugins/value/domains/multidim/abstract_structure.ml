@@ -204,7 +204,7 @@ sig
   val map : (submemory -> submemory) -> t -> t
 end
 
-module Disjunction (Config : Config) (M : ProtoMemory)
+module Disjunction (M : ProtoMemory)
     (S : Structure with type submemory = M.t) =
 struct
   module Valuation =

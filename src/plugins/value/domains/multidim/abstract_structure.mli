@@ -76,6 +76,5 @@ sig
   val map : (submemory -> submemory) -> t -> t
 end
 
-module Disjunction (Config : Config) (M : ProtoMemory)
-    (S : Structure with type submemory = M.t) :
+module Disjunction (M : ProtoMemory) (S : Structure with type submemory = M.t) :
   Disjunction with type submemory = M.t and type structure = S.t
