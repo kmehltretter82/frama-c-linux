@@ -815,12 +815,41 @@ struct
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
 
     method! typ ?fundecl fmt_opt fmt typ =
+      (* Extracted from Cil_printer *)
+      let pname fmt space = match fmt_opt with
+        | None -> ()
+        | Some d -> Format.fprintf fmt "%s%t" (if space then " " else "") d
+      in
       match fundecl with
       | Some _ -> super#typ ?fundecl fmt_opt fmt typ
       | None ->
-        Format.fprintf fmt "@{<%s>%a@}"
-          (Tag.create (PType typ))
-          (super#typ ?fundecl fmt_opt) typ
+        match typ with
+        | TNamed (t, a) ->
+          Format.fprintf fmt "@{<%s>%a@}%a%a"
+            (Tag.create (PType (TNamed (t, []))))
+            self#varname t.tname
+            self#attributes a
+            pname true
+
+        | TComp (comp, a) ->
+          Format.fprintf fmt
+            "@{<%s>%a %a@}%a%a"
+            (Tag.create (PType (TComp (comp, []))))
+            self#pp_keyword (if comp.cstruct then "struct" else "union")
+            self#varname comp.cname
+            self#attributes a
+            pname true
+
+        | TEnum (enum, a) ->
+          Format.fprintf fmt "@{<%s>%a %a@}%a%a"
+            (Tag.create (PType (TEnum (enum, []))))
+            self#pp_keyword "enum"
+            self#varname enum.ename
+            self#attributes a
+            pname true
+
+        | _ ->
+          super#typ ?fundecl fmt_opt fmt typ
 
     initializer force_brace <- true
 
