@@ -64,7 +64,6 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-cell-alarms {
-  z-index: 1;
   margin: 0px;
   padding: 0px;
   margin-right: 4px;
@@ -251,14 +250,6 @@ tr:first-of-type > .eva-table-callsite-box {
   min-height: 22px;
   max-height: 22px;
   white-space: pre;
-}
-
-.eva-table-values-left {
-  text-align: left;
-}
-
-.eva-table-values-center {
-  text-align: center;
 }
 
 .eva-table-descrs {
