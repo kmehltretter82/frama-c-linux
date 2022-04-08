@@ -70,8 +70,7 @@ let check_size typ kf =
 let create_retres_variable typ kf =
   let () = check_size typ kf in
   let name = Format.asprintf "\\result<%a>" Kernel_function.pretty kf in
-  let validity = Base.validity_from_type typ in
-  fst (create name typ validity None)
+  Cil.makeVarinfo ~source:true ~temp:false false false name typ
 
 let get_retres kf =
   let vi = Kernel_function.get_vi kf in
