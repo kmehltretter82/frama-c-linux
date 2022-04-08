@@ -468,7 +468,7 @@ let create_fun_output_node pdg state dpds =
 let find_return_lval kf =
   let stmt = Kernel_function.find_return kf in
   match stmt with
-  | { skind = Return (Some {enode = Lval lval}, _)} -> stmt, lval
+  | { skind = Return (Some {enode = Lval lval}, _) } -> stmt, lval
   | _ -> assert false
 
 (** add a node corresponding to the returned value. *)
