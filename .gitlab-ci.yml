@@ -118,6 +118,7 @@ manuals: # TODO: restore doc companions
     paths:
       - result/acsl-implementation.pdf
       - result/acsl.pdf
+      - result/aorai-example.tgz
       - result/aorai-manual.pdf
       - result/e-acsl-implementation.pdf
       - result/e-acsl-manual.pdf
