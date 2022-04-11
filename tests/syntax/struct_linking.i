@@ -1,5 +1,5 @@
 /* run.config
-OPT: %{deps:@PTEST_NAME@_2.i} -print
+OPT: %{dep:@PTEST_NAME@_2.i} -print
 */
 struct Foo {
   double z;
