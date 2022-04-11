@@ -76,6 +76,13 @@ genassigns:
   tags:
     - nix
 
+main-tests:
+  stage: tests
+  script:
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.main-tests
+  tags:
+    - nix
+
 metacsl:
   stage: tests
   script:
@@ -83,10 +90,10 @@ metacsl:
   tags:
     - nix
 
-main-tests:
+mthread:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.main-tests
+    - ./ci.sh mthread
   tags:
     - nix
 
