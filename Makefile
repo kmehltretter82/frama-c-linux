@@ -343,7 +343,7 @@ DISTRIB_TESTS=$(shell find \
                   -o -path 'tests/crowbar/*' -type d \! -name input -prune -false \
                   -o -type f \! -name "*\.log" \! -name "*\.o" \
                     \! -name '*~' \! -name "*\.cm*"  \! -name "*.sav" \
-                    -perm /u+w | sed -e 's/ /@/g')
+                    -perm -u+w | sed -e 's/ /@/g')
 
 # files that are needed to compile API documentation of external plugins
 DOC_GEN_FILES:=$(addprefix doc/code/,\
@@ -2100,7 +2100,6 @@ uninstall::
 HEADER_SPEC := $(DEFAULT_HEADER_SPEC)
 # The list can be extended by external plugins using PLUGIN_HEADER_SPEC variable
 HEADER_SPEC += $(PLUGIN_HEADER_SPEC_LIST)
-HEADER_SPEC += ivette/./headers/header_spec.txt
 # Default list of header specification files can be overloaded.
 HEADER_SPEC_FILE?=$(HEADER_SPEC)
 
@@ -2482,10 +2481,10 @@ DISTRIB_FILES += $(wildcard $(PLUGIN_DISTRIBUTED_LIST)                   \
 DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
                   $(DISTRIB_FILES))
 
-sinclude ivette/Makefile.distrib
-
 DISTRIB_TESTS += $(wildcard $(PLUGIN_DIST_TESTS_LIST))
 
+sinclude ivette/Makefile.distrib
+sinclude ivette/Makefile.plugins
 
 SPECIFIED_OPEN_SOURCE:=$(OPEN_SOURCE)
 OPEN_SOURCE  ?= no
