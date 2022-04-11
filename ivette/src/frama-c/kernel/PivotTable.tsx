@@ -32,6 +32,7 @@ import { LED } from 'dome/controls/displays';
 import { Scroll } from 'dome/layout/boxes';
 import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as PivotState from 'frama-c/plugins/pivot/api/general';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
 import 'frama-c/kernel/PivotTable-style.css';
@@ -44,8 +45,10 @@ interface PivotTableProps {
   data: string[][];
 }
 
+const PivotGlobalState = new GlobalState({});
+
 export function Pivot(props: PivotTableProps): JSX.Element {
-  const [state, setState] = React.useState({});
+  const [state, setState] = useGlobalState(PivotGlobalState);
   return (
     <PivotTableUI
       data={props.data}
