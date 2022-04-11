@@ -69,6 +69,13 @@ cfp:
   tags:
     - nix
 
+genassigns:
+  stage: tests
+  script:
+    - ./ci.sh genassigns
+  tags:
+    - nix
+
 metacsl:
   stage: tests
   script:
