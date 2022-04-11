@@ -5,14 +5,14 @@
 }:
 
 buildDunePackage rec {
-  version = "1.7.0";
+  version = "1.8.1";
   pname = "ocp-indent";
 
   src = fetchFromGitHub {
     owner = "OCamlPro";
     repo = pname;
     rev = version;
-    sha256 = "006x3fsd61vxnxj4chlakyk3b2s10pb0bdl46g0ghf3j8h33x7hc";
+    sha256 = "0h4ysh36q1fxc40inhsdq2swqpfm15lpilqqcafs5ska42pn7s68";
   };
 
   minimumOCamlVersion = "4.02";
