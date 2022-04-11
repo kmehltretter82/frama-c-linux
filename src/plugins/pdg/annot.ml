@@ -106,7 +106,7 @@ let find_code_annot_nodes pdg stmt annot =
   Pdg_parameters.debug "[pdg:annotation] CodeAnnot-%d stmt %d : %a @."
     annot.annot_id stmt.sid
     Printer.pp_code_annotation annot;
-  if Db.Value.is_reachable_stmt stmt then
+  if Eva.Results.is_reachable stmt then
     begin
       let kf =  PdgTypes.Pdg.get_kf pdg in
       let (data_info, decl_label_info), pragmas =

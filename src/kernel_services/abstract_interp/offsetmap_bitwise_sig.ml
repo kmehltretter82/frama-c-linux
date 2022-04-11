@@ -68,11 +68,11 @@ module type S = sig
 
   val add_binding_intervals :
     validity:Base.validity ->
-    exact:bool -> intervals -> v -> t -> t Bottom.or_bottom
+    exact:bool -> intervals -> v -> t -> t Lattice_bounds.or_bottom
 
   val add_binding_ival :
     validity:Base.validity ->
-    exact:bool -> Ival.t -> size:Int_Base.t -> v -> t -> t Bottom.or_bottom
+    exact:bool -> Ival.t -> size:Int_Base.t -> v -> t -> t Lattice_bounds.or_bottom
 
 
   (** {2 Creating an offsetmap} *)
@@ -84,7 +84,7 @@ module type S = sig
   (** offsetmap containing no interval. *)
 
   val size_from_validity:
-    Base.validity -> Integer.t Bottom.or_bottom
+    Base.validity -> Integer.t Lattice_bounds.or_bottom
   (** [size_from_validity v] returns the size to be used when creating a
       new offsetmap for a base with validity [v]. This is a convention that
       should be shared by all modules that create offsetmaps.

@@ -45,14 +45,19 @@ import * as Server from 'frama-c/server';
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-const quoteRe = new RegExp('^[-./:a-zA-Z0-9]+$');
-const quote = (s: string) => (quoteRe.test(s) ? s : `"${s}"`);
+const quoteRe = new RegExp('^[-_./:a-zA-Z0-9]+$');
+const quote = (s: string): string =>
+  (quoteRe.test(s) ? s : `"${s}"`);
+
+const unquoteRe = new RegExp('^".*"$');
+const unquote = (s: string): string =>
+  (unquoteRe.test(s) ? s.substring(1, s.length - 1) : s);
 
 function dumpServerConfig(sc: Server.Configuration): string {
   let buffer = '';
   const { cwd, command, sockaddr, params } = sc;
   if (cwd) buffer += `--cwd ${quote(cwd)}\n`;
-  if (command) buffer += `--command ${command}\n`;
+  if (command) buffer += `--command ${quote(command)}\n`;
   if (sockaddr) buffer += `--socket ${sockaddr}\n`;
   if (params) {
     params.forEach((v: string, i: number) => {
@@ -73,17 +78,17 @@ function buildServerConfig(argv: string[], cwd?: string) {
   const params = [];
   let command;
   let sockaddr;
-  let cwdir = cwd;
+  let cwdir = cwd ? unquote(cwd) : undefined;
   for (let k = 0; k < (argv ? argv.length : 0); k++) {
     const v = argv[k];
     switch (v) {
       case '--cwd':
         k += 1;
-        cwdir = argv[k];
+        cwdir = unquote(argv[k]);
         break;
       case '--command':
         k += 1;
-        command = argv[k];
+        command = unquote(argv[k]);
         break;
       case '--socket':
         k += 1;
@@ -155,6 +160,7 @@ export const Control = () => {
       play = { enabled: true, onClick: Server.start };
       break;
     case Server.Status.ON:
+    case Server.Status.CMD:
     case Server.Status.FAILURE:
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
@@ -220,8 +226,10 @@ const RenderConsole = () => {
   const doReload = () => {
     const cfg = Server.getConfig();
     const hst = insertConfig(history, cfg);
+    const cmd = hst[0];
     scratch.current = hst.slice();
-    editor.setValue(hst[0]);
+    editor.setValue(cmd);
+    setEmpty(cmd === '');
     setHistory(hst);
     setCursor(0);
   };
@@ -251,7 +259,9 @@ const RenderConsole = () => {
         const cmd = editor.getValue();
         const pad = scratch.current;
         pad[cursor] = cmd;
-        editor.setValue(pad[target]);
+        const cmd2 = pad[target];
+        editor.setValue(cmd2);
+        setEmpty(cmd2 === '');
         setCursor(target);
       };
     return undefined;
@@ -363,36 +373,50 @@ export const Status = () => {
   const status = Server.useStatus();
   const pending = Server.getPending();
   let led: LEDstatus = 'inactive';
+  let title = undefined;
   let icon = undefined;
-  let running = false;
+  let running = 'OFF';
   let blink = false;
 
   switch (status) {
     case Server.Status.OFF:
+      title = 'Server is off';
       break;
     case Server.Status.STARTING:
       led = 'active';
       blink = true;
-      running = true;
+      running = 'BOOT';
+      title = 'Server is starting';
       break;
     case Server.Status.ON:
-      led = pending > 0 ? 'positive' : 'active';
-      running = true;
+      led = 'active';
+      blink = pending > 0;
+      running = 'ON';
+      title = 'Server is running';
+      break;
+    case Server.Status.CMD:
+      led = 'positive';
+      blink = true;
+      running = 'CMD';
+      title = 'Command-line processing';
       break;
     case Server.Status.HALTING:
       led = 'negative';
       blink = true;
-      running = true;
+      running = 'HALT';
+      title = 'Server is halting';
       break;
     case Server.Status.RESTARTING:
       led = 'warning';
       blink = true;
-      running = true;
+      running = 'REBOOT';
+      title = 'Server is restarting';
       break;
     case Server.Status.FAILURE:
       led = 'negative';
       blink = true;
-      running = false;
+      running = 'ERR';
+      title = 'Server halted because of failure';
       icon = 'WARNING';
       break;
   }
@@ -400,7 +424,7 @@ export const Status = () => {
   return (
     <>
       <LED status={led} blink={blink} />
-      <Code icon={icon} label={running ? 'ON' : 'OFF'} />
+      <Code icon={icon} label={running} title={title} />
       <Toolbars.Separator />
     </>
   );

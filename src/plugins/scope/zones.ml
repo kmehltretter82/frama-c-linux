@@ -65,11 +65,11 @@ let compute_new_data old_zone l_zone l_dpds exact r_dpds =
   else (false, old_zone)
 
 let get_lval_zones ~for_writing stmt lval =
-  let state = Db.Value.get_stmt_state stmt in
-  let dpds, zone, exact =
-    !Db.Value.lval_to_zone_with_deps_state
-      state ~deps:(Some Locations.Zone.bottom) ~for_writing lval
-  in
+  let request = Eva.Results.before stmt in
+  let address = Eva.Results.eval_address ~for_writing lval request in
+  let zone = Eva.Results.as_zone address in
+  let exact = Eva.Results.is_singleton address in
+  let dpds = Eva.Results.address_deps lval request in
   dpds, exact, zone
 
 (* the call result can be processed like a normal assignment *)

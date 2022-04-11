@@ -67,7 +67,7 @@ module type S = sig
   val empty: t
   (** offsetmap containing no interval. *)
 
-  val size_from_validity: Base.validity -> Integer.t Bottom.or_bottom
+  val size_from_validity: Base.validity -> Integer.t Lattice_bounds.or_bottom
   (** [size_from_validity v] returns the size to be used when creating a
       new offsetmap for a base with validity [v]. This is a convention that
       must be shared by all modules that create offsetmaps, because operations
@@ -200,7 +200,7 @@ module type S = sig
   val copy_slice:
     validity:Base.validity ->
     offsets:Ival.t -> size:Integer.t ->
-    t -> t Bottom.or_bottom
+    t -> t Lattice_bounds.or_bottom
   (** [copy_slice ~validity ~offsets ~size m] copies and merges the slices of
       [m] starting at offsets [offsets] and of size [size]. Offsets invalid
       according to [validity] are removed. [size] must be strictly greater
@@ -224,7 +224,7 @@ module type S = sig
     offsets:Ival.t ->
     size:Int.t ->
     v ->
-    t -> t Bottom.or_bottom
+    t -> t Lattice_bounds.or_bottom
   (** [update ?origin ~validity ~exact ~offsets ~size v m] writes [v],
       of size [size], each [offsets] in [m]; [m] must be of the size implied by
       [validity]. [~exact=true] results in a strong update, while
@@ -239,7 +239,7 @@ module type S = sig
     offsets:Ival.t ->
     size:Int.t ->
     v ->
-    t -> t Bottom.or_bottom
+    t -> t Lattice_bounds.or_bottom
   (** Same as {!update}, except that no over-approximation on the set
       of offsets or on the value written occurs. In case of imprecision,
       [m] is not updated. *)
@@ -248,7 +248,7 @@ module type S = sig
   val update_imprecise_everywhere:
     validity:Base.validity ->
     Origin.t -> v ->
-    t -> t Bottom.or_bottom
+    t -> t Lattice_bounds.or_bottom
   (** [update_everywhere ~validity o v m] computes the offsetmap resulting
       from imprecisely writing [v] potentially anywhere where [m] is valid
       according to [validity]. If a value becomes too imprecise, [o] is used
@@ -260,7 +260,7 @@ module type S = sig
     from:t ->
     size:Int.t ->
     offsets:Ival.t ->
-    t -> t Bottom.or_bottom
+    t -> t Lattice_bounds.or_bottom
 
 
   (** {2 Shape} *)

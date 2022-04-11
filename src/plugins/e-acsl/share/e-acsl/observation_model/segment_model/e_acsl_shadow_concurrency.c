@@ -183,7 +183,11 @@ static void fill_thread_layout_stack(memory_partition *pstack,
 static void fill_thread_layout_tls(memory_partition *ptls) {
   // Since the TLS is by design specific to each thread, we can reuse the
   // method used to identify the TLS segment in the main thread
-  set_application_segment(&ptls->application, get_tls_start(), get_tls_size(),
+  // We first need to collect the safe locations of the current thread,
+  // since we need to register them in case the program uses one of them
+  // inside the thread
+  collect_safe_locations();
+  set_application_segment(&ptls->application, get_tls_start(0), get_tls_size(),
                           "thread_tls", NULL);
   set_shadow_segment(&ptls->primary, &ptls->application, 1,
                      "thread_tls_primary");

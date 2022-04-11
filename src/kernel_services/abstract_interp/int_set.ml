@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Abstract_interp
-open Bottom.Type
+open Lattice_bounds
 
 (* Make sure all this is synchronized with the default value of -ilevel *)
 let small_cardinal = ref 8

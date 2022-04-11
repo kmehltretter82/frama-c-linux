@@ -1,3 +1,8 @@
+/* run.config
+STDOPT:
+STDOPT: #"-no-frama-c-stdlib -no-pp-annot"
+*/
+
 #include <stdarg.h>
 
 /*@ requires n>= 0; */

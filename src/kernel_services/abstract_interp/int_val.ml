@@ -21,7 +21,8 @@
 (**************************************************************************)
 
 open Abstract_interp
-open Bottom.Type
+open Lattice_bounds
+open Bottom.Operators
 
 let small_cardinal = Int_set.get_small_cardinal
 let small_cardinal_Int () = Int.of_int (small_cardinal ())

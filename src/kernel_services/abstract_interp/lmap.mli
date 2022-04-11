@@ -44,7 +44,7 @@ module Make_LOffset
        val name: string
        (** Used to create different datatypes each time the functor is applied *)
 
-       val default_offsetmap : Base.t -> Offsetmap.t Bottom.or_bottom
+       val default_offsetmap : Base.t -> Offsetmap.t Lattice_bounds.or_bottom
        (** Value returned when a map is queried, and the base is not present.
            [`Bottom] indicates that the base is never bound in such a map. *)
 

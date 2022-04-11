@@ -225,6 +225,10 @@ val as_cvalue : value evaluation -> Cvalue.V.t
 (** Converts the value into a Cvalue abstraction. *)
 val as_cvalue_result : value evaluation -> Cvalue.V.t result
 
+(** Converts the value into a Cvalue abstraction with 'undefined' and 'escaping
+    addresses' flags. *)
+val as_cvalue_or_uninitialized : value evaluation -> Cvalue.V_Or_Uninitialized.t
+
 
 (** Converts into a C location abstraction. *)
 val as_location : address evaluation -> Locations.location result
@@ -271,6 +275,10 @@ val is_reachable : Cil_types.stmt -> bool
     the main function has been analyzed for [Kglobal]. *)
 val is_reachable_kinstr : Cil_types.kinstr -> bool
 
+val condition_truth_value: Cil_types.stmt -> bool * bool
+(** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
+    (resp. snd) is true if and only if the condition of the 'if' has been
+    evaluated to true (resp. false) at least once during the analysis. *)
 
 (*** Callers / Callees / Callsites *)
 

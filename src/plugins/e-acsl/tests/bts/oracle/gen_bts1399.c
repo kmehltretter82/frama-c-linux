@@ -18,9 +18,9 @@ typedef struct spongeStateStruct spongeState;
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   spongeState *state = malloc(sizeof(spongeState));
-  __e_acsl_store_block((void *)(& state),(size_t)8);
+  __e_acsl_store_block((void *)(& state),8UL);
   __e_acsl_full_init((void *)(& state));
   __e_acsl_initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
   state->bitsInQueue = (unsigned int)16;

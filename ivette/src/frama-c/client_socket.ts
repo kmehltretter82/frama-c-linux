@@ -27,7 +27,7 @@ import { Client } from './client';
 
 const D = new Debug('SocketServer');
 
-const RETRIES = 10;
+const RETRIES = 30;
 const TIMEOUT = 200;
 
 // --------------------------------------------------------------------------
@@ -61,6 +61,7 @@ class SocketClient extends Client {
     const s = Net.createConnection(sockaddr, () => {
       this.running = true;
       this.retries = 0;
+      this.buffer = Buffer.from('');
       this.emitConnect();
       this._flush();
     });
@@ -73,7 +74,7 @@ class SocketClient extends Client {
         this.socket = undefined;
         this.timer = setTimeout(() => this.connect(sockaddr), TIMEOUT);
       } else {
-        this.running = false;
+        this.disconnect();
         this.emitConnect(err);
       }
     });
@@ -84,6 +85,7 @@ class SocketClient extends Client {
     this.queue = [];
     this.retries = 0;
     this.running = false;
+    this.buffer = Buffer.from('');
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = undefined;
@@ -176,10 +178,8 @@ class SocketClient extends Client {
   _receive(chunk: Buffer): void {
     this.buffer = Buffer.concat([this.buffer, chunk]);
     while (true) {
-      const n0 = this.buffer.length;
       const data = this._fetch();
-      const n1 = this.buffer.length;
-      if (data === undefined || n0 <= n1) break;
+      if (!data) break;
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const cmd: any = JSON.parse(data);
@@ -193,8 +193,14 @@ class SocketClient extends Client {
             default:
               D.warn('Unknown command', cmd);
           }
-        } else
-          D.warn('Misformed data', data);
+        } else {
+          switch (cmd) {
+            case 'CMDLINEON': this.emitCmdLine(true); break;
+            case 'CMDLINEOFF': this.emitCmdLine(false); break;
+            default:
+              D.warn('Misformed data', data);
+          }
+        }
       } catch (err) {
         D.warn('Misformed JSON', data, err);
       }

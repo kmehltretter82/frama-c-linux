@@ -14,11 +14,11 @@ int *new_inversed(int len, int *v)
 {
   int i;
   int *p;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_and;
-    __e_acsl_store_block((void *)(& v),(size_t)8);
+    __e_acsl_store_block((void *)(& v),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"v",(void *)v);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
@@ -93,11 +93,11 @@ int main(void)
 {
   int __retres;
   int *v2;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& v2),(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& v2),8UL);
   int x = 3;
   int v1[3] = {1, 2, x};
-  __e_acsl_store_block((void *)(v1),(size_t)12);
+  __e_acsl_store_block((void *)(v1),12UL);
   __e_acsl_full_init((void *)(& v1));
   {
     int __gen_e_acsl_valid;

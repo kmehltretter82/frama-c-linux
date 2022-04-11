@@ -10,8 +10,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 void foo(int *a, int *b)
 {
-  __e_acsl_store_block((void *)(& b),(size_t)8);
-  __e_acsl_store_block((void *)(& a),(size_t)8);
+  __e_acsl_store_block((void *)(& b),8UL);
+  __e_acsl_store_block((void *)(& a),8UL);
   __e_acsl_temporal_pull_parameter((void *)(& a),0U,8UL);
   __e_acsl_temporal_pull_parameter((void *)(& b),1U,8UL);
   int t = *a;
@@ -34,20 +34,20 @@ int *bar(void)
 int main(int argc, char const **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   int a = 11;
-  __e_acsl_store_block((void *)(& a),(size_t)4);
+  __e_acsl_store_block((void *)(& a),4UL);
   __e_acsl_full_init((void *)(& a));
   int b = 12;
-  __e_acsl_store_block((void *)(& b),(size_t)4);
+  __e_acsl_store_block((void *)(& b),4UL);
   __e_acsl_full_init((void *)(& b));
   int *p = & a;
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& a));
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   int *q = & b;
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)(& b));
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   LAB:
   __e_acsl_temporal_reset_parameters();

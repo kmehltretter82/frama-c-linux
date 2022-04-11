@@ -261,7 +261,7 @@
   function Frama_C_make_unknown: precondition 'valid_p' got status unknown.
 [eva] Done for function Frama_C_make_unknown
 [eva:alarm] FRAMAC_SHARE/libc/stdio.c:131: Warning: 
-  out of bounds write. assert \valid(*strp + (unsigned int)(len - 1U));
+  out of bounds write. assert \valid(*strp + (size_t)(len - 1U));
 [eva] Recording results for asprintf
 [eva] Done for function asprintf
 [eva] computing for function printf_va_1 <- main.

@@ -152,14 +152,14 @@ int nested(int (*s1)[10], int (*s2)[10], int n)
 int with_void(void *s1, void *s2, int n)
 {
   int tmp;
-  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned long)10);
+  tmp = memcmp((void const *)s1,(void const *)s2,(size_t)10);
   return tmp;
 }
 
 int with_incomplete(struct incomplete *s1, struct incomplete *s2, int n)
 {
   int tmp;
-  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned long)n);
+  tmp = memcmp((void const *)s1,(void const *)s2,(size_t)n);
   return tmp;
 }
 
@@ -332,14 +332,14 @@ int nested(int (*s1)[10], int (*s2)[10], int n)
 int with_void(void *s1, void *s2, int n)
 {
   int tmp;
-  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned long)10);
+  tmp = memcmp((void const *)s1,(void const *)s2,(size_t)10);
   return tmp;
 }
 
 int with_incomplete(struct incomplete *s1, struct incomplete *s2, int n)
 {
   int tmp;
-  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned long)n);
+  tmp = memcmp((void const *)s1,(void const *)s2,(size_t)n);
   return tmp;
 }
 

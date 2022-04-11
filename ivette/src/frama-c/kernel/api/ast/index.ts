@@ -256,7 +256,7 @@ const markerInfo_internal: State.Array<string,markerInfoData> = {
   reload: reloadMarkerInfo,
   order: byMarkerInfoData,
 };
-/** Marker informations */
+/** Marker information */
 export const markerInfo: State.Array<string,markerInfoData> = markerInfo_internal;
 
 /** Localizable AST markers */
@@ -458,15 +458,34 @@ const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
 /** AST Functions */
 export const functions: State.Array<Json.key<'#functions'>,functionsData> = functions_internal;
 
-const getInfo_internal: Server.GetRequest<marker,text> = {
-  kind: Server.RqKind.GET,
-  name:   'kernel.ast.getInfo',
-  input:  jMarker,
-  output: jText,
-  signals: [],
+/** Updated AST information */
+export const getInformationUpdate: Server.Signal = {
+  name: 'kernel.ast.getInformationUpdate',
 };
-/** Get textual information about a marker */
-export const getInfo: Server.GetRequest<marker,text>= getInfo_internal;
+
+const getInformation_internal: Server.GetRequest<
+  marker |
+  undefined,
+  { id: string, label: string, title: string, descr: text }[]
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.getInformation',
+  input:  jMarker,
+  output: Json.jList(
+            Json.jObject({
+              id: Json.jFail(Json.jString,'String expected'),
+              label: Json.jFail(Json.jString,'String expected'),
+              title: Json.jFail(Json.jString,'String expected'),
+              descr: jTextSafe,
+            })),
+  signals: [ { name: 'kernel.ast.getInformationUpdate' } ],
+};
+/** Get available information about markers. When no marker is given, returns all kinds of information (with empty `descr` field). */
+export const getInformation: Server.GetRequest<
+  marker |
+  undefined,
+  { id: string, label: string, title: string, descr: text }[]
+  >= getInformation_internal;
 
 const getMarkerAt_internal: Server.GetRequest<
   [ string, number, number ],

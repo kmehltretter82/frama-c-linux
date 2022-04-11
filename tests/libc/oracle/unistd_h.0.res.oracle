@@ -9,6 +9,7 @@
   \return(gethostname) == 0 (auto)
   \return(getpgrp) == 0 (auto)
   \return(isatty) == 0 (auto)
+  \return(lseek) == -1 (auto)
   \return(pipe) == 0 (auto)
   \return(setegid) == 0 (auto)
   \return(seteuid) == 0 (auto)

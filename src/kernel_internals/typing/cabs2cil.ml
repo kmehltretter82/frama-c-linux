@@ -1388,7 +1388,7 @@ let fail_if_incompatible_sizeof ~ensure_complete op typ =
       (Cil.allowed_machdep "GCC/MSVC");
   if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
     Kernel.error ~current:true
-      "%s on incomplete type '%a'" op Cil_printer.pp_typ typ
+      "%s on incomplete type '%a'" op Cil_datatype.Typ.pretty typ
 
 (******** CASTS *********)
 
@@ -1439,7 +1439,7 @@ let is_scalar_type t =
    Abort if invalid *)
 let checkBool (ot : typ) (_ : exp) =
   if not (is_scalar_type ot) then
-    Kernel.fatal ~current:true "castToBool %a" Cil_printer.pp_typ ot
+    Kernel.fatal ~current:true "castToBool %a" Cil_datatype.Typ.pretty ot
 
 (* Evaluate constants to CTrue (non-zero) or CFalse (zero) *)
 let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
@@ -2150,7 +2150,7 @@ struct
            Kernel.feedback ~once:true ~source:(fst e.eloc)
              "Case label %a exceeds range of %a for switch expression. \
               Nothing to worry."
-             Cil_printer.pp_exp e Cil_printer.pp_typ t;
+             Cil_printer.pp_exp e Cil_datatype.Typ.pretty t;
          | _ -> ()
         );
         Case (e'', loc)
@@ -2764,7 +2764,7 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
             oldargslist argslist;
           (* Go over the arguments and update the old ones with the
            * adjusted types *)
-          (* Format.printf "new type is %a@." Cil_printer.pp_typ t; *)
+          (* Format.printf "new type is %a@." Cil_datatype.Typ.pretty t; *)
           let what =
             match what with
             | CombineFundef b -> CombineFunarg b
@@ -2815,7 +2815,7 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
 
   | _ -> raise (Cannot_combine
                   (Format.asprintf "different type constructors:@ %a and %a"
-                     Cil_printer.pp_typ oldt Cil_printer.pp_typ t))
+                     Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
 
 let get_qualifiers t = Cil.filter_qualifier_attributes (Cil.typeAttrs t)
 
@@ -2905,18 +2905,16 @@ let rec castTo ?context ?(fromsource=false)
     (ot : typ) (nt : typ) (e : exp) : (typ * exp ) =
   Kernel.debug ~dkey:Kernel.dkey_typing_cast "@[%t: castTo:%s %a->%a@\n@]"
     Cil.pp_thisloc (if fromsource then "(source)" else "")
-    Cil_printer.pp_typ ot Cil_printer.pp_typ nt;
-  let ot' = unrollType ot in
-  let nt' = unrollType nt in
-  if not fromsource && not (need_cast ot' nt') then begin
+    Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt;
+  if not fromsource && not (need_cast ot nt) then begin
     (* Do not put the cast if it is not necessary, unless it is from the
      * source. *)
     Kernel.debug ~dkey:Kernel.dkey_typing_cast "no cast to perform";
     (ot, e)
   end else begin
-    let nt' = if fromsource then nt' else !typeForInsertedCast e ot' nt' in
-    let result = (nt', if theMachine.insertImplicitCasts || fromsource then
-                    Cil.mkCastT ~force:true ~oldt:ot ~newt:nt' e else e)
+    let nt = if fromsource then nt else !typeForInsertedCast e ot nt in
+    let result = (nt, if theMachine.insertImplicitCasts || fromsource then
+                    Cil.mkCastT ~force:true ~oldt:ot ~newt:nt e else e)
     in
     let error s =
       if fromsource then abort_context s else Kernel.fatal ~current:true s
@@ -2925,10 +2923,10 @@ let rec castTo ?context ?(fromsource=false)
         ignore (check_strict_attributes true ot nt  && check_strict_attributes false nt ot);*)
     Kernel.debug ~dkey:Kernel.dkey_typing_cast
       "@[castTo: ot=%a nt=%a\n  result is %a@\n@]"
-      Cil_printer.pp_typ ot Cil_printer.pp_typ nt'
+      Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
       Cil_printer.pp_exp (snd result);
     (* Now see if we can have a cast here *)
-    match ot', nt' with
+    match Cil.unrollType ot, Cil.unrollType nt with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in castTo"
     | t, TInt(IBool,_) when is_scalar_type t ->
@@ -2936,7 +2934,7 @@ let rec castTo ?context ?(fromsource=false)
       else
         nt,
         Cil.mkCastT
-          ~oldt:ot ~newt:nt'
+          ~oldt:ot ~newt:nt
           (constFold true
              (new_exp  ~loc:e.eloc
                 (BinOp(Ne,e,Cil.integer ~loc:e.eloc 0,intType))))
@@ -2955,14 +2953,14 @@ let rec castTo ?context ?(fromsource=false)
         error
           "conversion between function types with \
            different number of arguments:@ %a@ and@ %a"
-          Cil_printer.pp_typ ot Cil_printer.pp_typ nt;
+          Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt;
       if not (areCompatibleTypes ?context ot nt) then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_types_call
           ~current:true
           "implicit conversion between incompatible function types:@ \
            %a@ and@ %a"
-          Cil_printer.pp_typ ot Cil_printer.pp_typ nt;
+          Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt;
       result
 
     | TFun _, TPtr(TFun _, _) ->
@@ -2971,7 +2969,7 @@ let rec castTo ?context ?(fromsource=false)
         | Lval lv ->  Cil.mkAddrOf ~loc:e.eloc lv
         | _ -> e (* function decay into pointer anyway *)
       in
-      castTo ?context ~fromsource (TPtr (ot', [])) nt' clean_e
+      castTo ?context ~fromsource (TPtr (ot, [])) nt clean_e
 
     (* accept converting a ptr to function to/from a ptr to void, even though
        not really accepted by the standard. gcc supports it. though
@@ -2999,16 +2997,16 @@ let rec castTo ?context ?(fromsource=false)
       Kernel.warning
         ~wkey:Kernel.wkey_incompatible_pointer_types
         ~current:true
-        "casting function to %a" Cil_printer.pp_typ nt;
+        "casting function to %a" Cil_datatype.Typ.pretty nt;
       result
     | TPtr _, TPtr (TFun _,_) ->
       Kernel.warning
         ~wkey:Kernel.wkey_incompatible_pointer_types
         ~current:true
-        "casting function from %a" Cil_printer.pp_typ ot;
+        "casting function from %a" Cil_datatype.Typ.pretty ot;
       result
     | _, TPtr (TFun _, _) ->
-      error "cannot cast %a to function type" Cil_printer.pp_typ ot
+      error "cannot cast %a to function type" Cil_datatype.Typ.pretty ot
     | TPtr _, TPtr _ -> result
 
     | TInt _, TPtr _ -> result
@@ -3025,10 +3023,10 @@ let rec castTo ?context ?(fromsource=false)
     | TArray _, TPtr _ -> result
 
     | TArray(t1,_,_), TArray(t2,None,_)
-      when Cil_datatype.Typ.equal t1 t2 -> (nt', e)
+      when Cil_datatype.Typ.equal t1 t2 -> (nt, e)
 
     | TPtr _, TArray(_,_,_) ->
-      error "Cast over a non-scalar type %a" Cil_printer.pp_typ nt';
+      error "Cast over a non-scalar type %a" Cil_datatype.Typ.pretty nt;
 
     | TEnum _, TInt _ -> result
     | TFloat _, (TInt _|TEnum _) -> result
@@ -3039,7 +3037,7 @@ let rec castTo ?context ?(fromsource=false)
        | Const (CEnum { eihost = ei'})
          when ei.ename = ei'.ename && not fromsource &&
               Cil.bytesSizeOfInt ik = Cil.bytesSizeOfInt ei'.ekind
-         -> (nt',e)
+         -> (nt,e)
        | _ -> result)
     | TEnum _, TEnum _ -> result
 
@@ -3049,7 +3047,7 @@ let rec castTo ?context ?(fromsource=false)
 
     | (TInt _ | TPtr _), TBuiltin_va_list _ ->
       Kernel.debug ~dkey:Kernel.dkey_typing_cast ~current:true
-        "Casting %a to __builtin_va_list" Cil_printer.pp_typ ot ;
+        "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty ot ;
       result
 
     | TPtr _, TEnum _ ->
@@ -3077,7 +3075,7 @@ let rec castTo ?context ?(fromsource=false)
         match isTransparentUnion ot with
         | None ->
           Kernel.fatal ~current:true "castTo %a -> %a"
-            Cil_printer.pp_typ ot Cil_printer.pp_typ nt'
+            Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
         | Some fstfield -> begin
             (* We do it now only if the expression is an lval *)
             let e' =
@@ -3091,11 +3089,11 @@ let rec castTo ?context ?(fromsource=false)
                   Cil_printer.pp_exp e
             in
             (* Continue casting *)
-            castTo ?context ~fromsource:fromsource fstfield.ftype nt' e'
+            castTo ?context ~fromsource:fromsource fstfield.ftype nt e'
           end
       end
     | _ ->
-      error "cannot cast from %a to %a@\n" Cil_printer.pp_typ ot Cil_printer.pp_typ nt'
+      error "cannot cast from %a to %a@\n" Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
   end
 
 (* Create and cache varinfo's for globals. Starts with a varinfo but if the
@@ -3187,8 +3185,8 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         with Cannot_combine reason ->
           Kernel.debug ~dkey:Kernel.dkey_typing_global
             "old type = %a\nnew type = %a\n"
-            Cil_printer.pp_typ oldvi.vtype
-            Cil_printer.pp_typ vi.vtype ;
+            Cil_datatype.Typ.pretty oldvi.vtype
+            Cil_datatype.Typ.pretty vi.vtype ;
           Kernel.error ~once:true ~current:true
             "Declaration of %s does not match previous declaration from \
              %a (%s)."
@@ -3347,13 +3345,13 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
         try combineTypes CombineOther t2' t3'
         with Cannot_combine msg -> begin
             Kernel.warning ~current:true "A.QUESTION: %a does not match %a (%s)"
-              Cil_printer.pp_typ (unrollType t2) Cil_printer.pp_typ (unrollType t3) msg;
+              Cil_datatype.Typ.pretty (unrollType t2) Cil_datatype.Typ.pretty (unrollType t3) msg;
             t2 (* Just pick one *)
           end
       end
     | _, _ ->
       Kernel.fatal ~current:true "invalid implicit conversion from %a to %a"
-        Cil_printer.pp_typ t2 Cil_printer.pp_typ t3
+        Cil_datatype.Typ.pretty t2 Cil_datatype.Typ.pretty t3
   in
   tresult
 
@@ -3361,7 +3359,7 @@ let logicConditionalConversion t1 t2 =
   match unrollType t1, unrollType t2 with
   | TPtr _ , TInt _ | TInt _, TPtr _ ->
     Kernel.fatal ~current:true "invalid implicit conversion from %a to %a"
-      Cil_printer.pp_typ t2 Cil_printer.pp_typ t1
+      Cil_datatype.Typ.pretty t2 Cil_datatype.Typ.pretty t1
   | _ -> conditionalConversion t1 t2
 
 (* Some utilities for doing initializers *)
@@ -3468,18 +3466,18 @@ let rec collectInitializer
   let loc = CurrentLoc.get() in
   if this = NoInitPre then begin
     Kernel.debug ~dkey "zero-initializing object of type %a"
-      Cil_printer.pp_typ thistype;
+      Cil_datatype.Typ.pretty thistype;
     (makeZeroInit ~loc thistype), thistype, reads
   end else
     match unrollType thistype, this with
     | _ , SinglePre (e, r) ->
       Kernel.debug ~dkey "Initializing object of type %a to %a"
-        Cil_printer.pp_typ thistype Cil_printer.pp_exp e;
+        Cil_datatype.Typ.pretty thistype Cil_printer.pp_exp e;
       SingleInit e, thistype, Cil_datatype.Lval.Set.union r reads
     | TArray (bt, leno, at), CompoundPre (pMaxIdx, pArray) ->
       Kernel.debug ~dkey
         "Initialization of an array object of type %a with index max %d"
-        Cil_printer.pp_typ thistype !pMaxIdx;
+        Cil_datatype.Typ.pretty thistype !pMaxIdx;
       let len, initializer_len_used =
         (* normal case: use array's declared length, newtype=thistype *)
         match leno with
@@ -3553,7 +3551,7 @@ let rec collectInitializer
           *)
           Kernel.debug ~dkey
             "Detected initialization of a flexible array member \
-             (length %d, parenttype %a)" len Cil_printer.pp_typ parenttype;
+             (length %d, parenttype %a)" len Cil_datatype.Typ.pretty parenttype;
           Kernel.error ~once:true ~current:true
             "static initialization of flexible array members is an \
              unsupported GNU extension";
@@ -3576,7 +3574,7 @@ let rec collectInitializer
       CompoundPre (pMaxIdx, pArray) when comp.cstruct ->
       Kernel.debug ~dkey
         "Initialization of an object of type %a with at least %d components"
-        Cil_printer.pp_typ thistype !pMaxIdx;
+        Cil_datatype.Typ.pretty thistype !pMaxIdx;
       let rec collect (idx: int) reads = function
           [] -> [], reads
         | [ _ ] when Cil.has_flexible_array_member t && idx > !pMaxIdx ->
@@ -3604,7 +3602,7 @@ let rec collectInitializer
     | TComp (comp, _), CompoundPre (pMaxIdx, pArray) when not comp.cstruct ->
       Kernel.debug ~dkey
         "Initialization of an object of type %a with at least %d components"
-        Cil_printer.pp_typ thistype !pMaxIdx;
+        Cil_datatype.Typ.pretty thistype !pMaxIdx;
       (* Find the field to initialize *)
       let rec findField (idx: int) = function
         | [] -> abort_context "collectInitializer: union"
@@ -3987,7 +3985,7 @@ let integral_cast ty t =
   raise
     (Failure
        (Format.asprintf "term %a has type %a, but %a is expected"
-          Cil_printer.pp_term t Cil_printer.pp_logic_type Linteger Cil_printer.pp_typ ty))
+          Cil_printer.pp_term t Cil_printer.pp_logic_type Linteger Cil_datatype.Typ.pretty ty))
 
 (* Exception raised by the instance of Logic_typing local to this module.
    See document of [error] below. *)
@@ -5189,11 +5187,11 @@ and doType (ghost:bool) isFuncArg
       if Cil.isFunctionType bt then
         Kernel.error ~once:true ~current:true
           "declaration of array of function type '%a`"
-          Cil_printer.pp_typ bt
+          Cil_datatype.Typ.pretty bt
       else if not (Cil.isCompleteType ~allowZeroSizeArrays:true bt) then
         Kernel.error ~once:true ~current:true
           "declaration of array of incomplete type '%a`"
-          Cil_printer.pp_typ bt
+          Cil_datatype.Typ.pretty bt
       else if not allowZeroSizeArrays &&
               not (Cil.isCompleteType ~allowZeroSizeArrays:false bt)
       then
@@ -5203,12 +5201,12 @@ and doType (ghost:bool) isFuncArg
           Kernel.warning ~once:true ~current:true
             "declaration of array of 'zero-length arrays' ('%a`);@ \
              zero-length arrays are a compiler extension"
-            Cil_printer.pp_typ bt
+            Cil_datatype.Typ.pretty bt
         else
           Kernel.error ~once:true ~current:true
             "declaration of array of 'zero-length arrays' ('%a`);@ \
              zero-length arrays are not allowed in C99"
-            Cil_printer.pp_typ bt;
+            Cil_datatype.Typ.pretty bt;
       let lo =
         match len.expr_node with
         | Cabs.NOTHING -> None
@@ -5527,13 +5525,13 @@ and makeCompType ghost (isstruct: bool)
               Kernel.error ~source
                 "flexible array member '%s' (type %a) \
                  not allowed in otherwise empty struct"
-                n Cil_printer.pp_typ ftype
+                n Cil_datatype.Typ.pretty ftype
             else (* valid flexible array member *) ()
           end
         | _ ->
           Kernel.error ~source
             "field `%s' is declared with incomplete type %a"
-            n Cil_printer.pp_typ ftype
+            n Cil_datatype.Typ.pretty ftype
       end;
       let fbitfield, ftype =
         match widtho with
@@ -5558,11 +5556,11 @@ and makeCompType ghost (isstruct: bool)
                   if s > Cil.bitsSizeOf ftype then
                     Kernel.error ~source
                       "bitfield width (%d) exceeds its type (%a, %d bits)"
-                      s Cil_printer.pp_typ ftype (Cil.bitsSizeOf ftype)
+                      s Cil_datatype.Typ.pretty ftype (Cil.bitsSizeOf ftype)
                 with
                   SizeOfError _ ->
                   Kernel.fatal ~source
-                    "Unable to compute size of %a" Cil_printer.pp_typ ftype
+                    "Unable to compute size of %a" Cil_datatype.Typ.pretty ftype
               end;
               let ftype =
                 typeAddAttributes
@@ -5664,7 +5662,7 @@ and makeCompType ghost (isstruct: bool)
       Kernel.error ~source
         "field %s occurs multiple times in aggregate %a. \
          Previous occurrence is at line %d."
-        f.fname Cil_printer.pp_typ (TComp(comp,[]))
+        f.fname Cil_datatype.Typ.pretty (TComp(comp,[]))
         (fst oldf.floc).Filepath.pos_lnum
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
@@ -5906,7 +5904,7 @@ and doExp local_env
             let typ = Cil.typeOf item.eival in
             (*Kernel.debug "Looking for %s got enum %s : %a of type %a"
               n item.einame Cil_printer.pp_exp item.eival
-              Cil_printer.pp_typ typ; *)
+              Cil_datatype.Typ.pretty typ; *)
             if Cil.theMachine.Cil.lowerConstants then
               finishExp [] (unspecified_chunk empty) item.eival typ
             else
@@ -5948,7 +5946,7 @@ and doExp local_env
               "Expecting exactly one pointer type in array access %a[%a] (%a \
                and %a)"
               Cil_printer.pp_exp e1' Cil_printer.pp_exp e2'
-              Cil_printer.pp_typ t1 Cil_printer.pp_typ t2
+              Cil_datatype.Typ.pretty t1 Cil_datatype.Typ.pretty t2
         in
         (* We have to distinguish the construction based on the type of e1'' *)
         let res =
@@ -5981,7 +5979,7 @@ and doExp local_env
         | _ ->
           Kernel.fatal ~current:true
             "Expecting a pointer type in *. Got %a."
-            Cil_printer.pp_typ t
+            Cil_datatype.Typ.pretty t
       in
       let res = mkMem ~addr:e' ~off:NoOffset in
       let reads =
@@ -6044,7 +6042,7 @@ and doExp local_env
         | x ->
           Kernel.fatal ~current:true
             "expecting a struct with field %s. Found %a. t1 is %a"
-            str Cil_printer.pp_typ x Cil_printer.pp_typ t'
+            str Cil_datatype.Typ.pretty x Cil_datatype.Typ.pretty t'
       in
       let lv' = mkMem ~addr:e' ~off:field_offset in
       let field_type = typeOfLval lv' in
@@ -6353,7 +6351,7 @@ and doExp local_env
               doExp local_env CNoConst e (AExp None)
             in
             (* ignore (E.log "ADDROF on %a : %a\n" Cil_printer.pp_exp e'
-               Cil_printer.pp_typ t); *)
+               Cil_datatype.Typ.pretty t); *)
             match e'.enode with
             | Lval x | CastE(_, {enode = Lval x}) | StartOf x ->
               (* Recover type qualifiers that were dropped by dropQualifiers
@@ -6771,12 +6769,12 @@ and doExp local_env
             | x ->
               Kernel.fatal ~current:true
                 "Unexpected type of the called function %a: %a"
-                Cil_printer.pp_exp f' Cil_printer.pp_typ x
+                Cil_printer.pp_exp f' Cil_datatype.Typ.pretty x
           end
         | x ->
           Kernel.fatal ~current:true
             "Unexpected type of the called function %a: %a"
-            Cil_printer.pp_exp f' Cil_printer.pp_typ x
+            Cil_printer.pp_exp f' Cil_datatype.Typ.pretty x
       in
       let argTypesList = argsToList argTypes in
       let warn_no_proto f =
@@ -6881,8 +6879,8 @@ and doExp local_env
                    Kernel.warning ~wkey:Kernel.wkey_implicit_conv_void_ptr
                      ~current:true ~once:true
                      "implicit conversion from %a to %a"
-                     Cil_printer.pp_typ Cil.voidPtrType
-                     Cil_printer.pp_typ texpected;
+                     Cil_datatype.Typ.pretty Cil.voidPtrType
+                     Cil_datatype.Typ.pretty texpected;
                    true
                  end else
                    false
@@ -6892,7 +6890,7 @@ and doExp local_env
             Kernel.warning ~wkey:Kernel.wkey_incompatible_types_call
               ~current:true ~once:true
               "expected '%a' but got argument of type '%a': %a"
-              Cil_printer.pp_typ texpected Cil_printer.pp_typ att
+              Cil_datatype.Typ.pretty texpected Cil_datatype.Typ.pretty att
               Cil_printer.pp_exp a';
           (ss @@ (sa, ghost), a'' :: args')
 
@@ -7795,13 +7793,13 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
         tres
     | _ ->
       Kernel.fatal ~current:true "%a operator on non-integer type %a"
-        Cil_printer.pp_binop bop Cil_printer.pp_typ tres
+        Cil_printer.pp_binop bop Cil_datatype.Typ.pretty tres
   in
   (* Invariant: t1 and t2 are pointers types *)
   let pointerComparison e1 t1 e2 t2 =
     if false then Kernel.debug "%a %a %a %a"
-        Cil_printer.pp_exp e1 Cil_printer.pp_typ t1
-        Cil_printer.pp_exp e2 Cil_printer.pp_typ t2;
+        Cil_printer.pp_exp e1 Cil_datatype.Typ.pretty t1
+        Cil_printer.pp_exp e2 Cil_datatype.Typ.pretty t2;
     let t1p = Cil.(unrollType (typeOf_pointed t1)) in
     let t2p = Cil.(unrollType (typeOf_pointed t2)) in
     (* We are more lenient than the norm here (C99 6.5.8, 6.5.9), and cast
@@ -8118,7 +8116,7 @@ and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
 
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "@\nStarting a new initializer for %s : %a@\n"
-    vi.vname Cil_printer.pp_typ vi.vtype;
+    vi.vname Cil_datatype.Typ.pretty vi.vtype;
   let acc, preinit, restl =
     let so = makeSubobj vi vi.vtype NoOffset in
     let asconst = if vi.vglob then CConst else CNoConst in
@@ -8139,7 +8137,7 @@ and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   in
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "Finished the initializer for %s@\n  init=%a@\n  typ=%a@\n  acc=%a@\n"
-    vi.vname Cil_printer.pp_init init Cil_printer.pp_typ typ' d_chunk acc;
+    vi.vname Cil_printer.pp_init init Cil_datatype.Typ.pretty typ' d_chunk acc;
   empty @@ (acc, local_env.is_ghost), init, typ'', reads
 
 (* Consume some initializers. This is used by both global and local variables
@@ -8394,8 +8392,8 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     in
     let r = Cil_datatype.Lval.Set.of_list r in
     Kernel.debug ~dkey:Kernel.dkey_typing_init "oneinit'=%a, t'=%a, so.soTyp=%a"
-      Cil_printer.pp_exp oneinit' Cil_printer.pp_typ t'
-      Cil_printer.pp_typ so.soTyp;
+      Cil_printer.pp_exp oneinit' Cil_datatype.Typ.pretty t'
+      Cil_datatype.Typ.pretty so.soTyp;
     let init_expr =
       if theMachine.insertImplicitCasts then snd (castTo t' so.soTyp oneinit')
       else oneinit'
@@ -8518,7 +8516,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
       with Not_found ->
         abort_context
           "scalar value (of type %a) initialized by compound initializer"
-          Cil_printer.pp_typ t
+          Cil_datatype.Typ.pretty t
     end
   (* We have a designator *)
   | _, (what, ie) :: restil when what != Cabs.NEXT_INIT ->
@@ -8632,7 +8630,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     in
     expandRange (fun x -> x) what
   | t, (_what, _ie) :: _ ->
-    abort_context "doInit: cases for t=%a" Cil_printer.pp_typ t
+    abort_context "doInit: cases for t=%a" Cil_datatype.Typ.pretty t
 
 (* Create and add to the file (if not already added) a global. Return the
  * varinfo *)
@@ -9360,7 +9358,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
 
           (*
             ignore (E.log "makefunvar:%s@\n type=%a@\n vattr=%a@\n"
-            n Cil_printer.pp_typ thisFunctionVI.vtype
+            n Cil_datatype.Typ.pretty thisFunctionVI.vtype
             d_attrlist thisFunctionVI.vattr);
           *)
 
@@ -9424,7 +9422,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
                               f.vattr)) formals),
                          isvararg, funta) in
 
-        (*log "Funtype of %s: %a\n" n Cil_printer.pp_typ ftype;*)
+        (*log "Funtype of %s: %a\n" n Cil_datatype.Typ.pretty ftype;*)
 
         (* Now fix the names of the formals in the type of the function
          * as well *)
@@ -9776,7 +9774,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                       if not (Kernel.C11.get ()) then error_c11_redefinition ()
                     | _ -> (* because of the compatibility test, this should not happen *)
                       Kernel.fatal ~current:true "typeinfo.ttype (%a) should be TComp"
-                        Cil_printer.pp_typ typeinfo.ttype
+                        Cil_datatype.Typ.pretty typeinfo.ttype
                   end
                 | TEnum _ -> (* GCC/Clang: "conflicting types" *)
                   error_conflicting_types ()
@@ -10115,7 +10113,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     if not (isVoidType !currentReturnType) then
       Kernel.error ~current:true
         "Return statement without a value in function returning %a\n"
-        Cil_printer.pp_typ !currentReturnType;
+        Cil_datatype.Typ.pretty !currentReturnType;
     returnChunk ~ghost None loc'
 
   | Cabs.RETURN (e, loc) ->

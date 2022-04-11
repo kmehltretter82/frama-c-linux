@@ -29,7 +29,7 @@ int f(void)
 }
 
 char Size;
-Tx X = (int)sizeof(Size);
+Tx X = (Tx)sizeof(Size);
 int Y;
 int use_in_PX_init;
 int *PX;

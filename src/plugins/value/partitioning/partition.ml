@@ -20,7 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Bottom.Type
+open Lattice_bounds
+open Bottom.Operators
 
 (* --- Split monitors --- *)
 
@@ -411,7 +412,7 @@ struct
     let build i acc =
       let value = Abstract.Val.inject_int (Cil.typeOf exp) i in
       let state =
-        Abstract.Eval.assume ~valuation state exp value >>- fun valuation ->
+        let* valuation = Abstract.Eval.assume ~valuation state exp value in
         (* Check the reduction *)
         Abstract.Dom.update (Abstract.Eval.to_domain_valuation valuation) state
       in
@@ -471,8 +472,8 @@ struct
     in
     let source = fst (predicate.Cil_types.pred_loc) in
     let aux positive =
-      Abstract.Dom.reduce_by_predicate env state predicate positive
-      >>-: fun state' ->
+      let+ state' =
+        Abstract.Dom.reduce_by_predicate env state predicate positive in
       let x = Abstract.Dom.evaluate_predicate env state' predicate in
       if x == Unknown
       then
@@ -482,7 +483,7 @@ struct
       let value = if positive then Integer.one else Integer.zero in
       value, state'
     in
-    Bottom.all [ aux true; aux false ]
+    Bottom.list_values [ aux true; aux false ]
 
   (* --- Applying partitioning actions onto flows --------------------------- *)
 

@@ -85,10 +85,10 @@ let () = Analysis.register_computation_hook ~on:Computed
 let next_steps s =
   match s.skind with
   | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
-  | Instr (Set _ | Call _ | Local_init _ | Asm _ | Code_annot _)
+  | Instr (Set _ | Call _ | Local_init _) -> [ `After ]
+  | Instr (Asm _ | Code_annot _)
   | Switch _ | Loop _ | Block _ | UnspecifiedSequence _
   | TryCatch _ | TryFinally _ | TryExcept _
-    -> [ `After ]
   | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
 
 let probe_stmt s =
@@ -102,6 +102,7 @@ let probe_stmt s =
 let probe marker =
   let open Printer_tag in
   match marker with
+  | PLval (_, _, (Var vi, NoOffset)) when Cil.isFunctionType vi.vtype -> None
   | PLval(_,Kstmt s,l) -> Some (Plval (l,s))
   | PExp(_,Kstmt s,e) -> Some (Pexpr (e,s))
   | PStmt(_,s) | PStmtStart(_,s) -> probe_stmt s
@@ -336,7 +337,7 @@ end
 module Proxy(A : Analysis.S) : EvaProxy = struct
 
   open Eval
-  type dstate = A.Dom.state or_top_or_bottom
+  type dstate = A.Dom.state or_top_bottom
 
   let get_precise_loc =
     let default = fun _ -> Precise_locs.loc_top in
@@ -354,7 +355,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let dstate ~after stmt = function
     | None -> (A.get_stmt_state ~after stmt :> dstate)
     | Some cs ->
-      match A.get_stmt_state_by_callstack ~after stmt with
+      match A.get_stmt_state_by_callstack ~selection:[cs] ~after stmt with
       | (`Top | `Bottom) as res -> res
       | `Value cmap ->
         try `Value (CSmap.find cmap cs)
@@ -530,7 +531,10 @@ let () =
 
 let () =
   let getProbeInfo = Request.signature ~input:(module Jmarker) () in
-  let set_code = Request.result_opt getProbeInfo
+  let set_evaluable = Request.result getProbeInfo
+      ~name:"evaluable" ~descr:(Md.plain "Can the probe be evaluated?")
+      (module Jbool)
+  and set_code = Request.result_opt getProbeInfo
       ~name:"code" ~descr:(Md.plain "Probe source code")
       (module Jstring)
   and set_stmt = Request.result_opt getProbeInfo
@@ -547,6 +551,9 @@ let () =
       ~default:false (module Jbool)
   in
   let set_probe rq pp p s =
+    let computed = Analysis.is_computed () in
+    let reachable = Results.is_reachable s in
+    set_evaluable rq (computed && reachable);
     set_code rq (Some (Pretty_utils.to_string pp p)) ;
     set_stmt rq (Some s) ;
     set_rank rq (Ranking.stmt s) ;
@@ -563,7 +570,7 @@ let () =
       match probe marker with
       | Some (Plval (l, s)) -> set_probe rq Printer.pp_lval l s
       | Some (Pexpr (e, s)) -> set_probe rq Printer.pp_exp  e s
-      | None -> ()
+      | None -> set_evaluable rq false
     end
 
 (* -------------------------------------------------------------------------- *)

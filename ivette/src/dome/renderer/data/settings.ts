@@ -248,26 +248,29 @@ function useSettings<A>(
   D: Driver,
   K?: string,
 ): State<A> {
-  // Load value
-  const loader = () => (
+  // Local State
+  const [value, setValue] = React.useState<A>(() => (
     JSON.jCatch(S.decoder, S.defaultValue)(D.load(K))
-  );
-  // Local state
-  const [value, setValue] = React.useState<A>(loader);
-  // Emit update event
+  ));
+  // Foreign Settings Update
   React.useEffect(() => {
     const event = D.evt;
-    const callback = () => setValue(loader());
-    SysEmitter.on(event, callback);
-    return () => { SysEmitter.off(event, callback); };
+    const onUpdate = () => {
+      const fromSettings = JSON.jCatch(S.decoder, undefined)(D.load(K));
+      if (fromSettings !== undefined)
+        setValue(fromSettings);
+    };
+    SysEmitter.on(event, onUpdate);
+    return () => { SysEmitter.off(event, onUpdate); };
   });
-  // Updates
+  // Hooked Settings Update
   const updateValue = React.useCallback((newValue: A) => {
     if (!isEqual(value, newValue)) {
       setValue(newValue);
       if (K) D.save(K, S.encoder(newValue));
     }
   }, [S, D, K, value]);
+  // Hook
   return [value, updateValue];
 }
 

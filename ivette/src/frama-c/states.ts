@@ -188,7 +188,7 @@ export function useRequest<In, Out>(
     }
   });
 
-  const signals = options.onSignals ?? rq.signals;
+  const signals = rq.signals.concat(options.onSignals ?? []);
   React.useEffect(() => {
     signals.forEach((s) => Server.onSignal(s, trigger));
     return () => {
@@ -304,6 +304,7 @@ class SyncState<A> {
         `Fail to set value of SyncState '${this.handler.name}'.`,
         `${error}`,
       );
+      this.UPDATE.emit();
     }
   }
 
@@ -311,16 +312,18 @@ class SyncState<A> {
     try {
       this.upToDate = true;
       this.value = undefined;
+      this.UPDATE.emit();
       if (Server.isRunning()) {
         const v = await Server.send(this.handler.getter, null);
         this.value = v;
+        this.UPDATE.emit();
       }
-      this.UPDATE.emit();
     } catch (error) {
       D.error(
         `Fail to update SyncState '${this.handler.name}'.`,
         `${error}`,
       );
+      this.UPDATE.emit();
     }
   }
 }
@@ -411,8 +414,8 @@ class SyncArray<K, A> {
       /* eslint-enable no-await-in-loop */
     } catch (error) {
       D.error(
-        `Fail to retrieve the value of syncArray '${this.handler.name}.`,
-        `${error}`,
+        `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
+        error,
       );
     } finally {
       this.fetching = false;
@@ -764,10 +767,17 @@ const emptySelection = {
   },
 };
 
+export type Hovered = Location | undefined;
 export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
+export const GlobalHovered = new GlobalState<Hovered>(undefined);
 export const GlobalSelection = new GlobalState<Selection>(emptySelection);
 
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
+
+export function setHovered(h: Hovered) { GlobalHovered.setValue(h); }
+export function useHovered(): [Hovered, (h: Hovered) => void] {
+  return useGlobalState(GlobalHovered);
+}
 
 export function setSelection(location: Location, meta = false) {
   const s = GlobalSelection.getValue();
@@ -778,7 +788,10 @@ export function setSelection(location: Location, meta = false) {
 /** Current selection. */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [current, setCurrent] = useGlobalState(GlobalSelection);
-  return [current, (action) => setCurrent(reducer(current, action))];
+  const callback = React.useCallback((action) => {
+    setCurrent(reducer(current, action));
+  }, [ current, setCurrent ]);
+  return [current, callback];
 }
 
 /** Resets the selected locations. */

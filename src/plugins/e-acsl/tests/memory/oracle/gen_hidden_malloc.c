@@ -26,7 +26,7 @@ void __e_acsl_globals_init(void)
 int main(int argc, char const **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   __e_acsl_globals_init();
   char *cwd = realpath(__gen_e_acsl_literal_string,(char *)0);
   __retres = 0;

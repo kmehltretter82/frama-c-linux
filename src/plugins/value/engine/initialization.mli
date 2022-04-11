@@ -23,7 +23,7 @@
 (** Creation of the initial state of abstract domain. *)
 
 open Cil_types
-open Bottom.Type
+open Lattice_bounds
 
 module type S = sig
   type state

@@ -29,7 +29,7 @@ module PivotSourceState =
     (Datatype.List(Datatype.String))
     (struct
       let name = "PivotSourceState"
-      let dependencies = [ Ast.self; Db.Value.self; Property_status.self;
+      let dependencies = [ Ast.self; Eva.Analysis.self; Property_status.self;
                            Messages.self ]
     end)
 

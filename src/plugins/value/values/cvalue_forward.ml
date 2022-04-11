@@ -23,6 +23,7 @@
 open Cvalue
 open Cil_types
 open Abstract_value
+open Lattice_bounds
 
 (* --------------------------------------------------------------------------
                                Comparison

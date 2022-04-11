@@ -139,6 +139,7 @@ share/analysis-scripts/normalize_jcdb.py: CEA_LGPL
 share/analysis-scripts/parse-coverage.sh: .ignore
 share/analysis-scripts/print_callgraph.py: CEA_LGPL
 share/analysis-scripts/prologue.mk: CEA_LGPL
+share/analysis-scripts/pyproject.toml: .ignore
 share/analysis-scripts/README.md: .ignore
 share/analysis-scripts/results_display.py: CEA_LGPL
 share/analysis-scripts/script_for_creduce_fatal.sh: .ignore
@@ -479,8 +480,6 @@ src/kernel_services/abstract_interp/abstract_offset.ml: CEA_LGPL
 src/kernel_services/abstract_interp/abstract_offset.mli: CEA_LGPL
 src/kernel_services/abstract_interp/base.ml: CEA_LGPL
 src/kernel_services/abstract_interp/base.mli: CEA_LGPL
-src/kernel_services/abstract_interp/bottom.ml: CEA_LGPL
-src/kernel_services/abstract_interp/bottom.mli: CEA_LGPL
 src/kernel_services/abstract_interp/eva_lattice_type.mli: CEA_LGPL
 src/kernel_services/abstract_interp/fc_float.ml: CEA_LGPL
 src/kernel_services/abstract_interp/fc_float.mli: CEA_LGPL
@@ -503,6 +502,8 @@ src/kernel_services/abstract_interp/int_val.ml: CEA_LGPL
 src/kernel_services/abstract_interp/int_val.mli: CEA_LGPL
 src/kernel_services/abstract_interp/ival.ml: CEA_LGPL
 src/kernel_services/abstract_interp/ival.mli: CEA_LGPL
+src/kernel_services/abstract_interp/lattice_bounds.ml: CEA_LGPL
+src/kernel_services/abstract_interp/lattice_bounds.mli: CEA_LGPL
 src/kernel_services/abstract_interp/lattice_messages.ml: CEA_LGPL
 src/kernel_services/abstract_interp/lattice_messages.mli: CEA_LGPL
 src/kernel_services/abstract_interp/lattice_type.mli: CEA_LGPL

@@ -63,7 +63,7 @@ let translate_in_marks pdg_called in_new_marks
   let translate pdg rqs call =
     in_marks_to_caller pdg call (m2m (Some call) pdg) ~rqs in_new_marks
   in
-  let build rqs (caller, _) =
+  let build rqs caller =
     let pdg_caller = !Db.Pdg.get caller in
     let caller_rqs =
       try
@@ -77,8 +77,7 @@ let translate_in_marks pdg_called in_new_marks
     in
     (pdg_caller, caller_rqs)::rqs
   in
-  let res = List.fold_left build other_rqs (!Db.Value.callers kf_called) in
-  res
+  List.fold_left build other_rqs (Eva.Results.callers kf_called)
 
 let call_out_marks_to_called called_pdg m2m ?(rqs=[]) out_marks =
   let build rqs (out_key, m) =
@@ -98,7 +97,7 @@ let call_out_marks_to_called called_pdg m2m ?(rqs=[]) out_marks =
   List.fold_left build rqs out_marks
 
 let translate_out_mark _pdg m2m other_rqs (call, l) =
-  let add_list l_out_m called_kf rqs  =
+  let add_list l_out_m rqs called_kf  =
     let called_pdg = !Db.Pdg.get called_kf in
     let m2m = m2m (Some call) called_pdg in
     try
@@ -111,8 +110,8 @@ let translate_out_mark _pdg m2m other_rqs (call, l) =
        * *)
       rqs
   in
-  let all_called = Db.Value.call_to_kernel_function call in
-  Kernel_function.Hptset.fold (add_list l)  all_called other_rqs
+  let all_called = Eva.Results.callee call in
+  List.fold_left (add_list l) other_rqs all_called
 
 (** [add_new_marks_to_rqs pdg new_marks other_rqs] translates [new_marks]
  * that were computed during intraprocedural propagation into requests,

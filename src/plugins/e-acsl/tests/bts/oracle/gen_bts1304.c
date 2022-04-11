@@ -26,7 +26,7 @@ union msg {
 };
 void read_sensor_4(unsigned int *m)
 {
-  __e_acsl_store_block((void *)(& m),(size_t)8);
+  __e_acsl_store_block((void *)(& m),8UL);
   __e_acsl_initialize((void *)m,sizeof(unsigned int));
   *m = (unsigned int)0;
   __e_acsl_delete_block((void *)(& m));
@@ -38,8 +38,8 @@ int main(void)
   int __retres;
   unsigned char buf[sizeof(union msg)];
   int i;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(buf),(size_t)16);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(buf),16UL);
   i = 0;
   while ((unsigned long)i < sizeof(buf) / (unsigned long)4) {
     read_sensor_4((unsigned int *)(buf) + i);

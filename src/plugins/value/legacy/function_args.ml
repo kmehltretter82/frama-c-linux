@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Lattice_bounds
 
 exception Actual_is_bottom
 exception WrongFunctionType (* at a call through a pointer *)

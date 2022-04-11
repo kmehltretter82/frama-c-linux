@@ -28,9 +28,9 @@ void init4(int *arr, int start)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int a[4] = {1, 2, 3, 4};
-  __e_acsl_store_block((void *)(a),(size_t)16);
+  __e_acsl_store_block((void *)(a),16UL);
   __e_acsl_full_init((void *)(& a));
   int b[4] = {5, 6, 7, 8};
   {
@@ -55,7 +55,7 @@ int main(void)
   }
   /*@ assert !\valid(&a[4]); */ ;
   int *ap = a;
-  __e_acsl_store_block((void *)(& ap),(size_t)8);
+  __e_acsl_store_block((void *)(& ap),8UL);
   __e_acsl_full_init((void *)(& ap));
   int *bp = b;
   {
@@ -85,13 +85,13 @@ int main(void)
   }
   /*@ assert !\valid(&(*((int (*)[])ap))[4]); */ ;
   struct dat d = {.arr = {4, 5, 6, 7}};
-  __e_acsl_store_block((void *)(& d),(size_t)16);
+  __e_acsl_store_block((void *)(& d),16UL);
   __e_acsl_full_init((void *)(& d));
   struct dat dd = {.arr = {1, 2, 3, 9}};
-  __e_acsl_store_block((void *)(& dd),(size_t)16);
+  __e_acsl_store_block((void *)(& dd),16UL);
   __e_acsl_full_init((void *)(& dd));
   struct dat2 d2 = {.p = {& d, & dd}};
-  __e_acsl_store_block((void *)(& d2),(size_t)16);
+  __e_acsl_store_block((void *)(& d2),16UL);
   __e_acsl_full_init((void *)(& d2));
   {
     int __gen_e_acsl_valid_3;

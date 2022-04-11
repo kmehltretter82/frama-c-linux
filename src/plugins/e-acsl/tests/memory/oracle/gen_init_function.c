@@ -14,7 +14,7 @@ extern size_t __e_acsl_heap_allocation_size;
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
@@ -31,7 +31,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert __e_acsl_heap_allocation_size == 0; */ ;
-  char *a = malloc((unsigned long)7);
+  char *a = malloc((size_t)7);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};

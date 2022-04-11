@@ -258,8 +258,7 @@ include
       let is_accessible = Eva.Results.is_reachable
       let dependencies = [ Eva.Analysis.self ]
       let name = "value"
-      let eval_cond stmt _e =
-        Db.Value.condition_truth_value stmt
+      let eval_cond stmt _e = Eva.Results.condition_truth_value stmt
     end)
     (Db.PostdominatorsValue)
 

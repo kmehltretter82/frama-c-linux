@@ -92,7 +92,7 @@ int f4(int c)
   int __retres;
   if (c) {
     struct my_exn2 exn;
-    exn.c = 0;
+    exn.c = (char)0;
     throw (exn);
   }
   else {

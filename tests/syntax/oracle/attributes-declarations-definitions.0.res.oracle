@@ -29,7 +29,7 @@ aint g(int __attribute__((__a2__)) i3);
 aint g(int __attribute__((__a2__)) i3)
 {
   aint __retres;
-  __retres = (int __attribute__((__a1__)))i3;
+  __retres = (aint)i3;
   return __retres;
 }
 
@@ -38,7 +38,7 @@ iptr h(iptr volatile ip2);
 iptr h(iptr volatile ip2)
 {
   iptr __retres;
-  __retres = (int __attribute__((__p1__)) *)0;
+  __retres = (iptr)0;
   return __retres;
 }
 

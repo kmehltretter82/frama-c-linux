@@ -38,16 +38,16 @@
 [eva] conv.i:69: Frama_C_show_each: [4.94065645841e-322 .. 9.22442153475e+159]
 [eva] conv.i:73: Frama_C_show_each: {1.79769313486e+308}
 [eva] conv.i:74: assertion got status valid.
-[eva] conv.i:77: Frama_C_show_each: Bottom
-[eva] conv.i:80: Frama_C_show_each: Bottom
+[eva] conv.i:77: Frama_C_show_each: ⊥
+[eva] conv.i:80: Frama_C_show_each: ⊥
 [eva] conv.i:84: Frama_C_show_each: {-1.79769313486e+308}
 [eva] conv.i:85: assertion got status valid.
-[eva] conv.i:88: Frama_C_show_each: Bottom
+[eva] conv.i:88: Frama_C_show_each: ⊥
 [eva] conv.i:91: Frama_C_show_each: [0. .. 4.94065645841e-324]
 [eva:alarm] conv.i:94: Warning: assertion got status unknown.
-[eva] conv.i:95: Frama_C_show_each: Bottom
+[eva] conv.i:95: Frama_C_show_each: ⊥
 [eva] conv.i:98: Frama_C_show_each: {0}
-[eva] conv.i:101: Frama_C_show_each: Bottom
+[eva] conv.i:101: Frama_C_show_each: ⊥
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main

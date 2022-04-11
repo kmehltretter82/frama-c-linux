@@ -27,7 +27,7 @@ int main(void)
 {
   int __retres;
   int t[2];
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   int x = 0;
   int i = 1;

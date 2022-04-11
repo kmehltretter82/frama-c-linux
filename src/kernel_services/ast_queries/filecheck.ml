@@ -24,10 +24,18 @@ open Cil_types
 open Cil_datatype
 
 
+let same_integral_types t1 t2 =
+  match Cil.unrollType t1, Cil.unrollType t2 with
+  | TInt(ik1,[]), TInt(ik2,[]) ->
+    Cil.bitsSizeOfInt ik1 = Cil.bitsSizeOfInt ik2 &&
+    Cil.isSigned ik1 = Cil.isSigned ik2
+  | _ -> false
+
 let is_admissible_conversion e ot nt =
   let ot' = Cil.typeDeepDropAllAttributes ot in
   let nt' = Cil.typeDeepDropAllAttributes nt in
   not (Cil.need_cast ot' nt') ||
+  same_integral_types ot' nt' ||
   (match e.enode, Cil.unrollType nt with
    | Const(CEnum { eihost = ei }), TEnum(ei',_) -> ei.ename = ei'.ename
    | _ -> false)
@@ -1310,6 +1318,15 @@ module Base_checker = struct
         | Local_init (v, ConsInit(f,args,k),loc) ->
           self#check_initialized_var v;
           Cil.treat_constructor_as_func treat_call v f args k loc
+        | Set(lv, rv, _) ->
+          let t1 = Cil.typeOfLval lv in
+          let t2 = Cil.typeOf rv in
+          if not (is_admissible_conversion rv t2 t1) then
+            check_abort
+              "Incompatible types in assignment %a:\
+               location has type %a, value has type %a"
+              Printer.pp_instr i Printer.pp_typ t1 Printer.pp_typ t2;
+          Cil.DoChildren
         | Asm(_,_,Some { asm_gotos },_) ->
           List.iter self#check_label asm_gotos; Cil.DoChildren
         | _ -> Cil.DoChildren

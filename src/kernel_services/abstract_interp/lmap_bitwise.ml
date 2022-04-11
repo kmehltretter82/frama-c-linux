@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Locations
+open Lattice_bounds
 
 exception Bitwise_cannot_copy
 

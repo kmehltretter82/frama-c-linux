@@ -22,6 +22,7 @@
 
 open Cil_types
 open Gui_types
+open Lattice_bounds
 
 let results_kf_computed kf =
   Eva.Analysis.is_computed () &&
@@ -107,7 +108,7 @@ module type S = sig
   val lval_as_offsm_ev: (Analysis.Dom.t, lval, gui_offsetmap_res) evaluation_functions
   val lval_zone_ev: (Analysis.Dom.t, lval, Locations.Zone.t) evaluation_functions
   val null_ev: (Analysis.Dom.t, unit, gui_offsetmap_res) evaluation_functions
-  val exp_ev: (Analysis.Dom.t, exp, Analysis.Val.t Bottom.or_bottom) evaluation_functions
+  val exp_ev: (Analysis.Dom.t, exp, Analysis.Val.t or_bottom) evaluation_functions
   val lval_ev: (Analysis.Dom.t, lval, Analysis.Val.t Eval.flagged_value) evaluation_functions
 
   val tlval_ev:
@@ -116,20 +117,20 @@ module type S = sig
     gui_loc -> (Eval_terms.eval_env, term, Locations.Zone.t) evaluation_functions
   val term_ev:
     gui_loc ->
-    (Eval_terms.eval_env, term, Analysis.Val.t Bottom.or_bottom) evaluation_functions
+    (Eval_terms.eval_env, term, Analysis.Val.t or_bottom) evaluation_functions
 
   val predicate_ev:
     gui_loc ->
     (Eval_terms.eval_env,
      predicate,
-     Eval_terms.predicate_status Bottom.or_bottom
+     Eval_terms.predicate_status or_bottom
     ) evaluation_functions
 
   val predicate_with_red:
     gui_loc ->
     (Eval_terms.eval_env * (kinstr * Value_types.callstack),
      Red_statuses.alarm_or_property * predicate,
-     Eval_terms.predicate_status Bottom.or_bottom
+     Eval_terms.predicate_status or_bottom
     ) evaluation_functions
 
 
@@ -357,8 +358,8 @@ module Make (X: Analysis.S) = struct
   (* Maps from callstacks to Value states before and after a GUI location.
      The 'after' map is not always available. *)
   type states_by_callstack = {
-    states_before: X.Dom.t Value_types.Callstack.Hashtbl.t Eval.or_top_or_bottom;
-    states_after: X.Dom.t Value_types.Callstack.Hashtbl.t Eval.or_top_or_bottom;
+    states_before: X.Dom.t Value_types.Callstack.Hashtbl.t or_top_bottom;
+    states_after: X.Dom.t Value_types.Callstack.Hashtbl.t or_top_bottom;
   }
 
   let top_states_by_callstacks = { states_before = `Top; states_after = `Top }

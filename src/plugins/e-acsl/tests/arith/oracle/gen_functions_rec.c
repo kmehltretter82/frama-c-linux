@@ -68,7 +68,7 @@ void __gen_e_acsl_f5_3(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * n);
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     __e_acsl_mpz_t __gen_e_acsl_f1_8;
     __e_acsl_mpz_t __gen_e_acsl__7;

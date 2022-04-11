@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -22,8 +22,8 @@
 #                                                                        #
 ##########################################################################
 
-# This script finds files containing likely declarations and definitions
-# for a given function name, via heuristic syntactic matching.
+"""This script finds files containing likely declarations and definitions
+for a given function name, via heuristic syntactic matching."""
 
 import sys
 import build_callgraph

@@ -81,7 +81,7 @@ module V : sig
   val of_char : char -> t
   val of_int64: int64 -> t
 
-  val backward_mult_int_left: right:t -> result:t -> t option Bottom.or_bottom
+  val backward_mult_int_left: right:t -> result:t -> t option Lattice_bounds.or_bottom
 
   val backward_comp_int_left: Comp.t -> t -> t -> t
   val backward_comp_float_left_true: Comp.t -> Fval.kind -> t -> t -> t
@@ -241,15 +241,15 @@ module V_Offsetmap: sig
     with type v = V_Or_Uninitialized.t
      and type widen_hint = V_Or_Uninitialized.numerical_widen_hint
 
-  val narrow: t -> t -> t Bottom.Type.or_bottom
-  val narrow_reinterpret: t -> t -> t Bottom.Type.or_bottom
+  val narrow: t -> t -> t Lattice_bounds.or_bottom
+  val narrow_reinterpret: t -> t -> t Lattice_bounds.or_bottom
   (** See the corresponding functions in {!Offsetmap_sig}. *)
 end
 
 
 (** Values bound by default to a variable. *)
 module Default_offsetmap: sig
-  val default_offsetmap : Base.t -> V_Offsetmap.t Bottom.or_bottom
+  val default_offsetmap : Base.t -> V_Offsetmap.t Lattice_bounds.or_bottom
 end
 
 (** Memories. They are maps from bases to memory slices *)

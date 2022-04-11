@@ -111,6 +111,8 @@ let rec encode = function
   | `Killed id :: w -> "KILLED" :: id :: encode w
   | `Rejected id :: w -> "REJECTED" :: id :: encode w
   | `Signal sg :: w -> "SIGNAL" :: sg :: encode w
+  | `CmdLineOn :: w -> "CMDLINEON" :: encode w
+  | `CmdLineOff :: w -> "CMDLINEOFF" :: encode w
   | [] -> []
 
 (* -------------------------------------------------------------------------- *)

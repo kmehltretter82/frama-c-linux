@@ -25,11 +25,11 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   {
     char buf[4];
-    __e_acsl_store_block((void *)(buf),(size_t)4);
+    __e_acsl_store_block((void *)(buf),4UL);
     {
       int __gen_e_acsl_size;
       int __gen_e_acsl_if;
@@ -132,7 +132,7 @@ int main(void)
   }
   {
     char buf_0[4];
-    __e_acsl_store_block((void *)(buf_0),(size_t)4);
+    __e_acsl_store_block((void *)(buf_0),4UL);
     {
       int __gen_e_acsl_size_3;
       int __gen_e_acsl_if_3;
@@ -171,7 +171,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     /*@ assert !\initialized(&buf_0[0 .. 3]); */ ;
-    __e_acsl_builtin_snprintf("d",buf_0,(unsigned long)2,
+    __e_acsl_builtin_snprintf("d",buf_0,(size_t)2,
                               __gen_e_acsl_literal_string,10);
     {
       int __gen_e_acsl_size_4;
@@ -263,7 +263,7 @@ int main(void)
   }
   {
     char buf_1[4];
-    __e_acsl_store_block((void *)(buf_1),(size_t)4);
+    __e_acsl_store_block((void *)(buf_1),4UL);
     {
       int __gen_e_acsl_size_5;
       int __gen_e_acsl_if_5;
@@ -302,7 +302,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
     /*@ assert !\initialized(&buf_1[0 .. 3]); */ ;
-    __e_acsl_builtin_snprintf("d",buf_1,(unsigned long)4,
+    __e_acsl_builtin_snprintf("d",buf_1,(size_t)4,
                               __gen_e_acsl_literal_string,10);
     {
       int __gen_e_acsl_size_6;

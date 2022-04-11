@@ -53,6 +53,9 @@ extern char end;
 /*!\brief The first address of a program. */
 extern char __executable_start;
 
+uintptr_t actual_tls_size = 0;
+uintptr_t registered_tls_start = 0;
+
 size_t increase_stack_limit(const size_t size) {
   rlim_t stacksz = (rlim_t)size;
   struct rlimit rl;
@@ -166,7 +169,7 @@ static size_t get_global_size() {
 
 /*! \brief Return byte-size of the TLS segment */
 inline size_t get_tls_size() {
-  return PGM_TLS_SIZE;
+  return (actual_tls_size == 0 ? PGM_TLS_SIZE : actual_tls_size);
 }
 
 static __thread int id_tdata = 1;
@@ -220,13 +223,40 @@ static void grow_bounds_for_size(uintptr_t *min_bound, uintptr_t *max_bound,
   }
 }
 
-/*! \brief Return start address of a program's TLS */
-uintptr_t get_tls_start() {
-  size_t tls_size = get_tls_size();
+// We do not exactly know the bounds of the TLS, we can only guess an
+// approximation. To do that, we take TLS's known addresses and add a buffer
+// around them. Since the TLS in Linux is positionned around the heap, we can
+// check if the approximation overlaps with heap space and adjust it
+// accordingly. The heap spaces allocated for E-ACSL are of course application
+// heap and rtl spaces, but also shadow memory spaces. We also add as a condition
+// that the [safe_locations] should be in the TLS, by construction. It might
+// happen that those addresses are separated by a more than half the size of
+// our initial guess. If this is the case, we have to increase the size of
+// our guess in order to fit both the TLS that we see and its shadow model.
+static void init_tls_size() {
   uintptr_t data = (uintptr_t)&id_tdata, bss = (uintptr_t)&id_tbss;
+  uintptr_t min_safe_loc = safe_locations_boundaries.start;
+  uintptr_t max_safe_loc = safe_locations_boundaries.end;
   uintptr_t min_addr = data < bss ? data : bss;
   uintptr_t max_addr = data > bss ? data : bss;
+  min_addr = min_addr < min_safe_loc ? min_addr : min_safe_loc;
+  max_addr = max_addr > max_safe_loc ? max_addr : max_safe_loc;
+  uintptr_t size = (max_addr - min_addr + 1) * 2;
+  actual_tls_size = size > PGM_TLS_SIZE ? size : PGM_TLS_SIZE;
+}
 
+/*! \brief Return start address of a program's TLS */
+uintptr_t get_tls_start(int main_thread) {
+  size_t tls_size = get_tls_size();
+  uintptr_t data = (uintptr_t)&id_tdata, bss = (uintptr_t)&id_tbss;
+  uintptr_t min_safe_loc = safe_locations_boundaries.start;
+  uintptr_t max_safe_loc = safe_locations_boundaries.end;
+  uintptr_t min_addr = data < bss ? data : bss;
+  uintptr_t max_addr = data > bss ? data : bss;
+  if (main_thread) {
+    min_addr = min_addr < min_safe_loc ? min_addr : min_safe_loc;
+    max_addr = max_addr > max_safe_loc ? max_addr : max_safe_loc;
+  }
   // We do not exactly know the bounds of the TLS, we can only guess an
   // approximation. To do that, we take TLS's known addresses and add a buffer
   // around them. Since the TLS in Linux is positionned around the heap, we can
@@ -287,15 +317,19 @@ uintptr_t get_tls_start() {
     private_abort("Unsupported TLS area in the middle of heap area.\n"
                   "Example bss TLS address: %a\n"
                   "Example data TLS address: %a\n"
-                  "Estimated bounds of heap area: [%a, %a]\n",
-                  bss, data, min_bound, max_bound);
+                  "Range of safe locations data: [%a, %a]\n"
+                  "Estimated bounds of heap area: [%a, %a]\n"
+                  "Minimal TLS address: %a\n",
+                  bss, data, min_safe_loc, max_safe_loc, min_bound, max_bound,
+                  min_addr);
   }
-
   private_assert(tls_start <= min_addr && max_addr <= tls_end,
                  "Configured TLS size smaller than actual TLS size\n"
                  "Configured TLS size: %" PRIxPTR " MB\n"
                  "Minimum supported TLS size for this execution: %" PRIxPTR
-                 " MB (%" PRIxPTR " B)\n",
+                 " MB (%" PRIxPTR " B)\n"
+                 "Please ensure that the TLS size has been initialize with "
+                 "[init_tls_size()]",
                  MB_SZ(tls_size),
                  // The minimum actual size is found by substracting the lesser
                  // known TLS address to the greater one. Since we estimate the
@@ -328,7 +362,10 @@ static void init_shadow_layout_global() {
 
 static void init_shadow_layout_tls() {
   memory_partition *ptls = &mem_layout.tls;
-  set_application_segment(&ptls->application, get_tls_start(), get_tls_size(),
+  /* Collect the safe locations of the main thread */
+  collect_safe_locations();
+  init_tls_size();
+  set_application_segment(&ptls->application, get_tls_start(1), get_tls_size(),
                           "tls", NULL);
   /* Changes of the ratio in the following would require changes in get_tls_start */
   set_shadow_segment(&ptls->primary, &ptls->application, 1, "tls_primary");
@@ -709,7 +746,6 @@ void init_shadow_layout_main(int *argc_ref, char ***argv_ref) {
 }
 
 void register_safe_locations(int thread_only) {
-  collect_safe_locations();
   int count = get_safe_locations_count();
   for (int i = 0; i < count; ++i) {
     memory_location *loc = get_safe_location(i);

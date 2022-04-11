@@ -5,7 +5,7 @@ typedef unsigned short DWORD;
 DWORD f(void)
 {
   DWORD __retres;
-  __retres = (unsigned short)0;
+  __retres = (DWORD)0;
   return __retres;
 }
 

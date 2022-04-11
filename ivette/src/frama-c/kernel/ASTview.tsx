@@ -30,7 +30,7 @@ import React from 'react';
 import _ from 'lodash';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import * as Utils from 'frama-c/utils';
+import * as RichText from 'frama-c/richtext';
 
 import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
@@ -66,7 +66,7 @@ async function loadAST(
         if (!data) {
           buffer.log('// No code for function', theFunction);
         }
-        Utils.printTextWithTags(buffer, data);
+        RichText.printTextWithTags(buffer, data);
         if (theMarker)
           buffer.scroll(theMarker);
       } catch (err) {
@@ -161,9 +161,11 @@ export default function ASTview() {
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
+  const [hoveredLoc] = States.useHovered();
   const multipleSelections = selection?.multiple.allSelections;
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
+  const hovered = hoveredLoc?.marker;
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
 
   const markersInfo = States.useSyncArray(Ast.markerInfo);
@@ -220,15 +222,23 @@ export default function ASTview() {
         return 'dead-code';
       if (deadCode?.nonTerminating?.some((m) => m === marker))
         return 'non-terminating';
+      if (marker === hovered)
+        return 'hovered-marker';
       return undefined;
     };
     buffer.setDecorator(decorator);
-  }, [buffer, multipleSelections, deadCode]);
+  }, [buffer, multipleSelections, hovered, deadCode]);
 
   // Hook: marker scrolling
   React.useEffect(() => {
     if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
+
+  function onHover(markerId?: string) {
+    const marker = Ast.jMarker(markerId);
+    const fct = selection?.current?.fct;
+    States.setHovered(marker ? { fct, marker } : undefined);
+  }
 
   function onSelection(markerId: string, meta = false) {
     const fct = selection?.current?.fct;
@@ -303,6 +313,7 @@ export default function ASTview() {
         mode="text/x-csrc"
         fontSize={fontSize}
         selection={theMarker}
+        onHover={onHover}
         onSelection={onSelection}
         onContextMenu={onContextMenu}
         gutters={['bullet']}

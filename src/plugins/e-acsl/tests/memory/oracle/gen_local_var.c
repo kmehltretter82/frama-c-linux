@@ -16,8 +16,8 @@ struct list {
 struct list *add(struct list *l, int i)
 {
   struct list *new;
-  __e_acsl_store_block((void *)(& new),(size_t)8);
-  __e_acsl_store_block((void *)(& l),(size_t)8);
+  __e_acsl_store_block((void *)(& new),8UL);
+  __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& new));
   new = (struct list *)malloc(sizeof(struct list));
   {
@@ -70,9 +70,9 @@ struct list *add(struct list *l, int i)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   struct list *l = (struct list *)0;
-  __e_acsl_store_block((void *)(& l),(size_t)8);
+  __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   __e_acsl_full_init((void *)(& l));
   l = add(l,4);

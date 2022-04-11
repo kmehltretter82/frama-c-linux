@@ -21,7 +21,8 @@
 (**************************************************************************)
 
 module Comp = Abstract_interp.Comp
-open Bottom.Type
+open Lattice_bounds
+open Bottom.Operators
 
 type round = Float_sig.round = Up | Down | Near | Zero
 type prec = Float_sig.prec = Single | Double | Long_Double | Real

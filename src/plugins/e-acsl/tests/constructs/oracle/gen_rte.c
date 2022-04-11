@@ -33,7 +33,7 @@ void test(int a, int b, int c, int d, int e, int f, int g, int h, int i,
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __gen_e_acsl_test(2,3,4,5,6,7,8,9,10,11,12,13);
   __retres = 0;
   __e_acsl_memory_clean();
@@ -63,7 +63,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_at = b;
     __gen_e_acsl_at_2 = e;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)1);
+    __gen_e_acsl_contract = __e_acsl_contract_init(1UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -98,10 +98,10 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     __gen_e_acsl_assert_data_3.name = "division_by_zero";
     __e_acsl_assert(c != 0,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            1 % c == 1);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_or;
       int __gen_e_acsl_and;
@@ -355,7 +355,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     __e_acsl_assert(1 % __gen_e_acsl_at == 1,& __gen_e_acsl_assert_data_18);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value_2) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
         {.values = (void *)0};

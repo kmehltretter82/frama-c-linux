@@ -11,19 +11,19 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int i = 0;
   int arr[4] = {1, 2, 3, 4};
-  __e_acsl_store_block((void *)(arr),(size_t)16);
+  __e_acsl_store_block((void *)(arr),16UL);
   __e_acsl_full_init((void *)(& arr));
   int arr2[4] = {1, 2, 3, 4};
-  if (! ((unsigned long)(& arr) + sizeof(arr) == (unsigned long)(& arr2))) {
+  if (! ((uintptr_t)(& arr) + sizeof(arr) == (uintptr_t)(& arr2))) {
     __retres = 0;
     goto return_label;
   }
   int *q = arr;
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)(arr));
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   while (i < 4) {
     {
@@ -109,7 +109,7 @@ int main(void)
   /*@ assert !\valid(q); */ ;
   __retres = 0;
   return_label:
-  __e_acsl_store_block_duplicate((void *)(& q),(size_t)8);
+  __e_acsl_store_block_duplicate((void *)(& q),8UL);
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(arr));
   __e_acsl_memory_clean();

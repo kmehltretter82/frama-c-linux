@@ -37,9 +37,9 @@ int sorted(int *t, int n)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int t[7] = {1, 4, 4, 5, 5, 5, 7};
-  __e_acsl_store_block((void *)(t),(size_t)28);
+  __e_acsl_store_block((void *)(t),28UL);
   __e_acsl_full_init((void *)(& t));
   int n = __gen_e_acsl_sorted(t,7);
   {
@@ -72,8 +72,8 @@ int __gen_e_acsl_sorted(int *t, int n)
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_i;
-    __e_acsl_store_block((void *)(& t),(size_t)8);
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)1);
+    __e_acsl_store_block((void *)(& t),8UL);
+    __gen_e_acsl_contract = __e_acsl_contract_init(1UL);
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_i = 0 + 1;
     while (1) {
@@ -133,14 +133,14 @@ int __gen_e_acsl_sorted(int *t, int n)
       __gen_e_acsl_i ++;
     }
     e_acsl_end_loop1: ;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            __gen_e_acsl_forall);
   }
   __retres = sorted(t,n);
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};

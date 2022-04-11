@@ -26,23 +26,23 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   char *c = (char *)__gen_e_acsl_literal_string;
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  char *p = malloc((unsigned long)256);
+  char *p = malloc((size_t)256);
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   char *q = (char *)0;
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)0);
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   __e_acsl_full_init((void *)(& q));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  q = (char *)malloc((unsigned long)256);
+  q = (char *)malloc((size_t)256);
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)*(& q));
   {
     int __gen_e_acsl_initialized;
@@ -113,7 +113,7 @@ int main(void)
   __e_acsl_temporal_save_nreferent_parameter((void *)(& q),1U);
   char *path = realpath((char const *)c,q);
   __e_acsl_temporal_store_nblock((void *)(& path),(void *)*(& path));
-  __e_acsl_store_block((void *)(& path),(size_t)8);
+  __e_acsl_store_block((void *)(& path),8UL);
   __e_acsl_full_init((void *)(& path));
   __e_acsl_full_init((void *)(& path));
   __e_acsl_temporal_reset_parameters();

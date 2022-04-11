@@ -11,15 +11,15 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int x = 1;
-  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_store_block((void *)(& x),4UL);
   __e_acsl_full_init((void *)(& x));
   int t[3] = {2, 3, 4};
-  __e_acsl_store_block((void *)(t),(size_t)12);
+  __e_acsl_store_block((void *)(t),12UL);
   __e_acsl_full_init((void *)(& t));
   int *p = & x;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
     int __gen_e_acsl_initialized;

@@ -82,7 +82,7 @@
 [eva] socket_h.c:31: 
   function recvfrom: precondition 'valid_buffer_length' got status valid.
 [eva] socket_h.c:31: 
-  function recvfrom: precondition 'valid_addrbuf_or_null' got status valid.
+  function recvfrom: precondition 'valid_addrbuf_or_null,initialization' got status valid.
 [eva] Done for function recvfrom
 [eva] socket_h.c:35: assertion got status valid.
 [eva] computing for function recvfrom <- main.
@@ -92,7 +92,7 @@
 [eva] socket_h.c:37: 
   function recvfrom: precondition 'valid_buffer_length' got status valid.
 [eva] socket_h.c:37: 
-  function recvfrom: precondition 'valid_addrbuf_or_null' got status valid.
+  function recvfrom: precondition 'valid_addrbuf_or_null,initialization' got status valid.
 [eva:invalid-assigns] socket_h.c:37: 
   Completely invalid destination for assigns clause *addrbuf_len. Ignoring.
 [eva:invalid-assigns] socket_h.c:37: 

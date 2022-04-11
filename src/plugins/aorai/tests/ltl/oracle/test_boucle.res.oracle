@@ -345,9 +345,7 @@ int main(void)
       loop invariant Aorai: 0 ≡ T0_init;
       loop invariant Aorai: 1 ≡ accept_S1 ∨ 0 ≡ accept_S1;
       loop invariant Aorai: 1 ≡ T0_S2 ∨ 1 ≡ accept_S1;
-      loop invariant
-        Aorai:
-          aorai_Loop_Init_7 ≢ 0 ⇒ \at(1 ≡ T0_init,Pre) ⇒ 0 ≡ T0_S2;
+      loop invariant Aorai: aorai_Loop_Init_7 ≢ 0 ⇒ 0 ≡ T0_S2;
       loop invariant Aorai: aorai_Loop_Init_7 ≡ 0 ⇒ 0 ≡ accept_S1;
   */
   while (x < 10) {
