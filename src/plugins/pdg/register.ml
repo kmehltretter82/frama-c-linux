@@ -123,7 +123,7 @@ let () = Pdg_parameters.BuildAll.set_output_dependencies deps
 
 let compute_for_kf kf =
   let all = Pdg_parameters.BuildAll.get () in
-  (all && !Db.Value.is_called kf) ||
+  (all && Eva.Results.is_called kf) ||
   Kernel_function.Set.mem kf (Pdg_parameters.BuildFct.get ())
 
 let compute () =

@@ -364,7 +364,6 @@
 [eva] Done for function copy_0
 [eva] Recording results for main_all
 [from] Computing for function main_all
-[from] Non-terminating function main_all (no dependencies)
 [from] Done for function main_all
 [eva] done for function main_all
 [scope:rm_asserts] removing 1 assertion(s)

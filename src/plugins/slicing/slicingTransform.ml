@@ -449,7 +449,7 @@ module Visibility (SliceName : sig
     info
 
   let cond_edge_visible _ff_opt s =
-    Db.Value.condition_truth_value s
+    Eva.Results.condition_truth_value s
 
 end
 
