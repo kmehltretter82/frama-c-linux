@@ -123,7 +123,7 @@ type results =
 (* Analysis status of a function. *)
 type status =
   | Unreachable
-  (** The function has not been reached by the analysis. Any request in thi
+  (** The function has not been reached by the analysis. Any request in this
       function will lead to a Bottom result. *)
   | SpecUsed
   (** The function specification has been used to interpret its calls:
