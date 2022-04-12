@@ -14,5 +14,6 @@ yarn-error.log
 /doc/html
 /src/renderer/loader.ts
 /src/dome/doc/guides/icons.md
+/Makefile.plugins
 
 # --------------------------------------------------------------------------
