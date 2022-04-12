@@ -1,4 +1,0 @@
-14d13
-< [eva:malloc:weak] alloc_weak.c:23: marking variable `__malloc_main1_l23' as weak
-62d60
-< [eva:malloc:weak] alloc_weak.c:51: marking variable `__malloc_main3_l51' as weak

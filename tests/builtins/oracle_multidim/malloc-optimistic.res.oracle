@@ -1,10 +1,9 @@
-14,15d13
-< [eva:malloc] malloc-optimistic.c:17: 
-<   resizing variable `__malloc_main1_l17' (0..31) to fit 0..63
-19a18,19
-> [kernel] malloc-optimistic.c:19: Warning: 
->   all target addresses were invalid. This path is assumed to be dead.
-22,3402d21
+16,19d15
+< [eva] malloc-optimistic.c:18: Frama_C_show_each_1_2: {0}
+< [eva] malloc-optimistic.c:18: Frama_C_show_each_1_2: {1}
+< [eva:alarm] malloc-optimistic.c:19: Warning: 
+<   out of bounds write. assert \valid(p + i);
+22,3402d17
 < [eva] malloc-optimistic.c:136: Call to builtin free
 < [eva:malloc] malloc-optimistic.c:136: strong free on bases: {__malloc_main1_l17}
 < [eva] computing for function main2 <- main.
@@ -3386,13 +3385,10 @@
 <   Frama_C_show_each: [30..99], {{ &__malloc_w_main9_l119 }}
 < [eva] Recording results for main9
 < [eva] Done for function main9
-3404a24,25
-> [eva] malloc-optimistic.c:19: 
->   assertion 'Eva,mem_access' got final status invalid.
-3406,3407d26
+3406,3407d20
 < [eva:final-states] Values at end of function main9_aux:
 <   __malloc_w_main9_l119 ∈ [-20..99] or UNINITIALIZED
-3409,3492c28
+3409,3492c22
 <   i ∈ {0; 1}
 <   p ∈ {{ &__malloc_main1_l17[0] }}
 <   __retres ∈ {{ (void *)&__malloc_main1_l17 }}
@@ -3479,7 +3475,7 @@
 <                          [2] ∈ {2}
 ---
 >   NON TERMINATING FUNCTION
-3494,3525c30
+3494,3525c24
 <   p ∈ ESCAPINGADDR
 <   __malloc_w_main6_l77[0] ∈ UNINITIALIZED
 <                       [1] ∈ {0; 1} or UNINITIALIZED
@@ -3514,9 +3510,9 @@
 < [from] Done for function main9_aux
 ---
 >   NON TERMINATING FUNCTION
-3528a34
+3528a28
 > [from] Non-terminating function main1 (no dependencies)
-3530,3551d35
+3530,3551d29
 < [from] Computing for function main2
 < [from] Done for function main2
 < [from] Computing for function main5
@@ -3539,14 +3535,14 @@
 < [from] Done for function main_4_aux
 < [from] Computing for function main4
 < [from] Done for function main4
-3552a37
+3552a31
 > [from] Non-terminating function main (no dependencies)
-3556,3559d40
+3556,3559d34
 < [from] Function free:
 <   NO EFFECTS
 < [from] Function main9_aux:
 <   __malloc_w_main9_l119 FROM p (and SELF)
-3563,3594c44
+3563,3594c38
 <   __malloc_main1_l17[0..1] FROM v (and SELF)
 <   \result FROM \nothing
 < [from] Function main2:
@@ -3581,7 +3577,7 @@
 <   \result FROM \nothing
 ---
 >   NON TERMINATING - NO EFFECTS
-3596,3604c46
+3596,3604c40
 <   __malloc_main1_l17[0..1] FROM v (and SELF)
 <   __malloc_main2_l27[1..2] FROM v (and SELF)
 <   __malloc_main_3_aux_l34[0..1] FROM v (and SELF)
@@ -3593,16 +3589,16 @@
 <   __malloc_w_main9_l119 FROM \nothing (and SELF)
 ---
 >   NON TERMINATING - NO EFFECTS
-3606,3609d47
+3606,3609d41
 < [inout] Out (internal) for function main9_aux:
 <     __malloc_w_main9_l119
 < [inout] Inputs for function main9_aux:
 <     \nothing
-3611c49
+3611c43
 <     i; p; __retres; __malloc_main1_l17[0..1]
 ---
 >     i; p
-3614,3653d51
+3614,3653d45
 < [inout] Out (internal) for function main2:
 <     i; p; __retres; __malloc_main2_l27[1..2]
 < [inout] Inputs for function main2:
@@ -3643,7 +3639,7 @@
 <     i; p; __retres; __malloc_main_4_aux_l40[1..2]
 < [inout] Inputs for function main4:
 <     v
-3655,3659c53
+3655,3659c47
 <     p; __malloc_main1_l17[0..1]; __malloc_main2_l27[1..2];
 <     __malloc_main_3_aux_l34[0..1]; __malloc_main_4_aux_l40[1..2];
 <     __malloc_main5_l64[0..10]; __malloc_w_main6_l77[0..10];
@@ -3651,7 +3647,7 @@
 <     __malloc_w_main9_l119
 ---
 >     p
-3661,3663c55
+3661,3663c49
 <     v; __malloc_main5_l64[0..10]; __malloc_w_main6_l77[0..10];
 <     __malloc_main7_l90[0..100]; __malloc_w_main8_l103[0..100];
 <     __malloc_w_main9_l119

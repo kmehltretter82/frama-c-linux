@@ -1,8 +1,0 @@
-10a11,14
-> [eva:alarm] gcc_zero_length_array.c:16: Warning: 
->   out of bounds write. assert \valid(&p->len);
-> [kernel] gcc_zero_length_array.c:16: Warning: 
->   all target addresses were invalid. This path is assumed to be dead.
-16,17d19
-< [eva:malloc] gcc_zero_length_array.c:26: 
-<   strong free on bases: {__malloc_make_fam_l15}

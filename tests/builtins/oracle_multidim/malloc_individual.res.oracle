@@ -1,6 +1,0 @@
-11a12,13
-> [eva:alarm] malloc_individual.c:14: Warning: 
->   out of bounds write. assert \valid(p);
-13a16,17
-> [eva:alarm] malloc_individual.c:15: Warning: 
->   out of bounds read. assert \valid_read(p);
