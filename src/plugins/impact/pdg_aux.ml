@@ -104,7 +104,7 @@ module NS = struct
     fold (fun n z -> f (n, z))
 
 
-  let () = Db.Value.Table_By_Callstack.add_hook_on_update (fun _ -> clear_caches ())
+  let () = Eva.Analysis.register_computation_hook (fun _ -> clear_caches ())
 end
 
 type call_interface = (PdgTypes.Node.t * NS.t) list
