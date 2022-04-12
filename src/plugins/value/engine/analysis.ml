@@ -96,11 +96,14 @@ module Make (Abstract: Abstractions.S) = struct
   include Compute_functions.Make (Abstract)
 
   let find stmt f =
-    let kf = Kernel_function.find_englobing_kf stmt in
-    match status kf with
-    | Unreachable -> `Bottom
-    | Analyzed NoResults | SpecUsed | Builtin _ -> `Top
-    | Analyzed (Complete | Partial) -> f stmt
+    if is_computed ()
+    then
+      let kf = Kernel_function.find_englobing_kf stmt in
+      match status kf with
+      | Unreachable -> `Bottom
+      | Analyzed NoResults | SpecUsed | Builtin _ -> `Top
+      | Analyzed (Complete | Partial) -> f stmt
+    else `Top
 
   let get_stmt_state ~after stmt =
     find stmt (Dom.Store.get_stmt_state ~after :> stmt -> Dom.t or_top_bottom)
@@ -112,14 +115,18 @@ module Make (Abstract: Abstractions.S) = struct
     (Abstract.Dom.Store.get_global_state () :> Dom.t or_top_bottom)
 
   let get_initial_state kf =
-    if Function_calls.is_called kf
-    then (Abstract.Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
-    else `Bottom
+    if is_computed () then
+      if Function_calls.is_called kf
+      then (Abstract.Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
+      else `Bottom
+    else `Top
 
   let get_initial_state_by_callstack ?selection kf =
-    if Function_calls.is_called kf
-    then Abstract.Dom.Store.get_initial_state_by_callstack ?selection kf
-    else `Bottom
+    if is_computed () then
+      if Function_calls.is_called kf
+      then Abstract.Dom.Store.get_initial_state_by_callstack ?selection kf
+      else `Bottom
+    else `Top
 
   let eval_expr state expr = Eval.evaluate state expr >>=: snd
 

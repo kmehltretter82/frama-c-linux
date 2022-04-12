@@ -23,6 +23,7 @@
 open Lattice_bounds
 
 let are_available kf =
+  Analysis.is_computed () &&
   match Analysis.status kf with
   | Analyzed (Complete | Partial) -> true
   | SpecUsed | Builtin _ | Unreachable | Analyzed NoResults -> false
