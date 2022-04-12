@@ -310,19 +310,20 @@ export interface ActionMode {
 // --- ModalActionField default mode: Search
 // --------------------------------------------------------------------------
 
-const searchEnginesIds = new Set<string>();
-let searchEvaluators: HintsEvaluator[] = [];
+const searchEvaluators = new Map<string, HintsEvaluator>();
 
+// Updates to the new evaluator if the id is already registered
 export function registerSearchHints(id: string, search: HintsEvaluator) {
-  if (!(id in searchEnginesIds)) {
-    searchEnginesIds.add(id);
-    searchEvaluators = searchEvaluators.concat(search);
-  }
+  searchEvaluators.set(id, search);
+}
+
+export function unregisterSearchHints(id: string) {
+  searchEvaluators.delete(id);
 }
 
 async function searchHints(pattern: string) {
   if (pattern === '') return [];
-  const promises = searchEvaluators.map((E: HintsEvaluator) => E(pattern));
+  const promises = Array.from(searchEvaluators).map(([_id, E]) => E(pattern));
   const hints = await Promise.all(promises);
   return hints.flat().sort(byHint);
 }
@@ -561,8 +562,10 @@ export function ModalActionField() {
   }, [current.title, modesMode]);
 
   // Register the new search engine.
-  const register = () => registerSearchHints('ModesMode', searchModeHints);
-  React.useEffect(register, [searchModeHints]);
+  React.useEffect(() => {
+      registerSearchHints('ModesMode', searchModeHints);
+      return () => unregisterSearchHints('ModesMode');
+    }, [searchModeHints]);
 
   // Build the component.
   const { title, placeholder } = current;
