@@ -215,12 +215,6 @@ const editMenuItems: MenuSpec = [
     accelerator: 'CmdOrCtrl+F',
     click: userFindInfo,
   },
-  // {
-  //   label: 'Evaluate',
-  //   accelerator: 'CmdOrCtrl+E',
-  //   click: evaluateACSL,
-  //   enabled: evaluateVisible,
-  // }
 ];
 
 // --------------------------------------------------------------------------
