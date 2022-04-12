@@ -47,28 +47,30 @@ module Users =
       let dependencies = [ Eva.Analysis.self; ForceUsers.self ]
     end)
 
-let call_for_users (_state, call_stack) =
-  match call_stack with
-  | [] -> assert false
-  | (current_function, _call_site) :: tail ->
-    if tail = [] then begin
-      (* End of Value analysis, we record that Users has run. We should not
-         do this after the explicit call to Eva.Analysis.compute later in this
-         file, as Value can run on its own and execute Users while doing so.*)
-      Users.mark_as_computed ()
-    end;
-    let treat_element (user, _call_site) =
-      ignore
-        (Users.memo
-           ~change:(Kernel_function.Hptset.add current_function)
-           (fun _ -> Kernel_function.Hptset.singleton current_function)
-           user)
-    in
-    List.iter treat_element tail
+let compute_users _ =
+  let process kf =
+    if Eva.Results.is_called kf
+    then
+      let callstacks = Eva.Results.(at_start_of kf |> callstacks) in
+      let process_callstack list =
+        let process_element (user, _call_site) =
+          ignore
+            (Users.memo
+               ~change:(Kernel_function.Hptset.add kf)
+               (fun _ -> Kernel_function.Hptset.singleton kf)
+               user)
+        in
+        List.iter process_element (List.tl list)
+      in
+      List.iter process_callstack callstacks
+  in
+  Globals.Functions.iter process;
+  Users.mark_as_computed ()
 
-let add_value_hook () = Db.Value.Call_Value_Callbacks.extend_once call_for_users
+let add_eva_hook () =
+  Eva.Analysis.(register_computation_hook ~on:Computed compute_users)
 
-let init () = if ForceUsers.get () then add_value_hook ()
+let init () = if ForceUsers.get () then add_eva_hook ()
 let () = Cmdline.run_after_configuring_stage init
 
 let get kf =
@@ -86,8 +88,8 @@ let get kf =
         ()
     end else
       feedback ~level:2 "requiring the computation of the value analysis";
-    add_value_hook ();
     Eva.Analysis.compute ();
+    compute_users ();
     find kf
   end
 
