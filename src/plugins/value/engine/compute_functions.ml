@@ -360,16 +360,16 @@ module Make (Abstract: Abstractions.Eva) = struct
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Eva_utils.pop_call_stack ();
       Self.feedback "done for function %a" Kernel_function.pretty kf;
-      Self.(set_computation_state Computed);
       Abstract.Dom.Store.mark_as_computed ();
+      Self.(set_computation_state Computed);
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
       Summary.print_summary ();
       restore_signals ()
     in
     let cleanup () =
-      Self.(set_computation_state Aborted);
       Abstract.Dom.Store.mark_as_computed ();
+      Self.(set_computation_state Aborted);
       post_analysis_cleanup ~aborted:true
     in
     Eva_utils.protect compute ~cleanup
@@ -386,8 +386,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     match initial_state with
     | `Bottom ->
-      Self.(set_computation_state Aborted);
       Abstract.Dom.Store.mark_as_computed ();
+      Self.(set_computation_state Aborted);
       Self.result "Eva not started because globals \
                    initialization is not computable.";
       Eval_annots.mark_invalid_initializers ()
