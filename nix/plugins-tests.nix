@@ -1,5 +1,5 @@
 { lib
-, stdenv
+, stdenvNoCC
 , frama-c
 , alt-ergo
 , perl
@@ -9,21 +9,21 @@
 }:
 
 # TODO: SPLIT THIS
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation rec {
   pname = "plugins-tests";
   version = frama-c.version;
   slang = frama-c.slang;
 
   build_dir = frama-c.build_dir;
   src = build_dir + "/dir.tar";
-  wp_cache = fetchGit "git@git.frama-c.com:frama-c/wp-cache.git"; # only for WP qualif
+  wp_cache = fetchGit "git@git.frama-c.com:frama-c/wp-cache.git"; # only for WP qualif / Aorai
   sourceRoot = ".";
 
   buildInputs = frama-c.buildInputs ++ [
-    alt-ergo # only for WP qualif
+    alt-ergo # only for WP qualif / Aorai
     frama-c
     perl
-    pkgs.getopt
+    pkgs.getopt # only for E-ACSL
     time
     which
   ];
@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
   '' ;
 
   # Keep main configuration
-  # Only for WP qualif -> replace with true after split
+  # Only for WP qualif / Aorai -> replace with true after split
   configurePhase = ''
     mkdir home
     HOME=$(pwd)/home
@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
-    export FRAMAC_WP_CACHEDIR=$wp_cache
+    export FRAMAC_WP_CACHEDIR=$wp_cache # only for WP qualif / Aorai
     dune exec -- frama-c-ptests src/plugins/*/tests
     dune build -j1 --display short @src/plugins/ptests
   '';

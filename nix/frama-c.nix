@@ -1,6 +1,6 @@
 # Nix
 { lib
-, stdenv
+, stdenvNoCC # for E-ACSL
 , fetchurl
 , gitignoreSource
 , makeWrapper
@@ -15,6 +15,7 @@
 , camlzip
 , dune_3
 , dune-site-3
+, gcc9
 , graphviz
 , lablgtk3
 , lablgtk3-sourceview3
@@ -38,7 +39,7 @@
 
 # We do not use buildDunePackage because Frama-C still uses a Makefile to build
 # some files and prepare some information before starting dune.
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation rec {
   pname = "frama-c";
   version = lib.strings.removeSuffix "\n" (builtins.readFile ../VERSION);
   slang = lib.strings.removeSuffix "\n" (builtins.readFile ../VERSION_CODENAME);
@@ -57,6 +58,7 @@ stdenv.mkDerivation rec {
     dune_3
     dune-site-3
     findlib
+    gcc9
     graphviz
     lablgtk3
     lablgtk3-sourceview3
