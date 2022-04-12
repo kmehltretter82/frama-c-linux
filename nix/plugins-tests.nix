@@ -3,6 +3,7 @@
 , frama-c
 , alt-ergo
 , perl
+, pkgs
 , time
 , which
 }:
@@ -22,6 +23,7 @@ stdenv.mkDerivation rec {
     alt-ergo # only for WP qualif
     frama-c
     perl
+    pkgs.getopt
     time
     which
   ];
