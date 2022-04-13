@@ -45,6 +45,7 @@
     --default-button-hover: #ffffff;
     --default-button-active: #f9f9f9;
 
+    --primary-button-color: #449bef;
     --primary-button-img: linear-gradient(to bottom, #449bef 0%, #4990e2 100%);
     --primary-button-hover: #00b6ff;
     --primary-button-active: #ddd;
