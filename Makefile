@@ -865,7 +865,7 @@ endif
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	utils/eva_audit utils/eva_perf utils/eva_annotations \
 	utils/eva_dynamic utils/eva_utils utils/red_statuses \
-	utils/mark_noresults \
+	utils/active_behaviors \
 	utils/widen_hints_ext utils/widen \
 	partitioning/split_return \
 	partitioning/per_stmt_slevel \
@@ -899,21 +899,22 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/cvalue/builtins_watchpoint \
 	domains/cvalue/builtins_float domains/cvalue/builtins_split \
 	domains/inout_domain \
-	legacy/eval_terms legacy/eval_annots \
-	domains/powerset engine/transfer_logic \
+	legacy/eval_terms \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
-	utils/eva_results \
+	domains/powerset \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
+	engine/recursion engine/function_calls legacy/eval_annots \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
-	engine/recursion engine/transfer_stmt engine/transfer_specification \
+	engine/transfer_logic engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
 	domains/taint_domain \
 	$(APRON_CMO) $(NUMERORS_CMO) \
+	utils/eva_results \
 	utils/results api/general_requests api/values_request \
 	utils/unit_tests
 PLUGIN_CMI:= values/abstract_value values/abstract_location \

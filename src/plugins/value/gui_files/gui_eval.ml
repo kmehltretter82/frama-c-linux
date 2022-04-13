@@ -24,12 +24,8 @@ open Cil_types
 open Gui_types
 open Lattice_bounds
 
-let results_kf_computed kf =
-  Analysis.is_computed () &&
-  match kf with
-  | { fundec = Definition (fundec, _) } ->
-    Mark_noresults.should_memorize_function fundec
-  | { fundec = Declaration _ } -> true (* This value is not really used *)
+let results_kf_computed kf = Analysis.is_computed () && Results.are_available kf
+let kf_called kf = Analysis.is_computed () && Results.is_called kf
 
 let term_c_type t =
   Logic_const.plain_or_set
@@ -343,7 +339,7 @@ module Make (X: Analysis.S) = struct
     let pre = pre_kf kf callstack in
     let post = X.Dom.get_cvalue_or_top post in
     let result =
-      if !Db.Value.use_spec_instead_of_definition kf then
+      if Function_calls.use_spec_instead_of_definition kf then
         None
       else
         let ret_stmt = Kernel_function.find_return kf in
@@ -386,7 +382,7 @@ module Make (X: Analysis.S) = struct
      and correspond to the states before reduction by any precondition.
      After states are not available. *)
   let callstacks_at_pre kf =
-    if results_kf_computed kf then
+    if kf_called kf then
       let states_before = X.get_initial_state_by_callstack kf in
       { states_before; states_after = `Top }
     else top_states_by_callstacks
@@ -395,7 +391,8 @@ module Make (X: Analysis.S) = struct
      normal termination, and only when the function is called.
      After states are not available. *)
   let callstacks_at_post kf =
-    if not (!Db.Value.use_spec_instead_of_definition kf) && results_kf_computed kf
+    if not (Function_calls.use_spec_instead_of_definition kf)
+    && results_kf_computed kf
     then
       let ret = Kernel_function.find_return kf in
       let states_before = X.get_stmt_state_by_callstack ~after:true ret in

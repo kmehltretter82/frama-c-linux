@@ -11,10 +11,10 @@
   s1 ∈ {0}
   si[0..1] ∈ {0}
   so[0..1] ∈ {0}
-[eva] computing for function init <- main_init.
-  Called from bts334.i:66.
 [kernel] bts334.i:66: Warning: 
   No code nor explicit assigns clause for function init, generating default assigns from the specification
+[eva] computing for function init <- main_init.
+  Called from bts334.i:66.
 [eva] using specification for function init
 [eva] bts334.i:61: Warning: 
   no 'assigns \result \from ...' clause specified for function init

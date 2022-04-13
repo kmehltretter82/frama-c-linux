@@ -371,7 +371,7 @@ module Component = struct
       match kind with
       | Forward _ -> Lazy.force lazy_l
       | Direct | Indirect_Backward ->
-        if !Db.Value.use_spec_instead_of_definition kf
+        if Eva.Analysis.use_spec_instead_of_definition kf
         then Lazy.force lazy_l
         else []
     with Not_found ->

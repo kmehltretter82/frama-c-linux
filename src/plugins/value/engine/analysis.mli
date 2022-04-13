@@ -28,13 +28,13 @@ module type Results = sig
   type value
   type location
 
-  val get_global_state: unit -> state or_bottom
-  val get_stmt_state : after:bool -> stmt -> state or_bottom
+  val get_global_state: unit -> state or_top_bottom
+  val get_stmt_state : after:bool -> stmt -> state or_top_bottom
   val get_stmt_state_by_callstack:
     ?selection:callstack list ->
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_bottom
   val get_initial_state:
-    kernel_function -> state or_bottom
+    kernel_function -> state or_top_bottom
   val get_initial_state_by_callstack:
     ?selection:callstack list ->
     kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_bottom
@@ -106,6 +106,49 @@ val is_computed : unit -> bool
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
 
+
+(** Kind of results for the analysis of a function body. *)
+type results =
+  | Complete
+  (** The results are complete: they cover all possible call contexts of the
+      given function. *)
+  | Partial
+  (** The results are partial, as the functions has not been analyzed in all
+      possible call contexts. This happens for recursive functions that are
+      not completely unrolled, or if the analysis has stopped unexpectedly. *)
+  | NoResults
+  (** No results were saved for the function, due to option -eva-no-results.
+      Any request at a statement of this function will lead to a Top result. *)
+
+(* Analysis status of a function. *)
+type status =
+  | Unreachable
+  (** The function has not been reached by the analysis. Any request in this
+      function will lead to a Bottom result. *)
+  | SpecUsed
+  (** The function specification has been used to interpret its calls:
+      its body has not been analyzed. Any request at a statement of this
+      function will lead to a Top result. *)
+  | Builtin of string
+  (** The builtin of the given name has been used to interpret the function:
+      its body has not been analyzed. Any request at a statement of this
+      function will lead to a Top result. *)
+  | Analyzed of results
+  (** The function body has been analyzed. *)
+
+(** Returns the analysis status of a given function. *)
+val status: Cil_types.kernel_function -> status
+
+(** Does the analysis ignores the body of a given function, and uses instead
+    its specification or a builtin to interpret it?
+    Please use {!Eva.Results.are_available} instead to known whether results
+    are available for a given function. *)
+val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
+
+(** Returns [true] if the user has requested that no results should be recorded
+    for the given function. Please use {!Eva.Results.are_available} instead
+    to known whether results are available for a given function. *)
+val save_results: Cil_types.kernel_function -> bool
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t

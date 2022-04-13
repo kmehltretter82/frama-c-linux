@@ -52,10 +52,10 @@
    .t[0] ∈ {{ &y }}
    .t[1] ∈ {0}
   S_gpp[0..1] ∈ [--..--]
-[eva] computing for function f <- origin.
-  Called from origin.i:124.
 [kernel:annot:missing-spec] origin.i:124: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
+[eva] computing for function f <- origin.
+  Called from origin.i:124.
 [eva] using specification for function f
 [eva] Done for function f
 [eva] origin.i:126: 

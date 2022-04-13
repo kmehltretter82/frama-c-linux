@@ -16,10 +16,10 @@
 [eva] Done for function fun
 [eva:alarm] contract_special_float.c:93: Warning: 
   NaN double value. assert ¬\is_NaN(v);
-[eva] computing for function fun_no_default <- main.
-  Called from contract_special_float.c:94.
 [kernel] contract_special_float.c:94: Warning: 
   No code nor explicit assigns clause for function fun_no_default, generating default assigns from the specification
+[eva] computing for function fun_no_default <- main.
+  Called from contract_special_float.c:94.
 [eva] using specification for function fun_no_default
 [eva:alarm] contract_special_float.c:94: Warning: 
   function fun_no_default: precondition 'not_negative' got status unknown.

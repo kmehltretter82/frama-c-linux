@@ -584,10 +584,7 @@ class check_annot_visitor = object(self)
     Cil.SkipChildren
 
   method! vglob_aux g = match g with
-    | GFun (fdec, _loc) when
-        Eva.Results.is_called (Option.get self#current_kf) &&
-        not (!Db.Value.no_results fdec)
-      ->
+    | GFun _ when Eva.Results.are_available (Option.get self#current_kf) ->
       Cil.DoChildren
     | _ -> Cil.SkipChildren
 

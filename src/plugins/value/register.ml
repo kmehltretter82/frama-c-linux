@@ -124,14 +124,6 @@ let find_deps_term_no_transitivity_state state t =
     r.Eval_terms.ldeps
   with Eval_terms.LogicEvalError _ -> raise Db.From.Not_lval
 
-(* If the function is a builtin, or if the user has requested it, use
-   \assigns and \from clauses, that give an approximation of the result *)
-let use_spec_instead_of_definition kf =
-  not (Kernel_function.is_definition kf) ||
-  Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
-  Builtins.is_builtin_overridden kf ||
-  Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
-
 let eval_predicate ~pre ~here p =
   let open Eval_terms in
   let env = env_annot ~pre ~here () in
@@ -140,9 +132,22 @@ let eval_predicate ~pre ~here p =
   | False -> Property_status.False_if_reachable
   | Unknown -> Property_status.Dont_know
 
+let valid_behaviors kf state =
+  let funspec = Annotations.funspec kf in
+  let eval_predicate pred =
+    match Eval_terms.(eval_predicate (env_pre_f ~pre:state ()) pred) with
+    | Eval_terms.True -> Alarmset.True
+    | Eval_terms.False -> Alarmset.False
+    | Eval_terms.Unknown -> Alarmset.Unknown
+  in
+  let ab = Active_behaviors.create eval_predicate funspec in
+  Active_behaviors.active_behaviors ab
+
 let () =
-  (* Pretty-printing *)
-  Db.Value.use_spec_instead_of_definition := use_spec_instead_of_definition;
+  Db.Value.is_called := Function_calls.is_called;
+  Db.Value.callers := Function_calls.callsites;
+  Db.Value.use_spec_instead_of_definition :=
+    Function_calls.use_spec_instead_of_definition;
   Db.Value.assigns_outputs_to_zone := assigns_outputs_to_zone;
   Db.Value.assigns_outputs_to_locations := assigns_outputs_to_locations;
   Db.Value.assigns_inputs_to_zone := assigns_inputs_to_zone;
@@ -150,6 +155,7 @@ let () =
   Db.Value.access_location := access_value_of_location;
   Db.Value.access_expr := access_value_of_expr;
   Db.Value.Logic.eval_predicate := eval_predicate;
+  Db.Value.valid_behaviors := valid_behaviors;
   Db.From.find_deps_term_no_transitivity_state :=
     find_deps_term_no_transitivity_state;
 

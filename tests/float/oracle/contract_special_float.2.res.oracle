@@ -8,10 +8,10 @@
   Called from contract_special_float.c:92.
 [eva] using specification for function fun
 [eva] Done for function fun
-[eva] computing for function fun_no_default <- main.
-  Called from contract_special_float.c:94.
 [kernel] contract_special_float.c:94: Warning: 
   No code nor explicit assigns clause for function fun_no_default, generating default assigns from the specification
+[eva] computing for function fun_no_default <- main.
+  Called from contract_special_float.c:94.
 [eva] using specification for function fun_no_default
 [eva] Done for function fun_no_default
 [eva] computing for function fun_no_disjoint <- main.

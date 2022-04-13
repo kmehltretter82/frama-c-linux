@@ -44,6 +44,7 @@ module Computer
   : sig
 
     val compute:
+      save_results:bool ->
       kernel_function -> kinstr -> Abstract.Dom.t ->
       (Partition.key * Abstract.Dom.t) list * Eval.cacheable
 

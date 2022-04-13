@@ -44,10 +44,10 @@
   f_previous ∈ {{ &a }}
 [eva] computing for function f <- main.
   Called from from_call.i:81.
-[eva] computing for function h <- f <- main.
-  Called from from_call.i:20.
 [kernel:annot:missing-spec] from_call.i:20: Warning: 
   Neither code nor specification for function h, generating default assigns from the prototype
+[eva] computing for function h <- f <- main.
+  Called from from_call.i:20.
 [eva] using specification for function h
 [eva] Done for function h
 [eva] computing for function g <- f <- main.

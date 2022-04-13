@@ -43,7 +43,7 @@ module UsedVarState =
 
 let used_var = UsedVarState.memo
     (fun var ->
-       Mark_noresults.no_memoization_enabled () ||
+       Function_calls.partial_results () ||
        try
          let f = fst (Globals.entry_point ()) in
          let inputs = !Db.Inputs.get_external f in
@@ -528,7 +528,7 @@ module Select (Eval: Eval) = struct
                | Kstmt stmt -> Eval.Analysis.get_stmt_state ~after:false stmt
              in
              match state  with
-             | `Bottom -> ()
+             | `Bottom | `Top -> ()
              | `Value state ->
                let funs, _ = Eval.Analysis.eval_function_exp state e in
                match funs with

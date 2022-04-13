@@ -4,17 +4,17 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function __builtin_va_start <- main.
-  Called from va_list2.c:11.
 [kernel:annot:missing-spec] va_list2.c:11: Warning: 
   Neither code nor specification for function __builtin_va_start, generating default assigns from the prototype
+[eva] computing for function __builtin_va_start <- main.
+  Called from va_list2.c:11.
 [eva] using specification for function __builtin_va_start
 [eva] Done for function __builtin_va_start
 [eva:alarm] va_list2.c:12: Warning: out of bounds read. assert \valid_read(fmt);
-[eva] computing for function __builtin_va_arg <- main.
-  Called from va_list2.c:15.
 [kernel:annot:missing-spec] va_list2.c:15: Warning: 
   Neither code nor specification for function __builtin_va_arg, generating default assigns from the prototype
+[eva] computing for function __builtin_va_arg <- main.
+  Called from va_list2.c:15.
 [eva] using specification for function __builtin_va_arg
 [eva] Done for function __builtin_va_arg
 [eva:alarm] va_list2.c:15: Warning: 
@@ -45,10 +45,10 @@
 [eva] Done for function __builtin_va_arg
 [eva] va_list2.c:21: 
   Frama_C_show_each_f: [-3.40282346639e+38 .. 3.40282346639e+38]
-[eva] computing for function __builtin_va_end <- main.
-  Called from va_list2.c:28.
 [kernel:annot:missing-spec] va_list2.c:28: Warning: 
   Neither code nor specification for function __builtin_va_end, generating default assigns from the prototype
+[eva] computing for function __builtin_va_end <- main.
+  Called from va_list2.c:28.
 [eva] using specification for function __builtin_va_end
 [eva] Done for function __builtin_va_end
 [eva] Recording results for main

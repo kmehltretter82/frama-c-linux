@@ -15,10 +15,10 @@
 [eva] watch.c:10: Call to builtin Frama_C_watch_value
 [eva] watch.c:13: Watchpoint: & c [--..--]
 [eva] watch.c:14: Watchpoint: & c [--..--]
-[eva] computing for function u <- main.
-  Called from watch.c:16.
 [kernel:annot:missing-spec] watch.c:16: Warning: 
   Neither code nor specification for function u, generating default assigns from the prototype
+[eva] computing for function u <- main.
+  Called from watch.c:16.
 [eva] using specification for function u
 [eva] Done for function u
 [eva] watch.c:17: Watchpoint: & c [--..--]

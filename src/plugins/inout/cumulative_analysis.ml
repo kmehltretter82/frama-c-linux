@@ -155,7 +155,7 @@ struct
         r_glob
 
     method compute_kf kf =
-      if !Db.Value.use_spec_instead_of_definition kf then
+      if Eva.Analysis.use_spec_instead_of_definition kf then
         (* If only a declaration is available, or we are instructed to use
            the spec, do so. If a current stmt is available (most of the times),
            do not cache the results. Maybe [compute_funspec] will be able

@@ -84,7 +84,7 @@ type pdg_build = {
 (** create an empty build pdg for the function*)
 let create_pdg_build kf =
   let nb_stmts =
-    if !Db.Value.use_spec_instead_of_definition kf then 17
+    if Eva.Analysis.use_spec_instead_of_definition kf then 17
     else List.length (Kernel_function.get_definition kf).sallstmts
   in
   let index = FctIndex.create nb_stmts in
@@ -946,13 +946,12 @@ exception Value_State_Top
 let compute_pdg_for_f kf =
   let pdg = create_pdg_build kf in
   let f_locals, f_stmts =
-    if !Db.Value.use_spec_instead_of_definition kf then [], []
-    else
+    if Eva.Analysis.use_spec_instead_of_definition kf then [], []
+    else if Eva.Analysis.save_results kf
+    then
       let f = Kernel_function.get_definition kf in
-      if !Db.Value.no_results f then
-        raise Value_State_Top
-      else
-        f.slocals, f.sbody.bstmts
+      f.slocals, f.sbody.bstmts
+    else raise Value_State_Top
   in
   let init_state =
     process_entry_point pdg f_stmts;

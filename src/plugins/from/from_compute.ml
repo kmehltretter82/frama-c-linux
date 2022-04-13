@@ -604,7 +604,7 @@ struct
     match kf.fundec with
     | Declaration _ -> assert false
     | Definition (f,_) ->
-      if !Db.Value.no_results f then Function_Froms.top
+      if not (Eva.Analysis.save_results kf) then Function_Froms.top
       else
         try
           Stack.iter
@@ -689,7 +689,7 @@ struct
        !s);
     Db.yield ();
     let result =
-      if !Db.Value.use_spec_instead_of_definition kf
+      if Eva.Analysis.use_spec_instead_of_definition kf
       then compute_using_prototype kf
       else compute_using_cfg kf
     in

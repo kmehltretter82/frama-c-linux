@@ -383,7 +383,7 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
           Globals.Functions.iter
             (fun kf ->
                if Eva.Results.is_called kf then
-                 if not (!Db.Value.use_spec_instead_of_definition kf)
+                 if not (Eva.Analysis.use_spec_instead_of_definition kf)
                  then (* Called function with source code: just looks at its stmt *)
                    Kinstr.iter_from_func (select_rw_from_stmt kf) kf
                  else begin (* Called function without source code: looks at its effect *)

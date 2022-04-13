@@ -76,10 +76,10 @@
   S_1_0_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_0_1_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_1_1_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
-[eva] computing for function f_int <- main.
-  Called from library.i:30.
 [kernel:annot:missing-spec] library.i:30: Warning: 
   Neither code nor specification for function f_int, generating default assigns from the prototype
+[eva] computing for function f_int <- main.
+  Called from library.i:30.
 [eva] using specification for function f_int
 [eva] Done for function f_int
 [eva] computing for function f_star_int <- main.
@@ -95,10 +95,10 @@
 [eva:alarm] library.i:33: Warning: 
   out of bounds read. assert \valid_read(*(*G));
 [eva:alarm] library.i:33: Warning: out of bounds write. assert \valid(*(*(*G)));
-[eva] computing for function gen <- main.
-  Called from library.i:37.
 [kernel:annot:missing-spec] library.i:37: Warning: 
   Neither code nor specification for function gen, generating default assigns from the prototype
+[eva] computing for function gen <- main.
+  Called from library.i:37.
 [eva] using specification for function gen
 [eva] Done for function gen
 [eva:alarm] library.i:38: Warning: 
