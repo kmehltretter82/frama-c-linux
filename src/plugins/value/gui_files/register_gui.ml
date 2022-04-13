@@ -172,7 +172,7 @@ let active_highlighter buffer localizable ~start ~stop =
         | Some color_area ->
           apply_tag buffer color_area start stop
         | None ->
-          if Gui_eval.results_kf_computed kf then begin
+          if Analysis.status kf <> Analyzed NoResults then begin
             let csf = Gui_callstacks_filters.focused_callstacks () in
             if Gui_callstacks_filters.is_reachable_stmt csf stmt then begin
               if Gui_callstacks_filters.is_non_terminating_instr csf stmt then
