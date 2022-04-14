@@ -129,7 +129,6 @@ module type Messages = sig
       Enabling a category (via -plugin-msg-category) will enable all its
       subcategories.
       @since Fluorine-20130401
-      @modify Chlorine-20180501 categories are an abstract type of each plug-in
   *)
 
   type warn_category
@@ -161,8 +160,6 @@ module type Messages = sig
   val feedback : ?ontty:ontty -> ?level:int -> ?dkey:category -> 'a pretty_printer
   (** Progress and feedback. Level is tested against the verbosity level.
       @since Beryllium-20090601-beta1
-      @modify Fluorine-20130401 Optional parameter [?dkey]
-      @modify Magnesium-20151001 Optional parameter [?ontty]
       @plugin development guide *)
 
   val debug   : ?level:int -> ?dkey:category -> 'a pretty_printer
@@ -170,7 +167,6 @@ module type Messages = sig
       Default level is 1. The debugging key is used in message headers.
       See also [set_debug_keys] and [set_debug_keyset].
       @since Beryllium-20090601-beta1
-      @modify Nitrogen-20111001 Optional parameter [dkey]
       @plugin development guide *)
 
   val warning : ?wkey:warn_category -> 'a pretty_printer
@@ -302,7 +298,6 @@ module type Messages = sig
   (** returns the corresponding registered category or [None] if no
       such category exists.
       @since Fluorine-20130401
-      @modify Chlorine-20180501 return an option
   *)
 
   val get_all_categories: unit -> category list
@@ -313,22 +308,17 @@ module type Messages = sig
       subcategories) to the set of categories for which messages are
       to be displayed. The string must have been registered beforehand.
       @since Fluorine-20130401 use categories instead of plain string
-      @modify Chlorine-20180501 accepts a string as argument. Takes care
-                          of propagating to subcategories.
   *)
 
   val del_debug_keys: category -> unit
   (** removes the given categories from the set for which messages are printed.
       The string must have been registered beforehand.
       @since Fluorine-20130401
-      @modify Chlorine-20180501 accepts a string category as argument, takes care
-                          of propagating to subcategories
   *)
 
   val get_debug_keys: unit -> category list
   (** Returns currently active keys
       @since Fluorine-20130401
-      @modify Chlorine-20180501 returns a list instead of a set
   *)
 
   val is_debug_key_enabled: category -> bool
@@ -443,7 +433,6 @@ val log_channel : channel ->
   ?kind:kind -> 'a pretty_printer
 (** logging function to user-created channel.
     @since Beryllium-20090901
-    @modify Chlorine-20180501 removed ~prefix
     @plugin development guide *)
 
 val kernel_channel_name: string
@@ -455,9 +444,7 @@ val kernel_label_name: string
     @since Beryllium-20090601-beta1 *)
 
 val source : file:Filepath.Normalized.t -> line:int -> Filepath.position
-(** @since Chlorine-20180501
-    @modify 18.0-Argon change type of [file]
-*)
+(** @since Chlorine-20180501 *)
 
 val get_current_source : unit -> Filepath.position
 
@@ -501,7 +488,6 @@ val print_on_output : (Format.formatter -> unit) -> unit
 
     Can not be recursively invoked.
     @since Beryllium-20090901
-    @modify Nitrogen-20111001 signature changed
     @plugin development guide *)
 
 val print_delayed : (Format.formatter -> unit) -> unit
@@ -512,7 +498,6 @@ val print_delayed : (Format.formatter -> unit) -> unit
 
     Can not be recursively invoked.
     @since Beryllium-20090901
-    @modify Nitrogen-20111001 signature changed
     @plugin development guide *)
 
 (**/**)

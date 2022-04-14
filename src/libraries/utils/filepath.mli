@@ -49,7 +49,6 @@ exception File_exists
     - non-existing directories in [realpath] may lead to ENOTDIR errors,
       but [normalize] may accept them.
 
-    @modify Aluminium-20160501 optional base_name.
     @modify 21.0-Scandium optional existence.
 *)
 val normalize: ?existence:existence -> ?base_name:string -> string -> string

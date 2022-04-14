@@ -30,5 +30,4 @@ val rm_unused_globals : ?new_proj_name:string -> ?project:Project.t -> unit -> P
 (** Remove unused global types and variables from the given project
     (the current one if no project given).
     The source project is not modified.
-    The result is in the returned new project.
-    @modify Carbon-20110201 optional argument [new_proj_name] added. *)
+    The result is in the returned new project. *)

@@ -170,7 +170,6 @@ val update_to_pred:
     related to the possible values of the auxiliary variables at current point
     the function, guarded by the fact that we have followed this path, from
     the given program point
-    @modify Neon-20130301 add logic_label argument
 *)
 val action_to_pred:
   start:Cil_types.logic_label ->
@@ -179,7 +178,6 @@ val action_to_pred:
 
 (** All actions that might have been performed on aux variables from the
     given program point, guarded by the path followed.
-    @modify Neon-20140301 add logic_label argument
 *)
 val all_actions_preds:
   Cil_types.logic_label ->

@@ -87,7 +87,6 @@ val behavior_postcondition :
   goal:bool -> funbehavior -> termination_kind -> predicate
 (** Builds the postcondition from [b_assumes] and [b_post_cond] clauses.
     For flag [~goal] see {Ast_info.precondition} above.
-    @modify Boron-20100401 added termination kind as filtering argument.
     @modify 23.0-Vanadium introduce [goal] flag
 *)
 
@@ -121,8 +120,8 @@ val merge_assigns_from_spec: ?warn:bool -> funspec -> assigns
 
 val merge_assigns: ?warn:bool -> funbehavior list -> assigns
 (** Returns the assigns of an unguarded behavior.
-    @modify Oxygen-20120901 Optional [warn] argument added which can be used to
-    force emitting or cancelation of warnings. *)
+    Optional [warn] argument can be used to force emitting or cancelation of
+    warnings. *)
 
 val variable_term: location -> logic_var -> term
 val constant_term: location -> Integer.t -> term

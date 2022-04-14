@@ -1689,10 +1689,6 @@ and ext_code_annot_context =
 
 (** Behavior of a function or statement. This type shares the name of its
     constructors with {!Logic_ptree.behavior}.
-    @since Oxygen-20120901 [b_allocation] has been added.
-    @since Carbon-20101201 [b_requires] has been added.
-    @modify Boron-20100401 [b_ensures] is replaced by [b_post_cond].
-    Old [b_ensures] represent the [Normal] case of [b_post_cond].
 *)
 and behavior = {
   mutable b_name : string; (** name of the behavior. *)

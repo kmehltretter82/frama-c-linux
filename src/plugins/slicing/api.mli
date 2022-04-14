@@ -190,8 +190,7 @@ module Select : sig
       execution of the statement [~eval].
       The selection preserve the [~rd] and ~[wr] accesses contained into the
       statement [ki].
-      Note: add also a transparent selection on the whole statement.
-      @modify Magnesium-20151001 argument [~scope] removed. *)
+      Note: add also a transparent selection on the whole statement. *)
   val select_stmt_lval_rw :
     set ->
     Mark.t ->
@@ -207,8 +206,7 @@ module Select : sig
       execution of the statement [~eval].
       The selection preserve the value of these lvalues before or after (c.f.
       boolean [~before]) the statement [ki].
-      Note: add also a transparent selection on the whole statement.
-      @modify Magnesium-20151001 argument [~scope] removed.  *)
+      Note: add also a transparent selection on the whole statement. *)
   val select_stmt_lval :
     set ->
     Mark.t ->
@@ -272,7 +270,7 @@ module Select : sig
       The interpretation of the address of the lvalues is done just before the
       execution of the statement [~eval].
       The selection preserve the value of these lvalues into the whole project.
-      @modify Magnesium-20151001 argument [~scope] removed. *)
+  *)
   val select_func_lval_rw :
     set -> Mark.t -> rd:Datatype.String.Set.t -> wr:Datatype.String.Set.t ->
     eval:Cil_datatype.Stmt.t -> Cil_types.kernel_function -> set

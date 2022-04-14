@@ -66,8 +66,6 @@ class type t =  object
       menu is returned.
 
       @since Nitrogen-20111001
-      @modify Oxygen-20120901 Signature change for the filter argument,
-      return the menu.
   *)
 
   method get_file_globals:
@@ -87,9 +85,7 @@ class type t =  object
     (was_activated:bool -> activating:bool -> filetree_node -> unit) -> unit
   (** Register a callback that is called whenever an element of the file tree
       is selected or unselected.
-
-      @modify Nitrogen-20111001 Changed argument from a list
-      of globals to [filetree_node] *)
+  *)
 
   method append_text_column:
     title:string ->
@@ -121,9 +117,6 @@ class type t =  object
       can be used to force an update on the display of the column
       [`Visibility] means that the column must be show or hidden. [`Contents]
       means what it contains has changed.
-
-      @modify Nitrogen-20111001 Add third argument, and change return type
-      @modify Oxygen-20120901 Change return type
   *)
 
   method select_global : Cil_types.global -> bool
@@ -133,9 +126,7 @@ class type t =  object
       provided they are not filtered out.) Unless you known what your
       are doing, prefer calling [main_ui#select_or_display_global],
       which is more resilient to globals not displayed in the filetree.
-
-      @modify Nitrogen-20111001 Takes a [global] as argument, instead of
-      a [varinfo]. Returns a boolean to indicate success or failure. *)
+  *)
 
   method selected_globals : Cil_types.global list
   (** @since Carbon-20101201

@@ -82,8 +82,6 @@ val pp_list: ?pre:sformat -> ?sep:sformat -> ?last:sformat -> ?suf:sformat ->
     - the last separator to be put just before the last element (default:sep)
     - the suffix to output after a non-empty list (default: close box)
     - what to print if the list is empty (default: nothing)
-
-    @modify Silicon-20161101 new optional argument [empty]
 *)
 
 val pp_array: ?pre:sformat -> ?sep:sformat -> ?suf:sformat -> ?empty:sformat ->
@@ -93,8 +91,6 @@ val pp_array: ?pre:sformat -> ?sep:sformat -> ?suf:sformat -> ?empty:sformat ->
     - the separator between two elements (default: nothing)
     - the suffix to output after a non-empty array (default: close box)
     - what to print if the array is empty (default: nothing)
-
-    @modify Silicon-20161101 new optional argument [empty]
 *)
 
 val pp_iter:
@@ -121,8 +117,7 @@ val pp_iter2:
 val pp_opt: ?pre:sformat -> ?suf:sformat -> ?none:sformat -> 'a formatter -> 'a option formatter
 (** pretty-prints an optional value. Prefix and suffix default to "@[" and "@]"
     respectively. If the value is [None], pretty-print using [none].
-
-    @modify Silicon-20161101 new optional argument [none] *)
+*)
 
 val pp_cond: ?pr_false:sformat -> bool -> sformat formatter
 (** [pp_cond cond f s]  pretty-prints [s] if cond is [true] and the optional

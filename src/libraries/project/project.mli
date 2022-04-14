@@ -110,8 +110,7 @@ val set_name: t -> string -> unit
 exception Unknown_project
 val from_unique_name: string -> t
 (** Return a project based on {!unique_name}.
-    @raise Unknown_project if no project has this unique name.
-    @modify Sodium-20150201 *)
+    @raise Unknown_project if no project has this unique name. *)
 
 val set_current: ?on:bool -> ?selection:State_selection.t -> t -> unit
 (** Set the current project with the given one.
@@ -133,8 +132,6 @@ val on: ?selection:State_selection.t -> t -> ('a -> 'b) -> 'a -> 'b
 (** [on p f x] sets the current project to [p], computes [f x] then
     restores the current project. You should use this function if you use a
     project different of [current ()].
-    @modify Carbon-20101201 replace the optional arguments [only] and
-    [except] by a single one [selection].
     @plugin development guide *)
 
 val set_keep_current: bool -> unit
@@ -151,8 +148,7 @@ val copy: ?selection:State_selection.t -> ?src:t -> t -> unit
     ()]. Replace the destination by [src].
     For each state to copy, the function [copy] given at state registration
     time must be fully implemented.
-    @modify Carbon-20101201 replace the optional arguments [only] and
-    [except] by a single one [selection]. *)
+*)
 
 val create_by_copy:
   ?selection:State_selection.t -> ?src:t -> last:bool -> string -> t
@@ -164,9 +160,7 @@ val create_by_copy:
     applied when loading a project are applied (see {!load}).
     If [last], then remember that the returned project is the last created
     one (see {!last_created_by_copy}).
-    @modify Carbon-20101201 replace the optional arguments [only] and
-    [except] by a single one [selection].
-    @modify Sodium-20150201 add the labeled argument [last]. *)
+*)
 
 val create_by_copy_hook: (t -> t -> unit) -> unit
 (** Register a hook to call at the end of {!create_by_copy}. The first
@@ -177,8 +171,6 @@ val clear: ?selection:State_selection.t -> ?project:t -> unit -> unit
 (** Clear the given project. Default project is [current ()]. All the
     internal states of the given project are now empty (wrt the action
     registered with {!register_todo_on_clear}).
-    @modify Carbon-20101201 replace the optional arguments [only] and
-    [except] by a single one [selection].
     @plugin development guide *)
 
 val register_todo_before_clear: (t -> unit) -> unit
@@ -212,8 +204,6 @@ exception IOError of string
 val save: ?selection:State_selection.t -> ?project:t -> Filepath.Normalized.t -> unit
 (** Save a given project in a file. Default project is [current ()].
     @raise IOError if the project cannot be saved.
-    @modify Carbon-20101201 replace the optional arguments [only] and
-    [except] by a single one [selection].
     @plugin development guide *)
 
 val load: ?selection:State_selection.t -> ?name:string -> Filepath.Normalized.t -> t
@@ -228,14 +218,10 @@ val load: ?selection:State_selection.t -> ?name:string -> Filepath.Normalized.t 
     }
     @raise IOError if the project cannot be loaded
     @return the new project containing the loaded data.
-    @modify Carbon-20101201 replace the optional arguments [only] and
-    [except] by a single one [selection].
     @plugin development guide *)
 
 val save_all: ?selection:State_selection.t -> Filepath.Normalized.t -> unit
 (** Save all the projects in a file.
-    @modify Carbon-20101201 replace the optional arguments [only] and
-    [except] by a single one [selection].
     @raise IOError a project cannot be saved. *)
 
 val load_all: ?selection:State_selection.t -> Filepath.Normalized.t -> unit
@@ -243,8 +229,6 @@ val load_all: ?selection:State_selection.t -> Filepath.Normalized.t -> unit
     file. For each project to load, the specification is the same than
     {!Project.load}. Furthermore, after loading, all the hooks registered by
     [register_after_set_current_hook] are applied.
-    @modify Carbon-20101201 replace the optional arguments [only] and
-    [except] by a single one [selection].
     @raise IOError if a project cannot be loaded. *)
 
 val register_before_load_hook: (unit -> unit) -> unit

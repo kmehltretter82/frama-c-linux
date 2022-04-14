@@ -93,7 +93,7 @@ val is_invisible: unit -> unit
 (** Prevent -help from listing the parameter.
     Also imply {!is_not_reconfigurable}.
     @since Carbon-20101201
-    @modify Nitrogen-20111001 does not appear in the help *)
+*)
 
 val argument_is_function_name: unit -> unit
 (** Indicate that the string argument of the parameter must be a valid function
@@ -101,8 +101,7 @@ val argument_is_function_name: unit -> unit
     analysed C program. Do nothing if the following applied functor has not type
     [String].
     @since Oxygen-20120901
-    @modify Sodium-20150201 do nothing when applied to [String_set] or
-    [String_list]. *)
+*)
 
 val argument_may_be_fundecl: unit -> unit
 (** Indicate that the argument of the parameter can match a valid function

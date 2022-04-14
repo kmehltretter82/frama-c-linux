@@ -46,9 +46,7 @@ class type view_code = object
   (** Move the pretty-printed source viewer to the given localizable
       if possible. Return a boolean indicating whether the operation
       succeeded
-
-      @modify Nitrogen-20111001  Now indicates whether the
-      operation succeeded. *)
+  *)
 
   method display_globals : global list -> unit
   (** Display the given globals in the pretty-printed source viewer. *)
@@ -84,7 +82,6 @@ class protected_menu_factory:
   Gtk_helper.host -> GMenu.menu -> [ GMenu.menu ] GMenu.factory
 
 (** This is the type of extension points for the GUI.
-    @modify Boron-20100401 new way of handling the menu and the toolbar
     @plugin development guide *)
 class type main_window_extension_points = object
   inherit view_code
@@ -171,9 +168,7 @@ class type main_window_extension_points = object
       between start and stop in the given buffer.
       Priority of [Gtext.tags] is used to decide which tag is rendered on
       top of the other.
-
-      @modify Aluminium-20160501: receives a {!reactive_buffer} instead
-      of a {!GSourceView.source_buffer} *)
+  *)
 
   method register_panel :
     (main_window_extension_points->(string*GObj.widget*(unit-> unit) option))

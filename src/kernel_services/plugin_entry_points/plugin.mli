@@ -76,8 +76,6 @@ end
 
 (** Provided plug-general services for plug-ins.
     @since Beryllium-20090601-beta1
-    @modify Chlorine-20180501 removed programmatic access to [Debug_category]:
-    managing categories is now entirely done by Log.Messages
     @plugin development guide *)
 module type S = sig
   include Log.Messages

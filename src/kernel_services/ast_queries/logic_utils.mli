@@ -67,7 +67,6 @@ val isLogicType : (typ -> bool) -> logic_type -> bool
 (** {3 Predefined tests over types} *)
 val isLogicArrayType : logic_type -> bool
 
-(** @modify Chlorine-20180501 old behavior renamed as [isLogicAnyCharType] *)
 val isLogicCharType : logic_type -> bool
 
 (** @since Chlorine-20180501 *)
@@ -123,8 +122,7 @@ val mk_logic_pointer_or_StartOf : term -> term
     performed automatically. If [force] is [true], the cast will always
     be inserted. Otherwise (which is the default), [mk_cast typ t] will return
     [t] if it is already of type [typ]
-
-    @modify Aluminium-20160501 added [force] optional argument *)
+*)
 val mk_cast: ?loc:location -> ?force:bool -> typ -> term -> term
 
 
@@ -434,7 +432,6 @@ val merge_behaviors :
 (** [merge_funspec ?oldloc oldspec newspec] merges [newspec] into [oldspec].
     If the funspec belongs to a kernel function, do not forget to call
     {!Kernel_function.set_spec} after merging.
-    @modify 20.0-Calcium add optional parameter [oldloc].
 *)
 val merge_funspec :
   ?oldloc:location -> ?silent_about_merging_behav:bool ->

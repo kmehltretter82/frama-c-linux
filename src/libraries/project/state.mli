@@ -180,8 +180,7 @@ val create:
   unique_name:string ->
   name:string ->
   t
-(** @since Carbon-20101201
-    @modify Nitrogen-20111001 add the [on_update] argument *)
+(** @since Carbon-20101201 *)
 
 val delete: t -> unit
 (** @since Carbon-20101201 *)

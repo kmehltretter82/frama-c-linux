@@ -265,8 +265,6 @@ val areCompatibleTypes: Cil_types.typ -> Cil_types.typ -> bool
     compatible to avoid spurious casts.
 
     @since Neon-20140301
-    @modify Phosphorus-20170501-beta1
-    @modify Chlorine-20180501 refined notion
 *)
 
 val stmtFallsThrough: Cil_types.stmt -> bool

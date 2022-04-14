@@ -40,7 +40,6 @@ module UntypedFiles: sig
       @raise NoUntypedAst if no untyped AST is available. This is in
       particular the case for projects obtained by code transformation from
       original C files.
-      @modify Nitrogen-20111001 raise NoUntypedAst
   *)
 
   val set: Cabs.file list -> unit

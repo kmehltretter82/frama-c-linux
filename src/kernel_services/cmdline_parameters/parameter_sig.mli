@@ -431,7 +431,6 @@ module type Set = sig
 
 end
 
-(** @modify Sodium-20150201 *)
 module type String_set =
   Set with type elt = string and type t = Datatype.String.Set.t
 
@@ -467,7 +466,6 @@ module type List =  sig
 
 end
 
-(** @modify Sodium-20150201 *)
 module type String_list = List with type elt = string and type t = string list
 
 module type Filepath_list =

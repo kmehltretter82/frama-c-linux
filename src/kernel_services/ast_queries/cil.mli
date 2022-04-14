@@ -168,7 +168,6 @@ val selfFormalsDecl: State.t
 val makeFormalsVarDecl: ?ghost:bool -> (string * typ * attributes) -> varinfo
 (** creates a new varinfo for the parameter of a prototype.
     By default, this formal variable is not ghost.
-    @modify 20.0-Calcium adds a parameter for ghost status
 *)
 
 (** Update the formals of a function declaration from its identifier and its
@@ -475,8 +474,7 @@ val integralPromotion : Cil_types.typ -> Cil_types.typ
 val isAnyCharType: typ -> bool
 
 (** True if the argument is a plain character type
-    (but neither [signed char] nor [unsigned char]).
-    @modify Chlorine-20180501 old behavior renamed as [isAnyCharType] *)
+    (but neither [signed char] nor [unsigned char]). *)
 val isCharType: typ -> bool
 
 (** True if the argument is a short type (i.e. signed or unsigned) *)
@@ -488,8 +486,7 @@ val isShortType: typ -> bool
 val isAnyCharPtrType: typ -> bool
 
 (** True if the argument is a pointer to a plain character type
-    (but neither [signed char] nor [unsigned char]).
-    @modify Chlorine-20180501 old behavior renamed as [isAnyCharPtrType] *)
+    (but neither [signed char] nor [unsigned char]). *)
 val isCharPtrType: typ -> bool
 
 (** True if the argument is a pointer to a constant character type,
@@ -504,7 +501,7 @@ val isAnyCharArrayType: typ -> bool
 
 (** True if the argument is an array of a character type
     (i.e. plain, signed or unsigned)
-    @modify Chlorine-20180501 old behavior renamed as [isAnyCharArrayType] *)
+*)
 val isCharArrayType: typ -> bool
 
 (** True if the argument is an integral type (i.e. integer or enum) *)
@@ -524,28 +521,23 @@ val isLogicPureBooleanType: logic_type -> bool
 val isIntegralOrPointerType: typ -> bool
 
 (** True if the argument is an integral type (i.e. integer or enum), either
-    C or mathematical one.
-    @modify 18.0-Argon expands the logic type definition if necessary. *)
+    C or mathematical one. *)
 val isLogicIntegralType: logic_type -> bool
 
 (** True if the argument is a boolean type, either integral C type or
-    mathematical boolean one.
-    @modify 18.0-Argon expands the logic type definition if necessary. *)
+    mathematical boolean one. *)
 val isLogicBooleanType: logic_type -> bool
 
 (** True if the argument is a floating point type. *)
 val isFloatingType: typ -> bool
 
-(** True if the argument is a floating point type.
-    @modify 18.0-Argon expands the logic type definition if necessary. *)
+(** True if the argument is a floating point type. *)
 val isLogicFloatType: logic_type -> bool
 
-(** True if the argument is a C floating point type or logic 'real' type.
-    @modify 18.0-Argon expands the logic type definition if necessary. *)
+(** True if the argument is a C floating point type or logic 'real' type. *)
 val isLogicRealOrFloatType: logic_type -> bool
 
-(** True if the argument is the logic 'real' type.
-    @modify 18.0-Argon expands the logic type definition if necessary. *)
+(** True if the argument is the logic 'real' type. *)
 val isLogicRealType: logic_type -> bool
 
 (** True if the argument is an arithmetic type (i.e. integer, enum or
@@ -564,8 +556,7 @@ val isScalarType: typ -> bool
 val isArithmeticOrPointerType: typ -> bool
 
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
-    floating point, either C or mathematical one.
-    @modify 18.0-Argon expands the logic type definition if necessary. *)
+    floating point, either C or mathematical one. *)
 val isLogicArithmeticType: logic_type -> bool
 
 (** True if the argument is a function type *)
@@ -588,8 +579,7 @@ val isFunPtrType: typ -> bool
     @since 18.0-Argon *)
 val isLogicFunPtrType: logic_type -> bool
 
-(** True if the argument is the type for reified C types.
-    @modify 18.0-Argon expands the logic type definition if necessary. *)
+(** True if the argument is the type for reified C types. *)
 val isTypeTagType: logic_type -> bool
 
 (** True if the argument denotes the type of ... in a variadic function.
@@ -686,7 +676,6 @@ val splitFunctionTypeVI:
     [vdecl] .
     The first unnamed argument specifies whether the varinfo is for a global and
     the second is for formals.
-    @modify 19.0-Potassium adds an optional ghost parameter
 *)
 val makeVarinfo:
   ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool -> ?loc:Location.t -> bool -> bool
@@ -705,8 +694,6 @@ val makeVarinfo:
     - specifying ghost to false if the function is ghost leads to an error
     - when [where] is specified, its status must be the same as the formal to
       insert (else, it cannot be found in the list of ghost or non ghost formals)
-
-    @modify 19.0-Potassium adds the optional ghost parameter
 *)
 val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Location.t -> string -> typ -> varinfo
 
@@ -717,9 +704,6 @@ val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Location.t -> 
     The variable is attached to the toplevel block if [scope] is not specified.
     If the name passed as argument already exists within the function,
     a fresh name will be generated for the varinfo.
-
-    @modify Chlorine-20180501 the name of the variable is guaranteed to be fresh.
-    @modify 20.0-Calcium add ghost optional argument
 *)
 val makeLocalVar:
   fundec -> ?scope:block -> ?temp:bool -> ?referenced:bool -> ?insert:bool ->
@@ -742,15 +726,12 @@ val refresh_local_name: fundec -> varinfo -> unit
     among other locals of the function. The value for [insert] should
     only be changed if you are completely sure this is not useful.
 
-    @modify 20.0-Calcium add ghost optional argument
 *)
 val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
   ?descr:string -> ?descrpure:bool -> ?loc:Location.t -> typ -> varinfo
 
 (** Make a global variable. Your responsibility to make sure that the name
     is unique. [source] defaults to [true]. [temp] defaults to [false].
-
-    @modify 20.0-Calcium add ghost optional arg
 *)
 val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool ->
   ?ghost:bool -> ?loc:Cil_datatype.Location.t -> string -> typ -> varinfo
@@ -967,7 +948,6 @@ val mkMem: addr:exp -> off:offset -> lval
     casts between arithmetic types as needed, or between pointer
     types, but do not attempt to cast pointer to int or
     vice-versa. Use appropriate binop (PlusPI & friends) for that.
-    @modify Chlorine-20180501 no systematic cast to uintptr_t for ptr comparisons.
 *)
 val mkBinOp: loc:location -> binop -> exp -> exp -> exp
 
@@ -991,14 +971,12 @@ val mkString: loc:location -> string -> exp
     (modulo typedefs). If [force] is [false] (the default), other equivalences
     are considered, in particular between an enum and its representative
     integer type.
-    @modify Fluorine-20130401 added [force] argument
 *)
 val need_cast: ?force:bool -> typ -> typ -> bool
 
 (** Construct a cast when having the old type of the expression. If the new
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false])
-    @modify Fluorine-20130401 add [force] argument
     @modify 23.0-Vanadium change order or arguments
 *)
 val mkCastT: ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
@@ -1093,7 +1071,7 @@ val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
 
 (** Returns an empty statement (of kind [Instr]). See [mkStmt] for [ghost] and
     [valid_sid] arguments.
-    @modify Neon-20130301 adds the [valid_sid] optional argument. *)
+*)
 val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
   ?loc:location -> unit -> stmt
 
@@ -1119,9 +1097,6 @@ val mkPureExprInstr:
 
     See {!Cil.mkStmt} for information about [ghost] and [valid_sid], and
     {!Cil.mkPureExprInstr} for information about [loc].
-
-    @modify Chlorine-20180501 lift optional arg valid_sid from [mkStmt] instead
-    of relying on ill-fated default.
 *)
 val mkPureExpr:
   ?ghost:bool -> ?valid_sid:bool -> fundec:fundec ->
@@ -1934,7 +1909,6 @@ val visitCilBlock: cilVisitor -> block -> block
     and contain definitions of local variables that are not part of the block.
 
     @since Phosphorus-20170501-beta1
-    @modify 19.0-Potassium: do not raise fatal as soon as the block has locals
 *)
 val transient_block: block -> block
 
@@ -2009,7 +1983,6 @@ val visitCilBehaviors: cilVisitor -> funbehavior list -> funbehavior list
 
 (** visit an extended clause of a behavior.
     @since Nitrogen-20111001
-    @modify Silicon-20161101
 *)
 val visitCilExtended: cilVisitor -> acsl_extension -> acsl_extension
 
@@ -2206,7 +2179,7 @@ exception Not_representable
 (** @return the smallest kind that will hold the integer's value.
     The kind will be unsigned if the 2nd argument is true.
     @raise Not_representable if the bigint is not representable.
-    @modify Neon-20130301 may raise Not_representable. *)
+*)
 val intKindForValue: Integer.t -> bool -> ikind
 
 (** The size of a type, in bytes. Returns a constant expression or a "sizeof"

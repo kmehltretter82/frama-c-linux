@@ -75,7 +75,6 @@ val register_compute:
   string ->
   State.t list ->
   (unit -> unit) ref -> (unit -> unit) -> State.t
-(** @modify Boron-20100401 now return the state of the computation. *)
 
 val register_guarded_compute:
   string ->
@@ -619,51 +618,37 @@ module Properties : sig
 
     val term_lval_to_lval:
       (result: Cil_types.varinfo option -> term_lval -> Cil_types.lval) ref
-    (** @raise No_conversion if the argument is not a left value.
-        @modify Aluminium-20160501 raises a custom exn instead of generic Invalid_arg
-    *)
+    (** @raise No_conversion if the argument is not a left value. *)
 
     val term_to_lval:
       (result: Cil_types.varinfo option -> term -> Cil_types.lval) ref
-    (** @raise No_conversion if the argument is not a left value.
-        @modify Aluminium-20160501 raises a custom exn instead of generic Invalid_arg
-    *)
+    (** @raise No_conversion if the argument is not a left value. *)
 
     val term_to_exp:
       (result: Cil_types.varinfo option -> term -> Cil_types.exp) ref
-    (** @raise No_conversion if the argument is not a valid expression.
-        @modify Aluminium-20160501 raises a custom exn instead of generic Invalid_arg
-    *)
+    (** @raise No_conversion if the argument is not a valid expression. *)
 
     val loc_to_exp:
       (result: Cil_types.varinfo option -> term -> Cil_types.exp list) ref
     (** @return a list of C expressions.
         @raise No_conversion if the argument is not a valid set of
-        expressions.
-        @modify Aluminium-20160501 raises a custom exn instead of generic Invalid_arg
-    *)
+        expressions. *)
 
     val loc_to_lval:
       (result: Cil_types.varinfo option -> term -> Cil_types.lval list) ref
     (** @return a list of C locations.
         @raise No_conversion if the argument is not a valid set of
-        left values.
-        @modify Aluminium-20160501 raises a custom exn instead of generic Invalid_arg
-    *)
+        left values. *)
 
     val term_offset_to_offset:
       (result: Cil_types.varinfo option -> term_offset -> offset) ref
-    (** @raise No_conversion if the argument is not a valid offset.
-        @modify Aluminium-20160501 raises a custom exn instead of generic Invalid_arg
-    *)
+    (** @raise No_conversion if the argument is not a valid offset. *)
 
     val loc_to_offset:
       (result: Cil_types.varinfo option -> term -> Cil_types.offset list) ref
     (** @return a list of C offset provided the term denotes locations who
         have all the same base address.
-        @raise No_conversion if the given term does not match the precondition
-        @modify Aluminium-20160501 raises a custom exn instead of generic Invalid_arg
-    *)
+        @raise No_conversion if the given term does not match the precondition *)
 
 
     (** {3 From logic terms to Locations.location} *)
@@ -671,10 +656,7 @@ module Properties : sig
     val loc_to_loc:
       (result: Cil_types.varinfo option -> Value.state -> term ->
        Locations.location) ref
-    (** @raise No_conversion if the translation fails.
-        @modify Aluminium-20160501 raises a custom exn instead of generic
-        Invalid_arg
-    *)
+    (** @raise No_conversion if the translation fails. *)
 
     val loc_to_loc_under_over:
       (result: Cil_types.varinfo option -> Value.state -> term ->
@@ -687,8 +669,6 @@ module Properties : sig
         Warning: This API is not stabilized, and may change in
         the future.
         @raise No_conversion if the translation fails.
-        @modify Aluminium-20160501 raises a custom exn instead of generic
-        Invalid_arg
     *)
 
     (** {3 From logic terms to Zone.t} *)
@@ -787,9 +767,6 @@ module Properties : sig
   val add_assert: Emitter.t -> kernel_function -> stmt -> string -> unit
   (** @deprecated since Oxygen-20120901
       Ask for {ACSL_importer plug-in} if you need such functionality.
-      @modify Boron-20100401 takes as additional argument the
-      computation which adds the assert.
-      @modify Oxygen-20120901 replaces the State.t list by an Emitter.t
   *)
 
 end

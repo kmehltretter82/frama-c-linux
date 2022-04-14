@@ -207,7 +207,6 @@ sig
      @param explicit true if the cast is present in original source.
             defaults to false
      @since Nitrogen-20111001
-     @modify 19.0-Potassium introduces explicit param
   *)
   val mk_cast:
     ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term

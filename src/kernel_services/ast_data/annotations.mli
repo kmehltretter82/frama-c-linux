@@ -22,7 +22,6 @@
 
 (** Annotations in the AST.
     The AST should be computed before calling functions of this module.
-    @modify Oxygen-20120901 fully rewritten.
     @plugin development guide *)
 
 open Cil_types
@@ -132,7 +131,6 @@ val iter_all_code_annot:
     If [sorted] is [true] (the default), iteration is sorted according
     to the location of the statements and by emitter. Note that the
     sorted version is less efficient than the unsorted iteration.
-    @modify Sodium-20150201: iteration is sorted
 *)
 
 val fold_all_code_annot:
@@ -140,7 +138,6 @@ val fold_all_code_annot:
   (stmt -> Emitter.t -> code_annotation -> 'a -> 'a) -> 'a -> 'a
 (** Fold on each code annotation of the program. See above for
     the meaning of the [sorted] argument.
-    @modify Sodium-20150201 sorted fold
 *)
 
 val iter_global:
@@ -347,22 +344,16 @@ val add_behaviors:
 (** Add new behaviors into the given contract.
     if [register_children] is [true] (the default), inner clauses of the
     behavior will also be registered by the function.
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_decreases: Emitter.t -> kernel_function -> variant -> unit
 (** Add a decrease clause into the contract of the given function.
     No decrease clause must previously be attached to this function.
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_terminates: identified_predicate contract_component_addition
 (** Add a terminates clause into a contract.
     No terminates clause must previously be attached to this contract.
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_complete: string list contract_component_addition
@@ -372,8 +363,6 @@ val add_complete: string list contract_component_addition
 
     @raise Fatal if one of the given name
     is either an unknown behavior or {!Cil.default_behavior_name}.
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_disjoint: string list contract_component_addition
@@ -383,14 +372,10 @@ val add_disjoint: string list contract_component_addition
 
     @raise Fatal if one of the given name
     is either an unknown behavior or {!Cil.default_behavior_name}.
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_requires: identified_predicate list behavior_component_addition
 (** Add new requires clauses into the given behavior.
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_assumes: identified_predicate list behavior_component_addition
@@ -398,15 +383,11 @@ val add_assumes: identified_predicate list behavior_component_addition
 
     Does nothing but emitting a warning if an attempt is
     made to add assumes clauses to the default behavior.
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_ensures:
   (termination_kind * identified_predicate) list behavior_component_addition
 (** Add new ensures clauses into the given behavior.
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_assigns:
@@ -417,8 +398,6 @@ val add_assigns:
     the assigns clause remains empty. (That corresponds to the ACSL semantics of
     an assigns clause: if no assigns is specified, that is equivalent to assigns
     everything.)
-
-    @modify Aluminium-20160501 restructuration of annotations management
 *)
 
 val add_allocates:

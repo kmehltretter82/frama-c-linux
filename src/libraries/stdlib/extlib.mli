@@ -222,7 +222,6 @@ val the: exn:exn -> 'a option -> 'a
 (** @raise Exn if the value is [None] and [exn] is specified.
     @raise Invalid_argument if the value is [None] and [exn] is not specified.
     @return v if the value is [Some v].
-    @modify Magnesium-20151001 add optional argument [exn]
     @modify 23.0-Vanadium optional argument [exn] now mandatory; otherwise,
             use [Option.get], which is equivalent.
     @plugin development guide *)
@@ -345,14 +344,10 @@ val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
     to true, in which case a message with the name of the kept file will be
     printed.
     @raise Temp_file_error if the temp file cannot be created.
-    @modify Nitrogen-20111001 may now raise Temp_file_error
-    @modify Oxygen-20120901 optional debug argument
 *)
 
 val temp_dir_cleanup_at_exit: ?debug:bool -> string -> string
-(** @raise Temp_file_error if the temp dir cannot be created.
-    @modify Nitrogen-20111001 may now raise Temp_file_error
-    @modify Neon-20130301 add optional debug flag *)
+(** @raise Temp_file_error if the temp dir cannot be created. *)
 
 val safe_remove: string -> unit
 (** Tries to delete a file and never fails. *)

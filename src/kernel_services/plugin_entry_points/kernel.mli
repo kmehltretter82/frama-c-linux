@@ -513,8 +513,6 @@ module Orig_name: Parameter_sig.Bool
 val normalization_parameters: unit -> Typed_parameter.t list
 (** All the normalization options that influence the AST (in particular,
     changing one will reset the AST entirely.contents
-
-    @modify Chlorine-20180501 make it non-constant
 *)
 
 module WarnDecimalFloat: Parameter_sig.String

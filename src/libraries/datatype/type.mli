@@ -96,10 +96,7 @@ val register:
     [ml_name] is the OCaml name of the registered type value.
     @raise AlreadyExists if the given name is already used by another type.
     @raise Invalid_argument if [reprs] is the empty list
-    @modify Boron-20100401 request a list of representant, not only a single
-    one
-    @modify Carbon-20101201 [value_name] is now [ml_name]. Must provide a
-    structural descriptor. Argument [pp] does not exist anymore. *)
+*)
 
 exception No_abstract_type of string
 
@@ -324,7 +321,7 @@ module type Heterogeneous_table = sig
       argument was dynamically registered, then it may raise
       [Incompatible_Type].
       @raise AlreadyExists if [s] is already bound in [tbl].
-      @modify Nitrogen-20111001 returns [unit] now. *)
+  *)
 
   exception Unbound_value of string
   exception Incompatible_type of string

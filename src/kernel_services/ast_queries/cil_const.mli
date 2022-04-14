@@ -59,7 +59,6 @@ val set_vid: varinfo -> unit
 (** returns a copy of the varinfo with a fresh vid.
     If the varinfo has an associated logic var, a copy of the logic var
     is made as well.
-    @modify Oxygen-20120901 take logic var into account
 *)
 val copy_with_new_vid: varinfo -> varinfo
 
