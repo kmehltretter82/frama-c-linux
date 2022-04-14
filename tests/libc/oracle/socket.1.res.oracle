@@ -50,6 +50,8 @@
 [eva] using specification for function read
 [eva] socket.c:61: function read: precondition 'valid_fd' got status valid.
 [eva] socket.c:61: function read: precondition 'buf_has_room' got status valid.
+[eva] socket.c:61: 
+  function read, behavior large_read_implementation_defined: assumes got status invalid; behavior not evaluated.
 [eva] Done for function read
 [eva] computing for function printf_va_1 <- test_read <- main.
   Called from socket.c:62.
@@ -173,6 +175,8 @@
   Called from socket.c:115.
 [eva] socket.c:115: function read: precondition 'valid_fd' got status valid.
 [eva] socket.c:115: function read: precondition 'buf_has_room' got status valid.
+[eva] socket.c:115: 
+  function read, behavior large_read_implementation_defined: assumes got status invalid; behavior not evaluated.
 [eva] Done for function read
 [eva] computing for function write <- test_server_echo <- main.
   Called from socket.c:117.

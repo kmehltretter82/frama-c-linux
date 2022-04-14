@@ -11,6 +11,7 @@
   \return(isatty) == 0 (auto)
   \return(lseek) == -1 (auto)
   \return(pipe) == 0 (auto)
+  \return(read) == -1, 32 (auto)
   \return(setegid) == 0 (auto)
   \return(seteuid) == 0 (auto)
   \return(setgid) == 0 (auto)
@@ -564,6 +565,53 @@
   Called from unistd_h.c:107.
 [eva] Done for function sleep
 [eva] unistd_h.c:108: assertion got status valid.
+[eva] computing for function read <- main.
+  Called from unistd_h.c:111.
+[eva] using specification for function read
+[eva] unistd_h.c:111: function read: precondition 'valid_fd' got status valid.
+[eva] unistd_h.c:111: 
+  function read: precondition 'buf_has_room' got status valid.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:111.
+[eva] Done for function read
+[eva] unistd_h.c:113: assertion got status valid.
+[eva] computing for function read <- main.
+  Called from unistd_h.c:117.
+[eva] unistd_h.c:117: function read: precondition 'valid_fd' got status valid.
+[eva] unistd_h.c:117: 
+  function read: precondition 'buf_has_room' got status valid.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:117.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:118.
+[eva] unistd_h.c:118: function read: precondition 'valid_fd' got status valid.
+[eva] unistd_h.c:118: 
+  function read: precondition 'buf_has_room' got status valid.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:118.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:118.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:118.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:118.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:118.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:118.
+[eva] Done for function read
+[eva] computing for function read <- main.
+  Called from unistd_h.c:118.
+[eva] Done for function read
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -591,4 +639,6 @@
   halfpipe ∈ UNINITIALIZED
   pipefd[0..1] ∈ [0..1023] or UNINITIALIZED
   unslept ∈ [0..42]
+  buf[0..4294967294] ∈ [--..--] or UNINITIALIZED
+  rread ∈ [--..--]
   __retres ∈ {0; 1}

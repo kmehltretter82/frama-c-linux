@@ -183,7 +183,7 @@
 [eva] computing for function wrong_assigns <- g5 <- main.
   Called from initialized.c:127.
 [eva] using specification for function wrong_assigns
-[eva] initialized.c:114: Warning: 
+[eva:ensures-false] initialized.c:114: Warning: 
   function wrong_assigns: this postcondition evaluates to false in this
   context. If it is valid, either a precondition was not verified for this
   call, or some assigns/from clauses are incomplete (or incorrect).

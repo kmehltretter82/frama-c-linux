@@ -359,7 +359,7 @@ module Make
         | Postcondition (PostLeaf | PostUseSpec) -> true
         | _ -> false)
        && pr.pred_content <> Pfalse then
-      Self.warning ~once:true ~source
+      Self.warning ~once:true ~source ~wkey:Self.wkey_ensures_false
         "@[%a:@ this postcondition@ evaluates to@ false@ in this@ context.\
          @ If it is valid,@ either@ a precondition@ was not@ verified@ \
          for this@ call%t,@ or some assigns/from@ clauses@ are \

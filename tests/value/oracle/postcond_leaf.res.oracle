@@ -8,24 +8,24 @@
 [kernel] postcond_leaf.c:109: Warning: 
   No code nor implicit assigns clause for function f1, generating default assigns from the prototype
 [eva] using specification for function f1
-[eva] postcond_leaf.c:21: Warning: 
+[eva:ensures-false] postcond_leaf.c:21: Warning: 
   function f1: this postcondition evaluates to false in this context.
   If it is valid, either a precondition was not verified for this call,
   or some assigns/from clauses are incomplete (or incorrect).
 [eva] using specification for function f2
-[eva] postcond_leaf.c:28: Warning: 
+[eva:ensures-false] postcond_leaf.c:28: Warning: 
   function f2, behavior b: this postcondition evaluates to false in this
   context. If it is valid, either a precondition was not verified for this
   call, or some assigns/from clauses are incomplete (or incorrect).
 [eva] using specification for function f3
 [eva] using specification for function f4
 [eva] using specification for function g1
-[eva] postcond_leaf.c:46: Warning: 
+[eva:ensures-false] postcond_leaf.c:46: Warning: 
   function g1: this postcondition evaluates to false in this context.
   If it is valid, either a precondition was not verified for this call,
   or some assigns/from clauses are incomplete (or incorrect).
 [eva] using specification for function g2
-[eva] postcond_leaf.c:55: Warning: 
+[eva:ensures-false] postcond_leaf.c:55: Warning: 
   function g2, behavior b: this postcondition evaluates to false in this
   context. If it is valid, either a precondition was not verified for this
   call, or some assigns/from clauses are incomplete (or incorrect).
