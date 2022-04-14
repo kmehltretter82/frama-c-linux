@@ -343,7 +343,7 @@ struct
     include Datatype.Pair (Memory) (References)
     let pretty_debug = pretty
     let top = Memory.top, References.empty
-    let _istop (m,r) = Memory.is_top m && References.is_empty r
+    let is_top (m,r) = Memory.is_top m && References.is_empty r
   end
 
   module BaseMap =
@@ -356,15 +356,17 @@ struct
     let find_or_top (state : t) (b : Base.t) =
       try find b state with Not_found -> V.top
 
+    (* Update or remove if top *)
+    let add (b : Base.t) (v : V.t) (state : t) =
+      if V.is_top v
+      then remove b state
+      else add b v state
+
     let remove_var (state : t) (v : Cil_types.varinfo) =
       remove (Base.of_varinfo v) state
 
     let remove_vars (state : t) (l : Cil_types.varinfo list) =
       List.fold_left remove_var state l
-
-    let remove_loc (state : t) (loc : Precise_locs.precise_location) =
-      let loc = Precise_locs.imprecise_location loc in
-      Locations.(Location_Bits.fold_bases remove loc.loc state)
   end
 
   include Datatype.Pair_with_collections
@@ -512,10 +514,13 @@ struct
       let oracle = convert_oracle oracle in
       write (fun m off -> Memory.overwrite ~oracle ~weak m off value) state dst
 
-  let erase ~oracle
+  let erase ~oracle ?(weak: bool option)
       (state : state) (dst : mdlocation) (b : Abstract_memory.bit): state =
-    let weak = not (Location.is_singleton dst)
-    and oracle = convert_oracle oracle in
+    let oracle = convert_oracle oracle
+    and weak = match weak with
+      | None -> not (Location.is_singleton dst)
+      | Some weak -> weak
+    in
     write (fun m off -> Memory.erase ~oracle ~weak m off b) state dst
 
   let reinforce
@@ -764,18 +769,18 @@ struct
     let (base_map,tracked) = state in
     BaseMap.remove_vars base_map vars, tracked
 
-  let logic_assign assign location (base_map,tracked as state) =
-    match assign with
-    | None -> BaseMap.remove_loc base_map location, tracked
-    | Some ((Frees _ | Allocates _), _) -> state
-    | Some (Assigns (_dest, sources), _pre_state) ->
-      match sources with
-      | [] ->
-        let dst = Location.of_precise_loc location in
-        let oracle = mk_oracle state in
-        erase ~oracle state dst Abstract_memory.Bit.numerical
-      | _ ->
-        BaseMap.remove_loc base_map location, tracked
+  let logic_assign assign location state =
+    let oracle = mk_oracle state
+    and dst = Location.of_precise_loc location
+    and b =
+      match assign with
+      | None
+      | Some (Frees _, _)
+      | Some (Allocates _, _)
+      | Some (Assigns (_, _ :: _), _) -> Abstract_memory.Bit.top
+      | Some (Assigns (_, []), _) -> Abstract_memory.Bit.numerical
+    in
+    erase ~oracle ~weak:true state dst b
 
   let reduce_by_papp env li _labels args positive state =
     match li.l_var_info.lv_name, args with

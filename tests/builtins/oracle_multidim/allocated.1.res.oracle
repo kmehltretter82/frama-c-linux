@@ -165,275 +165,58 @@
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
 > [eva] allocated.c:81: Trace partitioning superposing up to 500 states
-646,693d763
-< [eva] allocated.c:131: Frama_C_show_each: {0}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_0
-< [eva] allocated.c:131: Frama_C_show_each: {1}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_0}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_1
-< [eva] allocated.c:131: Frama_C_show_each: {2}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_1}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_2
-< [eva] allocated.c:131: Frama_C_show_each: {3}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_2}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_3
-< [eva] allocated.c:131: Frama_C_show_each: {4}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_3}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_4
-< [eva] allocated.c:131: Frama_C_show_each: {5}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_4}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_5
-< [eva] allocated.c:131: Frama_C_show_each: {6}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_5}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_6
-< [eva] allocated.c:131: Frama_C_show_each: {7}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_6}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_7
-< [eva] allocated.c:131: Frama_C_show_each: {8}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_7}
-< [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-< [eva] allocated.c:127: allocating variable __malloc_main_l127_8
-< [eva] allocated.c:131: Frama_C_show_each: {9}
-< [eva] allocated.c:127: Call to builtin __fc_vla_free
-< [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_8}
-701,792c771
-<   __fc_heap_status ∈ [--..--]
-<   i ∈ {10}
-<   j ∈ {10}
-<   p ∈ ESCAPINGADDR
-<   k ∈ {12}
-<   size ∈ [1..100]
-<   pb ∈ ESCAPINGADDR
-<   __retres ∈ {0}
-<   __malloc_main_l82_0 ∈ {7} or UNINITIALIZED
-<   __malloc_main_l82_1 ∈ {7} or UNINITIALIZED
-<   __malloc_main_l82_2[0] ∈ {14} or UNINITIALIZED
-<                      [1] ∈ {17} or UNINITIALIZED
-<   __malloc_main_l82_3[0] ∈ {14} or UNINITIALIZED
-<                      [1] ∈ {17} or UNINITIALIZED
-<   __malloc_main_l82_4[0] ∈ {14} or UNINITIALIZED
-<                      [1] ∈ {17} or UNINITIALIZED
-<   __malloc_main_l82_5[0] ∈ {14} or UNINITIALIZED
-<                      [1] ∈ {17} or UNINITIALIZED
-<   __malloc_main_l82_6[0] ∈ {14} or UNINITIALIZED
-<                      [1] ∈ {17} or UNINITIALIZED
+721,723c839,840
 <   __malloc_main_l82_7[0] ∈ {21} or UNINITIALIZED
 <                      [1] ∈ {24} or UNINITIALIZED
 <                      [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_8[0] ∈ {21} or UNINITIALIZED
-<                      [1] ∈ {24} or UNINITIALIZED
-<                      [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_9[0] ∈ {21} or UNINITIALIZED
-<                      [1] ∈ {24} or UNINITIALIZED
-<                      [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_10[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_11[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_12[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_13[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_14[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_15[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_16[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_17[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_18[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_19[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_20[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_21[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_22[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_23[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_24[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_25[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_26[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_27[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_28[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_29[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
-<   __malloc_main_l82_30[0] ∈ {21} or UNINITIALIZED
-<                       [1] ∈ {24} or UNINITIALIZED
-<                       [2] ∈ {27} or UNINITIALIZED
 ---
->   NON TERMINATING FUNCTION
-800,801c779
-< [from] Computing for function __fc_vla_free <-main
-< [from] Done for function __fc_vla_free
----
-> [from] Non-terminating function main (no dependencies)
-807,808d784
-< [from] Function __fc_vla_free:
-<   NO EFFECTS
-815,872c791
-<   __fc_heap_status FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l25 FROM __fc_heap_status
-<   __malloc_main_l36[0..1] FROM __fc_heap_status; nondet
-<   __malloc_main_l50[0..1] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l50_0[0..1] FROM __fc_heap_status; nondet (and SELF)
-<                      [2] FROM __fc_heap_status; nondet
-<   __malloc_main_l63 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l63_0 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l63_1 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l63_2 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l73 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l73_0 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l73_1 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l73_2 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_0 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_1 FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_2[0..1] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_3[0..1] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_4[0..1] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_5[0..1] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_6[0..1] FROM __fc_heap_status; nondet (and SELF)
+>   __malloc_main_l82_7[0] ∈ {14} or UNINITIALIZED
+>                      [1] ∈ {17} or UNINITIALIZED
+792a910,930
+>   __malloc_main_l82_31[0] ∈ {21} or UNINITIALIZED
+>                       [1] ∈ {24} or UNINITIALIZED
+>                       [2] ∈ {27} or UNINITIALIZED
+>   __malloc_main_l82_32[0] ∈ {21} or UNINITIALIZED
+>                       [1] ∈ {24} or UNINITIALIZED
+>                       [2] ∈ {27} or UNINITIALIZED
+>   __malloc_main_l82_33[0] ∈ {21} or UNINITIALIZED
+>                       [1] ∈ {24} or UNINITIALIZED
+>                       [2] ∈ {27} or UNINITIALIZED
+>   __malloc_main_l82_34[0] ∈ {21} or UNINITIALIZED
+>                       [1] ∈ {24} or UNINITIALIZED
+>                       [2] ∈ {27} or UNINITIALIZED
+>   __malloc_main_l82_35[0] ∈ {21} or UNINITIALIZED
+>                       [1] ∈ {24} or UNINITIALIZED
+>                       [2] ∈ {27} or UNINITIALIZED
+>   __malloc_main_l82_36[0] ∈ {21} or UNINITIALIZED
+>                       [1] ∈ {24} or UNINITIALIZED
+>                       [2] ∈ {27} or UNINITIALIZED
+>   __malloc_main_l82_37[0] ∈ {21} or UNINITIALIZED
+>                       [1] ∈ {24} or UNINITIALIZED
+>                       [2] ∈ {27} or UNINITIALIZED
+836c974
 <   __malloc_main_l82_7[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_8[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_9[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_10[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_11[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_12[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_13[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_14[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_15[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_16[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_17[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_18[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_19[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_20[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_21[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_22[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_23[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_24[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_25[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_26[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_27[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_28[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_29[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l82_30[0..2] FROM __fc_heap_status; nondet (and SELF)
-<   __malloc_main_l97[0] FROM __fc_heap_status; nondet
-<   __malloc_main_l114[0..3] FROM __fc_heap_status; nondet
-<   __malloc_main_l127 FROM \nothing (and SELF)
-<   __malloc_main_l127_0[0..1] FROM \nothing (and SELF)
-<   __malloc_main_l127_1[0..2] FROM \nothing (and SELF)
-<   __malloc_main_l127_2[0..3] FROM \nothing (and SELF)
-<   __malloc_main_l127_3[0..4] FROM \nothing (and SELF)
-<   __malloc_main_l127_4[0..5] FROM \nothing (and SELF)
-<   __malloc_main_l127_5[0..6] FROM \nothing (and SELF)
-<   __malloc_main_l127_6[0..7] FROM \nothing (and SELF)
-<   __malloc_main_l127_7[0..8] FROM \nothing (and SELF)
-<   __malloc_main_l127_8[0..9] FROM \nothing (and SELF)
-<   \result FROM \nothing
 ---
->   NON TERMINATING - NO EFFECTS
-876,900c795,817
-<     __retres; __malloc_main_l25; __malloc_main_l36[0..1];
-<     __malloc_main_l50[0..1]; __malloc_main_l50_0[0..2]; __malloc_main_l63;
-<     __malloc_main_l63_0; __malloc_main_l63_1; __malloc_main_l63_2;
-<     __malloc_main_l73; __malloc_main_l73_0; __malloc_main_l73_1;
-<     __malloc_main_l73_2; __malloc_main_l82_0; __malloc_main_l82_1;
-<     __malloc_main_l82_2[0..1]; __malloc_main_l82_3[0..1];
-<     __malloc_main_l82_4[0..1]; __malloc_main_l82_5[0..1];
+>   __malloc_main_l82_7[0..1] FROM __fc_heap_status; nondet (and SELF)
+859a998,1004
+>   __malloc_main_l82_31[0..2] FROM __fc_heap_status; nondet (and SELF)
+>   __malloc_main_l82_32[0..2] FROM __fc_heap_status; nondet (and SELF)
+>   __malloc_main_l82_33[0..2] FROM __fc_heap_status; nondet (and SELF)
+>   __malloc_main_l82_34[0..2] FROM __fc_heap_status; nondet (and SELF)
+>   __malloc_main_l82_35[0..2] FROM __fc_heap_status; nondet (and SELF)
+>   __malloc_main_l82_36[0..2] FROM __fc_heap_status; nondet (and SELF)
+>   __malloc_main_l82_37[0..2] FROM __fc_heap_status; nondet (and SELF)
+883c1028
 <     __malloc_main_l82_6[0..1]; __malloc_main_l82_7[0..2];
-<     __malloc_main_l82_8[0..2]; __malloc_main_l82_9[0..2];
-<     __malloc_main_l82_10[0..2]; __malloc_main_l82_11[0..2];
-<     __malloc_main_l82_12[0..2]; __malloc_main_l82_13[0..2];
-<     __malloc_main_l82_14[0..2]; __malloc_main_l82_15[0..2];
-<     __malloc_main_l82_16[0..2]; __malloc_main_l82_17[0..2];
-<     __malloc_main_l82_18[0..2]; __malloc_main_l82_19[0..2];
-<     __malloc_main_l82_20[0..2]; __malloc_main_l82_21[0..2];
-<     __malloc_main_l82_22[0..2]; __malloc_main_l82_23[0..2];
-<     __malloc_main_l82_24[0..2]; __malloc_main_l82_25[0..2];
-<     __malloc_main_l82_26[0..2]; __malloc_main_l82_27[0..2];
-<     __malloc_main_l82_28[0..2]; __malloc_main_l82_29[0..2];
+---
+>     __malloc_main_l82_6[0..1]; __malloc_main_l82_7[0..1];
+895,896c1040,1045
 <     __malloc_main_l82_30[0..2]; __malloc_main_l97[0]; __malloc_main_l114[0..3];
 <     __malloc_main_l127; __malloc_main_l127_0[0..1]; __malloc_main_l127_1[0..2];
-<     __malloc_main_l127_2[0..3]; __malloc_main_l127_3[0..4];
-<     __malloc_main_l127_4[0..5]; __malloc_main_l127_5[0..6];
-<     __malloc_main_l127_6[0..7]; __malloc_main_l127_7[0..8];
-<     __malloc_main_l127_8[0..9]
 ---
->     __malloc_main_l25; __malloc_main_l36[0..1]; __malloc_main_l50[0..1];
->     __malloc_main_l50_0[0..2]; __malloc_main_l63; __malloc_main_l63_0;
->     __malloc_main_l63_1; __malloc_main_l63_2; __malloc_main_l73;
->     __malloc_main_l73_0; __malloc_main_l73_1; __malloc_main_l73_2;
->     __malloc_main_l82_0; __malloc_main_l82_1; __malloc_main_l82_2[0..1];
->     __malloc_main_l82_3[0..1]; __malloc_main_l82_4[0..1];
->     __malloc_main_l82_5[0..1]; __malloc_main_l82_6[0..1];
->     __malloc_main_l82_7[0..1]; __malloc_main_l82_8[0..2];
->     __malloc_main_l82_9[0..2]; __malloc_main_l82_10[0..2];
->     __malloc_main_l82_11[0..2]; __malloc_main_l82_12[0..2];
->     __malloc_main_l82_13[0..2]; __malloc_main_l82_14[0..2];
->     __malloc_main_l82_15[0..2]; __malloc_main_l82_16[0..2];
->     __malloc_main_l82_17[0..2]; __malloc_main_l82_18[0..2];
->     __malloc_main_l82_19[0..2]; __malloc_main_l82_20[0..2];
->     __malloc_main_l82_21[0..2]; __malloc_main_l82_22[0..2];
->     __malloc_main_l82_23[0..2]; __malloc_main_l82_24[0..2];
->     __malloc_main_l82_25[0..2]; __malloc_main_l82_26[0..2];
->     __malloc_main_l82_27[0..2]; __malloc_main_l82_28[0..2];
->     __malloc_main_l82_29[0..2]; __malloc_main_l82_30[0..2];
->     __malloc_main_l82_31[0..2]; __malloc_main_l82_32[0..2];
->     __malloc_main_l82_33[0..2]; __malloc_main_l82_34[0..2];
->     __malloc_main_l82_35[0..2]; __malloc_main_l82_36[0..2];
->     __malloc_main_l82_37[0..2]; __malloc_main_l97[0]; __malloc_main_l114[0..3]
-906,911c823
-<     __malloc_main_l97[0][bits 0 to 0]; __malloc_main_l114[0][bits 0 to 0];
-<     __malloc_main_l127; __malloc_main_l127_0[0..1]; __malloc_main_l127_1[0..2];
-<     __malloc_main_l127_2[0..3]; __malloc_main_l127_3[0..4];
-<     __malloc_main_l127_4[0..5]; __malloc_main_l127_5[0..6];
-<     __malloc_main_l127_6[0..7]; __malloc_main_l127_7[0..8];
-<     __malloc_main_l127_8[0..9]
----
->     __malloc_main_l97[0][bits 0 to 0]; __malloc_main_l114[0][bits 0 to 0]
+>     __malloc_main_l82_30[0..2]; __malloc_main_l82_31[0..2];
+>     __malloc_main_l82_32[0..2]; __malloc_main_l82_33[0..2];
+>     __malloc_main_l82_34[0..2]; __malloc_main_l82_35[0..2];
+>     __malloc_main_l82_36[0..2]; __malloc_main_l82_37[0..2];
+>     __malloc_main_l97[0]; __malloc_main_l114[0..3]; __malloc_main_l127;
+>     __malloc_main_l127_0[0..1]; __malloc_main_l127_1[0..2];
