@@ -60,13 +60,13 @@ void main2(void) {
 }
 
 void main3(void) {
+  // Nest loops for 2d-arrays: currently the partitioning algorithm fails with it
   for (int i = 0 ; i < M ; i ++) {
     for (int j = 0 ; j < N ; j ++) {
       z[i].t1[j].f = 2.0;
       z[i].t1[j].i = 2;
     }
   }
-  
   int a = Frama_C_interval(0,M-1);
   int b = Frama_C_interval(0,N-1);
   t r = z[a].t1[b];
@@ -94,17 +94,17 @@ void main5(void) {
 
   //@ array_partition t, 0, 10, 20;
   for (int i = 0; i < 20; i++) {
-    //@ split i < 9;
-    //@ split i == 9;
+    //@ split i >= 10;
     if (i < 10)
       t[i] = 1;
     else
       t[i] = 2;
-    //@ array_partition t, 0, 10, 20;
   }
 
   Frama_C_domain_show_each(t);
 }
+
+
 
 void main6(void) {
   // Limit on the number of bounds in a segmentation

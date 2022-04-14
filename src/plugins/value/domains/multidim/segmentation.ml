@@ -46,6 +46,14 @@ type comparison =
   | GreaterOrEqual
   | Uncomparable
 
+let _comparison_symbol = function
+  | Equal -> "="
+  | Lower -> "<"
+  | Greater -> ">"
+  | LowerOrEqual -> Utf8_logic.le
+  | GreaterOrEqual -> Utf8_logic.ge
+  | Uncomparable -> "?"
+
 module type Operators =
 sig
   [@@@warning "-32"] (* unused operators... for now*)
@@ -316,16 +324,30 @@ struct
 
   let upper_const ~oracle b =
     upper_integer ~oracle b >>-: of_integer
+
+  let equivalent_bounds ~oracle b =
+    match b with
+    | Const _ -> [b]
+    | Exp _ ->
+      b :: (
+        to_integer ~oracle b |>
+        Option.map of_integer |>
+        Option.to_list)
+    | Ptroffset _ -> raise Not_implemented
 end
 
 module AgingBound =
 struct
   open Top.Operators
 
-  type age = Integer.t
+  type age = int (* -1 means everlasting bound *)
   type t = Bound.t * age
 
-  let pretty fmt (b,_) = Bound.pretty fmt b
+  let debug_mode = false
+  let pretty fmt (b,a) =
+    if debug_mode
+    then Format.fprintf fmt "%a@%d" Bound.pretty b a
+    else Bound.pretty fmt b
   let hash (b,_a) = Bound.hash b
   let compare (b1,_a1) (b2,_a2) =
     Bound.compare b1 b2
@@ -339,16 +361,20 @@ struct
   let eq ?oracle (b1,_a1) (b2,_a2) = Bound.eq ?oracle b1 b2
   let lower_bound ~oracle (b1,a1) (b2,a2) =
     let+ b = Bound.lower_bound ~oracle b1 b2 in
-    b, Integer.min a1 a2
+    b, min a1 a2
   let upper_bound ~oracle (b1,a1) (b2,a2) =
     let+ b = Bound.upper_bound ~oracle b1 b2 in
-    b, Integer.min a1 a2
+    b, min a1 a2
   let lower_const ~oracle (b,_a) = Bound.lower_const ~oracle b
   let upper_const ~oracle (b,_a) = Bound.upper_const ~oracle b
-  let birth b = b, Integer.zero
-  let aging (b,a) = b, Integer.succ a
+  let equivalent_bounds ~oracle (b,a) =
+    List.map (fun b -> (b,a)) (Bound.equivalent_bounds ~oracle b)
+  let birth b = b, 0
+  let everlasting b = b, -1
+  let is_everlasting (_b,a) = a < 0
+  let aging (b,a) = b, if a >= 0 then a+1 else a
   let age (_,a) = a
-  let unify_age ~other:(_,a') (b,a) = (b, Integer.min a' a)
+  let unify_age ~other:(_,a') (b,a) = (b, min a' a)
   let operators oracle : (module Operators with type t = t) =
     operators (cmp ~oracle)
 end
@@ -498,6 +524,22 @@ struct
     | [] -> assert false
     | _ :: _  -> m
 
+  (* Segmentation normalization *)
+  let remove_empty_segments ~oracle m =
+    let unify_head_age (b' : B.t) : segments -> segments = function
+      | [] -> [] (* Start of segmentation, age is 0, do nothing *)
+      | (v,b) :: t -> (v, B.unify_age ~other:b' b) :: t
+    in
+    let rec aux l acc = function
+      | [] -> List.rev acc
+      | (v,u) :: t ->
+        if B.eq ~oracle l u then (* empty segment, remove v *)
+          aux l (unify_head_age u acc) t
+        else
+          aux u ((v,u) :: acc) t
+    in
+    check { m with segments = aux m.start [] m.segments }
+
   (* Merge the two first slices of a segmentation *)
   exception NothingToMerge
   let smash_head ~oracle l = function
@@ -515,6 +557,7 @@ struct
     | [(v,u)] -> `Value v, u
     | t -> smash_all ~oracle l (smash_head ~oracle l t)
 
+
   (* Unify two arrays m1 and m2 *)
   let unify ~oracle f (m1 (*Left*): t) (m2 (*Right*) : t) : t or_top =
     let open Top.Operators in
@@ -522,6 +565,9 @@ struct
     let left = oracle Left and right = oracle Right in
     let equals side b1 b2 = B.cmp ~oracle:(oracle side) b1 b2 = Equal in
     let smash side = Bottom.join (M.smash ~oracle:(oracle side)) in
+    (* Normalise *)
+    let m1 = remove_empty_segments ~oracle:left m1 in
+    let m2 = remove_empty_segments ~oracle:right m2 in
     let {start=l1 ; segments=s1 ; padding=p1 } = m1
     and {start=l2 ; segments=s2 ; padding=p2 } = m2 in
     (* Unify the segmentation start *)
@@ -554,10 +600,24 @@ struct
     let rec aux l s1 s2 acc =
       (* Look for emerging slices *)
       let left_slice_emerges = match s1 with
-        | (v1,u1) :: t1 when equals Right l u1 -> Some (v1,u1,t1)
+        | (v1,u1) :: t1 ->
+          begin
+            try
+              let candidates = B.equivalent_bounds ~oracle:left u1 in
+              let u = List.find (equals Right l) candidates in
+              Some (v1,u,t1)
+            with Not_found -> None
+          end
         | _ -> None
       and right_slice_emerges = match s2 with
-        | (v2,u2) :: t2 when equals Left l u2 -> Some (v2,u2,t2)
+        | (v2,u2) :: t2 ->
+          begin
+            try
+              let candidates = B.equivalent_bounds ~oracle:right u2 in
+              let u = List.find (equals Left l) candidates in
+              Some (v2,u,t2)
+            with Not_found -> None
+          end
         | _ -> None
       in
       match left_slice_emerges, right_slice_emerges with
@@ -565,12 +625,12 @@ struct
         if equals Left l u1 then (* actually empty both sides*)
           aux l t1 s2 acc
         else
-          aux u1 t1 s2 ((v1,B.unify_age ~other:l u1) :: acc)
+          aux u1 t1 s2 ((v1,u1) :: acc)
       | None, Some (v2,u2,t2) -> (* right slice emerges *)
         if equals Right l u2 then (* actually empty both sides *)
           aux l s1 t2 acc
         else
-          aux u2 s1 t2 ((v2,B.unify_age ~other:l u2) :: acc)
+          aux u2 s1 t2 ((v2,u2) :: acc)
       | Some _, Some _ (* both emerges, can't choose *)
       | None, None -> (* none emerges *)
         match s1, s2 with (* Are we done yet ? *)
@@ -583,19 +643,25 @@ struct
               (* u1 and u2 can be indeferently used right side
                  -> use u1 as next bound
                  Note: Asymetric choice, u2 may also be a good choice *)
-              aux u1 t1 t2 ((f v1 v2, B.unify_age ~other:u2 u1) :: acc)
+              aux u1 t1 t2 ((f v1 v2, u1) :: acc)
             | Equal, _ ->
               (* u1 and u2 can be indeferently used left side
                  -> use u2 as next bound *)
-              aux u2 t1 t2 ((f v1 v2, B.unify_age ~other:u1 u2) :: acc)
+              aux u2 t1 t2 ((f v1 v2, u2) :: acc)
+            | _, _ when B.is_everlasting u1 && not (B.is_everlasting u2) ->
+              (* Remove the right bound to keep the left everlasting bound *)
+              aux l s1 (merge_first Right l s2) acc
+            | _, _ when B.is_everlasting u2 && not (B.is_everlasting u1) ->
+              (* Remove the left bound to keep the right everlasting bound *)
+              aux l (merge_first Left l s1) s2 acc
             | (Greater | GreaterOrEqual),
               (Greater | GreaterOrEqual | Uncomparable) ->
-              (* u1 > u2 on the left side, we are sure u2 doesn't appear left
+              (* u1 >= u2 on the left side, we are sure u2 doesn't appear left
                  -> remove u2, merge slices *)
               aux l s1 (merge_first Right l s2) acc
             | (Lower | LowerOrEqual | Uncomparable),
               (Lower | LowerOrEqual) ->
-              (* u1 < u2 on the right side, we are sure u1 doesn't appear right
+              (* u1 <= u2 on the right side, we are sure u1 doesn't appear right
                  -> remove u1, merge slices *)
               aux l (merge_first Left l s1) s2 acc
             | (Greater | GreaterOrEqual), (Lower | LowerOrEqual) (* Can't choose which bound to remove first *)
@@ -653,30 +719,30 @@ struct
       in
       aux (B.age b) t
 
-  let remove_elderlies ~oracle m =
-    match age m with
-    | None -> m (* no inner bounds, should not happen if segments_limit > 2 *)
-    | Some oldest_age ->
-      (* Remove all bounds of this age *)
-      let rec aux acc l = function
-        | ([] | [_]) as t -> List.rev (t @ acc)
-        | ((v,u) :: t) as s ->
-          if B.age u = oldest_age then
-            aux acc l (smash_head ~oracle l s)
-          else
-            aux ((v,u) :: acc) u t
-      in
-      { m with segments = aux [] m.start m.segments }
+  (* Remove all bounds >= limit *)
+  let remove_elderlies ~oracle limit m =
+    let rec aux acc l = function
+      | ([] | [_]) as t -> List.rev (t @ acc)
+      | ((v,u) :: t) as s ->
+        if B.age u >= limit then
+          aux acc l (smash_head ~oracle l s)
+        else
+          aux ((v,u) :: acc) u t
+    in
+    { m with segments = aux [] m.start m.segments }
 
   let limit_size ~oracle m =
     let limit = max 1 (Config.slice_limit ()) in
     let rec aux m =
       if List.length m.segments <= limit
       then m
-      else aux (remove_elderlies ~oracle m)
+      else
+        match age m with
+        | None -> m (* no inner bounds, should not happen if segments_limit > 2 *)
+        | Some oldest when oldest > 0 -> aux (remove_elderlies ~oracle oldest m)
+        | Some _ -> m
     in
     aux m
-
 
   (* TODO: partitioning strategies
      1. reinforcement without loss
@@ -686,7 +752,10 @@ struct
     let open TopBottom.Operators in
     let open (val (B.operators oracle)) in
     let same_bounds = lindex == uindex in (* happens when adding partitioning hints *)
-    let lindex = B.birth lindex and uindex = B.birth uindex in
+    let lindex, uindex =
+      if same_bounds
+      then B.everlasting lindex, B.everlasting uindex
+      else B.birth lindex, B.birth uindex in
     (* (start,head) : segmentation kept identical below the update indexes,
                       head is a list in reverse order
        (l,v,u) : the segment (l,u) beeing overwriten with previous value v
@@ -739,29 +808,16 @@ struct
         start = start';
       }
     in
+    let m = if same_bounds then m else remove_empty_segments ~oracle m in
     aux_before m.start m.segments >>-:
     aging >>-:
     limit_size ~oracle
 
-  let remove_empty_segments m =
-    let unify_head_age (b' : B.t) : segments -> segments = function
-      | [] -> [] (* Start of segmentation, age is 0, do nothing *)
-      | (v,b) :: t -> (v, B.unify_age ~other:b' b) :: t
-    in
-    let rec aux l acc = function
-      | [] -> List.rev acc
-      | (v,u) :: t ->
-        (* Oracle cannot be used in case of incr here as it represents the
-           value of the bounds before the instruction, while we iterate
-           here over a segmentation interpreted after the instruction. *)
-        if B.equal_regardless_age l u then (* empty segment, remove v *)
-          aux l (unify_head_age u acc) t
-        else
-          aux u ((v,u) :: acc) t
-    in
-    check { m with segments = aux m.start [] m.segments }
 
   let incr_bound ~oracle vi x m =
+    (* Removing empty segments must be done before updating bounds as the oracle
+       is only valid before the update *)
+    let m = remove_empty_segments ~oracle m in
     let incr = B.incr_or_constantify ~oracle vi x in
     let rec incr_start p l = function
       | [] -> `Top (* No more segments, top segmentation *)
@@ -792,9 +848,7 @@ struct
     and incr_inner p l acc (* In right order *) = function (* In reverse order *)
       | [] -> assert false
       | [s] ->
-        check { start=l ; padding=p ; segments=s :: acc } |>
-        remove_empty_segments |>
-        fun m -> `Value m
+        `Value (check { start=l ; padding=p ; segments=s :: acc })
       | (v1,u) :: (v2,m) :: t -> (* u is already increased *)
         match incr m with
         | Some m' ->
