@@ -128,11 +128,11 @@ type status =
   | SpecUsed
   (** The function specification has been used to interpret its calls:
       its body has not been analyzed. Any request at a statement of this
-      function will lead to a Top result. *)
+      function will lead to a Bottom result. *)
   | Builtin of string
   (** The builtin of the given name has been used to interpret the function:
       its body has not been analyzed. Any request at a statement of this
-      function will lead to a Top result. *)
+      function will lead to a Bottom result. *)
   | Analyzed of results
   (** The function body has been analyzed. *)
 

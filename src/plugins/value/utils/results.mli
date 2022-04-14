@@ -60,7 +60,7 @@
     - the function has not been reached by the analysis: all requests in the
       function will lead to a Bottom error.
     - a specification or a builtin has been used instead of analyzing the
-      function body: all requests in the function will lead to a Top error.
+      function body: all requests in the function will lead to a Bottom error.
     - results have not been saved, due to the [-eva-no-results] parameter:
       all requests in the function will lead to a Top error. *)
 val are_available: Cil_types.kernel_function -> bool

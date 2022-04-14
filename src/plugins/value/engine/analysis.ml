@@ -100,8 +100,8 @@ module Make (Abstract: Abstractions.S) = struct
     then
       let kf = Kernel_function.find_englobing_kf stmt in
       match status kf with
-      | Unreachable -> `Bottom
-      | Analyzed NoResults | SpecUsed | Builtin _ -> `Top
+      | Unreachable | SpecUsed | Builtin _ -> `Bottom
+      | Analyzed NoResults -> `Top
       | Analyzed (Complete | Partial) -> f stmt
     else `Top
 
