@@ -41,12 +41,6 @@ val add_logic_function : logic_info -> unit
 
 (** {2 Types} *)
 
-(** instantiate type variables in a logic type. *)
-val instantiate :
-  (string * logic_type) list ->
-  logic_type -> logic_type
-[@@deprecated "Use Logic_const.instantiate instead."]
-
 (** [is_instance_of poly t1 t2] returns [true] if [t1] can be derived from [t2]
     by instantiating some of the type variable in [poly].
 
@@ -90,10 +84,6 @@ val array_to_ptr : logic_type -> logic_type
 val coerce_type : typ -> logic_type
 
 (** {2 Predicates} *)
-
-(** @deprecated use Logic_const.pred_of_id_pred instead *)
-val predicate_of_identified_predicate: identified_predicate -> predicate
-[@@ deprecated "Use Logic_const.pred_of_id_pred instead"]
 
 (** transforms \old and \at(,Old) into \at(,L) for L a label pointing
     to the given statement, creating one if needed. *)
@@ -345,8 +335,6 @@ val is_same_builtin_profile :
 val is_same_logic_ctor_info :
   logic_ctor_info -> logic_ctor_info -> bool
 
-(** @deprecated Nitrogen-20111001 use {!Cil.compareConstant} instead. *)
-val is_same_constant : constant -> constant -> bool
 val is_same_term : term -> term -> bool
 val is_same_logic_info : logic_info -> logic_info -> bool
 val is_same_logic_body : logic_body -> logic_body -> bool

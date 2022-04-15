@@ -158,7 +158,7 @@ class mkcomposer
         Pretty_utils.ksfprintf head#set_text "%s: -" wtitle
       | value ->
         let text =
-          Pretty_utils.sfprintf "@[<hov 2>%s: %a@]" wtitle pp value in
+          Format.asprintf "@[<hov 2>%s: %a@]" wtitle pp value in
         let msg =
           if String.length text <= 20 then text else
             String.sub text 0 17 ^ "..." in

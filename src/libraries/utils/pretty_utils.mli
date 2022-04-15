@@ -43,10 +43,6 @@ val with_null : (unit -> 'b) -> ('a,Format.formatter,unit,'b) format4 -> 'a
 (** {2 pretty-printing to a string} *)
 (* ********************************************************************** *)
 
-val sfprintf: ('a,Format.formatter,unit,string) format4 -> 'a
-(** Equivalent to Format.asprintf. Used for compatibility with OCaml < 4.01.
-    @deprecated Silicon-20161101 use Format.asprintf *)
-
 val ksfprintf:
   (string -> 'b) -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 (** similar to Format.kfprintf, but the continuation is given the result

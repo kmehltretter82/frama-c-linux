@@ -183,9 +183,6 @@ val all_actions_preds:
   Cil_types.logic_label ->
   Data_for_aorai.state -> predicate list
 
-(** Return an integer constant term with the 0 value. *)
-val zero_term : unit -> Cil_types.term
-
 (** Given an lval term 'host' and an integer value 'off', it returns a lval term host[off]. *)
 val mk_offseted_array : Cil_types.term_lval -> int -> Cil_types.term
 val mk_offseted_array_states_as_enum :

@@ -129,8 +129,6 @@ let coerce_type typ =
   else if Cil.isFloatingType ty then Lreal
   else Ctype typ
 
-let predicate_of_identified_predicate ip = ip.ip_content.tp_statement
-
 let translate_old_label s p =
   let get_label () =
     match s.labels with
@@ -873,8 +871,6 @@ let compare_logic_ctor_info ci1 ci2 =
         Cil_datatype.Logic_type_ByName.compare ci1.ctor_params ci2.ctor_params
     else res
   else res
-
-let is_same_constant = Cil.compareConstant
 
 let is_same_pconstant c1 c2 =
   let open Logic_ptree in
@@ -2749,10 +2745,6 @@ class simplify_const_lval global_find_init = object (self)
 end
 
 let () = Cil_datatype.punrollLogicType := unroll_type
-
-(* ************************************************************************** *)
-(** {1 Deprecated} *)
-let instantiate = Logic_const.instantiate
 
 (*
 Local Variables:

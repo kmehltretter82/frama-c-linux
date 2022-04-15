@@ -68,7 +68,7 @@ let cluster_key = Wp.register_category "cluster"
 let chunk_key = Wp.register_category "chunk"
 let offset_key = Wp.register_category "offset"
 
-let sfprintf = Pretty_utils.sfprintf
+let sfprintf = Format.asprintf
 
 let dotpointed ~label r =
   let attr =

@@ -33,12 +33,6 @@ exception Backtrack
 
 let ($) = Extlib.($)
 
-let add_offset_lval =
-  Kernel.deprecated
-    "Logic_typing.add_offset_lval"
-    ~now:"Logic_const.addTermOffsetLval"
-    Logic_const.addTermOffsetLval
-
 let loc_join (b,_) (_,e) = (b,e)
 let unescape s = Logic_lexer.chr (Lexing.from_string s)
 

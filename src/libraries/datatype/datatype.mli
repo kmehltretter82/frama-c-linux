@@ -340,10 +340,6 @@ val string: string Type.t
 module Formatter: S with type t = Format.formatter
 val formatter: Format.formatter Type.t
 
-(* module Big_int: S_with_collections with type t = Integer.t *)
-(* val big_int: Big_int.t Type.t *)
-(** @deprecated use Integer instead. *)
-
 module Integer: S_with_collections with type t = Integer.t
 val integer: Integer.t Type.t
 

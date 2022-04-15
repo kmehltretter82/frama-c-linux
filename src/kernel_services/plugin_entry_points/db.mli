@@ -762,13 +762,6 @@ module Properties : sig
 
   end
 
-  (** {3 Assertions} *)
-
-  val add_assert: Emitter.t -> kernel_function -> stmt -> string -> unit
-  (** @deprecated since Oxygen-20120901
-      Ask for {ACSL_importer plug-in} if you need such functionality.
-  *)
-
 end
 
 (* ************************************************************************* *)

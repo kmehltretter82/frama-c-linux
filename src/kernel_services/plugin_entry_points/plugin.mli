@@ -142,14 +142,6 @@ val plugin_subpath: string -> unit
     directories [Share], [Session] and [Config] above.
     @since Neon-20140301 *)
 
-val default_msg_keys: string list -> unit
-(** Debug message keys set by default for the plugin.
-    @since Silicon-20161101
-    @deprecated since Chlorine-20180501 use directly functions from Log
-     (add_debug_keys and del_debug_keys) to manage the default status of each
-     category
-*)
-
 (* ************************************************************************* *)
 (** {2 Handling plugins} *)
 (* ************************************************************************* *)
@@ -166,11 +158,6 @@ val is_present: string -> bool
 (** Whether a plug-in already exists.
     Plugins are identified by their short name.
     @since Magnesium-20151001 *)
-
-val get: string -> plugin
-[@@ deprecated "Use Plugin.get_from_name"]
-(** Get a plug-in from its name.
-    @deprecated since Oxygen-20120901 *)
 
 val iter_on_plugins: (plugin -> unit) -> unit
 (** Iterate on each registered plug-in.

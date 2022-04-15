@@ -970,13 +970,6 @@ module Properties = struct
       mk_fun "Properties.Interp.to_result_from_pred"
   end
 
-  let add_assert emitter kf kinstr prop =
-    Kernel.deprecated "Db.Properties.add_assert" ~now:"ACSL_importer plug-in"
-      (fun () ->
-         let interp_prop = !Interp.code_annot kf kinstr prop in
-         Annotations.add_code_annot emitter kinstr interp_prop)
-      ()
-
 end
 
 (* ************************************************************************* *)

@@ -128,7 +128,7 @@ let pretty fmt wh =
     Format.fprintf fmt "%a" (pp_bindings Base.pretty pp_elt) (Base.Map.bindings m)
   in
   let pp_stmt fmt stmt =
-    let stmt_str = Pretty_utils.sfprintf "%a" Stmt.pretty stmt in
+    let stmt_str = Format.asprintf "%a" Stmt.pretty stmt in
     let len = String.length stmt_str in
     Format.fprintf fmt "[sid:%d<%s>]" stmt.Cil_types.sid
       (if len < 10 then stmt_str else String.sub stmt_str 0 10 ^ "...")

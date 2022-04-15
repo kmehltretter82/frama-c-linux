@@ -326,12 +326,6 @@ module type Messages = sig
       @since Fluorine-20130401
   *)
 
-  val get_debug_keyset : unit -> category list
-  (** Returns currently active keys
-      @since Nitrogen-20111001
-      @deprecated Fluorine-20130401 use get_debug_keys instead
-  *)
-
   val register_warn_category: string -> warn_category
 
   val is_warn_category: string -> bool
@@ -456,24 +450,6 @@ val get_current_source : unit -> Filepath.position
 
 val clean : unit -> unit
 (** Flushes the last transient message if necessary. *)
-
-val null : formatter
-[@@ deprecated "Use 'Pretty_utils.null' instead"]
-(** Prints nothing.
-    @since Beryllium-20090901
-    @deprecated Chlorine-20180501 use {!Pretty_utils} instead. *)
-
-val nullprintf :  ('a,formatter,unit) format -> 'a
-[@@ deprecated "Use 'Pretty_utils.nullprintf' instead"]
-(** Discards the message and returns unit.
-    @since Beryllium-20090901
-    @deprecated Chlorine-20180501 use {!Pretty_utils} instead. *)
-
-val with_null : (unit -> 'b) -> ('a,formatter,unit,'b) format4 -> 'a
-[@@ deprecated "Use 'Pretty_utils.with_null' instead"]
-(** Discards the message and call the continuation.
-    @since Beryllium-20090901
-    @deprecated Chlorine-20180501 use {!Pretty_utils} instead. *)
 
 val set_output : ?isatty:bool -> (string -> int -> int -> unit) -> (unit -> unit) -> unit
 (** This function has the same parameters as Format.make_formatter.

@@ -135,7 +135,7 @@ let filter tau e =
   with Not_found -> true (* allowed to not restrict usage *)
 
 let fieldname ~range k x =
-  Pretty_utils.sfprintf "%s (%a)%t"
+  Format.asprintf "%s (%a)%t"
     (descr k) F.Tau.pretty (F.tau_of_var x)
     (fun fmt -> if range then Format.pp_print_string fmt "(accept range)")
 

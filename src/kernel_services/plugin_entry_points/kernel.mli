@@ -294,10 +294,6 @@ end
 (** Behavior of option "-unicode".
     @plugin development guide *)
 
-module UseUnicode: Parameter_sig.Bool
-(** Behavior of option "-unicode"
-    @deprecated since Nitrogen-20111001 use module {!Unicode} instead. *)
-
 module Time: Parameter_sig.String
 (** Behavior of option "-time" *)
 

@@ -1279,17 +1279,6 @@ val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 *)
 val isGlobalInitConst: varinfo -> bool
 
-(** Remove attributes whose name appears in the first argument that are
-    present anywhere in the fully expanded version of the type.
-    @since Oxygen-20120901
-    @deprecated Chlorine-20180501 use {!Cil.typeRemoveAttributesDeep} instead,
-    which does not traverse pointers and function types, or
-    {!Cil.typeDeepDropAllAttributes}, which will give a pristine version of the
-    type, without any attributes.
-*)
-val typeDeepDropAttributes: string list -> typ -> typ
-[@@ ocaml.deprecated "Use Cil.typeRemoveAttributesDeep"]
-
 (** Remove any attribute appearing somewhere in the fully expanded
     version of the type.
     @since Oxygen-20120901
@@ -1361,14 +1350,6 @@ val typeHasQualifier: string -> typ -> bool
     For l-values, both functions return the same results, as l-values cannot
     have array type.
     @since Sodium-20150201 *)
-
-val typeHasAttributeDeep: string -> typ -> bool
-[@@ deprecated "Use Cil.typeHasAttributeMemoryBlock instead"]
-(** Does the type or one of its subtypes have the given attribute. Does
-    not recurse through pointer types, nor inside function prototypes.
-    @since Oxygen-20120901
-    @deprecated Chlorine-20180501 see {!Cil.typeHasAttributeMemoryBlock}
-*)
 
 val typeHasAttributeMemoryBlock: string -> typ -> bool
 (** [typeHasAttributeMemoryBlock attr t] is

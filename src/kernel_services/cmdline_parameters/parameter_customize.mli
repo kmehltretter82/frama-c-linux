@@ -79,12 +79,6 @@ val set_unset_option_help: string -> unit
     has not been called before. No default.
     @since Fluorine-20130401 *)
 
-val set_optional_help: (unit, Format.formatter, unit) format -> unit
-(** Concatenate an additional description just after the default one.
-    @since Beryllium-20090601-beta1
-    @deprecated since Oxygen-20120901: directly use the help string
-    instead. *)
-
 val set_group: Cmdline.Group.t -> unit
 (** Affect a group to the parameter.
       @since Beryllium-20090901 *)

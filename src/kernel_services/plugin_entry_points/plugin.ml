@@ -91,9 +91,6 @@ let plugin_subpath s = plugin_subpath_ref := Some s
 
 let default_msg_keys_ref = ref []
 
-let default_msg_keys l = default_msg_keys_ref := l
-[@@ deprecated "Manage msg keys with Log interface"]
-
 let reset_plugin () =
   kernel := false;
   share_visible_ref := false;
@@ -132,10 +129,6 @@ let fold_on_plugins (f : (plugin -> 'a -> 'a)) (acc : 'a) : 'a =
 let is_present s = List.exists (fun p -> p.p_shortname = s) !plugins
 let get_from_name s = List.find (fun p -> p.p_name = s) !plugins
 let get_from_shortname s = List.find (fun p -> p.p_shortname = s) !plugins
-let get s =
-  Cmdline.Kernel_log.deprecated
-    "Plugin.get" ~now:"Plugin.get_from_name" get_from_name s
-[@@ deprecated "Use Plugin.get_from_name"]
 
 (* ************************************************************************* *)
 (** {2 Global data structures} *)

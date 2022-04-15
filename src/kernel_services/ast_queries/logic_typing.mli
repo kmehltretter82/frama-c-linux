@@ -60,11 +60,6 @@ val type_of_set_elem: logic_type -> logic_type
 val ctype_of_pointed: logic_type -> typ
 val ctype_of_array_elem: logic_type -> typ
 
-(**
-   @deprecated Neon-20130301 use Logic_const.addTermOffsetLval instead
-*)
-val add_offset_lval: term_offset -> term_lval -> term_lval
-
 val arithmetic_conversion:
   Cil_types.logic_type -> Cil_types.logic_type -> Cil_types.logic_type
 
