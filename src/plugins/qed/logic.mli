@@ -280,12 +280,6 @@ sig
 
   type path = int list (** position of a subterm in a term. *)
 
-  val subterm: term -> path -> term
-  [@@deprecated "Path-access might be unsafe in presence of binders"]
-
-  val change_subterm: term -> path -> term -> term
-  [@@deprecated "Path-access might be unsafe in presence of binders"]
-
   (** {3 Basic constructors} *)
 
   val e_true : term
@@ -335,9 +329,6 @@ sig
   val e_bind : binder -> var -> term -> term
   (** Bind the given variable if it appears free in the term,
       or return the term unchanged. *)
-
-  val lc_open : var -> lc_term -> term
-  [@@deprecated "Use e_unbind instead"]
 
   val e_unbind : var -> lc_term -> term
   (** Opens the top-most bound variable with a (fresh) variable.
