@@ -296,10 +296,6 @@ val boolean_type: logic_type
 (** returns a anonymous term of the given type. *)
 val term : ?loc:Location.t -> term_node -> logic_type -> term
 
-(** &
-    @deprecated Neon-20130301 {!Logic_utils.mk_AddrOf} is easier to use.*)
-val taddrof: ?loc:Location.t -> term_lval -> logic_type -> term
-
 (** [..] of integers *)
 val trange: ?loc:Location.t -> term option * term option -> term
 

@@ -367,13 +367,14 @@ let extract_quantifiers ~loc args =
                  eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers
                in
                let lty_noset =
+                 Logic_typing.type_of_pointed @@
                  if Logic_const.is_set_type arg.term_type then
                    Logic_const.type_of_element arg.term_type
                  else
                    arg.term_type
                in
                let arg' =
-                 Logic_const.taddrof ~loc (TVar lv, toffset') lty_noset
+                 Logic_utils.mk_logic_AddrOf ~loc (TVar lv, toffset') lty_noset
                in
                arg', quantifiers'
              with Range_elimination_exception ->

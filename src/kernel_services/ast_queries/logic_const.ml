@@ -268,11 +268,6 @@ let term ?(loc=Cil_datatype.Location.unknown) term typ =
     term_name = [];
     term_loc = loc }
 
-let taddrof ?(loc=Cil_datatype.Location.unknown) lv typ =
-  match lv with
-  | TMem h, TNoOffset -> h
-  | _ -> term ~loc (TAddrOf lv) typ
-
 (** range of integers *)
 let trange ?(loc=Cil_datatype.Location.unknown) (low,high) =
   term ~loc (Trange(low,high))
