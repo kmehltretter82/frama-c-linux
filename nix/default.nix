@@ -318,7 +318,6 @@ pkgs.lib.makeExtensible
                 [ pkgs.getopt pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
                   pkgs.swiProlog stdenv.cc.cc.lib ];
             };
-        counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
         frama_clang_src = plugins.frama-clang.src;
         pathcrawler_src = plugins.pathcrawler.src;
@@ -333,8 +332,6 @@ pkgs.lib.makeExtensible
                patchShebangs .
         '';
         postUnpack = ''
-           cp -r --preserve=mode "$counter_examples_src" "$sourceRoot/src/plugins/counter-examples"
-           chmod -R u+w -- "$sourceRoot/src/plugins/counter-examples"
            cp -r --preserve=mode "$genassigns_src" "$sourceRoot/src/plugins/genassigns"
            chmod -R u+w -- "$sourceRoot/src/plugins/genassigns"
            # cp -r --preserve=mode "$frama_clang_src" "$sourceRoot/src/plugins/frama-clang"
