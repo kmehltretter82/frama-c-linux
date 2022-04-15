@@ -37,11 +37,13 @@ let (<?>) c lcmp =
 
 (* Types compatibility *)
 
-let typ_size t =
+let typ_size t = (* raises Cil.SizeOfError *)
   Integer.of_int (Cil.bitsSizeOf t)
 
 let are_typ_compatible t1 t2 =
-  Integer.equal (typ_size t1) (typ_size t2)
+  Cil_datatype.TypNoAttrs.equal t1 t2 ||
+  try Integer.equal (typ_size t1) (typ_size t2)
+  with Cil.SizeOfError _ -> false
 
 (* Input modules *)
 

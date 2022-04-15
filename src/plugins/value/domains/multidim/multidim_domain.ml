@@ -108,11 +108,6 @@ struct
     map (fun _ -> new_v) v
 end
 
-let no_oracle exp =
-  match Cil.isInteger exp with
-  | None -> Value.top
-  | Some i -> Value.inject_int i
-
 let convert_oracle oracle =
   fun exp ->
   match Ival.project_int_val (Value.project_ival (oracle exp)) with
@@ -161,6 +156,12 @@ struct
       match o with
       | `Top -> false
       | `Value o -> not (Base.is_weak b) && Offset.is_singleton o
+
+  let to_singleton_var map =
+    match map_to_singleton map with
+    | Some (Base.Var (vi, _), `Value (Offset.NoOffset t)) (* maybe too restrictive *)
+      when Typed_memory.are_typ_compatible vi.vtype t -> Some (vi)
+    | _ -> None
 
   let references (map : t) =
     let module Set = Cil_datatype.Varinfo.Set in
@@ -355,11 +356,6 @@ struct
       then remove b state
       else add b v state
 
-    let remove_var (state : t) (v : Cil_types.varinfo) =
-      remove (Base.of_varinfo v) state
-
-    let remove_vars (state : t) (l : Cil_types.varinfo list) =
-      List.fold_left remove_var state l
   end
 
   include Datatype.Pair_with_collections
@@ -411,7 +407,7 @@ struct
       (fun state b -> add_references state b referers)
       state referees
 
-  let update_references ~oracle (dst : Cil_types.varinfo)
+  let update_var_references ~oracle (dst : Cil_types.varinfo)
       (src : Cil_types.exp option) (base_map,tracked : t) =
     let incr = Option.bind src (fun expr ->
         match expr.Cil_types.enode with
@@ -450,6 +446,19 @@ struct
         base_map
     in
     base_map, tracked
+
+  let update_references ~oracle (dst : mdlocation)
+      (src : Cil_types.exp option) (state : t) =
+    let remove_references b state =
+      match Base.to_varinfo b with
+      | exception Base.Not_a_C_variable -> state (* only references to variables are kept *)
+      | vi -> update_var_references ~oracle vi None state
+    in
+    match Location.to_singleton_var dst with
+    | Some vi ->
+      update_var_references ~oracle vi src state
+    | None -> (* Weak update of referee, remove references *)
+      Location.fold (fun b _offset state -> remove_references b state) dst state
 
 
   (* Accesses *)
@@ -553,7 +562,7 @@ struct
       write (fun m off -> Memory.overwrite ~oracle ~weak m off value) state dst
 
   let erase ~oracle ?(weak: bool option)
-      (state : state) (dst : mdlocation) (b : Abstract_memory.bit): state =
+      (state : state) (dst : mdlocation) (b : Abstract_memory.bit) : state =
     let oracle = convert_oracle oracle
     and weak = match weak with
       | None -> not (Location.is_singleton dst)
@@ -567,6 +576,12 @@ struct
       (state : state) (dst : mdlocation) : state or_bottom =
     let oracle = convert_oracle oracle in
     write' (fun m off -> Memory.reinforce ~oracle f m off) state dst
+
+  let remove ~oracle (vi : Cil_types.varinfo) (state : t) =
+    let state = update_var_references ~oracle vi None state in
+    let map, tracked = state in
+    BaseMap.remove (Base.of_varinfo vi) map, tracked
+
 
   (* Lattice *)
 
@@ -685,11 +700,12 @@ struct
   let update valuation state =
     assume_valuation valuation state
 
-  let assign_lval lval assigned_value oracle state =
-    match Location.of_lval oracle lval with
+  let assign' ~oracle ~value dst src state =
+    match Location.of_lval oracle dst with
     | `Top -> top
     | `Value dst ->
-      match assigned_value with
+      let state = update_references ~oracle dst src state in
+      match value with
       | Assign value ->
         set ~oracle state dst (Value_or_Uninitialized.of_value value)
       | Copy (right, value) ->
@@ -700,22 +716,10 @@ struct
         | `Value src ->
           overwrite ~oracle state dst src
 
-  let assign _kinstr left expr assigned_value valuation state =
+  let assign _kinstr { lval=dst } src assigned_value valuation state =
     let+ state = assume_valuation valuation state in
     let oracle = valuation_to_oracle state valuation in
-    (* Update references *)
-    let state =
-      match left.lval with
-      | Mem _, _ -> state (* Do nothing *)
-      | Var vi, offset ->
-        let expr = match offset with
-          | NoOffset -> Some expr
-          | _ -> None
-        in
-        update_references ~oracle vi expr state
-    in
-    (* Update destination *)
-    assign_lval left.lval assigned_value oracle state
+    assign' ~oracle ~value:assigned_value dst (Some src) state
 
   let assume _stmt _expr _pos valuation state =
     assume_valuation valuation state
@@ -727,7 +731,8 @@ struct
         "The multidim domain does not support recursive calls yet";
     let oracle = valuation_to_oracle state valuation in
     let bind state arg =
-      state >>-: assign_lval (Cil.var arg.formal) arg.avalue oracle
+      state >>-:
+      assign' ~oracle ~value:arg.avalue (Cil.var arg.formal) (Some arg.concrete)
     in
     List.fold_left bind (`Value state) call.arguments
 
@@ -737,7 +742,8 @@ struct
     | Some f, Some return ->
       let args = List.map (fun arg -> arg.avalue) call.arguments in
       let+ assigned_result = f args in
-      assign_lval (Cil.var return) assigned_result no_oracle post
+      let oracle = mk_oracle post in
+      assign' ~oracle ~value:assigned_result (Cil.var return) None post
 
   let show_expr valuation state fmt expr =
     match expr.enode with
@@ -761,13 +767,7 @@ struct
 
   let leave_scope _kf vars state =
     let oracle = mk_oracle state in
-    let state =
-      List.fold_left
-        (fun state vi -> update_references ~oracle vi None state)
-        state vars
-    in
-    let (base_map,tracked) = state in
-    BaseMap.remove_vars base_map vars, tracked
+    List.fold_left (fun state vi -> remove ~oracle vi state) state vars
 
   let logic_assign assign location state =
     let oracle = mk_oracle state
@@ -780,6 +780,7 @@ struct
       | Some (Assigns (_, _ :: _), _) -> Abstract_memory.Bit.top
       | Some (Assigns (_, []), _) -> Abstract_memory.Bit.numerical
     in
+    let state = update_references ~oracle dst None state in
     erase ~oracle ~weak:true state dst b
 
   let reduce_by_papp env li _labels args positive state =
@@ -851,7 +852,8 @@ struct
   let empty () = top
 
   let initialize_variable lval _loc ~initialized:_ init_value state =
-    match Location.of_lval no_oracle lval with
+    let oracle = mk_oracle state in
+    match Location.of_lval oracle lval with
     | `Top -> top
     | `Value dst ->
       let d = match init_value with
@@ -863,7 +865,8 @@ struct
 
   let initialize_variable_using_type _kind vi state =
     let lval = Cil.var vi in
-    match Location.of_lval no_oracle lval with
+    let oracle = mk_oracle state in
+    match Location.of_lval oracle lval with
     | `Top -> top
     | `Value dst ->
       let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)

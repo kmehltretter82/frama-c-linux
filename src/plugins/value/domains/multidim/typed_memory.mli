@@ -23,6 +23,9 @@
 open Lattice_bounds
 open Abstract_memory
 
+val are_typ_compatible : Cil_types.typ -> Cil_types.typ -> bool
+
+
 (* Configuration of the Abstract Memory model *)
 module type Config =
 sig
