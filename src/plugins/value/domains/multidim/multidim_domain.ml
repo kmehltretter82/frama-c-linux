@@ -316,34 +316,27 @@ struct
       Memory.segmentation_hint ~oracle m loc bounds
 end
 
-(* References to variables inside array segmentation.
-   For instance if an array A is described with the segmentation
-     0..i-1 ; i ; i+1..10
-   then, everytime i is changed, the segmentation must be updated. This requires
-   referencing every base where at least one segmentation references i. *)
-module References =
-struct
-  include Base.Hptset (* The set of bases referencing the variable *)
-end
-
-module TrackedBases =
-struct
-  include Base.Hptset
-end
-
 module DomainLattice =
 struct
   open Bottom.Operators
+  (* References to variables inside array segmentation.
+     For instance if an array A is described with the segmentation
+      0..i-1 ; i ; i+1..10
+     then, everytime i is changed, the segmentation must be updated. This requires
+     referencing every base where at least one segmentation references i. *)
+  module Referers = Base.Hptset (* The set of bases referencing the variable *)
+  (* The domain can be set to track a subset of bases *)
+  module Tracking = Base.Hptset
 
   (* The domain is essentially a map from bases to individual memory abstractions *)
   module Initial_Values = struct let v = [[]] end
   module Deps = struct let l = [Ast.self] end
   module V =
   struct
-    include Datatype.Pair (Memory) (References)
+    include Datatype.Pair (Memory) (Referers)
     let pretty_debug = pretty
-    let top = Memory.top, References.empty
-    let is_top (m,r) = Memory.is_top m && References.is_empty r
+    let top = Memory.top, Referers.empty
+    let is_top (m,r) = Memory.is_top m && Referers.is_empty r
   end
 
   module BaseMap =
@@ -371,7 +364,7 @@ struct
 
   include Datatype.Pair_with_collections
       (BaseMap)
-      (Datatype.Option (TrackedBases))
+      (Datatype.Option (Tracking))
       (struct let module_name = "DomainLattice" end)
 
   type state = t
@@ -391,18 +384,72 @@ struct
 
   (* Bases handling *)
 
-  let covers_base (tracked : TrackedBases.t option) (b : base) : bool =
+  let covers_base (tracked : Tracking.t option) (b : base) : bool =
     match b with
     | Base.Var (vi, _) | Allocated (vi, _, _) ->
       not (Cil.typeHasQualifier "volatile" vi.vtype) &&
-      Option.fold ~none:true ~some:(TrackedBases.mem b) tracked
+      Option.fold ~none:true ~some:(Tracking.mem b) tracked
     | Null -> true
     | CLogic_Var _ | String _ -> false
 
   let join_tracked tracked1 tracked2 =
     match tracked1, tracked2 with
     | None, tracked | tracked, None -> tracked
-    | Some s1, Some s2 -> Some (TrackedBases.union s1 s2)
+    | Some s1, Some s2 -> Some (Tracking.union s1 s2)
+
+
+  (* References *)
+
+  let add_references (state : t) (referee : base) (referers' : base list) : t =
+    let base_map, tracked = state in
+    let memory, referers = BaseMap.find_or_top base_map referee in
+    let referers'' = Referers.union referers (Referers.of_list referers') in
+    BaseMap.add referee (memory, referers'') base_map, tracked
+
+  let add_references_l state (referees : base list) (referers : base list) =
+    List.fold_left
+      (fun state b -> add_references state b referers)
+      state referees
+
+  let update_references ~oracle (dst : Cil_types.varinfo)
+      (src : Cil_types.exp option) (base_map,tracked : t) =
+    let incr = Option.bind src (fun expr ->
+        match expr.Cil_types.enode with
+        | BinOp ((PlusA|PlusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
+          when Cil_datatype.Varinfo.equal dst vi' ->
+          Cil.constFoldToInt exp
+        | BinOp ((PlusA|PlusPI), exp, { enode=Lval (Var vi', NoOffset)}, _typ)
+          when Cil_datatype.Varinfo.equal dst vi' ->
+          Cil.constFoldToInt exp
+        | BinOp ((MinusA|MinusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
+          when Cil_datatype.Varinfo.equal dst vi' ->
+          Option.map Integer.neg (Cil.constFoldToInt exp)
+        | _ -> None)
+    in
+    (* [oracle] must be the oracle before the (non-invertible)
+       assignement of the referee to allow removing of eventual empty slice
+       before the bound leaves the segmentation. *)
+    let referers = snd (BaseMap.find_or_top base_map (Base.of_varinfo dst)) in
+    let update_ref base base_map =
+      let update (memory, refs) =
+        let oracle = convert_oracle oracle in
+        Memory.incr_bound ~oracle dst incr memory, refs
+      in
+      BaseMap.replace (Option.map update) base base_map
+    in
+    let base_map = Referers.fold update_ref referers base_map in
+    (* If increment is None, every reference to dst should have been removed by
+        Memory.incr_bound *)
+    let base_map =
+      if Option.is_none incr then
+        BaseMap.replace
+          (Option.map (fun (memory, _refs) -> memory, Referers.empty))
+          (Base.of_varinfo dst)
+          base_map
+      else
+        base_map
+    in
+    base_map, tracked
 
 
   (* Accesses *)
@@ -469,26 +516,17 @@ struct
     let oracle = convert_oracle oracle in
     read (Memory.extract ~oracle) (Memory.smash ~oracle) state src
 
-  let add_references (base_map,tracked : t) vi refs' : t =
-    let base = Base.of_varinfo vi in
-    let memory, refs = BaseMap.find_or_top base_map base in
-    let refs'' = References.union refs (References.of_list refs') in
-    BaseMap.add base (memory, refs'') base_map, tracked
-
-  let add_references_l state l refs =
-    List.fold_left (fun state vi -> add_references state vi refs) state l
-
   let write' (update : memory -> offset -> memory or_bottom)
       (state : state) (loc : mdlocation) : state or_bottom =
-    let deps = Location.references loc in
-    let deps_set = TrackedBases.of_list (List.map Base.of_varinfo deps) in
+    let deps = List.map Base.of_varinfo (Location.references loc) in
+    let deps_set = Tracking.of_list deps in
     let f base off state' =
       let* base_map,tracked = state' in
       if covers_base tracked base then
         let memory, refs = BaseMap.find_or_top base_map base in
         let+ memory' = update memory off in
         BaseMap.add base (memory', refs) base_map,
-        Option.map (TrackedBases.union deps_set) tracked
+        Option.map (Tracking.union deps_set) tracked
       else
         state'
     in
@@ -559,7 +597,7 @@ struct
     and decide _ x1 x2 =
       let m1,r1 = Option.value ~default:V.top x1
       and m2,r2 = Option.value ~default:V.top x2 in
-      Memory.join ~oracle m1 m2, References.union r1 r2 (* TODO: Remove tops *)
+      Memory.join ~oracle m1 m2, Referers.union r1 r2 (* TODO: Remove tops *)
     in
     generic_join ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
     join_tracked t1 t2
@@ -576,7 +614,7 @@ struct
     and decide base x1 x2 =
       let m1,r1 = Option.value ~default:V.top x1
       and m2,r2 = Option.value ~default:V.top x2 in
-      Memory.widen ~oracle (get_hints base) m1 m2, References.union r1 r2
+      Memory.widen ~oracle (get_hints base) m1 m2, Referers.union r1 r2
     in
     generic_join ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
     join_tracked t1 t2
@@ -647,55 +685,6 @@ struct
   let update valuation state =
     assume_valuation valuation state
 
-  let update_array_segmentation_bounds ~oracle vi expr (base_map,tracked) =
-    let incr = Option.bind expr (fun expr ->
-        match expr.Cil_types.enode with
-        | BinOp ((PlusA|PlusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
-          when Cil_datatype.Varinfo.equal vi vi' ->
-          Cil.constFoldToInt exp
-        | BinOp ((PlusA|PlusPI), exp, { enode=Lval (Var vi', NoOffset)}, _typ)
-          when Cil_datatype.Varinfo.equal vi vi' ->
-          Cil.constFoldToInt exp
-        | BinOp ((MinusA|MinusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
-          when Cil_datatype.Varinfo.equal vi vi' ->
-          Option.map Integer.neg (Cil.constFoldToInt exp)
-        | _ -> None)
-    in
-    (* Very important : oracle must be the oracle before a non-invertible
-       assignement of the bound to allow removing of eventual empty slice
-       before the bound leaves the segmentation. *)
-    let references = snd (BaseMap.find_or_top base_map (Base.of_varinfo vi)) in
-    let update_ref base base_map =
-      let update (memory, refs) =
-        let oracle = convert_oracle oracle in
-        Memory.incr_bound ~oracle vi incr memory, refs
-      in
-      BaseMap.replace (Option.map update) base base_map
-    in
-    let base_map = References.fold update_ref references base_map in
-    (* If increment is None, every reference to vi should have been removed by
-       Memory.incr_bound *)
-    let base_map =
-      if Option.is_none incr then
-        BaseMap.replace
-          (Option.map (fun (memory, _refs) -> memory, References.empty))
-          (Base.of_varinfo vi)
-          base_map
-      else
-        base_map
-    in
-    base_map, tracked
-
-  let update_array_segmentation ~oracle lval expr state =
-    match lval with
-    | Mem _, _ -> state (* Do nothing *)
-    | Var vi, offset ->
-      let expr = match offset with
-        | NoOffset -> expr
-        | _ -> None
-      in
-      update_array_segmentation_bounds ~oracle vi expr state
-
   let assign_lval lval assigned_value oracle state =
     match Location.of_lval oracle lval with
     | `Top -> top
@@ -712,9 +701,20 @@ struct
           overwrite ~oracle state dst src
 
   let assign _kinstr left expr assigned_value valuation state =
-    let oracle = valuation_to_oracle state valuation in
-    let state = update_array_segmentation ~oracle left.lval (Some expr) state in
     let+ state = assume_valuation valuation state in
+    let oracle = valuation_to_oracle state valuation in
+    (* Update references *)
+    let state =
+      match left.lval with
+      | Mem _, _ -> state (* Do nothing *)
+      | Var vi, offset ->
+        let expr = match offset with
+          | NoOffset -> Some expr
+          | _ -> None
+        in
+        update_references ~oracle vi expr state
+    in
+    (* Update destination *)
     assign_lval left.lval assigned_value oracle state
 
   let assume _stmt _expr _pos valuation state =
@@ -763,7 +763,7 @@ struct
     let oracle = mk_oracle state in
     let state =
       List.fold_left
-        (fun state vi -> update_array_segmentation_bounds ~oracle vi None state)
+        (fun state vi -> update_references ~oracle vi None state)
         state vars
     in
     let (base_map,tracked) = state in
@@ -831,15 +831,16 @@ struct
             (Cil_datatype.Varinfo.Set.to_seq r |> List.of_seq) @ acc
           in
           let references = List.fold_left add [] bounds in
+          let references = List.map Base.of_varinfo references in
           add_references_l state references (Location.bases loc)
       end
     | "eva_domain_scope" ->
       let domain,vars = Eva_annotations.read_domain_scope extension in
       if domain = "multidim" then
         let (base_map,tracked) = state in
-        let set = Option.value ~default:TrackedBases.empty tracked
+        let set = Option.value ~default:Tracking.empty tracked
         and bases = List.map Base.of_varinfo vars in
-        let tracked = List.fold_right TrackedBases.add bases set in
+        let tracked = List.fold_right Tracking.add bases set in
         let base_map = BaseMap.inter_with_shape tracked base_map in (* Only keep tracked bases in the current base map *)
         base_map, Some tracked
       else
@@ -872,7 +873,7 @@ struct
 
   let filter _kf _kind bases (base_map,tracked : t) =
     BaseMap.filter (fun elt -> Base.Hptset.mem elt bases) base_map,
-    Option.map (TrackedBases.inter bases) tracked
+    Option.map (Tracking.inter bases) tracked
 
   let reuse _kf bases =
     let open BaseMap in
