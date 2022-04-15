@@ -38,9 +38,6 @@ module type S_no_log = sig
       [memo] defaults to [false]
       @since Beryllium-20090901 *)
 
-  module Help: Parameter_sig.Bool
-  (** @deprecated since Oxygen-20120901 *)
-
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
 

@@ -36,7 +36,6 @@ let config_ref = Extlib.mk_fun "config_ref"
 
 module type S_no_log = sig
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
-  module Help: Parameter_sig.Bool
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
   module Share: Parameter_sig.Specific_dir
