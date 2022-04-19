@@ -4128,8 +4128,8 @@ Most domains are also presented in more details in the following subsections.
     \tabularnewline
     \midrule
     multidim & d-multidim & \ref{sec:multidim} &
-    More precise representation of arrays of structures
-    and multidimensional arrays. \\
+    More precise representation of arrays of structures,
+    multidimensional arrays and arrays invariants. \\
     Experimental.
     \tabularnewline
     \midrule
@@ -4405,23 +4405,73 @@ and at the end, the inferred relations are propagated back to the caller.
 
 The multidim domain implements a typed memory model designed to abstract
 multidimensional arrays, arrays of structures, or any composition of any depth
-of these.
+of these. It can also infer simple array invariants on simple program loops.
 
-Arrays are summarized by only one abstract value, meaning that the domain is not
-able to express distinct properties of individual cells. However, arrays of
-structures are approximated field by field, allowing the inference of precise
-invariants about each field of all structures included in the array.
-
-The model also keeps track of the types used to write to the memory, and thus
-can display the contents of the memory with its structure (via
-\lstinline|Frama_C_domain_show_each| directives), even when the underlying
-location type does not always match the types used to write into it.
-
-The domain is no more precise than the cvalue domain when array properties need
+The domain is less precise than the cvalue domain when array properties need
 to be inferred cell by cell.
 However, it may often be more precise on large arrays of structures, especially
 when the indexes at which these arrays are written cannot be
 reduced to singleton values with usual techniques such as loop unrolling.
+
+The domain abstract arrays by summarizing them with a {\it segmentation}, i.e. a
+partition of {\it segments}. A segment is a set of arrays cells with consecutive
+indexes. A classical segmentation would be the division of an array into three
+segments arround a program variable {\tt i}: the set of cells whose index is
+lower than {\tt i}, the singleton cell of index {\tt i} and the set of cells
+whose index is greater than {\tt i}.
+
+
+Each segment is then abstracted separately, allowing the analyser to infer
+distinct properties of these segments. Inside these segments, the infered
+properties are the properties valid for all cells of the segment.
+
+Arrays of structures, however, are approximated field by field, allowing the
+inference of precise invariants about each field of all structures included in
+the array. More generally, an (multidimensional) array of structures is
+abstracted by a tree where
+\begin{itemize}
+  \item each node is a set of offsets,
+  \item each depth of the tree corresponds to an array or structure type,
+  \item {\it array nodes} have an associated segmentation and a child for
+        each segment and
+  \item {\it structures nodes} have a child for each field of this structure.
+\end{itemize}
+
+This model keeps track of the types used to write to the memory, and thus
+can display the contents of the memory with its structure (via
+\lstinline|Frama_C_domain_show_each| directives), even when the underlying
+location type does not always match the types used to write into it.
+
+The domain tries to infer a suitable partition in a best-effort strategy. It
+will work on most simple loops, but may fails outside the most common patterns.
+
+Two command-line options and one annotation can be used to parameterize the
+domain.
+\begin{itemize}
+  \item {\tt -eva-multidim-disjunctive-invariants} can be used to infer
+        disjunction invariants on C structures when a field of a structure is
+        assigned a constant value and the invariant of the structure depends on
+        this value.
+  \item {\tt -eva-multidim-segment-limit} can be used to increase the limit on
+        the number of segments allowed in the array partitions, when the default
+        limit of 8 is too low.
+  \item The annotation {\tt array\_partition} can be used to help the domain
+        to find a suitable segmentation for the analysis. For instance, in
+        the following example, the annotation instructs the analyser to use
+        3 segments for the analysis of the loop.
+\begin{lstlisting}[language=C]
+int t[20] = {0};
+//@ array_partition t, 0, i, i+1, 20;
+for (int i = 0; i < 20; i++) {
+  ...
+}
+\end{lstlisting}
+        When the annotation is encountered, the current array partition is
+        replaced by the given one, and the introduced segments bounds are kept
+        as long as possible. When a subsequent array access uses an index than
+        cannot be proven always below or always above an introduced bound, this
+        bound is thrown away.
+\end{itemize}
 
 
 \subsection{Bitwise values}
