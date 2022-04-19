@@ -66,6 +66,14 @@ PLUGIN_DISTRIBUTED := $(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 #PLUGIN_NO_DEFAULT_TEST := no
 PLUGIN_TESTS_DIRS := string stdlib options api plugin
+PLUGIN_DISTRIB_TESTS := \
+  $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
+    $(dir)/oracle/* \
+    $(filter-out result oracle,$(dir)/*)) \
+  ) \
+  $(filter-out result oracle,tests/*)) \
+  $(foreach dir, tests $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
+    $(dir)/test_config)
 
 ################
 # Generic part #
