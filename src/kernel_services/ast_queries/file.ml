@@ -447,19 +447,9 @@ let concat_strs ?(pre="") ?(sep=" ") l =
   if l = [] then ""
   else pre ^ (String.concat sep l)
 
-let cwd () =
-  (* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
-     no function in its stdlib to resolve symbolic links (e.g. realpath)
-     for a given path. 'getcwd' always resolves them, but if the user
-     supplies a path with symbolic links, this may cause issues.
-     Instead of forcing the user to always provide resolved paths, we
-     currently choose to never resolve them.
-     We only resort to getcwd() to avoid issues when PWD does not exist. *)
-  try Unix.getenv "PWD" with Not_found -> Sys.getcwd ()
-
 let adjust_pwd fp cpp_command =
   if Kernel.JsonCompilationDatabase.is_set () then
-    let cwd = cwd () in
+    let cwd = Filepath.pwd () in
     let dir =
       match Json_compilation_database.get_dir fp with
       | None -> cwd
@@ -583,7 +573,7 @@ let abort_with_detailed_pp_message f cpp_command =
     "failed to run: %s\n(PWD: %s)@\n\
      %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
      for more details."
-    cpp_command (cwd ()) possible_cause
+    cpp_command (Filepath.pwd ()) possible_cause
 
 let parse_cabs cpp_command = function
   | NoCPP f ->

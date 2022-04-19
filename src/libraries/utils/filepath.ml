@@ -323,6 +323,8 @@ type position =
 let pp_pos fmt pos =
   Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
 
+let pwd () = try Unix.getenv "PWD" with Not_found -> Sys.getcwd ()
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
