@@ -532,7 +532,7 @@ export function ModalActionField() {
 
   // Auxiliary function that build a Hint from an ActionMode.
   const modeToHint = (mode: ActionMode) => {
-    const { label, title, icon } = mode;
+    const { label, title = '', icon } = mode;
     const id = 'ActionMode-' + title + '-' + icon;
     const value = () => { onModeChange(mode); };
     return { id, icon, label, title, value, rank: -1000 };
@@ -562,7 +562,7 @@ export function ModalActionField() {
     const hs = await modesMode.hints(input);
     const notCurrent = (h: Hint) => !(h.label.includes(current.label));
     return hs.filter(notCurrent);
-  }, [current.title, modesMode]);
+  }, [current.label, modesMode]);
 
   // Register the new search engine.
   React.useEffect(() => {

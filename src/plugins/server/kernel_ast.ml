@@ -44,7 +44,9 @@ let get_term kf term =
   try Some (!Db.Properties.Interp.term ~env kf term)
   with Logic_interp.Error _ | Parsing.Parse_error -> None
 
-let key_of_localizable = let open Printer_tag in function
+let key_of_localizable =
+  let open Printer_tag in
+  function
   | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _ -> None
   | PLval (_, Kglobal, _) | PExp (_, Kglobal, _) -> None
   | PLval (kf, Kstmt stmt, lval) ->
