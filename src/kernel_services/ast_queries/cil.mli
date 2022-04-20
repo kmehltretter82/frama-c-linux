@@ -977,12 +977,12 @@ val need_cast: ?force:bool -> typ -> typ -> bool
 (** Construct a cast when having the old type of the expression. If the new
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false])
-    @modify 23.0-Vanadium change order or arguments
+    @before 23.0-Vanadium different order of arguments.
 *)
 val mkCastT: ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
 (** Like {!Cil.mkCastT} but uses typeOf to get [oldt]
-    @modify 23.0-Vanadium change order or arguments
+    @before 23.0-Vanadium different order of arguments.
 *)
 val mkCast: ?force:bool -> newt:typ -> exp -> exp
 
@@ -1105,8 +1105,8 @@ val mkPureExpr:
 (** Make a loop. Can contain Break or Continue.
     The kind of loop (while, for, dowhile) is given by [sattr]
     (none by default). Use {!Cil.mkWhile} for a While loop.
-    @modify 23.0-Vanadium add unit argument. Default type is no longer While,
-            use {!Cil.mkWhile} instead.
+    @before 23.0-Vanadium no unit argument, and default type was While
+            (for while loops, there is now {!Cil.mkWhile}).
 *)
 val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
   stmt list
@@ -1115,14 +1115,14 @@ val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
     can contain Break but not Continue. Can be used with i a pointer
     or an integer. Start and done must have the same type but incr
     must be an integer
-    @modify 23.0-Vanadium add unit argument
+    @before 23.0-Vanadium did not have unit argument.
 *)
 val mkForIncr: ?sattr:attributes -> iter:varinfo -> first:exp -> stopat:exp ->
   incr:exp -> body:stmt list -> unit -> stmt list
 
 (** Make a for loop for(start; guard; next) \{ ... \}. The body can
     contain Break but not Continue !!!
-    @modify 23.0-Vanadium add unit argument
+    @before 23.0-Vanadium did not have unit argument.
 *)
 val mkFor: ?sattr:attributes -> start:stmt list -> guard:exp -> next: stmt list ->
   body: stmt list -> unit -> stmt list

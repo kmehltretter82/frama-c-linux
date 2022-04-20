@@ -146,7 +146,7 @@ val get_name: t -> string
 
 val get_preprocessor_command: unit -> string
 (** Return the preprocessor command to use.
-    @modify 23.0-Vanadium return type now contains only the command
+    @before 23.0-Vanadium return type also contained cpp_opt_kind.
 *)
 
 val pre_register: t -> unit

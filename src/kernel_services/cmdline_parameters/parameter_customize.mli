@@ -122,7 +122,7 @@ val is_reconfigurable: unit -> unit
     only parameters corresponding to options registered at the
     {!Cmdline.Configuring} stage are reconfigurable.
     @since Nitrogen-20111001
-    @modify 22.0-Titanium [do_iterate] renamed to [is_reconfigurable]
+    @before 22.0-Titanium this function was called [do_iterate].
 *)
 
 val is_not_reconfigurable: unit -> unit
@@ -130,7 +130,7 @@ val is_not_reconfigurable: unit -> unit
     parameters corresponding to options registered at the
     {!Cmdline.Configuring} stage are reconfigurable.
     @since Nitrogen-20111001
-    @modify 22.0-Titanium [do_iterate] renamed to [is_reconfigurable]
+    @before 22.0-Titanium this function was called [do_not_iterate].
 *)
 
 val no_category: unit -> unit

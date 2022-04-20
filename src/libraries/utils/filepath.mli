@@ -49,7 +49,7 @@ exception File_exists
     - non-existing directories in [realpath] may lead to ENOTDIR errors,
       but [normalize] may accept them.
 
-    @modify 21.0-Scandium optional existence.
+    @before 21.0-Scandium no [existence] argument.
 *)
 val normalize: ?existence:existence -> ?base_name:string -> string -> string
 
@@ -70,7 +70,7 @@ module Normalized: sig
 
   (** [of_string s] converts [s] into a normalized path.
       @raise Invalid_argument if [s] is the empty string.
-      @modify 21.0-Scandium add optional existence parameter.
+      @before 21.0-Scandium no [existence] argument.
   *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
@@ -169,7 +169,7 @@ end
     (that is, it is prefixed by [base_name]), or to the current
     working directory if no base is specified.
     @since Aluminium-20160501
-    @modify 23.0-Vanadium argument types changed from string to Normalized.t
+    @before 23.0-Vanadium argument types were string instead of Normalized.t.
 *)
 val is_relative: ?base_name:Normalized.t -> Normalized.t -> bool
 

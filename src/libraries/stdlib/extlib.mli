@@ -208,8 +208,7 @@ val the: exn:exn -> 'a option -> 'a
 (** @raise Exn if the value is [None] and [exn] is specified.
     @raise Invalid_argument if the value is [None] and [exn] is not specified.
     @return v if the value is [Some v].
-    @modify 23.0-Vanadium optional argument [exn] now mandatory; otherwise,
-            use [Option.get], which is equivalent.
+    @before 23.0-Vanadium [exn] was an optional argument.
     @plugin development guide *)
 
 val opt_hash: ('a -> int) -> 'a option -> int
