@@ -762,6 +762,9 @@ ifneq ($(ENABLE_GUI),no)
 OCAMLDOC_DEPEND:= $(OCAMLDOC_DEPEND) $(PLUGIN_GUI_CMO)
 endif
 
+PLUGIN_DOC_DUMP:=$(@PLUGIN_NAME@_DOC_DIR)/@PLUGIN_NAME@.ocamldoc
+@PLUGIN_NAME@_DOC_DUMP:=$(PLUGIN_DOC_DUMP)
+
 .PHONY: @PLUGIN_NAME@_DOC
 @PLUGIN_NAME@_DOC: $(OCAMLDOC_DEPEND) \
 		    $(OCAMLDOC_GEN) \
@@ -780,6 +783,7 @@ endif
 	  -t "@PLUGIN_NAME@ plugin" \
 	  -css-style ../style.css \
 	  -d $(@PLUGIN_NAME@_DOC_DIR) -g $(DOC_PLUGIN) -passopt -docpath $(DOC_DIR)/html \
+          -dump $(@PLUGIN_NAME@_DOC_DUMP) \
 	  $(addprefix -load ,$(wildcard $(DOC_DIR)/kernel-doc.ocamldoc)) \
 	  $(wildcard $(@PLUGIN_NAME@_DOC_SRC))
 # [rb+js] 20090619
@@ -798,6 +802,7 @@ endif
 	  $(ISED) -e 's|\(doc/code/html\)|../../../\1|g' $$f ; \
 	done
 
+PLUGIN_DOC_DUMP_LIST+=$(PLUGIN_DOC_DUMP)
 
 # removed dependencies:
 #		    $(PLUGIN_DOC_DIR)/modules.ps \

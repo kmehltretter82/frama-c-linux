@@ -29,7 +29,7 @@ let print_in_file l =
   in
   let file_path = !doc_dev_path ^ "/code_file" in
   try 
-    let chan_out = open_out file_path in
+    let chan_out = open_out_gen [Open_append; Open_creat] 0o644 file_path in
     output_string chan_out (string_of_list l) ;
     flush chan_out ;
     close_out chan_out 
