@@ -4,10 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function leaf <- main.
-  Called from copy_stdin.i:4.
 [kernel:annot:missing-spec] copy_stdin.i:4: Warning: 
   Neither code nor specification for function leaf, generating default assigns from the prototype
+[eva] computing for function leaf <- main.
+  Called from copy_stdin.i:4.
 [eva] using specification for function leaf
 [eva] Done for function leaf
 [eva] Recording results for main

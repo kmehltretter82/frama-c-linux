@@ -8,10 +8,10 @@
   Called from switch2.i:13.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] computing for function g <- main.
-  Called from switch2.i:13.
 [kernel:annot:missing-spec] switch2.i:13: Warning: 
   Neither code nor specification for function g, generating default assigns from the prototype
+[eva] computing for function g <- main.
+  Called from switch2.i:13.
 [eva] using specification for function g
 [eva] Done for function g
 [eva] Recording results for main

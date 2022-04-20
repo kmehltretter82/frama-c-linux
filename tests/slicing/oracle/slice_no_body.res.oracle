@@ -4,10 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
-[eva] computing for function f <- h.
-  Called from slice_no_body.i:21.
 [kernel:annot:missing-spec] slice_no_body.i:21: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
+[eva] computing for function f <- h.
+  Called from slice_no_body.i:21.
 [eva] using specification for function f
 [eva] Done for function f
 [eva] computing for function f <- h.
@@ -51,10 +51,10 @@
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [slicing] initializing slicing ...
-[pdg] computing for function h
-[pdg] done for function h
 [pdg] computing for function g
 [pdg] done for function g
+[pdg] computing for function h
+[pdg] done for function h
 int G;
 /*@ assigns \result;
     assigns \result \from a; */
@@ -120,7 +120,7 @@ Print slice = h_slice_1:
 }
 
 Slicing project worklist [default] =
-[h_slice_1 = change_call for call 16 -> g_slice_1][g_slice_1 = change_call for call 5 -> (src:f)][h_slice_1 = change_call for call 13 -> (src:f)][h_slice_1 = change_call for call 12 -> (src:f)][h_slice_1 = change_call for call 11 -> (src:f)][h_slice_1 = change_call for call 10 -> (src:f)]
+[h_slice_1 = change_call for call 13 -> (src:f)][h_slice_1 = change_call for call 12 -> (src:f)][h_slice_1 = change_call for call 11 -> (src:f)][h_slice_1 = change_call for call 10 -> (src:f)][h_slice_1 = change_call for call 16 -> g_slice_1][g_slice_1 = change_call for call 5 -> (src:f)]
 
 [slicing] exporting project to 'Sliced code'...
 [slicing] applying all slicing requests...

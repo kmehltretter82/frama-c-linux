@@ -43,7 +43,7 @@ module UsedVarState =
 
 let used_var = UsedVarState.memo
     (fun var ->
-       Mark_noresults.no_memoization_enabled () ||
+       Function_calls.partial_results () ||
        try
          let f = fst (Globals.entry_point ()) in
          let inputs = !Db.Inputs.get_external f in
@@ -172,7 +172,7 @@ let active_highlighter buffer localizable ~start ~stop =
         | Some color_area ->
           apply_tag buffer color_area start stop
         | None ->
-          if Gui_eval.results_kf_computed kf then begin
+          if Analysis.status kf <> Analyzed NoResults then begin
             let csf = Gui_callstacks_filters.focused_callstacks () in
             if Gui_callstacks_filters.is_reachable_stmt csf stmt then begin
               if Gui_callstacks_filters.is_non_terminating_instr csf stmt then
@@ -528,7 +528,7 @@ module Select (Eval: Eval) = struct
                | Kstmt stmt -> Eval.Analysis.get_stmt_state ~after:false stmt
              in
              match state  with
-             | `Bottom -> ()
+             | `Bottom | `Top -> ()
              | `Value state ->
                let funs, _ = Eval.Analysis.eval_function_exp state e in
                match funs with

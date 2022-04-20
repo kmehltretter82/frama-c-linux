@@ -1,6 +1,12 @@
 /* run.config
    COMMENT: Check behaviours of format functions
+   DEPS: @PTEST_DEPS@ utils/signalled.h
    STDOPT: +"-eva-precision=1"
+   COMMENT: This part is blank on purpose (test stability + Dune)
+
+
+
+
 */
 
 #include "utils/signalled.h"

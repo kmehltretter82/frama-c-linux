@@ -48,10 +48,10 @@
   Called from intra.i:89.
 [eva] Recording results for assign
 [eva] Done for function assign
-[eva] computing for function stop <- main.
-  Called from intra.i:92.
 [kernel:annot:missing-spec] intra.i:92: Warning: 
   Neither code nor specification for function stop, generating default assigns from the prototype
+[eva] computing for function stop <- main.
+  Called from intra.i:92.
 [eva] using specification for function stop
 [eva] Done for function stop
 [eva] Recording results for main

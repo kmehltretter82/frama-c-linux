@@ -165,111 +165,97 @@ module Make (Abstract: Abstractions.Eva) = struct
     | None -> fun _ -> assert false
     | Some get -> fun location -> get location
 
-  (* Compute a call to [kf] in the state [state]. The evaluation will
-     be done either using the body of [kf] or its specification, depending
-     on whether the body exists and on option [-eva-use-spec]. [call_kinstr]
-     is the instruction at which the call takes place, and is used to update
-     the statuses of the preconditions of [kf]. If [show_progress] is true,
-     the callstack and additional information are printed. *)
-  let compute_using_spec_or_body call_kinstr call recursion state =
-    let kf = call.kf in
-    Eva_results.mark_kf_as_called kf;
-    let global = match call_kinstr with Kglobal -> true | _ -> false in
+  (* ----- Mem Exec cache --------------------------------------------------- *)
+
+  module MemExec = Mem_exec.Make (Abstract.Val) (Abstract.Dom)
+
+  let compute_and_cache_call compute kinstr call init_state =
+    let args =
+      List.map (fun {avalue} -> Eval.value_assigned avalue) call.arguments
+    in
+    match MemExec.reuse_previous_call call.kf init_state args with
+    | None ->
+      let call_result = compute kinstr call init_state in
+      let () =
+        if call_result.Transfer.cacheable = Eval.Cacheable
+        then
+          let final_states = call_result.Transfer.states in
+          MemExec.store_computed_call call.kf init_state args final_states
+      in
+      call_result
+    | Some (states, i) ->
+      let stack = Eva_utils.call_stack () in
+      let cvalue = Abstract.Dom.get_cvalue_or_top init_state in
+      Db.Value.Call_Type_Value_Callbacks.apply (`Memexec, cvalue, stack);
+      (* Evaluate the preconditions of kf, to update the statuses
+         at this call. *)
+      let spec = Annotations.funspec call.kf in
+      if not (Eva_utils.skip_specifications call.kf) &&
+         Eval_annots.has_requires spec
+      then begin
+        let ab = Logic.create init_state call.kf in
+        ignore (Logic.check_fct_preconditions kinstr call.kf ab init_state);
+      end;
+      if Parameters.ValShowProgress.get () then begin
+        Self.feedback ~current:true
+          "Reusing old results for call to %a" Kernel_function.pretty call.kf;
+        Self.debug ~dkey
+          "calling Record_Value_New callbacks on saved previous result";
+      end;
+      Db.Value.Record_Value_Callbacks_New.apply (stack, Value_types.Reuse i);
+      (* call can be cached since it was cached once *)
+      Transfer.{states; cacheable = Cacheable; builtin=false}
+
+  (* ----- Body or specification analysis ----------------------------------- *)
+
+  (* Interprets a [call] at callsite [kinstr] in the state [state] by analyzing
+     the body of the called function. *)
+  let compute_using_body fundec ~save_results kinstr call state =
+    let result = Computer.compute ~save_results call.kf kinstr state in
+    Summary.FunctionStats.recompute fundec;
+    result
+
+  (* Interprets a [call] at callsite [kinstr] in the state [state] by using the
+     specification of the called function. *)
+  let compute_using_spec spec kinstr call state =
+    if Parameters.InterpreterMode.get ()
+    then Self.abort "Library function call. Stopping.";
+    Self.feedback ~once:true
+      "@[using specification for function %a@]" Kernel_function.pretty call.kf;
+    let vi = Kernel_function.get_vi call.kf in
+    if Cil.is_in_libc vi.vattr then
+      Library_functions.warn_unsupported_spec vi.vorig_name;
+    Spec.compute_using_specification ~warn:true kinstr call spec state,
+    Eval.Cacheable
+
+  (* Interprets a [call] at callsite [kinstr] in state [state], using its
+     specification or body according to [target]. If [-eva-show-progress] is
+     true, the callstack and additional information are printed. *)
+  let compute_using_spec_or_body target kinstr call state =
+    let global = match kinstr with Kglobal -> true | _ -> false in
     let pp = not global && Parameters.ValShowProgress.get () in
     let call_stack = Eva_utils.call_stack () in
     if pp then
       Self.feedback
         "@[computing for function %a.@\nCalled from %a.@]"
         Value_types.Callstack.pretty_short call_stack
-        Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc call_kinstr);
-    let use_spec =
-      match recursion with
-      | Some { depth } when depth >= Parameters.RecursiveUnroll.get () ->
-        `Spec (Recursion.get_spec call_kinstr kf)
-      | _ ->
-        match kf.fundec with
-        | Declaration (_,_,_,_) -> `Spec (Annotations.funspec kf)
-        | Definition (def, _) ->
-          if Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
-          then `Spec (Annotations.funspec kf)
-          else `Def def
-    in
+        Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
     let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
-    let resulting_states, cacheable = match use_spec with
-      | `Spec spec ->
-        Db.Value.Call_Type_Value_Callbacks.apply
-          (`Spec spec, cvalue_state, call_stack);
-        if Parameters.InterpreterMode.get ()
-        then Self.abort "Library function call. Stopping.";
-        Self.feedback ~once:true
-          "@[using specification for function %a@]" Kernel_function.pretty kf;
-        let vi = Kernel_function.get_vi kf in
-        if Cil.is_in_libc vi.vattr then
-          Library_functions.warn_unsupported_spec vi.vorig_name;
-        Spec.compute_using_specification ~warn:true call_kinstr call spec state,
-        Eval.Cacheable
-      | `Def fundec ->
-        Db.Value.Call_Type_Value_Callbacks.apply (`Def, cvalue_state, call_stack);
-        let result = Computer.compute kf call_kinstr state in
-        Summary.FunctionStats.recompute fundec;
-        result
+    let compute, kind =
+      match target with
+      | `Def (fundec, save_results) ->
+        compute_using_body fundec ~save_results, `Def
+      | `Spec funspec ->
+        compute_using_spec funspec, `Spec funspec
     in
+    Db.Value.Call_Type_Value_Callbacks.apply (kind, cvalue_state, call_stack);
+    let resulting_states, cacheable = compute kinstr call state in
     if pp then
       Self.feedback
-        "Done for function %a" Kernel_function.pretty kf;
+        "Done for function %a" Kernel_function.pretty call.kf;
     Transfer.{ states = resulting_states; cacheable; builtin=false }
 
-
-  (* Mem Exec *)
-
-  module MemExec = Mem_exec.Make (Abstract.Val) (Abstract.Dom)
-
-  let compute_and_cache_call stmt call recursion init_state =
-    let default () =
-      compute_using_spec_or_body (Kstmt stmt) call recursion init_state
-    in
-    if Parameters.MemExecAll.get () then
-      let args =
-        List.map (fun {avalue} -> Eval.value_assigned avalue) call.arguments
-      in
-      match MemExec.reuse_previous_call call.kf init_state args with
-      | None ->
-        let call_result = default () in
-        let () =
-          if not (!Db.Value.use_spec_instead_of_definition call.kf)
-          && call_result.Transfer.cacheable = Eval.Cacheable
-          then
-            let final_states = call_result.Transfer.states in
-            MemExec.store_computed_call call.kf init_state args final_states
-        in
-        call_result
-      | Some (states, i) ->
-        let stack = Eva_utils.call_stack () in
-        let cvalue = Abstract.Dom.get_cvalue_or_top init_state in
-        Db.Value.Call_Type_Value_Callbacks.apply (`Memexec, cvalue, stack);
-        (* Evaluate the preconditions of kf, to update the statuses
-           at this call. *)
-        let spec = Annotations.funspec call.kf in
-        if not (Eva_utils.skip_specifications call.kf) &&
-           Eval_annots.has_requires spec
-        then begin
-          let ab = Logic.create init_state call.kf in
-          ignore (Logic.check_fct_preconditions
-                    (Kstmt stmt) call.kf ab init_state);
-        end;
-        if Parameters.ValShowProgress.get () then begin
-          Self.feedback ~current:true
-            "Reusing old results for call to %a" Kernel_function.pretty call.kf;
-          Self.debug ~dkey
-            "calling Record_Value_New callbacks on saved previous result";
-        end;
-        let stack_with_call = Eva_utils.call_stack () in
-        Db.Value.Record_Value_Callbacks_New.apply
-          (stack_with_call, Value_types.Reuse i);
-        (* call can be cached since it was cached once *)
-        Transfer.{states; cacheable = Cacheable; builtin=false}
-    else
-      default ()
+  (* ----- Use of cvalue builtins ------------------------------------------- *)
 
   let get_cvalue_call call =
     let lift_left left = { left with lloc = get_ploc left.lloc } in
@@ -288,53 +274,73 @@ module Make (Abstract: Abstractions.Eva) = struct
     | (_k,s) :: l  ->
       `Value (List.fold_left Abstract.Dom.join s (List.map snd l))
 
-  let compute_call_or_builtin stmt call recursion state =
-    match Builtins.find_builtin_override call.kf with
-    | None -> compute_and_cache_call stmt call recursion state
-    | Some (name, builtin, cacheable, spec) ->
-      Eva_results.mark_kf_as_called call.kf;
-      let kinstr = Kstmt stmt in
-      let kf_name = Kernel_function.get_name call.kf in
-      if Parameters.ValShowProgress.get ()
-      then
-        Self.feedback ~current:true "Call to builtin %s%s"
-          name (if kf_name = name then "" else " for function " ^ kf_name);
-      (* Do not track garbled mixes created when interpreting the specification,
-         as the result of the cvalue builtin will overwrite them. *)
-      Locations.Location_Bytes.do_track_garbled_mix false;
-      let states =
-        Spec.compute_using_specification ~warn:false kinstr call spec state
+  (* Interprets a call to [kf] at callsite [kinstr] in the state [state]
+     by using a cvalue builtin. *)
+  let compute_builtin (name, builtin, cacheable, spec) kinstr call state =
+    let kf_name = Kernel_function.get_name call.kf in
+    if Parameters.ValShowProgress.get ()
+    then
+      Self.feedback ~current:true "Call to builtin %s%s"
+        name (if kf_name = name then "" else " for function " ^ kf_name);
+    (* Do not track garbled mixes created when interpreting the specification,
+       as the result of the cvalue builtin will overwrite them. *)
+    Locations.Location_Bytes.do_track_garbled_mix false;
+    let states =
+      Spec.compute_using_specification ~warn:false kinstr call spec state
+    in
+    Locations.Location_Bytes.do_track_garbled_mix true;
+    let final_state = join_states states in
+    let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
+    match final_state with
+    | `Bottom ->
+      let cs = Eva_utils.call_stack () in
+      Db.Value.Call_Type_Value_Callbacks.apply (`Spec spec, cvalue_state, cs);
+      let cacheable = Eval.Cacheable in
+      Transfer.{states; cacheable; builtin=true}
+    | `Value final_state ->
+      let cvalue_call = get_cvalue_call call in
+      let post = Abstract.Dom.get_cvalue_or_top final_state in
+      let cvalue_states =
+        Builtins.apply_builtin builtin cvalue_call ~pre:cvalue_state ~post
       in
-      Locations.Location_Bytes.do_track_garbled_mix true;
-      let final_state = join_states states in
-      let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
-      match final_state with
-      | `Bottom ->
-        let cs = Eva_utils.call_stack () in
-        Db.Value.Call_Type_Value_Callbacks.apply (`Spec spec, cvalue_state, cs);
-        let cacheable = Eval.Cacheable in
-        Transfer.{states; cacheable; builtin=true}
-      | `Value final_state ->
-        let cvalue_call = get_cvalue_call call in
-        let post = Abstract.Dom.get_cvalue_or_top final_state in
-        let cvalue_states =
-          Builtins.apply_builtin builtin cvalue_call ~pre:cvalue_state ~post
-        in
-        let insert cvalue_state =
-          Partition.Key.empty,
-          Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
-        in
-        let states = List.map insert cvalue_states in
-        Transfer.{states; cacheable; builtin=true}
+      let insert cvalue_state =
+        Partition.Key.empty,
+        Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
+      in
+      let states = List.map insert cvalue_states in
+      Transfer.{states; cacheable; builtin=true}
 
-  let compute_call =
+  (* Uses cvalue builtin only if the cvalue domain is available. Otherwise, only
+     use the called function specification. *)
+  let compute_builtin =
     if Abstract.Dom.mem Cvalue_domain.State.key
     && Abstract.Val.mem Main_values.CVal.key
     && Abstract.Loc.mem Main_locations.PLoc.key
-    then compute_call_or_builtin
-    else compute_and_cache_call
+    then compute_builtin
+    else fun (_, _, _, spec) -> compute_using_spec_or_body (`Spec spec)
 
-  let () = Transfer.compute_call_ref := compute_call
+  (* ----- Call computation ------------------------------------------------- *)
+
+  (* Interprets a [call] at callsite [kinstr] in the state [state],
+     using a builtin, the specification or the body of the called function,
+     according to [Function_calls.register]. *)
+  let compute_call kinstr call recursion state =
+    let recursion_depth = Option.map (fun r -> r.depth) recursion in
+    let target =
+      Function_calls.define_analysis_target ?recursion_depth kinstr call.kf
+    in
+    match target with
+    | `Builtin builtin_info -> compute_builtin builtin_info kinstr call state
+    | `Spec _ as spec -> compute_using_spec_or_body spec kinstr call state
+    | `Def _ as def ->
+      let compute = compute_using_spec_or_body def in
+      if Parameters.MemExecAll.get ()
+      then compute_and_cache_call compute kinstr call state
+      else compute kinstr call state
+
+  let () = Transfer.compute_call_ref := (fun stmt -> compute_call (Kstmt stmt))
+
+  (* ----- Main call -------------------------------------------------------- *)
 
   let store_initial_state kf init_state =
     Abstract.Dom.Store.register_initial_state (Eva_utils.call_stack ()) init_state;
@@ -349,9 +355,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let call =
         { kf; callstack = []; arguments = []; rest = []; return = None; }
       in
-      let final_result =
-        compute_using_spec_or_body Kglobal call None init_state
-      in
+      let final_result = compute_call Kglobal call None init_state in
       let final_states = List.map snd (final_result.Transfer.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Eva_utils.pop_call_stack ();

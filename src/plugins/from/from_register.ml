@@ -98,7 +98,7 @@ let print_calldeps () =
   let treat_call s funtype =
     let caller = Kernel_function.find_englobing_kf s in
     let f, typ_f =
-      if !Db.Value.no_results (Kernel_function.get_definition caller)
+      if not (Eva.Analysis.save_results caller)
       then "<unknown>", funtype
       else
         match Eva.Results.callee s with

@@ -271,10 +271,6 @@ Cannot filter: dumping raw memory (including unchanged variables)
     j; tmp
 [inout] Inputs for function main_asm:
     \nothing
-[inout] Out (internal) for function no_results:
-    __retres
-[inout] Inputs for function no_results:
-    \nothing
 [pdg] computing for function fun_asm
 [pdg] top_pdg_input.c:45: Warning: Ignoring inline assembly code
 [pdg] done for function fun_asm

@@ -39,10 +39,10 @@
   Called from cond.i:20.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] computing for function unknf <- main.
-  Called from cond.i:34.
 [kernel:annot:missing-spec] cond.i:34: Warning: 
   Neither code nor specification for function unknf, generating default assigns from the prototype
+[eva] computing for function unknf <- main.
+  Called from cond.i:34.
 [eva] using specification for function unknf
 [eva] Done for function unknf
 [eva] cond.i:37: Frama_C_show_each_2: {0; 1; 2; 4; 5; 6; 7; 8}

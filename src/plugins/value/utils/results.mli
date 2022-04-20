@@ -54,6 +54,16 @@
       default O (as_int (eval_var vi (in_callstack cs (before stmt))))
 *)
 
+(** Are results available for a given function? True if the function body has
+    been has been analyzed and the results have been saved.
+    False if:
+    - the function has not been reached by the analysis: all requests in the
+      function will lead to a Bottom error.
+    - a specification or a builtin has been used instead of analyzing the
+      function body: all requests in the function will lead to a Bottom error.
+    - results have not been saved, due to the [-eva-no-results] parameter:
+      all requests in the function will lead to a Top error. *)
+val are_available: Cil_types.kernel_function -> bool
 
 type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 

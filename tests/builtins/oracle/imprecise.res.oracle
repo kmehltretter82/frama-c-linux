@@ -129,10 +129,10 @@
 [eva] Done for function cast_address
 [eva] computing for function garbled_mix_null <- main.
   Called from imprecise.c:148.
-[eva] computing for function gm_f1 <- garbled_mix_null <- main.
-  Called from imprecise.c:75.
 [kernel:annot:missing-spec] imprecise.c:75: Warning: 
   Neither code nor specification for function gm_f1, generating default assigns from the prototype
+[eva] computing for function gm_f1 <- garbled_mix_null <- main.
+  Called from imprecise.c:75.
 [eva] using specification for function gm_f1
 [eva] Done for function gm_f1
 [eva] imprecise.c:76: 
@@ -167,10 +167,10 @@
 [eva:alarm] imprecise.c:77: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(p_gm_null);
-[eva] computing for function gm_f2 <- garbled_mix_null <- main.
-  Called from imprecise.c:77.
 [kernel:annot:missing-spec] imprecise.c:77: Warning: 
   Neither code nor specification for function gm_f2, generating default assigns from the prototype
+[eva] computing for function gm_f2 <- garbled_mix_null <- main.
+  Called from imprecise.c:77.
 [eva] using specification for function gm_f2
 [eva] Done for function gm_f2
 [eva] imprecise.c:78: 

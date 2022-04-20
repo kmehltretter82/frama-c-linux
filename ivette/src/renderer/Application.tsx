@@ -47,10 +47,7 @@ export default function Application(): JSX.Element {
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
   const [viewbar, flipViewbar] =
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
-  const hints = Extensions.useSearchHints();
-  const onSelectedHints = (): void => {
-    if (hints.length === 1) Extensions.onSearchHint(hints[0]);
-  };
+
   return (
     <Vfill>
       <Toolbar.ToolBar>
@@ -63,15 +60,9 @@ export default function Application(): JSX.Element {
         <Controller.Control />
         <Extensions.Toolbar />
         <Toolbar.Filler />
-        <Toolbar.SearchField
-          placeholder="Search…"
-          hints={hints}
-          onSearch={Extensions.searchHints}
-          onHint={Extensions.onSearchHint}
-          onSelect={onSelectedHints}
-        />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
+        <Toolbar.ModalActionField />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"

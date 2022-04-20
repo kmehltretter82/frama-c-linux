@@ -20,8 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Are the states of the function analysis saved? *)
-val should_memorize_function: Cil_types.fundec -> bool
+open Cil_types
 
-(** Signal that some analysis results are not stored. *)
-val no_memoization_enabled: unit -> bool
+type t
+val is_active: t -> behavior -> Alarmset.status
+val is_active_from_name: t -> string -> Alarmset.status
+val active_behaviors: t -> behavior list
+val create: (predicate -> Alarmset.status) -> spec -> t

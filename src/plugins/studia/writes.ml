@@ -39,7 +39,7 @@ let effects_of_call stmt zlval effects  =
     let inout = !Db.Operational_inputs.get_internal_precise ~stmt kf in
     let out = inout.Inout_type.over_outputs in
     if Zone.intersects out zlval then
-      if !Db.Value.use_spec_instead_of_definition kf then
+      if Eva.Analysis.use_spec_instead_of_definition kf then
         { effects with direct = true } (* Mark the effect as direct, there is
                                           no body for this funtion. *)
       else

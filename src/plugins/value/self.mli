@@ -77,3 +77,4 @@ val wkey_signed_overflow : warn_category
 val wkey_invalid_assigns : warn_category
 val wkey_experimental : warn_category
 val wkey_unknown_size : warn_category
+val wkey_ensures_false : warn_category

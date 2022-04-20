@@ -85,7 +85,7 @@ let do_copy_at = function
    on functions whose body is analyzed. *)
 let is_determinate kf =
   let name = Kernel_function.get_name kf in
-  (warn_indeterminate kf || !Db.Value.use_spec_instead_of_definition kf)
+  (warn_indeterminate kf || Function_calls.use_spec_instead_of_definition kf)
   && not (Ast_info.is_frama_c_builtin name)
 
 let subdivide_stmt = Eva_utils.get_subdivision
@@ -748,7 +748,6 @@ module Make (Abstract: Abstractions.Eva) = struct
     let cacheable = ref Cacheable in
     let eval =
       let+ functions = functions in
-      let current_kf = Eva_utils.current_kf () in
       let process_one_function kf valuation =
         (* The special Frama_C_ functions to print states are handled here. *)
         if apply_special_directives ~subdivnb kf args state
@@ -761,8 +760,6 @@ module Make (Abstract: Abstractions.Eva) = struct
           Alarmset.emit ki_call alarms;
           let states =
             let+ call, recursion, valuation = eval in
-            (* Register the call. *)
-            Eva_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
             (* Do the call. *)
             let c, states =
               do_one_call valuation stmt lval_option call recursion state

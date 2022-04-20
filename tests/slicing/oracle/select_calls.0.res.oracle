@@ -6,19 +6,19 @@
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
   d ∈ [--..--]
-[eva] computing for function send <- f.
-  Called from select_calls.i:22.
 [kernel:annot:missing-spec] select_calls.i:22: Warning: 
   Neither code nor specification for function send, generating default assigns from the prototype
+[eva] computing for function send <- f.
+  Called from select_calls.i:22.
 [eva] using specification for function send
 [eva] Done for function send
 [eva] computing for function send <- f.
   Called from select_calls.i:23.
 [eva] Done for function send
-[eva] computing for function crypt <- f.
-  Called from select_calls.i:24.
 [kernel:annot:missing-spec] select_calls.i:24: Warning: 
   Neither code nor specification for function crypt, generating default assigns from the prototype
+[eva] computing for function crypt <- f.
+  Called from select_calls.i:24.
 [eva] using specification for function crypt
 [eva] Done for function crypt
 [eva] computing for function send <- f.
@@ -27,10 +27,10 @@
 [eva] computing for function send <- f.
   Called from select_calls.i:28.
 [eva] Done for function send
-[eva] computing for function uncrypt <- f.
-  Called from select_calls.i:30.
 [kernel:annot:missing-spec] select_calls.i:30: Warning: 
   Neither code nor specification for function uncrypt, generating default assigns from the prototype
+[eva] computing for function uncrypt <- f.
+  Called from select_calls.i:30.
 [eva] using specification for function uncrypt
 [eva] Done for function uncrypt
 [eva] computing for function send <- f.

@@ -512,7 +512,7 @@ let get_internal_aux ?stmt kf =
   | Some stmt ->
     try CallwiseResults.find (kf, Kstmt stmt)
     with Not_found ->
-      if !Db.Value.use_spec_instead_of_definition kf then
+      if Eva.Analysis.use_spec_instead_of_definition kf then
         compute_using_prototype ~stmt kf
       else !Db.Operational_inputs.get_internal kf
 
@@ -524,7 +524,7 @@ let get_external_aux ?stmt kf =
       let internals = CallwiseResults.find (kf, Kstmt stmt) in
       externalize ~with_formals:false kf internals
     with Not_found ->
-      if !Db.Value.use_spec_instead_of_definition kf then
+      if Eva.Analysis.use_spec_instead_of_definition kf then
         let r = compute_externals_using_prototype ~stmt kf in
         CallwiseResults.add (kf, Kstmt stmt) r;
         r
@@ -702,12 +702,9 @@ module Callwise = struct
       | Value_types.NormalStore ((states, _after_states), _) ->
         let kf, _ = List.hd call_stack in
         let inout =
-          try
-            if !Db.Value.no_results (Kernel_function.get_definition kf) then
-              top
-            else
-              compute_call_from_value_states kf call_stack (Lazy.force states)
-          with Kernel_function.No_Definition -> top
+          if Eva.Analysis.save_results kf
+          then compute_call_from_value_states kf call_stack (Lazy.force states)
+          else top
         in
         (match value_res with
          | Value_types.NormalStore (_, memexec_counter) ->
@@ -778,7 +775,7 @@ module FunctionWise = struct
                                               }*)
 
   let compute_internal_using_cfg kf =
-    if !Db.Value.no_results (Kernel_function.get_definition kf) then
+    if not (Eva.Analysis.save_results kf) then
       top
     else begin
       Inout_parameters.feedback ~level:2 "computing for function %a%s"
@@ -805,7 +802,7 @@ let get_internal =
                                 to Eva.Analysis.compute *)
        with
        | Not_found ->
-         if!Db.Value.use_spec_instead_of_definition kf then
+         if Eva.Analysis.use_spec_instead_of_definition kf then
            compute_using_prototype kf
          else
            FunctionWise.compute_internal_using_cfg kf

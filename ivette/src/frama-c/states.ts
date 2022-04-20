@@ -487,6 +487,7 @@ export function useSyncArray<K, A>(
   const st = lookupSyncArray(arr);
   React.useEffect(() => st.update(), [st]);
   Server.useSignal(arr.signal, st.fetch);
+  st.update();
   useModel(st.model, sync);
   return st.model;
 }

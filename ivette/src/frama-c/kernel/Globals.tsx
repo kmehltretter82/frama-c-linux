@@ -30,7 +30,7 @@ import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
-import * as Ivette from 'ivette';
+import * as Toolbars from 'dome/frame/toolbars';
 
 import * as States from 'frama-c/states';
 import { functions, functionsData } from 'frama-c/kernel/api/ast';
@@ -40,16 +40,16 @@ import { computationState } from 'frama-c/plugins/eva/api/general';
 // --- Global Search Hints
 // --------------------------------------------------------------------------
 
-function makeFunctionHint(fct: functionsData): Ivette.Hint {
+function makeFunctionHint(fct: functionsData): Toolbars.Hint {
   return {
     id: fct.key,
     label: fct.name,
     title: fct.signature,
-    onSelection: () => States.setSelection({ fct: fct.name }),
+    value: () => States.setSelection({ fct: fct.name }),
   };
 }
 
-async function lookupGlobals(pattern: string): Promise<Ivette.Hint[]> {
+async function lookupGlobals(pattern: string): Promise<Toolbars.Hint[]> {
   const lookup = pattern.toLowerCase();
   const fcts = States.getSyncArray(functions).getArray();
   return fcts.filter((fn) => (
@@ -57,7 +57,7 @@ async function lookupGlobals(pattern: string): Promise<Ivette.Hint[]> {
   )).map(makeFunctionHint);
 }
 
-Ivette.registerHints('frama-c.globals', lookupGlobals);
+Toolbars.registerSearchHints('frama-c.globals', lookupGlobals);
 
 // --------------------------------------------------------------------------
 // --- Function Item

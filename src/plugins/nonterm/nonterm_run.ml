@@ -197,30 +197,29 @@ end
    1. SyntacticallyUnreachable is disabled (otherwise it already checks them);
    2. No warnings were emitted for the function (otherwise it may be redundant). *)
 let check_unreachable_returns kf =
-  if Eva.Results.is_called kf then begin
-    try
-      let ret_stmt = Kernel_function.find_return kf in
-      if not (Eva.Results.is_reachable ret_stmt) then
-        warn_unreachable_statement ret_stmt
-    with
-    | Kernel_function.No_Statement -> (* should never happen *)
-      Self.error "function %a has no return statement, skipping"
-        Kernel_function.pretty kf;
-  end
+  try
+    let ret_stmt = Kernel_function.find_return kf in
+    if not (Eva.Results.is_reachable ret_stmt) then
+      warn_unreachable_statement ret_stmt
+  with
+  | Kernel_function.No_Statement -> (* should never happen *)
+    Self.error "function %a has no return statement, skipping"
+      Kernel_function.pretty kf
 
 (* Checks [kf] for unreachable statements (ignoring those in [to_ignore])
    and emits warnings. [warned_kfs] indicates functions which already had
    warnings emitted, to minimize the amount of redundant ones. *)
 let check_unreachable_statements kf ~to_ignore ~dead_code ~warned_kfs =
-  if !Db.Value.use_spec_instead_of_definition kf then
+  match Eva.Analysis.status kf with
+  | Unreachable | Analyzed NoResults -> ()
+  | SpecUsed | Builtin _ ->
     (* TODO: consider as non-terminating if spec has
        \terminates(false) or \ensures(false) *)
     Self.debug "not analyzing function %a@ \
                 (using specification instead of definition),@ \
                 considered as always terminating"
       Kernel_function.pretty kf
-  else
-  if Eva.Results.is_called kf then begin
+  | Analyzed _ ->
     try
       let vis = new unreachable_stmt_visitor kf to_ignore in
       ignore (Visitor.visitFramacKf (vis :> Visitor.frama_c_visitor) kf);
@@ -236,30 +235,18 @@ let check_unreachable_statements kf ~to_ignore ~dead_code ~warned_kfs =
     with
     | Kernel_function.No_Statement -> (* should never happen *)
       Self.error "function %a has no return statement, skipping"
-        Kernel_function.pretty kf;
-  end
+        Kernel_function.pretty kf
 
 (* To avoid redundant warnings, calls to possibly non-terminating functions
    are ignored if:
    1. the function is in the list of functions to be ignored;
-   2. or the function has a body AND its specification is not being used
-      via -eva-use-spec.
+   2. or Eva results are available for the function.
    In case 2, the call is ignored because non-terminating statements inside
    it will already be reported. *)
 let ignore_kf name =
   try
     let kf = Globals.Functions.find_by_name name in
-    let has_definition =
-      try ignore (Kernel_function.get_definition kf); true
-      with Kernel_function.No_Definition -> false
-    in
-    match Ignore.mem name,
-          !Db.Value.use_spec_instead_of_definition kf,
-          has_definition
-    with
-    | true, _, _ -> true
-    | false, false, true -> true
-    | _, _, _ -> false
+    Ignore.mem name || Eva.Results.are_available kf
   with Not_found -> false
 
 (* simple statement collector: accumulates a list of all

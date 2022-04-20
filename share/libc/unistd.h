@@ -1009,8 +1009,20 @@ extern ssize_t      pwrite(int, const void *, size_t, off_t);
   assigns __fc_fds[fd] \from __fc_fds[fd];
   assigns \result, *((char *)buf+(0..count-1))
           \from indirect:__fc_fds[fd], indirect:count;
-  ensures  result_error_or_read_length: 0 <= \result <= count || \result == -1;
-  ensures  initialization:buf: \initialized(((char*)buf)+(0..\result-1));
+  behavior full_read:
+    assumes nondet_small_count: Frama_C_entropy_source && count <= SSIZE_MAX;
+    ensures res_full: \result == count;
+    ensures res_init:initialization: \initialized(((char*)buf)+(0..count-1));
+  behavior large_read_implementation_defined:
+    assumes nondet_large_count: Frama_C_entropy_source && count > SSIZE_MAX;
+    ensures res_init:initialization: \initialized(((char*)buf)+(0..count-1));
+  behavior partial_or_error:
+    assumes nondet: !Frama_C_entropy_source;
+    ensures result_error_or_read_length: -1 <= \result < count;
+    ensures initialization:buf: \initialized(((char*)buf)+(0..\result-1));
+            //note: for \result == -1, the above range is empty, as intended
+  disjoint behaviors;
+  complete behaviors;
 */
 extern ssize_t      read(int fd, void *buf, size_t count);
 

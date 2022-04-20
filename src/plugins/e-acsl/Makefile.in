@@ -370,8 +370,9 @@ EACSL_DISTRIB_TESTS = \
       $(dir)/test_config_dev \
       $(dir)/oracle/* \
       $(dir)/oracle_dev/* \
-  )
-
+  ) \
+  tests/builtin/utils \
+  tests/format/utils
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
 

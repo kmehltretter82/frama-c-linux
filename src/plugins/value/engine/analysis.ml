@@ -28,19 +28,36 @@ type computation_state = Self.computation_state =
 let current_computation_state = Self.current_computation_state
 let register_computation_hook = Self.register_computation_hook
 let is_computed = Self.is_computed
+let self = Self.state
+
+type results = Function_calls.results = Complete | Partial | NoResults
+type status = Function_calls.analysis_status =
+    Unreachable | SpecUsed | Builtin of string | Analyzed of results
+let status kf =
+  match Function_calls.analysis_status kf with
+  | Analyzed Complete as status ->
+    if is_computed () then status else Analyzed Partial
+  | status -> status
+
+let use_spec_instead_of_definition =
+  Function_calls.use_spec_instead_of_definition ?recursion_depth:None
+
+let save_results kf =
+  try Function_calls.save_results (Kernel_function.get_definition kf)
+  with Kernel_function.No_Definition -> false
 
 module type Results = sig
   type state
   type value
   type location
 
-  val get_global_state: unit -> state or_bottom
-  val get_stmt_state : after:bool -> stmt -> state or_bottom
+  val get_global_state: unit -> state or_top_bottom
+  val get_stmt_state : after:bool -> stmt -> state or_top_bottom
   val get_stmt_state_by_callstack:
     ?selection:callstack list ->
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_bottom
   val get_initial_state:
-    kernel_function -> state or_bottom
+    kernel_function -> state or_top_bottom
   val get_initial_state_by_callstack:
     ?selection:callstack list ->
     kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_bottom
@@ -78,22 +95,38 @@ module Make (Abstract: Abstractions.S) = struct
   include Abstract
   include Compute_functions.Make (Abstract)
 
+  let find stmt f =
+    if is_computed ()
+    then
+      let kf = Kernel_function.find_englobing_kf stmt in
+      match status kf with
+      | Unreachable | SpecUsed | Builtin _ -> `Bottom
+      | Analyzed NoResults -> `Top
+      | Analyzed (Complete | Partial) -> f stmt
+    else `Top
+
   let get_stmt_state ~after stmt =
-    let fundec = Kernel_function.(get_definition (find_englobing_kf stmt)) in
-    if Mark_noresults.should_memorize_function fundec && is_computed ()
-    then Abstract.Dom.Store.get_stmt_state ~after stmt
-    else `Value Abstract.Dom.top
+    find stmt (Dom.Store.get_stmt_state ~after :> stmt -> Dom.t or_top_bottom)
 
-  let get_global_state = Abstract.Dom.Store.get_global_state
+  let get_stmt_state_by_callstack ?selection ~after stmt =
+    find stmt (Abstract.Dom.Store.get_stmt_state_by_callstack ?selection ~after)
 
-  let get_stmt_state_by_callstack =
-    Abstract.Dom.Store.get_stmt_state_by_callstack
+  let get_global_state () =
+    (Abstract.Dom.Store.get_global_state () :> Dom.t or_top_bottom)
 
-  let get_initial_state =
-    Abstract.Dom.Store.get_initial_state
+  let get_initial_state kf =
+    if is_computed () then
+      if Function_calls.is_called kf
+      then (Abstract.Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
+      else `Bottom
+    else `Top
 
-  let get_initial_state_by_callstack =
-    Abstract.Dom.Store.get_initial_state_by_callstack
+  let get_initial_state_by_callstack ?selection kf =
+    if is_computed () then
+      if Function_calls.is_called kf
+      then Abstract.Dom.Store.get_initial_state_by_callstack ?selection kf
+      else `Bottom
+    else `Top
 
   let eval_expr state expr = Eval.evaluate state expr >>=: snd
 
@@ -201,5 +234,3 @@ let () =
   Project.register_after_set_current_hook
     ~user_only:true (fun _ -> reset_analyzer ());
   Project.register_after_global_load_hook reset_analyzer
-
-let self = Self.state

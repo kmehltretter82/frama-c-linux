@@ -36,10 +36,10 @@
   signed overflow. assert *y + *x ≤ 2147483647;
 [eva] computing for function send1 <- main.
   Called from unravel-point.i:75.
-[eva] computing for function printf <- send1 <- main.
-  Called from unravel-point.i:36.
 [kernel:annot:missing-spec] unravel-point.i:36: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
+[eva] computing for function printf <- send1 <- main.
+  Called from unravel-point.i:36.
 [eva] using specification for function printf
 [eva] Done for function printf
 [eva] Recording results for send1
@@ -139,10 +139,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function scanf <- main.
-  Called from unravel-point.i:59.
 [kernel:annot:missing-spec] unravel-point.i:59: Warning: 
   Neither code nor specification for function scanf, generating default assigns from the prototype
+[eva] computing for function scanf <- main.
+  Called from unravel-point.i:59.
 [eva] using specification for function scanf
 [eva] Done for function scanf
 [eva:alarm] unravel-point.i:60: Warning: 

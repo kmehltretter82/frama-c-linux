@@ -337,10 +337,10 @@
 [eva] Done for function test_assigns2
 [eva] computing for function test_small1 <- main.
   Called from behaviors1.i:649.
-[eva] computing for function f3 <- test_small1 <- main.
-  Called from behaviors1.i:506.
 [kernel] behaviors1.i:506: Warning: 
   No code nor implicit assigns clause for function f3, generating default assigns from the prototype
+[eva] computing for function f3 <- test_small1 <- main.
+  Called from behaviors1.i:506.
 [eva] using specification for function f3
 [eva:alarm] behaviors1.i:506: Warning: 
   function f3: precondition got status unknown.
@@ -351,10 +351,10 @@
 [eva] Done for function test_small1
 [eva] computing for function test_small2 <- main.
   Called from behaviors1.i:650.
-[eva] computing for function f4 <- test_small2 <- main.
-  Called from behaviors1.i:521.
 [kernel] behaviors1.i:521: Warning: 
   No code nor implicit assigns clause for function f4, generating default assigns from the prototype
+[eva] computing for function f4 <- test_small2 <- main.
+  Called from behaviors1.i:521.
 [eva] using specification for function f4
 [eva:alarm] behaviors1.i:521: Warning: 
   function f4: precondition got status unknown.
@@ -369,30 +369,30 @@
 [eva] Done for function test_small2
 [eva] computing for function test_small3 <- main.
   Called from behaviors1.i:651.
-[eva] computing for function f5 <- test_small3 <- main.
-  Called from behaviors1.i:534.
 [kernel] behaviors1.i:534: Warning: 
   No code nor implicit assigns clause for function f5, generating default assigns from the prototype
+[eva] computing for function f5 <- test_small3 <- main.
+  Called from behaviors1.i:534.
 [eva] using specification for function f5
 [eva] Done for function f5
 [eva] Recording results for test_small3
 [eva] Done for function test_small3
 [eva] computing for function test_small4 <- main.
   Called from behaviors1.i:652.
-[eva] computing for function f6 <- test_small4 <- main.
-  Called from behaviors1.i:548.
 [kernel] behaviors1.i:548: Warning: 
   No code nor implicit assigns clause for function f6, generating default assigns from the prototype
+[eva] computing for function f6 <- test_small4 <- main.
+  Called from behaviors1.i:548.
 [eva] using specification for function f6
 [eva] Done for function f6
 [eva] Recording results for test_small4
 [eva] Done for function test_small4
 [eva] computing for function test_small5 <- main.
   Called from behaviors1.i:653.
-[eva] computing for function f7 <- test_small5 <- main.
-  Called from behaviors1.i:561.
 [kernel] behaviors1.i:561: Warning: 
   No code nor implicit assigns clause for function f7, generating default assigns from the prototype
+[eva] computing for function f7 <- test_small5 <- main.
+  Called from behaviors1.i:561.
 [eva] using specification for function f7
 [eva:alarm] behaviors1.i:561: Warning: 
   function f7: precondition got status unknown.

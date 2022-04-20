@@ -1129,15 +1129,7 @@ let get_output_dir d =
 (* --- Session dir                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
-   no function in its stdlib to resolve symbolic links (e.g. realpath)
-   for a given path. 'getcwd' always resolves them, but if the user
-   supplies a path with symbolic links, this may cause issues.
-   Instead of forcing the user to always provide resolved paths, we
-   currently choose to never resolve them.
-   We only resort to getcwd() to avoid issues when PWD does not exist. *)
-let default =
-  (try Sys.getenv "PWD" with Not_found -> Sys.getcwd ()) ^ "/.frama-c"
+let default = Fc_Filepath.pwd () ^ "/.frama-c"
 
 let has_session () =
   Session.is_set () ||

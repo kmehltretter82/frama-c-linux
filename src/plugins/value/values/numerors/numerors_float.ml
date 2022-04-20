@@ -122,7 +122,7 @@ let neg_inf prec = of_mpfr prec @@ Mpfrf.of_float neg_infinity  Mpfr.Near
  *---------------------------------------------------------------------------*)
 let compare (px, nx) (py, ny) =
   if not (Precisions.eq px py) then
-    Eva.Private.Self.fatal
+    Self.fatal
       "Numerors: impossible to compare two numbers with different precisions"
   else Mpfrf.cmp nx ny
 let eq a b = compare a b =  0
