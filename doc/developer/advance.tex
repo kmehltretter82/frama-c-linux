@@ -4393,55 +4393,6 @@ documentation with \texttt{make doc}, you must have generated the documentation
 of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the 
 \texttt{make install-doc-code}\codeidx{install-doc-code} command.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% \section{License Policy}\label{adv:copyright}\index{License|bfit}
-
-%% \begin{target}developers with a SVN access.\end{target}
-
-%% \begin{prereq}
-%% knowledge of \make.
-%% \end{prereq}
-
-%% If you want to redistribute a plug-in inside \framac, you have to define a
-%% proper license policy\index{Plug-in!License}. For this purpose, some help is
-%% provided in the \texttt{Makefile}\codeidx{Makefile}. Mainly we distinguish two
-%% cases described below.
-%% \begin{itemize}
-%% \item \textbf{If the wished license is already used inside \framac}, just
-%%   extend the variable corresponding to the wished license in order to include
-%%   files of your plug-in. Next run \texttt{make headers}\index{Header}.
-%%   \begin{example}
-%%     Plug-in \texttt{slicing}\index{Slicing}\index{Plug-in!Slicing|see{Slicing}}
-%%     is released under LGPL\index{LGPL} and is proprietary of both CEA and
-%%     INRIA\index{Copyright}. Thus, in the \texttt{Makefile}, there is the following line.
-%%     \codeidx{CEA\_INRIA\_LGPL}
-%%     \begin{makefilecode}
-%% CEA_INRIA_LGPL= ... €
-%%                  src/plugins/slicing/*.ml*
-%%      \end{makefilecode}
-%%   \end{example}
-%% \item \textbf{If the wished license is unknown inside \framac}, you have to:
-%%   \begin{enumerate}
-%%   \item Add a new variable $v$ corresponding to it and assign files of your
-%%     plug-in;
-%%   \item Extend variable \texttt{LICENSES}\codeidx{LICENSES} with
-%%     this variable;
-%%   \item Add a text file in directory \texttt{licenses}\codeidx{licenses}
-%%     containing your licenses
-%%   \item Add a text file in directory \texttt{headers}\codeidx{headers}
-%%     containing the headers\index{Header} to add into files of your plug-in
-%%     (those assigned by $v$).
-
-%%     \begin{important}
-%%       The filename must be the same than the variable name $v$. Moreover this
-%%       file should contain a reference to the file containing the whole license
-%%       text.
-%%     \end{important}
-%%   \item Run \texttt{make headers}.
-%%   \end{enumerate}
-%% \end{itemize}
-
 % Local Variables:
 % ispell-local-dictionary: "english"
 % TeX-master: "main"
