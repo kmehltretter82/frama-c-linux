@@ -69,7 +69,7 @@ val precondition : goal:bool -> funspec -> predicate
     With [~goal:true], only returns assert and check predicates.
     With [~goal:false], only returns assert and admit predicates.
     @since Carbon-20101201
-    @modify 23.0-Vanadium introduce [goal] flag
+    @before 23.0-Vanadium no [goal] flag.
 *)
 
 val behavior_assumes : funbehavior -> predicate
@@ -80,14 +80,14 @@ val behavior_precondition : goal:bool -> funbehavior -> predicate
 (** Builds the precondition from [b_assumes] and [b_requires] clauses.
     For flag [~goal] see {!Ast_info.precondition} above.
     @since Carbon-20101201
-    @modify 23.0-Vanadium introduce [goal] flag
+    @before 23.0-Vanadium no [goal] flag.
 *)
 
 val behavior_postcondition :
   goal:bool -> funbehavior -> termination_kind -> predicate
 (** Builds the postcondition from [b_assumes] and [b_post_cond] clauses.
     For flag [~goal] see {Ast_info.precondition} above.
-    @modify 23.0-Vanadium introduce [goal] flag
+    @before 23.0-Vanadium no [goal] flag.
 *)
 
 val disjoint_behaviors : funspec -> string list -> predicate

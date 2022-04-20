@@ -311,7 +311,7 @@ val add_aliases:
     If [deprecated] is set to true, the use of the aliases emits a warning.
     @Invalid_argument if an alias name is the empty string
     @since Carbon-20110201
-    @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
+    @before 22.0-Titanium no [visible] and [deprecated] arguments. *)
 
 val replace_option_setting:
   string -> plugin:string -> group:Group.t -> option_setting -> unit
