@@ -620,10 +620,15 @@ let overlaps ~partial ~size t1 t2 =
     not (Int_set.for_all
            (fun i -> Int.ge (Int.abs i) size || (partial && Int.is_zero i))
            array)
-  | Itv i ->
-    let min, max = Int_interval.min_and_max i in
+  | _ ->
     let pred_size = Int.pred size in
-    min_le_elt min pred_size && max_ge_elt max (Int.neg pred_size)
+    if partial
+    then
+      let size_itv = inject_range (Some Int.one) (Some pred_size) in
+      intersects diff size_itv || intersects diff (neg size_itv)
+    else
+      let size_itv = inject_range (Some (Int.neg pred_size)) (Some pred_size) in
+      intersects diff size_itv
 
 let make = check_make
 
