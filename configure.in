@@ -725,7 +725,7 @@ check_plugin(callgraph, src/plugins/callgraph,
 
 plugin_use_external(callgraph,dot)
 plugin_use(callgraph,gui)
-plugin_use(callgraph,eva)
+plugin_require(callgraph,eva)
 
 # constant propagation
 ######################
@@ -808,6 +808,7 @@ plugin_require(pdg,callgraph)
 
 check_plugin(postdominators,src/plugins/postdominators,
              [support for postdominators plugin],yes)
+plugin_require(postdominators,eva)
 
 # reduc
 ############
