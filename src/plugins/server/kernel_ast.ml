@@ -751,6 +751,17 @@ let () =
 
 type marker_term_input = { atStmt : stmt ; term : string }
 
+module MarkerTermInputAsKey = struct
+  type t = marker_term_input
+  let compare x y =
+    let c = Cil_datatype.Stmt.compare x.atStmt y.atStmt in
+    if c = 0 then String.compare x.term y.term else c
+  let equal x y = compare x y = 0
+  let hash x = 17 * Cil_datatype.Stmt.hash x.atStmt + Hashtbl.hash x.term
+end
+
+module MarkerTermInputCache = Hashtbl.Make(MarkerTermInputAsKey)
+
 module MarkerTermInput = struct
   type record
   let record : record Record.signature = Record.signature ()
@@ -792,12 +803,18 @@ let logic_environment () =
   let open Logic_typing in
   Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
 
-let build_marker = Option.map @@ fun input ->
-  let env = logic_environment () in
-  let kf = Kernel_function.find_englobing_kf input.atStmt in
-  let term = !Db.Properties.Interp.term ~env kf input.term in
-  let exp = !Db.Properties.Interp.term_to_exp ~result:None term in
-  Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp)
+let build_marker =
+  let table = MarkerTermInputCache.create 10 in
+  Option.map @@ fun input ->
+  match MarkerTermInputCache.find_opt table input with
+  | Some tag -> tag
+  | None ->
+    let env = logic_environment () in
+    let kf = Kernel_function.find_englobing_kf input.atStmt in
+    let term = !Db.Properties.Interp.term ~env kf input.term in
+    let exp = !Db.Properties.Interp.term_to_exp ~result:None term in
+    let tag = Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp) in
+    MarkerTermInputCache.add table input tag ; tag
 
 let descr = "Build a marker from an ACSL term."
 
