@@ -24,7 +24,8 @@ let repair_word s =
     with Not_found -> st
   in
   Str.global_replace (Str.regexp "\\") "" (repair_word_aux s)
- 
+
+let external_names = [ "Landmarks"; "Makefile" ]
 
 (** [fill_tbl] takes a file containing data which is 
     as "element_name/type/comment/" or "element_name".
@@ -34,52 +35,22 @@ let repair_word s =
 let fill_tbl tbl file_name =
   try
     let c = open_in file_name in
-    try 
-      while true do 
-	let s = input_line c
-	in 
-	if not (Str.string_match (Str.regexp "Command.Line") s 0)
-	  && not ( Hashtbl.mem tbl s)
-	then match (Str.split (Str.regexp "/") s) with
-	  | []    -> ()
-	  | h::[] -> Hashtbl.add tbl h [] 
-	  | h::q  -> Hashtbl.add tbl h q 
+    let add_if_needed name infos =
+      if not (Hashtbl.mem tbl name || List.mem name external_names) then
+        Hashtbl.add tbl name infos
+    in
+    try
+      while true do
+        let s = input_line c in
+        match (Str.split (Str.regexp "/") s) with
+        | []    -> ()
+        | h::[] -> add_if_needed h []
+        | h::q  -> add_if_needed h q
       done
     with End_of_file -> close_in c
   with Sys_error _ as exn ->
     Format.eprintf "cannot handle file %s: %s" file_name 
       (Printexc.to_string exn)
-
-(** [fill_list] takes a file containing data which is 
-    as "element_name/type/comment/" if (has_type=true) or
-    "element_name" if (has_type=false). It fills the list [li]
-    with all the element names and alphabetically sorts them. *)
-let fill_list li name ~has_type = 
-  let fill_list_no_sorting l file_name =
-    try let c = open_in file_name in
-	try 
-	  while true do 
-	    let s = input_line c in 
-	    if not (Str.string_match
-		      (Str.regexp "Command.Line") s 0)&& not ( List.mem s !l) 
-	    then begin
-	      if has_type then
-		try let t =(Str.string_before s
-			      (String.index_from s 0 '/' )) in
-		    match t with
-		    |""  -> ()
-		    | _  -> if not( List.mem t !l) 
-		      then l := t::!l
-		with Not_found ->()
-		      else l := s::!l
-	    end 
-	  done
-	with End_of_file -> close_in c
-    with Sys_error _ as exn ->
-      Format.eprintf "cannot handle file %s: %s" file_name 
-	(Printexc.to_string exn) in
-  fill_list_no_sorting li name ; 
-  li := List.sort String.compare !li
 
 (** [run_oracle] takes two hashtables [t1] and [t2] when called.
     It first tests if the file "run.oracle" is already existing.
@@ -180,6 +151,9 @@ let compare t1 t2 name1 name2 =
     name2 name1; 
   List.iter (compare_aux t1) t2
 
+let sort_keys tbl =
+  let l = Hashtbl.fold (fun k _ l -> k :: l) tbl [] in
+  List.sort String.compare l
 
 (** here are used the lexer and parser "check_index_lexer" and
     "check_index_grammar" to create the file "index_file". 
@@ -187,8 +161,6 @@ let compare t1 t2 name1 name2 =
 let () =
   let index_hstbl: (string,string list) Hashtbl.t = Hashtbl.create 197 in
   let code_hstbl: (string,string list) Hashtbl.t = Hashtbl.create 197 in
-  let index_list = ref [] in
-  let code_list = ref [] in
   try
     let chan_out = open_out ( "index_file") in
     try
@@ -205,9 +177,9 @@ let () =
       close_out chan_out ; close_in chan_in;
       fill_tbl code_hstbl "code_file";
       fill_tbl index_hstbl "index_file";
-      fill_list code_list "code_file" ~has_type:true;
-      fill_list index_list "index_file" ~has_type:false;
-      compare !index_list !code_list "THE INDEX \
+      let code_list = sort_keys code_hstbl in
+      let index_list = sort_keys index_hstbl in
+      compare index_list code_list "THE INDEX \
 OF THE DEVELOPER GUIDE" "THE CODE";
       run_oracle index_hstbl code_hstbl ;
     with Sys_error _ as exn ->

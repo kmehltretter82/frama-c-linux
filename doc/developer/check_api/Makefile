@@ -26,7 +26,7 @@ all:  check_and_compare main.idx
 main.idx: ../developer.idx $(wildcard ../*.tex)
 	cp ../developer.idx main.idx
 
-check_and_compare: check_index_grammar.cmi check_index_grammar.cmx \
+check_and_compare: check_index_grammar.cmi check_index_lexer.cmi check_index_grammar.cmx \
 	     	check_index_lexer.cmx check_and_compare.cmx 
 	$(OCAMLOPT) -o check_and_compare str.cmxa check_index_grammar.cmx \
 	        check_index_lexer.cmx check_and_compare.cmx 
