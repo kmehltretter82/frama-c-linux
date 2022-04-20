@@ -1,7 +1,12 @@
 /* run.config
  COMMENT: Test `strlen` E-ACSL built-ins
- DEPS: @PTESTS_DEPS@ utils/signalled.h
+ DEPS: @PTEST_DEPS@ utils/signalled.h
    STDOPT:
+ COMMENT: This part is blank on purpose (test stability + Dune)
+
+
+
+
 */
 
 #include "utils/signalled.h"
