@@ -440,10 +440,10 @@ val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
     @since 18.0-Argon
 *)
 val has_flexible_array_member: typ -> bool
-(** [true] iff the given type has flexible array member.
+(** [true] iff the given type has flexible array member, in GCC/MSVC mode, this
+    function mode recursively searches in the type of the last field.
 
-    @modify 24.0-Chromium in GCC/MSVC mode recursively searches in the type of the
-    last field.
+    @before 24.0-Chromium this function didn't take in account the GCC/MSVC mode
 *)
 
 (** Unroll a type until it exposes a non
