@@ -281,7 +281,7 @@ val add_code_annot:
     There can be at most one loop variant registered per statement.
     Attempting to register a second one will result in a fatal error.
 
-    @modify 22.0-Titanium: add keep_empty argument
+    @before 22.0-Titanium there was no [keep_empty] optional argument
 *)
 
 val add_assert:
