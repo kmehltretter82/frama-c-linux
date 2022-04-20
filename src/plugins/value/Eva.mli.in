@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
-(*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*                                                                       *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,37 +20,34 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Private = struct
-  module Abstractions = Eva__Abstractions
-  module Analysis = Eva__Analysis
-  module Alarmset = Eva__Alarmset
+(** ../.. *)
+
+(** For internal use *)
+(* Private first so that we do not override internal modules with public ones *)
+
+module Private: sig
+  module Abstractions = Abstractions
+  module Analysis = Analysis
+  module Alarmset = Alarmset
   module Parameters = Parameters
-  module Main_values = Eva__Main_values
-  module Eval = Eva__Eval
-  module Eval_terms = Eva__Eval_terms
+  module Main_values = Main_values
+  module Eval = Eval
   module Eva_utils = Eva_utils
   module Eva_results = Eva_results
   module Self = Self
-  module Red_statuses = Eva__Red_statuses
-  module Abstract_value = Eva__Abstract_value
-  module Abstract_domain = Eva__Abstract_domain
-  module Mark_noresults = Eva__Mark_noresults
-  module Simple_memory = Eva__Simple_memory
-  module Structure = Eva__Structure
-  module Eval_typ = Eva__Eval_typ
-  module Eval_op = Eva__Eval_op
-  module Domain_builder = Eva__Domain_builder
-  module Main_locations = Eva__Main_locations
-  module Eval_annots = Eva__Eval_annots
+  module Eval_terms = Eval_terms
+  module Red_statuses = Red_statuses
+  module Abstract_value = Abstract_value
+  module Abstract_domain = Abstract_domain
+  module Mark_noresults = Mark_noresults
+  module Simple_memory = Simple_memory
+  module Structure = Structure
+  module Eval_typ = Eval_typ
+  module Eval_op = Eval_op
+  module Domain_builder = Domain_builder
+  module Main_locations = Main_locations
+  module Eval_annots = Eval_annots
   module Eva_dynamic = Eva_dynamic
 end
 
-module Analysis = Analysis
-module Results = Results
-module Parameters = Parameters
-module Eva_annotations = Eva_annotations
-module Eval = Eval
-module Builtins = Builtins
-module Eval_terms = Eval_terms
-module Eva_results = Eva_results
-module Unit_tests = Unit_tests
+(** ../.. *)

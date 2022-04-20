@@ -130,6 +130,16 @@
 
 (plugin (optional) (name eva) (libraries frama-c-eva.core) (site (frama-c plugins)))
 
+(rule
+  (targets Eva.ml Eva.mli)
+  (deps
+    gen-api.sh Eva.ml.in Eva.mli.in
+    analysis.mli results.mli parameters.mli eva_annotations.mli eval.mli
+    builtins.mli eval_terms.mli eva_results.mli unit_tests.mli
+  )
+  (action (run %{deps}))
+)
+
 ( library
   (name numerors)
   (public_name frama-c-eva.numerors)
