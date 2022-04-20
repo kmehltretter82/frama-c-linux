@@ -31,8 +31,6 @@ import _ from 'lodash';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as RichText from 'frama-c/richtext';
-import * as Eva from 'frama-c/plugins/eva/api/general';
-import { evaluateEvent } from 'frama-c/plugins/eva/valuetable';
 
 import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
@@ -249,9 +247,7 @@ export default function ASTview() {
     if (meta) States.MetaSelection.emit(location);
   }
 
-  const computationState = States.useSyncValue(Eva.computationState);
   async function onContextMenu(markerId: string) {
-    onSelection(markerId);
     const items = [];
     const selectedMarkerInfo = markersInfo.getData(markerId);
     if (selectedMarkerInfo?.var === 'function') {
@@ -305,13 +301,6 @@ export default function ASTview() {
       enabled,
       onClick: () => onClick('Reads'),
     });
-    if (computationState === 'computed') {
-      items.push({
-        label: 'Evaluate',
-        enabled: true,
-        onClick: () => evaluateEvent.emit(),
-      });
-    }
     if (items.length > 0)
       Dome.popupMenu(items);
   }

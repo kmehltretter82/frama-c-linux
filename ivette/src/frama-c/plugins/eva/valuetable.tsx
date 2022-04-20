@@ -949,6 +949,10 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     key: 'Cmd+E',
     onClick: () => evaluateEvent.emit(),
   });
+  React.useEffect(() => {
+    Dome.setMenuItem({ id: 'EvaluateMenu', enabled: true });
+    return () => Dome.setMenuItem({ id: 'EvaluateMenu', enabled: false });
+  });
 }
 
 /* -------------------------------------------------------------------------- */
