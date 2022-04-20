@@ -254,7 +254,7 @@ tr:first-of-type > .eva-table-callsite-box {
 
 .eva-table-descrs {
   background-color: var(--background-sidebar);
-  border-right: thin solid var(--border);
+  text-align: center;
 }
 
 .eva-table-descr-sticky {
