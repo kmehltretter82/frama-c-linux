@@ -29,6 +29,34 @@ open Cil_types
 let package = Pkg.package ~title:"Ast Services" ~name:"ast" ~readme:"ast.md" ()
 
 (* -------------------------------------------------------------------------- *)
+(* --- Marker Cache System                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let logic_environment () =
+  let open Logic_typing in
+  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+
+module Key = Datatype.Pair(Cil_datatype.Stmt)(Cil_datatype.Term)
+module Cache = Hashtbl.Make(Key)
+
+let get_term kf term =
+  let env = logic_environment () in
+  try Some (!Db.Properties.Interp.term ~env kf term)
+  with Logic_interp.Error _ | Parsing.Parse_error -> None
+
+let key_of_localizable = let open Printer_tag in function
+  | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _ -> None
+  | PLval (_, Kglobal, _) | PExp (_, Kglobal, _) -> None
+  | PLval (kf, Kstmt stmt, lval) ->
+    let str = Format.asprintf "%a" Cil_datatype.Lval.pretty lval in
+    Option.(bind kf (fun kf -> get_term kf str) |> map (fun t -> (stmt, t)))
+  | PExp (kf, Kstmt stmt, exp) ->
+    let str = Format.asprintf "%a" Cil_datatype.Exp.pretty exp in
+    Option.(bind kf (fun kf -> get_term kf str) |> map (fun t -> (stmt, t)))
+
+let cache = Cache.create 10
+
+(* -------------------------------------------------------------------------- *)
 (* --- Compute Ast                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -276,6 +304,8 @@ struct
     | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
 
   let create loc =
+    let add_cache key = Cache.add cache key loc in
+    key_of_localizable loc |> Option.iter add_cache;
     let { tags ; locs } = STATE.get () in
     try Localizable.Hashtbl.find tags loc
     with Not_found ->
@@ -751,17 +781,6 @@ let () =
 
 type marker_term_input = { atStmt : stmt ; term : string }
 
-module MarkerTermInputAsKey = struct
-  type t = marker_term_input
-  let compare x y =
-    let c = Cil_datatype.Stmt.compare x.atStmt y.atStmt in
-    if c = 0 then String.compare x.term y.term else c
-  let equal x y = compare x y = 0
-  let hash x = 17 * Cil_datatype.Stmt.hash x.atStmt + Hashtbl.hash x.term
-end
-
-module MarkerTermInputCache = Hashtbl.Make(MarkerTermInputAsKey)
-
 module MarkerTermInput = struct
   type record
   let record : record Record.signature = Record.signature ()
@@ -799,22 +818,18 @@ end
 
 module MarkerTermOutput = Data.Joption (Marker)
 
-let logic_environment () =
-  let open Logic_typing in
-  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
-
 let build_marker =
-  let table = MarkerTermInputCache.create 10 in
   Option.map @@ fun input ->
-  match MarkerTermInputCache.find_opt table input with
+  let env = logic_environment () in
+  let kf = Kernel_function.find_englobing_kf input.atStmt in
+  let term = !Db.Properties.Interp.term ~env kf input.term in
+  let key = (input.atStmt, term) in
+  match Cache.find_opt cache key with
   | Some tag -> tag
   | None ->
-    let env = logic_environment () in
-    let kf = Kernel_function.find_englobing_kf input.atStmt in
-    let term = !Db.Properties.Interp.term ~env kf input.term in
     let exp = !Db.Properties.Interp.term_to_exp ~result:None term in
     let tag = Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp) in
-    MarkerTermInputCache.add table input tag ; tag
+    Cache.add cache key tag ; tag
 
 let descr = "Build a marker from an ACSL term."
 
