@@ -24,6 +24,7 @@ import React from 'react';
 import _ from 'lodash';
 import * as Ivette from 'ivette';
 import * as Dome from 'dome/dome';
+import * as System from 'dome/system';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -922,13 +923,15 @@ function useEvaluationMode(props: EvaluationModeProps): void {
   };
   React.useEffect(() => {
     if (computationState !== 'computed') return () => { return; };
+    const shortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
     const onEnter = (pattern: string): void => {
       const marker = selection?.current?.marker;
       const data = { atStmt: marker, term: pattern };
       Server.send(Ast.markerFromTerm, data).then(addProbe).catch(handleError);
     };
     const evalMode = {
-      title: 'Evaluation',
+      label: 'Evaluation',
+      title: `Evaluate an ACSL expression (shortcut: ${shortcut})`,
       icon: 'TERMINAL',
       className: 'eva-evaluation-mode',
       hints: () => { return Promise.resolve([]); },
