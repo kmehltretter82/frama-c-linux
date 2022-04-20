@@ -100,6 +100,7 @@ module type Get = sig
   val typeinfo: t -> typeinfo -> typeinfo
   val stmt: t -> stmt -> stmt
   (** @plugin development guide *)
+
   val logic_info: t -> logic_info -> logic_info
   val logic_type_info: t -> logic_type_info -> logic_type_info
   val fieldinfo: t -> fieldinfo -> fieldinfo
@@ -107,6 +108,7 @@ module type Get = sig
   val logic_var: t -> logic_var -> logic_var
   val kernel_function: t -> kernel_function -> kernel_function
   (** @plugin development guide *)
+
   val fundec: t -> fundec -> fundec
 end
 

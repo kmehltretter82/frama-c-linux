@@ -291,6 +291,7 @@ module type S_with_collections = sig
   include S
   module Set: Set with type elt = t
   (** @plugin development guide *)
+
   module Map: Map with type key = t
   module Hashtbl: Hashtbl with type key = t
   (** @plugin development guide *)
