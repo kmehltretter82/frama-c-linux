@@ -59,7 +59,8 @@ val refresh_spec: funspec -> funspec
 val toplevel_predicate: ?kind:predicate_kind -> predicate -> toplevel_predicate
 
 (** creates a new identified predicate with a fresh id.
-    @modify 22.0-Titanium add [only_check] optional parameter
+    @before 22.0-Titanium no [only_check] parameter.
+    @before 23.0-Vanadium [kind] parameter was named [only_check].
 *)
 val new_predicate: ?kind:predicate_kind -> predicate -> identified_predicate
 
