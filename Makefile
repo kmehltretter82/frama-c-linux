@@ -959,7 +959,6 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 # Reduc #
 #########
 PLUGIN_ENABLE:=$(ENABLE_REDUC)
-PLUGIN_DYNAMIC:=$(DYNAMIC_REDUC)
 PLUGIN_NAME:=Reduc
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/reduc

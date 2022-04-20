@@ -41,7 +41,6 @@ endif
 # --------------------------------------------------------------------------
 
 PLUGIN_ENABLE:=yes
-PLUGIN_DYNAMIC:=yes
 PLUGIN_NAME:=Qed
 PLUGIN_CMO:= \
 	hcons \
