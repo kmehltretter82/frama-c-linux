@@ -686,7 +686,14 @@ struct
         | `Value loc ->
           let update value' =
             let v = Value_or_Uninitialized.narrow value value' in
-            if Value_or_Uninitialized.is_bottom v then `Bottom else `Value v
+            (* The value can legitimately be bottom on escaping variables (not
+               tracked by the multidim domain), or on empty structs or unions.
+               In these cases, do not reduce the state to bottom. *)
+            if Value_or_Uninitialized.is_bottom v
+            && not record.value.escaping
+            && not (Int_Base.is_zero (Bit_utils.sizeof_lval lv))
+            then `Bottom
+            else `Value v
           in
           if Location.is_singleton loc
           then reinforce ~oracle update state loc
