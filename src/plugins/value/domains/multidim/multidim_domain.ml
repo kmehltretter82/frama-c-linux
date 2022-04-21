@@ -726,10 +726,13 @@ struct
         | `Value src ->
           overwrite ~oracle state dst src
 
-  let assign _kinstr { lval=dst } src assigned_value valuation state =
-    let+ state = assume_valuation valuation state in
-    let oracle = valuation_to_oracle state valuation in
-    assign' ~oracle ~value:assigned_value dst (Some src) state
+  let assign _kinstr { lval=dst; ltyp } src assigned_value valuation state =
+    if Int_Base.is_zero (Bit_utils.sizeof ltyp)
+    then `Value state
+    else
+      let+ state = assume_valuation valuation state in
+      let oracle = valuation_to_oracle state valuation in
+      assign' ~oracle ~value:assigned_value dst (Some src) state
 
   let assume _stmt _expr _pos valuation state =
     assume_valuation valuation state
