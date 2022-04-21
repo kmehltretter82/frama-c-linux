@@ -528,4 +528,49 @@ const setFiles_internal: Server.SetRequest<string[],null> = {
 /** Set the source file names to analyze. */
 export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;
 
+/** <markerFromTerm> input */
+export interface markerFromTermInput {
+  /** The statement at which we will build the marker. */
+  atStmt: marker;
+  /** The ACSL term. */
+  term: string;
+}
+
+/** Loose decoder for `markerFromTermInput` */
+export const jMarkerFromTermInput: Json.Loose<markerFromTermInput> =
+  Json.jObject({
+    atStmt: jMarkerSafe,
+    term: Json.jFail(Json.jString,'String expected'),
+  });
+
+/** Safe decoder for `markerFromTermInput` */
+export const jMarkerFromTermInputSafe: Json.Safe<markerFromTermInput> =
+  Json.jFail(jMarkerFromTermInput,'MarkerFromTermInput expected');
+
+/** Natural order for `markerFromTermInput` */
+export const byMarkerFromTermInput: Compare.Order<markerFromTermInput> =
+  Compare.byFields
+    <{ atStmt: marker, term: string }>({
+    atStmt: byMarker,
+    term: Compare.string,
+  });
+
+const markerFromTerm_internal: Server.GetRequest<
+  markerFromTermInput,
+  marker |
+  undefined
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.markerFromTerm',
+  input:  jMarkerFromTermInput,
+  output: jMarker,
+  signals: [],
+};
+/** Build a marker from an ACSL term. */
+export const markerFromTerm: Server.GetRequest<
+  markerFromTermInput,
+  marker |
+  undefined
+  >= markerFromTerm_internal;
+
 /* ------------------------------------- */

@@ -24,18 +24,22 @@ import React from 'react';
 import _ from 'lodash';
 import * as Ivette from 'ivette';
 import * as Dome from 'dome/dome';
+import * as System from 'dome/system';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Inset } from 'dome/frame/toolbars';
+import * as Toolbars from 'dome/frame/toolbars';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
+import { ipcRenderer } from 'electron';
 
 
 
@@ -898,6 +902,64 @@ class FunctionsManager {
 
 
 /* -------------------------------------------------------------------------- */
+/* --- Evaluation Mode Handling                                           --- */
+/* -------------------------------------------------------------------------- */
+
+export const evaluateEvent = new Dome.Event('dome.evaluate');
+ipcRenderer.on('dome.ipc.evaluate', () => evaluateEvent.emit());
+
+interface EvaluationModeProps {
+  computationState : Eva.computationStateType | undefined;
+  selection: States.Selection;
+  setLocPin: (loc: Location, pin: boolean) => void;
+}
+
+function useEvaluationMode(props: EvaluationModeProps): void {
+  const { computationState, selection, setLocPin } = props;
+  const handleError = (): void => { return; };
+  const addProbe = (target: Ast.marker | undefined): void => {
+    const fct = selection?.current?.fct;
+    if (fct && target) setLocPin({ fct, target }, true);
+  };
+  React.useEffect(() => {
+    if (computationState !== 'computed') return () => { return; };
+    const shortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
+    const onEnter = (pattern: string): void => {
+      const marker = selection?.current?.marker;
+      const data = { atStmt: marker, term: pattern };
+      Server.send(Ast.markerFromTerm, data).then(addProbe).catch(handleError);
+    };
+    const evalMode = {
+      label: 'Evaluation',
+      title: `Evaluate an ACSL expression (shortcut: ${shortcut})`,
+      icon: 'TERMINAL',
+      className: 'eva-evaluation-mode',
+      hints: () => { return Promise.resolve([]); },
+      onEnter,
+      event: evaluateEvent,
+    };
+    Toolbars.RegisterMode.emit(evalMode);
+    return () => Toolbars.UnregisterMode.emit(evalMode);
+  });
+  Dome.addMenuItem({
+    menu: 'Edit',
+    id: 'EvaluateMenu',
+    type: 'normal',
+    label: 'Evaluate',
+    key: 'Cmd+E',
+    onClick: () => evaluateEvent.emit(),
+  });
+  React.useEffect(() => {
+    Dome.setMenuItem({ id: 'EvaluateMenu', enabled: true });
+    return () => Dome.setMenuItem({ id: 'EvaluateMenu', enabled: false });
+  });
+}
+
+/* -------------------------------------------------------------------------- */
+
+
+
+/* -------------------------------------------------------------------------- */
 /* --- Eva Table Complet Component                                        --- */
 /* -------------------------------------------------------------------------- */
 
@@ -1060,6 +1122,10 @@ function EvaTable(): JSX.Element {
     return StackInfos({ callsites, isSelected, setSelection: select, close });
   }, [ cs, setCS, select, getCallsites, selection ]);
   const { result: stackInfos } = Dome.usePromise(stackInfosPromise);
+
+  /* Handle Evaluation mode */
+  const computationState = States.useSyncValue(Eva.computationState);
+  useEvaluationMode({ computationState, selection, setLocPin });
 
   /* Builds the component */
   return (

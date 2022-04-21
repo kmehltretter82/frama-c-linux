@@ -404,7 +404,7 @@ export function setMenuItem({ id, ...options }: CustomMenuItem) {
   if (entry) {
     if (entry.spec) Object.assign(entry.spec, options);
     if (entry.item) Object.assign(entry.item, options);
-    if (options.label || options.type || options.click) requestUpdate();
+    requestUpdate ();
   } else
     console.warn(`[Dome] unknown menu item #${id}`);
 }

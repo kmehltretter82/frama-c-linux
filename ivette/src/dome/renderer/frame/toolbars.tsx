@@ -272,7 +272,7 @@ export function Select(props: SelectionProps<string>) {
 export interface Hint {
   id: string | number;
   icon?: string;
-  label: string | JSX.Element;
+  label: string;
   title?: string;
   value(): void;
   rank?: number;
@@ -288,8 +288,10 @@ export type HintsEvaluator = (pattern: string) => Promise<Hint[]>;
 
 /** Description of an action mode. */
 export interface ActionMode {
-  /** Mode tooltip text. */
-  title: string;
+  /** Mode tooltip title. */
+  title?: string;
+  /** Mode tooltip label. */
+  label: string;
   /** Mode placeholder text. */
   placeholder?: string;
   /** Icon displayed when the mode is selected. */
@@ -329,7 +331,8 @@ async function searchHints(pattern: string) {
 }
 
 const searchMode: ActionMode = {
-  title: "Search",
+  label: "Search",
+  title: 'Search through the global definitions',
   placeholder: "Search…",
   icon: "SEARCH",
   className: 'dome-xToolBar-searchMode',
@@ -415,7 +418,7 @@ function Suggestions(props: SuggestionsProps) {
 // --------------------------------------------------------------------------
 
 interface ActionInputProps {
-  title: string;
+  title?: string;
   placeholder?: string;
   hints: Hint[];
   onHint: (hint: Hint) => void;
@@ -529,16 +532,16 @@ export function ModalActionField() {
 
   // Auxiliary function that build a Hint from an ActionMode.
   const modeToHint = (mode: ActionMode) => {
-    const { title, icon } = mode;
+    const { label, title = '', icon } = mode;
     const id = 'ActionMode-' + title + '-' + icon;
     const value = () => { onModeChange(mode); };
-    return { id, icon, label: title, title, value, rank: -1000 };
+    return { id, icon, label, title, value, rank: -1000 };
   };
 
   // Hints provider for the mode of all modes.
   const modesHints = React.useCallback((input: string) => {
     const p = input.toLowerCase();
-    const fit = (m: ActionMode) => m.title.toLowerCase().includes(p);
+    const fit = (m: ActionMode) => m.label.toLowerCase().includes(p);
     return Promise.resolve(Array.from(allModes).filter(fit).map(modeToHint));
   }, [allModes]);
 
@@ -546,20 +549,20 @@ export function ModalActionField() {
   // on the current mode icon and allows to change the current mode, displaying
   // a list of all available modes as hints.
   const modesMode = React.useMemo(() => {
-    const title = "Mode selection";
+    const label = "Mode selection";
     const placeholder = "Search mode";
     const icon = "TUNINGS";
     const className = 'dome-xToolBar-modeOfModes';
-    return { title, placeholder, icon, className, hints: modesHints };
+    return { label, placeholder, icon, className, hints: modesHints };
   }, [modesHints]);
 
   // Build a new search engine for the search mode, adding available modes to
   // the possible search hints.
   const searchModeHints = React.useCallback(async (input: string) => {
     const hs = await modesMode.hints(input);
-    const notCurrent = (h: Hint) => !(h.title?.includes(current.title));
+    const notCurrent = (h: Hint) => !(h.label.includes(current.label));
     return hs.filter(notCurrent);
-  }, [current.title, modesMode]);
+  }, [current.label, modesMode]);
 
   // Register the new search engine.
   React.useEffect(() => {

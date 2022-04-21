@@ -480,6 +480,7 @@
   width: 200px;
   outline: none;
   background: var(--background-softer);
+  color: var(--text);
 }
 
 .dome-xToolBar-actionComponent div.dome-xToolBar-suggestions {
