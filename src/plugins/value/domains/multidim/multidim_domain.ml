@@ -646,23 +646,26 @@ struct
   let extract_expr ~oracle:_ _context _state _expr =
     `Value (Value.top, None), Alarmset.all
 
-  let extract_lval ~oracle _context state lv _typ _loc =
-    let oracle = fun exp ->
-      match oracle exp with
-      | `Value v, alarms when Alarmset.is_empty alarms -> v (* only use values safely evaluated *)
-      | _ -> Value.top
-    in
-    match Location.of_lval oracle lv with
-    | `Top -> (* can't evaluate location *)
+  let extract_lval ~oracle _context state lv typ _loc =
+    if Cil.isScalarType typ then
+      let oracle = fun exp ->
+        match oracle exp with
+        | `Value v, alarms when Alarmset.is_empty alarms -> v (* only use values safely evaluated *)
+        | _ -> Value.top
+      in
+      match Location.of_lval oracle lv with
+      | `Top -> (* can't evaluate location *)
+        `Value (Value.top, None), Alarmset.all
+      | `Value loc ->
+        match get ~oracle state loc with
+        | `Bottom -> `Bottom, Alarmset.all
+        | `Value v ->
+          Value_or_Uninitialized.get_v_normalized v >>-: (fun v -> v, None),
+          if Value_or_Uninitialized.is_initialized v
+          then Alarmset.(set (Alarms.Uninitialized lv) True all)
+          else Alarmset.all
+    else
       `Value (Value.top, None), Alarmset.all
-    | `Value loc ->
-      match get ~oracle state loc with
-      | `Bottom -> `Bottom, Alarmset.all
-      | `Value v ->
-        Value_or_Uninitialized.get_v_normalized v >>-: (fun v -> v, None),
-        if Value_or_Uninitialized.is_initialized v
-        then Alarmset.(set (Alarms.Uninitialized lv) True all)
-        else Alarmset.all
 
 
   (* Eva Transfer *)
@@ -678,7 +681,7 @@ struct
     let* state = state' in
     let oracle = valuation_to_oracle state valuation in
     match expr.enode with
-    | Lval lv ->
+    | Lval lv when Cil.isScalarType (Cil.typeOfLval lv) ->
       let value = Value_or_Uninitialized.from_flagged record.value in
       if not (Value.is_topint (Value_or_Uninitialized.get_v value)) then
         match Location.of_lval oracle lv with
