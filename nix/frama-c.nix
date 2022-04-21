@@ -84,6 +84,8 @@ stdenvNoCC.mkDerivation rec {
 
   preConfigure = ''
     autoconf
+    patchShebangs src/plugins/value/gen-api.sh
+    chmod +x src/plugins/value/gen-api.sh
   '';
 
   # Do not use default parallel building, but allow 2 cores for Frama-C build
