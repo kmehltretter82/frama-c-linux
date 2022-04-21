@@ -63,11 +63,6 @@ warning () {
 BASEDIR="$(realpath `dirname $0`)"
 error "unable to find base dir of script" $?
 
-# True if the script is launched from the E-ACSL sources, false otherwise
-is_development_version() {
-  test -f "$BASEDIR/../E_ACSL.mli"
-}
-
 # Check if a given executable name can be found by in the PATH
 has_tool() {
   command -v "$@" >/dev/null 2>&1 && return 0 || return 1
@@ -89,8 +84,6 @@ retrieve_framac_path() {
     echo "$1"
   elif [ -e "$BASEDIR/$1" ]; then
     echo "$BASEDIR/$1"
-  elif is_development_version && [ -e "$BASEDIR/../../../../bin/$1" ]; then
-    echo "$BASEDIR/../../../../bin/$1"
   else
     echo "No executable '$1' or '$BASEDIR/$1' found"
     return 1
@@ -865,33 +858,11 @@ FRAMAC="$OPTION_FRAMAC"
 : ${FRAMAC_SHARE:="`$FRAMAC -no-autoload-plugins -print-share-path`"}
 : ${FRAMAC_PLUGIN:="`$FRAMAC -no-autoload-plugins -print-plugin-path`"}
 
-# Check if this is a development or an installed version
-if is_development_version; then
-  # Development version
-  DEVELOPMENT="$(realpath "$BASEDIR/..")"
-  error "unable to find parent dir of base dir" $?
-  # Check if the project has been built, as if this is a non-installed
-  # version that has not been built Frama-C will fallback to an installed one
-  # for instrumentation but still use local RTL
-  error "Plugin in $DEVELOPMENT not compiled" \
-    `test -f "$DEVELOPMENT/META.frama-c-e_acsl" -o \
-          -f "$FRAMAC_PLUGIN/META.frama-c-e_acsl"; echo $?`
-  EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
-  # E-ACSL should use its own dune site for getting lib and contrib
-  EACSL_LIB="$DEVELOPMENT/lib"
-  EACSL_CONTRIB="$DEVELOPMENT/contrib"
-  # Add the project directory to FRAMAC_PLUGINS,
-  # otherwise Frama-C uses an installed version
-  if test -f "$DEVELOPMENT/META.frama-c-e_acsl"; then
-    FRAMAC_FLAGS="-add-path=$DEVELOPMENT/top -add-path=$DEVELOPMENT $FRAMAC_FLAGS";
-  fi
-else
-  # Installed version. FRAMAC_SHARE should not be used here as Frama-C
-  # and E-ACSL may not be installed to the same location
-  EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl"
-  EACSL_LIB="$BASEDIR/../lib/frama-c/e-acsl"
-  EACSL_CONTRIB="$BASEDIR/../share/frama-c/e-acsl/contrib"
-fi
+# Installed version. FRAMAC_SHARE should not be used here as Frama-C
+# and E-ACSL may not be installed to the same location
+EACSL_SHARE="$BASEDIR/../share/frama-c/share/e-acsl"
+EACSL_LIB="$BASEDIR/../lib/frama-c-e-acsl"
+EACSL_CONTRIB="$BASEDIR/../share/frama-c-e-acsl/contrib"
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
 # architecture we need to make sure that same architecture is used for

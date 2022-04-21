@@ -2,10 +2,10 @@
  COMMENT: Test `strcpy` and `strncpy` E-ACSL built-ins
  DEPS: @PTEST_DEPS@ utils/signalled.h
    STDOPT:
- COMMENT: This part is blank on purpose (test stability + Dune)
-
-
-
+*/
+/* run.config_dev
+   MACRO: INCLUDED_HEADERS utils/signalled.h
+   COMMENT: This part is blank on purpose (test stability + Dune)
 
 */
 

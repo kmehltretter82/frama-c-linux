@@ -1,3 +1,4 @@
 (lang dune 2.8)
 (name frama-c-e-acsl)
 (using dune_site 0.1)
+(package (name frama-c-e-acsl) (sites (share contrib)))

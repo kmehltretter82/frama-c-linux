@@ -5,8 +5,8 @@
 */
 /* run.config_dev
    MACRO: ROOT_EACSL_GCC_OPTS_EXT @ROOT_EACSL_GCC_OPTS_EXT@ -e "-Wno-maybe-uninitialized"
+   MACRO: INCLUDED_HEADERS utils/signalled.h
    COMMENT: This part is blank on purpose (test stability + Dune)
-
 
 
 

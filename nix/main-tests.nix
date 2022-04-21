@@ -1,12 +1,12 @@
 { lib
-, stdenv
+, stdenvNoCC # for E-ACSL
 , frama-c
 , perl
 , time
 , which
 }:
 
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation rec {
   pname = "main-tests";
   version = frama-c.version;
   slang = frama-c.slang;

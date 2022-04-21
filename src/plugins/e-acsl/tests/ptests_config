@@ -1,1 +1,2 @@
-IGNORE= DEFAULT_SUITES = arith bts builtin constructs examples format full-mtracking gmp-only memory special temporal
+DEFAULT_SUITES = arith bts builtin concurrency constructs examples format full-mtracking gmp-only memory special temporal
+dev_SUITES = arith bts builtin concurrency constructs examples format full-mtracking gmp-only memory special temporal

@@ -65,7 +65,7 @@ exec_err_log=$result_dir/$test_name.exec_err.log
 output_log=$result_dir/$output_name
 
 # Compile the test file
-$BASEDIR/../scripts/e-acsl-gcc.sh -I $framac_exe \
+e-acsl-gcc.sh -I $framac_exe \
   -c $opts \
   --frama-c-extra="$fc_opts" \
   -o $result_dir/$test_name.gcc.c \
