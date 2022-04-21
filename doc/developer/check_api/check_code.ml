@@ -11,8 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* do not work with OCaml 4 or higher *)
-
 open Odoc_html
 open Odoc_module
 open Odoc_info
