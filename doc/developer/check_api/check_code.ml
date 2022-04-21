@@ -251,6 +251,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
       | Type.Type_variant l ->
         let print_one constr =
           last_type <- last_type ^ " | " ^ constr.Type.vc_name ;
+          last_name <- t.Type.ty_name;
           (match constr.Type.vc_args with
           | Odoc_type.Cstr_tuple [] -> ()
           | Odoc_type.Cstr_tuple l ->
