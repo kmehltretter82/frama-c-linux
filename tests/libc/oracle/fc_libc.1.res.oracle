@@ -9370,7 +9370,7 @@ extern int select(int nfds, fd_set *readfds, fd_set *writefds,
     ensures
       errno_set:
         __fc_errno ≡ \old(__fc_errno) ∨
-        __fc_errno ∈ {13, 40, 36, 2, 20, 1, 30};
+        __fc_errno ∈ {13, 4, 22, 40, 36, 2, 20, 1, 30};
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result, __fc_errno;
     assigns \result
@@ -9386,7 +9386,7 @@ extern int chmod(char const *path, mode_t mode);
     ensures
       errno_set:
         __fc_errno ≡ \old(__fc_errno) ∨
-        __fc_errno ∈ {13, 9, 4, 22, 40, 36, 2, 95, 20, 1, 30};
+        __fc_errno ∈ {13, 9, 4, 22, 40, 36, 2, 20, 95, 1, 30};
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result, __fc_errno;
     assigns \result
@@ -9427,7 +9427,7 @@ extern int fstat(int fildes, struct stat *buf);
     ensures
       errno_set:
         __fc_errno ≡ \old(__fc_errno) ∨
-        __fc_errno ∈ {13, 9, 22, 40, 36, 2, 12, 20, 75};
+        __fc_errno ∈ {13, 9, 22, 5, 40, 36, 2, 12, 20, 75};
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result, *buf, __fc_errno;
     assigns \result
