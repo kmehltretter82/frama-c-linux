@@ -22,7 +22,6 @@
 
 open Lattice_bounds
 open Abstract_memory
-open Pretty_memory
 
 exception Not_implemented
 
@@ -456,7 +455,7 @@ struct
         (* fold the previous upper bound = the current lower bound *)
         ignore (List.fold_left (fun l (v,u) -> f (l,v,u) ; u) l segments)
       in
-      pp_iter (iter l) pp fmt s
+      Pretty_memory.pp_iter (iter l) pp fmt s
 
   let pretty fmt (m : t) : unit =
     pretty_segments fmt (m.start,m.segments)

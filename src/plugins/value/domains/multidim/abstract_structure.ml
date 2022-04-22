@@ -22,7 +22,6 @@
 
 open Lattice_bounds
 open Abstract_memory
-open Pretty_memory
 
 let no_oracle = fun _exp -> Int_val.top
 
@@ -92,7 +91,7 @@ struct
   type submemory = M.t
 
   let pretty fmt m =
-    pp_iter2 ~format:"@[<hv>.%a%a@]"
+    Pretty_memory.pp_iter2 ~format:"@[<hv>.%a%a@]"
       FieldMap.iter Field.pretty M.pretty fmt m.fields
 
   let hash m =
@@ -266,7 +265,8 @@ struct
     | [(_,s)] -> S.pretty fmt s
     | bindings ->
       let l = List.map snd bindings in
-      pp_iter ~format:"@[<hv>%a@]" ~sep:" or @;<1 2>" List.iter S.pretty fmt l
+      Pretty_memory.pp_iter ~format:"@[<hv>%a@]" ~sep:" or @;<1 2>"
+        List.iter S.pretty fmt l
 
   let hash (m : t) =
     Hashtbl.hash (Map.fold (fun _ s acc -> s :: acc) m [])
