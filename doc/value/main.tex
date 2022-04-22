@@ -4413,7 +4413,7 @@ However, it may often be more precise on large arrays of structures, especially
 when the indexes at which these arrays are written cannot be
 reduced to singleton values with usual techniques such as loop unrolling.
 
-The domain abstract arrays by summarizing them with a {\it segmentation}, i.e. a
+The domain abstracts arrays by summarizing them with a {\it segmentation}, i.e. a
 partition of {\it segments}. A segment is a set of arrays cells with consecutive
 indexes. A classical segmentation would be the division of an array into three
 segments arround a program variable {\tt i}: the set of cells whose index is
@@ -4421,20 +4421,20 @@ lower than {\tt i}, the singleton cell of index {\tt i} and the set of cells
 whose index is greater than {\tt i}.
 
 
-Each segment is then abstracted separately, allowing the analyser to infer
-distinct properties of these segments. Inside these segments, the infered
-properties are the properties valid for all cells of the segment.
+The segments are then abstracted separately, allowing the analyzer to infer
+distinct properties for each segment. Inside a segment, the inferred
+properties are valid for all cells of the segment.
 
-Arrays of structures, however, are approximated field by field, allowing the
+Furthermore, arrays of structures are approximated field by field, allowing the
 inference of precise invariants about each field of all structures included in
-the array. More generally, an (multidimensional) array of structures is
-abstracted by a tree where
+the array. More generally, a (multidimensional) array of structures is
+abstracted by a tree where:
 \begin{itemize}
   \item each node is a set of offsets,
   \item each depth of the tree corresponds to an array or structure type,
   \item {\it array nodes} have an associated segmentation and a child for
-        each segment and
-  \item {\it structures nodes} have a child for each field of this structure.
+        each segment,
+  \item {\it structures nodes} have a child for each field of the structure.
 \end{itemize}
 
 This model keeps track of the types used to write to the memory, and thus
@@ -4445,7 +4445,7 @@ location type does not always match the types used to write into it.
 The domain tries to infer a suitable partition in a best-effort strategy. It
 will work on most simple loops, but may fails outside the most common patterns.
 
-Two command-line options and one annotation can be used to parameterize the
+Two command-line options and one annotation can be used to configure the
 domain.
 \begin{itemize}
   \item {\tt -eva-multidim-disjunctive-invariants} can be used to infer
@@ -4457,7 +4457,7 @@ domain.
         limit of 8 is too low.
   \item The annotation {\tt array\_partition} can be used to help the domain
         to find a suitable segmentation for the analysis. For instance, in
-        the following example, the annotation instructs the analyser to use
+        the following example, the annotation instructs the analyzer to use
         3 segments for the analysis of the loop.
 \begin{lstlisting}[language=C]
 int t[20] = {0};
@@ -4467,10 +4467,10 @@ for (int i = 0; i < 20; i++) {
 }
 \end{lstlisting}
         When the annotation is encountered, the current array partition is
-        replaced by the given one, and the introduced segments bounds are kept
+        replaced by the given one, and the introduced segment bounds are kept
         as long as possible. When a subsequent array access uses an index than
-        cannot be proven always below or always above an introduced bound, this
-        bound is thrown away.
+        cannot be proven to be always below or above such a bound, this
+        bound is removed.
 \end{itemize}
 
 
