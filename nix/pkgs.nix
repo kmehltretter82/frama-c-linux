@@ -49,8 +49,11 @@ let
     frama-c = oself.callPackage ./frama-c.nix {};
     lint = oself.callPackage ./lint.nix {};
     # Tests
-    main-tests = oself.callPackage ./main-tests.nix {};
+    e-acsl-tests = oself.callPackage ./e-acsl-tests.nix {};
+    eva-tests = oself.callPackage ./eva-tests.nix {};
+    kernel-tests = oself.callPackage ./kernel-tests.nix {};
     plugins-tests = oself.callPackage ./plugins-tests.nix {};
+    wp-tests = oself.callPackage ./wp-tests.nix {};
     # Release
     manuals = oself.callPackage ./manuals.nix {};
   };

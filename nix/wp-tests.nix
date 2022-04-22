@@ -1,21 +1,24 @@
 { lib
-, stdenvNoCC # for E-ACSL
+, stdenv
 , frama-c
+, alt-ergo
 , perl
 , time
 , which
 }:
 
-stdenvNoCC.mkDerivation rec {
-  pname = "main-tests";
+stdenv.mkDerivation rec {
+  pname = "wp-tests";
   version = frama-c.version;
   slang = frama-c.slang;
 
   build_dir = frama-c.build_dir;
   src = build_dir + "/dir.tar";
+  wp_cache = fetchGit "git@git.frama-c.com:frama-c/wp-cache.git";
   sourceRoot = ".";
 
   buildInputs = frama-c.buildInputs ++ [
+    alt-ergo
     frama-c
     perl
     time
@@ -26,14 +29,16 @@ stdenvNoCC.mkDerivation rec {
     patchShebangs .
   '' ;
 
-  # Keep main configuration
   configurePhase = ''
-    true
+    mkdir home
+    HOME=$(pwd)/home
+    why3 config detect
   '';
 
   buildPhase = ''
-    dune exec -- frama-c-ptests tests
-    dune build -j1 --display short @tests/ptests
+    export FRAMAC_WP_CACHEDIR=$wp_cache
+    dune exec -- frama-c-ptests src/plugins/wp/tests
+    dune build -j1 --display short @src/plugins/wp/tests/ptests
   '';
 
   # No installation required

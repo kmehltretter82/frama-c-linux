@@ -76,10 +76,24 @@ genassigns:
   tags:
     - nix
 
-main-tests:
+e-acsl-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.main-tests
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.e-acsl-tests
+  tags:
+    - nix
+
+eva-tests:
+  stage: tests
+  script:
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.eva-tests
+  tags:
+    - nix
+
+kernel-tests:
+  stage: tests
+  script:
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.kernel-tests
   tags:
     - nix
 
@@ -117,6 +131,14 @@ volatile:
     - ./ci.sh Volatile
   tags:
     - nix
+
+wp-tests:
+  stage: tests
+  script:
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.wp-tests
+  tags:
+    - nix
+
 
 ################################################################################
 ### DISTRIB
