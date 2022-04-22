@@ -8,47 +8,11 @@ let
     ocp-indent = oself.callPackage ./ocp-indent.nix {};
     psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
     why3 = oself.callPackage ./why3.nix {};
-    # Nix + Dune 3
-    dune-build-3 =
-      osuper.buildDunePackage.override {
-        dune_2 = oself.dune_3;
-      };
-    dune-ordering-3 =
-      oself.callPackage ./dune-ordering.nix {
-        dune_2 = oself.dune_3;
-        buildDunePackage = oself.dune-build-3;
-      };
-    dune-dyn-3 =
-      oself.callPackage ./dune-dyn.nix {
-        dune_2 = oself.dune_3;
-        buildDunePackage = oself.dune-build-3;
-        dune-ordering = oself.dune-ordering-3;
-      };
-    dune-stdune-3 =
-      oself.callPackage ./dune-stdune.nix {
-        dune_2 = oself.dune_3;
-        buildDunePackage = oself.dune-build-3;
-        dune-ordering = oself.dune-ordering-3;
-        dune-dyn = oself.dune-dyn-3;
-      };
-    dune-private-libs-3 =
-      oself.callPackage ./dune-private-libs.nix {
-        dune_2 = oself.dune_3;
-        buildDunePackage = oself.dune-build-3;
-        dune-ordering = oself.dune-ordering-3;
-        dune-stdune = oself.dune-stdune-3;
-        dune-dyn = oself.dune-dyn-3;
-      };
-    dune-site-3 =
-      osuper.dune-site.override {
-        dune_2 = oself.dune_3;
-        buildDunePackage = oself.dune-build-3;
-        dune-private-libs = oself.dune-private-libs-3;
-      };
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
     lint = oself.callPackage ./lint.nix {};
     # Tests
+    default-config-tests = oself.callPackage ./default-config-tests.nix {};
     e-acsl-tests = oself.callPackage ./e-acsl-tests.nix {};
     eva-tests = oself.callPackage ./eva-tests.nix {};
     kernel-tests = oself.callPackage ./kernel-tests.nix {};

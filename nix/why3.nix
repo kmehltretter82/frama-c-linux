@@ -14,7 +14,6 @@
 , ppx_deriving
 , ppx_sexp_conv
 , camlzip
-, camlp5
 , sexplib
 , re
 , num
@@ -57,7 +56,6 @@ stdenv.mkDerivation rec {
     # Coq Support
     coqPackages.coq
     coqPackages.flocq
-    camlp5
   ];
 
   propagatedBuildInputs = [ camlzip num re sexplib ];

@@ -14,7 +14,7 @@
 , apron
 , camlzip
 , dune_3
-, dune-site-3
+, dune-site
 , gcc9
 , graphviz
 , lablgtk3
@@ -56,7 +56,7 @@ stdenvNoCC.mkDerivation rec {
     apron
     camlzip
     dune_3
-    dune-site-3
+    dune-site
     findlib
     gcc9
     graphviz
