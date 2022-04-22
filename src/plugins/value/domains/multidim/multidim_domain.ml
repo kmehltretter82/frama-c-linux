@@ -382,11 +382,11 @@ struct
 
   let covers_base (tracked : Tracking.t option) (b : base) : bool =
     match b with
-    | Base.Var (vi, _) | Allocated (vi, _, _) ->
+    | Base.Var (vi, _) ->
       not (Cil.typeHasQualifier "volatile" vi.vtype) &&
       Option.fold ~none:true ~some:(Tracking.mem b) tracked
     | Null -> true
-    | CLogic_Var _ | String _ -> false
+    | CLogic_Var _ | String _ | Allocated (_, _, _) -> false
 
   let join_tracked tracked1 tracked2 =
     match tracked1, tracked2 with

@@ -1,3 +1,0 @@
-669,670d668
-< [eva:alarm] realloc.c:166: Warning: 
-<   accessing uninitialized left-value. assert \initialized(p);
