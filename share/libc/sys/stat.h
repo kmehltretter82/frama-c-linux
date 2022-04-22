@@ -37,8 +37,9 @@ __BEGIN_DECLS
           \from indirect:path, indirect:path[0 .. strlen(path)],
                 indirect:mode; //missing: \from 'filesystem'
   ensures errno_set: __fc_errno == \old(__fc_errno) ||
-                     __fc_errno \in {EACCES, ELOOP, ENAMETOOLONG, ENOENT,
-                                     ENOTDIR, EPERM, EROFS};
+                     __fc_errno \in {EACCES, EINTR, EINVAL, ELOOP,
+                                     ENAMETOOLONG, ENOENT, ENOTDIR, EPERM,
+                                     EROFS};
   ensures result_ok_or_error: \result == 0 || \result == -1;
 */
 extern int chmod(const char *path, mode_t mode);
@@ -51,7 +52,7 @@ extern int chmod(const char *path, mode_t mode);
                 indirect:mode, indirect:flag; //missing: \from 'filesystem'
   ensures errno_set: __fc_errno == \old(__fc_errno) ||
                      __fc_errno \in {EACCES, EBADF, EINTR, EINVAL, ELOOP,
-                                     ENAMETOOLONG, ENOENT, EOPNOTSUPP, ENOTDIR,
+                                     ENAMETOOLONG, ENOENT, ENOTDIR, EOPNOTSUPP,
                                      EPERM, EROFS};
   ensures result_ok_or_error: \result == 0 || \result == -1;
 */
@@ -87,7 +88,7 @@ extern int fstat(int fildes, struct stat *buf);
           \from indirect:fd, indirect:path, indirect:path[0 .. strlen(path)],
                 indirect:flag; //missing: \from 'filesystem'
   ensures errno_set: __fc_errno == \old(__fc_errno) ||
-                     __fc_errno \in {EACCES, EBADF, EINVAL, ELOOP,
+                     __fc_errno \in {EACCES, EBADF, EINVAL, EIO, ELOOP,
                                      ENAMETOOLONG, ENOENT, ENOMEM, ENOTDIR,
                                      EOVERFLOW};
   ensures result_ok_or_error: \result == 0 || \result == -1;
