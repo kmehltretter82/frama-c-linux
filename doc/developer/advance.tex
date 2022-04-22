@@ -519,41 +519,6 @@ Which variable can be set and how they are useful is explained
 Section~\ref{make:plugin}. Furthermore, Section~\ref{make:dynamic} explains
 the specific features of \texttt{Makefile.dynamic}.
 
-%% \subsection{Calling a Plug-in Specific Makefile from the \framac Makefile}
-%% \label{dynamic-make:integrating}
-%% [JS 2012/05/09] nobody does this from a while.
-
-%% \begin{target}
-%%   kernel-integrated plug-in developers using the \svn repository of \framac.
-%% \end{target}
-
-%% Even if you are writing a kernel-integrated plug-in, it is useful to have your
-%% plug-in specific Makefile. For instance, it allows you to easily release your
-%% plug-in independently of \framac. However, if your version of \framac is
-%% changing frequently, it is useful to compile together \framac and your plug-in
-%% without installing \framac each time. To reach this goal, you have to mix the
-%% integration in \texttt{Makefile} described in Section~\ref{adv:make} and the
-%% solution presented in this section: in the section ``Plug-ins'' of
-%% \texttt{Makefile} you just have to set few variables before including your
-%% plug-in specific Makefile
-
-%% \begin{example} For compiling the plug-in
-%%   \texttt{Ltl\_to\_acsl}\index{Ltl\_to\_acsl}, the following lines are added
-%%   into \texttt{Makefile}.
-%% \codeidx{PLUGIN\_ENABLE}
-%% \codeidx{PLUGIN\_DIR}
-%% \codeidx{PLUGIN\_DYNAMIC}
-%% \codeidx{DISTRIB\_FILES}
-%% \codeidx{@ENABLE\_$plugin$}
-%% \begin{makefilecode}
-%% PLUGIN_ENABLE	:=@ENABLE_LTL_TO_ACSL@
-%% PLUGIN_DIR	:=src/ltl_to_acsl
-%% DISTRIB_FILES += $(PLUGIN_DIR)/Makefile
-%% include $(PLUGIN_DIR)/Makefile
-%% \end{makefilecode}
-%% \end{example}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Compiling \framac and external plug-ins at the same time}
 \label{dynamic-make:comp-same-time}

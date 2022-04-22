@@ -189,6 +189,7 @@ ENABLE_METRICS	                  ?=@ENABLE_METRICS@
 ENABLE_OCCURRENCE                 ?=@ENABLE_OCCURRENCE@
 ENABLE_PDG	                  ?=@ENABLE_PDG@
 ENABLE_POSTDOMINATORS             ?=@ENABLE_POSTDOMINATORS@
+ENABLE_REDUC                      ?=@ENABLE_REDUC@
 ENABLE_RTEGEN                     ?=@ENABLE_RTEGEN@
 ENABLE_SCOPE	                  ?=@ENABLE_SCOPE@
 ENABLE_SLICING	                  ?=@ENABLE_SLICING@

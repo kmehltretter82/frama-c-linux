@@ -254,7 +254,7 @@ tr:first-of-type > .eva-table-callsite-box {
 
 .eva-table-descrs {
   background-color: var(--background-sidebar);
-  border-right: thin solid var(--border);
+  text-align: center;
 }
 
 .eva-table-descr-sticky {
@@ -300,6 +300,20 @@ tr:first-of-type > .eva-table-callsite-box {
 
 .eva-focused {
   background: var(--code-select);
+}
+
+.eva-evaluation-mode {
+  background: purple;
+  fill: white;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Evaluation Mode CSS                                                --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-evaluation-mode {
+  background: var(--eva-evaluation-mode);
+  fill: var(--text-discrete);
 }
 
 /* -------------------------------------------------------------------------- */
