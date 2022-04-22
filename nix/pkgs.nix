@@ -12,6 +12,7 @@ let
     frama-c = oself.callPackage ./frama-c.nix {};
     lint = oself.callPackage ./lint.nix {};
     # Tests
+    default-config-tests = oself.callPackage ./default-config-tests.nix {};
     e-acsl-tests = oself.callPackage ./e-acsl-tests.nix {};
     eva-tests = oself.callPackage ./eva-tests.nix {};
     kernel-tests = oself.callPackage ./kernel-tests.nix {};
