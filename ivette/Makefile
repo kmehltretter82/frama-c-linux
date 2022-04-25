@@ -153,7 +153,7 @@ include $(DOME)/template/makefile
 # --- Ivette Installation
 # --------------------------------------------------------------------------
 
-include ../share/Makefile.config
+sinclude ../share/Makefile.config
 
 dist-dir:
 	@echo "Cleaning dist"
@@ -161,6 +161,8 @@ dist-dir:
 
 IVETTE_DIST=$(wildcard dist/linux-unpacked dist/mac dist/mac-arm64)
 
+ifdef LIBDIR
+ifdef BINDIR
 ifeq ($(IVETTE_DIST),dist/linux-unpacked)
 
 install:
@@ -186,4 +188,6 @@ install:
 	@echo "use 'make dist' and retry"
 	@exit 1
 
+endif
+endif
 endif
