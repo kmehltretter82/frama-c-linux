@@ -351,3 +351,104 @@ module Allocation = struct
 end
 
 let get_allocation = Allocation.get
+
+
+module ArraySegmentation = Register (struct
+    module Interp = Db.Properties.Interp
+
+    type t = Cil_types.varinfo * Cil_types.offset * Cil_types.exp list
+    let name = "array_partition"
+    let is_loop_annot = false
+
+    let convert = function
+      | {term_node =  TLval (TVar {lv_origin=Some vi}, toffset)} :: tbounds ->
+        begin try
+            let offset = !Interp.term_offset_to_offset ~result:None toffset
+            and bounds = List.map (!Interp.term_to_exp ~result:None) tbounds in
+            Some (vi, offset, bounds)
+          with
+            Interp.No_conversion -> None
+        end
+      | _ -> None
+
+    let parse ~typing_context:context lexprs =
+      let open Logic_typing in
+      let l = List.map (context.type_term context context.pre_state) lexprs in
+      Extlib.the ~exn:Parse_error (convert l)
+
+    let import = function
+      | Ext_terms l -> Option.get (convert l)
+      | _ -> assert false
+
+    let export (vi, offset, bounds) =
+      let lv = Cil.cvar_to_lvar vi
+      and toffset = Logic_utils.offset_to_term_offset offset
+      and tbounds = List.map Logic_utils.expr_to_term bounds in
+      let tlval = TVar lv, toffset in
+      let tarray = Logic_const.term (TLval tlval) (Cil.typeOfTermLval tlval) in
+      Ext_terms (tarray :: tbounds)
+
+    let print fmt (vi,offset,bounds) =
+      Format.fprintf fmt "%a, %a"
+        Cil_printer.pp_lval (Var vi, offset)
+        (Pretty_utils.pp_list ~sep:",@ " Cil_printer.pp_exp) bounds
+  end)
+
+
+type array_segmentation = ArraySegmentation.t
+let add_array_segmentation = ArraySegmentation.add
+let read_array_segmentation ext = ArraySegmentation.import ext.ext_kind
+
+
+module DomainScope = Register (struct
+    type t = string * Cil_types.varinfo list
+    let name = "eva_domain_scope"
+    let is_loop_annot = false
+
+    let parse ~typing_context:context =
+      let parse_domain = function
+        | {lexpr_node = PLvar v} -> v
+        | _ -> raise Parse_error
+      and parse_var = function
+        | {lexpr_node = PLvar v} ->
+          begin match context.Logic_typing.find_var v with
+            | {lv_origin=Some vi} -> vi
+            | _ -> raise Parse_error
+            | exception Not_found ->
+              Kernel.warning ~wkey:Kernel.wkey_annot_error
+                ~once:true ~current:true
+                "cannot find variable %s at this point" v;
+              raise Parse_error
+          end
+        | _ -> raise Parse_error
+      in
+      function
+      | domain :: vars ->
+        parse_domain domain, List.map parse_var vars
+      | _ -> raise Parse_error
+
+    let import = function
+      | Ext_terms ({term_node=TConst (LStr domain)} :: vars) ->
+        let import_var = function
+          | {term_node=TLval (TVar {lv_origin=Some vi}, TNoOffset)} -> vi
+          | _ -> assert false
+        in
+        domain, List.map import_var vars
+      | _ -> assert false
+
+    let export (domain, vars) =
+      let export_var vi =
+        Logic_const.tvar (Cil.cvar_to_lvar vi)
+      in
+      Ext_terms (Logic_const.tstring domain :: List.map export_var vars)
+
+    let print fmt (domain, vars) =
+      Format.fprintf fmt "%s, %a"
+        domain
+        (Pretty_utils.pp_list ~sep:",@ " Cil_printer.pp_varinfo) vars
+  end)
+
+
+type domain_scope = DomainScope.t
+let add_domain_scope = DomainScope.add
+let read_domain_scope ext = DomainScope.import ext.ext_kind

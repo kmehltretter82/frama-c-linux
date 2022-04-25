@@ -605,9 +605,6 @@ KERNEL_CMO=\
 	src/kernel_services/abstract_interp/locations.cmo               \
 	src/kernel_services/abstract_interp/lmap.cmo                    \
 	src/kernel_services/abstract_interp/lmap_bitwise.cmo            \
-	src/kernel_services/abstract_interp/multidim.cmo                \
-	src/kernel_services/abstract_interp/abstract_offset.cmo         \
-	src/kernel_services/abstract_interp/abstract_memory.cmo         \
 	src/kernel_services/visitors/visitor.cmo                        \
 	src/kernel_services/ast_data/statuses_by_call.cmo               \
 	src/kernel_services/ast_printing/printer_tag.cmo                \
@@ -675,12 +672,6 @@ check-logic-parser-wildcard:
 	cd src/kernel_internals/parsing && ocaml check_logic_parser.ml
 
 NON_OPAQUE_DEPS+= src/kernel_services/plugin_entry_points/dynamic
-
-# abstract_memory.cmi must _not_ inherit the '-rectypes' flag, so we
-# eagerly assign it _before_ adding -rectypes to the .cmo/.cmx files
-src/kernel_services/abstract_interp/abstract_memory.cmi: BFLAGS := $(BFLAGS)
-src/kernel_services/abstract_interp/abstract_memory.cmo: BFLAGS += -rectypes
-src/kernel_services/abstract_interp/abstract_memory.cmx: OFLAGS += -rectypes
 
 # C Bindings
 ############
@@ -828,7 +819,7 @@ PLUGIN_NAME:=Eva
 PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains api domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy partitioning utils gui_files \
-	api values/numerors domains/numerors
+	api values/numerors domains/numerors domains/multidim
 PLUGIN_TESTS_DIRS+=value/traces
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/Eva.mli
 PLUGIN_DISTRIB_EXTERNAL+=gen-api.sh
@@ -887,7 +878,6 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \
 	domains/offsm_domain \
-	domains/multidim_domain \
 	domains/symbolic_locs \
 	domains/sign_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
@@ -912,6 +902,14 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	engine/transfer_logic engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
+	domains/multidim/multidim \
+	domains/multidim/abstract_offset \
+	domains/multidim/abstract_memory \
+	domains/multidim/pretty_memory \
+	domains/multidim/abstract_structure \
+	domains/multidim/segmentation \
+	domains/multidim/typed_memory \
+	domains/multidim/multidim_domain \
 	domains/taint_domain \
 	$(APRON_CMO) $(NUMERORS_CMO) \
 	utils/eva_results \

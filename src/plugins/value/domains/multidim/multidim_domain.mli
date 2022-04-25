@@ -20,28 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Generated file. The file to update is [transitioning.ml.in] *)
+include Abstract_domain.Leaf
+  with type value = Cvalue.V.t
+   and type location = Precise_locs.precise_location
 
-module List = struct
-
-  let concat_map f l =
-    let rec aux f acc = function
-      | [] -> List.rev acc
-      | x :: l ->
-        let xs = f x in
-        aux f (List.rev_append xs acc) l
-    in aux f [] l
-
-  let equal f l1 l2 =
-    l1 == l2 || try List.for_all2 f l1 l2 with Invalid_argument _ -> false
-
-  let rec compare f l1 l2 =
-    if l1 == l2 then 0
-    else match l1, l2 with
-      | [], [] -> assert false
-      | [], _ :: _ -> -1
-      | _ :: _, [] -> 1
-      | x1 :: q1, x2 :: q2 ->
-        let n = f x1 x2 in
-        if n = 0 then compare f q1 q2 else n
-end
+val flag: Abstractions.flag

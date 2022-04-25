@@ -20,23 +20,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type size = Integer.t
+open Lattice_bounds
+open Abstract_memory
 
-type bit =
-  | Uninitialized (* Uninitialized everywhere *)
-  | Zero (* Zero or uninitialized everywhere *)
-  | Any of Base.SetLattice.t (* Undetermined anywhere, and can contain bits
-                                of pointers. If the base set is empty,
-                                the bit can only come from numerical values. *)
+val are_typ_compatible : Cil_types.typ -> Cil_types.typ -> bool
 
-module Bit :
+
+(* Configuration of the Abstract Memory model *)
+module type Config =
 sig
-  type t = bit
+  (* Dependencies of the hash-consing table. The table will be cleared
+     whenever one of those dependencies is cleared. *)
+  val deps : State.t list
 
-  val uninitialized : t
-  val zero : t
-  val numerical : t
-  val top : t
+  (* Limit on the number of slice after a write for array segmentations.
+     Makes sense above or equal to 1, though below 3 is counter-productive. *)
+  val slice_limit : unit -> int
+
+  (* Whether the memory model try to infer some structure disjunctive
+     invariants. *)
+  val disjunctive_invariants : unit -> bool
 end
 
 (* Values the memory is mapped to *)
@@ -51,21 +54,17 @@ sig
   val compare : t -> t -> int
 
   val pretty : Format.formatter -> t -> unit
-  val of_bit : bit -> t
+  val of_bit : typ:Cil_types.typ -> bit -> t
   val to_bit : t -> bit
+  val to_integer : t -> Integer.t option
   val is_included : t -> t -> bool
   val join : t -> t -> t
 end
 
-module type Config =
+module Make (Config : Config) (Value : Value) :
 sig
-  val deps : State.t list
-end
-
-module type T =
-sig
-  type location
-  type value
+  type location = Abstract_offset.t
+  type value = Value.t
   type t
 
   (* Datatype *)
@@ -83,37 +82,44 @@ sig
   val is_top : t -> bool
 
   (* Get a value from a set of locations *)
-  val get : t -> location -> value
+  val get : oracle:oracle -> t -> location -> value
 
   (* Extract a sub map from a set of locations *)
-  val extract : t -> location -> t
+  val extract : oracle:oracle -> t -> location -> t
 
   (* Erase / initialize the memory on a set of locations. *)
-  val erase : weak:bool -> t -> location -> bit -> t
+  val erase : oracle:oracle -> weak:bool -> t -> location -> bit -> t
 
   (* Set a value on a set of locations *)
-  val set : weak:bool -> t -> location -> value -> t
+  val set : oracle:oracle -> weak:bool -> t -> location -> value -> t
 
   (* Copy a whole map over another *)
-  val overwrite : weak:bool -> t -> location -> t -> t
+  val overwrite : oracle:oracle -> weak:bool -> t -> location -> t -> t
 
   (* Reinforce values on a set of locations when the locations match the
      memory structure ; does nothing on locations that cannot be matched *)
-  val reinforce : (value -> value) ->  t -> location -> t
-
+  val reinforce : oracle:oracle ->
+    (value -> value or_bottom) ->  t -> location -> t or_bottom
 
   (* Test inclusion of one memory map into another *)
   val is_included : t -> t -> bool
 
   (* Finest partition that is coarcer than both *)
-  val join : t -> t -> t
+  val join : oracle:bioracle -> t -> t -> t
 
   (* Partition widening *)
-  val widen : (size:size -> value -> value -> value) -> t -> t -> t
+  val widen : oracle:bioracle -> (size:size -> value -> value -> value) ->
+    t -> t -> t
 
+  (* Bounds update for array segmentations *)
+  val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
+    t -> t
+
+  (* Pretty prints memory *)
   val pretty : Format.formatter -> t -> unit
-end
 
-module Make (Config : Config) (Value : Value) : T
-  with type value = Value.t
-   and type location = Abstract_offset.typed_offset
+  (* Update the array segmentation at the given offset so the given bound
+     expressions appear in the segmentation *)
+  val segmentation_hint : oracle:oracle ->
+    t -> location -> Cil_types.exp list -> t
+end

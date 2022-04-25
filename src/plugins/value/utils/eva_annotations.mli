@@ -59,6 +59,13 @@ type flow_annotation =
 
 type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
 
+type array_segmentation =
+  Cil_types.varinfo * Cil_types.offset * Cil_types.exp list
+
+type domain_scope =
+  string (* domain *) *
+  Cil_types.varinfo list (* variables that must be tracked by the domain *)
+
 val get_slevel_annot : Cil_types.stmt -> slevel_annotation option
 val get_unroll_annot : Cil_types.stmt -> unroll_annotation list
 val get_flow_annot : Cil_types.stmt -> flow_annotation list
@@ -73,4 +80,11 @@ val add_flow_annot : emitter:Emitter.t ->
   Cil_types.stmt -> flow_annotation -> unit
 val add_subdivision_annot : emitter:Emitter.t ->
   Cil_types.stmt -> int -> unit
+val add_array_segmentation : emitter:Emitter.t ->
+  Cil_types.stmt -> array_segmentation -> unit
+val add_domain_scope : emitter:Emitter.t ->
+  Cil_types.stmt -> domain_scope -> unit
 [@@@ api_end]
+
+val read_array_segmentation : Cil_types.acsl_extension -> array_segmentation
+val read_domain_scope : Cil_types.acsl_extension -> domain_scope

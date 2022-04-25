@@ -20,28 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Generated file. The file to update is [transitioning.ml.in] *)
+open Lattice_bounds
 
-module List = struct
+type t =
+  | NoOffset of Cil_types.typ
+  | Index of Cil_types.exp option * Int_val.t * Cil_types.typ * t
+  | Field of Cil_types.fieldinfo * t
 
-  let concat_map f l =
-    let rec aux f acc = function
-      | [] -> List.rev acc
-      | x :: l ->
-        let xs = f x in
-        aux f (List.rev_append xs acc) l
-    in aux f [] l
+val pretty : Format.formatter -> t -> unit
 
-  let equal f l1 l2 =
-    l1 == l2 || try List.for_all2 f l1 l2 with Invalid_argument _ -> false
+val of_var_address : Cil_types.varinfo -> t
+val of_cil_offset : (Cil_types.exp -> Int_val.t) ->
+  Cil_types.typ -> Cil_types.offset -> t or_top
+val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t or_top
+val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t or_top
 
-  let rec compare f l1 l2 =
-    if l1 == l2 then 0
-    else match l1, l2 with
-      | [], [] -> assert false
-      | [], _ :: _ -> -1
-      | _ :: _, [] -> 1
-      | x1 :: q1, x2 :: q2 ->
-        let n = f x1 x2 in
-        if n = 0 then compare f q1 q2 else n
-end
+val is_singleton : t -> bool
+val references : t -> Cil_datatype.Varinfo.Set.t (* variables referenced in the offset *)
+
+val append : t -> t -> t (* Does not check that the appened offset fits *)
+val join : t -> t -> t or_top
+val add_index : (Cil_types.exp -> Int_val.t) -> t -> Cil_types.exp -> t or_top
