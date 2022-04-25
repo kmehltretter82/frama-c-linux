@@ -176,6 +176,7 @@ install:
 	@echo "Installing Ivette (macOS)"
 	@rm -fr /Applications/Ivette.app
 	@mv $(IVETTE_DIST)/Ivette.app /Applications/
+	@rm -fr $(IVETTE_DIST)
 	@install ivette-macos.sh $(BINDIR)/ivette
 
 else
