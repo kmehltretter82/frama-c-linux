@@ -168,7 +168,7 @@ install:
 	@rm -fr $(LIBDIR)/ivette
 	@rm -f $(BINDIR)/ivette
 	@mv $(IVETTE_DIST) $(LIBDIR)/ivette
-	@ln -s $(LIBDIR)/ivette/Ivette $(BINDIR)/ivette
+	@ln -s $(LIBDIR)/ivette/ivette $(BINDIR)/ivette
 
 else ifeq ($(IVETTE_DIST:-arm64=),dist/mac)
 
