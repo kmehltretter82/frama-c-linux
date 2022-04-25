@@ -49,7 +49,6 @@ include Lattice_type.Full_AI_Lattice_with_cardinality
    and type widen_hint = size_widen_hint * numerical_widen_hint
 
 val is_bottom : t -> bool
-val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
 
 val is_float: t -> bool
 val is_int: t -> bool
