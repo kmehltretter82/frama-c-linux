@@ -5,18 +5,49 @@ Required package to be installed:
 - `pandoc` for generating the documentation;
 - `node` version 16.x (codename: gallium)
 
+It is recommanded to use NVM to select a node 16.x version.
+
+## Linux
+
+```sh
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+$ nvm install 16
+$ nvm use 16
+$ npm install yarn
+```
+
+## macOS
+
+```sh
+$ brew install yarn
+$ brew install nvm # follow instructions
+$ nvm install 16
+$ nvm use 16
+```
+
 # Installation
 
 From the `Frama-C` main directory, simply type:
 
 ```
 $ make -C ivette dist
+$ [sudo] make -C ivette install
 ```
 
 If this is the first time you compile `ivette`, this might take some time to download
 all the necessary packages and Electron binaries from the web.
 
-Once finished, the Ivette application is available in `ivette/dist/<platform>` directory.
+The first `make` command builds a binary distribution of Ivette for your
+architecture in `ivette/dist/<arch>` ; the second `make` command installs it on
+your system accordingly.
+
+## Linux
+
+> TODO
+
+## macOS
+
+> TODO
 
 # Developer Install
 

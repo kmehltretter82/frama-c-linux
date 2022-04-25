@@ -37,7 +37,7 @@ all: pkg lint app
 
 app: dome-app
 dev: dome-dev
-dist: dome-dist
+dist: dist-dir dome-dist
 
 lint: dome-pkg dome-templ checkcase
 	@echo "[Ivette] running typechecker & linter"
@@ -148,3 +148,41 @@ $(NODEBIN)/%:
 # --------------------------------------------------------------------------
 include $(DOME)/template/makefile
 # --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
+# --- Ivette Installation
+# --------------------------------------------------------------------------
+
+include ../share/Makefile.config
+
+dist-dir:
+	@echo "Cleaning dist"
+	@rm -fr dist
+
+IVETTE_DIST=$(wildcard dist/linux-unpacked dist/mac dist/mac-arm64)
+
+ifeq ($(IVETTE_DIST),dist/linux-unpacked)
+
+install:
+	@echo "Installing Ivette (Linux)"
+	@rm -fr $(LIBDIR)/ivette
+	@rm -f $(BINDIR)/ivette
+	@mv $(IVETTE_DIST) $(LIBDIR)/ivette
+	@ln -s $(LIBDIR)/ivette/Ivette $(BINDIR)/ivette
+
+else ifeq ($(IVETTE_DIST:-arm64=),dist/mac)
+
+install:
+	@echo "Installing Ivette (macOS)"
+	@rm -fr /Applications/Ivette.app
+	@mv $(IVETTE_DIST)/Ivette.app /Applications/
+	@install ivette-macos.sh $(BINDIR)/ivette
+
+else
+
+install:
+	@echo "No distribution to install"
+	@echo "use 'make dist' and retry"
+	@exit 1
+
+endif
