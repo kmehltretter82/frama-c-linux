@@ -168,9 +168,9 @@ struct
     let add_refs _b o acc =
       match o with
       | `Top -> acc
-      | `Value o -> Set.union (Set.of_list (Offset.references o)) acc
+      | `Value o -> Set.union (Offset.references o) acc
     in
-    Map.fold add_refs map Set.empty |> Set.to_seq |> List.of_seq
+    Map.fold add_refs map Set.empty |> Set.elements
 
   let of_var (vi : Cil_types.varinfo) : t =
     Map.singleton (Base.of_varinfo vi) (`Value (Offset.of_var_address vi))

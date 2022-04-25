@@ -36,7 +36,7 @@ val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t or_top
 val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t or_top
 
 val is_singleton : t -> bool
-val references : t -> Cil_types.varinfo list (* variables referenced in the offset *)
+val references : t -> Cil_datatype.Varinfo.Set.t (* variables referenced in the offset *)
 
 val append : t -> t -> t (* Does not check that the appened offset fits *)
 val join : t -> t -> t or_top

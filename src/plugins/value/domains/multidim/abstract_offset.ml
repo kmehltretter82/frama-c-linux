@@ -249,7 +249,7 @@ let references =
     | Field (_, sub) | Index (None, _, _, sub) -> aux acc sub
     | Index (Some e, _, _, sub) ->
       let r = Cil.extract_varinfos_from_exp e in
-      let acc = (Cil_datatype.Varinfo.Set.to_seq r |> List.of_seq) @ acc in
+      let acc = Cil_datatype.Varinfo.Set.union r acc in
       aux acc sub
   in
-  aux []
+  aux Cil_datatype.Varinfo.Set.empty
