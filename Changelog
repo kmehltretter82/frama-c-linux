@@ -18,10 +18,11 @@
 Open Source Release <next-release>
 ##################################
 
-o   Eva       [2022-04-xx] The multidim abstract domain is now able to infer
-              simple array invariants on simple loops.
-o   Eva       [2022-04-xx] The multidim abstract domain is more robust, more
-              correct, and more precise.
+-   Eva       [2022-04-25] Improve the multidim abstract domain: it is now
+              more precise and more robust, it is able to infer simple array
+              invariants on some loops without unrolling, and has a new option
+              -eva-multidim-disjunctive-invariants to infer structures
+              disjunctive invariants.
 o   Kernel    [2022-03-07] Known compiler builtins are no longer hardcoded in
               OCaml, but defined via JSON files (in share/compliance).
 o   Kernel    [2022-02-23] New visitor functions visitFramacFileFunctions
