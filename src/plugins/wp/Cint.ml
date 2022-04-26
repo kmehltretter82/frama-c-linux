@@ -629,15 +629,16 @@ let smp_leq_improved f a b =
   else raise Not_found
 
 let smp_leq_with_land a b =
-  try
-    let es = match_fun f_land a in
-    let a1,_ = match_list_head match_positive_or_null_integer es in
-    if F.decide (F.e_leq (e_zint a1) b)
-    then e_true
-    else raise Not_found
-  with Not_found ->
+  let es = match_fun f_land a in
+  let a1,_ = match_list_head match_positive_or_null_integer es in
+  if F.decide (F.e_leq (e_zint a1) b)
+  then e_true
+  else raise Not_found
+(* Disabled rule :
+   with Not_found ->
     (* a <= 0 && 0 <= (x&y) ==> a <= (x & y) *)
     smp_leq_improved f_land a b
+*)
 
 let smp_eq_with_land a b =
   let es = match_fun f_land a in
