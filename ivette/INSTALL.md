@@ -3,9 +3,11 @@
 Required package to be installed:
 - `yarn` for node pakage management;
 - `pandoc` for generating the documentation;
-- `node` version 16.x (codename: gallium)
+- `node` version 16.x;
 
-It is recommanded to use NVM to select a node 16.x version.
+We recommand to use node v16 as a workaroung against incompatible versions of
+SSL and Webpack packages. However, under Arch Linux, the standard node v17 is
+also known to work.
 
 ## Linux
 
@@ -14,6 +16,13 @@ $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bas
 $ nvm install 16
 $ nvm use 16
 $ npm install yarn
+```
+
+Under Arch you can simply rely on the `yarn` package and its `node` standard
+dependency:
+
+```sh
+$ pacman -S yarn
 ```
 
 ## macOS
@@ -27,7 +36,11 @@ $ nvm use 16
 
 # Installation
 
-From the `Frama-C` main directory, simply type:
+You shall have configured `frama-c` before installing Ivette. Notice that, by
+default, the installed `ivette` command will look for an installed `frama-c`
+command to run the server.
+
+From the (configured) `Frama-C` main directory, simply type:
 
 ```
 $ make -C ivette dist
@@ -41,15 +54,13 @@ The first `make` command builds a binary distribution of Ivette for your
 architecture in `ivette/dist/<arch>` ; the second `make` command installs it on
 your system accordingly.
 
-## Linux
+The installed command is `<prefix>/bin/ivette` which is actually just a wrapper
+to launch the Ivette application. The Ivette application itself is installed:
 
-> TODO
+- **Linux:** in `<prefix>/lib/ivette/*`
+- **macOS:** in `/Applications/Ivette.app`
 
-## macOS
-
-> TODO
-
-# Developer Install
+# Developer Setup
 
 Ivette can be compiled and used with different modes:
 - `make dev` builds and start the development version with live-code-editing enabled. It uses
