@@ -57,8 +57,6 @@ let _computation_signal =
     ~add_hook:Analysis.register_computation_hook
     ()
 
-let is_computed kf = Analysis.is_computed () && Results.are_available kf
-
 module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 
 let callers kf =
@@ -116,20 +114,22 @@ end
 
 let dead_code kf =
   let empty = { kf; unreachable = []; non_terminating = [] } in
-  if is_computed kf then
-    let module Results = (val Analysis.current_analyzer ()) in
-    let is_unreachable ~after stmt =
-      Results.get_stmt_state ~after stmt = `Bottom
-    in
-    let classify acc stmt =
-      if is_unreachable ~after:false stmt
-      then { acc with unreachable = stmt :: acc.unreachable }
-      else if is_unreachable ~after:true stmt
-      then { acc with non_terminating = stmt :: acc.non_terminating }
-      else acc
-    in
+  if Analysis.is_computed ()
+  then
     let fundec = Kernel_function.get_definition kf in
-    List.fold_left classify empty fundec.sallstmts
+    match Analysis.status kf with
+    | Unreachable | SpecUsed | Builtin _ ->
+      { kf; unreachable = fundec.sallstmts; non_terminating = [] }
+    | Analyzed NoResults -> empty
+    | Analyzed (Partial | Complete) ->
+      let classify acc stmt =
+        if Results.(before stmt |> is_empty)
+        then { acc with unreachable = stmt :: acc.unreachable }
+        else if Results.(after stmt |> is_empty)
+        then { acc with non_terminating = stmt :: acc.non_terminating }
+        else acc
+      in
+      List.fold_left classify empty fundec.sallstmts
   else empty
 
 let () = Request.register ~package
