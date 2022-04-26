@@ -191,3 +191,22 @@ install:
 endif
 endif
 endif
+
+# --------------------------------------------------------------------------
+# --- Ivette Un-Installation
+# --------------------------------------------------------------------------
+
+ifdef LIBDIR
+ifdef BINDIR
+
+uninstall:
+	@echo "Uninstall Ivette"
+	@rm -fr dist
+	@rm -fr /Applications/Ivette.app
+	@rm -fr $(LIBDIR)/ivette
+	@rm -f $(BINDIR)/ivette
+
+endif
+endif
+
+# --------------------------------------------------------------------------
