@@ -74,19 +74,6 @@ val register_hook: ((module S) -> unit) -> unit
     is changed. This happens when a new analysis is run with different
     abstractions than before, or when the current project is changed. *)
 
-type computation_state = NotComputed | Computing | Computed | Aborted
-(** Computation state of the analysis. *)
-
-val current_computation_state : unit -> computation_state
-(** Get the current computation state of the analysis, updated by
-    [force_compute] and states updates. *)
-
-val register_computation_hook: ?on:computation_state ->
-  (computation_state -> unit) -> unit
-(** Registers a hook that will be called each time the analysis starts or
-    finishes. If [on] is given, the hook will only be called when the
-    analysis switches to this specific state. *)
-
 val force_compute : unit -> unit
 (** Perform a full analysis, starting from the [main] function. *)
 
@@ -106,6 +93,18 @@ val is_computed : unit -> bool
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
 
+type computation_state = NotComputed | Computing | Computed | Aborted
+(** Computation state of the analysis. *)
+
+val current_computation_state : unit -> computation_state
+(** Get the current computation state of the analysis, updated by
+    [force_compute] and states updates. *)
+
+val register_computation_hook: ?on:computation_state ->
+  (computation_state -> unit) -> unit
+(** Registers a hook that will be called each time the analysis starts or
+    finishes. If [on] is given, the hook will only be called when the
+    analysis switches to this specific state. *)
 
 (** Kind of results for the analysis of a function body. *)
 type results =
