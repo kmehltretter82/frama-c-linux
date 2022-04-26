@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Server Controller
 // --------------------------------------------------------------------------
@@ -55,8 +53,8 @@ const unquote = (s: string): string =>
 
 function dumpServerConfig(sc: Server.Configuration): string {
   let buffer = '';
-  const { cwd, command, sockaddr, params } = sc;
-  if (cwd) buffer += `--cwd ${quote(cwd)}\n`;
+  const { working, command, sockaddr, params } = sc;
+  if (working) buffer += `--working ${quote(working)}\n`;
   if (command) buffer += `--command ${quote(command)}\n`;
   if (sockaddr) buffer += `--socket ${sockaddr}\n`;
   if (params) {
@@ -74,22 +72,26 @@ function dumpServerConfig(sc: Server.Configuration): string {
   return buffer;
 }
 
-function buildServerConfig(argv: string[], cwd?: string) {
+function buildServerConfig(argv: string[], cwd?: string): Server.Configuration {
   const params = [];
   let command;
   let sockaddr;
-  let cwdir = cwd ? unquote(cwd) : undefined;
+  let working = cwd ? unquote(cwd) : undefined;
   for (let k = 0; k < (argv ? argv.length : 0); k++) {
     const v = argv[k];
     switch (v) {
-      case '--cwd':
+      case '-C':
+      case '--working':
+      case '--cwd': // Deprecated
         k += 1;
-        cwdir = unquote(argv[k]);
+        working = unquote(argv[k]);
         break;
+      case '-B':
       case '--command':
         k += 1;
         command = unquote(argv[k]);
         break;
+      case '-U':
       case '--socket':
         k += 1;
         sockaddr = argv[k];
@@ -99,18 +101,18 @@ function buildServerConfig(argv: string[], cwd?: string) {
     }
   }
   return {
-    cwd: cwdir,
+    working,
     command,
     sockaddr,
     params,
   };
 }
 
-function buildServerCommand(cmd: string) {
+function buildServerCommand(cmd: string): Server.Configuration {
   return buildServerConfig(cmd.trim().split(/[ \t\n]+/));
 }
 
-function insertConfig(hs: string[], cfg: Server.Configuration) {
+function insertConfig(hs: string[], cfg: Server.Configuration): string[] {
   const cmd = dumpServerConfig(cfg).trim();
   const newhs =
     hs.map((h) => h.trim())
@@ -126,17 +128,21 @@ function insertConfig(hs: string[], cfg: Server.Configuration) {
 
 let reloadCommand: string | undefined;
 
-Dome.reload.on(() => {
+function lastCommand(): string {
   const [lastCmd] = Settings.getLocalStorage(
     'Controller.history', Json.jList(Json.jString), [],
   );
-  reloadCommand = lastCmd;
-});
+  return lastCmd;
+}
+
+Dome.reload.on(() => { reloadCommand = lastCommand(); });
 
 Dome.onCommand((argv: string[], cwd: string) => {
   let cfg;
   if (reloadCommand) {
     cfg = buildServerCommand(reloadCommand);
+  } else if (argv.find((v) => v === '--reload' || v === '-R')) {
+    cfg = buildServerCommand(lastCommand());
   } else {
     cfg = buildServerConfig(argv, cwd);
   }
@@ -148,7 +154,7 @@ Dome.onCommand((argv: string[], cwd: string) => {
 // --- Server Control
 // --------------------------------------------------------------------------
 
-export const Control = () => {
+export const Control = (): JSX.Element => {
   const status = Server.useStatus();
 
   let play = { enabled: false, onClick: () => { /* do nothing */ } };
@@ -199,7 +205,7 @@ export const Control = () => {
 
 const editor = new RichTextBuffer();
 
-const RenderConsole = () => {
+const RenderConsole = (): JSX.Element => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
@@ -209,7 +215,7 @@ const RenderConsole = () => {
   );
 
   React.useEffect(() => {
-    const callback = () => {
+    const callback = (): void => {
       const cmd = editor.getValue().trim();
       setEmpty(cmd === '');
       setNoTrash(noTrash && cmd === history[0]);
@@ -223,7 +229,7 @@ const RenderConsole = () => {
     Server.buffer.setMaxlines(maxLines);
   });
 
-  const doReload = () => {
+  const doReload = (): void => {
     const cfg = Server.getConfig();
     const hst = insertConfig(history, cfg);
     const cmd = hst[0];
@@ -234,7 +240,7 @@ const RenderConsole = () => {
     setCursor(0);
   };
 
-  const doSwitch = () => {
+  const doSwitch = (): void => {
     if (cursor < 0) doReload();
     else {
       editor.clear();
@@ -243,7 +249,7 @@ const RenderConsole = () => {
     }
   };
 
-  const doExec = () => {
+  const doExec = (): void => {
     const cfg = buildServerCommand(editor.getValue());
     const hst = insertConfig(history, cfg);
     setHistory(hst);
@@ -253,9 +259,9 @@ const RenderConsole = () => {
     Server.restart();
   };
 
-  const doMove = (target: number) => {
+  const doMove = (target: number): (undefined | (() => void)) => {
     if (0 <= target && target < history.length && target !== cursor)
-      return () => {
+      return (): void => {
         const cmd = editor.getValue();
         const pad = scratch.current;
         pad[cursor] = cmd;
@@ -267,7 +273,7 @@ const RenderConsole = () => {
     return undefined;
   };
 
-  const doRemove = () => {
+  const doRemove = (): void => {
     const n = history.length;
     if (n <= 1) doReload();
     else {
@@ -369,7 +375,7 @@ Ivette.registerView({
 // --- Status
 // --------------------------------------------------------------------------
 
-export const Status = () => {
+export const Status = (): JSX.Element => {
   const status = Server.useStatus();
   const pending = Server.getPending();
   let led: LEDstatus = 'inactive';
@@ -434,7 +440,7 @@ export const Status = () => {
 // --- Server Stats
 // --------------------------------------------------------------------------
 
-export const Stats = () => {
+export const Stats = (): (null | JSX.Element) => {
   Server.useStatus();
   const pending = Server.getPending();
   return pending > 0 ? <Code>{pending} rq.</Code> : null;

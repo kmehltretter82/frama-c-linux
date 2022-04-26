@@ -379,7 +379,7 @@ export interface Configuration {
   /** Process environment variables (default: `undefined`). */
   env?: { [VAR: string]: string };
   /** Working directory (default: current). */
-  cwd?: string;
+  working?: string;
   /** Server command (default: `frama-c`). */
   command?: string;
   /** Additional server arguments (default: empty). */
@@ -423,7 +423,7 @@ export function getConfig(): Configuration {
 async function _launch(): Promise<void> {
   let {
     env,
-    cwd,
+    working,
     command = 'frama-c',
     params,
     sockaddr,
@@ -453,12 +453,12 @@ async function _launch(): Promise<void> {
     const pid = Dome.getPID();
     sockaddr = System.join(tmp, `ivette.frama-c.${pid}.io`);
   }
-  if (!cwd) cwd = System.getWorkingDir();
-  logout = logout && System.join(cwd, logout);
-  logerr = logerr && System.join(cwd, logerr);
+  if (!working) working = System.getWorkingDir();
+  logout = logout && System.join(working, logout);
+  logerr = logerr && System.join(working, logerr);
   params = client.commandLine(sockaddr, params);
   const options = {
-    cwd,
+    cwd: working,
     stdout: { path: logout, pipe: true },
     stderr: { path: logerr, pipe: true },
     env,
