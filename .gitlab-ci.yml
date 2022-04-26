@@ -173,6 +173,11 @@ manuals: # TODO: restore doc companions
   tags:
    - nix
 
+frama-c-ocaml-4.11:
+  variables:
+    OCAML: "4_11"
+  <<: *frama-c-ocaml
+
 frama-c-ocaml-4.13:
   variables:
     OCAML: "4_13"
