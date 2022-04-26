@@ -2,14 +2,17 @@
 [kernel] Parsing decreases.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp:hypothesis] decreases.i:108: Warning: 'Rel' relation must be well-founded
+[wp:hypothesis] decreases.i:44: Warning: 'Rel' relation must be well-founded
+[wp:hypothesis] decreases.i:25: Warning: 'Rel' relation must be well-founded
+[wp:hypothesis] decreases.i:30: Warning: 'Rel' relation must be well-founded
 [wp] decreases.i:71: Warning: No decreases clause for missing_2
-[wp:hypothesis] decreases.i:108: Warning: 'Wrong' relation must be well-founded
+[wp:hypothesis] decreases.i:107: Warning: 'Wrong' relation must be well-founded
 [wp] decreases.i:109: Warning: 
   On call to mw1, relation (Wrong) does not match caller (Rel)
+[wp:hypothesis] decreases.i:103: Warning: 'Rel' relation must be well-founded
 [wp] decreases.i:105: Warning: 
   On call to mw2, relation (Rel) does not match caller (Wrong)
-[wp] 26 goals scheduled
+[wp] 27 goals scheduled
 [wp] [Qed] Goal typed_fact_terminates : Valid
 [wp] [Alt-Ergo] Goal typed_fact_variant : Valid
 [wp] [Alt-Ergo] Goal typed_fails_fact_variant : Unsuccess
@@ -36,8 +39,9 @@
 [wp] [Alt-Ergo] Goal typed_mw2_variant_part1 : Unsuccess (Degenerated)
 [wp] [Alt-Ergo] Goal typed_mw2_variant_part2 : Valid
 [wp] [Alt-Ergo] Goal typed_mw1_variant : Unsuccess (Degenerated)
-[wp] Proved goals:   18 / 26
-  Qed:             7 
+[wp] [Qed] Goal typed_se_variant : Valid
+[wp] Proved goals:   19 / 27
+  Qed:             8 
   Alt-Ergo:       11  (unsuccess: 8)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -54,4 +58,5 @@
   mt1                       1        1        3      66.7%
   mw2                       -        1        2      50.0%
   mw1                       -        -        1       0.0%
+  se                        1        -        1       100%
 ------------------------------------------------------------

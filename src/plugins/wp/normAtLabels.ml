@@ -214,6 +214,10 @@ let preproc_annot labels p =
   let visitor = new norm_at labels in
   Visitor.visitFramacPredicate visitor p
 
+let preproc_term labels t =
+  let visitor = new norm_at labels in
+  Visitor.visitFramacTerm visitor t
+
 (** @raise LabelError if there is a label in [p] that is incompatible
  * with the [labels] translation *)
 let preproc_assigns labels asgns =

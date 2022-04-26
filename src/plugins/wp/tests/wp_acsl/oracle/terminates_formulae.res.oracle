@@ -2,7 +2,9 @@
 [kernel] Parsing terminates_formulae.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp:hypothesis] terminates_formulae.i:90: Warning: 
+[wp:hypothesis] terminates_formulae.i:84: Warning: 
+  'Rel' relation must be well-founded
+[wp:hypothesis] terminates_formulae.i:67: Warning: 
   'Rel' relation must be well-founded
 [wp] [CFG] Goal general_variant_terminates : Valid (Trivial)
 [wp] [CFG] Goal variant_terminates : Valid (Trivial)
