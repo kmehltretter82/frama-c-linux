@@ -15,6 +15,7 @@ let
     default-config-tests = oself.callPackage ./default-config-tests.nix {};
     e-acsl-tests = oself.callPackage ./e-acsl-tests.nix {};
     eva-tests = oself.callPackage ./eva-tests.nix {};
+    full-tests = oself.callPackage ./full-tests.nix {};
     kernel-tests = oself.callPackage ./kernel-tests.nix {};
     plugins-tests = oself.callPackage ./plugins-tests.nix {};
     wp-tests = oself.callPackage ./wp-tests.nix {};
