@@ -134,7 +134,7 @@ val remove_logic_coerce: term -> term
     set type.
 
     @since Magnesium-20151001
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was ambiguous (coercion vs. conversion).
 *)
 val numeric_coerce: logic_type -> term -> term
 
@@ -167,7 +167,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
     To obtain a boolean or predicate, use [expr_to_boolean] or
     [expr_to_predicate] instead.
 
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was unsound in many cases.
 *)
 
 val expr_to_predicate: exp -> predicate
@@ -180,7 +180,7 @@ val expr_to_predicate: exp -> predicate
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was unsound in many cases.
 *)
 
 val expr_to_ipredicate: exp -> identified_predicate
@@ -192,7 +192,7 @@ val expr_to_ipredicate: exp -> identified_predicate
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was unsound in many cases.
 *)
 
 val expr_to_boolean: exp -> term
@@ -205,7 +205,7 @@ val expr_to_boolean: exp -> term
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was unsound in many cases.
 *)
 
 val is_zero_comparable: term -> bool
