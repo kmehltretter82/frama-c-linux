@@ -37,8 +37,7 @@ stdenvNoCC.mkDerivation rec {
       @tests/builtins/ptests \
       @tests/float/ptests \
       @tests/idct/ptests \
-      @tests/value/ptests \
-      @tests/value/traces/ptests
+      @tests/value/ptests
   '';
 
   # No installation required
