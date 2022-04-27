@@ -24,7 +24,7 @@ Prove: true.
 Goal Recursion variant:
 Call Effect at line 17
 Assume { Type: is_uint32(n). (* Else *) Have: n != 0. }
-Prove: to_uint32(n - 1) < n.
+Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -51,14 +51,7 @@ Prove: 0 < n.
 
 Goal Recursion variant:
 Call Effect at line 40
-Assume {
-  Type: is_sint32(n).
-  (* Goal *)
-  When: 0 <= n.
-  (* Else *)
-  Have: n != 0.
-}
-Prove: 0 < n.
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -132,7 +125,7 @@ Prove: P_Rel(n, n).
 Goal Recursion variant:
 Call Effect at line 55
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
-Prove: to_uint32(n - 1) < n.
+Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -142,14 +135,14 @@ Prove: to_uint32(n - 1) < n.
 Goal Recursion variant (1/2):
 Call Effect at line 59
 Assume { Type: is_uint32(x). (* Then *) Have: x != 0. }
-Prove: to_uint32(x - 1) < x.
+Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 
 ------------------------------------------------------------
 
 Goal Recursion variant (2/2):
 Call Effect at line 60
 Assume { Type: is_uint32(x). (* Then *) Have: 11 <= x. }
-Prove: to_uint32(x - 1) < x.
+Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -169,7 +162,7 @@ Prove: false.
 Goal Recursion variant (2/2):
 Call Effect at line 72
 Assume { Type: is_uint32(n). (* Then *) Have: 31 <= n. }
-Prove: to_uint32(n - 1) < n.
+Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -191,7 +184,7 @@ Prove: to_uint32(n - 1) <= 10.
 Goal Recursion variant:
 Call Effect at line 86
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
-Prove: to_uint32(n - 1) < n.
+Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -218,7 +211,7 @@ Assume {
   (* Then *)
   Have: x != 0.
 }
-Prove: to_uint32(x - 1) < x.
+Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 
 ------------------------------------------------------------
 

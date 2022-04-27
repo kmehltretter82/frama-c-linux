@@ -77,7 +77,7 @@ Prove: true.
 Goal Recursion variant:
 Call Effect at line 80
 Assume { Type: is_uint32(n). (* Goal *) When: P_Q. (* Then *) Have: n != 0. }
-Prove: to_uint32(n - 1) < n.
+Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
