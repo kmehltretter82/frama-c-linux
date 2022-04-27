@@ -106,7 +106,7 @@ let compare_pc pc1 pc2 =
   | `Body_changed, `Body_changed -> 0
   | `Body_changed, _ -> -1
   | _, `Body_changed -> 1
-  | `Callees_changed, `Callees_changed -> -1
+  | `Callees_changed, `Callees_changed -> 0
   | `Callees_changed, _ -> -1
   | _, `Callees_changed -> 1
   | `Callees_spec_changed, `Callees_spec_changed -> 0
