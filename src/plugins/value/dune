@@ -22,6 +22,9 @@
   abstract
   abstract_domain
   abstract_location
+  abstract_memory
+  abstract_offset
+  abstract_structure
   abstract_value
   abstractions
   active_behaviors
@@ -80,6 +83,7 @@
   main_locations
   main_values
   mem_exec
+  multidim
   multidim_domain
   octagons
   offsm_domain
@@ -91,10 +95,12 @@
   per_stmt_slevel
   powerset
   printer_domain
+  pretty_memory
   recursion
   red_statuses
   register
   results
+  segmentation
   self
   sign_domain
   sign_value
@@ -112,6 +118,7 @@
   transfer_logic
   transfer_specification
   transfer_stmt
+  typed_memory
   unit_domain
   unit_tests
   value_product
@@ -181,6 +188,7 @@
 (copy_files# domains/gauges/*)
 (copy_files# domains/apron/*)
 (copy_files# domains/numerors/*)
+(copy_files# domains/multidim/*)
 (copy_files# engine/*)
 (copy_files# utils/*)
 (copy_files# legacy/*)

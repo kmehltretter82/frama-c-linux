@@ -9367,6 +9367,83 @@ extern int select(int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *errorfds, struct timeval *timeout);
 
 /*@ requires valid_path: valid_read_string(path);
+    ensures
+      errno_set:
+        __fc_errno ≡ \old(__fc_errno) ∨
+        __fc_errno ∈ {13, 4, 22, 40, 36, 2, 20, 1, 30};
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, __fc_errno;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: mode);
+    assigns __fc_errno
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: mode);
+ */
+extern int chmod(char const *path, mode_t mode);
+
+/*@ requires valid_path: valid_read_string(path);
+    ensures
+      errno_set:
+        __fc_errno ≡ \old(__fc_errno) ∨
+        __fc_errno ∈ {13, 9, 4, 22, 40, 36, 2, 20, 95, 1, 30};
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, __fc_errno;
+    assigns \result
+      \from (indirect: fd), (indirect: path),
+            (indirect: *(path + (0 .. strlen{Old}(path)))), (indirect: mode),
+            (indirect: flag);
+    assigns __fc_errno
+      \from (indirect: fd), (indirect: path),
+            (indirect: *(path + (0 .. strlen{Old}(path)))), (indirect: mode),
+            (indirect: flag);
+ */
+extern int fchmodat(int fd, char const *path, mode_t mode, int flag);
+
+/*@ ensures
+      errno_set:
+        __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ∈ {9, 4, 22, 1, 30};
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, __fc_errno;
+    assigns \result \from (indirect: fildes), (indirect: mode);
+    assigns __fc_errno \from (indirect: fildes), (indirect: mode);
+ */
+extern int fchmod(int fildes, mode_t mode);
+
+/*@ requires valid_buf: \valid(buf);
+    ensures
+      errno_set:
+        __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ∈ {9, 5, 75};
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, *buf, __fc_errno;
+    assigns \result \from (indirect: fildes);
+    assigns *buf \from (indirect: fildes);
+    assigns __fc_errno \from (indirect: fildes);
+ */
+extern int fstat(int fildes, struct stat *buf);
+
+/*@ requires valid_path: valid_read_string(path);
+    requires valid_buf: \valid(buf);
+    ensures
+      errno_set:
+        __fc_errno ≡ \old(__fc_errno) ∨
+        __fc_errno ∈ {13, 9, 22, 5, 40, 36, 2, 12, 20, 75};
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, *buf, __fc_errno;
+    assigns \result
+      \from (indirect: fd), (indirect: path),
+            (indirect: *(path + (0 .. strlen{Old}(path)))), (indirect: flag);
+    assigns *buf
+      \from (indirect: fd), (indirect: path),
+            (indirect: *(path + (0 .. strlen{Old}(path)))), (indirect: flag);
+    assigns __fc_errno
+      \from (indirect: fd), (indirect: path),
+            (indirect: *(path + (0 .. strlen{Old}(path)))), (indirect: flag);
+ */
+extern int fstatat(int fd, char const * restrict path,
+                   struct stat * restrict buf, int flag);
+
+/*@ requires valid_path: valid_read_string(path);
     requires valid_buf: \valid(buf);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result, *buf;

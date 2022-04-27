@@ -20,6 +20,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Abstract_domain.Leaf
-  with type value = Cvalue.V.t
-   and type location = Precise_locs.precise_location
+type 'a sformat = ('a,Format.formatter,unit) format
+type 'a formatter = Format.formatter -> 'a -> unit
+
+(* Pretty printing for iterators *)
+
+val pp_iter :
+  ?pre:unit sformat ->
+  ?sep:unit sformat ->
+  ?suf:unit sformat ->
+  ?format:('a formatter -> 'a -> unit) sformat ->
+  (('a -> unit) -> 'b -> unit) ->
+  'a formatter -> 'b formatter
+
+val pp_iter2 :
+  ?pre:(unit sformat) ->
+  ?sep:(unit sformat) ->
+  ?suf:(unit sformat) ->
+  ?format:('a formatter -> 'a -> 'b formatter -> 'b -> unit) sformat ->
+  (('a -> 'b -> unit) -> 'c -> unit) ->
+  'a formatter -> 'b formatter -> 'c formatter

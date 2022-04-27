@@ -270,7 +270,7 @@ module ValueCoverageGUI = struct
     update_filetree := refresh
 
   let () =
-    Db.Value.Table_By_Callstack.add_hook_on_update
+    Eva.Analysis.register_computation_hook
       (fun _ ->
          Metrics__Metrics_coverage.clear_coverage_by_fun ();
          !update_filetree `Visibility)

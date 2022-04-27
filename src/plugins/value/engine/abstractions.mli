@@ -158,7 +158,6 @@ module Config : sig
   val inout: flag
   val sign: flag
   val traces: flag
-  val multidim: flag
   val printer: flag
 
   val default: t

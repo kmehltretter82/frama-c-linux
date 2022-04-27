@@ -28,13 +28,73 @@ __BEGIN_DECLS
 
 #include "../__fc_define_stat.h"
 #include "../__fc_string_axiomatic.h"
+#include "../errno.h"
 
-extern int    chmod(const char *, mode_t);
-extern int    fchmodat(int fd, const char *path, mode_t mode, int flag);
-extern int    fchmod(int, mode_t);
-extern int    fstat(int, struct stat *);
-extern int    fstatat(int fd, const char *restrict path,
-                      struct stat *restrict buf, int flag);
+/*@
+  // missing: assigns 'filesystem' \frompath, path[0..], mode;
+  requires valid_path: valid_read_string(path);
+  assigns \result, __fc_errno
+          \from indirect:path, indirect:path[0 .. strlen(path)],
+                indirect:mode; //missing: \from 'filesystem'
+  ensures errno_set: __fc_errno == \old(__fc_errno) ||
+                     __fc_errno \in {EACCES, EINTR, EINVAL, ELOOP,
+                                     ENAMETOOLONG, ENOENT, ENOTDIR, EPERM,
+                                     EROFS};
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int chmod(const char *path, mode_t mode);
+
+/*@
+  // missing: assigns 'filesystem' \from fd, path, path[0..], mode, flag;
+  requires valid_path: valid_read_string(path);
+  assigns \result, __fc_errno
+          \from indirect:fd, indirect:path, indirect:path[0 .. strlen(path)],
+                indirect:mode, indirect:flag; //missing: \from 'filesystem'
+  ensures errno_set: __fc_errno == \old(__fc_errno) ||
+                     __fc_errno \in {EACCES, EBADF, EINTR, EINVAL, ELOOP,
+                                     ENAMETOOLONG, ENOENT, ENOTDIR, EOPNOTSUPP,
+                                     EPERM, EROFS};
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int fchmodat(int fd, const char *path, mode_t mode, int flag);
+
+/*@
+  // missing: assigns 'filesystem' \from fildes, mode;
+  assigns \result, __fc_errno
+          \from indirect:fildes, indirect:mode; //missing: \from 'filesystem'
+  ensures errno_set: __fc_errno == \old(__fc_errno) ||
+                     __fc_errno \in {EBADF, EINTR, EINVAL, EPERM, EROFS};
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int fchmod(int fildes, mode_t mode);
+
+/*@
+  //TODO: define proper initialization postcondition; it involves only a few
+  //      specific fields, and only a few bits within those fields.
+  requires valid_buf: \valid(buf);
+  assigns \result, *buf, __fc_errno
+          \from indirect:fildes; //missing: \from 'filesystem'
+  ensures errno_set: __fc_errno == \old(__fc_errno) ||
+                     __fc_errno \in {EBADF, EIO, EOVERFLOW};
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int fstat(int fildes, struct stat *buf);
+
+/*@
+  // missing: assigns 'filesystem' \from fd, path, path[0..], flag;
+  requires valid_path: valid_read_string(path);
+  requires valid_buf: \valid(buf);
+  assigns \result, *buf, __fc_errno
+          \from indirect:fd, indirect:path, indirect:path[0 .. strlen(path)],
+                indirect:flag; //missing: \from 'filesystem'
+  ensures errno_set: __fc_errno == \old(__fc_errno) ||
+                     __fc_errno \in {EACCES, EBADF, EINVAL, EIO, ELOOP,
+                                     ENAMETOOLONG, ENOENT, ENOMEM, ENOTDIR,
+                                     EOVERFLOW};
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int fstatat(int fd, const char *restrict path,
+                   struct stat *restrict buf, int flag);
 
 /*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG,
     //                               ENOENT, ENOMEM, ENOTDIR, EOVERFLOW,

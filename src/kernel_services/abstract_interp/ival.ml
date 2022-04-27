@@ -882,9 +882,11 @@ let cast_float_to_int_non_nan ~signed ~size (min, max) =
     assert false (* impossible if min-max are correct *)
 
 let cast_float_to_int ~signed ~size iv =
-  match Fval.min_and_max (project_float iv) with
-  | Some (min, max), _nan -> cast_float_to_int_non_nan ~signed ~size (min, max)
-  | None, _ -> bottom (* means NaN *)
+  if equal top iv then top
+  else
+    match Fval.min_and_max (project_float iv) with
+    | Some (min, max), _nan -> cast_float_to_int_non_nan ~signed ~size (min, max)
+    | None, _ -> bottom (* means NaN *)
 
 
 (* These are the bounds of the range of integers that can be represented
