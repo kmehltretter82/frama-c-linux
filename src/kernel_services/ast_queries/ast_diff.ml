@@ -75,7 +75,7 @@ struct
     | `Same x -> mem query x
 end
 
-module Correspondance=Datatype.Polymorphic(Correspondance_input)
+module Correspondance = Datatype.Polymorphic(Correspondance_input)
 
 (* for kernel function, we are a bit more precise than a yes/no answer.
    More precisely, we check whether a function has the same spec,
@@ -187,13 +187,12 @@ struct
     | #correspondance as x -> Correspondance_input.mk_mem_project f p x
 end
 
-module Code_correspondance =
-  Datatype.Polymorphic(Code_correspondance_input)
+module Code_correspondance = Datatype.Polymorphic(Code_correspondance_input)
 
 module Info(I: sig val name: string end) =
   (struct
     let name = "Ast_diff." ^ I.name
-    let dependencies = [Ast.self; Orig_project.self ]
+    let dependencies = [ Ast.self; Orig_project.self ]
     let size = 43
   end)
 
@@ -1005,7 +1004,7 @@ and is_matching_varinfo vi vi' env =
   end
 
 and is_same_offset o o' env =
-  match (o,o') with
+  match o, o' with
   | NoOffset, NoOffset -> true
   | Field (i,o), Field(i',o') ->
     is_matching_fieldinfo i i' && is_same_offset o o' env
@@ -1027,7 +1026,7 @@ and is_same_extended_asm a a' env =
 (* we don't check goto targets, as explained below for goto statements. *)
 
 and is_same_instr i i' env: body_correspondance*is_same_env =
-  match i,i' with
+  match i, i' with
   | Set(lv,e,_), Set(lv',e',_) ->
     if is_same_lval lv lv' env && is_same_exp e e' env then
       `Same_body, env
