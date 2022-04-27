@@ -1,7 +1,7 @@
 /* run.config
+   PLUGIN: @PTEST_PLUGIN@ eva.numerors
    OPT: -eva -eva-domains numerors -eva-msg-key=d-numerors
 */
-
 /* Tests for the numerors domain, that computes absolute and relative errors
    of floating-point computations. */
 
