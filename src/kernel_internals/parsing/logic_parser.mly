@@ -1868,6 +1868,7 @@ any_identifier:
 ;
 
 identifier_or_typename: /* allowed as C field names */
+| is_acsl_typename  { $1 }
 | TYPENAME { $1 } /* followed by the same list than 'identifier' */
 | IDENTIFIER { $1 }
 /* token list used inside ascl clauses: */
@@ -1888,6 +1889,11 @@ identifier: /* part included into 'identifier_or_typename', but duplicated to av
 
 bounded_var:
 | identifier { $1 }
+| is_acsl_typename /* Since TYPENAME cannot be accepted by lexpr rule */
+    { raise
+	(Not_well_formed(loc (),
+			 "Type names are not allowed as binding variable"))
+    }
 | TYPENAME  /* Since TYPENAME cannot be accepted by lexpr rule */
     { raise
 	(Not_well_formed(loc (),
@@ -1981,9 +1987,9 @@ is_acsl_decl_or_code_annot:
 | AXIOMATIC { "axiomatic" }
 ;
 
-is_acsl_other:
-| INTEGER  { "integer" (* token that cannot be used in C fields *) }
-| REAL     { "real" (* token that cannot be used in C fields *) }
+is_acsl_typename:
+| INTEGER  { "integer" (* token that can be used in C fields *) }
+| REAL     { "real" (* token that can be used in C fields *) }
 ;
 
 is_ext_spec:
@@ -2006,7 +2012,6 @@ non_logic_keyword:
 | is_ext_spec    { $1 }
 | is_acsl_spec   { $1 }
 | is_acsl_decl_or_code_annot { $1 }
-| is_acsl_other  { $1 }
 ;
 
 bs_keyword:

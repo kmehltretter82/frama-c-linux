@@ -21,6 +21,15 @@ struct __anonstruct_Point_1 {
    int y ;
 };
 typedef struct __anonstruct_Point_1 Point;
+struct INTEGER {
+   int integer ;
+};
+typedef struct INTEGER Integer;
+struct COMPLEX {
+   double real ;
+   double img ;
+};
+typedef struct COMPLEX Complex;
 /*@ type t;
  */
 /*@ logic t create(int x) ;
@@ -60,6 +69,21 @@ void h(void)
 /*@ logic 𝔹 boolean_from_int(int b) = b ≢ 0;
  */
 /*@ logic 𝔹 boolean_from_Bool(_Bool b) = b ≢ 0;
+ */
+/*@ axiomatic B {
+      logic ℤ value{L}(Integer *p) = p->integer;
+      
+      }
+ */
+/*@
+axiomatic CPX {
+  type complex = Complex;
+  
+  logic double re{L}(Complex *p) = p->real;
+  
+  logic complex with_re(complex c, double re) = {c \with .real = re};
+  
+  }
 
 */
 

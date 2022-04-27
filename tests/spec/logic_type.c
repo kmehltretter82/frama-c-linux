@@ -34,3 +34,16 @@ void h(void) {
 //@ logic boolean boolean_from_integer(integer b) = (boolean) b;
 //@ logic boolean boolean_from_int(int b) = (boolean) b;
 //@ logic boolean boolean_from_Bool(_Bool b) = (boolean) b;
+
+typedef struct INTEGER { int integer; } Integer ;
+/*@ axiomatic B {
+  logic integer value{L}(Integer *p) = p->integer;
+} */
+
+typedef struct COMPLEX { double real,img; } Complex ;
+/*@ axiomatic CPX {
+  type complex = Complex;
+  logic double re{L}(complex *p) = p->real;
+  logic complex with_re(complex c, double re) = { c \with .real = re };
+} */
+
