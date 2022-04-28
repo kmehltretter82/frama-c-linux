@@ -34,10 +34,12 @@ DEPENDENCIES= $(FRAMAC_MODERN) $(GENERATED) frama-c-book.cls
 
 all: developer.pdf check
 
+FC_BINDIR:=$(FRAMAC_ROOT_SRCDIR)/bin
+
 # local plugin.cmi (if any) is in conflict with the one of Frama-C
 check: $(GENERATED)
 	$(ECHO) Checking compilation of example scripts
-	../../bin/frama-c \
+	$(FC_BINDIR)/frama-c \
 		-load-script ./examples/syntactic_check \
 		-load-script ./examples/callstack \
 		-load-script ./examples/use_callstack \
@@ -51,16 +53,16 @@ check: $(GENERATED)
            exit 1; \
         fi
 	for i in value value_gui_options visitor ; \
-	do ../../bin/frama-c -load-script ./tutorial/viewcfg/generated/$$i/cfg_print.ml ; \
+	do $(FC_BINDIR)/frama-c -load-script ./tutorial/viewcfg/generated/$$i/cfg_print.ml ; \
 	done
 	for i in with_options with_log with_registration ; \
-	do ../../bin/frama-c -load-script ./tutorial/hello/generated/$$i/hello_world.ml ; \
+	do $(FC_BINDIR)/frama-c -load-script ./tutorial/hello/generated/$$i/hello_world.ml ; \
 	done
 	$(ECHO) compilation ok
-	$(MAKE) PATH=../../bin:$$PATH -C tutorial/hello/generated/with_test
-	$(MAKE) PATH=../../bin:$$PATH -C tutorial/hello/generated/makefile_multiple
-	$(MAKE) PATH=../../bin:$$PATH -C tutorial/hello/generated/makefile_single
-	$(MAKE) PATH=../../bin:$$PATH -C tutorial/viewcfg/generated/split
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) -C tutorial/hello/generated/with_test
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) -C tutorial/hello/generated/makefile_multiple
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) -C tutorial/hello/generated/makefile_single
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) -C tutorial/viewcfg/generated/split
 
 check-all: developer.pdf 
 	$(MAKE) -C ../.. check-devguide
