@@ -36,8 +36,14 @@ all: developer.pdf check
 
 FC_BINDIR:=$(FRAMAC_ROOT_SRCDIR)/bin
 
+.PHONY: clean-tuto
+clean-tuto:
+	$(RM) ../../lib/plugins/META.frama-c-hello ../../lib/plugins/META.frama-c-viewcfg
+	$(RM) ../../lib/plugins/top/Hello.* ../../lib/plugins/top/Viewcfg.*
+
 # local plugin.cmi (if any) is in conflict with the one of Frama-C
 check: $(GENERATED)
+	$(MAKE) clean-tuto
 	$(ECHO) Checking compilation of example scripts
 	$(FC_BINDIR)/frama-c \
 		-load-script ./examples/syntactic_check \
@@ -59,10 +65,15 @@ check: $(GENERATED)
 	do $(FC_BINDIR)/frama-c -load-script ./tutorial/hello/generated/$$i/hello_world.ml ; \
 	done
 	$(ECHO) compilation ok
-	PATH=$(FC_BINDIR):$$PATH; $(MAKE) -C tutorial/hello/generated/with_test
-	PATH=$(FC_BINDIR):$$PATH; $(MAKE) -C tutorial/hello/generated/makefile_multiple
-	PATH=$(FC_BINDIR):$$PATH; $(MAKE) -C tutorial/hello/generated/makefile_single
-	PATH=$(FC_BINDIR):$$PATH; $(MAKE) -C tutorial/viewcfg/generated/split
+	$(MAKE) clean-tuto
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/hello/generated/with_test byte opt tests
+	$(MAKE) clean-tuto
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/hello/generated/makefile_multiple opt
+	$(MAKE) clean-tuto
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/hello/generated/makefile_single opt
+	$(MAKE) clean-tuto
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/viewcfg/generated/split opt
+	$(MAKE) clean-tuto
 
 check-all: developer.pdf 
 	$(MAKE) -C ../.. check-devguide
