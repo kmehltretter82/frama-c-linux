@@ -526,7 +526,7 @@ function createSecondaryWindow(
   _event: Electron.Event,
   chromiumArgv: string[],
   wdir: string,
-) {
+): void {
   const argStart = "--second-instance=";
   let argString = chromiumArgv.find(a => a.startsWith(argStart));
   if (argString) {

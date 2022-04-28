@@ -217,7 +217,7 @@ export const Control = (): JSX.Element => {
       />
     </Toolbars.ButtonGroup>
   );
-}
+};
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -370,7 +370,7 @@ const RenderConsole = (): JSX.Element => {
       />
     </>
   );
-}
+};
 
 Ivette.registerComponent({
   id: 'frama-c.console',
@@ -451,7 +451,7 @@ export const Status = (): JSX.Element => {
       <Toolbars.Separator />
     </>
   );
-}
+};
 
 // --------------------------------------------------------------------------
 // --- Server Stats
@@ -461,6 +461,6 @@ export const Stats = (): (null | JSX.Element) => {
   Server.useStatus();
   const pending = Server.getPending();
   return pending > 0 ? <Code>{pending} rq.</Code> : null;
-}
+};
 
 // --------------------------------------------------------------------------

@@ -372,7 +372,7 @@ const customItemCallbacks = new Map<string, callback>();
 
    @param label - the menu title (shall be unique)
  */
-export function addMenu(label: string) {
+export function addMenu(label: string): void {
   ipcRenderer.send('dome.ipc.menu.addmenu', label);
 }
 
@@ -417,7 +417,7 @@ export interface MenuItemProps {
    windows would be ignored. It is also possible to call this function from the
    main process.
  */
-export function addMenuItem(props: MenuItemProps) {
+export function addMenuItem(props: MenuItemProps): void {
   if (!props.id && props.type !== 'separator') {
     // eslint-disable-next-line no-console
     console.error('[Dome] Missing menu-item identifier', props);

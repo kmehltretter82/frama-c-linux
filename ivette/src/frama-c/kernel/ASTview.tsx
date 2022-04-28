@@ -26,9 +26,6 @@
 
 import React from 'react';
 import _ from 'lodash';
-import * as Server from 'frama-c/server';
-import * as States from 'frama-c/states';
-import * as RichText from 'frama-c/richtext';
 
 import * as Dome from 'dome';
 import * as Settings from 'dome/data/settings';
@@ -40,7 +37,7 @@ import * as Preferences from 'ivette/prefs';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import * as Utils from 'frama-c/utils';
+import * as RichText from 'frama-c/richtext';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Properties from 'frama-c/kernel/api/properties';
 import { getCallers, getDeadCode } from 'frama-c/plugins/eva/api/general';
@@ -245,13 +242,13 @@ export default function ASTview(): JSX.Element {
     if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
 
-  function onHover(markerId?: string) {
+  function onHover(markerId?: string): void {
     const marker = Ast.jMarker(markerId);
     const fct = selection?.current?.fct;
     States.setHovered(marker ? { fct, marker } : undefined);
   }
 
-  function onSelection(markerId: string, meta = false) {
+  function onSelection(markerId: string, meta = false): void {
     const fct = selection?.current?.fct;
     const location = { fct, marker: Ast.jMarker(markerId) };
     updateSelection({ location });

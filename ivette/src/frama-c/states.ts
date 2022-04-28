@@ -773,12 +773,12 @@ export const GlobalSelection = new GlobalState<Selection>(emptySelection);
 
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
-export function setHovered(h: Hovered) { GlobalHovered.setValue(h); }
+export function setHovered(h: Hovered): void { GlobalHovered.setValue(h); }
 export function useHovered(): [Hovered, (h: Hovered) => void] {
   return useGlobalState(GlobalHovered);
 }
 
-export function setSelection(location: Location, meta = false) {
+export function setSelection(location: Location, meta = false): void {
   const s = GlobalSelection.getValue();
   GlobalSelection.setValue(reducer(s, { location }));
   if (meta) MetaSelection.emit(location);
@@ -789,7 +789,7 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [current, setCurrent] = useGlobalState(GlobalSelection);
   const callback = React.useCallback((action) => {
     setCurrent(reducer(current, action));
-  }, [ current, setCurrent ]);
+  }, [current, setCurrent]);
   return [current, callback];
 }
 

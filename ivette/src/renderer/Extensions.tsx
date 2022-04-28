@@ -56,7 +56,7 @@ export class ElementRack {
   private rank = 1;
   private readonly items = new Map<string, ElementProps>();
 
-  register(elt: ElementProps) {
+  register(elt: ElementProps): void {
     if (elt.rank === undefined) elt.rank = this.rank;
     this.rank++;
     this.items.set(elt.id, elt);
