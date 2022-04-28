@@ -2450,7 +2450,10 @@ following.
   value analysis would not be consistent anymore with the current entry point,
   leading to incorrect results.
 \begin{example}
-\sscodeidx{Db}{Value}{is\_computed}
+\scodeidx{Analysis}{is\_computed}
+\sscodeidx{Eva}{Analysis}{is\_computed}
+\scodeidx{Analysis}{compute}
+\sscodeidx{Eva}{Analysis}{compute}
 ~
 
 \begin{ocamlcode}
@@ -4019,8 +4022,9 @@ Similarly, in a loop annotation, \verb|loop kw e1, ..., en;| will be treated as 
 \verb|kw| extension. In case the loop annotation has a \verb|loop variant|, the extension must 
 occur before. Otherwise, there is no ordering constraint with other loop annotations clauses.
 
-Global extensions can appear either alone in a global annotation, or as part of an axiomatic with
-a set of other global annotations.
+Global extensions can either be a standalone global annotation, or a whole block
+of global extensions, the latter case following the syntax of
+\texttt{axiomatic} blocks.
 
 Finally, a code annotation extension must appear as a single code annotation, like any code annotation.
 
@@ -4058,6 +4062,8 @@ registered by one of the following functions, depending on its category.
 \scodeidx{Acsl\_extension}{register\_behavior}
 \item \texttt{Acsl\_extension.register\_global}%
 \scodeidx{Acsl\_extension}{register\_global}
+\item \texttt{Acsl\_extension.register\_global\_block}%
+\scodeidx{Acsl\_extension}{register\_global\_block}
 \item \texttt{Acsl\_extension.register\_code\_annot}%
 \scodeidx{Acsl\_extension}{register\_code\_annot}
 \item \texttt{Acsl\_extension.register\_code\_annot\_next\_stmt}%
