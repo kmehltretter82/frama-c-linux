@@ -537,21 +537,23 @@ export function spawn(
   return new Promise((result, reject) => {
 
     const cwd = options ? options.cwd : undefined;
-    const env = options && options.env ? ({ ...process.env, ...options.env }) : undefined;
+    const opt = options ? options.env : undefined;
+    const env =
+      (cwd || opt) ? { ...process.env, ...opt, 'PWD': cwd } : undefined;
     const stdin = stdSpec(options && options.stdin, false);
     const stdout = stdSpec(options && options.stdout, true);
     const stderr = stdSpec(options && options.stderr, true);
     const stdio = [stdin.io, stdout.io, stderr.io];
-    const opt: Exec.ForkOptions = { cwd, env, stdio };
-    const fork = options && options.fork;
+    const fopt: Exec.ForkOptions = { cwd, env, stdio };
+    const forked = options && options.fork;
     const cargs = args ? args.slice() : [];
     let child: Exec.ChildProcess | undefined;
 
-    if (fork) {
+    if (forked) {
       stdio.push('ipc');
-      child = Exec.fork(command, cargs, opt);
+      child = Exec.fork(command, cargs, fopt);
     } else {
-      child = Exec.spawn(command, cargs, opt);
+      child = Exec.spawn(command, cargs, fopt);
     }
 
     if (!child) reject(new Error(
