@@ -29,13 +29,14 @@ import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import * as Preferences from 'ivette/prefs';
-
 import * as Toolbars from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
 import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
+import { resolve } from 'dome/system';
+
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 
@@ -84,12 +85,12 @@ function buildServerConfig(argv: string[], cwd?: string): Server.Configuration {
       case '--working':
       case '--cwd': // Deprecated
         k += 1;
-        working = unquote(argv[k]);
+        working = resolve(unquote(argv[k]));
         break;
       case '-B':
       case '--command':
         k += 1;
-        command = unquote(argv[k]);
+        command = resolve(unquote(argv[k]));
         break;
       case '-U':
       case '--socket':

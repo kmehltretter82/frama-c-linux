@@ -86,8 +86,9 @@ following command line options:
 
 ```
 ivette [ivette options] [frama-c command line]
-  --working <dir> change the working directory used by ivette & frama-c
-  --command <bin> set the frama-c server to be launched
+  -R|--reload re-run the last command from history (other options are discarded)
+  -C|--working <dir> change the working directory used by ivette & frama-c
+  -B|--command <bin> set the frama-c server to be launched
   --socket <socket> set the Linux socket name to be used for the frama-c server
 ```
 
