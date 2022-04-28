@@ -11,19 +11,34 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let replace_space_by_dot s = Str.global_replace (Str.regexp " ") "." s
+let repair_word s = Str.global_replace (Str.regexp_string "\\") "" s
 
-let repair_word s = 
-  let rec repair_word_aux st = 
-    try let d1 = String.index st '$'
-	in 
-	try let d2 = String.index_from st d1 '$'
-	    in (Str.string_before st d1)^
-	    (repair_word_aux (Str.string_after st (d2+1)))
-	with Not_found -> st
-    with Not_found -> st
+let index_entry = Str.regexp {|^\\indexentry{\(.*\)}{[0-9]*}|}
+
+let index_subentry = Str.regexp {|^.*@\texttt *{\([A-Za-z0-9_]+\)}$|}
+
+let all_caps = Str.regexp "^[A-Z0-9_]+$"
+
+let inspect_subentry l =
+  let check_one_entry e =
+    let e = repair_word e in
+    if Str.string_match index_subentry e 0 then begin
+      let word = Str.matched_group 1 e in
+      if Str.string_match all_caps word 0 then raise Exit else word
+    end else raise Exit
   in
-  Str.global_replace (Str.regexp "\\") "" (repair_word_aux s)
+  try
+    let l = List.map check_one_entry l in
+    (String.concat "." l)  ^ "\n"
+  with Exit -> ""
+
+let inspect_entry line =
+  if Str.string_match index_entry line 0 then begin
+    let content = Str.matched_group 1 line in
+    match Str.split (Str.regexp_string "|") content with
+    | [ entry; _ ] -> inspect_subentry (Str.split (Str.regexp_string "!") entry)
+    | _ -> ""
+  end else ""
 
 let external_names = [ "Landmarks"; "Makefile" ]
 
@@ -88,14 +103,14 @@ let run_oracle t1 t2 =
       then h ^ "\n" ^ (string_of_info_list q)
       else (string_of_info_list q)
   in
-  let wo_tbl t k d = 
+  let wo_tbl t k _d = 
     try let element_info = Hashtbl.find t k
 	in
 	to_fill := 
 	  !to_fill ^ "\n" ^ k ^ "/" ^ (string_of_list element_info)
     with Not_found -> ()
   in
-  let w_tbl t k d = 
+  let w_tbl t k _d = 
     let tbl: (string,string list) Hashtbl.t = Hashtbl.create 197
     in
     fill_tbl tbl "run.oracle";
@@ -165,15 +180,13 @@ let () =
     let chan_out = open_out ( "index_file") in
     try
       let chan_in = open_in ( "main.idx") in
-      let lexbuf = Lexing.from_channel chan_in in
-      let temp =
-        repair_word (Check_index_grammar.main Check_index_lexer.token lexbuf)
-      in
-      let lexbuf_2 =Lexing.from_string temp in
-      let result =
-        Check_index_grammar.main Check_index_lexer.token_2 lexbuf_2
-      in
-      output_string chan_out (replace_space_by_dot result);
+      try
+        while true do
+          let line = input_line chan_in in
+          let res = inspect_entry line in
+          output_string chan_out res;
+        done
+      with End_of_file -> ();
       close_out chan_out ; close_in chan_in;
       fill_tbl code_hstbl "code_file";
       fill_tbl index_hstbl "index_file";
