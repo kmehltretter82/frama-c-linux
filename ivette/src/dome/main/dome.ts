@@ -494,11 +494,17 @@ let appCount = 1;
 
 function createSecondaryWindow(
   _event: Electron.Event,
-  electronArgv: string[],
+  chromiumArgv: string[],
   wdir: string,
 ) {
-  const argv = stripElectronArgv(electronArgv);
-  createBrowserWindow({ title: `${appName} #${++appCount}` }, argv, wdir);
+  const argStart = "--second-instance=";
+  let argString = chromiumArgv.find(a => a.startsWith(argStart));
+  if (argString) {
+    argString = argString.substring(argStart.length);
+    const electronArgv = JSON.parse(argString);
+    const argv = stripElectronArgv(electronArgv);
+    createBrowserWindow({ title: `${appName} #${++appCount}` }, argv, wdir);
+  }
 }
 
 function createDesktopWindow() {
@@ -581,6 +587,11 @@ ipcMain.on('dome.app.paths', (event) => {
 
 /** Starts the main process. */
 export function start() {
+
+  // Workaround to recover the original commandline of a second instance
+  // after chromium messes with the argument order.
+  // See https://github.com/electron/electron/issues/20322 for more details.
+  app.commandLine.appendSwitch("second-instance", JSON.stringify(process.argv));
 
   // Ensures second instance triggers the main one
   if (!app.requestSingleInstanceLock()) app.quit();

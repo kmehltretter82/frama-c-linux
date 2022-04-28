@@ -65,24 +65,31 @@ to launch the Ivette application. The Ivette application itself is installed:
 # Developer Setup
 
 Ivette can be compiled and used with different modes:
+
 - `make dev` builds and start the development version with live-code-editing enabled. It uses
   local binaries of Electron framework. This is _not_ a full packaged
   application.
+
 - `make app` pre-builds the production application. It is not _yet_ packaged and still
   uses the local Electron binaries.
-- `make dist` packages the pre-built application into a new application for the host
-  operating system.
 
-The development and production applications can be launched from the command line
-with `Frama-C/ivette/bin/frama-c-gui` binary.
-The generated `frama-c-gui` script will use the local `Frama-C/bin/frama-c` binary by default,
-although you can change the default settings by using the following options:
+- `make dist` packages the pre-built application into a new application for the host
+  operating system, see Installation section above.
+
+The development and production applications can be launched from the command
+line with `Frama-C/ivette/bin/ivette` wrapper. The generated `ivette` script
+will use the local `Frama-C/bin/frama-c` binary by default, although you can
+change this behaviour by using `ivette` command-line options.
+
+The `ivette` application and its installed or local wrappers accept the
+following command line options:
 
 ```
-frama-c-gui [ivette options] [frama-c command line]
-  --cwd <dir> change the working directory used by ivette & frama-c
-  --command <bin> set the frama-c server to be launched
-  --socket <socket> set the IPC socket name to be used for the frama-c server
+ivette [ivette options] [frama-c command line]
+  -R|--reload re-run the last command from history (other options are discarded)
+  -C|--working <dir> change the working directory used by ivette & frama-c
+  -B|--command <bin> set the frama-c server to be launched
+  --socket <socket> set the Linux socket name to be used for the frama-c server
 ```
 
 See also the [CONTRIBUTING] guide for editor configuration if you want to hack in Ivette
