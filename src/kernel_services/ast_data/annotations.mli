@@ -297,13 +297,13 @@ val add_check:
   Emitter.t -> ?kf:kernel_function -> stmt -> predicate -> unit
 (** Add a checking assertion attached to the given statement. If [kf] is
     provided, the function runs faster.
-    @plugin development guide *)
+*)
 
 val add_admit:
   Emitter.t -> ?kf:kernel_function -> stmt -> predicate -> unit
 (** Add an hypothesis assertion attached to the given statement. If [kf] is
     provided, the function runs faster.
-    @plugin development guide *)
+*)
 
 val add_global: Emitter.t -> global_annotation -> unit
 (** Add a new global annotation into the program. *)
