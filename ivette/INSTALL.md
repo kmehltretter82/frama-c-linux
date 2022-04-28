@@ -40,9 +40,11 @@ You shall have configured `frama-c` before installing Ivette. Notice that, by
 default, the installed `ivette` command will look for an installed `frama-c`
 command to run the server.
 
-From the (configured) `Frama-C` main directory, simply type:
+From the `Frama-C` main directory, simply type:
 
 ```
+$ autoconf -f
+$ ./configure
 $ make -C ivette dist
 $ [sudo] make -C ivette install
 ```
