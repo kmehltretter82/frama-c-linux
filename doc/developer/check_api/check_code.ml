@@ -241,8 +241,6 @@ module Generator (G : Odoc_html.Html_generator) = struct
         last_type <- last_type ^ "}"
 
     method html_of_type b t =
-      last_name <- t.Type.ty_name;
-      last_type <- "";
       Odoc_info.reset_type_names ();
       let father = Name.father t.Type.ty_name in
       self#html_of_type_expr_param_list_1 b father t;
@@ -250,8 +248,8 @@ module Generator (G : Odoc_html.Html_generator) = struct
       | Type.Type_abstract -> ()
       | Type.Type_variant l ->
         let print_one constr =
-          last_type <- last_type ^ " | " ^ constr.Type.vc_name ;
-          last_name <- t.Type.ty_name;
+          last_type <- "";
+          last_name <- t.Type.ty_name ^ "." ^  constr.Type.vc_name;
           (match constr.Type.vc_args with
           | Odoc_type.Cstr_tuple [] -> ()
           | Odoc_type.Cstr_tuple l ->
@@ -264,6 +262,8 @@ module Generator (G : Odoc_html.Html_generator) = struct
         print_concat b "\n" print_one l;
       | Type.Type_record l -> self#print_record b father l
       | _ -> ());
+      last_name <- t.Type.ty_name;
+      last_type <- "";
       self#html_of_info b t.Type.ty_info;
 
     method html_of_attribute b a =
