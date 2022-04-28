@@ -538,7 +538,7 @@ export function spawn(
 
     const cwd = options ? options.cwd : undefined;
     const opt = options ? options.env : undefined;
-    const env =
+    const env = // Forces 'PWD' env. variable for executing a non-shell process
       (cwd || opt) ? { ...process.env, ...opt, 'PWD': cwd } : undefined;
     const stdin = stdSpec(options && options.stdin, false);
     const stdout = stdSpec(options && options.stdout, true);
