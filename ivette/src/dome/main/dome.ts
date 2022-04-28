@@ -631,7 +631,7 @@ export function start() {
 // --------------------------------------------------------------------------
 
 /**
-    Define a custom main window menu.
+   Define a custom main window menu.
 */
 export function addMenu(label: string) {
   Menubar.addMenu(label);
