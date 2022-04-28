@@ -104,6 +104,7 @@ generated/makefile_multiple: generated/src/help_msg.ml \
 
 generated/with_test: generated/src/run_call_print_bug.ml \
                      generated/src/tests/hello/hello_test.c \
+                     generated/src/tests/hello/oracle/hello_test.res.oracle \
                      generated/src/Makefile.test
 	mkdir -p $@
 	cp generated/makefile_multiple/hello_options.ml $@/hello_options.ml
@@ -112,8 +113,9 @@ generated/with_test: generated/src/run_call_print_bug.ml \
 	cp generated/src/run_call_print_bug.ml $@/hello_run_bug.ml
 	echo "" >> $@/hello_run_bug.ml
 	cat generated/src/extend_run.ml >> $@/hello_run_bug.ml
-	mkdir -p $@/tests/hello
+	mkdir -p $@/tests/hello/oracle
 	cp generated/src/tests/hello/hello_test.c $@/tests/hello/hello_test.c
+	cp generated/src/tests/hello/oracle/hello_test.res.oracle $@/tests/hello/oracle/hello_test.res.oracle
 	cp generated/src/Makefile.test $@/Makefile
 
 generated/with_doc: generated/src/help_msg.ml \
