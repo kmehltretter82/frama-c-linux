@@ -368,7 +368,6 @@ Ivette.registerView({
   id: 'console',
   rank: -1,
   label: 'Console',
-  defaultView: true,
   layout: 'frama-c.console',
 });
 

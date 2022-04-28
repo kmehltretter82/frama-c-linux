@@ -656,10 +656,10 @@ Ivette.registerComponent({
 Ivette.registerView({
   id: 'dive',
   label: 'Dive Dataflow',
-  rank: 2,
+  rank: 5,
   layout: [
-    ['frama-c.astview', 'frama-c.plugins.dive', 'frama-c.locations'],
-    ['frama-c.properties', 'frama-c.console'],
+    ['frama-c.astview', 'frama-c.plugins.dive'],
+    ['frama-c.properties', 'frama-c.locations'],
   ],
 });
 
