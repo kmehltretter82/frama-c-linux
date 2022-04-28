@@ -277,7 +277,7 @@ const helpMenuItems: MenuSpec = [
   {
     label: 'Learn More',
     click() {
-      shell.openExternal('http://electron.atom.io');
+      shell.openExternal('https://frama-c.com/');
     },
   },
 ];
