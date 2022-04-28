@@ -256,7 +256,7 @@ struct
 
   let pick (m : t) =
     match Map.choose_opt m with
-    | None -> Kernel.fatal "The disjunction should never be empty"
+    | None -> assert false (* the disjunction should never be empty *)
     | Some (k,s) -> k,s,Map.remove k m
 
   let pretty fmt (m : t) =

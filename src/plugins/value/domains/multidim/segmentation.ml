@@ -292,7 +292,7 @@ struct
     match Int_val.min_int (to_int_val ~oracle b) with
     | Some l -> `Value l
     | None ->
-      Kernel.warning ~current:true "cannot retrieve a lower bound for %a"
+      Self.warning ~current:true "cannot retrieve a lower bound for %a"
         pretty b;
       `Top
 
@@ -300,7 +300,7 @@ struct
     match Int_val.max_int (to_int_val ~oracle b) with
     | Some u -> `Value u
     | None ->
-      Kernel.warning ~current:true "cannot retrieve an upper bound for %a"
+      Self.warning ~current:true "cannot retrieve an upper bound for %a"
         pretty b;
       `Top
 
@@ -870,7 +870,7 @@ struct
       | `Value m -> m
       | `Bottom -> assert false
       | `Top ->
-        Kernel.warning ~current:true
+        Self.warning ~current:true
           "failed to introduce %a inside the array segmentation"
           Bound.pretty b;
         m
