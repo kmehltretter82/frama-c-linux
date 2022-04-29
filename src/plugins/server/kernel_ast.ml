@@ -478,7 +478,8 @@ let () = Request.register ~package
       try
         if not libc then Kernel.PrintLibc.set true ;
         let global = Kernel_function.get_global kf in
-        let ast = Jbuffer.to_json Printer.pp_global global in
+        let pp_glb = Printer.(with_unfold_precond (fun _ -> true) pp_global) in
+        let ast = Jbuffer.to_json pp_glb global in
         if not libc then Kernel.PrintLibc.set false ; ast
       with err ->
         if not libc then Kernel.PrintLibc.set false ; raise err
