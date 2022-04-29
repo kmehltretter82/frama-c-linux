@@ -113,6 +113,25 @@ function buildServerCommand(cmd: string): Server.Configuration {
   return buildServerConfig(cmd.trim().split(/[ \t\n]+/));
 }
 
+/* -------------------------------------------------------------------------- */
+/* --- History Management                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+const historySetting = 'Controller.history';
+const historyDecoder = Json.jList(Json.jString);
+
+function getHistory(): string[] {
+  return Settings.getLocalStorage(historySetting, historyDecoder, []);
+}
+
+function setHistory(hs: string[]): void {
+  Settings.setLocalStorage(historySetting, hs);
+}
+
+function useHistory(): [string[], ((hs: string[]) => void)] {
+  return Settings.useLocalStorage(historySetting, historyDecoder, []);
+}
+
 function insertConfig(hs: string[], cfg: Server.Configuration): string[] {
   const cmd = dumpServerConfig(cfg).trim();
   const newhs =
@@ -129,23 +148,23 @@ function insertConfig(hs: string[], cfg: Server.Configuration): string[] {
 
 let reloadCommand: string | undefined;
 
-function lastCommand(): string {
-  const [lastCmd] = Settings.getLocalStorage(
-    'Controller.history', Json.jList(Json.jString), [],
-  );
-  return lastCmd;
-}
-
-Dome.reload.on(() => { reloadCommand = lastCommand(); });
+Dome.reload.on(() => {
+  const [lastCmd] = getHistory();
+  reloadCommand = lastCmd;
+});
 
 Dome.onCommand((argv: string[], cwd: string) => {
   let cfg;
   if (reloadCommand) {
     cfg = buildServerCommand(reloadCommand);
-  } else if (argv.find((v) => v === '--reload' || v === '-R')) {
-    cfg = buildServerCommand(lastCommand());
   } else {
-    cfg = buildServerConfig(argv, cwd);
+    const hs = getHistory();
+    if (argv.find((v) => v === '--reload' || v === '-R')) {
+      cfg = buildServerCommand(hs[0]);
+    } else {
+      cfg = buildServerConfig(argv, cwd);
+      setHistory(insertConfig(hs, cfg));
+    }
   }
   Server.setConfig(cfg);
   Server.start();
@@ -211,9 +230,7 @@ const RenderConsole = (): JSX.Element => {
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
   const [noTrash, setNoTrash] = React.useState(true);
-  const [history, setHistory] = Settings.useLocalStorage(
-    'Controller.history', Json.jList(Json.jString), [],
-  );
+  const [history, setHistory] = useHistory();
 
   React.useEffect(() => {
     const callback = (): void => {
