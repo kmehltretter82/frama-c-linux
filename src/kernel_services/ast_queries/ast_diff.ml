@@ -1227,9 +1227,8 @@ and logic_vars_env l l' env =
 and find_candidate_logic_var ?loc:_loc lv env =
   let candidates = Logic_env.find_all_logic_functions lv.lv_name in
   match List.find_opt (fun li -> li.l_profile = []) candidates with
-  | None -> Format.printf "No such var@."; None
+  | None -> None
   | Some li ->
-    Format.printf "Found something@.";
     if is_same_logic_var lv li.l_var_info env then
       Some li.l_var_info
     else None
