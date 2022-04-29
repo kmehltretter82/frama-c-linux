@@ -1614,11 +1614,11 @@ struct
   let rec fold_and acc = function
     | [] -> List.sort List.compare_lengths acc
     | x::others ->
-      match x.repr with
-      | False -> raise Absorbant
-      | True -> fold_and acc others
-      | And xs -> fold_and (xs::acc) others
-      | _ -> fold_and ([x]::acc) others
+        match x.repr with
+        | False -> raise Absorbant
+        | True -> fold_and acc others
+        | And xs -> fold_and (xs::acc) others
+        | _ -> fold_and ([x]::acc) others
 
   let rec many_merge_uniq cmp =
     let rec insert_by_length l = function
@@ -1630,17 +1630,17 @@ struct
       match l1, l2 with
       | [], l | l, [] -> l
       | h1::t1, h2::t2 ->
-        let c = cmp h1 h2 in
-        if c = 0 then h1::(merge_uniq cmp t1 t2)
-        else if c < 0 then h1::(merge_uniq cmp t1 l2)
-        else h2::(merge_uniq cmp l1 t2)
+          let c = cmp h1 h2 in
+          if c = 0 then h1::(merge_uniq cmp t1 t2)
+          else if c < 0 then h1::(merge_uniq cmp t1 l2)
+          else h2::(merge_uniq cmp l1 t2)
     in
     function
     | [] -> []
     | [l] -> l
     | l1::l2::ll ->
-      let l = merge_uniq cmp l1 l2 in
-      many_merge_uniq cmp (insert_by_length l ll)
+        let l = merge_uniq cmp l1 l2 in
+        many_merge_uniq cmp (insert_by_length l ll)
 
   let rec fold_or acc xs =
     match xs with
