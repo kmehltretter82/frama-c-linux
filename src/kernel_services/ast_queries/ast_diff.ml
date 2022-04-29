@@ -1294,11 +1294,7 @@ and find_candidate_model_info ?loc:_loc mi env =
   let find_one mi' =
     is_same_type mi.mi_base_type mi'.mi_base_type env
   in
-  let rec aux = function
-    | [] -> None
-    | mi' :: tl -> if find_one mi' then Some mi' else aux tl
-  in
-  aux candidates
+  List.find_opt find_one candidates
 
 and typeinfo_correspondance ?loc ti env =
   let add ti =
