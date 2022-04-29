@@ -2162,13 +2162,20 @@ struct
 
   (* Alpha-convert free-variables in xs with the top-most bound variables *)
   (* Only activate flag subset if lc.vars is a subset of xs *)
-  let lc_close_xs ?(subset = false) xs (lc : lc_term) : lc_term =
+  let lc_close_xs ?(subset = false) ?(reversed = false) xs (lc : lc_term) : lc_term =
     let mu = cache () in
-    let i = ref (Bvars.order lc.bind) in
-    List.rev xs |> List.iter (fun x ->
-        set mu (e_var x) (c_bvar !i (tau_of_var x));
-        i := !i +1
-      );
+    begin
+      if reversed then
+        let n = Bvars.order lc.bind in
+        List.iteri (fun i x ->
+            set mu (e_var x) (c_bvar (n+i) (tau_of_var x))
+          ) xs
+      else
+        let n = Bvars.order lc.bind + List.length xs -1 in
+        List.iteri (fun i x ->
+            set mu (e_var x) (c_bvar (n-i) (tau_of_var x))
+          ) xs
+    end;
     (* if Vars.subset lc.vars xs then*)
     if subset then
       let rec walk mu lc =
@@ -2315,8 +2322,8 @@ struct
         | Lambda, _ -> true
         | Forall, x | Exists, x -> Vars.mem x e.vars
       ) qxs in
-    let xs = List.rev_map (fun (_q, x) -> x) qxs in
-    let e = lc_close_xs xs e in
+    let rxs = List.map (fun (_q, x) -> x) qxs in
+    let e = lc_close_xs ~reversed:true rxs e in
     List.fold_right (fun (q, x) e -> c_bind q (tau_of_var x) e) qxs e
 
   let rec subst sigma alpha e =
@@ -2547,13 +2554,14 @@ struct
     in (* let_intro_case have to be called sequentially because of cases like
           '\forall x y, 42 = x + y -> P' where we detect two let-in variables in parralel
           but we can only simplify one in practice.*)
-    let e, xs = List.fold_left (fun (e, xs') x ->
+    let e, xs = List.fold_right (fun x (e, xs') ->
         match let_intro_case q x e with
         | None -> e, x::xs'
         | Some v -> e_subst_var x v e, xs'
-      ) (e, []) (List.rev xs) in
-    let e = lc_close_xs xs e in
-    List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e (List.rev xs)
+      ) xs (e, []) in
+    let rxs = List.rev xs in
+    let e = lc_close_xs ~reversed:true rxs e in
+    List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e rxs
 
   let e_forall = bind_xs Forall
   let e_exists = bind_xs Exists
@@ -2565,9 +2573,9 @@ struct
         | None -> e
         | Some v -> e_subst_var x v e
       ) e.vars e in
-    let xs = List.sort POOL.compare (Vars.elements e.vars) in
-    let e = lc_close_xs ~subset:true xs e in
-    List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e (List.rev xs)
+    let rxs = List.sort (fun x y -> -(POOL.compare x y)) (Vars.elements e.vars) in
+    let e = lc_close_xs ~subset:true ~reversed:true rxs e in
+    List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e rxs
 
   let e_close_forall = bind_all Forall
   let e_close_exists = bind_all Exists
