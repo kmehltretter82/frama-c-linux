@@ -1611,15 +1611,36 @@ struct
     | False -> Logic.Yes
     | _ -> Logic.Maybe
 
-  let rec fold_and acc xs =
-    match xs with
-    | [] -> acc
+  let rec fold_and acc = function
+    | [] -> List.sort List.compare_lengths acc
     | x::others ->
       match x.repr with
-      | False  -> raise Absorbant
-      | True   -> fold_and acc others
-      | And xs -> fold_and (fold_and acc xs) others
-      | _      -> fold_and (x::acc) others
+      | False -> raise Absorbant
+      | True -> fold_and acc others
+      | And xs -> fold_and (xs::acc) others
+      | _ -> fold_and ([x]::acc) others
+
+  let rec many_merge_uniq cmp =
+    let rec insert_by_length l = function
+      | [] -> [l]
+      | l'::ll when List.compare_lengths l l' <= 0 -> l::l'::ll
+      | l'::ll -> l' :: (insert_by_length l ll)
+    in
+    let rec merge_uniq cmp l1 l2 =
+      match l1, l2 with
+      | [], l | l, [] -> l
+      | h1::t1, h2::t2 ->
+        let c = cmp h1 h2 in
+        if c = 0 then h1::(merge_uniq cmp t1 t2)
+        else if c < 0 then h1::(merge_uniq cmp t1 l2)
+        else h2::(merge_uniq cmp l1 t2)
+    in
+    function
+    | [] -> []
+    | [l] -> l
+    | l1::l2::ll ->
+      let l = merge_uniq cmp l1 l2 in
+      many_merge_uniq cmp (insert_by_length l ll)
 
   let rec fold_or acc xs =
     match xs with
@@ -1633,8 +1654,8 @@ struct
 
   let conjunction ts =
     try
-      let ms = fold_and [] ts in
-      let ms = List.sort_uniq compare_raising_absorbant ms in
+      let mss = fold_and [] ts in
+      let ms = many_merge_uniq compare_raising_absorbant mss in
       c_and ms
     with Absorbant -> e_false
 
@@ -1985,8 +2006,8 @@ struct
     | True -> e_true
     | _ ->
       try
-        let hs = fold_and [] hs in
-        let hs = List.sort_uniq compare_raising_absorbant hs in
+        let hss = fold_and [] hs in
+        let hs = many_merge_uniq compare_raising_absorbant hss in
         match hs with
         | []  -> p
         | [a] -> imply1 a p
