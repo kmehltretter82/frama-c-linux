@@ -471,6 +471,10 @@ module Ikind = struct
   type t = [%import: Cil_types.ikind] [@@deriving eq]
 end
 
+module Fkind = struct
+  type t = [%import: Cil_types.fkind] [@@deriving eq]
+end
+
 module Predicate_kind = struct
   type t = [%import: Cil_types.predicate_kind] [@@deriving eq]
 end
@@ -889,8 +893,13 @@ and is_same_model_info mi mi' env =
 
 and is_same_type t t' env =
   match t, t' with
-  | (TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _), _ ->
-    Cil_datatype.TypByName.equal t t'
+  | TVoid a, TVoid a' -> Cil_datatype.Attributes.equal a a'
+  | TInt (ik,a), TInt(ik',a') ->
+    Ikind.equal ik ik' && Cil_datatype.Attributes.equal a a'
+  | TFloat (fk,a), TFloat(fk', a') ->
+    Fkind.equal fk fk' && Cil_datatype.Attributes.equal a a'
+  | TBuiltin_va_list a, TBuiltin_va_list a' ->
+    Cil_datatype.Attributes.equal a a'
   | TPtr(t,a), TPtr(t',a') ->
     is_same_type t t' env && Cil_datatype.Attributes.equal a a'
   | TArray(t,s,a), TArray(t',s',a') ->
@@ -920,7 +929,8 @@ and is_same_type t t' env =
      | `Not_present -> false
      | `Same e'' -> Cil_datatype.Enuminfo.equal e' e'') &&
     Cil_datatype.Attributes.equal a a'
-  | (TPtr _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _), _ -> false
+  | (TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _ | TPtr _ | TArray _
+    | TFun _ | TNamed _ | TComp _ | TEnum _), _ -> false
 
 and is_same_compinfo ci ci' env =
   ci.cstruct = ci'.cstruct &&
