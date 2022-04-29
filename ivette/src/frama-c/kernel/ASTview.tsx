@@ -315,10 +315,7 @@ export default function ASTview(): JSX.Element {
   const unfoldAll = (): void => buffer.forEach(CodeMirror.commands.unfoldAll);
 
   const defaultFold = React.useCallback((): void => {
-    buffer.forEach((cm) => {
-      CodeMirror.commands.foldAll(cm);
-      cm.foldCode(0, undefined, 'unfold');
-    });
+    buffer.forEach((cm) => { CodeMirror.commands.unfoldAll(cm); });
   }, [buffer]);
 
   React.useEffect(() => {
