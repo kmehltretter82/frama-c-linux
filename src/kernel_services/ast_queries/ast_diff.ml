@@ -314,7 +314,7 @@ let add_statics l l' =
   let add_one v v' = Varinfo.add v (`Same v') in
   List.iter2 add_one l l'
 
-let add_logic_prms p p' env =
+let add_logic_vars p p' env =
   let add_one env lv lv' =
     { env with
       logic_local_vars =
@@ -542,13 +542,13 @@ and is_same_predicate_node p p' env =
   | Plet(v,p), Plet(v',p') ->
     if is_same_logic_info v v' env then begin
       let env = add_logic_info v v' env in
-      let env = add_logic_prms [v.l_var_info] [v'.l_var_info] env in
+      let env = add_logic_vars [v.l_var_info] [v'.l_var_info] env in
       is_same_predicate p p' env
     end else false
   | Pforall(q,p), Pforall(q',p')
   | Pexists(q,p), Pexists(q',p') ->
     if is_same_list is_same_logic_var q q' env then begin
-      let env = add_logic_prms q q' env in
+      let env = add_logic_vars q q' env in
       is_same_predicate p p' env
     end else false
   | Pat(p,l), Pat(p',l') ->
@@ -608,7 +608,7 @@ and is_same_term_node t t' env =
     is_same_list is_same_term args args' env
   | Tlambda(q,t), Tlambda(q',t') ->
     if is_same_list is_same_logic_var q q' env then begin
-      let env = add_logic_prms q q' env in
+      let env = add_logic_vars q q' env in
       is_same_term t t' env
     end else false
   | TDataCons(c,args), TDataCons(c',args') ->
@@ -638,7 +638,7 @@ and is_same_term_node t t' env =
   | Tinter l, Tinter l' -> is_same_list is_same_term l l' env
   | Tcomprehension(t,q,p), Tcomprehension(t',q',p') ->
     if is_same_list is_same_logic_var q q' env then begin
-      let env = add_logic_prms q q' env in
+      let env = add_logic_vars q q' env in
       is_same_term t t' env && is_same_opt is_same_predicate p p' env
     end else false
   | Trange(l,u), Trange(l',u') ->
@@ -646,7 +646,7 @@ and is_same_term_node t t' env =
   | Tlet(v,t), Tlet(v',t') ->
     if is_same_logic_info v v' env then begin
       let env = add_logic_info v v' env in
-      let env = add_logic_prms [v.l_var_info] [v'.l_var_info] env in
+      let env = add_logic_vars [v.l_var_info] [v'.l_var_info] env in
       is_same_term t t' env
     end else false
   | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
@@ -1265,7 +1265,7 @@ and is_same_logic_var lv lv' env =
 
 and logic_vars_env l l' env =
   if is_same_list is_same_logic_var l l' env then
-    true, add_logic_prms l l' env
+    true, add_logic_vars l l' env
   else
     false, env
 
@@ -1459,7 +1459,7 @@ and logic_info_correspondance ?loc li env =
     match find_candidate_logic_info ?loc li env with
     | None -> `Not_present
     | Some li' ->
-      let env = add_logic_prms li.l_profile li'.l_profile env in
+      let env = add_logic_vars li.l_profile li'.l_profile env in
       let env =
         { env with
           logic_info=Cil_datatype.Logic_info.Map.add li li' env.logic_info }
