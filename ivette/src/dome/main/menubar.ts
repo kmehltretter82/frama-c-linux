@@ -273,12 +273,15 @@ const windowMenuItemsMacos: MenuSpec = windowMenuItemsLinux.concat([
 // --- Help Menu Items
 // --------------------------------------------------------------------------
 
+let learnMoreLink = '';
+ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {
+  if (typeof link === 'string') learnMoreLink = link;
+});
+
 const helpMenuItems: MenuSpec = [
   {
     label: 'Learn More',
-    click() {
-      shell.openExternal('https://frama-c.com/');
-    },
+    click() { shell.openExternal(learnMoreLink); },
   },
 ];
 
