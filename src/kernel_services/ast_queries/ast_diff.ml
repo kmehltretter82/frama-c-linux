@@ -210,6 +210,11 @@ type is_same_env =
     logic_type_info: logic_type_info Cil_datatype.Logic_type_info.Map.t;
     logic_local_vars: logic_var Cil_datatype.Logic_var.Map.t;
     logic_type_vars: string Datatype.String.Map.t;
+    (* goto targets pairs are checked afterwards, so that forward gotos
+       do not interrupt the linear visit.
+       We thus collect them in the environment.
+    *)
+    goto_targets: (stmt * stmt) list;
   }
 
 module type Correspondance_table = sig
@@ -294,6 +299,7 @@ let empty_env =
     logic_type_info = Cil_datatype.Logic_type_info.Map.empty;
     logic_local_vars = Cil_datatype.Logic_var.Map.empty;
     logic_type_vars = Datatype.String.Map.empty;
+    goto_targets = []
   }
 
 let add_locals f f' env =
@@ -390,6 +396,12 @@ let is_same_opt f o o' env =
   | Some v, Some v' -> f v v' env
   | _ -> false
 
+let is_same_opt_env f o o' env =
+  match o, o' with
+  | None, None -> true, env
+  | Some v, Some v' -> f v v' env
+  | _ -> false, env
+
 let is_same_pair f1 f2 (x1,x2) (y1,y2) env = f1 x1 y1 env && f2 x2 y2 env
 
 let rec is_same_list f l l' env =
@@ -409,6 +421,22 @@ let get_original_kf vi =
       [Kernel_function.self; Annotations.funspec_state; Globals.Functions.self]
   in
   Project.on ~selection (Orig_project.get()) Globals.Functions.get vi
+
+let check_goto_targets env =
+  let check_one (s,s') =
+    match Stmt.find s with
+    | `Not_present -> false
+    | `Same s'' | `Partial (s'',_) ->
+      (* From the goto point of view, what matters is that the targets
+         themselves have a correspondance. If they're e.g. calls to a
+         function that has itself changed, or blocks whose content has
+         changed, it has already been detected when comparing the targets,
+         and will be dealt with accordingly as the fundec level. *)
+      Cil_datatype.Stmt.equal s' s''
+    | exception Not_found -> false
+  in
+  if List.for_all check_one env.goto_targets then `Same_body, env
+  else `Body_changed, env
 
 let is_matching_fieldinfo fi fi' =
   match Fieldinfo.find fi with
@@ -1014,12 +1042,19 @@ and is_same_extended_asm a a' env =
   and is_same_in (_,c,e) (_,c',e') env =
     Datatype.String.equal c c' && is_same_exp e e' env
   in
-  is_same_list is_same_out a.asm_outputs a'.asm_outputs env &&
-  is_same_list is_same_in a.asm_inputs a'.asm_inputs env &&
-  is_same_list
-    (fun s1 s2 _ -> Datatype.String.equal s1 s2)
-    a.asm_clobbers a'.asm_clobbers env
-(* we don't check goto targets, as explained below for goto statements. *)
+  let res =
+    is_same_list is_same_out a.asm_outputs a'.asm_outputs env &&
+    is_same_list is_same_in a.asm_inputs a'.asm_inputs env &&
+    is_same_list
+      (fun s1 s2 _ -> Datatype.String.equal s1 s2)
+      a.asm_clobbers a'.asm_clobbers env
+    &&
+    List.length a.asm_gotos = List.length a'.asm_gotos
+  in
+  let bind s s' env =
+    (true, { env with goto_targets = (!s,!s') :: env.goto_targets})
+  in
+  (res, env) &&& is_same_list_env bind a.asm_gotos a'.asm_gotos
 
 and is_same_instr i i' env: body_correspondance*is_same_env =
   match i, i' with
@@ -1051,12 +1086,12 @@ and is_same_instr i i' env: body_correspondance*is_same_env =
       res, env
     end else `Body_changed, env
   | Asm(a,c,e,_), Asm(a',c',e',_) ->
-    if Cil_datatype.Attributes.equal a a' &&
-       is_same_list (fun s1 s2 _ -> Datatype.String.equal s1 s2) c c' env &&
-       is_same_opt is_same_extended_asm e e' env
-    then
-      `Same_body, env
-    else `Body_changed, env
+    let res =
+      Cil_datatype.Attributes.equal a a' &&
+      is_same_list (fun s1 s2 _ -> Datatype.String.equal s1 s2) c c' env
+    in
+    let (res,env) = (res,env) &&& is_same_opt_env is_same_extended_asm e e' in
+    if res then `Same_body, env else `Body_changed, env
   | Skip _, Skip _ -> `Same_body, env
   | Code_annot _, Code_annot _ ->
     (* should not be present in normalized AST *)
@@ -1087,7 +1122,8 @@ and is_same_stmt s s' env =
         | Return (r,_), Return(r', _) ->
           if is_same_opt is_same_exp r r' env then `Same_body, env
           else `Body_changed, env
-        | Goto (_s,_), Goto(_s',_) -> `Same_body, env
+        | Goto (s,_), Goto(s',_) ->
+          `Same_body, { env with goto_targets = (!s,!s') :: env.goto_targets }
         | Break _, Break _ -> `Same_body, env
         | Continue _, Continue _ -> `Same_body, env
         | If(e,b1,b2,_), If(e',b1',b2',_) ->
@@ -1185,7 +1221,10 @@ and is_same_binder b b' env =
    and formals mapping to have been put in the local env
 *)
 and is_same_fundec f f' env: body_correspondance =
-  let res, env = is_same_block f.sbody f'.sbody env in
+  let res, env =
+    is_same_block f.sbody f'.sbody env &&>
+    check_goto_targets
+  in
   (* Since we add the locals only if the body is the same,
      we have explored all nodes, and added all locals bindings.
      Otherwise, is_same_block would have returned `Body_changed.

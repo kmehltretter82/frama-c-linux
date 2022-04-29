@@ -80,3 +80,17 @@ extern struct s s;
 enum e;
 
 struct s* use_s() { enum e* x; return &s; }
+
+void with_goto_changed(int c) {
+  if (c) goto L1;
+  X++;
+  L1: X++;
+  L2: X++;
+}
+
+void with_goto_unchanged(int c) {
+  if (c) goto L1;
+  X++;
+  L1: X++;
+  L2: X++;
+}
