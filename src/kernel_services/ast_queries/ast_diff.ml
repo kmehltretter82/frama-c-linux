@@ -465,9 +465,7 @@ let is_same_behavior_set l l' =
 let are_same_cd_clauses l l' =
   let module StringSetSet = Set.Make(Datatype.String.Set) in
   let of_list l =
-    List.fold_left
-      (fun acc l -> StringSetSet.add (Datatype.String.Set.of_list l) acc)
-      StringSetSet.empty l
+    StringSetSet.of_list (List.map Datatype.String.Set.of_list l)
   in
   StringSetSet.equal (of_list l) (of_list l')
 
@@ -722,10 +720,8 @@ and is_same_variant (v,m) (v',m') env =
 
 and is_same_loop_pragma p p' env =
   match p, p' with
-  | Unroll_specs l, Unroll_specs l' ->
-    is_same_list is_same_term l l' env
-  | Widen_hints l, Widen_hints l' ->
-    is_same_list is_same_term l l' env
+  | Unroll_specs l, Unroll_specs l'
+  | Widen_hints l, Widen_hints l'
   | Widen_variables l, Widen_variables l' ->
     is_same_list is_same_term l l' env
   | (Unroll_specs _ | Widen_hints _ | Widen_variables _), _ -> false
