@@ -37,31 +37,33 @@ the efficiency of regex-based heuristics."""
 # of errors when running the filters. Note that an absent tool
 # does _not_ lead to an error.
 
-import external_tool
+from pathlib import Path
 import sys
 
+import external_tool
 
-def filter_with_scc(input_data):
+
+def filter_with_scc(input_data: str) -> str:
     scc_bin = "scc" if sys.platform != "win32" else "scc.exe"
     scc = external_tool.get_command(scc_bin, "SCC")
     if scc:
-        return external_tool.run_and_check([scc, "-k", "-b"], input_data)
+        return external_tool.run_and_check([str(scc), "-k", "-b"], input_data)
     else:
         return input_data
 
 
-def filter_with_astyle(input_data):
+def filter_with_astyle(input_data: str) -> str:
     astyle_bin = "astyle" if sys.platform != "win32" else "astyle.exe"
     astyle = external_tool.get_command(astyle_bin, "ASTYLE")
     if astyle:
         return external_tool.run_and_check(
-            [astyle, "--keep-one-line-blocks", "--keep-one-line-statements"], input_data
+            [str(astyle), "--keep-one-line-blocks", "--keep-one-line-statements"], input_data
         )
     else:
         return input_data
 
 
-def open_and_filter(filename, apply_filters):
+def open_and_filter(filename: Path, apply_filters: bool) -> str:
     # we ignore encoding errors and use ASCII to avoid issues when
     # opening files with different encodings (UTF-8, ISO-8859, etc)
     with open(filename, "r", encoding="ascii", errors="ignore") as f:

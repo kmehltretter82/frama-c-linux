@@ -35,6 +35,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import typing
 
 import build_callgraph
 import external_tool
@@ -86,30 +87,27 @@ fclog.init(debug, verbose)
 ### Auxiliary functions #######################################################
 
 
-def get_dir(path):
-    """Similar to dirname, but returns the path itself if it refers to a directory"""
-    if path.is_dir():
-        return path
-    else:
-        return path.parent
-
-
-def collect_files_and_local_dirs(paths):
+def collect_files_and_local_dirs(
+    paths: typing.Iterable[Path],
+) -> typing.Tuple[set[Path], set[Path]]:
     """Returns the list of directories (and their subdirectories) containing
     the specified paths. Note that this also includes subdirectories which do not
     themselves contain any .c files, but which may contain .h files."""
-    dirs = set()
-    files = set()
+    dirs: set[Path] = set()
+    files: set[Path] = set()
     for p in paths:
         if p.is_dir():
-            files = files.union(glob.glob(f"{p}/**/*.[chi]", recursive=True))
+            files = files.union([Path(p) for p in glob.glob(f"{p}/**/*.[chi]", recursive=True)])
             dirs.add(p)
         else:
             files.add(p)
             dirs.add(p.parent)
-    local_dirs = {s[0] for d in dirs for s in os.walk(d)}
+    local_dirs = {Path(s[0]) for d in dirs for s in os.walk(d)}
     if not files:
-        sys.exit("error: no source files (.c/.i) found in provided paths: " + " ".join(paths))
+        sys.exit(
+            "error: no source files (.c/.i) found in provided paths: "
+            + " ".join([str(p) for p in paths])
+        )
     return files, local_dirs
 
 
@@ -117,7 +115,9 @@ def extract_keys(l):
     return [list(key.keys())[0] for key in l]
 
 
-def get_framac_libc_function_statuses(framac, framac_share):
+def get_framac_libc_function_statuses(
+    framac: typing.Optional[Path], framac_share: Path
+) -> typing.Tuple[list[str], list[str]]:
     if framac:
         (_handler, metrics_tmpfile) = tempfile.mkstemp(prefix="fc_script_est_diff", suffix=".json")
         logging.debug("metrics_tmpfile: %s", metrics_tmpfile)
@@ -150,7 +150,7 @@ def get_framac_libc_function_statuses(framac, framac_share):
     return (defined, spec_only)
 
 
-def grep_includes_in_file(filename):
+def grep_includes_in_file(filename: Path):
     re_include = re.compile(r'\s*#\s*include\s*("|<)([^">]+)("|>)')
     file_content = source_filter.open_and_filter(filename, not under_test)
     i = 0
@@ -163,9 +163,9 @@ def grep_includes_in_file(filename):
             yield (i, kind, header)
 
 
-def get_includes(files):
-    quote_includes = {}
-    chevron_includes = {}
+def get_includes(files: typing.Iterable[Path]):
+    quote_includes: dict[Path, list[typing.Tuple[Path, int]]] = {}
+    chevron_includes: dict[Path, list[typing.Tuple[Path, int]]] = {}
     for filename in files:
         for line, kind, header in grep_includes_in_file(filename):
             if kind == "<":
@@ -180,30 +180,27 @@ def get_includes(files):
     return chevron_includes, quote_includes
 
 
-def is_local_header(local_dirs, header):
+def is_local_header(local_dirs: typing.Iterable[Path], header: Path):
     for d in local_dirs:
-        path = Path(d)
-        if Path(path / header).exists():
+        if (d / header).exists():
             return True
     return False
 
 
-def grep_keywords(keywords, filename):
+def grep_keywords(keywords: list[str], filename: Path) -> dict[str, int]:
     with open(filename, "r") as f:
-        found = {}
+        found: dict[str, int] = {}
         for line in f:
-            if any(x in line for x in keywords):
-                # found one or more keywords; count them
-                for kw in keywords:
-                    if kw in line:
-                        if kw in found:
-                            found[kw] += 1
-                        else:
-                            found[kw] = 1
+            for kw in keywords:
+                if kw in line:
+                    if kw in found:
+                        found[kw] += 1
+                    else:
+                        found[kw] = 1
         return found
 
 
-def pretty_keyword_count(found):
+def pretty_keyword_count(found: dict[str, int]) -> str:
     res = ""
     for kw, count in sorted(found.items()):
         if res:
@@ -248,7 +245,9 @@ if not no_cloc:
     cloc = external_tool.get_command("cloc", "CLOC")
     if cloc:
         data = external_tool.run_and_check(
-            [cloc, "--hide-rate", "--progress-rate=0", "--csv"] + list(files), ""
+            [str(cloc), "--hide-rate", "--progress-rate=0", "--csv"]
+            + list(str(f) for f in files),
+            "",
         )
         data = data.splitlines()
         [nfiles, _sum, nblank, ncomment, ncode] = data[-1].split(",")
@@ -279,7 +278,7 @@ with open(framac_share / "compliance" / "posix_identifiers.json", encoding="utf-
     posix_identifiers = all_data["data"]
     posix_headers = all_data["headers"]
 
-recursive_cycles = []
+recursive_cycles: list[typing.Tuple[typing.Tuple[str, int], list[typing.Tuple[str, str]]]] = []
 reported_recursive_pairs = set()
 build_callgraph.compute_recursive_cycles(cg, recursive_cycles)
 for (cycle_start_loc, cycle) in recursive_cycles:
@@ -305,8 +304,7 @@ for (cycle_start_loc, cycle) in recursive_cycles:
     )
     score["recursion"] += 1
 
-callees = [callee for (_, callee) in list(cg.edges.keys())]
-callees = set(callees)
+callees = set(callee for (_, callee) in list(cg.edges.keys()))
 used_headers = set()
 logging.info("Estimating difficulty for %d function calls...", len(callees))
 warnings = 0
@@ -439,10 +437,10 @@ c11_unsupported = [
 
 logging.info("Checking presence of unsupported C11 features...")
 
-for f in files:
-    found = grep_keywords(c11_unsupported, f)
+for fi in files:
+    found = grep_keywords(c11_unsupported, fi)
     if found:
-        logging.warning("unsupported keyword(s) in %s:%s", f, pretty_keyword_count(found))
+        logging.warning("unsupported keyword(s) in %s:%s", fi, pretty_keyword_count(found))
     score["keywords"] += len(found)
 
 # assembly code

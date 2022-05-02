@@ -29,46 +29,41 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import typing
 
 # warnings about missing commands are disabled during testing
 emit_warns = os.getenv("PTESTS_TESTING") is None
 
 # Cache for get_command
-cached_commands = {}
+cached_commands: dict[str, typing.Union[Path, None]] = {}
 
 
-def resource_path(relative_path):
+def resource_path(relative_path: str) -> str:
     """Get absolute path to resource; only used by the pyinstaller standalone distribution"""
     base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
 
-def get_command(command, env_var_name):
+def get_command(command: str, env_var_name: str) -> typing.Union[Path, None]:
     """Returns a Path to the command; priority goes to the environment variable,
     then in the PATH, then in the resource directory (for a pyinstaller binary)."""
     if command in cached_commands:
         return cached_commands[command]
-    p = os.getenv(env_var_name)
-    if p:
-        p = Path(p)
+    p = Path(os.getenv(env_var_name) or shutil.which(command) or resource_path(command))
+    if p.exists():
+        cached_commands[command] = p
+        return p
     else:
-        p = shutil.which(command)
-        if p:
-            p = Path(p)
-        else:
-            p = Path(resource_path(command))
-            if not p.exists():
-                if emit_warns:
-                    print(
-                        f"info: optional external command '{command}' not found in PATH;",
-                        f"consider installing it or setting environment variable {env_var_name}",
-                    )
-                p = None
-    cached_commands[command] = p
-    return p
+        if emit_warns:
+            print(
+                f"info: optional external command '{command}' not found in PATH;",
+                f"consider installing it or setting environment variable {env_var_name}",
+            )
+        cached_commands[command] = None
+        return None
 
 
-def run_and_check(command_and_args, input_data):
+def run_and_check(command_and_args: list[str], input_data: str):
     try:
         return subprocess.check_output(
             command_and_args,

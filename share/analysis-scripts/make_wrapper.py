@@ -31,6 +31,8 @@ import os
 import re
 import subprocess
 import sys
+import typing
+
 from functools import partial
 
 # Check if GNU make is available and has the minimal required version
@@ -78,12 +80,14 @@ framac_script = f"{framac_bin}/frama-c-script"
 output_lines = []
 cmd_list = [make_cmd, "-C", make_dir] + args
 with subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as proc:
+    if not proc.stdout:
+        sys.exit(f"error capturing stdout for cmd: {cmd_list}")
     while True:
-        line = proc.stdout.readline()
-        if line:
-            sys.stdout.buffer.write(line)
+        line_bytes = proc.stdout.readline()
+        if line_bytes:
+            sys.stdout.buffer.write(line_bytes)
             sys.stdout.flush()
-            output_lines.append(line.decode("utf-8"))
+            output_lines.append(line_bytes.decode("utf-8"))
         else:
             break
 
@@ -99,7 +103,7 @@ for line in lines:
     match = re_recursive_call_start.search(line)
     if match:
 
-        def _action():
+        def action_msg():
             print(
                 "Consider patching, stubbing or adding an ACSL "
                 + "specification to the recursive call, "
@@ -125,7 +129,7 @@ for line in lines:
                 # note: this ending line can also match re_missing_spec
                 tip = {
                     "message": "Found recursive call at:\n" + "".join(msg_lines),
-                    "action": _action,
+                    "action": action_msg,
                 }
                 tips.append(tip)
                 break
@@ -136,7 +140,7 @@ for line in lines:
     if match:
         fname = match.group(1)
 
-        def _action(fname):
+        def action_find_fun(fname):
             out = subprocess.Popen(
                 [framac_script, "find-fun", "-C", make_dir, fname],
                 stdout=subprocess.PIPE,
@@ -178,7 +182,7 @@ for line in lines:
             + fname
             + "\n"
             + "   Looking for files defining it...",
-            "action": partial(_action, fname),
+            "action": partial(action_find_fun, fname),
         }
         tips.append(tip)
 
@@ -193,6 +197,6 @@ if tips != []:
         if counter > 1:
             print("")
             print("*** recommendation #" + str(counter) + " ***")
-        print(str(counter) + ". " + tip["message"])
+        print(str(counter) + ". " + typing.cast(str, tip["message"]))
         counter += 1
-        tip["action"]()
+        typing.cast(typing.Callable, tip["action"])()

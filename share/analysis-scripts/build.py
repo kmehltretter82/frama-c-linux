@@ -34,6 +34,7 @@ import re
 import shutil
 import sys
 import subprocess
+import typing
 
 import function_finder
 import source_filter
@@ -112,21 +113,20 @@ dot_framac_dir = Path(".frama-c")
 
 # Check required environment variables and commands in the PATH ###############
 
-framac_bin = os.getenv("FRAMAC_BIN")
-if not framac_bin:
-    sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
-framac_bin = Path(framac_bin)
+framac_bin = Path(
+    os.getenv("FRAMAC_BIN")
+    or sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
+)
 
 under_test = os.getenv("PTESTS_TESTING")
 
 # Prepare blug-related variables and functions ################################
 
-blug = os.getenv("BLUG")
-if not blug:
-    blug = shutil.which("blug")
-    if not blug:
-        sys.exit("error: path to 'blug' binary must be in PATH or variable BLUG")
-blug = Path(blug)
+blug = Path(
+    os.getenv("BLUG")
+    or shutil.which("blug")
+    or sys.exit("error: path to 'blug' binary must be in PATH or variable BLUG")
+)
 blug_dir = blug.resolve().parent
 # to import blug_jbdb
 sys.path.insert(0, blug_dir.as_posix())
@@ -191,11 +191,13 @@ def make_target_name(target):
 
 # sources are pretty-printed relatively to the .frama-c directory, where the
 # GNUmakefile will reside
-def rel_prefix(path):
+def rel_prefix(path, max_rel_parents=1):
     """Return a relative path to the .frama-c directory if path is relative, or if the relativized
-    path will contain at most a single '..'. Otherwise, return an absolute path."""
+    path will contain at most max_rel_parents (in the form of '..').
+    Otherwise, return an absolute path."""
     rel = os.path.relpath(path, start=dot_framac_dir)
-    if rel.startswith("../.."):
+    max_parent_prefix = "../" * (max_rel_parents + 1)
+    if rel.startswith(max_parent_prefix):
         return os.path.abspath(path)
     else:
         return rel
@@ -346,7 +348,7 @@ if unknown_sources:
 # We also need to check if the main function uses a 'main(void)'-style
 # signature, to patch fc_stubs.c.
 
-main_definitions = {}
+main_definitions: dict[Path, list[typing.Tuple[Path, str, str]]] = {}
 for target, sources in sources_map.items():
     main_definitions[target] = []
     for source in sources:

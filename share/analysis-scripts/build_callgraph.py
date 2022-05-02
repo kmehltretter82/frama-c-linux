@@ -26,6 +26,7 @@ for a given function name, via heuristic syntactic matching."""
 
 import os
 import sys
+import typing
 
 import function_finder
 import source_filter
@@ -44,10 +45,10 @@ class Callgraph:
     """
 
     # maps each caller to the list of its callees
-    succs = {}
+    succs: dict[str, list[str]] = {}
 
     # maps (caller, callee) to the list of call locations
-    edges = {}
+    edges: dict[typing.Tuple[str, str], list[typing.Tuple[str, int]]] = {}
 
     def add_edge(self, caller, callee, loc):
         if (caller, callee) in self.edges:
