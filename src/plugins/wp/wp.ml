@@ -66,7 +66,7 @@ module VC = VC
 module Wpo = Wpo
 module ProverTask = ProverTask
 module Prover = Prover
-
+module AssignsCompleteness = AssignsCompleteness
 
 (** For gui *)
 module ProofEngine = ProofEngine
