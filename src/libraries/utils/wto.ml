@@ -314,11 +314,11 @@ module Make(N:sig
         (* Unmark all vertices in the loop, and, if pref is given, try to
            return a better head *)
         let rec reset_SCC best_head =
-          (** pop until vertex *)
+          (* pop until vertex *)
           let element = Stack.pop state.stack in
           DFN.remove state.dfn element;
           if not (N.equal element vertex) then begin
-            (** the strict is important because we are conservative *)
+            (* the strict is important because we are conservative *)
             let best_head =
               if pref best_head element < 0 then element else best_head
             in
