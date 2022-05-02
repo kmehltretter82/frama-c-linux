@@ -416,6 +416,12 @@ let rec is_same_list_env f l l' env =
   | h::t, h'::t' -> f h h' env &&& is_same_list_env f t t'
   | _ -> false, env
 
+let rec correspondance_list_env f l l' env =
+  match l, l' with
+  | [], [] -> `Same_body, env
+  | h::t, h'::t' -> f h h' env &&> correspondance_list_env f t t'
+  | _ -> `Body_changed, env
+
 let get_original_kf vi =
   let selection = State_selection.of_list
       [Kernel_function.self; Annotations.funspec_state; Globals.Functions.self]
@@ -1141,9 +1147,14 @@ and is_same_stmt s s' env =
             is_same_block b1 b1' env &&>
             is_same_block b2 b2'
           end else `Body_changed, env
-        | Switch(e,b,_,_), Switch(e',b',_,_) ->
+        | Switch(e,b,c,_), Switch(e',b',c',_) ->
+          let bind_goto_target case case' env =
+            `Same_body,
+            { env with goto_targets = (case,case')::env.goto_targets }
+          in
           if is_same_exp e e' env then begin
-            is_same_block b b' env
+            is_same_block b b' env &&>
+            correspondance_list_env bind_goto_target c c'
           end else `Body_changed, env
         | Loop(_,b,_,_,_), Loop(_,b',_,_,_) ->
           is_same_block b b' env
