@@ -131,8 +131,9 @@ let tactical_inside step unfolds sequent =
       in
       let p = condition step @@ Lang.p_subst subst p in
       let feedback =
-        Format.asprintf "Unfold '%a'"
-          (Pretty_utils.pp_list ~sep:", " Lang.Fun.pretty) !unfolded
+        let pp fmt f = Format.fprintf fmt "'%a'" Lang.Fun.pretty f in
+        Format.asprintf "Unfold %a"
+          (Pretty_utils.pp_list ~sep:", " pp) !unfolded
       in
       !unfolded, snd @@ Tactical.replace_single ~at:step.id (feedback, p) sequent
     | _ -> raise Not_found

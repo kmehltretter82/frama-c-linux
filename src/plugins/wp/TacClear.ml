@@ -82,8 +82,9 @@ let tactical_inside step remove =
         List.fold_left add Filteredset.empty remove
       in
       let feedback =
+        let pp fmt f = Format.fprintf fmt "'%a'" Filtered.pretty f in
         Format.asprintf "Filtered: %a"
-          (Pretty_utils.pp_list ~sep:", " Filtered.pretty) removed
+          (Pretty_utils.pp_list ~sep:", " pp) removed
       in
       let cond = condition step @@ Lang.F.p_bool @@ Lang.F.e_and kept in
       removed, Tactical.replace_single ~at:step.id (feedback, cond)
@@ -114,8 +115,9 @@ let fold_selection s seq =
   in
   let removed, seq = Smap.fold tactical m ([], seq) in
   let feedback =
+    let pp fmt f = Format.fprintf fmt "'%a'" Filtered.pretty f in
     Format.asprintf "Filtered: %a"
-      (Pretty_utils.pp_list ~sep:", " Filtered.pretty) removed
+      (Pretty_utils.pp_list ~sep:", " pp) removed
   in
   feedback, seq
 
