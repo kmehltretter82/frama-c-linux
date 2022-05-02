@@ -1105,7 +1105,7 @@ and is_same_instr i i' env: body_correspondance*is_same_env =
   | Skip _, Skip _ -> `Same_body, env
   | Code_annot _, Code_annot _ ->
     (* should not be present in normalized AST *)
-    `Same_body, env
+    Kernel.fatal "Unexpected Code_annot instruction in normalized AST"
   | _ -> `Body_changed, env
 
 and is_same_instr_list l l' env =
