@@ -1249,8 +1249,6 @@ and is_same_fundec f f' env: body_correspondance =
    | `Body_changed -> ());
   res
 
-(* only for locals and formals. Globals are treated by
-   gvar_correspondance below. *)
 and is_same_varinfo vi vi' env =
   is_same_type vi.vtype vi'.vtype env &&
   Cil_datatype.Attributes.equal vi.vattr vi'.vattr
@@ -1373,13 +1371,16 @@ and gvar_correspondance ?loc vi env =
       end
     | None -> `Not_present
     | Some vi' ->
-      let selection = State_selection.singleton Globals.Vars.self in
-      let init =
-        Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
-      in
-      let init' = Globals.Vars.find vi' in
-      let res = is_same_initinfo init init' empty_env in
-      if res then `Same vi' else `Not_present
+      if is_same_varinfo vi vi' env
+      then
+        let selection = State_selection.singleton Globals.Vars.self in
+        let init =
+          Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
+        in
+        let init' = Globals.Vars.find vi' in
+        let res = is_same_initinfo init init' empty_env in
+        if res then `Same vi' else `Not_present
+      else `Not_present
   in
   Varinfo.memo add vi
 
