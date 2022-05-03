@@ -336,6 +336,17 @@ else
   AC_MSG_RESULT(found $YOJSON)
 fi
 
+# ppx_import
+############
+
+AC_MSG_CHECKING(for ppx_import)
+PPX_IMPORT=$($OCAMLFIND query ppx_import -format %v)
+if test -z "$PPX_IMPORT"; then
+   AC_MSG_ERROR(Cannot find ppx_import via ocamlfind)
+else
+   AC_MSG_RESULT(found $PPX_IMPORT)
+fi
+
 #################################################
 # Check for other (optional) tools/libraries    #
 #################################################

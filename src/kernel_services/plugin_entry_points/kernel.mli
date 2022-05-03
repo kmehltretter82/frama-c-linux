@@ -334,6 +334,9 @@ module CodeOutput : sig
   val output: (Format.formatter -> unit) -> unit
 end
 
+(** Behavior of option "-ast-diff" *)
+module AstDiff: Parameter_sig.Bool
+
 (** Behavior of option "-add-symbolic-path"
     @since Neon-20140301
     @modify 23.0-Vanadium inversed argument order (now uses path:name) *)

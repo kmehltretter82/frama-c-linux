@@ -161,12 +161,22 @@ endif
 # Merlin #
 
 .PHONY:merlin
-.merlin merlin: share/Makefile.config Makefile.generating
+
+# hack to account for the fact that merlin and ocamlfind treat
+# differently dependencies between ppx rewriting.
+PPX_DEPENDENCIES=ppx_deriving.eq ppx_import
+
 #create Merlin file
+.merlin merlin: share/Makefile.config Makefile.generating
 	$(PRINT_MAKING) $@
 	echo "FLG -c $(FLAGS) $(FRAMAC_USER_MERLIN_FLAGS)" > .merlin
-	for PKG in $(LIBRARY_NAMES); do echo PKG $$PKG >> .merlin; done
-	for PKG in $(LIBRARY_NAMES_GUI); do echo PKG $$PKG >> .merlin; done
+	for PKG in $(filter-out $(PPX_DEPENDENCIES),$(LIBRARY_NAMES)); \
+          do echo PKG $$PKG >> .merlin; done
+	for PKG in $(filter-out $(PPX_DEPENDENCIES),$(LIBRARY_NAMES_GUI)); \
+	 do echo PKG $$PKG >> .merlin; done
+	for PKG in \
+         $(filter $(LIBRARY_NAMES) $(LIBRARY_NAMES_GUI),$(PPX_DEPENDENCIES)); \
+         do echo PKG $$PKG >> .merlin; done
 	for PKG in $(MERLIN_PACKAGES); do echo PKG $$PKG >> .merlin; done
 	echo "B lib/plugins" >> .merlin
 	echo "B lib/plugins/gui" >> .merlin
