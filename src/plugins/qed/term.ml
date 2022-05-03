@@ -2554,11 +2554,15 @@ struct
     in (* let_intro_case have to be called sequentially because of cases like
           '\forall x y, 42 = x + y -> P' where we detect two let-in variables in parralel
           but we can only simplify one in practice.*)
-    let e, xs = List.fold_right (fun x (e, xs') ->
-        match let_intro_case q x e with
-        | None -> e, x::xs'
-        | Some v -> e_subst_var x v e, xs'
-      ) xs (e, []) in
+    let rec aux e xs =
+      let e, xs, changed = List.fold_right (fun x (e, xs', b) ->
+          match let_intro_case q x e with
+          | None -> e, x::xs', b
+          | Some v -> e_subst_var x v e, xs', true
+        ) xs (e, [], false) in
+      if changed then aux e xs else e, xs
+    in
+    let e, xs = aux e xs in
     let rxs = List.rev xs in
     let e = lc_close_xs ~reversed:true rxs e in
     List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e rxs
@@ -2568,11 +2572,15 @@ struct
   let e_lambda = bind_xs Lambda
 
   let bind_all q e =
-    let e = Vars.fold (fun x e ->
-        match let_intro_case q x e with
-        | None -> e
-        | Some v -> e_subst_var x v e
-      ) e.vars e in
+    let rec aux e =
+      let e, changed = Vars.fold (fun x (e, b) ->
+          match let_intro_case q x e with
+          | None -> e, b
+          | Some v -> e_subst_var x v e, true
+        ) e.vars (e, false) in
+      if changed then aux e else e
+    in
+    let e = aux e in
     let rxs = List.sort (fun x y -> -(POOL.compare x y)) (Vars.elements e.vars) in
     let e = lc_close_xs ~subset:true ~reversed:true rxs e in
     List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e rxs
