@@ -416,12 +416,6 @@ let rec is_same_list_env f l l' env =
   | h::t, h'::t' -> f h h' env &&& is_same_list_env f t t'
   | _ -> false, env
 
-let rec correspondance_list_env f l l' env =
-  match l, l' with
-  | [], [] -> `Same_body, env
-  | h::t, h'::t' -> f h h' env &&> correspondance_list_env f t t'
-  | _ -> `Body_changed, env
-
 let get_original_kf vi =
   let selection = State_selection.of_list
       [Kernel_function.self; Annotations.funspec_state; Globals.Functions.self]
@@ -510,6 +504,11 @@ let are_same_cd_clauses l l' =
 let is_same_logic_label l l' _env =
   match l, l' with
   | StmtLabel s, StmtLabel s' ->
+    (* Contrarily to labels in goto statement, C labels in the logic can only
+       refer to previous statements thanks to ACSL typing rules. Hence, we can
+       directly check the Stmt table without resorting to deferred check by
+       updating env.goto_targets
+    *)
     (match Stmt.find !s with
      | `Not_present -> false
      | `Same s'' | `Partial(s'',_) ->
@@ -1072,18 +1071,6 @@ and is_same_extended_asm a a' env =
   in
   (res, env) &&& is_same_list_env bind a.asm_gotos a'.asm_gotos
 
-(* Only compare case labels of statements. *)
-and are_same_case_labels l l' env =
-  let l = List.filter Cil.is_case_label l in
-  let l' = List.filter Cil.is_case_label l' in
-  let is_same_case_label lbl lbl' env =
-    match lbl, lbl' with
-    | Default _, Default _ -> true
-    | Case (e, _), Case (e', _) -> is_same_exp e e' env
-    | _, _ -> false
-  in
-  is_same_list is_same_case_label l l' env
-
 and is_same_instr i i' env: body_correspondance*is_same_env =
   match i, i' with
   | Set(lv,e,_), Set(lv',e',_) ->
@@ -1133,6 +1120,27 @@ and is_same_instr_list l l' env =
   | i::tl, i'::tl' ->
     is_same_instr i i' env &&> is_same_instr_list tl tl'
 
+and same_switch_labels l l' env =
+  let is_switch_lab = function Label _ -> false | Case _ | Default _ -> true in
+  let l = List.filter is_switch_lab l in
+  let l' = List.filter is_switch_lab l' in
+  let is_same_label lab lab' =
+    match lab, lab' with
+    | (Label _ as l, _) |  (_, (Label _ as l)) ->
+      Kernel.fatal "Label %a should have been filtered beforehand"
+        Printer.pp_label l
+    | Case(e,_), Case(e', _) -> is_same_exp e e' env
+    | Default _, Default _ -> true
+    | (Case _ | Default _), _ -> false
+  in
+  let exist_same_label l lab = List.exists (is_same_label lab) l in
+  (* it is not sufficient to ensure that any case label present in the original
+     also exists in the new AST: we also must check that no new label was
+     introduced that would change the cfg for this case.
+  *)
+  List.for_all (exist_same_label l') l &&
+  List.for_all (exist_same_label l) l'
+
 and is_same_stmt s s' env =
   let selection =
     State_selection.with_codependencies Annotations.code_annot_state
@@ -1143,9 +1151,8 @@ and is_same_stmt s s' env =
   let annots' = Annotations.code_annot s' in
   let annot_res = is_same_list is_same_code_annotation annots annots' env in
   let code_res, env =
-    if s.ghost = s'.ghost
-    && Cil_datatype.Attributes.equal s.sattr s'.sattr
-    && are_same_case_labels s.labels s'.labels env
+    if s.ghost = s'.ghost && Cil_datatype.Attributes.equal s.sattr s'.sattr &&
+       same_switch_labels s.labels s'.labels env
     then
       begin
         match s.skind,s'.skind with
@@ -1162,14 +1169,9 @@ and is_same_stmt s s' env =
             is_same_block b1 b1' env &&>
             is_same_block b2 b2'
           end else `Body_changed, env
-        | Switch(e,b,c,_), Switch(e',b',c',_) ->
-          let bind_goto_target case case' env =
-            `Same_body,
-            { env with goto_targets = (case,case')::env.goto_targets }
-          in
+        | Switch(e,b,_,_), Switch(e',b',_,_) ->
           if is_same_exp e e' env then begin
-            is_same_block b b' env &&>
-            correspondance_list_env bind_goto_target c c'
+            is_same_block b b' env
           end else `Body_changed, env
         | Loop(_,b,_,_,_), Loop(_,b',_,_,_) ->
           is_same_block b b' env
