@@ -1389,7 +1389,7 @@ and gvar_correspondance ?loc vi env =
           Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
         in
         let init' = Globals.Vars.find vi' in
-        let res = is_same_initinfo init init' empty_env in
+        let res = is_same_initinfo init init' env in
         if res then `Same vi' else `Not_present
       else `Not_present
   in
