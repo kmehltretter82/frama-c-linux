@@ -1121,9 +1121,8 @@ and is_same_instr_list l l' env =
     is_same_instr i i' env &&> is_same_instr_list tl tl'
 
 and same_switch_labels l l' env =
-  let is_switch_lab = function Label _ -> false | Case _ | Default _ -> true in
-  let l = List.filter is_switch_lab l in
-  let l' = List.filter is_switch_lab l' in
+  let l = List.filter Cil.is_case_label l in
+  let l' = List.filter Cil.is_case_label l' in
   let is_same_label lab lab' =
     match lab, lab' with
     | (Label _ as l, _) |  (_, (Label _ as l)) ->
