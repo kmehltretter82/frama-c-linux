@@ -1482,7 +1482,6 @@ and logic_info_correspondance ?loc li env =
     match find_candidate_logic_info ?loc li env with
     | None -> `Not_present
     | Some li' ->
-      let env = add_logic_vars li.l_profile li'.l_profile env in
       let env =
         { env with
           logic_info=Cil_datatype.Logic_info.Map.add li li' env.logic_info }
