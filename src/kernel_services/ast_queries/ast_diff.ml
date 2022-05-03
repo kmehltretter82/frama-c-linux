@@ -1072,6 +1072,18 @@ and is_same_extended_asm a a' env =
   in
   (res, env) &&& is_same_list_env bind a.asm_gotos a'.asm_gotos
 
+(* Only compare case labels of statements. *)
+and are_same_case_labels l l' env =
+  let l = List.filter Cil.is_case_label l in
+  let l' = List.filter Cil.is_case_label l' in
+  let is_same_case_label lbl lbl' env =
+    match lbl, lbl' with
+    | Default _, Default _ -> true
+    | Case (e, _), Case (e', _) -> is_same_exp e e' env
+    | _, _ -> false
+  in
+  is_same_list is_same_case_label l l' env
+
 and is_same_instr i i' env: body_correspondance*is_same_env =
   match i, i' with
   | Set(lv,e,_), Set(lv',e',_) ->
@@ -1131,7 +1143,10 @@ and is_same_stmt s s' env =
   let annots' = Annotations.code_annot s' in
   let annot_res = is_same_list is_same_code_annotation annots annots' env in
   let code_res, env =
-    if s.ghost = s'.ghost && Cil_datatype.Attributes.equal s.sattr s'.sattr then
+    if s.ghost = s'.ghost
+    && Cil_datatype.Attributes.equal s.sattr s'.sattr
+    && are_same_case_labels s.labels s'.labels env
+    then
       begin
         match s.skind,s'.skind with
         | Instr i, Instr i' -> is_same_instr i i' env
