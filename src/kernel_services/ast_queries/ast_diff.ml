@@ -1431,8 +1431,7 @@ and gfun_correspondance ?loc vi env =
         in
         let res = make_correspondance kf' same_spec same_body in
         (match res with
-         | `Not_present ->
-           List.iter (fun v -> Varinfo.add v `Not_present) formals;
+         | `Not_present -> ()
          | `Same _ | `Partial _ -> formals_correspondance formals formals');
         res
       end else begin
