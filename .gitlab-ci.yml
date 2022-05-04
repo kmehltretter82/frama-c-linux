@@ -16,6 +16,13 @@ variables:
 ################################################################################
 ### BUILD
 
+# build-distrib-tarball:
+#   stage: build
+#   script:
+#     -
+#   tags:
+#     - nix
+
 check-no-old-frama-c:
   stage: build
   script:
@@ -37,6 +44,20 @@ frama-c:
   tags:
     - nix
 
+# ivette:
+#   stage: build
+#   image: node:lts-gallium
+#   cache:
+#     paths:
+#       - ivette/node_modules/
+#   script:
+#     - node --version
+#     - npm --version
+#     - yarn --version
+#     - make -C ivette
+#   tags:
+#     - docker
+
 lint:
   stage: build
   script:
@@ -44,13 +65,6 @@ lint:
   coverage: '/lint coverage: \d+\.\d+/'
   tags:
    - nix
-
-# build-distrib-tarball:
-#   stage: build
-#   script:
-#    -
-#   tags:
-#    - nix
 
 ################################################################################
 ### TESTS
@@ -61,6 +75,13 @@ acsl-importer:
     - ./nix/external-plugin-ci.sh ACSL-importer
   tags:
     - nix
+
+# build-from-distrib-tarball:
+#   stage: tests
+#   script:
+#     -
+#   tags:
+#     - nix
 
 caveat-importer:
   stage: tests
@@ -156,6 +177,47 @@ wp-tests:
 ################################################################################
 ### DISTRIB
 
+# api-doc:
+#   stage: tests
+#   script:
+#     -
+#   tags:
+#     - nix
+#   allow_failure: true
+
+.build_template: &frama-c-ocaml
+  stage: distrib_and_compatibility
+  script:
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
+  tags:
+    - nix
+
+# frama-c-ocaml-4.11:
+#   variables:
+#     OCAML: "4_11"
+#   <<: *frama-c-ocaml
+
+# frama-c-ocaml-4.13:
+#   variables:
+#     OCAML: "4_13"
+#   <<: *frama-c-ocaml
+
+.build_template: &internal_template
+  stage: distrib_and_compatibility
+  script:
+    - ./nix/internal-tests.sh
+  tags:
+    - nix
+
+internal:
+  <<: *internal_template
+  when: manual
+
+internal_nightly:
+  <<: *internal_template
+  only:
+    - schedules
+
 manuals: # TODO: restore doc companions
   stage: distrib_and_compatibility
   script:
@@ -179,73 +241,8 @@ manuals: # TODO: restore doc companions
       - result/user-manual.pdf
       - result/wp-manual.pdf
 
-.build_template: &frama-c-ocaml
-  stage: distrib_and_compatibility
-  script:
-   - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
-  tags:
-   - nix
-
-# frama-c-ocaml-4.11:
-#   variables:
-#     OCAML: "4_11"
-#   <<: *frama-c-ocaml
-
-# frama-c-ocaml-4.13:
-#   variables:
-#     OCAML: "4_13"
-#   <<: *frama-c-ocaml
-
 ################################################################################
 ### PUBLIC
-
-
-# build-from-distrib-tarball:
-#   stage: tests
-#   script:
-#    -
-#   tags:
-#    - nix
-
-# doc:
-#   stage: tests
-#   script:
-#    -
-#   tags:
-#    - nix
-#   allow_failure: true
-
-# .build_template: &internal_template
-#   stage: distrib_and_compatibility
-#   tags:
-#    - nix
-
-# internal:
-#   <<: *internal_template
-#   script:
-#    -
-#   when: manual
-
-# internal_nightly:
-#   <<: *internal_template
-#   script:
-#    -
-#   only:
-#   - schedules
-
-# ivette:
-#   stage: build
-#   image: node:lts-gallium
-#   cache:
-#     paths:
-#     - ivette/node_modules/
-#   script:
-#    - node --version
-#    - npm --version
-#    - yarn --version
-#    - make -C ivette
-#   tags:
-#     - docker
 
 # make_public stage is used to push the current master branch of Frama-C and
 # associated plugins from the internal frama-c group to the public pub group.

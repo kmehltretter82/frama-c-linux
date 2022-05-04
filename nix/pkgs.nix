@@ -22,6 +22,8 @@ let
     kernel-tests = oself.callPackage ./kernel-tests.nix {};
     plugins-tests = oself.callPackage ./plugins-tests.nix {};
     wp-tests = oself.callPackage ./wp-tests.nix {};
+    # Internal tests
+    internal-tests = oself.callPackage ./internal-tests.nix {};
     # Release
     manuals = oself.callPackage ./manuals.nix {};
   };
