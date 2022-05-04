@@ -204,7 +204,7 @@ def rel_prefix(path, max_rel_parents=1):
 
 
 def pretty_sources(sources):
-    return [f"  {rel_prefix(source)} \\" for source in sources]
+    return [f"  {rel_prefix(source)} \\" for source in sorted(sources)]
 
 
 def lines_of_file(path):
@@ -416,13 +416,13 @@ if jbdb_path:
         [f"  -json-compilation-database {rel_prefix(jbdb_path)} \\"],
     )
 
-targets_eva = [f"  {make_target_name(target)}.eva \\" for target in targets]
+targets_eva = [f"  {make_target_name(target)}.eva \\" for target in sorted(targets)]
 replace_line(template, "^TARGETS = main.eva", "TARGETS = \\")
 insert_lines_after(template, r"^TARGETS = \\", targets_eva)
 
 delete_line(template, r"^main.parse: \\")
 delete_line(template, r"^  main.c \\")
-for target, sources in reversed(sources_map.items()):
+for target, sources in reversed(sorted(sources_map.items())):
     pp_target = make_target_name(target)
     new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + [""]
     if any(d[2] for d in main_definitions[target]):
