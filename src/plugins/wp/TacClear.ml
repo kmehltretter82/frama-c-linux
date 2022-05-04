@@ -37,12 +37,33 @@ let tactical_step step =
     (* Note: the provided name is used in the GUi for the subgoal title *)
     ("Removed Step", Conditions.Have Lang.F.p_true)
 
-module TermLset = Qed.Listset.Make(Lang.F.QED.Term)
+module Filtered =
+struct
+  type t =
+    | Fun of Lang.Fun.t
+    | Other of Lang.F.term
 
-let pp_filtered fmt t =
-  match Lang.F.repr t with
-  | Qed.Logic.Fun(f,_) -> Format.fprintf fmt "%a(...)" Lang.Fun.pretty f
-  | _ -> Lang.F.pp_term fmt t
+  let of_term t =
+    match Lang.F.repr t with
+    | Qed.Logic.Fun(f, _) -> Fun f
+    | _ -> Other t
+
+  let pretty fmt = function
+    | Fun f -> Format.fprintf fmt "%a(...)" Lang.Fun.pretty f
+    | Other t -> Lang.F.pp_term fmt t
+
+  let compare a b =
+    match a, b with
+    | Fun a, Fun b -> Lang.Fun.compare a b
+    | Other a, Other b -> Lang.F.compare a b
+    | Fun _, _ -> 1
+    | _, Fun _ -> -1
+
+  let equal a b = 0 = compare a b
+end
+
+module TermLset = Qed.Listset.Make(Lang.F.QED.Term)
+module Filteredset = Qed.Listset.Make(Filtered)
 
 
 let tactical_inside step remove =
@@ -56,12 +77,17 @@ let tactical_inside step remove =
     | Type p | Have p | When p | Core p | Init p ->
       let ps = Lang.F.e_props @@ collect p in
       let kept = TermLset.diff ps remove in
+      let removed =
+        let add s e = Filteredset.add (Filtered.of_term e) s in
+        List.fold_left add Filteredset.empty remove
+      in
       let feedback =
+        let pp fmt f = Format.fprintf fmt "'%a'" Filtered.pretty f in
         Format.asprintf "Filtered: %a"
-          (Pretty_utils.pp_list ~sep:", " pp_filtered) remove
+          (Pretty_utils.pp_list ~sep:", " pp) removed
       in
       let cond = condition step @@ Lang.F.p_bool @@ Lang.F.e_and kept in
-      Tactical.replace_single ~at:step.id (feedback, cond)
+      removed, Tactical.replace_single ~at:step.id (feedback, cond)
 
     | _ -> raise Not_found
   end
@@ -83,8 +109,18 @@ let collect_remove m = function
 
 let fold_selection s seq =
   let m = List.fold_left collect_remove Smap.empty s in
-  "Filtered mutiple selection",
-  Smap.fold (fun s l seq -> snd @@ tactical_inside s l seq) m seq
+  let tactical s l (acc_rm, seq) =
+    let rm, op = tactical_inside s l in
+    Filteredset.union rm acc_rm, snd @@ op seq
+  in
+  let removed, seq = Smap.fold tactical m ([], seq) in
+  let feedback =
+    let pp fmt f = Format.fprintf fmt "'%a'" Filtered.pretty f in
+    Format.asprintf "Filtered: %a"
+      (Pretty_utils.pp_list ~sep:", " pp) removed
+  in
+  feedback, seq
+
 
 let process (f: sequent -> string * sequent) s = [ f s ]
 
@@ -101,7 +137,7 @@ class clear =
         Applicable(process @@ tactical_step step)
       | Inside(Step step, remove) ->
         begin
-          try Applicable(process @@ tactical_inside step [remove])
+          try Applicable(process @@ snd @@ tactical_inside step [remove])
           with Not_found -> Not_applicable
         end
       | Multi es ->
