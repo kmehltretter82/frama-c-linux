@@ -45,34 +45,41 @@ lint:
   tags:
    - nix
 
+# build-distrib-tarball:
+#   stage: build
+#   script:
+#    -
+#   tags:
+#    - nix
+
 ################################################################################
 ### TESTS
 
 acsl-importer:
   stage: tests
   script:
-    - ./ci.sh ACSL-importer
+    - ./nix/external-plugin-ci.sh ACSL-importer
   tags:
     - nix
 
 caveat-importer:
   stage: tests
   script:
-    - ./ci.sh Caveat-importer
+    - ./nix/external-plugin-ci.sh Caveat-importer
   tags:
     - nix
 
 cfp:
   stage: tests
   script:
-    - ./ci.sh context-from-precondition
+    - ./nix/external-plugin-ci.sh context-from-precondition
   tags:
     - nix
 
 genassigns:
   stage: tests
   script:
-    - ./ci.sh genassigns
+    - ./nix/external-plugin-ci.sh genassigns
   tags:
     - nix
 
@@ -100,14 +107,14 @@ kernel-tests:
 metacsl:
   stage: tests
   script:
-    - ./ci.sh meta
+    - ./nix/external-plugin-ci.sh meta
   tags:
     - nix
 
 mthread:
   stage: tests
   script:
-    - ./ci.sh mthread
+    - ./nix/external-plugin-ci.sh mthread
   tags:
     - nix
 
@@ -121,14 +128,14 @@ plugins-tests:
 security:
   stage: tests
   script:
-    - ./ci.sh security
+    - ./nix/external-plugin-ci.sh security
   tags:
     - nix
 
 volatile:
   stage: tests
   script:
-    - ./ci.sh Volatile
+    - ./nix/external-plugin-ci.sh Volatile
   tags:
     - nix
 
@@ -138,7 +145,6 @@ wp-tests:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.wp-tests
   tags:
     - nix
-
 
 ################################################################################
 ### DISTRIB
@@ -186,104 +192,18 @@ manuals: # TODO: restore doc companions
 ################################################################################
 ### PUBLIC
 
-# wp-qualif:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A frama-c.wp-qualif
-#   tags:
-#    - nix
-#   allow_failure: true
-
-# aorai-prove:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A frama-c.aorai-prove
-#   tags:
-#    - nix
-#   allow_failure: true
-
-# genassigns:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A genassigns.tests
-#   tags:
-#    - nix
-
-# frama-clang:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A frama-clang.tests
-#   tags:
-#    - nix
-
-# counter-examples:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A counter-examples.tests
-#   tags:
-#    - nix
-
-# acsl-importer:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A acsl-importer.tests
-#   tags:
-#    - nix
-
-# volatile:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A volatile.tests
-#   tags:
-#    - nix
-
-# metacsl:
-#   stage: tests
-#   script:
-#   - nix/frama-ci.sh build -A meta.tests
-#   tags:
-#   - nix
-
-# Security:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A security.tests
-#   tags:
-#    - nix
-
-# CFP:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A context-from-precondition.tests
-#   tags:
-#    - nix
-
-# eva-tests:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A frama-c.eva-tests
-#   tags:
-#    - nix
-#   allow_failure: true
-
-# build-distrib-tarball:
-#   stage: build
-#   script:
-#    - nix/frama-ci.sh build -A frama-c.build-distrib-tarball
-#   tags:
-#    - nix
 
 # build-from-distrib-tarball:
 #   stage: tests
 #   script:
-#    - nix/frama-ci.sh build -A frama-c.build-from-distrib-tarball
+#    -
 #   tags:
 #    - nix
 
 # doc:
 #   stage: tests
 #   script:
-#    - nix/frama-ci.sh build -A frama-c.doc
+#    -
 #   tags:
 #    - nix
 #   allow_failure: true
@@ -296,55 +216,15 @@ manuals: # TODO: restore doc companions
 # internal:
 #   <<: *internal_template
 #   script:
-#    - nix/frama-ci.sh build -A frama-c.internal
+#    -
 #   when: manual
 
 # internal_nightly:
 #   <<: *internal_template
 #   script:
-#    - nix/frama-ci.sh build -A frama-c.internal
+#    -
 #   only:
 #   - schedules
-
-# .build_template: &frama-c-ocaml
-#   stage: distrib_and_compatibility
-#   script:
-#    - nix/frama-ci.sh build -A frama-c.tests
-#   tags:
-#    - nix
-
-# frama-c-ocaml-4.13:
-#   variables:
-#     OCAML: "4_13"
-#   <<: *frama-c-ocaml
-
-# caveat-importer:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A caveat-importer.tests
-#   tags:
-#    - nix
-
-# mthread:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A mthread.tests
-#   tags:
-#    - nix
-
-# pathcrawler:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A pathcrawler.tests
-#   tags:
-#    - nix
-
-# e-acsl-tests-dev:
-#   stage: tests
-#   script:
-#    - nix/frama-ci.sh build -A frama-c.e-acsl-tests-dev
-#   tags:
-#    - nix
 
 # ivette:
 #   stage: build

@@ -34,7 +34,9 @@ get_matching_branch () {
   fi
 }
 
-curdir="$(dirname "$(readlink -f "$0")")"
+#         fc-dir     nix-dir
+curdir="$(dirname "$(dirname "$(readlink -f "$0")")")"
+
 git_current_branch="$(git branch --show-current)"
 : "${git_current_branch:=${CI_COMMIT_BRANCH:-}}"
 echo "currently on branch $git_current_branch"
