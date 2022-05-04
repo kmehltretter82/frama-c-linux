@@ -5,18 +5,15 @@ set -euxo pipefail
 if [[ $# != 1 ]];
 then
   cat <<EOF
-usage: $0 <plugin> | all
-  $0 all run CI on all plugins
-  $0 <plugin_name> run CI only on this plugins
+usage: OCAML=N_MM $0 <plugin>
+  $0 <plugin_name> run CI on this plugin
 EOF
   exit 2
 fi
 
-# all plugins to check
-all_plugins=(Volatile)
-if [[ "$1" = "all" ]];
-then plugins=("${all_plugins[@]}")
-else plugins=("$1")
+if [ -z ${OCAML+x} ]; then
+  echo "OCAML variable must be set to a version of OCaml"
+  exit 2
 fi
 
 DEFAULT=${DEFAULT:-master}
@@ -51,59 +48,55 @@ cleanup () {
 
 trap cleanup EXIT
 
-do_plugin () {
-  OPTS="--arg frama-c-repo $curdir"
+OPTS="--arg frama-c-repo $curdir"
 
-  plugin=$1
-  cd "$(mktemp -d)"
-  # the hash of the derivation depends on the directory name
-  mkdir "$plugin"
-  cd "$plugin"
-  plugin_repo="$(readlink -f .)"
-  plugin_url="git@git.frama-c.com:frama-c/$plugin.git"
+plugin=$1
 
-  plugin_branch="$(get_matching_branch "$plugin_url" "$git_current_branch")"
-  echo "using branch $plugin_branch of $plugin_url"
-  git clone --depth=1 --branch="$plugin_branch" "$plugin_url" .
+cd "$(mktemp -d)"
 
-  declare -A deps=( )
-  declare -A dirs=( )
+# the hash of the derivation depends on the directory name
+mkdir "$plugin"
+cd "$plugin"
+plugin_repo="$(readlink -f .)"
+plugin_url="git@git.frama-c.com:frama-c/$plugin.git"
 
-  if [[ -f "./nix/dependencies" ]]; then
-    while read -r var value; do
-      deps[$var]=$value
-    done < "./nix/dependencies"
+plugin_branch="$(get_matching_branch "$plugin_url" "$git_current_branch")"
+echo "using branch $plugin_branch of $plugin_url"
+git clone --depth=1 --branch="$plugin_branch" "$plugin_url" .
 
-    for repo in ${!deps[@]}; do
-      # the hash of the derivation depends on the directory name
-      mkdir "../$repo"
-      directory="$(readlink -f ../$repo)"
-      dirs[$repo]=$directory
+declare -A deps=( )
+declare -A dirs=( )
 
-      url=${deps[$repo]}
-      branch="$(get_matching_branch "$url" "$git_current_branch")"
-      echo "using branch $branch of $repo at $directory"
-      # clone
-      git clone --depth=1 --branch="$branch" "$url" "$directory"
+if [[ -f "./nix/dependencies" ]]; then
+  while read -r var value; do
+    deps[$var]=$value
+  done < "./nix/dependencies"
 
-      OPTS="$OPTS --arg $repo $directory"
-    done
-  fi
+  for repo in ${!deps[@]}; do
+    # the hash of the derivation depends on the directory name
+    mkdir "../$repo"
+    directory="$(readlink -f ../$repo)"
+    dirs[$repo]=$directory
 
-  # run the build
-  nix-build --no-out-link "./nix/pkgs.nix" $OPTS -A ocaml-ng.ocamlPackages_4_12."$plugin"
+    url=${deps[$repo]}
+    branch="$(get_matching_branch "$url" "$git_current_branch")"
+    echo "using branch $branch of $repo at $directory"
+    # clone
+    git clone --depth=1 --branch="$branch" "$url" "$directory"
 
-  cd "$curdir"
-
-  for repo in ${!dirs[@]}; do
-    if [[ -n ${dirs[$repo]} ]];
-    then rm -rf "${dirs[$repo]}"
-    fi
+    OPTS="$OPTS --arg $repo $directory"
   done
+fi
 
-  rm -rf "$plugin_repo"
-}
+# run the build
+nix-build --no-out-link "./nix/pkgs.nix" $OPTS -A ocaml-ng.ocamlPackages_$OCAML."$plugin"
 
-for plugin in "${plugins[@]}"; do
-  do_plugin $plugin
+cd "$curdir"
+
+for repo in ${!dirs[@]}; do
+  if [[ -n ${dirs[$repo]} ]];
+  then rm -rf "${dirs[$repo]}"
+  fi
 done
+
+rm -rf "$plugin_repo"
