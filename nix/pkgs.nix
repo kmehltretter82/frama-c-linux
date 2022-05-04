@@ -9,6 +9,8 @@ let
     ocp-indent = oself.callPackage ./ocp-indent.nix {};
     psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
     why3 = oself.callPackage ./why3.nix {};
+    # Helpers
+    mk_tests = oself.callPackage ./mk_tests.nix {};
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
     lint = oself.callPackage ./lint.nix {};

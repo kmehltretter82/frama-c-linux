@@ -1,44 +1,8 @@
-{ lib
-, stdenvNoCC
-, frama-c
-, alt-ergo
-, perl
-, time
-, which
-}:
+{ mk_tests } :
 
-stdenvNoCC.mkDerivation rec {
-  pname = "plugins-tests";
-  version = frama-c.version;
-  slang = frama-c.slang;
-
-  build_dir = frama-c.build_dir;
-  src = build_dir + "/dir.tar";
-  wp_cache = fetchGit "git@git.frama-c.com:frama-c/wp-cache.git"; # for Aorai
-  sourceRoot = ".";
-
-  buildInputs = frama-c.buildInputs ++ [
-    alt-ergo # only for Aorai
-    frama-c
-    perl
-    time
-    which
-  ];
-
-  postPatch = ''
-    patchShebangs .
-  '' ;
-
-  # Keep main configuration
-  # But for Aorai, configure Why3
-  configurePhase = ''
-    mkdir home
-    HOME=$(pwd)/home
-    why3 config detect
-  '';
-
-  buildPhase = ''
-    export FRAMAC_WP_CACHEDIR=$wp_cache # for Aorai
+mk_tests {
+  tests-name = "plugins-tests";
+  tests-command = ''
     dune exec -- frama-c-ptests tests src/plugins/*/tests
     dune build -j1 --display short \
       @tests/callgraph/ptests \
@@ -62,9 +26,5 @@ stdenvNoCC.mkDerivation rec {
       @src/plugins/server/tests/ptests \
       @src/plugins/variadic/tests/ptests
   '';
-
-  # No installation required
-  installPhase = ''
-    touch $out
-  '';
+  has-wp-proofs = true ;
 }
