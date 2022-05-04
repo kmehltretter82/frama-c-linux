@@ -11,6 +11,7 @@
       "-eva-context-width": "2",
       "-eva-initialization-padding-globals": "yes",
       "-eva-initialized-locals": "false",
+      "-eva-load": "",
       "-eva-new-initial-state": "0",
       "-eva-reduce-on-logic-alarms": "false",
       "-eva-undefined-pointer-comparison-propagate-all": "false",
