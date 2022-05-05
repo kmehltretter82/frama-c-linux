@@ -18,7 +18,6 @@ support libraries (notably gtksourceview). lablgtk3 should be preferred.
 - why3.1.4.0
 - yojson.1.7.0
 - zarith.1.12
-- zmq.5.1.5 (for server, optional)
 
 [^gcc-10]: As mentioned in this [OCaml PR](https://github.com/ocaml/ocaml/issues/9144)
 gcc 10 changed its default linking conventions to make them more stringent,
