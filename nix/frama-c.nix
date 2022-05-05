@@ -26,6 +26,7 @@
 , ocamlgraph
 , ppx_deriving
 , ppx_deriving_yojson
+, ppx_import
 , yojson
 , which
 , why3
@@ -69,6 +70,7 @@ stdenvNoCC.mkDerivation rec {
     ocamlgraph
     ppx_deriving
     ppx_deriving_yojson
+    ppx_import
     yojson
     which
     why3
