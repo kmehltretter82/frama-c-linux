@@ -147,6 +147,21 @@ module type External = sig
   val mem : 'a key -> bool
   val get : 'a key -> (t -> 'a) option
   val set : 'a key -> 'a -> t -> t
+
+  type polymorphic_iter_fun = {
+    iter: 'a. 'a key -> 'a data -> 'a -> unit;
+  }
+  val iter: polymorphic_iter_fun -> t -> unit
+
+  type 'b polymorphic_fold_fun = {
+    fold: 'a. 'a key -> 'a data -> 'a -> 'b -> 'b;
+  }
+  val fold: 'b polymorphic_fold_fun -> t -> 'b -> 'b
+
+  type polymorphic_map_fun = {
+    map: 'a. 'a key -> 'a data -> 'a -> 'a;
+  }
+  val map: polymorphic_map_fun -> t -> t
 end
 
 module Open
@@ -228,4 +243,61 @@ module Open
     | Some (Set (k, set)) -> match Shape.eq_type key k with
       | None -> fun _ t -> t
       | Some Eq -> set
+
+  type polymorphic_iter_fun = {
+    iter: 'a. 'a Shape.key -> 'a Shape.data -> 'a -> unit;
+  }
+
+  let rec iter: type a. a structure -> (polymorphic_iter_fun -> a -> unit) =
+    function
+    | Unit -> fun _ () -> ()
+    | Void -> fun _ _ -> ()
+    | Leaf (key, data) -> fun poly v -> poly.iter key data v
+    | Node (left, right) ->
+      let left = iter left
+      and right = iter right in
+      fun poly (a, b) -> left poly a; right poly b;
+    | Option (s, _) ->
+      let iter = iter s in
+      fun poly v -> Option.iter (iter poly) v
+
+  let iter = iter M.structure
+
+  type 'b polymorphic_fold_fun = {
+    fold: 'a. 'a Shape.key -> 'a Shape.data -> 'a -> 'b -> 'b;
+  }
+
+  let rec fold: type a. a structure -> ('b polymorphic_fold_fun -> a -> 'b -> 'b) =
+    function
+    | Unit -> fun _ () acc -> acc
+    | Void -> fun _ _ acc -> acc
+    | Leaf (key, data) -> fun poly v acc -> poly.fold key data v acc
+    | Node (left, right) ->
+      let left = fold left
+      and right = fold right in
+      fun poly (a, b) acc -> right poly b (left poly a acc)
+    | Option (s, _) ->
+      let fold = fold s in
+      fun poly v acc -> Option.fold ~none:acc ~some:(fun v -> fold poly v acc) v
+
+  let fold x = fold M.structure x
+
+  type polymorphic_map_fun = {
+    map: 'a. 'a Shape.key -> 'a Shape.data -> 'a -> 'a;
+  }
+
+  let rec map: type a. a structure -> (polymorphic_map_fun -> a -> a) =
+    function
+    | Unit -> fun _ () -> ()
+    | Void -> fun _ x -> x
+    | Leaf (key, data) -> fun poly v -> poly.map key data v
+    | Node (left, right) ->
+      let left = map left
+      and right = map right in
+      fun poly (a, b) -> (left poly a, right poly b)
+    | Option (s, _) ->
+      let map = map s in
+      fun poly v -> Option.map (map poly) v
+
+  let map = map M.structure
 end

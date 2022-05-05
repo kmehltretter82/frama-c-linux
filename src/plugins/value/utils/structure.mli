@@ -106,6 +106,23 @@ module type External = sig
         this subpart has been replaced by [v].
       - otherwise, [set key _] is the identity function. *)
   val set : 'a key -> 'a -> t -> t
+
+  (** Iterators on the components of a structure. *)
+
+  type polymorphic_iter_fun = {
+    iter: 'a. 'a key -> 'a data -> 'a -> unit;
+  }
+  val iter: polymorphic_iter_fun -> t -> unit
+
+  type 'b polymorphic_fold_fun = {
+    fold: 'a. 'a key -> 'a data -> 'a -> 'b -> 'b;
+  }
+  val fold: 'b polymorphic_fold_fun -> t -> 'b -> 'b
+
+  type polymorphic_map_fun = {
+    map: 'a. 'a key -> 'a data -> 'a -> 'a;
+  }
+  val map: polymorphic_map_fun -> t -> t
 end
 
 (** Opens an internal tree module into an external one. *)
