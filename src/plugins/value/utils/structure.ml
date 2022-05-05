@@ -143,6 +143,7 @@ end
 module type External = sig
   type t
   type 'a key
+  type 'a data
   val mem : 'a key -> bool
   val get : 'a key -> (t -> 'a) option
   val set : 'a key -> 'a -> t -> t

@@ -30,14 +30,7 @@
     Partitioning index relies on an heuristics on the cvalue domain,
     and is very inefficient without it. *)
 
-module type Domain = sig
-  include Abstract_domain.Lattice
-  include Datatype.S_with_collections with type t = state
-  include Abstract.Interface with type t := state
-                              and type 'a key := 'a Abstract_domain.key
-end
-
-module Make (Domain: Domain) : sig
+module Make (Domain: Abstract.Domain.External) : sig
   type t
 
   (** Creates an empty index. *)

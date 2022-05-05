@@ -89,8 +89,22 @@ end
 module type External = sig
   type t
   type 'a key
+  type 'a data
+
+  (** Tests whether a key belongs to the module. *)
   val mem : 'a key -> bool
+
+  (** For a key of type [k key]:
+      - if the values of type [t] contain a subpart of type [k] from a module
+        identified by the key, then [get key] returns an accessor for it.
+      - otherwise, [get key] returns None. *)
   val get : 'a key -> (t -> 'a) option
+
+  (** For a key of type [k key]:
+      - if the values of type [t] contain a subpart of type [k] from a module
+        identified by the key, then [set key v t] returns the value [t] in which
+        this subpart has been replaced by [v].
+      - otherwise, [set key _] is the identity function. *)
   val set : 'a key -> 'a -> t -> t
 end
 
@@ -100,3 +114,4 @@ module Open
     (Data : Internal with type 'a structure := 'a Shape.structure)
   : External with type t := Data.t
               and type 'a key := 'a Shape.key
+              and type 'a data := 'a Shape.data
