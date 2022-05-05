@@ -1,37 +1,8 @@
-{ lib
-, stdenv
-, frama-c
-, perl
-, time
-, which
-}:
+{ mk_tests } :
 
-stdenv.mkDerivation rec {
-  pname = "kernel-tests";
-  version = frama-c.version;
-  slang = frama-c.slang;
-
-  build_dir = frama-c.build_dir;
-  src = build_dir + "/dir.tar";
-  sourceRoot = ".";
-
-  buildInputs = frama-c.buildInputs ++ [
-    frama-c
-    perl
-    time
-    which
-  ];
-
-  postPatch = ''
-    patchShebangs .
-  '' ;
-
-  # Keep main configuration
-  configurePhase = ''
-    true
-  '';
-
-  buildPhase = ''
+mk_tests {
+  tests-name = "kernel-tests";
+  tests-command = ''
     dune exec -- frama-c-ptests tests
     dune build -j1 --display short \
       @tests/cil/ptests \
@@ -44,10 +15,5 @@ stdenv.mkDerivation rec {
       @tests/spec/ptests \
       @tests/syntax/ptests \
       @tests/test/ptests
-  '';
-
-  # No installation required
-  installPhase = ''
-    touch $out
   '';
 }
