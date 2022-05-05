@@ -60,12 +60,19 @@ module HCE: sig
   (** Replaces all occurrences of the lvalue [late] by the expression [heir].
       @raise NonExchangeable if the replacement is not feasible. *)
   val replace: kill_type -> late:lval -> heir:exp -> t -> t
+
+  (** Raises exception Not_found when the argument cannot be imported. *)
+  val import: t -> t
 end
 
 
 (** Hashconsed sets of symbolic expressions. *)
-module HCESet: Hptset.S with type elt = HCE.t
-                         and type 'a map = 'a Hptmap.Shape(HCE).t
+module HCESet: sig
+  include Hptset.S with type elt = HCE.t
+                    and type 'a map = 'a Hptmap.Shape(HCE).t
+
+  val import: t -> t
+end
 
 (* Sets of lvalues that appear in an expression. The [addr] field gathers the
    lvalues [lv] appearing as addresses &lv, while the [read] field gathers the
@@ -98,6 +105,7 @@ module HCEToZone: sig
   val union: t -> t -> t
   val inter: t -> t -> t
   val merge: into:t -> t -> t
+  val import: t -> t
 end
 
 
@@ -112,4 +120,6 @@ module BaseToHCESet: sig
 
   val find_default: Base.t -> t -> HCESet.t
   (** returns the empty set when the key is not bound *)
+
+  val import: t -> t
 end

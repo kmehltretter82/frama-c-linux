@@ -101,6 +101,7 @@ module E = struct
   let replace kind ~late ~heir expr =
     let visitor = replace_visitor kind ~late ~heir in
     Visitor.visitFramacExpr visitor expr
+
 end
 
 module HCE = struct
@@ -146,10 +147,23 @@ module HCE = struct
       then raise NonExchangeable
       else of_exp e
     | LV lval -> if Lval.equal lval late then of_exp heir else h
+
+  let import h =
+    match get h with
+    | E expr ->
+      let expr' = Eva_diff.import_expr expr in
+      if Exp.equal expr expr' then h else of_exp expr
+    | LV lval ->
+      let lval' = Eva_diff.import_lval lval in
+      if Lval.equal lval lval' then h else of_lval lval
 end
 
-module HCESet =
-  Hptset.Make (HCE) (struct let v = [] end) (struct let l = [Ast.self] end)
+module HCESet = struct
+  include
+    Hptset.Make (HCE) (struct let v = [] end) (struct let l = [Ast.self] end)
+
+  let import set = fold (fun elt -> add (HCE.import elt)) set empty
+end
 
 type lvalues = {
   read : HCESet.t;
@@ -217,6 +231,15 @@ module HCEToZone = struct
     join ~cache ~symmetric:false ~idempotent:true ~decide
 
   let merge ~into v = merge into v
+
+  let import =
+    let cache_name = "Eva.Hcexprs.HCEToZone.import" in
+    let f hce zone =
+      let hce = HCE.import hce in
+      let zone = Eva_diff.import_zone zone in
+      singleton hce zone
+    in
+    cached_fold ~cache_name ~temporary:false ~f ~joiner:union ~empty
 end
 
 
@@ -250,4 +273,12 @@ module BaseToHCESet = struct
     try find b m
     with Not_found -> HCESet.empty
 
+  let import =
+    let cache_name = "Eva.Hcexprs.BaseToHCESet.import" in
+    let f base set =
+      let base = Eva_diff.import_base base in
+      let set = HCESet.import set in
+      singleton base set
+    in
+    cached_fold ~cache_name ~temporary:false ~f ~joiner:union ~empty
 end

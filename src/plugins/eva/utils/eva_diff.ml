@@ -20,15 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let import_varinfo vi =
-  match Ast_diff.Varinfo.find vi with
-  | `Same vi -> vi
+let import find elt =
+  match find elt with
+  | `Same elt -> elt
   | `Not_present -> raise Not_found
 
-let import_logic_var lvi =
-  match Ast_diff.Logic_var.find lvi with
-  | `Same lvi -> lvi
-  | `Not_present -> raise Not_found
+let import_varinfo = import Ast_diff.Varinfo.find
+let import_logic_var = import Ast_diff.Logic_var.find
 
 let import_base = function
   | Base.Var (vi, _validity) -> Base.of_varinfo (import_varinfo vi)
@@ -59,3 +57,41 @@ let import_offsetmap offsm =
        let v = import_cvalue_or_initialized v in
        Cvalue.V_Offsetmap.add ~exact:true itv (v, size, offset) acc)
     offsm Cvalue.V_Offsetmap.empty
+
+let import_zone zone =
+  let import base itv acc =
+    let zone = Locations.Zone.inject base itv in
+    Locations.Zone.join acc zone
+  in
+  try Locations.Zone.(fold_i import zone bottom)
+  with Abstract_interp.Error_Top ->
+    assert Locations.Zone.(equal zone top);
+    zone
+
+
+let change_to find x = Cil.ChangeTo (import find x)
+
+let import_visitor () = object
+  inherit Visitor.frama_c_copy (Project.current ())
+
+  method! vvrbl vi = ChangeTo (import_varinfo vi)
+  method! vvdec vi = ChangeTo (import_varinfo vi)
+
+  method! vcompinfo = change_to Ast_diff.Compinfo.find
+  method! venuminfo = change_to Ast_diff.Enuminfo.find
+  method! venumitem = change_to Ast_diff.Enumitem.find
+  method! vfieldinfo = change_to Ast_diff.Fieldinfo.find
+
+  method! vmodel_info = change_to Ast_diff.Model_info.find
+  method! vlogic_info_decl = change_to Ast_diff.Logic_info.find
+  method! vlogic_info_use = change_to Ast_diff.Logic_info.find
+  method! vlogic_type_info_decl = change_to Ast_diff.Logic_type_info.find
+  method! vlogic_type_info_use = change_to Ast_diff.Logic_type_info.find
+  method! vlogic_ctor_info_decl = change_to Ast_diff.Logic_ctor_info.find
+  method! vlogic_ctor_info_use = change_to Ast_diff.Logic_ctor_info.find
+  method! vlogic_var_decl = change_to Ast_diff.Logic_var.find
+  method! vlogic_var_use = change_to Ast_diff.Logic_var.find
+end
+
+let import_expr expr = Visitor.visitFramacExpr (import_visitor ()) expr
+let import_lval lval = Visitor.visitFramacLval (import_visitor ()) lval
