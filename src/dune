@@ -22,6 +22,7 @@
   (foreign_stubs (language c) (names c_bindings))
   (flags :standard -w -9-32-34)
   (libraries frama-c.init str unix zarith ocamlgraph dynlink bytes yojson dune-site dune-site.plugins)
+  (preprocess (staged_pps ppx_import ppx_deriving.eq))
 )
 
 (ocamllex json)
