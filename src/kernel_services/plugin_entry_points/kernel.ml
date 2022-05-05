@@ -821,6 +821,17 @@ module EagerLoadSources =
                 in memory"
   end)
 
+let () = Parameter_customize.set_group inout_source
+let () = Parameter_customize.do_not_projectify ()
+module AstDiff =
+  False
+    (struct
+      let option_name = "-ast-diff"
+      let module_name = "AstDiff"
+      let help = "creates a new project and computes a diff of the AST \
+                  from the current one"
+    end)
+
 (* ************************************************************************* *)
 (** {2 Save/Load} *)
 (* ************************************************************************* *)

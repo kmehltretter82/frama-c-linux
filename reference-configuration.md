@@ -13,10 +13,11 @@ support libraries (notably gtksourceview). lablgtk3 should be preferred.
 - mlgmpidl.1.2.12 (for eva, optional)
 - ocamlfind.1.8.1
 - ocamlgraph.1.8.8
-- ppx_deriving_yojson.3.5.2 (for mdr, optional)
+- ppx_deriving_yojson.3.6.1 (for mdr, optional)
+- ppx_import.1.9.0
 - why3.1.4.0
 - yojson.1.7.0
-- zarith.1.9.1
+- zarith.1.10
 - zmq.5.1.3 (for server, optional)
 
 [^gcc-10]: As mentioned in this [OCaml PR](https://github.com/ocaml/ocaml/issues/9144)

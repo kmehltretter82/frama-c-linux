@@ -167,6 +167,7 @@ function obtainGlobalSettings() {
 type Store = { [key: string]: unknown };
 
 interface Handle {
+  primary: boolean; // Primary window
   window: BrowserWindow; // Also prevents Gc
   frame: Electron.Rectangle; // Window frame
   devtools: boolean; // Developper tools visible
@@ -348,6 +349,7 @@ function lookupConfig(pwd = '.') {
 // --------------------------------------------------------------------------
 
 function createBrowserWindow(
+  primary: boolean,
   config: BrowserWindowConstructorOptions,
   argv?: string[],
   wdir?: string,
@@ -387,6 +389,7 @@ function createBrowserWindow(
   const wid = webContents.id;
 
   const handle: Handle = {
+    primary,
     window: theWindow,
     config: configFile,
     reloaded: false,
@@ -487,23 +490,31 @@ function createPrimaryWindow() {
   applyThemeSettings(globals);
 
   // Create Window
-  createBrowserWindow({ title: appName }, argv, wdir);
+  createBrowserWindow(true, { title: appName }, argv, wdir);
 }
 
 let appCount = 1;
 
 function createSecondaryWindow(
   _event: Electron.Event,
-  electronArgv: string[],
+  chromiumArgv: string[],
   wdir: string,
 ) {
-  const argv = stripElectronArgv(electronArgv);
-  createBrowserWindow({ title: `${appName} #${++appCount}` }, argv, wdir);
+  const argStart = "--second-instance=";
+  let argString = chromiumArgv.find(a => a.startsWith(argStart));
+  if (argString) {
+    argString = argString.substring(argStart.length);
+    const electronArgv = JSON.parse(argString);
+    const argv = stripElectronArgv(electronArgv);
+    const title = `${appName} #${++appCount}`;
+    createBrowserWindow(false, { title }, argv, wdir);
+  }
 }
 
 function createDesktopWindow() {
   const wdir = app.getPath('home');
-  createBrowserWindow({ title: `${appName} #${++appCount}` }, [], wdir);
+  const title = `${appName} #${++appCount}`;
+  createBrowserWindow(false, { title }, [], wdir);
 }
 
 // --------------------------------------------------------------------------
@@ -535,7 +546,8 @@ let PreferenceWindow: BrowserWindow | undefined;
 
 function showSettingsWindow() {
   if (!PreferenceWindow)
-    PreferenceWindow = createBrowserWindow({
+    PreferenceWindow = createBrowserWindow(
+      false, {
       title: `${appName} Settings`,
       width: 256,
       height: 248,
@@ -582,6 +594,11 @@ ipcMain.on('dome.app.paths', (event) => {
 /** Starts the main process. */
 export function start() {
 
+  // Workaround to recover the original commandline of a second instance
+  // after chromium messes with the argument order.
+  // See https://github.com/electron/electron/issues/20322 for more details.
+  app.commandLine.appendSwitch("second-instance", JSON.stringify(process.argv));
+
   // Ensures second instance triggers the main one
   if (!app.requestSingleInstanceLock()) app.quit();
 
@@ -614,7 +631,7 @@ export function start() {
 // --------------------------------------------------------------------------
 
 /**
-    Define a custom main window menu.
+   Define a custom main window menu.
 */
 export function addMenu(label: string) {
   Menubar.addMenu(label);
@@ -634,9 +651,21 @@ export function setMenuItem(spec: Menubar.CustomMenuItem) {
   Menubar.setMenuItem(spec);
 }
 
-ipcMain.on('dome.ipc.menu.addmenu', (_evt, label) => addMenu(label));
-ipcMain.on('dome.ipc.menu.addmenuitem', (_evt, spec) => addMenuItem(spec));
-ipcMain.on('dome.ipc.menu.setmenuitem', (_evt, spec) => setMenuItem(spec));
+function isPrimary(evt: IpcMainEvent): boolean {
+  const h = WindowHandles.get(evt.sender.id);
+  return h ? h.primary : false;
+}
+
+ipcMain.on('dome.ipc.menu.addmenu', (evt, label) =>
+  isPrimary(evt) && Menubar.addMenu(label)
+);
+ipcMain.on('dome.ipc.menu.addmenuitem', (evt, spec) =>
+  isPrimary(evt) && Menubar.addMenuItem(spec)
+);
+ipcMain.on('dome.ipc.menu.setmenuitem', (_evt, spec) =>
+  // Always update menu items
+  Menubar.setMenuItem(spec)
+);
 
 // --------------------------------------------------------------------------
 // --- Dialogs Management

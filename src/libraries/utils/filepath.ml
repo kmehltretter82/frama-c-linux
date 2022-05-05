@@ -132,7 +132,14 @@ let insert base path_name =
    Instead of forcing the user to always provide resolved paths, we
    currently choose to never resolve them.
    Note that, in rare situations (e.g. some Docker images), PWD does not
-   exist in the environment, so in that case, we fallback to Sys.getcwd. *)
+   exist in the environment, so in that case, we fallback to Sys.getcwd.
+
+   REMARK[LC]: when the Frama-C binary is directly invoked by Node without
+   going through a shell script wrapper like ./bin/frama-c, the environment
+   variable "PWD" is _no more_ synchronized with Sys.getcwd.
+   This problem has been solved in `Dome.spawn()` by forcing the `PWD`
+   environement variable accordingly.
+*)
 let cwd = insert dummy (try Sys.getenv "PWD" with Not_found -> Sys.getcwd ())
 
 type existence =

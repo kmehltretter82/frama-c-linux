@@ -364,13 +364,15 @@ const customItemCallbacks = new Map<string, callback>();
 /**
    Create a new custom menu in the menu bar.
 
-   This function can be triggered at any time, and will eventually trigger
-   an update of the whole application menubar.
+
+   This function shall be called statically, although calls from _secondary_
+   windows would be ignored. It is also possible to call this function from the
+   main process.
 
    It is also possible to call this function from the main process.
 
    @param label - the menu title (shall be unique)
-*/
+ */
 export function addMenu(label: string) {
   ipcRenderer.send('dome.ipc.menu.addmenu', label);
 }
@@ -399,8 +401,7 @@ export interface MenuItemProps {
   onClick?: () => void;
 }
 
-/**
-   Inserts a new custom item in a menu.
+/** Inserts a new custom item in a menu.
 
    The menu can be modified later with [[setMenuItem]].
 
@@ -408,15 +409,15 @@ export interface MenuItemProps {
    event on all application windows.  The item callback, if any, is invoked only
    in the process that specify it.
 
-   Key short cuts shall be specified with the following codes:
-   - `"Cmd+<Key>"` for command (MacOS) or control (Linux) key
-   - `"Alt+<Key>"` for command+option (MacOS) or alt (Linux) key
-   - `"Meta+<Key>"` for command+shift (MacOS) or control+alt (Linux) key
+   Key short cuts shall be specified with the following codes: - `"Cmd+<Key>"`
+   for command (MacOS) or control (Linux) key - `"Alt+<Key>"` for command+option
+   (MacOS) or alt (Linux) key - `"Meta+<Key>"` for command+shift (MacOS) or
+   control+alt (Linux) key
 
-   This function can be triggered at any time, and will eventually trigger
-   an update of the complete application menubar.
-   It is also possible to call this function from the main process.
-*/
+   This function shall be called statically, although calls from _secondary_
+   windows would be ignored. It is also possible to call this function from the
+   main process.
+ */
 export function addMenuItem(props: MenuItemProps) {
   if (!props.id && props.type !== 'separator') {
     // eslint-disable-next-line no-console
@@ -443,10 +444,6 @@ export interface MenuItemOptions {
    If an `onClick` callback is specified, it will _replace_ the previous one.
    You shall specify `null` to remove the previously registered callback
    (`undefined` callback is ignored).
-
-   This function can be triggered at any time, and will possibly trigger
-   an update of the application menubar if the properties
-   can not be changed dynamically in Electron.
 
    It is also possible to call this function from the main process.
  */
@@ -601,7 +598,7 @@ export function useCache<K, V>(r: (k: K) => V, s?: Serialize<K>): (k: K) => V {
     const v = r(k);
     cache.set(id, v);
     return v;
-  }, [ cache, r,  serialize ]);
+  }, [cache, r, serialize]);
   return get;
 }
 

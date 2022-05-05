@@ -9,10 +9,11 @@ let mydir = builtins.getEnv("PWD");
     };
      opamPackages =
       [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
-        "ppx_deriving" "ppx_deriving_yojson"
+        "ppx_import" "ppx_deriving" "ppx_deriving_yojson"
         "coq=8.13.0" "alt-ergo=2.2.0"
         "why3=1.4.0" "why3-coq=1.4.0"
         "menhir=20211012" "dune=2.9.1"
+        "easy-format=1.3.2"
       ];
     # only pure nix packages. See mk_deriv below for adding opam2nix packages
     mk_buildInputs = { nixPackages ? [] } :

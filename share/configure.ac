@@ -57,7 +57,7 @@ lower() {
   echo "$1" | tr "A-Z" "a-z"
 }
 
-m4_define([tovarname],[m4_esyscmd(printf "%s" $1 | tr "a-z-" "A-Z_")])
+m4_define([tovarname],[m4_esyscmd(printf "%s" $1 | tr "a-z-." "A-Z__")])
 
 new_section() {
   banner=`echo "* $1 *" | sed -e 's/./*/g'`
