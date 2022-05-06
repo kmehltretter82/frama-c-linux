@@ -1258,6 +1258,10 @@ and is_same_binder b b' env =
    and formals mapping to have been put in the local env
 *)
 and is_same_fundec f f' env: body_correspondance =
+  (* The goto_targets field of [env] accumulates visited goto targets to be
+     verified after the function body. If the given environment is not empty,
+     resets this field for this function. *)
+  let env = { env with goto_targets = [] } in
   let res, env =
     is_same_block f.sbody f'.sbody env &&>
     check_goto_targets
