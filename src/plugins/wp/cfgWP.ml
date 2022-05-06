@@ -1162,7 +1162,7 @@ struct
              | (caller_d, rel), Some (callee_d,_ ) ->
                let rel caller callee = match rel with
                  | None ->
-                   p_and (p_leq e_zero callee) (p_lt callee caller)
+                   p_and (p_leq e_zero caller) (p_lt callee caller)
                  | Some rel ->
                    (L.in_frame call_f (L.call_pred call_e))
                      rel [] [caller ; callee]

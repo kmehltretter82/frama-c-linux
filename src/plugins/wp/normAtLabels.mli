@@ -42,6 +42,7 @@ val labels_stmt_assigns_l : kf:kernel_function -> stmt -> c_label option -> labe
 val labels_predicate : (logic_label * logic_label) list -> label_mapping
 val labels_axiom : label_mapping
 
+val preproc_term : label_mapping -> term -> term
 val preproc_annot : label_mapping -> predicate -> predicate
 val preproc_assigns : label_mapping -> from list -> from list
 val has_postassigns : assigns -> bool
