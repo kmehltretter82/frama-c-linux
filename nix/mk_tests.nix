@@ -2,9 +2,9 @@
 , alt-ergo
 , frama-c
 , perl
-, pkgs
 , stdenvNoCC
 , time
+, unixtools
 , which
 } :
 
@@ -24,8 +24,8 @@ stdenvNoCC.mkDerivation {
   buildInputs = frama-c.buildInputs ++ [
     frama-c
     perl
-    pkgs.getopt
     time
+    unixtools.getopt
     which
   ] ++
   (if has-wp-proofs then [ alt-ergo ] else []);
