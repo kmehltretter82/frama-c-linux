@@ -64,15 +64,8 @@ target_path="$(readlink -f "$clone_dir/$git_hash")"
 # Checkout
 if [ ! -e "$target_path" ]
 then
-    # The workdir cmd can extract a working tree of the desired hash
-    # without cloning once more
-    workdir_cmd=`locate git-new-workdir --limit 1`
-    if [ -z "$workdir_cmd" ]
-    then
-        git --git-dir="$bare" worktree add "$target_path" "$git_hash"
-    else
-        bash "$workdir_cmd" "$bare" "$target_path" "$git_hash"
-    fi
+    git clone "$bare" "$target_path" --quiet
+    (cd "$target_path" && git checkout "$git_hash" --quiet)
 fi
 
 # Build Frama-C

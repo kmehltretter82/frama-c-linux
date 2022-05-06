@@ -30,6 +30,7 @@ import os
 import signal
 import argparse
 import uuid
+from pathlib import Path
 
 import frama_c_results
 import results_display
@@ -76,15 +77,18 @@ def list_targets(dir):
 
 def clone_frama_c(clonedir, hash):
     print("Cloning Frama-C", hash, "...")
-    res = subprocess.run(
-        ["./scripts/clone.sh", "--clone-dir", clonedir, hash],
-        stdout=subprocess.PIPE,
-        encoding="ascii",
-    )
-    if res.returncode != 0:
-        raise OperationException("Cannot clone repository. Try to manually"
-            "remove the broken clone in " + clonedir)
-    return res.stdout.strip() + "/build"
+    try:
+        clone_cmd = Path(__file__).parent / "clone.sh"
+        res = subprocess.run(
+            [clone_cmd, "--clone-dir", clonedir, hash],
+            stdout=subprocess.PIPE,
+            encoding="ascii",
+            check=True)
+        return res.stdout.strip() + "/build"
+    except subprocess.CalledProcessError as e:
+        raise OperationException(
+            f"Cannot clone repository. Try to manually remove the broken clone"
+            f"in {clonedir}\n{e.output}") from e
 
 def run_make(framac, benchmark_tag=None):
     args = ["make", "--keep-going", "all"]
