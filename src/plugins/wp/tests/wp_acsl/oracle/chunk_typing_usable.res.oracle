@@ -75,13 +75,13 @@ theory A_Occ
   
   (* use Chunk *)
   
-  Q_empty :
+  axiom Q_empty :
     forall mint:addr -> int, v:int, p:addr, f:int, t:int.
      t <= f -> is_sint32_chunk mint -> is_sint32 v -> L_occ mint v p f t = 0
   
   (* use Compound *)
   
-  Q_is :
+  axiom Q_is :
     forall mint:addr -> int, v:int, p:addr, f:int, t:int.
      let x = (- 1) + t in
      let x1 = get mint (shift_sint32 p x) in
@@ -91,7 +91,7 @@ theory A_Occ
      is_sint32 v ->
      is_sint32 x1 -> (1 + L_occ mint v p f x) = L_occ mint v p f t
   
-  Q_isnt :
+  axiom Q_isnt :
     forall mint:addr -> int, v:int, p:addr, f:int, t:int.
      let x = (- 1) + t in
      let x1 = get mint (shift_sint32 p x) in
@@ -154,7 +154,7 @@ end
       forall t:addr -> int, a:addr, i:int, i1:int, i2:int, i3:int.
        i3 <= i1 ->
        i < i3 ->
-       region (base a) <= 0 ->
+       region (a.base) <= 0 ->
        is_sint32_chunk t ->
        is_uint32 i3 ->
        is_uint32 i1 ->
@@ -233,14 +233,14 @@ theory A_Occ1
   
   (* use Chunk1 *)
   
-  Q_empty1 :
+  axiom Q_empty1 :
     forall mint:addr1 -> int, v:int, p:addr1, f:int, t:int.
      t <=' f ->
      is_sint32_chunk1 mint -> is_sint321 v -> L_occ1 mint v p f t = 0
   
   (* use Compound1 *)
   
-  Q_is1 :
+  axiom Q_is1 :
     forall mint:addr1 -> int, v:int, p:addr1, f:int, t:int.
      let x = (- 1) +' t in
      let x1 = get1 mint (shift_sint321 p x) in
@@ -250,7 +250,7 @@ theory A_Occ1
      is_sint321 v ->
      is_sint321 x1 -> (1 +' L_occ1 mint v p f x) = L_occ1 mint v p f t
   
-  Q_isnt1 :
+  axiom Q_isnt1 :
     forall mint:addr1 -> int, v:int, p:addr1, f:int, t:int.
      let x = (- 1) +' t in
      let x1 = get1 mint (shift_sint321 p x) in
@@ -315,7 +315,7 @@ end
        let x = (- 1) +' i1 in
        not get1 t (shift_sint321 a x) = i2 ->
        i <' i1 ->
-       region1 (base1 a) <=' 0 ->
+       region1 (a.base1) <=' 0 ->
        i1 <=' 1000 ->
        is_sint32_chunk1 t ->
        is_uint321 i1 ->
@@ -392,14 +392,14 @@ theory A_Occ2
   
   (* use Chunk2 *)
   
-  Q_empty2 :
+  axiom Q_empty2 :
     forall mint:addr2 -> int, v:int, p:addr2, f:int, t:int.
      t <='' f ->
      is_sint32_chunk2 mint -> is_sint322 v -> L_occ2 mint v p f t = 0
   
   (* use Compound2 *)
   
-  Q_is2 :
+  axiom Q_is2 :
     forall mint:addr2 -> int, v:int, p:addr2, f:int, t:int.
      let x = (- 1) +'' t in
      let x1 = get2 mint (shift_sint322 p x) in
@@ -409,7 +409,7 @@ theory A_Occ2
      is_sint322 v ->
      is_sint322 x1 -> (1 +'' L_occ2 mint v p f x) = L_occ2 mint v p f t
   
-  Q_isnt2 :
+  axiom Q_isnt2 :
     forall mint:addr2 -> int, v:int, p:addr2, f:int, t:int.
      let x = (- 1) +'' t in
      let x1 = get2 mint (shift_sint322 p x) in
