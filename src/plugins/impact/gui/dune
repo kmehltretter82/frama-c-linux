@@ -5,3 +5,5 @@
   (flags -open Frama_c_kernel -open Frama_c_gui -open Impact :standard -w -9)
   (libraries frama-c.kernel frama-c.gui frama-c-impact.core frama-c-slicing.core frama-c-callgraph.core)
 )
+
+(plugin (optional) (name impact-gui) (libraries frama-c-impact.gui) (site (frama-c plugins_gui)))

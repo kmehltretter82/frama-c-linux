@@ -5,3 +5,5 @@
   (flags -open Frama_c_kernel -open Frama_c_gui -open Wp :standard -w -9)
   (libraries frama-c-wp.core frama-c.kernel frama-c.gui why3 qed)
 )
+
+(plugin (optional) (name wp-gui) (libraries frama-c-wp.gui) (site (frama-c plugins_gui)))

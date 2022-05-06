@@ -5,3 +5,5 @@
   (flags -open Frama_c_kernel -open Frama_c_gui -open Slicing :standard -w -9)
   (libraries frama-c.kernel frama-c.gui frama-c-slicing.core)
 )
+
+(plugin (optional) (name slicing-gui) (libraries frama-c-slicing.gui) (site (frama-c plugins_gui)))
