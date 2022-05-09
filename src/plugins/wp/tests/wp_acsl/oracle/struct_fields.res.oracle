@@ -4,9 +4,9 @@
 [rte:annot] annotating function foo
 [wp] 2 goals scheduled
 ---------------------------------------------
---- Context 'typed_foo' Cluster 'Init_S1_X' 
+--- Context 'typed_foo' Cluster 'Chunk' 
 ---------------------------------------------
-theory Init_S1_X
+theory Chunk
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -21,8 +21,18 @@ theory Init_S1_X
   
   (* use map.Map *)
   
-  type Init_S1_X =
-    | Init_S1_X1 (Init_F1_X_a:bool) (Init_F1_X_b:bool) (Init_F1_X_c:bool)
+  (* use frama_c_wp.memory.Memory *)
+  
+  (* use frama_c_wp.cint.Cint *)
+  
+  predicate is_sint8_chunk (m:addr -> int) =
+    forall a:addr. is_sint8 (get m a)
+  
+  predicate is_sint16_chunk (m:addr -> int) =
+    forall a:addr. is_sint16 (get m a)
+  
+  predicate is_sint32_chunk (m:addr -> int) =
+    forall a:addr. is_sint32 (get m a)
 end
 ---------------------------------------------
 --- Context 'typed_foo' Cluster 'S1_X' 
@@ -49,6 +59,27 @@ theory S1_X
   
   predicate IsS1_X (s:S1_X) =
     (is_sint8 (F1_X_a s) /\ is_sint16 (F1_X_b s)) /\ is_sint32 (F1_X_c s)
+end
+---------------------------------------------
+--- Context 'typed_foo' Cluster 'Init_S1_X' 
+---------------------------------------------
+theory Init_S1_X
+  (* use why3.BuiltIn.BuiltIn *)
+  
+  (* use bool.Bool *)
+  
+  (* use int.Int *)
+  
+  (* use int.ComputerDivision *)
+  
+  (* use real.RealInfix *)
+  
+  (* use frama_c_wp.qed.Qed *)
+  
+  (* use map.Map *)
+  
+  type Init_S1_X =
+    | Init_S1_X1 (Init_F1_X_a:bool) (Init_F1_X_b:bool) (Init_F1_X_c:bool)
 end
 ---------------------------------------------
 --- Context 'typed_foo' Cluster 'Compound' 
@@ -177,37 +208,6 @@ theory Compound
      separated p 3 q n ->
      Load_Init_S1_X p (havoc init1 init q n) = Load_Init_S1_X p init
 end
----------------------------------------------
---- Context 'typed_foo' Cluster 'Chunk' 
----------------------------------------------
-theory Chunk
-  (* use why3.BuiltIn.BuiltIn *)
-  
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
-  (* use frama_c_wp.memory.Memory *)
-  
-  (* use frama_c_wp.cint.Cint *)
-  
-  predicate is_sint8_chunk (m:addr -> int) =
-    forall a:addr. is_sint8 (get m a)
-  
-  predicate is_sint16_chunk (m:addr -> int) =
-    forall a:addr. is_sint16 (get m a)
-  
-  predicate is_sint32_chunk (m:addr -> int) =
-    forall a:addr. is_sint32 (get m a)
-end
 [wp:print-generated] 
   theory WP
     (* use why3.BuiltIn.BuiltIn *)
@@ -226,16 +226,15 @@ end
     
     (* use frama_c_wp.memory.Memory *)
     
-    (* use Init_S1_X *)
+    (* use Chunk *)
+    
+    (* use S1_X *)
     
     (* use Compound *)
     
-    (* use Chunk *)
-    
     goal wp_goal :
-      forall t:addr -> bool, x:Init_S1_X, t1:int -> int, t2:addr -> int, t3:
-       addr -> int, t4:addr -> int, a:addr.
-       Load_Init_S1_X a t = x ->
+      forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
+       addr -> int, a:addr.
        region (base a) <= 0 ->
        is_sint16_chunk t3 ->
        is_sint32_chunk t4 ->
