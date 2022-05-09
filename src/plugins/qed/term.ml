@@ -2324,7 +2324,7 @@ struct
       ) qxs in
     let rxs = List.map (fun (_q, x) -> x) qxs in
     let e = lc_close_xs ~reversed:true rxs e in
-    List.fold_right (fun (q, x) e -> c_bind q (tau_of_var x) e) qxs e
+    List.fold_left (fun e (q, x) -> c_bind q (tau_of_var x) e) e qxs
 
   let rec subst sigma alpha e =
     if filter sigma e then
@@ -2563,9 +2563,8 @@ struct
       if changed then aux e xs else e, xs
     in
     let e, xs = aux e xs in
-    let rxs = List.rev xs in
-    let e = lc_close_xs ~reversed:true rxs e in
-    List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e rxs
+    let e = lc_close_xs ~reversed:false xs e in
+    List.fold_right (fun x e -> c_bind q (tau_of_var x) e) xs e
 
   let e_forall = bind_xs Forall
   let e_exists = bind_xs Exists
@@ -2581,7 +2580,7 @@ struct
       if changed then aux e else e
     in
     let e = aux e in
-    let rxs = List.sort (fun x y -> -(POOL.compare x y)) (Vars.elements e.vars) in
+    let rxs = List.sort (fun x y -> POOL.compare y x) (Vars.elements e.vars) in
     let e = lc_close_xs ~subset:true ~reversed:true rxs e in
     List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e rxs
 
