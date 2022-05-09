@@ -86,7 +86,6 @@ PLUGIN_BIN_DOC_LIST:=
 PLUGIN_DIST_EXTERNAL_LIST:=
 PLUGIN_DIST_TESTS_LIST:=
 PLUGIN_DISTRIBUTED_NAME_LIST:=
-MERLIN_PACKAGES:=
 
 PLUGIN_HEADER_SPEC_LIST :=
 PLUGIN_HEADER_DIRS_LIST :=
@@ -563,6 +562,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_data/annotations.cmo                    \
 	src/kernel_services/ast_printing/printer.cmo                    \
 	src/kernel_internals/typing/logic_builtin.cmo                 \
+	src/kernel_services/ast_queries/ast_diff.cmo                  \
 	src/kernel_services/ast_printing/cabs_debug.cmo                 \
 	src/kernel_internals/parsing/lexerhack.cmo                     \
 	src/kernel_internals/parsing/clexer.cmo                        \

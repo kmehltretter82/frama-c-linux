@@ -914,6 +914,15 @@ interface EvaluationModeProps {
   setLocPin: (loc: Location, pin: boolean) => void;
 }
 
+Dome.addMenuItem({
+  menu: 'Edit',
+  id: 'EvaluateMenu',
+  type: 'normal',
+  label: 'Evaluate',
+  key: 'Cmd+E',
+  onClick: () => evaluateEvent.emit(),
+});
+
 function useEvaluationMode(props: EvaluationModeProps): void {
   const { computationState, selection, setLocPin } = props;
   const handleError = (): void => { return; };
@@ -940,14 +949,6 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     };
     Toolbars.RegisterMode.emit(evalMode);
     return () => Toolbars.UnregisterMode.emit(evalMode);
-  });
-  Dome.addMenuItem({
-    menu: 'Edit',
-    id: 'EvaluateMenu',
-    type: 'normal',
-    label: 'Evaluate',
-    key: 'Cmd+E',
-    onClick: () => evaluateEvent.emit(),
   });
   React.useEffect(() => {
     Dome.setMenuItem({ id: 'EvaluateMenu', enabled: true });

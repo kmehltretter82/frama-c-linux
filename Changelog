@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ##################################
 
+o   Kernel    [2022-05-03] Prototype of AST comparison between two versions
+              of the same program, via the new option -ast-diff.
+-   Eva       [2022-05-02] Fixes stack overflow errors on very large C functions.
 -   Eva       [2022-04-25] Improve the multidim abstract domain: it is now
               more precise and more robust, it is able to infer simple array
               invariants on some loops without unrolling, and has a new option
@@ -34,6 +37,10 @@ o!  Kernel    [2022-02-23] Remove State_selection.Static (deprecated since
               integer literal constants
 *   Kernel    [2022-02-17] Reject programs using unsupported
               vector_size attribute (fixes ##2573)
+o   Eva       [2022-02-15] New API to run the analysis and access its results,
+              intended to replace the old API in Db.Value. It is more precise
+              as it uses all available domains to evaluate values and locations.
+              See file Eva.mli for more details.
 *   Kernel    [2022-02-08] Reject array whose size is too big with a proper
               error message instead of a crash (fixes ##2590)
 o!  Kernel    [2022-01-19] Removed obsolete AST nodes IndexPI and Info

@@ -36,7 +36,7 @@ import './style.css';
 
 Ivette.registerView({
   id: 'summary',
-  rank: 1,
+  rank: 3,
   label: 'Eva Summary',
   layout: [
     ['frama-c.plugins.eva_summary', 'frama-c.plugins.eva_coverage'],
@@ -46,11 +46,11 @@ Ivette.registerView({
 
 Ivette.registerView({
   id: 'values',
-  rank: 1,
+  rank: 4,
   label: 'Eva Values',
   layout: [
-    ['frama-c.astview', 'frama-c.plugins.values'],
-    'frama-c.properties',
+    ['frama-c.astview', 'frama-c.astinfo'],
+    'frama-c.plugins.values',
   ],
 });
 

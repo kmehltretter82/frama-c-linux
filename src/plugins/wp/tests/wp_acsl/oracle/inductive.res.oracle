@@ -138,42 +138,42 @@ end
       forall a:int, b:int, d:int. P_is_gcd2 a b d -> not P_is_gcd2 b d a
     
     predicate P_same_array (mint:addr -> int) (mint1:addr -> int) (a:addr) (b:
-      addr) (begin:int) (end1:int) =
+      addr) (begin1:int) (end1:int) =
       forall i:int.
-       begin <= i ->
+       begin1 <= i ->
        i < end1 -> get mint1 (shift_sint32 a i) = get mint (shift_sint32 b i)
     
     predicate P_swap (mint:addr -> int) (mint1:addr -> int) (a:addr) (b:addr)
-      (begin:int) (i:int) (j:int) (end1:int) =
+      (begin1:int) (i:int) (j:int) (end1:int) =
       ((((get mint1 (shift_sint32 a i) = get mint (shift_sint32 b j) /\
           get mint1 (shift_sint32 a j) = get mint (shift_sint32 b i)) /\
-         begin <= i) /\
+         begin1 <= i) /\
         i < j) /\
        j < end1) /\
       (forall i1:int.
         not i1 = i ->
         not j = i1 ->
-        begin <= i1 ->
+        begin1 <= i1 ->
         i1 < end1 ->
         get mint1 (shift_sint32 a i1) = get mint (shift_sint32 b i1))
     
     inductive P_same_elements (addr -> int) (addr -> int) addr addr int int =
       | Q_refl :
-          forall mint:addr -> int, mint1:addr -> int, a:addr, b:addr, begin:
+          forall mint:addr -> int, mint1:addr -> int, a:addr, b:addr, begin1:
            int, end1:int.
-           P_same_array mint mint1 a b begin end1 ->
-           P_same_elements mint mint1 a b begin end1
+           P_same_array mint mint1 a b begin1 end1 ->
+           P_same_elements mint mint1 a b begin1 end1
       | Q_swap :
-          forall mint:addr -> int, mint1:addr -> int, a:addr, b:addr, begin:
+          forall mint:addr -> int, mint1:addr -> int, a:addr, b:addr, begin1:
            int, i:int, j:int, end1:int.
-           P_swap mint mint1 a b begin i j end1 ->
-           P_same_elements mint mint1 a b begin end1
+           P_swap mint mint1 a b begin1 i j end1 ->
+           P_same_elements mint mint1 a b begin1 end1
       | Q_trans :
           forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, a:
-           addr, b:addr, c:addr, begin:int, end1:int.
-           P_same_elements mint mint1 b c begin end1 ->
-           P_same_elements mint1 mint2 a b begin end1 ->
-           P_same_elements mint mint2 a c begin end1
+           addr, b:addr, c:addr, begin1:int, end1:int.
+           P_same_elements mint mint1 b c begin1 end1 ->
+           P_same_elements mint1 mint2 a b begin1 end1 ->
+           P_same_elements mint mint2 a c begin1 end1
     
     goal wp_goal :
       forall t:addr -> int, t1:addr -> int, t2:addr -> int, a:addr, a1:addr, i:

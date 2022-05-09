@@ -9,9 +9,9 @@ let mydir = builtins.getEnv("PWD");
     };
      opamPackages =
       [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
-        "ppx_deriving" "ppx_deriving_yojson"
+        "ppx_import" "ppx_deriving" "ppx_deriving_yojson"
         "coq=8.13.0" "alt-ergo=2.2.0"
-        "why3=1.4.0" "why3-coq=1.4.0"
+        "why3=1.5.0" "why3-coq=1.5.0"
         "menhir=20211012"
         "easy-format=1.3.2"
       ];

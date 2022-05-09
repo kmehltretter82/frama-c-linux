@@ -74,7 +74,7 @@ end
     goal wp_goal :
       forall t:addr -> int, i:int, a:addr.
        let x = get t (shift_sint32 a i) in
-       region (base a) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
+       region (a.base) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
   end
 [wp] 1 goal generated
 ------------------------------------------------------------
@@ -162,7 +162,7 @@ end
     goal wp_goal :
       forall t:addr1 -> int, i:int, a:addr1.
        let x = get1 t (shift_sint321 a i) in
-       region1 (base1 a) <=' 0 -> is_sint321 i -> is_sint321 x -> P_P1 x
+       region1 (a.base1) <=' 0 -> is_sint321 i -> is_sint321 x -> P_P1 x
   end
 [wp] 1 goal generated
 ------------------------------------------------------------

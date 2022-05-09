@@ -91,6 +91,12 @@ let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
     Some (id , implies ?assumes p)
   else None
 
+let normalize_decreases (d, li) =
+  let module L = NormAtLabels in
+  let at_pre e = Logic_const.tat (e, BuiltinLabel Pre) in
+  let labels = L.labels_fct_pre in
+  (at_pre @@ L.preproc_term labels d, li)
+
 let normalize_froms tk froms =
   let module L = NormAtLabels in
   let labels = L.labels_fct_assigns ~exit:(tk=Exits) in
@@ -246,12 +252,13 @@ let get_terminates_hyp kf =
 
 let check_variant_relation = function
   | (_, None) -> ()
-  | (_, Some rel) ->
-    Wp_parameters.hypothesis ~once:true
+  | ({ term_loc }, Some rel) ->
+    Wp_parameters.hypothesis
+      ~source:(fst term_loc) ~once:true
       "'%a' relation must be well-founded" Cil_printer.pp_logic_info rel
 
 let get_decreases_goal kf =
-  let defined t = WpPropId.mk_decrease_id kf Kglobal t, t in
+  let defined t = WpPropId.mk_decrease_id kf Kglobal t, normalize_decreases t in
   match Annotations.decreases ~populate:false kf with
   | None -> None
   | Some v -> check_variant_relation v ; Some (defined v)
@@ -348,7 +355,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           | Writes froms -> Writes (normalize_froms Normal froms)
         in
         let terminates = get_terminates_hyp kf in
-        let decreases = get_decreases_hyp kf in
+        let decreases = Option.map normalize_decreases @@ get_decreases_hyp kf in
         {
           contract_cond = List.rev !wcond ;
           contract_hpre = List.rev !whpre ;

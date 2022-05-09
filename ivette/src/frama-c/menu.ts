@@ -31,6 +31,7 @@ import * as Services from 'frama-c/kernel/api/services';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
+import { ipcRenderer } from 'electron';
 
 const cFilter = {
   name: 'C source files',
@@ -134,6 +135,7 @@ async function saveSession(): Promise<void> {
 }
 
 export function init(): void {
+  ipcRenderer.invoke('dome.ipc.updateLearnMore', 'https://frama-c.com/');
   Dome.addMenuItem({
     menu: 'File',
     label: 'Set source files…',

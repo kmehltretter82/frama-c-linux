@@ -116,6 +116,7 @@ Ivette.registerView({
   id: 'source',
   rank: 1,
   label: 'Source Code',
+  defaultView: true,
   layout: [
     ['frama-c.astview', 'frama-c.sourcecode'],
     'frama-c.astinfo',
@@ -123,8 +124,18 @@ Ivette.registerView({
 });
 
 Ivette.registerView({
-  id: 'pivot-table',
+  id: 'properties',
   rank: 2,
+  label: 'Properties',
+  layout: [
+    ['frama-c.astview', 'frama-c.sourcecode'],
+    'frama-c.properties',
+  ],
+});
+
+Ivette.registerView({
+  id: 'pivot-table',
+  rank: 6,
   label: 'Pivot Table',
   layout: [
     ['frama-c.pivottable'],
