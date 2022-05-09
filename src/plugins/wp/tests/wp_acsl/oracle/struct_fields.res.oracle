@@ -235,7 +235,7 @@ end
     goal wp_goal :
       forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
        addr -> int, a:addr.
-       region (base a) <= 0 ->
+       region (a.base) <= 0 ->
        is_sint16_chunk t3 ->
        is_sint32_chunk t4 ->
        is_sint8_chunk t2 ->
