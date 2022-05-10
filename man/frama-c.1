@@ -3,13 +3,13 @@
 .TH "FRAMA-C" "1" "" "2021-06-18" ""
 .hy
 .\"------------------------------------------------------------------------
-.\"                                                                        
-.\"  This file is part of Frama-C documentation                            
-.\"                                                                        
-.\"  Copyright (C) 2007-2021                                               
-.\"    CEA (Commissariat à l'énergie atomique et aux énergies              
-.\"         alternatives)                                                  
-.\"                                                                        
+.\"
+.\"  This file is part of Frama-C documentation
+.\"
+.\"  Copyright (C) 2007-2021
+.\"    CEA (Commissariat à l'énergie atomique et aux énergies
+.\"         alternatives)
+.\"
 .\"  you can redistribute it and/or modify it under the terms of the
 .\"  CC-BY-SA 4.0 license
 
@@ -292,21 +292,6 @@ Use \f[B]\[at]inline\f[R] to select all functions with attribute
 \f[I]inline\f[R].
 Recursive functions are inlined only at the first level.
 Calls via function pointers are not inlined.
-.TP
--journal-disable
-do not output a journal of the current session.
-See \f[B]-journal-enable\f[R].
-.TP
--journal-enable
-on by default, dumps a journal of all the actions performed during the
-current Frama-C session in the form of an OCaml script that can be
-replayed with \f[B]-load-script\f[R].
-The name of the script can be set with the \f[B]-journal-name\f[R]
-option.
-.TP
--journal-name \f[I]name\f[R]
-sets the name of the journal file (without the \f[I].ml\f[R] extension).
-Defaults to \f[B]frama_c_journal\f[R].
 .TP
 -json-compilation-database \f[I]path\f[R]
 use \f[I]path\f[R] as a JSON compilation database (see

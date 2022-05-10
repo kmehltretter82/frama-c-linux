@@ -4,13 +4,13 @@ header-includes:
 - |
   ```{=man}
   .\"------------------------------------------------------------------------
-  .\"                                                                        
-  .\"  This file is part of Frama-C documentation                            
-  .\"                                                                        
-  .\"  Copyright (C) 2007-2021                                               
-  .\"    CEA (Commissariat à l'énergie atomique et aux énergies              
-  .\"         alternatives)                                                  
-  .\"                                                                        
+  .\"
+  .\"  This file is part of Frama-C documentation
+  .\"
+  .\"  Copyright (C) 2007-2021
+  .\"    CEA (Commissariat à l'énergie atomique et aux énergies
+  .\"         alternatives)
+  .\"
   .\"  you can redistribute it and/or modify it under the terms of the
   .\"  CC-BY-SA 4.0 license
 
@@ -247,19 +247,6 @@ If false, padding bits are left uninitialized. Defaults to yes.
 Use **@inline** to select all functions with attribute *inline*.
 Recursive functions are inlined only at the first level.
 Calls via function pointers are not inlined.
-
--journal-disable
-: do not output a journal of the current session. See **-journal-enable**.
-
--journal-enable
-: on by default, dumps a journal of all the actions performed during the
-current Frama-C session in the form of an OCaml script that can be replayed
-with **-load-script**. The name of the script can be set with the
-**-journal-name** option.
-
--journal-name *name*
-: sets the name of the journal file (without the *.ml* extension).
-Defaults to **frama_c_journal**.
 
 -json-compilation-database *path*
 : use *path* as a JSON compilation database
