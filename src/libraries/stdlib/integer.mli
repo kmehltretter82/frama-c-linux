@@ -214,10 +214,10 @@ val to_string : t -> string
 val of_string : string -> t
 (** @raise Invalid_argument when the string cannot be parsed. *)
 
-(** @modify Frama-C+dev remove optional `hexa` argument *)
+(** @modify 25.0-Manganese remove optional `hexa` argument *)
 val pretty : t formatter
 
-(** @since Frama-C+dev *)
+(** @since 25.0-Manganese *)
 val pretty_hex : t formatter
 
 val pp_bin : ?nbits:int -> ?sep:string -> t formatter

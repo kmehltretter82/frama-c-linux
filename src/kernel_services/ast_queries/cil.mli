@@ -122,7 +122,7 @@ val allowed_machdep: string -> string
 (** [allowed_machdep "machdep family"] provides a standard message for features
     only allowed for a particular machdep.
 
-    @since Frama-C+dev
+    @since 25.0-Manganese
 *)
 
 (* ************************************************************************* *)
@@ -1300,7 +1300,7 @@ val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 (** [true] iff the given variable is a const global variable with non extern
     storage.
 
-    @since Frama-C+dev
+    @since 25.0-Manganese
 *)
 val isGlobalInitConst: varinfo -> bool
 
@@ -1885,7 +1885,7 @@ val visitCilFileSameGlobals: cilVisitor -> file -> unit
 
 (** Same as {!visitCilFilesSameGlobals}, but only visits function definitions
     (i.e. behaves as if all globals but [GFun] return [SkipChildren]).
-    @since Frama-C+dev
+    @since 25.0-Manganese
 *)
 val visitCilFileFunctions: cilVisitor -> file -> unit
 

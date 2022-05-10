@@ -25,6 +25,11 @@
 Plugin E-ACSL <next-release>
 ############################
 
+
+##############################
+Plugin E-ACSL 24.0 (Manganese)
+##############################
+
 -  E-ACSL       [2022-03-04] Improve translation of `\at()` terms and
                 predicates (frama-c/e-acsl#108).
 -* E-ACSL       [2022-03-01] Fix normalization of global annotations that

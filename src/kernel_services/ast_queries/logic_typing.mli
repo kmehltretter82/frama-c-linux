@@ -147,7 +147,7 @@ type typing_context = {
       a text message indicating the issue) and the exception will be re-raised.
 
       @since Chlorine-20180501
-      @modify Frama-C+dev rollback takes as argument the error
+      @modify 25.0-Manganese rollback takes as argument the error
   *)
 }
 

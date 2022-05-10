@@ -287,7 +287,7 @@ val is_plain_type: logic_type -> bool
 (** [make_arrow_type args rt] returns a [rt] if [args] is empty or the
     corresponding [Larrow] type.
 
-    @since Frama-C+dev
+    @since 25.0-Manganese
 *)
 val make_arrow_type: logic_var list -> logic_type -> logic_type
 

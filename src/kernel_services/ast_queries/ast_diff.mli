@@ -22,7 +22,7 @@
 
 (** Compute diff information from an existing project.
 
-    @since Frama-C+dev
+    @since 25.0-Manganese
 *)
 
 open Cil_types
