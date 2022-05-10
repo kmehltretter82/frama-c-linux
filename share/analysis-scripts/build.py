@@ -49,6 +49,13 @@ for analysis with Frama-C. Tries to use a build_commands.json file if
 available."""
 )
 parser.add_argument(
+    "--base",
+    metavar="DIR",
+    default=".",
+    help="base directory used for pretty-printing relative paths (default: PWD)",
+    type=Path,
+)
+parser.add_argument(
     "--debug",
     metavar="FILE",
     help="enable debug mode and redirect output to the specified file",
@@ -59,6 +66,7 @@ parser.add_argument(
     metavar="FILE",
     default="build_commands.json",
     help="path to JBDB (default: build_commands.json)",
+    type=Path,
 )
 parser.add_argument(
     "--machdep", metavar="MACHDEP", help="analysis machdep (default: Frama-C's default)"
@@ -80,11 +88,12 @@ parser.add_argument(
     "--targets",
     metavar="FILE",
     nargs="+",
-    help="targets to build. When using --sources, " + "only a single target is allowed.",
+    help="targets to build. When using --sources, only a single target is allowed.",
     type=Path,
 )
 
 args = parser.parse_args()
+base = args.base
 force = args.force
 jbdb_path = args.jbdb
 machdep = args.machdep
@@ -189,22 +198,18 @@ def make_target_name(target):
     return prettify(target).replace("/", "_").replace(".", "_")
 
 
-# sources are pretty-printed relatively to the .frama-c directory, where the
-# GNUmakefile will reside
-def rel_prefix(path, max_rel_parents=1):
-    """Return a relative path to the .frama-c directory if path is relative, or if the relativized
-    path will contain at most max_rel_parents (in the form of '..').
-    Otherwise, return an absolute path."""
-    rel = os.path.relpath(path, start=dot_framac_dir)
-    max_parent_prefix = "../" * (max_rel_parents + 1)
-    if rel.startswith(max_parent_prefix):
-        return os.path.abspath(path)
-    else:
-        return rel
+def rel_path(path: Path, base: Path) -> str:
+    """Return a relative path to the .frama-c directory, if path is relative to base.
+    Otherwise, return an absolute path. Typically, base is the parent of the .frama-c directory."""
+    try:
+        path.resolve().relative_to(base.resolve())  # Fails if path is not inside base
+        return os.path.relpath(path, start=dot_framac_dir)
+    except ValueError:
+        return str(path.resolve())
 
 
-def pretty_sources(sources):
-    return [f"  {rel_prefix(source)} \\" for source in sorted(sources)]
+def pretty_sources(sources, base):
+    return [f"  {rel_path(source, base)} \\" for source in sorted(sources)]
 
 
 def lines_of_file(path):
@@ -413,7 +418,7 @@ if jbdb_path:
     insert_lines_after(
         template,
         "^FCFLAGS",
-        [f"  -json-compilation-database {rel_prefix(jbdb_path)} \\"],
+        [f"  -json-compilation-database {rel_path(jbdb_path, base)} \\"],
     )
 
 targets_eva = [f"  {make_target_name(target)}.eva \\" for target in sorted(targets)]
@@ -424,7 +429,7 @@ delete_line(template, r"^main.parse: \\")
 delete_line(template, r"^  main.c \\")
 for target, sources in reversed(sorted(sources_map.items())):
     pp_target = make_target_name(target)
-    new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + [""]
+    new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources, base) + [""]
     if any(d[2] for d in main_definitions[target]):
         logging.debug(
             "target %s has main with args, adding -main eva_main to its FCFLAGS",

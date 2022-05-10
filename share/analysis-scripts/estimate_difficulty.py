@@ -245,8 +245,7 @@ if not no_cloc:
     cloc = external_tool.get_command("cloc", "CLOC")
     if cloc:
         data = external_tool.run_and_check(
-            [str(cloc), "--hide-rate", "--progress-rate=0", "--csv"]
-            + list(str(f) for f in files),
+            [str(cloc), "--hide-rate", "--progress-rate=0", "--csv"] + list(str(f) for f in files),
             "",
         )
         data = data.splitlines()
