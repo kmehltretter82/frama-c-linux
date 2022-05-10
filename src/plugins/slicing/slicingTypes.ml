@@ -74,8 +74,6 @@ type sl_fct_slice = SlicingInternals.fct_slice
 (** Marks : used to put 'colors' in the result *)
 type sl_mark = SlicingInternals.pdg_mark
 
-(** {3 For the journalization of values of these types} *)
-
 let pp_sl_project p_caller fmt _p =
   let pp fmt =
     Format.fprintf fmt

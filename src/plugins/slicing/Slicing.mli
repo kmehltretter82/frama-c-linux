@@ -109,7 +109,7 @@ module Api:sig
     type t
 
     val dyn_t : t Type.t
-    (** For dynamic type checking and journalization. *)
+    (** For dynamic type checking. *)
 
     val make : data:bool -> addr:bool -> ctrl:bool -> t
     (** To construct a mark such as
@@ -165,13 +165,13 @@ module Api:sig
     (** Internal selection. *)
 
     val dyn_t : t Type.t
-    (** For dynamic type checking and journalization. *)
+    (** For dynamic type checking. *)
 
     type set
     (** Set of colored selections. *)
 
     val dyn_set : set Type.t
-    (** For dynamic type checking and journalization. *)
+    (** For dynamic type checking. *)
 
     (** {3 Journalized selectors} *)
 
@@ -264,8 +264,6 @@ module Api:sig
        kernel_function -> set)
     (** To select the annotations related to a function. *)
 
-    (** {3 Selectors that are not journalized} *)
-
     val select_func_zone :
       (set -> Mark.t -> Locations.Zone.t -> kernel_function -> set)
     (** To select an output zone related to a function. *)
@@ -306,7 +304,7 @@ module Api:sig
         - mark the node with a spare_mark and propagate so that
           the dependencies that were not selected yet will be marked spare. *)
 
-    (** {3 Not for casual users and not journalized} *)
+    (** {3 Not for casual users} *)
 
     val get_function : t -> kernel_function
     (** May be used to get the function related to an internal selection. *)
@@ -410,7 +408,7 @@ module Api:sig
     (** Abstract data type for function slice. *)
 
     val dyn_t : t Type.t
-    (** For dynamic type checking and journalization. *)
+    (** For dynamic type checking. *)
 
     val create : kernel_function -> t
     (** Used to get an empty slice (nothing selected) related to a
@@ -497,7 +495,7 @@ module Api:sig
     val add_persistent_cmdline : unit -> unit
     (** Add persistent selection from the command line. *)
 
-    (** {3 Not for casual users and not journalized} *)
+    (** {3 Not for casual users} *)
 
     val add_slice_selection_internal:Slice.t -> Select.t -> unit
     (** May be used to add a selection request for a function slice

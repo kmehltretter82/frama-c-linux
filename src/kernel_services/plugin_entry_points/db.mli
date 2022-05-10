@@ -26,7 +26,6 @@
 (**
    Modules providing general services:
    - {!Dynamic}: API for plug-ins linked dynamically
-   - {!Journal}: journalisation
    - {!Log}: message outputs and printers
    - {!Plugin}: general services for plug-ins
    - {!Project} and associated files: {!Kind}, {!Datatype} and {!State_builder}.
@@ -172,8 +171,7 @@ module Value : sig
       [fun_use_default_args] is called, when the ast is changed, or
       if the options [-libentry] or [-main] are changed. *)
 
-  (** Specify the arguments to use. This function is not journalized, and
-      will generate an error when the journal is replayed *)
+  (** Specify the arguments to use. *)
   val fun_set_args : t list -> unit
 
   val fun_use_default_args : unit -> unit
@@ -196,8 +194,7 @@ module Value : sig
       the option [-libentry]) is used when [globals_use_default_initial_state]
       is called, or when the ast changes. *)
 
-  (** Specify the initial state to use. This function is not journalized,
-      and will generate an error when the journal is replayed *)
+  (** Specify the initial state to use. *)
   val globals_set_initial_state : state -> unit
 
   val globals_use_default_initial_state : unit -> unit

@@ -71,8 +71,6 @@ module Kernel_log =
 let dkey = Kernel_log.register_category "cmdline"
 
 let quiet_ref = ref false
-let journal_enable_ref = ref !Fc_config.is_gui
-let journal_isset_ref = ref false
 let use_obj_ref = ref true
 let use_type_ref = ref true
 let deterministic = ref false
@@ -379,15 +377,9 @@ let parse known_options_list then_expected options_list =
 let non_initial_options_ref = ref []
 
 let () =
-  let set_journal b =
-    journal_enable_ref := b;
-    journal_isset_ref := true
-  in
   let first_parsing_stage () =
     parse
-      [ "-journal-enable", Unit (fun () -> set_journal true);
-        "-journal-disable", Unit (fun () -> set_journal false);
-        "-no-obj", Unit (fun () -> use_obj_ref := false);
+      [ "-no-obj", Unit (fun () -> use_obj_ref := false);
         "-no-type", Unit (fun () -> use_type_ref := false);
         "-quiet",
         Unit (fun () ->
@@ -418,16 +410,10 @@ let () =
   if not !use_obj_ref then use_type_ref := false;
   if not !use_type_ref then begin
     Type.no_obj ();
-    if !journal_enable_ref then begin
-      Kernel_log.warning "disabling journal in the 'no obj' mode";
-      journal_enable_ref := false
-    end
   end
 
 let quiet = !quiet_ref
 
-let journal_enable = !journal_enable_ref
-let journal_isset = !journal_isset_ref
 let use_obj = !use_obj_ref
 let use_type = !use_type_ref
 let deterministic = !deterministic

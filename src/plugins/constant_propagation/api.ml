@@ -395,7 +395,6 @@ let main () =
     || not (Cil_datatype.Fundec.Set.is_empty
               (PropagationParameters.SemanticConstFold.get ()))
   in
-  (* must called the function stored in [Db] for journalisation purpose *)
   if force_semantic_folding then compute ()
 
 let () =

@@ -839,7 +839,6 @@ let () =
 
 let get_component =
   Dynamic.register
-  ~journalize:true
   "Security.get_component"
   (Datatype.func Kernel_type.stmt (Datatype.list Kernel_type.stmt))
   (fun s -> compute (); Components.find s)
@@ -878,7 +877,6 @@ let slice ctrl =
 let slice =
   Dynamic.register
     "Security_slicing.slice"
-    ~journalize:true
     (Datatype.func Datatype.bool Project.ty)
     slice
 *)

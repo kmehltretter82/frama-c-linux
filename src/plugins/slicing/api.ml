@@ -44,8 +44,6 @@ let self = SlicingState.self
 
 (* ---------------------------------------------------------------------- *)
 
-(** {2 Functions with journalized side effects } *)
-
 let set_modes calls callers sliceUndef keepAnnotations () =
   SlicingParameters.Mode.Calls.set calls ;
   SlicingParameters.Mode.Callers.set callers ;
@@ -67,8 +65,6 @@ module Project = struct
   (** {2 Values } *)
 
   let default_slice_names = SlicingTransform.default_slice_names
-
-  (** {2 Functions with journalized side effects } *)
 
   let reset_slicing = SlicingState.reset_slicing
 
@@ -159,8 +155,6 @@ module Slice = struct
   type t = SlicingTypes.sl_fct_slice
   let dyn_t = SlicingTypes.dyn_sl_fct_slice
 
-  (** {2 Functions with journalized side effects } *)
-
   let create =
     SlicingProject.create_slice
 
@@ -225,8 +219,6 @@ end
 
 (** {1 Slicing request} *)
 module Request = struct
-
-  (** {2 Functions with journalized side effects } *)
 
   let apply_all propagate_to_callers =
     SlicingCmds.apply_all ~propagate_to_callers

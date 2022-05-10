@@ -65,8 +65,6 @@ type sl_fct_slice = SlicingInternals.fct_slice
 (** Marks : used to put 'colors' in the result *)
 type sl_mark = SlicingInternals.pdg_mark
 
-(** {3 For the journalization of values of these types} *)
-
 val pp_sl_project : Type.precedence -> Format.formatter -> 'a -> unit
 
 module Sl_project : Datatype.S with type t = sl_project

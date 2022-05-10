@@ -28,8 +28,6 @@ val self : State.t
 
 (* ---------------------------------------------------------------------- *)
 
-(** {2 Functions with journalized side effects } *)
-
 (** Set the used slicing modes. *)
 val set_modes :
   ?calls:SlicingParameters.Mode.Calls.t ->
@@ -41,8 +39,6 @@ val set_modes :
 
 (** {1 Slicing project management.} *)
 module Project : sig
-
-  (** {2 Functions with journalized side effects } *)
 
   (** Init/reset a slicing project. *)
   val reset_slicing : unit -> unit
@@ -102,7 +98,7 @@ module Mark : sig
   (** Abstract data type for mark value. *)
   type t = SlicingTypes.sl_mark
 
-  (** For dynamic type checking and journalization. *)
+  (** For dynamic type checking. *)
   val dyn_t : t Type.t
 
   (** {2 No needs of Journalization} *)
@@ -158,13 +154,13 @@ module Select : sig
   (** Internal selection. *)
   type t = SlicingTypes.sl_select
 
-  (** For dynamic type checking and journalization. *)
+  (** For dynamic type checking. *)
   val dyn_t : t Type.t
 
   (** Set of colored selections. *)
   type set = SlicingCmds.set
 
-  (** For dynamic type checking and journalization. *)
+  (** For dynamic type checking. *)
   val dyn_set : set Type.t
 
   (** {2 Selectors.} *)
@@ -429,8 +425,6 @@ module Slice : sig
   type t = SlicingTypes.sl_fct_slice
   val dyn_t : t Type.t
 
-  (** {2 Functions with journalized side effects } *)
-
   val create : Cil_types.kernel_function -> t
 
   val remove : t -> unit
@@ -473,8 +467,6 @@ end
 
 (** {1 Slicing request} *)
 module Request : sig
-
-  (** {2 Functions with journalized side effects } *)
 
   val apply_all : propagate_to_callers:bool -> unit
 

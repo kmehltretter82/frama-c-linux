@@ -32,7 +32,7 @@ let syntactic ?(libc=Metrics_parameters.Libc.get ()) () =
   begin
     match AstType.get () with
     | "cil" -> Metrics_cilast.compute_on_cilast ~libc
-    (* Cabs metrics are experimental. unregistered, unjournalized *)
+    (* Cabs metrics are experimental. unregistered *)
     | "cabs" -> Metrics_cabs.compute_on_cabs ()
     | "acsl" -> Metrics_acsl.dump()
     | _ -> assert false (* the possible values are checked by the kernel*)

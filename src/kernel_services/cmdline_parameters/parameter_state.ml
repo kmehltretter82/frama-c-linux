@@ -225,7 +225,6 @@ struct
     Is_set.set false
 
   let clear () =
-    (* write this call in the journal if and only if there is something to do *)
     if Is_set.get () || not (is_default ()) then unguarded_clear ()
 
   let equal = X.equal

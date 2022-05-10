@@ -320,7 +320,6 @@ module Kernel_function_set(X: Input_with_arg) =
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
-let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module GeneralHelp =
   False
@@ -335,7 +334,6 @@ let () = GeneralHelp.add_aliases [ "-h"; "-help"]
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
-let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module ListPlugins =
   False
@@ -445,7 +443,6 @@ module PrintConfigJson =
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
-let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module AutocompleteHelp =
   P.String_set
@@ -474,7 +471,6 @@ let _ =
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
-let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module Explain =
   False
@@ -498,7 +494,6 @@ let () =
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
-let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.is_reconfigurable ()
 module GeneralVerbose =
@@ -520,7 +515,6 @@ let () =
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
-let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.is_reconfigurable ()
 module GeneralDebug =
@@ -548,7 +542,6 @@ let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.is_reconfigurable ()
 let () = Parameter_customize.do_not_projectify ()
-let () = Parameter_customize.do_not_journalize ()
 module Quiet =
   Bool
     (struct
@@ -563,7 +556,6 @@ let () =
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extended
-let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.do_not_projectify ()
 module Unicode = struct
   include True
@@ -573,9 +565,7 @@ module Unicode = struct
         let help = "use utf8 in messages"
       end)
   (* This function behaves nicely with the Gui, that detects if command-line
-     arguments have been set by the user at some point. One possible improvement
-     would be to bypass journalization entirely, but this requires an API
-     change in Plugin *)
+     arguments have been set by the user at some point. *)
   let without_unicode f arg =
     let old, default = get (), not (is_set ()) in
     off ();
@@ -905,44 +895,6 @@ let bootstrap_loader () =
   end
 
 let () = Cmdline.load_all_plugins := bootstrap_loader
-
-module Journal = struct
-  let () = Parameter_customize.set_negative_option_name "-journal-disable"
-  let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-  let () = Parameter_customize.set_group saveload
-  let () = Parameter_customize.do_not_projectify ()
-  module Enable = struct
-    include Bool
-        (struct
-          let module_name = "Journal.Enable"
-          let default = Cmdline.journal_enable
-          let option_name = "-journal-enable"
-          let help = "dump a journal while Frama-C exit"
-        end)
-    let is_set () = Cmdline.journal_isset
-  end
-  let () = Parameter_customize.set_group saveload
-  let () = Parameter_customize.do_not_projectify ()
-  module Name =
-    String
-      (struct
-        let module_name = "Journal.Name"
-        let option_name = "-journal-name"
-        let default =
-          let dir =
-            (* duplicate code from Plugin.Session *)
-            if Session.is_set ()
-            then
-              (Session.get () :> string)
-            else
-              try Sys.getenv "FRAMAC_SESSION"
-              with Not_found -> "./.frama-c"
-          in
-          dir ^ "/frama_c_journal.ml"
-        let arg_name = "s"
-        let help = "set the filename of the journal"
-      end)
-end
 
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload

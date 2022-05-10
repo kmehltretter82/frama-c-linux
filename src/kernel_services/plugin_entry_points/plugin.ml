@@ -508,7 +508,6 @@ struct
   let output_mode modname optname =
     Parameter_customize.set_group messages;
     Parameter_customize.do_not_projectify ();
-    Parameter_customize.do_not_journalize ();
     Parameter_customize.is_reconfigurable ();
     if is_kernel () then begin
       Parameter_customize.set_cmdline_stage Cmdline.Early;

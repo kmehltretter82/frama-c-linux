@@ -206,7 +206,6 @@ module Value = struct
         let dependencies = [Ast.self]
       end)
 
-  (* This function is *not* journalized *)
   let globals_set_initial_state state =
     if not (Option.equal Cvalue.Model.equal
               (Some state)
