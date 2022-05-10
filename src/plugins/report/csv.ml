@@ -88,7 +88,6 @@ let output file =
 let print_csv =
   Dynamic.register
     ~plugin:"Report"
-    ~journalize:true
     "print_csv"
     (Datatype.func Datatype.string Datatype.unit)
     output

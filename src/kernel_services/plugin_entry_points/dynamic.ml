@@ -359,29 +359,9 @@ let load_module m =
 let dynamic_values = Tbl.create 97
 let comments_fordoc = Hashtbl.create 97
 
-let register ?(comment="") ~plugin name ty ~journalize f =
+let register ?(comment="") ~plugin name ty f =
   if Cmdline.use_type then begin
     Klog.debug ~level:5 "registering dynamic function %s" name;
-    let f =
-      if journalize then
-        let comment fmt =
-          Format.fprintf fmt
-            "@[<hov>Applying@;dynamic@;functions@;%S@;of@;type@;%s@]"
-            name
-            (Type.name ty)
-        in
-        let jname =
-          Format.fprintf
-            Format.str_formatter
-            "@[<hv 2>Dynamic.get@;~plugin:%S@;%S@;%t@]"
-            plugin name
-            (Type.pp_ml_name ty Type.Call);
-          Format.flush_str_formatter ()
-        in
-        Journal.register jname ty ~is_dyn:true ~comment f
-      else
-        f
-    in
     let key = plugin ^ "." ^ name in
     Tbl.add dynamic_values key ty f;
     if comment <> "" then Hashtbl.add comments_fordoc key comment ;

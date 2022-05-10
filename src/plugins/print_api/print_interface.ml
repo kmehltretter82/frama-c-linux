@@ -362,7 +362,6 @@ let print =
                It takes the path where to create this file as an argument."
     ~plugin:"Print_api"
     "run"
-    ~journalize:true
     (Datatype.func Datatype.string Datatype.unit)
     print
 

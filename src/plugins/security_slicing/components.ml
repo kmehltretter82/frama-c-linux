@@ -734,7 +734,6 @@ end
 
 let register name arg =
   Dynamic.register
-    ~journalize:true
     ~plugin:"Security_slicing"
     name
     (Datatype.func Stmt.ty (Datatype.list Stmt.ty))
@@ -752,7 +751,6 @@ let impact_analysis =
   Dynamic.register
     ~plugin:"Security_slicing"
     "impact_analysis"
-    ~journalize:true
     (Datatype.func2 Kernel_function.ty Stmt.ty (Datatype.list Stmt.ty))
     (Component.forward Component.Impact)
 

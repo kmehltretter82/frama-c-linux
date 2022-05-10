@@ -453,11 +453,6 @@ struct
         ]
         let visible_ref = !session_visible_ref
       end)
-  let () =
-    if is_kernel ()
-    then
-      Journal.get_session_file :=
-        (fun s -> Session.get_file ~mode:`Create_path s)
 
   module Config =
     Make_specific_dir

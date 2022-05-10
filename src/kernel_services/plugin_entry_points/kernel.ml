@@ -942,7 +942,6 @@ module Journal = struct
         let arg_name = "s"
         let help = "set the filename of the journal"
       end)
-  let () = Name.add_set_hook (fun _ s -> Journal.set_name s);
 end
 
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending

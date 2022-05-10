@@ -53,22 +53,7 @@ open Cil_datatype
 (** {2 Registering} *)
 (* ************************************************************************* *)
 
-(** How to journalize the given function.
-    @since Beryllium-20090601-beta1 *)
-type 'a how_to_journalize =
-  | Journalize of string * 'a Type.t
-  (** Journalize the value with the given name and type. *)
-  | Journalization_not_required
-  (** Journalization of this value is not required
-      (usually because it has no effect on the Frama-C global state). *)
-  | Journalization_must_not_happen of string
-  (** Journalization of this value should not happen
-      (usually because it is a low-level function: this function is always
-      called from a journalized function).
-      The string is the function name which is used for displaying suitable
-      error message. *)
-
-val register: 'a how_to_journalize -> 'a ref -> 'a -> unit
+val register: 'a ref -> 'a -> unit
 (** Plugins must register values with this function. *)
 
 val register_compute:
@@ -77,7 +62,6 @@ val register_compute:
   (unit -> unit) ref -> (unit -> unit) -> State.t
 
 val register_guarded_compute:
-  string ->
   (unit -> bool) ->
   (unit -> unit) ref -> (unit -> unit) -> unit
 

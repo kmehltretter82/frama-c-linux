@@ -79,7 +79,6 @@ let _iter_in_rev_order =
     ~plugin:Options.name
     "iter_in_rev_order"
     Datatype.(func (func Kernel_function.ty unit) unit)
-    ~journalize:false
     iter_in_rev_order
 
 let iter_on_aux iter_dir f kf =
@@ -132,7 +131,6 @@ let _accept_base =
     ~plugin:Options.name
     "accept_base"
     Datatype.(func2 Kernel_function.ty Base.ty bool)
-    ~journalize:false
     (fun kf b -> accept_base ~with_formals:true ~with_locals:true kf b)
 
 let nb_calls () =

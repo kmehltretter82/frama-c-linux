@@ -249,8 +249,6 @@ let guarded_feedback selection level fmt_msg =
   else
     Pretty_utils.nullprintf fmt_msg
 
-let dft_sel () = State_selection.full
-
 module Q = Qstack.Make(struct type t = project let equal = equal end)
 
 let projects = Q.create ()
@@ -283,20 +281,14 @@ module Mem = struct
 end
 module Setter = Make_setter(Mem)
 
-let unjournalized_set_name p s =
+let set_name p s =
   feedback ~dkey ~level:2 "renaming project %S to %S" p.unique_name s;
   Setter.set_name p s
-
-let set_name =
-  Journal.register
-    "Project.set_name"
-    (Datatype.func2 ty Datatype.string Datatype.unit)
-    unjournalized_set_name
 
 module Create_Hook = Hook.Build(struct type t = project end)
 let register_create_hook = Create_Hook.extend
 
-let force_create name =
+let create name =
   feedback ~dkey ~level:2 "creating project %S" name;
   let p = Setter.make name in
   feedback ~dkey ~level:3 "its unique name is %S" p.unique_name;
@@ -304,18 +296,6 @@ let force_create name =
   States_operations.create p;
   Create_Hook.apply p;
   p
-
-let journalized_create =
-  Journal.register
-    "Project.create" (Datatype.func Datatype.string ty) force_create
-
-(* do not journalise the first call to [create] *)
-let create =
-  let first = ref true in
-  fun name ->
-    let p = if !first then force_create name else journalized_create name in
-    first := false;
-    p
 
 let get_name p = p.name
 let get_unique_name p = p.unique_name
@@ -328,7 +308,7 @@ module Set_Current_Hook = Hook.Build(struct type t = project end)
 let register_after_set_current_hook ~user_only =
   if user_only then Set_Current_Hook_User.extend else Set_Current_Hook.extend
 
-let unjournalized_set_current =
+let force_set_current =
   let apply_hook = ref false in
   fun on selection p ->
     if not (Q.mem p projects) then
@@ -350,16 +330,8 @@ let unjournalized_set_current =
       apply_hook := false
     end
 
-let journalized_set_current =
-  let lbl = Datatype.optlabel_func in
-  Journal.register "Project.set_current"
-    (lbl "on" (fun () -> false) Datatype.bool
-       (lbl "selection" dft_sel State_selection.ty
-          (Datatype.func ty Datatype.unit)))
-    unjournalized_set_current
-
 let set_current ?(on=false) ?(selection=State_selection.full) p =
-  if not (equal p (current ())) then journalized_set_current on selection p
+  if not (equal p (current ())) then force_set_current on selection p
 
 let set_current_as_last_created () =
   Option.iter (fun p -> set_current p) !last_created_by_copy_ref
@@ -367,12 +339,7 @@ let set_current_as_last_created () =
 (** Indicates if we should keep [p] as the current project when calling {!on p}. *)
 let keep_current: bool ref = ref false
 
-let unjournalized_set_keep_current b = keep_current := b
-
-let set_keep_current =
-  Journal.register "Project.set_keep_current"
-    (Datatype.func Datatype.bool Datatype.unit)
-    unjournalized_set_keep_current
+let set_keep_current b = keep_current := b
 
 let on ?selection p f x =
   let old_current = current () in
@@ -415,7 +382,7 @@ exception Cannot_remove of string
 module Before_remove = Hook.Build(struct type t = project end)
 let register_before_remove_hook = Before_remove.extend
 
-let unjournalized_remove project =
+let remove ?(project=current()) () =
   feedback ~dkey ~level:2 "removing project %S" project.unique_name;
   if Q.length projects = 1 then raise (Cannot_remove project.unique_name);
   Before_remove.apply project;
@@ -435,15 +402,6 @@ let unjournalized_remove project =
     !last_created_by_copy_ref;
   (* clear all the states of other projects referring to the delete project *)
   Q.iter (States_operations.clear_some_projects (equal project)) projects
-(*  Gc.major ()*)
-
-let journalized_remove =
-  Journal.register "Project.remove"
-    (Datatype.optlabel_func
-       "project" current ty (Datatype.func Datatype.unit Datatype.unit))
-    (fun project () -> unjournalized_remove project)
-
-let remove ?(project=current()) () = journalized_remove project ()
 
 let remove_all () =
   feedback ~dkey ~level:2 "removing all existing projects";
@@ -456,19 +414,11 @@ let remove_all () =
   with NoProject ->
     ()
 
-let journalized_copy =
-  let lbl = Datatype.optlabel_func in
-  Journal.register "Project.copy"
-    (lbl "selection" dft_sel State_selection.ty
-       (lbl "src" current ty (Datatype.func ty Datatype.unit)))
-    (fun selection src dst ->
-       guarded_feedback selection 2 "copying project from %S to %S"
-         src.unique_name dst.unique_name;
-       States_operations.commit ~selection src;
-       States_operations.copy ~selection src dst)
-
 let copy ?(selection=State_selection.full) ?(src=current()) dst =
-  journalized_copy selection src dst
+  guarded_feedback selection 2 "copying project from %S to %S"
+    src.unique_name dst.unique_name;
+  States_operations.commit ~selection src;
+  States_operations.copy ~selection src dst
 
 module Before_Clear_Hook = Hook.Build(struct type t = project end)
 let register_todo_before_clear = Before_Clear_Hook.extend
@@ -476,30 +426,15 @@ let register_todo_before_clear = Before_Clear_Hook.extend
 module After_Clear_Hook = Hook.Build(struct type t = project end)
 let register_todo_after_clear = After_Clear_Hook.extend
 
-let journalized_clear =
-  let lbl = Datatype.optlabel_func in
-  Journal.register "Project.clear"
-    (lbl "selection" dft_sel State_selection.ty
-       (lbl "project" current ty (Datatype.func Datatype.unit Datatype.unit)))
-    (fun selection project () ->
-       guarded_feedback selection 2 "clearing project %S" project.unique_name;
-       Before_Clear_Hook.apply project;
-       States_operations.clear ~selection project;
-       After_Clear_Hook.apply project;
-       (*Gc.major ()*))
-
 let clear ?(selection=State_selection.full) ?(project=current()) () =
-  journalized_clear selection project ()
+  guarded_feedback selection 2 "clearing project %S" project.unique_name;
+  Before_Clear_Hook.apply project;
+  States_operations.clear ~selection project;
+  After_Clear_Hook.apply project
 
-let unjournalized_clear_all () =
+let clear_all () =
   Q.iter States_operations.clear projects;
   Gc.full_major ()
-
-let clear_all =
-  Journal.register
-    "Project.clear_all"
-    (Datatype.func Datatype.unit Datatype.unit)
-    unjournalized_clear_all
 
 (* ************************************************************************** *)
 (* Save/load *)
@@ -540,35 +475,15 @@ let save_projects selection projects filename =
   end else
     abort "saving a file is not supported in the 'no obj' mode"
 
-let unjournalized_save selection project filename =
+let save ?(selection=State_selection.full) ?(project=current()) filename =
   guarded_feedback selection 2 "saving project %S into file %a"
     project.unique_name Filepath.Normalized.pretty filename;
   save_projects selection (Q.singleton project) filename
 
-let journalized_save =
-  let lbl = Datatype.optlabel_func in
-  Journal.register "Project.save"
-    (lbl "selection" dft_sel State_selection.ty
-       (lbl "project" current ty (Datatype.func Datatype.Filepath.ty Datatype.unit)))
-    unjournalized_save
-
-let save ?(selection=State_selection.full) ?(project=current()) filename =
-  journalized_save selection project filename
-
-let unjournalized_save_all selection filename =
+let save_all ?(selection=State_selection.full) filename =
   guarded_feedback selection 2 "saving the current session into file %a"
     Filepath.Normalized.pretty filename;
   save_projects selection projects filename
-
-let journalized_save_all =
-  let lbl = Datatype.optlabel_func in
-  Journal.register "Project.save_all"
-    (lbl "selection" dft_sel State_selection.ty
-       (Datatype.func Datatype.Filepath.ty Datatype.unit))
-    unjournalized_save_all
-
-let save_all ?(selection=State_selection.full) filename =
-  journalized_save_all selection filename
 
 module Descr = struct
 
@@ -655,7 +570,7 @@ module Descr = struct
           (fun () ->
              (* Local states must be up-to-date according to [p] when
                 unmarshalling states of [p] *)
-             unjournalized_set_current true selection p;
+             force_set_current true selection p;
              Before_load.apply ();
              Descr.t_list tbl_on_disk)
       in
@@ -738,56 +653,39 @@ let load_projects ~project_under_copy selection ?name filename =
        temporarily. *)
     let true_current = current () in
     Q.add last projects;
-    unjournalized_set_current true selection true_current;
+    force_set_current true selection true_current;
     Q.remove last projects;
     After_global_load.apply ();
     loaded_projects
   end else
     abort "loading a file is not supported in the 'no obj' mode"
 
-let unjournalized_load ~project_under_copy selection name filename =
+let load_with_copy
+    ?project_under_copy ?(selection=State_selection.full) ?name filename =
   guarded_feedback selection 2 "loading the project saved in file %a"
     Filepath.Normalized.pretty filename;
   match load_projects ~project_under_copy selection ?name filename with
   | [ p ] -> p
   | [] | _ :: _ :: _ -> assert false
 
-let journalized_load =
-  let lbl = Datatype.optlabel_func in
-  Journal.register "Project.load"
-    (lbl "selection" dft_sel State_selection.ty
-       (lbl "name" (fun () -> None)
-          (Datatype.option Datatype.string) (Datatype.func Datatype.Filepath.ty ty)))
-    (unjournalized_load ~project_under_copy:None)
+let load = load_with_copy ?project_under_copy:None
 
-let load ?(selection=State_selection.full) ?name filename =
-  journalized_load selection name filename
-
-let unjournalized_load_all selection filename =
+let load_all ?(selection=State_selection.full) filename =
   remove_all ();
   guarded_feedback selection 2 "loading the session saved in file %a"
     Filepath.Normalized.pretty filename;
   try
     ignore (load_projects ~project_under_copy:None selection filename)
   with IOError _ as e ->
-    unjournalized_set_current false selection (create "default");
+    force_set_current false selection (create "default");
     raise e
-
-let journalized_load_all =
-  let lbl = Datatype.optlabel_func in
-  Journal.register "Project.load_all"
-    (lbl "selection" dft_sel State_selection.ty
-       (Datatype.func Datatype.Filepath.ty Datatype.unit))
-    unjournalized_load_all
-
-let load_all ?(selection=State_selection.full) filename =
-  journalized_load_all selection filename
 
 module Create_by_copy_hook = Hook.Build(struct type t = project * project end)
 let create_by_copy_hook f =
   Create_by_copy_hook.extend (fun (src, dst) -> f src dst)
 
-let unjournalized_create_by_copy selection src last name =
+let create_by_copy
+    ?(selection=State_selection.full) ?(src=current()) ~last name =
   guarded_feedback selection 2 "creating project %S by copying project %S"
     name (src.unique_name);
   let filename =
@@ -797,10 +695,7 @@ let unjournalized_create_by_copy selection src last name =
   in
   save ~selection ~project:src filename;
   try
-    let prj =
-      unjournalized_load
-        ~project_under_copy:(Some src) selection (Some name) filename
-    in
+    let prj = load_with_copy ~project_under_copy:src ~selection ~name filename in
     Extlib.safe_remove (filename:>string);
     if last then last_created_by_copy_ref := Some prj;
     Create_by_copy_hook.apply (src, prj);
@@ -808,19 +703,6 @@ let unjournalized_create_by_copy selection src last name =
   with e ->
     Extlib.safe_remove (filename:>string);
     raise e
-
-let journalized_create_by_copy =
-  let lbl = Datatype.optlabel_func in
-  Journal.register "Project.create_by_copy"
-    (lbl "selection" dft_sel State_selection.ty
-       (lbl "src" current ty
-          (Datatype.func2
-             ~label1:("last", None) Datatype.bool Datatype.string ty)))
-    unjournalized_create_by_copy
-
-let create_by_copy
-    ?(selection=State_selection.full) ?(src=current()) ~last name =
-  journalized_create_by_copy selection src last name
 
 (* ************************************************************************** *)
 (** {2 Undoing} *)
@@ -836,8 +718,6 @@ module Undo = struct
   let restore () =
     if Cmdline.use_obj then begin
       try
-        Journal.prevent load_all !filename;
-        Journal.restore ();
         clear_breakpoint ()
       with IOError s ->
         feedback ~dkey "cannot restore the last breakpoint: %S" s;
@@ -851,8 +731,6 @@ module Undo = struct
           (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
            with Extlib.Temp_file_error s ->
              abort "cannot create temporary file: %s" s);
-      Journal.prevent save_all !filename;
-      Journal.save ()
     end
 
 end

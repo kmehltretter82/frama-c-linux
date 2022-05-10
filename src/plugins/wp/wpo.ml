@@ -490,13 +490,13 @@ let () = Type.set_ml_name ResultType.ty (Some "Wpo.result")
 
 let get_gid =
   Dynamic.register
-    ~plugin:"Wp" "Wpo.get_gid" ~journalize:false
+    ~plugin:"Wp" "Wpo.get_gid"
     (Datatype.func WpoType.ty Datatype.string)
     (fun g -> g.po_gid)
 
 let get_property =
   Dynamic.register
-    ~plugin:"Wp" "Wpo.get_property" ~journalize:false
+    ~plugin:"Wp" "Wpo.get_property"
     (Datatype.func WpoType.ty Property.ty)
     (fun g -> WpPropId.property_of_id g.po_pid)
 
@@ -827,12 +827,12 @@ let is_passed g =
     is_proved g
 
 let get_result =
-  Dynamic.register ~plugin:"Wp" "Wpo.get_result" ~journalize:false
+  Dynamic.register ~plugin:"Wp" "Wpo.get_result"
     (Datatype.func2 WpoType.ty ProverType.ty ResultType.ty)
     get_result
 
 let is_valid =
-  Dynamic.register ~plugin:"Wp" "Wpo.is_valid" ~journalize:false
+  Dynamic.register ~plugin:"Wp" "Wpo.is_valid"
     (Datatype.func ResultType.ty Datatype.bool) VCS.is_valid
 
 (* -------------------------------------------------------------------------- *)
@@ -920,7 +920,6 @@ let iter ?ip ?index ?on_axiomatics ?on_behavior ?on_goal () =
 let iter_on_goals =
   Dynamic.register ~plugin:"Wp" "Wpo.iter_on_goals"
     (Datatype.func (Datatype.func WpoType.ty Datatype.unit) Datatype.unit)
-    ~journalize:true
     (fun on_goal -> iter ~on_goal ())
 
 let goals_of_property prop =
@@ -934,11 +933,10 @@ let goals_of_property prop =
 let goals_of_property =
   Dynamic.register ~plugin:"Wp" "Wpo.goals_of_property"
     (Datatype.func Property.ty (Datatype.list WpoType.ty))
-    ~journalize:false
     goals_of_property
 
 let prover_of_name =
-  Dynamic.register ~plugin:"Wp" "Wpo.prover_of_name" ~journalize:false
+  Dynamic.register ~plugin:"Wp" "Wpo.prover_of_name"
     (Datatype.func Datatype.string (Datatype.option ProverType.ty))
     VCS.parse_prover
 
@@ -953,7 +951,7 @@ let get_logfile w prover result =
   DISK.cache_log ~pid:w.po_pid ~model ~prover ~result
 
 let _ignore =
-  Dynamic.register ~plugin:"Wp" "Wpo.file_for_log_proof" ~journalize:false
+  Dynamic.register ~plugin:"Wp" "Wpo.file_for_log_proof"
     (Datatype.func2
        WpoType.ty ProverType.ty
        (Datatype.pair Datatype.string Datatype.string))

@@ -148,25 +148,9 @@ let compute_pragmas () =
   stmts;
 ;;
 
-let compute_pragmas =
-  Journal.register
-    "Impact.compute_pragmas"
-    (Datatype.func Datatype.unit (Datatype.list Stmt.ty))
-    compute_pragmas
+let from_stmt = compute_from_stmt
 
-let from_stmt =
-  Journal.register
-    "Impact.from_stmt"
-    (Datatype.func Stmt.ty (Datatype.list Stmt.ty))
-    compute_from_stmt
-
-let from_nodes =
-  Journal.register
-    "Impact.from_nodes"
-    (Datatype.func2 Kernel_function.ty
-       (Datatype.list PdgTypes.Node.ty)
-       (PdgTypes.NodeSet.ty))
-    compute_from_nodes
+let from_nodes = compute_from_nodes
 
 let main () =
   if Options.is_on () then begin

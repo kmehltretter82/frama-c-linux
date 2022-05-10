@@ -61,15 +61,15 @@ let compute () =
 
 let journal_register ?comment is_dyn name ty_arg fctref fct =
   let ty = Datatype.func ty_arg Datatype.unit in
-  Db.register (Db.Journalize("RteGen." ^ name, ty)) fctref fct;
+  Db.register fctref fct;
   if is_dyn then
     let _ignore =
-      Dynamic.register ?comment ~plugin:"RteGen" name ty ~journalize:true fct
+      Dynamic.register ?comment ~plugin:"RteGen" name ty fct
     in
     ()
 
 let nojournal_register fctref fct =
-  Db.register Db.Journalization_not_required fctref (fun () -> fct)
+  Db.register fctref (fun () -> fct)
 
 let () =
   journal_register false
@@ -109,7 +109,6 @@ let _ =
     ~plugin:"RteGen"
     "emitter"
     Emitter.ty
-    ~journalize:false
     Generator.emitter
 
 (* retrieve list of generated rte annotations for a given stmt *)
@@ -122,7 +121,6 @@ let _ignore =
     (Datatype.func
        Cil_datatype.Stmt.ty
        (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
-    ~journalize:true
     Generator.get_registered_annotations
 
 let _ignore =
@@ -133,7 +131,6 @@ let _ignore =
     "stmt_annotations"
     (Datatype.func2 Kernel_function.ty Cil_datatype.Stmt.ty
        (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
-    ~journalize:false
     Visit.get_annotations_stmt
 
 let _ignore =
@@ -144,7 +141,6 @@ let _ignore =
     "exp_annotations"
     (Datatype.func3 Kernel_function.ty Cil_datatype.Stmt.ty Cil_datatype.Exp.ty
        (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
-    ~journalize:false
     Visit.get_annotations_exp
 
 let _ignore =
@@ -153,7 +149,6 @@ let _ignore =
     ~plugin:"RteGen"
     "all_statuses"
     Datatype.(list (triple string (func2 kf bool unit) (func kf bool)))
-    ~journalize:false
     Generator.all_statuses
 
 let main () =

@@ -639,48 +639,9 @@ let rm_asserts () =
     CA_Map.iter aux to_be_removed
   end
 
-let get_data_scope_at_stmt =
-  Journal.register
-    "Scope.Datascope.get_data_scope_at_stmt"
-    (Datatype.func3
-       Kernel_function.ty
-       Cil_datatype.Stmt.ty
-       Cil_datatype.Lval.ty
-       (Datatype.pair
-          Cil_datatype.Stmt.Hptset.ty
-          (Datatype.pair Cil_datatype.Stmt.Hptset.ty
-             Cil_datatype.Stmt.Hptset.ty)))
-    get_data_scope_at_stmt
-
-let get_prop_scope_at_stmt =
-  Journal.register
-    "Scope.Datascope.get_prop_scope_at_stmt"
-    (Datatype.func3
-       Kernel_function.ty
-       Cil_datatype.Stmt.ty
-       Cil_datatype.Code_annotation.ty
-       (Datatype.pair
-          (Cil_datatype.Stmt.Hptset.ty)
-          (Datatype.list Cil_datatype.Code_annotation.ty)))
-    get_prop_scope_at_stmt
-
-let check_asserts =
-  Journal.register
-    "Scope.Datascope.check_asserts"
-    (Datatype.func Datatype.unit (Datatype.list Cil_datatype.Code_annotation.ty))
-    check_asserts
-
-let rm_asserts =
-  Journal.register
-    "Scope.Datascope.rm_asserts"
-    (Datatype.func Datatype.unit Datatype.unit)
-    rm_asserts
 
 let () =
-  Db.register
-    (Db.Journalize
-       ("Value.rm_asserts", Datatype.func Datatype.unit Datatype.unit))
-    Db.Value.rm_asserts rm_asserts
+  Db.register   Db.Value.rm_asserts rm_asserts
 
 let rm_asserts =
   Dynamic.register
@@ -688,7 +649,6 @@ let rm_asserts =
     ~plugin:name
     "rm_asserts"
     Datatype.(func unit unit)
-    ~journalize:true
     rm_asserts
 
 (*

@@ -93,12 +93,6 @@ let get kf =
     find kf
   end
 
-let get =
-  Journal.register
-    "Users.get"
-    (Datatype.func Kernel_function.ty Kernel_function.Hptset.ty)
-    get
-
 let print () =
   if ForceUsers.get () then
     result "@[<v>====== DISPLAYING USERS ======@ %t\

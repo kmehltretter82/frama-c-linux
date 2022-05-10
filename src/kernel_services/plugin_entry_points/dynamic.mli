@@ -30,7 +30,7 @@
 val register:
   ?comment:string ->
   plugin:string ->
-  string -> 'a Type.t -> journalize:bool -> 'a -> 'a
+  string -> 'a Type.t -> 'a -> 'a
 (** [register ~plugin name ty v] registers [v] with the name
     [name], the type [ty] and the plug-in [plugin].
     @raise Type.AlreadyExists if [name] already exists. In other words you

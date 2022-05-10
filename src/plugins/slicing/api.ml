@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 
 (* ---------------------------------------------------------------------- *)
 (** Global data management *)
@@ -52,17 +51,7 @@ let set_modes calls callers sliceUndef keepAnnotations () =
   SlicingParameters.Mode.Callers.set callers ;
   SlicingParameters.Mode.SliceUndef.set sliceUndef;
   SlicingParameters.Mode.KeepAnnotations.set keepAnnotations
-let set_modes =
-  Journal.register "Slicing.Api.set_modes"
-    (Datatype.func4
-       ~label1:("calls", None) Datatype.int
-       ~label2:("callers", None) Datatype.bool
-       ~label3:("sliceUndef", None) Datatype.bool
-       ~label4:("keepAnnotations", None) Datatype.bool
-       (Datatype.func
-          Datatype.unit
-          Datatype.unit))
-    set_modes
+
 let set_modes ?(calls=SlicingParameters.Mode.Calls.get ())
     ?(callers=SlicingParameters.Mode.Callers.get ())
     ?(sliceUndef=SlicingParameters.Mode.SliceUndef.get ())
@@ -78,49 +67,18 @@ module Project = struct
   (** {2 Values } *)
 
   let default_slice_names = SlicingTransform.default_slice_names
-  let () =
-    Journal.Binding.add
-      (Datatype.func3
-         Kernel_function.ty Datatype.bool Datatype.int Datatype.string)
-      default_slice_names
-      "Slicing.Api.Project.default_slice_names"
 
   (** {2 Functions with journalized side effects } *)
 
-  let reset_slicing = Journal.register "Slicing.Api.Project.reset_slicing"
-      (Datatype.func Datatype.unit Datatype.unit)
-      SlicingState.reset_slicing
+  let reset_slicing = SlicingState.reset_slicing
 
-  let extract f_slice_names = SlicingTransform.extract ~f_slice_names
-  let extract = Journal.register "Slicing.Api.Project.extract"
-      (Datatype.func2
-         ~label1:("f_slice_names",
-                  Some (fun () -> default_slice_names))
-         (Datatype.func3
-            Kernel_function.ty Datatype.bool Datatype.int Datatype.string)
-         Datatype.string
-         Project.ty)
-      extract
   let extract ?(f_slice_names=default_slice_names) new_proj_name =
-    extract f_slice_names new_proj_name
+    SlicingTransform.extract ~f_slice_names new_proj_name
 
-  let print_dot = PrintSlice.build_dot_project
-  let print_dot = Journal.register "Slicing.Api.Project.print_dot"
-      (Datatype.func2
-         ~label1:("filename", None) Datatype.string
-         ~label2:("title", None) Datatype.string
-         Datatype.unit)
-      print_dot
   let print_dot ~filename ~title =
-    print_dot filename title
+    PrintSlice.build_dot_project filename title
 
-  let change_slicing_level =
-    Journal.register "Slicing.Api.Project.change_slicing_level"
-      (Datatype.func2
-         Kernel_function.ty
-         Datatype.int
-         Datatype.unit)
-      SlicingMacros.change_slicing_level
+  let change_slicing_level = SlicingMacros.change_slicing_level
 
   (** {2 No needs of Journalization} *)
 
@@ -162,195 +120,15 @@ module Select = struct
 
   type t = SlicingTypes.sl_select
   let dyn_t = SlicingTypes.Sl_select.ty
-  type set = SlicingCmds.set
+
   module S = Cil_datatype.Varinfo.Map.Make(SlicingTypes.Fct_user_crit)
   let dyn_set = S.ty
-  (** {2 Journalized selectors } *)
+  let empty_selects = Cil_datatype.Varinfo.Map.empty
 
-  let empty_selects = Journal.register
-      "Slicing.Api.Select.empty_selects"
-      dyn_set
-      Cil_datatype.Varinfo.Map.empty
+  include SlicingCmds
+  let get_function = get_select_kf
 
-  let select_stmt set spare = SlicingCmds.select_stmt set ~spare
-  let select_stmt = Journal.register "Slicing.Api.Select.select_stmt"
-      (Datatype.func4
-         dyn_set
-         ~label2:("spare", None) Datatype.bool
-         Stmt.ty
-         Kernel_function.ty
-         dyn_set)
-      select_stmt
-  let select_stmt set ~spare =
-    select_stmt set spare
-
-  let select_stmt_ctrl set spare = SlicingCmds.select_stmt_ctrl set ~spare
-  let select_stmt_ctrl = Journal.register "Slicing.Api.Select.select_stmt_ctrl"
-      (Datatype.func4
-         dyn_set
-         ~label2:("spare", None) Datatype.bool
-         Stmt.ty
-         Kernel_function.ty
-         dyn_set)
-      select_stmt_ctrl
-  let select_stmt_ctrl set ~spare =
-    select_stmt_ctrl set spare
-
-  let select_stmt_lval_rw set mark rd wr stmt eval =
-    SlicingCmds.select_stmt_lval_rw set mark ~rd ~wr stmt ~eval
-  let select_stmt_lval_rw = Journal.register
-      "Slicing.ApiSelect.select_stmt_lval_rw"
-      (Datatype.func4
-         dyn_set
-         SlicingTypes.dyn_sl_mark
-         ~label3:("rd", None) Datatype.String.Set.ty
-         ~label4:("wr", None) Datatype.String.Set.ty
-         (Datatype.func3
-            Stmt.ty
-            ~label2:("eval", None) Stmt.ty
-            Kernel_function.ty
-            dyn_set))
-      select_stmt_lval_rw
-  let select_stmt_lval_rw set mark ~rd ~wr stmt ~eval =
-    select_stmt_lval_rw set mark rd wr stmt eval
-
-  let select_stmt_lval set mark lval before stmt eval =
-    SlicingCmds.select_stmt_lval set mark lval ~before stmt ~eval
-  let select_stmt_lval = Journal.register "Slicing.Api.Select.select_stmt_lval"
-      (Datatype.func4
-         dyn_set
-         Mark.dyn_t
-         Datatype.String.Set.ty
-         ~label4:("before", None) Datatype.bool
-         (Datatype.func3
-            Stmt.ty
-            ~label2:("eval", None) Stmt.ty
-            Kernel_function.ty
-            dyn_set))
-      select_stmt_lval
-  let select_stmt_lval set mark lval ~before stmt ~eval =
-    select_stmt_lval set mark lval before stmt eval
-
-  let select_stmt_annots set mark spare threat user_assert slicing_pragma loop_inv loop_var =
-    SlicingCmds.select_stmt_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var
-  let select_stmt_annots = Journal.register
-      "Slicing.Api.Select.select_stmt_annots"
-      (Datatype.func4
-         dyn_set
-         Mark.dyn_t
-         ~label3:("spare", None) Datatype.bool
-         ~label4:("threat", None) Datatype.bool
-         (Datatype.func4
-            ~label1:("user_assert", None) Datatype.bool
-            ~label2:("slicing_pragma", None) Datatype.bool
-            ~label3:("loop_inv", None) Datatype.bool
-            ~label4:("loop_var", None) Datatype.bool
-            (Datatype.func2
-               Stmt.ty
-               Kernel_function.ty
-               dyn_set)))
-      select_stmt_annots
-  let select_stmt_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var =
-    select_stmt_annots set mark spare threat user_assert slicing_pragma loop_inv loop_var
-
-  let select_func_lval = Journal.register "Slicing.Api.Select.select_func_lval"
-      (Datatype.func4
-         dyn_set
-         Mark.dyn_t
-         Datatype.String.Set.ty
-         Kernel_function.ty
-         dyn_set)
-      SlicingCmds.select_func_lval
-
-  let select_func_lval_rw set mark rd wr eval =
-    SlicingCmds.select_func_lval_rw set mark ~rd ~wr ~eval
-  let select_func_lval_rw = Journal.register
-      "Slicing.Api.Select.select_func_lval_rw"
-      (Datatype.func4
-         dyn_set
-         Mark.dyn_t
-         ~label3:("rd", None) Datatype.String.Set.ty
-         ~label4:("wr", None) Datatype.String.Set.ty
-         (Datatype.func2
-            ~label1:("eval", None) Stmt.ty
-            Kernel_function.ty
-            dyn_set))
-      select_func_lval_rw
-  let select_func_lval_rw set mark ~rd ~wr ~eval =
-    select_func_lval_rw set mark rd wr eval
-
-  let select_func_return set spare =
-    SlicingCmds.select_func_return set ~spare
-  let select_func_return = Journal.register
-      "Slicing.Api.Select.select_func_return"
-      (Datatype.func3
-         dyn_set
-         ~label2:("spare", None) Datatype.bool
-         Kernel_function.ty
-         dyn_set)
-      select_func_return
-  let select_func_return set ~spare = select_func_return set spare
-
-  let select_func_calls_to set spare =
-    SlicingCmds.select_func_calls_to set ~spare
-  let select_func_calls_to = Journal.register
-      "Slicing.Api.Select.select_func_calls_to"
-      (Datatype.func3
-         dyn_set
-         ~label2:("spare", None) Datatype.bool
-         Kernel_function.ty
-         dyn_set)
-      select_func_calls_to
-  let select_func_calls_to set ~spare =
-    select_func_calls_to set spare
-
-  let select_func_calls_into set spare =
-    SlicingCmds.select_func_calls_into set ~spare
-  let select_func_calls_into = Journal.register
-      "Slicing.Api.Select.select_func_calls_into"
-      (Datatype.func3
-         dyn_set
-         ~label2:("spare", None) Datatype.bool
-         Kernel_function.ty
-         dyn_set)
-      select_func_calls_into
-  let select_func_calls_into set ~spare =
-    select_func_calls_into set spare
-
-  let select_func_annots set mark spare threat user_assert slicing_pragma loop_inv loop_var =
-    SlicingCmds.select_func_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var
-  let select_func_annots = Journal.register
-      "Slicing.Api.Select.select_func_annots"
-      (Datatype.func4
-         dyn_set
-         Mark.dyn_t
-         ~label3:("spare", None) Datatype.bool
-         ~label4:("threat", None) Datatype.bool
-         (Datatype.func4
-            ~label1:("user_assert", None) Datatype.bool
-            ~label2:("slicing_pragma", None) Datatype.bool
-            ~label3:("loop_inv", None) Datatype.bool
-            ~label4:("loop_var", None) Datatype.bool
-            (Datatype.func Kernel_function.ty dyn_set)))
-      select_func_annots
-  let select_func_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var =
-    select_func_annots set mark spare threat user_assert slicing_pragma loop_inv loop_var
-
-  (** {2 No Journalization} *)
-
-  let select_func_zone = SlicingCmds.select_func_zone
-  let select_stmt_term = SlicingCmds.select_stmt_term
-  let select_stmt_pred = SlicingCmds.select_stmt_pred
-  let select_stmt_annot = SlicingCmds.select_stmt_annot
-  let select_stmt_zone = SlicingCmds.select_stmt_zone
-
-  let select_pdg_nodes = SlicingCmds.select_pdg_nodes
-
-  (** {2 No Journalization} *)
-
-  let get_function = SlicingCmds.get_select_kf
   let merge_internal = SlicingSelect.merge_db_select
-
   let add_to_selects_internal = SlicingSelect.Selections.add_to_selects
   let iter_selects_internal = SlicingSelect.Selections.iter_selects_internal
   let fold_selects_internal = SlicingSelect.Selections.fold_selects_internal
@@ -384,19 +162,13 @@ module Slice = struct
   (** {2 Functions with journalized side effects } *)
 
   let create =
-    Journal.register "Slicing.Api.Slice.create"
-      (Datatype.func Kernel_function.ty dyn_t)
-      SlicingProject.create_slice
+    SlicingProject.create_slice
 
   let remove =
-    Journal.register "Slicing.Api.Slice.remove"
-      (Datatype.func dyn_t Datatype.unit)
-      SlicingProject.remove_ff
+    SlicingProject.remove_ff
 
   let remove_uncalled =
-    Journal.register "Slicing.Api.Slice.remove_uncalled"
-      (Datatype.func Datatype.unit Datatype.unit)
-      SlicingProject.remove_uncalled_slices
+    SlicingProject.remove_uncalled_slices
 
   (** {2 No needs of Journalization} *)
 
@@ -458,104 +230,48 @@ module Request = struct
 
   let apply_all propagate_to_callers =
     SlicingCmds.apply_all ~propagate_to_callers
-  let apply_all = Journal.register "Slicing.Api.Request.apply_all"
-      (Datatype.func
-         ~label:("propagate_to_callers", None) Datatype.bool
-         Datatype.unit)
-      apply_all
   let apply_all ~propagate_to_callers =
     apply_all propagate_to_callers
 
   let apply_all_internal =
-    Journal.register "Slicing.Api.Request.apply_all_internal"
-      (Datatype.func Datatype.unit Datatype.unit)
-      SlicingCmds.apply_all_actions
+    SlicingCmds.apply_all_actions
 
   let apply_next_internal =
-    Journal.register "Slicing.Api.Request.apply_next_internal"
-      (Datatype.func Datatype.unit Datatype.unit)
-      SlicingCmds.apply_next_action
+    SlicingCmds.apply_next_action
 
   let propagate_user_marks =
-    Journal.register "Slicing.Api.Request.propagate_user_marks"
-      (Datatype.func Datatype.unit Datatype.unit)
-      SlicingCmds.topologic_propagation
+    SlicingCmds.topologic_propagation
 
-  let copy_slice = Journal.register "Slicing.Api.Request.copy_slice"
-      (Datatype.func
-         Slice.dyn_t
-         Slice.dyn_t)
-      copy_slice
+  let copy_slice = copy_slice
 
-  let split_slice = Journal.register "Slicing.Api.Request.split_slice"
-      (Datatype.func
-         Slice.dyn_t
-         (Datatype.list Slice.dyn_t))
-      split_slice
+  let split_slice = split_slice
 
-  let merge_slices ff_1 ff_2 replace =
-    merge_slices ff_1 ff_2 ~replace
-  let merge_slices = Journal.register "Slicing.Api.Request.merge_slices"
-      (Datatype.func3
-         Slice.dyn_t
-         Slice.dyn_t
-         ~label3:("replace", None) Datatype.bool
-         Slice.dyn_t)
-      merge_slices
   let merge_slices ff_1 ff_2 ~replace =
-    merge_slices ff_1 ff_2 replace
+    merge_slices ff_1 ff_2 ~replace
 
   let add_call_slice caller to_call =
     SlicingSelect.call_ff_in_caller ~caller ~to_call
-  let add_call_slice =
-    Journal.register "Slicing.Api.Request.add_call_slice"
-      (Datatype.func2
-         ~label1:("caller", None) Slice.dyn_t
-         ~label2:("to_call", None) Slice.dyn_t
-         Datatype.unit)
-      add_call_slice
   let add_call_slice ~caller ~to_call =
     add_call_slice caller to_call
 
   let add_call_fun caller to_call =
     SlicingSelect.call_fsrc_in_caller ~caller ~to_call
-  let add_call_fun =
-    Journal.register "Slicing.Api.Request.add_call_fun"
-      (Datatype.func2
-         ~label1:("caller", None) Slice.dyn_t
-         ~label2:("to_call", None) Kernel_function.ty
-         Datatype.unit)
-      add_call_fun
   let add_call_fun ~caller ~to_call =
     add_call_fun caller to_call
 
   let add_call_min_fun caller to_call =
     SlicingSelect.call_min_f_in_caller ~caller ~to_call
-  let add_call_min_fun =
-    Journal.register "Slicing.Api.Request.add_call_min_fun"
-      (Datatype.func2
-         ~label1:("caller", None) Slice.dyn_t
-         ~label2:("to_call", None) Kernel_function.ty
-         Datatype.unit)
-      add_call_min_fun
   let add_call_min_fun ~caller ~to_call =
     add_call_min_fun caller to_call
 
-  let add_selection = Journal.register "Slicing.Request.add_selection"
-      (Datatype.func
-         Select.dyn_set Datatype.unit)
-      SlicingCmds.add_selection
+  let add_selection =
+    SlicingCmds.add_selection
 
   let add_persistent_selection =
-    Journal.register "Slicing.Request.add_persistent_selection"
-      (Datatype.func
-         Select.dyn_set Datatype.unit)
-      SlicingCmds.add_persistent_selection
+    SlicingCmds.add_persistent_selection
 
   let add_persistent_cmdline =
-    Journal.register "Slicing.Request.add_persistent_cmdline"
-      (Datatype.func Datatype.unit Datatype.unit)
-      SlicingCmds.add_persistent_cmdline
+    SlicingCmds.add_persistent_cmdline
 
   (** {2 No needs of Journalization} *)
 
