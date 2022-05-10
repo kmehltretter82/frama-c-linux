@@ -355,7 +355,7 @@ let exclude s = exclude_suites := s :: !exclude_suites
 let macro_post_options = ref "" (* value set to @PTEST_POST_OPTIONS@ macro *)
 let macro_pre_options  = ref "" (* value set to @PTEST_PRE_OPTIONS@  macro *)
 let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
-let macro_default_options = ref "-journal-disable -check -no-autoload-plugins"
+let macro_default_options = ref "-check -no-autoload-plugins"
 
 let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
 let macro_frama_c     = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"

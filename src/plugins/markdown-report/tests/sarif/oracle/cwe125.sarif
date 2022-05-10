@@ -16,10 +16,9 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report cwe125.c -save ./cwe125_parse.sav",
+            "frama-c -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report cwe125.c -save ./cwe125_parse.sav",
           "arguments": [
-            "-journal-disable", "-check", "-no-autoload-plugins",
-            "-add-symbolic-path", ":.",
+            "-check", "-no-autoload-plugins", "-add-symbolic-path", ":.",
             "-load-module=eva,from,scope,markdown_report", "cwe125.c",
             "-save", "./cwe125_parse.sav"
           ],
@@ -28,10 +27,9 @@
         },
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_parse.sav -eva -save ./cwe125_eva.sav",
+            "frama-c -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_parse.sav -eva -save ./cwe125_eva.sav",
           "arguments": [
-            "-journal-disable", "-check", "-no-autoload-plugins",
-            "-add-symbolic-path", ":.",
+            "-check", "-no-autoload-plugins", "-add-symbolic-path", ":.",
             "-load-module=eva,from,scope,markdown_report", "-load",
             "./cwe125_parse.sav", "-eva", "-save", "./cwe125_eva.sav"
           ],
@@ -40,10 +38,9 @@
         },
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_eva.sav -then -mdr-out ./cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
+            "frama-c -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_eva.sav -then -mdr-out ./cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
           "arguments": [
-            "-journal-disable", "-check", "-no-autoload-plugins",
-            "-add-symbolic-path", ":.",
+            "-check", "-no-autoload-plugins", "-add-symbolic-path", ":.",
             "-load-module=eva,from,scope,markdown_report", "-load",
             "./cwe125_eva.sav", "-then", "-mdr-out", "./cwe125.sarif",
             "-mdr-gen", "sarif", "-mdr-no-print-libc",
