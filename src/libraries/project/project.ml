@@ -51,12 +51,6 @@ module D =
       let hash p = p.pid
       let rehash x = !rehash_ref x
       let copy = Datatype.undefined
-      let internal_pretty_code p_caller fmt p =
-        let pp f =
-          Format.fprintf
-            f "@[<hv 2>Project.from_unique_name@;%S@]" p.unique_name
-        in
-        Type.par p_caller Type.Call fmt pp
       let pretty fmt p = Format.fprintf fmt "project %S" p.unique_name
       let varname p = "p_" ^ p.name
       let mem_project f x = f x

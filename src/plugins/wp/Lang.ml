@@ -684,7 +684,6 @@ struct
         let copy _old = QZERO.create ()
         let varname = Datatype.undefined
         let pretty = Datatype.undefined
-        let internal_pretty_code = Datatype.undefined
         let mem_project _ _ = false
       end)
 

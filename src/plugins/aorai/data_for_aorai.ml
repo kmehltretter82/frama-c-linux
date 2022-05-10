@@ -45,10 +45,8 @@ module Aorai_state =
     let rehash = Datatype.identity
     let compare x y = Datatype.Int.compare x.nums y.nums
     let copy = Datatype.identity
-    let internal_pretty_code = Datatype.undefined
     let pretty fmt x = Format.fprintf fmt "state_%d" x.nums
-    let varname _ =
-      assert false (* unused while internal_pretty_code is undefined *)
+    let varname _ = assert false
     let mem_project = Datatype.never_any_project
   end
   )
@@ -67,7 +65,6 @@ module Aorai_typed_trans =
     let rehash = Datatype.identity
     let compare x y = Datatype.Int.compare x.numt y.numt
     let copy = Datatype.identity
-    let internal_pretty_code = Datatype.undefined
     let pretty = Promelaoutput.Typed.print_transition
     let varname _ = assert false
     let mem_project = Datatype.never_any_project
@@ -1815,7 +1812,6 @@ module Range = Datatype.Make_with_collections
           Bounded(Datatype.Int.copy c1, Cil_datatype.Term.copy c2)
         | Unbounded c1 -> Unbounded (Datatype.Int.copy c1)
         | Unknown -> Unknown
-      let internal_pretty_code _ = Datatype.from_pretty_code
       let pretty fmt = function
         | Fixed c1 -> Format.fprintf fmt "%d" c1
         | Interval (c1,c2) ->

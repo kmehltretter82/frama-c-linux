@@ -533,7 +533,6 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
                 create l x d r
             in aux
 
-        let internal_pretty_code = Datatype.undefined
         let pretty = Datatype.undefined
         let varname = Datatype.undefined
         let mem_project =

@@ -861,7 +861,7 @@ let removeUnmarked isRoot ast reachable_tbl =
             begin
               try
                 let kf = Globals.Functions.get vi in
-                Kernel.debug ~dkey "GFunDecl: %a@." Kernel_function.pretty_code kf
+                Kernel.debug ~dkey "GFunDecl: %a@." Kernel_function.pretty kf
               with Not_found ->
                 Kernel.debug ~dkey
                   "GFunDecl: %a (no associated kernel function)@."

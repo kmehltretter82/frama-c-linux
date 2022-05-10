@@ -86,7 +86,6 @@ include Datatype.Make_with_collections
       let equal (k1:k) k2 = k1 = k2
       let compare (k1:k) k2 = Stdlib.compare k1 k2
       let varname _ = "k"
-      let internal_pretty_code = Datatype.undefined
       let copy = Datatype.identity
       let structural_descr = Structural_descr.t_abstract
       let rehash = Datatype.identity

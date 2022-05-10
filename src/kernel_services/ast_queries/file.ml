@@ -27,12 +27,6 @@ open Cil_datatype
 
 type cpp_opt_kind = Gnu | Not_gnu | Unknown
 
-let pretty_cpp_opt_kind fmt =
-  function
-  | Gnu -> Format.pp_print_string fmt "Gnu"
-  | Not_gnu -> Format.pp_print_string fmt "Not_gnu"
-  | Unknown -> Format.pp_print_string fmt "Unknown"
-
 type file =
   | NeedCPP of
       Filepath.Normalized.t (* Filename of the [.c] to preprocess. *)
@@ -62,22 +56,6 @@ module D =
       let structural_descr = Structural_descr.t_abstract
       let mem_project = Datatype.never_any_project
       let copy = Datatype.identity (* immutable strings *)
-      let internal_pretty_code p_caller fmt t =
-        let pp fmt = match t with
-          | NoCPP s ->
-            Format.fprintf fmt "@[File.NoCPP %a@]" Filepath.Normalized.pretty s
-          | External (f,p) ->
-            Format.fprintf fmt "@[File.External (%a,%S)@]"
-              Filepath.Normalized.pretty f p
-          | NeedCPP (f,cmd,extra,kind) ->
-            Format.fprintf
-              fmt "@[File.NeedCPP (%a,%S,%S,%a)@]"
-              Filepath.Normalized.pretty f
-              cmd
-              (String.concat " " extra)
-              pretty_cpp_opt_kind kind
-        in
-        Type.par p_caller Type.Call fmt pp
     end)
 include D
 

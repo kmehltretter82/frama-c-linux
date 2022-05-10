@@ -160,7 +160,6 @@ module Builtin_template = struct
         let hash b = Datatype.String.hash b.name
         let equal b1 b2 = b1.name = b2.name
         let copy = Datatype.identity
-        let internal_pretty_code = Datatype.undefined
         let pretty fmt b =
           Format.fprintf fmt "%s %s(%a%s)"
             b.rettype b.name

@@ -104,11 +104,6 @@ include Datatype.Make_with_collections
       let hash x = Hashtbl.hash x.unique_name
       let copy = Datatype.undefined
       let rehash = Datatype.undefined
-      let internal_pretty_code p_caller fmt s =
-        let pp fmt =
-          Format.fprintf fmt "@[<hv 2>State.get@;%S@]" s.unique_name
-        in
-        Type.par p_caller Type.Call fmt pp
       let pretty fmt s = Format.fprintf fmt "state %S" s.unique_name
       let varname = Datatype.undefined
       let mem_project = Datatype.never_any_project

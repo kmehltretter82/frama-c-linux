@@ -308,7 +308,6 @@ module D =
         | Invalid_bool lv ->
           Format.fprintf fmt "Invalid_bool(@[%a@])" Lval.pretty lv
 
-      let internal_pretty_code = Datatype.undefined
       let copy = Datatype.undefined
       let mem_project = Datatype.never_any_project
     end)

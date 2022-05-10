@@ -59,11 +59,6 @@ struct
   let map f = function
     | `Same x -> `Same (f x)
     | `Not_present -> `Not_present
-  let mk_internal_pretty_code pp prec fmt = function
-    | `Not_present -> Format.pp_print_string fmt "`Not_present"
-    | `Same x ->
-      let pp fmt = Format.fprintf fmt "`Same %a" (pp Type.Call) x in
-      Type.par prec Call fmt pp
   let mk_pretty pp fmt = function
     | `Not_present -> Format.pp_print_string fmt "N/A"
     | `Same x -> Format.fprintf fmt " => %a" pp x
@@ -111,12 +106,6 @@ let compare_pc pc1 pc2 =
   | _, `Callees_changed -> 1
   | `Callees_spec_changed, `Callees_spec_changed -> 0
 
-let string_of_pc = function
-  | `Spec_changed -> "Spec_changed"
-  | `Body_changed -> "Body_changed"
-  | `Callees_changed -> "Callees_changed"
-  | `Callees_spec_changed -> "Callees_spec_changed"
-
 let pretty_pc fmt =
   let open Format in
   function
@@ -162,16 +151,6 @@ struct
   let map f = function
     | `Partial(x,pc) -> `Partial(f x,pc)
     | (#correspondance as x) -> Correspondance_input.map f x
-
-  let mk_internal_pretty_code pp prec fmt = function
-    | `Partial (x,flags) ->
-      let pp fmt =
-        Format.fprintf fmt "`Partial (%a,%s)"
-          (pp Type.Call) x (string_of_pc flags)
-      in
-      Type.par prec Call fmt pp
-    | #correspondance as x ->
-      Correspondance_input.mk_internal_pretty_code pp prec fmt x
 
   let mk_pretty pp fmt = function
     | `Partial(x,flags) ->

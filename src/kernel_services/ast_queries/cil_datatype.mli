@@ -269,8 +269,6 @@ module Varinfo: sig
   end
   val dummy: t
   (**/**)
-  val internal_pretty_code_ref:
-    (Type.precedence -> Format.formatter -> t -> unit) ref
 end
 
 module Kf: sig

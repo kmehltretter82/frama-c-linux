@@ -80,9 +80,6 @@ module Sl_fct_slice : Datatype.S with type t = SlicingInternals.fct_slice
 
 val dyn_sl_fct_slice : Sl_fct_slice.t Type.t
 
-val pp_sl_mark :
-  Type.precedence -> Format.formatter -> SlicingInternals.pdg_mark -> unit
-
 module Sl_mark : Datatype.S_with_collections with
   type t = SlicingInternals.pdg_mark
 

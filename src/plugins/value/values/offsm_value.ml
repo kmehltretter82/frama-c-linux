@@ -372,7 +372,6 @@ module Datatype_Offsm_or_top = Datatype.Make_with_collections(struct
       | Top -> 7895
       | O o -> V_Offsetmap.hash o
     let copy = Datatype.undefined
-    let internal_pretty_code = Datatype.undefined
     let pretty fmt = function
       | Top -> Format.pp_print_string fmt "TopO"
       | O o -> Format.fprintf fmt "O @[%a@]" V_Offsetmap.pretty o

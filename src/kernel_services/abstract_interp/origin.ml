@@ -135,7 +135,6 @@ include Datatype.Make
       let hash = hash
       let rehash = Datatype.undefined
       let copy = Datatype.undefined
-      let internal_pretty_code = Datatype.undefined
       let pretty = pretty
       let varname = Datatype.undefined
       let mem_project = Datatype.never_any_project
