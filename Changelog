@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ##################################
 
+####################################
+Open Source Release 25.0 (Manganese)
+####################################
+
 o   Kernel    [2022-05-03] Prototype of AST comparison between two versions
               of the same program, via the new option -ast-diff.
 -   Eva       [2022-05-02] Fixes stack overflow errors on very large C functions.
