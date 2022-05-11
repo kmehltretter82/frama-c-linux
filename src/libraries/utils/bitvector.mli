@@ -55,6 +55,7 @@ val compare: t -> t -> int
 val hash: t -> int
 
 (** {2 Bitwise Binary Operations}
+
     The first argument is the size of the vectors. *)
 
 val bnot: int -> t -> t
@@ -64,6 +65,7 @@ val bxor: int -> t -> t -> t        (* bitwise difference *)
 val beq: int -> t -> t -> t         (* bitwise equivalence/equality *)
 
 (** {2 Generic Bitwise Operations}.
+
     Prefer using these rather than create intermediary bitvectors. *)
 
 val bitwise_op2: int -> (int -> int -> int) -> t -> t -> t

@@ -787,7 +787,7 @@ and binop =
 (** Left values (aka Lvalues) are the sublanguage of expressions that can appear
     at the left of an assignment or as operand to the address-of operator.  In C
     the syntax for lvalues is not always a good indication of the meaning of the
-    lvalue. For example the C value {v a[0][1][2] v} might involve 1, 2 or 3
+    lvalue. For example the C value [a[0][1][2]] might involve 1, 2 or 3
     memory reads when used in an expression context, depending on the declared
     type of the variable [a]. If [a] has type [int \[4\]\[4\]\[4\]] then we have
     one memory read from somewhere inside the area that stores the array [a]. On
@@ -822,7 +822,8 @@ and binop =
     - {!Cil.removeOffset} and {!Cil.removeOffsetLval} - shrink sequences
       of offsets.
 
-    The following equivalences hold {v
+    The following equivalences hold
+    {v
     Mem(AddrOf(Mem a, aoff)), off   = Mem a, aoff + off
     Mem(AddrOf(Var v, aoff)), off   = Var v, aoff + off
     AddrOf (Mem a, NoOffset)        = a

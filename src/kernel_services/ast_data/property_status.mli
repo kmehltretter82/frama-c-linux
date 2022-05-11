@@ -68,7 +68,8 @@ val emit:
     the best status is changed accordingly. One example when [~distinct:true]
     may be required is when emitting a status for a pre-condition of a function
     [f] since the status associated to a pre-condition [p] merges all statuses
-    of [p] at each callsite of the function [f].  @return the kept status.
+    of [p] at each callsite of the function [f].
+    @return the kept status.
     @raise Inconsistent_emitted_status when emitting False after emitting True
     or conversely *)
 

@@ -21,10 +21,8 @@
 (**************************************************************************)
 
 (** All these functions find the nodes needed for various kind of annotations.
- *
- * @raise Kernel_function.No_Definition on annotations for function declarations.
- *
- * *)
+    @raise Kernel_function.No_Definition on annotations for function declarations.
+*)
 
 (** [data_info] is composed of [(node,z_part) list, undef_loc)]
  *             and correspond to data dependencies nodes.

@@ -545,7 +545,9 @@ module States: sig
   (** iterates a function [f] over all registered states.  Arguments of [f] are
       its name, its type value, its value for the given project
       ([Project.current ()] by default) and a boolean which indicates if it is
-      already computed.  @since Fluorine-20130401 *)
+      already computed.
+      @since Fluorine-20130401
+  *)
 
   val fold:
     ?prj:Project.t ->
