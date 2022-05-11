@@ -47,7 +47,6 @@ o   Eva       [2022-02-15] New API to run the analysis and access its results,
               See file Eva.mli for more details.
 *   Kernel    [2022-02-08] Reject array whose size is too big with a proper
               error message instead of a crash (fixes ##2590)
-o!  Kernel    [2022-01-19] Removed obsolete AST nodes IndexPI and Info
 o!  Kernel    [2022-02-19] Removed obsolete AST nodes IndexPI and Info
 *   Kernel    [2022-02-08] Reject array whose size is too big with a proper
               error message instead of a crash (fixes ##2590)
