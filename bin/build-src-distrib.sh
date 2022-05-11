@@ -767,13 +767,17 @@ case "${STEP}" in
     6)
         step 6 "PREPARE WIKI"
         assert_out_dir
-        run "git -C $WIKI_DIR reset --hard"
+        run "git -C $WIKI_DIR checkout master"
+        run "git -C $WIKI_DIR fetch origin"
+        run "git -C $WIKI_DIR reset --hard origin/master"
         fill_wiki
         ;&
     7)
         step 7 "PREPARE WEBSITE"
         assert_out_dir
-        run "git -C $WEBSITE_DIR reset --hard"
+        run "git -C $WEBSITE_DIR checkout master"
+        run "git -C $WEBSITE_DIR fetch origin"
+        run "git -C $WEBSITE_DIR reset --hard origin/master"
         fill_website
         ;&
     8)
