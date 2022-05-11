@@ -85,7 +85,7 @@ There are many administrative steps, coordinated by the release manager.
   to use a tilde \textasciitilde{} between the version number and \texttt{beta},
   and not a dash \texttt{-}.
 \item Create the last commit
-\item Create the tag using \texttt{git tag \$(cat VERSION)} and push it (e.g. via \texttt{git push origin \$(cat VERSION)})
+\item Create the tag using \texttt{git tag \$(cat VERSION | sed -e "s/~/-/")} and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/~/-/")})
 \end{enumerate}
 
 \section{Update the Documentation}\label{update_doc}
