@@ -761,6 +761,29 @@ module ScriptOnStdout = False
     end)
 
 let () = Parameter_customize.set_group wp_prover
+module PrepareScripts = Action
+    (struct
+      let option_name = "-wp-prepare-scripts"
+      let help = "Initialize script tracking"
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module FinalizeScripts = Action
+    (struct
+      let option_name = "-wp-finalize-scripts"
+      let help = "Remove untracked scripts"
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module DryFinalizeScripts = False
+    (struct
+      let option_name = "-wp-dry-finalize-scripts"
+      let help =
+        "Scripts that might be removed by -wp-finalize-scripts are kept, a \
+         message is printed instead for each file."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module Detect = Action
     (struct
       let option_name = "-wp-detect"
