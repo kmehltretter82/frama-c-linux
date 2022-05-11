@@ -185,10 +185,14 @@ let normalize ?(existence=Indifferent) ?base_name path_name =
 let symbolic_dirs = Hashtbl.create 3
 
 let add_symbolic_dir name dir =
-  Hashtbl.replace symbolic_dirs name dir;
+  Hashtbl.replace symbolic_dirs dir name ;
   (insert cwd (dir:>string)).symbolic_name <- Some name
 
 let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
+
+let all_symbolic_dirs () =
+  List.sort Extlib.compare_basic @@
+  Hashtbl.fold (fun dir name acc -> (name, dir) :: acc) symbolic_dirs []
 
 let rec add_uri_path buffer path =
   let open Buffer in
@@ -221,9 +225,6 @@ let rec skip_dot file_name =
   if Extlib.string_prefix "./" file_name then
     skip_dot (String.sub file_name 2 (String.length file_name - 2))
   else file_name
-
-let all_symbolic_dirs () =
-  Hashtbl.fold (fun name dir acc -> (name, dir) :: acc) symbolic_dirs []
 
 let pretty file_name =
   if Filename.is_relative file_name then
